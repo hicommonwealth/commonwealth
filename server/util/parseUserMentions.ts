@@ -5,7 +5,11 @@ export const parseUserMentions = (text): any[] => {
     const parsedText = JSON.parse(text);
     return (parsedText.ops || [])
       .filter((op) => {
-        return op.attributes?.link?.length > 0 && typeof op.insert === 'string' && op.insert?.slice(0, 1) === '@';
+        return (
+          op.attributes?.link?.length > 0 &&
+          typeof op.insert === 'string' &&
+          op.insert?.slice(0, 1) === '@'
+        );
       })
       .map((op) => {
         const chunks = op.attributes.link.split('/');

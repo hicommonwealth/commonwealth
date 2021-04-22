@@ -14,7 +14,10 @@ import { IApp } from 'state';
 import EthereumTokenChain from './chain';
 import TokenAPI from './api';
 
-export default class Token extends IChainAdapter<EthereumCoin, EthereumAccount> {
+export default class Token extends IChainAdapter<
+  EthereumCoin,
+  EthereumAccount
+> {
   public readonly base = ChainBase.Ethereum;
   public readonly class;
   public readonly contractAddress;
@@ -22,7 +25,7 @@ export default class Token extends IChainAdapter<EthereumCoin, EthereumAccount> 
 
   public chain: EthereumTokenChain;
   public accounts: EthereumAccounts;
-  public hasToken: boolean = false;
+  public hasToken = false;
 
   public readonly webWallet: EthWebWalletController = new EthWebWalletController();
   public readonly chainEntities = new ChainEntityController();
@@ -42,14 +45,24 @@ export default class Token extends IChainAdapter<EthereumCoin, EthereumAccount> 
 
     if (this.webWallet) {
       await this.webWallet.enable();
-      await this.webWallet.web3.givenProvider.on('accountsChanged', async (accounts) => {
-        const updatedAddress = this.app.user.activeAccounts.find((addr) => addr.address === accounts[0]);
-        await setActiveAccount(updatedAddress);
-      });
+      await this.webWallet.web3.givenProvider.on(
+        'accountsChanged',
+        async (accounts) => {
+          const updatedAddress = this.app.user.activeAccounts.find(
+            (addr) => addr.address === accounts[0]
+          );
+          await setActiveAccount(updatedAddress);
+        }
+      );
     }
 
-    const activeAddress: string = this.webWallet.accounts && this.webWallet.accounts[0];
-    const api = new TokenAPI(this.meta.address, this.chain.api.currentProvider as any, activeAddress);
+    const activeAddress: string =
+      this.webWallet.accounts && this.webWallet.accounts[0];
+    const api = new TokenAPI(
+      this.meta.address,
+      this.chain.api.currentProvider as any,
+      activeAddress
+    );
     await api.init();
     this.chain.tokenAPI = api;
     await super.initApi();
@@ -58,7 +71,8 @@ export default class Token extends IChainAdapter<EthereumCoin, EthereumAccount> 
   public async initData() {
     await this.chain.initEventLoop();
     await super.initData();
-    const activeAddress: string = this.webWallet.accounts && this.webWallet.accounts[0];
+    const activeAddress: string =
+      this.webWallet.accounts && this.webWallet.accounts[0];
     await this.activeAddressHasToken(activeAddress);
   }
 
@@ -71,7 +85,9 @@ export default class Token extends IChainAdapter<EthereumCoin, EthereumAccount> 
   }
 
   public async getEthersProvider() {
-    const provider = new ethers.providers.Web3Provider(this.chain.api.currentProvider as any);
+    const provider = new ethers.providers.Web3Provider(
+      this.chain.api.currentProvider as any
+    );
     return provider;
   }
 

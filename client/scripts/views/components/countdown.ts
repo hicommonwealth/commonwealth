@@ -13,24 +13,30 @@ const Countdown: m.Component<ICountdownAttrs> = {
   view: (vnode: m.VnodeDOM<ICountdownAttrs>) => {
     const { time, duration, includeSeconds } = vnode.attrs;
     if (!time && !duration) return;
-    const durationForDisplay = time ? moment.duration(moment(time).diff(moment())) : duration;
+    const durationForDisplay = time
+      ? moment.duration(moment(time).diff(moment()))
+      : duration;
 
-    return m('span.Countdown', {
-      oncreate: (vvnode) => {
-        vvnode.state.timerHandle = setInterval(() => {
-          vvnode.state.timer++;
-          m.redraw();
-        }, 1000);
+    return m(
+      'span.Countdown',
+      {
+        oncreate: (vvnode) => {
+          vvnode.state.timerHandle = setInterval(() => {
+            vvnode.state.timer++;
+            m.redraw();
+          }, 1000);
+        },
+        onremove: (vvnode) => {
+          if (vvnode.state.timerHandle) {
+            clearInterval(vvnode.state.timerHandle);
+          }
+        },
       },
-      onremove: (vvnode) => {
-        if (vvnode.state.timerHandle) {
-          clearInterval(vvnode.state.timerHandle);
-        }
-      },
-    }, includeSeconds
-      ? formatDuration(durationForDisplay)
-      : formatDuration(durationForDisplay, false));
-  }
+      includeSeconds
+        ? formatDuration(durationForDisplay)
+        : formatDuration(durationForDisplay, false)
+    );
+  },
 };
 
 interface ICountdownUntilBlockAttrs {
@@ -43,8 +49,11 @@ export const CountdownUntilBlock: m.Component<ICountdownUntilBlockAttrs> = {
     let { includeSeconds } = vnode.attrs;
     if (!vnode.attrs.block) return;
     if (includeSeconds === undefined) includeSeconds = true;
-    return m(Countdown, { time: blocknumToTime(vnode.attrs.block), includeSeconds });
-  }
+    return m(Countdown, {
+      time: blocknumToTime(vnode.attrs.block),
+      includeSeconds,
+    });
+  },
 };
 
 export default Countdown;

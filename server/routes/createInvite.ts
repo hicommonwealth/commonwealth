@@ -18,8 +18,17 @@ export const Errors = {
   FailedToSendEmail: 'Could not send invite email',
 };
 
-const createInvite = async (models, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+const createInvite = async (
+  models,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const [chain, community, error] = await lookupCommunityIsVisibleToUser(
+    models,
+    req.body,
+    req.user
+  );
   if (error) return next(new Error(error));
   if (!req.user) return next(new Error('Not logged in'));
   if (!req.body.invitedAddress && !req.body.invitedEmail) {
@@ -47,10 +56,11 @@ const createInvite = async (models, req: Request, res: Response, next: NextFunct
       where: {
         ...chainOrCommObj,
         address_id: address.id,
-        permission: ['admin', 'moderator']
+        permission: ['admin', 'moderator'],
       },
     });
-    if (requesterIsAdminOrMod.length === 0) return next(new Error(Errors.MustBeAdminOrMod));
+    if (requesterIsAdminOrMod.length === 0)
+      return next(new Error(Errors.MustBeAdminOrMod));
   }
 
   const { invitedEmail } = req.body;
@@ -58,7 +68,7 @@ const createInvite = async (models, req: Request, res: Response, next: NextFunct
     const existingAddress = await models.Address.findOne({
       where: {
         address: req.body.invitedAddress,
-      }
+      },
     });
     if (!existingAddress) return next(new Error(Errors.AddressNotFound));
     const existingRole = await models.Role.findOne({
@@ -90,16 +100,18 @@ const createInvite = async (models, req: Request, res: Response, next: NextFunct
 
   const inviteChainOrCommObj = chain
     ? { chain_id: chain.id, community_name: chain.name }
-    : { community_id: community.id, community_name: community.name }
+    : { community_id: community.id, community_name: community.name };
 
   const previousInvite = await models.InviteCode.findOne({
     where: {
       invited_email: invitedEmail,
-      ...inviteChainOrCommObj
-    }
+      ...inviteChainOrCommObj,
+    },
   });
 
-  if (previousInvite && previousInvite.used === true) { await previousInvite.update({ used: false, }); }
+  if (previousInvite && previousInvite.used === true) {
+    await previousInvite.update({ used: false });
+  }
   let invite = previousInvite;
   if (!previousInvite) {
     const inviteCode = crypto.randomBytes(24).toString('hex');
@@ -127,8 +139,8 @@ const createInvite = async (models, req: Request, res: Response, next: NextFunct
     },
     mail_settings: {
       sandbox_mode: {
-        enable: (process.env.NODE_ENV === 'development'),
-      }
+        enable: process.env.NODE_ENV === 'development',
+      },
     },
   };
 
@@ -136,7 +148,9 @@ const createInvite = async (models, req: Request, res: Response, next: NextFunct
     await sgMail.send(msg);
     return res.json({ status: 'Success', result: invite.toJSON() });
   } catch (e) {
-    return res.status(500).json({ error: Errors.FailedToSendEmail, message: e.message });
+    return res
+      .status(500)
+      .json({ error: Errors.FailedToSendEmail, message: e.message });
   }
 };
 

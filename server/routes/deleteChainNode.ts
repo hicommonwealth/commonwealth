@@ -11,7 +11,12 @@ export const Errors = {
   NodeNotFound: 'Node not found',
 };
 
-const deleteChainNode = async (models, req: Request, res: Response, next: NextFunction) => {
+const deleteChainNode = async (
+  models,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.user) {
     return next(new Error(Errors.NotLoggedIn));
   }
@@ -22,9 +27,11 @@ const deleteChainNode = async (models, req: Request, res: Response, next: NextFu
     return next(new Error(Errors.NeedParams));
   }
 
-  const chain = await models.Chain.findOne({ where: {
-    id: req.body.id
-  } });
+  const chain = await models.Chain.findOne({
+    where: {
+      id: req.body.id,
+    },
+  });
   if (!chain) {
     return next(new Error(Errors.ChainNotFound));
   }

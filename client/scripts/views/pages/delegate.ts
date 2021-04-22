@@ -8,55 +8,71 @@ import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import Marlin from 'controllers/chain/ethereum/marlin/adapter';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { Grid, Col, List, Form, FormGroup, FormLabel, Input, Button } from 'construct-ui';
+import {
+  Grid,
+  Col,
+  List,
+  Form,
+  FormGroup,
+  FormLabel,
+  Input,
+  Button,
+} from 'construct-ui';
 import PageNotFound from './404';
 
 const getDelegate = async (vnode) => {
   vnode.state.currentDelegate = await (app.chain as Marlin).marlinAccounts.senderGetDelegate();
 };
 
-const DelegateStats: m.Component<{ currentDelegate: string, }> = {
+const DelegateStats: m.Component<{ currentDelegate: string }> = {
   view: (vnode) => {
     if (!app.chain) return;
 
-    return m(Grid, {
-      align: 'middle',
-      class: 'stats-container',
-      gutter: 5,
-      justify: 'space-between'
-    }, [
-      m(Col, { span: { xs: 6, md: 3 } }, [
-        m('.stats-tile', [
-          m('.stats-heading', 'Current Delegate'),
-          vnode.attrs.currentDelegate
-            ? m('.stats-tile-figure-minor', vnode.attrs.currentDelegate)
-            : '--',
+    return m(
+      Grid,
+      {
+        align: 'middle',
+        class: 'stats-container',
+        gutter: 5,
+        justify: 'space-between',
+      },
+      [
+        m(Col, { span: { xs: 6, md: 3 } }, [
+          m('.stats-tile', [
+            m('.stats-heading', 'Current Delegate'),
+            vnode.attrs.currentDelegate
+              ? m('.stats-tile-figure-minor', vnode.attrs.currentDelegate)
+              : '--',
+          ]),
+          m('.stats-tile', [
+            m('.stats-heading', 'Your address:'),
+            app.user.activeAccount.address
+              ? m('.stats-tile-figure-minor', app.user.activeAccount.address)
+              : '--',
+          ]),
         ]),
-        m('.stats-tile', [
-          m('.stats-heading', 'Your address:'),
-          app.user.activeAccount.address
-            ? m('.stats-tile-figure-minor', app.user.activeAccount.address)
-            : '--',
-        ]),
-      ]),
-      // m(Col, { span: { xs: 6, md: 3 } }, [
-      //   m('.stats-tile', [
-      //     m('.stats-heading', 'Your address:'),
-      //     app.user.activeAccount.address
-      //       ? m('.stats-tile-figure-minor', app.user.activeAccount.address)
-      //       : '--',
-      //   ]),
-      // ]),
-    ]);
-  }
+        // m(Col, { span: { xs: 6, md: 3 } }, [
+        //   m('.stats-tile', [
+        //     m('.stats-heading', 'Your address:'),
+        //     app.user.activeAccount.address
+        //       ? m('.stats-tile-figure-minor', app.user.activeAccount.address)
+        //       : '--',
+        //   ]),
+        // ]),
+      ]
+    );
+  },
 };
 
 interface IDelegateForm {
-  address: string,
-  amount: number,
+  address: string;
+  amount: number;
 }
 
-const DelegateForm: m.Component<{}, { form: IDelegateForm, loading: boolean, currentDelegate: string, }> = {
+const DelegateForm: m.Component<
+  {},
+  { form: IDelegateForm; loading: boolean; currentDelegate: string }
+> = {
   oninit: (vnode) => {
     vnode.state.form = {
       address: '',
@@ -84,7 +100,7 @@ const DelegateForm: m.Component<{}, { form: IDelegateForm, loading: boolean, cur
                   const result = (e.target as any).value;
                   vnode.state.form.address = result;
                   m.redraw();
-                }
+                },
               }),
               m(FormLabel, 'Amount of MPOND to delegate:'),
               m(Input, {
@@ -95,7 +111,7 @@ const DelegateForm: m.Component<{}, { form: IDelegateForm, loading: boolean, cur
                   const result = (e.target as any).value;
                   vnode.state.form.amount = result;
                   m.redraw();
-                }
+                },
               }),
             ]),
             m(FormGroup, [
@@ -108,13 +124,21 @@ const DelegateForm: m.Component<{}, { form: IDelegateForm, loading: boolean, cur
                   e.preventDefault();
                   vnode.state.loading = true;
                   if ((app.chain as Marlin).apiInitialized) {
-                    await (app.chain as Marlin).marlinAccounts.senderSetDelegate(vnode.state.form.address, vnode.state.form.amount)
+                    await (app.chain as Marlin).marlinAccounts
+                      .senderSetDelegate(
+                        vnode.state.form.address,
+                        vnode.state.form.amount
+                      )
                       .then(async () => {
-                        notifySuccess(`Sent transaction to delegate to ${vnode.state.form.address}`);
+                        notifySuccess(
+                          `Sent transaction to delegate to ${vnode.state.form.address}`
+                        );
                         await getDelegate(vnode);
                         m.redraw();
                       })
-                      .catch((err) => { notifyError(`${err.message}`); });
+                      .catch((err) => {
+                        notifyError(`${err.message}`);
+                      });
                   }
                   vnode.state.loading = false;
                   m.redraw();
@@ -126,7 +150,7 @@ const DelegateForm: m.Component<{}, { form: IDelegateForm, loading: boolean, cur
         ]),
       ]),
     ];
-  }
+  },
 };
 
 const DelegatePage: m.Component<{}> = {
@@ -140,12 +164,16 @@ const DelegatePage: m.Component<{}> = {
         });
       }
       // wrong chain loaded
-      if (app.chain && app.chain.loaded
-          && [ChainNetwork.Marlin, ChainNetwork.MarlinTestnet].includes(app.chain.network)
+      if (
+        app.chain &&
+        app.chain.loaded &&
+        [ChainNetwork.Marlin, ChainNetwork.MarlinTestnet].includes(
+          app.chain.network
+        )
       ) {
         return m(PageNotFound, {
           title: 'Delegate Page',
-          message: 'Delegate page for Marlin users only!'
+          message: 'Delegate page for Marlin users only!',
         });
       }
       // chain loading
@@ -155,15 +183,15 @@ const DelegatePage: m.Component<{}> = {
       });
     }
 
-    return m(Sublayout, {
-      class: 'DelegatePage',
-      title: 'Delegate',
-    }, [
-      m('.forum-container', [
-        m(DelegateForm, {}),
-      ]),
-    ]);
-  }
+    return m(
+      Sublayout,
+      {
+        class: 'DelegatePage',
+        title: 'Delegate',
+      },
+      [m('.forum-container', [m(DelegateForm, {})])]
+    );
+  },
 };
 
 export default DelegatePage;

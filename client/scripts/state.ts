@@ -30,7 +30,6 @@ export const enum LoginState {
   LoggedIn = 'logged_in',
 }
 
-
 export interface IApp {
   socket: WebsocketController;
   chain: IChainAdapter<any, any>;
@@ -116,9 +115,10 @@ const app: IApp = {
 
   recentActivity: new RecentActivityController(),
 
-  activeChainId: () => app.chain ? app.chain.id : null,
-  activeCommunityId: () => app.community ? app.community.meta.id : null,
-  activeId: () => app.community ? app.activeCommunityId() : app.activeChainId(),
+  activeChainId: () => (app.chain ? app.chain.id : null),
+  activeCommunityId: () => (app.community ? app.community.meta.id : null),
+  activeId: () =>
+    app.community ? app.activeCommunityId() : app.activeChainId(),
   defaultScope: () => app.config.defaultChain,
 
   toasts: getToastStore(),

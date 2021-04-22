@@ -7,7 +7,12 @@ import { Button, TextArea, Grid, Col, Spinner } from 'construct-ui';
 
 import app from 'state';
 import { formatAsTitleCase, link } from 'helpers';
-import { ITXModalData, ITransactionResult, TransactionStatus, ChainBase } from 'models';
+import {
+  ITXModalData,
+  ITransactionResult,
+  TransactionStatus,
+  ChainBase,
+} from 'models';
 
 import Substrate from 'controllers/chain/substrate/main';
 import { ISubstrateTXData } from 'controllers/chain/substrate/shared';
@@ -68,9 +73,13 @@ const TXSigningTransactionBox = {
   view: (vnode) => {
     return m('.TXSigningTransactionBox', [
       m('.txbox-header', 'Status'),
-      m('.txbox-content', {
-        class: vnode.attrs.success ? 'txbox-success' : 'txbox-fail'
-      }, vnode.attrs.status),
+      m(
+        '.txbox-content',
+        {
+          class: vnode.attrs.success ? 'txbox-success' : 'txbox-fail',
+        },
+        vnode.attrs.status
+      ),
       m('.txbox-header', 'Block Hash'),
       m('.txbox-content', vnode.attrs.blockHash),
       m('.txbox-header', 'Block Number'),
@@ -78,7 +87,7 @@ const TXSigningTransactionBox = {
       m('.txbox-header', 'Timestamp'),
       m('.txbox-content', vnode.attrs.timestamp),
     ]);
-  }
+  },
 };
 
 //
@@ -87,34 +96,47 @@ const TXSigningTransactionBox = {
 
 const setupEventListeners = (vnode) => {
   vnode.attrs.txData.events.once(TransactionStatus.Ready.toString(), () => {
-    vnode.attrs.next('WaitingToConfirmTransaction', { events: vnode.attrs.txData.events });
-  });
-  vnode.attrs.txData.events.once(TransactionStatus.Error.toString(), ({ err }) => {
-    vnode.attrs.txData.events.removeAllListeners();
-    vnode.attrs.next('SentTransactionRejected', {
-      error: new Error('Transaction Failed'), hash: null, err,
+    vnode.attrs.next('WaitingToConfirmTransaction', {
+      events: vnode.attrs.txData.events,
     });
   });
-  vnode.attrs.txData.events.once(TransactionStatus.Failed.toString(), ({ hash, blocknum, err, timestamp }) => {
-    // the transaction may be submitted twice, so only go to a
-    // failure state if transaction has not already succeeded
-    if (vnode.state.timerHandle) {
-      clearInterval(vnode.state.timerHandle);
+  vnode.attrs.txData.events.once(
+    TransactionStatus.Error.toString(),
+    ({ err }) => {
+      vnode.attrs.txData.events.removeAllListeners();
+      vnode.attrs.next('SentTransactionRejected', {
+        error: new Error('Transaction Failed'),
+        hash: null,
+        err,
+      });
     }
-    vnode.attrs.txData.events.removeAllListeners();
-    vnode.attrs.next('SentTransactionRejected', {
-      error: err,
-      hash,
-      blocknum,
-      timestamp
-    });
-  });
-  vnode.attrs.txData.events.once(TransactionStatus.Success.toString(), ({ hash, blocknum, timestamp }) => {
-    vnode.attrs.txData.events.removeAllListeners();
-    const $modal = $('.TXSigningModal');
-    $modal.trigger('modalcomplete');
-    vnode.attrs.next('SentTransactionSuccess', { hash, blocknum, timestamp });
-  });
+  );
+  vnode.attrs.txData.events.once(
+    TransactionStatus.Failed.toString(),
+    ({ hash, blocknum, err, timestamp }) => {
+      // the transaction may be submitted twice, so only go to a
+      // failure state if transaction has not already succeeded
+      if (vnode.state.timerHandle) {
+        clearInterval(vnode.state.timerHandle);
+      }
+      vnode.attrs.txData.events.removeAllListeners();
+      vnode.attrs.next('SentTransactionRejected', {
+        error: err,
+        hash,
+        blocknum,
+        timestamp,
+      });
+    }
+  );
+  vnode.attrs.txData.events.once(
+    TransactionStatus.Success.toString(),
+    ({ hash, blocknum, timestamp }) => {
+      vnode.attrs.txData.events.removeAllListeners();
+      const $modal = $('.TXSigningModal');
+      $modal.trigger('modalcomplete');
+      vnode.attrs.next('SentTransactionSuccess', { hash, blocknum, timestamp });
+    }
+  );
 };
 
 const TXSigningCLIOption = {
@@ -131,15 +153,25 @@ const TXSigningCLIOption = {
     };
 
     // TODO: this is substrate specific, add a cosmos codepath
-    let signBlock = m(CodeBlock, { clickToSelect: true }, [ 'Loading transaction data... ']);
+    let signBlock = m(CodeBlock, { clickToSelect: true }, [
+      'Loading transaction data... ',
+    ]);
     let instructions;
     let submitAction;
-    if (vnode.state.calldata && app.chain && app.chain.base === ChainBase.CosmosSDK) {
+    if (
+      vnode.state.calldata &&
+      app.chain &&
+      app.chain.base === ChainBase.CosmosSDK
+    ) {
       const calldata: ICosmosTXData = vnode.state.calldata;
       instructions = m('.instructions', [
-        'Save the transaction\'s JSON data to a file: ',
-        m(CodeBlock, { clickToSelect: true }, `echo '${calldata.call}' > tx.json`),
-        ' and then sign the transaction, using the appropriate account:'
+        "Save the transaction's JSON data to a file: ",
+        m(
+          CodeBlock,
+          { clickToSelect: true },
+          `echo '${calldata.call}' > tx.json`
+        ),
+        ' and then sign the transaction, using the appropriate account:',
       ]);
       signBlock = m('.gaiacli-codeblock', [
         m(CodeBlock, { clickToSelect: true }, [
@@ -150,7 +182,7 @@ const TXSigningCLIOption = {
   --signature-only --offline \\
   --from=`,
           m('span.no-select', '<key name> <tx.json>'),
-        ])
+        ]),
       ]);
       submitAction = m(Button, {
         intent: 'primary',
@@ -159,7 +191,10 @@ const TXSigningCLIOption = {
         onclick: (e) => {
           e.preventDefault();
           // try {
-          const signedBlob = $(vnode.dom).find('textarea.signedtx').val().toString()
+          const signedBlob = $(vnode.dom)
+            .find('textarea.signedtx')
+            .val()
+            .toString()
             .trim();
           const signature = JSON.parse(signedBlob);
           transact(signature, calldata.gas);
@@ -169,10 +204,14 @@ const TXSigningCLIOption = {
         },
         label: 'Send transaction',
       });
-    } else if (vnode.state.calldata && app.chain && app.chain.base === ChainBase.Substrate) {
+    } else if (
+      vnode.state.calldata &&
+      app.chain &&
+      app.chain.base === ChainBase.Substrate
+    ) {
       const calldata = vnode.state.calldata as ISubstrateTXData;
       instructions = m('.instructions', [
-        'Use subkey to sign this transaction:'
+        'Use subkey to sign this transaction:',
       ]);
       signBlock = m(CodeBlock, { clickToSelect: true }, [
         `subkey ${calldata.isEd25519 ? '-e ' : ''}sign-transaction \\
@@ -191,14 +230,17 @@ const TXSigningCLIOption = {
         onclick: (e) => {
           e.preventDefault();
           try {
-            const signedTx = $(vnode.dom).find('textarea.signedtx').val().toString()
+            const signedTx = $(vnode.dom)
+              .find('textarea.signedtx')
+              .val()
+              .toString()
               .trim();
             transact(signedTx);
           } catch (err) {
             throw new Error('Failed to execute signed transaction');
           }
         },
-        label: 'Send transaction'
+        label: 'Send transaction',
       });
     }
     return m('.TXSigningCLIOption', [
@@ -209,19 +251,26 @@ const TXSigningCLIOption = {
       m(TextArea, {
         class: 'signedtx',
         fluid: true,
-        placeholder: app.chain && app.chain.base === ChainBase.CosmosSDK ? 'Signature JSON' : 'Signed TX',
+        placeholder:
+          app.chain && app.chain.base === ChainBase.CosmosSDK
+            ? 'Signature JSON'
+            : 'Signed TX',
       }),
       vnode.state.error && m('.error-message', vnode.state.error),
       submitAction,
-      !submitAction && m('p.transaction-loading', 'Still loading transaction...'),
+      !submitAction &&
+        m('p.transaction-loading', 'Still loading transaction...'),
     ]);
-  }
+  },
 };
 
 const TXSigningWebWalletOption = {
   oncreate: (vnode) => {
     // try to enable web wallet
-    if ((app.chain as Substrate).webWallet && !(app.chain as Substrate).webWallet.enabled) {
+    if (
+      (app.chain as Substrate).webWallet &&
+      !(app.chain as Substrate).webWallet.enabled
+    ) {
       (app.chain as Substrate).webWallet.enable().then(() => m.redraw());
     }
   },
@@ -229,26 +278,37 @@ const TXSigningWebWalletOption = {
     const transact = async () => {
       const acct = vnode.attrs.author;
       try {
-        const signer = await (app.chain as Substrate).webWallet.getSigner(acct.address);
+        const signer = await (app.chain as Substrate).webWallet.getSigner(
+          acct.address
+        );
         setupEventListeners(vnode);
         vnode.attrs.txData.transact(acct.address, signer);
       } catch (e) {
         console.log(e);
       }
     };
-    const isWebWalletAvailable = (app.chain as Substrate).webWallet && (app.chain as Substrate).webWallet.available;
-    const isWebWalletEnabled = (app.chain as Substrate).webWallet && (app.chain as Substrate).webWallet.enabled;
-    const isAuthorInWebWallet = (app.chain as Substrate).webWallet
-      && !!(app.chain as Substrate).webWallet.accounts.find((v) => {
-        return AddressSwapper({
-          address: v.address,
-          currentPrefix: (app.chain as Substrate).chain.ss58Format,
-        }) === vnode.attrs.author.address;
+    const isWebWalletAvailable =
+      (app.chain as Substrate).webWallet &&
+      (app.chain as Substrate).webWallet.available;
+    const isWebWalletEnabled =
+      (app.chain as Substrate).webWallet &&
+      (app.chain as Substrate).webWallet.enabled;
+    const isAuthorInWebWallet =
+      (app.chain as Substrate).webWallet &&
+      !!(app.chain as Substrate).webWallet.accounts.find((v) => {
+        return (
+          AddressSwapper({
+            address: v.address,
+            currentPrefix: (app.chain as Substrate).chain.ss58Format,
+          }) === vnode.attrs.author.address
+        );
       });
     return m('.TXSigningSeedOrMnemonicOption', [
       m('div', [
         'Use a ',
-        link('a', 'https://polkadot.js.org/extension/', 'polkadot-js', { target: '_blank' }),
+        link('a', 'https://polkadot.js.org/extension/', 'polkadot-js', {
+          target: '_blank',
+        }),
         ' compatible wallet to sign the transaction:',
       ]),
       m(Button, {
@@ -256,18 +316,20 @@ const TXSigningWebWalletOption = {
         intent: 'primary',
         rounded: true,
         disabled: !isWebWalletEnabled || !isAuthorInWebWallet,
-        onclick: async (e) => { await transact(); },
+        onclick: async (e) => {
+          await transact();
+        },
         oncreate: (vvnode) => $(vvnode.dom).focus(),
         label: !isWebWalletAvailable
           ? 'No extension detected'
           : !isWebWalletEnabled
-            ? 'Connect to extension'
-            : !isAuthorInWebWallet
-              ? 'Current address not in wallet'
-              : 'Sign and send transaction'
+          ? 'Connect to extension'
+          : !isAuthorInWebWallet
+          ? 'Current address not in wallet'
+          : 'Sign and send transaction',
       }),
     ]);
-  }
+  },
 };
 
 const TXSigningSeedOrMnemonicOption = {
@@ -277,52 +339,68 @@ const TXSigningSeedOrMnemonicOption = {
       vnode.attrs.txData.transact();
     };
     return m('.TXSigningSeedOrMnemonicOption', [
-      (!vnode.attrs.author.getSeed() && !vnode.attrs.author.getMnemonic()) ? m('form', [
-        m('.instructions', 'Enter your key phrase to sign this transaction:'),
-        m('.warn', 'This is insecure. Only use key phrases for testnets or throwaway accounts.'),
-        m(TextArea, {
-          class: 'mnemonic',
-          placeholder: 'Key phrase or seed',
-          fluid: true,
-          oncreate: (vvnode) => $(vvnode.dom).focus()
-        }),
-        m(Button, {
-          intent: 'primary',
-          type: 'submit',
-          rounded: true,
-          onclick: (e) => {
-            e.preventDefault();
-            const newKey = `${$(vnode.dom).find('textarea.mnemonic').val().toString()
-              .trim()}`;
-            try {
-              if (mnemonicValidate(newKey)) {
-                vnode.attrs.author.setMnemonic(newKey);
-              } else {
-                vnode.attrs.author.setSeed(newKey);
-              }
-              transact();
-            } catch (err) {
-              throw new Error('Key phrase or seed did not match this account');
-            }
-          },
-          label: 'Send transaction'
-        }),
-      ]) : [
-        m('div', 'This account is already unlocked. Click here to sign the transaction:'),
-        m(Button, {
-          intent: 'primary',
-          type: 'submit',
-          rounded: true,
-          onclick: (e) => {
-            e.preventDefault();
-            transact();
-          },
-          oncreate: (vvnode) => $(vvnode.dom).focus(),
-          label: 'Send transaction'
-        }),
-      ],
+      !vnode.attrs.author.getSeed() && !vnode.attrs.author.getMnemonic()
+        ? m('form', [
+            m(
+              '.instructions',
+              'Enter your key phrase to sign this transaction:'
+            ),
+            m(
+              '.warn',
+              'This is insecure. Only use key phrases for testnets or throwaway accounts.'
+            ),
+            m(TextArea, {
+              class: 'mnemonic',
+              placeholder: 'Key phrase or seed',
+              fluid: true,
+              oncreate: (vvnode) => $(vvnode.dom).focus(),
+            }),
+            m(Button, {
+              intent: 'primary',
+              type: 'submit',
+              rounded: true,
+              onclick: (e) => {
+                e.preventDefault();
+                const newKey = `${$(vnode.dom)
+                  .find('textarea.mnemonic')
+                  .val()
+                  .toString()
+                  .trim()}`;
+                try {
+                  if (mnemonicValidate(newKey)) {
+                    vnode.attrs.author.setMnemonic(newKey);
+                  } else {
+                    vnode.attrs.author.setSeed(newKey);
+                  }
+                  transact();
+                } catch (err) {
+                  throw new Error(
+                    'Key phrase or seed did not match this account'
+                  );
+                }
+              },
+              label: 'Send transaction',
+            }),
+          ])
+        : [
+            m(
+              'div',
+              'This account is already unlocked. Click here to sign the transaction:'
+            ),
+            m(Button, {
+              intent: 'primary',
+              type: 'submit',
+              rounded: true,
+              onclick: (e) => {
+                e.preventDefault();
+                transact();
+              },
+              oncreate: (vvnode) => $(vvnode.dom).focus(),
+              label: 'Send transaction',
+            }),
+          ],
     ]);
-  }
+  },
 };
 
 const TXSigningModalStates = {
@@ -332,49 +410,58 @@ const TXSigningModalStates = {
 
       return m('.TXSigningModalBody.Intro', [
         m('.compact-modal-title', [
-          m('h3', [
-            'Sign transaction',
-            (txLabel ? `: ${txLabel}` : '')
-          ]),
+          m('h3', ['Sign transaction', txLabel ? `: ${txLabel}` : '']),
           m(CompactModalExitButton),
         ]),
         m('.compact-modal-body', [
-          m(HorizontalTabs, [{
-            name: 'Web wallet',
-            content: m(TXSigningWebWalletOption, {
-              txData: vnode.attrs.txData,
-              author: vnode.attrs.author,
-              next: vnode.attrs.next,
-            }),
-            selected: app.chain.base === ChainBase.Substrate
-              && !(vnode.attrs.author.getSeed() || vnode.attrs.author.getMnemonic())
-              && (app.chain as Substrate).webWallet
-              && (app.chain as Substrate).webWallet.available
-              && (app.chain as Substrate).webWallet.enabled
-              && (app.chain as Substrate).webWallet.accounts.find((v) => v.address === vnode.attrs.author.address),
-            disabled: app.chain.base !== ChainBase.Substrate,
-          }, {
-            name: 'Command line',
-            content: m(TXSigningCLIOption, {
-              txData: vnode.attrs.txData,
-              author: vnode.attrs.author,
-              next: vnode.attrs.next,
-            }),
-          }, {
-            name: 'Key phrase',
-            content: m(TXSigningSeedOrMnemonicOption, {
-              txData: vnode.attrs.txData,
-              author: vnode.attrs.author,
-              next: vnode.attrs.next,
-            }),
-            // select mnemonic if the account is already unlocked
-            selected: app.chain.base === ChainBase.Substrate
-              && (vnode.attrs.author.getSeed() || vnode.attrs.author.getMnemonic()),
-            disabled: app.chain.base !== ChainBase.Substrate,
-          }]),
-        ])
+          m(HorizontalTabs, [
+            {
+              name: 'Web wallet',
+              content: m(TXSigningWebWalletOption, {
+                txData: vnode.attrs.txData,
+                author: vnode.attrs.author,
+                next: vnode.attrs.next,
+              }),
+              selected:
+                app.chain.base === ChainBase.Substrate &&
+                !(
+                  vnode.attrs.author.getSeed() ||
+                  vnode.attrs.author.getMnemonic()
+                ) &&
+                (app.chain as Substrate).webWallet &&
+                (app.chain as Substrate).webWallet.available &&
+                (app.chain as Substrate).webWallet.enabled &&
+                (app.chain as Substrate).webWallet.accounts.find(
+                  (v) => v.address === vnode.attrs.author.address
+                ),
+              disabled: app.chain.base !== ChainBase.Substrate,
+            },
+            {
+              name: 'Command line',
+              content: m(TXSigningCLIOption, {
+                txData: vnode.attrs.txData,
+                author: vnode.attrs.author,
+                next: vnode.attrs.next,
+              }),
+            },
+            {
+              name: 'Key phrase',
+              content: m(TXSigningSeedOrMnemonicOption, {
+                txData: vnode.attrs.txData,
+                author: vnode.attrs.author,
+                next: vnode.attrs.next,
+              }),
+              // select mnemonic if the account is already unlocked
+              selected:
+                app.chain.base === ChainBase.Substrate &&
+                (vnode.attrs.author.getSeed() ||
+                  vnode.attrs.author.getMnemonic()),
+              disabled: app.chain.base !== ChainBase.Substrate,
+            },
+          ]),
+        ]),
       ]);
-    }
+    },
   },
   WaitingToConfirmTransaction: {
     oncreate: (vnode) => {
@@ -407,9 +494,12 @@ const TXSigningModalStates = {
     },
     view: (vnode) => {
       return m('.TXSigningModalBody.WaitingToConfirmTransaction', [
-        m('.compact-modal-title', [ m('h3', 'Confirm transaction') ]),
+        m('.compact-modal-title', [m('h3', 'Confirm transaction')]),
         m('.compact-modal-body', [
-          m('.TXSigningBodyText', 'Waiting for your transaction to be confirmed by the network...'),
+          m(
+            '.TXSigningBodyText',
+            'Waiting for your transaction to be confirmed by the network...'
+          ),
           m(Spinner, { active: true }),
           m('br'),
           m(Button, {
@@ -418,17 +508,17 @@ const TXSigningModalStates = {
             disabled: true,
             fluid: true,
             rounded: true,
-            onclick: (e) => (undefined),
-            label: `Waiting ${vnode.state.timer || 0}s...`
+            onclick: (e) => undefined,
+            label: `Waiting ${vnode.state.timer || 0}s...`,
           }),
         ]),
       ]);
-    }
+    },
   },
   SentTransactionSuccess: {
     view: (vnode) => {
       return m('.TXSigningModalBody.SentTransactionSuccess', [
-        m('.compact-modal-title', [ m('h3', 'Transaction confirmed') ]),
+        m('.compact-modal-title', [m('h3', 'Transaction confirmed')]),
         m('.compact-modal-body', [
           m(TXSigningTransactionBox, {
             success: true,
@@ -449,23 +539,29 @@ const TXSigningModalStates = {
               e.preventDefault();
               $(vnode.dom).trigger('modalexit');
             },
-            label: 'Done'
+            label: 'Done',
           }),
         ]),
       ]);
-    }
+    },
   },
   SentTransactionRejected: {
     view: (vnode) => {
       return m('.TXSigningModalBody.SentTransactionRejected', [
-        m('.compact-modal-title', [ m('h3', 'Transaction rejected') ]),
+        m('.compact-modal-title', [m('h3', 'Transaction rejected')]),
         m('.compact-modal-body', [
           m(TXSigningTransactionBox, {
             success: false,
             status: vnode.attrs.stateData.error,
-            blockHash: vnode.attrs.stateData.hash ? `${vnode.attrs.stateData.hash}` : '--',
-            blockNum: vnode.attrs.stateData.blocknum ? `${vnode.attrs.stateData.blocknum}` : '--',
-            timestamp: vnode.attrs.stateData.timestamp ? `${vnode.attrs.stateData.timestamp.format()}` : '--',
+            blockHash: vnode.attrs.stateData.hash
+              ? `${vnode.attrs.stateData.hash}`
+              : '--',
+            blockNum: vnode.attrs.stateData.blocknum
+              ? `${vnode.attrs.stateData.blocknum}`
+              : '--',
+            timestamp: vnode.attrs.stateData.timestamp
+              ? `${vnode.attrs.stateData.timestamp.format()}`
+              : '--',
           }),
           m(Grid, [
             m(Col, { span: 6 }, [
@@ -479,7 +575,7 @@ const TXSigningModalStates = {
                   e.preventDefault();
                   $(vnode.dom).trigger('modalexit');
                 },
-                label: 'Done'
+                label: 'Done',
               }),
             ]),
             m(Col, { span: 6 }, [
@@ -489,14 +585,16 @@ const TXSigningModalStates = {
                 rounded: true,
                 style: 'margin-left: 10px',
                 oncreate: (vvnode) => $(vvnode.dom).focus(),
-                onclick: (e) => { vnode.attrs.next('Intro'); },
-                label: 'Try again'
+                onclick: (e) => {
+                  vnode.attrs.next('Intro');
+                },
+                label: 'Try again',
               }),
             ]),
           ]),
         ]),
       ]);
-    }
+    },
   },
 };
 
@@ -518,21 +616,25 @@ const TXSigningModal = {
             vnode.state.stateName = newState;
             vnode.state.data = newData;
             m.redraw();
-          }
+          },
         }),
-      ])
+      ]),
     ];
-  }
+  },
 };
 
-export const createTXModal = async (dataP: ITXModalData | Promise<ITXModalData>) => {
+export const createTXModal = async (
+  dataP: ITXModalData | Promise<ITXModalData>
+) => {
   const data = await Promise.resolve(dataP);
   if (data) {
     const modalP = new Promise((resolve, reject) => {
       let complete = false;
       app.modals.create({
         modal: TXSigningModal,
-        completeCallback: () => { complete = true; },
+        completeCallback: () => {
+          complete = true;
+        },
         exitCallback: () => {
           if (data.cb) {
             data.cb(complete);

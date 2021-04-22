@@ -5,7 +5,7 @@ import {
   IThresholdEndTime,
   INotStartedEndTime,
   IQueuedEndTime,
-  IUnavailableEndTime
+  IUnavailableEndTime,
 } from './interfaces';
 import Proposal from './Proposal';
 
@@ -38,55 +38,88 @@ export enum ChainNetwork {
   ALEX = 'alex',
   Commonwealth = 'commonwealth',
   Clover = 'clover',
-  HydraDX = 'hydradx'
+  HydraDX = 'hydradx',
 }
 
 // This function returns a default chain for a chainbase
 export function baseToNetwork(n: ChainBase): ChainNetwork {
   switch (n) {
-    case ChainBase.CosmosSDK: return ChainNetwork.Cosmos;
-    case ChainBase.Substrate: return ChainNetwork.Edgeware;
-    case ChainBase.Ethereum: return ChainNetwork.Ethereum;
-    case ChainBase.NEAR: return ChainNetwork.NEAR;
-    default: return null;
+    case ChainBase.CosmosSDK:
+      return ChainNetwork.Cosmos;
+    case ChainBase.Substrate:
+      return ChainNetwork.Edgeware;
+    case ChainBase.Ethereum:
+      return ChainNetwork.Ethereum;
+    case ChainBase.NEAR:
+      return ChainNetwork.NEAR;
+    default:
+      return null;
   }
 }
 
 export function baseToLabel(n: ChainBase): string {
   switch (n) {
-    case ChainBase.CosmosSDK: return 'Cosmos Wallet';
-    case ChainBase.Substrate: return 'polkadot-js';
-    case ChainBase.Ethereum: return 'Ethereum Wallet';
-    case ChainBase.NEAR: return 'NEAR Wallet';
-    default: return 'Wallet';
+    case ChainBase.CosmosSDK:
+      return 'Cosmos Wallet';
+    case ChainBase.Substrate:
+      return 'polkadot-js';
+    case ChainBase.Ethereum:
+      return 'Ethereum Wallet';
+    case ChainBase.NEAR:
+      return 'NEAR Wallet';
+    default:
+      return 'Wallet';
   }
 }
 
 export function networkToBase(n: ChainNetwork | string): ChainBase {
   switch (n) {
-    case ChainNetwork.Clover: return ChainBase.Substrate;
-    case ChainNetwork.Edgeware: return ChainBase.Substrate;
-    case ChainNetwork.EdgewareTestnet: return ChainBase.Substrate;
-    case ChainNetwork.Kusama: return ChainBase.Substrate;
-    case ChainNetwork.Kulupu: return ChainBase.Substrate;
-    case ChainNetwork.Polkadot: return ChainBase.Substrate;
-    case ChainNetwork.Plasm: return ChainBase.Substrate;
-    case ChainNetwork.Stafi: return ChainBase.Substrate;
-    case ChainNetwork.Darwinia: return ChainBase.Substrate;
-    case ChainNetwork.Phala: return ChainBase.Substrate;
-    case ChainNetwork.Centrifuge: return ChainBase.Substrate;
-    case ChainNetwork.HydraDX: return ChainBase.Substrate;
-    case ChainNetwork.Cosmos: return ChainBase.CosmosSDK;
-    case ChainNetwork.Straightedge: return ChainBase.CosmosSDK;
-    case ChainNetwork.NEAR: return ChainBase.NEAR;
-    case ChainNetwork.Ethereum: return ChainBase.Ethereum;
-    case ChainNetwork.Moloch: return ChainBase.Ethereum;
-    case ChainNetwork.Metacartel: return ChainBase.Ethereum;
-    case ChainNetwork.Commonwealth: return ChainBase.Ethereum;
-    case ChainNetwork.ALEX: return ChainBase.Ethereum;
-    case ChainNetwork.Marlin: return ChainBase.Ethereum;
-    case ChainNetwork.MarlinTestnet: return ChainBase.Ethereum;
-    default: return null;
+    case ChainNetwork.Clover:
+      return ChainBase.Substrate;
+    case ChainNetwork.Edgeware:
+      return ChainBase.Substrate;
+    case ChainNetwork.EdgewareTestnet:
+      return ChainBase.Substrate;
+    case ChainNetwork.Kusama:
+      return ChainBase.Substrate;
+    case ChainNetwork.Kulupu:
+      return ChainBase.Substrate;
+    case ChainNetwork.Polkadot:
+      return ChainBase.Substrate;
+    case ChainNetwork.Plasm:
+      return ChainBase.Substrate;
+    case ChainNetwork.Stafi:
+      return ChainBase.Substrate;
+    case ChainNetwork.Darwinia:
+      return ChainBase.Substrate;
+    case ChainNetwork.Phala:
+      return ChainBase.Substrate;
+    case ChainNetwork.Centrifuge:
+      return ChainBase.Substrate;
+    case ChainNetwork.HydraDX:
+      return ChainBase.Substrate;
+    case ChainNetwork.Cosmos:
+      return ChainBase.CosmosSDK;
+    case ChainNetwork.Straightedge:
+      return ChainBase.CosmosSDK;
+    case ChainNetwork.NEAR:
+      return ChainBase.NEAR;
+    case ChainNetwork.Ethereum:
+      return ChainBase.Ethereum;
+    case ChainNetwork.Moloch:
+      return ChainBase.Ethereum;
+    case ChainNetwork.Metacartel:
+      return ChainBase.Ethereum;
+    case ChainNetwork.Commonwealth:
+      return ChainBase.Ethereum;
+    case ChainNetwork.ALEX:
+      return ChainBase.Ethereum;
+    case ChainNetwork.Marlin:
+      return ChainBase.Ethereum;
+    case ChainNetwork.MarlinTestnet:
+      return ChainBase.Ethereum;
+    default:
+      return null;
   }
 }
 
@@ -176,7 +209,13 @@ export enum VotingUnit {
   None = 'none',
 }
 
-export type ProposalEndTime = IFixedEndTime | IFixedBlockEndTime | IDynamicEndTime | IThresholdEndTime |
-  INotStartedEndTime | IQueuedEndTime | IUnavailableEndTime;
+export type ProposalEndTime =
+  | IFixedEndTime
+  | IFixedBlockEndTime
+  | IDynamicEndTime
+  | IThresholdEndTime
+  | INotStartedEndTime
+  | IQueuedEndTime
+  | IUnavailableEndTime;
 
 export type AnyProposal = Proposal<any, any, any, any>;

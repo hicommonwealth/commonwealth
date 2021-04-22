@@ -14,7 +14,7 @@ const log = factory.getLogger(formatFilename(__filename));
 interface CacheT {
   [contract: string]: {
     [address: string]: {
-      balance: BN,
+      balance: BN;
       fetchedAt: moment.Moment;
     };
   };
@@ -30,29 +30,39 @@ export interface TokenForumMeta {
 export default class TokenBalanceCache extends JobRunner<CacheT> {
   private _contracts: TokenForumMeta[];
 
-  constructor(noBalancePruneTimeS: number = 5 * 60, private _hasBalancePruneTimeS: number = 24 * 60 * 60) {
+  constructor(
+    noBalancePruneTimeS: number = 5 * 60,
+    private _hasBalancePruneTimeS: number = 24 * 60 * 60
+  ) {
     super({}, noBalancePruneTimeS);
   }
 
-  public static async connectTokens(models, network = 'mainnet'): Promise<TokenForumMeta[]> {
+  public static async connectTokens(
+    models,
+    network = 'mainnet'
+  ): Promise<TokenForumMeta[]> {
     // initialize web3 (we all URL fields should be the same -- infura)
-    const web3Provider = new Web3.providers.HttpProvider(`https://${network}.infura.io/v3/${INFURA_API_KEY}`);
+    const web3Provider = new Web3.providers.HttpProvider(
+      `https://${network}.infura.io/v3/${INFURA_API_KEY}`
+    );
     const provider = new providers.Web3Provider(web3Provider);
 
     // initialize metadata from database
     const tokens = await models['Chain'].findAll({
       where: { type: 'token' },
-      include: [ models['ChainNode'] ],
+      include: [models['ChainNode']],
     });
 
     // TODO: support customized balance thresholds
     return tokens
       .filter(({ ChainNodes }) => ChainNodes)
-      .map(({ ChainNodes }): TokenForumMeta => ({
-        id: ChainNodes[0].chain,
-        address: ChainNodes[0].address,
-        api: Erc20Factory.connect(ChainNodes[0].address, provider),
-      }));
+      .map(
+        ({ ChainNodes }): TokenForumMeta => ({
+          id: ChainNodes[0].chain,
+          address: ChainNodes[0].address,
+          api: Erc20Factory.connect(ChainNodes[0].address, provider),
+        })
+      );
   }
 
   public async start(tokenMeta: TokenForumMeta[]) {
@@ -61,13 +71,17 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     // write init values into saved cache
     await this.access(async (cache) => {
       for (const { id } of this._contracts) {
-        cache[id] = { };
+        cache[id] = {};
       }
     });
 
     // kick off job
     super.start();
-    log.info(`Started Token Balance Cache with tokens: ${JSON.stringify(this._contracts.map(({ id }) => id))}`);
+    log.info(
+      `Started Token Balance Cache with tokens: ${JSON.stringify(
+        this._contracts.map(({ id }) => id)
+      )}`
+    );
   }
 
   public async reset(tokenMeta: TokenForumMeta[]) {
@@ -87,9 +101,11 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     const threshold = tokenMeta.balanceThreshold || new BN(1);
 
     // first check the cache for the token balance
-    const result = await this.access((async (c: CacheT): Promise<BN | undefined> => {
-      return c[contractId][address]?.balance;
-    }));
+    const result = await this.access(
+      async (c: CacheT): Promise<BN | undefined> => {
+        return c[contractId][address]?.balance;
+      }
+    );
     if (result !== undefined) return result.gte(threshold);
 
     // fetch balance if not found in cache
@@ -103,9 +119,9 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     const fetchedAt = moment();
 
     // write fetched balance back to cache
-    await this.access((async (c: CacheT) => {
+    await this.access(async (c: CacheT) => {
       c[contractId][address] = { balance, fetchedAt };
-    }));
+    });
     return balance.gte(threshold);
   }
 
@@ -118,7 +134,10 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
           delete cache[contract][address];
         } else {
           // 24 hour lifetime if token balance
-          const cutoff = moment().subtract(this._hasBalancePruneTimeS, 'seconds');
+          const cutoff = moment().subtract(
+            this._hasBalancePruneTimeS,
+            'seconds'
+          );
           const fetchedAt = cache[contract][address].fetchedAt;
           if (fetchedAt.isSameOrBefore(cutoff)) {
             delete cache[contract][address];

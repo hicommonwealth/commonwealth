@@ -12,21 +12,35 @@ export const Errors = {
   MemberAlreadyExists: 'Membership already exists',
 };
 
-const createMembership = async (models, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+const createMembership = async (
+  models,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const [chain, community, error] = await lookupCommunityIsVisibleToUser(
+    models,
+    req.body,
+    req.user
+  );
   if (error) return next(new Error(error));
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
 
   // Privacy check: Cannot join a private community, but we shouldn't reveal the existence of private communities here
-  if (community && community.privacyEnabled) return next(new Error(Errors.InvalidChain));
+  if (community && community.privacyEnabled)
+    return next(new Error(Errors.InvalidChain));
 
-  const existingMembership = await models.Membership.findOne({ where: chain ? {
-    user_id: req.user.id,
-    chain: chain.id,
-  } : {
-    user_id: req.user.id,
-    community: community.id,
-  } });
+  const existingMembership = await models.Membership.findOne({
+    where: chain
+      ? {
+          user_id: req.user.id,
+          chain: chain.id,
+        }
+      : {
+          user_id: req.user.id,
+          community: community.id,
+        },
+  });
   if (existingMembership) return next(new Error(Errors.MemberAlreadyExists));
 
   // We should require an address to be created when joining a community.
@@ -51,13 +65,17 @@ const createMembership = async (models, req: Request, res: Response, next: NextF
   //   if (validAddresses.length === 0) return next(new Error('Verified address required'));
   // }
 
-  const membership = await models.Membership.create(chain ? {
-    user_id: req.user.id,
-    chain: chain.id,
-  } : {
-    user_id: req.user.id,
-    community: community.id,
-  });
+  const membership = await models.Membership.create(
+    chain
+      ? {
+          user_id: req.user.id,
+          chain: chain.id,
+        }
+      : {
+          user_id: req.user.id,
+          community: community.id,
+        }
+  );
 
   return res.json({ status: 'Success', result: membership.toJSON() });
 };

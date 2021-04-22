@@ -14,8 +14,22 @@ class OffchainTopic {
     this.communityId = communityId;
     this.chainId = chainId;
   }
-  public static fromJSON({ name, id, description, telegram, communityId, chainId }) {
-    return new OffchainTopic(name, id, description, telegram, communityId, chainId);
+  public static fromJSON({
+    name,
+    id,
+    description,
+    telegram,
+    communityId,
+    chainId,
+  }) {
+    return new OffchainTopic(
+      name,
+      id,
+      description,
+      telegram,
+      communityId,
+      chainId
+    );
   }
 }
 

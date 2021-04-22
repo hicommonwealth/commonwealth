@@ -12,7 +12,12 @@ export const Errors = {
   InvalidAddress: 'Must provide editor address and chain',
 };
 
-const deleteEditors = async (models, req: Request, res: Response, next: NextFunction) => {
+const deleteEditors = async (
+  models,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.body.thread_id) {
     return next(new Error(Errors.InvalidThread));
   }
@@ -24,13 +29,19 @@ const deleteEditors = async (models, req: Request, res: Response, next: NextFunc
   } catch (e) {
     return next(new Error(Errors.InvalidEditorFormat));
   }
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  const [chain, community, error] = await lookupCommunityIsVisibleToUser(
+    models,
+    req.body,
+    req.user
+  );
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));
 
-  const userOwnedAddressIds = await (req.user as any).getAddresses()
-    .filter((addr) => !!addr.verified).map((addr) => addr.id);
+  const userOwnedAddressIds = await (req.user as any)
+    .getAddresses()
+    .filter((addr) => !!addr.verified)
+    .map((addr) => addr.id);
   const thread = await models.OffchainThread.findOne({
     where: {
       id: thread_id,
@@ -39,35 +50,39 @@ const deleteEditors = async (models, req: Request, res: Response, next: NextFunc
   });
   if (!thread) return next(new Error(Errors.InvalidThread));
 
-  await Promise.all(editors.map(async (editor: any) => {
-    const address = await models.Address.findOne({
-      where: {
-        chain: editor.chain,
-        address: editor.address,
-      },
-    });
-    const collaboration = await models.Collaboration.findOne({
-      where: {
-        offchain_thread_id: thread.id,
-        address_id: address.id
+  await Promise.all(
+    editors.map(async (editor: any) => {
+      const address = await models.Address.findOne({
+        where: {
+          chain: editor.chain,
+          address: editor.address,
+        },
+      });
+      const collaboration = await models.Collaboration.findOne({
+        where: {
+          offchain_thread_id: thread.id,
+          address_id: address.id,
+        },
+      });
+      if (collaboration) {
+        await collaboration.destroy();
       }
-    });
-    if (collaboration) {
-      await collaboration.destroy();
-    }
-  }));
+    })
+  );
 
   const finalEditors = await models.Collaboration.findAll({
     where: { offchain_thread_id: thread.id },
-    include: [{
-      model: models.Address,
-    }]
+    include: [
+      {
+        model: models.Address,
+      },
+    ],
   });
 
   return res.json({
     status: 'Success',
     result: {
-      collaborators: finalEditors.map((e) => e.Address.toJSON())
+      collaborators: finalEditors.map((e) => e.Address.toJSON()),
     },
   });
 };

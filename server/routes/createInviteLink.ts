@@ -12,13 +12,18 @@ export const Errors = {
 };
 
 const createInviteLink = async (models, req, res, next) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  const [chain, community, error] = await lookupCommunityIsVisibleToUser(
+    models,
+    req.body,
+    req.user
+  );
   if (error) return next(new Error(error));
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   const { time } = req.body;
   if (!time) return next(new Error(Errors.NoTimeLimit));
 
-  const chainOrCommunityObj = chain ? { chain_id: chain.id }
+  const chainOrCommunityObj = chain
+    ? { chain_id: chain.id }
     : { community_id: community.id };
 
   if (community && !community.invitesEnabled) {
@@ -55,7 +60,7 @@ const createInviteLink = async (models, req, res, next) => {
     });
     if (foreverInvite) {
       if (foreverInvite.active === false) {
-        await foreverInvite.update({ active: true, });
+        await foreverInvite.update({ active: true });
       }
       return res.json({ status: 'Success', result: foreverInvite.toJSON() });
     }
@@ -66,14 +71,16 @@ const createInviteLink = async (models, req, res, next) => {
   const inviteLink = await models.InviteLink.create({
     id: inviteId,
     // community_id: community.id,
-    ... chainOrCommunityObj,
+    ...chainOrCommunityObj,
     creator_id: req.user.id,
     active: true,
     multi_use: uses,
     time_limit: time,
     used: 0,
   });
-  if (!inviteLink) { return res.json({ status: 'Failure' }); }
+  if (!inviteLink) {
+    return res.json({ status: 'Failure' });
+  }
 
   return res.json({ status: 'Success', result: inviteLink.toJSON() });
 };

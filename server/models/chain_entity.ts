@@ -22,43 +22,60 @@ export interface ChainEntityAttributes {
 }
 
 export interface ChainEntityInstance
-extends Sequelize.Instance<ChainEntityAttributes>, ChainEntityAttributes {
+  extends Sequelize.Instance<ChainEntityAttributes>,
+    ChainEntityAttributes {}
 
-}
-
-export interface ChainEntityModel extends Sequelize.Model<ChainEntityInstance, ChainEntityAttributes> {
-
-}
+export type ChainEntityModel = Sequelize.Model<
+  ChainEntityInstance,
+  ChainEntityAttributes
+>;
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
+  dataTypes: Sequelize.DataTypes
 ): ChainEntityModel => {
-  const ChainEntity = sequelize.define<ChainEntityInstance, ChainEntityAttributes>('ChainEntity', {
-    id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    chain: { type: dataTypes.STRING, allowNull: false },
-    type: { type: dataTypes.STRING, allowNull: false },
-    type_id: { type: dataTypes.STRING, allowNull: false },
-    thread_id: { type: dataTypes.INTEGER, allowNull: true },
-    completed: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
-    title: { type: dataTypes.STRING, allowNull: true },
-    author: { type: dataTypes.STRING, allowNull: true },
+  const ChainEntity = sequelize.define<
+    ChainEntityInstance,
+    ChainEntityAttributes
+  >(
+    'ChainEntity',
+    {
+      id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+      chain: { type: dataTypes.STRING, allowNull: false },
+      type: { type: dataTypes.STRING, allowNull: false },
+      type_id: { type: dataTypes.STRING, allowNull: false },
+      thread_id: { type: dataTypes.INTEGER, allowNull: true },
+      completed: {
+        type: dataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      title: { type: dataTypes.STRING, allowNull: true },
+      author: { type: dataTypes.STRING, allowNull: true },
 
-    created_at: { type: dataTypes.DATE, allowNull: false },
-    updated_at: { type: dataTypes.DATE, allowNull: false },
-  }, {
-    timestamps: true,
-    underscored: true,
-    paranoid: false,
-    indexes: [
-      { fields: ['id'] },
-      { fields: ['thread_id'] },
-      { fields: ['chain', 'type', 'id' ] },
-    ],
-  });
+      created_at: { type: dataTypes.DATE, allowNull: false },
+      updated_at: { type: dataTypes.DATE, allowNull: false },
+    },
+    {
+      timestamps: true,
+      underscored: true,
+      paranoid: false,
+      indexes: [
+        { fields: ['id'] },
+        { fields: ['thread_id'] },
+        { fields: ['chain', 'type', 'id'] },
+      ],
+    }
+  );
 
   ChainEntity.associate = (models) => {
-    models.ChainEntity.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
-    models.ChainEntity.belongsTo(models.OffchainThread, { foreignKey: 'thread_id', targetKey: 'id' });
+    models.ChainEntity.belongsTo(models.Chain, {
+      foreignKey: 'chain',
+      targetKey: 'id',
+    });
+    models.ChainEntity.belongsTo(models.OffchainThread, {
+      foreignKey: 'thread_id',
+      targetKey: 'id',
+    });
     models.ChainEntity.hasMany(models.ChainEvent, { foreignKey: 'entity_id' });
   };
 

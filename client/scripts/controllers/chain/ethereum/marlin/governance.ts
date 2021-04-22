@@ -10,11 +10,11 @@ import MarlinHolders from './holders';
 import MarlinChain from './chain';
 
 export interface MarlinProposalArgs {
-  targets: string[],
-  values: string[],
-  signatures: string[],
-  calldatas: string[], // TODO: CHECK IF THIS IS RIGHT
-  description: string,
+  targets: string[];
+  values: string[];
+  signatures: string[];
+  calldatas: string[]; // TODO: CHECK IF THIS IS RIGHT
+  description: string;
 }
 
 export default class MarlinGovernance extends ProposalModule<
@@ -34,18 +34,30 @@ export default class MarlinGovernance extends ProposalModule<
   private _api: MarlinAPI;
   private _Holders: MarlinHolders;
 
-
   // GETTERS
   // Contract Constants
-  public get quorumVotes() { return this._quorumVotes; }
-  public get proposalThreshold() { return this._proposalThreshold; }
-  public get proposalMaxOperations() { return this._proposalMaxOperations; }
-  public get votingDelay() { return this._votingDelay; }
-  public get votingPeriod() { return this._votingPeriod; }
+  public get quorumVotes() {
+    return this._quorumVotes;
+  }
+  public get proposalThreshold() {
+    return this._proposalThreshold;
+  }
+  public get proposalMaxOperations() {
+    return this._proposalMaxOperations;
+  }
+  public get votingDelay() {
+    return this._votingDelay;
+  }
+  public get votingPeriod() {
+    return this._votingPeriod;
+  }
 
-  public get api() { return this._api; }
-  public get usingServerChainEntities() { return this._usingServerChainEntities; }
-
+  public get api() {
+    return this._api;
+  }
+  public get usingServerChainEntities() {
+    return this._usingServerChainEntities;
+  }
 
   // INIT / DEINIT
   constructor(app: IApp, private _usingServerChainEntities = false) {
@@ -55,7 +67,10 @@ export default class MarlinGovernance extends ProposalModule<
   // METHODS
 
   public async castVote(proposalId: number, support: boolean) {
-    const tx = await this._api.governorAlphaContract.castVote(proposalId, support);
+    const tx = await this._api.governorAlphaContract.castVote(
+      proposalId,
+      support
+    );
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
       throw new Error(`Failed to cast vote on proposal #${proposalId}`);
@@ -66,9 +81,12 @@ export default class MarlinGovernance extends ProposalModule<
 
   public async propose(args: MarlinProposalArgs) {
     const { targets, values, signatures, calldatas, description } = args;
-    if (!targets || !values || !signatures || !calldatas || !description) return;
-    if (!(await this._Holders.isSenderDelegate())) throw new Error('sender must be valid delegate');
-    const priorDelegates = await this._Holders.get(this._api.userAddress)
+    if (!targets || !values || !signatures || !calldatas || !description)
+      return;
+    if (!(await this._Holders.isSenderDelegate()))
+      throw new Error('sender must be valid delegate');
+    const priorDelegates = await this._Holders
+      .get(this._api.userAddress)
       .priorDelegates(this._api.Provider.blockNumber);
     if (this.proposalThreshold < priorDelegates) {
       throw new Error('sender must have requisite delegates');
@@ -78,8 +96,12 @@ export default class MarlinGovernance extends ProposalModule<
     }
 
     const tx = await this._api.governorAlphaContract.propose(
-      targets, values, signatures, calldatas, description,
-      { gasLimit: this._api.gasLimit },
+      targets,
+      values,
+      signatures,
+      calldatas,
+      description,
+      { gasLimit: this._api.gasLimit }
     );
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
@@ -124,11 +146,21 @@ export default class MarlinGovernance extends ProposalModule<
     this._Holders = Holders;
     this._api = api;
 
-    this._quorumVotes = new BN((await this._api.governorAlphaContract.quorumVotes()).toString());
-    this._proposalThreshold = new BN((await this._api.governorAlphaContract.proposalThreshold()).toString());
-    this._proposalMaxOperations = new BN((await this._api.governorAlphaContract.proposalMaxOperations()).toString());
-    this._votingDelay = new BN((await this._api.governorAlphaContract.votingDelay()).toString());
-    this._votingPeriod = new BN((await this._api.governorAlphaContract.votingPeriod()).toString());
+    this._quorumVotes = new BN(
+      (await this._api.governorAlphaContract.quorumVotes()).toString()
+    );
+    this._proposalThreshold = new BN(
+      (await this._api.governorAlphaContract.proposalThreshold()).toString()
+    );
+    this._proposalMaxOperations = new BN(
+      (await this._api.governorAlphaContract.proposalMaxOperations()).toString()
+    );
+    this._votingDelay = new BN(
+      (await this._api.governorAlphaContract.votingDelay()).toString()
+    );
+    this._votingPeriod = new BN(
+      (await this._api.governorAlphaContract.votingPeriod()).toString()
+    );
     this._initialized = true;
   }
 

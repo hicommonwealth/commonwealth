@@ -24,63 +24,82 @@ export interface OffchainCommentAttributes {
   Chain?: ChainAttributes;
   OffchainCommunity?: OffchainCommunityAttributes;
   Address?: AddressAttributes;
-  OffchainAttachments?: OffchainAttachmentAttributes[] | OffchainAttachmentAttributes['id'][];
+  OffchainAttachments?:
+    | OffchainAttachmentAttributes[]
+    | OffchainAttachmentAttributes['id'][];
 }
 
 export interface OffchainCommentInstance
-extends Sequelize.Instance<OffchainCommentAttributes>, OffchainCommentAttributes {
+  extends Sequelize.Instance<OffchainCommentAttributes>,
+    OffchainCommentAttributes {
   // no mixins used
 }
 
-export interface OffchainCommentModel extends Sequelize.Model<OffchainCommentInstance, OffchainCommentAttributes> {
-
-}
+export type OffchainCommentModel = Sequelize.Model<
+  OffchainCommentInstance,
+  OffchainCommentAttributes
+>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
+  dataTypes: Sequelize.DataTypes
 ): OffchainCommentModel => {
-  const OffchainComment = sequelize.define<OffchainCommentInstance, OffchainCommentAttributes>('OffchainComment', {
-    id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-    chain: { type: dataTypes.STRING, allowNull: true },
-    root_id: { type: dataTypes.STRING, allowNull: false },
-    parent_id: { type: dataTypes.STRING, allowNull: true },
-    child_comments: { type: dataTypes.ARRAY(dataTypes.INTEGER), allowNull: false, defaultValue: [] },
-    address_id: { type: dataTypes.INTEGER, allowNull: false },
-    text: { type: dataTypes.TEXT, allowNull: false },
-    plaintext: { type: dataTypes.TEXT, allowNull: true },
-    community: { type: dataTypes.STRING, allowNull: true },
-    version_history: { type: dataTypes.ARRAY(dataTypes.TEXT), defaultValue: [], allowNull: false },
-    created_at: { type: dataTypes.DATE, allowNull: false },
-    updated_at: { type: dataTypes.DATE, allowNull: false },
-    deleted_at: { type: dataTypes.DATE, allowNull: true },
-  }, {
-    underscored: true,
-    paranoid: true,
-    indexes: [
-      { fields: ['id'] },
-      { fields: ['chain', 'root_id'] },
-      { fields: ['address_id'] },
-      { fields: ['chain', 'created_at'] },
-      { fields: ['community', 'created_at'] },
-      { fields: ['chain', 'updated_at'] },
-      { fields: ['community', 'updated_at'] },
-      { fields: ['root_id'] },
-    ],
-  });
+  const OffchainComment = sequelize.define<
+    OffchainCommentInstance,
+    OffchainCommentAttributes
+  >(
+    'OffchainComment',
+    {
+      id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+      chain: { type: dataTypes.STRING, allowNull: true },
+      root_id: { type: dataTypes.STRING, allowNull: false },
+      parent_id: { type: dataTypes.STRING, allowNull: true },
+      child_comments: {
+        type: dataTypes.ARRAY(dataTypes.INTEGER),
+        allowNull: false,
+        defaultValue: [],
+      },
+      address_id: { type: dataTypes.INTEGER, allowNull: false },
+      text: { type: dataTypes.TEXT, allowNull: false },
+      plaintext: { type: dataTypes.TEXT, allowNull: true },
+      community: { type: dataTypes.STRING, allowNull: true },
+      version_history: {
+        type: dataTypes.ARRAY(dataTypes.TEXT),
+        defaultValue: [],
+        allowNull: false,
+      },
+      created_at: { type: dataTypes.DATE, allowNull: false },
+      updated_at: { type: dataTypes.DATE, allowNull: false },
+      deleted_at: { type: dataTypes.DATE, allowNull: true },
+    },
+    {
+      underscored: true,
+      paranoid: true,
+      indexes: [
+        { fields: ['id'] },
+        { fields: ['chain', 'root_id'] },
+        { fields: ['address_id'] },
+        { fields: ['chain', 'created_at'] },
+        { fields: ['community', 'created_at'] },
+        { fields: ['chain', 'updated_at'] },
+        { fields: ['community', 'updated_at'] },
+        { fields: ['root_id'] },
+      ],
+    }
+  );
 
   OffchainComment.associate = (models) => {
     models.OffchainComment.belongsTo(models.Chain, {
       foreignKey: 'chain',
-      targetKey: 'id'
+      targetKey: 'id',
     });
     models.OffchainComment.belongsTo(models.OffchainCommunity, {
       foreignKey: 'community',
-      targetKey: 'id'
+      targetKey: 'id',
     });
     models.OffchainComment.belongsTo(models.Address, {
       foreignKey: 'address_id',
-      targetKey: 'id'
+      targetKey: 'id',
     });
     models.OffchainComment.hasMany(models.OffchainAttachment, {
       foreignKey: 'attachment_id',

@@ -24,16 +24,32 @@ export default class MolochAPI {
   private _Signer: JsonRpcSigner;
   private _tokenContract: Erc20;
 
-  public get contractAddress() { return this._contractAddress; }
-  public get userAddress() { return this._userAddress; }
-  public get Contract(): Moloch1 { return this._Contract; }
-  public get Provider(): Web3Provider { return this._Provider; }
-  public get Signer(): JsonRpcSigner { return this._Signer; }
-  public get tokenContract() { return this._tokenContract; }
+  public get contractAddress() {
+    return this._contractAddress;
+  }
+  public get userAddress() {
+    return this._userAddress;
+  }
+  public get Contract(): Moloch1 {
+    return this._Contract;
+  }
+  public get Provider(): Web3Provider {
+    return this._Provider;
+  }
+  public get Signer(): JsonRpcSigner {
+    return this._Signer;
+  }
+  public get tokenContract() {
+    return this._tokenContract;
+  }
 
-  constructor(contractAddress: string, web3Provider: AsyncSendable, userAddress?: string) {
+  constructor(
+    contractAddress: string,
+    web3Provider: AsyncSendable,
+    userAddress?: string
+  ) {
     this._contractAddress = contractAddress.toLowerCase();
-    if (userAddress) { 
+    if (userAddress) {
       this._userAddress = userAddress.toLowerCase();
     } else {
       this._userAddress = '0';
@@ -45,7 +61,10 @@ export default class MolochAPI {
 
   public updateSigner(userAddress: string) {
     this._Signer = this._Provider.getSigner(userAddress);
-    this._Contract = Moloch1Factory.connect(this._contractAddress, this._Signer);
+    this._Contract = Moloch1Factory.connect(
+      this._contractAddress,
+      this._Signer
+    );
   }
 
   public async init() {

@@ -13,27 +13,27 @@ export default {
     lockFor: 'LockFor',
     LockReasons: 'Reasons',
     amount: 'Balance',
-    reasons: 'Reasons'
+    reasons: 'Reasons',
   },
   LockFor: {
     _enum: {
       Common: 'Common',
-      Staking: 'StakingLock'
-    }
+      Staking: 'StakingLock',
+    },
   },
   Common: {
-    amount: 'Balance'
+    amount: 'Balance',
   },
   StakingLock: {
     stakingAmount: 'Balance',
-    unbondings: 'Vec<Unbonding>'
+    unbondings: 'Vec<Unbonding>',
   },
   Reasons: {
-    _enum: ['Fee', 'Misc', 'All']
+    _enum: ['Fee', 'Misc', 'All'],
   },
   Unbonding: {
     amount: 'Balance',
-    moment: 'BlockNumber'
+    moment: 'BlockNumber',
   },
   AccountData: {
     free: 'Balance',
@@ -41,7 +41,7 @@ export default {
     freeKton: 'Balance',
     reservedKton: 'Balance',
     miscFrozen: 'Balance',
-    feeFrozen: 'Balance'
+    feeFrozen: 'Balance',
   },
 
   RingBalance: 'Balance',
@@ -52,8 +52,8 @@ export default {
   StakingBalanceT: {
     _enum: {
       RingBalance: 'Balance',
-      KtonBalance: 'Balance'
-    }
+      KtonBalance: 'Balance',
+    },
   },
   StakingLedgerT: {
     stash: 'AccountId',
@@ -66,46 +66,46 @@ export default {
     claimedRewards: 'Vec<EraIndex>',
     total: 'Compact<Balance>',
     active: 'Compact<Balance>',
-    unlocking: 'Vec<UnlockChunk>'
+    unlocking: 'Vec<UnlockChunk>',
   },
   TimeDepositItem: {
     value: 'Compact<Balance>',
     startTime: 'Compact<TsInMs>',
-    expireTime: 'Compact<TsInMs>'
+    expireTime: 'Compact<TsInMs>',
   },
   ExposureT: {
     ownRingBalance: 'Compact<Balance>',
     ownKtonBalance: 'Compact<Balance>',
     ownPower: 'Power',
     totalPower: 'Power',
-    others: 'Vec<IndividualExposure>'
+    others: 'Vec<IndividualExposure>',
   },
   Exposure: 'ExposureT',
   IndividualExposure: {
     who: 'AccountId',
     ringBalance: 'Compact<Balance>',
     ktonBalance: 'Compact<Balance>',
-    power: 'Power'
+    power: 'Power',
   },
   ElectionResultT: {
     electedStashes: 'Vec<AccountId>',
     exposures: 'Vec<(AccountId, ExposureT)>',
-    compute: 'ElectionCompute'
+    compute: 'ElectionCompute',
   },
   RKT: {
     r: 'Balance',
-    k: 'Balance'
+    k: 'Balance',
   },
   SpanRecord: {
     slashed: 'RKT',
-    paidOut: 'RKT'
+    paidOut: 'RKT',
   },
   UnappliedSlash: {
     validator: 'AccountId',
     own: 'RKT',
     others: 'Vec<(AccountId, RKT)>',
     reporters: 'Vec<AccountId>',
-    payout: 'RKT'
+    payout: 'RKT',
   },
 
   TreasuryProposal: {
@@ -114,7 +114,7 @@ export default {
     ringValue: 'Balance',
     ktonValue: 'Balance',
     ringBond: 'Balance',
-    ktonBond: 'Balance'
+    ktonBond: 'Balance',
   },
 
   MappedRing: 'u128',
@@ -136,20 +136,20 @@ export default {
     gas_limit: 'U256',
     difficulty: 'U256',
     seal: 'Vec<Bytes>',
-    hash: 'Option<H256>'
+    hash: 'Option<H256>',
   },
   EthereumAddress: 'H160',
   Bloom: '[u8; 256; Bloom]',
   H128: '[u8; 16; H128]',
   EthashProof: {
     dagNodes: '(H512, H512)',
-    proof: 'Vec<H128>'
+    proof: 'Vec<H128>',
   },
   EthereumReceipt: {
     gasUsed: 'U256',
     logBloom: 'Bloom',
     logs: 'Vec<LogEntry>',
-    outcome: 'TransactionOutcome'
+    outcome: 'TransactionOutcome',
   },
 
   LogEntry: {},
@@ -158,54 +158,54 @@ export default {
   EthereumNetworkType: {
     _enum: {
       Mainnet: null,
-      Ropsten: null
-    }
+      Ropsten: null,
+    },
   },
   RedeemFor: {
     _enum: {
       Token: null,
-      Deposit: null
-    }
+      Deposit: null,
+    },
   },
   EthereumReceiptProof: {
     index: 'u64',
     proof: 'Bytes',
-    headerHash: 'H256'
+    headerHash: 'H256',
   },
   EthereumReceiptProofThing: '(EthereumHeader, EthereumReceiptProof, MMRProof)',
   MMRProof: {
     memberLeafIndex: 'u64',
     lastLeafIndex: 'u64',
-    proof: 'Vec<H256>'
+    proof: 'Vec<H256>',
   },
   EthereumRelayHeaderParcel: {
     header: 'EthereumHeader',
-    mmrRoot: 'H256'
+    mmrRoot: 'H256',
   },
   EthereumRelayProofs: {
     ethashProof: 'Vec<EthashProof>',
-    mmrProof: 'Vec<H256>'
+    mmrProof: 'Vec<H256>',
   },
 
   OtherSignature: {
     _enum: {
       Eth: 'EcdsaSignature',
-      Tron: 'EcdsaSignature'
-    }
+      Tron: 'EcdsaSignature',
+    },
   },
   EcdsaSignature: '[u8; 65; EcdsaSignature]',
   TronAddress: 'EthereumAddress',
   OtherAddress: {
     _enum: {
       Eth: 'EthereumAddress',
-      Tron: 'TronAddress'
-    }
+      Tron: 'TronAddress',
+    },
   },
   AddressT: '[u8; 20; AddressT]',
 
   MerkleMountainRangeRootLog: {
     prefix: '[u8; 4; Prefix]',
-    mmrRoot: 'Hash'
+    mmrRoot: 'Hash',
   },
 
   ChainProperties: {
@@ -213,18 +213,18 @@ export default {
     tokenDecimals: 'Option<u32>',
     tokenSymbol: 'Option<Text>',
     ktonTokenDecimals: 'Option<u32>',
-    ktonTokenSymbol: 'Option<Text>'
+    ktonTokenSymbol: 'Option<Text>',
   },
 
   AccountInfo: {
     nonce: 'Index',
     refcount: 'RefCount',
-    data: 'AccountData'
+    data: 'AccountData',
   },
   ProxyDefinition: {
     delegate: 'AccountId',
     proxyType: 'ProxyType',
-    delay: 'BlockNumber'
+    delay: 'BlockNumber',
   },
   ProxyType: {
     _enum: {
@@ -233,13 +233,13 @@ export default {
       Governance: null,
       Staking: null,
       IdentityJudgement: null,
-      EthereumBridge: null
-    }
+      EthereumBridge: null,
+    },
   },
   ProxyAnnouncement: {
     real: 'AccountId',
     callHash: 'Hash',
-    height: 'BlockNumber'
+    height: 'BlockNumber',
   },
   Announcement: 'ProxyAnnouncement',
   RelayHeaderId: 'EthereumBlockNumber',
@@ -248,20 +248,20 @@ export default {
   RelayAffirmationId: {
     relayHeaderId: 'EthereumBlockNumber',
     round: 'u32',
-    index: 'u32'
+    index: 'u32',
   },
   RelayAffirmationT: {
     relayer: 'AccountId',
     relayHeaderParcels: 'EthereumRelayHeaderParcel',
     bond: 'Balance',
     maybeExtendedRelayAffirmationId: 'Option<RelayAffirmationId>',
-    verified: 'bool'
+    verified: 'bool',
   },
   RelayVotingState: {
     ayes: 'Vec<AccountId>',
-    nays: 'Vec<AccountId>'
+    nays: 'Vec<AccountId>',
   },
   PowerOf: {
-    power: 'Power'
-  }
+    power: 'Power',
+  },
 };

@@ -6,7 +6,9 @@ import { IUniqueId } from '../models/interfaces';
 class CommentsStore extends IdStore<OffchainComment<any>> {
   private _storeAuthor: { [address: string]: Array<OffchainComment<any>> } = {};
 
-  private _storeProposal: { [identifier: string]: Array<OffchainComment<any>> } = {};
+  private _storeProposal: {
+    [identifier: string]: Array<OffchainComment<any>>;
+  } = {};
 
   public add(comment: OffchainComment<any>) {
     // TODO: Remove this once we start enforcing an ordering in stores
@@ -30,16 +32,25 @@ class CommentsStore extends IdStore<OffchainComment<any>> {
 
     const authorIndex = this._storeAuthor[comment.author].indexOf(comment);
     if (authorIndex === -1) {
-      console.error('Attempting to remove a comment that was not found in the authors store');
+      console.error(
+        'Attempting to remove a comment that was not found in the authors store'
+      );
     }
     this._storeAuthor[comment.author].splice(authorIndex, 1);
 
     if (comment.proposal) {
-      const proposalIndex = this._storeProposal[comment.proposal.uniqueIdentifier].indexOf(comment);
+      const proposalIndex = this._storeProposal[
+        comment.proposal.uniqueIdentifier
+      ].indexOf(comment);
       if (comment.proposal && proposalIndex === -1) {
-        console.error('Attempting to remove a comment that was not found in the proposals store');
+        console.error(
+          'Attempting to remove a comment that was not found in the proposals store'
+        );
       }
-      this._storeProposal[comment.proposal.uniqueIdentifier].splice(proposalIndex, 1);
+      this._storeProposal[comment.proposal.uniqueIdentifier].splice(
+        proposalIndex,
+        1
+      );
     }
     return this;
   }
@@ -67,7 +78,9 @@ class CommentsStore extends IdStore<OffchainComment<any>> {
     return this._storeAuthor[address] || [];
   }
 
-  public getByProposal<T extends IUniqueId>(proposal: T): Array<OffchainComment<any>> {
+  public getByProposal<T extends IUniqueId>(
+    proposal: T
+  ): Array<OffchainComment<any>> {
     return this._storeProposal[proposal.uniqueIdentifier] || [];
   }
 

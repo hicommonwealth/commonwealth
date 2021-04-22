@@ -10,7 +10,12 @@ export const Errors = {
   NotOwned: 'Not owned by this user',
 };
 
-const deleteComment = async (models, req: Request, res: Response, next: NextFunction) => {
+const deleteComment = async (
+  models,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.user) {
     return next(new Error(Errors.NotLoggedIn));
   }
@@ -19,13 +24,16 @@ const deleteComment = async (models, req: Request, res: Response, next: NextFunc
   }
 
   try {
-    const userOwnedAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
+    const userOwnedAddressIds = await req.user
+      .getAddresses()
+      .filter((addr) => !!addr.verified)
+      .map((addr) => addr.id);
     const comment = await models.OffchainComment.findOne({
       where: {
         id: req.body.comment_id,
         address_id: { [Op.in]: userOwnedAddressIds },
       },
-      include: [ models.Address ],
+      include: [models.Address],
     });
     if (!comment) {
       return next(new Error(Errors.NotOwned));
@@ -36,9 +44,11 @@ const deleteComment = async (models, req: Request, res: Response, next: NextFunc
         offchain_comment_id: comment.id,
       },
     });
-    await Promise.all(subscriptions.map((s) => {
-      return s.destroy();
-    }));
+    await Promise.all(
+      subscriptions.map((s) => {
+        return s.destroy();
+      })
+    );
 
     // actually delete
     await comment.destroy();

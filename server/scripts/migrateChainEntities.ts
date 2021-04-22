@@ -5,7 +5,11 @@
  */
 
 import _ from 'underscore';
-import { SubstrateTypes, SubstrateEvents, chainSupportedBy } from '@commonwealth/chain-events';
+import {
+  SubstrateTypes,
+  SubstrateEvents,
+  chainSupportedBy,
+} from '@commonwealth/chain-events';
 
 import MigrationHandler from '../eventHandlers/migration';
 import EntityArchivalHandler from '../eventHandlers/entityArchival';
@@ -20,12 +24,16 @@ export default async function (models, chain?: string): Promise<void> {
   if (chain && !chainSupportedBy(chain, SubstrateTypes.EventChains)) {
     throw new Error('unsupported chain');
   }
-  const chains = !chain ? SubstrateTypes.EventChains.concat() : [ chain ];
+  const chains = !chain ? SubstrateTypes.EventChains.concat() : [chain];
 
   // query one node for each supported chain
-  const nodes = (await Promise.all(chains.map((c) => {
-    return models.ChainNode.findOne({ where: { chain: c } });
-  }))).filter((n) => !!n);
+  const nodes = (
+    await Promise.all(
+      chains.map((c) => {
+        return models.ChainNode.findOne({ where: { chain: c } });
+      })
+    )
+  ).filter((n) => !!n);
   if (!nodes) {
     throw new Error('no nodes found for chain entity migration');
   }
@@ -38,7 +46,10 @@ export default async function (models, chain?: string): Promise<void> {
 
     const nodeUrl = constructSubstrateUrl(node.url);
     try {
-      const api = await SubstrateEvents.createApi(nodeUrl, selectSpec(node.chain));
+      const api = await SubstrateEvents.createApi(
+        nodeUrl,
+        selectSpec(node.chain)
+      );
 
       // fetch all events and run through handlers in sequence then exit
       log.info('Fetching chain events...');

@@ -20,14 +20,22 @@ export default class MarlinHolder extends EthereumAccount {
   private _Holders: MarlinHolders;
 
   public get balance(): Promise<MPond> {
-    return this.initialized.then(() => this.isHolder
-      ? this._balance
-      : new MPond(this._Holders.api.mPondAddress, 0));
+    return this.initialized.then(() =>
+      this.isHolder
+        ? this._balance
+        : new MPond(this._Holders.api.mPondAddress, 0)
+    );
   }
 
-  public get isHolder() { return this._isHolder; }
-  public get isDelegate() { return this._isDelegate; }
-  public get getbalance() { return this._balance; }
+  public get isHolder() {
+    return this._isHolder;
+  }
+  public get isDelegate() {
+    return this._isDelegate;
+  }
+  public get getbalance() {
+    return this._balance;
+  }
 
   constructor(
     app: IApp,
@@ -44,8 +52,14 @@ export default class MarlinHolder extends EthereumAccount {
         throw new Error('Holder does not correspond with account');
       }
       this._isHolder = true;
-      this._balance = new MPond(this._Holders.api.mPondAddress, new BN(data.balance));
-      this._delegates = new MPond(this._Holders.api.mPondAddress, new BN(data.delegates));
+      this._balance = new MPond(
+        this._Holders.api.mPondAddress,
+        new BN(data.balance)
+      );
+      this._delegates = new MPond(
+        this._Holders.api.mPondAddress,
+        new BN(data.delegates)
+      );
       this._initialized = Promise.resolve(true);
     } else {
       this._initialized = new Promise((resolve, reject) => {
@@ -56,18 +70,28 @@ export default class MarlinHolder extends EthereumAccount {
   }
 
   public async refresh() {
-    const balance = await this._Holders.api.mPondContract?.balanceOf(this.address);
+    const balance = await this._Holders.api.mPondContract?.balanceOf(
+      this.address
+    );
     if (!balance.isZero()) {
       this._isHolder = true;
-      this._balance = new MPond(this._Holders.api.mPondAddress, new BN(balance.toString()));
+      this._balance = new MPond(
+        this._Holders.api.mPondAddress,
+        new BN(balance.toString())
+      );
     } else {
       this._isHolder = false;
       this._balance = new MPond(this._Holders.api.mPondAddress, new BN(0));
     }
-    const delegates = await this._Holders.api.mPondContract.getCurrentVotes(this.address);
+    const delegates = await this._Holders.api.mPondContract.getCurrentVotes(
+      this.address
+    );
     if (!delegates.isZero()) {
       this._isDelegate = true;
-      this._delegates = new MPond(this._Holders.api.mPondAddress, new BN(delegates.toString()));
+      this._delegates = new MPond(
+        this._Holders.api.mPondAddress,
+        new BN(delegates.toString())
+      );
     } else {
       this._isDelegate = false;
       this._delegates = new MPond(this._Holders.api.mPondAddress, new BN(0));
@@ -75,16 +99,24 @@ export default class MarlinHolder extends EthereumAccount {
   }
 
   public async priorDelegates(blockNumber: number | string) {
-    const delegates = await this._Holders.api.mPondContract.getPriorVotes(this.address, blockNumber);
+    const delegates = await this._Holders.api.mPondContract.getPriorVotes(
+      this.address,
+      blockNumber
+    );
     return new BN(delegates.toString(), 10) || new BN(0);
   }
 
   public async balanceOf() {
-    const balance = await this._Holders.api.mPondContract.balanceOf(this.address);
+    const balance = await this._Holders.api.mPondContract.balanceOf(
+      this.address
+    );
     console.log('balanceOf Marlin Accounts', balance);
     if (!balance.isZero()) {
       this._isHolder = true;
-      this._balance = new MPond(this._Holders.api.mPondAddress, new BN(balance.toString()));
+      this._balance = new MPond(
+        this._Holders.api.mPondAddress,
+        new BN(balance.toString())
+      );
     } else {
       this._isHolder = false;
       this._balance = new MPond(this._Holders.api.mPondAddress, new BN(0));

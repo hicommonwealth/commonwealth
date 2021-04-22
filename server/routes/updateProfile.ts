@@ -5,7 +5,7 @@ import {
   PROFILE_BIO_MAX_CHARS,
   PROFILE_HEADLINE_MAX_CHARS,
   PROFILE_NAME_MAX_CHARS,
-  PROFILE_NAME_MIN_CHARS
+  PROFILE_NAME_MIN_CHARS,
 } from '../../shared/types';
 import IdentityFetchCache from '../util/identityFetchCache';
 
@@ -23,7 +23,11 @@ export const Errors = {
 };
 
 const updateProfile = async (
-  models, identityFetchCache: IdentityFetchCache, req: Request, res: Response, next: NextFunction
+  models,
+  identityFetchCache: IdentityFetchCache,
+  req: Request,
+  res: Response,
+  next: NextFunction
 ) => {
   if (!req.body.chain || !req.body.address || !req.body.data) {
     return next(new Error(Errors.MissingParams));
@@ -40,7 +44,7 @@ const updateProfile = async (
     where: {
       chain: req.body.chain,
       address: req.body.address,
-    }
+    },
   });
   if (!address || !address.id) {
     return next(new Error(Errors.InvalidProfile));
@@ -59,62 +63,75 @@ const updateProfile = async (
   // enforce max chars
   if (unpackedData.name && unpackedData.name.length > PROFILE_NAME_MAX_CHARS) {
     return next(new Error(Errors.NameTooLong));
-  } else if (unpackedData.headline && unpackedData.headline.length > PROFILE_HEADLINE_MAX_CHARS) {
+  } else if (
+    unpackedData.headline &&
+    unpackedData.headline.length > PROFILE_HEADLINE_MAX_CHARS
+  ) {
     return next(new Error(Errors.HeadlineTooLong));
-  } else if (unpackedData.bio && unpackedData.bio.length > PROFILE_BIO_MAX_CHARS) {
+  } else if (
+    unpackedData.bio &&
+    unpackedData.bio.length > PROFILE_BIO_MAX_CHARS
+  ) {
     return next(new Error(Errors.BioTooLong));
   }
 
   const chain = await models.Chain.findOne({
-    where: { id: address.chain }
+    where: { id: address.chain },
   });
 
   const chains = await models.Chain.findAll({
-    where: { base: chain.base }
+    where: { base: chain.base },
   });
-
 
   const addressesInSameChainbase = await models.Address.findAll({
     where: {
       user_id: address.user_id,
       address: address.address,
-      chain: { [Op.in]: chains.map((ch) => ch.id) }
-    }
+      chain: { [Op.in]: chains.map((ch) => ch.id) },
+    },
   });
 
   // try to find existing profile
   const profiles = await models.OffchainProfile.findAll({
     where: {
       address_id: { [Op.in]: addressesInSameChainbase.map((_) => _.id) },
-    }
+    },
   });
   let profile = profiles.find((pro) => pro.address_id === address.id);
 
   if (unpackedData.name) {
-    await models.Address.update({
-      name: unpackedData.name
-    }, {
-      where: {
-        user_id: address.user_id,
-        address: address.address,
-        chain: { [Op.in]: chains.map((ch) => ch.id) }
+    await models.Address.update(
+      {
+        name: unpackedData.name,
+      },
+      {
+        where: {
+          user_id: address.user_id,
+          address: address.address,
+          chain: { [Op.in]: chains.map((ch) => ch.id) },
+        },
       }
-    });
+    );
   }
-  await models.OffchainProfile.update({
-    data: req.body.data
-  }, {
-    where: {
-      address_id: { [Op.in]: addressesInSameChainbase.map((addr) => addr.id) },
+  await models.OffchainProfile.update(
+    {
+      data: req.body.data,
+    },
+    {
+      where: {
+        address_id: {
+          [Op.in]: addressesInSameChainbase.map((addr) => addr.id),
+        },
+      },
     }
-  });
+  );
 
   // create if exists, update otherwise
   if (profile) {
     profile = await models.OffchainProfile.findOne({
       where: {
-        address_id: address.id
-      }
+        address_id: address.id,
+      },
     });
   } else {
     profile = await models.OffchainProfile.create({
@@ -124,7 +141,10 @@ const updateProfile = async (
 
     // new profiles on substrate chains get added to the identity cache
     // to be fetched on a timer job
-    if (!req.body.skipChainFetch && chainSupportedBy(req.body.chain, SubstrateTypes.EventChains)) {
+    if (
+      !req.body.skipChainFetch &&
+      chainSupportedBy(req.body.chain, SubstrateTypes.EventChains)
+    ) {
       await identityFetchCache.add(req.body.chain, req.body.address);
     }
   }

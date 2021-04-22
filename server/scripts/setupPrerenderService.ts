@@ -23,13 +23,13 @@ const setupPrerenderServer = () => {
     }
   } else if (isMac) {
     const server = prerender({
-      chromeLocation: '/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome',
+      chromeLocation:
+        '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
       port: 3000,
     });
     return run(server);
   }
   return run(prerender());
 };
-
 
 export default setupPrerenderServer;

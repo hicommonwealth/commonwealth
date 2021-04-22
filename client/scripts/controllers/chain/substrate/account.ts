@@ -3,8 +3,14 @@ import { ApiPromise } from '@polkadot/api';
 import { decodeAddress } from '@polkadot/keyring';
 import { KeyringPair } from '@polkadot/keyring/types';
 import {
-  Balance, BalanceLock, BalanceLockTo212, EraIndex,
-  AccountId, Exposure, Conviction, StakingLedger,
+  Balance,
+  BalanceLock,
+  BalanceLockTo212,
+  EraIndex,
+  AccountId,
+  Exposure,
+  Conviction,
+  StakingLedger,
 } from '@polkadot/types/interfaces';
 import { Vec } from '@polkadot/types';
 import { mnemonicValidate } from '@polkadot/util-crypto';
@@ -20,43 +26,43 @@ import BN from 'bn.js';
 import SubstrateChain from './shared';
 
 function addressFromSeed(seed: string, chain: SubstrateChain): string {
-  return `${(chain.keyring()).addFromUri(`//${seed}`).address}`;
+  return `${chain.keyring().addFromUri(`//${seed}`).address}`;
 }
 
 function addressFromMnemonic(mnemonic: string, chain: SubstrateChain): string {
   if (!mnemonicValidate(mnemonic)) throw new Error('Invalid mnemonic');
-  return `${(chain.keyring()).addFromMnemonic(mnemonic).address}`;
+  return `${chain.keyring().addFromMnemonic(mnemonic).address}`;
 }
 
 export interface IValidators {
   [address: string]: {
-    exposure: Exposure,
-    controller: string,
-    isElected: boolean,
-    prefs, // TODO
+    exposure: Exposure;
+    controller: string;
+    isElected: boolean;
+    prefs; // TODO
   };
 }
 
-type Delegation = [ AccountId, Conviction ] & Codec;
+type Delegation = [AccountId, Conviction] & Codec;
 
 export class SubstrateAccount extends Account<SubstrateCoin> {
   // GETTERS AND SETTERS
   // staking
   public get stakedBalance(): Promise<SubstrateCoin> {
     if (!this._Chain?.apiInitialized) return;
-    return this.stakingExposure.then(
-      (exposure) => this._Chain.coins(exposure ? exposure.total : NaN)
+    return this.stakingExposure.then((exposure) =>
+      this._Chain.coins(exposure ? exposure.total : NaN)
     );
   }
 
   // The total balance
   public get balance(): Promise<SubstrateCoin> {
     if (!this._Chain?.apiInitialized) return;
-    return this._Chain.api.derive.balances.all(this.address)
-      .then(({
-        freeBalance,
-        reservedBalance,
-      }) => this._Chain.coins(freeBalance.add(reservedBalance)));
+    return this._Chain.api.derive.balances
+      .all(this.address)
+      .then(({ freeBalance, reservedBalance }) =>
+        this._Chain.coins(freeBalance.add(reservedBalance))
+      );
   }
 
   // The quantity of unlocked balance
@@ -64,23 +70,32 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
   //   only includes subtracted reserves, and not locks! And we want to see free for usage now.
   public get freeBalance(): Promise<SubstrateCoin> {
     if (!this._Chain?.apiInitialized) return;
-    return this._Chain.api.derive.balances.all(this.address)
+    return this._Chain.api.derive.balances
+      .all(this.address)
       .then(({ availableBalance }) => this._Chain.coins(availableBalance));
   }
 
   public get lockedBalance(): Promise<SubstrateCoin> {
     if (!this._Chain?.apiInitialized) return;
-    return this._Chain.api.derive.balances.all(this.address)
-      // we compute illiquid balance by doing (total - available), because there's no query
-      // or parameter to fetch it
-      .then(({ availableBalance, votingBalance }) => this._Chain.coins(votingBalance.sub(availableBalance)));
+    return (
+      this._Chain.api.derive.balances
+        .all(this.address)
+        // we compute illiquid balance by doing (total - available), because there's no query
+        // or parameter to fetch it
+        .then(({ availableBalance, votingBalance }) =>
+          this._Chain.coins(votingBalance.sub(availableBalance))
+        )
+    );
   }
 
   // The coin locks this account has on them
   public get locks(): Promise<(BalanceLock | BalanceLockTo212)[]> {
     if (!this._Chain?.apiInitialized) return;
-    return this._Chain.api.derive.balances.all(this.address)
-      .then(({ lockedBreakdown }) => (lockedBreakdown.length > 0 ? lockedBreakdown : []));
+    return this._Chain.api.derive.balances
+      .all(this.address)
+      .then(({ lockedBreakdown }) =>
+        lockedBreakdown.length > 0 ? lockedBreakdown : []
+      );
   }
 
   // True iff this account is on the main substrate council
@@ -88,30 +103,39 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
   //   collective memberships.
   public get isCouncillor(): Promise<boolean> {
     if (!this._Chain?.apiInitialized) return;
-    return this._Chain.api.query.council.members()
-      .then((members: Vec<AccountId>) => undefined !== members.find((m) => m.toString() === this.address));
+    return this._Chain.api.query.council
+      .members()
+      .then(
+        (members: Vec<AccountId>) =>
+          undefined !== members.find((m) => m.toString() === this.address)
+      );
   }
 
   // The amount staked by this account & accounts who have nominated it
   public get stakingExposure(): Promise<Exposure> {
     if (!this._Chain?.apiInitialized) return;
-    return this._Chain.api.query.staking.currentEra<EraIndex>()
+    return this._Chain.api.query.staking
+      .currentEra<EraIndex>()
       .then((era: EraIndex) => {
         // Different runtimes call for different access to stakers: old vs. new
-        const stakersCall = (this._Chain.api.query.staking.stakers)
+        const stakersCall = this._Chain.api.query.staking.stakers
           ? this._Chain.api.query.staking.stakers
           : this._Chain.api.query.staking.erasStakers;
         // Different staking functions call for different function arguments: old vs. new
-        const stakersCallArgs = (account) => (this._Chain.api.query.staking.stakers)
-          ? [account]
-          : [era.toString(), account];
-        return stakersCall(...stakersCallArgs(this.address)) as Promise<Exposure>;
+        const stakersCallArgs = (account) =>
+          this._Chain.api.query.staking.stakers
+            ? [account]
+            : [era.toString(), account];
+        return stakersCall(...stakersCallArgs(this.address)) as Promise<
+          Exposure
+        >;
       });
   }
 
   public get bonded(): Promise<SubstrateAccount> {
     if (!this._Chain?.apiInitialized) return;
-    return this._Chain.api.query.staking.bonded(this.address)
+    return this._Chain.api.query.staking
+      .bonded(this.address)
       .then((accountId) => {
         if (accountId && accountId.isSome) {
           return this._Accounts.fromAddress(accountId.unwrap().toString());
@@ -123,14 +147,13 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
 
   public get stakingLedger(): Promise<StakingLedger> {
     if (!this._Chain?.apiInitialized) return;
-    return this._Chain.api.query.staking.ledger(this.address)
-      .then((ledger) => {
-        if (ledger && ledger.isSome) {
-          return ledger.unwrap();
-        } else {
-          return null;
-        }
-      });
+    return this._Chain.api.query.staking.ledger(this.address).then((ledger) => {
+      if (ledger && ledger.isSome) {
+        return ledger.unwrap();
+      } else {
+        return null;
+      }
+    });
   }
 
   /*
@@ -149,29 +172,36 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
   */
 
   // Accounts may delegate their voting power for democracy referenda. This always incurs the maximum locktime
-  public get delegation(): Promise<[ SubstrateAccount, number ]> {
+  public get delegation(): Promise<[SubstrateAccount, number]> {
     if (!this._Chain?.apiInitialized) return;
     // we have to hack around the type here because of the linked_map wrapper
-    return this._Chain.api.query.democracy.delegations<Delegation[]>(this.address)
-      .then(([ delegation ]: [ Delegation ]) => {
-        const [ delegatedTo, conviction ] = delegation;
+    return this._Chain.api.query.democracy
+      .delegations<Delegation[]>(this.address)
+      .then(([delegation]: [Delegation]) => {
+        const [delegatedTo, conviction] = delegation;
         if (delegatedTo.isEmpty || delegatedTo.toString() === this.address) {
           return null;
         } else {
           // console.log('set delegation for acct: ' + this.address);
-          return [ this._Accounts.fromAddress(delegatedTo.toString()), conviction.index ];
+          return [
+            this._Accounts.fromAddress(delegatedTo.toString()),
+            conviction.index,
+          ];
         }
       });
   }
 
   // returns all stash keys of validators that the account has nominated
   public get nominees(): Promise<SubstrateAccount[]> {
-    return this._Accounts.validators.then(
-      (validators: IValidators) => Object.entries(validators)
-        .filter(([ stash, { exposure }]) => exposure.others.findIndex(
-          ({ who }) => who.toString() === this.address
-        ) !== -1)
-        .map(([ stash ]) => this._Accounts.get(stash))
+    return this._Accounts.validators.then((validators: IValidators) =>
+      Object.entries(validators)
+        .filter(
+          ([stash, { exposure }]) =>
+            exposure.others.findIndex(
+              ({ who }) => who.toString() === this.address
+            ) !== -1
+        )
+        .map(([stash]) => this._Accounts.get(stash))
     );
   }
 
@@ -187,7 +217,7 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
     ChainInfo: SubstrateChain,
     Accounts: SubstrateAccounts,
     address: string,
-    isEd25519: boolean = false
+    isEd25519 = false
   ) {
     if (!app.isModuleReady) {
       // defer chain initialization
@@ -237,9 +267,9 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
       throw new Error('Seed or mnemonic not found!');
     }
     if (this.seed) {
-      return (this._Chain.keyring(this.isEd25519)).addFromUri(`//${this.seed}`);
+      return this._Chain.keyring(this.isEd25519).addFromUri(`//${this.seed}`);
     } else {
-      return (this._Chain.keyring(this.isEd25519)).addFromMnemonic(this.mnemonic);
+      return this._Chain.keyring(this.isEd25519).addFromMnemonic(this.mnemonic);
     }
   }
 
@@ -247,11 +277,15 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
   public get balanceTransferFee(): Promise<SubstrateCoin> {
     const txFee = this._Chain.api.consts.balances.transferFee as Balance;
     if (txFee) return Promise.resolve(this._Chain.coins(txFee));
-    const dummyTxFunc = (api: ApiPromise) => api.tx.balances.transfer(this.address, '0');
+    const dummyTxFunc = (api: ApiPromise) =>
+      api.tx.balances.transfer(this.address, '0');
     return this._Chain.computeFees(this.address, dummyTxFunc);
   }
 
-  public async sendBalanceTx(recipient: SubstrateAccount, amount: SubstrateCoin) {
+  public async sendBalanceTx(
+    recipient: SubstrateAccount,
+    amount: SubstrateCoin
+  ) {
     return this._Chain.createTXModalData(
       this,
       (api: ApiPromise) => api.tx.balances.transfer(recipient.address, amount),
@@ -263,9 +297,10 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
   public nominateTx(nominees: SubstrateAccount[]) {
     return this._Chain.createTXModalData(
       this,
-      (api: ApiPromise) => api.tx.staking.nominate(nominees.map((n) => n.address)),
+      (api: ApiPromise) =>
+        api.tx.staking.nominate(nominees.map((n) => n.address)),
       'nominate',
-      `${this.address} updates nominations`,
+      `${this.address} updates nominations`
     );
   }
 
@@ -278,16 +313,23 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
     );
   }
 
-  public bondTx(controller: SubstrateAccount, amount: SubstrateCoin, rewardDestination: number | string) {
+  public bondTx(
+    controller: SubstrateAccount,
+    amount: SubstrateCoin,
+    rewardDestination: number | string
+  ) {
     return this._Chain.createTXModalData(
       this,
-      (api: ApiPromise) => api.tx.staking.bond(
-        controller.address,
-        amount,
-        this._Chain.createType('RewardDestination', rewardDestination),
-      ),
+      (api: ApiPromise) =>
+        api.tx.staking.bond(
+          controller.address,
+          amount,
+          this._Chain.createType('RewardDestination', rewardDestination)
+        ),
       'bond',
-      `${this.address} bonds ${amount.toString()} to controller ${controller.address}`,
+      `${this.address} bonds ${amount.toString()} to controller ${
+        controller.address
+      }`
     );
   }
 
@@ -296,7 +338,7 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
       this,
       (api: ApiPromise) => api.tx.staking.bondExtra(amount),
       'bondExtra',
-      `${this.address} bonds additional ${amount.toString()}`,
+      `${this.address} bonds additional ${amount.toString()}`
     );
   }
 
@@ -305,7 +347,7 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
       this,
       (api: ApiPromise) => api.tx.staking.unbond(amount),
       'unbond',
-      `${this.address} unbonds ${amount.toString()}`,
+      `${this.address} unbonds ${amount.toString()}`
     );
   }
 
@@ -314,25 +356,32 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
       this,
       (api: ApiPromise) => api.tx.staking.setController(controller.address),
       'setController',
-      `${this.address} sets controller ${controller.address}`,
+      `${this.address} sets controller ${controller.address}`
     );
   }
 
   public setPayee(rewardDestination: number | string) {
     return this._Chain.createTXModalData(
       this,
-      (api: ApiPromise) => api.tx.staking.setPayee(this._Chain.createType('RewardDestination', rewardDestination)),
+      (api: ApiPromise) =>
+        api.tx.staking.setPayee(
+          this._Chain.createType('RewardDestination', rewardDestination)
+        ),
       'setPayee',
-      `${this.address} sets reward destination ${rewardDestination}`,
+      `${this.address} sets reward destination ${rewardDestination}`
     );
   }
 
   public setKeys(sessionKeys: string) {
     return this._Chain.createTXModalData(
       this,
-      (api: ApiPromise) => api.tx.session.setKeys(this._Chain.createType('Keys', sessionKeys), '0x'),
+      (api: ApiPromise) =>
+        api.tx.session.setKeys(
+          this._Chain.createType('Keys', sessionKeys),
+          '0x'
+        ),
       'setKeys',
-      `${this.address} sets session keys ${sessionKeys}`,
+      `${this.address} sets session keys ${sessionKeys}`
     );
   }
 
@@ -341,11 +390,12 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
     const commission = Math.round(1000000000 * ((validatorPrefs * 1.0) / 100));
     return this._Chain.createTXModalData(
       this,
-      (api: ApiPromise) => api.tx.staking.validate({
-        commission: new BN(commission),
-      }),
+      (api: ApiPromise) =>
+        api.tx.staking.validate({
+          commission: new BN(commission),
+        }),
       'setKeys',
-      `${this.address} sets validation commission ${this.validate}`,
+      `${this.address} sets validation commission ${this.validate}`
     );
   }
 
@@ -354,7 +404,7 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
       this,
       (api: ApiPromise) => api.tx.democracy.unlock(this.address),
       'unlock',
-      `${this.address} attempts to unlock from democracy`,
+      `${this.address} attempts to unlock from democracy`
     );
   }
 
@@ -363,7 +413,7 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
       this,
       (api: ApiPromise) => api.tx.staking.payoutNominator(era, validators),
       'unlock',
-      `${this.address} attempts to unlock from democracy`,
+      `${this.address} attempts to unlock from democracy`
     );
   }
 
@@ -372,19 +422,24 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
       this,
       (api: ApiPromise) => api.tx.staking.payoutValidator(era),
       'unlock',
-      `${this.address} attempts to unlock from democracy`,
+      `${this.address} attempts to unlock from democracy`
     );
   }
 }
-class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccount> {
-  private _initialized: boolean = false;
+class SubstrateAccounts
+  implements IAccountsModule<SubstrateCoin, SubstrateAccount> {
+  private _initialized = false;
   private cachedValidators;
 
-  public get initialized() { return this._initialized; }
+  public get initialized() {
+    return this._initialized;
+  }
 
   // STORAGE
   private _store: AccountsStore<SubstrateAccount> = new AccountsStore();
-  public get store() { return this._store; }
+  public get store() {
+    return this._store;
+  }
 
   private _Chain: SubstrateChain;
 
@@ -396,7 +451,9 @@ class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccou
   }
 
   private _app: IApp;
-  public get app() { return this._app; }
+  public get app() {
+    return this._app;
+  }
 
   constructor(app: IApp) {
     this._app = app;
@@ -418,12 +475,24 @@ class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccou
       const acct = this._store.getByAddress(address);
       // update account key type if created with incorrect settings
       if (acct.isEd25519 !== isEd25519) {
-        return new SubstrateAccount(this.app, this._Chain, this, address, isEd25519);
+        return new SubstrateAccount(
+          this.app,
+          this._Chain,
+          this,
+          address,
+          isEd25519
+        );
       } else {
         return acct;
       }
     } catch (e) {
-      return new SubstrateAccount(this.app, this._Chain, this, address, isEd25519);
+      return new SubstrateAccount(
+        this.app,
+        this._Chain,
+        this,
+        address,
+        isEd25519
+      );
     }
   }
 
@@ -448,16 +517,18 @@ class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccou
       }
 
       this.validators.then((results) => {
-        this.cachedValidators = Object.entries(results).map(([address, info]) => ({
-          chain: this._Chain.app.chain?.meta?.id,
-          stash: address,
-          controller: info.controller,
-          isElected: info.isElected,
-          total: this._Chain.coins(info.exposure.total.toBn()),
-          own: this._Chain.coins(info.exposure.own.toBn()),
-          commission: info.prefs.commission.toHuman(),
-          nominators: info.exposure.others.length,
-        }));
+        this.cachedValidators = Object.entries(results).map(
+          ([address, info]) => ({
+            chain: this._Chain.app.chain?.meta?.id,
+            stash: address,
+            controller: info.controller,
+            isElected: info.isElected,
+            total: this._Chain.coins(info.exposure.total.toBn()),
+            own: this._Chain.coins(info.exposure.own.toBn()),
+            commission: info.prefs.commission.toHuman(),
+            nominators: info.exposure.others.length,
+          })
+        );
         resolve(this.cachedValidators);
       });
     });
@@ -465,33 +536,43 @@ class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccou
 
   public get validators(): Promise<IValidators> {
     return new Promise(async (resolve) => {
-      const { nextElected, validators: currentSet } = await this._Chain.api.derive.staking.validators();
+      const {
+        nextElected,
+        validators: currentSet,
+      } = await this._Chain.api.derive.staking.validators();
       const era = await this._Chain.api.query.staking.currentEra<EraIndex>();
 
       // set of not yet but future validators
       const toBeElected = nextElected.filter((v) => !currentSet.includes(v));
       // Different runtimes call for different access to stakers: old vs. new
-      const stakersCall = (this._Chain.api.query.staking.stakers)
+      const stakersCall = this._Chain.api.query.staking.stakers
         ? this._Chain.api.query.staking.stakers
         : this._Chain.api.query.staking.erasStakers;
 
       // Different staking functions call for different function arguments: old vs. new
-      const stakersCallArgs = (account) => (this._Chain.api.query.staking.stakers)
-        ? account
-        : [era.toString(), account];
-      const controllers = await this._Chain.api.query.staking.bonded
-        .multi(currentSet.map((elt) => elt.toString()));
-      const exposures: Exposure[] = await stakersCall
-        .multi(currentSet.map((elt) => stakersCallArgs(elt.toString())));
-      const validatorPrefs = await this._Chain.api.query.staking.erasValidatorPrefs
-        .multi(currentSet.map((elt) => stakersCallArgs(elt.toString())));
+      const stakersCallArgs = (account) =>
+        this._Chain.api.query.staking.stakers
+          ? account
+          : [era.toString(), account];
+      const controllers = await this._Chain.api.query.staking.bonded.multi(
+        currentSet.map((elt) => elt.toString())
+      );
+      const exposures: Exposure[] = await stakersCall.multi(
+        currentSet.map((elt) => stakersCallArgs(elt.toString()))
+      );
+      const validatorPrefs = await this._Chain.api.query.staking.erasValidatorPrefs.multi(
+        currentSet.map((elt) => stakersCallArgs(elt.toString()))
+      );
 
-      const nextUpControllers = await this._Chain.api.query.staking.bonded
-        .multi(toBeElected.map((elt) => elt.toString()));
-      const nextUpExposures: Exposure[] = await stakersCall
-        .multi(toBeElected.map((elt) => stakersCallArgs(elt.toString())));
-      const nextUpValidatorPrefs = await this._Chain.api.query.staking.erasValidatorPrefs
-        .multi(toBeElected.map((elt) => stakersCallArgs(elt.toString())));
+      const nextUpControllers = await this._Chain.api.query.staking.bonded.multi(
+        toBeElected.map((elt) => elt.toString())
+      );
+      const nextUpExposures: Exposure[] = await stakersCall.multi(
+        toBeElected.map((elt) => stakersCallArgs(elt.toString()))
+      );
+      const nextUpValidatorPrefs = await this._Chain.api.query.staking.erasValidatorPrefs.multi(
+        toBeElected.map((elt) => stakersCallArgs(elt.toString()))
+      );
 
       const result: IValidators = {};
       for (let i = 0; i < currentSet.length; ++i) {

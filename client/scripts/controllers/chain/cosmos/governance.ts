@@ -1,10 +1,9 @@
 import _ from 'underscore';
+import { ITXModalData, ProposalModule } from 'models';
 import {
-  ITXModalData,
-  ProposalModule,
-} from 'models';
-import {
-  ICosmosProposal, CosmosToken, ICosmosProposalTally
+  ICosmosProposal,
+  CosmosToken,
+  ICosmosProposalTally,
 } from 'adapters/chain/cosmos/types';
 import { CosmosApi } from 'adapters/chain/cosmos/api';
 import { CosmosAccount, CosmosAccounts } from './account';
@@ -36,22 +35,37 @@ class CosmosGovernance extends ProposalModule<
   private _penalty: number;
   private _maxDepositPeriodNs: number;
   private _minDeposit: CosmosToken;
-  public get votingPeriodNs() { return this._votingPeriodNs; }
-  public get yesThreshold() { return this._yesThreshold; }
-  public get vetoThreshold() { return this._vetoThreshold; }
-  public get penalty() { return this._penalty; }
-  public get maxDepositPeriodNs() { return this._maxDepositPeriodNs; }
-  public get minDeposit() { return this._minDeposit; }
+  public get votingPeriodNs() {
+    return this._votingPeriodNs;
+  }
+  public get yesThreshold() {
+    return this._yesThreshold;
+  }
+  public get vetoThreshold() {
+    return this._vetoThreshold;
+  }
+  public get penalty() {
+    return this._penalty;
+  }
+  public get maxDepositPeriodNs() {
+    return this._maxDepositPeriodNs;
+  }
+  public get minDeposit() {
+    return this._minDeposit;
+  }
 
   private _Chain: CosmosChain;
   private _Accounts: CosmosAccounts;
 
-  public async init(ChainInfo: CosmosChain, Accounts: CosmosAccounts): Promise<void> {
+  public async init(
+    ChainInfo: CosmosChain,
+    Accounts: CosmosAccounts
+  ): Promise<void> {
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
 
     // query chain-wide params
-    const [ depositParams, tallyingParams, votingParams ] = await Promise.all([
+    const [depositParams, tallyingParams, votingParams] = await Promise.all([
       this._Chain.api.query.govDepositParameters(),
       this._Chain.api.query.govTallyingParameters(),
       this._Chain.api.query.govVotingParameters(),
@@ -61,7 +75,10 @@ class CosmosGovernance extends ProposalModule<
     this._vetoThreshold = +tallyingParams.veto;
     this._penalty = +tallyingParams.governance_penalty;
     this._maxDepositPeriodNs = +depositParams.max_deposit_period;
-    this._minDeposit = new CosmosToken(depositParams.min_deposit[0].denom, +depositParams.min_deposit[0].amount);
+    this._minDeposit = new CosmosToken(
+      depositParams.min_deposit[0].denom,
+      +depositParams.min_deposit[0].amount
+    );
 
     // query existing proposals
     await this._initProposals();
@@ -91,7 +108,7 @@ class CosmosGovernance extends ProposalModule<
           depositors: [],
           voters: [],
           tally: marshalTally(p.final_tally_result),
-        }
+        },
       };
     };
     const proposalResps = await Promise.all([
@@ -102,24 +119,42 @@ class CosmosGovernance extends ProposalModule<
       api.queryUrl('/gov/proposals?status=rejected', 1, 10, false),
     ]);
 
-    const proposalMsgs = _.flatten(proposalResps.map((ps) => ps || [])).sort((p1, p2) => +p2.id - +p1.id);
+    const proposalMsgs = _.flatten(proposalResps.map((ps) => ps || [])).sort(
+      (p1, p2) => +p2.id - +p1.id
+    );
     const proposals = proposalMsgs.map((p) => msgToIProposal(p));
-    proposals.forEach((p) => new CosmosProposal(this._Chain, this._Accounts, this, p));
+    proposals.forEach(
+      (p) => new CosmosProposal(this._Chain, this._Accounts, this, p)
+    );
   }
 
   // TODO: cosmos-api only supports text proposals and not parameter_change or software_upgrade
   public createTx(
-    sender: CosmosAccount, title: string, description: string, initialDeposit: CosmosToken, memo: string = ''
+    sender: CosmosAccount,
+    title: string,
+    description: string,
+    initialDeposit: CosmosToken,
+    memo = ''
   ): ITXModalData {
-    const args = { title, description, initialDeposits: [initialDeposit.toCoinObject()] };
-    const txFn = (gas: number) => this._Chain.api.tx(
-      'MsgSubmitProposal', sender.address, args, memo, gas, this._Chain.denom
-    );
+    const args = {
+      title,
+      description,
+      initialDeposits: [initialDeposit.toCoinObject()],
+    };
+    const txFn = (gas: number) =>
+      this._Chain.api.tx(
+        'MsgSubmitProposal',
+        sender.address,
+        args,
+        memo,
+        gas,
+        this._Chain.denom
+      );
     return this._Chain.createTXModalData(
       sender,
       txFn,
       'MsgSubmitProposal',
-      `${sender.address} submits proposal: ${title}.`,
+      `${sender.address} submits proposal: ${title}.`
     );
   }
 }

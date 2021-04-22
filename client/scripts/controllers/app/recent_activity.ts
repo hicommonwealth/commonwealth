@@ -4,7 +4,7 @@ import {
   ActiveAddressesStore,
   ActiveThreadsStore,
   IIdScopedAddressCountAndInfo,
-  IAddressCountAndInfo
+  IAddressCountAndInfo,
 } from '../../stores/ActivityStore';
 
 export interface IAbridgedThreadFromServer {
@@ -19,7 +19,9 @@ export interface IAbridgedThreadFromServer {
   url?: string;
 }
 
-export const modelAbridgedThreadFromServer = (thread: IAbridgedThreadFromServer): AbridgedThread => {
+export const modelAbridgedThreadFromServer = (
+  thread: IAbridgedThreadFromServer
+): AbridgedThread => {
   return new AbridgedThread(
     thread.id,
     thread.Address.id,
@@ -45,7 +47,9 @@ class RecentActivityController {
 
   private _initialized = false;
 
-  public get initialized() { return this._initialized; }
+  public get initialized() {
+    return this._initialized;
+  }
 
   public setCommunityThreadCounts(community: string, count) {
     if (Number.isNaN(+count) || !count) count = 0;
@@ -62,7 +66,7 @@ class RecentActivityController {
       const { chain, address, name, headline, bio, avatarUrl } = user.info;
       const info = new Profile(chain, address);
       info.initialize(name, headline, bio, avatarUrl, null);
-      return ({ info, count });
+      return { info, count };
     });
   }
 

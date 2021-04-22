@@ -21,38 +21,48 @@ export interface OffchainTopicAttributes {
   threads?: OffchainThreadAttributes[] | OffchainTopicAttributes['id'][];
 }
 
-export interface OffchainTopicInstance extends Sequelize.Instance<OffchainTopicAttributes>, OffchainTopicAttributes {
+export interface OffchainTopicInstance
+  extends Sequelize.Instance<OffchainTopicAttributes>,
+    OffchainTopicAttributes {
   // no mixins used
   // TODO: do we need to implement the "as" stuff here?
 }
 
-export interface OffchainTopicModel extends Sequelize.Model<OffchainTopicInstance, OffchainTopicAttributes> {
-
-}
+export type OffchainTopicModel = Sequelize.Model<
+  OffchainTopicInstance,
+  OffchainTopicAttributes
+>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
+  dataTypes: Sequelize.DataTypes
 ): OffchainTopicModel => {
-  const OffchainTopic = sequelize.define<OffchainTopicInstance, OffchainTopicAttributes>('OffchainTopic', {
-    id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-    name: { type: dataTypes.STRING, allowNull: false },
-    description: { type: dataTypes.TEXT, allowNull: false, defaultValue: '' },
-    telegram: { type: dataTypes.STRING, allowNull: true },
-    chain_id: { type: dataTypes.STRING, allowNull: true },
-    community_id: { type: dataTypes.STRING, allowNull: true },
-    created_at: { type: dataTypes.DATE, allowNull: false },
-    updated_at: { type: dataTypes.DATE, allowNull: false },
-    deleted_at: { type: dataTypes.DATE, allowNull: true },
-  }, {
-    underscored: true,
-    paranoid: true,
-    defaultScope: {
-      attributes: {
-        exclude: [ 'created_at', 'updated_at', 'deleted_at' ],
-      }
+  const OffchainTopic = sequelize.define<
+    OffchainTopicInstance,
+    OffchainTopicAttributes
+  >(
+    'OffchainTopic',
+    {
+      id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+      name: { type: dataTypes.STRING, allowNull: false },
+      description: { type: dataTypes.TEXT, allowNull: false, defaultValue: '' },
+      telegram: { type: dataTypes.STRING, allowNull: true },
+      chain_id: { type: dataTypes.STRING, allowNull: true },
+      community_id: { type: dataTypes.STRING, allowNull: true },
+      created_at: { type: dataTypes.DATE, allowNull: false },
+      updated_at: { type: dataTypes.DATE, allowNull: false },
+      deleted_at: { type: dataTypes.DATE, allowNull: true },
     },
-  });
+    {
+      underscored: true,
+      paranoid: true,
+      defaultScope: {
+        attributes: {
+          exclude: ['created_at', 'updated_at', 'deleted_at'],
+        },
+      },
+    }
+  );
 
   OffchainTopic.associate = (models) => {
     models.OffchainTopic.belongsTo(models.OffchainCommunity, {

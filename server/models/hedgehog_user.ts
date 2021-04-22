@@ -8,25 +8,38 @@ export interface HedgehogUserAttributes {
   updated_at?: Date;
 }
 
-export interface HedgehogUserInstance extends Sequelize.Instance<HedgehogUserAttributes>, HedgehogUserAttributes {
+export interface HedgehogUserInstance
+  extends Sequelize.Instance<HedgehogUserAttributes>,
+    HedgehogUserAttributes {}
 
-}
-
-export interface HedgehogUserModel extends Sequelize.Model<HedgehogUserInstance, HedgehogUserAttributes> {
-
-}
+export type HedgehogUserModel = Sequelize.Model<
+  HedgehogUserInstance,
+  HedgehogUserAttributes
+>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
+  dataTypes: Sequelize.DataTypes
 ): HedgehogUserModel => {
-  const HedgehogUser = sequelize.define<HedgehogUserInstance, HedgehogUserAttributes>('HedgehogUser', {
-    id:            { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true, allowNull: false },
-    username:      { type: dataTypes.STRING, allowNull: false, unique: true },
-    walletAddress: { type: dataTypes.STRING, allowNull: true },
-  }, {
-    underscored: true,
-  });
+  const HedgehogUser = sequelize.define<
+    HedgehogUserInstance,
+    HedgehogUserAttributes
+  >(
+    'HedgehogUser',
+    {
+      id: {
+        type: dataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+        allowNull: false,
+      },
+      username: { type: dataTypes.STRING, allowNull: false, unique: true },
+      walletAddress: { type: dataTypes.STRING, allowNull: true },
+    },
+    {
+      underscored: true,
+    }
+  );
 
   return HedgehogUser;
 };

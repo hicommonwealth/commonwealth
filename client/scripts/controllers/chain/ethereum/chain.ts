@@ -2,12 +2,7 @@ import { ApiStatus, IApp } from 'state';
 import Web3 from 'web3';
 import m from 'mithril';
 
-import {
-  NodeInfo,
-  ITXModalData,
-  ITXData,
-  IChainModule
-} from 'models';
+import { NodeInfo, ITXModalData, ITXData, IChainModule } from 'models';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import EthereumAccount from './account';
 
@@ -24,7 +19,12 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
   public hasWebWallet(): boolean {
     return true;
   }
-  public createTXModalData(author: EthereumAccount, txFunc: any, txName: string, objName: string): ITXModalData {
+  public createTXModalData(
+    author: EthereumAccount,
+    txFunc: any,
+    txName: string,
+    objName: string
+  ): ITXModalData {
     throw new Error('Method not implemented.');
   }
 
@@ -42,7 +42,9 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
   }
 
   private _app: IApp;
-  public get app() { return this._app; }
+  public get app() {
+    return this._app;
+  }
 
   constructor(app: IApp) {
     this._app = app;
@@ -54,10 +56,14 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
 
   private _api: Web3;
   private _eventHandlers = {};
-  private _metadataInitialized: boolean = false;
+  private _metadataInitialized = false;
   private _totalbalance: EthereumCoin;
-  public get metadataInitialized() { return this._metadataInitialized; }
-  public get totalbalance() { return this._totalbalance; }
+  public get metadataInitialized() {
+    return this._metadataInitialized;
+  }
+  public get totalbalance() {
+    return this._totalbalance;
+  }
 
   public initApi(node?: NodeInfo): Promise<any> {
     return new Promise((resolve, reject) => {
@@ -104,7 +110,8 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
           return reject(error);
         }
       }
-      this._api.eth.net.isListening()
+      this._api.eth.net
+        .isListening()
         .then((isListening) => {
           this.app.chain.networkStatus = ApiStatus.Connected;
           this._api.eth.getBlock('latest').then((headers) => {
@@ -136,7 +143,10 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
     if (this._api) {
       // https://web3js.readthedocs.io/en/v1.2.0/web3-net.html
       const isListening = await this._api.eth.net.isListening();
-      if (isListening && (this.api.currentProvider as any).connection !== undefined) {
+      if (
+        isListening &&
+        (this.api.currentProvider as any).connection !== undefined
+      ) {
         await (this._api.currentProvider as any).connection.close();
       }
       this._api = null;
@@ -167,7 +177,11 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
     this.addEventHandler(
       'newBlockHeaders',
       (data) => data,
-      (err) => { throw new Error(`EthereumChain.eventHandlers.newBlockHeaders err ${err}`); },
+      (err) => {
+        throw new Error(
+          `EthereumChain.eventHandlers.newBlockHeaders err ${err}`
+        );
+      }
     );
   }
 
@@ -184,14 +198,21 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
     }
   }
 
-  public addEventHandler(eventName: string, onData: (data: any) => void, onErr: (err: any) => void): number {
+  public addEventHandler(
+    eventName: string,
+    onData: (data: any) => void,
+    onErr: (err: any) => void
+  ): number {
     console.log('EthereumChain.addEventHandler', eventName);
 
     // Map event name to Web3 EventEmitter object
-    this._eventHandlers[eventName] = this._api.eth.subscribe(eventName as any, (err, res) => {
-      if (!err) return;
-      console.error(err);
-    });
+    this._eventHandlers[eventName] = this._api.eth.subscribe(
+      eventName as any,
+      (err, res) => {
+        if (!err) return;
+        console.error(err);
+      }
+    );
 
     this._eventHandlers[eventName].on('data', onData);
     this._eventHandlers[eventName].on('error', onErr);
@@ -206,7 +227,7 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
       return false;
     }
     // Unsubscribe the Web3 EventEmiteter obj and remove from handler map
-    (this._eventHandlers[eventName]).unsubscribe((err, success) => {
+    this._eventHandlers[eventName].unsubscribe((err, success) => {
       if (err) {
         console.log('Unsubscribe err for', eventName, err);
       } else {

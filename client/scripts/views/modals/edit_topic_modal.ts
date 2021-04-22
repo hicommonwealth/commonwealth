@@ -9,24 +9,33 @@ import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { CompactModalExitButton } from 'views/modal';
 
 interface IEditTopicModalForm {
-  description: string,
-  id: number,
-  name: string,
-  telegram: string,
+  description: string;
+  id: number;
+  name: string;
+  telegram: string;
 }
 
-const EditTopicModal : m.Component<{
-  description: string,
-  id: number,
-  name: string,
-  telegram: string,
-}, {
-  error: any,
-  form: IEditTopicModalForm,
-  saving: boolean,
-}> = {
+const EditTopicModal: m.Component<
+  {
+    description: string;
+    id: number;
+    name: string;
+    telegram: string;
+  },
+  {
+    error: any;
+    form: IEditTopicModalForm;
+    saving: boolean;
+  }
+> = {
   view: (vnode) => {
-    if (!app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })) return null;
+    if (
+      !app.user.isAdminOfEntity({
+        chain: app.activeChainId(),
+        community: app.activeCommunityId(),
+      })
+    )
+      return null;
     const { id, name, description, telegram } = vnode.attrs;
     if (!vnode.state.form) {
       vnode.state.form = { id, name, description, telegram };
@@ -90,7 +99,7 @@ const EditTopicModal : m.Component<{
               defaultValue: vnode.state.form.description,
               oninput: (e) => {
                 vnode.state.form.description = (e.target as any).value;
-              }
+              },
             }),
           ]),
           m(FormGroup, [
@@ -103,7 +112,7 @@ const EditTopicModal : m.Component<{
               defaultValue: vnode.state.form.telegram,
               oninput: (e) => {
                 vnode.state.form.telegram = (e.target as any).value;
-              }
+              },
             }),
           ]),
           m(FormGroup, [
@@ -114,12 +123,14 @@ const EditTopicModal : m.Component<{
               rounded: true,
               onclick: async (e) => {
                 e.preventDefault();
-                updateTopic(vnode.state.form).then(() => {
-                  $(e.target).trigger('modalexit');
-                }).catch((err) => {
-                  vnode.state.saving = false;
-                  m.redraw();
-                });
+                updateTopic(vnode.state.form)
+                  .then(() => {
+                    $(e.target).trigger('modalexit');
+                  })
+                  .catch((err) => {
+                    vnode.state.saving = false;
+                    m.redraw();
+                  });
               },
               label: 'Save changes',
             }),
@@ -129,24 +140,28 @@ const EditTopicModal : m.Component<{
               rounded: true,
               onclick: async (e) => {
                 e.preventDefault();
-                const confirmed = await confirmationModalWithText('Delete this topic?')();
+                const confirmed = await confirmationModalWithText(
+                  'Delete this topic?'
+                )();
                 if (!confirmed) return;
-                deleteTopic(vnode.state.form).then(() => {
-                  $(e.target).trigger('modalexit');
-                  m.route.set(`/${app.activeId()}/`);
-                }).catch((err) => {
-                  vnode.state.saving = false;
-                  m.redraw();
-                });
+                deleteTopic(vnode.state.form)
+                  .then(() => {
+                    $(e.target).trigger('modalexit');
+                    m.route.set(`/${app.activeId()}/`);
+                  })
+                  .catch((err) => {
+                    vnode.state.saving = false;
+                    m.redraw();
+                  });
               },
               label: 'Delete topic',
             }),
           ]),
         ]),
         vnode.state.error && m('.error-message', vnode.state.error),
-      ])
+      ]),
     ]);
-  }
+  },
 };
 
 export default EditTopicModal;

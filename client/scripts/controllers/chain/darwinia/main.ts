@@ -11,7 +11,7 @@ class Darwinia extends Substrate {
 
   public async initApi() {
     await super.initApi({
-      'types': spec,
+      types: spec,
     });
   }
 }

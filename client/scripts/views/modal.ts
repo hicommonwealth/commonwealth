@@ -96,31 +96,53 @@ const Modal: m.Component<{ spec }> = {
     const exitCallback = spec.exitCallback || (() => undefined);
     const confirmExit = spec.modal.confirmExit || (() => true);
 
-    return m('.Modal', {
-      oncreate: oncreate.bind(this, spec, confirmExit, completeCallback, exitCallback),
-    }, [
-      m('.overlay', {
-        onclick: onclickoverlay.bind(this, spec, confirmExit, exitCallback),
-      }, [
-        m('.popup', {
-          onclick: (e) => {
-            e.stopPropagation();
+    return m(
+      '.Modal',
+      {
+        oncreate: oncreate.bind(
+          this,
+          spec,
+          confirmExit,
+          completeCallback,
+          exitCallback
+        ),
+      },
+      [
+        m(
+          '.overlay',
+          {
+            onclick: onclickoverlay.bind(this, spec, confirmExit, exitCallback),
           },
-        }, vnode.children),
-      ]),
-    ]);
+          [
+            m(
+              '.popup',
+              {
+                onclick: (e) => {
+                  e.stopPropagation();
+                },
+              },
+              vnode.children
+            ),
+          ]
+        ),
+      ]
+    );
   },
 };
 
 export const CompactModalExitButton: m.Component<{}> = {
   view: (vnode) => {
-    return m('.CompactModalExitButton', {
-      onclick: (e) => {
-        e.preventDefault();
-        $(e.target).trigger('modalexit');
-      }
-    }, m.trust('&times;'));
-  }
+    return m(
+      '.CompactModalExitButton',
+      {
+        onclick: (e) => {
+          e.preventDefault();
+          $(e.target).trigger('modalexit');
+        },
+      },
+      m.trust('&times;')
+    );
+  },
 };
 
 export const AppModals: m.Component<{}, { escapeHandler }> = {
@@ -136,8 +158,12 @@ export const AppModals: m.Component<{}, { escapeHandler }> = {
     $(document).off('keyup', vnode.state.escapeHandler);
   },
   view: (vnode) => {
-    return app.modals.getList().map((spec) => m(Modal, { spec, key: spec.id || '-' }, m(spec.modal, spec.data)));
-  }
+    return app.modals
+      .getList()
+      .map((spec) =>
+        m(Modal, { spec, key: spec.id || '-' }, m(spec.modal, spec.data))
+      );
+  },
 };
 
 export default Modal;

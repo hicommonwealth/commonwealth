@@ -21,47 +21,79 @@ export interface OffchainReactionAttributes {
 }
 
 export interface OffchainReactionInstance
-extends Sequelize.Instance<OffchainReactionAttributes>, OffchainReactionAttributes {
+  extends Sequelize.Instance<OffchainReactionAttributes>,
+    OffchainReactionAttributes {}
 
-}
-
-export interface OffchainReactionModel extends Sequelize.Model<OffchainReactionInstance, OffchainReactionAttributes> {
-
-}
+export type OffchainReactionModel = Sequelize.Model<
+  OffchainReactionInstance,
+  OffchainReactionAttributes
+>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
+  dataTypes: Sequelize.DataTypes
 ): OffchainReactionModel => {
-  const OffchainReaction = sequelize.define<OffchainReactionInstance, OffchainReactionAttributes>('OffchainReaction', {
-    id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-    chain: { type: dataTypes.STRING, allowNull: true },
-    thread_id: { type: dataTypes.INTEGER, allowNull: true },
-    proposal_id: { type: dataTypes.STRING, allowNull: true },
-    comment_id: { type: dataTypes.INTEGER, allowNull: true },
-    address_id: { type: dataTypes.INTEGER, allowNull: false },
-    reaction: { type: dataTypes.STRING, allowNull: false },
-    community: { type: dataTypes.STRING, allowNull: true },
-  }, {
-    underscored: true,
-    indexes: [
-      { fields: ['id'] },
-      { fields: ['chain', 'thread_id', 'proposal_id', 'comment_id'] },
-      { fields: ['address_id'] },
-      { fields: ['chain', 'address_id', 'thread_id', 'proposal_id', 'comment_id', 'reaction'], unique: true },
-      { fields: ['chain', 'thread_id'] },
-      { fields: ['community', 'thread_id'] },
-      { fields: ['chain', 'comment_id'] },
-      { fields: ['community', 'comment_id'] },
-    ],
-  });
+  const OffchainReaction = sequelize.define<
+    OffchainReactionInstance,
+    OffchainReactionAttributes
+  >(
+    'OffchainReaction',
+    {
+      id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+      chain: { type: dataTypes.STRING, allowNull: true },
+      thread_id: { type: dataTypes.INTEGER, allowNull: true },
+      proposal_id: { type: dataTypes.STRING, allowNull: true },
+      comment_id: { type: dataTypes.INTEGER, allowNull: true },
+      address_id: { type: dataTypes.INTEGER, allowNull: false },
+      reaction: { type: dataTypes.STRING, allowNull: false },
+      community: { type: dataTypes.STRING, allowNull: true },
+    },
+    {
+      underscored: true,
+      indexes: [
+        { fields: ['id'] },
+        { fields: ['chain', 'thread_id', 'proposal_id', 'comment_id'] },
+        { fields: ['address_id'] },
+        {
+          fields: [
+            'chain',
+            'address_id',
+            'thread_id',
+            'proposal_id',
+            'comment_id',
+            'reaction',
+          ],
+          unique: true,
+        },
+        { fields: ['chain', 'thread_id'] },
+        { fields: ['community', 'thread_id'] },
+        { fields: ['chain', 'comment_id'] },
+        { fields: ['community', 'comment_id'] },
+      ],
+    }
+  );
 
   OffchainReaction.associate = (models) => {
-    models.OffchainReaction.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
-    models.OffchainReaction.belongsTo(models.OffchainCommunity, { foreignKey: 'community', targetKey: 'id' });
-    models.OffchainReaction.belongsTo(models.Address, { foreignKey: 'address_id', targetKey: 'id' });
-    models.OffchainReaction.belongsTo(models.OffchainComment, { foreignKey: 'comment_id', targetKey: 'id' });
-    models.OffchainReaction.belongsTo(models.OffchainThread, { foreignKey: 'thread_id', targetKey: 'id' });
+    models.OffchainReaction.belongsTo(models.Chain, {
+      foreignKey: 'chain',
+      targetKey: 'id',
+    });
+    models.OffchainReaction.belongsTo(models.OffchainCommunity, {
+      foreignKey: 'community',
+      targetKey: 'id',
+    });
+    models.OffchainReaction.belongsTo(models.Address, {
+      foreignKey: 'address_id',
+      targetKey: 'id',
+    });
+    models.OffchainReaction.belongsTo(models.OffchainComment, {
+      foreignKey: 'comment_id',
+      targetKey: 'id',
+    });
+    models.OffchainReaction.belongsTo(models.OffchainThread, {
+      foreignKey: 'thread_id',
+      targetKey: 'id',
+    });
   };
 
   return OffchainReaction;

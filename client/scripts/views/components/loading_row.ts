@@ -6,11 +6,7 @@ const LoadingRow: m.Component<{}> = {
   view: (vnode) => {
     return m('.LoadingRow', [
       m('.proposal-row', [
-        m('.proposal-left', [
-          m('.title-block'),
-          m('br'),
-          m('.metadata-block'),
-        ]),
+        m('.proposal-left', [m('.title-block'), m('br'), m('.metadata-block')]),
         m('.proposal-center', [
           m('.content-block'),
           m('.content-block'),
@@ -18,7 +14,7 @@ const LoadingRow: m.Component<{}> = {
         ]),
       ]),
     ]);
-  }
+  },
 };
 
 export default LoadingRow;

@@ -12,7 +12,17 @@ class OffchainReaction<T extends IUniqueId> {
   public readonly author_chain: string;
   // TODO: Do thread/comment/proposal ids ever appear as strings?
 
-  constructor(id, author, chain, community, reaction, threadId, proposalId, commentId, author_chain) {
+  constructor(
+    id,
+    author,
+    chain,
+    community,
+    reaction,
+    threadId,
+    proposalId,
+    commentId,
+    author_chain
+  ) {
     this.id = id;
     this.author = author;
     this.chain = chain;

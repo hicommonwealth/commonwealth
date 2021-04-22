@@ -5,7 +5,16 @@ import _ from 'lodash';
 import $ from 'jquery';
 import dragula from 'dragula';
 import {
-  Button, Popover, PopoverMenu, MenuItem, Icon, Icons, Tag, Tooltip, Spinner, Select
+  Button,
+  Popover,
+  PopoverMenu,
+  MenuItem,
+  Icon,
+  Icons,
+  Tag,
+  Tooltip,
+  Spinner,
+  Select,
 } from 'construct-ui';
 
 import { selectNode, initChain } from 'app';
@@ -13,7 +22,15 @@ import { selectNode, initChain } from 'app';
 import app, { ApiStatus } from 'state';
 import { ProposalType } from 'identifiers';
 import { link, removeUrlPrefix } from 'helpers';
-import { ChainClass, ChainBase, ChainNetwork, ChainInfo, CommunityInfo, AddressInfo, NodeInfo } from 'models';
+import {
+  ChainClass,
+  ChainBase,
+  ChainNetwork,
+  ChainInfo,
+  CommunityInfo,
+  AddressInfo,
+  NodeInfo,
+} from 'models';
 import NewTopicModal from 'views/modals/new_topic_modal';
 
 import SubscriptionButton from 'views/components/subscription_button';
@@ -21,47 +38,79 @@ import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import CommunitySelector from 'views/components/sidebar/community_selector';
 
-import { discordIcon, telegramIcon, elementIcon, githubIcon, websiteIcon } from './icons';
+import {
+  discordIcon,
+  telegramIcon,
+  elementIcon,
+  githubIcon,
+  websiteIcon,
+} from './icons';
 
-const SidebarQuickSwitcherItem: m.Component<{ item, size }> = {
+const SidebarQuickSwitcherItem: m.Component<{ item; size }> = {
   view: (vnode) => {
     const { item, size } = vnode.attrs;
 
-    return m('.SidebarQuickSwitcherItem', {
-      key: `${item instanceof ChainInfo ? 'chain' : 'community'}-${item.id}`
-    }, [
-      m('.quick-switcher-option', {
-        class: (item instanceof ChainInfo && item.id === app?.chain?.meta?.chain?.id)
-          || (item instanceof CommunityInfo && item.id === app?.community?.id)
-          ? ' active' : '',
-      }, item instanceof ChainInfo
-        ? m(ChainIcon, {
-          size,
-          chain: item,
-          onclick: link ? (() => m.route.set(`/${item.id}`)) : null
-        }) : item instanceof CommunityInfo
-          ? m(CommunityIcon, {
-            size,
-            community: item,
-            onclick: link ? (() => m.route.set(`/${item.id}`)) : null
-          }) : null),
-    ]);
-  }
+    return m(
+      '.SidebarQuickSwitcherItem',
+      {
+        key: `${item instanceof ChainInfo ? 'chain' : 'community'}-${item.id}`,
+      },
+      [
+        m(
+          '.quick-switcher-option',
+          {
+            class:
+              (item instanceof ChainInfo &&
+                item.id === app?.chain?.meta?.chain?.id) ||
+              (item instanceof CommunityInfo && item.id === app?.community?.id)
+                ? ' active'
+                : '',
+          },
+          item instanceof ChainInfo
+            ? m(ChainIcon, {
+                size,
+                chain: item,
+                onclick: link ? () => m.route.set(`/${item.id}`) : null,
+              })
+            : item instanceof CommunityInfo
+            ? m(CommunityIcon, {
+                size,
+                community: item,
+                onclick: link ? () => m.route.set(`/${item.id}`) : null,
+              })
+            : null
+        ),
+      ]
+    );
+  },
 };
 
 const SidebarQuickSwitcher: m.Component<{}> = {
   view: (vnode) => {
-    const allCommunities = (app.config.communities.getAll() as (CommunityInfo | ChainInfo)[])
+    const allCommunities = (app.config.communities.getAll() as (
+      | CommunityInfo
+      | ChainInfo
+    )[])
       .concat(app.config.chains.getAll())
       .sort((a, b) => a.name.localeCompare(b.name))
-      .filter((item) => (item instanceof ChainInfo)
-        ? app.config.nodes.getByChain(item.id)?.length > 0
-        : true); // only chains with nodes
+      .filter((item) =>
+        item instanceof ChainInfo
+          ? app.config.nodes.getByChain(item.id)?.length > 0
+          : true
+      ); // only chains with nodes
 
     const starredCommunities = allCommunities.filter((item) => {
       // filter out non-starred communities
-      if (item instanceof ChainInfo && !app.communities.isStarred(item.id, null)) return false;
-      if (item instanceof CommunityInfo && !app.communities.isStarred(null, item.id)) return false;
+      if (
+        item instanceof ChainInfo &&
+        !app.communities.isStarred(item.id, null)
+      )
+        return false;
+      if (
+        item instanceof CommunityInfo &&
+        !app.communities.isStarred(null, item.id)
+      )
+        return false;
       return true;
     });
 
@@ -77,20 +126,28 @@ const SidebarQuickSwitcher: m.Component<{}> = {
         },
       }),
       m(CommunitySelector),
-      starredCommunities.map((item) => m(SidebarQuickSwitcherItem, { item, size })),
+      starredCommunities.map((item) =>
+        m(SidebarQuickSwitcherItem, { item, size })
+      ),
     ]);
-  }
+  },
 };
 
-export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: true }> = {
+export const OffchainNavigationModule: m.Component<
+  {},
+  { dragulaInitialized: true }
+> = {
   view: (vnode) => {
-    const onDiscussionsPage = (p) => p === `/${app.activeId()}` || p === `/${app.activeId()}/`
-      || p.startsWith(`/${app.activeId()}/discussions/`)
-      || p.startsWith(`/${app.activeId()}/proposal/discussion/`)
-      || p.startsWith(`/${app.activeId()}?`);
+    const onDiscussionsPage = (p) =>
+      p === `/${app.activeId()}` ||
+      p === `/${app.activeId()}/` ||
+      p.startsWith(`/${app.activeId()}/discussions/`) ||
+      p.startsWith(`/${app.activeId()}/proposal/discussion/`) ||
+      p.startsWith(`/${app.activeId()}?`);
     const onSearchPage = (p) => p.startsWith(`/${app.activeId()}/search`);
-    const onMembersPage = (p) => p.startsWith(`/${app.activeId()}/members`)
-      || p.startsWith(`/${app.activeId()}/account/`);
+    const onMembersPage = (p) =>
+      p.startsWith(`/${app.activeId()}/members`) ||
+      p.startsWith(`/${app.activeId()}/account/`);
     const onChatPage = (p) => p === `/${app.activeId()}/chat`;
 
     return m('.OffchainNavigationModule.SidebarModule', [
@@ -98,8 +155,13 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
       m(Button, {
         rounded: true,
         fluid: true,
-        active: onDiscussionsPage(m.route.get())
-          && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
+        active:
+          onDiscussionsPage(m.route.get()) &&
+          (app.chain
+            ? app.chain.serverLoaded
+            : app.community
+            ? app.community.serverLoaded
+            : true),
         label: 'Discussions',
         onclick: (e) => {
           e.preventDefault();
@@ -109,8 +171,13 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
       m(Button, {
         rounded: true,
         fluid: true,
-        active: onSearchPage(m.route.get())
-          && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
+        active:
+          onSearchPage(m.route.get()) &&
+          (app.chain
+            ? app.chain.serverLoaded
+            : app.community
+            ? app.community.serverLoaded
+            : true),
         label: 'Search',
         onclick: (e) => {
           e.preventDefault();
@@ -120,8 +187,13 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
       m(Button, {
         rounded: true,
         fluid: true,
-        active: onMembersPage(m.route.get())
-          && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
+        active:
+          onMembersPage(m.route.get()) &&
+          (app.chain
+            ? app.chain.serverLoaded
+            : app.community
+            ? app.community.serverLoaded
+            : true),
         label: 'Members',
         onclick: (e) => {
           e.preventDefault();
@@ -139,7 +211,7 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
       //   },
       // }),
     ]);
-  }
+  },
 };
 
 export const OnchainNavigationModule: m.Component<{}, {}> = {
@@ -156,43 +228,56 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
     // const molochProposals = (app.chain?.loaded && app.chain?.class === ChainClass.Moloch)
     //   ? (app.chain as any).governance.store.getAll().filter((p) => !p.completed).length : 0;
 
-    const hasProposals = app.chain && !app.community && (
-      app.chain.base === ChainBase.CosmosSDK
-        || (app.chain.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Plasm)
-        || app.chain.class === ChainClass.Moloch
-        || app.chain.network === ChainNetwork.Marlin
-        || app.chain.network === ChainNetwork.MarlinTestnet
-        || app.chain.class === ChainClass.Commonwealth);
+    const hasProposals =
+      app.chain &&
+      !app.community &&
+      (app.chain.base === ChainBase.CosmosSDK ||
+        (app.chain.base === ChainBase.Substrate &&
+          app.chain.network !== ChainNetwork.Plasm) ||
+        app.chain.class === ChainClass.Moloch ||
+        app.chain.network === ChainNetwork.Marlin ||
+        app.chain.network === ChainNetwork.MarlinTestnet ||
+        app.chain.class === ChainClass.Commonwealth);
     if (!hasProposals) return;
 
-    const showMolochMenuOptions = app.user.activeAccount && app.chain?.class === ChainClass.Moloch;
-    const showMolochMemberOptions = showMolochMenuOptions && (app.user.activeAccount as any)?.shares?.gtn(0);
-    const showCommonwealthMenuOptions = app.chain?.class === ChainClass.Commonwealth;
+    const showMolochMenuOptions =
+      app.user.activeAccount && app.chain?.class === ChainClass.Moloch;
+    const showMolochMemberOptions =
+      showMolochMenuOptions && (app.user.activeAccount as any)?.shares?.gtn(0);
+    const showCommonwealthMenuOptions =
+      app.chain?.class === ChainClass.Commonwealth;
 
-    const showMarlinOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Marlin;
+    const showMarlinOptions =
+      app.user.activeAccount && app.chain?.network === ChainNetwork.Marlin;
 
-    const onProposalPage = (p) => (
-      p.startsWith(`/${app.activeChainId()}/proposals`)
-        || p.startsWith(`/${app.activeChainId()}/proposal/councilmotion`)
-        || p.startsWith(`/${app.activeChainId()}/proposal/democracyproposal`));
-    const onReferendaPage = (p) => p.startsWith(`/${app.activeChainId()}/referenda`)
-      || p.startsWith(`/${app.activeChainId()}/proposal/referendum`);
-    const onTreasuryPage = (p) => p.startsWith(`/${app.activeChainId()}/treasury`)
-      || p.startsWith(`/${app.activeChainId()}/proposal/treasuryproposal`);
-    const onBountiesPage = (p) => p.startsWith(`/${app.activeChainId()}/bounties`);
-    const onCouncilPage = (p) => p.startsWith(`/${app.activeChainId()}/council`);
+    const onProposalPage = (p) =>
+      p.startsWith(`/${app.activeChainId()}/proposals`) ||
+      p.startsWith(`/${app.activeChainId()}/proposal/councilmotion`) ||
+      p.startsWith(`/${app.activeChainId()}/proposal/democracyproposal`);
+    const onReferendaPage = (p) =>
+      p.startsWith(`/${app.activeChainId()}/referenda`) ||
+      p.startsWith(`/${app.activeChainId()}/proposal/referendum`);
+    const onTreasuryPage = (p) =>
+      p.startsWith(`/${app.activeChainId()}/treasury`) ||
+      p.startsWith(`/${app.activeChainId()}/proposal/treasuryproposal`);
+    const onBountiesPage = (p) =>
+      p.startsWith(`/${app.activeChainId()}/bounties`);
+    const onCouncilPage = (p) =>
+      p.startsWith(`/${app.activeChainId()}/council`);
 
-    const onValidatorsPage = (p) => p.startsWith(`/${app.activeChainId()}/validators`);
+    const onValidatorsPage = (p) =>
+      p.startsWith(`/${app.activeChainId()}/validators`);
     const onNotificationsPage = (p) => p.startsWith('/notifications');
     if (onNotificationsPage(m.route.get())) return;
 
     return m('.OnchainNavigationModule.SidebarModule', [
       m('.sidebar-spacer'),
       // referenda (substrate only)
-      !app.community && app.chain?.base === ChainBase.Substrate
-        && app.chain.network !== ChainNetwork.Darwinia
-        && app.chain.network !== ChainNetwork.HydraDX
-        && m(Button, {
+      !app.community &&
+        app.chain?.base === ChainBase.Substrate &&
+        app.chain.network !== ChainNetwork.Darwinia &&
+        app.chain.network !== ChainNetwork.HydraDX &&
+        m(Button, {
           fluid: true,
           rounded: true,
           active: onReferendaPage(m.route.get()),
@@ -204,24 +289,31 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           contentRight: [], // TODO
         }),
       // proposals (substrate, cosmos, moloch & marlin only)
-      !app.community && ((app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Darwinia)
-                         || app.chain?.base === ChainBase.CosmosSDK
-                         || app.chain?.class === ChainClass.Moloch
-                         || app.chain?.network === ChainNetwork.Marlin
-                         || app.chain?.network === ChainNetwork.MarlinTestnet)
-        && m(Button, {
+      !app.community &&
+        ((app.chain?.base === ChainBase.Substrate &&
+          app.chain.network !== ChainNetwork.Darwinia) ||
+          app.chain?.base === ChainBase.CosmosSDK ||
+          app.chain?.class === ChainClass.Moloch ||
+          app.chain?.network === ChainNetwork.Marlin ||
+          app.chain?.network === ChainNetwork.MarlinTestnet) &&
+        m(Button, {
           fluid: true,
           rounded: true,
           active: onProposalPage(m.route.get()),
-          label: app.chain?.base === ChainBase.Substrate ? 'Proposals & Motions' : 'Proposals',
+          label:
+            app.chain?.base === ChainBase.Substrate
+              ? 'Proposals & Motions'
+              : 'Proposals',
           onclick: (e) => {
             e.preventDefault();
             m.route.set(`/${app.activeChainId()}/proposals`);
           },
         }),
       // treasury (substrate only)
-      !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Centrifuge
-        && m(Button, {
+      !app.community &&
+        app.chain?.base === ChainBase.Substrate &&
+        app.chain.network !== ChainNetwork.Centrifuge &&
+        m(Button, {
           fluid: true,
           rounded: true,
           active: onTreasuryPage(m.route.get()),
@@ -232,8 +324,10 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           },
         }),
       // bounties (substrate only)
-      !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Centrifuge
-        && m(Button, {
+      !app.community &&
+        app.chain?.base === ChainBase.Substrate &&
+        app.chain.network !== ChainNetwork.Centrifuge &&
+        m(Button, {
           fluid: true,
           rounded: true,
           active: onBountiesPage(m.route.get()),
@@ -245,8 +339,9 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         }),
       m('.sidebar-spacer'),
       // council (substrate only)
-      !app.community && app.chain?.base === ChainBase.Substrate
-        && m(Button, {
+      !app.community &&
+        app.chain?.base === ChainBase.Substrate &&
+        m(Button, {
           fluid: true,
           rounded: true,
           active: onCouncilPage(m.route.get()),
@@ -257,8 +352,9 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           },
         }),
       // validators (substrate only)
-      !app.community && app.chain?.base === ChainBase.Substrate
-        && m(Button, {
+      !app.community &&
+        app.chain?.base === ChainBase.Substrate &&
+        m(Button, {
           fluid: true,
           rounded: true,
           active: onValidatorsPage(m.route.get()),
@@ -268,80 +364,100 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
             m.route.set(`/${app.activeChainId()}/validators`);
           },
         }),
-      showMarlinOptions && m(Button, {
-        fluid: true,
-        rounded: true,
-        onclick: (e) => {
-          e.preventDefault();
-          m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.MarlinProposal });
-        },
-        label: 'Submit Proposal',
-        active: m.route.get() === `/${app.activeChainId()}/new/proposal/${ProposalType.MarlinProposal}`,
-      }),
-      showMarlinOptions && m(Button, {
-        fluid: true,
-        rounded: true,
-        onclick: (e) => {
-          e.preventDefault();
-          m.route.set(`/${app.activeChainId()}/delegate`);
-        },
-        label: 'Delegate',
-        active: m.route.get() === `/${app.activeChainId()}/delegate`,
-      }),
-      showMolochMemberOptions && m(Button, {
-        fluid: true,
-        rounded: true,
-        onclick: (e) => {
-          e.preventDefault();
-          m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.MolochProposal });
-        },
-        label: 'New proposal',
-      }),
-      showMolochMemberOptions && m(Button, {
-        fluid: true,
-        rounded: true,
-        onclick: (e) => {
-          e.preventDefault();
-          app.modals.lazyCreate('update_delegate_modal', {
-            account: app.user.activeAccount,
-            delegateKey: (app.user.activeAccount as any).delegateKey,
-          });
-        },
-        label: 'Update delegate key',
-      }),
-      showMolochMemberOptions && m(Button, {
-        fluid: true,
-        rounded: true,
-        onclick: (e) => {
-          e.preventDefault();
-          app.modals.lazyCreate('ragequit_modal', { account: app.user.activeAccount });
-        },
-        label: 'Rage quit',
-      }),
-      showMolochMenuOptions && m(Button, {
-        fluid: true,
-        rounded: true,
-        onclick: (e) => {
-          e.preventDefault();
-          app.modals.lazyCreate('token_management_modal', {
-            account: app.user.activeAccount,
-            accounts: ((app.user.activeAccount as any).app.chain as any).ethAccounts,
-            contractAddress: ((app.user.activeAccount as any).app.chain as any).governance.api.contractAddress,
-            tokenAddress: ((app.user.activeAccount as any).app.chain as any).governance.api.tokenContract.address,
-          });
-        },
-        label: 'Approve tokens',
-      }),
-      showCommonwealthMenuOptions && m(Button, {
-        fluid: true,
-        rounded: true,
-        label: 'Projects',
-        active: m.route.get().startsWith(`/${app.activeChainId()}/projects`),
-        onclick: (e) => {
-          e.preventDefault();
-          m.route.set(`/${app.activeChainId()}/projects`);
-        },
-      }),
+      showMarlinOptions &&
+        m(Button, {
+          fluid: true,
+          rounded: true,
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set(`/${app.activeChainId()}/new/proposal/:type`, {
+              type: ProposalType.MarlinProposal,
+            });
+          },
+          label: 'Submit Proposal',
+          active:
+            m.route.get() ===
+            `/${app.activeChainId()}/new/proposal/${
+              ProposalType.MarlinProposal
+            }`,
+        }),
+      showMarlinOptions &&
+        m(Button, {
+          fluid: true,
+          rounded: true,
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set(`/${app.activeChainId()}/delegate`);
+          },
+          label: 'Delegate',
+          active: m.route.get() === `/${app.activeChainId()}/delegate`,
+        }),
+      showMolochMemberOptions &&
+        m(Button, {
+          fluid: true,
+          rounded: true,
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set(`/${app.activeChainId()}/new/proposal/:type`, {
+              type: ProposalType.MolochProposal,
+            });
+          },
+          label: 'New proposal',
+        }),
+      showMolochMemberOptions &&
+        m(Button, {
+          fluid: true,
+          rounded: true,
+          onclick: (e) => {
+            e.preventDefault();
+            app.modals.lazyCreate('update_delegate_modal', {
+              account: app.user.activeAccount,
+              delegateKey: (app.user.activeAccount as any).delegateKey,
+            });
+          },
+          label: 'Update delegate key',
+        }),
+      showMolochMemberOptions &&
+        m(Button, {
+          fluid: true,
+          rounded: true,
+          onclick: (e) => {
+            e.preventDefault();
+            app.modals.lazyCreate('ragequit_modal', {
+              account: app.user.activeAccount,
+            });
+          },
+          label: 'Rage quit',
+        }),
+      showMolochMenuOptions &&
+        m(Button, {
+          fluid: true,
+          rounded: true,
+          onclick: (e) => {
+            e.preventDefault();
+            app.modals.lazyCreate('token_management_modal', {
+              account: app.user.activeAccount,
+              accounts: ((app.user.activeAccount as any).app.chain as any)
+                .ethAccounts,
+              contractAddress: ((app.user.activeAccount as any).app
+                .chain as any).governance.api.contractAddress,
+              tokenAddress: ((app.user.activeAccount as any).app.chain as any)
+                .governance.api.tokenContract.address,
+            });
+          },
+          label: 'Approve tokens',
+        }),
+      showCommonwealthMenuOptions &&
+        m(Button, {
+          fluid: true,
+          rounded: true,
+          label: 'Projects',
+          active: m.route.get().startsWith(`/${app.activeChainId()}/projects`),
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set(`/${app.activeChainId()}/projects`);
+          },
+        }),
       // showCommonwealthMenuOptions && m(Button, {
       //   fluid: true,
       //   rounded: true,
@@ -352,18 +468,21 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
       //     m.route.set(`/${app.activeChainId()}/backers`);
       //   },
       // }),
-      showCommonwealthMenuOptions && m(Button, {
-        fluid: true,
-        rounded: true,
-        label: 'Collectives',
-        active: m.route.get().startsWith(`/${app.activeChainId()}/collectives`),
-        onclick: (e) => {
-          e.preventDefault();
-          m.route.set(`/${app.activeChainId()}/collectives`);
-        },
-      }),
+      showCommonwealthMenuOptions &&
+        m(Button, {
+          fluid: true,
+          rounded: true,
+          label: 'Collectives',
+          active: m.route
+            .get()
+            .startsWith(`/${app.activeChainId()}/collectives`),
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set(`/${app.activeChainId()}/collectives`);
+          },
+        }),
     ]);
-  }
+  },
 };
 
 export const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
@@ -371,136 +490,170 @@ export const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
     const url = app.chain?.meta?.url;
     if (!url) return;
 
-    const formatUrl = (u) => u
-      .replace('ws://', '')
-      .replace('wss://', '')
-      .replace('http://', '')
-      .replace('https://', '')
-      .split('/')[0]
-      .split(':')[0];
+    const formatUrl = (u) =>
+      u
+        .replace('ws://', '')
+        .replace('wss://', '')
+        .replace('http://', '')
+        .replace('https://', '')
+        .split('/')[0]
+        .split(':')[0];
 
-    const nodes = (app.chain && app.chain.meta ? [] : [{
-      name: 'node',
-      label: 'Select a node',
-      value: undefined,
-      selected: true,
-      chainId: undefined,
-    }]).concat(app.config.nodes.getAll().map((n) => ({
-      name: 'node',
-      label: formatUrl(n.url),
-      value: n.id,
-      selected: app.chain && app.chain.meta && n.url === app.chain.meta.url && n.chain === app.chain.meta.chain,
-      chainId: n.chain.id,
-    })));
+    const nodes = (app.chain && app.chain.meta
+      ? []
+      : [
+          {
+            name: 'node',
+            label: 'Select a node',
+            value: undefined,
+            selected: true,
+            chainId: undefined,
+          },
+        ]
+    ).concat(
+      app.config.nodes.getAll().map((n) => ({
+        name: 'node',
+        label: formatUrl(n.url),
+        value: n.id,
+        selected:
+          app.chain &&
+          app.chain.meta &&
+          n.url === app.chain.meta.url &&
+          n.chain === app.chain.meta.chain,
+        chainId: n.chain.id,
+      }))
+    );
 
     return m('.ChainStatusModule', [
-      app.chain.deferred ? m(Button, {
-        label: vnode.state.initializing ? 'Connecting...' : 'Connect to chain',
-        rounded: true,
-        fluid: true,
-        disabled: vnode.state.initializing,
-        onclick: async (e) => {
-          e.preventDefault();
-          vnode.state.initializing = true;
-          await initChain();
-          vnode.state.initializing = false;
-          m.redraw();
-        }
-      }) : m(PopoverMenu, {
-        transitionDuration: 0,
-        closeOnContentClick: true,
-        closeOnOutsideClick: true,
-        content: nodes.filter((node) => node.chainId === app.activeChainId()).map((node) => {
-          return m(MenuItem, {
-            label: [
-              node.label,
-              app.chain?.meta.id === node.value && ' (Selected)',
-            ],
+      app.chain.deferred
+        ? m(Button, {
+            label: vnode.state.initializing
+              ? 'Connecting...'
+              : 'Connect to chain',
+            rounded: true,
+            fluid: true,
+            disabled: vnode.state.initializing,
             onclick: async (e) => {
               e.preventDefault();
               vnode.state.initializing = true;
-              const n: NodeInfo = app.config.nodes.getById(node.value);
-              if (!n) return;
-              const finalizeInitialization = await selectNode(n);
-              if (finalizeInitialization) await initChain();
+              await initChain();
               vnode.state.initializing = false;
               m.redraw();
-            }
-          });
-        }),
-        trigger: m(Button, {
-          rounded: true,
-          class: 'chain-status-main',
-          fluid: true,
-          disabled: vnode.state.initializing,
-          label: vnode.state.initializing ? 'Connecting...' : app.chain.deferred
-            ? 'Connect to chain' : m(ChainStatusIndicator),
-        }),
-      }),
+            },
+          })
+        : m(PopoverMenu, {
+            transitionDuration: 0,
+            closeOnContentClick: true,
+            closeOnOutsideClick: true,
+            content: nodes
+              .filter((node) => node.chainId === app.activeChainId())
+              .map((node) => {
+                return m(MenuItem, {
+                  label: [
+                    node.label,
+                    app.chain?.meta.id === node.value && ' (Selected)',
+                  ],
+                  onclick: async (e) => {
+                    e.preventDefault();
+                    vnode.state.initializing = true;
+                    const n: NodeInfo = app.config.nodes.getById(node.value);
+                    if (!n) return;
+                    const finalizeInitialization = await selectNode(n);
+                    if (finalizeInitialization) await initChain();
+                    vnode.state.initializing = false;
+                    m.redraw();
+                  },
+                });
+              }),
+            trigger: m(Button, {
+              rounded: true,
+              class: 'chain-status-main',
+              fluid: true,
+              disabled: vnode.state.initializing,
+              label: vnode.state.initializing
+                ? 'Connecting...'
+                : app.chain.deferred
+                ? 'Connect to chain'
+                : m(ChainStatusIndicator),
+            }),
+          }),
     ]);
-  }
+  },
 };
 
 export const ExternalLinksModule: m.Component<{}, {}> = {
   view: (vnode) => {
     if (!app.chain && !app.community) return;
     const meta = app.chain ? app.chain.meta.chain : app.community.meta;
-    const { name, description, website, discord, element, telegram, github } = meta;
+    const {
+      name,
+      description,
+      website,
+      discord,
+      element,
+      telegram,
+      github,
+    } = meta;
     if (!website && !discord && !telegram && !github) return;
 
     return m('.ExternalLinksModule.SidebarModule', [
-      discord && m(Tooltip, {
-        transitionDuration: 100,
-        content: 'Discord',
-        trigger: m(Button, {
-          rounded: true,
-          onclick: () => window.open(discord),
-          label: m.trust(discordIcon),
-          class: 'discord-button',
+      discord &&
+        m(Tooltip, {
+          transitionDuration: 100,
+          content: 'Discord',
+          trigger: m(Button, {
+            rounded: true,
+            onclick: () => window.open(discord),
+            label: m.trust(discordIcon),
+            class: 'discord-button',
+          }),
         }),
-      }),
-      element && m(Tooltip, {
-        transitionDuration: 100,
-        content: 'Element',
-        trigger: m(Button, {
-          rounded: true,
-          onclick: () => window.open(element),
-          label: m.trust(elementIcon),
-          class: 'element-button',
+      element &&
+        m(Tooltip, {
+          transitionDuration: 100,
+          content: 'Element',
+          trigger: m(Button, {
+            rounded: true,
+            onclick: () => window.open(element),
+            label: m.trust(elementIcon),
+            class: 'element-button',
+          }),
         }),
-      }),
-      telegram && m(Tooltip, {
-        transitionDuration: 100,
-        content: 'Telegram',
-        trigger: m(Button, {
-          rounded: true,
-          onclick: () => window.open(telegram),
-          label: m.trust(telegramIcon),
-          class: 'telegram-button',
+      telegram &&
+        m(Tooltip, {
+          transitionDuration: 100,
+          content: 'Telegram',
+          trigger: m(Button, {
+            rounded: true,
+            onclick: () => window.open(telegram),
+            label: m.trust(telegramIcon),
+            class: 'telegram-button',
+          }),
         }),
-      }),
-      github && m(Tooltip, {
-        transitionDuration: 100,
-        content: 'Github',
-        trigger: m(Button, {
-          rounded: true,
-          onclick: () => window.open(github),
-          label: m.trust(githubIcon),
-          class: 'github-button',
+      github &&
+        m(Tooltip, {
+          transitionDuration: 100,
+          content: 'Github',
+          trigger: m(Button, {
+            rounded: true,
+            onclick: () => window.open(github),
+            label: m.trust(githubIcon),
+            class: 'github-button',
+          }),
         }),
-      }),
-      website && m(Tooltip, {
-        transitionDuration: 100,
-        content: 'Homepage',
-        trigger: m(Button, {
-          rounded: true,
-          onclick: () => window.open(website),
-          label: m.trust(websiteIcon),
-          class: 'website-button',
+      website &&
+        m(Tooltip, {
+          transitionDuration: 100,
+          content: 'Homepage',
+          trigger: m(Button, {
+            rounded: true,
+            onclick: () => window.open(website),
+            label: m.trust(websiteIcon),
+            class: 'website-button',
+          }),
         }),
-      }),
     ]);
-  }
+  },
 };
 
 const Sidebar: m.Component<{ hideQuickSwitcher? }, {}> = {
@@ -512,9 +665,11 @@ const Sidebar: m.Component<{ hideQuickSwitcher? }, {}> = {
         (app.chain || app.community) && m(OnchainNavigationModule),
         (app.chain || app.community) && m(ExternalLinksModule),
         m('br'),
-        app.isLoggedIn() && (app.chain || app.community) && m(SubscriptionButton),
+        app.isLoggedIn() &&
+          (app.chain || app.community) &&
+          m(SubscriptionButton),
         app.chain && m(ChainStatusModule),
-      ])
+      ]),
     ];
   },
 };

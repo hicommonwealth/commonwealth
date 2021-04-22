@@ -28,12 +28,13 @@ const SendingFrom = {
     const balance = vnode.state.balance;
     return m('.SendingFrom', [
       m('span.sending-from', m(User, { user: author })),
-      showBalance && m('span.sending-from-balance', [
-        'Free: ',
-        balance === undefined ? '--' : balance.format(true),
-      ]),
+      showBalance &&
+        m('span.sending-from-balance', [
+          'Free: ',
+          balance === undefined ? '--' : balance.format(true),
+        ]),
     ]);
-  }
+  },
 };
 
 export default SendingFrom;

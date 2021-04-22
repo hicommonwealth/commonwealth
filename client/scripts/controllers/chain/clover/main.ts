@@ -10,7 +10,7 @@ class Clover extends Substrate {
 
   public async initApi() {
     await super.initApi({
-      'types': CloverSpecTypes,
+      types: CloverSpecTypes,
     });
   }
 }

@@ -24,7 +24,7 @@ class DiscussionDraft {
     topic: string,
     createdAt: moment.Moment,
     attachments: OffchainAttachment[],
-    authorChain?: string,
+    authorChain?: string
   ) {
     this.author = author;
     this.title = title;

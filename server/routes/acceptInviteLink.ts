@@ -6,7 +6,9 @@ import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 const redirectWithError = (res, message: string) => {
-  const uri = `${SERVER_URL}/?invitemessage=failure&message=${encodeURIComponent(message)}`;
+  const uri = `${SERVER_URL}/?invitemessage=failure&message=${encodeURIComponent(
+    message
+  )}`;
   return res.redirect(uri);
 };
 
@@ -16,23 +18,27 @@ const redirectWithSuccess = (res) => {
 };
 
 const acceptInviteLink = async (models, req, res, next) => {
-  if (!req.user) return redirectWithError(res, 'Must be logged in to accept invites');
-  if (!req.user.email) return redirectWithError(
-    res,
-    'Must have an email to accept invites. Try adding one in the Settings panel'
-  );
+  if (!req.user)
+    return redirectWithError(res, 'Must be logged in to accept invites');
+  if (!req.user.email)
+    return redirectWithError(
+      res,
+      'Must have an email to accept invites. Try adding one in the Settings panel'
+    );
   const { id } = req.query;
 
   const inviteLink = await models.InviteLink.findOne({
     where: {
       id,
-    }
+    },
   });
-  if (!inviteLink || !inviteLink.active) return redirectWithError(res, 'Invite link expired or invalid');
+  if (!inviteLink || !inviteLink.active)
+    return redirectWithError(res, 'Invite link expired or invalid');
 
   const { time_limit, multi_use, used, community_id, creator_id } = inviteLink;
 
-  if (multi_use !== null) { // meaning limited usage
+  if (multi_use !== null) {
+    // meaning limited usage
     if (used === multi_use) {
       return redirectWithError(res, 'Invite link expired or invalid');
     }
@@ -44,30 +50,30 @@ const acceptInviteLink = async (models, req, res, next) => {
     switch (time_limit) {
       case '24h':
         if (timeElapsed > 24) {
-          await inviteLink.update({ active: false, });
+          await inviteLink.update({ active: false });
           return redirectWithError(res, 'Invite link expired or invalid');
         }
         break;
       case '48h':
-        if (timeElapsed > (24 * 2)) {
-          await inviteLink.update({ active: false, });
+        if (timeElapsed > 24 * 2) {
+          await inviteLink.update({ active: false });
           return redirectWithError(res, 'Invite link expired or invalid');
         }
         break;
       case '1w':
-        if (timeElapsed > (24 * 7)) {
-          await inviteLink.update({ active: false, });
+        if (timeElapsed > 24 * 7) {
+          await inviteLink.update({ active: false });
           return redirectWithError(res, 'Invite link expired or invalid');
         }
         break;
       case '1m':
-        if (timeElapsed > (24 * 30)) {
-          await inviteLink.update({ active: false, });
+        if (timeElapsed > 24 * 30) {
+          await inviteLink.update({ active: false });
           return redirectWithError(res, 'Invite link expired or invalid');
         }
         break;
       default:
-        await inviteLink.update({ active: false, });
+        await inviteLink.update({ active: false });
         return redirectWithError(res, 'Invite link expired or invalid');
     }
   }
@@ -78,7 +84,7 @@ const acceptInviteLink = async (models, req, res, next) => {
       community_id,
       invited_email: req.user.email,
       used: false,
-    }
+    },
   });
   if (prevInviteCode) {
     return redirectWithSuccess(res);
@@ -87,10 +93,13 @@ const acceptInviteLink = async (models, req, res, next) => {
   const community = await models.OffchainCommunity.findOne({
     where: {
       id: community_id,
-    }
+    },
   });
   if (!community) {
-    return redirectWithError(res, 'Community associated with invite not found!');
+    return redirectWithError(
+      res,
+      'Community associated with invite not found!'
+    );
   }
 
   const code = crypto.randomBytes(24).toString('hex');
@@ -106,7 +115,7 @@ const acceptInviteLink = async (models, req, res, next) => {
 
   // updating inviteLink checks
   await inviteLink.update({
-    used: (used + 1),
+    used: used + 1,
   });
 
   if (inviteLink.used === multi_use) {

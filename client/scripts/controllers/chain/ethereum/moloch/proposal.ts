@@ -25,7 +25,7 @@ import MolochGovernance from './governance';
 export enum MolochVote {
   NULL = 'Null',
   YES = 'Yes',
-  NO = 'No'
+  NO = 'No',
 }
 
 export enum MolochProposalState {
@@ -34,7 +34,7 @@ export enum MolochProposalState {
   GracePeriod,
   InProcessingQueue,
   ReadyToProcess,
-  Processed
+  Processed,
 }
 
 export class MolochProposalVote implements IVote<EthereumCoin> {
@@ -51,21 +51,37 @@ const backportEntityToAdapter = (
   Gov: MolochGovernance,
   entity: ChainEntity
 ): IMolochProposalResponse => {
-  const startEvent = entity.chainEvents.find((e) => e.data.kind === MolochTypes.EventKind.SubmitProposal);
-  const processEvent = entity.chainEvents.find((e) => e.data.kind === MolochTypes.EventKind.ProcessProposal);
-  const abortEvent = entity.chainEvents.find((e) => e.data.kind === MolochTypes.EventKind.Abort);
+  const startEvent = entity.chainEvents.find(
+    (e) => e.data.kind === MolochTypes.EventKind.SubmitProposal
+  );
+  const processEvent = entity.chainEvents.find(
+    (e) => e.data.kind === MolochTypes.EventKind.ProcessProposal
+  );
+  const abortEvent = entity.chainEvents.find(
+    (e) => e.data.kind === MolochTypes.EventKind.Abort
+  );
   if (!startEvent) {
     throw new Error('Proposal start event not found!');
   }
-  const identifier = `${(startEvent.data as MolochTypes.ISubmitProposal).proposalIndex}`;
+  const identifier = `${
+    (startEvent.data as MolochTypes.ISubmitProposal).proposalIndex
+  }`;
   const id = identifier;
   const details = (startEvent.data as MolochTypes.ISubmitProposal).details;
-  const timestamp = `${(startEvent.data as MolochTypes.ISubmitProposal).startTime}`;
-  const startingPeriod = (new BN(timestamp, 10)).sub(Gov.summoningTime).div(Gov.periodDuration).toString(10);
+  const timestamp = `${
+    (startEvent.data as MolochTypes.ISubmitProposal).startTime
+  }`;
+  const startingPeriod = new BN(timestamp, 10)
+    .sub(Gov.summoningTime)
+    .div(Gov.periodDuration)
+    .toString(10);
   const delegateKey = (startEvent.data as MolochTypes.ISubmitProposal).member;
-  const applicantAddress = (startEvent.data as MolochTypes.ISubmitProposal).applicant;
-  const tokenTribute = (startEvent.data as MolochTypes.ISubmitProposal).tokenTribute;
-  const sharesRequested = (startEvent.data as MolochTypes.ISubmitProposal).sharesRequested;
+  const applicantAddress = (startEvent.data as MolochTypes.ISubmitProposal)
+    .applicant;
+  const tokenTribute = (startEvent.data as MolochTypes.ISubmitProposal)
+    .tokenTribute;
+  const sharesRequested = (startEvent.data as MolochTypes.ISubmitProposal)
+    .sharesRequested;
   const processed = !!processEvent;
   const proposal: IMolochProposalResponse = {
     identifier,
@@ -97,7 +113,6 @@ const backportEntityToAdapter = (
   return proposal;
 };
 
-
 export default class MolochProposal extends Proposal<
   MolochAPI,
   EthereumCoin,
@@ -107,10 +122,12 @@ export default class MolochProposal extends Proposal<
   private _Members: MolochMembers;
   private _Gov: MolochGovernance;
 
-  private _yesShares: number = 0;
-  private _noShares: number = 0;
+  private _yesShares = 0;
+  private _noShares = 0;
 
-  public get shortIdentifier() { return `MGP-${this.data.identifier}`; }
+  public get shortIdentifier() {
+    return `MGP-${this.data.identifier}`;
+  }
   public get title(): string {
     try {
       const parsed = JSON.parse(this.data.details);
@@ -142,30 +159,54 @@ export default class MolochProposal extends Proposal<
     }
   }
 
-  public get author() { return this._Members.get(this.data.delegateKey); }
-  public get applicantAddress() { return this.data.applicantAddress; }
+  public get author() {
+    return this._Members.get(this.data.delegateKey);
+  }
+  public get applicantAddress() {
+    return this.data.applicantAddress;
+  }
 
-  public get votingType() { return VotingType.MolochYesNo; }
-  public get votingUnit() { return VotingUnit.CoinVote; }
+  public get votingType() {
+    return VotingType.MolochYesNo;
+  }
+  public get votingUnit() {
+    return VotingUnit.CoinVote;
+  }
 
-  public get startingPeriod() { return +this.data.startingPeriod; }
-  public get votingPeriodEnd() { return this.startingPeriod + +this._Gov.votingPeriodLength; }
-  public get gracePeriodEnd() { return this.votingPeriodEnd + +this._Gov.gracePeriod; }
-  public get abortPeriodEnd() { return this.startingPeriod + +this._Gov.abortWindow; }
+  public get startingPeriod() {
+    return +this.data.startingPeriod;
+  }
+  public get votingPeriodEnd() {
+    return this.startingPeriod + +this._Gov.votingPeriodLength;
+  }
+  public get gracePeriodEnd() {
+    return this.votingPeriodEnd + +this._Gov.gracePeriod;
+  }
+  public get abortPeriodEnd() {
+    return this.startingPeriod + +this._Gov.abortWindow;
+  }
 
   public get state(): MolochProposalState {
     const currentPeriod = this._Gov.currentPeriod;
     if (this.startingPeriod > currentPeriod) {
       return MolochProposalState.NotStarted;
-    } else if (this.startingPeriod <= currentPeriod && currentPeriod < this.votingPeriodEnd) {
+    } else if (
+      this.startingPeriod <= currentPeriod &&
+      currentPeriod < this.votingPeriodEnd
+    ) {
       return MolochProposalState.Voting;
-    } else if (this.votingPeriodEnd <= currentPeriod && currentPeriod < this.gracePeriodEnd) {
+    } else if (
+      this.votingPeriodEnd <= currentPeriod &&
+      currentPeriod < this.gracePeriodEnd
+    ) {
       return MolochProposalState.GracePeriod;
     } else if (this.gracePeriodEnd < currentPeriod && !this.data.processed) {
       // has previous proposal been processed?
       // this should always be available, but we might need to load this property
       // at init time if we implement e.g. paginated loading
-      const prevProposal = this._Gov.store.getByIdentifier(+this.identifier - 1);
+      const prevProposal = this._Gov.store.getByIdentifier(
+        +this.identifier - 1
+      );
       if (!prevProposal || prevProposal.data.processed) {
         return MolochProposalState.ReadyToProcess;
       } else {
@@ -190,7 +231,9 @@ export default class MolochProposal extends Proposal<
     } else {
       endPeriod = this.gracePeriodEnd;
     }
-    const endTimestamp = this._Gov.summoningTime.add(this._Gov.periodDuration.muln(endPeriod));
+    const endTimestamp = this._Gov.summoningTime.add(
+      this._Gov.periodDuration.muln(endPeriod)
+    );
     return { kind: 'fixed', time: moment.unix(endTimestamp.toNumber()) };
   }
 
@@ -199,14 +242,27 @@ export default class MolochProposal extends Proposal<
   }
 
   public get isPassing() {
-    if (this.data.status === 'PASSED' || this.data.didPass) return ProposalStatus.Passed;
-    if (this.data.status === 'FAILED' || this.data.status === 'ABORTED' || this.data.aborted || this.data.processed) {
+    if (this.data.status === 'PASSED' || this.data.didPass)
+      return ProposalStatus.Passed;
+    if (
+      this.data.status === 'FAILED' ||
+      this.data.status === 'ABORTED' ||
+      this.data.aborted ||
+      this.data.processed
+    ) {
       return ProposalStatus.Failed;
     }
-    if (this.state === MolochProposalState.Voting || this.state === MolochProposalState.NotStarted) {
-      return new BN(this._yesShares).gt(new BN(this._noShares)) ? ProposalStatus.Passing : ProposalStatus.Failing;
+    if (
+      this.state === MolochProposalState.Voting ||
+      this.state === MolochProposalState.NotStarted
+    ) {
+      return new BN(this._yesShares).gt(new BN(this._noShares))
+        ? ProposalStatus.Passing
+        : ProposalStatus.Failing;
     } else {
-      return new BN(this._yesShares).gt(new BN(this._noShares)) ? ProposalStatus.Passed : ProposalStatus.Failed;
+      return new BN(this._yesShares).gt(new BN(this._noShares))
+        ? ProposalStatus.Passed
+        : ProposalStatus.Failed;
     }
   }
 
@@ -237,7 +293,7 @@ export default class MolochProposal extends Proposal<
   constructor(
     Members: MolochMembers,
     Gov: MolochGovernance,
-    entity: ChainEntity,
+    entity: ChainEntity
   ) {
     // must set identifier before super() because of how response object is named
     super('molochproposal', backportEntityToAdapter(Gov, entity));
@@ -245,7 +301,9 @@ export default class MolochProposal extends Proposal<
     this._Members = Members;
     this._Gov = Gov;
 
-    entity.chainEvents.sort((e1, e2) => e1.blockNumber - e2.blockNumber).forEach((e) => this.update(e));
+    entity.chainEvents
+      .sort((e1, e2) => e1.blockNumber - e2.blockNumber)
+      .forEach((e) => this.update(e));
     this._initialized = true;
     this._Gov.store.add(this);
   }
@@ -266,7 +324,12 @@ export default class MolochProposal extends Proposal<
           highestIndexYesVote: `${e.data.highestIndexYesVote}`,
         };
         const member = this._Members.getFromJSON(memberJson);
-        const choice = e.data.vote === 1 ? MolochVote.YES : e.data.vote === 2 ? MolochVote.NO : MolochVote.NULL;
+        const choice =
+          e.data.vote === 1
+            ? MolochVote.YES
+            : e.data.vote === 2
+            ? MolochVote.NO
+            : MolochVote.NULL;
         this.addOrUpdateVote(new MolochProposalVote(member, choice));
         if (choice === MolochVote.YES) {
           this._yesShares += +e.data.shares;
@@ -305,7 +368,10 @@ export default class MolochProposal extends Proposal<
   }
 
   public canAbort(currentUser: MolochMember) {
-    if (currentUser.address.toLowerCase() !== this.data.applicantAddress.toLowerCase()) {
+    if (
+      currentUser.address.toLowerCase() !==
+      this.data.applicantAddress.toLowerCase()
+    ) {
       return false;
     }
     return this._Gov.currentPeriod < this.abortPeriodEnd;
@@ -335,8 +401,12 @@ export default class MolochProposal extends Proposal<
 
     const tx = await this._Gov.api.Contract.submitVote(
       this.data.identifier,
-      vote.choice === MolochVote.YES ? 1 : vote.choice === MolochVote.NO ? 2 : 0,
-      { gasLimit: this._Gov.api.gasLimit },
+      vote.choice === MolochVote.YES
+        ? 1
+        : vote.choice === MolochVote.NO
+        ? 2
+        : 0,
+      { gasLimit: this._Gov.api.gasLimit }
     );
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
@@ -379,14 +449,16 @@ export default class MolochProposal extends Proposal<
       throw new Error('proposal not in abort window');
     }
 
-    if (this._Gov.api.userAddress.toLowerCase() !== this.applicantAddress.toLowerCase()) {
+    if (
+      this._Gov.api.userAddress.toLowerCase() !==
+      this.applicantAddress.toLowerCase()
+    ) {
       throw new Error('only applicant can abort');
     }
 
-    const tx = await this._Gov.api.Contract.abort(
-      this.data.identifier,
-      { gasLimit: this._Gov.api.gasLimit }
-    );
+    const tx = await this._Gov.api.Contract.abort(this.data.identifier, {
+      gasLimit: this._Gov.api.gasLimit,
+    });
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
       throw new Error('failed to abort proposal');

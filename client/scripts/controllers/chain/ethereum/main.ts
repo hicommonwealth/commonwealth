@@ -31,11 +31,16 @@ class Ethereum extends IChainAdapter<EthereumCoin, EthereumAccount> {
 
     if (this.webWallet) {
       await this.webWallet.enable();
-      await this.webWallet.web3.givenProvider.on('accountsChanged', async (accounts) => {
-        const updatedAddress = this.app.user.activeAccounts.find((addr) => addr.address === accounts[0]);
-        if (!updatedAddress) return;
-        await setActiveAccount(updatedAddress);
-      });
+      await this.webWallet.web3.givenProvider.on(
+        'accountsChanged',
+        async (accounts) => {
+          const updatedAddress = this.app.user.activeAccounts.find(
+            (addr) => addr.address === accounts[0]
+          );
+          if (!updatedAddress) return;
+          await setActiveAccount(updatedAddress);
+        }
+      );
     }
     await this.chain.initEventLoop();
     await super.initApi();
@@ -50,7 +55,9 @@ class Ethereum extends IChainAdapter<EthereumCoin, EthereumAccount> {
   }
 
   public async getEthersProvider() {
-    const provider = new ethers.providers.Web3Provider(this.chain.api.currentProvider as any);
+    const provider = new ethers.providers.Web3Provider(
+      this.chain.api.currentProvider as any
+    );
     return provider;
   }
 }

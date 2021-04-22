@@ -10,32 +10,46 @@ export const Errors = {
   MustBeAdmin: 'Must be admin',
   MissingParams: 'Must provide chain ID, name, symbol, network, and node url',
   NodeExists: 'Node already exists',
-  MustSpecifyContract: 'This is a contract, you must specify a contract address',
+  MustSpecifyContract:
+    'This is a contract, you must specify a contract address',
 };
 
-const addChainNode = async (models, req: Request, res: Response, next: NextFunction) => {
+const addChainNode = async (
+  models,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.user) {
     return next(new Error(Errors.NotLoggedIn));
   }
   if (!req.user.isAdmin) {
     return next(new Error(Errors.MustBeAdmin));
   }
-  if (!req.body.id || !req.body.name || !req.body.symbol || !req.body.network || !req.body.node_url || !req.body.base) {
+  if (
+    !req.body.id ||
+    !req.body.name ||
+    !req.body.symbol ||
+    !req.body.network ||
+    !req.body.node_url ||
+    !req.body.base
+  ) {
     return next(new Error(Errors.MissingParams));
   }
 
-  let chain = await models.Chain.findOne({ where: {
-    // TODO: should we only check id?
-    [Op.or]: [
-      { id: req.body.id },
-      { name: req.body.name }
-    ]
-  } });
+  let chain = await models.Chain.findOne({
+    where: {
+      // TODO: should we only check id?
+      [Op.or]: [{ id: req.body.id }, { name: req.body.name }],
+    },
+  });
   if (chain) {
-    const existingNode = await models.ChainNode.find({ where: {
-      chain: chain.id,
-      url: req.body.node_url,
-    } });
+    const existingNode = await models.ChainNode.find({
+      where: {
+        chain: chain.id,
+        url: req.body.node_url,
+      },
+    });
     if (existingNode) {
       return next(new Error(Errors.NodeExists));
     }
@@ -58,7 +72,7 @@ const addChainNode = async (models, req: Request, res: Response, next: NextFunct
   const node = await models.ChainNode.create({
     chain: chain.id,
     url: req.body.node_url,
-    address: (req.body.address) ? req.body.address : '',
+    address: req.body.address ? req.body.address : '',
   });
 
   return res.json({ status: 'Success', result: node.toJSON() });

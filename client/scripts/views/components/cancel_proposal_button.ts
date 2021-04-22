@@ -19,9 +19,9 @@ const CancelProposalButton: m.Component<IAttrs> = {
         e.preventDefault();
         // TODO: check for login?
       },
-      label: vnode.attrs.label || 'Cancel Proposal'
+      label: vnode.attrs.label || 'Cancel Proposal',
     });
-  }
+  },
 };
 
 export default CancelProposalButton;

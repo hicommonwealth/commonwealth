@@ -14,7 +14,10 @@ import CommonwealthMembers from './members';
 import CommonwealthAPI from './api';
 import CommonwealthGovernance from './governance';
 
-export default class Commonwealth extends IChainAdapter<EthereumCoin, EthereumAccount> {
+export default class Commonwealth extends IChainAdapter<
+  EthereumCoin,
+  EthereumAccount
+> {
   public readonly base = ChainBase.Ethereum;
   public readonly class = ChainClass.Commonwealth;
   public chain: CommonwealthChain;
@@ -29,7 +32,10 @@ export default class Commonwealth extends IChainAdapter<EthereumCoin, EthereumAc
     this.chain = new CommonwealthChain(this.app);
     this.ethAccounts = new EthereumAccounts(this.app);
     this.accounts = new CommonwealthMembers(this.app);
-    this.governance = new CommonwealthGovernance(this.app, !this.usingServerChainEntities);
+    this.governance = new CommonwealthGovernance(
+      this.app,
+      !this.usingServerChainEntities
+    );
   }
 
   public async initApi() {
@@ -38,26 +44,41 @@ export default class Commonwealth extends IChainAdapter<EthereumCoin, EthereumAc
     await this.ethAccounts.init(this.chain);
     await this.webWallet.enable();
 
-    const activeAddress: string = this.webWallet.accounts && this.webWallet.accounts[0];
-    const api = new CommonwealthAPI(this.meta.address, this.chain.api.currentProvider as any, activeAddress);
+    const activeAddress: string =
+      this.webWallet.accounts && this.webWallet.accounts[0];
+    const api = new CommonwealthAPI(
+      this.meta.address,
+      this.chain.api.currentProvider as any,
+      activeAddress
+    );
     await api.init();
     this.chain.commonwealthApi = api;
 
     if (this.webWallet) {
       await this.webWallet.enable();
-      await this.webWallet.web3.givenProvider.on('accountsChanged', async (accounts) => {
-        const updatedAddress = this.app.user.activeAccounts.find((addr) => addr.address === accounts[0]);
-        if (!updatedAddress) return;
-        await setActiveAccount(updatedAddress);
-      });
+      await this.webWallet.web3.givenProvider.on(
+        'accountsChanged',
+        async (accounts) => {
+          const updatedAddress = this.app.user.activeAccounts.find(
+            (addr) => addr.address === accounts[0]
+          );
+          if (!updatedAddress) return;
+          await setActiveAccount(updatedAddress);
+        }
+      );
     }
 
-    await this.webWallet.web3.givenProvider.on('accountsChanged', async (accounts) => {
-      const updatedAddress = this.app.user.activeAccounts.find((addr) => addr.address === accounts[0]);
-      if (!updatedAddress) return;
-      await setActiveAccount(updatedAddress);
-      api.updateSigner(accounts[0]);
-    });
+    await this.webWallet.web3.givenProvider.on(
+      'accountsChanged',
+      async (accounts) => {
+        const updatedAddress = this.app.user.activeAccounts.find(
+          (addr) => addr.address === accounts[0]
+        );
+        if (!updatedAddress) return;
+        await setActiveAccount(updatedAddress);
+        api.updateSigner(accounts[0]);
+      }
+    );
 
     await this.accounts.init(api, this.chain, this.ethAccounts);
     await super.initApi();

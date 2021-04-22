@@ -12,12 +12,21 @@ import { getLastEdited } from '../util/getLastEdited';
 
 const log = factory.getLogger(formatFilename(__filename));
 
-export const Errors = { };
+export const Errors = {};
 
 // Topics, comments, reactions, members+admins, threads
-const bulkOffchain = async (models, req: Request, res: Response, next: NextFunction) => {
+const bulkOffchain = async (
+  models,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { Op } = models.sequelize;
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
+  const [chain, community, error] = await lookupCommunityIsVisibleToUser(
+    models,
+    req.query,
+    req.user
+  );
   if (error) return next(new Error(error));
 
   // globally shared SQL replacements
@@ -29,12 +38,18 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
     : { chain: chain.id };
 
   // parallelized queries
-  const [topics, threadsCommentsReactions, admins, mostActiveUsers, threadsInVoting] = await Promise.all([
+  const [
+    topics,
+    threadsCommentsReactions,
+    admins,
+    mostActiveUsers,
+    threadsInVoting,
+  ] = await Promise.all([
     // topics
     models.OffchainTopic.findAll({
       where: community
         ? { community_id: community.id }
-        : { chain_id: chain.id }
+        : { chain_id: chain.id },
     }),
     // threads, comments, reactions
     new Promise(async (resolve, reject) => {
@@ -45,19 +60,19 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
           include: [
             {
               model: models.Address,
-              as: 'Address'
+              as: 'Address',
             },
             {
               model: models.Address,
               through: models.Collaboration,
-              as: 'collaborators'
+              as: 'collaborators',
             },
             {
               model: models.OffchainTopic,
-              as: 'topic'
-            }
+              as: 'topic',
+            },
           ],
-          exclude: [ 'version_history' ],
+          exclude: ['version_history'],
         });
 
         const query = `
@@ -107,7 +122,10 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
             AND t.deleted_at IS NULL
             AND t.pinned = false
             GROUP BY (t.id, c.comm_created_at, t.created_at)
-            ORDER BY COALESCE(c.comm_created_at, t.created_at) DESC LIMIT ${Math.max(0, 10 - pinnedThreads.length)}
+            ORDER BY COALESCE(c.comm_created_at, t.created_at) DESC LIMIT ${Math.max(
+              0,
+              10 - pinnedThreads.length
+            )}
           ) threads
           ON threads.address_id = addr.id
           LEFT JOIN "OffchainTopics" topics
@@ -117,7 +135,7 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
         try {
           preprocessedThreads = await models.sequelize.query(query, {
             replacements,
-            type: QueryTypes.SELECT
+            type: QueryTypes.SELECT,
           });
         } catch (e) {
           console.log(e);
@@ -169,15 +187,17 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
           return data;
         });
 
-        const allThreads = pinnedThreads.map((t) => {
-          root_ids.push(`discussion_${t.id}`);
-          return t.toJSON();
-        }).concat(threads);
+        const allThreads = pinnedThreads
+          .map((t) => {
+            root_ids.push(`discussion_${t.id}`);
+            return t.toJSON();
+          })
+          .concat(threads);
 
         // Comments
         const comments = await models.OffchainComment.findAll({
           where: {
-            root_id: root_ids
+            root_id: root_ids,
           },
           include: [models.Address, models.OffchainAttachment],
           order: [['created_at', 'DESC']],
@@ -197,7 +217,7 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
           where: community
             ? { community: community.id, [Op.or]: matchThreadsOrComments }
             : { chain: chain.id, [Op.or]: matchThreadsOrComments },
-          include: [ models.Address ],
+          include: [models.Address],
           order: [['created_at', 'DESC']],
         });
         resolve([allThreads, comments, reactions]);
@@ -208,61 +228,75 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
     }),
     // admins
     models.Role.findAll({
-      where: chain ? {
-        chain_id: chain.id,
-        permission: { [Op.in]: ['admin', 'moderator'] },
-      } : {
-        offchain_community_id: community.id,
-        permission: { [Op.in]: ['admin', 'moderator'] },
-      },
-      include: [ models.Address ],
+      where: chain
+        ? {
+            chain_id: chain.id,
+            permission: { [Op.in]: ['admin', 'moderator'] },
+          }
+        : {
+            offchain_community_id: community.id,
+            permission: { [Op.in]: ['admin', 'moderator'] },
+          },
+      include: [models.Address],
       order: [['created_at', 'DESC']],
     }),
     // most active users
     new Promise(async (resolve, reject) => {
       try {
-        const thirtyDaysAgo = new Date((new Date() as any) - 1000 * 24 * 60 * 60 * 30);
+        const thirtyDaysAgo = new Date(
+          (new Date() as any) - 1000 * 24 * 60 * 60 * 30
+        );
         const activeUsers = {};
         const where = { updated_at: { [Op.gt]: thirtyDaysAgo } };
         if (community) where['community'] = community.id;
         else where['chain'] = chain.id;
 
-        const monthlyComments = await models.OffchainComment.findAll({ where, include: [ models.Address ] });
+        const monthlyComments = await models.OffchainComment.findAll({
+          where,
+          include: [models.Address],
+        });
         const monthlyThreads = await models.OffchainThread.findAll({
           where,
-          include: [ { model: models.Address, as: 'Address' } ],
-          exclude: [ 'version_history' ],
+          include: [{ model: models.Address, as: 'Address' }],
+          exclude: ['version_history'],
         });
 
         monthlyComments.concat(monthlyThreads).forEach((post) => {
           if (!post.Address) return;
           const addr = post.Address.address;
           if (activeUsers[addr]) activeUsers[addr]['count'] += 1;
-          else activeUsers[addr] = {
-            info: post.Address,
-            count: 1,
-          };
+          else
+            activeUsers[addr] = {
+              info: post.Address,
+              count: 1,
+            };
         });
         const mostActiveUsers_ = Object.values(activeUsers).sort((a, b) => {
-          return ((b as any).count - (a as any).count);
+          return (b as any).count - (a as any).count;
         });
         resolve(mostActiveUsers_);
       } catch (e) {
         reject(new Error('Could not fetch most active users'));
       }
     }),
-    models.sequelize.query(`
+    models.sequelize.query(
+      `
      SELECT id, title, stage FROM "OffchainThreads"
-     WHERE ${communityOptions} AND (stage = 'proposal_in_review' OR stage = 'voting')`, {
-      replacements,
-      type: QueryTypes.SELECT
-    }),
+     WHERE ${communityOptions} AND (stage = 'proposal_in_review' OR stage = 'voting')`,
+      {
+        replacements,
+        type: QueryTypes.SELECT,
+      }
+    ),
   ]);
 
   const [threads, comments, reactions] = threadsCommentsReactions as any;
 
-  const numPrevotingThreads = threadsInVoting.filter((t) => t.stage === 'proposal_in_review').length;
-  const numVotingThreads = threadsInVoting.filter((t) => t.stage === 'voting').length;
+  const numPrevotingThreads = threadsInVoting.filter(
+    (t) => t.stage === 'proposal_in_review'
+  ).length;
+  const numVotingThreads = threadsInVoting.filter((t) => t.stage === 'voting')
+    .length;
 
   return res.json({
     status: 'Success',
@@ -277,7 +311,7 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
       //
       admins: admins.map((a) => a.toJSON()),
       activeUsers: mostActiveUsers,
-    }
+    },
   });
 };
 

@@ -19,38 +19,57 @@ export interface LoginTokenAttributes {
   SocialAccounts?: SocialAccountAttributes[];
 }
 
-export interface LoginTokenInstance extends Sequelize.Instance<LoginTokenAttributes>, LoginTokenAttributes {
+export interface LoginTokenInstance
+  extends Sequelize.Instance<LoginTokenAttributes>,
+    LoginTokenAttributes {
   // no mixins used yet
 }
 
-export interface LoginTokenModel extends Sequelize.Model<LoginTokenInstance, LoginTokenAttributes> {
-  createForEmail?: (email: string, path?: string) => Promise<LoginTokenInstance>;
+export interface LoginTokenModel
+  extends Sequelize.Model<LoginTokenInstance, LoginTokenAttributes> {
+  createForEmail?: (
+    email: string,
+    path?: string
+  ) => Promise<LoginTokenInstance>;
 }
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
+  dataTypes: Sequelize.DataTypes
 ): LoginTokenModel => {
-  const LoginToken: LoginTokenModel = sequelize.define<LoginTokenInstance, LoginTokenAttributes>('LoginToken', {
-    id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    token: { type: dataTypes.STRING, allowNull: false },
-    email: { type: dataTypes.STRING, allowNull: true },
-    expires: { type: dataTypes.DATE, allowNull: false },
-    redirect_path: { type: dataTypes.STRING, allowNull: true },
-    used: { type: dataTypes.DATE, allowNull: true },
-    created_at: { type: dataTypes.DATE, allowNull: false },
-    updated_at: { type: dataTypes.DATE, allowNull: false },
-  }, {
-    underscored: true,
-    indexes: [
-      { fields: ['token', 'email'] },
-    ],
-  });
+  const LoginToken: LoginTokenModel = sequelize.define<
+    LoginTokenInstance,
+    LoginTokenAttributes
+  >(
+    'LoginToken',
+    {
+      id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+      token: { type: dataTypes.STRING, allowNull: false },
+      email: { type: dataTypes.STRING, allowNull: true },
+      expires: { type: dataTypes.DATE, allowNull: false },
+      redirect_path: { type: dataTypes.STRING, allowNull: true },
+      used: { type: dataTypes.DATE, allowNull: true },
+      created_at: { type: dataTypes.DATE, allowNull: false },
+      updated_at: { type: dataTypes.DATE, allowNull: false },
+    },
+    {
+      underscored: true,
+      indexes: [{ fields: ['token', 'email'] }],
+    }
+  );
 
-  LoginToken.createForEmail = async (email: string, path?: string): Promise<LoginTokenInstance> => {
+  LoginToken.createForEmail = async (
+    email: string,
+    path?: string
+  ): Promise<LoginTokenInstance> => {
     const token = crypto.randomBytes(24).toString('hex');
-    const expires = new Date(+(new Date()) + LOGIN_TOKEN_EXPIRES_IN * 60 * 1000);
-    const result = await LoginToken.create({ email, expires, token, redirect_path: path });
+    const expires = new Date(+new Date() + LOGIN_TOKEN_EXPIRES_IN * 60 * 1000);
+    const result = await LoginToken.create({
+      email,
+      expires,
+      token,
+      redirect_path: path,
+    });
     return result;
   };
 

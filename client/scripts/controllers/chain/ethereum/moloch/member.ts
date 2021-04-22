@@ -22,17 +22,25 @@ export default class MolochMember extends EthereumAccount {
   private _Members: MolochMembers;
 
   public get balance(): Promise<MolochShares> {
-    return this.initialized.then(
-      () => this.isMember
+    return this.initialized.then(() =>
+      this.isMember
         ? this._shares
         : new MolochShares(this._Members.api.contractAddress, 0)
     );
   }
 
-  public get isMember() { return this._isMember; }
-  public get delegateKey() { return this._delegateKey; }
-  public get shares() { return this._shares; }
-  public get highestIndexYesVote() { return this._highestIndexYesVote; }
+  public get isMember() {
+    return this._isMember;
+  }
+  public get delegateKey() {
+    return this._delegateKey;
+  }
+  public get shares() {
+    return this._shares;
+  }
+  public get highestIndexYesVote() {
+    return this._highestIndexYesVote;
+  }
 
   constructor(
     app: IApp,
@@ -50,8 +58,13 @@ export default class MolochMember extends EthereumAccount {
       }
       this._isMember = true;
       this._delegateKey = data.delegateKey.toLowerCase();
-      this._shares = new MolochShares(this._Members.api.contractAddress, new BN(data.shares));
-      this._highestIndexYesVote = data.highestIndexYesVote ? new BN(data.highestIndexYesVote) : null;
+      this._shares = new MolochShares(
+        this._Members.api.contractAddress,
+        new BN(data.shares)
+      );
+      this._highestIndexYesVote = data.highestIndexYesVote
+        ? new BN(data.highestIndexYesVote)
+        : null;
       this._initialized = Promise.resolve(true);
     } else {
       this._initialized = new Promise((resolve, reject) => {
@@ -65,12 +78,20 @@ export default class MolochMember extends EthereumAccount {
     const m = await this._Members.api.Contract.members(this.address);
     if (!m.exists) {
       this._isMember = false;
-      this._shares = new MolochShares(this._Members.api.contractAddress, new BN(0));
+      this._shares = new MolochShares(
+        this._Members.api.contractAddress,
+        new BN(0)
+      );
     } else {
       this._isMember = true;
       this._delegateKey = m.delegateKey.toLowerCase();
-      this._shares = new MolochShares(this._Members.api.contractAddress, new BN(m.shares.toString()));
-      this._highestIndexYesVote = m.highestIndexYesVote ? new BN(m.highestIndexYesVote.toString()) : null;
+      this._shares = new MolochShares(
+        this._Members.api.contractAddress,
+        new BN(m.shares.toString())
+      );
+      this._highestIndexYesVote = m.highestIndexYesVote
+        ? new BN(m.highestIndexYesVote.toString())
+        : null;
     }
   }
 
@@ -88,21 +109,24 @@ export default class MolochMember extends EthereumAccount {
     }
 
     // ensure delegate is not member
-    const delegateMember = await this._Members.api.Contract.members(delegateKey);
+    const delegateMember = await this._Members.api.Contract.members(
+      delegateKey
+    );
     if (delegateMember.exists) {
-      throw new Error('can\'t overwrite existing member');
+      throw new Error("can't overwrite existing member");
     }
 
     // ensure no other member is using delegate
-    const otherMemberDelegate = await this._Members.api.Contract.memberAddressByDelegateKey(delegateKey);
+    const otherMemberDelegate = await this._Members.api.Contract.memberAddressByDelegateKey(
+      delegateKey
+    );
     if (parseInt(otherMemberDelegate, 16) !== 0) {
       throw new Error('other member already using delegate key');
     }
 
-    const tx = await this._Members.api.Contract.updateDelegateKey(
-      delegateKey,
-      { gasLimit: this._Members.api.gasLimit }
-    );
+    const tx = await this._Members.api.Contract.updateDelegateKey(delegateKey, {
+      gasLimit: this._Members.api.gasLimit,
+    });
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
       throw new Error('failed to update delegate key');
@@ -112,7 +136,6 @@ export default class MolochMember extends EthereumAccount {
     await this.refresh();
     return txReceipt;
   }
-
 
   public async ragequitTx(sharesToBurn: BN) {
     if (this._Members.api.userAddress !== this.address) {
@@ -130,7 +153,9 @@ export default class MolochMember extends EthereumAccount {
 
     // we can guarantee this is available bc we waited for balance above
     const highestIndexYesVote = this.highestIndexYesVote;
-    const prop = await this._Members.api.Contract.proposalQueue(highestIndexYesVote.toString());
+    const prop = await this._Members.api.Contract.proposalQueue(
+      highestIndexYesVote.toString()
+    );
     if (!prop.processed) {
       throw new Error('must wait for last YES-voted proposal to process');
     }

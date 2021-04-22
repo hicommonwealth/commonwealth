@@ -15,7 +15,7 @@ interface IProfileCommentGroupAttrs {
   account: Account<any>;
 }
 
-const ProfileCommentGroup : m.Component<IProfileCommentGroupAttrs> = {
+const ProfileCommentGroup: m.Component<IProfileCommentGroupAttrs> = {
   view: (vnode) => {
     const { proposal, comments, account } = vnode.attrs;
     if (!proposal) return;
@@ -27,40 +27,56 @@ const ProfileCommentGroup : m.Component<IProfileCommentGroupAttrs> = {
           user: new AddressInfo(null, account.address, account.chain, null),
           linkify: true,
           hideAvatar: true,
-          popover: true
+          popover: true,
         }),
         ' commented',
         (proposal.chain || proposal.community) && [
           ' on a ',
           link(
-            'a', `/${proposal.chain || proposal.community}/proposal/${slug}/${identifier}`,
-            ((proposal instanceof OffchainThread) ? 'thread' : 'proposal'), {},
+            'a',
+            `/${
+              proposal.chain || proposal.community
+            }/proposal/${slug}/${identifier}`,
+            proposal instanceof OffchainThread ? 'thread' : 'proposal',
+            {},
             `profile-${account.address}-${account.chain}-${proposal.chain}-scrollY`
           ),
           ' in ',
-          link('a', `/${proposal.chain || proposal.community}`,
-            ` ${ proposal.chain || proposal.community }`),
+          link(
+            'a',
+            `/${proposal.chain || proposal.community}`,
+            ` ${proposal.chain || proposal.community}`
+          ),
         ],
-        comments[0] && comments[0].createdAt && [
-          m.trust(' &middot; '),
-          m('span', comments[0].createdAt.fromNow()),
-        ]
+        comments[0] &&
+          comments[0].createdAt && [
+            m.trust(' &middot; '),
+            m('span', comments[0].createdAt.fromNow()),
+          ],
       ]),
       m('.activity', [
-        comments.map((comment) => m('.proposal-comment', [
-          m('.comment-text', (() => {
-            try {
-              const doc = JSON.parse(comment.text);
-              if (!doc.ops) throw new Error();
-              return m(QuillFormattedText, { doc, collapse: true });
-            } catch (e) {
-              return m(MarkdownFormattedText, { doc: comment.text, collapse: true });
-            }
-          })()),
-        ])),
-      ])
+        comments.map((comment) =>
+          m('.proposal-comment', [
+            m(
+              '.comment-text',
+              (() => {
+                try {
+                  const doc = JSON.parse(comment.text);
+                  if (!doc.ops) throw new Error();
+                  return m(QuillFormattedText, { doc, collapse: true });
+                } catch (e) {
+                  return m(MarkdownFormattedText, {
+                    doc: comment.text,
+                    collapse: true,
+                  });
+                }
+              })()
+            ),
+          ])
+        ),
+      ]),
     ]);
-  }
+  },
 };
 
 export default ProfileCommentGroup;

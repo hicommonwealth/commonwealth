@@ -15,7 +15,9 @@ class NodeStore extends IdStore<NodeInfo> {
 
   public remove(n: NodeInfo) {
     super.remove(n);
-    this._storeChain[n.chain.id] = this._storeChain[n.chain.id].filter((x) => x !== n);
+    this._storeChain[n.chain.id] = this._storeChain[n.chain.id].filter(
+      (x) => x !== n
+    );
     return this;
   }
 

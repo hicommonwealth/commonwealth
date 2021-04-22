@@ -11,32 +11,36 @@ export interface ChatMessageAttributes {
 }
 
 export interface ChatMessageInstance
-extends Sequelize.Instance<ChatMessageAttributes>, ChatMessageAttributes {
+  extends Sequelize.Instance<ChatMessageAttributes>,
+    ChatMessageAttributes {}
 
-}
-
-export interface ChatMessageModel
-extends Sequelize.Model<ChatMessageInstance, ChatMessageAttributes> {
-
-}
+export type ChatMessageModel = Sequelize.Model<
+  ChatMessageInstance,
+  ChatMessageAttributes
+>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
+  dataTypes: Sequelize.DataTypes
 ): ChatMessageModel => {
-  const ChatMessage = sequelize.define<ChatMessageInstance, ChatMessageAttributes>('ChatMessage', {
-    id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    chain: { type: dataTypes.STRING, allowNull: false },
-    address: { type: dataTypes.STRING, allowNull: false },
-    text: { type: dataTypes.TEXT, allowNull: false },
-    room: { type: dataTypes.STRING, allowNull: false },
-  }, {
-    underscored: true,
-    timestamps: true,
-    indexes: [
-      { fields: ['created_at'] },
-    ],
-  });
+  const ChatMessage = sequelize.define<
+    ChatMessageInstance,
+    ChatMessageAttributes
+  >(
+    'ChatMessage',
+    {
+      id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+      chain: { type: dataTypes.STRING, allowNull: false },
+      address: { type: dataTypes.STRING, allowNull: false },
+      text: { type: dataTypes.TEXT, allowNull: false },
+      room: { type: dataTypes.STRING, allowNull: false },
+    },
+    {
+      underscored: true,
+      timestamps: true,
+      indexes: [{ fields: ['created_at'] }],
+    }
+  );
 
   return ChatMessage;
 };

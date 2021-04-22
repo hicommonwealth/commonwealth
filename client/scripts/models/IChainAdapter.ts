@@ -6,7 +6,9 @@ import $ from 'jquery';
 import m from 'mithril';
 
 import { CommentRefreshOption } from 'controllers/server/comments';
-import ChainEntityController, { EntityRefreshOption } from 'controllers/server/chain_entities';
+import ChainEntityController, {
+  EntityRefreshOption,
+} from 'controllers/server/chain_entities';
 import { IChainModule, IAccountsModule, IBlockInfo } from './interfaces';
 import { ChainBase, ChainClass } from './types';
 import { Account, NodeInfo, ProposalModule } from '.';
@@ -15,14 +17,20 @@ import { Account, NodeInfo, ProposalModule } from '.';
 // initialization. Saved as `app.chain` in the global object store.
 // TODO: move this from `app.chain` or else rename `chain`?
 abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
-  protected _apiInitialized: boolean = false;
-  public get apiInitialized() { return this._apiInitialized; }
+  protected _apiInitialized = false;
+  public get apiInitialized() {
+    return this._apiInitialized;
+  }
 
-  protected _loaded: boolean = false;
-  public get loaded() { return this._loaded; }
+  protected _loaded = false;
+  public get loaded() {
+    return this._loaded;
+  }
 
-  protected _failed: boolean = false;
-  public get failed() { return this._failed; }
+  protected _failed = false;
+  public get failed() {
+    return this._failed;
+  }
 
   public abstract chain: IChainModule<C, A>;
   public abstract accounts: IAccountsModule<C, A>;
@@ -33,7 +41,9 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
   public deferred: boolean;
 
   protected _serverLoaded: boolean;
-  public get serverLoaded() { return this._serverLoaded; }
+  public get serverLoaded() {
+    return this._serverLoaded;
+  }
 
   public async initServer(): Promise<boolean> {
     clearLocalStorage();
@@ -57,7 +67,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
           chain: this.id,
           community: null,
           jwt: this.app.user.jwt,
-        })
+        }),
       ]);
     } else {
       response = await $.get(`${this.app.serverUrl()}/bulkOffchain`, {
@@ -75,9 +85,21 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     }
 
     const {
-      threads, comments, reactions, topics, admins, activeUsers, numPrevotingThreads, numVotingThreads
+      threads,
+      comments,
+      reactions,
+      topics,
+      admins,
+      activeUsers,
+      numPrevotingThreads,
+      numVotingThreads,
     } = response.result;
-    this.app.threads.initialize(threads, numPrevotingThreads, numVotingThreads, true);
+    this.app.threads.initialize(
+      threads,
+      numPrevotingThreads,
+      numVotingThreads,
+      true
+    );
     this.app.comments.initialize(comments, false);
     this.app.reactions.initialize(reactions, true);
     this.app.topics.initialize(topics, true);
@@ -101,14 +123,18 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
 
   public async initApi(): Promise<void> {
     this._apiInitialized = true;
-    console.log(`Started API for ${this.meta.chain.id} on node: ${this.meta.url}.`);
+    console.log(
+      `Started API for ${this.meta.chain.id} on node: ${this.meta.url}.`
+    );
   }
 
   public async initData(): Promise<void> {
     this._loaded = true;
     this.app.chainModuleReady.emit('ready');
     this.app.isModuleReady = true;
-    console.log(`Loaded data for ${this.meta.chain.id} on node: ${this.meta.url}.`);
+    console.log(
+      `Loaded data for ${this.meta.chain.id} on node: ${this.meta.url}.`
+    );
   }
 
   public async deinit(): Promise<void> {
@@ -124,7 +150,9 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     }
     // TODO: does this need debouncing?
     if (modules.some((mod) => !mod.initializing && !mod.ready)) {
-      await Promise.all(modules.map((mod) => mod.init(this.chain, this.accounts)));
+      await Promise.all(
+        modules.map((mod) => mod.init(this.chain, this.accounts))
+      );
     }
   }
 

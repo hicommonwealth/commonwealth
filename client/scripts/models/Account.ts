@@ -7,17 +7,21 @@ import { ChainBase, ChainClass } from './types';
 import ChainInfo from './ChainInfo';
 import Profile from './Profile';
 
-
 abstract class Account<C extends Coin> {
-  public readonly serverUrl : string;
+  public readonly serverUrl: string;
   public readonly address: string;
   public readonly chain: ChainInfo;
 
   public readonly chainBase: ChainBase;
   public readonly chainClass: ChainClass;
-  public get freeBalance() { return this.balance; }
+  public get freeBalance() {
+    return this.balance;
+  }
   public abstract balance: Promise<C>;
-  public abstract sendBalanceTx(recipient: Account<C>, amount: C): Promise<ITXModalData> | ITXModalData;
+  public abstract sendBalanceTx(
+    recipient: Account<C>,
+    amount: C
+  ): Promise<ITXModalData> | ITXModalData;
   public abstract signMessage(message: string): Promise<string>;
   protected abstract addressFromMnemonic(mnemonic: string): string;
   protected abstract addressFromSeed(seed: string): string;
@@ -31,10 +35,14 @@ abstract class Account<C extends Coin> {
 
   // A helper for encoding
   private _encoding: number;
-  public get encoding() { return this._encoding; }
+  public get encoding() {
+    return this._encoding;
+  }
 
   private _profile: Profile;
-  public get profile() { return this._profile; }
+  public get profile() {
+    return this._profile;
+  }
 
   public app: IApp;
 
@@ -43,8 +51,8 @@ abstract class Account<C extends Coin> {
     // Because there won't be any chain base or chain class
     this.app = app;
     this.chain = chain;
-    this.chainBase = (app.chain) ? app.chain.base : null;
-    this.chainClass = (app.chain) ? app.chain.class : null;
+    this.chainBase = app.chain ? app.chain.base : null;
+    this.chainClass = app.chain ? app.chain.class : null;
     this.address = address;
     this._profile = app.profiles.getProfile(chain.id, address);
     this._encoding = encoding;
@@ -92,7 +100,10 @@ abstract class Account<C extends Coin> {
 
     // We add a newline to the validation token because signing via the
     // command line always adds an implicit newline.
-    if (!signature && (this.seed || this.mnemonic || this.chainBase === ChainBase.NEAR)) {
+    if (
+      !signature &&
+      (this.seed || this.mnemonic || this.chainBase === ChainBase.NEAR)
+    ) {
       // construct signature from private key
       signature = await this.signMessage(`${this._validationToken}\n`);
     } else if (!signature) {
@@ -100,19 +111,21 @@ abstract class Account<C extends Coin> {
     }
 
     if (signature) {
-      const params : any = {
+      const params: any = {
         address: this.address,
         chain: this.chain.id,
         jwt: this.app.user.jwt,
         signature,
       };
       return new Promise<void>((resolve, reject) => {
-        $.post(`${this.app.serverUrl()}/verifyAddress`, params).then((result) => {
-          if (result.status === 'Success') return resolve();
-          else reject();
-        }).catch((error) => {
-          reject();
-        });
+        $.post(`${this.app.serverUrl()}/verifyAddress`, params)
+          .then((result) => {
+            if (result.status === 'Success') return resolve();
+            else reject();
+          })
+          .catch((error) => {
+            reject();
+          });
       });
     } else {
       throw new Error('signature or key required for validation');

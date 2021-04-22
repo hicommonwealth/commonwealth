@@ -25,18 +25,22 @@ const SettingsPage: m.Component<{}> = {
     }
     if (!app.loginStatusLoaded()) return m(PageLoading);
 
-    return m(Sublayout, {
-      class: 'SettingsPage',
-      title: 'Account Settings',
-    }, [
-      m('br'),
-      m(EmailWell, { github: true }),
-      m('br'),
-      m(LinkedAddressesWell),
-      m('br'),
-      m(SettingsWell),
-    ]);
-  }
+    return m(
+      Sublayout,
+      {
+        class: 'SettingsPage',
+        title: 'Account Settings',
+      },
+      [
+        m('br'),
+        m(EmailWell, { github: true }),
+        m('br'),
+        m(LinkedAddressesWell),
+        m('br'),
+        m(SettingsWell),
+      ]
+    );
+  },
 };
 
 export default SettingsPage;

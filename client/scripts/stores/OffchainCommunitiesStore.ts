@@ -15,7 +15,9 @@ class OffchainCommunitiesStore extends IdStore<CommunityInfo> {
 
   public remove(c: CommunityInfo) {
     super.remove(c);
-    this._storeCommunity[c.id] = this._storeCommunity[c.id].filter((x) => x !== c);
+    this._storeCommunity[c.id] = this._storeCommunity[c.id].filter(
+      (x) => x !== c
+    );
     return this;
   }
 

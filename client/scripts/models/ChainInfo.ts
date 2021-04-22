@@ -28,8 +28,24 @@ class ChainInfo {
 
   // TODO: convert this to accept an object with params instead
   constructor(
-    id, network, symbol, name, iconUrl, description, website, discord, element, telegram, github,
-    customDomain, blockExplorerIds, collapsedOnHomepage, featuredTopics, topics, adminsAndMods?, base?
+    id,
+    network,
+    symbol,
+    name,
+    iconUrl,
+    description,
+    website,
+    discord,
+    element,
+    telegram,
+    github,
+    customDomain,
+    blockExplorerIds,
+    collapsedOnHomepage,
+    featuredTopics,
+    topics,
+    adminsAndMods?,
+    base?
   ) {
     this.id = id;
     this.network = network;
@@ -76,17 +92,20 @@ class ChainInfo {
       json.featured_topics,
       json.topics,
       json.adminsAndMods,
-      json.base,
+      json.base
     );
   }
 
   // TODO: get operation should not have side effects, and either way this shouldn't be here
   public async getMembers(id: string) {
     try {
-      const res = await $.get(`${app.serverUrl()}/bulkMembers`, { chain: id, });
+      const res = await $.get(`${app.serverUrl()}/bulkMembers`, { chain: id });
       this.setMembers(res.result);
       const roles = res.result.filter((r) => {
-        return r.permission === RolePermission.admin || r.permission === RolePermission.moderator;
+        return (
+          r.permission === RolePermission.admin ||
+          r.permission === RolePermission.moderator
+        );
       });
       this.setAdmins(roles);
       return this.adminsAndMods;
@@ -98,52 +117,62 @@ class ChainInfo {
   public setMembers(roles) {
     this.members = [];
     roles.forEach((r) => {
-      this.members.push(new RoleInfo(
-        r.id,
-        r.address_id,
-        r.Address.address,
-        r.Address.chain,
-        r.chain_id,
-        r.offchain_community_id,
-        r.permission,
-        r.is_user_default
-      ));
+      this.members.push(
+        new RoleInfo(
+          r.id,
+          r.address_id,
+          r.Address.address,
+          r.Address.chain,
+          r.chain_id,
+          r.offchain_community_id,
+          r.permission,
+          r.is_user_default
+        )
+      );
     });
   }
 
   public setAdmins(roles) {
     this.adminsAndMods = [];
     roles.forEach((r) => {
-      this.adminsAndMods.push(new RoleInfo(
-        r.id,
-        r.address_id,
-        r.Address.address,
-        r.Address.chain,
-        r.chain_id,
-        r.offchain_community_id,
-        r.permission,
-        r.is_user_default
-      ));
+      this.adminsAndMods.push(
+        new RoleInfo(
+          r.id,
+          r.address_id,
+          r.Address.address,
+          r.Address.chain,
+          r.chain_id,
+          r.offchain_community_id,
+          r.permission,
+          r.is_user_default
+        )
+      );
     });
   }
 
   // TODO: change to accept an object
   public async updateChainData(
-    name: string, description: string, website: string, discord: string, element: string, telegram: string,
-    github: string, customDomain: string
+    name: string,
+    description: string,
+    website: string,
+    discord: string,
+    element: string,
+    telegram: string,
+    github: string,
+    customDomain: string
   ) {
     // TODO: Change to PUT /chain
     const r = await $.post(`${app.serverUrl()}/updateChain`, {
-      'id': app.activeChainId(),
-      'name': name,
-      'description': description,
-      'website': website,
-      'discord': discord,
-      'element': element,
-      'telegram': telegram,
-      'github': github,
-      'customDomain': customDomain,
-      'jwt': app.user.jwt,
+      id: app.activeChainId(),
+      name,
+      description,
+      website,
+      discord,
+      element,
+      telegram,
+      github,
+      customDomain,
+      jwt: app.user.jwt,
     });
     const updatedChain: ChainInfo = r.result;
     this.name = updatedChain.name;
@@ -170,15 +199,17 @@ class ChainInfo {
     try {
       // TODO: Change to PUT /chain
       await $.post(`${app.serverUrl()}/updateChain`, {
-        'id': app.activeChainId(),
+        id: app.activeChainId(),
         'featured_topics[]': topics,
-        'jwt': app.user.jwt
+        jwt: app.user.jwt,
       });
     } catch (err) {
       console.log('Failed to update featured topics');
-      throw new Error((err.responseJSON && err.responseJSON.error)
-        ? err.responseJSON.error
-        : 'Failed to update featured topics');
+      throw new Error(
+        err.responseJSON && err.responseJSON.error
+          ? err.responseJSON.error
+          : 'Failed to update featured topics'
+      );
     }
   }
 }

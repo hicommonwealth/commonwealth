@@ -15,7 +15,10 @@ import MolochMembers from './members';
 import MolochAPI from './api';
 import MolochGovernance from './governance';
 
-export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount> {
+export default class Moloch extends IChainAdapter<
+  EthereumCoin,
+  EthereumAccount
+> {
   public readonly base = ChainBase.Ethereum;
   public readonly class = ChainClass.Moloch;
   public chain: MolochChain;
@@ -30,7 +33,10 @@ export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount>
     this.chain = new MolochChain(this.app);
     this.ethAccounts = new EthereumAccounts(this.app);
     this.accounts = new MolochMembers(this.app, this.chain, this.ethAccounts);
-    this.governance = new MolochGovernance(this.app, !this.usingServerChainEntities);
+    this.governance = new MolochGovernance(
+      this.app,
+      !this.usingServerChainEntities
+    );
   }
 
   public async initApi() {
@@ -39,26 +45,41 @@ export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount>
     await this.ethAccounts.init(this.chain);
     // await this.webWallet.enable();
 
-    const activeAddress: string = this.webWallet.accounts && this.webWallet.accounts[0];
-    const api = new MolochAPI(this.meta.address, this.chain.api.currentProvider as any, activeAddress);
+    const activeAddress: string =
+      this.webWallet.accounts && this.webWallet.accounts[0];
+    const api = new MolochAPI(
+      this.meta.address,
+      this.chain.api.currentProvider as any,
+      activeAddress
+    );
     await api.init();
     this.chain.molochApi = api;
 
     if (this.webWallet) {
       await this.webWallet.enable();
-      await this.webWallet.web3.givenProvider.on('accountsChanged', async (accounts) => {
-        const updatedAddress = this.app.user.activeAccounts.find((addr) => addr.address === accounts[0]);
-        if (!updatedAddress) return;
-        await setActiveAccount(updatedAddress);
-      });
+      await this.webWallet.web3.givenProvider.on(
+        'accountsChanged',
+        async (accounts) => {
+          const updatedAddress = this.app.user.activeAccounts.find(
+            (addr) => addr.address === accounts[0]
+          );
+          if (!updatedAddress) return;
+          await setActiveAccount(updatedAddress);
+        }
+      );
     }
 
-    await this.webWallet.web3.givenProvider.on('accountsChanged', async (accounts) => {
-      const updatedAddress = this.app.user.activeAccounts.find((addr) => addr.address === accounts[0]);
-      if (!updatedAddress) return;
-      await setActiveAccount(updatedAddress);
-      api.updateSigner(accounts[0]);
-    });
+    await this.webWallet.web3.givenProvider.on(
+      'accountsChanged',
+      async (accounts) => {
+        const updatedAddress = this.app.user.activeAccounts.find(
+          (addr) => addr.address === accounts[0]
+        );
+        if (!updatedAddress) return;
+        await setActiveAccount(updatedAddress);
+        api.updateSigner(accounts[0]);
+      }
+    );
 
     await this.accounts.init(api);
     await super.initApi();

@@ -14,7 +14,12 @@ export const Errors = {
   InvalidChain: 'Invalid chain',
 };
 
-const linkExistingAddressToChain = async (models, req: Request, res: Response, next: NextFunction) => {
+const linkExistingAddressToChain = async (
+  models,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.body.address) {
     return next(new Error(Errors.NeedAddress));
   }
@@ -31,16 +36,23 @@ const linkExistingAddressToChain = async (models, req: Request, res: Response, n
   const userId = req.user.id;
 
   const chain = await models.Chain.findOne({
-    where: { id: req.body.chain }
+    where: { id: req.body.chain },
   });
   if (!chain) {
     return next(new Error(Errors.InvalidChain));
   }
 
   // check if the original address is verified and is owned by the user
-  const originalAddress = await models.Address.scope('withPrivateData').findOne({
-    where: { chain: req.body.originChain, address: req.body.address, user_id: userId, verified: { [Op.ne]: null } }
-  });
+  const originalAddress = await models.Address.scope('withPrivateData').findOne(
+    {
+      where: {
+        chain: req.body.originChain,
+        address: req.body.address,
+        user_id: userId,
+        verified: { [Op.ne]: null },
+      },
+    }
+  );
 
   if (!originalAddress) {
     return next(new Error(Errors.NotVerifiedAddressOrUser));
@@ -49,31 +61,39 @@ const linkExistingAddressToChain = async (models, req: Request, res: Response, n
   // check if the original address's token is expired. refer edge case 1)
   let verificationToken = originalAddress.verification_token;
   let verificationTokenExpires = originalAddress.verification_token_expires;
-  const isOriginalTokenValid = verificationTokenExpires && +verificationTokenExpires <= +(new Date());
+  const isOriginalTokenValid =
+    verificationTokenExpires && +verificationTokenExpires <= +new Date();
 
   if (!isOriginalTokenValid) {
     const chains = await models.Chain.findAll({
-      where: { base: chain.base }
+      where: { base: chain.base },
     });
 
     verificationToken = crypto.randomBytes(18).toString('hex');
-    verificationTokenExpires = new Date(+(new Date()) + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000);
+    verificationTokenExpires = new Date(
+      +new Date() + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000
+    );
 
-    await models.Address.update({
-      verification_token: verificationToken,
-      verification_token_expires: verificationTokenExpires
-    }, {
-      where: {
-        user_id: originalAddress.user_id,
-        address: req.body.address,
-        chain: { [Op.in]: chains.map((ch) => ch.id) }
+    await models.Address.update(
+      {
+        verification_token: verificationToken,
+        verification_token_expires: verificationTokenExpires,
+      },
+      {
+        where: {
+          user_id: originalAddress.user_id,
+          address: req.body.address,
+          chain: { [Op.in]: chains.map((ch) => ch.id) },
+        },
       }
-    });
+    );
   }
 
-  const existingAddress = await models.Address.scope('withPrivateData').findOne({
-    where: { chain: req.body.chain, address: req.body.address }
-  });
+  const existingAddress = await models.Address.scope('withPrivateData').findOne(
+    {
+      where: { chain: req.body.chain, address: req.body.address },
+    }
+  );
 
   try {
     let addressId;
@@ -105,23 +125,32 @@ const linkExistingAddressToChain = async (models, req: Request, res: Response, n
     }
 
     const ownedAddresses = await models.Address.findAll({
-      where: { user_id: originalAddress.user_id }
+      where: { user_id: originalAddress.user_id },
     });
 
     const role = await models.Role.findOne({
-      where: { address_id: addressId, ...(req.body.community ? { offchain_community_id: req.body.community } : { chain_id: req.body.chain }) }
+      where: {
+        address_id: addressId,
+        ...(req.body.community
+          ? { offchain_community_id: req.body.community }
+          : { chain_id: req.body.chain }),
+      },
     });
 
     if (!role) {
-      await models.Role.create(req.body.community ? {
-        address_id: addressId,
-        offchain_community_id: req.body.community,
-        permission: 'member',
-      } : {
-        address_id: addressId,
-        chain_id: req.body.chain,
-        permission: 'member',
-      });
+      await models.Role.create(
+        req.body.community
+          ? {
+              address_id: addressId,
+              offchain_community_id: req.body.community,
+              permission: 'member',
+            }
+          : {
+              address_id: addressId,
+              chain_id: req.body.chain,
+              permission: 'member',
+            }
+      );
     }
 
     return res.json({
@@ -129,8 +158,8 @@ const linkExistingAddressToChain = async (models, req: Request, res: Response, n
       result: {
         verification_token: verificationToken,
         addressId,
-        addresses: ownedAddresses
-      }
+        addresses: ownedAddresses,
+      },
     });
   } catch (e) {
     console.log(e);

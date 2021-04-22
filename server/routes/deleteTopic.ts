@@ -12,7 +12,11 @@ export const Errors = {
 };
 
 const deleteTopic = async (models, req, res: Response, next: NextFunction) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  const [chain, community, error] = await lookupCommunityIsVisibleToUser(
+    models,
+    req.body,
+    req.user
+  );
   if (error) return next(new Error(error));
   if (!req.user) {
     return next(new Error(Errors.NotLoggedIn));
@@ -41,11 +45,14 @@ const deleteTopic = async (models, req, res: Response, next: NextFunction) => {
     type: QueryTypes.UPDATE,
   });
 
-  topic.destroy().then(() => {
-    res.json({ status: 'Success' });
-  }).catch((e) => {
-    next(new Error(Errors.DeleteFail));
-  });
+  topic
+    .destroy()
+    .then(() => {
+      res.json({ status: 'Success' });
+    })
+    .catch((e) => {
+      next(new Error(Errors.DeleteFail));
+    });
 };
 
 export default deleteTopic;

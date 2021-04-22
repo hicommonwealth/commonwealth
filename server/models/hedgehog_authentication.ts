@@ -9,29 +9,37 @@ export interface HedgehogAuthenticationAttributes {
 }
 
 export interface HedgehogAuthenticationInstance
-extends Sequelize.Instance<HedgehogAuthenticationAttributes>, HedgehogAuthenticationAttributes {
+  extends Sequelize.Instance<HedgehogAuthenticationAttributes>,
+    HedgehogAuthenticationAttributes {}
 
-}
-
-export interface HedgehogAuthenticationModel extends Sequelize.Model<
-  HedgehogAuthenticationInstance, HedgehogAuthenticationAttributes
-> {
-
-}
+export type HedgehogAuthenticationModel = Sequelize.Model<
+  HedgehogAuthenticationInstance,
+  HedgehogAuthenticationAttributes
+>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
+  dataTypes: Sequelize.DataTypes
 ): HedgehogAuthenticationModel => {
   const HedgehogAuthentication = sequelize.define<
-    HedgehogAuthenticationInstance, HedgehogAuthenticationAttributes
-  >('HedgehogAuthentication', {
-    iv:         { type: dataTypes.STRING, allowNull: false },
-    cipherText: { type: dataTypes.STRING, allowNull: false },
-    lookupKey:  { type: dataTypes.STRING, allowNull: false, unique: true, primaryKey: true },
-  }, {
-    underscored: true
-  });
+    HedgehogAuthenticationInstance,
+    HedgehogAuthenticationAttributes
+  >(
+    'HedgehogAuthentication',
+    {
+      iv: { type: dataTypes.STRING, allowNull: false },
+      cipherText: { type: dataTypes.STRING, allowNull: false },
+      lookupKey: {
+        type: dataTypes.STRING,
+        allowNull: false,
+        unique: true,
+        primaryKey: true,
+      },
+    },
+    {
+      underscored: true,
+    }
+  );
 
   return HedgehogAuthentication;
 };

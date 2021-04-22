@@ -5,7 +5,14 @@ import EthWebWalletController from 'controllers/app/eth_web_wallet';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import EthereumChain from 'controllers/chain/ethereum/chain';
-import { ChainBase, ChainClass, IChainAdapter, ChainEntity, ChainEvent, NodeInfo } from 'models';
+import {
+  ChainBase,
+  ChainClass,
+  IChainAdapter,
+  ChainEntity,
+  ChainEvent,
+  NodeInfo,
+} from 'models';
 
 import { setActiveAccount } from 'controllers/app/login';
 import ChainEntityController from 'controllers/server/chain_entities';
@@ -19,12 +26,15 @@ import MarlinGovernance from './governance';
 import MarlinProposal from './proposal';
 import MarlinHolders from './holders';
 
-export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount> {
+export default class Marlin extends IChainAdapter<
+  EthereumCoin,
+  EthereumAccount
+> {
   public readonly base = ChainBase.Ethereum;
   public readonly class = ChainClass.Marlin;
   public chain: MarlinChain;
   public accounts: EthereumAccounts;
-  public marlinAccounts:  MarlinHolders;
+  public marlinAccounts: MarlinHolders;
   public governance: MarlinGovernance;
   public readonly webWallet: EthWebWalletController = new EthWebWalletController();
   public readonly chainEntities = new ChainEntityController();
@@ -33,7 +43,11 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
     super(meta, app);
     this.chain = new MarlinChain(this.app);
     this.accounts = new EthereumAccounts(this.app);
-    this.marlinAccounts = new MarlinHolders(this.app, this.chain, this.accounts);
+    this.marlinAccounts = new MarlinHolders(
+      this.app,
+      this.chain,
+      this.accounts
+    );
     this.governance = new MarlinGovernance(this.app);
     this.accounts.init(this.chain);
   }
@@ -58,12 +72,13 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
 
     const activeAddress: string = await this.webWallet.accounts[0];
     const mpondContractAddress = this.meta.address;
-    const governorAlphaContractAddress = '0x777992c2E4EDF704e49680468a9299C6679e37F6';
+    const governorAlphaContractAddress =
+      '0x777992c2E4EDF704e49680468a9299C6679e37F6';
     const api = new MarlinAPI(
       this.meta.address,
       governorAlphaContractAddress,
       this.chain.api.currentProvider as any,
-      activeAddress,
+      activeAddress
     );
     await api.init().catch((e) => {
       this._failed = true;
@@ -72,13 +87,19 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
     this.chain.marlinApi = api;
 
     if ((window as any).ethereum || (window as any).web3) {
-      if (!this.webWallet.enabled) await this.webWallet.enable().catch((e) => console.error(e));
+      if (!this.webWallet.enabled)
+        await this.webWallet.enable().catch((e) => console.error(e));
 
-      await this.webWallet.web3.givenProvider.on('accountsChanged', (accounts) => {
-        const updatedAddress = this.app.user.activeAccounts.find((addr) => addr.address === accounts[0]);
-        setActiveAccount(updatedAddress);
-        api.updateSigner(accounts[0]);
-      });
+      await this.webWallet.web3.givenProvider.on(
+        'accountsChanged',
+        (accounts) => {
+          const updatedAddress = this.app.user.activeAccounts.find(
+            (addr) => addr.address === accounts[0]
+          );
+          setActiveAccount(updatedAddress);
+          api.updateSigner(accounts[0]);
+        }
+      );
     }
 
     await this.marlinAccounts.init(api);

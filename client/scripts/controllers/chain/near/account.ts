@@ -26,7 +26,12 @@ export class NearAccount extends Account<NearToken> {
   private _keyPair: nearlib.KeyPair;
   private _Accounts: NearAccounts;
   private _Chain: NearChain;
-  constructor(app: IApp, Chain: NearChain, Accounts: NearAccounts, address: string) {
+  constructor(
+    app: IApp,
+    Chain: NearChain,
+    Accounts: NearAccounts,
+    address: string
+  ) {
     super(app, app.chain.meta.chain, address);
     this._nearlibAccount = new nearlib.Account(Chain.api.connection, address);
     this._Chain = Chain;
@@ -36,14 +41,15 @@ export class NearAccount extends Account<NearToken> {
   }
 
   public get balance(): Promise<NearToken> {
-    return this._nearlibAccount.state().then(
-      (s: AccountState) => {
-        return this._Chain.coins(s.amount, false);
-      }
-    );
+    return this._nearlibAccount.state().then((s: AccountState) => {
+      return this._Chain.coins(s.amount, false);
+    });
   }
 
-  public sendBalanceTx(recipient: NearAccount, amount: NearToken): ITXModalData {
+  public sendBalanceTx(
+    recipient: NearAccount,
+    amount: NearToken
+  ): ITXModalData {
     throw new Error('tx not supported on NEAR protocol');
   }
 
@@ -55,7 +61,10 @@ export class NearAccount extends Account<NearToken> {
   // use the account in any way that requires a key.
   public async updateKeypair(): Promise<boolean> {
     return new Promise(async (resolve) => {
-      this._keyPair = await this._Accounts.keyStore.getKey(this._Chain.api.connection.networkId, this.address);
+      this._keyPair = await this._Accounts.keyStore.getKey(
+        this._Chain.api.connection.networkId,
+        this.address
+      );
       // if a keypair is found, return
       if (this._keyPair) {
         return resolve(!!this._keyPair);
@@ -74,7 +83,7 @@ export class NearAccount extends Account<NearToken> {
     const { signature, publicKey } = this._keyPair.sign(Buffer.from(message));
     return JSON.stringify({
       signature: Buffer.from(signature).toString('base64'),
-      publicKey: Buffer.from(publicKey.data).toString('base64')
+      publicKey: Buffer.from(publicKey.data).toString('base64'),
     });
   }
 
@@ -90,14 +99,20 @@ export class NearAccount extends Account<NearToken> {
 export class NearAccounts implements IAccountsModule<NearToken, NearAccount> {
   private _Chain: NearChain;
   private _store: AccountsStore<NearAccount> = new AccountsStore();
-  public get store() { return this._store; }
+  public get store() {
+    return this._store;
+  }
   public readonly keyStore: BrowserLocalStorageKeyStore;
 
   private _validators: INearValidators = {};
-  public get validators() { return this._validators; }
+  public get validators() {
+    return this._validators;
+  }
 
   private _app: IApp;
-  public get app() { return this._app; }
+  public get app() {
+    return this._app;
+  }
 
   constructor(app: IApp) {
     this._app = app;
@@ -121,7 +136,8 @@ export class NearAccounts implements IAccountsModule<NearToken, NearAccount> {
 
   public async init(ChainInfo: NearChain): Promise<void> {
     this._Chain = ChainInfo;
-    const validators = ChainInfo.nodeStatus.validators as unknown as INearValidator[];
+    const validators = (ChainInfo.nodeStatus
+      .validators as unknown) as INearValidator[];
     for (const validator of validators) {
       if (!this._validators[validator.account_id]) {
         this._validators[validator.account_id] = {

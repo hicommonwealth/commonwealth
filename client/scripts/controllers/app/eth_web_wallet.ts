@@ -20,7 +20,7 @@ class EthWebWalletController {
   }
 
   public get available() {
-    return !!(window.ethereum);
+    return !!window.ethereum;
   }
   public get enabled() {
     return this.available && this._enabled;
@@ -33,7 +33,10 @@ class EthWebWalletController {
   }
 
   public async signMessage(message: string): Promise<string> {
-    const signature = await this._web3.eth.personal.sign(message, this.accounts[0]);
+    const signature = await this._web3.eth.personal.sign(
+      message,
+      this.accounts[0]
+    );
     return signature;
   }
 
@@ -41,9 +44,10 @@ class EthWebWalletController {
   public async enable() {
     console.log('Attempting to enable ETH web wallet');
     // (this needs to be called first, before other requests)
-    this._web3 = (app.chain.id === 'ethereum-local')
-      ? new (window as any).Web3((window as any).ethereum)
-      : (app.chain as Ethereum).chain.api;
+    this._web3 =
+      app.chain.id === 'ethereum-local'
+        ? new (window as any).Web3((window as any).ethereum)
+        : (app.chain as Ethereum).chain.api;
     await this._web3.givenProvider.enable();
 
     this._accounts = await this._web3.eth.getAccounts();

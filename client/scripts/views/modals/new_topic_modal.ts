@@ -9,24 +9,33 @@ import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { CompactModalExitButton } from 'views/modal';
 
 interface INewTopicModalForm {
-  id: number,
-  name: string,
-  description: string,
-  telegram: string,
+  id: number;
+  name: string;
+  description: string;
+  telegram: string;
 }
 
-const NewTopicModal: m.Component<{
-  id: number,
-  name: string,
-  description: string,
-  telegram: string,
-}, {
-  error: any,
-  form: INewTopicModalForm,
-  saving: boolean,
-}> = {
+const NewTopicModal: m.Component<
+  {
+    id: number;
+    name: string;
+    description: string;
+    telegram: string;
+  },
+  {
+    error: any;
+    form: INewTopicModalForm;
+    saving: boolean;
+  }
+> = {
   view: (vnode) => {
-    if (!app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })) return null;
+    if (
+      !app.user.isAdminOfEntity({
+        chain: app.activeChainId(),
+        community: app.activeCommunityId(),
+      })
+    )
+      return null;
     const { id, name, description, telegram } = vnode.attrs;
     if (!vnode.state.form) {
       vnode.state.form = { id, name, description, telegram };
@@ -66,7 +75,7 @@ const NewTopicModal: m.Component<{
               defaultValue: vnode.state.form.description,
               oninput: (e) => {
                 vnode.state.form.description = (e.target as any).value;
-              }
+              },
             }),
           ]),
           m(FormGroup, [
@@ -78,7 +87,7 @@ const NewTopicModal: m.Component<{
               defaultValue: vnode.state.form.telegram,
               oninput: (e) => {
                 vnode.state.form.telegram = (e.target as any).value;
-              }
+              },
             }),
           ]),
           m(Button, {
@@ -88,25 +97,30 @@ const NewTopicModal: m.Component<{
             onclick: async (e) => {
               e.preventDefault();
               if (!vnode.state.form.name.trim()) return;
-              app.topics.add(
-                vnode.state.form.name, vnode.state.form.description, vnode.state.form.telegram
-              ).then(() => {
-                vnode.state.saving = false;
-                m.redraw();
-                $(e.target).trigger('modalexit');
-              }).catch(() => {
-                vnode.state.error = 'Error creating topic';
-                vnode.state.saving = false;
-                m.redraw();
-              });
+              app.topics
+                .add(
+                  vnode.state.form.name,
+                  vnode.state.form.description,
+                  vnode.state.form.telegram
+                )
+                .then(() => {
+                  vnode.state.saving = false;
+                  m.redraw();
+                  $(e.target).trigger('modalexit');
+                })
+                .catch(() => {
+                  vnode.state.error = 'Error creating topic';
+                  vnode.state.saving = false;
+                  m.redraw();
+                });
             },
             label: 'Create topic',
           }),
           vnode.state.error && m('.error-message', vnode.state.error),
         ]),
-      ])
+      ]),
     ]);
-  }
+  },
 };
 
 export default NewTopicModal;

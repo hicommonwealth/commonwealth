@@ -2,7 +2,11 @@
  * Generic handler that transforms events into notifications.
  */
 import WebSocket from 'ws';
-import { IEventHandler, CWEvent, IChainEventKind } from '@commonwealth/chain-events';
+import {
+  IEventHandler,
+  CWEvent,
+  IChainEventKind,
+} from '@commonwealth/chain-events';
 import { NotificationCategories } from '../../shared/types';
 
 import { factory, formatFilename } from '../../shared/logging';
@@ -12,7 +16,7 @@ export default class extends IEventHandler {
   constructor(
     private readonly _models,
     private readonly _wss?: WebSocket.Server,
-    private readonly _excludedEvents: IChainEventKind[] = [],
+    private readonly _excludedEvents: IChainEventKind[] = []
   ) {
     super();
   }
@@ -45,7 +49,7 @@ export default class extends IEventHandler {
       { chainEvent: dbEvent, chainEventType: dbEventType }, // TODO: add webhook data once specced out
       this._wss,
       event.excludeAddresses,
-      event.includeAddresses,
+      event.includeAddresses
     );
     log.trace(`Emitted ${dbNotifications.length} notifications.`);
     return dbEvent;

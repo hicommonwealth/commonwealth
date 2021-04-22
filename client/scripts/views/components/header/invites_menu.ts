@@ -1,7 +1,13 @@
 import 'components/header/invites_menu.scss';
 
 import m from 'mithril';
-import { Button, ButtonGroup, PopoverMenu, Icons, MenuItem } from 'construct-ui';
+import {
+  Button,
+  ButtonGroup,
+  PopoverMenu,
+  Icons,
+  MenuItem,
+} from 'construct-ui';
 
 import app from 'state';
 import { pluralize } from 'helpers';
@@ -35,7 +41,7 @@ const InvitesMenu = {
         onclick: () => app.modals.create({ modal: ConfirmInviteModal }),
       }),
     });
-  }
+  },
 };
 
 export default InvitesMenu;

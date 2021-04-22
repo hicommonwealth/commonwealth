@@ -5,9 +5,9 @@ import app from 'state';
 const AppToasts: m.Component<{}> = {
   view: (vnode) => {
     return m(Toaster, {
-      toasts: app.toasts.getList()
+      toasts: app.toasts.getList(),
     });
-  }
+  },
 };
 
 export default AppToasts;

@@ -7,8 +7,10 @@ import { Button, List, ListItem, Checkbox } from 'construct-ui';
 import { Webhook } from 'models';
 import { NotificationCategories } from 'types';
 import {
-  EdgewareChainNotificationTypes, KusamaChainNotificationTypes,
-  KulupuChainNotificationTypes, PolkadotChainNotificationTypes
+  EdgewareChainNotificationTypes,
+  KusamaChainNotificationTypes,
+  KulupuChainNotificationTypes,
+  PolkadotChainNotificationTypes,
 } from 'helpers/chain_notification_types';
 import { notifyError } from 'controllers/app/notifications';
 
@@ -29,19 +31,30 @@ const forumNotificationTypes = [
 const WebhookSettingsModal: m.Component<IAttrs, IState> = {
   oninit: (vnode) => {
     vnode.state.selectedCategories = [];
-    vnode.attrs.webhook.categories.forEach((v) => vnode.state.selectedCategories.push(v));
+    vnode.attrs.webhook.categories.forEach((v) =>
+      vnode.state.selectedCategories.push(v)
+    );
   },
   view: (vnode) => {
     const { webhook } = vnode.attrs;
-    const isChain = webhook.chain_id ? true : false;
-    const chainNotifications = webhook.chain_id === 'edgeware' ? EdgewareChainNotificationTypes
-      : webhook.chain_id === 'kusama' ? KusamaChainNotificationTypes
-        : webhook.chain_id === 'kulupu' ? KulupuChainNotificationTypes
-          : webhook.chain_id === 'polkadot' ? PolkadotChainNotificationTypes
-            : {};
+    const isChain = !!webhook.chain_id;
+    const chainNotifications =
+      webhook.chain_id === 'edgeware'
+        ? EdgewareChainNotificationTypes
+        : webhook.chain_id === 'kusama'
+        ? KusamaChainNotificationTypes
+        : webhook.chain_id === 'kulupu'
+        ? KulupuChainNotificationTypes
+        : webhook.chain_id === 'polkadot'
+        ? PolkadotChainNotificationTypes
+        : {};
     const row = (label: string, values: string[]) => {
-      const allValuesPresent = values.every((v) => vnode.state.selectedCategories.includes(v));
-      const someValuesPresent = values.length > 1 && values.some((v) => vnode.state.selectedCategories.includes(v));
+      const allValuesPresent = values.every((v) =>
+        vnode.state.selectedCategories.includes(v)
+      );
+      const someValuesPresent =
+        values.length > 1 &&
+        values.some((v) => vnode.state.selectedCategories.includes(v));
       return m(ListItem, {
         contentLeft: label,
         contentRight: m(Checkbox, {
@@ -49,8 +62,9 @@ const WebhookSettingsModal: m.Component<IAttrs, IState> = {
           indeterminate: someValuesPresent && !allValuesPresent,
           onchange: (e) => {
             if (allValuesPresent) {
-              vnode.state.selectedCategories = vnode.state.selectedCategories
-                .filter((v) => !values.includes(v));
+              vnode.state.selectedCategories = vnode.state.selectedCategories.filter(
+                (v) => !values.includes(v)
+              );
               m.redraw();
             } else {
               values.forEach((v) => {
@@ -65,37 +79,52 @@ const WebhookSettingsModal: m.Component<IAttrs, IState> = {
       });
     };
     return m('.WebhookSettingsModal.compact-modal-body-max', [
-      m('.CompactModalExitButton.dark', {
-        onclick: (e) => {
-          e.preventDefault();
-          $(e.target).trigger('modalexit');
-        }
-      }, m.trust('&times;')),
+      m(
+        '.CompactModalExitButton.dark',
+        {
+          onclick: (e) => {
+            e.preventDefault();
+            $(e.target).trigger('modalexit');
+          },
+        },
+        m.trust('&times;')
+      ),
       m('.title-section', [
         m('h4', 'Webhook Settings'),
         m('p', 'Which events should trigger this webhook?'),
       ]),
       m('.forum-events', [
         m('h4', 'Off-chain discussions'),
-        m(List, {
-          interactive: false,
-          size: 'sm',
-        }, [
-          row('New thread', [NotificationCategories.NewThread]),
-          row('New comment', [NotificationCategories.NewComment]),
-          row('New reaction', [NotificationCategories.NewReaction]),
-        ])
+        m(
+          List,
+          {
+            interactive: false,
+            size: 'sm',
+          },
+          [
+            row('New thread', [NotificationCategories.NewThread]),
+            row('New comment', [NotificationCategories.NewComment]),
+            row('New reaction', [NotificationCategories.NewReaction]),
+          ]
+        ),
       ]),
-      isChain && m('.chain-events', [
-        m('h4', 'On-chain events'),
-        m(List, {
-          interactive: false,
-          size: 'sm',
-        }, [
-          // iterate over chain events
-          Object.keys(chainNotifications).map((k) => row(`${k} event`, chainNotifications[k])),
-        ])
-      ]),
+      isChain &&
+        m('.chain-events', [
+          m('h4', 'On-chain events'),
+          m(
+            List,
+            {
+              interactive: false,
+              size: 'sm',
+            },
+            [
+              // iterate over chain events
+              Object.keys(chainNotifications).map((k) =>
+                row(`${k} event`, chainNotifications[k])
+              ),
+            ]
+          ),
+        ]),
       m(Button, {
         label: 'Save webhook settings',
         class: 'settings-save-button',
@@ -123,12 +152,12 @@ const WebhookSettingsModal: m.Component<IAttrs, IState> = {
             error: (err) => {
               notifyError(err.statusText);
               m.redraw();
-            }
+            },
           });
-        }
+        },
       }),
     ]);
-  }
+  },
 };
 
 export default WebhookSettingsModal;

@@ -9,7 +9,12 @@ export const Errors = {
   NoThread: 'Cannot find thread',
 };
 
-const updateThreadPinned = async (models, req: Request, res: Response, next: NextFunction) => {
+const updateThreadPinned = async (
+  models,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { thread_id } = req.body;
   if (!thread_id) return next(new Error(Errors.NoThread));
 
@@ -19,39 +24,45 @@ const updateThreadPinned = async (models, req: Request, res: Response, next: Nex
         id: thread_id,
       },
     });
-    const userOwnedAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
+    const userOwnedAddressIds = await req.user
+      .getAddresses()
+      .filter((addr) => !!addr.verified)
+      .map((addr) => addr.id);
 
     // only community mods and admin can pin
     const roles = await models.Role.findAll({
       where: {
-        address_id: { [Op.in]: userOwnedAddressIds, },
+        address_id: { [Op.in]: userOwnedAddressIds },
         permission: { [Op.in]: ['admin', 'moderator'] },
-      }
+      },
     });
     const role = roles.find((r) => {
-      return r.offchain_community_id === thread.community || r.chain_id === thread.chain;
+      return (
+        r.offchain_community_id === thread.community ||
+        r.chain_id === thread.chain
+      );
     });
     if (!role) return next(new Error(Errors.NotAdmin));
 
     await thread.update({ pinned: !thread.pinned });
 
     const finalThread = await models.OffchainThread.findOne({
-      where: { id: thread.id, },
+      where: { id: thread.id },
       include: [
         {
           model: models.Address,
-          as: 'Address'
+          as: 'Address',
         },
         {
           model: models.Address,
           through: models.Collaboration,
-          as: 'collaborators'
+          as: 'collaborators',
         },
         models.OffchainAttachment,
         {
           model: models.OffchainTopic,
-          as: 'topic'
-        }
+          as: 'topic',
+        },
       ],
     });
 

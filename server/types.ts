@@ -18,7 +18,7 @@ declare global {
     interface SessionData {
       passport?: {
         user?: number;
-      }
+      };
     }
   }
 }

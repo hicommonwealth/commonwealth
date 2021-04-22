@@ -27,15 +27,25 @@ class ChatController extends WebsocketController {
     console.log('chat: websocket received message');
     const payload = JSON.parse(event.data);
     if (payload.event === WebsocketMessageType.Message) {
-      this.getListeners()[WebsocketMessageType.Message].call(this, payload.text, payload.address, payload.chain);
+      this.getListeners()[WebsocketMessageType.Message].call(
+        this,
+        payload.text,
+        payload.address,
+        payload.chain
+      );
     } else if (payload.event === WebsocketMessageType.Typing) {
       this.getListeners()[WebsocketMessageType.Typing].call(this);
     } else if (payload.event === WebsocketMessageType.InitializeScrollback) {
       const scrollback = payload.data.reverse();
       for (const message of scrollback) {
         const timestamp = moment(message.created_at);
-        this.getListeners()[WebsocketMessageType.InitializeScrollback]
-          .call(this, message.text, message.address, message.chain, timestamp);
+        this.getListeners()[WebsocketMessageType.InitializeScrollback].call(
+          this,
+          message.text,
+          message.address,
+          message.chain,
+          timestamp
+        );
       }
     } else {
       console.log('chat: received malformed message', payload);

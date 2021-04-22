@@ -48,7 +48,7 @@ const setHedgehogAuthFn = (chainId) => async (obj) => {
     data: {
       chain: chainId,
       ...obj,
-    }
+    },
   });
 };
 
@@ -70,7 +70,7 @@ const getHedgehogAuthFn = (chainId) => async (obj) => {
     params: {
       chain: chainId,
       ...obj,
-    }
+    },
   });
 };
 
@@ -79,9 +79,9 @@ const checkHedgehogWalletStatus = (vnode) => {
     // TODO: Handle already signed on
     vnode.state.wallet = vnode.state.hedgehog.getWallet();
   } else if (
-    vnode.state.hedgehog
-        && vnode.state.hedgehog.walletExistsLocally
-        && vnode.state.hedgehog.walletExistsLocally()
+    vnode.state.hedgehog &&
+    vnode.state.hedgehog.walletExistsLocally &&
+    vnode.state.hedgehog.walletExistsLocally()
   ) {
     vnode.state.wallet = vnode.state.hedgehog.restoreLocalWallet();
   } else {
@@ -90,62 +90,87 @@ const checkHedgehogWalletStatus = (vnode) => {
   }
 };
 
-const getHedgehogLoginOrSignupButton = (vnode, linkNewAddressModalVnode, isLogin = true) => {
-  return m('a.btn', {
-    class: `login-with-web3${vnode.state.disabled ? ' disabled' : ''}`,
-    onclick: async (e) => {
-      e.preventDefault();
-      const username = $(vnode.dom).find('[name="username"]').val().toString();
-      const password = $(vnode.dom).find('[name="password"]').val().toString();
-      if (!username) return;
-      if (!password) return;
-      vnode.state.disabled = true;
-      vnode.state.success = false;
-      vnode.state.failure = false;
-      try {
-        if (!password || !username) {
-          vnode.state.error = messages.empty;
-          return;
-        }
-        vnode.state.loading = true;
-        vnode.state.error = '';
+const getHedgehogLoginOrSignupButton = (
+  vnode,
+  linkNewAddressModalVnode,
+  isLogin = true
+) => {
+  return m(
+    'a.btn',
+    {
+      class: `login-with-web3${vnode.state.disabled ? ' disabled' : ''}`,
+      onclick: async (e) => {
+        e.preventDefault();
+        const username = $(vnode.dom)
+          .find('[name="username"]')
+          .val()
+          .toString();
+        const password = $(vnode.dom)
+          .find('[name="password"]')
+          .val()
+          .toString();
+        if (!username) return;
+        if (!password) return;
+        vnode.state.disabled = true;
+        vnode.state.success = false;
+        vnode.state.failure = false;
         try {
-          const result = isLogin
-            ? await vnode.state.hedgehog.login(username, password)
-            : await vnode.state.hedgehog.signUp(username, password);
-          checkHedgehogWalletStatus(vnode);
-          // we should be logged in
-          const address = vnode.state.wallet.getAddress().toString('hex');
-          const signerAccount = await createUserWithAddress(address) as EthereumAccount;
-          signerAccount.setWallet(vnode.state.wallet);
-          const signature = await signerAccount.signMessage(signerAccount.validationToken);
+          if (!password || !username) {
+            vnode.state.error = messages.empty;
+            return;
+          }
+          vnode.state.loading = true;
+          vnode.state.error = '';
           try {
-            await signerAccount.validate(signature);
-            vnode.state.loading = false;
-            vnode.attrs.accountVerifiedCallback(signerAccount, linkNewAddressModalVnode); // done!
-            m.redraw();
+            const result = isLogin
+              ? await vnode.state.hedgehog.login(username, password)
+              : await vnode.state.hedgehog.signUp(username, password);
+            checkHedgehogWalletStatus(vnode);
+            // we should be logged in
+            const address = vnode.state.wallet.getAddress().toString('hex');
+            const signerAccount = (await createUserWithAddress(
+              address
+            )) as EthereumAccount;
+            signerAccount.setWallet(vnode.state.wallet);
+            const signature = await signerAccount.signMessage(
+              signerAccount.validationToken
+            );
+            try {
+              await signerAccount.validate(signature);
+              vnode.state.loading = false;
+              vnode.attrs.accountVerifiedCallback(
+                signerAccount,
+                linkNewAddressModalVnode
+              ); // done!
+              m.redraw();
+            } catch (err) {
+              vnode.state.error =
+                'Verification failed. There was an inconsistency error; ' +
+                'please report this to the developers.';
+              vnode.state.loading = false;
+              m.redraw();
+            }
           } catch (err) {
-            vnode.state.error = 'Verification failed. There was an inconsistency error; '
-              + 'please report this to the developers.';
+            vnode.state.error = err.message; // isLogin ? err.message : messages.exists;
             vnode.state.loading = false;
             m.redraw();
           }
         } catch (err) {
-          vnode.state.error = err.message; // isLogin ? err.message : messages.exists;
-          vnode.state.loading = false;
+          console.log('Error', err);
+          vnode.state.error = err;
+          vnode.state.disabled = false;
           m.redraw();
         }
-      } catch (err) {
-        console.log('Error', err);
-        vnode.state.error = err;
-        vnode.state.disabled = false;
-        m.redraw();
-      }
+      },
     },
-  }, isLogin ? 'Login' : 'Create new wallet');
+    isLogin ? 'Login' : 'Create new wallet'
+  );
 };
 
-const HedgehogLoginForm: m.Component<{ accountVerifiedCallback, linkNewAddressModalVnode }, { hedgehog, error }> = {
+const HedgehogLoginForm: m.Component<
+  { accountVerifiedCallback; linkNewAddressModalVnode },
+  { hedgehog; error }
+> = {
   oninit: (vnode) => {
     import('@audius/hedgehog').then((Hedgehog) => {
       vnode.state.hedgehog = new Hedgehog(
@@ -159,8 +184,11 @@ const HedgehogLoginForm: m.Component<{ accountVerifiedCallback, linkNewAddressMo
     const linkNewAddressModalVnode = vnode.attrs.linkNewAddressModalVnode;
     return m('.HedgehogLoginForm', [
       m('.hedgehog-note', [
-        m('p', 'We will use these credentials to generate an Ethereum private key, '
-          + 'stored locally in your browser.'),
+        m(
+          'p',
+          'We will use these credentials to generate an Ethereum private key, ' +
+            'stored locally in your browser.'
+        ),
         m('p', 'Do not lose your password! It cannot be recovered.'),
       ]),
       m('input[type="text"]', {
@@ -178,7 +206,7 @@ const HedgehogLoginForm: m.Component<{ accountVerifiedCallback, linkNewAddressMo
       getHedgehogLoginOrSignupButton(vnode, linkNewAddressModalVnode, false), // signup btn
       vnode.state.error && m('.error-message', vnode.state.error),
     ]);
-  }
+  },
 };
 
 export default HedgehogLoginForm;

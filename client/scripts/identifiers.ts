@@ -18,14 +18,13 @@ export enum ProposalType {
 
 export const proposalSlugToClass = () => {
   if (app.community) {
-    return new Map<string, StorageModule>([
-      ['discussion', app.threads],
-    ]);
+    return new Map<string, StorageModule>([['discussion', app.threads]]);
   }
 
-  const mmap = new Map<string, ProposalModule<any, any, any> | ThreadsController>([
-    ['discussion', app.threads],
-  ]);
+  const mmap = new Map<
+    string,
+    ProposalModule<any, any, any> | ThreadsController
+  >([['discussion', app.threads]]);
   if (app.chain.base === ChainBase.Substrate) {
     mmap.set('referendum', (app.chain as any).democracy);
     mmap.set('democracyproposal', (app.chain as any).democracyProposals);
@@ -36,7 +35,10 @@ export const proposalSlugToClass = () => {
   } else if (app.chain.base === ChainBase.CosmosSDK) {
     mmap.set('cosmosproposal', (app.chain as any).governance);
   }
-  if (app.chain.class === ChainClass.Kusama || app.chain.class === ChainClass.Polkadot) {
+  if (
+    app.chain.class === ChainClass.Kusama ||
+    app.chain.class === ChainClass.Polkadot
+  ) {
     mmap.set('technicalcommitteemotion', (app.chain as any).technicalCommittee);
   }
   if (app.chain.class === ChainClass.Moloch) {
@@ -67,7 +69,7 @@ export const proposalSlugToFriendlyName = new Map<string, string>([
   ['discussion', 'Discussion Thread'],
   ['marlinproposal', 'Proposal'],
   ['cosmosproposal', 'Proposal'],
-  ['molochproposal', 'Proposal']
+  ['molochproposal', 'Proposal'],
 ]);
 
 export const idToProposal = (slug, id) => {
@@ -81,22 +83,28 @@ export const idToProposal = (slug, id) => {
 };
 
 export const uniqueIdToProposal = (uid) => {
-  const [ slug, id ] = uid.split('_');
+  const [slug, id] = uid.split('_');
   return idToProposal(slug, id);
 };
 
 export const chainEntityTypeToProposalSlug = (t: string) => {
   if (t === 'treasury-proposal') return ProposalType.SubstrateTreasuryProposal;
-  else if (t === 'democracy-referendum') return ProposalType.SubstrateDemocracyReferendum;
-  else if (t === 'democracy-proposal') return ProposalType.SubstrateDemocracyProposal;
-  else if (t === 'collective-proposal') return ProposalType.SubstrateCollectiveProposal;
+  else if (t === 'democracy-referendum')
+    return ProposalType.SubstrateDemocracyReferendum;
+  else if (t === 'democracy-proposal')
+    return ProposalType.SubstrateDemocracyProposal;
+  else if (t === 'collective-proposal')
+    return ProposalType.SubstrateCollectiveProposal;
 };
 
 export const proposalSlugToChainEntityType = (t) => {
   if (t === ProposalType.SubstrateTreasuryProposal) return 'treasury-proposal';
-  else if (t === ProposalType.SubstrateDemocracyReferendum) return 'democracy-referendum';
-  else if (t === ProposalType.SubstrateDemocracyProposal) return 'democracy-proposal';
-  else if (t === ProposalType.SubstrateCollectiveProposal) return 'collective-proposal';
+  else if (t === ProposalType.SubstrateDemocracyReferendum)
+    return 'democracy-referendum';
+  else if (t === ProposalType.SubstrateDemocracyProposal)
+    return 'democracy-proposal';
+  else if (t === ProposalType.SubstrateCollectiveProposal)
+    return 'collective-proposal';
 };
 
 export const chainEntityTypeToProposalName = (t: string) => {

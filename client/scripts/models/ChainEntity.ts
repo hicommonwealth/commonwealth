@@ -15,20 +15,37 @@ class ChainEntity {
   public readonly createdAt?: moment.Moment;
 
   private _updatedAt?: moment.Moment;
-  public get updatedAt() { return this._updatedAt; }
+  public get updatedAt() {
+    return this._updatedAt;
+  }
 
   private _chainEvents: ChainEvent[];
-  public get chainEvents() { return this._chainEvents; }
+  public get chainEvents() {
+    return this._chainEvents;
+  }
 
   public get stringId(): string {
     return `${this.chain}-${this.type}-${this.typeId}`;
   }
 
   public eq(e: ChainEntity) {
-    return e.chain === this.chain && e.type === this.type && e.typeId === this.typeId;
+    return (
+      e.chain === this.chain && e.type === this.type && e.typeId === this.typeId
+    );
   }
 
-  constructor(chain, type, typeId, chainEvents, createdAt?, updatedAt?, id?, threadId?, title?, author?) {
+  constructor(
+    chain,
+    type,
+    typeId,
+    chainEvents,
+    createdAt?,
+    updatedAt?,
+    id?,
+    threadId?,
+    title?,
+    author?
+  ) {
     this.id = id;
     this.chain = chain;
     this.type = type;

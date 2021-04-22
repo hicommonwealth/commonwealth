@@ -10,20 +10,28 @@ const log = factory.getLogger(formatFilename(__filename));
 export const sequelize = new Sequelize(DATABASE_URI, {
   // disable string operators (https://github.com/sequelize/sequelize/issues/8417)
   operatorsAliases: false,
-  logging: (process.env.NODE_ENV === 'test') ? false : (msg) => { log.trace(msg); },
-  dialectOptions: (process.env.NODE_ENV !== 'production') ? {
-    requestTimeout: 10000,
-  } : {
-    requestTimeout: 10000,
-    ssl: true,
-    rejectUnauthorized: false,
-  },
+  logging:
+    process.env.NODE_ENV === 'test'
+      ? false
+      : (msg) => {
+          log.trace(msg);
+        },
+  dialectOptions:
+    process.env.NODE_ENV !== 'production'
+      ? {
+          requestTimeout: 10000,
+        }
+      : {
+          requestTimeout: 10000,
+          ssl: true,
+          rejectUnauthorized: false,
+        },
   pool: {
     max: 10,
     min: 0,
     acquire: 30000,
     idle: 10000,
-  }
+  },
 });
 
 // TODO: separate Sequelize and SequelizeStatic into new object & type this as Sequelize.Models

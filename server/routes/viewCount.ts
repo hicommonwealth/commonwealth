@@ -12,7 +12,13 @@ export const Errors = {
   InvalidThread: 'Invalid offchain thread',
 };
 
-const viewCount = async (models, cache: ViewCountCache, req: Request, res: Response, next: NextFunction) => {
+const viewCount = async (
+  models,
+  cache: ViewCountCache,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.body.object_id) {
     return next(new Error(Errors.NoObjectId));
   }
@@ -20,10 +26,10 @@ const viewCount = async (models, cache: ViewCountCache, req: Request, res: Respo
     return next(new Error(Errors.NoChainOrComm));
   }
   const chain = await models.Chain.findOne({
-    where: { id: req.body.chain }
+    where: { id: req.body.chain },
   });
   const community = await models.OffchainCommunity.findOne({
-    where: { id: req.body.community }
+    where: { id: req.body.community },
   });
 
   if (!chain && !community) {
@@ -32,13 +38,15 @@ const viewCount = async (models, cache: ViewCountCache, req: Request, res: Respo
 
   // verify count exists before querying
   let count = await models.OffchainViewCount.findOne({
-    where: community ? {
-      community: req.body.community,
-      object_id: req.body.object_id,
-    } : {
-      chain: req.body.chain,
-      object_id: req.body.object_id,
-    }
+    where: community
+      ? {
+          community: req.body.community,
+          object_id: req.body.object_id,
+        }
+      : {
+          chain: req.body.chain,
+          object_id: req.body.object_id,
+        },
   });
   if (!count) {
     return next(new Error(Errors.InvalidThread));

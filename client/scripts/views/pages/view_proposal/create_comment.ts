@@ -15,39 +15,47 @@ import User from 'views/components/widgets/user';
 import Token from 'controllers/chain/ethereum/token/adapter';
 import { GlobalStatus } from './body';
 
-const CreateComment: m.Component<{
-  callback: CallableFunction,
-  cancellable?: boolean,
-  getSetGlobalEditingStatus: CallableFunction,
-  getSetGlobalReplyStatus: CallableFunction,
-  parentComment?: OffchainComment<any>,
-  rootProposal: AnyProposal | OffchainThread,
-  tabindex?: number,
-}, {
-  quillEditorState: any,
-  uploadsInProgress,
-  error,
-  saving: boolean,
-  sendingComment,
-}> = {
+const CreateComment: m.Component<
+  {
+    callback: CallableFunction;
+    cancellable?: boolean;
+    getSetGlobalEditingStatus: CallableFunction;
+    getSetGlobalReplyStatus: CallableFunction;
+    parentComment?: OffchainComment<any>;
+    rootProposal: AnyProposal | OffchainThread;
+    tabindex?: number;
+  },
+  {
+    quillEditorState: any;
+    uploadsInProgress;
+    error;
+    saving: boolean;
+    sendingComment;
+  }
+> = {
   view: (vnode) => {
     const {
       callback,
       cancellable,
       getSetGlobalEditingStatus,
       getSetGlobalReplyStatus,
-      rootProposal
+      rootProposal,
     } = vnode.attrs;
     let { parentComment } = vnode.attrs;
     const author = app.user.activeAccount;
-    const parentType = parentComment ? CommentParent.Comment : CommentParent.Proposal;
+    const parentType = parentComment
+      ? CommentParent.Comment
+      : CommentParent.Proposal;
     if (!parentComment) parentComment = null;
     if (vnode.state.uploadsInProgress === undefined) {
       vnode.state.uploadsInProgress = 0;
     }
 
     const submitComment = async (e?) => {
-      if (!vnode.state.quillEditorState || !vnode.state.quillEditorState.editor) {
+      if (
+        !vnode.state.quillEditorState ||
+        !vnode.state.quillEditorState.editor
+      ) {
         if (e) e.preventDefault();
         vnode.state.error = 'Editor not initialized, please try again';
         return;
@@ -60,9 +68,10 @@ const CreateComment: m.Component<{
 
       const { quillEditorState } = vnode.state;
 
-      const mentionsEle = document.getElementsByClassName('ql-mention-list-container')[0];
+      const mentionsEle = document.getElementsByClassName(
+        'ql-mention-list-container'
+      )[0];
       if (mentionsEle) (mentionsEle as HTMLElement).style.visibility = 'hidden';
-
 
       const commentText = quillEditorState.markdownMode
         ? quillEditorState.editor.getText()
@@ -78,8 +87,15 @@ const CreateComment: m.Component<{
       const chainId = app.activeCommunityId() ? null : app.activeChainId();
       const communityId = app.activeCommunityId();
       try {
-        const res = await app.comments.create(author.address, rootProposal.uniqueIdentifier,
-          chainId, communityId, commentText, parentComment?.id, attachments);
+        const res = await app.comments.create(
+          author.address,
+          rootProposal.uniqueIdentifier,
+          chainId,
+          communityId,
+          commentText,
+          parentComment?.id,
+          attachments
+        );
         callback();
         if (vnode.state.quillEditorState.editor) {
           vnode.state.quillEditorState.editor.enable();
@@ -102,13 +118,13 @@ const CreateComment: m.Component<{
       vnode.state.saving = false;
       mixpanel.track('Proposal Funnel', {
         'Step No': 2,
-        'Step': 'Create Comment',
-        'Proposal Name': `${(rootProposal).slug}: ${(rootProposal).identifier}`,
-        'Scope': app.activeId(),
+        Step: 'Create Comment',
+        'Proposal Name': `${rootProposal.slug}: ${rootProposal.identifier}`,
+        Scope: app.activeId(),
       });
       mixpanel.people.increment('Comment');
       mixpanel.people.set({
-        'Last Comment Created': new Date().toISOString()
+        'Last Comment Created': new Date().toISOString(),
       });
 
       getSetGlobalReplyStatus(GlobalStatus.Set, false, true);
@@ -116,85 +132,113 @@ const CreateComment: m.Component<{
 
     const { error, sendingComment, uploadsInProgress } = vnode.state;
 
-    return m('.CreateComment', {
-      class: parentType === CommentParent.Comment ? 'new-comment-child' : 'new-thread-child'
-    }, [
-      m('.create-comment-avatar', [
-        m(User, { user: author, popover: true, avatarOnly: true, avatarSize: 40 }),
-      ]),
-      m('.create-comment-body', [
-        m(User, { user: author, popover: true, hideAvatar: true }),
-        (rootProposal instanceof OffchainThread && rootProposal.readOnly)
-          ? m(Callout, {
-            intent: 'primary',
-            content: 'Commenting is disabled because this post has been locked.',
-          })
-          : [
-            app.user.activeAccount?.profile && !app.user.activeAccount.profile.name && m(Callout, {
-              class: 'no-profile-callout',
-              intent: 'primary',
-              content: [
-                'You haven\'t set a display name yet. ',
-                m('a', {
-                  href: `/${app.activeId()}/account/${app.user.activeAccount.address}`
-                    + `?base=${app.user.activeAccount.chain}`,
-                  onclick: (e) => {
-                    e.preventDefault();
-                    app.modals.create({
-                      modal: EditProfileModal,
-                      data: {
-                        account: app.user.activeAccount,
-                        refreshCallback: () => m.redraw(),
-                      },
-                    });
-                  }
-                }, 'Set a display name'),
-              ],
-            }),
-            m(QuillEditor, {
-              contentsDoc: '',
-              oncreateBind: (state) => {
-                vnode.state.quillEditorState = state;
-              },
-              editorNamespace: `${document.location.pathname}-commenting`,
-              onkeyboardSubmit: () => {
-                submitComment();
-                m.redraw(); // ensure button is disabled
-              },
-              tabindex: vnode.attrs.tabindex,
-            }),
-            m('.form-bottom', [
-              m(Button, {
+    return m(
+      '.CreateComment',
+      {
+        class:
+          parentType === CommentParent.Comment
+            ? 'new-comment-child'
+            : 'new-thread-child',
+      },
+      [
+        m('.create-comment-avatar', [
+          m(User, {
+            user: author,
+            popover: true,
+            avatarOnly: true,
+            avatarSize: 40,
+          }),
+        ]),
+        m('.create-comment-body', [
+          m(User, { user: author, popover: true, hideAvatar: true }),
+          rootProposal instanceof OffchainThread && rootProposal.readOnly
+            ? m(Callout, {
                 intent: 'primary',
-                type: 'submit',
-                compact: true,
-                disabled: getSetGlobalEditingStatus(GlobalStatus.Get) || sendingComment || uploadsInProgress > 0
-                  || !app.activeCommunityId() && ((app.chain as Token).isToken && !(app.chain as Token).hasToken),
-                rounded: true,
-                onclick: submitComment,
-                label: (uploadsInProgress > 0)
-                  ? 'Uploading...'
-                  : parentType === CommentParent.Proposal ? 'Post comment' : 'Reply to comment'
-              }),
-              cancellable
-                && m(Button, {
-                  intent: 'none',
-                  type: 'cancel',
-                  compact: true,
-                  rounded: true,
-                  onclick: (e) => {
-                    e.preventDefault();
-                    getSetGlobalReplyStatus(GlobalStatus.Set, false, true);
+                content:
+                  'Commenting is disabled because this post has been locked.',
+              })
+            : [
+                app.user.activeAccount?.profile &&
+                  !app.user.activeAccount.profile.name &&
+                  m(Callout, {
+                    class: 'no-profile-callout',
+                    intent: 'primary',
+                    content: [
+                      "You haven't set a display name yet. ",
+                      m(
+                        'a',
+                        {
+                          href:
+                            `/${app.activeId()}/account/${
+                              app.user.activeAccount.address
+                            }` + `?base=${app.user.activeAccount.chain}`,
+                          onclick: (e) => {
+                            e.preventDefault();
+                            app.modals.create({
+                              modal: EditProfileModal,
+                              data: {
+                                account: app.user.activeAccount,
+                                refreshCallback: () => m.redraw(),
+                              },
+                            });
+                          },
+                        },
+                        'Set a display name'
+                      ),
+                    ],
+                  }),
+                m(QuillEditor, {
+                  contentsDoc: '',
+                  oncreateBind: (state) => {
+                    vnode.state.quillEditorState = state;
                   },
-                  label: 'Cancel'
+                  editorNamespace: `${document.location.pathname}-commenting`,
+                  onkeyboardSubmit: () => {
+                    submitComment();
+                    m.redraw(); // ensure button is disabled
+                  },
+                  tabindex: vnode.attrs.tabindex,
                 }),
-              error
-                && m('.new-comment-error', error),
-            ])
-          ]
-      ])
-    ]);
-  }
+                m('.form-bottom', [
+                  m(Button, {
+                    intent: 'primary',
+                    type: 'submit',
+                    compact: true,
+                    disabled:
+                      getSetGlobalEditingStatus(GlobalStatus.Get) ||
+                      sendingComment ||
+                      uploadsInProgress > 0 ||
+                      (!app.activeCommunityId() &&
+                        (app.chain as Token).isToken &&
+                        !(app.chain as Token).hasToken),
+                    rounded: true,
+                    onclick: submitComment,
+                    label:
+                      uploadsInProgress > 0
+                        ? 'Uploading...'
+                        : parentType === CommentParent.Proposal
+                        ? 'Post comment'
+                        : 'Reply to comment',
+                  }),
+                  cancellable &&
+                    m(Button, {
+                      intent: 'none',
+                      type: 'cancel',
+                      compact: true,
+                      rounded: true,
+                      onclick: (e) => {
+                        e.preventDefault();
+                        getSetGlobalReplyStatus(GlobalStatus.Set, false, true);
+                      },
+                      label: 'Cancel',
+                    }),
+                  error && m('.new-comment-error', error),
+                ]),
+              ],
+        ]),
+      ]
+    );
+  },
 };
 
 export default CreateComment;

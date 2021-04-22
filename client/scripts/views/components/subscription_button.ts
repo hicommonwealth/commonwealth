@@ -9,9 +9,14 @@ import { Button, Icon, Icons, PopoverMenu, MenuItem } from 'construct-ui';
 const SubscriptionButton: m.Component<{}> = {
   view: (vnode) => {
     const subscriptions = app.user.notifications;
-    const communitySubscription = subscriptions.subscriptions
-      .find((v) => v.category === NotificationCategories.NewThread && v.objectId === app.activeId());
-    const communityOrChain = app.activeChainId() ? app.activeChainId() : app.activeCommunityId();
+    const communitySubscription = subscriptions.subscriptions.find(
+      (v) =>
+        v.category === NotificationCategories.NewThread &&
+        v.objectId === app.activeId()
+    );
+    const communityOrChain = app.activeChainId()
+      ? app.activeChainId()
+      : app.activeCommunityId();
 
     return m(Button, {
       class: 'SubscriptionButton',
@@ -24,9 +29,11 @@ const SubscriptionButton: m.Component<{}> = {
             m.redraw();
           });
         } else {
-          subscriptions.subscribe(NotificationCategories.NewThread, communityOrChain).then(() => {
-            m.redraw();
-          });
+          subscriptions
+            .subscribe(NotificationCategories.NewThread, communityOrChain)
+            .then(() => {
+              m.redraw();
+            });
         }
       },
       label: communitySubscription ? 'Notifications on' : 'Notifications off',

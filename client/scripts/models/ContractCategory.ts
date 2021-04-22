@@ -11,7 +11,12 @@ class ContractCategory {
     this.color = color;
   }
   public static fromJSON(json) {
-    return new ContractCategory(json.name, json.description, json.id, json.color);
+    return new ContractCategory(
+      json.name,
+      json.description,
+      json.id,
+      json.color
+    );
   }
 }
 

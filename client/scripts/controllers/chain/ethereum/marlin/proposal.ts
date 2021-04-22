@@ -24,7 +24,7 @@ import MarlinGovernance from './governance';
 
 export enum MarlinVote {
   YES = 1,
-  NO = 0
+  NO = 0,
 }
 
 export enum MarlinProposalState {
@@ -35,7 +35,7 @@ export enum MarlinProposalState {
   Succeeded,
   Queued,
   Expired,
-  Executed
+  Executed,
 }
 
 export class MarlinProposalVote implements IVote<EthereumCoin> {
@@ -52,30 +52,48 @@ const backportEntityToAdapter = (
   Gov: MarlinGovernance,
   entity: ChainEntity
 ): IMarlinProposalResponse => {
-  const startEvent = entity.chainEvents.find((e) => e.data.kind === MarlinTypes.EventKind.ProposalCreated);
-  const canceledEvent = entity.chainEvents.find((e) => e.data.kind === MarlinTypes.EventKind.ProposalCanceled);
-  const executedEvent = entity.chainEvents.find((e) => e.data.kind === MarlinTypes.EventKind.ProposalExecuted);
-  const voteEvents = entity.chainEvents.filter((e) => e.data.kind === MarlinTypes.EventKind.VoteCast);
+  const startEvent = entity.chainEvents.find(
+    (e) => e.data.kind === MarlinTypes.EventKind.ProposalCreated
+  );
+  const canceledEvent = entity.chainEvents.find(
+    (e) => e.data.kind === MarlinTypes.EventKind.ProposalCanceled
+  );
+  const executedEvent = entity.chainEvents.find(
+    (e) => e.data.kind === MarlinTypes.EventKind.ProposalExecuted
+  );
+  const voteEvents = entity.chainEvents.filter(
+    (e) => e.data.kind === MarlinTypes.EventKind.VoteCast
+  );
   if (!startEvent) {
     throw new Error('Proposal start event not found!');
   }
 
   const identifier = `${(startEvent.data as MarlinTypes.IProposalCreated).id}`;
   const id = identifier;
-  const proposer = `${(startEvent.data as MarlinTypes.IProposalCreated).proposer}`;
-  const description = `${(startEvent.data as MarlinTypes.IProposalCreated).description}`;
+  const proposer = `${
+    (startEvent.data as MarlinTypes.IProposalCreated).proposer
+  }`;
+  const description = `${
+    (startEvent.data as MarlinTypes.IProposalCreated).description
+  }`;
   const targets = (startEvent.data as MarlinTypes.IProposalCreated).targets;
   const values = (startEvent.data as MarlinTypes.IProposalCreated).values;
-  const signatures = (startEvent.data as MarlinTypes.IProposalCreated).signatures;
+  const signatures = (startEvent.data as MarlinTypes.IProposalCreated)
+    .signatures;
   const calldatas = (startEvent.data as MarlinTypes.IProposalCreated).calldatas;
-  const startBlock = (startEvent.data as MarlinTypes.IProposalCreated).startBlock;
+  const startBlock = (startEvent.data as MarlinTypes.IProposalCreated)
+    .startBlock;
   const endBlock = (startEvent.data as MarlinTypes.IProposalCreated).endBlock;
   const eta = null;
 
   const voteReducer = (acc, vote) => acc + vote.votes.toNumber();
-  const forVotesArray = voteEvents.filter((e) => (e.data as MarlinTypes.IVoteCast).support);
+  const forVotesArray = voteEvents.filter(
+    (e) => (e.data as MarlinTypes.IVoteCast).support
+  );
   const forVotes = forVotesArray.reduce(voteReducer, 0);
-  const againstVotesArray = voteEvents.filter((e) => !(e.data as MarlinTypes.IVoteCast).support);
+  const againstVotesArray = voteEvents.filter(
+    (e) => !(e.data as MarlinTypes.IVoteCast).support
+  );
   const againstVotes = againstVotesArray.reduce(voteReducer, 0);
   const canceled = !!canceledEvent;
   const executed = !!executedEvent;
@@ -120,7 +138,6 @@ const backportEntityToAdapter = (
   return proposal;
 };
 
-
 export default class MarlinProposal extends Proposal<
   MarlinAPI,
   EthereumCoin,
@@ -130,7 +147,9 @@ export default class MarlinProposal extends Proposal<
   private _Holders: MarlinHolders;
   private _Gov: MarlinGovernance;
 
-  public get shortIdentifier() { return `MarlinProposal-${this.data.identifier}`; }
+  public get shortIdentifier() {
+    return `MarlinProposal-${this.data.identifier}`;
+  }
   public get title(): string {
     try {
       const parsed = JSON.parse(this.data.description);
@@ -156,20 +175,31 @@ export default class MarlinProposal extends Proposal<
     return ProposalStatus.Passing;
   }
 
-  public get author() { return this._Holders.get(this.data.proposer); }
+  public get author() {
+    return this._Holders.get(this.data.proposer);
+  }
 
-  public get votingType() { return VotingType.MarlinYesNo; }
-  public get votingUnit() { return VotingUnit.CoinVote; }
+  public get votingType() {
+    return VotingType.MarlinYesNo;
+  }
+  public get votingUnit() {
+    return VotingUnit.CoinVote;
+  }
 
-  public get startingPeriod() { return +this.data.startBlock; }
-  public get votingPeriodEnd() { return this.startingPeriod + +this._Gov.votingPeriod; }
+  public get startingPeriod() {
+    return +this.data.startBlock;
+  }
+  public get votingPeriodEnd() {
+    return this.startingPeriod + +this._Gov.votingPeriod;
+  }
 
   public async state(): Promise<MarlinProposalState> {
     const state = await this._Gov.state(this.identifier);
     return state;
   }
 
-  public get endTime(): ProposalEndTime { // TODO: Get current block and subtract from endBlock * 15s
+  public get endTime(): ProposalEndTime {
+    // TODO: Get current block and subtract from endBlock * 15s
     return { kind: 'fixed', time: moment.unix(this.data.endBlock) };
   }
 
@@ -192,7 +222,7 @@ export default class MarlinProposal extends Proposal<
   constructor(
     Holders: MarlinHolders,
     Gov: MarlinGovernance,
-    entity: ChainEntity,
+    entity: ChainEntity
   ) {
     // must set identifier before super() because of how response object is named
     super('marlinproposal', backportEntityToAdapter(Gov, entity));
@@ -200,13 +230,14 @@ export default class MarlinProposal extends Proposal<
     this._Holders = Holders;
     this._Gov = Gov;
 
-    entity.chainEvents.sort((e1, e2) => e1.blockNumber - e2.blockNumber).forEach((e) => this.update(e));
+    entity.chainEvents
+      .sort((e1, e2) => e1.blockNumber - e2.blockNumber)
+      .forEach((e) => this.update(e));
     this._initialized = true;
     this._Gov.store.add(this);
   }
 
-  public update(e: ChainEvent) {
-  }
+  public update(e: ChainEvent) {}
 
   public canVoteFrom(account: MarlinHolder) {
     // We need to check the delegate of account to perform voting checks. Delegates must
@@ -236,14 +267,14 @@ export default class MarlinProposal extends Proposal<
       throw new Error('sender must be valid delegate');
     }
 
-    if (await this.state() !== MarlinProposalState.Active) {
+    if ((await this.state()) !== MarlinProposalState.Active) {
       throw new Error('proposal not in active period');
     }
 
     const tx = await this._Gov.api.governorAlphaContract.castVote(
       this.data.identifier,
       !!vote.choice,
-      { gasLimit: this._Gov.api.gasLimit },
+      { gasLimit: this._Gov.api.gasLimit }
     );
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {

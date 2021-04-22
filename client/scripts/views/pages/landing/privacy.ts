@@ -122,7 +122,7 @@ const PrivacyPage: m.Component<{}> = {
         renderMultilineText(PrivacyPolicy),
       ]),
     ]);
-  }
+  },
 };
 
 export default PrivacyPage;

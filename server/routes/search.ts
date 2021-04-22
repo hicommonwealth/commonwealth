@@ -11,8 +11,17 @@ const Errors = {
   QueryTooShort: 'Query must be at least 3 characters',
 };
 
-const search = async (models, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
+const search = async (
+  models,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const [chain, community, error] = await lookupCommunityIsVisibleToUser(
+    models,
+    req.query,
+    req.user
+  );
   if (error) return next(new Error(error));
   const { cutoff_date } = req.query;
 
@@ -36,7 +45,8 @@ const search = async (models, req: Request, res: Response, next: NextFunction) =
   // query for both threads and comments, and then execute a union and keep only the most recent :limit
   let threadsAndComments;
   try {
-    threadsAndComments = await models.sequelize.query(`
+    threadsAndComments = await models.sequelize.query(
+      `
 SELECT * FROM (
   (SELECT
       "OffchainThreads".title,
@@ -69,10 +79,12 @@ SELECT * FROM (
     ORDER BY "OffchainComments".created_at DESC LIMIT :limit)
 ) s
 ORDER BY created_at DESC LIMIT :limit;
-`, {
-      replacements,
-      type: QueryTypes.SELECT
-    });
+`,
+      {
+        replacements,
+        type: QueryTypes.SELECT,
+      }
+    );
   } catch (e) {
     console.log(e);
     return next(new Error(Errors.UnexpectedError));

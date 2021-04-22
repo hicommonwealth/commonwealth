@@ -8,9 +8,18 @@ import { getLastEdited } from '../util/getLastEdited';
 const log = factory.getLogger(formatFilename(__filename));
 
 // bulkThreads takes a date param and fetches the most recent 20 threads before that date
-const bulkThreads = async (models, req: Request, res: Response, next: NextFunction) => {
+const bulkThreads = async (
+  models,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { Op } = models.sequelize;
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
+  const [chain, community, error] = await lookupCommunityIsVisibleToUser(
+    models,
+    req.query,
+    req.user
+  );
   if (error) return next(new Error(error));
   const { cutoff_date, topic_id, stage } = req.query;
 
@@ -98,7 +107,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
     try {
       preprocessedThreads = await models.sequelize.query(query, {
         replacements,
-        type: QueryTypes.SELECT
+        type: QueryTypes.SELECT,
       });
     } catch (e) {
       console.log(e);
@@ -136,7 +145,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
           id: t.addr_id,
           address: t.addr_address,
           chain: t.addr_chain,
-        }
+        },
       };
       if (t.topic_id) {
         data['topic'] = {
@@ -153,7 +162,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
 
     comments = await models.OffchainComment.findAll({
       where: {
-        root_id: root_ids
+        root_id: root_ids,
       },
       include: [models.Address, models.OffchainAttachment],
       order: [['created_at', 'DESC']],
@@ -164,28 +173,28 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       return row;
     });
   } else {
-    const whereOptions = (community)
-      ? { community: community.id, }
-      : { chain: chain.id, };
+    const whereOptions = community
+      ? { community: community.id }
+      : { chain: chain.id };
 
     threads = await models.OffchainThread.findAll({
       where: whereOptions,
       include: [
         {
           model: models.Address,
-          as: 'Address'
+          as: 'Address',
         },
         {
           model: models.Address,
           through: models.Collaboration,
-          as: 'collaborators'
+          as: 'collaborators',
         },
         {
           model: models.OffchainTopic,
-          as: 'topic'
-        }
+          as: 'topic',
+        },
       ],
-      exclude: [ 'version_history' ],
+      exclude: ['version_history'],
       order: [['created_at', 'DESC']],
     }).map((t, idx) => {
       const row = t.toJSON();
@@ -197,7 +206,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
     comments = await models.OffchainComment.findAll({
       where: whereOptions,
       include: [models.Address, models.OffchainAttachment],
-      exclude: [ 'version_history' ],
+      exclude: ['version_history'],
       order: [['created_at', 'DESC']],
     }).map((c, idx) => {
       const row = c.toJSON();
@@ -214,7 +223,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
         { comment_id: comments.map((comment) => comment.id) },
       ],
     },
-    include: [ models.Address ],
+    include: [models.Address],
     order: [['created_at', 'DESC']],
   });
 
@@ -224,10 +233,13 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
 
   const threadsInVoting = await models.sequelize.query(countsQuery, {
     replacements,
-    type: QueryTypes.SELECT
+    type: QueryTypes.SELECT,
   });
-  const numPrevotingThreads = threadsInVoting.filter((t) => t.stage === 'proposal_in_review').length;
-  const numVotingThreads = threadsInVoting.filter((t) => t.stage === 'voting').length;
+  const numPrevotingThreads = threadsInVoting.filter(
+    (t) => t.stage === 'proposal_in_review'
+  ).length;
+  const numVotingThreads = threadsInVoting.filter((t) => t.stage === 'voting')
+    .length;
 
   return res.json({
     status: 'Success',
@@ -237,7 +249,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       threads,
       comments, // already converted to JSON earlier
       reactions: reactions.map((r) => r.toJSON()),
-    }
+    },
   });
 };
 

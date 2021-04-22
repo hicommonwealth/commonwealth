@@ -25,42 +25,50 @@ export interface InviteLinkAttributes {
 }
 
 export interface InviteLinkInstance
-extends Sequelize.Instance<InviteLinkAttributes>, InviteLinkAttributes {
+  extends Sequelize.Instance<InviteLinkAttributes>,
+    InviteLinkAttributes {}
 
-}
-
-export interface InviteLinkModel
-extends Sequelize.Model<InviteLinkInstance, InviteLinkAttributes> {
-
-}
+export type InviteLinkModel = Sequelize.Model<
+  InviteLinkInstance,
+  InviteLinkAttributes
+>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
+  dataTypes: Sequelize.DataTypes
 ): InviteLinkModel => {
-  const InviteLink = sequelize.define<InviteLinkInstance, InviteLinkAttributes>('InviteLink', {
-    id: { type: dataTypes.STRING, primaryKey: true, allowNull: false },
-    community_id: { type: dataTypes.STRING, allowNull: true },
-    chain_id: { type: dataTypes.STRING, allowNull: true },
-    creator_id: { type: dataTypes.INTEGER, allowNull: false },
-    active: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: true },
-    multi_use: { type: dataTypes.INTEGER, allowNull: true, defaultValue: null },
-    used: { type: dataTypes.INTEGER, allowNull: false, defaultValue: 0 },
-    time_limit: {
-      type: dataTypes.ENUM,
-      values: Object.keys(InviteLinkTimeLimit),
-      defaultValue: 'none',
-      allowNull: false,
+  const InviteLink = sequelize.define<InviteLinkInstance, InviteLinkAttributes>(
+    'InviteLink',
+    {
+      id: { type: dataTypes.STRING, primaryKey: true, allowNull: false },
+      community_id: { type: dataTypes.STRING, allowNull: true },
+      chain_id: { type: dataTypes.STRING, allowNull: true },
+      creator_id: { type: dataTypes.INTEGER, allowNull: false },
+      active: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: true },
+      multi_use: {
+        type: dataTypes.INTEGER,
+        allowNull: true,
+        defaultValue: null,
+      },
+      used: { type: dataTypes.INTEGER, allowNull: false, defaultValue: 0 },
+      time_limit: {
+        type: dataTypes.ENUM,
+        values: Object.keys(InviteLinkTimeLimit),
+        defaultValue: 'none',
+        allowNull: false,
+      },
     },
-  }, {
-    underscored: true,
-    indexes: [
-      { fields: ['id'] },
-    ],
-  });
+    {
+      underscored: true,
+      indexes: [{ fields: ['id'] }],
+    }
+  );
 
   InviteLink.associate = (models) => {
-    models.InviteLink.belongsTo(models.OffchainCommunity, { foreignKey: 'community_id', targetKey: 'id' });
+    models.InviteLink.belongsTo(models.OffchainCommunity, {
+      foreignKey: 'community_id',
+      targetKey: 'id',
+    });
   };
 
   return InviteLink;

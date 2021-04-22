@@ -30,55 +30,83 @@ export interface OffchainThreadAttributes {
   Chain?: ChainAttributes;
   OffchainCommunity?: OffchainCommunityAttributes;
   Address?: AddressAttributes;
-  OffchainAttachments?: OffchainAttachmentAttributes[] | OffchainAttachmentAttributes['id'][];
+  OffchainAttachments?:
+    | OffchainAttachmentAttributes[]
+    | OffchainAttachmentAttributes['id'][];
   ChainEntity?: ChainEntityAttributes;
 }
 
-export interface OffchainThreadInstance extends Sequelize.Instance<OffchainThreadAttributes>, OffchainThreadAttributes {
+export interface OffchainThreadInstance
+  extends Sequelize.Instance<OffchainThreadAttributes>,
+    OffchainThreadAttributes {
   // no mixins used
 }
 
-export interface OffchainThreadModel extends Sequelize.Model<OffchainThreadInstance, OffchainThreadAttributes> {
-
-}
+export type OffchainThreadModel = Sequelize.Model<
+  OffchainThreadInstance,
+  OffchainThreadAttributes
+>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
+  dataTypes: Sequelize.DataTypes
 ): OffchainThreadModel => {
-  const OffchainThread = sequelize.define<OffchainThreadInstance, OffchainThreadAttributes>('OffchainThread', {
-    id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-    address_id: { type: dataTypes.INTEGER, allowNull: false },
-    title: { type: dataTypes.TEXT, allowNull: false },
-    body: { type: dataTypes.TEXT, allowNull: true },
-    plaintext: { type: dataTypes.TEXT, allowNull: true },
-    kind: { type: dataTypes.TEXT, allowNull: false },
-    stage: { type: dataTypes.TEXT, allowNull: false, defaultValue: 'discussion' },
-    url: { type: dataTypes.TEXT, allowNull: true },
-    topic_id: { type: dataTypes.INTEGER, allowNull: true },
-    pinned: { type: dataTypes.BOOLEAN, defaultValue: false, allowNull: false },
-    chain: { type: dataTypes.STRING, allowNull: true },
-    community: { type: dataTypes.STRING, allowNull: true },
-    read_only: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
-    version_history: { type: dataTypes.ARRAY(dataTypes.TEXT), defaultValue: [], allowNull: false },
-    created_at: { type: dataTypes.DATE, allowNull: false },
-    updated_at: { type: dataTypes.DATE, allowNull: false },
-    deleted_at: { type: dataTypes.DATE, allowNull: true },
-  }, {
-    underscored: true,
-    paranoid: true,
-    indexes: [
-      { fields: ['address_id'] },
-      { fields: ['chain'] },
-      { fields: ['community'] },
-      { fields: ['chain', 'created_at'] },
-      { fields: ['community', 'created_at'] },
-      { fields: ['chain', 'updated_at'] },
-      { fields: ['community', 'updated_at'] },
-      { fields: ['chain', 'pinned'] },
-      { fields: ['community', 'pinned'] },
-    ],
-  });
+  const OffchainThread = sequelize.define<
+    OffchainThreadInstance,
+    OffchainThreadAttributes
+  >(
+    'OffchainThread',
+    {
+      id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+      address_id: { type: dataTypes.INTEGER, allowNull: false },
+      title: { type: dataTypes.TEXT, allowNull: false },
+      body: { type: dataTypes.TEXT, allowNull: true },
+      plaintext: { type: dataTypes.TEXT, allowNull: true },
+      kind: { type: dataTypes.TEXT, allowNull: false },
+      stage: {
+        type: dataTypes.TEXT,
+        allowNull: false,
+        defaultValue: 'discussion',
+      },
+      url: { type: dataTypes.TEXT, allowNull: true },
+      topic_id: { type: dataTypes.INTEGER, allowNull: true },
+      pinned: {
+        type: dataTypes.BOOLEAN,
+        defaultValue: false,
+        allowNull: false,
+      },
+      chain: { type: dataTypes.STRING, allowNull: true },
+      community: { type: dataTypes.STRING, allowNull: true },
+      read_only: {
+        type: dataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      version_history: {
+        type: dataTypes.ARRAY(dataTypes.TEXT),
+        defaultValue: [],
+        allowNull: false,
+      },
+      created_at: { type: dataTypes.DATE, allowNull: false },
+      updated_at: { type: dataTypes.DATE, allowNull: false },
+      deleted_at: { type: dataTypes.DATE, allowNull: true },
+    },
+    {
+      underscored: true,
+      paranoid: true,
+      indexes: [
+        { fields: ['address_id'] },
+        { fields: ['chain'] },
+        { fields: ['community'] },
+        { fields: ['chain', 'created_at'] },
+        { fields: ['community', 'created_at'] },
+        { fields: ['chain', 'updated_at'] },
+        { fields: ['community', 'updated_at'] },
+        { fields: ['chain', 'pinned'] },
+        { fields: ['community', 'pinned'] },
+      ],
+    }
+  );
 
   OffchainThread.associate = (models) => {
     models.OffchainThread.belongsTo(models.Chain, {
@@ -87,12 +115,12 @@ export default (
     });
     models.OffchainThread.belongsTo(models.OffchainCommunity, {
       foreignKey: 'community',
-      targetKey: 'id'
+      targetKey: 'id',
     });
     models.OffchainThread.belongsTo(models.Address, {
       as: 'Address',
       foreignKey: 'address_id',
-      targetKey: 'id'
+      targetKey: 'id',
     });
     models.OffchainThread.hasMany(models.OffchainAttachment, {
       foreignKey: 'attachment_id',
@@ -111,7 +139,7 @@ export default (
     });
     models.OffchainThread.belongsToMany(models.Address, {
       through: models.Collaboration,
-      as: 'collaborators'
+      as: 'collaborators',
     });
     models.OffchainThread.hasMany(models.Collaboration);
     models.OffchainThread.hasMany(models.ChainEntity, {

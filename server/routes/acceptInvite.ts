@@ -13,14 +13,19 @@ export const Errors = {
   CodeUpdateFailure: 'Failed to update invite code',
 };
 
-const acceptInvite = async (models, req: Request, res: Response, next: NextFunction) => {
+const acceptInvite = async (
+  models,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { inviteCode, address, reject } = req.body;
 
   const code = await models.InviteCode.findOne({
     where: {
       id: inviteCode,
       used: false,
-    }
+    },
   });
   if (!code) return next(new Error(Errors.NoInviteCodeFound(inviteCode)));
 
@@ -34,7 +39,7 @@ const acceptInvite = async (models, req: Request, res: Response, next: NextFunct
   const addressObj = await models.Address.findOne({
     where: {
       address,
-    }
+    },
   });
   if (!addressObj) return next(new Error(Errors.NoAddressFound(address)));
 
@@ -50,9 +55,10 @@ const acceptInvite = async (models, req: Request, res: Response, next: NextFunct
   const community = await models.OffchainCommunity.findOne({
     where: {
       id: code.community_id,
-    }
+    },
   });
-  if (!community) return next(new Error(Errors.NoCommunityFound(code.community_id)));
+  if (!community)
+    return next(new Error(Errors.NoCommunityFound(code.community_id)));
 
   const role = await models.Role.create({
     address_id: addressObj.id,
@@ -76,7 +82,11 @@ const acceptInvite = async (models, req: Request, res: Response, next: NextFunct
 
   return res.json({
     status: 'Success',
-    result: { updatedCode: updatedCode.toJSON(), role: role.toJSON(), subscription: subscription.toJSON() }
+    result: {
+      updatedCode: updatedCode.toJSON(),
+      role: role.toJSON(),
+      subscription: subscription.toJSON(),
+    },
   });
 };
 

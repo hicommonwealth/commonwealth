@@ -33,7 +33,7 @@ const sendResponse = (req, res, resp) => {
 export const successResponse = (obj = {}) => {
   return {
     statusCode: 200,
-    object: obj
+    object: obj,
   };
 };
 
@@ -42,8 +42,8 @@ export const successResponse = (obj = {}) => {
  */
 const errorResponse = (statusCode, message) => {
   return {
-    statusCode: statusCode,
-    object: { error: message }
+    statusCode,
+    object: { error: message },
   };
 };
 

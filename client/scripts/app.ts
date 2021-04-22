@@ -10,10 +10,21 @@ import moment from 'moment-twitter';
 import mixpanel from 'mixpanel-browser';
 
 import app, { ApiStatus, LoginState } from 'state';
-import { ChainInfo, CommunityInfo, NodeInfo, ChainNetwork, NotificationCategory, Notification } from 'models';
+import {
+  ChainInfo,
+  CommunityInfo,
+  NodeInfo,
+  ChainNetwork,
+  NotificationCategory,
+  Notification,
+} from 'models';
 import { WebsocketMessageType, IWebsocketsPayload } from 'types';
 
-import { notifyError, notifySuccess, notifyInfo } from 'controllers/app/notifications';
+import {
+  notifyError,
+  notifySuccess,
+  notifyInfo,
+} from 'controllers/app/notifications';
 import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
 import Community from 'controllers/chain/community/main';
 import WebsocketController from 'controllers/server/socket/index';
@@ -33,76 +44,97 @@ import(/* webpackPrefetch: true */ 'views/pages/view_proposal');
 // On logout: called to reset everything
 export async function initAppState(updateSelectedNode = true): Promise<void> {
   return new Promise((resolve, reject) => {
-    $.get(`${app.serverUrl()}/status`).then((data) => {
-      app.config.chains.clear();
-      app.config.nodes.clear();
-      app.config.communities.clear();
-      app.user.notifications.store.clear();
-      app.user.notifications.clearSubscriptions();
-      data.chains.filter((chain) => chain.active).map((chain) => app.config.chains.add(ChainInfo.fromJSON(chain)));
-      data.nodes.sort((a, b) => a.id - b.id).map((node) => {
-        return app.config.nodes.add(NodeInfo.fromJSON({
-          id: node.id,
-          url: node.url,
-          chain: app.config.chains.getById(node.chain),
-          address: node.address,
-        }));
+    $.get(`${app.serverUrl()}/status`)
+      .then((data) => {
+        app.config.chains.clear();
+        app.config.nodes.clear();
+        app.config.communities.clear();
+        app.user.notifications.store.clear();
+        app.user.notifications.clearSubscriptions();
+        data.chains
+          .filter((chain) => chain.active)
+          .map((chain) => app.config.chains.add(ChainInfo.fromJSON(chain)));
+        data.nodes
+          .sort((a, b) => a.id - b.id)
+          .map((node) => {
+            return app.config.nodes.add(
+              NodeInfo.fromJSON({
+                id: node.id,
+                url: node.url,
+                chain: app.config.chains.getById(node.chain),
+                address: node.address,
+              })
+            );
+          });
+        data.communities
+          .sort((a, b) => a.id - b.id)
+          .map((community) => {
+            return app.config.communities.add(
+              CommunityInfo.fromJSON({
+                id: community.id,
+                name: community.name,
+                description: community.description,
+                iconUrl: community.iconUrl,
+                website: community.website,
+                discord: community.discord,
+                element: community.element,
+                telegram: community.telegram,
+                github: community.github,
+                default_chain: app.config.chains.getById(
+                  community.default_chain
+                ),
+                visible: community.visible,
+                collapsed_on_homepage: community.collapsed_on_homepage,
+                invitesEnabled: community.invitesEnabled,
+                privacyEnabled: community.privacyEnabled,
+                featuredTopics: community.featured_topics,
+                topics: community.topics,
+              })
+            );
+          });
+        app.user.setRoles(data.roles);
+        // app.config.topics = data.topics.map((json) => OffchainTopic.fromJSON(json));
+        app.config.notificationCategories = data.notificationCategories.map(
+          (json) => NotificationCategory.fromJSON(json)
+        );
+        app.config.invites = data.invites;
+
+        // add recentActivity
+        const { recentThreads } = data;
+        Object.entries(recentThreads).forEach(([comm, count]) => {
+          app.recentActivity.setCommunityThreadCounts(comm, count);
+        });
+
+        // update the login status
+        updateActiveUser(data.user);
+        app.loginState = data.user ? LoginState.LoggedIn : LoginState.LoggedOut;
+        app.user.setStarredCommunities(
+          data.user ? data.user.starredCommunities : []
+        );
+
+        // update the selectedNode, unless we explicitly want to avoid
+        // changing the current state (e.g. when logging in through link_new_address_modal)
+        if (updateSelectedNode && data.user && data.user.selectedNode) {
+          app.user.setSelectedNode(NodeInfo.fromJSON(data.user.selectedNode));
+        }
+
+        // update whether we're on a custom domain
+        const host = document.location.host;
+        app.setIsCustomDomain(
+          app.config.chains.getAll().find((c) => c.customDomain === host) !==
+            undefined ||
+            app.config.communities
+              .getAll()
+              .find((c) => c.customDomain === host) !== undefined
+        );
+
+        resolve();
+      })
+      .catch((err: any) => {
+        app.loadingError =
+          err.responseJSON?.error || 'Error loading application state';
+        reject(err);
       });
-      data.communities.sort((a, b) => a.id - b.id).map((community) => {
-        return app.config.communities.add(CommunityInfo.fromJSON({
-          id: community.id,
-          name: community.name,
-          description: community.description,
-          iconUrl: community.iconUrl,
-          website: community.website,
-          discord: community.discord,
-          element: community.element,
-          telegram: community.telegram,
-          github: community.github,
-          default_chain: app.config.chains.getById(community.default_chain),
-          visible: community.visible,
-          collapsed_on_homepage: community.collapsed_on_homepage,
-          invitesEnabled: community.invitesEnabled,
-          privacyEnabled: community.privacyEnabled,
-          featuredTopics: community.featured_topics,
-          topics: community.topics,
-        }));
-      });
-      app.user.setRoles(data.roles);
-      // app.config.topics = data.topics.map((json) => OffchainTopic.fromJSON(json));
-      app.config.notificationCategories = data.notificationCategories
-        .map((json) => NotificationCategory.fromJSON(json));
-      app.config.invites = data.invites;
-
-      // add recentActivity
-      const { recentThreads } = data;
-      Object.entries(recentThreads).forEach(([comm, count]) => {
-        app.recentActivity.setCommunityThreadCounts(comm, count);
-      });
-
-      // update the login status
-      updateActiveUser(data.user);
-      app.loginState = data.user ? LoginState.LoggedIn : LoginState.LoggedOut;
-      app.user.setStarredCommunities(data.user ? data.user.starredCommunities : []);
-
-      // update the selectedNode, unless we explicitly want to avoid
-      // changing the current state (e.g. when logging in through link_new_address_modal)
-      if (updateSelectedNode && data.user && data.user.selectedNode) {
-        app.user.setSelectedNode(NodeInfo.fromJSON(data.user.selectedNode));
-      }
-
-      // update whether we're on a custom domain
-      const host = document.location.host;
-      app.setIsCustomDomain(
-        app.config.chains.getAll().find((c) => c.customDomain === host) !== undefined
-          || app.config.communities.getAll().find((c) => c.customDomain === host) !== undefined
-      );
-
-      resolve();
-    }).catch((err: any) => {
-      app.loadingError = err.responseJSON?.error || 'Error loading application state';
-      reject(err);
-    });
   });
 }
 
@@ -128,9 +160,12 @@ export function handleInviteLinkRedirect() {
   if (inviteMessage) {
     mixpanel.track('Invite Link Used', {
       'Step No': 1,
-      'Step': inviteMessage,
+      Step: inviteMessage,
     });
-    if (inviteMessage === 'failure' && m.route.param('message') === 'Must be logged in to accept invites') {
+    if (
+      inviteMessage === 'failure' &&
+      m.route.param('message') === 'Must be logged in to accept invites'
+    ) {
       notifyInfo('Log in to join a community with an invite link');
       app.modals.create({ modal: LoginModal });
     } else if (inviteMessage === 'failure') {
@@ -149,7 +184,7 @@ export function handleUpdateEmailConfirmation() {
   if (m.route.param('confirmation')) {
     mixpanel.track('Update Email Verification Redirect', {
       'Step No': 1,
-      'Step': m.route.param('confirmation'),
+      Step: m.route.param('confirmation'),
     });
     if (m.route.param('confirmation') === 'success') {
       notifySuccess('Email confirmed!');
@@ -189,7 +224,10 @@ export async function selectCommunity(c?: CommunityInfo): Promise<boolean> {
 // called by the user, when clicking on the chain/node switcher menu
 // returns a boolean reflecting whether initialization of chain via the
 // initChain fn ought to proceed or abort
-export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolean> {
+export async function selectNode(
+  n?: NodeInfo,
+  deferred = false
+): Promise<boolean> {
   // Select the default node, if one wasn't provided
   if (!n) {
     if (app.user.selectedNode) {
@@ -219,138 +257,182 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
   let newChain;
   let initApi; // required for NEAR
   if (n.chain.network === ChainNetwork.Edgeware) {
-    const Edgeware = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "edgeware-main" */
-      './controllers/chain/edgeware/main'
-    )).default;
+    const Edgeware = (
+      await import(
+        /* webpackMode: "lazy" */
+        /* webpackChunkName: "edgeware-main" */
+        './controllers/chain/edgeware/main'
+      )
+    ).default;
     newChain = new Edgeware(n, app);
   } else if (n.chain.network === ChainNetwork.Kusama) {
-    const Kusama = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "kusama-main" */
-      './controllers/chain/kusama/main'
-    )).default;
+    const Kusama = (
+      await import(
+        /* webpackMode: "lazy" */
+        /* webpackChunkName: "kusama-main" */
+        './controllers/chain/kusama/main'
+      )
+    ).default;
     newChain = new Kusama(n, app);
   } else if (n.chain.network === ChainNetwork.Polkadot) {
-    const Polkadot = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "kusama-main" */
-      './controllers/chain/polkadot/main'
-    )).default;
+    const Polkadot = (
+      await import(
+        /* webpackMode: "lazy" */
+        /* webpackChunkName: "kusama-main" */
+        './controllers/chain/polkadot/main'
+      )
+    ).default;
     newChain = new Polkadot(n, app);
   } else if (n.chain.network === ChainNetwork.Kulupu) {
-    const Kulupu = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "kulupu-main" */
-      './controllers/chain/kulupu/main'
-    )).default;
+    const Kulupu = (
+      await import(
+        /* webpackMode: "lazy" */
+        /* webpackChunkName: "kulupu-main" */
+        './controllers/chain/kulupu/main'
+      )
+    ).default;
     newChain = new Kulupu(n, app);
   } else if (n.chain.network === ChainNetwork.Plasm) {
-    const Plasm = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "plasm-main" */
-      './controllers/chain/plasm/main'
-    )).default;
+    const Plasm = (
+      await import(
+        /* webpackMode: "lazy" */
+        /* webpackChunkName: "plasm-main" */
+        './controllers/chain/plasm/main'
+      )
+    ).default;
     newChain = new Plasm(n, app);
   } else if (n.chain.network === ChainNetwork.Stafi) {
-    const Stafi = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "stafi-main" */
-      './controllers/chain/stafi/main'
-    )).default;
+    const Stafi = (
+      await import(
+        /* webpackMode: "lazy" */
+        /* webpackChunkName: "stafi-main" */
+        './controllers/chain/stafi/main'
+      )
+    ).default;
     newChain = new Stafi(n, app);
   } else if (n.chain.network === ChainNetwork.Darwinia) {
-    const Darwinia = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "darwinia-main" */
-      './controllers/chain/darwinia/main'
-    )).default;
+    const Darwinia = (
+      await import(
+        /* webpackMode: "lazy" */
+        /* webpackChunkName: "darwinia-main" */
+        './controllers/chain/darwinia/main'
+      )
+    ).default;
     newChain = new Darwinia(n, app);
   } else if (n.chain.network === ChainNetwork.Phala) {
-    const Phala = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "phala-main" */
-      './controllers/chain/phala/main'
-    )).default;
+    const Phala = (
+      await import(
+        /* webpackMode: "lazy" */
+        /* webpackChunkName: "phala-main" */
+        './controllers/chain/phala/main'
+      )
+    ).default;
     newChain = new Phala(n, app);
   } else if (n.chain.network === ChainNetwork.Centrifuge) {
-    const Centrifuge = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "centrifuge-main" */
-      './controllers/chain/centrifuge/main'
-    )).default;
+    const Centrifuge = (
+      await import(
+        /* webpackMode: "lazy" */
+        /* webpackChunkName: "centrifuge-main" */
+        './controllers/chain/centrifuge/main'
+      )
+    ).default;
     newChain = new Centrifuge(n, app);
   } else if (n.chain.network === ChainNetwork.Cosmos) {
-    const Cosmos = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "cosmos-main" */
-      './controllers/chain/cosmos/main'
-    )).default;
+    const Cosmos = (
+      await import(
+        /* webpackMode: "lazy" */
+        /* webpackChunkName: "cosmos-main" */
+        './controllers/chain/cosmos/main'
+      )
+    ).default;
     newChain = new Cosmos(n, app);
   } else if (n.chain.network === ChainNetwork.Straightedge) {
-    const Straightedge = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "straightedge-main" */
-      './controllers/chain/straightedge/main'
-    )).default;
+    const Straightedge = (
+      await import(
+        /* webpackMode: "lazy" */
+        /* webpackChunkName: "straightedge-main" */
+        './controllers/chain/straightedge/main'
+      )
+    ).default;
     newChain = new Straightedge(n, app);
   } else if (n.chain.network === ChainNetwork.Ethereum) {
-    const Ethereum = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "ethereum-main" */
-      './controllers/chain/ethereum/main'
-    )).default;
+    const Ethereum = (
+      await import(
+        /* webpackMode: "lazy" */
+        /* webpackChunkName: "ethereum-main" */
+        './controllers/chain/ethereum/main'
+      )
+    ).default;
     newChain = new Ethereum(n, app);
   } else if (n.chain.network === ChainNetwork.NEAR) {
-    const Near = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "near-main" */
-      './controllers/chain/near/main'
-    )).default;
+    const Near = (
+      await import(
+        /* webpackMode: "lazy" */
+        /* webpackChunkName: "near-main" */
+        './controllers/chain/near/main'
+      )
+    ).default;
     newChain = new Near(n, app);
     initApi = true;
   } else if (n.chain.network === ChainNetwork.Clover) {
-    const Clover = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "clover-main" */
-      './controllers/chain/clover/main'
-    )).default;
+    const Clover = (
+      await import(
+        /* webpackMode: "lazy" */
+        /* webpackChunkName: "clover-main" */
+        './controllers/chain/clover/main'
+      )
+    ).default;
     newChain = new Clover(n, app);
   } else if (n.chain.network === ChainNetwork.HydraDX) {
-    const HydraDX = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "hydradx-main" */
-      './controllers/chain/hydradx/main'
-    )).default;
+    const HydraDX = (
+      await import(
+        /* webpackMode: "lazy" */
+        /* webpackChunkName: "hydradx-main" */
+        './controllers/chain/hydradx/main'
+      )
+    ).default;
     newChain = new HydraDX(n, app);
-  } else if (n.chain.network === ChainNetwork.Moloch || n.chain.network === ChainNetwork.Metacartel) {
-    const Moloch = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "moloch-main" */
-      './controllers/chain/ethereum/moloch/adapter'
-    )).default;
+  } else if (
+    n.chain.network === ChainNetwork.Moloch ||
+    n.chain.network === ChainNetwork.Metacartel
+  ) {
+    const Moloch = (
+      await import(
+        /* webpackMode: "lazy" */
+        /* webpackChunkName: "moloch-main" */
+        './controllers/chain/ethereum/moloch/adapter'
+      )
+    ).default;
     newChain = new Moloch(n, app);
-  } else if (n.chain.network === ChainNetwork.Marlin || n.chain.network === ChainNetwork.MarlinTestnet) {
-    const Marlin = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "marlin-main" */
-      './controllers/chain/ethereum/marlin/adapter'
-    )).default;
+  } else if (
+    n.chain.network === ChainNetwork.Marlin ||
+    n.chain.network === ChainNetwork.MarlinTestnet
+  ) {
+    const Marlin = (
+      await import(
+        /* webpackMode: "lazy" */
+        /* webpackChunkName: "marlin-main" */
+        './controllers/chain/ethereum/marlin/adapter'
+      )
+    ).default;
     newChain = new Marlin(n, app);
   } else if ([ChainNetwork.ALEX].includes(n.chain.network)) {
-    const Token = (await import(
-    //   /* webpackMode: "lazy" */
-    //   /* webpackChunkName: "token-main" */
-      './controllers/chain/ethereum/token/adapter'
-    )).default;
+    const Token = (
+      await import(
+        //   /* webpackMode: "lazy" */
+        //   /* webpackChunkName: "token-main" */
+        './controllers/chain/ethereum/token/adapter'
+      )
+    ).default;
     newChain = new Token(n, app);
   } else if (n.chain.network === ChainNetwork.Commonwealth) {
-    const Commonwealth = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "commonwealth-main" */
-      './controllers/chain/ethereum/commonwealth/adapter'
-    )).default;
+    const Commonwealth = (
+      await import(
+        /* webpackMode: "lazy" */
+        /* webpackChunkName: "commonwealth-main" */
+        './controllers/chain/ethereum/commonwealth/adapter'
+      )
+    ).default;
     newChain = new Commonwealth(n, app);
   } else {
     throw new Error('Invalid chain');
@@ -380,7 +462,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
   if (app.isLoggedIn()) {
     await app.user.selectNode({
       url: n.url,
-      chain: n.chain.id
+      chain: n.chain.id,
     });
   }
 
@@ -463,20 +545,20 @@ document.ontouchmove = (event) => {
 // set up moment-twitter
 moment.updateLocale('en', {
   relativeTime: {
-    future : 'just now',
-    past   : '%s ago',
-    s  : (num, withoutSuffix) => withoutSuffix ? 'now' : 'seconds',
-    m  : '1 min',
-    mm : '%d min',
-    h  : '1 hour',
-    hh : '%d hours',
-    d  : '1 day',
-    dd : '%d days',
-    M  : '1 month',
-    MM : '%d months',
-    y  : '1 year',
-    yy : '%d years'
-  }
+    future: 'just now',
+    past: '%s ago',
+    s: (num, withoutSuffix) => (withoutSuffix ? 'now' : 'seconds'),
+    m: '1 min',
+    mm: '%d min',
+    h: '1 hour',
+    hh: '%d hours',
+    d: '1 day',
+    dd: '%d days',
+    M: '1 month',
+    MM: '%d months',
+    y: '1 year',
+    yy: '%d years',
+  },
 });
 
 $(() => {
@@ -486,7 +568,8 @@ $(() => {
   // replace chunk loading errors with a notification that the app has been updated
   const chunkLoadingErrRe = /^Uncaught SyntaxError: Unexpected token '<'/;
   window.onerror = (errorMsg, url, lineNumber, colNumber, error) => {
-    if (typeof errorMsg === 'string' && resizeObserverLoopErrRe.test(errorMsg)) return false;
+    if (typeof errorMsg === 'string' && resizeObserverLoopErrRe.test(errorMsg))
+      return false;
     if (typeof errorMsg === 'string' && chunkLoadingErrRe.test(errorMsg)) {
       alertModalWithText(
         'A new version of the application has been released. Please save your work and refresh.',
@@ -500,9 +583,13 @@ $(() => {
 
   const redirectRoute = (path: string | Function) => ({
     render: (vnode) => {
-      m.route.set((typeof path === 'string' ? path : path(vnode.attrs)), {}, { replace: true });
+      m.route.set(
+        typeof path === 'string' ? path : path(vnode.attrs),
+        {},
+        { replace: true }
+      );
       return m(LoadingLayout);
-    }
+    },
   });
 
   interface RouteAttrs {
@@ -526,9 +613,15 @@ $(() => {
       // handle custom domains, for routes that need special handling
       const host = document.location.host;
       if (redirectCustomDomain) {
-        const hasLoadedAll = app.config.chains.getAll().length !== 0 || app.config.communities.getAll().length !== 0;
-        const matchingChain = app.config.chains.getAll().find((c) => c.customDomain === host);
-        const matchingCommunity = app.config.communities.getAll().find((c) => c.customDomain === host);
+        const hasLoadedAll =
+          app.config.chains.getAll().length !== 0 ||
+          app.config.communities.getAll().length !== 0;
+        const matchingChain = app.config.chains
+          .getAll()
+          .find((c) => c.customDomain === host);
+        const matchingCommunity = app.config.communities
+          .getAll()
+          .find((c) => c.customDomain === host);
 
         // keep the page loading until chains & communities have been fetched
         if (!hasLoadedAll) return m(LoadingLayout);
@@ -546,91 +639,154 @@ $(() => {
 
       // normal render
       let deferChain = attrs.deferChain;
-      const scope = typeof scoped === 'string'
-        // string => scope is defined by route
-        ? scoped
-        : scoped
-          // true => scope is derived from path
-          ? vnode.attrs.scope.toString()
-          // false => scope is null
-          : null;
+      const scope =
+        typeof scoped === 'string'
+          ? // string => scope is defined by route
+            scoped
+          : scoped
+          ? // true => scope is derived from path
+            vnode.attrs.scope.toString()
+          : // false => scope is null
+            null;
       // Special case to defer chain loading specifically for viewing an offchain thread. We need
       // a special case because OffchainThreads and on-chain proposals are all viewed through the
       // same "/:scope/proposal/:type/:id" route.
-      if (vnode.attrs.scope && path === 'views/pages/view_proposal/index' && vnode.attrs.type === 'discussion') {
+      if (
+        vnode.attrs.scope &&
+        path === 'views/pages/view_proposal/index' &&
+        vnode.attrs.type === 'discussion'
+      ) {
         deferChain = true;
       }
       if (app.chain instanceof Token) deferChain = false;
-      return m(Layout, { scope, deferChain, hideSidebar }, [ vnode ]);
+      return m(Layout, { scope, deferChain, hideSidebar }, [vnode]);
     },
   });
 
   m.route(document.body, '/', {
     // Legacy redirects
-    '/unlock':                   redirectRoute('/edgeware/unlock'),
-    '/stats/edgeware':           redirectRoute('/edgeware/stats'),
-    '/home':                     redirectRoute(`/${app.activeId() || app.config.defaultChain}/`),
-    '/discussions':              redirectRoute(`/${app.activeId() || app.config.defaultChain}/`),
+    '/unlock': redirectRoute('/edgeware/unlock'),
+    '/stats/edgeware': redirectRoute('/edgeware/stats'),
+    '/home': redirectRoute(`/${app.activeId() || app.config.defaultChain}/`),
+    '/discussions': redirectRoute(
+      `/${app.activeId() || app.config.defaultChain}/`
+    ),
 
     // Landing pages
-    '/':                         importRoute('views/pages/home', { scoped: false, hideSidebar: true, redirectCustomDomain: true }),
-    '/about':                    importRoute('views/pages/landing/about', { scoped: false }),
-    '/terms':                    importRoute('views/pages/landing/terms', { scoped: false }),
-    '/privacy':                  importRoute('views/pages/landing/privacy', { scoped: false }),
-    '/components':               importRoute('views/pages/components', { scoped: false, hideSidebar: true }),
+    '/': importRoute('views/pages/home', {
+      scoped: false,
+      hideSidebar: true,
+      redirectCustomDomain: true,
+    }),
+    '/about': importRoute('views/pages/landing/about', { scoped: false }),
+    '/terms': importRoute('views/pages/landing/terms', { scoped: false }),
+    '/privacy': importRoute('views/pages/landing/privacy', { scoped: false }),
+    '/components': importRoute('views/pages/components', {
+      scoped: false,
+      hideSidebar: true,
+    }),
 
     // Login page
-    '/login':                    importRoute('views/pages/login', { scoped: false }),
-    '/settings':                 importRoute('views/pages/settings', { scoped: false }),
-    '/notifications':            redirectRoute(() => '/edgeware/notifications'),
-    '/:scope/notifications':     importRoute('views/pages/notifications', { scoped: true, deferChain: true }),
-    '/notificationsList':        redirectRoute(() => '/edgeware/notificationsList'),
-    '/:scope/notificationsList': importRoute('views/pages/notificationsList', { scoped: true, deferChain: true }),
+    '/login': importRoute('views/pages/login', { scoped: false }),
+    '/settings': importRoute('views/pages/settings', { scoped: false }),
+    '/notifications': redirectRoute(() => '/edgeware/notifications'),
+    '/:scope/notifications': importRoute('views/pages/notifications', {
+      scoped: true,
+      deferChain: true,
+    }),
+    '/notificationsList': redirectRoute(() => '/edgeware/notificationsList'),
+    '/:scope/notificationsList': importRoute('views/pages/notificationsList', {
+      scoped: true,
+      deferChain: true,
+    }),
 
     // Edgeware lockdrop
-    '/edgeware/unlock':          importRoute('views/pages/unlock_lockdrop', { scoped: false }),
-    '/edgeware/stats':           importRoute('views/stats/edgeware', { scoped: false }),
+    '/edgeware/unlock': importRoute('views/pages/unlock_lockdrop', {
+      scoped: false,
+    }),
+    '/edgeware/stats': importRoute('views/stats/edgeware', { scoped: false }),
 
     // Commonwealth protocol
-    '/:scope/projects':          importRoute('views/pages/commonwealth/projects', { scoped: true }),
+    '/:scope/projects': importRoute('views/pages/commonwealth/projects', {
+      scoped: true,
+    }),
     // '/:scope/backers':           importRoute('views/pages/commonwealth/backers', { scoped: true }),
-    '/:scope/collectives':       importRoute('views/pages/commonwealth/collectives', { scoped: true }),
+    '/:scope/collectives': importRoute('views/pages/commonwealth/collectives', {
+      scoped: true,
+    }),
 
     // Chain pages
-    '/:scope/home':              redirectRoute((attrs) => `/${attrs.scope}/`),
-    '/:scope/discussions':       redirectRoute((attrs) => `/${attrs.scope}/`),
+    '/:scope/home': redirectRoute((attrs) => `/${attrs.scope}/`),
+    '/:scope/discussions': redirectRoute((attrs) => `/${attrs.scope}/`),
 
-    '/:scope':                   importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
-    '/:scope/discussions/:topic': importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
-    '/:scope/search':            importRoute('views/pages/search', { scoped: true, deferChain: true }),
-    '/:scope/members':           importRoute('views/pages/members', { scoped: true, deferChain: true }),
-    '/:scope/chat':              importRoute('views/pages/chat', { scoped: true, deferChain: true }),
-    '/:scope/referenda':         importRoute('views/pages/referenda', { scoped: true }),
-    '/:scope/proposals':         importRoute('views/pages/proposals', { scoped: true }),
-    '/:scope/treasury':          importRoute('views/pages/treasury', { scoped: true }),
-    '/:scope/bounties':          importRoute('views/pages/bounties', { scoped: true }),
-    '/:scope/proposal/:type/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
-    '/:scope/council':           importRoute('views/pages/council', { scoped: true }),
-    '/:scope/delegate':          importRoute('views/pages/delegate', { scoped: true, }),
-    '/:scope/login':             importRoute('views/pages/login', { scoped: true, deferChain: true }),
-    '/:scope/new/thread':        importRoute('views/pages/new_thread', { scoped: true, deferChain: true }),
-    '/:scope/new/proposal/:type': importRoute('views/pages/new_proposal/index', { scoped: true }),
-    '/:scope/admin':             importRoute('views/pages/admin', { scoped: true }),
-    '/:scope/settings':          importRoute('views/pages/settings', { scoped: true }),
-    '/:scope/analytics':         importRoute('views/pages/stats', { scoped: true, deferChain: true }),
-    '/:scope/web3login':         importRoute('views/pages/web3login', { scoped: true }),
+    '/:scope': importRoute('views/pages/discussions', {
+      scoped: true,
+      deferChain: true,
+    }),
+    '/:scope/discussions/:topic': importRoute('views/pages/discussions', {
+      scoped: true,
+      deferChain: true,
+    }),
+    '/:scope/search': importRoute('views/pages/search', {
+      scoped: true,
+      deferChain: true,
+    }),
+    '/:scope/members': importRoute('views/pages/members', {
+      scoped: true,
+      deferChain: true,
+    }),
+    '/:scope/chat': importRoute('views/pages/chat', {
+      scoped: true,
+      deferChain: true,
+    }),
+    '/:scope/referenda': importRoute('views/pages/referenda', { scoped: true }),
+    '/:scope/proposals': importRoute('views/pages/proposals', { scoped: true }),
+    '/:scope/treasury': importRoute('views/pages/treasury', { scoped: true }),
+    '/:scope/bounties': importRoute('views/pages/bounties', { scoped: true }),
+    '/:scope/proposal/:type/:identifier': importRoute(
+      'views/pages/view_proposal/index',
+      { scoped: true }
+    ),
+    '/:scope/council': importRoute('views/pages/council', { scoped: true }),
+    '/:scope/delegate': importRoute('views/pages/delegate', { scoped: true }),
+    '/:scope/login': importRoute('views/pages/login', {
+      scoped: true,
+      deferChain: true,
+    }),
+    '/:scope/new/thread': importRoute('views/pages/new_thread', {
+      scoped: true,
+      deferChain: true,
+    }),
+    '/:scope/new/proposal/:type': importRoute(
+      'views/pages/new_proposal/index',
+      { scoped: true }
+    ),
+    '/:scope/admin': importRoute('views/pages/admin', { scoped: true }),
+    '/:scope/settings': importRoute('views/pages/settings', { scoped: true }),
+    '/:scope/analytics': importRoute('views/pages/stats', {
+      scoped: true,
+      deferChain: true,
+    }),
+    '/:scope/web3login': importRoute('views/pages/web3login', { scoped: true }),
 
-    '/:scope/account/:address':  importRoute('views/pages/profile', { scoped: true, deferChain: true }),
-    '/:scope/account':           redirectRoute((attrs) => {
-      return (app.user.activeAccount)
+    '/:scope/account/:address': importRoute('views/pages/profile', {
+      scoped: true,
+      deferChain: true,
+    }),
+    '/:scope/account': redirectRoute((attrs) => {
+      return app.user.activeAccount
         ? `/${attrs.scope}/account/${app.user.activeAccount.address}`
         : `/${attrs.scope}/`;
     }),
 
-    '/:scope/validators':        importRoute('views/pages/validators', { scoped: true }),
+    '/:scope/validators': importRoute('views/pages/validators', {
+      scoped: true,
+    }),
 
     // NEAR login
-    '/:scope/finishNearLogin':    importRoute('views/pages/finish_near_login', { scoped: true }),
+    '/:scope/finishNearLogin': importRoute('views/pages/finish_near_login', {
+      scoped: true,
+    }),
   });
 
   // initialize construct-ui focus manager
@@ -639,7 +795,10 @@ $(() => {
   // initialize mixpanel, before adding an alias or tracking identity
   try {
     mixpanel.init('32c32e2c81e63e65dcdd98dc7d2c6811');
-    if (document.location.host.startsWith('localhost') || document.location.host.startsWith('127.0.0.1')) {
+    if (
+      document.location.host.startsWith('localhost') ||
+      document.location.host.startsWith('127.0.0.1')
+    ) {
       mixpanel.disable();
     }
   } catch (e) {
@@ -647,8 +806,12 @@ $(() => {
   }
 
   // handle login redirects
-  if (m.route.param('loggedin') && m.route.param('loggedin').toString() === 'true'
-      && m.route.param('path') && !m.route.param('path').startsWith('/login')) {
+  if (
+    m.route.param('loggedin') &&
+    m.route.param('loggedin').toString() === 'true' &&
+    m.route.param('path') &&
+    !m.route.param('path').startsWith('/login')
+  ) {
     // (we call toString() because m.route.param() returns booleans, even though the types don't reflect this)
     // handle param-based redirect after email login
 
@@ -659,7 +822,7 @@ $(() => {
       console.log('creating account');
       mixpanel.track('Account Creation', {
         'Step No': 1,
-        'Step': 'Add Email'
+        Step: 'Add Email',
       });
       try {
         mixpanel.alias(m.route.param('email').toString());
@@ -670,16 +833,22 @@ $(() => {
     } else {
       console.log('logging in account');
       mixpanel.track('Logged In', {
-        Step: 'Email'
+        Step: 'Email',
       });
       mixpanel.identify(app.user.email);
     }
     m.route.set(m.route.param('path'), {}, { replace: true });
-  } else if (localStorage && localStorage.getItem && localStorage.getItem('githubPostAuthRedirect')) {
+  } else if (
+    localStorage &&
+    localStorage.getItem &&
+    localStorage.getItem('githubPostAuthRedirect')
+  ) {
     // handle localStorage-based redirect after Github login (callback must occur within 30 seconds)
     try {
-      const postAuth = JSON.parse(localStorage.getItem('githubPostAuthRedirect'));
-      if (postAuth.path && (+new Date() - postAuth.timestamp < 30 * 1000)) {
+      const postAuth = JSON.parse(
+        localStorage.getItem('githubPostAuthRedirect')
+      );
+      if (postAuth.path && +new Date() - postAuth.timestamp < 30 * 1000) {
         m.route.set(postAuth.path, {}, { replace: true });
       }
       localStorage.removeItem('githubPostAuthRedirect');
@@ -695,56 +864,64 @@ $(() => {
   }
 
   // initialize the app
-  initAppState().then(() => {
-    // setup notifications and websocket if not already set up
-    if (!app.socket) {
-      let jwt;
-      // refresh notifications once
-      if (app.loginState === LoginState.LoggedIn) {
-        app.user.notifications.refresh().then(() => m.redraw());
-        jwt = app.user.jwt;
-      }
-      // grab discussion drafts
-      if (app.loginState === LoginState.LoggedIn) {
-        app.user.discussionDrafts.refreshAll().then(() => m.redraw());
-      }
+  initAppState()
+    .then(() => {
+      // setup notifications and websocket if not already set up
+      if (!app.socket) {
+        let jwt;
+        // refresh notifications once
+        if (app.loginState === LoginState.LoggedIn) {
+          app.user.notifications.refresh().then(() => m.redraw());
+          jwt = app.user.jwt;
+        }
+        // grab discussion drafts
+        if (app.loginState === LoginState.LoggedIn) {
+          app.user.discussionDrafts.refreshAll().then(() => m.redraw());
+        }
 
-      handleInviteLinkRedirect();
+        handleInviteLinkRedirect();
 
-      // If the user updates their email
-      handleUpdateEmailConfirmation();
+        // If the user updates their email
+        handleUpdateEmailConfirmation();
 
-      // subscribe to notifications
-      const wsUrl = document.location.origin
-        .replace('http://', 'ws://')
-        .replace('https://', 'wss://');
-      app.socket = new WebsocketController(wsUrl, jwt, null);
-      if (app.loginState === LoginState.LoggedIn) {
-        app.socket.addListener(
-          WebsocketMessageType.Notification,
-          (payload: IWebsocketsPayload<any>) => {
-            if (payload.data && payload.data.subscription_id) {
-              const subscription = app.user.notifications.subscriptions.find(
-                (sub) => sub.id === payload.data.subscription_id
-              );
-              // note that payload.data should have the correct JSON form
-              if (subscription) {
-                console.log('adding new notification from websocket:', payload.data);
-                const notification = Notification.fromJSON(payload.data, subscription);
-                app.user.notifications.update(notification);
-                m.redraw();
+        // subscribe to notifications
+        const wsUrl = document.location.origin
+          .replace('http://', 'ws://')
+          .replace('https://', 'wss://');
+        app.socket = new WebsocketController(wsUrl, jwt, null);
+        if (app.loginState === LoginState.LoggedIn) {
+          app.socket.addListener(
+            WebsocketMessageType.Notification,
+            (payload: IWebsocketsPayload<any>) => {
+              if (payload.data && payload.data.subscription_id) {
+                const subscription = app.user.notifications.subscriptions.find(
+                  (sub) => sub.id === payload.data.subscription_id
+                );
+                // note that payload.data should have the correct JSON form
+                if (subscription) {
+                  console.log(
+                    'adding new notification from websocket:',
+                    payload.data
+                  );
+                  const notification = Notification.fromJSON(
+                    payload.data,
+                    subscription
+                  );
+                  app.user.notifications.update(notification);
+                  m.redraw();
+                }
+              } else {
+                console.error('got invalid notification payload:', payload);
               }
-            } else {
-              console.error('got invalid notification payload:', payload);
             }
-          },
-        );
+          );
+        }
       }
-    }
-    m.redraw();
-  }).catch((err) => {
-    m.redraw();
-  });
+      m.redraw();
+    })
+    .catch((err) => {
+      m.redraw();
+    });
 });
 
 // /////////////////////////////////////////////////////////

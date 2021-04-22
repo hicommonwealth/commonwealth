@@ -53,7 +53,9 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
   }
 
   private _app: IApp;
-  public get app() { return this._app; }
+  public get app() {
+    return this._app;
+  }
 
   constructor(app: IApp, addressPrefix: string) {
     this._app = app;
@@ -76,14 +78,28 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     // on its own, so you need to configure a reverse-proxy server (I did it with nginx)
     // that forwards the requests to it, and adds the header 'Access-Control-Allow-Origin: *'
     /* eslint-disable prefer-template */
-    const wsUrl = (node.url.indexOf('localhost') !== -1 || node.url.indexOf('127.0.0.1') !== -1)
-      ? ('ws://' + node.url.replace('ws://', '').replace('wss://', '').split(':')[0] + ':26657/websocket')
-      : ('wss://' + node.url.replace('ws://', '').replace('wss://', '').split(':')[0] + ':36657/websocket');
-    const restUrl = (node.url.indexOf('localhost') !== -1 || node.url.indexOf('127.0.0.1') !== -1)
-      ? ('http://' + node.url.replace('ws://', '').replace('wss://', '').split(':')[0] + ':1318')
-      : ('https://' + node.url.replace('ws://', '').replace('wss://', '').split(':')[0] + ':1318');
+    const wsUrl =
+      node.url.indexOf('localhost') !== -1 ||
+      node.url.indexOf('127.0.0.1') !== -1
+        ? 'ws://' +
+          node.url.replace('ws://', '').replace('wss://', '').split(':')[0] +
+          ':26657/websocket'
+        : 'wss://' +
+          node.url.replace('ws://', '').replace('wss://', '').split(':')[0] +
+          ':36657/websocket';
+    const restUrl =
+      node.url.indexOf('localhost') !== -1 ||
+      node.url.indexOf('127.0.0.1') !== -1
+        ? 'http://' +
+          node.url.replace('ws://', '').replace('wss://', '').split(':')[0] +
+          ':1318'
+        : 'https://' +
+          node.url.replace('ws://', '').replace('wss://', '').split(':')[0] +
+          ':1318';
 
-    console.log(`Starting Tendermint REST API at ${restUrl} and Websocket API on ${wsUrl}...`);
+    console.log(
+      `Starting Tendermint REST API at ${restUrl} and Websocket API on ${wsUrl}...`
+    );
 
     this._api = new CosmosApi(wsUrl, restUrl);
     if (this.app.chain.networkStatus === ApiStatus.Disconnected) {
@@ -98,7 +114,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     const { bonded_tokens } = await this._api.query.pool();
     this._staked = +bonded_tokens;
     const { bond_denom } = await this._api.query.stakingParameters();
-    this._denom = bond_denom;          // uatom
+    this._denom = bond_denom; // uatom
     this._chainId = this._api.chainId; // cosmoshub-2
     m.redraw();
   }
@@ -113,7 +129,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     txFunc,
     txName: string,
     objName: string,
-    cb?: (success: boolean) => void,
+    cb?: (success: boolean) => void
   ): ITXModalData {
     const events = new EventEmitter();
     return {
@@ -123,9 +139,14 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       txData: {
         events,
         unsignedData: async (): Promise<ICosmosTXData> => {
-          const { cmdData: { messageToSign, chainId, accountNumber, gas, sequence } } = await txFunc();
+          const {
+            cmdData: { messageToSign, chainId, accountNumber, gas, sequence },
+          } = await txFunc();
           return {
-            call: JSON.stringify({ type: 'cosmos-sdk/StdTx', value: messageToSign }),
+            call: JSON.stringify({
+              type: 'cosmos-sdk/StdTx',
+              value: messageToSign,
+            }),
             chainId,
             gas,
             accountNumber,
@@ -144,28 +165,33 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
             signer = (author as CosmosAccount).getLedgerSigner();
           }
           // perform transaction and coerce into compatible observable
-          txFunc(computedGas).then(({ msg, memo, cmdData: { gas } }) => {
-            return msg.send({ gas: `${gas}`, memo }, signer);
-          }).then(({ hash, sequence, included }) => {
-            events.emit(TransactionStatus.Ready.toString(), { hash });
-            // wait for transaction to process
-            return included();
-          }).then((txObj) => {
-            // TODO: is this necessarily success or can it fail?
-            console.log(txObj);
-            // TODO: add gas wanted/gas used to the modal?
-            events.emit(TransactionStatus.Success.toString(), {
-              blocknum: +txObj.height,
-              timestamp: moment(txObj.timestamp),
-              hash: '--', // TODO: fetch the hash value of the block rather than the tx
-            });
-          })
+          txFunc(computedGas)
+            .then(({ msg, memo, cmdData: { gas } }) => {
+              return msg.send({ gas: `${gas}`, memo }, signer);
+            })
+            .then(({ hash, sequence, included }) => {
+              events.emit(TransactionStatus.Ready.toString(), { hash });
+              // wait for transaction to process
+              return included();
+            })
+            .then((txObj) => {
+              // TODO: is this necessarily success or can it fail?
+              console.log(txObj);
+              // TODO: add gas wanted/gas used to the modal?
+              events.emit(TransactionStatus.Success.toString(), {
+                blocknum: +txObj.height,
+                timestamp: moment(txObj.timestamp),
+                hash: '--', // TODO: fetch the hash value of the block rather than the tx
+              });
+            })
             .catch((err) => {
               console.error(err);
-              events.emit(TransactionStatus.Error.toString(), { err: err.message });
+              events.emit(TransactionStatus.Error.toString(), {
+                err: err.message,
+              });
             });
         },
-      }
+      },
     };
   }
 }

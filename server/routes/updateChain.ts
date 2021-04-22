@@ -18,7 +18,12 @@ export const Errors = {
   InvalidCustomDomain: 'Custom domain may not include "commonwealth"',
 };
 
-const updateChain = async (models, req: Request, res: Response, next: NextFunction) => {
+const updateChain = async (
+  models,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { Op } = models.sequelize;
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   if (!req.body.id) return next(new Error(Errors.NoChainId));
@@ -27,7 +32,10 @@ const updateChain = async (models, req: Request, res: Response, next: NextFuncti
   const chain = await models.Chain.findOne({ where: { id: req.body.id } });
   if (!chain) return next(new Error(Errors.NoChainFound));
   else {
-    const userAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
+    const userAddressIds = await req.user
+      .getAddresses()
+      .filter((addr) => !!addr.verified)
+      .map((addr) => addr.id);
     const userMembership = await models.Role.findOne({
       where: {
         address_id: { [Op.in]: userAddressIds },
@@ -40,7 +48,20 @@ const updateChain = async (models, req: Request, res: Response, next: NextFuncti
     }
   }
 
-  const { active, icon_url, symbol, type, name, description, website, discord, element, telegram, github, customDomain } = req.body;
+  const {
+    active,
+    icon_url,
+    symbol,
+    type,
+    name,
+    description,
+    website,
+    discord,
+    element,
+    telegram,
+    github,
+    customDomain,
+  } = req.body;
 
   if (website && !urlHasValidHTTPPrefix(website)) {
     return next(new Error(Errors.InvalidWebsite));
@@ -68,7 +89,8 @@ const updateChain = async (models, req: Request, res: Response, next: NextFuncti
   chain.telegram = telegram;
   chain.github = github;
   chain.customDomain = customDomain;
-  if (req.body['featured_topics[]']) chain.featured_topics = req.body['featured_topics[]'];
+  if (req.body['featured_topics[]'])
+    chain.featured_topics = req.body['featured_topics[]'];
 
   await chain.save();
 

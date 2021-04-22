@@ -15,7 +15,13 @@ export class ContractItem {
     this.category = category;
   }
   public static fromJSON(json) {
-    return new ContractItem(json.name, json.description, json.id, json.color, json.category);
+    return new ContractItem(
+      json.name,
+      json.description,
+      json.id,
+      json.color,
+      json.category
+    );
   }
 }
 

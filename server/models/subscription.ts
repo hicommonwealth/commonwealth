@@ -7,10 +7,16 @@ import { UserAttributes } from './user';
 import { NotificationCategoryAttributes } from './notification_category';
 import { NotificationAttributes } from './notification';
 import {
-  WebsocketMessageType, IWebsocketsPayload,
-  IPostNotificationData, ICommunityNotificationData, IChainEventNotificationData
+  WebsocketMessageType,
+  IWebsocketsPayload,
+  IPostNotificationData,
+  ICommunityNotificationData,
+  IChainEventNotificationData,
 } from '../../shared/types';
-import { createImmediateNotificationEmailObject, sendImmediateNotificationEmail } from '../scripts/emails';
+import {
+  createImmediateNotificationEmailObject,
+  sendImmediateNotificationEmail,
+} from '../scripts/emails';
 import { factory, formatFilename } from '../../shared/logging';
 import { ChainAttributes } from './chain';
 import { OffchainCommunityAttributes } from './offchain_community';
@@ -51,34 +57,46 @@ export interface SubscriptionAttributes {
 }
 
 export interface SubscriptionInstance
-extends Sequelize.Instance<SubscriptionAttributes>, SubscriptionAttributes {
-
-}
+  extends Sequelize.Instance<SubscriptionAttributes>,
+    SubscriptionAttributes {}
 
 export interface SubscriptionModel
-extends Sequelize.Model<SubscriptionInstance, SubscriptionAttributes> {
+  extends Sequelize.Model<SubscriptionInstance, SubscriptionAttributes> {
   emitNotifications?: any;
 }
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
+  dataTypes: Sequelize.DataTypes
 ): SubscriptionModel => {
-  const Subscription: SubscriptionModel = sequelize.define<SubscriptionInstance, SubscriptionAttributes>(
-    'Subscription', {
+  const Subscription: SubscriptionModel = sequelize.define<
+    SubscriptionInstance,
+    SubscriptionAttributes
+  >(
+    'Subscription',
+    {
       id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
       subscriber_id: { type: dataTypes.INTEGER, allowNull: false },
       category_id: { type: dataTypes.STRING, allowNull: false },
       object_id: { type: dataTypes.STRING, allowNull: false },
-      is_active: { type: dataTypes.BOOLEAN, defaultValue: true, allowNull: false },
-      immediate_email: { type: dataTypes.BOOLEAN, defaultValue: false, allowNull: false },
+      is_active: {
+        type: dataTypes.BOOLEAN,
+        defaultValue: true,
+        allowNull: false,
+      },
+      immediate_email: {
+        type: dataTypes.BOOLEAN,
+        defaultValue: false,
+        allowNull: false,
+      },
       chain_id: { type: dataTypes.STRING, allowNull: true },
       community_id: { type: dataTypes.STRING, allowNull: true },
       offchain_thread_id: { type: dataTypes.INTEGER, allowNull: true },
       offchain_comment_id: { type: dataTypes.INTEGER, allowNull: true },
       chain_event_type_id: { type: dataTypes.STRING, allowNull: true },
       chain_entity_id: { type: dataTypes.INTEGER, allowNull: true },
-    }, {
+    },
+    {
       underscored: true,
       indexes: [
         { fields: ['subscriber_id'] },
@@ -91,29 +109,33 @@ export default (
     models,
     category_id: string,
     object_id: string,
-    notification_data: IPostNotificationData | ICommunityNotificationData | IChainEventNotificationData,
+    notification_data:
+      | IPostNotificationData
+      | ICommunityNotificationData
+      | IChainEventNotificationData,
     webhook_data?: WebhookContent,
     wss?: WebSocket.Server,
     excludeAddresses?: string[],
-    includeAddresses?: string[],
+    includeAddresses?: string[]
   ) => {
     // get subscribers to send notifications to
     const findOptions: any = {
-      [Op.and]: [
-        { category_id },
-        { object_id },
-        { is_active: true },
-      ],
+      [Op.and]: [{ category_id }, { object_id }, { is_active: true }],
     };
 
     // typeguard function to differentiate between chain event notifications as needed
     const isChainEventData = (
-      n: IPostNotificationData | ICommunityNotificationData | IChainEventNotificationData
+      n:
+        | IPostNotificationData
+        | ICommunityNotificationData
+        | IChainEventNotificationData
     ): n is IChainEventNotificationData => {
       return (n as IChainEventNotificationData).chainEvent !== undefined;
     };
 
-    const fetchUsersFromAddresses = async (addresses: string[]): Promise<number[]> => {
+    const fetchUsersFromAddresses = async (
+      addresses: string[]
+    ): Promise<number[]> => {
       // fetch user ids from address models
       const addressModels = await models.Address.findAll({
         where: {
@@ -146,45 +168,57 @@ export default (
       }
     }
 
-    const subscribers = await models.Subscription.findAll({ where: findOptions });
+    const subscribers = await models.Subscription.findAll({
+      where: findOptions,
+    });
     // create notifications (data should always exist, but we check anyway)
     if (!notification_data) {
-      log.info('Subscription is missing notification data, will not trigger send emails or webhooks');
+      log.info(
+        'Subscription is missing notification data, will not trigger send emails or webhooks'
+      );
       return [];
     }
 
     let msg;
     try {
-      msg = await createImmediateNotificationEmailObject(notification_data, category_id, models);
+      msg = await createImmediateNotificationEmailObject(
+        notification_data,
+        category_id,
+        models
+      );
     } catch (e) {
       console.log('Error generating immediate notification email!');
       console.trace(e);
     }
 
-    const notifications = await Promise.all(subscribers.map(async (subscription) => {
-      const notification = await models.Notification.create(
-        isChainEventData(notification_data)
-          ? {
-            subscription_id: subscription.id,
-            notification_data: '',
-            chain_event_id: notification_data.chainEvent.id
-          } : {
-            subscription_id: subscription.id,
-            notification_data: JSON.stringify(notification_data)
-          }
-      );
-      if (msg && isChainEventData(notification_data)) {
-        msg.dynamic_template_data.notification.path = `${SERVER_URL}/${notification_data.chainEventType.chain}/notificationsList?id=${notification.id}`;
-      }
-      if (msg && subscription.immediate_email) sendImmediateNotificationEmail(subscription, msg);
-      return notification;
-    }));
+    const notifications = await Promise.all(
+      subscribers.map(async (subscription) => {
+        const notification = await models.Notification.create(
+          isChainEventData(notification_data)
+            ? {
+                subscription_id: subscription.id,
+                notification_data: '',
+                chain_event_id: notification_data.chainEvent.id,
+              }
+            : {
+                subscription_id: subscription.id,
+                notification_data: JSON.stringify(notification_data),
+              }
+        );
+        if (msg && isChainEventData(notification_data)) {
+          msg.dynamic_template_data.notification.path = `${SERVER_URL}/${notification_data.chainEventType.chain}/notificationsList?id=${notification.id}`;
+        }
+        if (msg && subscription.immediate_email)
+          sendImmediateNotificationEmail(subscription, msg);
+        return notification;
+      })
+    );
 
     // send data to relevant webhooks
     if (webhook_data) {
       await send(models, {
         notificationCategory: category_id,
-        ...webhook_data
+        ...webhook_data,
       });
     }
 
@@ -216,15 +250,39 @@ export default (
   };
 
   Subscription.associate = (models) => {
-    models.Subscription.belongsTo(models.User, { foreignKey: 'subscriber_id', targetKey: 'id' });
-    models.Subscription.belongsTo(models.NotificationCategory, { foreignKey: 'category_id', targetKey: 'name' });
+    models.Subscription.belongsTo(models.User, {
+      foreignKey: 'subscriber_id',
+      targetKey: 'id',
+    });
+    models.Subscription.belongsTo(models.NotificationCategory, {
+      foreignKey: 'category_id',
+      targetKey: 'name',
+    });
     models.Subscription.hasMany(models.Notification, { onDelete: 'cascade' });
-    models.Subscription.belongsTo(models.Chain, { foreignKey: 'chain_id', targetKey: 'id' });
-    models.Subscription.belongsTo(models.OffchainCommunity, { foreignKey: 'community_id', targetKey: 'id' });
-    models.Subscription.belongsTo(models.OffchainThread, { foreignKey: 'offchain_thread_id', targetKey: 'id' });
-    models.Subscription.belongsTo(models.OffchainComment, { foreignKey: 'offchain_comment_id', targetKey: 'id' });
-    models.Subscription.belongsTo(models.ChainEventType, { foreignKey: 'chain_event_type_id', targetKey: 'id' });
-    models.Subscription.belongsTo(models.ChainEntity, { foreignKey: 'chain_entity_id', targetKey: 'id' });
+    models.Subscription.belongsTo(models.Chain, {
+      foreignKey: 'chain_id',
+      targetKey: 'id',
+    });
+    models.Subscription.belongsTo(models.OffchainCommunity, {
+      foreignKey: 'community_id',
+      targetKey: 'id',
+    });
+    models.Subscription.belongsTo(models.OffchainThread, {
+      foreignKey: 'offchain_thread_id',
+      targetKey: 'id',
+    });
+    models.Subscription.belongsTo(models.OffchainComment, {
+      foreignKey: 'offchain_comment_id',
+      targetKey: 'id',
+    });
+    models.Subscription.belongsTo(models.ChainEventType, {
+      foreignKey: 'chain_event_type_id',
+      targetKey: 'id',
+    });
+    models.Subscription.belongsTo(models.ChainEntity, {
+      foreignKey: 'chain_entity_id',
+      targetKey: 'id',
+    });
   };
 
   return Subscription;

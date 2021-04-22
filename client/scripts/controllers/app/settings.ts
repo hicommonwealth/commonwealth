@@ -11,14 +11,16 @@ class SettingsController {
         jwt: app.user.jwt,
         key: 'disableRichText',
         value: value ? 'true' : 'false',
-      }).then((result) => {
-        app.user.setDisableRichText(value);
-        resolve();
-      }).catch((e) => {
-        console.error(e);
-        notifyError('Could not update setting');
-        reject(e);
-      });
+      })
+        .then((result) => {
+          app.user.setDisableRichText(value);
+          resolve();
+        })
+        .catch((e) => {
+          console.error(e);
+          notifyError('Could not update setting');
+          reject(e);
+        });
     });
   }
 }

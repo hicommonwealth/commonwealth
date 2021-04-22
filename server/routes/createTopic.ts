@@ -9,13 +9,22 @@ export const Errors = {
 
 const createTopic = async (models, req, res: Response, next: NextFunction) => {
   const { Op } = models.sequelize;
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  const [chain, community, error] = await lookupCommunityIsVisibleToUser(
+    models,
+    req.body,
+    req.user
+  );
   if (error) return next(new Error(error));
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   if (!req.body.name) return next(new Error(Errors.TopicRequired));
 
-  const chainOrCommObj = community ? { offchain_community_id: community.id } : { chain_id: chain.id };
-  const userAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
+  const chainOrCommObj = community
+    ? { offchain_community_id: community.id }
+    : { chain_id: chain.id };
+  const userAddressIds = await req.user
+    .getAddresses()
+    .filter((addr) => !!addr.verified)
+    .map((addr) => addr.id);
   const adminRoles = await models.Role.findAll({
     where: {
       address_id: { [Op.in]: userAddressIds },
@@ -27,7 +36,9 @@ const createTopic = async (models, req, res: Response, next: NextFunction) => {
     return next(new Error(Errors.MustBeAdmin));
   }
 
-  const chainOrCommObj2 = community ? { community_id: community.id } : { chain_id: chain.id };
+  const chainOrCommObj2 = community
+    ? { community_id: community.id }
+    : { chain_id: chain.id };
 
   const options = {
     name: req.body.name,

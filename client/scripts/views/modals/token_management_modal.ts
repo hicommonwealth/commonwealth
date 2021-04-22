@@ -35,8 +35,11 @@ const TokenManagementModal: m.Component<IAttrs, IState> = {
     vnode.state.toggleValue = 'approve';
     Promise.all([
       vnode.attrs.account.tokenBalance(vnode.attrs.tokenAddress),
-      vnode.attrs.account.tokenAllowance(vnode.attrs.tokenAddress, vnode.attrs.contractAddress),
-    ]).then(([ tokensAvailable, tokensAllocated ]) => {
+      vnode.attrs.account.tokenAllowance(
+        vnode.attrs.tokenAddress,
+        vnode.attrs.contractAddress
+      ),
+    ]).then(([tokensAvailable, tokensAllocated]) => {
       vnode.state.tokensAvailable = tokensAvailable.toString();
       vnode.state.tokensAllocatedToContract = tokensAllocated.toString();
       m.redraw();
@@ -47,7 +50,10 @@ const TokenManagementModal: m.Component<IAttrs, IState> = {
     if (vnode.state.toggleValue === 'approve') {
       content.push(
         m(FormGroup, [
-          m(FormLabel, 'Amount of token to approve (If you want to become a DAO member, you must allow it to handle some of your tokens)'),
+          m(
+            FormLabel,
+            'Amount of token to approve (If you want to become a DAO member, you must allow it to handle some of your tokens)'
+          ),
           m(Input, {
             defaultValue: vnode.state.tokenAmount,
             oncreate: (vvnode) => {
@@ -57,12 +63,17 @@ const TokenManagementModal: m.Component<IAttrs, IState> = {
               const result = (e.target as any).value;
               vnode.state.tokenAmount = result.toString();
               m.redraw(); // TODO: comment why this is needed?
-            }
-          })
+            },
+          }),
         ]),
-        m('.token-data-label', [ `Moloch contract address: ${vnode.attrs.contractAddress}` ]),
-        m('.token-data-label',
-          [ `ERC20 Tokens allocated to contract: ${vnode.state.tokensAllocatedToContract || '--'}` ]),
+        m('.token-data-label', [
+          `Moloch contract address: ${vnode.attrs.contractAddress}`,
+        ]),
+        m('.token-data-label', [
+          `ERC20 Tokens allocated to contract: ${
+            vnode.state.tokensAllocatedToContract || '--'
+          }`,
+        ])
       );
     } else if (vnode.state.toggleValue === 'transfer') {
       content.push(
@@ -100,19 +111,28 @@ const TokenManagementModal: m.Component<IAttrs, IState> = {
               const result = (e.target as any).value;
               vnode.state.tokenAmount = result.toString();
               m.redraw(); // TODO: comment why this is necessary?
-            }
-          })
+            },
+          }),
         ]),
-        m('.token-data-label', [ `Recipient holdings: ${vnode.state.recipientHoldings || '--'}` ]),
+        m('.token-data-label', [
+          `Recipient holdings: ${vnode.state.recipientHoldings || '--'}`,
+        ])
       );
     } else {
       throw new Error(`unknown toggle value: ${vnode.state.toggleValue}`);
     }
     return m('.TokenManagementModal', [
-      m('.header', vnode.state.toggleValue === 'approve' ? 'Approve' : 'Transfer'),
+      m(
+        '.header',
+        vnode.state.toggleValue === 'approve' ? 'Approve' : 'Transfer'
+      ),
       m('.compact-modal-body', [
-        m('.token-data-label', [ `ERC20 contract address: ${vnode.attrs.tokenAddress}` ]),
-        m('.token-data-label', [ `Your ERC20 holdings: ${vnode.state.tokensAvailable || '--'}` ]),
+        m('.token-data-label', [
+          `ERC20 contract address: ${vnode.attrs.tokenAddress}`,
+        ]),
+        m('.token-data-label', [
+          `Your ERC20 holdings: ${vnode.state.tokensAvailable || '--'}`,
+        ]),
         m(RadioSelectorFormField, {
           callback: (value: ToggleAction) => {
             vnode.state.toggleValue = value;
@@ -131,22 +151,33 @@ const TokenManagementModal: m.Component<IAttrs, IState> = {
           disabled: !vnode.state.tokensAvailable || !vnode.state.tokenAmount,
           onclick: (e) => {
             e.preventDefault();
-            const tokens = new ERC20Token(vnode.attrs.tokenAddress, new BN(vnode.state.tokenAmount));
-            if ((new BN(vnode.state.tokensAvailable, 10)).lt(tokens)) {
+            const tokens = new ERC20Token(
+              vnode.attrs.tokenAddress,
+              new BN(vnode.state.tokenAmount)
+            );
+            if (new BN(vnode.state.tokensAvailable, 10).lt(tokens)) {
               vnode.state.error = 'Insufficent token holdings';
               return;
             }
             let txP;
             if (vnode.state.toggleValue === 'approve') {
-              txP = vnode.attrs.account.approveTokenTx(tokens, vnode.attrs.contractAddress);
+              txP = vnode.attrs.account.approveTokenTx(
+                tokens,
+                vnode.attrs.contractAddress
+              );
             } else if (vnode.state.toggleValue === 'transfer') {
               if (!Web3.utils.isAddress(vnode.state.recipient)) {
                 vnode.state.error = 'Recipient address invalid.';
                 return;
               }
-              txP = vnode.attrs.account.sendTokenTx(tokens, vnode.state.recipient);
+              txP = vnode.attrs.account.sendTokenTx(
+                tokens,
+                vnode.state.recipient
+              );
             } else {
-              throw new Error(`Unknown toggle value: ${vnode.state.toggleValue}.`);
+              throw new Error(
+                `Unknown toggle value: ${vnode.state.toggleValue}.`
+              );
             }
             txP
               .then((result) => {
@@ -163,7 +194,7 @@ const TokenManagementModal: m.Component<IAttrs, IState> = {
         vnode.state.error && m('.error', vnode.state.error),
       ]),
     ]);
-  }
+  },
 };
 
 export default TokenManagementModal;

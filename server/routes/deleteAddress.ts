@@ -11,7 +11,12 @@ export const Errors = {
   CannotDeleteMagic: 'Cannot delete Magic Link address',
 };
 
-const deleteAddress = async (models, req: Request, res: Response, next: NextFunction) => {
+const deleteAddress = async (
+  models,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.user) {
     return next(new Error(Errors.NotLoggedIn));
   }
@@ -23,7 +28,7 @@ const deleteAddress = async (models, req: Request, res: Response, next: NextFunc
   }
 
   const addressObj = await models.Address.findOne({
-    where: { chain: req.body.chain, address: req.body.address }
+    where: { chain: req.body.chain, address: req.body.address },
   });
   if (!addressObj || addressObj.user_id !== req.user.id) {
     return next(new Error(Errors.AddressNotFound));

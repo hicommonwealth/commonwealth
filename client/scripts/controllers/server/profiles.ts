@@ -9,7 +9,9 @@ import { Profile } from 'models';
 class ProfilesController {
   private _store: ProfileStore = new ProfileStore();
 
-  public get store() { return this._store; }
+  public get store() {
+    return this._store;
+  }
 
   private _unfetched: Profile[];
 
@@ -43,23 +45,26 @@ class ProfilesController {
     return new Promise((resolve, reject) => {
       // TODO: Change to PUT /profile
       $.post(`${app.serverUrl()}/updateProfile`, {
-        chain: (typeof account.chain === 'string') ? account.chain : account.chain.id,
+        chain:
+          typeof account.chain === 'string' ? account.chain : account.chain.id,
         address: account.address,
         data: JSON.stringify(data),
         auth: true,
         jwt: app.user.jwt,
-      }).then((result) => {
-        if (!account.profile) {
-          const profile = new Profile(account.chain.id, account.address);
-          this._store.add(profile);
-          this._refreshProfile(profile);
-        } else {
-          this._refreshProfile(account.profile);
-        }
-        resolve(result);
-      }).catch((error) => {
-        reject(error);
-      });
+      })
+        .then((result) => {
+          if (!account.profile) {
+            const profile = new Profile(account.chain.id, account.address);
+            this._store.add(profile);
+            this._refreshProfile(profile);
+          } else {
+            this._refreshProfile(account.profile);
+          }
+          resolve(result);
+        })
+        .catch((error) => {
+          reject(error);
+        });
     });
   }
 
@@ -71,42 +76,64 @@ class ProfilesController {
   private async _refreshProfiles(profiles: Profile[]): Promise<Profile[]> {
     // refresh in chunks of 20 to avoid making the body too large
     const chunkedProfiles = _.chunk(profiles, 20);
-    const ps = await Promise.all(chunkedProfiles.map(async (chunk): Promise<Profile[]> => {
-      const fetchedProfiles = chunk; // keep a list of the profiles we just fetched
-      try {
-        // TODO: Change to GET /profiles
-        const result = await $.post(`${app.serverUrl()}/bulkProfiles`, {
-          'addresses[]': chunk.map((profile) => profile.address),
-          'chains[]': chunk.map((profile) => profile.chain),
-        });
-        fetchedProfiles.map((profile) => profile.initializeEmpty());
-        return result.result.map((profileData) => {
-          const profile = fetchedProfiles.find((p) => p.chain === profileData.Address.chain
-            && p.address === profileData.Address.address);
-          if (!profile) return null;
-          const pInfo = profileData.data ? JSON.parse(profileData.data) : {};
-          const lastActive = profileData.Address.last_active;
-          const isCouncillor = profileData.Address.is_councillor;
-          const isValidator = profileData.Address.is_validator;
-          // ignore off-chain name if substrate id exists
-          if (profileData.identity) {
-            profile.initializeWithChain(
-              profileData.identity, pInfo.headline, pInfo.bio, pInfo.avatarUrl,
-              profileData.judgements, lastActive, isCouncillor, isValidator
-            );
-          } else {
-            profile.initialize(
-              pInfo.name, pInfo.headline, pInfo.bio, pInfo.avatarUrl,
-              lastActive, isCouncillor, isValidator
-            );
+    const ps = await Promise.all(
+      chunkedProfiles.map(
+        async (chunk): Promise<Profile[]> => {
+          const fetchedProfiles = chunk; // keep a list of the profiles we just fetched
+          try {
+            // TODO: Change to GET /profiles
+            const result = await $.post(`${app.serverUrl()}/bulkProfiles`, {
+              'addresses[]': chunk.map((profile) => profile.address),
+              'chains[]': chunk.map((profile) => profile.chain),
+            });
+            fetchedProfiles.map((profile) => profile.initializeEmpty());
+            return result.result
+              .map((profileData) => {
+                const profile = fetchedProfiles.find(
+                  (p) =>
+                    p.chain === profileData.Address.chain &&
+                    p.address === profileData.Address.address
+                );
+                if (!profile) return null;
+                const pInfo = profileData.data
+                  ? JSON.parse(profileData.data)
+                  : {};
+                const lastActive = profileData.Address.last_active;
+                const isCouncillor = profileData.Address.is_councillor;
+                const isValidator = profileData.Address.is_validator;
+                // ignore off-chain name if substrate id exists
+                if (profileData.identity) {
+                  profile.initializeWithChain(
+                    profileData.identity,
+                    pInfo.headline,
+                    pInfo.bio,
+                    pInfo.avatarUrl,
+                    profileData.judgements,
+                    lastActive,
+                    isCouncillor,
+                    isValidator
+                  );
+                } else {
+                  profile.initialize(
+                    pInfo.name,
+                    pInfo.headline,
+                    pInfo.bio,
+                    pInfo.avatarUrl,
+                    lastActive,
+                    isCouncillor,
+                    isValidator
+                  );
+                }
+                return profile;
+              })
+              .filter((p) => p !== null);
+          } catch (e) {
+            console.error(e);
+            return [];
           }
-          return profile;
-        }).filter((p) => p !== null);
-      } catch (e) {
-        console.error(e);
-        return [];
-      }
-    }));
+        }
+      )
+    );
     m.redraw();
     return _.flatten(ps);
   }

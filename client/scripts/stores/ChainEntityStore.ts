@@ -4,7 +4,9 @@ import { ChainEntity } from '../models';
 import Store from './Store';
 
 class ChainEntityStore extends Store<ChainEntity> {
-  private _storeType: { [type: string]: { [stringId: string]: ChainEntity } } = { };
+  private _storeType: {
+    [type: string]: { [stringId: string]: ChainEntity };
+  } = {};
 
   public get(entity: ChainEntity) {
     return this._store.find((e) => e.eq(entity));
@@ -28,7 +30,10 @@ class ChainEntityStore extends Store<ChainEntity> {
 
   public remove(entity: ChainEntity) {
     super.remove(entity, (e) => e.eq(entity));
-    if (this._storeType[entity.type] && this._storeType[entity.type][entity.stringId]) {
+    if (
+      this._storeType[entity.type] &&
+      this._storeType[entity.type][entity.stringId]
+    ) {
       delete this._storeType[entity.type][entity.stringId];
     }
     return this;

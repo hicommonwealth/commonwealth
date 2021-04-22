@@ -9,9 +9,21 @@ import { Button, Icon, Icons, Tag } from 'construct-ui';
 import { updateRoute } from 'app';
 import app from 'state';
 import { chainEntityTypeToProposalShortName } from 'identifiers';
-import { formatLastUpdated, slugify, link, externalLink, extractDomain, offchainThreadStageToLabel } from 'helpers';
+import {
+  formatLastUpdated,
+  slugify,
+  link,
+  externalLink,
+  extractDomain,
+  offchainThreadStageToLabel,
+} from 'helpers';
 
-import { OffchainThread, OffchainThreadKind, OffchainThreadStage, AddressInfo } from 'models';
+import {
+  OffchainThread,
+  OffchainThreadKind,
+  OffchainThreadStage,
+  AddressInfo,
+} from 'models';
 import ReactionButton, { ReactionType } from 'views/components/reaction_button';
 import User from 'views/components/widgets/user';
 import QuillFormattedText from 'views/components/quill_formatted_text';
@@ -28,61 +40,85 @@ const getLastUpdated = (proposal) => {
   return moment(lastUpdate);
 };
 
-const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boolean }, { expanded: boolean }> = {
+const DiscussionRow: m.Component<
+  { proposal: OffchainThread; showExcerpt?: boolean },
+  { expanded: boolean }
+> = {
   view: (vnode) => {
     const { proposal, showExcerpt } = vnode.attrs;
     if (!proposal) return;
     const propType: OffchainThreadKind = proposal.kind;
     const pinned = proposal.pinned;
-    const discussionLink = `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-`
-      + `${slugify(proposal.title)}`;
+    const discussionLink =
+      `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-` +
+      `${slugify(proposal.title)}`;
 
     const rowHeader: any = [
-      (propType === OffchainThreadKind.Link && proposal.url)
-        && externalLink('a.external-discussion-link', proposal.url, [
+      propType === OffchainThreadKind.Link &&
+        proposal.url &&
+        externalLink('a.external-discussion-link', proposal.url, [
           extractDomain(proposal.url),
         ]),
-      (propType === OffchainThreadKind.Link && proposal.url)
-        && m('span.spacer', ' '),
+      propType === OffchainThreadKind.Link &&
+        proposal.url &&
+        m('span.spacer', ' '),
       link('a', discussionLink, proposal.title),
-      proposal.chainEntities?.length > 0 && m('span.spacer', m.trust(' &nbsp; ')),
-      proposal.chainEntities?.length > 0 && proposal.chainEntities.map((ce) => {
-        if (!chainEntityTypeToProposalShortName(ce.type)) return;
-        return m(Button, {
-          class: 'discussion-row-linked-chain-entity',
-          label: [
-            chainEntityTypeToProposalShortName(ce.type),
-            Number.isNaN(parseInt(ce.typeId, 10)) ? '' : ` #${ce.typeId}`,
-          ],
-          intent: 'primary',
-          size: 'xs',
-          rounded: true,
-          compact: true,
-        });
-      }),
+      proposal.chainEntities?.length > 0 &&
+        m('span.spacer', m.trust(' &nbsp; ')),
+      proposal.chainEntities?.length > 0 &&
+        proposal.chainEntities.map((ce) => {
+          if (!chainEntityTypeToProposalShortName(ce.type)) return;
+          return m(Button, {
+            class: 'discussion-row-linked-chain-entity',
+            label: [
+              chainEntityTypeToProposalShortName(ce.type),
+              Number.isNaN(parseInt(ce.typeId, 10)) ? '' : ` #${ce.typeId}`,
+            ],
+            intent: 'primary',
+            size: 'xs',
+            rounded: true,
+            compact: true,
+          });
+        }),
     ];
     const rowSubheader = [
-      proposal.readOnly && m('.discussion-locked', [
-        m(Tag, {
-          size: 'xs',
-          label: [
-            m(Icon, { name: Icons.LOCK, size: 'xs' }),
-          ],
-        }),
-      ]),
-      proposal.topic && link('a.proposal-topic', `/${app.activeId()}/discussions/${proposal.topic.name}`, [
-        m('span.proposal-topic-name', `${proposal.topic.name}`),
-      ]),
+      proposal.readOnly &&
+        m('.discussion-locked', [
+          m(Tag, {
+            size: 'xs',
+            label: [m(Icon, { name: Icons.LOCK, size: 'xs' })],
+          }),
+        ]),
+      proposal.topic &&
+        link(
+          'a.proposal-topic',
+          `/${app.activeId()}/discussions/${proposal.topic.name}`,
+          [m('span.proposal-topic-name', `${proposal.topic.name}`)]
+        ),
       m(User, {
-        user: new AddressInfo(null, proposal.author, proposal.authorChain, null),
+        user: new AddressInfo(
+          null,
+          proposal.author,
+          proposal.authorChain,
+          null
+        ),
         linkify: true,
         popover: true,
         hideAvatar: true,
         showAddressWithDisplayName: true,
       }),
-      proposal instanceof OffchainThread && proposal.collaborators && proposal.collaborators.length > 0
-        && m('span.proposal-collaborators', [ ' +', proposal.collaborators.length ]),
-      m('.created-at', link('a', discussionLink, `Last active ${formatLastUpdated(getLastUpdated(proposal))}`)),
+      proposal instanceof OffchainThread &&
+        proposal.collaborators &&
+        proposal.collaborators.length > 0 &&
+        m('span.proposal-collaborators', [' +', proposal.collaborators.length]),
+      m(
+        '.created-at',
+        link(
+          'a',
+          discussionLink,
+          `Last active ${formatLastUpdated(getLastUpdated(proposal))}`
+        )
+      ),
       m('.mobile-comment-count', [
         m(Icon, { name: Icons.MESSAGE_SQUARE }),
         app.comments.nComments(proposal),
@@ -99,25 +135,32 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
             proposal,
             proposal.author,
             proposal.authorChain
-          )
+          ),
         }),
         m(Button, {
           class: 'discussion-row-stage',
           label: offchainThreadStageToLabel(proposal.stage),
-          intent: proposal.stage === OffchainThreadStage.Discussion ? 'none'
-            : proposal.stage === OffchainThreadStage.ProposalInReview ? 'positive'
-              : proposal.stage === OffchainThreadStage.Voting ? 'positive'
-                : proposal.stage === OffchainThreadStage.Passed ? 'positive'
-                  : proposal.stage === OffchainThreadStage.Failed ? 'negative'
-                    : proposal.stage === OffchainThreadStage.Abandoned ? 'negative' : 'none',
+          intent:
+            proposal.stage === OffchainThreadStage.Discussion
+              ? 'none'
+              : proposal.stage === OffchainThreadStage.ProposalInReview
+              ? 'positive'
+              : proposal.stage === OffchainThreadStage.Voting
+              ? 'positive'
+              : proposal.stage === OffchainThreadStage.Passed
+              ? 'positive'
+              : proposal.stage === OffchainThreadStage.Failed
+              ? 'negative'
+              : proposal.stage === OffchainThreadStage.Abandoned
+              ? 'negative'
+              : 'none',
           size: 'xs',
           rounded: true,
           compact: true,
         }),
       ]),
-      app.isLoggedIn() && m('.discussion-row-menu', [
-        m(DiscussionRowMenu, { proposal }),
-      ]),
+      app.isLoggedIn() &&
+        m('.discussion-row-menu', [m(DiscussionRowMenu, { proposal })]),
     ];
 
     const reaction = m(ReactionButton, {
@@ -146,7 +189,7 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
         m.route.set(discussionLink);
       },
     });
-  }
+  },
 };
 
 export default DiscussionRow;

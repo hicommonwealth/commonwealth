@@ -8,24 +8,31 @@ export interface TaggedThreadAttributes {
 }
 
 export interface TaggedThreadInstance
-extends Sequelize.Instance<TaggedThreadAttributes>, TaggedThreadAttributes {
+  extends Sequelize.Instance<TaggedThreadAttributes>,
+    TaggedThreadAttributes {}
 
-}
-
-export interface TaggedThreadModel extends Sequelize.Model<TaggedThreadInstance, TaggedThreadAttributes> {
-
-}
+export type TaggedThreadModel = Sequelize.Model<
+  TaggedThreadInstance,
+  TaggedThreadAttributes
+>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
+  dataTypes: Sequelize.DataTypes
 ): TaggedThreadModel => {
-  const TaggedThread = sequelize.define<TaggedThreadInstance, TaggedThreadAttributes>('TaggedThread', {
-    topic_id: { type: dataTypes.STRING, allowNull: false },
-    thread_id: { type: dataTypes.INTEGER, allowNull: false },
-  }, {
-    timestamps: true,
-    underscored: true,
-  });
+  const TaggedThread = sequelize.define<
+    TaggedThreadInstance,
+    TaggedThreadAttributes
+  >(
+    'TaggedThread',
+    {
+      topic_id: { type: dataTypes.STRING, allowNull: false },
+      thread_id: { type: dataTypes.INTEGER, allowNull: false },
+    },
+    {
+      timestamps: true,
+      underscored: true,
+    }
+  );
   return TaggedThread;
 };

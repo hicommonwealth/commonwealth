@@ -1,27 +1,42 @@
 import m from 'mithril';
 
 import {
-  Breadcrumb, BreadcrumbItem,
-  Icon, Icons,
-  Input, TextArea,
-  Button, ButtonGroup,
-  Card, Callout,
-  Form, FormGroup, FormLabel,
-  List, ListItem,
-  Menu, MenuItem,
+  Breadcrumb,
+  BreadcrumbItem,
+  Icon,
+  Icons,
+  Input,
+  TextArea,
+  Button,
+  ButtonGroup,
+  Card,
+  Callout,
+  Form,
+  FormGroup,
+  FormLabel,
+  List,
+  ListItem,
+  Menu,
+  MenuItem,
   PopoverMenu,
-  Switch, Checkbox,
-  Radio, RadioGroup,
+  Switch,
+  Checkbox,
+  Radio,
+  RadioGroup,
   Spinner,
   Tag,
-  Tabs, TabItem,
-  Table
+  Tabs,
+  TabItem,
+  Table,
 } from 'construct-ui';
 
-const ComponentKit: m.Component<{}, { radioGroupSelected, activeTab }> = {
+const ComponentKit: m.Component<{}, { radioGroupSelected; activeTab }> = {
   view: (vnode) => {
     return m('.ComponentKit', [
-      m('style', '.ComponentKit > * { margin: 20px; }\n .ComponentKit > .gallery > * { margin-right: 20px; }'),
+      m(
+        'style',
+        '.ComponentKit > * { margin: 20px; }\n .ComponentKit > .gallery > * { margin-right: 20px; }'
+      ),
 
       // buttons and inputs
       m('.gallery', [
@@ -94,17 +109,17 @@ const ComponentKit: m.Component<{}, { radioGroupSelected, activeTab }> = {
         m(ButtonGroup, [
           m(Button, {
             iconLeft: Icons.COPY,
-            label: 'Copy'
+            label: 'Copy',
           }),
           m(Button, {
             iconLeft: Icons.SETTINGS,
-            label: 'Settings'
+            label: 'Settings',
           }),
           m(Button, {
             iconLeft: Icons.LINK,
             iconRight: Icons.CHEVRON_DOWN,
-            label: 'Link'
-          })
+            label: 'Link',
+          }),
         ]),
       ]),
       m('.gallery', [
@@ -212,7 +227,7 @@ const ComponentKit: m.Component<{}, { radioGroupSelected, activeTab }> = {
         }),
         m(Switch, {
           label: 'Switch (primary)',
-          intent: 'primary'
+          intent: 'primary',
         }),
         m(Switch, {
           label: 'Switch (small)',
@@ -221,14 +236,18 @@ const ComponentKit: m.Component<{}, { radioGroupSelected, activeTab }> = {
       ]),
 
       // breadcrumb
-      m(Breadcrumb, {
-        size: 'default',
-        seperator: m(Icon, { name: Icons.CHEVRON_RIGHT })
-      }, [
-        m(BreadcrumbItem, { href: '#' }, m(Icon, { name: Icons.HOME })),
-        m(BreadcrumbItem, { href: '#' }, 'Application'),
-        m(BreadcrumbItem, 'Section 1')
-      ]),
+      m(
+        Breadcrumb,
+        {
+          size: 'default',
+          seperator: m(Icon, { name: Icons.CHEVRON_RIGHT }),
+        },
+        [
+          m(BreadcrumbItem, { href: '#' }, m(Icon, { name: Icons.HOME })),
+          m(BreadcrumbItem, { href: '#' }, 'Application'),
+          m(BreadcrumbItem, 'Section 1'),
+        ]
+      ),
 
       m('div', [
         m(Tag, { size: 'xs', label: 'Extra small' }),
@@ -252,18 +271,39 @@ const ComponentKit: m.Component<{}, { radioGroupSelected, activeTab }> = {
         m(Tag, { intent: 'primary', size: 'xl', label: 'Extra large' }),
       ]),
       m('div', [
-        m(Tag, { rounded: true, size: 'xs', label: [ m(Icon, { name: Icons.LOCK }), ' Extra small' ] }),
-        m(Tag, { rounded: true, size: 'sm', label: [ m(Icon, { name: Icons.LOCK }), ' Small' ] }),
-        m(Tag, { rounded: true, size: 'default', label: [ m(Icon, { name: Icons.LOCK }), ' Default' ] }),
-        m(Tag, { rounded: true, size: 'lg', label: [ m(Icon, { name: Icons.LOCK }), ' Large' ] }),
-        m(Tag, { rounded: true, size: 'xl', label: [ m(Icon, { name: Icons.LOCK }), ' Extra large' ] }),
+        m(Tag, {
+          rounded: true,
+          size: 'xs',
+          label: [m(Icon, { name: Icons.LOCK }), ' Extra small'],
+        }),
+        m(Tag, {
+          rounded: true,
+          size: 'sm',
+          label: [m(Icon, { name: Icons.LOCK }), ' Small'],
+        }),
+        m(Tag, {
+          rounded: true,
+          size: 'default',
+          label: [m(Icon, { name: Icons.LOCK }), ' Default'],
+        }),
+        m(Tag, {
+          rounded: true,
+          size: 'lg',
+          label: [m(Icon, { name: Icons.LOCK }), ' Large'],
+        }),
+        m(Tag, {
+          rounded: true,
+          size: 'xl',
+          label: [m(Icon, { name: Icons.LOCK }), ' Extra large'],
+        }),
       ]),
 
       // callout
       m('div', [
         m(Callout, {
           header: 'Callout header',
-          content: 'Commodo maecenas elit vivamus volutpat urna ridiculus mauris aptent tellus etiam varius sodales',
+          content:
+            'Commodo maecenas elit vivamus volutpat urna ridiculus mauris aptent tellus etiam varius sodales',
           icon: Icons.ALERT_CIRCLE,
           size: 'default',
           intent: 'primary',
@@ -272,7 +312,8 @@ const ComponentKit: m.Component<{}, { radioGroupSelected, activeTab }> = {
       m('div', [
         m(Callout, {
           header: 'Callout header',
-          content: 'Commodo maecenas elit vivamus volutpat urna ridiculus mauris aptent tellus etiam varius sodales',
+          content:
+            'Commodo maecenas elit vivamus volutpat urna ridiculus mauris aptent tellus etiam varius sodales',
           size: 'sm',
           intent: 'none',
         }),
@@ -280,26 +321,28 @@ const ComponentKit: m.Component<{}, { radioGroupSelected, activeTab }> = {
 
       // card
       m('div', [
-        m(Card, {
-          elevation: 0,
-          fluid: true,
-          interactive: true,
-          size: 'default',
-          style: 'min-width: 300px'
-        }, [
-          m('h4', 'Card title'),
-          m('div', 'Card content'),
-        ]),
+        m(
+          Card,
+          {
+            elevation: 0,
+            fluid: true,
+            interactive: true,
+            size: 'default',
+            style: 'min-width: 300px',
+          },
+          [m('h4', 'Card title'), m('div', 'Card content')]
+        ),
       ]),
       m('div', [
-        m(Card, {
-          elevation: 0,
-          size: 'default',
-          style: 'min-width: 300px'
-        }, [
-          m('h4', 'Card title'),
-          m('div', 'Card content'),
-        ]),
+        m(
+          Card,
+          {
+            elevation: 0,
+            size: 'default',
+            style: 'min-width: 300px',
+          },
+          [m('h4', 'Card title'), m('div', 'Card content')]
+        ),
       ]),
 
       // form
@@ -311,8 +354,8 @@ const ComponentKit: m.Component<{}, { radioGroupSelected, activeTab }> = {
               contentLeft: m(Icon, { name: Icons.USER }),
               id: 'username',
               name: 'username',
-              placeholder: 'Username...'
-            })
+              placeholder: 'Username...',
+            }),
           ]),
           m(FormGroup, [
             m(FormLabel, { for: 'password' }, 'Password'),
@@ -320,8 +363,8 @@ const ComponentKit: m.Component<{}, { radioGroupSelected, activeTab }> = {
               contentLeft: m(Icon, { name: Icons.LOCK }),
               id: 'password',
               name: 'password',
-              placeholder: 'Password...'
-            })
+              placeholder: 'Password...',
+            }),
           ]),
         ]),
       ]),
@@ -335,23 +378,25 @@ const ComponentKit: m.Component<{}, { radioGroupSelected, activeTab }> = {
               m(Input, {
                 id: 'name',
                 name: 'name',
-                placeholder: 'Name...'
-              })
+                placeholder: 'Name...',
+              }),
             ]),
             m(FormGroup, [
               m(FormLabel, { for: 'bio' }, 'Bio'),
               m(TextArea, {
                 id: 'bio',
                 name: 'bio',
-                placeholder: 'Bio...'
-              })
+                placeholder: 'Bio...',
+              }),
             ]),
             m(FormGroup, [
               m(FormLabel, { for: 'privacy' }, 'Privacy'),
               m(RadioGroup, {
                 options: ['Public', 'Private'],
                 name: 'privacy',
-                onchange: (e) => { vnode.state.radioGroupSelected = (e.currentTarget as HTMLInputElement).value; },
+                onchange: (e) => {
+                  vnode.state.radioGroupSelected = (e.currentTarget as HTMLInputElement).value;
+                },
                 value: vnode.state.radioGroupSelected,
               }),
             ]),
@@ -361,116 +406,149 @@ const ComponentKit: m.Component<{}, { radioGroupSelected, activeTab }> = {
 
       // list
       m('div', [
-        m(List, [ 'List item 1', 'List item 2', 'List item 3', 'List item 4' ].map((item) => m(ListItem, {
-          contentLeft: m(Icon, { name: Icons.LINK }),
-          contentRight: m(PopoverMenu, {
-            closeOnContentClick: true,
-            content: [
-              m(MenuItem, {
-                iconLeft: Icons.EDIT,
-                label: 'Edit'
-              }),
-              m(MenuItem, {
-                iconLeft: Icons.TRASH_2,
-                label: 'Delete',
-                intent: 'negative'
+        m(
+          List,
+          ['List item 1', 'List item 2', 'List item 3', 'List item 4'].map(
+            (item) =>
+              m(ListItem, {
+                contentLeft: m(Icon, { name: Icons.LINK }),
+                contentRight: m(PopoverMenu, {
+                  closeOnContentClick: true,
+                  content: [
+                    m(MenuItem, {
+                      iconLeft: Icons.EDIT,
+                      label: 'Edit',
+                    }),
+                    m(MenuItem, {
+                      iconLeft: Icons.TRASH_2,
+                      label: 'Delete',
+                      intent: 'negative',
+                    }),
+                  ],
+                  trigger: m(Button, {
+                    iconLeft: Icons.MORE_HORIZONTAL,
+                    size: 'xs',
+                  }),
+                  position: 'bottom-end',
+                }),
+                label: item,
               })
-            ],
-            trigger: m(Button, {
-              iconLeft: Icons.MORE_HORIZONTAL,
-              size: 'xs'
-            }),
-            position: 'bottom-end'
-          }),
-          label: item
-        }))),
+          )
+        ),
       ]),
 
       // tabs
-      m(Tabs, {
-        align: 'left',
-        bordered: true,
-        fluid: false,
-        size: 'default',
-      }, [
-        [ 'Accounts', 'Projects', 'Settings' ].map((item) => m(TabItem, {
-          label: [
-            item === 'Settings' && m(Icon, {
-              name: Icons.SETTINGS,
-              style: 'margin-right: 5px'
-            }),
-            item
-          ],
-          active: vnode.state.activeTab === item || (!vnode.state.activeTab && item === 'Accounts'),
-          onclick: () => { vnode.state.activeTab = item; },
-        }))
-      ]),
-      m(Tabs, {
-        align: 'center',
-        bordered: true,
-        fluid: false,
-        size: 'default',
-      }, [
-        [ 'Accounts', 'Projects', 'Settings' ].map((item) => m(TabItem, {
-          label: [
-            item === 'Settings' && m(Icon, {
-              name: Icons.SETTINGS,
-              style: 'margin-right: 5px'
-            }),
-            item
-          ],
-          active: vnode.state.activeTab === item || (!vnode.state.activeTab && item === 'Accounts'),
-          onclick: () => { vnode.state.activeTab = item; },
-        }))
-      ]),
+      m(
+        Tabs,
+        {
+          align: 'left',
+          bordered: true,
+          fluid: false,
+          size: 'default',
+        },
+        [
+          ['Accounts', 'Projects', 'Settings'].map((item) =>
+            m(TabItem, {
+              label: [
+                item === 'Settings' &&
+                  m(Icon, {
+                    name: Icons.SETTINGS,
+                    style: 'margin-right: 5px',
+                  }),
+                item,
+              ],
+              active:
+                vnode.state.activeTab === item ||
+                (!vnode.state.activeTab && item === 'Accounts'),
+              onclick: () => {
+                vnode.state.activeTab = item;
+              },
+            })
+          ),
+        ]
+      ),
+      m(
+        Tabs,
+        {
+          align: 'center',
+          bordered: true,
+          fluid: false,
+          size: 'default',
+        },
+        [
+          ['Accounts', 'Projects', 'Settings'].map((item) =>
+            m(TabItem, {
+              label: [
+                item === 'Settings' &&
+                  m(Icon, {
+                    name: Icons.SETTINGS,
+                    style: 'margin-right: 5px',
+                  }),
+                item,
+              ],
+              active:
+                vnode.state.activeTab === item ||
+                (!vnode.state.activeTab && item === 'Accounts'),
+              onclick: () => {
+                vnode.state.activeTab = item;
+              },
+            })
+          ),
+        ]
+      ),
 
       // table
       m('div', [
-        m(Table, {
-          bordered: false,
-          interactive: true,
-          striped: false,
-        }, [
-          m('tr', [
-            m('th', 'Heading 1'),
-            m('th', 'Heading 2')
-          ]),
-          m('tr', [
-            m('td', 'Cell 1'),
-            m('td', 'Cell 2')
-          ]),
-          m('tr', [
-            m('td', 'Cell 1'),
-            m('td', 'Cell 2')
-          ]),
-          m('tr', [
-            m('td', 'Cell 1'),
-            m('td', 'Cell 2')
-          ])
-        ])
+        m(
+          Table,
+          {
+            bordered: false,
+            interactive: true,
+            striped: false,
+          },
+          [
+            m('tr', [m('th', 'Heading 1'), m('th', 'Heading 2')]),
+            m('tr', [m('td', 'Cell 1'), m('td', 'Cell 2')]),
+            m('tr', [m('td', 'Cell 1'), m('td', 'Cell 2')]),
+            m('tr', [m('td', 'Cell 1'), m('td', 'Cell 2')]),
+          ]
+        ),
       ]),
 
       // spinner
-      m(Card, [
-        m(Spinner, { active: true, fill: true }),
-      ]),
+      m(Card, [m(Spinner, { active: true, fill: true })]),
       m(Card, { style: 'height: 160px' }, [
-        m(Spinner, { active: true, fill: true, size: 'xs', message: 'Extra small' }),
+        m(Spinner, {
+          active: true,
+          fill: true,
+          size: 'xs',
+          message: 'Extra small',
+        }),
       ]),
       m(Card, { style: 'height: 160px' }, [
         m(Spinner, { active: true, fill: true, size: 'sm', message: 'Small' }),
       ]),
       m(Card, { style: 'height: 160px' }, [
-        m(Spinner, { active: true, fill: true, size: 'default', message: 'Default' }),
+        m(Spinner, {
+          active: true,
+          fill: true,
+          size: 'default',
+          message: 'Default',
+        }),
       ]),
       m(Card, { style: 'height: 160px' }, [
         m(Spinner, { active: true, fill: true, size: 'lg', message: 'Large' }),
       ]),
       m(Card, { style: 'height: 160px' }, [
-        m(Spinner, { active: true, fill: true, size: 'xl', message: 'Extra large' }),
+        m(Spinner, {
+          active: true,
+          fill: true,
+          size: 'xl',
+          message: 'Extra large',
+        }),
       ]),
     ]);
-  }
+  },
 };
 
 export default ComponentKit;

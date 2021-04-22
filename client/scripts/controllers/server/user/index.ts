@@ -4,7 +4,10 @@ export default class extends Roles {
   /*
     Address logic
   */
-  public getDefaultAddressInCommunity(options: { chain?: string, community?: string }) {
+  public getDefaultAddressInCommunity(options: {
+    chain?: string;
+    community?: string;
+  }) {
     const role = this.roles.find((r) => {
       const communityMatches = options.chain
         ? r.chain_id === options.chain

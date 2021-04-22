@@ -8,26 +8,30 @@ export interface NotificationCategoryAttributes {
 }
 
 export interface NotificationCategoryInstance
-extends Sequelize.Instance<NotificationCategoryAttributes>, NotificationCategoryAttributes {
+  extends Sequelize.Instance<NotificationCategoryAttributes>,
+    NotificationCategoryAttributes {}
 
-}
-
-export interface NotificationCategoryModel
-extends Sequelize.Model<NotificationCategoryInstance, NotificationCategoryAttributes> {
-
-}
+export type NotificationCategoryModel = Sequelize.Model<
+  NotificationCategoryInstance,
+  NotificationCategoryAttributes
+>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
+  dataTypes: Sequelize.DataTypes
 ): NotificationCategoryModel => {
   const NotificationCategory = sequelize.define<
-    NotificationCategoryInstance, NotificationCategoryAttributes
-  >('NotificationCategory', {
-    name: { type: dataTypes.STRING, primaryKey: true },
-    description: { type: dataTypes.TEXT, allowNull: false },
-  }, {
-    underscored: true,
-  });
+    NotificationCategoryInstance,
+    NotificationCategoryAttributes
+  >(
+    'NotificationCategory',
+    {
+      name: { type: dataTypes.STRING, primaryKey: true },
+      description: { type: dataTypes.TEXT, allowNull: false },
+    },
+    {
+      underscored: true,
+    }
+  );
   return NotificationCategory;
 };

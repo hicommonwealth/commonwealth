@@ -9,15 +9,18 @@ export const Errors = {
   NotLoggedIn: 'Not logged in',
 };
 
-export default async (models, req: Request, res: Response, next: NextFunction) => {
+export default async (
+  models,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.user) {
     return next(new Error(Errors.NotLoggedIn));
   }
 
   // locate active subscriptions, filter by category if specified
-  const searchParams: any[] = [
-    { subscriber_id: req.user.id },
-  ];
+  const searchParams: any[] = [{ subscriber_id: req.user.id }];
   if (req.body.active_only) {
     searchParams.push({ is_active: true });
   }
@@ -25,7 +28,7 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
     searchParams.push({
       category_id: {
         [Op.contained]: req.body.categories,
-      }
+      },
     });
   }
 
@@ -33,16 +36,20 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
   const notificationParams: any = {
     model: models.Notification,
     as: 'Notifications',
-    include: [{
-      model: models.ChainEvent,
-      required: false,
-      as: 'ChainEvent',
-      include: [{
-        model: models.ChainEventType,
+    include: [
+      {
+        model: models.ChainEvent,
         required: false,
-        as: 'ChainEventType',
-      }, ],
-    },]
+        as: 'ChainEvent',
+        include: [
+          {
+            model: models.ChainEventType,
+            required: false,
+            as: 'ChainEventType',
+          },
+        ],
+      },
+    ],
   };
   if (req.body.unread_only) {
     notificationParams.where = { is_read: false };
@@ -51,11 +58,14 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
   // perform the query
   const subscriptions = await models.Subscription.findAll({
     where: {
-      [Op.and]: searchParams
+      [Op.and]: searchParams,
     },
-    include: [ notificationParams ],
+    include: [notificationParams],
   });
 
   // TODO: flatten? sort by date?
-  return res.json({ status: 'Success', result: subscriptions.map((s) => s.toJSON()) });
+  return res.json({
+    status: 'Success',
+    result: subscriptions.map((s) => s.toJSON()),
+  });
 };

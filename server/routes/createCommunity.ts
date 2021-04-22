@@ -8,14 +8,21 @@ export const Errors = {
   NoName: 'Must provide community name',
   NoCreatorAddress: 'Must provide creator address',
   NoCreatorChain: 'Must provide creator chain',
-  NoAuthenticatedForumSetting: 'Authenticated forum setting must be \'true\' or false\'',
-  NoPrivacySetting: 'Privacy setting must be \'true\' or false\'',
-  NoInvitesEnableldSetting: 'Invites setting must be \'true\' or false\'',
-  CommunityNameExists: 'The name for this community already exists, please choose another name',
+  NoAuthenticatedForumSetting:
+    "Authenticated forum setting must be 'true' or false'",
+  NoPrivacySetting: "Privacy setting must be 'true' or false'",
+  NoInvitesEnableldSetting: "Invites setting must be 'true' or false'",
+  CommunityNameExists:
+    'The name for this community already exists, please choose another name',
   InvalidAddress: 'Tried to create this community with an invalid address',
 };
 
-const createCommunity = async (models, req: Request, res: Response, next: NextFunction) => {
+const createCommunity = async (
+  models,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.user) {
     return next(new Error('Not logged in'));
   }
@@ -29,13 +36,22 @@ const createCommunity = async (models, req: Request, res: Response, next: NextFu
     return next(new Error(Errors.NoCreatorChain));
   }
 
-  if (req.body.isAuthenticatedForum !== 'true' && req.body.isAuthenticatedForum !== 'false') {
+  if (
+    req.body.isAuthenticatedForum !== 'true' &&
+    req.body.isAuthenticatedForum !== 'false'
+  ) {
     return next(new Error(Errors.NoAuthenticatedForumSetting));
   }
-  if (req.body.privacyEnabled !== 'true' && req.body.privacyEnabled !== 'false') {
+  if (
+    req.body.privacyEnabled !== 'true' &&
+    req.body.privacyEnabled !== 'false'
+  ) {
     return next(new Error(Errors.NoPrivacySetting));
   }
-  if (req.body.invitesEnabled !== 'true' && req.body.invitesEnabled !== 'false') {
+  if (
+    req.body.invitesEnabled !== 'true' &&
+    req.body.invitesEnabled !== 'false'
+  ) {
     return next(new Error(Errors.NoInvitesEnableldSetting));
   }
   const isAuthenticatedForum = req.body.isAuthenticatedForum === 'true';
@@ -61,13 +77,17 @@ const createCommunity = async (models, req: Request, res: Response, next: NextFu
   }
 
   // If there's any whitespace in the community name replace to make a nice url
-  const createdId = req.body.name.toLowerCase().trim().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
+  const createdId = req.body.name
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w ]+/g, '')
+    .replace(/ +/g, '-');
   const communityContent = {
     id: createdId,
     creator_id: address.id,
     name: req.body.name,
     description: req.body.description,
-    default_chain: (req.body.default_chain) ? req.body.default_chain : 'ethereum',
+    default_chain: req.body.default_chain ? req.body.default_chain : 'ethereum',
     isAuthenticatedForum,
     privacyEnabled,
     invitesEnabled,
@@ -99,7 +119,7 @@ const createCommunity = async (models, req: Request, res: Response, next: NextFu
       community: req.body.name,
     },
     req.wss,
-    [ req.body.creator_address ],
+    [req.body.creator_address]
   );
 
   return res.json({ status: 'Success', result: community.toJSON() });

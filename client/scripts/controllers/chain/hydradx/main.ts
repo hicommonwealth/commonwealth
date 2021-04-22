@@ -10,7 +10,7 @@ class HydraDX extends Substrate {
 
   public async initApi() {
     await super.initApi({
-      'types': SpecTypes,
+      types: SpecTypes,
     });
   }
 }

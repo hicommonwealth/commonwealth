@@ -8,27 +8,32 @@ export interface CollaborationAttributes {
 }
 
 export interface CollaborationInstance
-extends Sequelize.Instance<CollaborationAttributes>, CollaborationAttributes {
+  extends Sequelize.Instance<CollaborationAttributes>,
+    CollaborationAttributes {
   // no mixins used yet
 }
 
-export interface CollaborationModel extends Sequelize.Model<
-  CollaborationInstance, CollaborationAttributes
-> {
-  // no static methods yet
-}
+export type CollaborationModel = Sequelize.Model<
+  CollaborationInstance,
+  CollaborationAttributes
+>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
+  dataTypes: Sequelize.DataTypes
 ): CollaborationModel => {
-  const Collaboration = sequelize.define<CollaborationInstance, CollaborationAttributes>(
-    'Collaboration', {
+  const Collaboration = sequelize.define<
+    CollaborationInstance,
+    CollaborationAttributes
+  >(
+    'Collaboration',
+    {
       address_id: { type: dataTypes.INTEGER, allowNull: false },
       offchain_thread_id: { type: dataTypes.INTEGER, allowNull: false },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
-    }, {
+    },
+    {
       timestamps: true,
       underscored: true,
     }

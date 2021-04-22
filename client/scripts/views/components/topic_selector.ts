@@ -4,17 +4,26 @@ import m from 'mithril';
 import { SelectList, ListItem, Callout, Button, Icons } from 'construct-ui';
 import { OffchainTopic } from 'models';
 
-const TopicSelector: m.Component<{
-  defaultTopic?: OffchainTopic | string | boolean;
-  featuredTopics: OffchainTopic[];
-  tabindex?: number;
-  topics: OffchainTopic[];
-  updateFormData: Function;
-}, {
-  error: string;
-}> = {
+const TopicSelector: m.Component<
+  {
+    defaultTopic?: OffchainTopic | string | boolean;
+    featuredTopics: OffchainTopic[];
+    tabindex?: number;
+    topics: OffchainTopic[];
+    updateFormData: Function;
+  },
+  {
+    error: string;
+  }
+> = {
   view: (vnode) => {
-    const { defaultTopic, featuredTopics, tabindex, topics, updateFormData } = vnode.attrs;
+    const {
+      defaultTopic,
+      featuredTopics,
+      tabindex,
+      topics,
+      updateFormData,
+    } = vnode.attrs;
     let selectedTopic;
     if (defaultTopic === false) {
       selectedTopic = undefined;
@@ -26,10 +35,10 @@ const TopicSelector: m.Component<{
 
     const itemRender = (topic) => {
       return m(ListItem, {
-        class: featuredTopics.includes(topic) ? 'featured-topic' : 'other-topic',
-        label: [
-          m('span.topic-name', topic.name),
-        ],
+        class: featuredTopics.includes(topic)
+          ? 'featured-topic'
+          : 'other-topic',
+        label: [m('span.topic-name', topic.name)],
         selected: (selectedTopic as OffchainTopic)?.name === topic.name,
       });
     };
@@ -50,22 +59,35 @@ const TopicSelector: m.Component<{
     };
 
     const manuallyClosePopover = () => {
-      const button = document.getElementsByClassName('topic-selection-drop-menu')[0];
+      const button = document.getElementsByClassName(
+        'topic-selection-drop-menu'
+      )[0];
       if (button) (button as HTMLButtonElement).click();
     };
 
     const addTopic = (topic?) => {
-      const newTopic = topic || (document.getElementsByClassName('autocomplete-topic-input')[0]
-        .firstChild as HTMLInputElement).value;
+      const newTopic =
+        topic ||
+        (document.getElementsByClassName('autocomplete-topic-input')[0]
+          .firstChild as HTMLInputElement).value;
       topics.push({ name: newTopic, id: null, description: '', telegram: '' });
-      setTimeout(() => { selectedTopic = newTopic; m.redraw(); }, 1);
+      setTimeout(() => {
+        selectedTopic = newTopic;
+        m.redraw();
+      }, 1);
       updateFormData(newTopic);
       if (!topic) manuallyClosePopover();
     };
 
     const sortTopics = (topics_: OffchainTopic[]) => {
-      return topics_.filter((topic) => featuredTopics.includes(topic)).sort((a, b) => a.name > b.name ? 1 : -1)
-        .concat(topics_.filter((topic) => !featuredTopics.includes(topic)).sort((a, b) => a.name > b.name ? 1 : -1));
+      return topics_
+        .filter((topic) => featuredTopics.includes(topic))
+        .sort((a, b) => (a.name > b.name ? 1 : -1))
+        .concat(
+          topics_
+            .filter((topic) => !featuredTopics.includes(topic))
+            .sort((a, b) => (a.name > b.name ? 1 : -1))
+        );
     };
 
     return m(SelectList, {
@@ -98,14 +120,12 @@ const TopicSelector: m.Component<{
         iconRight: Icons.CHEVRON_DOWN,
         label: selectedTopic
           ? [
-            m('span.proposal-topic-icon'),
-            m('span.topic-name', [
-              selectedTopic.name
-            ]),
-          ]
+              m('span.proposal-topic-icon'),
+              m('span.topic-name', [selectedTopic.name]),
+            ]
           : '',
         sublabel: selectedTopic ? '' : 'Select a topic',
-        tabindex
+        tabindex,
       }),
     });
   },

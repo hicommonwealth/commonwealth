@@ -8,16 +8,25 @@ import { setActiveAccount } from 'controllers/app/login';
 import { Account, AddressInfo } from 'models';
 import { formatAddressShort } from '../../../../../shared/utils';
 
-const ProfileBanner: m.Component<{ account: Account<any>, addressInfo: AddressInfo }, { loading: boolean }> = {
+const ProfileBanner: m.Component<
+  { account: Account<any>; addressInfo: AddressInfo },
+  { loading: boolean }
+> = {
   view: (vnode) => {
     const { account, addressInfo } = vnode.attrs;
-    const addrShort = formatAddressShort(addressInfo.address, addressInfo.chain);
+    const addrShort = formatAddressShort(
+      addressInfo.address,
+      addressInfo.chain
+    );
 
     const createRole = async (e) => {
       vnode.state.loading = true;
 
-      const community = app.chain?.meta.chain ? app.chain.meta.chain.name
-        : app.community?.meta ? app.community.meta.name : 'current';
+      const community = app.chain?.meta.chain
+        ? app.chain.meta.chain.name
+        : app.community?.meta
+        ? app.community.meta.name
+        : 'current';
       const confirmed = await confirmationModalWithText(
         `Join the ${community} community with this address?`
       )();
@@ -27,28 +36,31 @@ const ProfileBanner: m.Component<{ account: Account<any>, addressInfo: AddressIn
         return;
       }
 
-      app.user.createRole({
-        address: addressInfo,
-        chain: app.activeChainId(),
-        community: app.activeCommunityId(),
-      }).then(() => {
-        vnode.state.loading = false;
-        m.redraw();
-        notifySuccess(`Joined with ${addrShort}`); // ${addrShort} is now a member of the [Edgeware] community!
-        setActiveAccount(account).then(() => {
+      app.user
+        .createRole({
+          address: addressInfo,
+          chain: app.activeChainId(),
+          community: app.activeCommunityId(),
+        })
+        .then(() => {
+          vnode.state.loading = false;
           m.redraw();
-          $(e.target).trigger('modalexit');
+          notifySuccess(`Joined with ${addrShort}`); // ${addrShort} is now a member of the [Edgeware] community!
+          setActiveAccount(account).then(() => {
+            m.redraw();
+            $(e.target).trigger('modalexit');
+          });
+        })
+        .catch((err: any) => {
+          vnode.state.loading = false;
+          m.redraw();
+          notifyError(err.responseJSON.error);
         });
-      }).catch((err: any) => {
-        vnode.state.loading = false;
-        m.redraw();
-        notifyError(err.responseJSON.error);
-      });
     };
 
     return m('.ProfileBanner', [
       m('.banner-text', [
-        'You are already logged in with this address' // but have not joined the [Edgeware] community
+        'You are already logged in with this address', // but have not joined the [Edgeware] community
       ]),
       m(Button, {
         label: 'Join community',
@@ -56,9 +68,9 @@ const ProfileBanner: m.Component<{ account: Account<any>, addressInfo: AddressIn
         rounded: true,
         disabled: vnode.state.loading,
         onclick: createRole.bind(this),
-      })
+      }),
     ]);
-  }
+  },
 };
 
 export default ProfileBanner;

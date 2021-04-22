@@ -13,35 +13,42 @@ export interface ChainEventTypeAttributes {
 }
 
 export interface ChainEventTypeInstance
-extends Sequelize.Instance<ChainEventTypeAttributes>, ChainEventTypeAttributes {
+  extends Sequelize.Instance<ChainEventTypeAttributes>,
+    ChainEventTypeAttributes {}
 
-}
-
-export interface ChainEventTypeModel extends Sequelize.Model<ChainEventTypeInstance, ChainEventTypeAttributes> {
-
-}
+export type ChainEventTypeModel = Sequelize.Model<
+  ChainEventTypeInstance,
+  ChainEventTypeAttributes
+>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
+  dataTypes: Sequelize.DataTypes
 ): ChainEventTypeModel => {
-  const ChainEventType = sequelize.define<ChainEventTypeInstance, ChainEventTypeAttributes>('ChainEventType', {
-    // id = chain-event_name (event_name is value of string enum)
-    id: { type: dataTypes.STRING, primaryKey: true },
-    chain: { type: dataTypes.STRING, allowNull: false },
-    event_name: { type: dataTypes.STRING, allowNull: false },
-  }, {
-    timestamps: false,
-    underscored: true,
-    indexes: [
-      { fields: ['id'] },
-      { fields: ['chain', 'event_name'] },
-    ]
-  });
+  const ChainEventType = sequelize.define<
+    ChainEventTypeInstance,
+    ChainEventTypeAttributes
+  >(
+    'ChainEventType',
+    {
+      // id = chain-event_name (event_name is value of string enum)
+      id: { type: dataTypes.STRING, primaryKey: true },
+      chain: { type: dataTypes.STRING, allowNull: false },
+      event_name: { type: dataTypes.STRING, allowNull: false },
+    },
+    {
+      timestamps: false,
+      underscored: true,
+      indexes: [{ fields: ['id'] }, { fields: ['chain', 'event_name'] }],
+    }
+  );
 
   ChainEventType.associate = (models) => {
     // chain the event happens on
-    models.ChainEventType.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
+    models.ChainEventType.belongsTo(models.Chain, {
+      foreignKey: 'chain',
+      targetKey: 'id',
+    });
 
     // many emitted events of this type
     models.ChainEventType.hasMany(models.ChainEvent, { as: 'events' });

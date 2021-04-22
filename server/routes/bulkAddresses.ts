@@ -14,7 +14,11 @@ const log = factory.getLogger(formatFilename(__filename));
 // Otherwise, it defaults to returning them in order of ['created_at', 'DESC'] (following to /bulkMembers).
 
 const bulkAddresses = async (models, req, res, next) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
+  const [chain, community, error] = await lookupCommunityIsVisibleToUser(
+    models,
+    req.query,
+    req.user
+  );
   if (error) return next(new Error(error));
 
   const options = {
@@ -29,10 +33,10 @@ const bulkAddresses = async (models, req, res, next) => {
       {
         [Op.and]: [
           { name: { [Op.ne]: null } },
-          { address: { [Op.iLike]: `%${req.query.searchTerm}%` } }
-        ]
-      }
-    ]
+          { address: { [Op.iLike]: `%${req.query.searchTerm}%` } },
+        ],
+      },
+    ],
   };
   if (req.query.searchTerm?.length) {
     options['where'] = options['where']
@@ -40,7 +44,10 @@ const bulkAddresses = async (models, req, res, next) => {
       : subStr;
   }
   const addresses = await models.Address.findAll(options);
-  return res.json({ status: 'Success', result: addresses.map((p) => p.toJSON()) });
+  return res.json({
+    status: 'Success',
+    result: addresses.map((p) => p.toJSON()),
+  });
 };
 
 export default bulkAddresses;

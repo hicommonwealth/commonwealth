@@ -4,10 +4,19 @@ import { PopoverMenu, MenuItem, Icon, Icons } from 'construct-ui';
 import app from 'state';
 import EditTopicModal from 'views/modals/edit_topic_modal';
 
-const TopicCaratMenu: m.Component<{ topic: string }, { topicEditorIsOpen: boolean }> = {
+const TopicCaratMenu: m.Component<
+  { topic: string },
+  { topicEditorIsOpen: boolean }
+> = {
   view: (vnode) => {
     if (!app.isLoggedIn()) return;
-    if (!app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })) return;
+    if (
+      !app.user.isAdminOfEntity({
+        chain: app.activeChainId(),
+        community: app.activeCommunityId(),
+      })
+    )
+      return;
 
     const { topic } = vnode.attrs;
     if (!topic) return;
@@ -30,9 +39,9 @@ const TopicCaratMenu: m.Component<{ topic: string }, { topicEditorIsOpen: boolea
                   id: topicObject.id,
                   name: topicObject.name,
                   telegram: topicObject.telegram,
-                }
+                },
               });
-            }
+            },
           }),
         ],
         inline: true,

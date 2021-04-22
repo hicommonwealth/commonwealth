@@ -31,25 +31,33 @@ export interface OffchainCommunityAttributes {
   Chain?: ChainAttributes;
   Address?: AddressAttributes;
   topics?: OffchainTopicAttributes[] | OffchainTopicAttributes['id'][];
-  OffchainThreads?: OffchainThreadAttributes[] | OffchainThreadAttributes['id'][];
-  StarredCommunities?: StarredCommunityAttributes[] | StarredCommunityAttributes['id'][];
+  OffchainThreads?:
+    | OffchainThreadAttributes[]
+    | OffchainThreadAttributes['id'][];
+  StarredCommunities?:
+    | StarredCommunityAttributes[]
+    | StarredCommunityAttributes['id'][];
 }
 
 export interface OffchainComunityInstance
-extends Sequelize.Instance<OffchainCommunityAttributes>, OffchainCommunityAttributes {
+  extends Sequelize.Instance<OffchainCommunityAttributes>,
+    OffchainCommunityAttributes {}
 
-}
-
-export interface OffchainCommunityModel extends Sequelize.Model<OffchainComunityInstance, OffchainCommunityAttributes> {
-
-}
+export type OffchainCommunityModel = Sequelize.Model<
+  OffchainComunityInstance,
+  OffchainCommunityAttributes
+>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
+  dataTypes: Sequelize.DataTypes
 ): OffchainCommunityModel => {
-  const OffchainCommunity = sequelize.define<OffchainComunityInstance, OffchainCommunityAttributes>(
-    'OffchainCommunity', {
+  const OffchainCommunity = sequelize.define<
+    OffchainComunityInstance,
+    OffchainCommunityAttributes
+  >(
+    'OffchainCommunity',
+    {
       id: { type: dataTypes.STRING, primaryKey: true },
       name: { type: dataTypes.STRING, allowNull: false },
       creator_id: { type: dataTypes.INTEGER, allowNull: false },
@@ -61,32 +69,59 @@ export default (
       element: { type: dataTypes.STRING, allowNull: true },
       telegram: { type: dataTypes.STRING, allowNull: true },
       github: { type: dataTypes.STRING, allowNull: true },
-      featured_topics: { type: dataTypes.ARRAY(dataTypes.STRING), allowNull: false, defaultValue: [] },
+      featured_topics: {
+        type: dataTypes.ARRAY(dataTypes.STRING),
+        allowNull: false,
+        defaultValue: [],
+      },
       // auth_forum: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
       // auth_condition: { type: DataTypes.STRING, allowNull: true, defaultValue: null }, // For Auth Forum Checking
       // ^^^ other names: community_config, OffchainCommunityConfiguration, CommunityConditions
 
       // XXX: mixing camelCase and underscore_case is bad practice
-      privacyEnabled: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
-      invitesEnabled: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
-      customDomain: { type: dataTypes.STRING, allowNull: true, },
-      collapsed_on_homepage: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: true },
-    }, {
+      privacyEnabled: {
+        type: dataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      invitesEnabled: {
+        type: dataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      customDomain: { type: dataTypes.STRING, allowNull: true },
+      collapsed_on_homepage: {
+        type: dataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true,
+      },
+    },
+    {
       underscored: true,
       paranoid: true,
-      indexes: [
-        { fields: ['id'], unique: true },
-        { fields: ['creator_id'] },
-      ],
+      indexes: [{ fields: ['id'], unique: true }, { fields: ['creator_id'] }],
     }
   );
 
   OffchainCommunity.associate = (models) => {
-    models.OffchainCommunity.belongsTo(models.Chain, { foreignKey: 'default_chain', targetKey: 'id' });
-    models.OffchainCommunity.belongsTo(models.Address, { foreignKey: 'creator_id', targetKey: 'id' });
-    models.OffchainCommunity.hasMany(models.OffchainTopic, { as: 'topics', foreignKey: 'community_id' });
-    models.OffchainCommunity.hasMany(models.OffchainThread, { foreignKey: 'community' });
-    models.OffchainCommunity.hasMany(models.StarredCommunity, { foreignKey: 'community' });
+    models.OffchainCommunity.belongsTo(models.Chain, {
+      foreignKey: 'default_chain',
+      targetKey: 'id',
+    });
+    models.OffchainCommunity.belongsTo(models.Address, {
+      foreignKey: 'creator_id',
+      targetKey: 'id',
+    });
+    models.OffchainCommunity.hasMany(models.OffchainTopic, {
+      as: 'topics',
+      foreignKey: 'community_id',
+    });
+    models.OffchainCommunity.hasMany(models.OffchainThread, {
+      foreignKey: 'community',
+    });
+    models.OffchainCommunity.hasMany(models.StarredCommunity, {
+      foreignKey: 'community',
+    });
   };
 
   return OffchainCommunity;

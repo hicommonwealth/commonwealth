@@ -44,7 +44,10 @@ const getInviteLinks = async (models, req, res, next) => {
   });
   if (!inviteLinks) return next(new Error(Errors.ErrorFetchingLinks));
 
-  return res.json({ status: 'Success', result: inviteLinks.map((inv) => inv.toJSON()) });
+  return res.json({
+    status: 'Success',
+    result: inviteLinks.map((inv) => inv.toJSON()),
+  });
 };
 
 export default getInviteLinks;

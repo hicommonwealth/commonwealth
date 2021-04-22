@@ -19,16 +19,22 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
     return this._api;
   }
 
-  public get denom() { return this.app.chain.currency; }
+  public get denom() {
+    return this.app.chain.currency;
+  }
   public coins(n: number | string | BN, inDollars?: boolean) {
     return new NearToken(n, inDollars);
   }
 
   private _config: any;
-  public get config() { return this._config; }
+  public get config() {
+    return this._config;
+  }
 
   private _chainId: string;
-  public get chainId() { return this._chainId; }
+  public get chainId() {
+    return this._chainId;
+  }
 
   private _syncHandle;
   private _nodeStatus: NodeStatusResult;
@@ -37,7 +43,9 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
   }
 
   private _app: IApp;
-  public get app() { return this._app; }
+  public get app() {
+    return this._app;
+  }
 
   constructor(app: IApp) {
     this._app = app;
@@ -62,15 +70,20 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
 
         // handle chain-related updates
         this._chainId = this._nodeStatus.chain_id;
-        const { latest_block_time, latest_block_height } = this._nodeStatus.sync_info;
+        const {
+          latest_block_time,
+          latest_block_height,
+        } = this._nodeStatus.sync_info;
 
         // update block heights and times
-        const lastTime: moment.Moment = this.app.chain.block && this.app.chain.block.lastTime;
+        const lastTime: moment.Moment =
+          this.app.chain.block && this.app.chain.block.lastTime;
         const lastHeight = this.app.chain.block && this.app.chain.block.height;
         this.app.chain.block.lastTime = moment(latest_block_time);
         this.app.chain.block.height = latest_block_height;
         if (lastTime && lastHeight) {
-          const duration = this.app.chain.block.lastTime.diff(lastTime, 'ms') / 1000;
+          const duration =
+            this.app.chain.block.lastTime.diff(lastTime, 'ms') / 1000;
           const nBlocks = this.app.chain.block.height - lastHeight;
           if (nBlocks > 0 && duration > 0) {
             // if we accidentally miss multiple blocks, use the average block time across all of them
@@ -101,7 +114,7 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
     txFunc,
     txName: string,
     objName: string,
-    cb?: (success: boolean) => void,
+    cb?: (success: boolean) => void
   ): ITXModalData {
     // TODO
     throw new Error('Txs not yet implemented');

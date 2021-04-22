@@ -56,7 +56,7 @@ class OffchainThread implements IUniqueId {
     pinned?: boolean,
     collaborators?: any[],
     chainEntities?: any[],
-    lastEdited?: moment.Moment,
+    lastEdited?: moment.Moment
   ) {
     this.author = author;
     this.title = title;
@@ -77,14 +77,16 @@ class OffchainThread implements IUniqueId {
     this.chain = chain;
     this.readOnly = readOnly;
     this.collaborators = collaborators || [];
-    this.chainEntities = chainEntities ? chainEntities.map((ce) => {
-      return {
-        id: +ce.id,
-        type: ce.type,
-        typeId: ce.type_id,
-        completed: ce.completed,
-      };
-    }) : [];
+    this.chainEntities = chainEntities
+      ? chainEntities.map((ce) => {
+          return {
+            id: +ce.id,
+            type: ce.type,
+            typeId: ce.type_id,
+            completed: ce.completed,
+          };
+        })
+      : [];
     this.lastEdited = lastEdited;
   }
 }

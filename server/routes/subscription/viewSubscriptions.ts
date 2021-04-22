@@ -8,7 +8,12 @@ export const Errors = {
   NotLoggedIn: 'Not logged in',
 };
 
-export default async (models, req: Request, res: Response, next: NextFunction) => {
+export default async (
+  models,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.user) {
     return next(new Error(Errors.NotLoggedIn));
   }
@@ -16,16 +21,20 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
   const notificationParams: any = {
     model: models.Notification,
     as: 'Notifications',
-    include: [{
-      model: models.ChainEvent,
-      required: false,
-      as: 'ChainEvent',
-      include: [{
-        model: models.ChainEventType,
+    include: [
+      {
+        model: models.ChainEvent,
         required: false,
-        as: 'ChainEventType',
-      }, ],
-    }, ]
+        as: 'ChainEvent',
+        include: [
+          {
+            model: models.ChainEventType,
+            required: false,
+            as: 'ChainEventType',
+          },
+        ],
+      },
+    ],
   };
 
   const associationParams: any = [
@@ -33,33 +42,39 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
     {
       model: models.Chain,
       as: 'Chain',
-    }, {
+    },
+    {
       model: models.OffchainCommunity,
       as: 'OffchainCommunity',
-    }, {
+    },
+    {
       model: models.OffchainThread,
       as: 'OffchainThread',
-    }, {
+    },
+    {
       model: models.OffchainComment,
       as: 'OffchainComment',
-    }, {
+    },
+    {
       model: models.ChainEventType,
       as: 'ChainEventType',
-    // // }, {
-    // //   model: models.ChainEntity,
-    // //   as: 'ChainEntity',
-    }];
-
-  const searchParams: any[] = [
-    { subscriber_id: req.user.id },
+      // // }, {
+      // //   model: models.ChainEntity,
+      // //   as: 'ChainEntity',
+    },
   ];
+
+  const searchParams: any[] = [{ subscriber_id: req.user.id }];
 
   const subscriptions = await models.Subscription.findAll({
     where: {
-      [Op.and]: searchParams
+      [Op.and]: searchParams,
     },
-    include: [ ...associationParams ],
+    include: [...associationParams],
   });
 
-  return res.json({ status: 'Success', result: subscriptions.map((s) => s.toJSON()) });
+  return res.json({
+    status: 'Success',
+    result: subscriptions.map((s) => s.toJSON()),
+  });
 };

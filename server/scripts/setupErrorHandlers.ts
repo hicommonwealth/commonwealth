@@ -4,7 +4,7 @@ const log = factory.getLogger(formatFilename(__filename));
 const setupErrorHandlers = (app, rollbar) => {
   // catch 404 and forward to error handler
   app.use((req, res, next) => {
-    const err : any = new Error('Not Found');
+    const err: any = new Error('Not Found');
     err.status = 404;
     next(err);
   });

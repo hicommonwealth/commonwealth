@@ -50,16 +50,16 @@ export interface AddressAttributes {
   Roles?: RoleAttributes[];
 }
 
-export interface AddressInstance extends Sequelize.Instance<AddressAttributes>, AddressAttributes {
+export interface AddressInstance
+  extends Sequelize.Instance<AddressAttributes>,
+    AddressAttributes {
   // no mixins used yet
 }
 
-export interface AddressModel extends Sequelize.Model<AddressInstance, AddressAttributes> {
+export interface AddressModel
+  extends Sequelize.Model<AddressInstance, AddressAttributes> {
   // static methods
-  createEmpty?: (
-    chain: string,
-    address: string,
-  ) => Promise<AddressInstance>;
+  createEmpty?: (chain: string, address: string) => Promise<AddressInstance>;
 
   createWithToken?: (
     user_id: number,
@@ -87,78 +87,119 @@ export interface AddressModel extends Sequelize.Model<AddressInstance, AddressAt
     chain: ChainInstance,
     addressModel: AddressInstance,
     user_id: number,
-    signatureString: string,
+    signatureString: string
   ) => Promise<boolean>;
 }
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
+  dataTypes: Sequelize.DataTypes
 ): AddressModel => {
-  const Address: AddressModel = sequelize.define<AddressInstance, AddressAttributes>('Address', {
-    id:                         { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-    address:                    { type: dataTypes.STRING, allowNull: false },
-    chain:                      { type: dataTypes.STRING, allowNull: false },
-    verification_token:         { type: dataTypes.STRING, allowNull: false },
-    verification_token_expires: { type: dataTypes.DATE, allowNull: true },
-    verified:                   { type: dataTypes.DATE, allowNull: true },
-    keytype:                    { type: dataTypes.STRING, allowNull: true },
-    name:                       { type: dataTypes.STRING, allowNull: true },
-    last_active:                { type: dataTypes.DATE, allowNull: true },
-    created_at:                 { type: dataTypes.DATE, allowNull: false },
-    updated_at:                 { type: dataTypes.DATE, allowNull: false },
-    user_id:                    { type: dataTypes.INTEGER, allowNull: true },
-    is_councillor:              { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
-    is_validator:               { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
-    is_magic:                   { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
-  }, {
-    underscored: true,
-    indexes: [
-      { fields: ['address', 'chain'], unique: true },
-      { fields: ['user_id'] },
-      { fields: ['name'] }
-    ],
-    defaultScope: {
-      attributes: {
-        exclude: [ 'verification_token', 'verification_token_expires', 'created_at', 'updated_at' ],
-      }
+  const Address: AddressModel = sequelize.define<
+    AddressInstance,
+    AddressAttributes
+  >(
+    'Address',
+    {
+      id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+      address: { type: dataTypes.STRING, allowNull: false },
+      chain: { type: dataTypes.STRING, allowNull: false },
+      verification_token: { type: dataTypes.STRING, allowNull: false },
+      verification_token_expires: { type: dataTypes.DATE, allowNull: true },
+      verified: { type: dataTypes.DATE, allowNull: true },
+      keytype: { type: dataTypes.STRING, allowNull: true },
+      name: { type: dataTypes.STRING, allowNull: true },
+      last_active: { type: dataTypes.DATE, allowNull: true },
+      created_at: { type: dataTypes.DATE, allowNull: false },
+      updated_at: { type: dataTypes.DATE, allowNull: false },
+      user_id: { type: dataTypes.INTEGER, allowNull: true },
+      is_councillor: {
+        type: dataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      is_validator: {
+        type: dataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      is_magic: {
+        type: dataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
     },
-    scopes: {
-      withPrivateData: {
-        attributes: {}
-      }
-    },
-  });
+    {
+      underscored: true,
+      indexes: [
+        { fields: ['address', 'chain'], unique: true },
+        { fields: ['user_id'] },
+        { fields: ['name'] },
+      ],
+      defaultScope: {
+        attributes: {
+          exclude: [
+            'verification_token',
+            'verification_token_expires',
+            'created_at',
+            'updated_at',
+          ],
+        },
+      },
+      scopes: {
+        withPrivateData: {
+          attributes: {},
+        },
+      },
+    }
+  );
 
   Address.createEmpty = (
     chain: string,
-    address: string,
+    address: string
   ): Promise<AddressInstance> => {
     const verification_token = 'NO_USER';
     const verification_token_expires = new Date(); // expired immediately
-    return Address.create({ chain, address, verification_token, verification_token_expires });
+    return Address.create({
+      chain,
+      address,
+      verification_token,
+      verification_token_expires,
+    });
   };
 
   Address.createWithToken = (
     user_id: number,
     chain: string,
     address: string,
-    keytype?: string,
+    keytype?: string
   ): Promise<AddressInstance> => {
     const verification_token = crypto.randomBytes(18).toString('hex');
-    const verification_token_expires = new Date(+(new Date()) + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000);
+    const verification_token_expires = new Date(
+      +new Date() + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000
+    );
     const last_active = new Date();
-    return Address.create({ user_id, chain, address, verification_token, verification_token_expires, keytype, last_active });
+    return Address.create({
+      user_id,
+      chain,
+      address,
+      verification_token,
+      verification_token_expires,
+      keytype,
+      last_active,
+    });
   };
 
   // Update an existing address' verification token
   Address.updateWithToken = (
     address: AddressInstance,
     user_id?: number,
-    keytype?: string,
+    keytype?: string
   ): Promise<AddressInstance> => {
     const verification_token = crypto.randomBytes(18).toString('hex');
-    const verification_token_expires = new Date(+(new Date()) + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000);
+    const verification_token_expires = new Date(
+      +new Date() + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000
+    );
     if (user_id) {
       address.user_id = user_id;
     }
@@ -195,7 +236,7 @@ export default (
     chain: ChainInstance,
     addressModel: AddressInstance,
     user_id: number,
-    signatureString: string,
+    signatureString: string
   ): Promise<boolean> => {
     if (!chain) {
       log.error('no chain provided to verifySignature');
@@ -210,7 +251,10 @@ export default (
       const address = decodeAddress(addressModel.address);
       const keyringOptions: KeyringOptions = { type: 'sr25519' };
       if (addressModel.keytype) {
-        if (addressModel.keytype !== 'sr25519' && addressModel.keytype !== 'ed25519') {
+        if (
+          addressModel.keytype !== 'sr25519' &&
+          addressModel.keytype !== 'ed25519'
+        ) {
           log.error('invalid keytype');
           return false;
         }
@@ -218,13 +262,19 @@ export default (
       }
       keyringOptions.ss58Format = chain.ss58_prefix ?? 42;
       const signerKeyring = new Keyring(keyringOptions).addFromAddress(address);
-      const signedMessageNewline = stringToU8a(`${addressModel.verification_token}\n`);
-      const signedMessageNoNewline = stringToU8a(addressModel.verification_token);
-      const signatureU8a = signatureString.slice(0, 2) === '0x'
-        ? hexToU8a(signatureString)
-        : hexToU8a(`0x${signatureString}`);
-      isValid = signerKeyring.verify(signedMessageNewline, signatureU8a)
-        || signerKeyring.verify(signedMessageNoNewline, signatureU8a);
+      const signedMessageNewline = stringToU8a(
+        `${addressModel.verification_token}\n`
+      );
+      const signedMessageNoNewline = stringToU8a(
+        addressModel.verification_token
+      );
+      const signatureU8a =
+        signatureString.slice(0, 2) === '0x'
+          ? hexToU8a(signatureString)
+          : hexToU8a(`0x${signatureString}`);
+      isValid =
+        signerKeyring.verify(signedMessageNewline, signatureU8a) ||
+        signerKeyring.verify(signedMessageNoNewline, signatureU8a);
     } else if (chain.base === 'cosmos') {
       //
       // cosmos-sdk address handling
@@ -235,25 +285,43 @@ export default (
       // we generate an address from the actual public key and verify that it matches,
       // this prevents people from using a different key to sign the message than
       // the account they registered with.
-      const bech32Prefix = chain.network === 'cosmos'
-        ? 'cosmos'
-        : chain.network === 'straightedge' ? 'str' : chain.network;
+      const bech32Prefix =
+        chain.network === 'cosmos'
+          ? 'cosmos'
+          : chain.network === 'straightedge'
+          ? 'str'
+          : chain.network;
       const generatedAddress = getCosmosAddress(pk, bech32Prefix);
       const generatedAddressWithCosmosPrefix = getCosmosAddress(pk, 'cosmos');
 
-      if (generatedAddress === addressModel.address || generatedAddressWithCosmosPrefix === addressModel.address) {
+      if (
+        generatedAddress === addressModel.address ||
+        generatedAddressWithCosmosPrefix === addressModel.address
+      ) {
         // get tx doc that was signed
-        const signDoc = await validationTokenToSignDoc(addressModel.address, addressModel.verification_token.trim());
+        const signDoc = await validationTokenToSignDoc(
+          addressModel.address,
+          addressModel.verification_token.trim()
+        );
 
         // check for signature validity
         // see the last test in @cosmjs/launchpad/src/secp256k1wallet.spec.ts for reference
         const { pubkey, signature } = decodeSignature(signatureData.signature);
-        const secpSignature = Secp256k1Signature.fromFixedLength(fromBase64(signatureData.signature.signature));
-        if (serializeSignDoc(signatureData.signed).toString() !== serializeSignDoc(signDoc).toString()) {
+        const secpSignature = Secp256k1Signature.fromFixedLength(
+          fromBase64(signatureData.signature.signature)
+        );
+        if (
+          serializeSignDoc(signatureData.signed).toString() !==
+          serializeSignDoc(signDoc).toString()
+        ) {
           isValid = false;
         } else {
           const messageHash = new Sha256(serializeSignDoc(signDoc)).digest();
-          isValid = await Secp256k1.verifySignature(secpSignature, messageHash, pubkey);
+          isValid = await Secp256k1.verifySignature(
+            secpSignature,
+            messageHash,
+            pubkey
+          );
         }
       } else {
         isValid = false;
@@ -275,14 +343,14 @@ export default (
       );
       const addressBuffer = ethUtil.publicToAddress(publicKey);
       const address = ethUtil.bufferToHex(addressBuffer);
-      isValid = (addressModel.address.toLowerCase() === address.toLowerCase());
+      isValid = addressModel.address.toLowerCase() === address.toLowerCase();
     } else if (chain.network === 'near') {
       // both in base64 encoding
       const { signature: sigObj, publicKey } = JSON.parse(signatureString);
       isValid = nacl.sign.detached.verify(
         Buffer.from(`${addressModel.verification_token}\n`),
         Buffer.from(sigObj, 'base64'),
-        Buffer.from(publicKey, 'base64'),
+        Buffer.from(publicKey, 'base64')
       );
     } else {
       // invalid network
@@ -323,13 +391,19 @@ export default (
   };
 
   Address.associate = (models) => {
-    models.Address.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
-    models.Address.belongsTo(models.User, { foreignKey: 'user_id', targetKey: 'id' });
+    models.Address.belongsTo(models.Chain, {
+      foreignKey: 'chain',
+      targetKey: 'id',
+    });
+    models.Address.belongsTo(models.User, {
+      foreignKey: 'user_id',
+      targetKey: 'id',
+    });
     models.Address.hasOne(models.OffchainProfile);
     models.Address.hasMany(models.Role, { foreignKey: 'address_id' });
     models.Address.belongsToMany(models.OffchainThread, {
       through: models.Collaboration,
-      as: 'collaboration'
+      as: 'collaboration',
     });
     models.Address.hasMany(models.Collaboration);
   };

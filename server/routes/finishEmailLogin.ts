@@ -4,19 +4,34 @@ import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
-export const redirectWithLoginSuccess = (res, email, path?, confirmation?, newAcct = false) => {
+export const redirectWithLoginSuccess = (
+  res,
+  email,
+  path?,
+  confirmation?,
+  newAcct = false
+) => {
   // Returns new if we are creating a new account
-  const url = `${SERVER_URL}/?loggedin=true&email=${email}&new=${newAcct}${path ? `&path=${encodeURIComponent(path)}` : ''}${confirmation ? '&confirmation=success' : ''}`;
+  const url = `${SERVER_URL}/?loggedin=true&email=${email}&new=${newAcct}${
+    path ? `&path=${encodeURIComponent(path)}` : ''
+  }${confirmation ? '&confirmation=success' : ''}`;
   return res.redirect(url);
 };
 
 export const redirectWithLoginError = (res, message) => {
-  const url = SERVER_URL + `/?loggedin=false&loginerror=${encodeURIComponent(message)}`;
+  const url = `${SERVER_URL}/?loggedin=false&loginerror=${encodeURIComponent(
+    message
+  )}`;
   return res.redirect(url);
 };
 import { Request, Response, NextFunction } from 'express';
 
-const finishEmailLogin = async (models, req: Request, res: Response, next: NextFunction) => {
+const finishEmailLogin = async (
+  models,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const previousUser = req.user;
   if (req.user && req.user.email && req.user.emailVerified) {
     return redirectWithLoginSuccess(res, req.user.email);
@@ -44,29 +59,46 @@ const finishEmailLogin = async (models, req: Request, res: Response, next: NextF
   await tokenObj.save();
 
   // Log in the user associated with the verified email
-  const existingUser = await models.User.scope('withPrivateData').findOne({ where: { email } });
+  const existingUser = await models.User.scope('withPrivateData').findOne({
+    where: { email },
+  });
 
   if (existingUser) {
     req.login(existingUser, async (err) => {
-      if (err) return redirectWithLoginError(res, 'Could not log in with user at ' + email);
+      if (err)
+        return redirectWithLoginError(
+          res,
+          `Could not log in with user at ${email}`
+        );
       // If the user is currently in a partly-logged-in state, merge their
       // social accounts over to the newly found user
       if (previousUser && previousUser.id !== existingUser.id) {
-        const [oldSocialAccounts, oldAddresses,
-               newSocialAccounts, newAddresses] = await Promise.all([
+        const [
+          oldSocialAccounts,
+          oldAddresses,
+          newSocialAccounts,
+          newAddresses,
+        ] = await Promise.all([
           previousUser.getSocialAccounts(),
           previousUser.getAddresses().filter((address) => !!address.verified),
           existingUser.getSocialAccounts(),
           existingUser.getAddresses().filter((address) => !!address.verified),
         ]);
-        await existingUser.setSocialAccounts(oldSocialAccounts.concat(newSocialAccounts));
+        await existingUser.setSocialAccounts(
+          oldSocialAccounts.concat(newSocialAccounts)
+        );
         await existingUser.setAddresses(oldAddresses.concat(newAddresses));
       }
       if (!existingUser.emailVerified) {
         existingUser.emailVerified = true;
         await existingUser.save();
       }
-      return redirectWithLoginSuccess(res, email, tokenObj.redirect_path, confirmation);
+      return redirectWithLoginSuccess(
+        res,
+        email,
+        tokenObj.redirect_path,
+        confirmation
+      );
     });
   } else if (previousUser && !previousUser.email) {
     // If the user is an partly-logged-in state, but the email is new, just set that user's email.
@@ -74,8 +106,17 @@ const finishEmailLogin = async (models, req: Request, res: Response, next: NextF
     previousUser.emailVerified = true;
     await previousUser.save();
     req.login(previousUser, (err) => {
-      if (err) return redirectWithLoginError(res, 'Could not log in with user at ' + email);
-      return redirectWithLoginSuccess(res, email, tokenObj.redirect_path, confirmation);
+      if (err)
+        return redirectWithLoginError(
+          res,
+          `Could not log in with user at ${email}`
+        );
+      return redirectWithLoginSuccess(
+        res,
+        email,
+        tokenObj.redirect_path,
+        confirmation
+      );
     });
   } else {
     // If the user isn't in a partly-logged-in state, create a new user
@@ -101,8 +142,18 @@ const finishEmailLogin = async (models, req: Request, res: Response, next: NextF
     });
 
     req.login(newUser, (err) => {
-      if (err) return redirectWithLoginError(res, 'Could not log in with user at ' + email);
-      return redirectWithLoginSuccess(res, email, tokenObj.redirect_path, confirmation, true);
+      if (err)
+        return redirectWithLoginError(
+          res,
+          `Could not log in with user at ${email}`
+        );
+      return redirectWithLoginSuccess(
+        res,
+        email,
+        tokenObj.redirect_path,
+        confirmation,
+        true
+      );
     });
   }
 };

@@ -9,8 +9,17 @@ export const Errors = {
   NoCommentOrThreadId: 'Must provide a comment or thread ID',
 };
 
-const viewReactions = async (models, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
+const viewReactions = async (
+  models,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const [chain, community, error] = await lookupCommunityIsVisibleToUser(
+    models,
+    req.query,
+    req.user
+  );
   if (error) return next(new Error(error));
 
   if (!req.query.thread_id && !req.query.comment_id) {
@@ -27,14 +36,17 @@ const viewReactions = async (models, req: Request, res: Response, next: NextFunc
   try {
     reactions = await models.OffchainReaction.findAll({
       where: options,
-      include: [ models.Address ],
+      include: [models.Address],
       order: [['created_at', 'DESC']],
     });
   } catch (err) {
     return next(new Error(err));
   }
 
-  return res.json({ status: 'Success', result: reactions.map((c) => c.toJSON()) });
+  return res.json({
+    status: 'Success',
+    result: reactions.map((c) => c.toJSON()),
+  });
 };
 
 export default viewReactions;

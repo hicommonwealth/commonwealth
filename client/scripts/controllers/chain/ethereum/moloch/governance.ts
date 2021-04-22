@@ -1,7 +1,12 @@
 import BN from 'bn.js';
 import EthDater from 'ethereum-block-by-date';
 
-import { ProposalModule, ITXModalData, ChainEntity, IChainModule } from 'models';
+import {
+  ProposalModule,
+  ITXModalData,
+  ChainEntity,
+  IChainModule,
+} from 'models';
 
 import { ERC20Token, EthereumCoin } from 'adapters/chain/ethereum/types';
 import { IMolochProposalResponse } from 'adapters/chain/moloch/types';
@@ -39,22 +44,49 @@ export default class MolochGovernance extends ProposalModule<
   private _Members: MolochMembers;
 
   // GETTERS
-  public get proposalCount() { return this._proposalCount; }
-  public get proposalDeposit() { return this._proposalDeposit; }
-  public get gracePeriod() { return this._gracePeriod; }
-  public get summoningTime() { return this._summoningTime; }
-  public get votingPeriodLength() { return this._votingPeriodLength; }
-  public get periodDuration() { return this._periodDuration; }
-  public get abortWindow() { return this._abortWindow; }
-  public get totalShares() { return this._totalShares; }
-  public get totalSharesRequested() { return this._totalSharesRequested; }
-  public get guildbank() { return this._guildBank; }
+  public get proposalCount() {
+    return this._proposalCount;
+  }
+  public get proposalDeposit() {
+    return this._proposalDeposit;
+  }
+  public get gracePeriod() {
+    return this._gracePeriod;
+  }
+  public get summoningTime() {
+    return this._summoningTime;
+  }
+  public get votingPeriodLength() {
+    return this._votingPeriodLength;
+  }
+  public get periodDuration() {
+    return this._periodDuration;
+  }
+  public get abortWindow() {
+    return this._abortWindow;
+  }
+  public get totalShares() {
+    return this._totalShares;
+  }
+  public get totalSharesRequested() {
+    return this._totalSharesRequested;
+  }
+  public get guildbank() {
+    return this._guildBank;
+  }
   public get currentPeriod() {
-    return ((Date.now() / 1000) - this.summoningTime.toNumber()) / this.periodDuration.toNumber();
+    return (
+      (Date.now() / 1000 - this.summoningTime.toNumber()) /
+      this.periodDuration.toNumber()
+    );
   }
 
-  public get api() { return this._api; }
-  public get usingServerChainEntities() { return this._usingServerChainEntities; }
+  public get api() {
+    return this._api;
+  }
+  public get usingServerChainEntities() {
+    return this._usingServerChainEntities;
+  }
 
   // INIT / DEINIT
   constructor(app: IApp, private _usingServerChainEntities = false) {
@@ -67,20 +99,49 @@ export default class MolochGovernance extends ProposalModule<
     this._api = api;
     this._guildBank = await this._api.Contract.guildBank();
 
-    this._totalSharesRequested = new BN((await this._api.Contract.totalSharesRequested()).toString(), 10);
-    this._totalShares = new BN((await this._api.Contract.totalShares()).toString(), 10);
-    this._gracePeriod = new BN((await this._api.Contract.gracePeriodLength()).toString(), 10);
-    this._abortWindow = new BN((await this._api.Contract.abortWindow()).toString(), 10);
-    this._summoningTime = new BN((await this._api.Contract.summoningTime()).toString(), 10);
-    this._votingPeriodLength = new BN((await this._api.Contract.votingPeriodLength()).toString(), 10);
-    this._periodDuration = new BN((await this._api.Contract.periodDuration()).toString(), 10);
-    this._proposalDeposit = new BN((await this._api.Contract.proposalDeposit()).toString(), 10);
+    this._totalSharesRequested = new BN(
+      (await this._api.Contract.totalSharesRequested()).toString(),
+      10
+    );
+    this._totalShares = new BN(
+      (await this._api.Contract.totalShares()).toString(),
+      10
+    );
+    this._gracePeriod = new BN(
+      (await this._api.Contract.gracePeriodLength()).toString(),
+      10
+    );
+    this._abortWindow = new BN(
+      (await this._api.Contract.abortWindow()).toString(),
+      10
+    );
+    this._summoningTime = new BN(
+      (await this._api.Contract.summoningTime()).toString(),
+      10
+    );
+    this._votingPeriodLength = new BN(
+      (await this._api.Contract.votingPeriodLength()).toString(),
+      10
+    );
+    this._periodDuration = new BN(
+      (await this._api.Contract.periodDuration()).toString(),
+      10
+    );
+    this._proposalDeposit = new BN(
+      (await this._api.Contract.proposalDeposit()).toString(),
+      10
+    );
 
     // fetch all proposals
     if (this._usingServerChainEntities) {
       console.log('Fetching moloch proposals from backend.');
-      await this.app.chain.chainEntities.refresh(this.app.chain.id, EntityRefreshOption.AllEntities);
-      const entities = this.app.chain.chainEntities.store.getByType(MolochEvents.Types.EntityKind.Proposal);
+      await this.app.chain.chainEntities.refresh(
+        this.app.chain.id,
+        EntityRefreshOption.AllEntities
+      );
+      const entities = this.app.chain.chainEntities.store.getByType(
+        MolochEvents.Types.EntityKind.Proposal
+      );
       entities.map((p) => this._entityConstructor(p));
     } else {
       console.log('Fetching moloch proposals from chain.');
@@ -89,13 +150,18 @@ export default class MolochGovernance extends ProposalModule<
         1,
         new EthDater((this.app.chain as Moloch).chain.api)
       );
-      const subscriber = new MolochEvents.Subscriber(api.Contract, this.app.chain.id);
+      const subscriber = new MolochEvents.Subscriber(
+        api.Contract,
+        this.app.chain.id
+      );
       const processor = new MolochEvents.Processor(api.Contract, 1);
-      await this.app.chain.chainEntities.fetchEntities(this.app.chain.id, () => fetcher.fetch());
+      await this.app.chain.chainEntities.fetchEntities(this.app.chain.id, () =>
+        fetcher.fetch()
+      );
       await this.app.chain.chainEntities.subscribeEntities(
         this.app.chain.id,
         subscriber,
-        processor,
+        processor
       );
     }
     this._proposalCount = new BN(this.store.getAll().length);
@@ -116,7 +182,7 @@ export default class MolochGovernance extends ProposalModule<
     applicantAddress: string,
     tokenTribute: BN,
     sharesRequested: BN,
-    details: string,
+    details: string
   ) {
     if (!(await this._Members.isSenderDelegate())) {
       throw new Error('sender must be valid delegate');
@@ -127,7 +193,9 @@ export default class MolochGovernance extends ProposalModule<
     }
 
     const MAX_N_SHARES = new BN(10).pow(new BN(18));
-    const newShareCount = sharesRequested.add(this.totalShares).add(this.totalSharesRequested);
+    const newShareCount = sharesRequested
+      .add(this.totalShares)
+      .add(this.totalSharesRequested);
     if (newShareCount.gt(MAX_N_SHARES)) {
       throw new Error('too many shares requested');
     }
@@ -135,7 +203,7 @@ export default class MolochGovernance extends ProposalModule<
     // first, we must approve xfer of proposal deposit tokens from the submitter
     const approvalTxReceipt = await submitter.approveTokenTx(
       new ERC20Token(this._api.tokenContract.address, this.proposalDeposit),
-      this._api.contractAddress,
+      this._api.contractAddress
     );
     if (approvalTxReceipt.status !== 1) {
       throw new Error('failed to approve proposal deposit');
@@ -148,7 +216,7 @@ export default class MolochGovernance extends ProposalModule<
       tokenTribute.toString(),
       sharesRequested.toString(),
       details,
-      { gasLimit: this._api.gasLimit },
+      { gasLimit: this._api.gasLimit }
     );
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {

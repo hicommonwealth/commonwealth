@@ -1,7 +1,11 @@
 import BN from 'bn.js';
 import { Wallet } from 'ethereumjs-wallet';
 import {
-  hashPersonalMessage, fromRpcSig, ecrecover, ecsign, toRpcSig
+  hashPersonalMessage,
+  fromRpcSig,
+  ecrecover,
+  ecsign,
+  toRpcSig,
 } from 'ethereumjs-util';
 import { providers } from 'ethers';
 
@@ -11,15 +15,19 @@ import { Erc20Factory } from 'Erc20Factory';
 import { EthereumCoin, ERC20Token } from 'adapters/chain/ethereum/types';
 import EthereumChain from './chain';
 import EthereumAccounts, {
-  getWalletFromSeed, addressFromSeed, addressFromMnemonic, getWalletFromMnemonic, addressFromWallet
+  getWalletFromSeed,
+  addressFromSeed,
+  addressFromMnemonic,
+  getWalletFromMnemonic,
+  addressFromWallet,
 } from './accounts';
 
 export default class EthereumAccount extends Account<EthereumCoin> {
   public get balance(): Promise<EthereumCoin> {
     if (!this._Chain) return; // TODO
-    return this._Chain.api.eth.getBalance(this.address).then(
-      (v) => new EthereumCoin('ETH', new BN(v), false)
-    );
+    return this._Chain.api.eth
+      .getBalance(this.address)
+      .then((v) => new EthereumCoin('ETH', new BN(v), false));
   }
 
   // Given an ERC20 token contract, fetches the balance of this account in that contract's tokens
@@ -37,9 +45,15 @@ export default class EthereumAccount extends Account<EthereumCoin> {
     if (!this._Chain) return;
     const token = Erc20Factory.connect(
       toSend.contractAddress,
-      (new providers.Web3Provider(this._Chain.api.currentProvider as any)).getSigner(this.address),
+      new providers.Web3Provider(
+        this._Chain.api.currentProvider as any
+      ).getSigner(this.address)
     );
-    const transferTx = await token.transfer(recipient, toSend.asBN.toString(10), { gasLimit: 3000000 });
+    const transferTx = await token.transfer(
+      recipient,
+      toSend.asBN.toString(10),
+      { gasLimit: 3000000 }
+    );
     const transferTxReceipt = await transferTx.wait();
     if (transferTxReceipt.status !== 1) {
       throw new Error('failed to transfer tokens');
@@ -51,7 +65,9 @@ export default class EthereumAccount extends Account<EthereumCoin> {
     if (!this._Chain) return; // TODO
     const token = Erc20Factory.connect(
       toApprove.contractAddress,
-      (new providers.Web3Provider(this._Chain.api.currentProvider as any)).getSigner(this.address),
+      new providers.Web3Provider(
+        this._Chain.api.currentProvider as any
+      ).getSigner(this.address)
     );
     const approvalTx = await token.approve(
       spender,
@@ -70,7 +86,10 @@ export default class EthereumAccount extends Account<EthereumCoin> {
 
   // Given an ERC20 token contract and a spender, fetches the token amount that this account has
   // approved for "spender" to spend.
-  public async tokenAllowance(contractAddress: string, spender: string): Promise<ERC20Token> {
+  public async tokenAllowance(
+    contractAddress: string,
+    spender: string
+  ): Promise<ERC20Token> {
     if (!this._Chain) return; // TODO
     const token = Erc20Factory.connect(
       contractAddress,
@@ -80,25 +99,36 @@ export default class EthereumAccount extends Account<EthereumCoin> {
     return new ERC20Token(contractAddress, new BN(allowance.toString(), 10));
   }
 
-  public sendBalanceTx(recipient: Account<EthereumCoin>, amount: EthereumCoin):
-    ITXModalData | Promise<ITXModalData> {
+  public sendBalanceTx(
+    recipient: Account<EthereumCoin>,
+    amount: EthereumCoin
+  ): ITXModalData | Promise<ITXModalData> {
     throw new Error('Method not implemented.');
   }
 
-  public sendTx(recipient: Account<EthereumCoin>, amount: EthereumCoin):
-  ITXModalData | Promise<ITXModalData> {
+  public sendTx(
+    recipient: Account<EthereumCoin>,
+    amount: EthereumCoin
+  ): ITXModalData | Promise<ITXModalData> {
     throw new Error('Method not implemented.');
   }
 
   protected _initialized: Promise<boolean>;
-  get initialized(): Promise<boolean> { return this._initialized; }
+  get initialized(): Promise<boolean> {
+    return this._initialized;
+  }
 
   private _Chain: EthereumChain;
   private _Accounts: EthereumAccounts;
   private wallet: Wallet;
 
   // CONSTRUCTORS
-  constructor(app: IApp, ChainInfo: EthereumChain, Accounts: EthereumAccounts, address: string) {
+  constructor(
+    app: IApp,
+    ChainInfo: EthereumChain,
+    Accounts: EthereumAccounts,
+    address: string
+  ) {
     super(app, app.chain.meta.chain, address.toLowerCase());
     if (!app.isModuleReady) {
       // defer chain initialization
@@ -154,7 +184,9 @@ export default class EthereumAccount extends Account<EthereumCoin> {
     if (this.seed) {
       privateKey = getWalletFromSeed(this.seed).getPrivateKey().toString('hex');
     } else if (this.mnemonic) {
-      privateKey = getWalletFromMnemonic(this.mnemonic).getPrivateKey().toString('hex');
+      privateKey = getWalletFromMnemonic(this.mnemonic)
+        .getPrivateKey()
+        .toString('hex');
     } else if (this.wallet) {
       privateKey = this.wallet.getPrivateKey().toString('hex');
     } else {
@@ -168,6 +200,11 @@ export default class EthereumAccount extends Account<EthereumCoin> {
   public recoverSigner(message: string, signature: string): Buffer {
     const recovered = fromRpcSig(signature);
     const msgHash = hashPersonalMessage(Buffer.from(message));
-    return ecrecover(Buffer.from(msgHash), recovered.v, recovered.r, recovered.s);
+    return ecrecover(
+      Buffer.from(msgHash),
+      recovered.v,
+      recovered.r,
+      recovered.s
+    );
   }
 }

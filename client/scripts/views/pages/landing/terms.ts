@@ -126,9 +126,9 @@ const TermsPage: m.Component<{}> = {
       m('.forum-container', [
         m('h1.page-title', 'Terms of Service'),
         renderMultilineText(TermsOfService),
-      ])
+      ]),
     ]);
-  }
+  },
 };
 
 export default TermsPage;

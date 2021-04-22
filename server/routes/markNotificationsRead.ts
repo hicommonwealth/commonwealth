@@ -12,7 +12,12 @@ export const Errors = {
   WrongOwner: 'Notification not owned by user',
 };
 
-export default async (models, req: Request, res: Response, next: NextFunction) => {
+export default async (
+  models,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.user) {
     return next(new Error(Errors.NotLoggedIn));
   }
@@ -29,7 +34,7 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
 
   const notifications = await models.Notification.findAll({
     where: { id: idOptions },
-    include: [ models.Subscription ]
+    include: [models.Subscription],
   });
 
   if (notifications.find((n) => n.Subscription.subscriber_id !== req.user.id)) {
@@ -37,10 +42,12 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
   }
 
   await sequelize.transaction(async (t) => {
-    await Promise.all(notifications.map((n) => {
-      n.is_read = true;
-      return n.save({ transaction: t });
-    }));
+    await Promise.all(
+      notifications.map((n) => {
+        n.is_read = true;
+        return n.save({ transaction: t });
+      })
+    );
   });
 
   return res.json({ status: 'Success', result: 'Marked notifications read' });

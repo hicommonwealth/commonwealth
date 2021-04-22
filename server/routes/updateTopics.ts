@@ -7,7 +7,7 @@ enum UpdateTopicsErrors {
   NoAddr = 'Must provide address',
   NoTopic = 'Must provide topic_name',
   InvalidAddr = 'Invalid address',
-  NoPermission = `You do not have permission to edit post's topics`
+  NoPermission = `You do not have permission to edit post's topics`,
 }
 
 const updateTopics = async (models, req, res: Response, next: NextFunction) => {
@@ -17,7 +17,9 @@ const updateTopics = async (models, req, res: Response, next: NextFunction) => {
   if (!req.body.topic_name) return next(new Error(UpdateTopicsErrors.NoTopic));
 
   const userAddresses = await req.user.getAddresses();
-  const userAddress = userAddresses.find((a) => !!a.verified && a.address === req.body.address);
+  const userAddress = userAddresses.find(
+    (a) => !!a.verified && a.address === req.body.address
+  );
   if (!userAddress) return next(new Error(UpdateTopicsErrors.InvalidAddr));
 
   const thread = await models.OffchainThread.findOne({
@@ -27,15 +29,17 @@ const updateTopics = async (models, req, res: Response, next: NextFunction) => {
   });
 
   const roles: any[] = await models.Role.findAll({
-    where: thread.community ? {
-      permission: ['admin', 'moderator'],
-      address_id: userAddress.id,
-      offchain_community_id: thread.community,
-    } : {
-      permission: ['admin', 'moderator'],
-      address_id: userAddress.id,
-      chain_id: thread.chain,
-    },
+    where: thread.community
+      ? {
+          permission: ['admin', 'moderator'],
+          address_id: userAddress.id,
+          offchain_community_id: thread.community,
+        }
+      : {
+          permission: ['admin', 'moderator'],
+          address_id: userAddress.id,
+          chain_id: thread.chain,
+        },
   });
   const isAdminOrMod = roles.length > 0;
   // const isAuthor = (thread.address_id === userAddress.id);
@@ -49,7 +53,7 @@ const updateTopics = async (models, req, res: Response, next: NextFunction) => {
     thread.topic_id = req.body.topic_id;
     await thread.save();
     newTopic = await models.OffchainTopic.findOne({
-      where: { id: req.body.topic_id }
+      where: { id: req.body.topic_id },
     });
   } else {
     [newTopic] = await models.OffchainTopic.findOrCreate({

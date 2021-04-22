@@ -1,7 +1,12 @@
 /**
  * Generic handler that stores the event in the database.
  */
-import { IEventHandler, CWEvent, IChainEventKind, SubstrateTypes } from '@commonwealth/chain-events';
+import {
+  IEventHandler,
+  CWEvent,
+  IChainEventKind,
+  SubstrateTypes,
+} from '@commonwealth/chain-events';
 import Sequelize from 'sequelize';
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
@@ -16,7 +21,7 @@ export default class extends IEventHandler {
   constructor(
     private readonly _models,
     private readonly _chain: string,
-    private readonly _filterConfig: StorageFilterConfig = {},
+    private readonly _filterConfig: StorageFilterConfig = {}
   ) {
     super();
   }
@@ -27,16 +32,20 @@ export default class extends IEventHandler {
    */
   private truncateEvent(event: CWEvent, maxLength = 64): CWEvent {
     // only truncate preimages, for now
-    if (event.data.kind === SubstrateTypes.EventKind.PreimageNoted && event.data.preimage) {
-      event.data.preimage.args = event.data.preimage.args.map((m) => m.length > maxLength
-        ? `${m.slice(0, maxLength - 1)}…`
-        : m);
+    if (
+      event.data.kind === SubstrateTypes.EventKind.PreimageNoted &&
+      event.data.preimage
+    ) {
+      event.data.preimage.args = event.data.preimage.args.map((m) =>
+        m.length > maxLength ? `${m.slice(0, maxLength - 1)}…` : m
+      );
     }
     return event;
   }
 
   private async _shouldSkip(event: CWEvent): Promise<boolean> {
-    if (this._filterConfig.excludedEvents?.includes(event.data.kind)) return true;
+    if (this._filterConfig.excludedEvents?.includes(event.data.kind))
+      return true;
     const addressesExist = async (addresses: string[]) => {
       const addressModels = await this._models.Address.findAll({
         where: {
@@ -75,12 +84,15 @@ export default class extends IEventHandler {
     }
 
     // locate event type and add event (and event type if needed) to database
-    const [ dbEventType, created ] = await this._models.ChainEventType.findOrCreate({
+    const [
+      dbEventType,
+      created,
+    ] = await this._models.ChainEventType.findOrCreate({
       where: {
         id: `${this._chain}-${event.data.kind.toString()}`,
         chain: this._chain,
         event_name: event.data.kind.toString(),
-      }
+      },
     });
     if (!dbEventType) {
       log.error(`unknown event type: ${event.data.kind}`);

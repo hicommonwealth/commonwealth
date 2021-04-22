@@ -11,7 +11,12 @@ export const Errors = {
   CannotDeleteChain: 'Cannot delete a chain with registered addresses',
 };
 
-const deleteChain = async (models, req: Request, res: Response, next: NextFunction) => {
+const deleteChain = async (
+  models,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.user) {
     return next(new Error(Errors.NotLoggedIn));
   }
@@ -22,9 +27,11 @@ const deleteChain = async (models, req: Request, res: Response, next: NextFuncti
     return next(new Error(Errors.NeedChainId));
   }
 
-  const chain = await models.Chain.findOne({ where: {
-    id: req.body.id,
-  } });
+  const chain = await models.Chain.findOne({
+    where: {
+      id: req.body.id,
+    },
+  });
   if (!chain) {
     return next(new Error(Errors.NoChain));
   }

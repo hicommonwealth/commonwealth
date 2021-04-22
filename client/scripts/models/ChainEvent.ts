@@ -24,7 +24,7 @@ class ChainEvent {
       json.block_number,
       json.event_data,
       ChainEventType.fromJSON(json.ChainEventType),
-      json.id,
+      json.id
     );
   }
 }

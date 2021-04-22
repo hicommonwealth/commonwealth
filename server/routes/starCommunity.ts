@@ -5,8 +5,17 @@ export const Errors = {
   NoStarValue: 'Must specify true or false to set starred status',
 };
 
-const starCommunity = async (models, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+const starCommunity = async (
+  models,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const [chain, community, error] = await lookupCommunityIsVisibleToUser(
+    models,
+    req.body,
+    req.user
+  );
   if (error) return next(new Error(error));
 
   if (req.body.star === 'true') {
@@ -22,7 +31,7 @@ const starCommunity = async (models, req: Request, res: Response, next: NextFunc
     const star = await models.StarredCommunity.findOne({
       where: chain
         ? { chain: chain.id, user_id: req.user.id }
-        : { community: community.id, user_id: req.user.id }
+        : { community: community.id, user_id: req.user.id },
     });
     if (star) {
       await star.destroy();

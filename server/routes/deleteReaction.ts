@@ -10,7 +10,12 @@ export const Errors = {
   AddressNotOwned: 'Not owned by this user',
 };
 
-const deleteReaction = async (models, req: Request, res: Response, next: NextFunction) => {
+const deleteReaction = async (
+  models,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.user) {
     return next(new Error(Errors.NotLoggedIn));
   }
@@ -19,13 +24,16 @@ const deleteReaction = async (models, req: Request, res: Response, next: NextFun
   }
 
   try {
-    const userOwnedAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
+    const userOwnedAddressIds = await req.user
+      .getAddresses()
+      .filter((addr) => !!addr.verified)
+      .map((addr) => addr.id);
     const reaction = await models.OffchainReaction.findOne({
       where: {
         id: req.body.reaction_id,
         address_id: { [Op.in]: userOwnedAddressIds },
       },
-      include: [ models.Address ],
+      include: [models.Address],
     });
     // actually delete
     await reaction.destroy();

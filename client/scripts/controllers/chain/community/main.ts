@@ -6,13 +6,17 @@ import $ from 'jquery';
 import OffchainAccounts, { OffchainAccount } from './account';
 
 class Community extends ICommunityAdapter<Coin, OffchainAccount> {
-  private _loaded: boolean = false;
+  private _loaded = false;
   public accounts: OffchainAccounts;
 
-  get loaded() { return this._loaded; }
+  get loaded() {
+    return this._loaded;
+  }
 
-  private _serverLoaded: boolean = false;
-  get serverLoaded() { return this._serverLoaded; }
+  private _serverLoaded = false;
+  get serverLoaded() {
+    return this._serverLoaded;
+  }
 
   public init = async () => {
     console.log(`Starting ${this.meta.name}`);
@@ -31,9 +35,21 @@ class Community extends ICommunityAdapter<Coin, OffchainAccount> {
     }
 
     const {
-      threads, comments, reactions, topics, admins, activeUsers, numPrevotingThreads, numVotingThreads
+      threads,
+      comments,
+      reactions,
+      topics,
+      admins,
+      activeUsers,
+      numPrevotingThreads,
+      numVotingThreads,
     } = response.result;
-    this.app.threads.initialize(threads, numPrevotingThreads, numVotingThreads, true);
+    this.app.threads.initialize(
+      threads,
+      numPrevotingThreads,
+      numVotingThreads,
+      true
+    );
     this.app.comments.initialize(comments, true);
     this.app.reactions.initialize(reactions, true);
     this.app.topics.initialize(topics, true);
@@ -42,7 +58,7 @@ class Community extends ICommunityAdapter<Coin, OffchainAccount> {
     this._serverLoaded = true;
     this._loaded = true;
     return true;
-  }
+  };
 
   public deinit = async (): Promise<void> => {
     this._loaded = false;
@@ -51,7 +67,7 @@ class Community extends ICommunityAdapter<Coin, OffchainAccount> {
     this.app.comments.deinit();
     this.app.reactions.deinit();
     console.log(`${this.meta.name} stopped.`);
-  }
+  };
 }
 
 export default Community;

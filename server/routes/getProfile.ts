@@ -11,7 +11,12 @@ export const Errors = {
   NoAddressFound: 'No address found',
 };
 
-const getProfile = async (models, req: Request, res: Response, next: NextFunction) => {
+const getProfile = async (
+  models,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { chain, address } = req.query;
   if (!chain) return next(new Error(Errors.NoChain));
   if (!address) return next(new Error(Errors.NoAddress));
@@ -29,7 +34,9 @@ const getProfile = async (models, req: Request, res: Response, next: NextFunctio
         address_id: { [Op.in]: addressIds },
       },
     });
-    const visiblePrivateCommunityIds = roles.map((role) => role.offchain_community_id);
+    const visiblePrivateCommunityIds = roles.map(
+      (role) => role.offchain_community_id
+    );
     const privateCommunities = await models.OffchainCommunity.findAll({
       where: {
         privacyEnabled: true,
@@ -44,44 +51,51 @@ const getProfile = async (models, req: Request, res: Response, next: NextFunctio
   const publicChains = await models.Chain.findAll();
   const visibleChainIds = publicChains.map((c) => c.id);
 
-
   const addressModel = await models.Address.findOne({
     where: {
       address,
       chain,
     },
-    include: [ models.OffchainProfile, ],
+    include: [models.OffchainProfile],
   });
   if (!addressModel) return next(new Error(Errors.NoAddressFound));
 
   const threads = await models.OffchainThread.findAll({
     where: {
       address_id: addressModel.id,
-      [Op.or]: [{
-        community: { [Op.in]: visibleCommunityIds }
-      }, {
-        chain: { [Op.in]: visibleChainIds }
-      }]
+      [Op.or]: [
+        {
+          community: { [Op.in]: visibleCommunityIds },
+        },
+        {
+          chain: { [Op.in]: visibleChainIds },
+        },
+      ],
     },
-    include: [ { model: models.Address, as: 'Address' } ],
+    include: [{ model: models.Address, as: 'Address' }],
   });
 
   const comments = await models.OffchainComment.findAll({
     where: {
       address_id: addressModel.id,
-      [Op.or]: [{
-        community: { [Op.in]: visibleCommunityIds }
-      }, {
-        chain: { [Op.in]: visibleChainIds }
-      }]
+      [Op.or]: [
+        {
+          community: { [Op.in]: visibleCommunityIds },
+        },
+        {
+          chain: { [Op.in]: visibleChainIds },
+        },
+      ],
     },
   });
 
   return res.json({
     status: 'Success',
     result: {
-      account: addressModel, threads: threads.map((t) => t.toJSON()), comments: comments.map((c) => c.toJSON())
-    }
+      account: addressModel,
+      threads: threads.map((t) => t.toJSON()),
+      comments: comments.map((c) => c.toJSON()),
+    },
   });
 };
 

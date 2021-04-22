@@ -10,24 +10,48 @@ class Profile {
   private _avatarUrl: string;
   private _initialized: boolean;
   private _judgements: { [registrar: string]: string } = {};
-  private _isOnchain: boolean = false;
+  private _isOnchain = false;
   private _lastActive: Date;
-  private _isCouncillor: boolean = false;
-  private _isValidator: boolean = false;
-  private _isEmpty: boolean = false;
-  private _isNameInvalid: boolean = false;
-  get name() { return this._name; }
-  get headline() { return this._headline; }
-  get bio() { return this._bio; }
-  get avatarUrl() { return this._avatarUrl; }
-  get initialized() { return this._initialized; }
-  get judgements() { return this._judgements; }
-  get isOnchain() { return this._isOnchain; }
-  get lastActive() { return this._lastActive; }
-  get isCouncillor() { return this._isCouncillor; }
-  get isValidator() { return this._isValidator; }
-  get isEmpty() { return this._isEmpty; }
-  get isNameInvalid() { return this._isNameInvalid; }
+  private _isCouncillor = false;
+  private _isValidator = false;
+  private _isEmpty = false;
+  private _isNameInvalid = false;
+  get name() {
+    return this._name;
+  }
+  get headline() {
+    return this._headline;
+  }
+  get bio() {
+    return this._bio;
+  }
+  get avatarUrl() {
+    return this._avatarUrl;
+  }
+  get initialized() {
+    return this._initialized;
+  }
+  get judgements() {
+    return this._judgements;
+  }
+  get isOnchain() {
+    return this._isOnchain;
+  }
+  get lastActive() {
+    return this._lastActive;
+  }
+  get isCouncillor() {
+    return this._isCouncillor;
+  }
+  get isValidator() {
+    return this._isValidator;
+  }
+  get isEmpty() {
+    return this._isEmpty;
+  }
+  get isNameInvalid() {
+    return this._isNameInvalid;
+  }
 
   public readonly chain: string;
   public readonly address: string;
@@ -50,7 +74,16 @@ class Profile {
     this._isNameInvalid = true;
   }
 
-  public initializeWithChain(name, headline, bio, avatarUrl, judgements, lastActive, isCouncillor = false, isValidator = false) {
+  public initializeWithChain(
+    name,
+    headline,
+    bio,
+    avatarUrl,
+    judgements,
+    lastActive,
+    isCouncillor = false,
+    isValidator = false
+  ) {
     this._initialized = true;
     this._isEmpty = false;
     this._isOnchain = true;
@@ -64,7 +97,15 @@ class Profile {
     this._isValidator = isValidator;
   }
 
-  public initialize(name, headline, bio, avatarUrl, lastActive, isCouncillor = false, isValidator = false) {
+  public initialize(
+    name,
+    headline,
+    bio,
+    avatarUrl,
+    lastActive,
+    isCouncillor = false,
+    isValidator = false
+  ) {
     this._initialized = true;
     this._isEmpty = false;
     this._name = name;
@@ -83,12 +124,12 @@ class Profile {
   // this.displayName() is the user-set name or the address, and
   // this.displayNameWithAddress() is the user-set name with the address,
   // or just the address if the user has not set a name.
-  get displayName() : string {
+  get displayName(): string {
     if (!this._initialized) return 'Loading...';
     return this.name || 'Anonymous';
   }
 
-  get displayNameWithAddress() : string {
+  get displayNameWithAddress(): string {
     if (!this._initialized) return 'Loading...';
     return this.name
       ? `${this.name} · ${formatAddressShort(this.address, this.chain)}`
@@ -98,8 +139,9 @@ class Profile {
   public getAvatar(size: number) {
     if (this.avatarUrl) {
       return m('.avatar-image', {
-        style: `width: ${size}px; height: ${size}px; background-image: url('${this.avatarUrl}'); `
-          + 'background-size: cover; border-radius: 9999px',
+        style:
+          `width: ${size}px; height: ${size}px; background-image: url('${this.avatarUrl}'); ` +
+          'background-size: cover; border-radius: 9999px',
       });
     } else {
       const html = jdenticon.toSvg(this.address, size);
@@ -112,7 +154,7 @@ class Profile {
         },
         onupdate: (vnode) => {
           jdenticon.update(vnode.dom as HTMLElement, this.address);
-        }
+        },
       });
     }
   }

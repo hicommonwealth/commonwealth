@@ -12,14 +12,26 @@ class NotificationSubscription {
   public readonly OffchainThread: any;
 
   private _immediateEmail: boolean;
-  public get immediateEmail() { return this._immediateEmail; }
-  public enableImmediateEmail() { this._immediateEmail = true; }
-  public disableImmediateEmail() { this._immediateEmail = false; }
+  public get immediateEmail() {
+    return this._immediateEmail;
+  }
+  public enableImmediateEmail() {
+    this._immediateEmail = true;
+  }
+  public disableImmediateEmail() {
+    this._immediateEmail = false;
+  }
 
   private _isActive: boolean;
-  public get isActive() { return this._isActive; }
-  public enable() { this._isActive = true; }
-  public disable() { this._isActive = false; }
+  public get isActive() {
+    return this._isActive;
+  }
+  public enable() {
+    this._isActive = true;
+  }
+  public disable() {
+    this._isActive = false;
+  }
 
   constructor(
     id,
@@ -32,7 +44,7 @@ class NotificationSubscription {
     ChainEventType?,
     OffchainComment?,
     OffchainCommunity?,
-    OffchainThread?,
+    OffchainThread?
   ) {
     this.id = id;
     this.category = category;
@@ -59,7 +71,7 @@ class NotificationSubscription {
       json.ChainEventType,
       json.OffchainComment,
       json.OffchainCommunity,
-      json.OffchainThread,
+      json.OffchainThread
     );
   }
 }

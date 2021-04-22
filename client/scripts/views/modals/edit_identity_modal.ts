@@ -2,7 +2,15 @@ import 'modals/edit_identity_modal.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
-import { Button, Input, Form, FormGroup, FormLabel, Icon, Icons } from 'construct-ui';
+import {
+  Button,
+  Input,
+  Form,
+  FormGroup,
+  FormLabel,
+  Icon,
+  Icons,
+} from 'construct-ui';
 
 import { Data } from '@polkadot/types/primitive';
 import { u8aToString } from '@polkadot/util';
@@ -28,7 +36,9 @@ interface IState {
 const EditIdentityModal: m.Component<IAttrs, IState> = {
   oninit: (vnode) => {
     app.runWhenReady(async () => {
-      vnode.state.identity = await (app.chain as Substrate).identities.load(vnode.attrs.account);
+      vnode.state.identity = await (app.chain as Substrate).identities.load(
+        vnode.attrs.account
+      );
       m.redraw();
     });
   },
@@ -43,11 +53,12 @@ const EditIdentityModal: m.Component<IAttrs, IState> = {
         email,
         // pgpFingerprint,
         image,
-        twitter
+        twitter,
       } = vnode.state.identity?.info;
 
       // do not display SHA values, only raw strings
-      const d2s = (d: Data) => u8aToString(d.toU8a()).replace(/[^\x20-\x7E]/g, '');
+      const d2s = (d: Data) =>
+        u8aToString(d.toU8a()).replace(/[^\x20-\x7E]/g, '');
       $(vnode.dom).find('input[name=display]').val(d2s(display));
       $(vnode.dom).find('input[name=legal]').val(d2s(legal));
       $(vnode.dom).find('input[name=web]').val(d2s(web));
@@ -74,20 +85,33 @@ const EditIdentityModal: m.Component<IAttrs, IState> = {
 
       vnode.state.saving = true;
       const idData: IdentityInfoProps = {
-        display: { [data.display ? 'raw' : 'none']: data.display ? data.display : null },
-        email: { [data.email ? 'raw' : 'none']: data.email ? data.email : null },
-        image: { [data.image ? 'sha256' : 'none']: data.image ? data.image : null },
-        legal: { [data.legal ? 'raw' : 'none']: data.legal ? data.legal : null },
+        display: {
+          [data.display ? 'raw' : 'none']: data.display ? data.display : null,
+        },
+        email: {
+          [data.email ? 'raw' : 'none']: data.email ? data.email : null,
+        },
+        image: {
+          [data.image ? 'sha256' : 'none']: data.image ? data.image : null,
+        },
+        legal: {
+          [data.legal ? 'raw' : 'none']: data.legal ? data.legal : null,
+        },
         riot: { [data.riot ? 'raw' : 'none']: data.riot ? data.riot : null },
         web: { [data.web ? 'raw' : 'none']: data.web ? data.web : null },
-        twitter: { [data.twitter ? 'raw' : 'none']: data.twitter ? data.twitter : null },
+        twitter: {
+          [data.twitter ? 'raw' : 'none']: data.twitter ? data.twitter : null,
+        },
         // pgpFingerprint: data.pgpFingerprint ? data.pgpFingerprint : null,
         additional: [],
       };
 
       try {
         await createTXModal(
-          (app.chain as Substrate).identities.setIdentityTx(app.user.activeAccount as SubstrateAccount, idData)
+          (app.chain as Substrate).identities.setIdentityTx(
+            app.user.activeAccount as SubstrateAccount,
+            idData
+          )
         );
       } catch (error) {
         if (typeof error === 'string') {
@@ -101,11 +125,16 @@ const EditIdentityModal: m.Component<IAttrs, IState> = {
 
       // force creation and update of the user's on-chain identity, guaranteeing that the identity
       // component has immediate access to the new identity.
-      await (app.chain as Substrate).identities.load(app.user.activeAccount as SubstrateAccount);
+      await (app.chain as Substrate).identities.load(
+        app.user.activeAccount as SubstrateAccount
+      );
 
       // temporarily mark the user's profile as invalid, since they've potentially updated their
       // display name. this ensures that any identity display will fall back to the loaded identity.
-      const profile = app.profiles.getProfile(app.chain.id, app.user.activeAccount.address);
+      const profile = app.profiles.getProfile(
+        app.chain.id,
+        app.user.activeAccount.address
+      );
       if (profile) {
         profile.invalidateName();
       }
@@ -115,9 +144,13 @@ const EditIdentityModal: m.Component<IAttrs, IState> = {
 
     const getInput = (inputLabel, inputName, description, prefixAt = false) => {
       return m(FormGroup, [
-        m(FormLabel, {
-          for: inputName,
-        }, inputLabel),
+        m(
+          FormLabel,
+          {
+            for: inputName,
+          },
+          inputLabel
+        ),
         m(Input, {
           name: inputName,
           id: inputName,
@@ -129,17 +162,40 @@ const EditIdentityModal: m.Component<IAttrs, IState> = {
     };
 
     return m('.EditIdentityModal', [
-      m('.compact-modal-title', [
-        m('h3', 'Set on-chain identity')
-      ]),
+      m('.compact-modal-title', [m('h3', 'Set on-chain identity')]),
       m(Form, { class: 'form' }, [
-        getInput('Display Name', 'display', 'A reasonable display name for the controller of the account'),
-        getInput('Legal Name', 'legal', 'Full legal name in the local jurisdiction of the entity'),
-        getInput('Website', 'web', 'Website for the controller of the account, https:// automatically prepended'),
-        getInput('Riot/Matrix', 'riot', 'Riot/Matrix handle held by the controller of the account'),
-        getInput('Email', 'email', 'Email address of the controller of the account'),
+        getInput(
+          'Display Name',
+          'display',
+          'A reasonable display name for the controller of the account'
+        ),
+        getInput(
+          'Legal Name',
+          'legal',
+          'Full legal name in the local jurisdiction of the entity'
+        ),
+        getInput(
+          'Website',
+          'web',
+          'Website for the controller of the account, https:// automatically prepended'
+        ),
+        getInput(
+          'Riot/Matrix',
+          'riot',
+          'Riot/Matrix handle held by the controller of the account'
+        ),
+        getInput(
+          'Email',
+          'email',
+          'Email address of the controller of the account'
+        ),
         // getInput('PGP', 'pgp', 'PGP/GPG public key of the controller of the account'),
-        getInput('Twitter', 'twitter', 'Twitter identity of the controller of the account', true),
+        getInput(
+          'Twitter',
+          'twitter',
+          'Twitter identity of the controller of the account',
+          true
+        ),
         m('.form-bottom', [
           m('.buttons', [
             m(Button, {
@@ -150,7 +206,7 @@ const EditIdentityModal: m.Component<IAttrs, IState> = {
                 e.preventDefault();
                 updateIdentity().then(() => $(vnode.dom).trigger('modalexit'));
               },
-              label: 'Set identity'
+              label: 'Set identity',
             }),
             m(Button, {
               rounded: true,
@@ -158,14 +214,14 @@ const EditIdentityModal: m.Component<IAttrs, IState> = {
                 e.preventDefault();
                 $(vnode.dom).trigger('modalexit');
               },
-              label: 'Cancel'
+              label: 'Cancel',
             }),
           ]),
           m('.clear'),
-        ])
-      ])
+        ]),
+      ]),
     ]);
-  }
+  },
 };
 
 export default EditIdentityModal;

@@ -18,22 +18,24 @@ export interface OffchainAttachmentAttributes {
 }
 
 export interface OffchainAttachmentInstance
-extends Sequelize.Instance<OffchainAttachmentAttributes>, OffchainAttachmentAttributes {
+  extends Sequelize.Instance<OffchainAttachmentAttributes>,
+    OffchainAttachmentAttributes {}
 
-}
-
-export interface OffchainAttachmentModel extends Sequelize.Model<
-  OffchainAttachmentInstance, OffchainAttachmentAttributes
-> {
-
-}
+export type OffchainAttachmentModel = Sequelize.Model<
+  OffchainAttachmentInstance,
+  OffchainAttachmentAttributes
+>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
+  dataTypes: Sequelize.DataTypes
 ): OffchainAttachmentModel => {
-  const OffchainAttachment = sequelize.define<OffchainAttachmentInstance, OffchainAttachmentAttributes>(
-    'OffchainAttachment', {
+  const OffchainAttachment = sequelize.define<
+    OffchainAttachmentInstance,
+    OffchainAttachmentAttributes
+  >(
+    'OffchainAttachment',
+    {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       attachable: { type: dataTypes.STRING, allowNull: false },
       attachment_id: { type: dataTypes.INTEGER, allowNull: false },
@@ -41,11 +43,10 @@ export default (
       description: { type: dataTypes.TEXT, allowNull: false },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
-    }, {
+    },
+    {
       underscored: true,
-      indexes: [
-        { fields: ['attachable', 'attachment_id'] },
-      ],
+      indexes: [{ fields: ['attachable', 'attachment_id'] }],
     }
   );
 

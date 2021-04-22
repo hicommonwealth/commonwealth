@@ -17,33 +17,50 @@ export interface ContractItemAttributes {
 }
 
 export interface ContractItemInstance
-extends Sequelize.Instance<ContractItemAttributes>, ContractItemAttributes {
+  extends Sequelize.Instance<ContractItemAttributes>,
+    ContractItemAttributes {}
 
-}
-
-export interface ContractItemModel
-extends Sequelize.Model<ContractItemInstance, ContractItemAttributes> {
-
-}
+export type ContractItemModel = Sequelize.Model<
+  ContractItemInstance,
+  ContractItemAttributes
+>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
+  dataTypes: Sequelize.DataTypes
 ): ContractItemModel => {
-  const ContractItem = sequelize.define<ContractItemInstance, ContractItemAttributes>('ContractItem', {
-    id:          { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true, allowNull: false },
-    chain:       { type: dataTypes.STRING, allowNull: false },
-    name:        { type: dataTypes.STRING, allowNull: false },
-    description: { type: dataTypes.TEXT, allowNull: false },
-    color:       { type: dataTypes.STRING, allowNull: false },
-    category_id: { type: dataTypes.INTEGER, allowNull: false },
-  }, {
-    underscored: true,
-  });
+  const ContractItem = sequelize.define<
+    ContractItemInstance,
+    ContractItemAttributes
+  >(
+    'ContractItem',
+    {
+      id: {
+        type: dataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+        allowNull: false,
+      },
+      chain: { type: dataTypes.STRING, allowNull: false },
+      name: { type: dataTypes.STRING, allowNull: false },
+      description: { type: dataTypes.TEXT, allowNull: false },
+      color: { type: dataTypes.STRING, allowNull: false },
+      category_id: { type: dataTypes.INTEGER, allowNull: false },
+    },
+    {
+      underscored: true,
+    }
+  );
 
   ContractItem.associate = (models) => {
-    models.ContractItem.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
-    models.ContractItem.belongsTo(models.ContractCategory, { foreignKey: 'category_id', targetKey: 'id' });
+    models.ContractItem.belongsTo(models.Chain, {
+      foreignKey: 'chain',
+      targetKey: 'id',
+    });
+    models.ContractItem.belongsTo(models.ContractCategory, {
+      foreignKey: 'category_id',
+      targetKey: 'id',
+    });
   };
   return ContractItem;
 };

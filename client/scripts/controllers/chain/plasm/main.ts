@@ -10,10 +10,12 @@ class Plasm extends Substrate {
   }
 
   public async initApi() {
-    const t = Object.values(plasmDefinitions)
-      .reduce((res, { types }): object => ({ ...res, ...types }), {});
+    const t = Object.values(plasmDefinitions).reduce(
+      (res, { types }): object => ({ ...res, ...types }),
+      {}
+    );
     await super.initApi({
-      'types': { ...t }
+      types: { ...t },
     });
   }
 }

@@ -14,39 +14,52 @@ const Web3LoginPage: m.Component<{}> = {
     const joiningChain = m.route.param('joiningChain');
     const targetCommunity = m.route.param('targetCommunity');
     // oops! = address linking interrupted
-    const loginCopy = loggingInWithAddress ? 'Login interrupted' : (joiningCommunity || joiningChain)
-      ? 'Oops! An error occurred' : app.isLoggedIn() ? 'Oops! An error occurred' : 'Login interrupted';
+    const loginCopy = loggingInWithAddress
+      ? 'Login interrupted'
+      : joiningCommunity || joiningChain
+      ? 'Oops! An error occurred'
+      : app.isLoggedIn()
+      ? 'Oops! An error occurred'
+      : 'Login interrupted';
 
-    return m(Sublayout, {
-      class: 'Web3LoginPage',
-    }, [
-      m('.web3login-options', [
-        m('h3', loginCopy),
-        m(Button, {
-          intent: 'primary',
-          label: 'Try again',
-          fluid: true,
-          rounded: true,
-          onclick: (e) => {
-            app.modals.lazyCreate('link_new_address_modal', {
-              loggingInWithAddress,
-              joiningCommunity,
-              joiningChain,
-              targetCommunity,
-              successCallback: () => {
-                m.route.set(
-                  m.route.param('prev') ? m.route.param('prev') : app.activeId() ? `/${app.activeId()}` : '/'
-                );
-              },
-            });
-          },
-        }),
-        m.route.param('prev')
-          ? link('a.web3login-go-home', m.route.param('prev'), 'Go back')
-          : link('a.web3login-go-home', `/${app.activeId()}`, 'Go home'),
-      ]),
-    ]);
-  }
+    return m(
+      Sublayout,
+      {
+        class: 'Web3LoginPage',
+      },
+      [
+        m('.web3login-options', [
+          m('h3', loginCopy),
+          m(Button, {
+            intent: 'primary',
+            label: 'Try again',
+            fluid: true,
+            rounded: true,
+            onclick: (e) => {
+              app.modals.lazyCreate('link_new_address_modal', {
+                loggingInWithAddress,
+                joiningCommunity,
+                joiningChain,
+                targetCommunity,
+                successCallback: () => {
+                  m.route.set(
+                    m.route.param('prev')
+                      ? m.route.param('prev')
+                      : app.activeId()
+                      ? `/${app.activeId()}`
+                      : '/'
+                  );
+                },
+              });
+            },
+          }),
+          m.route.param('prev')
+            ? link('a.web3login-go-home', m.route.param('prev'), 'Go back')
+            : link('a.web3login-go-home', `/${app.activeId()}`, 'Go home'),
+        ]),
+      ]
+    );
+  },
 };
 
 export default Web3LoginPage;

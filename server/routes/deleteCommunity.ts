@@ -11,7 +11,12 @@ export const Errors = {
   NotCreate: 'Only the original creator can delete this community',
 };
 
-const deleteCommunity = async (models, req: Request, res: Response, next: NextFunction) => {
+const deleteCommunity = async (
+  models,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   // TODO: re-implement this route if we decide that admins should be able to delete a community
   return next(new Error(Errors.Unimplemented));
 

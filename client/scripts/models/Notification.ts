@@ -38,7 +38,7 @@ class Notification {
       json.is_read,
       json.created_at,
       subscription,
-      json.ChainEvent ? ChainEvent.fromJSON(json.ChainEvent) : undefined,
+      json.ChainEvent ? ChainEvent.fromJSON(json.ChainEvent) : undefined
     );
   }
 }

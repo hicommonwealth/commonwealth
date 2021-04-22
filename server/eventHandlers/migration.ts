@@ -2,17 +2,18 @@
  * Processes events during migration, upgrading from simple notifications to entities.
  */
 import {
-  IEventHandler, CWEvent, eventToEntity, entityToFieldName, IChainEventData
+  IEventHandler,
+  CWEvent,
+  eventToEntity,
+  entityToFieldName,
+  IChainEventData,
 } from '@commonwealth/chain-events';
 
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 export default class extends IEventHandler {
-  constructor(
-    private readonly _models,
-    private readonly _chain: string,
-  ) {
+  constructor(private readonly _models, private readonly _chain: string) {
     super();
   }
 
@@ -23,10 +24,12 @@ export default class extends IEventHandler {
   public async handle(event: CWEvent<IChainEventData>) {
     // case by entity type to determine what value to look for
     const createOrUpdateModel = async (fieldName, fieldValue) => {
-      const dbEventType = await this._models.ChainEventType.findOne({ where: {
-        chain: this._chain,
-        event_name: event.data.kind.toString(),
-      } });
+      const dbEventType = await this._models.ChainEventType.findOne({
+        where: {
+          chain: this._chain,
+          event_name: event.data.kind.toString(),
+        },
+      });
       if (!dbEventType) {
         log.error(`unknown event type: ${event.data.kind}`);
         return;
@@ -34,10 +37,12 @@ export default class extends IEventHandler {
         log.trace(`found chain event type: ${dbEventType.id}`);
       }
       const queryFieldName = `event_data.${fieldName}`;
-      const existingEvent = await this._models.ChainEvent.findOne({ where: {
-        chain_event_type_id: dbEventType.id,
-        [queryFieldName]: fieldValue,
-      } });
+      const existingEvent = await this._models.ChainEvent.findOne({
+        where: {
+          chain_event_type_id: dbEventType.id,
+          [queryFieldName]: fieldValue,
+        },
+      });
       if (existingEvent) {
         existingEvent.event_data = event.data;
         await existingEvent.save();
@@ -55,7 +60,7 @@ export default class extends IEventHandler {
 
     const entity = eventToEntity(event.data.kind);
     if (!entity) return null;
-    const [ entityKind ] = entity;
+    const [entityKind] = entity;
     const fieldName = entityToFieldName(entityKind);
     if (!fieldName) return null;
     const fieldValue = event.data[fieldName];

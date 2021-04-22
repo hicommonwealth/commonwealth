@@ -6,14 +6,16 @@ import ComponentKit from 'views/components/component_kit';
 
 const ComponentsPage: m.Component<{}, {}> = {
   view: (vnode: m.VnodeDOM) => {
-    return m(Sublayout, {
-      title: 'Commonwealth UI Component Kit',
-      class: 'ComponentsPage',
-      alwaysShowTitle: true,
-    }, [
-      m(ComponentKit),
-    ]);
-  }
+    return m(
+      Sublayout,
+      {
+        title: 'Commonwealth UI Component Kit',
+        class: 'ComponentsPage',
+        alwaysShowTitle: true,
+      },
+      [m(ComponentKit)]
+    );
+  },
 };
 
 export default ComponentsPage;

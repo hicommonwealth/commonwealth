@@ -11,7 +11,12 @@ export const Errors = {
   WrongOwner: 'Notification not owned by user',
 };
 
-export default async (models, req: Request, res: Response, next: NextFunction) => {
+export default async (
+  models,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.user) {
     return next(new Error(Errors.NotLoggedIn));
   }
@@ -28,16 +33,18 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
 
   const notifications = await models.Notification.findAll({
     where: { id: idOptions },
-    include: [ models.Subscription ]
+    include: [models.Subscription],
   });
 
   if (notifications.find((n) => n.Subscription.subscriber_id !== req.user.id)) {
     return next(new Error(Errors.WrongOwner));
   }
 
-  await Promise.all(notifications.map((n) => {
-    return n.destroy();
-  }));
+  await Promise.all(
+    notifications.map((n) => {
+      return n.destroy();
+    })
+  );
 
   return res.json({ status: 'Success', result: 'Cleared notifications' });
 };

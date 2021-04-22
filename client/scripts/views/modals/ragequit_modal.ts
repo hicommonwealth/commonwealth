@@ -22,7 +22,7 @@ const RagequitModal: m.Component<IAttrs, IState> = {
     return m('.RagequitModal', [
       m('.header', 'Ragequit'),
       m('.compact-modal-body', [
-        m('.data-label', [ `Share holdings: ${acct?.shares?.format() ?? '--'}` ]),
+        m('.data-label', [`Share holdings: ${acct?.shares?.format() ?? '--'}`]),
         m(FormGroup, [
           m(FormLabel, 'Shares to burn (to exchange for ETH)'),
           m(Input, {
@@ -33,8 +33,8 @@ const RagequitModal: m.Component<IAttrs, IState> = {
             oninput: (e) => {
               const result = (e.target as any).value;
               vnode.state.sharesToBurn = result.toString();
-            }
-          })
+            },
+          }),
         ]),
         m(Button, {
           type: 'submit',
@@ -43,18 +43,19 @@ const RagequitModal: m.Component<IAttrs, IState> = {
           onclick: (e) => {
             e.preventDefault();
             const toBurn = new BN(vnode.state.sharesToBurn);
-            vnode.attrs.account.ragequitTx(toBurn)
+            vnode.attrs.account
+              .ragequitTx(toBurn)
               .then((result) => {
                 $(vnode.dom).trigger('modalforceexit');
                 m.redraw();
               })
               .catch((err) => notifyError(err));
           },
-          label: 'Ragequit'
+          label: 'Ragequit',
         }),
       ]),
     ]);
-  }
+  },
 };
 
 export default RagequitModal;

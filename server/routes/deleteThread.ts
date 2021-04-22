@@ -7,10 +7,15 @@ const log = factory.getLogger(formatFilename(__filename));
 enum DeleteThreadErrors {
   NoUser = 'Not logged in',
   NoThread = 'Must provide thread_id',
-  NoPermission = 'Not owned by this user'
+  NoPermission = 'Not owned by this user',
 }
 
-const deleteThread = async (models, req: Request, res: Response, next: NextFunction) => {
+const deleteThread = async (
+  models,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { thread_id } = req.body;
   if (!req.user) {
     return next(new Error(DeleteThreadErrors.NoUser));
@@ -20,8 +25,10 @@ const deleteThread = async (models, req: Request, res: Response, next: NextFunct
   }
 
   try {
-    const userOwnedAddressIds = await req.user.getAddresses()
-      .filter((addr) => !!addr.verified).map((addr) => addr.id);
+    const userOwnedAddressIds = await req.user
+      .getAddresses()
+      .filter((addr) => !!addr.verified)
+      .map((addr) => addr.id);
 
     // allow either the author or admin/mods to delete threads
     const myThread = await models.OffchainThread.findOne({
@@ -29,33 +36,38 @@ const deleteThread = async (models, req: Request, res: Response, next: NextFunct
         id: req.body.thread_id,
         address_id: { [Op.in]: userOwnedAddressIds },
       },
-      include: [ models.Chain, models.OffchainCommunity ]
+      include: [models.Chain, models.OffchainCommunity],
     });
 
-    const thread = myThread || await models.OffchainThread.findOne({
-      where: {
-        id: req.body.thread_id,
-      },
-      include: [ models.Chain, models.OffchainCommunity ]
-    });
+    const thread =
+      myThread ||
+      (await models.OffchainThread.findOne({
+        where: {
+          id: req.body.thread_id,
+        },
+        include: [models.Chain, models.OffchainCommunity],
+      }));
 
     if (!thread) {
       return next(new Error(DeleteThreadErrors.NoThread));
     }
 
     const userRole = await models.Role.findOne({
-      where: thread.Chain ? {
-        address_id: userOwnedAddressIds,
-        chain_id: thread.Chain.id,
-        permission: ['admin', 'moderator'],
-      } : {
-        address_id: userOwnedAddressIds,
-        offchain_community_id: thread.OffchainCommunity.id,
-        permission: ['admin', 'moderator'],
-      },
+      where: thread.Chain
+        ? {
+            address_id: userOwnedAddressIds,
+            chain_id: thread.Chain.id,
+            permission: ['admin', 'moderator'],
+          }
+        : {
+            address_id: userOwnedAddressIds,
+            offchain_community_id: thread.OffchainCommunity.id,
+            permission: ['admin', 'moderator'],
+          },
     });
 
-    const isAdminOrMod = userRole?.permission === 'admin' || userRole?.permission === 'moderator';
+    const isAdminOrMod =
+      userRole?.permission === 'admin' || userRole?.permission === 'moderator';
 
     if (!myThread && !isAdminOrMod) {
       return next(new Error(DeleteThreadErrors.NoPermission));
@@ -63,10 +75,15 @@ const deleteThread = async (models, req: Request, res: Response, next: NextFunct
 
     const topic = await models.OffchainTopic.findOne({
       where: { id: thread.topic_id },
-      include: [ { model: models.OffchainThread, as: 'threads' } ]
+      include: [{ model: models.OffchainThread, as: 'threads' }],
     });
-    const featuredTopics = (thread.Chain || thread.OffchainCommunity).featured_topics;
-    if (topic && !featuredTopics.includes(`${topic.id}`) && topic.threads.length <= 1) {
+    const featuredTopics = (thread.Chain || thread.OffchainCommunity)
+      .featured_topics;
+    if (
+      topic &&
+      !featuredTopics.includes(`${topic.id}`) &&
+      topic.threads.length <= 1
+    ) {
       topic.destroy();
     }
 
@@ -76,9 +93,11 @@ const deleteThread = async (models, req: Request, res: Response, next: NextFunct
         offchain_thread_id: thread.id,
       },
     });
-    await Promise.all(subscriptions.map((s) => {
-      return s.destroy();
-    }));
+    await Promise.all(
+      subscriptions.map((s) => {
+        return s.destroy();
+      })
+    );
 
     await thread.destroy();
     return res.json({ status: 'Success' });

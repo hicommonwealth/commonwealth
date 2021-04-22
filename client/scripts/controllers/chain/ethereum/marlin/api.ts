@@ -25,24 +25,46 @@ export default class MarlinAPI {
   private _Symbol: string;
   private _Bridge: string;
 
-  public get userAddress() { return this._userAddress; }
-  public get mPondAddress() { return this._MPondAddress; }
-  public get governorAlphaAddress() { return this._GovernorAlphaAddress; }
-  public get mPondContract(): MPond { return this._MPondContract; }
-  public get governorAlphaContract(): GovernorAlpha { return this._GovernorAlphaContract; }
+  public get userAddress() {
+    return this._userAddress;
+  }
+  public get mPondAddress() {
+    return this._MPondAddress;
+  }
+  public get governorAlphaAddress() {
+    return this._GovernorAlphaAddress;
+  }
+  public get mPondContract(): MPond {
+    return this._MPondContract;
+  }
+  public get governorAlphaContract(): GovernorAlpha {
+    return this._GovernorAlphaContract;
+  }
 
-  public get Provider(): Web3Provider { return this._Provider; }
-  public get Signer(): JsonRpcSigner { return this._Signer; }
-  public get tokenContract() { return this._tokenContract; }
-  public get userMPond(): number { return this._userMPond.toNumber(); }
-  public get symbol(): string { return this._Symbol; }
-  public get bridge(): string { return this._Bridge; }
+  public get Provider(): Web3Provider {
+    return this._Provider;
+  }
+  public get Signer(): JsonRpcSigner {
+    return this._Signer;
+  }
+  public get tokenContract() {
+    return this._tokenContract;
+  }
+  public get userMPond(): number {
+    return this._userMPond.toNumber();
+  }
+  public get symbol(): string {
+    return this._Symbol;
+  }
+  public get bridge(): string {
+    return this._Bridge;
+  }
 
   constructor(
     mPondAddress: string,
     governorAlphaAddress: string,
     web3Provider: AsyncSendable,
-    userAddress?: string,
+    userAddress?: string
   ) {
     this._Provider = new ethers.providers.Web3Provider(web3Provider);
 
@@ -55,25 +77,38 @@ export default class MarlinAPI {
     this._GovernorAlphaAddress = governorAlphaAddress.toLowerCase();
     if (this._Signer) {
       this._MPondContract = MPondFactory.connect(mPondAddress, this._Signer);
-      this._GovernorAlphaContract = GovernorAlphaFactory.connect(governorAlphaAddress, this._Signer);
+      this._GovernorAlphaContract = GovernorAlphaFactory.connect(
+        governorAlphaAddress,
+        this._Signer
+      );
     } else {
       this._MPondContract = MPondFactory.connect(mPondAddress, this._Provider);
-      this._GovernorAlphaContract = GovernorAlphaFactory.connect(governorAlphaAddress, this._Provider);
+      this._GovernorAlphaContract = GovernorAlphaFactory.connect(
+        governorAlphaAddress,
+        this._Provider
+      );
     }
   }
 
   public updateSigner(userAddress: string) {
     console.log('inside signer', userAddress);
     this._Signer = this._Provider.getSigner(userAddress);
-    this._MPondContract = MPondFactory.connect(this._MPondAddress, this._Signer);
-    this._GovernorAlphaContract = GovernorAlphaFactory.connect(this._GovernorAlphaAddress, this._Signer);
+    this._MPondContract = MPondFactory.connect(
+      this._MPondAddress,
+      this._Signer
+    );
+    this._GovernorAlphaContract = GovernorAlphaFactory.connect(
+      this._GovernorAlphaAddress,
+      this._Signer
+    );
   }
 
   public async init() {
     // perform fetch of approved ERC20 token and set up contract for approval
     const tokenAddress = this._MPondContract.address;
     this._tokenContract = Erc20Factory.connect(tokenAddress, this._Provider);
-    if (this._userAddress) this._userMPond = await this._MPondContract.balanceOf(this._userAddress);
+    if (this._userAddress)
+      this._userMPond = await this._MPondContract.balanceOf(this._userAddress);
     this._Symbol = await this._MPondContract.symbol();
   }
 }

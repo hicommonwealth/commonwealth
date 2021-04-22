@@ -1,10 +1,20 @@
 import { ApiPromise } from '@polkadot/api';
 
 import { formatCoin } from 'adapters/currency';
-import { ISubstrateBounty, SubstrateCoin } from 'adapters/chain/substrate/types';
 import {
-  Proposal, ProposalStatus, ProposalEndTime, ITXModalData, BinaryVote,
-  VotingType, VotingUnit, ChainEntity, ChainEvent,
+  ISubstrateBounty,
+  SubstrateCoin,
+} from 'adapters/chain/substrate/types';
+import {
+  Proposal,
+  ProposalStatus,
+  ProposalEndTime,
+  ITXModalData,
+  BinaryVote,
+  VotingType,
+  VotingUnit,
+  ChainEntity,
+  ChainEvent,
 } from 'models';
 import { SubstrateTypes } from '@commonwealth/chain-events';
 import { formatAddressShort } from '../../../../../shared/utils';
@@ -27,40 +37,66 @@ const backportEventToAdapter = (
   };
 };
 
-export class SubstrateBounty
-  extends Proposal<ApiPromise, SubstrateCoin, ISubstrateBounty, null> {
+export class SubstrateBounty extends Proposal<
+  ApiPromise,
+  SubstrateCoin,
+  ISubstrateBounty,
+  null
+> {
   public get shortIdentifier() {
     return `#${this.identifier.toString()}`;
   }
   public get title() {
     const account = this._Accounts.fromAddress(this.author.address);
-    const displayName = account.profile && account.profile.name
-      ? `${account.profile.name} (${formatAddressShort(this.author.address, account.chain.id)})`
-      : formatAddressShort(this.author.address, account.chain.id);
-    return `${(this.completed || this.active) ? '' : 'Proposed '} Bounty: ${formatCoin(this._value)} to ${displayName}`;
+    const displayName =
+      account.profile && account.profile.name
+        ? `${account.profile.name} (${formatAddressShort(
+            this.author.address,
+            account.chain.id
+          )})`
+        : formatAddressShort(this.author.address, account.chain.id);
+    return `${
+      this.completed || this.active ? '' : 'Proposed '
+    } Bounty: ${formatCoin(this._value)} to ${displayName}`;
   }
-  public get description() { return null; }
+  public get description() {
+    return null;
+  }
 
   private readonly _author: SubstrateAccount;
-  public get author() { return this._author; }
+  public get author() {
+    return this._author;
+  }
 
-  private _awarded: boolean = false;
-  get awarded() { return this._awarded; }
+  private _awarded = false;
+  get awarded() {
+    return this._awarded;
+  }
 
-  private _active: boolean = false;
-  get active() { return this._active; }
+  private _active = false;
+  get active() {
+    return this._active;
+  }
 
   public readonly _value: SubstrateCoin;
-  public get value() { return this._value; }
+  public get value() {
+    return this._value;
+  }
 
   public readonly _bond: SubstrateCoin;
-  public get bond() { return this._bond; }
+  public get bond() {
+    return this._bond;
+  }
 
   public readonly _fee: SubstrateCoin;
-  public get fee() { return this._fee; }
+  public get fee() {
+    return this._fee;
+  }
 
   public readonly _curatorDeposit: SubstrateCoin;
-  public get curatorDeposit() { return this._curatorDeposit; }
+  public get curatorDeposit() {
+    return this._curatorDeposit;
+  }
 
   public get votingType() {
     return VotingType.None;
@@ -86,7 +122,7 @@ export class SubstrateBounty
     return ProposalStatus.None;
   }
 
-  get endTime() : ProposalEndTime {
+  get endTime(): ProposalEndTime {
     return { kind: 'unavailable' };
   }
 
@@ -107,7 +143,8 @@ export class SubstrateBounty
   public get blockExplorerLinkLabel() {
     const chainInfo = this._Chain.app.chain?.meta?.chain;
     const blockExplorerIds = chainInfo?.blockExplorerIds;
-    if (blockExplorerIds && blockExplorerIds['subscan']) return 'View in Subscan';
+    if (blockExplorerIds && blockExplorerIds['subscan'])
+      return 'View in Subscan';
     return undefined;
   }
 
@@ -124,15 +161,18 @@ export class SubstrateBounty
     ChainInfo: SubstrateChain,
     Accounts: SubstrateAccounts,
     Treasury: SubstrateBountyTreasury,
-    entity: ChainEntity,
+    entity: ChainEntity
   ) {
-    super('bountyproposal', backportEventToAdapter( // TODO: check if this is the right backport string
-      ChainInfo,
-      entity.chainEvents
-        .find(
+    super(
+      'bountyproposal',
+      backportEventToAdapter(
+        // TODO: check if this is the right backport string
+        ChainInfo,
+        entity.chainEvents.find(
           (e) => e.data.kind === SubstrateTypes.EventKind.TreasuryBountyProposed
         ).data as SubstrateTypes.ITreasuryBountyProposed
-    ));
+      )
+    );
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._Treasury = Treasury;

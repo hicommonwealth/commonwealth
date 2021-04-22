@@ -1,9 +1,19 @@
 import { ApiPromise } from '@polkadot/api';
 import { formatCoin } from 'adapters/currency';
-import { ISubstrateTreasuryProposal, SubstrateCoin } from 'adapters/chain/substrate/types';
 import {
-  Proposal, ProposalStatus, ProposalEndTime, ITXModalData, BinaryVote,
-  VotingType, VotingUnit, ChainEntity, ChainEvent
+  ISubstrateTreasuryProposal,
+  SubstrateCoin,
+} from 'adapters/chain/substrate/types';
+import {
+  Proposal,
+  ProposalStatus,
+  ProposalEndTime,
+  ITXModalData,
+  BinaryVote,
+  VotingType,
+  VotingUnit,
+  ChainEntity,
+  ChainEvent,
 } from 'models';
 import { SubstrateTypes } from '@commonwealth/chain-events';
 import { chainEntityTypeToProposalSlug } from 'identifiers';
@@ -26,27 +36,41 @@ const backportEventToAdapter = (
   };
 };
 
-export class SubstrateTreasuryProposal
-  extends Proposal<ApiPromise, SubstrateCoin, ISubstrateTreasuryProposal, null> {
+export class SubstrateTreasuryProposal extends Proposal<
+  ApiPromise,
+  SubstrateCoin,
+  ISubstrateTreasuryProposal,
+  null
+> {
   public get shortIdentifier() {
     return `#${this.identifier.toString()}`;
   }
   public generateTitle() {
     const account = this._Accounts.fromAddress(this.beneficiaryAddress);
-    const displayName = account.profile && account.profile.name
-      ? `${account.profile.name} (${formatAddressShort(this.beneficiaryAddress, account.chain.id)})`
-      : formatAddressShort(this.beneficiaryAddress, account.chain.id);
+    const displayName =
+      account.profile && account.profile.name
+        ? `${account.profile.name} (${formatAddressShort(
+            this.beneficiaryAddress,
+            account.chain.id
+          )})`
+        : formatAddressShort(this.beneficiaryAddress, account.chain.id);
     return `Proposed spend: ${formatCoin(this.value)} to ${displayName}`;
   }
-  public get description() { return null; }
+  public get description() {
+    return null;
+  }
 
   private readonly _author: SubstrateAccount;
-  public get author() { return this._author; }
+  public get author() {
+    return this._author;
+  }
 
   public title: string;
 
-  private _awarded: boolean = false;
-  get awarded() { return this._awarded; }
+  private _awarded = false;
+  get awarded() {
+    return this._awarded;
+  }
 
   public readonly value: SubstrateCoin;
   public readonly bond: SubstrateCoin;
@@ -72,7 +96,7 @@ export class SubstrateTreasuryProposal
     if (this.awarded) return ProposalStatus.Passed;
     return ProposalStatus.None;
   }
-  get endTime() : ProposalEndTime {
+  get endTime(): ProposalEndTime {
     return { kind: 'unavailable' };
   }
 
@@ -93,7 +117,8 @@ export class SubstrateTreasuryProposal
   public get blockExplorerLinkLabel() {
     const chainInfo = this._Chain.app.chain?.meta?.chain;
     const blockExplorerIds = chainInfo?.blockExplorerIds;
-    if (blockExplorerIds && blockExplorerIds['subscan']) return 'View in Subscan';
+    if (blockExplorerIds && blockExplorerIds['subscan'])
+      return 'View in Subscan';
     return undefined;
   }
 
@@ -110,13 +135,17 @@ export class SubstrateTreasuryProposal
     ChainInfo: SubstrateChain,
     Accounts: SubstrateAccounts,
     Treasury: SubstrateTreasury,
-    entity: ChainEntity,
+    entity: ChainEntity
   ) {
-    super('treasuryproposal', backportEventToAdapter(
-      ChainInfo,
-      entity.chainEvents
-        .find((e) => e.data.kind === SubstrateTypes.EventKind.TreasuryProposed).data as SubstrateTypes.ITreasuryProposed
-    ));
+    super(
+      'treasuryproposal',
+      backportEventToAdapter(
+        ChainInfo,
+        entity.chainEvents.find(
+          (e) => e.data.kind === SubstrateTypes.EventKind.TreasuryProposed
+        ).data as SubstrateTypes.ITreasuryProposed
+      )
+    );
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._Treasury = Treasury;
@@ -124,22 +153,25 @@ export class SubstrateTreasuryProposal
     this.value = this._Chain.coins(this.data.value);
     this.bond = this._Chain.coins(this.data.bond);
     this.beneficiaryAddress = this.data.beneficiary;
-    this._author = this._Accounts.fromAddress(this.data.proposer || entity.author);
+    this._author = this._Accounts.fromAddress(
+      this.data.proposer || entity.author
+    );
     this.title = entity.title || this.generateTitle();
     this.createdAt = entity.createdAt;
     this.threadId = entity.threadId;
 
     entity.chainEvents.forEach((e) => this.update(e));
 
-
     if (!this._completed) {
       const slug = chainEntityTypeToProposalSlug(entity.type);
       const uniqueId = `${slug}_${entity.typeId}`;
-      this._Chain.app.chain.chainEntities._fetchTitle(entity.chain, uniqueId).then((response) => {
-        if (response.status === 'Success' && response.result?.length) {
-          this.title = response.result;
-        }
-      });
+      this._Chain.app.chain.chainEntities
+        ._fetchTitle(entity.chain, uniqueId)
+        .then((response) => {
+          if (response.status === 'Success' && response.result?.length) {
+            this.title = response.result;
+          }
+        });
       this._initialized = true;
       this._Treasury.store.add(this);
     } else {

@@ -1,5 +1,10 @@
 import { IApp } from 'state';
-import { Account, IOffchainAccountsModule, Profile, CommunityInfo } from 'models';
+import {
+  Account,
+  IOffchainAccountsModule,
+  Profile,
+  CommunityInfo,
+} from 'models';
 import { AccountsStore } from 'stores';
 import { Coin } from 'adapters/currency';
 
@@ -47,16 +52,23 @@ export class OffchainAccount extends Account<Coin> {
 }
 
 // Allow it such that
-class OffchainAccounts implements IOffchainAccountsModule<Coin, OffchainAccount> {
-  private _initialized: boolean = false;
-  public get initialized() { return this._initialized; }
+class OffchainAccounts
+  implements IOffchainAccountsModule<Coin, OffchainAccount> {
+  private _initialized = false;
+  public get initialized() {
+    return this._initialized;
+  }
 
   private _store: AccountsStore<OffchainAccount> = new AccountsStore();
 
-  public get store() { return this._store; }
+  public get store() {
+    return this._store;
+  }
 
   private _app: IApp;
-  public get app() { return this._app; }
+  public get app() {
+    return this._app;
+  }
 
   constructor(app: IApp) {
     this._app = app;

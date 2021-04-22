@@ -10,11 +10,20 @@ export const Errors = {
   NoTopicId: 'Must supply topic ID',
   NotAdmin: 'Must be an admin to edit or feature topics',
   NotVerified: 'Must have a verified address to edit or feature topics',
-  TopicNotFound: 'Topic not found'
+  TopicNotFound: 'Topic not found',
 };
 
-const editTopic = async (models, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+const editTopic = async (
+  models,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const [chain, community, error] = await lookupCommunityIsVisibleToUser(
+    models,
+    req.body,
+    req.user
+  );
   if (error) return next(new Error(error));
   if (!req.body.id) {
     return next(new Error(Errors.NoTopicId));
@@ -57,14 +66,21 @@ const editTopic = async (models, req: Request, res: Response, next: NextFunction
 
     if (featured_order) {
       const activeEntity = community
-        ? await models.OffchainCommunity.findOne({ where: { id: community.id } })
+        ? await models.OffchainCommunity.findOne({
+            where: { id: community.id },
+          })
         : await models.Chain.findOne({ where: { id: chain.id } });
       let { featured_topics } = activeEntity;
       if (featured_order === 'true' && !featured_topics.includes(`${id}`)) {
         featured_topics.push(`${id}`);
-      } else if (featured_order === 'false' && featured_topics.includes(`${id}`)) {
+      } else if (
+        featured_order === 'false' &&
+        featured_topics.includes(`${id}`)
+      ) {
         const idx = featured_topics.indexOf(`${id}`);
-        featured_topics = featured_topics.slice(0, idx).concat(featured_topics.slice(idx + 1));
+        featured_topics = featured_topics
+          .slice(0, idx)
+          .concat(featured_topics.slice(idx + 1));
       }
       activeEntity.featured_topics = featured_topics;
       await activeEntity.save();

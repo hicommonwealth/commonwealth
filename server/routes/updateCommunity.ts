@@ -18,17 +18,25 @@ export const Errors = {
   InvalidCustomDomain: 'Custom domain may not include "commonwealth"',
 };
 
-const updateCommunity = async (models, req: Request, res: Response, next: NextFunction) => {
+const updateCommunity = async (
+  models,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   if (!req.body.id) return next(new Error(Errors.NoCommunityId));
   if (req.body.network) return next(new Error(Errors.CantChangeNetwork));
 
   const community = await models.OffchainCommunity.findOne({
-    where: { id: req.body.id }
+    where: { id: req.body.id },
   });
   if (!community) return next(new Error(Errors.CommunityNotFound));
   else {
-    const userAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
+    const userAddressIds = await req.user
+      .getAddresses()
+      .filter((addr) => !!addr.verified)
+      .map((addr) => addr.id);
     const userRole = await models.Role.findOne({
       where: {
         address_id: userAddressIds,
@@ -40,7 +48,19 @@ const updateCommunity = async (models, req: Request, res: Response, next: NextFu
     }
   }
 
-  const { iconUrl, name, description, website, discord, element, telegram, github, customDomain, invites, privacy } = req.body;
+  const {
+    iconUrl,
+    name,
+    description,
+    website,
+    discord,
+    element,
+    telegram,
+    github,
+    customDomain,
+    invites,
+    privacy,
+  } = req.body;
 
   if (website && !urlHasValidHTTPPrefix(website)) {
     return next(new Error(Errors.InvalidWebsite));
@@ -57,7 +77,8 @@ const updateCommunity = async (models, req: Request, res: Response, next: NextFu
   }
 
   if (req.body.name) community.name = req.body.name;
-  if (req.body['featured_topics[]']) community.featured_topics = req.body['featured_topics[]'];
+  if (req.body['featured_topics[]'])
+    community.featured_topics = req.body['featured_topics[]'];
   community.description = description;
   community.iconUrl = iconUrl;
   community.website = website;
@@ -72,16 +93,20 @@ const updateCommunity = async (models, req: Request, res: Response, next: NextFu
 
   // @TODO -> make sure this gets changed... on the front end, only allow one image to be attached
   if (req.body['attachments[]']) {
-    await Promise.all(req.body['attachments[]'].map((url) => models.OffchainAttachment.create({
-      attachable: 'community',
-      attachment_id: community.id,
-      description: 'image',
-      url,
-    })));
+    await Promise.all(
+      req.body['attachments[]'].map((url) =>
+        models.OffchainAttachment.create({
+          attachable: 'community',
+          attachment_id: community.id,
+          description: 'image',
+          url,
+        })
+      )
+    );
 
     const finalCommunity = await models.OffchainCommunity.findOne({
       where: { id: community.id },
-      include: [ models.Address, models.OffchainAttachment ],
+      include: [models.Address, models.OffchainAttachment],
     });
 
     return res.json({ status: 'Success', result: finalCommunity.toJSON() });

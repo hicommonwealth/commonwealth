@@ -2,7 +2,12 @@ import 'layout.scss';
 
 import m from 'mithril';
 
-import { initChain, initCommunity, deinitChainOrCommunity, selectNode } from 'app';
+import {
+  initChain,
+  initCommunity,
+  deinitChainOrCommunity,
+  selectNode,
+} from 'app';
 import app from 'state';
 
 import Sublayout from 'views/sublayout';
@@ -15,54 +20,83 @@ const CHAIN_LOADING_TIMEOUT = 3000;
 export const LoadingLayout: m.Component<{ hideSidebar?: boolean }> = {
   view: (vnode) => {
     const { hideSidebar } = vnode.attrs;
-    return m('.Layout.mithril-app', {
-      class: app.isCustomDomain() ? 'custom-domain' : ''
-    }, [
-      m(Sublayout, { loadingLayout: true, hideSidebar }),
-      m(AppModals),
-      m(AppToasts),
-    ]);
-  }
-};
-
-export const Layout: m.Component<{
-  scope: string,
-  hideSidebar?: boolean,
-  deferChain?: boolean,
-}, {
-  loadingScope,
-  deferred
-}> = {
-  view: (vnode) => {
-    const { scope, deferChain, hideSidebar } = vnode.attrs;
-    const scopeMatchesChain = app.config.nodes.getAll().find((n) => n.chain.id === scope);
-    const scopeMatchesCommunity = app.config.communities.getAll().find((c) => c.id === scope);
-
-    if (app.loadingError) {
-      return m('.Layout.mithril-app', {
-        class: app.isCustomDomain() ? 'custom-domain' : ''
-      }, [
-        m(Sublayout, { errorLayout: [
-          m('p', { style: 'color: #222' }, `Application error: ${app.loadingError}`),
-          m('p', { style: 'color: #222' }, 'Please try again at another time'),
-        ] }),
+    return m(
+      '.Layout.mithril-app',
+      {
+        class: app.isCustomDomain() ? 'custom-domain' : '',
+      },
+      [
+        m(Sublayout, { loadingLayout: true, hideSidebar }),
         m(AppModals),
         m(AppToasts),
-      ]);
+      ]
+    );
+  },
+};
+
+export const Layout: m.Component<
+  {
+    scope: string;
+    hideSidebar?: boolean;
+    deferChain?: boolean;
+  },
+  {
+    loadingScope;
+    deferred;
+  }
+> = {
+  view: (vnode) => {
+    const { scope, deferChain, hideSidebar } = vnode.attrs;
+    const scopeMatchesChain = app.config.nodes
+      .getAll()
+      .find((n) => n.chain.id === scope);
+    const scopeMatchesCommunity = app.config.communities
+      .getAll()
+      .find((c) => c.id === scope);
+
+    if (app.loadingError) {
+      return m(
+        '.Layout.mithril-app',
+        {
+          class: app.isCustomDomain() ? 'custom-domain' : '',
+        },
+        [
+          m(Sublayout, {
+            errorLayout: [
+              m(
+                'p',
+                { style: 'color: #222' },
+                `Application error: ${app.loadingError}`
+              ),
+              m(
+                'p',
+                { style: 'color: #222' },
+                'Please try again at another time'
+              ),
+            ],
+          }),
+          m(AppModals),
+          m(AppToasts),
+        ]
+      );
     } else if (!app.loginStatusLoaded()) {
       // Wait for /api/status to return with the user's login status
       return m(LoadingLayout, { hideSidebar });
     } else if (scope && !scopeMatchesChain && !scopeMatchesCommunity) {
       // If /api/status has returned, then app.config.nodes and app.config.communities
       // should both be loaded. If we match neither of them, then we can safely 404
-      return m('.Layout.mithril-app', {
-        class: app.isCustomDomain() ? 'custom-domain' : ''
-      }, [
-        m(PageNotFound),
-        m(AppModals),
-        m(AppToasts),
-      ]);
-    } else if (scope && scope !== app.activeId() && scope !== vnode.state.loadingScope) {
+      return m(
+        '.Layout.mithril-app',
+        {
+          class: app.isCustomDomain() ? 'custom-domain' : '',
+        },
+        [m(PageNotFound), m(AppModals), m(AppToasts)]
+      );
+    } else if (
+      scope &&
+      scope !== app.activeId() &&
+      scope !== vnode.state.loadingScope
+    ) {
       // If we are supposed to load a new chain or community, we do so now
       // This happens only once, and then loadingScope should be set
       vnode.state.loadingScope = scope;
@@ -92,12 +126,14 @@ export const Layout: m.Component<{
       return m(LoadingLayout, { hideSidebar });
     }
 
-    return m('.Layout.mithril-app', {
-      class: `${hideSidebar ? 'hide-sidebar' : ''} ${app.isCustomDomain() ? 'custom-domain' : ''}`
-    }, [
-      vnode.children,
-      m(AppModals),
-      m(AppToasts),
-    ]);
-  }
+    return m(
+      '.Layout.mithril-app',
+      {
+        class: `${hideSidebar ? 'hide-sidebar' : ''} ${
+          app.isCustomDomain() ? 'custom-domain' : ''
+        }`,
+      },
+      [vnode.children, m(AppModals), m(AppToasts)]
+    );
+  },
 };

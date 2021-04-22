@@ -11,16 +11,25 @@ import CommonwealthAPI from './api';
 // TODO: ideally we should store DAO accounts inside the EthereumAccount object, rather
 //   than extending it into a CommonwealthMember. But this is our first-pass implementation,
 //   for now.
-export default class CommonwealthMembers implements IAccountsModule<EthereumCoin, CommonwealthMember> {
+export default class CommonwealthMembers
+  implements IAccountsModule<EthereumCoin, CommonwealthMember> {
   protected _store: AccountsStore<CommonwealthMember> = new AccountsStore();
   private _api: CommonwealthAPI;
   private _Chain: EthereumChain;
   private _Accounts: EthereumAccounts;
 
-  public get store() { return this._store; }
-  public get api() { return this._api; }
+  public get store() {
+    return this._store;
+  }
+  public get api() {
+    return this._api;
+  }
 
-  public async init(api: CommonwealthAPI, ChainInfo: EthereumChain, Accounts: EthereumAccounts) {
+  public async init(
+    api: CommonwealthAPI,
+    ChainInfo: EthereumChain,
+    Accounts: EthereumAccounts
+  ) {
     this._api = api;
 
     // only used to initialize member for super call
@@ -33,7 +42,9 @@ export default class CommonwealthMembers implements IAccountsModule<EthereumCoin
   }
 
   private _app: IApp;
-  public get app() { return this._app; }
+  public get app() {
+    return this._app;
+  }
 
   constructor(app: IApp) {
     this._app = app;
@@ -44,7 +55,13 @@ export default class CommonwealthMembers implements IAccountsModule<EthereumCoin
       return this._store.getByAddress(address.toLowerCase());
     } catch (e) {
       if (!this._Accounts) return null;
-      return new CommonwealthMember(this.app, this._Chain, this._Accounts, this, address);
+      return new CommonwealthMember(
+        this.app,
+        this._Chain,
+        this._Accounts,
+        this,
+        address
+      );
     }
   }
 
@@ -54,7 +71,14 @@ export default class CommonwealthMembers implements IAccountsModule<EthereumCoin
       return this._store.getByAddress(member.id);
     } catch (e) {
       if (!this._Accounts) return null;
-      return new CommonwealthMember(this.app, this._Chain, this._Accounts, this, member.id, member);
+      return new CommonwealthMember(
+        this.app,
+        this._Chain,
+        this._Accounts,
+        this,
+        member.id,
+        member
+      );
     }
   }
 }

@@ -10,7 +10,7 @@ import {
   EntityEventKind,
   IChainEntityKind,
   IChainEventData,
-  SubstrateTypes
+  SubstrateTypes,
 } from '@commonwealth/chain-events';
 
 import { factory, formatFilename } from '../../shared/logging';
@@ -21,7 +21,7 @@ export default class extends IEventHandler {
   constructor(
     private readonly _models,
     private readonly _chain: string,
-    private readonly _wss?: WebSocket.Server,
+    private readonly _wss?: WebSocket.Server
   ) {
     super();
   }
@@ -36,12 +36,14 @@ export default class extends IEventHandler {
         chainEntity: dbEntity.toJSON(),
         chainEvent: dbEvent.toJSON(),
         chainEventType: dbEventType.toJSON(),
-      }
+      },
     };
     try {
       this._wss.emit(WebsocketMessageType.ChainEntity, payload);
     } catch (e) {
-      log.warn(`Failed to emit websocket event for entity ${dbEntity.type}:${dbEntity.type_id}`);
+      log.warn(
+        `Failed to emit websocket event for entity ${dbEntity.type}:${dbEntity.type_id}`
+      );
     }
   }
 
@@ -65,7 +67,12 @@ export default class extends IEventHandler {
      * We should determine, using the event's type, what action to take, based
      * on whether it is a creation, modification, or unrelated event.
      */
-    const createEntityFn = async (type: IChainEntityKind, type_id: string, author?, completed = false) => {
+    const createEntityFn = async (
+      type: IChainEntityKind,
+      type_id: string,
+      author?,
+      completed = false
+    ) => {
       if (type === SubstrateTypes.EntityKind.DemocracyPreimage) {
         // we always mark preimages as "completed" -- we have no link between democracy proposals
         // and preimages in the database, so we want to always fetch them for archival purposes,
@@ -73,11 +80,17 @@ export default class extends IEventHandler {
         completed = true;
       }
       const params = author
-        ? { type: type.toString(), type_id, chain: this._chain, completed, author }
+        ? {
+            type: type.toString(),
+            type_id,
+            chain: this._chain,
+            completed,
+            author,
+          }
         : { type: type.toString(), type_id, chain: this._chain, completed };
-      const [ dbEntity, created ] = await this._models.ChainEntity.findOrCreate({
+      const [dbEntity, created] = await this._models.ChainEntity.findOrCreate({
         where: params,
-        default: { },
+        default: {},
       });
       if (created) {
         log.info(`Created db entity, ${type.toString()}: ${type_id}.`);
@@ -97,11 +110,17 @@ export default class extends IEventHandler {
       return dbEvent;
     };
 
-    const updateEntityFn = async (type: IChainEntityKind, type_id: string, completed = false) => {
+    const updateEntityFn = async (
+      type: IChainEntityKind,
+      type_id: string,
+      completed = false
+    ) => {
       const dbEntity = await this._models.ChainEntity.findOne({
         where: {
-          type: type.toString(), type_id, chain: this._chain
-        }
+          type: type.toString(),
+          type_id,
+          chain: this._chain,
+        },
       });
       if (!dbEntity) {
         log.error(`no relevant db entity found for ${type}: ${type_id}`);
@@ -125,10 +144,12 @@ export default class extends IEventHandler {
 
     const entity = eventToEntity(event.data.kind);
     if (!entity) {
-      log.info(`no archival action needed for event of kind ${event.data.kind.toString()}`);
+      log.info(
+        `no archival action needed for event of kind ${event.data.kind.toString()}`
+      );
       return dbEvent;
     }
-    const [ entityKind, updateType ] = entity;
+    const [entityKind, updateType] = entity;
     const fieldName = entityToFieldName(entityKind);
     const fieldValue = event.data[fieldName].toString();
     const author = event.data['proposer'];
