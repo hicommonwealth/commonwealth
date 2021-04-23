@@ -1,7 +1,7 @@
 @import "client/styles/shared";
 
-.LandingPageHeaderLinks {
-  a.text-gray-500.leading-none {
+.TokensCreatorsButton.text-center.hidden.mb-20 {
+  a.btn-outline {
     color: $text-color-black;
     text-decoration: none;
     cursor: pointer;

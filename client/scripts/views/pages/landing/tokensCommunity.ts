@@ -1,5 +1,6 @@
 import m from 'mithril';
 import FindYourTokenInputComponent from './find_your_token_input';
+import './tokens_community.scss';
 
 const TokensCommunityComponent: m.Component<{}, {}> = {
   view: (vnode) => {
@@ -83,7 +84,7 @@ const TokensCommunityComponent: m.Component<{}, {}> = {
                   ]
                 ),
                 m(
-                  'div',
+                  'div.TokensCommunityConnectWalletButton',
                   m('p', [
                     m('span', { class: 'mr-5 text-lg' }, 'or'),
                     m(
@@ -103,18 +104,18 @@ const TokensCommunityComponent: m.Component<{}, {}> = {
               'div',
               {
                 class:
-                  'gradient-135 overflow-hidden relative h-full lg:min-h-desktop lg:h-screen lg:w-50-screen lg:absolute lg:left-1/2 xl:h-full xl:min-h-full',
+                  'gradient-135 overflow-hidden relative h-full lg:min-h-desktop lg:h-screen lg:w-50-screen lg:absolute lg:object-left xl:h-full xl:min-h-full',
               },
               [
                 m('img', {
                   class:
-                    'absolute top-1/2 transform -translate-y-2/4 left-10 max-w-none max-h-none h-auto w-629 xl:left-36 mt-10',
+                    'absolute object-top transform -translate-y-2/4 left-10 max-w-none max-h-none h-auto w-629 xl:left-36 mt-10',
                   src: 'static/img/discussions.svg',
                   alt: '',
                 }),
                 m('img', {
                   class:
-                    'absolute -bottom-10 left-24 lg:-bottom-2 lg:left-64 w-350',
+                    'absolute object-bottom left-24 lg:left-64 w-350',
                   src: 'static/img/notification.svg',
                   alt: '',
                 }),

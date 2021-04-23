@@ -1,4 +1,5 @@
 import m from 'mithril';
+import './chains_crowdfunding.scss';
 
 interface IState {
   chains: {
@@ -16,9 +17,9 @@ const ChainsCrowdfundingComponent: m.Component<IState, IState> = {
     vnode.state.chains = vnode.attrs.chains;
   },
   view: (vnode) => {
-    return m('section', { class: 'container mx-auto pt-20' }, [
+    return m('section.ChainsCrowdfunding', { class: 'mx-auto pt-20 container ' }, [
       m('img', {
-        class: 'mx-auto mb-3 w-36 h-auto',
+        class: 'mx-auto mb-3 w-32 h-32',
         src: 'static/img/misc.png',
         alt: '',
       }),
@@ -28,7 +29,7 @@ const ChainsCrowdfundingComponent: m.Component<IState, IState> = {
         ' Leverage on-chain crowdfunding '
       ),
       m(
-        'div',
+        'div.ChainsCrowdfundingButton',
         { class: 'flex justify-center text-center' },
         m(
           'a',
@@ -54,6 +55,7 @@ const ChainsCrowdfundingComponent: m.Component<IState, IState> = {
                   m(
                     'button',
                     {
+                      // HOVER DYNAMIC WHEN BUTTON IS CLICKED (TODO)
                       class:
                         'rounded-2xl p-5 bg-gray-300 text-left w-full focus:outline-none',
                       onclick: "changeTokenCreatorsTab(1, 'secondSection')",
@@ -65,6 +67,7 @@ const ChainsCrowdfundingComponent: m.Component<IState, IState> = {
                         { class: 'font-bold text-xl' },
                         chain.button.title
                       ),
+                      // SHOW TEXT WHEN ITS BUTTON ITS CLICKED (TODO)
                       m('p', { id: chain.button.card.id }, chain.button.card.text),
                     ]
                   )
@@ -74,6 +77,7 @@ const ChainsCrowdfundingComponent: m.Component<IState, IState> = {
                   {
                     class:
                       'flex justify-center lg:w-2/3 lg:absolute lg:w-2/3 lg:right-0 lg:top-0',
+                    // SHOW CARD IMAGE WHEN ITS BUTTON ITS CLICKED (TODO)
                     id: chain.card.id,
                   },
                   m('img', {

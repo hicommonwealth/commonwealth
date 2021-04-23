@@ -22,7 +22,7 @@ const TokensChainsComponent: m.Component<IState, IState> = {
       'section',
       {
         class:
-          'bg-geometric-pattern bg-cover bg-full pt-20 pb-40 md:pb-48 mb-40 relative',
+          'bg-geometric-pattern bg-cover bg-full pt-20 pb-40 md:pb-48 mb-48 relative',
       },
       [
         m('div', { class: 'container mx-auto' }, [

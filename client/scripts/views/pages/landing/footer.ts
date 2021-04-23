@@ -1,4 +1,5 @@
 import m from 'mithril';
+import './landing_page_footer.scss';
 
 interface IState {
   list: { text: string; href: string }[];
@@ -35,7 +36,7 @@ const FooterLandingPage: m.Component<IState, IState> = {
               m('ul', { class: 'flex flex-wrap flex-col h-32' }, [
                 vnode.state.list.map((item) => {
                   return m(
-                    'li',
+                    'li.FooterNavsLinks',
                     { class: 'mb-2' },
                     m(
                       'a',

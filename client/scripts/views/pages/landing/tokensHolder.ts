@@ -17,7 +17,7 @@ const TokenHoldersComponent: m.Component<IState, IState> = {
   view: (vnode) => {
     return m(
       'section.LandingPageTokenHolders',
-      { class: 'container' },
+      { class: 'container mx-auto pt-20' },
       [
         m('h2',
           { class: 'text-3xl font-bold mb-5 text-center' },
@@ -25,7 +25,7 @@ const TokenHoldersComponent: m.Component<IState, IState> = {
         m('p',
           { class: 'text-2xl max-w-screen-sm mx-auto text-center mb-10' },
           ' Find your community and drive your token forward. '),
-        m('div',
+        m('div.TokenHoldersButton',
           { class: 'text-center' },
           m('a',
             { class: 'btn-outline text-xl px-6 rounded-lg pb-3', href: '' },

@@ -1,4 +1,5 @@
 import m from 'mithril';
+import './tokens_creators.scss';
 
 interface IState {
   creators: {
@@ -35,7 +36,7 @@ const TokensCreatorComponent: m.Component<IState, IState> = {
         ' Commonwealth lets you simplify your community and governance. We bring four tools into one. '
       ),
       m(
-        'div',
+        'div.TokensCreatorsButton',
         { class: 'text-center hidden lg:block xl:block mb-20' },
         m(
           'a',
