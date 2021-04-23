@@ -107,7 +107,7 @@ const send = async (models, content: WebhookContent) => {
   });
   const chainOrCommwebhookUrls = [];
   chainOrCommWebhooks.forEach((wh) => {
-      chainOrCommwebhookUrls.push(wh.url);
+    chainOrCommwebhookUrls.push(wh.url);
   });
 
   const {
@@ -251,19 +251,19 @@ const send = async (models, content: WebhookContent) => {
         const getUpdatesUrl = url.split('/@').slice(0, -1).join('@');
 
         let getChatUsername = url.split('/@');
-        getChatUsername = '@' + getChatUsername[1];
+        getChatUsername = `@${getChatUsername[1]}`;
 
-        url = getUpdatesUrl+'/sendMessage'
+        url = `${getUpdatesUrl}/sendMessage`;
 
         webhookData = isChainEvent ? {
           chat_id: getChatUsername,
           text: `<a href="${chainEventLink}"><b>${title}</b></a>\n\n${fulltext}`,
           parse_mode: 'HTML',
           reply_markup: {
-            "resize_keyboard": true,
-            "inline_keyboard": [
+            'resize_keyboard': true,
+            'inline_keyboard': [
               [
-                {"text": "Read more on commonwealth", "url": actedOnLink}
+                { 'text': 'Read more on commonwealth', 'url': chainEventLink }
               ]
             ]
           }
@@ -272,10 +272,10 @@ const send = async (models, content: WebhookContent) => {
           text: `<b>Author:</b> <a href="${actorAccountLink}">${actor}</a>\n<a href="${actedOnLink}"><b>${notificationTitlePrefix + actedOn}</b></a> \r\n\n${notificationExcerpt.replace(REGEX_EMOJI, '')}`,
           parse_mode: 'HTML',
           reply_markup: {
-            "resize_keyboard": true,
-            "inline_keyboard": [
+            'resize_keyboard': true,
+            'inline_keyboard': [
               [
-                {"text": "Commonwealth", "url": actedOnLink}
+                { 'text': 'Commonwealth', 'url': actedOnLink }
               ]
             ]
           }
