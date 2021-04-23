@@ -263,7 +263,7 @@ const send = async (models, content: WebhookContent) => {
             "resize_keyboard": true,
             "inline_keyboard": [
               [
-                {"text": "Read more on commonwealth", "url": chainEventLink}
+                {"text": "Read more on commonwealth", "url": actedOnLink}
               ]
             ]
           }
@@ -275,7 +275,7 @@ const send = async (models, content: WebhookContent) => {
             "resize_keyboard": true,
             "inline_keyboard": [
               [
-                {"text": "Commonwealth", "url": chainEventLink}
+                {"text": "Commonwealth", "url": actedOnLink}
               ]
             ]
           }
