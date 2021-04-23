@@ -1,0 +1,89 @@
+@import "client/styles/shared";
+
+.OnboardingCLI {
+  padding: 0 0 25px 0;
+  text-align: center;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+
+  .title {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    width: 500px;
+    margin: 0 auto;
+
+    .icons {
+      display: flex;
+      align-items: center;
+      svg:nth-child(2) {
+        margin: 0 45px;
+      }
+    }
+
+    h2 {
+      font-size: 32px;
+      line-height: 38.4px;
+      margin: 24px 0 8px 0;
+    }
+
+    span {
+      text-align: center;
+      font-size: 18px;
+      line-height: 21.6px;
+    }
+  }
+
+  .targetAddress {
+    margin: 5px auto 15px;
+  }
+
+  .content {
+    flex-grow: 1;
+    width: 380px;
+    margin: 0 auto;
+
+    .guide {
+      background: #36393f;
+      color: white;
+      padding: 12px 16px 11px;
+      margin: 15px auto;
+      line-height: 1;
+      width: fit-content;
+      white-space: pre-wrap;
+      word-break: break-word;
+      border-radius: 4px;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .error-message {
+      @include error-text();
+      margin: 15px 0;
+    }
+    .mobile-error-message {
+      color: $text-color-medium;
+      margin: 26px 40px;
+      p {
+        margin: 8px 0;
+      }
+    }
+  }
+
+  @media only screen and (max-width: 768px) {
+    padding: 15px 0;
+    .title {
+      width: 260px;
+    }
+
+    .address {
+      display: none;
+
+      &.mobile {
+        margin: 10px auto;
+        display: inherit;
+      }
+    }
+  }
+}

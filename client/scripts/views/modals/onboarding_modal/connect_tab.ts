@@ -23,8 +23,8 @@ const OnboardingConnect: m.Component<IOnboardingConnectAttr, {}> = {
         m('h2', 'Connect Your Wallet'),
         m('span', 'Connect your wallet address to claim the following address on Commonwealth.')
       ]),
-      m('div.address', vnode.attrs.address),
-      m('div.address.mobile', [vnode.attrs.address?.slice(0, 10), '...', vnode.attrs.address?.slice(-10)]),
+      m('div.targetAddress', vnode.attrs.address),
+      m('div.targetAddress.mobile', [vnode.attrs.address?.slice(0, 10), '...', vnode.attrs.address?.slice(-10)]),
       m(Button, {
         label: 'Connect Wallet',
         onclick: () => {
@@ -32,7 +32,11 @@ const OnboardingConnect: m.Component<IOnboardingConnectAttr, {}> = {
         }
       }),
       m('div.or', 'OR'),
-      m('div.cli', 'Claim address with command line')
+      m('div.cli', {
+        onclick: () => {
+          vnode.attrs.onUseCLI();
+        }
+      }, 'Claim address with command line')
     ]);
   },
 };

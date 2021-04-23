@@ -30,18 +30,6 @@
     }
   }
 
-  .address {
-    background: #ffffe8;
-    padding: 10px 20px;
-    margin: 25px auto;
-    line-height: 1;
-    width: fit-content;
-
-    &.mobile {
-      display: none;
-    }
-  }
-
   button {
     background: linear-gradient(274.37deg, #333239 0%, #1a191f 81.48%);
     color: white;
@@ -72,15 +60,6 @@
     padding: 15px 0;
     .title {
       width: 260px;
-    }
-
-    .address {
-      display: none;
-
-      &.mobile {
-        margin: 10px auto;
-        display: inherit;
-      }
     }
 
     .or {

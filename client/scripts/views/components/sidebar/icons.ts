@@ -191,6 +191,14 @@ export const onboardingArrowRightIcon = `
 </svg>
 `;
 
+export const onboardingArrowLeftRightIcon = `
+<svg width="59" height="26" viewBox="0 0 59 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M53.7128 12.791L2.74512 12.791" stroke="#DDDDDD" stroke-width="4" stroke-linecap="round"/>
+<path d="M42.6687 23.4281L56.1567 12.7902L42.6687 2.15234" stroke="#DDDDDD" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16.2334 23.4281L2.74536 12.7902L16.2334 2.15234" stroke="#DDDDDD" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+`;
+
 export const onboardingChooseWalletIcon = `
 <svg width="121" height="78" viewBox="0 0 121 78" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path fill-rule="evenodd" clip-rule="evenodd" d="M37.3163 32.9533C37.3163 32.6322 37.1601 32.3311 36.8975 32.1461C36.635 31.9611 36.2989 31.9153 35.9965 32.0234L1.08552 44.4976C0.68678 44.6245 0.397949 44.9979 0.397949 45.4387V45.439V76.4657V76.4661C0.397949 76.481 0.398286 76.4958 0.398954 76.5106C0.406073 76.6696 0.450762 76.8187 0.524356 76.9495C0.595437 77.0761 0.694544 77.1873 0.816663 77.2733C0.992908 77.3975 1.2023 77.4589 1.41241 77.4532H48.9582C49.5036 77.4532 49.9457 77.0111 49.9457 76.4657V45.4387C49.9457 44.8933 49.5036 44.4512 48.9582 44.4512H37.3163V32.9533ZM35.3413 44.4512V34.3548L7.08492 44.4512H35.3413ZM2.37295 46.4262V75.0646L35.3413 63.2845V46.4262H2.37295ZM7.08495 75.4782L36.661 64.9103C37.054 64.7699 37.3163 64.3976 37.3163 63.9804V46.4262H47.9707V75.4782H7.08495Z" fill="url(#paint0_linear)"/>
@@ -467,6 +475,23 @@ export const onboardingJoinCommunityIcon = `
 <stop offset="0.8386" stop-color="#91BFFF"/>
 <stop offset="0.9208" stop-color="#91FFA0"/>
 <stop offset="1" stop-color="#FBFF91"/>
+</linearGradient>
+</defs>
+</svg>
+`;
+
+export const onboardingCLIIcon = `
+<svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M37.6466 3.09416L3.77811 36.9626C2.21602 38.5247 2.21602 41.0573 3.77811 42.6194L37.6466 76.4879C39.2086 78.05 41.7413 78.05 43.3034 76.4879L77.1718 42.6194C78.7339 41.0573 78.7339 38.5247 77.1718 36.9626L43.3034 3.09416C41.7413 1.53208 39.2086 1.53208 37.6466 3.09416Z" fill="url(#paint0_linear)"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M27.2833 29.6757C26.6975 29.0899 25.7478 29.0899 25.162 29.6757C24.5762 30.2614 24.5762 31.2112 25.162 31.797L33.1557 39.7907L25.162 47.7844C24.5762 48.3702 24.5762 49.3199 25.162 49.9057C25.7478 50.4915 26.6975 50.4915 27.2833 49.9057L36.3377 40.8513L37.3983 39.7907L36.3377 38.73L27.2833 29.6757ZM43.4239 47.3444C42.5955 47.3444 41.9239 48.016 41.9239 48.8444C41.9239 49.6728 42.5955 50.3444 43.4239 50.3444H56.2287C57.0571 50.3444 57.7287 49.6728 57.7287 48.8444C57.7287 48.016 57.0571 47.3444 56.2287 47.3444H43.4239Z" fill="url(#paint1_linear)"/>
+<defs>
+<linearGradient id="paint0_linear" x1="80.0002" y1="39.791" x2="42.9059" y2="71.6217" gradientUnits="userSpaceOnUse">
+<stop stop-color="#333239"/>
+<stop offset="1" stop-color="#1A191F"/>
+</linearGradient>
+<linearGradient id="paint1_linear" x1="57.0507" y1="29.2363" x2="25.9372" y2="30.1183" gradientUnits="userSpaceOnUse">
+<stop stop-color="#00DB8C"/>
+<stop offset="1" stop-color="#1BDEBB"/>
 </linearGradient>
 </defs>
 </svg>

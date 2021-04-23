@@ -360,8 +360,6 @@ const LinkNewAddressModal: m.Component<{
       }
     }
 
-    console.log('app.chain: ', app.chain);
-
     // TODO: refactor this out so we don't have duplicated loading code
     if (!app.chain && vnode.state.step !== LinkNewAddressSteps.Step2CreateProfile) return m('.LinkNewAddressModal', {
       key: 'placeholder', // prevent vnode from being reused so later oninit / oncreate code runs

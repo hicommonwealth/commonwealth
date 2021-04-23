@@ -29,6 +29,19 @@
     }
   }
 
+  .targetAddress {
+    background: #ffffe8;
+    padding: 10px 20px;
+    margin: 25px auto;
+    line-height: 1;
+    width: fit-content;
+    border-radius: 4px;
+
+    &.mobile {
+      display: none;
+    }
+  }
+
   .OnboardingFooterActions {
     display: flex;
     align-items: flex-end;
@@ -129,6 +142,15 @@
       margin: 0 15px;
       button {
         width: 140px;
+      }
+    }
+
+    .targetAddress {
+      display: none;
+
+      &.mobile {
+        margin: 10px auto;
+        display: inherit;
       }
     }
 
