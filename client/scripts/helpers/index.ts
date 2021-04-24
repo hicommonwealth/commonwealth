@@ -46,12 +46,9 @@ export function offchainThreadStageToIndex(stage: OffchainThreadStage) {
 
 export function offchainVoteToLabel(option) {
   switch (option) {
-    case OffchainVoteOptions.APPROVE: return 'Approve';
-    case OffchainVoteOptions.LEAN_APPROVE: return 'Undecided, leaning approve';
-    case OffchainVoteOptions.UNDECIDED_INFO: return 'Undecided, need more information';
-    case OffchainVoteOptions.UNDECIDED_CHANGES: return 'Undecided, changes requested';
-    case OffchainVoteOptions.LEAN_DISAPPROVE: return 'Undecided, leaning disapprove';
-    case OffchainVoteOptions.DISAPPROVE: return 'Disapprove';
+    case OffchainVoteOptions.SUPPORT: return 'Support';
+    case OffchainVoteOptions.OPPOSE: return 'Oppose';
+    case OffchainVoteOptions.CHANGES_REQUESTED: return 'Changes requested';
     default: // invalid
   }
 }

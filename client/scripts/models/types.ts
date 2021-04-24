@@ -134,12 +134,9 @@ export enum OffchainThreadStage {
 }
 
 export enum OffchainVoteOptions {
-  APPROVE,
-  LEAN_APPROVE,
-  UNDECIDED_INFO,
-  UNDECIDED_CHANGES,
-  LEAN_DISAPPROVE,
-  DISAPPROVE,
+  SUPPORT,
+  OPPOSE,
+  CHANGES_REQUESTED,
 }
 
 export enum TransactionStatus {

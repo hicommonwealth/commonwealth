@@ -49,12 +49,9 @@ export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread 
     return m('.ProposalHeaderOffchainPoll', [
       m('.offchain-poll-header', 'Poll'),
       [
-        OffchainVoteOptions.APPROVE,
-        OffchainVoteOptions.LEAN_APPROVE,
-        OffchainVoteOptions.UNDECIDED_INFO,
-        OffchainVoteOptions.UNDECIDED_CHANGES,
-        OffchainVoteOptions.LEAN_DISAPPROVE,
-        OffchainVoteOptions.DISAPPROVE,
+        OffchainVoteOptions.SUPPORT,
+        OffchainVoteOptions.OPPOSE,
+        OffchainVoteOptions.CHANGES_REQUESTED,
       ].map((option) => m('.offchain-poll-option', [
         m('.offchain-poll-option-left', [
           offchainVoteToLabel(option),
