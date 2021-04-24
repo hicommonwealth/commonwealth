@@ -3,7 +3,7 @@ import moment from 'moment-twitter';
 import app from 'state';
 
 import { IUniqueId } from './interfaces';
-import { OffchainThreadKind, OffchainThreadStage } from './types';
+import { OffchainThreadKind, OffchainThreadStage, OffchainVoteOptions } from './types';
 import OffchainAttachment from './OffchainAttachment';
 import OffchainTopic from './OffchainTopic';
 import OffchainVote from './OffchainVote';
@@ -47,16 +47,16 @@ class OffchainThread implements IUniqueId {
   }
 
   public offchainVotes: OffchainVote[];
-  public getOffchainVoteFor(address, chain) {
+  public getOffchainVoteFor(chain: string, address: string) {
     return this.offchainVotes?.find((vote) => vote.address === address && vote.chain === chain);
   }
-  public async submitOffchainVote(address, chain, option) {
+  public async submitOffchainVote(chain: string, address: string, option: OffchainVoteOptions) {
     const thread_id = this.id;
     try {
       await $.post(`${app.serverUrl()}/updateOffchainVote`, { thread_id, option, address, chain, jwt: app.user.jwt });
       const vote = new OffchainVote({ address, chain, thread_id, option });
       // remove any existing vote
-      const existingVoteIndex = this.offchainVotes.findIndex((vote) => vote.address === address && vote.chain === chain);
+      const existingVoteIndex = this.offchainVotes.findIndex((v) => v.address === address && v.chain === chain);
       if (existingVoteIndex !== -1) this.offchainVotes.splice(existingVoteIndex, 1);
       // add new vote
       this.offchainVotes.push(vote);

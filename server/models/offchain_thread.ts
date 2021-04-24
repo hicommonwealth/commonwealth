@@ -67,7 +67,7 @@ export default (
     version_history: { type: dataTypes.ARRAY(dataTypes.TEXT), defaultValue: [], allowNull: false },
 
     offchain_voting_enabled_at: { type: dataTypes.DATE, allowNull: true },
-    offchain_voting_votes_only: { type: dataTypes.BOOLEAN, allowNull: true },
+    offchain_voting_votes: { type: dataTypes.INTEGER, allowNull: true },
 
     created_at: { type: dataTypes.DATE, allowNull: false },
     updated_at: { type: dataTypes.DATE, allowNull: false },

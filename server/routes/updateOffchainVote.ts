@@ -13,9 +13,9 @@ const updateOffchainVote = async (models, req: Request, res: Response, next: Nex
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));
 
-  // TODO: check that req.thread_id is valid
-  // TODO: check that req.option is valid
-  // TODO: check and validate req.signature
+  // TODO: check that req.thread_id is valid, and increment offchain_voting_offchain_votes on the thread
+  // TODO: check that req.option is valid, and import options from shared/types
+  // TODO: check and validate req.signature, instead of checking for author
 
   let vote = await models.OffchainVote.findOne({
     where: {
