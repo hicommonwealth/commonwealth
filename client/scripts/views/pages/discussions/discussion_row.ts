@@ -9,7 +9,10 @@ import { Button, Icon, Icons, Tag } from 'construct-ui';
 import { updateRoute } from 'app';
 import app from 'state';
 import { chainEntityTypeToProposalShortName } from 'identifiers';
-import { formatLastUpdated, slugify, link, externalLink, extractDomain, offchainThreadStageToLabel } from 'helpers';
+import {
+  formatLastUpdated, slugify, link, externalLink, extractDomain, pluralize,
+  offchainThreadStageToLabel
+} from 'helpers';
 
 import { OffchainThread, OffchainThreadKind, OffchainThreadStage, AddressInfo } from 'models';
 import ReactionButton, { ReactionType } from 'views/components/reaction_button';
@@ -83,6 +86,10 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
       proposal instanceof OffchainThread && proposal.collaborators && proposal.collaborators.length > 0
         && m('span.proposal-collaborators', [ ' +', proposal.collaborators.length ]),
       m('.created-at', link('a', discussionLink, `Last active ${formatLastUpdated(getLastUpdated(proposal))}`)),
+      proposal instanceof OffchainThread && proposal.offchainVotingEnabledAt
+        && m('.offchain-voting-stat', 'POLL OPEN'),
+      proposal instanceof OffchainThread && proposal.offchainVotingNumVotes
+        && m('.offchain-voting-stat', pluralize(proposal.offchainVotingNumVotes, 'vote')),
       m('.mobile-comment-count', [
         m(Icon, { name: Icons.MESSAGE_SQUARE }),
         app.comments.nComments(proposal),

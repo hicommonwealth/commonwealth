@@ -29,8 +29,8 @@ const updateOffchainVote = async (models, req: Request, res: Response, next: Nex
 
   const thread = await models.OffchainThread.findOne({
     where: community
-      ? { thread_id: req.body.thread_id, community: community.id }
-      : { thread_id: req.body.thread_id, chain: chain.id }
+      ? { id: req.body.thread_id, community: community.id }
+      : { id: req.body.thread_id, chain: chain.id }
   });
 
   if (!thread) return next(new Error(Errors.InvalidThread));

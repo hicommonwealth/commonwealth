@@ -92,7 +92,8 @@
                     margin: 0 2px;
                 }
             }
-            > .created-at {
+            > .created-at,
+            > .offchain-voting-stat {
                 &::before {
                     content: ' ';
                     margin: 0 8px;
