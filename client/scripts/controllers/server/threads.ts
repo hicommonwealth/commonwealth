@@ -27,13 +27,34 @@ export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
 
 export const modelFromServer = (thread) => {
-  const attachments = thread.OffchainAttachments
-    ? thread.OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
+  const {
+    id,
+    title,
+    body,
+    last_edited,
+    version_history,
+    OffchainAttachments,
+    created_at,
+    topic,
+    kind,
+    stage,
+    community,
+    chain,
+    read_only,
+    plaintext,
+    url,
+    pinned,
+    collaborators,
+    chain_entities,
+  } = thread;
+
+  const attachments = OffchainAttachments
+    ? OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
     : [];
 
-  let versionHistory;
-  if (thread.version_history) {
-    versionHistory = thread.version_history.map((v) => {
+  let versionHistoryProcessed;
+  if (version_history) {
+    versionHistoryProcessed = version_history.map((v) => {
       if (!v) return;
       let history;
       try {
@@ -49,34 +70,34 @@ export const modelFromServer = (thread) => {
     });
   }
 
-  const lastEdited = thread.last_edited
-    ? moment(thread.last_edited)
-    : versionHistory && versionHistory?.length > 1
-      ? versionHistory[0].timestamp
+  const lastEditedProcessed = last_edited
+    ? moment(last_edited)
+    : versionHistoryProcessed && versionHistoryProcessed?.length > 1
+      ? versionHistoryProcessed[0].timestamp
       : null;
 
-  return new OffchainThread(
-    thread.Address.address,
-    decodeURIComponent(thread.title),
+  return new OffchainThread({
+    id,
+    author: thread.Address.address,
+    authorChain: thread.Address.chain,
+    title: decodeURIComponent(title),
+    body: decodeURIComponent(body),
+    createdAt: moment(created_at),
     attachments,
-    thread.id,
-    moment(thread.created_at),
-    thread.topic,
-    thread.kind,
-    thread.stage,
-    versionHistory,
-    thread.community,
-    thread.chain,
-    thread.read_only,
-    decodeURIComponent(thread.body),
-    thread.plaintext,
-    thread.url,
-    thread.Address.chain,
-    thread.pinned,
-    thread.collaborators,
-    thread.chain_entities,
-    lastEdited,
-  );
+    topic,
+    kind,
+    stage,
+    community,
+    chain,
+    readOnly: read_only,
+    plaintext,
+    url,
+    pinned,
+    collaborators,
+    chainEntities: chain_entities,
+    versionHistory: versionHistoryProcessed,
+    lastEdited: lastEditedProcessed,
+  });
 };
 
 /*

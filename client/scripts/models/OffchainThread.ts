@@ -73,7 +73,29 @@ class OffchainThread implements IUniqueId {
     }
   }
 
-  constructor(
+  constructor({
+    author,
+    title,
+    attachments,
+    id,
+    createdAt,
+    topic,
+    kind,
+    stage,
+    versionHistory,
+    community,
+    chain,
+    readOnly,
+    // optional args:
+    body,
+    plaintext,
+    url,
+    authorChain,
+    pinned,
+    collaborators,
+    chainEntities,
+    lastEdited,
+  }: {
     author: string,
     title: string,
     attachments: OffchainAttachment[],
@@ -94,7 +116,7 @@ class OffchainThread implements IUniqueId {
     collaborators?: any[],
     chainEntities?: any[],
     lastEdited?: moment.Moment,
-  ) {
+  }) {
     this.author = author;
     this.title = title;
     this.body = body;
