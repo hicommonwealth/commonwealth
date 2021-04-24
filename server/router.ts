@@ -74,6 +74,7 @@ import updateThreadPrivacy from './routes/updateThreadPrivacy';
 import updateThreadPinned from './routes/updateThreadPinned';
 import updateThreadLinkedChainEntities from './routes/updateThreadLinkedChainEntities';
 import updateOffchainVote from './routes/updateOffchainVote';
+import viewOffchainVotes from './routes/viewOffchainVotes';
 import fetchEntityTitle from './routes/fetchEntityTitle';
 import updateChainEntityTitle from './routes/updateChainEntityTitle';
 import deleteThread from './routes/deleteThread';
@@ -163,6 +164,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   router.post('/updateThreadPinned', passport.authenticate('jwt', { session: false }), updateThreadPinned.bind(this, models));
   router.post('/updateThreadLinkedChainEntities', passport.authenticate('jwt', { session: false }), updateThreadLinkedChainEntities.bind(this, models));
   router.post('/updateOffchainVote', passport.authenticate('jwt', { session: false }), updateOffchainVote.bind(this, models));
+  router.get('/viewOffchainVotes', viewOffchainVotes.bind(this, models));
   router.get('/fetchEntityTitle', fetchEntityTitle.bind(this, models));
   router.post('/updateChainEntityTitle', passport.authenticate('jwt', { session: false }), updateChainEntityTitle.bind(this, models));
   router.post('/addEditors', passport.authenticate('jwt', { session: false }), addEditors.bind(this, models));

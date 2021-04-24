@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import moment from 'moment-twitter';
+import m from 'mithril';
 import app from 'state';
 
 import { IUniqueId } from './interfaces';
@@ -46,7 +47,9 @@ class OffchainThread implements IUniqueId {
     // return _hasOffchainPoll;
   }
 
-  public offchainVotes: OffchainVote[];
+  public offchainVotingNumVotes: number;
+  public offchainVotingEnabledAt: moment.Moment | null;
+  public offchainVotes: OffchainVote[]; // lazy loaded
   public getOffchainVoteFor(chain: string, address: string) {
     return this.offchainVotes?.find((vote) => vote.address === address && vote.chain === chain);
   }
@@ -67,6 +70,7 @@ class OffchainThread implements IUniqueId {
       if (existingVoteIndex !== -1) this.offchainVotes.splice(existingVoteIndex, 1);
       // add new vote
       this.offchainVotes.push(vote);
+      m.redraw();
       return vote;
     } catch (e) {
       // TODO: handle error
@@ -95,6 +99,9 @@ class OffchainThread implements IUniqueId {
     collaborators,
     chainEntities,
     lastEdited,
+    offchainVotingEnabledAt,
+    offchainVotingNumVotes,
+    offchainVotes,
   }: {
     author: string,
     title: string,
@@ -116,6 +123,9 @@ class OffchainThread implements IUniqueId {
     collaborators?: any[],
     chainEntities?: any[],
     lastEdited?: moment.Moment,
+    offchainVotingEnabledAt?: moment.Moment | null,
+    offchainVotingNumVotes?: number,
+    offchainVotes?: OffchainVote[],
   }) {
     this.author = author;
     this.title = title;
@@ -144,7 +154,9 @@ class OffchainThread implements IUniqueId {
         completed: ce.completed,
       };
     }) : [];
-    this.offchainVotes = []; // TODO
+    this.offchainVotingEnabledAt = offchainVotingEnabledAt;
+    this.offchainVotingNumVotes = offchainVotingNumVotes;
+    this.offchainVotes = offchainVotes || [];
     this.lastEdited = lastEdited;
   }
 }
