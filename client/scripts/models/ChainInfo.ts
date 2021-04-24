@@ -26,11 +26,10 @@ class ChainInfo {
   public adminsAndMods: RoleInfo[];
   public members: RoleInfo[];
 
-  // TODO: convert this to accept an object with params instead
-  constructor(
+  constructor({
     id, network, symbol, name, iconUrl, description, website, discord, element, telegram, github,
-    customDomain, blockExplorerIds, collapsedOnHomepage, featuredTopics, topics, adminsAndMods?, base?
-  ) {
+    customDomain, blockExplorerIds, collapsedOnHomepage, featuredTopics, topics, adminsAndMods, base
+  }) {
     this.id = id;
     this.network = network;
     this.base = base || networkToBase(network);
@@ -51,33 +50,52 @@ class ChainInfo {
     this.adminsAndMods = adminsAndMods || [];
   }
 
-  public static fromJSON(json) {
-    let blockExplorerIds;
+  public static fromJSON({
+    id,
+    network,
+    symbol,
+    name,
+    icon_url,
+    description,
+    website,
+    discord,
+    element,
+    telegram,
+    github,
+    customDomain,
+    blockExplorerIds,
+    collapsed_on_homepage,
+    featured_topics,
+    topics,
+    adminsAndMods,
+    base,
+  }) {
+    let blockExplorerIdsParsed;
     try {
-      blockExplorerIds = JSON.parse(json.blockExplorerIds);
+      blockExplorerIdsParsed = JSON.parse(blockExplorerIds);
     } catch (e) {
       // ignore invalid JSON blobs
     }
-    return new ChainInfo(
-      json.id,
-      json.network,
-      json.symbol,
-      json.name,
-      json.icon_url,
-      json.description,
-      json.website,
-      json.discord,
-      json.element,
-      json.telegram,
-      json.github,
-      json.customDomain,
-      blockExplorerIds,
-      json.collapsed_on_homepage,
-      json.featured_topics,
-      json.topics,
-      json.adminsAndMods,
-      json.base,
-    );
+    return new ChainInfo({
+      id,
+      network,
+      symbol,
+      name,
+      iconUrl: icon_url,
+      description,
+      website,
+      discord,
+      element,
+      telegram,
+      github,
+      customDomain,
+      blockExplorerIds: blockExplorerIdsParsed,
+      collapsedOnHomepage: collapsed_on_homepage,
+      featuredTopics: featured_topics,
+      topics,
+      adminsAndMods,
+      base,
+    });
   }
 
   // TODO: get operation should not have side effects, and either way this shouldn't be here

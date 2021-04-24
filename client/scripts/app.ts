@@ -59,13 +59,15 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
           element: community.element,
           telegram: community.telegram,
           github: community.github,
-          default_chain: app.config.chains.getById(community.default_chain),
+          defaultChain: app.config.chains.getById(community.default_chain),
           visible: community.visible,
-          collapsed_on_homepage: community.collapsed_on_homepage,
+          collapsedOnHomepage: community.collapsed_on_homepage,
           invitesEnabled: community.invitesEnabled,
           privacyEnabled: community.privacyEnabled,
           featuredTopics: community.featured_topics,
           topics: community.topics,
+          customDomain: community.customDomain,
+          adminsAndMods: [],
         }));
       });
       app.user.setRoles(data.roles);
