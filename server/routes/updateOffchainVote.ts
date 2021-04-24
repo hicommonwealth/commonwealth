@@ -14,28 +14,26 @@ const updateOffchainVote = async (models, req: Request, res: Response, next: Nex
   if (authorError) return next(new Error(authorError));
 
   // TODO: check that req.thread_id is valid
-  // TODO: check that req.choice is valid
+  // TODO: check that req.option is valid
   // TODO: check and validate req.signature
 
   let vote = await models.OffchainVote.findOne({
     where: {
-      thread_id: req.thread_id,
-      address: req.address,
-      chain: req.chain,
-      community: req.community,
+      thread_id: req.body.thread_id,
+      address: req.body.address,
+      chain: req.body.chain,
     }
   });
 
   if (!vote) {
     vote = await models.OffchainVote.create({
-      thread_id: req.thread_id,
-      address: req.address,
-      chain: req.chain,
-      community: req.community,
-      choice: req.choice,
+      thread_id: req.body.thread_id,
+      address: req.body.address,
+      chain: req.body.chain,
+      option: req.body.option,
     });
   } else {
-    vote.choice = req.choice;
+    vote.option = req.body.option;
     await vote.save();
   }
 

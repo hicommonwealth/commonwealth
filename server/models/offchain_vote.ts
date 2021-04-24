@@ -5,7 +5,7 @@ import { OffchainThreadAttributes } from './offchain_thread';
 export interface OffchainVoteAttributes {
   id?: number;
   thread_id: number;
-  choice: string;
+  option: string;
   created_at?: Date;
   updated_at?: Date;
 
@@ -30,7 +30,7 @@ export default (
     'OffchainVote', {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       thread_id: { type: dataTypes.INTEGER, allowNull: false },
-      choice: { type: dataTypes.STRING, allowNull: false },
+      option: { type: dataTypes.STRING, allowNull: false },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
     }, {

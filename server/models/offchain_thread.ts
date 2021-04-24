@@ -22,6 +22,10 @@ export interface OffchainThreadAttributes {
 
   read_only?: boolean;
   version_history?: string[];
+
+  offchain_voting_enabled_at?: Date;
+  offchain_voting_votes?: number;
+
   created_at?: Date;
   updated_at?: Date;
   deleted_at?: Date;
@@ -61,6 +65,10 @@ export default (
     community: { type: dataTypes.STRING, allowNull: true },
     read_only: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     version_history: { type: dataTypes.ARRAY(dataTypes.TEXT), defaultValue: [], allowNull: false },
+
+    offchain_voting_enabled_at: { type: dataTypes.DATE, allowNull: true },
+    offchain_voting_votes_only: { type: dataTypes.BOOLEAN, allowNull: true },
+
     created_at: { type: dataTypes.DATE, allowNull: false },
     updated_at: { type: dataTypes.DATE, allowNull: false },
     deleted_at: { type: dataTypes.DATE, allowNull: true },
@@ -77,6 +85,10 @@ export default (
       { fields: ['community', 'updated_at'] },
       { fields: ['chain', 'pinned'] },
       { fields: ['community', 'pinned'] },
+      { fields: ['chain', 'offchain_voting_enabled_at'] },
+      { fields: ['community', 'offchain_voting_enabled_at'] },
+      { fields: ['chain', 'offchain_voting_votes'] },
+      { fields: ['community', 'offchain_voting_votes'] },
     ],
   });
 

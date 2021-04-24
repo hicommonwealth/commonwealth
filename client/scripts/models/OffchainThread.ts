@@ -1,4 +1,7 @@
+import $ from 'jquery';
 import moment from 'moment-twitter';
+import app from 'state';
+
 import { IUniqueId } from './interfaces';
 import { OffchainThreadKind, OffchainThreadStage } from './types';
 import OffchainAttachment from './OffchainAttachment';
@@ -44,20 +47,23 @@ class OffchainThread implements IUniqueId {
   }
 
   public offchainVotes: OffchainVote[];
-  public async submitOffchainVote(address, chain, option) {
-    const thread_id = this.id;
-    const vote = new OffchainVote({ address, chain, thread_id, option });
-
-    // TODO: use controller to make a round trip to the backend
-    // remove existing vote, add new vote
-    const existingVoteIndex = this.offchainVotes.findIndex((vote) => vote.address === address && vote.chain === chain);
-    if (existingVoteIndex !== -1) this.offchainVotes.splice(existingVoteIndex, 1);
-    this.offchainVotes.push(vote);
-
-    return vote;
-  }
   public getOffchainVoteFor(address, chain) {
     return this.offchainVotes?.find((vote) => vote.address === address && vote.chain === chain);
+  }
+  public async submitOffchainVote(address, chain, option) {
+    const thread_id = this.id;
+    try {
+      await $.post(`${app.serverUrl()}/updateOffchainVote`, { thread_id, option, address, chain, jwt: app.user.jwt });
+      const vote = new OffchainVote({ address, chain, thread_id, option });
+      // remove any existing vote
+      const existingVoteIndex = this.offchainVotes.findIndex((vote) => vote.address === address && vote.chain === chain);
+      if (existingVoteIndex !== -1) this.offchainVotes.splice(existingVoteIndex, 1);
+      // add new vote
+      this.offchainVotes.push(vote);
+      return vote;
+    } catch (e) {
+      // TODO: handle error
+    }
   }
 
   constructor(
