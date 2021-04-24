@@ -262,7 +262,8 @@ const ProposalHeader: m.Component<{
               ]),
           ]),
           proposal instanceof OffchainThread
-            && m(ProposalHeaderOffchainPoll), // TODO: only show this if the thread has a poll
+            && proposal.hasOffchainPoll
+            && m(ProposalHeaderOffchainPoll, { proposal }),
         ]),
       ]),
       proposal instanceof OffchainThread && m('.proposal-content', [

@@ -3,16 +3,20 @@ import { IUniqueId } from './interfaces';
 import { OffchainVoteOptions } from './types';
 
 class OffchainVote {
-  public readonly id: number;
+  // public readonly id: number;
+  // public readonly createdAt: moment.Moment;
+  public readonly address: string;
+  public readonly chain: string;
   public readonly thread_id: number;
-  public choice: OffchainVoteOptions;
-  public readonly createdAt: moment.Moment;
+  public option: OffchainVoteOptions;
 
-  constructor({ id, thread_id, choice, createdAt }) {
-    this.id = id;
+  constructor({ address, chain, thread_id, option }) {
+    // this.id = id;
+    // this.createdAt = createdAt;
+    this.address = address;
+    this.chain = chain;
     this.thread_id = thread_id;
-    this.choice = choice;
-    this.createdAt = createdAt;
+    this.option = option;
   }
 }
 

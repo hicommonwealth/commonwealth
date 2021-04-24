@@ -46,6 +46,8 @@ export const ProposalHeaderExternalLink: m.Component<{ proposal: AnyProposal | O
 
 export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread }> = {
   view: (vnode) => {
+    const { proposal } = vnode.attrs;
+
     return m('.ProposalHeaderOffchainPoll', [
       m('.offchain-poll-header', 'Poll'),
       [
@@ -61,15 +63,27 @@ export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread 
             rounded: true,
             compact: true,
             size: 'sm',
-            intent: 'primary', // TODO
-            label: 'Vote', // TODO
-            disabled: false, // !canVote || !alreadyVoted, // TODO
+            intent: 'primary',
+            label: 'Vote',
+            disabled: !app.user.activeAccount
+              ? true
+              : (proposal.getOffchainVoteFor(app.user.activeAccount.chain.id, app.user.activeAccount.address)
+                 && proposal.getOffchainVoteFor(app.user.activeAccount.chain.id, app.user.activeAccount.address).option
+                 === option)
+                ? true
+                : false,
             onclick: () => {
-              // TODO
+              // submit vote
+              proposal.submitOffchainVote(
+                app.user.activeAccount.chain.id,
+                app.user.activeAccount.address,
+                option,
+              );
             }
           }),
         ]),
         m('.offchain-poll-option-right', [
+          proposal.offchainVotes.filter((vote) => vote.option === option).length,
           // m(UserGallery)
         ]),
       ])),

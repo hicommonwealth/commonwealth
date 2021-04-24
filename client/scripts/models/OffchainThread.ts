@@ -3,6 +3,7 @@ import { IUniqueId } from './interfaces';
 import { OffchainThreadKind, OffchainThreadStage } from './types';
 import OffchainAttachment from './OffchainAttachment';
 import OffchainTopic from './OffchainTopic';
+import OffchainVote from './OffchainVote';
 import { VersionHistory } from '../controllers/server/threads';
 
 class OffchainThread implements IUniqueId {
@@ -34,6 +35,29 @@ class OffchainThread implements IUniqueId {
 
   public get uniqueIdentifier() {
     return `${this.slug}_${this.identifier}`;
+  }
+
+  private _hasOffchainPoll: boolean;
+  public get hasOffchainPoll() {
+    return true;
+    // return _hasOffchainPoll;
+  }
+
+  public offchainVotes: OffchainVote[];
+  public async submitOffchainVote(address, chain, option) {
+    const thread_id = this.id;
+    const vote = new OffchainVote({ address, chain, thread_id, option });
+
+    // TODO: use controller to make a round trip to the backend
+    // remove existing vote, add new vote
+    const existingVoteIndex = this.offchainVotes.findIndex((vote) => vote.address === address && vote.chain === chain);
+    if (existingVoteIndex !== -1) this.offchainVotes.splice(existingVoteIndex, 1);
+    this.offchainVotes.push(vote);
+
+    return vote;
+  }
+  public getOffchainVoteFor(address, chain) {
+    return this.offchainVotes?.find((vote) => vote.address === address && vote.chain === chain);
   }
 
   constructor(
@@ -85,6 +109,7 @@ class OffchainThread implements IUniqueId {
         completed: ce.completed,
       };
     }) : [];
+    this.offchainVotes = []; // TODO
     this.lastEdited = lastEdited;
   }
 }
