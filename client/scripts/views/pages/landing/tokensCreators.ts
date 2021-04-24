@@ -17,11 +17,50 @@ interface IState {
       imgAlt: string;
     };
   }[];
+  buttonHoverActiveById: string;
+  textActiveById: string;
+  chainCardImageActiveById: string;
 }
 
-const TokensCreatorComponent: m.Component<IState, IState> = {
+interface IAttrs {
+  creators: {
+    button: {
+      id: string;
+    };
+    texts: {
+      id: string;
+      title: string;
+      text: string;
+    };
+    card: {
+      id: string;
+      imgSrc: string;
+      imgAlt: string;
+    };
+  }[];
+}
+
+const removeOrAddClasslistFromChains = (
+  creators,
+  classlist,
+  method
+) => {
+  creators.forEach((creator: any) => {
+    const METHODS = {
+      add: () => document.getElementById(creator.card.id).classList.add(classlist),
+      remove: () => document.getElementById(creator.card.id).classList.remove(classlist),
+    };
+
+    return METHODS[method]();
+  });
+};
+
+const TokensCreatorComponent: m.Component<IAttrs, IState> = {
   oninit: (vnode) => {
     vnode.state.creators = vnode.attrs.creators;
+    vnode.state.buttonHoverActiveById = 'first-section-button1';
+    vnode.state.textActiveById = 'tab-codepen-text';
+    vnode.state.chainCardImageActiveById = 'tab-codepen';
   },
   view: (vnode) => {
     return m('section', { class: 'container mx-auto pt-10' }, [
@@ -62,10 +101,48 @@ const TokensCreatorComponent: m.Component<IState, IState> = {
                   m(
                     'button',
                     {
-                      class:
-                        'rounded-2xl p-5 bg-gray-500 text-left w-full focus:outline-none',
+                      class: `${
+                        vnode.state.buttonHoverActiveById === creator.button.id
+                          ? 'bg-gray-500'
+                          : ''
+                      } rounded-2xl p-5 text-left w-full focus:outline-none`,
                       id: creator.button.id,
-                      onclick: "changeTokenCreatorsTab(1, 'firstSection')",
+                      onclick: () => {
+                        removeOrAddClasslistFromChains(
+                          vnode.state.creators,
+                          'visible',
+                          'remove'
+                        );
+                        removeOrAddClasslistFromChains(
+                          vnode.state.creators,
+                          'invisible',
+                          'remove'
+                        );
+
+
+                        const filteredCreators = vnode.state.creators.filter(
+                          (creatoarToFilter) => creatoarToFilter !== creator
+                        );
+
+                        removeOrAddClasslistFromChains(
+                          filteredCreators,
+                          'invisible',
+                          'add'
+                        );
+
+                        document
+                          .getElementById(creator.button.id)
+                          .classList.add('bg-gray-500');
+                        document
+                          .getElementById(creator.card.id)
+                          .classList.add('visible');
+                        document
+                          .getElementById(creator.texts.id)
+                          .classList.add('visible');
+                        vnode.state.buttonHoverActiveById = creator.button.id;
+                        vnode.state.chainCardImageActiveById = creator.card.id;
+                        vnode.state.textActiveById = creator.texts.id;
+                      },
                     },
                     [
                       m(
@@ -75,7 +152,14 @@ const TokensCreatorComponent: m.Component<IState, IState> = {
                       ),
                       m(
                         'p',
-                        { class: 'text-white', id: creator.texts.id },
+                        {
+                          class: `${
+                            vnode.state.buttonHoverActiveById === creator.button.id
+                              ? 'bg-gray-500'
+                              : 'invisible'
+                          } text-white`,
+                          id: creator.texts.id,
+                        },
                         creator.texts.text
                       ),
                     ]
