@@ -34,7 +34,7 @@ const LandingPage: m.Component<{}, {}> = {
             focusAt: 'center',
             perView: 3,
             gap: 40,
-            autoplay: 0,
+            autoplay: 2500,
             hoverpause: true,
             peek: {
               before: 100,

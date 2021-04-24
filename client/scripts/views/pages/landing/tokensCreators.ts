@@ -40,11 +40,7 @@ interface IAttrs {
   }[];
 }
 
-const removeOrAddClasslistFromChains = (
-  creators,
-  classlist,
-  method
-) => {
+const removeOrAddClasslistFromChains = (creators, classlist, method) => {
   creators.forEach((creator: any) => {
     const METHODS = {
       add: () => document.getElementById(creator.card.id).classList.add(classlist),
@@ -119,7 +115,6 @@ const TokensCreatorComponent: m.Component<IAttrs, IState> = {
                           'remove'
                         );
 
-
                         const filteredCreators = vnode.state.creators.filter(
                           (creatoarToFilter) => creatoarToFilter !== creator
                         );
@@ -168,8 +163,11 @@ const TokensCreatorComponent: m.Component<IAttrs, IState> = {
                 m(
                   'div',
                   {
-                    class:
-                      'flex justify-center lg:w-2/3 lg:absolute lg:w-2/3 lg:right-0 lg:top-0',
+                    class: `${
+                      vnode.state.chainCardImageActiveById === creator.card.id
+                        ? 'visible'
+                        : 'invisible'
+                    } flex justify-center lg:w-2/3 lg:absolute lg:w-2/3 lg:right-0 lg:top-0`,
                     id: creator.card.id,
                   },
                   m('img', {
