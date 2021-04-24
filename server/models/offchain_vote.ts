@@ -6,6 +6,8 @@ export interface OffchainVoteAttributes {
   id?: number;
   thread_id: number;
   option: string;
+  address: string;
+  chain: string;
   created_at?: Date;
   updated_at?: Date;
 
@@ -31,6 +33,8 @@ export default (
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       thread_id: { type: dataTypes.INTEGER, allowNull: false },
       option: { type: dataTypes.STRING, allowNull: false },
+      address: { type: Sequelize.STRING, allowNull: false },
+      chain: { type: Sequelize.STRING, allowNull: false },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
     }, {
