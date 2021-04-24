@@ -21,7 +21,7 @@ const LandingPage: m.Component<{}, {}> = {
           navs: [
             { text: 'Why Commonwealth?', ref: '' },
             { text: 'Use Cases', ref: '' },
-            { text: 'Crowdfounding', ref: '' },
+            { text: 'Crowdfunding', ref: '' },
             { text: 'Developers', ref: '' },
           ],
         })
