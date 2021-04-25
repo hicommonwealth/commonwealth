@@ -94,6 +94,7 @@ const TokensCommunityComponent: m.Component<{}, IState> = {
                 m(
                   'form',
                   {
+                    autocomplete: 'off',
                     class:
                       'bg-white shadow-2xl rounded-xl p-2 flex flex-row justify-between mb-10 relative',
                   },
