@@ -92,17 +92,17 @@ const ChainsCrowdfundingComponent: m.Component<IAttrs, IState> = {
                         onclick: () => {
                           removeOrAddClasslistFromChains(
                             vnode.state.chains,
-                            'visible',
+                            'block',
                             'remove'
                           );
                           removeOrAddClasslistFromChains(
                             vnode.state.chains,
-                            'invisible',
+                            'hidden',
                             'remove'
                           );
                           removeOrAddClasslistFromChains(
                             vnode.state.chains.filter((chainToFilter) => chainToFilter !== chain),
-                            'invisible',
+                            'hidden',
                             'add'
                           );
 
@@ -111,7 +111,7 @@ const ChainsCrowdfundingComponent: m.Component<IAttrs, IState> = {
                             .classList.add('bg-gray-300');
                           document
                             .getElementById(chain.card.id)
-                            .classList.add('visible');
+                            .classList.add('block');
                           vnode.state.buttonHoverActiveById = chain.button.id;
                           vnode.state.chainCardImageActiveById = chain.button.card.id;
                         },
@@ -134,7 +134,7 @@ const ChainsCrowdfundingComponent: m.Component<IAttrs, IState> = {
                   m(
                     'div',
                     {
-                      class: `${vnode.state.chainCardImageActiveById === chain.card.id ? 'visible' : 'invisible'} flex justify-center lg:w-2/3 lg:absolute lg:w-2/3 lg:right-0 lg:top-0`,
+                      class: `${vnode.state.chainCardImageActiveById === chain.card.id ? 'block' : 'hidden'} flex justify-center lg:w-2/3 lg:absolute lg:w-2/3 lg:right-0 lg:top-0`,
                       id: chain.card.id,
                     },
                     m('img', {

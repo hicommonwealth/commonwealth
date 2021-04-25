@@ -106,12 +106,12 @@ const TokensCreatorComponent: m.Component<IAttrs, IState> = {
                       onclick: () => {
                         removeOrAddClasslistFromChains(
                           vnode.state.creators,
-                          'visible',
+                          'block',
                           'remove'
                         );
                         removeOrAddClasslistFromChains(
                           vnode.state.creators,
-                          'invisible',
+                          'hidden',
                           'remove'
                         );
 
@@ -121,7 +121,7 @@ const TokensCreatorComponent: m.Component<IAttrs, IState> = {
 
                         removeOrAddClasslistFromChains(
                           filteredCreators,
-                          'invisible',
+                          'hidden',
                           'add'
                         );
 
@@ -130,10 +130,10 @@ const TokensCreatorComponent: m.Component<IAttrs, IState> = {
                           .classList.add('bg-gray-500');
                         document
                           .getElementById(creator.card.id)
-                          .classList.add('visible');
+                          .classList.add('block');
                         document
                           .getElementById(creator.texts.id)
-                          .classList.add('visible');
+                          .classList.add('block');
                         vnode.state.buttonHoverActiveById = creator.button.id;
                         vnode.state.chainCardImageActiveById = creator.card.id;
                         vnode.state.textActiveById = creator.texts.id;
@@ -151,7 +151,7 @@ const TokensCreatorComponent: m.Component<IAttrs, IState> = {
                           class: `${
                             vnode.state.buttonHoverActiveById === creator.button.id
                               ? 'bg-gray-500'
-                              : 'invisible'
+                              : 'hidden'
                           } text-white`,
                           id: creator.texts.id,
                         },
@@ -165,8 +165,8 @@ const TokensCreatorComponent: m.Component<IAttrs, IState> = {
                   {
                     class: `${
                       vnode.state.chainCardImageActiveById === creator.card.id
-                        ? 'visible'
-                        : 'invisible'
+                        ? 'block'
+                        : 'hidden'
                     } flex justify-center lg:w-2/3 lg:absolute lg:w-2/3 lg:right-0 lg:top-0`,
                     id: creator.card.id,
                   },
