@@ -15,6 +15,7 @@ export const Errors = {
   InvalidElement: 'Element must begin with https://',
   InvalidTelegram: 'Telegram must begin with https://t.me/',
   InvalidGithub: 'Github must begin with https://github.com/',
+  InvalidCustomDomain: 'Custom domain may not include "commonwealth"',
 };
 
 const updateCommunity = async (models, req: Request, res: Response, next: NextFunction) => {
@@ -39,7 +40,7 @@ const updateCommunity = async (models, req: Request, res: Response, next: NextFu
     }
   }
 
-  const { iconUrl, name, description, website, discord, element, telegram, github, invites, privacy } = req.body;
+  const { iconUrl, name, description, website, discord, element, telegram, github, customDomain, invites, privacy } = req.body;
 
   if (website && !urlHasValidHTTPPrefix(website)) {
     return next(new Error(Errors.InvalidWebsite));
@@ -51,6 +52,8 @@ const updateCommunity = async (models, req: Request, res: Response, next: NextFu
     return next(new Error(Errors.InvalidTelegram));
   } else if (github && !github.startsWith('https://github.com/')) {
     return next(new Error(Errors.InvalidGithub));
+  } else if (customDomain && customDomain.includes('commonwealth')) {
+    return next(new Error(Errors.InvalidCustomDomain));
   }
 
   if (req.body.name) community.name = req.body.name;
@@ -62,6 +65,7 @@ const updateCommunity = async (models, req: Request, res: Response, next: NextFu
   community.element = element;
   community.telegram = telegram;
   community.github = github;
+  community.customDomain = customDomain;
   community.invitesEnabled = invites || false;
   community.privacyEnabled = privacy || false;
   await community.save();

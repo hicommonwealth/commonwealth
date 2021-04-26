@@ -24,9 +24,9 @@
     "reset-server": "NO_CLIENT=true NO_PRERENDER=true RESET_DB=true ts-node --project tsconfig.node.json server.ts",
     "start-ci": "FETCH_INTERVAL_MS=500 ts-node --project tsconfig.node.json server.ts",
     "psql": "psql -h localhost commonwealth -U commonwealth",
-    "dump-db": "pg_dump $(heroku config:get DATABASE_URL) --verbose --exclude-table-data=\"public.\\\"Sessions\\\"\" --exclude-table-data=\"public.\\\"DiscussionDrafts\\\"\" --exclude-table-data=\"public.\\\"LoginTokens\\\"\" --exclude-table-data=\"public.\\\"Notifications\\\"\" --exclude-table-data=\"public.\\\"SocialAccounts\\\"\" --exclude-table-data=\"public.\\\"Webhooks\\\"\" --no-privileges --no-owner -f latest.dump",
+    "dump-db": "pg_dump $(heroku config:get DATABASE_URL -a commonwealthapp) --verbose --exclude-table-data=\"public.\\\"Sessions\\\"\" --exclude-table-data=\"public.\\\"DiscussionDrafts\\\"\" --exclude-table-data=\"public.\\\"LoginTokens\\\"\" --exclude-table-data=\"public.\\\"Notifications\\\"\" --exclude-table-data=\"public.\\\"SocialAccounts\\\"\" --exclude-table-data=\"public.\\\"Webhooks\\\"\" --no-privileges --no-owner -f latest.dump",
     "reset-db": "sh -c \"npx sequelize db:drop && npx sequelize db:create\"",
-    "load-db": "psql -d commonwealth -U commonwealth -f latest.dump"
+    "load-db": "psql -d commonwealth -U commonwealth -W -f latest.dump"
   },
   "engines": {
     "node": "12.3.1"
@@ -46,9 +46,9 @@
     "@babel/preset-env": "^7.2.3",
     "@babel/register": "^7.4.0",
     "@clover-network/node-tpye": "^1.0.1",
-    "@commonwealth/chain-events": "0.5.1",
+    "@commonwealth/chain-events": "0.5.3",
     "@cosmjs/launchpad": "^0.24.0-alpha.13",
-    "@edgeware/node-types": "3.3.1-newyork.0",
+    "@edgeware/node-types": "3.3.3",
     "@lunie/cosmos-api": "git+https://git@github.com/hicommonwealth/cosmos-api.git#develop",
     "@lunie/cosmos-keys": "^0.3.2",
     "@magic-ext/polkadot": "^0.1.2",

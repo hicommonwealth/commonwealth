@@ -42,13 +42,23 @@ export enum ChainNetwork {
 }
 
 // This function returns a default chain for a chainbase
-export function baseToNetwork(n: ChainBase | string): ChainNetwork {
+export function baseToNetwork(n: ChainBase): ChainNetwork {
   switch (n) {
     case ChainBase.CosmosSDK: return ChainNetwork.Cosmos;
     case ChainBase.Substrate: return ChainNetwork.Edgeware;
     case ChainBase.Ethereum: return ChainNetwork.Ethereum;
     case ChainBase.NEAR: return ChainNetwork.NEAR;
     default: return null;
+  }
+}
+
+export function baseToLabel(n: ChainBase): string {
+  switch (n) {
+    case ChainBase.CosmosSDK: return 'Cosmos Wallet';
+    case ChainBase.Substrate: return 'polkadot-js';
+    case ChainBase.Ethereum: return 'Ethereum Wallet';
+    case ChainBase.NEAR: return 'NEAR Wallet';
+    default: return 'Wallet';
   }
 }
 

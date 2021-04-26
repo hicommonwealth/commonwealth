@@ -62,7 +62,7 @@ const ConfirmInviteModal: m.Component<{}, {
           vnode.state.selectedAddress = account.address;
         },
       }, [
-        m(UserBlock, { user: account })
+        m(UserBlock, { user: account, showChainName: true })
       ]);
     };
 
@@ -78,7 +78,7 @@ const ConfirmInviteModal: m.Component<{}, {
     return m('.ConfirmInviteModal', [
       m('.compact-modal-title', [
         !vnode.state.isComplete
-          ? m('h3', (vnode.state.invites.length > 1) ? 'Manage Invites' : 'Accept or reject invite')
+          ? m('h3', 'Manage Invites')
           : m('h3', 'No more invites'),
         m(CompactModalExitButton),
       ]),
@@ -90,19 +90,18 @@ const ConfirmInviteModal: m.Component<{}, {
         }),
       invites.length > 0 && !vnode.state.isComplete
         ? m('.compact-modal-body', [
-          m('p', 'You\'ve been invited to a community on Commonwealth:'),
-          m('.CommunityBlock', [
-            m('.community-block-top', `${invites[vnode.state.location].community_name}`),
-            m(Icon, { name: Icons.LOCK, size: 'xs' }),
-            m('.community-block-bottom', `commonwealth.im/${invites[vnode.state.location].community_id}`)
+          m('p', [
+            'You\'ve been invited to the ',
+            m('strong', invites[vnode.state.location].community_name),
+            ' community. Select an address to accept the invite:'
           ]),
           vnode.state.accepted.includes(vnode.state.location) ? m('h4', 'You\'ve accepted this invite!')
             : vnode.state.rejected.includes(vnode.state.location) ? m('h4', 'You\'ve already deleted this invite!') : [
-              addresses.length > 0
-                && m('p', 'Accept the invite with any of your addresses:'),
-              addresses,
-              addresses.length > 0
-                && m(Button, {
+              m('.invite-addresses', [
+                addresses,
+              ]),
+              addresses.length > 0 && m('.invite-actions', [
+                m(Button, {
                   class: 'submit',
                   intent: 'primary',
                   rounded: true,
@@ -130,15 +129,17 @@ const ConfirmInviteModal: m.Component<{}, {
                   },
                   label: 'Accept invite',
                 }),
-              addresses.length > 0
-                && m(Button, {
+                m('.invite-actions-or', 'or'),
+                m(Button, {
                   class: 'reject',
                   intent: 'negative',
                   rounded: true,
                   disabled: vnode.state.accepted.includes(vnode.state.location),
                   onclick: async (e) => {
                     e.preventDefault();
-                    const confirmed = await confirmationModalWithText('Really delete this invite?')();
+                    const confirmed = await confirmationModalWithText(
+                      'Reject this invite? You will need to be invited again.'
+                    )();
                     if (!confirmed) return;
                     $.post(`${app.serverUrl()}/acceptInvite`, {
                       inviteCode: invites[vnode.state.location].id,
@@ -152,21 +153,36 @@ const ConfirmInviteModal: m.Component<{}, {
                       vnode.state.selectedAddress = null;
                       m.redraw();
                     }, (err) => {
-                      notifyError('Error deleting invite.');
+                      notifyError('Error rejecting invite.');
                     });
                   },
-                  label: 'Delete invite'
+                  label: 'Reject invite'
                 }),
-              addresses.length === 0
-                && m('.no-accounts', 'You must connect an address to join this community.'),
-              addresses.length === 0
-              && m('a.btn.add-account', {
+              ]),
+              addresses.length === 0 && m('a.btn.add-account', {
                 href: '#',
                 onclick: (e) => {
                   e.preventDefault();
+
+                  // set defaults for the web3 login modal
+                  // TODO: let the user select between different crypto wallets for linking an address
+                  const defaultChainId = 'edgeware';
+                  const joiningCommunity = invites[vnode.state.location].community_id;
+                  const targetCommunity = joiningCommunity;
+                  const prev = m.route.get();
+                  const next = `/${joiningCommunity}`;
+                  // TODO: implement joiningChain once confirm_invite_modal supports chains
+                  const web3loginParams = joiningCommunity ? { prev, next, joiningCommunity } : { prev, next };
+
+                  // redirect to /web3login to connect to the chain
+                  m.route.set(`/${app.chain?.id || defaultChainId}/web3login`, web3loginParams);
+
+                  // show web3 login modal
                   app.modals.lazyCreate('link_new_address_modal', {
+                    joiningCommunity,
+                    targetCommunity,
                     successCallback: () => {
-                      // TODO XX: set membership
+                      m.route.set(next);
                       $(e.target).trigger('modalexit');
                     }
                   });

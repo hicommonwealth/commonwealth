@@ -15,24 +15,6 @@ export const Errors = {
 };
 
 const linkExistingAddressToChain = async (models, req: Request, res: Response, next: NextFunction) => {
-  /*
-    - general idea:
-      this is called when it joins to new chain but already has the address under the same chainbase.
-      should be already logged in (req.user is required)
-    - example:
-      for example, if user logged in to `kusama` and wants to join to `edgeware`, we shouldn't let the user to verify
-      his address again. To do so, we should create a new address (chain `edgeware`) marked as verified.
-    - edge cases:
-      1) in case, the original chain address's token is expired
-        At first time, I tried to let users to reverify his address but for simplicity, just update expiration time for
-        all same chainbase addresses.
-      2) in case, the target chain address is existed
-        (1) the existing address is owned by this user
-          not sure when this happens but in this case, we need to update the verification token with the original one's.
-        (2) the existing address is owned by other user
-          I think this could happen because the old login flow made the same chainbase addresses are owned by several
-          people. (with different chain). In this case, should update the user_id and the verification token.
-  */
   if (!req.body.address) {
     return next(new Error(Errors.NeedAddress));
   }
@@ -67,9 +49,9 @@ const linkExistingAddressToChain = async (models, req: Request, res: Response, n
   // check if the original address's token is expired. refer edge case 1)
   let verificationToken = originalAddress.verification_token;
   let verificationTokenExpires = originalAddress.verification_token_expires;
-  const isOriginalExpired = verificationTokenExpires && +verificationTokenExpires <= +(new Date());
+  const isOriginalTokenValid = verificationTokenExpires && +verificationTokenExpires <= +(new Date());
 
-  if (!isOriginalExpired) {
+  if (!isOriginalTokenValid) {
     const chains = await models.Chain.findAll({
       where: { base: chain.base }
     });

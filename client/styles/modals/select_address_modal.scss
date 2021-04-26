@@ -9,16 +9,22 @@
         }
     }
 
+    .select-address-placeholder {
+        padding: 30px 30px 24px;
+        border: 1px solid $border-color-light;
+        border-radius: 15px;
+        margin-bottom: 12px;
+        p:first-child {
+            margin-top: 0;
+        }
+        p:last-child {
+            margin-bottom: 0;
+        }
+    }
+
     .select-address-options {
         border-bottom: 1px solid $border-color-lightest;
         margin-bottom: 10px;
-    }
-    .select-address-placeholder {
-        padding: 25px 0 20px;
-        text-align: center;
-        border: 1px solid $border-color-lightest;
-        border-bottom: none;
-        color: $text-color-light;
     }
     .select-address-option {
         position: relative;

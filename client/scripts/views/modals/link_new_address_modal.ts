@@ -73,8 +73,7 @@ const EthereumLinkAccountItem: m.Component<{
               vnode.state.linking = false;
               return;
             } else {
-              const modalMsg = 'This address is currently linked to another account. '
-                + 'Remove it from that account and transfer to yours?';
+              const modalMsg = 'Another user owns this address. Remove it from that user and transfer it to yours?';
               const confirmed = await confirmationModalWithText(modalMsg)();
               if (!confirmed) {
                 vnode.state.linking = false;
@@ -217,8 +216,10 @@ const SubstrateLinkAccountItem: m.Component<{
       address: account.address,
       currentPrefix: (app.chain as Substrate).chain.ss58Format,
     });
+    const isPrepopulated = address === linkNewAddressModalVnode.attrs.prepopulateAddress
+    || account.address === linkNewAddressModalVnode.attrs.prepopulateAddress;
 
-    return m('.SubstrateLinkAccountItem.account-item', {
+    return m(`.SubstrateLinkAccountItem.account-item${isPrepopulated ? '.account-item-emphasized' : ''}`, {
       onclick: async (e) => {
         e.preventDefault();
 
@@ -303,18 +304,20 @@ const SubstrateLinkAccountItem: m.Component<{
 };
 
 const LinkNewAddressModal: m.Component<{
-  loggingInWithAddress?: boolean; // determines whether the header says "Connect a new address" or "Login with address"
+  loggingInWithAddress?: boolean; // determines whether the header says "Connect address" or "Login with address"
   joiningCommunity: string,       // join community after verification
   joiningChain: string,           // join chain after verification
   targetCommunity?: string,       // this is valid when loggingInWithAddress=true and user joins to community through default chain.
   useCommandLineWallet: boolean,  //
   alreadyInitializedAccount?: Account<any>; // skip verification, go straight to profile creation (only used for NEAR)
+  prepopulateAddress?: string, // link a specific address rather than prompting
   successCallback;
 }, {
   // meta
   step;
   error;
   selectedWallet: LinkNewAddressWallets;
+  isFirstInit: boolean,
   // step 1 - validate address
   userProvidedSignature: string;
   secretPhraseSaved: boolean;
@@ -337,13 +340,14 @@ const LinkNewAddressModal: m.Component<{
       $('.LinkNewAddressModal').trigger('modalforceexit');
     };
     $(window).on('popstate', vnode.state.onpopstate);
+    vnode.state.isFirstInit = true;
   },
   onremove: (vnode) => {
     $(window).off('popstate', vnode.state.onpopstate);
   },
   view: (vnode) => {
     const linkAddressHeader = m('.compact-modal-title', [
-      vnode.attrs.loggingInWithAddress ? m('h3', 'Log in with address') : m('h3', 'Connect a new address'),
+      vnode.attrs.loggingInWithAddress ? m('h3', 'Log in with address') : m('h3', 'Connect address'),
     ]);
 
     const { targetCommunity } = vnode.attrs;
@@ -372,6 +376,7 @@ const LinkNewAddressModal: m.Component<{
             key: 'placeholder',
             intent: 'primary',
             label: [ m(Spinner, { size: 'xs', active: true }), ' Connecting to chain...' ],
+            rounded: true,
             disabled: true,
           }),
         ])
@@ -476,6 +481,49 @@ const LinkNewAddressModal: m.Component<{
         m.redraw();
       }
     };
+
+    const cliAddressInputFn = async (address) => {
+      vnode.state.error = null;
+      vnode.state.enteredAddress = address;
+
+      // Prevent validation on empty field
+      if (address === '') {
+        return;
+      }
+
+      if ((app.chain.base === ChainBase.Substrate)) {
+        if (isU8a(address) || isHex(address)) {
+          vnode.state.error = 'Address must be SS58 (e.g. 5Ew4...)';
+        }
+        try {
+          (await import('@polkadot/keyring')).decodeAddress(address);
+        } catch (err) {
+          vnode.state.error = 'Invalid address';
+        }
+      }
+      if (app.user.activeAccounts.find((acct) => acct.address === address)) {
+        vnode.state.error = 'You have already linked this address';
+      }
+
+      if (!vnode.state.error) {
+        try {
+          vnode.state.newAddress = await createUserWithAddress(AddressSwapper({
+            address,
+            currentPrefix: (app.chain as Substrate).chain.ss58Format,
+          }), vnode.state.isEd25519 ? 'ed25519' : undefined, targetCommunity);
+        } catch (err) {
+          vnode.state.error = err.responseJSON ? err.responseJSON.error : 'Failed to create user.';
+        }
+      }
+
+      m.redraw();
+    };
+
+    // immediately trigger address population if given
+    if (vnode.attrs.prepopulateAddress && vnode.state.isFirstInit) {
+      vnode.state.isFirstInit = false;
+      cliAddressInputFn(vnode.attrs.prepopulateAddress);
+    }
 
     return m('.LinkNewAddressModal', [
       vnode.state.step === LinkNewAddressSteps.Step1VerifyWithWebWallet ? m('.link-address-step', [

@@ -132,6 +132,7 @@ const CreateCommunityModal: m.Component<IAttrs, IState> = {
                 null, // github
                 result.result.default_chain,
                 false, // visible
+                null, // customDomain
                 result.result.invitesEnabled,
                 result.result.privacyEnabled,
                 true, // collapsedOnHomepage

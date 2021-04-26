@@ -7,7 +7,7 @@ import { Button, PopoverMenu, MenuItem, MenuDivider, Icon, Icons } from 'constru
 import app from 'state';
 import { ChainBase } from 'models';
 import { ChainBaseIcon } from 'views/components/chain_icon';
-import { baseToNetwork } from 'models/types';
+import { baseToLabel, baseToNetwork } from 'models/types';
 
 const CHAINBASE_WITH_CLI = [
   ChainBase.CosmosSDK, ChainBase.Substrate
@@ -19,9 +19,10 @@ const LoginWithWalletDropdown: m.Component<{
   joiningChain,
   joiningCommunity,
   onSuccess?,
+  prepopulateAddress?,
 }> = {
   view: (vnode) => {
-    const { label, loggingInWithAddress, joiningChain, joiningCommunity, onSuccess } = vnode.attrs;
+    const { label, loggingInWithAddress, joiningChain, joiningCommunity, onSuccess, prepopulateAddress } = vnode.attrs;
 
     // prev and next must work whether the modal is on the web3login page, or not...which is why this is so confusing
     const prev = m.route.param('prev') ? m.route.param('prev') : m.route.get();
@@ -37,10 +38,6 @@ const LoginWithWalletDropdown: m.Component<{
                 : '/?';
     // only redirect to home as an absolute last resort
 
-    // I introduce one more parameter in web3loginParams because of the following case
-    // When user log into a community, we let the user to select one of the chainbase wallet to sign (new flow)
-    // But with the old flow, it only creates a role between the default chain vs address.
-    // We should create a role between the community vs address. To indicate which community it is, `targetCommunity`
     const targetCommunity = app.community?.id;
 
     const web3loginParams = loggingInWithAddress ? { prev, loggingInWithAddress, targetCommunity } : joiningChain
@@ -54,7 +51,7 @@ const LoginWithWalletDropdown: m.Component<{
       label: m('.chain-login-label', [
         m(ChainBaseIcon, { chainbase: base, size: 20 }),
         m('.chain-login-label-name', [
-          cli ? `${base} (command line)` : base
+          cli ? `${baseToLabel(base)} (command line)` : baseToLabel(base)
         ]),
       ]),
       onclick: (e) => {
@@ -67,6 +64,7 @@ const LoginWithWalletDropdown: m.Component<{
           joiningCommunity,
           targetCommunity,
           useCommandLineWallet: !!cli,
+          prepopulateAddress,
           successCallback: () => {
             if (next === '/?') {
               m.route.set(`/${app.chain?.id || defaultChainId}`);

@@ -595,7 +595,19 @@ const ViewProposalPage: m.Component<{
             return m(PageNotFound, { message: 'Invalid proposal type' });
           }
           if (!c.ready) {
-            app.chain.loadModules([ c ]);
+            // load sibling modules too
+            if (app.chain.base === ChainBase.Substrate) {
+              const chain = (app.chain as Substrate);
+              app.chain.loadModules([
+                chain.council,
+                chain.technicalCommittee,
+                chain.treasury,
+                chain.democracyProposals,
+                chain.democracy
+              ]);
+            } else {
+              app.chain.loadModules([ c ]);
+            }
             return m(PageLoading, { narrow: true, showNewProposalButton: true, title: headerTitle });
           }
         }

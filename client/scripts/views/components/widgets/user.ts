@@ -191,13 +191,14 @@ export const UserBlock: m.Component<{
   popover?: boolean,
   showRole?: boolean,
   showAddressWithDisplayName?: boolean,
+  showChainName?: boolean,
   hideOnchainRole?: boolean,
   selected?: boolean,
   compact?: boolean,
 }> = {
   view: (vnode) => {
     const {
-      user, hideIdentityIcon, popover, showRole, hideOnchainRole, showAddressWithDisplayName, selected, compact
+      user, hideIdentityIcon, popover, showRole, hideOnchainRole, showAddressWithDisplayName, showChainName, selected, compact
     } = vnode.attrs;
 
     let profile;
@@ -218,8 +219,6 @@ export const UserBlock: m.Component<{
           avatarSize: 28,
           popover,
         }),
-        // TODO: this is weird...symbol display should not depend on user being an Account
-        user.chain instanceof ChainInfo && m('.user-block-symbol', CHAINBASE_SHORT_FOR_AVATAR[user.chain.base]),
       ]),
       m('.user-block-center', [
         m('.user-block-name', [
@@ -236,6 +235,8 @@ export const UserBlock: m.Component<{
           class: profile?.address ? '' : 'no-address',
         }, [
           profile?.address && formatAddressShort(profile.address, profile.chain),
+          profile?.address && showChainName && ' · ',
+          showChainName && (typeof user.chain === 'string' ? user.chain : user.chain.name),
         ]),
       ]),
       m('.user-block-right', [
