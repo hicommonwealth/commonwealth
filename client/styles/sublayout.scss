@@ -1,5 +1,38 @@
 @import 'client/styles/shared';
 
+@mixin narrowBrowserHeader {
+    .sublayout-header-right {
+        .User {
+            .user-display-name {
+                display: none;
+            }
+            .user-avatar {
+                margin: 0px;
+                margin-right: 0px;
+                position: relative;
+                top: 2px;
+            }
+        }
+        .NewProposalButton {
+            .cui-button {
+                padding: 0 10px;
+                .cui-button-label {
+                    top: 2px;
+                }
+            }
+        }
+    }
+    .role-icon {
+        display: none;
+    }
+    .LoginSelectorMenu .user-display-name {
+        display: inline;
+    }
+    .cui-button-label .cui-icon-user {
+        margin-right: 0;
+    }
+}
+
 .Sublayout {
     display: block;
 
@@ -71,6 +104,15 @@
         @include md-max {
             padding-right: 0;
         }
+        @include md-max {
+            @include narrowBrowserHeader();
+            .sublayout-header-heading {
+                display: none !important;
+            }
+        }
+        @include lg-max {
+            @include narrowBrowserHeader();
+        }
         .hide-sidebar & {
             padding-right: 0;
         }
@@ -97,7 +139,6 @@
                 display: inline-block;
                 margin-right: 14px;
                 position: relative;
-                top: 4px;
                 .no-image {
                     position: relative;
                     top: -9px;
