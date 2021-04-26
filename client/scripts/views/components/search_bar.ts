@@ -48,10 +48,8 @@ const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the datab
 
 // TODO: Linkification of tokens, comms results
 export const getMemberPreview = (addr, searchTerm, showChainName?) => {
-  console.log('getMemberPreview');
   const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
   if (addr.name) profile.initialize(addr.name, null, null, null, null);
-  console.log({ profile });
   const userLink = `/${m.route.param('scope') || addr.chain}/account/${addr.address}?base=${addr.chain}`;
   // TODO: Display longer or even full addresses
   return m(ListItem, {
@@ -72,7 +70,6 @@ export const getMemberPreview = (addr, searchTerm, showChainName?) => {
 };
 
 export const getCommunityPreview = (community) => {
-  console.log('getCommunityPreview');
   if (community.contentType === ContentType.Token) {
     return m(ListItem, {
       label: m('a.search-results-item', [
@@ -105,8 +102,6 @@ export const getCommunityPreview = (community) => {
 };
 
 export const getDiscussionPreview = (thread, searchTerm) => {
-  console.log('getDiscussionPreview');
-  // TODO: Separate threads, proposals, and comments
   const activeId = app.activeId();
   const proposalId = thread.proposalid;
   return m(ListItem, {
@@ -187,7 +182,6 @@ const sortResults = (a, b) => {
 };
 
 const getBalancedContentListing = (unfilteredResults: any[], types: SearchType[]) => {
-  console.log('getbalancedContentListing');
   const results = {};
   let unfilteredResultsLength = 0;
   for (const key of types) {
@@ -235,7 +229,6 @@ const getResultsPreview = (searchTerm: string, communityScoped?) => {
       }
     });
     organizedResults.push(headerEle);
-    console.log({ communityScoped });
     (res as any[]).forEach((item) => {
       const resultRow = item.searchType === SearchType.Discussion
         ? getDiscussionPreview(item, searchTerm)
@@ -263,7 +256,6 @@ const concludeSearch = (searchTerm: string, params: SearchParams, state, err?) =
       ? getResultsPreview(searchTerm, commOrChainScoped)
       : app.searchCache[searchTerm];
   }
-  console.log('redrawing');
   m.redraw();
 };
 
@@ -300,7 +292,6 @@ export const search = async (searchTerm: string, params: SearchParams, state) =>
 
     const unfilteredTokens = app.searchCache[ALL_RESULTS_KEY]['tokens'];
     const tokens = unfilteredTokens.filter((token) => token.name?.toLowerCase().includes(searchTerm));
-    console.log({ tokens });
     app.searchCache[searchTerm][SearchType.Community] = tokens.map((token) => {
       token.contentType = ContentType.Token;
       token.searchType = SearchType.Community;
@@ -382,7 +373,7 @@ const SearchBar : m.Component<{}, {
       ? (app.searchCache[searchTerm].loaded)
         ? m(List, [ m(emptySearchPreview, { searchTerm }) ])
         : m(List, m(ListItem, { label: m(Spinner, { active: true }) }))
-      : m(List, results);
+      : m(List, { class: 'search-results-list' }, results);
 
     return m(ControlGroup, {
       class: 'SearchBar'

@@ -37,8 +37,6 @@ export const searchMentionableAddresses = async (
   if (response.status !== 'Success') {
     throw new Error(`Got unsuccessful status: ${response.status}`);
   }
-  console.log({ isRoles: !!(communityScope || chainScope) });
-  console.log(response.result);
   return response.result;
 };
 
