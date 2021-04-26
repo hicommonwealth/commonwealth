@@ -1,14 +1,15 @@
 import m from 'mithril';
-import app from 'state';
 import FindYourTokenInputComponent from './find_your_token_input';
 import InputTokensListComponent from './input_tokens_lists';
 
 import './tokens_community.scss';
 
 interface Chain {
-  tokenImg: string;
-  tokenName: string;
+  img: string;
+  id: string;
+  name: string;
   placeholder?: boolean;
+  chainInfo: string;
 }
 
 interface IState {
@@ -17,50 +18,24 @@ interface IState {
   inputTokenValue: string;
 }
 
-const TokensCommunityComponent: m.Component<{}, IState> = {
+interface IAttrs {
+  chains: Chain[]
+}
+
+const TokensCommunityComponent: m.Component<IAttrs, IState> = {
   oninit: (vnode) => {
     vnode.state.hiddenInputTokenList = true;
     vnode.state.inputTokenValue = '';
     vnode.state.chains = [
       {
-        tokenImg: 'static/img/add.svg',
-        tokenName: 'Add your token!.',
+        img: 'static/img/add.svg',
+        id: 'placeholder',
+        chainInfo: '',
+        name: 'Add your token!.',
         placeholder: true
       },
+      ...vnode.attrs.chains
     ];
-
-    const chains = {};
-    app.config.nodes.getAll().forEach((n) => {
-      if (chains[n.chain.id]) {
-        chains[n.chain.id].push(n);
-      } else {
-        chains[n.chain.id] = [n];
-      }
-    });
-
-    const myChains: any = Object.entries(chains);
-    const myCommunities: any = app.config.communities.getAll();
-    const sortChainsAndCommunities = (list) => list
-      .sort((a, b) => {
-        const threadCountA = app.recentActivity.getCommunityThreadCount(
-          Array.isArray(a) ? a[0] : a.id
-        );
-        const threadCountB = app.recentActivity.getCommunityThreadCount(
-          Array.isArray(b) ? b[0] : b.id
-        );
-        return threadCountB - threadCountA;
-      })
-    // eslint-disable-next-line array-callback-return
-      .map((entity) => {
-        if (Array.isArray(entity)) {
-          const [chain, nodeList]: [string, any] = entity as any;
-          const chainInfo = nodeList[0].chain;
-          return { tokenImg: chainInfo.iconUrl, tokenName: chain };
-        }
-      });
-
-    const sortedChainsAndCommunities = sortChainsAndCommunities(myChains);
-    vnode.state.chains = sortedChainsAndCommunities;
   },
   view: (vnode) => {
     return m(
@@ -109,36 +84,36 @@ const TokensCommunityComponent: m.Component<{}, IState> = {
                       optionList: vnode.state.chains,
                       hidden: vnode.state.hiddenInputTokenList,
                       inputValue: vnode.state.inputTokenValue,
-                      maxOptions: 5
+                      maxOptions: 20
                     }),
-                    m(
-                      'button',
-                      {
-                        class:
-                          'btn-primary text-xl font-medium rounded-lg pb-3 w-36',
-                      },
-                      [
-                        " Let's Go ",
-                        m('img', {
-                          class: 'inline ml-1.5',
-                          src: 'static/img/arrow-right.svg',
-                          alt: "Let's Go",
-                        }),
-                      ]
-                    ),
+                    // m(
+                    //   'button',
+                    //   {
+                    //     class:
+                    //       'btn-primary text-xl font-medium rounded-lg pb-3 w-36',
+                    //   },
+                    //   [
+                    //     " Let's Go ",
+                    //     m('img', {
+                    //       class: 'inline ml-1.5',
+                    //       src: 'static/img/arrow-right.svg',
+                    //       alt: "Let's Go",
+                    //     }),
+                    //   ]
+                    // ),
                   ]
                 ),
-                m(
-                  'div.TokensCommunityConnectWalletButton',
-                  m('p', [
-                    m('span', { class: 'mr-5 text-lg' }, 'or'),
-                    m(
-                      'a',
-                      { class: 'btn-outline pb-3 rounded-lg', href: '' },
-                      'Connect Wallet'
-                    ),
-                  ])
-                ),
+                // m(
+                //   'div.TokensCommunityConnectWalletButton',
+                //   m('p', [
+                //     m('span', { class: 'mr-5 text-lg' }, 'or'),
+                //     m(
+                //       'a',
+                //       { class: 'btn-outline pb-3 rounded-lg', href: '' },
+                //       'Connect Wallet'
+                //     ),
+                //   ])
+                // ),
               ]
             )
           ),

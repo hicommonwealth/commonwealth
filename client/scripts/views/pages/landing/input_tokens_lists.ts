@@ -2,9 +2,11 @@ import m from 'mithril';
 import InputTokenOptionComponent from './input_token_option';
 
 interface Chain {
-  tokenImg: string;
-  tokenName: string;
-  placeholder?: boolean;
+    img: string;
+    id: string;
+    name: string;
+    placeholder?: boolean;
+    chainInfo: string;
 }
 
 interface IAttrs {
@@ -16,19 +18,21 @@ interface IAttrs {
 
 const InputTokenList: m.Component<IAttrs, {}> = {
   view: (vnode) => {
+    // eslint-disable-next-line array-callback-return
     const options = vnode.attrs.optionList.map((option, index) => {
       if (index >= vnode.attrs.maxOptions) return;
 
-      const tokenNameSubstracted = option.tokenName.substr(0, vnode.attrs.inputValue.length);
+      const tokenNameSubstracted = option.id.substr(0, vnode.attrs.inputValue.length);
       const tokenNameInputValue = vnode.attrs.inputValue;
 
       if (tokenNameSubstracted === tokenNameInputValue || option.placeholder) {
         return m(InputTokenOptionComponent, {
-          iconImg: option.tokenImg,
-          text: option.tokenName,
+          id: option.id,
+          iconImg: option.img,
+          text: option.name,
         });
       }
-    });
+    }).filter((option: any) => option);
 
     return m(
       'ul',

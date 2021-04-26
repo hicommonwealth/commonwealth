@@ -3,15 +3,16 @@ import m from 'mithril';
 interface IState {
   chains: {
     img: string;
-    content: string;
-    title: string;
+    id: string;
+    placeholder?: boolean;
+    chainInfo: string;
+    name: string;
   }[];
   oncreateSlider: Function;
 }
 
 const TokensChainsComponent: m.Component<IState, IState> = {
   oninit: (vnode) => {
-    vnode.state.chains = vnode.attrs.chains;
     vnode.state.oncreateSlider = vnode.attrs.oncreateSlider;
   },
   oncreate: (vnode) => {
@@ -54,11 +55,18 @@ const TokensChainsComponent: m.Component<IState, IState> = {
               'div',
               { class: 'glide__track', 'data-glide-el': 'track' },
               m('ul', { class: 'glide__slides' }, [
-                vnode.state.chains.map(
-                  (chain: { img: string; title: string; content: string }) => {
+                vnode.attrs.chains.map(
+                  (chain: any) => {
                     return m(
                       'li',
-                      { class: 'glide__slide  h-56' },
+                      {
+                        class: 'glide__slide  h-56',
+                        onclick: (e) => {
+                          e.preventDefault();
+                          localStorage['home-scrollY'] = window.scrollY;
+                          m.route.set(`/${chain.id}`);
+                        },
+                      },
                       m(
                         'div',
                         {
@@ -74,9 +82,9 @@ const TokensChainsComponent: m.Component<IState, IState> = {
                           m(
                             'h3',
                             { class: 'text-2xl font-extrabold mb-1' },
-                            chain.title
+                            chain.name
                           ),
-                          m('p', { class: 'text-xl' }, chain.content),
+                          m('p', { class: 'text-xl' }, chain.chainInfo.description),
                         ]
                       )
                     );

@@ -2,6 +2,8 @@ import m from 'mithril';
 import './landing_page.scss';
 import Glide from '@glidejs/glide';
 
+import app from 'state';
+
 import HeaderLandingPage from './header';
 import FooterLandingPage from './footer';
 import TokensCommunityComponent from './tokensCommunity';
@@ -11,7 +13,79 @@ import JoinCommonWealthSection from './joinCommonWealth';
 import TokenHoldersComponent from './tokensHolder';
 import ChainsCrowdfundingComponent from './chainsCrowdfunding';
 
-const LandingPage: m.Component<{}, {}> = {
+interface Chain {
+  img: string;
+  id: string;
+  name: string;
+  placeholder?: boolean;
+  chainInfo: string;
+}
+
+interface IState {
+  chains: Chain[];
+  hiddenInputTokenList: boolean;
+  inputTokenValue: string;
+}
+
+const LandingPage: m.Component<{}, IState> = {
+  oninit: (vnode) => {
+    vnode.state.hiddenInputTokenList = true;
+    vnode.state.inputTokenValue = '';
+    vnode.state.chains = [];
+
+    const chains = {};
+    app.config.nodes.getAll().forEach((n) => {
+      if (chains[n.chain.id]) {
+        chains[n.chain.id].push(n);
+      } else {
+        chains[n.chain.id] = [n];
+      }
+    });
+
+    const myChains: any = Object.entries(chains);
+    const myCommunities: any = app.config.communities.getAll();
+    const sortChainsAndCommunities = (list) => list
+      .sort((a, b) => {
+        const threadCountA = app.recentActivity.getCommunityThreadCount(
+          Array.isArray(a) ? a[0] : a.id
+        );
+        const threadCountB = app.recentActivity.getCommunityThreadCount(
+          Array.isArray(b) ? b[0] : b.id
+        );
+        return threadCountB - threadCountA;
+      })
+    // eslint-disable-next-line array-callback-return
+      .map((entity) => {
+        if (Array.isArray(entity)) {
+          const [chain, nodeList]: [string, any] = entity as any;
+          const chainInfo = nodeList[0].chain;
+          return { img: chainInfo.iconUrl, id: chain, chainInfo, name: chainInfo.name };
+        } else if (entity.id && entity.defaultChain && entity.iconUrl) {
+          return {
+            img: entity.iconUrl,
+            id: entity.id,
+            chainInfo: entity.defaultChain,
+            name: entity.defaultChain.name,
+          };
+        }
+      }).filter((chain: any) => chain);
+
+    const sortedChainsAndCommunities = sortChainsAndCommunities(
+      myChains
+        .filter((c) => c[1][0] && !c[1][0].chain.collapsedOnHomepage)
+        .concat(myCommunities.filter((c) => !c.collapsedOnHomepage))
+    );
+    const betaChainsAndCommunities = sortChainsAndCommunities(
+      myChains
+        .filter((c) => c[1][0] && c[1][0].chain.collapsedOnHomepage)
+        .concat(myCommunities.filter((c) => c.collapsedOnHomepage))
+    );
+
+    vnode.state.chains = [
+      ...sortedChainsAndCommunities,
+      ...betaChainsAndCommunities,
+    ];
+  },
   view: (vnode) => {
     return m('.LandingPage', { class: 'bg-primary' }, [
       m(
@@ -20,13 +94,13 @@ const LandingPage: m.Component<{}, {}> = {
         m(HeaderLandingPage, {
           navs: [
             { text: 'Why Commonwealth?', ref: '' },
-            { text: 'Use Cases', ref: '' },
-            { text: 'Crowdfunding', ref: '' },
-            { text: 'Developers', ref: '' },
+            // { text: 'Use Cases', ref: '' },
+            // { text: 'Crowdfunding', ref: '' },
+            // { text: 'Developers', ref: '' },
           ],
         })
       ),
-      m(TokensCommunityComponent),
+      m(TokensCommunityComponent, { chains: vnode.state.chains }),
       m(TokensChainsComponent, {
         oncreateSlider: () => {
           const glide = new (Glide as any)('.glide', {
@@ -61,23 +135,7 @@ const LandingPage: m.Component<{}, {}> = {
           });
           glide.mount();
         },
-        chains: [
-          {
-            img: 'static/img/near-protocol.png',
-            title: 'NEAR Protocol',
-            content: ' High-performance platform for dapps with foccus on UX ',
-          },
-          {
-            img: 'static/img/edgeware.svg',
-            title: 'Edgeware',
-            content: ' Next generation smart contracts ',
-          },
-          {
-            img: 'static/img/straightedge.svg',
-            title: 'Straightedge',
-            content: ' A Cosmic smart contracting platform ',
-          },
-        ],
+        chains: vnode.state.chains,
       }),
       m(TokensCreatorComponent, {
         creators: [
@@ -234,13 +292,13 @@ const LandingPage: m.Component<{}, {}> = {
       m(JoinCommonWealthSection),
       m(FooterLandingPage, {
         list: [
-          { text:  'Why Commonwealth?', href: '' },
-          { text:  'Use Cases', href: '' },
-          { text:  'Crowdfunding', href: '' },
-          { text:  'Developers', href: '' },
-          { text:  'About us', href: '' },
-          { text:  'Carrers', href: '' }
-        ]
+          { text: 'Why Commonwealth?', href: '' },
+          // { text:  'Use Cases', href: '' },
+          // { text:  'Crowdfunding', href: '' },
+          // { text:  'Developers', href: '' },
+          // { text:  'About us', href: '' },
+          // { text:  'Carrers', href: '' }
+        ],
       }),
       m('script', {
         src:

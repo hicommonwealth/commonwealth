@@ -3,6 +3,7 @@ import m from 'mithril';
 interface IAttrs {
   iconImg: string;
   text: string;
+  id: string
 }
 
 const InputTokenOptionComponent: m.Component<IAttrs, {}> = {
@@ -12,6 +13,11 @@ const InputTokenOptionComponent: m.Component<IAttrs, {}> = {
       m(
         'button',
         {
+          onclick: (e) => {
+            e.preventDefault();
+            localStorage['home-scrollY'] = window.scrollY;
+            m.route.set(`/${vnode.attrs.id}`);
+          },
           class:
             'p-3 rounded hover:bg-gray-100 flex flex-grow items-center flex-row text-left leading-none w-full justify-between focus:outline-none',
         },
