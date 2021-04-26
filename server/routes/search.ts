@@ -58,7 +58,9 @@ SELECT * FROM (
       "Addresses".id as address_id,
       "Addresses".address,
       "Addresses".chain as address_chain,
-      "OffchainThreads".created_at
+      "OffchainThreads".created_at,
+      "OffchainThreads".chain,
+      "OffchainThreads".community
     FROM "OffchainThreads"
     JOIN "Addresses" ON "OffchainThreads".address_id = "Addresses".id
     WHERE ${communityOptions} "OffchainThreads"._search @@ plainto_tsquery('english', :searchTerm)
@@ -72,7 +74,9 @@ SELECT * FROM (
       "Addresses".id as address_id,
       "Addresses".address,
       "Addresses".chain as address_chain,
-      "OffchainComments".created_at
+      "OffchainComments".created_at,
+      "OffchainThreads".chain,
+      "OffchainThreads".community
     FROM "OffchainComments"
     JOIN "OffchainThreads" ON "OffchainThreads".id =
         CASE WHEN root_id ~ '^discussion_[0-9\\.]+$' THEN CAST(REPLACE(root_id, 'discussion_', '') AS int) ELSE NULL END

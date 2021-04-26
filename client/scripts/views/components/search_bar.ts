@@ -102,13 +102,13 @@ export const getCommunityPreview = (community) => {
 };
 
 export const getDiscussionPreview = (thread, searchTerm) => {
-  const activeId = app.activeId();
+  console.log({ thread });
   const proposalId = thread.proposalid;
   return m(ListItem, {
     onclick: (e) => {
       m.route.set((thread.type === 'thread')
-        ? `/${activeId}/proposal/discussion/${proposalId}`
-        : `/${activeId}/proposal/${proposalId.split('_')[0]}/${proposalId.split('_')[1]}`);
+        ? `/${thread.chain || thread.offchain_community}/proposal/discussion/${proposalId}`
+        : `/${thread.chain || thread.offchain_community}/proposal/${proposalId.split('_')[0]}/${proposalId.split('_')[1]}`);
     },
     label: m('a.search-results-item', [
       thread.type === 'thread' ? [
