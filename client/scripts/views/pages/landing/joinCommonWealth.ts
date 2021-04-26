@@ -24,22 +24,22 @@ const JoinCommonWealthSection: m.Component<{}, {}> = {
           m(
             'div',
             { class: 'flex mt-10 md:justify-end md:mt-0' },
-            m(
-              'button',
-              { class: 'btn-gradient pb-3' },
-              m(
-                'span',
-                { class: 'btn-white flex text-xl py-3 px-8 rounded-lg' },
-                [
-                  ' Join yours ',
-                  m('img', {
-                    class: 'inline ml-1.5',
-                    src: 'static/img/arrow-right-black.svg',
-                    alt: "Let's Go",
-                  }),
-                ]
-              )
-            )
+            // m(
+            //   'button',
+            //   { class: 'btn-gradient pb-3' },
+            //   m(
+            //     'span',
+            //     { class: 'btn-white flex text-xl py-3 px-8 rounded-lg' },
+            //     [
+            //       ' Join yours ',
+            //       m('img', {
+            //         class: 'inline ml-1.5',
+            //         src: 'static/img/arrow-right-black.svg',
+            //         alt: "Let's Go",
+            //       }),
+            //     ]
+            //   )
+            // )
           ),
         ])
       )
