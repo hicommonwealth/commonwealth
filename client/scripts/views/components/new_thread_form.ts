@@ -702,8 +702,6 @@ export const NewThreadForm: m.Component<{
                   );
                 }
                 try {
-                  // TODO here
-                  // ------------
                   await newThread(form, quillEditorState, author);
                   vnode.state.overwriteConfirmationModal = true;
                   vnode.state.saving = false;

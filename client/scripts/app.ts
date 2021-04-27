@@ -24,8 +24,6 @@ import LoginModal from 'views/modals/login_modal';
 import Token from 'controllers/chain/ethereum/token/adapter';
 import { alertModalWithText } from 'views/modals/alert_modal';
 
-import getTokenLists from 'views/pages/home/token_lists';
-
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/home');
 import(/* webpackPrefetch: true */ 'views/pages/discussions');
@@ -188,24 +186,8 @@ export async function createTemporaryTokenChain(n: NodeInfo): Promise<boolean> {
   await deinitChainOrCommunity();
 
   // Begin initializing the community
-  //const newCommunity = new Community(c, app);
-  /*
-  const finalizeInitialization = await newCommunity.init();
-
-  // If the user is still in the initializing community, finalize the
-  // initialization; otherwise, abort and return false
-  if (!finalizeInitialization) {
-    return false;
-  } else {
-    app.community = newCommunity;
-  }*/
-
-  //app.community = newCommunity;
-
   const newToken = new Token(n, app)
   app.chain = newToken;
-
-  console.log(`${(n as any).name.toUpperCase()} started.`);
 
   // Redraw with community fully loaded and return true to indicate
   // initialization has finalized.
@@ -460,13 +442,12 @@ export function initCommunity(communityId: string): Promise<boolean> {
 
 export async function initTemporaryTokenChain(address: string): Promise<boolean> {
   // todo token list in localstorage
-  let tokenLists = await getTokenLists()
+  let tokenLists = await app.tokens.getTokensFromLists()
   let token = tokenLists.find(o=>{ return o.address === address })
 
   if(!token) { return false }
 
-  // Update active addresses w Ethereum address
- // updateActiveAddresses(n.chain)
+  app.threads.initialize([],0,0,true)
 
   return createTemporaryTokenChain(
     new NodeInfo(
@@ -597,8 +578,6 @@ $(() => {
           ? vnode.attrs.scope.toString()
           // false => scope is null
           : null;
-
-
       // Special case to defer chain loading specifically for viewing an offchain thread. We need
       // a special case because OffchainThreads and on-chain proposals are all viewed through the
       // same "/:scope/proposal/:type/:id" route.

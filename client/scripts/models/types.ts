@@ -84,6 +84,7 @@ export function networkToBase(n: ChainNetwork | string): ChainBase {
     case ChainNetwork.Moloch: return ChainBase.Ethereum;
     case ChainNetwork.Metacartel: return ChainBase.Ethereum;
     case ChainNetwork.Commonwealth: return ChainBase.Ethereum;
+    case ChainNetwork.ERC20: return ChainBase.Ethereum;
     case ChainNetwork.ALEX: return ChainBase.Ethereum;
     case ChainNetwork.Marlin: return ChainBase.Ethereum;
     case ChainNetwork.MarlinTestnet: return ChainBase.Ethereum;

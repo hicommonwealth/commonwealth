@@ -26,6 +26,8 @@ import EditProfileModal from 'views/modals/edit_profile_modal';
 import LoginModal from 'views/modals/login_modal';
 import FeedbackModal from 'views/modals/feedback_modal';
 import SelectAddressModal from 'views/modals/select_address_modal';
+import ManageCommunityModal from 'views/modals/manage_community_modal';
+import Token from 'controllers/chain/ethereum/token/adapter';
 import { linkExistingAddressToChainOrCommunity, setActiveAccount } from 'controllers/app/login';
 import { networkToBase } from 'models/types';
 

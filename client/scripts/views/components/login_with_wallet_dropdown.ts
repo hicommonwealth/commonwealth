@@ -9,13 +9,9 @@ import { ChainBase } from 'models';
 import { ChainBaseIcon } from 'views/components/chain_icon';
 import { baseToLabel, baseToNetwork } from 'models/types';
 
+import Token from 'controllers/chain/ethereum/token/adapter';
 
-// TODO: store ChainBase in the database, and check for substrate/cosmos chains instead
-const CHAINS_WITH_CLI = [
-  'edgeware', 'kulupu', 'kusama', 'cosmos', 'edgeware-local', 'edgeware-testnet',
-  'darwinia', 'phala', 'plasm', 'polkadot', 'centrifuge', 'clover',
-];
-  const CHAINBASE_WITH_CLI = [
+const CHAINBASE_WITH_CLI = [
   ChainBase.CosmosSDK, ChainBase.Substrate
 ];
 
