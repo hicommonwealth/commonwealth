@@ -260,6 +260,11 @@ const concludeSearch = (searchTerm: string, params: SearchParams, state, err?) =
   m.redraw();
 };
 
+
+// Search makes the relevant queries, depending on whether the search is global or
+// community-scoped. It then "concludesSearch," and either assigns the results to
+// app.searchCache or sends them to getResultsPreview, which creates the relevant
+// preview rows
 export const search = async (searchTerm: string, params: SearchParams, state) => {
   const { isSearchPreview, communityScope, chainScope } = params;
   const resultSize = isSearchPreview ? SEARCH_PREVIEW_SIZE : SEARCH_PAGE_SIZE;
