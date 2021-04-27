@@ -340,20 +340,20 @@ export const initializeSearch = async () => {
 const emptySearchPreview : m.Component<{ searchTerm: string }, {}> = {
   view: (vnode) => {
     const { searchTerm } = vnode.attrs;
+    const message = app.activeId()
+      ? `No results in ${app.activeId()}. Search Commonwealth?`
+      : 'No results found.';
     return m(ListItem, {
       class: 'no-results',
       label: [
         m('b', searchTerm),
-        m('span', `Search ${app.activeId() || 'Commonwealth'}`)
+        m('span', message)
       ],
       onclick: (e) => {
         if (searchTerm.length < 4) {
           notifyError('Query must be at least 4 characters');
         }
-        // TODO: Consistent, in-advance sanitization of all params
-        let params = `q=${encodeURIComponent(searchTerm.toString().trim())}`;
-        if (app.activeCommunityId()) params += `&comm=${app.activeCommunityId()}`;
-        else if (app.activeChainId()) params += `&chain=${app.activeChainId()}`;
+        const params = `q=${encodeURIComponent(searchTerm.toString().trim())}`;
         m.route.set(`/search?${params}`);
       }
     });
