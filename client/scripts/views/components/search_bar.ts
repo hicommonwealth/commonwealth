@@ -9,7 +9,6 @@ import {
   searchChainsAndCommunities,
   SearchIcon,
 } from 'helpers/search';
-import getTokenLists from 'views/pages/home/token_lists';
 import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
 import { Profile, AddressInfo } from 'models';
@@ -328,7 +327,7 @@ export const initializeSearch = async () => {
   if (!app.searchCache[ALL_RESULTS_KEY]?.loaded) {
     app.searchCache[ALL_RESULTS_KEY] = {};
     try {
-      const [tokens, comms] = await Promise.all([getTokenLists(), searchChainsAndCommunities()]);
+      const [tokens, comms] = await Promise.all([app.tokens.getTokensFromLists(), searchChainsAndCommunities()]);
       app.searchCache[ALL_RESULTS_KEY]['tokens'] = tokens;
       app.searchCache[ALL_RESULTS_KEY]['communities'] = comms;
     } catch (err) {
