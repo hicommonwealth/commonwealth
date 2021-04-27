@@ -6,7 +6,7 @@
     text-decoration: none;
     cursor: pointer;
     &:hover {
-      // text-decoration: underline;
+     background-color: $background-color-black-hover
     }
   }
 }
@@ -17,7 +17,7 @@ li.LandingPageHeaderLoginButton.ml-10.pt-2 {
     text-decoration: none;
     cursor: pointer;
     &:hover {
-      // text-decoration: underline;
+     background-color: $background-color-black-hover
     }
   }
 }

@@ -50,7 +50,7 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
             { class: 'lg:h-720 flex items-center justify-start md:w-2/4' },
             m(
               'div',
-              { class: 'px-4 mt-32 mb-10 md:my-40 lg:px-14 xl:px-0 xl:pr-32' },
+              { class: 'px-8 mt-32 mb-10 md:my-40 lg:px-14 xl:px-0 xl:pr-32' },
               [
                 m('h1', { class: 'text-4xl font-bold mb-5' }, [
                   'A ',

@@ -71,7 +71,7 @@ const TokensCreatorComponent: m.Component<IAttrs, IState> = {
         ' Commonwealth lets you simplify your community and governance. We bring four tools into one. '
       ),
       m(
-        'div.TokensCreatorsButton',
+        'div.TokensCreatorsUseCaseButton',
         { class: 'text-center hidden lg:block xl:block mb-20' },
         m(
           'a',
@@ -92,16 +92,16 @@ const TokensCreatorComponent: m.Component<IAttrs, IState> = {
               { class: 'lg:flex-grow' },
               m('div', { class: 'lg:flex lg:flex-row' }, [
                 m(
-                  'div',
-                  { class: 'lg:w-1/3 lg:mr-5 xl:mr-20' },
+                  'div.TokensCreatorsText',
+                  { class: 'lg:w-1/3 lg:mr-5 xl:mr-20 rounded-2xl' },
                   m(
                     'button',
                     {
-                      class: `${
+                      class: `rounded-2xl p-5 text-left w-full focus:outline-none ${
                         vnode.state.buttonHoverActiveById === creator.button.id
                           ? 'bg-gray-500'
                           : ''
-                      } rounded-2xl p-5 text-left w-full focus:outline-none`,
+                      }`,
                       id: creator.button.id,
                       onclick: () => {
                         removeOrAddClasslistFromChains(
@@ -150,7 +150,7 @@ const TokensCreatorComponent: m.Component<IAttrs, IState> = {
                         {
                           class: `${
                             vnode.state.buttonHoverActiveById === creator.button.id
-                              ? 'bg-gray-500'
+                              ? ''
                               : 'hidden'
                           } text-white`,
                           id: creator.texts.id,
