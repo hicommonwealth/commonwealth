@@ -30,7 +30,8 @@ const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the datab
 export const getMemberResult = (addr, searchTerm) => {
   const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
   if (addr.name) profile.initialize(addr.name, null, null, null, null);
-  const userLink = `/${m.route.param('scope') || addr.chain}/account/${addr.address}?base=${addr.chain}`;
+  const scope = m.route.param('chain');
+  const userLink = `/${scope || addr.chain}/account/${addr.address}?base=${addr.chain}`;
   // TODO: Display longer or even full addresses
   return m(ListItem, {
     contentLeft: m(MemberIcon),
@@ -39,6 +40,8 @@ export const getMemberResult = (addr, searchTerm) => {
         user: profile,
         searchTerm,
         avatarSize: 36,
+        showFullAddress: true,
+        showChainName: !scope,
       }),
     ]),
     onclick: (e) => {
