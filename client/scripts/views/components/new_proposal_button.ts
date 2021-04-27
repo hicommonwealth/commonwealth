@@ -69,8 +69,8 @@ export const MobileNewProposalButton: m.Component<{}, { councilCandidates?: Arra
         hoverCloseDelay: 0,
         hasArrow: false,
         trigger: m(Button, {
-          disabled: !app.user.activeAccount
-            || !app.activeCommunityId() && ((app.chain as Token).isToken && !(app.chain as Token).hasToken),
+          disabled: (!app.user.activeAccount || !app.activeCommunityId())
+           && ((app.chain as Token).isToken && !(app.chain as Token).hasToken),
           label: m(Icon, { name: Icons.PLUS }),
         }),
         inline: true,
