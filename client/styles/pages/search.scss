@@ -169,12 +169,14 @@
             position: relative;
             background: #EFEFEF;
             border: 1px solid white;
+            outline: 0;
             &:focus {
-                border: none !important;
+                border: none;
+                outline: 0;
             }
         }
     }
-    .search-results-list.cui-list {
+    .search-results-list, .cui-list {
         position: absolute;
         z-index: 10;
         top: 40px;
@@ -184,6 +186,10 @@
         width: 94%;
         padding: 20px;
         overflow-y: visible;
+        &.search-results-loading {
+            display: flex;
+            justify-content: center;
+        }
         .cui-list-item {
             border-bottom: none;
             padding: 2px !important;

@@ -47,7 +47,7 @@ const SEARCH_PREVIEW_SIZE = 6;
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
 
 // TODO: Linkification of tokens, comms results
-export const getMemberPreview = (addr, searchTerm, showChainName?) => {
+export const getMemberPreview = (addr, closeResultsFn, searchTerm, showChainName?) => {
   const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
   if (addr.name) profile.initialize(addr.name, null, null, null, null);
   const userLink = `/${m.route.param('scope') || addr.chain}/account/${addr.address}?base=${addr.chain}`;
@@ -65,11 +65,12 @@ export const getMemberPreview = (addr, searchTerm, showChainName?) => {
     ]),
     onclick: (e) => {
       m.route.set(userLink);
+      closeResultsFn();
     }
   });
 };
 
-export const getCommunityPreview = (community) => {
+export const getCommunityPreview = (community, closeResultsFn) => {
   if (community.contentType === ContentType.Token) {
     return m(ListItem, {
       label: m('a.search-results-item', [
@@ -96,19 +97,20 @@ export const getCommunityPreview = (community) => {
       ]),
       onclick: (e) => {
         m.route.set(community.id ? `/${community.id}` : '/');
+        closeResultsFn();
       }
     });
   }
 };
 
-export const getDiscussionPreview = (thread, searchTerm) => {
-  console.log({ thread });
+export const getDiscussionPreview = (thread, closeResultsFn, searchTerm) => {
   const proposalId = thread.proposalid;
   return m(ListItem, {
     onclick: (e) => {
       m.route.set((thread.type === 'thread')
         ? `/${thread.chain || thread.offchain_community}/proposal/discussion/${proposalId}`
         : `/${thread.chain || thread.offchain_community}/proposal/${proposalId.split('_')[0]}/${proposalId.split('_')[1]}`);
+      closeResultsFn();
     },
     label: m('a.search-results-item', [
       thread.type === 'thread' ? [
@@ -206,9 +208,10 @@ const getBalancedContentListing = (unfilteredResults: any[], types: SearchType[]
   return results;
 };
 
-const getResultsPreview = (searchTerm: string, communityScoped?) => {
+const getResultsPreview = (searchTerm: string, state, communityScoped?: boolean) => {
   let results;
   let types;
+
   if (communityScoped) {
     types = [SearchType.Discussion, SearchType.Member];
     results = getBalancedContentListing(app.searchCache[searchTerm], types);
@@ -231,11 +234,11 @@ const getResultsPreview = (searchTerm: string, communityScoped?) => {
     organizedResults.push(headerEle);
     (res as any[]).forEach((item) => {
       const resultRow = item.searchType === SearchType.Discussion
-        ? getDiscussionPreview(item, searchTerm)
+        ? getDiscussionPreview(item, state.closeResults, searchTerm)
         : item.searchType === SearchType.Member
-          ? getMemberPreview(item, searchTerm, !!communityScoped)
+          ? getMemberPreview(item, state.closeResults, searchTerm, !!communityScoped)
           : item.searchType === SearchType.Community
-            ? getCommunityPreview(item)
+            ? getCommunityPreview(item, state.closeResults)
             : null;
       organizedResults.push(resultRow);
     });
@@ -253,7 +256,7 @@ const concludeSearch = (searchTerm: string, params: SearchParams, state, err?) =
     state.errorText = (err.responseJSON?.error || err.responseText || err.toString());
   } else {
     state.results = params.isSearchPreview
-      ? getResultsPreview(searchTerm, commOrChainScoped)
+      ? getResultsPreview(searchTerm, state, !!commOrChainScoped)
       : app.searchCache[searchTerm];
   }
   m.redraw();
@@ -362,18 +365,21 @@ const SearchBar : m.Component<{}, {
   searchTerm: string,
   errorText: string,
   focused: boolean,
+  closeResults: Function,
+  resultsClosed: boolean,
   inputTimeout: any,
 }> = {
   view: (vnode) => {
     if (!vnode.state.searchTerm) vnode.state.searchTerm = '';
-
+    console.log({ state: vnode.state });
     const { results, searchTerm } = vnode.state;
     const showDropdownPreview = !m.route.get().includes('/search?q=');
-    const searchResults = (results?.length === 0)
-      ? (app.searchCache[searchTerm].loaded)
+    const searchResults = (!results || results?.length === 0)
+      ? (app.searchCache[searchTerm]?.loaded)
         ? m(List, [ m(emptySearchPreview, { searchTerm }) ])
-        : m(List, m(ListItem, { label: m(Spinner, { active: true }) }))
+        : m(List, { class: 'search-results-loading' }, m(ListItem, { label: m(Spinner, { active: true }) }))
       : m(List, { class: 'search-results-list' }, results);
+    vnode.state.closeResults = () => { vnode.state.resultsClosed = true; };
 
     return m(ControlGroup, {
       class: 'SearchBar'
@@ -394,6 +400,9 @@ const SearchBar : m.Component<{}, {
         oninput: (e) => {
           e.stopPropagation();
           vnode.state.searchTerm = e.target.value?.toLowerCase();
+          if (vnode.state.resultsClosed) {
+            vnode.state.resultsClosed = false;
+          }
           if (!app.searchCache[vnode.state.searchTerm]) {
             app.searchCache[vnode.state.searchTerm] = { loaded: false };
           }
@@ -428,6 +437,7 @@ const SearchBar : m.Component<{}, {
       }),
       searchTerm.length > 3
       && showDropdownPreview
+      && !vnode.state.resultsClosed
       && searchResults
     ]);
   }

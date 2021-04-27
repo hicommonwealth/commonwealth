@@ -55,8 +55,6 @@ const bulkAddresses = async (models, req, res, next) => {
         where: { offchain_community_id: community.id },
       }];
     }
-    console.log(options);
-    console.log(options['include']);
   }
 
   const addresses = await models.Address.findAll(options);
