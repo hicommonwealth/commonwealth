@@ -46,12 +46,10 @@ export enum ContentType {
 const SEARCH_PREVIEW_SIZE = 6;
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
 
-// TODO: Linkification of tokens, comms results
 export const getMemberPreview = (addr, closeResultsFn, searchTerm, showChainName?) => {
   const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
   if (addr.name) profile.initialize(addr.name, null, null, null, null);
   const userLink = `/${m.route.param('scope') || addr.chain}/account/${addr.address}?base=${addr.chain}`;
-  // TODO: Display longer or even full addresses
   return m(ListItem, {
     label: m('a.search-results-item', [
       m(UserBlock, {

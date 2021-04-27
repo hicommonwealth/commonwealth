@@ -26,13 +26,11 @@ import { ContentType, initializeSearch, search, SearchType } from '../components
 export const ALL_RESULTS_KEY = 'COMMONWEALTH_ALL_RESULTS';
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
 
-// TODO: Linkification of users, tokens, comms results
 export const getMemberResult = (addr, searchTerm) => {
   const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
   if (addr.name) profile.initialize(addr.name, null, null, null, null);
   const scope = m.route.param('chain');
   const userLink = `/${scope || addr.chain}/account/${addr.address}?base=${addr.chain}`;
-  // TODO: Display longer or even full addresses
   return m(ListItem, {
     contentLeft: m(MemberIcon),
     label: m('a.search-results-item', [
@@ -85,7 +83,6 @@ export const getCommunityResult = (community) => {
 };
 
 export const getDiscussionResult = (thread, searchTerm) => {
-  // TODO: Separate threads, proposals, and comments
   const activeId = app.activeId();
   const proposalId = thread.proposalid;
   return m(ListItem, {
