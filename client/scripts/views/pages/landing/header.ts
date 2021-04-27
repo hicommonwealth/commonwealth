@@ -1,18 +1,15 @@
 import m from 'mithril';
 import './landing_page_header.scss';
 
-interface IState {
+interface IAttrs {
   navs: { text: string; ref: string }[];
 }
 
-const HeaderLandingPage: m.Component<IState, IState> = {
-  oninit: (vnode: m.VnodeDOM<IState, IState>) => {
-    vnode.state.navs = vnode.attrs.navs;
-  },
+const HeaderLandingPage: m.Component<IAttrs, {}> = {
   view: (vnode) => {
     return m(
       'div',
-      { class: 'mt-8 container mx+auto' },
+      { class: 'mt-8 container mx-auto' },
       m(
         'header',
         {
@@ -29,10 +26,10 @@ const HeaderLandingPage: m.Component<IState, IState> = {
             'nav',
             { class: 'hidden lg:block' },
             m('ul', { class: 'lg:flex lg:flex-row lg:items-center' }, [
-              vnode.state.navs.map((nav: any) => {
+              vnode.attrs.navs.map((nav: any) => {
                 return m(
                   'li.LandingPageHeaderLinks',
-                  { class: 'ml-10' },
+                  { class: 'ml-10 pt-2' },
                   m(
                     'a',
                     { class: 'text-gray-500 leading-none', href: nav.href },
@@ -41,9 +38,9 @@ const HeaderLandingPage: m.Component<IState, IState> = {
                 );
               }),
               m(
-                'li.LandingPageHeaderLinks',
-                { class: 'ml-10' },
-                m('a', { class: 'btn-primary pb-3', href: '' }, [
+                'li.LandingPageHeaderLoginButton',
+                { class: 'ml-10 pt-2' },
+                m('a', { class: 'btn-primary pb-3 text-white', href: '' }, [
                   m('img', {
                     class: 'inline mr-1.5',
                     src: 'static/img/user.svg',

@@ -1,4 +1,5 @@
 import m from 'mithril';
+import './tokens_chains.scss';
 
 interface IState {
   chains: {
@@ -60,7 +61,7 @@ const TokensChainsComponent: m.Component<IState, IState> = {
                     return m(
                       'li',
                       {
-                        class: 'glide__slide  h-56',
+                        class: 'glide__slide mt-4 pb-8',
                         onclick: (e) => {
                           e.preventDefault();
                           localStorage['home-scrollY'] = window.scrollY;
@@ -71,11 +72,11 @@ const TokensChainsComponent: m.Component<IState, IState> = {
                         'div',
                         {
                           class:
-                            'bg-white rounded shadow-xl p-5 xl:p-10 text-center h-56',
+                            'bg-white shadow-xl p-5 xl:p-10 rounded-xl text-center h-56 grow',
                         },
                         [
                           m('img', {
-                            class: 'mx-auto mb-3 w-12 h-auto h-56',
+                            class: 'mx-auto mb-3 w-12 h-auto',
                             src: chain.img,
                             alt: '',
                           }),

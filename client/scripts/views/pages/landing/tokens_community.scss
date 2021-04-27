@@ -1,12 +1,12 @@
 @import "client/styles/shared";
 
 .TokensCommunityConnectWalletButton {
-  a.btn-outline.rounded-lg.pb-3 {
+  a.btn-outline.rounded-lg.pb-2.pt-3.px-3 {
     color: $text-color-black;
     text-decoration: none;
     cursor: pointer;
     &:hover {
-      text-decoration: underline;
+      // text-decoration: underline;
     }
   }
 }

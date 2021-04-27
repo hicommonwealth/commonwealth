@@ -108,7 +108,7 @@ const LandingPage: m.Component<{}, IState> = {
             focusAt: 'center',
             perView: 3,
             gap: 40,
-            autoplay: 2500,
+            autoplay: 3000,
             hoverpause: true,
             peek: {
               before: 100,

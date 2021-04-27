@@ -86,34 +86,34 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
                       inputValue: vnode.state.inputTokenValue,
                       maxOptions: 20
                     }),
-                    // m(
-                    //   'button',
-                    //   {
-                    //     class:
-                    //       'btn-primary text-xl font-medium rounded-lg pb-3 w-36',
-                    //   },
-                    //   [
-                    //     " Let's Go ",
-                    //     m('img', {
-                    //       class: 'inline ml-1.5',
-                    //       src: 'static/img/arrow-right.svg',
-                    //       alt: "Let's Go",
-                    //     }),
-                    //   ]
-                    // ),
+                    m(
+                      'button',
+                      {
+                        class:
+                          'btn-primary text-xl font-medium rounded-lg pb-2 pt-3 px-3 w-36',
+                      },
+                      [
+                        " Let's Go ",
+                        m('img', {
+                          class: 'inline ml-1.5',
+                          src: 'static/img/arrow-right.svg',
+                          alt: "Let's Go",
+                        }),
+                      ]
+                    ),
                   ]
                 ),
-                // m(
-                //   'div.TokensCommunityConnectWalletButton',
-                //   m('p', [
-                //     m('span', { class: 'mr-5 text-lg' }, 'or'),
-                //     m(
-                //       'a',
-                //       { class: 'btn-outline pb-3 rounded-lg', href: '' },
-                //       'Connect Wallet'
-                //     ),
-                //   ])
-                // ),
+                m(
+                  'div.TokensCommunityConnectWalletButton',
+                  m('p', [
+                    m('span', { class: 'mr-5 text-lg' }, 'or'),
+                    m(
+                      'a',
+                      { class: 'btn-outline rounded-lg pb-2 pt-3 px-3', href: '' },
+                      'Connect Wallet'
+                    ),
+                  ])
+                ),
               ]
             )
           ),

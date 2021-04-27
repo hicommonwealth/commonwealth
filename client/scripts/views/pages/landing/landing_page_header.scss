@@ -6,7 +6,18 @@
     text-decoration: none;
     cursor: pointer;
     &:hover {
-      text-decoration: underline;
+      // text-decoration: underline;
+    }
+  }
+}
+
+li.LandingPageHeaderLoginButton.ml-10.pt-2 {
+  a.btn-primary.pb-3.text-white {
+    color: $text-color-white;
+    text-decoration: none;
+    cursor: pointer;
+    &:hover {
+      // text-decoration: underline;
     }
   }
 }

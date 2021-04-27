@@ -70,15 +70,15 @@ const TokensCreatorComponent: m.Component<IAttrs, IState> = {
         { class: 'text-2xl max-w-screen-sm mx-auto text-center mb-10' },
         ' Commonwealth lets you simplify your community and governance. We bring four tools into one. '
       ),
-      // m(
-      //   'div.TokensCreatorsButton',
-      //   { class: 'text-center hidden lg:block xl:block mb-20' },
-      //   m(
-      //     'a',
-      //     { class: 'btn-outline text-xl px-6 rounded-lg pb-3', href: '' },
-      //     'See use cases'
-      //   )
-      // ),
+      m(
+        'div.TokensCreatorsButton',
+        { class: 'text-center hidden lg:block xl:block mb-20' },
+        m(
+          'a',
+          { class: 'btn-outline text-xl rounded-lg pb-2 pt-3 px-3 ', href: '' },
+          'See use cases'
+        )
+      ),
       m(
         'ul',
         {

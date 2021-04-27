@@ -57,15 +57,15 @@ const ChainsCrowdfundingComponent: m.Component<IAttrs, IState> = {
           { class: 'text-3xl font-bold mb-5 text-center mb-10' },
           ' Leverage on-chain crowdfunding '
         ),
-        // m(
-        //   'div.ChainsCrowdfundingButton',
-        //   { class: 'flex justify-center text-center' },
-        //   m(
-        //     'a',
-        //     { class: 'btn-outline text-xl px-6 rounded-lg pb-3', href: '' },
-        //     'Learn more about crowdfunding'
-        //   )
-        // ),
+        m(
+          'div.ChainsCrowdfundingButton',
+          { class: 'flex justify-center text-center' },
+          m(
+            'a',
+            { class: 'btn-outline text-xl rounded-lg pb-2 pt-3 px-3 ', href: '' },
+            'Learn more about crowdfunding'
+          )
+        ),
         m(
           'ul',
           {

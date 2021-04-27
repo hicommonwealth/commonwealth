@@ -67,7 +67,7 @@ module.exports = {
     },
   },
   variants: {
-    extend: {},
+    extend: { outline: ['hover', 'active'] },
   },
   plugins: [],
 };
