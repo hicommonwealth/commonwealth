@@ -102,13 +102,11 @@
         padding: 24px 0 22px;
         padding-right: 20px;
         @include md-max {
-            padding-right: 0;
-        }
-        @include md-max {
             @include narrowBrowserHeader();
-            .sublayout-header-heading {
-                display: none !important;
-            }
+            padding-right: 0;
+            // .sublayout-header-heading {
+            //     display: none !important;
+            // }
         }
         @include lg-max {
             @include narrowBrowserHeader();
@@ -156,7 +154,7 @@
             h4.sublayout-header-heading {
                 font-size: 1.15rem;
                 font-weight: 600;
-                margin: 7px 17px 0 0;
+                margin: 7px 0 0 0;
                 white-space: nowrap;
                 a {
                     color: $text-color-black;

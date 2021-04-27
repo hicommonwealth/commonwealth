@@ -59,6 +59,9 @@ const getNewProposalMenu = (candidates: Array<[SubstrateAccount, number]>) => {
 
 export const MobileNewProposalButton: m.Component<{}, { councilCandidates?: Array<[SubstrateAccount, number]> }> = {
   view: (vnode) => {
+    if (!app.isLoggedIn()) return;
+    if (!app.chain && !app.community) return;
+    if (!app.activeId()) return;
     return m('.NewProposalButton.MobileNewProposalButton', [
       m(PopoverMenu, {
         class: 'new-proposal-button-popover',
@@ -100,8 +103,8 @@ const NewProposalButton: m.Component<{
         class: 'NewProposalButton',
         label: 'New thread',
         fluid,
-        disabled: !app.user.activeAccount
-       ,//   || ((app.chain as Token).isToken && !(app.chain as Token).hasToken),
+        disabled: !app.user.activeAccount,
+        //   || ((app.chain as Token).isToken && !(app.chain as Token).hasToken),
         onclick: () => app.modals.create({ modal: NewThreadModal }),
       });
     }

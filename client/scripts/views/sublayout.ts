@@ -42,9 +42,10 @@ const Sublayout: m.Component<{
       hideSidebar,
       alwaysShowTitle,
     } = vnode.attrs;
+
     const chain = app.chain ? app.chain.meta.chain : null;
     const community = app.community ? app.community.meta : null;
-    const narrowBrowserWidth = (window.innerWidth > 767.98) && (window.innerWidth < 1200);
+    const narrowBrowserWidth = (window.innerWidth > 767.98) && (window.innerWidth < 850);
 
     const ICON_SIZE = 22;
     const sublayoutHeaderLeft = m('.sublayout-header-left', [
@@ -80,8 +81,8 @@ const Sublayout: m.Component<{
         onclick: () => app.modals.create({ modal: ConfirmInviteModal }),
       }),
       app.isLoggedIn() && m(NotificationsMenu),                         // notifications menu
-      showNewProposalButton &&
-      (narrowBrowserWidth ? m(MobileNewProposalButton) : m(NewProposalButton, { fluid: false })),
+      showNewProposalButton
+      && (narrowBrowserWidth ? m(MobileNewProposalButton) : m(NewProposalButton, { fluid: false })),
     ]);
 
     if (vnode.attrs.loadingLayout) return [

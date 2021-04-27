@@ -273,7 +273,7 @@ const SearchPage : m.Component<{
       class: 'SearchPage',
       title: [
         'Search ',
-        m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+        capitalize(scope) || 'Commonwealth'
       ],
       showNewProposalButton: true,
       alwaysShowTitle: true,
