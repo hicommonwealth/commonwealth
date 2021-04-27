@@ -1,5 +1,7 @@
 import m from 'mithril';
 import './landing_page_header.scss';
+import app from 'state';
+import LoginModal from 'views/modals/login_modal';
 
 interface IAttrs {
   navs: { text: string; ref: string }[];
@@ -40,14 +42,21 @@ const HeaderLandingPage: m.Component<IAttrs, {}> = {
               m(
                 'li.LandingPageHeaderLoginButton',
                 { class: 'ml-10 pt-2' },
-                m('a', { class: 'btn-primary pb-3 text-white', href: '' }, [
-                  m('img', {
-                    class: 'inline mr-1.5',
-                    src: 'static/img/user.svg',
-                    alt: 'Login',
-                  }),
-                  ' Login ',
-                ])
+                m(
+                  'a',
+                  {
+                    class: 'btn-primary pb-3 text-white',
+                    onclick: () => app.modals.create({ modal: LoginModal }),
+                  },
+                  [
+                    m('img', {
+                      class: 'inline mr-1.5',
+                      src: 'static/img/user.svg',
+                      alt: 'Login',
+                    }),
+                    ' Login ',
+                  ]
+                )
               ),
             ])
           ),
