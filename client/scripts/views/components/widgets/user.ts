@@ -217,7 +217,7 @@ export const UserBlock: m.Component<{
       const isNear = profile.address.chain === 'near';
       const queryStart = profile.address.toLowerCase().indexOf(searchTerm);
       const queryEnd = queryStart + searchTerm.length;
-      console.log({ addr: profile.address, searchTerm });
+
       return ([
         m('span', profile.address.slice(0, queryStart)),
         m('mark', profile.address.slice(queryStart, queryEnd)),

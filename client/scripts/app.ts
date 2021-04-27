@@ -625,7 +625,7 @@ $(() => {
     '/components':               importRoute('views/pages/components', { scoped: false, hideSidebar: true }),
 
     // Search
-    '/search':                   importRoute('views/pages/search', { scoped: false, deferChain: true }),
+    '/search':                   importRoute('views/pages/search', { scoped: false, hideSidebar: true, deferChain: true }),
 
 
     // Login page

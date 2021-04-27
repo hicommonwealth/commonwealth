@@ -202,6 +202,7 @@ const SearchPage : m.Component<{
   results: any,
   searchTerm: string,
   searchPrefix: string,
+  refreshResults: boolean,
   overridePrefix: boolean,
   pageCount: number,
   errorText: string
@@ -236,9 +237,10 @@ const SearchPage : m.Component<{
       return LoadingPage;
     }
 
-    // re-fetch results for new search
-    if (searchTerm !== vnode.state.searchTerm) {
+    // re-fetch results for new search if search term or URI has changed
+    if (searchTerm !== vnode.state.searchTerm || vnode.state.refreshResults) {
       vnode.state.searchTerm = searchTerm;
+      vnode.state.refreshResults = false;
       vnode.state.results = {};
       if (!app.searchCache[vnode.state.searchTerm]) {
         app.searchCache[vnode.state.searchTerm] = { loaded: false };
@@ -335,11 +337,15 @@ const SearchPage : m.Component<{
           scope
             && [
               '. ',
-              link(
-                'a.search-all-communities',
-                `/search?q=${searchTerm}`,
-                'Search all communities?'
-              )
+              m('a.search-all-communities', {
+                href: '#',
+                onclick: (e) => {
+                  m.route.set(`/search?q=${searchTerm}`);
+                  setTimeout(() => {
+                    vnode.state.refreshResults = true;
+                  }, 0);
+                }
+              }, 'Search all communities?')
             ]
         ]),
         m('.search-results-list', tabScopedListing),
