@@ -371,7 +371,7 @@ const SearchBar : m.Component<{}, {
 }> = {
   view: (vnode) => {
     if (!vnode.state.searchTerm) vnode.state.searchTerm = '';
-    console.log({ state: vnode.state });
+
     const { results, searchTerm } = vnode.state;
     const showDropdownPreview = !m.route.get().includes('/search?q=');
     const searchResults = (!results || results?.length === 0)

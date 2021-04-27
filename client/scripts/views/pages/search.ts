@@ -285,7 +285,8 @@ const SearchPage : m.Component<{
           vnode.state.activeTab = SearchType.Top;
         },
       }),
-      m(TabItem, {
+      !scope
+      && m(TabItem, {
         label: 'Communities',
         active: activeTab === SearchType.Community,
         onclick: () => {
