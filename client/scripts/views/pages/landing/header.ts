@@ -7,16 +7,38 @@ interface IAttrs {
   navs: { text: string; ref: string }[];
 }
 
-const HeaderLandingPage: m.Component<IAttrs, {}> = {
+interface IState {
+  headerMinimized: boolean;
+  hideHeader: boolean;
+}
+
+// eslint-disable-next-line max-len
+const INITIAL_HEADER_STYLE = 'bg-white lg:flex lg:flex-row lg:justify-between lg:items-center p-4 px-10 rounded-full shadow-lg z-20';
+
+window.onscroll = (e: any): void => {
+  if (window.scrollY > 100) {
+    document.getElementById(
+      'landing-page'
+    ).className = `w-2/4 fixed ${INITIAL_HEADER_STYLE}`;
+  }
+
+  if (window.scrollY - window.innerHeight > 0) {
+    document.getElementById(
+      'landing-page'
+    ).className = `w-100 ${INITIAL_HEADER_STYLE}`;
+  }
+};
+
+const HeaderLandingPage: m.Component<IAttrs, IState> = {
   view: (vnode) => {
     return m(
       'div',
-      { class: 'mt-8 container mx-auto' },
+      {},
       m(
         'header',
         {
-          class:
-            'bg-white lg:flex lg:flex-row lg:justify-between lg:items-center p-4 px-10 rounded-full shadow-lg',
+          id: 'landing-page',
+          class: INITIAL_HEADER_STYLE,
         },
         [
           m('img', {

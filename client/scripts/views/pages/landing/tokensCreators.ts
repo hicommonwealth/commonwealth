@@ -83,7 +83,7 @@ const TokensCreatorComponent: m.Component<IAttrs, IState> = {
         'ul',
         {
           class:
-            'bg-gray-900 rounded-3xl p-3 lg:p-6 relative min-h-tabs lg:flex lg:flex-col lg:h-full',
+            'bg-gray-900 rounded-3xl p-3 lg:p-6 relative min-h-tabs lg:flex lg:flex-col lg:h-full mt-4',
         },
         [
           vnode.state.creators.map((creator: any) => {
@@ -111,7 +111,7 @@ const TokensCreatorComponent: m.Component<IAttrs, IState> = {
                         );
                         removeOrAddClasslistFromChains(
                           vnode.state.creators,
-                          'hidden',
+                          'invisible',
                           'remove'
                         );
 
@@ -121,7 +121,7 @@ const TokensCreatorComponent: m.Component<IAttrs, IState> = {
 
                         removeOrAddClasslistFromChains(
                           filteredCreators,
-                          'hidden',
+                          'invisible',
                           'add'
                         );
 
@@ -151,7 +151,7 @@ const TokensCreatorComponent: m.Component<IAttrs, IState> = {
                           class: `${
                             vnode.state.buttonHoverActiveById === creator.button.id
                               ? ''
-                              : 'hidden'
+                              : 'invisible'
                           } text-white`,
                           id: creator.texts.id,
                         },
@@ -166,11 +166,12 @@ const TokensCreatorComponent: m.Component<IAttrs, IState> = {
                     class: `${
                       vnode.state.chainCardImageActiveById === creator.card.id
                         ? 'block'
-                        : 'hidden'
+                        : 'invisible'
                     } flex justify-center lg:w-2/3 lg:absolute lg:w-2/3 lg:right-0 lg:top-0`,
                     id: creator.card.id,
                   },
                   m('img', {
+                    class: 'block max-w-2xl w-full h-auto',
                     src: creator.card.imgSrc,
                     alt: creator.card.imgAlt,
                   })
