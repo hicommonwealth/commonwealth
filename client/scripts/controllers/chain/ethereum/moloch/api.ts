@@ -14,7 +14,7 @@ import { Moloch2Factory } from 'Moloch2Factory';
 import { GuildBank2 } from 'GuildBank2';
 import { GuildBank2Factory } from 'GuildBank2Factory';
 
-import ISignerApi from 'models/ISignerApi';
+import { ISignerApi } from 'models';
 
 export default class MolochAPI implements ISignerApi {
   public readonly gasLimit: number = 3000000;

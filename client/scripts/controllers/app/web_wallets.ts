@@ -1,5 +1,4 @@
-import { ChainBase } from 'client/scripts/models';
-import IWebWallet from 'models/IWebWallet';
+import { ChainBase, IWebWallet } from 'models';
 import MetamaskWebWalletController from './metamask_web_wallet';
 import KeplrWebWalletController from './keplr_web_wallet';
 import PolkadotWebWalletController from './polkadot_web_wallet';

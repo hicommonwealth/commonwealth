@@ -42,7 +42,7 @@ export default class Token extends IChainAdapter<EthereumCoin, EthereumAccount> 
     await this.accounts.init(this.chain);
 
     if (this.webWallet) {
-      await this.webWallet.enable();
+      // await this.webWallet.enable();
     }
 
     const activeAddress: string = this.webWallet.accounts && this.webWallet.accounts[0];

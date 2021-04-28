@@ -2,8 +2,7 @@ declare let window: any;
 
 import app from 'state';
 import Web3 from 'web3';
-import IWebWallet from 'models/IWebWallet';
-import { ChainBase, ISignerApi } from 'client/scripts/models';
+import { ChainBase, ISignerApi, IWebWallet } from 'models';
 import Ethereum from 'controllers/chain/ethereum/main';
 import { setActiveAccount } from './login';
 
@@ -37,7 +36,7 @@ class MetamaskWebWalletController implements IWebWallet {
   }
 
   public async signMessage(message: string): Promise<string> {
-    const signature = await this._web3.eth.sign(message, this.accounts[0]);
+    const signature = await this._web3.eth.personal.sign(message, this.accounts[0], '');
     return signature;
   }
 
@@ -53,8 +52,10 @@ class MetamaskWebWalletController implements IWebWallet {
     this._accounts = await this._web3.eth.getAccounts();
     this._provider = this._web3.currentProvider;
     const balance = await this._web3.eth.getBalance(this._accounts[0]);
+    console.log(balance);
 
-    await this.initAccountsChanged(api);
+    // TODO: reenable this to ensure that api is enabled before wallet
+    // await this.initAccountsChanged(api);
     this._enabled = true;
   }
 

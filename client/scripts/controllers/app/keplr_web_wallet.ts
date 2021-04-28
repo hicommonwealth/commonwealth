@@ -1,7 +1,6 @@
 import app from 'state';
 
-import { ChainBase } from 'client/scripts/models';
-import IWebWallet from 'models/IWebWallet';
+import { ChainBase, IWebWallet } from 'models';
 
 declare let window: any;
 

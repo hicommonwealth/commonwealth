@@ -2,8 +2,7 @@ import { web3Accounts, web3Enable, web3FromAddress, isWeb3Injected } from '@polk
 import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import { Signer } from '@polkadot/api/types';
 
-import { ChainBase } from 'client/scripts/models';
-import IWebWallet from 'models/IWebWallet';
+import { ChainBase, IWebWallet } from 'models';
 import AddressSwapper from 'views/components/addresses/address_swapper';
 
 // TODO: make this a generic controller, and have the polkadot-js extension implementation inherit

@@ -5,11 +5,10 @@ import $ from 'jquery';
 import { Button, PopoverMenu, MenuItem, MenuDivider, Icon, Icons } from 'construct-ui';
 
 import app from 'state';
-import { ChainBase } from 'models';
+import { ChainBase, IWebWallet } from 'models';
 import { ChainBaseIcon } from 'views/components/chain_icon';
-import { baseToLabel, baseToNetwork } from 'models/types';
+import { baseToNetwork } from 'models/types';
 import _ from 'underscore';
-import IWebWallet from 'client/scripts/models/IWebWallet';
 
 const CHAINBASE_WITH_CLI = [
   ChainBase.CosmosSDK, ChainBase.Substrate

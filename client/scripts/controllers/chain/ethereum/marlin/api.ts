@@ -10,7 +10,7 @@ import { GovernorAlpha } from 'GovernorAlpha';
 import { GovernorAlphaFactory } from 'GovernorAlphaFactory';
 import { BigNumber } from 'ethers/utils';
 
-import ISignerApi from 'models/ISignerApi';
+import { ISignerApi } from 'models';
 
 export default class MarlinAPI implements ISignerApi {
   public readonly gasLimit: number = 3000000;

@@ -46,7 +46,7 @@ export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount>
     this.chain.molochApi = api;
 
     if (this.webWallet) {
-      await this.webWallet.enable(api);
+      // await this.webWallet.enable(api);
     }
 
     await this.accounts.init(api);

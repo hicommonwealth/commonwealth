@@ -4,7 +4,7 @@ import { ethers } from 'ethers';
 import { Erc20 } from 'Erc20';
 import { Erc20Factory } from 'Erc20Factory';
 
-import ISignerApi from 'models/ISignerApi';
+import { ISignerApi } from 'models';
 
 export default class TokenAPI implements ISignerApi {
   public readonly gasLimit: number = 3000000;

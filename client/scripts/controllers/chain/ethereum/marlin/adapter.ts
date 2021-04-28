@@ -55,7 +55,7 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
   public async initApi() {
     await this.chain.resetApi(this.meta);
     await this.chain.initMetadata();
-    await this.webWallet.enable().catch((e) => console.error(e));
+    // await this.webWallet.enable().catch((e) => console.error(e));
 
     const activeAddress: string = await this.webWallet.accounts[0];
     const mpondContractAddress = this.meta.address;
@@ -73,7 +73,7 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
     this.chain.marlinApi = api;
 
     if ((window as any).ethereum || (window as any).web3) {
-      if (!this.webWallet.enabled) await this.webWallet.enable(api).catch((e) => console.error(e));
+      // if (!this.webWallet.enabled) await this.webWallet.enable(api).catch((e) => console.error(e));
     }
 
     await this.marlinAccounts.init(api);

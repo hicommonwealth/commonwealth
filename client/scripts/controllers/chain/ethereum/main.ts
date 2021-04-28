@@ -31,7 +31,7 @@ class Ethereum extends IChainAdapter<EthereumCoin, EthereumAccount> {
     await this.accounts.init(this.chain);
 
     if (this.webWallet) {
-      await this.webWallet.enable();
+      // await this.webWallet.enable();
     }
     await this.chain.initEventLoop();
     await super.initApi();
