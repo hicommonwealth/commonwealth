@@ -35,9 +35,10 @@ function createAccount(account: Account<any>, community?: string) {
   });
 }
 
-export function linkExistingAddressToChainOrCommunity(address: string, chain: string, originChain: string, community: string) {
+export function linkExistingAddressToChainOrCommunity(address: string, encodedAddress: string, chain: string, originChain: string, community: string) {
   return $.post(`${app.serverUrl()}/linkExistingAddressToChain`, {
     address,
+    encodedAddress,
     chain,
     originChain,
     community,

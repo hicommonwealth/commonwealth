@@ -7,6 +7,7 @@ const { Op } = Sequelize;
 
 export const Errors = {
   NeedAddress: 'Must provide address',
+  NeedEncodedAddress: 'Must provide encoded address',
   NeedChain: 'Must provide chain',
   NeedOriginChain: 'Must provide original chain',
   NeedLoggedIn: 'Must be logged in',
@@ -17,6 +18,9 @@ export const Errors = {
 const linkExistingAddressToChain = async (models, req: Request, res: Response, next: NextFunction) => {
   if (!req.body.address) {
     return next(new Error(Errors.NeedAddress));
+  }
+  if (!req.body.encodedAddress) {
+    return next(new Error(Errors.NeedEncodedAddress));
   }
   if (!req.body.chain) {
     return next(new Error(Errors.NeedChain));
@@ -72,7 +76,7 @@ const linkExistingAddressToChain = async (models, req: Request, res: Response, n
   }
 
   const existingAddress = await models.Address.scope('withPrivateData').findOne({
-    where: { chain: req.body.chain, address: req.body.address }
+    where: { chain: req.body.chain, address: req.body.encodedAddress }
   });
 
   try {
@@ -91,7 +95,7 @@ const linkExistingAddressToChain = async (models, req: Request, res: Response, n
     } else {
       const newObj = await models.Address.create({
         user_id: originalAddress.user_id,
-        address: originalAddress.address,
+        address: req.body.encodedAddress,
         chain: req.body.chain,
         verification_token: verificationToken,
         verification_token_expires: verificationTokenExpires,
