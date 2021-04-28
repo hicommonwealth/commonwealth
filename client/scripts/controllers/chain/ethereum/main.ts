@@ -1,6 +1,6 @@
 import ethers from 'ethers';
 
-import EthWebWalletController from 'controllers/app/eth_web_wallet';
+import MetamaskWebWalletController from 'controllers/app/metamask_web_wallet';
 import { setActiveAccount } from 'controllers/app/login';
 import EthereumChain from 'controllers/chain/ethereum/chain';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
@@ -16,10 +16,11 @@ class Ethereum extends IChainAdapter<EthereumCoin, EthereumAccount> {
   public readonly class = ChainClass.Ethereum;
   public chain: EthereumChain;
   public accounts: EthereumAccounts;
-  public readonly webWallet: EthWebWalletController = new EthWebWalletController();
+  public readonly webWallet: MetamaskWebWalletController;
 
   constructor(meta: NodeInfo, app: IApp) {
     super(meta, app);
+    this.webWallet = app.wallets.defaultWallet(this.base) as MetamaskWebWalletController;
     this.chain = new EthereumChain(this.app);
     this.accounts = new EthereumAccounts(this.app);
   }
@@ -31,11 +32,6 @@ class Ethereum extends IChainAdapter<EthereumCoin, EthereumAccount> {
 
     if (this.webWallet) {
       await this.webWallet.enable();
-      await this.webWallet.web3.givenProvider.on('accountsChanged', async (accounts) => {
-        const updatedAddress = this.app.user.activeAccounts.find((addr) => addr.address === accounts[0]);
-        if (!updatedAddress) return;
-        await setActiveAccount(updatedAddress);
-      });
     }
     await this.chain.initEventLoop();
     await super.initApi();

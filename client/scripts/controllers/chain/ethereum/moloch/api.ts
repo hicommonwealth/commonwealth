@@ -14,7 +14,9 @@ import { Moloch2Factory } from 'Moloch2Factory';
 import { GuildBank2 } from 'GuildBank2';
 import { GuildBank2Factory } from 'GuildBank2Factory';
 
-export default class MolochAPI {
+import ISignerApi from 'models/ISignerApi';
+
+export default class MolochAPI implements ISignerApi {
   public readonly gasLimit: number = 3000000;
 
   private _contractAddress: string;
@@ -33,7 +35,7 @@ export default class MolochAPI {
 
   constructor(contractAddress: string, web3Provider: AsyncSendable, userAddress?: string) {
     this._contractAddress = contractAddress.toLowerCase();
-    if (userAddress) { 
+    if (userAddress) {
       this._userAddress = userAddress.toLowerCase();
     } else {
       this._userAddress = '0';

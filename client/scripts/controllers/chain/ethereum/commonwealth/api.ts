@@ -14,7 +14,9 @@ import { Erc20Factory } from 'Erc20Factory';
 // import { GuildBank2 } from 'GuildBank2';
 // import { GuildBank2Factory } from 'GuildBank2Factory';
 
-export default class CommonwealthAPI {
+import ISignerApi from 'models/ISignerApi';
+
+export default class CommonwealthAPI implements ISignerApi {
   public readonly gasLimit: number = 3000000;
 
   private _contractAddress: string;

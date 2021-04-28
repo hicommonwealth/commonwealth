@@ -1,7 +1,7 @@
 import { MolochTypes } from '@commonwealth/chain-events';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 
-import EthWebWalletController from 'controllers/app/eth_web_wallet';
+import MetamaskWebWalletController from 'controllers/app/metamask_web_wallet';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import { ChainBase, ChainClass, IChainAdapter, NodeInfo } from 'models';
@@ -22,11 +22,12 @@ export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount>
   public ethAccounts: EthereumAccounts;
   public accounts: MolochMembers;
   public governance: MolochGovernance;
-  public readonly webWallet: EthWebWalletController = new EthWebWalletController();
+  public readonly webWallet: MetamaskWebWalletController;
   public readonly chainEntities = new ChainEntityController();
 
   constructor(meta: NodeInfo, app: IApp) {
     super(meta, app);
+    this.webWallet = app.wallets.defaultWallet(this.base) as MetamaskWebWalletController;
     this.chain = new MolochChain(this.app);
     this.ethAccounts = new EthereumAccounts(this.app);
     this.accounts = new MolochMembers(this.app, this.chain, this.ethAccounts);
@@ -45,20 +46,8 @@ export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount>
     this.chain.molochApi = api;
 
     if (this.webWallet) {
-      await this.webWallet.enable();
-      await this.webWallet.web3.givenProvider.on('accountsChanged', async (accounts) => {
-        const updatedAddress = this.app.user.activeAccounts.find((addr) => addr.address === accounts[0]);
-        if (!updatedAddress) return;
-        await setActiveAccount(updatedAddress);
-      });
+      await this.webWallet.enable(api);
     }
-
-    await this.webWallet.web3.givenProvider.on('accountsChanged', async (accounts) => {
-      const updatedAddress = this.app.user.activeAccounts.find((addr) => addr.address === accounts[0]);
-      if (!updatedAddress) return;
-      await setActiveAccount(updatedAddress);
-      api.updateSigner(accounts[0]);
-    });
 
     await this.accounts.init(api);
     await super.initApi();

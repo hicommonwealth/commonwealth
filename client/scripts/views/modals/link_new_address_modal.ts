@@ -30,6 +30,7 @@ import CodeBlock from 'views/components/widgets/code_block';
 import User from 'views/components/widgets/user';
 import AvatarUpload from 'views/components/avatar_upload';
 import AddressSwapper from '../components/addresses/address_swapper';
+import IWebWallet from 'client/scripts/models/IWebWallet';
 
 enum LinkNewAddressSteps {
   Step1VerifyWithCLI,
@@ -311,6 +312,9 @@ const LinkNewAddressModal: m.Component<{
   joiningChain: string,           // join chain after verification
   targetCommunity?: string,       // this is valid when loggingInWithAddress=true and user joins to community through default chain.
   useCommandLineWallet: boolean,  //
+
+  // TODO: use this!
+  webWallet: IWebWallet<any>,
   alreadyInitializedAccount?: Account<any>; // skip verification, go straight to profile creation (only used for NEAR)
   prepopulateAddress?: string, // link a specific address rather than prompting
   successCallback;

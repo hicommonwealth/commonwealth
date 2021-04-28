@@ -1,6 +1,6 @@
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 
-import EthWebWalletController from 'controllers/app/eth_web_wallet';
+import MetamaskWebWalletController from 'controllers/app/metamask_web_wallet';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import { ChainBase, ChainClass, IChainAdapter, NodeInfo } from 'models';
@@ -21,11 +21,12 @@ export default class Commonwealth extends IChainAdapter<EthereumCoin, EthereumAc
   public ethAccounts: EthereumAccounts;
   public accounts: CommonwealthMembers;
   public governance: CommonwealthGovernance;
-  public readonly webWallet: EthWebWalletController = new EthWebWalletController();
+  public readonly webWallet: MetamaskWebWalletController;
   public readonly chainEntities = new ChainEntityController();
 
   constructor(meta: NodeInfo, app: IApp) {
     super(meta, app);
+    this.webWallet = app.wallets.defaultWallet(this.base) as MetamaskWebWalletController;
     this.chain = new CommonwealthChain(this.app);
     this.ethAccounts = new EthereumAccounts(this.app);
     this.accounts = new CommonwealthMembers(this.app);
@@ -44,20 +45,8 @@ export default class Commonwealth extends IChainAdapter<EthereumCoin, EthereumAc
     this.chain.commonwealthApi = api;
 
     if (this.webWallet) {
-      await this.webWallet.enable();
-      await this.webWallet.web3.givenProvider.on('accountsChanged', async (accounts) => {
-        const updatedAddress = this.app.user.activeAccounts.find((addr) => addr.address === accounts[0]);
-        if (!updatedAddress) return;
-        await setActiveAccount(updatedAddress);
-      });
+      await this.webWallet.enable(api);
     }
-
-    await this.webWallet.web3.givenProvider.on('accountsChanged', async (accounts) => {
-      const updatedAddress = this.app.user.activeAccounts.find((addr) => addr.address === accounts[0]);
-      if (!updatedAddress) return;
-      await setActiveAccount(updatedAddress);
-      api.updateSigner(accounts[0]);
-    });
 
     await this.accounts.init(api, this.chain, this.ethAccounts);
     await super.initApi();

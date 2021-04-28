@@ -2,7 +2,7 @@ import { ethers } from 'ethers';
 
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 
-import EthWebWalletController from 'controllers/app/eth_web_wallet';
+import MetamaskWebWalletController from 'controllers/app/metamask_web_wallet';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import { ChainBase, ChainClass, IChainAdapter, NodeInfo } from 'models';
@@ -24,11 +24,12 @@ export default class Token extends IChainAdapter<EthereumCoin, EthereumAccount> 
   public accounts: EthereumAccounts;
   public hasToken: boolean = false;
 
-  public readonly webWallet: EthWebWalletController = new EthWebWalletController();
+  public readonly webWallet: MetamaskWebWalletController;
   public readonly chainEntities = new ChainEntityController();
 
   constructor(meta: NodeInfo, app: IApp) {
     super(meta, app);
+    this.webWallet = app.wallets.defaultWallet(this.base) as MetamaskWebWalletController;
     this.chain = new EthereumTokenChain(this.app);
     this.accounts = new EthereumAccounts(this.app);
     this.class = meta.chain.network;
@@ -42,10 +43,6 @@ export default class Token extends IChainAdapter<EthereumCoin, EthereumAccount> 
 
     if (this.webWallet) {
       await this.webWallet.enable();
-      await this.webWallet.web3.givenProvider.on('accountsChanged', async (accounts) => {
-        const updatedAddress = this.app.user.activeAccounts.find((addr) => addr.address === accounts[0]);
-        await setActiveAccount(updatedAddress);
-      });
     }
 
     const activeAddress: string = this.webWallet.accounts && this.webWallet.accounts[0];

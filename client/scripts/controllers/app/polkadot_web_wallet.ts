@@ -2,14 +2,19 @@ import { web3Accounts, web3Enable, web3FromAddress, isWeb3Injected } from '@polk
 import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import { Signer } from '@polkadot/api/types';
 
+import { ChainBase } from 'client/scripts/models';
+import IWebWallet from 'models/IWebWallet';
 import AddressSwapper from 'views/components/addresses/address_swapper';
 
 // TODO: make this a generic controller, and have the polkadot-js extension implementation inherit
-class WebWalletController {
+class PolkadotWebWalletController implements IWebWallet<InjectedAccountWithMeta> {
   // GETTERS/SETTERS
   private _enabled: boolean;
   private _accounts: InjectedAccountWithMeta[];
   private _injectedAddress: string;
+
+  public readonly label = 'polkadot-js';
+  public readonly chain = ChainBase.Substrate;
 
   public get available() {
     return isWeb3Injected;
@@ -51,4 +56,4 @@ class WebWalletController {
   }
 }
 
-export default WebWalletController;
+export default PolkadotWebWalletController;

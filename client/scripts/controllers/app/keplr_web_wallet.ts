@@ -1,18 +1,21 @@
-import { SigningCosmosClient } from '@cosmjs/launchpad';
 import app from 'state';
+
+import { ChainBase } from 'client/scripts/models';
+import IWebWallet from 'models/IWebWallet';
 
 declare let window: any;
 
-class KeplrWebWalletController {
+class KeplrWebWalletController implements IWebWallet {
   // GETTERS/SETTERS
   private _offlineSigner: any;
   private _accounts: any[]; // Todo Typecasting...
   private _enabled: boolean;
 
+  public readonly label = 'Cosmos Wallet (keplr)';
+  public readonly chain = ChainBase.CosmosSDK;
+
   public get available() {
-    if (!window.getOfflineSigner || !window.keplr) return false;
-    if (!window.keplr?.experimentalSuggestChain) return alert('Please update to a more recent version of Keplr');
-    return true;
+    return window.getOfflineSigner && window.keplr;
   }
   public get enabled() {
     return this.available && this._enabled;
@@ -27,6 +30,11 @@ class KeplrWebWalletController {
   // ACTIONS
   public async enable() {
     console.log('Attempting to enable Keplr web wallet');
+
+    if (!window.keplr?.experimentalSuggestChain) {
+      alert('Please update to a more recent version of Keplr');
+      return;
+    }
 
     // get the chain id to enable
     if (!app.chain?.id || !app.chain?.meta?.chain?.id) return;
