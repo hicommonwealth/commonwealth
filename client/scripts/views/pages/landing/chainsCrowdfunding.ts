@@ -150,11 +150,11 @@ const ChainsCrowdfundingComponent: m.Component<IAttrs, IState> = {
                         vnode.state.chainCardImageActiveById === chain.card.id
                           ? 'block'
                           : 'hidden'
-                      } flex justify-center lg:w-2/3 lg:absolute lg:w-2/3 lg:right-0 lg:top-0`,
+                      } justify-center lg:w-2/3 lg:absolute lg:w-2/3 lg:right-0 lg:top-0`,
                       id: chain.card.id,
                     },
                     m('img', {
-                      class: 'block max-w-2xl w-full h-auto',
+                      class: '',
                       src: chain.card.src,
                       alt: chain.card.alt,
                     })
