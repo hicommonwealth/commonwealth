@@ -53,7 +53,7 @@ const LoginWithWalletDropdown: m.Component<{
     const getMenuItemsForChainBase = (base: ChainBase, cli?: boolean) => {
       const wallets = app.wallets.availableWallets(base);
       const baseString = base.charAt(0).toUpperCase() + base.slice(1);
-      const createItem = (webWallet?: IWebWallet, useCli?: boolean) => m(MenuItem, {
+      const createItem = (webWallet?: IWebWallet<any>, useCli?: boolean) => m(MenuItem, {
         label: m('.chain-login-label', [
           m(ChainBaseIcon, { chainbase: base, size: 20 }),
           m('.chain-login-label-name', [

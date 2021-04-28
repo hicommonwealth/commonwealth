@@ -1,20 +1,27 @@
 import app from 'state';
 
-import { ChainBase, IWebWallet } from 'models';
+import { AccountData, OfflineSigner, SigningCosmosClient } from '@cosmjs/launchpad';
 
-declare let window: any;
+import { Account, ChainBase, IWebWallet } from 'models';
+import { validationTokenToSignDoc } from 'adapters/chain/cosmos/keys';
+import { Window as KeplrWindow } from '@keplr-wallet/types';
 
-class KeplrWebWalletController implements IWebWallet {
+declare global {
+  // eslint-disable-next-line @typescript-eslint/no-empty-interface
+  interface Window extends KeplrWindow {}
+}
+
+class KeplrWebWalletController implements IWebWallet<AccountData> {
   // GETTERS/SETTERS
-  private _offlineSigner: any;
-  private _accounts: any[]; // Todo Typecasting...
+  private _offlineSigner: OfflineSigner;
+  private _accounts: readonly AccountData[];
   private _enabled: boolean;
 
   public readonly label = 'Cosmos Wallet (keplr)';
   public readonly chain = ChainBase.CosmosSDK;
 
   public get available() {
-    return window.getOfflineSigner && window.keplr;
+    return window.getOfflineSigner && !!window.keplr;
   }
   public get enabled() {
     return this.available && this._enabled;
@@ -24,6 +31,29 @@ class KeplrWebWalletController implements IWebWallet {
   }
   public get offlineSigner() {
     return this._offlineSigner;
+  }
+
+  public async validateWithAccount(account: Account<any>): Promise<void> {
+    if (!this.offlineSigner) throw new Error('Missing or misconfigured web wallet');
+    const client = new SigningCosmosClient(
+      // TODO: Figure out our own nodes, these are ported from the Keplr example code.
+      app.chain.meta.chain.network === 'cosmos'
+        ? 'https://node-cosmoshub-3.keplr.app/rest'
+        : app.chain.meta.chain.network === 'straightedge'
+          ? 'https://node-straightedge-2.keplr.app/rest'
+          : '',
+      account.address,
+      this.offlineSigner,
+    );
+
+    // Get the verification token & placeholder TX to send
+    const signDoc = await validationTokenToSignDoc(account.address, account.validationToken);
+
+    // Some typing and versioning issues here...signAmino should be available but it's not
+    const signature = await ((client as any).signer.signAmino
+      ? (client as any).signer.signAmino(account.address, signDoc)
+      : (client as any).signer.sign(account.address, signDoc));
+    return account.validate(JSON.stringify(signature));
   }
 
   // ACTIONS

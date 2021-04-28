@@ -1,7 +1,7 @@
-import { ChainBase, IWebWallet } from 'models';
+import { Account, ChainBase, IWebWallet } from 'models';
 
 // TODO
-class NearWebWalletController implements IWebWallet {
+class NearWebWalletController implements IWebWallet<any> {
   public readonly label = 'NEAR Wallet';
   public readonly available = true;
   public readonly chain = ChainBase.NEAR;
@@ -10,6 +10,10 @@ class NearWebWalletController implements IWebWallet {
 
   public get accounts() {
     return [];
+  }
+
+  public async validateWithAccount(account: Account<any>): Promise<void> {
+    throw new Error('not implemented');
   }
 
   public async enable() {

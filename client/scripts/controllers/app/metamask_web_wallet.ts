@@ -2,12 +2,12 @@ declare let window: any;
 
 import app from 'state';
 import Web3 from 'web3';
-import { ChainBase, ISignerApi, IWebWallet } from 'models';
+import { Account, ChainBase, ISignerApi, IWebWallet } from 'models';
 import Ethereum from 'controllers/chain/ethereum/main';
 import { setActiveAccount } from './login';
 
 // TODO: make this a generic controller, it's shared with polkadotJS right now
-class MetamaskWebWalletController implements IWebWallet {
+class MetamaskWebWalletController implements IWebWallet<string> {
   // GETTERS/SETTERS
   private _enabled: boolean;
   private _accounts: any[]; // Todo Typecasting...
@@ -38,6 +38,12 @@ class MetamaskWebWalletController implements IWebWallet {
   public async signMessage(message: string): Promise<string> {
     const signature = await this._web3.eth.personal.sign(message, this.accounts[0], '');
     return signature;
+  }
+
+  public async validateWithAccount(account: Account<any>): Promise<void> {
+    // Sign with the method on eth_webwallet, because we don't have access to the private key
+    const webWalletSignature = await this.signMessage(account.validationToken);
+    return account.validate(webWalletSignature);
   }
 
   // ACTIONS

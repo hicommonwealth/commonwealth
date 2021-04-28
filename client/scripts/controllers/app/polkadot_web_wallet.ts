@@ -1,8 +1,10 @@
 import { web3Accounts, web3Enable, web3FromAddress, isWeb3Injected } from '@polkadot/extension-dapp';
 import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import { Signer } from '@polkadot/api/types';
+import { stringToHex } from '@polkadot/util';
+import { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
 
-import { ChainBase, IWebWallet } from 'models';
+import { Account, ChainBase, IWebWallet } from 'models';
 import AddressSwapper from 'views/components/addresses/address_swapper';
 
 // TODO: make this a generic controller, and have the polkadot-js extension implementation inherit
@@ -40,6 +42,18 @@ class PolkadotWebWalletController implements IWebWallet<InjectedAccountWithMeta>
   }
 
   // ACTIONS
+  public async validateWithAccount(account: Account<any>): Promise<void> {
+    const signer = await this.getSigner(account.address);
+    const token = account.validationToken;
+    const payload: SignerPayloadRaw = {
+      address: account.address,
+      data: stringToHex(token),
+      type: 'bytes',
+    };
+    const signature = (await signer.signRaw(payload)).signature;
+    return account.validate(signature);
+  }
+
   public async enable() {
     console.log('Attempting to enable Substrate web wallet');
     if (!this.available) throw new Error('Web wallet not available');
