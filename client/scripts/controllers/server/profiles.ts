@@ -55,7 +55,7 @@ class ProfilesController {
           this._store.add(profile);
         }
         if (result.updatedProfileAddresses) {
-          result.updatedProfileAddresses.forEach((address) => this._store.remove(new Profile(address.chain, address.address)));
+          result.updatedProfileAddresses.forEach((address) => this._refreshProfile(new Profile(address.chain, address.address)));
         }
         resolve(result.profile);
       }).catch((error) => {
