@@ -6,10 +6,12 @@ import {
   NodeInfo,
   ITXModalData,
   ITXData,
-  IChainModule
+  IChainModule,
+  ChainBase
 } from 'models';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import EthereumAccount from './account';
+import MetamaskWebWalletController from '../../app/metamask_web_wallet';
 
 export interface IEthereumTXData extends ITXData {
   chainId: string;
@@ -59,71 +61,77 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
   public get metadataInitialized() { return this._metadataInitialized; }
   public get totalbalance() { return this._totalbalance; }
 
-  public initApi(node?: NodeInfo): Promise<any> {
-    return new Promise((resolve, reject) => {
-      // TODO: check for ethereum-local should probably be elsewhere
-      // TODO: for dapp browsers, we should fall back to infura if connecting via the JS window object fails
-      // TODO: we may want to integrate the metamask code here with the webWallet API
-      if (node.chain.id === 'ethereum-local') {
-        // Local node
-        try {
-          const localProvider = new Web3.providers.WebsocketProvider(node.url);
-          this._api = new Web3(localProvider);
-        } catch (error) {
-          console.log('Could not connect to Ethereum using local node');
-          this.app.chain.networkStatus = ApiStatus.Disconnected;
-          return reject(error);
-        }
-      } else if ((window as any).ethereum) {
-        // Dapp browsers
-        try {
-          console.log('Connecting to Ethereum via Metamask');
-          this._api = new Web3((window as any).ethereum);
-        } catch (error) {
-          console.log('Could not connect to Ethereum using injected web3');
-          this.app.chain.networkStatus = ApiStatus.Disconnected;
-          return reject(error);
-        }
-      } else if ((window as any).web3) {
-        // Legacy dapp browsers
-        try {
-          console.log('Connecting to Ethereum via legacy web3 object');
-          this._api = new Web3((window as any).web3.currentProvider);
-        } catch (error) {
-          console.log('Could not connect to Ethereum using injected web3');
-          this.app.chain.networkStatus = ApiStatus.Disconnected;
-          return reject(error);
-        }
-      } else {
-        // Non-dapp browsers, use Infura -> https://infura.io/docs/ethereum/wss/introduction
-        try {
-          const provider = new Web3.providers.WebsocketProvider(node.url);
-          this._api = new Web3(provider);
-        } catch (error) {
-          console.log('Could not connect to Ethereum using remote node');
-          this.app.chain.networkStatus = ApiStatus.Disconnected;
-          return reject(error);
-        }
+  public async initApi(node?: NodeInfo): Promise<any> {
+    // initialize wallet first to check for web3 connection
+    // TODO: support other web wallets, and also have a priority list?
+    const availableWallets = this.app.wallets.availableWallets(ChainBase.Ethereum);
+    const metamaskWallet = availableWallets.find((w) => w instanceof MetamaskWebWalletController);
+    if (metamaskWallet && !metamaskWallet.enabled) {
+      await metamaskWallet.enable();
+    }
+
+    // TODO: check for ethereum-local should probably be elsewhere
+    // TODO: for dapp browsers, we should fall back to infura if connecting via the JS window object fails
+    if (node.chain.id === 'ethereum-local') {
+      // Local node
+      try {
+        const localProvider = new Web3.providers.WebsocketProvider(node.url);
+        this._api = new Web3(localProvider);
+      } catch (error) {
+        console.log('Could not connect to Ethereum using local node');
+        this.app.chain.networkStatus = ApiStatus.Disconnected;
+        throw error;
       }
-      this._api.eth.net.isListening()
-        .then((isListening) => {
-          this.app.chain.networkStatus = ApiStatus.Connected;
-          this._api.eth.getBlock('latest').then((headers) => {
-            if (this.app.chain) {
-              this.app.chain.block.height = headers.number;
-              m.redraw();
-            }
-          });
-          this._api.eth.subscribe('newBlockHeaders', (err, headers) => {
-            if (this.app.chain) {
-              this.app.chain.block.height = headers.number;
-              m.redraw();
-            }
-          });
-          resolve(this._api);
-        })
-        .catch((err) => reject(this._api));
+    } else if (metamaskWallet) {
+      // Dapp browsers
+      const provider = (metamaskWallet as MetamaskWebWalletController).provider;
+      console.log('Connecting to Ethereum via Metamask');
+      try {
+        this._api = new Web3(provider);
+      } catch (error) {
+        console.log('Could not connect to Ethereum using injected web3');
+        this.app.chain.networkStatus = ApiStatus.Disconnected;
+        throw error;
+      }
+      // TODO: support other web wallets
+    } else if ((window as any).web3) {
+      // Legacy dapp browsers
+      try {
+        console.log('Connecting to Ethereum via legacy web3 object');
+        this._api = new Web3((window as any).web3.currentProvider);
+      } catch (error) {
+        console.log('Could not connect to Ethereum using injected web3');
+        this.app.chain.networkStatus = ApiStatus.Disconnected;
+        throw error;
+      }
+    } else {
+      // Non-dapp browsers, use Infura -> https://infura.io/docs/ethereum/wss/introduction
+      try {
+        const provider = new Web3.providers.WebsocketProvider(node.url);
+        this._api = new Web3(provider);
+      } catch (error) {
+        console.log('Could not connect to Ethereum using remote node');
+        this.app.chain.networkStatus = ApiStatus.Disconnected;
+        throw error;
+      }
+    }
+    const isListening = await this._api.eth.net.isListening();
+    // TODO: what should we do with the result?
+
+    this.app.chain.networkStatus = ApiStatus.Connected;
+    this._api.eth.getBlock('latest').then((headers) => {
+      if (this.app.chain) {
+        this.app.chain.block.height = headers.number;
+        m.redraw();
+      }
     });
+    this._api.eth.subscribe('newBlockHeaders', (err, headers) => {
+      if (this.app.chain) {
+        this.app.chain.block.height = headers.number;
+        m.redraw();
+      }
+    });
+    return this._api;
   }
 
   public async resetApi(selectedNode: NodeInfo) {

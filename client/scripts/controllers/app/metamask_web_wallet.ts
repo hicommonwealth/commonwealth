@@ -2,6 +2,7 @@ declare let window: any;
 
 import app from 'state';
 import Web3 from 'web3';
+import { provider } from 'web3-core';
 import { Account, ChainBase, IWebWallet } from 'models';
 import Ethereum from 'controllers/chain/ethereum/main';
 import { setActiveAccount } from './login';
@@ -12,7 +13,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
   private _enabled: boolean;
   private _accounts: any[]; // Todo Typecasting...
   private _injectedAddress: string;
-  private _provider: any;
+  private _provider: provider;
   private _web3: Web3;
 
   public readonly label = 'Ethereum Wallet (Metamask)';
@@ -25,12 +26,19 @@ class MetamaskWebWalletController implements IWebWallet<string> {
   public get available() {
     return !!(window.ethereum);
   }
+
+  public get provider() {
+    return this._provider;
+  }
+
   public get enabled() {
     return this.available && this._enabled;
   }
+
   public get accounts() {
     return this._accounts || [];
   }
+
   public get injectedAddress() {
     return this._injectedAddress;
   }
