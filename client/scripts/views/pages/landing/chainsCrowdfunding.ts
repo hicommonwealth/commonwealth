@@ -153,7 +153,7 @@ const ChainsCrowdfundingComponent: m.Component<IAttrs, IState> = {
                       } justify-center lg:w-2/3 lg:absolute lg:w-2/3 lg:right-0 lg:top-0`,
                       id: chain.card.id,
                     },
-                    m('img', {
+                    m('img.ChainsImage', {
                       class: '',
                       src: chain.card.src,
                       alt: chain.card.alt,
