@@ -61,7 +61,7 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
     );
     await api.init().catch((e) => {
       this._failed = true;
-      notifyError('Please change your Metamask network');
+      notifyError('Failed to fetch via infura');
     });
     this.chain.marlinApi = api;
     await this.marlinAccounts.init(api);

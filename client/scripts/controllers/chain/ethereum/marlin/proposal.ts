@@ -233,7 +233,11 @@ export default class MarlinProposal extends Proposal<
   // web wallet TX only
   public async submitVoteWebTx(vote: MarlinProposalVote) {
     const address = vote.account.address;
-    this._Gov.api.attachSigner(this._Gov.app.wallets, address);
+    const contract = await this._Gov.api.attachSigner(
+      this._Gov.app.wallets,
+      address,
+      this._Gov.api.governorAlphaContract
+    );
     if (!(await this._Holders.isDelegate(address))) {
       throw new Error('sender must be valid delegate');
     }
@@ -242,7 +246,7 @@ export default class MarlinProposal extends Proposal<
       throw new Error('proposal not in active period');
     }
 
-    const tx = await this._Gov.api.governorAlphaContract.castVote(
+    const tx = await contract.castVote(
       this.data.identifier,
       !!vote.choice,
       { gasLimit: this._Gov.api.gasLimit },

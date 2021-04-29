@@ -9,6 +9,7 @@ import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web
 
 export type ContractFactoryT<ContractT> = (address: string, provider: Provider) => ContractT;
 
+
 class ContractApi<ContractT extends Contract> {
   public readonly gasLimit: number = 3000000;
 
@@ -32,7 +33,11 @@ class ContractApi<ContractT extends Contract> {
     this._Contract = factory(this._contractAddress, this._Provider);
   }
 
-  public async attachSigner(wallets: WebWalletController, sender: string): Promise<void> {
+  public async attachSigner<CT extends Contract = ContractT>(
+    wallets: WebWalletController,
+    sender: string,
+    contract?: CT
+  ): Promise<CT> {
     const availableWallets = wallets.availableWallets(ChainBase.Ethereum);
     if (availableWallets.length === 0) {
       throw new Error('No wallet available');
@@ -43,8 +48,8 @@ class ContractApi<ContractT extends Contract> {
       if (!wallet.enabled) {
         await wallet.enable();
       }
-      // TODO: ensure that we can find a wallet
-      if (wallet.accounts.find((acc) => acc === sender)) {
+      // TODO: ensure that we can find any wallet, even if non-string accounts
+      if (wallet.accounts.find((acc) => acc.toLowerCase() === sender.toLowerCase())) {
         signingWallet = wallet;
       }
     }
@@ -63,7 +68,11 @@ class ContractApi<ContractT extends Contract> {
     if (!signer) {
       throw new Error('Could not get signer.');
     }
-    this._Contract.connect(signer);
+    if (contract) {
+      return contract.connect(signer) as CT;
+    } else {
+      return this._Contract.connect(signer) as CT;
+    }
   }
 
   public async init(tokenAddress?: string): Promise<void> {

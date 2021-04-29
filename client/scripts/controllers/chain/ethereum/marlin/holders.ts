@@ -66,7 +66,8 @@ export default class MarlinHolders implements IAccountsModule<EthereumCoin, Marl
 
   public async senderSetDelegate(address: string, amount: number) {
     try {
-      await this.api.Contract.delegate(address, amount);
+      const contract = await this.api.attachSigner(this.app.wallets, this.app.user.activeAccount.address);
+      await contract.delegate(address, amount);
     } catch (e) {
       console.error(e);
       throw new Error(e);

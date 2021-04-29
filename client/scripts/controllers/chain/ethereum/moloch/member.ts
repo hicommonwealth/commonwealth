@@ -75,7 +75,7 @@ export default class MolochMember extends EthereumAccount {
   }
 
   public async updateDelegateKeyTx(delegateKey: string) {
-    this._Members.api.attachSigner(this.app.wallets, this.address);
+    const contract = await this._Members.api.attachSigner(this.app.wallets, this.address);
     if (!(await this._Members.isMember(this.address))) {
       throw new Error('caller must be member');
     }
@@ -96,7 +96,7 @@ export default class MolochMember extends EthereumAccount {
       throw new Error('other member already using delegate key');
     }
 
-    const tx = await this._Members.api.Contract.updateDelegateKey(
+    const tx = await contract.updateDelegateKey(
       delegateKey,
       { gasLimit: this._Members.api.gasLimit }
     );
@@ -112,7 +112,7 @@ export default class MolochMember extends EthereumAccount {
 
 
   public async ragequitTx(sharesToBurn: BN) {
-    this._Members.api.attachSigner(this.app.wallets, this.address);
+    const contract = await this._Members.api.attachSigner(this.app.wallets, this.address);
     if (!(await this._Members.isMember(this.address))) {
       throw new Error('sender must be member');
     }
@@ -129,7 +129,7 @@ export default class MolochMember extends EthereumAccount {
       throw new Error('must wait for last YES-voted proposal to process');
     }
 
-    const tx = await this._Members.api.Contract.ragequit(
+    const tx = await contract.ragequit(
       sharesToBurn.toString(),
       { gasLimit: this._Members.api.gasLimit }
     );

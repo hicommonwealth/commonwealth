@@ -66,7 +66,7 @@ export default class MarlinGovernance extends ProposalModule<
 
   public async propose(args: MarlinProposalArgs) {
     const address = this.app.user.activeAccount.address;
-    this.api.attachSigner(this.app.wallets, address);
+    const contract = await this.api.attachSigner(this.app.wallets, address, this._api.governorAlphaContract);
 
     const { targets, values, signatures, calldatas, description } = args;
     if (!targets || !values || !signatures || !calldatas || !description) return;
@@ -80,7 +80,7 @@ export default class MarlinGovernance extends ProposalModule<
       throw new Error('applicant cannot be 0');
     }
 
-    const tx = await this._api.governorAlphaContract.propose(
+    const tx = await contract.propose(
       targets, values, signatures, calldatas, description,
       { gasLimit: this._api.gasLimit },
     );
