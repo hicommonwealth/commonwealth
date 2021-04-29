@@ -171,7 +171,7 @@ const TokensCreatorComponent: m.Component<IAttrs, IState> = {
                     id: creator.card.id,
                   },
                   m('img', {
-                    class: 'block max-w-2xl w-full h-auto',
+                    class: `${vnode.state.chainCardImageActiveById === creator.card.id ? 'block' : 'hidden'} block max-w-2xl w-full h-auto`,
                     src: creator.card.imgSrc,
                     alt: creator.card.imgAlt,
                   })

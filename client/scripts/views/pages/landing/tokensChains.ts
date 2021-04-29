@@ -31,7 +31,7 @@ const TokensChainsComponent: m.Component<IState, IState> = {
           m(
             'h2',
             {
-              class: 'text-3xl text-left font-extrabold mb-5 md:text-center',
+              class: 'text-3xl text-left font-extrabold mb-5 text-center',
             },
             ' Every Token. Every Chain. '
           ),
@@ -39,7 +39,7 @@ const TokensChainsComponent: m.Component<IState, IState> = {
             'p',
             {
               class:
-                'text-left max-w-screen-md mx-auto text-2xl md:text-center',
+                'text-left max-w-screen-md mx-auto text-2xl text-center',
             },
             ' With Commonwealth, any token holder can drive their community. Subscribe to chain activity like whale transfers or new votes, discuss new ideas, crowdfund community projects, and access native governance for Layer 1s and NFTs alike. '
           ),

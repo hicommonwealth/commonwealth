@@ -90,13 +90,13 @@ const LandingPage: m.Component<{}, IState> = {
     return m('.LandingPage', { class: 'bg-primary' }, [
       m(
         'div',
-        { class: 'absolute w-screen z-20 mt-8' },
+        { class: 'absolute w-screen z-20' },
         m(HeaderLandingPage, {
           navs: [
-            // { text: 'Why Commonwealth?', ref: '' },
-            // { text: 'Use Cases', ref: '' },
-            // { text: 'Crowdfunding', ref: '' },
-            // { text: 'Developers', ref: '' },
+            { text: 'Why Commonwealth?', ref: '' },
+            { text: 'Use Cases', ref: '' },
+            { text: 'Crowdfunding', ref: '' },
+            { text: 'Developers', ref: '' },
           ],
         })
       ),
