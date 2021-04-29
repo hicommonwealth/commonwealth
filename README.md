@@ -175,7 +175,7 @@ heroku config:set [Set up session secrets, API keys, OAuth tokens, etc.]
 heroku addons:create timber-logging       # Set up a logging service
 heroku features:enable preboot            # Set up preboot (old deploys will not shut down until the new deploys are receiving requests)
 heroku addons:create scheduler:standard   # Set up schedule
-yarn deploy
+git push heroku master
 ```
 
 You should now set up any databases and services needed. In particular:
