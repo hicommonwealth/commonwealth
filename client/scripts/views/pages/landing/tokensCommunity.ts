@@ -129,18 +129,18 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
               [
                 m('img', {
                   class:
-                    'absolute object-top transform translate-y-16 translate-x-64 left-10 max-w-none max-h-none h-auto w-629 xl:left-36 mt-10 sm:mt-0"',
+                    'absolute object-top transform sm:translate-x-16 md:translate-x-64 lg:translate-x-48 translate-y-16 sm:translate-y-40 md:translate-y-32 lg:translate-y-32 left-10 max-w-none max-h-none h-auto w-629 xl:left-36 mt-10 sm:mt-0',
                   src: 'static/img/discussions.svg',
                   alt: '',
                 }),
                 m('img', {
-                  class: 'absolute object-bottom bottom-0 transform translate-x-64 -translate-y-8 lg:left-32 w-350',
+                  class: 'absolute object-bottom bottom-0 transform sm:translate-x-16 md:translate-x-8 lg:translate-x-64 -translate-y-8 lg:left-32 w-350',
                   src: 'static/img/notification.svg',
                   alt: '',
                 }),
                 m('img', {
                   class:
-                    'absolute top-1/2 transform translate-y-64 sm:translate-y-48 translate-x-8 sm:-translate-x-8 w-400',
+                    'absolute top-1/2 transform sm:translate-y-16 md:translate-y-48 lg:translate-y-64  translate-x-8 sm:-translate-x-8 w-400',
                   src: 'static/img/discussion.svg',
                   alt: '',
                 }),

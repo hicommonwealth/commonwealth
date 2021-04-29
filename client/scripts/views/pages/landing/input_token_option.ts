@@ -1,9 +1,11 @@
 import m from 'mithril';
 
+const ADD_TOKEN_LINK = 'https://hicommonwealth.typeform.com/to/cRP27Rp5';
+
 interface IAttrs {
   iconImg: string;
   text: string;
-  id: string
+  id: string;
 }
 
 const InputTokenOptionComponent: m.Component<IAttrs, {}> = {
@@ -14,9 +16,14 @@ const InputTokenOptionComponent: m.Component<IAttrs, {}> = {
         'button',
         {
           onclick: (e) => {
-            e.preventDefault();
-            localStorage['home-scrollY'] = window.scrollY;
-            m.route.set(`/${vnode.attrs.id}`);
+            if (vnode.attrs.id === 'placeholder') {
+              e.preventDefault();
+              window.location.href = ADD_TOKEN_LINK;
+            } else {
+              e.preventDefault();
+              localStorage['home-scrollY'] = window.scrollY;
+              m.route.set(`/${vnode.attrs.id}`);
+            }
           },
           class:
             'p-3 rounded hover:bg-gray-100 flex flex-grow items-center flex-row text-left leading-none w-full justify-between focus:outline-none',
