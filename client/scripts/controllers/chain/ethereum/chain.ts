@@ -62,59 +62,15 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
   public get totalbalance() { return this._totalbalance; }
 
   public async initApi(node?: NodeInfo): Promise<any> {
-    // initialize wallet first to check for web3 connection
-    // TODO: support other web wallets, and also have a priority list?
-    const availableWallets = this.app.wallets.availableWallets(ChainBase.Ethereum);
-    const metamaskWallet = availableWallets.find((w) => w instanceof MetamaskWebWalletController);
-    if (metamaskWallet && !metamaskWallet.enabling && !metamaskWallet.enabled) {
-      await metamaskWallet.enable();
+    try {
+      const provider = new Web3.providers.WebsocketProvider(node.url);
+      this._api = new Web3(provider);
+    } catch (error) {
+      console.log('Could not connect to Ethereum using remote node');
+      this.app.chain.networkStatus = ApiStatus.Disconnected;
+      throw error;
     }
 
-    // TODO: check for ethereum-local should probably be elsewhere
-    // TODO: for dapp browsers, we should fall back to infura if connecting via the JS window object fails
-    if (node.chain.id === 'ethereum-local') {
-      // Local node
-      try {
-        const localProvider = new Web3.providers.WebsocketProvider(node.url);
-        this._api = new Web3(localProvider);
-      } catch (error) {
-        console.log('Could not connect to Ethereum using local node');
-        this.app.chain.networkStatus = ApiStatus.Disconnected;
-        throw error;
-      }
-    } else if (metamaskWallet) {
-      // Dapp browsers
-      const provider = (metamaskWallet as MetamaskWebWalletController).provider;
-      console.log('Connecting to Ethereum via Metamask');
-      try {
-        this._api = new Web3(provider);
-      } catch (error) {
-        console.log('Could not connect to Ethereum using injected web3');
-        this.app.chain.networkStatus = ApiStatus.Disconnected;
-        throw error;
-      }
-      // TODO: support other web wallets
-    } else if ((window as any).web3) {
-      // Legacy dapp browsers
-      try {
-        console.log('Connecting to Ethereum via legacy web3 object');
-        this._api = new Web3((window as any).web3.currentProvider);
-      } catch (error) {
-        console.log('Could not connect to Ethereum using injected web3');
-        this.app.chain.networkStatus = ApiStatus.Disconnected;
-        throw error;
-      }
-    } else {
-      // Non-dapp browsers, use Infura -> https://infura.io/docs/ethereum/wss/introduction
-      try {
-        const provider = new Web3.providers.WebsocketProvider(node.url);
-        this._api = new Web3(provider);
-      } catch (error) {
-        console.log('Could not connect to Ethereum using remote node');
-        this.app.chain.networkStatus = ApiStatus.Disconnected;
-        throw error;
-      }
-    }
     const isListening = await this._api.eth.net.isListening();
     // TODO: what should we do with the result?
 
