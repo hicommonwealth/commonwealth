@@ -13,7 +13,7 @@ interface IState {
 }
 
 // eslint-disable-next-line max-len
-const INITIAL_HEADER_STYLE = 'bg-white lg:flex lg:flex-row lg:justify-between lg:items-center p-4 px-10 rounded-full shadow-lg transition transition-all duration-1000';
+const INITIAL_HEADER_STYLE = 'bg-white static lg:flex lg:flex-row lg:justify-between lg:items-center p-4 px-10 rounded-full shadow-lg transition transition-all duration-1000 mt-8';
 
 window.onscroll = (e: any): void => {
   if (window.scrollY > 50) {
@@ -25,7 +25,7 @@ window.onscroll = (e: any): void => {
   if (window.scrollY - window.innerHeight > 0) {
     document.getElementById(
       'landing-page'
-    ).className = `header-hidden static${INITIAL_HEADER_STYLE} transform -translate-y-8`;
+    ).className = `header-hidden ${INITIAL_HEADER_STYLE} transform -translate-y-8`;
   }
 };
 
@@ -33,12 +33,12 @@ const HeaderLandingPage: m.Component<IAttrs, IState> = {
   view: (vnode) => {
     return m(
       'div',
-      { class: 'container mx-auto mt-8' },
+      { class: 'container mx-auto' },
       m(
         'header',
         {
           id: 'landing-page',
-          class: 'bg-white lg:flex lg:flex-row lg:justify-between lg:items-center p-4 px-10 rounded-full shadow-lg',
+          class: INITIAL_HEADER_STYLE,
         },
         [
           m('img', {
