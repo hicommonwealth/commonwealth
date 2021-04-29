@@ -54,7 +54,7 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
     await this.chain.initMetadata();
     const governorAlphaContractAddress = '0x777992c2E4EDF704e49680468a9299C6679e37F6';
     const api = new MarlinAPI(
-      new MPondFactory(),
+      MPondFactory.connect,
       this.meta.address,
       governorAlphaContractAddress,
       this.chain.api.currentProvider as any

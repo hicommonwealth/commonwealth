@@ -1,8 +1,13 @@
-import { Web3Provider, AsyncSendable } from 'ethers/providers';
-import { ethers, Contract, ContractFactory, Signer } from 'ethers';
+import { Web3Provider, AsyncSendable, JsonRpcSigner, Provider } from 'ethers/providers';
+import { ethers, Contract } from 'ethers';
 
 import { Erc20 } from 'Erc20';
 import { Erc20Factory } from 'Erc20Factory';
+import { ChainBase, IWebWallet } from 'models';
+import WebWalletController from 'controllers/app/web_wallets';
+import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web_wallet';
+
+export type ContractFactoryT<ContractT> = (address: string, provider: Provider) => ContractT;
 
 class ContractApi<ContractT extends Contract> {
   public readonly gasLimit: number = 3000000;
@@ -17,18 +22,46 @@ class ContractApi<ContractT extends Contract> {
   public get Provider(): Web3Provider { return this._Provider; }
   public get tokenContract() { return this._tokenContract; }
 
-  constructor(factory: ContractFactory, contractAddress: string, web3Provider: AsyncSendable) {
+  constructor(
+    factory: ContractFactoryT<ContractT>,
+    contractAddress: string,
+    web3Provider: AsyncSendable
+  ) {
     this._contractAddress = contractAddress.toLowerCase();
     this._Provider = new ethers.providers.Web3Provider(web3Provider);
-    this._Contract = factory.attach(contractAddress) as ContractT;
+    this._Contract = factory(this._contractAddress, this._Provider);
   }
 
-  public attachSigner(sender: string, signer?: Signer): void {
-    if (!signer) {
-      signer = this._Provider.getSigner(sender);
-      if (!signer) {
-        throw new Error('Could not get signer.');
+  public async attachSigner(wallets: WebWalletController, sender: string): Promise<void> {
+    const availableWallets = wallets.availableWallets(ChainBase.Ethereum);
+    if (availableWallets.length === 0) {
+      throw new Error('No wallet available');
+    }
+
+    let signingWallet: IWebWallet<string>;
+    for (const wallet of availableWallets) {
+      if (!wallet.enabled) {
+        await wallet.enable();
       }
+      // TODO: ensure that we can find a wallet
+      if (wallet.accounts.find((acc) => acc === sender)) {
+        signingWallet = wallet;
+      }
+    }
+    if (!signingWallet) {
+      throw new Error('TX sender not found in wallet');
+    }
+
+    let signer: JsonRpcSigner;
+    if (signingWallet instanceof MetamaskWebWalletController) {
+      const walletProvider = new ethers.providers.Web3Provider(signingWallet.provider as any);
+      signer = walletProvider.getSigner(sender);
+    } else {
+      throw new Error('Unsupported wallet');
+    }
+
+    if (!signer) {
+      throw new Error('Could not get signer.');
     }
     this._Contract.connect(signer);
   }

@@ -66,7 +66,7 @@ export default class MarlinGovernance extends ProposalModule<
 
   public async propose(args: MarlinProposalArgs) {
     const address = this.app.user.activeAccount.address;
-    this.api.attachSigner(address);
+    this.api.attachSigner(this.app.wallets, address);
 
     const { targets, values, signatures, calldatas, description } = args;
     if (!targets || !values || !signatures || !calldatas || !description) return;

@@ -75,7 +75,7 @@ export default class MolochMember extends EthereumAccount {
   }
 
   public async updateDelegateKeyTx(delegateKey: string) {
-    this._Members.api.attachSigner(this.address);
+    this._Members.api.attachSigner(this.app.wallets, this.address);
     if (!(await this._Members.isMember(this.address))) {
       throw new Error('caller must be member');
     }
@@ -112,7 +112,7 @@ export default class MolochMember extends EthereumAccount {
 
 
   public async ragequitTx(sharesToBurn: BN) {
-    this._Members.api.attachSigner(this.address);
+    this._Members.api.attachSigner(this.app.wallets, this.address);
     if (!(await this._Members.isMember(this.address))) {
       throw new Error('sender must be member');
     }

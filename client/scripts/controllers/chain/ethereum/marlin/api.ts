@@ -1,11 +1,10 @@
 import { AsyncSendable } from 'ethers/providers';
 
 import { MPond } from 'MPond';
-import { MPondFactory } from 'MPondFactory';
 import { GovernorAlpha } from 'GovernorAlpha';
 import { GovernorAlphaFactory } from 'GovernorAlphaFactory';
 
-import ContractApi from 'controllers/chain/ethereum/contractApi';
+import ContractApi, { ContractFactoryT } from 'controllers/chain/ethereum/contractApi';
 
 export default class MarlinAPI extends ContractApi<MPond> {
   private _GovernorAlphaAddress: string;
@@ -18,15 +17,14 @@ export default class MarlinAPI extends ContractApi<MPond> {
   public get symbol(): string { return this._Symbol; }
 
   constructor(
-    factory: MPondFactory,
+    factory: ContractFactoryT<MPond>,
     mPondAddress: string,
     governorAlphaAddress: string,
     web3Provider: AsyncSendable,
   ) {
     super(factory, mPondAddress, web3Provider);
     this._GovernorAlphaAddress = governorAlphaAddress.toLowerCase();
-    const governorAlphaFactory = new GovernorAlphaFactory();
-    this._GovernorAlphaContract = governorAlphaFactory.attach(governorAlphaAddress);
+    this._GovernorAlphaContract = GovernorAlphaFactory.connect(governorAlphaAddress, this.Provider);
   }
 
   public async init() {

@@ -4,8 +4,7 @@ import app from 'state';
 import Web3 from 'web3';
 import { provider } from 'web3-core';
 import { Account, ChainBase, IWebWallet } from 'models';
-import Ethereum from 'controllers/chain/ethereum/main';
-import { setActiveAccount } from './login';
+import { setActiveAccount } from 'controllers/app/login';
 
 // TODO: make this a generic controller, it's shared with polkadotJS right now
 class MetamaskWebWalletController implements IWebWallet<string> {

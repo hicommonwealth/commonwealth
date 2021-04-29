@@ -314,7 +314,7 @@ export default class MolochProposal extends Proposal<
   // web wallet TX only
   public async submitVoteWebTx(vote: MolochProposalVote) {
     const address = vote.account.address;
-    this._Members.api.attachSigner(address);
+    this._Members.api.attachSigner(this._Members.app.wallets, address);
 
     if (!(await this._Members.isDelegate(address))) {
       throw new Error('sender must be valid delegate');
@@ -360,7 +360,7 @@ export default class MolochProposal extends Proposal<
   public async processTx() {
     // TODO: is this the correct user to process?
     const address = this.author.address;
-    this._Members.api.attachSigner(address);
+    this._Members.api.attachSigner(this._Members.app.wallets, address);
 
     if (this.state !== MolochProposalState.ReadyToProcess) {
       throw new Error('proposal not ready to process');
@@ -379,7 +379,7 @@ export default class MolochProposal extends Proposal<
 
   public async abortTx() {
     const address = this.applicantAddress;
-    this._Members.api.attachSigner(address);
+    this._Members.api.attachSigner(this._Members.app.wallets, address);
 
     if (this.isAborted) {
       throw new Error('proposal already aborted');

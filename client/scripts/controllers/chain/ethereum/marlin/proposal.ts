@@ -233,7 +233,7 @@ export default class MarlinProposal extends Proposal<
   // web wallet TX only
   public async submitVoteWebTx(vote: MarlinProposalVote) {
     const address = vote.account.address;
-    this._Gov.api.attachSigner(address);
+    this._Gov.api.attachSigner(this._Gov.app.wallets, address);
     if (!(await this._Holders.isDelegate(address))) {
       throw new Error('sender must be valid delegate');
     }
