@@ -63,6 +63,7 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
     return new Promise((resolve, reject) => {
       // TODO: check for ethereum-local should probably be elsewhere
       // TODO: for dapp browsers, we should fall back to infura if connecting via the JS window object fails
+      // TODO: we may want to integrate the metamask code here with the webWallet API
       if (node.chain.id === 'ethereum-local') {
         // Local node
         try {

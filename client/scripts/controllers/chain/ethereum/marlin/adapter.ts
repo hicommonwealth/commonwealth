@@ -1,13 +1,12 @@
 // import { MarlinTypes } from '@commonwealth/chain-events';
-import { MPond, EthereumCoin } from 'adapters/chain/ethereum/types';
+import { EthereumCoin } from 'adapters/chain/ethereum/types';
+import { MPondFactory } from 'MPondFactory';
 
 import MetamaskWebWalletController from 'controllers/app/metamask_web_wallet';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
-import EthereumChain from 'controllers/chain/ethereum/chain';
 import { ChainBase, ChainClass, IChainAdapter, ChainEntity, ChainEvent, NodeInfo } from 'models';
 
-import { setActiveAccount } from 'controllers/app/login';
 import ChainEntityController from 'controllers/server/chain_entities';
 import { IApp } from 'state';
 
@@ -16,7 +15,6 @@ import { MarlinTypes } from '@commonwealth/chain-events';
 import MarlinAPI from './api';
 import MarlinChain from './chain';
 import MarlinGovernance from './governance';
-import MarlinProposal from './proposal';
 import MarlinHolders from './holders';
 
 export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount> {
@@ -54,22 +52,18 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
   public async initApi() {
     await this.chain.resetApi(this.meta);
     await this.chain.initMetadata();
-    // TODO: enable metamask
-    const activeAddress: string = await this.webWallet.accounts[0];
-    const mpondContractAddress = this.meta.address;
     const governorAlphaContractAddress = '0x777992c2E4EDF704e49680468a9299C6679e37F6';
     const api = new MarlinAPI(
+      new MPondFactory(),
       this.meta.address,
       governorAlphaContractAddress,
-      this.chain.api.currentProvider as any,
-      activeAddress,
+      this.chain.api.currentProvider as any
     );
     await api.init().catch((e) => {
       this._failed = true;
       notifyError('Please change your Metamask network');
     });
     this.chain.marlinApi = api;
-    // TODO: enable metamask listener
     await this.marlinAccounts.init(api);
     this.block.height = await api.Provider.getBlockNumber(); // TODO: Fix the global eth block height setting
     await super.initApi();

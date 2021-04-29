@@ -2,7 +2,7 @@ declare let window: any;
 
 import app from 'state';
 import Web3 from 'web3';
-import { Account, ChainBase, ISignerApi, IWebWallet } from 'models';
+import { Account, ChainBase, IWebWallet } from 'models';
 import Ethereum from 'controllers/chain/ethereum/main';
 import { setActiveAccount } from './login';
 
@@ -47,7 +47,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
   }
 
   // ACTIONS
-  public async enable(api?: ISignerApi) {
+  public async enable() {
     console.log('Attempting to enable ETH web wallet');
     // (this needs to be called first, before other requests)
     this._web3 = (app.chain.id === 'ethereum-local')
@@ -60,19 +60,16 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     const balance = await this._web3.eth.getBalance(this._accounts[0]);
     console.log(balance);
 
-    // TODO: reenable this to ensure that api is enabled before wallet
-    // await this.initAccountsChanged(api);
+    await this.initAccountsChanged();
     this._enabled = true;
   }
 
-  public async initAccountsChanged(api?: ISignerApi) {
+  public async initAccountsChanged() {
     await this.web3.givenProvider.on('accountsChanged', async (accounts: string[]) => {
+      // TODO: ensure this is correct -- doesn't cause signing issues on Moloch etc
       const updatedAddress = app.user.activeAccounts.find((addr) => addr.address === accounts[0]);
       if (!updatedAddress) return;
       await setActiveAccount(updatedAddress);
-      if (api) {
-        api.updateSigner(accounts[0]);
-      }
     });
   }
 }

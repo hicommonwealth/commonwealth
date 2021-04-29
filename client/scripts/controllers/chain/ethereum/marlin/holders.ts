@@ -66,7 +66,7 @@ export default class MarlinHolders implements IAccountsModule<EthereumCoin, Marl
 
   public async senderSetDelegate(address: string, amount: number) {
     try {
-      await this.api.mPondContract.delegate(address, amount);
+      await this.api.Contract.delegate(address, amount);
     } catch (e) {
       console.error(e);
       throw new Error(e);
@@ -88,15 +88,13 @@ export default class MarlinHolders implements IAccountsModule<EthereumCoin, Marl
     // }
   }
 
-  public async isSenderHolder(): Promise<boolean> {
-    const sender = this._api.userAddress;
-    const m = await this._api.mPondContract.balances(sender);
+  public async isHolder(address: string): Promise<boolean> {
+    const m = await this._api.Contract.balances(address);
     return !m.isZero();
   }
 
-  public async isSenderDelegate(): Promise<boolean> {
-    const sender = this._api.userAddress;
-    const delegator = await this._api.mPondContract.getCurrentVotes(sender);
+  public async isDelegate(address: string): Promise<boolean> {
+    const delegator = await this._api.Contract.getCurrentVotes(address);
     return !delegator.isZero();
   }
 }

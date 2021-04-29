@@ -35,12 +35,9 @@ export default class Commonwealth extends IChainAdapter<EthereumCoin, EthereumAc
     await this.chain.resetApi(this.meta);
     await this.chain.initMetadata();
     await this.ethAccounts.init(this.chain);
-    // TODO: enable metamask
-    const activeAddress: string = this.webWallet.accounts && this.webWallet.accounts[0];
-    const api = new CommonwealthAPI(this.meta.address, this.chain.api.currentProvider as any, activeAddress);
+    const api = new CommonwealthAPI(null, this.meta.address, this.chain.api.currentProvider as any);
     await api.init();
     this.chain.commonwealthApi = api;
-    // TODO: enable metamask listener
     await this.accounts.init(api, this.chain, this.ethAccounts);
     await super.initApi();
   }

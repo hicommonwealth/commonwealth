@@ -118,7 +118,8 @@ export default class MolochGovernance extends ProposalModule<
     sharesRequested: BN,
     details: string,
   ) {
-    if (!(await this._Members.isSenderDelegate())) {
+    this.api.attachSigner(submitter.address);
+    if (!(await this._Members.isDelegate(submitter.address))) {
       throw new Error('sender must be valid delegate');
     }
 

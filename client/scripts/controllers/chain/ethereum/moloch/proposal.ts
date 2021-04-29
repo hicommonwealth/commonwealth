@@ -313,7 +313,10 @@ export default class MolochProposal extends Proposal<
 
   // web wallet TX only
   public async submitVoteWebTx(vote: MolochProposalVote) {
-    if (!(await this._Members.isSenderDelegate())) {
+    const address = vote.account.address;
+    this._Members.api.attachSigner(address);
+
+    if (!(await this._Members.isDelegate(address))) {
       throw new Error('sender must be valid delegate');
     }
 
@@ -326,7 +329,7 @@ export default class MolochProposal extends Proposal<
     }
 
     const prevVote = await this._Gov.api.Contract.getMemberProposalVote(
-      this._Gov.api.userAddress,
+      address,
       this.data.identifier
     );
     if (prevVote === 1 || prevVote === 2) {
@@ -355,6 +358,10 @@ export default class MolochProposal extends Proposal<
   }
 
   public async processTx() {
+    // TODO: is this the correct user to process?
+    const address = this.author.address;
+    this._Members.api.attachSigner(address);
+
     if (this.state !== MolochProposalState.ReadyToProcess) {
       throw new Error('proposal not ready to process');
     }
@@ -371,6 +378,9 @@ export default class MolochProposal extends Proposal<
   }
 
   public async abortTx() {
+    const address = this.applicantAddress;
+    this._Members.api.attachSigner(address);
+
     if (this.isAborted) {
       throw new Error('proposal already aborted');
     }
@@ -379,7 +389,7 @@ export default class MolochProposal extends Proposal<
       throw new Error('proposal not in abort window');
     }
 
-    if (this._Gov.api.userAddress.toLowerCase() !== this.applicantAddress.toLowerCase()) {
+    if (address.toLowerCase() !== this.applicantAddress.toLowerCase()) {
       throw new Error('only applicant can abort');
     }
 

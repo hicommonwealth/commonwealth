@@ -65,15 +65,18 @@ export default class MarlinGovernance extends ProposalModule<
   // PROPOSE
 
   public async propose(args: MarlinProposalArgs) {
+    const address = this.app.user.activeAccount.address;
+    this.api.attachSigner(address);
+
     const { targets, values, signatures, calldatas, description } = args;
     if (!targets || !values || !signatures || !calldatas || !description) return;
-    if (!(await this._Holders.isSenderDelegate())) throw new Error('sender must be valid delegate');
-    const priorDelegates = await this._Holders.get(this._api.userAddress)
+    if (!(await this._Holders.isDelegate(address))) throw new Error('sender must be valid delegate');
+    const priorDelegates = await this._Holders.get(address)
       .priorDelegates(this._api.Provider.blockNumber);
     if (this.proposalThreshold < priorDelegates) {
       throw new Error('sender must have requisite delegates');
     }
-    if (parseInt(this._api.userAddress, 16) === 0) {
+    if (parseInt(address, 16) === 0) {
       throw new Error('applicant cannot be 0');
     }
 
