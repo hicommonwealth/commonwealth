@@ -15,7 +15,7 @@ import PageNotFound from 'views/pages/404';
 import PageLoading from 'views/pages/loading';
 import Tabs from 'views/components/widgets/tabs';
 
-import { decodeAddress } from '@polkadot/keyring';
+import { decodeAddress, checkAddress, encodeAddress } from '@polkadot/util-crypto';
 import { setActiveAccount } from 'controllers/app/login';
 import ProfileHeader from './profile_header';
 import ProfileContent from './profile_content';
@@ -245,15 +245,24 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
         if (chainInfo?.base === ChainBase.Substrate) {
           try {
             // TODO: should we enforce specific chain checksums here?
-            decodeAddress(address);
-            vnode.state.account = {
-              profile: null,
-              chain,
-              address,
-              id: null,
-              name: null,
-              user_id: null,
-            };
+            const decodedAddress = decodeAddress(address);
+            const ss58Prefix = parseInt(chainInfo.ss58Prefix, 10);
+
+            const [valid] = checkAddress(address, ss58Prefix);
+
+            if (!valid) {
+              const encoded = encodeAddress(decodedAddress, ss58Prefix);
+              m.route.set(`/${m.route.param('scope')}/account/${encoded}?base=${m.route.param('base')}`);
+            } else {
+              vnode.state.account = {
+                profile: null,
+                chain,
+                address,
+                id: null,
+                name: null,
+                user_id: null,
+              };
+            }
           } catch (e) {
             // do nothing if can't decode
           }
