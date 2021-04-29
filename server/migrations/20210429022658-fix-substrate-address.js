@@ -7,8 +7,10 @@ module.exports = {
     const addresses = await queryInterface.sequelize.query('SELECT id, address, chain FROM "Addresses";');
     const chains = await queryInterface.sequelize.query('SELECT id, network, base, ss58_prefix FROM "Chains";');
     const promises = [];
+    const removeAddressIds = [];
 
-    addresses[0].map(async ({ id, address, chain }) => {
+    for (const addr of addresses[0]) {
+      const { id, address, chain } = addr;
       const ch = chains[0].find((_) => _.network === chain);
       if (ch && ch.base === 'substrate' && !!ch.ss58_prefix) {
         let decodedAddress;
@@ -25,12 +27,7 @@ module.exports = {
             const encoded = encodeAddress(decodedAddress, ch.ss58_prefix);
             const duplicated = await queryInterface.sequelize.query(`SELECT id FROM "Addresses" WHERE address='${encoded}' AND chain='${chain}';`);
             if (duplicated[0] && duplicated[0].length) {
-              await queryInterface.sequelize.query(`DELETE FROM "OffchainProfiles" WHERE address_id='${id}';`);
-              await queryInterface.sequelize.query(`DELETE FROM "Roles" WHERE address_id='${id}';`);
-              await queryInterface.sequelize.query(`DELETE FROM "Collaborations" WHERE address_id='${id}';`);
-              await queryInterface.sequelize.query(`DELETE FROM "OffchainThreads" WHERE address_id='${id}';`);
-              await queryInterface.sequelize.query(`DELETE FROM "OffchainReactions" WHERE address_id='${id}';`);
-              promises.push(queryInterface.sequelize.query(`DELETE FROM "Addresses" WHERE id='${id}';`));
+              removeAddressIds.push(id);
             } else {
               promises.push(
                 queryInterface.sequelize.query('UPDATE "Addresses" SET address=:address WHERE id=:id;', {
@@ -44,7 +41,31 @@ module.exports = {
           }
         }
       }
-    });
+    }
+
+    if (removeAddressIds.length) {
+      const payload = removeAddressIds.join(', ');
+      await queryInterface.sequelize.query(`DELETE FROM "OffchainProfiles" WHERE address_id IN (${payload});`);
+      await queryInterface.sequelize.query(`DELETE FROM "Roles" WHERE address_id IN (${payload});`);
+      await queryInterface.sequelize.query(`DELETE FROM "Collaborations" WHERE address_id IN (${payload});`);
+
+      const threads = await queryInterface.sequelize.query(`SELECT id FROM "OffchainThreads" WHERE address_id IN (${payload});`);
+      const comments = await queryInterface.sequelize.query(`SELECT id FROM "OffchainComments" WHERE address_id IN (${payload});`);
+
+      if (threads[0] && threads[0].length) {
+        const threadIds = threads[0].map((_) => _.id).join(', ');
+        await queryInterface.sequelize.query(`DELETE FROM "OffchainReactions" WHERE thread_id IN (${threadIds});`);
+        await queryInterface.sequelize.query(`DELETE FROM "OffchainThreads" WHERE id IN (${threadIds});`);
+      }
+
+      if (comments[0] && comments[0].length) {
+        const commentIds = comments[0].map((_) => _.id).join(', ');
+        await queryInterface.sequelize.query(`DELETE FROM "OffchainReactions" WHERE comment_id IN (${commentIds});`);
+        await queryInterface.sequelize.query(`DELETE FROM "OffchainComments" WHERE id IN (${commentIds});`);
+      }
+
+      await queryInterface.sequelize.query(`DELETE FROM "Addresses" WHERE id IN (${payload});`);
+    }
 
     console.log('affected addresses count: ', promises.length);
 
