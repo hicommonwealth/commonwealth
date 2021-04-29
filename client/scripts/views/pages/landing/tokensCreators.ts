@@ -86,6 +86,8 @@ const TokensCreatorComponent: m.Component<IAttrs, IState> = {
             'bg-gray-900 rounded-3xl p-3 lg:p-6 relative min-h-tabs lg:flex lg:flex-col lg:h-full mt-4',
         },
         [
+          // chainsCrodfunding and this are basically the same
+          // @TODO Component it
           vnode.state.creators.map((creator: any) => {
             return m(
               'li',
@@ -93,7 +95,10 @@ const TokensCreatorComponent: m.Component<IAttrs, IState> = {
               m('div', { class: 'lg:flex lg:flex-row' }, [
                 m(
                   'div.TokensCreatorsText',
-                  { class: 'lg:w-1/3 lg:mr-5 xl:mr-20 rounded-2xl' },
+                  {
+                    class:
+                      'lg:w-1/3 lg:mr-5 xl:mr-20 rounded-2xl transition hover:transition-all duration-500',
+                  },
                   m(
                     'button',
                     {
@@ -101,7 +106,7 @@ const TokensCreatorComponent: m.Component<IAttrs, IState> = {
                         vnode.state.buttonHoverActiveById === creator.button.id
                           ? 'bg-gray-500'
                           : ''
-                      }`,
+                      } transition transition-all duration-700`,
                       id: creator.button.id,
                       onclick: () => {
                         removeOrAddClasslistFromChains(
@@ -116,7 +121,7 @@ const TokensCreatorComponent: m.Component<IAttrs, IState> = {
                         );
 
                         const filteredCreators = vnode.state.creators.filter(
-                          (creatoarToFilter) => creatoarToFilter !== creator
+                          (creatorToFilter) => creatorToFilter !== creator
                         );
 
                         removeOrAddClasslistFromChains(
@@ -167,11 +172,15 @@ const TokensCreatorComponent: m.Component<IAttrs, IState> = {
                       vnode.state.chainCardImageActiveById === creator.card.id
                         ? 'block'
                         : 'invisible'
-                    } flex justify-center lg:w-2/3 lg:absolute lg:w-2/3 lg:right-0 lg:top-0`,
+                    }  lg:w-2/3 lg:absolute lg:w-2/3 lg:right-0 lg:top-0`,
                     id: creator.card.id,
                   },
-                  m('img', {
-                    class: `${vnode.state.chainCardImageActiveById === creator.card.id ? 'block' : 'hidden'} block max-w-2xl w-full h-auto`,
+                  m('img.TokensCreatorsImage', {
+                    class: `${
+                      vnode.state.chainCardImageActiveById === creator.card.id
+                        ? 'block'
+                        : 'hidden'
+                    } block max-w-2xl w-full h-auto`,
                     src: creator.card.imgSrc,
                     alt: creator.card.imgAlt,
                   })

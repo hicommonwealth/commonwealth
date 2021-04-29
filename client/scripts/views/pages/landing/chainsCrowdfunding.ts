@@ -76,6 +76,8 @@ const ChainsCrowdfundingComponent: m.Component<IAttrs, IState> = {
               'bg-white rounded-3xl p-3 lg:p-6 relative min-h-tabs lg:flex lg:flex-col lg:h-full mt-20',
           },
           [
+            // tokensCreators and this are basically the same
+            // @TODO Component it
             vnode.state.chains.map((chain: any) => {
               return m(
                 'li',
@@ -83,7 +85,7 @@ const ChainsCrowdfundingComponent: m.Component<IAttrs, IState> = {
                 m('div', { class: 'lg:flex lg:flex-row' }, [
                   m(
                     'div.ChainsCrowsfundingTextList',
-                    { class: 'lg:w-1/3 lg:mr-5 xl:mr-20 rounded-2xl' },
+                    { class: 'lg:w-1/3 lg:mr-5 xl:mr-20 rounded-2xl hover:transition-all duration-500' },
                     m(
                       'button',
                       {
@@ -91,7 +93,7 @@ const ChainsCrowdfundingComponent: m.Component<IAttrs, IState> = {
                           vnode.state.buttonHoverActiveById === chain.button.id
                             ? 'bg-gray-300'
                             : ''
-                        }`,
+                        } transition transition-all duration-1000`,
                         onclick: () => {
                           removeOrAddClasslistFromChains(
                             vnode.state.chains,
@@ -150,7 +152,7 @@ const ChainsCrowdfundingComponent: m.Component<IAttrs, IState> = {
                         vnode.state.chainCardImageActiveById === chain.card.id
                           ? 'block'
                           : 'hidden'
-                      } justify-center lg:w-2/3 lg:absolute lg:w-2/3 lg:right-0 lg:top-0`,
+                      } lg:w-2/3 lg:absolute lg:w-2/3 lg:right-0 lg:top-0`,
                       id: chain.card.id,
                     },
                     m('img.ChainsImage', {
