@@ -16,12 +16,16 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
   private _offlineSigner: OfflineSigner;
   private _accounts: readonly AccountData[];
   private _enabled: boolean;
+  private _enabling: boolean = false;
 
   public readonly label = 'Cosmos Wallet (keplr)';
   public readonly chain = ChainBase.CosmosSDK;
 
   public get available() {
     return window.getOfflineSigner && !!window.keplr;
+  }
+  public get enabling() {
+    return this._enabling;
   }
   public get enabled() {
     return this.available && this._enabled;
@@ -73,11 +77,18 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
     if (!chainId) return;
 
     // enable
-    await window.keplr.enable(chainId);
-    console.log(`Enabled web wallet for ${chainId}`);
-    this._offlineSigner = window.getOfflineSigner(chainId);
-    this._accounts = await this._offlineSigner.getAccounts();
-    this._enabled = true;
+    this._enabling = true;
+    try {
+      await window.keplr.enable(chainId);
+      console.log(`Enabled web wallet for ${chainId}`);
+      this._offlineSigner = window.getOfflineSigner(chainId);
+      this._accounts = await this._offlineSigner.getAccounts();
+      this._enabled = true;
+      this._enabling = false;
+    } catch (error) {
+      console.error('Failed to enable keplr wallet');
+      this._enabling = false;
+    }
   }
 }
 

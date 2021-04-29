@@ -11,6 +11,7 @@ import { setActiveAccount } from './login';
 class MetamaskWebWalletController implements IWebWallet<string> {
   // GETTERS/SETTERS
   private _enabled: boolean;
+  private _enabling: boolean = false;
   private _accounts: any[]; // Todo Typecasting...
   private _injectedAddress: string;
   private _provider: provider;
@@ -35,6 +36,10 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     return this.available && this._enabled;
   }
 
+  public get enabling() {
+    return this._enabling;
+  }
+
   public get accounts() {
     return this._accounts || [];
   }
@@ -57,26 +62,31 @@ class MetamaskWebWalletController implements IWebWallet<string> {
   // ACTIONS
   public async enable() {
     console.log('Attempting to enable ETH web wallet');
-    // (this needs to be called first, before other requests)
-    this._web3 = (app.chain.id === 'ethereum-local')
-      ? new (window as any).Web3((window as any).ethereum)
-      : (app.chain as Ethereum).chain.api;
-    await this._web3.givenProvider.enable();
+    this._enabling = true;
+    try {
+      // (this needs to be called first, before other requests)
+      this._web3 = new Web3((window as any).ethereum);
+      await this._web3.givenProvider.enable();
 
-    this._accounts = await this._web3.eth.getAccounts();
-    this._provider = this._web3.currentProvider;
-    const balance = await this._web3.eth.getBalance(this._accounts[0]);
-    console.log(balance);
+      this._accounts = await this._web3.eth.getAccounts();
+      this._provider = this._web3.currentProvider;
+      const balance = await this._web3.eth.getBalance(this._accounts[0]);
+      console.log(balance);
 
-    await this.initAccountsChanged();
-    this._enabled = true;
+      await this.initAccountsChanged();
+      this._enabled = true;
+      this._enabling = false;
+    } catch (error) {
+      console.error('Failed to enable ETH wallet');
+      this._enabling = false;
+    }
   }
 
   public async initAccountsChanged() {
     await this.web3.givenProvider.on('accountsChanged', async (accounts: string[]) => {
-      // TODO: ensure this is correct -- doesn't cause signing issues on Moloch etc
       const updatedAddress = app.user.activeAccounts.find((addr) => addr.address === accounts[0]);
       if (!updatedAddress) return;
+      // TODO: test this against token contract txs
       await setActiveAccount(updatedAddress);
     });
   }

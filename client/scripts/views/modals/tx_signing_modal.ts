@@ -252,11 +252,14 @@ const TXSigningWebWalletOption: m.Component<{
     const transact = async () => {
       const acct = vnode.attrs.author;
       try {
+        if (!webWallet.enabling && !webWallet.enabled) {
+          await webWallet.enable();
+        }
         const signer = await webWallet.getSigner(acct.address);
         setupEventListeners(vnode);
         vnode.attrs.txData.transact(acct.address, signer);
       } catch (e) {
-        console.log(e);
+        console.error(e);
       }
     };
     const isWebWalletAvailable = webWallet?.available;

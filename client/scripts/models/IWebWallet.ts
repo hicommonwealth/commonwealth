@@ -5,6 +5,7 @@ interface IWebWallet<AccountT extends { address: string } | string> {
   label: string;
   available: boolean;
   enabled: boolean;
+  enabling: boolean;
   accounts: readonly AccountT[];
   enable: () => Promise<void>;
   validateWithAccount: (account: Account<any>) => Promise<void>;

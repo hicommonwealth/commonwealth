@@ -66,7 +66,7 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
     // TODO: support other web wallets, and also have a priority list?
     const availableWallets = this.app.wallets.availableWallets(ChainBase.Ethereum);
     const metamaskWallet = availableWallets.find((w) => w instanceof MetamaskWebWalletController);
-    if (metamaskWallet && !metamaskWallet.enabled) {
+    if (metamaskWallet && !metamaskWallet.enabling && !metamaskWallet.enabled) {
       await metamaskWallet.enable();
     }
 

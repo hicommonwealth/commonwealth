@@ -13,6 +13,7 @@ class PolkadotWebWalletController implements IWebWallet<InjectedAccountWithMeta>
   private _enabled: boolean;
   private _accounts: InjectedAccountWithMeta[];
   private _injectedAddress: string;
+  private _enabling: boolean = false;
 
   public readonly label = 'polkadot-js';
   public readonly chain = ChainBase.Substrate;
@@ -22,6 +23,9 @@ class PolkadotWebWalletController implements IWebWallet<InjectedAccountWithMeta>
   }
   public get enabled() {
     return this.available && this._enabled;
+  }
+  public get enabling() {
+    return this._enabling;
   }
   public get accounts() {
     return this._accounts || [];
@@ -60,12 +64,20 @@ class PolkadotWebWalletController implements IWebWallet<InjectedAccountWithMeta>
 
     // returns an array of all the injected sources
     // (this needs to be called first, before other requests)
-    const injectedExtensionInfo = await web3Enable('commonwealth');
-    this._enabled = true;
+    this._enabling = true;
+    try {
+      const injectedExtensionInfo = await web3Enable('commonwealth');
 
-    // returns an array of { address, meta: { name, source } }
-    // meta.source contains the name of the extension that provides this account
-    this._accounts = await web3Accounts();
+      // returns an array of { address, meta: { name, source } }
+      // meta.source contains the name of the extension that provides this account
+      this._accounts = await web3Accounts();
+
+      this._enabled = true;
+      this._enabling = false;
+    } catch (error) {
+      console.error('Failed to enable polkadot wallet');
+      this._enabling = false;
+    }
   }
 }
 

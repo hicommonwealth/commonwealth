@@ -5,6 +5,7 @@ class NearWebWalletController implements IWebWallet<any> {
   public readonly label = 'NEAR Wallet';
   public readonly available = true;
   public readonly chain = ChainBase.NEAR;
+  public readonly enabling = false;
 
   private _enabled: boolean = false;
 
