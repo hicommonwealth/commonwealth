@@ -23,10 +23,22 @@ module.exports = {
         if (!valid) {
           try {
             const encoded = encodeAddress(decodedAddress, ch.ss58_prefix);
-            promises.push(queryInterface.sequelize.query('UPDATE "Addresses" SET address=:address WHERE id=:id;', {
-              replacements: { id, address: encoded },
-              type: queryInterface.sequelize.QueryTypes.UPDATE,
-            }));
+            const duplicated = await queryInterface.sequelize.query(`SELECT id FROM "Addresses" WHERE address='${encoded}' AND chain='${chain}';`);
+            if (duplicated[0] && duplicated[0].length) {
+              await queryInterface.sequelize.query(`DELETE FROM "OffchainProfiles" WHERE address_id='${id}';`);
+              await queryInterface.sequelize.query(`DELETE FROM "Roles" WHERE address_id='${id}';`);
+              await queryInterface.sequelize.query(`DELETE FROM "Collaborations" WHERE address_id='${id}';`);
+              await queryInterface.sequelize.query(`DELETE FROM "OffchainThreads" WHERE address_id='${id}';`);
+              await queryInterface.sequelize.query(`DELETE FROM "OffchainReactions" WHERE address_id='${id}';`);
+              promises.push(queryInterface.sequelize.query(`DELETE FROM "Addresses" WHERE id='${id}';`));
+            } else {
+              promises.push(
+                queryInterface.sequelize.query('UPDATE "Addresses" SET address=:address WHERE id=:id;', {
+                  replacements: { id, address: encoded },
+                  type: queryInterface.sequelize.QueryTypes.UPDATE,
+                })
+              );
+            }
           } catch (e) {
             console.error('failed to reencode address', e);
           }
