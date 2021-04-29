@@ -22,8 +22,8 @@ const InputTokenList: m.Component<IAttrs, {}> = {
     const options = vnode.attrs.optionList.map((option, index) => {
       if (index >= vnode.attrs.maxOptions) return;
 
-      const tokenNameSubstracted = option.id.substr(0, vnode.attrs.inputValue.length);
-      const tokenNameInputValue = vnode.attrs.inputValue;
+      const tokenNameSubstracted = option.id.substr(0, vnode.attrs.inputValue.length).toLowerCase();
+      const tokenNameInputValue = vnode.attrs.inputValue.toLowerCase();
 
       if (tokenNameSubstracted === tokenNameInputValue || option.placeholder) {
         return m(InputTokenOptionComponent, {
