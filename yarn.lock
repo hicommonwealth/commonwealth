@@ -2221,10 +2221,10 @@
   resolved "https://registry.yarnpkg.com/@types/minimist/-/minimist-1.2.0.tgz#69a23a3ad29caf0097f06eda59b361ee2f0639f6"
   integrity sha1-aaI6OtKcrwCX8G7aWbNh7i8GOfY=
 
-"@types/mithril@^2.0.2":
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/@types/mithril/-/mithril-2.0.2.tgz#29a6e32103769b29840ae25f5bf75bb382801a15"
-  integrity sha512-q0W5GGjWNxwmKPcfkkQJqSUIVr7yvMz1zH2enWDab8yDqvZuEgkR4+mcf1O70Wnreawg8OH4axfACDVdg2zskQ==
+"@types/mithril@^2.0.7":
+  version "2.0.7"
+  resolved "https://registry.yarnpkg.com/@types/mithril/-/mithril-2.0.7.tgz#e4016c79ce206621d7aee23de189faf7b007e0d5"
+  integrity sha512-ByD422x0GnYh5MOEAWNyqfkw2QlKkK3Yf7y5e1CobDVPG9m+/ThblfrIHENihF7VnygT6sQRObPvY1J/fUZICg==
 
 "@types/mixpanel-browser@^2.23.1":
   version "2.33.1"

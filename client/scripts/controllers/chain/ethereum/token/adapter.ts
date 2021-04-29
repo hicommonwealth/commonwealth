@@ -29,7 +29,6 @@ export default class Token extends IChainAdapter<EthereumCoin, EthereumAccount> 
 
   constructor(meta: NodeInfo, app: IApp) {
     super(meta, app);
-    this.webWallet = app.wallets.defaultWallet(this.base) as MetamaskWebWalletController;
     this.chain = new EthereumTokenChain(this.app);
     this.accounts = new EthereumAccounts(this.app);
     this.class = meta.chain.network;
@@ -40,14 +39,11 @@ export default class Token extends IChainAdapter<EthereumCoin, EthereumAccount> 
     await this.chain.resetApi(this.meta);
     await this.chain.initMetadata();
     await this.accounts.init(this.chain);
-
-    if (this.webWallet) {
-      // await this.webWallet.enable();
-    }
-
+    // TODO: enable metamask
     const activeAddress: string = this.webWallet.accounts && this.webWallet.accounts[0];
     const api = new TokenAPI(this.meta.address, this.chain.api.currentProvider as any, activeAddress);
     await api.init();
+    // TODO: enable metamask listener
     this.chain.tokenAPI = api;
     await super.initApi();
   }
@@ -55,6 +51,7 @@ export default class Token extends IChainAdapter<EthereumCoin, EthereumAccount> 
   public async initData() {
     await this.chain.initEventLoop();
     await super.initData();
+    // TODO: ensure metamask active
     const activeAddress: string = this.webWallet.accounts && this.webWallet.accounts[0];
     await this.activeAddressHasToken(activeAddress);
   }

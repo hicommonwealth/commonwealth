@@ -358,9 +358,7 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
       cliAddressInputFn(vnode.attrs.prepopulateAddress);
     }
 
-    // TODO: remove webWallet from app.chain entirely
-    // for now -- use default chain web wallet
-    const webWallet = vnode.attrs.webWallet || app.chain.webWallet;
+    const webWallet = vnode.attrs.webWallet;
     return m('.LinkNewAddressModal', [
       vnode.state.step === LinkNewAddressSteps.Step1VerifyWithWebWallet ? m('.link-address-step', [
         linkAddressHeader,
@@ -519,6 +517,7 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
             app.chain.base === ChainBase.Substrate && [
               m('p', 'Use the secret phrase to sign this message:'),
               m(CodeBlock, { clickToSelect: true }, [
+                // eslint-disable-next-line max-len
                 `echo "${vnode.state.newAddress.validationToken}" | subkey sign ${vnode.state.isEd25519 ? '--scheme ed25519 ' : ''} "`,
                 m('span.no-select', 'secret phrase'),
                 '"',

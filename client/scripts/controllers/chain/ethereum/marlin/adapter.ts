@@ -31,7 +31,6 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
 
   constructor(meta: NodeInfo, app: IApp) {
     super(meta, app);
-    this.webWallet = app.wallets.defaultWallet(this.base) as MetamaskWebWalletController;
     this.chain = new MarlinChain(this.app);
     this.accounts = new EthereumAccounts(this.app);
     this.marlinAccounts = new MarlinHolders(this.app, this.chain, this.accounts);
@@ -55,8 +54,7 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
   public async initApi() {
     await this.chain.resetApi(this.meta);
     await this.chain.initMetadata();
-    // await this.webWallet.enable().catch((e) => console.error(e));
-
+    // TODO: enable metamask
     const activeAddress: string = await this.webWallet.accounts[0];
     const mpondContractAddress = this.meta.address;
     const governorAlphaContractAddress = '0x777992c2E4EDF704e49680468a9299C6679e37F6';
@@ -71,11 +69,7 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
       notifyError('Please change your Metamask network');
     });
     this.chain.marlinApi = api;
-
-    if ((window as any).ethereum || (window as any).web3) {
-      // if (!this.webWallet.enabled) await this.webWallet.enable(api).catch((e) => console.error(e));
-    }
-
+    // TODO: enable metamask listener
     await this.marlinAccounts.init(api);
     this.block.height = await api.Provider.getBlockNumber(); // TODO: Fix the global eth block height setting
     await super.initApi();

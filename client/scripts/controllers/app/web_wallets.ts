@@ -6,6 +6,9 @@ import NearWebWalletController from './near_web_wallet';
 
 export default class WebWalletController {
   private _wallets: IWebWallet<any>[];
+  public get wallets() {
+    return this._wallets;
+  }
 
   public get currentWallet(): IWebWallet<any> | undefined {
     // TODO: how to handle chain switching? we need to ensure wallets are deinitialized

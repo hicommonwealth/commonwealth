@@ -27,7 +27,6 @@ export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount>
 
   constructor(meta: NodeInfo, app: IApp) {
     super(meta, app);
-    this.webWallet = app.wallets.defaultWallet(this.base) as MetamaskWebWalletController;
     this.chain = new MolochChain(this.app);
     this.ethAccounts = new EthereumAccounts(this.app);
     this.accounts = new MolochMembers(this.app, this.chain, this.ethAccounts);
@@ -38,17 +37,12 @@ export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount>
     await this.chain.resetApi(this.meta);
     await this.chain.initMetadata();
     await this.ethAccounts.init(this.chain);
-    // await this.webWallet.enable();
-
+    // TODO: enable metamask
     const activeAddress: string = this.webWallet.accounts && this.webWallet.accounts[0];
     const api = new MolochAPI(this.meta.address, this.chain.api.currentProvider as any, activeAddress);
     await api.init();
     this.chain.molochApi = api;
-
-    if (this.webWallet) {
-      // await this.webWallet.enable(api);
-    }
-
+    // TODO: enable metamask listener
     await this.accounts.init(api);
     await super.initApi();
   }

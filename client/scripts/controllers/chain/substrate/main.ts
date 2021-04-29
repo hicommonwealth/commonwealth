@@ -24,7 +24,6 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public treasury: SubstrateTreasury;
   public bounties: SubstrateBountyTreasury;
   public identities: SubstrateIdentities;
-  public readonly webWallet: PolkadotWebWalletController;
   public readonly chainEntities = new ChainEntityController();
 
   public readonly base = ChainBase.Substrate;
@@ -41,7 +40,6 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     _class: ChainClass,
   ) {
     super(meta, app);
-    this.webWallet = app.wallets.defaultWallet(this.base) as PolkadotWebWalletController;
     this.class = _class;
     this.chain = new SubstrateChain(this.app);
     this.accounts = new SubstrateAccounts(this.app);

@@ -10,7 +10,6 @@ import ChainEntityController, { EntityRefreshOption } from 'controllers/server/c
 import { IChainModule, IAccountsModule, IBlockInfo } from './interfaces';
 import { ChainBase, ChainClass } from './types';
 import { Account, NodeInfo, ProposalModule } from '.';
-import IWebWallet from './IWebWallet';
 
 // Extended by a chain's main implementation. Responsible for module
 // initialization. Saved as `app.chain` in the global object store.
@@ -29,7 +28,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
   public abstract accounts: IAccountsModule<C, A>;
   public readonly chainEntities?: ChainEntityController;
   public readonly usingServerChainEntities = false;
-  public readonly webWallet?: IWebWallet<any>;
 
   public deferred: boolean;
 

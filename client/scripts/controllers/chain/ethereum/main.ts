@@ -1,7 +1,5 @@
 import ethers from 'ethers';
 
-import MetamaskWebWalletController from 'controllers/app/metamask_web_wallet';
-import { setActiveAccount } from 'controllers/app/login';
 import EthereumChain from 'controllers/chain/ethereum/chain';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import EthereumAccount from 'controllers/chain/ethereum/account';
@@ -16,11 +14,9 @@ class Ethereum extends IChainAdapter<EthereumCoin, EthereumAccount> {
   public readonly class = ChainClass.Ethereum;
   public chain: EthereumChain;
   public accounts: EthereumAccounts;
-  public readonly webWallet: MetamaskWebWalletController;
 
   constructor(meta: NodeInfo, app: IApp) {
     super(meta, app);
-    this.webWallet = app.wallets.defaultWallet(this.base) as MetamaskWebWalletController;
     this.chain = new EthereumChain(this.app);
     this.accounts = new EthereumAccounts(this.app);
   }
@@ -29,10 +25,7 @@ class Ethereum extends IChainAdapter<EthereumCoin, EthereumAccount> {
     await this.chain.resetApi(this.meta);
     await this.chain.initMetadata();
     await this.accounts.init(this.chain);
-
-    if (this.webWallet) {
-      // await this.webWallet.enable();
-    }
+    // TODO: enable metamask
     await this.chain.initEventLoop();
     await super.initApi();
   }

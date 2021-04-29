@@ -5,7 +5,6 @@ import EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import { ChainBase, ChainClass, IChainAdapter, NodeInfo } from 'models';
 
-import { setActiveAccount } from 'controllers/app/login';
 import ChainEntityController from 'controllers/server/chain_entities';
 import { IApp } from 'state';
 
@@ -26,7 +25,6 @@ export default class Commonwealth extends IChainAdapter<EthereumCoin, EthereumAc
 
   constructor(meta: NodeInfo, app: IApp) {
     super(meta, app);
-    this.webWallet = app.wallets.defaultWallet(this.base) as MetamaskWebWalletController;
     this.chain = new CommonwealthChain(this.app);
     this.ethAccounts = new EthereumAccounts(this.app);
     this.accounts = new CommonwealthMembers(this.app);
@@ -37,17 +35,12 @@ export default class Commonwealth extends IChainAdapter<EthereumCoin, EthereumAc
     await this.chain.resetApi(this.meta);
     await this.chain.initMetadata();
     await this.ethAccounts.init(this.chain);
-    // await this.webWallet.enable();
-
+    // TODO: enable metamask
     const activeAddress: string = this.webWallet.accounts && this.webWallet.accounts[0];
     const api = new CommonwealthAPI(this.meta.address, this.chain.api.currentProvider as any, activeAddress);
     await api.init();
     this.chain.commonwealthApi = api;
-
-    if (this.webWallet) {
-      // await this.webWallet.enable(api);
-    }
-
+    // TODO: enable metamask listener
     await this.accounts.init(api, this.chain, this.ethAccounts);
     await super.initApi();
   }
