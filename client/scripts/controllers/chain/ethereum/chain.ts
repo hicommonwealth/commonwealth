@@ -6,12 +6,10 @@ import {
   NodeInfo,
   ITXModalData,
   ITXData,
-  IChainModule,
-  ChainBase
+  IChainModule
 } from 'models';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import EthereumAccount from './account';
-import MetamaskWebWalletController from '../../app/metamask_web_wallet';
 
 export interface IEthereumTXData extends ITXData {
   chainId: string;

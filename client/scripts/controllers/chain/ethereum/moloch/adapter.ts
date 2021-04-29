@@ -2,7 +2,7 @@
 import { Moloch1Factory } from 'Moloch1Factory';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 
-import MetamaskWebWalletController from 'controllers/app/metamask_web_wallet';
+import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web_wallet';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import { ChainBase, ChainClass, IChainAdapter, NodeInfo } from 'models';

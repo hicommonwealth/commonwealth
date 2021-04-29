@@ -8,7 +8,6 @@ import ChainEntityController from 'controllers/server/chain_entities';
 import { IChainAdapter, ChainBase, ChainClass, NodeInfo } from 'models';
 import { IApp } from 'state';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
-import PolkadotWebWalletController from '../../app/polkadot_web_wallet';
 import SubstratePhragmenElections from './phragmen_elections';
 import SubstrateIdentities from './identities';
 import SubstrateChain from './shared';

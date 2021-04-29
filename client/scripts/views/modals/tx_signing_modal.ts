@@ -10,7 +10,7 @@ import app from 'state';
 import { link } from 'helpers';
 import { ITXModalData, TransactionStatus, ChainBase, IWebWallet, ITXData, ITransactionResult } from 'models';
 
-import PolkadotWebWalletController from 'controllers/app/polkadot_web_wallet';
+import PolkadotWebWalletController from 'controllers/app/webWallets/polkadot_web_wallet';
 import Substrate from 'controllers/chain/substrate/main';
 import { ISubstrateTXData } from 'controllers/chain/substrate/shared';
 import { ICosmosTXData } from 'controllers/chain/cosmos/chain';

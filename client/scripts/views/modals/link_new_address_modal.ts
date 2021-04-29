@@ -21,8 +21,8 @@ import CodeBlock from 'views/components/widgets/code_block';
 import User from 'views/components/widgets/user';
 import AvatarUpload from 'views/components/avatar_upload';
 import AddressSwapper from 'views/components/addresses/address_swapper';
-import MetamaskWebWalletController from 'controllers/app/metamask_web_wallet';
-import KeplrWebWalletController from 'controllers/app/keplr_web_wallet';
+import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web_wallet';
+import KeplrWebWalletController from 'controllers/app/webWallets/keplr_web_wallet';
 
 enum LinkNewAddressSteps {
   Step1VerifyWithCLI,

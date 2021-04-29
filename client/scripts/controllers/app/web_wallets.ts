@@ -1,8 +1,8 @@
 import { ChainBase, IWebWallet } from 'models';
-import MetamaskWebWalletController from './metamask_web_wallet';
-import KeplrWebWalletController from './keplr_web_wallet';
-import PolkadotWebWalletController from './polkadot_web_wallet';
-import NearWebWalletController from './near_web_wallet';
+import MetamaskWebWalletController from './webWallets/metamask_web_wallet';
+import KeplrWebWalletController from './webWallets/keplr_web_wallet';
+import PolkadotWebWalletController from './webWallets/polkadot_web_wallet';
+import NearWebWalletController from './webWallets/near_web_wallet';
 
 export default class WebWalletController {
   private _wallets: IWebWallet<any>[];

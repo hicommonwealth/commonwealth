@@ -4,7 +4,6 @@ import { IApp } from 'state';
 import { CosmosAccount, CosmosAccounts } from './account';
 import CosmosChain from './chain';
 import CosmosGovernance from './governance';
-import KeplrWebWalletController from '../../app/keplr_web_wallet';
 
 class Cosmos extends IChainAdapter<CosmosToken, CosmosAccount> {
   public chain: CosmosChain;
