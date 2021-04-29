@@ -1,3 +1,3 @@
-import EthTokenApi from 'controllers/chain/ethereum/contractApi';
+import ContractApi from 'controllers/chain/ethereum/contractApi';
 
-export default class CommonwealthAPI extends EthTokenApi<any> { }
+export default class CommonwealthAPI extends ContractApi<any> { }

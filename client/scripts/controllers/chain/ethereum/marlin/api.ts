@@ -5,9 +5,9 @@ import { MPondFactory } from 'MPondFactory';
 import { GovernorAlpha } from 'GovernorAlpha';
 import { GovernorAlphaFactory } from 'GovernorAlphaFactory';
 
-import EthTokenApi from 'controllers/chain/ethereum/contractApi';
+import ContractApi from 'controllers/chain/ethereum/contractApi';
 
-export default class MarlinAPI extends EthTokenApi<MPond> {
+export default class MarlinAPI extends ContractApi<MPond> {
   private _GovernorAlphaAddress: string;
   private _GovernorAlphaContract: GovernorAlpha;
   private _Symbol: string;
