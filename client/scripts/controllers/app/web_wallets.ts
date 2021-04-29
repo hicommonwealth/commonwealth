@@ -10,18 +10,8 @@ export default class WebWalletController {
     return this._wallets;
   }
 
-  public get currentWallet(): IWebWallet<any> | undefined {
-    // TODO: how to handle chain switching? we need to ensure wallets are deinitialized
-    return this._wallets.find((w) => w.enabled);
-  }
-
   public availableWallets(chain?: ChainBase) {
     return this._wallets.filter((w) => w.available && (!chain || w.chain === chain));
-  }
-
-  public defaultWallet(chain: ChainBase) {
-    const wallets = this.availableWallets(chain);
-    return wallets.length > 0 ? wallets[0] : undefined;
   }
 
   constructor() {
