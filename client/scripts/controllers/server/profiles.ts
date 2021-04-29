@@ -53,9 +53,17 @@ class ProfilesController {
         if (!account.profile) {
           const profile = new Profile(account.chain.id, account.address);
           this._store.add(profile);
+          this._refreshProfile(profile);
         }
         if (result.updatedProfileAddresses) {
-          result.updatedProfileAddresses.forEach((address) => this._refreshProfile(new Profile(address.chain, address.address)));
+          result.updatedProfileAddresses.forEach((address) => {
+            const profile = this._store.getByAddress(address.address);
+            if (profile) {
+              this._refreshProfile(profile);
+            } else {
+              this._refreshProfile(new Profile(address.chain, address.address));
+            }
+          });
         }
         resolve(result.profile);
       }).catch((error) => {
