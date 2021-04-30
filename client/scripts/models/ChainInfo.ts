@@ -18,6 +18,7 @@ class ChainInfo {
   public telegram: string;
   public github: string;
   public customDomain: string;
+  public snapshot: string;
   public readonly blockExplorerIds: object;
   public readonly collapsedOnHomepage: boolean;
   public readonly featuredTopics: string[];
@@ -29,7 +30,7 @@ class ChainInfo {
   // TODO: convert this to accept an object with params instead
   constructor(
     id, network, symbol, name, iconUrl, description, website, discord, element, telegram, github,
-    customDomain, blockExplorerIds, collapsedOnHomepage, featuredTopics, topics, adminsAndMods?, base?
+    customDomain, snapshot, blockExplorerIds, collapsedOnHomepage, featuredTopics, topics, adminsAndMods?, base?
   ) {
     this.id = id;
     this.network = network;
@@ -44,6 +45,7 @@ class ChainInfo {
     this.telegram = telegram;
     this.github = github;
     this.customDomain = customDomain;
+    this.snapshot = snapshot;
     this.blockExplorerIds = blockExplorerIds;
     this.collapsedOnHomepage = collapsedOnHomepage;
     this.featuredTopics = featuredTopics || [];
@@ -71,6 +73,7 @@ class ChainInfo {
       json.telegram,
       json.github,
       json.customDomain,
+      json.snapshot,
       blockExplorerIds,
       json.collapsed_on_homepage,
       json.featured_topics,
