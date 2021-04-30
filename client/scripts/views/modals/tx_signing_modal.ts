@@ -437,8 +437,7 @@ const TXSigningModalStates: {
         vnode.state.timeoutHandle = setTimeout(() => {
           clearInterval(vnode.state.timeoutHandle);
           vnode.attrs.next('SentTransactionSuccess', {
-            hash: 'Not available (this chain is using an out of date API)',
-            timestamp: '--',
+            hash: 'Not available (this chain is using an out of date API)'
           });
           $parent.trigger('modalcomplete');
         }, 10000);

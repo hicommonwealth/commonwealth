@@ -1,4 +1,4 @@
-import moment from 'moment-twitter';
+import moment from 'moment';
 
 class NotificationSubscription {
   public readonly id: number;
