@@ -22,6 +22,7 @@ class ChainInfo {
   public additionalStages: string;
   public customDomain: string;
   public readonly blockExplorerIds: { [id: string]: string };
+  public snapshot: string;
   public readonly collapsedOnHomepage: boolean;
   public readonly featuredTopics: string[];
   public readonly topics: OffchainTopic[];
@@ -35,7 +36,7 @@ class ChainInfo {
   constructor({
     id, network, symbol, name, iconUrl, description, website, discord, element, telegram, github,
     stagesEnabled, additionalStages,
-    customDomain, blockExplorerIds, collapsedOnHomepage, featuredTopics, topics, adminsAndMods,
+    customDomain, snapshot, blockExplorerIds, collapsedOnHomepage, featuredTopics, topics, adminsAndMods,
     base, ss58_prefix, type, substrateSpec
   }) {
     this.id = id;
@@ -53,6 +54,7 @@ class ChainInfo {
     this.stagesEnabled = stagesEnabled;
     this.additionalStages = additionalStages;
     this.customDomain = customDomain;
+    this.snapshot = snapshot;
     this.blockExplorerIds = blockExplorerIds;
     this.collapsedOnHomepage = collapsedOnHomepage;
     this.featuredTopics = featuredTopics || [];
@@ -110,6 +112,7 @@ class ChainInfo {
       stagesEnabled,
       additionalStages,
       customDomain,
+      snapshot,
       blockExplorerIds: blockExplorerIdsParsed,
       collapsedOnHomepage: collapsed_on_homepage,
       featuredTopics: featured_topics,
