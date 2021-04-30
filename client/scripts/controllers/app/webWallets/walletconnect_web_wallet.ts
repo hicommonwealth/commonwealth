@@ -1,26 +1,19 @@
-declare let window: any;
-
+import { Account, ChainBase, IWebWallet } from 'models';
 import app from 'state';
 import Web3 from 'web3';
-import { provider } from 'web3-core';
-import { Account, ChainBase, IWebWallet } from 'models';
+import WalletConnectProvider from '@walletconnect/web3-provider';
 import { setActiveAccount } from 'controllers/app/login';
 
-// TODO: make this a generic controller, it's shared with polkadotJS right now
-class MetamaskWebWalletController implements IWebWallet<string> {
-  // GETTERS/SETTERS
+class WalletConnectWebWalletController implements IWebWallet<string> {
   private _enabled: boolean;
   private _enabling: boolean = false;
   private _accounts: string[];
-  private _provider: provider;
+  private _provider: WalletConnectProvider;
   private _web3: Web3;
 
-  public readonly label = 'Ethereum Wallet (Metamask)';
+  public readonly label = 'Ethereum Wallet (WalletConnect)';
   public readonly chain = ChainBase.Ethereum;
-
-  public get available() {
-    return !!(window.ethereum);
-  }
+  public readonly available = true;
 
   public get provider() {
     return this._provider;
@@ -49,17 +42,18 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     return account.validate(webWalletSignature);
   }
 
-  // ACTIONS
   public async enable() {
-    console.log('Attempting to enable Metamask');
+    console.log('Attempting to enable WalletConnect');
     this._enabling = true;
     try {
-      // (this needs to be called first, before other requests)
-      this._web3 = new Web3((window as any).ethereum);
-      await this._web3.givenProvider.enable();
+      //  Create WalletConnect Provider
+      this._provider = new WalletConnectProvider({
+        infuraId: 'b19b8175e688448ead43a0ab5f03438a'
+      });
 
-      this._accounts = await this._web3.eth.getAccounts();
-      this._provider = this._web3.currentProvider;
+      //  Enable session (triggers QR Code modal)
+      await this._provider.enable();
+      this._web3 = new Web3(this._provider as any);
       const balance = await this._web3.eth.getBalance(this._accounts[0]);
       console.log(balance);
 
@@ -67,13 +61,13 @@ class MetamaskWebWalletController implements IWebWallet<string> {
       this._enabled = true;
       this._enabling = false;
     } catch (error) {
-      console.error('Failed to enable Metamask');
+      console.error('Failed to enable WalletConnect');
       this._enabling = false;
     }
   }
 
   public async initAccountsChanged() {
-    await this._web3.givenProvider.on('accountsChanged', async (accounts: string[]) => {
+    await this._provider.on('accountsChanged', async (accounts: string[]) => {
       const updatedAddress = app.user.activeAccounts.find((addr) => addr.address === accounts[0]);
       if (!updatedAddress) return;
       await setActiveAccount(updatedAddress);
@@ -84,4 +78,4 @@ class MetamaskWebWalletController implements IWebWallet<string> {
   // TODO: disconnect
 }
 
-export default MetamaskWebWalletController;
+export default WalletConnectWebWalletController;

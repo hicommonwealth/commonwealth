@@ -12,7 +12,6 @@ class PolkadotWebWalletController implements IWebWallet<InjectedAccountWithMeta>
   // GETTERS/SETTERS
   private _enabled: boolean;
   private _accounts: InjectedAccountWithMeta[];
-  private _injectedAddress: string;
   private _enabling: boolean = false;
 
   public readonly label = 'polkadot-js';
@@ -21,17 +20,17 @@ class PolkadotWebWalletController implements IWebWallet<InjectedAccountWithMeta>
   public get available() {
     return isWeb3Injected;
   }
+
   public get enabled() {
     return this.available && this._enabled;
   }
+
   public get enabling() {
     return this._enabling;
   }
+
   public get accounts() {
     return this._accounts || [];
-  }
-  public get injectedAddress() {
-    return this._injectedAddress;
   }
 
   public async getSigner(who: string): Promise<Signer> {

@@ -2,7 +2,6 @@
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import { MPondFactory } from 'MPondFactory';
 
-import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web_wallet';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import { ChainBase, ChainClass, IChainAdapter, ChainEntity, ChainEvent, NodeInfo } from 'models';
@@ -24,7 +23,6 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
   public accounts: EthereumAccounts;
   public marlinAccounts:  MarlinHolders;
   public governance: MarlinGovernance;
-  public readonly webWallet: MetamaskWebWalletController;
   public readonly chainEntities = new ChainEntityController();
 
   constructor(meta: NodeInfo, app: IApp) {

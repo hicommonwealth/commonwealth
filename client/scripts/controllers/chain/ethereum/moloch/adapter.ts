@@ -2,7 +2,6 @@
 import { Moloch1Factory } from 'Moloch1Factory';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 
-import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web_wallet';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import { ChainBase, ChainClass, IChainAdapter, NodeInfo } from 'models';
@@ -22,7 +21,6 @@ export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount>
   public ethAccounts: EthereumAccounts;
   public accounts: MolochMembers;
   public governance: MolochGovernance;
-  public readonly webWallet: MetamaskWebWalletController;
   public readonly chainEntities = new ChainEntityController();
 
   constructor(meta: NodeInfo, app: IApp) {

@@ -3,7 +3,6 @@ import { ethers } from 'ethers';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 
 import { Erc20Factory } from 'Erc20Factory';
-import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web_wallet';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import { ChainBase, IChainAdapter, NodeInfo } from 'models';
@@ -25,7 +24,6 @@ export default class Token extends IChainAdapter<EthereumCoin, EthereumAccount> 
   public accounts: EthereumAccounts;
   public hasToken: boolean = false;
 
-  public readonly webWallet: MetamaskWebWalletController;
   public readonly chainEntities = new ChainEntityController();
 
   constructor(meta: NodeInfo, app: IApp) {

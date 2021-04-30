@@ -6,6 +6,7 @@ import { Erc20Factory } from 'Erc20Factory';
 import { ChainBase, IWebWallet } from 'models';
 import WebWalletController from 'controllers/app/web_wallets';
 import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web_wallet';
+import WalletConnectWebWalletController from '../../app/webWallets/walletconnect_web_wallet';
 
 export type ContractFactoryT<ContractT> = (address: string, provider: Provider) => ContractT;
 
@@ -58,7 +59,8 @@ class ContractApi<ContractT extends Contract> {
     }
 
     let signer: JsonRpcSigner;
-    if (signingWallet instanceof MetamaskWebWalletController) {
+    if (signingWallet instanceof MetamaskWebWalletController
+      || signingWallet instanceof WalletConnectWebWalletController) {
       const walletProvider = new ethers.providers.Web3Provider(signingWallet.provider as any);
       signer = walletProvider.getSigner(sender);
     } else {

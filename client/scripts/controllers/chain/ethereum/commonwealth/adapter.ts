@@ -1,6 +1,5 @@
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 
-import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web_wallet';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import { ChainBase, ChainClass, IChainAdapter, NodeInfo } from 'models';
@@ -20,7 +19,6 @@ export default class Commonwealth extends IChainAdapter<EthereumCoin, EthereumAc
   public ethAccounts: EthereumAccounts;
   public accounts: CommonwealthMembers;
   public governance: CommonwealthGovernance;
-  public readonly webWallet: MetamaskWebWalletController;
   public readonly chainEntities = new ChainEntityController();
 
   constructor(meta: NodeInfo, app: IApp) {
