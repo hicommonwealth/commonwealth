@@ -173,17 +173,7 @@ const ProposalHeader: m.Component<{
                 trigger: m(Icon, { name: Icons.EDIT_3 }),
               }),
               // This is the new social carat menu
-              m(PopoverMenu, {
-                transitionDuration: 0,
-                closeOnOutsideClick: true,
-                closeOnContentClick: true,
-                menuAttrs: { size: 'default' },
-                content: [
-                  m(SocialSharingCarat)
-                ],
-                inline: true,
-                trigger: m(Icon, { name: Icons.SHARE_2 }),
-              }),
+              m(SocialSharingCarat),
               vnode.state.editPermissionsIsOpen
                 && proposal instanceof OffchainThread
                 && m(ProposalEditorPermissions, {
