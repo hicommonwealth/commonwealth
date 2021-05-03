@@ -14,6 +14,7 @@
     "marlin-test": "nyc ts-mocha --config ./.mocharc.json ./test/integration/marlin.spec.ts",
     "integration-test": "nyc ts-mocha --config ./.mocharc.json ./test/integration/*.spec.ts",
     "test": "nyc ts-mocha --config ./.mocharc.json ./test/integration/*.spec.ts ./test/unit/**/*.spec.ts",
+    "prepare": "install-peers",
     "lint": "eslint src/ test/",
     "listen": "ts-node -T ./scripts/listener.ts",
     "listen-archival": "ts-node -T ./scripts/listener.ts -n edgeware-local -a true",
@@ -32,13 +33,16 @@
     "url": "https://github.com/hicommonwealth/chain-events/issues"
   },
   "homepage": "https://github.com/hicommonwealth/chain-events#readme",
+  "peerDependencies": {
+    "@polkadot/api": "3.6.4",
+    "@polkadot/api-derive": "3.6.4",
+    "@polkadot/keyring": "5.4.4",
+    "@polkadot/types": "3.6.4",
+    "@polkadot/util": "5.4.4"
+  },
   "dependencies": {
     "@clover-network/node-tpye": "^1.0.1",
     "@edgeware/node-types": "^3.3.3",
-    "@polkadot/api": "3.6.4",
-    "@polkadot/api-derive": "3.6.4",
-    "@polkadot/types": "3.6.4",
-    "@polkadot/util": "5.4.4",
     "bn.js": "^5.1.3",
     "ethereum-block-by-date": "^1.2.2",
     "ethers": "^4.0.39",
@@ -72,6 +76,7 @@
     "eslint-plugin-import": "^2.20.0",
     "eslint-plugin-prettier": "^3.1.2",
     "ganache-cli": "^6.9.1",
+    "install-peers-cli": "^2.2.0",
     "jsdom": "^16.2.2",
     "jsdom-global": "^3.0.2",
     "mocha": "^8.2.1",
