@@ -1,0 +1,64 @@
+@import 'client/styles/shared';
+
+.ProjectCard {
+    @include card;
+    padding: 0;
+    height: initial;
+    height: 280px;
+    .project-card-top {
+        position: relative;
+        padding: 24px 24px 22px;
+        height: 228px;
+        width: 100%;
+    }
+    .project-card-bottom {
+        position: relative;
+        padding: 16px 24px 12px;
+        border-top: 1px solid #eee;
+        user-select: none;
+        cursor: initial;
+        &:hover a {
+            text-decoration: underline;
+        }
+        .no-linked-thread {
+            color: $text-color-lightest;
+        }
+    }
+
+    .cui-tag {
+        font-weight: 600;
+        min-height: none;
+        height: 21px;
+    }
+    .project-title {
+        font-weight: 600;
+        line-height: 1.1;
+        margin: 9px 0 6px;
+    }
+    .project-amount,
+    .project-comments {
+        color: $text-color-light;
+    }
+    .project-action {
+        display: inline-block;
+        color: $text-color-light;
+        font-weight: 600;
+        font-size: 80%;
+        text-transform: uppercase;
+    }
+    .project-status {
+        position: absolute;
+        bottom: 14px;
+        // styling
+        font-weight: 600;
+        line-height: 1.1;
+        margin-bottom: 4px;
+        color: $text-color-black;
+        &.pass {
+            color: $positive-bg-color;
+        }
+        &.fail {
+            color: $negative-bg-color;
+        }
+    }
+}

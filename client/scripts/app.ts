@@ -560,6 +560,10 @@ $(() => {
       if (vnode.attrs.scope && path === 'views/pages/view_proposal/index' && vnode.attrs.type === 'discussion') {
         deferChain = true;
       }
+      // // same "/:scope/project/:type/:id" route. //  CWP
+      // if (vnode.attrs.scope && path === 'views/pages/view_project/index' && vnode.attrs.type === 'discussion') {
+      //   deferChain = true;
+      // }
       if (app.chain instanceof Token) deferChain = false;
       return m(Layout, { scope, deferChain, hideSidebar }, [ vnode ]);
     },
@@ -610,6 +614,7 @@ $(() => {
     '/:scope/treasury':          importRoute('views/pages/treasury', { scoped: true }),
     '/:scope/bounties':          importRoute('views/pages/bounties', { scoped: true }),
     '/:scope/proposal/:type/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
+    '/:scope/project/:identifier': importRoute('views/pages/view_project/index', { scoped: true }), // CWP
     '/:scope/council':           importRoute('views/pages/council', { scoped: true }),
     '/:scope/delegate':          importRoute('views/pages/delegate', { scoped: true, }),
     '/:scope/login':             importRoute('views/pages/login', { scoped: true, deferChain: true }),

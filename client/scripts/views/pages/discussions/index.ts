@@ -159,8 +159,9 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
     const selectedNode = selectedNodes.length > 0 && selectedNodes[0];
     const selectedCommunity = app.community;
 
-    const communityName = selectedNode
-      ? selectedNode.chain.name : selectedCommunity ? selectedCommunity.meta.name : '';
+    // const communityName = selectedNode
+    //   ? selectedNode.chain.name : selectedCommunity ? selectedCommunity.meta.name : '';
+    const communityName = selectedCommunity ? selectedCommunity.meta.name : selectedNode ? selectedNode.chain.name : '';  // for CWP
 
     const allLastVisited = (typeof app.user.lastVisited === 'string')
       ? JSON.parse(app.user.lastVisited)

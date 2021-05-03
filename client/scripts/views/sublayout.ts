@@ -5,6 +5,7 @@ import app from 'state';
 import { EmptyState, Button, Icon, Icons, Grid, Col, Spinner } from 'construct-ui';
 import { link } from 'helpers';
 
+import { initCommunity } from 'app';
 import NewProposalButton from 'views/components/new_proposal_button';
 import NotificationsMenu from 'views/components/header/notifications_menu';
 import InvitesMenu from 'views/components/header/invites_menu';
@@ -32,6 +33,16 @@ const Sublayout: m.Component<{
   hideSidebar?: boolean,
   alwaysShowTitle?: boolean,          // show page title even if app.chain and app.community are unavailable
 }> = {
+  oncreate: async(vnode) => {
+    // const {
+    //   title,
+    // } = vnode.attrs;
+    // // for CWP, init CWP community
+    // if ((title === 'Projects' || title === 'Collectives') && !app.community) {
+    //   await initCommunity('common-protocol');
+    //   m.redraw();
+    // }
+  },
   view: (vnode) => {
     const {
       title,
@@ -42,6 +53,7 @@ const Sublayout: m.Component<{
       hideSidebar,
       alwaysShowTitle,
     } = vnode.attrs;
+
     const chain = app.chain ? app.chain.meta.chain : null;
     const community = app.community ? app.community.meta : null;
 
@@ -49,18 +61,18 @@ const Sublayout: m.Component<{
     const sublayoutHeaderLeft = m('.sublayout-header-left', [
       (!m.route.param('scope') && (m.route.get() === '/' || m.route.get().startsWith('/?'))) ? [
         m('h3', 'Commonwealth')
-      ] : chain ? [
-        m(ChainIcon, { size: ICON_SIZE, chain }),
-        m('h4.sublayout-header-heading', [
-          link('a', `/${app.activeId()}`, chain.name),
-          title && m('span.breadcrumb', m.trust('/')),
-          title
-        ]),
       ] : community ? [
         m(CommunityIcon, { size: ICON_SIZE, community }),
         m('h4.sublayout-header-heading', [
           link('a', `/${app.activeId()}`, community.name),
           community.privacyEnabled && m(Icon, { name: Icons.LOCK, size: 'xs' }),
+          title && m('span.breadcrumb', m.trust('/')),
+          title
+        ]),
+      ] : chain ? [
+        m(ChainIcon, { size: ICON_SIZE, chain }),
+        m('h4.sublayout-header-heading', [
+          link('a', `/${app.activeId()}`, chain.name),
           title && m('span.breadcrumb', m.trust('/')),
           title
         ]),

@@ -149,6 +149,10 @@ const setupAppRoutes = (app, models, devMiddleware, templateFile, sendFile) => {
     renderWithMetaTags(res, title, description, author, image);
   });
 
+  //  CWP
+  // app.get('/:scope/project/:identifier', async (req, res, next) => {
+  // });
+
   app.get('*', (req, res, next) => {
     sendFile(res);
   });
