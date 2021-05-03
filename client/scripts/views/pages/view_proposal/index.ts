@@ -251,6 +251,7 @@ const ProposalHeader: m.Component<
                           vnode.state.editPermissionsIsOpen = v;
                         },
                         // TODO: Onchange logic
+                        // eslint-disable-next-line @typescript-eslint/no-empty-function
                         onChangeHandler: () => {},
                       }),
                     vnode.state.topicEditorIsOpen &&

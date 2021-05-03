@@ -43,6 +43,7 @@ const createInviteLink = async (models, req, res, next) => {
   } else {
     uses = +uses;
   }
+  // eslint-disable-next-line no-restricted-globals
   if (isNaN(uses)) {
     return next(new Error(Errors.InvalidUses));
   }

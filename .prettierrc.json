@@ -1,3 +1,4 @@
 {
+  "arrowParens": "always",
   "singleQuote": true
 }

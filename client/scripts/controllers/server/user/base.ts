@@ -150,8 +150,6 @@ export default class {
     this._unseenPosts = unseenPosts;
   }
 
-  constructor() {}
-
   // Recommend using the setActiveAccount helper in controllers/app/login.ts to persist the setting to the backend.
   public ephemerallySetActiveAccount(account: Account<any>): void {
     this._setActiveAccount(account);

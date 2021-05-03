@@ -417,6 +417,7 @@ export async function selectNode(
     ).default;
     newChain = new Marlin(n, app);
   } else if ([ChainNetwork.ALEX].includes(n.chain.network)) {
+    // eslint-disable-next-line no-shadow
     const Token = (
       await import(
         //   /* webpackMode: "lazy" */

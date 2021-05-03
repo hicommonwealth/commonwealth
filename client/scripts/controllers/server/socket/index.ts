@@ -38,6 +38,7 @@ class WebsocketController {
         [key]: DefaultWebsocketHandler.bind(null, key),
       }))
     );
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     this._onStatusChange = onStatusChange || (() => {});
     this._init = () => {
       // tear down old heartbeat timer

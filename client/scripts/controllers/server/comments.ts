@@ -228,7 +228,6 @@ class CommentsController {
   }
 
   public async delete(comment) {
-    const _this = this;
     return new Promise((resolve, reject) => {
       // TODO: Change to DELETE /comment
       $.post(`${app.serverUrl()}/deleteComment`, {
@@ -249,7 +248,7 @@ class CommentsController {
   }
 
   public async refresh(proposal, chainId: string, communityId: string) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise<void>(async (resolve, reject) => {
       try {
         // TODO: Change to GET /comments
         const response = await $.get(`${app.serverUrl()}/viewComments`, {

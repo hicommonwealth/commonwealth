@@ -32,6 +32,7 @@ const ProfileContent: m.Component<
   oncreate: (vnode) => {
     if (window.location.hash) {
       const matches = window.location.hash.match(/#([0-9]+)/);
+      // eslint-disable-next-line no-restricted-globals
       if (!matches || isNaN(+matches[1])) return;
 
       vnode.state.count = +matches[1];

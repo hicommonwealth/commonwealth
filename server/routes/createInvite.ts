@@ -5,6 +5,7 @@ import { SERVER_URL, SENDGRID_API_KEY } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
 import { DynamicTemplate } from '../../shared/types';
 const log = factory.getLogger(formatFilename(__filename));
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 

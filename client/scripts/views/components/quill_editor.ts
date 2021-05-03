@@ -182,7 +182,7 @@ const instantiateEditor = (
 
   // preemptively load Twitter Widgets, so users won't be confused by loading lag &
   // abandon an embed attempt
-  if (!(<any>window).twttr)
+  if (!(window as any).twttr)
     loadScript('//platform.twitter.com/widgets.js').then(() =>
       console.log('Twitter Widgets loaded')
     );
@@ -196,21 +196,21 @@ const instantiateEditor = (
     public static create(id) {
       const node = super.create(id);
       node.dataset.id = id;
-      if (!(<any>window).twttr) {
+      if (!(window as any).twttr) {
         loadScript('//platform.twitter.com/widgets.js').then(() => {
           setTimeout(() => {
             // eslint-disable-next-line
-            (<any>window).twttr?.widgets?.load();
+            (window as any).twttr?.widgets?.load();
             // eslint-disable-next-line
-            (<any>window).twttr?.widgets?.createTweet(id, node);
+            (window as any).twttr?.widgets?.createTweet(id, node);
           }, 1);
         });
       } else {
         setTimeout(() => {
           // eslint-disable-next-line
-          (<any>window).twttr?.widgets?.load();
+          (window as any).twttr?.widgets?.load();
           // eslint-disable-next-line
-          (<any>window).twttr?.widgets?.createTweet(id, node);
+          (window as any).twttr?.widgets?.createTweet(id, node);
         }, 1);
       }
       return node;

@@ -47,6 +47,7 @@ const ChainManager: m.Component<IChainManagerAttrs, IChainManagerState> = {
                 if (!app.user.isSiteAdmin) return alert('Admin required');
                 vnode.attrs.success = null;
                 vnode.attrs.error = null;
+                // eslint-disable-next-line no-restricted-globals
                 if (!confirm('Are you sure?')) return;
                 // TODO: Change to DELETE /chainNoode
                 $.post(`${app.serverUrl()}/deleteChainNode`, {

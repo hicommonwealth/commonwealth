@@ -119,7 +119,7 @@ class ReactionsController {
   }
 
   public async delete(reaction) {
-    const _this = this;
+    const store = this.store;
     return new Promise((resolve, reject) => {
       // TODO: Change to DELETE /reaction
       $.post(`${app.serverUrl()}/deleteReaction`, {
@@ -127,7 +127,7 @@ class ReactionsController {
         reaction_id: reaction.id,
       })
         .then((result) => {
-          _this.store.remove(reaction);
+          store.remove(reaction);
           resolve(result);
         })
         .catch((e) => {

@@ -237,7 +237,9 @@ export default class MarlinProposal extends Proposal<
     this._Gov.store.add(this);
   }
 
-  public update(e: ChainEvent) {}
+  public update(e: ChainEvent) {
+    // TODO
+  }
 
   public canVoteFrom(account: MarlinHolder) {
     // We need to check the delegate of account to perform voting checks. Delegates must

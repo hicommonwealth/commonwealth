@@ -12,8 +12,6 @@ import app from 'state';
 import { CompactModalExitButton } from 'views/modal';
 import { CommunityInfo } from 'models';
 
-interface IAttrs {}
-
 interface IState {
   disabled: boolean;
   error: string;
@@ -22,14 +20,14 @@ interface IState {
   selectedChain: string;
 }
 
-const CreateCommunityModal: m.Component<IAttrs, IState> = {
+const CreateCommunityModal: m.Component<{}, IState> = {
   oncreate: (vnode) => {
     mixpanel.track('New Community', {
       'Step No': 1,
       Step: 'Modal Opened',
     });
   },
-  view: (vnode: m.VnodeDOM<IAttrs, IState>) => {
+  view: (vnode: m.VnodeDOM<{}, IState>) => {
     return m('.CreateCommunityModal', [
       m('h3', 'New Commonwealth community'),
       m(CompactModalExitButton),

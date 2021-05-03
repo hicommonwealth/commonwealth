@@ -1,3 +1,4 @@
+import { Request, Response, NextFunction } from 'express';
 import { SERVER_URL } from '../config';
 import { NotificationCategories } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
@@ -24,7 +25,6 @@ export const redirectWithLoginError = (res, message) => {
   )}`;
   return res.redirect(url);
 };
-import { Request, Response, NextFunction } from 'express';
 
 const finishEmailLogin = async (
   models,

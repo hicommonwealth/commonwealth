@@ -265,7 +265,6 @@ class ThreadsController {
   }
 
   public async delete(proposal) {
-    const _this = this;
     return new Promise((resolve, reject) => {
       // TODO: Change to DELETE /thread
       $.post(`${app.serverUrl()}/deleteThread`, {

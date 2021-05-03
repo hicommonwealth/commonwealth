@@ -168,10 +168,9 @@ const CreateComment: m.Component<
                       m(
                         'a',
                         {
-                          href:
-                            `/${app.activeId()}/account/${
-                              app.user.activeAccount.address
-                            }` + `?base=${app.user.activeAccount.chain}`,
+                          href: `/${app.activeId()}/account/${
+                            app.user.activeAccount.address
+                          }?base=${app.user.activeAccount.chain}`,
                           onclick: (e) => {
                             e.preventDefault();
                             app.modals.create({

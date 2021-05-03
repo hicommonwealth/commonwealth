@@ -1,3 +1,4 @@
+/* eslint-disable */
 import WebSocket from 'ws';
 
 // create req.session.passport.user type on standard Request object

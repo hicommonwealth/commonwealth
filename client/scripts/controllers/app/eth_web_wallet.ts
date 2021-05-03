@@ -3,9 +3,6 @@ declare let window: any;
 import app from 'state';
 import Ethereum from '../chain/ethereum/main';
 
-// tslint:disable-next-line
-const ethUtil = require('ethereumjs-util');
-
 // TODO: make this a generic controller, it's shared with polkadotJS right now
 class EthWebWalletController {
   // GETTERS/SETTERS

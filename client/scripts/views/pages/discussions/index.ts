@@ -503,6 +503,7 @@ const DiscussionsPage: m.Component<
 
     app.topics
       .getByCommunity(app.activeId())
+      // eslint-disable-next-line no-shadow
       .forEach(({ id, name, description, telegram }) => {
         if (featuredTopicIds.includes(`${id}`)) {
           featuredTopics[name] = {

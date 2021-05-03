@@ -168,10 +168,9 @@ const ProposalCard: m.Component<{ proposal: AnyProposal }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     const { author, createdAt, slug, identifier, title } = proposal;
-    const proposalLink =
-      `/${app.activeChainId()}/proposal/${proposal.slug}/${
-        proposal.identifier
-      }` + `-${slugify(proposal.title)}`;
+    const proposalLink = `/${app.activeChainId()}/proposal/${proposal.slug}/${
+      proposal.identifier
+    }-${slugify(proposal.title)}`;
 
     return m('.ProposalCard', [
       m(

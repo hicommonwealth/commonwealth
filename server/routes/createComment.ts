@@ -15,6 +15,7 @@ import TokenBalanceCache from '../util/tokenBalanceCache';
 import { factory, formatFilename } from '../../shared/logging';
 
 import { SENDGRID_API_KEY } from '../config';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 

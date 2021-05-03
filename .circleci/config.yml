@@ -35,3 +35,9 @@ jobs:
           command: yarn test-suite
       - store_artifacts:
           path: coverage
+      - run:
+          name: lint
+          # eventually we should remove --quiet, but since we have 2000+ warnings
+          # for now this will prevent CI errors...
+          command: yarn lint-all --quiet
+

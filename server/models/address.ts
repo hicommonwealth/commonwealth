@@ -23,7 +23,7 @@ import { factory, formatFilename } from '../../shared/logging';
 import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
 const log = factory.getLogger(formatFilename(__filename));
 
-// tslint:disable-next-line
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const ethUtil = require('ethereumjs-util');
 
 export interface AddressAttributes {

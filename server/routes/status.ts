@@ -72,7 +72,9 @@ GROUP BY CONCAT("OffchainThreads".chain, "OffchainThreads".community);
 `,
       { replacements: { thirtyDaysAgo }, type: QueryTypes.SELECT }
     );
-    threadCountQueryData.forEach((ct) => (threadCount[ct.concat] = ct.count));
+    threadCountQueryData.forEach((ct) => {
+      threadCount[ct.concat] = ct.count;
+    });
 
     return res.json({
       chains,
@@ -164,7 +166,9 @@ GROUP BY CONCAT("OffchainThreads".chain, "OffchainThreads".community);
       type: QueryTypes.SELECT,
     }
   );
-  threadCountQueryData.forEach((ct) => (threadCount[ct.concat] = ct.count));
+  threadCountQueryData.forEach((ct) => {
+    threadCount[ct.concat] = ct.count;
+  });
 
   // get starred communities for user
   const starredCommunities = await models.StarredCommunity.findAll({
@@ -185,6 +189,7 @@ GROUP BY CONCAT("OffchainThreads".chain, "OffchainThreads".community);
   await Promise.all(
     commsAndChains.map(async (c) => {
       const [name, time] = c;
+      // eslint-disable-next-line no-restricted-globals
       if (isNaN(new Date(time as string).getDate())) {
         unseenPosts[name] = {};
         return;

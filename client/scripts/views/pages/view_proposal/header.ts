@@ -299,10 +299,9 @@ export const ProposalTitleSaveEdit: m.Component<{
   view: (vnode) => {
     const { proposal, getSetGlobalEditingStatus, parentState } = vnode.attrs;
     if (!proposal) return;
-    const proposalLink =
-      `/${app.activeChainId()}/proposal/${proposal.slug}/${
-        proposal.identifier
-      }` + `-${slugify(proposal.title)}`;
+    const proposalLink = `/${app.activeChainId()}/proposal/${proposal.slug}/${
+      proposal.identifier
+    }-${slugify(proposal.title)}`;
 
     return m('.ProposalTitleSaveEdit', [
       m(

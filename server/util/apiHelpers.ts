@@ -1,3 +1,17 @@
+const isValidResponse = (resp) => {
+  if (!resp || !resp.statusCode || !resp.object) {
+    return false;
+  }
+
+  return true;
+};
+
+/**
+ * Success response
+ */
+const sendResponse = (req, res, resp) => {
+  res.status(resp.statusCode).send(resp.object);
+};
 export const handleResponse = (func) => {
   return async (req, res, next) => {
     try {
@@ -13,21 +27,6 @@ export const handleResponse = (func) => {
       next(error);
     }
   };
-};
-
-const isValidResponse = (resp) => {
-  if (!resp || !resp.statusCode || !resp.object) {
-    return false;
-  }
-
-  return true;
-};
-
-/**
- * Success response
- */
-const sendResponse = (req, res, resp) => {
-  res.status(resp.statusCode).send(resp.object);
 };
 
 export const successResponse = (obj = {}) => {

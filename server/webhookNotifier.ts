@@ -37,10 +37,9 @@ const getFilteredContent = (content, address) => {
     );
     const title = `${capitalize(content.chainEventType.chain)}`;
     const chainEventLink = `${SERVER_URL}/${content.chainEventType.chain}`;
-    const fulltext =
-      `${event.heading} on ${capitalize(
-        content.chainEventType?.chain
-      )} at block` + ` ${content.chainEvent?.block_number} \n${event.label}`;
+    const fulltext = `${event.heading} on ${capitalize(
+      content.chainEventType?.chain
+    )} at block ${content.chainEvent?.block_number} \n${event.label}`;
     return { title, fulltext, chainEventLink };
   } else {
     const community = `${content.chain || content.community}`;

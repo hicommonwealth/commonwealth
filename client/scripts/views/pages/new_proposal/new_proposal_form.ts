@@ -274,8 +274,13 @@ const NewProposalForm = {
             EdgewareFunctionPicker.getMethod(),
             EdgewareFunctionPicker.getMethod().encodedLength,
           ];
-          createFunc = ([a, t, m, l]) =>
-            (app.chain as Substrate).council.createExternalProposal(a, t, m, l);
+          createFunc = ([a, t, method, l]) =>
+            (app.chain as Substrate).council.createExternalProposal(
+              a,
+              t,
+              method,
+              l
+            );
         } else if (
           vnode.state.councilMotionType === 'createExternalProposalMajority'
         ) {
@@ -285,11 +290,11 @@ const NewProposalForm = {
             EdgewareFunctionPicker.getMethod(),
             EdgewareFunctionPicker.getMethod().encodedLength,
           ];
-          createFunc = ([a, t, m, l]) =>
+          createFunc = ([a, t, method, l]) =>
             (app.chain as Substrate).council.createExternalProposalMajority(
               a,
               t,
-              m,
+              method,
               l
             );
         } else if (
@@ -301,11 +306,11 @@ const NewProposalForm = {
             EdgewareFunctionPicker.getMethod(),
             EdgewareFunctionPicker.getMethod().encodedLength,
           ];
-          createFunc = ([a, t, m, l]) =>
+          createFunc = ([a, t, method, l]) =>
             (app.chain as Substrate).council.createExternalProposalDefault(
               a,
               t,
-              m,
+              method,
               l
             );
         } else if (vnode.state.councilMotionType === 'createFastTrack') {

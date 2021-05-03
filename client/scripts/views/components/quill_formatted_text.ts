@@ -58,6 +58,7 @@ const renderQuillDelta = (delta, hideFormatting = false, collapse = false) => {
     return 'div';
   };
   // multiple list groups should be consolidated, so numbering is preserved even when ordered lists are broken
+  // eslint-disable-next-line no-shadow
   const consolidateOrderedLists = (groups) => {
     const result = [];
 
@@ -155,7 +156,7 @@ const renderQuillDelta = (delta, hideFormatting = false, collapse = false) => {
           // handle tweets
           if (child.insert?.twitter) {
             const id = child.insert.twitter.id;
-            if (!(<any>window).twttr) {
+            if (!(window as any).twttr) {
               loadScript('//platform.twitter.com/widgets.js').then(() => {
                 setTimeout(() => {
                   // eslint-disable-next-line
@@ -291,6 +292,7 @@ const renderQuillDelta = (delta, hideFormatting = false, collapse = false) => {
           );
         };
         // special handler for lists, which need to be un-flattened and turned into a tree
+        // eslint-disable-next-line no-shadow
         const renderListGroup = (group) => {
           const temp = []; // accumulator for potential parent tree nodes; will grow to the maximum depth of the tree
           group.parents.forEach((parent) => {
@@ -312,6 +314,7 @@ const renderQuillDelta = (delta, hideFormatting = false, collapse = false) => {
                 outdentBuffer[outdentBuffer.length - 1].content.push(
                   m(
                     getGroupTag(group),
+                    // eslint-disable-next-line no-shadow
                     temp.pop().map(({ tag, content }) => {
                       return m(tag, content);
                     })
@@ -369,7 +372,7 @@ const QuillFormattedText: m.Component<
         m.render(root, vnodes);
         const textToHighlight = root.innerText
           .replace(/\n/g, ' ')
-          .replace(/\ +/g, ' ');
+          .replace(/ +/g, ' ');
         const chunks = findAll({
           searchWords: [searchTerm.trim()],
           textToHighlight,
@@ -407,7 +410,7 @@ const QuillFormattedText: m.Component<
       {
         class: collapse ? 'collapsed' : '',
         oncreate: (vvnode) => {
-          if (!(<any>window).twttr)
+          if (!(window as any).twttr)
             loadScript('//platform.twitter.com/widgets.js').then(() => {
               console.log('Twitter Widgets loaded');
             });
