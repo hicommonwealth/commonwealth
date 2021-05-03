@@ -3,6 +3,7 @@ import app from 'state';
 import Web3 from 'web3';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import { setActiveAccount } from 'controllers/app/login';
+import { INFURA_ID } from 'client/scripts/constants';
 
 class WalletConnectWebWalletController implements IWebWallet<string> {
   private _enabled: boolean;
@@ -48,15 +49,16 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     try {
       //  Create WalletConnect Provider
       this._provider = new WalletConnectProvider({
-        infuraId: 'b19b8175e688448ead43a0ab5f03438a'
+        infuraId: INFURA_ID
       });
 
       //  Enable session (triggers QR Code modal)
       await this._provider.enable();
       this._web3 = new Web3(this._provider as any);
       this._accounts = await this._web3.eth.getAccounts();
-      const balance = await this._web3.eth.getBalance(this._accounts[0]);
-      console.log(balance);
+      if (this._accounts.length === 0) {
+        throw new Error('Could not fetch accounts from WalletConnect');
+      }
 
       await this.initAccountsChanged();
       this._enabled = true;

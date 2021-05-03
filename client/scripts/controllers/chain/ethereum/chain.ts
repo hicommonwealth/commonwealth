@@ -10,6 +10,7 @@ import {
 } from 'models';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import EthereumAccount from './account';
+import { INFURA_ID } from 'client/scripts/constants';
 
 export interface IEthereumTXData extends ITXData {
   chainId: string;
@@ -57,9 +58,8 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
   public get totalbalance() { return this._totalbalance; }
 
   public async initApi(node?: NodeInfo): Promise<any> {
-    // TODO: do not hardcode
     // TODO: support local/etc
-    const infuraId = 'b19b8175e688448ead43a0ab5f03438a';
+    const infuraId = INFURA_ID;
     const url = `wss://mainnet.infura.io/ws/v3/${infuraId}`;
     try {
       const provider = new Web3.providers.WebsocketProvider(url);

@@ -59,8 +59,9 @@ class MetamaskWebWalletController implements IWebWallet<string> {
 
       this._accounts = await this._web3.eth.getAccounts();
       this._provider = this._web3.currentProvider;
-      const balance = await this._web3.eth.getBalance(this._accounts[0]);
-      console.log(balance);
+      if (this._accounts.length === 0) {
+        throw new Error('Could not fetch accounts from Metamask');
+      }
 
       await this.initAccountsChanged();
       this._enabled = true;
