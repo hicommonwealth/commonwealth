@@ -971,7 +971,6 @@ const instantiateEditor = (
       if (quill.isEnabled()) {
         // Save the entire updated text to localStorage
         const data = JSON.stringify(quill.getContents());
-        console.log(quill.getContents());
         localStorage.setItem(
           `${app.activeId()}-${editorNamespace}-storedText`,
           data
