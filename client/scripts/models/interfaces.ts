@@ -20,8 +20,6 @@ export interface IChainModule<C extends Coin, A extends Account<C>> {
   coins(n: number | BN, inDollars?: boolean): C;
   denom: string;
 
-  hasWebWallet(): boolean;
-
   // Signs and submits an on-chain transaction, wrapping it in a modal dialog that tracks its status.
   createTXModalData(
     author: A,

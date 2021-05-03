@@ -54,6 +54,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
       //  Enable session (triggers QR Code modal)
       await this._provider.enable();
       this._web3 = new Web3(this._provider as any);
+      this._accounts = await this._web3.eth.getAccounts();
       const balance = await this._web3.eth.getBalance(this._accounts[0]);
       console.log(balance);
 
@@ -61,7 +62,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
       this._enabled = true;
       this._enabling = false;
     } catch (error) {
-      console.error('Failed to enable WalletConnect');
+      console.error(`Failed to enable WalletConnect: ${error.message}`);
       this._enabling = false;
     }
   }

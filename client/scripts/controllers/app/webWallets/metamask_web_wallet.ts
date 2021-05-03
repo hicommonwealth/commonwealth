@@ -67,7 +67,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
       this._enabled = true;
       this._enabling = false;
     } catch (error) {
-      console.error('Failed to enable Metamask');
+      console.error(`Failed to enable Metamask: ${error.message}`);
       this._enabling = false;
     }
   }

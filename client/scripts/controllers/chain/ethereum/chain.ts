@@ -21,9 +21,6 @@ export interface IEthereumTXData extends ITXData {
 }
 
 class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
-  public hasWebWallet(): boolean {
-    return true;
-  }
   public createTXModalData(author: EthereumAccount, txFunc: any, txName: string, objName: string): ITXModalData {
     throw new Error('Method not implemented.');
   }
@@ -60,8 +57,12 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
   public get totalbalance() { return this._totalbalance; }
 
   public async initApi(node?: NodeInfo): Promise<any> {
+    // TODO: do not hardcode
+    // TODO: support local/etc
+    const infuraId = 'b19b8175e688448ead43a0ab5f03438a';
+    const url = `wss://mainnet.infura.io/ws/v3/${infuraId}`;
     try {
-      const provider = new Web3.providers.WebsocketProvider(node.url);
+      const provider = new Web3.providers.WebsocketProvider(url);
       this._api = new Web3(provider);
     } catch (error) {
       console.log('Could not connect to Ethereum using remote node');

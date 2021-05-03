@@ -373,8 +373,13 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
                 // avoid oninit because it may be called multiple times
                 if (vnode.state.initializingWallet) return;
                 vnode.state.initializingWallet = true;
-                await webWallet?.enable();
-                await app.chain.initApi();
+                if (!webWallet.enabling && !webWallet.enabled) {
+                  await webWallet?.enable();
+                }
+                // TODO: this check can have race conditions -- need "initializing"
+                if (!app.chain.apiInitialized) {
+                  await app.chain.initApi();
+                }
                 vnode.state.initializingWallet = false;
                 m.redraw();
               },
@@ -382,8 +387,13 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
                 // initialize API if needed before starting webwallet
                 if (vnode.state.initializingWallet) return;
                 vnode.state.initializingWallet = true;
-                await webWallet?.enable();
-                await app.chain.initApi();
+                if (!webWallet.enabling && !webWallet.enabled) {
+                  await webWallet?.enable();
+                }
+                // TODO: this check can have race conditions -- need "initializing"
+                if (!app.chain.apiInitialized) {
+                  await app.chain.initApi();
+                }
                 vnode.state.initializingWallet = false;
                 m.redraw();
               },

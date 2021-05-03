@@ -10,10 +10,6 @@ import { NodeStatusResult } from 'nearlib/lib/providers/provider';
 import { NearAccount } from './account';
 
 class NearChain implements IChainModule<NearToken, NearAccount> {
-  public hasWebWallet(): boolean {
-    return true;
-  }
-
   private _api: NearApi;
   public get api(): NearApi {
     return this._api;
