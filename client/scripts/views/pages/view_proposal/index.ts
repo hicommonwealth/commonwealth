@@ -363,17 +363,7 @@ const ProposalComment: m.Component<{
           m(PopoverMenu, {
             closeOnContentClick: true,
             content: [
-              m(ProposalBodyEditMenuItem, {
-                item: comment, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state,
-              }),
-              m(ProposalBodyDeleteMenuItem, { item: comment, refresh: () => callback(), }),
-              // parentType === CommentParent.Proposal // For now, we are limiting threading to 1 level deep
-              // && m(ProposalBodyReplyMenuItem, {
-              //   item: comment,
-              //   getSetGlobalReplyStatus,
-              //   parentType,
-              //   parentState: vnode.state,
-              // }),
+              m(SocialSharingCarat)
             ],
             transitionDuration: 0,
             trigger: m(Icon, { name: Icons.SHARE_2 })
