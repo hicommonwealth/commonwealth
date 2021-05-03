@@ -3,19 +3,26 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
+import BN from 'bn.js';
 
 import { CWEvent, SubstrateTypes } from '@commonwealth/chain-events';
 
 import { resetDatabase } from '../../../server-test';
 import models from '../../../server/database';
 import StorageHandler from '../../../server/eventHandlers/storage';
+import * as modelUtils from '../../util/modelUtils';
 
 chai.use(chaiHttp);
 const { assert } = chai;
+const chain = 'edgeware';
+let loggedInAddr, loggedInAddrId;
 
 describe('Event Storage Handler Tests', () => {
   before('reset database', async () => {
     await resetDatabase();
+    const result = await modelUtils.createAndVerifyAddress({ chain });
+    loggedInAddr = result.address;
+    loggedInAddrId = result.address_id;
   });
 
   it('should create chain event', async () => {
@@ -31,7 +38,7 @@ describe('Event Storage Handler Tests', () => {
       }
     };
 
-    const eventHandler = new StorageHandler(models, 'edgeware');
+    const eventHandler = new StorageHandler(models, chain);
 
     // process event
     const dbEvent = await eventHandler.handle(event);
@@ -80,7 +87,7 @@ describe('Event Storage Handler Tests', () => {
       }
     };
 
-    const eventHandler = new StorageHandler(models, 'edgeware');
+    const eventHandler = new StorageHandler(models, chain);
 
     // process event
     const dbEvent = await eventHandler.handle(event);
@@ -106,7 +113,7 @@ describe('Event Storage Handler Tests', () => {
       }
     };
 
-    const eventHandler = new StorageHandler(models, 'edgeware');
+    const eventHandler = new StorageHandler(models, chain);
 
     // process event
     const dbEvent = await eventHandler.handle(event as unknown as CWEvent);
@@ -137,7 +144,7 @@ describe('Event Storage Handler Tests', () => {
         amount: '10000',
       }
     };
-    const eventHandler = new StorageHandler(models, 'edgeware', [ SubstrateTypes.EventKind.Reward ]);
+    const eventHandler = new StorageHandler(models, chain, { excludedEvents: [ SubstrateTypes.EventKind.Reward ] });
 
     // process event
     const dbEvent = await eventHandler.handle(event as unknown as CWEvent);
@@ -148,6 +155,61 @@ describe('Event Storage Handler Tests', () => {
       where: {
         chain_event_type_id: 'edgeware-reward',
         block_number: 13,
+      }
+    });
+    assert.lengthOf(chainEvents, 0);
+  });
+
+  it('should create chain event if included address exists in db', async () => {
+    const event: CWEvent = {
+      blockNumber: 14,
+      data: {
+        kind: SubstrateTypes.EventKind.Bonded,
+        stash: loggedInAddr,
+        amount: '10',
+        controller: 'bob',
+      },
+      includeAddresses: [ loggedInAddr, 'bob' ],
+    };
+    const eventHandler = new StorageHandler(models, chain);
+
+    // process event
+    const dbEvent = await eventHandler.handle(event as unknown as CWEvent);
+
+    // confirm results
+    assert.deepEqual(dbEvent.event_data, event.data);
+    const chainEvents = await models['ChainEvent'].findAll({
+      where: {
+        chain_event_type_id: 'edgeware-bonded',
+        block_number: 14,
+      }
+    });
+    assert.lengthOf(chainEvents, 1);
+    assert.deepEqual(chainEvents[0].toJSON(), dbEvent.toJSON());
+  });
+
+  it('should not create chain event if no included address exists in db', async () => {
+    const event: CWEvent = {
+      blockNumber: 15,
+      data: {
+        kind: SubstrateTypes.EventKind.Bonded,
+        stash: 'alice',
+        amount: '10',
+        controller: 'bob',
+      },
+      includeAddresses: [ 'alice', 'bob' ],
+    };
+    const eventHandler = new StorageHandler(models, chain);
+
+    // process event
+    const dbEvent = await eventHandler.handle(event as unknown as CWEvent);
+
+    // confirm no event emitted
+    assert.isUndefined(dbEvent);
+    const chainEvents = await models['ChainEvent'].findAll({
+      where: {
+        chain_event_type_id: 'edgeware-bonded',
+        block_number: 15,
       }
     });
     assert.lengthOf(chainEvents, 0);

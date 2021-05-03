@@ -173,21 +173,28 @@ const LoginSelector: m.Component<{
                 const address = originAddressInfo.address;
 
                 const targetChain = joiningChain || originAddressInfo.chain;
-                const res = await linkExistingAddressToChainOrCommunity(address, targetChain, originAddressInfo.chain, joiningCommunity);
+                const res = await linkExistingAddressToChainOrCommunity(
+                  address, targetChain, originAddressInfo.chain, joiningCommunity
+                );
 
                 if (res && res.result) {
                   const { verification_token, addressId, addresses } = res.result;
-                  app.user.setAddresses(addresses.map((a) => new AddressInfo(a.id, a.address, a.chain, a.keytype, a.is_magic)));
+                  app.user.setAddresses(addresses.map((a) => {
+                    return new AddressInfo(a.id, a.address, a.chain, a.keytype, a.is_magic);
+                  }));
                   const addressInfo = app.user.addresses.find((a) => a.address === address && a.chain === targetChain);
 
-                  const account = app.chain ? app.chain.accounts.get(address, addressInfo.keytype) : app.community.accounts.get(address, addressInfo.chain);
+                  const account = app.chain
+                    ? app.chain.accounts.get(address, addressInfo.keytype)
+                    : app.community.accounts.get(address, addressInfo.chain);
                   if (app.chain) {
                     account.setValidationToken(verification_token);
                   }
 
                   if (joiningChain && !app.user.getRoleInCommunity({ account, chain: joiningChain })) {
                     await app.user.createRole({ address: addressInfo, chain: joiningChain });
-                  } else if (joiningCommunity && !app.user.getRoleInCommunity({ account, community: joiningCommunity })) {
+                  } else if (joiningCommunity
+                             && !app.user.getRoleInCommunity({ account, community: joiningCommunity })) {
                     await app.user.createRole({ address: addressInfo, community: joiningCommunity });
                   }
 
@@ -200,8 +207,8 @@ const LoginSelector: m.Component<{
                 }
 
                 m.redraw();
-              } catch (e) {
-                console.error(e);
+              } catch (err) {
+                console.error(err);
               }
             }
           } else {
@@ -213,7 +220,7 @@ const LoginSelector: m.Component<{
         label: [
           m('span.hidden-sm', [
             samebaseAddressesFiltered.length === 0
-              ? `No ${CHAINBASE_SHORT[app.chain?.meta?.chain.base] || ''} address`
+              ? 'Connect address'
               : 'Join'
           ]),
         ],

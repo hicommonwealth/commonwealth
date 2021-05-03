@@ -20,7 +20,6 @@ import LoadingRow from 'views/components/loading_row';
 import Listing from 'views/pages/listing';
 import NewTopicModal from 'views/modals/new_topic_modal';
 import EditTopicModal from 'views/modals/edit_topic_modal';
-import ManageCommunityModal from 'views/modals/manage_community_modal';
 import CreateInviteModal from 'views/modals/create_invite_modal';
 
 import { INITIAL_PAGE_SIZE } from 'controllers/server/threads';
@@ -495,7 +494,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
                 label: 'Manage community',
                 onclick: (e) => {
                   e.preventDefault();
-                  app.modals.create({ modal: ManageCommunityModal });
+                  app.modals.lazyCreate('manage_community_modal');
                 }
               }),
               (isAdmin || isMod) && app.activeId() && m(MenuItem, {

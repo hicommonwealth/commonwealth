@@ -81,6 +81,10 @@ export interface IApp {
   serverUrl(): string;
   loadingError: string;
 
+  isCustomDomain(): boolean;
+  setIsCustomDomain(option: boolean): void;
+  _isCustomDomain: boolean;
+
   _lastNavigatedBack: boolean;
   _lastNavigatedFrom: string;
   lastNavigatedBack(): boolean;
@@ -148,6 +152,14 @@ const app: IApp = {
   },
   serverUrl: () => '/api',
   loadingError: null,
+
+  isCustomDomain: () => {
+    return app._isCustomDomain;
+  },
+  setIsCustomDomain: (option: boolean) => {
+    app._isCustomDomain = option;
+  },
+  _isCustomDomain: false,
 
   _lastNavigatedFrom: null,
   _lastNavigatedBack: false,

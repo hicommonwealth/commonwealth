@@ -16,6 +16,7 @@ export const LoadingLayout: m.Component<{ hideSidebar?: boolean }> = {
   view: (vnode) => {
     const { hideSidebar } = vnode.attrs;
     return m('.Layout.mithril-app', {
+      class: app.isCustomDomain() ? 'custom-domain' : ''
     }, [
       m(Sublayout, { loadingLayout: true, hideSidebar }),
       m(AppModals),
@@ -43,7 +44,9 @@ export const Layout: m.Component<{
     }
 
     if (app.loadingError) {
-      return m('.Layout.mithril-app', [
+      return m('.Layout.mithril-app', {
+        class: app.isCustomDomain() ? 'custom-domain' : ''
+      }, [
         m(Sublayout, { errorLayout: [
           m('p', { style: 'color: #222' }, `Application error: ${app.loadingError}`),
           m('p', { style: 'color: #222' }, 'Please try again at another time'),
@@ -61,7 +64,9 @@ export const Layout: m.Component<{
     } else if (scope && !scopeMatchesChain && !scopeMatchesCommunity && !isEthereumAddress(scope)) {
       // If /api/status has returned, then app.config.nodes and app.config.communities
       // should both be loaded. If we match neither of them, then we can safely 404
-      return m('.Layout.mithril-app', [
+      return m('.Layout.mithril-app', {
+        class: app.isCustomDomain() ? 'custom-domain' : ''
+      }, [
         m(PageNotFound),
         m(AppModals),
         m(AppToasts),
@@ -96,7 +101,9 @@ export const Layout: m.Component<{
       return m(LoadingLayout, { hideSidebar });
     }
 
-    return m('.Layout.mithril-app', { class: hideSidebar ? 'hide-sidebar' : '' }, [
+    return m('.Layout.mithril-app', {
+      class: `${hideSidebar ? 'hide-sidebar' : ''} ${app.isCustomDomain() ? 'custom-domain' : ''}`
+    }, [
       vnode.children,
       m(AppModals),
       m(AppToasts),

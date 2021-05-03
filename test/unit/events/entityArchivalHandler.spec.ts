@@ -134,7 +134,6 @@ describe('Edgeware Archival Event Handler Tests', () => {
   it('should ignore unrelated events', async () => {
     const event: CWEvent<SubstrateTypes.IEventData> = {
       blockNumber: 11,
-      includeAddresses: ['5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'],
       data: {
         kind: SubstrateTypes.EventKind.Slash,
         validator: '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty',

@@ -90,6 +90,14 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       if (updateSelectedNode && data.user && data.user.selectedNode) {
         app.user.setSelectedNode(NodeInfo.fromJSON(data.user.selectedNode));
       }
+
+      // update whether we're on a custom domain
+      const host = document.location.host;
+      app.setIsCustomDomain(
+        app.config.chains.getAll().find((c) => c.customDomain === host) !== undefined
+          || app.config.communities.getAll().find((c) => c.customDomain === host) !== undefined
+      );
+
       resolve();
     }).catch((err: any) => {
       app.loadingError = err.responseJSON?.error || 'Error loading application state';
@@ -557,6 +565,7 @@ $(() => {
     scoped: string | boolean;
     hideSidebar?: boolean;
     deferChain?: boolean;
+    redirectCustomDomain?: boolean;
   }
 
   const importRoute = (path: string, attrs: RouteAttrs) => ({
@@ -568,7 +577,30 @@ $(() => {
       ).then((p) => p.default);
     },
     render: (vnode) => {
-      const { scoped, hideSidebar } = attrs;
+      const { scoped, hideSidebar, redirectCustomDomain } = attrs;
+
+      // handle custom domains, for routes that need special handling
+      const host = document.location.host;
+      if (redirectCustomDomain) {
+        const hasLoadedAll = app.config.chains.getAll().length !== 0 || app.config.communities.getAll().length !== 0;
+        const matchingChain = app.config.chains.getAll().find((c) => c.customDomain === host);
+        const matchingCommunity = app.config.communities.getAll().find((c) => c.customDomain === host);
+
+        // keep the page loading until chains & communities have been fetched
+        if (!hasLoadedAll) return m(LoadingLayout);
+
+        // redirect into the community
+        if (matchingChain) {
+          m.route.set(`/${matchingChain.id}`, {}, { replace: true });
+          return m(LoadingLayout);
+        }
+        if (matchingCommunity) {
+          m.route.set(`/${matchingCommunity.id}`, {}, { replace: true });
+          return m(LoadingLayout);
+        }
+      }
+
+      // normal render
       let deferChain = attrs.deferChain;
       const scope = typeof scoped === 'string'
         // string => scope is defined by route
@@ -597,7 +629,7 @@ $(() => {
     '/discussions':              redirectRoute(`/${app.activeId() || app.config.defaultChain}/`),
 
     // Landing pages
-    '/':                         importRoute('views/pages/home', { scoped: false, hideSidebar: true }),
+    '/':                         importRoute('views/pages/home', { scoped: false, hideSidebar: true, redirectCustomDomain: true }),
     '/about':                    importRoute('views/pages/landing/about', { scoped: false }),
     '/terms':                    importRoute('views/pages/landing/terms', { scoped: false }),
     '/privacy':                  importRoute('views/pages/landing/privacy', { scoped: false }),
