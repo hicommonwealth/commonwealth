@@ -102,11 +102,17 @@ export const getCommunityPreview = (community, closeResultsFn) => {
 
 export const getDiscussionPreview = (thread, closeResultsFn, searchTerm) => {
   const proposalId = thread.proposalid;
+  const chainOrComm = thread.chain || thread.offchain_community;
+
   return m(ListItem, {
     onclick: (e) => {
+      if (!chainOrComm) {
+        notifyError('Discussion not found.');
+        return;
+      }
       m.route.set((thread.type === 'thread')
-        ? `/${thread.chain || thread.offchain_community}/proposal/discussion/${proposalId}`
-        : `/${thread.chain || thread.offchain_community}/proposal/${proposalId.split('_')[0]}/${proposalId.split('_')[1]}`);
+        ? `/${chainOrComm}/proposal/discussion/${proposalId}`
+        : `/${chainOrComm}/proposal/${proposalId.split('_')[0]}/${proposalId.split('_')[1]}`);
       closeResultsFn();
     },
     label: m('a.search-results-item', [
