@@ -18,6 +18,7 @@ import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import CommunitySelector from 'views/components/sidebar/community_selector';
 import CreateCommunityModal from 'views/modals/create_community_modal';
+import { CWPModule, CWPChainStatusModule, isCommonProtocolMenu } from './common_protocol';
 
 import { discordIcon, telegramIcon, elementIcon, githubIcon, websiteIcon } from './icons';
 import { AaveTypes, MarlinTypes, MolochTypes } from '@commonwealth/chain-events';
@@ -114,7 +115,8 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
         rounded: true,
         fluid: true,
         active: onDiscussionsPage(m.route.get())
-          && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
+          // && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
+          && (app.community ? app.community.serverLoaded : app.chain ? app.chain.serverLoaded : true),
         label: 'Discussions',
         onclick: (e) => {
           e.preventDefault();
@@ -149,7 +151,8 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
         rounded: true,
         fluid: true,
         active: onMembersPage(m.route.get())
-          && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
+          // && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
+          && (app.community ? app.community.serverLoaded : app.chain ? app.chain.serverLoaded : true),
         label: 'Members',
         onclick: (e) => {
           e.preventDefault();
@@ -472,6 +475,12 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
 
 export const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
   view: (vnode) => {
+    // add CWP chain status
+    if (isCommonProtocolMenu()) {
+      return m(CWPChainStatusModule);
+    }
+    if (!app.chain) return;
+
     const url = app.chain?.meta?.url;
     if (!url) return;
 
@@ -548,7 +557,8 @@ export const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
 export const ExternalLinksModule: m.Component<{}, {}> = {
   view: (vnode) => {
     if (!app.chain && !app.community) return;
-    const meta = app.chain ? app.chain.meta.chain : app.community.meta;
+    // const meta = app.chain ? app.chain.meta.chain : app.community.meta;
+    const meta = app.community ? app.community.meta : app.chain.meta.chain;
     const { name, description, website, discord, element, telegram, github } = meta;
     if (!website && !discord && !telegram && !github) return;
 
@@ -614,6 +624,7 @@ const Sidebar: m.Component<{ hideQuickSwitcher? }, {}> = {
       m('.Sidebar', [
         (app.chain || app.community) && m(OffchainNavigationModule),
         (app.chain || app.community) && m(OnchainNavigationModule),
+        isCommonProtocolMenu() && m(CWPModule), // for CWP Projects & Collectives
         (app.chain || app.community) && m(ExternalLinksModule),
         m('br'),
         app.isLoggedIn() && (app.chain || app.community) && m(SubscriptionButton),

@@ -294,6 +294,7 @@ const DiscussionsPage: m.Component<
     const selectedCommunity = app.community;
 
     const communityName = selectedNode ? selectedNode.chain.name : selectedCommunity ? selectedCommunity.meta.name : '';
+    // const communityName = selectedCommunity ? selectedCommunity.meta.name : selectedNode ? selectedNode.chain.name : '';  // for CWP
 
     const allLastVisited = typeof app.user.lastVisited === 'string' ? JSON.parse(app.user.lastVisited) : app.user.lastVisited;
     if (!vnode.state.lastVisitedUpdated) {
