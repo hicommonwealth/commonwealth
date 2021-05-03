@@ -6,7 +6,6 @@ import { provider } from 'web3-core';
 import { Account, ChainBase, IWebWallet } from 'models';
 import { setActiveAccount } from 'controllers/app/login';
 
-// TODO: make this a generic controller, it's shared with polkadotJS right now
 class MetamaskWebWalletController implements IWebWallet<string> {
   // GETTERS/SETTERS
   private _enabled: boolean;

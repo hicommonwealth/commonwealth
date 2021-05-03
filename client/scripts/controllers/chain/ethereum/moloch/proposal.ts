@@ -359,7 +359,7 @@ export default class MolochProposal extends Proposal<
 
   public async processTx() {
     // TODO: is this the correct user to process?
-    const address = this.author.address;
+    const address = this._Members.app.user.activeAccount.address;
     const contract = await this._Members.api.attachSigner(this._Members.app.wallets, address);
 
     if (this.state !== MolochProposalState.ReadyToProcess) {

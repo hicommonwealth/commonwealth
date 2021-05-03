@@ -25,7 +25,6 @@ class Ethereum extends IChainAdapter<EthereumCoin, EthereumAccount> {
     await this.chain.resetApi(this.meta);
     await this.chain.initMetadata();
     await this.accounts.init(this.chain);
-    // TODO: enable metamask
     await this.chain.initEventLoop();
     await super.initApi();
   }

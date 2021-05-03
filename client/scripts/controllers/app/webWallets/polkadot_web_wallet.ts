@@ -7,7 +7,6 @@ import { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
 import { Account, ChainBase, IWebWallet } from 'models';
 import AddressSwapper from 'views/components/addresses/address_swapper';
 
-// TODO: make this a generic controller, and have the polkadot-js extension implementation inherit
 class PolkadotWebWalletController implements IWebWallet<InjectedAccountWithMeta> {
   // GETTERS/SETTERS
   private _enabled: boolean;
