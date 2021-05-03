@@ -363,7 +363,9 @@ const ProposalComment: m.Component<{
           m(PopoverMenu, {
             closeOnContentClick: true,
             content: [
-              m(SocialSharingCarat)
+              m(SocialSharingCarat, {
+                commentID: comment.id,
+              })
             ],
             transitionDuration: 0,
             trigger: m(Icon, { name: Icons.SHARE_2 })
