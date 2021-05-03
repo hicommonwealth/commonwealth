@@ -83,6 +83,13 @@ const Sublayout: m.Component<{
           title && m('span.breadcrumb', m.trust('/')),
           title
         ]),
+      ] : chain ? [
+        m(ChainIcon, { size: ICON_SIZE, chain }),
+        m('h4.sublayout-header-heading', [
+          link('a', `/${app.activeId()}`, chain.name),
+          title && m('span.breadcrumb', m.trust('/')),
+          title
+        ]),
       ] : alwaysShowTitle ? [
         m('h4.sublayout-header-heading.no-chain-or-community', title)
       ] : [

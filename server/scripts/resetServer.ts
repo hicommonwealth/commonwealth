@@ -18,6 +18,7 @@ const nodes = [
   [ 'wss://rpc.polkadot.io', 'polkadot' ],
   // [ 'ws://127.0.0.1:7545', 'ethereum-local' ],
   // [ 'wss://mainnet.infura.io/ws', 'ethereum' ],
+  [ 'wss://kovan.infura.io/ws', 'ethereum' ],   // test
   // [ '18.223.143.102:9944', 'edgeware-testnet' ],
   // [ '157.230.218.41:9944', 'edgeware-testnet' ],
   // [ '157.230.125.18:9944', 'edgeware-testnet' ],
@@ -28,6 +29,7 @@ const nodes = [
   [ 'wss://straightedge.commonwealth.im', 'straightedge' ],
   [ 'http://localhost:3030', 'near-local' ],
   [ 'https://rpc.mainnet.near.org', 'near' ],
+  [ 'wss://mainnet.infura.io/ws', 'moloch', '0x1fd169A4f5c59ACf79d0Fd5d91D1201EF1Bce9f1'],
   [ 'wss://mainnet.infura.io/ws', 'moloch', '0x1fd169A4f5c59ACf79d0Fd5d91D1201EF1Bce9f1'],
   [ 'wss://rpc.kulupu.corepaper.org/ws', 'kulupu'],
   [ 'wss://rpc.plasmnet.io/', 'plasm'],
@@ -1364,6 +1366,18 @@ const resetServer = (): Promise<number> => {
           creator_id: 1,
           description: 'All things Commonwealth',
           default_chain: 'edgeware',
+        }),
+        models.OffchainCommunity.create({
+          id: 'common-protocol',
+          name: 'Commonwealth Protocol',
+          creator_id: 1,
+          description: 'Commonwealth Protocol helps powers crowdfunding for Commonwealth',
+          iconUrl:  'https://commonwealth-uploads.s3.us-east-2.amazonaws.com/b24443a7-c418-4515-b3eb-e0cb7239b46a.1618294677116',
+          github: 'https://github.com/hicommonwealth/',
+          telegram: 'https://t.me/HiCommonwealth',
+          discord: 'https://discord.gg/watSundeFK',
+          website: 'http://commonwealth.im/',
+          default_chain: 'ethereum',
         })
       ]);
 

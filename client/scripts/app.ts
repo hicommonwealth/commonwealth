@@ -565,6 +565,7 @@ Promise.all([
       if (app.chain?.meta.chain.type === ChainType.Token) {
         deferChain = false;
       }
+      if (app.chain instanceof Token) deferChain = false;
       return m(Layout, { scope, deferChain, hideSidebar }, [ vnode ]);
     },
   });
@@ -655,6 +656,7 @@ Promise.all([
       '/:scope/council':            redirectRoute(() => '/council'),
       '/:scope/delegate':           redirectRoute(() => '/delegate'),
       '/:scope/proposal/:type/:identifier': redirectRoute((attrs) => `/proposal/${attrs.type}/${attrs.identifier}/`),
+      '/:scope/project/:identifier': importRoute('views/pages/view_project/index', { scoped: true }), // CWP
       '/:scope/new/proposal/:type':  redirectRoute((attrs) => `/new/proposal/${attrs.type}/`),
       '/:scope/treasury':           redirectRoute(() => '/treasury'),
       '/:scope/bounties':           redirectRoute(() => '/bounties'),
