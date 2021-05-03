@@ -46,6 +46,7 @@ require('express-async-errors');
 
 const app = express();
 async function main() {
+  console.log("Hello robot")
   const DEV = process.env.NODE_ENV !== 'production';
 
   // CLI parameters for which task to run
@@ -69,6 +70,7 @@ async function main() {
   const FLAG_MIGRATION = process.env.FLAG_MIGRATION;
   const CHAIN_EVENTS = process.env.CHAIN_EVENTS;
   const RUN_AS_LISTENER = process.env.RUN_AS_LISTENER === 'true';
+  console.log("RUN_AS_LISTENER ",RUN_AS_LISTENER)
 
   const identityFetchCache = new IdentityFetchCache(10 * 60);
   const tokenBalanceCache = new TokenBalanceCache();
@@ -82,7 +84,6 @@ async function main() {
         chains = CHAIN_EVENTS.split(',');
       }
       const subscribers = await setupChainEventListeners(models, null, chains, SKIP_EVENT_CATCHUP);
-
       // construct storageFetchers needed for the identity cache
       const fetchers = {};
       for (const [ chain, subscriber ] of Object.entries(subscribers)) {
@@ -100,6 +101,7 @@ async function main() {
 
   let rc = null;
   if (RUN_AS_LISTENER) {
+    console.log("Run as listener ")
     // hack to keep process running indefinitely
     process.stdin.resume();
     listenChainEvents().then((retcode) => {

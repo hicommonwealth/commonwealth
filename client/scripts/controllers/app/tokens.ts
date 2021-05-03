@@ -18,9 +18,9 @@ export default class TokensController {
       }
     }
     var data : any = await Promise.all(
-      tokenListUrls.map(url=>m.request({method: "GET", url }))
+      tokenListUrls.map((url)=>m.request({method: "GET", url }))
     );
-    data = data.map(o=>o.tokens).flat();
+    data = data.map((o)=>o.tokens).flat();
     localStorage.setItem(TOKEN_LISTS_LOCAL_STORAGE_KEY,JSON.stringify(data));
     localStorage.setItem(TOKEN_LISTS_LAST_UPDATED_KEY,""+Date.now())
     return data;
