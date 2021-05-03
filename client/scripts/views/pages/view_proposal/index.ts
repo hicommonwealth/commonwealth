@@ -40,6 +40,9 @@ import PageNotFound from 'views/pages/404';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
+
+import { SocialSharingCarat } from 'views/components/social_sharing_carat';
+
 import {
   ProposalHeaderExternalLink, ProposalHeaderBlockExplorerLink, ProposalHeaderVotingInterfaceLink,
   ProposalHeaderThreadLink, ProposalHeaderThreadLinkedChainEntity,
@@ -58,6 +61,7 @@ import {
 } from './body';
 import CreateComment from './create_comment';
 import LinkedProposalsEmbed from './linked_proposals_embed';
+
 
 const ProposalHeader: m.Component<{
   commentCount: number;
@@ -166,7 +170,19 @@ const ProposalHeader: m.Component<{
                   m(ThreadSubscriptionMenuItem, { proposal: proposal as OffchainThread }),
                 ],
                 inline: true,
-                trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
+                trigger: m(Icon, { name: Icons.EDIT_3 }),
+              }),
+              // This is the new social carat menu
+              m(PopoverMenu, {
+                transitionDuration: 0,
+                closeOnOutsideClick: true,
+                closeOnContentClick: true,
+                menuAttrs: { size: 'default' },
+                content: [
+                  m(SocialSharingCarat)
+                ],
+                inline: true,
+                trigger: m(Icon, { name: Icons.SHARE_2 }),
               }),
               vnode.state.editPermissionsIsOpen
                 && proposal instanceof OffchainThread
@@ -344,6 +360,24 @@ const ProposalComment: m.Component<{
               trigger: m(Icon, { name: Icons.CHEVRON_DOWN })
             })
           ],
+          m(PopoverMenu, {
+            closeOnContentClick: true,
+            content: [
+              m(ProposalBodyEditMenuItem, {
+                item: comment, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state,
+              }),
+              m(ProposalBodyDeleteMenuItem, { item: comment, refresh: () => callback(), }),
+              // parentType === CommentParent.Proposal // For now, we are limiting threading to 1 level deep
+              // && m(ProposalBodyReplyMenuItem, {
+              //   item: comment,
+              //   getSetGlobalReplyStatus,
+              //   parentType,
+              //   parentState: vnode.state,
+              // }),
+            ],
+            transitionDuration: 0,
+            trigger: m(Icon, { name: Icons.SHARE_2 })
+          })
 
           // For now, we are limiting threading to 1 level deep
           // Comments whose parents are other comments should not display the reply option
