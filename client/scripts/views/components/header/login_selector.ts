@@ -8,16 +8,10 @@ import { Button, ButtonGroup, Icon, Icons, Menu, MenuItem, MenuDivider,
   Popover } from 'construct-ui';
 
 import app from 'state';
-import { Account, AddressInfo, ChainBase, ChainInfo, CommunityInfo, RoleInfo, RolePermission } from 'models';
+import { AddressInfo, ChainBase, ChainInfo, CommunityInfo, RoleInfo, RolePermission } from 'models';
 import { isSameAccount, pluralize } from 'helpers';
 import { initAppState } from 'app';
-import { notifySuccess, notifyError } from 'controllers/app/notifications';
-import { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
-import { stringToHex } from '@polkadot/util';
-import Substrate from 'controllers/chain/substrate/main';
-import Ethereum from 'controllers/chain/ethereum/main';
-import { SigningCosmosClient } from '@cosmjs/launchpad';
-import { validationTokenToSignDoc } from 'adapters/chain/cosmos/keys';
+import { notifySuccess } from 'controllers/app/notifications';
 
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';

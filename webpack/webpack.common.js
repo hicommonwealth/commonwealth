@@ -46,7 +46,7 @@ module.exports = {
           chunks: 'all',
         },
         cosmos: {
-          test: /[\\/]node_modules[\\/](@lunie|@tendermint|amino-js|supercop\.js|tendermint)[\\/]/,
+          test: /[\\/]node_modules[\\/](@cosmjs|@tendermint|amino-js|supercop\.js|tendermint)[\\/]/,
           name: 'cosmos',
           chunks: 'all',
         },

@@ -6,10 +6,9 @@ import crypto from 'crypto';
 import Keyring, { decodeAddress } from '@polkadot/keyring';
 import { stringToU8a, hexToU8a } from '@polkadot/util';
 
-import { serializeSignDoc, decodeSignature } from '@cosmjs/launchpad';
+import { serializeSignDoc, decodeSignature, rawSecp256k1PubkeyToAddress } from '@cosmjs/launchpad';
 import { Secp256k1, Secp256k1Signature, Sha256 } from '@cosmjs/crypto';
 import { fromBase64 } from '@cosmjs/encoding';
-import { getCosmosAddress } from '@lunie/cosmos-keys'; // used to check address validity. TODO: remove
 
 import nacl from 'tweetnacl';
 import { KeyringOptions } from '@polkadot/keyring/types';
@@ -148,7 +147,9 @@ export default (
     const verification_token = crypto.randomBytes(18).toString('hex');
     const verification_token_expires = new Date(+(new Date()) + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000);
     const last_active = new Date();
-    return Address.create({ user_id, chain, address, verification_token, verification_token_expires, keytype, last_active });
+    return Address.create({
+      user_id, chain, address, verification_token, verification_token_expires, keytype, last_active,
+    });
   };
 
   // Update an existing address' verification token
@@ -238,8 +239,8 @@ export default (
       const bech32Prefix = chain.network === 'cosmos'
         ? 'cosmos'
         : chain.network === 'straightedge' ? 'str' : chain.network;
-      const generatedAddress = getCosmosAddress(pk, bech32Prefix);
-      const generatedAddressWithCosmosPrefix = getCosmosAddress(pk, 'cosmos');
+      const generatedAddress = rawSecp256k1PubkeyToAddress(pk, bech32Prefix);
+      const generatedAddressWithCosmosPrefix = rawSecp256k1PubkeyToAddress(pk, 'cosmos');
 
       if (generatedAddress === addressModel.address || generatedAddressWithCosmosPrefix === addressModel.address) {
         // get tx doc that was signed

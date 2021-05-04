@@ -19,8 +19,8 @@ abstract class Account<C extends Coin> {
   public abstract balance: Promise<C>;
   public abstract sendBalanceTx(recipient: Account<C>, amount: C): Promise<ITXModalData> | ITXModalData;
   public abstract signMessage(message: string): Promise<string>;
-  protected abstract addressFromMnemonic(mnemonic: string): string;
-  protected abstract addressFromSeed(seed: string): string;
+  protected abstract addressFromMnemonic(mnemonic: string): Promise<string>;
+  protected abstract addressFromSeed(seed: string): Promise<string>;
 
   // The account's seed or mnemonic, used to generate their private key
   protected seed?: string;
@@ -56,14 +56,16 @@ abstract class Account<C extends Coin> {
   public getMnemonic() {
     return this.mnemonic;
   }
-  public setSeed(seed: string) {
-    if (this.addressFromSeed(seed) !== this.address) {
+  public async setSeed(seed: string): Promise<void> {
+    const address = await this.addressFromSeed(seed);
+    if (address !== this.address) {
       throw new Error('address does not match seed');
     }
     this.seed = seed;
   }
-  public setMnemonic(mnemonic: string) {
-    if (this.addressFromMnemonic(mnemonic) !== this.address) {
+  public async setMnemonic(mnemonic: string): Promise<void> {
+    const address = await this.addressFromMnemonic(mnemonic);
+    if (address !== this.address) {
       throw new Error('address does not match mnemonic');
     }
     this.mnemonic = mnemonic;

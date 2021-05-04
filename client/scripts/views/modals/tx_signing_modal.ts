@@ -290,15 +290,15 @@ const TXSigningSeedOrMnemonicOption = {
           intent: 'primary',
           type: 'submit',
           rounded: true,
-          onclick: (e) => {
+          onclick: async (e) => {
             e.preventDefault();
             const newKey = `${$(vnode.dom).find('textarea.mnemonic').val().toString()
               .trim()}`;
             try {
               if (mnemonicValidate(newKey)) {
-                vnode.attrs.author.setMnemonic(newKey);
+                await vnode.attrs.author.setMnemonic(newKey);
               } else {
-                vnode.attrs.author.setSeed(newKey);
+                await vnode.attrs.author.setSeed(newKey);
               }
               transact();
             } catch (err) {

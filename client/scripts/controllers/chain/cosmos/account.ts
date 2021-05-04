@@ -1,9 +1,17 @@
 import _ from 'lodash';
 import { IApp } from 'state';
 import { CosmosToken } from 'adapters/chain/cosmos/types';
-import CosmosChain from 'controllers/chain/cosmos/chain';
 import { Account, IAccountsModule } from 'models';
 import { AccountsStore } from 'stores';
+import {
+  Secp256k1HdWallet,
+  StakingValidatorDelegationsResponse,
+  StakingDelegatorDelegationsResponse,
+  AuthAccountsResponse,
+  StdSignDoc,
+} from '@cosmjs/launchpad';
+
+import CosmosChain from './chain';
 
 export interface ICosmosValidator {
   // TODO: add more properties (commission, unbonding, jailed, etc)
@@ -27,8 +35,7 @@ export class CosmosAccount extends Account<CosmosToken> {
   private _Accounts: CosmosAccounts;
 
   // TODO: add delegations, validations
-  private _privateKey: Buffer;
-  private _publicKey: Buffer;
+  private _wallet: Secp256k1HdWallet;
 
   private _validatorDelegations: { [address: string]: number } = {};
   public get validatorDelegations(): Promise<{ [address: string]: number }> {
@@ -66,69 +73,36 @@ export class CosmosAccount extends Account<CosmosToken> {
     this._Accounts.store.add(this);
   }
 
-  public setMnemonic(mnemonic: string) {
-    const { cosmosAddress, privateKey, publicKey } = this._Accounts.CosmosKeys.getNewWalletFromSeed(mnemonic);
-    if (cosmosAddress !== this.address) {
-      throw new Error('address does not match mnemonic');
-    }
-    this.mnemonic = mnemonic;
-    this.setPrivateKey(privateKey);
-    this.setPublicKey(publicKey);
-  }
-  public setSeed(seed: string) {
-    const { cosmosAddress, privateKey, publicKey } = this._Accounts.CosmosKeys.getNewWalletFromSeed(seed);
-    if (cosmosAddress !== this.address) {
-      throw new Error('address does not match mnemonic');
-    }
-    this.seed = seed;
-    this.setPrivateKey(privateKey);
-    this.setPublicKey(publicKey);
-  }
-  public setPrivateKey(pk: string) {
-    this._privateKey = Buffer.from(pk, 'hex');
-  }
-  public setPublicKey(pubk: string) {
-    this._publicKey = Buffer.from(pubk, 'hex');
-  }
-  get publicKey() {
-    if (this._publicKey) {
-      return this._publicKey.toString('hex');
-    } else {
-      return null;
-    }
+  public setWallet(wallet: Secp256k1HdWallet) {
+    this._wallet = wallet;
   }
 
-  protected addressFromMnemonic(mnemonic: string): string {
-    const { cosmosAddress, privateKey, publicKey } = this._Accounts.CosmosKeys.getNewWalletFromSeed(mnemonic);
-    return cosmosAddress;
-  }
-  protected addressFromSeed(seed: string): string {
-    const { cosmosAddress, privateKey, publicKey } = this._Accounts.CosmosKeys.getNewWalletFromSeed(seed);
-    return cosmosAddress;
+  // TODO: these should be sync, or we need to change rest of code to match
+  protected async addressFromMnemonic(mnemonic: string): Promise<string> {
+    const wallet = await Secp256k1HdWallet.fromMnemonic(mnemonic);
+    const [{ address }] = await wallet.getAccounts();
+    return address;
   }
 
-  public getLedgerSigner() {
-    if (!this._privateKey || !this._publicKey) {
-      throw new Error('cannot sign transaction without public key');
-    }
-    return (signMessage: string) => ({
-      signature: this._Accounts.CosmosKeys.signWithPrivateKey(signMessage, this._privateKey),
-      publicKey: this._publicKey
-    });
+  protected async addressFromSeed(seed: string): Promise<string> {
+    return this.addressFromMnemonic(seed);
   }
 
   public async signMessage(message: string): Promise<string> {
-    if (!this._privateKey) {
-      throw new Error('Private key required to sign.');
+    const aminoMsg: StdSignDoc = JSON.parse(message);
+    if (!this._wallet) {
+      throw new Error('Wallet required to sign.');
     }
-    return this._Accounts.CosmosKeys.signWithPrivateKey(message, this._privateKey).toString('hex');
+    const [{ address }] = await this._wallet.getAccounts();
+    const resp = await this._wallet.signAmino(address, aminoMsg);
+    return resp.signature.signature;
   }
 
   public updateValidatorDelegations = _.throttle(async () => {
-    let resp;
+    let resp: StakingValidatorDelegationsResponse;
     try {
       // @ Not sure if this is the query??
-      resp = await this._Chain.api.query.validatorDelegations(this.address);
+      resp = await this._Chain.api.query.staking.validatorDelegations(this.address);
     } catch (e) {
       console.error(e);
     }
@@ -138,7 +112,7 @@ export class CosmosAccount extends Account<CosmosToken> {
       return;
     }
     const validatorDelegations = this._validatorDelegations;
-    for (const validatorDelegation of resp) {
+    for (const validatorDelegation of resp.result) {
       validatorDelegations[validatorDelegations.delegate_address] = +validatorDelegation.shares;
     }
     this._validatorDelegations = validatorDelegations;
@@ -147,9 +121,9 @@ export class CosmosAccount extends Account<CosmosToken> {
 
   public updateDelegations = _.throttle(async () => {
     const queryUrl = `${this._Chain.api.restUrl}/staking/delegators/${this.address}/delegations`;
-    let resp;
+    let resp: StakingDelegatorDelegationsResponse;
     try {
-      resp = await this._Chain.api.query.delegations(this.address);
+      resp = await this._Chain.api.query.staking.delegatorDelegations(this.address);
     } catch (e) {
       console.error(e);
     }
@@ -159,7 +133,7 @@ export class CosmosAccount extends Account<CosmosToken> {
       return;
     }
     const delegations = this._delegations;
-    for (const delegation of resp) {
+    for (const delegation of resp.result) {
       delegations[delegation.validator_address] = +delegation.shares;
     }
     this._delegations = delegations;
@@ -172,9 +146,9 @@ export class CosmosAccount extends Account<CosmosToken> {
 
   public updateBalance = _.throttle(async () => {
     // const queryUrl = this._Chain.api.restUrl + '/auth/accounts/' + this.address;
-    let resp;
+    let resp: AuthAccountsResponse;
     try {
-      resp = await this._Chain.api.query.account(this.address);
+      resp = await this._Chain.api.query.auth.account(this.address);
     } catch (e) {
       // if coins is null, they have a zero balance
       console.log(`no balance found: ${JSON.stringify(e)}`);
@@ -185,8 +159,8 @@ export class CosmosAccount extends Account<CosmosToken> {
       console.error('could not update balance');
       return;
     }
-    if (resp && resp.coins && resp.coins[0]) {
-      for (const coins of resp.coins) {
+    if (resp && resp.result.value.coins && resp.result.value.coins[0]) {
+      for (const coins of resp.result.value.coins) {
         const bal = +coins.amount;
         if (coins.denom === this._Chain.denom) {
           this._balance = this._Chain.coins(bal, true);
@@ -196,10 +170,6 @@ export class CosmosAccount extends Account<CosmosToken> {
         } else {
           throw new Error(`invalid denomination: ${coins.denom}`);
         }
-      }
-      if (resp && resp.public_key && resp.public_key.type === 'tendermint/PubKeySecp256k1') {
-        const pk = Buffer.from(resp.public_key.value, 'base64');
-        this.setPublicKey(pk.toString('hex'));
       }
     }
     if (!this._balance) {
@@ -323,8 +293,6 @@ export class CosmosAccounts implements IAccountsModule<CosmosToken, CosmosAccoun
     this._app = app;
   }
 
-  public CosmosKeys;
-
   public updateValidators = _.throttle(async () => {
     const bonded = await this._Chain.api.queryUrl('/staking/validators?status=bonded', null, null, false);
     for (const validator of bonded) {
@@ -370,21 +338,16 @@ export class CosmosAccounts implements IAccountsModule<CosmosToken, CosmosAccoun
     }
   }
 
-  public fromMnemonic(mnemonic: string) {
-    const { cosmosAddress, privateKey, publicKey } = this.CosmosKeys.getNewWalletFromSeed(mnemonic);
-    const acct = new CosmosAccount(this.app, this._Chain, this, cosmosAddress);
-    acct.setMnemonic(mnemonic);
-    acct.setPublicKey(publicKey);
-    acct.setPrivateKey(privateKey);
+  public async fromMnemonic(mnemonic: string) {
+    const wallet = await Secp256k1HdWallet.fromMnemonic(mnemonic);
+    const [{ address }] = await wallet.getAccounts();
+    const acct = new CosmosAccount(this.app, this._Chain, this, address);
+    await acct.setMnemonic(mnemonic);
+    acct.setWallet(wallet);
     return acct;
   }
-  public fromSeed(seed: string) {
-    const { cosmosAddress, privateKey, publicKey } = this.CosmosKeys.getNewWalletFromSeed(seed);
-    const acct = new CosmosAccount(this.app, this._Chain, this, cosmosAddress);
-    acct.setSeed(seed);
-    acct.setPublicKey(publicKey);
-    acct.setPrivateKey(privateKey);
-    return acct;
+  public async fromSeed(seed: string) {
+    return this.fromMnemonic(seed);
   }
 
   public deinit() {
@@ -394,7 +357,7 @@ export class CosmosAccounts implements IAccountsModule<CosmosToken, CosmosAccoun
 
   public async init(ChainInfo: CosmosChain): Promise<void> {
     this._Chain = ChainInfo;
-    this.CosmosKeys = await import('@lunie/cosmos-keys');
+
     // handle account-related events
     this._Chain.api.observeEvent('MsgSend', async ({ msg }) => {
       const sent = msg.value;

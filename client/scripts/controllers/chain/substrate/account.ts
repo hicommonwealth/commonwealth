@@ -224,11 +224,11 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
   }
 
   // keys
-  protected addressFromMnemonic(mnemonic: string) {
+  protected async addressFromMnemonic(mnemonic: string) {
     return addressFromMnemonic(mnemonic, this._Chain);
   }
 
-  protected addressFromSeed(seed: string) {
+  protected async addressFromSeed(seed: string) {
     return addressFromSeed(seed, this._Chain);
   }
 
@@ -427,17 +427,17 @@ class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccou
     }
   }
 
-  public fromSeed(seed: string): SubstrateAccount {
+  public async fromSeed(seed: string): Promise<SubstrateAccount> {
     const address = addressFromSeed(seed, this._Chain);
     const acct = this.fromAddress(address);
-    acct.setSeed(seed);
+    await acct.setSeed(seed);
     return acct;
   }
 
-  public fromMnemonic(mnemonic: string): SubstrateAccount {
+  public async fromMnemonic(mnemonic: string): Promise<SubstrateAccount> {
     const address = addressFromMnemonic(mnemonic, this._Chain);
     const acct = this.fromAddress(address);
-    acct.setMnemonic(mnemonic);
+    await acct.setMnemonic(mnemonic);
     return acct;
   }
 

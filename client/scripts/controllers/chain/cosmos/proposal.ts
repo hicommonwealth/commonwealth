@@ -1,3 +1,4 @@
+import { GovDepositsResponse, GovTallyResponse, GovVotesResponse } from '@cosmjs/launchpad';
 import {
   Proposal,
   ITXModalData,
@@ -11,10 +12,11 @@ import {
 import {
   ICosmosProposal, ICosmosProposalState, CosmosToken, CosmosVoteChoice, CosmosProposalState, ICosmosProposalTally
 } from 'adapters/chain/cosmos/types';
-import { CosmosApi } from 'adapters/chain/cosmos/api';
 import { ProposalStore } from 'stores';
 import moment from 'moment-twitter';
+
 import { CosmosAccount, CosmosAccounts } from './account';
+import { CosmosApi } from './api';
 import CosmosChain from './chain';
 import CosmosGovernance, { marshalTally } from './governance';
 
@@ -113,14 +115,16 @@ export class CosmosProposal extends Proposal<
     }
 
     const api = this._Chain.api;
-    const [depositResp, voteResp, tallyResp] = await Promise.all([
-      api.query.proposalDeposits(this.data.identifier),
+    const [depositResp, voteResp, tallyResp]: [
+      GovDepositsResponse, GovVotesResponse, GovTallyResponse
+    ] = await Promise.all([
+      api.query.gov.deposits(this.data.identifier),
       this.status === CosmosProposalState.DEPOSIT_PERIOD
         ? Promise.resolve(null)
-        : api.query.proposalVotes(this.data.identifier),
+        : api.query.gov.votes(this.data.identifier),
       this.status === CosmosProposalState.DEPOSIT_PERIOD
         ? Promise.resolve(null)
-        : api.query.proposalTally(this.data.identifier),
+        : api.query.gov.tally(this.data.identifier),
     ]);
 
     const state: ICosmosProposalState = {
@@ -133,12 +137,12 @@ export class CosmosProposal extends Proposal<
       tally: null,
     };
     if (depositResp) {
-      for (const deposit of depositResp) {
-        state.depositors.push([ deposit.depositor, deposit.amount.amount ]);
+      for (const deposit of depositResp.result) {
+        state.depositors.push([ deposit.depositor, +deposit.amount[0].amount ]);
       }
     }
     if (voteResp) {
-      for (const voter of voteResp) {
+      for (const voter of voteResp.result) {
         const vote = voteToEnum(voter.option);
         if (vote) {
           state.voters.push([ voter.voter, vote ]);
@@ -253,15 +257,15 @@ export class CosmosProposal extends Proposal<
       return;
     }
     this._completedVotesFetched = true;
-    let voteResp;
+    let voteResp: GovVotesResponse;
     try {
-      voteResp = await this._Chain.api.query.proposalVotes(this.identifier);
+      voteResp = await this._Chain.api.query.gov.votes(this.identifier);
     } catch (e) {
       console.error(`could not fetch votes on proposal: ${this.identifier}`);
       return;
     }
     if (voteResp) {
-      for (const voter of voteResp) {
+      for (const voter of voteResp.result) {
         const vote = voteToEnum(voter.option);
         if (vote) {
           this.addOrUpdateVote({ account: this._Accounts.fromAddress(voter.voter), choice: vote });

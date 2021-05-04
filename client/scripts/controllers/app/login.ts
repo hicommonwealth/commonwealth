@@ -196,11 +196,11 @@ export async function createUserWithSeed(seed: string): Promise<Account<any>> {
     throw new Error('User with this seed already exists');
   }
 
-  const account = (app.chain.accounts as any).fromSeed(seed);
+  const account = await (app.chain.accounts as any).fromSeed(seed);
   // Look for account with the same public key
   const existingUser = app.user.activeAccounts.find((user) => user.address === account.address);
   if (existingUser) {
-    account.setSeed(seed);
+    await account.setSeed(seed);
     // TODO: what should we do here?
   }
   const response = await createAccount(account);
@@ -211,7 +211,7 @@ export async function createUserWithSeed(seed: string): Promise<Account<any>> {
 }
 
 export async function createUserWithMnemonic(mnemonic: string): Promise<Account<any>> {
-  const account = (app.chain.accounts as any).fromMnemonic(mnemonic);
+  const account = await (app.chain.accounts as any).fromMnemonic(mnemonic);
   const response = await createAccount(account);
   account.setValidationToken(response.result.verification_token);
   account.setAddressId(response.result.id);

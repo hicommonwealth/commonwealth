@@ -145,6 +145,7 @@ const CosmosLinkAccountItem: m.Component<{
         vnode.state.linking = true;
         m.redraw();
 
+        // TODO: investigate this code
         const client = new SigningCosmosClient(
           // TODO: Figure out our own nodes, these are ported from the Keplr example code.
           app.chain.meta.chain.network === 'cosmos'

@@ -1,3 +1,10 @@
+import { GovTallyResponse } from '@cosmjs/launchpad';
+import {
+  GovParametersDepositResponse,
+  GovParametersTallyingResponse,
+  GovParametersType,
+  GovParametersVotingResponse,
+} from '@cosmjs/launchpad/build/lcdapi/gov';
 import _ from 'underscore';
 import {
   ITXModalData,
@@ -6,7 +13,7 @@ import {
 import {
   ICosmosProposal, CosmosToken, ICosmosProposalTally
 } from 'adapters/chain/cosmos/types';
-import { CosmosApi } from 'adapters/chain/cosmos/api';
+import { CosmosApi } from './api';
 import { CosmosAccount, CosmosAccounts } from './account';
 import CosmosChain from './chain';
 import { CosmosProposal } from './proposal';
@@ -15,13 +22,13 @@ const isCompleted = (status: string): boolean => {
   return status === 'Passed' || status === 'Rejected' || status === 'Failed';
 };
 
-export const marshalTally = (tally): ICosmosProposalTally => {
-  if (!tally) return null;
+export const marshalTally = (tally: GovTallyResponse): ICosmosProposalTally => {
+  if (!tally?.result) return null;
   return {
-    yes: +tally.yes,
-    abstain: +tally.abstain,
-    no: +tally.no,
-    noWithVeto: +tally.no_with_veto,
+    yes: +tally.result.yes,
+    abstain: +tally.result.abstain,
+    no: +tally.result.no,
+    noWithVeto: +tally.result.no_with_veto,
   };
 };
 
@@ -33,13 +40,11 @@ class CosmosGovernance extends ProposalModule<
   private _votingPeriodNs: number;
   private _yesThreshold: number;
   private _vetoThreshold: number;
-  private _penalty: number;
   private _maxDepositPeriodNs: number;
   private _minDeposit: CosmosToken;
   public get votingPeriodNs() { return this._votingPeriodNs; }
   public get yesThreshold() { return this._yesThreshold; }
   public get vetoThreshold() { return this._vetoThreshold; }
-  public get penalty() { return this._penalty; }
   public get maxDepositPeriodNs() { return this._maxDepositPeriodNs; }
   public get minDeposit() { return this._minDeposit; }
 
@@ -51,17 +56,23 @@ class CosmosGovernance extends ProposalModule<
     this._Accounts = Accounts;
 
     // query chain-wide params
-    const [ depositParams, tallyingParams, votingParams ] = await Promise.all([
-      this._Chain.api.query.govDepositParameters(),
-      this._Chain.api.query.govTallyingParameters(),
-      this._Chain.api.query.govVotingParameters(),
-    ]);
-    this._votingPeriodNs = +votingParams.voting_period;
-    this._yesThreshold = +tallyingParams.threshold;
-    this._vetoThreshold = +tallyingParams.veto;
-    this._penalty = +tallyingParams.governance_penalty;
-    this._maxDepositPeriodNs = +depositParams.max_deposit_period;
-    this._minDeposit = new CosmosToken(depositParams.min_deposit[0].denom, +depositParams.min_deposit[0].amount);
+    const depositParams = await this._Chain.api.query.gov.parameters(
+      GovParametersType.Deposit
+    ) as GovParametersDepositResponse;
+    const tallyingParams = await this._Chain.api.query.gov.parameters(
+      GovParametersType.Tallying
+    ) as GovParametersTallyingResponse;
+    const votingParams = await this._Chain.api.query.gov.parameters(
+      GovParametersType.Voting
+    ) as GovParametersVotingResponse;
+    this._votingPeriodNs = +votingParams.result.voting_period;
+    this._yesThreshold = +tallyingParams.result.threshold;
+    this._vetoThreshold = +tallyingParams.result.veto;
+    this._maxDepositPeriodNs = +depositParams.result.max_deposit_period;
+    this._minDeposit = new CosmosToken(
+      depositParams.result.min_deposit[0].denom,
+      +depositParams.result.min_deposit[0].amount,
+    );
 
     // query existing proposals
     await this._initProposals();

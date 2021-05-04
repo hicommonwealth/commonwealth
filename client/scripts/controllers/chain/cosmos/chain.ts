@@ -8,11 +8,14 @@ import {
 import * as m from 'mithril';
 import { ApiStatus, IApp } from 'state';
 import moment from 'moment';
-import { CosmosApi } from 'adapters/chain/cosmos/api';
 import { BlocktimeHelper } from 'helpers';
 import BN from 'bn.js';
 import { EventEmitter } from 'events';
 import { CosmosToken } from 'adapters/chain/cosmos/types';
+
+import { Tendermint34Client, NewBlockHeaderEvent } from '@cosmjs/tendermint-rpc';
+
+import { CosmosApi } from './api';
 import { CosmosAccount } from './account';
 
 export interface ICosmosTXData extends ITXData {
@@ -89,15 +92,15 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     if (this.app.chain.networkStatus === ApiStatus.Disconnected) {
       this.app.chain.networkStatus = ApiStatus.Connecting;
     }
-    await this._api.init((header) => {
-      this._blocktimeHelper.stamp(moment(header.time));
+    await this._api.init((header: NewBlockHeaderEvent) => {
+      this._blocktimeHelper.stamp(moment(header.time.valueOf()));
       this.app.chain.block.height = +header.height;
       m.redraw();
     });
     this.app.chain.networkStatus = ApiStatus.Connected;
-    const { bonded_tokens } = await this._api.query.pool();
+    const { result: { bonded_tokens } } = await this._api.query.staking.pool();
     this._staked = +bonded_tokens;
-    const { bond_denom } = await this._api.query.stakingParameters();
+    const { result: { bond_denom } } = await this._api.query.staking.parameters();
     this._denom = bond_denom;          // uatom
     this._chainId = this._api.chainId; // cosmoshub-2
     m.redraw();
