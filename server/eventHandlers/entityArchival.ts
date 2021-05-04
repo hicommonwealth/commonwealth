@@ -65,15 +65,18 @@ export default class extends IEventHandler {
      * We should determine, using the event's type, what action to take, based
      * on whether it is a creation, modification, or unrelated event.
      */
-    const createEntityFn = async (type: IChainEntityKind, type_id: string, completed = false) => {
+    const createEntityFn = async (type: IChainEntityKind, type_id: string, author?, completed = false) => {
       if (type === SubstrateTypes.EntityKind.DemocracyPreimage) {
         // we always mark preimages as "completed" -- we have no link between democracy proposals
         // and preimages in the database, so we want to always fetch them for archival purposes,
         // which requires marking them completed.
         completed = true;
       }
+      const params = author
+        ? { type: type.toString(), type_id, chain: this._chain, completed, author }
+        : { type: type.toString(), type_id, chain: this._chain, completed };
       const [ dbEntity, created ] = await this._models.ChainEntity.findOrCreate({
-        where: { type: type.toString(), type_id, chain: this._chain, completed },
+        where: params,
         default: { },
       });
       if (created) {
@@ -128,9 +131,10 @@ export default class extends IEventHandler {
     const [ entityKind, updateType ] = entity;
     const fieldName = entityToFieldName(entityKind);
     const fieldValue = event.data[fieldName].toString();
+    const author = event.data['proposer'];
     switch (updateType) {
       case EntityEventKind.Create: {
-        return createEntityFn(entityKind, fieldValue);
+        return createEntityFn(entityKind, fieldValue, author);
       }
       case EntityEventKind.Update: {
         return updateEntityFn(entityKind, fieldValue);

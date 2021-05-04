@@ -347,6 +347,7 @@ function setupPassport(models) {
 
   passport.deserializeUser((userId, done) => {
     models.User
+      .scope('withPrivateData')
       .findOne({ where: { id: userId } })
       .then((user) => { done(null, user); })
       .catch((err) => { done(err, null); });

@@ -1,20 +1,26 @@
 import _ from 'underscore';
 import BN from 'bn.js';
+
+import { SubstrateTypes } from '@commonwealth/chain-events';
 import { ApiPromise } from '@polkadot/api';
 import { Vec } from '@polkadot/types';
 import { ITuple } from '@polkadot/types/types';
 import { AccountId, BalanceOf } from '@polkadot/types/interfaces';
 import { isFunction } from '@polkadot/util';
+
 import { ISubstrateDemocracyProposal, SubstrateCoin, formatCall } from 'adapters/chain/substrate/types';
 import { formatProposalHashShort } from 'helpers';
 import {
   Proposal, ProposalStatus, ProposalEndTime, DepositVote,
   VotingType, VotingUnit, ChainBase, Account, ChainEntity, ChainEvent
 } from 'models';
-import { SubstrateTypes } from '@commonwealth/chain-events';
+
+import { chainEntityTypeToProposalSlug } from 'identifiers';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateDemocracyProposals from './democracy_proposals';
+import { SubstrateDemocracyReferendum } from './democracy_referendum';
+import Substrate from './main';
 
 const backportEventToAdapter = (
   ChainInfo: SubstrateChain,
@@ -40,8 +46,7 @@ class SubstrateDemocracyProposal extends Proposal<
     return `#${this.identifier.toString()}`;
   }
 
-  private _title: string;
-  public get title() { return this._title; }
+  public title: string;
 
   public get description() { return null; }
 
@@ -135,29 +140,64 @@ class SubstrateDemocracyProposal extends Proposal<
     this._Accounts = Accounts;
     this._Proposals = Proposals;
     this.deposit = this._Chain.coins(new BN(eventData.deposit, 10));
-    this._author = this._Accounts.fromAddress(eventData.proposer);
+    this._author = this._Accounts.fromAddress(eventData.proposer || entity.author);
     this.hash = eventData.proposalHash;
     this.createdAt = entity.createdAt;
+    this.threadId = entity.threadId;
+
     // see if preimage exists and populate data if it does
     const preimage = this._Proposals.app.chain.chainEntities.getPreimage(eventData.proposalHash);
     if (preimage) {
       this._method = preimage.method;
       this._section = preimage.section;
       this._preimage = preimage;
-      this._title = formatCall(preimage);
+      this.title = entity.title || formatCall(preimage);
     } else {
-      this._title = `Proposal ${formatProposalHashShort(eventData.proposalHash)}`;
+      this.title = entity.title || `Proposal ${formatProposalHashShort(eventData.proposalHash)}`;
     }
 
     entity.chainEvents.forEach((e) => this.update(e));
 
-    this._initialized = true;
-    this.updateVoters();
-    this._Proposals.store.add(this);
+    if (!this._completed) {
+      const slug = chainEntityTypeToProposalSlug(entity.type);
+      const uniqueId = `${slug}_${entity.typeId}`;
+      this._Proposals.app.chain.chainEntities._fetchTitle(entity.chain, uniqueId).then((response) => {
+        if (response.status === 'Success' && response.result?.length) {
+          this.title = response.result;
+        }
+        this._initialized = true;
+        this.updateVoters();
+        this._Proposals.store.add(this);
+      });
+    } else {
+      this._initialized = true;
+      this.updateVoters();
+      this._Proposals.store.add(this);
+    }
   }
 
   protected complete() {
     super.complete(this._Proposals.store);
+  }
+
+  // Attempts to find the Referendum produced by this Democracy Proposal by
+  //   searching for the same proposal hash.
+  // NOTE: for full functionality, "referendum" module must be loaded.
+  // TODO: This may cause issues if we have the same Call proposed twice, as this will only fetch the
+  //   first one in storage. To fix this, we will need to use some timing heuristics to check that
+  //   this referendum was created approximately when the found proposal concluded.
+  public getReferendum(): SubstrateDemocracyReferendum | undefined {
+    // ensure all modules have loaded
+    if (!this._Chain.app.isModuleReady) return;
+
+    // search for same preimage/proposal hash
+    const chain = (this._Chain.app.chain as Substrate);
+    const referendum = chain.democracy?.store.getAll().find((p) => {
+      return p.hash === this.hash;
+    });
+    if (referendum) return referendum;
+
+    return undefined;
   }
 
   public update(e: ChainEvent) {
@@ -181,7 +221,7 @@ class SubstrateDemocracyProposal extends Proposal<
           this._method = preimage.method;
           this._section = preimage.section;
           this._preimage = preimage;
-          this._title = formatCall(preimage);
+          this.title = this.title || formatCall(preimage);
         }
         break;
       }

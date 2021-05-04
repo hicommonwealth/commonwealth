@@ -15,6 +15,7 @@ export const Errors = {
   InvalidElement: 'Element must begin with https://',
   InvalidTelegram: 'Telegram must begin with https://t.me/',
   InvalidGithub: 'Github must begin with https://github.com/',
+  InvalidCustomDomain: 'Custom domain may not include "commonwealth"',
 };
 
 const updateChain = async (models, req: Request, res: Response, next: NextFunction) => {
@@ -39,7 +40,7 @@ const updateChain = async (models, req: Request, res: Response, next: NextFuncti
     }
   }
 
-  const { active, icon_url, symbol, type, name, description, website, discord, element, telegram, github } = req.body;
+  const { active, icon_url, symbol, type, name, description, website, discord, element, telegram, github, customDomain } = req.body;
 
   if (website && !urlHasValidHTTPPrefix(website)) {
     return next(new Error(Errors.InvalidWebsite));
@@ -51,6 +52,8 @@ const updateChain = async (models, req: Request, res: Response, next: NextFuncti
     return next(new Error(Errors.InvalidTelegram));
   } else if (github && !github.startsWith('https://github.com/')) {
     return next(new Error(Errors.InvalidGithub));
+  } else if (customDomain && customDomain.includes('commonwealth')) {
+    return next(new Error(Errors.InvalidCustomDomain));
   }
 
   if (name) chain.name = name;
@@ -64,6 +67,7 @@ const updateChain = async (models, req: Request, res: Response, next: NextFuncti
   chain.element = element;
   chain.telegram = telegram;
   chain.github = github;
+  chain.customDomain = customDomain;
   if (req.body['featured_topics[]']) chain.featured_topics = req.body['featured_topics[]'];
 
   await chain.save();

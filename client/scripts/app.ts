@@ -40,7 +40,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       app.user.notifications.store.clear();
       app.user.notifications.clearSubscriptions();
       data.chains.filter((chain) => chain.active).map((chain) => app.config.chains.add(ChainInfo.fromJSON(chain)));
-      data.nodes.map((node) => {
+      data.nodes.sort((a, b) => a.id - b.id).map((node) => {
         return app.config.nodes.add(NodeInfo.fromJSON({
           id: node.id,
           url: node.url,
@@ -48,7 +48,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
           address: node.address,
         }));
       });
-      data.communities.map((community) => {
+      data.communities.sort((a, b) => a.id - b.id).map((community) => {
         return app.config.communities.add(CommunityInfo.fromJSON({
           id: community.id,
           name: community.name,
@@ -77,7 +77,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       // add recentActivity
       const { recentThreads } = data;
       Object.entries(recentThreads).forEach(([comm, count]) => {
-        app.recentActivity.setCommunityThreadCounts(comm, count as number);
+        app.recentActivity.setCommunityThreadCounts(comm, count);
       });
 
       // update the login status
@@ -90,6 +90,14 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       if (updateSelectedNode && data.user && data.user.selectedNode) {
         app.user.setSelectedNode(NodeInfo.fromJSON(data.user.selectedNode));
       }
+
+      // update whether we're on a custom domain
+      const host = document.location.host;
+      app.setIsCustomDomain(
+        app.config.chains.getAll().find((c) => c.customDomain === host) !== undefined
+          || app.config.communities.getAll().find((c) => c.customDomain === host) !== undefined
+      );
+
       resolve();
     }).catch((err: any) => {
       app.loadingError = err.responseJSON?.error || 'Error loading application state';
@@ -323,6 +331,13 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/ethereum/moloch/adapter'
     )).default;
     newChain = new Moloch(n, app);
+  } else if (n.chain.network === ChainNetwork.Marlin || n.chain.network === ChainNetwork.MarlinTestnet) {
+    const Marlin = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "marlin-main" */
+      './controllers/chain/ethereum/marlin/adapter'
+    )).default;
+    newChain = new Marlin(n, app);
   } else if ([ChainNetwork.ALEX].includes(n.chain.network)) {
     const Token = (await import(
     //   /* webpackMode: "lazy" */
@@ -494,6 +509,7 @@ $(() => {
     scoped: string | boolean;
     hideSidebar?: boolean;
     deferChain?: boolean;
+    redirectCustomDomain?: boolean;
   }
 
   const importRoute = (path: string, attrs: RouteAttrs) => ({
@@ -505,7 +521,30 @@ $(() => {
       ).then((p) => p.default);
     },
     render: (vnode) => {
-      const { scoped, hideSidebar } = attrs;
+      const { scoped, hideSidebar, redirectCustomDomain } = attrs;
+
+      // handle custom domains, for routes that need special handling
+      const host = document.location.host;
+      if (redirectCustomDomain) {
+        const hasLoadedAll = app.config.chains.getAll().length !== 0 || app.config.communities.getAll().length !== 0;
+        const matchingChain = app.config.chains.getAll().find((c) => c.customDomain === host);
+        const matchingCommunity = app.config.communities.getAll().find((c) => c.customDomain === host);
+
+        // keep the page loading until chains & communities have been fetched
+        if (!hasLoadedAll) return m(LoadingLayout);
+
+        // redirect into the community
+        if (matchingChain) {
+          m.route.set(`/${matchingChain.id}`, {}, { replace: true });
+          return m(LoadingLayout);
+        }
+        if (matchingCommunity) {
+          m.route.set(`/${matchingCommunity.id}`, {}, { replace: true });
+          return m(LoadingLayout);
+        }
+      }
+
+      // normal render
       let deferChain = attrs.deferChain;
       const scope = typeof scoped === 'string'
         // string => scope is defined by route
@@ -534,10 +573,11 @@ $(() => {
     '/discussions':              redirectRoute(`/${app.activeId() || app.config.defaultChain}/`),
 
     // Landing pages
-    '/':                         importRoute('views/pages/home', { scoped: false, hideSidebar: true }),
+    '/':                         importRoute('views/pages/home', { scoped: false, hideSidebar: true, redirectCustomDomain: true }),
     '/about':                    importRoute('views/pages/landing/about', { scoped: false }),
     '/terms':                    importRoute('views/pages/landing/terms', { scoped: false }),
     '/privacy':                  importRoute('views/pages/landing/privacy', { scoped: false }),
+    '/components':               importRoute('views/pages/components', { scoped: false, hideSidebar: true }),
 
     // Login page
     '/login':                    importRoute('views/pages/login', { scoped: false }),
@@ -568,14 +608,16 @@ $(() => {
     '/:scope/referenda':         importRoute('views/pages/referenda', { scoped: true }),
     '/:scope/proposals':         importRoute('views/pages/proposals', { scoped: true }),
     '/:scope/treasury':          importRoute('views/pages/treasury', { scoped: true }),
+    '/:scope/bounties':          importRoute('views/pages/bounties', { scoped: true }),
     '/:scope/proposal/:type/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
-    '/:scope/council':           importRoute('views/pages/council/index', { scoped: true }),
+    '/:scope/council':           importRoute('views/pages/council', { scoped: true }),
+    '/:scope/delegate':          importRoute('views/pages/delegate', { scoped: true, }),
     '/:scope/login':             importRoute('views/pages/login', { scoped: true, deferChain: true }),
     '/:scope/new/thread':        importRoute('views/pages/new_thread', { scoped: true, deferChain: true }),
     '/:scope/new/proposal/:type': importRoute('views/pages/new_proposal/index', { scoped: true }),
     '/:scope/admin':             importRoute('views/pages/admin', { scoped: true }),
     '/:scope/settings':          importRoute('views/pages/settings', { scoped: true }),
-    '/:scope/communityStats':    importRoute('views/pages/stats', { scoped: true, deferChain: true }),
+    '/:scope/analytics':         importRoute('views/pages/stats', { scoped: true, deferChain: true }),
     '/:scope/web3login':         importRoute('views/pages/web3login', { scoped: true }),
 
     '/:scope/account/:address':  importRoute('views/pages/profile', { scoped: true, deferChain: true }),
@@ -585,7 +627,7 @@ $(() => {
         : `/${attrs.scope}/`;
     }),
 
-    // '/:scope/validators':        importRoute('views/pages/validators', { scoped: true }),
+    '/:scope/validators':        importRoute('views/pages/validators', { scoped: true }),
 
     // NEAR login
     '/:scope/finishNearLogin':    importRoute('views/pages/finish_near_login', { scoped: true }),

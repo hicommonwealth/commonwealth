@@ -4,6 +4,7 @@ import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 import { Grid, Col, List, Tag } from 'construct-ui';
 import moment from 'moment';
+import BN from 'bn.js';
 
 import app from 'state';
 import { formatCoin } from 'adapters/currency';
@@ -18,13 +19,16 @@ import {
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
+import Marlin from 'controllers/chain/ethereum/marlin/adapter';
 
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
-import ProposalsLoadingRow from 'views/components/proposals_loading_row';
-import ProposalRow from 'views/components/proposal_row';
+import LoadingRow from 'views/components/loading_row';
+import ProposalCard from 'views/components/proposal_card';
 import { CountdownUntilBlock } from 'views/components/countdown';
+
 import NewProposalPage from 'views/pages/new_proposal/index';
+import PageNotFound from 'views/pages/404';
 import Listing from 'views/pages/listing';
 import ErrorPage from 'views/pages/error';
 
@@ -32,51 +36,67 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
   view: (vnode) => {
     if (!app.chain) return;
 
-    return m(Grid, {
-      align: 'middle',
-      class: 'stats-container',
-      gutter: 5,
-      justify: 'space-between'
-    }, [
-      m(Col, { span: { xs: 6, md: 3 } }, [
-        m('.stats-tile', [
-          m('.stats-heading', 'Next referendum'),
-          (app.chain as Substrate).democracyProposals.nextLaunchBlock
-            ? m(CountdownUntilBlock, {
-              block: (app.chain as Substrate).democracyProposals.nextLaunchBlock,
-              includeSeconds: false
-            })
-            : '--',
+    return m('.stats-box', [
+      m('.stats-box-left', '💭'),
+      m('.stats-box-right', [
+        m('', [
+          m('strong', 'Democracy Proposals'),
+          m('span', [
+            ' can be introduced by anyone. ',
+            'At a regular interval, the top ranked proposal will become a supermajority-required referendum.',
+          ]),
+          m('p', [
+            m('strong', 'Council Motions'),
+            m('span', [
+              ' can be introduced by councillors. They can directly approve/reject treasury proposals, ',
+              'propose simple-majority referenda, or create fast-track referenda.',
+            ]),
+          ]),
         ]),
-      ]),
-      m(Col, { span: { xs: 6, md: 3 } }, [
-        m('.stats-tile', [
-          m('.stats-heading', 'Enactment delay'),
-          (app.chain as Substrate).democracy.enactmentPeriod
-            ? blockperiodToDuration((app.chain as Substrate).democracy.enactmentPeriod).asDays()
-            : '--',
-          ' days'
+        m('', [
+          m('.stats-box-stat', [
+            'Next proposal or motion becomes a referendum: ',
+            (app.chain as Substrate).democracyProposals.nextLaunchBlock
+              ? m(CountdownUntilBlock, {
+                block: (app.chain as Substrate).democracyProposals.nextLaunchBlock,
+                includeSeconds: false
+              })
+              : '--',
+          ]),
         ]),
       ]),
     ]);
-    // onMoloch && m('.stats-tile', [
-    //   m('.stats-tile-label', 'DAO Basics'),
-    //   m('.stats-tile-figure-minor', [
-    //     `Voting Period Length: ${onMoloch && (app.chain as Moloch).governance.votingPeriodLength}`
-    //   ]),
-    //   m('.stats-tile-figure-minor', [
-    //     `Total Shares: ${onMoloch && (app.chain as Moloch).governance.totalShares}`
-    //   ]),
-    //   m('.stats-tile-figure-minor', [
-    //     `Summoned At: ${onMoloch && (app.chain as Moloch).governance.summoningTime}`
-    //   ]),
-    //   m('.stats-tile-figure-minor', [
-    //     `Proposal Count: ${onMoloch && (app.chain as Moloch).governance.proposalCount}`
-    //   ]),
-    //   m('.stats-tile-figure-minor', [
-    //     `Proposal Deposit: ${onMoloch && (app.chain as Moloch).governance.proposalDeposit}`
-    //   ]),
-    // ]),
+  }
+};
+
+const MarlinProposalStats: m.Component<{}, {}> = {
+  view: (vnode) => {
+    if (!app.chain) return;
+    if (!(app.chain instanceof Marlin)) return;
+
+    return m('.stats-box', [
+      m('.stats-box-left', '💭'),
+      m('.stats-box-right', [
+        m('', [
+          m('strong', 'Marlin Proposals'),
+          m('span', [
+            '', // TODO: fill in
+          ]),
+        ]),
+        m('', [
+          // TODO: We shouldn't be hardcoding these figures
+          m('.stats-box-stat', [
+            `Quorum: ${app.chain.governance?.quorumVotes.div(new BN('1000000000000000000')).toString()} MPOND`
+          ]),
+          m('.stats-box-stat', [
+            `Proposal Threshold: ${app.chain.governance?.proposalThreshold.div(new BN('1000000000000000000')).toString()} MPOND`
+          ]),
+          m('.stats-box-stat', [
+            `Voting Period Length: ${app.chain.governance.votingPeriod.toString(10)}`,
+          ]),
+        ]),
+      ]),
+    ]);
   }
 };
 
@@ -113,7 +133,7 @@ const ProposalsPage: m.Component<{}> = {
     if (returningFromThread && localStorage[`${app.activeId()}-proposals-scrollY`]) {
       setTimeout(() => {
         window.scrollTo(0, Number(localStorage[`${app.activeId()}-proposals-scrollY`]));
-      }, 1);
+      }, 100);
     }
   },
   view: (vnode) => {
@@ -127,6 +147,10 @@ const ProposalsPage: m.Component<{}> = {
           ],
         });
       }
+      if (app.chain?.failed) return m(PageNotFound, {
+        title: 'Wrong Ethereum Provider Network!',
+        message: 'Change Metamask to point to Ethereum Mainnet',
+      });
       return m(PageLoading, {
         message: 'Connecting to chain',
         title: [
@@ -136,15 +160,17 @@ const ProposalsPage: m.Component<{}> = {
         showNewProposalButton: true,
       });
     }
+
     const onSubstrate = app.chain && app.chain.base === ChainBase.Substrate;
     const onMoloch = app.chain && app.chain.class === ChainClass.Moloch;
+    const onMarlin = app.chain && (app.chain.network === ChainNetwork.Marlin || app.chain.network === ChainNetwork.MarlinTestnet);
 
     if (onSubstrate) {
       const modules = getModules();
       if (modules.some((mod) => !mod.ready)) {
         app.chain.loadModules(modules);
         return m(PageLoading, {
-          message: 'Connecting to chain',
+          message: 'Loading proposals',
           title: [
             'Proposals',
             m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
@@ -164,16 +190,21 @@ const ProposalsPage: m.Component<{}> = {
     const activeMolochProposals = onMoloch
       && (app.chain as Moloch).governance.store.getAll().filter((p) => !p.completed)
         .sort((p1, p2) => +p2.data.timestamp - +p1.data.timestamp);
+    const activeMarlinProposals = onMarlin
+      && (app.chain as Marlin).governance.store.getAll().filter((p) => !p.completed)
+        .sort((p1, p2) => +p2.startingPeriod - +p1.startingPeriod);
 
     const activeProposalContent = !activeDemocracyProposals?.length
       && !activeCouncilProposals?.length
       && !activeCosmosProposals?.length
       && !activeMolochProposals?.length
-      ? [ m('.no-proposals', 'None') ]
-      : (activeDemocracyProposals || []).map((proposal) => m(ProposalRow, { proposal }))
-        .concat((activeCouncilProposals || []).map((proposal) => m(ProposalRow, { proposal })))
-        .concat((activeCosmosProposals || []).map((proposal) => m(ProposalRow, { proposal })))
-        .concat((activeMolochProposals || []).map((proposal) => m(ProposalRow, { proposal })));
+      && !activeMarlinProposals?.length
+      ? [ m('.no-proposals', 'No active proposals') ]
+      : (activeDemocracyProposals || []).map((proposal) => m(ProposalCard, { proposal }))
+        .concat((activeCouncilProposals || []).map((proposal) => m(ProposalCard, { proposal })))
+        .concat((activeCosmosProposals || []).map((proposal) => m(ProposalCard, { proposal })))
+        .concat((activeMolochProposals || []).map((proposal) => m(ProposalCard, { proposal })))
+        .concat((activeMarlinProposals || []).map((proposal) => m(ProposalCard, { proposal })));
 
     // inactive proposals
     const inactiveDemocracyProposals = onSubstrate
@@ -186,16 +217,22 @@ const ProposalsPage: m.Component<{}> = {
     const inactiveMolochProposals = onMoloch
       && (app.chain as Moloch).governance.store.getAll().filter((p) => p.completed)
         .sort((p1, p2) => +p2.data.timestamp - +p1.data.timestamp);
+    const inactiveMarlinProposals = onMarlin
+      && (app.chain as Marlin).governance.store.getAll().filter((p) => p.completed)
+        .sort((p1, p2) => +p2.startingPeriod - +p1.startingPeriod);
 
     const inactiveProposalContent = !inactiveDemocracyProposals?.length
       && !inactiveCouncilProposals?.length
       && !inactiveCosmosProposals?.length
       && !inactiveMolochProposals?.length
-      ? [ m('.no-proposals', 'None') ]
-      : (inactiveDemocracyProposals || []).map((proposal) => m(ProposalRow, { proposal }))
-        .concat((inactiveCouncilProposals || []).map((proposal) => m(ProposalRow, { proposal })))
-        .concat((inactiveCosmosProposals || []).map((proposal) => m(ProposalRow, { proposal })))
-        .concat((inactiveMolochProposals || []).map((proposal) => m(ProposalRow, { proposal })));
+      && !inactiveMarlinProposals?.length
+      ? [ m('.no-proposals', 'No past proposals') ]
+      : (inactiveDemocracyProposals || []).map((proposal) => m(ProposalCard, { proposal }))
+        .concat((inactiveCouncilProposals || []).map((proposal) => m(ProposalCard, { proposal })))
+        .concat((inactiveCosmosProposals || []).map((proposal) => m(ProposalCard, { proposal })))
+        .concat((inactiveMolochProposals || []).map((proposal) => m(ProposalCard, { proposal })))
+        .concat((inactiveMarlinProposals || []).map((proposal) => m(ProposalCard, { proposal })));
+
 
     // XXX: display these
     const visibleTechnicalCommitteeProposals = app.chain
@@ -211,8 +248,18 @@ const ProposalsPage: m.Component<{}> = {
       showNewProposalButton: true,
     }, [
       onSubstrate && m(SubstrateProposalStats),
-      m(Listing, { content: activeProposalContent }),
-      m(Listing, { content: inactiveProposalContent }),
+      onMarlin && m(MarlinProposalStats),
+      m('.clear'),
+      m(Listing, {
+        content: activeProposalContent,
+        columnHeader: 'Active Proposals',
+      }),
+      m('.clear'),
+      m(Listing, {
+        content: inactiveProposalContent,
+        columnHeader: 'Inactive Proposals',
+      }),
+      m('.clear'),
     ]);
   }
 };

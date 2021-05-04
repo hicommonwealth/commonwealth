@@ -111,7 +111,8 @@ $discussion-title-font-size: 1.45rem;
         .ProposalHeaderThreadLinkedChainEntity,
         .ProposalHeaderExternalLink,
         .ProposalHeaderBlockExplorerLink,
-        .ProposalHeaderVotingInterfaceLink {
+        .ProposalHeaderVotingInterfaceLink,
+        .ProposalHeaderThreadLink {
             display: inline-block;
             margin-right: 12px;
             margin-top: 18px;
@@ -211,6 +212,23 @@ $discussion-title-font-size: 1.45rem;
             text-decoration: none;
             &:hover {
                 text-decoration: underline;
+            }
+        }
+    }
+    .ProposalTitleEditor {
+        .ProposalTitleSaveEdit {
+            font-size: $discussion-meta-font-size;
+            color: $discussion-meta-color;
+        }
+        .cui-input {
+            margin-right: 10px;
+        }
+        .proposal-title-buttons {
+            display: inline-flex;
+            position: relative;
+            bottom: 5px;
+            .ProposalTitleCancelEdit {
+                margin-left: 5px;
             }
         }
     }

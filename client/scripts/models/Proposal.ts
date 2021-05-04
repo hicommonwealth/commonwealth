@@ -23,7 +23,9 @@ abstract class Proposal<
     return `${this.slug}_${this.identifier}`;
   }
   public createdAt: moment.Moment; // TODO: unused?
-  public abstract get title(): string;
+  public threadId: number;
+
+  public abstract title: string;
   public abstract get description(): string;
   public abstract get author(): Account<C>;
 

@@ -198,14 +198,18 @@ async function main() {
     }
   };
 
+  const sessionStore = new SequelizeStore({
+    db: models.sequelize,
+    tableName: 'Sessions',
+    checkExpirationInterval: 15 * 60 * 1000, // Clean up expired sessions every 15 minutes
+    expiration: 7 * 24 * 60 * 60 * 1000, // Set session expiration to 7 days
+  });
+
+  sessionStore.sync();
+
   const sessionParser = session({
     secret: SESSION_SECRET,
-    store: new SequelizeStore({
-      db: models.sequelize,
-      tableName: 'Sessions',
-      checkExpirationInterval: 15 * 60 * 1000, // Clean up expired sessions every 15 minutes
-      expiration: 7 * 24 * 60 * 60 * 1000, // Set session expiration to 7 days
-    }),
+    store: sessionStore,
     resave: false,
     saveUninitialized: true,
   });
@@ -220,7 +224,18 @@ async function main() {
         next();
       }
     });
-    app.use(redirectToHTTPS([/localhost:(\d{4})/, /127.0.0.1:(\d{4})/], [], 301));
+
+    // redirect to https:// unless we are using a test domain
+    app.use(redirectToHTTPS(DEV ? [
+      /gov.edgewa.re:(\d{4})/,
+      /gov2.edgewa.re:(\d{4})/,
+      /gov3.edgewa.re:(\d{4})/,
+      /localhost:(\d{4})/,
+      /127.0.0.1:(\d{4})/
+    ] : [
+      /localhost:(\d{4})/,
+      /127.0.0.1:(\d{4})/
+    ], [], 301));
 
     // serve the compiled app
     if (!NO_CLIENT_SERVER) {

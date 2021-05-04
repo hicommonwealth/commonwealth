@@ -19,7 +19,6 @@ import { CountdownUntilBlock } from 'views/components/countdown';
 import ConvictionsChooser from 'views/components/proposals/convictions_chooser';
 import BalanceInfo from 'views/components/proposals/balance_info';
 import { createTXModal } from 'views/modals/tx_signing_modal';
-import Edgeware from 'controllers/chain/edgeware/main';
 import Substrate from 'controllers/chain/substrate/main';
 import SubstrateChain from 'controllers/chain/substrate/shared';
 import { SubstratePhragmenElection } from 'controllers/chain/substrate/phragmen_election';
@@ -28,6 +27,11 @@ import MolochProposal, {
   MolochVote,
   MolochProposalState
 } from 'controllers/chain/ethereum/moloch/proposal';
+import MarlinProposal, {
+  MarlinProposalVote,
+  MarlinProposalState,
+  MarlinVote
+} from 'controllers/chain/ethereum/marlin/proposal';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import { notifyError } from 'controllers/app/notifications';
 
@@ -126,6 +130,8 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
       user = app.user.activeAccount as CosmosAccount;
     } else if (proposal instanceof MolochProposal) {
       user = app.user.activeAccount as EthereumAccount;
+    } else if (proposal instanceof MarlinProposal) {
+      user = app.user.activeAccount as EthereumAccount;
     } else {
       return m(CannotVote, { action: 'Unrecognized proposal type' });
     }
@@ -171,6 +177,10 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
         proposal.submitVoteWebTx(new MolochProposalVote(user, MolochVote.YES))
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
+      } else if (proposal instanceof MarlinProposal) {
+        proposal.submitVoteWebTx(new MarlinProposalVote(user, MarlinVote.YES))
+          .then(() => m.redraw())
+          .catch((err) => notifyError(err.toString()));
       } else if (proposal instanceof SubstratePhragmenElection) {
         vnode.state.votingModalOpen = false;
         return notifyError('Unimplemented proposal type - use election voting modal');
@@ -209,6 +219,10 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
         createTXModal(proposal.submitVoteTx(new CosmosVote(user, CosmosVoteChoice.NO), null, onModalClose));
       } else if (proposal instanceof MolochProposal) {
         proposal.submitVoteWebTx(new MolochProposalVote(user, MolochVote.NO)).then(() => m.redraw());
+      } else if (proposal instanceof MarlinProposal) {
+        proposal.submitVoteWebTx(new MarlinProposalVote(user, MarlinVote.NO))
+          .then(() => m.redraw())
+          .catch((err) => notifyError(err.toString()));
       } else {
         vnode.state.votingModalOpen = false;
         return notifyError('Invalid proposal type');
@@ -229,6 +243,10 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
       });
       if (proposal instanceof MolochProposal) {
         proposal.abortTx()
+          .then(() => { onModalClose(); m.redraw(); })
+          .catch((err) => { onModalClose(); notifyError(err.toString()); });
+      } else if (proposal instanceof MarlinProposal) {
+        proposal.cancelTx()
           .then(() => { onModalClose(); m.redraw(); })
           .catch((err) => { onModalClose(); notifyError(err.toString()); });
       } else {
@@ -356,6 +374,11 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
         .filter((vote) => vote.choice === MolochVote.YES && vote.account.address === user.address).length > 0;
       hasVotedNo = user && proposal.getVotes()
         .filter((vote) => vote.choice === MolochVote.NO && vote.account.address === user.address).length > 0;
+    } else if (proposal instanceof MarlinProposal) {
+      hasVotedYes = user && proposal.getVotes()
+        .filter((vote) => vote.choice === MarlinVote.YES && vote.account.address === user.address).length > 0;
+      hasVotedNo = user && proposal.getVotes()
+        .filter((vote) => vote.choice === MarlinVote.NO && vote.account.address === user.address).length > 0;
     }
 
     let canVote = true;
@@ -365,6 +388,8 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
       canVote = false;
     } else if (proposal instanceof MolochProposal && proposal.state !== MolochProposalState.Voting) {
       canVote = false;
+    } else if (proposal instanceof MarlinProposal  /* && (await proposal.state()) !== MarlinProposalState.Active */) {
+      canVote = false; // TODO: Fix proposal.state function above to not return promise
     } else if (hasVotedForAnyChoice) {
       // enable re-voting for particular types
       if (proposal instanceof SubstratePhragmenElection
@@ -431,7 +456,7 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
       }),
     ]);
     // moloch: cancel
-    const cancelButton = (proposal.votingType === VotingType.MolochYesNo) && m('.veto-button', [
+    const cancelButton = (proposal.votingType === VotingType.MolochYesNo) ? m('.veto-button', [
       m(Button, {
         intent: 'negative',
         disabled: !((proposal as MolochProposal).canAbort(user) && !(proposal as MolochProposal).completed)
@@ -441,7 +466,16 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
         compact: true,
         rounded: true,
       }),
-    ]);
+    ]) : (proposal.votingType === VotingType.MarlinYesNo) ? m('.veto-button', [
+      m(Button, {
+        intent: 'negative',
+        disabled: (proposal as MarlinProposal).isCanceled
+          || votingModalOpen,
+        onclick: cancelProposal,
+        label: (proposal as MarlinProposal).isCanceled ? 'Cancelled' : 'Cancel',
+        compact: true,
+      }),
+    ]) : null;
     // V2 only: moloch: sponsor
     // const sponsorButton = (proposal.votingType === VotingType.MolochYesNo) && m('.yes-button', [
     //  m(Button, {
@@ -502,6 +536,10 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
         [ m('.button-row', [yesButton, noButton, /* sponsorButton, */processButton, cancelButton]),
           m(ProposalExtensions, { proposal }) ]
       ];
+    } else if (proposal.votingType === VotingType.MarlinYesNo) {
+      votingActionObj = [
+        m('.button-row', [yesButton, noButton, /** executeButton, queueButton, */ cancelButton])
+      ]
     } else if (proposal.votingType === VotingType.RankedChoiceVoting) {
       votingActionObj = m(CannotVote, { action: 'Unsupported proposal type' });
     } else if (proposal.votingType === VotingType.None) {

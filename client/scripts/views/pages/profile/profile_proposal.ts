@@ -18,7 +18,12 @@ const ProfileProposal : m.Component< { proposal: OffchainThread }, { revealThrea
           : proposal.kind === OffchainThreadKind.Request ? ' added a task'
             : [
               ' created a new ',
-              link('a', `/${chain || community}/proposal/${slug}/${identifier}-${slugify(title)}`, 'thread'),
+              link(
+                'a', `/${chain || community}/proposal/${slug}/${identifier}-${slugify(title)}`, 'thread', {},
+                `profile-${author}-${proposal.authorChain}-${proposal.chain}-scrollY`
+              ),
+              ' in',
+              link('a', `/${chain || community}`, ` ${chain || community}`),
             ],
         createdAt && [
           m.trust(' &middot; '),
@@ -27,7 +32,10 @@ const ProfileProposal : m.Component< { proposal: OffchainThread }, { revealThrea
       ]),
       m('.activity.proposal', [
         proposal.kind === OffchainThreadKind.Forum || proposal.kind === OffchainThreadKind.Link
-          ? link('a.proposal-title', `/${chain || community}/proposal/${slug}/${identifier}-${slugify(title)}`, title)
+          ? link(
+            'a.proposal-title', `/${chain || community}/proposal/${slug}/${identifier}-${slugify(title)}`, title, {},
+            `profile-${author}-${proposal.authorChain}-${proposal.chain}-scrollY`
+          )
           : m('a.proposal-title', title),
         // TODO: show a truncated thread once we have a good formatting stripping helper
         attachments && attachments.length > 0 && m('.proposal-attachments', [

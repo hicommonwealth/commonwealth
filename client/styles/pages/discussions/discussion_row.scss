@@ -2,6 +2,9 @@
 
 .DiscussionRow {
     .row-left {
+        .ReactionButton {
+            background: $background-color-white;
+        }
         .row-header {
             .spacer {
                 display: inline-block;
@@ -30,24 +33,36 @@
             }
         }
         .row-subheader {
+            > * {
+                display: inline-block !important;
+            }
             // Styling specific to DiscussionRow subheader content
             .discussion-locked {
-                margin-right: 12px;
                 .cui-tag.cui-xs .cui-icon svg {
                     margin-right: 0;
                 }
+                &::after {
+                    content: ' ';
+                }
             }
             a.proposal-topic {
-                margin-right: 16px;
+                display: inline-block;
                 color: $text-color-light;
+                &::after {
+                    content: ' ';
+                    margin: 0 8px;
+                }
             }
             .mobile-comment-count {
-                display: none;
+                display: none !important;
                 color: $text-color-light;
                 white-space: nowrap;
-                margin-left: 14px;
                 @include xs-max {
-                    display: inline;
+                    display: inline !important;
+                }
+                &::before {
+                    content: ' ';
+                    margin: 0 8px;
                 }
                 .cui-icon svg {
                     position: relative;
@@ -63,13 +78,25 @@
             }
             .discussion-link {
                 color: $text-color-light;
-                margin-right: 12px;
+                &::after {
+                    content: ' ';
+                    margin: 0 8px;
+                }
             }
             .proposal-collaborators {
-                margin-left: 8px;
                 color: $text-color-light;
                 position: relative;
                 font-size: 17px;
+                &::before {
+                    content: ' ';
+                    margin: 0 2px;
+                }
+            }
+            > .created-at {
+                &::before {
+                    content: ' ';
+                    margin: 0 8px;
+                }
             }
             > .User {
                 display: inline-flex;
@@ -89,9 +116,6 @@
                 > a.user-display-name {
                     color: $primary-bg-color;
                 }
-            }
-            > .created-at {
-                margin-right: 14px;
             }
         }
     }

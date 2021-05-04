@@ -18,6 +18,7 @@ export enum ChainBase {
 
 export enum ChainNetwork {
   Edgeware = 'edgeware',
+  EdgewareTestnet = 'edgeware-testnet',
   Kusama = 'kusama',
   Kulupu = 'kulupu',
   Polkadot = 'polkadot',
@@ -31,6 +32,8 @@ export enum ChainNetwork {
   Ethereum = 'ethereum',
   NEAR = 'near',
   Moloch = 'moloch',
+  Marlin = 'marlin',
+  MarlinTestnet = 'marlin-testnet',
   Metacartel = 'metacartel',
   ALEX = 'alex',
   Commonwealth = 'commonwealth',
@@ -38,10 +41,32 @@ export enum ChainNetwork {
   HydraDX = 'hydradx'
 }
 
-export function networkToBase(n: ChainNetwork): ChainBase {
+// This function returns a default chain for a chainbase
+export function baseToNetwork(n: ChainBase): ChainNetwork {
+  switch (n) {
+    case ChainBase.CosmosSDK: return ChainNetwork.Cosmos;
+    case ChainBase.Substrate: return ChainNetwork.Edgeware;
+    case ChainBase.Ethereum: return ChainNetwork.Ethereum;
+    case ChainBase.NEAR: return ChainNetwork.NEAR;
+    default: return null;
+  }
+}
+
+export function baseToLabel(n: ChainBase): string {
+  switch (n) {
+    case ChainBase.CosmosSDK: return 'Cosmos Wallet';
+    case ChainBase.Substrate: return 'polkadot-js';
+    case ChainBase.Ethereum: return 'Ethereum Wallet';
+    case ChainBase.NEAR: return 'NEAR Wallet';
+    default: return 'Wallet';
+  }
+}
+
+export function networkToBase(n: ChainNetwork | string): ChainBase {
   switch (n) {
     case ChainNetwork.Clover: return ChainBase.Substrate;
     case ChainNetwork.Edgeware: return ChainBase.Substrate;
+    case ChainNetwork.EdgewareTestnet: return ChainBase.Substrate;
     case ChainNetwork.Kusama: return ChainBase.Substrate;
     case ChainNetwork.Kulupu: return ChainBase.Substrate;
     case ChainNetwork.Polkadot: return ChainBase.Substrate;
@@ -53,11 +78,14 @@ export function networkToBase(n: ChainNetwork): ChainBase {
     case ChainNetwork.HydraDX: return ChainBase.Substrate;
     case ChainNetwork.Cosmos: return ChainBase.CosmosSDK;
     case ChainNetwork.Straightedge: return ChainBase.CosmosSDK;
-    case ChainNetwork.Ethereum: return ChainBase.Ethereum;
     case ChainNetwork.NEAR: return ChainBase.NEAR;
+    case ChainNetwork.Ethereum: return ChainBase.Ethereum;
     case ChainNetwork.Moloch: return ChainBase.Ethereum;
     case ChainNetwork.Metacartel: return ChainBase.Ethereum;
     case ChainNetwork.Commonwealth: return ChainBase.Ethereum;
+    case ChainNetwork.ALEX: return ChainBase.Ethereum;
+    case ChainNetwork.Marlin: return ChainBase.Ethereum;
+    case ChainNetwork.MarlinTestnet: return ChainBase.Ethereum;
     default: return null;
   }
 }
@@ -66,6 +94,7 @@ export function networkToBase(n: ChainNetwork): ChainBase {
 export enum ChainClass {
   Clover = 'clover',
   Edgeware = 'edgeware',
+  EdgewareTestnet = 'edgeware-testnet',
   HydraDX = 'hydradx',
   Kusama = 'kusama',
   Kulupu = 'kulupu',
@@ -81,6 +110,8 @@ export enum ChainClass {
   Ethereum = 'ethereum',
   Near = 'near',
   Moloch = 'moloch',
+  Marlin = 'marlin',
+  MarlinTestnet = 'marlin-testnet',
   ALEX = 'alex',
   Commonwealth = 'commonwealth',
 }
@@ -112,10 +143,21 @@ export enum TransactionStatus {
 export enum ProposalStatus {
   Passing = 'pass',
   Failing = 'fail',
+  Canceled = 'canceled',
   Passed = 'passed',
   Failed = 'failed',
   None = 'none',
 }
+
+export enum BountyStatus {
+  Proposed = 'proposed',
+  Approved = 'approved',
+  Funded = 'funded',
+  CuratorProposed = 'curator_proposed',
+  Active = 'active',
+  PendingPayout = 'pending_payout',
+}
+
 export enum VotingType {
   SimpleYesNoVoting = 'binary',
   ConvictionYesNoVoting = 'binary_conviction',
@@ -125,6 +167,7 @@ export enum VotingType {
   MultiOptionVoting = 'multioption',
   None = 'none',
   MolochYesNo = 'moloch',
+  MarlinYesNo = 'marlin',
 }
 export enum VotingUnit {
   OnePersonOneVote = '1p1v',
