@@ -21,7 +21,18 @@ export const getTokensFromListsInternal = async () => {
       .then((response) => { return { success: true, data: response }})
       .catch( _ => { return { success: false } }))
   );
-  const data = responseData.map((o)=>o.success ? o.data.tokens : []).flat();
+  let data = responseData.map((o)=>o.success ? o.data.tokens : []).flat();
+  if(process.env.NODE_ENV === 'development') {
+    // Test token
+    data = data.concat({
+      "chainId": 1,
+      "address": "0x1000000000000000000000000000000000000000",
+      "name": "Test token",
+      "symbol": "ABC",
+      "decimals": 18,
+      "logoURI": "https://assets.coingecko.com/coins/images/13397/thumb/Graph_Token.png?1608145566"
+    })  
+  }
   cachedData = data;
   lastTimeHit = Date.now();
   return data;

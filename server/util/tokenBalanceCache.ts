@@ -10,6 +10,7 @@ import { INFURA_API_KEY } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
 import { getTokensFromListsInternal } from '../routes/getTokensFromLists';
 const log = factory.getLogger(formatFilename(__filename));
+const TEST_CONTRACT_ID = "ABC";
 
 // map of addresses to balances
 interface CacheT {
@@ -98,6 +99,9 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
 
   // query a user's balance on a given token contract and save in cache
   public async hasToken(contractId: string, address: string): Promise<boolean> {
+    if(process.env.NODE_ENV === 'development' && contractId == TEST_CONTRACT_ID) {
+      return true
+    }
     const tokenMeta = this._contracts.find(({ id }) => id === contractId);
     if (!tokenMeta || !tokenMeta.api) throw new Error('unsupported token');
     const threshold = tokenMeta.balanceThreshold || new BN(1);
