@@ -1,10 +1,10 @@
 import { CosmosToken } from 'adapters/chain/cosmos/types';
+import KeplrWebWalletController from 'controllers/app/keplr_web_wallet';
 import { IChainAdapter, ChainBase, ChainClass, NodeInfo } from 'models';
 import { IApp } from 'state';
-import { CosmosAccount, CosmosAccounts } from '../cosmos/account';
-import CosmosChain from '../cosmos/chain';
-import CosmosGovernance from '../cosmos/governance';
-import KeplrWebWalletController from '../../app/keplr_web_wallet';
+import { CosmosAccount, CosmosAccounts } from '../account';
+import CosmosChain from '../chain';
+import CosmosGovernance from '../governance';
 
 class Straightedge extends IChainAdapter<CosmosToken, CosmosAccount> {
   public chain: CosmosChain;

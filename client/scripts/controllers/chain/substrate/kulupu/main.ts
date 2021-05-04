@@ -1,6 +1,6 @@
 import { ChainClass, NodeInfo } from 'models';
 import { IApp } from 'state';
-import Substrate from '../substrate/main';
+import Substrate from '../main';
 
 class Kulupu extends Substrate {
   constructor(n: NodeInfo, app: IApp) {

@@ -2,7 +2,7 @@ import { ChainClass, NodeInfo } from 'models';
 import { IApp } from 'state';
 import spec from './spec';
 
-import Substrate from '../substrate/main';
+import Substrate from '../main';
 
 class Darwinia extends Substrate {
   constructor(n: NodeInfo, app: IApp) {

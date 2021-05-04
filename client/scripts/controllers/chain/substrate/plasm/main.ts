@@ -2,7 +2,7 @@ import { ChainClass, NodeInfo } from 'models';
 import { IApp } from 'state';
 import * as plasmDefinitions from '@plasm/types/interfaces/definitions';
 
-import Substrate from '../substrate/main';
+import Substrate from '../main';
 
 class Plasm extends Substrate {
   constructor(n: NodeInfo, app: IApp) {

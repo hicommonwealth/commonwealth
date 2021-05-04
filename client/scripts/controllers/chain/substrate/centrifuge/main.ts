@@ -1,7 +1,7 @@
 import { ChainClass, NodeInfo } from 'models';
 import { IApp } from 'state';
 
-import Substrate from '../substrate/main';
+import Substrate from '../main';
 
 class Centrifuge extends Substrate {
   constructor(n: NodeInfo, app: IApp) {

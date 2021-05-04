@@ -7,15 +7,9 @@ import moment from 'moment';
 import BN from 'bn.js';
 
 import app from 'state';
-import { formatCoin } from 'adapters/currency';
-import { formatDuration, blockperiodToDuration } from 'helpers';
 import { ProposalType } from 'identifiers';
 import { ChainClass, ChainBase, ChainNetwork, ProposalModule } from 'models';
 
-import Edgeware from 'controllers/chain/edgeware/main';
-import {
-  convictionToWeight, convictionToLocktime, convictions
-} from 'controllers/chain/substrate/democracy_referendum';
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';

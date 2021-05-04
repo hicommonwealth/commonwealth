@@ -1,7 +1,7 @@
 import { ChainClass, NodeInfo } from 'models';
 import { IApp } from 'state';
 import SpecTypes from 'adapters/chain/hydradx/spec';
-import Substrate from '../substrate/main';
+import Substrate from '../main';
 
 class HydraDX extends Substrate {
   constructor(n: NodeInfo, app: IApp) {

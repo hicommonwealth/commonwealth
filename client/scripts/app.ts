@@ -222,63 +222,63 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
     const Edgeware = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "edgeware-main" */
-      './controllers/chain/edgeware/main'
+      './controllers/chain/substrate/edgeware/main'
     )).default;
     newChain = new Edgeware(n, app);
   } else if (n.chain.network === ChainNetwork.Kusama) {
     const Kusama = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "kusama-main" */
-      './controllers/chain/kusama/main'
+      './controllers/chain/substrate/kusama/main'
     )).default;
     newChain = new Kusama(n, app);
   } else if (n.chain.network === ChainNetwork.Polkadot) {
     const Polkadot = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "kusama-main" */
-      './controllers/chain/polkadot/main'
+      './controllers/chain/substrate/polkadot/main'
     )).default;
     newChain = new Polkadot(n, app);
   } else if (n.chain.network === ChainNetwork.Kulupu) {
     const Kulupu = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "kulupu-main" */
-      './controllers/chain/kulupu/main'
+      './controllers/chain/substrate/kulupu/main'
     )).default;
     newChain = new Kulupu(n, app);
   } else if (n.chain.network === ChainNetwork.Plasm) {
     const Plasm = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "plasm-main" */
-      './controllers/chain/plasm/main'
+      './controllers/chain/substrate/plasm/main'
     )).default;
     newChain = new Plasm(n, app);
   } else if (n.chain.network === ChainNetwork.Stafi) {
     const Stafi = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "stafi-main" */
-      './controllers/chain/stafi/main'
+      './controllers/chain/substrate/stafi/main'
     )).default;
     newChain = new Stafi(n, app);
   } else if (n.chain.network === ChainNetwork.Darwinia) {
     const Darwinia = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "darwinia-main" */
-      './controllers/chain/darwinia/main'
+      './controllers/chain/substrate/darwinia/main'
     )).default;
     newChain = new Darwinia(n, app);
   } else if (n.chain.network === ChainNetwork.Phala) {
     const Phala = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "phala-main" */
-      './controllers/chain/phala/main'
+      './controllers/chain/substrate/phala/main'
     )).default;
     newChain = new Phala(n, app);
   } else if (n.chain.network === ChainNetwork.Centrifuge) {
     const Centrifuge = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "centrifuge-main" */
-      './controllers/chain/centrifuge/main'
+      './controllers/chain/substrate/centrifuge/main'
     )).default;
     newChain = new Centrifuge(n, app);
   } else if (n.chain.network === ChainNetwork.Cosmos) {
@@ -292,7 +292,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
     const Straightedge = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "straightedge-main" */
-      './controllers/chain/straightedge/main'
+      './controllers/chain/cosmos/straightedge/main'
     )).default;
     newChain = new Straightedge(n, app);
   } else if (n.chain.network === ChainNetwork.Ethereum) {
@@ -314,14 +314,14 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
     const Clover = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "clover-main" */
-      './controllers/chain/clover/main'
+      './controllers/chain/substrate/clover/main'
     )).default;
     newChain = new Clover(n, app);
   } else if (n.chain.network === ChainNetwork.HydraDX) {
     const HydraDX = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "hydradx-main" */
-      './controllers/chain/hydradx/main'
+      './controllers/chain/substrate/hydradx/main'
     )).default;
     newChain = new HydraDX(n, app);
   } else if (n.chain.network === ChainNetwork.Moloch || n.chain.network === ChainNetwork.Metacartel) {

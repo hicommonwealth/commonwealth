@@ -1,7 +1,7 @@
 import { spec } from '@edgeware/node-types';
 import { ChainClass, NodeInfo } from 'models';
 import { IApp } from 'state';
-import Substrate from '../substrate/main';
+import Substrate from '../main';
 
 class Edgeware extends Substrate {
   constructor(n: NodeInfo, app: IApp) {

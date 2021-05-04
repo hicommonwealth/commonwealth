@@ -1,7 +1,7 @@
 import { ChainClass, NodeInfo } from 'models';
 import { IApp } from 'state';
 import StafiSpec from 'adapters/chain/stafi/spec';
-import Substrate from '../substrate/main';
+import Substrate from '../main';
 
 class Stafi extends Substrate {
   constructor(n: NodeInfo, app: IApp) {
