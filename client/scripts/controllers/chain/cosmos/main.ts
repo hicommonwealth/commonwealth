@@ -11,12 +11,18 @@ class Cosmos extends IChainAdapter<CosmosToken, CosmosAccount> {
   public accounts: CosmosAccounts;
   public governance: CosmosGovernance;
   public readonly base = ChainBase.CosmosSDK;
-  public readonly class = ChainClass.CosmosHub;
+  public readonly class;
   public readonly webWallet: KeplrWebWalletController = new KeplrWebWalletController();
 
-  constructor(meta: NodeInfo, app: IApp) {
+  constructor(
+    meta: NodeInfo,
+    app: IApp,
+    _class: ChainClass = ChainClass.CosmosHub,
+    _addressPrefix: string = 'cosmos',
+  ) {
     super(meta, app);
-    this.chain = new CosmosChain(this.app, 'cosmos');
+    this.class = _class;
+    this.chain = new CosmosChain(this.app, _addressPrefix);
     this.accounts = new CosmosAccounts(this.app);
     this.governance = new CosmosGovernance(this.app);
   }
