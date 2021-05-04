@@ -26,6 +26,8 @@ import { INITIAL_PAGE_SIZE } from 'controllers/server/threads';
 import PinnedListing from './pinned_listing';
 import DiscussionRow from './discussion_row';
 
+import Token from 'controllers/chain/ethereum/token/adapter';
+
 export const ALL_PROPOSALS_KEY = 'COMMONWEALTH_ALL_PROPOSALS';
 
 const getLastUpdate = (proposal) => {
@@ -529,7 +531,8 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
             otherTopicListItems,
           ]),
           m(DiscussionStagesBar, { topic: topicName, stage }),
-          (!activeEntity || !activeEntity.serverLoaded || stillFetching)
+          (!((app.chain as Token).isToken && (app.chain as Token).isUncreated)
+          && (!activeEntity || !activeEntity.serverLoaded || stillFetching))
             ? m('.discussions-main', [
               m(LoadingRow),
             ])
