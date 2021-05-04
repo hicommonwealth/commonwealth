@@ -161,7 +161,7 @@ const newThread = async (
   });
 
   const isNewChain = !chains[chainId] && (app.chain as Token).isToken 
-  && (app.chain as Token).isUninitialized;
+  && (app.chain as Token).isUncreated;
 
   let result;
   try {    

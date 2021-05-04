@@ -112,6 +112,7 @@ import IdentityFetchCache from './util/identityFetchCache';
 import TokenBalanceCache from './util/tokenBalanceCache';
 
 import bulkEntities from './routes/bulkEntities';
+import { getTokensFromLists } from './routes/getTokensFromLists';
 
 function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchCache: IdentityFetchCache, tokenBalanceCache: TokenBalanceCache) {
   const router = express.Router();
@@ -151,7 +152,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   // TODO: Change to PUT /community
   router.post('/updateCommunity', passport.authenticate('jwt', { session: false }), updateCommunity.bind(this, models));
   router.get('/communityStats', passport.authenticate('jwt', { session: false }), communityStats.bind(this, models));
-
+  router.get('/getTokensFromLists', getTokensFromLists.bind(this, models));
   // offchain threads
   // TODO: Change to POST /thread
   router.post('/createThread', passport.authenticate('jwt', { session: false }), createThread.bind(this, models, tokenBalanceCache));

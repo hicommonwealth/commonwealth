@@ -19,7 +19,7 @@ export default class Token extends IChainAdapter<EthereumCoin, EthereumAccount> 
   public readonly class;
   public readonly contractAddress;
   public readonly isToken = true;
-  public readonly isUninitialized: boolean = false;
+  public readonly isUncreated: boolean = false;
 
   public chain: EthereumTokenChain;
   public accounts: EthereumAccounts;
@@ -28,13 +28,13 @@ export default class Token extends IChainAdapter<EthereumCoin, EthereumAccount> 
   public readonly webWallet: EthWebWalletController = new EthWebWalletController();
   public readonly chainEntities = new ChainEntityController();
 
-  constructor(meta: NodeInfo, app: IApp) {
+  constructor(meta: NodeInfo, app: IApp, isUncreated: boolean = false) {
     super(meta, app);
     this.chain = new EthereumTokenChain(this.app);
     this.accounts = new EthereumAccounts(this.app);
     this.class = meta.chain.network;
     this.contractAddress = meta.address;
-    this.isUninitialized = meta.isUninitialized;
+    this.isUncreated = isUncreated;
   }
 
   public async initApi() {

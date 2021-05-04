@@ -8,6 +8,7 @@ import JobRunner from './cacheJobRunner';
 import { INFURA_API_KEY } from '../config';
 
 import { factory, formatFilename } from '../../shared/logging';
+import { getTokensFromListsInternal } from '../routes/getTokensFromLists';
 const log = factory.getLogger(formatFilename(__filename));
 
 // map of addresses to balances
@@ -40,19 +41,34 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     const provider = new providers.Web3Provider(web3Provider);
 
     // initialize metadata from database
-    const tokens = await models['Chain'].findAll({
+    let tokens = await models['Chain'].findAll({
       where: { type: 'token' },
       include: [ models['ChainNode'] ],
     });
 
     // TODO: support customized balance thresholds
-    return tokens
+    tokens = tokens
       .filter(({ ChainNodes }) => ChainNodes)
       .map(({ ChainNodes }): TokenForumMeta => ({
         id: ChainNodes[0].chain,
         address: ChainNodes[0].address,
         api: Erc20Factory.connect(ChainNodes[0].address, provider),
       }));
+
+    try {
+      let tokensFromLists = await getTokensFromListsInternal();
+      tokensFromLists = tokensFromLists
+        .map((o) => { return {
+          address: o.address,
+          api: Erc20Factory.connect(o.address, provider)
+        }});
+      
+      tokens = tokens.concat(tokensFromLists);  
+    } catch (e) {
+      console.error("An error occurred trying to access token lists", e.message)
+    }
+
+    return tokens;
   }
 
   public async start(tokenMeta: TokenForumMeta[]) {

@@ -69,7 +69,7 @@ const EthereumLinkAccountItem: m.Component<{
             jwt: app.user.jwt,
           });
 
-        if(!(app.chain && (app.chain as Token).isToken && (app.chain as Token).isUninitialized)) {
+        if(!(app.chain && (app.chain as Token).isToken && (app.chain as Token).isUncreated)) {
           if (result.exists) {
             if (result.belongsToUser) {
               notifyInfo('This address is already linked to your current account.');

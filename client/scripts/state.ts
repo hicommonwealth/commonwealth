@@ -122,7 +122,7 @@ const app: IApp = {
 
   activeChainId: () => app.chain 
     ? 
-      (app.chain as Token).isToken && (app.chain as Token).isUninitialized
+      (app.chain as Token).isToken && (app.chain as Token).isUncreated
       ? (app.chain as Token).contractAddress 
       : app.chain.id 
     : null,

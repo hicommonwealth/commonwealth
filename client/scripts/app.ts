@@ -194,7 +194,7 @@ export async function createTemporaryTokenChain(n: NodeInfo): Promise<boolean> {
   await deinitChainOrCommunity();
 
   // Begin initializing the community
-  const newToken = new Token(n, app)
+  const newToken = new Token(n, app, true)
   app.chain = newToken;
 
   // Redraw with community fully loaded and return true to indicate
@@ -475,8 +475,7 @@ export async function initTemporaryTokenChain(address: string): Promise<boolean>
         false, false, false, false, false, [], []  
       ),
       "",
-      token.address,
-      true
+      token.address
     )
   )
 }

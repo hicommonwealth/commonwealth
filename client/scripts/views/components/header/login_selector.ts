@@ -132,7 +132,7 @@ const LoginSelector: m.Component<{
     const activeAddressesWithRole = app.user.activeAccounts.filter((account) => {
       return app.user.getRoleInCommunity({
         account,
-        chain: (app.chain as Token).isToken && (app.chain as Token).isUninitialized ?
+        chain: (app.chain as Token).isToken && (app.chain as Token).isUncreated ?
           "ethereum" : app.activeChainId(),
         community: app.activeCommunityId()
       });

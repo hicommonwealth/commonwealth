@@ -1,5 +1,4 @@
 import moment from 'moment';
-import fetch from 'node-fetch';
 
 import { Request, Response, NextFunction } from 'express';
 import { NotificationCategories, ProposalType } from '../../shared/types';
@@ -10,6 +9,7 @@ import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
 import { parseUserMentions } from '../util/parseUserMentions';
 import TokenBalanceCache from '../util/tokenBalanceCache';
 import { factory, formatFilename } from '../../shared/logging';
+import { getTokensFromListsInternal } from './getTokensFromLists';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -23,25 +23,8 @@ export const Errors = {
   InsufficientTokenBalance: `Users need to hold some of the community's tokens to post`,
 };
 
-// TODO - perhaps find a way to make this and client/scripts/controllers/app/token.ts 
-// load from the same source
-const tokenListUrls = [
-  "https://wispy-bird-88a7.uniswap.workers.dev/?url=http://tokenlist.aave.eth.link",
-  "https://gateway.ipfs.io/ipns/tokens.uniswap.org",
-  "https://wispy-bird-88a7.uniswap.workers.dev/?url=http://defi.cmc.eth.link"
-]
-
-const getTokensFromLists = async () => {
-  var data : any = await Promise.all(
-    tokenListUrls.map(url=>fetch( url ))
-  );
-  data = data.map(o=>o.tokens).flat();
-  return data;
-}
-
-let tokens = []
-
 const checkNewChainInfoWithTokenList = async (newChainInfo) => {
+  const tokens = await getTokensFromListsInternal()
   if( !newChainInfo.iconUrl ) throw new Error("Missing iconUrl");
   if( !newChainInfo.symbol ) throw new Error("Missing symbol");
   if( !newChainInfo.name ) throw new Error("Missing name");
@@ -56,13 +39,7 @@ const checkNewChainInfoWithTokenList = async (newChainInfo) => {
 const createChainForThread = async (models, newChainInfoString) => {
   try {
     const newChainInfo = JSON.parse(newChainInfoString)
-    let foundInList = checkNewChainInfoWithTokenList(newChainInfo)
-    if(!foundInList) {
-      // fetch from remote server
-      await getTokensFromLists()
-      //check again
-      foundInList = checkNewChainInfoWithTokenList(newChainInfo)
-    }
+    const foundInList = checkNewChainInfoWithTokenList(newChainInfo)
     if(!foundInList) {
       throw new Error("New chain not found in token list")
     }
