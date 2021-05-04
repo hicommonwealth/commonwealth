@@ -143,7 +143,7 @@ const TXSigningCLIOption = {
       ]);
       signBlock = m('.gaiacli-codeblock', [
         m(CodeBlock, { clickToSelect: true }, [
-          `gaiacli tx sign \\
+          `gaiad tx sign \\
   --chain-id=${calldata.chainId} \\
   --account-number=${calldata.accountNumber} \\
   --sequence=${calldata.sequence} \\

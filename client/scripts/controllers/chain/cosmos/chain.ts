@@ -13,7 +13,8 @@ import BN from 'bn.js';
 import { EventEmitter } from 'events';
 import { CosmosToken } from 'adapters/chain/cosmos/types';
 
-import { Tendermint34Client, NewBlockHeaderEvent } from '@cosmjs/tendermint-rpc';
+import { NewBlockHeaderEvent } from '@cosmjs/tendermint-rpc';
+import { makeStdTx, StdTx, StdFee, Msg, BroadcastTxResult, isBroadcastTxFailure } from '@cosmjs/launchpad';
 
 import { CosmosApi } from './api';
 import { CosmosAccount } from './account';
@@ -135,38 +136,55 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
             sequence,
           };
         },
-        transact: (signature?, computedGas?: number): void => {
-          let signer;
-          if (signature) {
-            // create replacement signer that delivers signature as needed
-            signer = () => ({
-              signature: Buffer.from(signature.signature, 'base64'),
-              publicKey: Buffer.from(signature.pub_key.value, 'base64'),
-            });
-          } else {
-            signer = (author as CosmosAccount).getLedgerSigner();
-          }
+        transact: (signature?: string, computedGas?: number): void => {
           // perform transaction and coerce into compatible observable
-          txFunc(computedGas).then(({ msg, memo, cmdData: { gas } }) => {
-            return msg.send({ gas: `${gas}`, memo }, signer);
-          }).then(({ hash, sequence, included }) => {
-            events.emit(TransactionStatus.Ready.toString(), { hash });
-            // wait for transaction to process
-            return included();
-          }).then((txObj) => {
-            // TODO: is this necessarily success or can it fail?
-            console.log(txObj);
-            // TODO: add gas wanted/gas used to the modal?
-            events.emit(TransactionStatus.Success.toString(), {
-              blocknum: +txObj.height,
-              timestamp: moment(txObj.timestamp),
-              hash: '--', // TODO: fetch the hash value of the block rather than the tx
-            });
-          })
-            .catch((err) => {
-              console.error(err);
-              events.emit(TransactionStatus.Error.toString(), { err: err.message });
-            });
+          txFunc(computedGas).then(async ({ msg, memo, fee }) => {
+            let txResult: BroadcastTxResult;
+
+            // sign and make TX
+            try {
+              let stdTx: StdTx;
+              if (!signature) {
+                // create StdTx through API
+                stdTx = await author.client.sign([ msg as Msg ], fee as StdFee, memo);
+              } else {
+                // manually construct StdTx using signature
+                stdTx = makeStdTx(
+                  { memo, fee, msgs: [ msg ] },
+                  { signature, pub_key: author.pubKey },
+                );
+              }
+              txResult = await author.client.broadcastTx(stdTx);
+            } catch (e) {
+              events.emit(TransactionStatus.Error.toString(), { err: e.message });
+            }
+
+            // handle result of broadcast
+            if (isBroadcastTxFailure(txResult)) {
+              // TODO: test
+              events.emit(TransactionStatus.Error.toString(), { err: txResult.rawLog });
+              return;
+            }
+            try {
+              const indexedTx = await author.client.getTx(txResult.transactionHash);
+              const height = indexedTx.height;
+              const block = await author.client.getBlock(height);
+              events.emit(TransactionStatus.Success.toString(), {
+                blocknum: height,
+                timestamp: moment(block.header.time),
+                hash: block.id,
+              });
+            } catch (e) {
+              // TODO: failed to fetch TX from block, but successfully broadcast?
+              events.emit(TransactionStatus.Success.toString(), {
+                blocknum: this.app.chain.block.height,
+                timestamp: moment(),
+                hash: '--',
+              });
+            }
+          }).catch((err) => {
+            console.error(err);
+          });
         },
       }
     };

@@ -9,6 +9,12 @@ import {
   StakingDelegatorDelegationsResponse,
   AuthAccountsResponse,
   StdSignDoc,
+  Msg,
+  StdTx,
+  StdFee,
+  SigningCosmosClient,
+  encodeSecp256k1Pubkey,
+  PubKey,
 } from '@cosmjs/launchpad';
 
 import CosmosChain from './chain';
@@ -36,6 +42,10 @@ export class CosmosAccount extends Account<CosmosToken> {
 
   // TODO: add delegations, validations
   private _wallet: Secp256k1HdWallet;
+  private _pubKey: PubKey;
+  private _client: SigningCosmosClient;
+  public get pubKey() { return this._pubKey; }
+  public get client() { return this._client; }
 
   private _validatorDelegations: { [address: string]: number } = {};
   public get validatorDelegations(): Promise<{ [address: string]: number }> {
@@ -73,8 +83,11 @@ export class CosmosAccount extends Account<CosmosToken> {
     this._Accounts.store.add(this);
   }
 
-  public setWallet(wallet: Secp256k1HdWallet) {
+  public async setWallet(wallet: Secp256k1HdWallet) {
     this._wallet = wallet;
+    const [{ address, pubkey }] = await wallet.getAccounts();
+    this._pubKey = encodeSecp256k1Pubkey(pubkey);
+    this._client = new SigningCosmosClient(this._Chain.api.rpcUrl, address, wallet);
   }
 
   // TODO: these should be sync, or we need to change rest of code to match
@@ -96,6 +109,11 @@ export class CosmosAccount extends Account<CosmosToken> {
     const [{ address }] = await this._wallet.getAccounts();
     const resp = await this._wallet.signAmino(address, aminoMsg);
     return resp.signature.signature;
+  }
+
+  public async signMsg(msg: Msg, fee: StdFee, memo?: string): Promise<StdTx> {
+    const signed = await this._client.sign([ msg ], fee, memo);
+    return signed;
   }
 
   public updateValidatorDelegations = _.throttle(async () => {
@@ -343,7 +361,7 @@ export class CosmosAccounts implements IAccountsModule<CosmosToken, CosmosAccoun
     const [{ address }] = await wallet.getAccounts();
     const acct = new CosmosAccount(this.app, this._Chain, this, address);
     await acct.setMnemonic(mnemonic);
-    acct.setWallet(wallet);
+    await acct.setWallet(wallet);
     return acct;
   }
   public async fromSeed(seed: string) {

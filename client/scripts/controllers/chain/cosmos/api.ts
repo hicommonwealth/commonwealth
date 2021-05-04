@@ -13,6 +13,7 @@ import {
   StakingExtension,
 } from '@cosmjs/launchpad';
 import { Client as TendermintClient, NewBlockHeaderEvent, Event } from '@cosmjs/tendermint-rpc';
+import { ICosmosTXData } from './chain';
 
 export interface ITx {
   msg: {
@@ -43,8 +44,8 @@ export class CosmosApi {
     this.restUrl = restUrl;
   }
 
-  public async init(headerListener) {
-    console.log('lunie api');
+  public async init(headerListener: (header: NewBlockHeaderEvent) => void) {
+    console.log('cosmjs api');
     // TODO: configure broadcast mode
     this._lcdClient = LcdClient.withExtensions(
       { apiUrl: this.restUrl },
@@ -65,7 +66,7 @@ export class CosmosApi {
     return this._lcdClient;
   }
 
-  public async queryUrl(path, page = 1, limit = 30, recurse = true): Promise<any> {
+  public async queryUrl(path: string, page = 1, limit = 30, recurse = true): Promise<any> {
     try {
       const url = this.restUrl + path;
       console.log(`query: ${url}, page: ${page}, limit: ${limit}`);
@@ -135,7 +136,7 @@ export class CosmosApi {
     }
   }
 
-  private _initHeaders(headerListener) {
+  private _initHeaders(headerListener: (header: NewBlockHeaderEvent) => void) {
     this._newBlockHeaderSubscription = this._rpc.subscribeNewBlockHeader()
       .subscribe({ next: (e: NewBlockHeaderEvent) => {
         return headerListener(e);
@@ -210,6 +211,6 @@ export class CosmosApi {
     const DEFAULT_GAS_PRICE = [{ amount: (2.5e-8).toFixed(9), denom: gasDenom }];
     const fee = { amount: DEFAULT_GAS_PRICE, gas: `${gas}` };
     const messageToSign = makeSignDoc([ msg ], fee, this.chainId, memo, sequence, accountNumber);
-    return { msg, memo, cmdData: { messageToSign, chainId: this.chainId, sequence, accountNumber, gas } };
+    return { msg, memo, fee, cmdData: { messageToSign, chainId: this.chainId, sequence, accountNumber, gas } };
   }
 }
