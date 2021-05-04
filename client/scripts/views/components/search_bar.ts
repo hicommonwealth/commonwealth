@@ -18,7 +18,7 @@ import QuillFormattedText from './quill_formatted_text';
 import { CommunityLabel } from './sidebar/community_selector';
 import User, { UserBlock } from './widgets/user';
 import { ALL_RESULTS_KEY } from '../pages/search';
-import { ChainIcon, CommunityIcon } from './chain_icon';
+import { ChainIcon, CommunityIcon, TokenIcon } from './chain_icon';
 
 export interface SearchParams {
   communityScope?: string;
@@ -71,11 +71,10 @@ export const getMemberPreview = (addr, closeResultsFn, searchTerm, showChainName
 export const getCommunityPreview = (community, closeResultsFn) => {
   if (community.contentType === ContentType.Token) {
     return m(ListItem, {
-      label: m('a.search-results-item', [
-        m('img', {
-          src: community.logoURI,
-          height: '24px',
-          width: '24px'
+      label: m('a.search-results-item.token-result', [
+        m(TokenIcon, {
+          token: community,
+          size: 36,
         }),
         m('span', community.name)
       ]),
@@ -87,7 +86,7 @@ export const getCommunityPreview = (community, closeResultsFn) => {
   } else if (community.contentType === ContentType.Chain
     || community.contentType === ContentType.Community) {
     return m(ListItem, {
-      label: m('a.search-results-item.token-result', [
+      label: m('a.search-results-item.community-result', [
         m(CommunityLabel, {
           community,
           size: 36,
@@ -404,17 +403,27 @@ const SearchBar : m.Component<{}, {
           size: 15,
           community: app.community.meta,
         })
-      : null;
+      : '';
+    const cancelInputIcon = vnode.state.searchTerm
+      ? m(Icon, {
+        name: Icons.X,
+        onclick: () => {
+          const input = $('.SearchBar').find('input[name=search');
+          input.val('');
+          vnode.state.searchTerm = '';
+        } })
+      : '';
 
     return m(ControlGroup, {
       class: 'SearchBar'
     }, [
       m(Input, {
+        name: 'search',
         placeholder: 'Type to search...',
         autofocus: true,
         fluid: true,
         contentLeft: m(SearchIcon),
-        contentRight: chainOrCommIcon,
+        contentRight: m('.content-right-wrap', [ cancelInputIcon, chainOrCommIcon ]),
         defaultValue: m.route.param('q') || vnode.state.searchTerm,
         value: vnode.state.searchTerm,
         oncreate: (e) => {

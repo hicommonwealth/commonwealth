@@ -55,3 +55,25 @@ export const CommunityIcon: m.Component<{ community: CommunityInfo, onclick?: Fu
     ]);
   }
 };
+
+export const TokenIcon: m.Component<{ token: any, onclick?: Function, size?: number }> = {
+  view: (vnode) => {
+    const { token, onclick } = vnode.attrs;
+    const size = vnode.attrs.size || 32;
+
+    return m('.TokenIcon', { class: onclick ? 'onclick' : '' }, [
+      token.logoURI
+        ? m('img.token-icon', {
+          style: `width: ${size}px; height: ${size}px;`,
+          src: token.logoURI,
+          onclick
+        })
+        : m('.token-icon.no-image', {
+          style: `width: ${size}px; height: ${size}px;`,
+          onclick
+        }, [
+          m('span', token.name.slice(0, 1))
+        ]),
+    ]);
+  }
+};

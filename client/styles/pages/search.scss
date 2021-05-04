@@ -162,12 +162,17 @@
             margin-left: -15px;
             fill: url(#paint0_linear);
         }
-        .chain-icon, .community-icon {
-            z-index: 2;
-            position: relative;
-            right: 30px;
-            margin-right: -15px;
-            border-radius: 50%;
+        .content-right-wrap {
+            svg {
+                
+            }
+            .chain-icon, .community-icon {
+                z-index: 2;
+                position: relative;
+                right: 30px;
+                margin-right: -15px;
+                border-radius: 50%;
+            }
         }
         &:focus-within {
             background: linear-gradient(to bottom, #91ACE1, #DDBFE1) !important;
