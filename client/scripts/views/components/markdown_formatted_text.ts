@@ -37,6 +37,7 @@ const MarkdownFormattedText : m.Component<{
 
     // if we're showing highlighted search terms, render the doc once, and cache the result
     if (searchTerm) {
+      // TODO: Switch trim system to match QFT component
       if (JSON.stringify(doc) !== vnode.state.cachedDocWithHighlights) {
         const unsanitized = marked(doc.toString());
         const sanitized = DOMPurify.sanitize(unsanitized, { ALLOWED_TAGS: ['a'], ADD_ATTR: ['target'] });

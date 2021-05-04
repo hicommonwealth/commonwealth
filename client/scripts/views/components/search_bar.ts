@@ -312,7 +312,7 @@ export const search = async (searchTerm: string, params: SearchParams, state) =>
     const allComms = app.searchCache[ALL_RESULTS_KEY]['communities'];
     const filteredComms = allComms.filter((comm) => {
       return comm.name?.toLowerCase().includes(searchTerm)
-        || comm.symbol?.toLowerCase().includes(searchTerm)
+        || comm.symbol?.toLowerCase().includes(searchTerm);
     });
     app.searchCache[searchTerm][SearchType.Community] = app.searchCache[searchTerm][SearchType.Community]
       .concat(filteredComms.map((commOrChain) => {
@@ -374,20 +374,24 @@ const SearchBar : m.Component<{}, {
   errorText: string,
   focused: boolean,
   closeResults: Function,
-  resultsClosed: boolean,
+  hideResults: boolean,
   inputTimeout: any,
+  isTyping: boolean,
 }> = {
   view: (vnode) => {
     if (!vnode.state.searchTerm) vnode.state.searchTerm = '';
 
     const { results, searchTerm } = vnode.state;
     const showDropdownPreview = !m.route.get().includes('/search?q=');
+    const LoadingPreview = m(List, { class: 'search-results-loading' }, m(ListItem, { label: m(Spinner, { active: true }) }));
     const searchResults = (!results || results?.length === 0)
       ? (app.searchCache[searchTerm]?.loaded)
         ? m(List, [ m(emptySearchPreview, { searchTerm }) ])
-        : m(List, { class: 'search-results-loading' }, m(ListItem, { label: m(Spinner, { active: true }) }))
-      : m(List, { class: 'search-results-list' }, results);
-    vnode.state.closeResults = () => { vnode.state.resultsClosed = true; };
+        : LoadingPreview
+      : vnode.state.isTyping
+        ? LoadingPreview
+        : m(List, { class: 'search-results-list' }, results);
+    vnode.state.closeResults = () => { vnode.state.hideResults = true; };
 
     return m(ControlGroup, {
       class: 'SearchBar'
@@ -407,9 +411,10 @@ const SearchBar : m.Component<{}, {
         },
         oninput: (e) => {
           e.stopPropagation();
+          vnode.state.isTyping = true;
           vnode.state.searchTerm = e.target.value?.toLowerCase();
-          if (vnode.state.resultsClosed) {
-            vnode.state.resultsClosed = false;
+          if (vnode.state.hideResults) {
+            vnode.state.hideResults = false;
           }
           if (!app.searchCache[vnode.state.searchTerm]) {
             app.searchCache[vnode.state.searchTerm] = { loaded: false };
@@ -422,8 +427,9 @@ const SearchBar : m.Component<{}, {
             };
             clearTimeout(vnode.state.inputTimeout);
             vnode.state.inputTimeout = setTimeout(() => {
+              vnode.state.isTyping = false;
               return search(vnode.state.searchTerm, params, vnode.state);
-            }, 650);
+            }, 500);
           }
         },
         onkeyup: (e) => {
@@ -445,7 +451,7 @@ const SearchBar : m.Component<{}, {
       }),
       searchTerm.length > 3
       && showDropdownPreview
-      && !vnode.state.resultsClosed
+      && !vnode.state.hideResults
       && searchResults
     ]);
   }
