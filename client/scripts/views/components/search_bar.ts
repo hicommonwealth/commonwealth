@@ -18,6 +18,7 @@ import QuillFormattedText from './quill_formatted_text';
 import { CommunityLabel } from './sidebar/community_selector';
 import User, { UserBlock } from './widgets/user';
 import { ALL_RESULTS_KEY } from '../pages/search';
+import { ChainIcon, CommunityIcon } from './chain_icon';
 
 export interface SearchParams {
   communityScope?: string;
@@ -69,6 +70,7 @@ export const getMemberPreview = (addr, closeResultsFn, searchTerm, showChainName
 
 export const getCommunityPreview = (community, closeResultsFn) => {
   if (community.contentType === ContentType.Token) {
+    console.log({ community });
     return m(ListItem, {
       label: m('a.search-results-item', [
         m('img', {
@@ -79,7 +81,7 @@ export const getCommunityPreview = (community, closeResultsFn) => {
         m('span', community.name)
       ]),
       onclick: (e) => {
-        // TODO: Linkification of tokens
+        // TODO: Linkification of tokens to autogenerate ERC community
         m.route.set('/');
       }
     });
@@ -393,6 +395,18 @@ const SearchBar : m.Component<{}, {
         : m(List, { class: 'search-results-list' }, results);
     vnode.state.closeResults = () => { vnode.state.hideResults = true; };
 
+    const chainOrCommIcon = app.activeId()
+      ? app.activeChainId()
+        ? m(ChainIcon, {
+          size: 15,
+          chain: app.chain.meta.chain,
+        })
+        : m(CommunityIcon, {
+          size: 15,
+          community: app.community.meta,
+        })
+      : null;
+
     return m(ControlGroup, {
       class: 'SearchBar'
     }, [
@@ -401,6 +415,7 @@ const SearchBar : m.Component<{}, {
         autofocus: true,
         fluid: true,
         contentLeft: m(SearchIcon),
+        contentRight: chainOrCommIcon,
         defaultValue: m.route.param('q') || vnode.state.searchTerm,
         value: vnode.state.searchTerm,
         oncreate: (e) => {

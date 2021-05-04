@@ -162,12 +162,19 @@
             margin-left: -15px;
             fill: url(#paint0_linear);
         }
+        .chain-icon, .community-icon {
+            z-index: 2;
+            position: relative;
+            right: 30px;
+            margin-right: -15px;
+        }
         &:focus-within {
             background: linear-gradient(to bottom, #91ACE1, #DDBFE1);
             // box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.15);
         }
         input {
             height: 34px;
+            padding-right: 38px;
             position: relative;
             background: #EFEFEF;
             border: 1px solid white;
@@ -182,10 +189,10 @@
         position: absolute;
         z-index: 10;
         top: 40px;
-        left: 3%;
+        left: 4%;
         border-radius: 0 0 8px 8px;
-        box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.15);
-        width: 94%;
+        box-shadow: 0px 10px 10px rgba(0, 0, 0,  .15);
+        width: 92%;
         padding: 20px 0;
         overflow-y: visible;
         max-height: none !important;
