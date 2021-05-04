@@ -28,7 +28,7 @@ import DiscussionRow from './discussion_row';
 
 export const ALL_PROPOSALS_KEY = 'COMMONWEALTH_ALL_PROPOSALS';
 
-const getLastUpdate = (proposal: OffchainThread) => {
+const getLastUpdate = (proposal: OffchainThread): number => {
   const lastComment = app.comments.lastCommented(proposal)?.unix();
   const createdAt = proposal.createdAt?.unix();
   const lastUpdate = Math.max(createdAt, lastComment);
@@ -214,7 +214,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
 
     if (sortedThreads.length > 0) {
       let visitMarkerPlaced = false;
-      vnode.state.lookback[subpage] = moment(getLastUpdate(sortedThreads[sortedThreads.length - 1]));
+      vnode.state.lookback[subpage] = moment.unix(getLastUpdate(sortedThreads[sortedThreads.length - 1]));
 
       if (allThreads.length > sortedThreads.length) {
         if (firstThread) {
