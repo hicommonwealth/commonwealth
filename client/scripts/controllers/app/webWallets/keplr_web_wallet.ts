@@ -18,6 +18,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
   private _enabled: boolean;
   private _enabling: boolean = false;
 
+  public readonly name = 'keplr';
   public readonly label = 'Cosmos Wallet (Keplr)';
   public readonly chain = ChainBase.CosmosSDK;
 

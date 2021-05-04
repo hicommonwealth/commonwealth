@@ -11,8 +11,12 @@ export default class WebWalletController {
     return this._wallets;
   }
 
-  public availableWallets(chain?: ChainBase) {
+  public availableWallets(chain?: ChainBase): IWebWallet<any>[] {
     return this._wallets.filter((w) => w.available && (!chain || w.chain === chain));
+  }
+
+  public getByName(name: string): IWebWallet<any> | undefined {
+    return this._wallets.find((w) => w.name === name);
   }
 
   constructor() {

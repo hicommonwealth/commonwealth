@@ -2,6 +2,7 @@ import { ChainBase } from './types';
 import Account from './Account';
 
 interface IWebWallet<AccountT extends { address: string } | string> {
+  name: string;
   label: string;
   available: boolean;
   enabled: boolean;

@@ -14,6 +14,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
   private _provider: provider;
   private _web3: Web3;
 
+  public readonly name = 'metamask';
   public readonly label = 'Ethereum Wallet (Metamask)';
   public readonly chain = ChainBase.Ethereum;
 

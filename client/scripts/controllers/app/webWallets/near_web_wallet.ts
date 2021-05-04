@@ -2,6 +2,7 @@ import { Account, ChainBase, IWebWallet } from 'models';
 
 // TODO
 class NearWebWalletController implements IWebWallet<any> {
+  public readonly name = 'near';
   public readonly label = 'NEAR Wallet';
   public readonly available = true;
   public readonly chain = ChainBase.NEAR;
