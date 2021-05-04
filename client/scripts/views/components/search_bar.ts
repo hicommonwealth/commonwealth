@@ -70,7 +70,6 @@ export const getMemberPreview = (addr, closeResultsFn, searchTerm, showChainName
 
 export const getCommunityPreview = (community, closeResultsFn) => {
   if (community.contentType === ContentType.Token) {
-    console.log({ community });
     return m(ListItem, {
       label: m('a.search-results-item', [
         m('img', {
