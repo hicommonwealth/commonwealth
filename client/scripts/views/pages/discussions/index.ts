@@ -29,8 +29,8 @@ import DiscussionRow from './discussion_row';
 export const ALL_PROPOSALS_KEY = 'COMMONWEALTH_ALL_PROPOSALS';
 
 const getLastUpdate = (proposal: OffchainThread) => {
-  const lastComment = app.comments.lastCommented(proposal).unix();
-  const createdAt = proposal.createdAt.unix();
+  const lastComment = app.comments.lastCommented(proposal)?.unix();
+  const createdAt = proposal.createdAt?.unix();
   const lastUpdate = Math.max(createdAt, lastComment);
   return lastUpdate;
 };

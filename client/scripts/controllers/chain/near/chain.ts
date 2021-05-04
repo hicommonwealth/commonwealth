@@ -52,7 +52,7 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
     this._api = await nearConnect(this.config);
 
     // block times seem about 1.5-2.5 seconds, so querying every 2s feels right
-    this._syncHandle = setInterval(async () => {
+    const syncFn = async () => {
       try {
         this._nodeStatus = await this._api.connection.provider.status();
 
@@ -84,7 +84,9 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
           m.redraw();
         }
       }
-    }, 2000);
+    };
+    await syncFn();
+    this._syncHandle = setInterval(syncFn, 2000);
   }
 
   public async deinit(): Promise<void> {
