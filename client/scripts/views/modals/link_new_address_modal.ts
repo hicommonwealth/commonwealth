@@ -65,9 +65,11 @@ const LinkAccountItem: m.Component<{
     const name = account.meta?.name || (base === ChainBase.CosmosSDK
       ? `${app.chain.meta.chain.name} account`
       : 'Ethereum address');
-    return m(`.LinkAccountItem.account-item${isPrepopulated ? '.account-item-emphasized' : ''}`, {
+    return m('.LinkAccountItem.account-item', {
+      class: `${isPrepopulated ? 'account-item-emphasized' : ''} ${vnode.state.linking ? 'account-item-disabled' : ''}`,
       onclick: async (e) => {
         e.preventDefault();
+        if (vnode.state.linking) return;
 
         // check address status if currently logged in
         if (app.isLoggedIn()) {
@@ -95,6 +97,7 @@ const LinkAccountItem: m.Component<{
         try {
           const signerAccount = await createUserWithAddress(address, undefined, targetCommunity);
           vnode.state.linking = true;
+          m.redraw();
           await webWallet.validateWithAccount(signerAccount);
           vnode.state.linking = false;
           m.redraw();
@@ -118,6 +121,8 @@ const LinkAccountItem: m.Component<{
         m('.account-item-address', [
           m('.account-user', m(User, { user: app.chain.accounts.get(address), hideAvatar: true })),
         ]),
+        vnode.state.linking
+          && m('p.small-text', 'Check your wallet for a confirmation prompt.')
       ]),
       m('.account-item-right', [
         vnode.state.linking && m('.account-waiting', [
@@ -420,14 +425,14 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
             webWallet?.accounts.length === 0 ? [
               m('p', 'Wallet connected, but no accounts were found.'),
             ] : webWallet.chain === ChainBase.Ethereum ? [ // metamask + walletconnect
-              m('p.small-text', 'To connect with a different account, select it in your wallet, and refresh the page.'),
+              m('p.small-text', 'Use your wallet to switch between accounts.'),
             ] : [
               m('p', 'Select an address:'),
               m('p.small-text', 'Look for a popup, or check your wallet/browser extension.'),
               webWallet.chain === ChainBase.CosmosSDK // keplr wallet
                 && m('p.small-text', [
                   `Because ${app.chain.meta.chain.name} does not support signed verification messages, `,
-                  'you will be asked to sign a no-op transaction. It will not be submitted to the chain.'
+                  'you will be asked to sign a transaction that does nothing. It will not be submitted to the chain.'
                 ]),
             ],
           ]),
