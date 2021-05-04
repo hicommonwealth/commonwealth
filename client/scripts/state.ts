@@ -141,7 +141,8 @@ const app: IApp = {
   isProduction: () => {
     return document.location.origin.indexOf('commonwealth.im') !== -1;
   },
-  serverUrl: () => 'https://commonwealth.im/api',
+  serverUrl: () => '/api',
+
   loadingError: null,
 
   isCustomDomain: () => {
