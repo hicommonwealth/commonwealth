@@ -24,6 +24,8 @@ const TYPING_INDICATOR_INCOMING_PERSISTENCE = 2000;
 // how long a wait before visually separating multiple messages sent by the same person
 const MESSAGE_GROUPING_DELAY = 300;
 
+const CHAT_SERVER = 'commonwealthchat.herokuapp.com';
+
 const formatTimestampForChat = (timestamp) => {
   if (timestamp.isBefore(moment().subtract(365, 'days'))) return timestamp.format('MMM D YYYY');
   if (timestamp.isBefore(moment().subtract(7, 'days'))) return timestamp.format('MMM D');

@@ -10,7 +10,8 @@ import {
 } from 'models';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import EthereumAccount from './account';
-import { INFURA_ID } from 'client/scripts/constants';
+
+export const INFURA_ID = process.env.INFURA_ID || 'b19b8175e688448ead43a0ab5f03438a';
 
 export interface IEthereumTXData extends ITXData {
   chainId: string;

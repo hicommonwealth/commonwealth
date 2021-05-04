@@ -3,7 +3,7 @@ import app from 'state';
 import Web3 from 'web3';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import { setActiveAccount } from 'controllers/app/login';
-import { INFURA_ID } from 'client/scripts/constants';
+import { INFURA_ID } from 'controllers/chain/ethereum/chain';
 
 class WalletConnectWebWalletController implements IWebWallet<string> {
   private _enabled: boolean;
