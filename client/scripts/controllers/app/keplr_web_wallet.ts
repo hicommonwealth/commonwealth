@@ -32,7 +32,7 @@ class KeplrWebWalletController {
     if (!app.chain?.id || !app.chain?.meta?.chain?.id) return;
     const chainId = app.chain.meta.chain.id === 'straightedge' ? 'straightedge-2'
       : app.chain.meta.chain.id === 'cosmos' ? 'cosmoshub-3'
-        : null;
+        : app.chain.meta.chain.id; // TODO: check injective
     if (!chainId) return;
 
     // enable

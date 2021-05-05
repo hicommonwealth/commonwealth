@@ -237,7 +237,10 @@ export default (
       // the account they registered with.
       const bech32Prefix = chain.network === 'cosmos'
         ? 'cosmos'
-        : chain.network === 'straightedge' ? 'str' : chain.network;
+        : chain.network === 'straightedge'
+          ? 'str'
+          : chain.network === 'injective'
+            ? 'inj' : chain.network;
       const generatedAddress = getCosmosAddress(pk, bech32Prefix);
       const generatedAddressWithCosmosPrefix = getCosmosAddress(pk, 'cosmos');
 

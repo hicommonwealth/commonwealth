@@ -4,19 +4,17 @@ import { IApp } from 'state';
 import { CosmosAccount, CosmosAccounts } from '../cosmos/account';
 import CosmosChain from '../cosmos/chain';
 import CosmosGovernance from '../cosmos/governance';
-import KeplrWebWalletController from '../../app/keplr_web_wallet';
 
-class Straightedge extends IChainAdapter<CosmosToken, CosmosAccount> {
+class Injective extends IChainAdapter<CosmosToken, CosmosAccount> {
   public chain: CosmosChain;
   public accounts: CosmosAccounts;
   public governance: CosmosGovernance;
   public readonly base = ChainBase.CosmosSDK;
-  public readonly class = ChainClass.Straightedge;
-  public readonly webWallet: KeplrWebWalletController = new KeplrWebWalletController();
+  public readonly class = ChainClass.Injective;
 
   constructor(meta: NodeInfo, app: IApp) {
     super(meta, app);
-    this.chain = new CosmosChain(this.app, 'str');
+    this.chain = new CosmosChain(this.app, 'inj');
     this.accounts = new CosmosAccounts(this.app);
     this.governance = new CosmosGovernance(this.app);
   }
@@ -37,8 +35,8 @@ class Straightedge extends IChainAdapter<CosmosToken, CosmosAccount> {
     await this.governance.deinit();
     await this.accounts.deinit();
     await this.chain.deinit();
-    console.log('Straightedge stopped.');
+    console.log('Injective stopped.');
   }
 }
 
-export default Straightedge;
+export default Injective;
