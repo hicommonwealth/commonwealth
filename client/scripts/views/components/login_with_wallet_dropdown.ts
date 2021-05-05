@@ -10,7 +10,7 @@ import { ChainBaseIcon } from 'views/components/chain_icon';
 import { baseToLabel, baseToNetwork } from 'models/types';
 
 const CHAINBASE_WITH_CLI = [
-  ChainBase.CosmosSDK, ChainBase.Substrate
+  ChainBase.Substrate
 ];
 
 const LoginWithWalletDropdown: m.Component<{
@@ -44,7 +44,8 @@ const LoginWithWalletDropdown: m.Component<{
       ? { prev, joiningChain } : joiningCommunity ? { prev, joiningCommunity } : { prev };
 
     const allChains = app.config.chains.getAll();
-    const sortedChainBases = [ChainBase.CosmosSDK, ChainBase.Ethereum, ChainBase.NEAR, ChainBase.Substrate].filter((base) => allChains.find((chain) => chain.base === base));
+    const sortedChainBases = [ChainBase.CosmosSDK, ChainBase.Ethereum, ChainBase.NEAR, ChainBase.Substrate]
+      .filter((base) => allChains.find((chain) => chain.base === base));
     const sortedChainBasesWithCLI = sortedChainBases.filter((base) => CHAINBASE_WITH_CLI.indexOf(base) !== -1);
 
     const getMenuItemForChainBase = (base: ChainBase, cli?: boolean) => m(MenuItem, {
