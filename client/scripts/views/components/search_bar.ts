@@ -19,7 +19,7 @@ import QuillFormattedText from './quill_formatted_text';
 import { CommunityLabel } from './sidebar/community_selector';
 import User, { UserBlock } from './widgets/user';
 import { ALL_RESULTS_KEY } from '../pages/search';
-import { ChainIcon, CommunityIcon, TokenIcon } from './chain_icon';
+import { ChainIcon, CommunityIcon } from './chain_icon';
 
 export interface SearchParams {
   communityScope?: string;

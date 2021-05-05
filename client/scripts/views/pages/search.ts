@@ -49,37 +49,33 @@ export const getMemberResult = (addr, searchTerm) => {
 };
 
 export const getCommunityResult = (community) => {
-  if (community.contentType === ContentType.Token) {
-    return m(ListItem, {
-      contentLeft: m(CommunityIcon),
-      label: m('a.search-results-item', [
-        m('img', {
-          src: community.logoURI,
-          height: '36px',
-          width: '36px'
-        }),
-        m('span', community.name)
-      ]),
-      onclick: (e) => {
-        // TODO: Linkification of tokens
-        m.route.set('/');
+  const params = community.contentType === ContentType.Token
+    ? { token: community }
+    : community.contentType === ContentType.Chain
+      ? { chain: community }
+      : community.contentType === ContentType.Community
+        ? { community }
+        : null;
+  params['size'] = 36;
+  // TODO: Linkification of tokens to autogenerate ERC community
+  const onSelect = (e) => {
+    if (params.token) {
+      m.route.set('/');
+    } else {
+      m.route.set(community.id ? `/${community.id}` : '/');
+    }
+  };
+  return m(ListItem, {
+    label: m('a.search-results-item.community-result', [
+      m(CommunityLabel, params),
+    ]),
+    onclick: onSelect,
+    onkeyup: (e) => {
+      if (e.key === 'Enter') {
+        onSelect(e);
       }
-    });
-  } else if (community.contentType === ContentType.Chain
-    || community.contentType === ContentType.Community) {
-    return m(ListItem, {
-      contentLeft: m(CommunityIcon),
-      label: m('a.search-results-item', [
-        m(CommunityLabel, {
-          community,
-          size: 36,
-        })
-      ]),
-      onclick: (e) => {
-        m.route.set(community.id ? `/${community.id}` : '/');
-      }
-    });
-  }
+    }
+  });
 };
 
 export const getDiscussionResult = (thread, searchTerm) => {

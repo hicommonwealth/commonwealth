@@ -22,6 +22,15 @@
             margin: 0 !important;
             color: $text-color-light;
         }
+        .cui-tabs-item:hover {
+            color: #666666;
+            border-width: 2px;
+            border-color: #DDDDDD;
+            border-style: solid;
+            border-top: 0;
+            border-left: 0;
+            border-right: 0;
+        }
         .cui-tabs-item.cui-active {
             color: $text-color-black;
             border-width: 2px;
@@ -125,12 +134,16 @@
                             border-radius: 5px;
                         }
                     }
-                    &.token-result {
+                    .TokenLabel {
                         display: flex;
+                        justify-content: left;
                         align-items: center;
-                        width: 100%;
-                        img {
-                            margin-right: 13px;
+                        .token-label-left {
+                            padding-right: 12px;
+                        }
+                        .token-label-right {
+                            font-weight: 500;
+                            line-height: 1.25;
                         }
                     }
                 }

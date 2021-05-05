@@ -126,9 +126,9 @@ export const DiscussionIcon = {
 export const MemberIcon = {
   view: (vnode) => {
     return m('svg.MemberIcon', {
-      width: '42px',
-      height: '33px',
-      viewBox: '0 0 42 33',
+      width: '26px',
+      height: '30px',
+      viewBox: '0 0 26 30',
       fill: 'none'
     }, [
       m('path', {
