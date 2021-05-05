@@ -13,6 +13,8 @@ export const sequelize = new Sequelize(DATABASE_URI, {
   logging: (process.env.NODE_ENV === 'test') ? false : (msg) => { log.trace(msg); },
   dialectOptions: (process.env.NODE_ENV !== 'production') ? {
     requestTimeout: 10000,
+    // ssl: true,
+    // rejectUnauthorized: false,
   } : {
     requestTimeout: 10000,
     ssl: true,

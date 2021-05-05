@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import Sequelize from 'sequelize';
 import crypto from 'crypto';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
+import { getTokensFromListsInternal } from './getTokensFromLists';
 
 const { Op } = Sequelize;
 
@@ -13,6 +14,58 @@ export const Errors = {
   NotVerifiedAddressOrUser: 'Not verified address or user',
   InvalidChain: 'Invalid chain',
 };
+
+const checkNewChainInfoWithTokenList = async (newChainInfo) => {
+  const tokens = await getTokensFromListsInternal()
+  if( !newChainInfo.iconUrl ) throw new Error("Missing iconUrl");
+  if( !newChainInfo.symbol ) throw new Error("Missing symbol");
+  if( !newChainInfo.name ) throw new Error("Missing name");
+  if( !newChainInfo.address ) throw new Error("Missing address");
+
+  let token = tokens.find(o=> o.name == newChainInfo.name && 
+    o.symbol == newChainInfo.symbol &&
+    o.address == newChainInfo.address)
+  return token;
+}
+
+const createChainForAddress = async (models, newChainInfoString) => {
+  try {
+    const newChainInfo = JSON.parse(newChainInfoString)
+    const foundInList = checkNewChainInfoWithTokenList(newChainInfo)
+    if(!foundInList) {
+      throw new Error("New chain not found in token list")
+    }
+    
+    const createdId = newChainInfo.name.toLowerCase().trim().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
+    
+    const chainContent = {
+      id: createdId,
+      active: true,
+      network: createdId,
+      type: "token",
+      icon_url: newChainInfo.iconUrl,
+      symbol: newChainInfo.symbol, 
+      name: newChainInfo.name,
+      default_chain: 'ethereum',
+      base: 'ethereum',
+    };
+
+    const chainNodeContent = {
+      chain: createdId,
+      url: "wss://mainnet.infura.io/ws",
+      address: newChainInfo.address
+    }
+    const chain = await models.Chain.create(chainContent);
+    await models.ChainNode.create(chainNodeContent);
+
+    console.log('created chain');
+    console.log(chain);
+
+    return [chain, null, null]
+  } catch(e) {
+    return [null, null, e]
+  }
+}
 
 const linkExistingAddressToChain = async (models, req: Request, res: Response, next: NextFunction) => {
   if (!req.body.address) {
@@ -28,11 +81,23 @@ const linkExistingAddressToChain = async (models, req: Request, res: Response, n
     return next(new Error(Errors.NeedLoggedIn));
   }
 
+  let chain, community, error;
+  if(req.body.isNewChain) {
+    [chain, community, error] = await createChainForAddress(models, req.body.newChainInfo)
+  } 
+  
+  if (!chain) {
+    await models.Chain.findOne({
+      where: { id: req.body.chain }
+    });
+  } 
+
+  console.log('fetched chain');
+  console.log(chain);
+
   const userId = req.user.id;
 
-  const chain = await models.Chain.findOne({
-    where: { id: req.body.chain }
-  });
+
   if (!chain) {
     return next(new Error(Errors.InvalidChain));
   }

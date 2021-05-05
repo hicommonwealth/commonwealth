@@ -171,10 +171,32 @@ const LoginSelector: m.Component<{
             if (originAddressInfo) {
               try {
                 const address = originAddressInfo.address;
-
                 const targetChain = joiningChain || originAddressInfo.chain;
+
+                const chains = {};
+                app.config.nodes.getAll().forEach((n) => {
+                  if (chains[n.chain.id]) {
+                    chains[n.chain.id].push(n);
+                  } else {
+                    chains[n.chain.id] = [n];
+                  }
+                });
+
+                const isNewChain = !chains[joiningChain] && (app.chain as Token).isToken 
+                && (app.chain as Token).isUncreated;
+
+                let newChainInfo = null
+                if(isNewChain) {
+                  newChainInfo = {
+                    address: app.chain.id,
+                    iconUrl: app.chain.meta.chain.iconUrl,
+                    name: app.chain.meta.chain.name,
+                    symbol: app.chain.meta.chain.symbol,
+                  }                
+                }
+
                 const res = await linkExistingAddressToChainOrCommunity(
-                  address, targetChain, originAddressInfo.chain, joiningCommunity
+                  address, targetChain, originAddressInfo.chain, joiningCommunity, isNewChain, newChainInfo
                 );
 
                 if (res && res.result) {
@@ -220,7 +242,7 @@ const LoginSelector: m.Component<{
         label: [
           m('span.hidden-sm', [
             samebaseAddressesFiltered.length === 0
-              ? 'Connect address'
+              ? `No ${CHAINBASE_SHORT[app.chain?.meta?.chain.base] || ''} address`
               : 'Join'
           ]),
         ],
