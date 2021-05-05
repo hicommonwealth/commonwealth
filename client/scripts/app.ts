@@ -30,6 +30,7 @@ import { alertModalWithText } from 'views/modals/alert_modal';
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/home');
 import(/* webpackPrefetch: true */ 'views/pages/landing');
+import(/* webpackPrefetch: true */ 'views/pages/commonwealth');
 import(/* webpackPrefetch: true */ 'views/pages/discussions');
 import(/* webpackPrefetch: true */ 'views/pages/view_proposal');
 
@@ -578,6 +579,7 @@ $(() => {
 
     // Landing pages
     '/':                         importRoute('views/pages/landing', { scoped: false, hideSidebar: true }),
+    '/whyCommonWealth':          importRoute('views/pages/commonwealth', { scoped: false, hideSidebar: true }),
     '/about':                    importRoute('views/pages/landing/about', { scoped: false }),
     '/terms':                    importRoute('views/pages/landing/terms', { scoped: false }),
     '/privacy':                  importRoute('views/pages/landing/privacy', { scoped: false }),

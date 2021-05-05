@@ -108,10 +108,10 @@ const LandingPage: m.Component<{}, IState> = {
         { class: 'absolute w-screen z-20' },
         m(HeaderLandingPage, {
           navs: [
-            // { text: 'Why Commonwealth?', ref: '' },
-            // { text: 'Use Cases', ref: '' },
-            // { text: 'Crowdfunding', ref: '' },
-            // { text: 'Developers', ref: '' },
+            { text: 'Why Commonwealth?', redirectTo: '/whyCommonWealth' },
+            // { text: 'Use Cases' },
+            // { text: 'Crowdfunding' },
+            // { text: 'Developers' },
           ],
         })
       ),
@@ -300,12 +300,12 @@ const LandingPage: m.Component<{}, IState> = {
       m(JoinCommonWealthSection),
       m(FooterLandingPage, {
         list: [
-          // { text: 'Why Commonwealth?', href: '' },
-          // { text:  'Use Cases', href: '' },
-          // { text:  'Crowdfunding', href: '' },
-          // { text:  'Developers', href: '' },
-          // { text:  'About us', href: '' },
-          // { text:  'Carrers', href: '' }
+          { text: 'Why Commonwealth?', redirectTo: '/whyCommonWealth' },
+          // { text:  'Use Cases' },
+          // { text:  'Crowdfunding' },
+          // { text:  'Developers' },
+          // { text:  'About us' },
+          // { text:  'Carrers' }
         ],
       }),
       m('script', {

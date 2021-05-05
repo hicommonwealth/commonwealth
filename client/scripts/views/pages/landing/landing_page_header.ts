@@ -4,7 +4,7 @@ import app from 'state';
 import LoginModal from 'views/modals/login_modal';
 
 interface IAttrs {
-  navs: { text: string; ref: string }[];
+  navs: { text: string; redirectTo: string }[];
 }
 
 interface IState {
@@ -32,6 +32,10 @@ window.onscroll = (e: any): void => {
 
 const HeaderLandingPage: m.Component<IAttrs, IState> = {
   view: (vnode) => {
+    const redirectClick = (route) => {
+      m.route.set(route);
+    };
+
     return m('div',
       { class: 'container mx-auto' },
       m('header',
@@ -44,6 +48,7 @@ const HeaderLandingPage: m.Component<IAttrs, IState> = {
             class: 'w-32 md:w-48 lg:w-60',
             src: 'static/img/logo.svg',
             alt: 'Commonwealth',
+            onclick: () => redirectClick('/')
           }),
           m('nav',
             { class: 'hidden lg:block' },
@@ -53,7 +58,7 @@ const HeaderLandingPage: m.Component<IAttrs, IState> = {
                   'li.LandingPageHeaderLinks',
                   { class: 'ml-10 pt-2' },
                   m('a',
-                    { class: 'text-gray-500 leading-none', href: nav.href },
+                    { class: 'text-gray-500 leading-none',  onclick: () => redirectClick(nav.redirectTo) },
                     nav.text)
                 );
               }),

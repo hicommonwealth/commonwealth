@@ -2,7 +2,7 @@ import m from 'mithril';
 import './landing_page_footer.scss';
 
 interface IState {
-  list: { text: string; href: string }[];
+  list: { text: string; redirectTo: string }[];
 }
 
 const FooterLandingPage: m.Component<IState, IState> = {
@@ -10,6 +10,10 @@ const FooterLandingPage: m.Component<IState, IState> = {
     vnode.state.list = vnode.attrs.list;
   },
   view: (vnode) => {
+    const redirectClick = (route) => {
+      m.route.set(route);
+    };
+
     return m(
       'footer',
       { class: 'bg-footer bg-cover py-10' },
@@ -40,7 +44,10 @@ const FooterLandingPage: m.Component<IState, IState> = {
                     { class: 'mb-2' },
                     m(
                       'a',
-                      { class: 'text-gray-500', href: item.href },
+                      {
+                        class: 'text-gray-500',
+                        onclick: () => redirectClick(item.redirectTo),
+                      },
                       item.text
                     )
                   );
