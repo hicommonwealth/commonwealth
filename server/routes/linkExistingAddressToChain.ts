@@ -32,6 +32,8 @@ const createChainForAddress = async (models, newChainInfoString) => {
   try {
     const newChainInfo = JSON.parse(newChainInfoString)
     const foundInList = checkNewChainInfoWithTokenList(newChainInfo)
+    console.log('foundInList');
+    console.log(foundInList);
     if(!foundInList) {
       throw new Error("New chain not found in token list")
     }
@@ -82,10 +84,14 @@ const linkExistingAddressToChain = async (models, req: Request, res: Response, n
   }
 
   let chain, community, error;
+  console.log(req.body);
   if(req.body.isNewChain) {
     [chain, community, error] = await createChainForAddress(models, req.body.newChainInfo)
   } 
   
+  console.log('generated chain');
+  console.log(chain);
+
   if (!chain) {
     await models.Chain.findOne({
       where: { id: req.body.chain }
