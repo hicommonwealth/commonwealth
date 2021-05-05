@@ -30,7 +30,7 @@ function createAccount(account: Account<any>, community?: string) {
     address: account.address,
     keytype: account.chainBase === ChainBase.Substrate
       && (account as any).isEd25519 ? 'ed25519' : undefined,
-    chain: account.chain.id,
+    chain: (app.chain as Token).isToken ? 'ethereum' : account.chain.id,
     community,
     jwt: app.user.jwt,
   });

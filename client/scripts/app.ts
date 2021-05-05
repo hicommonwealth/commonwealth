@@ -196,6 +196,8 @@ export async function createTemporaryTokenChain(n: NodeInfo): Promise<boolean> {
   // Begin initializing the community
   const newToken = new Token(n, app, true)
   app.chain = newToken;
+  await app.chain.initApi();
+  await app.chain.initData();
 
   // Redraw with community fully loaded and return true to indicate
   // initialization has finalized.
