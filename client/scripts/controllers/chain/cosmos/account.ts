@@ -1,6 +1,7 @@
 import _ from 'lodash';
+import BN from 'bn.js';
 import { IApp } from 'state';
-import { CosmosToken } from 'adapters/chain/cosmos/types';
+import { CosmosToken } from 'controllers/chain/cosmos/types';
 import { Account, IAccountsModule } from 'models';
 import { AccountsStore } from 'stores';
 import {
@@ -63,8 +64,8 @@ export class CosmosAccount extends Account<CosmosToken> {
   }
 
   private _balance: CosmosToken;
-  private _validatorStake: number;
-  public get validatorStake(): number {
+  private _validatorStake: BN;
+  public get validatorStake(): BN {
     return this._validatorStake;
   }
 
@@ -179,12 +180,12 @@ export class CosmosAccount extends Account<CosmosToken> {
     }
     if (resp && resp.result.value.coins && resp.result.value.coins[0]) {
       for (const coins of resp.result.value.coins) {
-        const bal = +coins.amount;
+        const bal = new BN(coins.amount);
         if (coins.denom === this._Chain.denom) {
           this._balance = this._Chain.coins(bal, true);
         } else if (coins.denom === 'validatortoken') {
           // TODO: add validator tokens to accounts
-          this._validatorStake = +bal;
+          this._validatorStake = bal;
         } else {
           throw new Error(`invalid denomination: ${coins.denom}`);
         }

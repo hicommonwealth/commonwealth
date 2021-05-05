@@ -1,3 +1,4 @@
+import BN from 'bn.js';
 import { GovDepositsResponse, GovTallyResponse, GovVotesResponse } from '@cosmjs/launchpad';
 import {
   Proposal,
@@ -11,7 +12,7 @@ import {
 } from 'models';
 import {
   ICosmosProposal, ICosmosProposalState, CosmosToken, CosmosVoteChoice, CosmosProposalState, ICosmosProposalTally
-} from 'adapters/chain/cosmos/types';
+} from 'controllers/chain/cosmos/types';
 import { ProposalStore } from 'stores';
 import moment from 'moment-twitter';
 
@@ -72,8 +73,8 @@ export class CosmosProposal extends Proposal<
     return this._status;
   }
 
-  private _totalDeposit: number = 0;
-  private _depositors: { [depositor: string]: number } = {};
+  private _totalDeposit: BN = new BN(0);
+  private _depositors: { [depositor: string]: BN } = {};
   public get depositors() {
     return this._depositors;
   }
@@ -132,13 +133,13 @@ export class CosmosProposal extends Proposal<
       completed: false,
       status: this.status,
       depositors: [],
-      totalDeposit: 0,
+      totalDeposit: new BN(0),
       voters: [],
       tally: null,
     };
     if (depositResp) {
       for (const deposit of depositResp.result) {
-        state.depositors.push([ deposit.depositor, +deposit.amount[0].amount ]);
+        state.depositors.push([ deposit.depositor, new BN(deposit.amount[0].amount) ]);
       }
     }
     if (voteResp) {
@@ -160,32 +161,36 @@ export class CosmosProposal extends Proposal<
   // see: https://blog.chorus.one/an-overview-of-cosmos-hub-governance/
   get support() {
     if (this.status === CosmosProposalState.DEPOSIT_PERIOD) {
-      return this._totalDeposit;
+      return this._Chain.coins(this._totalDeposit);
     }
     if (!this._tally) return 0;
-    const nonAbstainingPower = this._tally.no + this._tally.noWithVeto + this._tally.yes;
-    if (nonAbstainingPower === 0) return 0;
-    return this._tally.yes / nonAbstainingPower;
+    const nonAbstainingPower = this._tally.no.add(this._tally.noWithVeto).add(this._tally.yes);
+    if (nonAbstainingPower.eqn(0)) return 0;
+    const ratioPpm = this._tally.yes.muln(1_000_000).div(nonAbstainingPower);
+    return +ratioPpm / 1_000_000;
   }
   get turnout() {
     if (this.status === CosmosProposalState.DEPOSIT_PERIOD) {
-      if (this._totalDeposit === 0) {
+      if (this._totalDeposit.eqn(0)) {
         return 0;
       } else {
-        return this._totalDeposit / this._Chain.staked;
+        const ratioInPpm = +this._totalDeposit.muln(1_000_000).div(this._Chain.staked);
+        return +ratioInPpm / 1_000_000;
       }
     }
     if (!this._tally) return 0;
     // all voters automatically abstain, so we compute turnout as the percent non-abstaining
-    const totalVotingPower = this._tally.no + this._tally.noWithVeto + this._tally.yes + this._tally.abstain;
-    if (totalVotingPower === 0) return 0;
-    return 1 - (this._tally.abstain / totalVotingPower);
+    const totalVotingPower = this._tally.no.add(this._tally.noWithVeto).add(this._tally.yes).add(this._tally.abstain);
+    if (totalVotingPower.eqn(0)) return 0;
+    const ratioInPpm = +this._tally.abstain.muln(1_000_000).div(totalVotingPower);
+    return 1 - (ratioInPpm / 1_000_000);
   }
   get veto() {
     if (!this._tally) return 0;
-    const totalVotingPower = this._tally.no + this._tally.noWithVeto + this._tally.yes + this._tally.abstain;
-    if (totalVotingPower === 0) return 0;
-    return this._tally.noWithVeto / totalVotingPower;
+    const totalVotingPower = this._tally.no.add(this._tally.noWithVeto).add(this._tally.yes).add(this._tally.abstain);
+    if (totalVotingPower.eqn(0)) return 0;
+    const ratioInPpm = +this._tally.noWithVeto.muln(1_000_000).div(totalVotingPower);
+    return ratioInPpm / 1_000_000;
   }
   get endTime(): ProposalEndTime {
     // if in deposit period: at most create time + maxDepositTime
@@ -206,7 +211,7 @@ export class CosmosProposal extends Proposal<
       case CosmosProposalState.VOTING_PERIOD:
         return (this.support > 0.5 && this.veto <= (1 / 3)) ? ProposalStatus.Passing : ProposalStatus.Failing;
       case CosmosProposalState.DEPOSIT_PERIOD:
-        return this._totalDeposit >= +this._Governance.minDeposit ? ProposalStatus.Passing : ProposalStatus.Failing;
+        return this._totalDeposit.gte(this._Governance.minDeposit) ? ProposalStatus.Passing : ProposalStatus.Failing;
       default:
         return ProposalStatus.None;
     }

@@ -13,7 +13,6 @@ import {
   StakingExtension,
 } from '@cosmjs/launchpad';
 import { Client as TendermintClient, NewBlockHeaderEvent, Event } from '@cosmjs/tendermint-rpc';
-import { ICosmosTXData } from './chain';
 
 export interface ITx {
   msg: {

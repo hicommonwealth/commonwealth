@@ -11,7 +11,7 @@ import moment from 'moment';
 import { BlocktimeHelper } from 'helpers';
 import BN from 'bn.js';
 import { EventEmitter } from 'events';
-import { CosmosToken } from 'adapters/chain/cosmos/types';
+import { CosmosToken } from 'controllers/chain/cosmos/types';
 
 import { NewBlockHeaderEvent } from '@cosmjs/tendermint-rpc';
 import { makeStdTx, StdTx, StdFee, Msg, BroadcastTxResult, isBroadcastTxFailure } from '@cosmjs/launchpad';
@@ -51,8 +51,8 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     return this._chainId;
   }
 
-  private _staked: number;
-  public get staked(): number {
+  private _staked: CosmosToken;
+  public get staked(): CosmosToken {
     return this._staked;
   }
 
@@ -81,8 +81,8 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     // that forwards the requests to it, and adds the header 'Access-Control-Allow-Origin: *'
     /* eslint-disable prefer-template */
     const wsUrl = (node.url.indexOf('localhost') !== -1 || node.url.indexOf('127.0.0.1') !== -1)
-      ? ('ws://' + node.url.replace('ws://', '').replace('wss://', '').split(':')[0] + ':26657/websocket')
-      : ('wss://' + node.url.replace('ws://', '').replace('wss://', '').split(':')[0] + ':36657/websocket');
+      ? ('ws://' + node.url.replace('ws://', '').replace('wss://', '').split(':')[0] + ':26657')
+      : ('wss://' + node.url.replace('ws://', '').replace('wss://', '').split(':')[0] + ':36657');
     const restUrl = (node.url.indexOf('localhost') !== -1 || node.url.indexOf('127.0.0.1') !== -1)
       ? ('http://' + node.url.replace('ws://', '').replace('wss://', '').split(':')[0] + ':1318')
       : ('https://' + node.url.replace('ws://', '').replace('wss://', '').split(':')[0] + ':1318');
@@ -100,7 +100,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     });
     this.app.chain.networkStatus = ApiStatus.Connected;
     const { result: { bonded_tokens } } = await this._api.query.staking.pool();
-    this._staked = +bonded_tokens;
+    this._staked = this.coins(new BN(bonded_tokens));
     const { result: { bond_denom } } = await this._api.query.staking.parameters();
     this._denom = bond_denom;          // uatom
     this._chainId = this._api.chainId; // cosmoshub-2

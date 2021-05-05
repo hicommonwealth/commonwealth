@@ -1,3 +1,4 @@
+import BN from 'bn.js';
 import { GovTallyResponse } from '@cosmjs/launchpad';
 import {
   GovParametersDepositResponse,
@@ -12,7 +13,7 @@ import {
 } from 'models';
 import {
   ICosmosProposal, CosmosToken, ICosmosProposalTally
-} from 'adapters/chain/cosmos/types';
+} from 'controllers/chain/cosmos/types';
 import { CosmosApi } from './api';
 import { CosmosAccount, CosmosAccounts } from './account';
 import CosmosChain from './chain';
@@ -25,10 +26,10 @@ const isCompleted = (status: string): boolean => {
 export const marshalTally = (tally: GovTallyResponse): ICosmosProposalTally => {
   if (!tally?.result) return null;
   return {
-    yes: +tally.result.yes,
-    abstain: +tally.result.abstain,
-    no: +tally.result.no,
-    noWithVeto: +tally.result.no_with_veto,
+    yes: new BN(tally.result.yes),
+    abstain: new BN(tally.result.abstain),
+    no: new BN(tally.result.no),
+    noWithVeto: new BN(tally.result.no_with_veto),
   };
 };
 
@@ -71,7 +72,7 @@ class CosmosGovernance extends ProposalModule<
     this._maxDepositPeriodNs = +depositParams.result.max_deposit_period;
     this._minDeposit = new CosmosToken(
       depositParams.result.min_deposit[0].denom,
-      +depositParams.result.min_deposit[0].amount,
+      new BN(depositParams.result.min_deposit[0].amount),
     );
 
     // query existing proposals
@@ -98,7 +99,7 @@ class CosmosGovernance extends ProposalModule<
           identifier: p.id || p.proposal_id,
           completed: isCompleted(p.proposal_status),
           status: p.proposal_status,
-          totalDeposit: p.total_deposit ? +p.total_deposit.amount : 0,
+          totalDeposit: p.total_deposit ? new BN(p.total_deposit.amount) : new BN(0),
           depositors: [],
           voters: [],
           tally: marshalTally(p.final_tally_result),

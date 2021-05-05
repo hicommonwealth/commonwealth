@@ -1,4 +1,4 @@
-import { CosmosToken } from 'adapters/chain/cosmos/types';
+import { CosmosToken } from 'controllers/chain/cosmos/types';
 import { IChainAdapter, ChainBase, ChainClass, NodeInfo } from 'models';
 import { IApp } from 'state';
 import { CosmosAccount, CosmosAccounts } from './account';

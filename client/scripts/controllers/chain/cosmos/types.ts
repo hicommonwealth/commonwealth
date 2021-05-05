@@ -1,6 +1,6 @@
 import BN from 'bn.js';
 import { Coin } from 'adapters/currency';
-import { IIdentifiable, ICompletable } from '../../shared';
+import { IIdentifiable, ICompletable } from 'adapters/shared';
 
 export class CosmosValidatorToken extends Coin {
   constructor(n: number | string | BN, inDollars: boolean = false) {
@@ -52,10 +52,10 @@ export enum CosmosProposalState {
 }
 
 export interface ICosmosProposalTally {
-  yes: number;
-  abstain: number;
-  no: number;
-  noWithVeto: number;
+  yes: BN;
+  abstain: BN;
+  no: BN;
+  noWithVeto: BN;
 }
 
 export interface ICosmosProposal extends IIdentifiable {
@@ -75,8 +75,8 @@ export interface ICosmosProposal extends IIdentifiable {
 // TODO: note that these vote number values are in terms of _stake_
 export interface ICosmosProposalState extends ICompletable {
   status: CosmosProposalState;
-  depositors: Array<[ string, number ]>;
-  totalDeposit: number;
+  depositors: Array<[ string, BN ]>;
+  totalDeposit: BN;
   voters: Array<[ string, CosmosVoteChoice ]>;
   tally: ICosmosProposalTally;
 }

@@ -8,7 +8,7 @@ import { formatCoin } from 'adapters/currency'; // TODO: remove formatCoin, only
 import User from 'views/components/widgets/user';
 import { VotingType, VotingUnit, IVote, DepositVote, BinaryVote, AnyProposal } from 'models';
 import { CosmosVote, CosmosProposal } from 'controllers/chain/cosmos/proposal';
-import { CosmosVoteChoice } from 'adapters/chain/cosmos/types';
+import { CosmosVoteChoice } from 'controllers/chain/cosmos/types';
 import { MolochProposalVote, MolochVote } from 'controllers/chain/ethereum/moloch/proposal';
 import { MarlinProposalVote, MarlinVote } from 'controllers/chain/ethereum/marlin/proposal';
 import { SubstrateCollectiveVote } from 'controllers/chain/substrate/collective_proposal';
