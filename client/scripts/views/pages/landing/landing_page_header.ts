@@ -12,6 +12,7 @@ interface IState {
   hideHeader: boolean;
 }
 
+// When the headers links get's done, just delete the mx-64
 // eslint-disable-next-line max-len
 const INITIAL_HEADER_STYLE = 'bg-white static lg:flex lg:flex-row lg:justify-between lg:items-center p-4 px-10 rounded-full shadow-lg transition transition-all duration-1000 mt-8 mx-64';
 
