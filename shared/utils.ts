@@ -123,9 +123,7 @@ export function formatAddressShort(address: string, chain: string) {
   if (!address) return;
   if (chain === 'near') {
     return `@${address}`;
-  } else if (chain === 'straightedge') {
-    return `${address.slice(0, 9)}…`;
-  } else if (chain === 'cosmos') {
+  } else if (chain === 'straightedge' || chain === 'cosmos' || chain === 'injective') {
     return `${address.slice(0, 9)}…`;
   } else {
     return `${address.slice(0, 5)}…`;
