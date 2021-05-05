@@ -1,6 +1,7 @@
 import 'pages/search.scss';
 
 import m from 'mithril';
+import $ from 'jquery';
 import _, { capitalize } from 'lodash';
 import { ControlGroup, Icon, Icons, Input, List, ListItem, Spinner } from 'construct-ui';
 import {
@@ -69,35 +70,28 @@ export const getMemberPreview = (addr, closeResultsFn, searchTerm, showChainName
 };
 
 export const getCommunityPreview = (community, closeResultsFn) => {
-  if (community.contentType === ContentType.Token) {
-    return m(ListItem, {
-      label: m('a.search-results-item.token-result', [
-        m(TokenIcon, {
-          token: community,
-          size: 36,
-        }),
-        m('span', community.name)
-      ]),
-      onclick: (e) => {
-        // TODO: Linkification of tokens to autogenerate ERC community
+  const params = community.contentType === ContentType.Token
+    ? { token: community }
+    : community.contentType === ContentType.Chain
+      ? { chain: community }
+      : community.contentType === ContentType.Community
+        ? { community }
+        : null;
+  params['size'] = 36;
+  return m(ListItem, {
+    label: m('a.search-results-item.community-result', [
+      m(CommunityLabel, params),
+    ]),
+    onclick: (e) => {
+      // TODO: Linkification of tokens to autogenerate ERC community
+      if (params.token) {
         m.route.set('/');
-      }
-    });
-  } else if (community.contentType === ContentType.Chain
-    || community.contentType === ContentType.Community) {
-    return m(ListItem, {
-      label: m('a.search-results-item.community-result', [
-        m(CommunityLabel, {
-          community,
-          size: 36,
-        })
-      ]),
-      onclick: (e) => {
+      } else {
         m.route.set(community.id ? `/${community.id}` : '/');
         closeResultsFn();
       }
-    });
-  }
+    }
+  });
 };
 
 export const getDiscussionPreview = (thread, closeResultsFn, searchTerm) => {
@@ -403,7 +397,7 @@ const SearchBar : m.Component<{}, {
           size: 15,
           community: app.community.meta,
         })
-      : '';
+      : null;
     const cancelInputIcon = vnode.state.searchTerm
       ? m(Icon, {
         name: Icons.X,
@@ -412,7 +406,7 @@ const SearchBar : m.Component<{}, {
           input.val('');
           vnode.state.searchTerm = '';
         } })
-      : '';
+      : null;
 
     return m(ControlGroup, {
       class: 'SearchBar'
@@ -423,7 +417,7 @@ const SearchBar : m.Component<{}, {
         autofocus: true,
         fluid: true,
         contentLeft: m(SearchIcon),
-        contentRight: m('.content-right-wrap', [ cancelInputIcon, chainOrCommIcon ]),
+        contentRight: cancelInputIcon || chainOrCommIcon,
         defaultValue: m.route.param('q') || vnode.state.searchTerm,
         value: vnode.state.searchTerm,
         oncreate: (e) => {

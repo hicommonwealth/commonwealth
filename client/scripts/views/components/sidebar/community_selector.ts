@@ -7,19 +7,20 @@ import app from 'state';
 import { AddressInfo, ChainInfo, CommunityInfo, RoleInfo } from 'models';
 import { SwitchIcon } from 'helpers';
 
-import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
+import { ChainIcon, CommunityIcon, TokenIcon } from 'views/components/chain_icon';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import User, { UserBlock } from '../widgets/user';
 
 export const CommunityLabel: m.Component<{
   chain?: ChainInfo,
   community?: CommunityInfo,
+  token?: any,
   showStatus?: boolean,
   link?: boolean,
   size?: number,
 }> = {
   view: (vnode) => {
-    const { chain, community, showStatus, link } = vnode.attrs;
+    const { chain, community, token, showStatus, link } = vnode.attrs;
 
     if (chain) return m('.CommunityLabel', [
       m('.community-label-left', [
@@ -51,6 +52,25 @@ export const CommunityLabel: m.Component<{
           showStatus === true && [
             community.privacyEnabled && m(Icon, { name: Icons.LOCK, size: 'xs' }),
             !community.privacyEnabled && m(Icon, { name: Icons.GLOBE, size: 'xs' }),
+          ],
+        ]),
+      ]),
+    ]);
+
+    if (token) return m('.TokenLabel', [
+      m('.token-label-left', [
+        m(TokenIcon, {
+          size: vnode.attrs.size || 18,
+          token,
+          onclick: link ? (() => m.route.set(`/${token.id}`)) : null
+        }),
+      ]),
+      m('.token-label-right', [
+        m('.token-name-row', [
+          m('span.token-name', token.name),
+          showStatus === true && [
+            token.privacyEnabled && m(Icon, { name: Icons.LOCK, size: 'xs' }),
+            !token.privacyEnabled && m(Icon, { name: Icons.GLOBE, size: 'xs' }),
           ],
         ]),
       ]),

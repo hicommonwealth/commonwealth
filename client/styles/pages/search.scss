@@ -155,24 +155,21 @@
         font-size: 14px;
         color: black;
         border: 1px solid transparent;
-        svg {
+        svg.SearchIcon {
             z-index: 2;
             position: relative;
             left: 30px;
             margin-left: -15px;
             fill: url(#paint0_linear);
         }
-        .content-right-wrap {
-            svg {
-                
-            }
-            .chain-icon, .community-icon {
-                z-index: 2;
-                position: relative;
-                right: 30px;
-                margin-right: -15px;
-                border-radius: 50%;
-            }
+        .chain-icon, .community-icon, .cui-icon-x {
+            z-index: 2;
+            right: 30px;
+            margin-right: -15px;
+            border-radius: 50%;
+        }
+        .chain-icon, .community-icon {
+            position: relative;
         }
         &:focus-within {
             background: linear-gradient(to bottom, #91ACE1, #DDBFE1) !important;
@@ -212,6 +209,18 @@
                 text-decoration: none;
                 font-size: 14px;
                 overflow: hidden;
+                .TokenLabel {
+                    display: flex;
+                    justify-content: left;
+                    align-items: center;
+                    .token-label-left {
+                        padding-right: 12px;
+                    }
+                    .token-label-right {
+                        font-weight: 500;
+                        line-height: 1.25;
+                    }
+                }
                 .search-results-thread-title {
                     font-weight: 500;
                 }

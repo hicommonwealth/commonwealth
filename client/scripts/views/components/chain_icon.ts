@@ -11,7 +11,7 @@ export const ChainIcon: m.Component<{ chain: ChainInfo, onclick?: Function, size
     return m('.ChainIcon', { class: onclick ? 'onclick' : '' }, [
       m('img.chain-icon', {
         style: `width: ${size}px; height: ${size}px;`,
-        src: vnode.attrs.chain.iconUrl,
+        src: vnode.attrs.chain.iconUrl || (vnode.attrs.chain as any).icon_url,
         onclick
       }),
     ]);
