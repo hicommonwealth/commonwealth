@@ -47,11 +47,12 @@ export enum ContentType {
 const SEARCH_PREVIEW_SIZE = 6;
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
 
-export const getMemberPreview = (addr, closeResultsFn, searchTerm, showChainName?) => {
+export const getMemberPreview = (addr, closeResultsFn, searchTerm, tabIndex, showChainName?) => {
   const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
   if (addr.name) profile.initialize(addr.name, null, null, null, null);
   const userLink = `/${m.route.param('scope') || addr.chain}/account/${addr.address}?base=${addr.chain}`;
   return m(ListItem, {
+    tabIndex,
     label: m('a.search-results-item', [
       m(UserBlock, {
         user: profile,
@@ -65,11 +66,17 @@ export const getMemberPreview = (addr, closeResultsFn, searchTerm, showChainName
     onclick: (e) => {
       m.route.set(userLink);
       closeResultsFn();
+    },
+    onkeyup: (e) => {
+      if (e.key === 'Enter') {
+        m.route.set(userLink);
+        closeResultsFn();
+      }
     }
   });
 };
 
-export const getCommunityPreview = (community, closeResultsFn) => {
+export const getCommunityPreview = (community, closeResultsFn, tabIndex) => {
   const params = community.contentType === ContentType.Token
     ? { token: community }
     : community.contentType === ContentType.Chain
@@ -78,36 +85,50 @@ export const getCommunityPreview = (community, closeResultsFn) => {
         ? { community }
         : null;
   params['size'] = 36;
+  // TODO: Linkification of tokens to autogenerate ERC community
+  const onSelect = (e) => {
+    if (params.token) {
+      m.route.set('/');
+    } else {
+      m.route.set(community.id ? `/${community.id}` : '/');
+    }
+    closeResultsFn();
+  };
   return m(ListItem, {
+    tabIndex,
     label: m('a.search-results-item.community-result', [
       m(CommunityLabel, params),
     ]),
-    onclick: (e) => {
-      // TODO: Linkification of tokens to autogenerate ERC community
-      if (params.token) {
-        m.route.set('/');
-      } else {
-        m.route.set(community.id ? `/${community.id}` : '/');
-        closeResultsFn();
+    onclick: onSelect,
+    onkeyup: (e) => {
+      if (e.key === 'Enter') {
+        onSelect(e);
       }
     }
   });
 };
 
-export const getDiscussionPreview = (thread, closeResultsFn, searchTerm) => {
+export const getDiscussionPreview = (thread, closeResultsFn, searchTerm, tabIndex) => {
   const proposalId = thread.proposalid;
   const chainOrComm = thread.chain || thread.offchain_community;
+  const onSelect = (e) => {
+    if (!chainOrComm) {
+      notifyError('Discussion not found.');
+      return;
+    }
+    m.route.set((thread.type === 'thread')
+      ? `/${chainOrComm}/proposal/discussion/${proposalId}`
+      : `/${chainOrComm}/proposal/${proposalId.split('_')[0]}/${proposalId.split('_')[1]}`);
+    closeResultsFn();
+  };
 
   return m(ListItem, {
-    onclick: (e) => {
-      if (!chainOrComm) {
-        notifyError('Discussion not found.');
-        return;
+    tabIndex,
+    onclick: onSelect,
+    onkeyup: (e) => {
+      if (e.key === 'Enter') {
+        onSelect(e);
       }
-      m.route.set((thread.type === 'thread')
-        ? `/${chainOrComm}/proposal/discussion/${proposalId}`
-        : `/${chainOrComm}/proposal/${proposalId.split('_')[0]}/${proposalId.split('_')[1]}`);
-      closeResultsFn();
     },
     label: m('a.search-results-item', [
       thread.type === 'thread' ? [
@@ -217,6 +238,7 @@ const getResultsPreview = (searchTerm: string, state, communityScoped?: boolean)
     results = getBalancedContentListing(app.searchCache[searchTerm], types);
   }
   const organizedResults = [];
+  let tabIndex = 1;
   types.forEach((type: SearchType) => {
     const res = results[type];
     if (res?.length === 0) return;
@@ -230,12 +252,13 @@ const getResultsPreview = (searchTerm: string, state, communityScoped?: boolean)
     });
     organizedResults.push(headerEle);
     (res as any[]).forEach((item) => {
+      tabIndex += 1;
       const resultRow = item.searchType === SearchType.Discussion
-        ? getDiscussionPreview(item, state.closeResults, searchTerm)
+        ? getDiscussionPreview(item, state.closeResults, searchTerm, tabIndex)
         : item.searchType === SearchType.Member
-          ? getMemberPreview(item, state.closeResults, searchTerm, !!communityScoped)
+          ? getMemberPreview(item, state.closeResults, searchTerm, tabIndex, !!communityScoped)
           : item.searchType === SearchType.Community
-            ? getCommunityPreview(item, state.closeResults)
+            ? getCommunityPreview(item, state.closeResults, tabIndex)
             : null;
       organizedResults.push(resultRow);
     });
@@ -416,6 +439,7 @@ const SearchBar : m.Component<{}, {
         placeholder: 'Type to search...',
         autofocus: true,
         fluid: true,
+        tabIndex: -10,
         contentLeft: m(SearchIcon),
         contentRight: cancelInputIcon || chainOrCommIcon,
         defaultValue: m.route.param('q') || vnode.state.searchTerm,
