@@ -209,38 +209,38 @@ const VotingResults: m.Component<{ proposal }> = {
     } else if (proposal.votingType === VotingType.YesNoAbstainVeto) {
       return m('.VotingResults', [
         m('.results-column', [
-          m('.results-header', `Voted yes (${votes.filter((v) => v.choice === CosmosVoteChoice.YES).length})`),
+          m('.results-header', `Voted yes (${votes.filter((v) => v.choice === 'Yes').length})`),
           m('.results-cell', [
             m(VoteListing, {
               proposal,
-              votes: votes.filter((v) => v.choice === CosmosVoteChoice.YES)
+              votes: votes.filter((v) => v.choice === 'Yes')
             })
           ]),
         ]),
         m('.results-column', [
-          m('.results-header', `Voted no (${votes.filter((v) => v.choice === CosmosVoteChoice.NO).length})`),
+          m('.results-header', `Voted no (${votes.filter((v) => v.choice === 'No').length})`),
           m('.results-cell', [
             m(VoteListing, {
               proposal,
-              votes: votes.filter((v) => v.choice === CosmosVoteChoice.NO)
+              votes: votes.filter((v) => v.choice === 'No')
             })
           ]),
         ]),
         m('.results-column', [
-          m('.results-header', `Voted abstain (${votes.filter((v) => v.choice === CosmosVoteChoice.ABSTAIN).length})`),
+          m('.results-header', `Voted abstain (${votes.filter((v) => v.choice === 'Abstain').length})`),
           m('.results-cell', [
             m(VoteListing, {
               proposal,
-              votes: votes.filter((v) => v.choice === CosmosVoteChoice.ABSTAIN)
+              votes: votes.filter((v) => v.choice === 'Abstain')
             })
           ]),
         ]),
         m('.results-column', [
-          m('.results-header', `Voted veto (${votes.filter((v) => v.choice === CosmosVoteChoice.VETO).length})`),
+          m('.results-header', `Voted veto (${votes.filter((v) => v.choice === 'NoWithVeto').length})`),
           m('.results-cell', [
             m(VoteListing, {
               proposal,
-              votes: votes.filter((v) => v.choice === CosmosVoteChoice.VETO)
+              votes: votes.filter((v) => v.choice === 'NoWithVeto')
             })
           ]),
         ])

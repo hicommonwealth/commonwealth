@@ -17,17 +17,16 @@ import { ProposalStore } from 'stores';
 import moment from 'moment-twitter';
 
 import { CosmosAccount, CosmosAccounts } from './account';
-import { CosmosApi } from './api';
-import CosmosChain from './chain';
+import CosmosChain, { CosmosApiType } from './chain';
 import CosmosGovernance, { marshalTally } from './governance';
 
 export const voteToEnum = (voteOption: number | string): CosmosVoteChoice => {
   if (typeof voteOption === 'number') {
     switch (voteOption) {
-      case 1: return CosmosVoteChoice.YES;
-      case 2: return CosmosVoteChoice.ABSTAIN;
-      case 3: return CosmosVoteChoice.NO;
-      case 4: return CosmosVoteChoice.VETO;
+      case 1: return 'Yes';
+      case 2: return 'Abstain';
+      case 3: return 'No';
+      case 4: return 'NoWithVeto';
       default: return null;
     }
   } else {
@@ -46,7 +45,7 @@ export class CosmosVote implements IVote<CosmosToken> {
 }
 
 export class CosmosProposal extends Proposal<
-  CosmosApi, CosmosToken, ICosmosProposal, CosmosVote
+  CosmosApiType, CosmosToken, ICosmosProposal, CosmosVote
 > {
   public get shortIdentifier() {
     return `#${this.identifier.toString()}`;
@@ -56,7 +55,7 @@ export class CosmosProposal extends Proposal<
   public get author() { return this.data.proposer ? this._Accounts.fromAddress(this.data.proposer) : null; }
 
   public get votingType() {
-    if (this.status === CosmosProposalState.DEPOSIT_PERIOD) {
+    if (this.status === 'DepositPeriod') {
       return VotingType.SimpleYesApprovalVoting;
     }
     return VotingType.YesNoAbstainVeto;
@@ -111,21 +110,17 @@ export class CosmosProposal extends Proposal<
   }
 
   private async _initState() {
-    if (this.completed) {
-      throw new Error('should not subscribe cosmos proposal state if completed');
-    }
-
     const api = this._Chain.api;
     const [depositResp, voteResp, tallyResp]: [
       GovDepositsResponse, GovVotesResponse, GovTallyResponse
     ] = await Promise.all([
-      api.query.gov.deposits(this.data.identifier),
-      this.status === CosmosProposalState.DEPOSIT_PERIOD
+      api.gov.deposits(this.data.identifier),
+      this.status === 'DepositPeriod'
         ? Promise.resolve(null)
-        : api.query.gov.votes(this.data.identifier),
-      this.status === CosmosProposalState.DEPOSIT_PERIOD
+        : api.gov.votes(this.data.identifier),
+      this.status === 'DepositPeriod'
         ? Promise.resolve(null)
-        : api.query.gov.tally(this.data.identifier),
+        : api.gov.tally(this.data.identifier),
     ]);
 
     const state: ICosmosProposalState = {
@@ -152,15 +147,15 @@ export class CosmosProposal extends Proposal<
         }
       }
     }
-    if (tallyResp) {
-      state.tally = marshalTally(tallyResp);
+    if (tallyResp?.result) {
+      state.tally = marshalTally(tallyResp.result);
     }
   }
 
   // TODO: add getters for various vote features: tally, quorum, threshold, veto
   // see: https://blog.chorus.one/an-overview-of-cosmos-hub-governance/
   get support() {
-    if (this.status === CosmosProposalState.DEPOSIT_PERIOD) {
+    if (this.status === 'DepositPeriod') {
       return this._Chain.coins(this._totalDeposit);
     }
     if (!this._tally) return 0;
@@ -170,7 +165,7 @@ export class CosmosProposal extends Proposal<
     return +ratioPpm / 1_000_000;
   }
   get turnout() {
-    if (this.status === CosmosProposalState.DEPOSIT_PERIOD) {
+    if (this.status === 'DepositPeriod') {
       if (this._totalDeposit.eqn(0)) {
         return 0;
       } else {
@@ -194,7 +189,7 @@ export class CosmosProposal extends Proposal<
   }
   get endTime(): ProposalEndTime {
     // if in deposit period: at most create time + maxDepositTime
-    if (this.status === CosmosProposalState.DEPOSIT_PERIOD) {
+    if (this.status === 'DepositPeriod') {
       if (!this.data.depositEndTime) return { kind: 'unavailable' };
       return { kind: 'fixed', time: moment(this.data.depositEndTime) };
     }
@@ -204,13 +199,13 @@ export class CosmosProposal extends Proposal<
   }
   get isPassing(): ProposalStatus {
     switch (this.status) {
-      case CosmosProposalState.PASSED:
+      case 'Passed':
         return ProposalStatus.Passed;
-      case CosmosProposalState.REJECTED:
+      case 'Rejected':
         return ProposalStatus.Failed;
-      case CosmosProposalState.VOTING_PERIOD:
+      case 'VotingPeriod':
         return (this.support > 0.5 && this.veto <= (1 / 3)) ? ProposalStatus.Passing : ProposalStatus.Failing;
-      case CosmosProposalState.DEPOSIT_PERIOD:
+      case 'DepositPeriod':
         return this._totalDeposit.gte(this._Governance.minDeposit) ? ProposalStatus.Passing : ProposalStatus.Failing;
       default:
         return ProposalStatus.None;
@@ -219,11 +214,11 @@ export class CosmosProposal extends Proposal<
 
   // TRANSACTIONS
   public submitDepositTx(depositor: CosmosAccount, amount: CosmosToken, memo: string = '') {
-    if (this.status !== CosmosProposalState.DEPOSIT_PERIOD) {
+    if (this.status !== 'DepositPeriod') {
       throw new Error('proposal not in deposit period');
     }
     const args = { proposalId: this.data.identifier, amounts: [amount] };
-    const txFn = (gas: number) => this._Chain.api.tx(
+    const txFn = (gas: number) => this._Chain.tx(
       'MsgDeposit', depositor.address, args, memo, gas, this._Chain.denom,
     );
     return this._Chain.createTXModalData(
@@ -235,11 +230,11 @@ export class CosmosProposal extends Proposal<
   }
 
   public submitVoteTx(vote: CosmosVote, memo: string = '', cb?): ITXModalData {
-    if (this.status !== CosmosProposalState.VOTING_PERIOD) {
+    if (this.status !== 'VotingPeriod') {
       throw new Error('proposal not in voting period');
     }
     const args = { proposalId: this.data.identifier, option: vote.choice };
-    const txFn = (gas: number) => this._Chain.api.tx(
+    const txFn = (gas: number) => this._Chain.tx(
       'MsgVote', vote.account.address, args, memo, gas, this._Chain.denom,
     );
     return this._Chain.createTXModalData(
@@ -264,7 +259,7 @@ export class CosmosProposal extends Proposal<
     this._completedVotesFetched = true;
     let voteResp: GovVotesResponse;
     try {
-      voteResp = await this._Chain.api.query.gov.votes(this.identifier);
+      voteResp = await this._Chain.api.gov.votes(this.identifier);
     } catch (e) {
       console.error(`could not fetch votes on proposal: ${this.identifier}`);
       return;

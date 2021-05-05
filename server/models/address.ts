@@ -6,9 +6,10 @@ import crypto from 'crypto';
 import Keyring, { decodeAddress } from '@polkadot/keyring';
 import { stringToU8a, hexToU8a } from '@polkadot/util';
 
-import { serializeSignDoc, decodeSignature, rawSecp256k1PubkeyToAddress } from '@cosmjs/launchpad';
+import { serializeSignDoc, decodeSignature } from '@cosmjs/launchpad';
+import { rawSecp256k1PubkeyToRawAddress } from '@cosmjs/amino';
 import { Secp256k1, Secp256k1Signature, Sha256 } from '@cosmjs/crypto';
-import { fromBase64 } from '@cosmjs/encoding';
+import { fromBase64, Bech32 } from '@cosmjs/encoding';
 
 import nacl from 'tweetnacl';
 import { KeyringOptions } from '@polkadot/keyring/types';
@@ -242,8 +243,8 @@ export default (
           ? 'str'
           : chain.network === 'injective'
             ? 'inj' : chain.network;
-      const generatedAddress = rawSecp256k1PubkeyToAddress(pk, bech32Prefix);
-      const generatedAddressWithCosmosPrefix = rawSecp256k1PubkeyToAddress(pk, 'cosmos');
+      const generatedAddress = Bech32.encode(bech32Prefix, rawSecp256k1PubkeyToRawAddress(pk));
+      const generatedAddressWithCosmosPrefix = Bech32.encode('cosmos', rawSecp256k1PubkeyToRawAddress(pk));
 
       if (generatedAddress === addressModel.address || generatedAddressWithCosmosPrefix === addressModel.address) {
         // get tx doc that was signed

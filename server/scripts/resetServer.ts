@@ -23,7 +23,7 @@ const nodes = [
   // [ '206.189.33.216:9944', 'edgeware-testnet' ],
   // [ 'localhost:26657', 'cosmos-local' ],
   [ 'gaia13k1.commonwealth.im:26657', 'cosmos-testnet' ],
-  [ 'cosmoshub1.commonwealth.im:26657', 'cosmos' ],
+  [ 'wss://api.cosmos.network', 'cosmos' ],
   [ 'wss://straightedge.commonwealth.im', 'straightedge' ],
   [ 'http://localhost:3030', 'near-local' ],
   [ 'https://rpc.nearprotocol.com', 'near' ],

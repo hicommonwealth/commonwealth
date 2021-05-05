@@ -6,8 +6,6 @@ import { Account, IAccountsModule } from 'models';
 import { AccountsStore } from 'stores';
 import {
   Secp256k1HdWallet,
-  StakingValidatorDelegationsResponse,
-  StakingDelegatorDelegationsResponse,
   AuthAccountsResponse,
   StdSignDoc,
   Msg,
@@ -15,8 +13,9 @@ import {
   StdFee,
   SigningCosmosClient,
   encodeSecp256k1Pubkey,
-  PubKey,
 } from '@cosmjs/launchpad';
+import { BondStatus } from '@cosmjs/launchpad/build/lcdapi/staking';
+import { Secp256k1Pubkey } from '@cosmjs/amino';
 
 import CosmosChain from './chain';
 
@@ -25,16 +24,10 @@ export interface ICosmosValidator {
   // TODO: if we wanted, we could get all delegations to a validator, but is this necessary?
   pubkey: string;
   operator: string;
-  tokens: number;
+  tokens: CosmosToken;
   description: any;
-  status: CosmosValidatorState;
+  status: BondStatus;
   isJailed: boolean;
-}
-
-export enum CosmosValidatorState {
-  Unbonded = 'unbonded',
-  Unbonding = 'unbonding',
-  Bonded = 'bonded',
 }
 
 export class CosmosAccount extends Account<CosmosToken> {
@@ -43,31 +36,13 @@ export class CosmosAccount extends Account<CosmosToken> {
 
   // TODO: add delegations, validations
   private _wallet: Secp256k1HdWallet;
-  private _pubKey: PubKey;
+  private _pubKey: Secp256k1Pubkey;
   private _client: SigningCosmosClient;
   public get pubKey() { return this._pubKey; }
   public get client() { return this._client; }
 
-  private _validatorDelegations: { [address: string]: number } = {};
-  public get validatorDelegations(): Promise<{ [address: string]: number }> {
-    return this.updateValidatorDelegations();
-  }
-
-  private _delegations: { [address: string]: number } = {};
-  public get delegations(): Promise<{ [address: string]: number }> {
-    if (this._balance) {
-      // console.log(this._balance.value.toCoinObject().amount);
-      return this.updateDelegations();
-    } else {
-      return null;
-    }
-  }
-
   private _balance: CosmosToken;
-  private _validatorStake: BN;
-  public get validatorStake(): BN {
-    return this._validatorStake;
-  }
+  public get balance() { return this.updateBalance().then(() => this._balance); }
 
   constructor(app: IApp, ChainInfo: CosmosChain, Accounts: CosmosAccounts, address: string) {
     super(app, app.chain.meta.chain, address);
@@ -88,7 +63,7 @@ export class CosmosAccount extends Account<CosmosToken> {
     this._wallet = wallet;
     const [{ address, pubkey }] = await wallet.getAccounts();
     this._pubKey = encodeSecp256k1Pubkey(pubkey);
-    this._client = new SigningCosmosClient(this._Chain.api.rpcUrl, address, wallet);
+    this._client = new SigningCosmosClient(this._Chain.url, address, wallet);
   }
 
   // TODO: these should be sync, or we need to change rest of code to match
@@ -117,57 +92,10 @@ export class CosmosAccount extends Account<CosmosToken> {
     return signed;
   }
 
-  public updateValidatorDelegations = _.throttle(async () => {
-    let resp: StakingValidatorDelegationsResponse;
-    try {
-      // @ Not sure if this is the query??
-      resp = await this._Chain.api.query.staking.validatorDelegations(this.address);
-    } catch (e) {
-      console.error(e);
-    }
-    // JSON incompatibilities...
-    if (!resp) {
-      console.error('could not update delegations');
-      return;
-    }
-    const validatorDelegations = this._validatorDelegations;
-    for (const validatorDelegation of resp.result) {
-      validatorDelegations[validatorDelegations.delegate_address] = +validatorDelegation.shares;
-    }
-    this._validatorDelegations = validatorDelegations;
-    return validatorDelegations;
-  });
-
-  public updateDelegations = _.throttle(async () => {
-    const queryUrl = `${this._Chain.api.restUrl}/staking/delegators/${this.address}/delegations`;
-    let resp: StakingDelegatorDelegationsResponse;
-    try {
-      resp = await this._Chain.api.query.staking.delegatorDelegations(this.address);
-    } catch (e) {
-      console.error(e);
-    }
-    // JSON incompatibilities...
-    if (!resp) {
-      console.error('could not update delegations');
-      return;
-    }
-    const delegations = this._delegations;
-    for (const delegation of resp.result) {
-      delegations[delegation.validator_address] = +delegation.shares;
-    }
-    this._delegations = delegations;
-    return delegations;
-  });
-
-  public get balance() {
-    return this.updateBalance();
-  }
-
   public updateBalance = _.throttle(async () => {
-    // const queryUrl = this._Chain.api.restUrl + '/auth/accounts/' + this.address;
     let resp: AuthAccountsResponse;
     try {
-      resp = await this._Chain.api.query.auth.account(this.address);
+      resp = await this._Chain.api.auth.account(this.address);
     } catch (e) {
       // if coins is null, they have a zero balance
       console.log(`no balance found: ${JSON.stringify(e)}`);
@@ -183,11 +111,8 @@ export class CosmosAccount extends Account<CosmosToken> {
         const bal = new BN(coins.amount);
         if (coins.denom === this._Chain.denom) {
           this._balance = this._Chain.coins(bal, true);
-        } else if (coins.denom === 'validatortoken') {
-          // TODO: add validator tokens to accounts
-          this._validatorStake = bal;
         } else {
-          throw new Error(`invalid denomination: ${coins.denom}`);
+          console.log(`found invalid denomination: ${coins.denom}`);
         }
       }
     }
@@ -203,7 +128,7 @@ export class CosmosAccount extends Account<CosmosToken> {
       toAddress: recipient.address,
       amounts: [ { denom: amount.denom, amount: amount.toString() } ]
     };
-    const txFn = (gas: number) => this._Chain.api.tx(
+    const txFn = (gas: number) => this._Chain.tx(
       'MsgSend', this.address, args, memo, gas, this._Chain.denom
     );
     return this._Chain.createTXModalData(
@@ -211,12 +136,13 @@ export class CosmosAccount extends Account<CosmosToken> {
       txFn,
       'MsgSend',
       `${this.address} sent ${amount.format()} to ${recipient.address}`,
-      // (success: boolean) => {
-      //   if (success) {
-      //     this.updateBalance();
-      //     recipient.updateBalance();
-      //   }
-      // },
+      // TODO: add these for other txs
+      (success: boolean) => {
+        if (success) {
+          this.updateBalance();
+          recipient.updateBalance();
+        }
+      },
     );
   }
 
@@ -226,7 +152,7 @@ export class CosmosAccount extends Account<CosmosToken> {
       amount: amount.toString(),
       denom: amount.denom,
     };
-    const txFn = (gas: number) => this._Chain.api.tx(
+    const txFn = (gas: number) => this._Chain.tx(
       'MsgDelegate', this.address, args, memo, gas, this._Chain.denom
     );
     return this._Chain.createTXModalData(
@@ -243,7 +169,7 @@ export class CosmosAccount extends Account<CosmosToken> {
       amount: amount.toString(),
       denom: amount.denom,
     };
-    const txFn = (gas: number) => this._Chain.api.tx(
+    const txFn = (gas: number) => this._Chain.tx(
       'MsgUndelegate', this.address, args, memo, gas, this._Chain.denom
     );
     return this._Chain.createTXModalData(
@@ -261,7 +187,7 @@ export class CosmosAccount extends Account<CosmosToken> {
       amount: amount.toString(),
       denom: amount.denom,
     };
-    const txFn = (gas: number) => this._Chain.api.tx(
+    const txFn = (gas: number) => this._Chain.tx(
       'MsgRedelegate', this.address, args, memo, gas, this._Chain.denom
     );
     return this._Chain.createTXModalData(
@@ -274,7 +200,7 @@ export class CosmosAccount extends Account<CosmosToken> {
 
   public withdrawDelegationRewardTx(validatorAddress: string, memo: string = '') {
     const args = { validatorAddress };
-    const txFn = (gas: number) => this._Chain.api.tx(
+    const txFn = (gas: number) => this._Chain.tx(
       'MsgWithdrawDelegationReward', this.address, args, memo, gas, this._Chain.denom
     );
     return this._Chain.createTXModalData(
@@ -300,43 +226,12 @@ export class CosmosAccounts implements IAccountsModule<CosmosToken, CosmosAccoun
     return this.fromAddress(address);
   }
 
-  private _validators: { [address: string]: ICosmosValidator } = {};
-  public get validators(): { [address: string]: ICosmosValidator } {
-    return this._validators;
-  }
-
   private _app: IApp;
   public get app() { return this._app; }
 
   constructor(app: IApp) {
     this._app = app;
   }
-
-  public updateValidators = _.throttle(async () => {
-    const bonded = await this._Chain.api.queryUrl('/staking/validators?status=bonded', null, null, false);
-    for (const validator of bonded) {
-      this._validators[validator.consensus_pubkey] = {
-        pubkey: validator.consensus_pubkey,
-        operator: validator.operator_address,
-        tokens: validator.tokens,
-        description: validator.description,
-        status: validator.status,
-        isJailed: validator.jailed,
-      };
-    }
-
-    const unbonded = await this._Chain.api.queryUrl('/staking/validators?status=unbonded', null, null, false);
-    for (const validator of unbonded) {
-      this._validators[validator.consensus_pubkey] = {
-        pubkey: validator.consensus_pubkey,
-        operator: validator.operator_address,
-        tokens: validator.tokens,
-        description: validator.description,
-        status: validator.status,
-        isJailed: validator.jailed,
-      };
-    }
-  });
 
   public fromAddress(address: string): CosmosAccount {
     // accepts bech32 encoded cosmosxxxxx addresses and not cosmospubxxx
@@ -376,73 +271,6 @@ export class CosmosAccounts implements IAccountsModule<CosmosToken, CosmosAccoun
 
   public async init(ChainInfo: CosmosChain): Promise<void> {
     this._Chain = ChainInfo;
-
-    // handle account-related events
-    this._Chain.api.observeEvent('MsgSend', async ({ msg }) => {
-      const sent = msg.value;
-      const from = sent.from_address;
-      const to = sent.to_address;
-      const amt = sent.amount;
-      console.log(`${amt[0].amount} ${amt[0].denom} sent from ${from} to ${to}`);
-      let acc = this.fromAddressIfExists(from);
-      if (acc) await acc.updateBalance();
-      acc = this.fromAddressIfExists(to);
-      if (acc) await acc.updateBalance();
-    });
-    this._Chain.api.observeEvent('MsgMultiSend', async ({ msg }) => {
-      const inputs = msg.value.inputs;
-      const outputs = msg.value.outputs;
-      for (const { address } of inputs.concat(outputs)) {
-        const acc = this.fromAddressIfExists(address);
-        if (acc) await acc.updateBalance();
-      }
-    });
-    this._Chain.api.observeEvent('MsgDelegate', async ({ msg }) => {
-      const acc = this.fromAddressIfExists((msg.value as any).delegator_address);
-      if (acc) await acc.updateBalance();
-      if (acc) await acc.updateDelegations();
-    });
-    this._Chain.api.observeEvent('MsgUndelegate', async ({ msg }) => {
-      const acc = this.fromAddressIfExists((msg.value as any).delegator_address);
-      if (acc) await acc.updateBalance();
-      if (acc) await acc.updateDelegations();
-    });
-    this._Chain.api.observeEvent('MsgWithdrawDelegationReward', async ({ msg }) => {
-      const acc = this.fromAddressIfExists((msg.value as any).delegator_address);
-      if (acc) await acc.updateBalance();
-    });
-    this._Chain.api.observeEvent('MsgBeginRedelegate', async ({ msg }) => {
-      const acc = this.fromAddressIfExists((msg.value as any).delegator_address);
-      if (acc) await acc.updateDelegations();
-    });
-
-    // TODO: validator-related events
-    // TODO: separate active from jailed/unbonded
-    // Do not recurse -- validators query does not support pagination.
-    const bonded = await this._Chain.api.queryUrl('/staking/validators?status=bonded', null, null, false);
-    for (const validator of bonded) {
-      this._validators[validator.consensus_pubkey] = {
-        pubkey: validator.consensus_pubkey,
-        operator: validator.operator_address,
-        tokens: validator.tokens,
-        description: validator.description,
-        status: validator.status,
-        isJailed: validator.jailed,
-      };
-    }
-
-    const unbonded = await this._Chain.api.queryUrl('/staking/validators?status=unbonded', null, null, false);
-    for (const validator of unbonded) {
-      this._validators[validator.consensus_pubkey] = {
-        pubkey: validator.consensus_pubkey,
-        operator: validator.operator_address,
-        tokens: validator.tokens,
-        description: validator.description,
-        status: validator.status,
-        isJailed: validator.jailed,
-      };
-    }
-
     this._initialized = true;
   }
 }

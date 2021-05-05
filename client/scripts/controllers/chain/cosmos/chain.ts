@@ -13,10 +13,25 @@ import BN from 'bn.js';
 import { EventEmitter } from 'events';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
 
-import { NewBlockHeaderEvent } from '@cosmjs/tendermint-rpc';
-import { makeStdTx, StdTx, StdFee, Msg, BroadcastTxResult, isBroadcastTxFailure } from '@cosmjs/launchpad';
+import * as $ from 'jquery';
+import _ from 'lodash';
 
-import { CosmosApi } from './api';
+import {
+  makeStdTx,
+  StdTx,
+  StdFee,
+  BroadcastTxResult,
+  isBroadcastTxFailure,
+  AuthExtension,
+  GovExtension,
+  LcdClient,
+  makeSignDoc,
+  Msg,
+  setupAuthExtension,
+  setupGovExtension,
+  setupStakingExtension,
+  StakingExtension
+} from '@cosmjs/launchpad';
 import { CosmosAccount } from './account';
 
 export interface ICosmosTXData extends ITXData {
@@ -28,11 +43,15 @@ export interface ICosmosTXData extends ITXData {
   gas: number;
 }
 
+export type CosmosApiType = LcdClient & StakingExtension & AuthExtension & GovExtension;
+
 class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
-  private _api: CosmosApi;
-  public get api(): CosmosApi {
-    return this._api;
-  }
+  private _url: string;
+  public get url() { return this._url; }
+  private _api: CosmosApiType;
+  public get api() { return this._api; }
+
+  private _blockSubscription: NodeJS.Timeout;
 
   private _addressPrefix: string;
   public get addressPrefix() {
@@ -80,36 +99,106 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     // on its own, so you need to configure a reverse-proxy server (I did it with nginx)
     // that forwards the requests to it, and adds the header 'Access-Control-Allow-Origin: *'
     /* eslint-disable prefer-template */
-    const wsUrl = (node.url.indexOf('localhost') !== -1 || node.url.indexOf('127.0.0.1') !== -1)
-      ? ('ws://' + node.url.replace('ws://', '').replace('wss://', '').split(':')[0] + ':26657')
-      : ('wss://' + node.url.replace('ws://', '').replace('wss://', '').split(':')[0] + ':36657');
-    const restUrl = (node.url.indexOf('localhost') !== -1 || node.url.indexOf('127.0.0.1') !== -1)
-      ? ('http://' + node.url.replace('ws://', '').replace('wss://', '').split(':')[0] + ':1318')
-      : ('https://' + node.url.replace('ws://', '').replace('wss://', '').split(':')[0] + ':1318');
+    this._url = node.url;
 
-    console.log(`Starting Tendermint REST API at ${restUrl} and Websocket API on ${wsUrl}...`);
+    console.log(`Starting REST API at ${this._url}...`);
 
-    this._api = new CosmosApi(wsUrl, restUrl);
+    console.log('cosmjs api');
+    // TODO: configure broadcast mode
+    this._api = LcdClient.withExtensions(
+      { apiUrl: this._url },
+      setupAuthExtension,
+      setupGovExtension,
+      setupStakingExtension,
+    );
     if (this.app.chain.networkStatus === ApiStatus.Disconnected) {
       this.app.chain.networkStatus = ApiStatus.Connecting;
     }
-    await this._api.init((header: NewBlockHeaderEvent) => {
-      this._blocktimeHelper.stamp(moment(header.time.valueOf()));
-      this.app.chain.block.height = +header.height;
-      m.redraw();
-    });
+    const nodeInfo = await this._api.nodeInfo();
+    this._chainId = nodeInfo.node_info.network;
+    console.log(`chain id: ${this._chainId}`);
     this.app.chain.networkStatus = ApiStatus.Connected;
-    const { result: { bonded_tokens } } = await this._api.query.staking.pool();
+
+    // Poll for new block immediately and then every 2s
+    const fetchBlockJob = async () => {
+      const block = await this._api.blocksLatest();
+      const height = +block.block.header.height;
+      const time = moment(block.block.header.time);
+      if (height !== this.app.chain.block.height) {
+        this._blocktimeHelper.stamp(moment(time));
+        this.app.chain.block.height = height;
+        m.redraw();
+      }
+    };
+    await fetchBlockJob();
+    this._blockSubscription = setInterval(fetchBlockJob, 2000);
+
+    const { result: { bonded_tokens } } = await this._api.staking.pool();
     this._staked = this.coins(new BN(bonded_tokens));
-    const { result: { bond_denom } } = await this._api.query.staking.parameters();
-    this._denom = bond_denom;          // uatom
-    this._chainId = this._api.chainId; // cosmoshub-2
+    const { result: { bond_denom } } = await this._api.staking.parameters();
+    this._denom = bond_denom;
     m.redraw();
   }
 
   public async deinit(): Promise<void> {
     this.app.chain.networkStatus = ApiStatus.Disconnected;
-    if (this._api) this._api.deinit();
+    if (this._blockSubscription) {
+      clearInterval(this._blockSubscription);
+    }
+  }
+
+  public async queryUrl(path: string, page = 1, limit = 30, recurse = true): Promise<any> {
+    try {
+      const url = this._url + path;
+      console.log(`query: ${url}, page: ${page}, limit: ${limit}`);
+      let response = await $.get(url, { page, limit });
+
+      // remove height wrappers
+      if (response.height !== undefined && response.result !== undefined) {
+        response = response.result;
+      }
+
+      if (recurse && response.length === limit) {
+        const nextResults = await this.queryUrl(path, page + 1);
+        return response + nextResults;
+      }
+      return response;
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  private async _simulate(msg: Msg, memo: string): Promise<number> {
+    // TODO
+    return 180000;
+  }
+
+  public async tx(
+    txName: string,
+    senderAddress: string,
+    args: object,
+    memo: string = '',
+    gas?: number,
+    gasDenom: string = 'uatom',
+  ) {
+    const msg: Msg = {
+      type: txName,
+      value: args,
+    };
+
+    // estimate the needed gas amount
+    if (!gas) {
+      gas = await this._simulate(msg, memo);
+    }
+
+    // generate unsigned version for CLI
+    // TODO: test!
+    const result = await this._api.auth.account(senderAddress);
+    const { sequence, account_number: accountNumber } = result.result.value;
+    const DEFAULT_GAS_PRICE = [{ amount: (2.5e-8).toFixed(9), denom: gasDenom }];
+    const fee = { amount: DEFAULT_GAS_PRICE, gas: `${gas}` };
+    const messageToSign = makeSignDoc([ msg ], fee, this.chainId, memo, sequence, accountNumber);
+    return { msg, memo, fee, cmdData: { messageToSign, chainId: this.chainId, sequence, accountNumber, gas } };
   }
 
   public createTXModalData(

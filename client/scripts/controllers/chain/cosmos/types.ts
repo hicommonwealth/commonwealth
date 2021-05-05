@@ -2,15 +2,6 @@ import BN from 'bn.js';
 import { Coin } from 'adapters/currency';
 import { IIdentifiable, ICompletable } from 'adapters/shared';
 
-export class CosmosValidatorToken extends Coin {
-  constructor(n: number | string | BN, inDollars: boolean = false) {
-    if (typeof n === 'string') {
-      n = parseInt(n, 10);
-    }
-    super('validatortoken', n, inDollars);
-  }
-}
-
 export class CosmosToken extends Coin {
   constructor(denom: string, n: number | string | BN, inDollars: boolean = false) {
     if (typeof n === 'string') {
@@ -31,26 +22,9 @@ export class CosmosToken extends Coin {
   }
 }
 
-export enum CosmosProposalType {
-  'text',
-  'upgrade',
-  'parameter',
-}
-
-export enum CosmosVoteChoice {
-  YES = 'Yes',
-  NO = 'No',
-  VETO = 'NoWithVeto',
-  ABSTAIN = 'Abstain',
-}
-
-export enum CosmosProposalState {
-  DEPOSIT_PERIOD = 'DepositPeriod',
-  VOTING_PERIOD = 'VotingPeriod',
-  PASSED = 'Passed',
-  REJECTED = 'Rejected',
-}
-
+export type CosmosProposalType = 'text' | 'upgrade' | 'parameter';
+export type CosmosVoteChoice = 'Yes' | 'No' | 'NoWithVeto' | 'Abstain';
+export type CosmosProposalState = 'DepositPeriod' | 'VotingPeriod' | 'Passed' | 'Rejected';
 export interface ICosmosProposalTally {
   yes: BN;
   abstain: BN;
