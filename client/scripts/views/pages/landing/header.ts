@@ -13,7 +13,7 @@ interface IState {
 }
 
 // eslint-disable-next-line max-len
-const INITIAL_HEADER_STYLE = 'bg-white static lg:flex lg:flex-row lg:justify-between lg:items-center p-4 px-10 rounded-full shadow-lg transition transition-all duration-1000 mt-8 mx-20';
+const INITIAL_HEADER_STYLE = 'bg-white static lg:flex lg:flex-row lg:justify-between lg:items-center p-4 px-10 rounded-full shadow-lg transition transition-all duration-1000 mt-8 mx-64';
 
 window.onscroll = (e: any): void => {
   if (window.scrollY > 50) {
@@ -31,11 +31,9 @@ window.onscroll = (e: any): void => {
 
 const HeaderLandingPage: m.Component<IAttrs, IState> = {
   view: (vnode) => {
-    return m(
-      'div',
+    return m('div',
       { class: 'container mx-auto' },
-      m(
-        'header',
+      m('header',
         {
           id: 'landing-page',
           class: INITIAL_HEADER_STYLE,
@@ -46,26 +44,21 @@ const HeaderLandingPage: m.Component<IAttrs, IState> = {
             src: 'static/img/logo.svg',
             alt: 'Commonwealth',
           }),
-          m(
-            'nav',
+          m('nav',
             { class: 'hidden lg:block' },
             m('ul', { class: 'lg:flex lg:flex-row lg:items-center' }, [
               vnode.attrs.navs.map((nav: any) => {
                 return m(
                   'li.LandingPageHeaderLinks',
                   { class: 'ml-10 pt-2' },
-                  m(
-                    'a',
+                  m('a',
                     { class: 'text-gray-500 leading-none', href: nav.href },
-                    nav.text
-                  )
+                    nav.text)
                 );
               }),
-              m(
-                'li.LandingPageHeaderLoginButton',
+              m('li.LandingPageHeaderLoginButton',
                 { class: 'ml-10 pt-2' },
-                m(
-                  'a',
+                m('a',
                   {
                     class: 'btn-primary pb-3 text-white',
                     onclick: () => app.modals.create({ modal: LoginModal }),
@@ -77,14 +70,9 @@ const HeaderLandingPage: m.Component<IAttrs, IState> = {
                       alt: 'Login',
                     }),
                     ' Login ',
-                  ]
-                )
-              ),
-            ])
-          ),
-        ]
-      )
-    );
+                  ])),
+            ])),
+        ]));
   },
 };
 

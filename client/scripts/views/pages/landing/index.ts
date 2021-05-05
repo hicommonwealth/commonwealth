@@ -44,7 +44,7 @@ const LandingPage: m.Component<{}, IState> = {
 
     const myChains: any = Object.entries(chains);
     const myCommunities: any = app.config.communities.getAll();
-    const sortChainsAndCommunities = (list) => list
+    const sortChainsAndCommunities = (list: any[]) => list
       .sort((a, b) => {
         const threadCountA = app.recentActivity.getCommunityThreadCount(
           Array.isArray(a) ? a[0] : a.id
@@ -59,7 +59,12 @@ const LandingPage: m.Component<{}, IState> = {
         if (Array.isArray(entity)) {
           const [chain, nodeList]: [string, any] = entity as any;
           const chainInfo = nodeList[0].chain;
-          return { img: chainInfo.iconUrl, id: chain, chainInfo, name: chainInfo.name };
+          return {
+            img: chainInfo.iconUrl,
+            id: chain,
+            chainInfo,
+            name: chainInfo.name,
+          };
         } else if (entity.id && entity.defaultChain && entity.iconUrl) {
           return {
             img: entity.iconUrl,
@@ -68,17 +73,26 @@ const LandingPage: m.Component<{}, IState> = {
             name: entity.defaultChain.name,
           };
         }
-      }).filter((chain: any) => chain);
+      })
+      .filter((chain: any) => chain);
 
     const sortedChainsAndCommunities = sortChainsAndCommunities(
       myChains
         .filter((c) => c[1][0] && !c[1][0].chain.collapsedOnHomepage)
-        .concat(myCommunities.filter((c) => !c.collapsedOnHomepage))
+        .concat(
+          myCommunities.filter(
+            (c: { collapsedOnHomepage: any }) => !c.collapsedOnHomepage
+          )
+        )
     );
     const betaChainsAndCommunities = sortChainsAndCommunities(
       myChains
         .filter((c) => c[1][0] && c[1][0].chain.collapsedOnHomepage)
-        .concat(myCommunities.filter((c) => c.collapsedOnHomepage))
+        .concat(
+          myCommunities.filter(
+            (c: { collapsedOnHomepage: any }) => c.collapsedOnHomepage
+          )
+        )
     );
 
     vnode.state.chains = [
@@ -94,9 +108,9 @@ const LandingPage: m.Component<{}, IState> = {
         m(HeaderLandingPage, {
           navs: [
             { text: 'Why Commonwealth?', ref: '' },
-            { text: 'Use Cases', ref: '' },
-            { text: 'Crowdfunding', ref: '' },
-            { text: 'Developers', ref: '' },
+            // { text: 'Use Cases', ref: '' },
+            // { text: 'Crowdfunding', ref: '' },
+            // { text: 'Developers', ref: '' },
           ],
         })
       ),
@@ -144,7 +158,6 @@ const LandingPage: m.Component<{}, IState> = {
               id: 'first-section-button1',
             },
             texts: {
-              id: 'tab-codepen-text',
               title: ' On-chain notifications ',
               text:
                 ' Your token holders can stay up-to-date on chain events like votes and large transfers ',
@@ -160,7 +173,6 @@ const LandingPage: m.Component<{}, IState> = {
               id: 'first-section-button2',
             },
             texts: {
-              id: 'tab2-codepen-text',
               title: ' Off-chain polling & On-chain voting ',
               text:
                 ' Whether your community uses Snapshot, Comp Governance, or native layer 1. Access everything from one place. ',
@@ -176,7 +188,6 @@ const LandingPage: m.Component<{}, IState> = {
               id: 'first-section-button3',
             },
             texts: {
-              id: 'tab3-codepen-text',
               title: ' Crowdfunding protocols ',
               text:
                 ' Fund new tokens and community initiatives with Kickstarter-like raises from a thread ',
@@ -192,7 +203,6 @@ const LandingPage: m.Component<{}, IState> = {
               id: 'first-section-button4',
             },
             texts: {
-              id: 'tab4-codepen-text',
               title: ' A rich forum experience ',
               text:
                 ' Discuss memes and important topics alike in a Discourse-style forum. Enhance your posts with built in Markdown and fun reactions. ',
@@ -242,49 +252,46 @@ const LandingPage: m.Component<{}, IState> = {
           {
             button: {
               id: 'second-section-button1',
+            },
+            texts: {
               title: 'Fund new projects',
-              card: {
-                text:
-                  ' Anyone from within your community can easily turn a conversation thread into a Kickstarter-like campaign ',
-                id: 'tab-card-text',
-              },
+              text:
+                'Anyone from within your community can easily turn a conversation thread into a Kickstarter-like campaign ',
             },
             card: {
               id: 'tab-card',
-              src: 'static/img/card1.png',
-              alt: '',
+              imgSrc: 'static/img/card1.png',
+              imgAlt: '',
             },
           },
           {
             button: {
               id: 'second-section-button2',
-              title: ' Create Community Endowments ',
-              card: {
-                text:
-                  ' Lets you pool funds with other like minded folks and fund interesting projects within your community or across the web[need better word] ',
-                id: 'tab2-card-text',
-              },
+            },
+            texts: {
+              title: 'Create Community Endowments',
+              text:
+                ' Lets you pool funds with other like minded folks and fund interesting projects within your community or across the web',
             },
             card: {
               id: 'tab2-card',
-              src: 'static/img/card2.png',
-              alt: '',
+              imgSrc: 'static/img/card2.png',
+              imgAlt: '',
             },
           },
           {
             button: {
               id: 'second-section-button3',
+            },
+            texts: {
               title: 'Launch New Tokens',
-              card: {
-                text:
-                  ' Use a project to raise funds for a new tokenize DeFi or NFT token and optionally plug in an allowlist for KYC compliance ',
-                id: 'tab3-card-text',
-              },
+              text:
+                ' Use a project to raise funds for a new tokenize DeFi or NFT token and optionally plug in an allowlist for KYC compliance ',
             },
             card: {
               id: 'tab3-card',
-              src: 'static/img/card3.png',
-              alt: '',
+              imgSrc: 'static/img/card3.png',
+              imgAlt: '',
             },
           },
         ],

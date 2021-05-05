@@ -1,64 +1,15 @@
-import m from 'mithril';
 import './tokens_creators.scss';
+import m from 'mithril';
 
-interface IState {
-  creators: {
-    button: {
-      id: string;
-    };
-    texts: {
-      id: string;
-      title: string;
-      text: string;
-    };
-    card: {
-      id: string;
-      imgSrc: string;
-      imgAlt: string;
-    };
-  }[];
-  buttonHoverActiveById: string;
-  textActiveById: string;
-  chainCardImageActiveById: string;
-}
+import { ICardListItem } from 'models/interfaces';
 
-interface IAttrs {
-  creators: {
-    button: {
-      id: string;
-    };
-    texts: {
-      id: string;
-      title: string;
-      text: string;
-    };
-    card: {
-      id: string;
-      imgSrc: string;
-      imgAlt: string;
-    };
-  }[];
-}
+import LandingPageButton from './landing_page_button';
+import ItemListsMapper from './list_mapper_with_item';
 
-const removeOrAddClasslistFromChains = (creators, classlist, method) => {
-  creators.forEach((creator: any) => {
-    const METHODS = {
-      add: () => document.getElementById(creator.card.id).classList.add(classlist),
-      remove: () => document.getElementById(creator.card.id).classList.remove(classlist),
-    };
-
-    return METHODS[method]();
-  });
-};
-
-const TokensCreatorComponent: m.Component<IAttrs, IState> = {
-  oninit: (vnode) => {
-    vnode.state.creators = vnode.attrs.creators;
-    vnode.state.buttonHoverActiveById = 'first-section-button1';
-    vnode.state.textActiveById = 'tab-codepen-text';
-    vnode.state.chainCardImageActiveById = 'tab-codepen';
-  },
+const TokensCreatorComponent: m.Component<{ creators: ICardListItem[] }, {}> = {
   view: (vnode) => {
+    const { creators } = vnode.attrs;
+
     return m('section', { class: 'container mx-auto pt-10' }, [
       m(
         'h2',
@@ -73,123 +24,14 @@ const TokensCreatorComponent: m.Component<IAttrs, IState> = {
       m(
         'div.TokensCreatorsUseCaseButton',
         { class: 'text-center hidden lg:block xl:block mb-20' },
-        m(
-          'a',
-          { class: 'btn-outline text-xl rounded-lg pb-2 pt-3 px-3 ', href: '' },
-          'See use cases'
-        )
+        m(LandingPageButton, { href: '', text: 'See use cases' })
       ),
-      m(
-        'ul',
-        {
-          class:
-            'bg-gray-900 rounded-3xl p-3 lg:p-6 relative min-h-tabs lg:flex lg:flex-col lg:h-full mt-4',
-        },
-        [
-          // chainsCrodfunding and this are basically the same
-          // @TODO Component it
-          vnode.state.creators.map((creator: any) => {
-            return m(
-              'li',
-              { class: 'lg:flex-grow' },
-              m('div', { class: 'lg:flex lg:flex-row' }, [
-                m(
-                  'div.TokensCreatorsText',
-                  {
-                    class:
-                      'lg:w-1/3 lg:mr-5 xl:mr-20 rounded-2xl transition hover:transition-all duration-500',
-                  },
-                  m(
-                    'button',
-                    {
-                      class: `rounded-2xl p-5 text-left w-full focus:outline-none ${
-                        vnode.state.buttonHoverActiveById === creator.button.id
-                          ? 'bg-gray-500'
-                          : ''
-                      } transition transition-all duration-700`,
-                      id: creator.button.id,
-                      onclick: () => {
-                        removeOrAddClasslistFromChains(
-                          vnode.state.creators,
-                          'block',
-                          'remove'
-                        );
-                        removeOrAddClasslistFromChains(
-                          vnode.state.creators,
-                          'invisible',
-                          'remove'
-                        );
-
-                        const filteredCreators = vnode.state.creators.filter(
-                          (creatorToFilter) => creatorToFilter !== creator
-                        );
-
-                        removeOrAddClasslistFromChains(
-                          filteredCreators,
-                          'invisible',
-                          'add'
-                        );
-
-                        document
-                          .getElementById(creator.button.id)
-                          .classList.add('bg-gray-500');
-                        document
-                          .getElementById(creator.card.id)
-                          .classList.add('block');
-                        document
-                          .getElementById(creator.texts.id)
-                          .classList.add('block');
-                        vnode.state.buttonHoverActiveById = creator.button.id;
-                        vnode.state.chainCardImageActiveById = creator.card.id;
-                        vnode.state.textActiveById = creator.texts.id;
-                      },
-                    },
-                    [
-                      m(
-                        'h4',
-                        { class: 'text-white font-bold text-xl' },
-                        creator.texts.title
-                      ),
-                      m(
-                        'p',
-                        {
-                          class: `${
-                            vnode.state.buttonHoverActiveById === creator.button.id
-                              ? ''
-                              : 'invisible'
-                          } text-white`,
-                          id: creator.texts.id,
-                        },
-                        creator.texts.text
-                      ),
-                    ]
-                  )
-                ),
-                m(
-                  'div',
-                  {
-                    class: `${
-                      vnode.state.chainCardImageActiveById === creator.card.id
-                        ? 'block'
-                        : 'invisible'
-                    }  lg:w-2/3 lg:absolute lg:w-2/3 lg:right-0 lg:top-0`,
-                    id: creator.card.id,
-                  },
-                  m('img.TokensCreatorsImage', {
-                    class: `${
-                      vnode.state.chainCardImageActiveById === creator.card.id
-                        ? 'block'
-                        : 'hidden'
-                    } block max-w-2xl w-full h-auto`,
-                    src: creator.card.imgSrc,
-                    alt: creator.card.imgAlt,
-                  })
-                ),
-              ])
-            );
-          }),
-        ]
-      ),
+      m(ItemListsMapper, {
+        bgColor: 'bg-gray-900',
+        margin: 'mt-4',
+        cardItems: creators,
+        tabHoverColor: 'bg-gray-500',
+      }),
     ]);
   },
 };

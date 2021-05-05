@@ -1,5 +1,6 @@
 import m from 'mithril';
 import moment from 'moment-twitter';
+import { ICardListItem } from 'models/interfaces';
 
 import app from 'state';
 import { OffchainThreadStage } from 'models/types';
@@ -318,5 +319,25 @@ export const loadScript = (scriptURI) => {
       reject();
     };
     document.head.appendChild(script);
+  });
+};
+
+
+export const removeOrAddClasslistToAllElements = (
+  cardList: ICardListItem[],
+  classlist: string,
+  method: string
+) => {
+  cardList.forEach((chain: ICardListItem) => {
+    const {
+      card: { id },
+    } = chain;
+
+    const METHODS = {
+      add: () => document.getElementById(id).classList.add(classlist),
+      remove: () => document.getElementById(id).classList.remove(classlist),
+    };
+
+    return METHODS[method]();
   });
 };

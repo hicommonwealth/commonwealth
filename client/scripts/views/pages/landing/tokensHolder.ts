@@ -1,5 +1,6 @@
 import m from 'mithril';
 import './landing_page_token_holders.scss';
+import LandingPageButton from './landing_page_button';
 
 interface IState {
   holders: {
@@ -27,9 +28,7 @@ const TokenHoldersComponent: m.Component<IState, IState> = {
           ' Find your community and drive your token forward. '),
         m('div.TokenHoldersButton',
           { class: 'text-center' },
-          m('a',
-            { class: 'btn-outline text-xl rounded-lg pb-2 pt-3 px-3', href: '' },
-            'Find your community')),
+          m(LandingPageButton, { href: '', text: 'Find your community' })),
         m('div',
           {
             class: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-20',

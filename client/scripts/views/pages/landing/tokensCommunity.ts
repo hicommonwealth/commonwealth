@@ -19,7 +19,7 @@ interface IState {
 }
 
 interface IAttrs {
-  chains: Chain[]
+  chains: Chain[];
 }
 
 const TokensCommunityComponent: m.Component<IAttrs, IState> = {
@@ -32,12 +32,41 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
         id: 'placeholder',
         chainInfo: '',
         name: 'Add your token!.',
-        placeholder: true
+        placeholder: true,
       },
-      ...vnode.attrs.chains
+      ...vnode.attrs.chains,
     ];
   },
   view: (vnode) => {
+    const mappedCommunities = [
+      {
+        variant:
+          'absolute object-top transform sm:translate-x-16 md:translate-x-64 lg:translate-x-48 translate-y-16 sm:translate-y-40 md:translate-y-32 lg:translate-y-32 left-10 max-w-none max-h-none h-auto w-629 xl:left-36 mt-10 sm:mt-0',
+        src: 'static/img/discussions.svg',
+        alt: '',
+      },
+      {
+        variant:
+          'absolute object-bottom bottom-0 transform sm:translate-x-16 md:translate-x-8 lg:translate-x-64 -translate-y-8 lg:left-32 w-350',
+        src: 'static/img/notification.svg',
+        alt: '',
+      },
+      {
+        variant:
+          'absolute top-1/2 transform sm:translate-y-16 md:translate-y-48 lg:translate-y-64  translate-x-8 sm:-translate-x-8 w-400',
+        src: 'static/img/discussion.svg',
+        alt: '',
+      },
+    ]
+      .map((community) => {
+        return m('img', {
+          class: community.variant,
+          src: community.src,
+          alt: community.alt,
+        });
+      })
+      .filter((comm) => comm);
+
     return m(
       'section',
       { class: 'bg-gray-700' },
@@ -77,14 +106,14 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
                     m(FindYourTokenInputComponent, {
                       onchangeValue: (event: any) => {
                         vnode.state.inputTokenValue = event.target.value;
-                        vnode.state.hiddenInputTokenList = event.target.value === '';
-                      }
+                        vnode.state.hiddenInputTokenList =                          event.target.value === '';
+                      },
                     }),
                     m(InputTokensListComponent, {
                       optionList: vnode.state.chains,
                       hidden: vnode.state.hiddenInputTokenList,
                       inputValue: vnode.state.inputTokenValue,
-                      maxOptions: 20
+                      maxOptions: 20,
                     }),
                     m(
                       'button',
@@ -103,17 +132,20 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
                     ),
                   ]
                 ),
-                m(
-                  'div.TokensCommunityConnectWalletButton',
-                  m('p', [
-                    m('span', { class: 'mr-5 text-lg' }, 'or'),
-                    m(
-                      'a',
-                      { class: 'btn-outline rounded-lg pb-2 pt-3 px-3', href: '' },
-                      'Connect Wallet'
-                    ),
-                  ])
-                ),
+                // m(
+                //   'div.TokensCommunityConnectWalletButton',
+                //   m('p', [
+                //     m('span', { class: 'mr-5 text-lg' }, 'or'),
+                //     m(
+                //       'a',
+                //       {
+                //         class: 'btn-outline rounded-lg pb-2 pt-3 px-3',
+                //         href: '',
+                //       },
+                //       'Connect Wallet'
+                //     ),
+                //   ])
+                // ),
               ]
             )
           ),
@@ -126,25 +158,7 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
                 class:
                   'gradient-135 overflow-hidden relative h-full lg:min-h-desktop lg:h-screen lg:w-50-screen lg:absolute lg:object-left xl:h-full xl:min-h-full',
               },
-              [
-                m('img', {
-                  class:
-                    'absolute object-top transform sm:translate-x-16 md:translate-x-64 lg:translate-x-48 translate-y-16 sm:translate-y-40 md:translate-y-32 lg:translate-y-32 left-10 max-w-none max-h-none h-auto w-629 xl:left-36 mt-10 sm:mt-0',
-                  src: 'static/img/discussions.svg',
-                  alt: '',
-                }),
-                m('img', {
-                  class: 'absolute object-bottom bottom-0 transform sm:translate-x-16 md:translate-x-8 lg:translate-x-64 -translate-y-8 lg:left-32 w-350',
-                  src: 'static/img/notification.svg',
-                  alt: '',
-                }),
-                m('img', {
-                  class:
-                    'absolute top-1/2 transform sm:translate-y-16 md:translate-y-48 lg:translate-y-64  translate-x-8 sm:-translate-x-8 w-400',
-                  src: 'static/img/discussion.svg',
-                  alt: '',
-                }),
-              ]
+              mappedCommunities
             )
           ),
         ])

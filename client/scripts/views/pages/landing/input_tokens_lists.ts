@@ -2,11 +2,11 @@ import m from 'mithril';
 import InputTokenOptionComponent from './input_token_option';
 
 interface Chain {
-    img: string;
-    id: string;
-    name: string;
-    placeholder?: boolean;
-    chainInfo: string;
+  img: string;
+  id: string;
+  name: string;
+  placeholder?: boolean;
+  chainInfo: string;
 }
 
 interface IAttrs {
@@ -18,21 +18,25 @@ interface IAttrs {
 
 const InputTokenList: m.Component<IAttrs, {}> = {
   view: (vnode) => {
+    const options = vnode.attrs.optionList
     // eslint-disable-next-line array-callback-return
-    const options = vnode.attrs.optionList.map((option, index) => {
-      if (index >= vnode.attrs.maxOptions) return;
+      .map((option, index) => {
+        if (index >= vnode.attrs.maxOptions) return;
 
-      const tokenNameSubstracted = option.id.substr(0, vnode.attrs.inputValue.length).toLowerCase();
-      const tokenNameInputValue = vnode.attrs.inputValue.toLowerCase();
+        const tokenNameSubstracted = option.id
+          .substr(0, vnode.attrs.inputValue.length)
+          .toLowerCase();
+        const tokenNameInputValue = vnode.attrs.inputValue.toLowerCase();
 
-      if (tokenNameSubstracted === tokenNameInputValue || option.placeholder) {
-        return m(InputTokenOptionComponent, {
-          id: option.id,
-          iconImg: option.img,
-          text: option.name,
-        });
-      }
-    }).filter((option: any) => option);
+        if (tokenNameSubstracted === tokenNameInputValue || option.placeholder) {
+          return m(InputTokenOptionComponent, {
+            id: option.id,
+            iconImg: option.img,
+            text: option.name,
+          });
+        }
+      })
+      .filter((option: any) => option);
 
     return m(
       'ul',
