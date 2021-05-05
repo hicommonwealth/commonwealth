@@ -147,27 +147,6 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     }
   }
 
-  public async queryUrl(path: string, page = 1, limit = 30, recurse = true): Promise<any> {
-    try {
-      const url = this._url + path;
-      console.log(`query: ${url}, page: ${page}, limit: ${limit}`);
-      let response = await $.get(url, { page, limit });
-
-      // remove height wrappers
-      if (response.height !== undefined && response.result !== undefined) {
-        response = response.result;
-      }
-
-      if (recurse && response.length === limit) {
-        const nextResults = await this.queryUrl(path, page + 1);
-        return response + nextResults;
-      }
-      return response;
-    } catch (err) {
-      console.error(err);
-    }
-  }
-
   private async _simulate(msg: Msg, memo: string): Promise<number> {
     // TODO
     return 180000;
