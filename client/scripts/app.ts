@@ -299,7 +299,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
     const Injective = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "injective-main" */
-      './controllers/chain/injective/main'
+      './controllers/chain/cosmos/injective/main'
     )).default;
     newChain = new Injective(n, app);
   } else if (n.chain.network === ChainNetwork.Ethereum) {
