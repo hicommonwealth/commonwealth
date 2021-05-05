@@ -107,7 +107,7 @@ const LandingPage: m.Component<{}, IState> = {
         { class: 'absolute w-screen z-20' },
         m(HeaderLandingPage, {
           navs: [
-            { text: 'Why Commonwealth?', ref: '' },
+            // { text: 'Why Commonwealth?', ref: '' },
             // { text: 'Use Cases', ref: '' },
             // { text: 'Crowdfunding', ref: '' },
             // { text: 'Developers', ref: '' },
