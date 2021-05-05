@@ -61,13 +61,13 @@ const renderQuillDelta = (delta, hideFormatting = false, collapse = false) => {
     let run = [];
     for (let i = 0; i < groups.length; i++) {
       if (groups[i].listtype) {
-        run.push(groups[i])
+        run.push(groups[i]);
       } else {
         if (run.length > 0) {
           result.push(run);
           run = [];
         }
-        result.push(groups[i])
+        result.push(groups[i]);
       }
     }
     if (run.length > 0) {
