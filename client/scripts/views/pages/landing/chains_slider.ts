@@ -1,5 +1,5 @@
 import m from 'mithril';
-import './tokens_chains.scss';
+import './chains_slider.scss';
 
 interface IState {
   chains: {
@@ -8,6 +8,7 @@ interface IState {
     placeholder?: boolean;
     chainInfo: string;
     name: string;
+    description?: string
   }[];
   oncreateSlider: Function;
 }
@@ -85,7 +86,7 @@ const TokensChainsComponent: m.Component<IState, IState> = {
                             { class: 'text-2xl font-extrabold mb-1' },
                             chain.name
                           ),
-                          m('p', { class: 'text-xl' }, chain.chainInfo.description),
+                          m('p', { class: 'text-xl' }, chain.description),
                         ]
                       )
                     );

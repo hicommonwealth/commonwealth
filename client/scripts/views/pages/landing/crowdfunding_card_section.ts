@@ -1,4 +1,4 @@
-import './chains_crowdfunding.scss';
+import './crowdfunding_card_section.scss';
 import m from 'mithril';
 
 import { ICardListItem } from 'models/interfaces';

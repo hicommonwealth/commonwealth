@@ -4,14 +4,14 @@ import Glide from '@glidejs/glide';
 
 import app from 'state';
 
-import HeaderLandingPage from './header';
-import FooterLandingPage from './footer';
-import TokensCommunityComponent from './tokensCommunity';
-import TokensCreatorComponent from './tokensCreators';
-import TokensChainsComponent from './tokensChains';
-import JoinCommonWealthSection from './joinCommonWealth';
-import TokenHoldersComponent from './tokensHolder';
-import ChainsCrowdfundingComponent from './chainsCrowdfunding';
+import HeaderLandingPage from './landing_page_header';
+import FooterLandingPage from './landing_page_footer';
+import JoinCommonWealthSection from './landing_page_pre_footer';
+import TokensCommunityComponent from './tokens_community_hero';
+import TokensCreatorComponent from './creators_card_section';
+import TokensChainsComponent from './chains_slider';
+import TokenHoldersComponent from './find_your_community_section';
+import ChainsCrowdfundingComponent from './crowdfunding_card_section';
 
 interface Chain {
   img: string;
@@ -65,11 +65,12 @@ const LandingPage: m.Component<{}, IState> = {
             chainInfo,
             name: chainInfo.name,
           };
-        } else if (entity.id && entity.defaultChain && entity.iconUrl) {
+        } else  {
           return {
-            img: entity.iconUrl,
+            img: entity.defaultChain.iconUrl,
             id: entity.id,
             chainInfo: entity.defaultChain,
+            description: entity.description,
             name: entity.defaultChain.name,
           };
         }
@@ -81,7 +82,7 @@ const LandingPage: m.Component<{}, IState> = {
         .filter((c) => c[1][0] && !c[1][0].chain.collapsedOnHomepage)
         .concat(
           myCommunities.filter(
-            (c: { collapsedOnHomepage: any }) => !c.collapsedOnHomepage
+            (c: any) => !c.collapsedOnHomepage
           )
         )
     );
@@ -90,7 +91,7 @@ const LandingPage: m.Component<{}, IState> = {
         .filter((c) => c[1][0] && c[1][0].chain.collapsedOnHomepage)
         .concat(
           myCommunities.filter(
-            (c: { collapsedOnHomepage: any }) => c.collapsedOnHomepage
+            (c: any) => c.collapsedOnHomepage
           )
         )
     );
@@ -299,7 +300,7 @@ const LandingPage: m.Component<{}, IState> = {
       m(JoinCommonWealthSection),
       m(FooterLandingPage, {
         list: [
-          { text: 'Why Commonwealth?', href: '' },
+          // { text: 'Why Commonwealth?', href: '' },
           // { text:  'Use Cases', href: '' },
           // { text:  'Crowdfunding', href: '' },
           // { text:  'Developers', href: '' },
