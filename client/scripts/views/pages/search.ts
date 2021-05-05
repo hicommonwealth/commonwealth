@@ -326,10 +326,11 @@ const SearchPage : m.Component<{
           '\'',
           vnode.state.activeTab === SearchType.Top
             && scope
-            && ` in ${capitalize(scope)}`,
+            ? ` in ${capitalize(scope)}.`
+            : ' on Commonwealth.',
           scope
             && [
-              '. ',
+              ' ',
               m('a.search-all-communities', {
                 href: '#',
                 onclick: (e) => {
