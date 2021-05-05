@@ -189,7 +189,7 @@ const LoginSelector: m.Component<{
                 if(isNewChain) {
                   newChainInfo = {
                     address: app.chain.id,
-                    iconUrl: app.chain.meta.chain.iconUrl,
+                    iconUrl: (app.chain.meta.chain.iconUrl) ? app.chain.meta.chain.iconUrl : 'default',
                     name: app.chain.meta.chain.name,
                     symbol: app.chain.meta.chain.symbol,
                   }                

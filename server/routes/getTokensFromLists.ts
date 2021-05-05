@@ -2,9 +2,10 @@
 import { Request, Response, NextFunction } from 'express';
 import fetch from 'node-fetch';
 const tokenListUrls = [
-  "https://wispy-bird-88a7.uniswap.workers.dev/?url=http://tokenlist.aave.eth.link",
+  "https://tokens.coingecko.com/uniswap/all.json",
   "https://gateway.ipfs.io/ipns/tokens.uniswap.org",
-  "https://wispy-bird-88a7.uniswap.workers.dev/?url=http://defi.cmc.eth.link"
+  "https://raw.githubusercontent.com/jab416171/uniswap-pairtokens/master/uniswap_pair_tokens.json",
+  "https://app.tryroll.com/tokens.json",
 ]
 
 const TWENTY_FOUR_HOURS = 86400000;
