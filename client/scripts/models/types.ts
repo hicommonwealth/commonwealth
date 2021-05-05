@@ -29,7 +29,6 @@ export enum ChainNetwork {
   Centrifuge = 'centrifuge',
   Cosmos = 'cosmos',
   Straightedge = 'straightedge',
-  Injective = 'injective',
   Ethereum = 'ethereum',
   NEAR = 'near',
   Moloch = 'moloch',
@@ -79,7 +78,6 @@ export function networkToBase(n: ChainNetwork | string): ChainBase {
     case ChainNetwork.HydraDX: return ChainBase.Substrate;
     case ChainNetwork.Cosmos: return ChainBase.CosmosSDK;
     case ChainNetwork.Straightedge: return ChainBase.CosmosSDK;
-    case ChainNetwork.Injective: return ChainBase.CosmosSDK;
     case ChainNetwork.NEAR: return ChainBase.NEAR;
     case ChainNetwork.Ethereum: return ChainBase.Ethereum;
     case ChainNetwork.Moloch: return ChainBase.Ethereum;
@@ -109,7 +107,6 @@ export enum ChainClass {
   CosmosHub = 'cosmos-hub',
   Gaia13k = 'gaia-13k',
   Straightedge = 'straightedge',
-  Injective = 'injective',
   Ethereum = 'ethereum',
   Near = 'near',
   Moloch = 'moloch',

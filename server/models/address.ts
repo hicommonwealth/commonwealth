@@ -241,8 +241,7 @@ export default (
         ? 'cosmos'
         : chain.network === 'straightedge'
           ? 'str'
-          : chain.network === 'injective'
-            ? 'inj' : chain.network;
+          : '';
       const generatedAddress = Bech32.encode(bech32Prefix, rawSecp256k1PubkeyToRawAddress(pk));
       const generatedAddressWithCosmosPrefix = Bech32.encode('cosmos', rawSecp256k1PubkeyToRawAddress(pk));
 
