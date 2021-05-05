@@ -204,6 +204,9 @@
         .cui-list-item {
             border-bottom: none;
             padding: 5px 20px !important;
+            &:focus {
+                outline: #CFCBFF auto 2px;
+            }
             .search-results-item {
                 color: $text-color-black;
                 text-decoration: none;
