@@ -16,6 +16,7 @@ import {
   ChainBase,
   CommunityInfo,
   AddressInfo,
+  NewChainInfo
 } from 'models';
 import moment from 'moment';
 import { notifyError } from 'controllers/app/notifications';
@@ -36,12 +37,14 @@ function createAccount(account: Account<any>, community?: string) {
   });
 }
 
-export function linkExistingAddressToChainOrCommunity(address: string, chain: string, originChain: string, community: string) {
+export function linkExistingAddressToChainOrCommunity(address: string, chain: string, originChain: string, community: string, isNewChain?: boolean, newChainInfo?: NewChainInfo) {
   return $.post(`${app.serverUrl()}/linkExistingAddressToChain`, {
     address,
     chain,
     originChain,
     community,
+    isNewChain,
+    newChainInfo,
     jwt: app.user.jwt,
   });
 }
