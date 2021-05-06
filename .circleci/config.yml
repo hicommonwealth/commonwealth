@@ -7,7 +7,7 @@ jobs:
   build:
     docker:
       # Service container image
-      - image: circleci/node:12.3.1
+      - image: circleci/node:14.7.0
 
     working_directory: ~/chain-events
 
