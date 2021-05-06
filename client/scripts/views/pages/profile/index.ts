@@ -172,6 +172,38 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
     vnode.state.threads = [];
     vnode.state.comments = [];
     vnode.state.refreshProfile = false;
+
+    const chain = (m.route.param('base'))
+      ? m.route.param('base')
+      : m.route.param('scope');
+    const { address } = vnode.attrs;
+    const chainInfo = app.config.chains.getById(chain);
+
+    if (chainInfo?.base === ChainBase.Substrate) {
+      const decodedAddress = decodeAddress(address);
+      const ss58Prefix = parseInt(chainInfo.ss58Prefix, 10);
+
+      const [valid] = checkAddress(address, ss58Prefix);
+      if (!valid) {
+        try {
+          const encoded = encodeAddress(decodedAddress, ss58Prefix);
+          m.route.set(`/${m.route.param('scope')}/account/${encoded}?base=${m.route.param('base')}`);
+        } catch (e) {
+          // do nothing if can't encode address
+        }
+      }
+    } else if (chainInfo?.base === ChainBase.Ethereum) {
+      const valid = Web3.utils.checkAddressChecksum(address);
+
+      if (!valid) {
+        try {
+          const checksumAddress = Web3.utils.toChecksumAddress(address);
+          m.route.set(`/${m.route.param('scope')}/account/${checksumAddress}?base=${m.route.param('base')}`);
+        } catch (e) {
+          // do nothing if can't get checksumAddress
+        }
+      }
+    }
   },
   oncreate: async (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'LoginPage' });
@@ -244,7 +276,6 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
         const chainInfo = app.config.chains.getById(chain);
         if (chainInfo?.base === ChainBase.Substrate) {
           try {
-            // TODO: should we enforce specific chain checksums here?
             decodeAddress(address);
             vnode.state.account = {
               profile: null,
@@ -258,7 +289,6 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
             // do nothing if can't decode
           }
         } else if (chainInfo?.base === ChainBase.Ethereum) {
-          // TODO: replace with "isAddress" if we want to support non-checksum i.e. all lower/upper
           if (Web3.utils.checkAddressChecksum(address)) {
             vnode.state.account = {
               profile: null,
@@ -288,7 +318,7 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
       vnode.state.loading = true;
       loadProfile();
     }
-    if (account && account.address !== vnode.attrs.address) {
+    if (!account || account.address !== vnode.attrs.address) {
       vnode.state.loading = true;
       vnode.state.loaded = false;
       loadProfile();
