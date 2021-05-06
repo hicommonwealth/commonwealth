@@ -39,12 +39,12 @@ function createAccount(account: Account<any>, community?: string) {
 
 export function linkExistingAddressToChainOrCommunity(address: string, chain: string, originChain: string, community: string, isNewChain?: boolean, newChainInfo?: NewChainInfo) {
   return $.post(`${app.serverUrl()}/linkExistingAddressToChain`, {
-    address,
-    chain,
-    originChain,
-    community,
-    isNewChain,
-    newChainInfo,
+    'address': address,
+    'chain': chain,
+    'originChain': originChain,
+    'community': community,
+    'isNewChain': isNewChain,
+    'newChainInfo': JSON.stringify(newChainInfo),
     jwt: app.user.jwt,
   });
 }

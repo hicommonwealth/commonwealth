@@ -31,9 +31,7 @@ const checkNewChainInfoWithTokenList = async (newChainInfo) => {
 const createChainForAddress = async (models, newChainInfoString) => {
   try {
     const newChainInfo = JSON.parse(newChainInfoString)
-    const foundInList = checkNewChainInfoWithTokenList(newChainInfo)
-    console.log('foundInList');
-    console.log(foundInList);
+    const foundInList = await checkNewChainInfoWithTokenList(newChainInfo);
     if(!foundInList) {
       throw new Error("New chain not found in token list")
     }
@@ -60,9 +58,6 @@ const createChainForAddress = async (models, newChainInfoString) => {
     const chain = await models.Chain.create(chainContent);
     await models.ChainNode.create(chainNodeContent);
 
-    console.log('created chain');
-    console.log(chain);
-
     return [chain, null, null]
   } catch(e) {
     return [null, null, e]
@@ -84,13 +79,9 @@ const linkExistingAddressToChain = async (models, req: Request, res: Response, n
   }
 
   let chain, community, error;
-  console.log(req.body);
   if(req.body.isNewChain) {
     [chain, community, error] = await createChainForAddress(models, req.body.newChainInfo)
   } 
-  
-  console.log('generated chain');
-  console.log(chain);
 
   if (!chain) {
     await models.Chain.findOne({
@@ -98,11 +89,7 @@ const linkExistingAddressToChain = async (models, req: Request, res: Response, n
     });
   } 
 
-  console.log('fetched chain');
-  console.log(chain);
-
   const userId = req.user.id;
-
 
   if (!chain) {
     return next(new Error(Errors.InvalidChain));
@@ -143,7 +130,7 @@ const linkExistingAddressToChain = async (models, req: Request, res: Response, n
   }
 
   const existingAddress = await models.Address.scope('withPrivateData').findOne({
-    where: { chain: req.body.chain, address: req.body.address }
+    where: { chain: (!req.body.isNewChain) ? req.body.chain : chain.id, address: req.body.address }
   });
 
   try {
@@ -163,7 +150,7 @@ const linkExistingAddressToChain = async (models, req: Request, res: Response, n
       const newObj = await models.Address.create({
         user_id: originalAddress.user_id,
         address: originalAddress.address,
-        chain: req.body.chain,
+        chain: (!req.body.isNewChain) ? req.body.chain : chain.id,
         verification_token: verificationToken,
         verification_token_expires: verificationTokenExpires,
         verified: originalAddress.verified,
@@ -190,7 +177,7 @@ const linkExistingAddressToChain = async (models, req: Request, res: Response, n
         permission: 'member',
       } : {
         address_id: addressId,
-        chain_id: req.body.chain,
+        chain_id: (!req.body.isNewChain) ? req.body.chain : chain.id,
         permission: 'member',
       });
     }
