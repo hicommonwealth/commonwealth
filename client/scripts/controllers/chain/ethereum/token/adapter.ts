@@ -1,5 +1,3 @@
-import { ethers } from 'ethers';
-
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 
 import { Erc20Factory } from 'Erc20Factory';
@@ -58,11 +56,6 @@ export default class Token extends IChainAdapter<EthereumCoin, EthereumAccount> 
     this.chain.deinitMetadata();
     this.chain.deinitEventLoop();
     this.chain.deinitApi();
-  }
-
-  public async getEthersProvider() {
-    const provider = new ethers.providers.Web3Provider(this.chain.api.currentProvider as any);
-    return provider;
   }
 
   public async activeAddressHasToken(activeAddress?: string) {
