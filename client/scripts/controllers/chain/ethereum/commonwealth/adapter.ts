@@ -1,11 +1,9 @@
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 
-import EthWebWalletController from 'controllers/app/eth_web_wallet';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import { ChainBase, ChainClass, IChainAdapter, NodeInfo } from 'models';
 
-import { setActiveAccount } from 'controllers/app/login';
 import ChainEntityController from 'controllers/server/chain_entities';
 import { IApp } from 'state';
 
@@ -21,7 +19,6 @@ export default class Commonwealth extends IChainAdapter<EthereumCoin, EthereumAc
   public ethAccounts: EthereumAccounts;
   public accounts: CommonwealthMembers;
   public governance: CommonwealthGovernance;
-  public readonly webWallet: EthWebWalletController = new EthWebWalletController();
   public readonly chainEntities = new ChainEntityController();
 
   constructor(meta: NodeInfo, app: IApp) {
@@ -36,29 +33,9 @@ export default class Commonwealth extends IChainAdapter<EthereumCoin, EthereumAc
     await this.chain.resetApi(this.meta);
     await this.chain.initMetadata();
     await this.ethAccounts.init(this.chain);
-    await this.webWallet.enable();
-
-    const activeAddress: string = this.webWallet.accounts && this.webWallet.accounts[0];
-    const api = new CommonwealthAPI(this.meta.address, this.chain.api.currentProvider as any, activeAddress);
+    const api = new CommonwealthAPI(() => null, this.meta.address, this.chain.api.currentProvider as any);
     await api.init();
     this.chain.commonwealthApi = api;
-
-    if (this.webWallet) {
-      await this.webWallet.enable();
-      await this.webWallet.web3.givenProvider.on('accountsChanged', async (accounts) => {
-        const updatedAddress = this.app.user.activeAccounts.find((addr) => addr.address === accounts[0]);
-        if (!updatedAddress) return;
-        await setActiveAccount(updatedAddress);
-      });
-    }
-
-    await this.webWallet.web3.givenProvider.on('accountsChanged', async (accounts) => {
-      const updatedAddress = this.app.user.activeAccounts.find((addr) => addr.address === accounts[0]);
-      if (!updatedAddress) return;
-      await setActiveAccount(updatedAddress);
-      api.updateSigner(accounts[0]);
-    });
-
     await this.accounts.init(api, this.chain, this.ethAccounts);
     await super.initApi();
   }

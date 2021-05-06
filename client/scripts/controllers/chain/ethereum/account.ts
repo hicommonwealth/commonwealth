@@ -3,7 +3,6 @@ import { Wallet } from 'ethereumjs-wallet';
 import {
   hashPersonalMessage, fromRpcSig, ecrecover, ecsign, toRpcSig
 } from 'ethereumjs-util';
-import { providers } from 'ethers';
 
 import { IApp } from 'state';
 import { Account, ITXModalData } from 'models';
@@ -13,8 +12,9 @@ import EthereumChain from './chain';
 import EthereumAccounts, {
   getWalletFromSeed, addressFromSeed, addressFromMnemonic, getWalletFromMnemonic, addressFromWallet
 } from './accounts';
+import TokenApi from './token/api';
 
-const TEST_TOKEN_ADDRESS = '0x1000000000000000000000000000000000000000'
+const TEST_TOKEN_ADDRESS = '0x1000000000000000000000000000000000000000';
 
 export default class EthereumAccount extends Account<EthereumCoin> {
   public get balance(): Promise<EthereumCoin> {
@@ -26,26 +26,22 @@ export default class EthereumAccount extends Account<EthereumCoin> {
 
   // Given an ERC20 token contract, fetches the balance of this account in that contract's tokens
   public async tokenBalance(contractAddress: string): Promise<ERC20Token> {
-    if (contractAddress === TEST_TOKEN_ADDRESS ) {
-      return new ERC20Token(contractAddress, new BN("10000000000", 10))
+    // TODO: remove this
+    if (contractAddress === TEST_TOKEN_ADDRESS) {
+      return new ERC20Token(contractAddress, new BN('10000000000', 10));
     }
     if (!this._Chain) return; // TODO
-    const token = Erc20Factory.connect(
-      contractAddress,
-      new providers.Web3Provider(this._Chain.api.currentProvider as any)
-    );
-    const balance = await token.balanceOf(this.address);
 
+    const api = new TokenApi(Erc20Factory.connect, contractAddress, this._Chain.api.currentProvider as any);
+    const balance = await api.Contract.balanceOf(this.address);
     return new ERC20Token(contractAddress, new BN(balance.toString(), 10));
   }
 
   public async sendTokenTx(toSend: ERC20Token, recipient: string) {
     if (!this._Chain) return;
-    const token = Erc20Factory.connect(
-      toSend.contractAddress,
-      (new providers.Web3Provider(this._Chain.api.currentProvider as any)).getSigner(this.address),
-    );
-    const transferTx = await token.transfer(recipient, toSend.asBN.toString(10), { gasLimit: 3000000 });
+    const api = new TokenApi(Erc20Factory.connect, toSend.contractAddress, this._Chain.api.currentProvider as any);
+    const contract = await api.attachSigner(this._Chain.app.wallets, this.address);
+    const transferTx = await contract.transfer(recipient, toSend.asBN.toString(10), { gasLimit: 3000000 });
     const transferTxReceipt = await transferTx.wait();
     if (transferTxReceipt.status !== 1) {
       throw new Error('failed to transfer tokens');
@@ -55,11 +51,9 @@ export default class EthereumAccount extends Account<EthereumCoin> {
 
   public async approveTokenTx(toApprove: ERC20Token, spender: string) {
     if (!this._Chain) return; // TODO
-    const token = Erc20Factory.connect(
-      toApprove.contractAddress,
-      (new providers.Web3Provider(this._Chain.api.currentProvider as any)).getSigner(this.address),
-    );
-    const approvalTx = await token.approve(
+    const api = new TokenApi(Erc20Factory.connect, toApprove.contractAddress, this._Chain.api.currentProvider as any);
+    const contract = await api.attachSigner(this._Chain.app.wallets, this.address);
+    const approvalTx = await contract.approve(
       spender,
       toApprove.asBN.toString(10),
       { gasLimit: 3000000 }
@@ -78,11 +72,8 @@ export default class EthereumAccount extends Account<EthereumCoin> {
   // approved for "spender" to spend.
   public async tokenAllowance(contractAddress: string, spender: string): Promise<ERC20Token> {
     if (!this._Chain) return; // TODO
-    const token = Erc20Factory.connect(
-      contractAddress,
-      new providers.Web3Provider(this._Chain.api.currentProvider as any)
-    );
-    const allowance = await token.allowance(this.address, spender);
+    const api = new TokenApi(Erc20Factory.connect, contractAddress, this._Chain.api.currentProvider as any);
+    const allowance = await api.Contract.allowance(this.address, spender);
     return new ERC20Token(contractAddress, new BN(allowance.toString(), 10));
   }
 

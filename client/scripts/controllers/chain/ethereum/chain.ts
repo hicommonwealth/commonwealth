@@ -11,6 +11,8 @@ import {
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import EthereumAccount from './account';
 
+export const INFURA_ID = process.env.INFURA_ID || 'b19b8175e688448ead43a0ab5f03438a';
+
 export interface IEthereumTXData extends ITXData {
   chainId: string;
   accountNumber: number;
@@ -21,9 +23,6 @@ export interface IEthereumTXData extends ITXData {
 }
 
 class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
-  public hasWebWallet(): boolean {
-    return true;
-  }
   public createTXModalData(author: EthereumAccount, txFunc: any, txName: string, objName: string): ITXModalData {
     throw new Error('Method not implemented.');
   }
@@ -59,70 +58,36 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
   public get metadataInitialized() { return this._metadataInitialized; }
   public get totalbalance() { return this._totalbalance; }
 
-  public initApi(node?: NodeInfo): Promise<any> {
-    return new Promise((resolve, reject) => {
-      // TODO: check for ethereum-local should probably be elsewhere
-      // TODO: for dapp browsers, we should fall back to infura if connecting via the JS window object fails
-      if (node.chain.id === 'ethereum-local') {
-        // Local node
-        try {
-          const localProvider = new Web3.providers.WebsocketProvider(node.url);
-          this._api = new Web3(localProvider);
-        } catch (error) {
-          console.log('Could not connect to Ethereum using local node');
-          this.app.chain.networkStatus = ApiStatus.Disconnected;
-          return reject(error);
-        }
-      } else if ((window as any).ethereum) {
-        // Dapp browsers
-        try {
-          console.log('Connecting to Ethereum via Metamask');
-          this._api = new Web3((window as any).ethereum);
-        } catch (error) {
-          console.log('Could not connect to Ethereum using injected web3');
-          this.app.chain.networkStatus = ApiStatus.Disconnected;
-          return reject(error);
-        }
-      } else if ((window as any).web3) {
-        // Legacy dapp browsers
-        try {
-          console.log('Connecting to Ethereum via legacy web3 object');
-          this._api = new Web3((window as any).web3.currentProvider);
-        } catch (error) {
-          console.log('Could not connect to Ethereum using injected web3');
-          this.app.chain.networkStatus = ApiStatus.Disconnected;
-          return reject(error);
-        }
-      } else {
-        // Non-dapp browsers, use Infura -> https://infura.io/docs/ethereum/wss/introduction
-        try {
-          const provider = new Web3.providers.WebsocketProvider(node.url);
-          this._api = new Web3(provider);
-        } catch (error) {
-          console.log('Could not connect to Ethereum using remote node');
-          this.app.chain.networkStatus = ApiStatus.Disconnected;
-          return reject(error);
-        }
+  public async initApi(node?: NodeInfo): Promise<any> {
+    // TODO: support local/etc
+    const infuraId = INFURA_ID;
+    const url = `wss://mainnet.infura.io/ws/v3/${infuraId}`;
+    try {
+      const provider = new Web3.providers.WebsocketProvider(url);
+      this._api = new Web3(provider);
+    } catch (error) {
+      console.log('Could not connect to Ethereum using remote node');
+      this.app.chain.networkStatus = ApiStatus.Disconnected;
+      throw error;
+    }
+
+    const isListening = await this._api.eth.net.isListening();
+    // TODO: what should we do with the result?
+
+    this.app.chain.networkStatus = ApiStatus.Connected;
+    this._api.eth.getBlock('latest').then((headers) => {
+      if (this.app.chain) {
+        this.app.chain.block.height = headers.number;
+        m.redraw();
       }
-      this._api.eth.net.isListening()
-        .then((isListening) => {
-          this.app.chain.networkStatus = ApiStatus.Connected;
-          this._api.eth.getBlock('latest').then((headers) => {
-            if (this.app.chain) {
-              this.app.chain.block.height = headers.number;
-              m.redraw();
-            }
-          });
-          this._api.eth.subscribe('newBlockHeaders', (err, headers) => {
-            if (this.app.chain) {
-              this.app.chain.block.height = headers.number;
-              m.redraw();
-            }
-          });
-          resolve(this._api);
-        })
-        .catch((err) => reject(this._api));
     });
+    this._api.eth.subscribe('newBlockHeaders', (err, headers) => {
+      if (this.app.chain) {
+        this.app.chain.block.height = headers.number;
+        m.redraw();
+      }
+    });
+    return this._api;
   }
 
   public async resetApi(selectedNode: NodeInfo) {

@@ -18,7 +18,8 @@ import WebsocketController from './controllers/server/socket';
 import TopicsController from './controllers/server/topics';
 import CommunitiesController from './controllers/server/communities';
 import UserController from './controllers/server/user/index';
-import Token from 'controllers/chain/ethereum/token/adapter';
+import Token from './controllers/chain/ethereum/token/adapter';
+import WebWalletController from './controllers/app/web_wallets';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -53,6 +54,7 @@ export interface IApp {
   communities: CommunitiesController;
   user: UserController;
   tokens: TokensController;
+  wallets: WebWalletController;
 
   recentActivity: RecentActivityController;
 
@@ -117,14 +119,14 @@ const app: IApp = {
   communities: new CommunitiesController(),
   user: new UserController(),
   tokens: new TokensController(),
+  wallets: new WebWalletController(),
 
   recentActivity: new RecentActivityController(),
 
-  activeChainId: () => app.chain 
-    ? 
-      (app.chain as Token).isToken && (app.chain as Token).isUncreated
-      ? (app.chain as Token).contractAddress 
-      : app.chain.id 
+  activeChainId: () => app.chain
+    ? (app.chain as Token).isToken && (app.chain as Token).isUncreated
+      ? (app.chain as Token).contractAddress
+      : app.chain.id
     : null,
   activeCommunityId: () => app.community ? app.community.meta.id : null,
   activeId: () => app.community ? app.activeCommunityId() : app.activeChainId(),
