@@ -13,6 +13,8 @@ import {
 } from 'construct-ui';
 
 import app from 'state';
+import { initAppState } from 'app';
+
 import { detectURL } from 'helpers/threads';
 import { OffchainTopic, OffchainThreadKind, OffchainThreadStage, CommunityInfo, NodeInfo } from 'models';
 
@@ -206,7 +208,12 @@ const newThread = async (
   updateLastVisited(app.activeCommunityId()
     ? (activeEntity.meta as CommunityInfo)
     : (activeEntity.meta as NodeInfo).chain, true);
+
   await app.user.notifications.refresh();
+  if(isNewChain) {
+    await initAppState(false);
+  }
+
   m.route.set(`/${
     isNewChain 
     ?
@@ -214,6 +221,7 @@ const newThread = async (
     :
     app.activeId()
   }/proposal/discussion/${result.id}`);
+
 
   if (result.topic) {
     try {

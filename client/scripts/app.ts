@@ -579,7 +579,6 @@ $(() => {
     },
     render: (vnode) => {
       const { scoped, hideSidebar, redirectCustomDomain } = attrs;
-
       // handle custom domains, for routes that need special handling
       const host = document.location.host;
       if (redirectCustomDomain) {
@@ -611,6 +610,20 @@ $(() => {
           ? vnode.attrs.scope.toString()
           // false => scope is null
           : null;
+
+        if(scope) {
+          const scopeIsEthereumAddress = scope.startsWith("0x") && scope.length === 42;
+          if(scopeIsEthereumAddress) {
+            const nodes = app.config.nodes.getAll();
+            const node = nodes.find(o=>o.address == scope)
+            if(node) {
+              const pagePath = window.location.href.substr(window.location.href.indexOf(scope)+scope.length)
+              m.route.set(`/` + node.chain.id + pagePath);
+            } 
+          }
+        }
+
+  
       // Special case to defer chain loading specifically for viewing an offchain thread. We need
       // a special case because OffchainThreads and on-chain proposals are all viewed through the
       // same "/:scope/proposal/:type/:id" route.
