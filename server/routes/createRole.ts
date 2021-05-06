@@ -27,6 +27,8 @@ const checkNewChainInfoWithTokenList = async (newChainInfo) => {
 
 const createChainForAddress = async (models, newChainInfoString) => {
   try {
+    console.log('newChainInfoString');
+    console.log(newChainInfoString);
     const newChainInfo = JSON.parse(newChainInfoString)
     const foundInList = await checkNewChainInfoWithTokenList(newChainInfo);
     if(!foundInList) {
