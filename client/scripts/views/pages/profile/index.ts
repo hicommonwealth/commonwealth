@@ -244,7 +244,6 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
         const chainInfo = app.config.chains.getById(chain);
         if (chainInfo?.base === ChainBase.Substrate) {
           try {
-            // TODO: should we enforce specific chain checksums here?
             const decodedAddress = decodeAddress(address);
             const ss58Prefix = parseInt(chainInfo.ss58Prefix, 10);
 

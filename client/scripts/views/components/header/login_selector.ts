@@ -175,24 +175,15 @@ const LoginSelector: m.Component<{
             if (originAddressInfo) {
               try {
                 const targetChain = joiningChain || originAddressInfo.chain;
-                const currentPrefix = app.config.chains.getById(targetChain).ss58Prefix;
 
                 const address = originAddressInfo.address;
-                let encodedAddress = address;
-
-                if (networkToBase(joiningChain) === ChainBase.Substrate) {
-                  encodedAddress =  AddressSwapper({
-                    address,
-                    currentPrefix,
-                  });
-                }
 
                 const res = await linkExistingAddressToChainOrCommunity(
-                  address, encodedAddress, targetChain, originAddressInfo.chain, joiningCommunity
+                  address, targetChain, originAddressInfo.chain, joiningCommunity
                 );
 
                 if (res && res.result) {
-                  const { verification_token, addressId, addresses } = res.result;
+                  const { verification_token, addresses, encodedAddress } = res.result;
                   app.user.setAddresses(addresses.map((a) => {
                     return new AddressInfo(a.id, a.address, a.chain, a.keytype, a.is_magic);
                   }));

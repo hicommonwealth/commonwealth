@@ -12,7 +12,7 @@ module.exports = {
     for (const addr of addresses[0]) {
       const { id, address, chain } = addr;
       const ch = chains[0].find((_) => _.network === chain);
-      if (ch && ch.base === 'substrate' && !!ch.ss58_prefix) {
+      if (ch && ch.base === 'substrate' && ch.ss58_prefix !== null && ch.ss58_prefix !== undefined) {
         let decodedAddress;
         try {
           decodedAddress = decodeAddress(address);
