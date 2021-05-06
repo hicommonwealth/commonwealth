@@ -195,10 +195,10 @@
     lodash "^4.17.19"
     to-fast-properties "^2.0.0"
 
-"@clover-network/node-tpye@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@clover-network/node-tpye/-/node-tpye-1.0.1.tgz#cb61a6ef57c3207ce3baec6f0bdcd23287dc5209"
-  integrity sha512-edR5xE6I3DdcNboBTnK9U6cVHPKsvJRD19o+LUelvJnqrH+DHipMZVr8VBLpf9CvLBxHNZffGX6Jf/iJmkR9+g==
+"@clover-network/node-types@1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@clover-network/node-types/-/node-types-1.0.3.tgz#0a83b850918ddf75b517b1f81784a398b94dc314"
+  integrity sha512-7zNm68KaRxyZWVOrDFWOWyG6h/khgkXpVKw6mByJnrzG6MajDkdctTFeu2RrXeYFl5fH9gm2sv0UDFvMuk3m5Q==
 
 "@edgeware/node-types@^3.3.3":
   version "3.3.3"

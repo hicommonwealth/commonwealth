@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 export const HydraDXSpec = {
   types: {
     Amount: 'i128',
@@ -24,5 +23,9 @@ export const HydraDXSpec = {
     },
     LookupSource: 'AccountId',
     Price: 'Balance',
+    Chain: {
+      genesisHash: 'Vec<u8>',
+      lastBlockHash: 'Vec<u8>',
+    },
   },
 };
