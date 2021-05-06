@@ -63,8 +63,8 @@ const LinkAccountItem: m.Component<{
     const isPrepopulated = account.address === linkNewAddressModalVnode.attrs.prepopulateAddress
       || address === linkNewAddressModalVnode.attrs.prepopulateAddress;
     const name = account.meta?.name || (base === ChainBase.CosmosSDK
-      ? `${app.chain.meta.chain.name} account`
-      : 'Ethereum address');
+      ? `${app.chain.meta.chain.name} address ${account.address.slice(0, 6)}...`
+      : `Ethereum address ${account.address.slice(0, 6)}...`);
     return m('.LinkAccountItem.account-item', {
       class: `${isPrepopulated ? 'account-item-emphasized' : ''} ${vnode.state.linking ? 'account-item-disabled' : ''}`,
       onclick: async (e) => {
