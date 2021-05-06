@@ -47,7 +47,7 @@ export default class Token extends IChainAdapter<EthereumCoin, EthereumAccount> 
   public async initData() {
     await this.chain.initEventLoop();
     await super.initData();
-    await this.activeAddressHasToken(this.app.user.activeAccount.address);
+    await this.activeAddressHasToken(this.app.user?.activeAccount?.address);
   }
 
   public async deinit() {
