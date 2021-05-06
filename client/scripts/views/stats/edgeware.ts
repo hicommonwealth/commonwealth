@@ -4,7 +4,7 @@ import 'stats/edgeware.scss';
 import $ from 'jquery';
 import m from 'mithril';
 import _ from 'lodash';
-import moment from 'moment-twitter';
+import moment from 'moment';
 import Chart from 'chart.js';
 import mixpanel from 'mixpanel-browser';
 import { Button, Input, Spinner } from 'construct-ui';
@@ -202,7 +202,7 @@ const EdgewareStatsPage = {
               m('.col-sm-4', [
                 m('h3', 'Last lock or signal'),
                 m('p', state.participationSummary ? [
-                  moment(state.participationSummary.lastBlockTime * 1000).twitterLong(true),
+                  moment(state.participationSummary.lastBlockTime * 1000).format(),
                   ` (Block ${formatNumberRound(state.participationSummary.lastBlock.number)})`
                 ] : '--'),
               ]),

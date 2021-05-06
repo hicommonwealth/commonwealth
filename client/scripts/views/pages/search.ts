@@ -3,7 +3,7 @@ import 'pages/search.scss';
 import $ from 'jquery';
 import m from 'mithril';
 import _ from 'lodash';
-import moment from 'moment-twitter';
+import moment from 'moment';
 import { Input, Spinner, Tag } from 'construct-ui';
 
 import { link, pluralize } from 'helpers';

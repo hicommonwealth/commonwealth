@@ -735,7 +735,7 @@ export const NewThreadForm: m.Component<{
       && m('.new-thread-form-sidebar', [
         m(List, {
           interactive: true
-        }, discussionDrafts.sort((a, b) => a.createdAt - b.createdAt).map((draft) => {
+        }, discussionDrafts.sort((a, b) => a.createdAt.unix() - b.createdAt.unix()).map((draft) => {
           const { body } = draft;
           let bodyComponent;
           if (body) {
