@@ -82,7 +82,7 @@ const LoginWithWalletDropdown: m.Component<{
         });
       }
     });
-    const chainbase = app.chain?.meta?.chain?.base;
+    const chainbase = (app.chain?.meta?.chain?.base.length != 0) ? app.chain?.meta?.chain?.base : ChainBase.Ethereum; // Hacky fix for ETH token forums;
     const menuItems = (chainbase && CHAINBASE_WITH_CLI.indexOf(chainbase) !== -1)
       ? [
         getMenuItemForChainBase(chainbase),
