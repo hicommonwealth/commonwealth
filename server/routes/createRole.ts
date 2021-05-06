@@ -25,11 +25,8 @@ const checkNewChainInfoWithTokenList = async (newChainInfo) => {
   return token;
 }
 
-const createChainForAddress = async (models, newChainInfoString) => {
+const createChainForAddress = async (models, newChainInfo) => {
   try {
-    console.log('newChainInfoString');
-    console.log(newChainInfoString);
-    const newChainInfo = JSON.parse(newChainInfoString)
     const foundInList = await checkNewChainInfoWithTokenList(newChainInfo);
     if(!foundInList) {
       throw new Error("New chain not found in token list")
@@ -66,7 +63,13 @@ const createChainForAddress = async (models, newChainInfoString) => {
 const createRole = async (models, req, res: Response, next: NextFunction) => {
   let chain, community, error;
   if (req.body.isNewChain) {
-    [chain, community, error] = await createChainForAddress(models, req.body.newChainInfo)
+    const newChain = {
+      address: req.body[`newChainInfo[address]`],
+      iconUrl: req.body[`newChainInfo[iconUrl]`],
+      name: req.body[`newChainInfo[name]`],
+      symbol: req.body[`newChainInfo[symbol]`],
+    };
+    [chain, community, error] = await createChainForAddress(models, newChain)
   } else {
     [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   }
