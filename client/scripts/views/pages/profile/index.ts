@@ -244,24 +244,16 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
         const chainInfo = app.config.chains.getById(chain);
         if (chainInfo?.base === ChainBase.Substrate) {
           try {
-            const decodedAddress = decodeAddress(address);
-            const ss58Prefix = parseInt(chainInfo.ss58Prefix, 10);
-
-            const [valid] = checkAddress(address, ss58Prefix);
-
-            if (!valid) {
-              const encoded = encodeAddress(decodedAddress, ss58Prefix);
-              m.route.set(`/${m.route.param('scope')}/account/${encoded}?base=${m.route.param('base')}`);
-            } else {
-              vnode.state.account = {
-                profile: null,
-                chain,
-                address,
-                id: null,
-                name: null,
-                user_id: null,
-              };
-            }
+            // TODO: should we enforce specific chain checksums here?
+            decodeAddress(address);
+            vnode.state.account = {
+              profile: null,
+              chain,
+              address,
+              id: null,
+              name: null,
+              user_id: null,
+            };
           } catch (e) {
             // do nothing if can't decode
           }

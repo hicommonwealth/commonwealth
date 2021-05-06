@@ -25,12 +25,11 @@ class ChainInfo {
   public readonly chainObjectId: string;
   public adminsAndMods: RoleInfo[];
   public members: RoleInfo[];
-  public readonly ss58Prefix: string;
 
   // TODO: convert this to accept an object with params instead
   constructor(
     id, network, symbol, name, iconUrl, description, website, discord, element, telegram, github,
-    customDomain, blockExplorerIds, collapsedOnHomepage, featuredTopics, topics, ss58_prefix, adminsAndMods?, base?
+    customDomain, blockExplorerIds, collapsedOnHomepage, featuredTopics, topics, adminsAndMods?, base?
   ) {
     this.id = id;
     this.network = network;
@@ -50,7 +49,6 @@ class ChainInfo {
     this.featuredTopics = featuredTopics || [];
     this.topics = topics || [];
     this.adminsAndMods = adminsAndMods || [];
-    this.ss58Prefix = ss58_prefix;
   }
 
   public static fromJSON(json) {
@@ -77,7 +75,6 @@ class ChainInfo {
       json.collapsed_on_homepage,
       json.featured_topics,
       json.topics,
-      json.ss58_prefix,
       json.adminsAndMods,
       json.base,
     );
