@@ -7,6 +7,7 @@ import {
   Account,
   RolePermission,
   ChainInfo,
+  NewChainInfo,
 } from 'models';
 
 import Base from './base';
@@ -30,7 +31,13 @@ export default class extends Base {
     return this.roles.filter((role) => role.offchain_community_id);
   }
 
-  public createRole(options: { address: AddressInfo, chain?: string, community?: string }): JQueryPromise<void> {
+  public createRole(options: { 
+    address: AddressInfo, 
+    chain?: string, 
+    community?: string,
+    isNewChain?: boolean,
+    newChainInfo?: NewChainInfo, 
+  }): JQueryPromise<void> {
     // TODO: Change to POST /role
     return $.post('/api/createRole', {
       jwt: this.jwt,
