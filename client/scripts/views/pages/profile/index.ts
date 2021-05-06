@@ -15,7 +15,7 @@ import PageNotFound from 'views/pages/404';
 import PageLoading from 'views/pages/loading';
 import Tabs from 'views/components/widgets/tabs';
 
-import { decodeAddress } from '@polkadot/keyring';
+import { decodeAddress, checkAddress, encodeAddress } from '@polkadot/util-crypto';
 import { setActiveAccount } from 'controllers/app/login';
 import ProfileHeader from './profile_header';
 import ProfileContent from './profile_content';
