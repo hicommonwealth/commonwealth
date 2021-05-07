@@ -178,6 +178,7 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
       : m.route.param('scope');
     const { address } = vnode.attrs;
     const chainInfo = app.config.chains.getById(chain);
+    const baseSuffix = m.route.param('base');
 
     if (chainInfo?.base === ChainBase.Substrate) {
       const decodedAddress = decodeAddress(address);
@@ -187,7 +188,7 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
       if (!valid) {
         try {
           const encoded = encodeAddress(decodedAddress, ss58Prefix);
-          m.route.set(`/${m.route.param('scope')}/account/${encoded}?base=${m.route.param('base')}`);
+          m.route.set(`/${m.route.param('scope')}/account/${encoded}${baseSuffix ? `?base=${baseSuffix}` : ''}`);
         } catch (e) {
           // do nothing if can't encode address
         }
@@ -198,7 +199,7 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
       if (!valid) {
         try {
           const checksumAddress = Web3.utils.toChecksumAddress(address);
-          m.route.set(`/${m.route.param('scope')}/account/${checksumAddress}?base=${m.route.param('base')}`);
+          m.route.set(`/${m.route.param('scope')}/account/${checksumAddress}${baseSuffix ? `?base=${baseSuffix}` : ''}`);
         } catch (e) {
           // do nothing if can't get checksumAddress
         }
@@ -214,6 +215,19 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
         ? m.route.param('base')
         : m.route.param('scope');
       const { address } = vnode.attrs;
+      const chainInfo = app.config.chains.getById(chain);
+      let valid = false;
+
+      if (chainInfo?.base === ChainBase.Substrate) {
+        const ss58Prefix = parseInt(chainInfo.ss58Prefix, 10);
+        [valid] = checkAddress(address, ss58Prefix);
+      } else if (chainInfo?.base === ChainBase.Ethereum) {
+        valid = Web3.utils.checkAddressChecksum(address);
+      }
+      if (!valid) {
+        return;
+      }
+      vnode.state.loading = true;
       try {
         const response = await $.ajax({
           url: `${app.serverUrl()}/profile`,
@@ -273,7 +287,6 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
       } catch (err) {
         console.log(err);
         // for certain chains, display addresses not in db if formatted properly
-        const chainInfo = app.config.chains.getById(chain);
         if (chainInfo?.base === ChainBase.Substrate) {
           try {
             decodeAddress(address);
@@ -315,15 +328,13 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
     const { setIdentity } = vnode.attrs;
     const { account, loaded, loading, refreshProfile } = vnode.state;
     if (!loading && !loaded) {
-      vnode.state.loading = true;
       loadProfile();
     }
-    if (!account || account.address !== vnode.attrs.address) {
-      vnode.state.loading = true;
+    if (account && account.address !== vnode.attrs.address) {
       vnode.state.loaded = false;
       loadProfile();
     }
-    if (loading || !loaded) return m(PageLoading, { showNewProposalButton: true });
+    if (loading) return m(PageLoading, { showNewProposalButton: true });
     if (!account) {
       return m(PageNotFound, { message: 'Invalid address provided' });
     }

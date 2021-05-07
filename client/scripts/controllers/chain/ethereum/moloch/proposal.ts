@@ -305,7 +305,7 @@ export default class MolochProposal extends Proposal<
   }
 
   public canAbort(currentUser: MolochMember) {
-    if (currentUser.address.toLowerCase() !== this.data.applicantAddress.toLowerCase()) {
+    if (currentUser.address !== this.data.applicantAddress) {
       return false;
     }
     return this._Gov.currentPeriod < this.abortPeriodEnd;
@@ -389,7 +389,7 @@ export default class MolochProposal extends Proposal<
       throw new Error('proposal not in abort window');
     }
 
-    if (address.toLowerCase() !== this.applicantAddress.toLowerCase()) {
+    if (address !== this.applicantAddress) {
       throw new Error('only applicant can abort');
     }
 

@@ -41,7 +41,7 @@ export default class CommonwealthMembers implements IAccountsModule<EthereumCoin
 
   public get(address: string) {
     try {
-      return this._store.getByAddress(address.toLowerCase());
+      return this._store.getByAddress(address);
     } catch (e) {
       if (!this._Accounts) return null;
       return new CommonwealthMember(this.app, this._Chain, this._Accounts, this, address);

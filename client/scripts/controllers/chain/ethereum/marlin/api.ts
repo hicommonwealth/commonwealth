@@ -23,7 +23,7 @@ export default class MarlinAPI extends ContractApi<MPond> {
     web3Provider: AsyncSendable,
   ) {
     super(factory, mPondAddress, web3Provider);
-    this._GovernorAlphaAddress = governorAlphaAddress.toLowerCase();
+    this._GovernorAlphaAddress = governorAlphaAddress;
     this._GovernorAlphaContract = GovernorAlphaFactory.connect(governorAlphaAddress, this.Provider);
   }
 

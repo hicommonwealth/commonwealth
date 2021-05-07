@@ -145,7 +145,7 @@ export default class MolochGovernance extends ProposalModule<
     // once approved we assume the applicant has approved the tribute and proceed
     // TODO: this assumes the active user is the signer on the contract -- we should make this explicit
     const tx = await this._api.Contract.submitProposal(
-      applicantAddress.toLowerCase(),
+      applicantAddress,
       tokenTribute.toString(),
       sharesRequested.toString(),
       details,
