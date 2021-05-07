@@ -36,12 +36,12 @@ class TokenListCache {
           return responseJson;
         } catch (err) {
           log.error(`Failed to fetch from token list ${url}: ${err.message}`);
-          return [];
+          return { tokens: [] };
         }
       })
     );
 
-    let tokens: TokenResponse[] = _.flatten(responseData);
+    let tokens: TokenResponse[] = _.flatten(responseData.map((d) => d.tokens));
     if (process.env.NODE_ENV === 'development') {
       // Test token
       tokens = tokens.concat({

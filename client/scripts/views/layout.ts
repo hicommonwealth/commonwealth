@@ -35,7 +35,7 @@ export const Layout: m.Component<{
 }> = {
   view: (vnode) => {
     const { scope, deferChain, hideSidebar } = vnode.attrs;
-    const scopeIsEthereumAddress = scope && scope.startsWith("0x") && scope.length === 42;
+    const scopeIsEthereumAddress = scope && scope.startsWith('0x') && scope.length === 42;
     const scopeMatchesChain = app.config.nodes.getAll().find((n) => n.chain.id === scope);
     const scopeMatchesCommunity = app.config.communities.getAll().find((c) => c.id === scope);
 
@@ -54,9 +54,9 @@ export const Layout: m.Component<{
       // Wait for /api/status to return with the user's login status
       return m(LoadingLayout, { hideSidebar });
     } else if (scope && scopeIsEthereumAddress && scope !== vnode.state.loadingScope) {
-        vnode.state.loadingScope = scope;
-        initTemporaryTokenChain(scope);
-        return m(LoadingLayout, { hideSidebar });  
+      vnode.state.loadingScope = scope;
+      initTemporaryTokenChain(scope);
+      return m(LoadingLayout, { hideSidebar });
     } else if (scope && !scopeMatchesChain && !scopeMatchesCommunity && !scopeIsEthereumAddress) {
       // If /api/status has returned, then app.config.nodes and app.config.communities
       // should both be loaded. If we match neither of them, then we can safely 404
