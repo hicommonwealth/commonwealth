@@ -91,6 +91,7 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
     const onSearchPage = (p) => p.startsWith(`/${app.activeId()}/search`);
     const onMembersPage = (p) => p.startsWith(`/${app.activeId()}/members`)
       || p.startsWith(`/${app.activeId()}/account/`);
+    const onSnapshotProposal = (p) => p.startsWith(`/${app.activeId()}/snapshot-proposals`);
     const onChatPage = (p) => p === `/${app.activeId()}/chat`;
 
     return m('.OffchainNavigationModule.SidebarModule', [
@@ -128,6 +129,17 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
           m.route.set(`/${app.activeId()}/members`);
         },
       }),
+      app.chain?.meta.chain.snapshot !== null
+        && m(Button, {
+          rounded: true,
+          fluid: true,
+          active: onSnapshotProposal(m.route.get()),
+          label: 'Snapshot proposal',
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set(`/${app.activeId()}/snapshot-proposals`);
+          },
+        }),
       // m(Button, {
       //   rounded: true,
       //   fluid: true,
