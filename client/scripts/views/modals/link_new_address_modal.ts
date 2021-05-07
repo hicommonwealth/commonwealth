@@ -250,10 +250,32 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
           }
 
           // link the address to the community
-          try {
+          try {        
+            const chains = {};
+            app.config.nodes.getAll().forEach((n) => {
+              if (chains[n.chain.id]) {
+                chains[n.chain.id].push(n);
+              } else {
+                chains[n.chain.id] = [n];
+              }
+            });
+        
+            const isNewChain = !chains[vnode.attrs.joiningChain] && (app.chain as Token).isToken 
+            && (app.chain as Token).isUncreated;
+        
+            let newChainInfo = null
+            if(isNewChain) {
+              newChainInfo = {
+                address: app.chain.id,
+                iconUrl: (app.chain.meta.chain.iconUrl) ? app.chain.meta.chain.iconUrl : 'default',
+                name: app.chain.meta.chain.name,
+                symbol: app.chain.meta.chain.symbol,
+              }                
+            }
+
             if (vnode.attrs.joiningChain
                 && !app.user.getRoleInCommunity({ account, chain: vnode.attrs.joiningChain })) {
-              await app.user.createRole({ address: addressInfo, chain: vnode.attrs.joiningChain });
+              await app.user.createRole({ address: addressInfo, chain: vnode.attrs.joiningChain, isNewChain, newChainInfo });
             } else if (vnode.attrs.joiningCommunity
                        && !app.user.getRoleInCommunity({ account, community: vnode.attrs.joiningCommunity })) {
               await app.user.createRole({ address: addressInfo, community: vnode.attrs.joiningCommunity });

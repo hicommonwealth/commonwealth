@@ -3,8 +3,9 @@ import { Request, Response, NextFunction } from 'express';
 import fetch from 'node-fetch';
 const tokenListUrls = [
   "https://tokens.coingecko.com/uniswap/all.json",
+  "https://gateway.ipfs.io/ipns/tokens.uniswap.org",
   "https://raw.githubusercontent.com/jab416171/uniswap-pairtokens/master/uniswap_pair_tokens.json",
-  "https://tokenlists.org/token-list?url=https://app.tryroll.com/tokens.json"
+  "https://app.tryroll.com/tokens.json",
 ]
 
 const TWENTY_FOUR_HOURS = 86400000;

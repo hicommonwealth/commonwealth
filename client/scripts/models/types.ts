@@ -49,11 +49,13 @@ export function baseToNetwork(n: ChainBase): ChainNetwork {
     case ChainBase.Substrate: return ChainNetwork.Edgeware;
     case ChainBase.Ethereum: return ChainNetwork.Ethereum;
     case ChainBase.NEAR: return ChainNetwork.NEAR;
+    case ChainBase.Ethereum: return ChainNetwork.Ethereum;
     default: return null;
   }
 }
 
 export function networkToBase(n: ChainNetwork | string): ChainBase {
+  if (/^0x[a-fA-F0-9]{40}$/.test(n)) n = ChainNetwork.ERC20;
   switch (n) {
     case ChainNetwork.Clover: return ChainBase.Substrate;
     case ChainNetwork.Edgeware: return ChainBase.Substrate;
