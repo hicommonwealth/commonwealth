@@ -2,13 +2,16 @@ import moment from 'moment';
 import Web3 from 'web3';
 import BN from 'bn.js';
 import { providers } from 'ethers';
+
+import { INFURA_API_KEY } from '../config';
 import { Erc20Factory } from '../../eth/types/Erc20Factory';
 import { Erc20 } from '../../eth/types/Erc20';
+
 import JobRunner from './cacheJobRunner';
-import { INFURA_API_KEY } from '../config';
+import TokenListCache, { TokenResponse } from './tokenListCache';
+import { tokenNameToId } from './createTokenChain';
 
 import { factory, formatFilename } from '../../shared/logging';
-import { getTokensFromListsInternal } from '../routes/getTokensFromLists';
 const log = factory.getLogger(formatFilename(__filename));
 const TEST_CONTRACT_ID = 'ABC';
 
@@ -29,18 +32,19 @@ export interface TokenForumMeta {
   api?: Erc20;
 }
 
-export function tokenNameToId(name: string): string {
-  return name.toLowerCase().trim().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
-}
-
 export default class TokenBalanceCache extends JobRunner<CacheT> {
   private _contracts: TokenForumMeta[];
 
-  constructor(noBalancePruneTimeS: number = 5 * 60, private _hasBalancePruneTimeS: number = 24 * 60 * 60) {
+  constructor(
+    private readonly _listCache: TokenListCache,
+    noBalancePruneTimeS: number = 5 * 60,
+    private readonly _hasBalancePruneTimeS: number = 24 * 60 * 60,
+  ) {
     super({}, noBalancePruneTimeS);
+    this._listCache = new TokenListCache();
   }
 
-  public static async connectTokens(models, network = 'mainnet'): Promise<TokenForumMeta[]> {
+  private async _connectTokens(models, network = 'mainnet'): Promise<TokenForumMeta[]> {
     // initialize web3 (we all URL fields should be the same -- infura)
     const web3Provider = new Web3.providers.HttpProvider(`https://${network}.infura.io/v3/${INFURA_API_KEY}`);
     const provider = new providers.Web3Provider(web3Provider);
@@ -62,7 +66,7 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
       }));
 
     try {
-      const tokensFromListsResponses = await getTokensFromListsInternal();
+      const tokensFromListsResponses = await this._listCache.getTokens();
       const tokensFromLists: TokenForumMeta[] = tokensFromListsResponses
         .map((o) => {
           return {
@@ -80,8 +84,14 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     return tokens;
   }
 
-  public async start(tokenMeta: TokenForumMeta[]) {
-    this._contracts = tokenMeta;
+  public async start(models, network = 'mainnet', prefetchedTokenMeta?: TokenForumMeta[]) {
+    if (!prefetchedTokenMeta) {
+      const tokenMeta = await this._connectTokens(models, network);
+      this._contracts = tokenMeta;
+    } else {
+      const tokenMeta = await this._connectTokens(models, network);
+      this._contracts = tokenMeta;
+    }
 
     // write init values into saved cache
     await this.access(async (cache) => {
@@ -103,6 +113,10 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
       }
     });
     return this.start(tokenMeta);
+  }
+
+  public getTokens(): Promise<TokenResponse[]> {
+    return this._listCache.getTokens();
   }
 
   // query a user's balance on a given token contract and save in cache

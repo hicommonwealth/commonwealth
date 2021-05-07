@@ -15,13 +15,12 @@ import {
   Account,
   ChainBase,
   CommunityInfo,
-  AddressInfo,
-  NewChainInfo
+  AddressInfo
 } from 'models';
 import moment from 'moment';
 import { notifyError } from 'controllers/app/notifications';
 import Token from 'controllers/chain/ethereum/token/adapter';
-import { networkToBase } from 'models/types';
+import { INewChainInfo } from 'types';
 
 const MAGIC_PUBLISHABLE_KEY = 'pk_live_B0604AA1B8EEFDB4';
 
@@ -43,7 +42,7 @@ export function linkExistingAddressToChainOrCommunity(
   originChain: string,
   community: string,
   isNewChain?: boolean,
-  newChainInfo?: NewChainInfo,
+  newChainInfo?: INewChainInfo,
 ) {
   return $.post(`${app.serverUrl()}/linkExistingAddressToChain`, {
     'address': address,
@@ -51,7 +50,7 @@ export function linkExistingAddressToChainOrCommunity(
     'originChain': originChain,
     'community': community,
     'isNewChain': isNewChain,
-    'newChainInfo': JSON.stringify(newChainInfo),
+    'newChainInfo': newChainInfo,
     jwt: app.user.jwt,
   });
 }

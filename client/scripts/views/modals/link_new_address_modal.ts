@@ -22,6 +22,7 @@ import User from 'views/components/widgets/user';
 import AvatarUpload from 'views/components/avatar_upload';
 import AddressSwapper from 'views/components/addresses/address_swapper';
 import Token from 'controllers/chain/ethereum/token/adapter';
+import { INewChainInfo } from 'types';
 
 enum LinkNewAddressSteps {
   Step1VerifyWithCLI,
@@ -250,7 +251,7 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
           }
 
           // link the address to the community
-          try {        
+          try {
             const chains = {};
             app.config.nodes.getAll().forEach((n) => {
               if (chains[n.chain.id]) {
@@ -259,23 +260,28 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
                 chains[n.chain.id] = [n];
               }
             });
-        
-            const isNewChain = !chains[vnode.attrs.joiningChain] && (app.chain as Token).isToken 
+
+            const isNewChain = !chains[vnode.attrs.joiningChain] && (app.chain as Token).isToken
             && (app.chain as Token).isUncreated;
-        
-            let newChainInfo = null
-            if(isNewChain) {
+
+            let newChainInfo: INewChainInfo;
+            if (isNewChain) {
               newChainInfo = {
                 address: app.chain.id,
                 iconUrl: (app.chain.meta.chain.iconUrl) ? app.chain.meta.chain.iconUrl : 'default',
                 name: app.chain.meta.chain.name,
                 symbol: app.chain.meta.chain.symbol,
-              }                
+              };
             }
 
             if (vnode.attrs.joiningChain
                 && !app.user.getRoleInCommunity({ account, chain: vnode.attrs.joiningChain })) {
-              await app.user.createRole({ address: addressInfo, chain: vnode.attrs.joiningChain, isNewChain, newChainInfo });
+              await app.user.createRole({
+                address: addressInfo,
+                chain: vnode.attrs.joiningChain,
+                isNewChain,
+                newChainInfo
+              });
             } else if (vnode.attrs.joiningCommunity
                        && !app.user.getRoleInCommunity({ account, community: vnode.attrs.joiningCommunity })) {
               await app.user.createRole({ address: addressInfo, community: vnode.attrs.joiningCommunity });

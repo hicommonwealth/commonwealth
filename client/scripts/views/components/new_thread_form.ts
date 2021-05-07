@@ -14,6 +14,7 @@ import {
 
 import app from 'state';
 import { initAppState } from 'app';
+import { INewChainInfo } from 'types';
 
 import { detectURL } from 'helpers/threads';
 import { OffchainTopic, OffchainThreadKind, OffchainThreadStage, CommunityInfo, NodeInfo } from 'models';
@@ -25,10 +26,10 @@ import QuillEditor from 'views/components/quill_editor';
 import TopicSelector from 'views/components/topic_selector';
 import EditProfileModal from 'views/modals/edit_profile_modal';
 
+import Token from 'controllers/chain/ethereum/token/adapter';
 import QuillFormattedText from './quill_formatted_text';
 import MarkdownFormattedText from './markdown_formatted_text';
 
-import Token from 'controllers/chain/ethereum/token/adapter';
 
 interface IThreadForm {
   topicName?: string;
@@ -162,22 +163,22 @@ const newThread = async (
     }
   });
 
-  const isNewChain = !chains[chainId] && (app.chain as Token).isToken 
+  const isNewChain = !chains[chainId] && (app.chain as Token).isToken
   && (app.chain as Token).isUncreated;
 
   let result;
-  try {    
+  try {
     // see if app.chain.network is existing in network lists and if app.chain.isToken
 
-    let newChainInfo = null
-    if(isNewChain) {
+    let newChainInfo: INewChainInfo;
+    if (isNewChain) {
       newChainInfo = {
         address: app.chain.id,
         iconUrl: app.chain.meta.chain.iconUrl,
         name: app.chain.meta.chain.name,
         symbol: app.chain.meta.chain.symbol,
-      }
-      topicName = "General"
+      };
+      topicName = 'General';
     }
 
     result = await app.threads.create(
@@ -210,16 +211,14 @@ const newThread = async (
     : (activeEntity.meta as NodeInfo).chain, true);
 
   await app.user.notifications.refresh();
-  if(isNewChain) {
+  if (isNewChain) {
     await initAppState(false);
   }
 
   m.route.set(`/${
-    isNewChain 
-    ?
-    filteredName
-    :
-    app.activeId()
+    isNewChain
+      ?      filteredName
+      :    app.activeId()
   }/proposal/discussion/${result.id}`);
 
 

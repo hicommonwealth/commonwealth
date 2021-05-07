@@ -1,8 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import Sequelize from 'sequelize';
 import crypto from 'crypto';
+import TokenBalanceCache from '../util/tokenBalanceCache';
+import { createChainForAddress } from '../util/createTokenChain';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
-import { getTokensFromListsInternal } from './getTokensFromLists';
 
 const { Op } = Sequelize;
 
@@ -15,56 +16,13 @@ export const Errors = {
   InvalidChain: 'Invalid chain',
 };
 
-const checkNewChainInfoWithTokenList = async (newChainInfo) => {
-  const tokens = await getTokensFromListsInternal()
-  if( !newChainInfo.iconUrl ) throw new Error("Missing iconUrl");
-  if( !newChainInfo.symbol ) throw new Error("Missing symbol");
-  if( !newChainInfo.name ) throw new Error("Missing name");
-  if( !newChainInfo.address ) throw new Error("Missing address");
-
-  let token = tokens.find(o=> o.name == newChainInfo.name && 
-    o.symbol == newChainInfo.symbol &&
-    o.address == newChainInfo.address)
-  return token;
-}
-
-const createChainForAddress = async (models, newChainInfoString) => {
-  try {
-    const newChainInfo = JSON.parse(newChainInfoString)
-    const foundInList = await checkNewChainInfoWithTokenList(newChainInfo);
-    if(!foundInList) {
-      throw new Error("New chain not found in token list")
-    }
-    
-    const createdId = newChainInfo.name.toLowerCase().trim().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
-    
-    const chainContent = {
-      id: createdId,
-      active: true,
-      network: createdId,
-      type: "token",
-      icon_url: newChainInfo.iconUrl,
-      symbol: newChainInfo.symbol, 
-      name: newChainInfo.name,
-      default_chain: 'ethereum',
-      base: 'ethereum',
-    };
-
-    const chainNodeContent = {
-      chain: createdId,
-      url: "wss://mainnet.infura.io/ws",
-      address: newChainInfo.address
-    }
-    const chain = await models.Chain.create(chainContent);
-    await models.ChainNode.create(chainNodeContent);
-
-    return [chain, null, null]
-  } catch(e) {
-    return [null, null, e]
-  }
-}
-
-const linkExistingAddressToChain = async (models, req: Request, res: Response, next: NextFunction) => {
+const linkExistingAddressToChain = async (
+  models,
+  tokenBalanceCache: TokenBalanceCache,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.body.address) {
     return next(new Error(Errors.NeedAddress));
   }
@@ -78,16 +36,16 @@ const linkExistingAddressToChain = async (models, req: Request, res: Response, n
     return next(new Error(Errors.NeedLoggedIn));
   }
 
-  let chain, community, error;
-  if(req.body.isNewChain) {
-    [chain, community, error] = await createChainForAddress(models, req.body.newChainInfo)
-  } 
+  let chain, error;
+  if (req.body.isNewChain && req.body.newChainInfo) {
+    [chain, error] = await createChainForAddress(models, tokenBalanceCache, req.body.newChainInfo);
+  }
 
   if (!chain) {
     await models.Chain.findOne({
       where: { id: req.body.chain }
     });
-  } 
+  }
 
   const userId = req.user.id;
 
@@ -137,7 +95,8 @@ const linkExistingAddressToChain = async (models, req: Request, res: Response, n
     let addressId;
     if (existingAddress) {
       // refer edge case 2)
-      // either if the existing address is owned by someone else or this user, we can just update with userId. this covers both edge case (1) & (2)
+      // either if the existing address is owned by someone else or this user,
+      //   we can just update with userId. this covers both edge case (1) & (2)
       const updatedObj = await models.Address.updateWithTokenProvided(
         existingAddress,
         userId,
@@ -167,7 +126,12 @@ const linkExistingAddressToChain = async (models, req: Request, res: Response, n
     });
 
     const role = await models.Role.findOne({
-      where: { address_id: addressId, ...(req.body.community ? { offchain_community_id: req.body.community } : { chain_id: req.body.chain }) }
+      where: {
+        address_id: addressId,
+        ...(req.body.community
+          ? { offchain_community_id: req.body.community }
+          : { chain_id: req.body.chain }),
+      }
     });
 
     if (!role) {

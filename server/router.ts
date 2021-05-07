@@ -132,7 +132,11 @@ function setupRouter(
   router.post('/verifyAddress', verifyAddress.bind(this, models));
   // TODO: Change to DELETE /address
   router.post('/deleteAddress', passport.authenticate('jwt', { session: false }), deleteAddress.bind(this, models));
-  router.post('/linkExistingAddressToChain', linkExistingAddressToChain.bind(this, models));
+  router.post(
+    '/linkExistingAddressToChain',
+    passport.authenticate('jwt', { session: false }),
+    linkExistingAddressToChain.bind(this, models, tokenBalanceCache),
+  );
   router.post('/getAddressStatus', getAddressStatus.bind(this, models));
   // TODO: Change to PUT /node
   router.post('/selectNode', passport.authenticate('jwt', { session: false }), selectNode.bind(this, models));
@@ -158,7 +162,7 @@ function setupRouter(
   // TODO: Change to PUT /community
   router.post('/updateCommunity', passport.authenticate('jwt', { session: false }), updateCommunity.bind(this, models));
   router.get('/communityStats', passport.authenticate('jwt', { session: false }), communityStats.bind(this, models));
-  router.get('/getTokensFromLists', getTokensFromLists.bind(this, models));
+  router.get('/getTokensFromLists', getTokensFromLists.bind(this, models, tokenBalanceCache));
   // offchain threads
   // TODO: Change to POST /thread
   router.post(
@@ -299,7 +303,11 @@ function setupRouter(
 
   // roles
   // TODO: Change to POST /role
-  router.post('/createRole', passport.authenticate('jwt', { session: false }), createRole.bind(this, models));
+  router.post(
+    '/createRole',
+    passport.authenticate('jwt', { session: false }),
+    createRole.bind(this, models, tokenBalanceCache),
+  );
   // TODO: Change to DELETE /role
   router.post('/deleteRole', passport.authenticate('jwt', { session: false }), deleteRole.bind(this, models));
   // TODO: Change to PUT /role

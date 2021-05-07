@@ -3,7 +3,7 @@ import { Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { NotificationCategories } from '../../shared/types';
 import TokenBalanceCache from '../util/tokenBalanceCache';
-import { getTokensFromListsInternal } from './getTokensFromLists';
+import { createChainForAddress } from '../util/createTokenChain';
 
 export const Errors = {
   InvalidChainComm: 'Invalid chain or community',
@@ -12,64 +12,16 @@ export const Errors = {
   RoleAlreadyExists: 'Role already exists',
 };
 
-const checkNewChainInfoWithTokenList = async (newChainInfo) => {
-  const tokens = await getTokensFromListsInternal()
-  if( !newChainInfo.iconUrl ) throw new Error("Missing iconUrl");
-  if( !newChainInfo.symbol ) throw new Error("Missing symbol");
-  if( !newChainInfo.name ) throw new Error("Missing name");
-  if( !newChainInfo.address ) throw new Error("Missing address");
-
-  let token = tokens.find(o=> o.name == newChainInfo.name && 
-    o.symbol == newChainInfo.symbol &&
-    o.address == newChainInfo.address)
-  return token;
-}
-
-const createChainForAddress = async (models, newChainInfo) => {
-  try {
-    const foundInList = await checkNewChainInfoWithTokenList(newChainInfo);
-    if(!foundInList) {
-      throw new Error("New chain not found in token list")
-    }
-    
-    const createdId = newChainInfo.name.toLowerCase().trim().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
-    
-    const chainContent = {
-      id: createdId,
-      active: true,
-      network: createdId,
-      type: "token",
-      icon_url: newChainInfo.iconUrl,
-      symbol: newChainInfo.symbol, 
-      name: newChainInfo.name,
-      default_chain: 'ethereum',
-      base: 'ethereum',
-    };
-
-    const chainNodeContent = {
-      chain: createdId,
-      url: "wss://mainnet.infura.io/ws",
-      address: newChainInfo.address
-    }
-    const chain = await models.Chain.create(chainContent);
-    await models.ChainNode.create(chainNodeContent);
-
-    return [chain, null, null]
-  } catch(e) {
-    return [null, null, e]
-  }
-}
-
-const createRole = async (models, req, res: Response, next: NextFunction) => {
+const createRole = async (
+  models,
+  tokenBalanceCache: TokenBalanceCache,
+  req,
+  res: Response,
+  next: NextFunction
+) => {
   let chain, community, error;
-  if (req.body.isNewChain) {
-    const newChain = {
-      address: req.body[`newChainInfo[address]`],
-      iconUrl: req.body[`newChainInfo[iconUrl]`],
-      name: req.body[`newChainInfo[name]`],
-      symbol: req.body[`newChainInfo[symbol]`],
-    };
-    [chain, community, error] = await createChainForAddress(models, newChain)
+  if (req.body.isNewChain && req.body.newChainInfo) {
+    [chain, error] = await createChainForAddress(models, tokenBalanceCache, req.body.newChainInfo);
   } else {
     [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   }
