@@ -276,11 +276,14 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
 
             if (vnode.attrs.joiningChain
                 && !app.user.getRoleInCommunity({ account, chain: vnode.attrs.joiningChain })) {
-              await app.user.createRole({
+              await app.user.createRole(isNewChain ? {
                 address: addressInfo,
                 chain: vnode.attrs.joiningChain,
                 isNewChain,
                 newChainInfo
+              } : {
+                address: addressInfo,
+                chain: vnode.attrs.joiningChain,
               });
             } else if (vnode.attrs.joiningCommunity
                        && !app.user.getRoleInCommunity({ account, community: vnode.attrs.joiningCommunity })) {

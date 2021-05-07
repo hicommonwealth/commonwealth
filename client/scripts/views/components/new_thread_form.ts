@@ -194,7 +194,7 @@ const newThread = async (
       url,
       attachments,
       readOnly,
-      isNewChain,
+      isNewChain || undefined,
       newChainInfo
     );
   } catch (e) {
