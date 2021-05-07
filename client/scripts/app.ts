@@ -624,6 +624,7 @@ $(() => {
     '/:scope/discussions/:topic': importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
     '/:scope/search':            importRoute('views/pages/search', { scoped: true, deferChain: true }),
     '/:scope/members':           importRoute('views/pages/members', { scoped: true, deferChain: true }),
+    '/:scope/snapshot-proposals': importRoute('views/pages/snapshot_proposals', { scoped: true, deferChain: true }),
     '/:scope/chat':              importRoute('views/pages/chat', { scoped: true, deferChain: true }),
     '/:scope/referenda':         importRoute('views/pages/referenda', { scoped: true }),
     '/:scope/proposals':         importRoute('views/pages/proposals', { scoped: true }),
