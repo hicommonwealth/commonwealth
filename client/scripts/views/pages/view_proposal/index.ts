@@ -170,7 +170,7 @@ const ProposalHeader: m.Component<{
                   m(ThreadSubscriptionMenuItem, { proposal: proposal as OffchainThread }),
                 ],
                 inline: true,
-                trigger: m(Icon, { name: Icons.EDIT_3 }),
+                trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
               }),
               m('.CommentSocialHeader', [ m(SocialSharingCarat)]),
               // This is the new social carat menu
