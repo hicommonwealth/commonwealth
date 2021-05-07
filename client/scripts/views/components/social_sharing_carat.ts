@@ -17,9 +17,9 @@ export const SocialSharingCarat: m.Component<{
             label: 'Copy URL',
             onclick: async (e) => {
               if (vnode.attrs.commentID == null) {
-                await navigator.clipboard.writeText(`https://commonwealth.im${  m.route.get()}`);
+                await navigator.clipboard.writeText(`https://commonwealth.im${m.route.get()}`);
               } else {
-                await navigator.clipboard.writeText(`https://commonwealth.im${  m.route.get()}?comment=${vnode.attrs.commentID}`);
+                await navigator.clipboard.writeText(`https://commonwealth.im${m.route.get()}?comment=${vnode.attrs.commentID}`);
               }
             },
           }), m(MenuItem, {
@@ -27,9 +27,9 @@ export const SocialSharingCarat: m.Component<{
             label: 'Share on Twitter',
             onclick: async (e) => {
               if (vnode.attrs.commentID == null) {
-                await window.open(`https://twitter.com/intent/tweet?text=https://commonwealth.im${  m.route.get()}`, '_blank');
+                await window.open(`https://twitter.com/intent/tweet?text=https://commonwealth.im${m.route.get()}`, '_blank');
               } else {
-                await window.open(`https://twitter.com/intent/tweet?text=https://commonwealth.im${  m.route.get()}?comment=${vnode.attrs.commentID}`, '_blank');
+                await window.open(`https://twitter.com/intent/tweet?text=https://commonwealth.im${m.route.get()}?comment=${vnode.attrs.commentID}`, '_blank');
               }
             }
           })
