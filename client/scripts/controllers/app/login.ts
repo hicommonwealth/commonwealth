@@ -44,6 +44,7 @@ export function linkExistingAddressToChainOrCommunity(
   isNewChain?: boolean,
   newChainInfo?: INewChainInfo,
 ) {
+  console.log(isNewChain, newChainInfo);
   return $.post(`${app.serverUrl()}/linkExistingAddressToChain`, {
     'address': address,
     'chain': chain,

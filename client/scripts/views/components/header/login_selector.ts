@@ -196,6 +196,7 @@ const LoginSelector: m.Component<{
                 if (res && res.result) {
                   const { verification_token, addressId, addresses } = res.result;
                   app.user.setAddresses(addresses.map((a) => {
+                    console.log(a);
                     return new AddressInfo(a.id, a.address, a.chain, a.keytype, a.is_magic);
                   }));
                   const addressInfo = app.user.addresses.find((a) => a.address === address && a.chain === targetChain);

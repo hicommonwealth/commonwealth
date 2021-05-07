@@ -4,6 +4,10 @@ import crypto from 'crypto';
 import TokenBalanceCache from '../util/tokenBalanceCache';
 import { createChainForAddress } from '../util/createTokenChain';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
+import { INewChainInfo } from '../../shared/types';
+
+import { factory, formatFilename } from '../../shared/logging';
+const log = factory.getLogger(formatFilename(__filename));
 
 const { Op } = Sequelize;
 
@@ -37,8 +41,14 @@ const linkExistingAddressToChain = async (
   }
 
   let chain, error;
-  if (req.body.isNewChain && req.body.newChainInfo) {
-    [chain, error] = await createChainForAddress(models, tokenBalanceCache, req.body.newChainInfo);
+  if (req.body.isNewChain) {
+    const newChainInfo: INewChainInfo = {
+      address: req.body['newChainInfo[address]'],
+      iconUrl: req.body['newChainInfo[iconUrl]'],
+      name: req.body['newChainInfo[name]'],
+      symbol: req.body['newChainInfo[symbol]'],
+    };
+    [chain, error] = await createChainForAddress(models, tokenBalanceCache, newChainInfo);
   }
 
   if (!chain) {
@@ -151,11 +161,11 @@ const linkExistingAddressToChain = async (
       result: {
         verification_token: verificationToken,
         addressId,
-        addresses: ownedAddresses
+        addresses: ownedAddresses.map((a) => a.toJSON()),
       }
     });
   } catch (e) {
-    console.log(e);
+    log.error(e.message);
     return next(e);
   }
 };

@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 import { Request, Response, NextFunction } from 'express';
-import { NotificationCategories, ProposalType } from '../../shared/types';
+import { NotificationCategories, ProposalType, INewChainInfo } from '../../shared/types';
 
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
@@ -9,8 +9,8 @@ import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
 import { parseUserMentions } from '../util/parseUserMentions';
 import TokenBalanceCache from '../util/tokenBalanceCache';
 import { createChainForThread } from '../util/createTokenChain';
-import { factory, formatFilename } from '../../shared/logging';
 
+import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
@@ -31,8 +31,14 @@ const createThread = async (
   next: NextFunction
 ) => {
   let chain, community, error;
-  if (req.body.isNewChain && req.body.newChainInfo) {
-    [chain, error] = await createChainForThread(models, tokenBalanceCache, req.body.newChainInfo);
+  if (req.body.isNewChain) {
+    const newChainInfo: INewChainInfo = {
+      address: req.body['newChainInfo[address]'],
+      iconUrl: req.body['newChainInfo[iconUrl]'],
+      name: req.body['newChainInfo[name]'],
+      symbol: req.body['newChainInfo[symbol]'],
+    };
+    [chain, error] = await createChainForThread(models, tokenBalanceCache, newChainInfo);
   } else {
     [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   }

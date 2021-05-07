@@ -1,7 +1,7 @@
 import Sequelize from 'sequelize';
 import { Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
-import { NotificationCategories } from '../../shared/types';
+import { NotificationCategories, INewChainInfo } from '../../shared/types';
 import TokenBalanceCache from '../util/tokenBalanceCache';
 import { createChainForAddress } from '../util/createTokenChain';
 
@@ -20,8 +20,14 @@ const createRole = async (
   next: NextFunction
 ) => {
   let chain, community, error;
-  if (req.body.isNewChain && req.body.newChainInfo) {
-    [chain, error] = await createChainForAddress(models, tokenBalanceCache, req.body.newChainInfo);
+  if (req.body.isNewChain) {
+    const newChainInfo: INewChainInfo = {
+      address: req.body['newChainInfo[address]'],
+      iconUrl: req.body['newChainInfo[iconUrl]'],
+      name: req.body['newChainInfo[name]'],
+      symbol: req.body['newChainInfo[symbol]'],
+    };
+    [chain, error] = await createChainForAddress(models, tokenBalanceCache, newChainInfo);
   } else {
     [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   }
