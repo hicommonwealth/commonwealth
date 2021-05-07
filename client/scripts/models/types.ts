@@ -49,7 +49,6 @@ export function baseToNetwork(n: ChainBase): ChainNetwork {
     case ChainBase.Substrate: return ChainNetwork.Edgeware;
     case ChainBase.Ethereum: return ChainNetwork.Ethereum;
     case ChainBase.NEAR: return ChainNetwork.NEAR;
-    case ChainBase.Ethereum: return ChainNetwork.Ethereum;
     default: return null;
   }
 }

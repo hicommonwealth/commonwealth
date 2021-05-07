@@ -163,13 +163,13 @@ const newThread = async (
     }
   });
 
-  const isNewChain = !chains[chainId] && (app.chain as Token).isToken
-  && (app.chain as Token).isUncreated;
+  const isNewChain = !chains[chainId]
+    && (app.chain as Token).isToken
+    && (app.chain as Token).isUncreated;
 
   let result;
   try {
     // see if app.chain.network is existing in network lists and if app.chain.isToken
-
     let newChainInfo: INewChainInfo;
     if (isNewChain) {
       newChainInfo = {

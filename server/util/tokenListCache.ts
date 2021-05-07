@@ -1,19 +1,11 @@
 import fetch from 'node-fetch';
 import _ from 'underscore';
 
+import { TokenResponse } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 const TWENTY_FOUR_HOURS = 86400000;
-
-export type TokenResponse = {
-  chainId: number;
-  address: string;
-  name: string;
-  symbol: string;
-  decimals: number;
-  logoURI?: string;
-};
 
 class TokenListCache {
   private _lastTimeHit = 0;

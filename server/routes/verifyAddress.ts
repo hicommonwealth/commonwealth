@@ -26,7 +26,7 @@ const verifyAddress = async (models, req: Request, res: Response, next: NextFunc
   if (!req.body.signature) {
     return next(new Error(Errors.NoSignature));
   }
-  const chainName = req.body.chain.startsWith("0x") ? "ethereum" : req.body.chain;
+  const chainName = req.body.chain.startsWith('0x') ? 'ethereum' : req.body.chain;
 
   const chain = await models.Chain.findOne({
     where: { id: chainName }

@@ -9,7 +9,6 @@ import { EventEmitter } from 'events';
 import { getToastStore, ToastStore } from 'controllers/app/toasts';
 import { getModalStore, ModalStore } from 'controllers/app/modals';
 import RecentActivityController from './controllers/app/recent_activity';
-import TokensController from './controllers/app/tokens';
 import ProfilesController from './controllers/server/profiles';
 import CommentsController from './controllers/server/comments';
 import ThreadsController from './controllers/server/threads';
@@ -53,7 +52,6 @@ export interface IApp {
   topics: TopicsController;
   communities: CommunitiesController;
   user: UserController;
-  tokens: TokensController;
   wallets: WebWalletController;
 
   recentActivity: RecentActivityController;
@@ -118,7 +116,6 @@ const app: IApp = {
   topics: new TopicsController(),
   communities: new CommunitiesController(),
   user: new UserController(),
-  tokens: new TokensController(),
   wallets: new WebWalletController(),
 
   recentActivity: new RecentActivityController(),

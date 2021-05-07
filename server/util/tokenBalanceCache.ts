@@ -6,9 +6,10 @@ import { providers } from 'ethers';
 import { INFURA_API_KEY } from '../config';
 import { Erc20Factory } from '../../eth/types/Erc20Factory';
 import { Erc20 } from '../../eth/types/Erc20';
+import { TokenResponse } from '../../shared/types';
 
 import JobRunner from './cacheJobRunner';
-import TokenListCache, { TokenResponse } from './tokenListCache';
+import TokenListCache from './tokenListCache';
 import { tokenNameToId } from './createTokenChain';
 
 import { factory, formatFilename } from '../../shared/logging';

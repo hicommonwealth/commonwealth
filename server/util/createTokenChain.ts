@@ -1,7 +1,6 @@
-import { INewChainInfo } from '../../shared/types';
+import { INewChainInfo, TokenResponse } from '../../shared/types';
 import { ChainInstance } from '../models/chain';
 import TokenBalanceCache from './tokenBalanceCache';
-import { TokenResponse } from './tokenListCache';
 
 export function tokenNameToId(name: string): string {
   return name.toLowerCase().trim().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
