@@ -40,7 +40,7 @@ export default class MarlinHolder extends EthereumAccount {
     super(app, ChainInfo, Accounts, address);
     this._Holders = Holders;
     if (data) {
-      if (address.toLowerCase() !== data.id.toLowerCase()) {
+      if (address !== data.id) {
         throw new Error('Holder does not correspond with account');
       }
       this._isHolder = true;
