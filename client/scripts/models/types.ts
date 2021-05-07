@@ -38,7 +38,9 @@ export enum ChainNetwork {
   ALEX = 'alex',
   Commonwealth = 'commonwealth',
   Clover = 'clover',
-  HydraDX = 'hydradx'
+  HydraDX = 'hydradx',
+  Yearn = 'yearn',
+  Fei = 'fei'
 }
 
 // This function returns a default chain for a chainbase
@@ -86,6 +88,8 @@ export function networkToBase(n: ChainNetwork | string): ChainBase {
     case ChainNetwork.ALEX: return ChainBase.Ethereum;
     case ChainNetwork.Marlin: return ChainBase.Ethereum;
     case ChainNetwork.MarlinTestnet: return ChainBase.Ethereum;
+    case ChainNetwork.Yearn: return ChainBase.Ethereum;
+    case ChainNetwork.Fei: return ChainBase.Ethereum;
     default: return null;
   }
 }
@@ -114,6 +118,8 @@ export enum ChainClass {
   MarlinTestnet = 'marlin-testnet',
   ALEX = 'alex',
   Commonwealth = 'commonwealth',
+  Yearn = 'yearn',
+  Fei = 'fei',
 }
 
 // TODO: this is inconsistently used
