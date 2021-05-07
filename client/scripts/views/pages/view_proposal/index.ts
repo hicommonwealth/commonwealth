@@ -350,15 +350,8 @@ const ProposalComment: m.Component<{
               trigger: m(Icon, { name: Icons.CHEVRON_DOWN })
             })
           ],
-          m(PopoverMenu, {
-            closeOnContentClick: true,
-            content: [
-              m(SocialSharingCarat, {
-                commentID: comment.id,
-              })
-            ],
-            transitionDuration: 0,
-            trigger: m(Icon, { name: Icons.SHARE_2 })
+          m(SocialSharingCarat, {
+            commentID: comment.id,
           })
 
           // For now, we are limiting threading to 1 level deep
