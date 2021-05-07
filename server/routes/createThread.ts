@@ -7,9 +7,10 @@ import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUs
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
 import { parseUserMentions } from '../util/parseUserMentions';
-import TokenBalanceCache from '../util/tokenBalanceCache';
+import TokenBalanceCache, { tokenNameToId } from '../util/tokenBalanceCache';
 import { factory, formatFilename } from '../../shared/logging';
 import { getTokensFromListsInternal } from './getTokensFromLists';
+import { ChainInstance } from '../models/chain';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -20,39 +21,42 @@ export const Errors = {
   NoBodyOrAttachments: 'Forum posts must include body or attachment',
   LinkMissingTitleOrUrl: 'Links must include a title and URL',
   UnsupportedKind: 'Only forum threads, questions, and requests supported',
-  InsufficientTokenBalance: `Users need to hold some of the community's tokens to post`,
+  InsufficientTokenBalance: 'Users need to hold some of the community\'s tokens to post',
 };
 
 const checkNewChainInfoWithTokenList = async (newChainInfo) => {
-  const tokens = await getTokensFromListsInternal()
-  if( !newChainInfo.iconUrl ) throw new Error("Missing iconUrl");
-  if( !newChainInfo.symbol ) throw new Error("Missing symbol");
-  if( !newChainInfo.name ) throw new Error("Missing name");
-  if( !newChainInfo.address ) throw new Error("Missing address");
+  const tokens = await getTokensFromListsInternal();
+  if (!newChainInfo.iconUrl) throw new Error('Missing iconUrl');
+  if (!newChainInfo.symbol) throw new Error('Missing symbol');
+  if (!newChainInfo.name) throw new Error('Missing name');
+  if (!newChainInfo.address) throw new Error('Missing address');
 
-  let token = tokens.find(o=> o.name == newChainInfo.name && 
-    o.symbol == newChainInfo.symbol &&
-    o.address == newChainInfo.address)
+  const token = tokens.find((o) => o.name === newChainInfo.name
+    && o.symbol === newChainInfo.symbol
+    && o.address === newChainInfo.address);
   return token;
-}
+};
 
-const createChainForThread = async (models, newChainInfoString) => {
+const createChainForThread = async (
+  models,
+  newChainInfoString: string
+): Promise<[ChainInstance | null, Error | null]> => {
   try {
-    const newChainInfo = JSON.parse(newChainInfoString)
-    const foundInList = checkNewChainInfoWithTokenList(newChainInfo)
-    if(!foundInList) {
-      throw new Error("New chain not found in token list")
+    const newChainInfo = JSON.parse(newChainInfoString);
+    const foundInList = checkNewChainInfoWithTokenList(newChainInfo);
+    if (!foundInList) {
+      throw new Error('New chain not found in token list');
     }
-    
-    const createdId = newChainInfo.name.toLowerCase().trim().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
-    
+
+    const createdId = tokenNameToId(newChainInfo.name);
+
     const chainContent = {
       id: createdId,
       active: true,
       network: createdId,
-      type: "token",
+      type: 'token',
       icon_url: newChainInfo.iconUrl,
-      symbol: newChainInfo.symbol, 
+      symbol: newChainInfo.symbol,
       name: newChainInfo.name,
       default_chain: 'ethereum',
       base: 'ethereum',
@@ -60,25 +64,31 @@ const createChainForThread = async (models, newChainInfoString) => {
 
     const chainNodeContent = {
       chain: createdId,
-      url: "wss://mainnet.infura.io/ws",
+      url: 'wss://mainnet.infura.io/ws',
       address: newChainInfo.address
-    }
+    };
     const chain = await models.Chain.create(chainContent);
     await models.ChainNode.create(chainNodeContent);
 
-    return [chain, null, null]
-  } catch(e) {
-    return [null, null, e]
+    return [chain, null];
+  } catch (e) {
+    return [null, e];
   }
-}
-const createThread = async (models, tokenBalanceCache: TokenBalanceCache, req: Request, res: Response, next: NextFunction) => {
+};
+
+const createThread = async (
+  models,
+  tokenBalanceCache: TokenBalanceCache,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   let chain, community, error;
   if (req.body.isNewChain) {
-    [chain, community, error] = await createChainForThread(models, req.body.newChainInfo)
-    chain.topics = []
+    [chain, error] = await createChainForThread(models, req.body.newChainInfo);
   } else {
     [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
-  } 
+  }
 
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
@@ -93,11 +103,8 @@ const createThread = async (models, tokenBalanceCache: TokenBalanceCache, req: R
       },
     });
     if (isAdmin.length === 0) {
-      
-      //TODO, can make sure do this after adding relevant logic to chain-events
-      /*
       const userHasBalance = await tokenBalanceCache.hasToken(chain.id, req.body.address);
-      if (!userHasBalance) return next(new Error(Errors.InsufficientTokenBalance));*/
+      if (!userHasBalance) return next(new Error(Errors.InsufficientTokenBalance));
     }
   }
 
@@ -195,7 +202,7 @@ const createThread = async (models, tokenBalanceCache: TokenBalanceCache, req: R
       return next(err);
     }
   } else {
-    if ((community || chain).topics.length > 0) {
+    if ((community || chain).topics?.length) {
       return next(Error('Must pass a topic_name string and/or a numeric topic_id'));
     }
   }

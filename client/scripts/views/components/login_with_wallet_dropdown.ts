@@ -94,8 +94,12 @@ const LoginWithWalletDropdown: m.Component<{
       } else {
         return wallets.map((w) => createItem(w));
       }
-    });
-    const chainbase = (app.chain?.meta?.chain?.base.length != 0) ? app.chain?.meta?.chain?.base : ChainBase.Ethereum; // Hacky fix for ETH token forums;
+    };
+
+    // Hacky fix for ETH token forums;
+    const chainbase = (app.chain?.meta?.chain?.base.length !== 0)
+      ? app.chain?.meta?.chain?.base
+      : ChainBase.Ethereum;
     const menuItems = (chainbase && CHAINBASE_WITH_CLI.indexOf(chainbase) !== -1)
       ? [
         ...getMenuItemsForChainBase(chainbase),

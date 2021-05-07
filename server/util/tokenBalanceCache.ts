@@ -10,7 +10,7 @@ import { INFURA_API_KEY } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
 import { getTokensFromListsInternal } from '../routes/getTokensFromLists';
 const log = factory.getLogger(formatFilename(__filename));
-const TEST_CONTRACT_ID = "ABC";
+const TEST_CONTRACT_ID = 'ABC';
 
 // map of addresses to balances
 interface CacheT {
@@ -29,6 +29,10 @@ export interface TokenForumMeta {
   api?: Erc20;
 }
 
+export function tokenNameToId(name: string): string {
+  return name.toLowerCase().trim().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
+}
+
 export default class TokenBalanceCache extends JobRunner<CacheT> {
   private _contracts: TokenForumMeta[];
 
@@ -42,13 +46,14 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     const provider = new providers.Web3Provider(web3Provider);
 
     // initialize metadata from database
-    let tokens = await models['Chain'].findAll({
+    const dbTokens = await models['Chain'].findAll({
       where: { type: 'token' },
       include: [ models['ChainNode'] ],
     });
 
     // TODO: support customized balance thresholds
-    tokens = tokens
+    // TODO: support ChainId
+    const tokens: TokenForumMeta[] = dbTokens
       .filter(({ ChainNodes }) => ChainNodes)
       .map(({ ChainNodes }): TokenForumMeta => ({
         id: ChainNodes[0].chain,
@@ -57,16 +62,19 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
       }));
 
     try {
-      let tokensFromLists = await getTokensFromListsInternal();
-      tokensFromLists = tokensFromLists
-        .map((o) => { return {
-          address: o.address,
-          api: Erc20Factory.connect(o.address, provider)
-        }});
-      
-      tokens = tokens.concat(tokensFromLists);  
+      const tokensFromListsResponses = await getTokensFromListsInternal();
+      const tokensFromLists: TokenForumMeta[] = tokensFromListsResponses
+        .map((o) => {
+          return {
+            id: tokenNameToId(o.name),
+            address: o.address,
+            api: Erc20Factory.connect(o.address, provider)
+          };
+        });
+
+      return [...tokens, ...tokensFromLists];
     } catch (e) {
-      console.error("An error occurred trying to access token lists", e.message)
+      log.error('An error occurred trying to access token lists', e.message);
     }
 
     return tokens;
@@ -84,7 +92,7 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
 
     // kick off job
     super.start();
-    log.info(`Started Token Balance Cache with tokens: ${JSON.stringify(this._contracts.map(({ id }) => id))}`);
+    log.info(`Started Token Balance Cache with ${this._contracts.length} tokens.`);
   }
 
   public async reset(tokenMeta: TokenForumMeta[]) {
@@ -99,8 +107,8 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
 
   // query a user's balance on a given token contract and save in cache
   public async hasToken(contractId: string, address: string): Promise<boolean> {
-    if(process.env.NODE_ENV === 'development' && contractId == TEST_CONTRACT_ID) {
-      return true
+    if (process.env.NODE_ENV === 'development' && contractId === TEST_CONTRACT_ID) {
+      return true;
     }
     const tokenMeta = this._contracts.find(({ id }) => id === contractId);
     if (!tokenMeta || !tokenMeta.api) throw new Error('unsupported token');
