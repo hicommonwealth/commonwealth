@@ -176,8 +176,9 @@ const LoginSelector: m.Component<{
                   }
                 });
 
-                const isNewChain = !chains[joiningChain] && (app.chain as Token).isToken
-                && (app.chain as Token).isUncreated;
+                const isNewChain = !chains[joiningChain]
+                  && (app.chain as Token).isToken
+                  && (app.chain as Token).isUncreated;
 
                 let newChainInfo: INewChainInfo;
                 if (isNewChain) {

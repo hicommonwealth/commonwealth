@@ -39,6 +39,7 @@ const linkExistingAddressToChain = async (
   if (!req.user?.id) {
     return next(new Error(Errors.NeedLoggedIn));
   }
+  const userId = req.user.id;
 
   let chain, error;
   if (req.body.isNewChain) {
@@ -52,12 +53,10 @@ const linkExistingAddressToChain = async (
   }
 
   if (!chain) {
-    await models.Chain.findOne({
+    chain = await models.Chain.findOne({
       where: { id: req.body.chain }
     });
   }
-
-  const userId = req.user.id;
 
   if (!chain) {
     return next(new Error(Errors.InvalidChain));
