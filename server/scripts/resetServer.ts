@@ -1368,7 +1368,7 @@ const resetServer = (): Promise<number> => {
           default_chain: 'edgeware',
         }),
         models.OffchainCommunity.create({
-          id: 'common-protocol',
+          id: 'cw-protocol',
           name: 'Commonwealth Protocol',
           creator_id: 1,
           description: 'Commonwealth Protocol helps powers crowdfunding for Commonwealth',
