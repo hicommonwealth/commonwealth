@@ -89,6 +89,9 @@ $discussion-title-font-size: 1.45rem;
                 font-size: $discussion-meta-font-size;
             }
         }
+        .social-right {
+            margin-right: 10px;
+        }
         .proposal-title {
             margin-bottom: 6px;
             .ProposalHeaderTitle {
@@ -215,6 +218,25 @@ $discussion-title-font-size: 1.45rem;
             }
         }
     }
+    
+    .CommentSocialHeader,
+    .ProposalSocialHeader {
+        font-size: $discussion-meta-font-size;
+        display: inline-block;
+        color: $discussion-meta-color;
+        margin-left: 10px;
+        > a:link,
+        > a:visited,
+        a.proposal-collaborators,
+        > .User a.user-display-name {
+            color: $discussion-meta-color;
+            text-decoration: none;
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+
     .ProposalTitleEditor {
         .ProposalTitleSaveEdit {
             font-size: $discussion-meta-font-size;
