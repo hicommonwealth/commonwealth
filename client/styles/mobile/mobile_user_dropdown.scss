@@ -9,12 +9,17 @@
     .cui-menu-divider {
         margin: 12px 0 14px;
     }
-    .LoginSelectorMenu .cui-menu-divider,
-    .NewProposalMenu .cui-menu-divider {
-        display: none;
-    }
+    // .LoginSelectorMenu .cui-menu-divider,
+    // .NewProposalMenu .cui-menu-divider {
+    //     display: none;
+    // }
     span {
         color: black;
         font-size: 18px;
+    }
+    .LoginSelectorMenu {
+        .cui-icon {
+            display: inline-flex;
+        }
     }
 }

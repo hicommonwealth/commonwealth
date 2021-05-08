@@ -21,7 +21,7 @@ const MobileUserDropdown: m.Component<{}, { open: boolean }> = {
     const nAccountsWithoutRole = activeAccountsByRole.filter(([account, role], index) => !role).length;
 
     return m(Menu, { class: 'MobileUserDropdown' }, [
-      m('.NewProposalMenu', getNewProposalMenu()),
+      m('.NewProposalMenu', getNewProposalMenu([], true)),
       m(MenuDivider),
       m(LoginSelectorMenuLeft, {
         activeAddressesWithRole, nAccountsWithoutRole, isPrivateCommunity

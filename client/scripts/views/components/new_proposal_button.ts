@@ -12,7 +12,7 @@ import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import Substrate from 'controllers/chain/substrate/main';
 import Token from 'controllers/chain/ethereum/token/adapter';
 
-export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]>) => {
+export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]>, mobile?: boolean) => {
   const activeAccount = app.user.activeAccount;
   return [
     m(MenuItem, {
@@ -20,6 +20,7 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
       label: 'New thread',
     }),
     (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
+      && !mobile
       && m(MenuDivider),
     app.chain?.base === ChainBase.CosmosSDK && m(MenuItem, {
       onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {

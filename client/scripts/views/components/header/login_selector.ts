@@ -30,6 +30,7 @@ import ManageCommunityModal from 'views/modals/manage_community_modal';
 import Token from 'controllers/chain/ethereum/token/adapter';
 import { linkExistingAddressToChainOrCommunity, setActiveAccount } from 'controllers/app/login';
 import { networkToBase } from 'models/types';
+import { NotificationsIcon } from '../../mobile/mobile_icons';
 
 export const CHAINBASE_SHORT = {
   [ChainBase.CosmosSDK]: 'Cosmos',
@@ -151,6 +152,7 @@ export const LoginSelectorMenuLeft: m.Component<{
             }
           },
           label: 'View profile',
+          iconLeft: Icons.EYE,
         }),
         activeAddressesWithRole.length > 0 && app.activeId() && m(MenuItem, {
           onclick: (e) => {
@@ -164,6 +166,7 @@ export const LoginSelectorMenuLeft: m.Component<{
             });
           },
           label: 'Edit profile',
+          iconLeft: Icons.PEN_TOOL
         }),
         !isPrivateCommunity && m(MenuItem, {
           onclick: () => app.modals.create({
@@ -184,18 +187,21 @@ export const LoginSelectorMenuRight: m.Component<{}> = {
         onclick: () => (app.activeChainId() || app.activeCommunityId())
           ? m.route.set(`/${app.activeChainId() || app.activeCommunityId()}/notifications`)
           : m.route.set('/notifications'),
-        label: 'Notification settings'
+        label: 'Notification settings',
+        iconLeft: Icons.BELL,
       }),
       m(MenuItem, {
         onclick: () => app.activeChainId()
           ? m.route.set(`/${app.activeChainId()}/settings`)
           : m.route.set('/settings'),
-        label: 'Account settings'
+        label: 'Account settings',
+        iconLeft: Icons.USER
       }),
       m(MenuDivider),
       m(MenuItem, {
         onclick: () => app.modals.create({ modal: FeedbackModal }),
         label: 'Send feedback',
+        iconLeft: Icons.MESSAGE_SQUARE
       }),
       m(MenuItem, {
         onclick: () => {
@@ -209,7 +215,8 @@ export const LoginSelectorMenuRight: m.Component<{}> = {
           });
           mixpanel.reset();
         },
-        label: 'Logout'
+        label: 'Logout',
+        iconLeft: Icons.LOG_OUT
       }),
     ]);
   }
