@@ -108,6 +108,113 @@ export const CurrentCommunityLabel: m.Component<{}> = {
   }
 };
 
+export const LoginSelectorMenuLeft: m.Component<{
+  activeAddressesWithRole: any,
+  nAccountsWithoutRole: number,
+  isPrivateCommunity: boolean,
+}> = {
+  view: (vnode) => {
+    const { activeAddressesWithRole, nAccountsWithoutRole, isPrivateCommunity } = vnode.attrs;
+    return m(Menu, { class: 'LoginSelectorMenu' }, [
+      // address list
+      (app.chain || app.community) && [
+        activeAddressesWithRole.map((account) => m(MenuItem, {
+          class: 'switch-user',
+          align: 'left',
+          basic: true,
+          onclick: async (e) => {
+            const currentActive = app.user.activeAccount;
+            await setActiveAccount(account);
+            m.redraw();
+          },
+          label: [
+            m(UserBlock, {
+              user: account,
+              selected: isSameAccount(account, app.user.activeAccount),
+              showRole: true,
+              compact: true
+            }),
+            // !account.profile?.name && m('.edit-profile-callout', [
+            //   'Set a display name'
+            // ]),
+          ],
+        })),
+        activeAddressesWithRole.length > 0 && m(MenuDivider),
+        activeAddressesWithRole.length > 0 && app.activeId() && m(MenuItem, {
+          onclick: () => {
+            const pf = app.user.activeAccount.profile;
+            if (app.chain) {
+              m.route.set(`/${app.activeId()}/account/${pf.address}`);
+            } else if (app.community) {
+              const a = app.user.activeAccount;
+              m.route.set(`/${app.activeId()}/account/${pf.address}?base=${pf.chain || a.chain.id}`);
+            }
+          },
+          label: 'View profile',
+        }),
+        activeAddressesWithRole.length > 0 && app.activeId() && m(MenuItem, {
+          onclick: (e) => {
+            e.preventDefault();
+            app.modals.create({
+              modal: EditProfileModal,
+              data: {
+                account: app.user.activeAccount,
+                refreshCallback: () => m.redraw(),
+              },
+            });
+          },
+          label: 'Edit profile',
+        }),
+        !isPrivateCommunity && m(MenuItem, {
+          onclick: () => app.modals.create({
+            modal: SelectAddressModal,
+          }),
+          label: nAccountsWithoutRole > 0 ? `${pluralize(nAccountsWithoutRole, 'other address')}...`
+            : activeAddressesWithRole.length > 0 ? 'Manage addresses' : 'Connect a new address',
+        }),
+      ],
+    ]);
+  }
+};
+
+export const LoginSelectorMenuRight: m.Component<{}> = {
+  view: (vnode) => {
+    return m(Menu, { class: 'LoginSelectorMenu' }, [
+      m(MenuItem, {
+        onclick: () => (app.activeChainId() || app.activeCommunityId())
+          ? m.route.set(`/${app.activeChainId() || app.activeCommunityId()}/notifications`)
+          : m.route.set('/notifications'),
+        label: 'Notification settings'
+      }),
+      m(MenuItem, {
+        onclick: () => app.activeChainId()
+          ? m.route.set(`/${app.activeChainId()}/settings`)
+          : m.route.set('/settings'),
+        label: 'Account settings'
+      }),
+      m(MenuDivider),
+      m(MenuItem, {
+        onclick: () => app.modals.create({ modal: FeedbackModal }),
+        label: 'Send feedback',
+      }),
+      m(MenuItem, {
+        onclick: () => {
+          $.get(`${app.serverUrl()}/logout`).then(async () => {
+            await initAppState();
+            notifySuccess('Logged out');
+            m.redraw();
+          }).catch((err) => {
+            // eslint-disable-next-line no-restricted-globals
+            location.reload();
+          });
+          mixpanel.reset();
+        },
+        label: 'Logout'
+      }),
+    ]);
+  }
+};
+
 const LoginSelector: m.Component<{
   small?: boolean
 }, {
@@ -234,65 +341,9 @@ const LoginSelector: m.Component<{
             })
           ],
         }),
-        content: m(Menu, { class: 'LoginSelectorMenu' }, [
-          // address list
-          (app.chain || app.community) && [
-            activeAddressesWithRole.map((account) => m(MenuItem, {
-              class: 'switch-user',
-              align: 'left',
-              basic: true,
-              onclick: async (e) => {
-                const currentActive = app.user.activeAccount;
-                await setActiveAccount(account);
-                m.redraw();
-              },
-              label: [
-                m(UserBlock, {
-                  user: account,
-                  selected: isSameAccount(account, app.user.activeAccount),
-                  showRole: true,
-                  compact: true
-                }),
-                // !account.profile?.name && m('.edit-profile-callout', [
-                //   'Set a display name'
-                // ]),
-              ],
-            })),
-            activeAddressesWithRole.length > 0 && m(MenuDivider),
-            activeAddressesWithRole.length > 0 && app.activeId() && m(MenuItem, {
-              onclick: () => {
-                const pf = app.user.activeAccount.profile;
-                if (app.chain) {
-                  m.route.set(`/${app.activeId()}/account/${pf.address}`);
-                } else if (app.community) {
-                  const a = app.user.activeAccount;
-                  m.route.set(`/${app.activeId()}/account/${pf.address}?base=${pf.chain || a.chain.id}`);
-                }
-              },
-              label: 'View profile',
-            }),
-            activeAddressesWithRole.length > 0 && app.activeId() && m(MenuItem, {
-              onclick: (e) => {
-                e.preventDefault();
-                app.modals.create({
-                  modal: EditProfileModal,
-                  data: {
-                    account: app.user.activeAccount,
-                    refreshCallback: () => m.redraw(),
-                  },
-                });
-              },
-              label: 'Edit profile',
-            }),
-            !isPrivateCommunity && m(MenuItem, {
-              onclick: () => app.modals.create({
-                modal: SelectAddressModal,
-              }),
-              label: nAccountsWithoutRole > 0 ? `${pluralize(nAccountsWithoutRole, 'other address')}...`
-                : activeAddressesWithRole.length > 0 ? 'Manage addresses' : 'Connect a new address',
-            }),
-          ],
-        ]),
+        content: m(LoginSelectorMenuLeft, {
+          activeAddressesWithRole, nAccountsWithoutRole, isPrivateCommunity
+        }),
       }),
       m(Popover, {
         hasArrow: false,
@@ -312,39 +363,7 @@ const LoginSelector: m.Component<{
             m(Icon, { name: Icons.USER })
           ],
         }),
-        content: m(Menu, { class: 'LoginSelectorMenu' }, [
-          m(MenuItem, {
-            onclick: () => (app.activeChainId() || app.activeCommunityId())
-              ? m.route.set(`/${app.activeChainId() || app.activeCommunityId()}/notifications`)
-              : m.route.set('/notifications'),
-            label: 'Notification settings'
-          }),
-          m(MenuItem, {
-            onclick: () => app.activeChainId()
-              ? m.route.set(`/${app.activeChainId()}/settings`)
-              : m.route.set('/settings'),
-            label: 'Account settings'
-          }),
-          m(MenuDivider),
-          m(MenuItem, {
-            onclick: () => app.modals.create({ modal: FeedbackModal }),
-            label: 'Send feedback',
-          }),
-          m(MenuItem, {
-            onclick: () => {
-              $.get(`${app.serverUrl()}/logout`).then(async () => {
-                await initAppState();
-                notifySuccess('Logged out');
-                m.redraw();
-              }).catch((err) => {
-                // eslint-disable-next-line no-restricted-globals
-                location.reload();
-              });
-              mixpanel.reset();
-            },
-            label: 'Logout'
-          }),
-        ]),
+        content: m(LoginSelectorMenuRight),
       }),
     ]);
   }

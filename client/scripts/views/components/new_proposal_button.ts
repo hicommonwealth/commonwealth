@@ -12,7 +12,7 @@ import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import Substrate from 'controllers/chain/substrate/main';
 import Token from 'controllers/chain/ethereum/token/adapter';
 
-const getNewProposalMenu = (candidates: Array<[SubstrateAccount, number]>) => {
+export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]>) => {
   const activeAccount = app.user.activeAccount;
   return [
     m(MenuItem, {
