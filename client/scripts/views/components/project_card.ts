@@ -32,7 +32,7 @@ const ProjectCard: m.Component<{project: AnyProject}> = {
     const { project } = vnode.attrs;
 
     const thredLink = `/${app.activeChainId()}/proposal/discussion/${project.threadId}`; // proposal => project
-    const projectLink = `/${app.activeCommunityId()}/project/${project.projectId}`;
+    const projectLink = `/${app.activeCommunityId()}/projects/${project.projectId}`;
 
     return m('.ProjectCard', [
       m('.project-card-top', {
