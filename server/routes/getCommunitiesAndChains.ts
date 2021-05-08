@@ -1,19 +1,38 @@
 import { Request, Response, NextFunction } from 'express';
 import Sequelize from 'sequelize';
+import lookupCommunityIsVisibleToUser from 'server/util/lookupCommunityIsVisibleToUser';
 const { Op } = Sequelize;
 
 const DEFAULT_SEARCH_LIMIT = 100;
 
 const getCommunitiesAndChains = async (models, req: Request, res: Response, next: NextFunction) => {
+  const { user } = req;
+  const { searchTerm, limit } = req.query;
   const params = {
-    limit: req.query.limit ? req.query.limit : DEFAULT_SEARCH_LIMIT
+    limit: limit || DEFAULT_SEARCH_LIMIT
   };
-  if (req.query.searchTerm) {
-    params['where'] = { name: { [Op.iLike]: `%${req.query.searchTerm}%` } };
+  if (searchTerm) {
+    params['where'] = { name: { [Op.iLike]: `%${searchTerm}%` } };
   }
   const chains = await models.Chain.findAll(params);
   const communities = await models.OffchainCommunity.findAll(params);
-  const chainsAndCommunities = chains.concat(communities);
+  const userAddressIds = await user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
+  const userRoles = await models.Role.findAll({
+    where: {
+      address_id: userAddressIds,
+    },
+  });
+  console.log(userRoles);
+  const visibleCommunities = communities.filter((community) => {
+    if (!community.privacyEnabled) {
+      return true;
+    } else {
+      if (!user) return false;
+      const userMembership = userRoles.find((role) => role.offchain_community_id === community.id);
+      return !!userMembership;
+    }
+  });
+  const chainsAndCommunities = chains.concat(visibleCommunities);
 
   return res.json({ status: 'Success', result: chainsAndCommunities.map((p) => p.toJSON()) });
 };
