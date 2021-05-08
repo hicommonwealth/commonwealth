@@ -14,6 +14,11 @@ import { TabItem } from 'construct-ui';
 import Tabs from '../components/widgets/tabs';
 import CommunitySelector from '../components/sidebar/community_selector';
 
+enum MenuTabs {
+  currentCommunity = 'currentCommunity',
+  allCommunities = 'allCommunities'
+}
+
 const MobileSidebar: m.Component<{}, { activeTab: string }> = {
   view: (vnode) => {
     const { activeTab } = vnode.state;
@@ -22,7 +27,8 @@ const MobileSidebar: m.Component<{}, { activeTab: string }> = {
     }, [
       m(TabItem, {
         label: app.activeId(),
-        active: activeTab === 'activeCommunity',
+        active: activeTab === MenuTabs.currentCommunity,
+        onclick: (e) => { vnode.state.activeTab = MenuTabs.currentCommunity; }
       }, [
         (app.chain || app.community) && m(OffchainNavigationModule),
         (app.chain || app.community) && m(OnchainNavigationModule),
@@ -33,7 +39,8 @@ const MobileSidebar: m.Component<{}, { activeTab: string }> = {
       ]),
       m(TabItem, {
         label: 'Communities',
-        active: activeTab === 'allCommunities'
+        active: activeTab === MenuTabs.allCommunities,
+        onclick: (e) => { vnode.state.activeTab = MenuTabs.allCommunities; }
       }, [
         m(CommunitySelector, { showListOnly: true })
       ])
