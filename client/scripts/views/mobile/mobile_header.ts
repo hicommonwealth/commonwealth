@@ -6,11 +6,10 @@ import { Button, PopoverMenu, Icon, Icons } from 'construct-ui';
 
 import app from 'state';
 
-import { MobileNewProposalButton } from 'views/components/new_proposal_button';
 import NotificationsMenu from 'views/components/header/notifications_menu';
-import LoginSelector from 'views/components/header/login_selector';
 import { SearchBar } from 'views/components/search_bar';
 import MobileSidebar from './mobile_sidebar';
+import MobileUserDropdown from './mobile_user_dropdown';
 
 const MobileHeader: m.Component<{}, { open: boolean }> = {
   view: (vnode) => {
@@ -29,7 +28,7 @@ const MobileHeader: m.Component<{}, { open: boolean }> = {
           transitionDuration: 0,
           closeOnContentClick: true,
           closeOnOutsideClick: true,
-          // inline: true,
+          // TODO: Update icon to CW logo
           trigger: m(Button, {
             class: 'mobile-header-trigger',
             compact: true,
@@ -38,12 +37,24 @@ const MobileHeader: m.Component<{}, { open: boolean }> = {
           }),
           content: m(MobileSidebar),
         }),
-        app.isLoggedIn() && m(MobileNewProposalButton),
       ]),
       m(SearchBar),
       m('.mobile-header-right', [
         app.isLoggedIn() && m(NotificationsMenu, { small: false }),
-        m(LoginSelector, { small: false }),
+        m(PopoverMenu, {
+          class: 'MobileHeaderPopoverMenu',
+          transitionDuration: 0,
+          closeOnContentClick: true,
+          closeOnOutsideClick: true,
+          // inline: true,
+          trigger: m(Button, {
+            class: 'mobile-header-trigger',
+            compact: true,
+            label: m(Icon, { name: Icons.MENU }),
+            disabled: !app.chain && !app.community,
+          }),
+          content: m(MobileUserDropdown)
+        }),
       ]),
     ]);
   }

@@ -1,6 +1,10 @@
 @import 'client/styles/shared';
 
 .MobileSidebar {
+    padding: 20px 32px;
+    min-height: calc(100vh - 60px);
+    height: min-content;
+    width: 100vw;
     .cui-tabs {
         @include gradientTabs();
         margin-bottom: 20px;

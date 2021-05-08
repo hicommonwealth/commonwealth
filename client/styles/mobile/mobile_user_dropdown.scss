@@ -1,0 +1,20 @@
+.MobileUserDropdown {
+    padding: 20px 32px;
+    min-height: calc(100vh - 60px);
+    height: min-content;
+    width: 100vw;
+    .cui-menu {
+        border: none;
+    }
+    .cui-menu-divider {
+        margin: 12px 0 14px;
+    }
+    .LoginSelectorMenu .cui-menu-divider,
+    .NewProposalMenu .cui-menu-divider {
+        display: none;
+    }
+    span {
+        color: black;
+        font-size: 18px;
+    }
+}

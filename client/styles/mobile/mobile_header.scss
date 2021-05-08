@@ -126,6 +126,9 @@
 .MobileHeaderPopoverMenu {
     @include sidebar();
     transform: translate3d(0px, 60px, 0px) !important;
+    .cui-menu {
+        border: none;
+    }
     .sidebar-spacer {
         margin-top: 20px;
     }
@@ -134,13 +137,6 @@
         color: $text-color-light;
         margin-top: 20px;
         margin-bottom: 6px;
-    }
-    .cui-menu {
-        padding: 20px 32px;
-        border-color: $border-color-lightest;
-        min-height: calc(100vh - 60px);
-        height: min-content;
-        width: 100vw;
     }
     .cui-popover-arrow {
         display: none;
