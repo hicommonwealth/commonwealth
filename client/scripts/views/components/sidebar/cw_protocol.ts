@@ -6,18 +6,18 @@ import {
   Button, PopoverMenu, MenuItem
 } from 'construct-ui';
 
-import { initChain } from 'app';
-
+import { initChain, selectCommunity } from 'app';
 import app from 'state';
 
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
+import { NodeInfo } from 'models';
 
-export const isCommonProtocolMenu = () => app.community && app.community.meta && app.community.meta.id === 'common-protocol';
+export const isCommonProtocolMenu = () => app.community && app.community.meta && app.community.meta.id === 'cw-protocol';
 
 export const CWPModule: m.Component<{}> = {
+  oncreate: async (vnode) => {
+  },
   view: (vnode) => {
-    // const projectsRoute = `/${app.activeChainId()}/projects`;
-    // const collectivesRoute = `/${app.activeChainId()}/collectives`;
     const projectsRoute = `/${app.activeCommunityId()}/projects`;
     const collectivesRoute = `/${app.activeCommunityId()}/collectives`;
     return m('.OffchainNavigationModule.SidebarModule', [
@@ -32,6 +32,17 @@ export const CWPModule: m.Component<{}> = {
           m.route.set(projectsRoute);
         },
       }),
+      m(Button, {
+        fluid: true,
+        rounded: true,
+        label: 'Collectives',
+        disabled: true,
+        active: m.route.get().startsWith(collectivesRoute),
+        onclick: (e) => {
+          e.preventDefault();
+          m.route.set(collectivesRoute);
+        },
+      }),
       // showCommonwealthMenuOptions && m(Button, {
       //   fluid: true,
       //   rounded: true,
@@ -42,39 +53,11 @@ export const CWPModule: m.Component<{}> = {
       //     m.route.set(`/${app.activeChainId()}/backers`);
       //   },
       // }),
-      m(Button, {
-        fluid: true,
-        rounded: true,
-        label: 'Collectives',
-        active: m.route.get().startsWith(collectivesRoute),
-        onclick: (e) => {
-          e.preventDefault();
-          m.route.set(collectivesRoute);
-        },
-      }),
     ]);
   }
 };
 
 export const CWPChainStatusModule: m.Component<{}, { initializing: boolean }> = {
-  oncreate: async (vnode) => {
-    // set app.chain with default Chain of community
-    if (!app.chain && app.community && app.community.meta && app.community.meta.defaultChain) {
-      const { meta } = app.community;
-      if (meta.id === 'common-protocol') {
-        const scopeMatchesChain = app.config.nodes.getAll().find((n) => n.chain.id === meta.defaultChain.id);
-        const Commonwealth = (await import(
-          /* webpackMode: "lazy" */
-          /* webpackChunkName: "commonwealth-main" */
-          '../../../controllers/chain/ethereum/commonwealth/adapter'
-        )).default;
-        const communityDefaultChain = new Commonwealth(scopeMatchesChain, app);
-        app.chain = communityDefaultChain;
-        app.chain.deferred = true;
-        m.redraw();
-      }
-    }
-  },
   view: (vnode) => {
     const url = app.chain?.meta?.url;
     if (!url) return;
@@ -126,14 +109,15 @@ export const CWPChainStatusModule: m.Component<{}, { initializing: boolean }> = 
                 app.chain?.meta.id === node.value && ' (Selected)',
               ],
               onclick: async (e) => {
-                // e.preventDefault();
-                // vnode.state.initializing = true;
-                // const n: NodeInfo = app.config.nodes.getById(node.value);
-                // if (!n) return;
-                // const finalizeInitialization = await selectNode(n);
-                // if (finalizeInitialization) await initChain();
-                // vnode.state.initializing = false;
-                // m.redraw();
+                e.preventDefault();
+                const n: NodeInfo = app.config.nodes.getById(node.value);
+                const community = app.config.communities.getByCommunity(app.community.id);
+                if (!n || !community || community.length === 0) return;
+                vnode.state.initializing = true;
+                const finalizeInitialization = await selectCommunity(community[0], n);
+                if (finalizeInitialization) await initChain();
+                vnode.state.initializing = false;
+                m.redraw();
               }
             });
           }),

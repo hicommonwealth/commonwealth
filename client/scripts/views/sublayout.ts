@@ -39,7 +39,7 @@ const Sublayout: m.Component<{
     // } = vnode.attrs;
     // // for CWP, init CWP community
     // if ((title === 'Projects' || title === 'Collectives') && !app.community) {
-    //   await initCommunity('common-protocol');
+    //   await initCommunity('cw-protocol');
     //   m.redraw();
     // }
   },

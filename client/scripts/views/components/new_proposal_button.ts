@@ -57,6 +57,22 @@ const getNewProposalMenu = (candidates: Array<[SubstrateAccount, number]>) => {
   ];
 };
 
+const getNewProjectMenu = () => {
+  return [
+    m(MenuItem, {
+      onclick: () => { m.route.set(`/${app.activeId()}/new/thread`); },
+      label: 'New thread',
+    }),
+    m(MenuDivider),
+    [
+      m(MenuItem, {
+        onclick: (e) => m.route.set(`/${app.community.id}/new/project`),
+        label: 'New Project'
+      }),
+    ],
+  ];
+};
+
 export const MobileNewProposalButton: m.Component<{}, { councilCandidates?: Array<[SubstrateAccount, number]> }> = {
   view: (vnode) => {
     return m('.NewProposalButton.MobileNewProposalButton', [
@@ -93,6 +109,37 @@ const NewProposalButton: m.Component<{
     if (!app.isLoggedIn()) return;
     if (!app.chain && !app.community) return;
     if (!app.activeId()) return;
+
+    if (app.community && app.community.id === 'cw-protocol') {      
+      return m(ButtonGroup, {
+        class: 'NewProposalButton',
+      }, [
+        m(PopoverMenu, {
+          class: 'new-proposal-button-popover',
+          transitionDuration: 0,
+          hoverCloseDelay: 0,
+          hasArrow: false,
+          trigger: m(Button, {
+            disabled: !app.user.activeAccount
+              || ((app.chain as Token).isToken && !(app.chain as Token).hasToken),
+            label: 'New thread',
+          }),
+          position: 'bottom-end',
+          closeOnContentClick: true,
+          menuAttrs: {
+            align: 'left',
+          },
+          content: getNewProjectMenu(),
+        }),
+        m(Button, {
+          disabled: !app.user.activeAccount
+            || ((app.chain as Token).isToken && !(app.chain as Token).hasToken),
+          iconLeft: Icons.EDIT,
+          fluid,
+          onclick: () => app.modals.create({ modal: NewThreadModal }),
+        }),
+      ]);
+    }
 
     // just a button for communities, or chains without governance
     if (app.community || threadOnly) {

@@ -1,16 +1,16 @@
 import { IApp } from 'state';
+
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import { ICommonwealthMember } from 'adapters/chain/commonwealth/types';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import EthereumChain from 'controllers/chain/ethereum/chain';
 import { IAccountsModule } from 'models';
 import { AccountsStore } from 'stores';
+
 import CommonwealthMember from './member';
 import CommonwealthAPI from './api';
 
-// TODO: ideally we should store DAO accounts inside the EthereumAccount object, rather
-//   than extending it into a CommonwealthMember. But this is our first-pass implementation,
-//   for now.
+
 export default class CommonwealthMembers implements IAccountsModule<EthereumCoin, CommonwealthMember> {
   protected _store: AccountsStore<CommonwealthMember> = new AccountsStore();
   private _api: CommonwealthAPI;
@@ -20,12 +20,8 @@ export default class CommonwealthMembers implements IAccountsModule<EthereumCoin
   public get store() { return this._store; }
   public get api() { return this._api; }
 
-  public async init(api: CommonwealthAPI, ChainInfo: EthereumChain, Accounts: EthereumAccounts) {
+  public async init(api: CommonwealthAPI) {
     this._api = api;
-
-    // only used to initialize member for super call
-    this._Chain = ChainInfo;
-    this._Accounts = Accounts;
   }
 
   public deinit() {
@@ -33,26 +29,31 @@ export default class CommonwealthMembers implements IAccountsModule<EthereumCoin
   }
 
   private _app: IApp;
-  public get app() { return this._app; }
+  public get app() { return this._app };
 
-  constructor(app: IApp) {
+  constructor(
+    app: IApp,
+    ChainInfo: EthereumChain,
+    Accounts: EthereumAccounts
+  ) {
     this._app = app;
+    this._Chain = ChainInfo;
+    this._Accounts = Accounts;
   }
 
   public get(address: string) {
     try {
-      return this._store.getByAddress(address);
-    } catch (e) {
+      return this._store.getByAddress(address.toLocaleLowerCase());
+    } catch(e) {
       if (!this._Accounts) return null;
       return new CommonwealthMember(this.app, this._Chain, this._Accounts, this, address);
     }
   }
 
-  // returns a member immediately given a struct returned from chain
   public getFromJSON(member: ICommonwealthMember): CommonwealthMember {
     try {
       return this._store.getByAddress(member.id);
-    } catch (e) {
+    } catch(e) {
       if (!this._Accounts) return null;
       return new CommonwealthMember(this.app, this._Chain, this._Accounts, this, member.id, member);
     }

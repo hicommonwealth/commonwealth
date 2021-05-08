@@ -20,7 +20,7 @@ import SubscriptionButton from 'views/components/subscription_button';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import CommunitySelector from 'views/components/sidebar/community_selector';
-import { CWPModule, CWPChainStatusModule, isCommonProtocolMenu } from './common_protocol';
+import { CWPModule, CWPChainStatusModule, isCommonProtocolMenu } from './cw_protocol';
 
 import { discordIcon, telegramIcon, elementIcon, githubIcon, websiteIcon } from './icons';
 
