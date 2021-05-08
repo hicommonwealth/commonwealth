@@ -1,4 +1,4 @@
-import 'components/sidebar/mobile.scss';
+import 'mobile/mobile_sidebar.scss';
 
 import m from 'mithril';
 import app from 'state';
@@ -10,8 +10,8 @@ import {
   ExternalLinksModule,
   ChainStatusModule
 } from 'views/components/sidebar';
-import { TabItem } from 'construct-ui';
-import Tabs from '../components/widgets/tabs';
+import { Tabs, TabItem } from 'construct-ui';
+import { capitalize } from 'lodash';
 import CommunitySelector from '../components/sidebar/community_selector';
 
 enum MenuTabs {
@@ -20,30 +20,43 @@ enum MenuTabs {
 }
 
 const MobileSidebar: m.Component<{}, { activeTab: string }> = {
+  oncreate: (vnode) => { vnode.state.activeTab = MenuTabs.currentCommunity; },
   view: (vnode) => {
-    const { activeTab } = vnode.state;
-    return m(Tabs, {
-      class: 'MobileSidebar'
-    }, [
-      m(TabItem, {
-        label: app.activeId(),
-        active: activeTab === MenuTabs.currentCommunity,
-        onclick: (e) => { vnode.state.activeTab = MenuTabs.currentCommunity; }
-      }, [
-        (app.chain || app.community) && m(OffchainNavigationModule),
-        (app.chain || app.community) && m(OnchainNavigationModule),
-        (app.chain || app.community) && m(ExternalLinksModule),
-        m('br'),
-        app.isLoggedIn() && (app.chain || app.community) && m(SubscriptionButton),
-        app.chain && m(ChainStatusModule),
+    let { activeTab } = vnode.state;
+    if (!activeTab) activeTab = MenuTabs.currentCommunity;
+    const currentCommunityMenu = m('.currentCommunityMenu', [
+      (app.chain || app.community) && m(OffchainNavigationModule),
+      (app.chain || app.community) && m(OnchainNavigationModule),
+      (app.chain || app.community) && m(ExternalLinksModule),
+      m('br'),
+      app.isLoggedIn() && (app.chain || app.community) && m(SubscriptionButton),
+      app.chain && m(ChainStatusModule),
+    ]);
+    const allCommunitiesMenu = m('.allCommunitiesMenu', [
+      m(CommunitySelector, { showListOnly: true, showHomeButtonAtTop: true })
+    ]);
+    return m('.MobileSidebar', [
+      m(Tabs, [
+        m(TabItem, {
+          label: capitalize(app.activeId()),
+          active: activeTab === MenuTabs.currentCommunity,
+          onclick: (e) => {
+            e.stopPropagation();
+            vnode.state.activeTab = MenuTabs.currentCommunity;
+          }
+        }),
+        m(TabItem, {
+          label: 'Communities',
+          active: activeTab === MenuTabs.allCommunities,
+          onclick: (e) => {
+            e.stopPropagation();
+            vnode.state.activeTab = MenuTabs.allCommunities;
+          }
+        })
       ]),
-      m(TabItem, {
-        label: 'Communities',
-        active: activeTab === MenuTabs.allCommunities,
-        onclick: (e) => { vnode.state.activeTab = MenuTabs.allCommunities; }
-      }, [
-        m(CommunitySelector, { showListOnly: true })
-      ])
+      activeTab === MenuTabs.currentCommunity
+        ? currentCommunityMenu
+        : allCommunitiesMenu
     ]);
   }
 };

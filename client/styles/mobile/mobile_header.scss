@@ -1,12 +1,12 @@
 @import 'client/styles/shared';
-@import './index';
+@import 'components/sidebar';
 
 .MobileHeader {
     // only content styles here. layout styles are in layout.scss
     background: $background-color-white;
     border-bottom: 1px solid $border-color-lightest;
 
-    .mobile-sidebar-center {
+    .mobile-header-center {
         flex: 1;
         max-width: calc(100% - 100px);
         &.logged-in {
@@ -16,17 +16,17 @@
             max-width: calc(100% - 142px);
         }
     }
-    .mobile-sidebar-left {
+    .mobile-header-left {
         padding-left: 6px !important;
     }
-    .mobile-sidebar-right {
+    .mobile-header-right {
         padding-right: 13px !important;
     }
 
     // TODO: split this up so CSS classes aren't duplicated
-    .mobile-sidebar-left,
-    .mobile-sidebar-center,
-    .mobile-sidebar-right {
+    .mobile-header-left,
+    .mobile-header-center,
+    .mobile-header-right {
         padding: 10px 0;
         .CommunitySelector .cui-button {
             width: 100%;
@@ -72,7 +72,7 @@
                     top: 2px;
                 }
             }
-            .cui-button.mobile-sidebar-trigger {
+            .cui-button.mobile-header-trigger {
                 padding-left: 12px;
                 padding-right: 12px;
                 .cui-icon {
@@ -125,7 +125,7 @@
 
 .MobileHeaderPopoverMenu {
     @include sidebar();
-    margin: 0 10px;
+    transform: translate3d(0px, 60px, 0px) !important;
     .sidebar-spacer {
         margin-top: 20px;
     }
@@ -136,8 +136,14 @@
         margin-bottom: 6px;
     }
     .cui-menu {
-        padding: 20px 16px;
+        padding: 20px 32px;
         border-color: $border-color-lightest;
+        min-height: calc(100vh - 60px);
+        height: min-content;
+        width: 100vw;
+    }
+    .cui-popover-arrow {
+        display: none;
     }
     .cui-button {
         margin-bottom: 6px;

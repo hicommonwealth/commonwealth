@@ -10,7 +10,7 @@ import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import NotificationsMenu from 'views/components/header/notifications_menu';
 import LoginSelector from 'views/components/header/login_selector';
 import Sidebar from 'views/components/sidebar';
-import MobileHeader from 'views/mobile/header';
+import MobileHeader from 'views/mobile/mobile_header';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import Token from 'controllers/chain/ethereum/token/adapter';
 

@@ -84,6 +84,11 @@ $text-size-item-meta: 17px;
 $listing-left-flex: 6;
 $listing-right-flex: 1;
 
+//
+// mobile specs
+
+$text-size-mobile-header: 22px;
+
 @mixin listing-row-base {
     display: flex;
     padding: 15px 20px 9px;
@@ -233,4 +238,30 @@ $listing-right-flex: 1;
     }
     // text
     overflow-wrap: break-word;
+}
+
+@mixin gradientTabs {
+    .cui-tabs-item {
+        padding: 13px 15px 7px;
+        margin: 0 !important;
+        color: $text-color-light;
+    }
+    .cui-tabs-item:hover {
+        color: #666666;
+        border-width: 2px;
+        border-color: #DDDDDD;
+        border-style: solid;
+        border-top: 0;
+        border-left: 0;
+        border-right: 0;
+    }
+    .cui-tabs-item.cui-active {
+        color: $text-color-black;
+        border-width: 2px;
+        border-style: solid;
+        border-top: 0;
+        border-left: 0;
+        border-right: 0;
+        border-image: linear-gradient(to right, #6086d1, #b37dba) 1;
+    }
 }

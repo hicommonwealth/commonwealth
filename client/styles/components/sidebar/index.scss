@@ -182,7 +182,7 @@
     }
     @include sm-max {
         padding-top: 30px;
-        max-height: calc(100vh - 60px); // $mobile-sidebar-height
+        max-height: calc(100vh - 60px); // $mobile-header-height
         overflow-y: scroll;
         .SidebarHeader {
             display: none;

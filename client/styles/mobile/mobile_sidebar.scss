@@ -1,0 +1,21 @@
+@import 'client/styles/shared';
+
+.MobileSidebar {
+    .cui-tabs {
+        @include gradientTabs();
+        margin-bottom: 20px;
+        .cui-tabs-item {
+            font-size: $text-size-mobile-header;
+        }
+    }
+    .CommunitySelectList {
+        h4 {
+            color: $text-color-light;
+            font-size: 16px;
+            font-weight: 400;
+        }
+        .cui-list-item {
+            margin: 0;
+        }
+    }
+}

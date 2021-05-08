@@ -101,8 +101,13 @@ export const CurrentCommunityLabel: m.Component<{}> = {
   }
 };
 
-const CommunitySelector: m.Component<{ showTextLabel?: boolean, showListOnly?: boolean }> = {
+const CommunitySelector: m.Component<{
+  showTextLabel?: boolean,
+  showListOnly?: boolean,
+  showHomeButtonAtTop?: boolean
+}> = {
   view: (vnode) => {
+    const { showTextLabel, showListOnly, showHomeButtonAtTop } = vnode.attrs;
     const activeEntityName = app.chain
       ? app.chain.meta.chain.name : app.community ? app.community.meta.name : 'Commonwealth';
     const allCommunities = (app.config.communities.getAll() as (CommunityInfo | ChainInfo)[])
@@ -213,7 +218,7 @@ const CommunitySelector: m.Component<{ showTextLabel?: boolean, showListOnly?: b
                 ]),
               ]),
           })
-          : m.route.get() !== '/'
+          : (m.route.get() !== '/')
             ? m(ListItem, {
               class: 'select-list-back-home',
               label: '« Back home',
@@ -223,8 +228,10 @@ const CommunitySelector: m.Component<{ showTextLabel?: boolean, showListOnly?: b
             }) : null;
     };
 
-    return vnode.attrs.showListOnly
+    return showListOnly
       ? m('.CommunitySelectList', [
+        showHomeButtonAtTop
+        && m('span', 'Home'),
         app.isLoggedIn() && [
           m('h4', 'Your communities'),
           joinedCommunities.map(renderCommunity),
@@ -232,7 +239,8 @@ const CommunitySelector: m.Component<{ showTextLabel?: boolean, showListOnly?: b
           m('h4', 'Other communities'),
         ],
         unjoinedCommunities.map(renderCommunity),
-        renderCommunity('home'),
+        !showHomeButtonAtTop
+        && renderCommunity('home'),
       ])
       : m('.CommunitySelector', [
         m('.title-selector', [
@@ -241,7 +249,7 @@ const CommunitySelector: m.Component<{ showTextLabel?: boolean, showListOnly?: b
             hasArrow: false,
             trigger: m(Button, {
               rounded: true,
-              label: vnode.attrs.showTextLabel ? activeEntityName : m(Icon, { name: Icons.MENU }),
+              label: showTextLabel ? activeEntityName : m(Icon, { name: Icons.MENU }),
             }),
             inline: true,
             class: 'CommunitySelectList',
