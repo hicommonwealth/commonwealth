@@ -79,7 +79,7 @@ pre {
 .forum-container {
     padding: 20px 0;
 }
-.MobileSidebarHeader {
+.MobileHeader {
     display: none;
 }
 .LoadingLayout {
@@ -105,7 +105,7 @@ pre {
 }
 @include sm-max {
     $mobile-sidebar-height: 60px; // see also sidebar/index.scss
-    .MobileSidebarHeader {
+    .MobileHeader {
         display: flex;
         position: fixed;
         top: 0;

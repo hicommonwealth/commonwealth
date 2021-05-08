@@ -10,11 +10,11 @@ import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import NotificationsMenu from 'views/components/header/notifications_menu';
 import LoginSelector from 'views/components/header/login_selector';
 import Sidebar from 'views/components/sidebar';
-import MobileSidebarHeader from 'views/components/sidebar/mobile';
+import MobileHeader from 'views/mobile/header';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import Token from 'controllers/chain/ethereum/token/adapter';
 
-import SearchBar from './components/search_bar';
+import { SearchBar } from './components/search_bar';
 
 const Sublayout: m.Component<{
   // overrides
@@ -107,7 +107,7 @@ const Sublayout: m.Component<{
     return [
       m('.layout-container', [
         m('.Sublayout', { class: vnode.attrs.class }, [
-          m(MobileSidebarHeader),
+          m(MobileHeader),
           m('.sublayout-header', { class: !title ? 'no-title' : '' }, [
             m('.sublayout-header-inner', [
               sublayoutHeaderLeft,

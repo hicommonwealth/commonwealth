@@ -15,14 +15,7 @@ const log = factory.getLogger(formatFilename(__filename));
 
 const bulkAddresses = async (models, req, res, next) => {
   const options = {
-    order: [req.query.order
-      ? req.query.community
-        ? [models.Address, models.Role].concat([req.query.order])
-        : req.query.order
-      : req.query.community
-        ? [models.Address, models.Role, 'created_at', 'DESC']
-        : ['created_at', 'DESC']
-    ]
+    order: req.query.order ? [req.query.order] : ['created_at', 'DESC']
   };
 
   if (req.query.limit) options['limit'] = req.query.limit;

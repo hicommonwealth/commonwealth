@@ -385,7 +385,7 @@ const emptySearchPreview : m.Component<{ searchTerm: string }, {}> = {
   }
 };
 
-const SearchBar : m.Component<{}, {
+export const SearchBar : m.Component<{}, {
   results: any[],
   searchTerm: string,
   errorText: string,

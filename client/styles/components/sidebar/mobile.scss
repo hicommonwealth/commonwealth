@@ -1,7 +1,7 @@
 @import 'client/styles/shared';
 @import './index';
 
-.MobileSidebarHeader {
+.MobileHeader {
     // only content styles here. layout styles are in layout.scss
     background: $background-color-white;
     border-bottom: 1px solid $border-color-lightest;
@@ -123,7 +123,7 @@
     }
 }
 
-.MobileSidebarPopoverMenu {
+.MobileHeaderPopoverMenu {
     @include sidebar();
     margin: 0 10px;
     .sidebar-spacer {

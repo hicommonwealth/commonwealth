@@ -22,7 +22,7 @@ const getCommunitiesAndChains = async (models, req: Request, res: Response, next
       address_id: userAddressIds,
     },
   });
-  console.log(userRoles);
+
   const visibleCommunities = communities.filter((community) => {
     if (!community.privacyEnabled) {
       return true;
