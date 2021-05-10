@@ -339,6 +339,8 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
     return false;
   } else {
     app.chain = newChain;
+    const snapshotId = app.chain?.meta.chain.snapshot;
+    app.snapshot.fetchSnapshotProposals(snapshotId);
   }
   if (initApi) {
     app.chain.initApi(); // required for loading NearAccounts
