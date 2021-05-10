@@ -1,7 +1,6 @@
 import { ChainClass, NodeInfo } from 'models';
 import { IApp } from 'state';
-import * as plasmDefinitions from '@plasm/types/interfaces/definitions';
-
+import SpecTypes from 'adapters/chain/plasm/spec';
 import Substrate from '../substrate/main';
 
 class Plasm extends Substrate {
@@ -10,11 +9,7 @@ class Plasm extends Substrate {
   }
 
   public async initApi() {
-    const t = Object.values(plasmDefinitions)
-      .reduce((res, { types }): object => ({ ...res, ...types }), {});
-    await super.initApi({
-      'types': { ...t }
-    });
+    await super.initApi(SpecTypes);
   }
 }
 

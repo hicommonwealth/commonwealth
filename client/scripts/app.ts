@@ -6,7 +6,7 @@ import 'construct.scss';
 import m from 'mithril';
 import $ from 'jquery';
 import { FocusManager } from 'construct-ui';
-import moment from 'moment-twitter';
+import moment from 'moment';
 import mixpanel from 'mixpanel-browser';
 
 import app, { ApiStatus, LoginState } from 'state';

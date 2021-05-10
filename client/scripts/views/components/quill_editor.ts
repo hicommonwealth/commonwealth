@@ -3,7 +3,7 @@ import 'components/quill_editor.scss';
 import m, { VnodeDOM } from 'mithril';
 import _ from 'lodash';
 import $ from 'jquery';
-import moment from 'moment-twitter';
+import moment from 'moment';
 import Quill from 'quill-2.0-dev/quill';
 import { Tag, Tooltip } from 'construct-ui';
 import ImageUploader from 'quill-image-uploader';
@@ -847,7 +847,6 @@ const instantiateEditor = (
       if (quill.isEnabled()) {
         // Save the entire updated text to localStorage
         const data = JSON.stringify(quill.getContents());
-        console.log(quill.getContents());
         localStorage.setItem(`${app.activeId()}-${editorNamespace}-storedText`, data);
         state.unsavedChanges = new Delta();
       }

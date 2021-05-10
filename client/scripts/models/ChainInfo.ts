@@ -25,10 +25,12 @@ class ChainInfo {
   public readonly chainObjectId: string;
   public adminsAndMods: RoleInfo[];
   public members: RoleInfo[];
+  public readonly ss58Prefix: string;
 
   constructor({
     id, network, symbol, name, iconUrl, description, website, discord, element, telegram, github,
-    customDomain, blockExplorerIds, collapsedOnHomepage, featuredTopics, topics, adminsAndMods, base
+    customDomain, blockExplorerIds, collapsedOnHomepage, featuredTopics, topics, adminsAndMods,
+    base, ss58_prefix
   }) {
     this.id = id;
     this.network = network;
@@ -48,6 +50,7 @@ class ChainInfo {
     this.featuredTopics = featuredTopics || [];
     this.topics = topics || [];
     this.adminsAndMods = adminsAndMods || [];
+    this.ss58Prefix = ss58_prefix;
   }
 
   public static fromJSON({
@@ -76,6 +79,7 @@ class ChainInfo {
     } catch (e) {
       // ignore invalid JSON blobs
     }
+<<<<<<< HEAD
     return new ChainInfo({
       id,
       network,
@@ -96,6 +100,29 @@ class ChainInfo {
       adminsAndMods,
       base,
     });
+=======
+    return new ChainInfo(
+      json.id,
+      json.network,
+      json.symbol,
+      json.name,
+      json.icon_url,
+      json.description,
+      json.website,
+      json.discord,
+      json.element,
+      json.telegram,
+      json.github,
+      json.customDomain,
+      blockExplorerIds,
+      json.collapsed_on_homepage,
+      json.featured_topics,
+      json.topics,
+      json.ss58_prefix,
+      json.adminsAndMods,
+      json.base,
+    );
+>>>>>>> master
   }
 
   // TODO: get operation should not have side effects, and either way this shouldn't be here

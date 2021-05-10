@@ -2,6 +2,7 @@ import $ from 'jquery';
 import moment from 'moment-twitter';
 import m from 'mithril';
 import app from 'state';
+import moment from 'moment';
 
 import { IUniqueId } from './interfaces';
 import { OffchainThreadKind, OffchainThreadStage, OffchainVoteOptions } from './types';

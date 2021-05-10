@@ -3,7 +3,7 @@ import 'pages/members.scss';
 import $ from 'jquery';
 import m from 'mithril';
 import _ from 'lodash';
-import moment from 'moment-twitter';
+import moment from 'moment';
 import { Input, List, ListItem, PopoverMenu, MenuItem, Icon, Icons, Tag } from 'construct-ui';
 
 import app from 'state';

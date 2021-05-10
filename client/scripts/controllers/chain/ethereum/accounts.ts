@@ -50,7 +50,7 @@ class EthereumAccounts implements IAccountsModule<EthereumCoin, EthereumAccount>
   private _Chain: EthereumChain;
 
   public get(address: string) {
-    return this.fromAddress(address.toLowerCase());
+    return this.fromAddress(address);
   }
 
   private _app: IApp;
@@ -61,7 +61,6 @@ class EthereumAccounts implements IAccountsModule<EthereumCoin, EthereumAccount>
   }
 
   public fromAddress(address: string): EthereumAccount {
-    address = address.toLowerCase();
     if (address.indexOf('0x') !== -1) {
       assert(address.length === 42);
     } else {

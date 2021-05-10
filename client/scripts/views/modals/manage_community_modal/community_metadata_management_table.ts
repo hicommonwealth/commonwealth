@@ -2,7 +2,7 @@ import $ from 'jquery';
 import m from 'mithril';
 import { Table, Button } from 'construct-ui';
 
-import { CommunityInfo, ChainInfo } from 'client/scripts/models';
+import { CommunityInfo, ChainInfo } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 import { InputPropertyRow, TogglePropertyRow, ManageRolesRow } from './metadata_rows';
 

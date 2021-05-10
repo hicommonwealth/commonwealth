@@ -1,4 +1,4 @@
-import moment from 'moment-twitter';
+import moment from 'moment';
 import { Coin } from 'adapters/currency';
 import { IIdentifiable } from 'adapters/shared';
 import { IVote, IUniqueId, ITXModalData } from './interfaces';
@@ -22,7 +22,7 @@ abstract class Proposal<
   public get uniqueIdentifier() {
     return `${this.slug}_${this.identifier}`;
   }
-  public createdAt: moment.Moment; // TODO: unused?
+  public createdAt: moment.Moment;
   public threadId: number;
 
   public abstract title: string;
