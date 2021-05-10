@@ -72,6 +72,7 @@ class ChainInfo {
     topics,
     adminsAndMods,
     base,
+    ss58_prefix,
   }) {
     let blockExplorerIdsParsed;
     try {
@@ -79,7 +80,6 @@ class ChainInfo {
     } catch (e) {
       // ignore invalid JSON blobs
     }
-<<<<<<< HEAD
     return new ChainInfo({
       id,
       network,
@@ -99,30 +99,8 @@ class ChainInfo {
       topics,
       adminsAndMods,
       base,
+      ss58_prefix,
     });
-=======
-    return new ChainInfo(
-      json.id,
-      json.network,
-      json.symbol,
-      json.name,
-      json.icon_url,
-      json.description,
-      json.website,
-      json.discord,
-      json.element,
-      json.telegram,
-      json.github,
-      json.customDomain,
-      blockExplorerIds,
-      json.collapsed_on_homepage,
-      json.featured_topics,
-      json.topics,
-      json.ss58_prefix,
-      json.adminsAndMods,
-      json.base,
-    );
->>>>>>> master
   }
 
   // TODO: get operation should not have side effects, and either way this shouldn't be here
