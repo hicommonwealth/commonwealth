@@ -12,21 +12,11 @@ import PageLoading from 'views/pages/loading';
 import app from 'state';
 
 
-const NewProjectForm = {
-  form: {},
+const NewProjectForm: m.Component<{callback: (project: any) => void}, {form}> = {
   view: (vnode) => {
-    const callback = vnode.attrs.callback;
-    const author = app.user.activeAccount;
-    const protocol = vnode.attrs.protocol;
-
-    if (!author) return m('div', 'Must be logged in');
-    if (!callback) return m('div', 'Must have callback');
-    if (!protocol) return m('div', 'Chain is not fully loaded yet');
-
     return m(Form, { class: 'NewProposalForm' }, [
       m(Grid, [
         m(Col, [
-          vnode.state.error && m('.error', vnode.state.error.message),
           [
             //  name
             m(FormGroup, [
@@ -152,18 +142,16 @@ const NewProjectForm = {
               label: 'Create a new Project',
               onclick: async(e) => {
                 e.preventDefault();
-                // await createNewProject();
-                await protocol.createProject(
-                  vnode.state.form.name,
-                  vnode.state.form.description,
-                  app.user.activeAccount.address,
-                  vnode.state.form.beneficiary,
-                  vnode.state.form.threshold,
-                  vnode.state.form.curatorFee,
-                  null,   // vnode.state.form.deadline,
-                  true,
-                  null
-                );
+                const projectData = {
+                  name: vnode.state.form.name,
+                  description: vnode.state.form.description,
+                  address: app.user.activeAccount.address,
+                  beneficiary: vnode.state.form.beneficiary,
+                  threshold: vnode.state.form.threshold,
+                  curatorFee: vnode.state.form.curatorFee,
+                  deadline: vnode.state.form.deadline,
+                }
+                vnode.attrs.callback(projectData)
               },
               tabindex: 4,
               type: 'submit',
@@ -198,9 +186,22 @@ const NewProjectPage: m.Component<{ type }, { initializing: boolean }> = {
       m('p', []),
       m('.forum-container', [
         m(NewProjectForm, {
-          callback: (project) => {
+          callback: async(projectData: any) => {
+            const protocol = (app.chain as any).protocol;
+            const author = app.user.activeAccount.address;
+            const res = await protocol.createProject(
+              projectData.name,
+              projectData.description,
+              author,
+              projectData.beneficiary,
+              parseInt(projectData.threshold),
+              parseInt(projectData.curatorFee),
+              parseInt(projectData.deadline),
+              true,
+              '0x01'
+            );
+            console.log('====>res', res);
           },
-          protocol: (app.chain as any).protocol,
         }),
       ])
     ]);
