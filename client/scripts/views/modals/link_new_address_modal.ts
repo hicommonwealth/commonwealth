@@ -350,6 +350,14 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
         vnode.state.error = null;
         m.redraw();
       }
+
+      if ((app.chain as Token).isToken && (app.chain as Token).isUncreated) {
+        await initAppState(false);
+        const filteredName = app.chain.meta.chain.name.toLowerCase().trim()
+          .replace(/[^\w ]+/g, '').replace(/ +/g, '-');
+        m.route.set(`/${filteredName}`);
+        m.redraw();
+      }
     };
 
     const cliAddressInputFn = async (address) => {
