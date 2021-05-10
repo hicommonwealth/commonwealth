@@ -324,8 +324,7 @@ const SearchPage : m.Component<{
           ' for \'',
           vnode.state.searchTerm,
           '\'',
-          vnode.state.activeTab === SearchType.Top
-            && scope
+          scope
             ? ` in ${capitalize(scope)}.`
             : ' on Commonwealth.',
           scope
