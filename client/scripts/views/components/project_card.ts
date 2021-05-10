@@ -4,59 +4,39 @@ import m from 'mithril';
 import { Tag } from 'construct-ui';
 
 import app from 'state';
-import { slugify } from 'helpers';
+import { CWUser, CWProject } from 'models/CWProtocol';
 
-export interface UserType {
-  address: string;
-  name: string;
-  amount: number;
-}
-
-export interface AnyProject {
-  projectId: string;
-  name: string;
-  description: string;
-  identifier: string;
-  slug: string;
-  threadId: string;
-  totalFunding: number;
-  threadhold: number;
-  token: string;
-  backers: UserType[];
-  curators: UserType[];
+export interface CWProjectWithParticipants extends CWProject {
+  backers: Array<CWUser>;
+  curators: Array<CWUser>;
+  threadId?: string;
 }
 
 
-const ProjectCard: m.Component<{project: AnyProject}> = {
+const ProjectCard: m.Component<{project: CWProjectWithParticipants}> = {
   view: (vnode) => {
     const { project } = vnode.attrs;
 
     const thredLink = `/${app.activeChainId()}/proposal/discussion/${project.threadId}`; // proposal => project
-    const projectLink = `/${app.activeCommunityId()}/projects/${project.projectId}`;
-
+    const projectLink = `/${app.activeCommunityId()}/project/${project.projectHash}`;
+    const bgColor = project.status === 'In Progress' ? 'blue' : (project.status === 'Successed') ? 'green' : 'red';
+    
     return m('.ProjectCard', [
       m('.project-card-top', {
         onclick: (e) => {
           e.stopPropagation();
           e.preventDefault();
-          // localStorage[`${app.activeId()}-proposals-scrollY`] = window.scrollY;
           m.route.set(projectLink); // avoid resetting scroll point
           },
         }, [
-          // tag
           m(Tag, {
-            label: [
-              'Project #',
-              project.projectId,
-            ],
+            label: ['Project #', project.projectHash.substring(0, 5)],
             intent: 'primary',
             rounded: true,
             size: 'xs',
+            style: `background: ${bgColor}`
           }),
-          // title
           m('.project-title', project.name),
-
-          // metadata
           m('.project-amount', `Total Funding: ${project.totalFunding}`),
           m('.project-description', project.description),
       ]),
