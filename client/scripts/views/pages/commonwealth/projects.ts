@@ -14,11 +14,12 @@ const Description: m.Component<{}, {}> = {
     if (!app.chain) return;
     return m('.stats-box', [
       m('div', [
-        'Projects can be introduced by anyone.',
+        'This is a UI version that use offchain local data, a production version will interact with real chain and contract data.',
       ]),
-      m('br'),
-      m('div', '- MVP version that use offchain local data, a production version will interact with real chain and contract data'),
-      m('div', '- Protocol will be set by admin'),
+      m('div', '- Protocol information(like protocolFee and feeTo) will be set by admin'),
+      m('div', '- Curators can only redeem CTokens when project funding is successed'),
+      m('div', '- Backers can only redeem BTokens when project funding is failed'),
+      m('div', '- Beneficiary can only withdraw when project funding is successed'),
     ]);
   }
 };

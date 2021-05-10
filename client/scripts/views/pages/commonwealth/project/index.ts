@@ -40,8 +40,8 @@ const ProjectContentModule: m.Component<{project: CWProjectWithParticipants, lef
       m('div.project-name', project.name),
       m('div.project-text', [
         m('span', 'A project by created by'),
-        m('span.bold', `${project.beneficiary.slice(0, 5)}...`),
-        m('span', {style: { color: project.status === 'In Progress' ? 'blue': project.status === 'Successed' ? 'green' : 'red' }}, `  : ${leftTime}`, ),
+        m('span.bold', `${project.beneficiary}   :`),
+        m('span', {style: { color: project.status === 'In Progress' ? 'blue': project.status === 'Successed' ? 'green' : 'red' }}, `${leftTime}`, ),
       ]),
       m('div.project-description', project.description)
     ]);

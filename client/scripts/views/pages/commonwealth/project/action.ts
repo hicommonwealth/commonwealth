@@ -5,7 +5,78 @@ import m from 'mithril';
 
 import { CWProjectWithParticipants } from 'views/components/project_card';
 
-const ActionModule: m.Component<{project: CWProjectWithParticipants}, {}> = {
+const InProgressActionModule: m.Component<{project: CWProjectWithParticipants}, {}> = {
+  view: (vnode) => {
+    return [
+      m(Button, {
+        class: 'contribute-button',
+        label: 'Back with',
+        rounded: true,
+        fluid: true,
+        intent: 'primary',
+        onclick: (e) => {
+          // TODO
+        }
+      }),
+      m(Button, {
+        class: 'contribute-button',
+        label: 'Curate to receive success',
+        rounded: true,
+        fluid: true,
+        intent: 'primary',
+        onclick: (e) => {
+          // TODO
+        }
+      }),
+    ];
+  }
+}
+
+const SuccsedActionModule: m.Component<{project: CWProjectWithParticipants}, {}> = {
+  view: (vnode) => {
+    return [
+      m(Button, {
+        class: 'contribute-button',
+        label: 'Redeem CToken',
+        rounded: true,
+        fluid: true,
+        intent: 'primary',
+        onclick: (e) => {
+          // TODO
+        }
+      }),
+      m(Button, {
+        class: 'contribute-button',
+        label: 'Withdraw',
+        rounded: true,
+        fluid: true,
+        intent: 'primary',
+        onclick: (e) => {
+          // TODO
+        }
+      }),
+    ];
+  }
+}
+
+const FailedActionModule: m.Component<{project: CWProjectWithParticipants}, {}> = {
+  view: (vnode) => {
+    return [
+      m(Button, {
+        class: 'contribute-button',
+        label: 'Redeem BTokens',
+        rounded: true,
+        fluid: true,
+        intent: 'primary',
+        onclick: (e) => {
+          // TODO
+        }
+      }),
+    ];
+  }
+}
+
+const ActionPage: m.Component<{project: CWProjectWithParticipants}, {}> = {
   view: (vnode) => {
     const { project } = vnode.attrs;
     let percent = (100 * (project.totalFunding / project.threshold)).toFixed(1);
@@ -20,33 +91,17 @@ const ActionModule: m.Component<{project: CWProjectWithParticipants}, {}> = {
       m('.project-progress', [
         m('.project-progress-bar', [
           m('.project-progress-bar-fill', {
-            style: `width: ${(100 * (project.totalFunding / project.threshold)).toFixed(1)}%`
+            style: `width: ${percent}%`
           }),
         ]),
       ]),
       m('.project-funding-action', [
+        project.status === 'In Progress' && m(InProgressActionModule, { project }),
+        project.status === 'Successed' && m(SuccsedActionModule, { project }),
+        project.status === 'Failed' && m(FailedActionModule, { project }),
         m(Button, {
           class: 'contribute-button',
-          label: 'Back with',
-          rounded: true,
-          fluid: true,
-          intent: 'primary',
-          onclick: (e) => {
-            // TODO
-          }
-        }),
-        m(Button, {
-          class: 'contribute-button',
-          label: 'Curate to receive success',
-          rounded: true,
-          fluid: true,
-          intent: 'primary',
-          onclick: (e) => {
-            // TODO
-          }
-        }),
-        m(Button, {
-          class: 'contribute-button',
+          disabled: true,
           label: 'Go to discussion thread ->',
           rounded: true,
           fluid: true,
@@ -61,4 +116,4 @@ const ActionModule: m.Component<{project: CWProjectWithParticipants}, {}> = {
 }
 
 
-export default ActionModule;
+export default ActionPage;
