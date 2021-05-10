@@ -9,10 +9,10 @@ import { CWProjectWithParticipants } from 'views/components/project_card';
 const UserComp: m.Component<{user: CWUser, project: CWProjectWithParticipants}> = {
   view: (vnode) => {
     const { user, project } = vnode.attrs;
-    const backedAmount = `${user.amount} ${project.acceptedToken}`;
-    const shortAddress = user.address.slice(0, 5) + '...';
+    const backedAmount = `${user.amount}ETH`;
+    // const shortAddress = user.address.slice(0, 5) + '...';
     return m('.member', [
-      m('.text', shortAddress),
+      m('.text', user.address),
       m('.text', backedAmount),
     ])
   }
