@@ -17,6 +17,8 @@ const ProposalRow: m.Component<{ proposal: SnapshotProposal }, { expanded: boole
     if (!proposal) return;
     const proposalLink = `/${app.activeId()}/snapshot-proposals/${proposal.ipfsHash}`;
 
+    const time = moment(+proposal.end * 1000);
+    const now = moment();
     const rowHeader: any = [
       link('a', proposalLink, proposal.name),
     ];
@@ -24,7 +26,8 @@ const ProposalRow: m.Component<{ proposal: SnapshotProposal }, { expanded: boole
       proposal.ipfsHash && link('a.proposal-topic', proposalLink, [
         m('span.proposal-topic-name', `${proposal.ipfsHash}`),
       ]),
-      m('.created-at', link('a', proposalLink, `Ended ${formatLastUpdated(moment(+proposal.end))}`)),
+      m('.created-at', link('a', proposalLink, (now > time) ? `Ended ${formatLastUpdated(time)}` 
+        : `Ending ${formatLastUpdated(moment(+proposal.end * 1000))}`)),
     ];
 
     return m(ProposalListingRow, {
