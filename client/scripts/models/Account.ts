@@ -109,10 +109,7 @@ abstract class Account<C extends Coin> {
       };
       const result = await $.post(`${this.app.serverUrl()}/verifyAddress`, params);
       if (result.status === 'Success') {
-        console.log('Verified address!');
-        // TODO: if this is a token, then it will create for ethereum, not the token
-        // forum, and wont create the token's chain at all on the backend. Need to figure
-        // out how to fix this.
+        console.log(`Verified address ${this.address}!`);
       }
     } else {
       throw new Error('signature or key required for validation');
