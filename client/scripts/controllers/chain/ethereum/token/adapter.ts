@@ -23,8 +23,6 @@ export default class Token extends IChainAdapter<EthereumCoin, EthereumAccount> 
   public accounts: EthereumAccounts;
   public hasToken: boolean = false;
 
-  public readonly chainEntities = new ChainEntityController();
-
   constructor(meta: NodeInfo, app: IApp, isUncreated: boolean = false) {
     super(meta, app);
     this.chain = new EthereumTokenChain(this.app);

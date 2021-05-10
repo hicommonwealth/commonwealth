@@ -80,7 +80,7 @@ const LinkAccountItem: m.Component<{
             chain: app.activeChainId(),
             jwt: app.user.jwt,
           });
-          if (result.exists && app.chain && (app.chain as Token).isToken && (app.chain as Token).isUncreated) {
+          if (result.exists) {
             if (result.belongsToUser) {
               notifyInfo('This address is already linked to your current account.');
               return;
@@ -291,6 +291,7 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
             }
           } catch (e) {
             // this may fail if the role already exists, e.g. if the address is being migrated from another user
+            console.error('Failed to create role');
           }
 
           // set the address as active
@@ -327,8 +328,9 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
         await initAppState(false);
         // load addresses for the current chain/community
         if (app.community) {
-          await updateActiveAddresses(undefined);
+          await updateActiveAddresses();
         } else if (app.chain) {
+          // TODO: this breaks when the user action creates a new token forum
           const chain = app.user.selectedNode
             ? app.user.selectedNode.chain
             : app.config.nodes.getByChain(app.activeChainId())[0].chain;
