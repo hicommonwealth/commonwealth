@@ -4,7 +4,7 @@ import m from
 
 export const CustomLogoutIcon = {
   view: (vnode) => {
-    return m('svg', {
+    return m('svg.CustomLogoutIcon', {
       'width': '32',
       'height': '30',
       'viewBox': '0 0 32 30',
@@ -33,7 +33,7 @@ export const CustomLogoutIcon = {
 
 export const CustomCommentIcon = {
   view: (vnode) => {
-    return m('svg', {
+    return m('svg.CustomCommentIcon', {
       'width': '30',
       'height': '30',
       'viewBox': '0 0 30 30',
@@ -57,7 +57,7 @@ export const CustomCommentIcon = {
 
 export const CustomEyeIcon = {
   view: (vnode) => {
-    return m('svg', {
+    return m('svg.CustomEyeIcon', {
       'width': '35',
       'height': '34',
       'viewBox': '0 0 35 34',
@@ -93,7 +93,7 @@ export const CustomEyeIcon = {
 
 export const CustomPencilIcon = {
   view: (vnode) => {
-    return m('svg', {
+    return m('svg.CustomPencilIcon', {
       'width': '35',
       'height': '34',
       'viewBox': '0 0 35 34',
@@ -132,7 +132,7 @@ export const CustomPencilIcon = {
 
 export const CustomUserIcon = {
   view: (vnode) => {
-    return m('svg', {
+    return m('svg.CustomUserIcon', {
       'width': '35',
       'height': '34',
       'viewBox': '0 0 35 34',
@@ -159,7 +159,7 @@ export const CustomUserIcon = {
 
 export const CustomBellIcon = {
   view: (vnode) => {
-    return m('svg', {
+    return m('svg.CustomBellIcon', {
       'viewBox': '0 0 35 38',
       'xmlns': 'http://www.w3.org/2000/svg'
     },
@@ -229,7 +229,7 @@ export const CustomBellIcon = {
 
 export const CustomWalletIcon = {
   view: (vnode) => {
-    return m('svg', {
+    return m('svg.CustomWalletIcon', {
       'width': '32',
       'height': '31',
       'viewBox': '0 0 32 31',
@@ -261,7 +261,7 @@ export const CustomWalletIcon = {
 
 export const CustomHamburgerIcon = {
   view: (vnode) => {
-    return m('svg', {
+    return m('svg.CustomHamburgerIcon', {
       'width':'26',
       'height':'26',
       'viewBox':'0 0 26 26',

@@ -52,14 +52,16 @@
         > .LoginSelector {
             margin-left: 9px;
         }
-        > .cui-button .cui-button-label {
-            display: inline-block;
-            position: relative;
-            top: 1px;
+        > .cui-button {
             border: none;
-            .CustomHamburgerIcon {
+            .cui-button-label {
+                display: inline-block;
                 position: relative;
-                right: 1.5px;
+                top: 1px;
+                .CustomHamburgerIcon {
+                    position: relative;
+                    right: 1.5px;
+                }
             }
         }
         @include xs-max {
