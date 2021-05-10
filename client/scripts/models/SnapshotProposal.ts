@@ -1,5 +1,6 @@
 class SnapshotProposal {
-	public readonly address: string;
+	public readonly ipfsHash: string;
+	public readonly authorAddress: string;
 	public readonly timestamp: string;
 	public readonly start: string;
 	public readonly end: string;
@@ -9,8 +10,9 @@ class SnapshotProposal {
 	public readonly authorIpfsHash: string;
 	public readonly relayerIpfsHash: string;
 
-	constructor(address, timestamp, start, end, name, body, sig, authorIpfsHash, relayerIpfsHash) {
-		this.address = address;
+	constructor(ipfsHash, authorAddress, timestamp, start, end, name, body, sig, authorIpfsHash, relayerIpfsHash) {
+		this.ipfsHash = ipfsHash;
+		this.authorAddress = authorAddress;
 		this.timestamp = timestamp;
 		this.start = start;
 		this.end = end;
