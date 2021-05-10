@@ -10,13 +10,14 @@ export interface CWProjectAttributes {
   beneficiary: string;
   acceptedToken: string;  //  '0x01',
   nominations: Array<string>;  //  []
-  threshold: number;
   endTime: Date; // startTime + number in seconds
-  curatorFee: number;
   projectHash: string;  // put projectHash
   status: ProjectStatus;
-  totalFunding: number;
   creator: string;
+
+  threshold: number;
+  totalFunding: number;
+  curatorFee: number;
 }
 
 export interface CWProjectInstance extends Sequelize.Instance<CWProjectAttributes>, CWProjectAttributes {

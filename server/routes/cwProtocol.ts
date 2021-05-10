@@ -9,6 +9,8 @@ export const Errors = {
   NotWithdrawWhenFailed: 'Not withdrawable since project funding is failed',
 };
 
+const protocolFee = 5;
+
 // this will be replaced with real chain data later
 const getBackersOrCurators = async (models, isbacker: boolean, projectHash: string, acceptedToken: string ) => {
   return models.CWUser.findAll({
@@ -19,22 +21,12 @@ const getBackersOrCurators = async (models, isbacker: boolean, projectHash: stri
     }
   });
 }
-const getTotalBackOrCuratedAmount = async(models, projectHash: string, isBacker: boolean, acceptedToken: string) => {
-  const participants = await getBackersOrCurators(models, isBacker, projectHash, acceptedToken);
-  if (participants.length === 0) return 0;
-  let totalAmount = 0;
-  for(let i = 0; i < participants.length; i++) {
-    totalAmount += participants[i].amount;
-  }
-  return totalAmount;
-}
-const checkBacker = async(address: string, isBacker: boolean) => {
-}
 const checkStatus = async(models, project) => {
   const timeDiff = (project.endTime.getTime() - (new Date()).getTime());
   let newStatus = 'In Progress';
   if (timeDiff < 0) {
-    if (project.threshold <= project.totalFunding) {
+    const { threshold } = project;
+    if (threshold - project.totalFunding > 0) {
       newStatus = 'Successed';
     } else {
       newStatus = 'Failed';
@@ -104,26 +96,27 @@ const backProject = async (models, req, res: Response, next: NextFunction) => {
   // totalFunding increase
   const newTotalFunding = {
     ...project,
-    totalFunding: project.totalFunding + req.body.backAmount
+    totalFunding: project.totalFunding + req.body.amount
   };
   await project.update(newTotalFunding);
 
   // add backer
   await models.CWUser.findOne({ where: {
-    backer: true,
+    role: 'backer',
     projectHash: project.projectHash
   } })
   .then(function(obj) {
     // update
     if(obj) {
-      return obj.update({ amount: obj.amount + req.body.backAmount });
+      return obj.update({ amount: obj.amount + req.body.amount });
     } else {
     // insert
       return models.CWUser.create({
-        backer: true,
+        role: 'backer',
         projectHash: project.projectHash,
-        amount: req.body.backAmount,
-        address: req.body.backer
+        amount: req.body.amount,
+        address: req.body.backer,
+        token: '0x01',
       })
     }
   })
@@ -141,20 +134,21 @@ const curateProject = async (models, req, res: Response, next: NextFunction) => 
 
   // add backer
   await models.CWUser.findOne({ where: {
-    backer: false,
+    role: 'curator',
     projectHash: project.projectHash
   } })
   .then(function(obj) {
     // update
     if(obj) {
-      return obj.update({ amount: obj.amount + req.body.backAmount });
+      return obj.update({ amount: obj.amount + req.body.amount });
     } else {
     // insert
       return models.CWUser.create({
-        backer: false,
+        role: 'curator',
         projectHash: project.projectHash,
-        amount: req.body.backAmount,
-        address: req.body.backer
+        amount: req.body.amount,
+        address: req.body.backer,
+        token: '0x01',
       })
     }
   })
@@ -204,7 +198,23 @@ const withdraw = async(models, req, res: Response, next: NextFunction) => {
   // uint256 fundingSuccessFee = totalFunding.mul(ICWProtocol(factory).protocolFee()).div(100);    // totalFunding * ICWProtocol(factory).protocolFee() / 100;
   // IERC20(token).transferFrom(backingDepositTo, ICWProtocol(factory).feeTo(), fundingSuccessFee);
 }
-
+const getCollatoralAmount = async(models, req, res: Response, next: NextFunction) => {
+  if (!req.user) return next(new Error(Errors.NotLoggedIn));
+  const { projectHash, isBToken, address, acceptedToken } = req.body;
+  const backerAccounts = models.CWUser.findAll({
+    where: {
+      role: isBToken ? 'backer' : 'curator',
+      token: acceptedToken,
+      projectHash: projectHash,
+      address,
+    }
+  });
+  let total = 0;
+  for (let i=0;i<backerAccounts.length;i++) {
+    total += backerAccounts[i].amount;
+  }
+  return res.json({ status: 'Success', result: total });
+}
 export {
   builkProjects,
   createProject,
@@ -213,4 +223,5 @@ export {
   redeemBToken,
   redeemCToken,
   withdraw,
+  getCollatoralAmount,
 }

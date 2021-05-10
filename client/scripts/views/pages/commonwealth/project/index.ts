@@ -48,28 +48,28 @@ const ProjectContentModule: m.Component<{project: CWProjectWithParticipants, lef
   }
 }
 
-const ViewProjectInitialPage: m.Component<{projectHash: string}, {project: CWProjectWithParticipants, initializing: boolean}> = {
+const ViewProjectInitialPage: m.Component<{projectHash: string}, {project: CWProjectWithParticipants, initializing: boolean, protocol: any}> = {
   oncreate: async(vnode) => {
     if (!app.chain || !app.chain.loaded) {
       vnode.state.initializing = true;
       await initChain();
-      // app.chain.deferred = false;
       vnode.state.initializing = false;
       m.redraw();
-    } else if(!vnode.state.project){
-      const projects = (app.chain as any).protocol ? (app.chain as any).protocol.get('root').projects : [];
+    } else if (!vnode.state.project || !vnode.state.protocol) {
+      vnode.state.protocol = (app.chain as any).protocol;
+      const projects = vnode.state.protocol.get('root').projects || [];
       vnode.state.project = projects.filter((item) => item.projectHash === vnode.attrs.projectHash)[0];
       m.redraw();
     }
   },
   view: (vnode) => {
-    const { project } = vnode.state;
-    if (vnode.state.initializing || !app.chain || !app.chain.loaded || !(app.chain as any).protocol || !project) {
+    if (vnode.state.initializing || !app.chain || !app.chain.loaded) {
       return m(PageLoading);
     }
-    // if (project) {
-    //   return m(ViewProjectPage, { project })
-    // }
+    const { project, protocol } = vnode.state;
+    if (!project || !protocol) {
+      return m(PageLoading);
+    }
 
     const startTime = new Date();
     const endTime = new Date(project.endTime);
@@ -82,7 +82,7 @@ const ViewProjectInitialPage: m.Component<{projectHash: string}, {project: CWPro
       m('.container', [
         m('.row', [
           m(ProjectContentModule, { project, leftInSeconds }),
-          m(ActionModule, { project })
+          m(ActionModule, { project, protocol })
         ]),
         m(MembersModule, { project })
       ]),
