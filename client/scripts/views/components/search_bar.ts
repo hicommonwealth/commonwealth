@@ -293,7 +293,6 @@ const concludeSearch = (searchTerm: string, params: SearchParams, state, err?) =
 // preview rows
 export const search = async (searchTerm: string, params: SearchParams, state) => {
   const { isSearchPreview, isHomepageSearch, communityScope, chainScope } = params;
-  console.log({ isHomepageSearch });
   const resultSize = isSearchPreview ? SEARCH_PREVIEW_SIZE : SEARCH_PAGE_SIZE;
 
   if (app.searchCache[searchTerm]?.loaded) {

@@ -16,13 +16,16 @@ const getCommunitiesAndChains = async (models, req: Request, res: Response, next
   }
   const chains = await models.Chain.findAll(params);
   const communities = await models.OffchainCommunity.findAll(params);
-  const userAddressIds = await user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
-  const userRoles = await models.Role.findAll({
-    where: {
-      address_id: userAddressIds,
-    },
-  });
-  console.log(userRoles);
+  let userAddressIds;
+  let userRoles;
+  if (user) {
+    userAddressIds = await user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
+    userRoles = await models.Role.findAll({
+      where: {
+        address_id: userAddressIds,
+      },
+    });
+  }
   const visibleCommunities = communities.filter((community) => {
     if (!community.privacyEnabled) {
       return true;
