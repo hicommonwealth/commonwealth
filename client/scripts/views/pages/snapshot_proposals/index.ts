@@ -104,6 +104,7 @@ const SnapshotProposalsPage: m.Component<{ topic?: string }, {
   lastSubpage: string;
   lastVisitedUpdated?: boolean;
   onscroll: any;
+  allProposals: any;
 }> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', {
@@ -113,27 +114,27 @@ const SnapshotProposalsPage: m.Component<{ topic?: string }, {
   },
 
   oninit: (vnode) => {
-    const snapshotId = app.chain?.meta.chain.snapshot;
-    app.snapshot.fetchSnapshotProposals(snapshotId);
   },
   
   view: (vnode) => {
     let listing = [];
-    const allProposals = app.snapshot.proposalStore.getAll();
     
-    listing.push(m('.discussion-group-wrap', allProposals
-        .map((proposal) => m(ProposalRow, { proposal }))));
+    listing.push(m('.discussion-group-wrap', app.snapshot.proposalStore.getAll()
+    .map((proposal) => m(ProposalRow, { proposal }))));
+    
 
     return m(Sublayout, {
-      class: 'SnapshotProposalsPage',
-      title: '',
+      class: 'DiscussionsPage',
+      title: 'Snapshot Proposals',
       description: '',
       showNewProposalButton: true,
     }, [
       (app.chain || app.community) && [
         m('.discussions-main', [
           m(SnapshotProposalStagesBar, {}),
-          m(Listing, { content: listing }),
+          listing.length === 0
+            ? m('.topic-loading-spinner-wrap', [ m(Spinner, { active: true, size: 'lg' }) ])
+            : m(Listing, { content: listing }),
         ])
       ]
     ]);
