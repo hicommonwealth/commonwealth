@@ -1,7 +1,9 @@
 import { isU8a, isHex } from '@polkadot/util';
 import { checkAddress, decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 
-const AddressSwapper = (options) => {
+const AddressSwapper = (options: {
+  address: string, currentPrefix: number,
+}): string => {
   if (!options.address) throw new Error('No address provided to swap');
   if (!options.currentPrefix) return options.address;
   if (isU8a(options.address) || isHex(options.address)) {

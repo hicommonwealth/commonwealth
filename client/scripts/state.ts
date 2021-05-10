@@ -17,6 +17,7 @@ import WebsocketController from './controllers/server/socket';
 import TopicsController from './controllers/server/topics';
 import CommunitiesController from './controllers/server/communities';
 import UserController from './controllers/server/user/index';
+import WebWalletController from './controllers/app/web_wallets';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -50,6 +51,7 @@ export interface IApp {
   topics: TopicsController;
   communities: CommunitiesController;
   user: UserController;
+  wallets: WebWalletController;
 
   recentActivity: RecentActivityController;
 
@@ -113,6 +115,7 @@ const app: IApp = {
   topics: new TopicsController(),
   communities: new CommunitiesController(),
   user: new UserController(),
+  wallets: new WebWalletController(),
 
   recentActivity: new RecentActivityController(),
 

@@ -15,7 +15,7 @@ import PageNotFound from 'views/pages/404';
 import PageLoading from 'views/pages/loading';
 import Tabs from 'views/components/widgets/tabs';
 
-import { decodeAddress } from '@polkadot/keyring';
+import { decodeAddress, checkAddress, encodeAddress } from '@polkadot/util-crypto';
 import { setActiveAccount } from 'controllers/app/login';
 import ProfileHeader from './profile_header';
 import ProfileContent from './profile_content';
@@ -172,6 +172,39 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
     vnode.state.threads = [];
     vnode.state.comments = [];
     vnode.state.refreshProfile = false;
+
+    const chain = (m.route.param('base'))
+      ? m.route.param('base')
+      : m.route.param('scope');
+    const { address } = vnode.attrs;
+    const chainInfo = app.config.chains.getById(chain);
+    const baseSuffix = m.route.param('base');
+
+    if (chainInfo?.base === ChainBase.Substrate) {
+      const decodedAddress = decodeAddress(address);
+      const ss58Prefix = parseInt(chainInfo.ss58Prefix, 10);
+
+      const [valid] = checkAddress(address, ss58Prefix);
+      if (!valid) {
+        try {
+          const encoded = encodeAddress(decodedAddress, ss58Prefix);
+          m.route.set(`/${m.route.param('scope')}/account/${encoded}${baseSuffix ? `?base=${baseSuffix}` : ''}`);
+        } catch (e) {
+          // do nothing if can't encode address
+        }
+      }
+    } else if (chainInfo?.base === ChainBase.Ethereum) {
+      const valid = Web3.utils.checkAddressChecksum(address);
+
+      if (!valid) {
+        try {
+          const checksumAddress = Web3.utils.toChecksumAddress(address);
+          m.route.set(`/${m.route.param('scope')}/account/${checksumAddress}${baseSuffix ? `?base=${baseSuffix}` : ''}`);
+        } catch (e) {
+          // do nothing if can't get checksumAddress
+        }
+      }
+    }
   },
   oncreate: async (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'LoginPage' });
@@ -182,6 +215,19 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
         ? m.route.param('base')
         : m.route.param('scope');
       const { address } = vnode.attrs;
+      const chainInfo = app.config.chains.getById(chain);
+      let valid = false;
+
+      if (chainInfo?.base === ChainBase.Substrate) {
+        const ss58Prefix = parseInt(chainInfo.ss58Prefix, 10);
+        [valid] = checkAddress(address, ss58Prefix);
+      } else if (chainInfo?.base === ChainBase.Ethereum) {
+        valid = Web3.utils.checkAddressChecksum(address);
+      }
+      if (!valid) {
+        return;
+      }
+      vnode.state.loading = true;
       try {
         const response = await $.ajax({
           url: `${app.serverUrl()}/profile`,
@@ -241,10 +287,8 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
       } catch (err) {
         console.log(err);
         // for certain chains, display addresses not in db if formatted properly
-        const chainInfo = app.config.chains.getById(chain);
         if (chainInfo?.base === ChainBase.Substrate) {
           try {
-            // TODO: should we enforce specific chain checksums here?
             decodeAddress(address);
             vnode.state.account = {
               profile: null,
@@ -258,7 +302,6 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
             // do nothing if can't decode
           }
         } else if (chainInfo?.base === ChainBase.Ethereum) {
-          // TODO: replace with "isAddress" if we want to support non-checksum i.e. all lower/upper
           if (Web3.utils.checkAddressChecksum(address)) {
             vnode.state.account = {
               profile: null,
@@ -286,15 +329,13 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
     const { account, loaded, loading, refreshProfile } = vnode.state;
 
     if (!loading && !loaded) {
-      vnode.state.loading = true;
       loadProfile();
     }
     if (account && account.address !== vnode.attrs.address) {
-      vnode.state.loading = true;
       vnode.state.loaded = false;
       loadProfile();
     }
-    if (loading || !loaded) return m(PageLoading, { showNewProposalButton: true });
+    if (loading) return m(PageLoading, { showNewProposalButton: true });
     if (!account) {
       return m(PageNotFound, { message: 'Invalid address provided' });
     }
