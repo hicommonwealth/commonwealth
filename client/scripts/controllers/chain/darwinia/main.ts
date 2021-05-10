@@ -1,7 +1,6 @@
 import { ChainClass, NodeInfo } from 'models';
 import { IApp } from 'state';
-import spec from './spec';
-
+import SpecTypes from 'adapters/chain/darwinia/spec';
 import Substrate from '../substrate/main';
 
 class Darwinia extends Substrate {
@@ -11,7 +10,7 @@ class Darwinia extends Substrate {
 
   public async initApi() {
     await super.initApi({
-      'types': spec,
+      'types': SpecTypes,
     });
   }
 }
