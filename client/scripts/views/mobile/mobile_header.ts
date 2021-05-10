@@ -10,6 +10,7 @@ import NotificationsMenu from 'views/components/header/notifications_menu';
 import { SearchBar } from 'views/components/search_bar';
 import MobileSidebar from './mobile_sidebar';
 import MobileUserDropdown from './mobile_user_dropdown';
+import { CustomHamburgerIcon } from './mobile_icons';
 
 const MobileHeader: m.Component<{}, { open: boolean }> = {
   view: (vnode) => {
@@ -28,7 +29,7 @@ const MobileHeader: m.Component<{}, { open: boolean }> = {
           transitionDuration: 0,
           closeOnContentClick: true,
           closeOnOutsideClick: true,
-          // TODO: Update icon to CW logo
+          // TODO: Update trigger hamburger icon to CW logo
           trigger: m(Button, {
             class: 'mobile-header-trigger',
             compact: true,
@@ -50,7 +51,7 @@ const MobileHeader: m.Component<{}, { open: boolean }> = {
           trigger: m(Button, {
             class: 'mobile-header-trigger',
             compact: true,
-            label: m(Icon, { name: Icons.MENU }),
+            label: m(CustomHamburgerIcon),
             disabled: !app.chain && !app.community,
           }),
           content: m(MobileUserDropdown)
