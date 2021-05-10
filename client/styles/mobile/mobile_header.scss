@@ -53,7 +53,9 @@
             margin-left: 9px;
         }
         > .cui-button {
-            border: none;
+            &.no-border {
+                border: none;
+            }
             .cui-button-label {
                 display: inline-block;
                 position: relative;

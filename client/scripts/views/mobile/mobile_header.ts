@@ -24,7 +24,8 @@ const MobileHeader: m.Component<{}, { open: boolean }> = {
       },
     }, [
       m('.mobile-header-left', [
-        m(PopoverMenu, {
+        (app.chain || app.community)
+        && m(PopoverMenu, {
           class: 'MobileHeaderPopoverMenu',
           transitionDuration: 0,
           closeOnContentClick: true,
@@ -34,7 +35,6 @@ const MobileHeader: m.Component<{}, { open: boolean }> = {
             class: 'mobile-header-trigger',
             compact: true,
             label: m(Icon, { name: Icons.MENU }),
-            disabled: !app.chain && !app.community,
           }),
           content: m(MobileSidebar),
         }),
@@ -42,17 +42,17 @@ const MobileHeader: m.Component<{}, { open: boolean }> = {
       m(SearchBar),
       m('.mobile-header-right', [
         app.isLoggedIn() && m(NotificationsMenu, { small: false }),
-        m(PopoverMenu, {
+        (app.chain || app.community)
+        && m(PopoverMenu, {
           class: 'MobileHeaderPopoverMenu',
           transitionDuration: 0,
           closeOnContentClick: true,
           closeOnOutsideClick: true,
           // inline: true,
           trigger: m(Button, {
-            class: 'mobile-header-trigger',
+            class: 'mobile-header-trigger no-border',
             compact: true,
             label: m(CustomHamburgerIcon),
-            disabled: !app.chain && !app.community,
           }),
           content: m(MobileUserDropdown)
         }),
