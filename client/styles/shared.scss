@@ -240,7 +240,7 @@ $text-size-mobile-header: 22px;
     overflow-wrap: break-word;
 }
 
-@mixin gradientTabs {
+@mixin gradientTabs() {
     .cui-tabs-item {
         padding: 13px 15px 7px;
         margin: 0 !important;

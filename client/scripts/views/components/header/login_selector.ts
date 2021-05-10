@@ -30,7 +30,7 @@ import ManageCommunityModal from 'views/modals/manage_community_modal';
 import Token from 'controllers/chain/ethereum/token/adapter';
 import { linkExistingAddressToChainOrCommunity, setActiveAccount } from 'controllers/app/login';
 import { networkToBase } from 'models/types';
-import { NotificationsIcon } from '../../mobile/mobile_icons';
+import { CustomPencilIcon, CustomCommentIcon, CustomLogoutIcon, CustomBellIcon, CustomUserIcon, CustomEyeIcon, CustomWalletIcon } from '../../mobile/mobile_icons';
 
 export const CHAINBASE_SHORT = {
   [ChainBase.CosmosSDK]: 'Cosmos',
@@ -151,8 +151,7 @@ export const LoginSelectorMenuLeft: m.Component<{
               m.route.set(`/${app.activeId()}/account/${pf.address}?base=${pf.chain || a.chain.id}`);
             }
           },
-          label: 'View profile',
-          iconLeft: Icons.EYE,
+          label: m('.label-wrap', [ m(CustomEyeIcon), m('span', 'View profile') ]),
         }),
         activeAddressesWithRole.length > 0 && app.activeId() && m(MenuItem, {
           onclick: (e) => {
@@ -165,15 +164,20 @@ export const LoginSelectorMenuLeft: m.Component<{
               },
             });
           },
-          label: 'Edit profile',
-          iconLeft: Icons.PEN_TOOL
+          label: m('.label-wrap', [ m(CustomPencilIcon), m('span', 'Edit profile') ]),
         }),
         !isPrivateCommunity && m(MenuItem, {
           onclick: () => app.modals.create({
             modal: SelectAddressModal,
           }),
-          label: nAccountsWithoutRole > 0 ? `${pluralize(nAccountsWithoutRole, 'other address')}...`
-            : activeAddressesWithRole.length > 0 ? 'Manage addresses' : 'Connect a new address',
+          label: m('.label-wrap', [
+            m(CustomWalletIcon),
+            m('span', nAccountsWithoutRole > 0
+              ? `${pluralize(nAccountsWithoutRole, 'other address')}...`
+              : activeAddressesWithRole.length > 0
+                ? 'Manage addresses'
+                : 'Connect a new address')
+          ]),
         }),
       ],
     ]);
@@ -187,21 +191,18 @@ export const LoginSelectorMenuRight: m.Component<{}> = {
         onclick: () => (app.activeChainId() || app.activeCommunityId())
           ? m.route.set(`/${app.activeChainId() || app.activeCommunityId()}/notifications`)
           : m.route.set('/notifications'),
-        label: 'Notification settings',
-        iconLeft: Icons.BELL,
+        label: m('.label-wrap', [ m(CustomBellIcon), m('span', 'Notification settings') ]),
       }),
       m(MenuItem, {
         onclick: () => app.activeChainId()
           ? m.route.set(`/${app.activeChainId()}/settings`)
           : m.route.set('/settings'),
-        label: 'Account settings',
-        iconLeft: Icons.USER
+        label: m('.label-wrap', [ m(CustomUserIcon), m('span', 'Account settings') ]),
       }),
       m(MenuDivider),
       m(MenuItem, {
         onclick: () => app.modals.create({ modal: FeedbackModal }),
-        label: 'Send feedback',
-        iconLeft: Icons.MESSAGE_SQUARE
+        label: m('.label-wrap', [ m(CustomCommentIcon), m('span', 'Send feedback') ]),
       }),
       m(MenuItem, {
         onclick: () => {
@@ -215,8 +216,7 @@ export const LoginSelectorMenuRight: m.Component<{}> = {
           });
           mixpanel.reset();
         },
-        label: 'Logout',
-        iconLeft: Icons.LOG_OUT
+        label: m('.label-wrap', [ m(CustomLogoutIcon), m('span', 'Logout') ]),
       }),
     ]);
   }

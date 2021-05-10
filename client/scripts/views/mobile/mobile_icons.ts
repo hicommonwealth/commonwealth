@@ -2,7 +2,7 @@
 import m from
   'mithril';
 
-export const LogoutIcon = {
+export const CustomLogoutIcon = {
   view: (vnode) => {
     return m('svg', {
       'width': '32',
@@ -31,7 +31,7 @@ export const LogoutIcon = {
   }
 };
 
-export const FeedbackIcon = {
+export const CustomCommentIcon = {
   view: (vnode) => {
     return m('svg', {
       'width': '30',
@@ -55,30 +55,43 @@ export const FeedbackIcon = {
   }
 };
 
-export const ViewProfileIcon = {
+export const CustomEyeIcon = {
   view: (vnode) => {
     return m('svg', {
-      'width': '34',
-      'height': '26',
-      'viewBox': '0 0 34 26',
+      'width': '35',
+      'height': '34',
+      'viewBox': '0 0 35 34',
       'fill': 'none',
       'xmlns': 'http://www.w3.org/2000/svg'
     },
-    m('path', {
-      'fill-rule': 'evenodd',
-      'clip-rule': 'evenodd',
-      'd': `M1.39893 12.9998C1.39893 12.9998 7.06559 1.6665 16.9823 1.6665C26.8989 1.6665 32.5656 
-      12.9998 32.5656 12.9998C32.5656 12.9998 26.8989 24.3332 16.9823 24.3332C7.06559 24.3332 1.39893 
-      12.9998 1.39893 12.9998Z`,
-      'stroke': '#666666',
-      'stroke-width': '2',
-      'stroke-linecap': 'round',
-      'stroke-linejoin': 'round'
-    }));
+    [
+      m('path', {
+        'fill-rule': 'evenodd',
+        'clip-rule': 'evenodd',
+        'd': `M2.39893 16.9998C2.39893 16.9998 8.06559 5.6665 17.9823 5.6665C27.8989 
+          5.6665 33.5656 16.9998 33.5656 16.9998C33.5656 16.9998 27.8989 28.3332 17.9823 
+          28.3332C8.06559 28.3332 2.39893 16.9998 2.39893 16.9998Z`,
+        'stroke': '#666666',
+        'stroke-width': '2',
+        'stroke-linecap': 'round',
+        'stroke-linejoin': 'round'
+      }),
+      m('path', {
+        'fill-rule': 'evenodd',
+        'clip-rule': 'evenodd',
+        'd': `M17.9821 23.2913C21.4566 23.2913 24.2732 20.4746 24.2732 17.0001C24.2732 
+          13.5256 21.4566 10.709 17.9821 10.709C14.5076 10.709 11.6909 13.5256 11.6909 
+          17.0001C11.6909 20.4746 14.5076 23.2913 17.9821 23.2913Z`,
+        'stroke': '#666666',
+        'stroke-width': '2',
+        'stroke-linecap': 'round',
+        'stroke-linejoin': 'round'
+      })
+    ]);
   }
 };
 
-export const EditProfileIcon = {
+export const CustomPencilIcon = {
   view: (vnode) => {
     return m('svg', {
       'width': '35',
@@ -117,7 +130,7 @@ export const EditProfileIcon = {
   }
 };
 
-export const ViewAccountIcon = {
+export const CustomUserIcon = {
   view: (vnode) => {
     return m('svg', {
       'width': '35',
@@ -144,7 +157,7 @@ export const ViewAccountIcon = {
   }
 };
 
-export const NotificationsIcon = {
+export const CustomBellIcon = {
   view: (vnode) => {
     return m('svg', {
       'viewBox': '0 0 35 38',
@@ -209,6 +222,38 @@ export const NotificationsIcon = {
           0 6.6361-2.9709 6.6364-6.6359l-4-3e-4c-1e-4 1.4559-1.1805 2.6362-2.6364 2.6362v4z`,
         'fill': '#666',
         'mask': 'url(#a)'
+      })
+    ]);
+  }
+};
+
+export const CustomWalletIcon = {
+  view: (vnode) => {
+    return m('svg', {
+      'width': '32',
+      'height': '31',
+      'viewBox': '0 0 32 31',
+      'fill': 'none',
+      'xmlns': 'http://www.w3.org/2000/svg'
+    },
+    [
+      m('path', {
+        'd': `M3.89233 11.1048C3.89233 10.7044 4.13115 10.3426 4.49931 10.1852L23.5127 
+          2.05858C24.1724 1.77658 24.9057 2.26061 24.9057 2.9781V18.9521C24.9057 
+          19.3525 24.6669 19.7143 24.2987 19.8716L5.28536 27.9983C4.6256 28.2803 
+          3.89233 27.7963 3.89233 27.0788V11.1048Z`,
+        'stroke': '#666666',
+        'stroke-width': '2'
+      }),
+      m('rect', {
+        'x': '3.89258',
+        'y': '10.7847',
+        'width': '26.0869',
+        'height': '18.3241',
+        'rx': '1',
+        'fill': 'white',
+        'stroke': '#666666',
+        'stroke-width': '2'
       })
     ]);
   }

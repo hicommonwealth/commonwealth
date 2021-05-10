@@ -93,12 +93,13 @@ const createChainForThread = async (models, newChainInfoString) => {
   } catch(e) {
     return [null, null, e]
   }
-}
+};
+
 const createThread = async (models, tokenBalanceCache: TokenBalanceCache, req: Request, res: Response, next: NextFunction) => {
   let chain, community, error;
-  if(req.body.isNewChain) {
+  if (req.body.isNewChain) {
     [chain, community, error] = await createChainForThread(models, req.body.newChainInfo)
-    chain.topics = []
+    chain.topics = [];
   } else {
     [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   } 

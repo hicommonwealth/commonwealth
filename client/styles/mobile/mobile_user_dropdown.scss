@@ -5,6 +5,20 @@
     width: 100vw;
     .cui-menu {
         border: none;
+        .label-wrap {
+            display: flex;
+            align-items: center;
+            svg {
+                margin-right: 25px;
+                stroke-width: 1px;
+                height: 28px;
+                width: 28px;
+            }
+            span {
+                position: relative;
+                top: 2px;
+            }
+        }
     }
     .cui-menu-divider {
         margin: 12px 0 14px;
