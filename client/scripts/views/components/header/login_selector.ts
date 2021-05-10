@@ -146,179 +146,193 @@ const LoginSelector: m.Component<{
     }
     const joiningChain = app.activeChainId();
     const joiningCommunity = app.activeCommunityId();
-    const samebaseAddresses = app.user.addresses.filter((addr) => joiningChain ? networkToBase(addr.chain) === networkToBase(joiningChain) : true);
+    const samebaseAddresses = app.user.addresses.filter((addr) => joiningChain
+      ? networkToBase(addr.chain) === networkToBase(joiningChain)
+      : true);
 
-    const samebaseAddressesFiltered = samebaseAddresses.reduce((arr, current) => {
-      if (!arr.find((item) => item.address === current.address && networkToBase(item.chain) === networkToBase(current.chain))) {
+    const samebaseAddressesFiltered: AddressInfo[] = samebaseAddresses.reduce((arr, current) => {
+      if (!arr.find((item) => item.address === current.address
+          && networkToBase(item.chain) === networkToBase(current.chain))) {
         return [...arr, current];
       }
       return arr;
     }, []);
 
     return m(ButtonGroup, { class: 'LoginSelector' }, [
-      (app.chain || app.community) && !app.chainPreloading && vnode.state.profileLoadComplete && !app.user.activeAccount && m(Button, {
-        class: 'login-selector-left',
-        onclick: async (e) => {
-          if (samebaseAddressesFiltered.length === 1) {
-            const originAddressInfo = samebaseAddressesFiltered[0];
-
-            if (originAddressInfo) {
-              try {
-                const address = originAddressInfo.address;
-                const targetChain = joiningChain || originAddressInfo.chain;
-
-                const chains = {};
-                app.config.nodes.getAll().forEach((n) => {
-                  if (chains[n.chain.id]) {
-                    chains[n.chain.id].push(n);
-                  } else {
-                    chains[n.chain.id] = [n];
-                  }
-                });
-
-                const isNewChain = !chains[joiningChain]
-                  && (app.chain as Token).isToken
-                  && (app.chain as Token).isUncreated;
-
-                let newChainInfo: INewChainInfo;
-                if (isNewChain) {
-                  newChainInfo = {
-                    address: app.chain.id,
-                    iconUrl: (app.chain.meta.chain.iconUrl) ? app.chain.meta.chain.iconUrl : 'default',
-                    name: app.chain.meta.chain.name,
-                    symbol: app.chain.meta.chain.symbol,
-                  };
-                }
-
-                const res = await linkExistingAddressToChainOrCommunity(
-                  address, targetChain, originAddressInfo.chain, joiningCommunity, isNewChain, newChainInfo
-                );
-
-                if (res && res.result) {
-                  const { verification_token, addressId, addresses } = res.result;
-                  app.user.setAddresses(addresses.map((a) => {
-                    return new AddressInfo(a.id, a.address, a.chain, a.keytype, a.is_magic);
-                  }));
-                  const addressInfo = app.user.addresses.find((a) => a.address === address && a.chain === targetChain);
-
-                  const account = app.chain
-                    ? app.chain.accounts.get(address, addressInfo.keytype)
-                    : app.community.accounts.get(address, addressInfo.chain);
-                  if (app.chain) {
-                    account.setValidationToken(verification_token);
-                  }
-
-                  if (joiningChain && !app.user.getRoleInCommunity({ account, chain: joiningChain })) {
-                    await app.user.createRole({ address: addressInfo, chain: joiningChain });
-                  } else if (joiningCommunity
-                             && !app.user.getRoleInCommunity({ account, community: joiningCommunity })) {
-                    await app.user.createRole({ address: addressInfo, community: joiningCommunity });
-                  }
-
-                  await setActiveAccount(account);
-                  if (app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length === 0) {
-                    app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
-                  }
-                } else {
-                  // Todo: handle error
-                }
-
-                m.redraw();
-              } catch (err) {
-                console.error(err);
-              }
-            }
-          } else {
-            app.modals.create({
-              modal: SelectAddressModal,
-            });
-          }
-        },
-        label: [
-          m('span.hidden-sm', [
-            samebaseAddressesFiltered.length === 0
-              ? `No ${CHAINBASE_SHORT[app.chain?.meta?.chain.base] || ''} address`
-              : 'Join'
-          ]),
-        ],
-      }),
-      (app.chain || app.community) && !app.chainPreloading && vnode.state.profileLoadComplete && app.user.activeAccount && m(Popover, {
-        hasArrow: false,
-        class: 'login-selector-popover',
-        closeOnContentClick: true,
-        transitionDuration: 0,
-        hoverCloseDelay: 0,
-        position: 'top-end',
-        inline: true,
-        trigger: m(Button, {
+      (app.chain || app.community)
+        && !app.chainPreloading
+        && vnode.state.profileLoadComplete
+        && !app.user.activeAccount
+        && m(Button, {
           class: 'login-selector-left',
+          onclick: async (e) => {
+            if (samebaseAddressesFiltered.length === 1) {
+              const originAddressInfo = samebaseAddressesFiltered[0];
+
+              if (originAddressInfo) {
+                try {
+                  const address = originAddressInfo.address;
+                  const targetChain = joiningChain || originAddressInfo.chain;
+
+                  // TODO: what's the purpose of looking through all the nodes? Shouldn't we
+                  //   know immediately if it's a new chain?
+                  const chains = {};
+                  app.config.nodes.getAll().forEach((n) => {
+                    if (chains[n.chain.id]) {
+                      chains[n.chain.id].push(n);
+                    } else {
+                      chains[n.chain.id] = [n];
+                    }
+                  });
+
+                  const isNewChain = !chains[joiningChain]
+                    && (app.chain as Token).isToken
+                    && (app.chain as Token).isUncreated;
+
+                  let newChainInfo: INewChainInfo;
+                  if (isNewChain) {
+                    newChainInfo = {
+                      address: app.chain.id,
+                      iconUrl: (app.chain.meta.chain.iconUrl) ? app.chain.meta.chain.iconUrl : 'default',
+                      name: app.chain.meta.chain.name,
+                      symbol: app.chain.meta.chain.symbol,
+                    };
+                  }
+
+                  const res = await linkExistingAddressToChainOrCommunity(
+                    address, targetChain, originAddressInfo.chain, joiningCommunity, isNewChain, newChainInfo
+                  );
+
+                  if (res && res.result) {
+                    const { verification_token, addressId, addresses } = res.result;
+                    app.user.setAddresses(addresses.map((a) => {
+                      return new AddressInfo(a.id, a.address, a.chain, a.keytype, a.is_magic);
+                    }));
+                    const addressInfo = app.user.addresses
+                      .find((a) => a.address === address && a.chain === targetChain);
+
+                    const account = app.chain
+                      ? app.chain.accounts.get(address, addressInfo.keytype)
+                      : app.community.accounts.get(address, addressInfo.chain);
+                    if (app.chain) {
+                      account.setValidationToken(verification_token);
+                    }
+
+                    if (joiningChain && !app.user.getRoleInCommunity({ account, chain: joiningChain })) {
+                      await app.user.createRole({ address: addressInfo, chain: joiningChain });
+                    } else if (joiningCommunity
+                              && !app.user.getRoleInCommunity({ account, community: joiningCommunity })) {
+                      await app.user.createRole({ address: addressInfo, community: joiningCommunity });
+                    }
+
+                    await setActiveAccount(account);
+                    if (app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length === 0) {
+                      app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
+                    }
+                  } else {
+                    // Todo: handle error
+                  }
+
+                  m.redraw();
+                } catch (err) {
+                  console.error(err);
+                }
+              }
+            } else {
+              app.modals.create({
+                modal: SelectAddressModal,
+              });
+            }
+          },
           label: [
-            m(User, {
-              user: app.user.activeAccount,
-              hideIdentityIcon: true,
-            })
+            m('span.hidden-sm', [
+              samebaseAddressesFiltered.length === 0
+                ? `No ${CHAINBASE_SHORT[app.chain?.meta?.chain.base] || ''} address`
+                : 'Join'
+            ]),
           ],
         }),
-        content: m(Menu, { class: 'LoginSelectorMenu' }, [
-          // address list
-          (app.chain || app.community) && [
-            activeAddressesWithRole.map((account) => m(MenuItem, {
-              class: 'switch-user',
-              align: 'left',
-              basic: true,
-              onclick: async (e) => {
-                const currentActive = app.user.activeAccount;
-                await setActiveAccount(account);
-                m.redraw();
-              },
-              label: [
-                m(UserBlock, {
-                  user: account,
-                  selected: isSameAccount(account, app.user.activeAccount),
-                  showRole: true,
-                  compact: true
-                }),
-                // !account.profile?.name && m('.edit-profile-callout', [
-                //   'Set a display name'
-                // ]),
-              ],
-            })),
-            activeAddressesWithRole.length > 0 && m(MenuDivider),
-            activeAddressesWithRole.length > 0 && app.activeId() && m(MenuItem, {
-              onclick: () => {
-                const pf = app.user.activeAccount.profile;
-                if (app.chain) {
-                  m.route.set(`/${app.activeId()}/account/${pf.address}`);
-                } else if (app.community) {
-                  const a = app.user.activeAccount;
-                  m.route.set(`/${app.activeId()}/account/${pf.address}?base=${pf.chain || a.chain.id}`);
-                }
-              },
-              label: 'View profile',
-            }),
-            activeAddressesWithRole.length > 0 && app.activeId() && m(MenuItem, {
-              onclick: (e) => {
-                e.preventDefault();
-                app.modals.create({
-                  modal: EditProfileModal,
-                  data: {
-                    account: app.user.activeAccount,
-                    refreshCallback: () => m.redraw(),
-                  },
-                });
-              },
-              label: 'Edit profile',
-            }),
-            !isPrivateCommunity && m(MenuItem, {
-              onclick: () => app.modals.create({
-                modal: SelectAddressModal,
+      (app.chain || app.community)
+        && !app.chainPreloading
+        && vnode.state.profileLoadComplete
+        && app.user.activeAccount
+        && m(Popover, {
+          hasArrow: false,
+          class: 'login-selector-popover',
+          closeOnContentClick: true,
+          transitionDuration: 0,
+          hoverCloseDelay: 0,
+          position: 'top-end',
+          inline: true,
+          trigger: m(Button, {
+            class: 'login-selector-left',
+            label: [
+              m(User, {
+                user: app.user.activeAccount,
+                hideIdentityIcon: true,
+              })
+            ],
+          }),
+          content: m(Menu, { class: 'LoginSelectorMenu' }, [
+            // address list
+            (app.chain || app.community) && [
+              activeAddressesWithRole.map((account) => m(MenuItem, {
+                class: 'switch-user',
+                align: 'left',
+                basic: true,
+                onclick: async (e) => {
+                  const currentActive = app.user.activeAccount;
+                  await setActiveAccount(account);
+                  m.redraw();
+                },
+                label: [
+                  m(UserBlock, {
+                    user: account,
+                    selected: isSameAccount(account, app.user.activeAccount),
+                    showRole: true,
+                    compact: true
+                  }),
+                  // !account.profile?.name && m('.edit-profile-callout', [
+                  //   'Set a display name'
+                  // ]),
+                ],
+              })),
+              activeAddressesWithRole.length > 0 && m(MenuDivider),
+              activeAddressesWithRole.length > 0 && app.activeId() && m(MenuItem, {
+                onclick: () => {
+                  const pf = app.user.activeAccount.profile;
+                  if (app.chain) {
+                    m.route.set(`/${app.activeId()}/account/${pf.address}`);
+                  } else if (app.community) {
+                    const a = app.user.activeAccount;
+                    m.route.set(`/${app.activeId()}/account/${pf.address}?base=${pf.chain || a.chain.id}`);
+                  }
+                },
+                label: 'View profile',
               }),
-              label: nAccountsWithoutRole > 0 ? `${pluralize(nAccountsWithoutRole, 'other address')}...`
-                : activeAddressesWithRole.length > 0 ? 'Manage addresses' : 'Connect a new address',
-            }),
-          ],
-        ]),
-      }),
+              activeAddressesWithRole.length > 0 && app.activeId() && m(MenuItem, {
+                onclick: (e) => {
+                  e.preventDefault();
+                  app.modals.create({
+                    modal: EditProfileModal,
+                    data: {
+                      account: app.user.activeAccount,
+                      refreshCallback: () => m.redraw(),
+                    },
+                  });
+                },
+                label: 'Edit profile',
+              }),
+              !isPrivateCommunity && m(MenuItem, {
+                onclick: () => app.modals.create({
+                  modal: SelectAddressModal,
+                }),
+                label: nAccountsWithoutRole > 0 ? `${pluralize(nAccountsWithoutRole, 'other address')}...`
+                  : activeAddressesWithRole.length > 0 ? 'Manage addresses' : 'Connect a new address',
+              }),
+            ],
+          ]),
+        }),
       m(Popover, {
         hasArrow: false,
         class: 'login-selector-popover',

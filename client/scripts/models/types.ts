@@ -54,6 +54,7 @@ export function baseToNetwork(n: ChainBase): ChainNetwork {
 }
 
 export function networkToBase(n: ChainNetwork | string): ChainBase {
+  console.log(n);
   if (/^0x[a-fA-F0-9]{40}$/.test(n)) n = ChainNetwork.ERC20;
   switch (n) {
     case ChainNetwork.Clover: return ChainBase.Substrate;
