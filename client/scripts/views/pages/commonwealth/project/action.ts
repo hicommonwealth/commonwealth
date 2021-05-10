@@ -1,25 +1,26 @@
 import 'pages/commonwealth/projects.scss';
 
-import { Card, Button } from 'construct-ui';
+import { Button } from 'construct-ui';
 import m from 'mithril';
 
-import { AnyProject } from 'views/components/project_card';
+import { CWProjectWithParticipants } from 'views/components/project_card';
 
-
-
-
-const ActionModule: m.Component<{project: AnyProject}, {}> = {
+const ActionModule: m.Component<{project: CWProjectWithParticipants}, {}> = {
   view: (vnode) => {
     const { project } = vnode.attrs;
+    let percent = (100 * (project.totalFunding / project.threshold)).toFixed(1);
+    if (parseInt(percent) > 100) {
+      percent = '100';
+    }
     return m('.col-lg-4 .action-area', [
       m('.action-title', [
-        m('span.amount', `${project.totalFunding} / ${project.threadhold} `),
-        m('span.coin', project.token)
+        m('span.amount', `${project.totalFunding} / ${project.threshold} `),
+        m('span.coin', project.acceptedToken === '0x01' ? 'Ether' : 'ERC20 Token')
       ]),
       m('.project-progress', [
         m('.project-progress-bar', [
           m('.project-progress-bar-fill', {
-            style: `width: ${(100 * (project.totalFunding / project.threadhold)).toFixed(1)}%`
+            style: `width: ${(100 * (project.totalFunding / project.threshold)).toFixed(1)}%`
           }),
         ]),
       ]),

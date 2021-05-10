@@ -615,6 +615,7 @@ $(() => {
     // '/:scope/backers':           importRoute('views/pages/commonwealth/backers', { scoped: true }),
     '/:scope/collectives':       importRoute('views/pages/commonwealth/collectives', { scoped: true }),
     '/:scope/new/project':        importRoute('views/pages/commonwealth/createProject', { scoped: true, deferChain: true }),
+    '/:scope/project/:projectHash': importRoute('views/pages/commonwealth/project/index', { scoped: true }), // CWP
 
     // Chain pages
     '/:scope/home':              redirectRoute((attrs) => `/${attrs.scope}/`),
@@ -630,7 +631,6 @@ $(() => {
     '/:scope/treasury':          importRoute('views/pages/treasury', { scoped: true }),
     '/:scope/bounties':          importRoute('views/pages/bounties', { scoped: true }),
     '/:scope/proposal/:type/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
-    '/:scope/projects/:identifier': importRoute('views/pages/view_project/index', { scoped: true }), // CWP
     '/:scope/council':           importRoute('views/pages/council', { scoped: true }),
     '/:scope/delegate':          importRoute('views/pages/delegate', { scoped: true, }),
     '/:scope/login':             importRoute('views/pages/login', { scoped: true, deferChain: true }),

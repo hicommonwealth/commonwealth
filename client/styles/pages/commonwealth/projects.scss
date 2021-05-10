@@ -7,61 +7,53 @@
         padding: 24px 20px 20px;
         border-radius: 10px;
         background-color: #f8f8f8;
-        display: flex;
     }
-    .cui-card {
-        padding-top: 28px;
-        margin-top: 24px;
-        max-width: none;
-        @include lg-min {
-            max-width: calc(50% - 20px);
-            margin-right: 20px;
-        }
-    }
-    h4 {
-        font-size: 24px;
-        font-weight: 700;
-        margin-bottom: 2px;
-    }
-    .project-description {
-        color: $text-color-medium;
-        margin-bottom: 5px;
-        line-height: 1.2;
-        margin-top: 5px;
+    .projects-row {
+        display: block;
+        margin-top: 30px;
+        width: 100%;
 
-        display: -webkit-box;
-        max-width: 100%;
-        -webkit-line-clamp: 4;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
-    .project-metadata {
-        margin-bottom: 20px;
-        .project-metadata-created,
-        .project-metadata-beneficiary {
-            display: inline-block;
-        }
-        .project-metadata-beneficiary {
+        .project-description {
             color: $text-color-medium;
-            margin-right: 18px;
+            margin-bottom: 5px;
+            line-height: 1.2;
+            margin-top: 5px;
+    
+            display: -webkit-box;
+            max-width: 100%;
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
-        .project-metadata-created {
-            color: $text-color-medium;
+        .project-metadata {
+            margin-bottom: 20px;
+            .project-metadata-created,
+            .project-metadata-beneficiary {
+                display: inline-block;
+            }
+            .project-metadata-beneficiary {
+                color: $text-color-medium;
+                margin-right: 18px;
+            }
+            .project-metadata-created {
+                color: $text-color-medium;
+            }
         }
-    }
-    .project-metrics {
-        display: flex;
-        .project-metric {
-            flex: 1;
-            padding: 16px 0 10px;
+        .project-metrics {
+            display: flex;
+            .project-metric {
+                flex: 1;
+                padding: 16px 0 10px;
+            }
+            .project-metric-figure {
+                width: 120px;
+                font-size: 24px;
+                line-height: 1;
+            }
+            .project-metric-title {
+            }
         }
-        .project-metric-figure {
-            width: 120px;
-            font-size: 24px;
-            line-height: 1;
-        }
-        .project-metric-title {
-        }
+
     }
 }
 

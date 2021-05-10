@@ -2,27 +2,27 @@ import 'pages/commonwealth/projects.scss';
 
 import m from 'mithril';
 
-import { AnyProject, UserType } from 'views/components/project_card';
+import { CWUser } from 'models/CWProtocol';
+import { CWProjectWithParticipants } from 'views/components/project_card';
 
 
-const UserComp: m.Component<{user: UserType, project: AnyProject}> = {
+const UserComp: m.Component<{user: CWUser, project: CWProjectWithParticipants}> = {
   view: (vnode) => {
     const { user, project } = vnode.attrs;
-    const backedAmount = `${user.amount} ${project.token}`;
+    const backedAmount = `${user.amount} ${project.acceptedToken}`;
     const shortAddress = user.address.slice(0, 5) + '...';
-    const userInfo = `${user.name} - ${shortAddress}`;
     return m('.member', [
-      m('.text', userInfo),
+      m('.text', shortAddress),
       m('.text', backedAmount),
     ])
   }
 }
 
-const MembersModule: m.Component<{project: AnyProject}, {}> = {
+const MembersModule: m.Component<{project: CWProjectWithParticipants}, {}> = {
   view: (vnode) => {
     const { project } = vnode.attrs;
-    const backersContent = project.backers.map((backer: UserType) => m(UserComp, { user: backer, project }));
-    const curatorsContent = project.curators.map((curator: UserType) => m(UserComp, { user: curator, project }));
+    const backersContent = project.backers.map((backer) => m(UserComp, { user: backer, project }));
+    const curatorsContent = project.curators.map((curator) => m(UserComp, { user: curator, project }));
 
     return m('.row .members-area', [
       m('.col-lg-6', [
