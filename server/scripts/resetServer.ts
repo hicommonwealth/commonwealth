@@ -1,4 +1,6 @@
 import crypto from 'crypto';
+import BN from 'bn.js';
+import { EventSupportingChains, SubstrateTypes, MolochTypes, chainSupportedBy } from '@commonwealth/chain-events';
 
 import tsmodels from '../database';
 const models = tsmodels as any;
