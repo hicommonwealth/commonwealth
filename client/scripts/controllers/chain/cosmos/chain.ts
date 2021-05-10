@@ -65,10 +65,6 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     return new CosmosToken(this.denom, n);
   }
 
-  public hasWebWallet(): boolean {
-    return false;
-  }
-
   private _blocktimeHelper: BlocktimeHelper = new BlocktimeHelper();
   public async init(node: NodeInfo, reset = false) {
     // A note on REST RPC: gaiacli exposes a command line option "rest-server" which

@@ -32,7 +32,7 @@ import EdgewareFunctionPicker from 'views/components/edgeware_function_picker';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 import TopicSelector from 'views/components/topic_selector';
 import ErrorPage from 'views/pages/error';
-import SubstrateBountyTreasury from 'client/scripts/controllers/chain/substrate/bountyTreasury';
+import SubstrateBountyTreasury from 'controllers/chain/substrate/bountyTreasury';
 
 // this should be titled the Substrate/Edgeware new proposal form
 const NewProposalForm = {

@@ -41,7 +41,7 @@ export default class MolochMembers implements IAccountsModule<EthereumCoin, Molo
 
   public get(address: string) {
     try {
-      return this._store.getByAddress(address.toLowerCase());
+      return this._store.getByAddress(address);
     } catch (e) {
       if (!this._Accounts) return null;
       return new MolochMember(this.app, this._Chain, this._Accounts, this, address);
@@ -58,15 +58,13 @@ export default class MolochMembers implements IAccountsModule<EthereumCoin, Molo
     }
   }
 
-  public async isSenderMember(): Promise<boolean> {
-    const sender = this._api.userAddress;
-    const m = await this._api.Contract.members(sender);
+  public async isMember(address: string): Promise<boolean> {
+    const m = await this._api.Contract.members(address);
     return m.exists && !m.shares.isZero();
   }
 
-  public async isSenderDelegate(): Promise<boolean> {
-    const sender = this._api.userAddress;
-    const delegator = await this._api.Contract.memberAddressByDelegateKey(sender);
+  public async isDelegate(address: string): Promise<boolean> {
+    const delegator = await this._api.Contract.memberAddressByDelegateKey(address);
     if (parseInt(delegator, 16) === 0) {
       return false;
     }

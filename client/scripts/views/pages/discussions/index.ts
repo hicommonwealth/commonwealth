@@ -4,12 +4,12 @@ import $ from 'jquery';
 import _ from 'lodash';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
-import moment from 'moment-twitter';
+import moment from 'moment';
 import app from 'state';
 
 import { Spinner, Button, ButtonGroup, Icons, Icon, PopoverMenu, MenuItem } from 'construct-ui';
 import { pluralize, offchainThreadStageToLabel, externalLink } from 'helpers';
-import { NodeInfo, CommunityInfo, OffchainThreadStage } from 'models';
+import { NodeInfo, CommunityInfo, OffchainThreadStage, OffchainThread } from 'models';
 
 import { updateLastVisited } from 'controllers/app/login';
 import { notifyError } from 'controllers/app/notifications';
@@ -28,9 +28,9 @@ import DiscussionRow from './discussion_row';
 
 export const ALL_PROPOSALS_KEY = 'COMMONWEALTH_ALL_PROPOSALS';
 
-const getLastUpdate = (proposal) => {
-  const lastComment = Number(app.comments.lastCommented(proposal));
-  const createdAt = Number(proposal.createdAt.utc());
+const getLastUpdate = (proposal: OffchainThread): number => {
+  const lastComment = app.comments.lastCommented(proposal)?.unix();
+  const createdAt = proposal.createdAt?.unix();
   const lastUpdate = Math.max(createdAt, lastComment);
   return lastUpdate;
 };
@@ -131,8 +131,8 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
     const subpage = (topic || stage) ? `${topic || ''}#${stage || ''}` : ALL_PROPOSALS_KEY;
     const returningFromThread = (app.lastNavigatedBack() && app.lastNavigatedFrom().includes('/proposal/discussion/'));
     vnode.state.lookback[subpage] = (returningFromThread && localStorage[`${app.activeId()}-lookback-${subpage}`])
-      ? localStorage[`${app.activeId()}-lookback-${subpage}`]
-      : vnode.state.lookback[subpage]?._isAMomentObject
+      ? moment(parseInt(localStorage[`${app.activeId()}-lookback-${subpage}`], 10))
+      : moment.isMoment(vnode.state.lookback[subpage])
         ? vnode.state.lookback[subpage]
         : moment();
   },
@@ -214,11 +214,11 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
 
     if (sortedThreads.length > 0) {
       let visitMarkerPlaced = false;
-      vnode.state.lookback[subpage] = moment(getLastUpdate(sortedThreads[sortedThreads.length - 1]));
+      vnode.state.lookback[subpage] = moment.unix(getLastUpdate(sortedThreads[sortedThreads.length - 1]));
 
       if (allThreads.length > sortedThreads.length) {
         if (firstThread) {
-          if (getLastUpdate(firstThread) > lastVisited) {
+          if (getLastUpdate(firstThread) > lastVisited.unix()) {
             listing.push(getLastSeenDivider(false));
           } else {
             listing.push(m('.PinnedDivider', m('hr')));
@@ -226,8 +226,8 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
         }
       }
 
-      const allThreadsSeen = () => firstThread && getLastUpdate(firstThread) < lastVisited;
-      const noThreadsSeen = () => lastThread && getLastUpdate(lastThread) > lastVisited;
+      const allThreadsSeen = () => firstThread && getLastUpdate(firstThread) < lastVisited.unix();
+      const noThreadsSeen = () => lastThread && getLastUpdate(lastThread) > lastVisited.unix();
 
       if (noThreadsSeen() || allThreadsSeen()) {
         listing.push(m('.discussion-group-wrap', sortedThreads
@@ -236,7 +236,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
         let count = 0;
         sortedThreads.forEach((proposal) => {
           const row = m(DiscussionRow, { proposal });
-          if (!visitMarkerPlaced && getLastUpdate(proposal) < lastVisited) {
+          if (!visitMarkerPlaced && getLastUpdate(proposal) < lastVisited.unix()) {
             listing = [m('.discussion-group-wrap', listing), getLastSeenDivider(), m('.discussion-group-wrap', [row])];
             visitMarkerPlaced = true;
             count += 1;
@@ -274,8 +274,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
         }
       }
 
-      if (!vnode.state.lookback[subpage]
-        || !vnode.state.lookback[subpage]?._isAMomentObject) {
+      if (!moment.isMoment(vnode.state.lookback[subpage])) {
         vnode.state.lookback[subpage] = moment();
       }
 
@@ -342,7 +341,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
       topicTelegram = topicObject?.telegram;
     }
 
-    localStorage.setItem(`${app.activeId()}-lookback-${subpage}`, vnode.state.lookback[subpage]);
+    localStorage.setItem(`${app.activeId()}-lookback-${subpage}`, `${vnode.state.lookback[subpage].valueOf()}`);
     const stillFetching = (allThreads.length === 0 && vnode.state.postsDepleted[subpage] === false);
     const emptyTopic = (allThreads.length === 0 && vnode.state.postsDepleted[subpage] === true && !stage);
     const emptyStage = (allThreads.length === 0 && vnode.state.postsDepleted[subpage] === true && !!stage);

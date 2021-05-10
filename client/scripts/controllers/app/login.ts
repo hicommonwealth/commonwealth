@@ -35,7 +35,9 @@ function createAccount(account: Account<any>, community?: string) {
   });
 }
 
-export function linkExistingAddressToChainOrCommunity(address: string, chain: string, originChain: string, community: string) {
+export function linkExistingAddressToChainOrCommunity(
+  address: string, chain: string, originChain: string, community: string
+) {
   return $.post(`${app.serverUrl()}/linkExistingAddressToChain`, {
     address,
     chain,
@@ -219,7 +221,9 @@ export async function createUserWithMnemonic(mnemonic: string): Promise<Account<
   return account;
 }
 
-export async function createUserWithAddress(address: string, keytype?: string, community?: string): Promise<Account<any>> {
+export async function createUserWithAddress(
+  address: string, keytype?: string, community?: string
+): Promise<Account<any>> {
   const account = app.chain.accounts.get(address, keytype);
   const response = await createAccount(account, community);
   const token = response.result.verification_token;
