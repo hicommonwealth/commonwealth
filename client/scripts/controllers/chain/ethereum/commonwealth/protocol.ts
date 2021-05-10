@@ -1,93 +1,120 @@
 import { utils } from 'ethers';
 import BN from 'bn.js';
+import $ from 'jquery';
 
-import { IApp } from 'state';
-import { ProposalModule, ITXModalData } from 'models';
+import app, { IApp } from 'state';
 import { ERC20Token } from 'adapters/chain/ethereum/types';
+import { CWProtocol, CWProject } from 'models/CWProtocol';
 
-import CommonwealthAPI from './api';
-import CommonwealthChain from './chain';
-import CommonwealthMembers from './members';
+import { CWProtocolStore } from '../../../../stores';
 
 const expandTo18Decimals = (n: number): BN => {
-  return new BN(n).mul(new BN(10).pow(new BN(18)))
+  return new BN(n).mul((new BN(10)).pow(new BN(18)))
 };
+export default class CommonwealthProtocol {
+  private _initialized: boolean = false;
+  public get initalized() { return this._initialized };
 
-export default class CommonwealthProtocol extends ProposalModule<
-  any,
-  any,
-  any
->{
-  private _api: CommonwealthAPI;
-  private _Members: CommonwealthMembers;
+  private _protocolAddress: string = 'root';
+  public get protocolAddress() { return this._protocolAddress}
 
-  public get api() { return this._api; }
-  // public get usingServerChainEntities() { return this._usingServerChainEntities; }
+  private _store: CWProtocolStore<CWProtocol> = new CWProtocolStore();
+  public get store() { return this._store; }
 
-  constructor(app: IApp, private _usingServerChainEntities = false) {
-    super(app, (e) => {
-      // new CommonwealthProtocol(this._Members, this, e)
+  private _app: IApp;
+  public get app() { return this._app; }
+
+  constructor(app: IApp) {
+    this._app = app;
+  }
+
+  public get(protocolID: string, chain?: string) {
+    try {
+      return this._store.getByID(protocolID);
+    } catch(e) {
+    }
+    return new CommonwealthProtocol(this.app);
+  }
+
+  public async retrieveProjects() {
+    // temporary API logic: router.get('/cw/projects', builkProjects.bind(this, models));
+    let projects: CWProject[] =  [];
+    const res = await $.get(`${app.serverUrl()}/cw/projects`, {
+      auth: true,
+      jwt: app.user.jwt
     });
+    if (res['status'] === 'Success' && res.result && res.result.projects && res.result.projects.length > 0) {
+      projects = res.result.projects;
+    }
+    return projects;
   }
 
-  public async init(chain: CommonwealthChain, Members: CommonwealthMembers) {
-    const api = chain.CommonwealthAPI;
-    this._Members = Members;
-    this._api = api;
-    this._initialized = true;
+  public async init() {
+    const projects: CWProject[] =  await this.retrieveProjects();
+    console.log('====>protocol init', projects);
+    const newProtocol = { 
+      name: 'root',
+      id: 'root',
+      protocolFee: 5,
+      feeTo: '0x01',
+      projects,
+    } as CWProtocol;
+    console.log('====>newProtocol', newProtocol);
+    this.store.add(newProtocol);
   }
 
-  public deinit() {
+  public async deinit() {
     this.store.clear();
+  }
+
+  public async updateState() {
+    const projects: CWProject[] =  await this.retrieveProjects();
+    const prevProtocol = await this.get('root');
+    this.store.remove(prevProtocol as CWProtocol);
+    this.store.add({
+      projects,
+      ...prevProtocol
+    } as CWProtocol);
   }
 
   public async createProject(
     u_name: string,
+    description: string,
     creator: string,
     beneficiary: string,
     u_threshold: number,
     curatorFee: number,
-    deadline = 5 * 60, // 5 minutes
+    deadline = 24 * 60 * 60, // 5 minutes
     backWithEther = true,
     token?: ERC20Token
   ) {
-    console.log('=====>u_threshold', u_threshold);
     const threshold = expandTo18Decimals(u_threshold);
-    console.log('=====>threshold');
-
-
-    console.log('=====>u_name', u_name);
     const name = utils.formatBytes32String(u_name);
-    console.log('=====>name');
-
-
-    const projectHash = utils.solidityKeccak256(
-      ['address', 'address', 'bytes32', 'uint256'],
-      [creator, beneficiary, name, threshold]
-    );
-    
-
     const newProjectData = {
       name,
+      description,
       ipfsHash: utils.formatBytes32String('0x01'),
       cwUrl: utils.formatBytes32String('commonwealth.im'),
       beneficiary,
-      acceptedTokens: [],
+      acceptedTokens: '0x01', // [],
       nominations: [],
       threshold,
-      deadline: Math.ceil(Date.now() / 1000) + deadline,
+      endtime: Math.ceil(Date.now() / 1000) + deadline,
       curatorFee,
+      projectHash: utils.solidityKeccak256(
+        ['address', 'address', 'bytes32', 'uint256'],
+        [creator, beneficiary, name, threshold.toString()]
+      ),
     }
-    console.log('====>newProjectData', newProjectData)
-    // call protocol.createProject() method
-  }
 
-  public async loadData() {
-    const res = new BN((await this._api.CWProtocolContract.allProjectsLength()).toString(), 10);
-    console.log('====>res', res);
-  }
-
-  public createTx(...args: any[]): ITXModalData {
-    throw new Error('Method not implemented.');
+    // router.post('/cw/create-project', passport.authenticate('jwt', { session: false }), createProject.bind(this, models));
+    const res = await $.post(`${app.serverUrl()}/cw/create-project`, {
+      ...newProjectData,
+      auth: true,
+      jwt: app.user.jwt
+    });
+    if (res['status'] === 'Success') {
+      await this.updateState();
+    }
   }
 }
