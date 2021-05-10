@@ -20,6 +20,7 @@ const ProjectCard: m.Component<{project: CWProjectWithParticipants}> = {
     const thredLink = `/${app.activeChainId()}/proposal/discussion/${project.threadId}`; // proposal => project
     const projectLink = `/${app.activeCommunityId()}/project/${project.projectHash}`;
     const bgColor = project.status === 'In Progress' ? 'blue' : (project.status === 'Successed') ? 'green' : 'red';
+    const totalFundingText = `Total Funding: ${project.totalFunding}Ether`;
     
     return m('.ProjectCard', [
       m('.project-card-top', {
@@ -37,7 +38,7 @@ const ProjectCard: m.Component<{project: CWProjectWithParticipants}> = {
             style: `background: ${bgColor}`
           }),
           m('.project-title', project.name),
-          m('.project-amount', `Total Funding: ${project.totalFunding}`),
+          m('.project-amount', totalFundingText),
           m('.project-description', project.description),
       ]),
 
