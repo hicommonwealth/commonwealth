@@ -147,7 +147,7 @@ const LoginSelector: m.Component<{
     const joiningChain = app.activeChainId();
     const joiningCommunity = app.activeCommunityId();
     const samebaseAddresses = app.user.addresses.filter((addr) => joiningChain
-      ? networkToBase(addr.chain) === networkToBase(app.chain.base || joiningChain)
+      ? networkToBase(addr.chain) === networkToBase(joiningChain)
       : true);
 
     const samebaseAddressesFiltered: AddressInfo[] = samebaseAddresses.reduce((arr, current) => {
@@ -168,6 +168,8 @@ const LoginSelector: m.Component<{
           onclick: async (e) => {
             if (samebaseAddressesFiltered.length === 1) {
               const originAddressInfo = samebaseAddressesFiltered[0];
+
+              console.log(originAddressInfo);
 
               if (originAddressInfo) {
                 try {
