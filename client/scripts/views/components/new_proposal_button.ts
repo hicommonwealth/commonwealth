@@ -101,7 +101,7 @@ const NewProposalButton: m.Component<{
         label: 'New thread',
         fluid,
         disabled: !app.user.activeAccount
-          || ((app.chain as Token).isToken && !(app.chain as Token).hasToken),
+          || (app.chain && (app.chain as Token).isToken && !(app.chain as Token).hasToken),
         onclick: () => app.modals.create({ modal: NewThreadModal }),
       });
     }

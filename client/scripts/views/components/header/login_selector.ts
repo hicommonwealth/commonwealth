@@ -126,7 +126,7 @@ const LoginSelector: m.Component<{
     const activeAddressesWithRole = app.user.activeAccounts.filter((account) => {
       return app.user.getRoleInCommunity({
         account,
-        chain: (app.chain as Token).isToken && (app.chain as Token).isUncreated
+        chain: (app.activeChainId() && (app.chain as Token).isToken && (app.chain as Token).isUncreated)
           ? 'ethereum' : app.activeChainId(),
         community: app.activeCommunityId()
       });
@@ -147,7 +147,7 @@ const LoginSelector: m.Component<{
     const joiningChain = app.activeChainId();
     const joiningCommunity = app.activeCommunityId();
     const samebaseAddresses = app.user.addresses.filter((addr) => joiningChain
-      ? networkToBase(addr.chain) === networkToBase(joiningChain)
+      ? networkToBase(addr.chain) === networkToBase(app.chain.base || joiningChain)
       : true);
 
     const samebaseAddressesFiltered: AddressInfo[] = samebaseAddresses.reduce((arr, current) => {
@@ -208,7 +208,6 @@ const LoginSelector: m.Component<{
 
                   if (res && res.result) {
                     const { verification_token, addressId, addresses } = res.result;
-                    console.log(addresses);
                     app.user.setAddresses(addresses.map((a) => {
                       return new AddressInfo(a.id, a.address, a.chain, a.keytype, a.is_magic);
                     }));
@@ -246,6 +245,10 @@ const LoginSelector: m.Component<{
                     m.route.set(`/${filteredName}`);
                     m.redraw();
                   } else {
+                    // If token forum make sure has token and add to app.chain obj
+                    if (app.chain && (app.chain as Token).isToken && !(app.chain as Token).isUncreated) {
+                      await (app.chain as Token).activeAddressHasToken(app.user.activeAccount.address);
+                    } 
                     m.redraw();
                   }
                 } catch (err) {
