@@ -1,7 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
 import Sequelize from 'sequelize';
 import crypto from 'crypto';
+import TokenBalanceCache from '../util/tokenBalanceCache';
+import { createChainForAddress } from '../util/createTokenChain';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
+import { INewChainInfo } from '../../shared/types';
+
+import { factory, formatFilename } from '../../shared/logging';
+const log = factory.getLogger(formatFilename(__filename));
 
 const { Op } = Sequelize;
 
@@ -14,7 +20,13 @@ export const Errors = {
   InvalidChain: 'Invalid chain',
 };
 
-const linkExistingAddressToChain = async (models, req: Request, res: Response, next: NextFunction) => {
+const linkExistingAddressToChain = async (
+  models,
+  tokenBalanceCache: TokenBalanceCache,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.body.address) {
     return next(new Error(Errors.NeedAddress));
   }
@@ -27,12 +39,25 @@ const linkExistingAddressToChain = async (models, req: Request, res: Response, n
   if (!req.user?.id) {
     return next(new Error(Errors.NeedLoggedIn));
   }
-
   const userId = req.user.id;
 
-  const chain = await models.Chain.findOne({
-    where: { id: req.body.chain }
-  });
+  let chain, error;
+  if (req.body.isNewChain) {
+    const newChainInfo: INewChainInfo = {
+      address: req.body['newChainInfo[address]'],
+      iconUrl: req.body['newChainInfo[iconUrl]'],
+      name: req.body['newChainInfo[name]'],
+      symbol: req.body['newChainInfo[symbol]'],
+    };
+    [chain, error] = await createChainForAddress(models, tokenBalanceCache, newChainInfo);
+  }
+
+  if (!chain) {
+    chain = await models.Chain.findOne({
+      where: { id: req.body.chain }
+    });
+  }
+
   if (!chain) {
     return next(new Error(Errors.InvalidChain));
   }
@@ -72,14 +97,15 @@ const linkExistingAddressToChain = async (models, req: Request, res: Response, n
   }
 
   const existingAddress = await models.Address.scope('withPrivateData').findOne({
-    where: { chain: req.body.chain, address: req.body.address }
+    where: { chain: (!req.body.isNewChain) ? req.body.chain : chain.id, address: req.body.address }
   });
 
   try {
     let addressId;
     if (existingAddress) {
       // refer edge case 2)
-      // either if the existing address is owned by someone else or this user, we can just update with userId. this covers both edge case (1) & (2)
+      // either if the existing address is owned by someone else or this user,
+      //   we can just update with userId. this covers both edge case (1) & (2)
       const updatedObj = await models.Address.updateWithTokenProvided(
         existingAddress,
         userId,
@@ -92,7 +118,7 @@ const linkExistingAddressToChain = async (models, req: Request, res: Response, n
       const newObj = await models.Address.create({
         user_id: originalAddress.user_id,
         address: originalAddress.address,
-        chain: req.body.chain,
+        chain: (!req.body.isNewChain) ? req.body.chain : chain.id,
         verification_token: verificationToken,
         verification_token_expires: verificationTokenExpires,
         verified: originalAddress.verified,
@@ -109,7 +135,12 @@ const linkExistingAddressToChain = async (models, req: Request, res: Response, n
     });
 
     const role = await models.Role.findOne({
-      where: { address_id: addressId, ...(req.body.community ? { offchain_community_id: req.body.community } : { chain_id: req.body.chain }) }
+      where: {
+        address_id: addressId,
+        ...(req.body.community
+          ? { offchain_community_id: req.body.community }
+          : { chain_id: req.body.chain }),
+      }
     });
 
     if (!role) {
@@ -119,7 +150,7 @@ const linkExistingAddressToChain = async (models, req: Request, res: Response, n
         permission: 'member',
       } : {
         address_id: addressId,
-        chain_id: req.body.chain,
+        chain_id: (!req.body.isNewChain) ? req.body.chain : chain.id,
         permission: 'member',
       });
     }
@@ -129,11 +160,11 @@ const linkExistingAddressToChain = async (models, req: Request, res: Response, n
       result: {
         verification_token: verificationToken,
         addressId,
-        addresses: ownedAddresses
+        addresses: ownedAddresses.map((a) => a.toJSON()),
       }
     });
   } catch (e) {
-    console.log(e);
+    log.error(e.message);
     return next(e);
   }
 };

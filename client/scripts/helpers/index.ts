@@ -1,5 +1,5 @@
 import m from 'mithril';
-import moment from 'moment-twitter';
+import moment from 'moment';
 
 import app from 'state';
 import { OffchainThreadStage } from 'models/types';

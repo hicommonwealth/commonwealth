@@ -9,7 +9,7 @@ export const Errors = {
   InvalidChain: 'Invalid chain',
 };
 
-const getAddress = async (models, req: Request, res: Response, next: NextFunction) => {
+const getAddressStatus = async (models, req: Request, res: Response, next: NextFunction) => {
   if (!req.body.address) {
     return next(new Error(Errors.NeedAddress));
   }
@@ -17,7 +17,8 @@ const getAddress = async (models, req: Request, res: Response, next: NextFunctio
     return next(new Error(Errors.NeedChain));
   }
 
-  const chainName = req.body.chain.startsWith("0x") ? "ethereum" : req.body.chain;
+  // TODO: this will not work for token forums
+  const chainName = req.body.chain.startsWith('0x') ? 'ethereum' : req.body.chain;
   const chain = await models.Chain.findOne({
     where: { id: chainName }
   });
@@ -31,7 +32,7 @@ const getAddress = async (models, req: Request, res: Response, next: NextFunctio
 
   let result;
   if (existingAddress) {
-    const belongsToUser = req.user && (existingAddress.user_id === req.user.id) ;
+    const belongsToUser = req.user && (existingAddress.user_id === req.user.id);
     result = {
       exists: true,
       belongsToUser
@@ -46,4 +47,4 @@ const getAddress = async (models, req: Request, res: Response, next: NextFunctio
   return res.json({ status: 'Success', result });
 };
 
-export default getAddress;
+export default getAddressStatus;

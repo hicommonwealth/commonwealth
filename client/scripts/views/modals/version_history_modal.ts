@@ -8,7 +8,7 @@ import { CompactModalExitButton } from 'views/modal';
 import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import User from 'views/components/widgets/user';
-import { VersionHistory } from 'client/scripts/controllers/server/threads';
+import { VersionHistory } from 'controllers/server/threads';
 import { Spinner } from 'construct-ui';
 const Delta = Quill.import('delta');
 

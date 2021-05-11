@@ -17,6 +17,7 @@ class ChainInfo {
   public element: string;
   public telegram: string;
   public github: string;
+  public customDomain: string;
   public readonly blockExplorerIds: object;
   public readonly collapsedOnHomepage: boolean;
   public readonly featuredTopics: string[];
@@ -26,9 +27,10 @@ class ChainInfo {
   public members: RoleInfo[];
   public type: string;
 
+  // TODO: convert this to accept an object with params instead
   constructor(
     id, network, symbol, name, iconUrl, description, website, discord, element, telegram, github,
-    blockExplorerIds, collapsedOnHomepage, featuredTopics, topics, adminsAndMods?, base?, type?
+    customDomain, blockExplorerIds, collapsedOnHomepage, featuredTopics, topics, adminsAndMods?, base?, type?
   ) {
     this.id = id;
     this.network = network;
@@ -42,6 +44,7 @@ class ChainInfo {
     this.element = element;
     this.telegram = telegram;
     this.github = github;
+    this.customDomain = customDomain;
     this.blockExplorerIds = blockExplorerIds;
     this.collapsedOnHomepage = collapsedOnHomepage;
     this.featuredTopics = featuredTopics || [];
@@ -69,6 +72,7 @@ class ChainInfo {
       json.element,
       json.telegram,
       json.github,
+      json.customDomain,
       blockExplorerIds,
       json.collapsed_on_homepage,
       json.featured_topics,
@@ -126,8 +130,10 @@ class ChainInfo {
     });
   }
 
+  // TODO: change to accept an object
   public async updateChainData(
-    name: string, description: string, website: string, discord: string, element: string, telegram: string, github: string
+    name: string, description: string, website: string, discord: string, element: string, telegram: string,
+    github: string, customDomain: string
   ) {
     // TODO: Change to PUT /chain
     const r = await $.post(`${app.serverUrl()}/updateChain`, {
@@ -139,6 +145,7 @@ class ChainInfo {
       'element': element,
       'telegram': telegram,
       'github': github,
+      'customDomain': customDomain,
       'jwt': app.user.jwt,
     });
     const updatedChain: ChainInfo = r.result;
@@ -149,6 +156,7 @@ class ChainInfo {
     this.element = updatedChain.element;
     this.telegram = updatedChain.telegram;
     this.github = updatedChain.github;
+    this.customDomain = updatedChain.customDomain;
   }
 
   public addFeaturedTopic(topic: string) {

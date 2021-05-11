@@ -8,7 +8,7 @@ import {
   RolePermission,
   ChainInfo,
 } from 'models';
-
+import { INewChainInfo } from 'types';
 import Base from './base';
 
 const getPermissionLevel = (permission: RolePermission | undefined) => {
@@ -30,7 +30,13 @@ export default class extends Base {
     return this.roles.filter((role) => role.offchain_community_id);
   }
 
-  public createRole(options: { address: AddressInfo, chain?: string, community?: string }): JQueryPromise<void> {
+  public createRole(options: {
+    address: AddressInfo,
+    chain?: string,
+    community?: string,
+    isNewChain?: boolean,
+    newChainInfo?: INewChainInfo,
+  }): JQueryPromise<void> {
     // TODO: Change to POST /role
     return $.post('/api/createRole', {
       jwt: this.jwt,
@@ -112,7 +118,9 @@ export default class extends Base {
       const referencedAddress = this.addresses.find((address) => address.id === r.address_id);
       if (!referencedAddress) return;
       const isSame = this.activeAccount.address === referencedAddress.address;
-      const ofCommunity = (options.chain) ? (r.chain_id === options.chain) : (r.offchain_community_id === options.community);
+      const ofCommunity = (options.chain)
+        ? (r.chain_id === options.chain)
+        : (r.offchain_community_id === options.community);
       return permission && referencedAddress && isSame && ofCommunity;
     });
   }
@@ -184,7 +192,10 @@ export default class extends Base {
       });
       return [account, role];
     });
-    const filteredActiveAccountsByRole = activeAccountsByRole.reduce((arr: [Account<any>, RoleInfo][], current: [Account<any>, RoleInfo]) => {
+    const filteredActiveAccountsByRole = activeAccountsByRole.reduce((
+      arr: [Account<any>, RoleInfo][],
+      current: [Account<any>, RoleInfo]
+    ) => {
       const index = arr.findIndex((item) => item[0].address === current[0].address);
       if (index < 0) {
         return [...arr, current];

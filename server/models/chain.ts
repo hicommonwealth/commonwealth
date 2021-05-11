@@ -26,6 +26,7 @@ export interface ChainAttributes {
   blockExplorerIds: string;
   collapsed_on_homepage: boolean;
   active: boolean;
+  customDomain: string;
   type: string;
 
   // associations
@@ -68,6 +69,7 @@ export default (
     ss58_prefix: { type: dataTypes.INTEGER, allowNull: true },
     icon_url: { type: dataTypes.STRING },
     active: { type: dataTypes.BOOLEAN },
+    customDomain: { type: dataTypes.STRING, allowNull: true, },
     blockExplorerIds: { type: dataTypes.STRING, allowNull: true, },
     collapsed_on_homepage: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: true },
     type: { type: dataTypes.STRING, allowNull: false },

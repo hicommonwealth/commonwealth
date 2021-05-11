@@ -8,6 +8,7 @@ export { default as ContractItem } from './ContractItem';
 export { default as DiscussionDraft } from './DiscussionDraft';
 export { default as IChainAdapter } from './IChainAdapter';
 export { default as ICommunityAdapter } from './ICommunityAdapter';
+export { default as IWebWallet } from './IWebWallet';
 export { default as Identity } from './Identity';
 export { default as NodeInfo } from './NodeInfo';
 export { default as Notification } from './Notification';
@@ -30,7 +31,6 @@ export { default as ChainEvent } from './ChainEvent';
 export { default as ChainEntity } from './ChainEntity';
 export { default as StarredCommunity } from './StarredCommunity';
 export { default as Webhook } from './Webhook';
-export { default as NewChainInfo } from './NewChainInfo';
 
 export { DepositVote, BinaryVote } from './votes';
 

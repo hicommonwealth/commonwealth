@@ -19,7 +19,7 @@ const createAddress = async (models, req: Request, res: Response, next: NextFunc
   if (!req.body.chain) {
     return next(new Error(Errors.NeedChain));
   }
-  const chainName = req.body.chain.startsWith("0x") ? "ethereum" : req.body.chain;
+  const chainName = req.body.chain.startsWith('0x') ? 'ethereum' : req.body.chain;
 
   const chain = await models.Chain.findOne({
     where: { id: chainName }

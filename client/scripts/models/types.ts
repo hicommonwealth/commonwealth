@@ -53,17 +53,9 @@ export function baseToNetwork(n: ChainBase): ChainNetwork {
   }
 }
 
-export function baseToLabel(n: ChainBase): string {
-  switch (n) {
-    case ChainBase.CosmosSDK: return 'Cosmos Wallet';
-    case ChainBase.Substrate: return 'polkadot-js';
-    case ChainBase.Ethereum: return 'Ethereum Wallet';
-    case ChainBase.NEAR: return 'NEAR Wallet';
-    default: return 'Wallet';
-  }
-}
-
-export function networkToBase(n: ChainNetwork | string): ChainBase {
+export function networkToBase(n: ChainNetwork | string, t?: boolean): ChainBase {
+  if (t) n = ChainNetwork.ERC20; // if it's type token turn it into type ERC20
+  if (/^0x[a-fA-F0-9]{40}$/.test(n)) n = ChainNetwork.ERC20;
   switch (n) {
     case ChainNetwork.Clover: return ChainBase.Substrate;
     case ChainNetwork.Edgeware: return ChainBase.Substrate;

@@ -503,10 +503,10 @@ export const ExternalLinksModule: m.Component<{}, {}> = {
   }
 };
 
-const Sidebar: m.Component<{}, {}> = {
+const Sidebar: m.Component<{ hideQuickSwitcher? }, {}> = {
   view: (vnode) => {
     return [
-      m(SidebarQuickSwitcher),
+      !app.isCustomDomain() && m(SidebarQuickSwitcher),
       m('.Sidebar', [
         (app.chain || app.community) && m(OffchainNavigationModule),
         (app.chain || app.community) && m(OnchainNavigationModule),

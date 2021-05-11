@@ -1,7 +1,7 @@
 import 'pages/commonwealth/projects.scss';
 
 import m from 'mithril';
-import moment from 'moment-twitter';
+import moment from 'moment';
 import { Card, Button } from 'construct-ui';
 
 import app from 'state';

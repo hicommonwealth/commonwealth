@@ -1,67 +1,51 @@
-import { ethers } from 'ethers';
-
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 
-import EthWebWalletController from 'controllers/app/eth_web_wallet';
+import { Erc20Factory } from 'Erc20Factory';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
-import { ChainBase, ChainClass, IChainAdapter, NodeInfo } from 'models';
+import { ChainBase, IChainAdapter, NodeInfo } from 'models';
 
-import { setActiveAccount } from 'controllers/app/login';
 import ChainEntityController from 'controllers/server/chain_entities';
 import { IApp } from 'state';
 
 import EthereumTokenChain from './chain';
-import TokenAPI from './api';
+import TokenApi from './api';
 
 export default class Token extends IChainAdapter<EthereumCoin, EthereumAccount> {
   public readonly base = ChainBase.Ethereum;
+  // TODO: ensure this chainnetwork -> chainclass
   public readonly class;
-  public readonly contractAddress;
+  public readonly contractAddress: string;
   public readonly isToken = true;
-  public readonly isUninitialized: boolean = false;
+  public readonly isUncreated: boolean = false;
 
   public chain: EthereumTokenChain;
   public accounts: EthereumAccounts;
   public hasToken: boolean = false;
 
-  public readonly webWallet: EthWebWalletController = new EthWebWalletController();
-  public readonly chainEntities = new ChainEntityController();
-
-  constructor(meta: NodeInfo, app: IApp) {
+  constructor(meta: NodeInfo, app: IApp, isUncreated: boolean = false) {
     super(meta, app);
     this.chain = new EthereumTokenChain(this.app);
     this.accounts = new EthereumAccounts(this.app);
     this.class = meta.chain.network;
     this.contractAddress = meta.address;
-    this.isUninitialized = meta.isUninitialized;
+    this.isUncreated = isUncreated;
   }
 
   public async initApi() {
     await this.chain.resetApi(this.meta);
     await this.chain.initMetadata();
     await this.accounts.init(this.chain);
-
-    if (this.webWallet) {
-      await this.webWallet.enable();
-      await this.webWallet.web3.givenProvider.on('accountsChanged', async (accounts) => {
-        const updatedAddress = this.app.user.activeAccounts.find((addr) => addr.address === accounts[0]);
-        await setActiveAccount(updatedAddress);
-      });
-    }
-
-    const activeAddress: string = this.webWallet.accounts && this.webWallet.accounts[0];
-    const api = new TokenAPI(this.meta.address, this.chain.api.currentProvider as any, activeAddress);
+    const api = new TokenApi(Erc20Factory.connect, this.meta.address, this.chain.api.currentProvider as any);
     await api.init();
-    this.chain.tokenAPI = api;
+    this.chain.contractApi = api;
     await super.initApi();
   }
 
   public async initData() {
     await this.chain.initEventLoop();
     await super.initData();
-    const activeAddress: string = this.webWallet.accounts && this.webWallet.accounts[0];
-    await this.activeAddressHasToken(activeAddress);
+    await this.activeAddressHasToken(this.app.user?.activeAccount?.address);
   }
 
   public async deinit() {
@@ -70,11 +54,6 @@ export default class Token extends IChainAdapter<EthereumCoin, EthereumAccount> 
     this.chain.deinitMetadata();
     this.chain.deinitEventLoop();
     this.chain.deinitApi();
-  }
-
-  public async getEthersProvider() {
-    const provider = new ethers.providers.Web3Provider(this.chain.api.currentProvider as any);
-    return provider;
   }
 
   public async activeAddressHasToken(activeAddress?: string) {

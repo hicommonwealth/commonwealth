@@ -1,9 +1,9 @@
 import 'pages/search.scss';
 
 import m from 'mithril';
-import _, { capitalize } from 'lodash';
-import moment from 'moment-twitter';
-import { Tabs, Spinner, TabItem, Tag, ListItem } from 'construct-ui';
+import _ from 'lodash';
+import moment from 'moment';
+import { Input, Spinner, Tag } from 'construct-ui';
 
 import { link, pluralize } from 'helpers';
 import {

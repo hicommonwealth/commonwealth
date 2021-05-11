@@ -103,18 +103,14 @@ abstract class Account<C extends Coin> {
       const params : any = {
         address: this.address,
         chain: this.chain.id,
-        isToken: this.chain.type === "token",
+        isToken: this.chain.type === 'token',
         jwt: this.app.user.jwt,
         signature,
       };
-      return new Promise<void>((resolve, reject) => {
-        $.post(`${this.app.serverUrl()}/verifyAddress`, params).then((result) => {
-          if (result.status === 'Success') return resolve();
-          else reject();
-        }).catch((error) => {
-          reject();
-        });
-      });
+      const result = await $.post(`${this.app.serverUrl()}/verifyAddress`, params);
+      if (result.status === 'Success') {
+        console.log(`Verified address ${this.address}!`);
+      }
     } else {
       throw new Error('signature or key required for validation');
     }

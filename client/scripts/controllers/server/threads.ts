@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 import _ from 'lodash';
-import moment from 'moment-twitter';
+import moment from 'moment';
 import m from 'mithril';
 import $ from 'jquery';
 
@@ -12,7 +12,6 @@ import {
   OffchainThreadStage,
   CommunityInfo,
   NodeInfo,
-  NewChainInfo,
   OffchainTopic,
   Profile,
   ChainEntity,
@@ -21,8 +20,8 @@ import {
 import { notifyError } from 'controllers/app/notifications';
 import { updateLastVisited } from 'controllers/app/login';
 import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
-import { Moment } from 'moment';
 import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
+import { INewChainInfo } from 'types';
 
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
@@ -109,7 +108,7 @@ would break the listingStore's careful chronology.
 
 export interface VersionHistory {
   author?: Profile;
-  timestamp: Moment;
+  timestamp: moment.Moment;
   body: string;
 }
 
@@ -152,7 +151,7 @@ class ThreadsController {
     attachments?: string[],
     readOnly?: boolean,
     isNewChain?: boolean,
-    newChainInfo?: NewChainInfo
+    newChainInfo?: INewChainInfo
   ) {
     try {
       // TODO: Change to POST /thread
@@ -173,7 +172,7 @@ class ThreadsController {
         'readOnly': readOnly,
         'jwt': app.user.jwt,
         'isNewChain': isNewChain,
-        'newChainInfo': JSON.stringify(newChainInfo)
+        'newChainInfo': newChainInfo,
       });
       const result = modelFromServer(response.result);
       this._store.add(result);
