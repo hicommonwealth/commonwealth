@@ -144,10 +144,13 @@ const LoginSelector: m.Component<{
     if (!vnode.state.profileLoadComplete && app.profiles.allLoaded()) {
       vnode.state.profileLoadComplete = true;
     }
+
+    const isToken = (app.chain && (app.chain as Token).isToken);
+
     const joiningChain = app.activeChainId();
     const joiningCommunity = app.activeCommunityId();
     const samebaseAddresses = app.user.addresses.filter((addr) => joiningChain
-      ? networkToBase(addr.chain) === networkToBase(joiningChain)
+      ? networkToBase(addr.chain) === networkToBase(joiningChain, isToken)
       : true);
 
     const samebaseAddressesFiltered: AddressInfo[] = samebaseAddresses.reduce((arr, current) => {
