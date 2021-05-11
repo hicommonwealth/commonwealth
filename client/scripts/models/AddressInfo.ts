@@ -5,7 +5,7 @@ class AddressInfo {
   public readonly keytype: string;
   public readonly isMagic: boolean;
 
-  constructor(id, address, chain, keytype, isMagic?) {
+  constructor(id, address, chain, keytype?, isMagic?) {
     this.id = id;
     this.address = address;
     this.chain = chain;

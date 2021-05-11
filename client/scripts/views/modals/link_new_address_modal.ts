@@ -274,6 +274,10 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
               };
             }
 
+            console.log(`inner joining chain accountcb and more${vnode.attrs.joiningChain}`)
+            console.log(isNewChain);
+            console.log(newChainInfo);
+
             if (vnode.attrs.joiningChain
                 && !app.user.getRoleInCommunity({ account, chain: vnode.attrs.joiningChain })) {
               await app.user.createRole(isNewChain ? {

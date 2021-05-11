@@ -203,23 +203,31 @@ const LoginSelector: m.Component<{
                     address, targetChain, originAddressInfo.chain, joiningCommunity, isNewChain, newChainInfo
                   );
 
+                  const filteredName = app.chain.meta.chain.name.toLowerCase().trim()
+                  .replace(/[^\w ]+/g, '').replace(/ +/g, '-');
+
                   if (res && res.result) {
                     const { verification_token, addressId, addresses } = res.result;
+                    console.log(addresses);
                     app.user.setAddresses(addresses.map((a) => {
-                      return new AddressInfo(a.id, a.address, a.chain, a.keytype, a.is_magic);
+                      return new AddressInfo(a.id, a.address, a.chain, (a.keytype) ? a.keytype : null, a.is_magic);
                     }));
+
+                    // Wack switch because the target chain is different for tokens communities that haven't been created
                     const addressInfo = app.user.addresses
-                      .find((a) => a.address === address && a.chain === targetChain);
+                      .find((a) => a.address === address && a.chain === ((isNewChain) ? filteredName : targetChain));
 
                     const account = app.chain
-                      ? app.chain.accounts.get(address, addressInfo.keytype)
+                      ? app.chain.accounts.get(address, (addressInfo.keytype) ? addressInfo.keytype : null)
                       : app.community.accounts.get(address, addressInfo.chain);
                     if (app.chain) {
                       account.setValidationToken(verification_token);
                     }
 
-                    if (joiningChain && !app.user.getRoleInCommunity({ account, chain: joiningChain })) {
+                    if (joiningChain && !app.user.getRoleInCommunity({ account, chain: joiningChain }) && !isNewChain) {
                       await app.user.createRole({ address: addressInfo, chain: joiningChain });
+                    } else if (joiningChain && !app.user.getRoleInCommunity({ account, chain: joiningChain }) && isNewChain) {
+                      await app.user.createRole({ address: addressInfo, chain: filteredName });
                     } else if (joiningCommunity
                               && !app.user.getRoleInCommunity({ account, community: joiningCommunity })) {
                       await app.user.createRole({ address: addressInfo, community: joiningCommunity });
@@ -233,7 +241,13 @@ const LoginSelector: m.Component<{
                     // Todo: handle error
                   }
 
-                  m.redraw();
+                  if ((app.chain as Token).isToken && (app.chain as Token).isUncreated) {
+                    await initAppState(false);
+                    m.route.set(`/${filteredName}`);
+                    m.redraw();
+                  } else {
+                    m.redraw();
+                  }
                 } catch (err) {
                   console.error(err);
                 }
