@@ -530,7 +530,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
             otherTopicListItems,
           ]),
           m(DiscussionStagesBar, { topic: topicName, stage }),
-          (!((app.chain as Token).isToken && (app.chain as Token).isUncreated)
+          (app.chain && !((app.chain as Token).isToken && (app.chain as Token).isUncreated)
           && (!activeEntity || !activeEntity.serverLoaded || stillFetching))
             ? m('.discussions-main', [
               m(LoadingRow),

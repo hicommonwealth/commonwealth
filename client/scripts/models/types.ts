@@ -53,8 +53,9 @@ export function baseToNetwork(n: ChainBase): ChainNetwork {
   }
 }
 
-export function networkToBase(n: ChainNetwork | string): ChainBase {
+export function networkToBase(n: ChainNetwork | string, t?: boolean): ChainBase {
   console.log(n);
+  if (t) n = ChainNetwork.ERC20; // if it's type token turn it into type ERC20
   if (/^0x[a-fA-F0-9]{40}$/.test(n)) n = ChainNetwork.ERC20;
   switch (n) {
     case ChainNetwork.Clover: return ChainBase.Substrate;
