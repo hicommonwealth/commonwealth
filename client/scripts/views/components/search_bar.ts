@@ -25,6 +25,7 @@ export interface SearchParams {
   communityScope?: string;
   chainScope?: string;
   isSearchPreview?: boolean;
+  isHomepageSearch?: boolean;
   resultSize?: number;
 }
 
@@ -210,7 +211,7 @@ const getBalancedContentListing = (unfilteredResults: any[], types: SearchType[]
   }
   let priorityPosition = 0;
   let resultsLength = 0;
-  while (resultsLength < 6 && resultsLength < unfilteredResultsLength) {
+  while (resultsLength < 6 && (resultsLength < unfilteredResultsLength)) {
     for (let i = 0; i < types.length; i++) {
       const type = types[i];
       if (resultsLength < 6) {
@@ -226,12 +227,15 @@ const getBalancedContentListing = (unfilteredResults: any[], types: SearchType[]
   return results;
 };
 
-const getResultsPreview = (searchTerm: string, state, communityScoped?: boolean) => {
+const getResultsPreview = (searchTerm: string, state, params: SearchParams) => {
   let results;
   let types;
-
-  if (communityScoped) {
+  const { communityScope, isHomepageSearch } = params;
+  if (communityScope) {
     types = [SearchType.Discussion, SearchType.Member];
+    results = getBalancedContentListing(app.searchCache[searchTerm], types);
+  } else if (isHomepageSearch) {
+    types = [SearchType.Community];
     results = getBalancedContentListing(app.searchCache[searchTerm], types);
   } else {
     types = [SearchType.Discussion, SearchType.Member, SearchType.Community];
@@ -256,7 +260,7 @@ const getResultsPreview = (searchTerm: string, state, communityScoped?: boolean)
       const resultRow = item.searchType === SearchType.Discussion
         ? getDiscussionPreview(item, state.closeResults, searchTerm, tabIndex)
         : item.searchType === SearchType.Member
-          ? getMemberPreview(item, state.closeResults, searchTerm, tabIndex, !!communityScoped)
+          ? getMemberPreview(item, state.closeResults, searchTerm, tabIndex, !!communityScope)
           : item.searchType === SearchType.Community
             ? getCommunityPreview(item, state.closeResults, tabIndex)
             : null;
@@ -276,7 +280,7 @@ const concludeSearch = (searchTerm: string, params: SearchParams, state, err?) =
     state.errorText = (err.responseJSON?.error || err.responseText || err.toString());
   } else {
     state.results = params.isSearchPreview
-      ? getResultsPreview(searchTerm, state, !!commOrChainScoped)
+      ? getResultsPreview(searchTerm, state, params)
       : app.searchCache[searchTerm];
   }
   m.redraw();
@@ -288,7 +292,7 @@ const concludeSearch = (searchTerm: string, params: SearchParams, state, err?) =
 // app.searchCache or sends them to getResultsPreview, which creates the relevant
 // preview rows
 export const search = async (searchTerm: string, params: SearchParams, state) => {
-  const { isSearchPreview, communityScope, chainScope } = params;
+  const { isSearchPreview, isHomepageSearch, communityScope, chainScope } = params;
   const resultSize = isSearchPreview ? SEARCH_PREVIEW_SIZE : SEARCH_PAGE_SIZE;
 
   if (app.searchCache[searchTerm]?.loaded) {
@@ -296,26 +300,28 @@ export const search = async (searchTerm: string, params: SearchParams, state) =>
     concludeSearch(searchTerm, params, state);
   }
   try {
-    const [discussions, addrs] = await Promise.all([
-      searchDiscussions(searchTerm, { resultSize, communityScope, chainScope }),
-      searchMentionableAddresses(searchTerm, { resultSize, communityScope, chainScope }, ['created_at', 'DESC'])
-    ]);
+    if (!isHomepageSearch) {
+      const [discussions, addrs] = await Promise.all([
+        searchDiscussions(searchTerm, { resultSize, communityScope, chainScope }),
+        searchMentionableAddresses(searchTerm, { resultSize, communityScope, chainScope }, ['created_at', 'DESC'])
+      ]);
 
-    app.searchCache[searchTerm][SearchType.Discussion] = discussions.map((discussion) => {
-      discussion.contentType = discussion.root_id ? ContentType.Comment : ContentType.Thread;
-      discussion.searchType = SearchType.Discussion;
-      return discussion;
-    }).sort(sortResults);
+      app.searchCache[searchTerm][SearchType.Discussion] = discussions.map((discussion) => {
+        discussion.contentType = discussion.root_id ? ContentType.Comment : ContentType.Thread;
+        discussion.searchType = SearchType.Discussion;
+        return discussion;
+      }).sort(sortResults);
 
-    app.searchCache[searchTerm][SearchType.Member] = addrs.map((addr) => {
-      addr.contentType = ContentType.Member;
-      addr.searchType = SearchType.Member;
-      return addr;
-    }).sort(sortResults);
+      app.searchCache[searchTerm][SearchType.Member] = addrs.map((addr) => {
+        addr.contentType = ContentType.Member;
+        addr.searchType = SearchType.Member;
+        return addr;
+      }).sort(sortResults);
 
-    if (communityScope || chainScope) {
-      concludeSearch(searchTerm, params, state);
-      return;
+      if (communityScope || chainScope) {
+        concludeSearch(searchTerm, params, state);
+        return;
+      }
     }
 
     const unfilteredTokens = app.searchCache[ALL_RESULTS_KEY]['tokens'];
@@ -367,7 +373,7 @@ const emptySearchPreview : m.Component<{ searchTerm: string }, {}> = {
     const { searchTerm } = vnode.attrs;
     const message = app.activeId()
       ? `No results in ${app.activeId()}. Search Commonwealth?`
-      : 'No results found.';
+      : 'No community results found.';
     return m(ListItem, {
       class: 'no-results',
       label: [
@@ -464,7 +470,8 @@ export const SearchBar : m.Component<{}, {
             const params: SearchParams = {
               isSearchPreview: true,
               communityScope: app.activeCommunityId(),
-              chainScope: app.activeChainId()
+              chainScope: app.activeChainId(),
+              isHomepageSearch: m.route.get() === '/'
             };
             clearTimeout(vnode.state.inputTimeout);
             vnode.state.inputTimeout = setTimeout(() => {
@@ -482,6 +489,9 @@ export const SearchBar : m.Component<{}, {
             }
             if (searchTerm.length < 4) {
               notifyError('Query must be at least 4 characters');
+            }
+            if (app.searchCache[searchTerm]?.loaded) {
+              app.searchCache[searchTerm].loaded = false;
             }
             let params = `q=${encodeURIComponent(vnode.state.searchTerm.toString().trim())}`;
             if (app.activeCommunityId()) params += `&comm=${app.activeCommunityId()}`;
