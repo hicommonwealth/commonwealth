@@ -24,22 +24,25 @@ const Description: m.Component<{}, {}> = {
   }
 };
 
-const ProjectsPage: m.Component<{}, { initializing: boolean }> = {
+const ProjectsPage: m.Component<{}, { initializing: boolean, protocol: any }> = {
   oncreate: async (vnode) => {
     if (!app.chain || !app.chain.loaded) {
       vnode.state.initializing = true;
       await initChain();
-      // app.chain.deferred = false;
+      vnode.state.protocol = (app.chain as any).protocol;
       vnode.state.initializing = false;
+      m.redraw();
+    } else if (!vnode.state.protocol) {
+      vnode.state.protocol = (app.chain as any).protocol;
       m.redraw();
     }
   },
   view: (vnode) => {
-    if (vnode.state.initializing || !app.chain || !app.chain.loaded || !(app.chain as any).protocol) {
+    if (vnode.state.initializing || !app.chain || !vnode.state.protocol) {
       return m(PageLoading);
     }
 
-    const projects = (app.chain as any).protocol ? (app.chain as any).protocol.get('root').projects : [];
+    const projects = vnode.state.protocol.get('root').projects;
     const activeProjectsContent = projects ? projects.filter((p) => p.status === 'In Progress').map((p) => m(ProjectCard, { project: p })) : [];
     const failedProjects = projects ? projects.filter((p) => p.status === 'Failed').map((p) => m(ProjectCard, { project: p })) : [];
     const successedProjects = projects ? projects.filter((p) => p.status === 'Successed').map((p) => m(ProjectCard, { project: p })) : [];
