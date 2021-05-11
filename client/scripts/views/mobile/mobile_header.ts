@@ -11,17 +11,11 @@ import { SearchBar } from 'views/components/search_bar';
 import MobileSidebar from './mobile_sidebar';
 import { CustomHamburgerIcon } from './mobile_icons';
 
-const MobileHeader: m.Component<{}, { open: boolean }> = {
+const MobileHeader: m.Component<{}, { sidebarOpen: boolean }> = {
   view: (vnode) => {
-    return m('.MobileHeader', {
-      onclick: (e) => {
-        e.preventDefault();
-        // clicking anywhere outside the trigger should close the sidebar
-        const onTrigger = $(e.target).hasClass('mobile-header-trigger')
-          || $(e.target).closest('.mobile-header-trigger').length > 0;
-        if (!onTrigger && vnode.state.open) vnode.state.open = false;
-      },
-    }, [
+    const { sidebarOpen } = vnode.state;
+    console.log({ sidebarOpen });
+    return m('.MobileHeader', [
       m('img.mobile-logo', {
         src: 'https://commonwealth.im/static/img/logo.png',
         onclick: (e) => { m.route.set('/'); }
@@ -39,7 +33,8 @@ const MobileHeader: m.Component<{}, { open: boolean }> = {
           trigger: m(Button, {
             class: 'mobile-header-trigger no-border',
             compact: true,
-            label: m(CustomHamburgerIcon),
+            label: sidebarOpen ? m(Icon, { name: Icons.X }) : m(CustomHamburgerIcon),
+            onclick: (e) => { vnode.state.sidebarOpen = !sidebarOpen; }
           }),
           content: m(MobileSidebar)
         }),

@@ -2,6 +2,9 @@
 @import 'components/sidebar';
 
 .MobileHeader {
+    * {
+        -webkit-tap-highlight-color:  rgba(255, 255, 255, 0); 
+    }
     // only content styles here. layout styles are in layout.scss
     background: $background-color-white;
     border-bottom: 1px solid $border-color-lightest;
@@ -22,12 +25,6 @@
         &.logged-in.no-community {
             max-width: calc(100% - 142px);
         }
-    }
-    .mobile-header-left {
-        padding-left: 6px !important;
-    }
-    .mobile-header-right {
-        padding-right: 13px !important;
     }
 
     // TODO: split this up so CSS classes aren't duplicated
@@ -57,7 +54,7 @@
         > .MobileNewProposalButton,
         > .community-label,
         > .LoginSelector {
-            margin-left: 9px;
+            margin-left: 5px;
         }
         > .cui-button {
             &.no-border {
@@ -71,6 +68,13 @@
                     position: relative;
                     right: 1.5px;
                 }
+            }
+        }
+        .mobile-header-trigger {
+            .cui-icon-x > svg {
+                height: 26px;
+                width: 26px;
+                stroke: black;
             }
         }
         @include xs-max {
@@ -140,7 +144,10 @@
 
 .MobileHeaderPopoverMenu {
     @include sidebar();
-    transform: translate3d(0px, 60px, 0px) !important;
+    transform: none !important;
+    position: absolute;
+    top: 60px !important;
+    will-change: initial !important;
     .cui-menu {
         border: none;
     }

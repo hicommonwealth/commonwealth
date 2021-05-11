@@ -407,6 +407,7 @@ export const SearchBar : m.Component<{}, {
     const { results, searchTerm } = vnode.state;
     const showDropdownPreview = !m.route.get().includes('/search?q=');
     const LoadingPreview = m(List, { class: 'search-results-loading' }, m(ListItem, { label: m(Spinner, { active: true }) }));
+    const isMobile = (window.innerWidth < 767.98);
     const searchResults = (!results || results?.length === 0)
       ? (app.searchCache[searchTerm]?.loaded)
         ? m(List, [ m(emptySearchPreview, { searchTerm }) ])
@@ -443,7 +444,7 @@ export const SearchBar : m.Component<{}, {
       m(Input, {
         name: 'search',
         placeholder: 'Type to search...',
-        autofocus: true,
+        autofocus: !isMobile,
         fluid: true,
         tabIndex: -10,
         contentLeft: m(SearchIcon),
