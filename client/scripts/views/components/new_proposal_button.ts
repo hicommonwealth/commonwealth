@@ -17,6 +17,7 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
     m(MenuItem, {
       onclick: () => { m.route.set(`/${app.activeId()}/new/thread`); },
       label: 'New thread',
+      iconLeft: mobile ? Icons.PLUS : undefined,
     }),
     (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
       && !mobile
@@ -25,33 +26,38 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
       onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
         type: ProposalType.CosmosProposal
       }),
-      label: 'New text proposal'
+      label: 'New text proposal',
+      iconLeft: mobile ? Icons.PLUS : undefined,
     }),
     app.chain?.base === ChainBase.Substrate && app.chain?.class !== ChainClass.Plasm && [
       m(MenuItem, {
         onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
           type: ProposalType.SubstrateTreasuryProposal
         }),
-        label: 'New treasury proposal'
+        label: 'New treasury proposal',
+        iconLeft: mobile ? Icons.PLUS : undefined,
       }),
       m(MenuItem, {
         onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
           type: ProposalType.SubstrateDemocracyProposal
         }),
-        label: 'New democracy proposal'
+        label: 'New democracy proposal',
+        iconLeft: mobile ? Icons.PLUS : undefined,
       }),
       m(MenuItem, {
         class: activeAccount && (activeAccount as any).isCouncillor ? '' : 'disabled',
         onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
           type: ProposalType.SubstrateCollectiveProposal
         }),
-        label: 'New council motion'
+        label: 'New council motion',
+        iconLeft: mobile ? Icons.PLUS : undefined,
       }),
       m(MenuItem, {
         onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
           type: ProposalType.SubstrateBountyProposal,
         }),
-        label: 'New bounty proposal'
+        label: 'New bounty proposal',
+        iconLeft: mobile ? Icons.PLUS : undefined,
       }),
     ],
   ];

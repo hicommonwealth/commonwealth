@@ -1,11 +1,10 @@
 import 'components/sidebar/community_selector.scss';
 
 import m from 'mithril';
-import { Button, Icon, Icons, List, ListItem, PopoverMenu, MenuItem } from 'construct-ui';
+import { Button, Icon, Icons, ListItem, PopoverMenu } from 'construct-ui';
 
 import app from 'state';
 import { AddressInfo, ChainInfo, CommunityInfo, RoleInfo } from 'models';
-import { SwitchIcon } from 'helpers';
 
 import { ChainIcon, CommunityIcon, TokenIcon } from 'views/components/chain_icon';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';

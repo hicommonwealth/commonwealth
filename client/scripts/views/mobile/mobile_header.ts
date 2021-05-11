@@ -22,7 +22,7 @@ const MobileHeader: m.Component<{}, { open: boolean }> = {
         if (!onTrigger && vnode.state.open) vnode.state.open = false;
       },
     }, [
-      m('img', { src: 'https://commonwealth.im/static/img/logo.png' }),
+      m('img.mobile-logo', { src: 'https://commonwealth.im/static/img/logo.png' }),
       m(SearchBar),
       m('.mobile-header-right', [
         app.isLoggedIn() && m(NotificationsMenu, { small: false }),

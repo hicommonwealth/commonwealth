@@ -26,13 +26,25 @@
             margin: 0;
         }
     }
+    .CurrentCommunityMenu {
+        .cui-menu-divider {
+            margin: 12px 0 18px;
+        }
+    }
+    .cui-icon {
+        margin-right: 25px !important;
+    }
+    .cui-icon svg {
+        display: inline-flex;
+        fill: rgb(102, 102, 102);
+        stroke: rgb(102, 102, 102) !important;
+        height: 28px;
+        width: 28px;
+    }
 }
 
 .MobileAccountMenu {
-    padding: 20px 32px;
-    min-height: calc(100vh - 60px);
-    height: min-content;
-    width: 100vw;
+    width: 100%;
     .cui-menu {
         border: none;
         .label-wrap {
@@ -57,17 +69,8 @@
     .cui-menu-divider {
         margin: 12px 0 14px;
     }
-    // .LoginSelectorMenu .cui-menu-divider,
-    // .NewProposalMenu .cui-menu-divider {
-    //     display: none;
-    // }
     span {
         color: black;
         font-size: 18px;
-    }
-    .LoginSelectorMenu {
-        .cui-icon {
-            display: inline-flex;
-        }
     }
 }

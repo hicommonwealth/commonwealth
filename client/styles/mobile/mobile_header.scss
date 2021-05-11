@@ -6,6 +6,13 @@
     background: $background-color-white;
     border-bottom: 1px solid $border-color-lightest;
 
+    img.mobile-logo {
+        height: 36px;
+        top: 1px;
+        position: relative;
+        background: black;
+        border-radius: 50%;
+    }
     .mobile-header-center {
         flex: 1;
         max-width: calc(100% - 100px);

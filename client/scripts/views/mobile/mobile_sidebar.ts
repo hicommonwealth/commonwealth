@@ -22,8 +22,9 @@ enum MenuTabs {
   account = 'account',
 }
 
-const MobileAccountMenu: m.Component<{}, { showNewThreadOptions: boolean }> = {
+const MobileAccountMenu: m.Component<{}, {}> = {
   view: (vnode) => {
+    if (!app.isLoggedIn) return;
     const isPrivateCommunity = app.community?.meta.privacyEnabled;
     const activeAddressesWithRole = app.user.activeAccounts.filter((account) => {
       return app.user.getRoleInCommunity({
@@ -36,19 +37,6 @@ const MobileAccountMenu: m.Component<{}, { showNewThreadOptions: boolean }> = {
     const nAccountsWithoutRole = activeAccountsByRole.filter(([account, role], index) => !role).length;
 
     return m(Menu, { class: 'MobileAccountMenu' }, [
-      m(Menu, { class: 'NewProposalMenu' }, [
-        m(MenuItem, {
-          label: 'New Thread',
-          icon: Icons.PLUS,
-          onclick: (e) => {
-            e.stopPropagation();
-            vnode.state.showNewThreadOptions = true;
-          }
-        })
-      ]),
-      m(Dialog, {
-        content: getNewProposalMenu([], true)
-      }),
       m(MenuDivider),
       m(LoginSelectorMenuLeft, {
         activeAddressesWithRole, nAccountsWithoutRole, isPrivateCommunity
@@ -59,20 +47,32 @@ const MobileAccountMenu: m.Component<{}, { showNewThreadOptions: boolean }> = {
   }
 }; 
 
-const MobileSidebar: m.Component<{}, { activeTab: string }> = {
+const MobileSidebar: m.Component<{}, { activeTab: string, showNewThreadOptions: boolean }> = {
   oncreate: (vnode) => { vnode.state.activeTab = MenuTabs.currentCommunity; },
   view: (vnode) => {
-    let { activeTab } = vnode.state;
+    let { activeTab, showNewThreadOptions } = vnode.state;
     if (!activeTab) activeTab = MenuTabs.currentCommunity;
-    const currentCommunityMenu = m('.currentCommunityMenu', [
+    const currentCommunityMenu = m(Menu, { class: 'CurrentCommunityMenu' }, [
+      m(Menu, { class: 'NewProposalMenu' }, [
+        m(MenuItem, {
+          label: 'Create New',
+          iconLeft: Icons.PLUS,
+          onclick: (e) => {
+            e.stopPropagation();
+            vnode.state.showNewThreadOptions = !showNewThreadOptions;
+          }
+        }),
+        showNewThreadOptions
+        && getNewProposalMenu([], true)
+      ]),
+      m(MenuDivider),
       (app.chain || app.community) && m(OffchainNavigationModule),
       (app.chain || app.community) && m(OnchainNavigationModule),
       (app.chain || app.community) && m(ExternalLinksModule),
-      m('br'),
       app.isLoggedIn() && (app.chain || app.community) && m(SubscriptionButton),
       app.chain && m(ChainStatusModule),
     ]);
-    const allCommunitiesMenu = m('.allCommunitiesMenu', [
+    const allCommunitiesMenu = m('.AllCommunitiesMenu', [
       m(CommunitySelector, { showListOnly: true, showHomeButtonAtTop: true })
     ]);
     return m('.MobileSidebar', [
@@ -93,7 +93,8 @@ const MobileSidebar: m.Component<{}, { activeTab: string }> = {
             vnode.state.activeTab = MenuTabs.allCommunities;
           }
         }),
-        m(TabItem, {
+        app.isLoggedIn()
+        && m(TabItem, {
           label: 'Account',
           active: activeTab === MenuTabs.account,
           onclick: (e) => {
