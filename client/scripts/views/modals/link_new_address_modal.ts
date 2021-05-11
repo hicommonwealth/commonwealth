@@ -252,17 +252,8 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
 
           // link the address to the community
           try {
-            const chains = {};
-            app.config.nodes.getAll().forEach((n) => {
-              if (chains[n.chain.id]) {
-                chains[n.chain.id].push(n);
-              } else {
-                chains[n.chain.id] = [n];
-              }
-            });
-
-            const isNewChain = !chains[vnode.attrs.joiningChain] && (app.chain as Token)?.isUncreated;
-
+            const isNewChain = !app.config.chains.getById(vnode.attrs.joiningChain)
+              && (app.chain as Token)?.isUncreated;
             let newChainInfo: INewChainInfo;
             if (isNewChain) {
               newChainInfo = {
