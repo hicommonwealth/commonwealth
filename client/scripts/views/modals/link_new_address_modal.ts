@@ -261,8 +261,7 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
               }
             });
 
-            const isNewChain = !chains[vnode.attrs.joiningChain] && (app.chain as Token).isToken
-            && (app.chain as Token).isUncreated;
+            const isNewChain = !chains[vnode.attrs.joiningChain] && (app.chain as Token)?.isUncreated;
 
             let newChainInfo: INewChainInfo;
             if (isNewChain) {
@@ -355,7 +354,7 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
         m.redraw();
       }
 
-      if ((app.chain as Token).isToken && (app.chain as Token).isUncreated) {
+      if ((app.chain as Token)?.isUncreated) {
         await initAppState(false);
         const filteredName = app.chain.meta.chain.name.toLowerCase().trim()
           .replace(/[^\w ]+/g, '').replace(/ +/g, '-');
