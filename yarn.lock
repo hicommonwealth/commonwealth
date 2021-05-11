@@ -195,11 +195,6 @@
     lodash "^4.17.19"
     to-fast-properties "^2.0.0"
 
-"@clover-network/node-types@1.0.3":
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/@clover-network/node-types/-/node-types-1.0.3.tgz#0a83b850918ddf75b517b1f81784a398b94dc314"
-  integrity sha512-7zNm68KaRxyZWVOrDFWOWyG6h/khgkXpVKw6mByJnrzG6MajDkdctTFeu2RrXeYFl5fH9gm2sv0UDFvMuk3m5Q==
-
 "@edgeware/node-types@^3.3.3":
   version "3.3.3"
   resolved "https://registry.yarnpkg.com/@edgeware/node-types/-/node-types-3.3.3.tgz#0a1f11698203c8056722e4c1b218f04f6eec55ed"

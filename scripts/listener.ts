@@ -4,7 +4,7 @@ import { spec as EdgewareSpec } from '@edgeware/node-types';
 import { HydraDXSpec } from './specs/hydraDX';
 import { KulupuSpec } from './specs/kulupu';
 import { StafiSpec } from './specs/stafi';
-import * as CloverSpecTypes from '@clover-network/node-types';
+import { CloverSpec } from './specs/clover';
 import {
   chainSupportedBy, IEventHandler, CWEvent, SubstrateEvents, MarlinEvents, MolochEvents, EventSupportingChains
 } from '../dist/index';
@@ -28,9 +28,7 @@ const networkUrls = {
 } as const;
 
 const networkSpecs: { [chain: string]: RegisteredTypes } = {
-  'clover': {
-    types: CloverSpecTypes
-  },
+  'clover': CloverSpec,
   'hydradx': HydraDXSpec,
   'kulupu': KulupuSpec,
   'edgeware': EdgewareSpec,
