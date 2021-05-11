@@ -1,10 +1,7 @@
 import { INewChainInfo, TokenResponse } from '../../shared/types';
+import { tokenNameToId } from '../../shared/utils';
 import { ChainInstance } from '../models/chain';
 import TokenBalanceCache from './tokenBalanceCache';
-
-export function tokenNameToId(name: string): string {
-  return name.toLowerCase().trim().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
-}
 
 const checkNewChainInfoWithTokenList = async (
   tokenBalanceCache: TokenBalanceCache,

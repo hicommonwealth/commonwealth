@@ -10,7 +10,7 @@ import { TokenResponse } from '../../shared/types';
 
 import JobRunner from './cacheJobRunner';
 import TokenListCache from './tokenListCache';
-import { tokenNameToId } from './createTokenChain';
+import { tokenNameToId } from '../../shared/utils';
 
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));

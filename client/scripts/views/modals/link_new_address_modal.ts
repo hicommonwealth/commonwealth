@@ -252,18 +252,8 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
 
           // link the address to the community
           try {
-            const chains = {};
-            app.config.nodes.getAll().forEach((n) => {
-              if (chains[n.chain.id]) {
-                chains[n.chain.id].push(n);
-              } else {
-                chains[n.chain.id] = [n];
-              }
-            });
-
-            const isNewChain = !chains[vnode.attrs.joiningChain] && (app.chain as Token).isToken
-            && (app.chain as Token).isUncreated;
-
+            const isNewChain = !app.config.chains.getById(vnode.attrs.joiningChain)
+              && (app.chain as Token)?.isUncreated;
             let newChainInfo: INewChainInfo;
             if (isNewChain) {
               newChainInfo = {
@@ -355,7 +345,7 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
         m.redraw();
       }
 
-      if ((app.chain as Token).isToken && (app.chain as Token).isUncreated) {
+      if ((app.chain as Token)?.isUncreated) {
         await initAppState(false);
         const filteredName = app.chain.meta.chain.name.toLowerCase().trim()
           .replace(/[^\w ]+/g, '').replace(/ +/g, '-');

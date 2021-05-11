@@ -131,3 +131,8 @@ export function formatAddressShort(address: string, chain: string) {
     return `${address.slice(0, 5)}…`;
   }
 }
+
+
+export function tokenNameToId(name: string): string {
+  return name.toLowerCase().trim().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
+}

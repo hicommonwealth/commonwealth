@@ -24,11 +24,8 @@ const createAddress = async (models, tokenBalanceCache: TokenBalanceCache,
     return next(new Error(Errors.NeedChain));
   }
 
-  const chainName = req.body.chain.startsWith('0x') ? 'ethereum' : req.body.chain;
-
   let chain, existingAddress, error;
   if (req.body.isNewChain === 'true') {
-    console.log("isnew chain")
     const newChainInfo: INewChainInfo = {
       address: req.body['newChainInfo[address]'],
       iconUrl: req.body['newChainInfo[iconUrl]'],
@@ -37,7 +34,6 @@ const createAddress = async (models, tokenBalanceCache: TokenBalanceCache,
     };
     [chain, error] = await createChainForAddress(models, tokenBalanceCache, newChainInfo);
     existingAddress = false;
-    console.log("error", chain, error);
 
     if (error) return next(new Error(error));
   } else {

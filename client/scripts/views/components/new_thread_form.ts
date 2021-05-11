@@ -153,19 +153,7 @@ const newThread = async (
   const attachments = [];
   const chainId = app.activeCommunityId() ? null : app.activeChainId();
   const communityId = app.activeCommunityId();
-
-  const chains = {};
-  app.config.nodes.getAll().forEach((n) => {
-    if (chains[n.chain.id]) {
-      chains[n.chain.id].push(n);
-    } else {
-      chains[n.chain.id] = [n];
-    }
-  });
-
-  const isNewChain = !chains[chainId]
-    && (app.chain as Token).isToken
-    && (app.chain as Token).isUncreated;
+  const isNewChain = (app.chain as Token)?.isUncreated;
 
   let result;
   try {

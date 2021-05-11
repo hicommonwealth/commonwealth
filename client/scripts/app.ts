@@ -10,7 +10,15 @@ import moment from 'moment';
 import mixpanel from 'mixpanel-browser';
 
 import app, { ApiStatus, LoginState } from 'state';
-import { ChainInfo, CommunityInfo, NodeInfo, ChainNetwork, NotificationCategory, Notification } from 'models';
+import {
+  ChainInfo,
+  CommunityInfo,
+  NodeInfo,
+  ChainNetwork,
+  NotificationCategory,
+  Notification,
+  ChainBase,
+} from 'models';
 import { WebsocketMessageType, IWebsocketsPayload, TokenResponse } from 'types';
 
 import { notifyError, notifySuccess, notifyInfo } from 'controllers/app/notifications';
@@ -472,20 +480,27 @@ export async function initTemporaryTokenChain(address: string): Promise<boolean>
   return createTemporaryTokenChain(
     new NodeInfo(
       0,
-      new ChainInfo(
-        token.address,
-        '',
-        token.symbol,
-        token.name,
-        token.logoURI,
-        '',
-        '',
-        '',
-        '',
-        '',
-        'ethereum',
-        false, false, false, false, false, [], []
-      ),
+      new ChainInfo({
+        id: token.address,
+        network: ChainNetwork.ERC20,
+        symbol: token.symbol,
+        name: token.name,
+        icon_url: token.logoURI,
+        description: '',
+        website: '',
+        discord: '',
+        element: '',
+        telegram: '',
+        github: '',
+        customDomain: '',
+        blockExplorerIds: {},
+        collapsed_on_homepage: false,
+        featured_topics: [],
+        topics: [],
+        adminsAndMods: [],
+        base: ChainBase.Ethereum,
+        type: 'token'
+      }),
       '',
       token.address
     )
