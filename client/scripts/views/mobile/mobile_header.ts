@@ -14,7 +14,6 @@ import { CustomHamburgerIcon } from './mobile_icons';
 const MobileHeader: m.Component<{}, { sidebarOpen: boolean }> = {
   view: (vnode) => {
     const { sidebarOpen } = vnode.state;
-    console.log({ sidebarOpen });
     return m('.MobileHeader', [
       m('img.mobile-logo', {
         src: 'https://commonwealth.im/static/img/logo.png',
