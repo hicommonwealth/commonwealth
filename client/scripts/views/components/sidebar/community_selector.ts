@@ -230,12 +230,13 @@ const CommunitySelector: m.Component<{
     return showListOnly
       ? m('.CommunitySelectList', [
         showHomeButtonAtTop
-        && m('a', {
+        && m('a.home-button', {
           href: '/',
-          onclick: (e) => { m.route.set('/'); }
+          onclick: (e) => { m.route.set('/'); },
         }, [
           m('img.mobile-logo', {
             src: 'https://commonwealth.im/static/img/logo.png',
+            style: 'height:18px;width:18px;background:black;border-radius:50%;'
           }),
           m('span', 'Home'),
         ]),

@@ -40,6 +40,21 @@
         height: 28px;
         width: 28px;
     }
+    .CommunitySelectList {
+        a.home-button {
+            display: flex;
+            color: black;
+            font-weight: 500;
+            margin: 4px 10px;
+            width: 100%;
+            &:hover {
+                text-transform: none;
+            }
+            img {
+                margin-right: 13px;
+            }
+        }
+    }
 }
 
 .MobileAccountMenu {
