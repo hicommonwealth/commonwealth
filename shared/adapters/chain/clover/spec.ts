@@ -14,6 +14,7 @@ const CloverSpec: RegisteredTypes = {
     BridgeNetworks: {
       _enum: ['BSC', 'Ethereum'],
     },
+    AccountInfo: 'AccountInfoWithDualRefCount',
   }
 };
 
