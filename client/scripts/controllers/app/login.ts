@@ -24,14 +24,32 @@ import { INewChainInfo } from 'types';
 
 const MAGIC_PUBLISHABLE_KEY = 'pk_live_B0604AA1B8EEFDB4';
 
-function createAccount(account: Account<any>, community?: string) {
-  // TODO: Change to POST /address
+function isNewChain() : boolean {
+  return (app.chain as Token).isToken
+  && (app.chain as Token).isUncreated;
+}
+
+function newChainInfo() {
+  return {
+    address: app.chain.id,
+    iconUrl: (app.chain.meta.chain.iconUrl) ? app.chain.meta.chain.iconUrl : 'default',
+    name: app.chain.meta.chain.name,
+    symbol: app.chain.meta.chain.symbol
+  };
+}
+
+function createAccount(
+  account: Account<any>,
+  community?: string
+) {
   return $.post(`${app.serverUrl()}/createAddress`, {
     address: account.address,
     keytype: account.chainBase === ChainBase.Substrate
       && (account as any).isEd25519 ? 'ed25519' : undefined,
-    chain: (app.chain as Token).isToken ? 'ethereum' : account.chain.id,
+    chain: account.chain.id,
     community,
+    isNewChain: isNewChain(),
+    newChainInfo: isNewChain() ? newChainInfo() : null,
     jwt: app.user.jwt,
   });
 }
@@ -41,16 +59,14 @@ export function linkExistingAddressToChainOrCommunity(
   chain: string,
   originChain: string,
   community: string,
-  isNewChain?: boolean,
-  newChainInfo?: INewChainInfo,
 ) {
   return $.post(`${app.serverUrl()}/linkExistingAddressToChain`, {
     'address': address,
     'chain': chain,
     'originChain': originChain,
     'community': community,
-    'isNewChain': isNewChain,
-    'newChainInfo': newChainInfo,
+    'isNewChain': isNewChain(),
+    'newChainInfo': isNewChain() ? newChainInfo() : null,
     jwt: app.user.jwt,
   });
 }

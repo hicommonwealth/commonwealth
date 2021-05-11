@@ -126,8 +126,7 @@ const LoginSelector: m.Component<{
     const activeAddressesWithRole = app.user.activeAccounts.filter((account) => {
       return app.user.getRoleInCommunity({
         account,
-        chain: (app.activeChainId() && (app.chain as Token).isToken && (app.chain as Token).isUncreated)
-          ? 'ethereum' : app.activeChainId(),
+        chain: app.activeChainId(),
         community: app.activeCommunityId()
       });
     });
@@ -152,7 +151,6 @@ const LoginSelector: m.Component<{
     const samebaseAddresses = app.user.addresses.filter((addr) => joiningChain
       ? networkToBase(addr.chain) === networkToBase(joiningChain, isToken)
       : true);
-
     const samebaseAddressesFiltered: AddressInfo[] = samebaseAddresses.reduce((arr, current) => {
       if (!arr.find((item) => item.address === current.address
           && networkToBase(item.chain) === networkToBase(current.chain))) {
@@ -205,11 +203,11 @@ const LoginSelector: m.Component<{
                   }
 
                   const res = await linkExistingAddressToChainOrCommunity(
-                    address, targetChain, originAddressInfo.chain, joiningCommunity, isNewChain, newChainInfo
+                    address, targetChain, originAddressInfo.chain, joiningCommunity
                   );
 
                   const filteredName = app.chain.meta.chain.name.toLowerCase().trim()
-                  .replace(/[^\w ]+/g, '').replace(/ +/g, '-');
+                    .replace(/[^\w ]+/g, '').replace(/ +/g, '-');
 
                   if (res && res.result) {
                     const { verification_token, addressId, addresses } = res.result;

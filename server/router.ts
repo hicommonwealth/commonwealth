@@ -127,7 +127,7 @@ function setupRouter(
   // TODO: Change to POST /gist
   router.post('/createGist', passport.authenticate('jwt', { session: false }), createGist.bind(this, models));
   // TODO: Change to POST /address
-  router.post('/createAddress', createAddress.bind(this, models));
+  router.post('/createAddress', createAddress.bind(this, models, tokenBalanceCache));
   // TODO: Change to PUT /address
   router.post('/verifyAddress', verifyAddress.bind(this, models));
   // TODO: Change to DELETE /address

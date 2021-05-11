@@ -1,5 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../../shared/logging';
+import TokenBalanceCache from '../util/tokenBalanceCache';
+import { INewChainInfo } from '../../shared/types';
+import { createChainForAddress } from '../util/createTokenChain';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -9,7 +12,8 @@ export const Errors = {
   InvalidChain: 'Invalid chain',
 };
 
-const createAddress = async (models, req: Request, res: Response, next: NextFunction) => {
+const createAddress = async (models, tokenBalanceCache: TokenBalanceCache,
+  req: Request, res: Response, next: NextFunction) => {
   // start the process of creating a new address. this may be called
   // when logged in to link a new address for an existing user, or
   // when logged out to create a new user by showing proof of an address.
@@ -19,18 +23,37 @@ const createAddress = async (models, req: Request, res: Response, next: NextFunc
   if (!req.body.chain) {
     return next(new Error(Errors.NeedChain));
   }
+
   const chainName = req.body.chain.startsWith('0x') ? 'ethereum' : req.body.chain;
 
-  const chain = await models.Chain.findOne({
-    where: { id: chainName }
-  });
+  let chain, existingAddress, error;
+  if (req.body.isNewChain === 'true') {
+    console.log("isnew chain")
+    const newChainInfo: INewChainInfo = {
+      address: req.body['newChainInfo[address]'],
+      iconUrl: req.body['newChainInfo[iconUrl]'],
+      name: req.body['newChainInfo[name]'],
+      symbol: req.body['newChainInfo[symbol]'],
+    };
+    [chain, error] = await createChainForAddress(models, tokenBalanceCache, newChainInfo);
+    existingAddress = false;
+    console.log("error", chain, error);
+
+    if (error) return next(new Error(error));
+  } else {
+    chain = await models.Chain.findOne({
+      where: { id: req.body.chain }
+    });
+
+    existingAddress = await models.Address.scope('withPrivateData').findOne({
+      where: { chain: req.body.name, address: req.body.address }
+    });
+  }
+
   if (!chain) {
     return next(new Error(Errors.InvalidChain));
   }
 
-  const existingAddress = await models.Address.scope('withPrivateData').findOne({
-    where: { chain: chainName, address: req.body.address }
-  });
   if (existingAddress) {
     // address already exists on another user, only take ownership if
     // unverified and expired
@@ -64,7 +87,7 @@ const createAddress = async (models, req: Request, res: Response, next: NextFunc
     try {
       const newObj = await models.Address.createWithToken(
         req.user ? req.user.id : null,
-        req.body.chain,
+        chain.id,
         req.body.address,
         req.body.keytype
       );
@@ -78,7 +101,7 @@ const createAddress = async (models, req: Request, res: Response, next: NextFunc
           permission: 'member',
         } : {
           address_id: newObj.id,
-          chain_id: req.body.chain,
+          chain_id: chain.id,
           permission: 'member',
         });
       }
