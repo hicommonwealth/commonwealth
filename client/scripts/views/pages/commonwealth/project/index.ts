@@ -35,41 +35,39 @@ const ProjectContentModule: m.Component<{project: CWProjectWithParticipants, lef
   view: (vnode) => {
     const { project, leftInSeconds } = vnode.attrs;
     const leftTime = project.status === 'In Progress' ? `${secondsToDhms(leftInSeconds)} left`: project.status;
+    const textColorStyle = { color: project.status === 'In Progress' ? 'blue': project.status === 'Successed' ? 'green' : 'red' }
 
     return m('.col-lg-8 .content-area', [
       m('div.project-name', project.name),
       m('div.project-text', [
         m('span', 'A project by created by'),
-        m('span.bold', `${project.beneficiary}   :`),
-        m('span', {style: { color: project.status === 'In Progress' ? 'blue': project.status === 'Successed' ? 'green' : 'red' }}, `${leftTime}`, ),
+        m('span.bold', `${project.beneficiary}`),
       ]),
+      m('div.project-description', { style: textColorStyle}, leftTime),
       m('div.project-description', project.description)
     ]);
   }
 }
 
-const ViewProjectInitialPage: m.Component<{projectHash: string}, {project: CWProjectWithParticipants, initializing: boolean, protocol: any}> = {
+const ViewProjectInitialPage: m.Component<{projectHash: string}, {initializing: boolean, protocol: any}> = {
   oncreate: async(vnode) => {
     if (!app.chain || !app.chain.loaded) {
       vnode.state.initializing = true;
       await initChain();
+      vnode.state.protocol = (app.chain as any).protocol;
       vnode.state.initializing = false;
       m.redraw();
-    } else if (!vnode.state.project || !vnode.state.protocol) {
+    } else if (!vnode.state.protocol) {
       vnode.state.protocol = (app.chain as any).protocol;
-      const projects = vnode.state.protocol.get('root').projects || [];
-      vnode.state.project = projects.filter((item) => item.projectHash === vnode.attrs.projectHash)[0];
       m.redraw();
     }
   },
   view: (vnode) => {
-    if (vnode.state.initializing || !app.chain || !app.chain.loaded) {
+    if (vnode.state.initializing || !app.chain || !vnode.state.protocol) {
       return m(PageLoading);
     }
-    const { project, protocol } = vnode.state;
-    if (!project || !protocol) {
-      return m(PageLoading);
-    }
+    const { protocol } = vnode.state;
+    const project: CWProjectWithParticipants = (protocol.get('root').projects || []).filter((item) => item.projectHash === vnode.attrs.projectHash)[0];
 
     const startTime = new Date();
     const endTime = new Date(project.endTime);
