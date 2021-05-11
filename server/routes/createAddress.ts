@@ -42,7 +42,7 @@ const createAddress = async (models, tokenBalanceCache: TokenBalanceCache,
     });
 
     existingAddress = await models.Address.scope('withPrivateData').findOne({
-      where: { chain: req.body.name, address: req.body.address }
+      where: { chain: req.body.chain, address: req.body.address }
     });
   }
 

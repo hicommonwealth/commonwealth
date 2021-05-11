@@ -9,7 +9,7 @@ import { Button, Input, TextArea, Spinner, Checkbox } from 'construct-ui';
 
 import { initAppState } from 'app';
 import { isSameAccount, link } from 'helpers';
-import { AddressInfo, Account, ChainBase, IWebWallet } from 'models';
+import { AddressInfo, Account, ChainBase, ChainInfo, IWebWallet } from 'models';
 import app, { ApiStatus } from 'state';
 
 import { updateActiveAddresses, createUserWithAddress, setActiveAccount } from 'controllers/app/login';
@@ -264,7 +264,7 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
               };
             }
 
-            console.log(`inner joining chain accountcb and more${vnode.attrs.joiningChain}`)
+            console.log(`inner joining chain accountcb and more${vnode.attrs.joiningChain}`);
             console.log(isNewChain);
             console.log(newChainInfo);
 
@@ -323,8 +323,32 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
         // load addresses for the current chain/community
         if (app.community) {
           await updateActiveAddresses();
+        } else if (app.chain && (app.chain as Token).isToken) {
+          const chainInfo = app.chain.meta.chain;
+          const newChainInfo = new ChainInfo({
+            id: chainInfo.name.toLowerCase().trim()
+              .replace(/[^\w ]+/g, '').replace(/ +/g, '-'),
+            network: chainInfo.network,
+            base: chainInfo.base,
+            symbol: chainInfo.symbol,
+            name: chainInfo.name,
+            icon_url: chainInfo.iconUrl,
+            description: chainInfo.description,
+            website: chainInfo.website,
+            discord: chainInfo.discord,
+            element: chainInfo.element,
+            telegram: chainInfo.telegram,
+            github: chainInfo.github,
+            customDomain: chainInfo.customDomain,
+            blockExplorerIds: chainInfo.blockExplorerIds,
+            collapsed_on_homepage: chainInfo.collapsedOnHomepage,
+            featured_topics: chainInfo.featuredTopics,
+            topics: chainInfo.topics,
+            adminsAndMods: chainInfo.adminsAndMods,
+            type: chainInfo.type
+          });
+          await updateActiveAddresses(newChainInfo);
         } else if (app.chain) {
-          // TODO: this breaks when the user action creates a new token forum
           const chain = app.user.selectedNode
             ? app.user.selectedNode.chain
             : app.config.nodes.getByChain(app.activeChainId())[0].chain;
@@ -342,14 +366,6 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
         vnode.state.newAddress = account;
         vnode.state.isNewLogin = true;
         vnode.state.error = null;
-        m.redraw();
-      }
-
-      if ((app.chain as Token)?.isUncreated) {
-        await initAppState(false);
-        const filteredName = app.chain.meta.chain.name.toLowerCase().trim()
-          .replace(/[^\w ]+/g, '').replace(/ +/g, '-');
-        m.route.set(`/${filteredName}`);
         m.redraw();
       }
     };

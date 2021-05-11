@@ -18,7 +18,7 @@ const getAddressStatus = async (models, req: Request, res: Response, next: NextF
   }
 
   // TODO: this will not work for token forums
-  const chainName = req.body.chain.startsWith('0x') ? 'ethereum' : req.body.chain;
+  const chainName = req.body.chain;
   const chain = await models.Chain.findOne({
     where: { id: chainName }
   });
