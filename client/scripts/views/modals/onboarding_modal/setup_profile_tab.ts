@@ -95,7 +95,7 @@ const OnboardingSetupProfile: m.Component<IOnboardingSetupProfileAttrs, { form: 
       ]),
       m(OnboardingFooterActions, {
         backDisabled: vnode.state.saving,
-        nextDisabled: vnode.state.saving,
+        nextDisabled: !vnode.state.form.name?.length || vnode.state.saving,
         nextSpinning: vnode.state.saving,
         onBack: vnode.attrs.onBack,
         onNext: () => {

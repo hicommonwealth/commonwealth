@@ -90,7 +90,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
   view: (vnode) => {
     const { account, refreshCallback, onOwnProfile, onLinkedProfile } = vnode.attrs;
     const showJoinCommunityButton = vnode.attrs.setIdentity && !onOwnProfile;
-    const isClaimable = !account || !account.profile || account.profile.isEmpty;
+    const isClaimable = !account || !account.profile;
 
     const joinCommunity = async () => {
       if (!app.activeChainId() || onOwnProfile) return;
@@ -145,13 +145,6 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
             }, 'Copy address'),
             vnode.state.copied && m('span.copy-done', 'Copied'),
             m('.space'),
-            isClaimable && m(LoginWithWalletDropdown, {
-              prepopulateAddress: account.address,
-              loggingInWithAddress: !app.isLoggedIn(),
-              joiningCommunity: app.activeCommunityId(),
-              joiningChain: app.activeChainId(),
-              label: 'Claim address',
-            }),
           ]),
         ]),
         m('.bio-actions-breakpoint'),
