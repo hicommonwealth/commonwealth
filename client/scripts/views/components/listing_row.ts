@@ -2,7 +2,7 @@ import 'components/listing_row.scss';
 
 import m, { Vnode } from 'mithril';
 import Chart from 'chart.js';
-import moment from 'moment';
+import moment from 'moment-twitter';
 
 import app from 'state';
 import { Grid, Col, Icon, Icons } from 'construct-ui';

@@ -1,4 +1,4 @@
-import moment from 'moment';
+import moment from 'moment-twitter';
 import { AddressInfo, OffchainTopic, AbridgedThread, Profile } from 'models';
 import {
   ActiveAddressesStore,

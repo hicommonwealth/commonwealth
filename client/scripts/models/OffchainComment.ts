@@ -1,4 +1,4 @@
-import moment from 'moment';
+import moment from 'moment-twitter';
 import { VersionHistory } from '../controllers/server/threads';
 import { IUniqueId } from './interfaces';
 import OffchainAttachment from './OffchainAttachment';

@@ -1,4 +1,4 @@
-import moment from 'moment';
+import moment from 'moment-twitter';
 
 import { IChainEntityKind } from '@commonwealth/chain-events';
 import ChainEvent from './ChainEvent';

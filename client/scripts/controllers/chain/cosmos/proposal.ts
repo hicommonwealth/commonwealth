@@ -13,7 +13,7 @@ import {
 } from 'adapters/chain/cosmos/types';
 import { CosmosApi } from 'adapters/chain/cosmos/api';
 import { ProposalStore } from 'stores';
-import moment from 'moment';
+import moment from 'moment-twitter';
 import { CosmosAccount, CosmosAccounts } from './account';
 import CosmosChain from './chain';
 import CosmosGovernance, { marshalTally } from './governance';

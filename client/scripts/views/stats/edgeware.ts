@@ -4,7 +4,7 @@ import 'stats/edgeware.scss';
 import $ from 'jquery';
 import m from 'mithril';
 import _ from 'lodash';
-import moment from 'moment';
+import moment from 'moment-twitter';
 import Chart from 'chart.js';
 import mixpanel from 'mixpanel-browser';
 import { Button, Input, Spinner } from 'construct-ui';

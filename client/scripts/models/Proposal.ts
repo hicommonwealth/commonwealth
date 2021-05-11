@@ -1,4 +1,4 @@
-import moment from 'moment';
+import moment from 'moment-twitter';
 import { Coin } from 'adapters/currency';
 import { IIdentifiable } from 'adapters/shared';
 import { IVote, IUniqueId, ITXModalData } from './interfaces';

@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 import _ from 'lodash';
-import moment from 'moment';
+import moment from 'moment-twitter';
 import m from 'mithril';
 import $ from 'jquery';
 

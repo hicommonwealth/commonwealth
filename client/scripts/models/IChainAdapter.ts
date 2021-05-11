@@ -1,4 +1,4 @@
-import moment from 'moment';
+import moment from 'moment-twitter';
 import { ApiStatus, IApp } from 'state';
 import { Coin } from 'adapters/currency';
 import { clearLocalStorage } from 'stores/PersistentStore';

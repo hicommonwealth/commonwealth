@@ -1,5 +1,5 @@
 import m from 'mithril';
-import moment from 'moment';
+import moment from 'moment-twitter';
 
 import { formatDuration, blocknumToTime } from 'helpers';
 

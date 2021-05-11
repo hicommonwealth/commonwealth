@@ -3,7 +3,7 @@ import 'pages/notifications.scss';
 import m from 'mithril';
 import $ from 'jquery';
 import _ from 'lodash';
-import moment from 'moment';
+import moment from 'moment-twitter';
 import { Checkbox, Button, Icons, ListItem, Table, Tag, Grid, Col, SelectList, RadioGroup } from 'construct-ui';
 import { SubstrateEvents, SubstrateTypes, IChainEventKind, TitlerFilter } from '@commonwealth/chain-events';
 

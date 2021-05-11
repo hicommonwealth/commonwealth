@@ -1,7 +1,7 @@
 import 'components/proposal_card.scss';
 
 import m from 'mithril';
-import moment from 'moment';
+import moment from 'moment-twitter';
 import { Icon, Icons, Tag } from 'construct-ui';
 
 import app from 'state';

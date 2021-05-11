@@ -4,7 +4,7 @@ import BN from 'bn.js';
 import { ApiStatus, IApp } from 'state';
 import { Near as NearApi, connect as nearConnect } from 'nearlib/lib/near';
 import { BrowserLocalStorageKeyStore } from 'nearlib/lib/key_stores';
-import moment from 'moment';
+import moment from 'moment-twitter';
 import * as m from 'mithril';
 import { NodeStatusResult } from 'nearlib/lib/providers/provider';
 import { NearAccount } from './account';

@@ -3,7 +3,7 @@ import 'components/sidebar/notification_row.scss';
 import { Icon, Icons, Tooltip, Spinner } from 'construct-ui';
 import _ from 'lodash';
 import m from 'mithril';
-import moment from 'moment';
+import moment from 'moment-twitter';
 import {
   SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents, IEventLabel, chainSupportedBy,
   // MarlinEvents
