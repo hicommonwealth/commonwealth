@@ -356,7 +356,15 @@ export const initializeSearch = async () => {
   if (!app.searchCache[ALL_RESULTS_KEY]?.loaded) {
     app.searchCache[ALL_RESULTS_KEY] = {};
     try {
-      const [tokens, comms] = await Promise.all([app.tokens.getTokensFromLists(), searchChainsAndCommunities()]);
+      const getTokens = () => $.getJSON('/api/getTokensFromLists')
+        .then((response) => {
+          if (response.status === 'Failure') {
+            throw response.message;
+          } else {
+            return response.result;
+          }
+        });
+      const [tokens, comms] = await Promise.all([getTokens(), searchChainsAndCommunities()]);
       app.searchCache[ALL_RESULTS_KEY]['tokens'] = tokens;
       app.searchCache[ALL_RESULTS_KEY]['communities'] = comms;
     } catch (err) {

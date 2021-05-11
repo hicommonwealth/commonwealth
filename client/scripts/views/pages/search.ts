@@ -3,7 +3,7 @@ import 'pages/search.scss';
 import m from 'mithril';
 import _, { capitalize } from 'lodash';
 import moment from 'moment';
-import { Input, Spinner, TabItem, Tabs, Tag } from 'construct-ui';
+import { Input, ListItem, Spinner, TabItem, Tabs, Tag } from 'construct-ui';
 
 import { link, pluralize } from 'helpers';
 import {
