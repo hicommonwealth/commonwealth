@@ -9,7 +9,6 @@ import app from 'state';
 import NotificationsMenu from 'views/components/header/notifications_menu';
 import { SearchBar } from 'views/components/search_bar';
 import MobileSidebar from './mobile_sidebar';
-import MobileUserDropdown from './mobile_user_dropdown';
 import { CustomHamburgerIcon } from './mobile_icons';
 
 const MobileHeader: m.Component<{}, { open: boolean }> = {
@@ -23,22 +22,7 @@ const MobileHeader: m.Component<{}, { open: boolean }> = {
         if (!onTrigger && vnode.state.open) vnode.state.open = false;
       },
     }, [
-      m('.mobile-header-left', [
-        (app.chain || app.community)
-        && m(PopoverMenu, {
-          class: 'MobileHeaderPopoverMenu',
-          transitionDuration: 0,
-          closeOnContentClick: true,
-          closeOnOutsideClick: true,
-          // TODO: Update trigger hamburger icon to CW logo
-          trigger: m(Button, {
-            class: 'mobile-header-trigger',
-            compact: true,
-            label: m(Icon, { name: Icons.MENU }),
-          }),
-          content: m(MobileSidebar),
-        }),
-      ]),
+      m('img', { src: 'https://commonwealth.im/static/img/logo.png' }),
       m(SearchBar),
       m('.mobile-header-right', [
         app.isLoggedIn() && m(NotificationsMenu, { small: false }),
@@ -54,7 +38,7 @@ const MobileHeader: m.Component<{}, { open: boolean }> = {
             compact: true,
             label: m(CustomHamburgerIcon),
           }),
-          content: m(MobileUserDropdown)
+          content: m(MobileSidebar)
         }),
       ]),
     ]);
