@@ -12,11 +12,20 @@ import PageLoading from 'views/pages/loading';
 import app from 'state';
 
 
-const NewProjectForm: m.Component<{callback: (project: any) => void}, {form: any}> = {
+const NewProjectForm = {
+  form: {},
   view: (vnode) => {
+    const callback = vnode.attrs.callback;
+    const author = app.user.activeAccount;
+    const protocol = vnode.attrs.protocol;
+
+    if (!author) return m('div', 'Must be logged in');
+    if (!callback) return m('div', 'Must have callback');
+
     return m(Form, { class: 'NewProposalForm' }, [
       m(Grid, [
         m(Col, [
+          vnode.state.error && m('.error', vnode.state.error.message),
           [
             //  name
             m(FormGroup, [
@@ -134,7 +143,6 @@ const NewProjectForm: m.Component<{callback: (project: any) => void}, {form: any
               intent: 'primary',
               rounded: true,
               disabled: (
-                !vnode.state.form ||
                 !vnode.state.form.name ||
                 !vnode.state.form.beneficiary ||
                 !vnode.state.form.threshold ||
