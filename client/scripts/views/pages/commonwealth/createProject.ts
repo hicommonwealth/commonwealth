@@ -12,7 +12,7 @@ import PageLoading from 'views/pages/loading';
 import app from 'state';
 
 
-const NewProjectForm: m.Component<{callback: (project: any) => void}, {form}> = {
+const NewProjectForm: m.Component<{callback: (project: any) => void}, {form: any}> = {
   view: (vnode) => {
     return m(Form, { class: 'NewProposalForm' }, [
       m(Grid, [
@@ -134,6 +134,7 @@ const NewProjectForm: m.Component<{callback: (project: any) => void}, {form}> = 
               intent: 'primary',
               rounded: true,
               disabled: (
+                !vnode.state.form ||
                 !vnode.state.form.name ||
                 !vnode.state.form.beneficiary ||
                 !vnode.state.form.threshold ||
@@ -163,31 +164,33 @@ const NewProjectForm: m.Component<{callback: (project: any) => void}, {form}> = 
   }
 }
 
-const NewProjectPage: m.Component<{ type }, { initializing: boolean }> = {
+const NewProjectPage: m.Component<{ type }, { initializing: boolean, protocol: any }> = {
   oncreate: async (vnode) => {
     if (!app.chain || !app.chain.loaded) {
       vnode.state.initializing = true;
       await initChain();
-      // app.chain.deferred = false;
+      vnode.state.protocol = (app.chain as any).protocol;
       vnode.state.initializing = false;
+      m.redraw();
+    } else if (!vnode.state.protocol) {
+      vnode.state.protocol = (app.chain as any).protocol;
       m.redraw();
     }
   },
   view: (vnode) => {
-    if (vnode.state.initializing || !app.chain || !app.chain.loaded || !(app.chain as any).protocol) {
+    if (vnode.state.initializing || !app.chain || !vnode.state.protocol) {
       return m(PageLoading);
     }
+    const { protocol } = vnode.state;
     return m(Sublayout, {
       class: 'NewProjectPage',
       title: 'Create a new Project',
       showNewProposalButton: true,
     }, [
       m('p', 'This UI version enables only Ether now. Production version will enable multiple ERC20 tokens too'),
-      m('p', []),
       m('.forum-container', [
         m(NewProjectForm, {
           callback: async(projectData: any) => {
-            const protocol = (app.chain as any).protocol;
             const author = app.user.activeAccount.address;
             const res = await protocol.createProject(
               projectData.name,
@@ -200,7 +203,6 @@ const NewProjectPage: m.Component<{ type }, { initializing: boolean }> = {
               true,
               '0x01'
             );
-            console.log('====>res', res);
           },
         }),
       ])
