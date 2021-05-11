@@ -26,9 +26,9 @@ const TokenHoldersComponent: m.Component<IState, IState> = {
         m('p',
           { class: 'text-2xl max-w-screen-sm mx-auto text-center mb-10' },
           ' Find your community and drive your token forward. '),
-        m('div.TokenHoldersButton',
-          { class: 'text-center' },
-          m(LandingPageButton, { href: '', text: 'Find your community' })),
+        // m('div.TokenHoldersButton',
+        //   { class: 'text-center' },
+        //   m(LandingPageButton, { href: '', text: 'Find your community' })),
         m('div',
           {
             class: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-20',

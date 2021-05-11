@@ -24,14 +24,14 @@ const ChainsCrowdfundingComponent: m.Component<{ chains: ICardListItem[] }, {}> 
           { class: 'text-3xl font-bold mb-5 text-center mb-10' },
           ' Leverage on-chain crowdfunding '
         ),
-        m(
-          'div.ChainsCrowdfundingButton',
-          { class: 'flex justify-center text-center' },
-          m(LandingPageButton, {
-            href: '',
-            text: 'Learn more about crowdfunding',
-          })
-        ),
+        // m(
+        //   'div.ChainsCrowdfundingButton',
+        //   { class: 'flex justify-center text-center' },
+        //   m(LandingPageButton, {
+        //     href: '',
+        //     text: 'Learn more about crowdfunding',
+        //   })
+        // ),
         m(ItemListsMapper, {
           bgColor: 'bg-white',
           margin: 'mt-20',

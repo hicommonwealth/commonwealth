@@ -21,11 +21,11 @@ const TokensCreatorComponent: m.Component<{ creators: ICardListItem[] }, {}> = {
         { class: 'text-2xl max-w-screen-sm mx-auto text-center mb-10' },
         ' Commonwealth lets you simplify your community and governance. We bring four tools into one. '
       ),
-      m(
-        'div.TokensCreatorsUseCaseButton',
-        { class: 'text-center hidden lg:block xl:block mb-20' },
-        m(LandingPageButton, { href: '', text: 'See use cases' })
-      ),
+      // m(
+      //   'div.TokensCreatorsUseCaseButton',
+      //   { class: 'text-center hidden lg:block xl:block mb-20' },
+      //   m(LandingPageButton, { href: '', text: 'See use cases' })
+      // ),
       m(ItemListsMapper, {
         bgColor: 'bg-gray-900',
         margin: 'mt-4',
