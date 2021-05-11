@@ -1,4 +1,4 @@
-import moment from 'moment-twitter';
+import moment from 'moment';
 import { IUniqueId } from './interfaces';
 import OffchainTopic from './OffchainTopic';
 

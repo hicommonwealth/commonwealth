@@ -1,5 +1,5 @@
 import BN from 'bn.js';
-import moment from 'moment-twitter';
+import moment from 'moment';
 import { EventEmitter } from 'events';
 import { Coin } from 'adapters/currency';
 import { IIdentifiable } from 'adapters/shared';

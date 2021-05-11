@@ -2,7 +2,7 @@ import 'pages/search.scss';
 
 import m from 'mithril';
 import _, { capitalize } from 'lodash';
-import moment from 'moment-twitter';
+import moment from 'moment';
 import { Tabs, Spinner, TabItem, Tag, ListItem } from 'construct-ui';
 
 import { link, pluralize } from 'helpers';
