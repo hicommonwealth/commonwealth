@@ -15,6 +15,7 @@ import { capitalize } from 'lodash';
 import CommunitySelector from '../components/sidebar/community_selector';
 import { LoginSelectorMenuLeft, LoginSelectorMenuRight } from '../components/header/login_selector';
 import { getNewProposalMenu } from '../components/new_proposal_button';
+import LoginModal from '../modals/login_modal';
 
 enum MenuTabs {
   currentCommunity = 'currentCommunity',
@@ -37,7 +38,6 @@ const MobileAccountMenu: m.Component<{}, {}> = {
     const nAccountsWithoutRole = activeAccountsByRole.filter(([account, role], index) => !role).length;
 
     return m(Menu, { class: 'MobileAccountMenu' }, [
-      m(MenuDivider),
       m(LoginSelectorMenuLeft, {
         activeAddressesWithRole, nAccountsWithoutRole, isPrivateCommunity
       }),
@@ -50,21 +50,30 @@ const MobileAccountMenu: m.Component<{}, {}> = {
 const MobileSidebar: m.Component<{}, { activeTab: string, showNewThreadOptions: boolean }> = {
   oncreate: (vnode) => { vnode.state.activeTab = MenuTabs.currentCommunity; },
   view: (vnode) => {
+    if (!app) return;
     let { activeTab, showNewThreadOptions } = vnode.state;
     if (!activeTab) activeTab = MenuTabs.currentCommunity;
-    const currentCommunityMenu = m(Menu, { class: 'CurrentCommunityMenu' }, [
-      m(Menu, { class: 'NewProposalMenu' }, [
-        m(MenuItem, {
-          label: 'Create New',
-          iconLeft: Icons.PLUS,
-          onclick: (e) => {
-            e.stopPropagation();
-            vnode.state.showNewThreadOptions = !showNewThreadOptions;
-          }
-        }),
-        showNewThreadOptions
-        && getNewProposalMenu([], true)
-      ]),
+    const CurrentCommunityMenu = m(Menu, { class: 'CurrentCommunityMenu' }, [
+      app.isLoggedIn()
+        ? m(Menu, { class: 'NewProposalMenu' }, [
+          m(MenuItem, {
+            label: 'Create New',
+            iconLeft: Icons.PLUS,
+            onclick: (e) => {
+              e.stopPropagation();
+              vnode.state.showNewThreadOptions = !showNewThreadOptions;
+            }
+          }),
+          showNewThreadOptions
+          && getNewProposalMenu([], true)
+        ])
+      : m(MenuItem, {
+        label: 'Login',
+        iconLeft: Icons.LOG_IN,
+        onclick: (e) => {
+          app.modals.create({ modal: LoginModal });
+        }
+      }),
       m(MenuDivider),
       (app.chain || app.community) && m(OffchainNavigationModule),
       (app.chain || app.community) && m(OnchainNavigationModule),
@@ -72,7 +81,7 @@ const MobileSidebar: m.Component<{}, { activeTab: string, showNewThreadOptions: 
       app.isLoggedIn() && (app.chain || app.community) && m(SubscriptionButton),
       app.chain && m(ChainStatusModule),
     ]);
-    const allCommunitiesMenu = m('.AllCommunitiesMenu', [
+    const AllCommunitiesMenu = m('.AllCommunitiesMenu', [
       m(CommunitySelector, { showListOnly: true, showHomeButtonAtTop: true })
     ]);
     return m('.MobileSidebar', [
@@ -104,9 +113,9 @@ const MobileSidebar: m.Component<{}, { activeTab: string, showNewThreadOptions: 
         })
       ]),
       activeTab === MenuTabs.currentCommunity
-        ? currentCommunityMenu
+        ? CurrentCommunityMenu
         : activeTab === MenuTabs.allCommunities
-          ? allCommunitiesMenu
+          ? AllCommunitiesMenu
           : m(MobileAccountMenu)
     ]);
   }

@@ -230,7 +230,15 @@ const CommunitySelector: m.Component<{
     return showListOnly
       ? m('.CommunitySelectList', [
         showHomeButtonAtTop
-        && m('span', 'Home'),
+        && m('a', {
+          href: '/',
+          onclick: (e) => { m.route.set('/'); }
+        }, [
+          m('img.mobile-logo', {
+            src: 'https://commonwealth.im/static/img/logo.png',
+          }),
+          m('span', 'Home'),
+        ]),
         app.isLoggedIn() && [
           m('h4', 'Your communities'),
           joinedCommunities.map(renderCommunity),
