@@ -210,7 +210,7 @@ const LoginSelector: m.Component<{
                     const { verification_token, addressId, addresses } = res.result;
                     console.log(addresses);
                     app.user.setAddresses(addresses.map((a) => {
-                      return new AddressInfo(a.id, a.address, a.chain, (a.keytype) ? a.keytype : null, a.is_magic);
+                      return new AddressInfo(a.id, a.address, a.chain, a.keytype, a.is_magic);
                     }));
 
                     // Wack switch because the target chain is different for tokens communities that haven't been created
@@ -218,7 +218,7 @@ const LoginSelector: m.Component<{
                       .find((a) => a.address === address && a.chain === ((isNewChain) ? filteredName : targetChain));
 
                     const account = app.chain
-                      ? app.chain.accounts.get(address, (addressInfo.keytype) ? addressInfo.keytype : null)
+                      ? app.chain.accounts.get(address, addressInfo.keytype)
                       : app.community.accounts.get(address, addressInfo.chain);
                     if (app.chain) {
                       account.setValidationToken(verification_token);
