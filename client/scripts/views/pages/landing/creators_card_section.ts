@@ -30,7 +30,8 @@ const TokensCreatorComponent: m.Component<{ creators: ICardListItem[] }, {}> = {
         bgColor: 'bg-gray-900',
         margin: 'mt-4',
         cardItems: creators,
-        tabHoverColor: 'bg-gray-500',
+        tabHoverColorClick: 'bg-gray-500',
+        variant: 'TokensCreatorsText'
       }),
     ]);
   },

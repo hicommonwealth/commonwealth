@@ -36,8 +36,9 @@ const ChainsCrowdfundingComponent: m.Component<{ chains: ICardListItem[] }, {}> 
           bgColor: 'bg-white',
           margin: 'mt-20',
           cardItems: chains,
-          tabHoverColor: 'bg-gray-300',
+          tabHoverColorClick: 'bg-gray-300',
           textType: 'black',
+          variant: 'ChainsCrowsfundingTextList'
         }),
       ]
     );

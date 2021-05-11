@@ -1,10 +1,10 @@
 import m from 'mithril';
 
 interface IAttrs {
-    handleClick: (creator) => void;
+  handleClick: (creator) => void;
   isTabHoverActive: boolean;
   buttonId: string;
-  tabHoverColor: string;
+  tabHoverColorClick: string;
   title: string;
   subtitle: string;
   subtitleId?: string;
@@ -12,7 +12,8 @@ interface IAttrs {
   cardId: string;
   imageSrc: string;
   imageAlt: string;
-  textType?: string
+  textType?: string;
+  variant?: string
 }
 
 const ListedCardWithImage: m.Component<IAttrs, {}> = {
@@ -25,30 +26,34 @@ const ListedCardWithImage: m.Component<IAttrs, {}> = {
           'div',
           {
             class:
-              'lg:w-1/3 lg:mr-5 xl:mr-20 rounded-2xl transition hover:transition-all duration-500',
+              'lg:w-1/3 lg:mr-5 xl:mr-20 p-1 rounded-2xl transition hover:transition-all duration-500',
           },
           m(
             'button',
             {
               class: `rounded-2xl p-5 text-left w-full focus:outline-none transition transition-all duration-500 ${
-                vnode.attrs.isTabHoverActive ? vnode.attrs.tabHoverColor : ''
-              }`,
+                vnode.attrs.isTabHoverActive ? `${vnode.attrs.tabHoverColorClick}` : ''
+              }  ${vnode.attrs.variant}`,
               onclick: vnode.attrs.handleClick,
               id: vnode.attrs.buttonId,
             },
             [
               m(
                 'h4',
-                { class: `${vnode.attrs.textType === 'black' ? '' : 'text-white'} font-bold text-xl` },
+                {
+                  class: `${
+                    vnode.attrs.textType === 'black' ? '' : 'text-white'
+                  } font-bold text-xl`,
+                },
                 vnode.attrs.title
               ),
               m(
                 'p',
                 {
                   id: vnode.attrs.subtitleId,
-                  class: `${
-                    vnode.attrs.isTabHoverActive ? '' : 'invisible'
-                  } ${vnode.attrs.textType === 'black' ? '' : 'text-white'}`,
+                  class: `${vnode.attrs.isTabHoverActive ? '' : 'invisible'} ${
+                    vnode.attrs.textType === 'black' ? '' : 'text-white'
+                  }`,
                 },
                 vnode.attrs.subtitle
               ),

@@ -11,9 +11,10 @@ const ItemListsMapper: m.Component<
   {
     cardItems: ICardListItem[];
     textType?: string;
-    tabHoverColor: string;
+    tabHoverColorClick?: string;
     bgColor: string;
     margin: string;
+    variant?: string;
   },
   { buttonHoverActiveById: string; cardImageActiveById: string }
 > = {
@@ -23,7 +24,7 @@ const ItemListsMapper: m.Component<
     vnode.state.cardImageActiveById = cardItems[0].card.id;
   },
   view: (vnode) => {
-    const { cardItems, tabHoverColor, textType, bgColor, margin } = vnode.attrs;
+    const { cardItems, tabHoverColorClick, textType, bgColor, margin, variant } = vnode.attrs;
     const { buttonHoverActiveById, cardImageActiveById } = vnode.state;
 
     const handleClickItem = (cardItem: ICardListItem) => {
@@ -36,7 +37,7 @@ const ItemListsMapper: m.Component<
         'add'
       );
 
-      document.getElementById(button.id).classList.add(tabHoverColor);
+      document.getElementById(button.id).classList.add(tabHoverColorClick);
       document.getElementById(card.id).classList.add('block');
       vnode.state.buttonHoverActiveById = button.id;
       vnode.state.cardImageActiveById = card.id;
@@ -55,8 +56,9 @@ const ItemListsMapper: m.Component<
         imageActive: cardImageActiveById === card.id,
         imageSrc: card.imgSrc,
         imageAlt: card.imgAlt,
-        tabHoverColor,
+        tabHoverColorClick,
         textType,
+        variant
       });
     });
 
