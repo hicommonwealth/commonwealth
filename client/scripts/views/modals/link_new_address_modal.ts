@@ -296,6 +296,10 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
           if (app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length === 0) {
             app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
           }
+
+          if (app.chain && (app.chain as Token).isToken && !(app.chain as Token).isUncreated) {
+            await (app.chain as Token).activeAddressHasToken(app.user.activeAccount.address);
+          }
           // TODO: set the address as default
         } catch (e) {
           console.trace(e);
