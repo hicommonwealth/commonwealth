@@ -48,59 +48,68 @@ export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread 
   view: (vnode) => {
     const { proposal } = vnode.attrs;
 
+    const options = [
+      OffchainVoteOptions.SUPPORT_2,
+      OffchainVoteOptions.SUPPORT,
+      OffchainVoteOptions.NEUTRAL_SUPPORT,
+      OffchainVoteOptions.NEUTRAL_OPPOSE,
+      OffchainVoteOptions.OPPOSE,
+      OffchainVoteOptions.OPPOSE_2,
+    ];
+
+    const tooltipContent = !app.isLoggedIn() ? 'Log in to vote'
+      : !app.user.activeAccount ? 'Connect an address to vote'
+        : (proposal.getOffchainVoteFor(app.user.activeAccount.chain.id, app.user.activeAccount.address)) ? 'Update your vote' : 'Vote now';
+
     return m('.ProposalHeaderOffchainPoll', [
-      m('.offchain-poll-header', 'Poll'),
-      [
-        OffchainVoteOptions.SUPPORT,
-        OffchainVoteOptions.OPPOSE,
-        OffchainVoteOptions.CHANGES_REQUESTED,
-      ].map((option) => {
-        const pollButtonDisabledReason = !app.isLoggedIn() ?
-          'Log in to vote'
-          : !app.user.activeAccount
-          ? 'Connect an address'
-          : (proposal.getOffchainVoteFor(app.user.activeAccount.chain.id, app.user.activeAccount.address)
-             && proposal.getOffchainVoteFor(app.user.activeAccount.chain.id, app.user.activeAccount.address).option
-             === option)
-          ? 'Already voted'
-          : false;
+      m('.offchain-poll-header', 'Sentiment poll'),
 
-        const pollButton = m('.poll-button-wrapper', m(Button, {
-          rounded: true,
-          compact: true,
-          size: 'sm',
-          intent: 'primary',
-          label: 'Vote',
-          disabled: !!pollButtonDisabledReason,
-          onclick: () => {
-            // submit vote
-            proposal.submitOffchainVote(
-              app.user.activeAccount.chain.id,
-              app.user.activeAccount.address,
-              option,
-            );
-          }
-        }));
+      m(Tooltip, {
+        class: 'offchain-poll-row-tooltip',
+        content: tooltipContent,
+        position: 'right',
+        trigger: m('.offchain-poll-row', [
+          options.map((option) => {
+            const hasVoted = app.user.activeAccount
+              && proposal.getOffchainVoteFor(app.user.activeAccount.chain.id, app.user.activeAccount.address);
+            const isSelected = hasVoted
+              && proposal.getOffchainVoteFor(app.user.activeAccount.chain.id, app.user.activeAccount.address).option === option;
+            return m('.offchain-poll-col', {
+              style: `background: ${offchainVoteToLabel(option)}`,
+              onclick: async () => {
+                if (!app.isLoggedIn() || !app.user.activeAccount || isSelected) return;
 
-        const pollButtonWrapped = pollButtonDisabledReason ? m(Tooltip, {
-          trigger: pollButton,
-          content: pollButtonDisabledReason,
-          transitionDuration: 0,
-          class: 'poll-button-tooltip',
-          position: 'right',
-        }) : pollButton;
-
-        return m('.offchain-poll-option', [
-          m('.offchain-poll-option-left', [
-            offchainVoteToLabel(option),
-          ]),
-          m('.offchain-poll-option-action', pollButtonWrapped),
-          m('.offchain-poll-option-right', [
-            proposal.offchainVotes.filter((vote) => vote.option === option).length,
-            // m(UserGallery)
-          ])
-        ]);
-      })
+                const confirmed = await confirmationModalWithText(hasVoted ? 'Update your vote?' : 'Confirm your vote?')();
+                if (!confirmed) return;
+                // submit vote
+                proposal.submitOffchainVote(
+                  app.user.activeAccount.chain.id,
+                  app.user.activeAccount.address,
+                  option,
+                );
+              }
+            }, [
+              isSelected ? m(Icon, { name: Icons.CHECK }) : ''
+            ]);
+          }),
+        ]),
+      }),
+      m('.offchain-poll-respondents', [
+        options.map((option) => m('.offchain-poll-respondents-col', [
+          proposal.offchainVotes.filter((vote) => vote.option === option).length
+          // m(UserGallery)
+        ]))
+      ]),
+      m('Tooltip', {
+        trigger: m('.offchain-poll-caption', [
+          '6 days, 5 hours left'
+        ]),
+        content: m('.offchain-poll-caption-tooltip', [
+          'Polling started on May 1, 2021 4:53pm',
+          m('br'),
+          'Will finish on May 14, 2021 9:00am',
+        ]),
+      }),
     ]);
   }
 };

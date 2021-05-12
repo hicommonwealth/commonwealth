@@ -124,9 +124,12 @@ export enum OffchainThreadStage {
 }
 
 export enum OffchainVoteOptions {
+  SUPPORT_2,
   SUPPORT,
+  NEUTRAL_SUPPORT,
+  NEUTRAL_OPPOSE,
   OPPOSE,
-  CHANGES_REQUESTED,
+  OPPOSE_2,
 }
 
 export enum TransactionStatus {

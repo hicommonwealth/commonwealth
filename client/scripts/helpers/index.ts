@@ -46,9 +46,12 @@ export function offchainThreadStageToIndex(stage: OffchainThreadStage) {
 
 export function offchainVoteToLabel(option) {
   switch (option) {
-    case OffchainVoteOptions.SUPPORT: return 'Support';
-    case OffchainVoteOptions.OPPOSE: return 'Oppose';
-    case OffchainVoteOptions.CHANGES_REQUESTED: return 'Changes requested';
+    case OffchainVoteOptions.SUPPORT_2: return '#a2d16d';
+    case OffchainVoteOptions.SUPPORT: return '#c4dbac';
+    case OffchainVoteOptions.NEUTRAL_SUPPORT: return '#d6ddef';
+    case OffchainVoteOptions.NEUTRAL_OPPOSE: return '#d3d6dc';
+    case OffchainVoteOptions.OPPOSE: return '#ecc9a0';
+    case OffchainVoteOptions.OPPOSE_2: return '#fb9191';
     default: // invalid
   }
 }
