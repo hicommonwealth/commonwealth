@@ -9,8 +9,8 @@ jsconfig.json
 .vscode
 psql.sh
 yarn-error.log
-.nyc_output/
 .idea/
+.nyc_output/
 coverage/
 *.sw*
 .env
