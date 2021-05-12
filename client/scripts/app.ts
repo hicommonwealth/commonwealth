@@ -244,9 +244,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
   if (app.chain && n === app.chain.meta) {
     return;
   }
-  if ((Object.values(ChainNetwork) as any).indexOf(n.chain.network) === -1
-    && n.chain.type !== 'token'
-  ) {
+  if ((Object.values(ChainNetwork) as any).indexOf(n.chain.network) === -1 && n.chain.type !== 'token') {
     throw new Error('invalid chain');
   }
 
@@ -463,6 +461,23 @@ export function initCommunity(communityId: string): Promise<boolean> {
   } else {
     throw new Error(`No community found for '${communityId}'`);
   }
+}
+
+export async function initNewTokenChain(address: string) {
+  const response = await $.getJSON('/api/getTokenForum', { address });
+  if (response.status !== 'Success') {
+    // TODO: better custom 404
+    m.route.set('/404');
+  }
+  const { chain, node } = response.result;
+  const chainInfo = ChainInfo.fromJSON(chain);
+  const nodeInfo = new NodeInfo(node.id, chainInfo, node.url, node.address);
+  if (!app.config.chains.getById(chainInfo.id)) {
+    app.config.chains.add(chainInfo);
+    app.config.nodes.add(nodeInfo);
+  }
+  console.log(nodeInfo, chainInfo);
+  await selectNode(nodeInfo);
 }
 
 export async function initTemporaryTokenChain(address: string): Promise<boolean> {

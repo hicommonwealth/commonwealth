@@ -113,6 +113,7 @@ import TokenBalanceCache from './util/tokenBalanceCache';
 
 import bulkEntities from './routes/bulkEntities';
 import { getTokensFromLists } from './routes/getTokensFromLists';
+import getTokenForum from './routes/getTokenForum';
 
 function setupRouter(
   app,
@@ -163,6 +164,8 @@ function setupRouter(
   router.post('/updateCommunity', passport.authenticate('jwt', { session: false }), updateCommunity.bind(this, models));
   router.get('/communityStats', passport.authenticate('jwt', { session: false }), communityStats.bind(this, models));
   router.get('/getTokensFromLists', getTokensFromLists.bind(this, models, tokenBalanceCache));
+  router.get('/getTokenForum', getTokenForum.bind(this, models, tokenBalanceCache));
+
   // offchain threads
   // TODO: Change to POST /thread
   router.post(

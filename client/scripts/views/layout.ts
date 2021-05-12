@@ -2,7 +2,7 @@ import 'layout.scss';
 
 import m from 'mithril';
 
-import { initChain, initCommunity, initTemporaryTokenChain, deinitChainOrCommunity, selectNode } from 'app';
+import { initChain, initCommunity, initNewTokenChain, deinitChainOrCommunity, selectNode } from 'app';
 import app from 'state';
 
 import Sublayout from 'views/sublayout';
@@ -55,7 +55,7 @@ export const Layout: m.Component<{
       return m(LoadingLayout, { hideSidebar });
     } else if (scope && scopeIsEthereumAddress && scope !== vnode.state.loadingScope) {
       vnode.state.loadingScope = scope;
-      initTemporaryTokenChain(scope);
+      initNewTokenChain(scope);
       return m(LoadingLayout, { hideSidebar });
     } else if (scope && !scopeMatchesChain && !scopeMatchesCommunity && !scopeIsEthereumAddress) {
       // If /api/status has returned, then app.config.nodes and app.config.communities

@@ -6,7 +6,7 @@ import { providers } from 'ethers';
 import { INFURA_API_KEY } from '../config';
 import { Erc20Factory } from '../../eth/types/Erc20Factory';
 import { Erc20 } from '../../eth/types/Erc20';
-import { TokenResponse } from '../../shared/types';
+import { INewChainInfo, TokenResponse } from '../../shared/types';
 
 import JobRunner from './cacheJobRunner';
 import TokenListCache from './tokenListCache';
@@ -26,9 +26,8 @@ interface CacheT {
   };
 }
 
-export interface TokenForumMeta {
+export interface TokenForumMeta extends INewChainInfo {
   id: string;
-  address: string;
   balanceThreshold?: BN;
   api?: Erc20;
 }
@@ -60,10 +59,13 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     // TODO: support ChainId
     const tokens: TokenForumMeta[] = dbTokens
       .filter(({ ChainNodes }) => ChainNodes)
-      .map(({ ChainNodes }): TokenForumMeta => ({
-        id: ChainNodes[0].chain,
-        address: ChainNodes[0].address,
-        api: Erc20Factory.connect(ChainNodes[0].address, provider),
+      .map((chain): TokenForumMeta => ({
+        id: chain.id,
+        address: chain.ChainNodes[0].address,
+        name: chain.name,
+        symbol: chain.symbol,
+        iconUrl: chain.icon_url,
+        api: Erc20Factory.connect(chain.ChainNodes[0].address, provider),
       }));
 
     try {
@@ -73,6 +75,9 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
           return {
             id: slugify(o.name),
             address: o.address,
+            name: o.name,
+            symbol: o.symbol,
+            iconUrl: o.logoURI,
             api: Erc20Factory.connect(o.address, provider)
           };
         });
@@ -83,6 +88,10 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     }
 
     return tokens;
+  }
+
+  public getToken(searchAddress: string): TokenForumMeta {
+    return this._contracts.find(({ address }) => address === searchAddress);
   }
 
   public async start(models, network = 'mainnet', prefetchedTokenMeta?: TokenForumMeta[]) {
