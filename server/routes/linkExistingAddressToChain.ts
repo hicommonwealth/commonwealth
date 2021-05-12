@@ -80,7 +80,7 @@ const linkExistingAddressToChain = async (
   }
 
   const existingAddress = await models.Address.scope('withPrivateData').findOne({
-    where: { chain: chain.id, address: req.body.address }
+    where: { chain: req.body.chain, address: req.body.address }
   });
 
   try {
@@ -101,7 +101,7 @@ const linkExistingAddressToChain = async (
       const newObj = await models.Address.create({
         user_id: originalAddress.user_id,
         address: originalAddress.address,
-        chain: chain.id,
+        chain: req.body.chain,
         verification_token: verificationToken,
         verification_token_expires: verificationTokenExpires,
         verified: originalAddress.verified,

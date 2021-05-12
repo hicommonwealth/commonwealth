@@ -118,9 +118,7 @@ export default class {
     this._addresses.splice(this._addresses.findIndex((a) => a.address === address.address), 1);
   }
 
-  public setActiveAccounts(activeAccounts: Account<any>[]): void {
-    this._setActiveAccounts(activeAccounts);
-  }
+  public setActiveAccounts(activeAccounts: Account<any>[]): void { this._setActiveAccounts(activeAccounts); }
   public addActiveAddress(address: Account<any>): void { this._activeAccounts.push(address); }
   public removeActiveAddress(address: Account<any>): void {
     this._activeAccounts.splice(this._activeAccounts.findIndex((a) => a.address === address.address), 1);

@@ -258,13 +258,7 @@ export default (
       } else {
         isValid = false;
       }
-    } else if (chain.network === 'ethereum'
-      || chain.network === 'moloch'
-      || chain.network === 'alex'
-      || chain.network === 'metacartel'
-      || chain.network === 'commonwealth'
-      || chain.type === 'token'
-    ) {
+    } else if (chain.base === 'ethereum') {
       //
       // ethereum address handling
       //
@@ -282,7 +276,7 @@ export default (
       const addressBuffer = ethUtil.publicToAddress(publicKey);
       const address = ethUtil.bufferToHex(addressBuffer);
       isValid = (addressModel.address.toLowerCase() === address.toLowerCase());
-    } else if (chain.network === 'near') {
+    } else if (chain.base === 'near') {
       // both in base64 encoding
       const { signature: sigObj, publicKey } = JSON.parse(signatureString);
       isValid = nacl.sign.detached.verify(

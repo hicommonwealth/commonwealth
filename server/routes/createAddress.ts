@@ -24,13 +24,13 @@ const createAddress = async (models, req: Request, res: Response, next: NextFunc
     where: { id: req.body.chain }
   });
 
-  const existingAddress = await models.Address.scope('withPrivateData').findOne({
-    where: { chain: req.body.chain, address: req.body.address }
-  });
-
   if (!chain) {
     return next(new Error(Errors.InvalidChain));
   }
+
+  const existingAddress = await models.Address.scope('withPrivateData').findOne({
+    where: { chain: req.body.chain, address: req.body.address }
+  });
 
   if (existingAddress) {
     // address already exists on another user, only take ownership if
@@ -65,7 +65,7 @@ const createAddress = async (models, req: Request, res: Response, next: NextFunc
     try {
       const newObj = await models.Address.createWithToken(
         req.user ? req.user.id : null,
-        chain.id,
+        req.body.chain,
         req.body.address,
         req.body.keytype
       );
@@ -79,7 +79,7 @@ const createAddress = async (models, req: Request, res: Response, next: NextFunc
           permission: 'member',
         } : {
           address_id: newObj.id,
-          chain_id: chain.id,
+          chain_id: req.body.chain,
           permission: 'member',
         });
       }

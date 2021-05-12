@@ -14,8 +14,6 @@ import EthereumAccounts, {
 } from './accounts';
 import TokenApi from './token/api';
 
-const TEST_TOKEN_ADDRESS = '0x1000000000000000000000000000000000000000';
-
 export default class EthereumAccount extends Account<EthereumCoin> {
   public get balance(): Promise<EthereumCoin> {
     if (!this._Chain) return; // TODO
@@ -26,10 +24,6 @@ export default class EthereumAccount extends Account<EthereumCoin> {
 
   // Given an ERC20 token contract, fetches the balance of this account in that contract's tokens
   public async tokenBalance(contractAddress: string): Promise<ERC20Token> {
-    // TODO: remove this
-    if (contractAddress === TEST_TOKEN_ADDRESS) {
-      return new ERC20Token(contractAddress, new BN('10000000000', 10));
-    }
     if (!this._Chain) return; // TODO
 
     const api = new TokenApi(Erc20Factory.connect, contractAddress, this._Chain.api.currentProvider as any);

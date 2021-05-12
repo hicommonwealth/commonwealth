@@ -6,7 +6,7 @@ import { providers } from 'ethers';
 import { INFURA_API_KEY } from '../config';
 import { Erc20Factory } from '../../eth/types/Erc20Factory';
 import { Erc20 } from '../../eth/types/Erc20';
-import { INewChainInfo, TokenResponse } from '../../shared/types';
+import { TokenResponse } from '../../shared/types';
 
 import JobRunner from './cacheJobRunner';
 import TokenListCache from './tokenListCache';
@@ -26,8 +26,12 @@ interface CacheT {
   };
 }
 
-export interface TokenForumMeta extends INewChainInfo {
+export interface TokenForumMeta {
   id: string;
+  address: string;
+  iconUrl: string;
+  name: string;
+  symbol: string;
   balanceThreshold?: BN;
   api?: Erc20;
 }

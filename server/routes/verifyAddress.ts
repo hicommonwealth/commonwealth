@@ -90,7 +90,7 @@ const verifyAddress = async (models, req: Request, res: Response, next: NextFunc
     } else {
       // if user isn't logged in, log them in now
       const newAddress = await models.Address.findOne({
-        where: { chain: chain.id, address: req.body.address },
+        where: { chain: req.body.chain, address: req.body.address },
       });
       const user = await models.User.scope('withPrivateData').findOne({
         where: { id: newAddress.user_id },

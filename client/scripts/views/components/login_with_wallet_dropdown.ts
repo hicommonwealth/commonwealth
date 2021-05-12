@@ -96,10 +96,7 @@ const LoginWithWalletDropdown: m.Component<{
       }
     };
 
-    // Hacky fix for ETH token forums;
-    const chainbase = (app.chain?.meta?.chain?.base.length !== 0)
-      ? app.chain?.meta?.chain?.base
-      : ChainBase.Ethereum;
+    const chainbase = app.chain?.meta?.chain?.base;
     const menuItems = (chainbase && CHAINBASE_WITH_CLI.indexOf(chainbase) !== -1)
       ? [
         ...getMenuItemsForChainBase(chainbase),

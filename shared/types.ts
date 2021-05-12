@@ -95,13 +95,6 @@ export const DynamicTemplate = {
   VerifyAddress: 'd-292c161f1aec4d0e98a0bf8d6d8e42c2',
 };
 
-export interface INewChainInfo {
-  address: string;
-  iconUrl: string;
-  name: string;
-  symbol: string;
-}
-
 export type TokenResponse = {
   chainId: number;
   address: string;

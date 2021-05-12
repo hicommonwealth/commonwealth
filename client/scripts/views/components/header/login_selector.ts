@@ -121,7 +121,6 @@ const LoginSelector: m.Component<{
       ]),
     ]);
 
-    // TODO: figure out where this gets populated when page is loaded
     const activeAddressesWithRole = app.user.activeAccounts.filter((account) => {
       return app.user.getRoleInCommunity({
         account,
