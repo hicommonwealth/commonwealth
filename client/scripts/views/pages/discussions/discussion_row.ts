@@ -86,10 +86,6 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
       proposal instanceof OffchainThread && proposal.collaborators && proposal.collaborators.length > 0
         && m('span.proposal-collaborators', [ ' +', proposal.collaborators.length ]),
       m('.created-at', link('a', discussionLink, `Last active ${formatLastUpdated(getLastUpdated(proposal))}`)),
-      proposal instanceof OffchainThread && proposal.offchainVotingEnabledAt
-        && m('.offchain-voting-stat', 'POLL OPEN'),
-      proposal instanceof OffchainThread && proposal.offchainVotingNumVotes
-        && m('.offchain-voting-stat', pluralize(proposal.offchainVotingNumVotes, 'vote')),
       m('.mobile-comment-count', [
         m(Icon, { name: Icons.MESSAGE_SQUARE }),
         app.comments.nComments(proposal),
@@ -97,7 +93,14 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
     ];
 
     const rowMetadata = [
-      m('.discussion-row-right-meta', [
+      m('.discussion-row-right-meta', (
+        proposal instanceof OffchainThread
+          && (proposal.offchainVotingEnabledAt || proposal.offchainVotingNumVotes)
+      ) ? [
+        // offchain polls on, show poll info
+        m('.offchain-voting', pluralize(proposal.offchainVotingNumVotes, 'vote')),
+      ] : [
+        // offchain polls off, show stage & replyers
         m(UserGallery, {
           avatarSize: 20,
           popover: true,

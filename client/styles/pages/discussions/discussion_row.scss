@@ -124,6 +124,18 @@
         .discussion-row-right-meta {
             margin-left: 20px;
             margin-right: 4px;
+            .offchain-voting {
+                position: relative;
+                top: -5px;
+                margin-top: 5px;
+                // styling
+                font-size: 16px;
+                height: 40px;
+                padding: 12px;
+                width: 100px;
+                border: 1px solid $border-color;
+                border-radius: 6px;
+            }
         }
         .discussion-row-stage {
             font-size: 15px;

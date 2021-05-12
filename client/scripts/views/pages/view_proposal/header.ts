@@ -1,7 +1,7 @@
 import m from 'mithril';
 import app from 'state';
 
-import { Button, Icon, Icons, Tag, MenuItem, Input } from 'construct-ui';
+import { Button, Icon, Icons, Tag, Tooltip, MenuItem, Input } from 'construct-ui';
 
 import {
   pluralize, link, externalLink, extractDomain,
@@ -54,39 +54,53 @@ export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread 
         OffchainVoteOptions.SUPPORT,
         OffchainVoteOptions.OPPOSE,
         OffchainVoteOptions.CHANGES_REQUESTED,
-      ].map((option) => m('.offchain-poll-option', [
-        m('.offchain-poll-option-left', [
-          offchainVoteToLabel(option),
-        ]),
-        m('.offchain-poll-option-action', [
-          m(Button, {
-            rounded: true,
-            compact: true,
-            size: 'sm',
-            intent: 'primary',
-            label: 'Vote',
-            disabled: !app.user.activeAccount
-              ? true
-              : (proposal.getOffchainVoteFor(app.user.activeAccount.chain.id, app.user.activeAccount.address)
-                 && proposal.getOffchainVoteFor(app.user.activeAccount.chain.id, app.user.activeAccount.address).option
-                 === option)
-                ? true
-                : false,
-            onclick: () => {
-              // submit vote
-              proposal.submitOffchainVote(
-                app.user.activeAccount.chain.id,
-                app.user.activeAccount.address,
-                option,
-              );
-            }
-          }),
-        ]),
-        m('.offchain-poll-option-right', [
-          proposal.offchainVotes.filter((vote) => vote.option === option).length,
-          // m(UserGallery)
-        ]),
-      ])),
+      ].map((option) => {
+        const pollButtonDisabledReason = !app.isLoggedIn() ?
+          'Log in to vote'
+          : !app.user.activeAccount
+          ? 'Connect an address'
+          : (proposal.getOffchainVoteFor(app.user.activeAccount.chain.id, app.user.activeAccount.address)
+             && proposal.getOffchainVoteFor(app.user.activeAccount.chain.id, app.user.activeAccount.address).option
+             === option)
+          ? 'Already voted'
+          : false;
+
+        const pollButton = m('.poll-button-wrapper', m(Button, {
+          rounded: true,
+          compact: true,
+          size: 'sm',
+          intent: 'primary',
+          label: 'Vote',
+          disabled: !!pollButtonDisabledReason,
+          onclick: () => {
+            // submit vote
+            proposal.submitOffchainVote(
+              app.user.activeAccount.chain.id,
+              app.user.activeAccount.address,
+              option,
+            );
+          }
+        }));
+
+        const pollButtonWrapped = pollButtonDisabledReason ? m(Tooltip, {
+          trigger: pollButton,
+          content: pollButtonDisabledReason,
+          transitionDuration: 0,
+          class: 'poll-button-tooltip',
+          position: 'right',
+        }) : pollButton;
+
+        return m('.offchain-poll-option', [
+          m('.offchain-poll-option-left', [
+            offchainVoteToLabel(option),
+          ]),
+          m('.offchain-poll-option-action', pollButtonWrapped),
+          m('.offchain-poll-option-right', [
+            proposal.offchainVotes.filter((vote) => vote.option === option).length,
+            // m(UserGallery)
+          ])
+        ]);
+      })
     ]);
   }
 };
