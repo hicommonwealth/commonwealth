@@ -53,9 +53,6 @@ class ChainInfo {
       id, network, base, symbol, name, icon_url, description, website, discord, element, telegram, github,
       customDomain, blockExplorerIds, collapsed_on_homepage, featured_topics, topics, adminsAndMods, type,
     } = obj;
-    // TODO: remove this once satisfied that all chains have bases
-    if (!base) throw new Error('could not find chain base');
-    console.log(blockExplorerIds);
     this.id = id;
     this.network = network;
     this.base = base;
