@@ -38,7 +38,8 @@ export enum ChainNetwork {
   ALEX = 'alex',
   Commonwealth = 'commonwealth',
   Clover = 'clover',
-  HydraDX = 'hydradx'
+  HydraDX = 'hydradx',
+  Crust = 'crust',
 }
 
 // This function returns a default chain for a chainbase
@@ -62,6 +63,7 @@ export function networkToBase(n: ChainNetwork | string): ChainBase {
     case ChainNetwork.Polkadot: return ChainBase.Substrate;
     case ChainNetwork.Plasm: return ChainBase.Substrate;
     case ChainNetwork.Stafi: return ChainBase.Substrate;
+    case ChainNetwork.Crust: return ChainBase.Substrate;
     case ChainNetwork.Darwinia: return ChainBase.Substrate;
     case ChainNetwork.Phala: return ChainBase.Substrate;
     case ChainNetwork.Centrifuge: return ChainBase.Substrate;
@@ -104,6 +106,7 @@ export enum ChainClass {
   MarlinTestnet = 'marlin-testnet',
   ALEX = 'alex',
   Commonwealth = 'commonwealth',
+  Crust = 'crust',
 }
 
 // TODO: this is inconsistently used
