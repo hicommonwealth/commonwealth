@@ -10,6 +10,7 @@ jsconfig.json
 psql.sh
 yarn-error.log
 .nyc_output/
+.idea/
 coverage/
 *.sw*
 .env
