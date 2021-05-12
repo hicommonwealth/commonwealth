@@ -52,14 +52,6 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       data.chains.filter((chain) => chain.active)
         .map((chain) => app.config.chains.add(ChainInfo.fromJSON(chain)));
 
-      // HACK: mark temporary token chain as created if it gets created in backend
-      //  as a result of some user action.
-      if (app.chain
-        && (app.chain as TokenAdapter).isUncreated
-        && app.config.chains.getById(slugify(app.chain.meta.chain.name))) {
-        (app.chain as TokenAdapter).markCreated();
-      }
-
       data.nodes.sort((a, b) => a.id - b.id).map((node) => {
         return app.config.nodes.add(NodeInfo.fromJSON({
           id: node.id,
