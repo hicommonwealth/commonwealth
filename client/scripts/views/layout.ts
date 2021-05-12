@@ -10,6 +10,8 @@ import { AppModals } from 'views/modal';
 import AppToasts from 'views/toast';
 import PageNotFound from 'views/pages/404';
 
+import { slugify } from 'utils';
+
 const CHAIN_LOADING_TIMEOUT = 3000;
 
 export const LoadingLayout: m.Component<{ hideSidebar?: boolean }> = {
@@ -35,9 +37,9 @@ export const Layout: m.Component<{
 }> = {
   view: (vnode) => {
     const { scope, deferChain, hideSidebar } = vnode.attrs;
-    const scopeIsEthereumAddress = scope && scope.startsWith('0x') && scope.length === 42;
     const scopeMatchesChain = app.config.nodes.getAll().find((n) => n.chain.id === scope);
     const scopeMatchesCommunity = app.config.communities.getAll().find((c) => c.id === scope);
+    const scopeMatchesUncreatedToken = app.tokens.getAll().find((c) => slugify(c.name) === scope);
 
     if (app.loadingError) {
       return m('.Layout.mithril-app', {
@@ -53,11 +55,7 @@ export const Layout: m.Component<{
     } else if (!app.loginStatusLoaded()) {
       // Wait for /api/status to return with the user's login status
       return m(LoadingLayout, { hideSidebar });
-    } else if (scope && scopeIsEthereumAddress && scope !== vnode.state.loadingScope) {
-      vnode.state.loadingScope = scope;
-      initTemporaryTokenChain(scope);
-      return m(LoadingLayout, { hideSidebar });
-    } else if (scope && !scopeMatchesChain && !scopeMatchesCommunity && !scopeIsEthereumAddress) {
+    } else if (scope && !scopeMatchesChain && !scopeMatchesCommunity && !scopeMatchesUncreatedToken) {
       // If /api/status has returned, then app.config.nodes and app.config.communities
       // should both be loaded. If we match neither of them, then we can safely 404
       return m('.Layout.mithril-app', {
@@ -81,6 +79,9 @@ export const Layout: m.Component<{
         return m(LoadingLayout, { hideSidebar });
       } else if (scopeMatchesCommunity) {
         initCommunity(scope);
+        return m(LoadingLayout, { hideSidebar });
+      } else if (scopeMatchesUncreatedToken) {
+        initTemporaryTokenChain(scope);
         return m(LoadingLayout, { hideSidebar });
       }
     } else if (scope && vnode.state.deferred && !deferChain) {

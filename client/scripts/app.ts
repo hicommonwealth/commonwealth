@@ -32,6 +32,7 @@ import LoginModal from 'views/modals/login_modal';
 import TokenAdapter from 'controllers/chain/ethereum/token/adapter';
 import { alertModalWithText } from 'views/modals/alert_modal';
 
+import { slugify } from 'utils';
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/home');
 import(/* webpackPrefetch: true */ 'views/pages/discussions');
@@ -47,6 +48,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       app.config.communities.clear();
       app.user.notifications.store.clear();
       app.user.notifications.clearSubscriptions();
+      app.tokens.initTokens();
       data.chains.filter((chain) => chain.active).map((chain) => app.config.chains.add(ChainInfo.fromJSON(chain)));
       data.nodes.sort((a, b) => a.id - b.id).map((node) => {
         return app.config.nodes.add(NodeInfo.fromJSON({
@@ -454,20 +456,9 @@ export function initCommunity(communityId: string): Promise<boolean> {
   }
 }
 
-export async function initTemporaryTokenChain(address: string): Promise<boolean> {
-  // todo token list in localstorage
-  const getTokensFromLists = async (): Promise<TokenResponse[]> => {
-    return $.getJSON('/api/getTokensFromLists')
-      .then((response) => {
-        if (response.status === 'Failure') {
-          throw response.message;
-        } else {
-          return response.result;
-        }
-      });
-  };
-  const tokenLists = await getTokensFromLists();
-  const token = tokenLists.find((o) => { return o.address === address; });
+export async function initTemporaryTokenChain(id: string): Promise<boolean> {
+  const tokenLists = await app.tokens.getAll();
+  const token = tokenLists.find((o) => { return slugify(o.name) === id; });
 
   if (!token) { return false; }
 
@@ -477,7 +468,7 @@ export async function initTemporaryTokenChain(address: string): Promise<boolean>
     new NodeInfo(
       0,
       new ChainInfo({
-        id: token.address,
+        id,
         network: ChainNetwork.ERC20,
         symbol: token.symbol,
         name: token.name,
@@ -603,7 +594,8 @@ $(() => {
       // handle custom domains, for routes that need special handling
       const host = document.location.host;
       if (redirectCustomDomain) {
-        const hasLoadedAll = app.config.chains.getAll().length !== 0 || app.config.communities.getAll().length !== 0;
+        const hasLoadedAll = app.tokens.hasLoaded()
+          && (app.config.chains.getAll().length !== 0 || app.config.communities.getAll().length !== 0);
         const matchingChain = app.config.chains.getAll().find((c) => c.customDomain === host);
         const matchingCommunity = app.config.communities.getAll().find((c) => c.customDomain === host);
 
@@ -635,11 +627,11 @@ $(() => {
       if (scope) {
         const scopeIsEthereumAddress = scope.startsWith('0x') && scope.length === 42;
         if (scopeIsEthereumAddress) {
-          const nodes = app.config.nodes.getAll();
-          const node = nodes.find((o) => o.address === scope);
-          if (node) {
+          const tokens = app.tokens.getAll();
+          const token = tokens.find((o) => o.address === scope);
+          if (token) {
             const pagePath = window.location.href.substr(window.location.href.indexOf(scope) + scope.length);
-            m.route.set(`/${node.chain.id}${pagePath}`);
+            m.route.set(`/${slugify(token.name)}${pagePath}`);
           }
         }
       }

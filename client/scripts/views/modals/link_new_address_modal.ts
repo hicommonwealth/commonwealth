@@ -258,7 +258,7 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
             let newChainInfo: INewChainInfo;
             if (isNewChain) {
               newChainInfo = {
-                address: app.chain.id,
+                address: (app.chain as Token).contractAddress,
                 iconUrl: (app.chain.meta.chain.iconUrl) ? app.chain.meta.chain.iconUrl : 'default',
                 name: app.chain.meta.chain.name,
                 symbol: app.chain.meta.chain.symbol,

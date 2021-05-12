@@ -103,9 +103,7 @@ abstract class Account<C extends Coin> {
     if (signature) {
       const params : any = {
         address: this.address,
-        chain: ((app.chain as Token).isToken && (app.chain as Token).isUncreated)
-          ? slugify(this.chain.name)
-          : this.chain.id,
+        chain: this.chain.id,
         isToken: this.chain.type === 'token',
         jwt: this.app.user.jwt,
         signature,

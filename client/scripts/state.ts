@@ -18,6 +18,7 @@ import TopicsController from './controllers/server/topics';
 import CommunitiesController from './controllers/server/communities';
 import UserController from './controllers/server/user/index';
 import WebWalletController from './controllers/app/web_wallets';
+import TokensController from './controllers/app/tokens';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -48,6 +49,7 @@ export interface IApp {
   comments: CommentsController;
   threads: ThreadsController;
   reactions: ReactionsController;
+  tokens: TokensController;
   topics: TopicsController;
   communities: CommunitiesController;
   user: UserController;
@@ -113,6 +115,7 @@ const app: IApp = {
   threads: new ThreadsController(),
   reactions: new ReactionsController(),
   topics: new TopicsController(),
+  tokens: new TokensController(),
   communities: new CommunitiesController(),
   user: new UserController(),
   wallets: new WebWalletController(),
