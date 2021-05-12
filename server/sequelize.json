@@ -9,9 +9,7 @@
   "production": {
     "use_env_variable": "DATABASE_URL",
     "dialectOptions": {
-      "ssl": true,
-      "rejectUnauthorized": false,
-      "requestTimeout": 10000
+      "ssl": { "rejectUnauthorized": false }
     }
   }
 }

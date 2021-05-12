@@ -22,6 +22,7 @@ import LoginModal from 'views/modals/login_modal';
 import FeedbackModal from 'views/modals/feedback_modal';
 import SelectAddressModal from 'views/modals/select_address_modal';
 import Token from 'controllers/chain/ethereum/token/adapter';
+import AddressSwapper from 'views/components/addresses/address_swapper';
 import { linkExistingAddressToChainOrCommunity, setActiveAccount } from 'controllers/app/login';
 
 export const CHAINBASE_SHORT = {
@@ -153,7 +154,17 @@ const LoginSelector: m.Component<{
 
       // skip already existing items (all items in arr will have same base already)
       const currentBase = allChains.find((c) => c.id === current.chain)?.base;
-      if (arr.find((item) => item.address === current.address)) return arr;
+      if (arr.find((item) => {
+        if (currentBase === ChainBase.Substrate) {
+          return AddressSwapper({
+            address: item.address, currentPrefix: 42
+          }) === AddressSwapper({
+            address: current.address, currentPrefix: 42
+          });
+        } else {
+          return item.address === current.address;
+        }
+      })) return arr;
 
       // add all items on same base as joining chain if not already existing
       const joiningBase = joiningChainInfo?.base;
@@ -172,29 +183,27 @@ const LoginSelector: m.Component<{
             if (samebaseAddresses.length === 1) {
               const originAddressInfo = samebaseAddresses[0];
 
-              console.log(originAddressInfo);
-
               if (originAddressInfo) {
                 try {
-                  const address = originAddressInfo.address;
                   const targetChain = joiningChain || originAddressInfo.chain;
+
+                  const address = originAddressInfo.address;
 
                   const res = await linkExistingAddressToChainOrCommunity(
                     address, targetChain, originAddressInfo.chain, joiningCommunity
                   );
 
                   if (res && res.result) {
-                    const { verification_token, addressId, addresses } = res.result;
+                    const { verification_token, addresses, encodedAddress } = res.result;
                     app.user.setAddresses(addresses.map((a) => {
                       return new AddressInfo(a.id, a.address, a.chain, a.keytype, a.is_magic);
                     }));
-
                     const addressInfo = app.user.addresses
-                      .find((a) => a.address === address && a.chain === targetChain);
+                      .find((a) => a.address === encodedAddress && a.chain === targetChain);
 
                     const account = app.chain
-                      ? app.chain.accounts.get(address, addressInfo.keytype)
-                      : app.community.accounts.get(address, addressInfo.chain);
+                      ? app.chain.accounts.get(encodedAddress, addressInfo.keytype)
+                      : app.community.accounts.get(encodedAddress, addressInfo.chain);
                     if (app.chain) {
                       account.setValidationToken(verification_token);
                     }

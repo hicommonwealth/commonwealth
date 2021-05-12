@@ -26,6 +26,7 @@ class ChainInfo {
   public adminsAndMods: RoleInfo[];
   public members: RoleInfo[];
   public type: string;
+  public readonly ss58Prefix: number;
 
   // TODO: convert this to accept an object with params instead
   constructor(obj: {
@@ -48,10 +49,11 @@ class ChainInfo {
       adminsAndMods?: RoleInfo[],
       base?: ChainBase,
       type?: string,
+      ss58_prefix?: number,
     }) {
     const {
       id, network, base, symbol, name, icon_url, description, website, discord, element, telegram, github,
-      customDomain, blockExplorerIds, collapsed_on_homepage, featured_topics, topics, adminsAndMods, type,
+      customDomain, blockExplorerIds, collapsed_on_homepage, featured_topics, topics, adminsAndMods, type, ss58_prefix,
     } = obj;
     this.id = id;
     this.network = network;
@@ -72,6 +74,7 @@ class ChainInfo {
     this.topics = topics || [];
     this.adminsAndMods = adminsAndMods || [];
     this.type = type;
+    this.ss58Prefix = ss58_prefix;
   }
 
   public static fromJSON(json) {

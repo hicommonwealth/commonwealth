@@ -29,7 +29,7 @@ class ContractApi<ContractT extends Contract> {
     contractAddress: string,
     web3Provider: AsyncSendable
   ) {
-    this._contractAddress = contractAddress.toLowerCase();
+    this._contractAddress = contractAddress;
     this._Provider = new ethers.providers.Web3Provider(web3Provider);
     this._Contract = factory(this._contractAddress, this._Provider);
   }
@@ -50,7 +50,7 @@ class ContractApi<ContractT extends Contract> {
         await wallet.enable();
       }
       // TODO: ensure that we can find any wallet, even if non-string accounts
-      if (wallet.accounts.find((acc) => acc.toLowerCase() === sender.toLowerCase())) {
+      if (wallet.accounts.find((acc) => acc === sender)) {
         signingWallet = wallet;
       }
     }
