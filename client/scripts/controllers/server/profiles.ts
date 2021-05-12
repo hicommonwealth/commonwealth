@@ -4,7 +4,7 @@ import _ from 'lodash';
 
 import app from 'state';
 import { ProfileStore } from 'stores';
-import { Profile } from 'models';
+import { Profile, Account, ChainInfo } from 'models';
 
 class ProfilesController {
   private _store: ProfileStore = new ProfileStore();
@@ -39,18 +39,19 @@ class ProfilesController {
     return profile;
   }
 
-  public async updateProfileForAccount(account, data) {
+  public async updateProfileForAccount(account: Account<any>, chain: string | ChainInfo, data) {
     return new Promise((resolve, reject) => {
       // TODO: Change to PUT /profile
+      const chainId = (typeof chain === 'string') ? chain : chain.id;
       $.post(`${app.serverUrl()}/updateProfile`, {
-        chain: (typeof account.chain === 'string') ? account.chain : account.chain.id,
+        chain: chainId,
         address: account.address,
         data: JSON.stringify(data),
         auth: true,
         jwt: app.user.jwt,
       }).then((result) => {
         if (!account.profile) {
-          const profile = new Profile(account.chain.id, account.address);
+          const profile = new Profile(chainId, account.address);
           this._store.add(profile);
           this._refreshProfile(profile);
         } else {

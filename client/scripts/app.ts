@@ -638,8 +638,10 @@ $(() => {
           const nodes = app.config.nodes.getAll();
           const node = nodes.find((o) => o.address === scope);
           if (node) {
+            console.log(app.temporaryTokenAddress);
             const pagePath = window.location.href.substr(window.location.href.indexOf(scope) + scope.length);
             m.route.set(`/${node.chain.id}${pagePath}`);
+            console.log(app.temporaryTokenAddress);
           }
         }
       }

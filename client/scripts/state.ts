@@ -4,6 +4,7 @@ import {
   IChainAdapter,
   ICommunityAdapter,
   NotificationCategory,
+  Account,
 } from 'models';
 import { EventEmitter } from 'events';
 import { getToastStore, ToastStore } from 'controllers/app/toasts';
@@ -43,6 +44,7 @@ export interface IApp {
   runWhenReady: (cb: () => any) => void;
   chainModuleReady: EventEmitter;
   isModuleReady: boolean;
+  temporaryTokenAddress?: Account<any>;
 
   profiles: ProfilesController;
   comments: CommentsController;

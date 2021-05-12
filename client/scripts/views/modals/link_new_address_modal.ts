@@ -24,6 +24,7 @@ import AddressSwapper from 'views/components/addresses/address_swapper';
 import Token from 'controllers/chain/ethereum/token/adapter';
 import { INewChainInfo } from 'types';
 import { slugify } from 'utils';
+import { Iot } from 'aws-sdk';
 
 enum LinkNewAddressSteps {
   Step1VerifyWithCLI,
@@ -178,6 +179,7 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
   // close the modal if the user moves away from the page
   oncreate: (vnode) => {
     vnode.state.onpopstate = (e) => {
+      app.temporaryTokenAddress = undefined;
       $('.LinkNewAddressModal').trigger('modalforceexit');
     };
     $(window).on('popstate', vnode.state.onpopstate);
@@ -195,9 +197,10 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
 
     // initialize the step
     if (vnode.state.step === undefined) {
-      if (vnode.attrs.alreadyInitializedAccount) {
+      if (vnode.attrs.alreadyInitializedAccount || app.temporaryTokenAddress) {
+        console.log('Using temporary account!');
         vnode.state.step = LinkNewAddressSteps.Step2CreateProfile;
-        vnode.state.newAddress = vnode.attrs.alreadyInitializedAccount;
+        vnode.state.newAddress = vnode.attrs.alreadyInitializedAccount || app.temporaryTokenAddress;
       } else {
         vnode.state.step = vnode.attrs.useCommandLineWallet
           ? LinkNewAddressSteps.Step1VerifyWithCLI
@@ -370,6 +373,8 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
           vnode.state.step = LinkNewAddressSteps.Step2CreateProfile;
         }
         vnode.state.newAddress = account;
+        app.temporaryTokenAddress = account;
+        console.log(app.temporaryTokenAddress);
         vnode.state.isNewLogin = true;
         vnode.state.error = null;
         m.redraw();
@@ -737,7 +742,16 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
                 bio: `${$form.find('textarea[name=bio]').val()}`,
                 avatarUrl: `${$form.find('input[name=avatarUrl]').val()}`,
               };
-              app.profiles.updateProfileForAccount(vnode.state.newAddress, data).then((args) => {
+              let chainToUpdate: string | ChainInfo = vnode.state.newAddress.chain;
+              if (app.temporaryTokenAddress) {
+                app.temporaryTokenAddress = undefined;
+                // HACK: if we were previously on a temporary token chain, we need to
+                //   replace the address's chain with the newly created ChainInfo generated
+                //   by the createAddress call. We know that the new chain's id will be the
+                //   slugified token name, so we can fetch that directly.
+                chainToUpdate = slugify(vnode.state.newAddress.chain.name);
+              }
+              app.profiles.updateProfileForAccount(vnode.state.newAddress, chainToUpdate, data).then((args) => {
                 vnode.state.error = null;
                 $form.trigger('modalforceexit');
                 if (vnode.attrs.successCallback) vnode.attrs.successCallback();

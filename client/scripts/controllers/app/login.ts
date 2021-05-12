@@ -42,6 +42,7 @@ function createAccount(
   account: Account<any>,
   community?: string
 ) {
+  console.log(account);
   return $.post(`${app.serverUrl()}/createAddress`, {
     address: account.address,
     keytype: account.chainBase === ChainBase.Substrate

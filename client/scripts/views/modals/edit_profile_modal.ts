@@ -86,7 +86,7 @@ const EditProfileModal = {
                   avatarUrl: `${$(vnode.dom).find('input[name=avatarUrl]').val()}`,
                 };
                 vnode.state.saving = true;
-                app.profiles.updateProfileForAccount(account, data).then((result) => {
+                app.profiles.updateProfileForAccount(account, account.chain, data).then((result) => {
                   vnode.state.saving = false;
                   m.redraw();
                   refreshCallback();
