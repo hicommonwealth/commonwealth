@@ -15,6 +15,7 @@ import ProposalCard from 'views/components/proposal_card';
 import Substrate from 'controllers/chain/substrate/main';
 import Listing from './listing';
 import ErrorPage from './error';
+import loadSubstrateModules from '../components/load_substrate_modules';
 
 function getModules() {
   if (!app || !app.chain || !app.chain.loaded) {
@@ -50,21 +51,8 @@ const BountiesPage: m.Component<{}> = {
       });
     }
 
-    const onSubstrate = app.chain?.base === ChainBase.Substrate;
-    if (onSubstrate) {
-      const modules = getModules();
-      if (modules.some((mod) => !mod.ready)) {
-        app.chain.loadModules(modules);
-        return m(PageLoading, {
-          message: 'Loading bounties',
-          title: [
-            'Bounties',
-            m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
-          ],
-          showNewProposalButton: true,
-        });
-      }
-    }
+    const modLoading = loadSubstrateModules('Bounties', getModules);
+    if (modLoading) return modLoading;
 
     const activeBounties = (app.chain as Substrate).bounties.store.getAll().filter((p) => !p.completed);
     const inactiveBounties = (app.chain as Substrate).bounties.store.getAll().filter((p) => p.completed);

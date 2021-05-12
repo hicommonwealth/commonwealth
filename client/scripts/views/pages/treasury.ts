@@ -27,6 +27,7 @@ import { CountdownUntilBlock } from 'views/components/countdown';
 import NewProposalPage from 'views/pages/new_proposal/index';
 import Listing from 'views/pages/listing';
 import ErrorPage from 'views/pages/error';
+import loadSubstrateModules from 'views/components/load_substrate_modules';
 
 const SubstrateProposalStats: m.Component<{}, {}> = {
   view: (vnode) => {
@@ -126,20 +127,9 @@ const TreasuryPage: m.Component<{}> = {
       });
     }
     const onSubstrate = app.chain && app.chain.base === ChainBase.Substrate;
-    if (onSubstrate) {
-      const modules = getModules();
-      if (modules.some((mod) => !mod.ready)) {
-        app.chain.loadModules(modules);
-        return m(PageLoading, {
-          message: 'Loading treasury',
-          title: [
-            'Treasury',
-            m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
-          ],
-          showNewProposalButton: true,
-        });
-      }
-    }
+
+    const modLoading = loadSubstrateModules('Treasury', getModules);
+    if (modLoading) return modLoading;
 
     const activeTreasuryProposals = onSubstrate
       && (app.chain as Substrate).treasury.store.getAll().filter((p) => !p.completed);

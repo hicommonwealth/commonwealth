@@ -86,6 +86,7 @@ const ValidatorsPage: m.Component<{}, { validators, totalStaked, validatorsIniti
       });
       // TODO: handle error fetching vals
       vnode.state.validatorsInitialized = true;
+      m.redraw();
     }
     const validators = vnode.state.validators;
 
