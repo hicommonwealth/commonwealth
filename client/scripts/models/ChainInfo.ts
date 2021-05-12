@@ -26,7 +26,7 @@ class ChainInfo {
   public adminsAndMods: RoleInfo[];
   public members: RoleInfo[];
   public type: string;
-  public readonly ss58Prefix: number;
+  public readonly ss58Prefix: string;
 
   // TODO: convert this to accept an object with params instead
   constructor(obj: {
@@ -49,7 +49,7 @@ class ChainInfo {
       adminsAndMods?: RoleInfo[],
       base?: ChainBase,
       type?: string,
-      ss58_prefix?: number,
+      ss58_prefix?: string,
     }) {
     const {
       id, network, base, symbol, name, icon_url, description, website, discord, element, telegram, github,
