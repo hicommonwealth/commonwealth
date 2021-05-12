@@ -21,7 +21,6 @@ import { notifyError } from 'controllers/app/notifications';
 import { updateLastVisited } from 'controllers/app/login';
 import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
 import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
-import { INewChainInfo } from 'types';
 
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
@@ -150,8 +149,6 @@ class ThreadsController {
     url?: string,
     attachments?: string[],
     readOnly?: boolean,
-    isNewChain?: boolean,
-    newChainInfo?: INewChainInfo
   ) {
     try {
       // TODO: Change to POST /thread
@@ -171,8 +168,6 @@ class ThreadsController {
         'url': url,
         'readOnly': readOnly,
         'jwt': app.user.jwt,
-        'isNewChain': isNewChain,
-        'newChainInfo': newChainInfo,
       });
       const result = modelFromServer(response.result);
       this._store.add(result);

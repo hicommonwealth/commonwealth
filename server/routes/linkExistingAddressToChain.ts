@@ -1,10 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import Sequelize from 'sequelize';
 import crypto from 'crypto';
-import TokenBalanceCache from '../util/tokenBalanceCache';
-import { createChainForAddress } from '../util/createTokenChain';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
-import { INewChainInfo } from '../../shared/types';
 
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
@@ -22,7 +19,6 @@ export const Errors = {
 
 const linkExistingAddressToChain = async (
   models,
-  tokenBalanceCache: TokenBalanceCache,
   req: Request,
   res: Response,
   next: NextFunction
@@ -41,22 +37,9 @@ const linkExistingAddressToChain = async (
   }
   const userId = req.user.id;
 
-  let chain, error;
-  if (req.body.isNewChain) {
-    const newChainInfo: INewChainInfo = {
-      address: req.body['newChainInfo[address]'],
-      iconUrl: req.body['newChainInfo[iconUrl]'],
-      name: req.body['newChainInfo[name]'],
-      symbol: req.body['newChainInfo[symbol]'],
-    };
-    [chain, error] = await createChainForAddress(models, tokenBalanceCache, newChainInfo);
-  }
-
-  if (!chain) {
-    chain = await models.Chain.findOne({
-      where: { id: req.body.chain }
-    });
-  }
+  const chain = await models.Chain.findOne({
+    where: { id: req.body.chain }
+  });
 
   if (!chain) {
     return next(new Error(Errors.InvalidChain));
@@ -150,7 +133,7 @@ const linkExistingAddressToChain = async (
         permission: 'member',
       } : {
         address_id: addressId,
-        chain_id: (!req.body.isNewChain) ? req.body.chain : chain.id,
+        chain_id: req.body.chain,
         permission: 'member',
       });
     }

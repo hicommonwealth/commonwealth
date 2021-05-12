@@ -19,24 +19,7 @@ import {
 } from 'models';
 import moment from 'moment';
 import { notifyError } from 'controllers/app/notifications';
-import Token from 'controllers/chain/ethereum/token/adapter';
-import { INewChainInfo } from 'types';
-
 const MAGIC_PUBLISHABLE_KEY = 'pk_live_B0604AA1B8EEFDB4';
-
-function isNewChain() : boolean {
-  return (app.chain as Token).isToken
-  && (app.chain as Token).isUncreated;
-}
-
-function newChainInfo() {
-  return {
-    address: app.chain.id,
-    iconUrl: (app.chain.meta.chain.iconUrl) ? app.chain.meta.chain.iconUrl : 'default',
-    name: app.chain.meta.chain.name,
-    symbol: app.chain.meta.chain.symbol
-  };
-}
 
 function createAccount(
   account: Account<any>,
@@ -48,8 +31,6 @@ function createAccount(
       && (account as any).isEd25519 ? 'ed25519' : undefined,
     chain: account.chain.id,
     community,
-    isNewChain: isNewChain(),
-    newChainInfo: isNewChain() ? newChainInfo() : null,
     jwt: app.user.jwt,
   });
 }
@@ -65,8 +46,6 @@ export function linkExistingAddressToChainOrCommunity(
     'chain': chain,
     'originChain': originChain,
     'community': community,
-    'isNewChain': isNewChain(),
-    'newChainInfo': isNewChain() ? newChainInfo() : null,
     jwt: app.user.jwt,
   });
 }

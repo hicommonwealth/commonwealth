@@ -1,8 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../../shared/logging';
-import TokenBalanceCache from '../util/tokenBalanceCache';
-import { INewChainInfo } from '../../shared/types';
-import { createChainForAddress } from '../util/createTokenChain';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -12,8 +9,7 @@ export const Errors = {
   InvalidChain: 'Invalid chain',
 };
 
-const createAddress = async (models, tokenBalanceCache: TokenBalanceCache,
-  req: Request, res: Response, next: NextFunction) => {
+const createAddress = async (models, req: Request, res: Response, next: NextFunction) => {
   // start the process of creating a new address. this may be called
   // when logged in to link a new address for an existing user, or
   // when logged out to create a new user by showing proof of an address.
@@ -24,27 +20,13 @@ const createAddress = async (models, tokenBalanceCache: TokenBalanceCache,
     return next(new Error(Errors.NeedChain));
   }
 
-  let chain, existingAddress, error;
-  if (req.body.isNewChain === 'true') {
-    const newChainInfo: INewChainInfo = {
-      address: req.body['newChainInfo[address]'],
-      iconUrl: req.body['newChainInfo[iconUrl]'],
-      name: req.body['newChainInfo[name]'],
-      symbol: req.body['newChainInfo[symbol]'],
-    };
-    [chain, error] = await createChainForAddress(models, tokenBalanceCache, newChainInfo);
-    existingAddress = false;
+  const chain = await models.Chain.findOne({
+    where: { id: req.body.chain }
+  });
 
-    if (error) return next(new Error(error));
-  } else {
-    chain = await models.Chain.findOne({
-      where: { id: req.body.chain }
-    });
-
-    existingAddress = await models.Address.scope('withPrivateData').findOne({
-      where: { chain: req.body.chain, address: req.body.address }
-    });
-  }
+  const existingAddress = await models.Address.scope('withPrivateData').findOne({
+    where: { chain: req.body.chain, address: req.body.address }
+  });
 
   if (!chain) {
     return next(new Error(Errors.InvalidChain));

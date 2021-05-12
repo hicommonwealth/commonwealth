@@ -17,10 +17,8 @@ import {
   ChainNetwork,
   NotificationCategory,
   Notification,
-  ChainBase,
 } from 'models';
-import { WebsocketMessageType, IWebsocketsPayload, TokenResponse } from 'types';
-import { slugify } from 'utils';
+import { WebsocketMessageType, IWebsocketsPayload } from 'types';
 
 import { notifyError, notifySuccess, notifyInfo } from 'controllers/app/notifications';
 import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
@@ -30,7 +28,6 @@ import WebsocketController from 'controllers/server/socket/index';
 import { Layout, LoadingLayout } from 'views/layout';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import LoginModal from 'views/modals/login_modal';
-import TokenAdapter from 'controllers/chain/ethereum/token/adapter';
 import { alertModalWithText } from 'views/modals/alert_modal';
 
 // Prefetch commonly used pages
@@ -50,15 +47,6 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       app.user.notifications.clearSubscriptions();
       data.chains.filter((chain) => chain.active)
         .map((chain) => app.config.chains.add(ChainInfo.fromJSON(chain)));
-
-      // HACK: mark temporary token chain as created if it gets created in backend
-      //  as a result of some user action.
-      if (app.chain
-        && (app.chain as TokenAdapter).isUncreated
-        && app.config.chains.getById(slugify(app.chain.meta.chain.name))) {
-        (app.chain as TokenAdapter).markCreated();
-      }
-
       data.nodes.sort((a, b) => a.id - b.id).map((node) => {
         return app.config.nodes.add(NodeInfo.fromJSON({
           id: node.id,
@@ -198,25 +186,6 @@ export async function selectCommunity(c?: CommunityInfo): Promise<boolean> {
 
   // Initialize available addresses
   await updateActiveAddresses();
-
-  // Redraw with community fully loaded and return true to indicate
-  // initialization has finalized.
-  m.redraw();
-  return true;
-}
-
-export async function createTemporaryTokenChain(n: NodeInfo): Promise<boolean> {
-  // Check for valid community selection, and that we need to switch
-  if (app.chain && n === app.chain.meta) return;
-
-  // Shut down old chain if applicable
-  await deinitChainOrCommunity();
-
-  // Begin initializing the community
-  const newToken = new TokenAdapter(n, app, true);
-  app.chain = newToken;
-  await app.chain.initApi();
-  await app.chain.initData();
 
   // Redraw with community fully loaded and return true to indicate
   // initialization has finalized.
@@ -480,55 +449,6 @@ export async function initNewTokenChain(address: string) {
   await selectNode(nodeInfo);
 }
 
-export async function initTemporaryTokenChain(address: string): Promise<boolean> {
-  // todo token list in localstorage
-  const getTokensFromLists = async (): Promise<TokenResponse[]> => {
-    return $.getJSON('/api/getTokensFromLists')
-      .then((response) => {
-        if (response.status === 'Failure') {
-          throw response.message;
-        } else {
-          return response.result;
-        }
-      });
-  };
-  const tokenLists = await getTokensFromLists();
-  const token = tokenLists.find((o) => { return o.address === address; });
-
-  if (!token) { return false; }
-
-  app.threads.initialize([], 0, 0, true);
-
-  return createTemporaryTokenChain(
-    new NodeInfo(
-      0,
-      new ChainInfo({
-        id: token.address,
-        network: ChainNetwork.ERC20,
-        symbol: token.symbol,
-        name: token.name,
-        icon_url: token.logoURI,
-        description: '',
-        website: '',
-        discord: '',
-        element: '',
-        telegram: '',
-        github: '',
-        customDomain: '',
-        blockExplorerIds: {},
-        collapsed_on_homepage: false,
-        featured_topics: [],
-        topics: [],
-        adminsAndMods: [],
-        base: ChainBase.Ethereum,
-        type: 'token'
-      }),
-      '',
-      token.address
-    )
-  );
-}
-
 // set up route navigation
 m.route.prefix = '';
 const _updateRoute = m.route.set;
@@ -677,7 +597,7 @@ $(() => {
       if (vnode.attrs.scope && path === 'views/pages/view_proposal/index' && vnode.attrs.type === 'discussion') {
         deferChain = true;
       }
-      if (app.chain instanceof TokenAdapter) deferChain = false;
+      if (app.chain?.meta.chain.type === 'token') deferChain = false;
       return m(Layout, { scope, deferChain, hideSidebar }, [ vnode ]);
     },
   });

@@ -18,23 +18,16 @@ export default class Token extends IChainAdapter<EthereumCoin, EthereumAccount> 
   public readonly contractAddress: string;
   public readonly isToken = true;
 
-  private _isUncreated: boolean = false;
-  public get isUncreated() { return this._isUncreated; }
   public chain: EthereumTokenChain;
   public accounts: EthereumAccounts;
   public hasToken: boolean = false;
 
-  public markCreated() {
-    this._isUncreated = false;
-  }
-
-  constructor(meta: NodeInfo, app: IApp, isUncreated: boolean = false) {
+  constructor(meta: NodeInfo, app: IApp) {
     super(meta, app);
     this.chain = new EthereumTokenChain(this.app);
     this.accounts = new EthereumAccounts(this.app);
     this.class = meta.chain.network;
     this.contractAddress = meta.address;
-    this._isUncreated = isUncreated;
   }
 
   public async initApi() {

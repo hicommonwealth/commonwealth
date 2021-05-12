@@ -23,8 +23,6 @@ import FeedbackModal from 'views/modals/feedback_modal';
 import SelectAddressModal from 'views/modals/select_address_modal';
 import Token from 'controllers/chain/ethereum/token/adapter';
 import { linkExistingAddressToChainOrCommunity, setActiveAccount } from 'controllers/app/login';
-import { INewChainInfo } from 'types';
-import { slugify } from 'utils';
 
 export const CHAINBASE_SHORT = {
   [ChainBase.CosmosSDK]: 'Cosmos',
@@ -145,9 +143,6 @@ const LoginSelector: m.Component<{
       vnode.state.profileLoadComplete = true;
     }
 
-    const isNewChain = app.chain
-      && (app.chain as Token).isToken
-      && (app.chain as Token).isUncreated;
     const joiningChainInfo = app.chain?.meta.chain;
     const allChains = app.config.chains.getAll();
     const joiningChain = joiningChainInfo?.id;
@@ -184,21 +179,10 @@ const LoginSelector: m.Component<{
                 try {
                   const address = originAddressInfo.address;
                   const targetChain = joiningChain || originAddressInfo.chain;
-                  let newChainInfo: INewChainInfo;
-                  if (isNewChain) {
-                    newChainInfo = {
-                      address: app.chain.id,
-                      iconUrl: (app.chain.meta.chain.iconUrl) ? app.chain.meta.chain.iconUrl : 'default',
-                      name: app.chain.meta.chain.name,
-                      symbol: app.chain.meta.chain.symbol,
-                    };
-                  }
 
                   const res = await linkExistingAddressToChainOrCommunity(
                     address, targetChain, originAddressInfo.chain, joiningCommunity
                   );
-
-                  const filteredName = slugify(app.chain.meta.chain.name);
 
                   if (res && res.result) {
                     const { verification_token, addressId, addresses } = res.result;
@@ -206,9 +190,8 @@ const LoginSelector: m.Component<{
                       return new AddressInfo(a.id, a.address, a.chain, a.keytype, a.is_magic);
                     }));
 
-                    // Wack switch because the target chain is different for uncreated tokens communities
                     const addressInfo = app.user.addresses
-                      .find((a) => a.address === address && a.chain === (isNewChain ? filteredName : targetChain));
+                      .find((a) => a.address === address && a.chain === targetChain);
 
                     const account = app.chain
                       ? app.chain.accounts.get(address, addressInfo.keytype)
@@ -217,12 +200,8 @@ const LoginSelector: m.Component<{
                       account.setValidationToken(verification_token);
                     }
 
-                    if (joiningChain && !app.user.getRoleInCommunity({ account, chain: joiningChain }) && !isNewChain) {
+                    if (joiningChain && !app.user.getRoleInCommunity({ account, chain: joiningChain })) {
                       await app.user.createRole({ address: addressInfo, chain: joiningChain });
-                    } else if (joiningChain
-                        && !app.user.getRoleInCommunity({ account, chain: joiningChain })
-                        && isNewChain) {
-                      await app.user.createRole({ address: addressInfo, chain: filteredName });
                     } else if (joiningCommunity
                               && !app.user.getRoleInCommunity({ account, community: joiningCommunity })) {
                       await app.user.createRole({ address: addressInfo, community: joiningCommunity });
@@ -236,17 +215,11 @@ const LoginSelector: m.Component<{
                     // Todo: handle error
                   }
 
-                  if ((app.chain as Token)?.isUncreated) {
-                    await initAppState(false);
-                    m.route.set(`/${filteredName}`);
-                    m.redraw();
-                  } else {
-                    // If token forum make sure has token and add to app.chain obj
-                    if (app.chain && (app.chain as Token).isToken && !(app.chain as Token).isUncreated) {
-                      await (app.chain as Token).activeAddressHasToken(app.user.activeAccount.address);
-                    }
-                    m.redraw();
+                  // If token forum make sure has token and add to app.chain obj
+                  if (app.chain && (app.chain as Token).isToken) {
+                    await (app.chain as Token).activeAddressHasToken(app.user.activeAccount.address);
                   }
+                  m.redraw();
                 } catch (err) {
                   console.error(err);
                 }

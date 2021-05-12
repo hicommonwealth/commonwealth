@@ -128,7 +128,7 @@ function setupRouter(
   // TODO: Change to POST /gist
   router.post('/createGist', passport.authenticate('jwt', { session: false }), createGist.bind(this, models));
   // TODO: Change to POST /address
-  router.post('/createAddress', createAddress.bind(this, models, tokenBalanceCache));
+  router.post('/createAddress', createAddress.bind(this, models));
   // TODO: Change to PUT /address
   router.post('/verifyAddress', verifyAddress.bind(this, models));
   // TODO: Change to DELETE /address
@@ -136,7 +136,7 @@ function setupRouter(
   router.post(
     '/linkExistingAddressToChain',
     passport.authenticate('jwt', { session: false }),
-    linkExistingAddressToChain.bind(this, models, tokenBalanceCache),
+    linkExistingAddressToChain.bind(this, models),
   );
   router.post('/getAddressStatus', getAddressStatus.bind(this, models));
   // TODO: Change to PUT /node
@@ -309,7 +309,7 @@ function setupRouter(
   router.post(
     '/createRole',
     passport.authenticate('jwt', { session: false }),
-    createRole.bind(this, models, tokenBalanceCache),
+    createRole.bind(this, models),
   );
   // TODO: Change to DELETE /role
   router.post('/deleteRole', passport.authenticate('jwt', { session: false }), deleteRole.bind(this, models));

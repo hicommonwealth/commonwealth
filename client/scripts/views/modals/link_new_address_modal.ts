@@ -22,7 +22,6 @@ import User from 'views/components/widgets/user';
 import AvatarUpload from 'views/components/avatar_upload';
 import AddressSwapper from 'views/components/addresses/address_swapper';
 import Token from 'controllers/chain/ethereum/token/adapter';
-import { INewChainInfo } from 'types';
 import { slugify } from 'utils';
 
 enum LinkNewAddressSteps {
@@ -74,13 +73,11 @@ const LinkAccountItem: m.Component<{
         e.preventDefault();
         if (vnode.state.linking) return;
 
-        const isUncreated = (app.chain as Token)?.isUncreated;
-
         // check address status if currently logged in
         if (app.isLoggedIn()) {
           const { result } = await $.post(`${app.serverUrl()}/getAddressStatus`, {
             address,
-            chain: (!isUncreated) ? app.activeChainId() : null,
+            chain: app.activeChainId(),
             jwt: app.user.jwt,
           });
           if (result.exists) {
@@ -255,30 +252,9 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
 
           // link the address to the community
           try {
-            const isNewChain = !app.config.chains.getById(vnode.attrs.joiningChain)
-              && (app.chain as Token)?.isUncreated;
-            let newChainInfo: INewChainInfo;
-            if (isNewChain) {
-              newChainInfo = {
-                address: app.chain.id,
-                iconUrl: (app.chain.meta.chain.iconUrl) ? app.chain.meta.chain.iconUrl : 'default',
-                name: app.chain.meta.chain.name,
-                symbol: app.chain.meta.chain.symbol,
-              };
-            }
-
-            console.log(`inner joining chain accountcb and more${vnode.attrs.joiningChain}`);
-            console.log(isNewChain);
-            console.log(newChainInfo);
-
             if (vnode.attrs.joiningChain
                 && !app.user.getRoleInCommunity({ account, chain: vnode.attrs.joiningChain })) {
-              await app.user.createRole(isNewChain ? {
-                address: addressInfo,
-                chain: vnode.attrs.joiningChain,
-                isNewChain,
-                newChainInfo
-              } : {
+              await app.user.createRole({
                 address: addressInfo,
                 chain: vnode.attrs.joiningChain,
               });
@@ -297,7 +273,7 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
             app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
           }
 
-          if (app.chain && (app.chain as Token).isToken && !(app.chain as Token).isUncreated) {
+          if (app.chain && (app.chain as Token).isToken) {
             await (app.chain as Token).activeAddressHasToken(app.user.activeAccount.address);
           }
           // TODO: set the address as default
@@ -330,30 +306,6 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
         // load addresses for the current chain/community
         if (app.community) {
           await updateActiveAddresses();
-        } else if (app.chain && (app.chain as Token).isToken) {
-          const chainInfo = app.chain.meta.chain;
-          const newChainInfo = new ChainInfo({
-            id: slugify(chainInfo.name),
-            network: chainInfo.network,
-            base: chainInfo.base,
-            symbol: chainInfo.symbol,
-            name: chainInfo.name,
-            icon_url: chainInfo.iconUrl,
-            description: chainInfo.description,
-            website: chainInfo.website,
-            discord: chainInfo.discord,
-            element: chainInfo.element,
-            telegram: chainInfo.telegram,
-            github: chainInfo.github,
-            customDomain: chainInfo.customDomain,
-            blockExplorerIds: chainInfo.blockExplorerIds,
-            collapsed_on_homepage: chainInfo.collapsedOnHomepage,
-            featured_topics: chainInfo.featuredTopics,
-            topics: chainInfo.topics,
-            adminsAndMods: chainInfo.adminsAndMods,
-            type: chainInfo.type
-          });
-          await updateActiveAddresses(newChainInfo);
         } else if (app.chain) {
           const chain = app.user.selectedNode
             ? app.user.selectedNode.chain
