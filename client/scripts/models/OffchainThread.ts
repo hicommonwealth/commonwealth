@@ -51,12 +51,12 @@ class OffchainThread implements IUniqueId {
   public offchainVotingEnabledAt: moment.Moment | null;
   public offchainVotes: OffchainVote[]; // lazy loaded
   public getOffchainVoteFor(chain: string, address: string) {
-    return this.offchainVotes?.find((vote) => vote.address === address && vote.chain === chain);
+    return this.offchainVotes?.find((vote) => vote.address === address && vote.author_chain === chain);
   }
   public setOffchainVotes(voteData) {
     const votes = voteData.map((data) => {
-      const { address, chain, thread_id, option } = data;
-      return new OffchainVote({ address, chain, thread_id, option: +option });
+      const { address, author_chain, thread_id, option } = data;
+      return new OffchainVote({ address, author_chain, thread_id, option: +option });
     });
     this.offchainVotes = votes;
   }
@@ -71,9 +71,9 @@ class OffchainThread implements IUniqueId {
         author_chain: chain,
         jwt: app.user.jwt
       });
-      const vote = new OffchainVote({ address, chain, thread_id, option });
+      const vote = new OffchainVote({ address, author_chain: chain, thread_id, option });
       // remove any existing vote
-      const existingVoteIndex = this.offchainVotes.findIndex((v) => v.address === address && v.chain === chain);
+      const existingVoteIndex = this.offchainVotes.findIndex((v) => v.address === address && v.author_chain === chain);
       if (existingVoteIndex !== -1) {
         this.offchainVotes.splice(existingVoteIndex, 1);
       } else {

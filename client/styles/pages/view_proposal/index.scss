@@ -151,6 +151,10 @@ $discussion-title-font-size: 1.45rem;
                     border-radius: 0 20px 20px 0;
                 }
             }
+            .UserGallery .User {
+                margin-right: -4px;
+                margin-left: -4px;
+            }
             .offchain-poll-respondents-col {
                 padding-top: 12px;
                 text-align: center;

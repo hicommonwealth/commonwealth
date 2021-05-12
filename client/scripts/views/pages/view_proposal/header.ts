@@ -23,8 +23,10 @@ import {
   OffchainThreadStage,
   OffchainVoteOptions,
   AnyProposal,
+  AddressInfo,
 } from 'models';
 
+import UserGallery from 'views/components/widgets/user_gallery';
 import { getStatusClass, getStatusText } from 'views/components/proposal_card';
 import { notifySuccess } from 'controllers/app/notifications';
 import { activeQuillEditorHasText, GlobalStatus } from './body';
@@ -119,9 +121,14 @@ export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread 
           ? m('.offchain-poll-respondents-col.wide', 'No votes yet')
           : options.map((option) => m('.offchain-poll-respondents-col', [
             proposal.offchainVotes.filter((vote) => vote.option === option).length > 0
-              ? proposal.offchainVotes.filter((vote) => vote.option === option).length
-              : ''
-            // m(UserGallery)
+              ? m(UserGallery, {
+                avatarSize: 16,
+                popover: true,
+                maxUsers: 3,
+                users: proposal.offchainVotes
+                  .filter((vote) => vote.option === option)
+                  .map((vote) => new AddressInfo(null, vote.address, vote.author_chain, null, null))
+              }) : ''
           ]))
       ]),
       m('Tooltip', {
