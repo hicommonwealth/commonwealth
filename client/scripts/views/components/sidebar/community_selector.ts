@@ -8,6 +8,7 @@ import { AddressInfo, ChainInfo, CommunityInfo, RoleInfo } from 'models';
 import { SwitchIcon } from 'helpers';
 
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
+import CreateCommunityModal from 'views/modals/create_community_modal';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import User, { UserBlock } from '../widgets/user';
 
@@ -221,6 +222,16 @@ const CommunitySelector: m.Component<{ showTextLabel?: boolean }> = {
               m('h4', 'Other communities'),
             ],
             unjoinedCommunities.map(renderCommunity),
+            app.user.isSiteAdmin && m(ListItem, {
+
+              icon: m('.star-icon', [
+                m(Icon, { name: Icons.PLUS }),
+              ]),
+              label: '+ Add Community',
+              onclick: (e) => {
+                app.modals.create({ modal: CreateCommunityModal })
+              },
+            }),
             renderCommunity('home'),
           ],
         })
