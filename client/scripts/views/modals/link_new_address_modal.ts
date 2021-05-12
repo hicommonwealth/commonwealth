@@ -74,11 +74,13 @@ const LinkAccountItem: m.Component<{
         e.preventDefault();
         if (vnode.state.linking) return;
 
+        const isUncreated = (app.chain as Token)?.isUncreated;
+
         // check address status if currently logged in
         if (app.isLoggedIn()) {
           const { result } = await $.post(`${app.serverUrl()}/getAddressStatus`, {
             address,
-            chain: app.activeChainId(),
+            chain: (!isUncreated) ? app.activeChainId() : null,
             jwt: app.user.jwt,
           });
           if (result.exists) {
