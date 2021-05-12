@@ -570,6 +570,8 @@ $(() => {
     },
   });
 
+
+
   m.route(document.body, '/', {
     // Legacy redirects
     '/unlock':                   redirectRoute('/edgeware/unlock'),
@@ -579,6 +581,7 @@ $(() => {
 
     // Landing pages
     '/':                         importRoute('views/pages/landing', { scoped: false, hideSidebar: true }),
+    '/dashboard':                importRoute('views/pages/home', { scoped: false, hideSidebar: true }),
     '/whyCommonWealth':          importRoute('views/pages/commonwealth', { scoped: false, hideSidebar: true }),
     '/about':                    importRoute('views/pages/landing/about', { scoped: false }),
     '/terms':                    importRoute('views/pages/landing/terms', { scoped: false }),
@@ -709,6 +712,7 @@ $(() => {
       if (app.loginState === LoginState.LoggedIn) {
         app.user.notifications.refresh().then(() => m.redraw());
         jwt = app.user.jwt;
+        m.route.set('/dashboard');
       }
       // grab discussion drafts
       if (app.loginState === LoginState.LoggedIn) {
