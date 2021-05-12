@@ -46,16 +46,15 @@ module.exports = {
         id: 'crust',
         symbol: 'CRUST',
         name: 'Crust',
-        // icon_url: '/static/img/protocols/crust.png',
+        icon_url: '/static/img/protocols/dot.png', // @TODO: Add crust
         type: 'chain',
         network: 'crust',
         active: true,
-        // @TODO: Fill in 
-        // description: 'An open-source DeFi protocol built to unlock the liquidity of staked assets',
-        // telegram: 'https://t.me/stafi_protocol',
-        // website: 'https://www.stafi.io/',
-        // chat: 'https://discord.com/invite/jB77etn',
-        // github: 'https://github.com/stafiprotocol/stafi-node',
+        description: 'A Decentralized Cloud Blockchain Technology on Polkadot',
+        telegram: 'https://t.me/CrustNetwork',
+        website: 'https://crust.network/',
+        chat: 'https://discord.com/invite/Jbw2PAUSCR',
+        github: 'https://github.com/crustio',
       }], { transaction: t });
 
       await queryInterface.bulkInsert('ChainNodes', [{
