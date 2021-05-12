@@ -23,6 +23,7 @@ const exitWithMagicLoginComplete = () => {
   }
 
   notifySuccess('Successfully logged in!');
+  m.route.set('/dashboard');
   m.redraw();
 };
 
