@@ -20,6 +20,7 @@ import {
   ChainBase,
 } from 'models';
 import { WebsocketMessageType, IWebsocketsPayload, TokenResponse } from 'types';
+import { slugify } from 'utils';
 
 import { notifyError, notifySuccess, notifyInfo } from 'controllers/app/notifications';
 import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
@@ -47,7 +48,17 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       app.config.communities.clear();
       app.user.notifications.store.clear();
       app.user.notifications.clearSubscriptions();
-      data.chains.filter((chain) => chain.active).map((chain) => app.config.chains.add(ChainInfo.fromJSON(chain)));
+      data.chains.filter((chain) => chain.active)
+        .map((chain) => app.config.chains.add(ChainInfo.fromJSON(chain)));
+
+      // HACK: mark temporary token chain as created if it gets created in backend
+      //  as a result of some user action.
+      if (app.chain
+        && (app.chain as TokenAdapter).isUncreated
+        && app.config.chains.getById(slugify(app.chain.meta.chain.name))) {
+        (app.chain as TokenAdapter).markCreated();
+      }
+
       data.nodes.sort((a, b) => a.id - b.id).map((node) => {
         return app.config.nodes.add(NodeInfo.fromJSON({
           id: node.id,
