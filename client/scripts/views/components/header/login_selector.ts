@@ -24,7 +24,7 @@ import SelectAddressModal from 'views/modals/select_address_modal';
 import Token from 'controllers/chain/ethereum/token/adapter';
 import { linkExistingAddressToChainOrCommunity, setActiveAccount } from 'controllers/app/login';
 import { INewChainInfo } from 'types';
-import { tokenNameToId } from 'utils';
+import { slugify } from 'utils';
 
 export const CHAINBASE_SHORT = {
   [ChainBase.CosmosSDK]: 'Cosmos',
@@ -198,7 +198,7 @@ const LoginSelector: m.Component<{
                     address, targetChain, originAddressInfo.chain, joiningCommunity
                   );
 
-                  const filteredName = tokenNameToId(app.chain.meta.chain.name);
+                  const filteredName = slugify(app.chain.meta.chain.name);
 
                   if (res && res.result) {
                     const { verification_token, addressId, addresses } = res.result;

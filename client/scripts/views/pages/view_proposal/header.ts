@@ -1,12 +1,12 @@
 import m from 'mithril';
 import app from 'state';
+import { slugify } from 'utils';
 
 import { Button, Icon, Icons, Tag, MenuItem, Input } from 'construct-ui';
 
 import {
   pluralize, link, externalLink, extractDomain,
   offchainThreadStageToLabel,
-  slugify,
 } from 'helpers';
 import {
   proposalSlugToFriendlyName,

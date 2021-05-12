@@ -1,5 +1,5 @@
 import { INewChainInfo, TokenResponse } from '../../shared/types';
-import { tokenNameToId } from '../../shared/utils';
+import { slugify } from '../../shared/utils';
 import { ChainInstance } from '../models/chain';
 import TokenBalanceCache from './tokenBalanceCache';
 
@@ -29,7 +29,7 @@ export const createChainForThread = async (
       throw new Error('New chain not found in token list');
     }
 
-    const createdId = tokenNameToId(foundInList.name);
+    const createdId = slugify(foundInList.name);
 
     const chainContent = {
       id: createdId,
@@ -68,7 +68,7 @@ export const createChainForAddress = async (
       throw new Error('New chain not found in token list');
     }
 
-    const createdId = foundInList.name.toLowerCase().trim().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
+    const createdId = slugify(foundInList.name);
 
     const chainContent = {
       id: createdId,

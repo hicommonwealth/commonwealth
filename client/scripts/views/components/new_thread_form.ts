@@ -15,6 +15,7 @@ import {
 import app from 'state';
 import { initAppState } from 'app';
 import { INewChainInfo } from 'types';
+import { slugify } from 'utils';
 
 import { detectURL } from 'helpers/threads';
 import { OffchainTopic, OffchainThreadKind, OffchainThreadStage, CommunityInfo, NodeInfo } from 'models';
@@ -191,7 +192,7 @@ const newThread = async (
     throw new Error(e);
   }
 
-  const filteredName = app.chain.meta.chain.name.toLowerCase().trim().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
+  const filteredName = slugify(app.chain.meta.chain.name);
 
   const activeEntity = app.activeCommunityId() ? app.community : app.chain;
   updateLastVisited(app.activeCommunityId()

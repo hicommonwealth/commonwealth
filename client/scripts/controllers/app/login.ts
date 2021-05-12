@@ -139,7 +139,6 @@ export async function updateLastVisited(activeEntity: ChainInfo | CommunityInfo,
 export async function updateActiveAddresses(chain?: ChainInfo) {
   // update addresses for a chain (if provided) or for offchain communities (if null)
   // for offchain communities, addresses on all chains are available by default
-
   app.user.setActiveAccounts(
     chain
       ? app.user.addresses

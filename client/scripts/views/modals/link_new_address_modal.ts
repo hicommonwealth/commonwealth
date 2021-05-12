@@ -23,6 +23,7 @@ import AvatarUpload from 'views/components/avatar_upload';
 import AddressSwapper from 'views/components/addresses/address_swapper';
 import Token from 'controllers/chain/ethereum/token/adapter';
 import { INewChainInfo } from 'types';
+import { slugify } from 'utils';
 
 enum LinkNewAddressSteps {
   Step1VerifyWithCLI,
@@ -326,8 +327,7 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
         } else if (app.chain && (app.chain as Token).isToken) {
           const chainInfo = app.chain.meta.chain;
           const newChainInfo = new ChainInfo({
-            id: chainInfo.name.toLowerCase().trim()
-              .replace(/[^\w ]+/g, '').replace(/ +/g, '-'),
+            id: slugify(chainInfo.name),
             network: chainInfo.network,
             base: chainInfo.base,
             symbol: chainInfo.symbol,

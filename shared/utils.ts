@@ -1,4 +1,4 @@
-export const slugify = (str) => {
+export const slugify = (str: string): string => {
   // remove any character that isn't a alphanumeric character or a
   // space, and then replace any sequence of spaces with dashes
   return str.toLowerCase().trim().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
@@ -130,9 +130,4 @@ export function formatAddressShort(address: string, chain: string) {
   } else {
     return `${address.slice(0, 5)}…`;
   }
-}
-
-
-export function tokenNameToId(name: string): string {
-  return name.toLowerCase().trim().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
 }

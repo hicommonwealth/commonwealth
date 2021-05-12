@@ -10,7 +10,7 @@ import { TokenResponse } from '../../shared/types';
 
 import JobRunner from './cacheJobRunner';
 import TokenListCache from './tokenListCache';
-import { tokenNameToId } from '../../shared/utils';
+import { slugify } from '../../shared/utils';
 
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
@@ -71,7 +71,7 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
       const tokensFromLists: TokenForumMeta[] = tokensFromListsResponses
         .map((o) => {
           return {
-            id: tokenNameToId(o.name),
+            id: slugify(o.name),
             address: o.address,
             api: Erc20Factory.connect(o.address, provider)
           };
