@@ -34,3 +34,21 @@ li.LandingPageHeaderLoginButton.ml-10.pt-2 {
 .header-hidden {
   top: -100px;
 }
+
+header.landing-header  {
+  @media (min-width: 1023px)   {
+    width: 91%;
+  }
+
+  @media (min-width: 1100px)  {
+    width: 85%;
+  }
+
+  @media (min-width: 1300px)  {
+    width: 75%;
+  }
+  
+  @media (min-width: 1500px) {
+    width: 90%;
+  }
+}

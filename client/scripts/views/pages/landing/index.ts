@@ -109,8 +109,8 @@ const LandingPage: m.Component<{}, IState> = {
         m(HeaderLandingPage, {
           navs: [
             { text: 'Why Commonwealth?', redirectTo: '/whyCommonWealth' },
-            // { text: 'Use Cases' },
-            // { text: 'Crowdfunding' },
+            // { text: 'Use Cases', redirectTo: '/whyCommonWealth' },
+            // { text: 'Crowdfunding', redirectTo: '/whyCommonWealth' },
             // { text: 'Developers' },
           ],
         })
