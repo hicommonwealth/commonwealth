@@ -18,41 +18,47 @@ const updateOffchainVote = async (models, req: Request, res: Response, next: Nex
   // TODO: check that req.option is valid, and import options from shared/types
   // TODO: check and validate req.signature, instead of checking for author
 
-  let vote = await models.OffchainVote.findOne({
-    where: {
-      thread_id: req.body.thread_id,
-      address: req.body.address,
-      chain: req.body.chain,
-      community: req.body.community,
-    }
-  });
-
   const thread = await models.OffchainThread.findOne({
     where: community
       ? { id: req.body.thread_id, community: community.id }
       : { id: req.body.thread_id, chain: chain.id }
   });
-
   if (!thread) return next(new Error(Errors.InvalidThread));
 
-  if (!vote) {
-    await sequelize.transaction(async (t) => {
-      vote = await models.OffchainVote.create({
+  let vote;
+  await sequelize.transaction(async (t) => {
+    // delete existing votes
+    const destroyed = await models.OffchainVote.destroy({
+      where: community ? {
         thread_id: req.body.thread_id,
         address: req.body.address,
-        chain: req.body.chain,
+        author_chain: req.body.author_chain,
         community: req.body.community,
-        option: req.body.option,
-      }, { transaction: t });
+      } : {
+        thread_id: req.body.thread_id,
+        address: req.body.address,
+        author_chain: req.body.author_chain,
+        chain: req.body.chain,
+      },
+      transaction: t
+    });
 
-      // update denormalized vote count
+    // create new vote
+    vote = await models.OffchainVote.create({
+      thread_id: req.body.thread_id,
+      address: req.body.address,
+      author_chain: req.body.author_chain,
+      chain: req.body.chain,
+      community: req.body.community,
+      option: req.body.option,
+    }, { transaction: t });
+
+    // update denormalized vote count
+    if (destroyed === 0) {
       thread.offchain_voting_votes = (thread.offchain_voting_votes ?? 0) + 1;
       await thread.save({ transaction: t });
-    });
-  } else {
-    vote.option = req.body.option;
-    await vote.save();
-  }
+    }
+  });
 
   return res.json({ status: 'Success', result: vote.toJSON() });
 };

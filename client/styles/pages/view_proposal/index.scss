@@ -135,9 +135,15 @@ $discussion-title-font-size: 1.45rem;
                 display: flex;
             }
             .offchain-poll-col {
-                height: 25px;
+                height: 20px;
                 text-align: center;
-                padding-top: 3px;
+                border: 1px solid transparent;
+                svg {
+                    stroke: #373b46;
+                }
+                &:hover {
+                    border: 1px solid #373b46;
+                }
                 &:first-child {
                     border-radius: 20px 0 0 20px;
                 }
@@ -146,7 +152,7 @@ $discussion-title-font-size: 1.45rem;
                 }
             }
             .offchain-poll-respondents-col {
-                padding-top: 8px;
+                padding-top: 12px;
                 text-align: center;
                 font-size: 15px;
                 color: $text-color-medium;
@@ -155,6 +161,9 @@ $discussion-title-font-size: 1.45rem;
             .offchain-poll-col,
             .offchain-poll-respondents-col {
                 width: 16.6%;
+                &.wide {
+                    width: 100%;
+                }
             }
         }
         .ProposalHeaderThreadLinkedChainEntity,

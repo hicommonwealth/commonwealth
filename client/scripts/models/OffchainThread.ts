@@ -53,6 +53,13 @@ class OffchainThread implements IUniqueId {
   public getOffchainVoteFor(chain: string, address: string) {
     return this.offchainVotes?.find((vote) => vote.address === address && vote.chain === chain);
   }
+  public setOffchainVotes(voteData) {
+    const votes = voteData.map((data) => {
+      const { address, chain, thread_id, option } = data;
+      return new OffchainVote({ address, chain, thread_id, option: +option });
+    });
+    this.offchainVotes = votes;
+  }
   public async submitOffchainVote(chain: string, address: string, option: OffchainVoteOptions) {
     const thread_id = this.id;
     try {

@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import m from 'mithril';
 import app from 'state';
 
@@ -44,9 +45,28 @@ export const ProposalHeaderExternalLink: m.Component<{ proposal: AnyProposal | O
   }
 };
 
-export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread }> = {
+export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread }, { offchainVotes }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
+
+    if (vnode.state.offchainVotes === undefined || vnode.state.offchainVotes[proposal.id] === undefined) {
+      // initialize or reset offchain votes
+      vnode.state.offchainVotes = {};
+      vnode.state.offchainVotes[proposal.id] = [];
+      // fetch from backend, and then set
+      $.get(`/api/viewOffchainVotes?thread_id=${proposal.id}` +
+            (app.activeChainId() ? `&chain=${app.activeChainId()}`
+             : app.activeCommunityId() ? `&community=${app.activeCommunityId()}` : ''))
+        .then((result) => {
+          if (result.result.length === 0) return;
+          if (result.result[0].thread_id !== proposal.id) return;
+          proposal.setOffchainVotes(result.result);
+          m.redraw();
+        })
+        .catch((err) => {
+          // TODO
+        });
+    }
 
     const options = [
       OffchainVoteOptions.SUPPORT_2,
@@ -95,10 +115,14 @@ export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread 
         ]),
       }),
       m('.offchain-poll-respondents', [
-        options.map((option) => m('.offchain-poll-respondents-col', [
-          proposal.offchainVotes.filter((vote) => vote.option === option).length
-          // m(UserGallery)
-        ]))
+        proposal.offchainVotes.length === 0
+          ? m('.offchain-poll-respondents-col.wide', 'No votes yet')
+          : options.map((option) => m('.offchain-poll-respondents-col', [
+            proposal.offchainVotes.filter((vote) => vote.option === option).length > 0
+              ? proposal.offchainVotes.filter((vote) => vote.option === option).length
+              : ''
+            // m(UserGallery)
+          ]))
       ]),
       m('Tooltip', {
         trigger: m('.offchain-poll-caption', [
