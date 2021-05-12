@@ -74,11 +74,13 @@ const LinkAccountItem: m.Component<{
         e.preventDefault();
         if (vnode.state.linking) return;
 
+        const isUncreated = (app.chain as Token)?.isUncreated;
+
         // check address status if currently logged in
         if (app.isLoggedIn()) {
           const { result } = await $.post(`${app.serverUrl()}/getAddressStatus`, {
             address,
-            chain: app.activeChainId(),
+            chain: (!isUncreated) ? app.activeChainId() : null,
             jwt: app.user.jwt,
           });
           if (result.exists) {
@@ -293,6 +295,10 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
           await setActiveAccount(account);
           if (app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length === 0) {
             app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
+          }
+
+          if (app.chain && (app.chain as Token).isToken && !(app.chain as Token).isUncreated) {
+            await (app.chain as Token).activeAddressHasToken(app.user.activeAccount.address);
           }
           // TODO: set the address as default
         } catch (e) {

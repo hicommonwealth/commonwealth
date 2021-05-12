@@ -20,6 +20,7 @@ import {
   ChainBase,
 } from 'models';
 import { WebsocketMessageType, IWebsocketsPayload, TokenResponse } from 'types';
+import { slugify } from 'utils';
 
 import { notifyError, notifySuccess, notifyInfo } from 'controllers/app/notifications';
 import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
@@ -32,7 +33,6 @@ import LoginModal from 'views/modals/login_modal';
 import TokenAdapter from 'controllers/chain/ethereum/token/adapter';
 import { alertModalWithText } from 'views/modals/alert_modal';
 
-import { slugify } from 'utils';
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/home');
 import(/* webpackPrefetch: true */ 'views/pages/discussions');
@@ -49,7 +49,17 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       app.user.notifications.store.clear();
       app.user.notifications.clearSubscriptions();
       app.tokens.initTokens();
-      data.chains.filter((chain) => chain.active).map((chain) => app.config.chains.add(ChainInfo.fromJSON(chain)));
+      data.chains.filter((chain) => chain.active)
+        .map((chain) => app.config.chains.add(ChainInfo.fromJSON(chain)));
+
+      // HACK: mark temporary token chain as created if it gets created in backend
+      //  as a result of some user action.
+      if (app.chain
+        && (app.chain as TokenAdapter).isUncreated
+        && app.config.chains.getById(slugify(app.chain.meta.chain.name))) {
+        (app.chain as TokenAdapter).markCreated();
+      }
+
       data.nodes.sort((a, b) => a.id - b.id).map((node) => {
         return app.config.nodes.add(NodeInfo.fromJSON({
           id: node.id,
