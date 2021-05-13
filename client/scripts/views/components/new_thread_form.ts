@@ -159,7 +159,7 @@ const newThread = async (
       chainId,
       communityId,
       title,
-      topicName, // if no topic name set to default
+      (topicName) ? topicName : 'General', // if no topic name set to default
       topicId,
       bodyText,
       url,
