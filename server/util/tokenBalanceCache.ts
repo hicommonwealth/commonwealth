@@ -98,13 +98,12 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     return this._contracts.find(({ address }) => address === searchAddress);
   }
 
-  public async start(models, network = 'mainnet', prefetchedTokenMeta?: TokenForumMeta[]) {
+  public async start(models?, network = 'mainnet', prefetchedTokenMeta?: TokenForumMeta[]) {
     if (!prefetchedTokenMeta) {
       const tokenMeta = await this._connectTokens(models, network);
       this._contracts = tokenMeta;
     } else {
-      const tokenMeta = await this._connectTokens(models, network);
-      this._contracts = tokenMeta;
+      this._contracts = prefetchedTokenMeta;
     }
 
     // write init values into saved cache
@@ -119,14 +118,14 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     log.info(`Started Token Balance Cache with ${this._contracts.length} tokens.`);
   }
 
-  public async reset(tokenMeta: TokenForumMeta[]) {
+  public async reset(models?, network = 'mainnet', prefetchedTokenMeta?: TokenForumMeta[]) {
     super.close();
     await this.access(async (cache) => {
       for (const key of Object.keys(cache)) {
         delete cache[key];
       }
     });
-    return this.start(tokenMeta);
+    return this.start(models, network, prefetchedTokenMeta);
   }
 
   public getTokens(): Promise<TokenResponse[]> {
