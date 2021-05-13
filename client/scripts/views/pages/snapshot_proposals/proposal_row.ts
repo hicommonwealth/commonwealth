@@ -15,7 +15,7 @@ const ProposalRow: m.Component<{ proposal: SnapshotProposal }, { expanded: boole
     const { proposal } = vnode.attrs;
 
     if (!proposal) return;
-    const proposalLink = `/${app.activeId()}/snapshot-proposals/${proposal.ipfsHash}`;
+    const proposalLink = `/${app.activeId()}/snapshot-proposal/${proposal.ipfsHash}`;
 
     const time = moment(+proposal.end * 1000);
     const now = moment();
