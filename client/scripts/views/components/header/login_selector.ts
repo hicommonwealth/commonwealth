@@ -144,18 +144,17 @@ const LoginSelector: m.Component<{
     }
 
     const joiningChainInfo = app.chain?.meta.chain;
-    const allChains = app.config.chains.getAll();
     const joiningChain = joiningChainInfo?.id;
     const joiningCommunity = app.activeCommunityId();
 
     const samebaseAddresses = app.user.addresses.reduce((arr: AddressInfo[], current: AddressInfo) => {
       // add all addresses if joining a community
-      if (!joiningChainInfo?.base) return [...arr, current];
+      const joiningBase = joiningChainInfo?.base;
+      if (!joiningBase) return [...arr, current];
 
-      // skip already existing items (all items in arr will have same base already)
-      const currentBase = allChains.find((c) => c.id === current.chain)?.base;
+      // skip already existing items
       if (arr.find((item) => {
-        if (currentBase === ChainBase.Substrate) {
+        if (joiningBase === ChainBase.Substrate) {
           return AddressSwapper({
             address: item.address, currentPrefix: 42
           }) === AddressSwapper({
@@ -167,7 +166,7 @@ const LoginSelector: m.Component<{
       })) return arr;
 
       // add all items on same base as joining chain if not already existing
-      const joiningBase = joiningChainInfo?.base;
+      const currentBase = app.config.chains.getById(current.chain)?.base;
       if (currentBase === joiningBase) return [...arr, current];
       else return arr;
     }, []);
