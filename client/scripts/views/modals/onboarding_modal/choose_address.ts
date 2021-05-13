@@ -387,7 +387,7 @@ const ChooseAddress: m.Component<IOnboardingChooseAddressAttr, IOnboardingChoose
               }),
             ] : app.chain.networkStatus !== ApiStatus.Connected ? [
             ] : app.chain.base === ChainBase.Ethereum ? [
-              sortedAccounts.map(
+              sortedAccounts?.map(
                 (address) => m(EthereumLinkAccountItem, {
                   address,
                   targetCommunity,
@@ -400,7 +400,7 @@ const ChooseAddress: m.Component<IOnboardingChooseAddressAttr, IOnboardingChoose
                 })
               ),
             ] : app.chain.base === ChainBase.Substrate ? [
-              sortedAccounts.map(
+              sortedAccounts?.map(
                 (account: InjectedAccountWithMeta) => m(SubstrateLinkAccountItem, {
                   account,
                   targetCommunity,
@@ -413,7 +413,7 @@ const ChooseAddress: m.Component<IOnboardingChooseAddressAttr, IOnboardingChoose
                 })
               ),
             ] : app.chain.base === ChainBase.CosmosSDK ? [
-              sortedAccounts.map(
+              sortedAccounts?.map(
                 (account: InjectedAccountWithMeta) => m(CosmosLinkAccountItem, {
                   account,
                   targetCommunity,
