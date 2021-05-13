@@ -4,7 +4,7 @@ import _ from 'lodash';
 
 import app from 'state';
 import { ProfileStore } from 'stores';
-import { Profile } from 'models';
+import { OffchainComment, OffchainThread, Profile } from 'models';
 
 class ProfilesController {
   private _store: ProfileStore = new ProfileStore();
@@ -26,6 +26,68 @@ class ProfilesController {
       this._unfetched.splice(0); // clear
       return profiles;
     }, 50);
+  }
+
+  public async getProfileWithActivity(chain: string, address: string): Promise<{
+    profile: Profile,
+    threads: OffchainThread[],
+    comments: OffchainComment<any>[],
+    addressId?: number,
+  }> {
+    let profile: Profile;
+    try {
+      const { result: { account, threads, comments } } = await $.ajax({
+        url: `${app.serverUrl()}/profile`,
+        type: 'GET',
+        data: {
+          address,
+          chain,
+          jwt: app.user.jwt,
+        },
+      });
+      if (account.OffchainProfile) {
+        profile = this._store.getByAddress(address);
+        if (!profile) {
+          profile = new Profile(chain, address);
+          const profileData = JSON.parse(account.OffchainProfile.data);
+          // ignore off-chain name if substrate id exists
+          if (account.OffchainProfile.identity) {
+            profile.initializeWithChain(
+              account.OffchainProfile.identity,
+              profileData?.headline,
+              profileData?.bio,
+              profileData?.avatarUrl,
+              account.OffchainProfile.judgements,
+              account.last_active,
+              account.is_councillor,
+              account.is_validator,
+            );
+          } else {
+            profile.initialize(
+              profileData?.name,
+              profileData?.headline,
+              profileData?.bio,
+              profileData?.avatarUrl,
+              account.last_active,
+              account.is_councillor,
+              account.is_validator
+            );
+          }
+          this._store.add(profile);
+        }
+      } else {
+        profile = new Profile(chain, address);
+        profile.initializeEmpty();
+        return { profile, threads: [], comments: [] };
+      }
+      const threadModels = threads.map((t) => OffchainThread.fromJSON(t));
+      const commentModels = comments.map((c) => OffchainComment.fromJSON(c));
+      return { addressId: account.id, profile, threads: threadModels, comments: commentModels };
+    } catch (e) {
+      profile = new Profile(chain, address);
+      profile.initializeEmpty();
+      return { profile, threads: [], comments: [] };
+    }
   }
 
   public getProfile(chain: string, address: string) {

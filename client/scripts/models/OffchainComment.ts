@@ -2,6 +2,7 @@ import moment from 'moment';
 import { VersionHistory } from '../controllers/server/threads';
 import { IUniqueId } from './interfaces';
 import OffchainAttachment from './OffchainAttachment';
+import OffchainThread from './OffchainThread';
 
 class OffchainComment<T extends IUniqueId> {
   [x: string]: any;
@@ -53,6 +54,58 @@ class OffchainComment<T extends IUniqueId> {
     this.community = community;
     this.authorChain = authorChain;
     this.lastEdited = lastEdited;
+  }
+
+  public static fromJSON(comment) {
+    const attachments = comment.OffchainAttachments
+      ? comment.OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
+      : [];
+    let proposal;
+    try {
+      const proposalSplit = decodeURIComponent(comment.root_id).split(/-|_/);
+      if (proposalSplit[0] === 'discussion') {
+        proposal = new OffchainThread(
+          '',
+          '',
+          null,
+          Number(proposalSplit[1]),
+          comment.created_at,
+          null,
+          null,
+          null,
+          comment.community,
+          comment.chain,
+          null,
+          null,
+          null,
+        );
+      } else {
+        proposal = {
+          chain: comment.chain,
+          community: comment.community,
+          slug: proposalSplit[0],
+          identifier: proposalSplit[1],
+        };
+      }
+    } catch (e) {
+      proposal = null;
+    }
+    return new OffchainComment(
+      comment.chain,
+      comment?.Address?.address || comment.author,
+      decodeURIComponent(comment.text),
+      comment.plaintext,
+      comment.version_history,
+      attachments,
+      proposal,
+      comment.id,
+      moment(comment.created_at),
+      comment.child_comments,
+      comment.root_id,
+      comment.parent_id,
+      comment.community,
+      comment?.Address?.chain || comment.authorChain,
+    );
   }
 }
 

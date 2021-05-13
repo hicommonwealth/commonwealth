@@ -8,7 +8,7 @@ import $ from 'jquery';
 import Web3 from 'web3';
 
 import app from 'state';
-import { OffchainThread, OffchainComment, OffchainAttachment, Profile, ChainBase } from 'models';
+import { OffchainThread, OffchainComment, Profile, ChainBase, AddressInfo } from 'models';
 
 import Sublayout from 'views/sublayout';
 import PageNotFound from 'views/pages/404';
@@ -22,105 +22,33 @@ import ProfileContent from './profile_content';
 import ProfileBio from './profile_bio';
 import ProfileBanner from './profile_banner';
 
-const commentModelFromServer = (comment) => {
-  const attachments = comment.OffchainAttachments
-    ? comment.OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
-    : [];
-  let proposal;
-  try {
-    const proposalSplit = decodeURIComponent(comment.root_id).split(/-|_/);
-    if (proposalSplit[0] === 'discussion') {
-      proposal = new OffchainThread(
-        '',
-        '',
-        null,
-        Number(proposalSplit[1]),
-        comment.created_at,
-        null,
-        null,
-        null,
-        comment.community,
-        comment.chain,
-        null,
-        null,
-        null,
-      );
-    } else {
-      proposal = {
-        chain: comment.chain,
-        community: comment.community,
-        slug: proposalSplit[0],
-        identifier: proposalSplit[1],
-      };
-    }
-  } catch (e) {
-    proposal = null;
-  }
-  return new OffchainComment(
-    comment.chain,
-    comment?.Address?.address || comment.author,
-    decodeURIComponent(comment.text),
-    comment.plaintext,
-    comment.version_history,
-    attachments,
-    proposal,
-    comment.id,
-    moment(comment.created_at),
-    comment.child_comments,
-    comment.root_id,
-    comment.parent_id,
-    comment.community,
-    comment?.Address?.chain || comment.authorChain,
-  );
-};
-
-const threadModelFromServer = (thread) => {
-  const attachments = thread.OffchainAttachments
-    ? thread.OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
-    : [];
-  return new OffchainThread(
-    thread.Address.address,
-    decodeURIComponent(thread.title),
-    attachments,
-    thread.id,
-    moment(thread.created_at),
-    thread.topic,
-    thread.kind,
-    thread.stage,
-    thread.version_history,
-    thread.community,
-    thread.chain,
-    thread.read_only,
-    decodeURIComponent(thread.body),
-    thread.plaintext,
-    thread.url,
-    thread.Address.chain,
-    thread.pinned,
-    thread.collaborators,
-    thread.chain_entities,
-  );
-};
-
-const getProfileStatus = (account) => {
+const getProfileStatus = (chain: string, address: string, id?: number): {
+  onOwnProfile: boolean,
+  onLinkedProfile: boolean,
+  displayBanner: boolean,
+  currentAddressInfo: AddressInfo,
+} => {
   const onOwnProfile = typeof app.user.activeAccount?.chain === 'string'
-    ? (account.chain === app.user.activeAccount?.chain && account.address === app.user.activeAccount?.address)
-    : (account.chain === app.user.activeAccount?.chain?.id && account.address === app.user.activeAccount?.address);
+    ? (chain === app.user.activeAccount?.chain && address === app.user.activeAccount?.address)
+    : (chain === app.user.activeAccount?.chain?.id && address === app.user.activeAccount?.address);
   const onLinkedProfile = !onOwnProfile && app.user.activeAccounts.length > 0
     && app.user.activeAccounts.filter((account_) => {
       return app.user.getRoleInCommunity({
         account: account_,
         chain: app.activeChainId(),
       });
-    }).filter((account_) => {
-      return account_.address === account.address;
+    }).filter((account) => {
+      return account.address === address;
     }).length > 0;
+
+  console.log(`onOwnProfile: ${onOwnProfile}, onLinkedProfile: ${onLinkedProfile}`);
 
   // if the profile that we are visiting is in app.activeAddresses() but not the current active address,
   // then display the ProfileBanner
   // TODO: display the banner if the current address is in app.activeAddresses() and *is* a member of the
   // community (this will require alternate copy on the banner)
-  let isUnjoinedJoinableAddress;
-  let currentAddressInfo;
+  let isUnjoinedJoinableAddress: boolean;
+  let currentAddressInfo: AddressInfo;
   if (!onOwnProfile && !onLinkedProfile) {
     const communityOptions = { chain: app.activeChainId(), community: app.activeCommunityId() };
     const communityRoles = app.user.getAllRolesInCommunity(communityOptions);
@@ -133,7 +61,7 @@ const getProfileStatus = (account) => {
       })
       : [];
     const currentAddressInfoArray = unjoinedJoinableAddresses.filter((addr) => {
-      return addr.id === account.id;
+      return id && addr.id === id;
     });
     isUnjoinedJoinableAddress = currentAddressInfoArray.length > 0;
     if (isUnjoinedJoinableAddress) {
@@ -156,9 +84,10 @@ export enum UserContent {
 }
 
 interface IProfilePageState {
-  account;
+  profile: Profile;
   threads: OffchainThread[];
   comments: OffchainComment<any>[];
+  addressId?: number;
   loaded: boolean;
   loading: boolean;
   refreshProfile: boolean;
@@ -166,7 +95,7 @@ interface IProfilePageState {
 
 const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProfilePageState> = {
   oninit: (vnode) => {
-    vnode.state.account = null;
+    vnode.state.profile = null;
     vnode.state.loaded = false;
     vnode.state.loading = false;
     vnode.state.threads = [];
@@ -191,6 +120,7 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
           m.route.set(`/${m.route.param('scope')}/account/${encoded}${baseSuffix ? `?base=${baseSuffix}` : ''}`);
         } catch (e) {
           // do nothing if can't encode address
+          console.error(`Invalid substrate address: ${address}`);
         }
       }
     } else if (chainInfo?.base === ChainBase.Ethereum) {
@@ -202,6 +132,7 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
           m.route.set(`/${m.route.param('scope')}/account/${checksumAddress}${baseSuffix ? `?base=${baseSuffix}` : ''}`);
         } catch (e) {
           // do nothing if can't get checksumAddress
+          console.error(`Can't get checksum address for: ${address}`);
         }
       }
     }
@@ -228,129 +159,38 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
         return;
       }
       vnode.state.loading = true;
-      try {
-        const response = await $.ajax({
-          url: `${app.serverUrl()}/profile`,
-          type: 'GET',
-          data: {
-            address,
-            chain,
-            jwt: app.user.jwt,
-          },
-        });
-
-        const { result } = response;
-        vnode.state.loaded = true;
-        vnode.state.loading = false;
-        const a = result.account;
-        const profile = new Profile(a.chain, a.address);
-        if (a.OffchainProfile) {
-          const profileData = JSON.parse(a.OffchainProfile.data);
-          // ignore off-chain name if substrate id exists
-          if (a.OffchainProfile.identity) {
-            profile.initializeWithChain(
-              a.OffchainProfile.identity,
-              profileData?.headline,
-              profileData?.bio,
-              profileData?.avatarUrl,
-              a.OffchainProfile.judgements,
-              a.last_active,
-              a.is_councillor,
-              a.is_validator,
-            );
-          } else {
-            profile.initialize(
-              profileData?.name,
-              profileData?.headline,
-              profileData?.bio,
-              profileData?.avatarUrl,
-              a.last_active,
-              a.is_councillor,
-              a.is_validator
-            );
-          }
-        } else {
-          profile.initializeEmpty();
-        }
-        const account = {
-          profile,
-          chain: a.chain,
-          address: a.address,
-          id: a.id,
-          name: a.name,
-          user_id: a.user_id,
-        };
-        vnode.state.account = account;
-        vnode.state.threads = result.threads.map((t) => threadModelFromServer(t));
-        vnode.state.comments = result.comments.map((c) => commentModelFromServer(c));
-        m.redraw();
-      } catch (err) {
-        console.log(err);
-        // for certain chains, display addresses not in db if formatted properly
-        if (chainInfo?.base === ChainBase.Substrate) {
-          try {
-            decodeAddress(address);
-            vnode.state.account = {
-              profile: null,
-              chain,
-              address,
-              id: null,
-              name: null,
-              user_id: null,
-            };
-          } catch (e) {
-            // do nothing if can't decode
-          }
-        } else if (chainInfo?.base === ChainBase.Ethereum) {
-          if (Web3.utils.checkAddressChecksum(address)) {
-            vnode.state.account = {
-              profile: null,
-              chain,
-              address,
-              id: null,
-              name: null,
-              user_id: null,
-            };
-          }
-        } else if (chainInfo?.base === ChainBase.CosmosSDK) {
-          // TODO
-        }
-        vnode.state.loaded = true;
-        vnode.state.loading = false;
-        m.redraw();
-        if (!vnode.state.account)
-          throw new Error((err.responseJSON && err.responseJSON.error)
-            ? err.responseJSON.error
-            : 'Failed to find profile');
-      }
+      const { addressId, profile, threads, comments } = await app.profiles.getProfileWithActivity(chain, address);
+      vnode.state.profile = profile;
+      vnode.state.threads = threads;
+      vnode.state.comments = comments;
+      vnode.state.addressId = addressId;
+      vnode.state.loaded = true;
+      vnode.state.loading = false;
+      m.redraw();
     };
 
     const { setIdentity } = vnode.attrs;
-    const { account, loaded, loading, refreshProfile } = vnode.state;
+    const { profile, loaded, loading, refreshProfile } = vnode.state;
     if (!loading && !loaded) {
       loadProfile();
     }
-    if (account && account.address !== vnode.attrs.address) {
-      vnode.state.loaded = false;
-      loadProfile();
-    }
-    if (loading) return m(PageLoading, { showNewProposalButton: true });
-    if (!account) {
+    if (loading || !app.chain?.accounts) return m(PageLoading, { showNewProposalButton: true });
+    if (!profile) {
       return m(PageNotFound, { message: 'Invalid address provided' });
     }
 
-    const { onOwnProfile, onLinkedProfile, displayBanner, currentAddressInfo } = getProfileStatus(account);
+    const account = app.chain.accounts.get(profile.address);
+    console.log(account);
+
+    const { onOwnProfile, onLinkedProfile, displayBanner, currentAddressInfo } = getProfileStatus(
+      profile.chain,
+      profile.address,
+      vnode.state.addressId,
+    );
 
     if (refreshProfile) {
-      loadProfile();
       vnode.state.refreshProfile = false;
-      if (onOwnProfile) {
-        setActiveAccount(account).then(() => {
-          m.redraw();
-        });
-      } else {
-        m.redraw();
-      }
+      loadProfile();
     }
 
     // TODO: search for cosmos proposals, if ChainClass is Cosmos

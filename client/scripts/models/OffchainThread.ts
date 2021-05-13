@@ -87,6 +87,33 @@ class OffchainThread implements IUniqueId {
     }) : [];
     this.lastEdited = lastEdited;
   }
+
+  public static fromJSON(thread) {
+    const attachments = thread.OffchainAttachments
+      ? thread.OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
+      : [];
+    return new OffchainThread(
+      thread.Address.address,
+      decodeURIComponent(thread.title),
+      attachments,
+      thread.id,
+      moment(thread.created_at),
+      thread.topic,
+      thread.kind,
+      thread.stage,
+      thread.version_history,
+      thread.community,
+      thread.chain,
+      thread.read_only,
+      decodeURIComponent(thread.body),
+      thread.plaintext,
+      thread.url,
+      thread.Address.chain,
+      thread.pinned,
+      thread.collaborators,
+      thread.chain_entities,
+    );
+  }
 }
 
 export default OffchainThread;
