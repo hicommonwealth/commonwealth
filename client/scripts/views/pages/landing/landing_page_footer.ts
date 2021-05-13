@@ -1,5 +1,5 @@
 import m from 'mithril';
-import './landing_page_footer.scss';
+import 'pages/landing/landing_page_footer.scss';
 
 interface IState {
   list: { text: string; redirectTo: string }[];

@@ -1,8 +1,9 @@
 import m from 'mithril';
-import './landing_page.scss';
+// Logged Out Homepage View
+import 'pages/landing/landing_page.scss';
 import Glide from '@glidejs/glide';
 
-import app from 'state';
+import app, { LoginState } from 'state';
 
 import HeaderLandingPage from './landing_page_header';
 import FooterLandingPage from './landing_page_footer';
@@ -12,6 +13,12 @@ import TokensCreatorComponent from './creators_card_section';
 import TokensChainsComponent from './chains_slider';
 import TokenHoldersComponent from './find_your_community_section';
 import ChainsCrowdfundingComponent from './crowdfunding_card_section';
+
+// Logged In Homepage View
+import 'pages/landing/index.scss';
+
+import Sublayout from 'views/sublayout';
+import CommunityCards from './community_cards';
 
 interface Chain {
   img: string;
@@ -26,7 +33,6 @@ interface IState {
   hiddenInputTokenList: boolean;
   inputTokenValue: string;
 }
-
 const LandingPage: m.Component<{}, IState> = {
   oninit: (vnode) => {
     vnode.state.hiddenInputTokenList = true;
@@ -102,7 +108,11 @@ const LandingPage: m.Component<{}, IState> = {
     ];
   },
   view: (vnode) => {
-    return m('.LandingPage', { class: 'bg-primary' }, [
+    console.log('landing page');
+    console.log(app.loginState);
+    console.log(app.user);
+    if (app.loginState !== LoginState.LoggedIn) {
+      return m('.LandingPage', { class: 'bg-primary' }, [
       m(
         'div',
         { class: 'absolute w-screen z-20' },
@@ -331,8 +341,33 @@ const LandingPage: m.Component<{}, IState> = {
           'sha512-wCwx+DYp8LDIaTem/rpXubV/C1WiNRsEVqoztV0NZm8tiTvsUeSlA/Uz02VTGSiqfzAHD4RnqVoevMcRZgYEcQ==',
         crossorigin: 'anonymous',
       }),
-    ]);
-  },
-};
+      ]); 
+    } else {
+      return m(Sublayout, {
+        class: 'Homepage',
+        hero: m('.hero-unit', [
+          m('.layout-container', [
+            m('.hero-unit-left', [
+              m('.hero-image', [
+                m('.hero-image-inner', [
+                  m('img', { src: '/static/img/hero_icon.png' }),
+                ]),
+              ]),
+            ]),
+            m('.hero-unit-right', [
+              m('h2', 'Discussions and governance for decentralized communities'),
+              m('p', [
+                'Commonwealth lets you conduct ongoing discussions, manage on-chain proposals, ',
+                'and poll community members from one simple interface.',
+              ]),
+            ]),
+          ]),
+        ]),
+      }, [
+        m(CommunityCards),
+      ]);
+    }
+  }
+}
 
 export default LandingPage;

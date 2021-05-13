@@ -2,7 +2,7 @@ import m from 'mithril';
 import FindYourTokenInputComponent from './find_your_token_input';
 import InputTokensListComponent from './input_tokens_lists';
 
-import './tokens_community_hero.scss';
+import 'pages/landing/tokens_community_hero.scss';
 
 interface Chain {
   img: string;
