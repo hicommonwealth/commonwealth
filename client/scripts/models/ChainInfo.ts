@@ -28,39 +28,17 @@ class ChainInfo {
   public type: string;
   public readonly ss58Prefix: string;
 
-  // TODO: convert this to accept an object with params instead
-  constructor(obj: {
-      id: string,
-      network: ChainNetwork,
-      symbol: string,
-      name: string,
-      icon_url: string,
-      description: string,
-      website: string,
-      discord: string,
-      element: string,
-      telegram: string,
-      github: string,
-      customDomain: string,
-      blockExplorerIds: { [id: string]: string },
-      collapsed_on_homepage: boolean,
-      featured_topics: string[],
-      topics: OffchainTopic[],
-      adminsAndMods?: RoleInfo[],
-      base?: ChainBase,
-      type?: string,
-      ss58_prefix?: string,
-    }) {
-    const {
-      id, network, base, symbol, name, icon_url, description, website, discord, element, telegram, github,
-      customDomain, blockExplorerIds, collapsed_on_homepage, featured_topics, topics, adminsAndMods, type, ss58_prefix,
-    } = obj;
+  constructor({
+    id, network, symbol, name, iconUrl, description, website, discord, element, telegram, github,
+    customDomain, blockExplorerIds, collapsedOnHomepage, featuredTopics, topics, adminsAndMods,
+    base, ss58_prefix, type
+  }) {
     this.id = id;
     this.network = network;
     this.base = base;
     this.symbol = symbol;
     this.name = name;
-    this.iconUrl = icon_url;
+    this.iconUrl = iconUrl;
     this.description = description;
     this.website = website;
     this.discord = discord;
@@ -69,24 +47,65 @@ class ChainInfo {
     this.github = github;
     this.customDomain = customDomain;
     this.blockExplorerIds = blockExplorerIds;
-    this.collapsedOnHomepage = collapsed_on_homepage;
-    this.featuredTopics = featured_topics || [];
+    this.collapsedOnHomepage = collapsedOnHomepage;
+    this.featuredTopics = featuredTopics || [];
     this.topics = topics || [];
     this.adminsAndMods = adminsAndMods || [];
     this.type = type;
     this.ss58Prefix = ss58_prefix;
   }
 
-  public static fromJSON(json) {
-    let blockExplorerIds;
+  public static fromJSON({
+    id,
+    network,
+    symbol,
+    name,
+    icon_url,
+    description,
+    website,
+    discord,
+    element,
+    telegram,
+    github,
+    customDomain,
+    blockExplorerIds,
+    collapsed_on_homepage,
+    featured_topics,
+    topics,
+    adminsAndMods,
+    base,
+    ss58_prefix,
+    type
+  }) {
+    let blockExplorerIdsParsed;
     try {
-      blockExplorerIds = JSON.parse(json.blockExplorerIds);
+      blockExplorerIdsParsed = JSON.parse(blockExplorerIds);
     } catch (e) {
       // ignore invalid JSON blobs
       blockExplorerIds = {};
     }
-    if (json.blockExplorerIds !== undefined) delete json.blockExplorerIds;
-    return new ChainInfo({ blockExplorerIds, ...json });
+    return new ChainInfo({
+      id,
+      network,
+      symbol,
+      name,
+      iconUrl: icon_url,
+      description,
+      website,
+      discord,
+      element,
+      telegram,
+      github,
+      customDomain,
+      blockExplorerIds: blockExplorerIdsParsed,
+      collapsedOnHomepage: collapsed_on_homepage,
+      featuredTopics: featured_topics,
+      topics,
+      adminsAndMods,
+      base,
+      ss58_prefix,
+      type
+    });
   }
 
   // TODO: get operation should not have side effects, and either way this shouldn't be here
