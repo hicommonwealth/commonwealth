@@ -73,7 +73,7 @@ class OffchainThread implements IUniqueId {
     });
     const vote = new OffchainVote({ address, author_chain: authorChain, thread_id, option });
     // remove any existing vote
-    const existingVoteIndex = this.offchainVotes.findIndex((v) => v.address === address && v.author_chain === chain);
+    const existingVoteIndex = this.offchainVotes.findIndex((v) => v.address === address && v.author_chain === authorChain);
     if (existingVoteIndex !== -1) {
       this.offchainVotes.splice(existingVoteIndex, 1);
     } else {
