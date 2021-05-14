@@ -26,7 +26,8 @@ class SnapshotController {
         response[key].msg.payload.body,
         response[key].sig,
         response[key].authorIpfsHash,
-        response[key].relayerIpfsHash
+        response[key].relayerIpfsHash,
+        response[key].msg.payload.choices,
       ))
     }
   }
