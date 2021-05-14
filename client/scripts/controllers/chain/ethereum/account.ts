@@ -96,7 +96,7 @@ export default class EthereumAccount extends Account<EthereumCoin> {
 
   // CONSTRUCTORS
   constructor(app: IApp, ChainInfo: EthereumChain, Accounts: EthereumAccounts, address: string) {
-    super(app, app.chain.meta.chain, address.toLowerCase());
+    super(app, app.chain.meta.chain, address);
     if (!app.isModuleReady) {
       // defer chain initialization
       app.chainModuleReady.once('ready', () => {

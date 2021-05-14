@@ -10,7 +10,7 @@ import { TokenResponse } from '../../shared/types';
 
 import JobRunner from './cacheJobRunner';
 import TokenListCache from './tokenListCache';
-import { tokenNameToId } from './createTokenChain';
+import { slugify } from '../../shared/utils';
 
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
@@ -29,6 +29,9 @@ interface CacheT {
 export interface TokenForumMeta {
   id: string;
   address: string;
+  iconUrl: string;
+  name: string;
+  symbol: string;
   balanceThreshold?: BN;
   api?: Erc20;
 }
@@ -59,20 +62,26 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     // TODO: support customized balance thresholds
     // TODO: support ChainId
     const tokens: TokenForumMeta[] = dbTokens
-      .filter(({ ChainNodes }) => ChainNodes)
-      .map(({ ChainNodes }): TokenForumMeta => ({
-        id: ChainNodes[0].chain,
-        address: ChainNodes[0].address,
-        api: Erc20Factory.connect(ChainNodes[0].address, provider),
-      }));
+    .filter(({ ChainNodes }) => ChainNodes && ChainNodes[0]?.address)
+    .map((chain): TokenForumMeta => ({
+      id: chain.id,
+      address: chain.ChainNodes[0].address,
+      name: chain.name,
+      symbol: chain.symbol,
+      iconUrl: chain.icon_url,
+      api: Erc20Factory.connect(chain.ChainNodes[0].address, provider),
+    }));
 
     try {
       const tokensFromListsResponses = await this._listCache.getTokens();
       const tokensFromLists: TokenForumMeta[] = tokensFromListsResponses
         .map((o) => {
           return {
-            id: tokenNameToId(o.name),
+            id: slugify(o.name),
             address: o.address,
+            name: o.name,
+            symbol: o.symbol,
+            iconUrl: o.logoURI,
             api: Erc20Factory.connect(o.address, provider)
           };
         });
@@ -85,13 +94,16 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     return tokens;
   }
 
-  public async start(models, network = 'mainnet', prefetchedTokenMeta?: TokenForumMeta[]) {
+  public getToken(searchAddress: string): TokenForumMeta {
+    return this._contracts.find(({ address }) => address === searchAddress);
+  }
+
+  public async start(models?, network = 'mainnet', prefetchedTokenMeta?: TokenForumMeta[]) {
     if (!prefetchedTokenMeta) {
       const tokenMeta = await this._connectTokens(models, network);
       this._contracts = tokenMeta;
     } else {
-      const tokenMeta = await this._connectTokens(models, network);
-      this._contracts = tokenMeta;
+      this._contracts = prefetchedTokenMeta;
     }
 
     // write init values into saved cache
@@ -106,14 +118,14 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     log.info(`Started Token Balance Cache with ${this._contracts.length} tokens.`);
   }
 
-  public async reset(tokenMeta: TokenForumMeta[]) {
+  public async reset(models?, network = 'mainnet', prefetchedTokenMeta?: TokenForumMeta[]) {
     super.close();
     await this.access(async (cache) => {
       for (const key of Object.keys(cache)) {
         delete cache[key];
       }
     });
-    return this.start(tokenMeta);
+    return this.start(models, network, prefetchedTokenMeta);
   }
 
   public getTokens(): Promise<TokenResponse[]> {

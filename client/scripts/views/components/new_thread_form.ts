@@ -13,8 +13,6 @@ import {
 } from 'construct-ui';
 
 import app from 'state';
-import { initAppState } from 'app';
-import { INewChainInfo } from 'types';
 
 import { detectURL } from 'helpers/threads';
 import { OffchainTopic, OffchainThreadKind, OffchainThreadStage, CommunityInfo, NodeInfo } from 'models';
@@ -154,32 +152,9 @@ const newThread = async (
   const chainId = app.activeCommunityId() ? null : app.activeChainId();
   const communityId = app.activeCommunityId();
 
-  const chains = {};
-  app.config.nodes.getAll().forEach((n) => {
-    if (chains[n.chain.id]) {
-      chains[n.chain.id].push(n);
-    } else {
-      chains[n.chain.id] = [n];
-    }
-  });
-
-  const isNewChain = !chains[chainId]
-    && (app.chain as Token).isToken
-    && (app.chain as Token).isUncreated;
-
   let result;
   try {
     // see if app.chain.network is existing in network lists and if app.chain.isToken
-    let newChainInfo: INewChainInfo;
-    if (isNewChain) {
-      newChainInfo = {
-        address: app.chain.id,
-        iconUrl: app.chain.meta.chain.iconUrl,
-        name: app.chain.meta.chain.name,
-        symbol: app.chain.meta.chain.symbol,
-      };
-      topicName = 'General';
-    }
 
     result = await app.threads.create(
       author.address,
@@ -188,14 +163,12 @@ const newThread = async (
       chainId,
       communityId,
       title,
-      topicName, // if no topic name set to default
+      (topicName) ? topicName : 'General', // if no topic name set to default
       topicId,
       bodyText,
       url,
       attachments,
       readOnly,
-      isNewChain || undefined,
-      newChainInfo
     );
   } catch (e) {
     console.error(e);
@@ -203,24 +176,14 @@ const newThread = async (
     throw new Error(e);
   }
 
-  const filteredName = app.chain.meta.chain.name.toLowerCase().trim().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
-
   const activeEntity = app.activeCommunityId() ? app.community : app.chain;
   updateLastVisited(app.activeCommunityId()
     ? (activeEntity.meta as CommunityInfo)
     : (activeEntity.meta as NodeInfo).chain, true);
 
   await app.user.notifications.refresh();
-  if (isNewChain) {
-    await initAppState(false);
-  }
 
-  m.route.set(`/${
-    isNewChain
-      ?      filteredName
-      :    app.activeId()
-  }/proposal/discussion/${result.id}`);
-
+  m.route.set(`/${app.activeId()}/proposal/discussion/${result.id}`);
 
   if (result.topic) {
     try {

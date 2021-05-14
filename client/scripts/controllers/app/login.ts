@@ -19,18 +19,18 @@ import {
 } from 'models';
 import moment from 'moment';
 import { notifyError } from 'controllers/app/notifications';
-import Token from 'controllers/chain/ethereum/token/adapter';
-import { INewChainInfo } from 'types';
 
 const MAGIC_PUBLISHABLE_KEY = 'pk_live_B0604AA1B8EEFDB4';
 
-function createAccount(account: Account<any>, community?: string) {
-  // TODO: Change to POST /address
+function createAccount(
+  account: Account<any>,
+  community?: string
+) {
   return $.post(`${app.serverUrl()}/createAddress`, {
     address: account.address,
     keytype: account.chainBase === ChainBase.Substrate
       && (account as any).isEd25519 ? 'ed25519' : undefined,
-    chain: (app.chain as Token).isToken ? 'ethereum' : account.chain.id,
+    chain: account.chain.id,
     community,
     jwt: app.user.jwt,
   });
@@ -41,16 +41,12 @@ export function linkExistingAddressToChainOrCommunity(
   chain: string,
   originChain: string,
   community: string,
-  isNewChain?: boolean,
-  newChainInfo?: INewChainInfo,
 ) {
   return $.post(`${app.serverUrl()}/linkExistingAddressToChain`, {
     'address': address,
     'chain': chain,
     'originChain': originChain,
     'community': community,
-    'isNewChain': isNewChain,
-    'newChainInfo': newChainInfo,
     jwt: app.user.jwt,
   });
 }
@@ -123,7 +119,6 @@ export async function updateLastVisited(activeEntity: ChainInfo | CommunityInfo,
 export async function updateActiveAddresses(chain?: ChainInfo) {
   // update addresses for a chain (if provided) or for offchain communities (if null)
   // for offchain communities, addresses on all chains are available by default
-
   app.user.setActiveAccounts(
     chain
       ? app.user.addresses

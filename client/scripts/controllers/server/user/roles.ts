@@ -8,7 +8,6 @@ import {
   RolePermission,
   ChainInfo,
 } from 'models';
-import { INewChainInfo } from 'types';
 import Base from './base';
 
 const getPermissionLevel = (permission: RolePermission | undefined) => {
@@ -34,8 +33,6 @@ export default class extends Base {
     address: AddressInfo,
     chain?: string,
     community?: string,
-    isNewChain?: boolean,
-    newChainInfo?: INewChainInfo,
   }): JQueryPromise<void> {
     // TODO: Change to POST /role
     return $.post('/api/createRole', {

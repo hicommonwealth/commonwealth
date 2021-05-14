@@ -26,6 +26,7 @@ import PageLoading from 'views/pages/loading';
 import LoadingRow from 'views/components/loading_row';
 import ProposalCard from 'views/components/proposal_card';
 import { CountdownUntilBlock } from 'views/components/countdown';
+import loadSubstrateModules from 'views/components/load_substrate_modules';
 
 import NewProposalPage from 'views/pages/new_proposal/index';
 import PageNotFound from 'views/pages/404';
@@ -163,22 +164,13 @@ const ProposalsPage: m.Component<{}> = {
 
     const onSubstrate = app.chain && app.chain.base === ChainBase.Substrate;
     const onMoloch = app.chain && app.chain.class === ChainClass.Moloch;
-    const onMarlin = app.chain && (app.chain.network === ChainNetwork.Marlin || app.chain.network === ChainNetwork.MarlinTestnet);
+    const onMarlin = app.chain && (
+      app.chain.network === ChainNetwork.Marlin || app.chain.network === ChainNetwork.MarlinTestnet
+    );
 
-    if (onSubstrate) {
-      const modules = getModules();
-      if (modules.some((mod) => !mod.ready)) {
-        app.chain.loadModules(modules);
-        return m(PageLoading, {
-          message: 'Loading proposals',
-          title: [
-            'Proposals',
-            m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
-          ],
-          showNewProposalButton: true,
-        });
-      }
-    }
+    const modLoading = loadSubstrateModules('Proposals', getModules);
+    if (modLoading) return modLoading;
+
     // active proposals
     const activeDemocracyProposals = onSubstrate
       && (app.chain as Substrate).democracyProposals.store.getAll().filter((p) => !p.completed);

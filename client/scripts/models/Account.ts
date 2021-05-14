@@ -1,12 +1,13 @@
 import $ from 'jquery';
-import { IApp } from 'state';
+import app, { IApp } from 'state';
 import { Coin } from 'adapters/currency';
+import { slugify } from 'utils';
+import Token from 'controllers/chain/ethereum/token/adapter';
 
 import { ITXModalData } from './interfaces';
 import { ChainBase, ChainClass } from './types';
 import ChainInfo from './ChainInfo';
 import Profile from './Profile';
-
 
 abstract class Account<C extends Coin> {
   public readonly serverUrl : string;
@@ -38,15 +39,15 @@ abstract class Account<C extends Coin> {
 
   public app: IApp;
 
-  constructor(app: IApp, chain: ChainInfo, address: string, encoding?: number) {
+  constructor(_app: IApp, chain: ChainInfo, address: string, encoding?: number) {
     // Check if the account is being initialized from an offchain Community
     // Because there won't be any chain base or chain class
-    this.app = app;
+    this.app = _app;
     this.chain = chain;
-    this.chainBase = (app.chain) ? app.chain.base : null;
-    this.chainClass = (app.chain) ? app.chain.class : null;
+    this.chainBase = (_app.chain) ? _app.chain.base : null;
+    this.chainClass = (_app.chain) ? _app.chain.class : null;
     this.address = address;
-    this._profile = app.profiles.getProfile(chain.id, address);
+    this._profile = _app.profiles.getProfile(chain.id, address);
     this._encoding = encoding;
   }
 

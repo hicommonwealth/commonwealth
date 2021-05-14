@@ -120,15 +120,11 @@ const app: IApp = {
   wallets: new WebWalletController(),
 
   recentActivity: new RecentActivityController(),
-  // TODO: Add type
+
   searchCache: {},
 
-  activeChainId: () => app.chain
-    ? (app.chain as Token).isToken && (app.chain as Token).isUncreated
-      ? (app.chain as Token).contractAddress
-      : app.chain.id
-    : null,
-  activeCommunityId: () => app.community ? app.community.meta.id : null,
+  activeChainId: () => app.chain?.id,
+  activeCommunityId: () => app.community?.meta.id,
   activeId: () => app.community ? app.activeCommunityId() : app.activeChainId(),
   defaultScope: () => app.config.defaultChain,
 

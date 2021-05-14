@@ -114,6 +114,7 @@ import TokenBalanceCache from './util/tokenBalanceCache';
 
 import bulkEntities from './routes/bulkEntities';
 import { getTokensFromLists } from './routes/getTokensFromLists';
+import getTokenForum from './routes/getTokenForum';
 
 function setupRouter(
   app,
@@ -136,7 +137,7 @@ function setupRouter(
   router.post(
     '/linkExistingAddressToChain',
     passport.authenticate('jwt', { session: false }),
-    linkExistingAddressToChain.bind(this, models, tokenBalanceCache),
+    linkExistingAddressToChain.bind(this, models),
   );
   router.post('/getAddressStatus', getAddressStatus.bind(this, models));
   // TODO: Change to PUT /node
@@ -165,6 +166,8 @@ function setupRouter(
   router.post('/updateCommunity', passport.authenticate('jwt', { session: false }), updateCommunity.bind(this, models));
   router.get('/communityStats', passport.authenticate('jwt', { session: false }), communityStats.bind(this, models));
   router.get('/getTokensFromLists', getTokensFromLists.bind(this, models, tokenBalanceCache));
+  router.get('/getTokenForum', getTokenForum.bind(this, models, tokenBalanceCache));
+
   // offchain threads
   // TODO: Change to POST /thread
   router.post(
@@ -308,7 +311,7 @@ function setupRouter(
   router.post(
     '/createRole',
     passport.authenticate('jwt', { session: false }),
-    createRole.bind(this, models, tokenBalanceCache),
+    createRole.bind(this, models),
   );
   // TODO: Change to DELETE /role
   router.post('/deleteRole', passport.authenticate('jwt', { session: false }), deleteRole.bind(this, models));

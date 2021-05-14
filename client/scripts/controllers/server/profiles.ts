@@ -36,6 +36,7 @@ class ProfilesController {
     this._store.add(profile);
     this._unfetched.push(profile);
     this._fetchNewProfiles();
+    m.redraw();
     return profile;
   }
 
@@ -48,15 +49,23 @@ class ProfilesController {
         data: JSON.stringify(data),
         auth: true,
         jwt: app.user.jwt,
-      }).then((result) => {
+      }).then(({ result }) => {
         if (!account.profile) {
           const profile = new Profile(account.chain.id, account.address);
           this._store.add(profile);
           this._refreshProfile(profile);
-        } else {
-          this._refreshProfile(account.profile);
         }
-        resolve(result);
+        if (result.updatedProfileAddresses) {
+          result.updatedProfileAddresses.forEach((address) => {
+            const profile = this._store.getByAddress(address.address);
+            if (profile) {
+              this._refreshProfile(profile);
+            } else {
+              this._refreshProfile(new Profile(address.chain, address.address));
+            }
+          });
+        }
+        resolve(result.profile);
       }).catch((error) => {
         reject(error);
       });

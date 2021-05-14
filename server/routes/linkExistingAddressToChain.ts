@@ -1,10 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import Sequelize from 'sequelize';
 import crypto from 'crypto';
-import TokenBalanceCache from '../util/tokenBalanceCache';
-import { createChainForAddress } from '../util/createTokenChain';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
-import { INewChainInfo } from '../../shared/types';
+import AddressSwapper from '../util/addressSwapper';
 
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
@@ -22,7 +20,6 @@ export const Errors = {
 
 const linkExistingAddressToChain = async (
   models,
-  tokenBalanceCache: TokenBalanceCache,
   req: Request,
   res: Response,
   next: NextFunction
@@ -41,22 +38,9 @@ const linkExistingAddressToChain = async (
   }
   const userId = req.user.id;
 
-  let chain, error;
-  if (req.body.isNewChain) {
-    const newChainInfo: INewChainInfo = {
-      address: req.body['newChainInfo[address]'],
-      iconUrl: req.body['newChainInfo[iconUrl]'],
-      name: req.body['newChainInfo[name]'],
-      symbol: req.body['newChainInfo[symbol]'],
-    };
-    [chain, error] = await createChainForAddress(models, tokenBalanceCache, newChainInfo);
-  }
-
-  if (!chain) {
-    chain = await models.Chain.findOne({
-      where: { id: req.body.chain }
-    });
-  }
+  const chain = await models.Chain.findOne({
+    where: { id: req.body.chain }
+  });
 
   if (!chain) {
     return next(new Error(Errors.InvalidChain));
@@ -70,6 +54,12 @@ const linkExistingAddressToChain = async (
   if (!originalAddress) {
     return next(new Error(Errors.NotVerifiedAddressOrUser));
   }
+
+  const originalProfile = await models.OffchainProfile.findOne({
+    where: { address_id: originalAddress.id }
+  });
+
+  const profileData = originalProfile && originalProfile.data ? originalProfile.data : null;
 
   // check if the original address's token is expired. refer edge case 1)
   let verificationToken = originalAddress.verification_token;
@@ -96,11 +86,15 @@ const linkExistingAddressToChain = async (
     });
   }
 
-  const existingAddress = await models.Address.scope('withPrivateData').findOne({
-    where: { chain: (!req.body.isNewChain) ? req.body.chain : chain.id, address: req.body.address }
-  });
-
   try {
+    const encodedAddress = chain.base === 'substrate'
+      ? AddressSwapper({ address: req.body.address, currentPrefix: chain.ss58_prefix })
+      : req.body.address;
+
+    const existingAddress = await models.Address.scope('withPrivateData').findOne({
+      where: { chain: req.body.chain, address: encodedAddress }
+    });
+
     let addressId;
     if (existingAddress) {
       // refer edge case 2)
@@ -117,8 +111,8 @@ const linkExistingAddressToChain = async (
     } else {
       const newObj = await models.Address.create({
         user_id: originalAddress.user_id,
-        address: originalAddress.address,
-        chain: (!req.body.isNewChain) ? req.body.chain : chain.id,
+        address: encodedAddress,
+        chain: req.body.chain,
         verification_token: verificationToken,
         verification_token_expires: verificationTokenExpires,
         verified: originalAddress.verified,
@@ -128,6 +122,25 @@ const linkExistingAddressToChain = async (
       });
 
       addressId = newObj.id;
+    }
+
+    const existingProfile = await models.OffchainProfile.findOne({
+      where: { address_id: addressId }
+    });
+
+    if (existingProfile) {
+      await models.OffchainProfile.update({
+        data: profileData,
+      }, {
+        where: {
+          address_id: addressId
+        }
+      });
+    } else {
+      await models.OffchainProfile.create({
+        address_id: addressId,
+        data: profileData,
+      });
     }
 
     const ownedAddresses = await models.Address.findAll({
@@ -161,6 +174,7 @@ const linkExistingAddressToChain = async (
         verification_token: verificationToken,
         addressId,
         addresses: ownedAddresses.map((a) => a.toJSON()),
+        encodedAddress
       }
     });
   } catch (e) {

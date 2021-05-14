@@ -45,11 +45,11 @@ export default class MolochMember extends EthereumAccount {
     super(app, ChainInfo, Accounts, address);
     this._Members = Members;
     if (data) {
-      if (address.toLowerCase() !== data.id.toLowerCase()) {
+      if (address !== data.id) {
         throw new Error('member does not correspond with account');
       }
       this._isMember = true;
-      this._delegateKey = data.delegateKey.toLowerCase();
+      this._delegateKey = data.delegateKey;
       this._shares = new MolochShares(this._Members.api.contractAddress, new BN(data.shares));
       this._highestIndexYesVote = data.highestIndexYesVote ? new BN(data.highestIndexYesVote) : null;
       this._initialized = Promise.resolve(true);
@@ -68,7 +68,7 @@ export default class MolochMember extends EthereumAccount {
       this._shares = new MolochShares(this._Members.api.contractAddress, new BN(0));
     } else {
       this._isMember = true;
-      this._delegateKey = m.delegateKey.toLowerCase();
+      this._delegateKey = m.delegateKey;
       this._shares = new MolochShares(this._Members.api.contractAddress, new BN(m.shares.toString()));
       this._highestIndexYesVote = m.highestIndexYesVote ? new BN(m.highestIndexYesVote.toString()) : null;
     }

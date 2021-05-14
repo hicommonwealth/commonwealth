@@ -35,8 +35,8 @@ const ReactionButton: m.Component<{
 
     const isCommunity = !!app.activeCommunityId();
 
-    const disabled = vnode.state.loading 
-      || !isCommunity && ((app.chain as Token).isToken && !(app.chain as Token).hasToken);
+    const disabled = vnode.state.loading
+      || (!isCommunity && (app.chain as Token).isToken && !(app.chain as Token).hasToken);
     const activeAddress = app.user.activeAccount?.address;
     const rxn = reactions.find((r) => r.reaction && r.author === activeAddress);
     const hasReacted : boolean = !!rxn;

@@ -122,6 +122,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     if (modules.some((mod) => !mod.initializing && !mod.ready)) {
       await Promise.all(modules.map((mod) => mod.init(this.chain, this.accounts)));
     }
+    m.redraw();
   }
 
   public abstract base: ChainBase;

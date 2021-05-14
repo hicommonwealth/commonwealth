@@ -2,6 +2,7 @@ import 'components/header/login_selector.scss';
 
 import $ from 'jquery';
 import m from 'mithril';
+import _ from 'underscore';
 import mixpanel from 'mixpanel-browser';
 
 import { Button, ButtonGroup, Icon, Icons, Menu, MenuItem, MenuDivider,
@@ -21,9 +22,8 @@ import LoginModal from 'views/modals/login_modal';
 import FeedbackModal from 'views/modals/feedback_modal';
 import SelectAddressModal from 'views/modals/select_address_modal';
 import Token from 'controllers/chain/ethereum/token/adapter';
+import AddressSwapper from 'views/components/addresses/address_swapper';
 import { linkExistingAddressToChainOrCommunity, setActiveAccount } from 'controllers/app/login';
-import { networkToBase } from 'models/types';
-import { INewChainInfo } from 'types';
 
 export const CHAINBASE_SHORT = {
   [ChainBase.CosmosSDK]: 'Cosmos',
@@ -109,7 +109,6 @@ const LoginSelector: m.Component<{
 }> = {
   view: (vnode) => {
     const { small } = vnode.attrs;
-
     if (!app.isLoggedIn()) return m('.LoginSelector', [
       m('.login-selector-user', [
         m(Button, {
@@ -126,8 +125,7 @@ const LoginSelector: m.Component<{
     const activeAddressesWithRole = app.user.activeAccounts.filter((account) => {
       return app.user.getRoleInCommunity({
         account,
-        chain: (app.activeChainId() && (app.chain as Token).isToken && (app.chain as Token).isUncreated)
-          ? 'ethereum' : app.activeChainId(),
+        chain: app.activeChainId(),
         community: app.activeCommunityId()
       });
     });
@@ -144,18 +142,33 @@ const LoginSelector: m.Component<{
     if (!vnode.state.profileLoadComplete && app.profiles.allLoaded()) {
       vnode.state.profileLoadComplete = true;
     }
-    const joiningChain = app.activeChainId();
-    const joiningCommunity = app.activeCommunityId();
-    const samebaseAddresses = app.user.addresses.filter((addr) => joiningChain
-      ? networkToBase(addr.chain) === networkToBase(joiningChain)
-      : true);
 
-    const samebaseAddressesFiltered: AddressInfo[] = samebaseAddresses.reduce((arr, current) => {
-      if (!arr.find((item) => item.address === current.address
-          && networkToBase(item.chain) === networkToBase(current.chain))) {
-        return [...arr, current];
-      }
-      return arr;
+    const joiningChainInfo = app.chain?.meta.chain;
+    const joiningChain = joiningChainInfo?.id;
+    const joiningCommunity = app.activeCommunityId();
+
+    const samebaseAddresses = app.user.addresses.reduce((arr: AddressInfo[], current: AddressInfo) => {
+      // add all addresses if joining a community
+      const joiningBase = joiningChainInfo?.base;
+      if (!joiningBase) return [...arr, current];
+
+      // skip already existing items
+      if (arr.find((item) => {
+        if (joiningBase === ChainBase.Substrate) {
+          return AddressSwapper({
+            address: item.address, currentPrefix: 42
+          }) === AddressSwapper({
+            address: current.address, currentPrefix: 42
+          });
+        } else {
+          return item.address === current.address;
+        }
+      })) return arr;
+
+      // add all items on same base as joining chain if not already existing
+      const currentBase = app.config.chains.getById(current.chain)?.base;
+      if (currentBase === joiningBase) return [...arr, current];
+      else return arr;
     }, []);
 
     return m(ButtonGroup, { class: 'LoginSelector' }, [
@@ -166,69 +179,36 @@ const LoginSelector: m.Component<{
         && m(Button, {
           class: 'login-selector-left',
           onclick: async (e) => {
-            if (samebaseAddressesFiltered.length === 1) {
-              const originAddressInfo = samebaseAddressesFiltered[0];
-
-              console.log(originAddressInfo);
+            if (samebaseAddresses.length === 1) {
+              const originAddressInfo = samebaseAddresses[0];
 
               if (originAddressInfo) {
                 try {
-                  const address = originAddressInfo.address;
                   const targetChain = joiningChain || originAddressInfo.chain;
 
-                  // TODO: what's the purpose of looking through all the nodes? Shouldn't we
-                  //   know immediately if it's a new chain?
-                  const chains = {};
-                  app.config.nodes.getAll().forEach((n) => {
-                    if (chains[n.chain.id]) {
-                      chains[n.chain.id].push(n);
-                    } else {
-                      chains[n.chain.id] = [n];
-                    }
-                  });
-
-                  const isNewChain = !chains[joiningChain]
-                    && (app.chain as Token).isToken
-                    && (app.chain as Token).isUncreated;
-
-                  let newChainInfo: INewChainInfo;
-                  if (isNewChain) {
-                    newChainInfo = {
-                      address: app.chain.id,
-                      iconUrl: (app.chain.meta.chain.iconUrl) ? app.chain.meta.chain.iconUrl : 'default',
-                      name: app.chain.meta.chain.name,
-                      symbol: app.chain.meta.chain.symbol,
-                    };
-                  }
+                  const address = originAddressInfo.address;
 
                   const res = await linkExistingAddressToChainOrCommunity(
-                    address, targetChain, originAddressInfo.chain, joiningCommunity, isNewChain, newChainInfo
+                    address, targetChain, originAddressInfo.chain, joiningCommunity
                   );
 
-                  const filteredName = app.chain.meta.chain.name.toLowerCase().trim()
-                    .replace(/[^\w ]+/g, '').replace(/ +/g, '-');
-
                   if (res && res.result) {
-                    const { verification_token, addressId, addresses } = res.result;
+                    const { verification_token, addresses, encodedAddress } = res.result;
                     app.user.setAddresses(addresses.map((a) => {
                       return new AddressInfo(a.id, a.address, a.chain, a.keytype, a.is_magic);
                     }));
-
-                    // Wack switch because the target chain is different for tokens communities that haven't been created
                     const addressInfo = app.user.addresses
-                      .find((a) => a.address === address && a.chain === ((isNewChain) ? filteredName : targetChain));
+                      .find((a) => a.address === encodedAddress && a.chain === targetChain);
 
                     const account = app.chain
-                      ? app.chain.accounts.get(address, addressInfo.keytype)
-                      : app.community.accounts.get(address, addressInfo.chain);
+                      ? app.chain.accounts.get(encodedAddress, addressInfo.keytype)
+                      : app.community.accounts.get(encodedAddress, addressInfo.chain);
                     if (app.chain) {
                       account.setValidationToken(verification_token);
                     }
 
-                    if (joiningChain && !app.user.getRoleInCommunity({ account, chain: joiningChain }) && !isNewChain) {
+                    if (joiningChain && !app.user.getRoleInCommunity({ account, chain: joiningChain })) {
                       await app.user.createRole({ address: addressInfo, chain: joiningChain });
-                    } else if (joiningChain && !app.user.getRoleInCommunity({ account, chain: joiningChain }) && isNewChain) {
-                      await app.user.createRole({ address: addressInfo, chain: filteredName });
                     } else if (joiningCommunity
                               && !app.user.getRoleInCommunity({ account, community: joiningCommunity })) {
                       await app.user.createRole({ address: addressInfo, community: joiningCommunity });
@@ -242,17 +222,11 @@ const LoginSelector: m.Component<{
                     // Todo: handle error
                   }
 
-                  if ((app.chain as Token).isToken && (app.chain as Token).isUncreated) {
-                    await initAppState(false);
-                    m.route.set(`/${filteredName}`);
-                    m.redraw();
-                  } else {
-                    // If token forum make sure has token and add to app.chain obj
-                    if (app.chain && (app.chain as Token).isToken && !(app.chain as Token).isUncreated) {
-                      await (app.chain as Token).activeAddressHasToken(app.user.activeAccount.address);
-                    } 
-                    m.redraw();
+                  // If token forum make sure has token and add to app.chain obj
+                  if (app.chain && (app.chain as Token).isToken) {
+                    await (app.chain as Token).activeAddressHasToken(app.user.activeAccount.address);
                   }
+                  m.redraw();
                 } catch (err) {
                   console.error(err);
                 }
@@ -265,7 +239,7 @@ const LoginSelector: m.Component<{
           },
           label: [
             m('span.hidden-sm', [
-              samebaseAddressesFiltered.length === 0
+              samebaseAddresses.length === 0
                 ? `No ${CHAINBASE_SHORT[app.chain?.meta?.chain.base] || ''} address`
                 : 'Join'
             ]),

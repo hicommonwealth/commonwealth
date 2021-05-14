@@ -65,6 +65,9 @@ Environment variables used for external services include:
 - PRODUCTION_APP (Heroku App Name)
 - JWT_SECRET
 - SESSION_SECRET
+- MAGIC_API_KEY
+- MAGIC_SUPPORTED_BASES
+- MAGIC_DEFAULT_CHAIN
 
 We also use certain environment variables to configure the application itself:
 

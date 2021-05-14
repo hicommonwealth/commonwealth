@@ -9,7 +9,7 @@ import { Button, Input, TextArea, Spinner, Checkbox } from 'construct-ui';
 
 import { initAppState } from 'app';
 import { isSameAccount, link } from 'helpers';
-import { AddressInfo, Account, ChainBase, IWebWallet } from 'models';
+import { AddressInfo, Account, ChainBase, ChainInfo, IWebWallet } from 'models';
 import app, { ApiStatus } from 'state';
 
 import { updateActiveAddresses, createUserWithAddress, setActiveAccount } from 'controllers/app/login';
@@ -22,7 +22,7 @@ import User from 'views/components/widgets/user';
 import AvatarUpload from 'views/components/avatar_upload';
 import AddressSwapper from 'views/components/addresses/address_swapper';
 import Token from 'controllers/chain/ethereum/token/adapter';
-import { INewChainInfo } from 'types';
+import { slugify } from 'utils';
 
 enum LinkNewAddressSteps {
   Step1VerifyWithCLI,
@@ -252,40 +252,9 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
 
           // link the address to the community
           try {
-            const chains = {};
-            app.config.nodes.getAll().forEach((n) => {
-              if (chains[n.chain.id]) {
-                chains[n.chain.id].push(n);
-              } else {
-                chains[n.chain.id] = [n];
-              }
-            });
-
-            const isNewChain = !chains[vnode.attrs.joiningChain] && (app.chain as Token).isToken
-            && (app.chain as Token).isUncreated;
-
-            let newChainInfo: INewChainInfo;
-            if (isNewChain) {
-              newChainInfo = {
-                address: app.chain.id,
-                iconUrl: (app.chain.meta.chain.iconUrl) ? app.chain.meta.chain.iconUrl : 'default',
-                name: app.chain.meta.chain.name,
-                symbol: app.chain.meta.chain.symbol,
-              };
-            }
-
-            console.log(`inner joining chain accountcb and more${vnode.attrs.joiningChain}`)
-            console.log(isNewChain);
-            console.log(newChainInfo);
-
             if (vnode.attrs.joiningChain
                 && !app.user.getRoleInCommunity({ account, chain: vnode.attrs.joiningChain })) {
-              await app.user.createRole(isNewChain ? {
-                address: addressInfo,
-                chain: vnode.attrs.joiningChain,
-                isNewChain,
-                newChainInfo
-              } : {
+              await app.user.createRole({
                 address: addressInfo,
                 chain: vnode.attrs.joiningChain,
               });
@@ -302,6 +271,10 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
           await setActiveAccount(account);
           if (app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length === 0) {
             app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
+          }
+
+          if (app.chain && (app.chain as Token).isToken) {
+            await (app.chain as Token).activeAddressHasToken(app.user.activeAccount.address);
           }
           // TODO: set the address as default
         } catch (e) {
@@ -352,14 +325,6 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
         vnode.state.newAddress = account;
         vnode.state.isNewLogin = true;
         vnode.state.error = null;
-        m.redraw();
-      }
-
-      if ((app.chain as Token).isToken && (app.chain as Token).isUncreated) {
-        await initAppState(false);
-        const filteredName = app.chain.meta.chain.name.toLowerCase().trim()
-          .replace(/[^\w ]+/g, '').replace(/ +/g, '-');
-        m.route.set(`/${filteredName}`);
         m.redraw();
       }
     };

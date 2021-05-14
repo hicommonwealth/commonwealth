@@ -10,8 +10,15 @@ import moment from 'moment';
 import mixpanel from 'mixpanel-browser';
 
 import app, { ApiStatus, LoginState } from 'state';
-import { ChainInfo, CommunityInfo, NodeInfo, ChainNetwork, NotificationCategory, Notification } from 'models';
-import { WebsocketMessageType, IWebsocketsPayload, TokenResponse } from 'types';
+import {
+  ChainInfo,
+  CommunityInfo,
+  NodeInfo,
+  ChainNetwork,
+  NotificationCategory,
+  Notification,
+} from 'models';
+import { WebsocketMessageType, IWebsocketsPayload } from 'types';
 
 import { notifyError, notifySuccess, notifyInfo } from 'controllers/app/notifications';
 import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
@@ -21,7 +28,6 @@ import WebsocketController from 'controllers/server/socket/index';
 import { Layout, LoadingLayout } from 'views/layout';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import LoginModal from 'views/modals/login_modal';
-import TokenAdapter from 'controllers/chain/ethereum/token/adapter';
 import { alertModalWithText } from 'views/modals/alert_modal';
 
 // Prefetch commonly used pages
@@ -39,7 +45,8 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       app.config.communities.clear();
       app.user.notifications.store.clear();
       app.user.notifications.clearSubscriptions();
-      data.chains.filter((chain) => chain.active).map((chain) => app.config.chains.add(ChainInfo.fromJSON(chain)));
+      data.chains.filter((chain) => chain.active)
+        .map((chain) => app.config.chains.add(ChainInfo.fromJSON(chain)));
       data.nodes.sort((a, b) => a.id - b.id).map((node) => {
         return app.config.nodes.add(NodeInfo.fromJSON({
           id: node.id,
@@ -179,25 +186,6 @@ export async function selectCommunity(c?: CommunityInfo): Promise<boolean> {
 
   // Initialize available addresses
   await updateActiveAddresses();
-
-  // Redraw with community fully loaded and return true to indicate
-  // initialization has finalized.
-  m.redraw();
-  return true;
-}
-
-export async function createTemporaryTokenChain(n: NodeInfo): Promise<boolean> {
-  // Check for valid community selection, and that we need to switch
-  if (app.chain && n === app.chain.meta) return;
-
-  // Shut down old chain if applicable
-  await deinitChainOrCommunity();
-
-  // Begin initializing the community
-  const newToken = new TokenAdapter(n, app, true);
-  app.chain = newToken;
-  await app.chain.initApi();
-  await app.chain.initData();
 
   // Redraw with community fully loaded and return true to indicate
   // initialization has finalized.
@@ -450,46 +438,21 @@ export function initCommunity(communityId: string): Promise<boolean> {
   }
 }
 
-export async function initTemporaryTokenChain(address: string): Promise<boolean> {
-  // todo token list in localstorage
-  const getTokensFromLists = async (): Promise<TokenResponse[]> => {
-    return $.getJSON('/api/getTokensFromLists')
-      .then((response) => {
-        if (response.status === 'Failure') {
-          throw response.message;
-        } else {
-          return response.result;
-        }
-      });
-  };
-  const tokenLists = await getTokensFromLists();
-  const token = tokenLists.find((o) => { return o.address === address; });
-
-  if (!token) { return false; }
-
-  app.threads.initialize([], 0, 0, true);
-
-  return createTemporaryTokenChain(
-    new NodeInfo(
-      0,
-      new ChainInfo(
-        token.address,
-        '',
-        token.symbol,
-        token.name,
-        token.logoURI,
-        '',
-        '',
-        '',
-        '',
-        '',
-        'ethereum',
-        false, false, false, false, false, [], []
-      ),
-      '',
-      token.address
-    )
-  );
+export async function initNewTokenChain(address: string) {
+  const response = await $.getJSON('/api/getTokenForum', { address });
+  if (response.status !== 'Success') {
+    // TODO: better custom 404
+    m.route.set('/404');
+  }
+  const { chain, node } = response.result;
+  const chainInfo = ChainInfo.fromJSON(chain);
+  const nodeInfo = new NodeInfo(node.id, chainInfo, node.url, node.address);
+  if (!app.config.chains.getById(chainInfo.id)) {
+    app.config.chains.add(chainInfo);
+    app.config.nodes.add(nodeInfo);
+  }
+  console.log(nodeInfo, chainInfo);
+  await selectNode(nodeInfo);
 }
 
 // set up route navigation
@@ -640,7 +603,7 @@ $(() => {
       if (vnode.attrs.scope && path === 'views/pages/view_proposal/index' && vnode.attrs.type === 'discussion') {
         deferChain = true;
       }
-      if (app.chain instanceof TokenAdapter) deferChain = false;
+      if (app.chain?.meta.chain.type === 'token') deferChain = false;
       return m(Layout, { scope, deferChain, hideSidebar }, [ vnode ]);
     },
   });

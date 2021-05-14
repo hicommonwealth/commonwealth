@@ -8,7 +8,7 @@ import { PopoverMenu, MenuDivider, Icon, Icons, Button } from 'construct-ui';
 import app from 'state';
 import Sublayout from 'views/sublayout';
 import { idToProposal, ProposalType, proposalSlugToClass } from 'identifiers';
-import { slugify, isSameAccount } from 'helpers';
+import { slugify } from 'utils';
 
 import Substrate from 'controllers/chain/substrate/main';
 import { notifyError } from 'controllers/app/notifications';
@@ -40,6 +40,9 @@ import PageNotFound from 'views/pages/404';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
+
+import { SocialSharingCarat } from 'views/components/social_sharing_carat';
+
 import {
   ProposalHeaderExternalLink, ProposalHeaderBlockExplorerLink, ProposalHeaderVotingInterfaceLink,
   ProposalHeaderThreadLink, ProposalHeaderThreadLinkedChainEntity,
@@ -58,6 +61,7 @@ import {
 } from './body';
 import CreateComment from './create_comment';
 import LinkedProposalsEmbed from './linked_proposals_embed';
+
 
 const ProposalHeader: m.Component<{
   commentCount: number;
@@ -168,6 +172,8 @@ const ProposalHeader: m.Component<{
                 inline: true,
                 trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
               }),
+              m('.CommentSocialHeader', [ m(SocialSharingCarat)]),
+              // This is the new social carat menu
               vnode.state.editPermissionsIsOpen
                 && proposal instanceof OffchainThread
                 && m(ProposalEditorPermissions, {
@@ -344,7 +350,7 @@ const ProposalComment: m.Component<{
               trigger: m(Icon, { name: Icons.CHEVRON_DOWN })
             })
           ],
-
+          m('.CommentSocialHeader', [ m(SocialSharingCarat, { commentID: comment.id })])
           // For now, we are limiting threading to 1 level deep
           // Comments whose parents are other comments should not display the reply option
           // !vnode.state.editing

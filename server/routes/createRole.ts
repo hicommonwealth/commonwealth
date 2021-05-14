@@ -1,9 +1,7 @@
 import Sequelize from 'sequelize';
 import { Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
-import { NotificationCategories, INewChainInfo } from '../../shared/types';
-import TokenBalanceCache from '../util/tokenBalanceCache';
-import { createChainForAddress } from '../util/createTokenChain';
+import { NotificationCategories } from '../../shared/types';
 
 export const Errors = {
   InvalidChainComm: 'Invalid chain or community',
@@ -14,23 +12,11 @@ export const Errors = {
 
 const createRole = async (
   models,
-  tokenBalanceCache: TokenBalanceCache,
   req,
   res: Response,
   next: NextFunction
 ) => {
-  let chain, community, error;
-  if (req.body.isNewChain) {
-    const newChainInfo: INewChainInfo = {
-      address: req.body['newChainInfo[address]'],
-      iconUrl: req.body['newChainInfo[iconUrl]'],
-      name: req.body['newChainInfo[name]'],
-      symbol: req.body['newChainInfo[symbol]'],
-    };
-    [chain, error] = await createChainForAddress(models, tokenBalanceCache, newChainInfo);
-  } else {
-    [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
-  }
+  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
 
   if (error) return next(new Error(error));
   if (!req.user) return next(new Error(Errors.NotLoggedIn));

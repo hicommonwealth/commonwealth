@@ -12,13 +12,10 @@ export const sequelize = new Sequelize(DATABASE_URI, {
   operatorsAliases: false,
   logging: (process.env.NODE_ENV === 'test') ? false : (msg) => { log.info(msg); },
   dialectOptions: (process.env.NODE_ENV !== 'production') ? {
-    requestTimeout: 10000,
-    // ssl: true,
-    // rejectUnauthorized: false,
+    // requestTimeout: 10000,
   } : {
-    requestTimeout: 10000,
-    ssl: true,
-    rejectUnauthorized: false,
+    // requestTimeout: 10000,
+    ssl: { rejectUnauthorized: false }
   },
   pool: {
     max: 10,
