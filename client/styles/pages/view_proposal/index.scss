@@ -321,3 +321,45 @@ $discussion-title-font-size: 1.45rem;
         z-index: -1;
     }
 }
+
+.VoteView {
+    .vote-count {
+        display: inline-block;
+        height: 19px;
+        font-size: 15px;
+        position: relative;
+        left: 2px;
+        padding: 3px 5px 0;
+        border-radius: 9999px;
+        background: #4f6dbd;
+        color: #fff;
+        font-weight: 500;
+        margin: -2px 0 -2px 2px;
+    }
+    .ViewRow {
+        display: flex;
+        padding: 15px 20px 9px;
+        margin: 0 -20px;
+        cursor: pointer;
+
+        .row-left {
+            line-height: 1.1;
+            flex: 6;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            position: relative;
+        }
+    
+        .row-right {
+            display: flex;
+            flex: 4;
+            align-items: center;
+            padding-left: 10px;
+        }
+    }
+
+    .ViewRow:hover {
+        background: #f9fafd;
+    }
+}
