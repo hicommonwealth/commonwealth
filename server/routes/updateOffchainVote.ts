@@ -8,6 +8,7 @@ import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 export const Errors = {
   InvalidThread: 'Invalid thread',
   InvalidUser: 'Invalid user',
+  PollingClosed: 'Polling already finished',
 };
 
 const updateOffchainVote = async (models, req: Request, res: Response, next: NextFunction) => {
@@ -26,6 +27,10 @@ const updateOffchainVote = async (models, req: Request, res: Response, next: Nex
       : { id: req.body.thread_id, chain: chain.id }
   });
   if (!thread) return next(new Error(Errors.InvalidThread));
+
+  if (!thread.offchain_voting_ends_at || moment(thread.offchain_voting_ends_at).utc().isBefore(moment().utc())) {
+    return next(new Error(Errors.PollingClosed));
+  }
 
   let vote;
   await sequelize.transaction(async (t) => {

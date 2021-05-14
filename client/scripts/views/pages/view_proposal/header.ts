@@ -92,6 +92,8 @@ export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread 
           m(User, { user: app.user.activeAccount }),
         ];
 
+    const pollingEnded = proposal.offchainVotingEndsAt?.isBefore(moment().utc());
+
     return m('.ProposalHeaderOffchainPoll', [
       m('.offchain-poll-header', 'Poll'),
 
@@ -99,7 +101,9 @@ export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread 
         class: 'offchain-poll-row-tooltip',
         content: tooltipContent,
         position: 'right',
-        trigger: m('.offchain-poll-row', [
+        trigger: m('.offchain-poll-row', {
+          class: pollingEnded ? 'offchain-poll-ended' : '',
+        }, [
           options.map((option) => {
             const hasVoted = app.user.activeAccount
               && proposal.getOffchainVoteFor(app.user.activeAccount.chain.id, app.user.activeAccount.address);
@@ -148,7 +152,7 @@ export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread 
               ? 'No votes yet'
               : pluralize(proposal.offchainVotes.length, 'vote'),
             ' · ',
-            proposal.offchainVotingEndsAt?.isBefore(moment().utc())
+            pollingEnded
               ? 'Ended '
               : 'Voting ends ',
             proposal.offchainVotingEndsAt?.format('lll'),
