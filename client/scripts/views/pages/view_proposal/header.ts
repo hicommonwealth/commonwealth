@@ -114,6 +114,8 @@ export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread 
                 if (!confirmed) return;
                 // submit vote
                 proposal.submitOffchainVote(
+                  proposal.chain,
+                  proposal.community,
                   app.user.activeAccount.chain.id,
                   app.user.activeAccount.address,
                   option,

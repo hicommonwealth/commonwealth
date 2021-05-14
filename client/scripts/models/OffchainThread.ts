@@ -60,17 +60,18 @@ class OffchainThread implements IUniqueId {
     });
     this.offchainVotes = votes;
   }
-  public async submitOffchainVote(chain: string, address: string, option: OffchainVoteOptions) {
+  public async submitOffchainVote(chain: string, community: string, authorChain: string, address: string, option: OffchainVoteOptions) {
     const thread_id = this.id;
     await $.post(`${app.serverUrl()}/updateOffchainVote`, {
       thread_id,
       option,
       address,
-      chain, // chain is not really needed except we are conducting an unnecessary backend check
-      author_chain: chain,
+      chain,
+      community,
+      author_chain: authorChain,
       jwt: app.user.jwt
     });
-    const vote = new OffchainVote({ address, author_chain: chain, thread_id, option });
+    const vote = new OffchainVote({ address, author_chain: authorChain, thread_id, option });
     // remove any existing vote
     const existingVoteIndex = this.offchainVotes.findIndex((v) => v.address === address && v.author_chain === chain);
     if (existingVoteIndex !== -1) {
