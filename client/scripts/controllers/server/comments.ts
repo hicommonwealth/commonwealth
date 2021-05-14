@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import _ from 'lodash';
-import moment from 'moment-twitter';
+import moment from 'moment';
 
 import app from 'state';
 import { uniqueIdToProposal } from 'identifiers';

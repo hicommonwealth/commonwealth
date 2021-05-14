@@ -305,7 +305,7 @@ export default class MolochProposal extends Proposal<
   }
 
   public canAbort(currentUser: MolochMember) {
-    if (currentUser.address.toLowerCase() !== this.data.applicantAddress.toLowerCase()) {
+    if (currentUser.address !== this.data.applicantAddress) {
       return false;
     }
     return this._Gov.currentPeriod < this.abortPeriodEnd;
@@ -313,7 +313,10 @@ export default class MolochProposal extends Proposal<
 
   // web wallet TX only
   public async submitVoteWebTx(vote: MolochProposalVote) {
-    if (!(await this._Members.isSenderDelegate())) {
+    const address = vote.account.address;
+    const contract = await this._Members.api.attachSigner(this._Members.app.wallets, address);
+
+    if (!(await this._Members.isDelegate(address))) {
       throw new Error('sender must be valid delegate');
     }
 
@@ -325,8 +328,8 @@ export default class MolochProposal extends Proposal<
       throw new Error('proposal aborted');
     }
 
-    const prevVote = await this._Gov.api.Contract.getMemberProposalVote(
-      this._Gov.api.userAddress,
+    const prevVote = await contract.getMemberProposalVote(
+      address,
       this.data.identifier
     );
     if (prevVote === 1 || prevVote === 2) {
@@ -355,11 +358,15 @@ export default class MolochProposal extends Proposal<
   }
 
   public async processTx() {
+    // TODO: is this the correct user to process?
+    const address = this._Members.app.user.activeAccount.address;
+    const contract = await this._Members.api.attachSigner(this._Members.app.wallets, address);
+
     if (this.state !== MolochProposalState.ReadyToProcess) {
       throw new Error('proposal not ready to process');
     }
 
-    const tx = await this._Gov.api.Contract.processProposal(
+    const tx = await contract.processProposal(
       this.data.identifier,
       { gasLimit: this._Gov.api.gasLimit }
     );
@@ -371,6 +378,9 @@ export default class MolochProposal extends Proposal<
   }
 
   public async abortTx() {
+    const address = this.applicantAddress;
+    const contract = await this._Members.api.attachSigner(this._Members.app.wallets, address);
+
     if (this.isAborted) {
       throw new Error('proposal already aborted');
     }
@@ -379,11 +389,11 @@ export default class MolochProposal extends Proposal<
       throw new Error('proposal not in abort window');
     }
 
-    if (this._Gov.api.userAddress.toLowerCase() !== this.applicantAddress.toLowerCase()) {
+    if (address !== this.applicantAddress) {
       throw new Error('only applicant can abort');
     }
 
-    const tx = await this._Gov.api.Contract.abort(
+    const tx = await contract.abort(
       this.data.identifier,
       { gasLimit: this._Gov.api.gasLimit }
     );

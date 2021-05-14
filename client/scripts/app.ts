@@ -9,11 +9,18 @@ import '../styles/lib/style.css';
 import m from 'mithril';
 import $ from 'jquery';
 import { FocusManager } from 'construct-ui';
-import moment from 'moment-twitter';
+import moment from 'moment';
 import mixpanel from 'mixpanel-browser';
 
 import app, { ApiStatus, LoginState } from 'state';
-import { ChainInfo, CommunityInfo, NodeInfo, ChainNetwork, NotificationCategory, Notification } from 'models';
+import {
+  ChainInfo,
+  CommunityInfo,
+  NodeInfo,
+  ChainNetwork,
+  NotificationCategory,
+  Notification,
+} from 'models';
 import { WebsocketMessageType, IWebsocketsPayload } from 'types';
 
 import { notifyError, notifySuccess, notifyInfo } from 'controllers/app/notifications';
@@ -24,7 +31,6 @@ import WebsocketController from 'controllers/server/socket/index';
 import { Layout, LoadingLayout } from 'views/layout';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import LoginModal from 'views/modals/login_modal';
-import Token from 'controllers/chain/ethereum/token/adapter';
 import { alertModalWithText } from 'views/modals/alert_modal';
 import Login from './views/components/login';
 
@@ -44,7 +50,8 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       app.config.communities.clear();
       app.user.notifications.store.clear();
       app.user.notifications.clearSubscriptions();
-      data.chains.filter((chain) => chain.active).map((chain) => app.config.chains.add(ChainInfo.fromJSON(chain)));
+      data.chains.filter((chain) => chain.active)
+        .map((chain) => app.config.chains.add(ChainInfo.fromJSON(chain)));
       data.nodes.sort((a, b) => a.id - b.id).map((node) => {
         return app.config.nodes.add(NodeInfo.fromJSON({
           id: node.id,
@@ -211,7 +218,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
   if (app.chain && n === app.chain.meta) {
     return;
   }
-  if ((Object.values(ChainNetwork) as any).indexOf(n.chain.network) === -1) {
+  if ((Object.values(ChainNetwork) as any).indexOf(n.chain.network) === -1 && n.chain.type !== 'token') {
     throw new Error('invalid chain');
   }
 
@@ -343,7 +350,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/ethereum/marlin/adapter'
     )).default;
     newChain = new Marlin(n, app);
-  } else if ([ChainNetwork.ALEX].includes(n.chain.network)) {
+  } else if (n.chain.type === 'token') {
     const Token = (await import(
     //   /* webpackMode: "lazy" */
     //   /* webpackChunkName: "token-main" */
@@ -428,6 +435,23 @@ export function initCommunity(communityId: string): Promise<boolean> {
   } else {
     throw new Error(`No community found for '${communityId}'`);
   }
+}
+
+export async function initNewTokenChain(address: string) {
+  const response = await $.getJSON('/api/getTokenForum', { address });
+  if (response.status !== 'Success') {
+    // TODO: better custom 404
+    m.route.set('/404');
+  }
+  const { chain, node } = response.result;
+  const chainInfo = ChainInfo.fromJSON(chain);
+  const nodeInfo = new NodeInfo(node.id, chainInfo, node.url, node.address);
+  if (!app.config.chains.getById(chainInfo.id)) {
+    app.config.chains.add(chainInfo);
+    app.config.nodes.add(nodeInfo);
+  }
+  console.log(nodeInfo, chainInfo);
+  await selectNode(nodeInfo);
 }
 
 // set up route navigation
@@ -527,7 +551,6 @@ $(() => {
     },
     render: (vnode) => {
       const { scoped, hideSidebar, redirectCustomDomain } = attrs;
-
       // handle custom domains, for routes that need special handling
       const host = document.location.host;
       if (redirectCustomDomain) {
@@ -559,13 +582,27 @@ $(() => {
           ? vnode.attrs.scope.toString()
           // false => scope is null
           : null;
+
+      if (scope) {
+        const scopeIsEthereumAddress = scope.startsWith('0x') && scope.length === 42;
+        if (scopeIsEthereumAddress) {
+          const nodes = app.config.nodes.getAll();
+          const node = nodes.find((o) => o.address === scope);
+          if (node) {
+            const pagePath = window.location.href.substr(window.location.href.indexOf(scope) + scope.length);
+            m.route.set(`/${node.chain.id}${pagePath}`);
+          }
+        }
+      }
+
+
       // Special case to defer chain loading specifically for viewing an offchain thread. We need
       // a special case because OffchainThreads and on-chain proposals are all viewed through the
       // same "/:scope/proposal/:type/:id" route.
       if (vnode.attrs.scope && path === 'views/pages/view_proposal/index' && vnode.attrs.type === 'discussion') {
         deferChain = true;
       }
-      if (app.chain instanceof Token) deferChain = false;
+      if (app.chain?.meta.chain.type === 'token') deferChain = false;
       return m(Layout, { scope, deferChain, hideSidebar }, [ vnode ]);
     },
   });

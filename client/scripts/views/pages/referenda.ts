@@ -24,6 +24,7 @@ import LoadingRow from 'views/components/loading_row';
 import ProposalCard from 'views/components/proposal_card';
 import { CountdownUntilBlock } from 'views/components/countdown';
 import NewProposalPage from 'views/pages/new_proposal/index';
+import loadSubstrateModules from 'views/components/load_substrate_modules';
 
 import Listing from './listing';
 import ErrorPage from './error';
@@ -111,21 +112,10 @@ const ReferendaPage: m.Component<{}> = {
         showNewProposalButton: true,
       });
     }
-    const onSubstrate = app.chain && app.chain.base === ChainBase.Substrate;
-    if (onSubstrate) {
-      const modules = getModules();
-      if (modules.some((mod) => !mod.ready)) {
-        app.chain.loadModules(modules);
-        return m(PageLoading, {
-          message: 'Loading referenda',
-          title: [
-            'Referenda',
-            m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
-          ],
-          showNewProposalButton: true,
-        });
-      }
-    }
+
+    const onSubstrate = app.chain?.base === ChainBase.Substrate;
+    const modLoading = loadSubstrateModules('Referenda', getModules);
+    if (modLoading) return modLoading;
 
     // active proposals
     const activeDemocracyReferenda = onSubstrate

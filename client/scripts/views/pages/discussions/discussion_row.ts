@@ -3,13 +3,13 @@ import 'pages/discussions/discussion_row.scss';
 import m from 'mithril';
 import _ from 'lodash';
 import $ from 'jquery';
-import moment from 'moment-twitter';
+import moment from 'moment';
 import { Button, Icon, Icons, Tag } from 'construct-ui';
 
-import { updateRoute } from 'app';
+import { slugify } from 'utils';
 import app from 'state';
 import { chainEntityTypeToProposalShortName } from 'identifiers';
-import { formatLastUpdated, slugify, link, externalLink, extractDomain, offchainThreadStageToLabel } from 'helpers';
+import { formatLastUpdated, link, externalLink, extractDomain, offchainThreadStageToLabel } from 'helpers';
 
 import { OffchainThread, OffchainThreadKind, OffchainThreadStage, AddressInfo } from 'models';
 import ReactionButton, { ReactionType } from 'views/components/reaction_button';
