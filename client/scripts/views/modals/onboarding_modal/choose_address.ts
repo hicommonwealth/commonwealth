@@ -343,9 +343,14 @@ const ChooseAddress: m.Component<IOnboardingChooseAddressAttr, IOnboardingChoose
         })];
         title = !webWallet?.available ? 'No wallet detected' : 'Connecting to chain...';
       } else {
-        const addressIndex = webWallet?.accounts?.findIndex((_) => app.chain.base === ChainBase.Ethereum ? _ === vnode.attrs.address : _.address === vnode.attrs.address);
+        const walletAccounts = webWallet?.accounts?.map((account) => app.chain.base === ChainBase.Substrate ? ({ ...account,
+          address: AddressSwapper({
+            address: account.address,
+            currentPrefix: (app.chain as Substrate).chain.ss58Format,
+          }) }) : account);
+        const addressIndex = walletAccounts?.findIndex((_) => app.chain.base === ChainBase.Ethereum ? _ === vnode.attrs.address : _.address === vnode.attrs.address);
         const addressFound = addressIndex >= 0;
-        const sortedAccounts = addressFound ? [webWallet?.accounts[addressIndex], ...webWallet?.accounts.filter((_) => app.chain.base === ChainBase.Ethereum ? _ !== vnode.attrs.address : _.address !== vnode.attrs.address)] : webWallet?.accounts;
+        const sortedAccounts = addressFound ? [walletAccounts[addressIndex], ...walletAccounts.filter((_) => app.chain.base === ChainBase.Ethereum ? _ !== vnode.attrs.address : _.address !== vnode.attrs.address)] : walletAccounts;
 
         content = [
           !webWallet?.available && m('.get-wallet-text', [
@@ -359,7 +364,7 @@ const ChooseAddress: m.Component<IOnboardingChooseAddressAttr, IOnboardingChoose
               && link('a', 'https://wallet.keplr.app/', 'Get Keplr', { target: '_blank' }),
           ]),
           webWallet?.enabled && m('.accounts-caption', [
-            webWallet?.accounts.length === 0 ? [
+            walletAccounts?.length === 0 ? [
               m('p', 'Wallet connected, but no accounts were found.'),
             ] : !addressFound ? [
               m('p.small-text', 'We can’t find the following address in your current wallet. Please try looking in another wallet to claim it.'),
