@@ -75,6 +75,7 @@ class ChainInfo {
     adminsAndMods,
     base,
     ss58_prefix,
+    type
   }) {
     let blockExplorerIdsParsed;
     try {
@@ -103,6 +104,7 @@ class ChainInfo {
       adminsAndMods,
       base,
       ss58_prefix,
+      type
     });
   }
 

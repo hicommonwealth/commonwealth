@@ -140,7 +140,6 @@ const CreateCommunityModal: m.Component<IAttrs, IState> = {
                 privacyEnabled: result.result.privacyEnabled,
                 featuredTopics: result.featured_topics,
                 topics: result.topics,
-                isInitialized: true,
               });
               app.config.communities.add(newCommunityInfo);
               vnode.state.success = 'Sucessfully added';
