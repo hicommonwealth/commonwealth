@@ -489,6 +489,9 @@ document.ontouchmove = (event) => {
 // set up moment-twitter
 moment.updateLocale('en', {
   relativeTime: {
+    // NOTE: This makes relative date display impossible for all
+    // future dates, e.g. when displaying how long until an offchain
+    // poll closes.
     future : 'just now',
     past   : '%s ago',
     s  : (num, withoutSuffix) => withoutSuffix ? 'now' : 'seconds',

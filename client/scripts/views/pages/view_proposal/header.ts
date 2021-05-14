@@ -96,8 +96,13 @@ export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread 
     const pollingEnded = proposal.offchainVotingEndsAt?.isBefore(moment().utc());
 
     return m('.ProposalHeaderOffchainPoll', [
-      m('.offchain-poll-header', 'Poll'),
-
+      m('.offchain-poll-header', pollingEnded ? [
+        'Poll closed'
+      ] : [
+        'Poll open - closes in ',
+        // weird hack because we overwrote the moment formatter to display "just now" for future dates
+        moment().from(proposal.offchainVotingEndsAt).replace(' ago', ''),
+      ]),
       m(Tooltip, {
         class: 'offchain-poll-row-tooltip',
         content: tooltipContent,
@@ -149,23 +154,15 @@ export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread 
           ]))
       ]),
       m('.offchain-poll-caption', [
-        m(Tooltip, {
-          trigger: m('span', [
-            proposal.offchainVotes.length === 0
-              ? 'No votes yet'
-              : pluralize(proposal.offchainVotes.length, 'vote'),
-            ' · ',
-            pollingEnded
-              ? 'Ended '
-              : 'Voting ends ',
-            proposal.offchainVotingEndsAt?.format('lll'),
-          ]),
-          content: m('.offchain-poll-caption-tooltip', [
-            'Polling ends on ',
-            proposal.offchainVotingEndsAt?.format('lll'),
-          ]),
-        }),
-      ])
+        proposal.offchainVotes.length === 0
+          ? 'No votes yet'
+          : pluralize(proposal.offchainVotes.length, 'vote'),
+        ' · ',
+        pollingEnded
+          ? 'Ended '
+          : 'Voting ends ',
+        proposal.offchainVotingEndsAt?.format('lll'),
+      ]),
     ]);
   }
 };
