@@ -10,7 +10,7 @@ export const Errors = {
   AlreadyPolling: 'There is already an active offchain poll for this thread',
   NoThreadId: 'Must provide thread_id',
   NoThread: 'Cannot find thread',
-  NotAdmin: 'Not an admin',
+  NotAuthor: 'Only the thread author can start polling',
 };
 
 const updateThreadPolling = async (models, req: Request, res: Response, next: NextFunction) => {
@@ -25,17 +25,9 @@ const updateThreadPolling = async (models, req: Request, res: Response, next: Ne
     });
     if (!thread) return next(new Error(Errors.NoThread));
     const userOwnedAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
-    if (!userOwnedAddressIds.includes(thread.address_id)) { // is not author
-      const roles = await models.Role.findAll({
-        where: {
-          address_id: { [Op.in]: userOwnedAddressIds, },
-          permission: { [Op.in]: ['admin', 'moderator'] },
-        }
-      });
-      const role = roles.find((r) => {
-        return r.offchain_community_id === thread.community || r.chain_id === thread.chain;
-      });
-      if (!role) return next(new Error(Errors.NotAdmin));
+    // We should allow collaborators to start polling too
+    if (!userOwnedAddressIds.includes(thread.address_id)) {
+      return next(new Error(Errors.NotAuthor));
     }
 
     // We assume that the server-side time is in sync with client-side time here
