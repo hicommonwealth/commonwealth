@@ -150,7 +150,7 @@
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
     "passport-magic": "^1.0.0",
-    "pg": "^7.11.0",
+    "pg": "^8.0.3",
     "postcss": "^8.2.10",
     "postcss-import": "^14.0.1",
     "postcss-loader": "4.2.0",
