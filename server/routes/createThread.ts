@@ -23,86 +23,8 @@ export const Errors = {
   InsufficientTokenBalance: `Users need to hold some of the community's tokens to post`,
 };
 
-// TODO - perhaps find a way to make this and client/scripts/controllers/app/token.ts 
-// load from the same source
-const tokenListUrls = [
-  "https://wispy-bird-88a7.uniswap.workers.dev/?url=http://tokenlist.aave.eth.link",
-  "https://gateway.ipfs.io/ipns/tokens.uniswap.org",
-  "https://wispy-bird-88a7.uniswap.workers.dev/?url=http://defi.cmc.eth.link"
-]
-
-const getTokensFromLists = async () => {
-  var data : any = await Promise.all(
-    tokenListUrls.map(url=>fetch( url ))
-  );
-  data = data.map(o=>o.tokens).flat();
-  return data;
-}
-
-let tokens = []
-
-const checkNewChainInfoWithTokenList = async (newChainInfo) => {
-  if( !newChainInfo.iconUrl ) throw new Error("Missing iconUrl");
-  if( !newChainInfo.symbol ) throw new Error("Missing symbol");
-  if( !newChainInfo.name ) throw new Error("Missing name");
-  if( !newChainInfo.address ) throw new Error("Missing address");
-
-  let token = tokens.find(o=> o.name == newChainInfo.name && 
-    o.symbol == newChainInfo.symbol &&
-    o.address == newChainInfo.address)
-  return token;
-}
-
-const createChainForThread = async (models, newChainInfoString) => {
-  try {
-    const newChainInfo = JSON.parse(newChainInfoString)
-    let foundInList = checkNewChainInfoWithTokenList(newChainInfo)
-    if(!foundInList) {
-      // fetch from remote server
-      await getTokensFromLists()
-      //check again
-      foundInList = checkNewChainInfoWithTokenList(newChainInfo)
-    }
-    if(!foundInList) {
-      throw new Error("New chain not found in token list")
-    }
-    
-    const createdId = newChainInfo.name.toLowerCase().trim().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
-    
-    const chainContent = {
-      id: createdId,
-      active: true,
-      network: createdId,
-      type: "token",
-      icon_url: newChainInfo.iconUrl,
-      symbol: newChainInfo.symbol, 
-      name: newChainInfo.name,
-      default_chain: 'ethereum',
-      base: 'ethereum',
-    };
-
-    const chainNodeContent = {
-      chain: createdId,
-      url: "wss://mainnet.infura.io/ws",
-      address: newChainInfo.address
-    }
-    const chain = await models.Chain.create(chainContent);
-    await models.ChainNode.create(chainNodeContent);
-
-    return [chain, null, null]
-  } catch(e) {
-    return [null, null, e]
-  }
-};
-
 const createThread = async (models, tokenBalanceCache: TokenBalanceCache, req: Request, res: Response, next: NextFunction) => {
-  let chain, community, error;
-  if (req.body.isNewChain) {
-    [chain, community, error] = await createChainForThread(models, req.body.newChainInfo)
-    chain.topics = [];
-  } else {
-    [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
-  } 
+  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
 
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
