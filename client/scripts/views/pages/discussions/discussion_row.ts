@@ -48,21 +48,37 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
       (propType === OffchainThreadKind.Link && proposal.url)
         && m('span.spacer', ' '),
       link('a', discussionLink, proposal.title),
-      proposal.chainEntities?.length > 0 && m('span.spacer', m.trust(' &nbsp; ')),
-      proposal.chainEntities?.length > 0 && proposal.chainEntities.map((ce) => {
-        if (!chainEntityTypeToProposalShortName(ce.type)) return;
-        return m(Button, {
-          class: 'discussion-row-linked-chain-entity',
-          label: [
-            chainEntityTypeToProposalShortName(ce.type),
-            Number.isNaN(parseInt(ce.typeId, 10)) ? '' : ` #${ce.typeId}`,
-          ],
-          intent: 'primary',
-          size: 'xs',
-          rounded: true,
-          compact: true,
-        });
-      }),
+      proposal instanceof OffchainThread
+        && (proposal.offchainVotingEnabledAt || proposal.offchainVotingNumVotes)
+        && [
+          m('span.spacer', m.trust(' &nbsp; ')),
+          m(Button, {
+            class: 'discussion-row-linked-poll',
+            label: 'POLL',
+            contentRight: pluralize(proposal.offchainVotingNumVotes, 'vote'),
+            intent: 'positive',
+            size: 'xs',
+            rounded: true,
+            compact: true,
+          }),
+        ],
+      proposal.chainEntities?.length > 0 && [
+        m('span.spacer', m.trust(' &nbsp; ')),
+        proposal.chainEntities.map((ce) => {
+          if (!chainEntityTypeToProposalShortName(ce.type)) return;
+          return m(Button, {
+            class: 'discussion-row-linked-chain-entity',
+            label: [
+              chainEntityTypeToProposalShortName(ce.type),
+              Number.isNaN(parseInt(ce.typeId, 10)) ? '' : ` #${ce.typeId}`,
+            ],
+            intent: 'primary',
+            size: 'xs',
+            rounded: true,
+            compact: true,
+          });
+        }),
+      ],
     ];
     const rowSubheader = [
       proposal.readOnly && m('.discussion-locked', [
@@ -93,13 +109,7 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
     ];
 
     const rowMetadata = [
-      m('.discussion-row-right-meta', (
-        proposal instanceof OffchainThread
-          && (proposal.offchainVotingEnabledAt || proposal.offchainVotingNumVotes)
-      ) ? [
-        // offchain polls on, show poll info
-        m('.offchain-voting', pluralize(proposal.offchainVotingNumVotes, 'vote')),
-      ] : [
+      m('.discussion-row-right-meta', [
         // offchain polls off, show stage & replyers
         m(UserGallery, {
           avatarSize: 20,
