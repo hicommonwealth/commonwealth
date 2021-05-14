@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import m from 'mithril';
+import moment from 'moment';
 import app from 'state';
 import { slugify } from 'utils';
 
@@ -31,7 +32,8 @@ import { getStatusClass, getStatusText } from 'views/components/proposal_card';
 import User from 'views/components/widgets/user';
 import { notifySuccess } from 'controllers/app/notifications';
 import { activeQuillEditorHasText, GlobalStatus } from './body';
-import { confirmationModalWithText } from '../../modals/confirm_modal';
+import { confirmationModalWithText } from 'views/modals/confirm_modal';
+import { alertModalWithText } from 'views/modals/alert_modal';
 
 export const ProposalHeaderExternalLink: m.Component<{ proposal: AnyProposal | OffchainThread }> = {
   view: (vnode) => {
@@ -51,6 +53,7 @@ export const ProposalHeaderExternalLink: m.Component<{ proposal: AnyProposal | O
 export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread }, { offchainVotes }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
+    if (!proposal.offchainVotingEndsAt) return;
 
     if (vnode.state.offchainVotes === undefined || vnode.state.offchainVotes[proposal.id] === undefined) {
       // initialize or reset offchain votes
@@ -66,8 +69,8 @@ export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread 
           proposal.setOffchainVotes(result.result);
           m.redraw();
         })
-        .catch((err) => {
-          // TODO
+        .catch(async (err) => {
+          await alertModalWithText('Error submitting vote. Maybe the poll has closed?')();
         });
     }
 
@@ -85,12 +88,12 @@ export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread 
         : (proposal.getOffchainVoteFor(app.user.activeAccount.chain.id, app.user.activeAccount.address)) ? [
           'Click to update vote'
         ] : [
-          'Click to vote as',
+          'Click to vote as ',
           m(User, { user: app.user.activeAccount }),
         ];
 
     return m('.ProposalHeaderOffchainPoll', [
-      m('.offchain-poll-header', 'Sentiment poll'),
+      m('.offchain-poll-header', 'Poll'),
 
       m(Tooltip, {
         class: 'offchain-poll-row-tooltip',
@@ -123,9 +126,8 @@ export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread 
         ]),
       }),
       m('.offchain-poll-respondents', [
-        proposal.offchainVotes.length === 0
-          ? m('.offchain-poll-respondents-col.wide', 'No votes yet')
-          : options.map((option) => m('.offchain-poll-respondents-col', [
+        proposal.offchainVotes.length > 0
+          && options.map((option) => m('.offchain-poll-respondents-col', [
             proposal.offchainVotes.filter((vote) => vote.option === option).length > 0
               ? m(UserGallery, {
                 avatarSize: 16,
@@ -137,16 +139,24 @@ export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread 
               }) : ''
           ]))
       ]),
-      m('Tooltip', {
-        trigger: m('.offchain-poll-caption', [
-          '6 days, 5 hours left'
-        ]),
-        content: m('.offchain-poll-caption-tooltip', [
-          'Polling started on May 1, 2021 4:53pm',
-          m('br'),
-          'Will finish on May 14, 2021 9:00am',
-        ]),
-      }),
+      m('.offchain-poll-caption', [
+        m(Tooltip, {
+          trigger: m('span', [
+            proposal.offchainVotes.length === 0
+              ? 'No votes yet'
+              : pluralize(proposal.offchainVotes.length, 'vote'),
+            ' · ',
+            proposal.offchainVotingEndsAt?.isBefore(moment().utc())
+              ? 'Ended '
+              : 'Voting ends ',
+            proposal.offchainVotingEndsAt?.format('lll'),
+          ]),
+          content: m('.offchain-poll-caption-tooltip', [
+            'Polling ends on ',
+            proposal.offchainVotingEndsAt?.format('lll'),
+          ]),
+        }),
+      ])
     ]);
   }
 };

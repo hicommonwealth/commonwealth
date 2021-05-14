@@ -69,6 +69,7 @@ import setDefaultRole from './routes/setDefaultRole';
 import getUploadSignature from './routes/getUploadSignature';
 import createThread from './routes/createThread';
 import editThread from './routes/editThread';
+import updateThreadPolling from './routes/updateThreadPolling';
 import updateThreadStage from './routes/updateThreadStage';
 import updateThreadPrivacy from './routes/updateThreadPrivacy';
 import updateThreadPinned from './routes/updateThreadPinned';
@@ -178,6 +179,11 @@ function setupRouter(
   // TODO: Change to PUT /thread
   router.put('/editThread', passport.authenticate('jwt', { session: false }), editThread.bind(this, models));
 
+  router.post(
+    '/updateThreadPolling',
+    passport.authenticate('jwt', { session: false }),
+    updateThreadPolling.bind(this, models),
+  );
   router.post(
     '/updateThreadStage',
     passport.authenticate('jwt', { session: false }),

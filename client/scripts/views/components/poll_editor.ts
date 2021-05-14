@@ -16,6 +16,8 @@ const PollEditor: m.Component<{
   // poll: OffchainThreadPoll;
 }> = {
   view: (vnode) => {
+    const { thread } = vnode.attrs;
+
     return m('.PollEditor', [
       m(Dialog, {
         basic: false,
@@ -57,6 +59,7 @@ const PollEditor: m.Component<{
             intent: 'primary',
             rounded: true,
             onclick: async () => {
+              await app.threads.setPolling({ threadId: thread.id });
               vnode.attrs.onChangeHandler();
             },
           }),

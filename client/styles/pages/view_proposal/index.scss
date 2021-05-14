@@ -161,6 +161,13 @@ $discussion-title-font-size: 1.45rem;
                 font-size: 15px;
                 color: $text-color-medium;
             }
+            .offchain-poll-caption {
+                padding-top: 16px;
+                text-align: center;
+                font-size: 15px;
+                color: $text-color-medium;
+                text-align: center;
+            }
 
             .offchain-poll-col,
             .offchain-poll-respondents-col {

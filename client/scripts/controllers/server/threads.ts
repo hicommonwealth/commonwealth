@@ -45,7 +45,7 @@ export const modelFromServer = (thread) => {
     pinned,
     collaborators,
     chain_entities,
-    offchain_voting_enabled_at,
+    offchain_voting_ends_at,
     offchain_voting_votes,
   } = thread;
 
@@ -98,7 +98,7 @@ export const modelFromServer = (thread) => {
     chainEntities: chain_entities,
     versionHistory: versionHistoryProcessed,
     lastEdited: lastEditedProcessed,
-    offchainVotingEnabledAt: offchain_voting_enabled_at,
+    offchainVotingEndsAt: offchain_voting_ends_at,
     offchainVotingNumVotes: offchain_voting_votes,
   });
 };
@@ -279,6 +279,30 @@ class ThreadsController {
         notifyError('Could not delete thread');
         reject(e);
       });
+    });
+  }
+
+  public async setPolling(args: { threadId: number }) {
+    // start polling
+    await $.ajax({
+      url: `${app.serverUrl()}/updateThreadPolling`,
+      type: 'POST',
+      data: {
+        'chain': app.activeChainId(),
+        'community': app.activeCommunityId(),
+        'thread_id': args.threadId,
+        'jwt': app.user.jwt
+      },
+      success: (response) => {
+        const thread = this._store.getByIdentifier(args.threadId);
+        thread.offchainVotingEndsAt = moment(response.result.offchain_voting_ends_at);
+        return;
+      },
+      error: (err) => {
+        console.log('Failed to start polling');
+        throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error
+          : 'Failed to start polling');
+      }
     });
   }
 

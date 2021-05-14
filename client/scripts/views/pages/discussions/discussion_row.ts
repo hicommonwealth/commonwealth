@@ -49,7 +49,7 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
         && m('span.spacer', ' '),
       link('a', discussionLink, proposal.title),
       proposal instanceof OffchainThread
-        && (proposal.offchainVotingEnabledAt || proposal.offchainVotingNumVotes)
+        && (proposal.offchainVotingEndsAt || proposal.offchainVotingNumVotes)
         && [
           m('span.spacer', m.trust(' &nbsp; ')),
           m(Button, {

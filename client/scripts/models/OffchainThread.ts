@@ -48,7 +48,7 @@ class OffchainThread implements IUniqueId {
   }
 
   public offchainVotingNumVotes: number;
-  public offchainVotingEnabledAt: moment.Moment | null;
+  public offchainVotingEndsAt: moment.Moment | null;
   public offchainVotes: OffchainVote[]; // lazy loaded
   public getOffchainVoteFor(chain: string, address: string) {
     return this.offchainVotes?.find((vote) => vote.address === address && vote.author_chain === chain);
@@ -62,30 +62,26 @@ class OffchainThread implements IUniqueId {
   }
   public async submitOffchainVote(chain: string, address: string, option: OffchainVoteOptions) {
     const thread_id = this.id;
-    try {
-      await $.post(`${app.serverUrl()}/updateOffchainVote`, {
-        thread_id,
-        option,
-        address,
-        chain, // chain is not really needed except we are conducting an unnecessary backend check
-        author_chain: chain,
-        jwt: app.user.jwt
-      });
-      const vote = new OffchainVote({ address, author_chain: chain, thread_id, option });
-      // remove any existing vote
-      const existingVoteIndex = this.offchainVotes.findIndex((v) => v.address === address && v.author_chain === chain);
-      if (existingVoteIndex !== -1) {
-        this.offchainVotes.splice(existingVoteIndex, 1);
-      } else {
-        this.offchainVotingNumVotes += 1;
-      }
-      // add new vote
-      this.offchainVotes.push(vote);
-      m.redraw();
-      return vote;
-    } catch (e) {
-      // TODO: handle error
+    await $.post(`${app.serverUrl()}/updateOffchainVote`, {
+      thread_id,
+      option,
+      address,
+      chain, // chain is not really needed except we are conducting an unnecessary backend check
+      author_chain: chain,
+      jwt: app.user.jwt
+    });
+    const vote = new OffchainVote({ address, author_chain: chain, thread_id, option });
+    // remove any existing vote
+    const existingVoteIndex = this.offchainVotes.findIndex((v) => v.address === address && v.author_chain === chain);
+    if (existingVoteIndex !== -1) {
+      this.offchainVotes.splice(existingVoteIndex, 1);
+    } else {
+      this.offchainVotingNumVotes += 1;
     }
+    // add new vote
+    this.offchainVotes.push(vote);
+    m.redraw();
+    return vote;
   }
 
   constructor({
@@ -110,7 +106,7 @@ class OffchainThread implements IUniqueId {
     collaborators,
     chainEntities,
     lastEdited,
-    offchainVotingEnabledAt,
+    offchainVotingEndsAt,
     offchainVotingNumVotes,
     offchainVotes,
   }: {
@@ -134,7 +130,7 @@ class OffchainThread implements IUniqueId {
     collaborators?: any[],
     chainEntities?: any[],
     lastEdited?: moment.Moment,
-    offchainVotingEnabledAt?: moment.Moment | null,
+    offchainVotingEndsAt?: string | moment.Moment | null,
     offchainVotingNumVotes?: number,
     offchainVotes?: OffchainVote[],
   }) {
@@ -165,7 +161,7 @@ class OffchainThread implements IUniqueId {
         completed: ce.completed,
       };
     }) : [];
-    this.offchainVotingEnabledAt = offchainVotingEnabledAt;
+    this.offchainVotingEndsAt = offchainVotingEndsAt ? moment(offchainVotingEndsAt) : null;
     this.offchainVotingNumVotes = offchainVotingNumVotes;
     this.offchainVotes = offchainVotes || [];
     this.lastEdited = lastEdited;
