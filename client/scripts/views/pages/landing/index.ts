@@ -108,9 +108,6 @@ const LandingPage: m.Component<{}, IState> = {
     ];
   },
   view: (vnode) => {
-    console.log('landing page');
-    console.log(app.loginState);
-    console.log(app.user);
     if (app.loginState !== LoginState.LoggedIn) {
       return m('.LandingPage', { class: 'bg-primary' }, [
       m(
