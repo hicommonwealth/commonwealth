@@ -17,7 +17,6 @@ import WebsocketController from './controllers/server/socket';
 import TopicsController from './controllers/server/topics';
 import CommunitiesController from './controllers/server/communities';
 import UserController from './controllers/server/user/index';
-import Token from './controllers/chain/ethereum/token/adapter';
 import WebWalletController from './controllers/app/web_wallets';
 
 export enum ApiStatus {
