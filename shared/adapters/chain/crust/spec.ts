@@ -1,3 +1,6 @@
+import { RegisteredTypes } from '@polkadot/types/types';
+
+
 const CrustSpec = {
   Address: 'AccountId',
   AddressInfo: 'Vec<u8>',
