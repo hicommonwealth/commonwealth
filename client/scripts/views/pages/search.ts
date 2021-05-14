@@ -272,7 +272,6 @@ const SearchPage : m.Component<{
       ],
       showNewProposalButton: true,
       alwaysShowTitle: true,
-      hideSidebar: true,
       centerGrid: true,
     }, m(Tabs, [
       m(TabItem, {
