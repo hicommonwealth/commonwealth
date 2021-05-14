@@ -1,9 +1,11 @@
 import 'components/poll_editor.scss';
 
 import m from 'mithril';
+import moment from 'moment';
 import $ from 'jquery';
 import { Switch, Button, Classes, Dialog } from 'construct-ui';
 
+import { getNextOffchainPollEndingTime } from 'utils';
 import app from 'state';
 import { OffchainThread } from 'models';
 
@@ -26,7 +28,12 @@ const PollEditor: m.Component<{
             label: 'Turn on polling',
           }),
           m('p', [
-            'Once turned on, this poll will run for 7 days.',
+            'Offchain polls run for at least 5 days, until the 1st or 15th of each month.'
+          ]),
+          m('p', [
+            'Once turned on, this poll will run until ',
+            m('strong', getNextOffchainPollEndingTime(moment()).local().format('lll')),
+            '.'
           ]),
         ],
         hasBackdrop: true,

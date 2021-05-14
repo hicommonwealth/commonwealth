@@ -28,6 +28,7 @@ import {
 
 import UserGallery from 'views/components/widgets/user_gallery';
 import { getStatusClass, getStatusText } from 'views/components/proposal_card';
+import User from 'views/components/widgets/user';
 import { notifySuccess } from 'controllers/app/notifications';
 import { activeQuillEditorHasText, GlobalStatus } from './body';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
@@ -81,7 +82,12 @@ export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread 
 
     const tooltipContent = !app.isLoggedIn() ? 'Log in to vote'
       : !app.user.activeAccount ? 'Connect an address to vote'
-        : (proposal.getOffchainVoteFor(app.user.activeAccount.chain.id, app.user.activeAccount.address)) ? 'Update your vote' : 'Vote now';
+        : (proposal.getOffchainVoteFor(app.user.activeAccount.chain.id, app.user.activeAccount.address)) ? [
+          'Click to update vote'
+        ] : [
+          'Click to vote as',
+          m(User, { user: app.user.activeAccount }),
+        ];
 
     return m('.ProposalHeaderOffchainPoll', [
       m('.offchain-poll-header', 'Sentiment poll'),

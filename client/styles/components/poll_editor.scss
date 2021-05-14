@@ -10,6 +10,8 @@
     p {
         margin: 0;
         margin-top: 16px;
-        color: $text-color-light;
+    }
+    p + p {
+        margin-top: 0;
     }
 }
