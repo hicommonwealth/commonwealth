@@ -93,8 +93,7 @@ function setupPassport(models) {
       }
 
       if (!existingUser) {
-        // ensure all eth addresses are lowercase
-        const ethAddress = userMetadata.publicAddress.toLowerCase();
+        const ethAddress = userMetadata.publicAddress;
         let polkadotAddress;
 
         // always retrieve the polkadot address for the user regardless of chain

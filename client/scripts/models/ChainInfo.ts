@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import app from 'state';
 import { RoleInfo, RolePermission } from 'models';
-import { ChainNetwork, ChainBase, networkToBase } from './types';
+import { ChainNetwork, ChainBase } from './types';
 import OffchainTopic from './OffchainTopic';
 
 class ChainInfo {
@@ -18,23 +18,24 @@ class ChainInfo {
   public telegram: string;
   public github: string;
   public customDomain: string;
-  public readonly blockExplorerIds: object;
+  public readonly blockExplorerIds: { [id: string]: string };
   public readonly collapsedOnHomepage: boolean;
   public readonly featuredTopics: string[];
   public readonly topics: OffchainTopic[];
   public readonly chainObjectId: string;
   public adminsAndMods: RoleInfo[];
   public members: RoleInfo[];
+  public type: string;
   public readonly ss58Prefix: string;
 
   constructor({
     id, network, symbol, name, iconUrl, description, website, discord, element, telegram, github,
     customDomain, blockExplorerIds, collapsedOnHomepage, featuredTopics, topics, adminsAndMods,
-    base, ss58_prefix
+    base, ss58_prefix, type
   }) {
     this.id = id;
     this.network = network;
-    this.base = base || networkToBase(network);
+    this.base = base;
     this.symbol = symbol;
     this.name = name;
     this.iconUrl = iconUrl;
@@ -50,6 +51,7 @@ class ChainInfo {
     this.featuredTopics = featuredTopics || [];
     this.topics = topics || [];
     this.adminsAndMods = adminsAndMods || [];
+    this.type = type;
     this.ss58Prefix = ss58_prefix;
   }
 
@@ -79,6 +81,7 @@ class ChainInfo {
       blockExplorerIdsParsed = JSON.parse(blockExplorerIds);
     } catch (e) {
       // ignore invalid JSON blobs
+      blockExplorerIds = {};
     }
     return new ChainInfo({
       id,

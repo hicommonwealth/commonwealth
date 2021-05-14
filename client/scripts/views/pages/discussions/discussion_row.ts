@@ -6,11 +6,11 @@ import $ from 'jquery';
 import moment from 'moment';
 import { Button, Icon, Icons, Tag } from 'construct-ui';
 
-import { updateRoute } from 'app';
+import { slugify } from 'utils';
 import app from 'state';
 import { chainEntityTypeToProposalShortName } from 'identifiers';
 import {
-  formatLastUpdated, slugify, link, externalLink, extractDomain, pluralize,
+  formatLastUpdated, link, externalLink, extractDomain, pluralize,
   offchainThreadStageToLabel
 } from 'helpers';
 

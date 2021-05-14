@@ -107,6 +107,7 @@ const CreateCommunityModal: m.Component<IAttrs, IState> = {
 
             vnode.state.disabled = true;
             vnode.state.success = false;
+
             // TODO: Change to POST /community
             $.post(`${app.serverUrl()}/createCommunity`, {
               creator_address: vnode.state.selectedAddress,
@@ -139,6 +140,7 @@ const CreateCommunityModal: m.Component<IAttrs, IState> = {
                 privacyEnabled: result.result.privacyEnabled,
                 featuredTopics: result.featured_topics,
                 topics: result.topics,
+                isInitialized: true,
               });
               app.config.communities.add(newCommunityInfo);
               vnode.state.success = 'Sucessfully added';

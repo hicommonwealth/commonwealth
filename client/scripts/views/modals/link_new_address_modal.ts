@@ -9,7 +9,7 @@ import { Button, Input, TextArea, Spinner, Checkbox } from 'construct-ui';
 
 import { initAppState } from 'app';
 import { isSameAccount, link } from 'helpers';
-import { AddressInfo, Account, ChainBase, IWebWallet } from 'models';
+import { AddressInfo, Account, ChainBase, ChainInfo, IWebWallet } from 'models';
 import app, { ApiStatus } from 'state';
 
 import { updateActiveAddresses, createUserWithAddress, setActiveAccount } from 'controllers/app/login';
@@ -21,6 +21,8 @@ import CodeBlock from 'views/components/widgets/code_block';
 import User from 'views/components/widgets/user';
 import AvatarUpload from 'views/components/avatar_upload';
 import AddressSwapper from 'views/components/addresses/address_swapper';
+import Token from 'controllers/chain/ethereum/token/adapter';
+import { slugify } from 'utils';
 
 enum LinkNewAddressSteps {
   Step1VerifyWithCLI,
@@ -252,19 +254,27 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
           try {
             if (vnode.attrs.joiningChain
                 && !app.user.getRoleInCommunity({ account, chain: vnode.attrs.joiningChain })) {
-              await app.user.createRole({ address: addressInfo, chain: vnode.attrs.joiningChain });
+              await app.user.createRole({
+                address: addressInfo,
+                chain: vnode.attrs.joiningChain,
+              });
             } else if (vnode.attrs.joiningCommunity
                        && !app.user.getRoleInCommunity({ account, community: vnode.attrs.joiningCommunity })) {
               await app.user.createRole({ address: addressInfo, community: vnode.attrs.joiningCommunity });
             }
           } catch (e) {
             // this may fail if the role already exists, e.g. if the address is being migrated from another user
+            console.error('Failed to create role');
           }
 
           // set the address as active
           await setActiveAccount(account);
           if (app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length === 0) {
             app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
+          }
+
+          if (app.chain && (app.chain as Token).isToken) {
+            await (app.chain as Token).activeAddressHasToken(app.user.activeAccount.address);
           }
           // TODO: set the address as default
         } catch (e) {
@@ -295,7 +305,7 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
         await initAppState(false);
         // load addresses for the current chain/community
         if (app.community) {
-          await updateActiveAddresses(undefined);
+          await updateActiveAddresses();
         } else if (app.chain) {
           const chain = app.user.selectedNode
             ? app.user.selectedNode.chain

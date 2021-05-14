@@ -1,6 +1,7 @@
 import $ from 'jquery';
 import m from 'mithril';
 import app from 'state';
+import { slugify } from 'utils';
 
 import { Button, Icon, Icons, Tag, Tooltip, MenuItem, Input } from 'construct-ui';
 
@@ -8,7 +9,6 @@ import {
   pluralize, link, externalLink, extractDomain,
   offchainThreadStageToLabel,
   offchainVoteToLabel,
-  slugify,
 } from 'helpers';
 import {
   proposalSlugToFriendlyName,

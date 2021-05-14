@@ -1,5 +1,3 @@
-import ethers from 'ethers';
-
 import EthereumChain from 'controllers/chain/ethereum/chain';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import EthereumAccount from 'controllers/chain/ethereum/account';
@@ -35,11 +33,6 @@ class Ethereum extends IChainAdapter<EthereumCoin, EthereumAccount> {
     this.chain.deinitMetadata();
     this.chain.deinitEventLoop();
     await this.chain.deinitApi();
-  }
-
-  public async getEthersProvider() {
-    const provider = new ethers.providers.Web3Provider(this.chain.api.currentProvider as any);
-    return provider;
   }
 }
 

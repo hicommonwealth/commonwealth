@@ -119,8 +119,8 @@ const app: IApp = {
 
   recentActivity: new RecentActivityController(),
 
-  activeChainId: () => app.chain ? app.chain.id : null,
-  activeCommunityId: () => app.community ? app.community.meta.id : null,
+  activeChainId: () => app.chain?.id,
+  activeCommunityId: () => app.community?.meta.id,
   activeId: () => app.community ? app.activeCommunityId() : app.activeChainId(),
   defaultScope: () => app.config.defaultChain,
 

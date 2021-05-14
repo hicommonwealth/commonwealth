@@ -191,12 +191,6 @@ export function articlize(str: string) {
   }
 }
 
-export function slugify(str: string) {
-  // remove any character that isn't a alphanumeric character or a
-  // space, and then replace any sequence of spaces with dashes
-  return str.toLowerCase().trim().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
-}
-
 export function formatAsTitleCase(str: string) {
   return str.toLowerCase().split(' ').map((word) => {
     return word.replace(word[0], word[0].toUpperCase());

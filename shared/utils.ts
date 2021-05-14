@@ -1,4 +1,4 @@
-export const slugify = (str) => {
+export const slugify = (str: string): string => {
   // remove any character that isn't a alphanumeric character or a
   // space, and then replace any sequence of spaces with dashes
   return str.toLowerCase().trim().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
