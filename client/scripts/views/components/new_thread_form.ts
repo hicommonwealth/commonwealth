@@ -13,6 +13,7 @@ import {
 } from 'construct-ui';
 
 import app from 'state';
+
 import { detectURL } from 'helpers/threads';
 import { OffchainTopic, OffchainThreadKind, OffchainThreadStage, CommunityInfo, NodeInfo } from 'models';
 
@@ -143,7 +144,7 @@ const newThread = async (
       ? quillEditorState.editor.getText()
       : JSON.stringify(quillEditorState.editor.getContents());
 
-  const { topicName, topicId, threadTitle, linkTitle, url } = form;
+  let { topicName, topicId, threadTitle, linkTitle, url } = form;
   const title = threadTitle || linkTitle;
   const attachments = [];
   const chainId = app.activeCommunityId() ? null : app.activeChainId();
@@ -158,7 +159,7 @@ const newThread = async (
       chainId,
       communityId,
       title,
-      topicName,
+      (topicName) ? topicName : 'General', // if no topic name set to default
       topicId,
       bodyText,
       url,
@@ -170,11 +171,14 @@ const newThread = async (
     quillEditorState.editor.enable();
     throw new Error(e);
   }
+
   const activeEntity = app.activeCommunityId() ? app.community : app.chain;
   updateLastVisited(app.activeCommunityId()
     ? (activeEntity.meta as CommunityInfo)
     : (activeEntity.meta as NodeInfo).chain, true);
+
   await app.user.notifications.refresh();
+
   m.route.set(`/${app.activeId()}/proposal/discussion/${result.id}`);
 
   if (result.topic) {

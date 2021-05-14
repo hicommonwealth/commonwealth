@@ -10,6 +10,8 @@ import { ChainBaseIcon } from 'views/components/chain_icon';
 import { baseToNetwork } from 'models/types';
 import _ from 'underscore';
 
+import Token from 'controllers/chain/ethereum/token/adapter';
+
 const CHAINBASE_WITH_CLI = [
   ChainBase.CosmosSDK, ChainBase.Substrate
 ];
@@ -93,6 +95,7 @@ const LoginWithWalletDropdown: m.Component<{
         return wallets.map((w) => createItem(w));
       }
     };
+
     const chainbase = app.chain?.meta?.chain?.base;
     const menuItems = (chainbase && CHAINBASE_WITH_CLI.indexOf(chainbase) !== -1)
       ? [

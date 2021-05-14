@@ -5,8 +5,9 @@ import moment from 'moment';
 import { Icon, Icons, Tag } from 'construct-ui';
 
 import app from 'state';
+import { slugify } from 'utils';
 import { Coin } from 'adapters/currency';
-import { blocknumToDuration, formatLastUpdated, formatPercentShort, slugify, link, pluralize } from 'helpers';
+import { blocknumToDuration, formatLastUpdated, formatPercentShort, link, pluralize } from 'helpers';
 import { ProposalStatus, VotingType, AnyProposal, AddressInfo } from 'models';
 import { ProposalType, proposalSlugToChainEntityType, chainEntityTypeToProposalShortName } from 'identifiers';
 

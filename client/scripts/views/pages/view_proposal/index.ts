@@ -8,7 +8,7 @@ import { PopoverMenu, MenuDivider, Icon, Icons, Button } from 'construct-ui';
 import app from 'state';
 import Sublayout from 'views/sublayout';
 import { idToProposal, ProposalType, proposalSlugToClass } from 'identifiers';
-import { slugify, isSameAccount } from 'helpers';
+import { slugify } from 'utils';
 
 import Substrate from 'controllers/chain/substrate/main';
 import { notifyError } from 'controllers/app/notifications';
@@ -537,7 +537,6 @@ const ViewProposalPage: m.Component<{
   },
   view: (vnode) => {
     const { identifier, type } = vnode.attrs;
-
     const headerTitle = m.route.param('type') === 'discussion' ? 'Discussions' : 'Proposals';
     if (typeof identifier !== 'string') return m(PageNotFound, { title: headerTitle });
     const proposalId = identifier.split('-')[0];
