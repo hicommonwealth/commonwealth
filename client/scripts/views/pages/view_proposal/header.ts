@@ -27,6 +27,7 @@ import {
   AddressInfo,
 } from 'models';
 
+import { notifyError } from 'controllers/app/notifications';
 import UserGallery from 'views/components/widgets/user_gallery';
 import { getStatusClass, getStatusText } from 'views/components/proposal_card';
 import User from 'views/components/widgets/user';
@@ -70,7 +71,7 @@ export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread 
           m.redraw();
         })
         .catch(async (err) => {
-          await alertModalWithText('Error submitting vote. Maybe the poll has closed?')();
+          notifyError('Unexpected error loading offchain votes');
         });
     }
 
@@ -123,7 +124,9 @@ export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread 
                   app.user.activeAccount.chain.id,
                   app.user.activeAccount.address,
                   option,
-                );
+                ).catch(async () => {
+                  await alertModalWithText('Error submitting vote. Maybe the poll has already ended?')();
+                });
               }
             }, [
               isSelected ? m(Icon, { name: Icons.CHECK }) : ''

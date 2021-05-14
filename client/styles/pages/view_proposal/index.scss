@@ -134,6 +134,12 @@ $discussion-title-font-size: 1.45rem;
             .offchain-poll-respondents {
                 display: flex;
             }
+            .offchain-poll-row.offchain-poll-ended {
+                pointer-events: none;
+                .offchain-poll-col {
+                    opacity: 0.8;
+                }
+            }
             .offchain-poll-col {
                 height: 20px;
                 text-align: center;
