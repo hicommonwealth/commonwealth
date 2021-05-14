@@ -60,7 +60,7 @@ export const getCommunityResult = (community) => {
   // TODO: Linkification of tokens to autogenerate ERC community
   const onSelect = (e) => {
     if (params.token) {
-      m.route.set('/');
+      m.route.set(params.token.address ? `/${params.token.address}` : '/');
     } else {
       m.route.set(community.id ? `/${community.id}` : '/');
     }
@@ -79,13 +79,13 @@ export const getCommunityResult = (community) => {
 };
 
 export const getDiscussionResult = (thread, searchTerm) => {
-  const activeId = app.activeId();
   const proposalId = thread.proposalid;
+  const chainOrComm = thread.chain || thread.offchain_community;
   return m(ListItem, {
     onclick: (e) => {
       m.route.set((thread.type === 'thread')
-        ? `/${activeId}/proposal/discussion/${proposalId}`
-        : `/${activeId}/proposal/${proposalId.split('_')[0]}/${proposalId.split('_')[1]}`);
+        ? `/${chainOrComm}/proposal/discussion/${proposalId}`
+        : `/${chainOrComm}/proposal/${proposalId.split('_')[0]}/${proposalId.split('_')[1]}`);
     },
     label: m('a.search-results-item', [
       thread.type === 'thread' ? [

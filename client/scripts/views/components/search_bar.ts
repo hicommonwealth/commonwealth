@@ -89,11 +89,11 @@ export const getCommunityPreview = (community, closeResultsFn, tabIndex) => {
   // TODO: Linkification of tokens to autogenerate ERC community
   const onSelect = (e) => {
     if (params.token) {
-      m.route.set('/');
+      m.route.set(params.token.address ? `/${params.token.address}` : '/');
     } else {
       m.route.set(community.id ? `/${community.id}` : '/');
+      closeResultsFn();
     }
-    closeResultsFn();
   };
   return m(ListItem, {
     tabIndex,
