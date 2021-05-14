@@ -7,12 +7,14 @@ import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 
 export const Errors = {
   InvalidThread: 'Invalid thread',
+  InvalidUser: 'Invalid user',
 };
 
 const updateOffchainVote = async (models, req: Request, res: Response, next: NextFunction) => {
   const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
+  if (!author) return next(new Error(Errors.InvalidUser));
   if (authorError) return next(new Error(authorError));
 
   // TODO: check that req.option is valid, and import options from shared/types
