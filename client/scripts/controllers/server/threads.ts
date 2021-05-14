@@ -295,6 +295,11 @@ class ThreadsController {
       },
       success: (response) => {
         const thread = this._store.getByIdentifier(args.threadId);
+        if (!thread) {
+          // TODO: sometimes the thread may not be in the store
+          location.reload();
+          return;
+        }
         thread.offchainVotingEndsAt = moment(response.result.offchain_voting_ends_at);
         return;
       },

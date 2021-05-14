@@ -13,7 +13,7 @@ const PollEditor: m.Component<{
   thread: OffchainThread;
   onChangeHandler: Function;
 }, {
-  // poll: OffchainThreadPoll;
+  value: boolean;
 }> = {
   view: (vnode) => {
     const { thread } = vnode.attrs;
@@ -28,6 +28,9 @@ const PollEditor: m.Component<{
           m(Switch, {
             intent: 'positive',
             label: 'Turn on polling',
+            onchange: (e) => {
+              vnode.state.value = (e.target as any).checked;
+            }
           }),
           m('p', [
             'Offchain polls run for at least 5 days, until the 1st or 15th of each month.'
@@ -59,7 +62,9 @@ const PollEditor: m.Component<{
             intent: 'primary',
             rounded: true,
             onclick: async () => {
-              await app.threads.setPolling({ threadId: thread.id });
+              if (vnode.state.value) {
+                await app.threads.setPolling({ threadId: thread.id });
+              }
               vnode.attrs.onChangeHandler();
             },
           }),

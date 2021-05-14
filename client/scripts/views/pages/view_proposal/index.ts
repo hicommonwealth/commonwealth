@@ -131,11 +131,12 @@ const ProposalHeader: m.Component<{
                   vnode.state.stageEditorIsOpen = true;
                 }
               }),
-              isAuthor && proposal instanceof OffchainThread && m(ProposalHeaderPollEditorButton, {
-                openPollEditor: () => {
-                  vnode.state.pollEditorIsOpen = true;
-                }
-              }),
+              isAuthor && proposal instanceof OffchainThread && !proposal.offchainVotingEndsAt
+                && m(ProposalHeaderPollEditorButton, {
+                  openPollEditor: () => {
+                    vnode.state.pollEditorIsOpen = true;
+                  }
+                }),
             ]),
           vnode.state.editing
             && m(ProposalTitleEditor, {

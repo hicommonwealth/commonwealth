@@ -26,7 +26,7 @@ const updateThreadPolling = async (models, req: Request, res: Response, next: Ne
     if (!thread) return next(new Error(Errors.NoThread));
     const userOwnedAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
     // We should allow collaborators to start polling too
-    if (!userOwnedAddressIds.includes(thread.address_id)) {
+    if (!req.user || !userOwnedAddressIds.includes(thread.address_id)) {
       return next(new Error(Errors.NotAuthor));
     }
 
