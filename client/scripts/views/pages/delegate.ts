@@ -108,13 +108,13 @@ const DelegateForm: m.Component<{}, { form: IDelegateForm, loading: boolean, cur
                   e.preventDefault();
                   vnode.state.loading = true;
                   if ((app.chain as Marlin).apiInitialized) {
-                    await (app.chain as Marlin).marlinAccounts.senderSetDelegate(vnode.state.form.address, vnode.state.form.amount)
-                      .then(async () => {
-                        notifySuccess(`Sent transaction to delegate to ${vnode.state.form.address}`);
-                        await getDelegate(vnode);
-                        m.redraw();
-                      })
-                      .catch((err) => { notifyError(`${err.message}`); });
+                    await (app.chain as Marlin).marlinAccounts.senderSetDelegate(
+                      vnode.state.form.address, vnode.state.form.amount
+                    ).then(async () => {
+                      notifySuccess(`Sent transaction to delegate to ${vnode.state.form.address}`);
+                      await getDelegate(vnode);
+                      m.redraw();
+                    }).catch((err) => { notifyError(`${err.message}`); });
                   }
                   vnode.state.loading = false;
                   m.redraw();

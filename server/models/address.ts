@@ -223,8 +223,8 @@ export default (
       const signatureU8a = signatureString.slice(0, 2) === '0x'
         ? hexToU8a(signatureString)
         : hexToU8a(`0x${signatureString}`);
-      isValid = signerKeyring.verify(signedMessageNewline, signatureU8a)
-        || signerKeyring.verify(signedMessageNoNewline, signatureU8a);
+      isValid = signerKeyring.verify(signedMessageNewline, signatureU8a, address)
+        || signerKeyring.verify(signedMessageNoNewline, signatureU8a, address);
     } else if (chain.base === 'cosmos') {
       //
       // cosmos-sdk address handling
@@ -276,7 +276,7 @@ export default (
       const addressBuffer = ethUtil.publicToAddress(publicKey);
       const address = ethUtil.bufferToHex(addressBuffer);
       isValid = (addressModel.address.toLowerCase() === address.toLowerCase());
-    } else if (chain.network === 'near') {
+    } else if (chain.base === 'near') {
       // both in base64 encoding
       const { signature: sigObj, publicKey } = JSON.parse(signatureString);
       isValid = nacl.sign.detached.verify(

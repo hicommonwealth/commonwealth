@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import app from 'state';
 import { RoleInfo, RolePermission } from 'models';
-import { ChainNetwork, ChainBase, networkToBase } from './types';
+import { ChainNetwork, ChainBase } from './types';
 import OffchainTopic from './OffchainTopic';
 
 class ChainInfo {
@@ -18,25 +18,49 @@ class ChainInfo {
   public telegram: string;
   public github: string;
   public customDomain: string;
-  public readonly blockExplorerIds: object;
+  public readonly blockExplorerIds: { [id: string]: string };
   public readonly collapsedOnHomepage: boolean;
   public readonly featuredTopics: string[];
   public readonly topics: OffchainTopic[];
   public readonly chainObjectId: string;
   public adminsAndMods: RoleInfo[];
   public members: RoleInfo[];
+  public type: string;
+  public readonly ss58Prefix: string;
 
   // TODO: convert this to accept an object with params instead
-  constructor(
-    id, network, symbol, name, iconUrl, description, website, discord, element, telegram, github,
-    customDomain, blockExplorerIds, collapsedOnHomepage, featuredTopics, topics, adminsAndMods?, base?
-  ) {
+  constructor(obj: {
+      id: string,
+      network: ChainNetwork,
+      symbol: string,
+      name: string,
+      icon_url: string,
+      description: string,
+      website: string,
+      discord: string,
+      element: string,
+      telegram: string,
+      github: string,
+      customDomain: string,
+      blockExplorerIds: { [id: string]: string },
+      collapsed_on_homepage: boolean,
+      featured_topics: string[],
+      topics: OffchainTopic[],
+      adminsAndMods?: RoleInfo[],
+      base?: ChainBase,
+      type?: string,
+      ss58_prefix?: string,
+    }) {
+    const {
+      id, network, base, symbol, name, icon_url, description, website, discord, element, telegram, github,
+      customDomain, blockExplorerIds, collapsed_on_homepage, featured_topics, topics, adminsAndMods, type, ss58_prefix,
+    } = obj;
     this.id = id;
     this.network = network;
-    this.base = base || networkToBase(network);
+    this.base = base;
     this.symbol = symbol;
     this.name = name;
-    this.iconUrl = iconUrl;
+    this.iconUrl = icon_url;
     this.description = description;
     this.website = website;
     this.discord = discord;
@@ -45,10 +69,12 @@ class ChainInfo {
     this.github = github;
     this.customDomain = customDomain;
     this.blockExplorerIds = blockExplorerIds;
-    this.collapsedOnHomepage = collapsedOnHomepage;
-    this.featuredTopics = featuredTopics || [];
+    this.collapsedOnHomepage = collapsed_on_homepage;
+    this.featuredTopics = featured_topics || [];
     this.topics = topics || [];
     this.adminsAndMods = adminsAndMods || [];
+    this.type = type;
+    this.ss58Prefix = ss58_prefix;
   }
 
   public static fromJSON(json) {
@@ -57,27 +83,10 @@ class ChainInfo {
       blockExplorerIds = JSON.parse(json.blockExplorerIds);
     } catch (e) {
       // ignore invalid JSON blobs
+      blockExplorerIds = {};
     }
-    return new ChainInfo(
-      json.id,
-      json.network,
-      json.symbol,
-      json.name,
-      json.icon_url,
-      json.description,
-      json.website,
-      json.discord,
-      json.element,
-      json.telegram,
-      json.github,
-      json.customDomain,
-      blockExplorerIds,
-      json.collapsed_on_homepage,
-      json.featured_topics,
-      json.topics,
-      json.adminsAndMods,
-      json.base,
-    );
+    if (json.blockExplorerIds !== undefined) delete json.blockExplorerIds;
+    return new ChainInfo({ blockExplorerIds, ...json });
   }
 
   // TODO: get operation should not have side effects, and either way this shouldn't be here

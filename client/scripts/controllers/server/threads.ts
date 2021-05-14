@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 import _ from 'lodash';
-import moment from 'moment-twitter';
+import moment from 'moment';
 import m from 'mithril';
 import $ from 'jquery';
 
@@ -20,7 +20,6 @@ import {
 import { notifyError } from 'controllers/app/notifications';
 import { updateLastVisited } from 'controllers/app/login';
 import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
-import { Moment } from 'moment';
 import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
 
 export const INITIAL_PAGE_SIZE = 10;
@@ -108,7 +107,7 @@ would break the listingStore's careful chronology.
 
 export interface VersionHistory {
   author?: Profile;
-  timestamp: Moment;
+  timestamp: moment.Moment;
   body: string;
 }
 

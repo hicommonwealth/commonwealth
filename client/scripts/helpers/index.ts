@@ -1,6 +1,6 @@
 import m from 'mithril';
-import moment from 'moment-twitter';
 import { ICardListItem } from 'models/interfaces';
+import moment from 'moment';
 
 import app from 'state';
 import { OffchainThreadStage } from 'models/types';
@@ -178,12 +178,6 @@ export function articlize(str: string) {
   } else {
     return `a ${str.trimLeft()}`;
   }
-}
-
-export function slugify(str: string) {
-  // remove any character that isn't a alphanumeric character or a
-  // space, and then replace any sequence of spaces with dashes
-  return str.toLowerCase().trim().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
 }
 
 export function formatAsTitleCase(str: string) {

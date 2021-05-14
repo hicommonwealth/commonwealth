@@ -67,7 +67,7 @@ export const MobileNewProposalButton: m.Component<{}, { councilCandidates?: Arra
         hasArrow: false,
         trigger: m(Button, {
           disabled: !app.user.activeAccount
-            || !app.activeCommunityId() && ((app.chain as Token).isToken && !(app.chain as Token).hasToken),
+            || (app.activeChainId() && (app.chain as Token).isToken && !(app.chain as Token).hasToken),
           label: m(Icon, { name: Icons.PLUS }),
         }),
         inline: true,
@@ -101,7 +101,7 @@ const NewProposalButton: m.Component<{
         label: 'New thread',
         fluid,
         disabled: !app.user.activeAccount
-          || !app.activeCommunityId() && ((app.chain as Token).isToken && !(app.chain as Token).hasToken),
+          || (app.chain && (app.chain as Token).isToken && !(app.chain as Token).hasToken),
         onclick: () => app.modals.create({ modal: NewThreadModal }),
       });
     }
