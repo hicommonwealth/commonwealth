@@ -3,7 +3,7 @@ import 'components/sidebar/notification_row.scss';
 import { Icon, Icons, Tooltip, Spinner } from 'construct-ui';
 import _ from 'lodash';
 import m from 'mithril';
-import moment from 'moment-twitter';
+import moment from 'moment';
 import {
   SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents, IEventLabel, chainSupportedBy,
   // MarlinEvents
@@ -359,7 +359,8 @@ const NotificationRow: m.Component<{
             && category !== `${NotificationCategories.NewThread}`
             && m('.comment-body-excerpt', notificationBody),
           m('.comment-body-bottom-wrap', [
-            m('.comment-body-created', createdAt.twitterShort()),
+            // TODO: add a formatter
+            m('.comment-body-created', createdAt.format()),
             !notification.isRead && m('.comment-body-mark-as-read', {
               onclick: (e) => {
                 e.preventDefault();

@@ -26,17 +26,16 @@ const verifyAddress = async (models, req: Request, res: Response, next: NextFunc
   if (!req.body.signature) {
     return next(new Error(Errors.NoSignature));
   }
-  const chainName = req.body.chain.startsWith("0x") ? "ethereum" : req.body.chain;
 
   const chain = await models.Chain.findOne({
-    where: { id: chainName }
+    where: { id: req.body.chain }
   });
   if (!chain) {
     return next(new Error(Errors.InvalidChain));
   }
 
   const existingAddress = await models.Address.scope('withPrivateData').findOne({
-    where: { chain: chainName, address: req.body.address }
+    where: { chain: req.body.chain, address: req.body.address }
   });
   if (!existingAddress) {
     return next(new Error(Errors.AddressNF));
@@ -91,7 +90,7 @@ const verifyAddress = async (models, req: Request, res: Response, next: NextFunc
     } else {
       // if user isn't logged in, log them in now
       const newAddress = await models.Address.findOne({
-        where: { chain: chainName, address: req.body.address },
+        where: { chain: req.body.chain, address: req.body.address },
       });
       const user = await models.User.scope('withPrivateData').findOne({
         where: { id: newAddress.user_id },

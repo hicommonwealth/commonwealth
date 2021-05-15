@@ -96,6 +96,9 @@ pre {
 
 .layout-container {
     padding-left: $quick-switcher-width;
+    .custom-domain & {
+        padding-left: 0;
+    }
     .hide-sidebar & {
         padding-left: 0;
     }

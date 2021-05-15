@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 import _ from 'lodash';
-import moment from 'moment-twitter';
+import moment from 'moment';
 import m from 'mithril';
 import $ from 'jquery';
 
@@ -12,7 +12,6 @@ import {
   OffchainThreadStage,
   CommunityInfo,
   NodeInfo,
-  NewChainInfo,
   OffchainTopic,
   Profile,
   ChainEntity,
@@ -21,20 +20,42 @@ import {
 import { notifyError } from 'controllers/app/notifications';
 import { updateLastVisited } from 'controllers/app/login';
 import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
-import { Moment } from 'moment';
 import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
 
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
 
 export const modelFromServer = (thread) => {
-  const attachments = thread.OffchainAttachments
-    ? thread.OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
+  const {
+    id,
+    title,
+    body,
+    last_edited,
+    version_history,
+    OffchainAttachments,
+    created_at,
+    topic,
+    kind,
+    stage,
+    community,
+    chain,
+    read_only,
+    plaintext,
+    url,
+    pinned,
+    collaborators,
+    chain_entities,
+    offchain_voting_ends_at,
+    offchain_voting_votes,
+  } = thread;
+
+  const attachments = OffchainAttachments
+    ? OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
     : [];
 
-  let versionHistory;
-  if (thread.version_history) {
-    versionHistory = thread.version_history.map((v) => {
+  let versionHistoryProcessed;
+  if (version_history) {
+    versionHistoryProcessed = version_history.map((v) => {
       if (!v) return;
       let history;
       try {
@@ -50,34 +71,36 @@ export const modelFromServer = (thread) => {
     });
   }
 
-  const lastEdited = thread.last_edited
-    ? moment(thread.last_edited)
-    : versionHistory && versionHistory?.length > 1
-      ? versionHistory[0].timestamp
+  const lastEditedProcessed = last_edited
+    ? moment(last_edited)
+    : versionHistoryProcessed && versionHistoryProcessed?.length > 1
+      ? versionHistoryProcessed[0].timestamp
       : null;
 
-  return new OffchainThread(
-    thread.Address.address,
-    decodeURIComponent(thread.title),
+  return new OffchainThread({
+    id,
+    author: thread.Address.address,
+    authorChain: thread.Address.chain,
+    title: decodeURIComponent(title),
+    body: decodeURIComponent(body),
+    createdAt: moment(created_at),
     attachments,
-    thread.id,
-    moment(thread.created_at),
-    thread.topic,
-    thread.kind,
-    thread.stage,
-    versionHistory,
-    thread.community,
-    thread.chain,
-    thread.read_only,
-    decodeURIComponent(thread.body),
-    thread.plaintext,
-    thread.url,
-    thread.Address.chain,
-    thread.pinned,
-    thread.collaborators,
-    thread.chain_entities,
-    lastEdited,
-  );
+    topic,
+    kind,
+    stage,
+    community,
+    chain,
+    readOnly: read_only,
+    plaintext,
+    url,
+    pinned,
+    collaborators,
+    chainEntities: chain_entities,
+    versionHistory: versionHistoryProcessed,
+    lastEdited: lastEditedProcessed,
+    offchainVotingEndsAt: offchain_voting_ends_at,
+    offchainVotingNumVotes: offchain_voting_votes,
+  });
 };
 
 /*
@@ -109,7 +132,7 @@ would break the listingStore's careful chronology.
 
 export interface VersionHistory {
   author?: Profile;
-  timestamp: Moment;
+  timestamp: moment.Moment;
   body: string;
 }
 
@@ -151,8 +174,6 @@ class ThreadsController {
     url?: string,
     attachments?: string[],
     readOnly?: boolean,
-    isNewChain?: boolean,
-    newChainInfo?: NewChainInfo
   ) {
     try {
       // TODO: Change to POST /thread
@@ -172,8 +193,6 @@ class ThreadsController {
         'url': url,
         'readOnly': readOnly,
         'jwt': app.user.jwt,
-        'isNewChain': isNewChain,
-        'newChainInfo': JSON.stringify(newChainInfo)
       });
       const result = modelFromServer(response.result);
       this._store.add(result);
@@ -260,6 +279,35 @@ class ThreadsController {
         notifyError('Could not delete thread');
         reject(e);
       });
+    });
+  }
+
+  public async setPolling(args: { threadId: number }) {
+    // start polling
+    await $.ajax({
+      url: `${app.serverUrl()}/updateThreadPolling`,
+      type: 'POST',
+      data: {
+        'chain': app.activeChainId(),
+        'community': app.activeCommunityId(),
+        'thread_id': args.threadId,
+        'jwt': app.user.jwt
+      },
+      success: (response) => {
+        const thread = this._store.getByIdentifier(args.threadId);
+        if (!thread) {
+          // TODO: sometimes the thread may not be in the store
+          location.reload();
+          return;
+        }
+        thread.offchainVotingEndsAt = moment(response.result.offchain_voting_ends_at);
+        return;
+      },
+      error: (err) => {
+        console.log('Failed to start polling');
+        throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error
+          : 'Failed to start polling');
+      }
     });
   }
 

@@ -4,16 +4,12 @@ import BN from 'bn.js';
 import { ApiStatus, IApp } from 'state';
 import { Near as NearApi, connect as nearConnect } from 'nearlib/lib/near';
 import { BrowserLocalStorageKeyStore } from 'nearlib/lib/key_stores';
-import moment from 'moment-twitter';
+import moment from 'moment';
 import * as m from 'mithril';
 import { NodeStatusResult } from 'nearlib/lib/providers/provider';
 import { NearAccount } from './account';
 
 class NearChain implements IChainModule<NearToken, NearAccount> {
-  public hasWebWallet(): boolean {
-    return true;
-  }
-
   private _api: NearApi;
   public get api(): NearApi {
     return this._api;
@@ -56,7 +52,7 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
     this._api = await nearConnect(this.config);
 
     // block times seem about 1.5-2.5 seconds, so querying every 2s feels right
-    this._syncHandle = setInterval(async () => {
+    const syncFn = async () => {
       try {
         this._nodeStatus = await this._api.connection.provider.status();
 
@@ -88,7 +84,9 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
           m.redraw();
         }
       }
-    }, 2000);
+    };
+    await syncFn();
+    this._syncHandle = setInterval(syncFn, 2000);
   }
 
   public async deinit(): Promise<void> {

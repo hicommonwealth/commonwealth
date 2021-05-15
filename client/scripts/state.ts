@@ -9,7 +9,6 @@ import { EventEmitter } from 'events';
 import { getToastStore, ToastStore } from 'controllers/app/toasts';
 import { getModalStore, ModalStore } from 'controllers/app/modals';
 import RecentActivityController from './controllers/app/recent_activity';
-import TokensController from './controllers/app/tokens';
 import ProfilesController from './controllers/server/profiles';
 import CommentsController from './controllers/server/comments';
 import ThreadsController from './controllers/server/threads';
@@ -18,7 +17,7 @@ import WebsocketController from './controllers/server/socket';
 import TopicsController from './controllers/server/topics';
 import CommunitiesController from './controllers/server/communities';
 import UserController from './controllers/server/user/index';
-import Token from 'controllers/chain/ethereum/token/adapter';
+import WebWalletController from './controllers/app/web_wallets';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -52,7 +51,7 @@ export interface IApp {
   topics: TopicsController;
   communities: CommunitiesController;
   user: UserController;
-  tokens: TokensController;
+  wallets: WebWalletController;
 
   recentActivity: RecentActivityController;
   searchCache: any;
@@ -81,6 +80,10 @@ export interface IApp {
   isProduction(): boolean;
   serverUrl(): string;
   loadingError: string;
+
+  isCustomDomain(): boolean;
+  setIsCustomDomain(option: boolean): void;
+  _isCustomDomain: boolean;
 
   _lastNavigatedBack: boolean;
   _lastNavigatedFrom: string;
@@ -113,18 +116,14 @@ const app: IApp = {
   topics: new TopicsController(),
   communities: new CommunitiesController(),
   user: new UserController(),
-  tokens: new TokensController(),
+  wallets: new WebWalletController(),
 
   recentActivity: new RecentActivityController(),
-  // TODO: Add type
+
   searchCache: {},
 
-  activeChainId: () => app.chain
-    ? (app.chain as Token).isToken && (app.chain as Token).isUninitialized
-      ? (app.chain as Token).contractAddress
-      : app.chain.id
-    : null,
-  activeCommunityId: () => app.community ? app.community.meta.id : null,
+  activeChainId: () => app.chain?.id,
+  activeCommunityId: () => app.community?.meta.id,
   activeId: () => app.community ? app.activeCommunityId() : app.activeChainId(),
   defaultScope: () => app.config.defaultChain,
 
@@ -150,6 +149,14 @@ const app: IApp = {
   },
   serverUrl: () => '/api',
   loadingError: null,
+
+  isCustomDomain: () => {
+    return app._isCustomDomain;
+  },
+  setIsCustomDomain: (option: boolean) => {
+    app._isCustomDomain = option;
+  },
+  _isCustomDomain: false,
 
   _lastNavigatedFrom: null,
   _lastNavigatedBack: false,

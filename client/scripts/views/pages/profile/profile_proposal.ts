@@ -1,9 +1,9 @@
 import m from 'mithril';
 import lity from 'lity';
-import app from 'state';
+import { slugify } from 'utils';
 
 import { OffchainThread, OffchainThreadKind, AddressInfo } from 'models';
-import { link, slugify } from 'helpers';
+import { link } from 'helpers';
 import User from 'views/components/widgets/user';
 
 const ProfileProposal : m.Component< { proposal: OffchainThread }, { revealThread: boolean } > = {

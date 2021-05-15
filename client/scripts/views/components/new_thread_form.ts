@@ -13,6 +13,7 @@ import {
 } from 'construct-ui';
 
 import app from 'state';
+
 import { detectURL } from 'helpers/threads';
 import { OffchainTopic, OffchainThreadKind, OffchainThreadStage, CommunityInfo, NodeInfo } from 'models';
 
@@ -23,10 +24,10 @@ import QuillEditor from 'views/components/quill_editor';
 import TopicSelector from 'views/components/topic_selector';
 import EditProfileModal from 'views/modals/edit_profile_modal';
 
+import Token from 'controllers/chain/ethereum/token/adapter';
 import QuillFormattedText from './quill_formatted_text';
 import MarkdownFormattedText from './markdown_formatted_text';
 
-import Token from 'controllers/chain/ethereum/token/adapter';
 
 interface IThreadForm {
   topicName?: string;
@@ -151,32 +152,9 @@ const newThread = async (
   const chainId = app.activeCommunityId() ? null : app.activeChainId();
   const communityId = app.activeCommunityId();
 
-  const chains = {};
-  app.config.nodes.getAll().forEach((n) => {
-    if (chains[n.chain.id]) {
-      chains[n.chain.id].push(n);
-    } else {
-      chains[n.chain.id] = [n];
-    }
-  });
-
-  const isNewChain = !chains[chainId] && (app.chain as Token).isToken 
-  && (app.chain as Token).isUninitialized;
-
   let result;
-  try {    
+  try {
     // see if app.chain.network is existing in network lists and if app.chain.isToken
-
-    let newChainInfo = null
-    if(isNewChain) {
-      newChainInfo = {
-        address: app.chain.id,
-        iconUrl: app.chain.meta.chain.iconUrl,
-        name: app.chain.meta.chain.name,
-        symbol: app.chain.meta.chain.symbol,
-      }
-      topicName = "General"
-    }
 
     result = await app.threads.create(
       author.address,
@@ -185,14 +163,12 @@ const newThread = async (
       chainId,
       communityId,
       title,
-      topicName,
+      (topicName) ? topicName : 'General', // if no topic name set to default
       topicId,
       bodyText,
       url,
       attachments,
       readOnly,
-      isNewChain,
-      newChainInfo
     );
   } catch (e) {
     console.error(e);
@@ -200,20 +176,14 @@ const newThread = async (
     throw new Error(e);
   }
 
-  const filteredName = app.chain.meta.chain.name.toLowerCase().trim().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
-
   const activeEntity = app.activeCommunityId() ? app.community : app.chain;
   updateLastVisited(app.activeCommunityId()
     ? (activeEntity.meta as CommunityInfo)
     : (activeEntity.meta as NodeInfo).chain, true);
+
   await app.user.notifications.refresh();
-  m.route.set(`/${
-    isNewChain 
-    ?
-    filteredName
-    :
-    app.activeId()
-  }/proposal/discussion/${result.id}`);
+
+  m.route.set(`/${app.activeId()}/proposal/discussion/${result.id}`);
 
   if (result.topic) {
     try {
@@ -773,7 +743,7 @@ export const NewThreadForm: m.Component<{
       && m('.new-thread-form-sidebar', [
         m(List, {
           interactive: true
-        }, discussionDrafts.sort((a, b) => a.createdAt - b.createdAt).map((draft) => {
+        }, discussionDrafts.sort((a, b) => a.createdAt.unix() - b.createdAt.unix()).map((draft) => {
           const { body } = draft;
           let bodyComponent;
           if (body) {

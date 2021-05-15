@@ -105,10 +105,6 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     }
   }
 
-  public hasWebWallet(): boolean {
-    return true;
-  }
-
   public createType<K extends keyof InterfaceTypes>(type: K, ...params: any[]): InterfaceTypes[K] {
     return this.api.registry.createType(type, ...params);
   }

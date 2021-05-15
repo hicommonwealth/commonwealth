@@ -465,7 +465,8 @@ class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccou
 
   public get validators(): Promise<IValidators> {
     return new Promise(async (resolve) => {
-      const { nextElected, validators: currentSet } = await this._Chain.api.derive.staking.validators();
+      const res = await this._Chain.api.derive.staking.validators();
+      const { nextElected, validators: currentSet } = res;
       const era = await this._Chain.api.query.staking.currentEra<EraIndex>();
 
       // set of not yet but future validators

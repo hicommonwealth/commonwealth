@@ -6,8 +6,8 @@ import { EmptyState, Button, Icon, Icons, Grid, Col, Spinner } from 'construct-u
 import { link } from 'helpers';
 
 import NewProposalButton, { MobileNewProposalButton } from 'views/components/new_proposal_button';
-import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import NotificationsMenu from 'views/components/header/notifications_menu';
+import InvitesMenu from 'views/components/header/invites_menu';
 import LoginSelector from 'views/components/header/login_selector';
 import Sidebar from 'views/components/sidebar';
 import MobileHeader from 'views/mobile/mobile_header';
@@ -74,13 +74,9 @@ const Sublayout: m.Component<{
     ]);
 
     const sublayoutHeaderRight = m('.sublayout-header-right', [
-      m(LoginSelector),                                                 // login selector
-      app.isLoggedIn() && app.config.invites?.length > 0 && m(Button, { // invites menu
-        class: 'InvitesButton',
-        iconLeft: Icons.MAIL,
-        onclick: () => app.modals.create({ modal: ConfirmInviteModal }),
-      }),
-      app.isLoggedIn() && m(NotificationsMenu),                         // notifications menu
+      m(LoginSelector),
+      app.isLoggedIn() && m(InvitesMenu),
+      app.isLoggedIn() && m(NotificationsMenu),
       showNewProposalButton
       && (narrowBrowserWidth ? m(MobileNewProposalButton) : m(NewProposalButton, { fluid: false })),
     ]);

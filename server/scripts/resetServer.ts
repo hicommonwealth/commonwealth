@@ -11,7 +11,7 @@ const nodes = [
   [ 'wss://beresheet1.edgewa.re', 'edgeware-testnet' ],
   [ 'wss://beresheet2.edgewa.re', 'edgeware-testnet' ],
   [ 'wss://beresheet3.edgewa.re', 'edgeware-testnet' ],
-  [ 'ws://mainnet2.edgewa.re:9944', 'edgeware' ],
+  [ 'ws://mainnet1.edgewa.re:9944', 'edgeware' ],
   // [ 'localhost:9944', 'kusama-local' ],
   [ 'wss://kusama-rpc.polkadot.io', 'kusama' ],
   [ 'wss://rpc.polkadot.io', 'polkadot' ],

@@ -2,8 +2,8 @@ import 'pages/search.scss';
 
 import m from 'mithril';
 import _, { capitalize } from 'lodash';
-import moment from 'moment-twitter';
-import { Tabs, Spinner, TabItem, Tag, ListItem } from 'construct-ui';
+import moment from 'moment';
+import { Input, ListItem, Spinner, TabItem, Tabs, Tag } from 'construct-ui';
 
 import { link, pluralize } from 'helpers';
 import {
@@ -59,7 +59,7 @@ export const getCommunityResult = (community) => {
   params['size'] = 36;
   const onSelect = (e) => {
     if (params.token) {
-      m.route.set('/');
+      m.route.set(params.token.address ? `/${params.token.address}` : '/');
     } else {
       m.route.set(community.id ? `/${community.id}` : '/');
     }
@@ -78,13 +78,13 @@ export const getCommunityResult = (community) => {
 };
 
 export const getDiscussionResult = (thread, searchTerm) => {
-  const activeId = app.activeId();
   const proposalId = thread.proposalid;
+  const chainOrComm = thread.chain || thread.offchain_community;
   return m(ListItem, {
     onclick: (e) => {
       m.route.set((thread.type === 'thread')
-        ? `/${activeId}/proposal/discussion/${proposalId}`
-        : `/${activeId}/proposal/${proposalId.split('_')[0]}/${proposalId.split('_')[1]}`);
+        ? `/${chainOrComm}/proposal/discussion/${proposalId}`
+        : `/${chainOrComm}/proposal/${proposalId.split('_')[0]}/${proposalId.split('_')[1]}`);
     },
     label: m('a.search-results-item', [
       thread.type === 'thread' ? [
@@ -271,7 +271,6 @@ const SearchPage : m.Component<{
       ],
       showNewProposalButton: true,
       alwaysShowTitle: true,
-      hideSidebar: true,
       centerGrid: true,
     }, m(Tabs, [
       m(TabItem, {

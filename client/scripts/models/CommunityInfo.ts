@@ -14,6 +14,7 @@ interface CommunityData {
   telegram: string;
   github: string;
   visible: boolean;
+  customDomain: string;
   invitesEnabled: boolean,
   privacyEnabled: boolean,
 }
@@ -32,16 +33,18 @@ class CommunityInfo {
   public readonly visible: boolean;
   public invitesEnabled: boolean;
   public privacyEnabled: boolean;
+  public customDomain: string;
   public readonly collapsedOnHomepage: boolean;
   public readonly featuredTopics: string[];
   public readonly topics: OffchainTopic[];
   public adminsAndMods: RoleInfo[];
   public members: RoleInfo[];
 
-  constructor(
-    id, name, description, iconUrl, website, discord, element, telegram, github, defaultChain,
-    visible, invitesEnabled, privacyEnabled, collapsedOnHomepage, featuredTopics, topics, adminsAndMods?
-  ) {
+  // TODO: convert this to accept opject with params instead
+  constructor({
+    id, name, description, iconUrl, website, discord, element, telegram, github, defaultChain, visible,
+    customDomain, invitesEnabled, privacyEnabled, collapsedOnHomepage, featuredTopics, topics, adminsAndMods
+  }) {
     this.id = id;
     this.name = name;
     this.description = description;
@@ -53,6 +56,7 @@ class CommunityInfo {
     this.github = github;
     this.defaultChain = defaultChain;
     this.visible = visible;
+    this.customDomain = customDomain;
     this.invitesEnabled = invitesEnabled;
     this.privacyEnabled = privacyEnabled;
     this.collapsedOnHomepage = collapsedOnHomepage;
@@ -61,26 +65,46 @@ class CommunityInfo {
     this.adminsAndMods = adminsAndMods || [];
   }
 
-  public static fromJSON(json) {
-    return new CommunityInfo(
-      json.id,
-      json.name,
-      json.description,
-      json.iconUrl,
-      json.website,
-      json.discord,
-      json.element,
-      json.telegram,
-      json.github,
-      json.default_chain,
-      json.visible,
-      json.invitesEnabled,
-      json.privacyEnabled,
-      json.collapsed_on_homepage,
-      json.featuredTopics,
-      json.topics,
-      json.adminsAndMods,
-    );
+  public static fromJSON({
+    id,
+    name,
+    description,
+    iconUrl,
+    website,
+    discord,
+    element,
+    telegram,
+    github,
+    defaultChain: default_chain,
+    visible,
+    customDomain,
+    invitesEnabled,
+    privacyEnabled,
+    collapsedOnHomepage: collapsed_on_homepage,
+    featuredTopics,
+    topics,
+    adminsAndMods,
+  }) {
+    return new CommunityInfo({
+      id,
+      name,
+      description,
+      iconUrl,
+      website,
+      discord,
+      element,
+      telegram,
+      github,
+      defaultChain: default_chain,
+      visible,
+      customDomain,
+      invitesEnabled,
+      privacyEnabled,
+      collapsedOnHomepage: collapsed_on_homepage,
+      featuredTopics,
+      topics,
+      adminsAndMods,
+    });
   }
 
   // TODO: get operation should not have side effects, and either way this shouldn't be here
@@ -136,6 +160,7 @@ class CommunityInfo {
     name,
     iconUrl,
     privacyEnabled,
+    customDomain,
     website,
     discord,
     element,
@@ -153,6 +178,7 @@ class CommunityInfo {
       'element': element,
       'telegram': telegram,
       'github': github,
+      'customDomain': customDomain,
       'privacy': privacyEnabled,
       'invites': invitesEnabled,
       'jwt': app.user.jwt,
@@ -166,6 +192,7 @@ class CommunityInfo {
     this.element = updatedCommunity.element;
     this.telegram = updatedCommunity.telegram;
     this.github = updatedCommunity.github;
+    this.customDomain = updatedCommunity.customDomain;
     this.privacyEnabled = updatedCommunity.privacyEnabled;
     this.invitesEnabled = updatedCommunity.invitesEnabled;
   }

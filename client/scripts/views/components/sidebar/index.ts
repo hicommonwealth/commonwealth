@@ -258,6 +258,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         }),
       // validators (substrate only)
       !app.community && app.chain?.base === ChainBase.Substrate
+        && app.chain?.class !== ChainClass.Kulupu && app.chain?.class !== ChainClass.Darwinia
         && m(Button, {
           fluid: true,
           rounded: true,
@@ -503,10 +504,10 @@ export const ExternalLinksModule: m.Component<{}, {}> = {
   }
 };
 
-const Sidebar: m.Component<{}, {}> = {
+const Sidebar: m.Component<{ hideQuickSwitcher? }, {}> = {
   view: (vnode) => {
     return [
-      m(SidebarQuickSwitcher),
+      !app.isCustomDomain() && m(SidebarQuickSwitcher),
       m('.Sidebar', [
         (app.chain || app.community) && m(OffchainNavigationModule),
         (app.chain || app.community) && m(OnchainNavigationModule),

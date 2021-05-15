@@ -2,13 +2,12 @@ import 'pages/view_proposal/editor_permissions.scss';
 
 import m from 'mithril';
 import lity from 'lity';
-import Quill from 'quill';
 import $ from 'jquery';
 import _ from 'lodash';
 
 import { updateRoute } from 'app';
 import app from 'state';
-import { pluralize, slugify } from 'helpers';
+import { pluralize } from 'helpers';
 import {
   OffchainThread,
   OffchainComment,
@@ -28,8 +27,6 @@ import VersionHistoryModal from 'views/modals/version_history_modal';
 import ReactionButton, { ReactionType } from 'views/components/reaction_button';
 import { MenuItem, Button, Dialog, QueryList, Classes, ListItem, Icon, Icons, Popover } from 'construct-ui';
 import { notifyError, notifyInfo, notifySuccess } from 'controllers/app/notifications';
-import { VersionHistory } from 'client/scripts/controllers/server/threads';
-import moment from 'moment';
 
 export enum GlobalStatus {
   Get = 'get',
