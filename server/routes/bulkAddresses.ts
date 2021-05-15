@@ -56,7 +56,8 @@ const bulkAddresses = async (models, req, res, next) => {
       }];
     }
   }
-
+  console.log(options);
+  console.log(options['include']);
   const addresses = await models.Address.findAll(options);
   return res.json({ status: 'Success', result: addresses.map((p) => p.toJSON()) });
 };

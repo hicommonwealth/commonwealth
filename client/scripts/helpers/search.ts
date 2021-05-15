@@ -8,50 +8,65 @@ export const searchDiscussions = async (
   params: SearchParams
 ) => {
   const { resultSize, chainScope, communityScope } = params;
-  const response = await $.get(`${app.serverUrl()}/search`, {
-    chain: chainScope,
-    community: communityScope,
-    cutoff_date: null, // cutoffDate.toISOString(),
-    search: searchTerm,
-    results_size: resultSize,
-  });
-  if (response.status !== 'Success') {
-    throw new Error(`Got unsuccessful status: ${response.status}`);
+  try {
+    const response = await $.get(`${app.serverUrl()}/search`, {
+      chain: chainScope,
+      community: communityScope,
+      cutoff_date: null, // cutoffDate.toISOString(),
+      search: searchTerm,
+      results_size: resultSize,
+    });
+    if (response.status !== 'Success') {
+      throw new Error(`Got unsuccessful status: ${response.status}`);
+    }
+    return response.result;
+  } catch (e) {
+    console.error(e);
+    return [];
   }
-  return response.result;
 };
 
 export const searchMentionableAddresses = async (
   searchTerm: string,
   params: SearchParams,
-  order: string[] = ['name', 'ASC']
+  order?: string[]
 ) => {
   const { resultSize, communityScope, chainScope } = params;
-  const response = await $.get(`${app.serverUrl()}/bulkAddresses`, {
-    chain: chainScope,
-    community: communityScope,
-    limit: resultSize,
-    searchTerm,
-    order,
-  });
-  if (response.status !== 'Success') {
-    throw new Error(`Got unsuccessful status: ${response.status}`);
+  try {
+    const response = await $.get(`${app.serverUrl()}/bulkAddresses`, {
+      chain: chainScope,
+      community: communityScope,
+      limit: resultSize,
+      searchTerm,
+      order,
+    });
+    if (response.status !== 'Success') {
+      throw new Error(`Got unsuccessful status: ${response.status}`);
+    }
+    return response.result;
+  } catch (e) {
+    console.error(e);
+    return [];
   }
-  return response.result;
 };
 
 export const searchChainsAndCommunities = async (
   searchTerm?: string,
   limit?: number,
 ) => {
-  const response = await $.get(`${app.serverUrl()}/getCommunitiesAndChains`, {
-    searchTerm,
-    limit,
-  });
-  if (response.status !== 'Success') {
-    throw new Error(`Got unsuccessful status: ${response.status}`);
+  try {
+    const response = await $.get(`${app.serverUrl()}/getCommunitiesAndChains`, {
+      searchTerm,
+      limit,
+    });
+    if (response.status !== 'Success') {
+      throw new Error(`Got unsuccessful status: ${response.status}`);
+    }
+    return response.result;
+  } catch (e) {
+    console.error(e);
+    return [];
   }
-  return response.result;
 };
 
 export const SearchIcon = {
