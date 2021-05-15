@@ -4,7 +4,7 @@ import m from 'mithril';
 import $ from 'jquery';
 import { Button, PopoverMenu, Icon, Icons } from 'construct-ui';
 
-import app from 'state';
+import app, { LoginState } from 'state';
 
 import NotificationsMenu from 'views/components/header/notifications_menu';
 import { SearchBar } from 'views/components/search_bar';
@@ -14,6 +14,7 @@ import { CustomHamburgerIcon } from './mobile_icons';
 const MobileHeader: m.Component<{}, { sidebarOpen: boolean }> = {
   view: (vnode) => {
     const { sidebarOpen } = vnode.state;
+    // Because onClick never happens when logging out we must set manually
     return m('.MobileHeader', [
       m('img.mobile-logo', {
         src: 'https://commonwealth.im/static/img/logo.png',
@@ -22,8 +23,7 @@ const MobileHeader: m.Component<{}, { sidebarOpen: boolean }> = {
       m(SearchBar),
       m('.mobile-header-right', [
         app.isLoggedIn() && m(NotificationsMenu, { small: false }),
-        (app.chain || app.community)
-        && m(PopoverMenu, {
+        m(PopoverMenu, {
           class: 'MobileHeaderPopoverMenu',
           transitionDuration: 0,
           closeOnContentClick: true,
