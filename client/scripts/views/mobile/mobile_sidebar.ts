@@ -38,24 +38,27 @@ const MobileAccountMenu: m.Component<{}, {}> = {
     const nAccountsWithoutRole = activeAccountsByRole.filter(([account, role], index) => !role).length;
 
     return m(Menu, { class: 'MobileAccountMenu' }, [
-      m(LoginSelectorMenuLeft, {
+      app.activeId() && m(LoginSelectorMenuLeft, {
         activeAddressesWithRole, nAccountsWithoutRole, isPrivateCommunity
       }),
-      m(MenuDivider),
+      app.activeId() && m(MenuDivider),
       m(LoginSelectorMenuRight)
     ]);
   }
-}; 
+};
 
 const MobileSidebar: m.Component<{}, { activeTab: string, showNewThreadOptions: boolean }> = {
-  oncreate: (vnode) => { 
-    vnode.state.activeTab = MenuTabs.currentCommunity; 
+  oncreate: (vnode) => {
+    vnode.state.activeTab = MenuTabs.currentCommunity;
     window.scrollTo(0, Number(localStorage['home-scrollY']));
   },
   view: (vnode) => {
     if (!app) return;
-    let { activeTab, showNewThreadOptions } = vnode.state;
-    if (!activeTab) activeTab = MenuTabs.currentCommunity;
+    let { activeTab } = vnode.state;
+    const { showNewThreadOptions } = vnode.state;
+    if (!activeTab) activeTab = app.activeId()
+      ? MenuTabs.currentCommunity
+      : MenuTabs.account;
     const CurrentCommunityMenu = m(Menu, { class: 'CurrentCommunityMenu' }, [
       app.isLoggedIn()
         ? m(Menu, { class: 'NewProposalMenu' }, [
@@ -70,13 +73,13 @@ const MobileSidebar: m.Component<{}, { activeTab: string, showNewThreadOptions: 
           showNewThreadOptions
           && getNewProposalMenu([], true)
         ])
-      : m(MenuItem, {
-        label: 'Login',
-        iconLeft: Icons.LOG_IN,
-        onclick: (e) => {
-          app.modals.create({ modal: LoginModal });
-        }
-      }),
+        : m(MenuItem, {
+          label: 'Login',
+          iconLeft: Icons.LOG_IN,
+          onclick: (e) => {
+            app.modals.create({ modal: LoginModal });
+          }
+        }),
       m(MenuDivider),
       (app.chain || app.community) && m(OffchainNavigationModule),
       (app.chain || app.community) && m(OnchainNavigationModule),
@@ -87,9 +90,9 @@ const MobileSidebar: m.Component<{}, { activeTab: string, showNewThreadOptions: 
     const AllCommunitiesMenu = m(Menu, { class: 'AllCommunitiesMenu' }, [
       m(CommunitySelector, { showListOnly: true, showHomeButtonAtTop: true })
     ]);
-    return m('.MobileSidebar',[
+    return m('.MobileSidebar', [
       m(Tabs, [
-        m(TabItem, {
+        app.activeId() && m(TabItem, {
           label: capitalize(app.activeId()),
           active: activeTab === MenuTabs.currentCommunity,
           onclick: (e) => {

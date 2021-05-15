@@ -28,7 +28,6 @@ const MobileHeader: m.Component<{}, { sidebarOpen: boolean }> = {
           transitionDuration: 0,
           closeOnContentClick: true,
           closeOnOutsideClick: true,
-          // inline: true,
           trigger: m(Button, {
             class: 'mobile-header-trigger no-border',
             compact: true,
