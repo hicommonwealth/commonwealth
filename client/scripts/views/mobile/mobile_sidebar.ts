@@ -23,7 +23,7 @@ enum MenuTabs {
   account = 'account',
 }
 
-const MobileAccountMenu: m.Component<{ onclick }, {}> = {
+const MobileAccountMenu: m.Component<{}, {}> = {
   view: (vnode) => {
     if (!app.isLoggedIn) return;
     const isPrivateCommunity = app.community?.meta.privacyEnabled;
@@ -36,26 +36,35 @@ const MobileAccountMenu: m.Component<{ onclick }, {}> = {
     });
     const activeAccountsByRole = app.user.getActiveAccountsByRole();
     const nAccountsWithoutRole = activeAccountsByRole.filter(([account, role], index) => !role).length;
-
-    return m(Menu, { class: 'MobileAccountMenu' }, [
-      app.activeId() && m(LoginSelectorMenuLeft, {
-        activeAddressesWithRole, nAccountsWithoutRole, isPrivateCommunity
-      }),
-      app.activeId() && m(MenuDivider),
-      m(LoginSelectorMenuRight, { onclick: vnode.attrs.onclick })
-    ]);
+    return m(Menu, { class: 'MobileAccountMenu' },
+      app.isLoggedIn()
+        ? [
+          app.activeId() && m(LoginSelectorMenuLeft, {
+            activeAddressesWithRole,
+            nAccountsWithoutRole,
+            isPrivateCommunity,
+          }),
+          app.activeId() && m(MenuDivider),
+          m(LoginSelectorMenuRight)
+        ]
+        : m(MenuItem, {
+          label: 'Login',
+          iconLeft: Icons.LOG_IN,
+          onclick: (e) => {
+            app.modals.create({ modal: LoginModal });
+          }
+        }));
   }
 };
 
-const MobileSidebar: m.Component<{ onclick }, { activeTab: string, showNewThreadOptions: boolean }> = {
-  oncreate: (vnode) => {
-    vnode.state.activeTab = MenuTabs.currentCommunity;
-    window.scrollTo(0, Number(localStorage['home-scrollY']));
-  },
+const MobileSidebar: m.Component<{}, { activeTab: string, showNewThreadOptions: boolean }> = {
   view: (vnode) => {
     if (!app) return;
     let { activeTab } = vnode.state;
     const { showNewThreadOptions } = vnode.state;
+    if (!app.activeId() && !app.activeId()) {
+      vnode.state.activeTab = MenuTabs.account;
+    }
     if (!activeTab) activeTab = app.activeId()
       ? MenuTabs.currentCommunity
       : MenuTabs.account;
@@ -77,7 +86,6 @@ const MobileSidebar: m.Component<{ onclick }, { activeTab: string, showNewThread
           label: 'Login',
           iconLeft: Icons.LOG_IN,
           onclick: (e) => {
-            if (vnode.attrs.onclick) vnode.attrs.onclick();
             app.modals.create({ modal: LoginModal });
           }
         }),
@@ -93,7 +101,8 @@ const MobileSidebar: m.Component<{ onclick }, { activeTab: string, showNewThread
     ]);
     return m('.MobileSidebar', [
       m(Tabs, [
-        app.activeId() && m(TabItem, {
+        app.activeId()
+        && m(TabItem, {
           label: capitalize(app.activeId()),
           active: activeTab === MenuTabs.currentCommunity,
           onclick: (e) => {
@@ -101,7 +110,8 @@ const MobileSidebar: m.Component<{ onclick }, { activeTab: string, showNewThread
             vnode.state.activeTab = MenuTabs.currentCommunity;
           }
         }),
-        app.activeId() && m(TabItem, {
+        app.activeId()
+        && m(TabItem, {
           label: 'Communities',
           active: activeTab === MenuTabs.allCommunities,
           onclick: (e) => {
@@ -109,8 +119,7 @@ const MobileSidebar: m.Component<{ onclick }, { activeTab: string, showNewThread
             vnode.state.activeTab = MenuTabs.allCommunities;
           }
         }),
-        app.isLoggedIn()
-        && m(TabItem, {
+        m(TabItem, {
           label: 'Account',
           active: activeTab === MenuTabs.account,
           onclick: (e) => {
@@ -123,7 +132,7 @@ const MobileSidebar: m.Component<{ onclick }, { activeTab: string, showNewThread
         ? CurrentCommunityMenu
         : activeTab === MenuTabs.allCommunities
           ? AllCommunitiesMenu
-          : m(MobileAccountMenu, { onclick: vnode.attrs.onclick })
+          : m(MobileAccountMenu)
     ]);
   }
 };

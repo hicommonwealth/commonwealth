@@ -28,13 +28,14 @@ const MobileHeader: m.Component<{}, { sidebarOpen: boolean }> = {
           transitionDuration: 0,
           closeOnContentClick: true,
           closeOnOutsideClick: true,
+          onClosed: () => { debugger; vnode.state.sidebarOpen = false; m.redraw(); },
           trigger: m(Button, {
             class: 'mobile-header-trigger no-border',
             compact: true,
             label: sidebarOpen ? m(Icon, { name: Icons.X }) : m(CustomHamburgerIcon),
             onclick: (e) => { vnode.state.sidebarOpen = !sidebarOpen; }
           }),
-          content: m(MobileSidebar, { onclick: () => { vnode.state.sidebarOpen = false; } })
+          content: m(MobileSidebar)
         }),
       ]),
     ]);
