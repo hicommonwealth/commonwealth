@@ -1,6 +1,5 @@
 import m from 'mithril';
-import './find_your_community_section.scss';
-import LandingPageButton from './landing_page_button';
+import 'pages/landing/find_your_community_section.scss';
 
 interface IState {
   holders: {

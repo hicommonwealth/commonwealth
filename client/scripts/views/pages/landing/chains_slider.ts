@@ -1,5 +1,5 @@
 import m from 'mithril';
-import './chains_slider.scss';
+import 'pages/landing/chains_slider.scss';
 
 interface IState {
   chains: {
