@@ -48,7 +48,10 @@ const MobileAccountMenu: m.Component<{}, {}> = {
 }; 
 
 const MobileSidebar: m.Component<{}, { activeTab: string, showNewThreadOptions: boolean }> = {
-  oncreate: (vnode) => { vnode.state.activeTab = MenuTabs.currentCommunity; },
+  oncreate: (vnode) => { 
+    vnode.state.activeTab = MenuTabs.currentCommunity; 
+    window.scrollTo(0, Number(localStorage['home-scrollY']));
+  },
   view: (vnode) => {
     if (!app) return;
     let { activeTab, showNewThreadOptions } = vnode.state;
@@ -84,7 +87,7 @@ const MobileSidebar: m.Component<{}, { activeTab: string, showNewThreadOptions: 
     const AllCommunitiesMenu = m(Menu, { class: 'AllCommunitiesMenu' }, [
       m(CommunitySelector, { showListOnly: true, showHomeButtonAtTop: true })
     ]);
-    return m('.MobileSidebar', [
+    return m('.MobileSidebar',[
       m(Tabs, [
         m(TabItem, {
           label: capitalize(app.activeId()),
@@ -94,7 +97,7 @@ const MobileSidebar: m.Component<{}, { activeTab: string, showNewThreadOptions: 
             vnode.state.activeTab = MenuTabs.currentCommunity;
           }
         }),
-        m(TabItem, {
+        app.activeId() && m(TabItem, {
           label: 'Communities',
           active: activeTab === MenuTabs.allCommunities,
           onclick: (e) => {

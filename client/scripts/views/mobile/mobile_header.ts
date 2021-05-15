@@ -14,9 +14,7 @@ import { CustomHamburgerIcon } from './mobile_icons';
 const MobileHeader: m.Component<{}, { sidebarOpen: boolean }> = {
   view: (vnode) => {
     const { sidebarOpen } = vnode.state;
-
     // Because onClick never happens when logging out we must set manually
-    vnode.state.sidebarOpen = (app.loginState !== LoginState.LoggedIn) ? false : sidebarOpen;
     return m('.MobileHeader', [
       m('img.mobile-logo', {
         src: 'https://commonwealth.im/static/img/logo.png',
@@ -25,8 +23,7 @@ const MobileHeader: m.Component<{}, { sidebarOpen: boolean }> = {
       m(SearchBar),
       m('.mobile-header-right', [
         app.isLoggedIn() && m(NotificationsMenu, { small: false }),
-        (app.chain || app.community)
-        && m(PopoverMenu, {
+        m(PopoverMenu, {
           class: 'MobileHeaderPopoverMenu',
           transitionDuration: 0,
           closeOnContentClick: true,
