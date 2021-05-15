@@ -57,7 +57,6 @@ export const getCommunityResult = (community) => {
         ? { community }
         : null;
   params['size'] = 36;
-  // TODO: Linkification of tokens to autogenerate ERC community
   const onSelect = (e) => {
     if (params.token) {
       m.route.set('/');
