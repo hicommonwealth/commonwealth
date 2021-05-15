@@ -607,8 +607,6 @@ $(() => {
     },
   });
 
-
-
   m.route(document.body, '/', {
     // Legacy redirects
     '/unlock':                   redirectRoute('/edgeware/unlock'),
@@ -617,13 +615,12 @@ $(() => {
     '/discussions':              redirectRoute(`/${app.activeId() || app.config.defaultChain}/`),
 
     // Landing pages
-    '/':                         importRoute('views/pages/landing', { scoped: false, hideSidebar: true }),
+    '/':                         importRoute('views/pages/landing', { scoped: false, hideSidebar: true, redirectCustomDomain: true }),
     '/whyCommonWealth':          importRoute('views/pages/commonwealth', { scoped: false, hideSidebar: true }),
     '/about':                    importRoute('views/pages/landing/about', { scoped: false }),
     '/terms':                    importRoute('views/pages/landing/terms', { scoped: false }),
     '/privacy':                  importRoute('views/pages/landing/privacy', { scoped: false }),
     '/components':               importRoute('views/pages/components', { scoped: false, hideSidebar: true }),
-    '/dashboard':                importRoute('views/pages/home', { scoped: false, hideSidebar: true }),
 
     // Login page
     '/login':                    importRoute('views/pages/login', { scoped: false }),
@@ -749,7 +746,7 @@ $(() => {
       if (app.loginState === LoginState.LoggedIn) {
         app.user.notifications.refresh().then(() => m.redraw());
         jwt = app.user.jwt;
-        m.route.set('/dashboard');
+        m.route.set('/');
       }
       // grab discussion drafts
       if (app.loginState === LoginState.LoggedIn) {

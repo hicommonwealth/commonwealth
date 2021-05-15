@@ -1,15 +1,16 @@
 import m from 'mithril';
 import 'pages/landing/chains_slider.scss';
 
+interface Chain {
+  img: string;
+  id: string;
+  name: string;
+  placeholder?: boolean;
+  chainInfo: string;
+}
+
 interface IState {
-  chains: {
-    img: string;
-    id: string;
-    placeholder?: boolean;
-    chainInfo: string;
-    name: string;
-    description?: string
-  }[];
+  chains: Chain[];
   oncreateSlider: Function;
 }
 

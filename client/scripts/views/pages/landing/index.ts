@@ -33,6 +33,7 @@ interface IState {
   hiddenInputTokenList: boolean;
   inputTokenValue: string;
 }
+
 const LandingPage: m.Component<{}, IState> = {
   oninit: (vnode) => {
     vnode.state.hiddenInputTokenList = true;
@@ -50,7 +51,7 @@ const LandingPage: m.Component<{}, IState> = {
 
     const myChains: any = Object.entries(chains);
     const myCommunities: any = app.config.communities.getAll();
-    const sortChainsAndCommunities = (list: any[]) => list
+    const sortChains = (list: any[]) => list
       .sort((a, b) => {
         const threadCountA = app.recentActivity.getCommunityThreadCount(
           Array.isArray(a) ? a[0] : a.id
@@ -72,6 +73,7 @@ const LandingPage: m.Component<{}, IState> = {
             name: chainInfo.name,
           };
         } else  {
+          // Should never be used
           return {
             img: entity.defaultChain.iconUrl,
             id: entity.id,
@@ -83,23 +85,13 @@ const LandingPage: m.Component<{}, IState> = {
       })
       .filter((chain: any) => chain);
 
-    const sortedChainsAndCommunities = sortChainsAndCommunities(
+    const sortedChainsAndCommunities = sortChains(
       myChains
         .filter((c) => c[1][0] && !c[1][0].chain.collapsedOnHomepage)
-        .concat(
-          myCommunities.filter(
-            (c: any) => !c.collapsedOnHomepage
-          )
-        )
     );
-    const betaChainsAndCommunities = sortChainsAndCommunities(
+    const betaChainsAndCommunities = sortChains(
       myChains
         .filter((c) => c[1][0] && c[1][0].chain.collapsedOnHomepage)
-        .concat(
-          myCommunities.filter(
-            (c: any) => c.collapsedOnHomepage
-          )
-        )
     );
 
     vnode.state.chains = [
@@ -311,8 +303,8 @@ const LandingPage: m.Component<{}, IState> = {
           // { text:  'Use Cases' },
           // { text:  'Crowdfunding' },
           // { text:  'Developers' },
-          // { text:  'About us' },
-          // { text:  'Carrers' }
+          { text:  'Privacy', redirectTo: '/privacy' },
+          { text:  'Terms', redirectTo:  '/terms'}
         ],
       }),
       m('script', {
