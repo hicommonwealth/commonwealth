@@ -86,14 +86,13 @@ export const getCommunityPreview = (community, closeResultsFn, tabIndex) => {
         ? { community }
         : null;
   params['size'] = 36;
-  // TODO: Linkification of tokens to autogenerate ERC community
   const onSelect = (e) => {
     if (params.token) {
       m.route.set(params.token.address ? `/${params.token.address}` : '/');
     } else {
       m.route.set(community.id ? `/${community.id}` : '/');
-      closeResultsFn();
     }
+    closeResultsFn();
   };
   return m(ListItem, {
     tabIndex,
@@ -122,7 +121,6 @@ export const getDiscussionPreview = (thread, closeResultsFn, searchTerm, tabInde
       : `/${chainOrComm}/proposal/${proposalId.split('_')[0]}/${proposalId.split('_')[1]}`);
     closeResultsFn();
   };
-
   return m(ListItem, {
     tabIndex,
     onclick: onSelect,
@@ -230,8 +228,8 @@ const getBalancedContentListing = (unfilteredResults: any[], types: SearchType[]
 const getResultsPreview = (searchTerm: string, state, params: SearchParams) => {
   let results;
   let types;
-  const { communityScope, isHomepageSearch } = params;
-  if (communityScope) {
+  const { communityScope, chainScope, isHomepageSearch } = params;
+  if (communityScope || chainScope) {
     types = [SearchType.Discussion, SearchType.Member];
     results = getBalancedContentListing(app.searchCache[searchTerm], types);
   } else if (isHomepageSearch) {
@@ -274,7 +272,6 @@ const concludeSearch = (searchTerm: string, params: SearchParams, state, err?) =
   if (!app.searchCache[searchTerm].loaded) {
     app.searchCache[searchTerm].loaded = true;
   }
-  const commOrChainScoped = params.communityScope || params.chainScope;
   if (err) {
     state.results = {};
     state.errorText = (err.responseJSON?.error || err.responseText || err.toString());
@@ -414,7 +411,9 @@ const SearchBar : m.Component<{}, {
 
     const { results, searchTerm } = vnode.state;
     const showDropdownPreview = !m.route.get().includes('/search?q=');
-    const LoadingPreview = m(List, { class: 'search-results-loading' }, m(ListItem, { label: m(Spinner, { active: true }) }));
+    const LoadingPreview = m(List, {
+      class: 'search-results-loading'
+    }, [ m(ListItem, { label: m(Spinner, { active: true }) }) ]);
     const searchResults = (!results || results?.length === 0)
       ? (app.searchCache[searchTerm]?.loaded)
         ? m(List, [ m(emptySearchPreview, { searchTerm }) ])
@@ -444,7 +443,6 @@ const SearchBar : m.Component<{}, {
           vnode.state.searchTerm = '';
         } })
       : null;
-
     return m(ControlGroup, {
       class: 'SearchBar'
     }, [
