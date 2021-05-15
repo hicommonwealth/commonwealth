@@ -34,7 +34,7 @@ const MobileHeader: m.Component<{}, { sidebarOpen: boolean }> = {
             label: sidebarOpen ? m(Icon, { name: Icons.X }) : m(CustomHamburgerIcon),
             onclick: (e) => { vnode.state.sidebarOpen = !sidebarOpen; }
           }),
-          content: m(MobileSidebar)
+          content: m(MobileSidebar, { onclick: () => { vnode.state.sidebarOpen = false; } })
         }),
       ]),
     ]);

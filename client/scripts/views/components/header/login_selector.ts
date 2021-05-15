@@ -106,6 +106,7 @@ export const LoginSelectorMenuLeft: m.Component<{
   activeAddressesWithRole: any,
   nAccountsWithoutRole: number,
   isPrivateCommunity: boolean,
+  onclick?,
 }> = {
   view: (vnode) => {
     const { activeAddressesWithRole, nAccountsWithoutRole, isPrivateCommunity } = vnode.attrs;
@@ -118,6 +119,7 @@ export const LoginSelectorMenuLeft: m.Component<{
           basic: true,
           onclick: async (e) => {
             const currentActive = app.user.activeAccount;
+            if (vnode.attrs.onclick) vnode.attrs.onclick();
             await setActiveAccount(account);
             m.redraw();
           },
@@ -137,6 +139,7 @@ export const LoginSelectorMenuLeft: m.Component<{
         activeAddressesWithRole.length > 0 && app.activeId() && m(MenuItem, {
           onclick: () => {
             const pf = app.user.activeAccount.profile;
+            if (vnode.attrs.onclick) vnode.attrs.onclick();
             if (app.chain) {
               m.route.set(`/${app.activeId()}/account/${pf.address}`);
             } else if (app.community) {
@@ -149,6 +152,7 @@ export const LoginSelectorMenuLeft: m.Component<{
         activeAddressesWithRole.length > 0 && app.activeId() && m(MenuItem, {
           onclick: (e) => {
             e.preventDefault();
+            if (vnode.attrs.onclick) vnode.attrs.onclick();
             app.modals.create({
               modal: EditProfileModal,
               data: {
@@ -177,8 +181,9 @@ export const LoginSelectorMenuLeft: m.Component<{
   }
 };
 
-export const LoginSelectorMenuRight: m.Component<{}> = {
+export const LoginSelectorMenuRight: m.Component<{ onclick }, {}> = {
   view: (vnode) => {
+    const { onclick } = vnode.attrs;
     return m(Menu, { class: 'LoginSelectorMenu' }, [
       m(MenuItem, {
         onclick: () => (app.activeChainId() || app.activeCommunityId())
@@ -199,6 +204,7 @@ export const LoginSelectorMenuRight: m.Component<{}> = {
       }),
       m(MenuItem, {
         onclick: () => {
+          if (vnode.attrs.onclick) vnode.attrs.onclick();
           $.get(`${app.serverUrl()}/logout`).then(async () => {
             await initAppState();
             notifySuccess('Logged out');
@@ -218,7 +224,7 @@ export const LoginSelectorMenuRight: m.Component<{}> = {
 const LoginSelector: m.Component<{
   small?: boolean
 }, {
-  profileLoadComplete: boolean
+  profileLoadComplete: boolean,
 }> = {
   view: (vnode) => {
     const { small } = vnode.attrs;

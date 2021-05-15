@@ -23,7 +23,7 @@ enum MenuTabs {
   account = 'account',
 }
 
-const MobileAccountMenu: m.Component<{}, {}> = {
+const MobileAccountMenu: m.Component<{ onclick }, {}> = {
   view: (vnode) => {
     if (!app.isLoggedIn) return;
     const isPrivateCommunity = app.community?.meta.privacyEnabled;
@@ -42,12 +42,12 @@ const MobileAccountMenu: m.Component<{}, {}> = {
         activeAddressesWithRole, nAccountsWithoutRole, isPrivateCommunity
       }),
       app.activeId() && m(MenuDivider),
-      m(LoginSelectorMenuRight)
+      m(LoginSelectorMenuRight, { onclick: vnode.attrs.onclick })
     ]);
   }
 };
 
-const MobileSidebar: m.Component<{}, { activeTab: string, showNewThreadOptions: boolean }> = {
+const MobileSidebar: m.Component<{ onclick }, { activeTab: string, showNewThreadOptions: boolean }> = {
   oncreate: (vnode) => {
     vnode.state.activeTab = MenuTabs.currentCommunity;
     window.scrollTo(0, Number(localStorage['home-scrollY']));
@@ -77,6 +77,7 @@ const MobileSidebar: m.Component<{}, { activeTab: string, showNewThreadOptions: 
           label: 'Login',
           iconLeft: Icons.LOG_IN,
           onclick: (e) => {
+            if (vnode.attrs.onclick) vnode.attrs.onclick();
             app.modals.create({ modal: LoginModal });
           }
         }),
@@ -122,7 +123,7 @@ const MobileSidebar: m.Component<{}, { activeTab: string, showNewThreadOptions: 
         ? CurrentCommunityMenu
         : activeTab === MenuTabs.allCommunities
           ? AllCommunitiesMenu
-          : m(MobileAccountMenu)
+          : m(MobileAccountMenu, { onclick: vnode.attrs.onclick })
     ]);
   }
 };
