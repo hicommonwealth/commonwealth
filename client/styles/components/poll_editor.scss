@@ -1,0 +1,17 @@
+@import 'client/styles/shared';
+
+.PollEditorDialog {
+    .cui-dialog-body {
+        padding: 36px 28px 32px;
+    }
+    .cui-switch {
+        color: $text-color-black;
+    }
+    p {
+        margin: 0;
+        margin-top: 16px;
+    }
+    p + p {
+        margin-top: 0;
+    }
+}
