@@ -623,6 +623,7 @@ $(() => {
     '/terms':                    importRoute('views/pages/landing/terms', { scoped: false }),
     '/privacy':                  importRoute('views/pages/landing/privacy', { scoped: false }),
     '/components':               importRoute('views/pages/components', { scoped: false, hideSidebar: true }),
+    '/dashboard':                importRoute('views/pages/home', { scoped: false, hideSidebar: true }),
 
     // Login page
     '/login':                    importRoute('views/pages/login', { scoped: false }),
@@ -748,7 +749,7 @@ $(() => {
       if (app.loginState === LoginState.LoggedIn) {
         app.user.notifications.refresh().then(() => m.redraw());
         jwt = app.user.jwt;
-        m.route.set('/');
+        m.route.set('/dashboard');
       }
       // grab discussion drafts
       if (app.loginState === LoginState.LoggedIn) {
