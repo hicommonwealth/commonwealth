@@ -215,7 +215,9 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
   if (app.chain && n === app.chain.meta) {
     return;
   }
-  if ((Object.values(ChainNetwork) as any).indexOf(n.chain.network) === -1 && n.chain.type !== 'token') {
+  if ((Object.values(ChainNetwork) as any).indexOf(n.chain.network) === -1
+    && n.chain.type !== 'token'
+  ) {
     throw new Error('invalid chain');
   }
 
@@ -418,8 +420,12 @@ export async function initChain(): Promise<void> {
   app.isAdapterReady = true;
   console.log(`${n.chain.network.toUpperCase()} started.`);
 
-  // Instantiate (again) to create chain-specific Account<> objects
-  await updateActiveAddresses(n.chain);
+  if (app.community) {
+    // Instantiate (again) to create chain-specific Account<> objects
+    await updateActiveAddresses(n.chain);
+  } else {
+    app.user.setActiveAccounts([]);
+  }
 
   // Finish redraw to remove loading dialog
   m.redraw();
@@ -623,6 +629,10 @@ $(() => {
     '/terms':                    importRoute('views/pages/landing/terms', { scoped: false }),
     '/privacy':                  importRoute('views/pages/landing/privacy', { scoped: false }),
     '/components':               importRoute('views/pages/components', { scoped: false, hideSidebar: true }),
+
+    // Search
+    '/search':                   importRoute('views/pages/search', { scoped: false, deferChain: true }),
+
 
     // Login page
     '/login':                    importRoute('views/pages/login', { scoped: false }),

@@ -25,19 +25,23 @@
     transform: none !important; // override any scrolling effects
     left: $quick-switcher-width !important;
     @include sm-max {
-        left: 0 !important;
-        top: 60px !important;
+        // left: 0 !important;
+        // top: 60px !important;
         overflow-y: scroll;
+    }
+    span {
+        font-size: 18px;
+        font-weight: 500;
     }
     .cui-popover-content {
         max-height: 100vh;
         overflow-y: auto;
         text-align: left;
-        @include xs-max {
-            margin: 0 10px;
-            width: calc(100vw - 20px);
-            max-height: calc(100vh - 70px);
-        }
+        // @include xs-max {
+        //     margin: 0 10px;
+        //     width: calc(100vw - 20px);
+        //     max-height: calc(100vh - 70px);
+        // }
     }
     .cui-menu {
         background: $background-color-white-hover;
@@ -45,10 +49,10 @@
         max-width: 360px;
         width: 360px;
         padding: 24px 4px 8px;
-        @include xs-max {
-            max-width: 100%;
-            width: 100%;
-        }
+        // @include xs-max {
+        //     max-width: 100%;
+        //     width: 100%;
+        // }
         h4 {
             margin: 20px 24px 10px;
             color: $text-color-light;

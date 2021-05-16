@@ -261,7 +261,13 @@ export default (
       } else {
         isValid = false;
       }
-    } else if (chain.base === 'ethereum') {
+    } else if (chain.network === 'ethereum'
+      || chain.network === 'moloch'
+      || chain.network === 'alex'
+      || chain.network === 'metacartel'
+      || chain.network === 'commonwealth'
+      || chain.type === "token"
+    ) {
       //
       // ethereum address handling
       //
