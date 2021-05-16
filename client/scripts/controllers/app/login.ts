@@ -111,8 +111,7 @@ export async function updateLastVisited(activeEntity: ChainInfo | CommunityInfo,
       value,
     });
   } catch (e) {
-    console.log(e);
-    notifyError('Could not update lastVisited');
+    console.log('Could not update lastVisited:', e);
   }
 }
 
