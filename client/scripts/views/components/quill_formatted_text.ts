@@ -61,13 +61,13 @@ const renderQuillDelta = (delta, hideFormatting = false, collapse = false) => {
     let run = [];
     for (let i = 0; i < groups.length; i++) {
       if (groups[i].listtype) {
-        run.push(groups[i])
+        run.push(groups[i]);
       } else {
         if (run.length > 0) {
           result.push(run);
           run = [];
         }
-        result.push(groups[i])
+        result.push(groups[i]);
       }
     }
     if (run.length > 0) {
@@ -291,12 +291,19 @@ const QuillFormattedText : m.Component<{
         vnode.state.cachedDocWithHighlights = JSON.stringify(doc);
         vnode.state.cachedResultWithHighlights = chunks.map(({ end, highlight, start }, index) => {
           const middle = 15;
-          const text = smartTruncate(
-            textToHighlight.substr(start, end - start),
+          const subString = textToHighlight.substr(start, end - start);
+          let text = smartTruncate(
+            subString,
             chunks.length <= 1 ? 150 : 40 + searchTerm.trim().length,
             chunks.length <= 1 ? {} : index === 0 ? { position: 0 } : index === chunks.length - 1
               ? {} : { position: middle }
           );
+          if (subString[subString.length - 1] === ' ') {
+            text += ' ';
+          }
+          if (subString[0] === ' ') {
+            text = ` ${text}`;
+          }
           return highlight ? m('mark', text) : m('span', text);
         });
       }

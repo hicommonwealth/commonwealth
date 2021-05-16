@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import app from 'state';
 import { RoleInfo, RolePermission } from 'models';
-import { ChainNetwork, ChainBase, networkToBase } from './types';
+import { ChainNetwork, ChainBase } from './types';
 import OffchainTopic from './OffchainTopic';
 
 class ChainInfo {
@@ -18,23 +18,24 @@ class ChainInfo {
   public telegram: string;
   public github: string;
   public customDomain: string;
-  public readonly blockExplorerIds: object;
+  public readonly blockExplorerIds: { [id: string]: string };
   public readonly collapsedOnHomepage: boolean;
   public readonly featuredTopics: string[];
   public readonly topics: OffchainTopic[];
   public readonly chainObjectId: string;
   public adminsAndMods: RoleInfo[];
   public members: RoleInfo[];
+  public type: string;
   public readonly ss58Prefix: string;
 
-  // TODO: convert this to accept an object with params instead
-  constructor(
+  constructor({
     id, network, symbol, name, iconUrl, description, website, discord, element, telegram, github,
-    customDomain, blockExplorerIds, collapsedOnHomepage, featuredTopics, topics, ss58_prefix, adminsAndMods?, base?
-  ) {
+    customDomain, blockExplorerIds, collapsedOnHomepage, featuredTopics, topics, adminsAndMods,
+    base, ss58_prefix, type
+  }) {
     this.id = id;
     this.network = network;
-    this.base = base || networkToBase(network);
+    this.base = base;
     this.symbol = symbol;
     this.name = name;
     this.iconUrl = iconUrl;
@@ -50,37 +51,61 @@ class ChainInfo {
     this.featuredTopics = featuredTopics || [];
     this.topics = topics || [];
     this.adminsAndMods = adminsAndMods || [];
+    this.type = type;
     this.ss58Prefix = ss58_prefix;
   }
 
-  public static fromJSON(json) {
-    let blockExplorerIds;
+  public static fromJSON({
+    id,
+    network,
+    symbol,
+    name,
+    icon_url,
+    description,
+    website,
+    discord,
+    element,
+    telegram,
+    github,
+    customDomain,
+    blockExplorerIds,
+    collapsed_on_homepage,
+    featured_topics,
+    topics,
+    adminsAndMods,
+    base,
+    ss58_prefix,
+    type
+  }) {
+    let blockExplorerIdsParsed;
     try {
-      blockExplorerIds = JSON.parse(json.blockExplorerIds);
+      blockExplorerIdsParsed = JSON.parse(blockExplorerIds);
     } catch (e) {
       // ignore invalid JSON blobs
+      blockExplorerIds = {};
     }
-    return new ChainInfo(
-      json.id,
-      json.network,
-      json.symbol,
-      json.name,
-      json.icon_url,
-      json.description,
-      json.website,
-      json.discord,
-      json.element,
-      json.telegram,
-      json.github,
-      json.customDomain,
-      blockExplorerIds,
-      json.collapsed_on_homepage,
-      json.featured_topics,
-      json.topics,
-      json.ss58_prefix,
-      json.adminsAndMods,
-      json.base,
-    );
+    return new ChainInfo({
+      id,
+      network,
+      symbol,
+      name,
+      iconUrl: icon_url,
+      description,
+      website,
+      discord,
+      element,
+      telegram,
+      github,
+      customDomain,
+      blockExplorerIds: blockExplorerIdsParsed,
+      collapsedOnHomepage: collapsed_on_homepage,
+      featuredTopics: featured_topics,
+      topics,
+      adminsAndMods,
+      base,
+      ss58_prefix,
+      type
+    });
   }
 
   // TODO: get operation should not have side effects, and either way this shouldn't be here

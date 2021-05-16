@@ -1,9 +1,9 @@
-import * as CloverSpecTypes from '@clover-network/node-types';
 import { spec as EdgewareSpec } from '@edgeware/node-types';
 import { RegisteredTypes } from '@polkadot/types/types';
 import StafiSpec from './adapters/chain/stafi/spec';
 import HydraSpec from './adapters/chain/hydradx/spec';
 import KulupuSpec from './adapters/chain/kulupu/spec';
+import CloverSpec from './adapters/chain/clover/spec';
 
 export function selectSpec(chain: string): RegisteredTypes {
   if (chain.includes('edgeware')) {
@@ -11,7 +11,7 @@ export function selectSpec(chain: string): RegisteredTypes {
   } else if (chain === 'stafi') {
     return StafiSpec;
   } else if (chain === 'clover') {
-    return { types: CloverSpecTypes };
+    return CloverSpec;
   } else if (chain === 'hydradx') {
     return { types: HydraSpec };
   } else if (chain === 'kulupu') {

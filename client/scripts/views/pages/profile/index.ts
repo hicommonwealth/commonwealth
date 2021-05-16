@@ -30,21 +30,20 @@ const commentModelFromServer = (comment) => {
   try {
     const proposalSplit = decodeURIComponent(comment.root_id).split(/-|_/);
     if (proposalSplit[0] === 'discussion') {
-      proposal = new OffchainThread(
-        '',
-        '',
-        null,
-        Number(proposalSplit[1]),
-        comment.created_at,
-        null,
-        null,
-        null,
-        comment.community,
-        comment.chain,
-        null,
-        null,
-        null,
-      );
+      proposal = new OffchainThread({
+        author: '',
+        title: '',
+        attachments: null,
+        id: Number(proposalSplit[1]),
+        createdAt: comment.created_at,
+        topic: null,
+        kind: null,
+        stage: null,
+        community: comment.community,
+        chain: comment.chain,
+        versionHistory: null,
+        readOnly: null,
+      });
     } else {
       proposal = {
         chain: comment.chain,
@@ -56,49 +55,50 @@ const commentModelFromServer = (comment) => {
   } catch (e) {
     proposal = null;
   }
-  return new OffchainComment(
-    comment.chain,
-    comment?.Address?.address || comment.author,
-    decodeURIComponent(comment.text),
-    comment.plaintext,
-    comment.version_history,
+  return new OffchainComment({
+    chain: comment.chain,
+    author: comment?.Address?.address || comment.author,
+    text: decodeURIComponent(comment.text),
+    plaintext: comment.plaintext,
+    versionHistory: comment.version_history,
     attachments,
     proposal,
-    comment.id,
-    moment(comment.created_at),
-    comment.child_comments,
-    comment.root_id,
-    comment.parent_id,
-    comment.community,
-    comment?.Address?.chain || comment.authorChain,
-  );
+    id: comment.id,
+    createdAt: moment(comment.created_at),
+    childComments: comment.child_comments,
+    rootProposal: comment.root_id,
+    parentComment: comment.parent_id,
+    community: comment.community,
+    authorChain: comment?.Address?.chain || comment.authorChain,
+    lastEdited: null,
+  });
 };
 
 const threadModelFromServer = (thread) => {
   const attachments = thread.OffchainAttachments
     ? thread.OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
     : [];
-  return new OffchainThread(
-    thread.Address.address,
-    decodeURIComponent(thread.title),
+  return new OffchainThread({
+    author: thread.Address.address,
+    title: decodeURIComponent(thread.title),
     attachments,
-    thread.id,
-    moment(thread.created_at),
-    thread.topic,
-    thread.kind,
-    thread.stage,
-    thread.version_history,
-    thread.community,
-    thread.chain,
-    thread.read_only,
-    decodeURIComponent(thread.body),
-    thread.plaintext,
-    thread.url,
-    thread.Address.chain,
-    thread.pinned,
-    thread.collaborators,
-    thread.chain_entities,
-  );
+    id: thread.id,
+    createdAt: moment(thread.created_at),
+    topic: thread.topic,
+    kind: thread.kind,
+    stage: thread.stage,
+    versionHistory: thread.version_history,
+    community: thread.community,
+    chain: thread.chain,
+    readOnly: thread.read_only,
+    body: decodeURIComponent(thread.body),
+    plaintext: thread.plaintext,
+    url: thread.url,
+    authorChain: thread.Address.chain,
+    pinned: thread.pinned,
+    collaborators: thread.collaborators,
+    chainEntities: thread.chain_entities,
+  });
 };
 
 const getProfileStatus = (account) => {

@@ -13,6 +13,7 @@ import {
 } from 'construct-ui';
 
 import app from 'state';
+
 import { detectURL } from 'helpers/threads';
 import { OffchainTopic, OffchainThreadKind, OffchainThreadStage, CommunityInfo, NodeInfo } from 'models';
 
@@ -23,8 +24,10 @@ import QuillEditor from 'views/components/quill_editor';
 import TopicSelector from 'views/components/topic_selector';
 import EditProfileModal from 'views/modals/edit_profile_modal';
 
+import Token from 'controllers/chain/ethereum/token/adapter';
 import QuillFormattedText from './quill_formatted_text';
 import MarkdownFormattedText from './markdown_formatted_text';
+
 
 interface IThreadForm {
   topicName?: string;
@@ -143,7 +146,7 @@ const newThread = async (
       ? quillEditorState.editor.getText()
       : JSON.stringify(quillEditorState.editor.getContents());
 
-  const { topicName, topicId, threadTitle, linkTitle, url } = form;
+  let { topicName, topicId, threadTitle, linkTitle, url } = form;
   const title = threadTitle || linkTitle;
   const attachments = [];
   const chainId = app.activeCommunityId() ? null : app.activeChainId();
@@ -151,6 +154,8 @@ const newThread = async (
 
   let result;
   try {
+    // see if app.chain.network is existing in network lists and if app.chain.isToken
+
     result = await app.threads.create(
       author.address,
       kind,
@@ -158,7 +163,7 @@ const newThread = async (
       chainId,
       communityId,
       title,
-      topicName,
+      (topicName) ? topicName : 'General', // if no topic name set to default
       topicId,
       bodyText,
       url,
@@ -170,11 +175,14 @@ const newThread = async (
     quillEditorState.editor.enable();
     throw new Error(e);
   }
+
   const activeEntity = app.activeCommunityId() ? app.community : app.chain;
   updateLastVisited(app.activeCommunityId()
     ? (activeEntity.meta as CommunityInfo)
     : (activeEntity.meta as NodeInfo).chain, true);
+
   await app.user.notifications.refresh();
+
   m.route.set(`/${app.activeId()}/proposal/discussion/${result.id}`);
 
   if (result.topic) {

@@ -44,9 +44,7 @@ export default {
     'free': 'Balance',
     'reserved': 'Balance',
     'freeKton': 'Balance',
-    'reservedKton': 'Balance',
-    'miscFrozen': 'Balance',
-    'feeFrozen': 'Balance'
+    'reservedKton': 'Balance'
   },
   'RingBalance': 'Balance',
   'KtonBalance': 'Balance',

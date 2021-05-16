@@ -37,27 +37,24 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
   public async initServer(): Promise<boolean> {
     clearLocalStorage();
     console.log(`Starting ${this.meta.chain.name}`);
-    // parallel fetch for offchain data and chain entities
-    let unused, response;
+    let response;
     if (this.chainEntities) {
       // if we're loading entities from chain, only pull completed
       const refresh = this.usingServerChainEntities
         ? EntityRefreshOption.AllEntities
         : EntityRefreshOption.CompletedEntities;
 
-      [unused, unused, response] = await Promise.all([
-        this.chainEntities.refresh(this.meta.chain.id, refresh),
-        this.app.comments.refreshAll(
-          this.meta.chain.id,
-          null,
-          CommentRefreshOption.LoadProposalComments
-        ),
-        $.get(`${this.app.serverUrl()}/bulkOffchain`, {
-          chain: this.id,
-          community: null,
-          jwt: this.app.user.jwt,
-        })
-      ]);
+      await this.chainEntities.refresh(this.meta.chain.id, refresh);
+      await this.app.comments.refreshAll(
+        this.meta.chain.id,
+        null,
+        CommentRefreshOption.LoadProposalComments
+      );
+      response = await $.get(`${this.app.serverUrl()}/bulkOffchain`, {
+        chain: this.id,
+        community: null,
+        jwt: this.app.user.jwt,
+      });
     } else {
       response = await $.get(`${this.app.serverUrl()}/bulkOffchain`, {
         chain: this.id,
@@ -125,6 +122,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     if (modules.some((mod) => !mod.initializing && !mod.ready)) {
       await Promise.all(modules.map((mod) => mod.init(this.chain, this.accounts)));
     }
+    m.redraw();
   }
 
   public abstract base: ChainBase;

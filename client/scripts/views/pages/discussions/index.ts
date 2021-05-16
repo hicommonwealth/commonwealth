@@ -8,11 +8,10 @@ import moment from 'moment';
 import app from 'state';
 
 import { Spinner, Button, ButtonGroup, Icons, Icon, PopoverMenu, MenuItem } from 'construct-ui';
-import { pluralize, offchainThreadStageToLabel, externalLink } from 'helpers';
+import { pluralize, offchainThreadStageToLabel } from 'helpers';
 import { NodeInfo, CommunityInfo, OffchainThreadStage, OffchainThread } from 'models';
 
 import { updateLastVisited } from 'controllers/app/login';
-import { notifyError } from 'controllers/app/notifications';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import EmptyTopicPlaceholder, { EmptyStagePlaceholder } from 'views/components/empty_topic_placeholder';
@@ -25,6 +24,8 @@ import CreateInviteModal from 'views/modals/create_invite_modal';
 import { INITIAL_PAGE_SIZE } from 'controllers/server/threads';
 import PinnedListing from './pinned_listing';
 import DiscussionRow from './discussion_row';
+
+import Token from 'controllers/chain/ethereum/token/adapter';
 
 export const ALL_PROPOSALS_KEY = 'COMMONWEALTH_ALL_PROPOSALS';
 
@@ -148,7 +149,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
     const subpage = (topic || stage) ? `${topic || ''}#${stage || ''}` : ALL_PROPOSALS_KEY;
 
     // add chain compatibility (node info?)
-    if (!activeEntity?.serverLoaded) return m(PageLoading, {
+    if (app.community && !activeEntity?.serverLoaded) return m(PageLoading, {
       title: topic || 'Discussions',
       showNewProposalButton: true,
     });
@@ -409,11 +410,14 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
     });
     const otherTopicListItems = Object.keys(otherTopics)
       .sort((a, b) => otherTopics[a].name.localeCompare(otherTopics[b].name))
-      .map((name, idx) => getTopicRow(otherTopics[name].name, name, otherTopics[name].description, otherTopics[name].telegram));
+      .map((name, idx) => getTopicRow(
+        otherTopics[name].name, name, otherTopics[name].description, otherTopics[name].telegram
+      ));
     const featuredTopicListItems = Object.keys(featuredTopics)
       .sort((a, b) => Number(featuredTopics[a].featured_order) - Number(featuredTopics[b].featured_order))
       .map((name, idx) => getTopicRow(
-        featuredTopics[name].name, name, featuredTopics[name].description, featuredTopics[name].telegram));
+        featuredTopics[name].name, name, featuredTopics[name].description, featuredTopics[name].telegram
+      ));
 
     const isAdmin = app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
     const isMod = app.user.isRoleOfCommunity({
@@ -528,7 +532,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
             otherTopicListItems,
           ]),
           m(DiscussionStagesBar, { topic: topicName, stage }),
-          (!activeEntity || !activeEntity.serverLoaded || stillFetching)
+          (app.chain && (!activeEntity || !activeEntity.serverLoaded || stillFetching))
             ? m('.discussions-main', [
               m(LoadingRow),
             ])
