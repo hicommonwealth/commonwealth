@@ -23,7 +23,9 @@ import SelectAddressModal from 'views/modals/select_address_modal';
 import Token from 'controllers/chain/ethereum/token/adapter';
 import AddressSwapper from 'views/components/addresses/address_swapper';
 import { linkExistingAddressToChainOrCommunity, setActiveAccount } from 'controllers/app/login';
-import { CustomPencilIcon, CustomCommentIcon, CustomLogoutIcon, CustomBellIcon, CustomUserIcon, CustomEyeIcon, CustomWalletIcon } from '../../mobile/mobile_icons';
+import {
+  CustomPencilIcon, CustomCommentIcon, CustomLogoutIcon, CustomBellIcon, CustomUserIcon, CustomEyeIcon, CustomWalletIcon
+} from 'views/mobile/mobile_icons';
 
 export const CHAINBASE_SHORT = {
   [ChainBase.CosmosSDK]: 'Cosmos',
@@ -261,29 +263,32 @@ const LoginSelector: m.Component<{
     const joiningChain = joiningChainInfo?.id;
     const joiningCommunity = app.activeCommunityId();
 
-    const samebaseAddresses = app.user.addresses.reduce((arr: AddressInfo[], current: AddressInfo) => {
-      // add all addresses if joining a community
-      const joiningBase = joiningChainInfo?.base;
-      if (!joiningBase) return [...arr, current];
+    let samebaseAddresses: AddressInfo[];
 
-      // skip already existing items
-      if (arr.find((item) => {
-        if (joiningBase === ChainBase.Substrate) {
-          return AddressSwapper({
-            address: item.address, currentPrefix: 42
-          }) === AddressSwapper({
-            address: current.address, currentPrefix: 42
-          });
-        } else {
-          return item.address === current.address;
+    // add all addresses if joining a community
+    const joiningBase = joiningChainInfo?.base;
+    if (!joiningBase) {
+      samebaseAddresses = app.user.addresses;
+    } else {
+      samebaseAddresses = [];
+      for (const addressInfo of app.user.addresses) {
+        // add all items on same base as joining chain
+        const addressBase = app.config.chains.getById(addressInfo.chain)?.base;
+        if (addressBase === joiningBase) {
+          // ensure doesn't already exist
+          const addressExists = !!samebaseAddresses.find((prev) => joiningBase === ChainBase.Substrate
+            ? AddressSwapper({
+              address: prev.address, currentPrefix: 42
+            }) === AddressSwapper({
+              address: addressInfo.address, currentPrefix: 42
+            })
+            : prev.address === addressInfo.address);
+          if (!addressExists) {
+            samebaseAddresses.push(addressInfo);
+          }
         }
-      })) return arr;
-
-      // add all items on same base as joining chain if not already existing
-      const currentBase = app.config.chains.getById(current.chain)?.base;
-      if (currentBase === joiningBase) return [...arr, current];
-      else return arr;
-    }, []);
+      }
+    }
 
     return m(ButtonGroup, { class: 'LoginSelector' }, [
       (app.chain || app.community)

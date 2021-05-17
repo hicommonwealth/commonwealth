@@ -17,17 +17,15 @@ const getAddressStatus = async (models, req: Request, res: Response, next: NextF
     return next(new Error(Errors.NeedChain));
   }
 
-  // TODO: this will not work for token forums
-  const chainName = req.body.chain.startsWith('0x') ? 'ethereum' : req.body.chain;
   const chain = await models.Chain.findOne({
-    where: { id: chainName }
+    where: { id: req.body.chain }
   });
   if (!chain) {
     return next(new Error(Errors.InvalidChain));
   }
 
   const existingAddress = await models.Address.findOne({
-    where: { chain: chainName, address: req.body.address, verified: { [Op.ne]: null } }
+    where: { chain: req.body.chain, address: req.body.address, verified: { [Op.ne]: null } }
   });
 
   let result;

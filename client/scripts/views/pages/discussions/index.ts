@@ -25,8 +25,6 @@ import { INITIAL_PAGE_SIZE } from 'controllers/server/threads';
 import PinnedListing from './pinned_listing';
 import DiscussionRow from './discussion_row';
 
-import Token from 'controllers/chain/ethereum/token/adapter';
-
 export const ALL_PROPOSALS_KEY = 'COMMONWEALTH_ALL_PROPOSALS';
 
 const getLastUpdate = (proposal: OffchainThread): number => {

@@ -10,7 +10,7 @@ const log = factory.getLogger(formatFilename(__filename));
 export const sequelize = new Sequelize(DATABASE_URI, {
   // disable string operators (https://github.com/sequelize/sequelize/issues/8417)
   operatorsAliases: false,
-  logging: (process.env.NODE_ENV === 'test') ? false : (msg) => { log.info(msg); },
+  logging: (process.env.NODE_ENV === 'test') ? false : (msg) => { log.trace(msg); },
   dialectOptions: (process.env.NODE_ENV !== 'production') ? {
     // requestTimeout: 10000,
   } : {

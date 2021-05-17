@@ -13,7 +13,7 @@ const lookupAddressIsOwnedByUser = async (models, req: Request): Promise<[any, s
   }
 
   const author = await models.Address.findOne({ where: {
-    chain: req.body.isNewChain ? "ethereum" : req.body.author_chain,
+    chain: req.body.author_chain,
     address: req.body.address,
     user_id: req.user.id,
   } });
