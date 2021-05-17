@@ -16,9 +16,9 @@ const nodes = [
   // [ 'localhost:9944', 'kusama-local' ],
   [ 'wss://kusama-rpc.polkadot.io', 'kusama' ],
   [ 'wss://rpc.polkadot.io', 'polkadot' ],
-  // [ 'ws://127.0.0.1:7545', 'ethereum-local' ],
   // [ 'wss://mainnet.infura.io/ws', 'ethereum' ],
-  [ 'wss://kovan.infura.io/ws', 'ethereum' ],   // test
+  [ 'wss://kovan.infura.io/ws', 'ethereum-kovan' ],   // ethereum kovan
+  [ 'ws://127.0.0.1:7545', 'ethereum-local' ],  // ethereum local
   // [ '18.223.143.102:9944', 'edgeware-testnet' ],
   // [ '157.230.218.41:9944', 'edgeware-testnet' ],
   // [ '157.230.125.18:9944', 'edgeware-testnet' ],
@@ -281,16 +281,16 @@ const resetServer = (models): Promise<number> => {
         //   type: 'chain',
         //   base: 'ethereum',
         // }),
-        models.Chain.create({
-          id: 'ethereum-local',
-          network: 'ethereum',
-          symbol: 'ETH',
-          name: 'Ethereum (local)',
-          icon_url: '/static/img/protocols/eth.png',
-          active: true,
-          type: 'chain',
-          base: 'ethereum',
-        }),
+        // models.Chain.create({
+        //   id: 'ethereum-local',
+        //   network: 'ethereum',
+        //   symbol: 'ETH',
+        //   name: 'Ethereum (local)',
+        //   icon_url: '/static/img/protocols/eth.png',
+        //   active: true,
+        //   type: 'chain',
+        //   base: 'ethereum',
+        // }),
         models.Chain.create({
           id: 'ethereum',
           network: 'ethereum',
@@ -403,6 +403,28 @@ const resetServer = (models): Promise<number> => {
           icon_url: '/static/img/protocols/eth.png',
           active: true,
           type: 'token',
+          base: 'ethereum',
+        }),
+
+        // for CWP
+        models.Chain.create({
+          id: 'ethereum-kovan',
+          network: 'cmn-kovan',
+          symbol: 'ETH',
+          name: 'Common Protocol (kovan)',
+          icon_url: '/static/img/protocols/eth.png',
+          active: true,
+          type: 'chain',
+          base: 'ethereum',
+        }),
+        models.Chain.create({
+          id: 'ethereum-local',
+          network: 'cmn-local',
+          symbol: 'ETH',
+          name: 'Common Protocol (local)',
+          icon_url: '/static/img/protocols/eth.png',
+          active: true,
+          type: 'chain',
           base: 'ethereum',
         }),
       ]);
@@ -538,77 +560,6 @@ const resetServer = (models): Promise<number> => {
         }),
       ]);
 
-      // CWP: temporary CW projects
-      await Promise.all([
-        models.CWProject.create({
-          projectHash: '0x270e2e385b5df258b9abad728b1611e1f3bea1c8d18c9824b4d40d02a340a1a4',
-          name: 'Zak project',
-          description: 'Test project. On Production version, it will work with real chain data and contracts',
-          deadline: 24 * 60 * 60,
-          endTime: new Date((new Date()).getTime() + 24 * 60 * 60 * 1000),
-          beneficiary: '0x4C7804bf331183adad98Af5AfBdA5F27A3E84e8C',
-          threshold: 10,
-          curatorFee: 1,
-          ipfsHash: '0x3078303100000000000000000000000000000000000000000000000000000000',
-          cwUrl: '0x636f6d6d6f6e7765616c74682e696d0000000000000000000000000000000000',
-          status: 'In Progress',
-          creator: '0x4C7804bf331183adad98Af5AfBdA5F27A3E84e8C'
-        }),
-        models.CWProject.create({
-          projectHash: '0x9d21e0be7c4e4283f9d0f6b1e3231aa17c089a454f3f2f8d1c445f778086f7be',
-          name: 'Keith project',
-          description: 'This is a test project that works on offchain mode. On Production version, it will work with real chain data and contracts',
-          deadline: 5 * 60,
-          endTime: new Date(new Date().getTime() - 5 * 60),
-          beneficiary: '0x4C7804bf331183adad98Af5AfBdA5F27A3E84e8C',
-          threshold: 5,
-          curatorFee: 1,
-          ipfsHash: '0x3078303100000000000000000000000000000000000000000000000000000000',
-          cwUrl: '0x636f6d6d6f6e7765616c74682e696d0000000000000000000000000000000000',
-          status: 'Failed',
-          creator: '0x4C7804bf331183adad98Af5AfBdA5F27A3E84e8C'
-        }),
-        models.CWProject.create({
-          projectHash: '0x23172e385b5df258b9abad728b1611e1f3bea1c8d18c9824b4d40d02a340a1a4',
-          name: 'Zak project',
-          description: 'Test project. On Production version, it will work with real chain data and contracts',
-          deadline: 24 * 60 * 60,
-          endTime: new Date(new Date().getTime() - 25 * 60 * 60),
-          beneficiary: '0x4C7804bf331183adad98Af5AfBdA5F27A3E84e8C',
-          threshold: 10,
-          curatorFee: 1,
-          ipfsHash: '0x3078303100000000000000000000000000000000000000000000000000000000',
-          cwUrl: '0x636f6d6d6f6e7765616c74682e696d0000000000000000000000000000000000',
-          status: 'Successed',
-          totalFunding: 14,
-          creator: '0x4C7804bf331183adad98Af5AfBdA5F27A3E84e8C'
-        }),
-      ]);
-      // CWP: temporary CW users
-      await Promise.all([
-        models.CWUser.create({
-          address: '0x4C7804bf331183adad98Af5AfBdA5F27A3E84e8C',
-          role: 'backer',
-          projectHash: '0x23172e385b5df258b9abad728b1611e1f3bea1c8d18c9824b4d40d02a340a1a4',
-          amount: 6,
-          token: '0x01'
-        }),
-        models.CWUser.create({
-          address: '0x983782bf331183adad98Af5AfBdA5F27A3E84e8C',
-          role: 'backer',
-          projectHash: '0x23172e385b5df258b9abad728b1611e1f3bea1c8d18c9824b4d40d02a340a1a4',
-          amount: 8,
-          token: '0x01'
-        }),
-        models.CWUser.create({
-          address: '0x398710bf331183adad98Af5AfBdA5F27A3E84e8C',
-          role: 'curator',
-          projectHash: '0x23172e385b5df258b9abad728b1611e1f3bea1c8d18c9824b4d40d02a340a1a4',
-          amount: 8,
-          token: '0x01'
-        }),
-      ]);
-
       // CWP temporary offchain data
       const communities = await Promise.all([
         models.OffchainCommunity.create({
@@ -631,19 +582,6 @@ const resetServer = (models): Promise<number> => {
           creator_id: 1,
           description: 'All things Commonwealth',
           default_chain: 'edgeware',
-        }),
-        models.OffchainCommunity.create({
-          id: 'cw-protocol',
-          name: 'Commonwealth Protocol',
-          address: '0x4C7804bf331183adad98Af5AfBdA5F27A3E84e8C',
-          creator_id: 1,
-          description: 'Commonwealth Protocol helps powers crowdfunding for Commonwealth',
-          iconUrl:  'https://commonwealth-uploads.s3.us-east-2.amazonaws.com/b24443a7-c418-4515-b3eb-e0cb7239b46a.1618294677116',
-          github: 'https://github.com/hicommonwealth/',
-          telegram: 'https://t.me/HiCommonwealth',
-          discord: 'https://discord.gg/watSundeFK',
-          website: 'http://commonwealth.im/',
-          default_chain: 'ethereum',
         })
       ]);
 
