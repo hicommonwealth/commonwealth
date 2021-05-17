@@ -378,7 +378,7 @@ const emptySearchPreview : m.Component<{ searchTerm: string }, {}> = {
     const { searchTerm } = vnode.attrs;
     const message = app.activeId()
       ? `No results in ${app.activeId()}. Search Commonwealth?`
-      : 'No community results found.';
+      : 'No communities found';
     return m(ListItem, {
       class: 'no-results',
       label: [
@@ -427,11 +427,11 @@ export const SearchBar : m.Component<{}, {
     const chainOrCommIcon = app.activeId()
       ? app.activeChainId()
         ? m(ChainIcon, {
-          size: 15,
+          size: 18,
           chain: app.chain.meta.chain,
         })
         : m(CommunityIcon, {
-          size: 15,
+          size: 18,
           community: app.community.meta,
         })
       : null;
@@ -457,6 +457,7 @@ export const SearchBar : m.Component<{}, {
         contentRight: cancelInputIcon || chainOrCommIcon,
         defaultValue: m.route.param('q') || vnode.state.searchTerm,
         value: vnode.state.searchTerm,
+        autocomplete: 'off',
         oncreate: (e) => {
           initializeSearch();
         },

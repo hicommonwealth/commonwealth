@@ -51,7 +51,7 @@ export const CommunityIcon: m.Component<{ community: CommunityInfo, onclick?: Fu
           onclick
         }, [
           m('span', {
-            style: `font-size: ${size - 4}px;`
+            style: `font-size: ${size - 6}px;`
           }, community.name.slice(0, 1))
         ]),
     ]);

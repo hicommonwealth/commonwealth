@@ -107,7 +107,7 @@ const Sublayout: m.Component<{
           m('.sublayout-header', { class: !title ? 'no-title' : '' }, [
             m('.sublayout-header-inner', [
               sublayoutHeaderLeft,
-              m(SearchBar),
+              !vnode.attrs.loadingLayout && m(SearchBar),
               sublayoutHeaderRight,
             ]),
           ]),

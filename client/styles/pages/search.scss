@@ -19,6 +19,7 @@
     .search-results-wrapper {
         .search-results-caption {
             margin: 20px 0;
+            text-align: center;
             color: $text-color-light;
             .search-results-clear {
                 margin-left: 10px;
@@ -139,7 +140,7 @@
         border-radius: 25px;
         font-size: 14px;
         color: black;
-        border: 1px solid transparent;
+        border: 1px solid $border-color-lightest;
         svg.SearchIcon {
             z-index: 2;
             position: relative;
@@ -156,6 +157,10 @@
         .chain-icon, .community-icon {
             position: relative;
         }
+        .CommunityIcon {
+            position: absolute;
+            right: 0;
+        }
         &:focus-within {
             background: linear-gradient(to bottom, #91ACE1, #DDBFE1) !important;
         }
@@ -163,8 +168,10 @@
             background: linear-gradient(to bottom, #CDDEFE, #E7D8E9);
         }
         input {
-            height: 34px;
+            height: 31px;
+            padding: 20px 15px 15px;
             padding-right: 38px;
+            padding-left: 22px !important;
             position: relative;
             background: #EFEFEF;
             border: none;
