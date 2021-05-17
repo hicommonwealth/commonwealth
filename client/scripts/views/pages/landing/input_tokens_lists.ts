@@ -1,17 +1,10 @@
 import { Spinner } from 'construct-ui';
 import m from 'mithril';
 import InputTokenOptionComponent from './input_token_option';
-
-interface Chain {
-  img: string;
-  id: string;
-  name: string;
-  placeholder?: boolean;
-  chainInfo: string;
-}
+import { Chain, Token } from './tokens_community_hero';
 
 interface IAttrs {
-  optionList: Chain[];
+  optionList: (Token | Chain)[];
   hidden: boolean;
   maxOptions: number;
   inputValue: string;
@@ -21,24 +14,45 @@ interface IAttrs {
 const InputTokenList: m.Component<IAttrs, {}> = {
   view: (vnode) => {
     const { optionList, maxOptions, inputValue, hidden, stillLoadingTokens } = vnode.attrs;
+    const chainNameInputValue = inputValue.toLowerCase();
     console.log(optionList);
-    debugger
     const options = optionList
     // eslint-disable-next-line array-callback-return
       .map((option, index) => {
         if (index >= maxOptions) return;
-
-        const tokenNameSubstracted = option.id
-          .substr(0, inputValue.length)
-          .toLowerCase();
-        const tokenNameInputValue = inputValue.toLowerCase();
-
-        if (tokenNameSubstracted === tokenNameInputValue || option.placeholder) {
-          return m(InputTokenOptionComponent, {
-            id: option.id,
-            iconImg: option.img,
-            text: option.name,
-          });
+        if ((option as Token).logoURI) {
+          option = (option as Token);
+          const tokenNameSubtracted = option.name
+            .substr(0, inputValue.length)
+            .toLowerCase();
+          const tokenSymbolSubtracted = option.symbol
+            .substr(0, inputValue.length)
+            .toLowerCase();
+          if (tokenNameSubtracted === chainNameInputValue
+            || tokenSymbolSubtracted === chainNameInputValue) {
+            return m(InputTokenOptionComponent, {
+              id: `${option.chainId}`,
+              iconImg: option.logoURI,
+              text: option.name,
+            });
+          }
+        } else {
+          option = (option as Chain);
+          const chainNameSubstracted = option.id
+            .substr(0, inputValue.length)
+            .toLowerCase();
+          const chainSymbolSubtracted = option.chainInfo.symbol
+            .substr(0, inputValue.length)
+            .toLowerCase();
+          if (chainNameSubstracted === chainNameInputValue
+            || chainSymbolSubtracted === chainNameInputValue
+            || option.placeholder) {
+            return m(InputTokenOptionComponent, {
+              id: option.id,
+              iconImg: option.img,
+              text: option.name,
+            });
+          }
         }
       })
       .filter((option: any) => option);

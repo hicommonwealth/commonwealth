@@ -1,21 +1,31 @@
 import m from 'mithril';
 import app from 'state';
+import { ChainInfo } from 'client/scripts/models';
 import FindYourTokenInputComponent from './find_your_token_input';
 import InputTokensListComponent from './input_tokens_lists';
 
 import 'pages/landing/tokens_community_hero.scss';
 import { initializeSearch } from '../../components/search_bar';
 
-interface Chain {
+export interface Chain {
   img: string;
   id: string;
   name: string;
   placeholder?: boolean;
-  chainInfo: string;
+  chainInfo: ChainInfo;
+}
+
+export interface Token {
+  address: string;
+  chainId: number;
+  decimals: number;
+  logoURI: string;
+  name: string;
+  symbol: string;
 }
 
 interface IState {
-  chainsAndTokens: any[];
+  chainsAndTokens: (Chain | Token)[];
   hiddenInputTokenList: boolean;
   inputTokenValue: string;
 }
@@ -29,6 +39,7 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
     initializeSearch();
     vnode.state.hiddenInputTokenList = true;
     vnode.state.inputTokenValue = '';
+    vnode.state.chainsAndTokens = [];
   },
   view: (vnode) => {
     const stillLoadingTokens = !app.searchCache.allResults.loaded;
