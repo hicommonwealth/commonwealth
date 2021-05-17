@@ -24,6 +24,7 @@ export const Errors = {
   // ChainEntityNotFound: 'Cannot comment; chain entity not found',
   CantCommentOnReadOnly: 'Cannot comment when thread is read_only',
   InsufficientTokenBalance: 'Users need to hold some of the community\'s tokens to comment',
+  CouldNotFetchTokenBalance: 'Unable to fetch user\'s token balance',
 };
 
 const createComment = async (
@@ -47,8 +48,13 @@ const createComment = async (
       },
     });
     if (isAdmin.length === 0) {
-      const userHasBalance = await tokenBalanceCache.hasToken(chain.id, req.body.address);
-      if (!userHasBalance) return next(new Error(Errors.InsufficientTokenBalance));
+      try {
+        const userHasBalance = await tokenBalanceCache.hasToken(chain.id, req.body.address);
+        if (!userHasBalance) return next(new Error(Errors.InsufficientTokenBalance));
+      } catch (e) {
+        log.error(`hasToken failed: ${e.message}`);
+        return next(new Error(Errors.CouldNotFetchTokenBalance));
+      }
     }
   }
 
