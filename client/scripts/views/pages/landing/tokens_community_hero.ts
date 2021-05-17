@@ -32,7 +32,7 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
         {
           img: 'static/img/add.svg',
           id: 'placeholder',
-          chainInfo: '',
+          chainInfo: { symbol: 'PLACEHOLDER', },
           name: 'Add your token!.',
           placeholder: true,
         },

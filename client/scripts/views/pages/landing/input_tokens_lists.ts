@@ -17,10 +17,8 @@ const InputTokenList: m.Component<IAttrs, {}> = {
     const chainNameInputValue = inputValue.toLowerCase();
     console.log(optionList);
     const options = optionList
-    // eslint-disable-next-line array-callback-return
-      .map((option, index) => {
-        if (index >= maxOptions) return;
-        if ((option as Token).logoURI) {
+      .filter((option) => {
+        if ((option as Token).symbol) {
           option = (option as Token);
           const tokenNameSubtracted = option.name
             .substr(0, inputValue.length)
@@ -28,36 +26,43 @@ const InputTokenList: m.Component<IAttrs, {}> = {
           const tokenSymbolSubtracted = option.symbol
             .substr(0, inputValue.length)
             .toLowerCase();
-          if (tokenNameSubtracted === chainNameInputValue
-            || tokenSymbolSubtracted === chainNameInputValue) {
-            return m(InputTokenOptionComponent, {
-              id: `${option.chainId}`,
-              iconImg: option.logoURI,
-              text: option.name,
-            });
-          }
+          console.log({ tokenNameSubtracted, tokenSymbolSubtracted, chainNameInputValue });
+          return (tokenNameSubtracted === chainNameInputValue || tokenSymbolSubtracted === chainNameInputValue);
         } else {
           option = (option as Chain);
-          const chainNameSubstracted = option.id
+          const chainNameSubtracted = option.id
             .substr(0, inputValue.length)
             .toLowerCase();
+          if (!option.chainInfo?.symbol) console.log(option);
           const chainSymbolSubtracted = option.chainInfo.symbol
             .substr(0, inputValue.length)
             .toLowerCase();
-          if (chainNameSubstracted === chainNameInputValue
+          console.log({ chainNameSubtracted, chainSymbolSubtracted, chainNameInputValue });
+          return (chainNameSubtracted === chainNameInputValue
             || chainSymbolSubtracted === chainNameInputValue
-            || option.placeholder) {
-            return m(InputTokenOptionComponent, {
-              id: option.id,
-              iconImg: option.img,
-              text: option.name,
-            });
-          }
+            || option.placeholder);
+        }
+      })
+      .map((option) => {
+        if ((option as Token).symbol) {
+          option = (option as Token);
+          return m(InputTokenOptionComponent, {
+            id: `${option.chainId}`,
+            iconImg: option.logoURI,
+            text: option.name,
+          });
+        } else {
+          option = (option as Chain);
+          return m(InputTokenOptionComponent, {
+            id: option.id,
+            iconImg: option.img,
+            text: option.name,
+          });
         }
       })
       .filter((option: any) => option);
-
-    return m('InputTokenList.ul', {
+    console.log(options);
+    return m('ul.InputTokenList', {
       class: `${
         hidden ? 'hidden' : ''
       } absolute left-0 right-0 shadow-xl bg-white rounded top-full mt-16 text-xl p-3 z-10`,
