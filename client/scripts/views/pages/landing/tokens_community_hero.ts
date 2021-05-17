@@ -12,6 +12,7 @@ interface IState {
   chainsAndTokens: (Chain | Token)[];
   hiddenInputTokenList: boolean;
   inputTokenValue: string;
+  inputTimeout: any;
 }
 
 interface IAttrs {
@@ -104,9 +105,13 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
                   }, [
                     m(FindYourTokenInputComponent, {
                       onchangeValue: (event: any) => {
-                        vnode.state.inputTokenValue = event.target.value;
-                        vnode.state.hiddenInputTokenList = event.target.value === '';
-                      },
+                        if (event.target.value?.length < 3) return;
+                        clearTimeout(vnode.state.inputTimeout);
+                        vnode.state.inputTimeout = setTimeout(() => {
+                          vnode.state.inputTokenValue = event.target.value;
+                          vnode.state.hiddenInputTokenList = event.target.value === '';
+                        }, 500);
+                      }
                     }),
                     m(InputTokensListComponent, {
                       optionList: vnode.state.chainsAndTokens,

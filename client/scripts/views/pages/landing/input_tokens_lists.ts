@@ -14,10 +14,11 @@ interface IAttrs {
 const InputTokenList: m.Component<IAttrs, { options: any[], oldValue: string }> = {
   view: (vnode) => {
     const { optionList, maxOptions, inputValue, hidden, stillLoadingTokens } = vnode.attrs;
+    const { oldValue } = vnode.state;
     const chainNameInputValue = inputValue.toLowerCase();
     if (inputValue !== vnode.state.oldValue) {
       vnode.state.oldValue = inputValue;
-      vnode.state.options = optionList
+      vnode.state.options = (inputValue.includes(oldValue) ? vnode.state.options : optionList)
         .filter((option) => {
           if ((option as Token).symbol) {
             option = (option as Token);
@@ -43,31 +44,31 @@ const InputTokenList: m.Component<IAttrs, { options: any[], oldValue: string }> 
               || chainSymbolSubtracted === chainNameInputValue
               || option.placeholder);
           }
-        })
-        .map((option) => {
-          if ((option as Token).symbol) {
-            option = (option as Token);
-            return m(InputTokenOptionComponent, {
-              id: `${option.chainId}`,
-              iconImg: option.logoURI,
-              text: option.name,
-            });
-          } else {
-            option = (option as Chain);
-            return m(InputTokenOptionComponent, {
-              id: option.id,
-              iconImg: option.img,
-              text: option.name,
-            });
-          }
         });
     }
+    const renderResults = (option) => {
+      if ((option as Token).symbol) {
+        option = (option as Token);
+        return m(InputTokenOptionComponent, {
+          id: `${option.chainId}`,
+          iconImg: option.logoURI,
+          text: option.name,
+        });
+      } else {
+        option = (option as Chain);
+        return m(InputTokenOptionComponent, {
+          id: option.id,
+          iconImg: option.img,
+          text: option.name,
+        });
+      }
+    };
     return m('ul.InputTokenList', {
       class: `${
         hidden ? 'hidden' : ''
       } absolute left-0 right-0 shadow-xl bg-white rounded top-full mt-16 text-xl p-3 z-10`,
       id: 'tokens-list',
-    }, stillLoadingTokens ? [ m(Spinner, { active: true }) ] : vnode.state.options);
+    }, stillLoadingTokens ? [ m(Spinner, { active: true }) ] : vnode.state.options.map(renderResults));
   },
 };
 
