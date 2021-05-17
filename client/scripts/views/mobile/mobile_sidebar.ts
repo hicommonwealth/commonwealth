@@ -43,9 +43,10 @@ const MobileAccountMenu: m.Component<{}, {}> = {
             activeAddressesWithRole,
             nAccountsWithoutRole,
             isPrivateCommunity,
+            mobile: true
           }),
           app.activeId() && m(MenuDivider),
-          m(LoginSelectorMenuRight)
+          m(LoginSelectorMenuRight, { mobile: true })
         ]
         : m(MenuItem, {
           label: 'Login',

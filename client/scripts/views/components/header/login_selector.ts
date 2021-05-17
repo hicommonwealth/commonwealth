@@ -108,9 +108,10 @@ export const LoginSelectorMenuLeft: m.Component<{
   activeAddressesWithRole: any,
   nAccountsWithoutRole: number,
   isPrivateCommunity: boolean,
+  mobile?: boolean,
 }> = {
   view: (vnode) => {
-    const { activeAddressesWithRole, nAccountsWithoutRole, isPrivateCommunity } = vnode.attrs;
+    const { activeAddressesWithRole, nAccountsWithoutRole, isPrivateCommunity, mobile } = vnode.attrs;
     return m(Menu, { class: 'LoginSelectorMenu' }, [
       // address list
       (app.chain || app.community) && [
@@ -145,7 +146,7 @@ export const LoginSelectorMenuLeft: m.Component<{
               m.route.set(`/${app.activeId()}/account/${pf.address}?base=${pf.chain || a.chain.id}`);
             }
           },
-          label: m('.label-wrap', [ m(CustomEyeIcon), m('span', 'View profile') ]),
+          label: m('.label-wrap', [ mobile && m(CustomEyeIcon), m('span', 'View profile') ]),
         }),
         activeAddressesWithRole.length > 0 && app.activeId() && m(MenuItem, {
           onclick: (e) => {
@@ -158,14 +159,14 @@ export const LoginSelectorMenuLeft: m.Component<{
               },
             });
           },
-          label: m('.label-wrap', [ m(CustomPencilIcon), m('span', 'Edit profile') ]),
+          label: m('.label-wrap', [ mobile && m(CustomPencilIcon), m('span', 'Edit profile') ]),
         }),
         !isPrivateCommunity && m(MenuItem, {
           onclick: () => app.modals.create({
             modal: SelectAddressModal,
           }),
           label: m('.label-wrap', [
-            m(CustomWalletIcon),
+            mobile && m(CustomWalletIcon),
             m('span', nAccountsWithoutRole > 0
               ? `${pluralize(nAccountsWithoutRole, 'other address')}...`
               : activeAddressesWithRole.length > 0
@@ -178,25 +179,26 @@ export const LoginSelectorMenuLeft: m.Component<{
   }
 };
 
-export const LoginSelectorMenuRight: m.Component<{}, {}> = {
+export const LoginSelectorMenuRight: m.Component<{ mobile?: boolean }, {}> = {
   view: (vnode) => {
+    const { mobile } = vnode.attrs;
     return m(Menu, { class: 'LoginSelectorMenu' }, [
       m(MenuItem, {
         onclick: () => (app.activeChainId() || app.activeCommunityId())
           ? m.route.set(`/${app.activeChainId() || app.activeCommunityId()}/notifications`)
           : m.route.set('/notifications'),
-        label: m('.label-wrap', [ m(CustomBellIcon), m('span', 'Notification settings') ]),
+        label: m('.label-wrap', [ mobile && m(CustomBellIcon), m('span', 'Notification settings') ]),
       }),
       m(MenuItem, {
         onclick: () => app.activeChainId()
           ? m.route.set(`/${app.activeChainId()}/settings`)
           : m.route.set('/settings'),
-        label: m('.label-wrap', [ m(CustomUserIcon), m('span', 'Account settings') ]),
+        label: m('.label-wrap', [ mobile && m(CustomUserIcon), m('span', 'Account settings') ]),
       }),
       m(MenuDivider),
       m(MenuItem, {
         onclick: () => app.modals.create({ modal: FeedbackModal }),
-        label: m('.label-wrap', [ m(CustomCommentIcon), m('span', 'Send feedback') ]),
+        label: m('.label-wrap', [ mobile && m(CustomCommentIcon), m('span', 'Send feedback') ]),
       }),
       m(MenuItem, {
         onclick: () => {
@@ -210,7 +212,7 @@ export const LoginSelectorMenuRight: m.Component<{}, {}> = {
           });
           mixpanel.reset();
         },
-        label: m('.label-wrap', [ m(CustomLogoutIcon), m('span', 'Logout') ]),
+        label: m('.label-wrap', [ mobile && m(CustomLogoutIcon), m('span', 'Logout') ]),
       }),
     ]);
   }
