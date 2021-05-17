@@ -10,7 +10,7 @@ const TokensCreatorComponent: m.Component<{ creators: ICardListItem[] }, {}> = {
   view: (vnode) => {
     const { creators } = vnode.attrs;
 
-    return m('section', { class: 'container mx-auto pt-10' }, [
+    return m('section.TokensCreatorComponent', { class: 'container mx-auto pt-10' }, [
       m(
         'h2',
         { class: 'text-3xl font-bold mb-5 text-center' },

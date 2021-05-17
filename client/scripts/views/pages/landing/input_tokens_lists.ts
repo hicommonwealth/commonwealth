@@ -1,3 +1,4 @@
+import { Spinner } from 'construct-ui';
 import m from 'mithril';
 import InputTokenOptionComponent from './input_token_option';
 
@@ -14,19 +15,23 @@ interface IAttrs {
   hidden: boolean;
   maxOptions: number;
   inputValue: string;
+  stillLoadingTokens: boolean;
 }
 
 const InputTokenList: m.Component<IAttrs, {}> = {
   view: (vnode) => {
-    const options = vnode.attrs.optionList
+    const { optionList, maxOptions, inputValue, hidden, stillLoadingTokens } = vnode.attrs;
+    console.log(optionList);
+    debugger
+    const options = optionList
     // eslint-disable-next-line array-callback-return
       .map((option, index) => {
-        if (index >= vnode.attrs.maxOptions) return;
+        if (index >= maxOptions) return;
 
         const tokenNameSubstracted = option.id
-          .substr(0, vnode.attrs.inputValue.length)
+          .substr(0, inputValue.length)
           .toLowerCase();
-        const tokenNameInputValue = vnode.attrs.inputValue.toLowerCase();
+        const tokenNameInputValue = inputValue.toLowerCase();
 
         if (tokenNameSubstracted === tokenNameInputValue || option.placeholder) {
           return m(InputTokenOptionComponent, {
@@ -38,16 +43,12 @@ const InputTokenList: m.Component<IAttrs, {}> = {
       })
       .filter((option: any) => option);
 
-    return m(
-      'ul',
-      {
-        class: `${
-          vnode.attrs.hidden ? 'hidden' : ''
-        } absolute left-0 right-0 shadow-xl bg-white rounded top-full mt-16 text-xl p-3 z-10`,
-        id: 'tokens-list',
-      },
-      options
-    );
+    return m('InputTokenList.ul', {
+      class: `${
+        hidden ? 'hidden' : ''
+      } absolute left-0 right-0 shadow-xl bg-white rounded top-full mt-16 text-xl p-3 z-10`,
+      id: 'tokens-list',
+    }, stillLoadingTokens ? [ m(Spinner, { active: true }) ] : options);
   },
 };
 

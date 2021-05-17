@@ -11,7 +11,7 @@ const FooterLandingPage: m.Component<IState, IState> = {
       m.route.set(route);
     };
 
-    return m('footer', { class: 'bg-footer bg-cover py-10' },
+    return m('footer.FooterLandingPage', { class: 'bg-footer bg-cover py-10' },
       m('div', { class: 'mt-8 container mx-auto md:flex md:flex-row md:justify-between md:items-start' }, [
         m('div', [
           m('img', {
