@@ -52,7 +52,10 @@ export default class CommonwealthProtocol {
   public async retrieveProjects() {
     let projects: CWProject[] =  [];
     const allProjectLenght = new BN((await this._api.Contract.allProjectsLength()).toString(), 10);
-    console.log('====>allProjectLenght', allProjectLenght);
+    if (allProjectLenght.gt(new BN(0))) {
+      // const ps: CWProject[] = this._api.Contract.allProjects();
+    }
+
     return projects;
   }
 
@@ -61,13 +64,9 @@ export default class CommonwealthProtocol {
   }
 
   public async updateState() {
-    // const projects: CWProject[] =  await this.retrieveProjects();
-    // const prevProtocol = await this.get('root');
-    // this.store.remove(prevProtocol as CWProtocol);
-    // this.store.add({
-    //   projects,
-    //   ...prevProtocol
-    // } as CWProtocol);
+    const projects: CWProject[] =  await this.retrieveProjects();
+    const protocolStore = this.store.getById('root');
+    await protocolStore.setProjects(projects);
   }
 
   public async createProject(
@@ -172,17 +171,6 @@ export default class CommonwealthProtocol {
   }
 
   public async getCollatoralAmount(isBToken, address, projectHash) {
-    // const res = await $.get(`${app.serverUrl()}/cw/get-collatora-amount`, {
-    //   address,
-    //   isBToken,
-    //   projectHash,
-    //   auth: true,
-    //   jwt: app.user.jwt
-    // });
-    // console.log('====>res', res);
-    // if (res['status'] === 'Success') {
-    //   await this.updateState();
-    // }
   }
 }
  
