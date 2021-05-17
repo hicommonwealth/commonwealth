@@ -2,6 +2,7 @@
 
 import * as Sequelize from 'sequelize';
 import crypto from 'crypto';
+import Web3 from 'web3';
 
 import Keyring, { decodeAddress } from '@polkadot/keyring';
 import { stringToU8a, hexToU8a } from '@polkadot/util';
@@ -148,7 +149,9 @@ export default (
     const verification_token = crypto.randomBytes(18).toString('hex');
     const verification_token_expires = new Date(+(new Date()) + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000);
     const last_active = new Date();
-    return Address.create({ user_id, chain, address, verification_token, verification_token_expires, keytype, last_active });
+    return Address.create({
+      user_id, chain, address, verification_token, verification_token_expires, keytype, last_active,
+    });
   };
 
   // Update an existing address' verification token
@@ -258,7 +261,13 @@ export default (
       } else {
         isValid = false;
       }
-    } else if (chain.base === 'ethereum') {
+    } else if (chain.network === 'ethereum'
+      || chain.network === 'moloch'
+      || chain.network === 'alex'
+      || chain.network === 'metacartel'
+      || chain.network === 'commonwealth'
+      || chain.type === "token"
+    ) {
       //
       // ethereum address handling
       //
@@ -274,8 +283,13 @@ export default (
         ethSignatureParams.s
       );
       const addressBuffer = ethUtil.publicToAddress(publicKey);
-      const address = ethUtil.bufferToHex(addressBuffer);
-      isValid = (addressModel.address.toLowerCase() === address.toLowerCase());
+      const lowercaseAddress = ethUtil.bufferToHex(addressBuffer);
+      try {
+        const address = Web3.utils.toChecksumAddress(lowercaseAddress);
+        isValid = (addressModel.address === address);
+      } catch (e) {
+        isValid = false;
+      }
     } else if (chain.base === 'near') {
       // both in base64 encoding
       const { signature: sigObj, publicKey } = JSON.parse(signatureString);

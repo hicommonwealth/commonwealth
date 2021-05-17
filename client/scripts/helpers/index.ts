@@ -3,7 +3,7 @@ import { ICardListItem } from 'models/interfaces';
 import moment from 'moment';
 
 import app from 'state';
-import { OffchainThreadStage } from 'models/types';
+import { OffchainThreadStage, OffchainVoteOptions } from 'models';
 
 export async function sleep(msec) {
   return new Promise((resolve) => setTimeout(resolve, msec));
@@ -42,6 +42,18 @@ export function offchainThreadStageToIndex(stage: OffchainThreadStage) {
     return 6;
   } else {
     return 7;
+  }
+}
+
+export function offchainVoteToLabel(option) {
+  switch (option) {
+    case OffchainVoteOptions.SUPPORT_2: return '#a2d16d';
+    case OffchainVoteOptions.SUPPORT: return '#c4dbac';
+    case OffchainVoteOptions.NEUTRAL_SUPPORT: return '#d6ddef';
+    case OffchainVoteOptions.NEUTRAL_OPPOSE: return '#d3d6dc';
+    case OffchainVoteOptions.OPPOSE: return '#ecc9a0';
+    case OffchainVoteOptions.OPPOSE_2: return '#fb9191';
+    default: // invalid
   }
 }
 

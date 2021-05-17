@@ -34,6 +34,7 @@ import createCommunity from './routes/createCommunity';
 import deleteCommunity from './routes/deleteCommunity';
 import updateCommunity from './routes/updateCommunity';
 import communityStats from './routes/communityStats';
+import getCommunitiesAndChains from './routes/getCommunitiesAndChains';
 import viewCount from './routes/viewCount';
 import updateEmail from './routes/updateEmail';
 
@@ -69,10 +70,13 @@ import setDefaultRole from './routes/setDefaultRole';
 import getUploadSignature from './routes/getUploadSignature';
 import createThread from './routes/createThread';
 import editThread from './routes/editThread';
+import updateThreadPolling from './routes/updateThreadPolling';
 import updateThreadStage from './routes/updateThreadStage';
 import updateThreadPrivacy from './routes/updateThreadPrivacy';
 import updateThreadPinned from './routes/updateThreadPinned';
 import updateThreadLinkedChainEntities from './routes/updateThreadLinkedChainEntities';
+import updateOffchainVote from './routes/updateOffchainVote';
+import viewOffchainVotes from './routes/viewOffchainVotes';
 import fetchEntityTitle from './routes/fetchEntityTitle';
 import updateChainEntityTitle from './routes/updateChainEntityTitle';
 import deleteThread from './routes/deleteThread';
@@ -154,6 +158,7 @@ function setupRouter(
 
   // offchain communities
   router.post('/starCommunity', passport.authenticate('jwt', { session: false }), starCommunity.bind(this, models));
+  router.get('/getCommunitiesAndChains', getCommunitiesAndChains.bind(this, models));
 
   // offchain community admin routes
   // TODO: Change to POST /community
@@ -175,6 +180,12 @@ function setupRouter(
   );
   // TODO: Change to PUT /thread
   router.put('/editThread', passport.authenticate('jwt', { session: false }), editThread.bind(this, models));
+
+  router.post(
+    '/updateThreadPolling',
+    passport.authenticate('jwt', { session: false }),
+    updateThreadPolling.bind(this, models),
+  );
   router.post(
     '/updateThreadStage',
     passport.authenticate('jwt', { session: false }),
@@ -195,6 +206,10 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     updateThreadLinkedChainEntities.bind(this, models),
   );
+
+  router.post('/updateOffchainVote', passport.authenticate('jwt', { session: false }), updateOffchainVote.bind(this, models));
+  router.get('/viewOffchainVotes', viewOffchainVotes.bind(this, models));
+
   router.get('/fetchEntityTitle', fetchEntityTitle.bind(this, models));
   router.post(
     '/updateChainEntityTitle',
