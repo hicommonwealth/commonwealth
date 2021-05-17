@@ -6,23 +6,7 @@ import InputTokensListComponent from './input_tokens_lists';
 
 import 'pages/landing/tokens_community_hero.scss';
 import { initializeSearch } from '../../components/search_bar';
-
-export interface Chain {
-  img: string;
-  id: string;
-  name: string;
-  placeholder?: boolean;
-  chainInfo: ChainInfo;
-}
-
-export interface Token {
-  address: string;
-  chainId: number;
-  decimals: number;
-  logoURI: string;
-  name: string;
-  symbol: string;
-}
+import { Chain, Token } from './index';
 
 interface IState {
   chainsAndTokens: (Chain | Token)[];

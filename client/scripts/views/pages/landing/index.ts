@@ -5,6 +5,7 @@ import Glide from '@glidejs/glide';
 
 import app, { LoginState } from 'state';
 
+import { ChainInfo } from 'client/scripts/models';
 import Sublayout from 'views/sublayout';
 import HeaderLandingPage from './landing_page_header';
 import FooterLandingPage from './landing_page_footer';
@@ -20,12 +21,21 @@ import 'pages/landing/index.scss';
 
 import CommunityCards from './community_cards';
 
-interface Chain {
+export interface Chain {
   img: string;
   id: string;
   name: string;
   placeholder?: boolean;
-  chainInfo: string;
+  chainInfo: ChainInfo;
+}
+
+export interface Token {
+  address: string;
+  chainId: number;
+  decimals: number;
+  logoURI: string;
+  name: string;
+  symbol: string;
 }
 
 interface IState {

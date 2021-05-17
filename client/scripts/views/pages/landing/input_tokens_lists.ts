@@ -1,7 +1,7 @@
 import { Spinner } from 'construct-ui';
 import m from 'mithril';
 import InputTokenOptionComponent from './input_token_option';
-import { Chain, Token } from './tokens_community_hero';
+import { Chain, Token } from './index';
 
 interface IAttrs {
   optionList: (Token | Chain)[];

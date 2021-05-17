@@ -1,13 +1,6 @@
 import m from 'mithril';
 import 'pages/landing/chains_slider.scss';
-
-interface Chain {
-  img: string;
-  id: string;
-  name: string;
-  placeholder?: boolean;
-  chainInfo: string;
-}
+import { Chain } from './index';
 
 interface IState {
   chains: Chain[];
