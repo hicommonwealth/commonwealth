@@ -5,19 +5,19 @@ import { Chain, Token } from './index';
 
 interface IAttrs {
   optionList: (Token | Chain)[];
-  hidden: boolean;
   maxOptions: number;
   inputValue: string;
   stillLoadingTokens: boolean;
+  refilterResults: boolean;
 }
 
 const InputTokenList: m.Component<IAttrs, { options: any[], oldValue: string }> = {
   view: (vnode) => {
-    const { optionList, maxOptions, inputValue, hidden, stillLoadingTokens } = vnode.attrs;
+    const { optionList, refilterResults, inputValue, stillLoadingTokens } = vnode.attrs;
     if (inputValue.length < 3) return;
     const { oldValue } = vnode.state;
     const chainNameInputValue = inputValue.toLowerCase();
-    if (inputValue !== vnode.state.oldValue) {
+    if (refilterResults && inputValue !== vnode.state.oldValue) {
       vnode.state.oldValue = inputValue;
       vnode.state.options = ((inputValue.includes(oldValue) && !!oldValue) ? vnode.state.options : optionList)
         .filter((option) => {
@@ -62,15 +62,14 @@ const InputTokenList: m.Component<IAttrs, { options: any[], oldValue: string }> 
         });
       }
     };
+    if (!vnode.state.options) return;
     return m('ul.InputTokenList', {
-      class: `${
-        hidden ? 'hidden' : ''
-      } absolute left-0 right-0 shadow-xl bg-white rounded top-full mt-16 text-xl p-3 z-10`,
+      class: 'absolute left-0 right-0 shadow-xl bg-white rounded top-full mt-16 text-xl p-3 z-10',
       id: 'tokens-list',
       style: 'overflow-y: scroll; max-height: 16rem;'
     }, stillLoadingTokens
       ? [ m(Spinner, { active: true }) ]
-      : vnode.state.options.slice(0, 20).map(renderResults));
+      : vnode.state.options.slice(0, vnode.attrs.maxOptions).map(renderResults));
   },
 };
 

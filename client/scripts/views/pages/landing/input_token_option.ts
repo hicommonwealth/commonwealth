@@ -35,6 +35,7 @@ const InputTokenOptionComponent: m.Component<IAttrs, {}> = {
       m(
         'button',
         {
+          type: 'button',
           onclick: (e) => {
             if (vnode.attrs.route === 'placeholder') {
               e.preventDefault();

@@ -14,6 +14,7 @@ interface IState {
   hiddenInputTokenList: boolean;
   inputTokenValue: string;
   inputTimeout: any;
+  refilterResults: boolean;
 }
 
 interface IAttrs {
@@ -21,6 +22,7 @@ interface IAttrs {
 }
 
 const initiateFullSearch = (searchTerm) => {
+  console.log({searchTerm});
   if (!searchTerm || !searchTerm.toString().trim() || !searchTerm.match(/[A-Za-z]+/)) {
     return;
   }
@@ -30,6 +32,7 @@ const initiateFullSearch = (searchTerm) => {
   if (app.searchCache[searchTerm]?.loaded) {
     app.searchCache[searchTerm].loaded = false;
   }
+  debugger
   const params = `q=${encodeURIComponent(searchTerm.toString().trim())}`;
   m.route.set(`/search?${params}`);
 };
@@ -39,6 +42,7 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
     initializeSearch();
     vnode.state.hiddenInputTokenList = true;
     vnode.state.inputTokenValue = '';
+    vnode.state.refilterResults = true;
     vnode.state.chainsAndTokens = [];
   },
   view: (vnode) => {
@@ -120,16 +124,17 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
                   }, [
                     m(FindYourTokenInputComponent, {
                       onchangeValue: (event: any) => {
+                        vnode.state.inputTokenValue = event.target.value;
+                        vnode.state.refilterResults = false;
                         clearTimeout(vnode.state.inputTimeout);
                         vnode.state.inputTimeout = setTimeout(() => {
-                          vnode.state.inputTokenValue = event.target.value;
-                          vnode.state.hiddenInputTokenList = event.target.value === '';
+                          vnode.state.refilterResults = true;
                           m.redraw();
-                        }, 500);
+                        }, 200);
                       },
                       onkeyupValue: (event: any) => {
                         if (event.key === 'Enter') {
-                          initiateFullSearch(vnode.state.inputTokenValue);
+                          initiateFullSearch(event.target.value);
                         }
                       }
                     }),
@@ -137,14 +142,14 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
                     && vnode.state.inputTokenValue.length > 2
                     && m(InputTokensListComponent, {
                       optionList: vnode.state.chainsAndTokens,
-                      hidden: vnode.state.hiddenInputTokenList,
                       inputValue: vnode.state.inputTokenValue,
                       maxOptions: 20,
-                      stillLoadingTokens
+                      stillLoadingTokens,
+                      refilterResults: vnode.state.refilterResults,
                     }),
                     m('button', {
                       class: 'btn-primary text-xl font-medium rounded-lg pb-2 pt-3 px-3 w-36',
-                      onclick: () => initiateFullSearch(vnode.state.inputTokenValue)
+                      onclick: () => { initiateFullSearch(vnode.state.inputTokenValue); }
                     }, [
                       " Let's Go ",
                       m('img', {
