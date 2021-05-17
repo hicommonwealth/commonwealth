@@ -29,6 +29,7 @@ const Sublayout: m.Component<{
   showNewProposalButton?: boolean,
   showCouncilMenu?: boolean,
   hideSidebar?: boolean,
+  hideSearch?: boolean,
   centerGrid?: boolean,
   alwaysShowTitle?: boolean,          // show page title even if app.chain and app.community are unavailable
 }> = {
@@ -40,6 +41,7 @@ const Sublayout: m.Component<{
       showNewProposalButton,
       showCouncilMenu,
       hideSidebar,
+      hideSearch,
       alwaysShowTitle,
     } = vnode.attrs;
 
@@ -107,7 +109,7 @@ const Sublayout: m.Component<{
           m('.sublayout-header', { class: !title ? 'no-title' : '' }, [
             m('.sublayout-header-inner', [
               sublayoutHeaderLeft,
-              !vnode.attrs.loadingLayout && m(SearchBar),
+              !vnode.attrs.loadingLayout && !hideSearch && m(SearchBar),
               sublayoutHeaderRight,
             ]),
           ]),
