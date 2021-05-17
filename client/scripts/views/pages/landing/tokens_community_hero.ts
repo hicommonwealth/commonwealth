@@ -105,7 +105,6 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
                   }, [
                     m(FindYourTokenInputComponent, {
                       onchangeValue: (event: any) => {
-                        if (event.target.value?.length < 3) return;
                         clearTimeout(vnode.state.inputTimeout);
                         vnode.state.inputTimeout = setTimeout(() => {
                           vnode.state.inputTokenValue = event.target.value;
@@ -113,7 +112,9 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
                         }, 500);
                       }
                     }),
-                    m(InputTokensListComponent, {
+                    vnode.state.inputTokenValue
+                    && vnode.state.inputTokenValue.length > 2
+                    && m(InputTokensListComponent, {
                       optionList: vnode.state.chainsAndTokens,
                       hidden: vnode.state.hiddenInputTokenList,
                       inputValue: vnode.state.inputTokenValue,
