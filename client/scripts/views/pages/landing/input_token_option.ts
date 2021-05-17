@@ -15,7 +15,7 @@ const InputTokenOptionComponent: m.Component<IAttrs, {}> = {
     if (!iconImg || !iconImg.length || iconImg.slice(0, 4) === 'ipfs') {
       tokenImage = m('.TokenIcon', [
         m('.token-icon.no-image', {
-          style: 'width: 1.5rem; height: 1.5rem;',
+          style: 'width: 1.5rem; height: 1.5rem; margin-right: 1rem;',
           onclick
         }, [
           m('span', {
