@@ -33,7 +33,6 @@ export interface TokenForumMeta {
   name: string;
   symbol: string;
   balanceThreshold?: BN;
-  api?: Erc20;
 }
 
 export default class TokenBalanceCache extends JobRunner<CacheT> {
@@ -49,10 +48,6 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
   }
 
   private async _connectTokens(models, network = 'mainnet'): Promise<TokenForumMeta[]> {
-    // initialize web3 (we all URL fields should be the same -- infura)
-    const web3Provider = new Web3.providers.HttpProvider(`https://${network}.infura.io/v3/${INFURA_API_KEY}`);
-    const provider = new providers.Web3Provider(web3Provider);
-
     // initialize metadata from database
     const dbTokens = await models['Chain'].findAll({
       where: { type: 'token' },
@@ -62,15 +57,14 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     // TODO: support customized balance thresholds
     // TODO: support ChainId
     const tokens: TokenForumMeta[] = dbTokens
-    .filter(({ ChainNodes }) => ChainNodes && ChainNodes[0]?.address)
-    .map((chain): TokenForumMeta => ({
-      id: chain.id,
-      address: chain.ChainNodes[0].address,
-      name: chain.name,
-      symbol: chain.symbol,
-      iconUrl: chain.icon_url,
-      api: Erc20Factory.connect(chain.ChainNodes[0].address, provider),
-    }));
+      .filter(({ ChainNodes }) => ChainNodes && ChainNodes[0]?.address)
+      .map((chain): TokenForumMeta => ({
+        id: chain.id,
+        address: chain.ChainNodes[0].address,
+        name: chain.name,
+        symbol: chain.symbol,
+        iconUrl: chain.icon_url,
+      }));
 
     try {
       const tokensFromListsResponses = await this._listCache.getTokens();
@@ -82,7 +76,6 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
             name: o.name,
             symbol: o.symbol,
             iconUrl: o.logoURI,
-            api: Erc20Factory.connect(o.address, provider)
           };
         });
 
@@ -133,12 +126,12 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
   }
 
   // query a user's balance on a given token contract and save in cache
-  public async hasToken(contractId: string, address: string): Promise<boolean> {
+  public async hasToken(contractId: string, address: string, network = 'mainnet'): Promise<boolean> {
     if (process.env.NODE_ENV === 'development' && contractId === TEST_CONTRACT_ID) {
       return true;
     }
     const tokenMeta = this._contracts.find(({ id }) => id === contractId);
-    if (!tokenMeta || !tokenMeta.api) throw new Error('unsupported token');
+    if (!tokenMeta) throw new Error('unsupported token');
     const threshold = tokenMeta.balanceThreshold || new BN(1);
 
     // first check the cache for the token balance
@@ -150,7 +143,11 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     // fetch balance if not found in cache
     let balance: BN;
     try {
-      const balanceBigNum = await tokenMeta.api.balanceOf(address);
+      // init API against infura
+      const web3Provider = new Web3.providers.HttpProvider(`https://${network}.infura.io/v3/${INFURA_API_KEY}`);
+      const provider = new providers.Web3Provider(web3Provider);
+      const api = Erc20Factory.connect(tokenMeta.address, provider);
+      const balanceBigNum = await api.balanceOf(address);
       balance = new BN(balanceBigNum.toString());
     } catch (e) {
       throw new Error(`Could not fetch token balance: ${e.message}`);
