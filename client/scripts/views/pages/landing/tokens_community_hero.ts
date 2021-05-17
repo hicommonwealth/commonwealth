@@ -53,7 +53,7 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
           img: 'static/img/add.svg',
           id: 'placeholder',
           chainInfo: { symbol: 'PLACEHOLDER', },
-          name: 'Add your token!.',
+          name: 'Add your token!',
           placeholder: true,
         },
         ...vnode.attrs.chains,
