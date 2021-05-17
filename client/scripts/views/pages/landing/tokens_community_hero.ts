@@ -109,6 +109,7 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
                         vnode.state.inputTimeout = setTimeout(() => {
                           vnode.state.inputTokenValue = event.target.value;
                           vnode.state.hiddenInputTokenList = event.target.value === '';
+                          m.redraw();
                         }, 500);
                       }
                     }),

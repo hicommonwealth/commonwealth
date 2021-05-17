@@ -19,7 +19,7 @@ const InputTokenList: m.Component<IAttrs, { options: any[], oldValue: string }> 
     const chainNameInputValue = inputValue.toLowerCase();
     if (inputValue !== vnode.state.oldValue) {
       vnode.state.oldValue = inputValue;
-      vnode.state.options = (inputValue.includes(oldValue) && !!oldValue) ? vnode.state.options : optionList
+      vnode.state.options = ((inputValue.includes(oldValue) && !!oldValue) ? vnode.state.options : optionList)
         .filter((option) => {
           if ((option as Token).symbol) {
             option = (option as Token);
@@ -67,7 +67,10 @@ const InputTokenList: m.Component<IAttrs, { options: any[], oldValue: string }> 
         hidden ? 'hidden' : ''
       } absolute left-0 right-0 shadow-xl bg-white rounded top-full mt-16 text-xl p-3 z-10`,
       id: 'tokens-list',
-    }, stillLoadingTokens ? [ m(Spinner, { active: true }) ] : vnode.state.options.map(renderResults));
+      style: 'overflow-y: scroll; max-height: 16rem;'
+    }, stillLoadingTokens
+      ? [ m(Spinner, { active: true }) ]
+      : vnode.state.options.map(renderResults));
   },
 };
 
