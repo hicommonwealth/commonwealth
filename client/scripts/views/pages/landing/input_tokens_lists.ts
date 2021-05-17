@@ -44,6 +44,7 @@ const InputTokenList: m.Component<IAttrs, { options: any[], oldValue: string }> 
               || option.placeholder);
           }
         });
+      console.log(vnode.state.options.slice(0, 20));
     }
     const renderResults = (option) => {
       if ((option as Token).symbol) {
@@ -70,7 +71,7 @@ const InputTokenList: m.Component<IAttrs, { options: any[], oldValue: string }> 
       style: 'overflow-y: scroll; max-height: 16rem;'
     }, stillLoadingTokens
       ? [ m(Spinner, { active: true }) ]
-      : vnode.state.options.map(renderResults));
+      : vnode.state.options.slice(0, 20).map(renderResults));
   },
 };
 
