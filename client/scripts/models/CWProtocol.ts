@@ -85,8 +85,4 @@ export class CWProtocol {
   public setProjects(_projects: CWProject[]) {
     this.projects = _projects;
   }
-
-  // public setProjects(_projects: CWProject[]) {
-  //   this.projects = _projects;
-  // }
 }
