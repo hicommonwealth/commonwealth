@@ -7,6 +7,7 @@ import InputTokensListComponent from './input_tokens_lists';
 import 'pages/landing/tokens_community_hero.scss';
 import { initializeSearch } from '../../components/search_bar';
 import { Chain, Token } from './index';
+import { ALL_RESULTS_KEY } from '../search';
 
 interface IState {
   chainsAndTokens: (Chain | Token)[];
@@ -26,8 +27,8 @@ const initiateFullSearch = (searchTerm) => {
   if (searchTerm.length < 3) {
     notifyError('Query must be at least 3 characters');
   }
-  if (app.searchCache.isLoaded(searchTerm)) {
-    app.searchCache.initKey(searchTerm);
+  if (app.searchCache[searchTerm]?.loaded) {
+    app.searchCache[searchTerm].loaded = false;
   }
   const params = `q=${encodeURIComponent(searchTerm.toString().trim())}`;
   m.route.set(`/search?${params}`);
@@ -41,7 +42,7 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
     vnode.state.chainsAndTokens = [];
   },
   view: (vnode) => {
-    const stillLoadingTokens = !app.searchCache.allResults.loaded;
+    const stillLoadingTokens = !app.searchCache[ALL_RESULTS_KEY].loaded;
     if (!stillLoadingTokens) {
       vnode.state.chainsAndTokens = [
         {
@@ -52,7 +53,7 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
           placeholder: true,
         },
         ...vnode.attrs.chains,
-        ...app.searchCache.allResults.tokens
+        ...app.searchCache[ALL_RESULTS_KEY]['tokens']
       ];
     }
     const mappedCommunities = [
