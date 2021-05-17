@@ -1,3 +1,5 @@
+import BN from 'bn.js';
+
 type ProjectStatus = 'In Progress' | 'Successed' | 'Failed';
 type ParticipantRole = 'backer' | 'curator' | 'beneficiary' | 'creator'
 
@@ -62,10 +64,10 @@ export class CWProject {
 }
 
 export class CWProtocol {
-  public protocolFee: number;
+  public readonly id: string;
+  public protocolFee: BN;
   public feeTo: string;
   public name: string;
-  public id: string;
   public projects: CWProject[];
 
   constructor(name, id, protocolFee, feeTo, projects) {
@@ -83,4 +85,8 @@ export class CWProtocol {
   public setProjects(_projects: CWProject[]) {
     this.projects = _projects;
   }
+
+  // public setProjects(_projects: CWProject[]) {
+  //   this.projects = _projects;
+  // }
 }
