@@ -33,18 +33,18 @@ export default class Commonwealth extends IChainAdapter<EthereumCoin, EthereumAc
     await this.accounts.init(this.chain);
     const api = new CommonwealthAPI(
       CWProtocolFactory.connect,
-      '0x4C7804bf331183adad98Af5AfBdA5F27A3E84e8C', // this.meta.address,
+      '0x487f2D9f9427bBBC97cDc2F77Ab3083ea82b2496', // this.meta.address,
       this.chain.api.currentProvider as any
-    );
+    );    
     await api.init();
     this.chain.CommonwealthAPI = api;
     // await this.chain.initEventLoop();
-    await super.initApi();
+    // await super.initApi();
   }
 
   public async initData() {
     // await this.chain.initEventLoop();
-    await this.protocol.init();
+    await this.protocol.init(this.chain);
     await super.initData();
   }
 

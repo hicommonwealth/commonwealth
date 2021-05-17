@@ -409,7 +409,7 @@ const resetServer = (models): Promise<number> => {
         // for CWP
         models.Chain.create({
           id: 'ethereum-kovan',
-          network: 'cmn-kovan',
+          network: 'CMN-kovan',
           symbol: 'ETH',
           name: 'Common Protocol (kovan)',
           icon_url: '/static/img/protocols/eth.png',
@@ -419,7 +419,7 @@ const resetServer = (models): Promise<number> => {
         }),
         models.Chain.create({
           id: 'ethereum-local',
-          network: 'cmn-local',
+          network: 'CMN-local',
           symbol: 'ETH',
           name: 'Common Protocol (local)',
           icon_url: '/static/img/protocols/eth.png',
