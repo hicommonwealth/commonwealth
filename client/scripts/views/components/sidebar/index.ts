@@ -260,6 +260,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         }),
       // validators (substrate only)
       !app.community && app.chain?.base === ChainBase.Substrate
+        && app.chain?.class !== ChainClass.Kulupu && app.chain?.class !== ChainClass.Darwinia
         && m(Button, {
           fluid: true,
           rounded: true,

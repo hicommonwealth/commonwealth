@@ -8,6 +8,7 @@ export { default as ContractItem } from './ContractItem';
 export { default as DiscussionDraft } from './DiscussionDraft';
 export { default as IChainAdapter } from './IChainAdapter';
 export { default as ICommunityAdapter } from './ICommunityAdapter';
+export { default as IWebWallet } from './IWebWallet';
 export { default as Identity } from './Identity';
 export { default as NodeInfo } from './NodeInfo';
 export { default as Notification } from './Notification';
@@ -18,6 +19,7 @@ export { default as OffchainComment } from './OffchainComment';
 export { default as OffchainReaction } from './OffchainReaction';
 export { default as OffchainTopic } from './OffchainTopic';
 export { default as OffchainThread } from './OffchainThread';
+export { default as OffchainVote } from './OffchainVote';
 export { default as Profile } from './Profile';
 export { default as Proposal } from './Proposal';
 export { default as ProposalModule } from './ProposalModule';
@@ -40,6 +42,7 @@ export {
   ChainClass,
   OffchainThreadKind,
   OffchainThreadStage,
+  OffchainVoteOptions,
   TransactionStatus,
   ProposalStatus,
   VotingType,

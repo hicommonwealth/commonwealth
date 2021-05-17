@@ -1,4 +1,4 @@
-import moment from 'moment-twitter';
+import moment from 'moment';
 import NotificationSubscription from './NotificationSubscription';
 import ChainEvent from './ChainEvent';
 

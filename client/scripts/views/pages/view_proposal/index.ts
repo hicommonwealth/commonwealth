@@ -8,7 +8,7 @@ import { PopoverMenu, MenuDivider, Icon, Icons, Button } from 'construct-ui';
 import app from 'state';
 import Sublayout from 'views/sublayout';
 import { idToProposal, ProposalType, proposalSlugToClass } from 'identifiers';
-import { slugify, isSameAccount } from 'helpers';
+import { slugify } from 'utils';
 
 import Substrate from 'controllers/chain/substrate/main';
 import { notifyError } from 'controllers/app/notifications';
@@ -29,8 +29,9 @@ import {
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import TopicEditor from 'views/components/topic_editor';
 import StageEditor from 'views/components/stage_editor';
+import PollEditor from 'views/components/poll_editor';
 import {
-  TopicEditorMenuItem, StageEditorMenuItem, ThreadSubscriptionMenuItem
+  TopicEditorMenuItem, ThreadSubscriptionMenuItem
 } from 'views/pages/discussions/discussion_row_menu';
 import ProposalVotingActions from 'views/components/proposals/voting_actions';
 import ProposalVotingResults from 'views/components/proposals/voting_results';
@@ -40,10 +41,15 @@ import PageNotFound from 'views/pages/404';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
+
+import { SocialSharingCarat } from 'views/components/social_sharing_carat';
+
 import {
   ProposalHeaderExternalLink, ProposalHeaderBlockExplorerLink, ProposalHeaderVotingInterfaceLink,
+  ProposalHeaderOffchainPoll,
   ProposalHeaderThreadLink, ProposalHeaderThreadLinkedChainEntity,
   ProposalHeaderTopics, ProposalHeaderTitle, ProposalHeaderStage, ProposalHeaderStageEditorButton,
+  ProposalHeaderPollEditorButton,
   ProposalHeaderOnchainId, ProposalHeaderOnchainStatus, ProposalHeaderSpacer, ProposalHeaderViewCount,
   ProposalHeaderPrivacyMenuItems,
   ProposalTitleEditor,
@@ -58,6 +64,7 @@ import {
 } from './body';
 import CreateComment from './create_comment';
 import LinkedProposalsEmbed from './linked_proposals_embed';
+
 
 const ProposalHeader: m.Component<{
   commentCount: number;
@@ -76,6 +83,7 @@ const ProposalHeader: m.Component<{
   currentText: any;
   topicEditorIsOpen: boolean;
   stageEditorIsOpen: boolean;
+  pollEditorIsOpen: boolean;
   editPermissionsIsOpen: boolean;
 }> = {
   view: (vnode) => {
@@ -123,6 +131,12 @@ const ProposalHeader: m.Component<{
                   vnode.state.stageEditorIsOpen = true;
                 }
               }),
+              isAuthor && proposal instanceof OffchainThread && !proposal.offchainVotingEndsAt
+                && m(ProposalHeaderPollEditorButton, {
+                  openPollEditor: () => {
+                    vnode.state.pollEditorIsOpen = true;
+                  }
+                }),
             ]),
           vnode.state.editing
             && m(ProposalTitleEditor, {
@@ -168,6 +182,8 @@ const ProposalHeader: m.Component<{
                 inline: true,
                 trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
               }),
+              m('.CommentSocialHeader', [ m(SocialSharingCarat)]),
+              // This is the new social carat menu
               vnode.state.editPermissionsIsOpen
                 && proposal instanceof OffchainThread
                 && m(ProposalEditorPermissions, {
@@ -198,6 +214,16 @@ const ProposalHeader: m.Component<{
                     m.redraw();
                   },
                   openStateHandler: (v) => { vnode.state.stageEditorIsOpen = v; m.redraw(); },
+                }),
+              vnode.state.pollEditorIsOpen
+                && proposal instanceof OffchainThread
+                && m(PollEditor, {
+                  thread: vnode.attrs.proposal as OffchainThread,
+                  onChangeHandler: () => {
+                    // TODO
+                    vnode.state.pollEditorIsOpen = false;
+                    m.redraw();
+                  },
                 }),
             ]
             : [
@@ -242,6 +268,9 @@ const ProposalHeader: m.Component<{
                 proposal['votingInterfaceLink'] && m(ProposalHeaderVotingInterfaceLink, { proposal }),
               ]),
           ]),
+          proposal instanceof OffchainThread
+            && proposal.hasOffchainPoll
+            && m(ProposalHeaderOffchainPoll, { proposal }),
         ]),
       ]),
       proposal instanceof OffchainThread && m('.proposal-content', [
@@ -344,7 +373,7 @@ const ProposalComment: m.Component<{
               trigger: m(Icon, { name: Icons.CHEVRON_DOWN })
             })
           ],
-
+          m('.CommentSocialHeader', [ m(SocialSharingCarat, { commentID: comment.id })])
           // For now, we are limiting threading to 1 level deep
           // Comments whose parents are other comments should not display the reply option
           // !vnode.state.editing
@@ -531,7 +560,6 @@ const ViewProposalPage: m.Component<{
   },
   view: (vnode) => {
     const { identifier, type } = vnode.attrs;
-
     const headerTitle = m.route.param('type') === 'discussion' ? 'Discussions' : 'Proposals';
     if (typeof identifier !== 'string') return m(PageNotFound, { title: headerTitle });
     const proposalId = identifier.split('-')[0];

@@ -19,9 +19,11 @@ const createAddress = async (models, req: Request, res: Response, next: NextFunc
   if (!req.body.chain) {
     return next(new Error(Errors.NeedChain));
   }
+
   const chain = await models.Chain.findOne({
     where: { id: req.body.chain }
   });
+
   if (!chain) {
     return next(new Error(Errors.InvalidChain));
   }
@@ -29,6 +31,7 @@ const createAddress = async (models, req: Request, res: Response, next: NextFunc
   const existingAddress = await models.Address.scope('withPrivateData').findOne({
     where: { chain: req.body.chain, address: req.body.address }
   });
+
   if (existingAddress) {
     // address already exists on another user, only take ownership if
     // unverified and expired

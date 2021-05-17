@@ -8,7 +8,6 @@ import ChainEntityController from 'controllers/server/chain_entities';
 import { IChainAdapter, ChainBase, ChainClass, NodeInfo } from 'models';
 import { IApp } from 'state';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
-import WebWalletController from '../../app/web_wallet';
 import SubstratePhragmenElections from './phragmen_elections';
 import SubstrateIdentities from './identities';
 import SubstrateChain from './shared';
@@ -24,7 +23,6 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public treasury: SubstrateTreasury;
   public bounties: SubstrateBountyTreasury;
   public identities: SubstrateIdentities;
-  public readonly webWallet: WebWalletController = new WebWalletController();
   public readonly chainEntities = new ChainEntityController();
 
   public readonly base = ChainBase.Substrate;

@@ -77,7 +77,6 @@ const updateProfile = async (
   const addressesInSameChainbase = await models.Address.findAll({
     where: {
       user_id: address.user_id,
-      address: address.address,
       chain: { [Op.in]: chains.map((ch) => ch.id) }
     }
   });
@@ -96,7 +95,6 @@ const updateProfile = async (
     }, {
       where: {
         user_id: address.user_id,
-        address: address.address,
         chain: { [Op.in]: chains.map((ch) => ch.id) }
       }
     });
@@ -129,7 +127,7 @@ const updateProfile = async (
     }
   }
 
-  return res.json({ status: 'Success', result: profile.toJSON() });
+  return res.json({ status: 'Success', result: { profile, updatedProfileAddresses: addressesInSameChainbase } });
 };
 
 export default updateProfile;

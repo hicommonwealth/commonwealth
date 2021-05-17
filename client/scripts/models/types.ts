@@ -37,6 +37,7 @@ export enum ChainNetwork {
   Metacartel = 'metacartel',
   ALEX = 'alex',
   Commonwealth = 'commonwealth',
+  ERC20 = 'erc20',
   Clover = 'clover',
   HydraDX = 'hydradx',
   Yearn = 'yearn',
@@ -50,46 +51,6 @@ export function baseToNetwork(n: ChainBase): ChainNetwork {
     case ChainBase.Substrate: return ChainNetwork.Edgeware;
     case ChainBase.Ethereum: return ChainNetwork.Ethereum;
     case ChainBase.NEAR: return ChainNetwork.NEAR;
-    default: return null;
-  }
-}
-
-export function baseToLabel(n: ChainBase): string {
-  switch (n) {
-    case ChainBase.CosmosSDK: return 'Cosmos Wallet';
-    case ChainBase.Substrate: return 'polkadot-js';
-    case ChainBase.Ethereum: return 'Ethereum Wallet';
-    case ChainBase.NEAR: return 'NEAR Wallet';
-    default: return 'Wallet';
-  }
-}
-
-export function networkToBase(n: ChainNetwork | string): ChainBase {
-  switch (n) {
-    case ChainNetwork.Clover: return ChainBase.Substrate;
-    case ChainNetwork.Edgeware: return ChainBase.Substrate;
-    case ChainNetwork.EdgewareTestnet: return ChainBase.Substrate;
-    case ChainNetwork.Kusama: return ChainBase.Substrate;
-    case ChainNetwork.Kulupu: return ChainBase.Substrate;
-    case ChainNetwork.Polkadot: return ChainBase.Substrate;
-    case ChainNetwork.Plasm: return ChainBase.Substrate;
-    case ChainNetwork.Stafi: return ChainBase.Substrate;
-    case ChainNetwork.Darwinia: return ChainBase.Substrate;
-    case ChainNetwork.Phala: return ChainBase.Substrate;
-    case ChainNetwork.Centrifuge: return ChainBase.Substrate;
-    case ChainNetwork.HydraDX: return ChainBase.Substrate;
-    case ChainNetwork.Cosmos: return ChainBase.CosmosSDK;
-    case ChainNetwork.Straightedge: return ChainBase.CosmosSDK;
-    case ChainNetwork.NEAR: return ChainBase.NEAR;
-    case ChainNetwork.Ethereum: return ChainBase.Ethereum;
-    case ChainNetwork.Moloch: return ChainBase.Ethereum;
-    case ChainNetwork.Metacartel: return ChainBase.Ethereum;
-    case ChainNetwork.Commonwealth: return ChainBase.Ethereum;
-    case ChainNetwork.ALEX: return ChainBase.Ethereum;
-    case ChainNetwork.Marlin: return ChainBase.Ethereum;
-    case ChainNetwork.MarlinTestnet: return ChainBase.Ethereum;
-    case ChainNetwork.Yearn: return ChainBase.Ethereum;
-    case ChainNetwork.Fei: return ChainBase.Ethereum;
     default: return null;
   }
 }
@@ -120,6 +81,7 @@ export enum ChainClass {
   Commonwealth = 'commonwealth',
   Yearn = 'yearn',
   Fei = 'fei',
+  ERC20 = 'erc20',
 }
 
 // TODO: this is inconsistently used
@@ -137,6 +99,15 @@ export enum OffchainThreadStage {
   Passed = 'passed',
   Failed = 'failed',
   Abandoned = 'abandoned',
+}
+
+export enum OffchainVoteOptions {
+  SUPPORT_2,
+  SUPPORT,
+  NEUTRAL_SUPPORT,
+  NEUTRAL_OPPOSE,
+  OPPOSE,
+  OPPOSE_2,
 }
 
 export enum TransactionStatus {

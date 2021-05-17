@@ -1,11 +1,11 @@
 import m from 'mithril';
-import moment from 'moment-twitter';
+import moment from 'moment';
 
 import { formatDuration, blocknumToTime } from 'helpers';
 
 interface ICountdownAttrs {
   time?: moment.Moment;
-  duration?: moment.Moment;
+  duration?: moment.Duration;
   includeSeconds?: boolean;
 }
 
