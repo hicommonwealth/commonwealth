@@ -1,6 +1,6 @@
 import m from 'mithril';
 import app from 'state';
-import { ChainInfo } from 'client/scripts/models';
+import { notifyError } from 'controllers/app/notifications';
 import FindYourTokenInputComponent from './find_your_token_input';
 import InputTokensListComponent from './input_tokens_lists';
 
@@ -18,6 +18,20 @@ interface IState {
 interface IAttrs {
   chains: Chain[];
 }
+
+const initiateFullSearch = (searchTerm) => {
+  if (!searchTerm || !searchTerm.toString().trim() || !searchTerm.match(/[A-Za-z]+/)) {
+    return;
+  }
+  if (searchTerm.length < 3) {
+    notifyError('Query must be at least 3 characters');
+  }
+  if (app.searchCache.isLoaded(searchTerm)) {
+    app.searchCache.initKey(searchTerm);
+  }
+  const params = `q=${encodeURIComponent(searchTerm.toString().trim())}`;
+  m.route.set(`/search?${params}`);
+};
 
 const TokensCommunityComponent: m.Component<IAttrs, IState> = {
   oninit: (vnode) => {
@@ -111,6 +125,11 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
                           vnode.state.hiddenInputTokenList = event.target.value === '';
                           m.redraw();
                         }, 500);
+                      },
+                      onkeyupValue: (event: any) => {
+                        if (event.key === 'Enter') {
+                          initiateFullSearch(vnode.state.inputTokenValue);
+                        }
                       }
                     }),
                     vnode.state.inputTokenValue
@@ -124,6 +143,7 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
                     }),
                     m('button', {
                       class: 'btn-primary text-xl font-medium rounded-lg pb-2 pt-3 px-3 w-36',
+                      onclick: () => initiateFullSearch(vnode.state.inputTokenValue)
                     }, [
                       " Let's Go ",
                       m('img', {

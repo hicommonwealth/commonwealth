@@ -44,7 +44,6 @@ const InputTokenList: m.Component<IAttrs, { options: any[], oldValue: string }> 
               || option.placeholder);
           }
         });
-      console.log(vnode.state.options.slice(0, 20));
     }
     const renderResults = (option) => {
       if ((option as Token).symbol) {
