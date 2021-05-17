@@ -208,6 +208,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
   {
     return;
   }
+
   if ((Object.values(ChainNetwork) as any).indexOf(n.chain.network) === -1) {
     throw new Error('invalid chain');
   }
