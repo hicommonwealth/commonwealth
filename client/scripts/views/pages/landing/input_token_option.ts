@@ -10,20 +10,23 @@ interface IAttrs {
 
 const InputTokenOptionComponent: m.Component<IAttrs, {}> = {
   view: (vnode) => {
+    const { iconImg } = vnode.attrs;
     let tokenImage;
-    if (!vnode.attrs.iconImg || !vnode.attrs.iconImg.length) {
-      tokenImage = m('.community-icon.no-image', {
-        style: `width: 20px; height: 20px;`,
-        onclick
-      }, [
-        m('span', {
-          style: `font-size: 16px;`
-        }, vnode.attrs.text.slice(0, 1))
+    if (!iconImg || !iconImg.length || iconImg.slice(0, 4) === 'ipfs') {
+      tokenImage = m('.TokenIcon', [
+        m('.token-icon.no-image', {
+          style: 'width: 1.5rem; height: 1.5rem;',
+          onclick
+        }, [
+          m('span', {
+            style: 'font-size: 1.25rem;'
+          }, vnode.attrs.text.slice(0, 1))
+        ])
       ]);
     } else {
       tokenImage = m('img', {
         class: 'mr-4 h-6 w-6',
-        src: vnode.attrs.iconImg,
+        src: iconImg,
         alt: '',
       });
     }
