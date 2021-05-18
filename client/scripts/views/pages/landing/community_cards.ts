@@ -216,9 +216,10 @@ const HomepageCommunityCards: m.Component<{}, {}> = {
         .concat(myCommunities.filter((c) => c.collapsedOnHomepage))
     );
 
-    return m('.HomepageCommunityCards', [
+    return m('.HomepageCommunityCards', {
+      style: 'margin-top: 20px',
+    }, [
       m('.communities-list', [
-        sortedChainsAndCommunities.length > 0 && m('h4', 'Live Networks'),
         sortedChainsAndCommunities,
         m('.clear'),
         betaChainsAndCommunities.length > 0 && m('h4', 'Testnets & Alpha Networks'),
