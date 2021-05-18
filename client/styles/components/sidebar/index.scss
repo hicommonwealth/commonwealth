@@ -24,7 +24,7 @@
         }
         svg {
             position: relative;
-            top: 1px;
+            top: -3px;
             left: -1px;
             path {
                 stroke: #2480cc;
@@ -42,6 +42,8 @@
             text-align: left;
         }
         svg {
+            position: relative;
+            top: -4px;
             path {
                 stroke: #0cbd8b;
             }
@@ -58,6 +60,8 @@
             text-align: left;
         }
         svg {
+            position: relative;
+            top: -4px;
             path {
                 fill: #677bc4;
             }
@@ -74,6 +78,8 @@
             text-align: left;
         }
         svg {
+            position: relative;
+            top: -3px;
             path {
                 fill: #222222;
             }
