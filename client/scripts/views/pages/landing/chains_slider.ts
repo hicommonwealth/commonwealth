@@ -28,7 +28,7 @@ const TokensChainsComponent: m.Component<IState, IState> = {
             {
               class: 'text-3xl text-left font-extrabold mb-5 text-center',
             },
-            ' Every Token. Every Chain. '
+            ' Every token, every chain '
           ),
           m(
             'p',
@@ -36,7 +36,7 @@ const TokensChainsComponent: m.Component<IState, IState> = {
               class:
                 'text-left max-w-screen-md mx-auto text-2xl text-center',
             },
-            ' With Commonwealth, any token holder can drive their community. Subscribe to chain activity like whale transfers or new votes, discuss new ideas, crowdfund community projects, and access native governance for Layer 1s and NFTs alike. '
+            ' Subscribe to chain activity like whale transfers or major votes. Discuss new ideas, crowdfund projects, and access native governance for Layer 1s, tokens, and NFTs alike. '
           ),
         ]),
         m(

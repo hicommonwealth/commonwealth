@@ -1,6 +1,7 @@
 @import "client/styles/shared";
 
 .LandingPageHeaderLinks {
+  white-space: nowrap;
   a.text-gray-500.leading-none {
     color: $text-color-black;
     text-decoration: none;
@@ -12,12 +13,19 @@
 }
 
 li.LandingPageHeaderLoginButton.ml-10.pt-2 {
+  white-space: nowrap;
   a.btn-primary.pb-3.text-white {
+    padding-top: 14px;
+    padding-bottom: 9px;
     color: $text-color-white;
     text-decoration: none;
     cursor: pointer;
     &:hover {
       background-color: $background-color-black-hover;
+    }
+    img {
+      position: relative;
+      top: -2px;
     }
   }
 }
@@ -47,7 +55,7 @@ header.landing-header  {
   @media (min-width: 1300px)  {
     width: 75%;
   }
-  
+
   @media (min-width: 1500px) {
     width: 90%;
   }

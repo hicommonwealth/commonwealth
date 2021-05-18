@@ -19,7 +19,7 @@ const TokensCreatorComponent: m.Component<{ creators: ICardListItem[] }, {}> = {
       m(
         'p',
         { class: 'text-2xl max-w-screen-sm mx-auto text-center mb-10' },
-        ' Commonwealth lets you simplify your community and governance. We bring four tools into one. '
+        ' Commonwealth lets you simplify your community and governance, bringing four tools into one. '
       ),
       // m(
       //   'div.TokensCreatorsUseCaseButton',

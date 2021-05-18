@@ -61,23 +61,23 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
     const mappedCommunities = [
       {
         variant:
-          `absolute object-top transform sm:translate-x-16 md:translate-x-64 
-          lg:translate-x-48 translate-y-16 sm:translate-y-40 md:translate-y-32 
-          lg:translate-y-32 left-10 max-w-none max-h-none h-auto w-629 xl:left-36 
+          `absolute object-top transform sm:translate-x-16 md:translate-x-64
+          lg:translate-x-48 translate-y-16 sm:translate-y-40 md:translate-y-32
+          lg:translate-y-32 left-10 max-w-none max-h-none h-auto w-629 xl:left-36
           mt-10 sm:mt-0`,
         src: 'static/img/discussions.svg',
         alt: '',
       },
       {
         variant:
-          `absolute object-bottom bottom-0 transform sm:translate-x-16 
+          `absolute object-bottom bottom-0 transform sm:translate-x-16
           md:translate-x-8 lg:translate-x-64 -translate-y-8 lg:left-32 w-350`,
         src: 'static/img/notification.svg',
         alt: '',
       },
       {
         variant:
-          `absolute top-1/2 transform sm:translate-y-16 md:translate-y-48 
+          `absolute top-1/2 transform sm:translate-y-16 md:translate-y-48
           lg:translate-y-64  translate-x-8 sm:-translate-x-8 w-400`,
         src: 'static/img/discussion.svg',
         alt: '',
@@ -102,7 +102,7 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
               m('div',
                 { class: 'px-8 mt-32 mb-10 md:my-40 lg:px-14 xl:px-0 xl:pr-32' },
                 [
-                  m('h1', { class: 'text-4xl font-bold mb-5' }, [
+                  m('h1', { class: 'text-4xl font-bold mb-5 leading-10' }, [
                     'A ',
                     m('span', {
                       class: 'bg-clip-text text-transparent gradient-0'
@@ -112,8 +112,8 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
                   m('p', {
                     class: 'text-xl text-gray-600 mb-5'
                   }, [
-                    ' Commonwealth is an all-in-one platform for on-chain communities to discuss, vote, and fund projects.',
-                    ' Never miss an interesting on-chain event or thread for your favorite projects. '
+                    'Commonwealth is an all-in-one platform for on-chain communities to discuss, vote, and fund projects together.',
+                    ' Never miss an on-chain event, proposal, or important discussion again. '
                   ]),
                   m('.token-search-wrap', {
                     autocomplete: 'off',
@@ -177,7 +177,7 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
             class: 'h-556 md:h-auto md:w-2/4'
           }, [
             m('div', {
-              class: `gradient-135 overflow-hidden relative h-full lg:min-h-desktop 
+              class: `gradient-135 overflow-hidden relative h-full lg:min-h-desktop
                 lg:h-screen lg:w-50-screen lg:absolute lg:object-left xl:h-full xl:min-h-full`,
             }, mappedCommunities)
           ]),

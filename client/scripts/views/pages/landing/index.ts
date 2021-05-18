@@ -170,7 +170,7 @@ const LandingPage: m.Component<{}, IState> = {
               texts: {
                 title: ' On-chain notifications ',
                 text:
-                ' Your token holders can stay up-to-date on chain events like votes and large transfers ',
+                ' Stay up-to-date on chain events like votes and large transfers. ',
               },
               card: {
                 id: 'tab-codepen',
@@ -183,9 +183,9 @@ const LandingPage: m.Component<{}, IState> = {
                 id: 'first-section-button2',
               },
               texts: {
-                title: ' Off-chain polling & On-chain voting ',
+                title: ' Off-chain polling & on-chain voting ',
                 text:
-                ' Whether your community uses Snapshot, Comp Governance, or native layer 1. Access everything from one place. ',
+                ' Whether you use Snapshot, COMP governance contracts, or native Layer 1 voting, access everything from one place. ',
               },
               card: {
                 id: 'tab2-codepen',
@@ -198,9 +198,9 @@ const LandingPage: m.Component<{}, IState> = {
                 id: 'first-section-button3',
               },
               texts: {
-                title: ' Crowdfunding protocols ',
+                title: ' Crowdfunding ',
                 text:
-                ' Fund new tokens and community initiatives with Kickstarter-like raises from a thread ',
+                ' Fund new tokens and community initiatives with Kickstarter-like raises from a thread. ',
               },
               card: {
                 id: 'tab3-codepen',
@@ -215,7 +215,7 @@ const LandingPage: m.Component<{}, IState> = {
               texts: {
                 title: ' A rich forum experience ',
                 text:
-                ' Discuss memes and important topics alike in a Discourse-style forum. Enhance your posts with built in Markdown and fun reactions. ',
+                ' Discuss memes or key decisions, in a Discourse-style forum. Enhance your posts with built in Markdown and fun reactions. ',
               },
               card: {
                 id: 'tab4-codepen',
@@ -266,7 +266,7 @@ const LandingPage: m.Component<{}, IState> = {
               texts: {
                 title: 'Fund new projects',
                 text:
-                'Anyone from within your community can easily turn a conversation thread into a Kickstarter-like campaign ',
+                'Anyone from within your community can easily turn a conversation thread into a Kickstarter-like campaign. ',
               },
               card: {
                 id: 'tab-card',
@@ -281,7 +281,7 @@ const LandingPage: m.Component<{}, IState> = {
               texts: {
                 title: 'Create Community Endowments',
                 text:
-                ' Lets you pool funds with other like minded folks and fund interesting projects within your community or across the web',
+                ' Pool funds with other like-minded folks, and fund interesting projects within your community or across the web. ',
               },
               card: {
                 id: 'tab2-card',
@@ -296,7 +296,7 @@ const LandingPage: m.Component<{}, IState> = {
               texts: {
                 title: 'Launch New Tokens',
                 text:
-                ' Use a project to raise funds for a new tokenize DeFi or NFT token and optionally plug in an allowlist for KYC compliance ',
+                ' Use a project to raise funds for a new DeFi token or NFT. Optionally plug in an allowlist for KYC compliance. ',
               },
               card: {
                 id: 'tab3-card',
