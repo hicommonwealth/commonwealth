@@ -317,7 +317,9 @@ const LandingPage: m.Component<{}, IState> = {
             { text:  'Privacy', redirectTo: '/privacy' },
             { text:  'Terms', redirectTo:  '/terms' },
             { text: 'Jobs', externalLink: 'https://angel.co/company/commonwealth-labs/jobs' },
-            { text: 'Blog', externalLink: 'https://commonwealth.im/' }
+            { text: 'Blog', externalLink: 'https://commonwealth.im/' },
+            { text: 'Discord', externalLink: 'https://discord.gg/ZFQCKUMP' },
+            { text: 'Telegram', externalLink: 'https://t.me/HiCommonwealth' }
           ],
         }),
         m('script', {
