@@ -1,8 +1,10 @@
 import 'modals/bounty_modals.scss';
 
+import $ from 'jquery';
 import m from 'mithril';
 import { Button, Input } from 'construct-ui';
 import Substrate from 'controllers/chain/substrate/main';
+import { SubstrateAccount } from 'controllers/chain/substrate/account';
 
 import app from 'state';
 
@@ -38,7 +40,7 @@ export const ApproveBountyModal: m.Component<{ bountyId: number }, { approvals: 
             e.preventDefault();
             if (isNaN(vnode.state.approvals)) return;
             await (app.chain as Substrate).bounties.createBountyApprovalMotionTx(
-              this.app.user?.activeAccount?.address, bountyId
+              app.user?.activeAccount as SubstrateAccount, bountyId
             );
 
             // done
@@ -90,7 +92,7 @@ export const ProposeCuratorModal: m.Component<{ bountyId: number }, { approvals:
           onclick: async (e) => {
             e.preventDefault();
             await (app.chain as Substrate).bounties.proposeCuratorTx(
-              this.app.user?.activeAccount?.address, bountyId, curator, feeCoins
+              app.user?.activeAccount as SubstrateAccount, bountyId, curator, feeCoins
             );
 
             // done
@@ -134,7 +136,7 @@ export const AwardBountyModal: m.Component<{ bountyId: number }, { approvals: nu
           onclick: async (e) => {
             e.preventDefault();
             await (app.chain as Substrate).bounties.awardBountyTx(
-              this.app.user?.activeAccount?.address, bountyId, recipient
+              app.user?.activeAccount as SubstrateAccount, bountyId, recipient
             );
 
             // done
@@ -178,7 +180,7 @@ export const ExtendExpiryModal: m.Component<{ bountyId: number }, { approvals: n
           onclick: async (e) => {
             e.preventDefault();
             await (app.chain as Substrate).bounties.extendBountyExpiryTx(
-              this.app.user?.activeAccount?.address, bountyId, remark
+              app.user?.activeAccount as SubstrateAccount, bountyId, remark
             );
 
             // done
