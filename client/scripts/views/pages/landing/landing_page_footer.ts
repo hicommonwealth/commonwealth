@@ -10,7 +10,6 @@ const FooterLandingPage: m.Component<IState, IState> = {
     const redirectClick = (route) => {
       m.route.set(route);
     };
-    console.log(vnode.attrs.list.length);
     return m('footer.FooterLandingPage', { class: 'bg-footer bg-cover py-10' },
       m('div', { class: 'mt-8 container mx-auto md:flex md:flex-row md:justify-between md:items-start' }, [
         m('div', [

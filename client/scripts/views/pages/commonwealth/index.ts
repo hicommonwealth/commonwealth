@@ -203,10 +203,10 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
       ]),
       m(FooterLandingPage, {
         list: [
-          { text:  'Privacy', redirectTo: '/privacy' },
-          { text:  'Terms', redirectTo:  '/terms' },
-          { text: 'Jobs', externalLink: 'https://angel.co/company/commonwealth-labs/jobs' },
           { text: 'Blog', externalLink: 'https://commonwealth.im/blog' },
+          { text: 'Jobs', externalLink: 'https://angel.co/company/commonwealth-labs/jobs' },
+          { text:  'Terms', redirectTo:  '/terms' },
+          { text:  'Privacy', redirectTo: '/privacy' },
           { text: 'Discord', externalLink: 'https://discord.gg/ZFQCKUMP' },
           { text: 'Telegram', externalLink: 'https://t.me/HiCommonwealth' }
           // { text:  'Use Cases' },
