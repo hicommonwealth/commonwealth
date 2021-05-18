@@ -206,7 +206,10 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
           { text:  'Privacy', redirectTo: '/privacy' },
           { text:  'Terms', redirectTo:  '/terms' },
           { text: 'Jobs', externalLink: 'https://angel.co/company/commonwealth-labs/jobs' },
-          { text: 'Blog', externalLink: 'https://commonwealth.im/' }          // { text:  'Use Cases' },
+          { text: 'Blog', externalLink: 'https://commonwealth.im/blog' },
+          { text: 'Discord', externalLink: 'https://discord.gg/ZFQCKUMP' },
+          { text: 'Telegram', externalLink: 'https://t.me/HiCommonwealth' }
+          // { text:  'Use Cases' },
           // { text:  'Crowdfunding' },
           // { text:  'Developers' },
           // { text:  'About us' },
