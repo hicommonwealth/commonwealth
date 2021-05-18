@@ -23,7 +23,7 @@ const FooterLandingPage: m.Component<IState, IState> = {
         m('div', [
           m('nav',
             { class: 'mt-10 md:mt-0 w-64' },
-            m('ul', { class: 'flex flex-wrap flex-col h-32' }, [
+            m('ul', { class: 'flex flex-wrap flex-col h-24' }, [
               vnode.attrs.list.map((item) => {
                 return m('li.FooterNavsLinks', { class: 'mb-2' }, [
                   m('a', {

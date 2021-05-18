@@ -22,7 +22,6 @@ interface IAttrs {
 }
 
 const initiateFullSearch = (searchTerm) => {
-  console.log({searchTerm});
   if (!searchTerm || !searchTerm.toString().trim() || !searchTerm.match(/[A-Za-z]+/)) {
     return;
   }
@@ -32,7 +31,6 @@ const initiateFullSearch = (searchTerm) => {
   if (app.searchCache[searchTerm]?.loaded) {
     app.searchCache[searchTerm].loaded = false;
   }
-  debugger
   const params = `q=${encodeURIComponent(searchTerm.toString().trim())}`;
   m.route.set(`/search?${params}`);
 };
@@ -117,7 +115,7 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
                     ' Commonwealth is an all-in-one platform for on-chain communities to discuss, vote, and fund projects.',
                     ' Never miss an interesting on-chain event or thread for your favorite projects. '
                   ]),
-                  m('form', {
+                  m('.token-search-wrap', {
                     autocomplete: 'off',
                     class:
                       'bg-white shadow-2xl rounded-xl p-2 flex flex-row justify-between mb-10 relative',
@@ -148,6 +146,7 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
                       refilterResults: vnode.state.refilterResults,
                     }),
                     m('button', {
+                      type: 'button',
                       class: 'btn-primary text-xl font-medium rounded-lg pb-2 pt-3 px-3 w-36',
                       onclick: () => { initiateFullSearch(vnode.state.inputTokenValue); }
                     }, [

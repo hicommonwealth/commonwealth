@@ -291,7 +291,6 @@ const concludeSearch = (searchTerm: string, params: SearchParams, state, err?) =
 export const search = async (searchTerm: string, params: SearchParams, state) => {
   const { isSearchPreview, isHomepageSearch, communityScope, chainScope } = params;
   const resultSize = isSearchPreview ? SEARCH_PREVIEW_SIZE : SEARCH_PAGE_SIZE;
-
   if (app.searchCache[searchTerm]?.loaded) {
     // If results exist in cache, conclude search
     concludeSearch(searchTerm, params, state);

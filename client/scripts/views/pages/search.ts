@@ -231,6 +231,7 @@ const SearchPage : m.Component<{
 
     // re-fetch results for new search if search term or URI has changed
     if (searchTerm !== vnode.state.searchTerm || vnode.state.refreshResults) {
+      debugger
       vnode.state.searchTerm = searchTerm;
       vnode.state.refreshResults = false;
       vnode.state.results = {};
