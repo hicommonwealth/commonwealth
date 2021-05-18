@@ -47,7 +47,7 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
               'Treasury: ', formatCoin((app.chain as Substrate).treasury.pot),
             ]),
             m('.stats-box-stat', [
-              'Next treasury spend: ',
+              'Next spend period: ',
               (app.chain as Substrate).treasury.nextSpendBlock
                 ? m(CountdownUntilBlock, {
                   block: (app.chain as Substrate).treasury.nextSpendBlock,

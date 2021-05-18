@@ -90,6 +90,15 @@ const BountiesPage: m.Component<{}> = {
               'Treasury: ',
               app.chain && formatCoin((app.chain as Substrate).treasury.pot),
             ]),
+            m('.stats-box-stat', [
+              'Next spend period: ',
+              (app.chain as Substrate).treasury.nextSpendBlock
+                ? m(CountdownUntilBlock, {
+                  block: (app.chain as Substrate).treasury.nextSpendBlock,
+                  includeSeconds: false
+                })
+                : '--',
+            ]),
           ]),
           m('', [
             m(Button, {

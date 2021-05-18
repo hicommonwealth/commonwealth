@@ -18,6 +18,7 @@ const backportEventToAdapter = (
 ): ISubstrateBounty => {
   return {
     identifier: event.bountyIndex.toString(),
+    description: 'Unknown bounty', // TODO: add to chain-events
     index: event.bountyIndex,
     value: ChainInfo.createType('u128', event.value),
     fee: ChainInfo.createType('u128', event.fee),
@@ -37,9 +38,11 @@ export class SubstrateBounty
     const displayName = account.profile && account.profile.name
       ? `${account.profile.name} (${formatAddressShort(this.author.address, account.chain.id)})`
       : formatAddressShort(this.author.address, account.chain.id);
-    return `${(this.completed || this.active) ? '' : 'Proposed '} Bounty: ${formatCoin(this._value)} to ${displayName}`;
+    return `${this.description} - ${formatCoin(this._value)}`;
   }
-  public get description() { return null; }
+
+  private readonly _description: string;
+  public get description() { return this._description; }
 
   private readonly _author: SubstrateAccount;
   public get author() { return this._author; }
@@ -141,6 +144,7 @@ export class SubstrateBounty
     this._bond = this._Chain.coins(this.data.bond);
     this._curatorDeposit = this._Chain.coins(this.data.curator_deposit);
     this._author = this._Accounts.fromAddress(this.data.proposer);
+    this._description = this.data.description;
     this.createdAt = entity.createdAt;
 
     entity.chainEvents.forEach((e) => this.update(e));
