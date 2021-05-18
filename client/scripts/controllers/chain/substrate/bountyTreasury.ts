@@ -77,14 +77,12 @@ class SubstrateBountyTreasury extends ProposalModule<
     this._initializing = false;
   }
 
-  public createTx(author: SubstrateAccount, description: string, value: string) {
+  public createTx(author: SubstrateAccount, value: SubstrateCoin, description: string) {
     return this._Chain.createTXModalData(
       author,
-      (api: ApiPromise) => api.tx.bounties
-        ? api.tx.bounties.createBounty(author.address, description, value)
-        : api.tx.treasury.proposeBounty(value, description),
-      'createBounty',
-      `createBounty(${author.address}, ${description}, ${value})`
+      (api: ApiPromise) => api.tx.bounties.proposeBounty(value, description),
+      'proposeBounty',
+      `proposeBounty(${description}, ${value})`
     );
   }
 }

@@ -300,11 +300,15 @@ export const createTokenMeta = (
   return {
     id: 'alex',
     address: '0xFab46E002BbF0b4509813474841E0716E6730136',
-    api: {
-      balanceOf: async (a: string) => {
-        const res = await balanceCb(a);
-        return bigNumberify(res);
-      }
-    } as unknown as Erc20,
+    symbol: 'alex',
+    name: 'Alex',
+    iconUrl: '',
+    // TODO: refactor this to succeed
+    // api: {
+    //   balanceOf: async (a: string) => {
+    //     const res = await balanceCb(a);
+    //     return bigNumberify(res);
+    //   }
+    // } as unknown as Erc20,
   };
 };

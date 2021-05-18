@@ -2,7 +2,7 @@ import 'pages/referenda.scss';
 
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
-import { Grid, Col, List, Tag } from 'construct-ui';
+import { Button, Grid, Col, List, Tag } from 'construct-ui';
 import moment from 'moment';
 
 import app from 'state';
@@ -59,6 +59,13 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
               : '--',
             ' days'
           ]),
+        ]),
+        m('', [
+          m(Button, {
+            rounded: true,
+            onclick: (e) => m.route.set(`/${app.chain.id}/proposals`),
+            label: 'Go to proposals',
+          }),
         ]),
       ]),
     ]);

@@ -16,10 +16,17 @@ export const Errors = {
   NoReaction: 'Must provide a reaction',
   NoCommentMatch: 'No matching comment found',
   NoProposalMatch: 'No matching proposal found',
-  InsufficientTokenBalance: `Users need to hold some of the community's tokens to react`,
+  InsufficientTokenBalance: 'Users need to hold some of the community\'s tokens to react',
+  CouldNotFetchTokenBalance: 'Unable to fetch user\'s token balance',
 };
 
-const createReaction = async (models, tokenBalanceCache: TokenBalanceCache, req: Request, res: Response, next: NextFunction) => {
+const createReaction = async (
+  models,
+  tokenBalanceCache: TokenBalanceCache,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
@@ -34,8 +41,13 @@ const createReaction = async (models, tokenBalanceCache: TokenBalanceCache, req:
       },
     });
     if (isAdmin.length === 0) {
-      const userHasBalance = await tokenBalanceCache.hasToken(chain.id, req.body.address);
-      if (!userHasBalance) return next(new Error(Errors.InsufficientTokenBalance));
+      try {
+        const userHasBalance = await tokenBalanceCache.hasToken(chain.id, req.body.address);
+        if (!userHasBalance) return next(new Error(Errors.InsufficientTokenBalance));
+      } catch (e) {
+        log.error(`hasToken failed: ${e.message}`);
+        return next(new Error(Errors.CouldNotFetchTokenBalance));
+      }
     }
   }
 

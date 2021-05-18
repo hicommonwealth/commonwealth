@@ -64,7 +64,7 @@ describe('Token Forum tests', () => {
       // everyone is a token holder
       return 1;
     });
-    await tbc.reset([ meta ]);
+    await tbc.reset(null, null, [ meta ]);
 
     // create a thread
     const res = await modelUtils.createThread({
@@ -110,7 +110,7 @@ describe('Token Forum tests', () => {
       // nobody is a token holder
       return 0;
     });
-    await tbc.reset([ meta ]);
+    await tbc.reset(null, null, [ meta ]);
 
     // fail to create a thread
     const res = await modelUtils.createThread({
@@ -139,7 +139,7 @@ describe('Token Forum tests', () => {
       if (nQueries === 1) return 1;
       else return 0;
     });
-    await tbc.reset([ meta ]);
+    await tbc.reset(null, null, [ meta ]);
 
     // create a thread successfully
     const res = await modelUtils.createThread({
@@ -190,7 +190,7 @@ describe('Token Forum tests', () => {
       if (nQueries === 1) return 0;
       else return 1;
     });
-    await tbc.reset([ meta ]);
+    await tbc.reset(null, null, [ meta ]);
 
     // create a thread successfully
     const errorRes = await modelUtils.createThread({
@@ -243,7 +243,7 @@ describe('Token Forum tests', () => {
       // nobody is a token holder
       return 0;
     });
-    await tbc.reset([ meta ]);
+    await tbc.reset(null, null, [ meta ]);
 
     // create a thread
     const res = await modelUtils.createThread({

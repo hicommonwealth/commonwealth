@@ -4,12 +4,13 @@
     .cui-button.cui-align-center {
         justify-content: left;
     }
-
+    .ExternalLinksModule {
+        margin: 22px 0;
+    }
     .cui-button.website-button, .cui-button.github-button, .cui-button.telegram-button,
     .cui-button.element-button, .cui-button.discord-button {
         padding: 0 10px;
         margin-right: 8px;
-        margin-top: 22px;
     }
     .cui-button.telegram-button {
         border-color: tint(#2480cc, 70%);
@@ -23,7 +24,7 @@
         }
         svg {
             position: relative;
-            top: 1px;
+            top: -3px;
             left: -1px;
             path {
                 stroke: #2480cc;
@@ -41,6 +42,8 @@
             text-align: left;
         }
         svg {
+            position: relative;
+            top: -4px;
             path {
                 stroke: #0cbd8b;
             }
@@ -57,6 +60,8 @@
             text-align: left;
         }
         svg {
+            position: relative;
+            top: -4px;
             path {
                 fill: #677bc4;
             }
@@ -73,6 +78,8 @@
             text-align: left;
         }
         svg {
+            position: relative;
+            top: -3px;
             path {
                 fill: #222222;
             }
@@ -182,7 +189,7 @@
     }
     @include sm-max {
         padding-top: 30px;
-        max-height: calc(100vh - 60px); // $mobile-sidebar-height
+        max-height: calc(100vh - 60px); // $mobile-header-height
         overflow-y: scroll;
         .SidebarHeader {
             display: none;

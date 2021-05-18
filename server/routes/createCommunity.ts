@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { NotificationCategories } from '../../shared/types';
+import { slugify } from '../../shared/utils';
 import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -61,7 +62,7 @@ const createCommunity = async (models, req: Request, res: Response, next: NextFu
   }
 
   // If there's any whitespace in the community name replace to make a nice url
-  const createdId = req.body.name.toLowerCase().trim().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
+  const createdId = slugify(req.body.name);
   const communityContent = {
     id: createdId,
     creator_id: address.id,

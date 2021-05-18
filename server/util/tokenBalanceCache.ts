@@ -2,13 +2,19 @@ import moment from 'moment';
 import Web3 from 'web3';
 import BN from 'bn.js';
 import { providers } from 'ethers';
+
+import { INFURA_API_KEY } from '../config';
 import { Erc20Factory } from '../../eth/types/Erc20Factory';
 import { Erc20 } from '../../eth/types/Erc20';
+import { TokenResponse } from '../../shared/types';
+
 import JobRunner from './cacheJobRunner';
-import { INFURA_API_KEY } from '../config';
+import TokenListCache from './tokenListCache';
+import { slugify } from '../../shared/utils';
 
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
+const TEST_CONTRACT_ID = 'ABC';
 
 // map of addresses to balances
 interface CacheT {
@@ -23,40 +29,75 @@ interface CacheT {
 export interface TokenForumMeta {
   id: string;
   address: string;
+  iconUrl: string;
+  name: string;
+  symbol: string;
   balanceThreshold?: BN;
-  api?: Erc20;
 }
 
 export default class TokenBalanceCache extends JobRunner<CacheT> {
   private _contracts: TokenForumMeta[];
 
-  constructor(noBalancePruneTimeS: number = 5 * 60, private _hasBalancePruneTimeS: number = 24 * 60 * 60) {
+  constructor(
+    private readonly _listCache: TokenListCache,
+    noBalancePruneTimeS: number = 5 * 60,
+    private readonly _hasBalancePruneTimeS: number = 24 * 60 * 60,
+  ) {
     super({}, noBalancePruneTimeS);
+    this._listCache = new TokenListCache();
   }
 
-  public static async connectTokens(models, network = 'mainnet'): Promise<TokenForumMeta[]> {
-    // initialize web3 (we all URL fields should be the same -- infura)
-    const web3Provider = new Web3.providers.HttpProvider(`https://${network}.infura.io/v3/${INFURA_API_KEY}`);
-    const provider = new providers.Web3Provider(web3Provider);
-
+  private async _connectTokens(models, network = 'mainnet'): Promise<TokenForumMeta[]> {
     // initialize metadata from database
-    const tokens = await models['Chain'].findAll({
+    const dbTokens = await models['Chain'].findAll({
       where: { type: 'token' },
       include: [ models['ChainNode'] ],
     });
 
     // TODO: support customized balance thresholds
-    return tokens
-      .filter(({ ChainNodes }) => ChainNodes)
-      .map(({ ChainNodes }): TokenForumMeta => ({
-        id: ChainNodes[0].chain,
-        address: ChainNodes[0].address,
-        api: Erc20Factory.connect(ChainNodes[0].address, provider),
+    // TODO: support ChainId
+    const tokens: TokenForumMeta[] = dbTokens
+      .filter(({ ChainNodes }) => ChainNodes && ChainNodes[0]?.address)
+      .map((chain): TokenForumMeta => ({
+        id: chain.id,
+        address: chain.ChainNodes[0].address,
+        name: chain.name,
+        symbol: chain.symbol,
+        iconUrl: chain.icon_url,
       }));
+
+    try {
+      const tokensFromListsResponses = await this._listCache.getTokens();
+      const tokensFromLists: TokenForumMeta[] = tokensFromListsResponses
+        .map((o) => {
+          return {
+            id: slugify(o.name),
+            address: o.address,
+            name: o.name,
+            symbol: o.symbol,
+            iconUrl: o.logoURI,
+          };
+        });
+
+      return [...tokens, ...tokensFromLists];
+    } catch (e) {
+      log.error('An error occurred trying to access token lists', e.message);
+    }
+
+    return tokens;
   }
 
-  public async start(tokenMeta: TokenForumMeta[]) {
-    this._contracts = tokenMeta;
+  public getToken(searchAddress: string): TokenForumMeta {
+    return this._contracts.find(({ address }) => address === searchAddress);
+  }
+
+  public async start(models?, network = 'mainnet', prefetchedTokenMeta?: TokenForumMeta[]) {
+    if (!prefetchedTokenMeta) {
+      const tokenMeta = await this._connectTokens(models, network);
+      this._contracts = tokenMeta;
+    } else {
+      this._contracts = prefetchedTokenMeta;
+    }
 
     // write init values into saved cache
     await this.access(async (cache) => {
@@ -67,23 +108,30 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
 
     // kick off job
     super.start();
-    log.info(`Started Token Balance Cache with tokens: ${JSON.stringify(this._contracts.map(({ id }) => id))}`);
+    log.info(`Started Token Balance Cache with ${this._contracts.length} tokens.`);
   }
 
-  public async reset(tokenMeta: TokenForumMeta[]) {
+  public async reset(models?, network = 'mainnet', prefetchedTokenMeta?: TokenForumMeta[]) {
     super.close();
     await this.access(async (cache) => {
       for (const key of Object.keys(cache)) {
         delete cache[key];
       }
     });
-    return this.start(tokenMeta);
+    return this.start(models, network, prefetchedTokenMeta);
+  }
+
+  public getTokens(): Promise<TokenResponse[]> {
+    return this._listCache.getTokens();
   }
 
   // query a user's balance on a given token contract and save in cache
-  public async hasToken(contractId: string, address: string): Promise<boolean> {
+  public async hasToken(contractId: string, address: string, network = 'mainnet'): Promise<boolean> {
+    if (process.env.NODE_ENV === 'development' && contractId === TEST_CONTRACT_ID) {
+      return true;
+    }
     const tokenMeta = this._contracts.find(({ id }) => id === contractId);
-    if (!tokenMeta || !tokenMeta.api) throw new Error('unsupported token');
+    if (!tokenMeta) throw new Error('unsupported token');
     const threshold = tokenMeta.balanceThreshold || new BN(1);
 
     // first check the cache for the token balance
@@ -95,7 +143,11 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     // fetch balance if not found in cache
     let balance: BN;
     try {
-      const balanceBigNum = await tokenMeta.api.balanceOf(address);
+      // init API against infura
+      const web3Provider = new Web3.providers.HttpProvider(`https://${network}.infura.io/v3/${INFURA_API_KEY}`);
+      const provider = new providers.Web3Provider(web3Provider);
+      const api = Erc20Factory.connect(tokenMeta.address, provider);
+      const balanceBigNum = await api.balanceOf(address);
       balance = new BN(balanceBigNum.toString());
     } catch (e) {
       throw new Error(`Could not fetch token balance: ${e.message}`);

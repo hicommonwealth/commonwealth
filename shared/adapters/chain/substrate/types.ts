@@ -73,6 +73,7 @@ export interface ISubstrateBounty extends IIdentifiable {
   fee: u128;
   curator_deposit: u128;
   bond: u128;
+  description: string;
   status?: BountyStatus;
 }
 

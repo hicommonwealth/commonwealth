@@ -79,7 +79,7 @@ pre {
 .forum-container {
     padding: 20px 0;
 }
-.MobileSidebarHeader {
+.MobileHeader {
     display: none;
 }
 .LoadingLayout {
@@ -107,21 +107,21 @@ pre {
     }
 }
 @include sm-max {
-    $mobile-sidebar-height: 60px; // see also sidebar/index.scss
-    .MobileSidebarHeader {
+    $mobile-header-height: 60px; // see also sidebar/index.scss
+    .MobileHeader {
         display: flex;
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         z-index: 99;
-        height: $mobile-sidebar-height;
         user-select: none;
+        padding: 10px;
     }
     .Sidebar {
         display: none;
         position: fixed;
-        top: $mobile-sidebar-height;
+        top: $mobile-header-height;
         left: 0;
         width: 100%;
         padding: 20px 0;
@@ -131,7 +131,7 @@ pre {
         }
     }
     .layout-container {
-        padding-top: $mobile-sidebar-height;
+        padding-top: $mobile-header-height;
         width: 100%;
         padding-left: 0;
         padding-right: 0;

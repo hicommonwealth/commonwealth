@@ -1,10 +1,8 @@
 import 'pages/profile.scss';
 
 import m from 'mithril';
-import moment from 'moment';
 import _ from 'lodash';
 import mixpanel from 'mixpanel-browser';
-import $ from 'jquery';
 import Web3 from 'web3';
 
 import app from 'state';
@@ -16,7 +14,6 @@ import PageLoading from 'views/pages/loading';
 import Tabs from 'views/components/widgets/tabs';
 
 import { decodeAddress, checkAddress, encodeAddress } from '@polkadot/util-crypto';
-import { setActiveAccount } from 'controllers/app/login';
 import ProfileHeader from './profile_header';
 import ProfileContent from './profile_content';
 import ProfileBio from './profile_bio';

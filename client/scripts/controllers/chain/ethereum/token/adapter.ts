@@ -1,5 +1,3 @@
-import { ethers } from 'ethers';
-
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 
 import { Erc20Factory } from 'Erc20Factory';
@@ -24,8 +22,6 @@ export default class Token extends IChainAdapter<EthereumCoin, EthereumAccount> 
   public accounts: EthereumAccounts;
   public hasToken: boolean = false;
 
-  public readonly chainEntities = new ChainEntityController();
-
   constructor(meta: NodeInfo, app: IApp) {
     super(meta, app);
     this.chain = new EthereumTokenChain(this.app);
@@ -47,7 +43,7 @@ export default class Token extends IChainAdapter<EthereumCoin, EthereumAccount> 
   public async initData() {
     await this.chain.initEventLoop();
     await super.initData();
-    await this.activeAddressHasToken(this.app.user.activeAccount.address);
+    await this.activeAddressHasToken(this.app.user?.activeAccount?.address);
   }
 
   public async deinit() {
@@ -56,11 +52,6 @@ export default class Token extends IChainAdapter<EthereumCoin, EthereumAccount> 
     this.chain.deinitMetadata();
     this.chain.deinitEventLoop();
     this.chain.deinitApi();
-  }
-
-  public async getEthersProvider() {
-    const provider = new ethers.providers.Web3Provider(this.chain.api.currentProvider as any);
-    return provider;
   }
 
   public async activeAddressHasToken(activeAddress?: string) {

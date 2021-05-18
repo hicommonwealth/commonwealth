@@ -22,7 +22,7 @@ class OffchainComment<T extends IUniqueId> {
   public readonly versionHistory: VersionHistory[];
   public readonly lastEdited: moment.Moment;
 
-  constructor(
+  constructor({
     chain,
     author,
     text,
@@ -34,11 +34,12 @@ class OffchainComment<T extends IUniqueId> {
     createdAt,
     childComments = [],
     rootProposal,
-    parentComment?,
-    community?,
-    authorChain?,
-    lastEdited?: moment.Moment,
-  ) {
+    // optional args
+    parentComment,
+    community,
+    authorChain,
+    lastEdited, // moment.Moment
+  }) {
     this.chain = chain;
     this.author = author;
     this.text = text;
@@ -64,21 +65,20 @@ class OffchainComment<T extends IUniqueId> {
     try {
       const proposalSplit = decodeURIComponent(comment.root_id).split(/-|_/);
       if (proposalSplit[0] === 'discussion') {
-        proposal = new OffchainThread(
-          '',
-          '',
-          null,
-          Number(proposalSplit[1]),
-          comment.created_at,
-          null,
-          null,
-          null,
-          comment.community,
-          comment.chain,
-          null,
-          null,
-          null,
-        );
+        proposal = new OffchainThread({
+          author: '',
+          title: '',
+          attachments: null,
+          id: Number(proposalSplit[1]),
+          createdAt: comment.created_at,
+          topic: null,
+          kind: null,
+          stage: null,
+          community: comment.community,
+          chain: comment.chain,
+          versionHistory: null,
+          readOnly: null,
+        });
       } else {
         proposal = {
           chain: comment.chain,
@@ -90,22 +90,23 @@ class OffchainComment<T extends IUniqueId> {
     } catch (e) {
       proposal = null;
     }
-    return new OffchainComment(
-      comment.chain,
-      comment?.Address?.address || comment.author,
-      decodeURIComponent(comment.text),
-      comment.plaintext,
-      comment.version_history,
+    return new OffchainComment({
+      chain: comment.chain,
+      author: comment?.Address?.address || comment.author,
+      text: decodeURIComponent(comment.text),
+      plaintext: comment.plaintext,
+      versionHistory: comment.version_history,
       attachments,
       proposal,
-      comment.id,
-      moment(comment.created_at),
-      comment.child_comments,
-      comment.root_id,
-      comment.parent_id,
-      comment.community,
-      comment?.Address?.chain || comment.authorChain,
-    );
+      id: comment.id,
+      createdAt: moment(comment.created_at),
+      childComments: comment.child_comments,
+      rootProposal: comment.root_id,
+      parentComment: comment.parent_id,
+      community: comment.community,
+      authorChain: comment?.Address?.chain || comment.authorChain,
+      lastEdited: null,
+    });
   }
 }
 

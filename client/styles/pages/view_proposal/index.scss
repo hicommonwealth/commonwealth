@@ -111,6 +111,78 @@ $discussion-title-font-size: 1.45rem;
                 }
             }
         }
+        .ProposalHeaderOffchainPoll {
+            display: inline-block;
+            margin-top: 32px;
+            margin-bottom: 10px;
+            padding: 16px 22px;
+            border-radius: 6px;
+            background: $background-color-light;
+            text-decoration: none !important;
+            width: 360px;
+            .offchain-poll-header {
+                padding-top: 4px;
+                padding-bottom: 12px;
+                font-weight: 600;
+                margin-left: -22px;
+                margin-right: -22px;
+                padding-left: 22px;
+                padding-right: 22px;
+            }
+
+            .offchain-poll-row,
+            .offchain-poll-respondents {
+                display: flex;
+            }
+            .offchain-poll-row.offchain-poll-ended {
+                pointer-events: none;
+                .offchain-poll-col {
+                    opacity: 0.8;
+                }
+            }
+            .offchain-poll-col {
+                height: 20px;
+                text-align: center;
+                border: 1px solid transparent;
+                svg {
+                    stroke: #373b46;
+                }
+                &:hover {
+                    border: 1px solid #373b46;
+                }
+                &:first-child {
+                    border-radius: 20px 0 0 20px;
+                }
+                &:last-child {
+                    border-radius: 0 20px 20px 0;
+                }
+            }
+            .UserGallery .User {
+                margin-right: -4px;
+                margin-left: -4px;
+            }
+            .offchain-poll-respondents-col {
+                padding-top: 12px;
+                text-align: center;
+                font-size: 15px;
+                color: $text-color-medium;
+            }
+            .offchain-poll-caption {
+                padding-top: 16px;
+                text-align: center;
+                font-size: 15px;
+                color: $text-color-medium;
+                text-align: center;
+            }
+
+            .offchain-poll-col,
+            .offchain-poll-respondents-col {
+                width: 16.6%;
+                &.wide {
+                    width: 100%;
+                }
+            }
+        }
         .ProposalHeaderThreadLinkedChainEntity,
         .ProposalHeaderExternalLink,
         .ProposalHeaderBlockExplorerLink,
@@ -218,7 +290,7 @@ $discussion-title-font-size: 1.45rem;
             }
         }
     }
-    
+
     .CommentSocialHeader,
     .ProposalSocialHeader {
         font-size: $discussion-meta-font-size;
@@ -255,12 +327,14 @@ $discussion-title-font-size: 1.45rem;
         }
     }
     .ProposalHeaderStage,
-    .ProposalHeaderStageEditorButton {
+    .ProposalHeaderStageEditorButton,
+    .ProposalHeaderPollEditorButton {
         position: relative;
         top: -4px;
         margin-right: 7px;
     }
-    .ProposalHeaderStageEditorButton.cui-button {
+    .ProposalHeaderStageEditorButton.cui-button,
+    .ProposalHeaderPollEditorButton.cui-button {
         height: 22px;
         min-height: 22px;
         padding: 0 10px;

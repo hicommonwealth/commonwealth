@@ -2,7 +2,7 @@ import 'pages/treasury.scss';
 
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
-import { Grid, Col, List, Tag } from 'construct-ui';
+import { Button, Grid, Col, List, Tag } from 'construct-ui';
 import moment from 'moment';
 
 import app from 'state';
@@ -32,6 +32,7 @@ import loadSubstrateModules from 'views/components/load_substrate_modules';
 const SubstrateProposalStats: m.Component<{}, {}> = {
   view: (vnode) => {
     if (!app.chain) return;
+    const activeAccount = app.user.activeAccount;
 
     return m('.stats-box', [
       m('.stats-box-left', '💭'),
@@ -46,7 +47,7 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
               'Treasury: ', formatCoin((app.chain as Substrate).treasury.pot),
             ]),
             m('.stats-box-stat', [
-              'Next treasury spend: ',
+              'Next spend period: ',
               (app.chain as Substrate).treasury.nextSpendBlock
                 ? m(CountdownUntilBlock, {
                   block: (app.chain as Substrate).treasury.nextSpendBlock,
@@ -54,6 +55,16 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
                 })
                 : '--',
             ]),
+          ]),
+          app.chain?.class !== ChainClass.Plasm && m('', [
+            m(Button, {
+              class: activeAccount ? '' : 'disabled',
+              onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
+                type: ProposalType.SubstrateTreasuryProposal
+              }),
+              rounded: true,
+              label: 'New treasury proposal',
+            }),
           ]),
         ]),
       ]),

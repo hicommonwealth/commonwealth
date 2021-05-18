@@ -19,6 +19,7 @@ export { default as OffchainComment } from './OffchainComment';
 export { default as OffchainReaction } from './OffchainReaction';
 export { default as OffchainTopic } from './OffchainTopic';
 export { default as OffchainThread } from './OffchainThread';
+export { default as OffchainVote } from './OffchainVote';
 export { default as Profile } from './Profile';
 export { default as Proposal } from './Proposal';
 export { default as ProposalModule } from './ProposalModule';
@@ -40,6 +41,7 @@ export {
   ChainClass,
   OffchainThreadKind,
   OffchainThreadStage,
+  OffchainVoteOptions,
   TransactionStatus,
   ProposalStatus,
   VotingType,

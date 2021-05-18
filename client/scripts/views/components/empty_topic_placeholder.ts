@@ -28,7 +28,7 @@ const EmptyTopicPlaceholder: m.Component<{ topicName?: string, communityName?: s
       ]),
       m('p', 'There are no threads here yet.'),
       !app.isLoggedIn() && m('p', 'Log in to create a new thread.'),
-      m(NewProposalButton, { fluid: false, threadOnly: true }),
+      m(NewProposalButton, { fluid: false }),
     ]);
   }
 };

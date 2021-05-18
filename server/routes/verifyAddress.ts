@@ -26,6 +26,7 @@ const verifyAddress = async (models, req: Request, res: Response, next: NextFunc
   if (!req.body.signature) {
     return next(new Error(Errors.NoSignature));
   }
+
   const chain = await models.Chain.findOne({
     where: { id: req.body.chain }
   });
