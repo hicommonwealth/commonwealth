@@ -9,7 +9,7 @@ class Crust extends Substrate {
   }
 
   public async initApi() {
-    await super.initApi({ 'types': { ...CrustSpec } });
+    await super.initApi({ 'types': CrustSpec });
   }
 }
 
