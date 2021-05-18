@@ -24,6 +24,11 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
 nvm install
 ```
 
+- if for some reason, nvm still doesnt work, try using 
+````
+    source ~/.nvm/nvm.sh
+```
+
 - Use the configured version of node: `nvm use`
 - Install packages: `yarn`
     - This is equivalent to `yarn update`

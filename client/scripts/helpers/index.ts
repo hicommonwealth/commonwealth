@@ -1,4 +1,5 @@
 import m from 'mithril';
+import { ICardListItem } from 'models/interfaces';
 import moment from 'moment';
 
 import app from 'state';
@@ -324,5 +325,25 @@ export const loadScript = (scriptURI) => {
       reject();
     };
     document.head.appendChild(script);
+  });
+};
+
+
+export const removeOrAddClasslistToAllElements = (
+  cardList: ICardListItem[],
+  classlist: string,
+  method: string
+) => {
+  cardList.forEach((chain: ICardListItem) => {
+    const {
+      card: { id },
+    } = chain;
+
+    const METHODS = {
+      add: () => document.getElementById(id).classList.add(classlist),
+      remove: () => document.getElementById(id).classList.remove(classlist),
+    };
+
+    return METHODS[method]();
   });
 };

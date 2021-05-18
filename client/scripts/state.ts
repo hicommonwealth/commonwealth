@@ -148,6 +148,7 @@ const app: IApp = {
     return document.location.origin.indexOf('commonwealth.im') !== -1;
   },
   serverUrl: () => '/api',
+
   loadingError: null,
 
   isCustomDomain: () => {

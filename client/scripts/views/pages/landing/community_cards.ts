@@ -1,4 +1,4 @@
-import 'pages/home/community_cards.scss';
+import 'pages/landing/community_cards.scss';
 
 import m from 'mithril';
 import { Button, Icon, Icons, Card, Tag } from 'construct-ui';

@@ -1,0 +1,54 @@
+@import "client/styles/shared";
+
+.LandingPageHeaderLinks {
+  a.text-gray-500.leading-none {
+    color: $text-color-black;
+    text-decoration: none;
+    cursor: pointer;
+    // &:hover {
+    //   background-color: $background-color-black-hover;
+    // }
+  }
+}
+
+li.LandingPageHeaderLoginButton.ml-10.pt-2 {
+  a.btn-primary.pb-3.text-white {
+    color: $text-color-white;
+    text-decoration: none;
+    cursor: pointer;
+    &:hover {
+      background-color: $background-color-black-hover;
+    }
+  }
+}
+
+.HeaderLandingPage {
+  margin-right: auto;
+  margin-left: auto;
+  margin-top: 1rem;
+  width: 70%;
+  padding-right: 1rem;
+  padding-left: 1rem;
+}
+
+.header-hidden {
+  top: -100px;
+}
+
+header.landing-header  {
+  @media (min-width: 1023px)   {
+    width: 91%;
+  }
+
+  @media (min-width: 1100px)  {
+    width: 85%;
+  }
+
+  @media (min-width: 1300px)  {
+    width: 75%;
+  }
+  
+  @media (min-width: 1500px) {
+    width: 90%;
+  }
+}

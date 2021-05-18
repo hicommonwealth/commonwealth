@@ -13,7 +13,6 @@ import Sidebar from 'views/components/sidebar';
 import MobileHeader from 'views/mobile/mobile_header';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import Token from 'controllers/chain/ethereum/token/adapter';
-
 import { SearchBar } from './components/search_bar';
 
 const Sublayout: m.Component<{
