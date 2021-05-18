@@ -159,7 +159,8 @@
         }
         .ChainIcon, .CommunityIcon {
             position: absolute;
-            right: 0;
+            right: -14px;
+            width: 18px;
         }
         &:focus-within {
             background: linear-gradient(to bottom, #91ACE1, #DDBFE1) !important;
