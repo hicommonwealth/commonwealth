@@ -4,7 +4,7 @@ import _ from 'lodash';
 
 import app from 'state';
 import { ProfileStore } from 'stores';
-import { OffchainComment, OffchainThread, Profile } from 'models';
+import { OffchainComment, OffchainThread, Profile, Account } from 'models';
 
 class ProfilesController {
   private _store: ProfileStore = new ProfileStore();
@@ -13,7 +13,7 @@ class ProfilesController {
 
   private _unfetched: Profile[];
 
-  private _fetchNewProfiles;
+  private _fetchNewProfiles: (() => Promise<Profile[]>) & _.Cancelable;
 
   public allLoaded() {
     return this._unfetched.length === 0;
@@ -102,7 +102,7 @@ class ProfilesController {
     return profile;
   }
 
-  public async updateProfileForAccount(account, data) {
+  public async updateProfileForAccount(account: Account<any>, data) {
     return new Promise((resolve, reject) => {
       // TODO: Change to PUT /profile
       $.post(`${app.serverUrl()}/updateProfile`, {

@@ -40,7 +40,7 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   ) {
     super(meta, app);
     this.class = _class;
-    this.chain = new SubstrateChain(this.app);
+    this.chain = new SubstrateChain(this.app, meta.chain.ss58Prefix);
     this.accounts = new SubstrateAccounts(this.app);
     this.phragmenElections = new SubstratePhragmenElections(this.app);
     this.council = new SubstrateCouncil(this.app);

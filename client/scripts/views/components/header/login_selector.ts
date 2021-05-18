@@ -145,6 +145,7 @@ export const LoginSelectorMenuLeft: m.Component<{
               const a = app.user.activeAccount;
               m.route.set(`/${app.activeId()}/account/${pf.address}?base=${pf.chain || a.chain.id}`);
             }
+            m.redraw();
           },
           label: m('.label-wrap', [ mobile && m(CustomEyeIcon), m('span', 'View profile') ]),
         }),

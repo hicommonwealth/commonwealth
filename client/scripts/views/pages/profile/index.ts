@@ -26,7 +26,6 @@ const getProfileStatus = (chain: string, address: string, id?: number): {
   displayBanner: boolean,
   currentAddressInfo?: AddressInfo,
 } => {
-  // TODO: this works but fix bug on editing
   const isAddressEqual = (base: ChainBase, address1: string, address2: string): boolean => {
     return base === ChainBase.Substrate
       ? AddressSwapper({
@@ -91,14 +90,19 @@ interface IProfilePageState {
   refreshProfile: boolean;
 }
 
+const resetProfileState = (vnode: m.Vnode<{ address: string, setIdentity?: boolean }, IProfilePageState>) => {
+  vnode.state.profile = null;
+  vnode.state.loaded = false;
+  vnode.state.loading = false;
+  vnode.state.addressId = undefined;
+  vnode.state.threads = [];
+  vnode.state.comments = [];
+  vnode.state.refreshProfile = false;
+};
+
 const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProfilePageState> = {
   oninit: (vnode) => {
-    vnode.state.profile = null;
-    vnode.state.loaded = false;
-    vnode.state.loading = false;
-    vnode.state.threads = [];
-    vnode.state.comments = [];
-    vnode.state.refreshProfile = false;
+    resetProfileState(vnode);
 
     const chain = (m.route.param('base'))
       ? m.route.param('base')
@@ -139,6 +143,11 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
     mixpanel.track('PageVisit', { 'Page Name': 'LoginPage' });
   },
   view: (vnode) => {
+    // Hack: if you're on a profile page and use the login selector to `m.route.set` to a new profile page,
+    //   we need to reset the current page's state in order to load the new account's data.
+    if (vnode.state.profile && vnode.attrs.address !== vnode.state.profile.address && !vnode.state.loading) {
+      resetProfileState(vnode);
+    }
     const loadProfile = async () => {
       const chain = (m.route.param('base'))
         ? m.route.param('base')

@@ -1,4 +1,5 @@
 import { SubstrateTypes, chainSupportedBy } from '@commonwealth/chain-events';
+import AddressSwapper from '../util/addressSwapper';
 import { Request, Response, NextFunction } from 'express';
 import Sequelize from 'sequelize';
 import {
@@ -73,18 +74,32 @@ const updateProfile = async (
     where: { base: chain.base }
   });
 
-
-  const addressesInSameChainbase = await models.Address.findAll({
+  // find all address the user owns
+  const allAddressesInSameChainbase = await models.Address.findAll({
     where: {
       user_id: address.user_id,
       chain: { [Op.in]: chains.map((ch) => ch.id) }
     }
   });
 
+  // we want to update only the addresses that own that can be converted to the same address
+  // when the SS58 prefix is swapped
+  const sameAddressesInSameChainbase = allAddressesInSameChainbase.filter((addr) => {
+    if (chain.base === 'substrate') {
+      return AddressSwapper({
+        address: req.body.address, currentPrefix: 42
+      }) === AddressSwapper({
+        address: addr.address, currentPrefix: 42
+      });
+    } else {
+      return addr.address === req.body.address;
+    }
+  });
+
   // try to find existing profile
   const profiles = await models.OffchainProfile.findAll({
     where: {
-      address_id: { [Op.in]: addressesInSameChainbase.map((_) => _.id) },
+      address_id: { [Op.in]: sameAddressesInSameChainbase.map((addr) => addr.id) },
     }
   });
   let profile = profiles.find((pro) => pro.address_id === address.id);
@@ -103,7 +118,7 @@ const updateProfile = async (
     data: req.body.data
   }, {
     where: {
-      address_id: { [Op.in]: addressesInSameChainbase.map((addr) => addr.id) },
+      address_id: { [Op.in]: sameAddressesInSameChainbase.map((addr) => addr.id) },
     }
   });
 
@@ -127,7 +142,13 @@ const updateProfile = async (
     }
   }
 
-  return res.json({ status: 'Success', result: { profile, updatedProfileAddresses: addressesInSameChainbase } });
+  return res.json({
+    status: 'Success',
+    result: {
+      profile,
+      updatedProfileAddresses: sameAddressesInSameChainbase.map((a) => a.toJSON()),
+    }
+  });
 };
 
 export default updateProfile;

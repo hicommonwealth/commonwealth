@@ -95,8 +95,9 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
   private _app: IApp;
   public get app() { return this._app; }
 
-  constructor(app: IApp) {
+  constructor(app: IApp, ss58Prefix: string) {
     this._app = app;
+    this._ss58Format = +ss58Prefix;
   }
 
   public coins(n: number | BN | SubstrateCoin | Compact<u128>, inDollars?: boolean) {
@@ -304,8 +305,11 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     // chainProps needs to be set first so calls to coins() correctly populate the denom
     if (chainProps) {
       const { ss58Format, tokenDecimals, tokenSymbol } = chainProps;
+      if (+ss58Format !== this._ss58Format) {
+        console.error(`SS58 prefix from chain is ${+ss58Format} and does not match saved ${this._ss58Format}!`);
+      }
       this.registry.setChainProperties(this.createType('ChainProperties', { ...chainProps, ss58Format }));
-      this._ss58Format = +ss58Format.unwrapOr(42);
+      // this._ss58Format = +ss58Format.unwrapOr(42);
       this._tokenDecimals = +tokenDecimals.unwrapOr([ 12 ])[0];
       this._tokenSymbol = `${tokenSymbol.unwrapOr([ this.app.chain.currency ])[0]}`;
     }
