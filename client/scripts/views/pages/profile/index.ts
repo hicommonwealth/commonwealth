@@ -18,6 +18,7 @@ import ProfileHeader from './profile_header';
 import ProfileContent from './profile_content';
 import ProfileBio from './profile_bio';
 import ProfileBanner from './profile_banner';
+import AddressSwapper from '../../components/addresses/address_swapper';
 
 const getProfileStatus = (chain: string, address: string, id?: number): {
   onOwnProfile: boolean,
@@ -25,15 +26,26 @@ const getProfileStatus = (chain: string, address: string, id?: number): {
   displayBanner: boolean,
   currentAddressInfo?: AddressInfo,
 } => {
-  console.log(app.user.activeAccount?.chain);
+  // TODO: this works but fix bug on editing
+  const isAddressEqual = (base: ChainBase, address1: string, address2: string): boolean => {
+    return base === ChainBase.Substrate
+      ? AddressSwapper({
+        address: address1, currentPrefix: 42
+      }) === AddressSwapper({
+        address: address2, currentPrefix: 42
+      })
+      : address1 === address2;
+  };
   const onOwnProfile = typeof app.user.activeAccount?.chain === 'string'
     ? (chain === app.user.activeAccount?.chain && address === app.user.activeAccount?.address)
-    : (chain === app.user.activeAccount?.chain?.id && address === app.user.activeAccount?.address);
+    : (chain === app.user.activeAccount?.chain?.id && isAddressEqual(
+      app.user.activeAccount.chainBase, address, app.user.activeAccount.address
+    ));
   const onLinkedProfile = !onOwnProfile && !!app.user.activeAccounts.find((account) => {
     return app.user.getRoleInCommunity({
       account,
       chain: app.activeChainId(),
-    }) && account.address === address;
+    }) && isAddressEqual(app.chain.base, account.address, address);
   });
 
   console.log(`onOwnProfile: ${onOwnProfile}, onLinkedProfile: ${onLinkedProfile}`);
@@ -81,7 +93,6 @@ interface IProfilePageState {
 
 const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProfilePageState> = {
   oninit: (vnode) => {
-    console.log('init profile page!');
     vnode.state.profile = null;
     vnode.state.loaded = false;
     vnode.state.loading = false;
@@ -104,7 +115,6 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
       if (!valid) {
         try {
           const encoded = encodeAddress(decodedAddress, ss58Prefix);
-          console.log('setting route to ', encoded, baseSuffix);
           m.route.set(`/${m.route.param('scope')}/account/${encoded}${baseSuffix ? `?base=${baseSuffix}` : ''}`);
         } catch (e) {
           // do nothing if can't encode address
@@ -117,7 +127,6 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
       if (!valid) {
         try {
           const checksumAddress = Web3.utils.toChecksumAddress(address);
-          console.log('setting route to ', checksumAddress, baseSuffix);
           m.route.set(`/${m.route.param('scope')}/account/${checksumAddress}${baseSuffix ? `?base=${baseSuffix}` : ''}`);
         } catch (e) {
           // do nothing if can't get checksumAddress
@@ -169,7 +178,6 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
     }
 
     const account = app.chain.accounts.get(profile.address);
-    console.log(account);
 
     const { onOwnProfile, onLinkedProfile, displayBanner, currentAddressInfo } = getProfileStatus(
       profile.chain,
