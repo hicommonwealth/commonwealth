@@ -23,20 +23,18 @@ const getProfileStatus = (chain: string, address: string, id?: number): {
   onOwnProfile: boolean,
   onLinkedProfile: boolean,
   displayBanner: boolean,
-  currentAddressInfo: AddressInfo,
+  currentAddressInfo?: AddressInfo,
 } => {
+  console.log(app.user.activeAccount?.chain);
   const onOwnProfile = typeof app.user.activeAccount?.chain === 'string'
     ? (chain === app.user.activeAccount?.chain && address === app.user.activeAccount?.address)
     : (chain === app.user.activeAccount?.chain?.id && address === app.user.activeAccount?.address);
-  const onLinkedProfile = !onOwnProfile && app.user.activeAccounts.length > 0
-    && app.user.activeAccounts.filter((account_) => {
-      return app.user.getRoleInCommunity({
-        account: account_,
-        chain: app.activeChainId(),
-      });
-    }).filter((account) => {
-      return account.address === address;
-    }).length > 0;
+  const onLinkedProfile = !onOwnProfile && !!app.user.activeAccounts.find((account) => {
+    return app.user.getRoleInCommunity({
+      account,
+      chain: app.activeChainId(),
+    }) && account.address === address;
+  });
 
   console.log(`onOwnProfile: ${onOwnProfile}, onLinkedProfile: ${onLinkedProfile}`);
 
@@ -44,25 +42,16 @@ const getProfileStatus = (chain: string, address: string, id?: number): {
   // then display the ProfileBanner
   // TODO: display the banner if the current address is in app.activeAddresses() and *is* a member of the
   // community (this will require alternate copy on the banner)
-  let isUnjoinedJoinableAddress: boolean;
-  let currentAddressInfo: AddressInfo;
+  let isUnjoinedJoinableAddress: boolean = false;
+  let currentAddressInfo: AddressInfo | undefined;
   if (!onOwnProfile && !onLinkedProfile) {
     const communityOptions = { chain: app.activeChainId(), community: app.activeCommunityId() };
-    const communityRoles = app.user.getAllRolesInCommunity(communityOptions);
-    const joinableAddresses = app.user.getJoinableAddresses(communityOptions);
-    const unjoinedJoinableAddresses = (joinableAddresses.length > communityRoles.length)
-      ? joinableAddresses.filter((addr) => {
-        return communityRoles.filter((role) => {
-          return role.address_id === addr.id;
-        }).length === 0;
-      })
-      : [];
-    const currentAddressInfoArray = unjoinedJoinableAddresses.filter((addr) => {
-      return id && addr.id === id;
-    });
-    isUnjoinedJoinableAddress = currentAddressInfoArray.length > 0;
-    if (isUnjoinedJoinableAddress) {
-      currentAddressInfo = currentAddressInfoArray[0];
+    const communityRoles = app.user.getAllRolesInCommunity(communityOptions); // already joined
+    const unjoinedJoinableAddresses = app.user.getJoinableAddresses(communityOptions)
+      .filter((addr) => !communityRoles.find((role) => role.address_id === addr.id));
+    currentAddressInfo = id && unjoinedJoinableAddresses.find((addr) => addr.id === id);
+    if (currentAddressInfo) {
+      isUnjoinedJoinableAddress = true;
     }
   }
 
@@ -92,6 +81,7 @@ interface IProfilePageState {
 
 const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProfilePageState> = {
   oninit: (vnode) => {
+    console.log('init profile page!');
     vnode.state.profile = null;
     vnode.state.loaded = false;
     vnode.state.loading = false;
@@ -114,6 +104,7 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
       if (!valid) {
         try {
           const encoded = encodeAddress(decodedAddress, ss58Prefix);
+          console.log('setting route to ', encoded, baseSuffix);
           m.route.set(`/${m.route.param('scope')}/account/${encoded}${baseSuffix ? `?base=${baseSuffix}` : ''}`);
         } catch (e) {
           // do nothing if can't encode address
@@ -126,6 +117,7 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
       if (!valid) {
         try {
           const checksumAddress = Web3.utils.toChecksumAddress(address);
+          console.log('setting route to ', checksumAddress, baseSuffix);
           m.route.set(`/${m.route.param('scope')}/account/${checksumAddress}${baseSuffix ? `?base=${baseSuffix}` : ''}`);
         } catch (e) {
           // do nothing if can't get checksumAddress
