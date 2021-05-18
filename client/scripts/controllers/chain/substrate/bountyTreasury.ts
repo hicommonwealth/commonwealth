@@ -73,6 +73,28 @@ class SubstrateBountyTreasury extends ProposalModule<
       () => this._Chain.fetcher.fetchBounties(this.app.chain.block.height),
     );
 
+    // fetch extra metadata
+    // TODO: this should be picked up by the chain-events system
+    const extra = await ChainInfo.api.derive.bounties.bounties();
+    extra.forEach((b) => {
+      const index = b.index.toNumber();
+      const bounty = this.store.getByIdentifier(index);
+      if (!bounty) {
+        console.log('Unexpected missing bounty, on chain but not returned by chain-events');
+        return;
+      }
+      const data = {
+        title: b.description,
+        isActive: b.bounty.status.isActive,
+        isApproved: b.bounty.status.isApproved,
+        isCuratorProposed: b.bounty.status.isCuratorProposed,
+        isFunded: b.bounty.status.isFunded,
+        isPendingPayout: b.bounty.status.isPendingPayout,
+        isProposed: b.bounty.status.isProposed,
+      };
+      bounty.setStatus(data);
+    });
+
     this._initialized = true;
     this._initializing = false;
   }

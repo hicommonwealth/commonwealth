@@ -5,11 +5,12 @@ import LoginModal from 'views/modals/login_modal';
 
 interface IAttrs {
   navs: { text: string; redirectTo: string }[];
+  scrollHeader: boolean;
 }
 
 interface IState {
   headerMinimized: boolean;
-  hideHeader: boolean;
+  hideHeader?: boolean;
 }
 
 // eslint-disable-next-line max-len
@@ -37,10 +38,14 @@ const scrollingHeader = () => {
 
 const HeaderLandingPage: m.Component<IAttrs, IState> = {
   oninit: (vnode) => {
-    window.addEventListener('scroll', scrollingHeader);
+    if (vnode.attrs.scrollHeader) {
+      window.addEventListener('scroll', scrollingHeader);
+    }
   },
   onremove: (vnode) => {
-    window.removeEventListener('scroll', scrollingHeader);
+    if (vnode.attrs.scrollHeader) {
+      window.removeEventListener('scroll', scrollingHeader);
+    }
   },
   view: (vnode) => {
     const redirectClick = (route) => {
@@ -61,6 +66,7 @@ const HeaderLandingPage: m.Component<IAttrs, IState> = {
             class: 'w-32 md:w-48 lg:w-60',
             src: 'static/img/logo.svg',
             alt: 'Commonwealth',
+            style: m.route.get() === '/' ? '' : 'cursor:pointer',
             onclick: () => redirectClick('/'),
           }),
           m(
