@@ -229,7 +229,7 @@ $text-size-mobile-header: 22px;
         width: 100%;
         max-width: none;
     }
-    @include lg-min {
+    @include xl-min {
         width: calc(33% - 24px);
     }
     // padding
