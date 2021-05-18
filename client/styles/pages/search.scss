@@ -171,10 +171,6 @@
             height: 31px;
             padding: 20px 15px 15px;
             padding-right: 38px;
-            padding-left: 22px !important;
-            @include sm-max {
-                padding-left: 38px !important;
-            }
             position: relative;
             background: #EFEFEF;
             border: none;
