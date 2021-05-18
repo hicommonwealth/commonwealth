@@ -116,6 +116,7 @@ const LandingPage: m.Component<{}, IState> = {
           'div',
           { class: 'absolute w-screen z-20' },
           m(HeaderLandingPage, {
+            scrollHeader: true,
             navs: [
               { text: 'Why Commonwealth?', redirectTo: '/whyCommonwealth' },
             // { text: 'Use Cases', redirectTo: '/whyCommonwealth' },

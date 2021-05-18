@@ -1,8 +1,11 @@
 /* eslint-disable max-len */
 
+import 'pages/landing/privacyAndTerms.scss';
+
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 import { renderMultilineText } from 'helpers';
+import HeaderLandingPage from './landing_page_header';
 
 const TermsOfService = `
 PLEASE READ THE BELOW GOVERNANCE PLATFORM SERVICES AGREEMENT VERY CAREFULLY. THE BELOW GOVERNANCE PLATFORM SERVICES AGREEMENT IS A LEGALLY BINDING CONTRACT BETWEEN YOU AND COMMONWEALTH LABS THAT SETS FORTH AND DETERMINES, AMONG OTHER THINGS:
@@ -123,6 +126,12 @@ const TermsPage: m.Component<{}> = {
   },
   view: (vnode) => {
     return m('.TermsPage', [
+      m(HeaderLandingPage, {
+        scrollHeader: false,
+        navs: [
+          { text: 'Why Commonwealth?', redirectTo: '/whyCommonwealth' },
+        ],
+      }),
       m('.forum-container', [
         m('h1.page-title', 'Terms of Service'),
         renderMultilineText(TermsOfService),

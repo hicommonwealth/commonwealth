@@ -13,6 +13,7 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
         'div',
         { class: 'absolute w-screen z-20' },
         m(HeaderLandingPage, {
+          scrollHeader: true,
           navs: [
             { text: 'Why Commonwealth?', redirectTo: '/whyCommonwealth' },
             // { text: 'Use Cases' },
@@ -202,12 +203,14 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
       ]),
       m(FooterLandingPage, {
         list: [
-          { text: 'Why Commonwealth?', redirectTo: '/whyCommonwealth' },
-          // { text:  'Use Cases' },
+          { text:  'Privacy', redirectTo: '/privacy' },
+          { text:  'Terms', redirectTo:  '/terms' },
+          { text: 'Jobs', externalLink: 'https://angel.co/company/commonwealth-labs/jobs' },
+          { text: 'Blog', externalLink: 'https://commonwealth.im/' }          // { text:  'Use Cases' },
           // { text:  'Crowdfunding' },
           // { text:  'Developers' },
           // { text:  'About us' },
-          // { text:  'Carrers' }
+          // { text:  'Careers' }
         ],
       }),
     ]);
