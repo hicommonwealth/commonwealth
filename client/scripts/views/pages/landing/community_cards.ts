@@ -217,7 +217,7 @@ const HomepageCommunityCards: m.Component<{}, {}> = {
     );
 
     return m('.HomepageCommunityCards', {
-      style: 'margin-top: 20px',
+      style: 'margin-top: 40px',
     }, [
       m('.communities-list', [
         sortedChainsAndCommunities,
