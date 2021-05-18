@@ -8,12 +8,19 @@ import { formatCoin } from 'adapters/currency';
 import { ProposalType } from 'identifiers';
 import { formatDuration, blockperiodToDuration } from 'helpers';
 
+import Substrate from 'controllers/chain/substrate/main';
+import { SubstrateAccount } from 'controllers/chain/substrate/account';
+
 import { ChainBase } from 'models';
 import { CountdownUntilBlock } from 'views/components/countdown';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import ProposalCard from 'views/components/proposal_card';
-import Substrate from 'controllers/chain/substrate/main';
+import {
+  ApproveBountyModal, ProposeCuratorModal, AwardBountyModal, ExtendExpiryModal
+} from 'views/modals/bounty_modals';
+import { confirmationModalWithText } from 'views/modals/confirm_modal';
+
 import Listing from './listing';
 import ErrorPage from './error';
 import loadSubstrateModules from '../components/load_substrate_modules';
@@ -29,17 +36,6 @@ function getModules() {
     throw new Error('invalid chain');
   }
 }
-
-enum BountyStatus {
-  Proposed,
-  Approved,
-  Funded,
-  CuratorProposed,
-  Active,
-  PendingPayout,
-  PayoutReady,
-  Complete,
-};
 
 const bountyStatusToLabel = (bounty) => {
   if (bounty.complete) return 'Bounty claimed';
@@ -60,7 +56,12 @@ const BountyDetail = {
       intent: 'primary' as any,
     };
 
-    return m('.BountyDetail', [
+    return m('.BountyDetail', {
+      onclick: (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }, [
       m('.b-box', [
         m('.b-row', [
           m('.b-col', bounty.isProposed ? '✓' : ''),
@@ -88,42 +89,52 @@ const BountyDetail = {
         ]),
       ]),
       m('.action', [
-        bounty.status === BountyStatus.Proposed ? m(Button, {
+        bounty.isProposed ? m(Button, {
           ...buttonAttrs,
           label: 'Create council motion',
           disabled: false, // TODO: councillors only
           onclick: (e) => {
-            // TODO: create council motion to approve bounty
-            // (app.chain as Substrate).bounties.approveBountyTx(author, bountyId);
+            app.modals.create({
+              modal: ApproveBountyModal,
+              data: { bountyId: bounty.id }
+            });
           }
-        }) : bounty.status === BountyStatus.Approved ? m(Button, {
+        }) : bounty.isApproved ? m(Button, {
           ...buttonAttrs,
-          label: 'Wait for next spend period',
+          label: 'Waiting for spend period',
           disabled: true,
-        }) : bounty.status === BountyStatus.Funded ? m(Button, {
+        }) : bounty.isFunded ? m(Button, {
           ...buttonAttrs,
           label: 'Propose curator',
           disabled: false, // TODO: councillors only
           onclick: (e) => {
-            // TODO: create council motion to propose curator
-            // (app.chain as Substrate).bounties.proposeCuratorTx(author, bountyId, curator, fee);
+            app.modals.create({
+              modal: ProposeCuratorModal,
+              data: { bountyId: bounty.id }
+            });
           }
-        }) : bounty.status === BountyStatus.CuratorProposed ? m(Button, {
+        }) : bounty.isCuratorProposed ? m(Button, {
           ...buttonAttrs,
           label: true ? 'Accept curator role' : 'Waiting for curator to accept',
           disabled: true, // TODO: curator only
-          onclick: (e) => {
-            // TODO: create tx to accept curator role
-            // (app.chain as Substrate).bounties.acceptCuratorTx(author, bountyId);
+          onclick: async (e) => {
+            const confirmed = await confirmationModalWithText(
+              'Send a transaction to accept your role as curator?', 'Continue'
+            )();
+            if (confirmed) {
+               (app.chain as Substrate).bounties.acceptCuratorTx(app.user.activeAccount as SubstrateAccount, bounty.id);
+            }
           }
-        }) : bounty.status === BountyStatus.Active ? [
+        }) : bounty.isActive ? [
           m(Button, {
             ...buttonAttrs,
             label: 'Payout to recipient',
             disabled: true, // TODO: curator only
             onclick: (e) => {
-              // TODO: create tx to payout
-              // (app.chain as Substrate).bounties.awardBounty(author, bountyId, beneficiary);
+              app.modals.create({
+                modal: AwardBountyModal,
+                data: { bountyId: bounty.id }
+              });
             }
           }) ,
           m(Button, {
@@ -131,21 +142,27 @@ const BountyDetail = {
             label: 'Extend expiry',
             disabled: true, // TODO: curator only
             onclick: (e) => {
-              // TODO: create tx to extend expiry
-              // (app.chain as Substrate).bounties.extendBountyExpiry(author, bountyId, remark);
+              app.modals.create({
+                modal: ExtendExpiryModal,
+                data: { bountyId: bounty.id }
+              });
             }
           }) ,
-        ] : bounty.status === BountyStatus.PendingPayout ? m(Button, {
+        ] : bounty.isPendingPayout ? m(Button, {
           ...buttonAttrs,
           label: 'Payout pending', // TODO: display time left
           disabled: true,
-        }) : bounty.status === BountyStatus.PendingPayout ? m(Button, {
+        }) : bounty.isPendingPayout ? m(Button, {
           ...buttonAttrs,
           label: true ? 'Claim payout' : 'Payout ready to claim',
           disabled: true, // TODO: recipient only
-          onclick: (e) => {
-            // TODO: create tx to claim payout
-            // (app.chain as Substrate).bounties.claimBounty(author, bountyId);
+          onclick: async (e) => {
+            const confirmed = await confirmationModalWithText(
+              'Send a transaction to claim your bounty payout?', 'Continue'
+            )();
+            if (confirmed) {
+              (app.chain as Substrate).bounties.claimBountyTx(app.user.activeAccount as SubstrateAccount, bounty.id);
+            }
           }
         }) : '',
       ]),

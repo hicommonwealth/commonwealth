@@ -107,6 +107,61 @@ class SubstrateBountyTreasury extends ProposalModule<
       `proposeBounty(${description}, ${value})`
     );
   }
+
+  public createBountyApprovalMotionTx(author: SubstrateAccount, bountyId: number) {
+    return this._Chain.createTXModalData(
+      author,
+      (api: ApiPromise) => api.tx.bounties.approveBounty(bountyId),
+      'approveBounty',
+      `approveBounty(${bountyId})`
+    );
+  }
+
+  public proposeCuratorTx(author: SubstrateAccount, bountyId: number, curator: string, fee: SubstrateCoin) {
+    return this._Chain.createTXModalData(
+      author,
+      (api: ApiPromise) => api.tx.bounties.proposeCurator(bountyId, curator, fee),
+      'proposeCurator',
+      `proposeCurator(${bountyId}, ${curator}, ${fee})`
+    );
+  }
+
+  public acceptCuratorTx(author: SubstrateAccount, bountyId: number) {
+    return this._Chain.createTXModalData(
+      author,
+      (api: ApiPromise) => api.tx.bounties.acceptCurator(bountyId),
+      'acceptCurator',
+      `acceptCurator(${bountyId})`
+    );
+  }
+
+  public awardBountyTx(author: SubstrateAccount, bountyId: number, recipient: string) {
+    return this._Chain.createTXModalData(
+      author,
+      (api: ApiPromise) => api.tx.bounties.awardBounty(bountyId, recipient),
+      'awardBounty',
+      `awardBounty(${bountyId}, ${recipient})`
+    );
+  }
+
+  public extendBountyExpiryTx(author: SubstrateAccount, bountyId: number, remark: string) {
+    return this._Chain.createTXModalData(
+      author,
+      (api: ApiPromise) => api.tx.bounties.extendBountyExpiry(bountyId, remark),
+      'extendBountyExpiry',
+      `extendBountyExpiry(${bountyId}, ${remark})`
+    );
+  }
+
+  public claimBountyTx(author: SubstrateAccount, bountyId: number) {
+    return this._Chain.createTXModalData(
+      author,
+      (api: ApiPromise) => api.tx.bounties.claimBounty(bountyId),
+      'claimBounty',
+      `claimBounty(${bountyId})`
+    );
+  }
+
 }
 
 export default SubstrateBountyTreasury;
