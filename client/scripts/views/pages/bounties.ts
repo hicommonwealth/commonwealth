@@ -2,9 +2,10 @@ import 'pages/bounties.scss';
 
 import m from 'mithril';
 import app from 'state';
-import { Grid, Col, List, Tag } from 'construct-ui';
+import { Button, Grid, Col, List, Tag } from 'construct-ui';
 
 import { formatCoin } from 'adapters/currency';
+import { ProposalType } from 'identifiers';
 import { formatDuration, blockperiodToDuration } from 'helpers';
 
 import { ChainBase } from 'models';
@@ -31,6 +32,8 @@ function getModules() {
 
 const BountiesPage: m.Component<{}> = {
   view: (vnode) => {
+    const activeAccount = app.user.activeAccount;
+
     if (!app.chain || !app.chain.loaded) {
       if (app.chain?.base === ChainBase.Substrate && (app.chain as Substrate).chain?.timedOut) {
         return m(ErrorPage, {
@@ -87,6 +90,16 @@ const BountiesPage: m.Component<{}> = {
               'Treasury: ',
               app.chain && formatCoin((app.chain as Substrate).treasury.pot),
             ]),
+          ]),
+          m('', [
+            m(Button, {
+              rounded: true,
+              class: activeAccount ? '' : 'disabled',
+              onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
+                type: ProposalType.SubstrateBountyProposal,
+              }),
+              label: 'New bounty',
+            }),
           ]),
         ]),
       ]),

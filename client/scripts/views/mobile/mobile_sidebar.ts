@@ -3,6 +3,7 @@ import 'mobile/mobile_sidebar.scss';
 import m from 'mithril';
 import app from 'state';
 import SubscriptionButton from 'views/components/subscription_button';
+import NewProposalButton from 'views/components/new_proposal_button';
 
 import {
   OffchainNavigationModule,
@@ -14,7 +15,6 @@ import { Tabs, TabItem, Menu, MenuDivider, MenuItem, Icons, Dialog } from 'const
 import { capitalize } from 'lodash';
 import CommunitySelector from '../components/sidebar/community_selector';
 import { LoginSelectorMenuLeft, LoginSelectorMenuRight } from '../components/header/login_selector';
-import { getNewProposalMenu } from '../components/new_proposal_button';
 import LoginModal from '../modals/login_modal';
 
 enum MenuTabs {
@@ -71,18 +71,7 @@ const MobileSidebar: m.Component<{}, { activeTab: string, showNewThreadOptions: 
       : MenuTabs.account;
     const CurrentCommunityMenu = m(Menu, { class: 'CurrentCommunityMenu' }, [
       app.isLoggedIn()
-        ? m(Menu, { class: 'NewProposalMenu' }, [
-          m(MenuItem, {
-            label: 'Create New',
-            iconLeft: Icons.PLUS,
-            onclick: (e) => {
-              e.stopPropagation();
-              vnode.state.showNewThreadOptions = !showNewThreadOptions;
-            }
-          }),
-          showNewThreadOptions
-          && getNewProposalMenu([], true)
-        ])
+        ? m(NewProposalButton, { fluid: true, rounded: true, basic: true })
         : m(MenuItem, {
           label: 'Login',
           iconLeft: Icons.LOG_IN,
@@ -90,7 +79,6 @@ const MobileSidebar: m.Component<{}, { activeTab: string, showNewThreadOptions: 
             app.modals.create({ modal: LoginModal });
           }
         }),
-      m(MenuDivider),
       (app.chain || app.community) && m(OffchainNavigationModule),
       (app.chain || app.community) && m(OnchainNavigationModule),
       (app.chain || app.community) && m(ExternalLinksModule),
