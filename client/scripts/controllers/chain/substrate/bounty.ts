@@ -28,18 +28,35 @@ const backportEventToAdapter = (
   };
 };
 
-export class SubstrateBounty
-  extends Proposal<ApiPromise, SubstrateCoin, ISubstrateBounty, null> {
+export class SubstrateBounty extends Proposal<ApiPromise, SubstrateCoin, ISubstrateBounty, null> {
   public get shortIdentifier() {
     return `#${this.identifier.toString()}`;
   }
-  public get title() {
-    const account = this._Accounts.fromAddress(this.author.address);
-    const displayName = account.profile && account.profile.name
-      ? `${account.profile.name} (${formatAddressShort(this.author.address, account.chain.id)})`
-      : formatAddressShort(this.author.address, account.chain.id);
-    return `${this.description} - ${formatCoin(this._value)}`;
+
+  public setStatus (status) {
+    this._title = status.title;
+    this._isActive = status.isActive;
+    this._isApproved = status.isApproved;
+    this._isCuratorProposed = status.isCuratorProposed;
+    this._isFunded = status.isFunded;
+    this._isPendingPayout = status.isPendingPayout;
+    this._isProposed = status.isProposed;
   }
+  private _title: string;
+  private _isActive: boolean;
+  private _isApproved: boolean;
+  private _isCuratorProposed: boolean;
+  private _isFunded: boolean;
+  private _isPendingPayout: boolean;
+  private _isProposed: boolean;
+
+  public get title() { return this._title || `Bounty ${this.shortIdentifier}`; }
+  public get isActive() { return this._isActive; }
+  public get isApproved() { return this._isApproved; }
+  public get isCuratorProposed() { return this._isCuratorProposed; }
+  public get isFunded() { return this._isFunded; }
+  public get isPendingPayout() { return this._isPendingPayout; }
+  public get isProposed() { return this._isProposed; }
 
   private readonly _description: string;
   public get description() { return this._description; }
