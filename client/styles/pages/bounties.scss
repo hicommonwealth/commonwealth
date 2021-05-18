@@ -4,6 +4,10 @@
     padding-bottom: 60px;
     @include gov-explainer;
 
+    .proposal-title {
+        min-height: 70px;
+    }
+
     .BountyDetail {
         .b-box {
             border: 1px solid $border-color-lightest;

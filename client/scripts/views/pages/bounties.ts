@@ -41,18 +41,13 @@ enum BountyStatus {
   Complete,
 };
 
-const bountyStatusToLabel = (status: BountyStatus) => {
-  switch (status) {
-    case BountyStatus.Proposed: return 'Waiting for council approval';
-    case BountyStatus.Approved: return 'Waiting for next spend period';
-    case BountyStatus.Funded: return 'Waiting for curator to accept';
-    case BountyStatus.CuratorProposed: return 'Active';
-    case BountyStatus.Active: return 'Curator has proposed a payout';
-    case BountyStatus.PendingPayout: return 'Waiting for council to review payout';
-    case BountyStatus.PayoutReady: return 'Waiting for recipient to claim payout';
-    case BountyStatus.Complete: return 'Bounty claimed';
-  }
-  return 'Invalid';
+const bountyStatusToLabel = (bounty) => {
+  if (bounty.complete) return 'Bounty claimed';
+  if (bounty.isPendingPayout) return 'Pending payout';
+  if (bounty.isActive) return 'Active';
+  if (bounty.isCuratorProposed) return 'Waiting for curator to accept';
+  if (bounty.approved) return 'Waiting for spend period';
+  return 'Waiting for approval';
 };
 
 const BountyDetail = {
@@ -68,36 +63,28 @@ const BountyDetail = {
     return m('.BountyDetail', [
       m('.b-box', [
         m('.b-row', [
-          m('.b-col', bounty.status >= BountyStatus.Proposed ? '✓' : ''),
+          m('.b-col', bounty.isProposed ? '✓' : ''),
           m('.b-col', 'Proposed'),
         ]),
         m('.b-row', [
-          m('.b-col', bounty.status >= BountyStatus.Approved ? '✓' : ''),
+          m('.b-col', bounty.isApproved ? '✓' : ''),
           m('.b-col', 'Approved by council'),
         ]),
         m('.b-row', [
-          m('.b-col', bounty.status >= BountyStatus.Funded ? '✓' : ''),
+          m('.b-col', bounty.isFunded ? '✓' : ''),
           m('.b-col', 'Funded by treasury'),
         ]),
         m('.b-row', [
-          m('.b-col', bounty.status >= BountyStatus.CuratorProposed ? '✓' : ''),
+          m('.b-col', bounty.isCuratorProposed ? '✓' : ''),
           m('.b-col', 'Curator proposed'),
         ]),
         m('.b-row', [
-          m('.b-col', bounty.status >= BountyStatus.Active ? '✓' : ''),
+          m('.b-col', bounty.isActive ? '✓' : ''),
           m('.b-col', 'Curator selected'),
         ]),
         m('.b-row', [
-          m('.b-col', bounty.status >= BountyStatus.PendingPayout ? '✓' : ''),
+          m('.b-col', bounty.isPendingPayout ? '✓' : ''),
           m('.b-col', 'Payout pending'),
-        ]),
-        m('.b-row', [
-          m('.b-col', bounty.status >= BountyStatus.PayoutReady ? '✓' : ''),
-          m('.b-col', 'Payout ready'),
-        ]),
-        m('.b-row', [
-          m('.b-col', bounty.status >= BountyStatus.Complete ? '✓' : ''),
-          m('.b-col', 'Payout claimed'),
         ]),
       ]),
       m('.action', [
