@@ -623,7 +623,7 @@ $(() => {
 
     // Landing pages
     '/':                         importRoute('views/pages/landing', { scoped: false, hideSidebar: true, redirectCustomDomain: true }),
-    '/whyCommonWealth':          importRoute('views/pages/commonwealth', { scoped: false, hideSidebar: true }),
+    '/whyCommonwealth':          importRoute('views/pages/commonwealth', { scoped: false, hideSidebar: true }),
     '/about':                    importRoute('views/pages/landing/about', { scoped: false }),
     '/terms':                    importRoute('views/pages/landing/terms', { scoped: false }),
     '/privacy':                  importRoute('views/pages/landing/privacy', { scoped: false }),

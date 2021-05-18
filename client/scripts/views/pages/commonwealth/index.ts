@@ -14,7 +14,7 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
         { class: 'absolute w-screen z-20' },
         m(HeaderLandingPage, {
           navs: [
-            { text: 'Why Commonwealth?', redirectTo: '/whyCommonWealth' },
+            { text: 'Why Commonwealth?', redirectTo: '/whyCommonwealth' },
             // { text: 'Use Cases' },
             // { text: 'Crowdfunding' },
             // { text: 'Developers' },
@@ -26,7 +26,7 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
         m('div.WhyCommonWealthInitialSection', { class: 'container mx-auto' }, [
           m(
             'h2',
-            { class: 'mt-24 text-5xl text-left font-bold mb-2 md:text-center' },
+            { class: 'mt-24 text-5xl text-left font-bold mb-2 md:text-center leading-tight pl-6 pr-6' },
             ' Crypto-native communities deserve crypto-native software. '
           ),
           m(
@@ -62,7 +62,7 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
             m(
               'h2',
               { class: 'mt-4 text-3xl text-center  font-bold' },
-              ' Threads help drive thoughtful conversation. '
+              ' Threads drive thoughtful conversation. '
             ),
             m(
               'p',
@@ -202,7 +202,7 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
       ]),
       m(FooterLandingPage, {
         list: [
-          { text: 'Why Commonwealth?', redirectTo: '/whyCommonWealth' },
+          { text: 'Why Commonwealth?', redirectTo: '/whyCommonwealth' },
           // { text:  'Use Cases' },
           // { text:  'Crowdfunding' },
           // { text:  'Developers' },

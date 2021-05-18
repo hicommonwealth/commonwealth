@@ -117,9 +117,9 @@ const LandingPage: m.Component<{}, IState> = {
           { class: 'absolute w-screen z-20' },
           m(HeaderLandingPage, {
             navs: [
-              { text: 'Why Commonwealth?', redirectTo: '/whyCommonWealth' },
-            // { text: 'Use Cases', redirectTo: '/whyCommonWealth' },
-            // { text: 'Crowdfunding', redirectTo: '/whyCommonWealth' },
+              { text: 'Why Commonwealth?', redirectTo: '/whyCommonwealth' },
+            // { text: 'Use Cases', redirectTo: '/whyCommonwealth' },
+            // { text: 'Crowdfunding', redirectTo: '/whyCommonwealth' },
             // { text: 'Developers' },
             ],
           })
@@ -309,7 +309,7 @@ const LandingPage: m.Component<{}, IState> = {
         m(JoinCommonWealthSection),
         m(FooterLandingPage, {
           list: [
-            { text: 'Why Commonwealth?', redirectTo: '/whyCommonWealth' },
+            { text: 'Why Commonwealth?', redirectTo: '/whyCommonwealth' },
             // { text:  'Use Cases' },
             // { text:  'Crowdfunding' },
             // { text:  'Developers' },
