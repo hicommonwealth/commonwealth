@@ -757,7 +757,6 @@ $(() => {
       if (app.loginState === LoginState.LoggedIn) {
         app.user.notifications.refresh().then(() => m.redraw());
         jwt = app.user.jwt;
-        m.route.set('/');
       }
       // grab discussion drafts
       if (app.loginState === LoginState.LoggedIn) {
