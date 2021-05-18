@@ -260,8 +260,8 @@ const SearchPage : m.Component<{
         ? `${tabScopedListing.length}+ results`
         : pluralize(tabScopedListing.length, 'result')
       : tabScopedListing.length === SEARCH_PAGE_SIZE
-        ? `${tabScopedListing.length}+ ${capitalize(activeTab)} results`
-        : pluralize(tabScopedListing.length, `${capitalize(activeTab)} result`);
+        ? `${tabScopedListing.length}+ ${pluralize(2, activeTab).replace('2 ', '')}`
+        : pluralize(tabScopedListing.length, activeTab);
 
     return m(Sublayout, {
       class: 'SearchPage',
@@ -319,12 +319,12 @@ const SearchPage : m.Component<{
       ]) : m('.search-results', [
         m('.search-results-caption', [
           resultCount,
-          ' for \'',
+          ' matching \'',
           vnode.state.searchTerm,
           '\'',
           scope
             ? ` in ${capitalize(scope)}.`
-            : ' on Commonwealth.',
+            : ' across all communities.',
           scope
             && [
               ' ',

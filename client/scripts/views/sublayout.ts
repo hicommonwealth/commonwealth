@@ -5,7 +5,7 @@ import app from 'state';
 import { EmptyState, Button, Icon, Icons, Grid, Col, Spinner } from 'construct-ui';
 import { link } from 'helpers';
 
-import NewProposalButton, { MobileNewProposalButton } from 'views/components/new_proposal_button';
+import NewProposalButton from 'views/components/new_proposal_button';
 import NotificationsMenu from 'views/components/header/notifications_menu';
 import InvitesMenu from 'views/components/header/invites_menu';
 import LoginSelector from 'views/components/header/login_selector';
@@ -28,6 +28,7 @@ const Sublayout: m.Component<{
   showNewProposalButton?: boolean,
   showCouncilMenu?: boolean,
   hideSidebar?: boolean,
+  hideSearch?: boolean,
   centerGrid?: boolean,
   alwaysShowTitle?: boolean,          // show page title even if app.chain and app.community are unavailable
 }> = {
@@ -39,6 +40,7 @@ const Sublayout: m.Component<{
       showNewProposalButton,
       showCouncilMenu,
       hideSidebar,
+      hideSearch,
       alwaysShowTitle,
     } = vnode.attrs;
 
@@ -76,8 +78,7 @@ const Sublayout: m.Component<{
       m(LoginSelector),
       app.isLoggedIn() && m(InvitesMenu),
       app.isLoggedIn() && m(NotificationsMenu),
-      showNewProposalButton
-      && (narrowBrowserWidth ? m(MobileNewProposalButton) : m(NewProposalButton, { fluid: false })),
+      showNewProposalButton && m(NewProposalButton, { fluid: false }),
     ]);
 
     if (vnode.attrs.loadingLayout) return [
@@ -106,7 +107,7 @@ const Sublayout: m.Component<{
           m('.sublayout-header', { class: !title ? 'no-title' : '' }, [
             m('.sublayout-header-inner', [
               sublayoutHeaderLeft,
-              m(SearchBar),
+              !vnode.attrs.loadingLayout && !hideSearch && m(SearchBar),
               sublayoutHeaderRight,
             ]),
           ]),

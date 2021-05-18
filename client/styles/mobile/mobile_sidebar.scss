@@ -8,12 +8,12 @@
     min-height: calc(100vh - 60px);
     width: 100vw;
     * {
-        -webkit-tap-highlight-color:  rgba(255, 255, 255, 0); 
+        -webkit-tap-highlight-color:  rgba(255, 255, 255, 0);
     }
     .cui-tabs {
         @include gradientTabs();
         .cui-tabs-item.cui-active {
-            border-image: linear-gradient(to right, #79E0E8, 
+            border-image: linear-gradient(to right, #79E0E8,
             #BF8E60, #D69FCC, #6086D1, #B37DBA) 1 !important;
         }
         margin-bottom: 20px;
@@ -40,8 +40,8 @@
         }
     }
     .CurrentCommunityMenu {
-        .cui-menu-divider {
-            margin: 12px 0 18px;
+        .NewProposalButton {
+            padding: 0 18px;
         }
     }
     .cui-icon {

@@ -155,7 +155,6 @@ const newThread = async (
   let result;
   try {
     // see if app.chain.network is existing in network lists and if app.chain.isToken
-
     result = await app.threads.create(
       author.address,
       kind,

@@ -163,7 +163,7 @@ const linkExistingAddressToChain = async (
         permission: 'member',
       } : {
         address_id: addressId,
-        chain_id: (!req.body.isNewChain) ? req.body.chain : chain.id,
+        chain_id: req.body.chain,
         permission: 'member',
       });
     }

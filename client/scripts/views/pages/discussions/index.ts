@@ -25,13 +25,11 @@ import { INITIAL_PAGE_SIZE } from 'controllers/server/threads';
 import PinnedListing from './pinned_listing';
 import DiscussionRow from './discussion_row';
 
-import Token from 'controllers/chain/ethereum/token/adapter';
-
 export const ALL_PROPOSALS_KEY = 'COMMONWEALTH_ALL_PROPOSALS';
 
 const getLastUpdate = (proposal: OffchainThread): number => {
-  const lastComment = app.comments.lastCommented(proposal)?.unix();
-  const createdAt = proposal.createdAt?.unix();
+  const lastComment = app.comments.lastCommented(proposal)?.unix() || 0;
+  const createdAt = proposal.createdAt?.unix() || 0;
   const lastUpdate = Math.max(createdAt, lastComment);
   return lastUpdate;
 };
@@ -132,7 +130,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
     const subpage = (topic || stage) ? `${topic || ''}#${stage || ''}` : ALL_PROPOSALS_KEY;
     const returningFromThread = (app.lastNavigatedBack() && app.lastNavigatedFrom().includes('/proposal/discussion/'));
     vnode.state.lookback[subpage] = (returningFromThread && localStorage[`${app.activeId()}-lookback-${subpage}`])
-      ? moment(parseInt(localStorage[`${app.activeId()}-lookback-${subpage}`], 10))
+      ? moment.unix(parseInt(localStorage[`${app.activeId()}-lookback-${subpage}`], 10))
       : moment.isMoment(vnode.state.lookback[subpage])
         ? vnode.state.lookback[subpage]
         : moment();
@@ -342,7 +340,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
       topicTelegram = topicObject?.telegram;
     }
 
-    localStorage.setItem(`${app.activeId()}-lookback-${subpage}`, `${vnode.state.lookback[subpage].valueOf()}`);
+    localStorage.setItem(`${app.activeId()}-lookback-${subpage}`, `${vnode.state.lookback[subpage].unix()}`);
     const stillFetching = (allThreads.length === 0 && vnode.state.postsDepleted[subpage] === false);
     const emptyTopic = (allThreads.length === 0 && vnode.state.postsDepleted[subpage] === true && !stage);
     const emptyStage = (allThreads.length === 0 && vnode.state.postsDepleted[subpage] === true && !!stage);

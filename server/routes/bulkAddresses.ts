@@ -15,7 +15,7 @@ const log = factory.getLogger(formatFilename(__filename));
 
 const bulkAddresses = async (models, req, res, next) => {
   const options = {
-    order: req.query.order ? [req.query.order] : ['created_at', 'DESC']
+    order: req.query.order ? [[req.query.order]] : [['created_at', 'DESC']]
   };
 
   if (req.query.limit) options['limit'] = req.query.limit;
@@ -49,8 +49,6 @@ const bulkAddresses = async (models, req, res, next) => {
       }];
     }
   }
-  console.log(options);
-  console.log(options['include']);
   const addresses = await models.Address.findAll(options);
   return res.json({ status: 'Success', result: addresses.map((p) => p.toJSON()) });
 };

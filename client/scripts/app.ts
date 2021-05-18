@@ -425,12 +425,8 @@ export async function initChain(): Promise<void> {
   app.isAdapterReady = true;
   console.log(`${n.chain.network.toUpperCase()} started.`);
 
-  if (app.community) {
-    // Instantiate (again) to create chain-specific Account<> objects
-    await updateActiveAddresses(n.chain);
-  } else {
-    app.user.setActiveAccounts([]);
-  }
+  // Instantiate (again) to create chain-specific Account<> objects
+  await updateActiveAddresses(n.chain);
 
   // Finish redraw to remove loading dialog
   m.redraw();

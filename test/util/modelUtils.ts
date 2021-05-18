@@ -303,11 +303,12 @@ export const createTokenMeta = (
     symbol: 'alex',
     name: 'Alex',
     iconUrl: '',
-    api: {
-      balanceOf: async (a: string) => {
-        const res = await balanceCb(a);
-        return bigNumberify(res);
-      }
-    } as unknown as Erc20,
+    // TODO: refactor this to succeed
+    // api: {
+    //   balanceOf: async (a: string) => {
+    //     const res = await balanceCb(a);
+    //     return bigNumberify(res);
+    //   }
+    // } as unknown as Erc20,
   };
 };

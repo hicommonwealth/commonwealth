@@ -19,6 +19,7 @@
     .search-results-wrapper {
         .search-results-caption {
             margin: 20px 0;
+            text-align: center;
             color: $text-color-light;
             .search-results-clear {
                 margin-left: 10px;
@@ -128,7 +129,7 @@
 }
 
 .SearchBar {
-    margin: 0 4%;
+    margin: -1px 4%;
     padding: 0 1px;
     flex: 6;
     position: relative;
@@ -139,7 +140,7 @@
         border-radius: 25px;
         font-size: 14px;
         color: black;
-        border: 1px solid transparent;
+        border: 1px solid $border-color-lightest;
         svg.SearchIcon {
             z-index: 2;
             position: relative;
@@ -156,6 +157,10 @@
         .chain-icon, .community-icon {
             position: relative;
         }
+        .ChainIcon, .CommunityIcon {
+            position: absolute;
+            right: 0;
+        }
         &:focus-within {
             background: linear-gradient(to bottom, #91ACE1, #DDBFE1) !important;
         }
@@ -163,7 +168,8 @@
             background: linear-gradient(to bottom, #CDDEFE, #E7D8E9);
         }
         input {
-            height: 34px;
+            height: 31px;
+            padding: 20px 15px 15px;
             padding-right: 38px;
             position: relative;
             background: #EFEFEF;
@@ -195,8 +201,10 @@
             .search-results-item {
                 color: $text-color-black;
                 text-decoration: none;
-                font-size: 14px;
+                padding: 12px 0 6px;
+                font-size: 18px;
                 overflow: hidden;
+                line-height: 1.2;
                 .TokenLabel {
                     display: flex;
                     justify-content: left;
@@ -206,13 +214,14 @@
                     }
                     .token-label-right {
                         font-weight: 500;
-                        line-height: 1.25;
                     }
                 }
                 .search-results-thread-title {
                     font-weight: 500;
+                    margin-bottom: 4px;
                 }
                 .search-results-thread-subtitle {
+                    margin-bottom: 2px;
                     .User {
                         margin-left: 5px;
                     }
@@ -223,7 +232,9 @@
             }
             &.disabled, &.no-results {
                 font-weight: 500;
-                font-size: 12px;
+                font-size: 14px;
+                letter-spacing: 0.3px;
+                margin-bottom: 3px;
                 line-height: 14px;
                 text-transform: uppercase;
                 color: #AAAAAA;
