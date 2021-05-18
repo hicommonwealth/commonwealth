@@ -62,15 +62,15 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     // TODO: support customized balance thresholds
     // TODO: support ChainId
     const tokens: TokenForumMeta[] = dbTokens
-    .filter(({ ChainNodes }) => ChainNodes && ChainNodes[0]?.address)
-    .map((chain): TokenForumMeta => ({
-      id: chain.id,
-      address: chain.ChainNodes[0].address,
-      name: chain.name,
-      symbol: chain.symbol,
-      iconUrl: chain.icon_url,
-      api: Erc20Factory.connect(chain.ChainNodes[0].address, provider),
-    }));
+      .filter(({ ChainNodes }) => ChainNodes && ChainNodes[0]?.address)
+      .map((chain): TokenForumMeta => ({
+        id: chain.id,
+        address: chain.ChainNodes[0].address,
+        name: chain.name,
+        symbol: chain.symbol,
+        iconUrl: chain.icon_url,
+        api: Erc20Factory.connect(chain.ChainNodes[0].address, provider),
+      }));
 
     try {
       const tokensFromListsResponses = await this._listCache.getTokens();

@@ -48,7 +48,7 @@ const HeaderLandingPage: m.Component<IAttrs, IState> = {
     };
 
     return m(
-      'div',
+      '.HeaderLandingPage',
       { class: 'container mx-auto' },
       m(
         'header',

@@ -1,7 +1,8 @@
 import m from 'mithril';
 
 interface IAttrs {
-  onchangeValue: (event: any) => void
+  onchangeValue: (event: any) => void;
+  onkeyupValue: (event: any) => void;
 }
 
 const FindYourTokenInputComponent: m.Component<IAttrs, {}> = {
@@ -13,8 +14,8 @@ const FindYourTokenInputComponent: m.Component<IAttrs, {}> = {
       id: 'token-input',
       type: 'text',
       placeholder: 'Find your favorite token',
-      onchange: vnode.attrs.onchangeValue,
-      oninput: vnode.attrs.onchangeValue
+      oninput: vnode.attrs.onchangeValue,
+      onkeyup: vnode.attrs.onkeyupValue,
     });
   },
 };

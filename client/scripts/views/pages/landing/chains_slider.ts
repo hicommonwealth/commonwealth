@@ -1,13 +1,6 @@
 import m from 'mithril';
 import 'pages/landing/chains_slider.scss';
-
-interface Chain {
-  img: string;
-  id: string;
-  name: string;
-  placeholder?: boolean;
-  chainInfo: string;
-}
+import { Chain } from './index';
 
 interface IState {
   chains: Chain[];
@@ -23,7 +16,7 @@ const TokensChainsComponent: m.Component<IState, IState> = {
   },
   view: (vnode) => {
     return m(
-      'section',
+      'section.TokensChainsComponent',
       {
         class:
           'bg-geometric-pattern bg-cover bg-full pt-20 pb-40 md:pb-48 mb-48 relative',
