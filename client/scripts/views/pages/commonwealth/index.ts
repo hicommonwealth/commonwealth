@@ -140,7 +140,7 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
                   ' No matter what protocol you build on, give easy access to your project’s most important on-chain actions like staking and voting. Commonwealth has a growing list of integrations--including Ethereum, NEAR, Cosmos, Substrate, and popular DAO frameworks like Moloch or Aragon. '
                 ),
               ]),
-              m('div', { class: 'grid grid-cols-2 ' }, [
+              m('div', { class: 'grid grid-cols-4 lg:grid-cols-2 ' }, [
                 m(
                   'div',
                   { class: 'relative' },
