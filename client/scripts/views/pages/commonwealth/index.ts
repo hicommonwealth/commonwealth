@@ -81,6 +81,38 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
           m('img', { src: 'static/img/chatCommonWealth.svg', alt: '' })
         ),
       ]),
+      m('section', { class: 'container mx-auto' }, [
+        m(
+          'div',
+          { class: 'mt-20' },
+          m('img', {
+            class: 'mx-auto my-auto',
+            src: 'static/img/Group 87.svg',
+            alt: '',
+          })
+        ),
+        m(
+          'h2',
+          { class: 'text-5xl text-left font-bold mb-2 md:text-center -mt-20' },
+          'Integrate your existing community tools. '
+        ),
+        m(
+          'div',
+          { class: 'grid md:grid-cols-5' },
+          m(
+            'div',
+            { class: 'md:col-start-2 md:col-span-3' },
+            m(
+              'p',
+              {
+                class:
+                  'text-xl text-gray-600 mb-12 mt-4 text-left md:text-center',
+              },
+              'Commonwealth helps break down silos between chat apps like Discord, Telegram, and Riot by providing integrations for webhooks and bridges. Your community will be able to receive Commonwealth notifications wherever they are most comfortable.'
+            )
+          )
+        ),
+      ]),
       m(
         'section',
         { class: 'bg-white' },
@@ -162,10 +194,10 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
               { class: 'flex justify-left' },
               m(
                 'div',
-                m('img', { src: 'static/img/commonWealthFork.svg', alt: '' })
+                m('img', { class: 'mt-40 md:mt-1', src: 'static/img/commonWealthFork.svg', alt: '' })
               )
             ),
-            m('div', { class: 'mt-10  md:-ml-20 ' }, [
+            m('div', { class: 'mt-10 lg:-ml-20 ' }, [
               m(
                 'h2',
                 { class: 'mt-4 text-3xl text-left font-bold' },
@@ -198,7 +230,11 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
           {
             class: 'mb-20',
           },
-          m('img', { src: 'static/img/wealthTable.svg', alt: '' })
+          m('img', {
+            src: 'static/img/wealthTable.svg',
+            alt: '',
+            class: 'mx-auto',
+          })
         ),
       ]),
       m(FooterLandingPage, {
