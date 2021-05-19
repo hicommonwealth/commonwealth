@@ -27,14 +27,14 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
         m('div.WhyCommonWealthInitialSection', { class: 'container mx-auto' }, [
           m(
             'h2',
-            { class: 'mt-24 text-5xl text-left font-bold mb-2 md:text-center leading-tight pl-6 pr-6' },
+            { class: 'mt-24 text-4xl sm:text-5xl text-left font-bold mb-2 md:text-center leading-tight pl-6 pr-6' },
             ' Crypto-native communities deserve crypto-native software. '
           ),
           m(
             'p',
             {
               class:
-                'text-xl text-gray-600 mb-12 mt-4 text-left md:text-center',
+                'text-xl text-gray-600 mb-12 mt-4 text-center',
             },
             ' Combine multiple tools in one. '
           ),
@@ -81,6 +81,38 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
           m('img', { src: 'static/img/chatCommonWealth.svg', alt: '' })
         ),
       ]),
+      m('section', { class: 'container mx-auto' }, [
+        m(
+          'div',
+          { class: 'mt-20' },
+          m('img', {
+            class: 'mx-auto my-auto',
+            src: 'static/img/Group 87.svg',
+            alt: '',
+          })
+        ),
+        m(
+          'h2',
+          { class: 'text-4xl sm:text-5xl text-left font-bold mb-2 md:text-center -mt-10 sm:-mt-20"' },
+          'Integrate your existing community tools. '
+        ),
+        m(
+          'div',
+          { class: 'grid md:grid-cols-5' },
+          m(
+            'div',
+            { class: 'md:col-start-2 md:col-span-3' },
+            m(
+              'p',
+              {
+                class:
+                  'text-xl text-gray-600 mb-12 mt-4 text-left md:text-center',
+              },
+              'Commonwealth helps break down silos between chat apps like Discord, Telegram, and Riot by providing integrations for webhooks and bridges. Your community will be able to receive Commonwealth notifications wherever they are most comfortable.'
+            )
+          )
+        ),
+      ]),
       m(
         'section',
         { class: 'bg-white' },
@@ -89,7 +121,7 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
           { class: 'container mx-auto p-10 ' },
           m(
             'div',
-            { class: 'grid grid-cols-1 lg:grid-cols-2  gap-10 mb-64 mt-40' },
+            { class: 'grid grid-cols-1 lg:grid-cols-2  gap-10 mb-64 mt-10 sm:mt-40' },
             [
               m('div', { class: 'mt-10' }, [
                 m(
@@ -108,7 +140,7 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
                   ' No matter what protocol you build on, give easy access to your project’s most important on-chain actions like staking and voting. Commonwealth has a growing list of integrations--including Ethereum, NEAR, Cosmos, Substrate, and popular DAO frameworks like Moloch or Aragon. '
                 ),
               ]),
-              m('div', { class: 'grid grid-cols-2 ' }, [
+              m('div', { class: 'grid grid-cols-4 lg:grid-cols-2 ' }, [
                 m(
                   'div',
                   { class: 'relative' },
@@ -162,10 +194,10 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
               { class: 'flex justify-left' },
               m(
                 'div',
-                m('img', { src: 'static/img/commonWealthFork.svg', alt: '' })
+                m('img', { class: 'mt-40 md:mt-1', src: 'static/img/commonWealthFork.svg', alt: '' })
               )
             ),
-            m('div', { class: 'mt-10  md:-ml-20 ' }, [
+            m('div', { class: 'mt-10 lg:-ml-20 ' }, [
               m(
                 'h2',
                 { class: 'mt-4 text-3xl text-left font-bold' },
@@ -198,7 +230,11 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
           {
             class: 'mb-20',
           },
-          m('img', { src: 'static/img/wealthTable.svg', alt: '' })
+          m('img', {
+            src: 'static/img/wealthTable.svg',
+            alt: '',
+            class: 'mx-auto',
+          })
         ),
       ]),
       m(FooterLandingPage, {
