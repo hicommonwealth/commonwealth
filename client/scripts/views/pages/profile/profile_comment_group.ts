@@ -1,8 +1,7 @@
 import m from 'mithril';
 import _ from 'lodash';
 
-import app from 'state';
-import { link, slugify } from 'helpers';
+import { link } from 'helpers';
 import { OffchainThread, OffchainComment, AddressInfo, Account } from 'models';
 
 import User from 'views/components/widgets/user';

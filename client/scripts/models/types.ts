@@ -37,6 +37,7 @@ export enum ChainNetwork {
   Metacartel = 'metacartel',
   ALEX = 'alex',
   Commonwealth = 'commonwealth',
+  ERC20 = 'erc20',
   Clover = 'clover',
   HydraDX = 'hydradx',
   Crust = 'crust',
@@ -53,6 +54,7 @@ export function baseToNetwork(n: ChainBase): ChainNetwork {
   }
 }
 
+<<<<<<< HEAD
 export function networkToBase(n: ChainNetwork | string): ChainBase {
   switch (n) {
     case ChainNetwork.Clover: return ChainBase.Substrate;
@@ -82,6 +84,8 @@ export function networkToBase(n: ChainNetwork | string): ChainBase {
   }
 }
 
+=======
+>>>>>>> master
 // TODO: this should be deprecated, and replaced with ChainNetwork in most instances
 export enum ChainClass {
   Clover = 'clover',
@@ -106,7 +110,11 @@ export enum ChainClass {
   MarlinTestnet = 'marlin-testnet',
   ALEX = 'alex',
   Commonwealth = 'commonwealth',
+<<<<<<< HEAD
   Crust = 'crust',
+=======
+  ERC20 = 'erc20',
+>>>>>>> master
 }
 
 // TODO: this is inconsistently used
@@ -124,6 +132,15 @@ export enum OffchainThreadStage {
   Passed = 'passed',
   Failed = 'failed',
   Abandoned = 'abandoned',
+}
+
+export enum OffchainVoteOptions {
+  SUPPORT_2,
+  SUPPORT,
+  NEUTRAL_SUPPORT,
+  NEUTRAL_OPPOSE,
+  OPPOSE,
+  OPPOSE_2,
 }
 
 export enum TransactionStatus {

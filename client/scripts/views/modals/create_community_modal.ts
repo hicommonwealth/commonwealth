@@ -107,6 +107,7 @@ const CreateCommunityModal: m.Component<IAttrs, IState> = {
 
             vnode.state.disabled = true;
             vnode.state.success = false;
+
             // TODO: Change to POST /community
             $.post(`${app.serverUrl()}/createCommunity`, {
               creator_address: vnode.state.selectedAddress,
@@ -120,25 +121,26 @@ const CreateCommunityModal: m.Component<IAttrs, IState> = {
               auth: true,
               jwt: app.user.jwt,
             }).then((result) => {
-              const newCommunityInfo = new CommunityInfo(
-                result.result.id,
-                result.result.name,
-                result.result.description,
-                null, // iconUrl
-                null, // website
-                null, // discord
-                null, // element
-                null, // telegram
-                null, // github
-                result.result.default_chain,
-                false, // visible
-                null, // customDomain
-                result.result.invitesEnabled,
-                result.result.privacyEnabled,
-                true, // collapsedOnHomepage
-                result.featured_topics,
-                result.topics,
-              );
+              const newCommunityInfo = new CommunityInfo({
+                id: result.result.id,
+                name: result.result.name,
+                description: result.result.description,
+                defaultChain: result.result.default_chain,
+                iconUrl: null,
+                website: null,
+                discord: null,
+                element: null,
+                telegram: null,
+                github: null,
+                visible: false,
+                customDomain: null,
+                collapsedOnHomepage: true,
+                adminsAndMods: [],
+                invitesEnabled: result.result.invitesEnabled,
+                privacyEnabled: result.result.privacyEnabled,
+                featuredTopics: result.featured_topics,
+                topics: result.topics,
+              });
               app.config.communities.add(newCommunityInfo);
               vnode.state.success = 'Sucessfully added';
               m.redraw();

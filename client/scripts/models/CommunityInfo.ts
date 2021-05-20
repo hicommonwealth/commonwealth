@@ -41,10 +41,10 @@ class CommunityInfo {
   public members: RoleInfo[];
 
   // TODO: convert this to accept opject with params instead
-  constructor(
+  constructor({
     id, name, description, iconUrl, website, discord, element, telegram, github, defaultChain, visible,
-    customDomain, invitesEnabled, privacyEnabled, collapsedOnHomepage, featuredTopics, topics, adminsAndMods?
-  ) {
+    customDomain, invitesEnabled, privacyEnabled, collapsedOnHomepage, featuredTopics, topics, adminsAndMods
+  }) {
     this.id = id;
     this.name = name;
     this.description = description;
@@ -65,27 +65,46 @@ class CommunityInfo {
     this.adminsAndMods = adminsAndMods || [];
   }
 
-  public static fromJSON(json) {
-    return new CommunityInfo(
-      json.id,
-      json.name,
-      json.description,
-      json.iconUrl,
-      json.website,
-      json.discord,
-      json.element,
-      json.telegram,
-      json.github,
-      json.default_chain,
-      json.visible,
-      json.customDomain,
-      json.invitesEnabled,
-      json.privacyEnabled,
-      json.collapsed_on_homepage,
-      json.featuredTopics,
-      json.topics,
-      json.adminsAndMods,
-    );
+  public static fromJSON({
+    id,
+    name,
+    description,
+    iconUrl,
+    website,
+    discord,
+    element,
+    telegram,
+    github,
+    defaultChain: default_chain,
+    visible,
+    customDomain,
+    invitesEnabled,
+    privacyEnabled,
+    collapsedOnHomepage: collapsed_on_homepage,
+    featuredTopics,
+    topics,
+    adminsAndMods,
+  }) {
+    return new CommunityInfo({
+      id,
+      name,
+      description,
+      iconUrl,
+      website,
+      discord,
+      element,
+      telegram,
+      github,
+      defaultChain: default_chain,
+      visible,
+      customDomain,
+      invitesEnabled,
+      privacyEnabled,
+      collapsedOnHomepage: collapsed_on_homepage,
+      featuredTopics,
+      topics,
+      adminsAndMods,
+    });
   }
 
   // TODO: get operation should not have side effects, and either way this shouldn't be here
