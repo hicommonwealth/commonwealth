@@ -159,6 +159,7 @@ interface IProfilePageState {
   account;
   threads: OffchainThread[];
   comments: OffchainComment<any>[];
+  initialized: boolean;
   loaded: boolean;
   loading: boolean;
   refreshProfile: boolean;
@@ -167,6 +168,7 @@ interface IProfilePageState {
 const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProfilePageState> = {
   oninit: (vnode) => {
     vnode.state.account = null;
+    vnode.state.initialized = false;
     vnode.state.loaded = false;
     vnode.state.loading = false;
     vnode.state.threads = [];
@@ -228,6 +230,7 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
         return;
       }
       vnode.state.loading = true;
+      vnode.state.initialized = true;
       try {
         const response = await $.ajax({
           url: `${app.serverUrl()}/profile`,
@@ -335,7 +338,7 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
       loadProfile();
     }
     if (loading) return m(PageLoading, { showNewProposalButton: true });
-    if (!account) {
+    if (!account && !vnode.state.initialized) {
       return m(PageNotFound, { message: 'Invalid address provided' });
     }
 
