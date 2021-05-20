@@ -9,6 +9,9 @@
     .cui-input {
         margin: 6px 0;
     }
+    .cui-input:last-child {
+        margin-bottom: 20px;
+    }
 }
 
 .ProposeCuratorModal .cui-input + p {

@@ -14,6 +14,11 @@ interface AddressInputTypeaheadItem {
 }
 
 const AddressInputTypeahead: m.Component<{ options: any, oninput }, { selectedItem, typeaheadAddresses, loading, initialized }> = {
+  oncreate: (vnode) => {
+    if (vnode.attrs.options.placeholder) {
+      $(vnode.dom).find('input').attr('placeholder', vnode.attrs.options.placeholder).attr('autocomplete', 'xyz123');
+    }
+  },
   view: (vnode) => {
     const { options, oninput } = vnode.attrs;
 
@@ -63,6 +68,7 @@ const AddressInputTypeahead: m.Component<{ options: any, oninput }, { selectedIt
       inputAttrs: {
         fluid: options.fluid,
         placeholder: options.placeholder,
+        autocomplete: 'xyz123',
       },
       popoverAttrs: {
         hasArrow: false,
