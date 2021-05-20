@@ -5,6 +5,7 @@ import m from 'mithril';
 import { Button, Input } from 'construct-ui';
 import Substrate from 'controllers/chain/substrate/main';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
+import AddressInputTypeahead from 'views/components/addresses/address_input_typeahead';
 
 import app from 'state';
 
@@ -68,22 +69,30 @@ export const ProposeCuratorModal: m.Component<{ bountyId: number }, { approvals:
       ]),
       m('.compact-modal-body', [
         m('p', [
-          'Propose a curator to manage this bounty.',
+          'Propose a curator and fee to manage this bounty.',
         ]),
-        m(Input, {
-          fluid: true,
-          oninput: (e) => {
-            vnode.state.curator = (e.target as any).value;
+        m('p', [
+          'The fee should be a portion of the bounty, that will go to the curator once the bounty is completed.',
+        ]),
+        m(AddressInputTypeahead, {
+          options: {
+            fluid: true,
+            placeholder: 'Curator address',
           },
-          placeholder: 'Curator address',
+          oninput: (result) => {
+            vnode.state.curator = result;
+          },
         }),
         m(Input, {
           fluid: true,
           oninput: (e) => {
-            vnode.state.fee = (e.target as any).value;
+            vnode.state.fee = +(e.target as any).value;
           },
-          placeholder: 'Fee',
+          placeholder: `Fee (${app.chain?.chain?.denom})`,
         }),
+        m('p', [
+          'This will create a council motion, that needs to be approved by all councillors.',
+        ]),
       ]),
       m('.compact-modal-actions', [
         m(Button, {

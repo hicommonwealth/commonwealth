@@ -2,7 +2,16 @@
 .ProposeCuratorModal,
 .AwardBountyModal,
 .ExtendExpiryModal {
-    .cui-input {
-        margin: 14px 0 20px;
+    p {
+        max-width: 360px;
+        margin-bottom: 10px;
     }
+    .cui-input {
+        margin: 6px 0;
+    }
+}
+
+.ProposeCuratorModal .cui-input + p {
+    margin-top: 16px;
+    margin-bottom: 16px;
 }
