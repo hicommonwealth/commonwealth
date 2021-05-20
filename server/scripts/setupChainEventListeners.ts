@@ -3,7 +3,7 @@ import _ from 'underscore';
 import {
   IDisconnectedRange, IEventHandler, EventSupportingChains, IEventSubscriber,
   SubstrateTypes, SubstrateEvents, MolochTypes, MolochEvents, chainSupportedBy,
-  MarlinTypes, MarlinEvents,
+  MarlinTypes, MarlinEvents, Erc20Events
 } from '@commonwealth/chain-events';
 
 import EventStorageHandler, { StorageFilterConfig } from '../eventHandlers/storage';
@@ -20,6 +20,7 @@ const log = factory.getLogger(formatFilename(__filename));
 
 // emit globally any transfer over 1% of total issuance
 // TODO: config this
+// MAXTODO look into this
 const BALANCE_TRANSFER_THRESHOLD_PERMILL: number = 10_000;
 
 const discoverReconnectRange = async (models, chain: string): Promise<IDisconnectedRange> => {
@@ -181,6 +182,35 @@ const setupChainEventListeners = async (
     });
     return [ node.chain, subscriber ];
   }));
+
+  // Add Erc20 subscribers
+  const erc20Addresses = nodes.filter((o) => o.address).map((o) => o.address);
+
+  // get ethereum's endpoint URL as most canonical one
+  const ethUrl = nodes.find((o) => o.chain === 'ethereum').url;
+  const api = await Erc20Events.createApi(ethUrl, erc20Addresses);
+  // we only need notifications for ERC20s
+  const handler = new EventNotificationHandler(models, wss);
+  const subscriber = await Erc20Events.subscribeEvents({
+    chain: 'erc20',
+    handlers: [ handler ],
+    skipCatchup,
+    // Unnecessary, I believe, as we will not be adding historical
+    // chain-events to the database
+    discoverReconnectRange: async () => { return { startBlock: null }; },
+    api,
+    enricherConfig: {
+      balanceTransferThresholdPermill: BALANCE_TRANSFER_THRESHOLD_PERMILL,
+    }
+  });
+
+  process.on('SIGTERM', () => {
+    if (subscriber) {
+      subscriber.unsubscribe();
+    }
+  });
+
+  subscribers.push([ 'erc20', subscriber]);
   return _.object<{ [chain: string]:  IEventSubscriber<any, any> }>(subscribers);
 };
 

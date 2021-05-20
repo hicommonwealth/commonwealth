@@ -114,6 +114,7 @@ import getWebhooks from './routes/webhooks/getWebhooks';
 import ViewCountCache from './util/viewCountCache';
 import IdentityFetchCache from './util/identityFetchCache';
 import TokenBalanceCache from './util/tokenBalanceCache';
+import Erc20SubscriberHolder from './util/erc20SubscriberHolder';
 
 import bulkEntities from './routes/bulkEntities';
 import { getTokensFromLists } from './routes/getTokensFromLists';
@@ -124,7 +125,8 @@ function setupRouter(
   models,
   viewCountCache: ViewCountCache,
   identityFetchCache: IdentityFetchCache,
-  tokenBalanceCache: TokenBalanceCache
+  tokenBalanceCache: TokenBalanceCache,
+  erc20SubscriberHolder: Erc20SubscriberHolder
 ) {
   const router = express.Router();
   router.get('/status', status.bind(this, models));
@@ -148,7 +150,7 @@ function setupRouter(
 
   // chains
   // TODO: Change to POST /chainNode
-  router.post('/addChainNode', passport.authenticate('jwt', { session: false }), addChainNode.bind(this, models));
+  router.post('/addChainNode', passport.authenticate('jwt', { session: false }), addChainNode.bind(this, models, erc20SubscriberHolder));
   // TODO: Change to DELETE /chain
   router.post('/deleteChain', passport.authenticate('jwt', { session: false }), deleteChain.bind(this, models));
   // TODO: Change to DELETE /chainNode

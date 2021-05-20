@@ -25,6 +25,7 @@ import ViewCountCache from './server/util/viewCountCache';
 import IdentityFetchCache from './server/util/identityFetchCache';
 import TokenBalanceCache from './server/util/tokenBalanceCache';
 import TokenListCache from './server/util/tokenListCache';
+import Erc20SubscriberHolder from './server/util/erc20SubscriberHolder';
 import { SESSION_SECRET, ROLLBAR_SERVER_TOKEN } from './server/config';
 import models from './server/database';
 import { updateEvents, updateBalances } from './server/util/eventPoller';
@@ -74,6 +75,8 @@ async function main() {
   const identityFetchCache = new IdentityFetchCache(10 * 60);
   const tokenListCache = new TokenListCache();
   const tokenBalanceCache = new TokenBalanceCache(tokenListCache);
+  const erc20SubscriberHolder = new Erc20SubscriberHolder();
+
   const listenChainEvents = async () => {
     try {
       // configure chain list from events
@@ -90,6 +93,7 @@ async function main() {
         if (chainSupportedBy(chain, SubstrateTypes.EventChains)) {
           fetchers[chain] = new SubstrateEvents.StorageFetcher(subscriber.api);
         }
+        if (chain === 'erc20') { erc20SubscriberHolder.setSubscriber(subscriber); }
       }
       await identityFetchCache.start(models, fetchers);
       return 0;
@@ -292,7 +296,7 @@ async function main() {
   setupPassport(models);
 
   await tokenBalanceCache.start(models);
-  setupAPI(app, models, viewCountCache, identityFetchCache, tokenBalanceCache);
+  setupAPI(app, models, viewCountCache, identityFetchCache, tokenBalanceCache, erc20SubscriberHolder);
   setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
   setupErrorHandlers(app, rollbar);
 
