@@ -102,21 +102,11 @@ export const ProposeCuratorModal: m.Component<{ bountyId: number }, { approvals:
           rounded: true,
           onclick: async (e) => {
             e.preventDefault();
-
-            try {
-              await createTXModal(
-                (app.chain as Substrate).bounties.proposeCuratorTx(
-                  app.user?.activeAccount as SubstrateAccount, bountyId, curator, feeCoins
-                )
-              );
-            } catch (error) {
-	      if (typeof error === 'string') {
-                notifyError(error);
-              } else {
-                notifyError('Unknown error', error.txType);
-              }
-              return;
-            }
+            await createTXModal(
+              (app.chain as Substrate).bounties.proposeCuratorTx(
+                app.user?.activeAccount as SubstrateAccount, bountyId, curator, feeCoins
+              )
+            );
 
             // done
             $(e.target).trigger('modalcomplete');
@@ -160,21 +150,11 @@ export const AwardBountyModal: m.Component<{ bountyId: number }, { approvals: nu
           rounded: true,
           onclick: async (e) => {
             e.preventDefault();
-
-            try {
-              await createTXModal(
-                (app.chain as Substrate).bounties.awardBountyTx(
-                  app.user?.activeAccount as SubstrateAccount, bountyId, recipient
-                )
-              );
-            } catch (error) {
-	      if (typeof error === 'string') {
-                notifyError(error);
-              } else {
-                notifyError('Unknown error', error.txType);
-              }
-              return;
-            }
+            await createTXModal(
+              (app.chain as Substrate).bounties.awardBountyTx(
+                app.user?.activeAccount as SubstrateAccount, bountyId, recipient
+              )
+            );
 
             // done
             $(e.target).trigger('modalcomplete');
@@ -216,21 +196,11 @@ export const ExtendExpiryModal: m.Component<{ bountyId: number }, { approvals: n
           rounded: true,
           onclick: async (e) => {
             e.preventDefault();
-
-            try {
-              await createTXModal(
-                await (app.chain as Substrate).bounties.extendBountyExpiryTx(
-                  app.user?.activeAccount as SubstrateAccount, bountyId, remark
-                )
-              );
-            } catch (error) {
-	      if (typeof error === 'string') {
-                notifyError(error);
-              } else {
-                notifyError('Unknown error', error.txType);
-              }
-              return;
-            }
+            await createTXModal(
+              (app.chain as Substrate).bounties.extendBountyExpiryTx(
+                app.user?.activeAccount as SubstrateAccount, bountyId, remark
+              )
+            );
 
             // done
             $(e.target).trigger('modalcomplete');

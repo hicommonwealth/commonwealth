@@ -127,22 +127,12 @@ const BountyDetail = {
           disabled: !isCurator,
           onclick: async (e) => {
             const confirmed = await confirmationModalWithText(
-              'Send a transaction to accept your role as curator?', 'Continue'
+              'Accept your role as curator? This requires putting down a curator deposit.', 'Yes'
             )();
-            if (confirmed) {
-              try {
-                await createTXModal(
-                  (app.chain as Substrate).bounties.acceptCuratorTx(app.user?.activeAccount as SubstrateAccount, bounty.identifier)
-                );
-              } catch (error) {
-	        if (typeof error === 'string') {
-                  notifyError(error);
-                } else {
-                  notifyError('Unknown error', error.txType);
-                }
-                return;
-              }
-            }
+            if (!confirmed) return;
+            await createTXModal(
+              (app.chain as Substrate).bounties.acceptCuratorTx(app.user?.activeAccount as SubstrateAccount, bounty.identifier)
+            );
           }
         }) : bounty.isActive ? [
           m(Button, {
@@ -177,7 +167,7 @@ const BountyDetail = {
           disabled: !isRecipient,
           onclick: async (e) => {
             const confirmed = await confirmationModalWithText(
-              'Send a transaction to claim your bounty payout?', 'Continue'
+              'Claim your bounty payout?', 'Yes'
             )();
             if (confirmed) {
               (app.chain as Substrate).bounties.claimBountyTx(app.user.activeAccount as SubstrateAccount, bounty.identifier);

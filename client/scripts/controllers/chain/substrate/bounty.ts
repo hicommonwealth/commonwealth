@@ -192,10 +192,10 @@ export class SubstrateBounty extends Proposal<ApiPromise, SubstrateCoin, ISubstr
     }
     switch (e.data.kind) {
       case SubstrateTypes.EventKind.TreasuryBountyProposed: {
+        this._active = true;
         break;
       }
       case SubstrateTypes.EventKind.TreasuryBountyBecameActive: {
-        this._active = true;
         break;
       }
       case SubstrateTypes.EventKind.TreasuryBountyCanceled: {
@@ -208,22 +208,23 @@ export class SubstrateBounty extends Proposal<ApiPromise, SubstrateCoin, ISubstr
       }
       case SubstrateTypes.EventKind.TreasuryBountyAwarded: {
         this._awarded = true;
-        this._active = false;
         break;
       }
       case SubstrateTypes.EventKind.TreasuryBountyRejected: {
         this.complete();
+        this._awarded = false;
         this._active = false;
         break;
       }
       case SubstrateTypes.EventKind.TreasuryBountyClaimed: {
-        this._awarded = true;
-        this._active = false;
         this.complete();
+        this._active = false;
         break;
       }
       default: {
-        throw new Error('invalid event update');
+        if ((e.data.kind as any) !== 'acceptCurator') {
+          throw new Error('invalid event update');
+        }
       }
     }
   }
