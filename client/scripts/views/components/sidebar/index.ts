@@ -181,6 +181,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
       || p.startsWith(`/${app.activeChainId()}/proposal/treasuryproposal`);
     const onBountiesPage = (p) => p.startsWith(`/${app.activeChainId()}/bounties`);
     const onCouncilPage = (p) => p.startsWith(`/${app.activeChainId()}/council`);
+    const onTipsPage = (p) => p.startsWith(`/${app.activeChainId()}/tips`);
 
     const onValidatorsPage = (p) => p.startsWith(`/${app.activeChainId()}/validators`);
     const onNotificationsPage = (p) => p.startsWith('/notifications');
@@ -241,6 +242,19 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           onclick: (e) => {
             e.preventDefault();
             m.route.set(`/${app.activeChainId()}/bounties`);
+          },
+        }),
+      // tips (substrate only)
+      // TODO: which chains?
+      !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Centrifuge
+        && m(Button, {
+          fluid: true,
+          rounded: true,
+          active: onTipsPage(m.route.get()),
+          label: 'Tips',
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set(`/${app.activeChainId()}/tips`);
           },
         }),
       m('.sidebar-spacer'),

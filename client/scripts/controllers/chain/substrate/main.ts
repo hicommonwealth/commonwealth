@@ -9,6 +9,7 @@ import { IChainAdapter, ChainBase, ChainClass, NodeInfo } from 'models';
 import { IApp } from 'state';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import SubstratePhragmenElections from './phragmen_elections';
+import SubstrateTreasuryTips from './treasury_tips';
 import SubstrateIdentities from './identities';
 import SubstrateChain from './shared';
 
@@ -23,6 +24,7 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public treasury: SubstrateTreasury;
   public bounties: SubstrateBountyTreasury;
   public identities: SubstrateIdentities;
+  public tips: SubstrateTreasuryTips;
   public readonly chainEntities = new ChainEntityController();
 
   public readonly base = ChainBase.Substrate;
@@ -49,6 +51,7 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     this.democracy = new SubstrateDemocracy(this.app);
     this.treasury = new SubstrateTreasury(this.app);
     this.bounties = new SubstrateBountyTreasury(this.app);
+    this.tips = new SubstrateTreasuryTips(this.app);
     this.identities = new SubstrateIdentities(this.app);
   }
 
@@ -80,6 +83,7 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
       this.democracy,
       this.treasury,
       this.bounties,
+      this.tips,
       this.identities,
     ].map((m) => m.initialized ? m.deinit() : Promise.resolve()));
     this.accounts.deinit();

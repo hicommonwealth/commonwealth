@@ -41,6 +41,7 @@ import PageNotFound from 'views/pages/404';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
+import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 
 import { SocialSharingCarat } from 'views/components/social_sharing_carat';
 
@@ -114,6 +115,7 @@ const ProposalHeader: m.Component<{
       + `${slugify(proposal.title)}`;
     const proposalTitleIsEditable = (proposal instanceof SubstrateDemocracyProposal
       || proposal instanceof SubstrateCollectiveProposal
+      || proposal instanceof SubstrateTreasuryTip
       || proposal instanceof SubstrateTreasuryProposal);
 
     return m('.ProposalHeader', {
@@ -623,6 +625,7 @@ const ViewProposalPage: m.Component<{
             return m(PageNotFound, { message: 'Invalid proposal type' });
           }
           if (!c.ready) {
+            // TODO: perhaps we should be able to load here without fetching ALL proposal data
             // load sibling modules too
             if (app.chain.base === ChainBase.Substrate) {
               const chain = (app.chain as Substrate);
@@ -631,7 +634,8 @@ const ViewProposalPage: m.Component<{
                 chain.technicalCommittee,
                 chain.treasury,
                 chain.democracyProposals,
-                chain.democracy
+                chain.democracy,
+                chain.tips,
               ]);
             } else {
               app.chain.loadModules([ c ]);

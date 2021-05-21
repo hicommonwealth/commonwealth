@@ -16,6 +16,7 @@ import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_
 import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
+import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 import MolochProposal, { MolochProposalState } from 'controllers/chain/ethereum/moloch/proposal';
 import MarlinProposal, { MarlinProposalState, MarlinProposalVote } from 'controllers/chain/ethereum/marlin/proposal';
 
@@ -76,6 +77,14 @@ export const getStatusText = (proposal: AnyProposal, showCountdown: boolean) => 
                 ? [ 'Expected to pass and move to referendum, ', countdown ]
                 : proposal.isPassing === ProposalStatus.Passing ? [ 'Expected to pass, ', countdown ]
                   : proposal.isPassing === ProposalStatus.Failing ? [ 'Needs more votes, ', countdown ]
+                  /* TODO: figure out how to display tip countdown/vote count
+                    : proposal instanceof SubstrateTreasuryTip ? (
+                      proposal.isClosable
+                        ? [ 'Ready to close' ]
+                        : proposal.isClosing
+                          ? [ 'Closing in ', countdown ]
+                          : [ 'Needs more tips, ', countdown ])
+                  */
                     : proposal.isPassing === ProposalStatus.None ? '' : '';
 };
 
@@ -131,6 +140,7 @@ const ProposalCard: m.Component<{ proposal: AnyProposal, injectedContent? }> = {
         // metadata
         proposal instanceof SubstrateTreasuryProposal && m('.proposal-amount', proposal.value.format(true)),
         proposal instanceof SubstrateDemocracyReferendum && m('.proposal-amount', proposal.threshold),
+        proposal instanceof SubstrateTreasuryTip && m('.proposal-amount', proposal.support.format(true)),
         // // linked treasury proposals
         // proposal instanceof SubstrateDemocracyReferendum && proposal.preimage?.section === 'treasury'
         //   && proposal.preimage?.method === 'approveProposal'

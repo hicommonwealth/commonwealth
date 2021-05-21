@@ -6,6 +6,7 @@ import {
   VotingType, VotingUnit, ChainEntity, ChainEvent, DepositVote,
 } from 'models';
 import { SubstrateTypes } from '@commonwealth/chain-events';
+import { chainEntityTypeToProposalSlug } from 'identifiers';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateTreasuryTips from './treasury_tips';
@@ -49,6 +50,9 @@ export class SubstrateTreasuryTip extends Proposal<
   private _slashed = false;
   public get slashed() { return this._slashed; }
 
+  public get isClosing() { return !!this.data.closing; }
+  public get isClosable() { return this.data.closing &&  this.data.closing <= this._Tips.app.chain.block.height; }
+
   // TODO: are these voting types correct?
   public readonly votingType = VotingType.SimpleYesApprovalVoting;
   public readonly votingUnit = VotingUnit.CoinVote;
@@ -73,7 +77,8 @@ export class SubstrateTreasuryTip extends Proposal<
     if (this._data.closing) {
       return { kind: 'fixed_block', blocknum: this._data.closing };
     } else {
-      return { kind: 'unavailable' };
+      // threshold for moving to "closing" is majority of Tippers elect to tip
+      return { kind: 'threshold', threshold: Math.floor((this._Tips.members.length + 1) / 2) };
     }
   }
 
@@ -130,6 +135,15 @@ export class SubstrateTreasuryTip extends Proposal<
 
     entity.chainEvents.forEach((e) => this.update(e));
 
+    if (!this.completed) {
+      const slug = chainEntityTypeToProposalSlug(entity.type);
+      const uniqueId = `${slug}_${entity.typeId}`;
+      this._Chain.app.chain.chainEntities._fetchTitle(entity.chain, uniqueId).then((response) => {
+        if (response.status === 'Success' && response.result?.length) {
+          this._title = response.result;
+        }
+      });
+    }
     this._initialized = true;
     this._Tips.store.add(this);
   }

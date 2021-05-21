@@ -21,7 +21,7 @@ class SubstrateTreasuryTips extends ProposalModule<
     return this._members.find((m) => m.address === account.address) !== undefined;
   }
 
-  constructor(app: IApp, public readonly moduleName: 'council' | 'technicalCommittee') {
+  constructor(app: IApp) {
     super(app, (e) => new SubstrateTreasuryTip(this._Chain, this._Accounts, this, e));
   }
 

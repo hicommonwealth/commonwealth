@@ -57,11 +57,14 @@ const NewProposalForm = {
     let hasTitleAndDescription : boolean;
     let hasBountyTitle : boolean;
     let hasTopics : boolean;
-    let hasBeneficiaryAndAmount : boolean;
+    let hasBeneficiary : boolean;
+    let hasAmount: boolean;
     let hasPhragmenInfo : boolean;
     let hasDepositChooser : boolean;
     // bounty proposal
     let hasBountyValue : boolean;
+    // tip
+    let hasReason: boolean;
     // council motion
     let hasVotingPeriodAndDelaySelector : boolean;
     let hasReferendumSelector : boolean;
@@ -100,7 +103,8 @@ const NewProposalForm = {
       hasTitleAndDescription = true;
       hasTopics = true;
     } else if (proposalTypeEnum === ProposalType.SubstrateTreasuryProposal) {
-      hasBeneficiaryAndAmount = true;
+      hasBeneficiary = true;
+      hasAmount = true;
       const treasury = (app.chain as Substrate).treasury;
       dataLoaded = !!treasury.initialized;
     } else if (proposalTypeEnum === ProposalType.SubstrateBountyProposal) {
@@ -108,6 +112,13 @@ const NewProposalForm = {
       hasBountyValue = true;
       const bountyTreasury = (app.chain as Substrate).bounties;
       dataLoaded = !!bountyTreasury.initialized;
+    } else if (proposalTypeEnum === ProposalType.SubstrateTreasuryTip) {
+      hasReason = true;
+      // TODO: this is only true if the proposer is doing reportAwesome()
+      //   we need special code for newTip().
+      hasBeneficiary = true;
+      const tips = (app.chain as Substrate).tips;
+      dataLoaded = !!tips.initialized;
     } else if (proposalTypeEnum === ProposalType.PhragmenCandidacy) {
       hasPhragmenInfo = true;
       const elections = (app.chain as Substrate).phragmenElections;
@@ -248,6 +259,11 @@ const NewProposalForm = {
         args = [author, vnode.state.form.value, vnode.state.form.title];
         createFunc = ([a, v, t]) => (app.chain as Substrate).bounties.createTx(a, v, t);
         return createTXModal(createFunc(args)).then(done);
+      } else if (proposalTypeEnum === ProposalType.SubstrateBountyProposal) {
+        if (!vnode.state.form.reason) throw new Error('Invalid reason');
+        if (!vnode.state.form.beneficiary) throw new Error('Invalid beneficiary address');
+        const beneficiary = app.chain.accounts.get(vnode.state.form.beneficiary);
+        args = [vnode.state.form.reason, beneficiary];
       } else if (proposalTypeEnum === ProposalType.PhragmenCandidacy) {
         args = [author];
         createFunc = ([a]) => (app.chain as Substrate).phragmenElections.activeElection.submitCandidacyTx(a);
@@ -407,6 +423,22 @@ const NewProposalForm = {
               }),
             ]),
           ],
+          hasReason && [
+            m(FormGroup, [
+              m(FormLabel, 'Reason'),
+              m(Input, {
+                placeholder: 'Enter a reason',
+                name: 'reason',
+                autofocus: true,
+                autocomplete: 'off',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.form.reason = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+          ],
           hasTitleAndDescription && [
             m(FormGroup, [
               m(FormLabel, 'Title'),
@@ -436,12 +468,12 @@ const NewProposalForm = {
               }),
             ]),
           ],
-          hasBeneficiaryAndAmount && [
+          hasBeneficiary && [
             m(FormGroup, [
               m(FormLabel, 'Beneficiary'),
               m(Input, {
                 name: 'beneficiary',
-                placeholder: 'Beneficiary of treasury proposal',
+                placeholder: 'Beneficiary of proposal',
                 defaultValue: author.address,
                 oncreate: (vvnode) => {
                   vnode.state.form.beneficiary = author.address;
@@ -453,12 +485,14 @@ const NewProposalForm = {
                 },
               }),
             ]),
+          ],
+          hasAmount && [
             m(FormGroup, [
               m(FormLabel, `Amount (${app.chain.chain.denom})`),
               m(Input, {
                 name: 'amount',
                 autofocus: true,
-                placeholder: 'Amount of treasury proposal',
+                placeholder: 'Amount of proposal',
                 autocomplete: 'off',
                 oninput: (e) => {
                   const result = (e.target as any).value;

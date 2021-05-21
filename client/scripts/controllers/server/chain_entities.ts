@@ -100,10 +100,14 @@ class ChainEntityController {
     this._handlers = {};
   }
 
-  public async _fetchTitle(chain: string, unique_id: string) {
-    return $.get(`${app.serverUrl()}/fetchEntityTitle`, {
-      unique_id, chain
-    });
+  public async _fetchTitle(chain: string, unique_id: string): Promise<any> {
+    try {
+      return $.get(`${app.serverUrl()}/fetchEntityTitle`, {
+        unique_id, chain
+      });
+    } catch (e) {
+      return { status: 'Failed' };
+    }
   }
 
   private _handleEvents(chain: string, events: CWEvent[]) {
