@@ -54,38 +54,6 @@ export function baseToNetwork(n: ChainBase): ChainNetwork {
   }
 }
 
-<<<<<<< HEAD
-export function networkToBase(n: ChainNetwork | string): ChainBase {
-  switch (n) {
-    case ChainNetwork.Clover: return ChainBase.Substrate;
-    case ChainNetwork.Edgeware: return ChainBase.Substrate;
-    case ChainNetwork.EdgewareTestnet: return ChainBase.Substrate;
-    case ChainNetwork.Kusama: return ChainBase.Substrate;
-    case ChainNetwork.Kulupu: return ChainBase.Substrate;
-    case ChainNetwork.Polkadot: return ChainBase.Substrate;
-    case ChainNetwork.Plasm: return ChainBase.Substrate;
-    case ChainNetwork.Stafi: return ChainBase.Substrate;
-    case ChainNetwork.Crust: return ChainBase.Substrate;
-    case ChainNetwork.Darwinia: return ChainBase.Substrate;
-    case ChainNetwork.Phala: return ChainBase.Substrate;
-    case ChainNetwork.Centrifuge: return ChainBase.Substrate;
-    case ChainNetwork.HydraDX: return ChainBase.Substrate;
-    case ChainNetwork.Cosmos: return ChainBase.CosmosSDK;
-    case ChainNetwork.Straightedge: return ChainBase.CosmosSDK;
-    case ChainNetwork.NEAR: return ChainBase.NEAR;
-    case ChainNetwork.Ethereum: return ChainBase.Ethereum;
-    case ChainNetwork.Moloch: return ChainBase.Ethereum;
-    case ChainNetwork.Metacartel: return ChainBase.Ethereum;
-    case ChainNetwork.Commonwealth: return ChainBase.Ethereum;
-    case ChainNetwork.ALEX: return ChainBase.Ethereum;
-    case ChainNetwork.Marlin: return ChainBase.Ethereum;
-    case ChainNetwork.MarlinTestnet: return ChainBase.Ethereum;
-    default: return null;
-  }
-}
-
-=======
->>>>>>> master
 // TODO: this should be deprecated, and replaced with ChainNetwork in most instances
 export enum ChainClass {
   Clover = 'clover',
@@ -110,11 +78,8 @@ export enum ChainClass {
   MarlinTestnet = 'marlin-testnet',
   ALEX = 'alex',
   Commonwealth = 'commonwealth',
-<<<<<<< HEAD
   Crust = 'crust',
-=======
   ERC20 = 'erc20',
->>>>>>> master
 }
 
 // TODO: this is inconsistently used
