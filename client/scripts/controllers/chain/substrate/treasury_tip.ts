@@ -202,11 +202,11 @@ export class SubstrateTreasuryTip extends Proposal<
       (api: ApiPromise) => api.tx.tips.tip(this.data.hash, vote.deposit.asBN),
       'tip',
       this.title,
-      (success) => {
-        if (success) {
-          this.addOrUpdateVote(vote);
-        }
-      },
+      // (success) => {
+      //   if (success) {
+      //     this.addOrUpdateVote(vote);
+      //   }
+      // },
     );
   }
 
@@ -219,7 +219,7 @@ export class SubstrateTreasuryTip extends Proposal<
       (api: ApiPromise) => api.tx.tips.closeTip(this.data.hash),
       'closeTip',
       this.title,
-      (success) => success && this.complete(),
+      // (success) => success && this.complete(),
     );
   }
 
@@ -232,12 +232,12 @@ export class SubstrateTreasuryTip extends Proposal<
       (api: ApiPromise) => api.tx.tips.retractTip(this.data.hash),
       'retractTip',
       this.title,
-      (success) => {
-        if (success) {
-          this._retracted = true;
-          this.complete();
-        }
-      }
+      // (success) => {
+      //   if (success) {
+      //     this._retracted = true;
+      //     this.complete();
+      //   }
+      // }
     );
   }
 }
