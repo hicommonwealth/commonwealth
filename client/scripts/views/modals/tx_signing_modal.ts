@@ -399,7 +399,6 @@ const TXSigningModalStates: {
               && polkaWallet.available
               && polkaWallet.enabled
               && polkaWallet.accounts.find((v) => v.address === vnode.attrs.author.address),
-            disabled: !polkaWallet?.available,
           }, {
             name: 'Command line',
             content: m(TXSigningCLIOption, {
