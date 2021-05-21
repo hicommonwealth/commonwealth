@@ -171,6 +171,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
     const showCommonwealthMenuOptions = app.chain?.class === ChainClass.Commonwealth;
 
     const showMarlinOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Marlin;
+    const showYearnOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Yearn;
 
     const onSnapshotProposal = (p) => p.startsWith(`/${app.activeId()}/snapshot-proposals`);
     const onProposalPage = (p) => (
@@ -345,6 +346,15 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           e.preventDefault();
           m.route.set(`/${app.activeId()}/snapshot-proposals`);
         },
+      }),
+      showYearnOptions && m(Button, {
+        fluid: true,
+        rounded: true,
+        onclick: (e) => {
+          e.preventDefault();
+          m.route.set(`/${app.activeChainId()}/new/snapshot-proposal`);
+        },
+        label: 'Submit a Proposal',
       }),
       showCommonwealthMenuOptions && m(Button, {
         fluid: true,

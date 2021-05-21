@@ -7,6 +7,7 @@ import mixpanel from 'mixpanel-browser';
 import app from 'state';
 import Sublayout from 'views/sublayout';
 import {SnapshotProposal } from 'models';
+import snapshotClient from 'helpers/snapshot_client';
 
 import { ProposalHeaderTitle } from './header';
 import {

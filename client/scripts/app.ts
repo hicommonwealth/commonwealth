@@ -677,6 +677,7 @@ $(() => {
     '/:scope/delegate':          importRoute('views/pages/delegate', { scoped: true, }),
     '/:scope/login':             importRoute('views/pages/login', { scoped: true, deferChain: true }),
     '/:scope/new/thread':        importRoute('views/pages/new_thread', { scoped: true, deferChain: true }),
+    '/:scope/new/snapshot-proposal':        importRoute('views/pages/new_snapshot_proposal', { scoped: true, deferChain: true }),
     '/:scope/new/proposal/:type': importRoute('views/pages/new_proposal/index', { scoped: true }),
     '/:scope/admin':             importRoute('views/pages/admin', { scoped: true }),
     '/:scope/settings':          importRoute('views/pages/settings', { scoped: true }),
