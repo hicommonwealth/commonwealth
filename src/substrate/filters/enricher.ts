@@ -730,11 +730,12 @@ export async function Enrich(
       }
 
       case EventKind.TreasuryBountyExtended: {
-        const [bountyIndex] = (event.data as unknown) as [BountyIndex] & Codec;
+        const [bountyIndex, remark] = (event.data as unknown) as [BountyIndex, any];
         return {
           data: {
             kind,
             bountyIndex: +bountyIndex,
+            remark: remark?.toHuman(),
           },
         };
       }
@@ -1177,6 +1178,39 @@ export async function Enrich(
           },
         };
       }
+
+      case EventKind.TreasuryBountyBecameActive: {
+        const [idx] = extrinsic.args as [BountyIndex];
+        return {
+          data: {
+            kind,
+            bountyIndex: +idx,
+          },
+        };
+      }
+
+      case EventKind.TreasuryBountyExtended: {
+        const [idx, remark] = extrinsic.args as [BountyIndex, any];
+        return {
+          data: {
+            kind,
+            bountyIndex: +idx,
+            remark: remark?.toHuman(),
+          },
+        };
+      }
+
+      case EventKind.TreasuryBountyAwarded: {
+        const [idx, beneficiary] = extrinsic.args as [BountyIndex, AccountId];
+        return {
+          data: {
+            kind,
+            bountyIndex: +idx,
+            beneficiary: beneficiary.toString(),
+          },
+        };
+      }
+
       default: {
         throw new Error(`unknown event type: ${kind}`);
       }

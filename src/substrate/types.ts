@@ -482,9 +482,10 @@ export interface ITreasuryBountyCanceled extends IEvent {
 }
 
 export interface ITreasuryBountyExtended extends IEvent {
-  // A bounty expiry is extended. [index]
+  // A bounty expiry is extended. [index, remark]
   kind: EventKind.TreasuryBountyExtended;
   bountyIndex: number;
+  remark: string;
 }
 
 /**

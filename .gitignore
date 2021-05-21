@@ -8,3 +8,6 @@ coverage/
 .env
 dist/
 *.tgz
+
+.yalc/
+yalc.lock

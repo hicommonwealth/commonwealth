@@ -25,6 +25,10 @@ Please submit any enhancements or bug fixes as a Pull Request on the [project's 
 
 ## Development
 
+```
+npm install -g npm-install-peers
+```
+
 For using a local version of Chain Events in other projects, we recommend you use `yalc`, which functions as a local package repository for your `npm` libraries in development.
 
 To install `yalc`, run:
