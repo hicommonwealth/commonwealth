@@ -754,13 +754,7 @@ const NewProposalForm = {
               rounded: true,
               label: proposalTypeEnum === ProposalType.OffchainThread
                 ? 'Create thread'
-                : proposalTypeEnum === ProposalType.SubstrateTreasuryProposal
-                  ? 'Create treasury proposal'
-                  : proposalTypeEnum === ProposalType.PhragmenCandidacy
-                    ? 'Create candidacy'
-                    : proposalTypeEnum === ProposalType.SubstrateBountyProposal
-                      ? 'Create bounty'
-                      : 'Create proposal',
+                : 'Send transaction',
               onclick: (e) => {
                 e.preventDefault();
                 createNewProposal();

@@ -85,6 +85,7 @@ interface IProfilePageState {
   threads: OffchainThread[];
   comments: OffchainComment<any>[];
   addressId?: number;
+  initialized: boolean;
   loaded: boolean;
   loading: boolean;
   refreshProfile: boolean;

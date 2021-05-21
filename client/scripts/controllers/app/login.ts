@@ -2,12 +2,14 @@
  * @file Manages logged-in user accounts and local storage.
  */
 import $ from 'jquery';
+import m from 'mithril';
 import app from 'state';
 import { isSameAccount } from 'helpers';
 
 import { initAppState } from 'app';
 import { Magic } from 'magic-sdk';
 import { PolkadotExtension } from '@magic-ext/polkadot';
+import Token from 'controllers/chain/ethereum/token/adapter';
 
 import {
   ChainInfo,
@@ -52,9 +54,14 @@ export function linkExistingAddressToChainOrCommunity(
 }
 
 export async function setActiveAccount(account: Account<any>): Promise<void> {
+  console.log('set active account');
   const chain = app.activeChainId();
   const community = app.activeCommunityId();
   const role = app.user.getRoleInCommunity({ account, chain, community });
+
+  if (app.chain && (app.chain as Token).isToken) {
+    (app.chain as Token).activeAddressHasToken(account.address).then(() => m.redraw());
+  }
 
   if (!role || role.is_user_default) {
     app.user.ephemerallySetActiveAccount(account);

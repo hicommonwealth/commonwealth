@@ -76,7 +76,7 @@ export const getStatusText = (proposal: AnyProposal, showCountdown: boolean) => 
                 ? [ 'Expected to pass and move to referendum, ', countdown ]
                 : proposal.isPassing === ProposalStatus.Passing ? [ 'Expected to pass, ', countdown ]
                   : proposal.isPassing === ProposalStatus.Failing ? [ 'Needs more votes, ', countdown ]
-                    : proposal.isPassing === ProposalStatus.None ? [ 'To be decided' ] : '';
+                    : proposal.isPassing === ProposalStatus.None ? '' : '';
 };
 
 // export const getSecondaryStatusText = (proposal: AnyProposal): string | null => {
@@ -99,9 +99,9 @@ export const getStatusText = (proposal: AnyProposal, showCountdown: boolean) => 
 //   }
 // };
 
-const ProposalCard: m.Component<{ proposal: AnyProposal }> = {
+const ProposalCard: m.Component<{ proposal: AnyProposal, injectedContent? }> = {
   view: (vnode) => {
-    const { proposal } = vnode.attrs;
+    const { proposal, injectedContent } = vnode.attrs;
     const { author, createdAt, slug, identifier, title } = proposal;
     const proposalLink = `/${app.activeChainId()}/proposal/${proposal.slug}/${proposal.identifier}`
       + `-${slugify(proposal.title)}`;
@@ -154,10 +154,12 @@ const ProposalCard: m.Component<{ proposal: AnyProposal }> = {
         (proposal instanceof SubstrateDemocracyProposal || proposal instanceof SubstrateCollectiveProposal)
           && proposal.getReferendum()
           && m('.proposal-action', [ 'Became REF-', proposal.getReferendum().identifier ]),
-        // comments
-        m('.proposal-comments', pluralize(app.comments.nComments(proposal), 'comment')),
-        // status
-        m('.proposal-status', { class: getStatusClass(proposal) }, getStatusText(proposal, true)),
+        injectedContent ? m('.proposal-injected', injectedContent) : [
+          // comments
+          m('.proposal-comments', pluralize(app.comments.nComments(proposal), 'comment')),
+          // status
+          m('.proposal-status', { class: getStatusClass(proposal) }, getStatusText(proposal, true)),
+        ],
       ]),
       m('.proposal-card-bottom', {
         onclick: (e) => {

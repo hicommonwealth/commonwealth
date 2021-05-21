@@ -2,7 +2,7 @@ import m from 'mithril';
 import 'pages/landing/landing_page_footer.scss';
 
 interface IState {
-  list: { text: string; redirectTo: string }[];
+  list: { text: string; redirectTo?: string, externalLink?: string }[];
 }
 
 const FooterLandingPage: m.Component<IState, IState> = {
@@ -10,7 +10,6 @@ const FooterLandingPage: m.Component<IState, IState> = {
     const redirectClick = (route) => {
       m.route.set(route);
     };
-
     return m('footer.FooterLandingPage', { class: 'bg-footer bg-cover py-10' },
       m('div', { class: 'mt-8 container mx-auto md:flex md:flex-row md:justify-between md:items-start' }, [
         m('div', [
@@ -23,14 +22,23 @@ const FooterLandingPage: m.Component<IState, IState> = {
         m('div', [
           m('nav',
             { class: 'mt-10 md:mt-0 w-64' },
-            m('ul', { class: 'flex flex-wrap flex-col h-24' }, [
+            m('ul', { class: `flex flex-wrap flex-col ${vnode.attrs.list.length > 6 ? 'h-32' : 'h-24'}` }, [
               vnode.attrs.list.map((item) => {
                 return m('li.FooterNavsLinks', { class: 'mb-2' }, [
-                  m('a', {
-                    class: 'text-gray-500',
-                    onclick: () => redirectClick(item.redirectTo),
-                  },
-                  item.text)
+                  item.redirectTo
+                    ? m('a', {
+                      class: 'text-gray-500',
+                      onclick: (e) => {
+                        e.preventDefault();
+                        redirectClick(item.redirectTo);
+                      },
+                    },
+                    item.text)
+                    : m('a', {
+                      class: 'text-gray-500',
+                      href: item.externalLink,
+                      target: '_blank'
+                    }, item.text)
                 ]);
               }),
             ]))
