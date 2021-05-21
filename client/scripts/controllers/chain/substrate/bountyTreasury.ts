@@ -116,10 +116,9 @@ class SubstrateBountyTreasury extends ProposalModule<
   }
 
   // council approves a bounty
-  public createBountyApprovalMotionTx(author: SubstrateAccount, bountyId: number) {
+  public createBountyApprovalMotionTx(author: SubstrateAccount, bountyId: number, threshold: number) {
     const action = this._Chain.getTxMethod('bounties', 'approveBounty', [ bountyId ]);
-    const threshold = 1;
-    const length = 1000
+    const length = 1000;
     return this._Chain.createTXModalData(
       author,
       (api: ApiPromise) => api.tx.council.propose(threshold, action, length),
@@ -129,10 +128,9 @@ class SubstrateBountyTreasury extends ProposalModule<
   }
 
   // council approves a curator
-  public proposeCuratorTx(author: SubstrateAccount, bountyId: number, curator: string, fee: SubstrateCoin) {
+  public proposeCuratorTx(author: SubstrateAccount, bountyId: number, curator: string, fee: SubstrateCoin, threshold: number) {
     const action = this._Chain.getTxMethod('bounties', 'proposeCurator', [ bountyId, curator, fee ]);
-    const threshold = 1;
-    const length = 1000
+    const length = 1000;
     return this._Chain.createTXModalData(
       author,
       (api: ApiPromise) => api.tx.council.propose(threshold, action, length),
