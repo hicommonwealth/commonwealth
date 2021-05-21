@@ -23,6 +23,36 @@ Be sure to call `yarn unlink` once development has been completed and the new ch
 
 Please submit any enhancements or bug fixes as a Pull Request on the [project's github page](https://github.com/hicommonwealth/chain-events).
 
+## Development
+
+For using a local version of Chain Events in other projects, we recommend you use `yalc`, which functions as a local package repository for your `npm` libraries in development.
+
+To install `yalc`, run:
+
+```bash
+$ yarn global add yalc
+```
+
+Then, publish Chain Events to the `yalc` respository (which will first build the project):
+
+```bash
+~/chain-events$ yalc publish
+```
+
+Navigate to the project you want to test Chain Events inside, and use `yalc` to add it. This will update its `package.json` to point the "@commonwealth/chain-events" dependency to a local file.
+
+```bash
+~/commonwealth$ yalc add @commonwealth/chain-events
+~/commonwealth$ yarn
+```
+
+Any time you update Chain Events after publishing and adding, simply run the following to build and propagate a new update:
+
+```bash
+~/chain-events$ yalc publish --push
+```
+
+
 ## Publishing
 
 First ensure you bump the package version in the [package.json](./package.json) file. Then build, and publish to the npm repository. A `--dry-run` is useful beforehand to ensure the version and file lists are correct.
