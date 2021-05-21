@@ -1,0 +1,16 @@
+.AddressInputTypeahead {
+}
+
+.AddressInputTypeaheadPopoverPortal {
+    margin-top: 1px;
+    .cui-popover {
+    }
+    .cui-popover-content {
+        .cui-list {
+            max-height: 200px !important;
+            overscroll-behavior: none;
+        }
+        padding: 10px;
+        padding-right: 0;
+    }
+}

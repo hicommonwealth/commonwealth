@@ -30,5 +30,8 @@
                 min-width: 24px;
             }
         }
+        .cui-button + .cui-button {
+            margin-top: 6px;
+        }
     }
 }

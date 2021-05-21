@@ -41,6 +41,10 @@ export class SubstrateBounty extends Proposal<ApiPromise, SubstrateCoin, ISubstr
     this._isFunded = status.isFunded;
     this._isPendingPayout = status.isPendingPayout;
     this._isProposed = status.isProposed;
+    this._curator = status.curator?.toString();
+    this._updateDue = status.updateDue;
+    this._unlockAt = status.unlockAt;
+    this._beneficiary = status.beneficiary?.toString();
   }
   private _title: string;
   private _isActive: boolean;
@@ -49,6 +53,10 @@ export class SubstrateBounty extends Proposal<ApiPromise, SubstrateCoin, ISubstr
   private _isFunded: boolean;
   private _isPendingPayout: boolean;
   private _isProposed: boolean;
+  private _curator: string;
+  private _updateDue;
+  private _unlockAt;
+  private _beneficiary: string;
 
   public get title() { return this._title || `Bounty ${this.shortIdentifier}`; }
   public get isActive() { return this._isActive; }
@@ -57,6 +65,10 @@ export class SubstrateBounty extends Proposal<ApiPromise, SubstrateCoin, ISubstr
   public get isFunded() { return this._isFunded; }
   public get isPendingPayout() { return this._isPendingPayout; }
   public get isProposed() { return this._isProposed; }
+  public get curator() { return this._curator; }
+  public get updateDue() { return this._updateDue; }
+  public get unlockAt() { return this._unlockAt; }
+  public get beneficiary() { return this._beneficiary; }
 
   private readonly _description: string;
   public get description() { return this._description; }
@@ -180,10 +192,10 @@ export class SubstrateBounty extends Proposal<ApiPromise, SubstrateCoin, ISubstr
     }
     switch (e.data.kind) {
       case SubstrateTypes.EventKind.TreasuryBountyProposed: {
+        this._active = true;
         break;
       }
       case SubstrateTypes.EventKind.TreasuryBountyBecameActive: {
-        this._active = true;
         break;
       }
       case SubstrateTypes.EventKind.TreasuryBountyCanceled: {
@@ -196,22 +208,23 @@ export class SubstrateBounty extends Proposal<ApiPromise, SubstrateCoin, ISubstr
       }
       case SubstrateTypes.EventKind.TreasuryBountyAwarded: {
         this._awarded = true;
-        this._active = false;
         break;
       }
       case SubstrateTypes.EventKind.TreasuryBountyRejected: {
         this.complete();
+        this._awarded = false;
         this._active = false;
         break;
       }
       case SubstrateTypes.EventKind.TreasuryBountyClaimed: {
-        this._awarded = true;
-        this._active = false;
         this.complete();
+        this._active = false;
         break;
       }
       default: {
-        throw new Error('invalid event update');
+        if ((e.data.kind as any) !== 'acceptCurator') {
+          throw new Error('invalid event update');
+        }
       }
     }
   }
