@@ -340,6 +340,8 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
     if (loading) return m(PageLoading, { showNewProposalButton: true });
     if (!account && !vnode.state.initialized) {
       return m(PageNotFound, { message: 'Invalid address provided' });
+    } else if (!account) {
+      return m(PageLoading, { showNewProposalButton: true });
     }
 
     const { onOwnProfile, onLinkedProfile, displayBanner, currentAddressInfo } = getProfileStatus(account);
