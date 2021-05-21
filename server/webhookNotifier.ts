@@ -97,6 +97,7 @@ const send = async (models, content: WebhookContent) => {
   const notificationCategory = (content.chainEvent)
     ? content.chainEvent.chain_event_type_id : content.notificationCategory;
   // grab all webhooks for specific community
+  // Testing all functionality
   const chainOrCommWebhooks = await models.Webhook.findAll({
     where: {
       ...chainOrCommObj,
