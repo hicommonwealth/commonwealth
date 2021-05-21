@@ -42,8 +42,10 @@ export const ApproveBountyModal: m.Component<{ bountyId: number }, { approvals: 
           onclick: async (e) => {
             e.preventDefault();
             if (isNaN(vnode.state.approvals)) return;
-            await (app.chain as Substrate).bounties.createBountyApprovalMotionTx(
-              app.user?.activeAccount as SubstrateAccount, bountyId, vnode.state.approvals
+            await createTXModal(
+              (app.chain as Substrate).bounties.createBountyApprovalMotionTx(
+                app.user?.activeAccount as SubstrateAccount, bountyId, vnode.state.approvals
+              )
             );
 
             // done
