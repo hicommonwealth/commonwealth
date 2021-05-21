@@ -87,7 +87,7 @@ const send = async (models, content: WebhookContent) => {
   try {
     address = await models.Address.findOne({ where: { address: content.user, chain: content.author_chain } });
   } catch (err) {
-    // pass nothing if no matching address is found
+    console.log("There's no address")
   }
 
   // if a community is passed with the content, we know that it is from an offchain community
@@ -97,7 +97,6 @@ const send = async (models, content: WebhookContent) => {
   const notificationCategory = (content.chainEvent)
     ? content.chainEvent.chain_event_type_id : content.notificationCategory;
   // grab all webhooks for specific community
-  // Testing all functionality
   const chainOrCommWebhooks = await models.Webhook.findAll({
     where: {
       ...chainOrCommObj,
@@ -249,12 +248,14 @@ const send = async (models, content: WebhookContent) => {
           }]
         };
       } else if (url.indexOf('telegram.org') !== -1) {
-        const getUpdatesUrl = url.split('/@').slice(0, -1).join('@');
+        let getUpdatesUrl = url.split('/@').slice(0, -1).join('@');
 
         let getChatUsername = url.split('/@');
-        getChatUsername = `@${getChatUsername[1]}`;
+        getChatUsername = '@'+getChatUsername[1];
 
-        url = `${getUpdatesUrl}/sendMessage`;
+        const botToken = 'bot1662899908:AAGuGPpsYzfM2KzAGjveaois9TUN-OMggC4';
+        getUpdatesUrl = `https://api.telegram.org/${botToken}`;
+        url = getUpdatesUrl+'/sendMessage';
 
         webhookData = isChainEvent ? {
           chat_id: getChatUsername,
@@ -276,7 +277,7 @@ const send = async (models, content: WebhookContent) => {
             'resize_keyboard': true,
             'inline_keyboard': [
               [
-                { 'text': 'Commonwealth', 'url': actedOnLink }
+                { 'text': 'Read more on commonwealth', 'url': actedOnLink }
               ]
             ]
           }
