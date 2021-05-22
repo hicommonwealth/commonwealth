@@ -23,7 +23,6 @@ module.exports = {
         chain: 'crust',
         url: 'wss://api.crust.network/',
       }], { transaction: t });
-
     });
   },
 
