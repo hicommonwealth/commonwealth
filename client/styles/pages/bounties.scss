@@ -9,6 +9,12 @@
     }
 
     .BountyDetail {
+        p {
+            margin-top: 16px;
+        }
+        p + p {
+            margin-top: 4px;
+        }
         .b-box {
             border: 1px solid $border-color-lightest;
             border-radius: 8px;

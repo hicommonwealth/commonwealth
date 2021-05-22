@@ -1,4 +1,15 @@
+@import 'client/styles/shared';
+
 .AddressInputTypeahead {
+    .User {
+        position: relative;
+        top: -3px;
+        margin-right: 10px;
+    }
+    .lighter {
+        margin-left: 6px;
+        color: $text-color-lighter;
+    }
 }
 
 .AddressInputTypeaheadPopoverPortal {
