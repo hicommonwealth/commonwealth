@@ -71,12 +71,12 @@ const HeaderLandingPage: m.Component<IAttrs, IState> = {
           }),
           m(
             'nav',
-            { class: 'hidden lg:block' },
+            { class: 'lg:block' },
             m('ul', { class: 'lg:flex lg:flex-row lg:items-center' }, [
               vnode.attrs.navs.map((nav: any) => {
                 return m(
                   'li.LandingPageHeaderLinks',
-                  { class: 'ml-10 pt-2' },
+                  { class: 'ml-10 pt-2 hidden lg:flex' },
                   m(
                     'a',
                     {
@@ -89,11 +89,11 @@ const HeaderLandingPage: m.Component<IAttrs, IState> = {
               }),
               m(
                 'li.LandingPageHeaderLoginButton',
-                { class: 'ml-10 pt-2' },
+                { class: 'ml-5 md:ml-10 pt-4 lg:pt-0' },
                 m(
                   'a',
                   {
-                    class: 'btn-primary pb-3 text-white',
+                    class: 'btn-primary md:pb-3 text-white text-xs md:text-base',
                     onclick: () => app.modals.create({ modal: LoginModal }),
                   },
                   [
