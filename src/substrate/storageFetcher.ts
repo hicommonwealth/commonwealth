@@ -20,7 +20,7 @@ import {
 } from '@polkadot/types/interfaces';
 import { Codec } from '@polkadot/types/types';
 import { DeriveProposalImage } from '@polkadot/api-derive/types';
-import { isFunction } from '@polkadot/util';
+import { hexToString, isFunction } from '@polkadot/util';
 
 import { CWEvent, IStorageFetcher } from '../interfaces';
 import { factory, formatFilename } from '../logging';
@@ -350,7 +350,7 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
     log.info('Migrating treasury bounties...');
     const bounties = await this._api.derive.bounties.bounties();
     const events = [];
-    bounties.forEach((b) => {
+    for (const b of bounties) {
       events.push({
         kind: EventKind.TreasuryBountyProposed,
         bountyIndex: +b.index,
@@ -359,36 +359,27 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
         fee: b.bounty.fee.toString(),
         curatorDeposit: b.bounty.curatorDeposit.toString(),
         bond: b.bounty.bond.toString(),
+        description: b.description,
       } as ITreasuryBountyProposed);
 
-      if (
-        b.bounty.status.isProposed ||
-        b.bounty.status.isNone ||
-        b.bounty.status.isCuratorProposed
-      )
-        return; // Return here, not progressed
+      if (b.bounty.status.isActive || b.bounty.status.isPendingPayout) {
+        events.push({
+          kind: EventKind.TreasuryBountyBecameActive,
+          bountyIndex: +b.index,
+        } as ITreasuryBountyBecameActive);
 
-      events.push({
-        kind: EventKind.TreasuryBountyBecameActive,
-        bountyIndex: +b.index,
-      } as ITreasuryBountyBecameActive);
-      if (b.bounty.status.isActive) return;
-      if (b.bounty.status.isPendingPayout) {
-        events.push({
-          kind: EventKind.TreasuryBountyAwarded,
-          bountyIndex: +b.index,
-          value: b.bounty.value.toString(),
-          beneficiary: b.bounty.status.asPendingPayout.beneficiary.toString(),
-        } as ITreasuryBountyAwarded);
-        events.push({
-          kind: EventKind.TreasuryBountyClaimed,
-          bountyIndex: +b.index,
-          payout: b.bounty.value.toString(),
-          beneficiary: b.bounty.status.asPendingPayout.beneficiary.toString(),
-        } as ITreasuryBountyClaimed);
+        if (b.bounty.status.isPendingPayout) {
+          events.push({
+            kind: EventKind.TreasuryBountyAwarded,
+            bountyIndex: +b.index,
+            value: b.bounty.value.toString(),
+            beneficiary: b.bounty.status.asPendingPayout.beneficiary.toString(),
+          } as ITreasuryBountyAwarded);
+        }
       }
-      // No other events can be extracted from a derivable bounty itself
-    });
+      // We don't belive any other events can be extracted from a
+      // derivable bounty itself, but we might be wrong
+    }
 
     log.info(`Found ${bounties.length} bounties!`);
     return events.map((data) => ({ blockNumber, data }));

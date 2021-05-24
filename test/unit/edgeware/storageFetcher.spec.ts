@@ -10,7 +10,7 @@ import {
   Votes,
   Bounty,
 } from '@polkadot/types/interfaces';
-import { Vec, Data, TypeRegistry } from '@polkadot/types';
+import { Vec, Data, TypeRegistry, Bytes } from '@polkadot/types';
 import { Codec } from '@polkadot/types/types';
 import { stringToHex } from '@polkadot/util';
 import { DeriveReferendum } from '@polkadot/api-derive/democracy/types';
@@ -180,7 +180,7 @@ const api = constructFakeApi({
         bond: 10,
         status: 'Proposed',
       },
-      description: 'test bounty description',
+      description: 'hello',
       index: 0,
       proposals: [{}],
     } as unknown) as DeriveBounty,
@@ -479,14 +479,8 @@ describe('Edgeware Event Migration Tests', () => {
           fee: '10',
           curatorDeposit: '10',
           bond: '10',
+          description: 'hello',
         } as ITreasuryBountyProposed,
-      },
-      {
-        blockNumber,
-        data: {
-          kind: 'treasury-bounty-became-active',
-          bountyIndex: 0,
-        } as ITreasuryBountyBecameActive,
       },
     ]);
   });

@@ -198,10 +198,10 @@ export function ParseType(
           return EventKind.TreasuryBountyClaimed;
         case 'BountyCanceled':
           return EventKind.TreasuryBountyCanceled;
-        case 'BountyExtended':
+        case 'extendBountyExpiry':
           return EventKind.TreasuryBountyExtended;
         default:
-          throw new Error('invalid case');
+          return null;
       }
     }
     default:

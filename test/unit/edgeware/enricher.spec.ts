@@ -22,7 +22,7 @@ import {
   DeriveProposalImage,
   DeriveBounties,
 } from '@polkadot/api-derive/types';
-import { Vec, bool, Data, TypeRegistry, Option } from '@polkadot/types';
+import { Vec, bool, Data, TypeRegistry, Option, Bytes } from '@polkadot/types';
 import { Codec, ITuple, TypeDef } from '@polkadot/types/types';
 import { stringToHex } from '@polkadot/util';
 import {
@@ -504,6 +504,8 @@ const api = constructFakeApi({
         proposals: [],
       },
     ] as unknown) as DeriveBounties,
+  bountyDescriptions: async () =>
+    constructOption((stringToHex('hello') as unknown) as Bytes),
   voting: async (hash) =>
     hash.toString() !== 'hash'
       ? constructOption()
@@ -1101,6 +1103,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
         fee: '10',
         proposer: 'alice',
         value: '50',
+        description: 'hello',
       },
     });
   });
@@ -1177,13 +1180,14 @@ describe('Edgeware Event Enricher Filter Tests', () => {
 
   it('should enrich bounty-extended event', async () => {
     const kind = EventKind.TreasuryBountyExtended;
-    const event = constructEvent(['1']);
+    const event = constructExtrinsic('alice', ['1', stringToHex('remark')]);
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       data: {
         kind,
         bountyIndex: 1,
+        remark: 'remark',
       },
     });
   });

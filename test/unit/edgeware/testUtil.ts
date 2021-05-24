@@ -215,6 +215,7 @@ export function constructFakeApi(callOverrides: {
       },
       bounties: {
         bountyCount: callOverrides['bountyCount'],
+        bountyDescriptions: callOverrides['bountyDescriptions'],
       },
       democracy: {
         referendumInfoOf: callOverrides['referendumInfoOf'],
