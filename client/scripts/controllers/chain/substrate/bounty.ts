@@ -191,40 +191,50 @@ export class SubstrateBounty extends Proposal<ApiPromise, SubstrateCoin, ISubstr
       return;
     }
     switch (e.data.kind) {
+      // proposed by anyone
       case SubstrateTypes.EventKind.TreasuryBountyProposed: {
         this._active = true;
+        this._isProposed = true;
         break;
       }
-      case SubstrateTypes.EventKind.TreasuryBountyBecameActive: {
-        break;
-      }
-      case SubstrateTypes.EventKind.TreasuryBountyCanceled: {
-        this._active = false;
-        this.complete();
-        break;
-      }
-      case SubstrateTypes.EventKind.TreasuryBountyExtended: {
-        break;
-      }
-      case SubstrateTypes.EventKind.TreasuryBountyAwarded: {
-        this._awarded = true;
-        break;
-      }
+      // proposal rejected by council
       case SubstrateTypes.EventKind.TreasuryBountyRejected: {
         this.complete();
         this._awarded = false;
         this._active = false;
         break;
       }
+      // curator accepted
+      case SubstrateTypes.EventKind.TreasuryBountyBecameActive: {
+        this._isProposed = false;
+        this._isActive = true;
+        break;
+      }
+      // extended by curator
+      case SubstrateTypes.EventKind.TreasuryBountyExtended: {
+        break;
+      }
+      // awarded by curator
+      case SubstrateTypes.EventKind.TreasuryBountyAwarded: {
+        this._awarded = true;
+        this._isActive = false;
+        this._isPendingPayout = true;
+        break;
+      }
+      // claimed by recipient
       case SubstrateTypes.EventKind.TreasuryBountyClaimed: {
         this.complete();
         this._active = false;
         break;
       }
+      // rejected by council (?)
+      case SubstrateTypes.EventKind.TreasuryBountyCanceled: {
+        this._active = false;
+        this.complete();
+        break;
+      }
       default: {
-        if ((e.data.kind as any) !== 'acceptCurator') {
-          throw new Error('invalid event update');
-        }
+        throw new Error('invalid event update');
       }
     }
   }

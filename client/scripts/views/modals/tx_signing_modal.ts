@@ -373,7 +373,7 @@ const TXSigningModalStates: {
   Intro: {
     view: (vnode) => {
       const txLabel = getTransactionLabel(vnode.attrs.txType);
-      const polkaWallet = app.wallets.availableWallets(app.chain.base)
+      const polkaWallet = app.wallets.wallets
         .find((w) => w instanceof PolkadotWebWalletController);
 
       return m('.TXSigningModalBody.Intro', [
@@ -399,7 +399,6 @@ const TXSigningModalStates: {
               && polkaWallet.available
               && polkaWallet.enabled
               && polkaWallet.accounts.find((v) => v.address === vnode.attrs.author.address),
-            disabled: !polkaWallet?.available,
           }, {
             name: 'Command line',
             content: m(TXSigningCLIOption, {
