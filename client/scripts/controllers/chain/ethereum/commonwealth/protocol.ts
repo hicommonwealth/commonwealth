@@ -41,6 +41,8 @@ export default class CommonwealthProtocol {
 
     const protocolFee = new BN((await this._api.Contract.protocolFee()).toString(), 10);
     const feeTo = await this._api.Contract.feeTo();
+    console.log('====>protocolFee', protocolFee);
+    console.log('====>feeTo', feeTo);
 
     const projects: CWProject[] =  await this.retrieveProjects();
     const newProtocol = new CWProtocol('root', 'root', protocolFee, feeTo, projects);
