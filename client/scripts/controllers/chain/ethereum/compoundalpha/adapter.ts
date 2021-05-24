@@ -59,12 +59,7 @@ export default class Compoundalpha extends IChainAdapter<EthereumCoin, EthereumA
     const activeAddress: string = await this.webWallet.accounts[0];
     const mpondContractAddress = this.meta.address;
     const governorAlphaContractAddress = '0x777992c2E4EDF704e49680468a9299C6679e37F6';
-    const api = new CompoundalphaAPI(
-      this.meta.address,
-      governorAlphaContractAddress,
-      this.chain.api.currentProvider as any,
-      activeAddress,
-    );
+    const api = new CompoundalphaAPI();
     await api.init().catch((e) => {
       this._failed = true;
       notifyError('Please change your Metamask network');
