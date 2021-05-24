@@ -4,15 +4,14 @@ import $ from 'jquery';
 import _ from 'lodash';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
-import moment from 'moment-twitter';
+import moment from 'moment';
 import app from 'state';
 
 import { Spinner, Button, ButtonGroup, Icons, Icon, PopoverMenu, MenuItem } from 'construct-ui';
-import { pluralize, offchainThreadStageToLabel, externalLink } from 'helpers';
-import { NodeInfo, CommunityInfo, OffchainThreadStage } from 'models';
+import { pluralize, offchainThreadStageToLabel } from 'helpers';
+import { NodeInfo, CommunityInfo, OffchainThreadStage, OffchainThread } from 'models';
 
 import { updateLastVisited } from 'controllers/app/login';
-import { notifyError } from 'controllers/app/notifications';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import EmptyTopicPlaceholder, { EmptyStagePlaceholder } from 'views/components/empty_topic_placeholder';
@@ -20,7 +19,6 @@ import LoadingRow from 'views/components/loading_row';
 import Listing from 'views/pages/listing';
 import NewTopicModal from 'views/modals/new_topic_modal';
 import EditTopicModal from 'views/modals/edit_topic_modal';
-import ManageCommunityModal from 'views/modals/manage_community_modal';
 import CreateInviteModal from 'views/modals/create_invite_modal';
 
 import { INITIAL_PAGE_SIZE } from 'controllers/server/threads';
@@ -29,9 +27,9 @@ import DiscussionRow from './discussion_row';
 
 export const ALL_PROPOSALS_KEY = 'COMMONWEALTH_ALL_PROPOSALS';
 
-const getLastUpdate = (proposal) => {
-  const lastComment = Number(app.comments.lastCommented(proposal));
-  const createdAt = Number(proposal.createdAt.utc());
+const getLastUpdate = (proposal: OffchainThread): number => {
+  const lastComment = app.comments.lastCommented(proposal)?.unix() || 0;
+  const createdAt = proposal.createdAt?.unix() || 0;
   const lastUpdate = Math.max(createdAt, lastComment);
   return lastUpdate;
 };
@@ -132,8 +130,8 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
     const subpage = (topic || stage) ? `${topic || ''}#${stage || ''}` : ALL_PROPOSALS_KEY;
     const returningFromThread = (app.lastNavigatedBack() && app.lastNavigatedFrom().includes('/proposal/discussion/'));
     vnode.state.lookback[subpage] = (returningFromThread && localStorage[`${app.activeId()}-lookback-${subpage}`])
-      ? localStorage[`${app.activeId()}-lookback-${subpage}`]
-      : vnode.state.lookback[subpage]?._isAMomentObject
+      ? moment.unix(parseInt(localStorage[`${app.activeId()}-lookback-${subpage}`], 10))
+      : moment.isMoment(vnode.state.lookback[subpage])
         ? vnode.state.lookback[subpage]
         : moment();
   },
@@ -149,7 +147,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
     const subpage = (topic || stage) ? `${topic || ''}#${stage || ''}` : ALL_PROPOSALS_KEY;
 
     // add chain compatibility (node info?)
-    if (!activeEntity?.serverLoaded) return m(PageLoading, {
+    if (app.community && !activeEntity?.serverLoaded) return m(PageLoading, {
       title: topic || 'Discussions',
       showNewProposalButton: true,
     });
@@ -215,11 +213,11 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
 
     if (sortedThreads.length > 0) {
       let visitMarkerPlaced = false;
-      vnode.state.lookback[subpage] = moment(getLastUpdate(sortedThreads[sortedThreads.length - 1]));
+      vnode.state.lookback[subpage] = moment.unix(getLastUpdate(sortedThreads[sortedThreads.length - 1]));
 
       if (allThreads.length > sortedThreads.length) {
         if (firstThread) {
-          if (getLastUpdate(firstThread) > lastVisited) {
+          if (getLastUpdate(firstThread) > lastVisited.unix()) {
             listing.push(getLastSeenDivider(false));
           } else {
             listing.push(m('.PinnedDivider', m('hr')));
@@ -227,8 +225,8 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
         }
       }
 
-      const allThreadsSeen = () => firstThread && getLastUpdate(firstThread) < lastVisited;
-      const noThreadsSeen = () => lastThread && getLastUpdate(lastThread) > lastVisited;
+      const allThreadsSeen = () => firstThread && getLastUpdate(firstThread) < lastVisited.unix();
+      const noThreadsSeen = () => lastThread && getLastUpdate(lastThread) > lastVisited.unix();
 
       if (noThreadsSeen() || allThreadsSeen()) {
         listing.push(m('.discussion-group-wrap', sortedThreads
@@ -237,7 +235,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
         let count = 0;
         sortedThreads.forEach((proposal) => {
           const row = m(DiscussionRow, { proposal });
-          if (!visitMarkerPlaced && getLastUpdate(proposal) < lastVisited) {
+          if (!visitMarkerPlaced && getLastUpdate(proposal) < lastVisited.unix()) {
             listing = [m('.discussion-group-wrap', listing), getLastSeenDivider(), m('.discussion-group-wrap', [row])];
             visitMarkerPlaced = true;
             count += 1;
@@ -275,8 +273,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
         }
       }
 
-      if (!vnode.state.lookback[subpage]
-        || !vnode.state.lookback[subpage]?._isAMomentObject) {
+      if (!moment.isMoment(vnode.state.lookback[subpage])) {
         vnode.state.lookback[subpage] = moment();
       }
 
@@ -343,7 +340,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
       topicTelegram = topicObject?.telegram;
     }
 
-    localStorage.setItem(`${app.activeId()}-lookback-${subpage}`, vnode.state.lookback[subpage]);
+    localStorage.setItem(`${app.activeId()}-lookback-${subpage}`, `${vnode.state.lookback[subpage].unix()}`);
     const stillFetching = (allThreads.length === 0 && vnode.state.postsDepleted[subpage] === false);
     const emptyTopic = (allThreads.length === 0 && vnode.state.postsDepleted[subpage] === true && !stage);
     const emptyStage = (allThreads.length === 0 && vnode.state.postsDepleted[subpage] === true && !!stage);
@@ -411,11 +408,14 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
     });
     const otherTopicListItems = Object.keys(otherTopics)
       .sort((a, b) => otherTopics[a].name.localeCompare(otherTopics[b].name))
-      .map((name, idx) => getTopicRow(otherTopics[name].name, name, otherTopics[name].description, otherTopics[name].telegram));
+      .map((name, idx) => getTopicRow(
+        otherTopics[name].name, name, otherTopics[name].description, otherTopics[name].telegram
+      ));
     const featuredTopicListItems = Object.keys(featuredTopics)
       .sort((a, b) => Number(featuredTopics[a].featured_order) - Number(featuredTopics[b].featured_order))
       .map((name, idx) => getTopicRow(
-        featuredTopics[name].name, name, featuredTopics[name].description, featuredTopics[name].telegram));
+        featuredTopics[name].name, name, featuredTopics[name].description, featuredTopics[name].telegram
+      ));
 
     const isAdmin = app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
     const isMod = app.user.isRoleOfCommunity({
@@ -495,7 +495,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
                 label: 'Manage community',
                 onclick: (e) => {
                   e.preventDefault();
-                  app.modals.create({ modal: ManageCommunityModal });
+                  app.modals.lazyCreate('manage_community_modal');
                 }
               }),
               (isAdmin || isMod) && app.activeId() && m(MenuItem, {
@@ -530,7 +530,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
             otherTopicListItems,
           ]),
           m(DiscussionStagesBar, { topic: topicName, stage }),
-          (!activeEntity || !activeEntity.serverLoaded || stillFetching)
+          (app.chain && (!activeEntity || !activeEntity.serverLoaded || stillFetching))
             ? m('.discussions-main', [
               m(LoadingRow),
             ])

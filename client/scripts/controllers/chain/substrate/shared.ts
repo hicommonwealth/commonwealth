@@ -105,10 +105,6 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     }
   }
 
-  public hasWebWallet(): boolean {
-    return true;
-  }
-
   public createType<K extends keyof InterfaceTypes>(type: K, ...params: any[]): InterfaceTypes[K] {
     return this.api.registry.createType(type, ...params);
   }
@@ -133,11 +129,13 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     const provider = new WsProvider(nodeUrl, INTERVAL);
 
     const connectedCb = () => {
-      this.app.chain.networkStatus = ApiStatus.Connected;
-      this.app.chain.networkError = null;
-      this._suppressAPIDisconnectErrors = false;
-      this._connectTime = 0;
-      m.redraw();
+      if (this.app.chain) {
+        this.app.chain.networkStatus = ApiStatus.Connected;
+        this.app.chain.networkError = null;
+        this._suppressAPIDisconnectErrors = false;
+        this._connectTime = 0;
+        m.redraw();
+      }
     };
     const disconnectedCb = () => {
       if (!this._suppressAPIDisconnectErrors && this.app.chain && node === this.app.chain.meta) {

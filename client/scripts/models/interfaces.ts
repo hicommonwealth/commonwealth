@@ -1,5 +1,5 @@
 import BN from 'bn.js';
-import moment from 'moment-twitter';
+import moment from 'moment';
 import { EventEmitter } from 'events';
 import { Coin } from 'adapters/currency';
 import { IIdentifiable } from 'adapters/shared';
@@ -19,8 +19,6 @@ export interface IBlockInfo {
 export interface IChainModule<C extends Coin, A extends Account<C>> {
   coins(n: number | BN, inDollars?: boolean): C;
   denom: string;
-
-  hasWebWallet(): boolean;
 
   // Signs and submits an on-chain transaction, wrapping it in a modal dialog that tracks its status.
   createTXModalData(
@@ -109,4 +107,19 @@ export interface IUnavailableEndTime {
 }
 export interface IQueuedEndTime {
   kind: 'queued';
+}
+
+export interface ICardListItem {
+  button: {
+    id: string;
+  };
+  texts: {
+    title: string;
+    text: string;
+  };
+  card: {
+    id: string;
+    imgSrc: string;
+    imgAlt: string;
+  };
 }

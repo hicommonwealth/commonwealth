@@ -32,9 +32,9 @@ class SubstratePhragmenElections extends ProposalModule<
 
   protected _activeElection: SubstratePhragmenElection;
   public get activeElection() { return this._activeElection; }
-  public get round() { return this._activeElection.data.round; }
+  public get round() { return this._activeElection?.data.round; }
 
-  private _members: { [who: string]: BN };
+  private _members: { [who: string]: BN } = { };
   public get members() { return Object.keys(this._members); }
   public isMember(who: SubstrateAccount) { return !!this._members[who.address]; }
   public backing(who: SubstrateAccount) { return this._Chain.coins(this._members[who.address]); }
@@ -43,7 +43,9 @@ class SubstratePhragmenElections extends ProposalModule<
   public get runnersUp() { return this._runnersUp.map((r) => r.who); }
   public get nextRunnerUp() { return this._runnersUp[this._runnersUp.length - 1].who; }
   public isRunnerUp(who: SubstrateAccount) { return !!this._runnersUp.find((r) => r.who === who.address); }
-  public runnerUpBacking(who: SubstrateAccount) { return !!this._runnersUp.find((r) => r.who === who.address).score; }
+  public runnerUpBacking(who: SubstrateAccount) {
+    return this._Chain.coins(this._runnersUp.find((r) => r.who === who.address).score || 0);
+  }
 
   private _Chain: SubstrateChain;
   private _Accounts: SubstrateAccounts;
@@ -68,10 +70,16 @@ class SubstratePhragmenElections extends ProposalModule<
     const [ members, runnersUp ] = await ChainInfo.api.queryMulti([
       [ ChainInfo.api.query[moduleName].members ],
       [ ChainInfo.api.query[moduleName].runnersUp ],
-    ]) as [ Vec<ElectionResultCodec>, Vec<ElectionResultCodec> ];
+    ]) as [ Vec<any>, Vec<any> ];
 
-    this._runnersUp = runnersUp.map(([ who, bal ]) => ({ who: who.toString(), score: bal.toBn() }));
-    this._members = members.reduce((ms, [ who, bal ]) => {
+    this._runnersUp = runnersUp.map((r) => ({
+      who: r.who !== undefined ? r.who.toString() : r[0].toString(),
+      // TODO: broken on KLP
+      score: r.stake ? r.stake.toBn() : r[1].toBn()
+    }));
+    this._members = members.reduce((ms, r) => {
+      const who = r.who !== undefined ? r.who : r[0];
+      const bal = r.stake !== undefined ? r.stake : r[1];
       ms[who.toString()] = bal.toBn();
       return ms;
     }, {});

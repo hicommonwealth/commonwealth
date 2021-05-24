@@ -1,9 +1,9 @@
 import m from 'mithril';
 import lity from 'lity';
-import app from 'state';
+import { slugify } from 'utils';
 
 import { OffchainThread, OffchainThreadKind, AddressInfo } from 'models';
-import { link, slugify } from 'helpers';
+import { link } from 'helpers';
 import User from 'views/components/widgets/user';
 
 const ProfileProposal : m.Component< { proposal: OffchainThread }, { revealThread: boolean } > = {
@@ -22,6 +22,8 @@ const ProfileProposal : m.Component< { proposal: OffchainThread }, { revealThrea
                 'a', `/${chain || community}/proposal/${slug}/${identifier}-${slugify(title)}`, 'thread', {},
                 `profile-${author}-${proposal.authorChain}-${proposal.chain}-scrollY`
               ),
+              ' in',
+              link('a', `/${chain || community}`, ` ${chain || community}`),
             ],
         createdAt && [
           m.trust(' &middot; '),

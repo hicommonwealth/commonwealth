@@ -9,9 +9,7 @@ class Stafi extends Substrate {
   }
 
   public async initApi() {
-    await super.initApi({
-      types: StafiSpec,
-    });
+    await super.initApi(StafiSpec);
   }
 }
 

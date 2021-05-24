@@ -1,8 +1,7 @@
 import m from 'mithril';
 import _ from 'lodash';
 
-import app from 'state';
-import { link, slugify } from 'helpers';
+import { link } from 'helpers';
 import { OffchainThread, OffchainComment, AddressInfo, Account } from 'models';
 
 import User from 'views/components/widgets/user';
@@ -37,6 +36,9 @@ const ProfileCommentGroup : m.Component<IProfileCommentGroupAttrs> = {
             ((proposal instanceof OffchainThread) ? 'thread' : 'proposal'), {},
             `profile-${account.address}-${account.chain}-${proposal.chain}-scrollY`
           ),
+          ' in ',
+          link('a', `/${proposal.chain || proposal.community}`,
+            ` ${ proposal.chain || proposal.community }`),
         ],
         comments[0] && comments[0].createdAt && [
           m.trust(' &middot; '),

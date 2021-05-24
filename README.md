@@ -24,6 +24,11 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
 nvm install
 ```
 
+- if for some reason, nvm still doesnt work, try using 
+````
+    source ~/.nvm/nvm.sh
+```
+
 - Use the configured version of node: `nvm use`
 - Install packages: `yarn`
     - This is equivalent to `yarn update`
@@ -65,6 +70,9 @@ Environment variables used for external services include:
 - PRODUCTION_APP (Heroku App Name)
 - JWT_SECRET
 - SESSION_SECRET
+- MAGIC_API_KEY
+- MAGIC_SUPPORTED_BASES
+- MAGIC_DEFAULT_CHAIN
 
 We also use certain environment variables to configure the application itself:
 
@@ -170,7 +178,7 @@ heroku config:set [Set up session secrets, API keys, OAuth tokens, etc.]
 heroku addons:create timber-logging       # Set up a logging service
 heroku features:enable preboot            # Set up preboot (old deploys will not shut down until the new deploys are receiving requests)
 heroku addons:create scheduler:standard   # Set up schedule
-yarn deploy
+git push heroku master
 ```
 
 You should now set up any databases and services needed. In particular:

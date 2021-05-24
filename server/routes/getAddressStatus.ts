@@ -9,13 +9,14 @@ export const Errors = {
   InvalidChain: 'Invalid chain',
 };
 
-const getAddress = async (models, req: Request, res: Response, next: NextFunction) => {
+const getAddressStatus = async (models, req: Request, res: Response, next: NextFunction) => {
   if (!req.body.address) {
     return next(new Error(Errors.NeedAddress));
   }
   if (!req.body.chain) {
     return next(new Error(Errors.NeedChain));
   }
+
   const chain = await models.Chain.findOne({
     where: { id: req.body.chain }
   });
@@ -44,4 +45,4 @@ const getAddress = async (models, req: Request, res: Response, next: NextFunctio
   return res.json({ status: 'Success', result });
 };
 
-export default getAddress;
+export default getAddressStatus;

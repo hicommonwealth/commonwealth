@@ -1,9 +1,9 @@
 import 'components/quill_editor.scss';
 
-import m, { VnodeDOM } from 'mithril';
+import m from 'mithril';
 import _ from 'lodash';
 import $ from 'jquery';
-import moment from 'moment-twitter';
+import moment from 'moment';
 import Quill from 'quill-2.0-dev/quill';
 import { Tag, Tooltip } from 'construct-ui';
 import ImageUploader from 'quill-image-uploader';
@@ -13,11 +13,11 @@ import QuillMention from 'quill-mention';
 
 import app from 'state';
 import { loadScript } from 'helpers';
+import { searchMentionableAddresses } from 'helpers/search';
 import { detectURL } from 'helpers/threads';
 import { notifyError } from 'controllers/app/notifications';
 import SettingsController from 'controllers/app/settings';
-import { Profile, RolePermission } from 'models';
-import User from 'views/components/widgets/user';
+import { Profile } from 'models';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import PreviewModal from 'views/modals/preview_modal';
 
@@ -255,20 +255,6 @@ const instantiateEditor = (
   Quill.register('formats/twitter', TwitterBlot, true);
   Quill.register('formats/video', VideoBlot, true);
 
-  const searchMentionableAddresses = async (searchTerm: string) => {
-    const response = await $.get(`${app.serverUrl()}/bulkAddresses`, {
-      chain: app.activeChainId(),
-      community: app.activeCommunityId(),
-      limit: 6,
-      searchTerm,
-      order: ['name', 'ASC']
-    });
-    if (response.status !== 'Success') {
-      throw new Error(`got unsuccessful status: ${response.status}`);
-    }
-    return response.result;
-  };
-
   const queryMentions = async (searchTerm, renderList, mentionChar) => {
     if (mentionChar !== '@') return;
     // Optional code for tagging roles:
@@ -290,7 +276,7 @@ const instantiateEditor = (
       }];
       renderList(formattedMatches, searchTerm);
     } else if (searchTerm.length > 0) {
-      members = await searchMentionableAddresses(searchTerm);
+      members = await searchMentionableAddresses(searchTerm, { resultSize: 6 });
       formattedMatches = members.map((addr) => {
         const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
         const node = document.createElement('div');
@@ -847,7 +833,6 @@ const instantiateEditor = (
       if (quill.isEnabled()) {
         // Save the entire updated text to localStorage
         const data = JSON.stringify(quill.getContents());
-        console.log(quill.getContents());
         localStorage.setItem(`${app.activeId()}-${editorNamespace}-storedText`, data);
         state.unsavedChanges = new Delta();
       }

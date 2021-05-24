@@ -18,6 +18,7 @@ export enum ChainBase {
 
 export enum ChainNetwork {
   Edgeware = 'edgeware',
+  EdgewareTestnet = 'edgeware-testnet',
   Kusama = 'kusama',
   Kulupu = 'kulupu',
   Polkadot = 'polkadot',
@@ -38,30 +39,18 @@ export enum ChainNetwork {
   Metacartel = 'metacartel',
   ALEX = 'alex',
   Commonwealth = 'commonwealth',
+  ERC20 = 'erc20',
   Clover = 'clover',
   HydraDX = 'hydradx'
 }
 
-export function networkToBase(n: ChainNetwork): ChainBase {
+// This function returns a default chain for a chainbase
+export function baseToNetwork(n: ChainBase): ChainNetwork {
   switch (n) {
-    case ChainNetwork.Clover: return ChainBase.Substrate;
-    case ChainNetwork.Edgeware: return ChainBase.Substrate;
-    case ChainNetwork.Kusama: return ChainBase.Substrate;
-    case ChainNetwork.Kulupu: return ChainBase.Substrate;
-    case ChainNetwork.Polkadot: return ChainBase.Substrate;
-    case ChainNetwork.Plasm: return ChainBase.Substrate;
-    case ChainNetwork.Stafi: return ChainBase.Substrate;
-    case ChainNetwork.Darwinia: return ChainBase.Substrate;
-    case ChainNetwork.Phala: return ChainBase.Substrate;
-    case ChainNetwork.Centrifuge: return ChainBase.Substrate;
-    case ChainNetwork.HydraDX: return ChainBase.Substrate;
-    case ChainNetwork.Cosmos: return ChainBase.CosmosSDK;
-    case ChainNetwork.Straightedge: return ChainBase.CosmosSDK;
-    case ChainNetwork.Ethereum: return ChainBase.Ethereum;
-    case ChainNetwork.NEAR: return ChainBase.NEAR;
-    case ChainNetwork.Moloch: return ChainBase.Ethereum;
-    case ChainNetwork.Metacartel: return ChainBase.Ethereum;
-    case ChainNetwork.Commonwealth: return ChainBase.Ethereum;
+    case ChainBase.CosmosSDK: return ChainNetwork.Cosmos;
+    case ChainBase.Substrate: return ChainNetwork.Edgeware;
+    case ChainBase.Ethereum: return ChainNetwork.Ethereum;
+    case ChainBase.NEAR: return ChainNetwork.NEAR;
     default: return null;
   }
 }
@@ -70,6 +59,7 @@ export function networkToBase(n: ChainNetwork): ChainBase {
 export enum ChainClass {
   Clover = 'clover',
   Edgeware = 'edgeware',
+  EdgewareTestnet = 'edgeware-testnet',
   HydraDX = 'hydradx',
   Kusama = 'kusama',
   Kulupu = 'kulupu',
@@ -91,6 +81,7 @@ export enum ChainClass {
   CompoundalphaTestnet = 'compoundalpha-testnet',
   ALEX = 'alex',
   Commonwealth = 'commonwealth',
+  ERC20 = 'erc20',
 }
 
 // TODO: this is inconsistently used
@@ -108,6 +99,15 @@ export enum OffchainThreadStage {
   Passed = 'passed',
   Failed = 'failed',
   Abandoned = 'abandoned',
+}
+
+export enum OffchainVoteOptions {
+  SUPPORT_2,
+  SUPPORT,
+  NEUTRAL_SUPPORT,
+  NEUTRAL_OPPOSE,
+  OPPOSE,
+  OPPOSE_2,
 }
 
 export enum TransactionStatus {

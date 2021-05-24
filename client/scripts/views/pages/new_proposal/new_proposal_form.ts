@@ -32,7 +32,7 @@ import EdgewareFunctionPicker from 'views/components/edgeware_function_picker';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 import TopicSelector from 'views/components/topic_selector';
 import ErrorPage from 'views/pages/error';
-import SubstrateBountyTreasury from 'client/scripts/controllers/chain/substrate/bountyTreasury';
+import SubstrateBountyTreasury from 'controllers/chain/substrate/bountyTreasury';
 
 // this should be titled the Substrate/Edgeware new proposal form
 const NewProposalForm = {
@@ -55,12 +55,13 @@ const NewProposalForm = {
     let hasToggle : boolean;
     let hasPreimageInput : boolean;
     let hasTitleAndDescription : boolean;
+    let hasBountyTitle : boolean;
     let hasTopics : boolean;
     let hasBeneficiaryAndAmount : boolean;
     let hasPhragmenInfo : boolean;
     let hasDepositChooser : boolean;
     // bounty proposal
-    let hasValue : boolean;
+    let hasBountyValue : boolean;
     // council motion
     let hasVotingPeriodAndDelaySelector : boolean;
     let hasReferendumSelector : boolean;
@@ -103,8 +104,8 @@ const NewProposalForm = {
       const treasury = (app.chain as Substrate).treasury;
       dataLoaded = !!treasury.initialized;
     } else if (proposalTypeEnum === ProposalType.SubstrateBountyProposal) {
-      hasTitleAndDescription = true;
-      hasValue = true;
+      hasBountyTitle = true;
+      hasBountyValue = true;
       const bountyTreasury = (app.chain as Substrate).bounties;
       dataLoaded = !!bountyTreasury.initialized;
     } else if (proposalTypeEnum === ProposalType.PhragmenCandidacy) {
@@ -242,12 +243,10 @@ const NewProposalForm = {
           'Thread Type': 'Proposal',
         });
       } else if (proposalTypeEnum === ProposalType.SubstrateBountyProposal) {
-        // TODO: fix these lines
         if (!vnode.state.form.title) throw new Error('Invalid title');
-        if (!vnode.state.form.description) throw new Error('Invalid description');
-        if (!vnode.state.value) throw new Error('Invalid value');
-        args = [author, `${vnode.state.form.title}: ${vnode.state.form.description}`, vnode.state.value];
-        createFunc = ([a, d, v]) => (app.chain as Substrate).bounties.createTx(a, d, v);
+        if (!vnode.state.form.value) throw new Error('Invalid value');
+        args = [author, vnode.state.form.value, vnode.state.form.title];
+        createFunc = ([a, v, t]) => (app.chain as Substrate).bounties.createTx(a, v, t);
         return createTXModal(createFunc(args)).then(done);
       } else if (proposalTypeEnum === ProposalType.PhragmenCandidacy) {
         args = [author];
@@ -392,15 +391,30 @@ const NewProposalForm = {
               },
               tabindex: 3,
             }),
+          hasBountyTitle && [
+            m(FormGroup, [
+              m(FormLabel, 'Title'),
+              m(Input, {
+                placeholder: 'Bounty title (stored on chain)',
+                name: 'title',
+                autofocus: true,
+                autocomplete: 'off',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.form.title = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+          ],
           hasTitleAndDescription && [
             m(FormGroup, [
               m(FormLabel, 'Title'),
               m(Input, {
-                options: {
-                  name: 'title',
-                  placeholder: 'Enter a title',
-                  autofocus: true,
-                },
+                placeholder: 'Enter a title',
+                name: 'title',
+                autofocus: true,
+                autocomplete: 'off',
                 oninput: (e) => {
                   const result = (e.target as any).value;
                   vnode.state.form.title = result;
@@ -411,10 +425,8 @@ const NewProposalForm = {
             m(FormGroup, [
               m(FormLabel, 'Description'),
               m(TextArea, {
-                options: {
-                  name: 'description',
-                  placeholder: 'Enter a description',
-                },
+                name: 'description',
+                placeholder: 'Enter a description',
                 oninput: (e) => {
                   const result = (e.target as any).value;
                   if (vnode.state.form.description === result) return;
@@ -491,19 +503,19 @@ const NewProposalForm = {
               name: 'democracy-tx-switcher',
             }),
           ],
-          hasValue && [
+          hasBountyValue && [
             m(FormGroup, [
-              m(FormLabel, 'Value'),
+              m(FormLabel, `Value (${app.chain.chain.denom})`),
               m(Input, {
                 name: 'value',
-                placeholder: 'Min: 0',
-                oncreate: (vvnode) => $(vvnode.dom).val('0'),
+                placeholder: 'Amount allocated to bounty',
+                autocomplete: 'off',
                 oninput: (e) => {
                   const result = (e.target as any).value;
-                  vnode.state.value = parseFloat(result);
+                  vnode.state.form.value = app.chain.chain.coins(parseFloat(result), true);
                   m.redraw();
                 },
-              }),
+              })
             ]),
           ],
           hasDepositChooser && [

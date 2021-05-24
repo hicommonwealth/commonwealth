@@ -6,7 +6,7 @@ import {
   MarlinTypes, MarlinEvents, CompoundalphaTypes, CompoundalphaEvents,
 } from '@commonwealth/chain-events';
 
-import EventStorageHandler from '../eventHandlers/storage';
+import EventStorageHandler, { StorageFilterConfig } from '../eventHandlers/storage';
 import EventNotificationHandler from '../eventHandlers/notifications';
 import EntityArchivalHandler from '../eventHandlers/entityArchival';
 import IdentityHandler from '../eventHandlers/identity';
@@ -17,6 +17,10 @@ import { constructSubstrateUrl, selectSpec } from '../../shared/substrate';
 import { factory, formatFilename } from '../../shared/logging';
 import { ChainNodeInstance } from '../models/chain_node';
 const log = factory.getLogger(formatFilename(__filename));
+
+// emit globally any transfer over 1% of total issuance
+// TODO: config this
+const BALANCE_TRANSFER_THRESHOLD_PERMILL: number = 10_000;
 
 const discoverReconnectRange = async (models, chain: string): Promise<IDisconnectedRange> => {
   const lastChainEvent = await models.ChainEvent.findAll({
@@ -73,15 +77,9 @@ const setupChainEventListeners = async (
   }
 
   log.info('Setting up event listeners...');
-  const subscribers = await Promise.all(nodes.map(async (node) => {
-    const excludedEvents = [
-      SubstrateTypes.EventKind.Reward,
-      SubstrateTypes.EventKind.TreasuryRewardMinting,
-      SubstrateTypes.EventKind.TreasuryRewardMintingV2,
-    ];
-
+  const generateHandlers = (node, storageConfig: StorageFilterConfig = {}) => {
     // writes events into the db as ChainEvents rows
-    const storageHandler = new EventStorageHandler(models, node.chain, excludedEvents);
+    const storageHandler = new EventStorageHandler(models, node.chain, storageConfig);
 
     // emits notifications by writing into the db's Notifications table, and also optionally
     // sending a notification to the client via websocket
@@ -97,13 +95,6 @@ const setupChainEventListeners = async (
     // actions, like voting on proposals or registering an identity
     const profileCreationHandler = new ProfileCreationHandler(models, node.chain);
 
-    // populates identity information in OffchainProfiles when received (Substrate only)
-    const identityHandler = new IdentityHandler(models, node.chain);
-
-    // populates is_validator and is_councillor flags on Addresses when validator and
-    // councillor sets are updated (Substrate only)
-    const userFlagsHandler = new UserFlagsHandler(models, node.chain);
-
     // the set of handlers, run sequentially on all incoming chain events
     const handlers: IEventHandler[] = [
       storageHandler,
@@ -111,23 +102,49 @@ const setupChainEventListeners = async (
       entityArchivalHandler,
       profileCreationHandler,
     ];
+
+    // only handle identities and user flags on substrate chains
+    if (chainSupportedBy(node.chain, SubstrateTypes.EventChains)) {
+      // populates identity information in OffchainProfiles when received (Substrate only)
+      const identityHandler = new IdentityHandler(models, node.chain);
+
+      // populates is_validator and is_councillor flags on Addresses when validator and
+      // councillor sets are updated (Substrate only)
+      const userFlagsHandler = new UserFlagsHandler(models, node.chain);
+
+      handlers.push(identityHandler, userFlagsHandler);
+    }
+
+    return handlers;
+  };
+
+  const subscribers = await Promise.all(nodes.map(async (node) => {
     let subscriber: IEventSubscriber<any, any>;
     if (chainSupportedBy(node.chain, SubstrateTypes.EventChains)) {
-      // only handle identities and user flags on substrate chains
-      handlers.push(identityHandler, userFlagsHandler);
-
       const nodeUrl = constructSubstrateUrl(node.url);
       const api = await SubstrateEvents.createApi(nodeUrl, selectSpec(node.chain));
+      const excludedEvents = [
+        SubstrateTypes.EventKind.Reward,
+        SubstrateTypes.EventKind.TreasuryRewardMinting,
+        SubstrateTypes.EventKind.TreasuryRewardMintingV2,
+        SubstrateTypes.EventKind.HeartbeatReceived,
+      ];
+
+      const handlers = generateHandlers(node, { excludedEvents });
       subscriber = await SubstrateEvents.subscribeEvents({
         chain: node.chain,
         handlers,
         skipCatchup,
         discoverReconnectRange: () => discoverReconnectRange(models, node.chain),
         api,
+        enricherConfig: {
+          balanceTransferThresholdPermill: BALANCE_TRANSFER_THRESHOLD_PERMILL,
+        }
       });
     } else if (chainSupportedBy(node.chain, MolochTypes.EventChains)) {
       const contractVersion = 1;
       const api = await MolochEvents.createApi(node.url, contractVersion, node.address);
+      const handlers = generateHandlers(node);
       subscriber = await MolochEvents.subscribeEvents({
         chain: node.chain,
         handlers,
@@ -146,6 +163,7 @@ const setupChainEventListeners = async (
           timelock: timelockContractAddress,
         }
       );
+      const handlers = generateHandlers(node);
       subscriber = await MarlinEvents.subscribeEvents({
         chain: node.chain,
         handlers,

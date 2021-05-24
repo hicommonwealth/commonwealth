@@ -21,6 +21,8 @@ import { NotificationCategories } from './shared/types';
 import ViewCountCache from './server/util/viewCountCache';
 import IdentityFetchCache from './server/util/identityFetchCache';
 import TokenBalanceCache from './server/util/tokenBalanceCache';
+import TokenListCache from './server/util/tokenListCache';
+import { MockTokenBalanceProvider } from './test/util/modelUtils';
 
 require('express-async-errors');
 
@@ -31,7 +33,9 @@ const viewCountCache = new ViewCountCache(1, 10 * 60);
 const identityFetchCache = new IdentityFetchCache(0);
 
 // always prune both token and non-token holders asap
-const tokenBalanceCache = new TokenBalanceCache(0, 0);
+const tokenListCache = new TokenListCache();
+const mockTokenBalanceProvider = new MockTokenBalanceProvider();
+const tokenBalanceCache = new TokenBalanceCache(tokenListCache, 0, 0, mockTokenBalanceProvider);
 const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
 let server;
 
@@ -136,7 +140,7 @@ const resetServer = (debug=false): Promise<void> => {
         network: 'alex',
         symbol: 'ALEX',
         name: 'Alex',
-        icon_url: '/static/img/protocols/alex.png',
+        icon_url: '/static/img/protocols/eth.png',
         active: true,
         type: 'token',
         base: 'ethereum',
@@ -309,5 +313,6 @@ setupServer();
 export const resetDatabase = () => resetServer();
 export const getIdentityFetchCache = () => identityFetchCache;
 export const getTokenBalanceCache = () => tokenBalanceCache;
+export const getMockBalanceProvider = () => mockTokenBalanceProvider;
 
 export default app;

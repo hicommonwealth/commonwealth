@@ -1,8 +1,11 @@
 /* eslint-disable max-len */
 
+import 'pages/landing/privacyAndTerms.scss';
+
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 import { renderMultilineText } from 'helpers';
+import HeaderLandingPage from './landing_page_header';
 
 const PrivacyPolicy = `
 Last updated: January 14, 2019
@@ -117,6 +120,12 @@ const PrivacyPage: m.Component<{}> = {
   },
   view: (vnode) => {
     return m('.PrivacyPage', [
+      m(HeaderLandingPage, {
+        scrollHeader: false,
+        navs: [
+          { text: 'Why Commonwealth?', redirectTo: '/whyCommonwealth' },
+        ],
+      }),
       m('.forum-container', [
         m('h1.page-title', 'Privacy Policy'),
         renderMultilineText(PrivacyPolicy),

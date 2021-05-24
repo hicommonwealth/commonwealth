@@ -2,7 +2,7 @@ import $ from 'jquery';
 import m from 'mithril';
 import { Button, Table } from 'construct-ui';
 
-import { ChainNetwork } from 'client/scripts/models';
+import { ChainNetwork } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 import { IChainOrCommMetadataManagementAttrs } from './community_metadata_management_table';
 import { InputPropertyRow, ManageRolesRow } from './metadata_rows';
@@ -19,6 +19,7 @@ interface IChainMetadataManagementState {
   loadingFinished: boolean;
   loadingStarted: boolean;
   iconUrl: string;
+  customDomain: string;
   network: ChainNetwork;
   symbol: string;
 }
@@ -32,6 +33,7 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
     vnode.state.element = vnode.attrs.chain.element;
     vnode.state.telegram = vnode.attrs.chain.telegram;
     vnode.state.github = vnode.attrs.chain.github;
+    vnode.state.customDomain = vnode.attrs.chain.customDomain;
     vnode.state.iconUrl = vnode.attrs.chain.iconUrl;
     vnode.state.network = vnode.attrs.chain.network;
     vnode.state.symbol = vnode.attrs.chain.symbol;
@@ -85,6 +87,12 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
           placeholder: 'https://github.com',
           onChangeHandler: (v) => { vnode.state.github = v; },
         }),
+        m(InputPropertyRow, {
+          title: 'Domain',
+          defaultValue: vnode.state.customDomain,
+          placeholder: 'gov.edgewa.re',
+          onChangeHandler: (v) => { vnode.state.customDomain = v; },
+        }),
         m('tr', [
           m('td', 'Admins'),
           m('td', [ m(ManageRolesRow, {
@@ -106,9 +114,9 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
         label: 'Save changes',
         intent: 'primary',
         onclick: async (e) => {
-          const { name, description, website, discord, element, telegram, github } = vnode.state;
+          const { name, description, website, discord, element, telegram, github, customDomain } = vnode.state;
           try {
-            await vnode.attrs.chain.updateChainData(name, description, website, discord, element, telegram, github);
+            await vnode.attrs.chain.updateChainData(name, description, website, discord, element, telegram, github, customDomain);
             $(e.target).trigger('modalexit');
           } catch (err) {
             notifyError(err.responseJSON?.error || 'Chain update failed');

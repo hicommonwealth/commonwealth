@@ -5,9 +5,9 @@ import $ from 'jquery';
 import { Tag, Button, Icon, Icons } from 'construct-ui';
 
 import app from 'state';
-import { Account, RoleInfo, RolePermission } from 'models';
+import { Account, RoleInfo, ChainBase } from 'models';
 import { UserBlock } from 'views/components/widgets/user';
-import { isSameAccount, formatAsTitleCase } from 'helpers';
+import { articlize, isSameAccount, formatAsTitleCase } from 'helpers';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { setActiveAccount } from 'controllers/app/login';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
@@ -79,17 +79,24 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
       });
     };
 
+    // const chainbase = (app.chain?.meta?.chain?.base.length != 0) ? app.chain?.meta?.chain?.base : ChainBase.Ethereum;
+
     return m('.SelectAddressModal', [
       m('.compact-modal-title', [
-        m('h3', app.chain?.meta.chain.id ? `Manage ${app.chain.meta.chain.name} addresses` : 'Manage addresses'),
+        m('h3', 'Manage addresses'),
       ]),
       m('.compact-modal-body', [
-        m('.select-address-options', [
-          activeAccountsByRole.length === 0 && m('.select-address-placeholder', [
-            app.chain?.meta.chain.id
-              ? `No ${app.chain?.meta?.chain.name} addresses found`
-              : 'Connect an address to comment or vote'
+        activeAccountsByRole.length === 0 ? m('.select-address-placeholder', [
+          m('p', [
+            `Connect ${articlize(app.chain?.meta?.chain.name || 'Web3')} address to participate in this community. `,
           ]),
+          m('p', [
+            'This address will serve as your identity when you post, comment, or vote.'
+          ]),
+          m('p', [
+            'You may need to download a Web3 wallet to get started:'
+          ]),
+        ]) : m('.select-address-options', [
           activeAccountsByRole.map(([account, role], index) => role && m('.select-address-option.existing', [
             m('.select-address-option-left', [
               m(UserBlock, { user: account }),
@@ -121,11 +128,7 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
             ]),
           ])),
         ]),
-        // m('.select-address-explanation', [
-        //   'You can link multiple addresses in one community, e.g. ',
-        //   'separate voting and staking addresses.',
-        // ]),
-        m(Button, {
+        activeAccountsByRole.length !== 0 && m(Button, {
           label: 'Join community with address',
           intent: 'primary',
           compact: true,
@@ -138,7 +141,7 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
           loggingInWithAddress: false,
           joiningCommunity: app.activeCommunityId(),
           joiningChain: app.activeChainId(),
-          label: 'Connect a new address',
+          label: activeAccountsByRole.length !== 0 ? 'Connect a new address' : 'Connect address',
           onSuccess: () => {
             $('.SelectAddressModal').trigger('modalexit');
             notifySuccess('New address connected!');

@@ -8,8 +8,17 @@ import {
   RolePermission,
   ChainInfo,
 } from 'models';
-
 import Base from './base';
+
+const getPermissionLevel = (permission: RolePermission | undefined) => {
+  switch (permission) {
+    case undefined: return 0;
+    case RolePermission.member: return 1;
+    case RolePermission.moderator: return 2;
+    case RolePermission.admin: return 3;
+    default: return 4;
+  }
+};
 
 export default class extends Base {
   public getChainRoles(): RoleInfo[] {
@@ -20,7 +29,11 @@ export default class extends Base {
     return this.roles.filter((role) => role.offchain_community_id);
   }
 
-  public createRole(options: { address: AddressInfo, chain?: string, community?: string }): JQueryPromise<void> {
+  public createRole(options: {
+    address: AddressInfo,
+    chain?: string,
+    community?: string,
+  }): JQueryPromise<void> {
     // TODO: Change to POST /role
     return $.post('/api/createRole', {
       jwt: this.jwt,
@@ -102,7 +115,9 @@ export default class extends Base {
       const referencedAddress = this.addresses.find((address) => address.id === r.address_id);
       if (!referencedAddress) return;
       const isSame = this.activeAccount.address === referencedAddress.address;
-      const ofCommunity = (options.chain) ? (r.chain_id === options.chain) : (r.offchain_community_id === options.community);
+      const ofCommunity = (options.chain)
+        ? (r.chain_id === options.chain)
+        : (r.offchain_community_id === options.community);
       return permission && referencedAddress && isSame && ofCommunity;
     });
   }
@@ -166,7 +181,7 @@ export default class extends Base {
   }
 
   public getActiveAccountsByRole(): [Account<any>, RoleInfo][] {
-    return this.activeAccounts.map((account) => {
+    const activeAccountsByRole = this.activeAccounts.map((account) => {
       const role = this.getRoleInCommunity({
         account,
         chain: app.activeChainId(),
@@ -174,6 +189,21 @@ export default class extends Base {
       });
       return [account, role];
     });
+    const filteredActiveAccountsByRole = activeAccountsByRole.reduce((
+      arr: [Account<any>, RoleInfo][],
+      current: [Account<any>, RoleInfo]
+    ) => {
+      const index = arr.findIndex((item) => item[0].address === current[0].address);
+      if (index < 0) {
+        return [...arr, current];
+      }
+      if (getPermissionLevel(arr[index][1]?.permission) < getPermissionLevel(current[1]?.permission)) {
+        return [...arr.splice(0, index), current, ...arr.splice(index + 1)];
+      }
+      return arr;
+    }, []);
+
+    return filteredActiveAccountsByRole;
   }
 
   /**

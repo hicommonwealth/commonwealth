@@ -18,6 +18,7 @@ const backportEventToAdapter = (
 ): ISubstrateBounty => {
   return {
     identifier: event.bountyIndex.toString(),
+    description: 'Unknown bounty', // TODO: add to chain-events
     index: event.bountyIndex,
     value: ChainInfo.createType('u128', event.value),
     fee: ChainInfo.createType('u128', event.fee),
@@ -27,19 +28,50 @@ const backportEventToAdapter = (
   };
 };
 
-export class SubstrateBounty
-  extends Proposal<ApiPromise, SubstrateCoin, ISubstrateBounty, null> {
+export class SubstrateBounty extends Proposal<ApiPromise, SubstrateCoin, ISubstrateBounty, null> {
   public get shortIdentifier() {
     return `#${this.identifier.toString()}`;
   }
-  public get title() {
-    const account = this._Accounts.fromAddress(this.author.address);
-    const displayName = account.profile && account.profile.name
-      ? `${account.profile.name} (${formatAddressShort(this.author.address, account.chain.id)})`
-      : formatAddressShort(this.author.address, account.chain.id);
-    return `${(this.completed || this.active) ? '' : 'Proposed '} Bounty: ${formatCoin(this._value)} to ${displayName}`;
+
+  public setStatus (status) {
+    this._title = status.title;
+    this._isActive = status.isActive;
+    this._isApproved = status.isApproved;
+    this._isCuratorProposed = status.isCuratorProposed;
+    this._isFunded = status.isFunded;
+    this._isPendingPayout = status.isPendingPayout;
+    this._isProposed = status.isProposed;
+    this._curator = status.curator?.toString();
+    this._updateDue = status.updateDue;
+    this._unlockAt = status.unlockAt;
+    this._beneficiary = status.beneficiary?.toString();
   }
-  public get description() { return null; }
+  private _title: string;
+  private _isActive: boolean;
+  private _isApproved: boolean;
+  private _isCuratorProposed: boolean;
+  private _isFunded: boolean;
+  private _isPendingPayout: boolean;
+  private _isProposed: boolean;
+  private _curator: string;
+  private _updateDue;
+  private _unlockAt;
+  private _beneficiary: string;
+
+  public get title() { return this._title || `Bounty ${this.shortIdentifier}`; }
+  public get isActive() { return this._isActive; }
+  public get isApproved() { return this._isApproved; }
+  public get isCuratorProposed() { return this._isCuratorProposed; }
+  public get isFunded() { return this._isFunded; }
+  public get isPendingPayout() { return this._isPendingPayout; }
+  public get isProposed() { return this._isProposed; }
+  public get curator() { return this._curator; }
+  public get updateDue() { return this._updateDue; }
+  public get unlockAt() { return this._unlockAt; }
+  public get beneficiary() { return this._beneficiary; }
+
+  private readonly _description: string;
+  public get description() { return this._description; }
 
   private readonly _author: SubstrateAccount;
   public get author() { return this._author; }
@@ -141,6 +173,7 @@ export class SubstrateBounty
     this._bond = this._Chain.coins(this.data.bond);
     this._curatorDeposit = this._Chain.coins(this.data.curator_deposit);
     this._author = this._Accounts.fromAddress(this.data.proposer);
+    this._description = this.data.description;
     this.createdAt = entity.createdAt;
 
     entity.chainEvents.forEach((e) => this.update(e));
@@ -158,33 +191,44 @@ export class SubstrateBounty
       return;
     }
     switch (e.data.kind) {
+      // proposed by anyone
       case SubstrateTypes.EventKind.TreasuryBountyProposed: {
-        break;
-      }
-      case SubstrateTypes.EventKind.TreasuryBountyBecameActive: {
         this._active = true;
+        this._isProposed = true;
         break;
       }
-      case SubstrateTypes.EventKind.TreasuryBountyCanceled: {
-        this._active = false;
+      // proposal rejected by council
+      case SubstrateTypes.EventKind.TreasuryBountyRejected: {
         this.complete();
+        this._awarded = false;
+        this._active = false;
         break;
       }
+      // curator accepted
+      case SubstrateTypes.EventKind.TreasuryBountyBecameActive: {
+        this._isProposed = false;
+        this._isActive = true;
+        break;
+      }
+      // extended by curator
       case SubstrateTypes.EventKind.TreasuryBountyExtended: {
         break;
       }
+      // awarded by curator
       case SubstrateTypes.EventKind.TreasuryBountyAwarded: {
         this._awarded = true;
-        this._active = false;
+        this._isActive = false;
+        this._isPendingPayout = true;
         break;
       }
-      case SubstrateTypes.EventKind.TreasuryBountyRejected: {
+      // claimed by recipient
+      case SubstrateTypes.EventKind.TreasuryBountyClaimed: {
         this.complete();
         this._active = false;
         break;
       }
-      case SubstrateTypes.EventKind.TreasuryBountyClaimed: {
-        this._awarded = true;
+      // rejected by council (?)
+      case SubstrateTypes.EventKind.TreasuryBountyCanceled: {
         this._active = false;
         this.complete();
         break;

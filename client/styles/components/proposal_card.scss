@@ -4,12 +4,17 @@
     @include card;
     padding: 0;
     height: initial;
-    height: 280px;
+    min-height: 280px;
     .proposal-card-top {
         position: relative;
         padding: 24px 24px 22px;
-        height: 228px;
+        min-height: 228px;
         width: 100%;
+    }
+    .proposal-injected {
+        margin-top: 16px;
+        margin-bottom: 4px;
+        padding: 0 2px;
     }
     .proposal-card-bottom {
         position: relative;

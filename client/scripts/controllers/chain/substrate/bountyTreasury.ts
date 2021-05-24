@@ -73,20 +73,112 @@ class SubstrateBountyTreasury extends ProposalModule<
       () => this._Chain.fetcher.fetchBounties(this.app.chain.block.height),
     );
 
+    // fetch extra metadata
+    // TODO: this should be picked up by the chain-events system
+    const extra = await ChainInfo.api.derive.bounties.bounties();
+    extra.forEach((b) => {
+      const index = b.index.toNumber();
+      const bounty = this.store.getByIdentifier(index);
+      if (!bounty) {
+        console.log('Unexpected missing bounty, on chain but not returned by chain-events');
+        return;
+      }
+      const data = {
+        title: b.description,
+        isActive: b.bounty.status.isActive,
+        isApproved: b.bounty.status.isApproved,
+        isCuratorProposed: b.bounty.status.isCuratorProposed,
+        isFunded: b.bounty.status.isFunded,
+        isPendingPayout: b.bounty.status.isPendingPayout,
+        isProposed: b.bounty.status.isProposed,
+        curator: b.bounty.status.isCuratorProposed ? b.bounty.status.asCuratorProposed?.curator
+          : b.bounty.status.isActive ? b.bounty.status.asActive.curator
+          : b.bounty.status.isPendingPayout ? b.bounty.status.asPendingPayout.curator : null,
+        updateDue: b.bounty.status.isActive ? b.bounty.status.asActive.updateDue : null,
+        beneficiary: b.bounty.status.isPendingPayout ? b.bounty.status.asPendingPayout.beneficiary : null,
+        unlockAt: b.bounty.status.isPendingPayout ? b.bounty.status.asPendingPayout.unlockAt : null,
+      };
+      bounty.setStatus(data);
+    });
+
     this._initialized = true;
     this._initializing = false;
   }
 
-  public createTx(author: SubstrateAccount, description: string, value: string) {
+  // anyone proposes a bounty
+  public createTx(author: SubstrateAccount, value: SubstrateCoin, description: string) {
     return this._Chain.createTXModalData(
       author,
-      (api: ApiPromise) => api.tx.bounties
-        ? api.tx.bounties.createBounty(author.address, description, value)
-        : api.tx.treasury.proposeBounty(value, description),
-      'createBounty',
-      `createBounty(${author.address}, ${description}, ${value})`
+      (api: ApiPromise) => api.tx.bounties.proposeBounty(value, description),
+      'proposeBounty',
+      `proposeBounty(${description}, ${value})`
     );
   }
+
+  // council approves a bounty
+  public createBountyApprovalMotionTx(author: SubstrateAccount, bountyId: number, threshold: number) {
+    const action = this._Chain.getTxMethod('bounties', 'approveBounty', [ bountyId ]);
+    const length = 1000;
+    return this._Chain.createTXModalData(
+      author,
+      (api: ApiPromise) => api.tx.council.propose(threshold, action, length),
+      'approveBounty',
+      `approveBounty(${bountyId})`
+    );
+  }
+
+  // council approves a curator
+  public proposeCuratorTx(author: SubstrateAccount, bountyId: number, curator: string, fee: SubstrateCoin, threshold: number) {
+    const action = this._Chain.getTxMethod('bounties', 'proposeCurator', [ bountyId, curator, fee ]);
+    const length = 1000;
+    return this._Chain.createTXModalData(
+      author,
+      (api: ApiPromise) => api.tx.council.propose(threshold, action, length),
+      'proposeCurator',
+      `proposeCurator(${bountyId}, ${curator}, ${fee})`
+    );
+  }
+
+  // curator accepts the bounty
+  public acceptCuratorTx(author: SubstrateAccount, bountyId: number) {
+    return this._Chain.createTXModalData(
+      author,
+      (api: ApiPromise) => api.tx.bounties.acceptCurator(bountyId),
+      'acceptCurator',
+      `acceptCurator(${bountyId})`
+    );
+  }
+
+  // curator awards the bounty
+  public awardBountyTx(author: SubstrateAccount, bountyId: number, recipient: string) {
+    return this._Chain.createTXModalData(
+      author,
+      (api: ApiPromise) => api.tx.bounties.awardBounty(bountyId, recipient),
+      'awardBounty',
+      `awardBounty(${bountyId}, ${recipient})`
+    );
+  }
+
+  // curator extends the bounty
+  public extendBountyExpiryTx(author: SubstrateAccount, bountyId: number, remark: string) {
+    return this._Chain.createTXModalData(
+      author,
+      (api: ApiPromise) => api.tx.bounties.extendBountyExpiry(bountyId, remark),
+      'extendBountyExpiry',
+      `extendBountyExpiry(${bountyId}, ${remark})`
+    );
+  }
+
+  // recipient claims the bounty
+  public claimBountyTx(author: SubstrateAccount, bountyId: number) {
+    return this._Chain.createTXModalData(
+      author,
+      (api: ApiPromise) => api.tx.bounties.claimBounty(bountyId),
+      'claimBounty',
+      `claimBounty(${bountyId})`
+    );
+  }
+
 }
 
 export default SubstrateBountyTreasury;

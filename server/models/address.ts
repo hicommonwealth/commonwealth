@@ -2,6 +2,7 @@
 
 import * as Sequelize from 'sequelize';
 import crypto from 'crypto';
+import Web3 from 'web3';
 
 import Keyring, { decodeAddress } from '@polkadot/keyring';
 import { stringToU8a, hexToU8a } from '@polkadot/util';
@@ -74,6 +75,14 @@ export interface AddressModel extends Sequelize.Model<AddressInstance, AddressAt
     keytype?: string
   ) => Promise<AddressInstance>;
 
+  updateWithTokenProvided?: (
+    address: AddressInstance,
+    user_id: number,
+    keytype?: string,
+    verification_token?: string,
+    verification_token_expires?: Date
+  ) => Promise<AddressInstance>;
+
   verifySignature?: (
     models: Sequelize.Models,
     chain: ChainInstance,
@@ -140,7 +149,9 @@ export default (
     const verification_token = crypto.randomBytes(18).toString('hex');
     const verification_token_expires = new Date(+(new Date()) + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000);
     const last_active = new Date();
-    return Address.create({ user_id, chain, address, verification_token, verification_token_expires, keytype, last_active });
+    return Address.create({
+      user_id, chain, address, verification_token, verification_token_expires, keytype, last_active,
+    });
   };
 
   // Update an existing address' verification token
@@ -154,6 +165,23 @@ export default (
     if (user_id) {
       address.user_id = user_id;
     }
+    address.keytype = keytype;
+    address.verification_token = verification_token;
+    address.verification_token_expires = verification_token_expires;
+    address.last_active = new Date();
+
+    return address.save();
+  };
+
+  // Update an existing address' verification token with provided one
+  Address.updateWithTokenProvided = (
+    address: AddressInstance,
+    user_id: number,
+    keytype?: string,
+    verification_token?: string,
+    verification_token_expires?: Date
+  ): Promise<AddressInstance> => {
+    address.user_id = user_id;
     address.keytype = keytype;
     address.verification_token = verification_token;
     address.verification_token_expires = verification_token_expires;
@@ -198,8 +226,8 @@ export default (
       const signatureU8a = signatureString.slice(0, 2) === '0x'
         ? hexToU8a(signatureString)
         : hexToU8a(`0x${signatureString}`);
-      isValid = signerKeyring.verify(signedMessageNewline, signatureU8a)
-        || signerKeyring.verify(signedMessageNoNewline, signatureU8a);
+      isValid = signerKeyring.verify(signedMessageNewline, signatureU8a, address)
+        || signerKeyring.verify(signedMessageNoNewline, signatureU8a, address);
     } else if (chain.base === 'cosmos') {
       //
       // cosmos-sdk address handling
@@ -233,7 +261,13 @@ export default (
       } else {
         isValid = false;
       }
-    } else if (chain.base === 'ethereum') {
+    } else if (chain.network === 'ethereum'
+      || chain.network === 'moloch'
+      || chain.network === 'alex'
+      || chain.network === 'metacartel'
+      || chain.network === 'commonwealth'
+      || chain.type === 'token'
+    ) {
       //
       // ethereum address handling
       //
@@ -249,9 +283,14 @@ export default (
         ethSignatureParams.s
       );
       const addressBuffer = ethUtil.publicToAddress(publicKey);
-      const address = ethUtil.bufferToHex(addressBuffer);
-      isValid = (addressModel.address.toLowerCase() === address.toLowerCase());
-    } else if (chain.network === 'near') {
+      const lowercaseAddress = ethUtil.bufferToHex(addressBuffer);
+      try {
+        const address = Web3.utils.toChecksumAddress(lowercaseAddress);
+        isValid = (addressModel.address === address);
+      } catch (e) {
+        isValid = false;
+      }
+    } else if (chain.base === 'near') {
       // both in base64 encoding
       const { signature: sigObj, publicKey } = JSON.parse(signatureString);
       isValid = nacl.sign.detached.verify(

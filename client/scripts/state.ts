@@ -17,6 +17,7 @@ import WebsocketController from './controllers/server/socket';
 import TopicsController from './controllers/server/topics';
 import CommunitiesController from './controllers/server/communities';
 import UserController from './controllers/server/user/index';
+import WebWalletController from './controllers/app/web_wallets';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -50,8 +51,10 @@ export interface IApp {
   topics: TopicsController;
   communities: CommunitiesController;
   user: UserController;
+  wallets: WebWalletController;
 
   recentActivity: RecentActivityController;
+  searchCache: any;
 
   // XXX: replace this with some app.chain helper
   activeChainId(): string;
@@ -77,6 +80,10 @@ export interface IApp {
   isProduction(): boolean;
   serverUrl(): string;
   loadingError: string;
+
+  isCustomDomain(): boolean;
+  setIsCustomDomain(option: boolean): void;
+  _isCustomDomain: boolean;
 
   _lastNavigatedBack: boolean;
   _lastNavigatedFrom: string;
@@ -109,11 +116,14 @@ const app: IApp = {
   topics: new TopicsController(),
   communities: new CommunitiesController(),
   user: new UserController(),
+  wallets: new WebWalletController(),
 
   recentActivity: new RecentActivityController(),
 
-  activeChainId: () => app.chain ? app.chain.id : null,
-  activeCommunityId: () => app.community ? app.community.meta.id : null,
+  searchCache: {},
+
+  activeChainId: () => app.chain?.id,
+  activeCommunityId: () => app.community?.meta.id,
   activeId: () => app.community ? app.activeCommunityId() : app.activeChainId(),
   defaultScope: () => app.config.defaultChain,
 
@@ -138,7 +148,16 @@ const app: IApp = {
     return document.location.origin.indexOf('commonwealth.im') !== -1;
   },
   serverUrl: () => '/api',
+
   loadingError: null,
+
+  isCustomDomain: () => {
+    return app._isCustomDomain;
+  },
+  setIsCustomDomain: (option: boolean) => {
+    app._isCustomDomain = option;
+  },
+  _isCustomDomain: false,
 
   _lastNavigatedFrom: null,
   _lastNavigatedBack: false,

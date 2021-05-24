@@ -1,12 +1,13 @@
 import 'components/proposal_card.scss';
 
 import m from 'mithril';
-import moment from 'moment-twitter';
+import moment from 'moment';
 import { Icon, Icons, Tag } from 'construct-ui';
 
 import app from 'state';
+import { slugify } from 'utils';
 import { Coin } from 'adapters/currency';
-import { blocknumToDuration, formatLastUpdated, formatPercentShort, slugify, link, pluralize } from 'helpers';
+import { blocknumToDuration, formatLastUpdated, formatPercentShort, link, pluralize } from 'helpers';
 import { ProposalStatus, VotingType, AnyProposal, AddressInfo } from 'models';
 import { ProposalType, proposalSlugToChainEntityType, chainEntityTypeToProposalShortName } from 'identifiers';
 
@@ -75,7 +76,7 @@ export const getStatusText = (proposal: AnyProposal, showCountdown: boolean) => 
                 ? [ 'Expected to pass and move to referendum, ', countdown ]
                 : proposal.isPassing === ProposalStatus.Passing ? [ 'Expected to pass, ', countdown ]
                   : proposal.isPassing === ProposalStatus.Failing ? [ 'Needs more votes, ', countdown ]
-                    : proposal.isPassing === ProposalStatus.None ? [ 'To be decided' ] : '';
+                    : proposal.isPassing === ProposalStatus.None ? '' : '';
 };
 
 // export const getSecondaryStatusText = (proposal: AnyProposal): string | null => {
@@ -98,9 +99,9 @@ export const getStatusText = (proposal: AnyProposal, showCountdown: boolean) => 
 //   }
 // };
 
-const ProposalCard: m.Component<{ proposal: AnyProposal }> = {
+const ProposalCard: m.Component<{ proposal: AnyProposal, injectedContent? }> = {
   view: (vnode) => {
-    const { proposal } = vnode.attrs;
+    const { proposal, injectedContent } = vnode.attrs;
     const { author, createdAt, slug, identifier, title } = proposal;
     const proposalLink = `/${app.activeChainId()}/proposal/${proposal.slug}/${proposal.identifier}`
       + `-${slugify(proposal.title)}`;
@@ -153,10 +154,12 @@ const ProposalCard: m.Component<{ proposal: AnyProposal }> = {
         (proposal instanceof SubstrateDemocracyProposal || proposal instanceof SubstrateCollectiveProposal)
           && proposal.getReferendum()
           && m('.proposal-action', [ 'Became REF-', proposal.getReferendum().identifier ]),
-        // comments
-        m('.proposal-comments', pluralize(app.comments.nComments(proposal), 'comment')),
-        // status
-        m('.proposal-status', { class: getStatusClass(proposal) }, getStatusText(proposal, true)),
+        injectedContent ? m('.proposal-injected', injectedContent) : [
+          // comments
+          m('.proposal-comments', pluralize(app.comments.nComments(proposal), 'comment')),
+          // status
+          m('.proposal-status', { class: getStatusClass(proposal) }, getStatusText(proposal, true)),
+        ],
       ]),
       m('.proposal-card-bottom', {
         onclick: (e) => {

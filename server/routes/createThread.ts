@@ -1,4 +1,5 @@
 import moment from 'moment';
+
 import { Request, Response, NextFunction } from 'express';
 import { NotificationCategories, ProposalType } from '../../shared/types';
 
@@ -7,8 +8,8 @@ import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
 import { parseUserMentions } from '../util/parseUserMentions';
 import TokenBalanceCache from '../util/tokenBalanceCache';
-import { factory, formatFilename } from '../../shared/logging';
 
+import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
@@ -18,11 +19,19 @@ export const Errors = {
   NoBodyOrAttachments: 'Forum posts must include body or attachment',
   LinkMissingTitleOrUrl: 'Links must include a title and URL',
   UnsupportedKind: 'Only forum threads, questions, and requests supported',
-  InsufficientTokenBalance: `Users need to hold some of the community's tokens to post`,
+  InsufficientTokenBalance: 'Users need to hold some of the community\'s tokens to post',
+  CouldNotFetchTokenBalance: 'Unable to fetch user\'s token balance',
 };
 
-const createThread = async (models, tokenBalanceCache: TokenBalanceCache, req: Request, res: Response, next: NextFunction) => {
+const createThread = async (
+  models,
+  tokenBalanceCache: TokenBalanceCache,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));
@@ -36,8 +45,13 @@ const createThread = async (models, tokenBalanceCache: TokenBalanceCache, req: R
       },
     });
     if (isAdmin.length === 0) {
-      const userHasBalance = await tokenBalanceCache.hasToken(chain.id, req.body.address);
-      if (!userHasBalance) return next(new Error(Errors.InsufficientTokenBalance));
+      try {
+        const userHasBalance = await tokenBalanceCache.hasToken(chain.id, req.body.address);
+        if (!userHasBalance) return next(new Error(Errors.InsufficientTokenBalance));
+      } catch (e) {
+        log.error(`hasToken failed: ${e.message}`);
+        return next(new Error(Errors.CouldNotFetchTokenBalance));
+      }
     }
   }
 
@@ -135,7 +149,7 @@ const createThread = async (models, tokenBalanceCache: TokenBalanceCache, req: R
       return next(err);
     }
   } else {
-    if ((community || chain).topics.length > 0) {
+    if ((community || chain).topics?.length) {
       return next(Error('Must pass a topic_name string and/or a numeric topic_id'));
     }
   }

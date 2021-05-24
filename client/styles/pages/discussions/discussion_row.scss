@@ -17,6 +17,7 @@
                     text-decoration: underline;
                 }
             }
+            .discussion-row-linked-poll,
             .discussion-row-linked-chain-entity {
                 font-size: 14px;
                 padding: 0 8px;
@@ -92,7 +93,8 @@
                     margin: 0 2px;
                 }
             }
-            > .created-at {
+            > .created-at,
+            > .offchain-voting-stat {
                 &::before {
                     content: ' ';
                     margin: 0 8px;
@@ -123,6 +125,18 @@
         .discussion-row-right-meta {
             margin-left: 20px;
             margin-right: 4px;
+            .offchain-voting {
+                position: relative;
+                top: -5px;
+                margin-top: 5px;
+                // styling
+                font-size: 16px;
+                height: 40px;
+                padding: 12px;
+                width: 100px;
+                border: 1px solid $border-color;
+                border-radius: 6px;
+            }
         }
         .discussion-row-stage {
             font-size: 15px;
