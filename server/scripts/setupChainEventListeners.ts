@@ -20,8 +20,14 @@ const log = factory.getLogger(formatFilename(__filename));
 
 // emit globally any transfer over 1% of total issuance
 // TODO: config this
-// MAXTODO look into this
 const BALANCE_TRANSFER_THRESHOLD_PERMILL: number = 10_000;
+const BALANCE_TRANSFER_THRESHOLD: number = 10 ** 22;
+/* TODO: both of these are imperfect solutions. The BALANCE_TRANSFER_THRESHOLD_PERMILL used
+by the Substrate enricher uses an API call to get the max token amount of the chain its referring to
+for every event it processes. This seems like too much overheard for the ERC20 enricher which 
+could end being processed on through hundreds of chains all with rapid transfers happening. So
+I have made it a fixed value here (1000 tokens if they're using the default decimal value) but
+the ideal solution would be to have every chain's max token amount stored in the database. */
 
 const discoverReconnectRange = async (models, chain: string): Promise<IDisconnectedRange> => {
   const lastChainEvent = await models.ChainEvent.findAll({
@@ -209,10 +215,11 @@ const setupChainEventListeners = async (
       chain: 'erc20',
       handlers: [ storageHandler, notificationHandler ],
       skipCatchup,
-      // Unnecessary, I believe, as we will not be adding historical
-      // chain-events to the database
-      discoverReconnectRange: async () => { return { startBlock: null }; },
       api,
+      discoverReconnectRange: async () => discoverReconnectRange(models, 'erc20'),
+      enricherConfig: {
+        balanceTransferThreshold: BALANCE_TRANSFER_THRESHOLD,
+      }
     });
     process.on('SIGTERM', () => {
       if (subscriber) {

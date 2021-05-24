@@ -78,11 +78,12 @@ export default class extends IEventHandler {
     // locate event type and add event (and event type if needed) to database
     let chain;
     if (this._chain === 'erc20') {
-      const tokenChain = this._models.ChainNode.findOne({
+      const tokenChain = await this._models.ChainNode.findOne({
         where: {
-          address: (event.data as Erc20Types.ITransfer).contractAddress
+          address: (event.data as Erc20Types.ITransfer).contractAddress.toLowerCase()
         }
       });
+
       chain = tokenChain.chain;
     } else { chain = this._chain; }
 
