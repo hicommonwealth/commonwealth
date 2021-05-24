@@ -24,7 +24,8 @@ const getNewTag = (labelCount = null) => {
 
 const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[] }> = {
   view: (vnode) => {
-    const { chain, nodeList } = vnode.attrs;
+    const { nodeList } = vnode.attrs;
+    let chain = vnode.attrs.chain;
     const { unseenPosts } = app.user;
     const chainInfo = app.config.chains.getById(chain);
     const visitedChain = !!unseenPosts[chain];
