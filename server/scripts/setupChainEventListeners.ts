@@ -182,32 +182,46 @@ const setupChainEventListeners = async (
     });
     return [ node.chain, subscriber ];
   }));
-/*
+
   // Add Erc20 subscribers
-  const erc20Addresses = nodes.filter((o) => o.address).map((o) => o.address);
+  if (chains === 'all' || chains.includes('erc20')) {
+    const erc20Nodes = await models.ChainNode.findAll({
+      where: {
+        address: {
+          [sequelize.Op.not]: null,
+        }
+      }
+    });
+    const erc20Addresses = erc20Nodes.map((o) => o.address);
+    // get ethereum's endpoint URL as most canonical one
+    const ethNode = await models.ChainNode.findOne({
+      where: {
+        chain: 'ethereum'
+      }
+    });
+    const ethUrl = ethNode.url;
 
-  // get ethereum's endpoint URL as most canonical one
-  const ethUrl = nodes.find((o) => o.chain === 'ethereum').url;
-  const api = await Erc20Events.createApi(ethUrl, erc20Addresses);
-  // we only need notifications for ERC20s
-  const handler = new EventNotificationHandler(models, wss);
-  const subscriber = await Erc20Events.subscribeEvents({
-    chain: 'erc20',
-    handlers: [ handler ],
-    skipCatchup,
-    // Unnecessary, I believe, as we will not be adding historical
-    // chain-events to the database
-    discoverReconnectRange: async () => { return { startBlock: null }; },
-    api,
-  });
+    const api = await Erc20Events.createApi(ethUrl, erc20Addresses);
+    // we only need notifications for ERC20s
+    const storageHandler = new EventStorageHandler(models, 'erc20', {});
+    const notificationHandler = new EventNotificationHandler(models, wss);
+    const subscriber = await Erc20Events.subscribeEvents({
+      chain: 'erc20',
+      handlers: [ storageHandler, notificationHandler ],
+      skipCatchup,
+      // Unnecessary, I believe, as we will not be adding historical
+      // chain-events to the database
+      discoverReconnectRange: async () => { return { startBlock: null }; },
+      api,
+    });
+    process.on('SIGTERM', () => {
+      if (subscriber) {
+        subscriber.unsubscribe();
+      }
+    });
+    subscribers.push([ 'erc20', subscriber ]);
+  }
 
-  process.on('SIGTERM', () => {
-    if (subscriber) {
-      subscriber.unsubscribe();
-    }
-  });
-
-  subscribers.push([ 'erc20', subscriber]);*/
   return _.object<{ [chain: string]:  IEventSubscriber<any, any> }>(subscribers);
 };
 

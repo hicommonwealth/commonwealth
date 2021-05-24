@@ -2,6 +2,7 @@
  * Generic handler that stores the event in the database.
  */
 import { IEventHandler, CWEvent, IChainEventKind, SubstrateTypes } from '@commonwealth/chain-events';
+import { Erc20Types } from '@commonwealth/chain-events';
 import Sequelize from 'sequelize';
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
@@ -75,13 +76,24 @@ export default class extends IEventHandler {
     }
 
     // locate event type and add event (and event type if needed) to database
-    const [ dbEventType, created ] = await this._models.ChainEventType.findOrCreate({
+    let chain;
+    if (this._chain === 'erc20') {
+      const tokenChain = this._models.ChainNode.findOne({
+        where: {
+          address: (event.data as Erc20Types.ITransfer).contractAddress
+        }
+      });
+      chain = tokenChain.chain;
+    } else { chain = this._chain; }
+
+    const [dbEventType, created] = await this._models.ChainEventType.findOrCreate({
       where: {
-        id: `${this._chain}-${event.data.kind.toString()}`,
-        chain: this._chain,
+        id: `${chain}-${event.data.kind.toString()}`,
+        chain,
         event_name: event.data.kind.toString(),
       }
     });
+
     if (!dbEventType) {
       log.error(`unknown event type: ${event.data.kind}`);
       return;
