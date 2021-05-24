@@ -3,7 +3,7 @@ import BN from 'bn.js';
 type ProjectStatus = 'In Progress' | 'Successed' | 'Failed';
 type ParticipantRole = 'backer' | 'curator' | 'beneficiary' | 'creator'
 
-export interface CWUser {
+interface CWUser {
   id?: number;
   address: string;
   role: ParticipantRole;
