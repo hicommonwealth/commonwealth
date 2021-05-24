@@ -1,7 +1,7 @@
 import { RegisteredTypes } from '@polkadot/types/types';
 
 
-const CrustSpec = {
+const CrustSpec: RegisteredTypes = {
   types: {
     Address: 'AccountId',
     AddressInfo: 'Vec<u8>',
