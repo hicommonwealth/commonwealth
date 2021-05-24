@@ -19,6 +19,8 @@ const nodes = [
   // [ 'wss://mainnet.infura.io/ws', 'ethereum' ],
   [ 'wss://kovan.infura.io/ws', 'ethereum-kovan' ],   // ethereum kovan
   [ 'ws://127.0.0.1:7545', 'ethereum-local' ],  // ethereum local
+  [ 'wss://kovan.infura.io/ws', 'common-protocol-kovan', '0xa995cc3127BDB3E26B3c12c317E3Fa170424f0Eb' ],   // CWP using kovan etherum
+  [ 'ws://127.0.0.1:7545', 'common-protocol-local' ],  // CWP using local ethreum
   // [ '18.223.143.102:9944', 'edgeware-testnet' ],
   // [ '157.230.218.41:9944', 'edgeware-testnet' ],
   // [ '157.230.125.18:9944', 'edgeware-testnet' ],
@@ -281,16 +283,26 @@ const resetServer = (models): Promise<number> => {
         //   type: 'chain',
         //   base: 'ethereum',
         // }),
-        // models.Chain.create({
-        //   id: 'ethereum-local',
-        //   network: 'ethereum',
-        //   symbol: 'ETH',
-        //   name: 'Ethereum (local)',
-        //   icon_url: '/static/img/protocols/eth.png',
-        //   active: true,
-        //   type: 'chain',
-        //   base: 'ethereum',
-        // }),
+        models.Chain.create({
+          id: 'ethereum-kovan',
+          network: 'ethereum',
+          symbol: 'ETH',
+          name: 'Ethereum (kovan)',
+          icon_url: '/static/img/protocols/eth.png',
+          active: true,
+          type: 'chain',
+          base: 'ethereum',
+        }),
+        models.Chain.create({
+          id: 'ethereum-local',
+          network: 'ethereum',
+          symbol: 'ETH',
+          name: 'Ethereum (local)',
+          icon_url: '/static/img/protocols/eth.png',
+          active: true,
+          type: 'chain',
+          base: 'ethereum',
+        }),
         models.Chain.create({
           id: 'ethereum',
           network: 'ethereum',
@@ -405,10 +417,9 @@ const resetServer = (models): Promise<number> => {
           type: 'token',
           base: 'ethereum',
         }),
-
         // for CWP
         models.Chain.create({
-          id: 'ethereum-kovan',
+          id: 'common-protocol-kovan',
           network: 'CMN-kovan',
           symbol: 'ETH',
           name: 'Common Protocol (kovan)',
@@ -418,12 +429,12 @@ const resetServer = (models): Promise<number> => {
           base: 'ethereum',
         }),
         models.Chain.create({
-          id: 'ethereum-local',
+          id: 'common-protocol-local',
           network: 'CMN-local',
           symbol: 'ETH',
           name: 'Common Protocol (local)',
           icon_url: '/static/img/protocols/eth.png',
-          active: true,
+          active: false,
           type: 'chain',
           base: 'ethereum',
         }),
@@ -560,7 +571,7 @@ const resetServer = (models): Promise<number> => {
         }),
       ]);
 
-      // CWP temporary offchain data
+      // Communities
       const communities = await Promise.all([
         models.OffchainCommunity.create({
           id: 'staking',

@@ -64,6 +64,8 @@ interface CwProtocolInterface extends Interface {
 
     allProjectsLength: TypedFunctionDescription<{ encode([]: []): string }>;
 
+    getAllProjects: TypedFunctionDescription<{ encode([]: []): string }>;
+
     setFeeTo: TypedFunctionDescription<{ encode([_feeTo]: [string]): string }>;
 
     setProtocolFee: TypedFunctionDescription<{
@@ -218,6 +220,10 @@ export class CwProtocol extends Contract {
 
     "allProjectsLength()"(overrides?: TransactionOverrides): Promise<BigNumber>;
 
+    getAllProjects(overrides?: TransactionOverrides): Promise<string[]>;
+
+    "getAllProjects()"(overrides?: TransactionOverrides): Promise<string[]>;
+
     setFeeTo(
       _feeTo: string,
       overrides?: TransactionOverrides
@@ -353,6 +359,10 @@ export class CwProtocol extends Contract {
   allProjectsLength(overrides?: TransactionOverrides): Promise<BigNumber>;
 
   "allProjectsLength()"(overrides?: TransactionOverrides): Promise<BigNumber>;
+
+  getAllProjects(overrides?: TransactionOverrides): Promise<string[]>;
+
+  "getAllProjects()"(overrides?: TransactionOverrides): Promise<string[]>;
 
   setFeeTo(
     _feeTo: string,
@@ -501,6 +511,10 @@ export class CwProtocol extends Contract {
     allProjectsLength(overrides?: TransactionOverrides): Promise<BigNumber>;
 
     "allProjectsLength()"(overrides?: TransactionOverrides): Promise<BigNumber>;
+
+    getAllProjects(overrides?: TransactionOverrides): Promise<BigNumber>;
+
+    "getAllProjects()"(overrides?: TransactionOverrides): Promise<BigNumber>;
 
     setFeeTo(
       _feeTo: string,
