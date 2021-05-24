@@ -191,11 +191,15 @@ const BountyDetail = {
             }),
           ]),
           m('p', [
-            'Must renew within: ',
-            m(CountdownUntilBlock, {
-              block: bounty.updateDue,
-              includeSeconds: false,
-            }),
+            bounty.updateDue ? [
+              'Must renew within: ',
+              m(CountdownUntilBlock, {
+                block: bounty.updateDue,
+                includeSeconds: false,
+              }),
+            ] : [
+              'Renewal period just extended'
+            ]
           ]),
         ] : bounty.isPendingPayout ? [
           m(Button, {
