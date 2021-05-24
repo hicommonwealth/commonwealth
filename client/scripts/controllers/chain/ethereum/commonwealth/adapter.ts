@@ -39,7 +39,7 @@ export default class Commonwealth extends IChainAdapter<EthereumCoin, EthereumAc
     await api.init();
     this.chain.CommonwealthAPI = api;
     // await this.chain.initEventLoop();
-    // await super.initApi();
+    await super.initApi();
   }
 
   public async initData() {
