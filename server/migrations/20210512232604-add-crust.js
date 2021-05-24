@@ -15,7 +15,7 @@ module.exports = {
         description: 'A Decentralized Cloud Blockchain Technology on Polkadot',
         telegram: 'https://t.me/CrustNetwork',
         website: 'https://crust.network/',
-        chat: 'https://discord.com/invite/Jbw2PAUSCR',
+        discord: 'https://discord.com/invite/Jbw2PAUSCR',
         github: 'https://github.com/crustio',
       }], { transaction: t });
 
