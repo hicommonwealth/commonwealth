@@ -22,6 +22,7 @@ import ViewCountCache from './server/util/viewCountCache';
 import IdentityFetchCache from './server/util/identityFetchCache';
 import TokenBalanceCache from './server/util/tokenBalanceCache';
 import TokenListCache from './server/util/tokenListCache';
+import Erc20SubscriberHolder from 'server/util/erc20SubscriberHolder';
 
 require('express-async-errors');
 
@@ -34,6 +35,7 @@ const identityFetchCache = new IdentityFetchCache(0);
 // always prune both token and non-token holders asap
 const tokenListCache = new TokenListCache();
 const tokenBalanceCache = new TokenBalanceCache(tokenListCache, 0, 0);
+const erc20SubscriberHolder = new Erc20SubscriberHolder();
 const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
 let server;
 
@@ -304,7 +306,7 @@ const setupServer = () => {
 };
 
 setupPassport(models);
-setupAPI(app, models, viewCountCache, identityFetchCache, tokenBalanceCache);
+setupAPI(app, models, viewCountCache, identityFetchCache, tokenBalanceCache, erc20SubscriberHolder);
 setupErrorHandlers();
 setupServer();
 

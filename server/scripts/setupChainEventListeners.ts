@@ -182,7 +182,7 @@ const setupChainEventListeners = async (
     });
     return [ node.chain, subscriber ];
   }));
-
+/*
   // Add Erc20 subscribers
   const erc20Addresses = nodes.filter((o) => o.address).map((o) => o.address);
 
@@ -199,9 +199,6 @@ const setupChainEventListeners = async (
     // chain-events to the database
     discoverReconnectRange: async () => { return { startBlock: null }; },
     api,
-    enricherConfig: {
-      balanceTransferThresholdPermill: BALANCE_TRANSFER_THRESHOLD_PERMILL,
-    }
   });
 
   process.on('SIGTERM', () => {
@@ -210,7 +207,7 @@ const setupChainEventListeners = async (
     }
   });
 
-  subscribers.push([ 'erc20', subscriber]);
+  subscribers.push([ 'erc20', subscriber]);*/
   return _.object<{ [chain: string]:  IEventSubscriber<any, any> }>(subscribers);
 };
 
