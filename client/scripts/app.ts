@@ -127,6 +127,7 @@ export async function initAppState(updateSelectedNode = true, customDomain = nul
 export async function deinitChainOrCommunity() {
   app.isAdapterReady = false;
   if (app.chain) {
+    
     app.chain.networkStatus = ApiStatus.Disconnected;
     app.chain.deinitServer();
     await app.chain.deinit();
@@ -177,7 +178,7 @@ export async function handleUpdateEmailConfirmation() {
   }
 }
 
-export async function selectCommunity(c?: CommunityInfo, node?: NodeInfo): Promise<boolean> {
+export async function selectCommunity(c?: CommunityInfo): Promise<boolean> {
   // Check for valid community selection, and that we need to switch
   if (app.community && c === app.community.meta) return;
 
@@ -202,18 +203,6 @@ export async function selectCommunity(c?: CommunityInfo, node?: NodeInfo): Promi
 
   // Redraw with community fully loaded and return true to indicate
   // initialization has finalized.
-  if (c.id === 'cw-protocol') {
-    const { meta } = app.community;
-    const communityNode = node ? node : app.config.nodes.getAll().find((n) => n.chain.id === meta.defaultChain.id);
-    const Commonwealth = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "commonwealth-main" */
-      './controllers/chain/ethereum/commonwealth/adapter'
-    )).default;
-    const commonwealthChain = new Commonwealth(communityNode, app);
-    app.chain = commonwealthChain;
-    app.chain.deferred = true;
-  }
   m.redraw();
   return true;
 }
@@ -235,7 +224,8 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
   }
 
   // Check for valid chain selection, and that we need to switch
-  if (app.chain && n === app.chain.meta) {
+  if (app.chain && n === app.chain.meta) 
+  {
     return;
   }
 
@@ -312,16 +302,14 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/ethereum/token/adapter'
     )).default;
     newChain = new Token(n, app);
-  }
-  // else if (n.chain.network === ChainNetwork.Commonwealth) {
-  //   const Commonwealth = (await import(
-  //     /* webpackMode: "lazy" */
-  //     /* webpackChunkName: "commonwealth-main" */
-  //     './controllers/chain/ethereum/commonwealth/adapter'
-  //   )).default;
-  //   newChain = new Commonwealth(n, app);
-  // } else {
-  else {
+  } else if (n.chain.network === ChainNetwork.CMNKovan || n.chain.network === ChainNetwork.CMNLocal) {
+    const Commonwealth = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "commonwealth-main" */
+      './controllers/chain/ethereum/commonwealth/adapter'
+    )).default;
+    newChain = new Commonwealth(n, app);
+  } else {
     throw new Error('Invalid chain');
   }
 
@@ -376,7 +364,7 @@ export async function initChain(): Promise<void> {
     await app.chain.initApi();
   }
   app.chain.deferred = false;
-  const n = app.chain.meta;
+  const n = app.chain.meta;  
   await app.chain.initData();
 
   // Emit chain as updated

@@ -50,7 +50,6 @@ export default class Commonwealth extends IChainAdapter<EthereumCoin, EthereumAc
     await this.chain.initEventLoop();
     await this.governance.init(this.chain);
     await this.protocol.init(this.chain);
-    await this.protocol.init();
     await super.initData();
   }
 
@@ -60,7 +59,7 @@ export default class Commonwealth extends IChainAdapter<EthereumCoin, EthereumAc
     this.governance.deinit();
     this.accounts.deinit();
     this.chain.deinitMetadata();
-    // this.chain.deinitEventLoop();
+    this.chain.deinitEventLoop();
     await this.chain.deinitApi();
     console.log('Ethereum/Commonwealth stopped.');
   }

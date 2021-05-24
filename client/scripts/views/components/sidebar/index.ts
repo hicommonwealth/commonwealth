@@ -201,6 +201,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
     const showMolochMenuOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Moloch;
     const showMolochMemberOptions = showMolochMenuOptions && (app.user.activeAccount as any)?.shares?.gtn(0);
     const showCommonwealthMenuOptions = app.chain?.network === ChainNetwork.Commonwealth;
+    // const showCommonwealthMenuOptions = app.chain?.class === ChainClass.Commonwealth;
 
     const showCompoundOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Compound;
     const showAaveOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Aave;
@@ -445,24 +446,10 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         fluid: true,
         rounded: true,
         label: 'Collectives',
-        active: m.route.get().startsWith(`/${app.activeChainId()}/collectives`),
         onclick: (e) => {
           e.preventDefault();
           navigateToSubpage('/collectives');
         },
-      }),
-    ]);
-  }
-};
-
-export const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
-  view: (vnode) => {
-    // add CWP chain status
-    if (isCommonProtocolMenu()) {
-      return m(CWPChainStatusModule);
-    }
-    if (!app.chain) return;
-
     const url = app.chain?.meta?.url;
     if (!url) return;
 
@@ -606,7 +593,7 @@ const Sidebar: m.Component<{ hideQuickSwitcher? }, {}> = {
       m('.Sidebar', [
         (app.chain || app.community) && m(OffchainNavigationModule),
         (app.chain || app.community) && m(OnchainNavigationModule),
-        isCommonProtocolMenu() && m(CWPModule), // for CWP Projects & Collectives
+        // isCommonProtocolMenu() && m(CWPModule), // for CWP Projects & Collectives
         (app.chain || app.community) && m(ExternalLinksModule),
         m('br'),
         app.isLoggedIn() && (app.chain || app.community) && m(SubscriptionButton),

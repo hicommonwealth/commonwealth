@@ -29,10 +29,11 @@ const ProjectsPage: m.Component<{}, { initializing: boolean, protocol: any }> = 
     if (!app.chain || !app.chain.loaded) {
       vnode.state.initializing = true;
       await initChain();
+      console.log('====>app.chain', app.chain)
       vnode.state.protocol = (app.chain as any).protocol;
       vnode.state.initializing = false;
-      m.redraw();
-    } else if (!vnode.state.protocol) {
+      m.redraw(); 
+    } else if (!vnode.state.protocol && (app.chain as any).protocol) {
       vnode.state.protocol = (app.chain as any).protocol;
       m.redraw();
     }

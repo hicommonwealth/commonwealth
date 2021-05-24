@@ -138,7 +138,7 @@ const getNewProjectMenu = () => {
     m(MenuDivider),
     [
       m(MenuItem, {
-        onclick: (e) => m.route.set(`/${app.community.id}/new/project`),
+        onclick: (e) => m.route.set(`/${app.activeChainId()}/new/project`),
         label: 'New Project'
       }),
     ],
@@ -184,7 +184,7 @@ const NewProposalButton: m.Component<{
     if (!app.chain && !app.community) return;
     if (!app.activeId()) return;
 
-    if (app.community && app.community.id === 'cw-protocol') {      
+    if (app.chain.network && app.chain.network.includes('CMN')) {
       return m(ButtonGroup, {
         class: 'NewProposalButton',
       }, [
