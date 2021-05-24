@@ -20,7 +20,6 @@ import SubscriptionButton from 'views/components/subscription_button';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import CommunitySelector from 'views/components/sidebar/community_selector';
-import { CWPModule, CWPChainStatusModule, isCommonProtocolMenu } from './cw_protocol';
 
 import { discordIcon, telegramIcon, elementIcon, githubIcon, websiteIcon } from './icons';
 
@@ -167,13 +166,13 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         || app.chain.network === ChainNetwork.Marlin
         || app.chain.network === ChainNetwork.MarlinTestnet
         || app.chain.class === ChainClass.Commonwealth);
-
     if (!hasProposals) return;
 
     const showMolochMenuOptions = app.user.activeAccount && app.chain?.class === ChainClass.Moloch;
     const showMolochMemberOptions = showMolochMenuOptions && (app.user.activeAccount as any)?.shares?.gtn(0);
+    const showCommonwealthMenuOptions = app.chain?.class === ChainClass.Commonwealth;
+
     const showMarlinOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Marlin;
-    // const showCommonwealthMenuOptions = app.chain?.class === ChainClass.Commonwealth;
 
     const onProposalPage = (p) => (
       p.startsWith(`/${app.activeChainId()}/proposals`)
@@ -262,6 +261,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         }),
       // validators (substrate only)
       !app.community && app.chain?.base === ChainBase.Substrate
+        && app.chain?.class !== ChainClass.Kulupu && app.chain?.class !== ChainClass.Darwinia
         && m(Button, {
           fluid: true,
           rounded: true,
@@ -336,18 +336,43 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         },
         label: 'Approve tokens',
       }),
+      showCommonwealthMenuOptions && m(Button, {
+        fluid: true,
+        rounded: true,
+        label: 'Projects',
+        active: m.route.get().startsWith(`/${app.activeChainId()}/projects`),
+        onclick: (e) => {
+          e.preventDefault();
+          m.route.set(`/${app.activeChainId()}/projects`);
+        },
+      }),
+      // showCommonwealthMenuOptions && m(Button, {
+      //   fluid: true,
+      //   rounded: true,
+      //   label: 'Backers',
+      //   active: m.route.get().startsWith(`/${app.activeChainId()}/backers`),
+      //   onclick: (e) => {
+      //     e.preventDefault();
+      //     m.route.set(`/${app.activeChainId()}/backers`);
+      //   },
+      // }),
+      showCommonwealthMenuOptions && m(Button, {
+        fluid: true,
+        rounded: true,
+        label: 'Collectives',
+        disabled: true,
+        active: m.route.get().startsWith(`/${app.activeChainId()}/collectives`),
+        onclick: (e) => {
+          e.preventDefault();
+          m.route.set(`/${app.activeChainId()}/collectives`);
+        },
+      }),
     ]);
   }
 };
 
 export const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
   view: (vnode) => {
-    // add CWP chain status
-    if (isCommonProtocolMenu()) {
-      return m(CWPChainStatusModule);
-    }
-    if (!app.chain) return;
-
     const url = app.chain?.meta?.url;
     if (!url) return;
 
@@ -491,11 +516,11 @@ const Sidebar: m.Component<{ hideQuickSwitcher? }, {}> = {
       m('.Sidebar', [
         (app.chain || app.community) && m(OffchainNavigationModule),
         (app.chain || app.community) && m(OnchainNavigationModule),
-        isCommonProtocolMenu() && m(CWPModule), // for CWP Projects & Collectives
+        // isCommonProtocolMenu() && m(CWPModule), // for CWP Projects & Collectives
         (app.chain || app.community) && m(ExternalLinksModule),
         m('br'),
         app.isLoggedIn() && (app.chain || app.community) && m(SubscriptionButton),
-        m(ChainStatusModule)
+        app.chain && m(ChainStatusModule),
       ])
     ];
   },

@@ -5,6 +5,7 @@ import $ from 'jquery';
 import app, { IApp } from 'state';
 import { ERC20Token } from 'adapters/chain/ethereum/types';
 import { CWProtocol, CWProject } from 'models/CWProtocol';
+import CommonwealthChain from './chain';
 
 import { CWProtocolStore } from '../../../../stores';
 
@@ -37,19 +38,21 @@ export default class CommonwealthProtocol {
   }
 
   public async retrieveProjects() {
-    // temporary API logic: router.get('/cw/projects', builkProjects.bind(this, models));
     let projects: CWProject[] =  [];
-    const res = await $.get(`${app.serverUrl()}/cw/projects`, {
-      auth: true,
-      jwt: app.user.jwt
-    });
-    if (res['status'] === 'Success' && res.result && res.result.projects && res.result.projects.length > 0) {
-      projects = res.result.projects;
-    }
+    // const res = await $.get(`${app.serverUrl()}/cw/projects`, {
+    //   auth: true,
+    //   jwt: app.user.jwt
+    // });
+    // if (res['status'] === 'Success' && res.result && res.result.projects && res.result.projects.length > 0) {
+    //   projects = res.result.projects;
+    // }
     return projects;
   }
 
-  public async init() {
+  public async init(chain: CommonwealthChain) {
+    // const api = chain.CommonwealthAPI;
+    // const allProjectLenght = await api.Contract.allProjectsLength();
+    // console.log('====>allProjectLenght', allProjectLenght);
     const projects: CWProject[] =  await this.retrieveProjects();
     const newProtocol = { 
       name: 'root',
@@ -106,15 +109,15 @@ export default class CommonwealthProtocol {
     }
 
     // router.post('/cw/create-project', passport.authenticate('jwt', { session: false }), createProject.bind(this, models));
-    const res = await $.post(`${app.serverUrl()}/cw/create-project`, {
-      ...newProjectData,
-      auth: true,
-      jwt: app.user.jwt
-    });
-    if (res['status'] === 'Success') {
-      await this.updateState();
-    }
-    return res;
+    // const res = await $.post(`${app.serverUrl()}/cw/create-project`, {
+    //   ...newProjectData,
+    //   auth: true,
+    //   jwt: app.user.jwt
+    // });
+    // if (res['status'] === 'Success') {
+    //   await this.updateState();
+    // }
+    // return res;
   }
 
   public async backProject(
@@ -123,16 +126,16 @@ export default class CommonwealthProtocol {
     projectHash: string,
   ) {
     // router.post('/cw/back-project', passport.authenticate('jwt', { session: false }), backProject.bind(this, models));
-    const res = await $.post(`${app.serverUrl()}/cw/back-project`, {
-      backer,
-      amount,
-      projectHash,
-      auth: true,
-      jwt: app.user.jwt
-    });
-    if (res['status'] === 'Success') {
-      await this.updateState();
-    }
+    // const res = await $.post(`${app.serverUrl()}/cw/back-project`, {
+    //   backer,
+    //   amount,
+    //   projectHash,
+    //   auth: true,
+    //   jwt: app.user.jwt
+    // });
+    // if (res['status'] === 'Success') {
+    //   await this.updateState();
+    // }
   }
 
   public async curateProject(
@@ -141,28 +144,28 @@ export default class CommonwealthProtocol {
     projectHash: string,
   ) {
     // router.post('/cw/curate-project', passport.authenticate('jwt', { session: false }), backProject.bind(this, models));
-    const res = await $.post(`${app.serverUrl()}/cw/back-project`, {
-      curator,
-      amount,
-      projectHash,
-      auth: true,
-      jwt: app.user.jwt
-    });
-    console.log('=====>Res', res);
-    if (res['status'] === 'Success') {
-      await this.updateState();
-    }
+    // const res = await $.post(`${app.serverUrl()}/cw/back-project`, {
+    //   curator,
+    //   amount,
+    //   projectHash,
+    //   auth: true,
+    //   jwt: app.user.jwt
+    // });
+    // console.log('=====>Res', res);
+    // if (res['status'] === 'Success') {
+    //   await this.updateState();
+    // }
   }
 
   public async getCollatoralAmount(isBToken, address, projectHash) {
-    const res = await $.get(`${app.serverUrl()}/cw/get-collatora-amount`, {
-      address,
-      isBToken,
-      projectHash,
-      auth: true,
-      jwt: app.user.jwt
-    });
-    console.log('====>res', res);
+    // const res = await $.get(`${app.serverUrl()}/cw/get-collatora-amount`, {
+    //   address,
+    //   isBToken,
+    //   projectHash,
+    //   auth: true,
+    //   jwt: app.user.jwt
+    // });
+    // console.log('====>res', res);
     // if (res['status'] === 'Success') {
     //   await this.updateState();
     // }
@@ -174,16 +177,16 @@ export default class CommonwealthProtocol {
     projectHash: string,
   ) {
     // router.post('/cw/redeem-bToken', passport.authenticate('jwt', { session: false }), backProject.bind(this, models));
-    const res = await $.post(`${app.serverUrl()}/cw/back-project`, {
-      backer,
-      amount,
-      projectHash,
-      auth: true,
-      jwt: app.user.jwt
-    });
-    if (res['status'] === 'Success') {
-      await this.updateState();
-    }
+    // const res = await $.post(`${app.serverUrl()}/cw/back-project`, {
+    //   backer,
+    //   amount,
+    //   projectHash,
+    //   auth: true,
+    //   jwt: app.user.jwt
+    // });
+    // if (res['status'] === 'Success') {
+    //   await this.updateState();
+    // }
   }
 
   public async redeemCToken(
@@ -192,16 +195,15 @@ export default class CommonwealthProtocol {
     projectHash: string,
   ) {
     // router.post('/cw/redeem-bToken', passport.authenticate('jwt', { session: false }), backProject.bind(this, models));
-    const res = await $.post(`${app.serverUrl()}/cw/back-project`, {
-      curator,
-      amount,
-      projectHash,
-      auth: true,
-      jwt: app.user.jwt
-    });
-    if (res['status'] === 'Success') {
-      await this.updateState();
-    }
+    // const res = await $.post(`${app.serverUrl()}/cw/back-project`, {
+    //   curator,
+    //   amount,
+    //   projectHash,
+    //   auth: true,
+    //   jwt: app.user.jwt
+    // });
+    // if (res['status'] === 'Success') {
+    //   await this.updateState();
+    // }
   }
-
 }

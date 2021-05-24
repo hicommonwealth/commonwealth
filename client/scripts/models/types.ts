@@ -36,9 +36,10 @@ export enum ChainNetwork {
   MarlinTestnet = 'marlin-testnet',
   Metacartel = 'metacartel',
   ALEX = 'alex',
-  Commonwealth = 'commonwealth',
   Clover = 'clover',
-  HydraDX = 'hydradx'
+  HydraDX = 'hydradx',
+  CMNKovan = 'CMN-kovan',
+  CMNLocal = 'CMN-local',
 }
 
 // This function returns a default chain for a chainbase
@@ -72,7 +73,8 @@ export function networkToBase(n: ChainNetwork | string): ChainBase {
     case ChainNetwork.Ethereum: return ChainBase.Ethereum;
     case ChainNetwork.Moloch: return ChainBase.Ethereum;
     case ChainNetwork.Metacartel: return ChainBase.Ethereum;
-    case ChainNetwork.Commonwealth: return ChainBase.Ethereum;
+    case ChainNetwork.CMNKovan: return ChainBase.Ethereum;
+    case ChainNetwork.CMNLocal: return ChainBase.Ethereum;
     case ChainNetwork.ALEX: return ChainBase.Ethereum;
     case ChainNetwork.Marlin: return ChainBase.Ethereum;
     case ChainNetwork.MarlinTestnet: return ChainBase.Ethereum;
@@ -104,6 +106,8 @@ export enum ChainClass {
   MarlinTestnet = 'marlin-testnet',
   ALEX = 'alex',
   Commonwealth = 'commonwealth',
+  CMNLocal = 'CMN-local',
+  CMNKovan = 'CMN-kovan',
 }
 
 // TODO: this is inconsistently used
