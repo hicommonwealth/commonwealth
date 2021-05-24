@@ -5,9 +5,8 @@ import BN from 'bn.js';
 import app, { IApp } from 'state';
 import { ERC20Token } from 'adapters/chain/ethereum/types';
 import { CWProtocol, CWProject } from 'models/CWProtocol';
-import { CwProtocolFactory as CWProtocolFactory } from 'CwProtocolFactory';
 import { CwProjectFactory as CWProjectFactory } from 'CwProjectFactory';
-import { CwProject as CWProjectContract } from 'CWProject';
+import { CwProject as CWProjectContract } from 'CwProject';
 
 import CommonwealthChain from './chain';
 import CommonwealthAPI from './api';
@@ -42,6 +41,8 @@ export default class CommonwealthProtocol {
 
     const protocolFee = new BN((await this._api.Contract.protocolFee()).toString(), 10);
     const feeTo = await this._api.Contract.feeTo();
+    console.log('====>protocolFee', protocolFee);
+    console.log('====>feeTo', feeTo);
 
     const projects: CWProject[] =  await this.retrieveProjects();
     const newProtocol = new CWProtocol('root', 'root', protocolFee, feeTo, projects);
