@@ -17,6 +17,7 @@ import CompoundalphaChain from './chain';
 import CompoundalphaGovernance from './governance';
 import CompoundalphaProposal from './proposal';
 import CompoundalphaHolders from './holders';
+import Token from '../token/adapter';
 
 export default class Compoundalpha extends IChainAdapter<EthereumCoin, EthereumAccount> {
   public readonly base = ChainBase.Ethereum;
