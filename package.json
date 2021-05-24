@@ -10,11 +10,11 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "prepare": "npx install-peers",
     "unit-test": "nyc ts-mocha --config ./.mocharc.json ./test/unit/**/*.spec.ts",
     "marlin-test": "nyc ts-mocha --config ./.mocharc.json ./test/integration/marlin.spec.ts",
     "integration-test": "nyc ts-mocha --config ./.mocharc.json ./test/integration/*.spec.ts",
     "test": "nyc ts-mocha --config ./.mocharc.json ./test/integration/*.spec.ts ./test/unit/**/*.spec.ts",
+    "prepare": "install-peers",
     "lint": "eslint src/ test/",
     "listen": "ts-node -T ./scripts/listener.ts",
     "listen-archival": "ts-node -T ./scripts/listener.ts -n edgeware-local -a true",

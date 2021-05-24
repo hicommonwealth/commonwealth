@@ -186,29 +186,22 @@ export function ParseType(
     }
     case 'bounties': {
       switch (method) {
-        case 'proposeBounty':
         case 'BountyProposed':
           return EventKind.TreasuryBountyProposed;
-        case 'rejectBounty': // TODO: To be tested
         case 'BountyRejected':
           return EventKind.TreasuryBountyRejected;
-        case 'acceptCurator':
         case 'BountyBecameActive':
           return EventKind.TreasuryBountyBecameActive;
-        case 'awardBounty':
         case 'BountyAwarded':
           return EventKind.TreasuryBountyAwarded;
-        case 'claimBounty':
         case 'BountyClaimed':
           return EventKind.TreasuryBountyClaimed;
-        case 'cancelBounty': // TODO: To be tested
         case 'BountyCanceled':
           return EventKind.TreasuryBountyCanceled;
-        case 'extendBountyExpiry':
         case 'BountyExtended':
           return EventKind.TreasuryBountyExtended;
         default:
-          throw new Error('invalid case: ' + method);
+          throw new Error('invalid case');
       }
     }
     default:
