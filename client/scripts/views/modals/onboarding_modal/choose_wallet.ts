@@ -41,7 +41,7 @@ const ChooseWallet: m.Component<IOnboardingChooseWalletAttr, IOnboardingChooseWa
     };
 
     const allChains = app.config.chains.getAll();
-    const sortedChainBases = [ChainBase.CosmosSDK, ChainBase.Ethereum, ChainBase.NEAR, ChainBase.Substrate].filter((base) => allChains.find((chain) => chain.base === base));
+    const sortedChainBases = Object.values(ChainBase).filter((base) => allChains.find((chain) => chain.base === base));
 
     const chainbase = app.chain?.meta?.chain?.base;
     const items = app.chain ? (matchBase(chainbase) ? [ getWalletItemForChainBase(chainbase) ] : []) : sortedChainBases.filter((base) => matchBase(base)).map((base) => getWalletItemForChainBase(base));

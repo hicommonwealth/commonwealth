@@ -10,13 +10,6 @@ import app from 'state';
 import { Account, AddressInfo, ChainInfo, ChainBase, Profile } from 'models';
 import { formatAddressShort } from '../../../../../shared/utils';
 
-export const CHAINBASE_SHORT_FOR_AVATAR = {
-  [ChainBase.CosmosSDK]: 'COS',
-  [ChainBase.Ethereum]: 'ETH',
-  [ChainBase.NEAR]: 'NEAR',
-  [ChainBase.Substrate]: 'SUB',
-};
-
 const User: m.Component<{
   user: Account<any> | AddressInfo | Profile;
   avatarSize?: number;

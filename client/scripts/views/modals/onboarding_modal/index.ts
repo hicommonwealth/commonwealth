@@ -20,6 +20,15 @@ import OnboardingSetupProfile from './setup_profile_tab';
 import OnboardingJoinCommunity from './join_community';
 import OnboardingCLI from './claim_with_cli';
 
+enum OnboardingStep {
+  Connect = 0,
+  ChooseWallet = 1,
+  ChooseAddress = 2,
+  SetupProfile = 3,
+  JoinCommunity = 4,
+  CLI = 5
+}
+
 interface IOnboardingState {
   step: number;
   selected: ChainBase;
@@ -35,7 +44,7 @@ interface IOnboardingAttrs {
 
 const OnboardingModal: m.Component<IOnboardingAttrs, IOnboardingState> = {
   oninit: (vnode) => {
-    vnode.state.step = parseInt(vnode.attrs.step, 10) || 0;
+    vnode.state.step = parseInt(vnode.attrs.step, 10) || OnboardingStep.Connect;
     vnode.state.selected = null;
     vnode.state.account = null;
   },
@@ -116,26 +125,26 @@ const OnboardingModal: m.Component<IOnboardingAttrs, IOnboardingState> = {
 
     return m('.OnboardingModal', [
       m(OnboardingProgressBar, { step: vnode.state.step }),
-      step === 0 ? m(OnboardingConnect, {
+      step === OnboardingStep.Connect ? m(OnboardingConnect, {
         address,
         onUseWallet: () => {
-          vnode.state.step = 1;
+          vnode.state.step = OnboardingStep.ChooseWallet;
         },
         onUseCLI: () => {
-          vnode.state.step = 5;
+          vnode.state.step = OnboardingStep.CLI;
         }
       })
-        : step === 1 ? m(OnboardingChooseWallet, {
+        : step === OnboardingStep.ChooseWallet ? m(OnboardingChooseWallet, {
           selected: vnode.state.selected,
           onSelect: (base) => {
             vnode.state.selected = base;
           },
           onBack: () => {
-            vnode.state.step = 0;
+            vnode.state.step = OnboardingStep.Connect;
             vnode.state.selected = null;
           },
           onNext: () => {
-            vnode.state.step = 2;
+            vnode.state.step = OnboardingStep.ChooseAddress;
             if (joiningCommunity) {
               app.modals.removeAll();
 
@@ -144,56 +153,56 @@ const OnboardingModal: m.Component<IOnboardingAttrs, IOnboardingState> = {
                 base: m.route.param('base'),
                 joiningChain,
                 joiningCommunity,
-                step: 2,
+                step: OnboardingStep.ChooseAddress,
               });
             }
           },
-        }) : step === 2 ? m(OnboardingChooseAddress, {
+        }) : step === OnboardingStep.ChooseAddress ? m(OnboardingChooseAddress, {
           address,
           joiningChain,
           joiningCommunity,
           base: vnode.state.selected,
           onBack: () => {
-            vnode.state.step = 1;
+            vnode.state.step = OnboardingStep.ChooseWallet;
             if (joiningCommunity) {
               app.modals.removeAll();
               m.route.set(`/${joiningCommunity}/account/${vnode.attrs.address}`, {
                 base: m.route.param('base'),
                 joiningChain: vnode.attrs.joiningChain,
                 joiningCommunity: vnode.attrs.joiningCommunity,
-                step: 1,
+                step: OnboardingStep.ChooseWallet,
               });
             }
           },
           onNext: (account: Account<any>) => {
             vnode.state.account = account;
-            vnode.state.step = 3;
+            vnode.state.step = OnboardingStep.SetupProfile;
           },
           accountVerifiedCallback
-        }) : step === 3 ? m(OnboardingSetupProfile, {
+        }) : step === OnboardingStep.SetupProfile ? m(OnboardingSetupProfile, {
           account: vnode.state.account,
           onBack: () => {
-            vnode.state.step = 2;
+            vnode.state.step = OnboardingStep.ChooseAddress;
           },
           onNext: () => {
-            vnode.state.step = 4;
+            vnode.state.step = OnboardingStep.JoinCommunity;
           }
-        }) : step === 4 ? m(OnboardingJoinCommunity, {
+        }) : step === OnboardingStep.JoinCommunity ? m(OnboardingJoinCommunity, {
           account: vnode.state.account,
           onBack: () => {
-            vnode.state.step = 3;
+            vnode.state.step = OnboardingStep.SetupProfile;
           },
           onNext: () => {
             $('.OnboardingModal').trigger('modalexit');
             notifySuccess('Claimed the address successfully!');
           }
-        }) : step === 5 ? m(OnboardingCLI, {
+        }) : step === OnboardingStep.CLI ? m(OnboardingCLI, {
           address,
           onBack: () => {
-            vnode.state.step = 0;
+            vnode.state.step = OnboardingStep.Connect;
           },
           onNext: () => {
-            vnode.state.step = 3;
+            vnode.state.step = OnboardingStep.SetupProfile;
           },
           accountVerifiedCallback
         }) : '',
