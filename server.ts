@@ -99,7 +99,6 @@ async function main() {
       return 0;
     } catch (e) {
       console.error(`Chain event listener setup failed: ${e.message}`);
-      // MAXTODO we left off here
       return 1;
     }
   };
