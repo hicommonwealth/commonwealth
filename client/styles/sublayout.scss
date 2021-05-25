@@ -2,7 +2,7 @@
 
 @mixin narrowBrowserHeader {
     .sublayout-header-right {
-        .User {
+        > .cui-button > .cui-button-label > .User {
             .user-display-name {
                 display: none;
             }
