@@ -33,7 +33,7 @@ export class SubstrateBounty extends Proposal<ApiPromise, SubstrateCoin, ISubstr
     return `#${this.identifier.toString()}`;
   }
 
-  public setStatus (status) {
+  public setStatus(status) {
     this._title = status.title;
     this._isActive = status.isActive;
     this._isApproved = status.isApproved;
@@ -45,6 +45,12 @@ export class SubstrateBounty extends Proposal<ApiPromise, SubstrateCoin, ISubstr
     this._updateDue = status.updateDue;
     this._unlockAt = status.unlockAt;
     this._beneficiary = status.beneficiary?.toString();
+
+    this._fee = this._Chain.coins(status.fee);
+    this._curatorDeposit = this._Chain.coins(status.curatorDeposit);
+  }
+  public setUpdateDue(updateDue) {
+    this._updateDue = updateDue;
   }
   private _title: string;
   private _isActive: boolean;
@@ -88,10 +94,10 @@ export class SubstrateBounty extends Proposal<ApiPromise, SubstrateCoin, ISubstr
   public readonly _bond: SubstrateCoin;
   public get bond() { return this._bond; }
 
-  public readonly _fee: SubstrateCoin;
+  public _fee: SubstrateCoin;
   public get fee() { return this._fee; }
 
-  public readonly _curatorDeposit: SubstrateCoin;
+  public _curatorDeposit: SubstrateCoin;
   public get curatorDeposit() { return this._curatorDeposit; }
 
   public get votingType() {
@@ -199,9 +205,9 @@ export class SubstrateBounty extends Proposal<ApiPromise, SubstrateCoin, ISubstr
       }
       // proposal rejected by council
       case SubstrateTypes.EventKind.TreasuryBountyRejected: {
-        this.complete();
         this._awarded = false;
         this._active = false;
+        this.complete();
         break;
       }
       // curator accepted
@@ -212,6 +218,8 @@ export class SubstrateBounty extends Proposal<ApiPromise, SubstrateCoin, ISubstr
       }
       // extended by curator
       case SubstrateTypes.EventKind.TreasuryBountyExtended: {
+        // clear updateDue, it can be re-fetched if needed
+        this._updateDue = null;
         break;
       }
       // awarded by curator
@@ -223,8 +231,8 @@ export class SubstrateBounty extends Proposal<ApiPromise, SubstrateCoin, ISubstr
       }
       // claimed by recipient
       case SubstrateTypes.EventKind.TreasuryBountyClaimed: {
-        this.complete();
         this._active = false;
+        this.complete();
         break;
       }
       // rejected by council (?)

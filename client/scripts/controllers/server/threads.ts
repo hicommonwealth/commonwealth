@@ -47,11 +47,18 @@ export const modelFromServer = (thread) => {
     chain_entities,
     offchain_voting_ends_at,
     offchain_voting_votes,
+    reactions
   } = thread;
 
   const attachments = OffchainAttachments
     ? OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
     : [];
+
+  if (reactions) {
+    for (const reaction of reactions) {
+      app.reactions.store.add(modelReactionFromServer(reaction));
+    }
+  }
 
   let versionHistoryProcessed;
   if (version_history) {
