@@ -143,4 +143,8 @@
   section.LandingPageTokenHolders {
     @apply mx-auto pt-20
   }
+
+  .menu-open {
+    @apply fixed bottom-0 top-0 right-0 left-0 rounded-none;
+  }
 }
