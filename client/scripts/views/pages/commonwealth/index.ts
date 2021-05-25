@@ -87,7 +87,7 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
           { class: 'mt-20' },
           m('img', {
             class: 'mx-auto my-auto',
-            src: 'static/img/Group 87.svg',
+            src: 'static/img/group-87.svg',
             alt: '',
           })
         ),
