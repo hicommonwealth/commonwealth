@@ -1,7 +1,7 @@
 import request from 'superagent';
 import { Op } from 'sequelize';
 import { capitalize } from 'lodash';
-import { SubstrateEvents } from '@commonwealth/chain-events';
+import { SubstrateEvents, Erc20Events } from '@commonwealth/chain-events';
 
 import { NotificationCategories } from '../shared/types';
 import { smartTrim, validURL, renderQuillDeltaToText } from '../shared/utils';
@@ -26,11 +26,21 @@ const REGEX_EMOJI = /([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF
 const getFilteredContent = (content, address) => {
   let event;
   if (content.chainEvent && content.chainEventType) {
-    event = SubstrateEvents.Label(
-      content.chainEvent.block_number,
-      content.chainEventType.chain,
-      content.chainEvent.event_data
-    );
+    // Check to see if it's an Erc20 event... TODO is there a better way to do this?
+    if (content.chainEvent.event_data.kind === 'approval'
+    || content.chainEvent.event_data.kind === 'transfer') {
+      event = Erc20Events.Label(
+        content.chainEvent.block_number,
+        content.chainEventType.chain,
+        content.chainEvent.event_data
+      );
+    } else {
+      event = SubstrateEvents.Label(
+        content.chainEvent.block_number,
+        content.chainEventType.chain,
+        content.chainEvent.event_data
+      );
+    }
     const title = `${capitalize(content.chainEventType.chain)}`;
     const chainEventLink = `${SERVER_URL}/${content.chainEventType.chain}`;
     const fulltext = `${event.heading} on ${capitalize(content.chainEventType?.chain)} at block`
