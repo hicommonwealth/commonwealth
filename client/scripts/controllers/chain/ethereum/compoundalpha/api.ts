@@ -1,6 +1,6 @@
 import { AsyncSendable } from 'ethers/providers';
 
-import { Uni } from 'Uni'; // @TODO: Change to COMP
+import { Uni } from 'Uni'; 
 import { GovernorAlpha } from 'GovernorAlpha';
 import { GovernorAlphaFactory } from 'GovernorAlphaFactory';
 import ContractApi, { ContractFactoryT } from 'controllers/chain/ethereum/contractApi';
@@ -17,11 +17,11 @@ export default class CompoundalphaAPI extends ContractApi<Uni> {
 
   constructor(
     factory: ContractFactoryT<Uni>,
-    mPondAddress: string,
+    compAddress: string,
     governorAlphaAddress: string,
     web3Provider: AsyncSendable,
   ) {
-    super(factory, mPondAddress, web3Provider);
+    super(factory, compAddress, web3Provider);
     this._GovernorAlphaAddress = governorAlphaAddress;
     this._GovernorAlphaContract = GovernorAlphaFactory.connect(governorAlphaAddress, this.Provider);
   }
