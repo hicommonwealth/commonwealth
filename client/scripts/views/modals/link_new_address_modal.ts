@@ -252,13 +252,17 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
           try {
             if (vnode.attrs.joiningChain
                 && !app.user.getRoleInCommunity({ account, chain: vnode.attrs.joiningChain })) {
-              await app.user.createRole({ address: addressInfo, chain: vnode.attrs.joiningChain });
+              await app.user.createRole({
+                address: addressInfo,
+                chain: vnode.attrs.joiningChain,
+              });
             } else if (vnode.attrs.joiningCommunity
                        && !app.user.getRoleInCommunity({ account, community: vnode.attrs.joiningCommunity })) {
               await app.user.createRole({ address: addressInfo, community: vnode.attrs.joiningCommunity });
             }
           } catch (e) {
             // this may fail if the role already exists, e.g. if the address is being migrated from another user
+            console.error('Failed to create role');
           }
 
           // set the address as active
@@ -295,8 +299,9 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
         await initAppState(false);
         // load addresses for the current chain/community
         if (app.community) {
-          await updateActiveAddresses(undefined);
+          await updateActiveAddresses();
         } else if (app.chain) {
+          // TODO: this breaks when the user action creates a new token forum
           const chain = app.user.selectedNode
             ? app.user.selectedNode.chain
             : app.config.nodes.getByChain(app.activeChainId())[0].chain;

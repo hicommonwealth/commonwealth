@@ -1,12 +1,20 @@
 @import 'client/styles/shared';
-@import './index';
+@import 'components/sidebar';
 
-.MobileSidebarHeader {
+.MobileHeader {
+    * {
+        -webkit-tap-highlight-color:  rgba(255, 255, 255, 0); 
+    }
     // only content styles here. layout styles are in layout.scss
     background: $background-color-white;
     border-bottom: 1px solid $border-color-lightest;
 
-    .mobile-sidebar-center {
+    img.mobile-logo {
+        height: 36px;
+        top: 1px;
+        position: relative;
+    }
+    .mobile-header-center {
         flex: 1;
         max-width: calc(100% - 100px);
         &.logged-in {
@@ -16,18 +24,11 @@
             max-width: calc(100% - 142px);
         }
     }
-    .mobile-sidebar-left {
-        padding-left: 6px !important;
-    }
-    .mobile-sidebar-right {
-        padding-right: 13px !important;
-    }
 
     // TODO: split this up so CSS classes aren't duplicated
-    .mobile-sidebar-left,
-    .mobile-sidebar-center,
-    .mobile-sidebar-right {
-        padding: 10px 0;
+    .mobile-header-left,
+    .mobile-header-center,
+    .mobile-header-right {
         .CommunitySelector .cui-button {
             width: 100%;
             padding: 0 14px;
@@ -51,12 +52,28 @@
         > .MobileNewProposalButton,
         > .community-label,
         > .LoginSelector {
-            margin-left: 9px;
+            margin-left: 5px;
         }
-        > .cui-button .cui-button-label {
-            display: inline-block;
-            position: relative;
-            top: 1px;
+        > .cui-button {
+            &.no-border {
+                border: none;
+            }
+            .cui-button-label {
+                display: inline-block;
+                position: relative;
+                top: 1px;
+                .CustomHamburgerIcon {
+                    position: relative;
+                    right: 1.5px;
+                }
+            }
+        }
+        .mobile-header-trigger {
+            .cui-icon-x > svg {
+                height: 26px;
+                width: 26px;
+                stroke: black;
+            }
         }
         @include xs-max {
             .MobileNewProposalButton .cui-button {
@@ -72,7 +89,7 @@
                     top: 2px;
                 }
             }
-            .cui-button.mobile-sidebar-trigger {
+            .cui-button.mobile-header-trigger {
                 padding-left: 12px;
                 padding-right: 12px;
                 .cui-icon {
@@ -123,9 +140,15 @@
     }
 }
 
-.MobileSidebarPopoverMenu {
+.MobileHeaderPopoverMenu {
     @include sidebar();
-    margin: 0 10px;
+    transform: none !important;
+    position: absolute;
+    top: 61px !important;
+    will-change: initial !important;
+    .cui-menu {
+        border: none;
+    }
     .sidebar-spacer {
         margin-top: 20px;
     }
@@ -135,9 +158,8 @@
         margin-top: 20px;
         margin-bottom: 6px;
     }
-    .cui-menu {
-        padding: 20px 16px;
-        border-color: $border-color-lightest;
+    .cui-popover-arrow {
+        display: none;
     }
     .cui-button {
         margin-bottom: 6px;

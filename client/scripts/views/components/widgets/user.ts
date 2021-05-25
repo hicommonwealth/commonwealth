@@ -186,37 +186,58 @@ const User: m.Component<{
 };
 
 export const UserBlock: m.Component<{
-  user: Account<any> | AddressInfo,
+  user: Account<any> | AddressInfo | Profile,
   hideIdentityIcon?: boolean,
   popover?: boolean,
   showRole?: boolean,
   showAddressWithDisplayName?: boolean,
+  showFullAddress?: boolean,
+  searchTerm?: string,
   showChainName?: boolean,
   hideOnchainRole?: boolean,
   selected?: boolean,
   compact?: boolean,
+  linkify?: boolean,
+  avatarSize?: number,
 }> = {
   view: (vnode) => {
     const {
-      user, hideIdentityIcon, popover, showRole, hideOnchainRole, showAddressWithDisplayName, showChainName, selected, compact
+      user, hideIdentityIcon, popover, showRole, searchTerm,
+      hideOnchainRole, showAddressWithDisplayName, showChainName,
+      selected, compact, linkify, showFullAddress
     } = vnode.attrs;
 
     let profile;
     if (user instanceof AddressInfo) {
       if (!user.chain || !user.address) return;
       profile = app.profiles.getProfile(user.chain, user.address);
+    } else if (user instanceof Profile) {
+      profile = user;
     } else {
       profile = app.profiles.getProfile(user.chain.id, user.address);
     }
 
-    return m('.UserBlock', {
-      class: compact ? 'compact' : ''
-    }, [
+    const highlightSearchTerm = profile?.address
+      && searchTerm
+      && profile.address.toLowerCase().includes(searchTerm);
+    const highlightedAddress = highlightSearchTerm ? (() => {
+      const isNear = profile.address.chain === 'near';
+      const queryStart = profile.address.toLowerCase().indexOf(searchTerm);
+      const queryEnd = queryStart + searchTerm.length;
+
+      return ([
+        m('span', profile.address.slice(0, queryStart)),
+        m('mark', profile.address.slice(queryStart, queryEnd)),
+        m('span', profile.address.slice(queryEnd, profile.address.length)),
+      ]);
+    })() : null;
+
+    const children = [
       m('.user-block-left', [
         m(User, {
           user,
           avatarOnly: true,
-          avatarSize: 28,
+          avatarSize: vnode.attrs.avatarSize || 28,
           popover,
         }),
       ]),
@@ -234,7 +255,9 @@ export const UserBlock: m.Component<{
         m('.user-block-address', {
           class: profile?.address ? '' : 'no-address',
         }, [
-          profile?.address && formatAddressShort(profile.address, profile.chain),
+          highlightSearchTerm
+            ? highlightedAddress
+            : showFullAddress ? profile.address : formatAddressShort(profile.address, profile.chain),
           profile?.address && showChainName && ' · ',
           showChainName && (typeof user.chain === 'string' ? user.chain : user.chain.name),
         ]),
@@ -242,7 +265,17 @@ export const UserBlock: m.Component<{
       m('.user-block-right', [
         m('.user-block-selected', selected ? m(Icon, { name: Icons.CHECK }) : ''),
       ]),
-    ]);
+    ];
+
+    const userLink = profile
+      ? `/${m.route.param('scope') || profile.chain}/account/${profile.address}?base=${profile.chain}`
+      : 'javascript:';
+
+    return linkify
+      ? link('.UserBlock', userLink, children)
+      : m('.UserBlock', {
+        class: compact ? 'compact' : ''
+      }, children);
   }
 };
 

@@ -262,9 +262,7 @@ const TXSigningWebWalletOption: m.Component<{
         console.error(e);
       }
     };
-    const isWebWalletAvailable = webWallet?.available;
-    const isWebWalletEnabled = webWallet?.enabled;
-    const isAuthorInWebWallet = webWallet && !!webWallet.accounts.find((v) => {
+    const foundAuthorInWebWallet = webWallet && !!webWallet.accounts.find((v) => {
       return AddressSwapper({
         address: v.address,
         currentPrefix: (app.chain as Substrate).chain.ss58Format,
@@ -280,14 +278,20 @@ const TXSigningWebWalletOption: m.Component<{
         type: 'submit',
         intent: 'primary',
         rounded: true,
-        disabled: !isWebWalletEnabled || !isAuthorInWebWallet,
-        onclick: async (e) => { await transact(); },
+        disabled: !webWallet || (webWallet?.enabled && !foundAuthorInWebWallet),
+        onclick: async (e) => {
+          if (webWallet && !webWallet.available) {
+            await vnode.attrs.wallet.enable();
+            m.redraw();
+          }
+          await transact();
+        },
         oncreate: (vvnode) => $(vvnode.dom).focus(),
-        label: !isWebWalletAvailable
+        label: !webWallet
           ? 'No extension detected'
-          : !isWebWalletEnabled
+          : !webWallet.enabled
             ? 'Connect to extension'
-            : !isAuthorInWebWallet
+            : !foundAuthorInWebWallet
               ? 'Current address not in wallet'
               : 'Sign and send transaction'
       }),
@@ -369,7 +373,7 @@ const TXSigningModalStates: {
   Intro: {
     view: (vnode) => {
       const txLabel = getTransactionLabel(vnode.attrs.txType);
-      const polkaWallet = app.wallets.availableWallets(app.chain.base)
+      const polkaWallet = app.wallets.wallets
         .find((w) => w instanceof PolkadotWebWalletController);
 
       return m('.TXSigningModalBody.Intro', [
@@ -395,7 +399,6 @@ const TXSigningModalStates: {
               && polkaWallet.available
               && polkaWallet.enabled
               && polkaWallet.accounts.find((v) => v.address === vnode.attrs.author.address),
-            disabled: !polkaWallet?.available,
           }, {
             name: 'Command line',
             content: m(TXSigningCLIOption, {

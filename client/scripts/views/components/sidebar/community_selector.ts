@@ -1,29 +1,30 @@
 import 'components/sidebar/community_selector.scss';
 
 import m from 'mithril';
-import { Button, Icon, Icons, List, ListItem, PopoverMenu, MenuItem } from 'construct-ui';
+import { Button, Icon, Icons, ListItem, PopoverMenu } from 'construct-ui';
 
 import app from 'state';
 import { AddressInfo, ChainInfo, CommunityInfo, RoleInfo } from 'models';
-import { SwitchIcon } from 'helpers';
 
-import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
+import { ChainIcon, CommunityIcon, TokenIcon } from 'views/components/chain_icon';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import User, { UserBlock } from '../widgets/user';
 
 export const CommunityLabel: m.Component<{
   chain?: ChainInfo,
   community?: CommunityInfo,
+  token?: any,
   showStatus?: boolean,
   link?: boolean,
+  size?: number,
 }> = {
   view: (vnode) => {
-    const { chain, community, showStatus, link } = vnode.attrs;
+    const { chain, community, token, showStatus, link } = vnode.attrs;
 
     if (chain) return m('.CommunityLabel', [
       m('.community-label-left', [
         m(ChainIcon, {
-          size: 18,
+          size: vnode.attrs.size || 18,
           chain,
           onclick: link ? (() => m.route.set(`/${chain.id}`)) : null
         }),
@@ -39,7 +40,7 @@ export const CommunityLabel: m.Component<{
     if (community) return m('.CommunityLabel', [
       m('.community-label-left', [
         m(CommunityIcon, {
-          size: 18,
+          size: vnode.attrs.size || 18,
           community,
           onclick: link ? (() => m.route.set(`/${community.id}`)) : null
         }),
@@ -50,6 +51,25 @@ export const CommunityLabel: m.Component<{
           showStatus === true && [
             community.privacyEnabled && m(Icon, { name: Icons.LOCK, size: 'xs' }),
             !community.privacyEnabled && m(Icon, { name: Icons.GLOBE, size: 'xs' }),
+          ],
+        ]),
+      ]),
+    ]);
+
+    if (token) return m('.TokenLabel', [
+      m('.token-label-left', [
+        m(TokenIcon, {
+          size: vnode.attrs.size || 18,
+          token,
+          onclick: link ? (() => m.route.set(`/${token.id}`)) : null
+        }),
+      ]),
+      m('.token-label-right', [
+        m('.token-name-row', [
+          m('span.token-name', token.name),
+          showStatus === true && [
+            token.privacyEnabled && m(Icon, { name: Icons.LOCK, size: 'xs' }),
+            !token.privacyEnabled && m(Icon, { name: Icons.GLOBE, size: 'xs' }),
           ],
         ]),
       ]),
@@ -80,8 +100,13 @@ export const CurrentCommunityLabel: m.Component<{}> = {
   }
 };
 
-const CommunitySelector: m.Component<{ showTextLabel?: boolean }> = {
+const CommunitySelector: m.Component<{
+  showTextLabel?: boolean,
+  showListOnly?: boolean,
+  showHomeButtonAtTop?: boolean
+}> = {
   view: (vnode) => {
+    const { showTextLabel, showListOnly, showHomeButtonAtTop } = vnode.attrs;
     const activeEntityName = app.chain
       ? app.chain.meta.chain.name : app.community ? app.community.meta.name : 'Commonwealth';
     const allCommunities = (app.config.communities.getAll() as (CommunityInfo | ChainInfo)[])
@@ -192,7 +217,7 @@ const CommunitySelector: m.Component<{ showTextLabel?: boolean }> = {
                 ]),
               ]),
           })
-          : m.route.get() !== '/'
+          : (m.route.get() !== '/')
             ? m(ListItem, {
               class: 'select-list-back-home',
               label: '« Back home',
@@ -202,30 +227,53 @@ const CommunitySelector: m.Component<{ showTextLabel?: boolean }> = {
             }) : null;
     };
 
-    return m('.CommunitySelector', [
-      m('.title-selector', [
-        m(PopoverMenu, {
-          transitionDuration: 0,
-          hasArrow: false,
-          trigger: m(Button, {
-            rounded: true,
-            label: vnode.attrs.showTextLabel ? activeEntityName : m(Icon, { name: Icons.MENU }),
+    return showListOnly
+      ? m('.CommunitySelectList', [
+        showHomeButtonAtTop
+        && m('a.home-button', {
+          href: '/',
+          onclick: (e) => { m.route.set('/'); },
+        }, [
+          m('img.mobile-logo', {
+            src: 'https://commonwealth.im/static/img/logo.png',
+            style: 'height:18px;width:18px;background:black;border-radius:50%;'
           }),
-          inline: true,
-          class: 'CommunitySelectList',
-          content: [
-            app.isLoggedIn() && [
-              m('h4', 'Your communities'),
-              joinedCommunities.map(renderCommunity),
-              joinedCommunities.length === 0 && m('.community-placeholder', 'None'),
-              m('h4', 'Other communities'),
+          m('span', 'Home'),
+        ]),
+        app.isLoggedIn() && [
+          m('h4', 'Your communities'),
+          joinedCommunities.map(renderCommunity),
+          joinedCommunities.length === 0 && m('.community-placeholder', 'None'),
+          m('h4', 'Other communities'),
+        ],
+        unjoinedCommunities.map(renderCommunity),
+        !showHomeButtonAtTop
+        && renderCommunity('home'),
+      ])
+      : m('.CommunitySelector', [
+        m('.title-selector', [
+          m(PopoverMenu, {
+            transitionDuration: 0,
+            hasArrow: false,
+            trigger: m(Button, {
+              rounded: true,
+              label: showTextLabel ? activeEntityName : m(Icon, { name: Icons.MENU }),
+            }),
+            inline: true,
+            class: 'CommunitySelectList',
+            content: [
+              app.isLoggedIn() && [
+                m('h4', 'Your communities'),
+                joinedCommunities.map(renderCommunity),
+                joinedCommunities.length === 0 && m('.community-placeholder', 'None'),
+                m('h4', 'Other communities'),
+              ],
+              unjoinedCommunities.map(renderCommunity),
+              renderCommunity('home'),
             ],
-            unjoinedCommunities.map(renderCommunity),
-            renderCommunity('home'),
-          ],
-        })
-      ]),
-    ]);
+          })
+        ]),
+      ]);
   }
 };
 

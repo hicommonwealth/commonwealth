@@ -5,7 +5,7 @@ import $ from 'jquery';
 import { Tag, Button, Icon, Icons } from 'construct-ui';
 
 import app from 'state';
-import { Account, RoleInfo } from 'models';
+import { Account, RoleInfo, ChainBase } from 'models';
 import { UserBlock } from 'views/components/widgets/user';
 import { articlize, isSameAccount, formatAsTitleCase } from 'helpers';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
@@ -78,6 +78,8 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
         notifyError(err.responseJSON.error);
       });
     };
+
+    // const chainbase = (app.chain?.meta?.chain?.base.length != 0) ? app.chain?.meta?.chain?.base : ChainBase.Ethereum;
 
     return m('.SelectAddressModal', [
       m('.compact-modal-title', [

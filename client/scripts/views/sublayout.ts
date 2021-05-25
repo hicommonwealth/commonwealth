@@ -5,17 +5,15 @@ import app from 'state';
 import { EmptyState, Button, Icon, Icons, Grid, Col, Spinner } from 'construct-ui';
 import { link } from 'helpers';
 
-import NewProposalButton from 'views/components/new_proposal_button';
+import NewProposalButton, { MobileNewProposalButton } from 'views/components/new_proposal_button';
 import NotificationsMenu from 'views/components/header/notifications_menu';
 import InvitesMenu from 'views/components/header/invites_menu';
 import LoginSelector from 'views/components/header/login_selector';
 import Sidebar from 'views/components/sidebar';
-import MobileSidebarHeader from 'views/components/sidebar/mobile';
+import MobileHeader from 'views/mobile/mobile_header';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import Token from 'controllers/chain/ethereum/token/adapter';
-
-import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import Substrate from 'controllers/chain/substrate/main';
+import { SearchBar } from './components/search_bar';
 
 const Sublayout: m.Component<{
   // overrides
@@ -30,6 +28,8 @@ const Sublayout: m.Component<{
   showNewProposalButton?: boolean,
   showCouncilMenu?: boolean,
   hideSidebar?: boolean,
+  hideSearch?: boolean,
+  centerGrid?: boolean,
   alwaysShowTitle?: boolean,          // show page title even if app.chain and app.community are unavailable
 }> = {
   view: (vnode) => {
@@ -40,10 +40,13 @@ const Sublayout: m.Component<{
       showNewProposalButton,
       showCouncilMenu,
       hideSidebar,
+      hideSearch,
       alwaysShowTitle,
     } = vnode.attrs;
+
     const chain = app.chain ? app.chain.meta.chain : null;
     const community = app.community ? app.community.meta : null;
+    const narrowBrowserWidth = (window.innerWidth > 767.98) && (window.innerWidth < 850);
 
     const ICON_SIZE = 22;
     const sublayoutHeaderLeft = m('.sublayout-header-left', [
@@ -75,7 +78,8 @@ const Sublayout: m.Component<{
       m(LoginSelector),
       app.isLoggedIn() && m(InvitesMenu),
       app.isLoggedIn() && m(NotificationsMenu),
-      showNewProposalButton && m(NewProposalButton, { fluid: false }),
+      showNewProposalButton
+      && (narrowBrowserWidth ? m(MobileNewProposalButton) : m(NewProposalButton, { fluid: false })),
     ]);
 
     if (vnode.attrs.loadingLayout) return [
@@ -100,21 +104,22 @@ const Sublayout: m.Component<{
     return [
       m('.layout-container', [
         m('.Sublayout', { class: vnode.attrs.class }, [
-          m(MobileSidebarHeader),
+          m(MobileHeader),
           m('.sublayout-header', { class: !title ? 'no-title' : '' }, [
             m('.sublayout-header-inner', [
               sublayoutHeaderLeft,
+              !vnode.attrs.loadingLayout && !hideSearch && m(SearchBar),
               sublayoutHeaderRight,
             ]),
           ]),
           hero
             ? m('.sublayout-hero', hero)
-            : ((app.chain as Token)?.isToken && !(app.chain as Token)?.hasToken && app.isLoggedIn())
+            : (app.isLoggedIn() && (app.chain as Token)?.isToken && !(app.chain as Token)?.hasToken)
               ? m('.sublayout-hero.token-banner', [
                 m('.token-banner-content', `Link ${app.chain.meta.chain.symbol} address to participate in this community`),
               ]) : '',
           m('.sublayout-body', [
-            m('.sublayout-grid', [
+            m(`.sublayout-grid${vnode.attrs.centerGrid ? '.flex-center' : ''}`, [
               !hideSidebar && m('.sublayout-sidebar-col', [
                 m(Sidebar),
               ]),
