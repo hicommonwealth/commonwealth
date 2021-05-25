@@ -45,6 +45,9 @@ export class SubstrateBounty extends Proposal<ApiPromise, SubstrateCoin, ISubstr
     this._updateDue = status.updateDue;
     this._unlockAt = status.unlockAt;
     this._beneficiary = status.beneficiary?.toString();
+
+    this._fee = this._Chain.coins(status.fee);
+    this._curatorDeposit = this._Chain.coins(status.curatorDeposit);
   }
   public setUpdateDue(updateDue) {
     this._updateDue = updateDue;
@@ -91,10 +94,10 @@ export class SubstrateBounty extends Proposal<ApiPromise, SubstrateCoin, ISubstr
   public readonly _bond: SubstrateCoin;
   public get bond() { return this._bond; }
 
-  public readonly _fee: SubstrateCoin;
+  public _fee: SubstrateCoin;
   public get fee() { return this._fee; }
 
-  public readonly _curatorDeposit: SubstrateCoin;
+  public _curatorDeposit: SubstrateCoin;
   public get curatorDeposit() { return this._curatorDeposit; }
 
   public get votingType() {

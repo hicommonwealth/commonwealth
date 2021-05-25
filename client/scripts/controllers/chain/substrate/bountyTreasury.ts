@@ -85,12 +85,17 @@ class SubstrateBountyTreasury extends ProposalModule<
       }
       const data = {
         title: b.description,
+        // state
         isActive: b.bounty.status.isActive,
         isApproved: b.bounty.status.isApproved,
         isCuratorProposed: b.bounty.status.isCuratorProposed,
         isFunded: b.bounty.status.isFunded,
         isPendingPayout: b.bounty.status.isPendingPayout,
         isProposed: b.bounty.status.isProposed,
+        // metadata
+        fee: b.bounty.fee,
+        curatorDeposit: b.bounty.curatorDeposit,
+        bond: b.bounty.bond,
         curator: b.bounty.status.isCuratorProposed ? b.bounty.status.asCuratorProposed?.curator
           : b.bounty.status.isActive ? b.bounty.status.asActive.curator
           : b.bounty.status.isPendingPayout ? b.bounty.status.asPendingPayout.curator : null,

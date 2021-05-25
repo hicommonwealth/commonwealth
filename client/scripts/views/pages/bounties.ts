@@ -43,7 +43,7 @@ function getModules() {
 
 const bountyStatusToLabel = (bounty) => {
   if (bounty.complete) return 'Bounty claimed';
-  if (bounty.isPendingPayout) return 'Pending payout';
+  if (bounty.isPendingPayout) return 'Pending council review';
   if (bounty.isActive) return 'Active';
   if (bounty.isCuratorProposed) return 'Waiting for curator to accept';
   if (bounty.approved) return 'Waiting for spend period';
@@ -118,6 +118,10 @@ const BountyDetail = {
             disabled: true,
           }),
           m('p', [
+            'Bounty amount: ',
+            bounty.value && formatCoin(bounty.value),
+          ]),
+          m('p', [
             'Next spend period: ',
             (app.chain as Substrate).treasury.nextSpendBlock
               ? m(CountdownUntilBlock, {
@@ -138,6 +142,10 @@ const BountyDetail = {
               });
             }
           }),
+          m('p', [
+            'Bounty amount: ',
+            bounty.value && formatCoin(bounty.value),
+          ]),
         ] : bounty.isCuratorProposed ? [
           m(Button, {
             ...buttonAttrs,
@@ -154,11 +162,19 @@ const BountyDetail = {
             }
           }),
           m('p', [
+            'Bounty amount: ',
+            bounty.value && formatCoin(bounty.value),
+          ]),
+          m('p', [
             'Proposed curator: ',
             m(User, {
               user: new AddressInfo(null, bounty.curator, app.chain.id, null),
               linkify: true,
             }),
+          ]),
+          m('p', [
+            'Curator fee: ',
+            bounty.fee && formatCoin(bounty.fee),
           ]),
         ] : bounty.isActive ? [
           m(Button, {
@@ -184,11 +200,23 @@ const BountyDetail = {
             }
           }),
           m('p', [
+            'Bounty amount: ',
+            bounty.value && formatCoin(bounty.value),
+          ]),
+          m('p', [
             'Curator: ',
             m(User, {
               user: new AddressInfo(null, bounty.curator, app.chain.id, null),
               linkify: true,
             }),
+          ]),
+          m('p', [
+            'Curator fee: ',
+            bounty.fee && formatCoin(bounty.fee),
+          ]),
+          m('p', [
+            'Curator deposit: ',
+            bounty.fee && formatCoin(bounty.curatorDeposit),
           ]),
           m('p', [
             bounty.updateDue ? [
@@ -204,9 +232,20 @@ const BountyDetail = {
         ] : bounty.isPendingPayout ? [
           m(Button, {
             ...buttonAttrs,
-            label: 'Payout pending', // TODO: display time left
+            label: 'Payout pending',
             disabled: true,
-          })
+          }),
+          m('p', [
+            'Bounty amount: ',
+            bounty.value && formatCoin(bounty.value),
+          ]),
+          m('p', [
+            'Can be claimed in: ',
+            m(CountdownUntilBlock, {
+              block: bounty.unlockAt,
+              includeSeconds: false
+            })
+          ]),
         ] : bounty.isPendingPayout ? [
           m(Button, {
             ...buttonAttrs,
@@ -275,8 +314,12 @@ const BountiesPage: m.Component<{}> = {
     const modLoading = loadSubstrateModules('Bounties', getModules);
     if (modLoading) return modLoading;
 
-    const activeBounties = (app.chain as Substrate).bounties.store.getAll().filter((p) => !p.completed);
-    const inactiveBounties = (app.chain as Substrate).bounties.store.getAll().filter((p) => p.completed);
+    const activeBounties = (app.chain as Substrate).bounties.store.getAll().filter((p) => !p.completed && !p.isPendingPayout)
+      .sort((a, b) => +a.identifier - +b.identifier);
+    const pendingBounties = (app.chain as Substrate).bounties.store.getAll().filter((p) => !p.completed && p.isPendingPayout)
+      .sort((a, b) => +a.identifier - +b.identifier);
+    const inactiveBounties = (app.chain as Substrate).bounties.store.getAll().filter((p) => p.completed)
+      .sort((a, b) => +a.identifier - +b.identifier);
     const activeBountyContent = activeBounties.length
       ? activeBounties.map((bounty) => m(ProposalCard, {
         proposal: bounty,
@@ -284,8 +327,12 @@ const BountiesPage: m.Component<{}> = {
       }))
       : [ m('.no-proposals', 'None') ];
 
+    const pendingBountyContent = pendingBounties.length
+      ? pendingBounties.map((bounty) => m(ProposalCard, { proposal: bounty, injectedContent: m(BountyDetail, { bounty }), }))
+      : [ m('.no-proposals', 'None') ];
+
     const inactiveBountyContent = inactiveBounties.length
-      ? inactiveBounties.map((bounty) => m(ProposalCard, { proposal: bounty }))
+      ? inactiveBounties.map((bounty) => m(ProposalCard, { proposal: bounty, injectedContent: m(BountyDetail, { bounty }), }))
       : [ m('.no-proposals', 'None') ];
 
     return m(Sublayout, {
@@ -337,6 +384,11 @@ const BountiesPage: m.Component<{}> = {
       m(Listing, {
         content: activeBountyContent,
         columnHeader: 'Active Bounties',
+      }),
+      m('.clear'),
+      m(Listing, {
+        content: pendingBountyContent,
+        columnHeader: 'Payout Pending Review',
       }),
       m('.clear'),
       m(Listing, {
