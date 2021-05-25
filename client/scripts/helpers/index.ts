@@ -326,3 +326,14 @@ export const loadScript = (scriptURI) => {
     document.head.appendChild(script);
   });
 };
+
+export function formatSpace(key, space) {
+  space = {
+    key,
+    ...space,
+    members: space.members || [],
+    filters: space.filters || {}
+  };
+  if (!space.filters.minScore) space.filters.minScore = 0;
+  return space;
+}

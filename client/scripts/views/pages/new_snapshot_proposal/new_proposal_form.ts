@@ -8,18 +8,33 @@ import mixpanel from 'mixpanel-browser';
 import { Input, Form, FormLabel, FormGroup, Button, Callout } from 'construct-ui';
 import DatePicker from 'mithril-datepicker';
 import TimePicker from 'mithril-timepicker';
+import moment from 'moment';
+import getProvider from '@snapshot-labs/snapshot.js/src/utils/provider';
+import { getBlockNumber } from '@snapshot-labs/snapshot.js/src/utils/web3';
 
 import app from 'state';
+import snapshotClient from 'helpers/snapshot_client';
+import { formatSpace } from 'helpers';
 
 import { notifyError } from 'controllers/app/notifications';
 import QuillEditor from 'views/components/quill_editor';
 
+
+declare global {
+  interface ObjectConstructor {
+    fromEntries(xs: [string|number|symbol, any][]): object
+  }
+}
+
+const fromEntries = (xs: [string|number|symbol, any][]) =>
+  Object.fromEntries ? Object.fromEntries(xs) : xs.reduce((acc, [key, value]) => ({...acc, [key]: value}), {})
+
 DatePicker.localize({
   weekStart: 1,
   locale: 'en',
-  prevNextTitles: ['1M', '1A', '10A'],
+  prevNextTitles: ['1M', '1Y', '10Y'],
   formatOptions: {
-    weekday: 'long',
+    weekday: 'short',
     day: 'numeric',
     month: 'short',
     year: 'numeric'
@@ -27,16 +42,21 @@ DatePicker.localize({
 })
 
 interface IThreadForm {
-  name?: string;
+  name: string;
+  body: string;
   choices: string[];
   start: string;
   end: string;
-  snapshotBlockNumber: string;
+  snapshot: '',
+  metadata: {}
 }
 
 enum NewThreadErrors {
   NoBody = 'Proposal body cannot be blank',
   NoTitle = 'Title cannot be blank',
+  NoChoices = 'Choices cannot be blank',
+  NoStartDate = 'Start Date cannot be blank',
+  NoEndDate = 'End Date cannot be blank',
 }
 
 const newThread = async (
@@ -52,6 +72,18 @@ const newThread = async (
     throw new Error(NewThreadErrors.NoTitle);
   }
 
+  if (!form.start) {
+    throw new Error(NewThreadErrors.NoStartDate);
+  }
+
+  if (!form.end) {
+    throw new Error(NewThreadErrors.NoEndDate);
+  }
+
+  if (!form.choices[0] || !form.choices[1]) {
+    throw new Error(NewThreadErrors.NoChoices);
+  }
+
   if (quillEditorState.editor.editor.isBlank()) {
     throw new Error(NewThreadErrors.NoBody);
   }
@@ -65,32 +97,45 @@ const newThread = async (
       ? quillEditorState.editor.getText()
       : JSON.stringify(quillEditorState.editor.getContents());
 
-  let { name } = form;
-  const title = name;
-  const chainId = app.activeCommunityId() ? null : app.activeChainId();
-  const communityId = app.activeCommunityId();
+  form.body = bodyText;
+  let spaces: any = await snapshotClient.getSpaces();
 
-  let result;
-  // try {
-  //   result = await app.threads.create(
-  //     author.address,
-  //     kind,
-  //     stage,
-  //     chainId,
-  //     communityId,
-  //     title,
-  //     (topicName) ? topicName : 'General', // if no topic name set to default
-  //     topicId,
-  //     bodyText,
-  //     url,
-  //     attachments,
-  //     readOnly,
-  //   );
-  // } catch (e) {
-  //   console.error(e);
-  //   quillEditorState.editor.enable();
-  //   throw new Error(e);
-  // }
+  spaces = fromEntries(
+    Object.entries(spaces).map(space => [
+      space[0],
+      formatSpace(space[0], space[1])
+    ])
+  );
+  let space = spaces[app.chain.meta.chain.snapshot];
+  form.snapshot = await getBlockNumber(getProvider(space.network));
+  form.metadata.network = space.network;
+  form.metadata.strategies = space.strategies;
+
+  // console.log(form, "form");
+
+  try {
+    const result = await snapshotClient.broadcast(
+      web3Provider,
+      account,
+      space.key,
+      'proposal',
+      form
+    );
+    // dispatch('notify', [
+    //   'green',
+    //   type === 'delete-proposal'
+    //     ? i18n.global.t('notify.proposalDeleted')
+    //     : i18n.global.t('notify.yourIsIn', [type])
+    // ]);
+    const { ipfsHash } = result;
+  } catch (e) {
+    // const errorMessage =
+    //   e && e.error_description
+    //     ? `Oops, ${e.error_description}`
+    //     : i18n.global.t('notify.somethingWentWrong');
+    // dispatch('notify', ['red', errorMessage]);
+    return;
+  }
 
   await app.user.notifications.refresh();
 
@@ -115,10 +160,12 @@ export const NewProposalForm: m.Component<{}, {
   oninit: (vnode) => {
     vnode.state.form = {
       name: '',
-      choices: ['yes', 'no'],
+      body: '',
+      choices: ['Yes', 'No'],
       start: '',
       end: '',
-      snapshotBlockNumber: ''
+      snapshot: '',
+      metadata: {}
     };
   },
 
@@ -203,7 +250,7 @@ export const NewProposalForm: m.Component<{}, {
             ]),
           ]),
           m(Form, [
-            m('h2', 'Choices'),
+            m('h4', 'Choices'),
             m(FormGroup, [
               m(FormLabel, 'Choice 1'),
               m(Input, {
@@ -228,34 +275,26 @@ export const NewProposalForm: m.Component<{}, {
                 },
               }),
             ]),
-            m('h2', 'Start Date'),
+            m('h4', 'Start Date'),
             m(DatePicker,
               {
                 locale: 'en-us',
-                weekStart: 0
+                weekStart: 0,
+                onchange: function(chosenDate){
+                  vnode.state.form.start = moment(chosenDate).unix().toString();
+                }
               }
             ),
-            m(TimePicker, {
-              time: {
-                h: 21,
-                m: 0
-              },
-              increment: 15
-            }),
-            m('h2', 'End Date'),
+            m('h4', 'End Date'),
             m(DatePicker,
               {
                 locale: 'en-us',
-                weekStart: 0
+                weekStart: 0,
+                onchange: function(chosenDate){
+                  vnode.state.form.end = moment(chosenDate).unix().toString();
+                }
               }
             ),
-            m(TimePicker, {
-              time: {
-                h: 21,
-                m: 0
-              },
-              increment: 15
-            }),
           ]),
         ]),
       ]),
