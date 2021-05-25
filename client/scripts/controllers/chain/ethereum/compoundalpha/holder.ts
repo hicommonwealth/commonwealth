@@ -22,7 +22,7 @@ export default class CompoundalphaHolder extends EthereumAccount {
   public get balance(): Promise<Uni> {
     return this.initialized.then(() => this.isHolder
       ? this._balance
-      : new Uni(this._Holders.api.uniAddress, 0));
+      : new Uni(this._Holders.api.contractAddress, 0));
   }
 
   public get isHolder() { return this._isHolder; }
@@ -44,8 +44,8 @@ export default class CompoundalphaHolder extends EthereumAccount {
         throw new Error('Holder does not correspond with account');
       }
       this._isHolder = true;
-      this._balance = new Uni(this._Holders.api.uniAddress, new BN(data.balance));
-      this._delegates = new Uni(this._Holders.api.uniAddress, new BN(data.delegates));
+      this._balance = new Uni(this._Holders.api.contractAddress, new BN(data.balance));
+      this._delegates = new Uni(this._Holders.api.contractAddress, new BN(data.delegates));
       this._initialized = Promise.resolve(true);
     } else {
       this._initialized = new Promise((resolve, reject) => {
@@ -56,38 +56,38 @@ export default class CompoundalphaHolder extends EthereumAccount {
   }
 
   public async refresh() {
-    const balance = await this._Holders.api.uniContract?.balanceOf(this.address);
+    const balance = await this._Holders.api.Contract?.balanceOf(this.address);
     if (!balance.isZero()) {
       this._isHolder = true;
-      this._balance = new Uni(this._Holders.api.uniAddress, new BN(balance.toString()));
+      this._balance = new Uni(this._Holders.api.contractAddress, new BN(balance.toString()));
     } else {
       this._isHolder = false;
-      this._balance = new Uni(this._Holders.api.uniAddress, new BN(0));
+      this._balance = new Uni(this._Holders.api.contractAddress, new BN(0));
     }
-    const delegates = await this._Holders.api.uniContract.getCurrentVotes(this.address);
+    const delegates = await this._Holders.api.Contract.getCurrentVotes(this.address);
     if (!delegates.isZero()) {
       this._isDelegate = true;
-      this._delegates = new Uni(this._Holders.api.uniAddress, new BN(delegates.toString()));
+      this._delegates = new Uni(this._Holders.api.contractAddress, new BN(delegates.toString()));
     } else {
       this._isDelegate = false;
-      this._delegates = new Uni(this._Holders.api.uniAddress, new BN(0));
+      this._delegates = new Uni(this._Holders.api.contractAddress, new BN(0));
     }
   }
 
   public async priorDelegates(blockNumber: number | string) {
-    const delegates = await this._Holders.api.uniContract.getPriorVotes(this.address, blockNumber);
+    const delegates = await this._Holders.api.Contract.getPriorVotes(this.address, blockNumber);
     return new BN(delegates.toString(), 10) || new BN(0);
   }
 
   public async balanceOf() {
-    const balance = await this._Holders.api.uniContract.balanceOf(this.address);
+    const balance = await this._Holders.api.Contract.balanceOf(this.address);
     console.log('balanceOf Compoundalpha Accounts', balance);
     if (!balance.isZero()) {
       this._isHolder = true;
-      this._balance = new Uni(this._Holders.api.uniAddress, new BN(balance.toString()));
+      this._balance = new Uni(this._Holders.api.contractAddress, new BN(balance.toString()));
     } else {
       this._isHolder = false;
-      this._balance = new Uni(this._Holders.api.uniAddress, new BN(0));
+      this._balance = new Uni(this._Holders.api.contractAddress, new BN(0));
     }
     return balance.toString();
   }
