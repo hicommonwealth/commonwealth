@@ -42,13 +42,12 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
 
     const rowHeader: any = [
       (propType === OffchainThreadKind.Link && proposal.url)
-        && externalLink('a.external-discussion-link', proposal.url, [
-          extractDomain(proposal.url),
-        ]),
-      (propType === OffchainThreadKind.Link && proposal.url)
-        && m('span.spacer', ' '),
+        && [
+          externalLink('a.external-discussion-link', proposal.url, extractDomain(proposal.url)),
+          ' ', // en space
+        ],
       link('a', discussionLink, proposal.title),
-      m('span.spacer', m.trust(' &nbsp; ')),
+      ' ', // en space
       proposal instanceof OffchainThread
         && proposal.stage !== OffchainThreadStage.Discussion
         && [
@@ -95,18 +94,25 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
         }),
       ],
     ];
+
     const rowSubheader = [
-      proposal.readOnly && m('.discussion-locked', [
-        m(Tag, {
-          size: 'xs',
-          label: [
-            m(Icon, { name: Icons.LOCK, size: 'xs' }),
-          ],
-        }),
-      ]),
-      proposal.topic && link('a.proposal-topic', `/${app.activeId()}/discussions/${proposal.topic.name}`, [
-        m('span.proposal-topic-name', `${proposal.topic.name}`),
-      ]),
+      proposal.readOnly && [
+        m('.discussion-locked', [
+          m(Tag, {
+            size: 'xs',
+            label: [
+              m(Icon, { name: Icons.LOCK, size: 'xs' }),
+            ],
+          }),
+        ]),
+        ' ', // em space
+      ],
+      proposal.topic && [
+        link('a.proposal-topic', `/${app.activeId()}/discussions/${proposal.topic.name}`, [
+          m('span.proposal-topic-name', `${proposal.topic.name}`),
+        ]),
+        ' ', // em space
+      ],
       m(User, {
         user: new AddressInfo(null, proposal.author, proposal.authorChain, null),
         linkify: true,
@@ -115,13 +121,19 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
         showAddressWithDisplayName: true,
       }),
       proposal instanceof OffchainThread && proposal.collaborators && proposal.collaborators.length > 0
-        && m('span.proposal-collaborators', [ ' +', proposal.collaborators.length ]),
+        && [
+          ' ', // regular space
+          m('span.proposal-collaborators', [ ' +', pluralize(proposal.collaborators.length, 'collaborator') ]),
+          ' ', // em space
+        ],
+      ' ', // em space
       m('.created-at', link('a', discussionLink, `Last active ${formatLastUpdated(getLastUpdated(proposal))}`)),
+      ' ', // em space
       m('.mobile-comment-count', [
         m(Icon, { name: Icons.MESSAGE_SQUARE }),
         app.comments.nComments(proposal),
       ]),
-    ];
+    ] as any;
 
     const rowMetadata = [
       m('.discussion-row-right-meta', [

@@ -14,8 +14,8 @@
                 width: 8px;
             }
             a.external-discussion-link {
-                font-size: 17px;
-                color: $primary-bg-color;
+                font-size: 17px !important;
+                color: $primary-bg-color !important;
                 &:hover {
                     text-decoration: underline;
                 }
@@ -32,8 +32,7 @@
                 position: relative;
                 top: -1px;
                 margin: -2px 0;
-                margin-left: -1px;
-                margin-right: 5px;
+                margin-right: 6px;
                 border: none;
             }
         }
@@ -55,10 +54,6 @@
             a.proposal-topic {
                 display: inline-block;
                 color: $text-color-light;
-                &::after {
-                    content: ' ';
-                    margin: 0 8px;
-                }
             }
             .mobile-comment-count {
                 display: none !important;
@@ -66,10 +61,6 @@
                 white-space: nowrap;
                 @include xs-max {
                     display: inline !important;
-                }
-                &::before {
-                    content: ' ';
-                    margin: 0 8px;
                 }
                 .cui-icon svg {
                     position: relative;
@@ -85,26 +76,11 @@
             }
             .discussion-link {
                 color: $text-color-light;
-                &::after {
-                    content: ' ';
-                    margin: 0 8px;
-                }
             }
             .proposal-collaborators {
                 color: $text-color-light;
                 position: relative;
                 font-size: 17px;
-                &::before {
-                    content: ' ';
-                    margin: 0 2px;
-                }
-            }
-            > .created-at,
-            > .offchain-voting-stat {
-                &::before {
-                    content: ' ';
-                    margin: 0 8px;
-                }
             }
             > .User {
                 display: inline-flex;
@@ -129,7 +105,7 @@
     }
     .row-right {
         .discussion-row-right-meta {
-            margin-left: 20px;
+            margin-left: 8px;
             margin-right: 4px;
             .offchain-voting {
                 position: relative;
