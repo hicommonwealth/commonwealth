@@ -408,14 +408,12 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
     let topicId;
     let topicName;
     let topicDescription;
-    let topicTelegram;
     if (topic && app.activeId()) {
       const topics = app.topics.getByCommunity(app.activeId());
       const topicObject = topics.find((t) => t.name === topic);
       topicId = topicObject?.id;
       topicName = topicObject?.name;
       topicDescription = topicObject?.description;
-      topicTelegram = topicObject?.telegram;
     }
 
     localStorage.setItem(`${app.activeId()}-lookback-${subpage}`, `${vnode.state.lookback[subpage].unix()}`);
