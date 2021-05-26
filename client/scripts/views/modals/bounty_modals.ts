@@ -131,7 +131,7 @@ export const ProposeCuratorModal: m.Component<{ bountyId: number }, {
             $(e.target).trigger('modalcomplete');
             setTimeout(async () => {
               $(e.target).trigger('modalexit');
-              await alertModalWithText('Council motion created! Next, the motion must be approved & the curator must accept the bounty by putting down a deposit.')();
+              await alertModalWithText('Curator proposed! Next, the motion must be approved & the curator must accept.')();
             }, 0);
           },
           label: 'Go to send transaction',
@@ -181,7 +181,7 @@ export const AwardBountyModal: m.Component<{ bountyId: number }, { approvals: nu
             setTimeout(async () => {
               $(e.target).trigger('modalexit');
               await alertModalWithText(
-                'Bounty awarded! Once the review period has passed, the recipient will be able to claim their payout.'
+                'Payout recorded! Once the review period has passed, the recipient will be able to claim the bounty.'
               )();
             }, 0);
           },
@@ -229,7 +229,6 @@ export const ExtendExpiryModal: m.Component<{ bountyId: number }, { approvals: n
             $(e.target).trigger('modalcomplete');
             setTimeout(async () => {
               $(e.target).trigger('modalexit');
-              await alertModalWithText('Bounty extended!')();
             }, 0);
           },
           label: 'Go to send transaction',
