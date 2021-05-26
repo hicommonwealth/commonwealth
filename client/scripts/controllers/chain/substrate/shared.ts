@@ -478,7 +478,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
             } else if (status.isFinalized || status.isInBlock) {
               for (const e of result.events) {
                 if (this.api.events.system.ExtrinsicSuccess.is(e.event)) {
-                  console.log(`Confirmed ${txName}: "${objName}"`);
+                  notifySuccess(`Confirmed ${txName}`);
                   events.emit(TransactionStatus.Success.toString(), {
                     hash: status.isFinalized ? status.asFinalized.toHex() : status.asInBlock.toHex(),
                     blocknum: this.app.chain.block.height,

@@ -22,9 +22,6 @@
         border-top: 1px solid #eee;
         user-select: none;
         cursor: initial;
-        &:hover a {
-            text-decoration: underline;
-        }
         .no-linked-thread {
             color: $text-color-lightest;
         }

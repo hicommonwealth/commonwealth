@@ -19,13 +19,20 @@ const bulkEntities = async (models, req: Request, res: Response, next: NextFunct
   }
 
   const entityFindOptions: any = {
-    include: [ {
-      model: models.ChainEvent,
-      order: [
-        [ models.ChainEvent, 'id', 'asc' ]
-      ],
-      include: [ models.ChainEventType ],
-    } ],
+    include: [
+      {
+        model: models.ChainEvent,
+        order: [
+          [ models.ChainEvent, 'id', 'asc' ]
+        ],
+        include: [ models.ChainEventType ],
+      },
+      {
+        model: models.OffchainThread,
+        // attributes: ['title'],
+        // required: false,
+      }
+    ],
     order: [['created_at', 'DESC']],
     where: {
       chain: req.query.chain,
