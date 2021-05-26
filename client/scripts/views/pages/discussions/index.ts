@@ -7,7 +7,7 @@ import mixpanel from 'mixpanel-browser';
 import moment from 'moment';
 import app from 'state';
 
-import { Spinner, Button, ButtonGroup, Icons, Icon, PopoverMenu, MenuItem } from 'construct-ui';
+import { Spinner, Button, ButtonGroup, Icons, Icon, PopoverMenu, MenuItem, MenuDivider } from 'construct-ui';
 import { pluralize, offchainThreadStageToLabel } from 'helpers';
 import { NodeInfo, CommunityInfo, OffchainThreadStage, OffchainThread } from 'models';
 
@@ -47,7 +47,69 @@ const getLastSeenDivider = (hasText = true) => {
 const DiscussionStagesBar: m.Component<{ topic: string, stage: string }, {}> = {
   view: (vnode) => {
     const { topic, stage } = vnode.attrs;
+
+    const featuredTopicIds = app.community?.meta?.featuredTopics || app.chain?.meta?.chain?.featuredTopics;
+    const topics = app.topics.getByCommunity(app.activeId()).map(({ id, name, description, telegram }) => {
+        return { id, name, description, telegram, featured_order: featuredTopicIds.indexOf(`${id}`) };
+    });
+    const featuredTopics = topics.filter((t) => t.featured_order !== -1)
+      .sort((a, b) => Number(a.featured_order) - Number(b.featured_order));
+    const otherTopics = topics.filter((t) => t.featured_order === -1)
+      .sort((a, b) => a.name.localeCompare(b.name));
+
+    const selectedTopic = topics.find((t) => topic && topic === t.name);
+
     return m('.DiscussionStagesBar.discussions-stages', [
+      topics.length > 0 && m(PopoverMenu, {
+        trigger: m(Button, {
+          rounded: true,
+          compact: true,
+          active: true,
+          class: 'discussions-topic',
+          label: selectedTopic ? `Filter: ${topic}` : 'All Discussions',
+          iconRight: Icons.CHEVRON_DOWN,
+          size: 'sm',
+        }),
+        inline: true,
+        transitionDuration: 0,
+        closeOnContentClick: true,
+        class: 'DiscussionStagesBarTopicsPopover',
+        content: m('.discussions-topic-items', [
+          m(MenuItem, {
+            active: (m.route.get() === `/${app.activeId()}` || !topic),
+            iconRight: (m.route.get() === `/${app.activeId()}` || !topic) ? Icons.CHECK : null,
+            label: 'All Discussions',
+            onclick: () => { m.route.set(`/${app.activeId()}`); },
+          }),
+          m(MenuDivider),
+          // featured topics
+          featuredTopics.map(({ id, name, description }, idx) => m(MenuItem, {
+            key: name,
+            active: (m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name.toString().trim())}`
+                     || (topic && topic === name)),
+            iconRight: (m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name.toString().trim())}`
+                        || (topic && topic === name)) ? Icons.CHECK : null,
+            onclick: (e) => {
+              e.preventDefault();
+              m.route.set(`/${app.activeId()}/discussions/${name}`);
+            },
+            label: name,
+          })),
+          // other topics
+          otherTopics.map(({ id, name, description }, idx) => m(MenuItem, {
+            key: name,
+            active: (m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name.toString().trim())}`
+                     || (topic && topic === name)),
+            iconRight: (m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name.toString().trim())}`
+                        || (topic && topic === name)) ? Icons.CHECK : null,
+            onclick: (e) => {
+              e.preventDefault();
+              m.route.set(`/${app.activeId()}/discussions/${name}`);
+            },
+            label: name,
+          })),
+        ]),
+      }),
       m(ButtonGroup, [
         m(Button, {
           rounded: true,
@@ -62,7 +124,7 @@ const DiscussionStagesBar: m.Component<{ topic: string, stage: string }, {}> = {
           label: 'All Stages'
         }),
         [
-          OffchainThreadStage.Discussion,
+          // OffchainThreadStage.Discussion,
           OffchainThreadStage.ProposalInReview,
           OffchainThreadStage.Voting,
           OffchainThreadStage.Passed,
@@ -140,7 +202,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
     const stage = m.route.param('stage');
     const activeEntity = app.community ? app.community : app.chain;
     if (!activeEntity) return m(PageLoading, {
-      title: topic || 'Discussions',
+      title: 'Discussions',
       showNewProposalButton: true,
     });
 
@@ -148,7 +210,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
 
     // add chain compatibility (node info?)
     if (app.community && !activeEntity?.serverLoaded) return m(PageLoading, {
-      title: topic || 'Discussions',
+      title: 'Discussions',
       showNewProposalButton: true,
     });
 
@@ -262,7 +324,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
         if (!topicId) {
           return m(Sublayout, {
             class: 'DiscussionsPage',
-            title: topic || 'Discussions',
+            title: 'Discussions',
             showNewProposalButton: true,
           }, [
             m(EmptyTopicPlaceholder, {
@@ -344,78 +406,6 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
     const stillFetching = (allThreads.length === 0 && vnode.state.postsDepleted[subpage] === false);
     const emptyTopic = (allThreads.length === 0 && vnode.state.postsDepleted[subpage] === true && !stage);
     const emptyStage = (allThreads.length === 0 && vnode.state.postsDepleted[subpage] === true && !!stage);
-
-    const featuredTopics = {};
-    const otherTopics = {};
-    const featuredTopicIds = app.community?.meta?.featuredTopics || app.chain?.meta?.chain?.featuredTopics;
-
-    const getTopicRow = (key, name, description, telegram) => m(Button, {
-      rounded: true,
-      compact: true,
-      class: 'discussions-topic',
-      key,
-      active: (m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name.toString().trim())}`
-               || (topic && topic === key)),
-      onclick: (e) => {
-        e.preventDefault();
-        m.route.set(`/${app.activeId()}/discussions/${name}`);
-      },
-      label: [
-        name,
-        telegram && m(PopoverMenu, {
-          inline: true,
-          transitionDuration: 0,
-          closeOnContentClick: true,
-          closeOnOutsideClick: true,
-          hasArrow: false,
-          content: [
-            m(MenuItem, {
-              href: telegram,
-              size: 'sm',
-              onclick: (e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                window.open(telegram);
-              },
-              label: `Open ${name} Telegram chat`,
-            }),
-          ],
-          trigger: m('a.topic-telegram', [ ' ', m(Icon, { name: Icons.MORE_HORIZONTAL }) ]),
-        }),
-      ],
-      size: 'sm',
-    });
-
-    const allTopicsListItem = m(Button, {
-      rounded: true,
-      compact: true,
-      class: 'discussions-topic',
-      active: (m.route.get() === `/${app.activeId()}` || !topic),
-      onclick: (e) => {
-        e.preventDefault();
-        m.route.set(`/${app.activeId()}`);
-      },
-      label: 'All Discussions',
-      size: 'sm',
-    });
-
-    app.topics.getByCommunity(app.activeId()).forEach(({ id, name, description, telegram }) => {
-      if (featuredTopicIds.includes(`${id}`)) {
-        featuredTopics[name] = { id, name, description, telegram, featured_order: featuredTopicIds.indexOf(`${id}`) };
-      } else {
-        otherTopics[name] = { id, name, description, telegram };
-      }
-    });
-    const otherTopicListItems = Object.keys(otherTopics)
-      .sort((a, b) => otherTopics[a].name.localeCompare(otherTopics[b].name))
-      .map((name, idx) => getTopicRow(
-        otherTopics[name].name, name, otherTopics[name].description, otherTopics[name].telegram
-      ));
-    const featuredTopicListItems = Object.keys(featuredTopics)
-      .sort((a, b) => Number(featuredTopics[a].featured_order) - Number(featuredTopics[b].featured_order))
-      .map((name, idx) => getTopicRow(
-        featuredTopics[name].name, name, featuredTopics[name].description, featuredTopics[name].telegram
-      ));
 
     const isAdmin = app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
     const isMod = app.user.isRoleOfCommunity({
@@ -510,25 +500,6 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
     }, [
       (app.chain || app.community) && [
         m('.discussions-main', [
-          // topics
-          app.topics.getByCommunity(app.activeId()).length > 0 && m('.discussions-topics', {
-            // onupdate: (vvnode) => {
-            //   if (app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
-            //       && !vnode.state.dragulaInitialized) {
-            //     vnode.state.dragulaInitialized = true;
-            //     dragula([vvnode.dom]).on('drop', async (el, target, source) => {
-            //       const reorder = Array.from(source.children).map((child) => {
-            //         return (child as HTMLElement).id;
-            //       });
-            //       await app.community.meta.updateFeaturedTopics(reorder);
-            //     });
-            //   }
-            // }
-          }, [
-            allTopicsListItem,
-            featuredTopicListItems,
-            otherTopicListItems,
-          ]),
           m(DiscussionStagesBar, { topic: topicName, stage }),
           (app.chain && (!activeEntity || !activeEntity.serverLoaded || stillFetching))
             ? m('.discussions-main', [

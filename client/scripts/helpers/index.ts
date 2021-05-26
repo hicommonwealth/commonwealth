@@ -13,7 +13,7 @@ export function offchainThreadStageToLabel(stage: OffchainThreadStage) {
   if (stage === OffchainThreadStage.Discussion) {
     return 'Discussion';
   } else if (stage === OffchainThreadStage.ProposalInReview) {
-    return 'Preparing for Voting';
+    return 'Pre-Voting';
   } else if (stage === OffchainThreadStage.Voting) {
     return 'Voting';
   } else if (stage === OffchainThreadStage.Passed) {
