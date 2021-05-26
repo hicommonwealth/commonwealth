@@ -35,7 +35,7 @@ class ChainEntity {
     this.type = type;
     this.typeId = typeId;
     this.threadId = threadId;
-    this.threadTitle = threadTitle;
+    this.threadTitle = decodeURIComponent(threadTitle);
     this.title = title;
     this.author = author;
     this.createdAt = moment(createdAt);
