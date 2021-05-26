@@ -70,6 +70,9 @@ $discussion-title-font-size: 1.45rem;
                 width: 70%;
                 padding-bottom: 10px;
             }
+            .proposal-body-meta {
+                margin-bottom: 12px;
+            }
         }
         .proposal-content {
             display: flex;
@@ -189,7 +192,7 @@ $discussion-title-font-size: 1.45rem;
         .ProposalHeaderThreadLink {
             display: inline-block;
             margin-right: 12px;
-            margin-top: 18px;
+            margin-top: 12px;
             font-weight: 600;
             a:link,
             a:visited {
@@ -305,6 +308,12 @@ $discussion-title-font-size: 1.45rem;
             &:hover {
                 text-decoration: underline;
             }
+        }
+        svg {
+            stroke: $text-color-light;
+        }
+        svg:hover {
+            stroke: $text-color-medium;
         }
     }
 
