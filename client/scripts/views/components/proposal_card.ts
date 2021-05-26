@@ -33,7 +33,7 @@ export const getStatusText = (proposal: AnyProposal, showCountdown: boolean) => 
   } else if (proposal.completed && proposal instanceof SubstrateCollectiveProposal) {
     if (proposal.isPassing === ProposalStatus.Passed
         && proposal.call.section === 'treasury' && proposal.call.method === 'approveProposal')
-      return 'Passed, treasury spend approved';
+      return 'Passed';
     if (proposal.isPassing === ProposalStatus.Passed
         && proposal.call.section === 'democracy' && proposal.call.method.startsWith('externalPropose'))
       return 'Passed, moved to referendum';
@@ -126,6 +126,15 @@ const ProposalCard: m.Component<{ proposal: AnyProposal, injectedContent? }> = {
           rounded: true,
           size: 'xs',
         }),
+        (proposal instanceof SubstrateDemocracyProposal || proposal instanceof SubstrateCollectiveProposal)
+          && proposal.getReferendum()
+          && m(Tag, {
+            label: `REF #${proposal.getReferendum().identifier}`,
+            intent: 'primary',
+            rounded: true,
+            size: 'xs',
+            class: 'proposal-became-tag',
+          }),
         // title
         m('.proposal-title', proposal.title),
         // metadata
@@ -151,19 +160,11 @@ const ProposalCard: m.Component<{ proposal: AnyProposal, injectedContent? }> = {
               return m('.proposal-action', [ 'Via MOT-', originatingProposalOrMotion.identifier ]);
             }
           })(),
-        (proposal instanceof SubstrateDemocracyProposal || proposal instanceof SubstrateCollectiveProposal)
-          && proposal.getReferendum()
-          && m('.proposal-action', [ 'Became REF-', proposal.getReferendum().identifier ]),
-        injectedContent ? m('.proposal-injected', injectedContent) : [
-          // comments
-          m('.proposal-comments', pluralize(app.comments.nComments(proposal), 'comment')),
-          // status
-          m('.proposal-status', { class: getStatusClass(proposal) }, getStatusText(proposal, true)),
-        ],
-      ]),
-      m('.proposal-card-bottom', [
+        injectedContent
+          ? m('.proposal-injected', injectedContent)
+          : m('.proposal-status', { class: getStatusClass(proposal) }, getStatusText(proposal, true)),
         // thread link
-        proposal.threadId ? m('.proposal-thread-link', [
+        proposal.threadId && m('.proposal-thread-link', [
           m('a', {
             href: `/${app.activeId()}/proposal/discussion/${proposal.threadId}`,
             onclick: (e) => {
@@ -174,9 +175,10 @@ const ProposalCard: m.Component<{ proposal: AnyProposal, injectedContent? }> = {
               // avoid resetting scroll point
             },
           }, [
+            m(Icon, { name: Icons.ARROW_UP_RIGHT, size: 'xs' }),
             proposal.threadTitle ? proposal.threadTitle : 'Go to thread'
           ]),
-        ]) : m('.no-linked-thread', 'No linked thread'),
+        ])
       ]),
     ]);
   }
