@@ -293,15 +293,14 @@ export const ProposalHeaderStage: m.Component<{ proposal: OffchainThread }> = {
   }
 };
 
-export const ProposalHeaderPollEditorButton: m.Component<{ openPollEditor: Function }, { isOpen: boolean }> = {
+export const ProposalHeaderPollEditorButton: m.Component<{ proposal, openPollEditor: Function }, { isOpen: boolean }> = {
   view: (vnode) => {
-    const { openPollEditor } = vnode.attrs;
+    const { proposal, openPollEditor } = vnode.attrs;
     return m(Button, {
       class: 'ProposalHeaderPollEditorButton',
-      rounded: true,
       compact: true,
-      intent: 'primary',
-      label: 'Start off-chain polling',
+      disabled: !!proposal.offchainVotingEndsAt,
+      label: proposal.offchainVotingEndsAt ? 'Off-chain polling enabled' : 'Start off-chain polling',
       onclick: (e) => {
         e.preventDefault();
         openPollEditor();
@@ -315,10 +314,8 @@ export const ProposalHeaderStageEditorButton: m.Component<{ openStageEditor: Fun
     const { openStageEditor } = vnode.attrs;
     return m(Button, {
       class: 'ProposalHeaderStageEditorButton',
-      rounded: true,
       compact: true,
-      intent: 'primary',
-      label: 'Update on-chain status',
+      label: 'Connect on-chain proposal',
       onclick: (e) => {
         e.preventDefault();
         openStageEditor();

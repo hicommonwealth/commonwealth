@@ -257,18 +257,19 @@ const ProposalHeader: m.Component<{
                 proposal['votingInterfaceLink'] && m(ProposalHeaderVotingInterfaceLink, { proposal }),
               ]),
           ]),
-          isAuthor && proposal instanceof OffchainThread && !proposal.offchainVotingEndsAt
-            && [ m(ProposalHeaderPollEditorButton, {
+          isAuthor && proposal instanceof OffchainThread
+            && m(ProposalHeaderPollEditorButton, {
+              proposal,
               openPollEditor: () => {
                 vnode.state.pollEditorIsOpen = true;
               }
-            }), m('br') ],
+            }),
           (isAuthor || isAdmin) && proposal instanceof OffchainThread
-            && [ m(ProposalHeaderStageEditorButton, {
+            && m(ProposalHeaderStageEditorButton, {
               openStageEditor: () => {
                 vnode.state.stageEditorIsOpen = true;
               }
-            }), m('br') ],
+            }),
           proposal instanceof OffchainThread
             && proposal.hasOffchainPoll
             && m(ProposalHeaderOffchainPoll, { proposal }),
