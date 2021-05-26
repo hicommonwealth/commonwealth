@@ -42,7 +42,7 @@ const EditTopicModal : m.Component<{
         chainId: app.activeChainId(),
       };
       await app.topics.edit(topicInfo);
-      m.redraw();
+      m.route.set(`/${app.activeId()}/discussions/${encodeURI(form.name.toString().trim())}`);
     };
 
     const deleteTopic = async (form) => {
@@ -53,6 +53,7 @@ const EditTopicModal : m.Component<{
         chainId: app.activeChainId(),
       };
       await app.topics.remove(topicInfo);
+      m.route.set(`/${app.activeId()}`);
     };
 
     return m('.EditTopicModal', [

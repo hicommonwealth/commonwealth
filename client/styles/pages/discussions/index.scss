@@ -38,6 +38,18 @@
     }
     .discussions-topic-items {
         max-width: 300px;
+        .topic-menu-item {
+            display: flex;
+            .topic-menu-item-name {
+                flex: 1;
+                position: relative;
+                top: 1px;
+            }
+            .cui-button {
+                position: relative;
+                top: -3px;
+            }
+        }
     }
     .cui-button.discussions-topic {
         margin-right: 11px;

@@ -77,36 +77,39 @@ const DiscussionStagesBar: m.Component<{ topic: string, stage: string }, {}> = {
         content: m('.discussions-topic-items', [
           m(MenuItem, {
             active: (m.route.get() === `/${app.activeId()}` || !topic),
-            iconRight: (m.route.get() === `/${app.activeId()}` || !topic) ? Icons.CHECK : null,
+            iconLeft: (m.route.get() === `/${app.activeId()}` || !topic) ? Icons.CHECK : null,
             label: 'All Discussions',
             onclick: () => { m.route.set(`/${app.activeId()}`); },
           }),
           m(MenuDivider),
           // featured topics
-          featuredTopics.map(({ id, name, description }, idx) => m(MenuItem, {
+          featuredTopics.concat(otherTopics).map(({ id, name, description, telegram }, idx) => m(MenuItem, {
             key: name,
             active: (m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name.toString().trim())}`
                      || (topic && topic === name)),
-            iconRight: (m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name.toString().trim())}`
+            iconLeft: (m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name.toString().trim())}`
                         || (topic && topic === name)) ? Icons.CHECK : null,
             onclick: (e) => {
               e.preventDefault();
               m.route.set(`/${app.activeId()}/discussions/${name}`);
             },
-            label: name,
-          })),
-          // other topics
-          otherTopics.map(({ id, name, description }, idx) => m(MenuItem, {
-            key: name,
-            active: (m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name.toString().trim())}`
-                     || (topic && topic === name)),
-            iconRight: (m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name.toString().trim())}`
-                        || (topic && topic === name)) ? Icons.CHECK : null,
-            onclick: (e) => {
-              e.preventDefault();
-              m.route.set(`/${app.activeId()}/discussions/${name}`);
-            },
-            label: name,
+            label: m('.topic-menu-item', [
+              m('.topic-menu-item-name', name),
+              app.user?.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() }) && m(Button, {
+                size: 'xs',
+                label: 'Edit',
+                class: 'edit-topic-button',
+                compact: true,
+                rounded: true,
+                onclick: (e) => {
+                  e.preventDefault();
+                  app.modals.create({
+                    modal: EditTopicModal,
+                    data: { id, name, description, telegram },
+                  });
+                }
+              }),
+            ]),
           })),
         ]),
       }),
@@ -414,41 +417,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
 
     return m(Sublayout, {
       class: 'DiscussionsPage',
-      title: topic ? [
-        topic,
-        m.route.get().startsWith(`/${app.activeId()}/discussions/${encodeURI(topicName)}`)
-          && app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
-          && m(PopoverMenu, {
-            class: 'sidebar-edit-topic',
-            position: 'bottom',
-            transitionDuration: 0,
-            hoverCloseDelay: 0,
-            closeOnContentClick: true,
-            trigger: m(Icon, {
-              name: Icons.CHEVRON_DOWN,
-              style: 'margin-left: 6px;',
-            }),
-            content: [
-              m(MenuItem, {
-                label: 'New topic',
-                onclick: (e) => {
-                  e.preventDefault();
-                  app.modals.create({ modal: NewTopicModal });
-                }
-              }),
-              m(MenuItem, {
-                label: 'Edit topic',
-                onclick: (e) => {
-                  e.preventDefault();
-                  app.modals.create({
-                    modal: EditTopicModal,
-                    data: { description: topicDescription, id: topicId, name: topicName, telegram: topicTelegram }
-                  });
-                }
-              }),
-            ],
-          }),
-      ] : [
+      title: [
         'Discussions',
         (isAdmin || isMod || app.community?.meta.invitesEnabled)
           && m(PopoverMenu, {
