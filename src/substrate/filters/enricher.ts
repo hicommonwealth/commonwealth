@@ -686,11 +686,8 @@ export async function Enrich(
         }
         const bounty = bounties.find((b) => +b.index === +bountyIndex);
         if (!bounty) {
-          throw new Error(`could not fetch bounty`);
+          throw new Error('could not find bounty');
         }
-        const description = await api.query.bounties.bountyDescriptions(
-          bountyIndex
-        );
         return {
           data: {
             kind,
@@ -700,9 +697,7 @@ export async function Enrich(
             fee: bounty.bounty.fee.toString(),
             curatorDeposit: bounty.bounty.curatorDeposit.toString(),
             bond: bounty.bounty.bond.toString(),
-            description: description?.isSome
-              ? hexToString(description.unwrap().toString())
-              : undefined,
+            description: bounty.description,
           },
         };
       }
@@ -713,11 +708,25 @@ export async function Enrich(
           AccountId
         ] &
           Codec;
+
+        const bounties = await api.derive.bounties.bounties();
+        if (!bounties) {
+          throw new Error('could not fetch bounties');
+        }
+        const bounty = bounties.find((b) => +b.index === +bountyIndex);
+        if (!bounty) {
+          throw new Error('could not find bounty');
+        }
+        if (!bounty.bounty.status.isPendingPayout) {
+          throw new Error('invalid bounty status');
+        }
         return {
           data: {
             kind,
             bountyIndex: +bountyIndex,
             beneficiary: beneficiary.toString(),
+            curator: bounty.bounty.status.asPendingPayout.curator.toString(),
+            unlockAt: +bounty.bounty.status.asPendingPayout.unlockAt,
           },
         };
       }
@@ -766,10 +775,24 @@ export async function Enrich(
 
       case EventKind.TreasuryBountyBecameActive: {
         const [bountyIndex] = (event.data as unknown) as [BountyIndex] & Codec;
+
+        const bounties = await api.derive.bounties.bounties();
+        if (!bounties) {
+          throw new Error('could not fetch bounties');
+        }
+        const bounty = bounties.find((b) => +b.index === +bountyIndex);
+        if (!bounty) {
+          throw new Error('could not find bounty');
+        }
+        if (!bounty.bounty.status.isActive) {
+          throw new Error('invalid bounty status');
+        }
         return {
           data: {
             kind,
             bountyIndex: +bountyIndex,
+            curator: bounty.bounty.status.asActive.curator.toString(),
+            updateDue: +bounty.bounty.status.asActive.updateDue,
           },
         };
       }

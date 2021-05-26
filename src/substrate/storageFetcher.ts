@@ -362,23 +362,31 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
         description: b.description,
       } as ITreasuryBountyProposed);
 
-      if (b.bounty.status.isActive || b.bounty.status.isPendingPayout) {
+      if (b.bounty.status.isActive) {
         events.push({
           kind: EventKind.TreasuryBountyBecameActive,
           bountyIndex: +b.index,
+          curator: b.bounty.status.asActive.curator.toString(),
+          updateDue: +b.bounty.status.asActive.updateDue,
         } as ITreasuryBountyBecameActive);
-
-        if (b.bounty.status.isPendingPayout) {
-          events.push({
-            kind: EventKind.TreasuryBountyAwarded,
-            bountyIndex: +b.index,
-            value: b.bounty.value.toString(),
-            beneficiary: b.bounty.status.asPendingPayout.beneficiary.toString(),
-          } as ITreasuryBountyAwarded);
-        }
       }
-      // We don't belive any other events can be extracted from a
-      // derivable bounty itself, but we might be wrong
+
+      if (b.bounty.status.isPendingPayout) {
+        events.push({
+          kind: EventKind.TreasuryBountyBecameActive,
+          bountyIndex: +b.index,
+          curator: b.bounty.status.asPendingPayout.curator.toString(),
+          updateDue: blockNumber, // fake this unavailable field
+        } as ITreasuryBountyBecameActive);
+        events.push({
+          kind: EventKind.TreasuryBountyAwarded,
+          bountyIndex: +b.index,
+          value: b.bounty.value.toString(),
+          beneficiary: b.bounty.status.asPendingPayout.beneficiary.toString(),
+          curator: b.bounty.status.asPendingPayout.curator.toString(),
+          unlockAt: +b.bounty.status.asPendingPayout.unlockAt,
+        } as ITreasuryBountyAwarded);
+      }
     }
 
     log.info(`Found ${bounties.length} bounties!`);

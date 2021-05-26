@@ -453,6 +453,8 @@ export interface ITreasuryBountyAwarded extends IEvent {
   kind: EventKind.TreasuryBountyAwarded;
   bountyIndex: number;
   beneficiary: AccountId;
+  curator: AccountId;
+  unlockAt: number;
 }
 
 export interface ITreasuryBountyRejected extends IEvent {
@@ -466,6 +468,8 @@ export interface ITreasuryBountyBecameActive extends IEvent {
   // A bounty proposal is funded and became active. [index]
   kind: EventKind.TreasuryBountyBecameActive;
   bountyIndex: number;
+  curator: AccountId;
+  updateDue: number;
 }
 
 export interface ITreasuryBountyClaimed extends IEvent {
