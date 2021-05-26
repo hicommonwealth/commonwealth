@@ -304,15 +304,6 @@ function setupRouter(
   // TODO: Change to GET /topics
   router.get('/bulkTopics', bulkTopics.bind(this, models));
 
-  // CWP: offchain common-protocol API (temporary and will be replaced with chain data later)
-  router.post('/cw/create-project', passport.authenticate('jwt', { session: false }), createProject.bind(this, models));
-  router.get('/cw/projects', passport.authenticate('jwt', { session: false }), builkProjects.bind(this, models));
-  router.get('/cw/get-collatora-amount', passport.authenticate('jwt', { session: false }), getCollatoralAmount.bind(this, models));
-  router.post('/cw/back-project', passport.authenticate('jwt', { session: false }), backProject.bind(this, models));
-  router.post('/cw/curate-project', passport.authenticate('jwt', { session: false }), curateProject.bind(this, models));
-  router.post('/cw/redeem-bToken', passport.authenticate('jwt', { session: false }), redeemBToken.bind(this, models));
-  router.post('/cw/redeem-cToken', passport.authenticate('jwt', { session: false }), redeemCToken.bind(this, models));
-
   // offchain reactions
   // TODO: Change to POST /reaction
   router.post(

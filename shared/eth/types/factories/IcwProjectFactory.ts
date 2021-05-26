@@ -331,6 +331,19 @@ const _abi = [
     type: "function"
   },
   {
+    inputs: [],
+    name: "backWithETH",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool"
+      }
+    ],
+    stateMutability: "payable",
+    type: "function"
+  },
+  {
     inputs: [
       {
         internalType: "address",
@@ -351,7 +364,44 @@ const _abi = [
         type: "bool"
       }
     ],
+    stateMutability: "nonpayable",
+    type: "function"
+  },
+  {
+    inputs: [],
+    name: "curateWithETH",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool"
+      }
+    ],
     stateMutability: "payable",
+    type: "function"
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "token",
+        type: "address"
+      },
+      {
+        internalType: "uint256",
+        name: "value",
+        type: "uint256"
+      }
+    ],
+    name: "curate",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool"
+      }
+    ],
+    stateMutability: "nonpayable",
     type: "function"
   },
   {
@@ -388,7 +438,7 @@ const _abi = [
         type: "bool"
       }
     ],
-    stateMutability: "payable",
+    stateMutability: "nonpayable",
     type: "function"
   },
   {
@@ -412,7 +462,7 @@ const _abi = [
         type: "bool"
       }
     ],
-    stateMutability: "payable",
+    stateMutability: "nonpayable",
     type: "function"
   },
   {
@@ -515,19 +565,6 @@ const _abi = [
       }
     ],
     name: "addAcceptedTokens",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function"
-  },
-  {
-    inputs: [
-      {
-        internalType: "address[]",
-        name: "_nomination",
-        type: "address[]"
-      }
-    ],
-    name: "removeAcceptedTokens",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function"
