@@ -17,16 +17,19 @@ export class CWProject {
   public readonly ipfsHash: string;
   public readonly cwUrl: string;
   public readonly beneficiary: string;
-  public readonly acceptedToken: string;  //  '0x01',
-  public readonly nominations: Array<string>;  //  []
-  public readonly threshold: number;
-  public readonly endTime: Date; // startTime + number in seconds
-  public readonly curatorFee: number;
-  public readonly projectHash: string;  // put projectHash
+  public readonly acceptedToken: string;
+  public readonly nominations: Array<string>;
+  public readonly endTime: Date;
+  public readonly projectHash: string;
   public readonly status: ProjectStatus;
-  public readonly totalFunding: number;
+  public readonly cToken: string; // cToken address
+  public readonly bToken: string; // bToken address
   public readonly backers: Array<CWUser>;
   public readonly curators: Array<CWUser>;
+
+  public readonly threshold: number;
+  public readonly totalFunding: number;
+  public readonly curatorFee: number;
 
   constructor(
     name,
@@ -50,7 +53,7 @@ export class CWProject {
     this.ipfsHash = ipfsHash;
     this.cwUrl = cwUrl;
     this.beneficiary = beneficiary;
-    this.acceptedToken = acceptedToken;  //  '0x01',
+    this.acceptedToken = acceptedToken;  //  '0x0000000000000000000000000000000000000000',
     this.nominations = nominations;
     this.threshold = threshold;
     this.endTime = endTime; // startTime + number in seconds

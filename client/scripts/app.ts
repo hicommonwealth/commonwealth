@@ -601,7 +601,7 @@ $(() => {
     // Commonwealth protocol
     '/:scope/projects':          importRoute('views/pages/commonwealth/projects', { scoped: true }),
     '/:scope/collectives':       importRoute('views/pages/commonwealth/collectives', { scoped: true }),
-    '/:scope/new/project':        importRoute('views/pages/commonwealth/createProject', { scoped: true, deferChain: true }),
+    '/:scope/new/project':        importRoute('views/pages/commonwealth/createProject', { scoped: true }),
     '/:scope/project/:projectHash': importRoute('views/pages/commonwealth/project/index', { scoped: true }), // CWP
     // '/:scope/backers':           importRoute('views/pages/commonwealth/backers', { scoped: true }),
 

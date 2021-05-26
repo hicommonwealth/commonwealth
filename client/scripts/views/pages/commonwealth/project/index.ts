@@ -6,6 +6,7 @@ import { initChain } from 'app';
 
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
+import { CWProject } from 'models/CWProtocol';
 
 import { CWProject } from 'models/CWProtocol';
 
@@ -49,29 +50,34 @@ const ProjectContentModule: m.Component<{project: CWProject, leftInSeconds: numb
   }
 }
 
-const ViewProjectInitialPage: m.Component<{projectHash: string}, {initializing: boolean, protocol: any}> = {
+const ViewProjectPage: m.Component<{projectHash: string}, {initializing: boolean, protocol: any}> = {
   oncreate: async(vnode) => {
-    if (!app.chain || !app.chain.loaded) {
-      vnode.state.initializing = true;
-      await initChain();
-      vnode.state.protocol = (app.chain as any).protocol;
-      vnode.state.initializing = false;
-      m.redraw();
-    } else if (!vnode.state.protocol) {
-      vnode.state.protocol = (app.chain as any).protocol;
-      m.redraw();
-    }
+    // if (!app.chain || !app.chain.loaded) {
+    //   vnode.state.initializing = true;
+    //   await initChain();
+    //   vnode.state.protocol = (app.chain as any).protocol;
+    //   vnode.state.initializing = false;
+    //   m.redraw();
+    // } else if (!vnode.state.protocol) {
+    //   vnode.state.protocol = (app.chain as any).protocol;
+    //   m.redraw();
+    // }
   },
   view: (vnode) => {
-    if (vnode.state.initializing || !app.chain || !vnode.state.protocol) {
+    if (vnode.state.initializing || !app.chain) {
+      return m(PageLoading);
+    }
+    const protocol = (app.chain as any).protocol;
+    if (!protocol || !protocol.initalized) {
       return m(PageLoading);
     }
     const { protocol } = vnode.state;
     const project: CWProject = (protocol.projects || []).filter((item) => item.projectHash === vnode.attrs.projectHash)[0];
 
     const startTime = new Date();
-    const endTime = new Date(project.endTime);
+    const endTime = project.endTime;
     const leftInSeconds = (endTime.getTime() - startTime.getTime()) / 1000;
+
     return m(Sublayout, {
       class: 'ProjectPage',
       title: 'Projects',
@@ -88,4 +94,4 @@ const ViewProjectInitialPage: m.Component<{projectHash: string}, {initializing: 
   }
 }
 
-export default ViewProjectInitialPage;
+export default ViewProjectPage;

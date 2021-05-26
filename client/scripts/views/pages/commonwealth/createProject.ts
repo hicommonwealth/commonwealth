@@ -1,7 +1,5 @@
 import m from 'mithril';
 import { Input, TextArea, Form, FormLabel, FormGroup, Button, Grid, Col, Checkbox } from 'construct-ui';
-import { utils } from 'ethers';
-import { initChain, selectCommunity } from 'app';
 import BN from 'bn.js';
 
 import 'pages/new_proposal_page.scss';
@@ -11,13 +9,17 @@ import PageLoading from 'views/pages/loading';
 
 import app from 'state';
 
+const floatRegex = /^[0-9]*\.?[0-9]*$/;
+
+
 
 const NewProjectForm = {
-  form: {},
+  form: {
+  },
   view: (vnode) => {
     const callback = vnode.attrs.callback;
     const author = app.user.activeAccount;
-    const protocol = vnode.attrs.protocol;
+    const submitting = vnode.attrs.submitting;
 
     if (!author) return m('div', 'Must be logged in');
     if (!callback) return m('div', 'Must have callback');
@@ -25,7 +27,6 @@ const NewProjectForm = {
     return m(Form, { class: 'NewProposalForm' }, [
       m(Grid, [
         m(Col, [
-          vnode.state.error && m('.error', vnode.state.error.message),
           [
             //  name
             m(FormGroup, [
@@ -36,6 +37,7 @@ const NewProjectForm = {
                   placeholder: 'Enter a title',
                   autofocus: true,
                 },
+                disabled: submitting,
                 oninput: (e) => {
                   const result = (e.target as any).value;
                   vnode.state.form.name = result;
@@ -52,6 +54,7 @@ const NewProjectForm = {
                   placeholder: 'Enter description of the project',
                   autofocus: false,
                 },
+                disabled: submitting,
                 oninput: (e) => {
                   const result = (e.target as any).value;
                   vnode.state.form.description = result;
@@ -68,12 +71,14 @@ const NewProjectForm = {
                   placeholder: '1',
                   autofocus: true,
                 },
+                disabled: submitting,
                 oninput: (e) => {
                   const result = (e.target as any).value;
                   vnode.state.form.deadline = result;
                   m.redraw();
                 },
               }),
+              vnode.state.error && vnode.state.error.id === 'deadline' && m('p.error-text', vnode.state.error.message),
             ]),
             // beneficiary
             m(FormGroup, [
@@ -84,6 +89,7 @@ const NewProjectForm = {
                   name: 'beneficiary',
                   placeholder: 'Enter a description',
                 },
+                disabled: submitting,
                 oninput: (e) => {
                   const result = (e.target as any).value;
                   if (vnode.state.form.beneficiary === result) return;
@@ -109,16 +115,18 @@ const NewProjectForm = {
             m(FormGroup, [
               m(FormLabel, `Threshold Amount (${app.chain.chain.denom})`),
               m(Input, {
+                disabled: submitting,
                 name: 'threshold',
                 autofocus: true,
-                placeholder: 'Amount of threshold',
+                placeholder: 'Up to 4 digits after the decimal point',
                 autocomplete: 'off',
                 oninput: (e) => {
                   const result = (e.target as any).value;
                   vnode.state.form.threshold = result;
                   m.redraw();
                 },
-              })
+              }),
+              vnode.state.error && vnode.state.error.id === 'threshold' && m('p.error-text', vnode.state.error.message),
             ]),
             //  curatorFee
             m(FormGroup, [
@@ -128,13 +136,23 @@ const NewProjectForm = {
                   name: 'curatorFee',
                   placeholder: 'Enter a curatorFee amount',
                 },
+                disabled: submitting,
                 oninput: (e) => {
                   const result = (e.target as any).value;
-                  if (vnode.state.form.curatorFee === result) return;
-                  vnode.state.form.curatorFee = result;
+                  if (floatRegex.test(result)) {
+                    vnode.state.error = undefined;
+                    vnode.state.form.curatorFee = result;
+                  } else {
+                    vnode.state.form.curatorFee = undefined;
+                    vnode.state.error = {
+                      message: 'Invalid input value',
+                      id: 'curatorFee'
+                    };
+                  }
                   m.redraw();
                 },
               }),
+              vnode.state.error && vnode.state.error.id === 'curatorFee' && m('p.error-text', vnode.state.error.message),
             ]),
             //  ipfsHash, cwUrl, creator, projectID
           ],
@@ -146,9 +164,10 @@ const NewProjectForm = {
                 !vnode.state.form.name ||
                 !vnode.state.form.beneficiary ||
                 !vnode.state.form.threshold ||
-                !vnode.state.form.curatorFee
+                !vnode.state.form.curatorFee ||
+                submitting
               ),
-              label: 'Create a new Project',
+              label: submitting ? 'Createing now' : 'Create a new Project',
               onclick: async(e) => {
                 e.preventDefault();
                 const projectData = {
@@ -172,30 +191,22 @@ const NewProjectForm = {
   }
 }
 
-const NewProjectPage: m.Component<{ type }, { initializing: boolean, protocol: any }> = {
-  oncreate: async (vnode) => {
-    if (!app.chain || !app.chain.loaded) {
-      vnode.state.initializing = true;
-      await initChain();
-      vnode.state.protocol = (app.chain as any).protocol;
-      vnode.state.initializing = false;
-      m.redraw();
-    } else if (!vnode.state.protocol) {
-      vnode.state.protocol = (app.chain as any).protocol;
-      m.redraw();
-    }
-  },
+const NewProjectPage: m.Component<{ type }, { submitting: boolean, createError: string }> = {
   view: (vnode) => {
-    if (vnode.state.initializing || !app.chain || !vnode.state.protocol) {
+    vnode.state.createError = ''
+    if (!app.chain) {
       return m(PageLoading);
     }
-    const { protocol } = vnode.state;
+    const protocol = (app.chain as any).protocol;
+    if (!protocol || !protocol.initalized) {
+      return m(PageLoading);
+    }
+
     return m(Sublayout, {
       class: 'NewProjectPage',
       title: 'Create a new Project',
       showNewProposalButton: true,
     }, [
-      m('p', 'This UI version enables only Ether now. Production version will enable multiple ERC20 tokens too'),
       m('.forum-container', [
         m(NewProjectForm, {
           callback: async(projectData: any) => {
@@ -212,7 +223,9 @@ const NewProjectPage: m.Component<{ type }, { initializing: boolean, protocol: a
               '0x01'
             );
           },
+          submitting: vnode.state.submitting,
         }),
+        vnode.state.createError !== '' && m('p.error-text', vnode.state.createError)
       ])
     ]);
   }

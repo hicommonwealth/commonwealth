@@ -88,7 +88,7 @@ const ActionPage: m.Component<{project: CWProject, protocol: any}, {amount: any,
     return m('.col-lg-4 .action-area', [
       m('.action-title', [
         m('span.amount', `${project.totalFunding} / ${project.threshold} `),
-        m('span.coin', project.acceptedToken === '0x01' ? 'Ether' : 'ERC20 Token')
+        m('span.coin', project.acceptedToken === '0x0000000000000000000000000000000000000000' ? 'Ether' : 'ERC20 Token')
       ]),
       m('.project-progress', [
         m('.project-progress-bar', [
