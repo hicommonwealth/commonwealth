@@ -61,7 +61,7 @@ const NewProjectForm = {
             ]),
             //  deadline
             m(FormGroup, [
-              m(FormLabel, 'Deadline (in hours)'),
+              m(FormLabel, 'Deadline (in days)'),
               m(Input, {
                 options: {
                   name: 'deadline',
@@ -70,7 +70,7 @@ const NewProjectForm = {
                 },
                 oninput: (e) => {
                   const result = (e.target as any).value;
-                  vnode.state.form.deadline = parseInt(result) * 24 * 60 * 60;
+                  vnode.state.form.deadline = result;
                   m.redraw();
                 },
               }),
@@ -115,7 +115,7 @@ const NewProjectForm = {
                 autocomplete: 'off',
                 oninput: (e) => {
                   const result = (e.target as any).value;
-                  vnode.state.form.threshold = app.chain.chain.coins(parseFloat(result), true);
+                  vnode.state.form.threshold = result;
                   m.redraw();
                 },
               })
@@ -205,9 +205,9 @@ const NewProjectPage: m.Component<{ type }, { initializing: boolean, protocol: a
               projectData.description,
               author,
               projectData.beneficiary,
-              parseInt(projectData.threshold),
-              parseInt(projectData.curatorFee),
-              parseInt(projectData.deadline),
+              projectData.threshold,
+              projectData.curatorFee,
+              projectData.deadline,
               true,
               '0x01'
             );
