@@ -135,6 +135,23 @@ const ProposalCard: m.Component<{ proposal: AnyProposal, injectedContent? }> = {
             size: 'xs',
             class: 'proposal-became-tag',
           }),
+        proposal instanceof SubstrateDemocracyReferendum && proposal.preimage
+          && (() => {
+            const originatingProposalOrMotion = proposal.getProposalOrMotion(proposal.preimage);
+            if (!(originatingProposalOrMotion instanceof SubstrateCollectiveProposal)
+                && !(originatingProposalOrMotion instanceof SubstrateDemocracyProposal)) return;
+
+            return m(Tag, {
+              label: (originatingProposalOrMotion instanceof SubstrateDemocracyProposal)
+                ? `PROP #${originatingProposalOrMotion.identifier}`
+                  : (originatingProposalOrMotion instanceof SubstrateCollectiveProposal)
+                  ? `MOT #${originatingProposalOrMotion.identifier}` : '',
+              intent: 'primary',
+              rounded: true,
+              size: 'xs',
+              class: 'proposal-became-tag',
+            });
+          })(),
         // title
         m('.proposal-title', proposal.title),
         // metadata
@@ -151,15 +168,6 @@ const ProposalCard: m.Component<{ proposal: AnyProposal, injectedContent? }> = {
         //   && proposal.call?.method === 'approveProposal'
         //   && m('.proposal-action', [ 'Approves TRES-', proposal.call?.args[0] ]),
         // linked referenda
-        proposal instanceof SubstrateDemocracyReferendum && proposal.preimage
-          && (() => {
-            const originatingProposalOrMotion = proposal.getProposalOrMotion(proposal.preimage);
-            if (originatingProposalOrMotion instanceof SubstrateDemocracyProposal) {
-              return m('.proposal-action', [ 'Via PROP-', originatingProposalOrMotion.identifier ]);
-            } else if (originatingProposalOrMotion instanceof SubstrateCollectiveProposal) {
-              return m('.proposal-action', [ 'Via MOT-', originatingProposalOrMotion.identifier ]);
-            }
-          })(),
         injectedContent
           ? m('.proposal-injected', injectedContent)
           : m('.proposal-status', { class: getStatusClass(proposal) }, getStatusText(proposal, true)),
