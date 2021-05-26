@@ -17,6 +17,7 @@ interface IOnboardingJoinCommunityAttr {
   onNext: () => void;
   selected?: ChainBase;
   onSelect?: (base: ChainBase) => void;
+  base: ChainBase;
 }
 
 interface IOnboardingJoinCommunityState {
@@ -34,9 +35,10 @@ const JoinCommunity: m.Component<IOnboardingJoinCommunityAttr, IOnboardingJoinCo
     vnode.state.error = null;
   },
   view: (vnode) => {
-    const { account } = vnode.attrs;
+    const { account, base } = vnode.attrs;
+    console.log(app.config.chains.getAll());
     const allCommunities = (app.config.communities.getAll() as (CommunityInfo | ChainInfo)[])
-      .concat(app.config.chains.getAll())
+      .concat(app.config.chains.getAll().filter((chain) => chain.base === base))
       .sort((a, b) => a.name.localeCompare(b.name))
       .sort((a, b) => {
         // sort starred communities at top

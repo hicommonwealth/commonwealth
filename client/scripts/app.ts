@@ -674,7 +674,7 @@ $(() => {
     '/:scope/analytics':         importRoute('views/pages/stats', { scoped: true, deferChain: true }),
     '/:scope/web3login':         importRoute('views/pages/web3login', { scoped: true }),
 
-    '/:scope/account/:address':  importRoute('views/pages/profile', { scoped: true, deferChain: false }),
+    '/:scope/account/:address':  importRoute('views/pages/profile', { scoped: true, deferChain: true }),
     '/:scope/account':           redirectRoute((attrs) => {
       return (app.user.activeAccount)
         ? `/${attrs.scope}/account/${app.user.activeAccount.address}`

@@ -189,6 +189,7 @@ const OnboardingModal: m.Component<IOnboardingAttrs, IOnboardingState> = {
           }
         }) : step === OnboardingStep.JoinCommunity ? m(OnboardingJoinCommunity, {
           account: vnode.state.account,
+          base: vnode.state.selected,
           onBack: () => {
             vnode.state.step = OnboardingStep.SetupProfile;
           },

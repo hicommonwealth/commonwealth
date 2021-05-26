@@ -122,7 +122,6 @@ interface IOnboardingChooseAddressAttr {
   onBack: () => void;
   onNext: (account: Account<any>) => void;
   accountVerifiedCallback: (account: Account<any>, onNext: (account: Account<any>) => void) => any,
-  webWallet?: IWebWallet<any>,
 }
 
 interface IOnboardingChooseAddressState {
