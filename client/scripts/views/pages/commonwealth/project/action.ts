@@ -83,7 +83,7 @@ const ActionPage: m.Component<{project: CWProjectWithParticipants, protocol: any
       percent = '100';
     }
 
-    const { address } = app.user.activeAccount;
+    // const { address } = app.user.activeAccount;
 
     return m('.col-lg-4 .action-area', [
       m('.action-title', [
@@ -123,22 +123,22 @@ const ActionPage: m.Component<{project: CWProjectWithParticipants, protocol: any
               vnode.state.error = 'Please enter the amount';
             } else if (isBacker) {
               // do back logic
-              await protocol.backProject(address, parseInt(vnode.state.amount), project.projectHash);
+              await protocol.backProject(parseInt(vnode.state.amount), project.projectHash);
             } else {
               // do curate logic
-              await protocol.curateProject(address, parseInt(vnode.state.amount), project.projectHash);
+              await protocol.curateProject(parseInt(vnode.state.amount), project.projectHash);
             }
             m.redraw();
           }
         }),
         project.status === 'Successed' && m(SuccsedActionModule, {
-          isBeneficiary: address === project.beneficiary,
+          isBeneficiary: app.user.activeAccount.address === project.beneficiary,
           callback: async(isBacker) => {
             if (!vnode.state.amount || vnode.state.amount === 0) {
               vnode.state.error = 'Please enter the amount';
             } else if (isBacker) {
               // redeem CToken logic
-              await protocol.redeemCToken(address, parseInt(vnode.state.amount), project.projectHash);
+              await protocol.redeemCToken(parseInt(vnode.state.amount), project.projectHash);
             } else {
               // withdraw logic
               await protocol.withdraw(project.projectHash);
@@ -151,7 +151,7 @@ const ActionPage: m.Component<{project: CWProjectWithParticipants, protocol: any
             vnode.state.error = 'Please enter the amount';
           } else {
             // redeemCToken logic
-            await protocol.redeemCToken(address, parseInt(vnode.state.amount), project.projectHash);
+            await protocol.redeemCToken(parseInt(vnode.state.amount), project.projectHash);
           }
           m.redraw();
         } }),

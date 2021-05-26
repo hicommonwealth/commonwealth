@@ -67,7 +67,7 @@ const ViewProjectInitialPage: m.Component<{projectHash: string}, {initializing: 
       return m(PageLoading);
     }
     const { protocol } = vnode.state;
-    const project: CWProjectWithParticipants = (protocol.get('root').projects || []).filter((item) => item.projectHash === vnode.attrs.projectHash)[0];
+    const project: CWProjectWithParticipants = (protocol.projects || []).filter((item) => item.projectHash === vnode.attrs.projectHash)[0];
 
     const startTime = new Date();
     const endTime = new Date(project.endTime);

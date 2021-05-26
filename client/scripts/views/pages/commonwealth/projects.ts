@@ -8,6 +8,7 @@ import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import Listing from 'views/pages/listing';
 import ProjectCard from 'views/components/project_card';
+import BN from 'bn.js';
 
 const Description: m.Component<{}, {}> = {
   view: (vnode) => {
@@ -29,7 +30,6 @@ const ProjectsPage: m.Component<{}, { initializing: boolean, protocol: any }> = 
     if (!app.chain || !app.chain.loaded) {
       vnode.state.initializing = true;
       await initChain();
-      console.log('====>app.chain', app.chain)
       vnode.state.protocol = (app.chain as any).protocol;
       vnode.state.initializing = false;
       m.redraw(); 
@@ -43,7 +43,7 @@ const ProjectsPage: m.Component<{}, { initializing: boolean, protocol: any }> = 
       return m(PageLoading);
     }
 
-    const projects = vnode.state.protocol.get('root').projects;
+    const projects = vnode.state.protocol.projects;
     const activeProjectsContent = projects ? projects.filter((p) => p.status === 'In Progress').map((p) => m(ProjectCard, { project: p })) : [];
     const failedProjects = projects ? projects.filter((p) => p.status === 'Failed').map((p) => m(ProjectCard, { project: p })) : [];
     const successedProjects = projects ? projects.filter((p) => p.status === 'Successed').map((p) => m(ProjectCard, { project: p })) : [];
