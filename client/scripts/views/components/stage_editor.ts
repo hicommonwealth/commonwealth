@@ -13,7 +13,7 @@ import ChainEntityController, { EntityRefreshOption } from 'controllers/server/c
 
 const ChainEntitiesSelector: m.Component<{
   thread: OffchainThread;
-  enabled: boolean;
+  onSelect,
   chainEntitiesToSet: ChainEntity[];
 }, {
   initialized: boolean;
@@ -21,7 +21,7 @@ const ChainEntitiesSelector: m.Component<{
   chainEntitiesLoaded: boolean;
 }> = {
   view: (vnode) => {
-    const { thread, enabled } = vnode.attrs;
+    const { thread, onSelect } = vnode.attrs;
     if (!app.chain || !app.activeChainId()) return;
     if (!vnode.state.initialized) {
       vnode.state.initialized = true;
@@ -33,7 +33,7 @@ const ChainEntitiesSelector: m.Component<{
     }
 
     return m('.ChainEntitiesSelector', [
-      (enabled && vnode.state.chainEntitiesLoaded) ? m(QueryList, {
+      vnode.state.chainEntitiesLoaded ? m(QueryList, {
         checkmark: true,
         items: app.chain.chainEntities.store.getAll(),
         inputAttrs: {
@@ -66,11 +66,12 @@ const ChainEntitiesSelector: m.Component<{
           } else {
             vnode.attrs.chainEntitiesToSet.push(ce);
           }
+          onSelect(ce);
         },
       }) : m('.chain-entities-selector-placeholder', [
         m('.chain-entities-selector-placeholder-text', [
           vnode.state.chainEntitiesLoaded
-            ? 'Available once the thread is set to Voting or later'
+            ? 'Select "In Voting" to begin.'
             : 'Loading on-chain proposals...'
         ]),
       ]),
@@ -107,7 +108,7 @@ const StageEditor: m.Component<{
         closeOnOutsideClick: true,
         class: 'StageEditorDialog',
         content: [
-          m('h4', 'Select a stage'),
+          m('p', 'Track the status of any on-chain proposals related to this thread.'),
           m('.stage-options', [
             [
               OffchainThreadStage.Discussion,
@@ -127,11 +128,14 @@ const StageEditor: m.Component<{
               }
             })),
           ]),
-          app.chain && app.activeChainId() && m('h4', 'Link an on-chain proposal'),
           m(ChainEntitiesSelector, {
             thread: vnode.attrs.thread,
-            enabled: vnode.state.stage !== OffchainThreadStage.Discussion
-              && vnode.state.stage !== OffchainThreadStage.ProposalInReview,
+            onSelect: (result) => {
+              if (vnode.state.stage === OffchainThreadStage.Discussion
+                  || vnode.state.stage === OffchainThreadStage.ProposalInReview) {
+                vnode.state.stage = OffchainThreadStage.Voting;
+              }
+            },
             chainEntitiesToSet: vnode.state.chainEntitiesToSet,
           }),
         ],
@@ -145,7 +149,7 @@ const StageEditor: m.Component<{
             vnode.state.isOpen = false;
           }
         },
-        title: 'Edit stage',
+        title: 'Update on-chain status',
         transitionDuration: 200,
         footer: m(`.${Classes.ALIGN_RIGHT}`, [
           m(Button, {

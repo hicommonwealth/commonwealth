@@ -270,6 +270,8 @@ export const ProposalHeaderStage: m.Component<{ proposal: OffchainThread }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     if (!proposal) return;
+    if (proposal.stage === OffchainThreadStage.Discussion) return;
+
     return m('.ProposalHeaderStage', [
       m(Button, {
         rounded: true,
@@ -281,30 +283,13 @@ export const ProposalHeaderStage: m.Component<{ proposal: OffchainThread }> = {
           m.route.set(`/${proposal.chain || proposal.community}?stage=${proposal.stage}`);
         },
         label: offchainThreadStageToLabel(proposal.stage),
-        intent: proposal.stage === OffchainThreadStage.Discussion ? 'none'
-          : proposal.stage === OffchainThreadStage.ProposalInReview ? 'positive'
-            : proposal.stage === OffchainThreadStage.Voting ? 'positive'
-              : proposal.stage === OffchainThreadStage.Passed ? 'positive'
-                : proposal.stage === OffchainThreadStage.Failed ? 'negative'
-                  : proposal.stage === OffchainThreadStage.Abandoned ? 'negative' : 'none',
+        intent: proposal.stage === OffchainThreadStage.ProposalInReview ? 'positive'
+          : proposal.stage === OffchainThreadStage.Voting ? 'positive'
+            : proposal.stage === OffchainThreadStage.Passed ? 'positive'
+              : proposal.stage === OffchainThreadStage.Failed ? 'negative'
+                : proposal.stage === OffchainThreadStage.Abandoned ? 'negative' : 'none',
       }),
     ]);
-  }
-};
-
-export const ProposalHeaderStageEditorButton: m.Component<{ openStageEditor: Function }, { isOpen: boolean }> = {
-  view: (vnode) => {
-    const { openStageEditor } = vnode.attrs;
-    return m(Button, {
-      class: 'ProposalHeaderStageEditorButton',
-      rounded: true,
-      size: 'xs',
-      label: 'Select stage',
-      onclick: (e) => {
-        e.preventDefault();
-        openStageEditor();
-      },
-    });
   }
 };
 
@@ -314,11 +299,29 @@ export const ProposalHeaderPollEditorButton: m.Component<{ openPollEditor: Funct
     return m(Button, {
       class: 'ProposalHeaderPollEditorButton',
       rounded: true,
-      size: 'xs',
-      label: 'Create poll',
+      compact: true,
+      intent: 'primary',
+      label: 'Start off-chain polling',
       onclick: (e) => {
         e.preventDefault();
         openPollEditor();
+      },
+    });
+  }
+};
+
+export const ProposalHeaderStageEditorButton: m.Component<{ openStageEditor: Function }, { isOpen: boolean }> = {
+  view: (vnode) => {
+    const { openStageEditor } = vnode.attrs;
+    return m(Button, {
+      class: 'ProposalHeaderStageEditorButton',
+      rounded: true,
+      compact: true,
+      intent: 'primary',
+      label: 'Update on-chain status',
+      onclick: (e) => {
+        e.preventDefault();
+        openStageEditor();
       },
     });
   }

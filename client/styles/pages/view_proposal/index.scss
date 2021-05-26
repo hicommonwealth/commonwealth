@@ -326,20 +326,10 @@ $discussion-title-font-size: 1.45rem;
             }
         }
     }
-    .ProposalHeaderStage,
-    .ProposalHeaderStageEditorButton,
-    .ProposalHeaderPollEditorButton {
+    .ProposalHeaderStage {
         position: relative;
         top: -4px;
         margin-right: 7px;
-    }
-    .ProposalHeaderStageEditorButton.cui-button,
-    .ProposalHeaderPollEditorButton.cui-button {
-        height: 22px;
-        min-height: 22px;
-        padding: 0 10px;
-    }
-    .ProposalHeaderStage {
         margin-top: 9px;
         a.cui-button {
             height: 20px;
@@ -373,6 +363,12 @@ $discussion-title-font-size: 1.45rem;
                 display: block;
             }
         }
+    }
+
+    .ProposalHeaderStageEditorButton.cui-button,
+    .ProposalHeaderPollEditorButton.cui-button {
+        margin-top: 18px;
+        margin-right: 10px;
     }
 
     .QuillEditor {

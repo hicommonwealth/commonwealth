@@ -126,17 +126,6 @@ const ProposalHeader: m.Component<{
               m(ProposalHeaderTitle, { proposal }),
               m.trust(' &nbsp; '),
               proposal instanceof OffchainThread && m(ProposalHeaderStage, { proposal }),
-              (isAuthor || isAdmin) && proposal instanceof OffchainThread && m(ProposalHeaderStageEditorButton, {
-                openStageEditor: () => {
-                  vnode.state.stageEditorIsOpen = true;
-                }
-              }),
-              isAuthor && proposal instanceof OffchainThread && !proposal.offchainVotingEndsAt
-                && m(ProposalHeaderPollEditorButton, {
-                  openPollEditor: () => {
-                    vnode.state.pollEditorIsOpen = true;
-                  }
-                }),
             ]),
           vnode.state.editing
             && m(ProposalTitleEditor, {
@@ -268,6 +257,18 @@ const ProposalHeader: m.Component<{
                 proposal['votingInterfaceLink'] && m(ProposalHeaderVotingInterfaceLink, { proposal }),
               ]),
           ]),
+          isAuthor && proposal instanceof OffchainThread && !proposal.offchainVotingEndsAt
+            && [ m(ProposalHeaderPollEditorButton, {
+              openPollEditor: () => {
+                vnode.state.pollEditorIsOpen = true;
+              }
+            }), m('br') ],
+          (isAuthor || isAdmin) && proposal instanceof OffchainThread
+            && [ m(ProposalHeaderStageEditorButton, {
+              openStageEditor: () => {
+                vnode.state.stageEditorIsOpen = true;
+              }
+            }), m('br') ],
           proposal instanceof OffchainThread
             && proposal.hasOffchainPoll
             && m(ProposalHeaderOffchainPoll, { proposal }),

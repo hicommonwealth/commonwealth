@@ -9,6 +9,15 @@
         font-size: 17px;
         font-weight: 600;
     }
+    p {
+        margin: 0 8px;
+        margin-top: 16px;
+    }
+    p.secondary {
+        margin: 0;
+        margin-top: 16px;
+        color: $text-color-medium;
+    }
     .stage-options {
         margin-top: 12px;
         margin-bottom: 30px;
