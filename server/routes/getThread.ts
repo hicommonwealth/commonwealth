@@ -25,6 +25,14 @@ const getThread = async (models, req: Request, res: Response, next: NextFunction
           model: models.OffchainTopic,
           as: 'topic'
         },
+        {
+          model: models.OffchainReaction,
+          as: 'reactions',
+          include: {
+            model: models.Address,
+            as: 'Address'
+          }
+        }
       ],
     });
   } catch (e) {

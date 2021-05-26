@@ -85,12 +85,23 @@ class SubstrateBountyTreasury extends ProposalModule<
       }
       const data = {
         title: b.description,
+        // state
         isActive: b.bounty.status.isActive,
         isApproved: b.bounty.status.isApproved,
         isCuratorProposed: b.bounty.status.isCuratorProposed,
         isFunded: b.bounty.status.isFunded,
         isPendingPayout: b.bounty.status.isPendingPayout,
         isProposed: b.bounty.status.isProposed,
+        // metadata
+        fee: b.bounty.fee,
+        curatorDeposit: b.bounty.curatorDeposit,
+        bond: b.bounty.bond,
+        curator: b.bounty.status.isCuratorProposed ? b.bounty.status.asCuratorProposed?.curator
+          : b.bounty.status.isActive ? b.bounty.status.asActive.curator
+          : b.bounty.status.isPendingPayout ? b.bounty.status.asPendingPayout.curator : null,
+        updateDue: b.bounty.status.isActive ? b.bounty.status.asActive.updateDue : null,
+        beneficiary: b.bounty.status.isPendingPayout ? b.bounty.status.asPendingPayout.beneficiary : null,
+        unlockAt: b.bounty.status.isPendingPayout ? b.bounty.status.asPendingPayout.unlockAt : null,
       };
       bounty.setStatus(data);
     });
@@ -99,6 +110,7 @@ class SubstrateBountyTreasury extends ProposalModule<
     this._initializing = false;
   }
 
+  // anyone proposes a bounty
   public createTx(author: SubstrateAccount, value: SubstrateCoin, description: string) {
     return this._Chain.createTXModalData(
       author,
@@ -108,24 +120,31 @@ class SubstrateBountyTreasury extends ProposalModule<
     );
   }
 
-  public createBountyApprovalMotionTx(author: SubstrateAccount, bountyId: number) {
+  // council approves a bounty
+  public createBountyApprovalMotionTx(author: SubstrateAccount, bountyId: number, threshold: number) {
+    const action = this._Chain.getTxMethod('bounties', 'approveBounty', [ bountyId ]);
+    const length = 1000;
     return this._Chain.createTXModalData(
       author,
-      (api: ApiPromise) => api.tx.bounties.approveBounty(bountyId),
+      (api: ApiPromise) => api.tx.council.propose(threshold, action, length),
       'approveBounty',
       `approveBounty(${bountyId})`
     );
   }
 
-  public proposeCuratorTx(author: SubstrateAccount, bountyId: number, curator: string, fee: SubstrateCoin) {
+  // council approves a curator
+  public proposeCuratorTx(author: SubstrateAccount, bountyId: number, curator: string, fee: SubstrateCoin, threshold: number) {
+    const action = this._Chain.getTxMethod('bounties', 'proposeCurator', [ bountyId, curator, fee ]);
+    const length = 1000;
     return this._Chain.createTXModalData(
       author,
-      (api: ApiPromise) => api.tx.bounties.proposeCurator(bountyId, curator, fee),
+      (api: ApiPromise) => api.tx.council.propose(threshold, action, length),
       'proposeCurator',
       `proposeCurator(${bountyId}, ${curator}, ${fee})`
     );
   }
 
+  // curator accepts the bounty
   public acceptCuratorTx(author: SubstrateAccount, bountyId: number) {
     return this._Chain.createTXModalData(
       author,
@@ -135,6 +154,7 @@ class SubstrateBountyTreasury extends ProposalModule<
     );
   }
 
+  // curator awards the bounty
   public awardBountyTx(author: SubstrateAccount, bountyId: number, recipient: string) {
     return this._Chain.createTXModalData(
       author,
@@ -144,6 +164,7 @@ class SubstrateBountyTreasury extends ProposalModule<
     );
   }
 
+  // curator extends the bounty
   public extendBountyExpiryTx(author: SubstrateAccount, bountyId: number, remark: string) {
     return this._Chain.createTXModalData(
       author,
@@ -153,6 +174,7 @@ class SubstrateBountyTreasury extends ProposalModule<
     );
   }
 
+  // recipient claims the bounty
   public claimBountyTx(author: SubstrateAccount, bountyId: number) {
     return this._Chain.createTXModalData(
       author,

@@ -11,6 +11,7 @@ import SessionSequelizeStore from 'connect-session-sequelize';
 import WebSocket from 'ws';
 
 import { SubstrateTypes } from '@commonwealth/chain-events';
+import Erc20SubscriberHolder from 'server/util/erc20SubscriberHolder';
 
 import { SESSION_SECRET } from './server/config';
 import setupAPI from './server/router';
@@ -22,7 +23,7 @@ import ViewCountCache from './server/util/viewCountCache';
 import IdentityFetchCache from './server/util/identityFetchCache';
 import TokenBalanceCache from './server/util/tokenBalanceCache';
 import TokenListCache from './server/util/tokenListCache';
-import Erc20SubscriberHolder from 'server/util/erc20SubscriberHolder';
+import { MockTokenBalanceProvider } from './test/util/modelUtils';
 
 require('express-async-errors');
 
@@ -34,8 +35,10 @@ const identityFetchCache = new IdentityFetchCache(0);
 
 // always prune both token and non-token holders asap
 const tokenListCache = new TokenListCache();
-const tokenBalanceCache = new TokenBalanceCache(tokenListCache, 0, 0);
+const mockTokenBalanceProvider = new MockTokenBalanceProvider();
+const tokenBalanceCache = new TokenBalanceCache(tokenListCache, 0, 0, mockTokenBalanceProvider);
 const erc20SubscriberHolder = new Erc20SubscriberHolder();
+
 const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
 let server;
 
@@ -313,5 +316,6 @@ setupServer();
 export const resetDatabase = () => resetServer();
 export const getIdentityFetchCache = () => identityFetchCache;
 export const getTokenBalanceCache = () => tokenBalanceCache;
+export const getMockBalanceProvider = () => mockTokenBalanceProvider;
 
 export default app;

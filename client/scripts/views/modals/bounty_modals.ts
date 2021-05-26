@@ -5,6 +5,10 @@ import m from 'mithril';
 import { Button, Input } from 'construct-ui';
 import Substrate from 'controllers/chain/substrate/main';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
+import AddressInputTypeahead from 'views/components/addresses/address_input_typeahead';
+import { createTXModal } from 'views/modals/tx_signing_modal';
+import { alertModalWithText } from 'views/modals/alert_modal';
+import { notifyError } from 'controllers/app/notifications';
 
 import app from 'state';
 
@@ -39,14 +43,19 @@ export const ApproveBountyModal: m.Component<{ bountyId: number }, { approvals: 
           onclick: async (e) => {
             e.preventDefault();
             if (isNaN(vnode.state.approvals)) return;
-            await (app.chain as Substrate).bounties.createBountyApprovalMotionTx(
-              app.user?.activeAccount as SubstrateAccount, bountyId
+            await createTXModal(
+              (app.chain as Substrate).bounties.createBountyApprovalMotionTx(
+                app.user?.activeAccount as SubstrateAccount, bountyId, vnode.state.approvals
+              )
             );
 
             // done
             $(e.target).trigger('modalcomplete');
-            setTimeout(() => {
+            setTimeout(async () => {
               $(e.target).trigger('modalexit');
+              await alertModalWithText(
+                'Council motion created! Next, the motion must be approved to fund the bounty.'
+              )();
             }, 0);
           },
           label: 'Go to send transaction',
@@ -56,11 +65,15 @@ export const ApproveBountyModal: m.Component<{ bountyId: number }, { approvals: 
   }
 };
 
-export const ProposeCuratorModal: m.Component<{ bountyId: number }, { approvals: number, curator: string, fee: number }> = {
+export const ProposeCuratorModal: m.Component<{ bountyId: number }, {
+  approvals: number,
+  curator: string,
+  fee: number,
+}> = {
   view: (vnode) => {
     const { bountyId } = vnode.attrs;
-    const { curator, fee } = vnode.state;
-    const feeCoins = app.chain.chain.coins(fee);
+    const { curator, fee, approvals } = vnode.state;
+    const feeCoins = app.chain.chain.coins(fee, true);
 
     return m('.ProposeCuratorModal', [
       m('.compact-modal-title', [
@@ -68,21 +81,37 @@ export const ProposeCuratorModal: m.Component<{ bountyId: number }, { approvals:
       ]),
       m('.compact-modal-body', [
         m('p', [
-          'Propose a curator to manage this bounty.',
+          'Propose a curator and fee to manage this bounty.',
         ]),
-        m(Input, {
-          fluid: true,
-          oninput: (e) => {
-            vnode.state.curator = (e.target as any).value;
+        m('p', [
+          'The fee should be a portion of the bounty, that will go to the curator once the bounty is completed.',
+        ]),
+        m(AddressInputTypeahead, {
+          options: {
+            fluid: true,
+            placeholder: 'Curator address',
           },
-          placeholder: 'Curator address',
+          oninput: (result) => {
+            vnode.state.curator = result.address;
+          },
         }),
         m(Input, {
           fluid: true,
           oninput: (e) => {
-            vnode.state.fee = (e.target as any).value;
+            vnode.state.fee = +(e.target as any).value;
           },
-          placeholder: 'Fee',
+          placeholder: `Fee (${app.chain?.chain?.denom})`,
+        }),
+        m('p', [
+          'This will create a council motion, that needs to be approved by a sufficient number of councillors as configured by the chain.',
+        ]),
+        m(Input, {
+          fluid: true,
+          oninput: (e) => {
+            const approvals = +(e.target as any).value;
+            vnode.state.approvals = approvals;
+          },
+          placeholder: 'Approvals required',
         }),
       ]),
       m('.compact-modal-actions', [
@@ -91,14 +120,18 @@ export const ProposeCuratorModal: m.Component<{ bountyId: number }, { approvals:
           rounded: true,
           onclick: async (e) => {
             e.preventDefault();
-            await (app.chain as Substrate).bounties.proposeCuratorTx(
-              app.user?.activeAccount as SubstrateAccount, bountyId, curator, feeCoins
+            if (isNaN(vnode.state.approvals)) return;
+            await createTXModal(
+              (app.chain as Substrate).bounties.proposeCuratorTx(
+                app.user?.activeAccount as SubstrateAccount, bountyId, curator, feeCoins, approvals
+              )
             );
 
             // done
             $(e.target).trigger('modalcomplete');
-            setTimeout(() => {
+            setTimeout(async () => {
               $(e.target).trigger('modalexit');
+              await alertModalWithText('Council motion created! Next, the motion must be approved & the curator must accept the bounty by putting down a deposit.')();
             }, 0);
           },
           label: 'Go to send transaction',
@@ -121,12 +154,14 @@ export const AwardBountyModal: m.Component<{ bountyId: number }, { approvals: nu
         m('p', [
           'Award this bounty to the recipient. This action will take effect after a delay.'
         ]),
-        m(Input, {
-          fluid: true,
-          oninput: (e) => {
-            vnode.state.recipient = (e.target as any).value;
+        m(AddressInputTypeahead, {
+          options: {
+            fluid: true,
+            placeholder: 'Recipient address',
           },
-          placeholder: 'Recipient address',
+          oninput: (result) => {
+            vnode.state.recipient = result.address;
+          },
         }),
       ]),
       m('.compact-modal-actions', [
@@ -135,14 +170,19 @@ export const AwardBountyModal: m.Component<{ bountyId: number }, { approvals: nu
           rounded: true,
           onclick: async (e) => {
             e.preventDefault();
-            await (app.chain as Substrate).bounties.awardBountyTx(
-              app.user?.activeAccount as SubstrateAccount, bountyId, recipient
+            await createTXModal(
+              (app.chain as Substrate).bounties.awardBountyTx(
+                app.user?.activeAccount as SubstrateAccount, bountyId, recipient
+              )
             );
 
             // done
             $(e.target).trigger('modalcomplete');
-            setTimeout(() => {
+            setTimeout(async () => {
               $(e.target).trigger('modalexit');
+              await alertModalWithText(
+                'Bounty awarded! Once the review period has passed, the recipient will be able to claim their payout.'
+              )();
             }, 0);
           },
           label: 'Go to send transaction',
@@ -163,7 +203,7 @@ export const ExtendExpiryModal: m.Component<{ bountyId: number }, { approvals: n
       ]),
       m('.compact-modal-body', [
         m('p', [
-          'Extend this bounty? You can include a remark summarizing progress so far.',
+          'Extend this bounty? You should include a remark summarizing progress so far.',
         ]),
         m(Input, {
           fluid: true,
@@ -179,14 +219,17 @@ export const ExtendExpiryModal: m.Component<{ bountyId: number }, { approvals: n
           rounded: true,
           onclick: async (e) => {
             e.preventDefault();
-            await (app.chain as Substrate).bounties.extendBountyExpiryTx(
-              app.user?.activeAccount as SubstrateAccount, bountyId, remark
+            await createTXModal(
+              (app.chain as Substrate).bounties.extendBountyExpiryTx(
+                app.user?.activeAccount as SubstrateAccount, bountyId, remark
+              )
             );
 
             // done
             $(e.target).trigger('modalcomplete');
-            setTimeout(() => {
+            setTimeout(async () => {
               $(e.target).trigger('modalexit');
+              await alertModalWithText('Bounty extended!')();
             }, 0);
           },
           label: 'Go to send transaction',

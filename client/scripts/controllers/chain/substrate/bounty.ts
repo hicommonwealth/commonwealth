@@ -33,7 +33,7 @@ export class SubstrateBounty extends Proposal<ApiPromise, SubstrateCoin, ISubstr
     return `#${this.identifier.toString()}`;
   }
 
-  public setStatus (status) {
+  public setStatus(status) {
     this._title = status.title;
     this._isActive = status.isActive;
     this._isApproved = status.isApproved;
@@ -41,6 +41,16 @@ export class SubstrateBounty extends Proposal<ApiPromise, SubstrateCoin, ISubstr
     this._isFunded = status.isFunded;
     this._isPendingPayout = status.isPendingPayout;
     this._isProposed = status.isProposed;
+    this._curator = status.curator?.toString();
+    this._updateDue = status.updateDue;
+    this._unlockAt = status.unlockAt;
+    this._beneficiary = status.beneficiary?.toString();
+
+    this._fee = this._Chain.coins(status.fee);
+    this._curatorDeposit = this._Chain.coins(status.curatorDeposit);
+  }
+  public setUpdateDue(updateDue) {
+    this._updateDue = updateDue;
   }
   private _title: string;
   private _isActive: boolean;
@@ -49,6 +59,10 @@ export class SubstrateBounty extends Proposal<ApiPromise, SubstrateCoin, ISubstr
   private _isFunded: boolean;
   private _isPendingPayout: boolean;
   private _isProposed: boolean;
+  private _curator: string;
+  private _updateDue;
+  private _unlockAt;
+  private _beneficiary: string;
 
   public get title() { return this._title || `Bounty ${this.shortIdentifier}`; }
   public get isActive() { return this._isActive; }
@@ -57,6 +71,10 @@ export class SubstrateBounty extends Proposal<ApiPromise, SubstrateCoin, ISubstr
   public get isFunded() { return this._isFunded; }
   public get isPendingPayout() { return this._isPendingPayout; }
   public get isProposed() { return this._isProposed; }
+  public get curator() { return this._curator; }
+  public get updateDue() { return this._updateDue; }
+  public get unlockAt() { return this._unlockAt; }
+  public get beneficiary() { return this._beneficiary; }
 
   private readonly _description: string;
   public get description() { return this._description; }
@@ -76,10 +94,10 @@ export class SubstrateBounty extends Proposal<ApiPromise, SubstrateCoin, ISubstr
   public readonly _bond: SubstrateCoin;
   public get bond() { return this._bond; }
 
-  public readonly _fee: SubstrateCoin;
+  public _fee: SubstrateCoin;
   public get fee() { return this._fee; }
 
-  public readonly _curatorDeposit: SubstrateCoin;
+  public _curatorDeposit: SubstrateCoin;
   public get curatorDeposit() { return this._curatorDeposit; }
 
   public get votingType() {
@@ -179,33 +197,46 @@ export class SubstrateBounty extends Proposal<ApiPromise, SubstrateCoin, ISubstr
       return;
     }
     switch (e.data.kind) {
+      // proposed by anyone
       case SubstrateTypes.EventKind.TreasuryBountyProposed: {
-        break;
-      }
-      case SubstrateTypes.EventKind.TreasuryBountyBecameActive: {
         this._active = true;
+        this._isProposed = true;
         break;
       }
-      case SubstrateTypes.EventKind.TreasuryBountyCanceled: {
+      // proposal rejected by council
+      case SubstrateTypes.EventKind.TreasuryBountyRejected: {
+        this._awarded = false;
         this._active = false;
         this.complete();
         break;
       }
-      case SubstrateTypes.EventKind.TreasuryBountyExtended: {
+      // curator accepted
+      case SubstrateTypes.EventKind.TreasuryBountyBecameActive: {
+        this._isProposed = false;
+        this._isActive = true;
         break;
       }
+      // extended by curator
+      case SubstrateTypes.EventKind.TreasuryBountyExtended: {
+        // clear updateDue, it can be re-fetched if needed
+        this._updateDue = null;
+        break;
+      }
+      // awarded by curator
       case SubstrateTypes.EventKind.TreasuryBountyAwarded: {
         this._awarded = true;
-        this._active = false;
+        this._isActive = false;
+        this._isPendingPayout = true;
         break;
       }
-      case SubstrateTypes.EventKind.TreasuryBountyRejected: {
-        this.complete();
-        this._active = false;
-        break;
-      }
+      // claimed by recipient
       case SubstrateTypes.EventKind.TreasuryBountyClaimed: {
-        this._awarded = true;
+        this._active = false;
+        this.complete();
+        break;
+      }
+      // rejected by council (?)
+      case SubstrateTypes.EventKind.TreasuryBountyCanceled: {
         this._active = false;
         this.complete();
         break;
