@@ -15,7 +15,7 @@ export function offchainThreadStageToLabel(stage: OffchainThreadStage) {
   } else if (stage === OffchainThreadStage.ProposalInReview) {
     return 'Pre-Voting';
   } else if (stage === OffchainThreadStage.Voting) {
-    return 'Voting';
+    return 'In Voting';
   } else if (stage === OffchainThreadStage.Passed) {
     return 'Passed';
   } else if (stage === OffchainThreadStage.Failed) {

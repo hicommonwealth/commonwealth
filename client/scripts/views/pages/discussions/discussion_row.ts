@@ -48,22 +48,37 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
       (propType === OffchainThreadKind.Link && proposal.url)
         && m('span.spacer', ' '),
       link('a', discussionLink, proposal.title),
+      m('span.spacer', m.trust(' &nbsp; ')),
+      proposal instanceof OffchainThread
+        && proposal.stage !== OffchainThreadStage.Discussion
+        && [
+          m(Button, {
+            class: 'discussion-row-stage',
+            label: offchainThreadStageToLabel(proposal.stage),
+            intent: proposal.stage === OffchainThreadStage.ProposalInReview ? 'positive'
+              : proposal.stage === OffchainThreadStage.Voting ? 'positive'
+                : proposal.stage === OffchainThreadStage.Passed ? 'positive'
+                  : proposal.stage === OffchainThreadStage.Failed ? 'negative'
+                    : proposal.stage === OffchainThreadStage.Abandoned ? 'negative' : 'none',
+            size: 'xs',
+            rounded: true,
+            compact: true,
+          }),
+        ],
       proposal instanceof OffchainThread
         && (proposal.offchainVotingEndsAt || proposal.offchainVotingNumVotes)
         && [
-          m('span.spacer', m.trust(' &nbsp; ')),
           m(Button, {
             class: 'discussion-row-linked-poll',
-            label: 'POLL',
+            label: 'Poll',
             contentRight: pluralize(proposal.offchainVotingNumVotes, 'vote'),
-            intent: 'positive',
+            intent: 'warning',
             size: 'xs',
             rounded: true,
             compact: true,
           }),
         ],
       proposal.chainEntities?.length > 0 && [
-        m('span.spacer', m.trust(' &nbsp; ')),
         proposal.chainEntities.map((ce) => {
           if (!chainEntityTypeToProposalShortName(ce.type)) return;
           return m(Button, {
@@ -110,7 +125,6 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
 
     const rowMetadata = [
       m('.discussion-row-right-meta', [
-        // offchain polls off, show stage & replyers
         m(UserGallery, {
           avatarSize: 20,
           popover: true,
@@ -120,19 +134,6 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
             proposal.author,
             proposal.authorChain
           )
-        }),
-        m(Button, {
-          class: 'discussion-row-stage',
-          label: offchainThreadStageToLabel(proposal.stage),
-          intent: proposal.stage === OffchainThreadStage.Discussion ? 'none'
-            : proposal.stage === OffchainThreadStage.ProposalInReview ? 'positive'
-              : proposal.stage === OffchainThreadStage.Voting ? 'positive'
-                : proposal.stage === OffchainThreadStage.Passed ? 'positive'
-                  : proposal.stage === OffchainThreadStage.Failed ? 'negative'
-                    : proposal.stage === OffchainThreadStage.Abandoned ? 'negative' : 'none',
-          size: 'xs',
-          rounded: true,
-          compact: true,
         }),
       ]),
       app.isLoggedIn() && m('.discussion-row-menu', [

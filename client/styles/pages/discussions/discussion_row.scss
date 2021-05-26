@@ -6,6 +6,9 @@
             background: $background-color-white;
         }
         .row-header {
+            a {
+                line-height: 1.2;
+            }
             .spacer {
                 display: inline-block;
                 width: 8px;
@@ -17,6 +20,7 @@
                     text-decoration: underline;
                 }
             }
+            .discussion-row-stage,
             .discussion-row-linked-poll,
             .discussion-row-linked-chain-entity {
                 font-size: 14px;
@@ -27,13 +31,15 @@
                 user-select: none;
                 position: relative;
                 top: -1px;
-                margin: -3px 0;
+                margin: -2px 0;
                 margin-left: -1px;
                 margin-right: 5px;
                 border: none;
             }
         }
         .row-subheader {
+            position: relative;
+            top: -2px;
             > * {
                 display: inline-block !important;
             }
@@ -163,7 +169,6 @@
         .discussion-row-menu {
             width: 28px;
             position: relative;
-            top: 10px;
             svg {
                 position: relative;
                 top: 1px;
