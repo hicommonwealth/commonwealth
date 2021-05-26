@@ -56,16 +56,6 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
                 : '--',
             ]),
           ]),
-          app.chain?.class !== ChainClass.Plasm && m('', [
-            m(Button, {
-              class: activeAccount ? '' : 'disabled',
-              onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
-                type: ProposalType.SubstrateTreasuryProposal
-              }),
-              rounded: true,
-              label: 'New treasury proposal',
-            }),
-          ]),
         ]),
       ]),
     ]);

@@ -66,24 +66,6 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
               : '--',
           ]),
         ]),
-        app.chain?.class !== ChainClass.Plasm && m('', [
-          m(Button, {
-            rounded: true,
-            class: activeAccount ? '' : 'disabled',
-            onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
-              type: ProposalType.SubstrateDemocracyProposal
-            }),
-            label: 'New democracy proposal',
-          }),
-          m(Button, {
-            rounded: true,
-            class: activeAccount && (activeAccount as any).isCouncillor ? '' : 'disabled',
-            onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
-              type: ProposalType.SubstrateCollectiveProposal
-            }),
-            label: 'New council motion',
-          }),
-        ]),
       ]),
     ]);
   }
