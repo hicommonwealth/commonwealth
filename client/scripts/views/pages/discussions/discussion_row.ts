@@ -78,7 +78,9 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
           }),
         ],
       proposal.chainEntities?.length > 0 && [
-        proposal.chainEntities.map((ce) => {
+        proposal.chainEntities.sort((a, b) => {
+          return a.typeId - b.typeId;
+        }).map((ce) => {
           if (!chainEntityTypeToProposalShortName(ce.type)) return;
           return m(Button, {
             class: 'discussion-row-linked-chain-entity',
