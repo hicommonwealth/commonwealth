@@ -124,7 +124,6 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
         && [
           ' ', // regular space
           m('span.proposal-collaborators', [ ' +', pluralize(proposal.collaborators.length, 'collaborator') ]),
-          ' ', // em space
         ],
       ' ', // em space
       m('.created-at', link('a', discussionLink, `Last active ${formatLastUpdated(getLastUpdated(proposal))}`)),
