@@ -118,6 +118,8 @@ import bulkEntities from './routes/bulkEntities';
 import { getTokensFromLists } from './routes/getTokensFromLists';
 import getTokenForum from './routes/getTokenForum';
 
+import { sendMessage } from './routes/snapshotAPI';
+
 function setupRouter(
   app,
   models,
@@ -460,6 +462,8 @@ function setupRouter(
 
   // TODO: Change to GET /entities
   router.get('/bulkEntities', bulkEntities.bind(this, models));
+
+  router.post('/snapshotAPI/sendMessage', sendMessage.bind(this));
 
   app.use('/api', router);
 }

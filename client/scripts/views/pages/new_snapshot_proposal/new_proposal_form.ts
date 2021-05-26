@@ -9,8 +9,11 @@ import { Input, Form, FormLabel, FormGroup, Button, Callout } from 'construct-ui
 import DatePicker from 'mithril-datepicker';
 import TimePicker from 'mithril-timepicker';
 import moment from 'moment';
+import Web3 from 'web3';
 import getProvider from '@snapshot-labs/snapshot.js/src/utils/provider';
 import { getBlockNumber } from '@snapshot-labs/snapshot.js/src/utils/web3';
+import { version } from '@snapshot-labs/snapshot.js/src/constants.json';
+import { signMessage } from '@snapshot-labs/snapshot.js/src/utils/web3';
 
 import app from 'state';
 import snapshotClient from 'helpers/snapshot_client';
@@ -57,6 +60,7 @@ enum NewThreadErrors {
   NoChoices = 'Choices cannot be blank',
   NoStartDate = 'Start Date cannot be blank',
   NoEndDate = 'End Date cannot be blank',
+  SomethingWentWrong = "Something went wrong"
 }
 
 const newThread = async (
@@ -110,36 +114,43 @@ const newThread = async (
   form.snapshot = await getBlockNumber(getProvider(space.network));
   form.metadata.network = space.network;
   form.metadata.strategies = space.strategies;
-
-  // console.log(form, "form");
+  let user = app.user.activeAccount;
 
   try {
-    const result = await snapshotClient.broadcast(
-      web3Provider,
-      account,
-      space.key,
-      'proposal',
-      form
-    );
+    const msg: any = {
+      address: user.address,
+      msg: JSON.stringify({
+        version,
+        timestamp: (Date.now() / 1e3).toFixed(),
+        space,
+        type: 'proposal',
+        form
+      })
+    };
+    console.log(msg.msg);
+    msg.sig = await signMessage((window as any).ethereum, msg.msg, user.address);
+    console.log(msg);
+    let result = await $.post(`${app.serverUrl()}/snapshotAPI/sendMessage`, {
+      data: JSON.stringify(msg)
+    });
     // dispatch('notify', [
     //   'green',
     //   type === 'delete-proposal'
     //     ? i18n.global.t('notify.proposalDeleted')
     //     : i18n.global.t('notify.yourIsIn', [type])
     // ]);
-    const { ipfsHash } = result;
+    console.log(result);
   } catch (e) {
-    // const errorMessage =
-    //   e && e.error_description
-    //     ? `Oops, ${e.error_description}`
-    //     : i18n.global.t('notify.somethingWentWrong');
-    // dispatch('notify', ['red', errorMessage]);
-    return;
+    const errorMessage =
+      e && e.error_description
+        ? `Oops, ${e.error_description}`
+        : NewThreadErrors.SomethingWentWrong;
+    throw new Error(errorMessage);
   }
 
   await app.user.notifications.refresh();
 
-  m.route.set(`/${app.activeId()}/proposal/snapshot-proposal/${result.id}`);
+  //m.route.set(`/${app.activeId()}/proposal/snapshot-proposal/${result.id}`);
 
   mixpanel.track('Create Snapshot Proposal', {
     'Step No': 2,
