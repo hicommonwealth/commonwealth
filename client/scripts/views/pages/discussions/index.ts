@@ -58,13 +58,20 @@ const DiscussionStagesBar: m.Component<{ topic: string, stage: string }, {}> = {
       .sort((a, b) => a.name.localeCompare(b.name));
 
     const selectedTopic = topics.find((t) => topic && topic === t.name);
+    const selectedStage = [
+      OffchainThreadStage.Discussion,
+      OffchainThreadStage.ProposalInReview,
+      OffchainThreadStage.Voting,
+      OffchainThreadStage.Passed,
+      OffchainThreadStage.Failed,
+      OffchainThreadStage.Abandoned,
+    ].find((s) => s === stage as any);
 
     return m('.DiscussionStagesBar.discussions-stages', [
       topics.length > 0 && m(PopoverMenu, {
         trigger: m(Button, {
           rounded: true,
           compact: true,
-          active: true,
           class: 'discussions-topic',
           label: selectedTopic ? `Filter: ${topic}` : 'All Discussions',
           iconRight: Icons.CHEVRON_DOWN,
@@ -113,48 +120,54 @@ const DiscussionStagesBar: m.Component<{ topic: string, stage: string }, {}> = {
           })),
         ]),
       }),
-      m(ButtonGroup, [
-        m(Button, {
+      m(PopoverMenu, {
+        trigger: m(Button, {
           rounded: true,
           compact: true,
-          size: 'sm',
           class: 'discussions-stage',
-          onclick: (e) => {
-            e.preventDefault();
-            m.route.set(topic ? `/${app.activeId()}/discussions/${encodeURI(topic.trim())}` : `/${app.activeId()}`);
-          },
-          active: !stage,
-          label: 'All Stages'
+          label: selectedStage ? `Filter: ${offchainThreadStageToLabel(selectedStage)}` : 'All Stages',
+          iconRight: Icons.CHEVRON_DOWN,
+          size: 'sm',
         }),
-        [
-          // OffchainThreadStage.Discussion,
-          OffchainThreadStage.ProposalInReview,
-          OffchainThreadStage.Voting,
-          OffchainThreadStage.Passed,
-          OffchainThreadStage.Failed,
-          OffchainThreadStage.Abandoned,
-        ].map((targetStage, index) => m(Button, {
-          class: 'discussions-stage',
-          active: stage === targetStage,
-          rounded: true,
-          size: 'sm',
-          onclick: (e) => {
-            e.preventDefault();
-            m.route.set(
-              topic
-                ? `/${app.activeId()}/discussions/${encodeURI(topic.trim())}?stage=${targetStage}`
-                : `/${app.activeId()}?stage=${targetStage}`
-            );
-          },
-          label: [
-            `${offchainThreadStageToLabel(targetStage)}`,
-            targetStage === OffchainThreadStage.ProposalInReview
-              && [ ' ', m('.discussions-stage-count', `${app.threads.numPrevotingThreads}`) ],
-            targetStage === OffchainThreadStage.Voting
-              && [ ' ', m('.discussions-stage-count', `${app.threads.numVotingThreads}`) ],
-          ],
-        })),
-      ]),
+        inline: true,
+        transitionDuration: 0,
+        closeOnContentClick: true,
+        class: 'DiscussionStagesBarTopicsPopover',
+        content: m('.discussions-stage-items', [
+          m(MenuItem, {
+            onclick: (e) => {
+              e.preventDefault();
+              m.route.set(`/${app.activeId()}`);
+            },
+            active: !stage,
+            iconLeft: !stage ? Icons.CHECK : null,
+            label: 'All Stages'
+          }),
+          m(MenuDivider),
+          [
+            // OffchainThreadStage.Discussion,
+            OffchainThreadStage.ProposalInReview,
+            OffchainThreadStage.Voting,
+            OffchainThreadStage.Passed,
+            OffchainThreadStage.Failed,
+            OffchainThreadStage.Abandoned,
+          ].map((targetStage, index) => m(MenuItem, {
+            active: stage === targetStage,
+            iconLeft: stage === targetStage ? Icons.CHECK : null,
+            onclick: (e) => {
+              e.preventDefault();
+              m.route.set(`/${app.activeId()}?stage=${targetStage}`);
+            },
+            label: [
+              `${offchainThreadStageToLabel(targetStage)}`,
+              targetStage === OffchainThreadStage.ProposalInReview
+                && [ ' ', m('.discussions-stage-count', `${app.threads.numPrevotingThreads}`) ],
+              targetStage === OffchainThreadStage.Voting
+                && [ ' ', m('.discussions-stage-count', `${app.threads.numVotingThreads}`) ],
+            ],
+          })),
+        ]),
+      }),
     ]);
   }
 };

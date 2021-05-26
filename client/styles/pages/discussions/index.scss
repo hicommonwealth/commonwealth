@@ -36,7 +36,8 @@
             margin-bottom: 10px;
         }
     }
-    .discussions-topic-items {
+    .discussions-topic-items,
+    .discussions-stage-items {
         max-width: 300px;
         .topic-menu-item {
             display: flex;
@@ -51,7 +52,8 @@
             }
         }
     }
-    .cui-button.discussions-topic {
+    .cui-button.discussions-topic,
+    .cui-button.discussions-stage {
         margin-right: 11px;
         .cui-popover-content {
             position: relative;
