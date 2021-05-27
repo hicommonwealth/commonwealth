@@ -13,6 +13,7 @@ import EthereumAccounts, {
   getWalletFromSeed, addressFromSeed, addressFromMnemonic, getWalletFromMnemonic, addressFromWallet
 } from './accounts';
 import TokenApi from './token/api';
+import { attachSigner } from './contractApi';
 
 export default class EthereumAccount extends Account<EthereumCoin> {
   public get balance(): Promise<EthereumCoin> {
@@ -34,7 +35,7 @@ export default class EthereumAccount extends Account<EthereumCoin> {
   public async sendTokenTx(toSend: ERC20Token, recipient: string) {
     if (!this._Chain) return;
     const api = new TokenApi(ERC20__factory.connect, toSend.contractAddress, this._Chain.api.currentProvider as any);
-    const contract = await api.attachSigner(this._Chain.app.wallets, this.address);
+    const contract = await attachSigner(this._Chain.app.wallets, this.address, api.Contract);
     const transferTx = await contract.transfer(recipient, toSend.asBN.toString(10), { gasLimit: 3000000 });
     const transferTxReceipt = await transferTx.wait();
     if (transferTxReceipt.status !== 1) {
@@ -46,7 +47,7 @@ export default class EthereumAccount extends Account<EthereumCoin> {
   public async approveTokenTx(toApprove: ERC20Token, spender: string) {
     if (!this._Chain) return; // TODO
     const api = new TokenApi(ERC20__factory.connect, toApprove.contractAddress, this._Chain.api.currentProvider as any);
-    const contract = await api.attachSigner(this._Chain.app.wallets, this.address);
+    const contract = await attachSigner(this._Chain.app.wallets, this.address, api.Contract);
     const approvalTx = await contract.approve(
       spender,
       toApprove.asBN.toString(10),

@@ -44,8 +44,8 @@ export default class MarlinHolder extends EthereumAccount {
         throw new Error('Holder does not correspond with account');
       }
       this._isHolder = true;
-      this._balance = new MPond(this._Holders.api.contractAddress, new BN(data.balance));
-      this._delegates = new MPond(this._Holders.api.contractAddress, new BN(data.delegates));
+      this._balance = new MPond(this._Holders.api.MPondAddress, new BN(data.balance));
+      this._delegates = new MPond(this._Holders.api.MPondAddress, new BN(data.delegates));
       this._initialized = Promise.resolve(true);
     } else {
       this._initialized = new Promise((resolve, reject) => {

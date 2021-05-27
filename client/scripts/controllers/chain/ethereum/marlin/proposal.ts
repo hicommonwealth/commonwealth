@@ -21,6 +21,7 @@ import MarlinHolder from './holder';
 import MarlinHolders from './holders';
 import MarlinAPI from './api';
 import MarlinGovernance from './governance';
+import { attachSigner } from '../contractApi';
 
 export enum MarlinVote {
   YES = 1,
@@ -219,7 +220,10 @@ export default class MarlinProposal extends Proposal<
       throw new Error('proposal already canceled');
     }
 
-    const tx = await this._Gov.api.governorAlphaContract.cancel(
+    const address = this._Gov.app.user.activeAccount.address;
+    const contract = await attachSigner(this._Gov.app.wallets, address, this._Gov.api.Contract);
+
+    const tx = await contract.cancel(
       this.data.identifier,
       { gasLimit: this._Gov.api.gasLimit }
     );
@@ -233,10 +237,10 @@ export default class MarlinProposal extends Proposal<
   // web wallet TX only
   public async submitVoteWebTx(vote: MarlinProposalVote) {
     const address = vote.account.address;
-    const contract = await this._Gov.api.attachSigner(
+    const contract = await attachSigner(
       this._Gov.app.wallets,
       address,
-      this._Gov.api.governorAlphaContract
+      this._Gov.api.Contract
     );
     if (!(await this._Holders.isDelegate(address))) {
       throw new Error('sender must be valid delegate');

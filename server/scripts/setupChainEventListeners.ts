@@ -154,14 +154,8 @@ const setupChainEventListeners = async (
         contractVersion,
       });
     } else if (chainSupportedBy(node.chain, MarlinTypes.EventChains)) {
-      const governorAlphaContractAddress = '0x777992c2E4EDF704e49680468a9299C6679e37F6';
-      const timelockContractAddress = '0x42Bf58AD084595e9B6C5bb2aA04050B0C291264b';
       const api = await MarlinEvents.createApi(
-        node.url, {
-          comp: node.address,
-          governorAlpha: governorAlphaContractAddress,
-          timelock: timelockContractAddress,
-        }
+        node.url, node.address,
       );
       const handlers = generateHandlers(node);
       subscriber = await MarlinEvents.subscribeEvents({

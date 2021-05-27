@@ -22,6 +22,7 @@ import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import CommunitySelector from 'views/components/sidebar/community_selector';
 
 import { discordIcon, telegramIcon, elementIcon, githubIcon, websiteIcon } from './icons';
+import Moloch from 'client/scripts/controllers/chain/ethereum/moloch/adapter';
 
 const SidebarQuickSwitcherItem: m.Component<{ item, size }> = {
   view: (vnode) => {
@@ -328,7 +329,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
             account: app.user.activeAccount,
             accounts: ((app.user.activeAccount as any).app.chain as any).ethAccounts,
             contractAddress: ((app.user.activeAccount as any).app.chain as any).governance.api.contractAddress,
-            tokenAddress: ((app.user.activeAccount as any).app.chain as any).governance.api.tokenContract.address,
+            tokenAddress: ((app.user.activeAccount as any).app.chain as Moloch).governance.api.token.address,
           });
         },
         label: 'Approve tokens',

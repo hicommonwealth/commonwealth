@@ -1,6 +1,5 @@
 import { Web3Provider, ExternalProvider, JsonRpcSigner, Provider } from '@ethersproject/providers';
 import { ethers, Contract } from 'ethers';
-import { ERC20, ERC20__factory } from 'eth/types';
 import { ChainBase, IWebWallet } from 'models';
 import WebWalletController from 'controllers/app/web_wallets';
 import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web_wallet';
@@ -8,19 +7,58 @@ import WalletConnectWebWalletController from '../../app/webWallets/walletconnect
 
 export type ContractFactoryT<ContractT> = (address: string, provider: Provider) => ContractT;
 
+export async function attachSigner<CT extends Contract>(
+  wallets: WebWalletController,
+  sender: string,
+  contract: CT
+): Promise<CT> {
+  const availableWallets = wallets.availableWallets(ChainBase.Ethereum);
+  if (availableWallets.length === 0) {
+    throw new Error('No wallet available');
+  }
 
-class ContractApi<ContractT extends Contract> {
+  let signingWallet: IWebWallet<string>;
+  for (const wallet of availableWallets) {
+    if (!wallet.enabled) {
+      await wallet.enable();
+    }
+    // TODO: ensure that we can find any wallet, even if non-string accounts
+    if (wallet.accounts.find((acc) => acc === sender)) {
+      signingWallet = wallet;
+    }
+  }
+  if (!signingWallet) {
+    throw new Error('TX sender not found in wallet');
+  }
+
+  let signer: JsonRpcSigner;
+  if (signingWallet instanceof MetamaskWebWalletController
+    || signingWallet instanceof WalletConnectWebWalletController) {
+    const walletProvider = new ethers.providers.Web3Provider(signingWallet.provider as any);
+    signer = walletProvider.getSigner(sender);
+  } else {
+    throw new Error('Unsupported wallet');
+  }
+
+  if (!signer) {
+    throw new Error('Could not get signer.');
+  }
+  const ct = contract.connect(signer) as CT;
+  await ct.deployed();
+  return ct;
+}
+
+
+abstract class ContractApi<ContractT extends Contract> {
   public readonly gasLimit: number = 3000000;
 
   private _contractAddress: string;
   private _Contract: ContractT;
   private _Provider: Web3Provider;
-  private _tokenContract: ERC20;
 
   public get contractAddress() { return this._contractAddress; }
   public get Contract(): ContractT { return this._Contract; }
   public get Provider(): Web3Provider { return this._Provider; }
-  public get tokenContract() { return this._tokenContract; }
 
   constructor(
     factory: ContractFactoryT<ContractT>,
@@ -32,53 +70,8 @@ class ContractApi<ContractT extends Contract> {
     this._Contract = factory(this._contractAddress, this._Provider);
   }
 
-  public async attachSigner<CT extends Contract = ContractT>(
-    wallets: WebWalletController,
-    sender: string,
-    contract?: CT
-  ): Promise<CT> {
-    const availableWallets = wallets.availableWallets(ChainBase.Ethereum);
-    if (availableWallets.length === 0) {
-      throw new Error('No wallet available');
-    }
-
-    let signingWallet: IWebWallet<string>;
-    for (const wallet of availableWallets) {
-      if (!wallet.enabled) {
-        await wallet.enable();
-      }
-      // TODO: ensure that we can find any wallet, even if non-string accounts
-      if (wallet.accounts.find((acc) => acc === sender)) {
-        signingWallet = wallet;
-      }
-    }
-    if (!signingWallet) {
-      throw new Error('TX sender not found in wallet');
-    }
-
-    let signer: JsonRpcSigner;
-    if (signingWallet instanceof MetamaskWebWalletController
-      || signingWallet instanceof WalletConnectWebWalletController) {
-      const walletProvider = new ethers.providers.Web3Provider(signingWallet.provider as any);
-      signer = walletProvider.getSigner(sender);
-    } else {
-      throw new Error('Unsupported wallet');
-    }
-
-    if (!signer) {
-      throw new Error('Could not get signer.');
-    }
-    if (contract) {
-      return contract.connect(signer) as CT;
-    } else {
-      return this._Contract.connect(signer) as CT;
-    }
-  }
-
-  public async init(tokenAddress?: string): Promise<void> {
-    if (tokenAddress) {
-      this._tokenContract = ERC20__factory.connect(tokenAddress, this._Provider);
-    }
+  public async init(): Promise<void> {
+    await this._Contract.deployed();
   }
 }
 

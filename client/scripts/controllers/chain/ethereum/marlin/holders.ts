@@ -7,6 +7,7 @@ import { AccountsStore } from 'stores';
 import MarlinHolder from './holder';
 import MarlinAPI from './api';
 import MarlinChain from './chain';
+import { attachSigner } from '../contractApi';
 
 export default class MarlinHolders implements IAccountsModule<EthereumCoin, MarlinHolder> {
   protected _store: AccountsStore<MarlinHolder> = new AccountsStore();
@@ -66,7 +67,7 @@ export default class MarlinHolders implements IAccountsModule<EthereumCoin, Marl
 
   public async senderSetDelegate(address: string, amount: number) {
     try {
-      const contract = await this.api.attachSigner(this.app.wallets, this.app.user.activeAccount.address);
+      const contract = await attachSigner(this.app.wallets, this.app.user.activeAccount.address, this.api.Contract);
       await contract.delegate(address, amount);
     } catch (e) {
       console.error(e);
