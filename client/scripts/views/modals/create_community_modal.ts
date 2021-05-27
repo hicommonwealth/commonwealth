@@ -29,7 +29,6 @@ interface IState {
   element: string;
   telegram: string;
   github: string;
-  customDomain: string;
 }
 
 const CreateCommunityModal: m.Component<IAttrs, IState> = {
@@ -48,7 +47,6 @@ const CreateCommunityModal: m.Component<IAttrs, IState> = {
     vnode.state.element = '';
     vnode.state.telegram = '';
     vnode.state.github = '';
-    vnode.state.customDomain = '';
     vnode.state.isAuthenticatedForum = false;
     vnode.state.privacyEnabled = false;
     vnode.state.invitesEnabled = false;
@@ -107,12 +105,6 @@ const CreateCommunityModal: m.Component<IAttrs, IState> = {
             placeholder: 'https://github.com',
             onChangeHandler: (v) => { vnode.state.github = v; },
           }),
-          m(InputPropertyRow, {
-            title: 'Domain',
-            defaultValue: vnode.state.customDomain,
-            placeholder: 'gov.edgewa.re',
-            onChangeHandler: (v) => { vnode.state.customDomain = v; },
-          }),
           m(TogglePropertyRow, {
             title: 'Privacy',
             defaultValue: vnode.state.privacyEnabled,
@@ -125,21 +117,6 @@ const CreateCommunityModal: m.Component<IAttrs, IState> = {
             onToggle: (checked) => { vnode.state.invitesEnabled = checked; },
             caption: (checked) => checked ? 'Anyone can invite new members' : 'Admins/mods can invite new members',
           }),
-          // m('tr', [
-          //   m('td', 'Admins'),
-          //   m('td', [m(ManageRolesRow, {
-          //     roledata: vnode.attrs.admins,
-          //     onRoleUpdate: (oldRole, newRole) => { vnode.attrs.onRoleUpdate(oldRole, newRole); },
-          //   }),]),
-          // ]),
-          // vnode.attrs.mods.length > 0
-          // && m('tr', [
-          //   m('td', 'Moderators'),
-          //   m('td', [m(ManageRolesRow, {
-          //     roledata: vnode.attrs.mods,
-          //     onRoleUpdate: (oldRole, newRole) => { vnode.attrs.onRoleUpdate(oldRole, newRole); },
-          //   }),])
-          // ]),
         ]),
         m(Button, {
           label: 'Save changes',
@@ -154,7 +131,6 @@ const CreateCommunityModal: m.Component<IAttrs, IState> = {
               element,
               telegram,
               github,
-              customDomain,
               invitesEnabled,
               privacyEnabled,
               isAuthenticatedForum,
@@ -169,13 +145,11 @@ const CreateCommunityModal: m.Component<IAttrs, IState> = {
                 element,
                 telegram,
                 github,
-                customDomain,
                 invitesEnabled,
                 privacyEnabled,
                 isAuthenticatedForum,
                 jwt: app.user.jwt,
-              });
-              $(e.target).trigger('modalexit');
+              }).then(() => $(e.target).trigger('modalexit'));
             } catch (err) {
               notifyError(err.responseJSON?.error || 'Creating new community failed');
             }
