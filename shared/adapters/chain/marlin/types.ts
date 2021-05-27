@@ -3,34 +3,6 @@
 //  do this, but we'll need to think through them. Currently, this corresponds
 //  exactly to the format returned by the graphql query.
 
-// Represents all relevant fields of a member of a Moloch DAO
-export interface IMarlinHolder {
-  // address of the member
-  id: string;
-
-  // balance
-  balance: string;
-
-  // delegates
-  delegates: string;
-}
-
-export interface IMarlinVote {
-  // who voted
-  delegateAddress: string;
-
-  // when did they vote
-  timestamp: string;
-
-  // number of votes
-  voteWeight: number;
-
-  // 1 = yes, 2 = no, 0 = abstain
-  uintVote: number;
-
-  delegate: IMarlinHolder;
-}
-
 export interface IMarlinProposalResponse {
   // dummy field required by interfaces
   identifier: string;

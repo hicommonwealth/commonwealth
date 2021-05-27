@@ -47,14 +47,4 @@ export default class CommonwealthMembers implements IAccountsModule<EthereumCoin
       return new CommonwealthMember(this.app, this._Chain, this._Accounts, this, address);
     }
   }
-
-  // returns a member immediately given a struct returned from chain
-  public getFromJSON(member: ICommonwealthMember): CommonwealthMember {
-    try {
-      return this._store.getByAddress(member.id);
-    } catch (e) {
-      if (!this._Accounts) return null;
-      return new CommonwealthMember(this.app, this._Chain, this._Accounts, this, member.id, member);
-    }
-  }
 }

@@ -1,7 +1,6 @@
-import { ExternalProvider } from '@ethersproject/providers';
 import { GovernorAlpha, MPond, MPond__factory } from 'eth/types';
 
-import ContractApi, { ContractFactoryT }  from 'controllers/chain/ethereum/contractApi';
+import ContractApi from 'controllers/chain/ethereum/contractApi';
 
 export default class MarlinAPI extends ContractApi<GovernorAlpha> {
   private _MPondAddress: string;

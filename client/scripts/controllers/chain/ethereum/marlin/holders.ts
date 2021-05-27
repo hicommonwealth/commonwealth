@@ -1,6 +1,5 @@
 import { IApp } from 'state';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
-import { IMarlinHolder } from 'adapters/chain/marlin/types';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import { IAccountsModule } from 'models';
 import { AccountsStore } from 'stores';
@@ -53,15 +52,6 @@ export default class MarlinHolders implements IAccountsModule<EthereumCoin, Marl
     } catch (e) {
       console.log('MarlinHolders:', this._Accounts);
       return new MarlinHolder(this.app, this._Chain, this._Accounts, this, address);
-    }
-  }
-
-  // returns a Holder immediately given a struct returned from chain
-  public getFromJSON(holder: IMarlinHolder): MarlinHolder {
-    try {
-      return this._store.getByAddress(holder.id);
-    } catch (e) {
-      return new MarlinHolder(this.app, this._Chain, this._Accounts, this, holder.id);
     }
   }
 

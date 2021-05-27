@@ -6,7 +6,6 @@ import { MPond } from 'adapters/chain/ethereum/types';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 
-import { IMarlinHolder } from 'adapters/chain/marlin/types';
 import MarlinHolders from './holders';
 import MarlinChain from './chain';
 
@@ -27,7 +26,6 @@ export default class MarlinHolder extends EthereumAccount {
 
   public get isHolder() { return this._isHolder; }
   public get isDelegate() { return this._isDelegate; }
-  public get getbalance() { return this._balance; }
 
   constructor(
     app: IApp,
@@ -35,23 +33,12 @@ export default class MarlinHolder extends EthereumAccount {
     Accounts: EthereumAccounts,
     Holders: MarlinHolders,
     address?: string,
-    data?: IMarlinHolder
   ) {
     super(app, ChainInfo, Accounts, address);
     this._Holders = Holders;
-    if (data) {
-      if (address !== data.id) {
-        throw new Error('Holder does not correspond with account');
-      }
-      this._isHolder = true;
-      this._balance = new MPond(this._Holders.api.MPondAddress, new BN(data.balance));
-      this._delegates = new MPond(this._Holders.api.MPondAddress, new BN(data.delegates));
-      this._initialized = Promise.resolve(true);
-    } else {
-      this._initialized = new Promise((resolve, reject) => {
-        this.refresh().then(() => resolve(true));
-      });
-    }
+    this._initialized = new Promise((resolve, reject) => {
+      this.refresh().then(() => resolve(true));
+    });
     Holders.store.add(this);
   }
 

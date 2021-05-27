@@ -75,6 +75,7 @@ export enum ChainClass {
   Moloch = 'moloch',
   Marlin = 'marlin',
   MarlinTestnet = 'marlin-testnet',
+  Aave = 'aave',
   ALEX = 'alex',
   Commonwealth = 'commonwealth',
   ERC20 = 'erc20',
@@ -145,6 +146,7 @@ export enum VotingUnit {
   OnePersonOneVote = '1p1v',
   CoinVote = 'coin',
   ConvictionCoinVote = 'conviction_coin',
+  PowerVote = 'power',
   None = 'none',
 }
 
