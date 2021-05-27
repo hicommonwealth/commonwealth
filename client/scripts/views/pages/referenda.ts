@@ -60,13 +60,6 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
             ' days'
           ]),
         ]),
-        m('', [
-          m(Button, {
-            rounded: true,
-            onclick: (e) => m.route.set(`/${app.chain.id}/proposals`),
-            label: 'Go to proposals',
-          }),
-        ]),
       ]),
     ]);
   }

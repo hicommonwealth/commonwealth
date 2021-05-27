@@ -368,16 +368,6 @@ const BountiesPage: m.Component<{}> = {
                 : '--',
             ]),
           ]),
-          m('', [
-            m(Button, {
-              rounded: true,
-              class: activeAccount ? '' : 'disabled',
-              onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
-                type: ProposalType.SubstrateBountyProposal,
-              }),
-              label: 'New bounty',
-            }),
-          ]),
         ]),
       ]),
       m('.clear'),

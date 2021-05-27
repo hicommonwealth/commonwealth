@@ -70,6 +70,9 @@ $discussion-title-font-size: 1.45rem;
                 width: 70%;
                 padding-bottom: 10px;
             }
+            .proposal-body-meta {
+                margin-bottom: 12px;
+            }
         }
         .proposal-content {
             display: flex;
@@ -112,7 +115,6 @@ $discussion-title-font-size: 1.45rem;
             }
         }
         .ProposalHeaderOffchainPoll {
-            display: inline-block;
             margin-top: 32px;
             margin-bottom: 10px;
             padding: 16px 22px;
@@ -190,7 +192,7 @@ $discussion-title-font-size: 1.45rem;
         .ProposalHeaderThreadLink {
             display: inline-block;
             margin-right: 12px;
-            margin-top: 18px;
+            margin-top: 12px;
             font-weight: 600;
             a:link,
             a:visited {
@@ -307,6 +309,12 @@ $discussion-title-font-size: 1.45rem;
                 text-decoration: underline;
             }
         }
+        svg {
+            stroke: $text-color-light;
+        }
+        svg:hover {
+            stroke: $text-color-medium;
+        }
     }
 
     .ProposalTitleEditor {
@@ -326,20 +334,10 @@ $discussion-title-font-size: 1.45rem;
             }
         }
     }
-    .ProposalHeaderStage,
-    .ProposalHeaderStageEditorButton,
-    .ProposalHeaderPollEditorButton {
+    .ProposalHeaderStage {
         position: relative;
         top: -4px;
         margin-right: 7px;
-    }
-    .ProposalHeaderStageEditorButton.cui-button,
-    .ProposalHeaderPollEditorButton.cui-button {
-        height: 22px;
-        min-height: 22px;
-        padding: 0 10px;
-    }
-    .ProposalHeaderStage {
         margin-top: 9px;
         a.cui-button {
             height: 20px;
@@ -373,6 +371,12 @@ $discussion-title-font-size: 1.45rem;
                 display: block;
             }
         }
+    }
+
+    .ProposalHeaderStageEditorButton.cui-button,
+    .ProposalHeaderPollEditorButton.cui-button {
+        margin-top: 18px;
+        margin-right: 10px;
     }
 
     .QuillEditor {

@@ -20,7 +20,18 @@ const viewComments = async (models, req: Request, res: Response, next: NextFunct
     where: community
       ? { community: community.id, root_id: req.query.root_id }
       : { chain: chain.id, root_id: req.query.root_id },
-    include: [ models.Address, models.OffchainAttachment ],
+    include: [
+      models.Address,
+      models.OffchainAttachment,
+      {
+        model: models.OffchainReaction,
+        as: 'reactions',
+        include: {
+          model: models.Address,
+          as: 'Address'
+        }
+      }
+    ],
     order: [['created_at', 'DESC']],
   });
   return res.json({ status: 'Success', result: comments.map((c) => c.toJSON()) });

@@ -19,14 +19,17 @@ class ReactionStore extends IdStore<OffchainReaction<any>> {
 
   public add(reaction: OffchainReaction<any>) {
     // TODO: Remove this once we start enforcing an ordering in stores
-    super.add(reaction);
-    this.getAll().sort(byAscendingCreationDate);
     const identifier = this.getPostIdentifier(reaction);
-    if (!this._storePost[identifier]) {
-      this._storePost[identifier] = [];
+    const reactionAlreadyInStore = (this._storePost[identifier] || []).filter((rxn) => rxn.id === reaction.id).length > 0;
+    if (!reactionAlreadyInStore) {
+      super.add(reaction);
+      this.getAll().sort(byAscendingCreationDate);
+      if (!this._storePost[identifier]) {
+        this._storePost[identifier] = [];
+      }
+      this._storePost[identifier].push(reaction);
+      this._storePost[identifier].sort(byAscendingCreationDate);
     }
-    this._storePost[identifier].push(reaction);
-    this._storePost[identifier].sort(byAscendingCreationDate);
 
     return this;
   }

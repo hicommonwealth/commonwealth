@@ -122,7 +122,6 @@ export enum OffchainThreadStage {
   Voting = 'voting',
   Passed = 'passed',
   Failed = 'failed',
-  Abandoned = 'abandoned',
 }
 
 export enum OffchainVoteOptions {

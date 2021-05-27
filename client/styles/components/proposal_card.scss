@@ -4,11 +4,10 @@
     @include card;
     padding: 0;
     height: initial;
-    min-height: 280px;
     .proposal-card-top {
         position: relative;
         padding: 24px 24px 22px;
-        min-height: 228px;
+        min-height: 260px;
         width: 100%;
     }
     .proposal-injected {
@@ -16,24 +15,15 @@
         margin-bottom: 4px;
         padding: 0 2px;
     }
-    .proposal-card-bottom {
-        position: relative;
-        padding: 16px 24px 12px;
-        border-top: 1px solid #eee;
-        user-select: none;
-        cursor: initial;
-        &:hover a {
-            text-decoration: underline;
-        }
-        .no-linked-thread {
-            color: $text-color-lightest;
-        }
-    }
 
     .cui-tag {
         font-weight: 600;
         min-height: none;
         height: 21px;
+    }
+    .cui-tag.proposal-became-tag {
+        background: tint($primary-bg-color, 40%);
+        border-color: tint($primary-bg-color, 40%);
     }
     .proposal-title {
         font-weight: 600;
@@ -51,10 +41,35 @@
         font-size: 80%;
         text-transform: uppercase;
     }
+    .proposal-thread-link {
+        line-height: 1;
+        font-weight: 600;
+        //
+        padding: 12px 15px 6px;
+        background: $background-color-light;
+        border-radius: 6px;
+        font-size: 92%;
+        margin-top: 11px;
+        position: absolute;
+        bottom: 60px;
+        margin-right: 32px;
+        &:hover {
+            background: $background-color-light-hover;
+        }
+        a:hover {
+            text-decoration: none;
+        }
+        .cui-icon svg {
+            stroke: $text-color-primary;
+            position: relative;
+            top: -1px;
+            left: -2px;
+            opacity: 0.9;
+        }
+    }
     .proposal-status {
         position: absolute;
         bottom: 14px;
-        // styling
         font-weight: 600;
         line-height: 1.1;
         margin-bottom: 4px;

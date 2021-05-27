@@ -40,6 +40,9 @@ import(/* webpackPrefetch: true */ 'views/pages/commonwealth');
 import(/* webpackPrefetch: true */ 'views/pages/discussions');
 import(/* webpackPrefetch: true */ 'views/pages/view_proposal');
 
+const APPLICATION_UPDATE_MESSAGE = 'A new version of the application has been released. Please save your work and refresh.';
+const APPLICATION_UPDATE_ACTION = 'Okay';
+
 // On login: called to initialize the logged-in state, available chains, and other metadata at /api/status
 // On logout: called to reset everything
 export async function initAppState(updateSelectedNode = true): Promise<void> {
@@ -520,14 +523,11 @@ $(() => {
   // ignore ResizeObserver error: https://stackoverflow.com/questions/49384120/resizeobserver-loop-limit-exceeded
   const resizeObserverLoopErrRe = /^ResizeObserver loop limit exceeded/;
   // replace chunk loading errors with a notification that the app has been updated
-  const chunkLoadingErrRe = /^Uncaught SyntaxError: Unexpected token '<'/;
+  const chunkLoadingErrRe = /^Uncaught SyntaxError: Unexpected token/;
   window.onerror = (errorMsg, url, lineNumber, colNumber, error) => {
     if (typeof errorMsg === 'string' && resizeObserverLoopErrRe.test(errorMsg)) return false;
     if (typeof errorMsg === 'string' && chunkLoadingErrRe.test(errorMsg)) {
-      alertModalWithText(
-        'A new version of the application has been released. Please save your work and refresh.',
-        'Okay'
-      )();
+      alertModalWithText(APPLICATION_UPDATE_MESSAGE, APPLICATION_UPDATE_ACTION)();
       return false;
     }
     notifyError(`${errorMsg}`);
@@ -548,13 +548,25 @@ $(() => {
     redirectCustomDomain?: boolean;
   }
 
+  let hasCompletedSuccessfulPageLoad = false;
   const importRoute = (path: string, attrs: RouteAttrs) => ({
     onmatch: () => {
       return import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "route-[request]" */
         `./${path}`
-      ).then((p) => p.default);
+      ).then((p) => {
+        hasCompletedSuccessfulPageLoad = true;
+        return p.default;
+      }).catch((err) => {
+        // handle import() error
+        console.error(err);
+        if (err.name === 'ChunkLoadError') {
+          alertModalWithText(APPLICATION_UPDATE_MESSAGE, APPLICATION_UPDATE_ACTION)();
+        }
+        // return to the last page, if it was on commonwealth
+        if (hasCompletedSuccessfulPageLoad) history.back();
+      });
     },
     render: (vnode) => {
       const { scoped, hideSidebar, redirectCustomDomain } = attrs;
