@@ -2,6 +2,9 @@ import 'lib/normalize.css';
 import 'lib/flexboxgrid.css';
 import 'lity/dist/lity.min.css';
 import 'construct.scss';
+// import 'tailwindcss/tailwind.css';
+import '../styles/style.css';
+import '../styles/lib/style.css';
 
 import m from 'mithril';
 import $ from 'jquery';
@@ -29,11 +32,16 @@ import { Layout, LoadingLayout } from 'views/layout';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import LoginModal from 'views/modals/login_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';
+import Login from './views/components/login';
 
 // Prefetch commonly used pages
-import(/* webpackPrefetch: true */ 'views/pages/home');
+import(/* webpackPrefetch: true */ 'views/pages/landing');
+import(/* webpackPrefetch: true */ 'views/pages/commonwealth');
 import(/* webpackPrefetch: true */ 'views/pages/discussions');
 import(/* webpackPrefetch: true */ 'views/pages/view_proposal');
+
+const APPLICATION_UPDATE_MESSAGE = 'A new version of the application has been released. Please save your work and refresh.';
+const APPLICATION_UPDATE_ACTION = 'Okay';
 
 // On login: called to initialize the logged-in state, available chains, and other metadata at /api/status
 // On logout: called to reset everything
@@ -215,7 +223,9 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
   if (app.chain && n === app.chain.meta) {
     return;
   }
-  if ((Object.values(ChainNetwork) as any).indexOf(n.chain.network) === -1 && n.chain.type !== 'token') {
+  if ((Object.values(ChainNetwork) as any).indexOf(n.chain.network) === -1
+    && n.chain.type !== 'token'
+  ) {
     throw new Error('invalid chain');
   }
 
@@ -529,14 +539,11 @@ $(() => {
   // ignore ResizeObserver error: https://stackoverflow.com/questions/49384120/resizeobserver-loop-limit-exceeded
   const resizeObserverLoopErrRe = /^ResizeObserver loop limit exceeded/;
   // replace chunk loading errors with a notification that the app has been updated
-  const chunkLoadingErrRe = /^Uncaught SyntaxError: Unexpected token '<'/;
+  const chunkLoadingErrRe = /^Uncaught SyntaxError: Unexpected token/;
   window.onerror = (errorMsg, url, lineNumber, colNumber, error) => {
     if (typeof errorMsg === 'string' && resizeObserverLoopErrRe.test(errorMsg)) return false;
     if (typeof errorMsg === 'string' && chunkLoadingErrRe.test(errorMsg)) {
-      alertModalWithText(
-        'A new version of the application has been released. Please save your work and refresh.',
-        'Okay'
-      )();
+      alertModalWithText(APPLICATION_UPDATE_MESSAGE, APPLICATION_UPDATE_ACTION)();
       return false;
     }
     notifyError(`${errorMsg}`);
@@ -557,13 +564,25 @@ $(() => {
     redirectCustomDomain?: boolean;
   }
 
+  let hasCompletedSuccessfulPageLoad = false;
   const importRoute = (path: string, attrs: RouteAttrs) => ({
     onmatch: () => {
       return import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "route-[request]" */
         `./${path}`
-      ).then((p) => p.default);
+      ).then((p) => {
+        hasCompletedSuccessfulPageLoad = true;
+        return p.default;
+      }).catch((err) => {
+        // handle import() error
+        console.error(err);
+        if (err.name === 'ChunkLoadError') {
+          alertModalWithText(APPLICATION_UPDATE_MESSAGE, APPLICATION_UPDATE_ACTION)();
+        }
+        // return to the last page, if it was on commonwealth
+        if (hasCompletedSuccessfulPageLoad) history.back();
+      });
     },
     render: (vnode) => {
       const { scoped, hideSidebar, redirectCustomDomain } = attrs;
@@ -631,14 +650,16 @@ $(() => {
     '/discussions':              redirectRoute(`/${app.activeId() || app.config.defaultChain}/`),
 
     // Landing pages
-    '/':                         importRoute(
-      'views/pages/home',
-      { scoped: false, hideSidebar: true, redirectCustomDomain: true },
-    ),
+    '/':                         importRoute('views/pages/landing', { scoped: false, hideSidebar: true, redirectCustomDomain: true }),
+    '/whyCommonwealth':          importRoute('views/pages/commonwealth', { scoped: false, hideSidebar: true }),
     '/about':                    importRoute('views/pages/landing/about', { scoped: false }),
     '/terms':                    importRoute('views/pages/landing/terms', { scoped: false }),
     '/privacy':                  importRoute('views/pages/landing/privacy', { scoped: false }),
     '/components':               importRoute('views/pages/components', { scoped: false, hideSidebar: true }),
+
+    // Search
+    '/search':                   importRoute('views/pages/search', { scoped: false, deferChain: true }),
+
 
     // Login page
     '/login':                    importRoute('views/pages/login', { scoped: false }),

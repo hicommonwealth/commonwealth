@@ -12,14 +12,12 @@ interface INewTopicModalForm {
   id: number,
   name: string,
   description: string,
-  telegram: string,
 }
 
 const NewTopicModal: m.Component<{
   id: number,
   name: string,
   description: string,
-  telegram: string,
 }, {
   error: any,
   form: INewTopicModalForm,
@@ -27,9 +25,9 @@ const NewTopicModal: m.Component<{
 }> = {
   view: (vnode) => {
     if (!app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })) return null;
-    const { id, name, description, telegram } = vnode.attrs;
+    const { id, name, description } = vnode.attrs;
     if (!vnode.state.form) {
-      vnode.state.form = { id, name, description, telegram };
+      vnode.state.form = { id, name, description };
     }
 
     return m('.NewTopicModal', [
@@ -69,18 +67,6 @@ const NewTopicModal: m.Component<{
               }
             }),
           ]),
-          m(FormGroup, [
-            m(FormLabel, { for: 'telegram' }, 'Telegram'),
-            m(Input, {
-              title: 'Telegram',
-              class: 'topic-form-telegram',
-              tabindex: 2,
-              defaultValue: vnode.state.form.telegram,
-              oninput: (e) => {
-                vnode.state.form.telegram = (e.target as any).value;
-              }
-            }),
-          ]),
           m(Button, {
             intent: 'primary',
             disabled: vnode.state.saving,
@@ -89,7 +75,7 @@ const NewTopicModal: m.Component<{
               e.preventDefault();
               if (!vnode.state.form.name.trim()) return;
               app.topics.add(
-                vnode.state.form.name, vnode.state.form.description, vnode.state.form.telegram
+                vnode.state.form.name, vnode.state.form.description, null,
               ).then(() => {
                 vnode.state.saving = false;
                 m.redraw();

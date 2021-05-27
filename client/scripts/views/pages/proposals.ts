@@ -2,7 +2,7 @@ import 'pages/proposals.scss';
 
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
-import { Grid, Col, List, Tag } from 'construct-ui';
+import { Button, Grid, Col, List, Tag } from 'construct-ui';
 import moment from 'moment';
 import BN from 'bn.js';
 
@@ -36,6 +36,7 @@ import ErrorPage from 'views/pages/error';
 const SubstrateProposalStats: m.Component<{}, {}> = {
   view: (vnode) => {
     if (!app.chain) return;
+    const activeAccount = app.user.activeAccount;
 
     return m('.stats-box', [
       m('.stats-box-left', '💭'),
@@ -74,6 +75,7 @@ const MarlinProposalStats: m.Component<{}, {}> = {
   view: (vnode) => {
     if (!app.chain) return;
     if (!(app.chain instanceof Marlin)) return;
+    const activeAccount = app.user.activeAccount;
 
     return m('.stats-box', [
       m('.stats-box-left', '💭'),
@@ -96,6 +98,13 @@ const MarlinProposalStats: m.Component<{}, {}> = {
             `Voting Period Length: ${app.chain.governance.votingPeriod.toString(10)}`,
           ]),
         ]),
+        m(Button, {
+          intent: 'primary',
+          onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
+            type: ProposalType.CosmosProposal
+          }),
+          label: 'New proposal',
+        }),
       ]),
     ]);
   }

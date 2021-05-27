@@ -37,6 +37,7 @@ const MarkdownFormattedText : m.Component<{
 
     // if we're showing highlighted search terms, render the doc once, and cache the result
     if (searchTerm) {
+      // TODO: Switch trim system to match QFT component
       if (JSON.stringify(doc) !== vnode.state.cachedDocWithHighlights) {
         const unsanitized = marked(doc.toString());
         const sanitized = DOMPurify.sanitize(unsanitized, { ALLOWED_TAGS: ['a'], ADD_ATTR: ['target'] });
@@ -51,12 +52,19 @@ const MarkdownFormattedText : m.Component<{
         vnode.state.cachedDocWithHighlights = JSON.stringify(doc);
         vnode.state.cachedResultWithHighlights = chunks.map(({ end, highlight, start }, index) => {
           const middle = 15;
-          const text = smartTruncate(
-            textToHighlight.substr(start, end - start),
+          const subString = textToHighlight.substr(start, end - start);
+          let text = smartTruncate(
+            subString,
             chunks.length <= 1 ? 150 : 40 + searchTerm.trim().length,
             chunks.length <= 1 ? {} : index === 0 ? { position: 0 } : index === chunks.length - 1
               ? {} : { position: middle }
           );
+          if (subString[subString.length - 1] === ' ') {
+            text += ' ';
+          }
+          if (subString[0] === ' ') {
+            text = ` ${text}`;
+          }
           return highlight ? m('mark', text) : m('span', text);
         });
       }

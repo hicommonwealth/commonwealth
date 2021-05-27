@@ -56,6 +56,7 @@ export interface IApp {
   wallets: WebWalletController;
 
   recentActivity: RecentActivityController;
+  searchCache: any;
 
   // XXX: replace this with some app.chain helper
   activeChainId(): string;
@@ -122,6 +123,8 @@ const app: IApp = {
 
   recentActivity: new RecentActivityController(),
 
+  searchCache: {},
+
   activeChainId: () => app.chain?.id,
   activeCommunityId: () => app.community?.meta.id,
   activeId: () => app.community ? app.activeCommunityId() : app.activeChainId(),
@@ -148,6 +151,7 @@ const app: IApp = {
     return document.location.origin.indexOf('commonwealth.im') !== -1;
   },
   serverUrl: () => '/api',
+
   loadingError: null,
 
   isCustomDomain: () => {

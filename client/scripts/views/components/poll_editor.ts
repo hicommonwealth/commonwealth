@@ -25,6 +25,9 @@ const PollEditor: m.Component<{
         closeOnOutsideClick: true,
         class: 'PollEditorDialog',
         content: [
+          m('p', [
+            'Create an off-chain poll to measure sentiment around this thread.'
+          ]),
           m(Switch, {
             intent: 'positive',
             label: 'Turn on polling',
@@ -32,11 +35,14 @@ const PollEditor: m.Component<{
               vnode.state.value = (e.target as any).checked;
             }
           }),
-          m('p', [
-            'Offchain polls run for at least 5 days, until the 1st or 15th of each month.'
+          m('p.secondary', [
+            'Offchain polls end on the 1st and 15th of each month.'
           ]),
-          m('p', [
-            'Once turned on, this poll will run until ',
+          m('p.secondary', [
+            'Each poll runs for at least 5 days.',
+          ]),
+          m('p.secondary', [
+            'If started now, this poll will end ',
             m('strong', getNextOffchainPollEndingTime(moment()).local().format('lll')),
             '.'
           ]),
@@ -47,7 +53,7 @@ const PollEditor: m.Component<{
         onClose: () => {
           vnode.attrs.onChangeHandler();
         },
-        title: 'Create offchain poll',
+        title: 'Start off-chain polling',
         transitionDuration: 200,
         footer: m(`.${Classes.ALIGN_RIGHT}`, [
           m(Button, {

@@ -18,6 +18,7 @@ const LoadingPage: m.Component<{
       class: 'LoadingPage',
       title,
       showNewProposalButton,
+      hideSearch: true,
     }, [
       m(Spinner, {
         fill: true,

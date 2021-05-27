@@ -43,8 +43,7 @@ describe('API Tests', () => {
     });
 
     it('should verify an address', async () => {
-      const keypair = wallet.generate();
-      const address = `0x${keypair.getAddress().toString('hex')}`;
+      const { keypair, address } = modelUtils.generateEthAddress();
       const chain = 'ethereum';
       let res = await chai.request(app)
         .post('/api/createAddress')

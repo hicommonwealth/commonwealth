@@ -1,4 +1,5 @@
 import m from 'mithril';
+import { ICardListItem } from 'models/interfaces';
 import moment from 'moment';
 
 import app from 'state';
@@ -12,15 +13,13 @@ export function offchainThreadStageToLabel(stage: OffchainThreadStage) {
   if (stage === OffchainThreadStage.Discussion) {
     return 'Discussion';
   } else if (stage === OffchainThreadStage.ProposalInReview) {
-    return 'Preparing for Voting';
+    return 'Pre-Voting';
   } else if (stage === OffchainThreadStage.Voting) {
-    return 'Voting';
+    return 'In Voting';
   } else if (stage === OffchainThreadStage.Passed) {
     return 'Passed';
   } else if (stage === OffchainThreadStage.Failed) {
     return 'Not Passed';
-  } else if (stage === OffchainThreadStage.Abandoned) {
-    return 'Abandoned';
   } else {
     return 'Other';
   }
@@ -37,10 +36,8 @@ export function offchainThreadStageToIndex(stage: OffchainThreadStage) {
     return 4;
   } else if (stage === OffchainThreadStage.Failed) {
     return 5;
-  } else if (stage === OffchainThreadStage.Abandoned) {
-    return 6;
   } else {
-    return 7;
+    return 6;
   }
 }
 
@@ -337,3 +334,22 @@ export function formatSpace(key, space) {
   if (!space.filters.minScore) space.filters.minScore = 0;
   return space;
 }
+
+export const removeOrAddClasslistToAllElements = (
+  cardList: ICardListItem[],
+  classlist: string,
+  method: string
+) => {
+  cardList.forEach((chain: ICardListItem) => {
+    const {
+      card: { id },
+    } = chain;
+
+    const METHODS = {
+      add: () => document.getElementById(id).classList.add(classlist),
+      remove: () => document.getElementById(id).classList.remove(classlist),
+    };
+
+    return METHODS[method]();
+  });
+};
