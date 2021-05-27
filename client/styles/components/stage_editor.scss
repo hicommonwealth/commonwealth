@@ -40,6 +40,16 @@
         .cui-active {
             background: initial;
         }
+        .cui-list-item {
+            .chain-entity-info {
+                .chain-entity-top {
+
+                }
+                .chain-entity-bottom {
+                    font-size: 88%;
+                }
+            }
+        }
     }
     .cui-query-list-checkmark .cui-list-item-content-left {
         left: 0;

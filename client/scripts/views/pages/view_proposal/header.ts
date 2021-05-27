@@ -297,6 +297,7 @@ export const ProposalHeaderPollEditorButton: m.Component<{ proposal, openPollEdi
     const { proposal, openPollEditor } = vnode.attrs;
     return m(Button, {
       class: 'ProposalHeaderPollEditorButton',
+      rounded: true,
       compact: true,
       disabled: !!proposal.offchainVotingEndsAt,
       label: proposal.offchainVotingEndsAt ? 'Off-chain polling enabled' : 'Start off-chain polling',
@@ -313,6 +314,7 @@ export const ProposalHeaderStageEditorButton: m.Component<{ openStageEditor: Fun
     const { openStageEditor } = vnode.attrs;
     return m(Button, {
       class: 'ProposalHeaderStageEditorButton',
+      rounded: true,
       compact: true,
       label: 'Connect on-chain proposal',
       onclick: (e) => {

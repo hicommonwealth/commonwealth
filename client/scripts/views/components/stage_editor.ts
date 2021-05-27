@@ -35,7 +35,11 @@ const ChainEntitiesSelector: m.Component<{
     return m('.ChainEntitiesSelector', [
       vnode.state.chainEntitiesLoaded ? m(QueryList, {
         checkmark: true,
-        items: app.chain.chainEntities.store.getAll(),
+        items: app.chain.chainEntities.store.getAll().sort((a, b) => {
+          if (!a.threadId && b.threadId) return -1;
+          if (a.threadId && !b.threadId) return 1;
+          return 0;
+        }),
         inputAttrs: {
           placeholder: 'Search for an existing proposal...',
         },
@@ -43,9 +47,12 @@ const ChainEntitiesSelector: m.Component<{
           const selected = vnode.attrs.chainEntitiesToSet.map((ce_) => ce_.id).indexOf(ce.id) !== -1;
           // TODO: show additional info on the ListItem, like any set proposal title, the creator, or other metadata
           return m(ListItem, {
-            label: chainEntityTypeToProposalName(ce.type)
-              + (ce.typeId.startsWith('0x') ? '' : ` #${ce.typeId}`)
-              + (ce.title ? `: ${ce.title}` : ''),
+            disabled: ce.threadId && ce.threadId !== thread.id,
+            label: m('.chain-entity-info', [
+              m('.chain-entity-top', chainEntityTypeToProposalName(ce.type)
+                + (ce.typeId.startsWith('0x') ? ` ${ce.typeId.slice(0, 6)}...` : ` #${ce.typeId}`)),
+              m('.chain-entity-bottom', ce.threadTitle !== 'undefined' ? decodeURIComponent(ce.threadTitle) : ''),
+            ]),
             selected,
             key: ce.id ? ce.id : uuidv4(),
           });
