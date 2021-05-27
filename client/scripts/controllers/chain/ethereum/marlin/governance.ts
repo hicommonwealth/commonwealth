@@ -3,7 +3,7 @@ import { ProposalModule, ITXModalData } from 'models';
 import { IMarlinProposalResponse } from 'adapters/chain/marlin/types';
 import { IApp } from 'state';
 
-import { BigNumberish } from 'ethers/utils';
+import { BigNumberish } from 'ethers';
 import MarlinAPI from './api';
 import MarlinProposal from './proposal';
 import MarlinHolders from './holders';

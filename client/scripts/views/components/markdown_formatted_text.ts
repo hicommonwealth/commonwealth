@@ -4,7 +4,7 @@ import 'components/markdown_formatted_text.scss';
 import $ from 'jquery';
 import m from 'mithril';
 import DOMPurify from 'dompurify';
-import marked from 'marked';
+const marked = require('marked');
 import { findAll } from 'highlight-words-core';
 import smartTruncate from 'smart-truncate';
 

@@ -1,6 +1,6 @@
 // import { MarlinTypes } from '@commonwealth/chain-events';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
-import { MPondFactory } from 'MPondFactory';
+import { MPond__factory } from 'eth/types';
 
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
@@ -52,7 +52,7 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
     await this.chain.initMetadata();
     const governorAlphaContractAddress = '0x777992c2E4EDF704e49680468a9299C6679e37F6';
     const api = new MarlinAPI(
-      MPondFactory.connect,
+      MPond__factory.connect,
       this.meta.address,
       governorAlphaContractAddress,
       this.chain.api.currentProvider as any

@@ -4,7 +4,7 @@ import BN from 'bn.js';
 import { providers } from 'ethers';
 
 import { INFURA_API_KEY } from '../config';
-import { Erc20Factory } from '../../eth/types/Erc20Factory';
+import { ERC20__factory } from '../../shared/eth/types';
 import { TokenResponse } from '../../shared/types';
 
 import JobRunner from './cacheJobRunner';
@@ -39,7 +39,7 @@ export class TokenBalanceProvider {
   public async getBalance(tokenAddress: string, userAddress: string): Promise<BN> {
     const web3Provider = new Web3.providers.HttpProvider(`https://${this._network}.infura.io/v3/${INFURA_API_KEY}`);
     const provider = new providers.Web3Provider(web3Provider);
-    const api = Erc20Factory.connect(tokenAddress, provider);
+    const api = ERC20__factory.connect(tokenAddress, provider);
     const balanceBigNum = await api.balanceOf(userAddress);
     return new BN(balanceBigNum.toString());
   }

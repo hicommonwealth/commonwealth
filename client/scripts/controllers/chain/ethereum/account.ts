@@ -6,7 +6,7 @@ import {
 
 import { IApp } from 'state';
 import { Account, ITXModalData } from 'models';
-import { Erc20Factory } from 'Erc20Factory';
+import { ERC20__factory } from 'eth/types';
 import { EthereumCoin, ERC20Token } from 'adapters/chain/ethereum/types';
 import EthereumChain from './chain';
 import EthereumAccounts, {
@@ -26,14 +26,14 @@ export default class EthereumAccount extends Account<EthereumCoin> {
   public async tokenBalance(contractAddress: string): Promise<ERC20Token> {
     if (!this._Chain) return; // TODO
 
-    const api = new TokenApi(Erc20Factory.connect, contractAddress, this._Chain.api.currentProvider as any);
+    const api = new TokenApi(ERC20__factory.connect, contractAddress, this._Chain.api.currentProvider as any);
     const balance = await api.Contract.balanceOf(this.address);
     return new ERC20Token(contractAddress, new BN(balance.toString(), 10));
   }
 
   public async sendTokenTx(toSend: ERC20Token, recipient: string) {
     if (!this._Chain) return;
-    const api = new TokenApi(Erc20Factory.connect, toSend.contractAddress, this._Chain.api.currentProvider as any);
+    const api = new TokenApi(ERC20__factory.connect, toSend.contractAddress, this._Chain.api.currentProvider as any);
     const contract = await api.attachSigner(this._Chain.app.wallets, this.address);
     const transferTx = await contract.transfer(recipient, toSend.asBN.toString(10), { gasLimit: 3000000 });
     const transferTxReceipt = await transferTx.wait();
@@ -45,7 +45,7 @@ export default class EthereumAccount extends Account<EthereumCoin> {
 
   public async approveTokenTx(toApprove: ERC20Token, spender: string) {
     if (!this._Chain) return; // TODO
-    const api = new TokenApi(Erc20Factory.connect, toApprove.contractAddress, this._Chain.api.currentProvider as any);
+    const api = new TokenApi(ERC20__factory.connect, toApprove.contractAddress, this._Chain.api.currentProvider as any);
     const contract = await api.attachSigner(this._Chain.app.wallets, this.address);
     const approvalTx = await contract.approve(
       spender,
@@ -66,7 +66,7 @@ export default class EthereumAccount extends Account<EthereumCoin> {
   // approved for "spender" to spend.
   public async tokenAllowance(contractAddress: string, spender: string): Promise<ERC20Token> {
     if (!this._Chain) return; // TODO
-    const api = new TokenApi(Erc20Factory.connect, contractAddress, this._Chain.api.currentProvider as any);
+    const api = new TokenApi(ERC20__factory.connect, contractAddress, this._Chain.api.currentProvider as any);
     const allowance = await api.Contract.allowance(this.address, spender);
     return new ERC20Token(contractAddress, new BN(allowance.toString(), 10));
   }

@@ -1,8 +1,6 @@
-import { Web3Provider, AsyncSendable, JsonRpcSigner, Provider } from 'ethers/providers';
+import { Web3Provider, ExternalProvider, JsonRpcSigner, Provider } from '@ethersproject/providers';
 import { ethers, Contract } from 'ethers';
-
-import { Erc20 } from 'Erc20';
-import { Erc20Factory } from 'Erc20Factory';
+import { ERC20, ERC20__factory } from 'eth/types';
 import { ChainBase, IWebWallet } from 'models';
 import WebWalletController from 'controllers/app/web_wallets';
 import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web_wallet';
@@ -17,7 +15,7 @@ class ContractApi<ContractT extends Contract> {
   private _contractAddress: string;
   private _Contract: ContractT;
   private _Provider: Web3Provider;
-  private _tokenContract: Erc20;
+  private _tokenContract: ERC20;
 
   public get contractAddress() { return this._contractAddress; }
   public get Contract(): ContractT { return this._Contract; }
@@ -27,7 +25,7 @@ class ContractApi<ContractT extends Contract> {
   constructor(
     factory: ContractFactoryT<ContractT>,
     contractAddress: string,
-    web3Provider: AsyncSendable
+    web3Provider: ExternalProvider
   ) {
     this._contractAddress = contractAddress;
     this._Provider = new ethers.providers.Web3Provider(web3Provider);
@@ -79,7 +77,7 @@ class ContractApi<ContractT extends Contract> {
 
   public async init(tokenAddress?: string): Promise<void> {
     if (tokenAddress) {
-      this._tokenContract = Erc20Factory.connect(tokenAddress, this._Provider);
+      this._tokenContract = ERC20__factory.connect(tokenAddress, this._Provider);
     }
   }
 }

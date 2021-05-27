@@ -1,8 +1,6 @@
-import { AsyncSendable } from 'ethers/providers';
+import { ExternalProvider } from '@ethersproject/providers';
 
-import { MPond } from 'MPond';
-import { GovernorAlpha } from 'GovernorAlpha';
-import { GovernorAlphaFactory } from 'GovernorAlphaFactory';
+import { MPond, GovernorAlpha, GovernorAlpha__factory } from 'eth/types';
 
 import ContractApi, { ContractFactoryT } from 'controllers/chain/ethereum/contractApi';
 
@@ -20,11 +18,11 @@ export default class MarlinAPI extends ContractApi<MPond> {
     factory: ContractFactoryT<MPond>,
     mPondAddress: string,
     governorAlphaAddress: string,
-    web3Provider: AsyncSendable,
+    web3Provider: ExternalProvider,
   ) {
     super(factory, mPondAddress, web3Provider);
     this._GovernorAlphaAddress = governorAlphaAddress;
-    this._GovernorAlphaContract = GovernorAlphaFactory.connect(governorAlphaAddress, this.Provider);
+    this._GovernorAlphaContract = GovernorAlpha__factory.connect(governorAlphaAddress, this.Provider);
   }
 
   public async init() {

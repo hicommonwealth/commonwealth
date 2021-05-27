@@ -1,4 +1,4 @@
-import { Moloch1 } from 'Moloch1';
+import { Moloch1 } from 'eth/types';
 import ContractApi from 'controllers/chain/ethereum/contractApi';
 
 export default class MolochAPI extends ContractApi<Moloch1> {
