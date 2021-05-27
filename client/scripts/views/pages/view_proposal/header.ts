@@ -286,8 +286,7 @@ export const ProposalHeaderStage: m.Component<{ proposal: OffchainThread }> = {
         intent: proposal.stage === OffchainThreadStage.ProposalInReview ? 'positive'
           : proposal.stage === OffchainThreadStage.Voting ? 'positive'
             : proposal.stage === OffchainThreadStage.Passed ? 'positive'
-              : proposal.stage === OffchainThreadStage.Failed ? 'negative'
-                : proposal.stage === OffchainThreadStage.Abandoned ? 'negative' : 'none',
+              : proposal.stage === OffchainThreadStage.Failed ? 'negative' : 'none',
       }),
     ]);
   }

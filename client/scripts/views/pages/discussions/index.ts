@@ -64,7 +64,6 @@ const DiscussionStagesBar: m.Component<{ topic: string, stage: string }, {}> = {
       OffchainThreadStage.Voting,
       OffchainThreadStage.Passed,
       OffchainThreadStage.Failed,
-      OffchainThreadStage.Abandoned,
     ].find((s) => s === stage as any);
 
     return m('.DiscussionStagesBar.discussions-stages', [
@@ -152,7 +151,6 @@ const DiscussionStagesBar: m.Component<{ topic: string, stage: string }, {}> = {
             OffchainThreadStage.Voting,
             OffchainThreadStage.Passed,
             OffchainThreadStage.Failed,
-            OffchainThreadStage.Abandoned,
           ].map((targetStage, index) => m(MenuItem, {
             active: stage === targetStage,
             iconLeft: stage === targetStage ? Icons.CHECK : null,

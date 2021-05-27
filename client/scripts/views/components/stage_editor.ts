@@ -116,7 +116,6 @@ const StageEditor: m.Component<{
               OffchainThreadStage.Voting,
               OffchainThreadStage.Passed,
               OffchainThreadStage.Failed,
-              OffchainThreadStage.Abandoned,
             ].map((targetStage) => m(Button, {
               class: 'discussions-stage',
               active: vnode.state.stage === targetStage,
