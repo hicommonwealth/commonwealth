@@ -239,7 +239,7 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
       ]),
       m(FooterLandingPage, {
         list: [
-          { text: 'Blog', externalLink: 'https://commonwealth.im/blog' },
+          { text: 'Blog', externalLink: 'https://blog.commonwealth.im' },
           { text: 'Jobs', externalLink: 'https://angel.co/company/commonwealth-labs/jobs' },
           { text:  'Terms', redirectTo:  '/terms' },
           { text:  'Privacy', redirectTo: '/privacy' },
