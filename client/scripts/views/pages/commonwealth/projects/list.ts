@@ -1,4 +1,4 @@
-import 'pages/commonwealth/projects.scss';
+import 'pages/commonwealth/projects/list.scss';
 
 import m from 'mithril';
 
@@ -6,7 +6,7 @@ import app from 'state';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import Listing from 'views/pages/listing';
-import ProjectCard from 'views/components/project_card';
+import ProjectCard from 'views/components/commonwealth/project_card';
 
 const ProjectsPage: m.Component<{}, { initializing: boolean }> = {
   oncreate: async (vnode) => {
@@ -20,6 +20,7 @@ const ProjectsPage: m.Component<{}, { initializing: boolean }> = {
     //   vnode.state.protocol = (app.chain as any).protocol;
     //   m.redraw();
     // }
+    // this.accounts = new MolochMembers(app, app.chain, ethAccounts);
   },
   view: (vnode) => {
     if (vnode.state.initializing || !app.chain) {
@@ -51,17 +52,17 @@ const ProjectsPage: m.Component<{}, { initializing: boolean }> = {
       ]),
       m(Listing, {
         content: activeProjectsContent,
-        columnHeader: `${activeProjectsContent.length === 0 ? 'No' : ''} Active Proposals`,
+        columnHeader: `${activeProjectsContent.length === 0 ? 'No' : ''} Active Projects`,
       }),
       m('.clear'),
       m(Listing, {
         content: successedProjects,
-        columnHeader: `${successedProjects.length === 0 ? 'No' : ''} Successed Proposals`,
+        columnHeader: `${successedProjects.length === 0 ? 'No' : ''} Successed Projects`,
       }),
       m('.clear'),
       m(Listing, {
         content: failedProjects,
-        columnHeader: `${failedProjects.length === 0 ? 'No' : ''} Failed Proposals`,
+        columnHeader: `${failedProjects.length === 0 ? 'No' : ''} Failed Projects`,
       }),
     ]);
   }

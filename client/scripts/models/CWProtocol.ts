@@ -1,4 +1,5 @@
 import BN from 'bn.js';
+import { EthereumCoin } from 'shared/adapters/chain/ethereum/types';
 
 type ProjectStatus = 'In Progress' | 'Successed' | 'Failed';
 type ParticipantRole = 'backer' | 'curator' | 'beneficiary' | 'creator'
@@ -24,11 +25,11 @@ export class CWProject {
   public readonly status: ProjectStatus;
   public readonly cToken: string; // cToken address
   public readonly bToken: string; // bToken address
-  public readonly backers: Array<CWUser>;
-  public readonly curators: Array<CWUser>;
+  // public readonly backers: Array<CWUser>;
+  // public readonly curators: Array<CWUser>;
 
-  public readonly threshold: number;
-  public readonly totalFunding: number;
+  public readonly threshold: EthereumCoin;
+  public readonly totalFunding: EthereumCoin;
   public readonly curatorFee: number;
 
   constructor(
@@ -45,8 +46,10 @@ export class CWProject {
     projectHash,
     status,
     totalFunding,
-    backers,
-    curators,
+    bToken,
+    // backers,
+    cToken,
+    // curators,
   ) {
     this.name = name;
     this.description = description;
@@ -61,8 +64,10 @@ export class CWProject {
     this.projectHash = projectHash;  // put projectHash
     this.status = status;
     this.totalFunding = totalFunding;
-    this.backers = backers;
-    this.curators = curators;
+    this.bToken = bToken;
+    // this.backers = backers;
+    this.cToken = cToken;
+    // this.curators = curators;
   }
 }
 

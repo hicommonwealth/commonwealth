@@ -1,8 +1,7 @@
-import 'pages/commonwealth/projects.scss';
+import 'pages/commonwealth/projects/view.scss';
 
 import m from 'mithril';
 import app from 'state';
-import { initChain } from 'app';
 
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
@@ -10,8 +9,8 @@ import { CWProject } from 'models/CWProtocol';
 
 import { CWProject } from 'models/CWProtocol';
 
-import MembersModule from './members';
-import ActionModule from './action';
+import ActionModule from 'views/components/commonwealth/actions/action_card';
+import MembersModule from 'views/components/commonwealth/members_card';
 
 function secondsToDhms(seconds) {
   seconds = Number(seconds);

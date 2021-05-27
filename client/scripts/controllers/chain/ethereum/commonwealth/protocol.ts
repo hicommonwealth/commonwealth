@@ -2,17 +2,15 @@ import { utils } from 'ethers';
 import BN from 'bn.js';
 import moment from 'moment';
 
-import { Coin } from 'adapters/currency';
-
 import { IApp } from 'state';
 import { CWProtocol, CWProject } from 'models/CWProtocol';
 import { CwProjectFactory as CWProjectFactory } from 'CwProjectFactory';
-import { CwProject as CWProjectContract } from 'CwProject';
 
 import CommonwealthChain from './chain';
 import CommonwealthAPI from './api';
 
 import { CWProtocolStore } from '../../../../stores';
+import ContractApi from '../contractApi';
 
 const expandTo18Decimals = (n: number): BN => {
   return new BN(n).mul((new BN(10)).pow(new BN(18)))
@@ -24,9 +22,6 @@ export default class CommonwealthProtocol {
   private _api: CommonwealthAPI;
   private _store = new CWProtocolStore();
   private _chain: CommonwealthChain;
-
-  // private _activeProjectHash: string;
-  // private _activeProjectContract: CWProjectContract;
 
   public get initalized() { return this._initialized };
   public get app() { return this._app; }
@@ -43,7 +38,7 @@ export default class CommonwealthProtocol {
     const protocolFee = new BN((await this._api.Contract.protocolFee()).toString(), 10);
     const feeTo = await this._api.Contract.feeTo();
 
-    const projects: CWProject[] =  await this.retrieveProjects();
+    const projects: CWProject[] =  await this._api.retrieveAllProjects();
     const newProtocol = new CWProtocol('root', 'root', protocolFee, feeTo, projects);
 
     await this.createProject(
@@ -59,82 +54,13 @@ export default class CommonwealthProtocol {
     this.store.add(newProtocol);
   }
 
-  public async getProjectDetails(projAddress: string) {
-    const projContract: CWProjectContract = await CWProjectFactory.connect(projAddress, this._api.Provider);
-
-    const name = await projContract.name();
-    const ipfsHash = await projContract.ipfsHash();
-    const cwUrl = await projContract.cwUrl();
-    const beneficiary = await projContract.beneficiary();
-    const threshold = await projContract.threshold();
-    const curatorFee = await projContract.curatorFee();
-    const creator = await projContract.creator();
-    const totalFunding = await projContract.totalFunding();
-
-    const projectHash = utils.solidityKeccak256(
-      ['address', 'address', 'bytes32', 'uint256'],
-      [creator, beneficiary, name, threshold.toString()]
-    );
-    const daedline = (new BN((await projContract.deadline()).toString()).mul(new BN(1000))).toNumber();
-    const endTime = new Date(daedline);
-    const funded = await projContract.funded();
-
-    let status = 'In Progress';
-    if ((new Date()).getTime() - endTime.getTime() > 0) {
-      if (funded) {
-        status = 'Successed';
-      } else {
-        status = 'Failed';
-      }
-    }
-
-    const bToken = await projContract.bToken();
-    const backers = []  // get bToken holders
-
-    const cToken = await projContract.cToken();
-    const curators = []  // get cToken holders
-
-    const newProj = new CWProject(
-      utils.parseBytes32String(name),
-      '',
-      utils.parseBytes32String(ipfsHash),
-      utils.parseBytes32String(cwUrl),
-      beneficiary,
-      '0x00', // aceptedTokens
-      [], // nominations,
-      threshold,
-      endTime,
-      curatorFee,
-      projectHash,
-      status,
-      totalFunding,
-      backers,
-      curators
-    );
-
-    return newProj;
-  }
-
-  public async retrieveProjects() {
-    const projects: CWProject[] =  [];
-    const allProjectLenght = new BN((await this._api.Contract.allProjectsLength()).toString(), 10);
-    if (allProjectLenght.gt(new BN(0))) {
-      const projectAddresses = await this._api.Contract.getAllProjects();
-      for (let i=0; i<projectAddresses.length; i++) {
-        const proj: CWProject = await this.getProjectDetails(projectAddresses[i]);
-        projects.push(proj);
-      }
-    }
-    return projects;
-  }
-
   public async deinit() {
     this.store.clear();
   }
 
   public async updateState() {
-    const projects: CWProject[] =  await this.retrieveProjects();
     const protocolStore = this.store.getById('root');
+    let projects: CWProject[] =  await this._api.retrieveAllProjects(); // update all projects
     await protocolStore.setProjects(projects);
   }
 
@@ -186,64 +112,67 @@ export default class CommonwealthProtocol {
     // console.log('====>txReceipt', txReceipt);
   }
 
-  // public async setProjectContract(projectHash: string) {
-  //   const api = this._chain.CommonwealthAPI;
-  //   this._activeProjectHash = projectHash;
-  //   const activeProjectAddress:string = await api.Contract.projects(projectHash);
-  //   this._activeProjectContract = await CWProjectFactory.connect(activeProjectAddress, this._api.Provider);
-  // }
+    return txReceipt.status === 1;
+  }
 
-  // private async syncActiveProject(projectHash: string) {
-  //   if (!this._activeProjectHash || !this._activeProjectContract) {
-  //     await this.setProjectContract(projectHash);
-  //   }
-  //   if (this._activeProjectHash !== projectHash) {
-  //     await this.setProjectContract(projectHash);
-  //   }
-  // }
+  public async projectContractApi(projectHash: string, signer: string) {
+    const projAddress = await this._api.Contract.projects(projectHash);
+    const contract = new ContractApi(
+      CWProjectFactory.connect,
+      projAddress,
+      this._chain.api.currentProvider as any
+    );
+    const attachedContract = await contract.attachSigner(this._chain.app.wallets, signer);
+    return attachedContract;
+  }
 
-  public async getProjectContract(proj: string, byHash = false) {
-    let projecAddress = proj;
-    if (byHash) {
-      projecAddress = await this._api.Contract.projects(proj);
+  public async backOrCurate(
+    amount: number,
+    projectHash: string,
+    isBacking: boolean,
+    from: string,
+    withEther = true,
+  ) {
+    const projContractAPI = await this.projectContractApi(projectHash, from);
+    const isTxSuccessed = await this._api.backOrCurateWithEther(projContractAPI, amount, isBacking, withEther);
+    if (isTxSuccessed) {
+      await this.updateState();
     }
-    const projectContract: CWProjectContract = await CWProjectFactory.connect(proj, this._api.Provider);
-    return projectContract;
+    return isTxSuccessed;
   }
 
-  public async backProject(
+  public async redeemTokens(
     amount: number,
     projectHash: string,
+    isBToken: boolean,
+    from: string,
+    withEther = true,
   ) {
-    // await this.syncActiveProject(projectHash);
-    // await this._activeProjectContract.back('0x01', amount)
+    const projContractAPI = await this.projectContractApi(projectHash, from);
+    const isTxSuccessed = await this._api.redeemTokens(projContractAPI, amount, isBToken, withEther);
+    if (isTxSuccessed) {
+      await this.updateState();
+    }
+    return isTxSuccessed;
   }
 
-  public async curateProject(
-    amount: number,
+  public async withdraw(
     projectHash: string,
+    from: string,
   ) {
-    // await this.syncActiveProject(projectHash);
-    // await this._activeProjectContract.curate('0x01', amount)
+    const projContractAPI = await this.projectContractApi(projectHash, from);
+    const isTxSuccessed = await this._api.withdraw(projContractAPI);
+    if (isTxSuccessed) {
+      await this.updateState();
+    }
+    return isTxSuccessed;
   }
 
-  public async redeemBToken(
-    amount: number,
-    projectHash: string,
-  ) {
-    // await this.syncActiveProject(projectHash);
-    // await this._activeProjectContract.redeemBToken('0x01', amount)
-  }
+  public async getTokenHolders(tokenAddress: string) {
+    const tokenHolders = [];
 
-  public async redeemCToken(
-    amount: number,
-    projectHash: string,
-  ) {
-    // await this.syncActiveProject(projectHash);
-    // await this._activeProjectContract.redeemCToken('0x01', amount)
-  }
-
-  public async getCollatoralAmount(isBToken, address, projectHash) {
+    // do some logic to get token holders
+    return tokenHolders;
   }
 }
  

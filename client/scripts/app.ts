@@ -599,10 +599,10 @@ $(() => {
     '/edgeware/stats':           importRoute('views/stats/edgeware', { scoped: false }),
 
     // Commonwealth protocol
-    '/:scope/projects':          importRoute('views/pages/commonwealth/projects', { scoped: true }),
-    '/:scope/collectives':       importRoute('views/pages/commonwealth/collectives', { scoped: true }),
-    '/:scope/new/project':        importRoute('views/pages/commonwealth/createProject', { scoped: true }),
-    '/:scope/project/:projectHash': importRoute('views/pages/commonwealth/project/index', { scoped: true }), // CWP
+    '/:scope/projects':          importRoute('views/pages/commonwealth/projects/list', { scoped: true }),
+    '/:scope/new/project':        importRoute('views/pages/commonwealth/projects/create', { scoped: true }),
+    '/:scope/project/:projectHash': importRoute('views/pages/commonwealth/projects/view', { scoped: true }),
+    // '/:scope/collectives':       importRoute('views/pages/commonwealth/collectives', { scoped: true }),
     // '/:scope/backers':           importRoute('views/pages/commonwealth/backers', { scoped: true }),
 
     // Chain pages
