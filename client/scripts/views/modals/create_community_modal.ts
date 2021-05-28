@@ -6,10 +6,10 @@ import $ from 'jquery';
 import app from 'state';
 import mixpanel from 'mixpanel-browser';
 import { Table, Button } from 'construct-ui';
-
 import { CompactModalExitButton } from 'views/modal';
 import { notifyError } from 'controllers/app/notifications';
 import { InputPropertyRow, TogglePropertyRow } from './manage_community_modal/metadata_rows';
+import { initAppState } from '../../app';
 
 
 interface IAttrs {}
@@ -149,7 +149,11 @@ const CreateCommunityModal: m.Component<IAttrs, IState> = {
                 privacyEnabled,
                 isAuthenticatedForum,
                 jwt: app.user.jwt,
-              }).then(() => $(e.target).trigger('modalexit'));
+              }).then(async (res) => {
+                await initAppState(false);
+                $(e.target).trigger('modalexit');
+                m.route.set(`/${res.result.id}`);
+              });
             } catch (err) {
               notifyError(err.responseJSON?.error || 'Creating new community failed');
             }
