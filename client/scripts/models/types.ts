@@ -41,6 +41,7 @@ export enum ChainNetwork {
   Clover = 'clover',
   HydraDX = 'hydradx',
   Crust = 'crust',
+  Kylin = 'kylin',
 }
 
 // This function returns a default chain for a chainbase
@@ -79,6 +80,7 @@ export enum ChainClass {
   ALEX = 'alex',
   Commonwealth = 'commonwealth',
   Crust = 'crust',
+  Kylin = 'kylin',
   ERC20 = 'erc20',
 }
 
