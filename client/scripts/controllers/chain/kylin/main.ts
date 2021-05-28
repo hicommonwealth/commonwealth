@@ -3,7 +3,7 @@ import { IApp } from 'state';
 import KylinSpec from 'adapters/chain/kylin/spec';
 import Substrate from '../substrate/main';
 
-class Crust extends Substrate {
+class Kylin extends Substrate {
   constructor(n: NodeInfo, app: IApp) {
     super(n, app, ChainClass.Kylin);
   }
@@ -13,4 +13,4 @@ class Crust extends Substrate {
   }
 }
 
-export default Crust;
+export default Kylin;

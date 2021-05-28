@@ -31,6 +31,7 @@ const nodes = [
   [ 'wss://rpc.plasmnet.io/ws', 'plasm'],
   [ 'wss://scan-rpc.stafi.io/ws', 'stafi'],
   [ 'wss://api.crust.network/', 'crust'],
+  [ '', 'kylin'], // @TODO: Add kylin RPC here
   [ 'wss://cc1.darwinia.network/ws', 'darwinia'],
   [ 'wss://poc3.phala.com/ws', 'phala'],
   [ 'wss://fullnode.centrifuge.io', 'centrifuge'],
@@ -205,6 +206,18 @@ const resetServer = (models): Promise<number> => {
           symbol: 'CRUST',
           name: 'Crust',
           icon_url: '/static/img/protocols/crust.png',
+          active: true,
+          type: 'chain',
+          base: 'substrate',
+          ss58_prefix: 20, // @TODO: Check if true
+          collapsed_on_homepage: false,
+        }),
+        models.Chain.create({
+          id: 'kylin',
+          network: 'kylin',
+          symbol: 'KYLIN',
+          name: 'Kylin',
+          icon_url: '/static/img/protocols/kylin.png',
           active: true,
           type: 'chain',
           base: 'substrate',

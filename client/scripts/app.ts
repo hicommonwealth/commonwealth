@@ -286,6 +286,13 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/crust/main'
     )).default;
     newChain = new Crust(n, app);
+  } else if (n.chain.network === ChainNetwork.Kylin) {
+    const Kylin = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "kylin-main" */
+      './controllers/chain/kylin/main'
+    )).default;
+    newChain = new Kylin(n, app);
   } else if (n.chain.network === ChainNetwork.Darwinia) {
     const Darwinia = (await import(
       /* webpackMode: "lazy" */

@@ -5,6 +5,7 @@ import HydraSpec from './adapters/chain/hydradx/spec';
 import KulupuSpec from './adapters/chain/kulupu/spec';
 import CloverSpec from './adapters/chain/clover/spec';
 import CrustSpec from './adapters/chain/crust/spec';
+import KylinSpec from './adapters/chain/kylin/spec';
 
 
 export function selectSpec(chain: string): RegisteredTypes {
@@ -20,6 +21,8 @@ export function selectSpec(chain: string): RegisteredTypes {
     return KulupuSpec;
   } else if (chain === 'crust') {
     return CrustSpec;
+  } else if (chain === 'kylin') {
+    return KylinSpec;
   } else {
     return {};
   }
@@ -39,6 +42,7 @@ export function constructSubstrateUrl(url: string): string {
     'api.clover.finance',
     'rpc-01.snakenet.hydradx.io',
     'api.crust.network/',
+    '', // @TODO: Add kylin rpc here
   ];
   const hasProtocol = url.indexOf('wss://') !== -1 || url.indexOf('ws://') !== -1;
   url = hasProtocol ? url.split('://')[1] : url;
