@@ -6,7 +6,6 @@ export const sendMessage = async (
   req: Request,
   res: Response,
 ) => {
-	console.log(req.body.data);
 	const init = {
 		method: 'POST',
 		headers: {
@@ -20,7 +19,7 @@ export const sendMessage = async (
 		.then((res1) => {
 			if (res1.ok) 
 				return res.json({ status: 'Success', result: res1.json() });
-			return res.json({ status: 'Failure', result: res1.json() });
+			throw res1;
 		})
 		.catch((e) => {
 			e.json().then((json) => {

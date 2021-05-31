@@ -11,9 +11,9 @@ import TimePicker from 'mithril-timepicker';
 import moment from 'moment';
 import Web3 from 'web3';
 import getProvider from '@snapshot-labs/snapshot.js/src/utils/provider';
-import { getBlockNumber } from '@snapshot-labs/snapshot.js/src/utils/web3';
+import { getBlockNumber, signMessage } from '@snapshot-labs/snapshot.js/src/utils/web3';
 import { version } from '@snapshot-labs/snapshot.js/src/constants.json';
-import { signMessage } from '@snapshot-labs/snapshot.js/src/utils/web3';
+// import { getScores } from '@snapshot-labs/snapshot.js/src/utils';
 
 import app from 'state';
 import snapshotClient from 'helpers/snapshot_client';
@@ -67,6 +67,7 @@ const newThread = async (
   form,
   quillEditorState,
   author,
+  space
 ) => {
   const topics = app.chain
     ? app.chain.meta.chain.topics
@@ -102,55 +103,45 @@ const newThread = async (
       : JSON.stringify(quillEditorState.editor.getContents());
 
   form.body = bodyText;
-  let spaces: any = await snapshotClient.getSpaces();
 
-  spaces = fromEntries(
-    Object.entries(spaces).map(space => [
-      space[0],
-      formatSpace(space[0], space[1])
-    ])
-  );
-  let space = spaces[app.chain.meta.chain.snapshot];
   form.snapshot = await getBlockNumber(getProvider(space.network));
   form.metadata.network = space.network;
   form.metadata.strategies = space.strategies;
-  let user = app.user.activeAccount;
 
-  try {
-    const msg: any = {
-      address: user.address,
-      msg: JSON.stringify({
-        version,
-        timestamp: (Date.now() / 1e3).toFixed(),
-        space,
-        type: 'proposal',
-        form
-      })
-    };
-    console.log(msg.msg);
-    msg.sig = await signMessage((window as any).ethereum, msg.msg, user.address);
-    console.log(msg);
-    let result = await $.post(`${app.serverUrl()}/snapshotAPI/sendMessage`, {
-      data: JSON.stringify(msg)
-    });
-    // dispatch('notify', [
-    //   'green',
-    //   type === 'delete-proposal'
-    //     ? i18n.global.t('notify.proposalDeleted')
-    //     : i18n.global.t('notify.yourIsIn', [type])
-    // ]);
-    console.log(result);
-  } catch (e) {
+  const msg: any = {
+    address: author.address,
+    msg: JSON.stringify({
+      version,
+      timestamp: (Date.now() / 1e3).toFixed(),
+      space,
+      type: 'proposal',
+      form
+    })
+  };
+  console.log(author);
+  msg.sig = await signMessage((window as any).ethereum, msg.msg, author.address);
+  let result = await $.post(`${app.serverUrl()}/snapshotAPI/sendMessage`, {
+    data: JSON.stringify(msg)
+  });
+  // dispatch('notify', [
+  //   'green',
+  //   type === 'delete-proposal'
+  //     ? i18n.global.t('notify.proposalDeleted')
+  //     : i18n.global.t('notify.yourIsIn', [type])
+  // ]);
+  if (result.status === "Failure") {
     const errorMessage =
-      e && e.error_description
-        ? `Oops, ${e.error_description}`
+      result && result.message.error_description
+        ? `${result.message.error_description}`
         : NewThreadErrors.SomethingWentWrong;
     throw new Error(errorMessage);
   }
 
   await app.user.notifications.refresh();
 
-  //m.route.set(`/${app.activeId()}/proposal/snapshot-proposal/${result.id}`);
+  if (result.status === "Success") {
+    m.route.set(`/${app.activeId()}/proposal/snapshot-proposal/${result.result.id}`);
+  }
 
   mixpanel.track('Create Snapshot Proposal', {
     'Step No': 2,
@@ -158,8 +149,8 @@ const newThread = async (
   });
 };
 
-const newLink = async (form, quillEditorState, author) => {
-  const errors = await newThread(form, quillEditorState, author);
+const newLink = async (form, quillEditorState, author, space) => {
+  const errors = await newThread(form, quillEditorState, author, space);
   return errors;
 };
 
@@ -167,8 +158,12 @@ export const NewProposalForm: m.Component<{}, {
   form: IThreadForm,
   quillEditorState,
   saving: boolean,
+  space: any,
+  members: string[]
 }> = {
   oninit: (vnode) => {
+    vnode.state.space = {};
+    vnode.state.members = [];
     vnode.state.form = {
       name: '',
       body: '',
@@ -176,8 +171,38 @@ export const NewProposalForm: m.Component<{}, {
       start: '',
       end: '',
       snapshot: '',
-      metadata: {}
+      metadata: {},
     };
+
+    snapshotClient.getSpaces().then(response => {
+      let spaces: any = fromEntries(
+        Object.entries(response).map(space => [
+          space[0],
+          formatSpace(space[0], space[1])
+        ])
+      );
+      console.log(app.chain.meta.chain.snapshot, 'snapshot');
+      let space = spaces[app.chain.meta.chain.snapshot];
+      vnode.state.space = space;
+      vnode.state.members = space.members;
+      m.redraw();
+
+      // getScores(
+      //   space.key,
+      //   space.strategies,
+      //   space.network,
+      //   getProvider(space.network),
+      //   [app.user.activeAccount.address]
+      // ).then(response => {
+      //   console.log(response)
+      //   let scores = response
+      //     .map(score => Object.values(score).reduce((a, b) => (a as number) + (b as number), 0))
+      //     .reduce((a, b) => (a as number) + (b as number), 0);
+      //   vnode.state.userScore = scores as number;
+      //   vnode.state.space = space;
+      //   m.redraw();
+      // });
+    });
   },
 
   view: (vnode) => {
@@ -200,12 +225,24 @@ export const NewProposalForm: m.Component<{}, {
       localStorage.removeItem(`${app.activeId()}-new-snapshot-proposal-name`);
     };
 
+    console.log(vnode.state.space, "space");
+
+    const isMember = author && author.address && vnode.state.members.includes(author.address.toLowerCase());
+
+    let isValid = vnode.state.space !== undefined && 
+      (!vnode.state.space.filters?.onlyMembers ||
+        (vnode.state.space.filters?.onlyMembers && isMember));
+      // (vnode.state.space.filters?.minScore === 0 ||
+      //   (vnode.state.space.filters?.minScore > 0 && vnode.state.userScore) ||
+      //   isMember);
+
     return m('.NewThreadForm', {
       oncreate: (vvnode) => {
         $(vvnode.dom).find('.cui-input input').prop('autocomplete', 'off').focus();
       },
     }, [
       m('.new-thread-form-body', [
+        vnode.state.space.filters?.onlyMembers && !isMember && 
         m(Callout, {
           class: 'no-profile-callout',
           intent: 'primary',
@@ -244,12 +281,12 @@ export const NewProposalForm: m.Component<{}, {
                 intent: 'primary',
                 label: 'Publish',
                 name: 'submit',
-                disabled: !author || vnode.state.saving,
+                disabled: !author || vnode.state.saving || !isValid,
                 rounded: true,
                 onclick: async (e) => {
                   vnode.state.saving = true;
                   try {
-                    await newLink(vnode.state.form, vnode.state.quillEditorState, author);
+                    await newLink(vnode.state.form, vnode.state.quillEditorState, author, vnode.state.space);
                     vnode.state.saving = false;
                     clearLocalStorage();
                   } catch (err) {
