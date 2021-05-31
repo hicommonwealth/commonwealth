@@ -16,10 +16,12 @@ const ProjectCard: m.Component<{project: CWProject}> = {
     const projectLink = `/${app.activeCommunityId()}/project/${project.projectHash}`;
 =======
     // const thredLink = `/${app.activeChainId()}/proposal/discussion/${project.threadId}`; // proposal => project
+<<<<<<< HEAD
     const projectLink = `/${app.activeChainId()}/project/${project.projectHash}`;
 >>>>>>> 4be99152... structure updated:client/scripts/views/components/commonwealth/project_card.ts
+=======
+>>>>>>> d7b077d3... fix after testing
     const bgColor = project.status === 'In Progress' ? 'blue' : (project.status === 'Successed') ? 'green' : 'red';
-
     const totalFunding = utils.formatEther(project.totalFunding.asBN.toString());
     const totalFundingText = `Total Funding: ${totalFunding} Ether`;
     
@@ -28,7 +30,7 @@ const ProjectCard: m.Component<{project: CWProject}> = {
         onclick: (e) => {
           e.stopPropagation();
           e.preventDefault();
-          m.route.set(projectLink); // avoid resetting scroll point
+          m.route.set(`/${app.activeChainId()}/project/${project.projectHash}`); // avoid resetting scroll point
           },
         }, [
           m(Tag, {

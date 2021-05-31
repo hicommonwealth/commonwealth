@@ -1,7 +1,7 @@
 import 'components/commonwealth/action_card.scss';
 
 import { utils } from 'ethers';
-import { Button } from 'construct-ui';
+// import { Button } from 'construct-ui';
 import m from 'mithril';
 
 import app from 'state';
@@ -10,15 +10,25 @@ import { CWProject } from 'models/CWProtocol';
 import InProgressActionCard from './inprogress_action';
 import SuccsedActionCard from './successed_action';
 import FailedActionCard from './failed_action';
+import { CWUser } from '../members_card'
 
-const ActionCard: m.Component<{project: CWProject, protocol: any}, {amount: any, error: string, submitting: boolean}> = {
+const ActionCard: m.Component<{
+  project: CWProject,
+  protocol: any,
+  curators: CWUser[],
+  backers: CWUser[],
+},
+{
+  amount: any,
+  error: string,
+  submitting: boolean
+}> = {
   oncreate: (vnode) => {
     vnode.state.error = '';
     vnode.state.amount = 0;
   },
   view: (vnode) => {
-    const { project, protocol } = vnode.attrs;
-
+    const { project, protocol, curators, backers } = vnode.attrs;
     const threshold = utils.formatEther(project.threshold.asBN.toString());
     const totalFunding = utils.formatEther(project.totalFunding.asBN.toString());
     const acceptedTokenStr = project.totalFunding.denom;
@@ -27,6 +37,8 @@ const ActionCard: m.Component<{project: CWProject, protocol: any}, {amount: any,
     if (parseInt(percent) > 100) {
       percent = '100';
     }
+
+    const notLoggedIn = !app.user.activeAccount || !app.isLoggedIn();
 
     return m('.col-lg-4 .action-card', [
       m('.action-title', [
@@ -46,21 +58,24 @@ const ActionCard: m.Component<{project: CWProject, protocol: any}, {amount: any,
       }),
       project.status === 'Successed' && m(SuccsedActionCard, {
         project: project,
-        protocol: protocol
+        protocol: protocol,
+        curators
       }),
       project.status === 'Failed' && m(FailedActionCard, {
         project: project,
-        protocol: protocol
+        protocol: protocol,
+        backers
       }),
-      m(Button, {
-        class: 'contribute-button',
-        disabled: true,
-        label: 'Go to discussion thread ->',
-        rounded: true,
-        fluid: true,
-        // intent: 'primary',
-        onclick: (e) => {}
-      }),
+      notLoggedIn && m('p.display-txt', 'Please login first')
+      // m(Button, {
+      //   class: 'contribute-button',
+      //   disabled: true,
+      //   label: 'Go to discussion thread ->',
+      //   rounded: true,
+      //   fluid: true,
+      //   // intent: 'primary',
+      //   onclick: (e) => {}
+      // }),
     ]);
   }
 }

@@ -2,16 +2,11 @@ import BN from 'bn.js';
 import { EthereumCoin } from 'shared/adapters/chain/ethereum/types';
 
 type ProjectStatus = 'In Progress' | 'Successed' | 'Failed';
-type ParticipantRole = 'backer' | 'curator' | 'beneficiary' | 'creator'
 
 interface CWUser {
   id?: number;
   address: string;
-  role: ParticipantRole;
-  projectHash: string;
-  amount: number;
 }
-
 export class CWProject { 
   public readonly name: string;
   public readonly description: string;
@@ -25,8 +20,6 @@ export class CWProject {
   public readonly status: ProjectStatus;
   public readonly cToken: string; // cToken address
   public readonly bToken: string; // bToken address
-  // public readonly backers: Array<CWUser>;
-  // public readonly curators: Array<CWUser>;
 
   public readonly threshold: EthereumCoin;
   public readonly totalFunding: EthereumCoin;
@@ -47,9 +40,7 @@ export class CWProject {
     status,
     totalFunding,
     bToken,
-    // backers,
     cToken,
-    // curators,
   ) {
     this.name = name;
     this.description = description;
@@ -65,9 +56,7 @@ export class CWProject {
     this.status = status;
     this.totalFunding = totalFunding;
     this.bToken = bToken;
-    // this.backers = backers;
     this.cToken = cToken;
-    // this.curators = curators;
   }
 }
 
@@ -75,22 +64,48 @@ export class CWProtocol {
   public readonly id: string;
   public protocolFee: BN;
   public feeTo: string;
-  public name: string;
   public projects: CWProject[];
+  public updated_at: Date;
 
-  constructor(name, id, protocolFee, feeTo, projects) {
+  constructor(id, protocolFee, feeTo, projects) {
    this.protocolFee = protocolFee;
    this.feeTo = feeTo;
-   this.name = name;
    this.id = id;
    this.projects = projects;
+   this.updated_at = new Date();
   }
 
-  public static fromJSON({ name, id, protocolFee, feeTo, projects }) {
-    return new CWProtocol(name, id, protocolFee, feeTo, projects);
+  public static fromJSON({ id, protocolFee, feeTo, projects }) {
+    return new CWProtocol(id, protocolFee, feeTo, projects);
   }
 
   public setProjects(_projects: CWProject[]) {
     this.projects = _projects;
+    this.updated_at = new Date();
+  }
+}
+
+export class CWProtocolMembers {
+  public readonly id: string;
+  public backers: CWUser[];
+  public curators: CWUser[];
+  public updated_at: Date;
+
+  constructor(id, backers, curators) {
+   this.id = id;
+   this.backers = backers;
+   this.curators = curators;
+   this.updated_at = new Date();
+  }
+
+  public static fromJSON({ id, backers, curators }) {
+    return new CWProtocolMembers(id, backers, curators);
+  }
+
+
+  public setParticipants(backers: CWUser[], curators: CWUser[]) {
+    this.backers = backers;
+    this.curators = curators;
+    this.updated_at = new Date();
   }
 }

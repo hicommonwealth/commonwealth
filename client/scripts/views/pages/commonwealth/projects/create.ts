@@ -206,7 +206,7 @@ const NewProjectPage: m.Component<{ type }, { submitting: boolean, createError: 
       return m(PageLoading);
     }
     const protocol = (app.chain as any).protocol;
-    if (!protocol || !protocol.initalized) {
+    if (!protocol || !protocol.initialized) {
       return m(PageLoading);
     }
 

@@ -3,18 +3,23 @@ import 'components/commonwealth/action_card.scss';
 import { utils } from 'ethers';
 import { Input, FormGroup, Button } from 'construct-ui';
 import m from 'mithril';
+import BN from 'bn.js';
 
 import app from 'state';
 import { CWProject } from 'models/CWProtocol';
-import BN from 'bn.js';
+import { CWUser } from '../members_card';
+
 
 const floatRegex = /^[0-9]*\.?[0-9]*$/;
 
-const ActionModule: m.Component<{callback: (isWithdraw: boolean) => void, submitting: number, isBeneficiary: boolean}, {}> = {
+const ActionModule: m.Component<{
+  callback: (isWithdraw: boolean) => void,
+  submitting: number,
+  withdrawAble: boolean,
+  redeemAble: boolean,
+}, {}> = {
   view: (vnode) => {
-    const { callback, submitting, isBeneficiary } = vnode.attrs;
-    const actionDisabled = !app.user.activeAccount || !app.isLoggedIn() || submitting > 0;
-
+    const { callback, submitting, withdrawAble, redeemAble } = vnode.attrs;
     return [
       m(Button, {
         class: 'contribute-button',
@@ -22,13 +27,13 @@ const ActionModule: m.Component<{callback: (isWithdraw: boolean) => void, submit
         rounded: true,
         fluid: true,
         intent: 'primary',
-        disabled: actionDisabled,
+        disabled: !redeemAble,
         onclick: async(e) => { await callback(false) }
       }),
       m(Button, {
         class: 'contribute-button',
         label: `Withdraw${submitting === 1 ? 'ing' : ''}`,
-        disabled: !isBeneficiary || actionDisabled,
+        disabled: !withdrawAble,
         rounded: true,
         fluid: true,
         intent: 'primary',
@@ -38,17 +43,36 @@ const ActionModule: m.Component<{callback: (isWithdraw: boolean) => void, submit
   }
 }
 
-const SuccsedActionCard: m.Component<{project: CWProject, protocol: any}, {amount: any, error: string, submitting: number}> = {
+const SuccsedActionCard: m.Component<{
+  project: CWProject,
+  protocol: any,
+  curators: CWUser[]
+},
+{
+  amount: any,
+  error: string,
+  submitting: number
+}> = {
   oncreate: (vnode) => {
     vnode.state.error = '';
     vnode.state.amount = 0;
     vnode.state.submitting = 0;
   },
   view: (vnode) => {
-    const { project, protocol } = vnode.attrs;
-    const isBeneficiary = app.user.activeAccount.address === project.beneficiary;
+    const { project, protocol, curators } = vnode.attrs;
     const { submitting } = vnode.state; // 0: not in progress, 1: in progress of withdrawing, 2: in progress of redeeming cTokens
-    const actionDisabled = !app.user.activeAccount || !app.isLoggedIn() || submitting > 0;
+
+    let withdrawAble = false;
+    let redeemAble = false;
+    if (app.user.activeAccount && app.isLoggedIn() && submitting === 0) {
+      const activeAddress = app.user.activeAccount.address.toLowerCase();
+      if (activeAddress === project.beneficiary.toLowerCase()) {
+        withdrawAble = true;
+      }
+      if (curators.map((item: any) => item.address.toLowerCase()).includes(activeAddress)) {
+        redeemAble = true;
+      }
+    }
 
     return m('.project-funding-action', [
       m(FormGroup, [
@@ -61,7 +85,7 @@ const SuccsedActionCard: m.Component<{project: CWProject, protocol: any}, {amoun
             placeholder: 'Enter the amount in ETH',
             autofocus: true,
           },
-          disabled: actionDisabled,
+          // disabled: actionDisabled,
           oninput: (e) => {
             const result = (e.target as any).value;
             if (floatRegex.test(result)) {
@@ -78,30 +102,39 @@ const SuccsedActionCard: m.Component<{project: CWProject, protocol: any}, {amoun
       vnode.state.error && vnode.state.error !== '' && m('p.error', vnode.state.error),
       m(ActionModule, {
         callback: async(isWithdraw: boolean) => {
-          if (!vnode.state.amount || vnode.state.amount.toString() === new BN(0).toString()) {
-            vnode.state.error = 'Please enter the amount';
-          } else {
-            const author = app.user.activeAccount.address;
-            vnode.state.submitting = isWithdraw ? 1 : 2;
+          if (!app.user.activeAccount) return;
 
-            let txSuccessed = false;
+          const author = app.user.activeAccount.address;
+          vnode.state.submitting = isWithdraw ? 1 : 2;
+
+          let txSuccessed = false;
+          if (isWithdraw) {
             try {
-              if (isWithdraw) {
-                txSuccessed = await protocol.redeemTokens(vnode.state.amount, project.projectHash, false, author);
-              } else {
-                txSuccessed = await protocol.withdraw(project.projectHash, author);
-              }
+              txSuccessed = await protocol.withdraw(project.projectHash, author);
             } catch {
               txSuccessed = false;
             }
-
-            vnode.state.error = txSuccessed ? '' : 'Failed to do this action';
-            vnode.state.submitting = 0;
+          } else if (!vnode.state.amount || vnode.state.amount.toString() === new BN(0).toString()) {
+            vnode.state.error = 'Please enter the amount';
+          } else {
+            try {
+              txSuccessed = await protocol.redeemTokens(
+                vnode.state.amount,
+                project.projectHash,
+                false,
+                author
+              );
+            } catch {
+              txSuccessed = false;
+            }
           }
+          vnode.state.error = txSuccessed ? '' : 'Failed to do this action';
+          vnode.state.submitting = 0;
           m.redraw();
         },
         submitting,
-        isBeneficiary,
+        withdrawAble,
+        redeemAble,
       })
     ]);
   }

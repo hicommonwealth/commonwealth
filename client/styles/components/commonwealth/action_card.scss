@@ -9,15 +9,15 @@
     border-radius: 10px;
     background-color: #f8f8f8;
 
-  .action-title {
-        .amount {
-            font-size: 20px;
-            font-weight: 700;
-        }
-        .coin {
-            font-size: 14px;
-        }
-  }
+    .action-title {
+    .amount {
+        font-size: 20px;
+        font-weight: 700;
+    }
+    .coin {
+        font-size: 14px;
+    }
+    }
     .project-progress {
         padding-bottom: 20px;
         margin-top: 5px;
@@ -44,5 +44,10 @@
         text-align: center;
         margin-bottom: 0;
         margin-top: 5px;
+    }
+    .display-txt {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 0;
     }
 }

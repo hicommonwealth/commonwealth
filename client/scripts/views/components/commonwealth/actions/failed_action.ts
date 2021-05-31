@@ -6,18 +6,35 @@ import m from 'mithril';
 
 import app from 'state';
 import { CWProject } from 'models/CWProtocol';
+import { CWUser } from '../members_card';
 
 const floatRegex = /^[0-9]*\.?[0-9]*$/;
 
-const FailedActionCard: m.Component<{project: CWProject, protocol: any}, {amount: any, error: string, submitting: boolean}> = {
+const FailedActionCard: m.Component<{
+  project: CWProject,
+  protocol: any,
+  backers: CWUser[]
+}, {
+  amount: any,
+  error: string,
+  submitting: boolean
+}> = {
   oncreate: (vnode) => {
     vnode.state.error = '';
     vnode.state.amount = 0;
   },
   view: (vnode) => {
-    const { project, protocol } = vnode.attrs;
+    const { project, protocol, backers } = vnode.attrs;
     const { submitting } = vnode.state;
     const actionDisabled = !app.user.activeAccount || !app.isLoggedIn() || submitting;
+
+    let redeemAble = false;
+    if (app.user.activeAccount && app.isLoggedIn() && !submitting) {
+      const activeAddress = app.user.activeAccount.address.toLowerCase();
+      if (backers.map((item: any) => item.address.toLowerCase()).includes(activeAddress)) {
+        redeemAble = true;
+      }
+    }
 
     return m('.project-funding-action', [
       m(FormGroup, [
@@ -30,7 +47,6 @@ const FailedActionCard: m.Component<{project: CWProject, protocol: any}, {amount
             placeholder: 'Enter the amount in ETH',
             autofocus: true,
           },
-          disabled: actionDisabled,
           oninput: (e) => {
             const result = (e.target as any).value;
             if (floatRegex.test(result)) {

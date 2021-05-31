@@ -3,13 +3,13 @@ import BN from 'bn.js';
 import moment from 'moment';
 
 import { IApp } from 'state';
-import { CWProtocol, CWProject } from 'models/CWProtocol';
+import { CWProtocol, CWProject, CWProtocolMembers } from 'models/CWProtocol';
 import { CwProjectFactory as CWProjectFactory } from 'CwProjectFactory';
 
 import CommonwealthChain from './chain';
 import CommonwealthAPI from './api';
 
-import { CWProtocolStore } from '../../../../stores';
+import { CWProtocolStore, CWProtocolMembersStore } from '../../../../stores';
 import ContractApi from '../contractApi';
 
 const expandTo18Decimals = (n: number): BN => {
@@ -20,12 +20,14 @@ export default class CommonwealthProtocol {
   private _initialized: boolean = false;
   private _app: IApp;
   private _api: CommonwealthAPI;
-  private _store = new CWProtocolStore();
+  private _projectStore = new CWProtocolStore();
+  private _memberStore = new CWProtocolMembersStore();
   private _chain: CommonwealthChain;
 
-  public get initalized() { return this._initialized };
-  public get app() { return this._app; }
-  public get store() { return this._store; }
+  public get initialized() { return this._initialized };
+  public get app() { return this._app; };
+  public get projectStore() { return this._projectStore; };
+  public get memberStore() { return this._memberStore; };
 
   constructor(app: IApp) {
     this._app = app;
@@ -39,8 +41,10 @@ export default class CommonwealthProtocol {
     const feeTo = await this._api.Contract.feeTo();
 
     const projects: CWProject[] =  await this._api.retrieveAllProjects();
-    const newProtocol = new CWProtocol('root', 'root', protocolFee, feeTo, projects);
+    const newProtocol = new CWProtocol('cmn_projects', protocolFee, feeTo, projects);
+    this._projectStore.add(newProtocol);
 
+<<<<<<< HEAD
     await this.createProject(
       'cmn first project',
       'project that is running on cw protocol',
@@ -52,16 +56,14 @@ export default class CommonwealthProtocol {
     )
 
     this.store.add(newProtocol);
+=======
+    this._initialized = true;
+>>>>>>> d7b077d3... fix after testing
   }
 
   public async deinit() {
-    this.store.clear();
-  }
-
-  public async updateState() {
-    const protocolStore = this.store.getById('root');
-    let projects: CWProject[] =  await this._api.retrieveAllProjects(); // update all projects
-    await protocolStore.setProjects(projects);
+    this._projectStore.clear();
+    this.memberStore.clear();
   }
 
   public async createProject(
@@ -75,6 +77,7 @@ export default class CommonwealthProtocol {
     backWithEther = true,
     token?: ERC20Token
   ) {
+<<<<<<< HEAD
     const api = this._chain.CommonwealthAPI;
     await api.attachSigner(this._chain.app.wallets, '0xF5B35b607377850696cAF2ac4841D61E7d825a3b');
     console.log('====>after attach signer', api);
@@ -111,6 +114,33 @@ export default class CommonwealthProtocol {
     // }
     // console.log('====>txReceipt', txReceipt);
   }
+=======
+    const name = utils.formatBytes32String(u_name);
+    const ipfsHash = utils.formatBytes32String('0x01');
+    const cwUrl = utils.formatBytes32String('commonwealth.im');
+    const acceptedTokens = ['0x0000000000000000000000000000000000000000']; // only Ether
+    const nominations = [creator, beneficiary];
+    const endtime = Math.ceil(Date.now() / 1000) + u_period * 24 * 60 * 60;
+    
+    const contract = await this._api.attachSigner(this._chain.app.wallets, creator);
+    const createProjectTx = await contract.createProject(
+      name,
+      ipfsHash,
+      cwUrl,
+      beneficiary,
+      acceptedTokens,
+      nominations,
+      threshold.toString(),
+      endtime,
+      curatorFee.toString(),
+      '', // projectID
+    );
+    const txReceipt = await createProjectTx.wait();
+
+    if (txReceipt.status === 1) {
+      await this.syncProjects(true);
+    }
+>>>>>>> d7b077d3... fix after testing
 
     return txReceipt.status === 1;
   }
@@ -136,7 +166,7 @@ export default class CommonwealthProtocol {
     const projContractAPI = await this.projectContractApi(projectHash, from);
     const isTxSuccessed = await this._api.backOrCurateWithEther(projContractAPI, amount, isBacking, withEther);
     if (isTxSuccessed) {
-      await this.updateState();
+      await this.syncProjects(true);
     }
     return isTxSuccessed;
   }
@@ -151,7 +181,7 @@ export default class CommonwealthProtocol {
     const projContractAPI = await this.projectContractApi(projectHash, from);
     const isTxSuccessed = await this._api.redeemTokens(projContractAPI, amount, isBToken, withEther);
     if (isTxSuccessed) {
-      await this.updateState();
+      await this.syncProjects(true);
     }
     return isTxSuccessed;
   }
@@ -163,16 +193,44 @@ export default class CommonwealthProtocol {
     const projContractAPI = await this.projectContractApi(projectHash, from);
     const isTxSuccessed = await this._api.withdraw(projContractAPI);
     if (isTxSuccessed) {
-      await this.updateState();
+      await this.syncProjects(true);
     }
     return isTxSuccessed;
   }
 
-  public async getTokenHolders(tokenAddress: string) {
-    const tokenHolders = [];
+  public async syncMembers(bTokenAddress: string, cTokenAddress: string, projectHash: string) {
+    let mStore = this._memberStore.getById(projectHash);
+    let curators = [];
+    let backers = [];
 
-    // do some logic to get token holders
-    return tokenHolders;
+    if (!mStore || !mStore.updated_at) {
+      curators = await await this._api.getTokenHolders(cTokenAddress);
+      backers = await await this._api.getTokenHolders(bTokenAddress);
+      mStore = new CWProtocolMembers(projectHash, backers, curators);
+      this._memberStore.add(mStore);
+    } else {
+      const afterHours = Math.floor(Math.abs(new Date().getTime() - mStore.updated_at.getTime()) / 3600000); // diff in hours
+      if (afterHours > 0) {
+        curators = await await this._api.getTokenHolders(cTokenAddress);
+        backers = await await this._api.getTokenHolders(bTokenAddress);
+        mStore.setParticipants(backers, curators);
+      }
+    }
+
+    return { backers, curators };
+  }
+
+  public async syncProjects(force = false) {
+    const pStore = this._projectStore.getById('cmn_projects');
+    var afterHours = Math.floor(Math.abs(new Date().getTime() - pStore.updated_at.getTime()) / 3600000); // diff in hours
+    let projects: CWProject[] = []
+    if (force || afterHours > 1) {
+      projects =  await this._api.retrieveAllProjects();
+      pStore.setProjects(projects);
+    } else {
+      projects = pStore.projects;
+    }
+    return projects;
   }
 }
  

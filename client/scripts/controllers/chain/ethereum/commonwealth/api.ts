@@ -1,9 +1,9 @@
 import { utils } from 'ethers';
 import BN from 'bn.js';
+import $ from 'jquery';
 
 import ContractApi from 'controllers/chain/ethereum/contractApi';
-import { EthereumCoin, ERC20Token } from 'adapters/chain/ethereum/types';
-import WebWalletController from 'controllers/app/web_wallets';
+import { EthereumCoin } from 'adapters/chain/ethereum/types';
 
 import { CwProtocol as CWProtocolContract } from 'CWProtocol';
 import { CwProjectFactory as CWProjectFactory } from 'CwProjectFactory';
@@ -83,16 +83,12 @@ export default class CommonwealthAPI extends ContractApi<CWProtocolContract> {
       if (isBacking) {
         // back logic
         const backTx = await contract.backWithETH({value: amount});
-        console.log('====>backTx', backTx);
         const txReceipt = await backTx.wait();
-        console.log('====>backTx txReceipt', txReceipt);
         return txReceipt.status === 1
       } else {
         // curate logic
         const curateTx = await contract.curateWithETH({value: amount});
-        console.log('====>curateTx', curateTx);
         const txReceipt = await curateTx.wait();
-        console.log('====>curateTx txReceipt', txReceipt);
         return txReceipt.status === 1
       }
     } else {
@@ -102,21 +98,29 @@ export default class CommonwealthAPI extends ContractApi<CWProtocolContract> {
   }
 
   public async redeemTokens(contract: CWProject, amount: number, isBToken: boolean, withEther: boolean) {
+
     if (withEther) {
       if (isBToken) {
         // redeemBTokens
         const redeemBTokenTx = await contract.redeemBToken('0x0000000000000000000000000000000000000000', amount);
-        console.log('====>redeemBTokenTx', redeemBTokenTx);
         const txReceipt = await redeemBTokenTx.wait();
-        console.log('====>redeemBTokenTx txReceipt', txReceipt);
         return txReceipt.status === 1
       } else {
         // redeemCTokens
-        const redeemCTokenTx = await contract.redeemCToken('0x0000000000000000000000000000000000000000', amount);
-        console.log('====>redeemCTokenTx', redeemCTokenTx);
-        const txReceipt = await redeemCTokenTx.wait();
-        console.log('====>redeemCTokenTx txReceipt', txReceipt);
-        return txReceipt.status === 1
+        try {
+          const redeemCTokenTx = await contract.redeemCToken('0x0000000000000000000000000000000000000000', amount);
+          console.log('====>redeemCTokenTx', redeemCTokenTx);
+
+          const txReceipt = await redeemCTokenTx.wait();
+          console.log('====>redeemCTokenTx txReceipt', txReceipt);
+          return txReceipt.status === 1
+        } catch (error) {
+          console.log('======>2', error);
+        }
+        
+        
+        
+        
       }
     } else {
       // ERC20 token logic
@@ -127,9 +131,34 @@ export default class CommonwealthAPI extends ContractApi<CWProtocolContract> {
 
   public async withdraw(contract: CWProject) {    
     const withdrawTx = await contract.withdraw();
-    console.log('====>withdrawTx', withdrawTx);
     const txReceipt = await withdrawTx.wait();
-    console.log('====>redeemBTokenTx txReceipt', txReceipt);
+    console.log('====>withdrawTx txReceipt', txReceipt);
     return txReceipt.status === 1
+  }
+
+  public async getTokenHolders(tokenAddress: string) {
+    const COVALENTHQ_API_BASE_URL = 'https://api.covalenthq.com/v1';
+    const CHAIN_ID = 42; // for kovan
+    const apiUrl = `${COVALENTHQ_API_BASE_URL}/${CHAIN_ID}/tokens/${tokenAddress}/token_holders/`;
+
+    const response = await $.get(apiUrl, {
+      'key': 'ckey_1bee39d2c56f46e4aada2380624',
+      'page-number': 0,
+      'page-size': 200,
+    });
+
+    let tokenHolders = [];
+    if (!response.error) {
+      const { items, pagination, updated_at } = response.data;
+      tokenHolders = items.map((item: any) => {
+        const newItem = {
+          address: item.address,
+          balance: item.balance,
+        }
+        return newItem;
+      });
+    }
+
+    return tokenHolders;
   }
 }

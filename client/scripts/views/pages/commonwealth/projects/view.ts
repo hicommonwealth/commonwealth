@@ -1,16 +1,16 @@
 import 'pages/commonwealth/projects/view.scss';
 
 import m from 'mithril';
-import app from 'state';
+import { utils } from 'ethers';
 
+import app from 'state';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import { CWProject } from 'models/CWProtocol';
 
-import { CWProject } from 'models/CWProtocol';
 
 import ActionModule from 'views/components/commonwealth/actions/action_card';
-import MembersModule from 'views/components/commonwealth/members_card';
+
 
 function secondsToDhms(seconds) {
   seconds = Number(seconds);
@@ -49,25 +49,33 @@ const ProjectContentModule: m.Component<{project: CWProject, leftInSeconds: numb
   }
 }
 
-const ViewProjectPage: m.Component<{projectHash: string}, {initializing: boolean, protocol: any}> = {
+const ViewProjectPage: m.Component<{
+  projectHash: string
+},
+{
+  initialized: boolean,
+  project: CWProject,
+}> = {
   oncreate: async(vnode) => {
-    // if (!app.chain || !app.chain.loaded) {
-    //   vnode.state.initializing = true;
-    //   await initChain();
-    //   vnode.state.protocol = (app.chain as any).protocol;
-    //   vnode.state.initializing = false;
-    //   m.redraw();
-    // } else if (!vnode.state.protocol) {
-    //   vnode.state.protocol = (app.chain as any).protocol;
-    //   m.redraw();
-    // }
+    vnode.state.initialized = false;
+  },
+  onupdate: async(vnode) => {
+    if (!app.chain || vnode.state.initialized) return;
+
+    const protocol = (app.chain as any).protocol;
+    if (!protocol || !protocol.initialized || !protocol.projectStore) return;
+
+    const projects = await (app.chain as any).protocol.syncProjects();
+    const project = projects.filter((item) => item.projectHash === vnode.attrs.projectHash)[0];
+    await (app.chain as any).protocol.syncMembers(project.bToken, project.cToken, project.projectHash);
+    vnode.state.project = project;
+    vnode.state.initialized = true;
+    m.redraw();
   },
   view: (vnode) => {
-    if (vnode.state.initializing || !app.chain) {
-      return m(PageLoading);
-    }
-    const protocol = (app.chain as any).protocol;
-    if (!protocol || !protocol.initalized) {
+    const { project, initialized } = vnode.state;
+
+    if (!initialized) {
       return m(PageLoading);
     }
     const { protocol } = vnode.state;
@@ -77,6 +85,16 @@ const ViewProjectPage: m.Component<{projectHash: string}, {initializing: boolean
     const endTime = project.endTime;
     const leftInSeconds = (endTime.getTime() - startTime.getTime()) / 1000;
 
+    const backersContent = backers.map((backer) => m('.member', [
+      m('.text', backer.address),
+      m('.text', `${utils.formatEther(backer.balance)}ETH`),
+    ]));
+    const curatorsContent = curators.map((curator) => m('.member', [
+      m('.text', curator.address),
+      m('.text', `${utils.formatEther(curator.balance)}ETH`),
+    ]));
+
+
     return m(Sublayout, {
       class: 'ProjectPage',
       title: 'Projects',
@@ -85,12 +103,26 @@ const ViewProjectPage: m.Component<{projectHash: string}, {initializing: boolean
       m('.container', [
         m('.row', [
           m(ProjectContentModule, { project, leftInSeconds }),
-          m(ActionModule, { project, protocol })
+          m(ActionModule, { project, protocol, backers, curators })
         ]),
-        m(MembersModule, { project })
+        m('.row .members-card', [
+          m('.col-lg-6', [
+            m('.title', 'Backers'),
+            m('.text .mt-10px', `Backers' funds will go to the project if the funding threshold is reached.`),
+            backersContent
+          ]),
+          m('.col-lg-6', [
+            m('.title', 'Curator'),
+            m('.text .mt-10px', `Curators received 5% of the total raise if the project is successful. You should curate.`),
+            curatorsContent,
+          ])
+        ])
       ]),
     ]);
   }
 }
 
 export default ViewProjectPage;
+
+
+    
