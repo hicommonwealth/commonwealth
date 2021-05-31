@@ -9,19 +9,22 @@ import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 
 const InvitesMenu = {
   view: (vnode) => {
-    if (app.config.invites?.length === 0) return;
+    if (!app.config.invites?.length) return;
 
     return m(PopoverMenu, {
       hasArrow: false,
       transitionDuration: 0,
       hoverCloseDelay: 0,
-      trigger: m(Button, {
-        class: 'InvitesButton',
-        iconLeft: Icons.MAIL,
-        intent: 'primary',
-        size: 'default',
-        compact: true,
-      }),
+      trigger: m('.invites-button-wrap', [
+        m(Button, {
+          class: 'InvitesButton',
+          iconLeft: Icons.MAIL,
+          intent: 'primary',
+          size: 'default',
+          compact: true,
+        }),
+        m('.invites-count-pip', app.config.invites.length)
+      ]),
       position: 'bottom-end',
       inline: true,
       closeOnContentClick: true,
