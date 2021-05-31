@@ -123,7 +123,9 @@ const ConfirmInviteModal: m.Component<{}, {
                         mixpanel.track('Address Selected', {
                           'Step': 'Address Selected for Invite',
                         });
-                        $(e.target).trigger('modalexit');
+                        if (app.config.invites.length === 0) {
+                          $(e.target).trigger('modalexit');
+                        }
                         const communityId = invites[location].community_id;
                         const chainId = invites[location].community_id;
                         // if private community, re-init app
