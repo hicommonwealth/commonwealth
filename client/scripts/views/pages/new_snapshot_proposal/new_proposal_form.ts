@@ -51,7 +51,8 @@ interface IThreadForm {
   start: string;
   end: string;
   snapshot: '',
-  metadata: {}
+  metadata: {},
+  type: string
 }
 
 enum NewThreadErrors {
@@ -113,9 +114,9 @@ const newThread = async (
     msg: JSON.stringify({
       version,
       timestamp: (Date.now() / 1e3).toFixed(),
-      space,
+      space: space.key,
       type: 'proposal',
-      form
+      payload: form
     })
   };
   console.log(author);
@@ -172,6 +173,7 @@ export const NewProposalForm: m.Component<{}, {
       end: '',
       snapshot: '',
       metadata: {},
+      type: 'single-choice'
     };
 
     snapshotClient.getSpaces().then(response => {
@@ -247,7 +249,7 @@ export const NewProposalForm: m.Component<{}, {
           class: 'no-profile-callout',
           intent: 'primary',
           content: [
-            'You need to have a minimum of 1 YFI in order to submit a proposal',
+            'You need to be a member of the space in order to submit a proposal',
           ],
         }),
         m('.new-snapshot-proposal-form', [

@@ -385,6 +385,13 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/ethereum/fei/adapter'
     )).default;
     newChain = new Fei(n, app);
+  } else if (n.chain.network === ChainNetwork.Sushi) {
+    const Sushi = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "commonwealth-main" */
+      './controllers/chain/ethereum/sushi/adapter'
+    )).default;
+    newChain = new Sushi(n, app);
   } else {
     throw new Error('Invalid chain');
   }

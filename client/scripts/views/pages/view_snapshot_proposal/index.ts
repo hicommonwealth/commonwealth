@@ -104,7 +104,8 @@ const ViewProposalPage: m.Component<{
     vnode.state.proposal = allProposals.filter(proposal => proposal.ipfsHash === vnode.attrs.identifier)[0];
 
     if (vnode.state.proposal) {
-      $.get(`https://hub.snapshot.page/api/${app.chain?.meta.chain.snapshot}/proposal/${vnode.state.proposal.ipfsHash}`).then((response) => {
+      const hubUrl = process.env.SNAPSHOT_APP_HUB_URL || 'https://testnet.snapshot.org';
+      $.get(`${hubUrl}/api/${app.chain?.meta.chain.snapshot}/proposal/${vnode.state.proposal.ipfsHash}`).then((response) => {
         if (response.status !== 'Success') {
           var i = 0;
           let votes: Vote[] = [];
