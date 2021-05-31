@@ -11,6 +11,7 @@ import { notifyError } from 'controllers/app/notifications';
 import User, { UserBlock } from 'views/components/widgets/user';
 import { CompactModalExitButton } from 'views/modal';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
+import { initAppState } from 'app';
 
 const SideMenu: m.Component<{invites, onChangeHandler, location}, {}> = {
   view: (vnode) => {
@@ -66,7 +67,7 @@ const ConfirmInviteModal: m.Component<{}, {
       ]);
     };
 
-    const invites = vnode.state.invites;
+    const { invites } = vnode.state;
     let addresses;
     if (vnode.state.accepted.length + vnode.state.rejected.length === invites.length) {
       vnode.state.isComplete = true;
@@ -75,6 +76,8 @@ const ConfirmInviteModal: m.Component<{}, {
         .sort(orderAccountsByAddress)
         .map((account) => SelectAddress(account));
     }
+    console.log({ invites });
+    console.log(app.config.communities);
     return m('.ConfirmInviteModal', [
       m('.compact-modal-title', [
         !vnode.state.isComplete
@@ -118,6 +121,14 @@ const ConfirmInviteModal: m.Component<{}, {
                         );
                         vnode.state.accepted.push(vnode.state.location);
                         vnode.state.selectedAddress = null;
+                        $(e.target).trigger('modalexit');
+                        const communityId = invites[vnode.state.location].community_id;
+                        // if private community, re-init app
+                        if (communityId && !app.config.communities.getByCommunity(communityId)) {
+                          initAppState().then(() => m.route.set(`/${communityId}`));
+                        } else {
+                          m.route.set(`/${communityId}`);
+                        }
                         m.redraw();
                         mixpanel.track('Address Selected', {
                           'Step': 'Address Selected for Invite',

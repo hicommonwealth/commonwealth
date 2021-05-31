@@ -23,7 +23,11 @@ const InvitesMenu = {
           size: 'default',
           compact: true,
         }),
-        m('.invites-count-pip', app.config.invites.length)
+        m('.invites-count-pip', {
+          style: (app.config.invites.length === 1)
+            ? 'padding: 2px 3px'
+            : 'padding: 2px'
+        }, app.config.invites.length)
       ]),
       position: 'bottom-end',
       inline: true,
