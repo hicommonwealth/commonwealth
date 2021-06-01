@@ -31,13 +31,11 @@ const NotificationButtons: m.Component<{ showingChainNotifications: boolean }> =
           : m.route.set('/notificationsList'),
       }),
       showingChainNotifications ? m(Button, {
-        label: 'Clear events',
+        label: 'Mark all read',
         onclick: async (e) => {
           e.preventDefault();
-          e.stopPropagation();
-          const confirmed = await confirmationModalWithText('Clear all chain notifications?')();
           if (chainEventNotifications.length < 1) return;
-          app.user.notifications.clear(chainEventNotifications)?.then(() => m.redraw());
+          app.user.notifications.markAsRead(chainEventNotifications)?.then(() => m.redraw());
         },
       }) : m(Button, {
         label: 'Mark all read',

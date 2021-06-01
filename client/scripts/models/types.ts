@@ -39,7 +39,8 @@ export enum ChainNetwork {
   Commonwealth = 'commonwealth',
   ERC20 = 'erc20',
   Clover = 'clover',
-  HydraDX = 'hydradx'
+  HydraDX = 'hydradx',
+  Crust = 'crust',
 }
 
 // This function returns a default chain for a chainbase
@@ -77,6 +78,7 @@ export enum ChainClass {
   MarlinTestnet = 'marlin-testnet',
   ALEX = 'alex',
   Commonwealth = 'commonwealth',
+  Crust = 'crust',
   ERC20 = 'erc20',
 }
 
@@ -94,7 +96,6 @@ export enum OffchainThreadStage {
   Voting = 'voting',
   Passed = 'passed',
   Failed = 'failed',
-  Abandoned = 'abandoned',
 }
 
 export enum OffchainVoteOptions {

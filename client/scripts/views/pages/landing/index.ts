@@ -310,14 +310,14 @@ const LandingPage: m.Component<{}, IState> = {
         m(JoinCommonWealthSection),
         m(FooterLandingPage, {
           list: [
-            { text: 'Why Commonwealth?', redirectTo: '/whyCommonwealth' },
             // { text:  'Use Cases' },
             // { text:  'Crowdfunding' },
             // { text:  'Developers' },
-            { text:  'Privacy', redirectTo: '/privacy' },
-            { text:  'Terms', redirectTo:  '/terms' },
+            { text: 'Blog', externalLink: 'https://blog.commonwealth.im' },
             { text: 'Jobs', externalLink: 'https://angel.co/company/commonwealth-labs/jobs' },
-            { text: 'Blog', externalLink: 'https://commonwealth.im/blog' },
+            { text:  'Terms', redirectTo:  '/terms' },
+            { text:  'Privacy', redirectTo: '/privacy' },
+            { text: 'Why Commonwealth?', redirectTo: '/whyCommonwealth' },
             { text: 'Discord', externalLink: 'https://discord.gg/ZFQCKUMP' },
             { text: 'Telegram', externalLink: 'https://t.me/HiCommonwealth' }
           ],

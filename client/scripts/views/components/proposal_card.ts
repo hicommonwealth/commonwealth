@@ -33,7 +33,7 @@ export const getStatusText = (proposal: AnyProposal, showCountdown: boolean) => 
   } else if (proposal.completed && proposal instanceof SubstrateCollectiveProposal) {
     if (proposal.isPassing === ProposalStatus.Passed
         && proposal.call.section === 'treasury' && proposal.call.method === 'approveProposal')
-      return 'Passed, treasury spend approved';
+      return 'Passed';
     if (proposal.isPassing === ProposalStatus.Passed
         && proposal.call.section === 'democracy' && proposal.call.method.startsWith('externalPropose'))
       return 'Passed, moved to referendum';
@@ -53,7 +53,7 @@ export const getStatusText = (proposal: AnyProposal, showCountdown: boolean) => 
       : proposal.endTime.kind === 'dynamic'
         ? [ m(Countdown, { duration: blocknumToDuration(proposal.endTime.getBlocknum()) }), ' left' ]
         : proposal.endTime.kind === 'threshold'
-          ? `waiting for ${proposal.endTime.threshold} votes`
+          ? `needs ${proposal.endTime.threshold} votes`
           : proposal.endTime.kind === 'not_started'
             ? 'not yet started'
             : proposal.endTime.kind === 'queued'
@@ -74,8 +74,8 @@ export const getStatusText = (proposal: AnyProposal, showCountdown: boolean) => 
             : proposal.isPassing === ProposalStatus.Failed ? 'Did not pass'
               : (proposal.isPassing === ProposalStatus.Passing && proposal instanceof SubstrateDemocracyProposal)
                 ? [ 'Expected to pass and move to referendum, ', countdown ]
-                : proposal.isPassing === ProposalStatus.Passing ? [ 'Expected to pass, ', countdown ]
-                  : proposal.isPassing === ProposalStatus.Failing ? [ 'Needs more votes, ', countdown ]
+                : proposal.isPassing === ProposalStatus.Passing ? [ 'Passing, ', countdown ]
+                  : proposal.isPassing === ProposalStatus.Failing ? [ 'Not passing, ', countdown ]
                     : proposal.isPassing === ProposalStatus.None ? '' : '';
 };
 
@@ -126,6 +126,32 @@ const ProposalCard: m.Component<{ proposal: AnyProposal, injectedContent? }> = {
           rounded: true,
           size: 'xs',
         }),
+        (proposal instanceof SubstrateDemocracyProposal || proposal instanceof SubstrateCollectiveProposal)
+          && proposal.getReferendum()
+          && m(Tag, {
+            label: `REF #${proposal.getReferendum().identifier}`,
+            intent: 'primary',
+            rounded: true,
+            size: 'xs',
+            class: 'proposal-became-tag',
+          }),
+        proposal instanceof SubstrateDemocracyReferendum && proposal.preimage
+          && (() => {
+            const originatingProposalOrMotion = proposal.getProposalOrMotion(proposal.preimage);
+            if (!(originatingProposalOrMotion instanceof SubstrateCollectiveProposal)
+                && !(originatingProposalOrMotion instanceof SubstrateDemocracyProposal)) return;
+
+            return m(Tag, {
+              label: (originatingProposalOrMotion instanceof SubstrateDemocracyProposal)
+                ? `PROP #${originatingProposalOrMotion.identifier}`
+                  : (originatingProposalOrMotion instanceof SubstrateCollectiveProposal)
+                  ? `MOT #${originatingProposalOrMotion.identifier}` : '',
+              intent: 'primary',
+              rounded: true,
+              size: 'xs',
+              class: 'proposal-became-tag',
+            });
+          })(),
         // title
         m('.proposal-title', proposal.title),
         // metadata
@@ -142,37 +168,25 @@ const ProposalCard: m.Component<{ proposal: AnyProposal, injectedContent? }> = {
         //   && proposal.call?.method === 'approveProposal'
         //   && m('.proposal-action', [ 'Approves TRES-', proposal.call?.args[0] ]),
         // linked referenda
-        proposal instanceof SubstrateDemocracyReferendum && proposal.preimage
-          && (() => {
-            const originatingProposalOrMotion = proposal.getProposalOrMotion(proposal.preimage);
-            if (originatingProposalOrMotion instanceof SubstrateDemocracyProposal) {
-              return m('.proposal-action', [ 'Via PROP-', originatingProposalOrMotion.identifier ]);
-            } else if (originatingProposalOrMotion instanceof SubstrateCollectiveProposal) {
-              return m('.proposal-action', [ 'Via MOT-', originatingProposalOrMotion.identifier ]);
-            }
-          })(),
-        (proposal instanceof SubstrateDemocracyProposal || proposal instanceof SubstrateCollectiveProposal)
-          && proposal.getReferendum()
-          && m('.proposal-action', [ 'Became REF-', proposal.getReferendum().identifier ]),
-        injectedContent ? m('.proposal-injected', injectedContent) : [
-          // comments
-          m('.proposal-comments', pluralize(app.comments.nComments(proposal), 'comment')),
-          // status
-          m('.proposal-status', { class: getStatusClass(proposal) }, getStatusText(proposal, true)),
-        ],
-      ]),
-      m('.proposal-card-bottom', {
-        onclick: (e) => {
-          e.preventDefault();
-          if (proposal?.threadId) {
-            m.route.set(`/${app.activeId()}/proposal/discussion/${proposal.threadId}`);
-          }
-        }
-      }, [
+        injectedContent
+          ? m('.proposal-injected', injectedContent)
+          : m('.proposal-status', { class: getStatusClass(proposal) }, getStatusText(proposal, true)),
         // thread link
-        proposal.threadId ? m('.proposal-thread-link', [
-          m('a', { href: `/${app.activeId()}/proposal/discussion/${proposal.threadId}` }, 'Go to thread'),
-        ]) : m('.no-linked-thread', 'No linked thread'),
+        proposal.threadId && m('.proposal-thread-link', [
+          m('a', {
+            href: `/${app.activeId()}/proposal/discussion/${proposal.threadId}`,
+            onclick: (e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              localStorage[`${app.activeId()}-proposals-scrollY`] = window.scrollY;
+              m.route.set(`/${app.activeId()}/proposal/discussion/${proposal.threadId}`);
+              // avoid resetting scroll point
+            },
+          }, [
+            m(Icon, { name: Icons.ARROW_UP_RIGHT, size: 'xs' }),
+            proposal.threadTitle ? proposal.threadTitle : 'Go to thread'
+          ]),
+        ])
       ]),
     ]);
   }

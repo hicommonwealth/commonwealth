@@ -5,7 +5,7 @@ import app from 'state';
 import { EmptyState, Button, Icon, Icons, Grid, Col, Spinner } from 'construct-ui';
 import { link } from 'helpers';
 
-import NewProposalButton from 'views/components/new_proposal_button';
+import NewProposalButton, { MobileNewProposalButton } from 'views/components/new_proposal_button';
 import NotificationsMenu from 'views/components/header/notifications_menu';
 import InvitesMenu from 'views/components/header/invites_menu';
 import LoginSelector from 'views/components/header/login_selector';
@@ -78,7 +78,8 @@ const Sublayout: m.Component<{
       m(LoginSelector),
       app.isLoggedIn() && m(InvitesMenu),
       app.isLoggedIn() && m(NotificationsMenu),
-      showNewProposalButton && m(NewProposalButton, { fluid: false }),
+      showNewProposalButton
+      && (narrowBrowserWidth ? m(MobileNewProposalButton) : m(NewProposalButton, { fluid: false })),
     ]);
 
     if (vnode.attrs.loadingLayout) return [
@@ -113,7 +114,7 @@ const Sublayout: m.Component<{
           ]),
           hero
             ? m('.sublayout-hero', hero)
-            : ((app.chain as Token)?.isToken && !(app.chain as Token)?.hasToken && app.isLoggedIn())
+            : (app.isLoggedIn() && (app.chain as Token)?.isToken && !(app.chain as Token)?.hasToken)
               ? m('.sublayout-hero.token-banner', [
                 m('.token-banner-content', `Link ${app.chain.meta.chain.symbol} address to participate in this community`),
               ]) : '',
