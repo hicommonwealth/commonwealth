@@ -98,9 +98,9 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
       m('div', { class: 'xl:container relative mx-auto' }, [
         m('div', { class: 'md:flex md:flex-row' }, [
           m('div',
-            { class: 'lg:h-720 flex items-center justify-start md:w-2/4' }, [
+            { class: 'lg:h-720 flex items-center justify-center md:w-2/4' }, [
               m('div',
-                { class: 'px-8 mt-32 mb-10 md:my-40 lg:px-14 xl:px-0 xl:pr-32' },
+                { class: 'mt-32 mb-10 md:my-40 lg:px-14 xl:px-0 xl:pr-32 tokenSectionContainer' },
                 [
                   m('h1', { class: 'text-4xl font-bold mb-5 leading-10' }, [
                     'A ',

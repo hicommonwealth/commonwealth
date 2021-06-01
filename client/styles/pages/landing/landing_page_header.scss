@@ -52,6 +52,10 @@
   top: 20px;
 }
 
+.tokenSectionContainer {
+  max-width: 95%;
+}
+
 li.LandingPageHeaderLoginButton.ml-10.pt-2 {
   white-space: nowrap;
   a.btn-primary.pb-3.text-white {
@@ -72,20 +76,6 @@ li.LandingPageHeaderLoginButton.ml-10.pt-2 {
 li.LandingPageMenuButton.ml-10.pt-2 {
   white-space: nowrap;
   background: white;
-  // a.btn-primary.pb-3.text-white {
-  //   padding-top: 14px;
-  //   padding-bottom: 9px;
-  //   color: $text-color-white;
-  //   text-decoration: none;
-  //   cursor: pointer;
-  //   &:hover {
-  //     background-color: $background-color-black-hover;
-  //   }
-  //   img {
-  //     position: relative;
-  //     top: -2px;
-  //   }
-  // }
 }
 
 .HeaderLandingPage {
