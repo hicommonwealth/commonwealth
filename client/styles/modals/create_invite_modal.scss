@@ -47,4 +47,38 @@
       }
     }
   }
+
+  .divider {
+    width: calc(100% + 56px);
+    height: 1px;
+    background: #ddd;
+    margin-top: 20px;
+    margin-left: -28px;
+  }
+
+  .CreateInviteLink {
+    margin-top: 30px;
+    .invite-link-title {
+      font-size: 24px;
+      line-height: 28.8px;
+      font-weight: 500;
+    }
+    .cui-form-label {
+      font-size: 18px;
+      line-height: 21.6px;
+      font-weight: 500;
+    }
+
+    .cui-radio {
+      font-size: 18px;
+      line-height: 21.6px;
+      font-weight: 400;
+      padding-left: 24px;
+
+      .cui-control-indicator {
+        width: 16px;
+        height: 16px;
+      }
+    }
+  }
 }

@@ -3,7 +3,7 @@ import 'modals/create_invite_modal.scss';
 import m from 'mithril';
 import $ from 'jquery';
 import mixpanel from 'mixpanel-browser';
-import { Button, Input, Form, FormGroup, FormLabel, Select } from 'construct-ui';
+import { Button, Input, Form, FormGroup, FormLabel, Select, RadioGroup } from 'construct-ui';
 
 import app from 'state';
 import { CommunityInfo, ChainInfo, RoleInfo, ChainBase } from 'models';
@@ -138,26 +138,25 @@ const CreateInviteLink: m.Component<{
       ? { chain: chain.id }
       : { community: community.id };
     return m(Form, { class: 'CreateInviteLink' }, [
+      m(FormGroup, { span: 12 }, [
+        m('h2.invite-link-title', 'Generate Invite Link'),
+      ]),
       m(FormGroup, { span: 4 }, [
-        m(FormLabel, { for: 'uses', }, 'Generate invite link'),
-        m(Select, {
+        m(FormLabel, { for: 'uses', }, 'Number of Uses'),
+        m(RadioGroup, {
           name: 'uses',
-          defaultValue: vnode.state.inviteUses,
           options: [
             { value: 'none', label: 'Unlimited uses' },
             { value: '1', label: 'One time use' },
-            // { value: '2', label: 'Twice' },
           ],
-          onchange: (e) => {
-            vnode.state.inviteUses = (e.target as any).value;
-          },
+          value: vnode.state.inviteUses,
+          onchange: (e: Event) => { vnode.state.inviteUses = (e.target as any).value; },
         }),
       ]),
       m(FormGroup, { span: 4 }, [
         m(FormLabel, { for: 'time' }, 'Expires after'),
-        m(Select, {
+        m(RadioGroup, {
           name: 'time',
-          defaultValue: vnode.state.inviteTime,
           options: [
             { value: 'none', label: 'Never expires' },
             { value: '24h', label: '24 hours' },
@@ -165,9 +164,8 @@ const CreateInviteLink: m.Component<{
             { value: '1w', label: '1 week' },
             { value: '30d', label: '30 days' },
           ],
-          onchange: (e) => {
-            vnode.state.inviteTime = (e.target as any).value;
-          },
+          value: vnode.state.inviteTime,
+          onchange: (e: Event) => { vnode.state.inviteTime = (e.target as any).value; },
         }),
       ]),
       m(FormGroup, { span: 4 }),
@@ -351,6 +349,7 @@ const CreateInviteModal: m.Component<{
             ...chainOrCommunityObj
           }),
         ]),
+        m('div.divider'),
         m(CreateInviteLink, { ...chainOrCommunityObj }),
         vnode.state.success && m('.success-message', [
           'Success! Your invite was sent',
