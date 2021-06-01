@@ -43,8 +43,7 @@ const InviteButton: m.Component<IInviteButtonAttrs, { loading: boolean, }> = {
       disabled,
       rounded: true,
       type: 'submit',
-      label: selection === 'address'
-        ? 'Invite Commonwealth user' : selection === 'email' ? 'Invite email' : 'Add',
+      label: selection === 'address' || selection === 'email' ? 'Send Invite' : 'Add',
       onclick: (e) => {
         e.preventDefault();
         const address = invitedAddress;
