@@ -6,9 +6,9 @@ import { IApp } from 'state';
 import { BigNumberish } from 'ethers';
 import MarlinAPI from './api';
 import MarlinProposal from './proposal';
-import MarlinHolders from './holders';
 import MarlinChain from './chain';
 import { attachSigner } from '../contractApi';
+import EthereumAccounts from '../accounts';
 
 export interface MarlinProposalArgs {
   targets: string[],
@@ -33,8 +33,8 @@ export default class MarlinGovernance extends ProposalModule<
   private _votingPeriod: BN;
 
   private _api: MarlinAPI;
-  private _Holders: MarlinHolders;
-
+  private _Chain: MarlinChain;
+  private _Accounts: EthereumAccounts;
 
   // GETTERS
   // Contract Constants
@@ -47,10 +47,9 @@ export default class MarlinGovernance extends ProposalModule<
   public get api() { return this._api; }
   public get usingServerChainEntities() { return this._usingServerChainEntities; }
 
-
   // INIT / DEINIT
   constructor(app: IApp, private _usingServerChainEntities = false) {
-    super(app, (e) => new MarlinProposal(this._Holders, this, e));
+    super(app, (e) => new MarlinProposal(this._Accounts, this._Chain, this, e));
   }
 
   // METHODS
@@ -74,9 +73,8 @@ export default class MarlinGovernance extends ProposalModule<
 
     const { targets, values, signatures, calldatas, description } = args;
     if (!targets || !values || !signatures || !calldatas || !description) return;
-    if (!(await this._Holders.isDelegate(address))) throw new Error('sender must be valid delegate');
-    const priorDelegates = await this._Holders.get(address)
-      .priorDelegates(this._api.Provider.blockNumber);
+    if (!(await this._Chain.isDelegate(address))) throw new Error('sender must be valid delegate');
+    const priorDelegates = await this._Chain.priorDelegates(address, this._api.Provider.blockNumber);
     if (this.proposalThreshold < priorDelegates) {
       throw new Error('sender must have requisite delegates');
     }
@@ -135,10 +133,10 @@ export default class MarlinGovernance extends ProposalModule<
     }
   }
 
-  public async init(chain: MarlinChain, Holders: MarlinHolders) {
-    const api = chain.marlinApi;
-    this._Holders = Holders;
-    this._api = api;
+  public async init(chain: MarlinChain, Accounts: EthereumAccounts) {
+    this._api = chain.marlinApi;
+    this._Chain = chain;
+    this._Accounts = Accounts;
 
     this._quorumVotes = new BN((await this._api.Contract.quorumVotes()).toString());
     this._proposalThreshold = new BN((await this._api.Contract.proposalThreshold()).toString());

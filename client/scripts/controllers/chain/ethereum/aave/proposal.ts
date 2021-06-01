@@ -2,6 +2,7 @@ import moment from 'moment';
 import BN from 'bn.js';
 
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
+import { IAaveProposalResponse } from 'adapters/chain/aave/types';
 
 import { AaveTypes } from '@commonwealth/chain-events';
 
@@ -17,26 +18,21 @@ import {
   ChainEvent,
 } from 'models';
 
-import AaveHolder from './holder';
-import AaveHolders from './holders';
 import AaveAPI from './api';
 import AaveGovernance from './governance';
 import { attachSigner } from '../contractApi';
-import { IAaveProposalResponse } from 'shared/adapters/chain/aave/types';
-
-export enum AaveVote {
-  YES = 1,
-  NO = 0
-}
+import AaveChain from './chain';
+import EthereumAccounts from '../accounts';
+import EthereumAccount from '../account';
 
 export class AaveProposalVote implements IVote<EthereumCoin> {
-  public readonly account: AaveHolder;
-  public readonly choice: AaveVote;
+  public readonly account: EthereumAccount;
+  public readonly choice: boolean;
   public readonly power: BN;
 
-  constructor(member: AaveHolder, choice: boolean, power: BN) {
+  constructor(member: EthereumAccount, choice: boolean, power: BN) {
     this.account = member;
-    this.choice = choice ? AaveVote.YES : AaveVote.NO;
+    this.choice = choice;
     this.power = power;
   }
 }
@@ -52,9 +48,8 @@ const backportEntityToAdapter = (entity: ChainEntity): IAaveProposalResponse => 
     cancelled: false,
     completed: false,
     ...startData,
-  }
+  };
 };
-
 
 export default class AaveProposal extends Proposal<
   AaveAPI,
@@ -62,7 +57,8 @@ export default class AaveProposal extends Proposal<
   IAaveProposalResponse,
   AaveProposalVote
 > {
-  private _Holders: AaveHolders;
+  private _Chain: AaveChain;
+  private _Accounts: EthereumAccounts;
   private _Gov: AaveGovernance;
 
   public get shortIdentifier() { return `AaveProposal-${this.data.identifier}`; }
@@ -79,13 +75,13 @@ export default class AaveProposal extends Proposal<
     return ProposalStatus.Passing;
   }
 
-  public get author() { return this._Holders.get(this.data.proposer); }
+  public get author() { return this._Accounts.get(this.data.proposer); }
 
   public get votingType() { return VotingType.SimpleYesNoVoting; }
   public get votingUnit() { return VotingUnit.PowerVote; }
 
   public async state(): Promise<AaveTypes.ProposalState> {
-    const state = await this._Gov.api.Contract.state(this.data.id);
+    const state = await this._Gov.api.Governance.state(this.data.id);
     if (state === null) {
       throw new Error(`Failed to get state for proposal #${this.data.id}`);
     }
@@ -120,14 +116,16 @@ export default class AaveProposal extends Proposal<
   }
 
   constructor(
-    Holders: AaveHolders,
+    Chain: AaveChain,
+    Accounts: EthereumAccounts,
     Gov: AaveGovernance,
     entity: ChainEntity,
   ) {
     // must set identifier before super() because of how response object is named
     super('aaveproposal', backportEntityToAdapter(entity));
 
-    this._Holders = Holders;
+    this._Chain = Chain;
+    this._Accounts = Accounts;
     this._Gov = Gov;
 
     entity.chainEvents.sort((e1, e2) => e1.blockNumber - e2.blockNumber).forEach((e) => this.update(e));
@@ -141,33 +139,37 @@ export default class AaveProposal extends Proposal<
       case AaveTypes.EventKind.ProposalCreated: {
         this._forVotes = e.data.forVotes ? new BN(e.data.forVotes) : new BN(0);
         this._againstVotes = e.data.againstVotes ? new BN(e.data.forVotes) : new BN(0);
-        return;
+        break;
       }
       case AaveTypes.EventKind.VoteEmitted: {
         const power = new BN(e.data.votingPower);
         const vote = new AaveProposalVote(
-          this._Holders.get(e.data.voter),
+          this._Accounts.get(e.data.voter),
           e.data.support,
           power,
         );
         this.addOrUpdateVote(vote);
+        break;
       }
       case AaveTypes.EventKind.ProposalCanceled: {
         this._data.cancelled = true;
         this._data.completed = true;
         this.complete(this._Gov.store);
-        return;
+        break;
       }
       case AaveTypes.EventKind.ProposalQueued: {
         this._data.queued = true;
         this._data.executionTime = e.data.executionTime;
-        return;
+        break;
       }
       case AaveTypes.EventKind.ProposalExecuted: {
         this._data.queued = false;
         this._data.executed = true;
         this.complete(this._Gov.store);
-        return;
+        break;
+      }
+      default: {
+        break;
       }
     }
   }
@@ -176,14 +178,14 @@ export default class AaveProposal extends Proposal<
     super.addOrUpdateVote(vote);
 
     // maintain global power state
-    if (vote.choice === AaveVote.YES) {
+    if (vote.choice) {
       this._forVotes.add(vote.power);
     } else {
       this._againstVotes.add(vote.power);
     }
   }
 
-  public canVoteFrom(account: AaveHolder) {
+  public canVoteFrom(account: EthereumAccount) {
     // TODO
     // We need to check the delegate of account to perform voting checks. Delegates must
     // be fetched from chain, which requires async calls, making this impossible to implement.
@@ -192,7 +194,7 @@ export default class AaveProposal extends Proposal<
 
   public async castVote(support: boolean) {
     const address = this._Gov.app.user.activeAccount.address;
-    const contract = await attachSigner(this._Gov.app.wallets, address, this._Gov.api.Contract);
+    const contract = await attachSigner(this._Gov.app.wallets, address, this._Gov.api.Governance);
 
     // TODO: validate
 
@@ -209,7 +211,7 @@ export default class AaveProposal extends Proposal<
     }
 
     const address = this._Gov.app.user.activeAccount.address;
-    const contract = await attachSigner(this._Gov.app.wallets, address, this._Gov.api.Contract);
+    const contract = await attachSigner(this._Gov.app.wallets, address, this._Gov.api.Governance);
 
     // TODO: validate
 
@@ -230,9 +232,9 @@ export default class AaveProposal extends Proposal<
     const contract = await attachSigner(
       this._Gov.app.wallets,
       address,
-      this._Gov.api.Contract
+      this._Gov.api.Governance
     );
-    
+
     // TODO: validate
 
     if (await this.state() !== AaveTypes.ProposalState.ACTIVE) {

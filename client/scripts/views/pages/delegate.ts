@@ -12,7 +12,7 @@ import { Grid, Col, List, Form, FormGroup, FormLabel, Input, Button } from 'cons
 import PageNotFound from './404';
 
 const getDelegate = async (vnode) => {
-  vnode.state.currentDelegate = await (app.chain as Marlin).marlinAccounts.senderGetDelegate();
+  vnode.state.currentDelegate = await (app.chain as Marlin).chain.senderGetDelegate();
 };
 
 const DelegateStats: m.Component<{ currentDelegate: string, }> = {
@@ -108,7 +108,7 @@ const DelegateForm: m.Component<{}, { form: IDelegateForm, loading: boolean, cur
                   e.preventDefault();
                   vnode.state.loading = true;
                   if ((app.chain as Marlin).apiInitialized) {
-                    await (app.chain as Marlin).marlinAccounts.senderSetDelegate(
+                    await (app.chain as Marlin).chain.senderSetDelegate(
                       vnode.state.form.address, vnode.state.form.amount
                     ).then(async () => {
                       notifySuccess(`Sent transaction to delegate to ${vnode.state.form.address}`);

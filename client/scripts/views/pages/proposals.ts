@@ -20,6 +20,7 @@ import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
 import Marlin from 'controllers/chain/ethereum/marlin/adapter';
+import Aave from 'controllers/chain/ethereum/aave/adapter';
 
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
@@ -101,7 +102,7 @@ const MarlinProposalStats: m.Component<{}, {}> = {
         m(Button, {
           intent: 'primary',
           onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
-            type: ProposalType.CosmosProposal
+            type: ProposalType.MarlinProposal
           }),
           label: 'New proposal',
         }),
@@ -176,6 +177,9 @@ const ProposalsPage: m.Component<{}> = {
     const onMarlin = app.chain && (
       app.chain.network === ChainNetwork.Marlin || app.chain.network === ChainNetwork.MarlinTestnet
     );
+    const onAave = app.chain && (
+      app.chain.network === ChainNetwork.Aave || app.chain.network === ChainNetwork.AaveTestnet
+    );
 
     const modLoading = loadSubstrateModules('Proposals', getModules);
     if (modLoading) return modLoading;
@@ -194,18 +198,23 @@ const ProposalsPage: m.Component<{}> = {
     const activeMarlinProposals = onMarlin
       && (app.chain as Marlin).governance.store.getAll().filter((p) => !p.completed)
         .sort((p1, p2) => +p2.startingPeriod - +p1.startingPeriod);
+    const activeAaveProposals = onAave
+      && (app.chain as Aave).governance.store.getAll().filter((p) => !p.completed)
+        .sort((p1, p2) => +p2.startBlock - +p1.startBlock);
 
     const activeProposalContent = !activeDemocracyProposals?.length
       && !activeCouncilProposals?.length
       && !activeCosmosProposals?.length
       && !activeMolochProposals?.length
       && !activeMarlinProposals?.length
+      && !activeAaveProposals?.length
       ? [ m('.no-proposals', 'No active proposals') ]
       : (activeDemocracyProposals || []).map((proposal) => m(ProposalCard, { proposal }))
         .concat((activeCouncilProposals || []).map((proposal) => m(ProposalCard, { proposal })))
         .concat((activeCosmosProposals || []).map((proposal) => m(ProposalCard, { proposal })))
         .concat((activeMolochProposals || []).map((proposal) => m(ProposalCard, { proposal })))
-        .concat((activeMarlinProposals || []).map((proposal) => m(ProposalCard, { proposal })));
+        .concat((activeMarlinProposals || []).map((proposal) => m(ProposalCard, { proposal })))
+        .concat((activeAaveProposals || []).map((proposal) => m(ProposalCard, { proposal })));
 
     // inactive proposals
     const inactiveDemocracyProposals = onSubstrate
@@ -221,18 +230,23 @@ const ProposalsPage: m.Component<{}> = {
     const inactiveMarlinProposals = onMarlin
       && (app.chain as Marlin).governance.store.getAll().filter((p) => p.completed)
         .sort((p1, p2) => +p2.startingPeriod - +p1.startingPeriod);
+    const inactiveAaveProposals = onAave
+      && (app.chain as Aave).governance.store.getAll().filter((p) => p.completed)
+        .sort((p1, p2) => +p2.startBlock - +p1.startBlock);
 
     const inactiveProposalContent = !inactiveDemocracyProposals?.length
       && !inactiveCouncilProposals?.length
       && !inactiveCosmosProposals?.length
       && !inactiveMolochProposals?.length
       && !inactiveMarlinProposals?.length
+      && !inactiveAaveProposals?.length
       ? [ m('.no-proposals', 'No past proposals') ]
       : (inactiveDemocracyProposals || []).map((proposal) => m(ProposalCard, { proposal }))
         .concat((inactiveCouncilProposals || []).map((proposal) => m(ProposalCard, { proposal })))
         .concat((inactiveCosmosProposals || []).map((proposal) => m(ProposalCard, { proposal })))
         .concat((inactiveMolochProposals || []).map((proposal) => m(ProposalCard, { proposal })))
-        .concat((inactiveMarlinProposals || []).map((proposal) => m(ProposalCard, { proposal })));
+        .concat((inactiveMarlinProposals || []).map((proposal) => m(ProposalCard, { proposal })))
+        .concat((inactiveAaveProposals || []).map((proposal) => m(ProposalCard, { proposal })));
 
 
     // XXX: display these

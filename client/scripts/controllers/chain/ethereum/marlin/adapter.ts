@@ -1,6 +1,5 @@
 // import { MarlinTypes } from '@commonwealth/chain-events';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
-import { GovernorAlpha__factory } from 'eth/types';
 
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
@@ -11,17 +10,14 @@ import { IApp } from 'state';
 
 import { notifyError } from 'controllers/app/notifications';
 import { MarlinTypes } from '@commonwealth/chain-events';
-import MarlinAPI from './api';
 import MarlinChain from './chain';
 import MarlinGovernance from './governance';
-import MarlinHolders from './holders';
 
 export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount> {
   public readonly base = ChainBase.Ethereum;
   public readonly class = ChainClass.Marlin;
   public chain: MarlinChain;
   public accounts: EthereumAccounts;
-  public marlinAccounts:  MarlinHolders;
   public governance: MarlinGovernance;
   public readonly chainEntities = new ChainEntityController();
 
@@ -29,7 +25,6 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
     super(meta, app);
     this.chain = new MarlinChain(this.app);
     this.accounts = new EthereumAccounts(this.app);
-    this.marlinAccounts = new MarlinHolders(this.app, this.chain, this.accounts);
     this.governance = new MarlinGovernance(this.app);
     this.accounts.init(this.chain);
   }
@@ -48,27 +43,21 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
   }
 
   public async initApi() {
-    await this.chain.resetApi(this.meta);
-    await this.chain.initMetadata();
-    const api = new MarlinAPI(
-      GovernorAlpha__factory.connect,
-      this.meta.address,
-      this.chain.api.currentProvider as any
-    );
-    await api.init().catch((e) => {
+    try {
+      await this.chain.init(this.meta);
+      // TODO: Fix the global eth block height setting
+      this.block.height = await this.chain.marlinApi.Provider.getBlockNumber();
+      await super.initApi();
+    } catch (e) {
       this._failed = true;
       notifyError('Failed to fetch via infura');
-    });
-    this.chain.marlinApi = api;
-    await this.marlinAccounts.init(api);
-    this.block.height = await api.Provider.getBlockNumber(); // TODO: Fix the global eth block height setting
-    await super.initApi();
+    }
   }
 
   public async initData() {
     console.log('Marlin initData()');
     await this.chain.initEventLoop();
-    await this.governance.init(this.chain, this.marlinAccounts);
+    await this.governance.init(this.chain, this.accounts);
     await super.initData();
   }
 
@@ -76,11 +65,8 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
     console.log('Marlin deinit()');
     await super.deinit();
     this.governance.deinit();
-    this.marlinAccounts.deinit();
     this.accounts.deinit();
-    this.chain.deinitMetadata();
-    this.chain.deinitEventLoop();
-    this.chain.deinitApi();
+    this.chain.deinit();
     console.log('Ethereum/Marlin stopped.');
   }
 }

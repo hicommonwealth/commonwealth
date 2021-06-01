@@ -163,6 +163,8 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         || app.chain.class === ChainClass.Moloch
         || app.chain.network === ChainNetwork.Marlin
         || app.chain.network === ChainNetwork.MarlinTestnet
+        || app.chain.network === ChainNetwork.Aave
+        || app.chain.network === ChainNetwork.AaveTestnet
         || app.chain.class === ChainClass.Commonwealth);
     if (!hasProposals) return;
 
@@ -171,6 +173,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
     const showCommonwealthMenuOptions = app.chain?.class === ChainClass.Commonwealth;
 
     const showMarlinOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Marlin;
+    const showAaveOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Aave;
 
     const onProposalPage = (p) => (
       p.startsWith(`/${app.activeChainId()}/proposals`)
@@ -209,7 +212,9 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
                          || app.chain?.base === ChainBase.CosmosSDK
                          || app.chain?.class === ChainClass.Moloch
                          || app.chain?.network === ChainNetwork.Marlin
-                         || app.chain?.network === ChainNetwork.MarlinTestnet)
+                         || app.chain?.network === ChainNetwork.MarlinTestnet
+                         || app.chain?.network === ChainNetwork.Aave
+                         || app.chain?.network === ChainNetwork.AaveTestnet)
         && m(Button, {
           fluid: true,
           rounded: true,
@@ -289,6 +294,16 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         },
         label: 'Delegate',
         active: m.route.get() === `/${app.activeChainId()}/delegate`,
+      }),
+      showAaveOptions && m(Button, {
+        fluid: true,
+        rounded: true,
+        onclick: (e) => {
+          e.preventDefault();
+          m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.AaveProposal });
+        },
+        label: 'Submit Proposal',
+        active: m.route.get() === `/${app.activeChainId()}/new/proposal/${ProposalType.AaveProposal}`,
       }),
       showMolochMemberOptions && m(Button, {
         fluid: true,

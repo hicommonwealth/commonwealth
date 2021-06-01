@@ -357,6 +357,13 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/ethereum/marlin/adapter'
     )).default;
     newChain = new Marlin(n, app);
+  } else if (n.chain.network === ChainNetwork.Aave || n.chain.network === ChainNetwork.AaveTestnet) {
+    const Aave = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "aave-main" */
+      './controllers/chain/ethereum/aave/adapter'
+    )).default;
+    newChain = new Aave(n, app);
   } else if (n.chain.type === 'token') {
     const Token = (await import(
     //   /* webpackMode: "lazy" */

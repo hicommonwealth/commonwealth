@@ -3,7 +3,7 @@ import _ from 'underscore';
 import {
   IDisconnectedRange, IEventHandler, EventSupportingChains, IEventSubscriber,
   SubstrateTypes, SubstrateEvents, MolochTypes, MolochEvents, chainSupportedBy,
-  MarlinTypes, MarlinEvents,
+  MarlinTypes, MarlinEvents, isSupportedChain,
 } from '@commonwealth/chain-events';
 
 import EventStorageHandler, { StorageFilterConfig } from '../eventHandlers/storage';
@@ -77,9 +77,14 @@ const setupChainEventListeners = async (
   }
 
   log.info('Setting up event listeners...');
-  const generateHandlers = (node, storageConfig: StorageFilterConfig = {}) => {
+  const generateHandlers = (node: ChainNodeInstance, storageConfig: StorageFilterConfig = {}) => {
+    const chain = node.chain;
+    if (!chain || !isSupportedChain(chain)) {
+      throw new Error(`invalid event chain: ${chain}`);
+    }
+
     // writes events into the db as ChainEvents rows
-    const storageHandler = new EventStorageHandler(models, node.chain, storageConfig);
+    const storageHandler = new EventStorageHandler(models, chain, storageConfig);
 
     // emits notifications by writing into the db's Notifications table, and also optionally
     // sending a notification to the client via websocket
@@ -89,7 +94,7 @@ const setupChainEventListeners = async (
     const notificationHandler = new EventNotificationHandler(models, wss, excludedNotificationEvents);
 
     // creates and updates ChainEntity rows corresponding with entity-related events
-    const entityArchivalHandler = new EntityArchivalHandler(models, node.chain, wss);
+    const entityArchivalHandler = new EntityArchivalHandler(models, chain, wss);
 
     // creates empty Address and OffchainProfile models for users who perform certain
     // actions, like voting on proposals or registering an identity

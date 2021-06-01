@@ -2,7 +2,7 @@
  * Processes events during migration, upgrading from simple notifications to entities.
  */
 import {
-  IEventHandler, CWEvent, eventToEntity, entityToFieldName, IChainEventData
+  IEventHandler, CWEvent, eventToEntity, entityToFieldName, IChainEventData, EventSupportingChainT
 } from '@commonwealth/chain-events';
 
 import { factory, formatFilename } from '../../shared/logging';
@@ -11,7 +11,7 @@ const log = factory.getLogger(formatFilename(__filename));
 export default class extends IEventHandler {
   constructor(
     private readonly _models,
-    private readonly _chain: string,
+    private readonly _chain: EventSupportingChainT,
   ) {
     super();
   }
@@ -53,10 +53,10 @@ export default class extends IEventHandler {
       }
     };
 
-    const entity = eventToEntity(event.data.kind);
+    const entity = eventToEntity(this._chain, event.data.kind);
     if (!entity) return null;
     const [ entityKind ] = entity;
-    const fieldName = entityToFieldName(entityKind);
+    const fieldName = entityToFieldName(this._chain, entityKind);
     if (!fieldName) return null;
     const fieldValue = event.data[fieldName];
     return createOrUpdateModel(fieldName, fieldValue);

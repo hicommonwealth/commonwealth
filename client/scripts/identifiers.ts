@@ -3,6 +3,7 @@ import { ProposalStore } from 'stores';
 import app from './state';
 import ThreadsController from './controllers/server/threads';
 
+// eslint-disable-next-line no-shadow
 export enum ProposalType {
   SubstrateDemocracyReferendum = 'referendum',
   SubstrateDemocracyProposal = 'democracyproposal',
@@ -14,6 +15,7 @@ export enum ProposalType {
   CosmosProposal = 'cosmosproposal',
   MolochProposal = 'molochproposal',
   MarlinProposal = 'marlinproposal',
+  AaveProposal = 'aaveproposal',
 }
 
 export const proposalSlugToClass = () => {
@@ -45,6 +47,9 @@ export const proposalSlugToClass = () => {
   if (app.chain.class === ChainClass.Marlin) {
     mmap.set('marlinproposal', (app.chain as any).governance);
   }
+  if (app.chain.class === ChainClass.Aave) {
+    mmap.set('aaveproposal', (app.chain as any).governance);
+  }
   return mmap;
 };
 
@@ -67,7 +72,8 @@ export const proposalSlugToFriendlyName = new Map<string, string>([
   ['discussion', 'Discussion Thread'],
   ['marlinproposal', 'Proposal'],
   ['cosmosproposal', 'Proposal'],
-  ['molochproposal', 'Proposal']
+  ['molochproposal', 'Proposal'],
+  ['aaveproposal', 'Proposal'],
 ]);
 
 export const idToProposal = (slug, id) => {

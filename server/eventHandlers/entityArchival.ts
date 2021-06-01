@@ -10,7 +10,8 @@ import {
   EntityEventKind,
   IChainEntityKind,
   IChainEventData,
-  SubstrateTypes
+  SubstrateTypes,
+  EventSupportingChainT
 } from '@commonwealth/chain-events';
 
 import { factory, formatFilename } from '../../shared/logging';
@@ -20,7 +21,7 @@ const log = factory.getLogger(formatFilename(__filename));
 export default class extends IEventHandler {
   constructor(
     private readonly _models,
-    private readonly _chain: string,
+    private readonly _chain: EventSupportingChainT,
     private readonly _wss?: WebSocket.Server,
   ) {
     super();
@@ -123,13 +124,13 @@ export default class extends IEventHandler {
       return dbEvent;
     };
 
-    const entity = eventToEntity(event.data.kind);
+    const entity = eventToEntity(this._chain, event.data.kind);
     if (!entity) {
       log.info(`no archival action needed for event of kind ${event.data.kind.toString()}`);
       return dbEvent;
     }
     const [ entityKind, updateType ] = entity;
-    const fieldName = entityToFieldName(entityKind);
+    const fieldName = entityToFieldName(this._chain, entityKind);
     const fieldValue = event.data[fieldName].toString();
     const author = event.data['proposer'];
     switch (updateType) {

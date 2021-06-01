@@ -9,7 +9,7 @@ import { blake2AsHex } from '@polkadot/util-crypto';
 
 import app from 'state';
 import { ITXModalData, ProposalModule, ChainBase, ChainClass, OffchainThreadKind, OffchainThreadStage } from 'models';
-import { ProposalType, proposalSlugToClass, proposalSlugToFriendlyName } from 'identifiers';
+import { ProposalType, proposalSlugToClass } from 'identifiers';
 import { formatCoin } from 'adapters/currency';
 import { CosmosToken } from 'adapters/chain/cosmos/types';
 
@@ -20,7 +20,6 @@ import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collect
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
-import MarlinHolder from 'controllers/chain/ethereum/marlin/holder';
 import Marlin from 'controllers/chain/ethereum/marlin/adapter';
 import { MarlinProposalArgs } from 'controllers/chain/ethereum/marlin/governance';
 

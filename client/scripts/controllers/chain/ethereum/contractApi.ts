@@ -48,7 +48,6 @@ export async function attachSigner<CT extends Contract>(
   return ct;
 }
 
-
 abstract class ContractApi<ContractT extends Contract> {
   public readonly gasLimit: number = 3000000;
 

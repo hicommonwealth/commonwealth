@@ -1,8 +1,6 @@
 import 'components/proposals/voting_results.scss';
 import app from 'state';
 import m from 'mithril';
-import { VoteOutcome } from '@edgeware/node-types';
-import { u8aToString } from '@polkadot/util';
 
 import { formatCoin } from 'adapters/currency'; // TODO: remove formatCoin, only use coins.format()
 import User from 'views/components/widgets/user';
@@ -13,6 +11,8 @@ import { MolochProposalVote, MolochVote } from 'controllers/chain/ethereum/moloc
 import { MarlinProposalVote, MarlinVote } from 'controllers/chain/ethereum/marlin/proposal';
 import { SubstrateCollectiveVote } from 'controllers/chain/substrate/collective_proposal';
 import { SubstrateDemocracyVote } from 'controllers/chain/substrate/democracy_referendum';
+import { AaveProposalVote } from 'controllers/chain/ethereum/aave/proposal';
+import Marlin from 'controllers/chain/ethereum/marlin/adapter';
 
 const COLLAPSE_VOTERS_AFTER = 6; // if there are >6 voters, collapse remaining under "Show more"
 
@@ -33,6 +33,7 @@ const VoteListing: m.Component<{
     if (!vnode.state.balancesCache) vnode.state.balancesCache = {};
     if (!vnode.state.balancesCacheInitialized) vnode.state.balancesCacheInitialized = {};
 
+    // TODO: show turnout if specific votes not found
     return m('.VoteListing', [
       votes.length === 0
         ? m('.no-votes', 'No votes')
@@ -49,12 +50,26 @@ const VoteListing: m.Component<{
               } else {
                 // fetch balance and store in cache
                 vnode.state.balancesCacheInitialized[vote.account.address] = true;
-                vote.account.balance.then((b) => {
-                  balance = b;
-                  vnode.state.balancesCache[vote.account.address] = formatCoin(b, true);
+                if (vote instanceof AaveProposalVote) {
+                  balance = vote.power;
+                  // TODO: ensure balance displays okay
+                  vnode.state.balancesCache[vote.account.address] = formatCoin(app.chain.chain.coins(vote.power), true);
                   m.redraw();
-                });
-                balance = '--';
+                } else if (vote instanceof MarlinProposalVote) {
+                  (app.chain as Marlin).chain.balanceOf(vote.account.address).then((b) => {
+                    balance = b;
+                    vnode.state.balancesCache[vote.account.address] = formatCoin(app.chain.chain.coins(b), true);
+                    m.redraw();
+                  });
+                  balance = '--';
+                } else {
+                  vote.account.balance.then((b) => {
+                    balance = b;
+                    vnode.state.balancesCache[vote.account.address] = formatCoin(b, true);
+                    m.redraw();
+                  });
+                  balance = '--';
+                }
               }
             }
             switch (true) {
@@ -99,6 +114,12 @@ const VoteListing: m.Component<{
                 return m('.vote', [
                   m('.vote-voter', m(User, { user: vote.account, linkify: true })),
                   m('.vote-choice', (vote as MarlinProposalVote).choice.toString()),
+                  balance && m('.vote-balance', balance),
+                ]);
+              case (vote instanceof AaveProposalVote):
+                return m('.vote', [
+                  m('.vote-voter', m(User, { user: vote.account, linkify: true })),
+                  m('.vote-choice', (vote as AaveProposalVote).choice.toString()),
                   balance && m('.vote-balance', balance),
                 ]);
               default:

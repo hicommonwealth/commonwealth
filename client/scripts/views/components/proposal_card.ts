@@ -17,7 +17,6 @@ import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collect
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
 import MolochProposal, { MolochProposalState } from 'controllers/chain/ethereum/moloch/proposal';
-import MarlinProposal, { MarlinProposalState, MarlinProposalVote } from 'controllers/chain/ethereum/marlin/proposal';
 
 import Countdown from 'views/components/countdown';
 

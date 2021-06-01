@@ -11,9 +11,7 @@ import { IApp } from 'state';
 
 import { notifyError } from 'controllers/app/notifications';
 import { AaveTypes } from '@commonwealth/chain-events';
-import AaveApi from './api';
 import AaveChain from './chain';
-import AaveHolders from './holders';
 import AaveGovernance from './governance';
 
 export default class Aave extends IChainAdapter<EthereumCoin, EthereumAccount> {
@@ -21,7 +19,6 @@ export default class Aave extends IChainAdapter<EthereumCoin, EthereumAccount> {
   public readonly class = ChainClass.Aave;
   public chain: AaveChain;
   public accounts: EthereumAccounts;
-  public holders: AaveHolders;
   public governance: AaveGovernance;
   public readonly chainEntities = new ChainEntityController();
 
@@ -30,7 +27,6 @@ export default class Aave extends IChainAdapter<EthereumCoin, EthereumAccount> {
     this.chain = new AaveChain(this.app);
     this.accounts = new EthereumAccounts(this.app);
     this.governance = new AaveGovernance(this.app);
-    this.holders = new AaveHolders(this.app, this.chain, this.accounts);
     this.accounts.init(this.chain);
   }
 
@@ -48,26 +44,21 @@ export default class Aave extends IChainAdapter<EthereumCoin, EthereumAccount> {
   }
 
   public async initApi() {
-    await this.chain.resetApi(this.meta);
-    await this.chain.initMetadata();
-    const api = new AaveApi(
-      AaveGovernanceV2__factory.connect,
-      this.meta.address,
-      this.chain.api.currentProvider as any
-    );
-    await api.init().catch((e) => {
+    try {
+      await this.chain.init(this.meta);
+      // TODO: Fix the global eth block height setting
+      this.block.height = await this.chain.aaveApi.Provider.getBlockNumber();
+      await super.initApi();
+    } catch (e) {
       this._failed = true;
       notifyError('Failed to fetch via infura');
-    });
-    this.chain.aaveApi = api;
-    this.block.height = await api.Provider.getBlockNumber(); // TODO: Fix the global eth block height setting
-    await super.initApi();
+    }
   }
 
   public async initData() {
     console.log('Aave initData()');
     await this.chain.initEventLoop();
-    await this.governance.init(this.chain, this.holders);
+    await this.governance.init(this.chain, this.accounts);
     await super.initData();
   }
 
@@ -75,11 +66,8 @@ export default class Aave extends IChainAdapter<EthereumCoin, EthereumAccount> {
     console.log('Aave deinit()');
     await super.deinit();
     this.governance.deinit();
-    this.holders.deinit();
     this.accounts.deinit();
-    this.chain.deinitMetadata();
-    this.chain.deinitEventLoop();
-    this.chain.deinitApi();
+    this.chain.deinit();
     console.log('Ethereum/Aave stopped.');
   }
 }

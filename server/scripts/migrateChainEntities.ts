@@ -5,13 +5,14 @@
  */
 
 import _ from 'underscore';
-import { SubstrateTypes, SubstrateEvents, chainSupportedBy } from '@commonwealth/chain-events';
+import { SubstrateTypes, SubstrateEvents, chainSupportedBy, isSupportedChain } from '@commonwealth/chain-events';
 
 import MigrationHandler from '../eventHandlers/migration';
 import EntityArchivalHandler from '../eventHandlers/entityArchival';
 
 import { factory, formatFilename } from '../../shared/logging';
 import { constructSubstrateUrl, selectSpec } from '../../shared/substrate';
+import { ChainNodeInstance } from '../models/chain_node';
 const log = factory.getLogger(formatFilename(__filename));
 
 export default async function (models, chain?: string): Promise<void> {
@@ -23,23 +24,29 @@ export default async function (models, chain?: string): Promise<void> {
   const chains = !chain ? SubstrateTypes.EventChains.concat() : [ chain ];
 
   // query one node for each supported chain
-  const nodes = (await Promise.all(chains.map((c) => {
+  const nodes: ChainNodeInstance[] = (await Promise.all(chains.map((c) => {
     return models.ChainNode.findOne({ where: { chain: c } });
   }))).filter((n) => !!n);
   if (!nodes) {
     throw new Error('no nodes found for chain entity migration');
   }
 
-  console.log("nodes",nodes)
   // 2. for each node, fetch and migrate chain entities
   for (const node of nodes) {
-    console.log('Fetching and migrating chain entities for', node.chain);
-    const migrationHandler = new MigrationHandler(models, node.chain);
-    const entityArchivalHandler = new EntityArchivalHandler(models, node.chain);
+    const nodeChain = node.chain;
+    if (!isSupportedChain(nodeChain)) {
+      log.error(`Invalid chain for migration: ${nodeChain}`);
+      // eslint-disable-next-line no-continue
+      continue;
+    }
+
+    log.info(`Fetching and migrating chain entities for: ${nodeChain}`);
+    const migrationHandler = new MigrationHandler(models, nodeChain);
+    const entityArchivalHandler = new EntityArchivalHandler(models, nodeChain);
 
     const nodeUrl = constructSubstrateUrl(node.url);
     try {
-      const api = await SubstrateEvents.createApi(nodeUrl, selectSpec(node.chain));
+      const api = await SubstrateEvents.createApi(nodeUrl, selectSpec(nodeChain));
 
       // fetch all events and run through handlers in sequence then exit
       log.info('Fetching chain events...');
