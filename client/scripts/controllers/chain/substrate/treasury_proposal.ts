@@ -36,7 +36,7 @@ export class SubstrateTreasuryProposal
     const displayName = account.profile && account.profile.name
       ? `${account.profile.name} (${formatAddressShort(this.beneficiaryAddress, account.chain.id)})`
       : formatAddressShort(this.beneficiaryAddress, account.chain.id);
-    return `Proposed spend: ${formatCoin(this.value)} to ${displayName}`;
+    return `Proposal for ${formatCoin(this.value)}`;
   }
   public get description() { return null; }
 
@@ -128,6 +128,7 @@ export class SubstrateTreasuryProposal
     this.title = entity.title || this.generateTitle();
     this.createdAt = entity.createdAt;
     this.threadId = entity.threadId;
+    this.threadTitle = entity.threadTitle;
 
     entity.chainEvents.forEach((e) => this.update(e));
 

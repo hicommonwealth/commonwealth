@@ -407,6 +407,7 @@ class ThreadsController {
       },
       success: (response) => {
         const thread = this._store.getByIdentifier(args.threadId);
+        if (!thread) return;
         thread.chainEntities.splice(0);
         args.entities.forEach((ce) => thread.chainEntities.push({
           id: ce.id,
