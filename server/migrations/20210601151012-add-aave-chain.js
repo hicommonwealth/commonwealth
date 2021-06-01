@@ -29,12 +29,12 @@ module.exports = {
       await queryInterface.bulkInsert('ChainNodes', [{
         chain: 'aave',
         url: 'wss://mainnet.infura.io/ws',
-        address: '0x61910ecd7e8e942136ce7fe7943f956cea1cc2f7', // Executor (long)
+        address: '0xEC568fffba86c094cf06b22134B23074DFE2252c', // Governance
       },
       {
         chain: 'aave-testnet',
         url: 'wss://kovan.infura.io/ws',
-        address: '0x7e5195b0A6a60b371Ba3276032CF6958eADFA652', // Executor (long)
+        address: '0xc2ebab3bac8f2f5028f5c7317027a41ebfca31d2', // Governance
       }
       ], { transaction: t });
     });

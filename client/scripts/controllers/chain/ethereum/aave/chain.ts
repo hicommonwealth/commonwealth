@@ -1,5 +1,5 @@
 import { NodeInfo } from 'models';
-import { Executor__factory } from 'eth/types';
+import { AaveGovernanceV2__factory } from 'eth/types';
 import EthereumChain from '../chain';
 import AaveApi from './api';
 
@@ -12,7 +12,7 @@ export default class AaveChain extends EthereumChain {
     await super.resetApi(selectedNode);
     await super.initMetadata();
     this.aaveApi = new AaveApi(
-      Executor__factory.connect,
+      AaveGovernanceV2__factory.connect,
       selectedNode.address,
       this.api.currentProvider as any
     );

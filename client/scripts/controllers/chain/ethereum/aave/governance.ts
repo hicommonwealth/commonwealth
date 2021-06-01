@@ -10,6 +10,7 @@ import AaveApi from './api';
 import EthereumAccounts from '../accounts';
 
 export interface AaveProposalArgs {
+  executor: string,
   targets: string[],
   values: string[],
   signatures: string[],
@@ -41,12 +42,12 @@ export default class AaveGovernance extends ProposalModule<
   public async propose(args: AaveProposalArgs) {
     const address = this.app.user.activeAccount.address;
     const contract = await attachSigner(this.app.wallets, address, this._api.Governance);
-    const { targets, values, signatures, calldatas, withDelegateCalls, ipfsHash } = args;
+    const { executor, targets, values, signatures, calldatas, withDelegateCalls, ipfsHash } = args;
 
     // TODO: validate caller/args
 
     const tx = await contract.create(
-      this._api.Executor.address,
+      executor,
       targets,
       values,
       signatures,
@@ -84,8 +85,9 @@ export default class AaveGovernance extends ProposalModule<
     const processor = new AaveEvents.Processor(chainEventsContracts);
     // TODO: add range as argument
     await this.app.chain.chainEntities.fetchEntities(this.app.chain.id, () => fetcher.fetch({
-      startBlock: 12300000 // TODO: remove this
-    }, true)); // TODO: remove this and combine with backend entities
+      startBlock: 12300000,
+      maxResults: 5,
+    }, true)); // TODO: remove fetch all flag & combine with backend entities
     await this.app.chain.chainEntities.subscribeEntities(
       this.app.chain.id,
       subscriber,

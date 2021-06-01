@@ -1,23 +1,30 @@
-import { AaveGovernanceV2, AaveGovernanceV2__factory, Executor } from 'eth/types';
+import { AaveGovernanceV2, Executor__factory, Executor } from 'eth/types';
 import ContractApi from 'controllers/chain/ethereum/contractApi';
-
-// TODO: currently we do not distinguish between short and long executor, but we should
-//   support both contracts, in theory, in order to provide full support for the protocol.
-//   This may require a DB change in order to store both addresses on the same chain.
-export default class AaveApi extends ContractApi<Executor> {
-  private _Executor: Executor;
-  public get Executor() { return this._Executor; }
-
+export default class AaveApi extends ContractApi<AaveGovernanceV2> {
   private _Governance: AaveGovernanceV2;
   public get Governance() { return this._Governance; }
 
+  private _Executors: Executor[];
+  public get Executors() { return this._Executors; }
+
   public async init() {
     await super.init();
-    this._Executor = this.Contract;
+    this._Governance = this.Contract;
 
-    // fetch governance from executor etc
-    const governanceAddress = await this.Executor.getAdmin();
-    this._Governance = AaveGovernanceV2__factory.connect(governanceAddress, this.Provider);
-    await this._Governance.deployed();
+    // fetch executors from governance via historical filter query
+    const executorAuthFilter = this.Governance.filters.ExecutorAuthorized(null);
+    const executors = await this.Governance.queryFilter(executorAuthFilter, 0);
+    this._Executors = [];
+    for (const executorAuthResult of executors) {
+      const address = executorAuthResult.args[0];
+      // since the historical query returns all executors ever authorized, we need to check
+      // which haven't also been unauthorized later
+      const isValid = await this.Governance.isExecutorAuthorized(address);
+      if (isValid) {
+        const executor = Executor__factory.connect(address, this.Contract.provider);
+        await executor.deployed();
+        this._Executors.push(executor);
+      }
+    }
   }
 }

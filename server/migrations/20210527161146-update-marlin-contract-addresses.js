@@ -26,5 +26,4 @@ module.exports = {
       "UPDATE \"ChainNodes\" SET url='wss://ropsten.infura.io/ws/v3/90de850aff68424ab8e7321017406586' WHERE chain='marlin-testnet';"
     );
   },
-  }
 };

@@ -116,7 +116,6 @@ class ChainEntityController {
     for (const cwEvent of events) {
       // immediately return if no entity involved, event unrelated to proposals/etc
       const eventEntity = eventToEntity(chain, cwEvent.data.kind);
-      console.log(eventEntity);
       // eslint-disable-next-line no-continue
       if (!eventEntity) continue;
       const [ entityKind ] = eventEntity;
@@ -135,7 +134,6 @@ class ChainEntityController {
       // eslint-disable-next-line no-continue
       if (!fieldName) continue;
       const fieldValue = event.data[fieldName];
-      console.log(event, fieldName, fieldValue);
       const author = event.data['proposer'];
       let entity = new ChainEntity({
         chain,
