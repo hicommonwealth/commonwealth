@@ -7,7 +7,7 @@ import { initChain } from 'app';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 
-import { CWProjectWithParticipants } from 'views/components/project_card';
+import { CWProject } from 'models/CWProtocol';
 
 import MembersModule from './members';
 import ActionModule from './action';
@@ -26,7 +26,7 @@ function secondsToDhms(seconds) {
   return dDisplay + hDisplay + mDisplay + sDisplay;
 }
   
-const ProjectContentModule: m.Component<{project: CWProjectWithParticipants, leftInSeconds: number}, {}> = {
+const ProjectContentModule: m.Component<{project: CWProject, leftInSeconds: number}, {}> = {
   oncreate: (vnode) => {
     if (vnode.attrs.leftInSeconds > 0) {
       setTimeout(() => { m.redraw(); }, 1000);
@@ -67,7 +67,7 @@ const ViewProjectInitialPage: m.Component<{projectHash: string}, {initializing: 
       return m(PageLoading);
     }
     const { protocol } = vnode.state;
-    const project: CWProjectWithParticipants = (protocol.projects || []).filter((item) => item.projectHash === vnode.attrs.projectHash)[0];
+    const project: CWProject = (protocol.projects || []).filter((item) => item.projectHash === vnode.attrs.projectHash)[0];
 
     const startTime = new Date();
     const endTime = new Date(project.endTime);

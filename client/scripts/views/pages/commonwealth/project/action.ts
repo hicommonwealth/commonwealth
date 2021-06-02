@@ -1,10 +1,10 @@
 import 'pages/commonwealth/projects.scss';
 
-import { Input, TextArea, Form, FormLabel, FormGroup, Button, Grid, Col, Checkbox } from 'construct-ui';
+import { Input, FormGroup, Button } from 'construct-ui';
 import m from 'mithril';
 import app from 'state';
 
-import { CWProjectWithParticipants } from 'views/components/project_card';
+import { CWProject } from 'models/CWProtocol';
 
 const InProgressActionModule: m.Component<{callback: (isBack: boolean) => void}, {}> = {
   view: (vnode) => {
@@ -71,7 +71,7 @@ const FailedActionModule: m.Component<{callback: () => void}, {}> = {
   }
 }
 
-const ActionPage: m.Component<{project: CWProjectWithParticipants, protocol: any}, {amount: any, error: string}> = {
+const ActionPage: m.Component<{project: CWProject, protocol: any}, {amount: any, error: string}> = {
   oncreate: (vnode) => {
     vnode.state.error = '';
     vnode.state.amount = 0;

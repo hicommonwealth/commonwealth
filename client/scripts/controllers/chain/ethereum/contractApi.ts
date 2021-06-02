@@ -52,6 +52,7 @@ class ContractApi<ContractT extends Contract> {
       // TODO: ensure that we can find any wallet, even if non-string accounts
       if (wallet.accounts.find((acc) => acc === sender)) {
         signingWallet = wallet;
+        break;
       }
     }
     if (!signingWallet) {
