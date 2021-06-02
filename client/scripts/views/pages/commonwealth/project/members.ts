@@ -2,11 +2,10 @@ import 'pages/commonwealth/projects.scss';
 
 import m from 'mithril';
 
-import { CWUser } from 'models/CWProtocol';
-import { CWProjectWithParticipants } from 'views/components/project_card';
+import { CWProject } from 'models/CWProtocol';
 
 
-const UserComp: m.Component<{user: CWUser, project: CWProjectWithParticipants}> = {
+const UserComp: m.Component<{user: any, project: CWProject}> = {
   view: (vnode) => {
     const { user, project } = vnode.attrs;
     const backedAmount = `${user.amount}ETH`;
@@ -18,7 +17,7 @@ const UserComp: m.Component<{user: CWUser, project: CWProjectWithParticipants}> 
   }
 }
 
-const MembersModule: m.Component<{project: CWProjectWithParticipants}, {}> = {
+const MembersModule: m.Component<{project: CWProject}, {}> = {
   view: (vnode) => {
     const { project } = vnode.attrs;
     const backersContent = project.backers.map((backer) => m(UserComp, { user: backer, project }));

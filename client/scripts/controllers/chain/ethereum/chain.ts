@@ -104,6 +104,7 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
         m.redraw();
       }
     });
+
     return this._api;
   }
 
