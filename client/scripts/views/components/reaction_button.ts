@@ -28,6 +28,7 @@ const ReactionButton: m.Component<{
   view: (vnode) => {
     const { post, type, displayAsLink, tooltip, large } = vnode.attrs;
     const reactions = app.reactions.getByPost(post);
+
     let dislikes;
     let likes;
     if (type === ReactionType.Like) likes = reactions.filter((r) => r.reaction === 'like');

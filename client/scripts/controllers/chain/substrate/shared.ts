@@ -473,12 +473,12 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
           const txResultHandler = (result: SubmittableResult) => {
             const status = result.status;
             if (status.isReady) {
-              notifySuccess(`Pending ${txName}: "${objName}"`);
+              console.log(`Pending ${txName}: "${objName}"`);
               events.emit(TransactionStatus.Ready.toString(), {});
             } else if (status.isFinalized || status.isInBlock) {
               for (const e of result.events) {
                 if (this.api.events.system.ExtrinsicSuccess.is(e.event)) {
-                  notifySuccess(`Confirmed ${txName}: "${objName}"`);
+                  notifySuccess(`Confirmed ${txName}`);
                   events.emit(TransactionStatus.Success.toString(), {
                     hash: status.isFinalized ? status.asFinalized.toHex() : status.asInBlock.toHex(),
                     blocknum: this.app.chain.block.height,

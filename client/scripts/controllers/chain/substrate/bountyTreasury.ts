@@ -85,12 +85,17 @@ class SubstrateBountyTreasury extends ProposalModule<
       }
       const data = {
         title: b.description,
+        // state
         isActive: b.bounty.status.isActive,
         isApproved: b.bounty.status.isApproved,
         isCuratorProposed: b.bounty.status.isCuratorProposed,
         isFunded: b.bounty.status.isFunded,
         isPendingPayout: b.bounty.status.isPendingPayout,
         isProposed: b.bounty.status.isProposed,
+        // metadata
+        fee: b.bounty.fee,
+        curatorDeposit: b.bounty.curatorDeposit,
+        bond: b.bounty.bond,
         curator: b.bounty.status.isCuratorProposed ? b.bounty.status.asCuratorProposed?.curator
           : b.bounty.status.isActive ? b.bounty.status.asActive.curator
           : b.bounty.status.isPendingPayout ? b.bounty.status.asPendingPayout.curator : null,
@@ -116,10 +121,9 @@ class SubstrateBountyTreasury extends ProposalModule<
   }
 
   // council approves a bounty
-  public createBountyApprovalMotionTx(author: SubstrateAccount, bountyId: number) {
+  public createBountyApprovalMotionTx(author: SubstrateAccount, bountyId: number, threshold: number) {
     const action = this._Chain.getTxMethod('bounties', 'approveBounty', [ bountyId ]);
-    const threshold = 1;
-    const length = 1000
+    const length = 1000;
     return this._Chain.createTXModalData(
       author,
       (api: ApiPromise) => api.tx.council.propose(threshold, action, length),
@@ -129,10 +133,9 @@ class SubstrateBountyTreasury extends ProposalModule<
   }
 
   // council approves a curator
-  public proposeCuratorTx(author: SubstrateAccount, bountyId: number, curator: string, fee: SubstrateCoin) {
+  public proposeCuratorTx(author: SubstrateAccount, bountyId: number, curator: string, fee: SubstrateCoin, threshold: number) {
     const action = this._Chain.getTxMethod('bounties', 'proposeCurator', [ bountyId, curator, fee ]);
-    const threshold = 1;
-    const length = 1000
+    const length = 1000;
     return this._Chain.createTXModalData(
       author,
       (api: ApiPromise) => api.tx.council.propose(threshold, action, length),

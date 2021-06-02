@@ -6,17 +6,21 @@
             background: $background-color-white;
         }
         .row-header {
+            a {
+                line-height: 1.2;
+            }
             .spacer {
                 display: inline-block;
                 width: 8px;
             }
             a.external-discussion-link {
-                font-size: 17px;
-                color: $primary-bg-color;
+                font-size: 17px !important;
+                color: $primary-bg-color !important;
                 &:hover {
                     text-decoration: underline;
                 }
             }
+            .discussion-row-stage,
             .discussion-row-linked-poll,
             .discussion-row-linked-chain-entity {
                 font-size: 14px;
@@ -27,13 +31,14 @@
                 user-select: none;
                 position: relative;
                 top: -1px;
-                margin: -3px 0;
-                margin-left: -1px;
-                margin-right: 5px;
+                margin: -2px 0;
+                margin-right: 6px;
                 border: none;
             }
         }
         .row-subheader {
+            position: relative;
+            top: -2px;
             > * {
                 display: inline-block !important;
             }
@@ -49,10 +54,6 @@
             a.proposal-topic {
                 display: inline-block;
                 color: $text-color-light;
-                &::after {
-                    content: ' ';
-                    margin: 0 8px;
-                }
             }
             .mobile-comment-count {
                 display: none !important;
@@ -60,10 +61,6 @@
                 white-space: nowrap;
                 @include xs-max {
                     display: inline !important;
-                }
-                &::before {
-                    content: ' ';
-                    margin: 0 8px;
                 }
                 .cui-icon svg {
                     position: relative;
@@ -79,26 +76,11 @@
             }
             .discussion-link {
                 color: $text-color-light;
-                &::after {
-                    content: ' ';
-                    margin: 0 8px;
-                }
             }
             .proposal-collaborators {
                 color: $text-color-light;
                 position: relative;
                 font-size: 17px;
-                &::before {
-                    content: ' ';
-                    margin: 0 2px;
-                }
-            }
-            > .created-at,
-            > .offchain-voting-stat {
-                &::before {
-                    content: ' ';
-                    margin: 0 8px;
-                }
             }
             > .User {
                 display: inline-flex;
@@ -123,7 +105,7 @@
     }
     .row-right {
         .discussion-row-right-meta {
-            margin-left: 20px;
+            margin-left: 8px;
             margin-right: 4px;
             .offchain-voting {
                 position: relative;
@@ -163,7 +145,6 @@
         .discussion-row-menu {
             width: 28px;
             position: relative;
-            top: 10px;
             svg {
                 position: relative;
                 top: 1px;

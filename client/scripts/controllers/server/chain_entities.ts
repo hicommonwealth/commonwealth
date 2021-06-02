@@ -114,7 +114,7 @@ class ChainEntityController {
     for (const cwEvent of events) {
       // immediately return if no entity involved, event unrelated to proposals/etc
       const eventEntity = eventToEntity(cwEvent.data.kind);
-      if (!eventEntity) return;
+      if (!eventEntity) continue;
       const [ entityKind ] = eventEntity;
       // create event type
       const eventType = new ChainEventType(
@@ -128,10 +128,22 @@ class ChainEntityController {
 
       // create entity
       const fieldName = entityToFieldName(entityKind);
-      if (!fieldName) return;
+      if (!fieldName) continue;
       const fieldValue = event.data[fieldName];
       const author = event.data['proposer'];
-      let entity = new ChainEntity(chain, entityKind, fieldValue.toString(), [], null, null, null, null, null, author);
+      let entity = new ChainEntity({
+        chain,
+        type: entityKind,
+        typeId: fieldValue.toString(),
+        chainEvents: [],
+        createdAt: null,
+        updatedAt: null,
+        id: null,
+        threadId: null,
+        threadTitle: null,
+        title: null,
+        author,
+      });
 
       // update entity against store
       const existingEntity = this.store.get(entity);

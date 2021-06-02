@@ -1194,10 +1194,10 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@commonwealth/chain-events@0.6.1":
-  version "0.6.1"
-  resolved "https://registry.yarnpkg.com/@commonwealth/chain-events/-/chain-events-0.6.1.tgz#677134cf9ac9c80f3cc5228b45f12879f37260a2"
-  integrity sha512-iTNy7aMFchUWNxmydWcgySlbWw5HC5le1FloGukbdZshb2fvQWP1APTwLILzR3ulQRlIFYTP8hoMagfYvrFO0w==
+"@commonwealth/chain-events@0.6.3":
+  version "0.6.3"
+  resolved "https://registry.yarnpkg.com/@commonwealth/chain-events/-/chain-events-0.6.3.tgz#b40145fbbc1e617e4a750483fc2e03dcf5885ac9"
+  integrity sha512-HMjang8NeUz+rnJAb1KF1+22zBXsgSznYvlOiJ4ijqbu6AZDOLYIs1bVSAgkwItmVsbbmYnt+bHqLRaZGhORTA==
   dependencies:
     "@edgeware/node-types" "^3.3.3"
     bn.js "^5.1.3"

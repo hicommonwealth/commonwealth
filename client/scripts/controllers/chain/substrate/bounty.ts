@@ -33,7 +33,7 @@ export class SubstrateBounty extends Proposal<ApiPromise, SubstrateCoin, ISubstr
     return `#${this.identifier.toString()}`;
   }
 
-  public setStatus (status) {
+  public setStatus(status) {
     this._title = status.title;
     this._isActive = status.isActive;
     this._isApproved = status.isApproved;
@@ -45,6 +45,12 @@ export class SubstrateBounty extends Proposal<ApiPromise, SubstrateCoin, ISubstr
     this._updateDue = status.updateDue;
     this._unlockAt = status.unlockAt;
     this._beneficiary = status.beneficiary?.toString();
+
+    this._fee = this._Chain.coins(status.fee);
+    this._curatorDeposit = this._Chain.coins(status.curatorDeposit);
+  }
+  public setUpdateDue(updateDue) {
+    this._updateDue = updateDue;
   }
   private _title: string;
   private _isActive: boolean;
@@ -88,10 +94,10 @@ export class SubstrateBounty extends Proposal<ApiPromise, SubstrateCoin, ISubstr
   public readonly _bond: SubstrateCoin;
   public get bond() { return this._bond; }
 
-  public readonly _fee: SubstrateCoin;
+  public _fee: SubstrateCoin;
   public get fee() { return this._fee; }
 
-  public readonly _curatorDeposit: SubstrateCoin;
+  public _curatorDeposit: SubstrateCoin;
   public get curatorDeposit() { return this._curatorDeposit; }
 
   public get votingType() {
@@ -191,40 +197,52 @@ export class SubstrateBounty extends Proposal<ApiPromise, SubstrateCoin, ISubstr
       return;
     }
     switch (e.data.kind) {
+      // proposed by anyone
       case SubstrateTypes.EventKind.TreasuryBountyProposed: {
         this._active = true;
+        this._isProposed = true;
         break;
       }
+      // proposal rejected by council
+      case SubstrateTypes.EventKind.TreasuryBountyRejected: {
+        this._awarded = false;
+        this._active = false;
+        this.complete();
+        break;
+      }
+      // curator accepted
       case SubstrateTypes.EventKind.TreasuryBountyBecameActive: {
+        this._isProposed = false;
+        this._isActive = true;
         break;
       }
+      // extended by curator
+      case SubstrateTypes.EventKind.TreasuryBountyExtended: {
+        // clear updateDue, it can be re-fetched if needed
+        this._updateDue = null;
+        break;
+      }
+      // awarded by curator
+      case SubstrateTypes.EventKind.TreasuryBountyAwarded: {
+        this._awarded = true;
+        this._isActive = false;
+        this._isPendingPayout = true;
+        break;
+      }
+      // claimed by recipient
+      case SubstrateTypes.EventKind.TreasuryBountyClaimed: {
+        this._active = false;
+        this.complete();
+        break;
+      }
+      // rejected by council (?)
       case SubstrateTypes.EventKind.TreasuryBountyCanceled: {
         this._active = false;
         this.complete();
         break;
       }
-      case SubstrateTypes.EventKind.TreasuryBountyExtended: {
-        break;
-      }
-      case SubstrateTypes.EventKind.TreasuryBountyAwarded: {
-        this._awarded = true;
-        break;
-      }
-      case SubstrateTypes.EventKind.TreasuryBountyRejected: {
-        this.complete();
-        this._awarded = false;
-        this._active = false;
-        break;
-      }
-      case SubstrateTypes.EventKind.TreasuryBountyClaimed: {
-        this.complete();
-        this._active = false;
-        break;
-      }
       default: {
-        if ((e.data.kind as any) !== 'acceptCurator') {
-          throw new Error('invalid event update');
-        }
+        throw new Error('invalid event update');
       }
     }
   }
