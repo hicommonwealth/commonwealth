@@ -28,7 +28,8 @@ const VoteListing: m.Component<{
   view: (vnode) => {
     const { proposal, votes, amount, weight } = vnode.attrs;
     const balanceWeighted = proposal.votingUnit === VotingUnit.CoinVote
-      || proposal.votingUnit === VotingUnit.ConvictionCoinVote;
+      || proposal.votingUnit === VotingUnit.ConvictionCoinVote
+      || proposal.votingUnit === VotingUnit.PowerVote;
 
     if (!vnode.state.balancesCache) vnode.state.balancesCache = {};
     if (!vnode.state.balancesCacheInitialized) vnode.state.balancesCacheInitialized = {};
@@ -52,8 +53,7 @@ const VoteListing: m.Component<{
                 vnode.state.balancesCacheInitialized[vote.account.address] = true;
                 if (vote instanceof AaveProposalVote) {
                   balance = vote.power;
-                  // TODO: ensure balance displays okay
-                  vnode.state.balancesCache[vote.account.address] = formatCoin(app.chain.chain.coins(vote.power), true);
+                  vnode.state.balancesCache[vote.account.address] = vote.format();
                   m.redraw();
                 } else if (vote instanceof MarlinProposalVote) {
                   (app.chain as Marlin).chain.balanceOf(vote.account.address).then((b) => {
@@ -73,6 +73,26 @@ const VoteListing: m.Component<{
               }
             }
             switch (true) {
+              case (vote instanceof CosmosVote):
+                return m('.vote', [
+                  m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
+                  // (balanceWeighted && balance) && m('.vote-balance', balance),
+                ]);
+              case (vote instanceof MolochProposalVote):
+                return m('.vote', [
+                  m('.vote-voter', m(User, { user: vote.account, linkify: true })),
+                  balance && m('.vote-balance', balance),
+                ]);
+              case (vote instanceof MarlinProposalVote):
+                return m('.vote', [
+                  m('.vote-voter', m(User, { user: vote.account, linkify: true })),
+                  balance && m('.vote-balance', balance),
+                ]);
+              case (vote instanceof AaveProposalVote):
+                return m('.vote', [
+                  m('.vote-voter', m(User, { user: vote.account, linkify: true })),
+                  balance && m('.vote-balance', balance),
+                ]);
               case (vote instanceof BinaryVote):
                 switch (true) {
                   case (vote instanceof SubstrateDemocracyVote):
@@ -98,30 +118,6 @@ const VoteListing: m.Component<{
                   m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
                   m('.vote-deposit', formatCoin((vote as DepositVote<any>).deposit, true)),
                 ]);
-              case (vote instanceof CosmosVote):
-                return m('.vote', [
-                  m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
-                  m('.vote-choice', (vote as CosmosVote).choice.toString()),
-                  // (balanceWeighted && balance) && m('.vote-balance', balance),
-                ]);
-              case (vote instanceof MolochProposalVote):
-                return m('.vote', [
-                  m('.vote-voter', m(User, { user: vote.account, linkify: true })),
-                  m('.vote-choice', (vote as MolochProposalVote).choice.toString()),
-                  balance && m('.vote-balance', balance),
-                ]);
-              case (vote instanceof MarlinProposalVote):
-                return m('.vote', [
-                  m('.vote-voter', m(User, { user: vote.account, linkify: true })),
-                  m('.vote-choice', (vote as MarlinProposalVote).choice.toString()),
-                  balance && m('.vote-balance', balance),
-                ]);
-              case (vote instanceof AaveProposalVote):
-                return m('.vote', [
-                  m('.vote-voter', m(User, { user: vote.account, linkify: true })),
-                  m('.vote-choice', (vote as AaveProposalVote).choice.toString()),
-                  balance && m('.vote-balance', balance),
-                ]);
               default:
                 return m('.vote', [
                   m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
@@ -133,7 +129,7 @@ const VoteListing: m.Component<{
   }
 };
 
-const VotingResults: m.Component<{ proposal }> = {
+const VotingResults: m.Component<{ proposal: AnyProposal }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     const votes = proposal.getVotes();

@@ -1,9 +1,9 @@
 import moment from 'moment';
 import BN from 'bn.js';
-
+import Web3 from 'web3';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import { IAaveProposalResponse } from 'adapters/chain/aave/types';
-
+import { formatNumberLong } from 'adapters/currency';
 import { AaveTypes } from '@commonwealth/chain-events';
 
 import {
@@ -34,6 +34,10 @@ export class AaveProposalVote implements IVote<EthereumCoin> {
     this.account = member;
     this.choice = choice;
     this.power = power;
+  }
+
+  public format(): string {
+    return `${formatNumberLong(+Web3.utils.fromWei(this.power))} POWER`;
   }
 }
 
@@ -77,7 +81,7 @@ export default class AaveProposal extends Proposal<
 
   public get author() { return this._Accounts.get(this.data.proposer); }
 
-  public get votingType() { return VotingType.SimpleYesNoVoting; }
+  public get votingType() { return VotingType.ConvictionYesNoVoting; }
   public get votingUnit() { return VotingUnit.PowerVote; }
 
   public async state(): Promise<AaveTypes.ProposalState> {
@@ -99,11 +103,6 @@ export default class AaveProposal extends Proposal<
     if (this.data.executionTime) return { kind: 'fixed', time: moment(this.data.executionTime) };
     return { kind: 'fixed_block', blocknum: this.data.endBlock };
   }
-
-  private _forVotes: BN;
-  private _againstVotes: BN;
-  public get forVotes() { return this._forVotes; }
-  public get againstVotes() { return this._againstVotes; }
 
   public get support() {
     // TODO
@@ -137,8 +136,6 @@ export default class AaveProposal extends Proposal<
   public update(e: ChainEvent) {
     switch (e.data.kind) {
       case AaveTypes.EventKind.ProposalCreated: {
-        this._forVotes = e.data.forVotes ? new BN(e.data.forVotes) : new BN(0);
-        this._againstVotes = e.data.againstVotes ? new BN(e.data.forVotes) : new BN(0);
         break;
       }
       case AaveTypes.EventKind.VoteEmitted: {
@@ -171,17 +168,6 @@ export default class AaveProposal extends Proposal<
       default: {
         break;
       }
-    }
-  }
-
-  public addOrUpdateVote(vote: AaveProposalVote) {
-    super.addOrUpdateVote(vote);
-
-    // maintain global power state
-    if (vote.choice) {
-      this._forVotes.add(vote.power);
-    } else {
-      this._againstVotes.add(vote.power);
     }
   }
 
