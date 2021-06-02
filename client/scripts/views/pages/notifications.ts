@@ -197,7 +197,7 @@ const BatchedSubscriptionRow: m.Component<{
     }
 
     return m('tr.BatchedSubscriptionRow', [
-      m('td.subscription-label', [
+      m('td.subscription-label', { colspan: 2 }, [
         label || ((subscriptions?.length > 1)
           ? batchLabel(subscriptions)
           : singleLabel(subscriptions[0])),
@@ -392,7 +392,7 @@ const ChainEventSubscriptionRow: m.Component<{
     }
 
     return m('tr.ChainEventSubscriptionRow', [
-      m('td.subscription-label', [
+      m('td.subscription-label', { colspan: 2 }, [
         title,
         recommended && m(Tag, { size: 'xs', label: 'Recommended' }),
         m('.ChainEventDetails', [
@@ -625,6 +625,109 @@ const AllCommunitiesNotifications: m.Component<{
   },
 };
 
+const Erc20ChainEventNotificationRow: m.Component<{
+  subscriptions: NotificationSubscription[];
+  chainInfo: ChainInfo;
+}, {
+  option: string;
+  loading: boolean;
+  expanded: boolean;
+}> = {
+  view: (vnode) => {
+    const { subscriptions, chainInfo } = vnode.attrs;
+    const ERC20_EVENT_LIST = ['whale-transfer'];
+    return m('tr.BatchedSubscriptionRow', [
+      m('td.token-icon', [
+        m('img', { src: chainInfo.iconUrl }),
+      ]),
+      m('td.subscription-label', chainInfo.name,
+        m('.ChainEventDetails', ERC20_EVENT_LIST)),
+      m('td.subscription-setting', [
+        m(SelectList, {
+          class: 'BatchedNotificationSelectList',
+          filterable: false,
+          checkmark: false,
+          emptyContent: null,
+          inputAttrs: {
+            class: 'BatchedNotificationSelectRow',
+          },
+          popoverAttrs: {
+            transitionDuration: 0,
+          },
+          itemRender: (option: string) => {
+            return m(ListItem, {
+              label: option,
+              selected: (vnode.state.option === option),
+            });
+          },
+          items: [NOTIFICATION_ON_IMMEDIATE_EMAIL_OPTION, NOTIFICATION_ON_OPTION, NOTIFICATION_OFF_OPTION],
+          trigger: m(Button, {
+            align: 'left',
+            compact: true,
+            rounded: true,
+            disabled: !app.user.emailVerified || vnode.state.loading,
+            iconRight: Icons.CHEVRON_DOWN,
+            label: vnode.state.option,
+          }),
+          onSelect: async (option: string) => {
+            vnode.state.option = option;
+            vnode.state.loading = true;
+            try {
+              //if (subscriptions.length < 1) return;
+              if (option === NOTIFICATION_OFF_OPTION) {
+                /*if (someEmail) await app.user.notifications.disableImmediateEmails(subscriptions);
+                  if (someActive) await app.user.notifications.disableSubscriptions(subscriptions);
+                */
+                console.log("Notification off")
+              } else if (option === NOTIFICATION_ON_OPTION) {
+                console.log("Notification on")
+
+                /*
+                  await app.user.notifications.enableSubscriptions(subscriptions);
+                  if (someEmail) await app.user.notifications.disableImmediateEmails(subscriptions);
+                */
+              } else if (option === NOTIFICATION_ON_IMMEDIATE_EMAIL_OPTION) {
+                console.log("Notification on immediate email") 
+                /*  if (!everyActive) await app.user.notifications.enableSubscriptions(subscriptions);
+                  await app.user.notifications.enableImmediateEmails(subscriptions);
+                */
+              }
+            } catch (err) {
+              notifyError(err.toString());
+            }
+            vnode.state.loading = false;
+            m.redraw();
+          }
+        })])
+    ]);
+  }
+};
+
+const Erc20ChainEventNotifications: m.Component<{
+  subscriptions: NotificationSubscription[];
+}, {
+}> = {
+  view: (vnode) => {
+    const { subscriptions } = vnode.attrs;
+    console.log("subscriptions", subscriptions)
+    const roles = app.user.roles;
+    const nodes = app.config.nodes.getAll();
+    const activeErc20s = nodes.filter((n) => roles.find((r) => n.chain.id === r.chain_id && n.chain.type === 'token'))
+      .sort((n, o) => {
+        if (n.chain.name < o.chain.name) {
+          return -1;
+        } else if (o.chain.name > n.chain.name) {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
+
+    //  return activeErc20s.map((n)=>m('tr',n.chain.name))
+    return activeErc20s.map((n) => m(Erc20ChainEventNotificationRow, { subscriptions, chainInfo: n.chain }));
+  }
+};
+
 const NotificationsPage: m.Component<{}, {
   communities: CommunityInfo[];
   subscriptions: NotificationSubscription[];
@@ -767,6 +870,10 @@ const NotificationsPage: m.Component<{}, {
               m('tr.on-chain-events-header', m('th', { colspan: 2 }, 'Polkadot chain events')),
               m(PolkadotChainEventNotifications),
             ],
+            m('tr.on-chain-events-header', [
+              m('th', { colspan: 2 }, 'ERC20 chain events'),
+            ]),
+            m(Erc20ChainEventNotifications, { subscriptions }),
             selectedCommunity
               && m(IndividualCommunityNotifications, { subscriptions, community: selectedCommunity }),
             // on-chain event notifications
