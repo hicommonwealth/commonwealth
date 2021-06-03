@@ -5,7 +5,7 @@ import m from 'mithril';
 import Sublayout from 'views/sublayout';
 import NewProposalForm from 'views/pages/new_snapshot_proposal/new_proposal_form';
 
-const NewSnapshotProposalPage: m.Component<{}> = {
+const NewSnapshotProposalPage: m.Component<{snapshotId: string}> = {
   view: (vnode) => {
 
     return m(Sublayout, {
@@ -14,7 +14,7 @@ const NewSnapshotProposalPage: m.Component<{}> = {
       showNewProposalButton: true,
     }, [
       m('.forum-container', [
-        m(NewProposalForm, {}),
+        m(NewProposalForm, {snapshotId: vnode.attrs.snapshotId}),
       ])
     ]);
   }

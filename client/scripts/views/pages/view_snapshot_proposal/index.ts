@@ -3,6 +3,7 @@ import 'pages/view_proposal/index.scss';
 import $ from 'jquery';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
+import { Spinner } from 'construct-ui';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
@@ -16,15 +17,19 @@ import {
 } from './body';
 
 const ProposalHeader: m.Component<{
+  snapshotId: string
   proposal: SnapshotProposal
 }, {}> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
+    if (!proposal) {
+      return m('.topic-loading-spinner-wrap', [ m(Spinner, { active: true, size: 'lg' }) ])
+    }
 
     // Original posters have full editorial control, while added collaborators
     // merely have access to the body and title
 		
-    const proposalLink = `/${app.activeId()}/snapshot-proposal/${proposal.ipfsHash}`;
+    const proposalLink = `/${app.activeId()}/snapshot-proposal/${vnode.attrs.snapshotId}/${proposal.ipfsHash}`;
 
     return m('.ProposalHeader', {
       class: `proposal-snapshot`
@@ -90,6 +95,8 @@ const VoteView: m.Component<{
 }
 
 const ViewProposalPage: m.Component<{
+  scope: string,
+  snapshotId: string,
   identifier: string,
 }, {
   proposal: SnapshotProposal,
@@ -100,32 +107,37 @@ const ViewProposalPage: m.Component<{
     vnode.state.votes = [];
     vnode.state.voteCount = 0;
 
-    const allProposals: SnapshotProposal[] = app.snapshot.proposalStore.getAll();
-    vnode.state.proposal = allProposals.filter(proposal => proposal.ipfsHash === vnode.attrs.identifier)[0];
+    const snapshotId = vnode.attrs.snapshotId;
+    app.snapshot.fetchSnapshotProposals(snapshotId).then(response => {
+      
+      const allProposals: SnapshotProposal[] = app.snapshot.proposalStore.getAll();
+      console.log(allProposals);
+      vnode.state.proposal = allProposals.filter(proposal => proposal.ipfsHash === vnode.attrs.identifier)[0];
 
-    if (vnode.state.proposal) {
-      const hubUrl = process.env.SNAPSHOT_APP_HUB_URL || 'https://testnet.snapshot.org';
-      $.get(`${hubUrl}/api/${app.chain?.meta.chain.snapshot}/proposal/${vnode.state.proposal.ipfsHash}`).then((response) => {
-        if (response.status !== 'Success') {
-          var i = 0;
-          let votes: Vote[] = [];
-          for (const key in response) {
-            let vote: Vote = {
-              voterAddress: '',
-              choice: '',
-              timestamp: '',
-            };
-            vote.voterAddress = key,
-            vote.timestamp = response[key].msg.timestamp;
-            vote.choice = vnode.state.proposal.choices[response[key].msg.payload.choice - 1];
-            votes.push(vote);
+      if (vnode.state.proposal) {
+        const hubUrl = process.env.SNAPSHOT_APP_HUB_URL || 'https://testnet.snapshot.org';
+        $.get(`${hubUrl}/api/${snapshotId}/proposal/${vnode.state.proposal.ipfsHash}`).then((response) => {
+          if (response.status !== 'Success') {
+            var i = 0;
+            let votes: Vote[] = [];
+            for (const key in response) {
+              let vote: Vote = {
+                voterAddress: '',
+                choice: '',
+                timestamp: '',
+              };
+              vote.voterAddress = key,
+              vote.timestamp = response[key].msg.timestamp;
+              vote.choice = vnode.state.proposal.choices[response[key].msg.payload.choice - 1];
+              votes.push(vote);
+            }
+            vnode.state.voteCount = votes.length;
+            vnode.state.votes = votes.slice(0, 40);
+            m.redraw();
           }
-          vnode.state.voteCount = votes.length;
-          vnode.state.votes = votes.slice(0, 40);
-          m.redraw();
-        }
-      });
-    }
+        });
+      }
+    });
   },
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'ViewSnapShotProposalPage' });
@@ -139,6 +151,7 @@ const ViewProposalPage: m.Component<{
   view: (vnode) => {
     return m(Sublayout, { class: 'ViewProposalPage', title: "Snapshot Proposal" }, [
       m(ProposalHeader, {
+        snapshotId: vnode.attrs.snapshotId,
         proposal: vnode.state.proposal,
       }),
       m('.PinnedDivider', m('hr')),

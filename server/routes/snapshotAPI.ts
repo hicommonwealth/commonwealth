@@ -1,29 +1,25 @@
 
-import { Request, Response } from 'express';
-import fetch from 'node-fetch';
+import { Request, Response, NextFunction } from 'express';
+import axios from 'axios';
 
 export const sendMessage = async (
   req: Request,
   res: Response,
+  next: NextFunction
 ) => {
-	const init = {
-		method: 'POST',
-		headers: {
-			Accept: 'application/json',
-			'Content-Type': 'application/json'
-		},
-		body: req.body.data
-	};
 	const url = `${process.env.SNAPSHOT_APP_HUB_URL || 'https://testnet.snapshot.org'}/api/message`;
-	fetch(url, init)
-		.then((res1) => {
-			if (res1.ok) 
-				return res.json({ status: 'Success', result: res1.json() });
-			throw res1;
-		})
-		.catch((e) => {
-			e.json().then((json) => {
-				return res.json({ status: 'Failure', message: json });
-			})
-		});
+
+  axios.post(url, {
+    address: req.body.address,
+		msg: req.body.msg,
+		sig: req.body.sig,
+  })
+  .then(response => {
+    console.log(`statusCode: ${response.status}`)
+    return res.json({ status: 'Success', message: response.data });
+  })
+  .catch(error => {
+    console.error(error);
+    return res.json({ status: 'Failure', message: error.response.data });
+  })
 };

@@ -7,9 +7,9 @@ import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 import { Input, Form, FormLabel, FormGroup, Button, Callout } from 'construct-ui';
 import DatePicker from 'mithril-datepicker';
-import TimePicker from 'mithril-timepicker';
+// import TimePicker from 'mithril-timepicker';
 import moment from 'moment';
-import Web3 from 'web3';
+import { bufferToHex } from 'ethereumjs-util';
 import getProvider from '@snapshot-labs/snapshot.js/src/utils/provider';
 import { getBlockNumber, signMessage } from '@snapshot-labs/snapshot.js/src/utils/web3';
 import { version } from '@snapshot-labs/snapshot.js/src/constants.json';
@@ -48,27 +48,28 @@ interface IThreadForm {
   name: string;
   body: string;
   choices: string[];
-  start: string;
-  end: string;
-  snapshot: '',
+  start: number;
+  end: number;
+  snapshot: number,
   metadata: {},
   type: string
 }
 
 enum NewThreadErrors {
-  NoBody = 'Proposal body cannot be blank',
-  NoTitle = 'Title cannot be blank',
-  NoChoices = 'Choices cannot be blank',
-  NoStartDate = 'Start Date cannot be blank',
-  NoEndDate = 'End Date cannot be blank',
-  SomethingWentWrong = "Something went wrong"
+  NoBody = 'Proposal body cannot be blank!',
+  NoTitle = 'Title cannot be blank!',
+  NoChoices = 'Choices cannot be blank!',
+  NoStartDate = 'Start Date cannot be blank!',
+  NoEndDate = 'End Date cannot be blank!',
+  SomethingWentWrong = "Something went wrong!"
 }
 
 const newThread = async (
   form,
   quillEditorState,
   author,
-  space
+  space, 
+  snapshotId
 ) => {
   const topics = app.chain
     ? app.chain.meta.chain.topics
@@ -104,7 +105,6 @@ const newThread = async (
       : JSON.stringify(quillEditorState.editor.getContents());
 
   form.body = bodyText;
-
   form.snapshot = await getBlockNumber(getProvider(space.network));
   form.metadata.network = space.network;
   form.metadata.strategies = space.strategies;
@@ -119,43 +119,41 @@ const newThread = async (
       payload: form
     })
   };
-  console.log(author);
-  msg.sig = await signMessage((window as any).ethereum, msg.msg, author.address);
-  let result = await $.post(`${app.serverUrl()}/snapshotAPI/sendMessage`, {
-    data: JSON.stringify(msg)
-  });
-  // dispatch('notify', [
-  //   'green',
-  //   type === 'delete-proposal'
-  //     ? i18n.global.t('notify.proposalDeleted')
-  //     : i18n.global.t('notify.yourIsIn', [type])
-  // ]);
+
+  const msgBuffer = bufferToHex(new Buffer(msg.msg, 'utf8'));
+  msg.sig = await (window as any).ethereum.request({method: 'personal_sign', params: [msgBuffer, author.address]});
+
+  let result = await $.post(`${app.serverUrl()}/snapshotAPI/sendMessage`, { ...msg });
+
   if (result.status === "Failure") {
+    mixpanel.track('Create Snapshot Proposal', {
+      'Step No': 2,
+      'Step' : 'Incorrect Proposal',
+    });
+
     const errorMessage =
       result && result.message.error_description
         ? `${result.message.error_description}`
         : NewThreadErrors.SomethingWentWrong;
     throw new Error(errorMessage);
+  } else if (result.status === "Success") {
+    await app.user.notifications.refresh();
+
+    m.route.set(`/${app.activeId()}/snapshot-proposal/${snapshotId}/${result.message.ipfsHash}`);
+
+    mixpanel.track('Create Snapshot Proposal', {
+      'Step No': 2,
+      Step: 'Filled in Snapshot Proposal',
+    });
   }
-
-  await app.user.notifications.refresh();
-
-  if (result.status === "Success") {
-    m.route.set(`/${app.activeId()}/proposal/snapshot-proposal/${result.result.id}`);
-  }
-
-  mixpanel.track('Create Snapshot Proposal', {
-    'Step No': 2,
-    Step: 'Filled in Snapshot Proposal',
-  });
 };
 
-const newLink = async (form, quillEditorState, author, space) => {
-  const errors = await newThread(form, quillEditorState, author, space);
+const newLink = async (form, quillEditorState, author, space, snapshotId) => {
+  const errors = await newThread(form, quillEditorState, author, space, snapshotId);
   return errors;
 };
 
-export const NewProposalForm: m.Component<{}, {
+export const NewProposalForm: m.Component<{snapshotId: string}, {
   form: IThreadForm,
   quillEditorState,
   saving: boolean,
@@ -169,9 +167,9 @@ export const NewProposalForm: m.Component<{}, {
       name: '',
       body: '',
       choices: ['Yes', 'No'],
-      start: '',
-      end: '',
-      snapshot: '',
+      start: 0,
+      end: 0,
+      snapshot: 0,
       metadata: {},
       type: 'single-choice'
     };
@@ -183,8 +181,9 @@ export const NewProposalForm: m.Component<{}, {
           formatSpace(space[0], space[1])
         ])
       );
-      console.log(app.chain.meta.chain.snapshot, 'snapshot');
-      let space = spaces[app.chain.meta.chain.snapshot];
+      console.log(spaces);
+      let space = spaces[vnode.attrs.snapshotId];
+      console.log(space);
       vnode.state.space = space;
       vnode.state.members = space.members;
       m.redraw();
@@ -227,8 +226,6 @@ export const NewProposalForm: m.Component<{}, {
       localStorage.removeItem(`${app.activeId()}-new-snapshot-proposal-name`);
     };
 
-    console.log(vnode.state.space, "space");
-
     const isMember = author && author.address && vnode.state.members.includes(author.address.toLowerCase());
 
     let isValid = vnode.state.space !== undefined && 
@@ -249,7 +246,7 @@ export const NewProposalForm: m.Component<{}, {
           class: 'no-profile-callout',
           intent: 'primary',
           content: [
-            'You need to be a member of the space in order to submit a proposal',
+            'You need to be a member of the space in order to submit a proposal.',
           ],
         }),
         m('.new-snapshot-proposal-form', [
@@ -288,7 +285,7 @@ export const NewProposalForm: m.Component<{}, {
                 onclick: async (e) => {
                   vnode.state.saving = true;
                   try {
-                    await newLink(vnode.state.form, vnode.state.quillEditorState, author, vnode.state.space);
+                    await newLink(vnode.state.form, vnode.state.quillEditorState, author, vnode.state.space, vnode.attrs.snapshotId);
                     vnode.state.saving = false;
                     clearLocalStorage();
                   } catch (err) {
@@ -331,7 +328,7 @@ export const NewProposalForm: m.Component<{}, {
                 locale: 'en-us',
                 weekStart: 0,
                 onchange: function(chosenDate){
-                  vnode.state.form.start = moment(chosenDate).unix().toString();
+                  vnode.state.form.start = moment(chosenDate).unix();
                 }
               }
             ),
@@ -341,7 +338,7 @@ export const NewProposalForm: m.Component<{}, {
                 locale: 'en-us',
                 weekStart: 0,
                 onchange: function(chosenDate){
-                  vnode.state.form.end = moment(chosenDate).unix().toString();
+                  vnode.state.form.end = moment(chosenDate).unix();
                 }
               }
             ),

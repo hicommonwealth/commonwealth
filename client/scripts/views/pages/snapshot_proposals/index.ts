@@ -1,6 +1,5 @@
 import 'pages/discussions/index.scss';
 
-import $ from 'jquery';
 import _ from 'lodash';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
@@ -8,35 +7,13 @@ import moment from 'moment';
 import app from 'state';
 
 import { Spinner, Button, ButtonGroup, Icons, Icon, PopoverMenu, MenuItem } from 'construct-ui';
-import { pluralize, offchainThreadStageToLabel, externalLink } from 'helpers';
-import { NodeInfo, CommunityInfo, OffchainThreadStage } from 'models';
 
-import { updateLastVisited } from 'controllers/app/login';
-import { notifyError } from 'controllers/app/notifications';
 import Sublayout from 'views/sublayout';
-import PageLoading from 'views/pages/loading';
-import EmptyTopicPlaceholder, { EmptyStagePlaceholder } from 'views/components/empty_topic_placeholder';
-import LoadingRow from 'views/components/loading_row';
 import Listing from 'views/pages/listing';
-import NewTopicModal from 'views/modals/new_topic_modal';
-import EditTopicModal from 'views/modals/edit_topic_modal';
-import CreateInviteModal from 'views/modals/create_invite_modal';
 
-import { INITIAL_PAGE_SIZE } from 'controllers/server/threads';
-// import PinnedListing from './pinned_listing';
 import ProposalRow from './proposal_row';
 
 export const ALL_PROPOSALS_KEY = 'COMMONWEALTH_ALL_PROPOSALS';
-
-const getLastSeenDivider = (hasText = true) => {
-  return m('.LastSeenDivider', hasText ? [
-    m('hr'),
-    m('span', 'Last visit'),
-    m('hr'),
-  ] : [
-    m('hr'),
-  ]);
-};
 
 const SnapshotProposalStagesBar: m.Component<{}, {}> = {
   view: (vnode) => {
@@ -97,7 +74,7 @@ const SnapshotProposalStagesBar: m.Component<{}, {}> = {
   }
 };
 
-const SnapshotProposalsPage: m.Component<{ topic?: string }, {
+const SnapshotProposalsPage: m.Component<{ topic?: string, snapshotId: string }, {
   lookback?: { [community: string]: moment.Moment} ;
   postsDepleted: { [community: string]: boolean };
   topicInitialized: { [community: string]: boolean };
@@ -105,24 +82,30 @@ const SnapshotProposalsPage: m.Component<{ topic?: string }, {
   lastVisitedUpdated?: boolean;
   onscroll: any;
   allProposals: any;
+  listing: any[]
 }> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', {
       'Page Name': 'Snapshot Proposals Page',
       Scope: app.activeId(),
     });
+    const snapshotId = vnode.attrs.snapshotId
+    app.snapshot.fetchSnapshotProposals(snapshotId).then(response => {
+      vnode.state.listing = app.snapshot.proposalStore.getAll()
+      .map((proposal) => m(ProposalRow, { snapshotId, proposal }))
+
+      m.redraw();
+    });
   },
 
   oninit: (vnode) => {
+    vnode.state.listing = [];
   },
   
   view: (vnode) => {
     let listing = [];
+    listing.push(m('.discussion-group-wrap', vnode.state.listing));
     
-    listing.push(m('.discussion-group-wrap', app.snapshot.proposalStore.getAll()
-    .map((proposal) => m(ProposalRow, { proposal }))));
-    
-
     return m(Sublayout, {
       class: 'DiscussionsPage',
       title: 'Snapshot Proposals',

@@ -171,7 +171,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
     const showCommonwealthMenuOptions = app.chain?.class === ChainClass.Commonwealth;
 
     const showMarlinOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Marlin;
-    const showSubmitSnapshotProposalOptions = app.user.activeAccount && 
+    const showSubmitSnapshotProposalOptions = app.user.activeAccount && app.chain?.meta.chain.snapshot && 
       (app.chain?.network === ChainNetwork.Yearn ||
         app.chain?.network === ChainNetwork.Fei ||
         app.chain?.network === ChainNetwork.Sushi);
@@ -347,7 +347,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         label: 'Snapshot Proposals',
         onclick: (e) => {
           e.preventDefault();
-          m.route.set(`/${app.activeId()}/snapshot-proposals`);
+          m.route.set(`/${app.activeChainId()}/snapshot-proposals/${app.chain.meta.chain.snapshot}`);
         },
       }),
       showSubmitSnapshotProposalOptions && m(Button, {
@@ -355,7 +355,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         rounded: true,
         onclick: (e) => {
           e.preventDefault();
-          m.route.set(`/${app.activeChainId()}/new/snapshot-proposal`);
+          m.route.set(`/${app.activeChainId()}/new/snapshot-proposal/${app.chain.meta.chain.snapshot}`);
         },
         label: 'Submit a Proposal',
       }),
