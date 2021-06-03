@@ -1,6 +1,11 @@
 import IdStore from './IdStore';
-import { CWProtocol } from '../models';
+import { CWProtocol, CWProtocolMembers } from '../models';
 
 class CWProtocolStore extends IdStore<CWProtocol> {}
 
-export default CWProtocolStore;
+class CWProtocolMembersStore extends IdStore<CWProtocolMembers> {}
+
+export {
+  CWProtocolStore,
+  CWProtocolMembersStore
+};

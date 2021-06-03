@@ -1,0 +1,45 @@
+@import 'client/styles/shared';
+
+.ProjectPage {
+  .content-area {
+      flex-grow: 1;
+      margin-top: 36px;
+      padding-right: 20px;
+      padding-left: 0px;
+      .project-name {
+          font-size: 24px;
+          font-weight: 700;
+      }
+      .project-text {
+          font-size: 18px;
+          margin-top: 5px;
+      }
+      .project-description {
+          font-size: 18px;
+          margin-top: 10px;
+          // max-width: 90%;
+      }
+  }
+  .members-area {
+      background-color: #f8f8f8;
+      padding: 20px 20px 40px 20px;
+      margin-top: 30px;;
+      border-radius: 10px;
+      .member {
+          display: flex;
+          justify-content: space-between;
+      }
+      .title {
+          font-size: 20px;
+          font-weight: 700;
+          margin-top: 20px;
+      }
+      .text {
+          font-size: 16px;
+          color: #4a4a4a;
+      }
+      .mt-10px {
+          margin-top: 10px;
+      }
+  }
+}

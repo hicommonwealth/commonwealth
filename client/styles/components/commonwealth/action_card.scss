@@ -1,0 +1,53 @@
+@import 'client/styles/shared';
+
+.action-card {
+    margin: 36px auto;
+
+    width: 100%;
+    display: block;
+    padding: 40px 20px 30px;
+    border-radius: 10px;
+    background-color: #f8f8f8;
+
+    .action-title {
+    .amount {
+        font-size: 20px;
+        font-weight: 700;
+    }
+    .coin {
+        font-size: 14px;
+    }
+    }
+    .project-progress {
+        padding-bottom: 20px;
+        margin-top: 5px;
+        $progress-bar-height: 11px;
+        .project-progress-bar {
+            width: 100%;
+            height: $progress-bar-height;
+            border-radius: 9999px;
+            background-color: $background-color-medium-light;
+        }
+        .project-progress-bar-fill {
+            height: $progress-bar-height;
+            border-radius: 9999px;
+            background-color: $positive-bg-color;
+        }
+    }
+  
+    .contribute-button {
+        margin-top: 10px;
+    }
+  
+    .error {
+        color: red;
+        text-align: center;
+        margin-bottom: 0;
+        margin-top: 5px;
+    }
+    .display-txt {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 0;
+    }
+}
