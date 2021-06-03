@@ -1,6 +1,5 @@
 import { utils } from 'ethers';
 import BN from 'bn.js';
-import moment from 'moment';
 
 import { IApp } from 'state';
 import { CWProtocol, CWProject, CWProtocolMembers } from 'models/CWProtocol';
@@ -11,10 +10,6 @@ import CommonwealthAPI from './api';
 
 import { CWProtocolStore, CWProtocolMembersStore } from '../../../../stores';
 import ContractApi from '../contractApi';
-
-const expandTo18Decimals = (n: number): BN => {
-  return new BN(n).mul((new BN(10)).pow(new BN(18)))
-};
 
 export default class CommonwealthProtocol {
   private _initialized: boolean = false;
@@ -44,21 +39,7 @@ export default class CommonwealthProtocol {
     const newProtocol = new CWProtocol('cmn_projects', protocolFee, feeTo, projects);
     this._projectStore.add(newProtocol);
 
-<<<<<<< HEAD
-    await this.createProject(
-      'cmn first project',
-      'project that is running on cw protocol',
-      '0xF5B35b607377850696cAF2ac4841D61E7d825a3b',
-      '0xF5B35b607377850696cAF2ac4841D61E7d825a3b',
-      '1',
-      '1',
-      '1',
-    )
-
-    this.store.add(newProtocol);
-=======
     this._initialized = true;
->>>>>>> d7b077d3... fix after testing
   }
 
   public async deinit() {
@@ -71,50 +52,11 @@ export default class CommonwealthProtocol {
     u_description: string,
     creator: string,
     beneficiary: string,
-    u_threshold: string,
-    u_curatorFee: string,
-    u_period = '1', // 1 day
-    backWithEther = true,
-    token?: ERC20Token
+
+    threshold: number,
+    curatorFee: number,
+    u_period: number, // in days
   ) {
-<<<<<<< HEAD
-    const api = this._chain.CommonwealthAPI;
-    await api.attachSigner(this._chain.app.wallets, '0xF5B35b607377850696cAF2ac4841D61E7d825a3b');
-    console.log('====>after attach signer', api);
-
-
-    // const threshold = new utils.BigNumber(parseFloat(u_threshold));
-    // const name = utils.formatBytes32String(u_name);
-    // const ipfsHash = utils.formatBytes32String('0x01');
-    // const cwUrl = utils.formatBytes32String('commonwealth.im');
-    // const acceptedTokens = ['0x0000000000000000000000000000000000000000'];
-    // const nominations = [creator, beneficiary];
-    // const projectHash = utils.solidityKeccak256(
-    //   ['address', 'address', 'bytes32', 'uint256'],
-    //   [creator, beneficiary, name, threshold.toString()]
-    // );
-    // const endtime = Math.ceil(Date.now() / 1000) + parseFloat(u_period) * 24 * 60;
-    // const curatorFee = parseFloat(u_curatorFee);
-
-    // const tx = await api.Contract.createProject(
-    //   name,
-    //   ipfsHash,
-    //   cwUrl,
-    //   beneficiary,
-    //   acceptedTokens,
-    //   nominations,
-    //   threshold,
-    //   endtime,
-    //   curatorFee,
-    //   '',
-    // )
-    // const txReceipt = await tx.wait();
-    // if (txReceipt.status !== 1) {
-    //   throw new Error('failed to submit vote');
-    // }
-    // console.log('====>txReceipt', txReceipt);
-  }
-=======
     const name = utils.formatBytes32String(u_name);
     const ipfsHash = utils.formatBytes32String('0x01');
     const cwUrl = utils.formatBytes32String('commonwealth.im');
@@ -140,7 +82,6 @@ export default class CommonwealthProtocol {
     if (txReceipt.status === 1) {
       await this.syncProjects(true);
     }
->>>>>>> d7b077d3... fix after testing
 
     return txReceipt.status === 1;
   }
@@ -233,4 +174,3 @@ export default class CommonwealthProtocol {
     return projects;
   }
 }
- 

@@ -8,7 +8,6 @@ import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import { CWProject } from 'models/CWProtocol';
 
-
 import ActionModule from 'views/components/commonwealth/actions/action_card';
 
 
@@ -78,8 +77,11 @@ const ViewProjectPage: m.Component<{
     if (!initialized) {
       return m(PageLoading);
     }
-    const { protocol } = vnode.state;
-    const project: CWProject = (protocol.projects || []).filter((item) => item.projectHash === vnode.attrs.projectHash)[0];
+
+    const protocol = (app.chain as any).protocol;
+    const mStore = protocol.memberStore.getById(project.projectHash);
+    const backers = mStore.backers || [];
+    const curators = mStore.curators || [];
 
     const startTime = new Date();
     const endTime = project.endTime;
@@ -123,6 +125,3 @@ const ViewProjectPage: m.Component<{
 }
 
 export default ViewProjectPage;
-
-
-    

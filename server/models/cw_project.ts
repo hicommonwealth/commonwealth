@@ -8,13 +8,12 @@ export interface CWProjectAttributes {
   ipfsHash: string;
   cwUrl: string;
   beneficiary: string;
-  acceptedToken: string;  //  '0x0000000000000000000000000000000000000000',
-  nominations: Array<string>;  //  []
-  endTime: Date; // startTime + number in seconds
-  projectHash: string;  // put projectHash
+  acceptedToken: string;
+  nominations: Array<string>;
+  endTime: Date;
+  projectHash: string;
   status: ProjectStatus;
   creator: string;
-
   threshold: number;
   totalFunding: number;
   curatorFee: number;

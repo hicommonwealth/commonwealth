@@ -11,16 +11,7 @@ const ProjectCard: m.Component<{project: CWProject}> = {
   view: (vnode) => {
     const { project } = vnode.attrs;
 
-<<<<<<< HEAD:client/scripts/views/components/project_card.ts
-    // const thredLink = `/${app.activeChainId()}/proposal/discussion/${project.threadId}`; // threadId should be defined later
-    const projectLink = `/${app.activeCommunityId()}/project/${project.projectHash}`;
-=======
     // const thredLink = `/${app.activeChainId()}/proposal/discussion/${project.threadId}`; // proposal => project
-<<<<<<< HEAD
-    const projectLink = `/${app.activeChainId()}/project/${project.projectHash}`;
->>>>>>> 4be99152... structure updated:client/scripts/views/components/commonwealth/project_card.ts
-=======
->>>>>>> d7b077d3... fix after testing
     const bgColor = project.status === 'In Progress' ? 'blue' : (project.status === 'Successed') ? 'green' : 'red';
     const totalFunding = utils.formatEther(project.totalFunding.asBN.toString());
     const totalFundingText = `Total Funding: ${totalFunding} Ether`;
@@ -47,13 +38,13 @@ const ProjectCard: m.Component<{project: CWProject}> = {
 
       m('.project-card-bottom', {
         onclick: (e) => {
-          // e.preventDefault();
+          e.preventDefault();
           // if (project.threadId) {
           //   m.route.set(thredLink);
           // }
         }
       }, [
-        // thread link
+        // // thread link
         // project.threadId ? m('.project-thread-link', [
         //   m('a', { href: thredLink }, 'Go to thread'),
         // ]) : m('.no-linked-thread', 'No linked thread'),

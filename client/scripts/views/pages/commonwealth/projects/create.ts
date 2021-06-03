@@ -63,7 +63,7 @@ const NewProjectForm = {
             ]),
             //  deadline
             m(FormGroup, [
-              m(FormLabel, 'Deadline (in days)'),
+              m(FormLabel, 'Deadline (in Days)'),
               m(Input, {
                 options: {
                   name: 'deadline',
@@ -73,7 +73,16 @@ const NewProjectForm = {
                 disabled: submitting,
                 oninput: (e) => {
                   const result = (e.target as any).value;
-                  vnode.state.form.deadline = result;
+                  if (floatRegex.test(result)) {
+                    vnode.state.error = undefined;
+                    vnode.state.form.deadline = result;
+                  } else {
+                    vnode.state.form.deadline = undefined;
+                    vnode.state.error = {
+                      message: 'Invalid input value',
+                      id: 'deadline'
+                    };
+                  }
                   m.redraw();
                 },
               }),
@@ -121,7 +130,16 @@ const NewProjectForm = {
                 autocomplete: 'off',
                 oninput: (e) => {
                   const result = (e.target as any).value;
-                  vnode.state.form.threshold = result;
+                  if (floatRegex.test(result)) {
+                    vnode.state.form.threshold = utils.parseEther(result);
+                    vnode.state.error = undefined;
+                  } else {
+                    vnode.state.form.threshold = undefined;
+                    vnode.state.error = {
+                      message: 'Invalid input value',
+                      id: 'threshold'
+                    };
+                  }
                   m.redraw();
                 },
               }),
@@ -219,17 +237,26 @@ const NewProjectPage: m.Component<{ type }, { submitting: boolean, createError: 
         m(NewProjectForm, {
           callback: async(projectData: any) => {
             const author = app.user.activeAccount.address;
-            const res = await protocol.createProject(
-              projectData.name,
-              projectData.description,
-              author,
-              projectData.beneficiary,
-              projectData.threshold,
-              projectData.curatorFee,
-              projectData.deadline,
-              true,
-              '0x01'
-            );
+            vnode.state.submitting = true;
+
+            let txSuccessed = false;
+            try {
+              txSuccessed = await protocol.createProject(
+                projectData.name,
+                projectData.description,
+                author,
+                projectData.beneficiary,
+                projectData.threshold,
+                parseFloat(projectData.curatorFee),
+                parseFloat(projectData.deadline),
+              );
+            } catch {
+              txSuccessed = false;
+            }
+
+            vnode.state.createError = txSuccessed ? '' : 'Failed to create this project';
+            vnode.state.submitting = false;
+            m.redraw();
           },
           submitting: vnode.state.submitting,
         }),

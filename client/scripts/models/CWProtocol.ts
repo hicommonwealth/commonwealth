@@ -3,8 +3,8 @@ import { EthereumCoin } from 'shared/adapters/chain/ethereum/types';
 
 type ProjectStatus = 'In Progress' | 'Successed' | 'Failed';
 
-interface CWUser {
-  id?: number;
+export interface CWUser {
+  balance: number;
   address: string;
 }
 export class CWProject { 
@@ -47,12 +47,12 @@ export class CWProject {
     this.ipfsHash = ipfsHash;
     this.cwUrl = cwUrl;
     this.beneficiary = beneficiary;
-    this.acceptedToken = acceptedToken;  //  '0x0000000000000000000000000000000000000000',
+    this.acceptedToken = acceptedToken;
     this.nominations = nominations;
     this.threshold = threshold;
-    this.endTime = endTime; // startTime + number in seconds
+    this.endTime = endTime;
     this.curatorFee = curatorFee;
-    this.projectHash = projectHash;  // put projectHash
+    this.projectHash = projectHash;
     this.status = status;
     this.totalFunding = totalFunding;
     this.bToken = bToken;
