@@ -11,7 +11,7 @@ import AaveApi from './api';
 import EthereumAccounts from '../accounts';
 
 export interface AaveProposalArgs {
-  executor: Executor,
+  executor: Executor | string,
   targets: string[],
   values: string[],
   signatures: string[],
@@ -59,13 +59,19 @@ export default class AaveGovernance extends ProposalModule<
     }
 
     // validate executor
-    const isExecutorAuthorized = await this._api.Governance.isExecutorAuthorized(executor.address);
+    const executorContract = typeof executor === 'string'
+      ? this._api.getExecutor(executor)
+      : executor;
+    if (!executorContract) {
+      throw new Error('Executor not found.');
+    }
+    const isExecutorAuthorized = await this._api.Governance.isExecutorAuthorized(executorContract.address);
     if (!isExecutorAuthorized) {
       throw new Error('executor not authorized!');
     }
 
     // validate user
-    const isPropositionPowerEnough = await executor.isPropositionPowerEnough(
+    const isPropositionPowerEnough = await executorContract.isPropositionPowerEnough(
       this._api.Governance.address,
       address,
       this.app.chain.block.height - 1,
@@ -77,7 +83,7 @@ export default class AaveGovernance extends ProposalModule<
     // send transaction
     const contract = await attachSigner(this.app.wallets, address, this._api.Governance);
     const tx = await contract.create(
-      executor.address,
+      executorContract.address,
       targets,
       values,
       signatures,

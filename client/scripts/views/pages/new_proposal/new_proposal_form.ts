@@ -32,6 +32,8 @@ import { createTXModal } from 'views/modals/tx_signing_modal';
 import TopicSelector from 'views/components/topic_selector';
 import ErrorPage from 'views/pages/error';
 import SubstrateBountyTreasury from 'controllers/chain/substrate/bountyTreasury';
+import { AaveProposalArgs } from 'client/scripts/controllers/chain/ethereum/aave/governance';
+import Aave from 'client/scripts/controllers/chain/ethereum/aave/adapter';
 
 // this should be titled the Substrate/Edgeware new proposal form
 const NewProposalForm = {
@@ -71,6 +73,8 @@ const NewProposalForm = {
     let hasMolochFields : boolean;
     // marlin proposal
     let hasMarlinFields : boolean;
+    // aave proposal
+    let hasAaveFields: boolean;
     // data loaded
     let dataLoaded : boolean = true;
 
@@ -119,6 +123,8 @@ const NewProposalForm = {
       hasMolochFields = true;
     } else if (proposalTypeEnum === ProposalType.MarlinProposal) {
       hasMarlinFields = true;
+    } else if (proposalTypeEnum === ProposalType.AaveProposal) {
+      hasAaveFields = true;
     } else {
       return m('.NewProposalForm', 'Invalid proposal type');
     }
@@ -314,6 +320,41 @@ const NewProposalForm = {
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
 
+        // @TODO: Create Proposal via WebTx
+      } else if (proposalTypeEnum === ProposalType.AaveProposal) {
+        vnode.state.proposer = app.user?.activeAccount?.address;
+        if (!vnode.state.proposer) throw new Error('Invalid address / not logged in');
+        if (!vnode.state.executor) throw new Error('Invalid executor');
+        if (!vnode.state.targets) throw new Error('No targets');
+        if (!vnode.state.values) throw new Error('No values');
+        if (!vnode.state.signatures) throw new Error('No signatures');
+        if (!vnode.state.calldatas) throw new Error('No calldatas');
+        if (!vnode.state.withDelegateCalls) throw new Error('No withDelegateCalls');
+        if (!vnode.state.ipfsHash) throw new Error('No ipfs hash');
+        const targets: string[] = vnode.state.targets.split(',');
+        const values: string[] = vnode.state.values.split(',');
+        const calldatas: string[] = vnode.state.calldatas.split(',');
+        const signatures: string[] = vnode.state.signatures.split(',');
+        const withDelegateCalls: boolean[] = vnode.state.withDelegateCalls
+          .split(',')
+          .map((v: string): boolean => {
+            if (v.trim().toLowerCase() === 'true') return true;
+            if (v.trim().toLowerCase() === 'false') return false;
+            throw new Error(`invalid withDelegateCalls string: ${v}`);
+          });
+        const details: AaveProposalArgs = {
+          executor: vnode.state.executor as string,
+          targets,
+          values,
+          calldatas,
+          signatures,
+          withDelegateCalls,
+          ipfsHash: vnode.state.ipfsHash as string,
+        };
+        (app.chain as Aave).governance.propose(details)
+          .then((result) => done(result))
+          .then(() => m.redraw())
+          .catch((err) => notifyError(err.toString()));
         // @TODO: Create Proposal via WebTx
       } else {
         mixpanel.track('Create Thread', {
@@ -740,6 +781,104 @@ const NewProposalForm = {
                 oninput: (e) => {
                   const result = (e.target as any).value;
                   vnode.state.description = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+          ],
+          hasAaveFields && [
+            m('h2', 'New Aave Proposal:'),
+            // TODO: display offchain copy re AIPs and ARCs from https://docs.aave.com/governance/
+            m(FormGroup, [
+              m(FormLabel, 'Proposal Targets'),
+              m(Input, {
+                name: 'targets',
+                placeholder: 'Proposal Targets',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.targets = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Proposal Values'),
+              m(Input, {
+                name: 'values',
+                placeholder: 'Proposal Values',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.values = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Proposal Calldatas'),
+              m(Input, {
+                name: 'calldatas',
+                placeholder: 'Proposal Calldatas',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.calldatas = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Proposal Signatures'),
+              m(Input, {
+                name: 'signatures',
+                placeholder: 'Proposal Signatures',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.signatures = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              // TODO: make this a switchable list of true/false
+              m(FormLabel, 'Proposal Delegate Calls'),
+              m(Input, {
+                name: 'withDelegateCalls',
+                placeholder: 'Proposal Delegate Calls (false,true,false...)',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.withDelegateCalls = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Proposer (you)'),
+              m(Input, {
+                name: 'proposer',
+                value: `${app.user.activeAccount.address}`,
+                disabled: true,
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Proposal IPFS Hash'),
+              m(Input, {
+                name: 'ipfsHash',
+                placeholder: 'Proposal IPFS Hash',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.ipfsHash = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              // TODO: provide a dropdown here with valid executors
+              m(FormLabel, 'Proposal Executor'),
+              m(Input, {
+                name: 'executor',
+                placeholder: 'Proposal Executor',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.executor = result;
                   m.redraw();
                 },
               }),

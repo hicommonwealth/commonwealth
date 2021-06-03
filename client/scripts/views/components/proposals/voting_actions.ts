@@ -34,6 +34,7 @@ import MarlinProposal, {
 } from 'controllers/chain/ethereum/marlin/proposal';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import { notifyError } from 'controllers/app/notifications';
+import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 
 const CannotVote: m.Component<{ action }> = {
   view: (vnode) => {
@@ -128,9 +129,10 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
       user = app.user.activeAccount as SubstrateAccount;
     } else if (proposal instanceof CosmosProposal) {
       user = app.user.activeAccount as CosmosAccount;
-    } else if (proposal instanceof MolochProposal) {
-      user = app.user.activeAccount as EthereumAccount;
-    } else if (proposal instanceof MarlinProposal) {
+    } else if (proposal instanceof MolochProposal
+      || proposal instanceof MarlinProposal
+      || proposal instanceof AaveProposal
+    ) {
       user = app.user.activeAccount as EthereumAccount;
     } else {
       return m(CannotVote, { action: 'Unrecognized proposal type' });
