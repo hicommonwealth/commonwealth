@@ -43,8 +43,13 @@ export class AaveProposalVote implements IVote<EthereumCoin> {
 
 const backportEntityToAdapter = (entity: ChainEntity): IAaveProposalResponse => {
   const startEvent = entity.chainEvents.find((e) => e.data.kind === AaveTypes.EventKind.ProposalCreated);
+  if (!startEvent) {
+    console.log(entity);
+    console.log(entity.chainEvents);
+    console.log(entity.chainEvents.map((e) => e.data.kind));
+    console.log(AaveTypes.EventKind.ProposalCreated);
+  }
   const startData = startEvent.data as AaveTypes.IProposalCreated;
-  delete startData.kind;
   return {
     identifier: `${startData.id}`,
     queued: false,

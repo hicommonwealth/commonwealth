@@ -74,11 +74,11 @@ export default class extends IEventHandler {
         completed = true;
       }
       const params = author
-        ? { type: type.toString(), type_id, chain: this._chain, completed, author }
-        : { type: type.toString(), type_id, chain: this._chain, completed };
+        ? { type: type.toString(), type_id, chain: this._chain, author }
+        : { type: type.toString(), type_id, chain: this._chain };
       const [ dbEntity, created ] = await this._models.ChainEntity.findOrCreate({
         where: params,
-        default: { },
+        default: { completed },
       });
       if (created) {
         log.info(`Created db entity, ${type.toString()}: ${type_id}.`);
@@ -137,7 +137,8 @@ export default class extends IEventHandler {
       case EntityEventKind.Create: {
         return createEntityFn(entityKind, fieldValue, author);
       }
-      case EntityEventKind.Update: {
+      case EntityEventKind.Update:
+      case EntityEventKind.Vote: {
         return updateEntityFn(entityKind, fieldValue);
       }
       case EntityEventKind.Complete: {

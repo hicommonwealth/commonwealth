@@ -3,6 +3,7 @@ import { IApp } from 'state';
 import { IAaveProposalResponse } from 'adapters/chain/aave/types';
 import { AaveEvents, AaveTypes } from '@commonwealth/chain-events';
 import { Executor } from 'eth/types';
+import { EntityRefreshOption } from 'controllers/server/chain_entities';
 
 import AaveProposal from './proposal';
 import AaveChain from './chain';
@@ -105,6 +106,13 @@ export default class AaveGovernance extends ProposalModule<
 
     console.log('Fetching aave proposals from chain.');
 
+    // load server proposals
+    console.log('Fetching aave proposals from backend.');
+    await this.app.chain.chainEntities.refresh(this.app.chain.id, EntityRefreshOption.CompletedEntities);
+    const entities = this.app.chain.chainEntities.store.getByType(AaveTypes.EntityKind.Proposal);
+    console.log(entities);
+    entities.forEach((e) => this._entityConstructor(e));
+
     // register new chain-event handlers
     this.app.chain.chainEntities.registerEntityHandler(
       AaveTypes.EntityKind.Proposal, (entity, event) => {
@@ -112,18 +120,14 @@ export default class AaveGovernance extends ProposalModule<
       }
     );
 
-    // fetch proposals
+    // fetch proposals from chain
     const chainEventsContracts: AaveTypes.Api = { governance: this._api.Governance };
     const fetcher = new AaveEvents.StorageFetcher(
-      chainEventsContracts // TODO: add tokens
+      chainEventsContracts // TODO: add tokens if desired
     );
     const subscriber = new AaveEvents.Subscriber(chainEventsContracts, this.app.chain.id);
     const processor = new AaveEvents.Processor(chainEventsContracts);
-    // TODO: add range as argument
-    await this.app.chain.chainEntities.fetchEntities(this.app.chain.id, () => fetcher.fetch({
-      startBlock: 12300000,
-      maxResults: 5,
-    }, true)); // TODO: remove fetch all flag & combine with backend entities
+    await this.app.chain.chainEntities.fetchEntities(this.app.chain.id, () => fetcher.fetch());
     await this.app.chain.chainEntities.subscribeEntities(
       this.app.chain.id,
       subscriber,
