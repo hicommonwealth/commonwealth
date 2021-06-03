@@ -1,23 +1,22 @@
 /* eslint-disable no-unused-expressions */
 import chai from 'chai';
 import 'chai/register-should';
-import moment from 'moment';
+import Web3 from 'web3';
+import BN from 'bn.js';
 import wallet from 'ethereumjs-wallet';
-import { bigNumberify } from 'ethers/utils';
 import { Keyring } from '@polkadot/api';
 import { stringToU8a, u8aToHex } from '@polkadot/util';
-import { NotificationCategory } from 'models';
-import { Erc20 } from '../../eth/types/Erc20';
 import { factory, formatFilename } from '../../shared/logging';
 import app from '../../server-test';
 import models from '../../server/database';
-import { TokenForumMeta } from '../../server/util/tokenBalanceCache';
+import { TokenBalanceProvider, TokenForumMeta } from '../../server/util/tokenBalanceCache';
 const ethUtil = require('ethereumjs-util');
 const log = factory.getLogger(formatFilename(__filename));
 
 export const generateEthAddress = () => {
   const keypair = wallet.generate();
-  const address = `0x${keypair.getAddress().toString('hex')}`;
+  const lowercaseAddress = `0x${keypair.getAddress().toString('hex')}`;
+  const address = Web3.utils.toChecksumAddress(lowercaseAddress);
   return { keypair, address };
 };
 
@@ -37,6 +36,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .post('/api/verifyAddress')
       .set('Accept', 'application/json')
       .send({ address, chain, signature });
+    console.log(JSON.stringify(res.body));
     const user_id = res.body.result.user.id;
     const email = res.body.result.user.email;
     return { address_id, address, user_id, email };
@@ -294,20 +294,26 @@ export const createInvite = async (args: InviteArgs) => {
   return invite;
 };
 
-export const createTokenMeta = (
-  balanceCb: (address: string) => Promise<number>
-): TokenForumMeta => {
-  return {
-    id: 'alex',
-    address: '0xFab46E002BbF0b4509813474841E0716E6730136',
-    symbol: 'alex',
-    name: 'Alex',
-    iconUrl: '',
-    api: {
-      balanceOf: async (a: string) => {
-        const res = await balanceCb(a);
-        return bigNumberify(res);
-      }
-    } as unknown as Erc20,
-  };
+export const createTokenMeta = (): TokenForumMeta[] => {
+  return [
+    {
+      id: 'alex',
+      address: '0xFab46E002BbF0b4509813474841E0716E6730136',
+      symbol: 'alex',
+      name: 'Alex',
+      iconUrl: '',
+    }
+  ];
 };
+
+export class MockTokenBalanceProvider extends TokenBalanceProvider {
+  public balanceFn: (tokenAddress: string, userAddress: string) => Promise<BN>;
+
+  public async getBalance(tokenAddress: string, userAddress: string): Promise<BN> {
+    if (this.balanceFn) {
+      return this.balanceFn(tokenAddress, userAddress);
+    } else {
+      throw new Error('unable to fetch token balance');
+    }
+  }
+}

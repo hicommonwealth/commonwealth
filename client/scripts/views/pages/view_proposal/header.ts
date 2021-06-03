@@ -270,6 +270,8 @@ export const ProposalHeaderStage: m.Component<{ proposal: OffchainThread }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     if (!proposal) return;
+    if (proposal.stage === OffchainThreadStage.Discussion) return;
+
     return m('.ProposalHeaderStage', [
       m(Button, {
         rounded: true,
@@ -281,14 +283,29 @@ export const ProposalHeaderStage: m.Component<{ proposal: OffchainThread }> = {
           m.route.set(`/${proposal.chain || proposal.community}?stage=${proposal.stage}`);
         },
         label: offchainThreadStageToLabel(proposal.stage),
-        intent: proposal.stage === OffchainThreadStage.Discussion ? 'none'
-          : proposal.stage === OffchainThreadStage.ProposalInReview ? 'positive'
-            : proposal.stage === OffchainThreadStage.Voting ? 'positive'
-              : proposal.stage === OffchainThreadStage.Passed ? 'positive'
-                : proposal.stage === OffchainThreadStage.Failed ? 'negative'
-                  : proposal.stage === OffchainThreadStage.Abandoned ? 'negative' : 'none',
+        intent: proposal.stage === OffchainThreadStage.ProposalInReview ? 'positive'
+          : proposal.stage === OffchainThreadStage.Voting ? 'positive'
+            : proposal.stage === OffchainThreadStage.Passed ? 'positive'
+              : proposal.stage === OffchainThreadStage.Failed ? 'negative' : 'none',
       }),
     ]);
+  }
+};
+
+export const ProposalHeaderPollEditorButton: m.Component<{ proposal, openPollEditor: Function }, { isOpen: boolean }> = {
+  view: (vnode) => {
+    const { proposal, openPollEditor } = vnode.attrs;
+    return m(Button, {
+      class: 'ProposalHeaderPollEditorButton',
+      rounded: true,
+      compact: true,
+      disabled: !!proposal.offchainVotingEndsAt,
+      label: proposal.offchainVotingEndsAt ? 'Off-chain polling enabled' : 'Start off-chain polling',
+      onclick: (e) => {
+        e.preventDefault();
+        openPollEditor();
+      },
+    });
   }
 };
 
@@ -298,27 +315,11 @@ export const ProposalHeaderStageEditorButton: m.Component<{ openStageEditor: Fun
     return m(Button, {
       class: 'ProposalHeaderStageEditorButton',
       rounded: true,
-      size: 'xs',
-      label: 'Select stage',
+      compact: true,
+      label: 'Connect on-chain proposal',
       onclick: (e) => {
         e.preventDefault();
         openStageEditor();
-      },
-    });
-  }
-};
-
-export const ProposalHeaderPollEditorButton: m.Component<{ openPollEditor: Function }, { isOpen: boolean }> = {
-  view: (vnode) => {
-    const { openPollEditor } = vnode.attrs;
-    return m(Button, {
-      class: 'ProposalHeaderPollEditorButton',
-      rounded: true,
-      size: 'xs',
-      label: 'Create poll',
-      onclick: (e) => {
-        e.preventDefault();
-        openPollEditor();
       },
     });
   }

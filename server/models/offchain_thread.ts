@@ -125,6 +125,10 @@ export default (
       through: models.Collaboration,
       as: 'collaborators'
     });
+    models.OffchainThread.hasMany(models.OffchainReaction, {
+      foreignKey: 'thread_id',
+      as: 'reactions'
+    });
     models.OffchainThread.hasMany(models.Collaboration);
     models.OffchainThread.hasMany(models.ChainEntity, {
       foreignKey: 'thread_id',

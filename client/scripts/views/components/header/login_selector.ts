@@ -5,8 +5,7 @@ import m from 'mithril';
 import _ from 'underscore';
 import mixpanel from 'mixpanel-browser';
 
-import { Button, ButtonGroup, Icon, Icons, Menu, MenuItem, MenuDivider,
-  Popover } from 'construct-ui';
+import { Button, ButtonGroup, Icon, Icons, Menu, MenuItem, MenuDivider, Popover } from 'construct-ui';
 
 import app from 'state';
 import { AddressInfo, ChainBase, ChainInfo, CommunityInfo } from 'models';
@@ -24,6 +23,9 @@ import SelectAddressModal from 'views/modals/select_address_modal';
 import Token from 'controllers/chain/ethereum/token/adapter';
 import AddressSwapper from 'views/components/addresses/address_swapper';
 import { linkExistingAddressToChainOrCommunity, setActiveAccount } from 'controllers/app/login';
+import {
+  CustomPencilIcon, CustomCommentIcon, CustomLogoutIcon, CustomBellIcon, CustomUserIcon, CustomEyeIcon, CustomWalletIcon
+} from 'views/mobile/mobile_icons';
 
 export const CHAINBASE_SHORT = {
   [ChainBase.CosmosSDK]: 'Cosmos',
@@ -102,10 +104,124 @@ export const CurrentCommunityLabel: m.Component<{}> = {
   }
 };
 
+export const LoginSelectorMenuLeft: m.Component<{
+  activeAddressesWithRole: any,
+  nAccountsWithoutRole: number,
+  isPrivateCommunity: boolean,
+  mobile?: boolean,
+}> = {
+  view: (vnode) => {
+    const { activeAddressesWithRole, nAccountsWithoutRole, isPrivateCommunity, mobile } = vnode.attrs;
+    return m(Menu, { class: 'LoginSelectorMenu' }, [
+      // address list
+      (app.chain || app.community) && [
+        activeAddressesWithRole.map((account) => m(MenuItem, {
+          class: 'switch-user',
+          align: 'left',
+          basic: true,
+          onclick: async (e) => {
+            await setActiveAccount(account);
+            m.redraw();
+          },
+          label: [
+            m(UserBlock, {
+              user: account,
+              selected: isSameAccount(account, app.user.activeAccount),
+              showRole: true,
+              compact: true
+            }),
+            // !account.profile?.name && m('.edit-profile-callout', [
+            //   'Set a display name'
+            // ]),
+          ],
+        })),
+        activeAddressesWithRole.length > 0 && m(MenuDivider),
+        activeAddressesWithRole.length > 0 && app.activeId() && m(MenuItem, {
+          onclick: () => {
+            const pf = app.user.activeAccount.profile;
+            if (app.chain) {
+              m.route.set(`/${app.activeId()}/account/${pf.address}`);
+            } else if (app.community) {
+              const a = app.user.activeAccount;
+              m.route.set(`/${app.activeId()}/account/${pf.address}?base=${pf.chain || a.chain.id}`);
+            }
+          },
+          label: m('.label-wrap', [ mobile && m(CustomEyeIcon), m('span', 'View profile') ]),
+        }),
+        activeAddressesWithRole.length > 0 && app.activeId() && m(MenuItem, {
+          onclick: (e) => {
+            e.preventDefault();
+            app.modals.create({
+              modal: EditProfileModal,
+              data: {
+                account: app.user.activeAccount,
+                refreshCallback: () => m.redraw(),
+              },
+            });
+          },
+          label: m('.label-wrap', [ mobile && m(CustomPencilIcon), m('span', 'Edit profile') ]),
+        }),
+        !isPrivateCommunity && m(MenuItem, {
+          onclick: () => app.modals.create({
+            modal: SelectAddressModal,
+          }),
+          label: m('.label-wrap', [
+            mobile && m(CustomWalletIcon),
+            m('span', nAccountsWithoutRole > 0
+              ? `${pluralize(nAccountsWithoutRole, 'other address')}...`
+              : activeAddressesWithRole.length > 0
+                ? 'Manage addresses'
+                : 'Connect a new address')
+          ]),
+        }),
+      ],
+    ]);
+  }
+};
+
+export const LoginSelectorMenuRight: m.Component<{ mobile?: boolean }, {}> = {
+  view: (vnode) => {
+    const { mobile } = vnode.attrs;
+    return m(Menu, { class: 'LoginSelectorMenu' }, [
+      m(MenuItem, {
+        onclick: () => (app.activeChainId() || app.activeCommunityId())
+          ? m.route.set(`/${app.activeChainId() || app.activeCommunityId()}/notifications`)
+          : m.route.set('/notifications'),
+        label: m('.label-wrap', [ mobile && m(CustomBellIcon), m('span', 'Notification settings') ]),
+      }),
+      m(MenuItem, {
+        onclick: () => app.activeChainId()
+          ? m.route.set(`/${app.activeChainId()}/settings`)
+          : m.route.set('/settings'),
+        label: m('.label-wrap', [ mobile && m(CustomUserIcon), m('span', 'Account settings') ]),
+      }),
+      m(MenuDivider),
+      m(MenuItem, {
+        onclick: () => app.modals.create({ modal: FeedbackModal }),
+        label: m('.label-wrap', [ mobile && m(CustomCommentIcon), m('span', 'Send feedback') ]),
+      }),
+      m(MenuItem, {
+        onclick: () => {
+          $.get(`${app.serverUrl()}/logout`).then(async () => {
+            await initAppState();
+            notifySuccess('Logged out');
+            m.redraw();
+          }).catch((err) => {
+            // eslint-disable-next-line no-restricted-globals
+            location.reload();
+          });
+          mixpanel.reset();
+        },
+        label: m('.label-wrap', [ mobile && m(CustomLogoutIcon), m('span', 'Logout') ]),
+      }),
+    ]);
+  }
+};
+
 const LoginSelector: m.Component<{
   small?: boolean
 }, {
-  profileLoadComplete: boolean
+  profileLoadComplete: boolean,
 }> = {
   view: (vnode) => {
     const { small } = vnode.attrs;
@@ -147,29 +263,32 @@ const LoginSelector: m.Component<{
     const joiningChain = joiningChainInfo?.id;
     const joiningCommunity = app.activeCommunityId();
 
-    const samebaseAddresses = app.user.addresses.reduce((arr: AddressInfo[], current: AddressInfo) => {
-      // add all addresses if joining a community
-      const joiningBase = joiningChainInfo?.base;
-      if (!joiningBase) return [...arr, current];
+    let samebaseAddresses: AddressInfo[];
 
-      // skip already existing items
-      if (arr.find((item) => {
-        if (joiningBase === ChainBase.Substrate) {
-          return AddressSwapper({
-            address: item.address, currentPrefix: 42
-          }) === AddressSwapper({
-            address: current.address, currentPrefix: 42
-          });
-        } else {
-          return item.address === current.address;
+    // add all addresses if joining a community
+    const joiningBase = joiningChainInfo?.base;
+    if (!joiningBase) {
+      samebaseAddresses = app.user.addresses;
+    } else {
+      samebaseAddresses = [];
+      for (const addressInfo of app.user.addresses) {
+        // add all items on same base as joining chain
+        const addressBase = app.config.chains.getById(addressInfo.chain)?.base;
+        if (addressBase === joiningBase) {
+          // ensure doesn't already exist
+          const addressExists = !!samebaseAddresses.find((prev) => joiningBase === ChainBase.Substrate
+            ? AddressSwapper({
+              address: prev.address, currentPrefix: 42
+            }) === AddressSwapper({
+              address: addressInfo.address, currentPrefix: 42
+            })
+            : prev.address === addressInfo.address);
+          if (!addressExists) {
+            samebaseAddresses.push(addressInfo);
+          }
         }
-      })) return arr;
-
-      // add all items on same base as joining chain if not already existing
-      const currentBase = app.config.chains.getById(current.chain)?.base;
-      if (currentBase === joiningBase) return [...arr, current];
-      else return arr;
-    }, []);
+      }
+    }
 
     return m(ButtonGroup, { class: 'LoginSelector' }, [
       (app.chain || app.community)
@@ -266,65 +385,9 @@ const LoginSelector: m.Component<{
               })
             ],
           }),
-          content: m(Menu, { class: 'LoginSelectorMenu' }, [
-            // address list
-            (app.chain || app.community) && [
-              activeAddressesWithRole.map((account) => m(MenuItem, {
-                class: 'switch-user',
-                align: 'left',
-                basic: true,
-                onclick: async (e) => {
-                  const currentActive = app.user.activeAccount;
-                  await setActiveAccount(account);
-                  m.redraw();
-                },
-                label: [
-                  m(UserBlock, {
-                    user: account,
-                    selected: isSameAccount(account, app.user.activeAccount),
-                    showRole: true,
-                    compact: true
-                  }),
-                  // !account.profile?.name && m('.edit-profile-callout', [
-                  //   'Set a display name'
-                  // ]),
-                ],
-              })),
-              activeAddressesWithRole.length > 0 && m(MenuDivider),
-              activeAddressesWithRole.length > 0 && app.activeId() && m(MenuItem, {
-                onclick: () => {
-                  const pf = app.user.activeAccount.profile;
-                  if (app.chain) {
-                    m.route.set(`/${app.activeId()}/account/${pf.address}`);
-                  } else if (app.community) {
-                    const a = app.user.activeAccount;
-                    m.route.set(`/${app.activeId()}/account/${pf.address}?base=${pf.chain || a.chain.id}`);
-                  }
-                },
-                label: 'View profile',
-              }),
-              activeAddressesWithRole.length > 0 && app.activeId() && m(MenuItem, {
-                onclick: (e) => {
-                  e.preventDefault();
-                  app.modals.create({
-                    modal: EditProfileModal,
-                    data: {
-                      account: app.user.activeAccount,
-                      refreshCallback: () => m.redraw(),
-                    },
-                  });
-                },
-                label: 'Edit profile',
-              }),
-              !isPrivateCommunity && m(MenuItem, {
-                onclick: () => app.modals.create({
-                  modal: SelectAddressModal,
-                }),
-                label: nAccountsWithoutRole > 0 ? `${pluralize(nAccountsWithoutRole, 'other address')}...`
-                  : activeAddressesWithRole.length > 0 ? 'Manage addresses' : 'Connect a new address',
-              }),
-            ],
-          ]),
+          content: m(LoginSelectorMenuLeft, {
+            activeAddressesWithRole, nAccountsWithoutRole, isPrivateCommunity
+          }),
         }),
       m(Popover, {
         hasArrow: false,
@@ -344,39 +407,7 @@ const LoginSelector: m.Component<{
             m(Icon, { name: Icons.USER })
           ],
         }),
-        content: m(Menu, { class: 'LoginSelectorMenu' }, [
-          m(MenuItem, {
-            onclick: () => (app.activeChainId() || app.activeCommunityId())
-              ? m.route.set(`/${app.activeChainId() || app.activeCommunityId()}/notifications`)
-              : m.route.set('/notifications'),
-            label: 'Notification settings'
-          }),
-          m(MenuItem, {
-            onclick: () => app.activeChainId()
-              ? m.route.set(`/${app.activeChainId()}/settings`)
-              : m.route.set('/settings'),
-            label: 'Account settings'
-          }),
-          m(MenuDivider),
-          m(MenuItem, {
-            onclick: () => app.modals.create({ modal: FeedbackModal }),
-            label: 'Send feedback',
-          }),
-          m(MenuItem, {
-            onclick: () => {
-              $.get(`${app.serverUrl()}/logout`).then(async () => {
-                await initAppState();
-                notifySuccess('Logged out');
-                m.redraw();
-              }).catch((err) => {
-                // eslint-disable-next-line no-restricted-globals
-                location.reload();
-              });
-              mixpanel.reset();
-            },
-            label: 'Logout'
-          }),
-        ]),
+        content: m(LoginSelectorMenuRight),
       }),
     ]);
   }

@@ -49,9 +49,12 @@ $text-color-primary: $primary-bg-color;
 // background colors
 
 $background-color-white: #ffffff;
+$background-color-black-hover: tint(#484744, 30%);
 $background-color-white-hover: tint($primary-bg-color, 96.5%);
+$background-color-black: #262523;
+$background-color-white-hover-0: tint(#FAFAFA, 10%);
 $background-color-light: desaturate(tint($primary-bg-color, 90%), 12%);
-$background-color-light-hover: desaturate(tint($primary-bg-color, 83.5%), 12%);
+$background-color-light-hover: desaturate(tint($primary-bg-color, 86.5%), 12%);
 $background-color-medium-light: desaturate(tint($primary-bg-color, 75%), 25%);
 
 $background-color-light-positive: #cce8cc;
@@ -83,6 +86,11 @@ $text-size-item-header: 19px;
 $text-size-item-meta: 17px;
 $listing-left-flex: 6;
 $listing-right-flex: 1;
+
+//
+// mobile specs
+
+$text-size-mobile-header: 22px;
 
 @mixin listing-row-base {
     display: flex;
@@ -217,7 +225,7 @@ $listing-right-flex: 1;
         width: 100%;
         max-width: none;
     }
-    @include lg-min {
+    @include xl-min {
         width: calc(33% - 24px);
     }
     // padding
@@ -233,4 +241,30 @@ $listing-right-flex: 1;
     }
     // text
     overflow-wrap: break-word;
+}
+
+@mixin gradientTabs() {
+    .cui-tabs-item {
+        padding: 13px 15px 7px;
+        margin: 0 !important;
+        color: $text-color-light;
+    }
+    .cui-tabs-item:hover {
+        color: #666666;
+        border-width: 2px;
+        border-color: #DDDDDD;
+        border-style: solid;
+        border-top: 0;
+        border-left: 0;
+        border-right: 0;
+    }
+    .cui-tabs-item.cui-active {
+        color: $text-color-black;
+        border-width: 2px;
+        border-style: solid;
+        border-top: 0;
+        border-left: 0;
+        border-right: 0;
+        border-image: linear-gradient(to right, #6086d1, #b37dba) 1;
+    }
 }

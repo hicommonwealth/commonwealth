@@ -1,0 +1,12 @@
+@import "client/styles/shared";
+
+.FooterNavsLinks.mb-2 {
+  a.text-gray-500 {
+    color: $text-color-black;
+    text-decoration: none;
+    cursor: pointer;
+    &:hover {
+      // text-decoration: underline;
+    }
+  }
+}

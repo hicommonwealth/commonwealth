@@ -9,49 +9,55 @@ import { ProposalType } from 'identifiers';
 import { ChainClass, ChainBase } from 'models';
 import NewThreadModal from 'views/modals/new_thread_modal';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import Substrate from 'controllers/chain/substrate/main';
 import Token from 'controllers/chain/ethereum/token/adapter';
 
-const getNewProposalMenu = (candidates: Array<[SubstrateAccount, number]>) => {
+export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]>, mobile?: boolean) => {
   const activeAccount = app.user.activeAccount;
   return [
     m(MenuItem, {
       onclick: () => { m.route.set(`/${app.activeId()}/new/thread`); },
       label: 'New thread',
+      iconLeft: mobile ? Icons.PLUS : undefined,
     }),
     (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
+      && !mobile
       && m(MenuDivider),
     app.chain?.base === ChainBase.CosmosSDK && m(MenuItem, {
       onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
         type: ProposalType.CosmosProposal
       }),
-      label: 'New text proposal'
+      label: 'New text proposal',
+      iconLeft: mobile ? Icons.PLUS : undefined,
     }),
     app.chain?.base === ChainBase.Substrate && app.chain?.class !== ChainClass.Plasm && [
       m(MenuItem, {
         onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
           type: ProposalType.SubstrateTreasuryProposal
         }),
-        label: 'New treasury proposal'
+        label: 'New treasury proposal',
+        iconLeft: mobile ? Icons.PLUS : undefined,
       }),
       m(MenuItem, {
         onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
           type: ProposalType.SubstrateDemocracyProposal
         }),
-        label: 'New democracy proposal'
+        label: 'New democracy proposal',
+        iconLeft: mobile ? Icons.PLUS : undefined,
       }),
       m(MenuItem, {
         class: activeAccount && (activeAccount as any).isCouncillor ? '' : 'disabled',
         onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
           type: ProposalType.SubstrateCollectiveProposal
         }),
-        label: 'New council motion'
+        label: 'New council motion',
+        iconLeft: mobile ? Icons.PLUS : undefined,
       }),
       m(MenuItem, {
         onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
           type: ProposalType.SubstrateBountyProposal,
         }),
-        label: 'New bounty proposal'
+        label: 'New bounty proposal',
+        iconLeft: mobile ? Icons.PLUS : undefined,
       }),
     ],
   ];
@@ -59,6 +65,9 @@ const getNewProposalMenu = (candidates: Array<[SubstrateAccount, number]>) => {
 
 export const MobileNewProposalButton: m.Component<{}, { councilCandidates?: Array<[SubstrateAccount, number]> }> = {
   view: (vnode) => {
+    if (!app.isLoggedIn()) return;
+    if (!app.chain && !app.community) return;
+    if (!app.activeId()) return;
     return m('.NewProposalButton.MobileNewProposalButton', [
       m(PopoverMenu, {
         class: 'new-proposal-button-popover',

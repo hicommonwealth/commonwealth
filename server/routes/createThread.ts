@@ -20,6 +20,7 @@ export const Errors = {
   LinkMissingTitleOrUrl: 'Links must include a title and URL',
   UnsupportedKind: 'Only forum threads, questions, and requests supported',
   InsufficientTokenBalance: 'Users need to hold some of the community\'s tokens to post',
+  CouldNotFetchTokenBalance: 'Unable to fetch user\'s token balance',
 };
 
 const createThread = async (
@@ -44,8 +45,13 @@ const createThread = async (
       },
     });
     if (isAdmin.length === 0) {
-      const userHasBalance = await tokenBalanceCache.hasToken(chain.id, req.body.address);
-      if (!userHasBalance) return next(new Error(Errors.InsufficientTokenBalance));
+      try {
+        const userHasBalance = await tokenBalanceCache.hasToken(chain.id, req.body.address);
+        if (!userHasBalance) return next(new Error(Errors.InsufficientTokenBalance));
+      } catch (e) {
+        log.error(`hasToken failed: ${e.message}`);
+        return next(new Error(Errors.CouldNotFetchTokenBalance));
+      }
     }
   }
 

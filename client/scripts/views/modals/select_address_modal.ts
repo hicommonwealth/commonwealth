@@ -5,7 +5,7 @@ import $ from 'jquery';
 import { Tag, Button, Icon, Icons } from 'construct-ui';
 
 import app from 'state';
-import { Account, RoleInfo } from 'models';
+import { Account, RoleInfo, ChainBase } from 'models';
 import { UserBlock } from 'views/components/widgets/user';
 import { articlize, isSameAccount, formatAsTitleCase } from 'helpers';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
@@ -79,6 +79,8 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
       });
     };
 
+    // const chainbase = (app.chain?.meta?.chain?.base.length != 0) ? app.chain?.meta?.chain?.base : ChainBase.Ethereum;
+
     return m('.SelectAddressModal', [
       m('.compact-modal-title', [
         m('h3', 'Manage addresses'),
@@ -86,13 +88,10 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
       m('.compact-modal-body', [
         activeAccountsByRole.length === 0 ? m('.select-address-placeholder', [
           m('p', [
-            `Connect ${articlize(app.chain?.meta?.chain.name || 'Web3')} address to participate in this community. `,
+            `Connect ${articlize(app.chain?.meta?.chain.name || 'Web3')} address to join this community. `,
           ]),
           m('p', [
-            'This address will serve as your identity when you post, comment, or vote.'
-          ]),
-          m('p', [
-            'You may need to download a Web3 wallet to get started:'
+            'Select a wallet below to continue:',
           ]),
         ]) : m('.select-address-options', [
           activeAccountsByRole.map(([account, role], index) => role && m('.select-address-option.existing', [

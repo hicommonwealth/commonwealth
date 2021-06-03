@@ -16,6 +16,7 @@ const getAddressStatus = async (models, req: Request, res: Response, next: NextF
   if (!req.body.chain) {
     return next(new Error(Errors.NeedChain));
   }
+
   const chain = await models.Chain.findOne({
     where: { id: req.body.chain }
   });

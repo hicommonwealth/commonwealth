@@ -9,7 +9,7 @@ import { Button, Input, TextArea, Spinner, Checkbox } from 'construct-ui';
 
 import { initAppState } from 'app';
 import { isSameAccount, link } from 'helpers';
-import { AddressInfo, Account, ChainBase, ChainInfo, IWebWallet } from 'models';
+import { AddressInfo, Account, ChainBase, IWebWallet } from 'models';
 import app, { ApiStatus } from 'state';
 
 import { updateActiveAddresses, createUserWithAddress, setActiveAccount } from 'controllers/app/login';
@@ -21,8 +21,6 @@ import CodeBlock from 'views/components/widgets/code_block';
 import User from 'views/components/widgets/user';
 import AvatarUpload from 'views/components/avatar_upload';
 import AddressSwapper from 'views/components/addresses/address_swapper';
-import Token from 'controllers/chain/ethereum/token/adapter';
-import { slugify } from 'utils';
 
 enum LinkNewAddressSteps {
   Step1VerifyWithCLI,
@@ -272,10 +270,6 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
           if (app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length === 0) {
             app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
           }
-
-          if (app.chain && (app.chain as Token).isToken) {
-            await (app.chain as Token).activeAddressHasToken(app.user.activeAccount.address);
-          }
           // TODO: set the address as default
         } catch (e) {
           console.trace(e);
@@ -307,6 +301,7 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
         if (app.community) {
           await updateActiveAddresses();
         } else if (app.chain) {
+          // TODO: this breaks when the user action creates a new token forum
           const chain = app.user.selectedNode
             ? app.user.selectedNode.chain
             : app.config.nodes.getByChain(app.activeChainId())[0].chain;

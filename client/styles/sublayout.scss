@@ -1,5 +1,38 @@
 @import 'client/styles/shared';
 
+@mixin narrowBrowserHeader {
+    .sublayout-header-right {
+        > .cui-button > .cui-button-label > .User {
+            .user-display-name {
+                display: none;
+            }
+            .user-avatar {
+                margin: 0px;
+                margin-right: 0px;
+                position: relative;
+                top: 2px;
+            }
+        }
+        .NewProposalButton {
+            .cui-button {
+                padding: 0 10px;
+                .cui-button-label {
+                    top: 2px;
+                }
+            }
+        }
+    }
+    .role-icon {
+        display: none;
+    }
+    .LoginSelectorMenu .user-display-name {
+        display: inline;
+    }
+    .cui-button-label .cui-icon-user {
+        margin-right: 0;
+    }
+}
+
 .Sublayout {
     display: block;
 
@@ -12,6 +45,10 @@
         padding: 0 $layout-padding;
         @include xs-max {
             padding: 0 $layout-padding-xs;
+        }
+        &.flex-center {
+            display: flex;
+            justify-content: center;
         }
     }
     .sublayout-sidebar-col {
@@ -65,7 +102,14 @@
         padding: 24px 0 22px;
         padding-right: 20px;
         @include md-max {
+            @include narrowBrowserHeader();
             padding-right: 0;
+            // .sublayout-header-heading {
+            //     display: none !important;
+            // }
+        }
+        @include lg-max {
+            @include narrowBrowserHeader();
         }
         .hide-sidebar & {
             padding-right: 0;
@@ -82,17 +126,19 @@
         }
 
         .sublayout-header-left {
+            display: flex;
+            align-items: center;
+            margin-top: 0 !important;
             flex: 3;
             white-space: nowrap;
+            max-width: min-content;
             > .ChainIcon,
             > .CommunityIcon {
                 display: inline-block;
                 margin-right: 14px;
                 position: relative;
-                top: 4px;
                 .no-image {
                     position: relative;
-                    top: -9px;
                 }
             }
             .CommunitySelector,
@@ -107,7 +153,7 @@
             h4.sublayout-header-heading {
                 font-size: 1.15rem;
                 font-weight: 600;
-                margin: 7px 17px 0 0;
+                margin: 7px 0 0 0;
                 white-space: nowrap;
                 a {
                     color: $text-color-black;
@@ -132,6 +178,7 @@
         }
         .sublayout-header-right {
             display: flex;
+            align-items: center;
             flex: 1;
             text-align: right;
             flex-direction: row-reverse;

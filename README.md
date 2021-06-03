@@ -24,6 +24,11 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
 nvm install
 ```
 
+- if for some reason, nvm still doesnt work, try using
+````
+    source ~/.nvm/nvm.sh
+```
+
 - Use the configured version of node: `nvm use`
 - Install packages: `yarn`
     - This is equivalent to `yarn update`
@@ -62,7 +67,6 @@ Environment variables used for external services include:
 - SENDGRID_API_KEY: for sending emails, email login, etc.
 - NODE_URL: for server-side proposal archiving (usually ws://testnet2.edgewa.re:9944, may be deprecated soon)
 - DATABASE_URL (set by Heroku)
-- PRODUCTION_APP (Heroku App Name)
 - JWT_SECRET
 - SESSION_SECRET
 - MAGIC_API_KEY
@@ -80,7 +84,7 @@ We also use certain environment variables to configure the application itself:
 To download and restore the production database, and run migrations:
 
 ```
-pg_dump $(heroku config:get DATABASE_URL --app PRODUCTION_APP) --verbose --exclude-table-data="public.\"Sessions\"" --exclude-table-data="public.\"DiscussionDrafts\"" --exclude-table-data="public.\"LoginTokens\"" --exclude-table-data="public.\"Notifications\"" --exclude-table-data="public.\"SocialAccounts\"" --exclude-table-data="public.\"Webhooks\"" --no-privileges --no-owner -f latest.dump
+pg_dump $(heroku config:get DATABASE_URL --app commonwealthapp) --verbose --exclude-table-data="public.\"Sessions\"" --exclude-table-data="public.\"DiscussionDrafts\"" --exclude-table-data="public.\"LoginTokens\"" --exclude-table-data="public.\"Notifications\"" --exclude-table-data="public.\"SocialAccounts\"" --exclude-table-data="public.\"Webhooks\"" --exclude-table-data="public.\"ChainEvents\"" --no-privileges --no-owner -f latest.dump
 
 npx sequelize db:drop
 npx sequelize db:create

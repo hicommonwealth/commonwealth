@@ -41,7 +41,8 @@ export enum ChainNetwork {
   Clover = 'clover',
   HydraDX = 'hydradx',
   Yearn = 'yearn',
-  Fei = 'fei'
+  Fei = 'fei',
+  Crust = 'crust',
 }
 
 // This function returns a default chain for a chainbase
@@ -81,6 +82,7 @@ export enum ChainClass {
   Commonwealth = 'commonwealth',
   Yearn = 'yearn',
   Fei = 'fei',
+  Crust = 'crust',
   ERC20 = 'erc20',
 }
 
@@ -98,7 +100,6 @@ export enum OffchainThreadStage {
   Voting = 'voting',
   Passed = 'passed',
   Failed = 'failed',
-  Abandoned = 'abandoned',
 }
 
 export enum OffchainVoteOptions {

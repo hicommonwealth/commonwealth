@@ -5,7 +5,6 @@ import EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import { ChainBase, IChainAdapter, NodeInfo } from 'models';
 
-import ChainEntityController from 'controllers/server/chain_entities';
 import { IApp } from 'state';
 
 import EthereumTokenChain from './chain';
@@ -56,6 +55,7 @@ export default class Token extends IChainAdapter<EthereumCoin, EthereumAccount> 
 
   public async activeAddressHasToken(activeAddress?: string) {
     if (!activeAddress) return false;
+    this.hasToken = false;
     const account = this.accounts.get(activeAddress);
     const balance = await account.tokenBalance(this.contractAddress);
     this.hasToken = balance && !balance.isZero();

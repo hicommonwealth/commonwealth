@@ -24,8 +24,10 @@ import QuillEditor from 'views/components/quill_editor';
 import TopicSelector from 'views/components/topic_selector';
 import EditProfileModal from 'views/modals/edit_profile_modal';
 
+import Token from 'controllers/chain/ethereum/token/adapter';
 import QuillFormattedText from './quill_formatted_text';
 import MarkdownFormattedText from './markdown_formatted_text';
+
 
 interface IThreadForm {
   topicName?: string;
@@ -152,6 +154,7 @@ const newThread = async (
 
   let result;
   try {
+    // see if app.chain.network is existing in network lists and if app.chain.isToken
     result = await app.threads.create(
       author.address,
       kind,
