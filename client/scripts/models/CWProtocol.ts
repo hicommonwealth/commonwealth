@@ -24,6 +24,7 @@ export class CWProject {
   public readonly threshold: EthereumCoin;
   public readonly totalFunding: EthereumCoin;
   public readonly curatorFee: number;
+  public readonly address: string;
 
   constructor(
     name,
@@ -41,6 +42,7 @@ export class CWProject {
     totalFunding,
     bToken,
     cToken,
+    projAddress
   ) {
     this.name = name;
     this.description = description;
@@ -57,6 +59,7 @@ export class CWProject {
     this.totalFunding = totalFunding;
     this.bToken = bToken;
     this.cToken = cToken;
+    this.address = projAddress;
   }
 }
 

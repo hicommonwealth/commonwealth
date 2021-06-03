@@ -80,13 +80,13 @@ const InProgressActionCard: m.Component<{project: CWProject, protocol: any}, {am
           } else {
             const author = app.user.activeAccount.address;
             vnode.state.submitting = isBacker ? 1 : 2;
-            let txSuccessed = false;
-            try {
-              txSuccessed = await protocol.backOrCurate(vnode.state.amount, project.projectHash, isBacker, author);
-            } catch {
-              txSuccessed = false;
-            }
-            vnode.state.error = txSuccessed ? '' : 'Failed to do this action';
+            const res = await protocol.backOrCurate(
+              vnode.state.amount,
+              project,
+              isBacker,
+              author
+            );
+            vnode.state.error = res.error;
             vnode.state.submitting = 0;
           }
           m.redraw();

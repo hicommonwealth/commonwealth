@@ -13,8 +13,7 @@ import app from 'state';
 const floatRegex = /^[0-9]*\.?[0-9]*$/;
 
 const NewProjectForm = {
-  form: {
-  },
+  form: {},
   view: (vnode) => {
     const callback = vnode.attrs.callback;
     const author = app.user.activeAccount;
@@ -187,7 +186,6 @@ const NewProjectForm = {
               label: submitting ? 'Createing now' : 'Create a new Project',
               onclick: async(e) => {
                 e.preventDefault();
-
                 if (vnode.state.form.threshold.toString()  === new BN(0).toString()) {
                   vnode.state.error = {
                     message: 'Can not be zero',
@@ -219,7 +217,6 @@ const NewProjectForm = {
 
 const NewProjectPage: m.Component<{ type }, { submitting: boolean, createError: string }> = {
   view: (vnode) => {
-    vnode.state.createError = ''
     if (!app.chain) {
       return m(PageLoading);
     }
@@ -229,7 +226,7 @@ const NewProjectPage: m.Component<{ type }, { submitting: boolean, createError: 
     }
 
     return m(Sublayout, {
-      class: 'NewProjectPage',
+      class: 'NewProposalPage',
       title: 'Create a new Project',
       showNewProposalButton: true,
     }, [
@@ -238,29 +235,23 @@ const NewProjectPage: m.Component<{ type }, { submitting: boolean, createError: 
           callback: async(projectData: any) => {
             const author = app.user.activeAccount.address;
             vnode.state.submitting = true;
-
-            let txSuccessed = false;
-            try {
-              txSuccessed = await protocol.createProject(
-                projectData.name,
-                projectData.description,
-                author,
-                projectData.beneficiary,
-                projectData.threshold,
-                parseFloat(projectData.curatorFee),
-                parseFloat(projectData.deadline),
-              );
-            } catch {
-              txSuccessed = false;
-            }
-
-            vnode.state.createError = txSuccessed ? '' : 'Failed to create this project';
+            const res = await protocol.createProject(
+              projectData.name,
+              projectData.description,
+              author,
+              projectData.beneficiary,
+              projectData.threshold,
+              parseFloat(projectData.curatorFee),
+              parseFloat(projectData.deadline),
+            );
+            vnode.state.createError = res.error;
             vnode.state.submitting = false;
             m.redraw();
           },
           submitting: vnode.state.submitting,
         }),
-        vnode.state.createError !== '' && m('p.error-text', vnode.state.createError)
+        // vnode.state.createError !== '' && m('p.error-text', vnode.state.createError)
+        m('p.error-text', vnode.state.createError)
       ])
     ]);
   }

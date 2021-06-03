@@ -75,15 +75,13 @@ const FailedActionCard: m.Component<{
             } else {
               const author = app.user.activeAccount.address;
               vnode.state.submitting = true;
-
-              let txSuccessed = false;
-              try {
-                txSuccessed = await protocol.redeemTokens(vnode.state.amount, project.projectHash, true, author);
-              } catch {
-                txSuccessed = false;
-              }
-
-              vnode.state.error = txSuccessed ? '' : 'Failed to do this action';
+              const res = await protocol.redeemTokens(
+                vnode.state.amount,
+                true,
+                project,
+                author
+              );
+              vnode.state.error = res.error;
               vnode.state.submitting = false;
             }
             m.redraw();

@@ -13,22 +13,32 @@ import ActionModule from 'views/components/commonwealth/actions/action_card';
 
 function secondsToDhms(seconds) {
   seconds = Number(seconds);
-  var d = Math.floor(seconds / (3600*24));
-  var h = Math.floor(seconds % (3600*24) / 3600);
-  var m = Math.floor(seconds % 3600 / 60);
-  var s = Math.floor(seconds % 60);
-  
-  var dDisplay = d > 0 ? d + (d == 1 ? " day, " : " days, ") : "";
-  var hDisplay = h > 0 ? h + (h == 1 ? " hour, " : " hours, ") : "";
-  var mDisplay = m > 0 ? m + (m == 1 ? " minute, " : " minutes, ") : "";
-  var sDisplay = s > 0 ? s + (s == 1 ? " second" : " seconds") : "";
-  return dDisplay + hDisplay + mDisplay + sDisplay;
+
+  if (seconds >= 0) {
+    var d = Math.floor(seconds / (3600*24));
+    var h = Math.floor(seconds % (3600*24) / 3600);
+    var m = Math.floor(seconds % 3600 / 60);
+    var s = Math.floor(seconds % 60);
+    
+    var dDisplay = d > 0 ? d + (d == 1 ? " day, " : " days, ") : "";
+    var hDisplay = h > 0 ? h + (h == 1 ? " hour, " : " hours, ") : "";
+    var mDisplay = m > 0 ? m + (m == 1 ? " minute, " : " minutes, ") : "";
+    var sDisplay = s > 0 ? s + (s == 1 ? " second" : " seconds") : "";
+    return dDisplay + hDisplay + mDisplay + sDisplay;
+  }
+  return '0 seconds';
 }
   
-const ProjectContentModule: m.Component<{project: CWProject, leftInSeconds: number}, {}> = {
-  oncreate: (vnode) => {
+const ProjectContentModule: m.Component<{
+  project: CWProject,
+  leftInSeconds: number,
+  forceUpdateStatus: () => void,
+}, {}> = {
+  oncreate: async(vnode) => {
     if (vnode.attrs.leftInSeconds > 0) {
       setTimeout(() => { m.redraw(); }, 1000);
+    } else {
+      await vnode.attrs.forceUpdateStatus();
     }
   },
   view: (vnode) => {
@@ -40,7 +50,7 @@ const ProjectContentModule: m.Component<{project: CWProject, leftInSeconds: numb
       m('div.project-name', project.name),
       m('div.project-text', [
         m('span', 'A project by created by'),
-        m('span.bold', `${project.beneficiary}`),
+        m('span.bold', ` ${project.beneficiary}`),
       ]),
       m('div.project-description', { style: textColorStyle}, leftTime),
       m('div.project-description', project.description)
@@ -104,7 +114,15 @@ const ViewProjectPage: m.Component<{
     }, [
       m('.container', [
         m('.row', [
-          m(ProjectContentModule, { project, leftInSeconds }),
+          m(ProjectContentModule, { 
+            project,
+            leftInSeconds,
+            forceUpdateStatus: async() => {
+              vnode.state.initialized = false;
+              await protocol.syncProjects(); 
+              vnode.state.initialized = true;
+            }
+          }),
           m(ActionModule, { project, protocol, backers, curators })
         ]),
         m('.row .members-card', [

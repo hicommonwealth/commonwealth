@@ -19,8 +19,8 @@ const nodes = [
   // [ 'wss://mainnet.infura.io/ws', 'ethereum' ],
   [ 'wss://kovan.infura.io/ws', 'ethereum-kovan' ],   // ethereum kovan
   [ 'ws://127.0.0.1:7545', 'ethereum-local' ],  // ethereum local
-  [ 'wss://kovan.infura.io/ws', 'common-protocol-kovan', '0xa995cc3127BDB3E26B3c12c317E3Fa170424f0Eb' ],   // CWP using kovan etherum
-  [ 'ws://127.0.0.1:7545', 'common-protocol-local' ],  // CWP using local ethreum
+  [ 'wss://kovan.infura.io/ws', 'common-protocol-kovan', '0x129daa4C94694d082266778E63E9DF21B7FC11C2' ],   // CWP using kovan etherum
+  [ 'ws://127.0.0.1:7545', 'common-protocol-local', '0x5FbDB2315678afecb367f032d93F642f64180aa3' ],  // CWP using local ethreum
   // [ '18.223.143.102:9944', 'edgeware-testnet' ],
   // [ '157.230.218.41:9944', 'edgeware-testnet' ],
   // [ '157.230.125.18:9944', 'edgeware-testnet' ],

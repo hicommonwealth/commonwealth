@@ -9,16 +9,16 @@
     @include xs-max {
         width: initial;
     }
+    .error-text {
+        color: red;
+        margin-top: 5px;
+    }
 }
 
 .NewProposalForm {
     max-width: 85%;
     textarea {
         min-height: 200px;
-    }
-    .error-text {
-        color: red;
-        margin-top: 5px;
     }
     .council-motion-description {
         margin-top: -12px;

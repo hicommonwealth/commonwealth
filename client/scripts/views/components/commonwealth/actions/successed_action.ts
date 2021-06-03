@@ -103,32 +103,22 @@ const SuccsedActionCard: m.Component<{
       m(ActionModule, {
         callback: async(isWithdraw: boolean) => {
           if (!app.user.activeAccount) return;
-
           const author = app.user.activeAccount.address;
           vnode.state.submitting = isWithdraw ? 1 : 2;
-
-          let txSuccessed = false;
+          let res;
           if (isWithdraw) {
-            try {
-              txSuccessed = await protocol.withdraw(project.projectHash, author);
-            } catch {
-              txSuccessed = false;
-            }
+            res = await protocol.withdraw(project, author);
           } else if (!vnode.state.amount || vnode.state.amount.toString() === new BN(0).toString()) {
             vnode.state.error = 'Please enter the amount';
           } else {
-            try {
-              txSuccessed = await protocol.redeemTokens(
-                vnode.state.amount,
-                project.projectHash,
-                false,
-                author
-              );
-            } catch {
-              txSuccessed = false;
-            }
+            res = await protocol.redeemTokens(
+              vnode.state.amount,
+              false,
+              project,
+              author
+            );
           }
-          vnode.state.error = txSuccessed ? '' : 'Failed to do this action';
+          vnode.state.error = res.error;
           vnode.state.submitting = 0;
           m.redraw();
         },

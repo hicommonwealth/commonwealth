@@ -7,12 +7,31 @@ import { EthereumCoin } from 'adapters/chain/ethereum/types';
 
 import { CwProtocol as CWProtocolContract } from 'CWProtocol';
 import { CwProjectFactory as CWProjectFactory } from 'CwProjectFactory';
-import { CwProject as CWProject } from 'CwProject';
-import { CWProject as Project } from 'models/CWProtocol';
+import { CwProject as CWProjectContract } from 'CwProject';
+import { CWProject } from 'models/CWProtocol';
 
+export const EtherAddress = '0x0000000000000000000000000000000000000000';
 export default class CommonwealthAPI extends ContractApi<CWProtocolContract> {
+  private _projectAPIs;
+
+  public async init() {
+    this._projectAPIs = {};
+    super.init();
+  }
+  
+  public getProjectAPI(projAddress: string) {
+    if (Object.keys(this._projectAPIs).includes(projAddress)) {
+      return this._projectAPIs[projAddress];
+    }
+    return null;
+  }
+
+  public setProjectAPI(projAddress: string, projectAPI: ContractApi<CWProjectContract>) {
+    this._projectAPIs[projAddress] = projectAPI;
+  }
+
   public async getProjectDetails(projAddress: string) {
-    const projContract: CWProject = await CWProjectFactory.connect(projAddress, this.Provider);
+    const projContract: CWProjectContract = await CWProjectFactory.connect(projAddress, this.Provider);
 
     const name = await projContract.name();
     const ipfsHash = await projContract.ipfsHash();
@@ -45,7 +64,7 @@ export default class CommonwealthAPI extends ContractApi<CWProtocolContract> {
     const bToken = await projContract.bToken();
     const cToken = await projContract.cToken();
 
-    const newProj = new Project(
+    const newProj = new CWProject(
       utils.parseBytes32String(name),
       '',
       utils.parseBytes32String(ipfsHash),
@@ -61,79 +80,22 @@ export default class CommonwealthAPI extends ContractApi<CWProtocolContract> {
       new EthereumCoin('ETH', new BN(totalFunding.toString()), false), //totalFunding,
       bToken,
       cToken,
+      projAddress,
     );
     return newProj;
   }
 
   public async retrieveAllProjects() {
-    const projects: Project[] =  [];
+    const projects: CWProject[] =  [];
     const allProjectLenght = new BN((await this.Contract.allProjectsLength()).toString(), 10);
     if (allProjectLenght.gt(new BN(0))) {
       const projectAddresses = await this.Contract.getAllProjects();
       for (let i=0; i<projectAddresses.length; i++) {
-        const proj: Project = await this.getProjectDetails(projectAddresses[i]);
+        const proj: CWProject = await this.getProjectDetails(projectAddresses[i]);
         projects.push(proj);
       }
     }
     return projects;
-  }
-
-  public async backOrCurateWithEther(contract: CWProject, amount: number, isBacking: boolean, withEther: boolean) {
-    if (withEther) {
-      if (isBacking) {
-        // back logic
-        const backTx = await contract.backWithETH({value: amount});
-        const txReceipt = await backTx.wait();
-        return txReceipt.status === 1
-      } else {
-        // curate logic
-        const curateTx = await contract.curateWithETH({value: amount});
-        const txReceipt = await curateTx.wait();
-        return txReceipt.status === 1
-      }
-    } else {
-      // ERC20 token logic
-    }
-    return false;
-  }
-
-  public async redeemTokens(contract: CWProject, amount: number, isBToken: boolean, withEther: boolean) {
-
-    if (withEther) {
-      if (isBToken) {
-        // redeemBTokens
-        const redeemBTokenTx = await contract.redeemBToken('0x0000000000000000000000000000000000000000', amount);
-        const txReceipt = await redeemBTokenTx.wait();
-        return txReceipt.status === 1
-      } else {
-        // redeemCTokens
-        try {
-          const redeemCTokenTx = await contract.redeemCToken('0x0000000000000000000000000000000000000000', amount);
-          console.log('====>redeemCTokenTx', redeemCTokenTx);
-
-          const txReceipt = await redeemCTokenTx.wait();
-          console.log('====>redeemCTokenTx txReceipt', txReceipt);
-          return txReceipt.status === 1
-        } catch (error) {
-          console.log('======>2', error);
-        }
-        
-        
-        
-        
-      }
-    } else {
-      // ERC20 token logic
-    }
-
-    return false;
-  }
-
-  public async withdraw(contract: CWProject) {    
-    const withdrawTx = await contract.withdraw();
-    const txReceipt = await withdrawTx.wait();
-    console.log('====>withdrawTx txReceipt', txReceipt);
-    return txReceipt.status === 1
   }
 
   public async getTokenHolders(tokenAddress: string) {
@@ -160,5 +122,143 @@ export default class CommonwealthAPI extends ContractApi<CWProtocolContract> {
     }
 
     return tokenHolders;
+  }
+
+  public async createProject(
+    contract: CWProtocolContract,
+    u_name: string,
+    acceptedTokens: string[],
+    u_description: string,
+    creator: string,
+    beneficiary: string,
+
+    threshold: number,
+    curatorFee: number,
+    u_period: number, // in days
+  ) {
+    const name = utils.formatBytes32String(u_name);
+    const ipfsHash = utils.formatBytes32String('0x01');
+    const cwUrl = utils.formatBytes32String('commonwealth.im');
+    const nominations = [creator, beneficiary];
+    const endtime = Math.ceil(Math.ceil(Date.now() / 1000) + u_period * 24 * 60 * 60);
+
+    let transactionSuccessed: boolean;
+    try {
+      const tx = await contract.createProject(
+        name,
+        ipfsHash,
+        cwUrl,
+        beneficiary,
+        acceptedTokens,
+        nominations,
+        threshold.toString(),
+        endtime,
+        curatorFee.toString(),
+        '', // projectID
+      );
+      const txReceipt = await tx.wait();
+      transactionSuccessed = txReceipt.status === 1;
+    } catch(err) {
+      transactionSuccessed = false;
+    }
+    return {
+      status: transactionSuccessed ? 'success' : 'failed',
+      error: transactionSuccessed ? '' : 'Failed to process backWithETH transaction'
+    };
+  }
+
+  public async back(
+    contract: CWProjectContract,
+    amount: number,
+    tokenAddress: string,
+  ) {
+    if (tokenAddress === EtherAddress) {
+      let transactionSuccessed: boolean;
+      try {
+        const tx = await contract.backWithETH({value: amount});
+        const txReceipt = await tx.wait();
+        transactionSuccessed = txReceipt.status === 1;
+      } catch(err) {
+        transactionSuccessed = false;
+      }
+      return {
+        status: transactionSuccessed ? 'success' : 'failed',
+        error: transactionSuccessed ? '' : 'Failed to process backWithETH transaction'
+      };
+    }
+  }
+
+  public async curate(
+    contract: CWProjectContract,
+    amount: number,
+    tokenAddress: string,
+  ) {
+    if (tokenAddress === EtherAddress) {
+      let transactionSuccessed: boolean;
+      try {
+        const tx = await contract.curateWithETH({value: amount});
+        const txReceipt = await tx.wait();
+        transactionSuccessed = txReceipt.status === 1;
+      } catch(err) {
+        transactionSuccessed = false;
+      }
+      return {
+        status: transactionSuccessed ? 'success' : 'failed',
+        error: transactionSuccessed ? '' : 'Failed to process curateWithETH transaction'
+      };
+    }
+  }
+
+  public async redeemBToken(
+    contract: CWProjectContract,
+    amount: number,
+    tokenAddress: string,
+  ) {
+    let transactionSuccessed: boolean;
+    try {
+      const tx = await contract.redeemBToken(tokenAddress, amount, { gasLimit: 3000000 });
+      const txReceipt = await tx.wait();
+      transactionSuccessed = txReceipt.status === 1;
+    } catch(err) {
+      transactionSuccessed = false;
+    }
+    return {
+      status: transactionSuccessed ? 'success' : 'failed',
+      error: transactionSuccessed ? '' : 'Failed to process redeemBToken transaction'
+    };
+  }
+
+  public async redeemCToken(
+    contract: CWProjectContract,
+    amount: number,
+    tokenAddress: string,
+  ) {
+    let transactionSuccessed: boolean;
+    try {
+      const tx = await contract.redeemCToken(tokenAddress, amount, { gasLimit: 3000000 });
+      const txReceipt = await tx.wait();
+      transactionSuccessed = txReceipt.status === 1;
+    } catch(err) {
+      transactionSuccessed = false;
+    }
+    return {
+      status: transactionSuccessed ? 'success' : 'failed',
+      error: transactionSuccessed ? '' : 'Failed to process redeemCToken transaction'
+    };
+  }
+
+  public async withdraw(contract: CWProjectContract) {
+    let transactionSuccessed: boolean;
+    try {
+      const tx = await contract.withdraw({ gasLimit: 3000000 });
+      const txReceipt = await tx.wait();
+      transactionSuccessed = txReceipt.status === 1;
+    } catch(err) {
+      transactionSuccessed = false;
+    }
+    return {
+      status: transactionSuccessed ? 'success' : 'failed',
+      error: transactionSuccessed ? '' : 'Failed to process withdraw transaction'
+    };
   }
 }
