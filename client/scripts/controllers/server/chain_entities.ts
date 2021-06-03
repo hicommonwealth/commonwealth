@@ -127,7 +127,19 @@ class ChainEntityController {
       if (!fieldName) continue;
       const fieldValue = event.data[fieldName];
       const author = event.data['proposer'];
-      let entity = new ChainEntity(chain, entityKind, fieldValue.toString(), [], null, null, null, null, null, author);
+      let entity = new ChainEntity({
+        chain,
+        type: entityKind,
+        typeId: fieldValue.toString(),
+        chainEvents: [],
+        createdAt: null,
+        updatedAt: null,
+        id: null,
+        threadId: null,
+        threadTitle: null,
+        title: null,
+        author,
+      });
 
       // update entity against store
       const existingEntity = this.store.get(entity);

@@ -639,6 +639,23 @@ const instantiateEditor = (
         onSelect: selectMention,
         source: _.debounce(queryMentions, 300, { leading: true, trailing: true }),
         isolateChar: true,
+      },
+      clipboard: {
+        matchers: [
+	  [
+            Node.ELEMENT_NODE,
+            (node, delta) => {
+	      return delta.compose(
+                new Delta().retain(delta.length(), {
+                  header: false,
+                  align: false,
+                  color: false,
+                  background: false,
+                })
+              );
+	    }
+	  ]
+	]
       }
     },
     placeholder,
