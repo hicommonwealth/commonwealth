@@ -439,7 +439,9 @@ const ChainEventSubscriptionRow: m.Component<{
               if (!allSubscriptionsCreated) {
                 await Promise.all(
                   notificationTypeArray.map((obj) => {
-                    return app.user.notifications.subscribe(NotificationCategories.ChainEvent, obj);
+                    const chainName = obj.substr(0, obj.indexOf('-'));
+                    const eventName = obj.substr(obj.indexOf('-') + 1);
+                    return app.user.notifications.subscribe(NotificationCategories.ChainEvent, chainName, eventName);
                   })
                 );
               } else {
@@ -450,7 +452,9 @@ const ChainEventSubscriptionRow: m.Component<{
               if (!allSubscriptionsCreated) {
                 await Promise.all(
                   notificationTypeArray.map((obj) => {
-                    return app.user.notifications.subscribe(NotificationCategories.ChainEvent, obj);
+                    const chainName = obj.substr(0, obj.indexOf('-'));
+                    const eventName = obj.substr(obj.indexOf('-') + 1);
+                    return app.user.notifications.subscribe(NotificationCategories.ChainEvent, chainName, eventName);
                   })
                 ).then(async () => {
                   const newSubscriptions = app.user.notifications.subscriptions.filter((s) => {
@@ -547,7 +551,7 @@ const IndividualCommunityNotifications: m.Component<{
     return [
       newThreads && m(NewThreadRow, { community, subscriptions }),
       batchedSubscriptions.length > 0 && m('tr.NewActivityRow', [
-        m('td', NEW_ACTIVITY_LABEL),
+        m('td', { colspan: 2 }, NEW_ACTIVITY_LABEL),
         m('td'),
       ]),
       // TODO: Filter community past-thread/comment subscriptions here into SubscriptionRows.
@@ -605,7 +609,7 @@ const AllCommunitiesNotifications: m.Component<{
         label: NEW_COLLABORATIONS_LABEL,
       }),
       batchedSubscriptions.length > 0 && m('tr.NewActivityRow', [
-        m('td', NEW_ACTIVITY_LABEL),
+        m('td', { colspan: 2 }, NEW_ACTIVITY_LABEL),
         m('td'),
       ]),
       vnode.state.expanded && batchedSubscriptions.map((subscriptions2: NotificationSubscription[]) => {
@@ -635,7 +639,23 @@ const Erc20ChainEventNotificationRow: m.Component<{
 }> = {
   view: (vnode) => {
     const { subscriptions, chainInfo } = vnode.attrs;
-    const ERC20_EVENT_LIST = ['whale-transfer'];
+    const subscriptionName = `${chainInfo.id}-transfer`;
+    const subscription = subscriptions.find((s) => {
+      return (
+        s.category === NotificationCategories.ChainEvent
+        && s.objectId === subscriptionName
+      );
+    });
+
+    if (subscription && subscription.immediateEmail) {
+      vnode.state.option = NOTIFICATION_ON_IMMEDIATE_EMAIL_OPTION;
+    } else if (subscription && subscription.isActive) {
+      vnode.state.option = NOTIFICATION_ON_OPTION;
+    } else {
+      vnode.state.option = NOTIFICATION_OFF_OPTION;
+    }
+
+    const ERC20_EVENT_LIST = ['transfer'];
     return m('tr.BatchedSubscriptionRow', [
       m('td.token-icon', [
         m('img', { src: chainInfo.iconUrl }),
@@ -673,24 +693,22 @@ const Erc20ChainEventNotificationRow: m.Component<{
             vnode.state.option = option;
             vnode.state.loading = true;
             try {
-              //if (subscriptions.length < 1) return;
               if (option === NOTIFICATION_OFF_OPTION) {
-                /*if (someEmail) await app.user.notifications.disableImmediateEmails(subscriptions);
-                  if (someActive) await app.user.notifications.disableSubscriptions(subscriptions);
-                */
-                console.log("Notification off")
+                await app.user.notifications.disableImmediateEmails([subscription]);
+                await app.user.notifications.disableSubscriptions([subscription]);
               } else if (option === NOTIFICATION_ON_OPTION) {
-                console.log("Notification on")
-
-                /*
-                  await app.user.notifications.enableSubscriptions(subscriptions);
-                  if (someEmail) await app.user.notifications.disableImmediateEmails(subscriptions);
-                */
+                app.user.notifications.subscribe(NotificationCategories.ChainEvent, chainInfo.id, 'transfer');
               } else if (option === NOTIFICATION_ON_IMMEDIATE_EMAIL_OPTION) {
-                console.log("Notification on immediate email") 
-                /*  if (!everyActive) await app.user.notifications.enableSubscriptions(subscriptions);
-                  await app.user.notifications.enableImmediateEmails(subscriptions);
-                */
+                await app.user.notifications.subscribe(NotificationCategories.ChainEvent, chainInfo.id, 'transfer')
+                  .then(() => {
+                    const newSubscription = subscriptions.find((s) => {
+                      return (
+                        s.category === NotificationCategories.ChainEvent
+                        && s.objectId === subscriptionName
+                      );
+                    });
+                    app.user.notifications.enableImmediateEmails([newSubscription]);
+                  });
               }
             } catch (err) {
               notifyError(err.toString());
@@ -706,10 +724,11 @@ const Erc20ChainEventNotificationRow: m.Component<{
 const Erc20ChainEventNotifications: m.Component<{
   subscriptions: NotificationSubscription[];
 }, {
+  expanded: boolean;
 }> = {
   view: (vnode) => {
     const { subscriptions } = vnode.attrs;
-    console.log("subscriptions", subscriptions)
+    const COLLAPSED_ROW_COUNT = 4;
     const roles = app.user.roles;
     const nodes = app.config.nodes.getAll();
     const activeErc20s = nodes.filter((n) => roles.find((r) => n.chain.id === r.chain_id && n.chain.type === 'token'))
@@ -723,8 +742,35 @@ const Erc20ChainEventNotifications: m.Component<{
         }
       });
 
+    let displayErc20s;
+    if (!vnode.state.expanded) {
+      displayErc20s = activeErc20s.slice(0, 4);
+    } else {
+      displayErc20s = activeErc20s;
+    }
+
     //  return activeErc20s.map((n)=>m('tr',n.chain.name))
-    return activeErc20s.map((n) => m(Erc20ChainEventNotificationRow, { subscriptions, chainInfo: n.chain }));
+    return [
+      displayErc20s.length > 0
+        ? m('tr.on-chain-events-header', [
+          m('th', { colspan: 2 }, 'ERC20 chain events'),
+        ])
+        : null ]
+      .concat(displayErc20s.map((n) => m(Erc20ChainEventNotificationRow, { subscriptions, chainInfo: n.chain })))
+      .concat([
+        activeErc20s.length > COLLAPSED_ROW_COUNT
+          ? m('tr', [
+            m('td', { colspan: 2 }, [
+              m('a.expand-notifications-link', {
+                href: '#',
+                onclick: (e) => { e.preventDefault(); vnode.state.expanded = !vnode.state.expanded; },
+              }, [
+                `${vnode.state.expanded ? 'Hide' : 'Show'} ${pluralize(activeErc20s.length - COLLAPSED_ROW_COUNT, 'token')}`,
+              ]),
+            ]),
+          ])
+          : null
+      ]);
   }
 };
 
@@ -856,7 +902,7 @@ const NotificationsPage: m.Component<{}, {
           m(Table, { class: 'NotificationsTable' }, [
             // off-chain discussion notifications
             m('tr', [
-              m('th', NOTIFICATION_TABLE_PRE_COPY),
+              m('th', { colspan: 2 }, NOTIFICATION_TABLE_PRE_COPY),
               m('th', ''),
             ]),
             selectedCommunityId === ALL_COMMUNITIES && [
@@ -870,9 +916,6 @@ const NotificationsPage: m.Component<{}, {
               m('tr.on-chain-events-header', m('th', { colspan: 2 }, 'Polkadot chain events')),
               m(PolkadotChainEventNotifications),
             ],
-            m('tr.on-chain-events-header', [
-              m('th', { colspan: 2 }, 'ERC20 chain events'),
-            ]),
             m(Erc20ChainEventNotifications, { subscriptions }),
             selectedCommunity
               && m(IndividualCommunityNotifications, { subscriptions, community: selectedCommunity }),

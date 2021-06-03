@@ -24,7 +24,7 @@ const SubscriptionButton: m.Component<{}> = {
             m.redraw();
           });
         } else {
-          subscriptions.subscribe(NotificationCategories.NewThread, communityOrChain).then(() => {
+          subscriptions.subscribe(NotificationCategories.NewThread, communityOrChain, '').then(() => {
             m.redraw();
           });
         }
