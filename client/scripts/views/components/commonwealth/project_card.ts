@@ -1,5 +1,6 @@
-import 'components/project_card.scss';
+import 'components/commonwealth/project_card.scss';
 
+import { utils } from 'ethers';
 import m from 'mithril';
 import { Tag } from 'construct-ui';
 
@@ -10,17 +11,17 @@ const ProjectCard: m.Component<{project: CWProject}> = {
   view: (vnode) => {
     const { project } = vnode.attrs;
 
-    // const thredLink = `/${app.activeChainId()}/proposal/discussion/${project.threadId}`; // threadId should be defined later
-    const projectLink = `/${app.activeCommunityId()}/project/${project.projectHash}`;
+    // const thredLink = `/${app.activeChainId()}/proposal/discussion/${project.threadId}`; // proposal => project
     const bgColor = project.status === 'In Progress' ? 'blue' : (project.status === 'Successed') ? 'green' : 'red';
-    const totalFundingText = `Total Funding: ${project.totalFunding}Ether`;
+    const totalFunding = utils.formatEther(project.totalFunding.asBN.toString());
+    const totalFundingText = `Total Funding: ${totalFunding} Ether`;
     
     return m('.ProjectCard', [
       m('.project-card-top', {
         onclick: (e) => {
           e.stopPropagation();
           e.preventDefault();
-          m.route.set(projectLink); // avoid resetting scroll point
+          m.route.set(`/${app.activeChainId()}/project/${project.projectHash}`); // avoid resetting scroll point
           },
         }, [
           m(Tag, {
@@ -37,13 +38,13 @@ const ProjectCard: m.Component<{project: CWProject}> = {
 
       m('.project-card-bottom', {
         onclick: (e) => {
-          // e.preventDefault();
+          e.preventDefault();
           // if (project.threadId) {
           //   m.route.set(thredLink);
           // }
         }
       }, [
-        // thread link
+        // // thread link
         // project.threadId ? m('.project-thread-link', [
         //   m('a', { href: thredLink }, 'Go to thread'),
         // ]) : m('.no-linked-thread', 'No linked thread'),

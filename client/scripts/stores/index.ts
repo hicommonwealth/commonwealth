@@ -18,4 +18,4 @@ export { default as PersistentStore } from './PersistentStore';
 
 export { UpdateType, IHasId, ISerializable, IHasAddress } from './interfaces';
 
-export { default as CWProtocolStore } from './CWProtocolStore';
+export { CWProtocolStore, CWProtocolMembersStore } from './CWProtocolStore';

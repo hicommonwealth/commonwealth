@@ -35,7 +35,8 @@ export { default as Webhook } from './Webhook';
 
 export {
   CWProject,
-  CWProtocol
+  CWProtocol,
+  CWProtocolMembers
 } from './CWProtocol';
 
 export { DepositVote, BinaryVote } from './votes';

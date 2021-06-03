@@ -1,0 +1,28 @@
+@import 'client/styles/shared';
+
+
+.members-card {
+    background-color: #f8f8f8;
+    padding: 20px 20px 40px 20px;
+    margin-top: 30px;;
+    border-radius: 10px;
+    overflow-y: auto;
+    max-height: 300px;
+
+    .member {
+        display: flex;
+        justify-content: space-between;
+    }
+    .title {
+        font-size: 20px;
+        font-weight: 700;
+        margin-top: 20px;
+    }
+    .text {
+        font-size: 16px;
+        color: #4a4a4a;
+    }
+    .mt-10px {
+        margin-top: 10px;
+    }
+}

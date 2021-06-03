@@ -8,13 +8,12 @@ export interface CWProjectAttributes {
   ipfsHash: string;
   cwUrl: string;
   beneficiary: string;
-  acceptedToken: string;  //  '0x01',
-  nominations: Array<string>;  //  []
-  endTime: Date; // startTime + number in seconds
-  projectHash: string;  // put projectHash
+  acceptedToken: string;
+  nominations: Array<string>;
+  endTime: Date;
+  projectHash: string;
   status: ProjectStatus;
   creator: string;
-
   threshold: number;
   totalFunding: number;
   curatorFee: number;
@@ -38,7 +37,7 @@ export default (
     cwUrl: { type: dataTypes.STRING, allowNull: false },
     beneficiary: { type: dataTypes.STRING, allowNull: false },
     creator: { type: dataTypes.STRING, allowNull: false },
-    acceptedToken: { type: dataTypes.STRING, allowNull: false, defaultValue: '0x01' },  // 0x01 means Ether
+    acceptedToken: { type: dataTypes.STRING, allowNull: false, defaultValue: '0x0000000000000000000000000000000000000000' },  // 0x0000000000000000000000000000000000000000 means Ether
     nominations: { type: dataTypes.ARRAY(dataTypes.STRING), allowNull: false, defaultValue: [] },
     threshold: { type: dataTypes.INTEGER, allowNull: false },
     endTime: { type: dataTypes.DATE, allowNull: false },
