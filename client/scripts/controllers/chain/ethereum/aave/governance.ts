@@ -2,6 +2,7 @@ import { ProposalModule, ITXModalData } from 'models';
 import { IApp } from 'state';
 import { IAaveProposalResponse } from 'adapters/chain/aave/types';
 import { AaveEvents, AaveTypes } from '@commonwealth/chain-events';
+import { Executor } from 'eth/types';
 
 import AaveProposal from './proposal';
 import AaveChain from './chain';
@@ -10,7 +11,7 @@ import AaveApi from './api';
 import EthereumAccounts from '../accounts';
 
 export interface AaveProposalArgs {
-  executor: string,
+  executor: Executor,
   targets: string[],
   values: string[],
   signatures: string[],
@@ -41,13 +42,42 @@ export default class AaveGovernance extends ProposalModule<
   // METHODS
   public async propose(args: AaveProposalArgs) {
     const address = this.app.user.activeAccount.address;
-    const contract = await attachSigner(this.app.wallets, address, this._api.Governance);
     const { executor, targets, values, signatures, calldatas, withDelegateCalls, ipfsHash } = args;
 
-    // TODO: validate caller/args
+    // validate args
+    const nCalls = targets.length;
+    if (nCalls === 0) {
+      throw new Error('must provide at least one target');
+    }
 
+    if (values.length !== nCalls
+      || signatures.length !== nCalls
+      || calldatas.length !== nCalls
+      || withDelegateCalls.length !== nCalls
+    ) {
+      throw new Error('all argument arrays must have the same length');
+    }
+
+    // validate executor
+    const isExecutorAuthorized = await this._api.Governance.isExecutorAuthorized(executor.address);
+    if (!isExecutorAuthorized) {
+      throw new Error('executor not authorized!');
+    }
+
+    // validate user
+    const isPropositionPowerEnough = await executor.isPropositionPowerEnough(
+      this._api.Governance.address,
+      address,
+      this.app.chain.block.height - 1,
+    );
+    if (!isPropositionPowerEnough) {
+      throw new Error('user does not have enough proposition power');
+    }
+
+    // send transaction
+    const contract = await attachSigner(this.app.wallets, address, this._api.Governance);
     const tx = await contract.create(
-      executor,
+      executor.address,
       targets,
       values,
       signatures,

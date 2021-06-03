@@ -7,6 +7,10 @@ export default class AaveApi extends ContractApi<AaveGovernanceV2> {
   private _Executors: Executor[];
   public get Executors() { return this._Executors; }
 
+  public getExecutor(executorAddress: string) {
+    return this.Executors.find((ex) => ex.address === executorAddress);
+  }
+
   public async init() {
     await super.init();
     this._Governance = this.Contract;
