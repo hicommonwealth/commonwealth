@@ -234,7 +234,8 @@ export class SubstrateDemocracyReferendum
 
     // sometimes proposals don't get an execution OR DemocracyPassed/DemocracyNotPassed event
     if (this._endBlock < this._Democracy.app.chain.block.height
-        + (this._Democracy.app.chain as Substrate).democracy.enactmentPeriod) {
+        + (this._Democracy.app.chain as Substrate).democracy.enactmentPeriod
+       && !this.completed) {
       this.complete();
     }
   }
@@ -302,7 +303,7 @@ export class SubstrateDemocracyReferendum
       case SubstrateTypes.EventKind.DemocracyCancelled:
       case SubstrateTypes.EventKind.DemocracyNotPassed: {
         this._passed = false;
-        this.complete();
+        if (!this.completed) this.complete();
         break;
       }
       case SubstrateTypes.EventKind.DemocracyPassed: {
@@ -312,7 +313,7 @@ export class SubstrateDemocracyReferendum
 
         // hack to complete proposals that didn't get an execution event for some reason
         if (this._executionBlock < this._Democracy.app.chain.block.height) {
-          this.complete();
+          if (!this.completed) this.complete();
         }
         break;
       }
@@ -320,7 +321,9 @@ export class SubstrateDemocracyReferendum
         if (!this.passed) {
           this._passed = true;
         }
-        this.complete();
+        if (!this.completed) {
+          this.complete();
+        }
         break;
       }
       case SubstrateTypes.EventKind.PreimageNoted: {
