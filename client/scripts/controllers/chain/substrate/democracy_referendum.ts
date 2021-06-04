@@ -231,6 +231,12 @@ export class SubstrateDemocracyReferendum
     this._initialized = true;
     this.updateVoters();
     this._Democracy.store.add(this);
+
+    // sometimes proposals don't get an execution OR DemocracyPassed/DemocracyNotPassed event
+    if (this._endBlock < this._Democracy.app.chain.block.height
+        + (this._Democracy.app.chain as Substrate).democracy.enactmentPeriod) {
+      this.complete();
+    }
   }
 
   protected complete() {
