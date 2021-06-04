@@ -135,17 +135,14 @@ const ProposalCard: m.Component<{ proposal: AnyProposal, injectedContent? }> = {
             size: 'xs',
             class: 'proposal-became-tag',
           }),
-        proposal instanceof SubstrateDemocracyReferendum && proposal.preimage
+        proposal instanceof SubstrateDemocracyReferendum
           && (() => {
             const originatingProposalOrMotion = proposal.getProposalOrMotion(proposal.preimage);
-            if (!(originatingProposalOrMotion instanceof SubstrateCollectiveProposal)
-                && !(originatingProposalOrMotion instanceof SubstrateDemocracyProposal)) return;
-
             return m(Tag, {
               label: (originatingProposalOrMotion instanceof SubstrateDemocracyProposal)
                 ? `PROP #${originatingProposalOrMotion.identifier}`
                   : (originatingProposalOrMotion instanceof SubstrateCollectiveProposal)
-                  ? `MOT #${originatingProposalOrMotion.identifier}` : '',
+                  ? `MOT #${originatingProposalOrMotion.identifier}` : 'MISSING PROP',
               intent: 'primary',
               rounded: true,
               size: 'xs',
