@@ -152,7 +152,7 @@ const ProposalCard: m.Component<{ proposal: AnyProposal, injectedContent? }> = {
         // title
         m('.proposal-title', proposal.title),
         // metadata
-        proposal instanceof SubstrateTreasuryProposal && m('.proposal-amount', proposal.value.format(true)),
+        proposal instanceof SubstrateTreasuryProposal && m('.proposal-amount', proposal.value?.format(true)),
         proposal instanceof SubstrateDemocracyReferendum && m('.proposal-amount', proposal.threshold),
         // // linked treasury proposals
         // proposal instanceof SubstrateDemocracyReferendum && proposal.preimage?.section === 'treasury'
