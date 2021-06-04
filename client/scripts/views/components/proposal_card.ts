@@ -149,6 +149,13 @@ const ProposalCard: m.Component<{ proposal: AnyProposal, injectedContent? }> = {
               class: 'proposal-became-tag',
             });
           })(),
+        proposal instanceof SubstrateTreasuryProposal && !proposal.data.index && m(Tag, {
+          label: 'Missing data',
+          intent: 'primary',
+          rounded: true,
+          size: 'xs',
+          class: 'proposal-became-tag',
+        }),
         // title
         m('.proposal-title', proposal.title),
         // metadata
