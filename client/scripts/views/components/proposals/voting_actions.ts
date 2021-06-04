@@ -34,7 +34,7 @@ import MarlinProposal, {
 } from 'controllers/chain/ethereum/marlin/proposal';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import { notifyError } from 'controllers/app/notifications';
-import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
+import AaveProposal, { AaveProposalVote } from 'controllers/chain/ethereum/aave/proposal';
 
 const CannotVote: m.Component<{ action }> = {
   view: (vnode) => {
@@ -183,6 +183,10 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
         proposal.submitVoteWebTx(new MarlinProposalVote(user, MarlinVote.YES))
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
+      } else if (proposal instanceof AaveProposal) {
+        proposal.submitVoteWebTx(new AaveProposalVote(user, true))
+          .then(() => m.redraw())
+          .catch((err) => notifyError(err.toString()));
       } else if (proposal instanceof SubstratePhragmenElection) {
         vnode.state.votingModalOpen = false;
         return notifyError('Unimplemented proposal type - use election voting modal');
@@ -225,6 +229,10 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
         proposal.submitVoteWebTx(new MarlinProposalVote(user, MarlinVote.NO))
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
+      } else if (proposal instanceof AaveProposal) {
+        proposal.submitVoteWebTx(new AaveProposalVote(user, false))
+          .then(() => m.redraw())
+          .catch((err) => notifyError(err.toString()));
       } else {
         vnode.state.votingModalOpen = false;
         return notifyError('Invalid proposal type');
@@ -248,6 +256,10 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
           .then(() => { onModalClose(); m.redraw(); })
           .catch((err) => { onModalClose(); notifyError(err.toString()); });
       } else if (proposal instanceof MarlinProposal) {
+        proposal.cancelTx()
+          .then(() => { onModalClose(); m.redraw(); })
+          .catch((err) => { onModalClose(); notifyError(err.toString()); });
+      } else if (proposal instanceof AaveProposal) {
         proposal.cancelTx()
           .then(() => { onModalClose(); m.redraw(); })
           .catch((err) => { onModalClose(); notifyError(err.toString()); });
@@ -381,12 +393,18 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
         .filter((vote) => vote.choice === MarlinVote.YES && vote.account.address === user.address).length > 0;
       hasVotedNo = user && proposal.getVotes()
         .filter((vote) => vote.choice === MarlinVote.NO && vote.account.address === user.address).length > 0;
+    } else if (proposal instanceof AaveProposal) {
+      hasVotedYes = user && proposal.getVotes()
+        .find((vote) => vote.choice && vote.account.address === user.address);
+      hasVotedNo = user && proposal.getVotes()
+        .find((vote) => !vote.choice && vote.account.address === user.address);
+      hasVotedForAnyChoice = hasVotedYes || hasVotedNo;
     }
 
     let canVote = true;
     if (proposal.completed) {
       canVote = false;
-    } else if (proposal.isPassing === ProposalStatus.Passed || proposal.isPassing === ProposalStatus.Failed) {
+    } else if (proposal.isPassing !== ProposalStatus.Passing && proposal.isPassing !== ProposalStatus.Failing) {
       canVote = false;
     } else if (proposal instanceof MolochProposal && proposal.state !== MolochProposalState.Voting) {
       canVote = false;
@@ -458,23 +476,29 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
       }),
     ]);
     // moloch: cancel
-    const cancelButton = (proposal.votingType === VotingType.MolochYesNo) ? m('.veto-button', [
+    const cancelButton = (proposal instanceof MolochProposal) ? m('.veto-button', [
       m(Button, {
         intent: 'negative',
-        disabled: !((proposal as MolochProposal).canAbort(user) && !(proposal as MolochProposal).completed)
-          || votingModalOpen,
+        disabled: !(proposal.canAbort(user) && !proposal.completed) || votingModalOpen,
         onclick: cancelProposal,
-        label: (proposal as MolochProposal).isAborted ? 'Cancelled' : 'Cancel',
+        label: proposal.isAborted ? 'Cancelled' : 'Cancel',
         compact: true,
         rounded: true,
       }),
-    ]) : (proposal.votingType === VotingType.MarlinYesNo) ? m('.veto-button', [
+    ]) : (proposal instanceof MarlinProposal) ? m('.veto-button', [
       m(Button, {
         intent: 'negative',
-        disabled: (proposal as MarlinProposal).isCanceled
-          || votingModalOpen,
+        disabled: proposal.isCanceled || votingModalOpen,
         onclick: cancelProposal,
-        label: (proposal as MarlinProposal).isCanceled ? 'Cancelled' : 'Cancel',
+        label: proposal.isCanceled ? 'Cancelled' : 'Cancel',
+        compact: true,
+      }),
+    ]) : (proposal instanceof AaveProposal) ? m('.veto-button', [
+      m(Button, {
+        intent: 'negative',
+        disabled: proposal.data.cancelled || votingModalOpen,
+        onclick: cancelProposal,
+        label: proposal.data.cancelled ? 'Cancelled' : 'Cancel',
         compact: true,
       }),
     ]) : null;
@@ -492,16 +516,30 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
     //  }),
     // ]);
     // moloch: process
-    const processButton = (proposal.votingType === VotingType.MolochYesNo) && m('.yes-button', [
+    const processButton = (proposal instanceof MolochProposal) && m('.yes-button', [
       m(Button, {
         intent: 'none',
-        disabled: (proposal as MolochProposal).state !== MolochProposalState.ReadyToProcess || votingModalOpen,
+        disabled: proposal.state !== MolochProposalState.ReadyToProcess || votingModalOpen,
+        onclick: processProposal,
+        label: proposal.data.processed ? 'Processed' : 'Process',
+        compact: true,
+        rounded: true,
+      })
+    ]);
+
+    // TODO: aave: queue / execute
+    /*
+    const queueButton = (proposal instanceof AaveProposal) && m('.yes-button', [
+      m(Button, {
+        intent: 'none',
+        disabled: proposal.state !== MolochProposalState.ReadyToProcess || votingModalOpen,
         onclick: processProposal,
         label: (proposal as MolochProposal).data.processed ? 'Processed' : 'Process',
         compact: true,
         rounded: true,
       })
     ]);
+    */
 
     let votingActionObj;
     if (proposal.votingType === VotingType.SimpleYesNoVoting) {
@@ -541,7 +579,7 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
     } else if (proposal.votingType === VotingType.MarlinYesNo) {
       votingActionObj = [
         m('.button-row', [yesButton, noButton, /** executeButton, queueButton, */ cancelButton])
-      ]
+      ];
     } else if (proposal.votingType === VotingType.RankedChoiceVoting) {
       votingActionObj = m(CannotVote, { action: 'Unsupported proposal type' });
     } else if (proposal.votingType === VotingType.None) {

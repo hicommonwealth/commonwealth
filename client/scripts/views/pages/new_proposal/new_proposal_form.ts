@@ -3,6 +3,7 @@ import 'pages/new_proposal_page.scss';
 import $ from 'jquery';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
+import { utils } from 'ethers';
 import { Input, TextArea, Form, FormLabel, FormGroup, Button, Grid, Col, Spinner } from 'construct-ui';
 import BN from 'bn.js';
 import { blake2AsHex } from '@polkadot/util-crypto';
@@ -319,8 +320,7 @@ const NewProposalForm = {
           .then((result) => done(result))
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
-
-        // @TODO: Create Proposal via WebTx
+        return;
       } else if (proposalTypeEnum === ProposalType.AaveProposal) {
         vnode.state.proposer = app.user?.activeAccount?.address;
         if (!vnode.state.proposer) throw new Error('Invalid address / not logged in');
@@ -334,6 +334,7 @@ const NewProposalForm = {
         const targets: string[] = vnode.state.targets.split(',');
         const values: string[] = vnode.state.values.split(',');
         const calldatas: string[] = vnode.state.calldatas.split(',');
+        // TODO: this wont work with a signature like "_setCollateralFactor(address,uint256)"
         const signatures: string[] = vnode.state.signatures.split(',');
         const withDelegateCalls: boolean[] = vnode.state.withDelegateCalls
           .split(',')
@@ -342,6 +343,7 @@ const NewProposalForm = {
             if (v.trim().toLowerCase() === 'false') return false;
             throw new Error(`invalid withDelegateCalls string: ${v}`);
           });
+        const ipfsHash = utils.formatBytes32String(vnode.state.ipfsHash);
         const details: AaveProposalArgs = {
           executor: vnode.state.executor as string,
           targets,
@@ -349,13 +351,13 @@ const NewProposalForm = {
           calldatas,
           signatures,
           withDelegateCalls,
-          ipfsHash: vnode.state.ipfsHash as string,
+          ipfsHash,
         };
         (app.chain as Aave).governance.propose(details)
           .then((result) => done(result))
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
-        // @TODO: Create Proposal via WebTx
+        return;
       } else {
         mixpanel.track('Create Thread', {
           'Step No': 2,
@@ -789,6 +791,8 @@ const NewProposalForm = {
           hasAaveFields && [
             m('h2', 'New Aave Proposal:'),
             // TODO: display offchain copy re AIPs and ARCs from https://docs.aave.com/governance/
+            // TODO: make this a form where you add target + value + calldata + signature + withDelegate
+            //  pairings one by one
             m(FormGroup, [
               m(FormLabel, 'Proposal Targets'),
               m(Input, {
@@ -838,7 +842,6 @@ const NewProposalForm = {
               }),
             ]),
             m(FormGroup, [
-              // TODO: make this a switchable list of true/false
               m(FormLabel, 'Proposal Delegate Calls'),
               m(Input, {
                 name: 'withDelegateCalls',
@@ -858,6 +861,7 @@ const NewProposalForm = {
                 disabled: true,
               }),
             ]),
+            // TODO: validate this is the correct length, or else hash it ourselves
             m(FormGroup, [
               m(FormLabel, 'Proposal IPFS Hash'),
               m(Input, {
@@ -871,13 +875,13 @@ const NewProposalForm = {
               }),
             ]),
             m(FormGroup, [
-              // TODO: provide a dropdown here with valid executors
               m(FormLabel, 'Proposal Executor'),
-              m(Input, {
-                name: 'executor',
-                placeholder: 'Proposal Executor',
-                oninput: (e) => {
-                  const result = (e.target as any).value;
+              m(DropdownFormField, {
+                title: 'Referendum',
+                choices: (app.chain as Aave).governance.api.Executors.map(
+                  (r) => ({ name: 'executor', value: r.address, label: `${r.address}` })
+                ),
+                callback: (result) => {
                   vnode.state.executor = result;
                   m.redraw();
                 },

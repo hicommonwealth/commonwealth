@@ -1,6 +1,4 @@
-// import { AaveTypes } from '@commonwealth/chain-events';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
-import { AaveGovernanceV2__factory } from 'eth/types';
 
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
@@ -52,6 +50,7 @@ export default class Aave extends IChainAdapter<EthereumCoin, EthereumAccount> {
     } catch (e) {
       this._failed = true;
       notifyError('Failed to fetch via infura');
+      console.error(`Aave init error: ${e.message}`);
     }
   }
 

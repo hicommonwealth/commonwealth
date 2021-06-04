@@ -104,13 +104,10 @@ export default class AaveGovernance extends ProposalModule<
     this._Accounts = accounts;
     this._api = chain.aaveApi;
 
-    console.log('Fetching aave proposals from chain.');
-
     // load server proposals
     console.log('Fetching aave proposals from backend.');
     await this.app.chain.chainEntities.refresh(this.app.chain.id, EntityRefreshOption.CompletedEntities);
     const entities = this.app.chain.chainEntities.store.getByType(AaveTypes.EntityKind.Proposal);
-    console.log(entities);
     entities.forEach((e) => this._entityConstructor(e));
 
     // register new chain-event handlers
@@ -121,6 +118,7 @@ export default class AaveGovernance extends ProposalModule<
     );
 
     // fetch proposals from chain
+    console.log('Fetching aave proposals from chain.');
     const chainEventsContracts: AaveTypes.Api = { governance: this._api.Governance };
     const fetcher = new AaveEvents.StorageFetcher(
       chainEventsContracts // TODO: add tokens if desired

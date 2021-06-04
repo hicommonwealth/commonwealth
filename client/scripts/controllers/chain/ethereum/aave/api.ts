@@ -1,4 +1,10 @@
-import { AaveGovernanceV2, Executor__factory, Executor } from 'eth/types';
+import {
+  AaveGovernanceV2,
+  Executor__factory,
+  Executor,
+  GovernanceStrategy,
+  GovernanceStrategy__factory
+} from 'eth/types';
 import ContractApi from 'controllers/chain/ethereum/contractApi';
 export default class AaveApi extends ContractApi<AaveGovernanceV2> {
   private _Governance: AaveGovernanceV2;
@@ -7,11 +13,15 @@ export default class AaveApi extends ContractApi<AaveGovernanceV2> {
   private _Executors: Executor[];
   public get Executors() { return this._Executors; }
 
+  private _Strategy: GovernanceStrategy;
+  public get Strategy() { return this._Strategy; }
+
   public getExecutor(executorAddress: string) {
     return this.Executors.find((ex) => ex.address === executorAddress);
   }
 
   public async init() {
+    console.log('aave initApi()');
     await super.init();
     this._Governance = this.Contract;
 
@@ -30,5 +40,10 @@ export default class AaveApi extends ContractApi<AaveGovernanceV2> {
         this._Executors.push(executor);
       }
     }
+
+    // fetch strategy from governance
+    const strategyAddress = await this.Governance.getGovernanceStrategy();
+    this._Strategy = GovernanceStrategy__factory.connect(strategyAddress, this.Contract.provider);
+    await this._Strategy.deployed();
   }
 }

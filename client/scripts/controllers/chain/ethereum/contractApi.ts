@@ -51,26 +51,22 @@ export async function attachSigner<CT extends Contract>(
 abstract class ContractApi<ContractT extends Contract> {
   public readonly gasLimit: number = 3000000;
 
-  private _contractAddress: string;
-  private _Contract: ContractT;
-  private _Provider: Web3Provider;
-
-  public get contractAddress() { return this._contractAddress; }
-  public get Contract(): ContractT { return this._Contract; }
-  public get Provider(): Web3Provider { return this._Provider; }
+  public readonly contractAddress: string;
+  public readonly Contract: ContractT;
+  public readonly Provider: Web3Provider;
 
   constructor(
     factory: ContractFactoryT<ContractT>,
     contractAddress: string,
     web3Provider: ExternalProvider
   ) {
-    this._contractAddress = contractAddress;
-    this._Provider = new ethers.providers.Web3Provider(web3Provider);
-    this._Contract = factory(this._contractAddress, this._Provider);
+    this.contractAddress = contractAddress;
+    this.Provider = new ethers.providers.Web3Provider(web3Provider);
+    this.Contract = factory(this.contractAddress, this.Provider);
   }
 
   public async init(): Promise<void> {
-    await this._Contract.deployed();
+    await this.Contract.deployed();
   }
 }
 

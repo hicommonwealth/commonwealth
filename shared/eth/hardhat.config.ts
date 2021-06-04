@@ -1,7 +1,15 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
-require('hardhat-typechain');
+import 'hardhat-typechain';
+import '@nomiclabs/hardhat-ethers';
+import { HardhatUserConfig } from 'hardhat/types';
 
-module.exports = {
+const config: HardhatUserConfig = {
+  networks: {
+    hardhat: {
+      allowUnlimitedContractSize: true,
+      loggingEnabled: true,
+    },
+  },
   solidity: {
     compilers: [
       {
@@ -46,3 +54,5 @@ module.exports = {
     target: 'ethers-v5',
   },
 };
+
+export default config;
