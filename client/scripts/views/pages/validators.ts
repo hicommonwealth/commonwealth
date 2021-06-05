@@ -43,7 +43,7 @@ const Validator: m.Component<{ info }> = {
         ' from ',
         pluralize(info.nominators, 'nominator'),
       ]),
-      m('.validator-stat', { style: 'color: #999' }, [
+      info.commission && m('.validator-stat', { style: 'color: #999' }, [
         info.commission,
         ' commission',
       ]),
