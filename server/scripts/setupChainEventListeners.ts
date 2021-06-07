@@ -3,7 +3,7 @@ import _ from 'underscore';
 import {
   IDisconnectedRange, IEventHandler, EventSupportingChains, IEventSubscriber,
   SubstrateTypes, SubstrateEvents, MolochTypes, MolochEvents, chainSupportedBy,
-  MarlinTypes, MarlinEvents, isSupportedChain,
+  MarlinTypes, MarlinEvents, isSupportedChain, AaveTypes, AaveEvents
 } from '@commonwealth/chain-events';
 
 import EventStorageHandler, { StorageFilterConfig } from '../eventHandlers/storage';
@@ -169,6 +169,19 @@ const setupChainEventListeners = async (
         skipCatchup,
         discoverReconnectRange: () => discoverReconnectRange(models, node.chain),
         api,
+      });
+    } else if (chainSupportedBy(node.chain, AaveTypes.EventChains)) {
+      const api = await AaveEvents.createApi(
+        node.url, node.address,
+      );
+      const handlers = generateHandlers(node);
+      subscriber = await AaveEvents.subscribeEvents({
+        chain: node.chain,
+        handlers,
+        skipCatchup,
+        discoverReconnectRange: () => discoverReconnectRange(models, node.chain),
+        api,
+        verbose: true,
       });
     }
 

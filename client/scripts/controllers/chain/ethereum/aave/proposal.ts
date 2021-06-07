@@ -18,7 +18,7 @@ import {
   ChainEvent,
 } from 'models';
 
-import AaveAPI from './api';
+import AaveAPI, { AaveExecutor } from './api';
 import AaveGovernance from './governance';
 import { attachSigner } from '../contractApi';
 import AaveChain from './chain';
@@ -69,6 +69,7 @@ export default class AaveProposal extends Proposal<
   private _Chain: AaveChain;
   private _Accounts: EthereumAccounts;
   private _Gov: AaveGovernance;
+  private _Executor: AaveExecutor;
 
   public get shortIdentifier() { return `AaveProposal-${this.data.identifier}`; }
   public get title(): string {
@@ -86,14 +87,14 @@ export default class AaveProposal extends Proposal<
       case AaveTypes.ProposalState.SUCCEEDED:
       case AaveTypes.ProposalState.QUEUED:
       case AaveTypes.ProposalState.EXECUTED:
-        // TODO: does "expired" count as passed?
         return ProposalStatus.Passed;
+      case AaveTypes.ProposalState.EXPIRED:
       case AaveTypes.ProposalState.FAILED:
         return ProposalStatus.Failed;
       case AaveTypes.ProposalState.ACTIVE:
         return this._isPassed() ? ProposalStatus.Passing : ProposalStatus.Failing;
       default:
-        // PENDING and EXPIRED
+        // PENDING
         return ProposalStatus.None;
     }
   }
@@ -117,10 +118,10 @@ export default class AaveProposal extends Proposal<
     if (this.data.cancelled) return AaveTypes.ProposalState.CANCELED;
     if (blockNumber <= this.data.startBlock) return AaveTypes.ProposalState.PENDING;
     if (blockNumber <= this.data.endBlock) return AaveTypes.ProposalState.ACTIVE;
-    if (!this._isPassed()) return AaveTypes.ProposalState.FAILED;
+    if (this._isPassed() === false) return AaveTypes.ProposalState.FAILED;
     if (!this.data.executionTime) return AaveTypes.ProposalState.SUCCEEDED;
     if (this.data.executed) return AaveTypes.ProposalState.EXECUTED;
-    if (blockTimestamp > (this.data.executionTime + this._gracePeriod)) return AaveTypes.ProposalState.EXPIRED;
+    if (blockTimestamp > (this.data.executionTime + this._Executor.gracePeriod)) return AaveTypes.ProposalState.EXPIRED;
     if (this.data.queued) return AaveTypes.ProposalState.QUEUED;
     return null;
   }
@@ -152,11 +153,15 @@ export default class AaveProposal extends Proposal<
     const votes = this.getVotes();
     const yesPower = sumVotes(votes.filter((v) => v.choice));
     const noPower = sumVotes(votes.filter((v) => !v.choice));
+    if (yesPower.isZero() && noPower.isZero()) return 0;
     const supportBn = yesPower.muln(1000).div(yesPower.add(noPower));
     return +supportBn / 10000;
   }
 
   public get turnout() {
+    if (!this._votingSupplyAtStart || this._votingSupplyAtStart.isZero()) {
+      return null;
+    }
     const totalPowerVoted = sumVotes(this.getVotes());
     const turnoutBn = totalPowerVoted.muln(10000).div(this._votingSupplyAtStart);
     return +turnoutBn / 10000;
@@ -164,18 +169,19 @@ export default class AaveProposal extends Proposal<
 
   private _votingSupplyAtStart: BN;
   private _minVotingPowerNeeded: BN;
-  private _requiredVoteDifferential: BN;
-  private _gracePeriod: number;
 
   // Check whether a proposal has enough extra FOR-votes than AGAINST-votes
   // FOR VOTES - AGAINST VOTES > VOTE_DIFFERENTIAL * voting supply
   private _isVoteDifferentialPassing() {
+    if (!this._votingSupplyAtStart || this._votingSupplyAtStart.isZero()) {
+      return null;
+    }
     const votes = this.getVotes();
     const yesVotes = votes.filter((v) => v.choice);
     const noVotes = votes.filter((v) => !v.choice);
     const forProportion = sumVotes(yesVotes).muln(10000).div(this._votingSupplyAtStart);
     const againstProportion = sumVotes(noVotes).muln(10000).div(this._votingSupplyAtStart)
-      .add(this._requiredVoteDifferential);
+      .add(this._Executor.voteDifferential);
     return forProportion.gt(againstProportion);
   }
 
@@ -185,22 +191,36 @@ export default class AaveProposal extends Proposal<
   }
 
   private _isPassed() {
-    if (!this._requiredVoteDifferential) {
+    if (!this._initialized) {
       return null;
     }
     return this._isVoteDifferentialPassing() && this._isQuorumValid();
   }
 
-  private async _initConstants() {
+  public async init() {
+    if (this._initialized) {
+      throw new Error('proposal already initialized!');
+    }
+
+    // TODO: this case will be true always except pending -- do we need to check?
     if (this._Gov.app.chain.block.height > this.data.startBlock) {
       const totalVotingSupplyAtStart = await this._Gov.api.Strategy.getTotalVotingSupplyAt(this.data.startBlock);
       this._votingSupplyAtStart = new BN(totalVotingSupplyAtStart.toString());
-      const executor = this._Gov.api.getExecutor(this.data.executor);
-      this._gracePeriod = +(await executor.GRACE_PERIOD());
-      const minimumQuorum = await executor.MINIMUM_QUORUM();
-      this._minVotingPowerNeeded = new BN(totalVotingSupplyAtStart.mul(minimumQuorum).div(10000).toString());
-      this._requiredVoteDifferential = new BN((await executor.VOTE_DIFFERENTIAL()).toString());
+      this._minVotingPowerNeeded = new BN(
+        totalVotingSupplyAtStart
+          .mul(this._Executor.minimumQuorum.toString())
+          .div(10000)
+          .toString()
+      );
     }
+
+    // special case for expiration because no event is emitted
+    // TODO: hook onto specific block and set expired automatically
+    if (this.state === AaveTypes.ProposalState.EXPIRED) {
+      this.complete(this._Gov.store);
+    }
+
+    this._initialized = true;
   }
 
   constructor(
@@ -218,9 +238,7 @@ export default class AaveProposal extends Proposal<
 
     entity.chainEvents.sort((e1, e2) => e1.blockNumber - e2.blockNumber).forEach((e) => this.update(e));
 
-    this._initConstants();
-    this._initialized = true;
-    this._Gov.store.add(this);
+    this._Executor = this._Gov.api.getExecutor(this.data.executor);
   }
 
   public update(e: ChainEvent) {
@@ -268,6 +286,12 @@ export default class AaveProposal extends Proposal<
     return true;
   }
 
+  public get isCancellable() {
+    return !(this.state === AaveTypes.ProposalState.CANCELED
+      || this.state === AaveTypes.ProposalState.EXECUTED
+      || this.state === AaveTypes.ProposalState.EXPIRED);
+  }
+
   public async cancelTx() {
     if (this.data.cancelled) {
       throw new Error('proposal already canceled');
@@ -276,10 +300,7 @@ export default class AaveProposal extends Proposal<
     const address = this._Gov.app.user.activeAccount.address;
 
     // validate proposal state
-    if (this.state === AaveTypes.ProposalState.CANCELED
-      || this.state === AaveTypes.ProposalState.EXECUTED
-      || this.state === AaveTypes.ProposalState.EXPIRED
-    ) {
+    if (!this.isCancellable) {
       throw new Error('Proposal not in cancelable state');
     }
 
@@ -289,7 +310,7 @@ export default class AaveProposal extends Proposal<
     if (!executor) {
       throw new Error('executor not found');
     }
-    const isCancellable = await executor.validateProposalCancellation(
+    const isCancellable = await executor.contract.validateProposalCancellation(
       this._Gov.api.Governance.address,
       this.data.proposer,
       this._Gov.app.chain.block.height - 1,
@@ -330,22 +351,18 @@ export default class AaveProposal extends Proposal<
     }
   }
 
+  public get isExecutable() {
+    // will be EXPIRED if over grace period
+    return this.state === AaveTypes.ProposalState.QUEUED
+      && this.data.executionTime
+      && this.data.executionTime <= this._Gov.app.chain.block.lastTime.unix();
+  }
+
   public async executeTx() {
     const address = this._Gov.app.user.activeAccount.address;
 
-    // validate proposal state (will be expired if over grace period)
-    if (this.state !== AaveTypes.ProposalState.QUEUED) {
-      throw new Error('Proposal not in queued state');
-    }
-
-    // validate proposal queue
-    const executionTime = this.data.executionTime;
-    if (!executionTime) {
-      throw new Error('no execution time found');
-    }
-    const timestamp = this._Gov.app.chain.block.lastTime.unix();
-    if (timestamp >= executionTime) {
-      throw new Error('proposal not ready for execution');
+    if (!this.isExecutable) {
+      throw new Error('proposal not in executable state');
     }
 
     // no user validation needed

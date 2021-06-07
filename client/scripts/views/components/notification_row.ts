@@ -5,7 +5,7 @@ import _ from 'lodash';
 import m from 'mithril';
 import moment from 'moment';
 import {
-  SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents, IEventLabel, chainSupportedBy,
+  SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents, IEventLabel, chainSupportedBy, MarlinTypes, MarlinEvents, AaveTypes, AaveEvents,
   // MarlinEvents
 } from '@commonwealth/chain-events';
 
@@ -250,12 +250,18 @@ const NotificationRow: m.Component<{
           chainId,
           notification.chainEvent.data,
         );
-      // } else if (chainSupportedBy(chainId, MarlinTypes.EventChains)) {
-      //   label = MarlinEvents.Label(
-      //     notification.chainEvent.blockNumber,
-      //     chainId,
-      //     notification.chainEvent.data,
-      //   )
+      } else if (chainSupportedBy(chainId, MarlinTypes.EventChains)) {
+        label = MarlinEvents.Label(
+          notification.chainEvent.blockNumber,
+          chainId,
+          notification.chainEvent.data,
+        );
+      } else if (chainSupportedBy(chainId, AaveTypes.EventChains)) {
+        label = AaveEvents.Label(
+          notification.chainEvent.blockNumber,
+          chainId,
+          notification.chainEvent.data,
+        );
       } else {
         throw new Error(`invalid notification chain: ${chainId}`);
       }

@@ -35,6 +35,7 @@ import MarlinProposal, {
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import { notifyError } from 'controllers/app/notifications';
 import AaveProposal, { AaveProposalVote } from 'controllers/chain/ethereum/aave/proposal';
+import { AaveTypes } from '@commonwealth/chain-events';
 
 const CannotVote: m.Component<{ action }> = {
   view: (vnode) => {
@@ -247,7 +248,6 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
         'Proposal Name': `${proposal.slug}: ${proposal.identifier}`,
         'Scope': app.activeId(),
       });
-      mixpanel.people.increment('Votes');
       mixpanel.people.set({
         'Last Thread Created': new Date().toISOString()
       });
@@ -294,11 +294,10 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
       vnode.state.votingModalOpen = true;
       mixpanel.track('Proposal Funnel', {
         'Step No': 3,
-        'Step': 'Cancel Proposal',
+        'Step': 'Process Proposal',
         'Proposal Name': `${proposal.slug}: ${proposal.identifier}`,
         'Scope': app.activeId(),
       });
-      mixpanel.people.increment('Votes');
       mixpanel.people.set({
         'Last Thread Created': new Date().toISOString()
       });
@@ -496,7 +495,7 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
     ]) : (proposal instanceof AaveProposal) ? m('.veto-button', [
       m(Button, {
         intent: 'negative',
-        disabled: proposal.data.cancelled || votingModalOpen,
+        disabled: !proposal.isCancellable || votingModalOpen,
         onclick: cancelProposal,
         label: proposal.data.cancelled ? 'Cancelled' : 'Cancel',
         compact: true,
@@ -527,22 +526,35 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
       })
     ]);
 
-    // TODO: aave: queue / execute
-    /*
+    // aave: queue / execute
     const queueButton = (proposal instanceof AaveProposal) && m('.yes-button', [
       m(Button, {
         intent: 'none',
-        disabled: proposal.state !== MolochProposalState.ReadyToProcess || votingModalOpen,
-        onclick: processProposal,
-        label: (proposal as MolochProposal).data.processed ? 'Processed' : 'Process',
+        disabled: proposal.state !== AaveTypes.ProposalState.SUCCEEDED || votingModalOpen,
+        onclick: () => proposal.queueTx().then(() => m.redraw()),
+        label: proposal.data.queued || proposal.data.executed ? 'Queued' : 'Queue',
         compact: true,
         rounded: true,
       })
     ]);
-    */
+    const executeButton = (proposal instanceof AaveProposal) && m('.yes-button', [
+      m(Button, {
+        intent: 'none',
+        disabled: !proposal.isExecutable || votingModalOpen,
+        onclick: () => proposal.executeTx().then(() => m.redraw()),
+        label: proposal.data.executed ? 'Executed' : 'Execute',
+        compact: true,
+        rounded: true,
+      })
+    ]);
 
     let votingActionObj;
-    if (proposal.votingType === VotingType.SimpleYesNoVoting) {
+    // TODO: other specialized proposals go at top
+    if (proposal instanceof AaveProposal) {
+      votingActionObj = [
+        m('.button-row', [yesButton, noButton, queueButton, executeButton, cancelButton]),
+      ];
+    } else if (proposal.votingType === VotingType.SimpleYesNoVoting) {
       votingActionObj = [
         m('.button-row', [yesButton, noButton]),
         m(ProposalExtensions, { proposal }),

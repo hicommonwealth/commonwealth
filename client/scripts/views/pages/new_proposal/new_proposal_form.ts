@@ -877,7 +877,6 @@ const NewProposalForm = {
             m(FormGroup, [
               m(FormLabel, 'Proposal Executor'),
               m(DropdownFormField, {
-                title: 'Referendum',
                 choices: (app.chain as Aave).governance.api.Executors.map(
                   (r) => ({ name: 'executor', value: r.address, label: `${r.address}` })
                 ),
@@ -885,6 +884,7 @@ const NewProposalForm = {
                   vnode.state.executor = result;
                   m.redraw();
                 },
+                callbackOnInit: true,
               }),
             ]),
           ],

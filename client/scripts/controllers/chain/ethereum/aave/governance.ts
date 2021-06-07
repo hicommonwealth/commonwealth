@@ -60,12 +60,13 @@ export default class AaveGovernance extends ProposalModule<
     }
 
     // validate executor
-    const executorContract = typeof executor === 'string'
+    const ex = typeof executor === 'string'
       ? this._api.getExecutor(executor)
       : executor;
-    if (!executorContract) {
+    if (!ex) {
       throw new Error('Executor not found.');
     }
+    const executorContract = ex.contract;
     const isExecutorAuthorized = await this._api.Governance.isExecutorAuthorized(executorContract.address);
     if (!isExecutorAuthorized) {
       throw new Error('executor not authorized!');
@@ -106,9 +107,12 @@ export default class AaveGovernance extends ProposalModule<
 
     // load server proposals
     console.log('Fetching aave proposals from backend.');
-    await this.app.chain.chainEntities.refresh(this.app.chain.id, EntityRefreshOption.CompletedEntities);
+    await this.app.chain.chainEntities.refresh(this.app.chain.id, EntityRefreshOption.AllEntities);
     const entities = this.app.chain.chainEntities.store.getByType(AaveTypes.EntityKind.Proposal);
     entities.forEach((e) => this._entityConstructor(e));
+    console.log(`Found ${entities.length} proposals!`);
+
+    await Promise.all(this.store.getAll().map((p) => p.completed ? Promise.resolve() : p.init()));
 
     // register new chain-event handlers
     this.app.chain.chainEntities.registerEntityHandler(
@@ -118,14 +122,13 @@ export default class AaveGovernance extends ProposalModule<
     );
 
     // fetch proposals from chain
-    console.log('Fetching aave proposals from chain.');
+    // console.log('Fetching aave proposals from chain.');
+    // TODO: add tokens if desired
     const chainEventsContracts: AaveTypes.Api = { governance: this._api.Governance };
-    const fetcher = new AaveEvents.StorageFetcher(
-      chainEventsContracts // TODO: add tokens if desired
-    );
+    // const fetcher = new AaveEvents.StorageFetcher(chainEventsContracts);
     const subscriber = new AaveEvents.Subscriber(chainEventsContracts, this.app.chain.id);
     const processor = new AaveEvents.Processor(chainEventsContracts);
-    await this.app.chain.chainEntities.fetchEntities(this.app.chain.id, () => fetcher.fetch());
+    // await this.app.chain.chainEntities.fetchEntities(this.app.chain.id, () => fetcher.fetch());
     await this.app.chain.chainEntities.subscribeEntities(
       this.app.chain.id,
       subscriber,

@@ -65,7 +65,7 @@ export async function migrateChainEntity(models, chain: string): Promise<void> {
       const api = await AaveEvents.createApi(node.url, node.address);
       fetcher = new AaveEvents.StorageFetcher(api);
       // TODO: remove once testing completed
-      range.startBlock = 12200000;
+      range.startBlock = chain === 'aave-local' ? 0 : 12200000;
     } else {
       throw new Error('Unsupported migration chain');
     }
