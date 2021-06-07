@@ -24,16 +24,13 @@ export const ThreadSubscriptionMenuItem: m.Component<{ proposal: OffchainThread 
 
     const bothActive = (commentSubscription?.isActive && reactionSubscription?.isActive);
 
-    const chainName = proposal.uniqueIdentifier.substr(0, proposal.uniqueIdentifier.indexOf('-'));
-    const eventName = proposal.uniqueIdentifier.substr(proposal.uniqueIdentifier.indexOf('-') + 1);
-
     return m(MenuItem, {
       onclick: async (e) => {
         e.preventDefault();
         if (!commentSubscription || !reactionSubscription) {
           await Promise.all([
-            app.user.notifications.subscribe(NotificationCategories.NewReaction, chainName, eventName),
-            app.user.notifications.subscribe(NotificationCategories.NewComment, chainName, eventName),
+            app.user.notifications.subscribe(NotificationCategories.NewReaction, proposal.uniqueIdentifier, false),
+            app.user.notifications.subscribe(NotificationCategories.NewComment, proposal.uniqueIdentifier, false),
           ]);
           notifySuccess('Subscribed!');
         } else if (bothActive) {

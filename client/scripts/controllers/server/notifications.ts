@@ -25,16 +25,16 @@ class NotificationsController {
   private _subscriptions: NotificationSubscription[] = [];
   public get subscriptions() { return this._subscriptions; }
 
-  public subscribe(category: string, chainName: string, eventName: string) {
+  public subscribe(category: string, objectId: string, isErc20: boolean = true) {
     const subscription = this.subscriptions.find(
-      (v) => v.category === category && v.objectId === `${chainName}-${eventName}`
+      (v) => v.category === category && v.objectId === objectId
     );
     if (subscription) {
       return this.enableSubscriptions([subscription]);
     } else {
       // TODO: Change to POST /subscription
       return post('/createSubscription', {
-        'category': category, 'chain_name': chainName, 'event_name': eventName, 'is_active': true
+        'category': category, 'object_id': objectId, 'is_erc20':isErc20, 'is_active': true
       }, (result) => {
         const newSubscription = NotificationSubscription.fromJSON(result);
         this._subscriptions.push(newSubscription);

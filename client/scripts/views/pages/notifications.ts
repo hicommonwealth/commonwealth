@@ -439,9 +439,7 @@ const ChainEventSubscriptionRow: m.Component<{
               if (!allSubscriptionsCreated) {
                 await Promise.all(
                   notificationTypeArray.map((obj) => {
-                    const chainName = obj.substr(0, obj.indexOf('-'));
-                    const eventName = obj.substr(obj.indexOf('-') + 1);
-                    return app.user.notifications.subscribe(NotificationCategories.ChainEvent, chainName, eventName);
+                    return app.user.notifications.subscribe(NotificationCategories.ChainEvent, obj);
                   })
                 );
               } else {
@@ -452,9 +450,7 @@ const ChainEventSubscriptionRow: m.Component<{
               if (!allSubscriptionsCreated) {
                 await Promise.all(
                   notificationTypeArray.map((obj) => {
-                    const chainName = obj.substr(0, obj.indexOf('-'));
-                    const eventName = obj.substr(obj.indexOf('-') + 1);
-                    return app.user.notifications.subscribe(NotificationCategories.ChainEvent, chainName, eventName);
+                    return app.user.notifications.subscribe(NotificationCategories.ChainEvent, obj);
                   })
                 ).then(async () => {
                   const newSubscriptions = app.user.notifications.subscriptions.filter((s) => {
@@ -697,9 +693,9 @@ const Erc20ChainEventNotificationRow: m.Component<{
                 await app.user.notifications.disableImmediateEmails([subscription]);
                 await app.user.notifications.disableSubscriptions([subscription]);
               } else if (option === NOTIFICATION_ON_OPTION) {
-                app.user.notifications.subscribe(NotificationCategories.ChainEvent, chainInfo.id, 'transfer');
+                app.user.notifications.subscribe(NotificationCategories.ChainEvent, `${chainInfo.id}-transfer`, true);
               } else if (option === NOTIFICATION_ON_IMMEDIATE_EMAIL_OPTION) {
-                await app.user.notifications.subscribe(NotificationCategories.ChainEvent, chainInfo.id, 'transfer')
+                await app.user.notifications.subscribe(NotificationCategories.ChainEvent, `${chainInfo.id}-transfer`, true)
                   .then(() => {
                     const newSubscription = subscriptions.find((s) => {
                       return (

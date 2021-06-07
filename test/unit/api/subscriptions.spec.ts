@@ -336,7 +336,7 @@ describe('Subscriptions Tests', () => {
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, category, is_active, object_id, });
       expect(res.body.error).to.not.be.null;
-      expect(res.body.error).to.be.equal(Errors.NoCategoryChainNameAndEventName);
+      expect(res.body.error).to.be.equal(Errors.NoCategoryAndObjectId);
     });
 
 
