@@ -51,6 +51,7 @@ export default class CommonwealthAPI extends ContractApi<CWProtocolContract> {
     const daedline = (new BN((await projContract.deadline()).toString()).mul(new BN(1000))).toNumber();
     const endTime = new Date(daedline);
     const funded = await projContract.funded();
+    const lockedWithdraw = await projContract.lockedWithdraw();
 
     let status = 'In Progress';
     if ((new Date()).getTime() - endTime.getTime() > 0) {
@@ -77,6 +78,7 @@ export default class CommonwealthAPI extends ContractApi<CWProtocolContract> {
       curatorFee,
       projectHash,
       status,
+      lockedWithdraw,
       new EthereumCoin('ETH', new BN(totalFunding.toString()), false), //totalFunding,
       bToken,
       cToken,

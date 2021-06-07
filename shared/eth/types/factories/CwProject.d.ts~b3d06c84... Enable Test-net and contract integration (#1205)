@@ -38,6 +38,8 @@ interface CwProjectInterface extends Interface {
 
     ipfsHash: TypedFunctionDescription<{ encode([]: []): string }>;
 
+    lockedWithdraw: TypedFunctionDescription<{ encode([]: []): string }>;
+
     name: TypedFunctionDescription<{ encode([]: []): string }>;
 
     nominations: TypedFunctionDescription<{ encode([]: [string]): string }>;
@@ -225,6 +227,10 @@ export class CwProject extends Contract {
     ipfsHash(overrides?: TransactionOverrides): Promise<string>;
 
     "ipfsHash()"(overrides?: TransactionOverrides): Promise<string>;
+
+    lockedWithdraw(overrides?: TransactionOverrides): Promise<boolean>;
+
+    "lockedWithdraw()"(overrides?: TransactionOverrides): Promise<boolean>;
 
     name(overrides?: TransactionOverrides): Promise<string>;
 
@@ -510,6 +516,10 @@ export class CwProject extends Contract {
   ipfsHash(overrides?: TransactionOverrides): Promise<string>;
 
   "ipfsHash()"(overrides?: TransactionOverrides): Promise<string>;
+
+  lockedWithdraw(overrides?: TransactionOverrides): Promise<boolean>;
+
+  "lockedWithdraw()"(overrides?: TransactionOverrides): Promise<boolean>;
 
   name(overrides?: TransactionOverrides): Promise<string>;
 
@@ -804,6 +814,10 @@ export class CwProject extends Contract {
     ipfsHash(overrides?: TransactionOverrides): Promise<BigNumber>;
 
     "ipfsHash()"(overrides?: TransactionOverrides): Promise<BigNumber>;
+
+    lockedWithdraw(overrides?: TransactionOverrides): Promise<BigNumber>;
+
+    "lockedWithdraw()"(overrides?: TransactionOverrides): Promise<BigNumber>;
 
     name(overrides?: TransactionOverrides): Promise<BigNumber>;
 
