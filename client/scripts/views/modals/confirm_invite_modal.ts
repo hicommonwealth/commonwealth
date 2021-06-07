@@ -94,7 +94,10 @@ const ConfirmInviteModal: m.Component<{}, {
           m('p', [
             'You\'ve been invited to the ',
             m('strong', invites[vnode.state.location].community_name),
-            ' community. Select an address to accept the invite:'
+            ' community. ',
+            addresses.length > 0
+              ? 'Select an address to accept the invite:'
+              : 'To get started, connect an address:'
           ]),
           vnode.state.accepted.includes(vnode.state.location) ? m('h4', 'You\'ve accepted this invite!')
             : vnode.state.rejected.includes(vnode.state.location) ? m('h4', 'You\'ve already deleted this invite!') : [
