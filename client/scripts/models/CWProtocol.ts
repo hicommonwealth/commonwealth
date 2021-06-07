@@ -18,6 +18,7 @@ export class CWProject {
   public readonly endTime: Date;
   public readonly projectHash: string;
   public readonly status: ProjectStatus;
+  public readonly withdrawIsDone: boolean;
   public readonly cToken: string; // cToken address
   public readonly bToken: string; // bToken address
 
@@ -39,6 +40,7 @@ export class CWProject {
     curatorFee,
     projectHash,
     status,
+    lockedWithdraw,
     totalFunding,
     bToken,
     cToken,
@@ -56,6 +58,7 @@ export class CWProject {
     this.curatorFee = curatorFee;
     this.projectHash = projectHash;
     this.status = status;
+    this.withdrawIsDone = lockedWithdraw;
     this.totalFunding = totalFunding;
     this.bToken = bToken;
     this.cToken = cToken;

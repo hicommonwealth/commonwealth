@@ -66,11 +66,11 @@ const SuccsedActionCard: m.Component<{
     let redeemAble = false;
     if (app.user.activeAccount && app.isLoggedIn() && submitting === 0) {
       const activeAddress = app.user.activeAccount.address.toLowerCase();
-      if (activeAddress === project.beneficiary.toLowerCase()) {
-        withdrawAble = true;
-      }
       if (curators.map((item: any) => item.address.toLowerCase()).includes(activeAddress)) {
         redeemAble = true;
+      }
+      if ((activeAddress === project.beneficiary.toLowerCase()) && (!project.withdrawIsDone)) {
+        withdrawAble = true;
       }
     }
 

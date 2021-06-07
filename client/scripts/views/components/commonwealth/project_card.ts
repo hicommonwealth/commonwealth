@@ -14,7 +14,7 @@ const ProjectCard: m.Component<{project: CWProject}> = {
     // const thredLink = `/${app.activeChainId()}/proposal/discussion/${project.threadId}`; // proposal => project
     const bgColor = project.status === 'In Progress' ? 'blue' : (project.status === 'Successed') ? 'green' : 'red';
     const totalFunding = utils.formatEther(project.totalFunding.asBN.toString());
-    const totalFundingText = `Total Funding: ${totalFunding} Ether`;
+    const displayText = project.withdrawIsDone ? `Withdraw is done. Total Funding was ${totalFunding} Ether` : `Total Funding: ${totalFunding} Ether`;
     
     return m('.ProjectCard', [
       m('.project-card-top', {
@@ -32,7 +32,7 @@ const ProjectCard: m.Component<{project: CWProject}> = {
             style: `background: ${bgColor}`
           }),
           m('.project-title', project.name),
-          m('.project-amount', totalFundingText),
+          m('.project-display', displayText),
           m('.project-description', project.description),
       ]),
 
