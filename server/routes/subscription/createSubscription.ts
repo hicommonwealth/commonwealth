@@ -103,7 +103,7 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
           if (node) {
             await models.ChainEventType.create({
               id: req.body.object_id,
-              chain: p_entity,
+              chain: req.body.chain_id,
               event_name: 'transfer'
             });
           } else {

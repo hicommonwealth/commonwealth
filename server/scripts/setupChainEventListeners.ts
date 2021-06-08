@@ -65,6 +65,7 @@ const setupChainEventListeners = async (
   log.info('Fetching node urls...');
   await sequelize.authenticate();
   const nodes: ChainNodeInstance[] = [];
+
   if (chains === 'all') {
     const n = (await Promise.all(EventSupportingChains.map((c) => queryNode(c)))).filter((c) => !!c);
     nodes.push(...n);
@@ -192,13 +193,13 @@ const setupChainEventListeners = async (
   // Add Erc20 subscribers
   if (chains === 'all' || chains.includes('erc20')) {
     const erc20Nodes = await models.ChainNode.findAll({
-      where: {
-        address: {
-          [sequelize.Op.not]: null,
-        }
-      }
+      include: [{
+        model: models.Chain,
+        where: { type: 'token' },
+      }],
     });
     const erc20Addresses = erc20Nodes.map((o) => o.address);
+
     // get ethereum's endpoint URL as most canonical one
     const ethNode = await models.ChainNode.findOne({
       where: {

@@ -693,7 +693,10 @@ const Erc20ChainEventNotificationRow: m.Component<{
                 await app.user.notifications.disableImmediateEmails([subscription]);
                 await app.user.notifications.disableSubscriptions([subscription]);
               } else if (option === NOTIFICATION_ON_OPTION) {
-                app.user.notifications.subscribe(NotificationCategories.ChainEvent, `${chainInfo.id}-transfer`, true);
+                await app.user.notifications.subscribe(NotificationCategories.ChainEvent, `${chainInfo.id}-transfer`, true);
+                if (subscription && subscription.immediateEmail) {
+                  await app.user.notifications.disableImmediateEmails([subscription]);
+                }
               } else if (option === NOTIFICATION_ON_IMMEDIATE_EMAIL_OPTION) {
                 await app.user.notifications.subscribe(NotificationCategories.ChainEvent, `${chainInfo.id}-transfer`, true)
                   .then(() => {
@@ -703,7 +706,7 @@ const Erc20ChainEventNotificationRow: m.Component<{
                         && s.objectId === subscriptionName
                       );
                     });
-                    app.user.notifications.enableImmediateEmails([newSubscription]);
+                    return app.user.notifications.enableImmediateEmails([newSubscription]);
                   });
               }
             } catch (err) {

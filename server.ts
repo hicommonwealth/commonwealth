@@ -1,4 +1,4 @@
-import { SubstrateEvents, SubstrateTypes, chainSupportedBy } from '@commonwealth/chain-events';
+import { Erc20Events, SubstrateEvents, SubstrateTypes, chainSupportedBy } from '@commonwealth/chain-events';
 import session from 'express-session';
 import Rollbar from 'rollbar';
 import express from 'express';
@@ -93,7 +93,9 @@ async function main() {
         if (chainSupportedBy(chain, SubstrateTypes.EventChains)) {
           fetchers[chain] = new SubstrateEvents.StorageFetcher(subscriber.api);
         }
-        if (chain === 'erc20') { erc20SubscriberHolder.setSubscriber(subscriber); }
+        if (chain === 'erc20') {
+          erc20SubscriberHolder.setSubscriber(subscriber as Erc20Events.Subscriber);
+        }
       }
       await identityFetchCache.start(models, fetchers);
       return 0;

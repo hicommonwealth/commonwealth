@@ -1,6 +1,5 @@
 import Sequelize from 'sequelize';
 import { Request, Response, NextFunction } from 'express';
-import Erc20SubscriberHolder from 'server/util/erc20SubscriberHolder';
 
 import { factory, formatFilename } from '../../shared/logging';
 
@@ -15,7 +14,7 @@ export const Errors = {
   MustSpecifyContract: 'This is a contract, you must specify a contract address',
 };
 
-const addChainNode = async (models, erc20SubscriberHolder: Erc20SubscriberHolder,
+const addChainNode = async (models,
   req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {
     return next(new Error(Errors.NotLoggedIn));
@@ -56,11 +55,6 @@ const addChainNode = async (models, erc20SubscriberHolder: Erc20SubscriberHolder
 
   if (chain.type === 'dao' && !req.body.address) {
     return next(new Error(Errors.MustSpecifyContract));
-  }
-
-  // erc20 token
-  if (req.body.address) {
-    erc20SubscriberHolder.subscribeNewToken(req.body.address);
   }
 
   const node = await models.ChainNode.create({

@@ -34,7 +34,7 @@ class NotificationsController {
     } else {
       // TODO: Change to POST /subscription
       return post('/createSubscription', {
-        'category': category, 'object_id': objectId, 'is_erc20':isErc20, 'is_active': true
+        'category': category, 'object_id': objectId, 'is_erc20': isErc20, 'is_active': true
       }, (result) => {
         const newSubscription = NotificationSubscription.fromJSON(result);
         this._subscriptions.push(newSubscription);

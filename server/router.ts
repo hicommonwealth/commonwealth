@@ -150,7 +150,7 @@ function setupRouter(
 
   // chains
   // TODO: Change to POST /chainNode
-  router.post('/addChainNode', passport.authenticate('jwt', { session: false }), addChainNode.bind(this, models, erc20SubscriberHolder));
+  router.post('/addChainNode', passport.authenticate('jwt', { session: false }), addChainNode.bind(this, models));
   // TODO: Change to DELETE /chain
   router.post('/deleteChain', passport.authenticate('jwt', { session: false }), deleteChain.bind(this, models));
   // TODO: Change to DELETE /chainNode
@@ -171,7 +171,7 @@ function setupRouter(
   router.post('/updateCommunity', passport.authenticate('jwt', { session: false }), updateCommunity.bind(this, models));
   router.get('/communityStats', passport.authenticate('jwt', { session: false }), communityStats.bind(this, models));
   router.get('/getTokensFromLists', getTokensFromLists.bind(this, models, tokenBalanceCache));
-  router.get('/getTokenForum', getTokenForum.bind(this, models, tokenBalanceCache));
+  router.get('/getTokenForum', getTokenForum.bind(this, models, erc20SubscriberHolder, tokenBalanceCache));
 
   // offchain threads
   // TODO: Change to POST /thread

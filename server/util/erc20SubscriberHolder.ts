@@ -1,9 +1,10 @@
 import sleep from 'sleep-promise';
+import { Erc20Events } from '@commonwealth/chain-events';
 
 export default class Erc20SubscriberHolder {
-  private _subscriber;
+  private _subscriber: Erc20Events.Subscriber;
 
-  public setSubscriber(subscriber) {
+  public setSubscriber(subscriber: Erc20Events.Subscriber) {
     this._subscriber = subscriber;
   }
 
