@@ -40,6 +40,7 @@ const NewProposalPage: m.Component<{ type }, { typeEnum, titlePre }> = {
       showNewProposalButton: true,
     }, [
       m('.forum-container', [
+        m('h3', `${vnode.state.titlePre} ${proposalSlugToFriendlyName.get(vnode.state.typeEnum)}`),
         m(NewProposalForm, {
           typeEnum: vnode.attrs.type,
           onChangeSlugEnum: (value) => {

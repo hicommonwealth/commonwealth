@@ -13,15 +13,13 @@ export function offchainThreadStageToLabel(stage: OffchainThreadStage) {
   if (stage === OffchainThreadStage.Discussion) {
     return 'Discussion';
   } else if (stage === OffchainThreadStage.ProposalInReview) {
-    return 'Preparing for Voting';
+    return 'Pre-Voting';
   } else if (stage === OffchainThreadStage.Voting) {
-    return 'Voting';
+    return 'In Voting';
   } else if (stage === OffchainThreadStage.Passed) {
     return 'Passed';
   } else if (stage === OffchainThreadStage.Failed) {
     return 'Not Passed';
-  } else if (stage === OffchainThreadStage.Abandoned) {
-    return 'Abandoned';
   } else {
     return 'Other';
   }
@@ -38,10 +36,8 @@ export function offchainThreadStageToIndex(stage: OffchainThreadStage) {
     return 4;
   } else if (stage === OffchainThreadStage.Failed) {
     return 5;
-  } else if (stage === OffchainThreadStage.Abandoned) {
-    return 6;
   } else {
-    return 7;
+    return 6;
   }
 }
 

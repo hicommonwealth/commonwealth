@@ -115,6 +115,7 @@ export class SubstrateCollectiveProposal
     this.title = entity.title || formatCall(eventData.call);
     this.createdAt = entity.createdAt;
     this.threadId = entity.threadId;
+    this.threadTitle = entity.threadTitle;
 
     entity.chainEvents.forEach((e) => this.update(e));
 

@@ -39,6 +39,14 @@ const LinkedProposalsEmbed: m.Component<{ proposal }> = {
         }
       }
 
+      if (!(
+        (proposal instanceof SubstrateDemocracyProposal || proposal instanceof SubstrateCollectiveProposal)
+          && proposal.getReferendum()
+        ||
+          (proposal instanceof SubstrateDemocracyReferendum && proposal.preimage
+           && proposal.getProposalOrMotion(proposal.preimage))
+      )) return;
+
       return m('.LinkedProposalsEmbed', [
         (proposal instanceof SubstrateDemocracyProposal || proposal instanceof SubstrateCollectiveProposal)
           && proposal.getReferendum()
@@ -91,6 +99,8 @@ const LinkedProposalsEmbed: m.Component<{ proposal }> = {
         .filter((mo) => mo.call.section === 'treasury'
                 && (mo.call.method === 'approveProposal' || mo.call.method === 'rejectProposal')
                 && mo.call.args[0] === proposal.identifier);
+
+      if (democracyProposals.length === 0 && referenda.length === 0 && councilMotions.length === 0) return;
 
       return m('.LinkedProposalsEmbed', [
         democracyProposals.map((p) => m('.treasury-embed-section', [

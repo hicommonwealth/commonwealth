@@ -36,7 +36,7 @@ export abstract class ProposalModule<
     try {
       return this._constructorFunc(entity);
     } catch (e) {
-      console.error('failed to construct proposal from entity: ', entity);
+      console.error('failed to construct proposal from entity: ', entity, e);
     }
   }
 

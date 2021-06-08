@@ -47,11 +47,18 @@ export const modelFromServer = (thread) => {
     chain_entities,
     offchain_voting_ends_at,
     offchain_voting_votes,
+    reactions
   } = thread;
 
   const attachments = OffchainAttachments
     ? OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
     : [];
+
+  if (reactions) {
+    for (const reaction of reactions) {
+      app.reactions.store.add(modelReactionFromServer(reaction));
+    }
+  }
 
   let versionHistoryProcessed;
   if (version_history) {
@@ -400,6 +407,7 @@ class ThreadsController {
       },
       success: (response) => {
         const thread = this._store.getByIdentifier(args.threadId);
+        if (!thread) return;
         thread.chainEntities.splice(0);
         args.entities.forEach((ce) => thread.chainEntities.push({
           id: ce.id,
@@ -426,6 +434,10 @@ class ThreadsController {
     if (response.status !== 'Success') {
       throw new Error(`Cannot fetch thread: ${response.status}`);
     }
+
+    // rewrite ChainEntities alias since /getThread returns differently than /bulkThreads
+    response.result.chain_entities = response.result.ChainEntities;
+
     const thread = modelFromServer(response.result);
     const existing = this._store.getByIdentifier(thread.id);
     if (existing) this._store.remove(existing);
