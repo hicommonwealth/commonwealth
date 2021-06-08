@@ -95,7 +95,6 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
       });
       if (!chainEventType) {
         // Check to see if it's ERC20 transfer
-
         if (req.body.category === 'chain-event'
           && req.body.is_erc20 && p_id === 'transfer') {
           const node = await models.Chain.findOne({ chain: req.body.chain_id, type: 'token' });

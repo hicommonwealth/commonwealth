@@ -694,6 +694,8 @@ const Erc20ChainEventNotificationRow: m.Component<{
                 await app.user.notifications.disableSubscriptions([subscription]);
               } else if (option === NOTIFICATION_ON_OPTION) {
                 await app.user.notifications.subscribe(NotificationCategories.ChainEvent, `${chainInfo.id}-transfer`, true);
+                // Unsure why but this redundancy must be here for it to work
+                await app.user.notifications.enableSubscriptions([subscription]);
                 if (subscription && subscription.immediateEmail) {
                   await app.user.notifications.disableImmediateEmails([subscription]);
                 }
