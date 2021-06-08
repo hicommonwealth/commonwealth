@@ -790,6 +790,40 @@ const NewProposalForm = {
           ],
           hasAaveFields && [
             m('h2', 'New Aave Proposal:'),
+            m(FormGroup, [
+              m(FormLabel, 'Proposer (you)'),
+              m(Input, {
+                name: 'proposer',
+                value: `${app.user.activeAccount.address}`,
+                disabled: true,
+              }),
+            ]),
+            // TODO: validate this is the correct length, or else hash it ourselves
+            m(FormGroup, [
+              m(FormLabel, 'Proposal IPFS Hash'),
+              m(Input, {
+                name: 'ipfsHash',
+                placeholder: 'Proposal IPFS Hash',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.ipfsHash = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Proposal Executor'),
+              m(DropdownFormField, {
+                choices: (app.chain as Aave).governance.api.Executors.map(
+                  (r) => ({ name: 'executor', value: r.address, label: `${r.address}` })
+                ),
+                callback: (result) => {
+                  vnode.state.executor = result;
+                  m.redraw();
+                },
+                callbackOnInit: true,
+              }),
+            ]),
             // TODO: display offchain copy re AIPs and ARCs from https://docs.aave.com/governance/
             // TODO: make this a form where you add target + value + calldata + signature + withDelegate
             //  pairings one by one
@@ -851,40 +885,6 @@ const NewProposalForm = {
                   vnode.state.withDelegateCalls = result;
                   m.redraw();
                 },
-              }),
-            ]),
-            m(FormGroup, [
-              m(FormLabel, 'Proposer (you)'),
-              m(Input, {
-                name: 'proposer',
-                value: `${app.user.activeAccount.address}`,
-                disabled: true,
-              }),
-            ]),
-            // TODO: validate this is the correct length, or else hash it ourselves
-            m(FormGroup, [
-              m(FormLabel, 'Proposal IPFS Hash'),
-              m(Input, {
-                name: 'ipfsHash',
-                placeholder: 'Proposal IPFS Hash',
-                oninput: (e) => {
-                  const result = (e.target as any).value;
-                  vnode.state.ipfsHash = result;
-                  m.redraw();
-                },
-              }),
-            ]),
-            m(FormGroup, [
-              m(FormLabel, 'Proposal Executor'),
-              m(DropdownFormField, {
-                choices: (app.chain as Aave).governance.api.Executors.map(
-                  (r) => ({ name: 'executor', value: r.address, label: `${r.address}` })
-                ),
-                callback: (result) => {
-                  vnode.state.executor = result;
-                  m.redraw();
-                },
-                callbackOnInit: true,
               }),
             ]),
           ],

@@ -7,13 +7,10 @@ import { ChainNetwork } from 'models';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import Marlin from 'controllers/chain/ethereum/marlin/adapter';
+import Aave from 'controllers/chain/ethereum/aave/adapter';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { Grid, Col, List, Form, FormGroup, FormLabel, Input, Button } from 'construct-ui';
 import PageNotFound from './404';
-
-const getDelegate = async (vnode) => {
-  vnode.state.currentDelegate = await (app.chain as Marlin).chain.senderGetDelegate();
-};
 
 const DelegateStats: m.Component<{ currentDelegate: string, }> = {
   view: (vnode) => {
@@ -56,7 +53,45 @@ interface IDelegateForm {
   amount: number,
 }
 
-const DelegateForm: m.Component<{}, { form: IDelegateForm, loading: boolean, currentDelegate: string, }> = {
+interface IDelegateFormState {
+  form: IDelegateForm,
+  loading: boolean,
+  currentDelegate: string,
+}
+
+const getDelegate = async (vnode: m.Vnode<{}, IDelegateFormState>) => {
+  if (app.chain.network === ChainNetwork.Marlin || app.chain.network === ChainNetwork.MarlinTestnet) {
+    vnode.state.currentDelegate = await (app.chain as Marlin).chain.getDelegate();
+  } else if (app.chain.network === ChainNetwork.Aave || app.chain.network === ChainNetwork.AaveTestnet) {
+    // TODO: switch on delegation type
+    vnode.state.currentDelegate = await (app.chain as Aave).chain.getDelegate(app.user.activeAccount.address, 'voting');
+  }
+  m.redraw();
+};
+
+const setDelegate = async (vnode: m.Vnode<{}, IDelegateFormState>) => {
+  if (app.chain.apiInitialized) {
+    let delegationPromise: Promise<any>;
+    if (app.chain.network === ChainNetwork.Marlin || app.chain.network === ChainNetwork.MarlinTestnet) {
+      delegationPromise = (app.chain as Marlin).chain.setDelegate(
+        vnode.state.form.address, vnode.state.form.amount
+      );
+    } else if (app.chain.network === ChainNetwork.Aave || app.chain.network === ChainNetwork.AaveTestnet) {
+      delegationPromise = (app.chain as Aave).chain.setDelegate(vnode.state.form.address);
+    }
+    if (delegationPromise) {
+      try {
+        await delegationPromise;
+        notifySuccess(`Sent transaction to delegate to ${vnode.state.form.address}`);
+        getDelegate(vnode);
+      } catch (err) {
+        notifyError(`${err.message}`);
+      }
+    }
+  }
+};
+
+const DelegateForm: m.Component<{}, IDelegateFormState> = {
   oninit: (vnode) => {
     vnode.state.form = {
       address: '',
@@ -67,6 +102,7 @@ const DelegateForm: m.Component<{}, { form: IDelegateForm, loading: boolean, cur
   },
   view: (vnode) => {
     const { form, loading } = vnode.state;
+    const hasValue = app.chain.network === ChainNetwork.Marlin || app.chain.network === ChainNetwork.MarlinTestnet;
     return [
       m(DelegateStats, {
         currentDelegate: vnode.state.currentDelegate,
@@ -86,8 +122,8 @@ const DelegateForm: m.Component<{}, { form: IDelegateForm, loading: boolean, cur
                   m.redraw();
                 }
               }),
-              m(FormLabel, 'Amount of MPOND to delegate:'),
-              m(Input, {
+              hasValue && m(FormLabel, 'Amount to delegate:'),
+              hasValue && m(Input, {
                 name: 'amount',
                 placeholder: '10000',
                 defaultValue: '',
@@ -107,15 +143,7 @@ const DelegateForm: m.Component<{}, { form: IDelegateForm, loading: boolean, cur
                 onclick: async (e) => {
                   e.preventDefault();
                   vnode.state.loading = true;
-                  if ((app.chain as Marlin).apiInitialized) {
-                    await (app.chain as Marlin).chain.senderSetDelegate(
-                      vnode.state.form.address, vnode.state.form.amount
-                    ).then(async () => {
-                      notifySuccess(`Sent transaction to delegate to ${vnode.state.form.address}`);
-                      await getDelegate(vnode);
-                      m.redraw();
-                    }).catch((err) => { notifyError(`${err.message}`); });
-                  }
+                  await setDelegate(vnode);
                   vnode.state.loading = false;
                   m.redraw();
                 },
@@ -129,6 +157,13 @@ const DelegateForm: m.Component<{}, { form: IDelegateForm, loading: boolean, cur
   }
 };
 
+const SUPPORTED_CHAINS = [
+  ChainNetwork.Marlin,
+  ChainNetwork.MarlinTestnet,
+  ChainNetwork.Aave,
+  ChainNetwork.AaveTestnet,
+];
+
 const DelegatePage: m.Component<{}> = {
   view: (vnode) => {
     if (!app.chain || !app.chain.loaded) {
@@ -140,12 +175,11 @@ const DelegatePage: m.Component<{}> = {
         });
       }
       // wrong chain loaded
-      if (app.chain && app.chain.loaded
-          && [ChainNetwork.Marlin, ChainNetwork.MarlinTestnet].includes(app.chain.network)
+      if (app.chain && app.chain.loaded && !SUPPORTED_CHAINS.includes(app.chain.network)
       ) {
         return m(PageNotFound, {
           title: 'Delegate Page',
-          message: 'Delegate page for Marlin users only!'
+          message: 'Delegate page for Marlin and Aave users only!'
         });
       }
       // chain loading

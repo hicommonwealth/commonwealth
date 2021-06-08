@@ -39,7 +39,7 @@ export default class MarlinChain extends EthereumChain {
     return new BN(balance.toString(), 10) || new BN(0);
   }
 
-  public async senderSetDelegate(address: string, amount: number) {
+  public async setDelegate(address: string, amount: number) {
     try {
       const contract = await attachSigner(this.app.wallets, this.app.user.activeAccount.address, this.marlinApi.MPond);
       await contract.delegate(address, amount);
@@ -49,7 +49,7 @@ export default class MarlinChain extends EthereumChain {
     }
   }
 
-  public async senderGetDelegate(): Promise<string> {
+  public async getDelegate(): Promise<string> {
     // TODO: I don't think this is implementable anymore because of how the MPOND delegates mapping works now
     return new Promise(() => 'Method Not Implemented');
     // const sender = this._api.userAddress;
