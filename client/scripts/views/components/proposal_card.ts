@@ -150,7 +150,7 @@ const ProposalCard: m.Component<{ proposal: AnyProposal, injectedContent? }> = {
             });
           })(),
         proposal instanceof SubstrateTreasuryProposal && !proposal.data.index && m(Tag, {
-          label: 'Missing data',
+          label: 'MISSING DATA',
           intent: 'primary',
           rounded: true,
           size: 'xs',
