@@ -37,6 +37,7 @@ const createThread = async (
   if (authorError) return next(new Error(authorError));
   if (chain && chain.type === 'token') {
     // skip check for admins
+    /*
     const isAdmin = await models.Role.findAll({
       where: {
         address_id: author.id,
@@ -53,6 +54,7 @@ const createThread = async (
         return next(new Error(Errors.CouldNotFetchTokenBalance));
       }
     }
+    */
   }
 
   const { topic_name, topic_id, title, body, kind, stage, url, readOnly } = req.body;
