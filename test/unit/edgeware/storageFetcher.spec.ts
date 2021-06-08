@@ -10,7 +10,7 @@ import {
   Votes,
   Bounty,
 } from '@polkadot/types/interfaces';
-import { Vec, Data, TypeRegistry, Bytes } from '@polkadot/types';
+import { Vec, Data, TypeRegistry } from '@polkadot/types';
 import { Codec } from '@polkadot/types/types';
 import { stringToHex } from '@polkadot/util';
 import { DeriveReferendum } from '@polkadot/api-derive/democracy/types';
@@ -30,7 +30,6 @@ import {
   ICollectiveVoted,
   IdentityJudgement,
   ITreasuryBountyProposed,
-  ITreasuryBountyBecameActive,
 } from '../../../src/substrate/types';
 import { StorageFetcher } from '../../../src/substrate/storageFetcher';
 

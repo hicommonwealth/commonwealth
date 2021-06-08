@@ -20,7 +20,7 @@ import {
 } from '@polkadot/types/interfaces';
 import { Codec } from '@polkadot/types/types';
 import { DeriveProposalImage } from '@polkadot/api-derive/types';
-import { hexToString, isFunction } from '@polkadot/util';
+import { isFunction } from '@polkadot/util';
 
 import { CWEvent, IStorageFetcher } from '../interfaces';
 import { factory, formatFilename } from '../logging';
@@ -45,7 +45,6 @@ import {
   IdentityJudgement,
   ITreasuryBountyBecameActive,
   ITreasuryBountyAwarded,
-  ITreasuryBountyClaimed,
   ITreasuryBountyEvents,
 } from './types';
 
