@@ -30,6 +30,7 @@ const nodes = [
   [ 'wss://rpc.kulupu.corepaper.org/ws', 'kulupu'],
   [ 'wss://rpc.plasmnet.io/ws', 'plasm'],
   [ 'wss://scan-rpc.stafi.io/ws', 'stafi'],
+  [ 'wss://api.crust.network/', 'crust'],
   [ 'wss://cc1.darwinia.network/ws', 'darwinia'],
   [ 'wss://poc3.phala.com/ws', 'phala'],
   [ 'wss://fullnode.centrifuge.io', 'centrifuge'],
@@ -198,6 +199,18 @@ const resetServer = (models): Promise<number> => {
           type: 'chain',
           base: 'substrate',
           ss58_prefix: 20,
+          collapsed_on_homepage: false,
+        }),
+        models.Chain.create({
+          id: 'crust',
+          network: 'crust',
+          symbol: 'CRUST',
+          name: 'Crust',
+          icon_url: '/static/img/protocols/crust.png',
+          active: true,
+          type: 'chain',
+          base: 'substrate',
+          ss58_prefix: 20, // @TODO: Check if true
           collapsed_on_homepage: false,
         }),
         models.Chain.create({

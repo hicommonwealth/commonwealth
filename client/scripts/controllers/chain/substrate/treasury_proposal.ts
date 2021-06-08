@@ -14,8 +14,9 @@ import { formatAddressShort } from '../../../../../shared/utils';
 
 const backportEventToAdapter = (
   ChainInfo: SubstrateChain,
-  event: SubstrateTypes.ITreasuryProposed
+  event: SubstrateTypes.ITreasuryProposed | string
 ): ISubstrateTreasuryProposal => {
+  if (typeof event === 'string') return { identifier: event } as ISubstrateTreasuryProposal;
   return {
     identifier: event.proposalIndex.toString(),
     index: event.proposalIndex,
@@ -114,8 +115,8 @@ export class SubstrateTreasuryProposal
   ) {
     super('treasuryproposal', backportEventToAdapter(
       ChainInfo,
-      entity.chainEvents
-        .find((e) => e.data.kind === SubstrateTypes.EventKind.TreasuryProposed).data as SubstrateTypes.ITreasuryProposed
+      // sometimes a TreasuryProposed chainEvent isn't available, so we have to fill in stub data
+      (entity.chainEvents.find((e) => e.data.kind === SubstrateTypes.EventKind.TreasuryProposed)?.data as SubstrateTypes.ITreasuryProposed) || entity.typeId
     ));
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
@@ -124,7 +125,9 @@ export class SubstrateTreasuryProposal
     this.value = this._Chain.coins(this.data.value);
     this.bond = this._Chain.coins(this.data.bond);
     this.beneficiaryAddress = this.data.beneficiary;
-    this._author = this._Accounts.fromAddress(this.data.proposer || entity.author);
+    this._author = this.data.proposer ? this._Accounts.fromAddress(this.data.proposer)
+      : entity.author ? this._Accounts.fromAddress(this.data.proposer) : null;
+
     this.title = entity.title || this.generateTitle();
     this.createdAt = entity.createdAt;
     this.threadId = entity.threadId;
@@ -157,7 +160,7 @@ export class SubstrateTreasuryProposal
     if (this.completed) {
       return;
     }
-    switch (e.data.kind) {
+    switch (e.data?.kind) {
       case SubstrateTypes.EventKind.TreasuryProposed: {
         break;
       }

@@ -16,7 +16,6 @@ renderer.link = (href, title, text) => {
 marked.setOptions({
   renderer,
   gfm: true, // use github flavored markdown
-  sanitize: true, // extra sanitize pass
   smartypants: true,
   smartLists: true,
   xhtml: true,

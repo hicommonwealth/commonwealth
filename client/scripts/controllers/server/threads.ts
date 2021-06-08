@@ -434,6 +434,10 @@ class ThreadsController {
     if (response.status !== 'Success') {
       throw new Error(`Cannot fetch thread: ${response.status}`);
     }
+
+    // rewrite ChainEntities alias since /getThread returns differently than /bulkThreads
+    response.result.chain_entities = response.result.ChainEntities;
+
     const thread = modelFromServer(response.result);
     const existing = this._store.getByIdentifier(thread.id);
     if (existing) this._store.remove(existing);

@@ -279,6 +279,13 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/stafi/main'
     )).default;
     newChain = new Stafi(n, app);
+  } else if (n.chain.network === ChainNetwork.Crust) {
+    const Crust = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "crust-main" */
+      './controllers/chain/crust/main'
+    )).default;
+    newChain = new Crust(n, app);
   } else if (n.chain.network === ChainNetwork.Darwinia) {
     const Darwinia = (await import(
       /* webpackMode: "lazy" */
