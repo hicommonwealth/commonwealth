@@ -18,21 +18,21 @@
     width: 65%;
     flex: 1 1 auto;
 
-      .label {
-        font-weight: 600;
-        padding-bottom: 8px;
-      }
+    .label {
+      font-weight: 600;
+      padding-bottom: 8px;
+    }
 
-      .tip-reason {
-        width: 75%;
-      }
+    .tip-reason {
+      width: 75%;
+    }
   }
 
   .tip-contributions {
     width: 35%;
     flex: 1 1 auto;
 
-    .mb-12{
+    .mb-12 {
       margin-bottom: 12px;
     }
 
@@ -40,9 +40,22 @@
       font-weight: 600;
     }
 
-    .contributors{
+    .contributors {
       margin-top: 64px;
       margin-bottom: 32px;
+    }
+
+    .contributors-row {
+      display: flex;
+      margin-bottom: 18px;
+      overflow: hidden;
+
+      .amount {
+        flex: 0 0 30%;
+        overflow: hidden;
+        white-space: nowrap;
+        margin-right: 12px;
+      }
     }
   }
 }

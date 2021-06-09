@@ -885,7 +885,17 @@ const ViewProposalPage: m.Component<{
             }),
             contributors.length > 0 && [
               m('.contributors .title', 'Contributors'),
-              contributors.map((value) => console.log(value)),
+              contributors.map(({ account, deposit }) => (
+                m('.contributors-row', [
+                  m('.amount', deposit.format(true)),
+                  m(User, {
+                    user: account,
+                    linkify: true,
+                    popover: true,
+                    showAddressWithDisplayName: true,
+                  }),
+                ])
+              )),
             ]
           ]),
         ]),

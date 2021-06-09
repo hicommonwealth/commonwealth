@@ -22,7 +22,7 @@ import User from '../components/widgets/user';
 const TipDetail: m.Component<{ tip: SubstrateTreasuryTip }> = {
   view: (vnode) => {
     const { tip } = vnode.attrs;
-    const { reason, who } = tip.data;
+    const { who } = tip.data;
     const beneficiary = app.chain.accounts.get(who);
     return m('.TipDetail', {
       onclick: (e) => {
