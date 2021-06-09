@@ -14,6 +14,7 @@ export interface OffchainTopicAttributes {
   created_at?: Date;
   updated_at?: Date;
   deleted_at?: Date;
+  token_threshold: number;
 
   // associations
   community?: OffchainCommunityAttributes;
@@ -44,6 +45,7 @@ export default (
     created_at: { type: dataTypes.DATE, allowNull: false },
     updated_at: { type: dataTypes.DATE, allowNull: false },
     deleted_at: { type: dataTypes.DATE, allowNull: true },
+    token_threshold: { type: dataTypes.INTEGER, allowNull: false }
   }, {
     underscored: true,
     paranoid: true,

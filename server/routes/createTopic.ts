@@ -5,6 +5,7 @@ export const Errors = {
   NotLoggedIn: 'Not logged in',
   TopicRequired: 'Topic name required',
   MustBeAdmin: 'Must be an admin',
+  InvalidTokenThreshold: 'Invalid token threshold'
 };
 
 const createTopic = async (models, req, res: Response, next: NextFunction) => {
@@ -29,10 +30,14 @@ const createTopic = async (models, req, res: Response, next: NextFunction) => {
 
   const chainOrCommObj2 = community ? { community_id: community.id } : { chain_id: chain.id };
 
+  const token_threshold = parseInt(req.body.token_threshold, 10);
+  if (Number.isNaN(token_threshold)) {
+    return next(new Error(Errors.InvalidTokenThreshold));
+  }
   const options = {
     name: req.body.name,
     description: req.body.description,
-    token_threshold: req.body.token_threshold,
+    token_threshold,
     ...chainOrCommObj2,
   };
 
