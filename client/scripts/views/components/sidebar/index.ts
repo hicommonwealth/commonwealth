@@ -181,7 +181,8 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
       || p.startsWith(`/${app.activeChainId()}/proposal/treasuryproposal`);
     const onBountiesPage = (p) => p.startsWith(`/${app.activeChainId()}/bounties`);
     const onCouncilPage = (p) => p.startsWith(`/${app.activeChainId()}/council`);
-    const onTipsPage = (p) => p.startsWith(`/${app.activeChainId()}/tips`);
+    const onTipsPage = (p) => p.startsWith(`/${app.activeChainId()}/tips`)
+      || p.startsWith(`/${app.activeChainId()}/proposal/treasurytip`);
 
     const onValidatorsPage = (p) => p.startsWith(`/${app.activeChainId()}/validators`);
     const onNotificationsPage = (p) => p.startsWith('/notifications');

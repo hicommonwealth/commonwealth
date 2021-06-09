@@ -59,6 +59,13 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
         label: 'New bounty proposal',
         iconLeft: mobile ? Icons.PLUS : undefined,
       }),
+      m(MenuItem, {
+        onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
+          type: ProposalType.SubstrateTreasuryTip,
+        }),
+        label: 'New tip',
+        iconLeft: mobile ? Icons.PLUS : undefined,
+      }),
     ],
   ];
 };

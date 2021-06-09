@@ -33,6 +33,7 @@ import { createTXModal } from 'views/modals/tx_signing_modal';
 import TopicSelector from 'views/components/topic_selector';
 import ErrorPage from 'views/pages/error';
 import SubstrateBountyTreasury from 'controllers/chain/substrate/bountyTreasury';
+import User from '../../components/widgets/user';
 
 // this should be titled the Substrate/Edgeware new proposal form
 const NewProposalForm = {
@@ -64,7 +65,7 @@ const NewProposalForm = {
     // bounty proposal
     let hasBountyValue : boolean;
     // tip
-    let hasReason: boolean;
+    let hasTipsFields : boolean;
     // council motion
     let hasVotingPeriodAndDelaySelector : boolean;
     let hasReferendumSelector : boolean;
@@ -113,10 +114,9 @@ const NewProposalForm = {
       const bountyTreasury = (app.chain as Substrate).bounties;
       dataLoaded = !!bountyTreasury.initialized;
     } else if (proposalTypeEnum === ProposalType.SubstrateTreasuryTip) {
-      hasReason = true;
+      hasTipsFields = true;
       // TODO: this is only true if the proposer is doing reportAwesome()
       //   we need special code for newTip().
-      hasBeneficiary = true;
       const tips = (app.chain as Substrate).tips;
       dataLoaded = !!tips.initialized;
     } else if (proposalTypeEnum === ProposalType.PhragmenCandidacy) {
@@ -332,6 +332,16 @@ const NewProposalForm = {
           .catch((err) => notifyError(err.toString()));
 
         // @TODO: Create Proposal via WebTx
+      } else if (proposalTypeEnum === ProposalType.SubstrateTreasuryTip) {
+        if (!vnode.state.form.beneficiary) throw new Error('Invalid beneficiary address');
+        const beneficiary = app.chain.accounts.get(vnode.state.form.beneficiary);
+        args = [author, vnode.state.form.description, beneficiary];
+        mixpanel.track('Create Thread', {
+          'Step No': 2,
+          'Step' : 'Submit Proposal',
+          'Proposal Type': 'Tip',
+          'Thread Type': 'Proposal',
+        });
       } else {
         mixpanel.track('Create Thread', {
           'Step No': 2,
@@ -418,22 +428,6 @@ const NewProposalForm = {
                 oninput: (e) => {
                   const result = (e.target as any).value;
                   vnode.state.form.title = result;
-                  m.redraw();
-                },
-              }),
-            ]),
-          ],
-          hasReason && [
-            m(FormGroup, [
-              m(FormLabel, 'Reason'),
-              m(Input, {
-                placeholder: 'Enter a reason',
-                name: 'reason',
-                autofocus: true,
-                autocomplete: 'off',
-                oninput: (e) => {
-                  const result = (e.target as any).value;
-                  vnode.state.form.reason = result;
                   m.redraw();
                 },
               }),
@@ -775,6 +769,41 @@ const NewProposalForm = {
                 oninput: (e) => {
                   const result = (e.target as any).value;
                   vnode.state.description = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+          ],
+          hasTipsFields && [
+            m(FormGroup, [
+              m('.label', 'Finder'),
+              m(User, {
+                user: author,
+                linkify: true,
+                popover: true,
+                showAddressWithDisplayName: true,
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Beneficiary'),
+              m(Input, {
+                name: 'beneficiary',
+                placeholder: 'Beneficiary of treasury proposal',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.form.beneficiary = result;
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Reason'),
+              m(TextArea, {
+                name: 'reason',
+                placeholder: 'What’s the reason you want to tip the beneficiary?',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  if (vnode.state.form.description === result) return;
+                  vnode.state.form.description = result;
                   m.redraw();
                 },
               }),

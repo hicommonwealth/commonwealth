@@ -1,9 +1,10 @@
 import 'pages/view_proposal/index.scss';
+import 'pages/view_proposal/tips.scss';
 
 import $ from 'jquery';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
-import { PopoverMenu, MenuDivider, Icon, Icons, Button } from 'construct-ui';
+import { PopoverMenu, MenuDivider, Icon, Icons, Button, Input } from 'construct-ui';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
@@ -24,6 +25,7 @@ import {
   ChainBase,
   ChainEntity,
   ProposalModule,
+  DepositVote,
 } from 'models';
 
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
@@ -65,6 +67,9 @@ import {
 } from './body';
 import CreateComment from './create_comment';
 import LinkedProposalsEmbed from './linked_proposals_embed';
+import User from '../../components/widgets/user';
+import MarkdownFormattedText from '../../components/markdown_formatted_text';
+import { createTXModal } from '../../modals/tx_signing_modal';
 
 
 const ProposalHeader: m.Component<{
@@ -551,6 +556,7 @@ const ViewProposalPage: m.Component<{
   proposal: AnyProposal | OffchainThread,
   threadFetched,
   threadFetchFailed,
+  tipAmount: number,
 }> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'ViewProposalPage' });
@@ -812,6 +818,80 @@ const ViewProposalPage: m.Component<{
     };
 
     const { replyParent } = vnode.state;
+
+    if (proposal instanceof SubstrateTreasuryTip) {
+      const { author, title, data:{ who, reason } } = proposal;
+      const contributors = proposal.getVotes();
+
+      return m(Sublayout, { class: 'ViewProposalPage', showNewProposalButton: true, title: headerTitle }, [
+        m('.TipDetailPage', [
+          m('.tip-details', [
+            m('.title', title),
+            m('.proposal-page-row', [
+              m('.label', 'Finder'),
+              m(User, {
+                user: author,
+                linkify: true,
+                popover: true,
+                showAddressWithDisplayName: true,
+              }),
+            ]),
+            m('.proposal-page-row', [
+              m('.label', 'Beneficiary'),
+              m(User, {
+                user: app.profiles.getProfile(proposal.author.chain.id, who),
+                linkify: true,
+                popover: true,
+                showAddressWithDisplayName: true,
+              }),
+            ]),
+            m('.proposal-page-row', [
+              m('.label', 'Reason'),
+              m('.tip-reason', [
+                m(MarkdownFormattedText, { doc: reason }),
+              ]),
+            ]),
+          ]),
+          m('.tip-contributions', [
+            m('.title', 'Contribute'),
+            m('.mb-12', [
+              m('.label', 'Amount'),
+              m(Input, {
+                name: 'amount',
+                placeholder: 'Enter tip amount',
+                autocomplete: 'off',
+                fluid: true,
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.tipAmount = result.length > 0
+                    ? app.chain.chain.coins(parseFloat(result), true) : undefined;
+                  m.redraw();
+                },
+              })
+            ]),
+            m(Button, {
+              disabled: vnode.state.tipAmount === undefined,
+              intent: 'primary',
+              rounded: true,
+              label: 'Submit Transaction',
+              onclick: (e) => {
+                e.preventDefault();
+                createTXModal(proposal.submitVoteTx(
+                  new DepositVote(app.user.activeAccount, vnode.state.tipAmount)
+                ));
+              },
+              tabindex: 4,
+              type: 'submit',
+            }),
+            contributors.length > 0 && [
+              m('.contributors .title', 'Contributors'),
+              contributors.map((value) => console.log(value)),
+            ]
+          ]),
+        ]),
+      ]);
+    }
+
     return m(Sublayout, { class: 'ViewProposalPage', showNewProposalButton: true, title: headerTitle }, [
       m(ProposalHeader, {
         proposal,

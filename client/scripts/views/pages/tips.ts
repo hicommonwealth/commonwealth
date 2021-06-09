@@ -30,16 +30,15 @@ const TipDetail: m.Component<{ tip: SubstrateTreasuryTip }> = {
         e.stopPropagation();
       }
     }, [
-      m('.b-box', [
-        m('.b-row', [
-          m(User, {
-            user: beneficiary,
-            popover: true,
-          }),
-        ]),
-        m('.b-row', [
-          m('.b-col', reason),
-        ]),
+      m('.b-row', [
+        m('p', 'Beneficiary'),
+      ]),
+      m('.b-row', [
+        m(User, {
+          user: beneficiary,
+          popover: true,
+          showAddressWithDisplayName: true,
+        }),
       ]),
     ]);
   }

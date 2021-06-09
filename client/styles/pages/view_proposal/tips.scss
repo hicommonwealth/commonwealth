@@ -1,0 +1,48 @@
+@import 'client/styles/shared';
+
+.TipDetailPage {
+  display: flex;
+  padding: 24px 12px;
+
+  .title {
+    font-size: 32px;
+    font-weight: 500;
+    margin-bottom: 32px;
+  }
+
+  .proposal-page-row {
+    margin-bottom: 18px;
+  }
+
+  .tip-details {
+    width: 65%;
+    flex: 1 1 auto;
+
+      .label {
+        font-weight: 600;
+        padding-bottom: 8px;
+      }
+
+      .tip-reason {
+        width: 75%;
+      }
+  }
+
+  .tip-contributions {
+    width: 35%;
+    flex: 1 1 auto;
+
+    .mb-12{
+      margin-bottom: 12px;
+    }
+
+    .label {
+      font-weight: 600;
+    }
+
+    .contributors{
+      margin-top: 64px;
+      margin-bottom: 32px;
+    }
+  }
+}
