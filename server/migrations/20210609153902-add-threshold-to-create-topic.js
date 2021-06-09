@@ -4,7 +4,7 @@ module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.addColumn(
-        'OffchainThreads',
+        'OffchainTopics',
         'token_threshold',
         {
           type: Sequelize.INTEGER,
@@ -18,7 +18,7 @@ module.exports = {
   down: (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.removeColumn(
-        'OffchainThreads',
+        'OffchainTopics',
         'token_threshold',
         {
           type: Sequelize.INTEGER,
