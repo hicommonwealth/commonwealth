@@ -5,6 +5,7 @@
 import * as SubstrateTypes from './substrate/types';
 import * as MolochTypes from './moloch/types';
 import * as MarlinTypes from './marlin/types';
+import * as Erc20Types from './erc20/types';
 
 // add other events here as union types
 export type IChainEntityKind =
@@ -14,20 +15,24 @@ export type IChainEntityKind =
 export type IChainEventData =
   | SubstrateTypes.IEventData
   | MolochTypes.IEventData
-  | MarlinTypes.IEventData;
+  | MarlinTypes.IEventData
+  | Erc20Types.IEventData;
 export type IChainEventKind =
   | SubstrateTypes.EventKind
   | MolochTypes.EventKind
-  | MarlinTypes.EventKind;
+  | MarlinTypes.EventKind
+  | Erc20Types.EventKind;
 export const ChainEventKinds = [
   ...SubstrateTypes.EventKinds,
   ...MolochTypes.EventKinds,
   ...MarlinTypes.EventKinds,
+  ...Erc20Types.EventKinds,
 ];
 export const EventSupportingChains = [
   ...SubstrateTypes.EventChains,
   ...MolochTypes.EventChains,
   ...MarlinTypes.EventChains,
+  ...Erc20Types.EventChains,
 ] as const;
 export type EventSupportingChainT = typeof EventSupportingChains[number];
 
