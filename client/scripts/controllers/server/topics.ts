@@ -6,7 +6,7 @@ import { OffchainTopic } from 'models';
 import app from 'state';
 
 const modelFromServer = (topic) => {
-  return new OffchainTopic(topic.name, topic.id, topic.description, topic.telegram, topic.community_id, topic.chain_id);
+  return new OffchainTopic(topic.name, topic.id, topic.description, topic.telegram, topic.community_id, topic.chain_id, topic.token_threshold);
 };
 
 class TopicsController {
@@ -39,6 +39,22 @@ class TopicsController {
       }
       this._store.add(result);
       return result;
+    } catch (err) {
+      console.log('Failed to edit topic');
+      throw new Error((err.responseJSON && err.responseJSON.error)
+        ? err.responseJSON.error
+        : 'Failed to edit topic');
+    }
+  }
+
+  public async setTokenThreshold(topic: OffchainTopic, token_threshold: number) {
+    try {
+      const response = await $.post(`${app.serverUrl()}/setTopicThreshold`, {
+        'topic_id': topic.id,
+        'token_threshold': token_threshold,
+        'jwt': app.user.jwt
+      });
+      return response.result;
     } catch (err) {
       console.log('Failed to edit topic');
       throw new Error((err.responseJSON && err.responseJSON.error)

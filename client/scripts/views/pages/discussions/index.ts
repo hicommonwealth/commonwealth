@@ -18,6 +18,7 @@ import EmptyTopicPlaceholder, { EmptyStagePlaceholder } from 'views/components/e
 import LoadingRow from 'views/components/loading_row';
 import Listing from 'views/pages/listing';
 import NewTopicModal from 'views/modals/new_topic_modal';
+import EditTokenThresholdsModal from 'views/modals/edit_token_thresholds_modal';
 import EditTopicModal from 'views/modals/edit_topic_modal';
 import CreateInviteModal from 'views/modals/create_invite_modal';
 
@@ -447,6 +448,13 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
                 onclick: (e) => {
                   e.preventDefault();
                   app.modals.create({ modal: NewTopicModal });
+                }
+              }),
+              isAdmin && m(MenuItem, {
+                label: 'Edit token thresholds',
+                onclick: (e) => {
+                  e.preventDefault();
+                  app.modals.create({ modal: EditTokenThresholdsModal });
                 }
               }),
               (app.community?.meta.invitesEnabled || isAdmin) && m(MenuItem, {

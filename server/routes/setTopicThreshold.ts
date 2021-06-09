@@ -12,7 +12,7 @@ const setTopicThreshold = async (models, req, res: Response, next: NextFunction)
 
   const topic = await models.OffchainTopic.findOne({
     where: {
-      topic_id: req.body.topic_id,
+      id: req.body.topic_id,
     }
   });
   if (!topic) return next(new Error(Errors.InvalidTopicId));
@@ -22,7 +22,7 @@ const setTopicThreshold = async (models, req, res: Response, next: NextFunction)
   },
   {
     where: {
-      topic_id: req.body.topic_id
+      id: req.body.topic_id
     }
   });
 

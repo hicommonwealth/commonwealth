@@ -8,7 +8,8 @@ module.exports = {
         'token_threshold',
         {
           type: Sequelize.INTEGER,
-          allowNull: true,
+          allowNull: false,
+          defaultValue: 0,
         },
         { transaction: t }
       );
@@ -22,7 +23,8 @@ module.exports = {
         'token_threshold',
         {
           type: Sequelize.INTEGER,
-          allowNull: true,
+          allowNull: false,
+          defaultValue: 0,
         },
         { transaction: t }
       );
