@@ -16,6 +16,9 @@ import { redirectToHTTPS } from 'express-http-to-https';
 import favicon from 'serve-favicon';
 import logger from 'morgan';
 import prerenderNode from 'prerender-node';
+
+import { Magic } from '@magic-sdk/admin';
+
 import devWebpackConfig from './webpack/webpack.config.dev.js';
 import prodWebpackConfig from './webpack/webpack.config.prod.js';
 import { factory, formatFilename } from './shared/logging';
@@ -25,7 +28,7 @@ import ViewCountCache from './server/util/viewCountCache';
 import IdentityFetchCache from './server/util/identityFetchCache';
 import TokenBalanceCache from './server/util/tokenBalanceCache';
 import TokenListCache from './server/util/tokenListCache';
-import { SESSION_SECRET, ROLLBAR_SERVER_TOKEN } from './server/config';
+import { SESSION_SECRET, ROLLBAR_SERVER_TOKEN, MAGIC_API_KEY } from './server/config';
 import models from './server/database';
 import { updateEvents, updateBalances } from './server/util/eventPoller';
 import resetServer from './server/scripts/resetServer';
@@ -71,6 +74,7 @@ async function main() {
   const CHAIN_EVENTS = process.env.CHAIN_EVENTS;
   const RUN_AS_LISTENER = process.env.RUN_AS_LISTENER === 'true';
 
+  const magic = MAGIC_API_KEY ? new Magic(MAGIC_API_KEY) : null;
   const identityFetchCache = new IdentityFetchCache(10 * 60);
   const tokenListCache = new TokenListCache();
   const tokenBalanceCache = new TokenBalanceCache(tokenListCache);
@@ -289,10 +293,10 @@ async function main() {
   }
 
   setupMiddleware();
-  setupPassport(models);
+  setupPassport(models, magic);
 
   await tokenBalanceCache.start(models);
-  setupAPI(app, models, viewCountCache, identityFetchCache, tokenBalanceCache);
+  setupAPI(app, models, viewCountCache, identityFetchCache, tokenBalanceCache, magic);
   setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
   setupErrorHandlers(app, rollbar);
 

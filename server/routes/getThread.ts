@@ -26,6 +26,9 @@ const getThread = async (models, req: Request, res: Response, next: NextFunction
           as: 'topic'
         },
         {
+          model: models.ChainEntity,
+        },
+        {
           model: models.OffchainReaction,
           as: 'reactions',
           include: {

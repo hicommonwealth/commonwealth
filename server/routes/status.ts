@@ -1,6 +1,7 @@
 import { QueryTypes } from 'sequelize';
 import jwt from 'jsonwebtoken';
 import _ from 'lodash';
+import passport from 'passport';
 import { Request, Response, NextFunction } from 'express';
 import { JWT_SECRET, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
@@ -46,7 +47,16 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
   ]);
 
   const thirtyDaysAgo = new Date((new Date() as any) - 1000 * 24 * 60 * 60 * 30);
-  const { user } = req;
+  let { user } = req;
+
+  // attempt manual jwt authentication rather than requiring cookies
+  if (!user) {
+    user = await new Promise((resolve, reject) => {
+      passport.authenticate('jwt', { session: false }, (err, u, info) => {
+        resolve(u);
+      })(req, res, next);
+    });
+  }
 
   if (!user) {
     const threadCount = {};
