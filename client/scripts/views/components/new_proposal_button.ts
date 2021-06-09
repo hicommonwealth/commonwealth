@@ -75,8 +75,7 @@ export const MobileNewProposalButton: m.Component<{}, { councilCandidates?: Arra
         hoverCloseDelay: 0,
         hasArrow: false,
         trigger: m(Button, {
-          disabled: !app.user.activeAccount
-            || (app.activeChainId() && (app.chain as Token).isToken && !(app.chain as Token).hasToken),
+          disabled: !app.user.activeAccount,
           label: m(Icon, { name: Icons.PLUS }),
         }),
         inline: true,
@@ -109,8 +108,7 @@ const NewProposalButton: m.Component<{
         class: 'NewProposalButton',
         label: 'New thread',
         fluid,
-        disabled: !app.user.activeAccount
-          || (app.chain && (app.chain as Token).isToken && !(app.chain as Token).hasToken),
+        disabled: !app.user.activeAccount,
         onclick: () => app.modals.create({ modal: NewThreadModal }),
       });
     }
@@ -124,8 +122,7 @@ const NewProposalButton: m.Component<{
         hoverCloseDelay: 0,
         hasArrow: false,
         trigger: m(Button, {
-          disabled: !app.user.activeAccount
-            || ((app.chain as Token).isToken && !(app.chain as Token).hasToken),
+          disabled: !app.user.activeAccount,
           label: 'New thread',
         }),
         position: 'bottom-end',
@@ -136,8 +133,7 @@ const NewProposalButton: m.Component<{
         content: getNewProposalMenu(councilCandidates),
       }),
       m(Button, {
-        disabled: !app.user.activeAccount
-          || ((app.chain as Token).isToken && !(app.chain as Token).hasToken),
+        disabled: !app.user.activeAccount,
         iconLeft: Icons.EDIT,
         fluid,
         onclick: () => app.modals.create({ modal: NewThreadModal }),
