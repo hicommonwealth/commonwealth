@@ -70,7 +70,7 @@ class TopicsController {
     }
   }
 
-  public async add(name: string, description: string, telegram: string) {
+  public async add(name: string, description: string, telegram: string, token_threshold: number = 0) {
     try {
       const chainOrCommObj = (app.activeChainId())
         ? { 'chain': app.activeChainId() }
@@ -82,6 +82,7 @@ class TopicsController {
         'description': description,
         'telegram': telegram,
         'jwt': app.user.jwt,
+        'token_threshold': token_threshold
       });
       const result = modelFromServer(response.result);
       if (this._store.getById(result.id)) {

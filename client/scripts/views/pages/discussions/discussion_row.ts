@@ -39,7 +39,6 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
     const pinned = proposal.pinned;
     const discussionLink = `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-`
       + `${slugify(proposal.title)}`;
-
     const rowHeader: any = [
       (propType === OffchainThreadKind.Link && proposal.url)
         && [
