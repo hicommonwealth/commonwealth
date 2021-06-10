@@ -1,6 +1,8 @@
 import moment from 'moment';
 import BN from 'bn.js';
 import Web3 from 'web3';
+import $ from 'jquery';
+import bs58 from 'bs58';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import { IAaveProposalResponse } from 'adapters/chain/aave/types';
 import { formatNumberLong } from 'adapters/currency';
@@ -60,6 +62,20 @@ function sumVotes(vs: AaveProposalVote[]): BN {
   }, new BN(0));
 }
 
+interface AipIpfsObject {
+  aip: number;
+  title: string;
+  status: string;
+  author: string;
+  shortDescription: string;
+  discussions: string;
+  created: string;
+  preview: string;
+  basename: string;
+  description: string;
+  updated: string;
+}
+
 export default class AaveProposal extends Proposal<
   AaveAPI,
   EthereumCoin,
@@ -70,14 +86,14 @@ export default class AaveProposal extends Proposal<
   private _Accounts: EthereumAccounts;
   private _Gov: AaveGovernance;
   private _Executor: AaveExecutor;
+  public get Executor() { return this._Executor; }
 
   public get shortIdentifier() { return `AaveProposal-${this.data.identifier}`; }
   public get title(): string {
-    return `Aave Proposal #${this.data.identifier}`;
+    return this._ipfsData.title || `Aave Proposal #${this.data.identifier}`;
   }
   public get description(): string {
-    // TODO: populate from values/calldatas/etc
-    return '';
+    return this._ipfsData.description || '';
   }
 
   public get isPassing(): ProposalStatus {
@@ -169,6 +185,9 @@ export default class AaveProposal extends Proposal<
 
   private _votingSupplyAtStart: BN;
   private _minVotingPowerNeeded: BN;
+  private _ipfsAddress: string;
+  private _ipfsData: AipIpfsObject;
+  public get ipfsData() { return this._ipfsData; }
 
   // Check whether a proposal has enough extra FOR-votes than AGAINST-votes
   // FOR VOTES - AGAINST VOTES > VOTE_DIFFERENTIAL * voting supply
@@ -198,8 +217,16 @@ export default class AaveProposal extends Proposal<
   }
 
   public async init() {
-    if (this._initialized) {
-      throw new Error('proposal already initialized!');
+    // fetch IPFS information
+    this._ipfsData = await $.getJSON(`https://ipfs.infura.io:5001/api/v0/cat?arg=${this._ipfsAddress}`);
+
+    // special case for expiration because no event is emitted
+    // TODO: hook onto specific block and set expired automatically
+    if (this.state === AaveTypes.ProposalState.EXPIRED) {
+      this.complete(this._Gov.store);
+    }
+    if (this.completed) {
+      return;
     }
 
     // TODO: this case will be true always except pending -- do we need to check?
@@ -212,12 +239,6 @@ export default class AaveProposal extends Proposal<
           .div(10000)
           .toString()
       );
-    }
-
-    // special case for expiration because no event is emitted
-    // TODO: hook onto specific block and set expired automatically
-    if (this.state === AaveTypes.ProposalState.EXPIRED) {
-      this.complete(this._Gov.store);
     }
 
     this._initialized = true;
@@ -239,6 +260,8 @@ export default class AaveProposal extends Proposal<
     entity.chainEvents.sort((e1, e2) => e1.blockNumber - e2.blockNumber).forEach((e) => this.update(e));
 
     this._Executor = this._Gov.api.getExecutor(this.data.executor);
+    this._Gov.store.add(this);
+    this._ipfsAddress = bs58.encode(Buffer.from('1220' + this.data.ipfsHash.slice(2), 'hex'));
   }
 
   public update(e: ChainEvent) {

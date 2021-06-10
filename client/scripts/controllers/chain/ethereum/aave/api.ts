@@ -16,6 +16,7 @@ export interface AaveExecutor {
   gracePeriod: number;
   voteDifferential: BN;
   minimumQuorum: BN;
+  delay: number;
 }
 
 export default class AaveApi extends ContractApi<AaveGovernanceV2> {
@@ -57,12 +58,14 @@ export default class AaveApi extends ContractApi<AaveGovernanceV2> {
         const gracePeriod = +(await executor.GRACE_PERIOD());
         const minimumQuorum = new BN((await executor.MINIMUM_QUORUM()).toString());
         const voteDifferential = new BN((await executor.VOTE_DIFFERENTIAL()).toString());
+        const delay = +(await executor.getDelay());
         this._Executors.push({
           contract: executor,
           address: executor.address,
           gracePeriod,
           minimumQuorum,
-          voteDifferential
+          voteDifferential,
+          delay,
         });
       }
     }
