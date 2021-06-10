@@ -10,6 +10,7 @@ import { Spinner, Button } from 'construct-ui';
 import app from 'state';
 import Sublayout from 'views/sublayout';
 import {SnapshotProposal } from 'models';
+import ConfirmSnapshotVoteModal from 'views/modals/confirm_snapshot_vote_modal';
 
 import { ProposalHeaderTitle } from './header';
 import {
@@ -134,12 +135,14 @@ const VoteAction: m.Component<{
     const voteYes = async (e) => {
       e.preventDefault();
       vnode.state.votingModalOpen = false;
+      console.log('here');
+      app.modals.create({ modal: ConfirmSnapshotVoteModal });
     };
 
     const voteNo = (e) => {
       e.preventDefault();
       vnode.state.votingModalOpen = false;
-      // open modal and check canVote and create vote
+      app.modals.create({ modal: ConfirmSnapshotVoteModal });
     };
 
     const yesButton = m('.yes-button', [
