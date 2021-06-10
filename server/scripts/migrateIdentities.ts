@@ -9,7 +9,8 @@ import _ from 'underscore';
 import { SubstrateTypes, SubstrateEvents, chainSupportedBy } from '@commonwealth/chain-events';
 import { OffchainProfileInstance } from '../models/offchain_profile';
 import IdentityEventHandler from '../eventHandlers/identity';
-import { constructSubstrateUrl, selectSpec } from '../../shared/substrate';
+import { ChainNodeInstance } from '../models/chain_node';
+import { constructSubstrateUrl } from '../../shared/substrate';
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -22,8 +23,14 @@ export default async function (models, chain?: string): Promise<void> {
   const chains = !chain ? SubstrateTypes.EventChains.concat() : [ chain ];
 
   // query one node for each supported chain
-  const nodes = (await Promise.all(chains.map((c) => {
-    return models.ChainNode.findOne({ where: { chain: c } });
+  const nodes: ChainNodeInstance[] = (await Promise.all(chains.map((c) => {
+    return models.ChainNode.findOne({
+      where: { chain: c },
+      include: [{
+        model: models.Chain,
+        where: { active: true },
+        required: true,
+      }] });
   }))).filter((n) => !!n);
   if (!nodes) {
     throw new Error('no nodes found for identity migration');
@@ -48,7 +55,7 @@ export default async function (models, chain?: string): Promise<void> {
     log.info(`Fetching identities on chain ${node.chain} at url ${node.url}...`);
     const nodeUrl = constructSubstrateUrl(node.url);
     try {
-      const api = await SubstrateEvents.createApi(nodeUrl, selectSpec(node.chain));
+      const api = await SubstrateEvents.createApi(nodeUrl, node.Chain.substrate_spec);
       const fetcher = new SubstrateEvents.StorageFetcher(api);
       const identityEvents = await fetcher.fetchIdentities(addresses);
 

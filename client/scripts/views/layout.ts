@@ -87,8 +87,8 @@ export const Layout: m.Component<{
       vnode.state.deferred = false;
       initChain();
       return m(LoadingLayout, { hideSidebar });
-    } else if (!scope && ((app.chain && app.chain.class) || app.community)) {
-      // Handle the case where we unload the chain or community, if we're
+    } else if (!scope && ((app.chain && app.chain.network) || app.community)) {
+      // Handle the case where we unload the network or community, if we're
       // going to a page that doesn't have one
       deinitChainOrCommunity().then(() => {
         vnode.state.loadingScope = null;

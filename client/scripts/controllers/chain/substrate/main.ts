@@ -5,7 +5,7 @@ import { SubstrateCouncil, SubstrateTechnicalCommittee } from 'controllers/chain
 import SubstrateTreasury from 'controllers/chain/substrate/treasury';
 import SubstrateBountyTreasury from 'controllers/chain/substrate/bountyTreasury';
 import ChainEntityController from 'controllers/server/chain_entities';
-import { IChainAdapter, ChainBase, ChainClass, NodeInfo } from 'models';
+import { IChainAdapter, ChainBase, NodeInfo, ChainNetwork } from 'models';
 import { IApp } from 'state';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import SubstratePhragmenElections from './phragmen_elections';
@@ -26,7 +26,6 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public readonly chainEntities = new ChainEntityController();
 
   public readonly base = ChainBase.Substrate;
-  public readonly class: ChainClass;
 
   public get timedOut() {
     console.log(this.chain);
@@ -36,10 +35,8 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   constructor(
     meta: NodeInfo,
     app: IApp,
-    _class: ChainClass,
   ) {
     super(meta, app);
-    this.class = _class;
     this.chain = new SubstrateChain(this.app);
     this.accounts = new SubstrateAccounts(this.app);
     this.phragmenElections = new SubstratePhragmenElections(this.app);
@@ -54,10 +51,10 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
 
   public async initApi(additionalOptions?) {
     if (this.apiInitialized) return;
-    await this.chain.resetApi(this.meta, additionalOptions);
+    await this.chain.resetApi(this.meta, additionalOptions || this.meta.chain.substrateSpec);
     await this.chain.initMetadata();
     await this.accounts.init(this.chain);
-    if (this.class !== ChainClass.Plasm) {
+    if (this.network !== ChainNetwork.Plasm) {
       await this.identities.init(this.chain, this.accounts);
     }
     await super.initApi();

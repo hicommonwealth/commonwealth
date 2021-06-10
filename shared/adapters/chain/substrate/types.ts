@@ -2,9 +2,9 @@ import BN from 'bn.js';
 import { u128, Compact } from '@polkadot/types';
 import { Codec } from '@polkadot/types/types';
 import { Call } from '@polkadot/types/interfaces';
+import { BountyStatus } from 'models/types';
 import { IIdentifiable, ICompletable } from '../../shared';
 import { Coin } from '../../currency';
-import { BountyStatus } from 'models/types';
 
 export function formatCall(c: Call | { section: string, method: string, args: string[] }): string {
   // build args string
