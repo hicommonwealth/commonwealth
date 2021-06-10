@@ -1,0 +1,8 @@
+@import 'client/styles/shared';
+
+.SpecSettingsPage {
+  .warn {
+    @include error-text();
+    margin: 6px 0 12px;
+  }
+}

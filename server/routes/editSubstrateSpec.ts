@@ -7,7 +7,7 @@ import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 const getSubstrateSpec = async (models, req: Request, res: Response, next: NextFunction) => {
-  const [chain,, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
+  const [chain,, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
   if (!chain) return next(new Error('Unknown chain.'));
   if (chain.base !== 'substrate') return next(new Error('Chain must be substrate'));
@@ -52,10 +52,10 @@ const getSubstrateSpec = async (models, req: Request, res: Response, next: NextF
     return next(new Error('failed to connect to node url'));
   }
   try {
-    const api = await ApiPromise.create({ provider, ...sanitizedSpec });
-    const version = await api.rpc.system.version();
-    const chainProps = await api.rpc.system.properties();
-    log.info(`Fetched version: ${version.toHuman()} and properties ${chainProps.toHuman()}`);
+    const api = await ApiPromise.create({ throwOnConnect: true, provider, ...sanitizedSpec });
+    const version = api.runtimeVersion;
+    const props = await api.rpc.system.properties();
+    log.info(`Fetched version: ${version.specName}:${version.specVersion} and properties ${JSON.stringify(props)}`);
   } catch (err) {
     return next(new Error('failed to initialize polkadot api'));
   }
