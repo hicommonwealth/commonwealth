@@ -3,13 +3,22 @@ import 'modals/create_invite_modal.scss';
 import m from 'mithril';
 import $ from 'jquery';
 import mixpanel from 'mixpanel-browser';
-import { Button, Input, Form, FormGroup, FormLabel, Select, RadioGroup } from 'construct-ui';
+import { Button, Input, Form, FormGroup, FormLabel, Select, RadioGroup, ListItem, List, Spinner } from 'construct-ui';
 
+import Web3 from 'web3';
+import moment from 'moment';
 import app from 'state';
-import { CommunityInfo, ChainInfo, RoleInfo, ChainBase } from 'models';
+import { CommunityInfo, ChainInfo, RoleInfo, ChainBase, Profile } from 'models';
 import { CompactModalExitButton } from 'views/modal';
 import { checkAddress } from '@polkadot/util-crypto';
-import Web3 from 'web3';
+import { notifyError } from 'controllers/app/notifications';
+import { UserBlock } from '../components/widgets/user';
+
+export interface SearchParams {
+  communityScope?: string;
+  chainScope?: string;
+  resultSize?: number;
+}
 
 interface IInviteButtonAttrs {
   selection: string,
@@ -23,10 +32,166 @@ interface IInviteButtonAttrs {
   disabled?: boolean
 }
 
+enum SearchType {
+  Member = 'member',
+}
+
+const SEARCH_PREVIEW_SIZE = 10;
+
 function validateEmail(email) {
   const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return re.test(String(email).toLowerCase());
 }
+
+const getBalancedContentListing = (unfilteredResults: any[], types: SearchType[]) => {
+  const results = {};
+  let unfilteredResultsLength = 0;
+  for (const key of types) {
+    results[key] = [];
+    unfilteredResultsLength += (unfilteredResults[key]?.length || 0);
+  }
+  let priorityPosition = 0;
+  let resultsLength = 0;
+  while (resultsLength < 6 && (resultsLength < unfilteredResultsLength)) {
+    for (let i = 0; i < types.length; i++) {
+      const type = types[i];
+      if (resultsLength < 6) {
+        const nextResult = unfilteredResults[type][priorityPosition];
+        if (nextResult) {
+          results[type].push(nextResult);
+          resultsLength += 1;
+        }
+      }
+    }
+    priorityPosition += 1;
+  }
+  return results;
+};
+
+export const getMemberPreview = (addr, enterAddressFn, closeResultsFn, searchTerm, tabIndex, showChainName?) => {
+  const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
+  if (addr.name) profile.initialize(addr.name, null, null, null, null);
+  const userLink = `/${m.route.param('scope') || addr.chain}/account/${addr.address}?base=${addr.chain}`;
+  return m(ListItem, {
+    tabIndex,
+    label: m('a.search-results-item', [
+      m(UserBlock, {
+        user: profile,
+        searchTerm,
+        avatarSize: 24,
+        showAddressWithDisplayName: true,
+        showFullAddress: true,
+        showChainName,
+      }),
+    ]),
+    onclick: (e) => {
+      enterAddressFn(addr.address);
+      closeResultsFn();
+    },
+    onkeyup: (e) => {
+      if (e.key === 'Enter') {
+        enterAddressFn(addr.address);
+        closeResultsFn();
+      }
+    }
+  });
+};
+
+const getResultsPreview = (searchTerm: string, state, params: SearchParams) => {
+  const { communityScope, chainScope } = params;
+
+  const results = getBalancedContentListing(app.searchAddressCache[searchTerm], [SearchType.Member]);
+
+  const organizedResults = [];
+  let tabIndex = 1;
+
+  const res = results[SearchType.Member];
+  if (res?.length === 0) return;
+
+  (res as any[]).forEach((item) => {
+    tabIndex += 1;
+    const resultRow = getMemberPreview(item, state.enterAddress, state.closeResults, searchTerm, tabIndex, !!communityScope);
+    organizedResults.push(resultRow);
+  });
+
+  return organizedResults;
+};
+
+const concludeSearch = (searchTerm: string, params: SearchParams, state, err?) => {
+  if (!app.searchAddressCache[searchTerm].loaded) {
+    app.searchAddressCache[searchTerm].loaded = true;
+  }
+  if (err) {
+    state.results = {};
+    state.errorText = (err.responseJSON?.error || err.responseText || err.toString());
+  } else {
+    state.results = getResultsPreview(searchTerm, state, params);
+  }
+  m.redraw();
+};
+
+export const searchMentionableAddresses = async (
+  searchTerm: string,
+  params: SearchParams,
+  order?: string[]
+) => {
+  const { resultSize, communityScope, chainScope } = params;
+  try {
+    const response = await $.get(`${app.serverUrl()}/bulkAddresses`, {
+      chain: chainScope,
+      community: communityScope,
+      limit: resultSize,
+      searchTerm,
+      order,
+    });
+    if (response.status !== 'Success') {
+      throw new Error(`Got unsuccessful status: ${response.status}`);
+    }
+    return response.result;
+  } catch (e) {
+    console.error(e);
+    return [];
+  }
+};
+
+const sortResults = (a, b) => {
+  // TODO: Token-sorting approach
+  // Some users are not verified; we give them a default date of 1900
+  const aCreatedAt = moment(a.created_at || a.createdAt || a.verified || '1900-01-01T:00:00:00Z');
+  const bCreatedAt = moment(b.created_at || b.createdAt || b.verified || '1900-01-01T:00:00:00Z');
+  return bCreatedAt.diff(aCreatedAt);
+};
+
+// Search makes the relevant queries, depending on whether the search is global or
+// community-scoped. It then "concludesSearch," and either assigns the results to
+// app.searchAddressCache or sends them to getResultsPreview, which creates the relevant
+// preview rows
+export const search = async (searchTerm: string, params: SearchParams, state) => {
+  const { communityScope, chainScope } = params;
+  const resultSize = SEARCH_PREVIEW_SIZE;
+  if (app.searchAddressCache[searchTerm]?.loaded) {
+    // If results exist in cache, conclude search
+    concludeSearch(searchTerm, params, state);
+  }
+  try {
+    const addrs = await searchMentionableAddresses(searchTerm, { resultSize, communityScope, chainScope }, ['created_at', 'DESC']);
+
+    app.searchAddressCache[searchTerm].member = addrs.map((addr) => {
+      addr.contentType = 'member';
+      addr.searchType = SearchType.Member;
+      return addr;
+    }).sort(sortResults);
+
+    if (communityScope || chainScope) {
+      concludeSearch(searchTerm, params, state);
+      return;
+    }
+
+    concludeSearch(searchTerm, params, state);
+  } catch (err) {
+    concludeSearch(searchTerm, params, state, err);
+  }
+};
 
 const InviteButton: m.Component<IInviteButtonAttrs, { loading: boolean, }> = {
   oninit: (vnode) => {
@@ -219,6 +384,24 @@ const CreateInviteLink: m.Component<{
   }
 };
 
+const emptySearchPreview : m.Component<{ searchTerm: string }, {}> = {
+  view: (vnode) => {
+    const { searchTerm } = vnode.attrs;
+    return m(ListItem, {
+      class: 'no-results',
+      label: [
+        m('b', searchTerm),
+        m('span', 'No addresses found')
+      ],
+      onclick: (e) => {
+        if (searchTerm.length < 4) {
+          notifyError('Query must be at least 4 characters');
+        }
+      }
+    });
+  }
+};
+
 const CreateInviteModal: m.Component<{
   communityInfo?: CommunityInfo;
   chainInfo?: ChainInfo;
@@ -230,6 +413,14 @@ const CreateInviteModal: m.Component<{
   invitedAddress: string;
   invitedAddressChain: string;
   invitedEmail: string;
+  searchAddressTerm: string;
+  inputTimeout: any;
+  hideResults: boolean;
+  isTyping: boolean;
+  results: any[];
+  closeResults: Function;
+  enterAddress: Function;
+  errorText: string;
 }> = {
   oncreate: (vnode) => {
     vnode.state.invitedAddressChain = '';
@@ -259,6 +450,23 @@ const CreateInviteModal: m.Component<{
 
     const isEmailValid = validateEmail(vnode.state.invitedEmail);
 
+    const { results, searchAddressTerm } = vnode.state;
+
+    const LoadingPreview = m(List, {
+      class: 'search-results-loading'
+    }, [ m(ListItem, { label: m(Spinner, { active: true }) }) ]);
+
+    const searchResults = (!results || results?.length === 0)
+      ? (app.searchAddressCache[searchAddressTerm]?.loaded)
+        ? m(List, [ m(emptySearchPreview, { searchTerm: searchAddressTerm }) ])
+        : LoadingPreview
+      : vnode.state.isTyping
+        ? LoadingPreview
+        : m(List, { class: 'search-results-list' }, results);
+
+    vnode.state.closeResults = () => { vnode.state.hideResults = true; };
+    vnode.state.enterAddress = (address: string) => { vnode.state.searchAddressTerm = address; };
+
     return m('.CreateInviteModal', [
       m('.compact-modal-title', [
         m('h3', 'Invite members'),
@@ -267,9 +475,10 @@ const CreateInviteModal: m.Component<{
       m('.compact-modal-body', [
         m(Form, [
           m(FormGroup, { span: 4 }, [
-            m(FormLabel, { class: 'chainSelectLabel' }, 'Chain'),
+            m(FormLabel, { class: 'chainSelectLabel' }, 'Community'),
             m(Select, {
               name: 'invitedAddressChain',
+              fluid: true,
               defaultValue: vnode.state.invitedAddressChain
                 || (chainInfo ? chainInfo.id : app.config.chains.getAll()[0].id),
               options: chainInfo
@@ -286,18 +495,40 @@ const CreateInviteModal: m.Component<{
               }
             }),
           ]),
-          m(FormGroup, { span: 8 }, [
+          m(FormGroup, { span: 8, style: { 'position': 'relative' } }, [
             m(FormLabel, 'Address'),
             m(Input, {
               fluid: true,
               name: 'address',
               autocomplete: 'off',
-              placeholder: 'Paste address',
-              class: !vnode.state.invitedAddress?.length ? '' : isAddressValid ? 'valid' : 'invalid',
+              placeholder: 'Type to search...',
+              value: vnode.state.searchAddressTerm,
               oninput: (e) => {
-                vnode.state.invitedAddress = (e.target as any).value;
-              }
+                e.stopPropagation();
+                vnode.state.isTyping = true;
+                vnode.state.searchAddressTerm = e.target.value?.toLowerCase();
+                if (vnode.state.hideResults) {
+                  vnode.state.hideResults = false;
+                }
+                if (!app.searchAddressCache[vnode.state.searchAddressTerm]) {
+                  app.searchAddressCache[vnode.state.searchAddressTerm] = { loaded: false };
+                }
+                if (e.target.value?.length > 3) {
+                  const params: SearchParams = {
+                    communityScope: app.activeCommunityId(),
+                    chainScope: vnode.state.invitedAddressChain || (chainInfo ? chainInfo.id : app.config.chains.getAll()[0].id),
+                  };
+                  clearTimeout(vnode.state.inputTimeout);
+                  vnode.state.inputTimeout = setTimeout(() => {
+                    vnode.state.isTyping = false;
+                    return search(vnode.state.searchAddressTerm, params, vnode.state);
+                  }, 500);
+                }
+              },
             }),
+            searchAddressTerm?.length > 3
+              && !vnode.state.hideResults
+              && searchResults
           ]),
           m(InviteButton, {
             selection: 'address',

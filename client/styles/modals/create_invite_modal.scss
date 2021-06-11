@@ -81,4 +81,106 @@
       }
     }
   }
+
+  .search-results-list,
+  .cui-list {
+    position: absolute;
+    z-index: 10;
+    top: 68px;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.15);
+    overflow-y: visible;
+    max-height: none !important;
+    &.search-results-loading {
+      display: flex;
+      justify-content: center;
+    }
+    .cui-list-item {
+      border-bottom: none;
+      padding: 5px 20px !important;
+      &:focus {
+        outline: #cfcbff auto 2px;
+      }
+      .search-results-item {
+        color: $text-color-black;
+        text-decoration: none;
+        padding: 12px 0 6px;
+        font-size: 18px;
+        overflow: hidden;
+        line-height: 1.2;
+        .TokenLabel {
+          display: flex;
+          justify-content: left;
+          align-items: center;
+          .token-label-left {
+            padding-right: 12px;
+          }
+          .token-label-right {
+            font-weight: 500;
+          }
+        }
+        .search-results-thread-title {
+          font-weight: 500;
+          margin-bottom: 4px;
+        }
+        .search-results-thread-subtitle {
+          margin-bottom: 2px;
+          .User {
+            margin-left: 5px;
+          }
+        }
+        mark {
+          background-color: #cfcbff;
+        }
+      }
+      &.disabled,
+      &.no-results {
+        font-weight: 500;
+        font-size: 14px;
+        letter-spacing: 0.3px;
+        margin-bottom: 3px;
+        line-height: 14px;
+        text-transform: uppercase;
+        color: #aaaaaa;
+        margin-top: 18px;
+        top: 2px;
+        &:first-child {
+          margin-top: 0px;
+        }
+        &:hover {
+          background: white;
+        }
+      }
+      &.disabled {
+        margin-top: 5px;
+        &:hover {
+          cursor: default;
+        }
+      }
+      &.no-results {
+        display: flex;
+        justify-content: space-between;
+        b {
+          width: 50%;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          white-space: nowrap;
+        }
+        span {
+          width: 50%;
+          color: $primary-bg-color;
+          text-align: right;
+        }
+      }
+    }
+    .UserBlock {
+      .user-block-left {
+        display: flex;
+        align-items: center;
+      }
+      .user-block-right {
+        display: none;
+      }
+    }
+  }
 }

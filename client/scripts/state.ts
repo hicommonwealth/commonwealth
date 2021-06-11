@@ -55,6 +55,7 @@ export interface IApp {
 
   recentActivity: RecentActivityController;
   searchCache: any;
+  searchAddressCache: any;
 
   // XXX: replace this with some app.chain helper
   activeChainId(): string;
@@ -121,6 +122,8 @@ const app: IApp = {
   recentActivity: new RecentActivityController(),
 
   searchCache: {},
+
+  searchAddressCache: {},
 
   activeChainId: () => app.chain?.id,
   activeCommunityId: () => app.community?.meta.id,
