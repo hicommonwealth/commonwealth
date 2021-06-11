@@ -22,6 +22,7 @@ import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import CommunitySelector from 'views/components/sidebar/community_selector';
 
 import { discordIcon, telegramIcon, elementIcon, githubIcon, websiteIcon } from './icons';
+import CreateCommunityModal from '../../modals/create_community_modal';
 
 const SidebarQuickSwitcherItem: m.Component<{ item, size }> = {
   view: (vnode) => {
@@ -77,6 +78,14 @@ const SidebarQuickSwitcher: m.Component<{}> = {
         },
       }),
       m(CommunitySelector),
+      app.user.isSiteAdmin && m(Button, {
+        class: 'create-community',
+        rounded: true,
+        label: m(Icon, { name: Icons.PLUS }),
+        onclick: (e) => {
+          app.modals.create({ modal: CreateCommunityModal });
+        },
+      }),
       starredCommunities.map((item) => m(SidebarQuickSwitcherItem, { item, size })),
     ]);
   }
@@ -232,7 +241,9 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           },
         }),
       // bounties (substrate only)
-      !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Centrifuge
+      !app.community && app.chain?.base === ChainBase.Substrate
+        && app.chain.network !== ChainNetwork.Centrifuge
+        && app.chain.network !== ChainNetwork.HydraDX
         && m(Button, {
           fluid: true,
           rounded: true,

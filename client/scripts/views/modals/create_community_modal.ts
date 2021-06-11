@@ -1,16 +1,16 @@
-import 'modals/create_community_modal.scss';
+// import 'modals/create_community_modal.scss';
+import 'modals/manage_community_modal.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
-import _ from 'lodash';
-import mixpanel from 'mixpanel-browser';
-import { Button } from 'construct-ui';
-
 import app from 'state';
-
-// import User from 'views/components/widgets/user';
+import mixpanel from 'mixpanel-browser';
+import { Table, Button } from 'construct-ui';
 import { CompactModalExitButton } from 'views/modal';
-import { CommunityInfo } from 'models';
+import { notifyError } from 'controllers/app/notifications';
+import { InputPropertyRow, TogglePropertyRow } from './manage_community_modal/metadata_rows';
+import { initAppState } from '../../app';
+
 
 interface IAttrs {}
 
@@ -18,156 +18,147 @@ interface IState {
   disabled: boolean;
   error: string;
   success: string | boolean;
-  selectedAddress: string;
-  selectedChain: string;
+  name: string;
+  description: string;
+  iconUrl: string;
+  invitesEnabled: boolean;
+  privacyEnabled: boolean;
+  isAuthenticatedForum: boolean;
+  website: string;
+  discord: string;
+  element: string;
+  telegram: string;
+  github: string;
 }
 
 const CreateCommunityModal: m.Component<IAttrs, IState> = {
-  oncreate: (vnode) => {
+  oncreate: () => {
     mixpanel.track('New Community', {
       'Step No': 1,
       'Step': 'Modal Opened'
     });
   },
+  oninit: (vnode) => {
+    vnode.state.name = '';
+    vnode.state.description = '';
+    vnode.state.iconUrl = '';
+    vnode.state.website = '';
+    vnode.state.discord = '';
+    vnode.state.element = '';
+    vnode.state.telegram = '';
+    vnode.state.github = '';
+    vnode.state.isAuthenticatedForum = false;
+    vnode.state.privacyEnabled = false;
+    vnode.state.invitesEnabled = false;
+  },
   view: (vnode: m.VnodeDOM<IAttrs, IState>) => {
-    return m('.CreateCommunityModal', [
-      m('h3', 'New Commonwealth community'),
-      m(CompactModalExitButton),
-      m('form.login-option', [
-        m('input[type="text"]', {
-          name: 'name',
-          placeholder: 'Community name',
-          oncreate: (vvnode) => {
-            $(vvnode.dom).focus();
-          },
-          autocomplete: 'off',
-        }),
-        m('textarea', {
-          name: 'description',
-          placeholder: 'Community description',
-        }),
-        m('.auth-features', [
-          // Removed this until Auth_conditions exist bc must match "invite" otherwise
-          // m('.form-field', [
-          //   m('input[type="checkbox"]', {
-          //     name: 'auth_forum',
-          //     id: 'auth_forum',
-          //   }),
-          //   m('label', { for: 'auth_forum' } , 'Only members can post (Invites Required)'),
-          // ]),
-          m('.form-field', [
-            m('input[type="checkbox"]', {
-              name: 'invites',
-              id: 'invites',
-            }),
-            m('label', { for: 'invites' }, 'Allow members to invite others'),
-          ]),
-          m('.form-field', [
-            m('input[type="checkbox"]', {
-              name: 'private_forum',
-              id: 'private_forum',
-            }),
-            m('label', { for: 'private_forum' }, 'Private: Only visible to members'),
-          ]),
-          m('br'),
-          m('h4', 'Select an admin'),
-          app.user.addresses.length === 0
-            && m('.no-active-address', 'No address found. You must have an address before creating a community.'),
-          app.user.addresses.map((addr) => {
-            return m('.form-field', [
-              m('input[type="radio"]', {
-                name: 'addr_select',
-                value: `addr_select_${addr.address}_${addr.chain}`,
-                id: `addr_select_${addr.address}_${addr.chain}`,
-                oninput: (e) => {
-                  vnode.state.selectedAddress = addr.address;
-                  vnode.state.selectedChain = addr.chain;
-                },
-              }),
-              m('label', { for: `addr_select_${addr.address}_${addr.chain}` }, [
-                `${addr.address.slice(0, 6)}${addr.address.length > 6 ? '...' : ''} (${addr.chain})`,
-                // m(User, { user: [addr.address, addr.chain] }),
-              ]),
-            ]);
+    return m('.ManageCommunityModal', [
+      m('.compact-modal-title', [
+        m('h3', 'New Commonwealth Community'),
+        m(CompactModalExitButton),
+      ]),
+      m('.compact-modal-body-max', [
+        m('.CommunityMetadataManagementTable', [m(Table, {
+          bordered: false,
+          interactive: false,
+          striped: false,
+          class: 'metadata-management-table',
+        }, [
+          m(InputPropertyRow, {
+            title: 'Name',
+            defaultValue: vnode.state.name,
+            onChangeHandler: (v) => { vnode.state.name = v; },
+          }),
+          m(InputPropertyRow, {
+            title: 'Description',
+            defaultValue: vnode.state.description,
+            onChangeHandler: (v) => { vnode.state.description = v; },
+            textarea: true,
+          }),
+          m(InputPropertyRow, {
+            title: 'Website',
+            defaultValue: vnode.state.website,
+            placeholder: 'https://example.com',
+            onChangeHandler: (v) => { vnode.state.website = v; },
+          }),
+          m(InputPropertyRow, {
+            title: 'Discord',
+            defaultValue: vnode.state.discord,
+            placeholder: 'https://discord.com/invite',
+            onChangeHandler: (v) => { vnode.state.discord = v; },
+          }),
+          m(InputPropertyRow, {
+            title: 'Element',
+            defaultValue: vnode.state.element,
+            placeholder: 'https://matrix.to/#',
+            onChangeHandler: (v) => { vnode.state.element = v; },
+          }),
+          m(InputPropertyRow, {
+            title: 'Telegram',
+            defaultValue: vnode.state.telegram,
+            placeholder: 'https://t.me',
+            onChangeHandler: (v) => { vnode.state.telegram = v; },
+          }),
+          m(InputPropertyRow, {
+            title: 'Github',
+            defaultValue: vnode.state.github,
+            placeholder: 'https://github.com',
+            onChangeHandler: (v) => { vnode.state.github = v; },
+          }),
+          m(TogglePropertyRow, {
+            title: 'Privacy',
+            defaultValue: vnode.state.privacyEnabled,
+            onToggle: (checked) => { vnode.state.privacyEnabled = checked; },
+            caption: (checked) => checked ? 'Threads are private to members' : 'Threads are visible to the public',
+          }),
+          m(TogglePropertyRow, {
+            title: 'Invites',
+            defaultValue: vnode.state.invitesEnabled,
+            onToggle: (checked) => { vnode.state.invitesEnabled = checked; },
+            caption: (checked) => checked ? 'Anyone can invite new members' : 'Admins/mods can invite new members',
           }),
         ]),
         m(Button, {
-          class: (vnode.state.disabled || !vnode.state.selectedAddress || !vnode.state.selectedChain)
-            ? 'disabled' : '',
-          type: 'submit',
-          onclick: (e) => {
-            e.preventDefault();
-            const name = $(vnode.dom).find('[name="name"]').val();
-            const description = $(vnode.dom).find('[name="description"]').val();
-            const chain = vnode.state.selectedChain;
-            const address = vnode.state.selectedAddress;
-            // const isAuthenticatedForum = $(vnode.dom).find('[name="auth_forum"]').prop('checked');
-            const privacyEnabled = $(vnode.dom).find('[name="private_forum"]').prop('checked');
-            const invitesEnabled = $(vnode.dom).find('[name="invites"]').prop('checked');
-
-            vnode.state.disabled = true;
-            vnode.state.success = false;
-
-            // TODO: Change to POST /community
-            $.post(`${app.serverUrl()}/createCommunity`, {
-              creator_address: vnode.state.selectedAddress,
-              creator_chain: vnode.state.selectedChain,
+          label: 'Save changes',
+          intent: 'primary',
+          onclick: async (e) => {
+            const {
               name,
               description,
-              default_chain: chain,
-              isAuthenticatedForum: 'false', // TODO: fetch from isAuthenticatedForum
-              privacyEnabled: privacyEnabled ? 'true' : 'false',
-              invitesEnabled: invitesEnabled ? 'true' : 'false',
-              auth: true,
-              jwt: app.user.jwt,
-            }).then((result) => {
-              const newCommunityInfo = new CommunityInfo({
-                id: result.result.id,
-                name: result.result.name,
-                description: result.result.description,
-                defaultChain: result.result.default_chain,
-                iconUrl: null,
-                website: null,
-                discord: null,
-                element: null,
-                telegram: null,
-                github: null,
-                visible: false,
-                customDomain: null,
-                collapsedOnHomepage: true,
-                adminsAndMods: [],
-                invitesEnabled: result.result.invitesEnabled,
-                privacyEnabled: result.result.privacyEnabled,
-                featuredTopics: result.featured_topics,
-                topics: result.topics,
+              iconUrl,
+              website,
+              discord,
+              element,
+              telegram,
+              github,
+              invitesEnabled,
+              privacyEnabled,
+              isAuthenticatedForum,
+            } = vnode.state;
+            try {
+              $.post(`${app.serverUrl()}/createCommunity`, {
+                name,
+                description,
+                iconUrl,
+                website,
+                discord,
+                element,
+                telegram,
+                github,
+                invitesEnabled,
+                privacyEnabled,
+                isAuthenticatedForum,
+                jwt: app.user.jwt,
+              }).then(async (res) => {
+                await initAppState(false);
+                $(e.target).trigger('modalexit');
+                m.route.set(`/${res.result.id}`);
               });
-              app.config.communities.add(newCommunityInfo);
-              vnode.state.success = 'Sucessfully added';
-              m.redraw();
-              vnode.state.disabled = false;
-              if (result.status === 'Success') {
-                if (!app.isLoggedIn()) {
-                  mixpanel.track('New Community', {
-                    'Step No': 2,
-                    'Step': 'Created Community'
-                  });
-                }
-                m.route.set(`/${newCommunityInfo.id}/`);
-                $(vnode.dom).trigger('modalexit');
-              } else {
-                vnode.state.error = result.message;
-              }
-              m.redraw();
-            }, (err) => {
-              vnode.state.disabled = false;
-              if (err.responseJSON) vnode.state.error = err.responseJSON.error;
-              m.redraw();
-            });
+            } catch (err) {
+              notifyError(err.responseJSON?.error || 'Creating new community failed');
+            }
           },
-          label: 'Create community'
         }),
-        vnode.state.error && m('.create-community-message.error', [
-          vnode.state.error || 'An error occurred'
         ]),
       ]),
     ]);

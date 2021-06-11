@@ -231,6 +231,13 @@ export class SubstrateDemocracyReferendum
     this._initialized = true;
     this.updateVoters();
     this._Democracy.store.add(this);
+
+    // sometimes proposals don't get an execution OR DemocracyPassed/DemocracyNotPassed event
+    if (this._endBlock < this._Democracy.app.chain.block.height
+        + (this._Democracy.app.chain as Substrate).democracy.enactmentPeriod
+       && !this.completed) {
+      this.complete();
+    }
   }
 
   protected complete() {
@@ -244,7 +251,7 @@ export class SubstrateDemocracyReferendum
   // TODO: This may cause issues if we have the same Call proposed twice, as this will only fetch the
   //   first one in storage. To fix this, we will need to use some timing heuristics to check that
   //   this referendum was created approximately when the found proposal concluded.
-  public getProposalOrMotion(preimage): SubstrateDemocracyProposal | SubstrateCollectiveProposal
+  public getProposalOrMotion(preimage?): SubstrateDemocracyProposal | SubstrateCollectiveProposal
     | SubstrateTreasuryProposal | undefined {
     // ensure all modules have loaded
     if (!this._Chain.app.isModuleReady) return;
@@ -296,7 +303,7 @@ export class SubstrateDemocracyReferendum
       case SubstrateTypes.EventKind.DemocracyCancelled:
       case SubstrateTypes.EventKind.DemocracyNotPassed: {
         this._passed = false;
-        this.complete();
+        if (!this.completed) this.complete();
         break;
       }
       case SubstrateTypes.EventKind.DemocracyPassed: {
@@ -306,7 +313,7 @@ export class SubstrateDemocracyReferendum
 
         // hack to complete proposals that didn't get an execution event for some reason
         if (this._executionBlock < this._Democracy.app.chain.block.height) {
-          this.complete();
+          if (!this.completed) this.complete();
         }
         break;
       }
@@ -314,7 +321,9 @@ export class SubstrateDemocracyReferendum
         if (!this.passed) {
           this._passed = true;
         }
-        this.complete();
+        if (!this.completed) {
+          this.complete();
+        }
         break;
       }
       case SubstrateTypes.EventKind.PreimageNoted: {
