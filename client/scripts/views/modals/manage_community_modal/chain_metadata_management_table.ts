@@ -24,6 +24,7 @@ interface IChainMetadataManagementState {
   customDomain: string;
   network: ChainNetwork;
   symbol: string;
+  snapshot: string;
 }
 
 const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAttrs, IChainMetadataManagementState> = {
@@ -41,6 +42,7 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
     vnode.state.iconUrl = vnode.attrs.chain.iconUrl;
     vnode.state.network = vnode.attrs.chain.network;
     vnode.state.symbol = vnode.attrs.chain.symbol;
+    vnode.state.snapshot = vnode.attrs.chain.snapshot;
   },
   view: (vnode) => {
     return m('.ChainMetadataManagementTable', [
@@ -111,6 +113,12 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
           placeholder: 'gov.edgewa.re',
           onChangeHandler: (v) => { vnode.state.customDomain = v; },
         }),
+        m(InputPropertyRow, {
+          title: 'Snapshot',
+          defaultValue: vnode.state.snapshot,
+          placeholder: vnode.state.network,
+          onChangeHandler: (v) => { vnode.state.snapshot = v; },
+        }),
         m('tr', [
           m('td', 'Admins'),
           m('td', [ m(ManageRolesRow, {
@@ -142,7 +150,8 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
             github,
             stagesEnabled,
             additionalStages,
-            customDomain
+            customDomain,
+            snapshot
           } = vnode.state;
           try {
             await vnode.attrs.chain.updateChainData({
@@ -155,7 +164,8 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
               github,
               stagesEnabled,
               additionalStages,
-              customDomain
+              customDomain,
+              snapshot
             });
             $(e.target).trigger('modalexit');
           } catch (err) {

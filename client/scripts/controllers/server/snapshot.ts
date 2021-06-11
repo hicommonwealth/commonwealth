@@ -10,7 +10,8 @@ class SnapshotController {
   public get proposalStore() { return this._proposalStore; }
 
   public async fetchSnapshotProposals(snapshot: string) {
-    const response = await $.get(`https://hub.snapshot.page/api/${snapshot}/proposals`);
+    const hubUrl = process.env.SNAPSHOT_APP_HUB_URL || 'https://testnet.snapshot.org';
+    const response = await $.get(`${hubUrl}/api/${snapshot}/proposals`);
     // if (response.status !== 'Success') {
     //   throw new Error(`Cannot fetch snapshot proposals: ${response.status}`);
     // }

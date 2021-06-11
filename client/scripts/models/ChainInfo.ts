@@ -175,7 +175,7 @@ class ChainInfo {
   // TODO: change to accept an object
   public async updateChainData({
     name, description, website, discord, element, telegram,
-    github, stagesEnabled, additionalStages, customDomain
+    github, stagesEnabled, additionalStages, customDomain, snapshot
   }) {
     // TODO: Change to PUT /chain
     const r = await $.post(`${app.serverUrl()}/updateChain`, {
@@ -190,6 +190,7 @@ class ChainInfo {
       'stagesEnabled': stagesEnabled,
       'additionalStages': additionalStages,
       'customDomain': customDomain,
+      'snapshot': snapshot,
       'jwt': app.user.jwt,
     });
     const updatedChain: ChainInfo = r.result;
@@ -203,6 +204,7 @@ class ChainInfo {
     this.stagesEnabled = updatedChain.stagesEnabled;
     this.additionalStages = updatedChain.additionalStages;
     this.customDomain = updatedChain.customDomain;
+    this.snapshot = updatedChain.snapshot;
   }
 
   public addFeaturedTopic(topic: string) {

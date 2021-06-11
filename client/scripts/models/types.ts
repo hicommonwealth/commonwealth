@@ -44,6 +44,7 @@ export enum ChainNetwork {
   CosmosHub = 'cosmos-hub',
   Gaia13k = 'gaia-13k',
   Yearn = 'yearn',
+  Sushi = 'sushi',
   Fei = 'fei'
 }
 
@@ -126,6 +127,12 @@ export enum ChainClass {
   Commonwealth = 'commonwealth',
   Yearn = 'yearn',
   Fei = 'fei',
+<<<<<<< HEAD
+=======
+  Sushi = 'sushi',
+  Crust = 'crust',
+  ERC20 = 'erc20',
+>>>>>>> Add Snapshot Creation (#1216)
 }
 
 >>>>>>> Add yearn and fei migrations and controllers (#1156)
