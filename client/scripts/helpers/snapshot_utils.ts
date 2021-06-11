@@ -1,10 +1,10 @@
-import { getBlockNumber } from '@snapshot-labs/snapshot.js/src/utils/web3';
-import getProvider from '@snapshot-labs/snapshot.js/src/utils/provider';
-import { ipfsGet } from '@snapshot-labs/snapshot.js/src/utils';
-import gateways from '@snapshot-labs/snapshot.js/src/gateways.json';
+// import { getBlockNumber } from '@snapshot-labs/snapshot.js/src/utils/web3';
+// import getProvider from '@snapshot-labs/snapshot.js/src/utils/provider';
+// import { ipfsGet } from '@snapshot-labs/snapshot.js/src/utils';
+// import gateways from '@snapshot-labs/snapshot.js/src/gateways.json';
 import client from 'helpers/snapshot_client';
 
-const gateway = process.env.SNAPSHOT_IPFS_GATEWAY || gateways[0];
+// const gateway = process.env.SNAPSHOT_IPFS_GATEWAY || gateways[0];
 
 declare global {
   interface ObjectConstructor {
@@ -56,23 +56,23 @@ export function formatProposal(proposal) {
   return proposal;
 }
 
-export async function getProposal(space, id) {
-  try {
-    console.time('getProposal.data');
-    const provider = getProvider(space.network);
-    const response = await Promise.all([
-      ipfsGet(gateway, id),
-      client.getVotes(space.key, id),
-      getBlockNumber(provider)
-    ]);
-    console.timeEnd('getProposal.data');
-    const [, votes, blockNumber] = response;
-    let [proposal]: any = response;
-    proposal = formatProposal(proposal);
-    proposal.ipfsHash = id;
-    return { proposal, votes, blockNumber };
-  } catch (e) {
-    console.log(e);
-    return e;
-  }
-}
+// export async function getProposal(space, id) {
+//   try {
+//     console.time('getProposal.data');
+//     const provider = getProvider(space.network);
+//     const response = await Promise.all([
+//       ipfsGet(gateway, id),
+//       client.getVotes(space.key, id),
+//       getBlockNumber(provider)
+//     ]);
+//     console.timeEnd('getProposal.data');
+//     const [, votes, blockNumber] = response;
+//     let [proposal]: any = response;
+//     proposal = formatProposal(proposal);
+//     proposal.ipfsHash = id;
+//     return { proposal, votes, blockNumber };
+//   } catch (e) {
+//     console.log(e);
+//     return e;
+//   }
+// }

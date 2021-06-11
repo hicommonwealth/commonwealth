@@ -13,7 +13,7 @@ import Sublayout from 'views/sublayout';
 import {SnapshotProposal } from 'models';
 import ConfirmSnapshotVoteModal from 'views/modals/confirm_snapshot_vote_modal';
 import snapshotClient from 'helpers/snapshot_client';
-import { formatSpace, fromEntries, getProposal } from 'helpers/snapshot_utils';
+import { formatSpace, fromEntries } from 'helpers/snapshot_utils';
 
 import { ProposalHeaderTitle } from './header';
 import {
