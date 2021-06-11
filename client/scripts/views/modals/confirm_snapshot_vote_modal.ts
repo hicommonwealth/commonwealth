@@ -8,6 +8,13 @@ import { Button, Input, Form, FormGroup, FormLabel } from 'construct-ui';
 import { CompactModalExitButton } from 'views/modal';
 
 const ConfirmSnapshotVoteModal: m.Component<{
+	space, 
+	proposal,
+	id,
+	selectedChoice,
+	totalScore,
+	scores,
+	snapshot
 }, {
   error: any,
   saving: boolean,

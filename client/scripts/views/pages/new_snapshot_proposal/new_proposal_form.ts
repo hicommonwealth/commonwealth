@@ -17,20 +17,10 @@ import { version } from '@snapshot-labs/snapshot.js/src/constants.json';
 
 import app from 'state';
 import snapshotClient from 'helpers/snapshot_client';
-import { formatSpace } from 'helpers';
+import { formatSpace, fromEntries } from 'helpers/snapshot_utils';
 
 import { notifyError } from 'controllers/app/notifications';
 import QuillEditor from 'views/components/quill_editor';
-
-
-declare global {
-  interface ObjectConstructor {
-    fromEntries(xs: [string|number|symbol, any][]): object
-  }
-}
-
-const fromEntries = (xs: [string|number|symbol, any][]) =>
-  Object.fromEntries ? Object.fromEntries(xs) : xs.reduce((acc, [key, value]) => ({...acc, [key]: value}), {})
 
 DatePicker.localize({
   weekStart: 1,

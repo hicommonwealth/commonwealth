@@ -6,11 +6,14 @@ import $ from 'jquery';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 import { Spinner, Button } from 'construct-ui';
+import getProvider from '@snapshot-labs/snapshot.js/src/utils/provider';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
 import {SnapshotProposal } from 'models';
 import ConfirmSnapshotVoteModal from 'views/modals/confirm_snapshot_vote_modal';
+import snapshotClient from 'helpers/snapshot_client';
+import { formatSpace, fromEntries, getProposal } from 'helpers/snapshot_utils';
 
 import { ProposalHeaderTitle } from './header';
 import {
@@ -116,6 +119,13 @@ const VoteView: m.Component<{ votes: Vote[] }> = {
 };
 
 const VoteAction: m.Component<{
+  // space: any, 
+	// proposal: any,
+	// id: number,
+	// selectedChoice: number,
+	// totalScore: number,
+	// scores: any[],
+	// snapshot: number
   choices: string[],
 }, {
   votingModalOpen: boolean
@@ -136,13 +146,17 @@ const VoteAction: m.Component<{
       e.preventDefault();
       vnode.state.votingModalOpen = false;
       console.log('here');
-      app.modals.create({ modal: ConfirmSnapshotVoteModal });
+      app.modals.create({ modal: ConfirmSnapshotVoteModal, data: {
+
+      } });
     };
 
     const voteNo = (e) => {
       e.preventDefault();
       vnode.state.votingModalOpen = false;
-      app.modals.create({ modal: ConfirmSnapshotVoteModal });
+      app.modals.create({ modal: ConfirmSnapshotVoteModal, data: {
+
+      } });
     };
 
     const yesButton = m('.yes-button', [
@@ -182,6 +196,7 @@ const ViewProposalPage: m.Component<{
 }, {
   proposal: SnapshotProposal,
   votes: Vote[],
+  space: any,
 }> = {
   oninit: (vnode) => {
     vnode.state.votes = [];
@@ -192,8 +207,42 @@ const ViewProposalPage: m.Component<{
       const allProposals: SnapshotProposal[] = app.snapshot.proposalStore.getAll();
       vnode.state.proposal = allProposals.filter(proposal => proposal.ipfsHash === vnode.attrs.identifier)[0];
 
+      snapshotClient.getSpaces().then(response => {
+        let spaces: any = fromEntries(
+          Object.entries(response).map(space => [
+            space[0],
+            formatSpace(space[0], space[1])
+          ])
+        );
+        console.log(spaces, 'spaces');
+        let space = spaces[vnode.attrs.snapshotId];
+        console.log(space, "space");
+        vnode.state.space = space;
+        // getProposal(space, vnode.attrs.identifier).then(proposalObj => {
+        //   const { proposal, votes, blockNumber } = proposalObj;
+        //   console.log(proposal, 'proposal');
+        // })
+
+        m.redraw();
+        // getScores(
+        //   space.key,
+        //   space.strategies,
+        //   space.network,
+        //   getProvider(space.network),
+        //   [app.user.activeAccount.address]
+        // ).then(response => {
+        //   console.log(response)
+        //   let scores = response
+        //     .map(score => Object.values(score).reduce((a, b) => (a as number) + (b as number), 0))
+        //     .reduce((a, b) => (a as number) + (b as number), 0);
+        //   vnode.state.userScore = scores as number;
+        //   vnode.state.space = space;
+        //   m.redraw();
+        // });
+      });
+
       if (vnode.state.proposal) {
-        const hubUrl = process.env.SNAPSHOT_APP_HUB_URL || 'https://testnet.snapshot.org';
+        const hubUrl = process.env.SNAPSHOT_HUB_URL || 'https://testnet.snapshot.org';
         $.get(`${hubUrl}/api/${snapshotId}/proposal/${vnode.state.proposal.ipfsHash}`).then((response) => {
           if (response.status !== 'Success') {
             var i = 0;

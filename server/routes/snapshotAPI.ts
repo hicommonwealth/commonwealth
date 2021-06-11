@@ -7,7 +7,7 @@ export const sendMessage = async (
   res: Response,
   next: NextFunction
 ) => {
-	const url = `${process.env.SNAPSHOT_APP_HUB_URL || 'https://testnet.snapshot.org'}/api/message`;
+	const url = `${process.env.SNAPSHOT_HUB_URL || 'https://testnet.snapshot.org'}/api/message`;
 
   axios.post(url, {
     address: req.body.address,
