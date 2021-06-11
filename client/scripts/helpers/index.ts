@@ -324,6 +324,16 @@ export const loadScript = (scriptURI) => {
   });
 };
 
+export function formatSpace(key, space) {
+  space = {
+    key,
+    ...space,
+    members: space.members || [],
+    filters: space.filters || {}
+  };
+  if (!space.filters.minScore) space.filters.minScore = 0;
+  return space;
+}
 
 export const removeOrAddClasslistToAllElements = (
   cardList: ICardListItem[],

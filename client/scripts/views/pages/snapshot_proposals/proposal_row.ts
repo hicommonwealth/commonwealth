@@ -10,12 +10,12 @@ import { formatLastUpdated, link } from 'helpers';
 import { SnapshotProposal } from 'models';
 import ProposalListingRow from 'views/components/proposal_listing_row';
 
-const ProposalRow: m.Component<{ proposal: SnapshotProposal }, { expanded: boolean }> = {
+const ProposalRow: m.Component<{ snapshotId: string, proposal: SnapshotProposal }, { expanded: boolean }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
 
     if (!proposal) return;
-    const proposalLink = `/${app.activeId()}/snapshot-proposal/${proposal.ipfsHash}`;
+    const proposalLink = `/${app.activeId()}/snapshot-proposal/${vnode.attrs.snapshotId}/${proposal.ipfsHash}`;
 
     const time = moment(+proposal.end * 1000);
     const now = moment();
@@ -26,7 +26,7 @@ const ProposalRow: m.Component<{ proposal: SnapshotProposal }, { expanded: boole
       proposal.ipfsHash && link('a.proposal-topic', proposalLink, [
         m('span.proposal-topic-name', `${proposal.ipfsHash}`),
       ]),
-      m('.created-at', link('a', proposalLink, (now > time) ? `Ended ${formatLastUpdated(time)}` 
+      m('.created-at m-l-20', link('a', proposalLink, (now > time) ? `Ended ${formatLastUpdated(time)}` 
         : `Ending ${formatLastUpdated(moment(+proposal.end * 1000))}`)),
     ];
 

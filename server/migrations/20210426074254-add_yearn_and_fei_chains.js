@@ -41,9 +41,11 @@ module.exports = {
       await queryInterface.bulkInsert('ChainNodes', [{
         chain: 'yearn',
         url: 'wss://mainnet.infura.io/ws',
+        address: '0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e'
       }, {
         chain: 'fei',
         url: 'wss://mainnet.infura.io/ws',
+        address: '0x956F47F50A910163D8BF957Cf5846D573E7f87CA'
       }], { transaction: t });
     });
   },

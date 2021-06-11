@@ -392,6 +392,13 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/ethereum/fei/adapter'
     )).default;
     newChain = new Fei(n, app);
+  } else if (n.chain.network === ChainNetwork.Sushi) {
+    const Sushi = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "commonwealth-main" */
+      './controllers/chain/ethereum/sushi/adapter'
+    )).default;
+    newChain = new Sushi(n, app);
   } else {
     throw new Error('Invalid chain');
   }
@@ -693,8 +700,8 @@ $(() => {
     '/:scope/discussions/:topic': importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
     '/:scope/search':            importRoute('views/pages/search', { scoped: true, deferChain: true }),
     '/:scope/members':           importRoute('views/pages/members', { scoped: true, deferChain: true }),
-    '/:scope/snapshot-proposals': importRoute('views/pages/snapshot_proposals', { scoped: true, deferChain: true }),
-    '/:scope/snapshot-proposal/:identifier': importRoute('views/pages/view_snapshot_proposal/index', { scoped: true }),
+    '/:scope/snapshot-proposals/:snapshotId': importRoute('views/pages/snapshot_proposals', { scoped: true, deferChain: true }),
+    '/:scope/snapshot-proposal/:snapshotId/:identifier': importRoute('views/pages/view_snapshot_proposal', { scoped: true }),
     '/:scope/chat':              importRoute('views/pages/chat', { scoped: true, deferChain: true }),
     '/:scope/referenda':         importRoute('views/pages/referenda', { scoped: true }),
     '/:scope/proposals':         importRoute('views/pages/proposals', { scoped: true }),
@@ -705,6 +712,7 @@ $(() => {
     '/:scope/delegate':          importRoute('views/pages/delegate', { scoped: true, }),
     '/:scope/login':             importRoute('views/pages/login', { scoped: true, deferChain: true }),
     '/:scope/new/thread':        importRoute('views/pages/new_thread', { scoped: true, deferChain: true }),
+    '/:scope/new/snapshot-proposal/:snapshotId': importRoute('views/pages/new_snapshot_proposal', { scoped: true, deferChain: true }),
     '/:scope/new/proposal/:type': importRoute('views/pages/new_proposal/index', { scoped: true }),
     '/:scope/admin':             importRoute('views/pages/admin', { scoped: true }),
     '/:scope/settings':          importRoute('views/pages/settings', { scoped: true }),

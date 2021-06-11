@@ -42,7 +42,8 @@ export enum ChainNetwork {
   HydraDX = 'hydradx',
   Yearn = 'yearn',
   Fei = 'fei',
-  Crust = 'crust',
+  Sushi = 'sushi',
+  Crust = 'crust'
 }
 
 // This function returns a default chain for a chainbase
@@ -82,6 +83,7 @@ export enum ChainClass {
   Commonwealth = 'commonwealth',
   Yearn = 'yearn',
   Fei = 'fei',
+  Sushi = 'sushi',
   Crust = 'crust',
   ERC20 = 'erc20',
 }

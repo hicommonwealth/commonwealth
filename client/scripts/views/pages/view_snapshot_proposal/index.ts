@@ -1,8 +1,11 @@
 import 'pages/view_proposal/index.scss';
+import 'components/proposals/voting_results.scss';
+import 'components/proposals/voting_actions.scss';
 
 import $ from 'jquery';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
+import { Spinner, Button } from 'construct-ui';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
@@ -15,15 +18,19 @@ import {
 } from './body';
 
 const ProposalHeader: m.Component<{
+  snapshotId: string
   proposal: SnapshotProposal
 }, {}> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
+    if (!proposal) {
+      return m('.topic-loading-spinner-wrap', [ m(Spinner, { active: true, size: 'lg' }) ])
+    }
 
     // Original posters have full editorial control, while added collaborators
     // merely have access to the body and title
 		
-    const proposalLink = `/${app.activeId()}/snapshot-proposal/${proposal.ipfsHash}`;
+    const proposalLink = `/${app.activeId()}/snapshot-proposal/${vnode.attrs.snapshotId}/${proposal.ipfsHash}`;
 
     return m('.ProposalHeader', {
       class: `proposal-snapshot`
@@ -61,69 +68,150 @@ const VoteRow: m.Component<{
   view: (vnode) => {
     return m('.ViewRow', [
       m('.row-left', vnode.attrs.vote.voterAddress),
-      m('.row-right', vnode.attrs.vote.choice)
+      // m('.row-right', vnode.attrs.vote.choice)
     ]);
   }
 }
 
-// Should complete it after mocking up.
-const VoteView: m.Component<{
-  votes: Vote[],
-  voteCount: number
-}, {}> = {
+const VoteView: m.Component<{ votes: Vote[] }> = {
   view: (vnode) => {
-    const { votes, voteCount } = vnode.attrs;
-    let voteListing = [];
+    const { votes } = vnode.attrs;
 
-    voteListing.push(m('.vote-group-wrap', votes
-      .map((vote) => m(VoteRow, { vote }))));
+    let voteYesListing = [];
+    let voteNoListing = [];
 
-    return m('.VoteView', [
-      m('h1', [
-        'Votes',
-        m('.vote-count', `${voteCount}`)
+    voteYesListing.push(m('.vote-group-wrap', votes
+      .map((vote) => {
+        if (vote.choice === 'yes'){
+          return m(VoteRow, { vote });
+        }
+      })
+    ));
+
+    voteNoListing.push(m('.vote-group-wrap', votes
+      .map((vote) => {
+        if (vote.choice === 'no'){
+          return m(VoteRow, { vote });
+        }
+      })
+    ));
+
+    // TODO: fix up this function for cosmos votes
+    return m('.VotingResults', [
+      m('.results-column', [
+        m('.results-header', `Voted yes (${votes.filter((v) => v.choice === 'yes').length})`),
+        m('.results-cell', [
+          voteYesListing
+        ]),
       ]),
-      voteListing
+      m('.results-column', [
+        m('.results-header', `Voted no (${votes.filter((v) => v.choice === 'no').length})`),
+        m('.results-cell', [
+          voteNoListing
+        ]),
+      ])
     ]);
+  }
+};
+
+const VoteAction: m.Component<{
+  choices: string[],
+}, {
+  votingModalOpen: boolean
+}> = {
+  view: (vnode) => {
+    let { choices } = vnode.attrs;
+    let canVote = true;
+    let hasVotedYes = false;
+    let hasVotedNo = false;
+    const { votingModalOpen } = vnode.state;
+
+    const onModalClose = () => {
+      vnode.state.votingModalOpen = false;
+      m.redraw();
+    };
+
+    const voteYes = async (e) => {
+      e.preventDefault();
+      vnode.state.votingModalOpen = false;
+    };
+
+    const voteNo = (e) => {
+      e.preventDefault();
+      vnode.state.votingModalOpen = false;
+      // open modal and check canVote and create vote
+    };
+
+    const yesButton = m('.yes-button', [
+      m(Button, {
+        intent: 'positive',
+        disabled: !canVote || hasVotedYes || votingModalOpen,
+        onclick: voteYes,
+        label: hasVotedYes ? `Voted "${choices[0]}"` : `Vote "${choices[0]}"`,
+        compact: true,
+        rounded: true,
+      }),
+    ]);
+    const noButton = m('.no-button', [
+      m(Button, {
+        intent: 'negative',
+        disabled: !canVote || hasVotedNo || votingModalOpen,
+        onclick: voteNo,
+        label: hasVotedNo ? `Voted "${choices[1]}"` : `Vote "${choices[1]}"`,
+        compact: true,
+        rounded: true,
+      })
+    ]);
+
+    let votingActionObj;
+    votingActionObj = [
+      m('.button-row', [yesButton, noButton]),
+    ];
+
+    return m('.VotingActions', [votingActionObj]);
   }
 }
 
 const ViewProposalPage: m.Component<{
+  scope: string,
+  snapshotId: string,
   identifier: string,
 }, {
   proposal: SnapshotProposal,
   votes: Vote[],
-  voteCount: number
 }> = {
   oninit: (vnode) => {
     vnode.state.votes = [];
-    vnode.state.voteCount = 0;
 
-    const allProposals: SnapshotProposal[] = app.snapshot.proposalStore.getAll();
-    vnode.state.proposal = allProposals.filter(proposal => proposal.ipfsHash === vnode.attrs.identifier)[0];
+    const snapshotId = vnode.attrs.snapshotId;
+    app.snapshot.fetchSnapshotProposals(snapshotId).then(response => {
+      
+      const allProposals: SnapshotProposal[] = app.snapshot.proposalStore.getAll();
+      vnode.state.proposal = allProposals.filter(proposal => proposal.ipfsHash === vnode.attrs.identifier)[0];
 
-    if (vnode.state.proposal) {
-      $.get(`https://hub.snapshot.page/api/${app.chain?.meta.chain.snapshot}/proposal/${vnode.state.proposal.ipfsHash}`).then((response) => {
-        if (response.status !== 'Success') {
-          var i = 0;
-          let votes: Vote[] = [];
-          for (const key in response) {
-            let vote: Vote = {
-              voterAddress: '',
-              choice: '',
-              timestamp: '',
-            };
-            vote.voterAddress = key,
-            vote.timestamp = response[key].msg.timestamp;
-            vote.choice = vnode.state.proposal.choices[response[key].msg.payload.choice - 1];
-            votes.push(vote);
+      if (vnode.state.proposal) {
+        const hubUrl = process.env.SNAPSHOT_APP_HUB_URL || 'https://testnet.snapshot.org';
+        $.get(`${hubUrl}/api/${snapshotId}/proposal/${vnode.state.proposal.ipfsHash}`).then((response) => {
+          if (response.status !== 'Success') {
+            var i = 0;
+            let votes: Vote[] = [];
+            for (const key in response) {
+              let vote: Vote = {
+                voterAddress: '',
+                choice: '',
+                timestamp: '',
+              };
+              vote.voterAddress = key,
+              vote.timestamp = response[key].msg.timestamp;
+              vote.choice = response[key].msg.payload.choice === 1 ? 'yes' : 'no';
+              votes.push(vote);
+            }
+            vnode.state.votes = votes;
+            m.redraw();
           }
-          vnode.state.voteCount = votes.length;
-          vnode.state.votes = votes.slice(0, 40);
-          m.redraw();
-        }
-      });
-    }
+        });
+      }
+    });
   },
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'ViewSnapShotProposalPage' });
@@ -137,10 +225,12 @@ const ViewProposalPage: m.Component<{
   view: (vnode) => {
     return m(Sublayout, { class: 'ViewProposalPage', title: "Snapshot Proposal" }, [
       m(ProposalHeader, {
+        snapshotId: vnode.attrs.snapshotId,
         proposal: vnode.state.proposal,
       }),
       m('.PinnedDivider', m('hr')),
-      m(VoteView, { votes: vnode.state.votes, voteCount: vnode.state.voteCount })
+      vnode.state.votes && m(VoteView, { votes: vnode.state.votes }),
+      vnode.state.proposal && m(VoteAction, { choices: vnode.state.proposal.choices})
     ]);
   }
 };

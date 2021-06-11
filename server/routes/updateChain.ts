@@ -40,7 +40,7 @@ const updateChain = async (models, req: Request, res: Response, next: NextFuncti
     }
   }
 
-  const { active, icon_url, symbol, type, name, description, website, discord, element, telegram, github, customDomain } = req.body;
+  const { active, icon_url, symbol, type, name, description, website, discord, element, telegram, github, customDomain, snapshot } = req.body;
 
   if (website && !urlHasValidHTTPPrefix(website)) {
     return next(new Error(Errors.InvalidWebsite));
@@ -68,6 +68,7 @@ const updateChain = async (models, req: Request, res: Response, next: NextFuncti
   chain.telegram = telegram;
   chain.github = github;
   chain.customDomain = customDomain;
+  chain.snapshot = snapshot;
   if (req.body['featured_topics[]']) chain.featured_topics = req.body['featured_topics[]'];
 
   await chain.save();
