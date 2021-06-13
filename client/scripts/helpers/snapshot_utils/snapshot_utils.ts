@@ -123,26 +123,26 @@ export async function subgraphRequest(url: string, query, options: any = {}) {
 }
 
 
-// export async function getProposal(space, id) {
-//   try {
-//     console.time('getProposal.data');
-//     const provider = getProvider(space.network);
-//     const response = await Promise.all([
-//       ipfsGet(gateway, id),
-//       client.getVotes(space.key, id),
-//       getBlockNumber(provider)
-//     ]);
-//     console.timeEnd('getProposal.data');
-//     const [, votes, blockNumber] = response;
-//     let [proposal]: any = response;
-//     proposal = formatProposal(proposal);
-//     proposal.ipfsHash = id;
-//     return { proposal, votes, blockNumber };
-//   } catch (e) {
-//     console.log(e);
-//     return e;
-//   }
-// }
+export async function getProposal(space, id) {
+  try {
+    console.time('getProposal.data');
+    const provider = getProvider(space.network);
+    const response = await Promise.all([
+      ipfsGet(gateway, id),
+      client.getVotes(space.key, id),
+      getBlockNumber(provider)
+    ]);
+    console.timeEnd('getProposal.data');
+    const [, votes, blockNumber] = response;
+    let [proposal]: any = response;
+    proposal = formatProposal(proposal);
+    proposal.ipfsHash = id;
+    return { proposal, votes, blockNumber };
+  } catch (e) {
+    console.log(e);
+    return e;
+  }
+}
 
 export async function multicall(
   network: string,
@@ -195,5 +195,31 @@ export async function getScores(
     );
   } catch (e) {
     return Promise.reject(e);
+  }
+}
+
+export async function getPower(space, address, snapshot) {
+  try {
+    const blockNumber = await getBlockNumber(getProvider(space.network));
+    const blockTag = snapshot > blockNumber ? 'latest' : parseInt(snapshot);
+    let scores: any = await getScores(
+      space.key,
+      space.strategies,
+      space.network,
+      getProvider(space.network),
+      [address],
+      // @ts-ignore
+      blockTag
+    );
+    scores = scores.map((score: any) =>
+      Object.values(score).reduce((a, b: any) => a + b, 0)
+    );
+    return {
+      scores,
+      totalScore: scores.reduce((a, b: any) => a + b, 0)
+    };
+  } catch (e) {
+    console.log(e);
+    return e;
   }
 }

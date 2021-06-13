@@ -10,10 +10,10 @@ import getProvider from '@snapshot-labs/snapshot.js/src/utils/provider';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
-import {SnapshotProposal } from 'models';
+import { SnapshotProposal } from 'models';
 import ConfirmSnapshotVoteModal from 'views/modals/confirm_snapshot_vote_modal';
 import snapshotClient from 'helpers/snapshot_utils/snapshot_client';
-import { formatSpace } from 'helpers/snapshot_utils/snapshot_utils';
+import { formatSpace, getProposal, getPower } from 'helpers/snapshot_utils/snapshot_utils';
 
 import { ProposalHeaderTitle } from './header';
 import {
@@ -198,9 +198,11 @@ const ViewProposalPage: m.Component<{
   votes: Vote[],
   space: any,
   snapshotProposal: any,
+  totalScore: number
 }> = {
   oninit: (vnode) => {
     vnode.state.votes = [];
+    vnode.state.totalScore = 0;
 
     const snapshotId = vnode.attrs.snapshotId;
     app.snapshot.fetchSnapshotProposals(snapshotId).then(response => {
@@ -215,14 +217,31 @@ const ViewProposalPage: m.Component<{
             formatSpace(space[0], space[1])
           ])
         );
-        console.log(spaces, 'spaces');
         let space = spaces[vnode.attrs.snapshotId];
-        console.log(space, "space");
         vnode.state.space = space;
-        // getProposal(space, vnode.attrs.identifier).then(proposalObj => {
-        //   const { proposal, votes, blockNumber } = proposalObj;
-        //   vnode.state.snapshotProposal = proposal;
-        // })
+
+        
+        getProposal(space, vnode.attrs.identifier).then(proposalObj => {
+          const { proposal, votes, blockNumber } = proposalObj;
+          console.log(proposal, votes, blockNumber);
+          vnode.state.snapshotProposal = proposal;
+        })
+
+        const author = app.user.activeAccount;
+
+        if (author && this.proposal.address) {
+          getPower(
+            space,
+            author.address,
+            vnode.state.snapshotProposal.msg.payload.snapshot
+          ).then(power => {
+            const { scores, totalScore } = power;
+            console.log(power);
+            // this.totalScore = totalScore;
+            // this.scores = scores;
+          });
+        }
+        
 
         m.redraw();
         // getScores(
@@ -276,6 +295,8 @@ const ViewProposalPage: m.Component<{
     });
   },
   view: (vnode) => {
+    const author = app.user.activeAccount;
+
     return m(Sublayout, { class: 'ViewProposalPage', title: "Snapshot Proposal" }, [
       m(ProposalHeader, {
         snapshotId: vnode.attrs.snapshotId,
@@ -283,7 +304,7 @@ const ViewProposalPage: m.Component<{
       }),
       m('.PinnedDivider', m('hr')),
       vnode.state.votes && m(VoteView, { votes: vnode.state.votes }),
-      vnode.state.proposal && m(VoteAction, { choices: vnode.state.proposal.choices})
+      vnode.state.proposal && author && m(VoteAction, { choices: vnode.state.proposal.choices})
     ]);
   }
 };
