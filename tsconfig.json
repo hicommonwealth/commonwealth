@@ -15,7 +15,14 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "downlevelIteration": true,
-    "traceResolution": true
+    "traceResolution": true,
+    "lib": [
+      "esnext",
+      "dom",
+      "dom.iterable",
+      "scripthost",
+      "es2018",
+    ]
   },
   "include": [
     "./client",

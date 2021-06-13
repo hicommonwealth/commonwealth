@@ -13,11 +13,11 @@ import { bufferToHex } from 'ethereumjs-util';
 import getProvider from '@snapshot-labs/snapshot.js/src/utils/provider';
 import { getBlockNumber, signMessage } from '@snapshot-labs/snapshot.js/src/utils/web3';
 import { version } from '@snapshot-labs/snapshot.js/src/constants.json';
-// import { getScores } from '@snapshot-labs/snapshot.js/src/utils';
+import { getScores } from 'helpers/snapshot_utils/snapshot_utils';
 
 import app from 'state';
-import snapshotClient from 'helpers/snapshot_client';
-import { formatSpace, fromEntries } from 'helpers/snapshot_utils';
+import snapshotClient from 'helpers/snapshot_utils/snapshot_client';
+import { formatSpace } from 'helpers/snapshot_utils/snapshot_utils';
 
 import { notifyError } from 'controllers/app/notifications';
 import QuillEditor from 'views/components/quill_editor';
@@ -148,11 +148,13 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
   quillEditorState,
   saving: boolean,
   space: any,
-  members: string[]
+  members: string[],
+  userScore: any
 }> = {
   oninit: (vnode) => {
     vnode.state.space = {};
     vnode.state.members = [];
+    vnode.state.userScore = null;
     vnode.state.form = {
       name: '',
       body: '',
@@ -165,34 +167,32 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
     };
 
     snapshotClient.getSpaces().then(response => {
-      let spaces: any = fromEntries(
+      let spaces: any = Object.fromEntries(
         Object.entries(response).map(space => [
           space[0],
           formatSpace(space[0], space[1])
         ])
       );
-      console.log(spaces);
       let space = spaces[vnode.attrs.snapshotId];
-      console.log(space);
-      vnode.state.space = space;
-      vnode.state.members = space.members;
-      m.redraw();
 
-      // getScores(
-      //   space.key,
-      //   space.strategies,
-      //   space.network,
-      //   getProvider(space.network),
-      //   [app.user.activeAccount.address]
-      // ).then(response => {
-      //   console.log(response)
-      //   let scores = response
-      //     .map(score => Object.values(score).reduce((a, b) => (a as number) + (b as number), 0))
-      //     .reduce((a, b) => (a as number) + (b as number), 0);
-      //   vnode.state.userScore = scores as number;
-      //   vnode.state.space = space;
-      //   m.redraw();
-      // });
+      getScores(
+        space.key,
+        space.strategies,
+        space.network,
+        getProvider(space.network),
+        [app.user.activeAccount.address]
+      ).then(response => {
+        console.log(response)
+        let scores = response
+          .map(score => Object.values(score).reduce((a, b) => (a as number) + (b as number), 0))
+          .reduce((a, b) => (a as number) + (b as number), 0);
+        vnode.state.userScore = scores as number;
+        vnode.state.space = space;
+        vnode.state.members = space.members;
+
+        console.log(space, "space");
+        m.redraw();
+      });
     });
   },
 
@@ -218,12 +218,16 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
 
     const isMember = author && author.address && vnode.state.members.includes(author.address.toLowerCase());
 
+    const hasMinScore = vnode.state.userScore >= vnode.state.space.filters?.minScore;
+
+    const showScoreWarning = vnode.state.space.filters?.minScore > 0 && !hasMinScore && !isMember && vnode.state.userScore !== null;
+
     let isValid = vnode.state.space !== undefined && 
       (!vnode.state.space.filters?.onlyMembers ||
-        (vnode.state.space.filters?.onlyMembers && isMember));
-      // (vnode.state.space.filters?.minScore === 0 ||
-      //   (vnode.state.space.filters?.minScore > 0 && vnode.state.userScore) ||
-      //   isMember);
+        (vnode.state.space.filters?.onlyMembers && isMember)) &&
+        (vnode.state.space.filters?.minScore === 0 ||
+          (vnode.state.space.filters?.minScore > 0 && vnode.state.userScore) ||
+          isMember);
 
     return m('.NewThreadForm', {
       oncreate: (vvnode) => {
@@ -237,6 +241,14 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
           intent: 'primary',
           content: [
             'You need to be a member of the space in order to submit a proposal.',
+          ],
+        }),
+        showScoreWarning && 
+        m(Callout, {
+          class: 'no-profile-callout',
+          intent: 'primary',
+          content: [
+            `You need to have a minimum of ${vnode.state.space.filters.minScore} ${vnode.state.space.symbol} in order to submit a proposal`
           ],
         }),
         m('.new-snapshot-proposal-form', [

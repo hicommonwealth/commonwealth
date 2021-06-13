@@ -12,8 +12,8 @@ import app from 'state';
 import Sublayout from 'views/sublayout';
 import {SnapshotProposal } from 'models';
 import ConfirmSnapshotVoteModal from 'views/modals/confirm_snapshot_vote_modal';
-import snapshotClient from 'helpers/snapshot_client';
-import { formatSpace, fromEntries, getProposal } from 'helpers/snapshot_utils';
+import snapshotClient from 'helpers/snapshot_utils/snapshot_client';
+import { formatSpace } from 'helpers/snapshot_utils/snapshot_utils';
 
 import { ProposalHeaderTitle } from './header';
 import {
@@ -197,6 +197,7 @@ const ViewProposalPage: m.Component<{
   proposal: SnapshotProposal,
   votes: Vote[],
   space: any,
+  snapshotProposal: any,
 }> = {
   oninit: (vnode) => {
     vnode.state.votes = [];
@@ -208,7 +209,7 @@ const ViewProposalPage: m.Component<{
       vnode.state.proposal = allProposals.filter(proposal => proposal.ipfsHash === vnode.attrs.identifier)[0];
 
       snapshotClient.getSpaces().then(response => {
-        let spaces: any = fromEntries(
+        let spaces: any = Object.fromEntries(
           Object.entries(response).map(space => [
             space[0],
             formatSpace(space[0], space[1])
@@ -220,7 +221,7 @@ const ViewProposalPage: m.Component<{
         vnode.state.space = space;
         // getProposal(space, vnode.attrs.identifier).then(proposalObj => {
         //   const { proposal, votes, blockNumber } = proposalObj;
-        //   console.log(proposal, 'proposal');
+        //   vnode.state.snapshotProposal = proposal;
         // })
 
         m.redraw();
