@@ -540,7 +540,7 @@ const CreateInviteModal: m.Component<{
                 }
                 if (e.target.value?.length > 3) {
                   const params: SearchParams = {
-                    communityScope: app.activeCommunityId(),
+                    communityScope: null,
                     chainScope: vnode.state.invitedAddressChain || (chainInfo ? chainInfo.id : app.config.chains.getAll()[0].id),
                   };
                   clearTimeout(vnode.state.inputTimeout);
