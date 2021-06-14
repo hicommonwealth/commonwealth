@@ -10,6 +10,7 @@ import { initAppState } from 'app';
 import { Magic } from 'magic-sdk';
 import { PolkadotExtension } from '@magic-ext/polkadot';
 import Token from 'controllers/chain/ethereum/token/adapter';
+import { MAGIC_PUBLISHABLE_KEY } from 'utils';
 
 import {
   ChainInfo,
@@ -21,7 +22,6 @@ import {
 } from 'models';
 import moment from 'moment';
 import { notifyError } from 'controllers/app/notifications';
-const MAGIC_PUBLISHABLE_KEY = 'pk_live_B0604AA1B8EEFDB4';
 
 function createAccount(
   account: Account<any>,
