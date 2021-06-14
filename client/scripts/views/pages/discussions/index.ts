@@ -90,9 +90,9 @@ export const CommunityOptionsPopover: m.Component<{ isAdmin: boolean, isMod: boo
           onclick: (e) => m.route.set(`/${app.activeId()}/analytics`),
         }),
       ],
-    }),
+    });
   }
-}
+};
 
 const DiscussionStagesBar: m.Component<{ topic: string, stage: string }, {}> = {
   view: (vnode) => {
