@@ -90,9 +90,9 @@ export const CommunityOptionsPopover: m.Component<{ isAdmin: boolean, isMod: boo
           onclick: (e) => m.route.set(`/${app.activeId()}/analytics`),
         }),
       ],
-    }),
+    });
   }
-}
+};
 
 const DiscussionStagesBar: m.Component<{ topic: string, stage: string }, {}> = {
   view: (vnode) => {
@@ -223,7 +223,7 @@ const DiscussionStagesBar: m.Component<{ topic: string, stage: string }, {}> = {
 };
 
 const DiscussionsPage: m.Component<{ topic?: string }, {
-  lookback?: { [community: string]: moment.Moment} ;
+  lookback?: { [community: string]: moment.Moment};
   postsDepleted: { [community: string]: boolean };
   topicInitialized: { [community: string]: boolean };
   lastSubpage: string;
