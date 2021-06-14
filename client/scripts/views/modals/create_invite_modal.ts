@@ -3,7 +3,7 @@ import 'modals/create_invite_modal.scss';
 import m from 'mithril';
 import $ from 'jquery';
 import mixpanel from 'mixpanel-browser';
-import { Button, Input, Form, FormGroup, FormLabel, Select, RadioGroup, ListItem, List, Spinner } from 'construct-ui';
+import { Button, Input, Form, FormGroup, FormLabel, Select, RadioGroup, ListItem, List, Spinner, SelectList, Icons } from 'construct-ui';
 
 import Web3 from 'web3';
 import moment from 'moment';
@@ -34,6 +34,11 @@ interface IInviteButtonAttrs {
 
 enum SearchType {
   Member = 'member',
+}
+
+interface ICommunityOption {
+  label: string,
+  value: string
 }
 
 const SEARCH_PREVIEW_SIZE = 10;
@@ -71,7 +76,6 @@ const getBalancedContentListing = (unfilteredResults: any[], types: SearchType[]
 export const getMemberPreview = (addr, enterAddressFn, closeResultsFn, searchTerm, tabIndex, showChainName?) => {
   const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
   if (addr.name) profile.initialize(addr.name, null, null, null, null);
-  const userLink = `/${m.route.param('scope') || addr.chain}/account/${addr.address}?base=${addr.chain}`;
   return m(ListItem, {
     tabIndex,
     label: m('a.search-results-item', [
@@ -423,7 +427,7 @@ const CreateInviteModal: m.Component<{
   errorText: string;
 }> = {
   oncreate: (vnode) => {
-    vnode.state.invitedAddressChain = '';
+    const { chainInfo } = vnode.attrs;
     mixpanel.track('New Invite', {
       'Step No': 1,
       'Step': 'Modal Opened'
@@ -476,23 +480,44 @@ const CreateInviteModal: m.Component<{
         m(Form, [
           m(FormGroup, { span: 4 }, [
             m(FormLabel, { class: 'chainSelectLabel' }, 'Community'),
-            m(Select, {
-              name: 'invitedAddressChain',
-              fluid: true,
-              defaultValue: vnode.state.invitedAddressChain
-                || (chainInfo ? chainInfo.id : app.config.chains.getAll()[0].id),
-              options: chainInfo
+            m(SelectList, {
+              closeOnSelect: true,
+              items: chainInfo
                 ? [{ label: chainInfo.name, value: chainInfo.id, }]
                 : app.config.chains.getAll().map((chain) => ({
                   label: chain.name.toString(),
                   value: chain.id.toString(),
-                })),
-              oncreate: (vvnode) => {
-                vnode.state.invitedAddressChain = (vvnode.dom as any).value;
+                })).sort((a: ICommunityOption, b: ICommunityOption) => {
+                  if (a.label > b.label) return 1;
+                  if (a.label < b.label) return -1;
+                  return 0;
+                }),
+              itemRender: (item: ICommunityOption) => m(ListItem, {
+                label: item.label,
+                selected: vnode.state.invitedAddressChain && vnode.state.invitedAddressChain === item.value
+              }),
+              itemPredicate: (query: string, item: ICommunityOption) => {
+                return item.label.toLowerCase().includes(query.toLowerCase());
               },
-              onchange: (e) => {
-                vnode.state.invitedAddressChain = (e.target as any).value;
-              }
+              onSelect: (item: ICommunityOption) => {
+                vnode.state.invitedAddressChain = item.value;
+              },
+              loading: false,
+              popoverAttrs: {
+                hasArrow: false
+              },
+              trigger: m(Button, {
+                align: 'left',
+                compact: true,
+                iconRight: Icons.CHEVRON_DOWN,
+                label: selectedChainId,
+                style: { minWidth: '100%', height: '40px' }
+              }),
+              emptyContent: 'No communities found',
+              inputAttrs: {
+                placeholder: 'Search Community...'
+              },
+              checkmark: false
             }),
           ]),
           m(FormGroup, { span: 8, style: { 'position': 'relative' } }, [
@@ -503,6 +528,7 @@ const CreateInviteModal: m.Component<{
               autocomplete: 'off',
               placeholder: 'Type to search...',
               value: vnode.state.searchAddressTerm,
+              style: 'height: 40px',
               oninput: (e) => {
                 e.stopPropagation();
                 vnode.state.isTyping = true;
