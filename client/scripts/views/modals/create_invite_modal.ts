@@ -13,7 +13,6 @@ import { CompactModalExitButton } from 'views/modal';
 import { checkAddress } from '@polkadot/util-crypto';
 import { notifyError } from 'controllers/app/notifications';
 import { UserBlock } from '../components/widgets/user';
-
 export interface SearchParams {
   communityScope?: string;
   chainScope?: string;
