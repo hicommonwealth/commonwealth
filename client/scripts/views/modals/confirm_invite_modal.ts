@@ -8,10 +8,11 @@ import { Button, Icon, Icons } from 'construct-ui';
 
 import { orderAccountsByAddress } from 'helpers';
 import { notifyError } from 'controllers/app/notifications';
-import User, { UserBlock } from 'views/components/widgets/user';
+import { UserBlock } from 'views/components/widgets/user';
 import { CompactModalExitButton } from 'views/modal';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { initAppState } from 'app';
+import LoginWithWalletDropdown from '../components/login_with_wallet_dropdown';
 
 const SideMenu: m.Component<{invites, onChangeHandler, location}, {}> = {
   view: (vnode) => {
@@ -95,7 +96,10 @@ const ConfirmInviteModal: m.Component<{}, {
           m('p', [
             'You\'ve been invited to the ',
             m('strong', invites[location].community_name),
-            ' community. Select an address to accept the invite:'
+            ' community. ',
+            addresses.length > 0
+              ? 'Select an address to accept the invite:'
+              : 'To get started, connect an address:'
           ]),
           vnode.state.accepted.includes(location) ? m('h4', 'You\'ve accepted this invite!')
             : vnode.state.rejected.includes(location) ? m('h4', 'You\'ve already deleted this invite!') : [
@@ -171,35 +175,46 @@ const ConfirmInviteModal: m.Component<{}, {
                   label: 'Reject invite'
                 }),
               ]),
-              addresses.length === 0 && m('a.btn.add-account', {
-                href: '#',
-                onclick: (e) => {
-                  e.preventDefault();
+              // addresses.length === 0 && m('a.btn.add-account', {
+              //   href: '#',
+              //   onclick: (e) => {
+              //     e.preventDefault();
 
-                  // set defaults for the web3 login modal
-                  // TODO: let the user select between different crypto wallets for linking an address
-                  const defaultChainId = 'edgeware';
-                  const joiningCommunity = invites[vnode.state.location].community_id;
-                  const targetCommunity = joiningCommunity;
-                  const prev = m.route.get();
-                  const next = `/${joiningCommunity}`;
-                  // TODO: implement joiningChain once confirm_invite_modal supports chains
-                  const web3loginParams = joiningCommunity ? { prev, next, joiningCommunity } : { prev, next };
+              //     // set defaults for the web3 login modal
+              //     // TODO: let the user select between different crypto wallets for linking an address
+              //     const defaultChainId = 'edgeware';
+              //     const joiningCommunity = invites[vnode.state.location].community_id;
+              //     const targetCommunity = joiningCommunity;
+              //     const prev = m.route.get();
+              //     const next = `/${joiningCommunity}`;
+              //     // TODO: implement joiningChain once confirm_invite_modal supports chains
+              //     const web3loginParams = joiningCommunity ? { prev, next, joiningCommunity } : { prev, next };
 
-                  // redirect to /web3login to connect to the chain
-                  m.route.set(`/${app.chain?.id || defaultChainId}/web3login`, web3loginParams);
+              //     // redirect to /web3login to connect to the chain
+              //     m.route.set(`/${app.chain?.id || defaultChainId}/web3login`, web3loginParams);
 
-                  // show web3 login modal
-                  app.modals.lazyCreate('link_new_address_modal', {
-                    joiningCommunity,
-                    targetCommunity,
-                    successCallback: () => {
-                      m.route.set(next);
-                      $(e.target).trigger('modalexit');
-                    }
-                  });
+              //     // show web3 login modal
+              //     app.modals.lazyCreate('link_new_address_modal', {
+              //       joiningCommunity,
+              //       targetCommunity,
+              //       successCallback: () => {
+              //         m.route.set(next);
+              //         $(e.target).trigger('modalexit');
+              //       }
+              //     });
+              //   }
+              // }, 'Connect a new address'),
+              addresses.length === 0 && m(LoginWithWalletDropdown, {
+                loggingInWithAddress: false,
+                joiningCommunity: invites[vnode.state.location].community_id,
+                joiningChain: app.chain?.id || 'edgeware',
+                label: 'Connect an address',
+                onSuccess: (e) => {
+                  // $('.ConfirmInviteModal').trigger('modalexit');
+                  m.route.set(`/${invites[vnode.state.location].community_id}`);
+                  $(e.target).trigger('modalexit');
                 }
-              }, 'Connect a new address'),
+              })
             ],
         ])
         : m('.compact-modal-body', [

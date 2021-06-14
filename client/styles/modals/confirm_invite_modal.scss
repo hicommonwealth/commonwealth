@@ -25,7 +25,9 @@
         display: inline-block;
         height: initial;
     }
-
+    button.login-with-web3 {
+        margin-top: 12px;
+    }
     .invite-addresses {
         max-height: 209px;
         overflow-y: auto;

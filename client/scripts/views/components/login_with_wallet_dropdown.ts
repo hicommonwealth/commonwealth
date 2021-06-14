@@ -97,6 +97,8 @@ const LoginWithWalletDropdown: m.Component<{
     };
 
     const chainbase = app.chain?.meta?.chain?.base;
+    console.log(CHAINBASE_WITH_CLI);
+    console.log(chainbase);
     const menuItems = (chainbase && CHAINBASE_WITH_CLI.indexOf(chainbase) !== -1)
       ? [
         ...getMenuItemsForChainBase(chainbase),
