@@ -7,9 +7,13 @@ import app from 'state';
 import { pluralize } from 'helpers';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 
-const InvitesMenu = {
+const InvitesMenu: m.Component<{}, { modalAutoTriggered: boolean }> = {
   view: (vnode) => {
     if (!app.config.invites?.length) return;
+    if (m.route.param('inviteModal') === 't') {
+      vnode.state.modalAutoTriggered = true;
+      app.modals.create({ modal: ConfirmInviteModal });
+    }
 
     return m(PopoverMenu, {
       hasArrow: false,

@@ -18,6 +18,7 @@ import TopicsController from './controllers/server/topics';
 import CommunitiesController from './controllers/server/communities';
 import UserController from './controllers/server/user/index';
 import WebWalletController from './controllers/app/web_wallets';
+import { InviteCodeAttributes } from 'shared/types';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -73,7 +74,7 @@ export interface IApp {
     contractCategories?: ContractCategory[];
     notificationCategories?: NotificationCategory[];
     defaultChain: string;
-    invites: any[];
+    invites: InviteCodeAttributes[];
   };
   loginStatusLoaded(): boolean;
   isLoggedIn(): boolean;

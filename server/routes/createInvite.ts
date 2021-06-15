@@ -73,6 +73,7 @@ const createInvite = async (models, req: Request, res: Response, next: NextFunct
       address_id: existingAddress.id,
       permission: 'member',
     });
+    // TODO: We need to notify added users; role creation shouldn't happen silently
     return res.json({ status: 'Success', result: role.toJSON() });
   }
 
@@ -90,7 +91,7 @@ const createInvite = async (models, req: Request, res: Response, next: NextFunct
 
   const inviteChainOrCommObj = chain
     ? { chain_id: chain.id, community_name: chain.name }
-    : { community_id: community.id, community_name: community.name }
+    : { community_id: community.id, community_name: community.name };
 
   const previousInvite = await models.InviteCode.findOne({
     where: {
@@ -114,7 +115,11 @@ const createInvite = async (models, req: Request, res: Response, next: NextFunct
 
   // create and email the link
   const joinOrLogIn = user ? 'Log in' : 'Sign up';
-  const signupLink = SERVER_URL;
+  const communityRoute = chain
+    ? `/${chain.id}`
+    : community.privacyEnabled
+      ? '' : `/${community.id}`;
+  const signupLink = `${SERVER_URL}${communityRoute}?inviteModal=t`;
   const msg = {
     to: invitedEmail,
     from: 'Commonwealth <no-reply@commonwealth.im>',
