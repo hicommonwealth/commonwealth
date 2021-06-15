@@ -119,7 +119,10 @@ const createInvite = async (models, req: Request, res: Response, next: NextFunct
     ? `/${chain.id}`
     : community.privacyEnabled
       ? '' : `/${community.id}`;
-  const signupLink = `${SERVER_URL}${communityRoute}?inviteModal=t`;
+  const signupLink = `${SERVER_URL.split('://')[0]}${communityRoute}
+    ?triggerInvite=t
+    &inviteComm=${(community || chain).id}
+    &inviteEmail=${invitedEmail}`;
   const msg = {
     to: invitedEmail,
     from: 'Commonwealth <no-reply@commonwealth.im>',
