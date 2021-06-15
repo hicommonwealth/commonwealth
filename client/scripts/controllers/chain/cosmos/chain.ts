@@ -5,16 +5,14 @@ import {
   IChainModule,
   ITXData,
 } from 'models';
-import * as m from 'mithril';
+import m from 'mithril';
+import _ from 'lodash';
 import { ApiStatus, IApp } from 'state';
 import moment from 'moment';
 import { BlocktimeHelper } from 'helpers';
 import BN from 'bn.js';
 import { EventEmitter } from 'events';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
-
-import * as $ from 'jquery';
-import _ from 'lodash';
 
 import {
   makeStdTx,
