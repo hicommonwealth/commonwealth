@@ -12,6 +12,8 @@ import { UserBlock } from 'views/components/widgets/user';
 import { CompactModalExitButton } from 'views/modal';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { initAppState } from 'app';
+import { InviteCodeAttributes } from 'shared/types';
+import { AddressInfo } from 'client/scripts/models';
 import LoginWithWalletDropdown from '../components/login_with_wallet_dropdown';
 
 const SideMenu: m.Component<{invites, onChangeHandler, location}, {}> = {
@@ -31,13 +33,13 @@ const SideMenu: m.Component<{invites, onChangeHandler, location}, {}> = {
 };
 
 const ConfirmInviteModal: m.Component<{}, {
-  invites;
-  location;
-  isComplete;
-  selectedAddress;
-  addresses;
-  accepted;
-  rejected;
+  invites: InviteCodeAttributes[];
+  location: number;
+  isComplete: boolean;
+  selectedAddress: string;
+  addresses: AddressInfo[];
+  accepted: number[];
+  rejected: number[];
 }> = {
   oninit: (vnode) => {
     vnode.state.invites = app.config.invites;
@@ -157,20 +159,17 @@ const ConfirmInviteModal: m.Component<{}, {
                       'Reject this invite? You will need to be invited again.'
                     )();
                     if (!confirmed) return;
-                    $.post(`${app.serverUrl()}/acceptInvite`, {
-                      inviteCode: invites[location].id,
-                      reject: true,
-                      jwt: app.user.jwt,
-                    }).then((result) => {
-                      app.config.invites = app.config.invites.filter(
-                        (invite) => invite.community_name !== invites[location].community_name
-                      );
-                      vnode.state.rejected.push(location);
-                      vnode.state.selectedAddress = null;
-                      m.redraw();
-                    }, (err) => {
-                      notifyError('Error rejecting invite.');
-                    });
+                    app.user.rejectInvite({ inviteCode: invites[location].id })
+                      .then((result) => {
+                        app.config.invites = app.config.invites.filter(
+                          (invite) => invite.community_name !== invites[location].community_name
+                        );
+                        vnode.state.rejected.push(location);
+                        vnode.state.selectedAddress = null;
+                        m.redraw();
+                      }, (err) => {
+                        notifyError('Error rejecting invite.');
+                      });
                   },
                   label: 'Reject invite'
                 }),

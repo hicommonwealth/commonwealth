@@ -1,6 +1,10 @@
+import { ChainAttributes } from 'server/models/chain';
+import { OffchainCommunityAttributes } from 'server/models/offchain_community';
+
 // This is a const and not an enum because of a weird webpack error.
 // It has the same syntax, though, so it should be OK, as long as we don't
 // modify any of the values.
+
 // eslint-disable-next-line import/prefer-default-export
 export const NotificationCategories = {
   NewComment: 'new-comment-creation',
@@ -50,6 +54,20 @@ export interface IWebsocketsPayload<T> {
   chain?: string; // for incoming payloads
   address?: string; // for incoming payloads
   data?: T;
+}
+
+export interface InviteCodeAttributes {
+  id?: string;
+  community_id?: string;
+  community_name?: string;
+  chain_id?: string;
+  creator_id: number;
+  invited_email?: string;
+  used?: boolean;
+  created_at?: Date;
+  updated_at?: Date;
+  OffchainCommunity?: OffchainCommunityAttributes;
+  Chain?: ChainAttributes;
 }
 
 export interface IPostNotificationData {

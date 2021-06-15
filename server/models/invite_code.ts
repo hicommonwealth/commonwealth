@@ -1,21 +1,5 @@
 import * as Sequelize from 'sequelize';
-
-import { OffchainCommunityAttributes } from './offchain_community';
-import { ChainAttributes } from './chain';
-
-export interface InviteCodeAttributes {
-  id?: string;
-  community_id?: string;
-  community_name?: string;
-  chain_id?: string;
-  creator_id: number;
-  invited_email?: string;
-  used?: boolean;
-  created_at?: Date;
-  updated_at?: Date;
-  OffchainCommunity?: OffchainCommunityAttributes;
-  Chain?: ChainAttributes;
-}
+import { InviteCodeAttributes } from '../../shared/types';
 
 export interface InviteCodeInstance
 extends Sequelize.Instance<InviteCodeAttributes>, InviteCodeAttributes {
