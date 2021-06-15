@@ -8,26 +8,26 @@ import { pluralize } from 'helpers';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import LoginModal from '../../modals/login_modal';
 
+export const handleEmailInvites = (state) => {
+  if (!state.modalAutoTriggered) {
+    state.modalAutoTriggered = true;
+    m.redraw();
+    if (app.config.invites?.length) {
+      app.modals.create({
+        modal: ConfirmInviteModal,
+        data: { community: m.route.param('inviteComm') }
+      });
+    } else if (!app.user) {
+      app.modals.create({
+        modal: LoginModal,
+        data: { email: m.route.param('email') }
+      });
+    }
+  }
+};
+
 const InvitesMenu: m.Component<{}, { modalAutoTriggered: boolean }> = {
   view: (vnode) => {
-    if (!app) return;
-    if (!vnode.state.modalAutoTriggered
-      && m.route.param('triggerInvite') === 't') {
-      vnode.state.modalAutoTriggered = true;
-      if (app.config.invites?.length) {
-        app.modals.create({
-          modal: ConfirmInviteModal,
-          data: { community: m.route.param('inviteComm') }
-        });
-      } else if (!app.user) {
-        app.modals.create({
-          modal: LoginModal,
-          data: { email: m.route.param('email') }
-        });
-      }
-    }
-
-
     if (!app.config.invites?.length) return;
 
     return m(PopoverMenu, {

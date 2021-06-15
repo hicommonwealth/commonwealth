@@ -7,7 +7,7 @@ import { link } from 'helpers';
 
 import NewProposalButton, { MobileNewProposalButton } from 'views/components/new_proposal_button';
 import NotificationsMenu from 'views/components/header/notifications_menu';
-import InvitesMenu from 'views/components/header/invites_menu';
+import InvitesMenu, { handleEmailInvites } from 'views/components/header/invites_menu';
 import LoginSelector from 'views/components/header/login_selector';
 import Sidebar from 'views/components/sidebar';
 import MobileHeader from 'views/mobile/mobile_header';
@@ -31,6 +31,8 @@ const Sublayout: m.Component<{
   hideSearch?: boolean,
   centerGrid?: boolean,
   alwaysShowTitle?: boolean,          // show page title even if app.chain and app.community are unavailable
+}, {
+  modalAutoTriggered: boolean
 }> = {
   view: (vnode) => {
     const {
@@ -89,6 +91,10 @@ const Sublayout: m.Component<{
         ]),
       ]),
     ];
+
+    if (m.route.param('triggerInvite') === 't') {
+      handleEmailInvites(vnode.state);
+    }
 
     if (vnode.attrs.errorLayout) return [
       m('.layout-container', [
