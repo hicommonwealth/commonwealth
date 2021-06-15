@@ -2,29 +2,27 @@ import 'pages/treasury.scss';
 
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
-import { Grid, Col, List, Tag } from 'construct-ui';
-import moment from 'moment';
+import { Tag } from 'construct-ui';
 
 import app from 'state';
 import { formatCoin } from 'adapters/currency';
-import { formatDuration, blockperiodToDuration } from 'helpers';
 import { ProposalType } from 'identifiers';
-import { ChainClass, ChainBase } from 'models';
+import { ChainBase } from 'models';
 
 import Substrate from 'controllers/chain/substrate/main';
 
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
-import LoadingRow from 'views/components/loading_row';
 import ProposalCard from 'views/components/proposal_card';
 import { CountdownUntilBlock } from 'views/components/countdown';
-import NewProposalPage from 'views/pages/new_proposal/index';
 import Listing from 'views/pages/listing';
 import ErrorPage from 'views/pages/error';
+import loadSubstrateModules from 'views/components/load_substrate_modules';
 
 const SubstrateProposalStats: m.Component<{}, {}> = {
   view: (vnode) => {
     if (!app.chain) return;
+    const activeAccount = app.user.activeAccount;
 
     return m('.stats-box', [
       m('.stats-box-left', '💭'),
@@ -39,7 +37,7 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
               'Treasury: ', formatCoin((app.chain as Substrate).treasury.pot),
             ]),
             m('.stats-box-stat', [
-              'Next treasury spend: ',
+              'Next spend period: ',
               (app.chain as Substrate).treasury.nextSpendBlock
                 ? m(CountdownUntilBlock, {
                   block: (app.chain as Substrate).treasury.nextSpendBlock,
@@ -120,20 +118,9 @@ const TreasuryPage: m.Component<{}> = {
       });
     }
     const onSubstrate = app.chain && app.chain.base === ChainBase.Substrate;
-    if (onSubstrate) {
-      const modules = getModules();
-      if (modules.some((mod) => !mod.ready)) {
-        app.chain.loadModules(modules);
-        return m(PageLoading, {
-          message: 'Loading treasury',
-          title: [
-            'Treasury',
-            m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
-          ],
-          showNewProposalButton: true,
-        });
-      }
-    }
+
+    const modLoading = loadSubstrateModules('Treasury', getModules);
+    if (modLoading) return modLoading;
 
     const activeTreasuryProposals = onSubstrate
       && (app.chain as Substrate).treasury.store.getAll().filter((p) => !p.completed);

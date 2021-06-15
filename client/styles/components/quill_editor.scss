@@ -31,6 +31,9 @@
         line-height: 1.3;
         padding: 20px 22px 28px;
         max-height: 360px;
+        a {
+            text-decoration: underline;
+        }
         img {
             background-color: $background-color-white-hover;
         }

@@ -3,7 +3,7 @@ import 'pages/members.scss';
 import $ from 'jquery';
 import m from 'mithril';
 import _ from 'lodash';
-import moment from 'moment-twitter';
+import moment from 'moment';
 import { Input, List, ListItem, PopoverMenu, MenuItem, Icon, Icons, Tag } from 'construct-ui';
 
 import app from 'state';
@@ -15,6 +15,7 @@ import User, { UserBlock } from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
 import ManageCommunityModal from 'views/modals/manage_community_modal';
 import { formatAddressShort } from '../../../../shared/utils';
+import { CommunityOptionsPopover } from './discussions';
 
 interface MemberInfo {
   chain: string;
@@ -63,10 +64,17 @@ const MembersPage : m.Component<{}, { membersRequested: boolean, membersLoaded: 
         }
       });
     }
+
+    const isAdmin = app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
+    const isMod = app.user.isRoleOfCommunity({
+      role: 'moderator', chain: app.activeChainId(), community: app.activeCommunityId()
+    });
+
     if (!vnode.state.membersLoaded) return m(PageLoading, {
       message: 'Loading members',
       title: [
         'Members',
+        m(CommunityOptionsPopover, { isAdmin, isMod }),
         m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
       ],
       showNewProposalButton: true,
@@ -76,6 +84,7 @@ const MembersPage : m.Component<{}, { membersRequested: boolean, membersLoaded: 
       class: 'MembersPage',
       title: [
         'Members',
+        m(CommunityOptionsPopover, { isAdmin, isMod }),
         m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
       ],
       showNewProposalButton: true,

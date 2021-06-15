@@ -1,28 +1,84 @@
-@import 'client/styles/shared';
+@import "client/styles/shared";
 
 .CreateInviteModal {
-    form {
-        margin: 0;
-        max-width: 560px;
-        h4 {
-            margin-top: 0;
-            margin-bottom: 16px;
-        }
+  form {
+    margin: 0;
+    max-width: 560px;
+    h4 {
+      margin-top: 0;
+      margin-bottom: 16px;
     }
-    .chainSelectLabel {
-        display: block;
+  }
+  .chainSelectLabel {
+    display: block;
+  }
+  form + form {
+    margin-top: 40px;
+  }
+  .valid input {
+    border: solid 1px green;
+  }
+  .invalid input {
+    border: solid 1px red;
+  }
+  .error-message {
+    margin: 10px 0;
+    font-weight: 500;
+    color: $negative-bg-color;
+  }
+  .success-message {
+    margin: 10px 0;
+    font-weight: 500;
+    color: $positive-bg-color;
+  }
+  .copy-link-line {
+    display: flex;
+    align-items: center;
+    height: 40px;
+
+    img {
+      width: 30px;
+      margin-left: 10px;
+      content: url("/static/img/copy_default.svg");
+      cursor: pointer;
+
+      &:hover {
+        content: url("/static/img/copy_hover.svg");
+      }
     }
-    form + form {
-        margin-top: 40px;
+  }
+
+  .divider {
+    width: calc(100% + 56px);
+    height: 1px;
+    background: #ddd;
+    margin-top: 20px;
+    margin-left: -28px;
+  }
+
+  .CreateInviteLink {
+    margin-top: 30px;
+    .invite-link-title {
+      font-size: 24px;
+      line-height: 28.8px;
+      font-weight: 500;
     }
-    .error-message {
-        margin: 10px 0;
-        font-weight: 500;
-        color: $negative-bg-color;
+    .cui-form-label {
+      font-size: 18px;
+      line-height: 21.6px;
+      font-weight: 500;
     }
-    .success-message {
-        margin: 10px 0;
-        font-weight: 500;
-        color: $positive-bg-color;
+
+    .cui-radio {
+      font-size: 18px;
+      line-height: 21.6px;
+      font-weight: 400;
+      padding-left: 24px;
+
+      .cui-control-indicator {
+        width: 16px;
+        height: 16px;
+      }
     }
+  }
 }

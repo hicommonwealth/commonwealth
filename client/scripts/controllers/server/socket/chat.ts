@@ -1,4 +1,4 @@
-import moment from 'moment-twitter';
+import moment from 'moment';
 
 import app from 'state';
 import { IWebsocketsPayload, WebsocketMessageType } from 'types';

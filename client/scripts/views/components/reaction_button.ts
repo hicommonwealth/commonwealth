@@ -28,6 +28,7 @@ const ReactionButton: m.Component<{
   view: (vnode) => {
     const { post, type, displayAsLink, tooltip, large } = vnode.attrs;
     const reactions = app.reactions.getByPost(post);
+
     let dislikes;
     let likes;
     if (type === ReactionType.Like) likes = reactions.filter((r) => r.reaction === 'like');
@@ -35,8 +36,8 @@ const ReactionButton: m.Component<{
 
     const isCommunity = !!app.activeCommunityId();
 
-    const disabled = vnode.state.loading 
-      || !isCommunity && ((app.chain as Token).isToken && !(app.chain as Token).hasToken);
+    const disabled = vnode.state.loading
+      || (!isCommunity && (app.chain as Token).isToken && !(app.chain as Token).hasToken);
     const activeAddress = app.user.activeAccount?.address;
     const rxn = reactions.find((r) => r.reaction && r.author === activeAddress);
     const hasReacted : boolean = !!rxn;

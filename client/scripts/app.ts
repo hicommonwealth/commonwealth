@@ -2,15 +2,26 @@ import 'lib/normalize.css';
 import 'lib/flexboxgrid.css';
 import 'lity/dist/lity.min.css';
 import 'construct.scss';
+// import 'tailwindcss/tailwind.css';
+import '../styles/style.css';
+import '../styles/lib/style.css';
 
 import m from 'mithril';
 import $ from 'jquery';
 import { FocusManager } from 'construct-ui';
-import moment from 'moment-twitter';
+import moment from 'moment';
 import mixpanel from 'mixpanel-browser';
 
 import app, { ApiStatus, LoginState } from 'state';
-import { ChainInfo, CommunityInfo, NodeInfo, ChainNetwork, NotificationCategory, Notification } from 'models';
+import {
+  ChainInfo,
+  CommunityInfo,
+  NodeInfo,
+  ChainNetwork,
+  NotificationCategory,
+  Notification,
+  ChainBase,
+} from 'models';
 import { WebsocketMessageType, IWebsocketsPayload } from 'types';
 
 import { notifyError, notifySuccess, notifyInfo } from 'controllers/app/notifications';
@@ -21,13 +32,17 @@ import WebsocketController from 'controllers/server/socket/index';
 import { Layout, LoadingLayout } from 'views/layout';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import LoginModal from 'views/modals/login_modal';
-import Token from 'controllers/chain/ethereum/token/adapter';
 import { alertModalWithText } from 'views/modals/alert_modal';
+import Login from './views/components/login';
 
 // Prefetch commonly used pages
-import(/* webpackPrefetch: true */ 'views/pages/home');
+import(/* webpackPrefetch: true */ 'views/pages/landing');
+import(/* webpackPrefetch: true */ 'views/pages/commonwealth');
 import(/* webpackPrefetch: true */ 'views/pages/discussions');
 import(/* webpackPrefetch: true */ 'views/pages/view_proposal');
+
+const APPLICATION_UPDATE_MESSAGE = 'A new version of the application has been released. Please save your work and refresh.';
+const APPLICATION_UPDATE_ACTION = 'Okay';
 
 // On login: called to initialize the logged-in state, available chains, and other metadata at /api/status
 // On logout: called to reset everything
@@ -39,7 +54,8 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       app.config.communities.clear();
       app.user.notifications.store.clear();
       app.user.notifications.clearSubscriptions();
-      data.chains.filter((chain) => chain.active).map((chain) => app.config.chains.add(ChainInfo.fromJSON(chain)));
+      data.chains.filter((chain) => chain.active)
+        .map((chain) => app.config.chains.add(ChainInfo.fromJSON(chain)));
       data.nodes.sort((a, b) => a.id - b.id).map((node) => {
         return app.config.nodes.add(NodeInfo.fromJSON({
           id: node.id,
@@ -59,13 +75,15 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
           element: community.element,
           telegram: community.telegram,
           github: community.github,
-          default_chain: app.config.chains.getById(community.default_chain),
+          defaultChain: app.config.chains.getById(community.default_chain),
           visible: community.visible,
-          collapsed_on_homepage: community.collapsed_on_homepage,
+          collapsedOnHomepage: community.collapsed_on_homepage,
           invitesEnabled: community.invitesEnabled,
           privacyEnabled: community.privacyEnabled,
           featuredTopics: community.featured_topics,
           topics: community.topics,
+          customDomain: community.customDomain,
+          adminsAndMods: [],
         }));
       });
       app.user.setRoles(data.roles);
@@ -206,7 +224,9 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
   if (app.chain && n === app.chain.meta) {
     return;
   }
-  if ((Object.values(ChainNetwork) as any).indexOf(n.chain.network) === -1) {
+  if ((Object.values(ChainNetwork) as any).indexOf(n.chain.network) === -1
+    && n.chain.type !== 'token'
+  ) {
     throw new Error('invalid chain');
   }
 
@@ -218,83 +238,20 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
   // Import top-level chain adapter lazily, to facilitate code split.
   let newChain;
   let initApi; // required for NEAR
-  if (n.chain.network === ChainNetwork.Edgeware) {
-    const Edgeware = (await import(
+  if (n.chain.base === ChainBase.Substrate) {
+    const Substrate = (await import(
       /* webpackMode: "lazy" */
-      /* webpackChunkName: "edgeware-main" */
-      './controllers/chain/substrate/edgeware/main'
+      /* webpackChunkName: "substrate-main" */
+      './controllers/chain/substrate/main'
     )).default;
-    newChain = new Edgeware(n, app);
-  } else if (n.chain.network === ChainNetwork.Kusama) {
-    const Kusama = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "kusama-main" */
-      './controllers/chain/substrate/kusama/main'
-    )).default;
-    newChain = new Kusama(n, app);
-  } else if (n.chain.network === ChainNetwork.Polkadot) {
-    const Polkadot = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "kusama-main" */
-      './controllers/chain/substrate/polkadot/main'
-    )).default;
-    newChain = new Polkadot(n, app);
-  } else if (n.chain.network === ChainNetwork.Kulupu) {
-    const Kulupu = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "kulupu-main" */
-      './controllers/chain/substrate/kulupu/main'
-    )).default;
-    newChain = new Kulupu(n, app);
-  } else if (n.chain.network === ChainNetwork.Plasm) {
-    const Plasm = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "plasm-main" */
-      './controllers/chain/substrate/plasm/main'
-    )).default;
-    newChain = new Plasm(n, app);
-  } else if (n.chain.network === ChainNetwork.Stafi) {
-    const Stafi = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "stafi-main" */
-      './controllers/chain/substrate/stafi/main'
-    )).default;
-    newChain = new Stafi(n, app);
-  } else if (n.chain.network === ChainNetwork.Darwinia) {
-    const Darwinia = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "darwinia-main" */
-      './controllers/chain/substrate/darwinia/main'
-    )).default;
-    newChain = new Darwinia(n, app);
-  } else if (n.chain.network === ChainNetwork.Phala) {
-    const Phala = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "phala-main" */
-      './controllers/chain/substrate/phala/main'
-    )).default;
-    newChain = new Phala(n, app);
-  } else if (n.chain.network === ChainNetwork.Centrifuge) {
-    const Centrifuge = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "centrifuge-main" */
-      './controllers/chain/substrate/centrifuge/main'
-    )).default;
-    newChain = new Centrifuge(n, app);
-  } else if (n.chain.network === ChainNetwork.Cosmos) {
+    newChain = new Substrate(n, app);
+  } else if (n.chain.base === ChainBase.CosmosSDK) {
     const Cosmos = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "cosmos-main" */
       './controllers/chain/cosmos/main'
     )).default;
     newChain = new Cosmos(n, app);
-  } else if (n.chain.network === ChainNetwork.Straightedge) {
-    const Straightedge = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "straightedge-main" */
-      './controllers/chain/cosmos/straightedge/main'
-    )).default;
-    newChain = new Straightedge(n, app);
   } else if (n.chain.network === ChainNetwork.Ethereum) {
     const Ethereum = (await import(
       /* webpackMode: "lazy" */
@@ -310,20 +267,6 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
     )).default;
     newChain = new Near(n, app);
     initApi = true;
-  } else if (n.chain.network === ChainNetwork.Clover) {
-    const Clover = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "clover-main" */
-      './controllers/chain/substrate/clover/main'
-    )).default;
-    newChain = new Clover(n, app);
-  } else if (n.chain.network === ChainNetwork.HydraDX) {
-    const HydraDX = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "hydradx-main" */
-      './controllers/chain/substrate/hydradx/main'
-    )).default;
-    newChain = new HydraDX(n, app);
   } else if (n.chain.network === ChainNetwork.Moloch || n.chain.network === ChainNetwork.Metacartel) {
     const Moloch = (await import(
       /* webpackMode: "lazy" */
@@ -338,7 +281,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/ethereum/marlin/adapter'
     )).default;
     newChain = new Marlin(n, app);
-  } else if ([ChainNetwork.ALEX].includes(n.chain.network)) {
+  } else if (n.chain.type === 'token') {
     const Token = (await import(
     //   /* webpackMode: "lazy" */
     //   /* webpackChunkName: "token-main" */
@@ -425,6 +368,23 @@ export function initCommunity(communityId: string): Promise<boolean> {
   }
 }
 
+export async function initNewTokenChain(address: string) {
+  const response = await $.getJSON('/api/getTokenForum', { address });
+  if (response.status !== 'Success') {
+    // TODO: better custom 404
+    m.route.set('/404');
+  }
+  const { chain, node } = response.result;
+  const chainInfo = ChainInfo.fromJSON(chain);
+  const nodeInfo = new NodeInfo(node.id, chainInfo, node.url, node.address);
+  if (!app.config.chains.getById(chainInfo.id)) {
+    app.config.chains.add(chainInfo);
+    app.config.nodes.add(nodeInfo);
+  }
+  console.log(nodeInfo, chainInfo);
+  await selectNode(nodeInfo);
+}
+
 // set up route navigation
 m.route.prefix = '';
 const _updateRoute = m.route.set;
@@ -463,6 +423,9 @@ document.ontouchmove = (event) => {
 // set up moment-twitter
 moment.updateLocale('en', {
   relativeTime: {
+    // NOTE: This makes relative date display impossible for all
+    // future dates, e.g. when displaying how long until an offchain
+    // poll closes.
     future : 'just now',
     past   : '%s ago',
     s  : (num, withoutSuffix) => withoutSuffix ? 'now' : 'seconds',
@@ -484,14 +447,11 @@ $(() => {
   // ignore ResizeObserver error: https://stackoverflow.com/questions/49384120/resizeobserver-loop-limit-exceeded
   const resizeObserverLoopErrRe = /^ResizeObserver loop limit exceeded/;
   // replace chunk loading errors with a notification that the app has been updated
-  const chunkLoadingErrRe = /^Uncaught SyntaxError: Unexpected token '<'/;
+  const chunkLoadingErrRe = /^Uncaught SyntaxError: Unexpected token/;
   window.onerror = (errorMsg, url, lineNumber, colNumber, error) => {
     if (typeof errorMsg === 'string' && resizeObserverLoopErrRe.test(errorMsg)) return false;
     if (typeof errorMsg === 'string' && chunkLoadingErrRe.test(errorMsg)) {
-      alertModalWithText(
-        'A new version of the application has been released. Please save your work and refresh.',
-        'Okay'
-      )();
+      alertModalWithText(APPLICATION_UPDATE_MESSAGE, APPLICATION_UPDATE_ACTION)();
       return false;
     }
     notifyError(`${errorMsg}`);
@@ -512,17 +472,28 @@ $(() => {
     redirectCustomDomain?: boolean;
   }
 
+  let hasCompletedSuccessfulPageLoad = false;
   const importRoute = (path: string, attrs: RouteAttrs) => ({
     onmatch: () => {
       return import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "route-[request]" */
         `./${path}`
-      ).then((p) => p.default);
+      ).then((p) => {
+        hasCompletedSuccessfulPageLoad = true;
+        return p.default;
+      }).catch((err) => {
+        // handle import() error
+        console.error(err);
+        if (err.name === 'ChunkLoadError') {
+          alertModalWithText(APPLICATION_UPDATE_MESSAGE, APPLICATION_UPDATE_ACTION)();
+        }
+        // return to the last page, if it was on commonwealth
+        if (hasCompletedSuccessfulPageLoad) history.back();
+      });
     },
     render: (vnode) => {
       const { scoped, hideSidebar, redirectCustomDomain } = attrs;
-
       // handle custom domains, for routes that need special handling
       const host = document.location.host;
       if (redirectCustomDomain) {
@@ -554,13 +525,27 @@ $(() => {
           ? vnode.attrs.scope.toString()
           // false => scope is null
           : null;
+
+      if (scope) {
+        const scopeIsEthereumAddress = scope.startsWith('0x') && scope.length === 42;
+        if (scopeIsEthereumAddress) {
+          const nodes = app.config.nodes.getAll();
+          const node = nodes.find((o) => o.address === scope);
+          if (node) {
+            const pagePath = window.location.href.substr(window.location.href.indexOf(scope) + scope.length);
+            m.route.set(`/${node.chain.id}${pagePath}`);
+          }
+        }
+      }
+
+
       // Special case to defer chain loading specifically for viewing an offchain thread. We need
       // a special case because OffchainThreads and on-chain proposals are all viewed through the
       // same "/:scope/proposal/:type/:id" route.
       if (vnode.attrs.scope && path === 'views/pages/view_proposal/index' && vnode.attrs.type === 'discussion') {
         deferChain = true;
       }
-      if (app.chain instanceof Token) deferChain = false;
+      if (app.chain?.meta.chain.type === 'token') deferChain = false;
       return m(Layout, { scope, deferChain, hideSidebar }, [ vnode ]);
     },
   });
@@ -573,11 +558,16 @@ $(() => {
     '/discussions':              redirectRoute(`/${app.activeId() || app.config.defaultChain}/`),
 
     // Landing pages
-    '/':                         importRoute('views/pages/home', { scoped: false, hideSidebar: true, redirectCustomDomain: true }),
+    '/':                         importRoute('views/pages/landing', { scoped: false, hideSidebar: true, redirectCustomDomain: true }),
+    '/whyCommonwealth':          importRoute('views/pages/commonwealth', { scoped: false, hideSidebar: true }),
     '/about':                    importRoute('views/pages/landing/about', { scoped: false }),
     '/terms':                    importRoute('views/pages/landing/terms', { scoped: false }),
     '/privacy':                  importRoute('views/pages/landing/privacy', { scoped: false }),
     '/components':               importRoute('views/pages/components', { scoped: false, hideSidebar: true }),
+
+    // Search
+    '/search':                   importRoute('views/pages/search', { scoped: false, deferChain: true }),
+
 
     // Login page
     '/login':                    importRoute('views/pages/login', { scoped: false }),
@@ -616,6 +606,7 @@ $(() => {
     '/:scope/new/thread':        importRoute('views/pages/new_thread', { scoped: true, deferChain: true }),
     '/:scope/new/proposal/:type': importRoute('views/pages/new_proposal/index', { scoped: true }),
     '/:scope/admin':             importRoute('views/pages/admin', { scoped: true }),
+    '/:scope/spec_settings':     importRoute('views/pages/spec_settings', { scoped: true, deferChain: true }),
     '/:scope/settings':          importRoute('views/pages/settings', { scoped: true }),
     '/:scope/analytics':         importRoute('views/pages/stats', { scoped: true, deferChain: true }),
     '/:scope/web3login':         importRoute('views/pages/web3login', { scoped: true }),

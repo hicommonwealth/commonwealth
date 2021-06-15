@@ -2,6 +2,7 @@
 
 import * as Sequelize from 'sequelize';
 import crypto from 'crypto';
+import Web3 from 'web3';
 
 import Keyring, { decodeAddress } from '@polkadot/keyring';
 import { stringToU8a, hexToU8a } from '@polkadot/util';
@@ -225,8 +226,8 @@ export default (
       const signatureU8a = signatureString.slice(0, 2) === '0x'
         ? hexToU8a(signatureString)
         : hexToU8a(`0x${signatureString}`);
-      isValid = signerKeyring.verify(signedMessageNewline, signatureU8a)
-        || signerKeyring.verify(signedMessageNoNewline, signatureU8a);
+      isValid = signerKeyring.verify(signedMessageNewline, signatureU8a, address)
+        || signerKeyring.verify(signedMessageNoNewline, signatureU8a, address);
     } else if (chain.base === 'cosmos') {
       //
       // cosmos-sdk address handling
@@ -262,7 +263,13 @@ export default (
       } else {
         isValid = false;
       }
-    } else if (chain.base === 'ethereum') {
+    } else if (chain.network === 'ethereum'
+      || chain.network === 'moloch'
+      || chain.network === 'alex'
+      || chain.network === 'metacartel'
+      || chain.network === 'commonwealth'
+      || chain.type === 'token'
+    ) {
       //
       // ethereum address handling
       //
@@ -278,9 +285,14 @@ export default (
         ethSignatureParams.s
       );
       const addressBuffer = ethUtil.publicToAddress(publicKey);
-      const address = ethUtil.bufferToHex(addressBuffer);
-      isValid = (addressModel.address.toLowerCase() === address.toLowerCase());
-    } else if (chain.network === 'near') {
+      const lowercaseAddress = ethUtil.bufferToHex(addressBuffer);
+      try {
+        const address = Web3.utils.toChecksumAddress(lowercaseAddress);
+        isValid = (addressModel.address === address);
+      } catch (e) {
+        isValid = false;
+      }
+    } else if (chain.base === 'near') {
       // both in base64 encoding
       const { signature: sigObj, publicKey } = JSON.parse(signatureString);
       isValid = nacl.sign.detached.verify(

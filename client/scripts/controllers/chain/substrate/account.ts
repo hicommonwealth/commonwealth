@@ -448,6 +448,7 @@ class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccou
       }
 
       this.validators.then((results) => {
+        console.log(results);
         this.cachedValidators = Object.entries(results).map(([address, info]) => ({
           chain: this._Chain.app.chain?.meta?.id,
           stash: address,
@@ -455,7 +456,7 @@ class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccou
           isElected: info.isElected,
           total: this._Chain.coins(info.exposure.total.toBn()),
           own: this._Chain.coins(info.exposure.own.toBn()),
-          commission: info.prefs.commission.toHuman(),
+          commission: info.prefs.commission?.toHuman(),
           nominators: info.exposure.others.length,
         }));
         resolve(this.cachedValidators);
@@ -465,7 +466,8 @@ class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccou
 
   public get validators(): Promise<IValidators> {
     return new Promise(async (resolve) => {
-      const { nextElected, validators: currentSet } = await this._Chain.api.derive.staking.validators();
+      const res = await this._Chain.api.derive.staking.validators();
+      const { nextElected, validators: currentSet } = res;
       const era = await this._Chain.api.query.staking.currentEra<EraIndex>();
 
       // set of not yet but future validators

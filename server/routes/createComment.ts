@@ -23,28 +23,21 @@ export const Errors = {
   ThreadNotFound: 'Cannot comment; thread not found',
   // ChainEntityNotFound: 'Cannot comment; chain entity not found',
   CantCommentOnReadOnly: 'Cannot comment when thread is read_only',
-  InsufficientTokenBalance: `Users need to hold some of the community's tokens to comment`,
+  InsufficientTokenBalance: 'Users need to hold some of the community\'s tokens to comment',
+  CouldNotFetchTokenBalance: 'Unable to fetch user\'s token balance',
 };
 
-const createComment = async (models, tokenBalanceCache: TokenBalanceCache, req: Request, res: Response, next: NextFunction) => {
+const createComment = async (
+  models,
+  tokenBalanceCache: TokenBalanceCache,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));
-  if (chain && chain.type === 'token') {
-    // skip check for admins
-    const isAdmin = await models.Role.findAll({
-      where: {
-        address_id: author.id,
-        chain_id: chain.id,
-        permission: ['admin'],
-      },
-    });
-    if (isAdmin.length === 0) {
-      const userHasBalance = await tokenBalanceCache.hasToken(chain.id, req.body.address);
-      if (!userHasBalance) return next(new Error(Errors.InsufficientTokenBalance));
-    }
-  }
 
   const { parent_id, root_id, text } = req.body;
 

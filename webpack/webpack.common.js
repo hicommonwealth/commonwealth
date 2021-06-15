@@ -60,7 +60,14 @@ module.exports = {
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.mjs', '.js', '.jsx', '.svg'],
-    modules: ['../client/scripts', '../client/styles', '../shared', '../node_modules', '../eth/types'],
+    modules: [
+      '../client/scripts',
+      '../client/styles',
+      '../shared',
+      'node_modules',    // local node modules
+      '../node_modules', // global node modules
+      '../eth/types'
+    ],
   },
   module: {
     rules: [

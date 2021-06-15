@@ -8,7 +8,7 @@ import { Button } from 'construct-ui';
 import CodeBlock from 'views/components/widgets/code_block';
 import HorizontalTabs from 'views/components/widgets/horizontal_tabs';
 import { Account, ChainBase } from 'models';
-import { SubstrateAccount } from 'client/scripts/controllers/chain/substrate/account';
+import { SubstrateAccount } from 'controllers/chain/substrate/account';
 
 const MessageSigningSeedOrMnemonicOption = {
   view: (vnode) => {

@@ -13,7 +13,7 @@ import ChainEntityController, { EntityRefreshOption } from 'controllers/server/c
 
 const ChainEntitiesSelector: m.Component<{
   thread: OffchainThread;
-  enabled: boolean;
+  onSelect,
   chainEntitiesToSet: ChainEntity[];
 }, {
   initialized: boolean;
@@ -21,7 +21,7 @@ const ChainEntitiesSelector: m.Component<{
   chainEntitiesLoaded: boolean;
 }> = {
   view: (vnode) => {
-    const { thread, enabled } = vnode.attrs;
+    const { thread, onSelect } = vnode.attrs;
     if (!app.chain || !app.activeChainId()) return;
     if (!vnode.state.initialized) {
       vnode.state.initialized = true;
@@ -33,9 +33,13 @@ const ChainEntitiesSelector: m.Component<{
     }
 
     return m('.ChainEntitiesSelector', [
-      (enabled && vnode.state.chainEntitiesLoaded) ? m(QueryList, {
+      vnode.state.chainEntitiesLoaded ? m(QueryList, {
         checkmark: true,
-        items: app.chain.chainEntities.store.getAll(),
+        items: app.chain.chainEntities.store.getAll().sort((a, b) => {
+          if (!a.threadId && b.threadId) return -1;
+          if (a.threadId && !b.threadId) return 1;
+          return 0;
+        }),
         inputAttrs: {
           placeholder: 'Search for an existing proposal...',
         },
@@ -43,9 +47,12 @@ const ChainEntitiesSelector: m.Component<{
           const selected = vnode.attrs.chainEntitiesToSet.map((ce_) => ce_.id).indexOf(ce.id) !== -1;
           // TODO: show additional info on the ListItem, like any set proposal title, the creator, or other metadata
           return m(ListItem, {
-            label: chainEntityTypeToProposalName(ce.type)
-              + (ce.typeId.startsWith('0x') ? '' : ` #${ce.typeId}`)
-              + (ce.title ? `: ${ce.title}` : ''),
+            disabled: ce.threadId && ce.threadId !== thread.id,
+            label: m('.chain-entity-info', [
+              m('.chain-entity-top', chainEntityTypeToProposalName(ce.type)
+                + (ce.typeId.startsWith('0x') ? ` ${ce.typeId.slice(0, 6)}...` : ` #${ce.typeId}`)),
+              m('.chain-entity-bottom', ce.threadTitle !== 'undefined' ? decodeURIComponent(ce.threadTitle) : ''),
+            ]),
             selected,
             key: ce.id ? ce.id : uuidv4(),
           });
@@ -66,11 +73,12 @@ const ChainEntitiesSelector: m.Component<{
           } else {
             vnode.attrs.chainEntitiesToSet.push(ce);
           }
+          onSelect(ce);
         },
       }) : m('.chain-entities-selector-placeholder', [
         m('.chain-entities-selector-placeholder-text', [
           vnode.state.chainEntitiesLoaded
-            ? 'Available once the thread is set to Voting or later'
+            ? 'Select "In Voting" to begin.'
             : 'Loading on-chain proposals...'
         ]),
       ]),
@@ -107,7 +115,7 @@ const StageEditor: m.Component<{
         closeOnOutsideClick: true,
         class: 'StageEditorDialog',
         content: [
-          m('h4', 'Select a stage'),
+          m('p', 'Once you\'ve created an on-chain proposal for this thread, connect it here.'),
           m('.stage-options', [
             [
               OffchainThreadStage.Discussion,
@@ -115,7 +123,6 @@ const StageEditor: m.Component<{
               OffchainThreadStage.Voting,
               OffchainThreadStage.Passed,
               OffchainThreadStage.Failed,
-              OffchainThreadStage.Abandoned,
             ].map((targetStage) => m(Button, {
               class: 'discussions-stage',
               active: vnode.state.stage === targetStage,
@@ -127,11 +134,14 @@ const StageEditor: m.Component<{
               }
             })),
           ]),
-          app.chain && app.activeChainId() && m('h4', 'Link an on-chain proposal'),
           m(ChainEntitiesSelector, {
             thread: vnode.attrs.thread,
-            enabled: vnode.state.stage !== OffchainThreadStage.Discussion
-              && vnode.state.stage !== OffchainThreadStage.ProposalInReview,
+            onSelect: (result) => {
+              if (vnode.state.stage === OffchainThreadStage.Discussion
+                  || vnode.state.stage === OffchainThreadStage.ProposalInReview) {
+                vnode.state.stage = OffchainThreadStage.Voting;
+              }
+            },
             chainEntitiesToSet: vnode.state.chainEntitiesToSet,
           }),
         ],
@@ -145,7 +155,7 @@ const StageEditor: m.Component<{
             vnode.state.isOpen = false;
           }
         },
-        title: 'Edit stage',
+        title: 'Connect on-chain proposal',
         transitionDuration: 200,
         footer: m(`.${Classes.ALIGN_RIGHT}`, [
           m(Button, {

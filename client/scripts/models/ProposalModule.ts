@@ -26,6 +26,9 @@ export abstract class ProposalModule<
   public get initialized() { return this._initialized; }
   public get ready() { return this._initialized || this._disabled; }
 
+  protected _error?: string;
+  public get error() { return this._error; }
+
   private _app: IApp;
   public get app() { return this._app; }
 
@@ -33,7 +36,7 @@ export abstract class ProposalModule<
     try {
       return this._constructorFunc(entity);
     } catch (e) {
-      console.error('failed to construct proposal from entity: ', entity);
+      console.error('failed to construct proposal from entity: ', entity, e);
     }
   }
 
@@ -55,6 +58,7 @@ export abstract class ProposalModule<
     - set `this._initializing` to true while in progress, false before returning
     - set `this._initialized` to true before returning
     - set itself to disabled if the functionality is unavailable on the active chain
+    - set an error if functionality throws an error on the active chain
     - guard against multiple calls by returning immediately if initializing/initialized/ready
     - an example:
         (note that it's safe for multiple calls because JS threads will not yield until `return`)
@@ -78,6 +82,7 @@ export abstract class ProposalModule<
 
   public deinit() {
     this._initialized = false;
+    this._error = undefined;
     this.store.getAll().map((p) => p.deinit());
     this.store.clear();
   }

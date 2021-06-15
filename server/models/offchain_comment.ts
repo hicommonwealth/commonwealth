@@ -89,6 +89,10 @@ export default (
         attachable: 'comment',
       },
     });
+    models.OffchainComment.hasMany(models.OffchainReaction, {
+      foreignKey: 'comment_id',
+      as: 'reactions'
+    });
   };
 
   return OffchainComment;

@@ -123,7 +123,9 @@ export class SubstratePhragmenElection extends Proposal<
     const votingData: { [voter: string]: PhragmenElectionVote } = {};
     if (this._Chain.api.query[this.moduleName].voting) {
       const voting = await this._Chain.api.query[this.moduleName].voting.entries();
-      for (const [ key, [ stake, votes ]] of voting as Array<[StorageKey, [ BalanceOf, Vec<AccountId> ] & Codec ]>) {
+      for (const [ key, data ] of voting as Array<[StorageKey, any]>) {
+        const votes = data.votes !== undefined ? data.votes : data[1];
+        const stake = data.stake !== undefined ? data.stake : data[0];
         const voter = key.args[0].toString();
         const vote = new PhragmenElectionVote(
           this._Accounts.get(voter),

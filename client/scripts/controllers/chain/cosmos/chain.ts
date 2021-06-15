@@ -53,11 +53,6 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
 
   private _blockSubscription: NodeJS.Timeout;
 
-  private _addressPrefix: string;
-  public get addressPrefix() {
-    return this._addressPrefix;
-  }
-
   // TODO: rename this something like "bankDenom" or "gasDenom" or "masterDenom"
   private _denom: string;
   public get denom(): string {
@@ -78,18 +73,13 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
   private _app: IApp;
   public get app() { return this._app; }
 
-  constructor(app: IApp, addressPrefix: string) {
+  constructor(app: IApp) {
     this._app = app;
-    this._addressPrefix = addressPrefix;
   }
 
   public coins(n: number | BN, inDollars?: boolean) {
     // never interpret a CosmosToken in dollars
     return new CosmosToken(this.denom, n);
-  }
-
-  public hasWebWallet(): boolean {
-    return false;
   }
 
   private _blocktimeHelper: BlocktimeHelper = new BlocktimeHelper();

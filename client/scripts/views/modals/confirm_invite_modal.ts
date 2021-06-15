@@ -11,6 +11,7 @@ import { notifyError } from 'controllers/app/notifications';
 import User, { UserBlock } from 'views/components/widgets/user';
 import { CompactModalExitButton } from 'views/modal';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
+import { initAppState } from 'app';
 
 const SideMenu: m.Component<{invites, onChangeHandler, location}, {}> = {
   view: (vnode) => {
@@ -66,7 +67,7 @@ const ConfirmInviteModal: m.Component<{}, {
       ]);
     };
 
-    const invites = vnode.state.invites;
+    const { invites, location } = vnode.state;
     let addresses;
     if (vnode.state.accepted.length + vnode.state.rejected.length === invites.length) {
       vnode.state.isComplete = true;
@@ -75,6 +76,7 @@ const ConfirmInviteModal: m.Component<{}, {
         .sort(orderAccountsByAddress)
         .map((account) => SelectAddress(account));
     }
+
     return m('.ConfirmInviteModal', [
       m('.compact-modal-title', [
         !vnode.state.isComplete
@@ -85,18 +87,18 @@ const ConfirmInviteModal: m.Component<{}, {
       !vnode.state.isComplete
         && m(SideMenu, {
           invites,
-          location: vnode.state.location,
+          location,
           onChangeHandler: (result) => { vnode.state.location = result; vnode.state.selectedAddress = null; }
         }),
       invites.length > 0 && !vnode.state.isComplete
         ? m('.compact-modal-body', [
           m('p', [
             'You\'ve been invited to the ',
-            m('strong', invites[vnode.state.location].community_name),
+            m('strong', invites[location].community_name),
             ' community. Select an address to accept the invite:'
           ]),
-          vnode.state.accepted.includes(vnode.state.location) ? m('h4', 'You\'ve accepted this invite!')
-            : vnode.state.rejected.includes(vnode.state.location) ? m('h4', 'You\'ve already deleted this invite!') : [
+          vnode.state.accepted.includes(location) ? m('h4', 'You\'ve accepted this invite!')
+            : vnode.state.rejected.includes(location) ? m('h4', 'You\'ve already deleted this invite!') : [
               m('.invite-addresses', [
                 addresses,
               ]),
@@ -105,23 +107,33 @@ const ConfirmInviteModal: m.Component<{}, {
                   class: 'submit',
                   intent: 'primary',
                   rounded: true,
-                  disabled: vnode.state.accepted.includes(vnode.state.location) || !vnode.state.selectedAddress,
+                  disabled: vnode.state.accepted.includes(location) || !vnode.state.selectedAddress,
                   onclick: (e) => {
                     e.preventDefault();
                     if (vnode.state.selectedAddress) {
                       app.user.acceptInvite({
                         address: vnode.state.selectedAddress,
-                        inviteCode: invites[vnode.state.location].id
+                        inviteCode: invites[location].id
                       }).then(() => {
                         app.config.invites = app.config.invites.filter(
-                          (invite) => invite.community_name !== invites[vnode.state.location].community_name
+                          (invite) => invite.community_name !== invites[location].community_name
                         );
-                        vnode.state.accepted.push(vnode.state.location);
+                        vnode.state.accepted.push(location);
                         vnode.state.selectedAddress = null;
-                        m.redraw();
                         mixpanel.track('Address Selected', {
                           'Step': 'Address Selected for Invite',
                         });
+                        if (app.config.invites.length === 0) {
+                          $(e.target).trigger('modalexit');
+                        }
+                        const communityId = invites[location].community_id;
+                        const chainId = invites[location].community_id;
+                        // if private community, re-init app
+                        if (communityId && !app.config.communities.getByCommunity(communityId)) {
+                          initAppState().then(() => m.route.set(`/${communityId}`));
+                        } else {
+                          m.route.set(`/${communityId || chainId}`);
+                        }
                       }, (err) => {
                         notifyError('Error accepting invite');
                       });
@@ -134,7 +146,7 @@ const ConfirmInviteModal: m.Component<{}, {
                   class: 'reject',
                   intent: 'negative',
                   rounded: true,
-                  disabled: vnode.state.accepted.includes(vnode.state.location),
+                  disabled: vnode.state.accepted.includes(location),
                   onclick: async (e) => {
                     e.preventDefault();
                     const confirmed = await confirmationModalWithText(
@@ -142,14 +154,14 @@ const ConfirmInviteModal: m.Component<{}, {
                     )();
                     if (!confirmed) return;
                     $.post(`${app.serverUrl()}/acceptInvite`, {
-                      inviteCode: invites[vnode.state.location].id,
+                      inviteCode: invites[location].id,
                       reject: true,
                       jwt: app.user.jwt,
                     }).then((result) => {
                       app.config.invites = app.config.invites.filter(
-                        (invite) => invite.community_name !== invites[vnode.state.location].community_name
+                        (invite) => invite.community_name !== invites[location].community_name
                       );
-                      vnode.state.rejected.push(vnode.state.location);
+                      vnode.state.rejected.push(location);
                       vnode.state.selectedAddress = null;
                       m.redraw();
                     }, (err) => {

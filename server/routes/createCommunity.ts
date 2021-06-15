@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { NotificationCategories } from '../../shared/types';
+import { slugify } from '../../shared/utils';
 import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -21,12 +22,6 @@ const createCommunity = async (models, req: Request, res: Response, next: NextFu
   }
   if (!req.body.name || !req.body.name.trim()) {
     return next(new Error(Errors.NoName));
-  }
-  if (!req.body.creator_address) {
-    return next(new Error(Errors.NoCreatorAddress));
-  }
-  if (!req.body.creator_chain) {
-    return next(new Error(Errors.NoCreatorChain));
   }
 
   if (req.body.isAuthenticatedForum !== 'true' && req.body.isAuthenticatedForum !== 'false') {
@@ -54,14 +49,14 @@ const createCommunity = async (models, req: Request, res: Response, next: NextFu
   }
 
   const address = await models.Address.findOne({
-    where: { address: req.body.creator_address, chain: req.body.creator_chain },
+    where: { user_id: req.user.id, chain: 'ethereum' },
   });
   if (!address || address.user_id !== req.user.id) {
     return next(new Error(Errors.InvalidAddress));
   }
 
   // If there's any whitespace in the community name replace to make a nice url
-  const createdId = req.body.name.toLowerCase().trim().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
+  const createdId = slugify(req.body.name);
   const communityContent = {
     id: createdId,
     creator_id: address.id,

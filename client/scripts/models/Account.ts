@@ -1,20 +1,19 @@
 import $ from 'jquery';
-import { IApp } from 'state';
+import app, { IApp } from 'state';
 import { Coin } from 'adapters/currency';
+import { slugify } from 'utils';
+import Token from 'controllers/chain/ethereum/token/adapter';
 
 import { ITXModalData } from './interfaces';
-import { ChainBase, ChainClass } from './types';
+import { ChainBase } from './types';
 import ChainInfo from './ChainInfo';
 import Profile from './Profile';
-
 
 abstract class Account<C extends Coin> {
   public readonly serverUrl : string;
   public readonly address: string;
   public readonly chain: ChainInfo;
-
   public readonly chainBase: ChainBase;
-  public readonly chainClass: ChainClass;
   public get freeBalance() { return this.balance; }
   public abstract balance: Promise<C>;
   public abstract sendBalanceTx(recipient: Account<C>, amount: C): Promise<ITXModalData> | ITXModalData;
@@ -38,15 +37,14 @@ abstract class Account<C extends Coin> {
 
   public app: IApp;
 
-  constructor(app: IApp, chain: ChainInfo, address: string, encoding?: number) {
+  constructor(_app: IApp, chain: ChainInfo, address: string, encoding?: number) {
     // Check if the account is being initialized from an offchain Community
     // Because there won't be any chain base or chain class
-    this.app = app;
+    this.app = _app;
     this.chain = chain;
-    this.chainBase = (app.chain) ? app.chain.base : null;
-    this.chainClass = (app.chain) ? app.chain.class : null;
+    this.chainBase = (_app.chain) ? _app.chain.base : null;
     this.address = address;
-    this._profile = app.profiles.getProfile(chain.id, address);
+    this._profile = _app.profiles.getProfile(chain.id, address);
     this._encoding = encoding;
   }
 
@@ -105,17 +103,14 @@ abstract class Account<C extends Coin> {
       const params : any = {
         address: this.address,
         chain: this.chain.id,
+        isToken: this.chain.type === 'token',
         jwt: this.app.user.jwt,
         signature,
       };
-      return new Promise<void>((resolve, reject) => {
-        $.post(`${this.app.serverUrl()}/verifyAddress`, params).then((result) => {
-          if (result.status === 'Success') return resolve();
-          else reject();
-        }).catch((error) => {
-          reject();
-        });
-      });
+      const result = await $.post(`${this.app.serverUrl()}/verifyAddress`, params);
+      if (result.status === 'Success') {
+        console.log(`Verified address ${this.address}!`);
+      }
     } else {
       throw new Error('signature or key required for validation');
     }

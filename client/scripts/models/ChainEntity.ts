@@ -1,4 +1,4 @@
-import moment from 'moment-twitter';
+import moment from 'moment';
 
 import { IChainEntityKind } from '@commonwealth/chain-events';
 import ChainEvent from './ChainEvent';
@@ -12,6 +12,7 @@ class ChainEntity {
   public readonly author: string;
 
   public readonly threadId?: number;
+  public readonly threadTitle?: string;
   public readonly createdAt?: moment.Moment;
 
   private _updatedAt?: moment.Moment;
@@ -28,12 +29,13 @@ class ChainEntity {
     return e.chain === this.chain && e.type === this.type && e.typeId === this.typeId;
   }
 
-  constructor(chain, type, typeId, chainEvents, createdAt?, updatedAt?, id?, threadId?, title?, author?) {
+  constructor({ chain, type, typeId, chainEvents, createdAt, updatedAt, id, threadId, threadTitle, title, author }) {
     this.id = id;
     this.chain = chain;
     this.type = type;
     this.typeId = typeId;
     this.threadId = threadId;
+    this.threadTitle = decodeURIComponent(threadTitle);
     this.title = title;
     this.author = author;
     this.createdAt = moment(createdAt);
@@ -49,18 +51,20 @@ class ChainEntity {
   }
 
   public static fromJSON(json) {
-    return new ChainEntity(
-      json.chain,
-      json.type,
-      json.type_id,
-      json.ChainEvents,
-      json.created_at,
-      json.updated_at,
-      json.id,
-      json.thread_id,
-      json.title,
-      json.author
-    );
+    const { chain, type, type_id, ChainEvents, created_at, updated_at, id, thread_id, OffchainThread, title, author } = json;
+    return new ChainEntity({
+      chain,
+      type,
+      typeId: type_id,
+      chainEvents: ChainEvents,
+      createdAt: created_at,
+      updatedAt: updated_at,
+      id,
+      threadId: thread_id,
+      threadTitle: OffchainThread?.title,
+      title,
+      author,
+    });
   }
 
   public addEvent(chainEvent: ChainEvent, updatedAt?: moment.Moment) {

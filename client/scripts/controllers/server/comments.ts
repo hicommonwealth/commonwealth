@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import _ from 'lodash';
-import moment from 'moment-twitter';
+import moment from 'moment';
 
 import app from 'state';
 import { uniqueIdToProposal } from 'identifiers';
@@ -8,7 +8,9 @@ import { uniqueIdToProposal } from 'identifiers';
 import { CommentsStore } from 'stores';
 import { OffchainComment, OffchainAttachment, IUniqueId, AddressInfo, CommunityInfo, NodeInfo } from 'models';
 import { notifyError } from 'controllers/app/notifications';
+import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
 import { updateLastVisited } from '../app/login';
+
 // tslint:disable: object-literal-key-quotes
 
 export enum CommentParent {
@@ -25,6 +27,13 @@ export const modelFromServer = (comment) => {
   const attachments = comment.OffchainAttachments
     ? comment.OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
     : [];
+
+  const { reactions } = comment;
+  if (reactions) {
+    for (const reaction of reactions) {
+      app.reactions.store.add(modelReactionFromServer(reaction));
+    }
+  }
 
   let versionHistory;
   if (comment.version_history) {
@@ -57,23 +66,23 @@ export const modelFromServer = (comment) => {
     // no proposal
   }
 
-  return new OffchainComment(
-    comment.chain,
-    comment?.Address?.address || comment.author,
-    decodeURIComponent(comment.text),
-    comment.plaintext,
+  return new OffchainComment({
+    chain: comment.chain,
+    author: comment?.Address?.address || comment.author,
+    text: decodeURIComponent(comment.text),
+    plaintext: comment.plaintext,
     versionHistory,
     attachments,
     proposal,
-    comment.id,
-    moment(comment.created_at),
-    comment.child_comments,
-    comment.root_id,
-    comment.parent_id,
-    comment.community,
-    comment?.Address?.chain || comment.authorChain,
-    lastEdited
-  );
+    id: comment.id,
+    createdAt: moment(comment.created_at),
+    childComments: comment.child_comments,
+    rootProposal: comment.root_id,
+    parentComment: comment.parent_id,
+    community: comment.community,
+    authorChain: comment?.Address?.chain || comment.authorChain,
+    lastEdited,
+  });
 };
 
 class CommentsController {

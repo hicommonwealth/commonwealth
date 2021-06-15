@@ -34,6 +34,7 @@ import createCommunity from './routes/createCommunity';
 import deleteCommunity from './routes/deleteCommunity';
 import updateCommunity from './routes/updateCommunity';
 import communityStats from './routes/communityStats';
+import getCommunitiesAndChains from './routes/getCommunitiesAndChains';
 import viewCount from './routes/viewCount';
 import updateEmail from './routes/updateEmail';
 
@@ -69,10 +70,13 @@ import setDefaultRole from './routes/setDefaultRole';
 import getUploadSignature from './routes/getUploadSignature';
 import createThread from './routes/createThread';
 import editThread from './routes/editThread';
+import updateThreadPolling from './routes/updateThreadPolling';
 import updateThreadStage from './routes/updateThreadStage';
 import updateThreadPrivacy from './routes/updateThreadPrivacy';
 import updateThreadPinned from './routes/updateThreadPinned';
 import updateThreadLinkedChainEntities from './routes/updateThreadLinkedChainEntities';
+import updateOffchainVote from './routes/updateOffchainVote';
+import viewOffchainVotes from './routes/viewOffchainVotes';
 import fetchEntityTitle from './routes/fetchEntityTitle';
 import updateChainEntityTitle from './routes/updateChainEntityTitle';
 import deleteThread from './routes/deleteThread';
@@ -112,10 +116,27 @@ import IdentityFetchCache from './util/identityFetchCache';
 import TokenBalanceCache from './util/tokenBalanceCache';
 
 import bulkEntities from './routes/bulkEntities';
+import { getTokensFromLists } from './routes/getTokensFromLists';
+import getTokenForum from './routes/getTokenForum';
+import getSubstrateSpec from './routes/getSubstrateSpec';
+import editSubstrateSpec from './routes/editSubstrateSpec';
 
-function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchCache: IdentityFetchCache, tokenBalanceCache: TokenBalanceCache) {
+function setupRouter(
+  app,
+  models,
+  viewCountCache: ViewCountCache,
+  identityFetchCache: IdentityFetchCache,
+  tokenBalanceCache: TokenBalanceCache
+) {
   const router = express.Router();
   router.get('/status', status.bind(this, models));
+
+  router.get('/getSubstrateSpec', getSubstrateSpec.bind(this, models));
+  router.post(
+    '/editSubstrateSpec',
+    passport.authenticate('jwt', { session: false }),
+    editSubstrateSpec.bind(this, models)
+  );
 
   // TODO: Change to POST /gist
   router.post('/createGist', passport.authenticate('jwt', { session: false }), createGist.bind(this, models));
@@ -125,7 +146,11 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   router.post('/verifyAddress', verifyAddress.bind(this, models));
   // TODO: Change to DELETE /address
   router.post('/deleteAddress', passport.authenticate('jwt', { session: false }), deleteAddress.bind(this, models));
-  router.post('/linkExistingAddressToChain', linkExistingAddressToChain.bind(this, models));
+  router.post(
+    '/linkExistingAddressToChain',
+    passport.authenticate('jwt', { session: false }),
+    linkExistingAddressToChain.bind(this, models),
+  );
   router.post('/getAddressStatus', getAddressStatus.bind(this, models));
   // TODO: Change to PUT /node
   router.post('/selectNode', passport.authenticate('jwt', { session: false }), selectNode.bind(this, models));
@@ -142,6 +167,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
 
   // offchain communities
   router.post('/starCommunity', passport.authenticate('jwt', { session: false }), starCommunity.bind(this, models));
+  router.get('/getCommunitiesAndChains', getCommunitiesAndChains.bind(this, models));
 
   // offchain community admin routes
   // TODO: Change to POST /community
@@ -151,18 +177,58 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   // TODO: Change to PUT /community
   router.post('/updateCommunity', passport.authenticate('jwt', { session: false }), updateCommunity.bind(this, models));
   router.get('/communityStats', passport.authenticate('jwt', { session: false }), communityStats.bind(this, models));
+  router.get('/getTokensFromLists', getTokensFromLists.bind(this, models, tokenBalanceCache));
+  router.get('/getTokenForum', getTokenForum.bind(this, models, tokenBalanceCache));
 
   // offchain threads
   // TODO: Change to POST /thread
-  router.post('/createThread', passport.authenticate('jwt', { session: false }), createThread.bind(this, models, tokenBalanceCache));
+  router.post(
+    '/createThread',
+    passport.authenticate('jwt', { session: false }),
+    createThread.bind(this, models, tokenBalanceCache),
+  );
   // TODO: Change to PUT /thread
   router.put('/editThread', passport.authenticate('jwt', { session: false }), editThread.bind(this, models));
-  router.post('/updateThreadStage', passport.authenticate('jwt', { session: false }), updateThreadStage.bind(this, models));
-  router.post('/updateThreadPrivacy', passport.authenticate('jwt', { session: false }), updateThreadPrivacy.bind(this, models));
-  router.post('/updateThreadPinned', passport.authenticate('jwt', { session: false }), updateThreadPinned.bind(this, models));
-  router.post('/updateThreadLinkedChainEntities', passport.authenticate('jwt', { session: false }), updateThreadLinkedChainEntities.bind(this, models));
+
+  router.post(
+    '/updateThreadPolling',
+    passport.authenticate('jwt', { session: false }),
+    updateThreadPolling.bind(this, models),
+  );
+  router.post(
+    '/updateThreadStage',
+    passport.authenticate('jwt', { session: false }),
+    updateThreadStage.bind(this, models),
+  );
+  router.post(
+    '/updateThreadPrivacy',
+    passport.authenticate('jwt', { session: false }),
+    updateThreadPrivacy.bind(this, models),
+  );
+  router.post(
+    '/updateThreadPinned',
+    passport.authenticate('jwt', { session: false }),
+    updateThreadPinned.bind(this, models),
+  );
+  router.post(
+    '/updateThreadLinkedChainEntities',
+    passport.authenticate('jwt', { session: false }),
+    updateThreadLinkedChainEntities.bind(this, models),
+  );
+
+  router.post(
+    '/updateOffchainVote',
+    passport.authenticate('jwt', { session: false }),
+    updateOffchainVote.bind(this, models)
+  );
+  router.get('/viewOffchainVotes', viewOffchainVotes.bind(this, models));
+
   router.get('/fetchEntityTitle', fetchEntityTitle.bind(this, models));
-  router.post('/updateChainEntityTitle', passport.authenticate('jwt', { session: false }), updateChainEntityTitle.bind(this, models));
+  router.post(
+    '/updateChainEntityTitle',
+    passport.authenticate('jwt', { session: false }),
+    updateChainEntityTitle.bind(this, models),
+  );
   router.post('/addEditors', passport.authenticate('jwt', { session: false }), addEditors.bind(this, models));
   router.post('/deleteEditors', passport.authenticate('jwt', { session: false }), deleteEditors.bind(this, models));
   // TODO: Change to DELETE /thread
@@ -184,7 +250,11 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
 
   // offchain comments
   // TODO: Change to POST /comment
-  router.post('/createComment', passport.authenticate('jwt', { session: false }), createComment.bind(this, models, tokenBalanceCache));
+  router.post(
+    '/createComment',
+    passport.authenticate('jwt', { session: false }),
+    createComment.bind(this, models, tokenBalanceCache),
+  );
   // TODO: Change to PUT /comment
   router.post('/editComment', passport.authenticate('jwt', { session: false }), editComment.bind(this, models));
   // TODO: Change to DELETE /comment
@@ -207,7 +277,11 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
 
   // offchain reactions
   // TODO: Change to POST /reaction
-  router.post('/createReaction', passport.authenticate('jwt', { session: false }), createReaction.bind(this, models, tokenBalanceCache));
+  router.post(
+    '/createReaction',
+    passport.authenticate('jwt', { session: false }),
+    createReaction.bind(this, models, tokenBalanceCache),
+  );
   // TODO: Change to DELETE /reaction
   router.post('/deleteReaction', passport.authenticate('jwt', { session: false }), deleteReaction.bind(this, models));
   // TODO: Change to GET /reactions
@@ -217,7 +291,11 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
 
   // generic invite link
   // TODO: Change to POST /inviteLink
-  router.post('/createInviteLink', passport.authenticate('jwt', { session: false }), createInviteLink.bind(this, models));
+  router.post(
+    '/createInviteLink',
+    passport.authenticate('jwt', { session: false }),
+    createInviteLink.bind(this, models),
+  );
   // TODO: Change to PUT /inviteLink
   router.get('/acceptInviteLink', acceptInviteLink.bind(this, models));
   // TODO: Change to GET /inviteLinks
@@ -256,7 +334,11 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
 
   // roles
   // TODO: Change to POST /role
-  router.post('/createRole', passport.authenticate('jwt', { session: false }), createRole.bind(this, models));
+  router.post(
+    '/createRole',
+    passport.authenticate('jwt', { session: false }),
+    createRole.bind(this, models),
+  );
   // TODO: Change to DELETE /role
   router.post('/deleteRole', passport.authenticate('jwt', { session: false }), deleteRole.bind(this, models));
   // TODO: Change to PUT /role
@@ -264,59 +346,106 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
 
   // offchain profiles
   // TODO: Change to PUT /profile
-  router.post('/updateProfile', passport.authenticate('jwt', { session: false }), updateProfile.bind(this, models, identityFetchCache));
+  router.post(
+    '/updateProfile',
+    passport.authenticate('jwt', { session: false }),
+    updateProfile.bind(this, models, identityFetchCache),
+  );
   // TODO: Change to GET /profiles
   router.post('/bulkProfiles', bulkProfiles.bind(this, models));
 
   // social accounts
-  router.delete('/githubAccount', passport.authenticate('jwt', { session: false }), deleteGithubAccount.bind(this, models));
-
+  router.delete(
+    '/githubAccount',
+    passport.authenticate('jwt', { session: false }),
+    deleteGithubAccount.bind(this, models),
+  );
 
   // offchain viewCount
   router.post('/viewCount', viewCount.bind(this, models, viewCountCache));
 
   // attachments
   // TODO: Change to POST /uploadSignature
-  router.post('/getUploadSignature', passport.authenticate('jwt', { session: false }), getUploadSignature.bind(this, models));
+  router.post(
+    '/getUploadSignature',
+    passport.authenticate('jwt', { session: false }),
+    getUploadSignature.bind(this, models),
+  );
 
   // notifications
   // TODO: Change to GET /subscriptions
-  router.get('/viewSubscriptions', passport.authenticate('jwt', { session: false }),
-    viewSubscriptions.bind(this, models));
+  router.get(
+    '/viewSubscriptions',
+    passport.authenticate('jwt', { session: false }),
+    viewSubscriptions.bind(this, models),
+  );
   // TODO: Change to POST /subscription
-  router.post('/createSubscription', passport.authenticate('jwt', { session: false }),
-    createSubscription.bind(this, models));
+  router.post(
+    '/createSubscription',
+    passport.authenticate('jwt', { session: false }),
+    createSubscription.bind(this, models),
+  );
   // TODO: Change to DELETE /subscription
-  router.post('/deleteSubscription', passport.authenticate('jwt', { session: false }),
-    deleteSubscription.bind(this, models));
+  router.post(
+    '/deleteSubscription',
+    passport.authenticate('jwt', { session: false }),
+    deleteSubscription.bind(this, models),
+  );
   // TODO: Change to PUT /subscriptions
-  router.post('/enableSubscriptions', passport.authenticate('jwt', { session: false }),
-    enableSubscriptions.bind(this, models));
+  router.post(
+    '/enableSubscriptions',
+    passport.authenticate('jwt', { session: false }),
+    enableSubscriptions.bind(this, models),
+  );
   // TODO: Change to PUT /subscriptions
-  router.post('/disableSubscriptions', passport.authenticate('jwt', { session: false }),
-    disableSubscriptions.bind(this, models));
+  router.post(
+    '/disableSubscriptions',
+    passport.authenticate('jwt', { session: false }),
+    disableSubscriptions.bind(this, models),
+  );
   // TODO: Change to GET /notifications
-  router.post('/viewNotifications', passport.authenticate('jwt', { session: false }),
-    viewNotifications.bind(this, models));
+  router.post(
+    '/viewNotifications',
+    passport.authenticate('jwt', { session: false }),
+    viewNotifications.bind(this, models),
+  );
   // TODO: Change to PUT /notificationsRead
-  router.post('/markNotificationsRead', passport.authenticate('jwt', { session: false }),
-    markNotificationsRead.bind(this, models));
+  router.post(
+    '/markNotificationsRead',
+    passport.authenticate('jwt', { session: false }),
+    markNotificationsRead.bind(this, models),
+  );
   // TODO: Change to DELETE /notificationsRead
-  router.post('/clearReadNotifications', passport.authenticate('jwt', { session: false }),
-    clearReadNotifications.bind(this, models));
-  router.post('/clearNotifications', passport.authenticate('jwt', { session: false }),
-    clearNotifications.bind(this, models));
+  router.post(
+    '/clearReadNotifications',
+    passport.authenticate('jwt', { session: false }),
+    clearReadNotifications.bind(this, models),
+  );
+  router.post(
+    '/clearNotifications',
+    passport.authenticate('jwt', { session: false }),
+    clearNotifications.bind(this, models),
+  );
   // TODO: Change to PUT /immediateEmails
-  router.post('/enableImmediateEmails', passport.authenticate('jwt', { session: false }),
-    enableImmediateEmails.bind(this, models));
+  router.post(
+    '/enableImmediateEmails',
+    passport.authenticate('jwt', { session: false }),
+    enableImmediateEmails.bind(this, models),
+  );
   // TODO: Change to PUT /immediateEmails
-  router.post('/disableImmediateEmails', passport.authenticate('jwt', { session: false }),
-    disableImmediateEmails.bind(this, models));
+  router.post(
+    '/disableImmediateEmails',
+    passport.authenticate('jwt', { session: false }),
+    disableImmediateEmails.bind(this, models),
+  );
 
   // settings
   // TODO: Change to POST /userSetting
-  router.post('/writeUserSetting', passport.authenticate('jwt', { session: false }),
-    writeUserSetting.bind(this, models));
+  router.post(
+    '/writeUserSetting',
+    passport.authenticate('jwt', { session: false }),
+    writeUserSetting.bind(this, models),
+  );
 
   // send feedback button
   // TODO: Change to POST /feedback
@@ -334,7 +463,10 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
     return res.json({ status: 'Success', result: req.user.toJSON() });
   });
   router.get('/auth/github', passport.authenticate('github'));
-  router.get('/auth/github/callback', passport.authenticate('github', { successRedirect: '/', failureRedirect: '/#!/login' }));
+  router.get(
+    '/auth/github/callback',
+    passport.authenticate('github', { successRedirect: '/', failureRedirect: '/#!/login' }),
+  );
   // logout
   router.get('/logout', logout.bind(this, models));
 

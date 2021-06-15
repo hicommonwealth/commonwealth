@@ -6,6 +6,7 @@ import app from 'state';
 
 import { link } from 'helpers';
 import Sublayout from 'views/sublayout';
+import LoginWithWalletDropdown from '../components/login_with_wallet_dropdown';
 
 const Web3LoginPage: m.Component<{}> = {
   view: (vnode) => {
@@ -13,6 +14,7 @@ const Web3LoginPage: m.Component<{}> = {
     const joiningCommunity = m.route.param('joiningCommunity');
     const joiningChain = m.route.param('joiningChain');
     const targetCommunity = m.route.param('targetCommunity');
+
     // oops! = address linking interrupted
     const loginCopy = loggingInWithAddress ? 'Login interrupted' : (joiningCommunity || joiningChain)
       ? 'Oops! An error occurred' : app.isLoggedIn() ? 'Oops! An error occurred' : 'Login interrupted';
@@ -22,24 +24,11 @@ const Web3LoginPage: m.Component<{}> = {
     }, [
       m('.web3login-options', [
         m('h3', loginCopy),
-        m(Button, {
-          intent: 'primary',
+        m(LoginWithWalletDropdown, {
           label: 'Try again',
-          fluid: true,
-          rounded: true,
-          onclick: (e) => {
-            app.modals.lazyCreate('link_new_address_modal', {
-              loggingInWithAddress,
-              joiningCommunity,
-              joiningChain,
-              targetCommunity,
-              successCallback: () => {
-                m.route.set(
-                  m.route.param('prev') ? m.route.param('prev') : app.activeId() ? `/${app.activeId()}` : '/'
-                );
-              },
-            });
-          },
+          joiningChain,
+          joiningCommunity,
+          loggingInWithAddress,
         }),
         m.route.param('prev')
           ? link('a.web3login-go-home', m.route.param('prev'), 'Go back')

@@ -14,8 +14,7 @@ import {
   ICosmosProposal, ICosmosProposalState, CosmosToken, CosmosVoteChoice, CosmosProposalState, ICosmosProposalTally
 } from 'controllers/chain/cosmos/types';
 import { ProposalStore } from 'stores';
-import moment from 'moment-twitter';
-
+import moment from 'moment';
 import { CosmosAccount, CosmosAccounts } from './account';
 import CosmosChain, { CosmosApiType } from './chain';
 import CosmosGovernance, { marshalTally } from './governance';

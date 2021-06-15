@@ -2,12 +2,14 @@
  * @file Manages logged-in user accounts and local storage.
  */
 import $ from 'jquery';
+import m from 'mithril';
 import app from 'state';
 import { isSameAccount } from 'helpers';
 
 import { initAppState } from 'app';
 import { Magic } from 'magic-sdk';
 import { PolkadotExtension } from '@magic-ext/polkadot';
+import Token from 'controllers/chain/ethereum/token/adapter';
 
 import {
   ChainInfo,
@@ -15,16 +17,16 @@ import {
   Account,
   ChainBase,
   CommunityInfo,
-  AddressInfo,
+  AddressInfo
 } from 'models';
 import moment from 'moment';
 import { notifyError } from 'controllers/app/notifications';
-import { networkToBase } from 'models/types';
-
 const MAGIC_PUBLISHABLE_KEY = 'pk_live_B0604AA1B8EEFDB4';
 
-function createAccount(account: Account<any>, community?: string) {
-  // TODO: Change to POST /address
+function createAccount(
+  account: Account<any>,
+  community?: string
+) {
   return $.post(`${app.serverUrl()}/createAddress`, {
     address: account.address,
     keytype: account.chainBase === ChainBase.Substrate
@@ -35,12 +37,17 @@ function createAccount(account: Account<any>, community?: string) {
   });
 }
 
-export function linkExistingAddressToChainOrCommunity(address: string, chain: string, originChain: string, community: string) {
+export function linkExistingAddressToChainOrCommunity(
+  address: string,
+  chain: string,
+  originChain: string,
+  community: string,
+) {
   return $.post(`${app.serverUrl()}/linkExistingAddressToChain`, {
-    address,
-    chain,
-    originChain,
-    community,
+    'address': address,
+    'chain': chain,
+    'originChain': originChain,
+    'community': community,
     jwt: app.user.jwt,
   });
 }
@@ -49,6 +56,10 @@ export async function setActiveAccount(account: Account<any>): Promise<void> {
   const chain = app.activeChainId();
   const community = app.activeCommunityId();
   const role = app.user.getRoleInCommunity({ account, chain, community });
+
+  if (app.chain && (app.chain as Token).isToken) {
+    (app.chain as Token).activeAddressHasToken(account.address).then(() => m.redraw());
+  }
 
   if (!role || role.is_user_default) {
     app.user.ephemerallySetActiveAccount(account);
@@ -105,15 +116,13 @@ export async function updateLastVisited(activeEntity: ChainInfo | CommunityInfo,
       value,
     });
   } catch (e) {
-    console.log(e);
-    notifyError('Could not update lastVisited');
+    console.log('Could not update lastVisited:', e);
   }
 }
 
 export async function updateActiveAddresses(chain?: ChainInfo) {
   // update addresses for a chain (if provided) or for offchain communities (if null)
   // for offchain communities, addresses on all chains are available by default
-
   app.user.setActiveAccounts(
     chain
       ? app.user.addresses
@@ -219,7 +228,9 @@ export async function createUserWithMnemonic(mnemonic: string): Promise<Account<
   return account;
 }
 
-export async function createUserWithAddress(address: string, keytype?: string, community?: string): Promise<Account<any>> {
+export async function createUserWithAddress(
+  address: string, keytype?: string, community?: string
+): Promise<Account<any>> {
   const account = app.chain.accounts.get(address, keytype);
   const response = await createAccount(account, community);
   const token = response.result.verification_token;
@@ -279,7 +290,7 @@ export async function loginWithMagicLink(email: string) {
     // log in as the new user (assume all verification done server-side)
     await initAppState(false);
     if (app.community) {
-      await updateActiveAddresses(undefined);
+      await updateActiveAddresses();
     } else if (app.chain) {
       const c = app.user.selectedNode
         ? app.user.selectedNode.chain

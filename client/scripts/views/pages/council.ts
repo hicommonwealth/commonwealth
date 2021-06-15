@@ -3,14 +3,13 @@ import 'pages/council.scss';
 import _ from 'lodash';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
-import { Grid, Col, Button, MenuItem, Tag } from 'construct-ui';
+import { Tag } from 'construct-ui';
 
 import app, { ApiStatus } from 'state';
 import { ProposalType } from 'identifiers';
-import { formatNumberLong, pluralize, link } from 'helpers';
+import { pluralize, link } from 'helpers';
 import { formatCoin } from 'adapters/currency';
-import { SubstrateCoin } from 'adapters/chain/substrate/types';
-import { ChainBase, ChainClass, IVote } from 'models';
+import { ChainBase } from 'models';
 
 import Substrate from 'controllers/chain/substrate/main';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
@@ -19,13 +18,11 @@ import { PhragmenElectionVote } from 'controllers/chain/substrate/phragmen_elect
 import Sublayout from 'views/sublayout';
 import User, { UserBlock } from 'views/components/widgets/user';
 import { CountdownUntilBlock } from 'views/components/countdown';
-import NewProposalPage from 'views/pages/new_proposal/index';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 import CouncilVotingModal from 'views/modals/council_voting_modal';
 import PageLoading from 'views/pages/loading';
-import ViewVotersModal from 'views/modals/view_voters_modal';
-import Listing from 'views/pages/listing';
 import ErrorPage from 'views/pages/error';
+import loadSubstrateModules from 'views/components/load_substrate_modules';
 
 const Councillor: m.Component<{ account }> = {
   view: (vnode) => {
@@ -34,7 +31,7 @@ const Councillor: m.Component<{ account }> = {
 
     // TODO: refactor this logic to the top level
     const election = (app.chain as Substrate).phragmenElections;
-    const votes: PhragmenElectionVote[] = (app.chain as Substrate).phragmenElections.activeElection.getVotes()
+    const votes: PhragmenElectionVote[] = (app.chain as Substrate).phragmenElections.activeElection?.getVotes()
       .filter((v) => v.votes.includes(account.address));
     const hasMyVote = app.user.activeAccount && votes.filter((v) => v.account === app.user.activeAccount);
 
@@ -42,8 +39,10 @@ const Councillor: m.Component<{ account }> = {
       m(User, { user: account, popover: true, hideIdentityIcon: true }),
       m('.councillor-status', [
         election.isMember(account)
-          ? `${election.backing(account).format(true)} from ${pluralize(votes.length, 'voter')}`
-          : `??? from ${pluralize(votes.length, 'voter')}`
+          ? `${election.backing(account).format(true)} from ${pluralize(votes?.length || 0, 'voter')}`
+          : election.isRunnerUp(account)
+            ? `${election.runnerUpBacking(account).format(true)} from ${pluralize(votes?.length || 0, 'voter')}`
+            : `??? from ${pluralize(votes?.length || 0, 'voter')}`
       ]),
     ]);
   }
@@ -162,18 +161,8 @@ const CouncilPage: m.Component<{}> = {
       });
     }
 
-    const modules = getModules();
-    if (modules.some((mod) => !mod.ready)) {
-      app.chain.loadModules(modules);
-      return m(PageLoading, {
-        message: 'Loading council',
-        title: [
-          'Council',
-          m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
-        ],
-        showNewProposalButton: true
-      });
-    }
+    const modLoading = loadSubstrateModules('Council', getModules);
+    if (modLoading) return modLoading;
 
     const candidates = getCouncilCandidates();
     const councillors = getCouncillors();
@@ -187,9 +176,9 @@ const CouncilPage: m.Component<{}> = {
     const nRunnersUpSeats = (app.chain as Substrate).phragmenElections.desiredRunnersUp;
     const termDuration = (app.chain as Substrate).phragmenElections.termDuration;
     const votingBond = formatCoin((app.chain as Substrate).phragmenElections.votingBond);
-    const nextRoundStartBlock = (app.chain as Substrate).phragmenElections.activeElection.endTime.blocknum;
+    const nextRoundStartBlock = (app.chain as Substrate).phragmenElections.activeElection?.endTime.blocknum;
     const candidacyBond = formatCoin((app.chain as Substrate).phragmenElections.candidacyBond);
-    const voters = (app.chain as Substrate).phragmenElections.activeElection.getVoters();
+    const voters = (app.chain as Substrate).phragmenElections.activeElection?.getVoters();
     const electionIndex = (app.chain as Substrate).phragmenElections.round;
 
     return m(Sublayout, {
@@ -220,7 +209,8 @@ const CouncilPage: m.Component<{}> = {
             ]),
             m('.stats-box-stat', [
               'Next election finishes: ',
-              m(CountdownUntilBlock, { block: nextRoundStartBlock, includeSeconds: false }),
+              nextRoundStartBlock && m(CountdownUntilBlock, { block: nextRoundStartBlock, includeSeconds: false }),
+              !nextRoundStartBlock && '--'
             ]),
             app.user.activeAccount && app.chain.networkStatus === ApiStatus.Connected && m('.stats-box-action', [
               m('a', {

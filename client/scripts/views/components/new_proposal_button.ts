@@ -6,52 +6,57 @@ import { Button, ButtonGroup, Icon, Icons, PopoverMenu, MenuItem, MenuDivider } 
 
 import app from 'state';
 import { ProposalType } from 'identifiers';
-import { ChainClass, ChainBase } from 'models';
+import { ChainBase, ChainNetwork } from 'models';
 import NewThreadModal from 'views/modals/new_thread_modal';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import Substrate from 'controllers/chain/substrate/main';
-import Token from 'controllers/chain/ethereum/token/adapter';
 
-const getNewProposalMenu = (candidates: Array<[SubstrateAccount, number]>) => {
+export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]>, mobile?: boolean) => {
   const activeAccount = app.user.activeAccount;
   return [
     m(MenuItem, {
       onclick: () => { m.route.set(`/${app.activeId()}/new/thread`); },
       label: 'New thread',
+      iconLeft: mobile ? Icons.PLUS : undefined,
     }),
     (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
+      && !mobile
       && m(MenuDivider),
     app.chain?.base === ChainBase.CosmosSDK && m(MenuItem, {
       onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
         type: ProposalType.CosmosProposal
       }),
-      label: 'New text proposal'
+      label: 'New text proposal',
+      iconLeft: mobile ? Icons.PLUS : undefined,
     }),
-    app.chain?.base === ChainBase.Substrate && app.chain?.class !== ChainClass.Plasm && [
+    app.chain?.base === ChainBase.Substrate && app.chain?.network !== ChainNetwork.Plasm && [
       m(MenuItem, {
         onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
           type: ProposalType.SubstrateTreasuryProposal
         }),
-        label: 'New treasury proposal'
+        label: 'New treasury proposal',
+        iconLeft: mobile ? Icons.PLUS : undefined,
       }),
       m(MenuItem, {
         onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
           type: ProposalType.SubstrateDemocracyProposal
         }),
-        label: 'New democracy proposal'
+        label: 'New democracy proposal',
+        iconLeft: mobile ? Icons.PLUS : undefined,
       }),
       m(MenuItem, {
         class: activeAccount && (activeAccount as any).isCouncillor ? '' : 'disabled',
         onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
           type: ProposalType.SubstrateCollectiveProposal
         }),
-        label: 'New council motion'
+        label: 'New council motion',
+        iconLeft: mobile ? Icons.PLUS : undefined,
       }),
       m(MenuItem, {
         onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
           type: ProposalType.SubstrateBountyProposal,
         }),
-        label: 'New bounty proposal'
+        label: 'New bounty proposal',
+        iconLeft: mobile ? Icons.PLUS : undefined,
       }),
     ],
   ];
@@ -59,6 +64,9 @@ const getNewProposalMenu = (candidates: Array<[SubstrateAccount, number]>) => {
 
 export const MobileNewProposalButton: m.Component<{}, { councilCandidates?: Array<[SubstrateAccount, number]> }> = {
   view: (vnode) => {
+    if (!app.isLoggedIn()) return;
+    if (!app.chain && !app.community) return;
+    if (!app.activeId()) return;
     return m('.NewProposalButton.MobileNewProposalButton', [
       m(PopoverMenu, {
         class: 'new-proposal-button-popover',
@@ -66,8 +74,7 @@ export const MobileNewProposalButton: m.Component<{}, { councilCandidates?: Arra
         hoverCloseDelay: 0,
         hasArrow: false,
         trigger: m(Button, {
-          disabled: !app.user.activeAccount
-            || !app.activeCommunityId() && ((app.chain as Token).isToken && !(app.chain as Token).hasToken),
+          disabled: !app.user.activeAccount,
           label: m(Icon, { name: Icons.PLUS }),
         }),
         inline: true,
@@ -100,8 +107,7 @@ const NewProposalButton: m.Component<{
         class: 'NewProposalButton',
         label: 'New thread',
         fluid,
-        disabled: !app.user.activeAccount
-          || !app.activeCommunityId() && ((app.chain as Token).isToken && !(app.chain as Token).hasToken),
+        disabled: !app.user.activeAccount,
         onclick: () => app.modals.create({ modal: NewThreadModal }),
       });
     }
@@ -115,8 +121,7 @@ const NewProposalButton: m.Component<{
         hoverCloseDelay: 0,
         hasArrow: false,
         trigger: m(Button, {
-          disabled: !app.user.activeAccount
-            || ((app.chain as Token).isToken && !(app.chain as Token).hasToken),
+          disabled: !app.user.activeAccount,
           label: 'New thread',
         }),
         position: 'bottom-end',
@@ -127,8 +132,7 @@ const NewProposalButton: m.Component<{
         content: getNewProposalMenu(councilCandidates),
       }),
       m(Button, {
-        disabled: !app.user.activeAccount
-          || ((app.chain as Token).isToken && !(app.chain as Token).hasToken),
+        disabled: !app.user.activeAccount,
         iconLeft: Icons.EDIT,
         fluid,
         onclick: () => app.modals.create({ modal: NewThreadModal }),
