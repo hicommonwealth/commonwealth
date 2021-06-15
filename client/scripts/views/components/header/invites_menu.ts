@@ -9,18 +9,17 @@ import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import LoginModal from '../../modals/login_modal';
 
 export const handleEmailInvites = (state) => {
-  if (!state.modalAutoTriggered) {
+  if (!state.modalAutoTriggered && app.user) {
     state.modalAutoTriggered = true;
-    m.redraw();
     if (app.config.invites?.length) {
       app.modals.create({
         modal: ConfirmInviteModal,
         data: { community: m.route.param('inviteComm') }
       });
-    } else if (!app.user) {
+    } else if (!app.user.activeAccount) {
       app.modals.create({
         modal: LoginModal,
-        data: { email: m.route.param('email') }
+        data: { defaultEmail: m.route.param('inviteEmail') }
       });
     }
   }

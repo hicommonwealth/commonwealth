@@ -26,7 +26,9 @@ const exitWithMagicLoginComplete = () => {
   m.redraw();
 };
 
-const Login: m.Component<{}, {
+const Login: m.Component<{
+  defaultEmail?: string;
+}, {
   disabled: boolean;
   showMagicLoginPrompt: boolean;
   showMagicLoginPromptEmail: string;
@@ -46,6 +48,8 @@ const Login: m.Component<{}, {
             fluid: true,
             name: 'email',
             placeholder: 'Email',
+            disabled: !!vnode.attrs.defaultEmail,
+            defaultValue: vnode.attrs.defaultEmail,
             autocomplete: 'off',
             onclick: (e) => {
               e.stopPropagation();

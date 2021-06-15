@@ -92,10 +92,6 @@ const Sublayout: m.Component<{
       ]),
     ];
 
-    if (m.route.param('triggerInvite') === 't') {
-      handleEmailInvites(vnode.state);
-    }
-
     if (vnode.attrs.errorLayout) return [
       m('.layout-container', [
         m(EmptyState, {
@@ -106,6 +102,10 @@ const Sublayout: m.Component<{
         }),
       ]),
     ];
+
+    if (m.route.param('triggerInvite') === 't') {
+      setTimeout(() => handleEmailInvites(vnode.state), 0);
+    }
 
     return [
       m('.layout-container', [

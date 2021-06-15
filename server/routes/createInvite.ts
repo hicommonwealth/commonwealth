@@ -119,6 +119,7 @@ const createInvite = async (models, req: Request, res: Response, next: NextFunct
     ? `/${chain.id}`
     : community.privacyEnabled
       ? '' : `/${community.id}`;
+  // todo: inviteComm param may only be necesssary if no communityRoute present
   const params = `?triggerInvite=t&inviteComm=${(community || chain).id}&inviteEmail=${invitedEmail}`;
   const signupLink = `${SERVER_URL}${communityRoute}${params}`;
 
