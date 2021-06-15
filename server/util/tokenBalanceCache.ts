@@ -74,7 +74,7 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
         address: chain.ChainNodes[0].address,
         name: chain.name,
         symbol: chain.symbol,
-        iconUrl: chain.icon_url,
+        iconUrl: chain.icon_url
       }));
 
     try {
@@ -136,17 +136,24 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     return this._listCache.getTokens();
   }
 
-  // query a user's balance on a given token contract and save in cache
   public async hasToken(contractId: string, address: string, network = 'mainnet'): Promise<boolean> {
     const tokenMeta = this._contracts.find(({ id }) => id === contractId);
     if (!tokenMeta) throw new Error('unsupported token');
     const threshold = tokenMeta.balanceThreshold || new BN(1);
+    const balance = await this.getBalance(contractId, address);
+    return balance.gt(threshold);
+  }
+
+  // query a user's balance on a given token contract and save in cache
+  public async getBalance(contractId: string, address: string, network = 'mainnet'): Promise<BN> {
+    const tokenMeta = this._contracts.find(({ id }) => id === contractId);
+    if (!tokenMeta) throw new Error('unsupported token');
 
     // first check the cache for the token balance
     const result = await this.access((async (c: CacheT): Promise<BN | undefined> => {
       return c[contractId][address]?.balance;
     }));
-    if (result !== undefined) return result.gte(threshold);
+    if (result !== undefined) return result;
 
     // fetch balance if not found in cache
     let balance: BN;
@@ -161,7 +168,7 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     await this.access((async (c: CacheT) => {
       c[contractId][address] = { balance, fetchedAt };
     }));
-    return balance.gte(threshold);
+    return balance;
   }
 
   // prune cache job

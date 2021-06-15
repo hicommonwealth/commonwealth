@@ -42,8 +42,10 @@ const createReaction = async (
     });
     if (isAdmin.length === 0) {
       try {
-        const userHasBalance = await tokenBalanceCache.hasToken(chain.id, req.body.address);
-        if (!userHasBalance) return next(new Error(Errors.InsufficientTokenBalance));
+        const thread = models.OffchainThread.findOne({ id: req.body.thread_id });
+        const threshold = models.OffchainTopics.findOne({ id: thread.topic_id }).token_threshold;
+        const tokenBalance = await tokenBalanceCache.getBalance(chain.id, req.body.address);
+        if (!tokenBalance >= threshold) return next(new Error(Errors.InsufficientTokenBalance));
       } catch (e) {
         log.error(`hasToken failed: ${e.message}`);
         return next(new Error(Errors.CouldNotFetchTokenBalance));

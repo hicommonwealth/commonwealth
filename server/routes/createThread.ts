@@ -38,6 +38,27 @@ const createThread = async (
 
   const { topic_name, topic_id, title, body, kind, stage, url, readOnly } = req.body;
 
+  if (chain && chain.type === 'token') {
+    // skip check for admins
+    const isAdmin = await models.Role.findAll({
+      where: {
+        address_id: author.id,
+        chain_id: chain.id,
+        permission: ['admin'],
+      },
+    });
+    if (isAdmin.length === 0) {
+      try {
+        const threshold = models.OffchainTopics.findOne({ id: topic_id }).token_threshold;
+        const tokenBalance = await tokenBalanceCache.getBalance(chain.id, req.body.address);
+        if (!tokenBalance >= threshold) return next(new Error(Errors.InsufficientTokenBalance));
+      } catch (e) {
+        log.error(`hasToken failed: ${e.message}`);
+        return next(new Error(Errors.CouldNotFetchTokenBalance));
+      }
+    }
+  }
+
   if (kind === 'forum') {
     if (!title || !title.trim()) {
       return next(new Error(Errors.ForumMissingTitle));
