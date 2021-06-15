@@ -62,8 +62,15 @@ export class SubstrateTreasuryTip extends Proposal<
   }
 
   public get support(): SubstrateCoin {
-    return this._Chain.coins(this.getVotes()
-      .reduce((total, vote) => vote.deposit.add(total), new BN(0)));
+    const deposits = this.getVotes().map((vote) => vote.deposit.inDollars);
+    deposits.sort();
+    const n = deposits.length;
+    let median = 0;
+    if (n > 0) {
+      median = (n % 2) ? deposits[Math.floor(n / 2)]
+        : (deposits[Math.floor((n + 1) / 2)] + deposits[Math.floor((n - 1) / 2)]) / 2;
+    }
+    return this._Chain.coins(median, true);
   }
   public get turnout() {
     return null;
