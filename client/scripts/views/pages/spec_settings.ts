@@ -52,7 +52,7 @@ const SpecSettingsPage: m.Component<{}, ISpecSettingsState> = {
     }, [
       m(Form, { class: 'SpecSettingsForm' }, [
         m(Grid, [
-          m(Col, [
+          m(Col, { class: 'form-col' }, [
             m('h3', 'Substrate Spec Settings'),
 
             vnode.state.error && m('.warn', vnode.state.error),
