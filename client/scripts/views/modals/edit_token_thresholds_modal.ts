@@ -68,9 +68,9 @@ const EditTokenThresholdsModal: m.Component<{
         m('h3', 'Edit token thresholds'),
         m(CompactModalExitButton),
       ]),
-      m('.compact-modal-body', topics.sort(function(a, b){
-        if(a.name < b.name) { return -1; }
-        if(a.name > b.name) { return 1; }
+      m('.compact-modal-body', topics.sort((a, b) => {
+        if (a.name < b.name) { return -1; }
+        if (a.name > b.name) { return 1; }
         return 0;
       }).map((topic) => {
         return m(EditTokenThresholdsRow, { topic });

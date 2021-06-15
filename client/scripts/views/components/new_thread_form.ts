@@ -621,7 +621,9 @@ export const NewThreadForm: m.Component<{
                 defaultTopic: (vnode.state.activeTopic === false || vnode.state.activeTopic)
                   ? vnode.state.activeTopic
                   : localStorage.getItem(`${app.activeId()}-active-topic`),
-                topics: app.topics.getByCommunity(app.activeId()),
+                topics: app.topics.getByCommunity(app.activeId()).filter((t) => {
+                  return (app.chain as Token).tokenBalance >= t.token_threshold;
+                }),
                 featuredTopics: app.topics.getByCommunity(app.activeId())
                   .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
                 updateFormData: updateTopicState,

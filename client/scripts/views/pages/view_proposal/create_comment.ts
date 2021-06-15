@@ -114,6 +114,12 @@ const CreateComment: m.Component<{
       getSetGlobalReplyStatus(GlobalStatus.Set, false, true);
     };
 
+    const activeTopicName = rootProposal instanceof OffchainThread ? rootProposal.topic.name : null;
+    const tokenPostingThreshold = app.topics.getByName(
+      activeTopicName,
+      app.activeId()
+    )?.token_threshold;
+
     const { error, sendingComment, uploadsInProgress } = vnode.state;
 
     return m('.CreateComment', {
@@ -163,13 +169,18 @@ const CreateComment: m.Component<{
               },
               tabindex: vnode.attrs.tabindex,
             }),
+            m('.token-requirement', [
+              tokenPostingThreshold > 0
+                ? `Commenting in ${activeTopicName} requires ${tokenPostingThreshold} ${app.chain.meta.chain.symbol}`
+                : null
+            ]),
             m('.form-bottom', [
               m(Button, {
                 intent: 'primary',
                 type: 'submit',
                 compact: true,
                 disabled: getSetGlobalEditingStatus(GlobalStatus.Get) || sendingComment || uploadsInProgress > 0
-                  || (app.activeChainId() && (app.chain as Token).isToken && !(app.chain as Token).hasToken),
+                  || (app.activeChainId() && (app.chain as Token).isToken && tokenPostingThreshold > (app.chain as Token).tokenBalance),
                 rounded: true,
                 onclick: submitComment,
                 label: (uploadsInProgress > 0)
@@ -190,7 +201,7 @@ const CreateComment: m.Component<{
                 }),
               error
                 && m('.new-comment-error', error),
-            ])
+            ]),
           ]
       ])
     ]);

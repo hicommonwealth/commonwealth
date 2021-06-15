@@ -36,8 +36,9 @@ const ReactionButton: m.Component<{
 
     const isCommunity = !!app.activeCommunityId();
 
+    const tokenPostingThreshold = post instanceof OffchainThread ? app.topics.getByName(post.topic.name, app.activeId()).token_threshold : 0;
     const disabled = vnode.state.loading
-      || (!isCommunity && (app.chain as Token).isToken && !(app.chain as Token).hasToken);
+      || (!isCommunity && (app.chain as Token).isToken && tokenPostingThreshold > (app.chain as Token).tokenBalance);
     const activeAddress = app.user.activeAccount?.address;
     const rxn = reactions.find((r) => r.reaction && r.author === activeAddress);
     const hasReacted : boolean = !!rxn;

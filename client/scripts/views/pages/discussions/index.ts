@@ -216,6 +216,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
   },
   view: (vnode) => {
     const { topic } = vnode.attrs;
+
     const stage = m.route.param('stage');
     const activeEntity = app.community ? app.community : app.chain;
     if (!activeEntity) return m(PageLoading, {
