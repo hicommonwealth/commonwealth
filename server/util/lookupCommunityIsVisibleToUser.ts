@@ -50,7 +50,7 @@ const lookupCommunityIsVisibleToUser = async (
   // searching for chain and community that both don't exist
   if (!chain && !community) return [null, null, ChainCommunityErrors.BothChainAndCommunityDNE];
 
-  if (community && community.privacyEnabled) {
+  if (community && community.privacyEnabled && !user?.isAdmin) {
     if (!user) return [null, null, ChainCommunityErrors.NoUserProvided];
     const userAddressIds = await user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
     const userMembership = await models.Role.findOne({

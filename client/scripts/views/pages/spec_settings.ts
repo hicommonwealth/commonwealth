@@ -3,7 +3,7 @@ import 'pages/spec_settings.scss';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { RegisteredTypes } from '@polkadot/types/types';
 import { initChain, selectNode } from 'app';
-import { ChainBase, ChainInfo } from 'models';
+import { ChainBase, ChainInfo, RolePermission } from 'models';
 import { Button, TextArea, Form, Grid, Col } from 'construct-ui';
 import $ from 'jquery';
 import m from 'mithril';
@@ -27,7 +27,12 @@ interface ISpecSettingsState {
 const SpecSettingsPage: m.Component<{}, ISpecSettingsState> = {
   view: (vnode: m.VnodeDOM<{}, ISpecSettingsState>) => {
     // loading states
-    if (!app.user?.isSiteAdmin) {
+    const isAdmin = app.user?.isSiteAdmin;
+    const roles = app.user?.roles || [];
+    const substrateAdminChainIds = roles.filter((r) => r.permission === RolePermission.admin
+      && app.config.chains.getById(r.chain_id).base === ChainBase.Substrate)
+      .map((r) => r.chain_id);
+    if (!isAdmin && !substrateAdminChainIds.length) {
       return m(PageNotFound);
     }
     if (!app.chain?.serverLoaded) {
@@ -36,12 +41,17 @@ const SpecSettingsPage: m.Component<{}, ISpecSettingsState> = {
 
     // initial configuration
     if (!vnode.state.chains) {
+      // only include chains where user is admin
       vnode.state.chains = app.config.chains.getAll()
-        .filter((c) => c.base === ChainBase.Substrate)
+        .filter((c) => c.base === ChainBase.Substrate
+          && (isAdmin || substrateAdminChainIds.includes(c.id)))
         .map((c) => c.id);
     }
     if (!vnode.state.chain) {
-      vnode.state.chain = app.chain.base === ChainBase.Substrate
+      // if on chain where user is not community admin, select first chain in list
+      // where they are admin. otherwise, select current chain.
+      vnode.state.chain = (app.chain.base === ChainBase.Substrate
+          && (isAdmin || substrateAdminChainIds.includes(app.chain.id)))
         ? app.chain?.meta?.chain.id
         : vnode.state.chains[0];
       vnode.state.spec = app.config.chains.getById(vnode.state.chain).substrateSpec || {};
@@ -55,14 +65,12 @@ const SpecSettingsPage: m.Component<{}, ISpecSettingsState> = {
           m(Col, { class: 'form-col' }, [
             m('h3', 'Substrate Spec Settings'),
 
-            vnode.state.error && m('.warn', vnode.state.error),
-
             // Dropdown to select chain + reload spec
             m(DropdownFormField, {
-              defaultValue: vnode.state.chain,
               options: {
                 disabled: vnode.state.isLoading,
               },
+              value: vnode.state.chain,
               choices: vnode.state.chains.map(
                 (c) => ({ name: 'chain', value: c, label: c })
               ),
@@ -83,6 +91,7 @@ const SpecSettingsPage: m.Component<{}, ISpecSettingsState> = {
               class: 'spec',
               defaultValue: JSON.stringify(vnode.state.spec, null, 2),
               oninput: (e) => {
+                // TODO: support tabs / auto-alignment / syntax highlighting
                 const result = (e.target as any).value;
                 if (result !== vnode.state.spec) {
                   vnode.state.isSpecValid = false;
@@ -99,6 +108,9 @@ const SpecSettingsPage: m.Component<{}, ISpecSettingsState> = {
                 }
               },
             }),
+
+            // error output
+            vnode.state.error && m('.warn', vnode.state.error),
 
             // test button
             m(Button, {
@@ -162,8 +174,10 @@ const SpecSettingsPage: m.Component<{}, ISpecSettingsState> = {
                     spec: JSON.stringify(vnode.state.spec),
                   });
                 } catch (err) {
-                  vnode.state.error = err.message;
+                  vnode.state.error = err.message || 'Spec update failure.';
                   vnode.state.isLoading = false;
+                  m.redraw();
+                  return;
                 }
 
                 // update stored spec
@@ -172,7 +186,7 @@ const SpecSettingsPage: m.Component<{}, ISpecSettingsState> = {
                   app.config.chains.update(newChain);
 
                   // reinitialize chain with new spec if editing current chain
-                  if (app.chain) {
+                  if (app.chain?.id === newChain.id) {
                     const n = app.config.nodes.getByChain(newChain.id);
                     if (n.length) {
                       await selectNode(n[0]);
@@ -182,6 +196,7 @@ const SpecSettingsPage: m.Component<{}, ISpecSettingsState> = {
                 }
 
                 vnode.state.isLoading = false;
+                m.redraw();
               },
             }),
           ]),
