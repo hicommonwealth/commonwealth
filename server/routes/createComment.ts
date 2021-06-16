@@ -54,11 +54,11 @@ const createComment = async (
       try {
         const stage = root_id.substring(0, root_id.indexOf('_'));
         const topic_id = root_id.substring(root_id.indexOf('_') + 1);
-
-        const thread = models.OffchainThread.findOne({ stage, topic_id });
-        const threshold = models.OffchainTopics.findOne({ id: thread.topic_id }).token_threshold;
+        const thread = await models.OffchainThread.findOne({ where:{ stage, id: topic_id } });
+        const threshold = (await models.OffchainTopic.findOne({ where: { id: thread.topic_id } })).token_threshold;
         const tokenBalance = await tokenBalanceCache.getBalance(chain.id, req.body.address);
-        if (!tokenBalance >= threshold) return next(new Error(Errors.InsufficientTokenBalance));
+
+        if (tokenBalance < threshold) return next(new Error(Errors.InsufficientTokenBalance));
       } catch (e) {
         log.error(`hasToken failed: ${e.message}`);
         return next(new Error(Errors.CouldNotFetchTokenBalance));

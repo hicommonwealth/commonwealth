@@ -49,9 +49,10 @@ const createThread = async (
     });
     if (isAdmin.length === 0) {
       try {
-        const threshold = models.OffchainTopics.findOne({ id: topic_id }).token_threshold;
+        const threshold = (await models.OffchainTopic.findOne({ where: { id: topic_id } })).token_threshold;
         const tokenBalance = await tokenBalanceCache.getBalance(chain.id, req.body.address);
-        if (!tokenBalance >= threshold) return next(new Error(Errors.InsufficientTokenBalance));
+
+        if (tokenBalance < threshold) return next(new Error(Errors.InsufficientTokenBalance));
       } catch (e) {
         log.error(`hasToken failed: ${e.message}`);
         return next(new Error(Errors.CouldNotFetchTokenBalance));
