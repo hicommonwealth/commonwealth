@@ -359,6 +359,46 @@ export const Title: TitlerFilter = (kind: EventKind): IEventTitle => {
     }
 
     /**
+     * Tip Events
+     */
+    case EventKind.NewTip: {
+      return {
+        title: 'New Tip Suggested',
+        description: 'A new tip is opened.',
+      };
+    }
+    case EventKind.TipVoted: {
+      return {
+        title: 'Tip Voted',
+        description: 'A tip is voted on.',
+      };
+    }
+    case EventKind.TipClosing: {
+      return {
+        title: 'Tip Closing',
+        description: 'A tip begins closing.',
+      };
+    }
+    case EventKind.TipClosed: {
+      return {
+        title: 'Tip Closed',
+        description: 'A tip is closed and paid out.',
+      };
+    }
+    case EventKind.TipRetracted: {
+      return {
+        title: 'Tip Retracted',
+        description: 'A tip is retracted.',
+      };
+    }
+    case EventKind.TipSlashed: {
+      return {
+        title: 'Tip Slashed',
+        description: 'A tip is slashed.',
+      };
+    }
+
+    /**
      * TreasuryReward events
      */
     case EventKind.TreasuryRewardMinting:

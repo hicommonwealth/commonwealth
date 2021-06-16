@@ -181,6 +181,9 @@ export function entityToFieldName(entity: IChainEntityKind): string | null {
     case SubstrateTypes.EntityKind.SignalingProposal: {
       return 'proposalHash';
     }
+    case SubstrateTypes.EntityKind.TipProposal: {
+      return 'proposalHash';
+    }
     case MolochTypes.EntityKind.Proposal: {
       return 'proposalIndex';
     }
@@ -250,6 +253,20 @@ export function eventToEntity(
         SubstrateTypes.EntityKind.DemocracyPreimage,
         EntityEventKind.Complete,
       ];
+    }
+
+    // Tip Events
+    case SubstrateTypes.EventKind.NewTip: {
+      return [SubstrateTypes.EntityKind.TipProposal, EntityEventKind.Create];
+    }
+    case SubstrateTypes.EventKind.TipVoted:
+    case SubstrateTypes.EventKind.TipClosing: {
+      return [SubstrateTypes.EntityKind.TipProposal, EntityEventKind.Update];
+    }
+    case SubstrateTypes.EventKind.TipClosed:
+    case SubstrateTypes.EventKind.TipRetracted:
+    case SubstrateTypes.EventKind.TipSlashed: {
+      return [SubstrateTypes.EntityKind.TipProposal, EntityEventKind.Complete];
     }
 
     // Treasury Events

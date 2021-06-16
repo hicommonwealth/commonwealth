@@ -1,11 +1,7 @@
 import BN from 'bn.js';
 
-import {
-  IEventLabel,
-  LabelerFilter,
-  EventSupportingChainT,
-} from '../../interfaces';
-import { BalanceString, EventKind, IEventData } from '../types';
+import { IEventLabel, LabelerFilter } from '../../interfaces';
+import { BalanceString, EventKind, IEventData, EventChains } from '../types';
 
 function fmtAddr(addr: string) {
   if (!addr) return '';
@@ -49,7 +45,7 @@ function formatNumberShort(num: number) {
     : num.toString();
 }
 
-const getDenom = (chain: EventSupportingChainT): string => {
+const getDenom = (chain: typeof EventChains[number]): string => {
   switch (chain) {
     case 'clover':
       return 'CLV';
@@ -72,16 +68,6 @@ const getDenom = (chain: EventSupportingChainT): string => {
       return 'DOT';
     case 'polkadot-local':
       return 'tDOT';
-    case 'moloch':
-      return 'Shares';
-    case 'moloch-local':
-      return 'tShares';
-    case 'marlin':
-      return 'MPond';
-    case 'marlin-local':
-      return 'tMPond';
-    case 'erc20':
-      throw new Error('invalid chain'); // shouldn't happen
     default: {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const _dummy: never = chain;
@@ -90,9 +76,12 @@ const getDenom = (chain: EventSupportingChainT): string => {
   }
 };
 
-const edgBalanceFormatter = (chain, balance: BalanceString): string => {
+const edgBalanceFormatter = (
+  chain: typeof EventChains[number],
+  balance: BalanceString
+): string => {
   const denom = getDenom(chain);
-  let dollar;
+  let dollar: BN;
   if (chain.startsWith('edgeware')) {
     dollar = new BN(10).pow(new BN(EDG_DECIMAL));
   } else if (chain.startsWith('kusama') || chain.startsWith('polkadot')) {
@@ -117,7 +106,7 @@ const edgBalanceFormatter = (chain, balance: BalanceString): string => {
  */
 export const Label: LabelerFilter = (
   blockNumber: number,
-  chainId: string,
+  chainId: typeof EventChains[number],
   data: IEventData
 ): IEventLabel => {
   const balanceFormatter = (bal) => edgBalanceFormatter(chainId, bal);
@@ -707,6 +696,78 @@ export const Label: LabelerFilter = (
         label: "A signaling proposal's voting phase completed.",
         linkUrl: chainId
           ? `/${chainId}/proposal/signalingproposal/${voteId}`
+          : null,
+      };
+    }
+
+    /**
+     * Tip Events
+     */
+    case EventKind.NewTip: {
+      return {
+        heading: 'New Tip Suggested',
+        label: `A new tip for ${fmtAddr(data.who)} was suggested with reason "${
+          data.reason
+        }".`,
+        // TODO: fix
+        linkUrl: chainId
+          ? `/${chainId}/proposal/tip/${data.proposalHash}`
+          : null,
+      };
+    }
+    case EventKind.TipVoted: {
+      return {
+        heading: 'Tip Voted',
+        label: `A tip was voted on by ${data.who} for ${balanceFormatter(
+          data.value
+        )}.`,
+        // TODO: fix
+        linkUrl: chainId
+          ? `/${chainId}/proposal/tip/${data.proposalHash}`
+          : null,
+      };
+    }
+    case EventKind.TipClosing: {
+      return {
+        heading: 'Tip Closing',
+        label: `A tip is now closing on block ${data.closing}.`,
+        // TODO: fix
+        linkUrl: chainId
+          ? `/${chainId}/proposal/tip/${data.proposalHash}`
+          : null,
+      };
+    }
+    case EventKind.TipClosed: {
+      return {
+        heading: 'Tip Closed',
+        label: `A tip to ${fmtAddr(
+          data.who
+        )} was paid out for ${balanceFormatter(data.payout)}.`,
+        // TODO: fix
+        linkUrl: chainId
+          ? `/${chainId}/proposal/tip/${data.proposalHash}`
+          : null,
+      };
+    }
+    case EventKind.TipRetracted: {
+      return {
+        heading: 'Tip Retracted',
+        label: 'A tip was retracted.',
+        // TODO: fix
+        linkUrl: chainId
+          ? `/${chainId}/proposal/tip/${data.proposalHash}`
+          : null,
+      };
+    }
+    case EventKind.TipSlashed: {
+      return {
+        heading: 'Tip Slashed',
+        label: `A tip submitted by ${fmtAddr(
+          data.finder
+        )} slashed for ${balanceFormatter(data.deposit)}`,
+        // TODO: fix
+        linkUrl: chainId
+          ? `/${chainId}/proposal/tip/${data.proposalHash}`
           : null,
       };
     }

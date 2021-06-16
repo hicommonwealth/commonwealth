@@ -151,6 +151,31 @@ export function ParseType(
         default:
           return null;
       }
+    case 'tips':
+      switch (method) {
+        case 'NewTip': {
+          return EventKind.NewTip;
+        }
+        // extrinsic call tip()
+        case 'tip': {
+          return EventKind.TipVoted;
+        }
+        case 'TipClosing': {
+          return EventKind.TipClosing;
+        }
+        case 'TipClosed': {
+          return EventKind.TipClosed;
+        }
+        case 'TipRetracted': {
+          return EventKind.TipRetracted;
+        }
+        case 'TipSlashed': {
+          return EventKind.TipSlashed;
+        }
+        default: {
+          return null;
+        }
+      }
     case 'treasuryReward':
       switch (method) {
         case 'TreasuryMinting': {

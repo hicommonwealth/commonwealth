@@ -20,6 +20,7 @@ import {
   IdentificationTuple,
   AccountVote,
   BountyIndex,
+  BalanceOf,
 } from '@polkadot/types/interfaces';
 import {
   Option,
@@ -618,6 +619,97 @@ export async function Enrich(
       }
 
       /**
+       * Tip Events
+       */
+      case EventKind.NewTip: {
+        const [hash] = (event.data as unknown) as [Hash] & Codec;
+        const tip = await api.query.tips.tips(hash);
+        if (!tip.isSome) {
+          throw new Error(`Could not find tip: ${hash.toString()}`);
+        }
+        const {
+          reason: reasonHash,
+          who,
+          finder,
+          deposit,
+          findersFee,
+        } = tip.unwrap();
+        const reasonOpt = await api.query.tips.reasons(reasonHash);
+        if (!reasonOpt.isSome) {
+          throw new Error(
+            `Could not find reason for tip: ${reasonHash.toString()}`
+          );
+        }
+        return {
+          data: {
+            kind,
+            proposalHash: hash.toString(),
+            // TODO: verify this reason string unmarshals correctly
+            reason: hexToString(reasonOpt.unwrap().toString()),
+            who: who.toString(),
+            finder: finder.toString(),
+            deposit: deposit.toString(),
+            findersFee: findersFee.valueOf(),
+          },
+        };
+      }
+      case EventKind.TipClosing: {
+        const [hash] = (event.data as unknown) as [Hash] & Codec;
+        const tip = await api.query.tips.tips(hash);
+        if (!tip.isSome) {
+          throw new Error(`Could not find tip: ${hash.toString()}`);
+        }
+        return {
+          data: {
+            kind,
+            proposalHash: hash.toString(),
+            closing: +tip.unwrap().closes.unwrap(),
+          },
+        };
+      }
+      case EventKind.TipClosed: {
+        const [hash, accountId, balance] = (event.data as unknown) as [
+          Hash,
+          AccountId,
+          Balance
+        ] &
+          Codec;
+        return {
+          data: {
+            kind,
+            proposalHash: hash.toString(),
+            who: accountId.toString(),
+            payout: balance.toString(),
+          },
+        };
+      }
+      case EventKind.TipRetracted: {
+        const [hash] = (event.data as unknown) as [Hash] & Codec;
+        return {
+          data: {
+            kind,
+            proposalHash: hash.toString(),
+          },
+        };
+      }
+      case EventKind.TipSlashed: {
+        const [hash, accountId, balance] = (event.data as unknown) as [
+          Hash,
+          AccountId,
+          Balance
+        ] &
+          Codec;
+        return {
+          data: {
+            kind,
+            proposalHash: hash.toString(),
+            finder: accountId.toString(),
+            deposit: balance.toString(),
+          },
+        };
+      }
+
+      /**
        * Treasury Events
        */
       case EventKind.TreasuryProposed: {
@@ -1198,7 +1290,18 @@ export async function Enrich(
           },
         };
       }
-
+      case EventKind.TipVoted: {
+        const voter = extrinsic.signer.toString();
+        const [hash, value] = extrinsic.args as [Hash, Compact<BalanceOf>];
+        return {
+          data: {
+            kind,
+            proposalHash: hash.toString(),
+            who: voter,
+            value: value.toString(),
+          },
+        };
+      }
       case EventKind.TreasuryBountyExtended: {
         const [idx, remark] = extrinsic.args as [BountyIndex, Bytes];
         return {

@@ -108,6 +108,7 @@ export enum EntityKind {
   TreasuryProposal = 'treasury-proposal',
   CollectiveProposal = 'collective-proposal',
   SignalingProposal = 'signaling-proposal',
+  TipProposal = 'tip-proposal',
   TreasuryBounty = 'treasury-bounty',
 }
 
@@ -158,6 +159,13 @@ export enum EventKind {
   TreasuryBountyClaimed = 'treasury-bounty-claimed',
   TreasuryBountyCanceled = 'treasury-bounty-canceled',
   TreasuryBountyExtended = 'treasury-bounty-extended',
+
+  NewTip = 'new-tip',
+  TipVoted = 'tip-voted',
+  TipClosing = 'tip-closing',
+  TipClosed = 'tip-closed',
+  TipRetracted = 'tip-retracted',
+  TipSlashed = 'tip-slashed',
 
   ElectionNewTerm = 'election-new-term',
   ElectionEmptyTerm = 'election-empty-term',
@@ -494,6 +502,52 @@ export interface ITreasuryBountyExtended extends IEvent {
 }
 
 /**
+ * Tips Events
+ */
+export interface INewTip extends IEvent {
+  kind: EventKind.NewTip;
+  proposalHash: string;
+  reason: string;
+  who: AccountId;
+  finder: AccountId;
+  deposit: BalanceString;
+  findersFee: boolean;
+}
+
+// from extrinsic, not event
+export interface ITipVoted extends IEvent {
+  kind: EventKind.TipVoted;
+  proposalHash: string;
+  who: AccountId;
+  value: BalanceString;
+}
+
+export interface ITipClosing extends IEvent {
+  kind: EventKind.TipClosing;
+  closing: BlockNumber;
+  proposalHash: string;
+}
+
+export interface ITipClosed extends IEvent {
+  kind: EventKind.TipClosed;
+  proposalHash: string;
+  who: AccountId;
+  payout: BalanceString;
+}
+
+export interface ITipRetracted extends IEvent {
+  kind: EventKind.TipRetracted;
+  proposalHash: string;
+}
+
+export interface ITipSlashed extends IEvent {
+  kind: EventKind.TipSlashed;
+  proposalHash: string;
+  finder: AccountId;
+  deposit: BalanceString;
+}
+
+/**
  * Elections Events
  */
 export interface IElectionNewTerm extends IEvent {
@@ -691,6 +745,12 @@ export type IEventData =
   | ITreasuryBountyCanceled
   | ITreasuryBountyClaimed
   | ITreasuryBountyExtended
+  | INewTip
+  | ITipVoted
+  | ITipClosing
+  | ITipClosed
+  | ITipRetracted
+  | ITipSlashed
   | IElectionNewTerm
   | IElectionEmptyTerm
   | ICandidacySubmitted
@@ -757,6 +817,13 @@ export type ISignalingProposalEvents =
   | ISignalingCommitStarted
   | ISignalingVotingStarted
   | ISignalingVotingCompleted;
+export type ITipProposalEvents =
+  | INewTip
+  | ITipVoted
+  | ITipClosing
+  | ITipClosed
+  | ITipRetracted
+  | ITipSlashed;
 export type ITreasuryBountyEvents =
   | ITreasuryBountyBecameActive
   | ITreasuryBountyCanceled

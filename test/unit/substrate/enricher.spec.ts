@@ -16,13 +16,14 @@ import {
   RegistrarInfo,
   Bounty,
   RewardPoint,
+  OpenTip,
 } from '@polkadot/types/interfaces';
 import {
   DeriveDispatch,
   DeriveProposalImage,
   DeriveBounties,
 } from '@polkadot/api-derive/types';
-import { Vec, bool, Data, TypeRegistry, Option } from '@polkadot/types';
+import { Vec, bool, Data, TypeRegistry, Option, Bytes } from '@polkadot/types';
 import { Codec, ITuple, TypeDef } from '@polkadot/types/types';
 import { stringToHex } from '@polkadot/util';
 import {
@@ -31,7 +32,11 @@ import {
 } from '@polkadot/types/interfaces/offences';
 
 import { Enrich } from '../../../src/substrate/filters/enricher';
-import { EventKind, IdentityJudgement } from '../../../src/substrate/types';
+import {
+  BlockNumber,
+  EventKind,
+  IdentityJudgement,
+} from '../../../src/substrate/types';
 
 import {
   constructFakeApi,
@@ -618,6 +623,19 @@ const api = constructFakeApi({
     constructOption(({ account: 'charlie' } as unknown) as RegistrarInfo),
     constructOption(({ account: 'dave' } as unknown) as RegistrarInfo),
   ],
+  tips: async () =>
+    constructOption(({
+      reason: 'reasonHash',
+      who: 'alice',
+      finder: 'bob',
+      deposit: '1000',
+      closes: constructOption('123' as any),
+      findersFee: {
+        valueOf: () => true,
+      },
+    } as unknown) as Option<OpenTip>),
+  tipReasons: async () =>
+    constructOption((stringToHex('hello world!') as unknown) as Bytes),
 });
 
 class FakeEventData extends Array {
@@ -1082,6 +1100,92 @@ describe('Edgeware Event Enricher Filter Tests', () => {
         proposalHash: 'hash',
         noter: 'alice',
         reaper: 'bob',
+      },
+    });
+  });
+
+  /** tip events */
+  it('should enrich new-tip event', async () => {
+    const kind = EventKind.NewTip;
+    const event = constructEvent(['tip-hash']);
+    const result = await Enrich(api, blockNumber, kind, event);
+    assert.deepEqual(result, {
+      blockNumber,
+      data: {
+        kind,
+        proposalHash: 'tip-hash',
+        reason: 'hello world!',
+        who: 'alice',
+        finder: 'bob',
+        deposit: '1000',
+        findersFee: true,
+      },
+    });
+  });
+  it('should enrich tip-voted event', async () => {
+    const kind = EventKind.TipVoted;
+    const extrinsic = constructExtrinsic('bob', ['tip-hash', '100']);
+    const result = await Enrich(api, blockNumber, kind, extrinsic);
+    assert.deepEqual(result, {
+      blockNumber,
+      data: {
+        kind,
+        proposalHash: 'tip-hash',
+        who: 'bob',
+        value: '100',
+      },
+    });
+  });
+  it('should enrich tip-closing event', async () => {
+    const kind = EventKind.TipClosing;
+    const event = constructEvent(['tip-hash']);
+    const result = await Enrich(api, blockNumber, kind, event);
+    assert.deepEqual(result, {
+      blockNumber,
+      data: {
+        kind,
+        proposalHash: 'tip-hash',
+        closing: 123,
+      },
+    });
+  });
+  it('should enrich tip-closed event', async () => {
+    const kind = EventKind.TipClosed;
+    const event = constructEvent(['tip-hash', 'charlie', '123']);
+    const result = await Enrich(api, blockNumber, kind, event);
+    assert.deepEqual(result, {
+      blockNumber,
+      data: {
+        kind,
+        proposalHash: 'tip-hash',
+        who: 'charlie',
+        payout: '123',
+      },
+    });
+  });
+  it('should enrich tip-retracted event', async () => {
+    const kind = EventKind.TipRetracted;
+    const event = constructEvent(['tip-hash']);
+    const result = await Enrich(api, blockNumber, kind, event);
+    assert.deepEqual(result, {
+      blockNumber,
+      data: {
+        kind,
+        proposalHash: 'tip-hash',
+      },
+    });
+  });
+  it('should enrich tip-slashed event', async () => {
+    const kind = EventKind.TipSlashed;
+    const event = constructEvent(['tip-hash', 'dave', '111']);
+    const result = await Enrich(api, blockNumber, kind, event);
+    assert.deepEqual(result, {
+      blockNumber,
+      data: {
+        kind,
+        proposalHash: 'tip-hash',
+        finder: 'dave',
+        deposit: '111',
       },
     });
   });
