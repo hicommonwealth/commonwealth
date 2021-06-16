@@ -14,6 +14,13 @@
     margin-bottom: 18px;
   }
 
+  .denominator {
+    background: linear-gradient(239.17deg, #E1EBFF 27.75%, #FBDAFF 82.04%);
+    border-radius: 4px;
+    padding: 4px 6px 0;
+    margin-right: 12px;
+  }
+
   .tip-details {
     width: 65%;
     flex: 1 1 auto;
@@ -25,6 +32,11 @@
 
     .tip-reason {
       width: 75%;
+    }
+
+    .amount {
+      display: flex;
+      align-items: center;
     }
   }
 
@@ -55,6 +67,8 @@
         overflow: hidden;
         white-space: nowrap;
         margin-right: 12px;
+        display: flex;
+        align-items: center;
       }
     }
   }

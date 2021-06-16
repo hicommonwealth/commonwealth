@@ -851,6 +851,13 @@ const ViewProposalPage: m.Component<{
                 m(MarkdownFormattedText, { doc: reason }),
               ]),
             ]),
+            m('.proposal-page-row', [
+              m('.label', 'Amount'),
+              m('.amount', [
+                m('.denominator', proposal.support.denom),
+                m('', proposal.support.inDollars),
+              ]),
+            ]),
           ]),
           m('.tip-contributions', [
             m('.title', 'Contribute'),
@@ -887,7 +894,10 @@ const ViewProposalPage: m.Component<{
               m('.contributors .title', 'Contributors'),
               contributors.map(({ account, deposit }) => (
                 m('.contributors-row', [
-                  m('.amount', deposit.format(true)),
+                  m('.amount', [
+                    m('.denominator', deposit.denom),
+                    m('', deposit.inDollars),
+                  ]),
                   m(User, {
                     user: account,
                     linkify: true,
