@@ -182,7 +182,14 @@ const api = constructFakeApi({
         fee: 10,
         curatorDeposit: 10,
         bond: 10,
-        status: 'Proposed',
+        status: {
+          isPendingPayout: false,
+          asActive: {
+            curator: 'bob',
+            updateDue: 200,
+          },
+          isActive: true,
+        },
       },
       description: 'hello',
       index: 0,
@@ -336,257 +343,270 @@ describe('Edgeware Event Migration Tests', () => {
   it('should generate proposal events events', async () => {
     const fetcher = new StorageFetcher(api);
     const events = await fetcher.fetch();
-    assert.sameDeepMembers(events, [
-      {
-        blockNumber,
-        data: {
-          kind: EventKind.DemocracyProposed,
-          proposalIndex: 1,
-          proposalHash: 'hash1',
-          proposer: 'Charlie',
-          deposit: '100',
-        } as IDemocracyProposed,
-      },
-      {
-        blockNumber,
-        data: {
-          kind: EventKind.DemocracyStarted,
-          referendumIndex: 3,
-          proposalHash: 'image-hash-2',
-          voteThreshold: 'Supermajorityapproval',
-          endBlock: 100,
-        } as IDemocracyStarted,
-      },
-      {
-        blockNumber,
-        data: {
-          kind: EventKind.DemocracyStarted,
-          referendumIndex: 2,
-          proposalHash: 'image-hash-1',
-          voteThreshold: '',
-          endBlock: 0,
-        } as IDemocracyStarted,
-      },
-      {
-        blockNumber,
-        data: {
-          kind: EventKind.DemocracyPassed,
-          referendumIndex: 2,
-          dispatchBlock: 50,
-        } as IDemocracyPassed,
-      },
-      {
-        blockNumber: 10,
-        data: {
-          kind: EventKind.PreimageNoted,
-          proposalHash: 'image-hash-1',
-          noter: 'Alice',
-          preimage: {
-            method: 'method-1',
-            section: 'section-1',
-            args: ['arg-1-1', 'arg-1-2'],
-          },
-        } as IPreimageNoted,
-      },
-      {
-        blockNumber: 20,
-        data: {
-          kind: EventKind.PreimageNoted,
-          proposalHash: 'hash1',
-          noter: 'Bob',
-          preimage: {
-            method: 'method-2',
-            section: 'section-2',
-            args: ['arg-2-1', 'arg-2-2'],
-          },
-        } as IPreimageNoted,
-      },
-      {
-        blockNumber,
-        data: {
-          kind: EventKind.TreasuryProposed,
-          proposalIndex: 3,
-          proposer: 'Alice',
-          value: '50',
-          beneficiary: 'Bob',
-          bond: '5',
-        } as ITreasuryProposed,
-      },
-      {
-        blockNumber,
-        data: {
-          kind: EventKind.CollectiveProposed,
-          collectiveName: 'council',
-          proposalIndex: 15,
-          proposalHash: 'council-hash',
-          proposer: '',
-          threshold: 4,
-          call: {
-            method: 'proposal-method',
-            section: 'proposal-section',
-            args: ['proposal-arg-1', 'proposal-arg-2'],
-          },
-        } as ICollectiveProposed,
-      },
-      {
-        blockNumber,
-        data: {
-          kind: EventKind.CollectiveVoted,
-          collectiveName: 'council',
-          proposalHash: 'council-hash',
-          voter: 'Alice',
-          vote: true,
-        } as ICollectiveVoted,
-      },
-      {
-        blockNumber,
-        data: {
-          kind: EventKind.CollectiveVoted,
-          collectiveName: 'council',
-          proposalHash: 'council-hash',
-          voter: 'Bob',
-          vote: false,
-        } as ICollectiveVoted,
-      },
-      {
-        blockNumber,
-        data: {
-          kind: EventKind.SignalingNewProposal,
-          proposer: 'Inactive Author',
-          proposalHash: 'inactive-hash',
-          voteId: '1',
-          title: 'inactive',
-          description: 'inactive contents',
-          tallyType: 'inactive tally',
-          voteType: 'inactive vote',
-          choices: ['inactive1', 'inactive2'],
-        } as ISignalingNewProposal,
-      },
-      {
-        blockNumber,
-        data: {
-          kind: EventKind.SignalingNewProposal,
-          proposer: 'Active Author',
-          proposalHash: 'active-hash',
-          voteId: '2',
-          title: 'active',
-          description: 'active contents',
-          tallyType: 'active tally',
-          voteType: 'active vote',
-          choices: ['active1', 'active2'],
-        } as ISignalingNewProposal,
-      },
-      {
-        blockNumber,
-        data: {
-          kind: EventKind.SignalingNewProposal,
-          proposer: 'Completed Author',
-          proposalHash: 'completed-hash',
-          voteId: '3',
-          title: 'completed',
-          description: 'completed contents',
-          tallyType: 'completed tally',
-          voteType: 'completed vote',
-          choices: ['completed1', 'completed2'],
-        } as ISignalingNewProposal,
-      },
-      {
-        blockNumber,
-        data: {
-          kind: EventKind.SignalingVotingStarted,
-          proposalHash: 'active-hash',
-          voteId: '2',
-          endBlock: 250,
-        } as ISignalingVotingStarted,
-      },
-      {
-        blockNumber,
-        data: {
-          kind: EventKind.SignalingVotingStarted,
-          proposalHash: 'completed-hash',
-          voteId: '3',
-          endBlock: 100,
-        } as ISignalingVotingStarted,
-      },
-      {
-        blockNumber,
-        data: {
-          kind: EventKind.SignalingVotingCompleted,
-          proposalHash: 'completed-hash',
-          voteId: '3',
-        } as ISignalingVotingCompleted,
-      },
-      {
-        blockNumber,
-        data: {
-          kind: 'treasury-bounty-proposed',
-          bountyIndex: 0,
-          proposer: 'alice',
-          value: '50',
-          fee: '10',
-          curatorDeposit: '10',
-          bond: '10',
-          description: 'hello',
-        } as ITreasuryBountyProposed,
-      },
-      {
-        blockNumber,
-        data: {
-          kind: 'treasury-bounty-became-active',
-          bountyIndex: 0,
-        } as ITreasuryBountyBecameActive,
-      },
-      {
-        blockNumber,
-        data: {
-          kind: 'new-tip',
-          proposalHash: 'tip-hash-1',
-          who: 'alice',
-          reason: 'hello world!',
-          finder: 'bob',
-          deposit: '1000',
-          findersFee: true,
-        } as INewTip,
-      },
-      {
-        blockNumber,
-        data: {
-          kind: 'new-tip',
-          proposalHash: 'tip-hash-2',
-          who: 'charlie',
-          reason: 'goodbye world!',
-          finder: 'dave',
-          deposit: '999',
-          findersFee: false,
-        } as INewTip,
-      },
-      {
-        blockNumber,
-        data: {
-          kind: 'tip-voted',
-          proposalHash: 'tip-hash-2',
-          who: 'eve',
-          value: '3',
-        } as ITipVoted,
-      },
-      {
-        blockNumber,
-        data: {
-          kind: 'tip-voted',
-          proposalHash: 'tip-hash-2',
-          who: 'ferdie',
-          value: '4',
-        } as ITipVoted,
-      },
-      {
-        blockNumber,
-        data: {
-          kind: 'tip-closing',
-          proposalHash: 'tip-hash-2',
-          closing: 123,
-        } as ITipClosing,
-      },
-    ]);
+    assert.sameDeepMembers(
+      events.sort(
+        (p1, p2) =>
+          p1.data.kind.localeCompare(p2.data.kind) ||
+          p1.blockNumber - p2.blockNumber
+      ),
+      [
+        {
+          blockNumber,
+          data: {
+            kind: EventKind.DemocracyProposed,
+            proposalIndex: 1,
+            proposalHash: 'hash1',
+            proposer: 'Charlie',
+            deposit: '100',
+          } as IDemocracyProposed,
+        },
+        {
+          blockNumber,
+          data: {
+            kind: EventKind.DemocracyStarted,
+            referendumIndex: 3,
+            proposalHash: 'image-hash-2',
+            voteThreshold: 'Supermajorityapproval',
+            endBlock: 100,
+          } as IDemocracyStarted,
+        },
+        {
+          blockNumber,
+          data: {
+            kind: EventKind.DemocracyStarted,
+            referendumIndex: 2,
+            proposalHash: 'image-hash-1',
+            voteThreshold: '',
+            endBlock: 0,
+          } as IDemocracyStarted,
+        },
+        {
+          blockNumber,
+          data: {
+            kind: EventKind.DemocracyPassed,
+            referendumIndex: 2,
+            dispatchBlock: 50,
+          } as IDemocracyPassed,
+        },
+        {
+          blockNumber: 10,
+          data: {
+            kind: EventKind.PreimageNoted,
+            proposalHash: 'image-hash-1',
+            noter: 'Alice',
+            preimage: {
+              method: 'method-1',
+              section: 'section-1',
+              args: ['arg-1-1', 'arg-1-2'],
+            },
+          } as IPreimageNoted,
+        },
+        {
+          blockNumber: 20,
+          data: {
+            kind: EventKind.PreimageNoted,
+            proposalHash: 'hash1',
+            noter: 'Bob',
+            preimage: {
+              method: 'method-2',
+              section: 'section-2',
+              args: ['arg-2-1', 'arg-2-2'],
+            },
+          } as IPreimageNoted,
+        },
+        {
+          blockNumber,
+          data: {
+            kind: EventKind.TreasuryProposed,
+            proposalIndex: 3,
+            proposer: 'Alice',
+            value: '50',
+            beneficiary: 'Bob',
+            bond: '5',
+          } as ITreasuryProposed,
+        },
+        {
+          blockNumber,
+          data: {
+            kind: EventKind.CollectiveProposed,
+            collectiveName: 'council',
+            proposalIndex: 15,
+            proposalHash: 'council-hash',
+            proposer: '',
+            threshold: 4,
+            call: {
+              method: 'proposal-method',
+              section: 'proposal-section',
+              args: ['proposal-arg-1', 'proposal-arg-2'],
+            },
+          } as ICollectiveProposed,
+        },
+        {
+          blockNumber,
+          data: {
+            kind: EventKind.CollectiveVoted,
+            collectiveName: 'council',
+            proposalHash: 'council-hash',
+            voter: 'Alice',
+            vote: true,
+          } as ICollectiveVoted,
+        },
+        {
+          blockNumber,
+          data: {
+            kind: EventKind.CollectiveVoted,
+            collectiveName: 'council',
+            proposalHash: 'council-hash',
+            voter: 'Bob',
+            vote: false,
+          } as ICollectiveVoted,
+        },
+        {
+          blockNumber,
+          data: {
+            kind: EventKind.SignalingNewProposal,
+            proposer: 'Inactive Author',
+            proposalHash: 'inactive-hash',
+            voteId: '1',
+            title: 'inactive',
+            description: 'inactive contents',
+            tallyType: 'inactive tally',
+            voteType: 'inactive vote',
+            choices: ['inactive1', 'inactive2'],
+          } as ISignalingNewProposal,
+        },
+        {
+          blockNumber,
+          data: {
+            kind: EventKind.SignalingNewProposal,
+            proposer: 'Active Author',
+            proposalHash: 'active-hash',
+            voteId: '2',
+            title: 'active',
+            description: 'active contents',
+            tallyType: 'active tally',
+            voteType: 'active vote',
+            choices: ['active1', 'active2'],
+          } as ISignalingNewProposal,
+        },
+        {
+          blockNumber,
+          data: {
+            kind: EventKind.SignalingNewProposal,
+            proposer: 'Completed Author',
+            proposalHash: 'completed-hash',
+            voteId: '3',
+            title: 'completed',
+            description: 'completed contents',
+            tallyType: 'completed tally',
+            voteType: 'completed vote',
+            choices: ['completed1', 'completed2'],
+          } as ISignalingNewProposal,
+        },
+        {
+          blockNumber,
+          data: {
+            kind: EventKind.SignalingVotingStarted,
+            proposalHash: 'active-hash',
+            voteId: '2',
+            endBlock: 250,
+          } as ISignalingVotingStarted,
+        },
+        {
+          blockNumber,
+          data: {
+            kind: EventKind.SignalingVotingStarted,
+            proposalHash: 'completed-hash',
+            voteId: '3',
+            endBlock: 100,
+          } as ISignalingVotingStarted,
+        },
+        {
+          blockNumber,
+          data: {
+            kind: EventKind.SignalingVotingCompleted,
+            proposalHash: 'completed-hash',
+            voteId: '3',
+          } as ISignalingVotingCompleted,
+        },
+        {
+          blockNumber,
+          data: {
+            kind: 'treasury-bounty-proposed',
+            bountyIndex: 0,
+            proposer: 'alice',
+            value: '50',
+            fee: '10',
+            curatorDeposit: '10',
+            bond: '10',
+            description: 'hello',
+          } as ITreasuryBountyProposed,
+        },
+        {
+          blockNumber,
+          data: {
+            kind: 'treasury-bounty-became-active',
+            bountyIndex: 0,
+            curator: 'bob',
+            updateDue: 200,
+          } as ITreasuryBountyBecameActive,
+        },
+        {
+          blockNumber,
+          data: {
+            kind: 'new-tip',
+            proposalHash: 'tip-hash-1',
+            who: 'alice',
+            reason: 'hello world!',
+            finder: 'bob',
+            deposit: '1000',
+            findersFee: true,
+          } as INewTip,
+        },
+        {
+          blockNumber,
+          data: {
+            kind: 'new-tip',
+            proposalHash: 'tip-hash-2',
+            who: 'charlie',
+            reason: 'goodbye world!',
+            finder: 'dave',
+            deposit: '999',
+            findersFee: false,
+          } as INewTip,
+        },
+        {
+          blockNumber,
+          data: {
+            kind: 'tip-voted',
+            proposalHash: 'tip-hash-2',
+            who: 'eve',
+            value: '3',
+          } as ITipVoted,
+        },
+        {
+          blockNumber,
+          data: {
+            kind: 'tip-voted',
+            proposalHash: 'tip-hash-2',
+            who: 'ferdie',
+            value: '4',
+          } as ITipVoted,
+        },
+        {
+          blockNumber,
+          data: {
+            kind: 'tip-closing',
+            proposalHash: 'tip-hash-2',
+            closing: 123,
+          } as ITipClosing,
+        },
+      ].sort(
+        (p1, p2) =>
+          p1.data.kind.localeCompare(p2.data.kind) ||
+          p1.blockNumber - p2.blockNumber
+      )
+    );
   });
 
   it('should generate identity-set events', async () => {
