@@ -10,7 +10,7 @@ import moment from 'moment';
 import app from 'state';
 import { CommunityInfo, ChainInfo, RoleInfo, ChainBase, Profile } from 'models';
 import { CompactModalExitButton } from 'views/modal';
-import { checkAddress } from '@polkadot/util-crypto';
+import { checkAddress, decodeAddress } from '@polkadot/util-crypto';
 import { notifyError } from 'controllers/app/notifications';
 import { UserBlock } from '../components/widgets/user';
 export interface SearchParams {
@@ -413,7 +413,6 @@ const CreateInviteModal: m.Component<{
   failure: boolean;
   disabled: boolean;
   error: string;
-  invitedAddress: string;
   invitedAddressChain: string;
   invitedEmail: string;
   searchAddressTerm: string;
@@ -444,9 +443,15 @@ const CreateInviteModal: m.Component<{
     let isAddressValid = true;
 
     if (selectedChain?.base === ChainBase.Substrate) {
-      [isAddressValid] = checkAddress(vnode.state.invitedAddress, parseInt(selectedChain.ss58Prefix, 10));
+      try {
+        console.log(vnode.state.searchAddressTerm);
+        decodeAddress(vnode.state.searchAddressTerm);
+      } catch (e) {
+        isAddressValid = false;
+        console.error(e);
+      }
     } else if (chainInfo?.base === ChainBase.Ethereum) {
-      isAddressValid = Web3.utils.checkAddressChecksum(vnode.state.invitedAddress);
+      isAddressValid = Web3.utils.checkAddressChecksum(vnode.state.searchAddressTerm);
     } else {
       // TODO: check Cosmos & Near?
     }
@@ -560,7 +565,7 @@ const CreateInviteModal: m.Component<{
             disabled: !isAddressValid,
             successCallback: (v: boolean) => {
               vnode.state.success = v;
-              vnode.state.invitedAddress = '';
+              vnode.state.searchAddressTerm = '';
               m.redraw();
             },
             failureCallback: (v: boolean, err?: string,) => {
@@ -568,7 +573,7 @@ const CreateInviteModal: m.Component<{
               if (err) vnode.state.error = err;
               m.redraw();
             },
-            invitedAddress: vnode.state.invitedAddress,
+            invitedAddress: vnode.state.searchAddressTerm,
             invitedAddressChain: vnode.state.invitedAddressChain,
             ...chainOrCommunityObj
           }),
