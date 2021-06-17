@@ -75,8 +75,14 @@ export default class AaveApi extends ContractApi<AaveGovernanceV2> {
     this._Strategy = GovernanceStrategy__factory.connect(strategyAddress, this.Contract.provider);
     await this._Strategy.deployed();
 
-    // fetch token from strategy
-    const tokenAddress = await this.Strategy.AAVE();
+    // fetch token from strategy (if possible)
+    let tokenAddress;
+    try {
+      tokenAddress = await this.Strategy.AAVE();
+    } catch (e) {
+      // dydx-ropsten token
+      tokenAddress = '0x0c45c182B90Bc99bf78aeCc165685863399334e6';
+    }
     this._Token = AaveTokenV2__factory.connect(tokenAddress, this.Contract.provider);
     await this._Token.deployed();
   }

@@ -21,6 +21,7 @@ import CommunitySelector from 'views/components/sidebar/community_selector';
 import CreateCommunityModal from 'views/modals/create_community_modal';
 
 import { discordIcon, telegramIcon, elementIcon, githubIcon, websiteIcon } from './icons';
+import { AaveTypes, MarlinTypes, MolochTypes } from '@commonwealth/chain-events';
 
 const SidebarQuickSwitcherItem: m.Component<{ item, size }> = {
   view: (vnode) => {
@@ -166,11 +167,9 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
     const hasProposals = app.chain && !app.community && (
       app.chain.base === ChainBase.CosmosSDK
         || (app.chain.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Plasm)
-        || app.chain.network === ChainNetwork.Moloch
-        || app.chain.network === ChainNetwork.Marlin
-        || app.chain.network === ChainNetwork.MarlinTestnet
-        || app.chain.network === ChainNetwork.Aave
-        || app.chain.network === ChainNetwork.AaveTestnet
+        || MolochTypes.EventChains.find((c) => c === app.chain.network)
+        || MarlinTypes.EventChains.find((c) => c === app.chain.network)
+        || AaveTypes.EventChains.find((c) => c === app.chain.network)
         || app.chain.network === ChainNetwork.Commonwealth);
     if (!hasProposals) return;
 
@@ -216,11 +215,9 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
       // proposals (substrate, cosmos, moloch & marlin only)
       !app.community && ((app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Darwinia)
                          || app.chain?.base === ChainBase.CosmosSDK
-                         || app.chain?.network === ChainNetwork.Moloch
-                         || app.chain?.network === ChainNetwork.Marlin
-                         || app.chain?.network === ChainNetwork.MarlinTestnet
-                         || app.chain?.network === ChainNetwork.Aave
-                         || app.chain?.network === ChainNetwork.AaveTestnet)
+                         || MolochTypes.EventChains.find((c) => c === app.chain.network)
+                         || MarlinTypes.EventChains.find((c) => c === app.chain.network)
+                         || AaveTypes.EventChains.find((c) => c === app.chain.network))
         && m(Button, {
           fluid: true,
           rounded: true,

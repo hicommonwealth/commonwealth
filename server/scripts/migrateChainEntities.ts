@@ -30,7 +30,7 @@ const log = factory.getLogger(formatFilename(__filename));
 
 export async function migrateChainEntity(models, chain: string): Promise<void> {
   // 1. fetch the node and url of supported/selected chains
-  log.info('Fetching node info for chain entity migrations...');
+  log.info(`Fetching node info for ${chain}...`);
   if (!chain) {
     throw new Error('must provide chain');
   }
@@ -66,7 +66,7 @@ export async function migrateChainEntity(models, chain: string): Promise<void> {
       const api = await AaveEvents.createApi(node.url, node.address);
       fetcher = new AaveEvents.StorageFetcher(api);
       // TODO: remove once testing completed
-      range.startBlock = chain === 'aave-local' ? 0 : 12200000;
+      range.startBlock = chain === 'aave' ? 12200000 : 0;
     } else {
       throw new Error('Unsupported migration chain');
     }

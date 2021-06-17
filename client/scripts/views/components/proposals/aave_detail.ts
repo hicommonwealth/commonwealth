@@ -16,13 +16,14 @@ const AaveDetail = {
     }, [
       m('p', [
         m('b', [
-          proposal.ipfsData.shortDescription,
+          proposal.ipfsData?.shortDescription || '',
         ]),
       ]),
       m('p', [
         m('b', [
           'Author: ',
-          proposal.ipfsData.author,
+          // TODO: format as User
+          proposal.ipfsData?.author || proposal.data.proposer,
         ]),
       ]),
       m('p', [

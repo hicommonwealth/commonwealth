@@ -37,6 +37,7 @@ const nodes = [
   [ 'wss://mainnet.infura.io/ws', 'marlin', '0xEa2923b099b4B588FdFAD47201d747e3b9599A5f'],
   [ 'ws://127.0.0.1:9545', 'marlin-local', '0xe0D6a92B91B83D5c8A95557f1c966cAFd97f7171'], // TODO: Can't seem to keep this consistent which each local deploy
   [ 'wss://mainnet.infura.io/ws', 'aave', '0xEC568fffba86c094cf06b22134B23074DFE2252c'],
+  [ 'wss://ropsten.infura.io/ws', 'dydx-ropsten', '0x6938240Ba19cB8a614444156244b658f650c8D5c'],
   [ 'ws://127.0.0.1:8545', 'aave-local', '0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9'],
   [ 'ws://api.clover.finance', 'clover'],
   [ 'wss://rpc-01.snakenet.hydradx.io', 'hydradx'],
@@ -1139,6 +1140,16 @@ const resetServer = (models): Promise<number> => {
           collapsed_on_homepage: false,
         }),
         models.Chain.create({
+          id: 'dydx-ropsten',
+          network: 'aave',
+          symbol: 'DYDX',
+          name: 'DYDX (ropsten)',
+          icon_url: '/static/img/protocols/dydx.jpg',
+          active: true,
+          type: 'dao',
+          base: 'ethereum',
+        }),
+        models.Chain.create({
           id: 'aave-local',
           network: 'aave',
           symbol: 'AAVE',
@@ -1196,7 +1207,7 @@ const resetServer = (models): Promise<number> => {
         ethLocal, eth,
         nearLocal, nearTestnet,
         moloch, metacartel, molochLocal,
-        marlin, marlinLocal, aave, aaveLocal,
+        marlin, marlinLocal, aave, dydxRopsten, aaveLocal,
         alexRopsten,
       ] = chains;
 

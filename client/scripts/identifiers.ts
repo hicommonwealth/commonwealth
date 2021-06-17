@@ -2,6 +2,7 @@ import { StorageModule, ChainBase, ProposalModule, ChainNetwork } from 'models';
 import { ProposalStore } from 'stores';
 import app from './state';
 import ThreadsController from './controllers/server/threads';
+import { AaveTypes, MarlinTypes, MolochTypes } from '@commonwealth/chain-events';
 
 // eslint-disable-next-line no-shadow
 export enum ProposalType {
@@ -41,13 +42,13 @@ export const proposalSlugToClass = () => {
   if (app.chain.network === ChainNetwork.Kusama || app.chain.network === ChainNetwork.Polkadot) {
     mmap.set('technicalcommitteemotion', (app.chain as any).technicalCommittee);
   }
-  if (app.chain.network === ChainNetwork.Moloch) {
+  if (MolochTypes.EventChains.find((c) => c === app.chain.network)) {
     mmap.set('molochproposal', (app.chain as any).governance);
   }
-  if (app.chain.network === ChainNetwork.Marlin) {
+  if (MarlinTypes.EventChains.find((c) => c === app.chain.network)) {
     mmap.set('marlinproposal', (app.chain as any).governance);
   }
-  if (app.chain.class === ChainClass.Aave) {
+  if (AaveTypes.EventChains.find((c) => c === app.chain.network)) {
     mmap.set('aaveproposal', (app.chain as any).governance);
   }
   return mmap;

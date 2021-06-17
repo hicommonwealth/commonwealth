@@ -90,10 +90,10 @@ export default class AaveProposal extends Proposal<
 
   public get shortIdentifier() { return `AaveProposal-${this.data.identifier}`; }
   public get title(): string {
-    return this._ipfsData.title || `Aave Proposal #${this.data.identifier}`;
+    return this._ipfsData?.title || `Aave Proposal #${this.data.identifier}`;
   }
   public get description(): string {
-    return this._ipfsData.description || '';
+    return this._ipfsData?.description || '';
   }
 
   public get isPassing(): ProposalStatus {
@@ -218,7 +218,9 @@ export default class AaveProposal extends Proposal<
 
   public async init() {
     // fetch IPFS information
-    this._ipfsData = await $.getJSON(`https://ipfs.infura.io:5001/api/v0/cat?arg=${this._ipfsAddress}`);
+    $.getJSON(`https://ipfs.infura.io:5001/api/v0/cat?arg=${this._ipfsAddress}`).then((ipfsData) => {
+      this._ipfsData = ipfsData;
+    }).catch((e) => console.error(`Failed to fetch ipfs data for ${this._ipfsAddress}`));
 
     // special case for expiration because no event is emitted
     // TODO: hook onto specific block and set expired automatically
@@ -231,14 +233,18 @@ export default class AaveProposal extends Proposal<
 
     // TODO: this case will be true always except pending -- do we need to check?
     if (this._Gov.app.chain.block.height > this.data.startBlock) {
-      const totalVotingSupplyAtStart = await this._Gov.api.Strategy.getTotalVotingSupplyAt(this.data.startBlock);
-      this._votingSupplyAtStart = new BN(totalVotingSupplyAtStart.toString());
-      this._minVotingPowerNeeded = new BN(
-        totalVotingSupplyAtStart
-          .mul(this._Executor.minimumQuorum.toString())
-          .div(10000)
-          .toString()
-      );
+      try {
+        const totalVotingSupplyAtStart = await this._Gov.api.Strategy.getTotalVotingSupplyAt(this.data.startBlock);
+        this._votingSupplyAtStart = new BN(totalVotingSupplyAtStart.toString());
+        this._minVotingPowerNeeded = new BN(
+          totalVotingSupplyAtStart
+            .mul(this._Executor.minimumQuorum.toString())
+            .div(10000)
+            .toString()
+        );
+      } catch (e) {
+        console.error('Failed to fetch total voting supply at proposal start block, voting power computations will fail.');
+      }
     }
 
     this._initialized = true;

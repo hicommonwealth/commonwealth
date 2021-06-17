@@ -11,6 +11,7 @@ import Aave from 'controllers/chain/ethereum/aave/adapter';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { Grid, Col, List, Form, FormGroup, FormLabel, Input, Button } from 'construct-ui';
 import PageNotFound from './404';
+import { AaveTypes, MarlinTypes } from '@commonwealth/chain-events';
 
 const DelegateStats: m.Component<{ currentDelegate: string, }> = {
   view: (vnode) => {
@@ -60,9 +61,9 @@ interface IDelegateFormState {
 }
 
 const getDelegate = async (vnode: m.Vnode<{}, IDelegateFormState>) => {
-  if (app.chain.network === ChainNetwork.Marlin || app.chain.network === ChainNetwork.MarlinTestnet) {
+  if (MarlinTypes.EventChains.find((c) => c === app.chain.network)) {
     vnode.state.currentDelegate = await (app.chain as Marlin).chain.getDelegate();
-  } else if (app.chain.network === ChainNetwork.Aave || app.chain.network === ChainNetwork.AaveTestnet) {
+  } else if (AaveTypes.EventChains.find((c) => c === app.chain.network)) {
     // TODO: switch on delegation type
     vnode.state.currentDelegate = await (app.chain as Aave).chain.getDelegate(app.user.activeAccount.address, 'voting');
   }
@@ -72,11 +73,11 @@ const getDelegate = async (vnode: m.Vnode<{}, IDelegateFormState>) => {
 const setDelegate = async (vnode: m.Vnode<{}, IDelegateFormState>) => {
   if (app.chain.apiInitialized) {
     let delegationPromise: Promise<any>;
-    if (app.chain.network === ChainNetwork.Marlin || app.chain.network === ChainNetwork.MarlinTestnet) {
+    if (MarlinTypes.EventChains.find((c) => c === app.chain.network)) {
       delegationPromise = (app.chain as Marlin).chain.setDelegate(
         vnode.state.form.address, vnode.state.form.amount
       );
-    } else if (app.chain.network === ChainNetwork.Aave || app.chain.network === ChainNetwork.AaveTestnet) {
+    } else if (AaveTypes.EventChains.find((c) => c === app.chain.network)) {
       delegationPromise = (app.chain as Aave).chain.setDelegate(vnode.state.form.address);
     }
     if (delegationPromise) {
@@ -157,13 +158,6 @@ const DelegateForm: m.Component<{}, IDelegateFormState> = {
   }
 };
 
-const SUPPORTED_CHAINS = [
-  ChainNetwork.Marlin,
-  ChainNetwork.MarlinTestnet,
-  ChainNetwork.Aave,
-  ChainNetwork.AaveTestnet,
-];
-
 const DelegatePage: m.Component<{}> = {
   view: (vnode) => {
     if (!app.chain || !app.chain.loaded) {
@@ -175,7 +169,11 @@ const DelegatePage: m.Component<{}> = {
         });
       }
       // wrong chain loaded
-      if (app.chain && app.chain.loaded && !SUPPORTED_CHAINS.includes(app.chain.network)
+      if (
+        app.chain
+        && app.chain.loaded
+        && !MarlinTypes.EventChains.find((c) => c === app.chain.network)
+        && !AaveTypes.EventChains.find((c) => c === app.chain.network)
       ) {
         return m(PageNotFound, {
           title: 'Delegate Page',

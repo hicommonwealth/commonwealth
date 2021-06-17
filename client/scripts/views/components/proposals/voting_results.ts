@@ -1,5 +1,6 @@
 import 'components/proposals/voting_results.scss';
 import m from 'mithril';
+import app from 'state';
 
 import { formatCoin } from 'adapters/currency'; // TODO: remove formatCoin, only use coins.format()
 import User from 'views/components/widgets/user';

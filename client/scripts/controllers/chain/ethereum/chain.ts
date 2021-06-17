@@ -62,7 +62,8 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
   public async initApi(node?: NodeInfo): Promise<any> {
     if (node.url.includes('infura')) {
       const infuraId = INFURA_ID;
-      const url = `wss://mainnet.infura.io/ws/v3/${infuraId}`;
+      const networkPrefix = node.url.split('infura')[0];
+      const url = `${networkPrefix}infura.io/ws/v3/${infuraId}`;
       try {
         const provider = new Web3.providers.WebsocketProvider(url);
         this._api = new Web3(provider);

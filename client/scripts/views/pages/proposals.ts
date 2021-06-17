@@ -28,6 +28,7 @@ import PageNotFound from 'views/pages/404';
 import Listing from 'views/pages/listing';
 import ErrorPage from 'views/pages/error';
 import AaveDetail from '../components/proposals/aave_detail';
+import { AaveTypes, MarlinTypes } from '@commonwealth/chain-events';
 
 const SubstrateProposalStats: m.Component<{}, {}> = {
   view: (vnode) => {
@@ -169,12 +170,8 @@ const ProposalsPage: m.Component<{}> = {
 
     const onSubstrate = app.chain && app.chain.base === ChainBase.Substrate;
     const onMoloch = app.chain && app.chain.network === ChainNetwork.Moloch;
-    const onMarlin = app.chain && (
-      app.chain.network === ChainNetwork.Marlin || app.chain.network === ChainNetwork.MarlinTestnet
-    );
-    const onAave = app.chain && (
-      app.chain.network === ChainNetwork.Aave || app.chain.network === ChainNetwork.AaveTestnet
-    );
+    const onMarlin = app.chain && MarlinTypes.EventChains.find((c) => c === app.chain.network);
+    const onAave = app.chain && AaveTypes.EventChains.find((c) => c === app.chain.network);
 
     const modLoading = loadSubstrateModules('Proposals', getModules);
     if (modLoading) return modLoading;
