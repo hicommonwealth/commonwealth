@@ -202,7 +202,7 @@ const VoteAction: m.Component<{
 
     return m('.VotingActions', [votingActionObj]);
   }
-}
+};
 
 const ViewProposalPage: m.Component<{
   scope: string,
