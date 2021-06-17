@@ -12,8 +12,6 @@ import TokenApi from './api';
 
 export default class Token extends IChainAdapter<EthereumCoin, EthereumAccount> {
   public readonly base = ChainBase.Ethereum;
-  // TODO: ensure this chainnetwork -> chainclass
-  public readonly class;
   public readonly contractAddress: string;
   public readonly isToken = true;
 
@@ -25,7 +23,6 @@ export default class Token extends IChainAdapter<EthereumCoin, EthereumAccount> 
     super(meta, app);
     this.chain = new EthereumTokenChain(this.app);
     this.accounts = new EthereumAccounts(this.app);
-    this.class = meta.chain.network;
     this.contractAddress = meta.address;
   }
 

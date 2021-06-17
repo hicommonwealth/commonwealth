@@ -43,6 +43,8 @@ export enum ChainNetwork {
   Clover = 'clover',
   HydraDX = 'hydradx',
   Crust = 'crust',
+  CosmosHub = 'cosmos-hub',
+  Gaia13k = 'gaia-13k',
 }
 
 // This function returns a default chain for a chainbase
@@ -54,35 +56,6 @@ export function baseToNetwork(n: ChainBase): ChainNetwork {
     case ChainBase.NEAR: return ChainNetwork.NEAR;
     default: return null;
   }
-}
-
-// TODO: this should be deprecated, and replaced with ChainNetwork in most instances
-export enum ChainClass {
-  Clover = 'clover',
-  Edgeware = 'edgeware',
-  EdgewareTestnet = 'edgeware-testnet',
-  HydraDX = 'hydradx',
-  Kusama = 'kusama',
-  Kulupu = 'kulupu',
-  Polkadot = 'polkadot',
-  Plasm = 'plasm',
-  Stafi = 'stafi',
-  Darwinia = 'darwinia',
-  Phala = 'phala',
-  Centrifuge = 'centrifuge',
-  CosmosHub = 'cosmos-hub',
-  Gaia13k = 'gaia-13k',
-  Straightedge = 'straightedge',
-  Ethereum = 'ethereum',
-  Near = 'near',
-  Moloch = 'moloch',
-  Marlin = 'marlin',
-  MarlinTestnet = 'marlin-testnet',
-  Aave = 'aave',
-  ALEX = 'alex',
-  Commonwealth = 'commonwealth',
-  Crust = 'crust',
-  ERC20 = 'erc20',
 }
 
 // TODO: this is inconsistently used

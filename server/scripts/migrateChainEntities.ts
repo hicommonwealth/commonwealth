@@ -21,10 +21,11 @@ import {
 
 import MigrationHandler from '../eventHandlers/migration';
 import EntityArchivalHandler from '../eventHandlers/entityArchival';
+import { ChainNodeInstance } from '../models/chain_node';
 
 import { factory, formatFilename } from '../../shared/logging';
-import { constructSubstrateUrl, selectSpec } from '../../shared/substrate';
-import { ChainNodeInstance } from '../models/chain_node';
+import { constructSubstrateUrl } from '../../shared/substrate';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 export async function migrateChainEntity(models, chain: string): Promise<void> {
@@ -52,7 +53,7 @@ export async function migrateChainEntity(models, chain: string): Promise<void> {
     const range: IDisconnectedRange = { startBlock: 0 };
     if (chainSupportedBy(chain, SubstrateTypes.EventChains)) {
       const nodeUrl = constructSubstrateUrl(node.url);
-      const api = await SubstrateEvents.createApi(nodeUrl, selectSpec(chain));
+      const api = await SubstrateEvents.createApi(nodeUrl, node.Chain.substrate_spec);
       fetcher = new SubstrateEvents.StorageFetcher(api);
     } else if (chainSupportedBy(chain, MolochTypes.EventChains)) {
       // TODO: determine moloch API version

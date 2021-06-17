@@ -1,5 +1,4 @@
 import 'components/proposals/voting_results.scss';
-import app from 'state';
 import m from 'mithril';
 
 import { formatCoin } from 'adapters/currency'; // TODO: remove formatCoin, only use coins.format()
