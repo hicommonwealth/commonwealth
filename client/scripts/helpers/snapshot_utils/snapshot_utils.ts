@@ -1,16 +1,17 @@
 import { Interface } from '@ethersproject/abi';
 import { Contract } from '@ethersproject/contracts';
 import { jsonToGraphQLQuery } from 'json-to-graphql-query';
-
 import { getBlockNumber } from '@snapshot-labs/snapshot.js/src/utils/web3';
 import getProvider from '@snapshot-labs/snapshot.js/src/utils/provider';
 import gateways from '@snapshot-labs/snapshot.js/src/gateways.json';
+import networks from '@snapshot-labs/snapshot.js/src/networks.json';
+import numeral from 'numeral';
+
 import client from 'helpers/snapshot_utils/snapshot_client';
 import { abi as multicallAbi } from './abi/Multicall.json';
 import _strategies from './strategies';
 
 const gateway = process.env.SNAPSHOT_IPFS_GATEWAY || gateways[0];
-
 
 export const MULTICALL = {
   '1': '0xeefba1e63905ef1d7acba5a8513c70307c1ce441',
@@ -222,4 +223,29 @@ export async function getPower(space, address, snapshot) {
     console.log(e);
     return e;
   }
+}
+
+export function _explorer(network, str: string, type = 'address'): string {
+  return `${networks[network].explorer}/${type}/${str}`;
+}
+
+export function _n(number, format = '(0.[00]a)') {
+  if (number < 0.00001) return 0;
+  return numeral(number).format(format);
+}
+
+export function shorten(str = '') {
+  return `${str.slice(0, 6)}...${str.slice(str.length - 4)}`;
+}
+
+export function _shorten(str: string, key?: any): string {
+  if (!str) return str;
+  let limit;
+  if (typeof key === 'number') limit = key;
+  if (key === 'symbol') limit = 6;
+  if (key === 'name') limit = 64;
+  if (key === 'choice') limit = 12;
+  if (limit)
+    return str.length > limit ? `${str.slice(0, limit).trim()}...` : str;
+  return shorten(str);
 }

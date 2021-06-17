@@ -10,7 +10,7 @@ import getProvider from '@snapshot-labs/snapshot.js/src/utils/provider';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
-import { SnapshotProposal } from 'models';
+import { SnapshotProposal, VotingType } from 'models';
 import ConfirmSnapshotVoteModal from 'views/modals/confirm_snapshot_vote_modal';
 import snapshotClient from 'helpers/snapshot_utils/snapshot_client';
 import { formatSpace, getProposal, getPower } from 'helpers/snapshot_utils/snapshot_utils';
@@ -119,13 +119,11 @@ const VoteView: m.Component<{ votes: Vote[] }> = {
 };
 
 const VoteAction: m.Component<{
-  // space: any, 
-	// proposal: any,
-	// id: number,
-	// selectedChoice: number,
-	// totalScore: number,
-	// scores: any[],
-	// snapshot: number
+  space: any,
+	proposal: any,
+	id: string,
+	totalScore: number,
+	scores: any[],
   choices: string[],
 }, {
   votingModalOpen: boolean
@@ -145,18 +143,35 @@ const VoteAction: m.Component<{
     const voteYes = async (e) => {
       e.preventDefault();
       vnode.state.votingModalOpen = false;
-      console.log('here');
-      app.modals.create({ modal: ConfirmSnapshotVoteModal, data: {
-
-      } });
+      app.modals.create({
+        modal: ConfirmSnapshotVoteModal,
+        data: {
+          space: vnode.attrs.space,
+          proposal: vnode.attrs.proposal,
+          id: vnode.attrs.id,
+          selectedChoice: 0,
+          totalScore: vnode.attrs.totalScore,
+          scores: vnode.attrs.scores,
+          snapshot: vnode.attrs.proposal.msg.payload.snapshot
+        }
+      });
     };
 
     const voteNo = (e) => {
       e.preventDefault();
       vnode.state.votingModalOpen = false;
-      app.modals.create({ modal: ConfirmSnapshotVoteModal, data: {
-
-      } });
+      app.modals.create({
+        modal: ConfirmSnapshotVoteModal,
+        data: {
+          space: vnode.attrs.space,
+          proposal: vnode.attrs.proposal,
+          id: vnode.attrs.id,
+          selectedChoice: 1,
+          totalScore: vnode.attrs.totalScore,
+          scores: vnode.attrs.scores,
+          snapshot: vnode.attrs.proposal.msg.payload.snapshot,
+        }
+      });
     };
 
     const yesButton = m('.yes-button', [
@@ -198,15 +213,16 @@ const ViewProposalPage: m.Component<{
   votes: Vote[],
   space: any,
   snapshotProposal: any,
-  totalScore: number
+  totalScore: number,
+  scores: number[]
 }> = {
   oninit: (vnode) => {
     vnode.state.votes = [];
     vnode.state.totalScore = 0;
+    vnode.state.scores = [];
 
     const snapshotId = vnode.attrs.snapshotId;
     app.snapshot.fetchSnapshotProposals(snapshotId).then(response => {
-      
       const allProposals: SnapshotProposal[] = app.snapshot.proposalStore.getAll();
       vnode.state.proposal = allProposals.filter(proposal => proposal.ipfsHash === vnode.attrs.identifier)[0];
 
@@ -220,69 +236,39 @@ const ViewProposalPage: m.Component<{
         let space = spaces[vnode.attrs.snapshotId];
         vnode.state.space = space;
 
-        
         getProposal(space, vnode.attrs.identifier).then(proposalObj => {
-          const { proposal, votes, blockNumber } = proposalObj;
-          console.log(proposal, votes, blockNumber);
+          const { proposal, votes } = proposalObj;
           vnode.state.snapshotProposal = proposal;
-        })
+          let voteArray: Vote[] = [];
 
-        const author = app.user.activeAccount;
-
-        if (author && this.proposal.address) {
-          getPower(
-            space,
-            author.address,
-            vnode.state.snapshotProposal.msg.payload.snapshot
-          ).then(power => {
-            const { scores, totalScore } = power;
-            console.log(power);
-            // this.totalScore = totalScore;
-            // this.scores = scores;
-          });
-        }
-        
-
-        m.redraw();
-        // getScores(
-        //   space.key,
-        //   space.strategies,
-        //   space.network,
-        //   getProvider(space.network),
-        //   [app.user.activeAccount.address]
-        // ).then(response => {
-        //   console.log(response)
-        //   let scores = response
-        //     .map(score => Object.values(score).reduce((a, b) => (a as number) + (b as number), 0))
-        //     .reduce((a, b) => (a as number) + (b as number), 0);
-        //   vnode.state.userScore = scores as number;
-        //   vnode.state.space = space;
-        //   m.redraw();
-        // });
-      });
-
-      if (vnode.state.proposal) {
-        const hubUrl = process.env.SNAPSHOT_HUB_URL || 'https://testnet.snapshot.org';
-        $.get(`${hubUrl}/api/${snapshotId}/proposal/${vnode.state.proposal.ipfsHash}`).then((response) => {
-          if (response.status !== 'Success') {
-            var i = 0;
-            let votes: Vote[] = [];
-            for (const key in response) {
-              let vote: Vote = {
-                voterAddress: '',
-                choice: '',
-                timestamp: '',
-              };
-              vote.voterAddress = key,
-              vote.timestamp = response[key].msg.timestamp;
-              vote.choice = response[key].msg.payload.choice === 1 ? 'yes' : 'no';
-              votes.push(vote);
-            }
-            vnode.state.votes = votes;
-            m.redraw();
+          for (const key in votes) {
+            let vote: Vote = {
+              voterAddress: '',
+              choice: '',
+              timestamp: '',
+            };
+            vote.voterAddress = key,
+            vote.timestamp = votes[key].msg.timestamp;
+            vote.choice = votes[key].msg.payload.choice === 1 ? 'yes' : 'no';
+            voteArray.push(vote);
           }
-        });
-      }
+          vnode.state.votes = voteArray;
+          const author = app.user.activeAccount;
+
+          if (author && proposal.address) {
+            getPower(
+              space,
+              author.address,
+              proposal.msg.payload.snapshot
+            ).then(power => {
+              const { scores, totalScore } = power;
+              vnode.state.scores = scores;
+              vnode.state.totalScore = totalScore;
+              m.redraw();
+            });
+          }
+        })
+      });
     });
   },
   oncreate: (vnode) => {
@@ -304,7 +290,14 @@ const ViewProposalPage: m.Component<{
       }),
       m('.PinnedDivider', m('hr')),
       vnode.state.votes && m(VoteView, { votes: vnode.state.votes }),
-      vnode.state.proposal && author && m(VoteAction, { choices: vnode.state.proposal.choices})
+      vnode.state.proposal && author && m(VoteAction, {
+        space: vnode.state.space,
+        proposal: vnode.state.snapshotProposal,
+        id: vnode.attrs.identifier,
+        totalScore: vnode.state.totalScore,
+        scores: vnode.state.scores,
+        choices: vnode.state.proposal.choices
+      })
     ]);
   }
 };

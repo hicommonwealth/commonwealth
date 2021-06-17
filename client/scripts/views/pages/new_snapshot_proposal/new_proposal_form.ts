@@ -128,9 +128,7 @@ const newThread = async (
     throw new Error(errorMessage);
   } else if (result.status === "Success") {
     await app.user.notifications.refresh();
-
     m.route.set(`/${app.activeId()}/snapshot-proposal/${snapshotId}/${result.message.ipfsHash}`);
-
     mixpanel.track('Create Snapshot Proposal', {
       'Step No': 2,
       Step: 'Filled in Snapshot Proposal',
@@ -182,7 +180,6 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
         getProvider(space.network),
         [app.user.activeAccount.address]
       ).then(response => {
-        console.log(response)
         let scores = response
           .map(score => Object.values(score).reduce((a, b) => (a as number) + (b as number), 0))
           .reduce((a, b) => (a as number) + (b as number), 0);
@@ -190,7 +187,6 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
         vnode.state.space = space;
         vnode.state.members = space.members;
 
-        console.log(space, "space");
         m.redraw();
       });
     });
