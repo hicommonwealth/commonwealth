@@ -88,9 +88,11 @@ export default class AaveProposal extends Proposal<
   private _Executor: AaveExecutor;
   public get Executor() { return this._Executor; }
 
-  public get shortIdentifier() { return `AaveProposal-${this.data.identifier}`; }
+  public get shortIdentifier() {
+    return `#${this.identifier.toString()}`;
+  }
   public get title(): string {
-    return this._ipfsData?.title || `Aave Proposal #${this.data.identifier}`;
+    return this._ipfsData?.title || `Proposal #${this.data.identifier}`;
   }
   public get description(): string {
     return this._ipfsData?.description || '';
