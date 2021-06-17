@@ -23,12 +23,6 @@ const createCommunity = async (models, req: Request, res: Response, next: NextFu
   if (!req.body.name || !req.body.name.trim()) {
     return next(new Error(Errors.NoName));
   }
-  if (!req.body.creator_address) {
-    return next(new Error(Errors.NoCreatorAddress));
-  }
-  if (!req.body.creator_chain) {
-    return next(new Error(Errors.NoCreatorChain));
-  }
 
   if (req.body.isAuthenticatedForum !== 'true' && req.body.isAuthenticatedForum !== 'false') {
     return next(new Error(Errors.NoAuthenticatedForumSetting));
@@ -55,7 +49,7 @@ const createCommunity = async (models, req: Request, res: Response, next: NextFu
   }
 
   const address = await models.Address.findOne({
-    where: { address: req.body.creator_address, chain: req.body.creator_chain },
+    where: { user_id: req.user.id, chain: 'ethereum' },
   });
   if (!address || address.user_id !== req.user.id) {
     return next(new Error(Errors.InvalidAddress));

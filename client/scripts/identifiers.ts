@@ -1,4 +1,4 @@
-import { StorageModule, ChainBase, ChainClass, ProposalModule } from 'models';
+import { StorageModule, ChainBase, ProposalModule, ChainNetwork } from 'models';
 import { ProposalStore } from 'stores';
 import app from './state';
 import ThreadsController from './controllers/server/threads';
@@ -38,13 +38,13 @@ export const proposalSlugToClass = () => {
   } else if (app.chain.base === ChainBase.CosmosSDK) {
     mmap.set('cosmosproposal', (app.chain as any).governance);
   }
-  if (app.chain.class === ChainClass.Kusama || app.chain.class === ChainClass.Polkadot) {
+  if (app.chain.network === ChainNetwork.Kusama || app.chain.network === ChainNetwork.Polkadot) {
     mmap.set('technicalcommitteemotion', (app.chain as any).technicalCommittee);
   }
-  if (app.chain.class === ChainClass.Moloch) {
+  if (app.chain.network === ChainNetwork.Moloch) {
     mmap.set('molochproposal', (app.chain as any).governance);
   }
-  if (app.chain.class === ChainClass.Marlin) {
+  if (app.chain.network === ChainNetwork.Marlin) {
     mmap.set('marlinproposal', (app.chain as any).governance);
   }
   return mmap;

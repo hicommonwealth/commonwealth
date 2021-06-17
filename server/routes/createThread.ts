@@ -35,25 +35,6 @@ const createThread = async (
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));
-  if (chain && chain.type === 'token') {
-    // skip check for admins
-    const isAdmin = await models.Role.findAll({
-      where: {
-        address_id: author.id,
-        chain_id: chain.id,
-        permission: ['admin'],
-      },
-    });
-    if (isAdmin.length === 0) {
-      try {
-        const userHasBalance = await tokenBalanceCache.hasToken(chain.id, req.body.address);
-        if (!userHasBalance) return next(new Error(Errors.InsufficientTokenBalance));
-      } catch (e) {
-        log.error(`hasToken failed: ${e.message}`);
-        return next(new Error(Errors.CouldNotFetchTokenBalance));
-      }
-    }
-  }
 
   const { topic_name, topic_id, title, body, kind, stage, url, readOnly } = req.body;
 

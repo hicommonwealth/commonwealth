@@ -144,27 +144,31 @@ const ProposalCard: m.Component<{ proposal: AnyProposal, injectedContent? }> = {
             size: 'xs',
             class: 'proposal-became-tag',
           }),
-        proposal instanceof SubstrateDemocracyReferendum && proposal.preimage
+        proposal instanceof SubstrateDemocracyReferendum
           && (() => {
             const originatingProposalOrMotion = proposal.getProposalOrMotion(proposal.preimage);
-            if (!(originatingProposalOrMotion instanceof SubstrateCollectiveProposal)
-                && !(originatingProposalOrMotion instanceof SubstrateDemocracyProposal)) return;
-
             return m(Tag, {
               label: (originatingProposalOrMotion instanceof SubstrateDemocracyProposal)
                 ? `PROP #${originatingProposalOrMotion.identifier}`
                   : (originatingProposalOrMotion instanceof SubstrateCollectiveProposal)
-                  ? `MOT #${originatingProposalOrMotion.identifier}` : '',
+                  ? `MOT #${originatingProposalOrMotion.identifier}` : 'MISSING PROP',
               intent: 'primary',
               rounded: true,
               size: 'xs',
               class: 'proposal-became-tag',
             });
           })(),
+        proposal instanceof SubstrateTreasuryProposal && !proposal.data.index && m(Tag, {
+          label: 'MISSING DATA',
+          intent: 'primary',
+          rounded: true,
+          size: 'xs',
+          class: 'proposal-became-tag',
+        }),
         // title
         m('.proposal-title', proposal.title),
         // metadata
-        proposal instanceof SubstrateTreasuryProposal && m('.proposal-amount', proposal.value.format(true)),
+        proposal instanceof SubstrateTreasuryProposal && m('.proposal-amount', proposal.value?.format(true)),
         proposal instanceof SubstrateDemocracyReferendum && m('.proposal-amount', proposal.threshold),
         proposal instanceof SubstrateTreasuryTip && m('.proposal-amount', proposal.support.format(true)),
         // // linked treasury proposals
