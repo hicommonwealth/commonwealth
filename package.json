@@ -7,7 +7,7 @@
     "stylelint": "stylelint client/styles/*",
     "lint": "./scripts/lint-new-work.sh",
     "lint-all": "eslint client/\\**/*.ts server/\\**/*.ts",
-    "listen": "RUN_AS_LISTENER=true ts-node --project tsconfig.node.json server.ts",
+    "listen": "RUN_AS_LISTENER=true ts-node --log-error --project tsconfig.node.json server/scripts/listenChainEvents.ts",
     "test-client": "webpack-dev-server --config webpack/webpack.config.test.js",
     "test-events": "nyc ts-mocha --project test/tsconfig.node.json ./test/unit/events/*.spec.ts",
     "integration-test": "nyc ts-mocha --project test/tsconfig.node.json ./test/integration/**/*.spec.ts",
