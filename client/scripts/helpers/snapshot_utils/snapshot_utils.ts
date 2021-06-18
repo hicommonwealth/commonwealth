@@ -5,6 +5,7 @@ import { getBlockNumber } from '@snapshot-labs/snapshot.js/src/utils/web3';
 import getProvider from '@snapshot-labs/snapshot.js/src/utils/provider';
 import gateways from '@snapshot-labs/snapshot.js/src/gateways.json';
 import networks from '@snapshot-labs/snapshot.js/src/networks.json';
+import { ipfsGet } from '@snapshot-labs/snapshot.js/src/utils';
 import numeral from 'numeral';
 
 import client from 'helpers/snapshot_utils/snapshot_client';
@@ -100,14 +101,14 @@ export function formatProposal(proposal) {
   return proposal;
 }
 
-export async function ipfsGet(
-  gateway: string,
-  ipfsHash: string,
-  protocolType: string = 'ipfs'
-) {
-  const url = `https://${gateway}/${protocolType}/${ipfsHash}`;
-  return fetch(url).then((res) => res.json());
-}
+// export async function ipfsGet(
+//   gateway: string,
+//   ipfsHash: string,
+//   protocolType: string = 'ipfs'
+// ) {
+//   const url = `https://${gateway}/${protocolType}/${ipfsHash}`;
+//   return fetch(url).then((res) => res.json());
+// }
 
 export async function subgraphRequest(url: string, query, options: any = {}) {
   const res = await fetch(url, {
@@ -129,16 +130,18 @@ export async function getProposal(space, id) {
     console.time('getProposal.data');
     const provider = getProvider(space.network);
     const response = await Promise.all([
+      /* it is from snapshot.js. when run this, it fires errors. */
       ipfsGet(gateway, id),
-      client.getVotes(space.key, id),
-      getBlockNumber(provider)
+      // client.getVotes(space.key, id),
+      // getBlockNumber(provider)
     ]);
-    console.timeEnd('getProposal.data');
-    const [, votes, blockNumber] = response;
-    let [proposal]: any = response;
-    proposal = formatProposal(proposal);
-    proposal.ipfsHash = id;
-    return { proposal, votes, blockNumber };
+    // console.timeEnd('getProposal.data');
+    // const [, votes, blockNumber] = response;
+    // let [proposal]: any = response;
+    // proposal = formatProposal(proposal);
+    // proposal.ipfsHash = id;
+    // return { proposal, votes, blockNumber };
+    return response;
   } catch (e) {
     console.log(e);
     return e;

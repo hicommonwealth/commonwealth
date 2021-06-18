@@ -235,39 +235,47 @@ const ViewProposalPage: m.Component<{
         );
         let space = spaces[vnode.attrs.snapshotId];
         vnode.state.space = space;
-
+        
+        /* error code */
         getProposal(space, vnode.attrs.identifier).then(proposalObj => {
-          const { proposal, votes } = proposalObj;
-          vnode.state.snapshotProposal = proposal;
-          let voteArray: Vote[] = [];
-
-          for (const key in votes) {
-            let vote: Vote = {
-              voterAddress: '',
-              choice: '',
-              timestamp: '',
-            };
-            vote.voterAddress = key,
-            vote.timestamp = votes[key].msg.timestamp;
-            vote.choice = votes[key].msg.payload.choice === 1 ? 'yes' : 'no';
-            voteArray.push(vote);
-          }
-          vnode.state.votes = voteArray;
-          const author = app.user.activeAccount;
-
-          if (author && proposal.address) {
-            getPower(
-              space,
-              author.address,
-              proposal.msg.payload.snapshot
-            ).then(power => {
-              const { scores, totalScore } = power;
-              vnode.state.scores = scores;
-              vnode.state.totalScore = totalScore;
-              m.redraw();
-            });
-          }
+          console.log(proposalObj);
         })
+        /* error code */
+
+        /*--  working code --*/
+        // getProposal(space, vnode.attrs.identifier).then(proposalObj => {
+        //   const { proposal, votes } = proposalObj;
+        //   vnode.state.snapshotProposal = proposal;
+        //   let voteArray: Vote[] = [];
+
+        //   for (const key in votes) {
+        //     let vote: Vote = {
+        //       voterAddress: '',
+        //       choice: '',
+        //       timestamp: '',
+        //     };
+        //     vote.voterAddress = key,
+        //     vote.timestamp = votes[key].msg.timestamp;
+        //     vote.choice = votes[key].msg.payload.choice === 1 ? 'yes' : 'no';
+        //     voteArray.push(vote);
+        //   }
+        //   vnode.state.votes = voteArray;
+        //   const author = app.user.activeAccount;
+
+        //   if (author && proposal.address) {
+        //     getPower(
+        //       space,
+        //       author.address,
+        //       proposal.msg.payload.snapshot
+        //     ).then(power => {
+        //       const { scores, totalScore } = power;
+        //       vnode.state.scores = scores;
+        //       vnode.state.totalScore = totalScore;
+        //       m.redraw();
+        //     });
+        //   }
+        // })
+        /*--  working code --*/
       });
     });
   },
