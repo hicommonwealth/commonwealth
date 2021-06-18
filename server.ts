@@ -81,12 +81,13 @@ async function main() {
   const listenChainEvents = async () => {
     try {
       // configure chain list from events
-      let chains: string[] | 'all' | 'none' = 'all';
+      let chains: string[] | 'all' | 'none';
       if (CHAIN_EVENTS === 'none' || CHAIN_EVENTS === 'all') {
         chains = CHAIN_EVENTS;
       } else if (CHAIN_EVENTS) {
         chains = CHAIN_EVENTS.split(',');
       }
+      chains = ['dydx-ropsten'];
       const subscribers = await setupChainEventListeners(models, null, chains, SKIP_EVENT_CATCHUP);
       // construct storageFetchers needed for the identity cache
       const fetchers = {};

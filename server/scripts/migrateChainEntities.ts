@@ -90,7 +90,8 @@ export async function migrateChainEntity(models, chain: string): Promise<void> {
 }
 
 export async function migrateChainEntities(models): Promise<void> {
-  for (const chain of EventSupportingChains) {
-    await migrateChainEntity(models, chain);
-  }
+  // for (const chain of EventSupportingChains) {
+  //   await migrateChainEntity(models, chain);
+  // }
+  await migrateChainEntity(models, 'dydx-ropsten');
 }
