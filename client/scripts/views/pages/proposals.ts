@@ -208,7 +208,7 @@ const ProposalsPage: m.Component<{}> = {
         .concat((activeMarlinProposals || []).map((proposal) => m(ProposalCard, { proposal })))
         .concat((activeAaveProposals || []).map((proposal) => m(ProposalCard, {
           proposal,
-          injectedContent: m(AaveDetail, { proposal })
+          injectedContent: AaveDetail,
         })));
 
     // inactive proposals
@@ -243,9 +243,8 @@ const ProposalsPage: m.Component<{}> = {
         .concat((inactiveMarlinProposals || []).map((proposal) => m(ProposalCard, { proposal })))
         .concat((inactiveAaveProposals || []).map((proposal) => m(ProposalCard, {
           proposal,
-          injectedContent: m(AaveDetail, { proposal })
+          injectedContent: AaveDetail,
         })));
-
 
     // XXX: display these
     const visibleTechnicalCommitteeProposals = app.chain

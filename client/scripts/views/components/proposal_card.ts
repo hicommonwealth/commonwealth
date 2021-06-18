@@ -28,6 +28,7 @@ export const getStatusClass = (proposal: AnyProposal) => proposal.isPassing === 
       : proposal.isPassing === ProposalStatus.Failed ? 'fail' : '';
 
 export const getStatusText = (proposal: AnyProposal, showCountdown: boolean) => {
+  console.log(proposal);
   if (proposal.completed && proposal instanceof SubstrateDemocracyProposal) {
     if (proposal.isPassing === ProposalStatus.Passed) return 'Passed, moved to referendum';
     return 'Cancelled';
@@ -169,7 +170,7 @@ const ProposalCard: m.Component<{ proposal: AnyProposal, injectedContent? }> = {
             return m(Tag, {
               label: (originatingProposalOrMotion instanceof SubstrateDemocracyProposal)
                 ? `PROP #${originatingProposalOrMotion.identifier}`
-                  : (originatingProposalOrMotion instanceof SubstrateCollectiveProposal)
+                : (originatingProposalOrMotion instanceof SubstrateCollectiveProposal)
                   ? `MOT #${originatingProposalOrMotion.identifier}` : 'MISSING PROP',
               intent: 'primary',
               rounded: true,
@@ -201,7 +202,13 @@ const ProposalCard: m.Component<{ proposal: AnyProposal, injectedContent? }> = {
         //   && m('.proposal-action', [ 'Approves TRES-', proposal.call?.args[0] ]),
         // linked referenda
         injectedContent
-          ? m('.proposal-injected', injectedContent)
+          ? m('.proposal-injected', [
+            m(injectedContent, {
+              proposal,
+              statusClass: getStatusClass(proposal),
+              statusText: getStatusText(proposal, true),
+            })
+          ])
           : m('.proposal-status', { class: getStatusClass(proposal) }, getStatusText(proposal, true)),
         // thread link
         proposal.threadId && m('.proposal-thread-link', [

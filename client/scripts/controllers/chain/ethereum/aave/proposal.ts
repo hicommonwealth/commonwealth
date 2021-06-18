@@ -3,6 +3,7 @@ import BN from 'bn.js';
 import Web3 from 'web3';
 import $ from 'jquery';
 import bs58 from 'bs58';
+import { BigNumber } from 'ethers';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import { IAaveProposalResponse } from 'adapters/chain/aave/types';
 import { formatNumberLong } from 'adapters/currency';
@@ -235,18 +236,29 @@ export default class AaveProposal extends Proposal<
 
     // TODO: this case will be true always except pending -- do we need to check?
     if (this._Gov.app.chain.block.height > this.data.startBlock) {
+      let totalVotingSupplyAtStart: BigNumber;
       try {
-        const totalVotingSupplyAtStart = await this._Gov.api.Strategy.getTotalVotingSupplyAt(this.data.startBlock);
-        this._votingSupplyAtStart = new BN(totalVotingSupplyAtStart.toString());
-        this._minVotingPowerNeeded = new BN(
-          totalVotingSupplyAtStart
-            .mul(this._Executor.minimumQuorum.toString())
-            .div(10000)
-            .toString()
-        );
+        // dydx version
+        totalVotingSupplyAtStart = await this._Gov.api.Strategy.getVotingSupplyAt(this.data.startBlock);
       } catch (e) {
-        console.error('Failed to fetch total voting supply at proposal start block, voting power computations will fail.');
+        // aave version
+        try {
+          totalVotingSupplyAtStart = await this._Gov.api.Strategy.getTotalVotingSupplyAt(this.data.startBlock);
+        } catch (e2) {
+          console.error(
+            'Failed to fetch total voting supply at proposal start block, voting power computations will fail.'
+          );
+          this._initialized = true;
+          return;
+        }
       }
+      this._votingSupplyAtStart = new BN(totalVotingSupplyAtStart.toString());
+      this._minVotingPowerNeeded = new BN(
+        totalVotingSupplyAtStart
+          .mul(this._Executor.minimumQuorum.toString())
+          .div(10000)
+          .toString()
+      );
     }
 
     this._initialized = true;
@@ -269,7 +281,8 @@ export default class AaveProposal extends Proposal<
 
     this._Executor = this._Gov.api.getExecutor(this.data.executor);
     this._Gov.store.add(this);
-    this._ipfsAddress = bs58.encode(Buffer.from('1220' + this.data.ipfsHash.slice(2), 'hex'));
+    // insert Qm prefix via hex
+    this._ipfsAddress = bs58.encode(Buffer.from(`1220${this.data.ipfsHash.slice(2)}`, 'hex'));
   }
 
   public update(e: ChainEvent) {

@@ -7,6 +7,18 @@
     p + p {
         margin-top: 4px;
     }
+    .proposal-injected-status {
+        font-weight: 600;
+        line-height: 1.1;
+        margin-bottom: 4px;
+        color: $text-color-black;
+        &.pass {
+            color: $positive-bg-color;
+        }
+        &.fail {
+            color: $negative-bg-color;
+        }
+    }
     .b-box {
         border: 1px solid $border-color-lightest;
         border-radius: 8px;
