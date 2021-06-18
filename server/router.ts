@@ -1,6 +1,7 @@
 import express from 'express';
 import webpack from 'webpack';
 import passport from 'passport';
+import { Magic } from '@magic-sdk/admin';
 
 import status from './routes/status';
 import createGist from './routes/createGist';
@@ -62,7 +63,6 @@ import getInviteLinks from './routes/getInviteLinks';
 import deleteGithubAccount from './routes/deleteGithubAccount';
 import getProfile from './routes/getProfile';
 
-
 import createRole from './routes/createRole';
 import deleteRole from './routes/deleteRole';
 import setDefaultRole from './routes/setDefaultRole';
@@ -104,6 +104,7 @@ import editTopic from './routes/editTopic';
 import deleteTopic from './routes/deleteTopic';
 import bulkTopics from './routes/bulkTopics';
 import bulkOffchain from './routes/bulkOffchain';
+import mobileLoginRedirect from './routes/mobileLoginRedirect';
 
 import edgewareLockdropLookup from './routes/getEdgewareLockdropLookup';
 import edgewareLockdropStats from './routes/getEdgewareLockdropStats';
@@ -126,7 +127,8 @@ function setupRouter(
   models,
   viewCountCache: ViewCountCache,
   identityFetchCache: IdentityFetchCache,
-  tokenBalanceCache: TokenBalanceCache
+  tokenBalanceCache: TokenBalanceCache,
+  magic?: Magic,
 ) {
   const router = express.Router();
   router.get('/status', status.bind(this, models));
@@ -462,13 +464,14 @@ function setupRouter(
   router.post('/auth/magic', passport.authenticate('magic'), (req, res, next) => {
     return res.json({ status: 'Success', result: req.user.toJSON() });
   });
+  router.get('/mobileLoginRedirect', mobileLoginRedirect.bind(this, models, magic));
   router.get('/auth/github', passport.authenticate('github'));
   router.get(
     '/auth/github/callback',
     passport.authenticate('github', { successRedirect: '/', failureRedirect: '/#!/login' }),
   );
   // logout
-  router.get('/logout', logout.bind(this, models));
+  router.get('/logout', logout.bind(this, models, magic));
 
   router.get('/edgewareLockdropLookup', edgewareLockdropLookup.bind(this, models));
   router.get('/edgewareLockdropStats', edgewareLockdropStats.bind(this, models));

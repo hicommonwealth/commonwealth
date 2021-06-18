@@ -587,6 +587,7 @@ $(() => {
     '/login':                    importRoute('views/pages/login', { scoped: false }),
     '/settings':                 importRoute('views/pages/settings', { scoped: false }),
     '/notifications':            redirectRoute(() => '/edgeware/notifications'),
+    '/finishMagicLogin':         importRoute('views/pages/finishMagicLogin', { scoped: false }),
     '/:scope/notifications':     importRoute('views/pages/notifications', { scoped: true, deferChain: true }),
     '/notificationsList':        redirectRoute(() => '/edgeware/notificationsList'),
     '/:scope/notificationsList': importRoute('views/pages/notificationsList', { scoped: true, deferChain: true }),

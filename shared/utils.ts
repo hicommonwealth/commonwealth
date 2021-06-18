@@ -153,3 +153,5 @@ export function formatAddressShort(address: string, chain: string) {
     return `${address.slice(0, 5)}…`;
   }
 }
+
+export const MAGIC_PUBLISHABLE_KEY = 'pk_live_B0604AA1B8EEFDB4';
