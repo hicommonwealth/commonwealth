@@ -16,6 +16,9 @@ import { sequelize } from '../database';
 import { constructSubstrateUrl } from '../../shared/substrate';
 import { factory, formatFilename } from '../../shared/logging';
 import { ChainNodeInstance } from '../models/chain_node';
+
+import { Consumer } from '../util/rabbitmq/consumer';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 // emit globally any transfer over 1% of total issuance
@@ -117,6 +120,9 @@ const setupChainEventListeners = async (
 
     return handlers;
   };
+
+  const InitSubscriber = new Consumer();
+  await InitSubscriber.init();
 
   const subscribers = await Promise.all(nodes.map(async (node) => {
     let subscriber: IEventSubscriber<any, any>;
