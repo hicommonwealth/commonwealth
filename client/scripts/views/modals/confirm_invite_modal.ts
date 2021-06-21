@@ -7,7 +7,7 @@ import mixpanel from 'mixpanel-browser';
 import { Button, Icon, Icons } from 'construct-ui';
 
 import { orderAccountsByAddress } from 'helpers';
-import { notifyError } from 'controllers/app/notifications';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { UserBlock } from 'views/components/widgets/user';
 import { CompactModalExitButton } from 'views/modal';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
@@ -136,9 +136,13 @@ const ConfirmInviteModal: m.Component<{}, {
                         const chainId = invites[location].community_id;
                         // if private community, re-init app
                         if (communityId && !app.config.communities.getByCommunity(communityId)) {
-                          initAppState().then(() => m.route.set(`/${communityId}`));
+                          initAppState().then(() => {
+                            m.route.set(`/${communityId}`);
+                            notifySuccess(`Successfully joined ${invites[location].community_name}.`);
+                          });
                         } else {
                           m.route.set(`/${communityId || chainId}`);
+                          notifySuccess(`Successfully joined ${invites[location].community_name}.`);
                         }
                       }, (err) => {
                         notifyError('Error accepting invite');
