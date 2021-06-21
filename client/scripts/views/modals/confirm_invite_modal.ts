@@ -211,7 +211,6 @@ const ConfirmInviteModal: m.Component<{}, {
                 onSuccess: (e) => {
                   // $('.ConfirmInviteModal').trigger('modalexit');
                   m.route.set(`/${invites[vnode.state.location].community_id}`);
-                  $(e.target).trigger('modalexit');
                 }
               })
             ],
