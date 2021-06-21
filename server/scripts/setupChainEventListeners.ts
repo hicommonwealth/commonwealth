@@ -3,7 +3,7 @@ import _ from 'underscore';
 import {
   IDisconnectedRange, IEventHandler, EventSupportingChains, IEventSubscriber,
   SubstrateTypes, SubstrateEvents, MolochTypes, MolochEvents, chainSupportedBy,
-  MarlinTypes, MarlinEvents,
+  MarlinTypes, MarlinEvents, CWEvent,
 } from '@commonwealth/chain-events';
 
 import EventStorageHandler, { StorageFilterConfig } from '../eventHandlers/storage';
@@ -49,7 +49,7 @@ const discoverReconnectRange = async (models, chain: string): Promise<IDisconnec
 
 const setupChainEventListeners = async (
   models, wss: WebSocket.Server, chains: string[] | 'all' | 'none', skipCatchup?: boolean
-): Promise<{ [chain: string]: IEventSubscriber<any, any> }> => {
+): Promise<{}> => {
   const queryNode = (c: string): Promise<ChainNodeInstance> => models.ChainNode.findOne({
     where: { chain: c },
     include: [{
@@ -121,73 +121,41 @@ const setupChainEventListeners = async (
     return handlers;
   };
 
-  const InitSubscriber = new Consumer();
-  await InitSubscriber.init();
-
-  const subscribers = await Promise.all(nodes.map(async (node) => {
-    let subscriber: IEventSubscriber<any, any>;
+  // Create instances of all the handlers needed to process the events we want from the queue
+  const handlers = {};
+  nodes.forEach((node) => {
     if (chainSupportedBy(node.chain, SubstrateTypes.EventChains)) {
-      const nodeUrl = constructSubstrateUrl(node.url);
-      const api = await SubstrateEvents.createApi(nodeUrl, node.Chain.substrate_spec);
       const excludedEvents = [
         SubstrateTypes.EventKind.Reward,
         SubstrateTypes.EventKind.TreasuryRewardMinting,
         SubstrateTypes.EventKind.TreasuryRewardMintingV2,
         SubstrateTypes.EventKind.HeartbeatReceived,
       ];
-
-      const handlers = generateHandlers(node, { excludedEvents });
-      subscriber = await SubstrateEvents.subscribeEvents({
-        chain: node.chain,
-        handlers,
-        skipCatchup,
-        discoverReconnectRange: () => discoverReconnectRange(models, node.chain),
-        api,
-        enricherConfig: {
-          balanceTransferThresholdPermill: BALANCE_TRANSFER_THRESHOLD_PERMILL,
-        }
-      });
-    } else if (chainSupportedBy(node.chain, MolochTypes.EventChains)) {
-      const contractVersion = 1;
-      const api = await MolochEvents.createApi(node.url, contractVersion, node.address);
-      const handlers = generateHandlers(node);
-      subscriber = await MolochEvents.subscribeEvents({
-        chain: node.chain,
-        handlers,
-        skipCatchup,
-        discoverReconnectRange: () => discoverReconnectRange(models, node.chain),
-        api,
-        contractVersion,
-      });
-    } else if (chainSupportedBy(node.chain, MarlinTypes.EventChains)) {
-      const governorAlphaContractAddress = '0x777992c2E4EDF704e49680468a9299C6679e37F6';
-      const timelockContractAddress = '0x42Bf58AD084595e9B6C5bb2aA04050B0C291264b';
-      const api = await MarlinEvents.createApi(
-        node.url, {
-          comp: node.address,
-          governorAlpha: governorAlphaContractAddress,
-          timelock: timelockContractAddress,
-        }
-      );
-      const handlers = generateHandlers(node);
-      subscriber = await MarlinEvents.subscribeEvents({
-        chain: node.chain,
-        handlers,
-        skipCatchup,
-        discoverReconnectRange: () => discoverReconnectRange(models, node.chain),
-        api,
-      });
+      handlers[node.chain] = generateHandlers(node, { excludedEvents });
+    } else {
+      handlers[node.chain] = generateHandlers(node);
     }
+  });
 
-    // hook for clean exit
-    process.on('SIGTERM', () => {
-      if (subscriber) {
-        subscriber.unsubscribe();
+  // feed the events into the different their respective handlers
+  async function processEvents(event: CWEvent): Promise<void> {
+    const eventHandlers = handlers[event.chain];
+    let prevResult = null;
+    for (const handler of eventHandlers) {
+      try {
+        prevResult = await handler.handle(event, prevResult);
+      } catch (err) {
+        log.error(`Event handle failure: ${err.message}`);
+        break;
       }
-    });
-    return [ node.chain, subscriber ];
-  }));
-  return _.object<{ [chain: string]:  IEventSubscriber<any, any> }>(subscribers);
+    }
+  }
+
+  const InitSubscriber = new Consumer();
+  await InitSubscriber.init();
+  await InitSubscriber.consumeEvents(processEvents);
+
+  return {};
 };
 
 export default setupChainEventListeners;

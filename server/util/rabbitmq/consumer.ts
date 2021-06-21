@@ -1,4 +1,5 @@
 import Rascal from 'rascal';
+import { CWEvent } from '@commonwealth/chain-events';
 import config from './RabbitMQconfig.json';
 import { factory, formatFilename } from '../../../shared/logging';
 
@@ -14,6 +15,10 @@ export class Consumer implements IConsumer {
     public broker;
 
     public async init(): Promise<void> {
+      const cnct = config.vhosts['/'].connection;
+      log.info(
+        `Rascal connecting to RabbitMQ: ${cnct.protocol}://${cnct.user}:*****@${cnct.hostname}:${cnct.port}/`
+      );
       this.broker = await Rascal.BrokerAsPromised.create(
         Rascal.withDefaultConfig(config)
       );
@@ -35,11 +40,12 @@ export class Consumer implements IConsumer {
       });
     }
 
-    public async consumeEvents(): Promise<any> {
+    public async consumeEvents(eventProcessor: (event: CWEvent) => Promise<void>): Promise<any> {
       try {
         const subscription = await this.broker.subscribe('eventsSub');
         subscription.on('message', (message, content, ackOrNack) => {
-          console.log(message, content);
+          eventProcessor(content);
+          // console.log(message, content);
         }).on('error', (err, messageId) => {
           log.error(`Publisher error ${err}, ${messageId}`);
         });

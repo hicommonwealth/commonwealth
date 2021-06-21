@@ -83,15 +83,20 @@ async function main() {
       } else if (CHAIN_EVENTS) {
         chains = CHAIN_EVENTS.split(',');
       }
-      const subscribers = await setupChainEventListeners(models, null, chains, SKIP_EVENT_CATCHUP);
+
+      await setupChainEventListeners(models, null, chains, SKIP_EVENT_CATCHUP);
+      // TODO: code below is deprecated since we no longer return subscribers
+
+      // const subscribers = await setupChainEventListeners(models, null, chains, SKIP_EVENT_CATCHUP);
+
       // construct storageFetchers needed for the identity cache
-      const fetchers = {};
-      for (const [ chain, subscriber ] of Object.entries(subscribers)) {
-        if (chainSupportedBy(chain, SubstrateTypes.EventChains)) {
-          fetchers[chain] = new SubstrateEvents.StorageFetcher(subscriber.api);
-        }
-      }
-      await identityFetchCache.start(models, fetchers);
+      // const fetchers = {};
+      // for (const [ chain, subscriber ] of Object.entries(subscribers)) {
+      //   if (chainSupportedBy(chain, SubstrateTypes.EventChains)) {
+      //     fetchers[chain] = new SubstrateEvents.StorageFetcher(subscriber.api);
+      //   }
+      // }
+      // await identityFetchCache.start(models, fetchers);
       return 0;
     } catch (e) {
       console.error(`Chain event listener setup failed: ${e.message}`);
