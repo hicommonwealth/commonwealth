@@ -32,6 +32,7 @@ const EditTokenThresholdsRow: m.Component<{ topic: OffchainTopic }, { new_token_
           },
         }) ]),
         m('td', [ m(Button, {
+          label: 'Update',
           intent: 'primary',
           rounded: true,
           onclick: async (e) => {

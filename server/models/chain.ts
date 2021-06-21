@@ -28,6 +28,7 @@ export interface ChainAttributes {
   active: boolean;
   customDomain: string;
   type: string;
+  decimals?: number;
 
   // associations
   ChainNodes?: ChainNodeAttributes[] | ChainNodeAttributes['id'][];
@@ -73,6 +74,7 @@ export default (
     blockExplorerIds: { type: dataTypes.STRING, allowNull: true, },
     collapsed_on_homepage: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: true },
     type: { type: dataTypes.STRING, allowNull: false },
+    decimals: { type: dataTypes.INTEGER, allowNull: true },
   }, {
     timestamps: false,
     underscored: true,
