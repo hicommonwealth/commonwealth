@@ -243,15 +243,15 @@ export default class AaveProposal extends Proposal<
     }
 
     try {
-      const totalVotingSupplyAtStart = await this._Gov.api.Strategy.getTotalVotingSupplyAt(this.data.startBlock);
+      const totalVotingSupplyAtStart = await this._Gov.api.Strategy.getVotingSupplyAt(this.data.startBlock);
       this._votingSupplyAtStart = new BN(totalVotingSupplyAtStart.toString());
-    } catch (e2) {
-      console.error(
-        'Failed to fetch total voting supply at proposal start block, using hardcoded dydx value.'
-      );
-      this._votingSupplyAtStart = Web3.utils.toWei(new BN(1_000_000_000), 'ether')
+    } catch (e) {
+      console.error(`Failed to fetch total voting supply: ${e.message}`);
+      // this._votingSupplyAtStart = Web3.utils.toWei(new BN(1_000_000_000), 'ether')
+      this._initialized = true;
+      return;
     }
-    console.log(this._Executor);
+
     this._minVotingPowerNeeded = this._votingSupplyAtStart
       .mul(this._Executor.minimumQuorum)
       .divn(10000);
