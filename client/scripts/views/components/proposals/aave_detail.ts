@@ -30,20 +30,24 @@ const AaveDetail = {
         ]),
       ]),
       m('p', [
-        'Executor: ',
-        executor.address,
+        'Support: ',
+        proposal.support,
+        '%',
       ]),
       m('p', [
-        'Delay (H:m:s): ',
-        moment.unix(executor.delay).format('HH:mm:ss'),
+        'Turnout: ',
+        proposal.turnout,
+        '%',
       ]),
       m('p', [
-        'Quorum (% of total supply): ',
-        +executor.minimumQuorum / 10000,
+        'Required Quorum: ',
+        proposal.minimumQuorum * 100,
+        '% (of total supply)',
       ]),
       m('p', [
-        'Vote differential (% success): ',
-        +executor.voteDifferential / 10000,
+        'Required Vote differential: ',
+        proposal.voteDifferential * 100,
+        '%',
       ]),
     ]);
   }
