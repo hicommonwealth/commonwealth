@@ -3,7 +3,7 @@
 .ConfirmInviteModal {
     .compact-modal-body {
         width: auto;
-        max-width: 475px;
+        max-width: 500px;
         padding: 14px 28px 26px !important;
         @include sm-min {
             float: right;
@@ -41,11 +41,8 @@
 
     .SwitchAddress {
         display: block;
-        padding: 13px 18px 7px;
+        padding: 13px 10px 7px;
         border: 1px solid $background-color-light;
-        @include sm-min {
-            width: 420px;
-        }
         &:hover {
             background: $background-color-white-hover;
             cursor: pointer;
@@ -54,12 +51,23 @@
             display: block;
             float: right;
             color: $text-color-light;
+                      
         }
+        .UserBlock .address-divider {
+            display: none;
+        }  
     }
     .SwitchAddress.selected {
         background-color: darken($color: $background-color-white-hover, $amount: 5%);
         &:hover {
             background-color: darken($color: $background-color-white-hover, $amount: 5%);
+        }
+    }
+    .SwitchAddress.mobile { 
+        .user-block-address {
+            .address-divider {
+                display: block;
+            }
         }
     }
 

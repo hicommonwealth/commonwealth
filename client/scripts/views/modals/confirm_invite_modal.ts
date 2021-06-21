@@ -58,15 +58,20 @@ const ConfirmInviteModal: m.Component<{}, {
   },
   view: (vnode) => {
     const SelectAddress = (account) => {
+      const isMobile = (window.innerWidth < 767.98);
       return m('.SwitchAddress.account-menu-item', {
         key: `${account.chain.id}-${account.address}`,
-        class: vnode.state.selectedAddress === account.address ? 'selected' : '',
+        class: vnode.state.selectedAddress === account.address
+          ? isMobile
+            ? 'selected mobile'
+            : 'selected'
+          : '',
         onclick: (e) => {
           e.preventDefault();
           vnode.state.selectedAddress = account.address;
         },
       }, [
-        m(UserBlock, { user: account, showChainName: true })
+        m(UserBlock, { user: account, showChainName: true, showFullAddress: !isMobile })
       ]);
     };
 
@@ -116,13 +121,14 @@ const ConfirmInviteModal: m.Component<{}, {
                   disabled: vnode.state.accepted.includes(location) || !vnode.state.selectedAddress,
                   onclick: (e) => {
                     e.preventDefault();
+                    const communityName = invites[location].community_name;
                     if (vnode.state.selectedAddress) {
                       app.user.acceptInvite({
                         address: vnode.state.selectedAddress,
                         inviteCode: invites[location].id
                       }).then(() => {
                         app.config.invites = app.config.invites.filter(
-                          (invite) => invite.community_name !== invites[location].community_name
+                          (invite) => invite.community_name !== communityName
                         );
                         vnode.state.accepted.push(location);
                         vnode.state.selectedAddress = null;
@@ -138,11 +144,11 @@ const ConfirmInviteModal: m.Component<{}, {
                         if (communityId && !app.config.communities.getByCommunity(communityId)) {
                           initAppState().then(() => {
                             m.route.set(`/${communityId}`);
-                            notifySuccess(`Successfully joined ${invites[location].community_name}.`);
+                            notifySuccess(`Successfully joined ${communityName}.`);
                           });
                         } else {
                           m.route.set(`/${communityId || chainId}`);
-                          notifySuccess(`Successfully joined ${invites[location].community_name}.`);
+                          notifySuccess(`Successfully joined ${communityName}.`);
                         }
                       }, (err) => {
                         notifyError('Error accepting invite');
