@@ -38,7 +38,6 @@ export { DepositVote, BinaryVote } from './votes';
 export {
   ChainBase,
   ChainNetwork,
-  ChainClass,
   OffchainThreadKind,
   OffchainThreadStage,
   OffchainVoteOptions,

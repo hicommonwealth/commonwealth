@@ -9,9 +9,10 @@ import { Vec } from '@polkadot/types';
 import { Codec } from '@polkadot/types/types';
 
 import UserFlagsHandler from '../eventHandlers/userFlags';
+import { ChainNodeInstance } from '../models/chain_node';
 
 import { factory, formatFilename } from '../../shared/logging';
-import { constructSubstrateUrl, selectSpec } from '../../shared/substrate';
+import { constructSubstrateUrl } from '../../shared/substrate';
 const log = factory.getLogger(formatFilename(__filename));
 
 export default async function (models, chain?: string): Promise<void> {
@@ -23,8 +24,14 @@ export default async function (models, chain?: string): Promise<void> {
   const chains = !chain ? SubstrateTypes.EventChains.concat() : [ chain ];
 
   // query one node for each supported chain
-  const nodes = (await Promise.all(chains.map((c) => {
-    return models.ChainNode.findOne({ where: { chain: c } });
+  const nodes: ChainNodeInstance[] = (await Promise.all(chains.map((c) => {
+    return models.ChainNode.findOne({
+      where: { chain: c },
+      include: [{
+        model: models.Chain,
+        where: { active: true },
+        required: true,
+      }] });
   }))).filter((n) => !!n);
   if (!nodes) {
     throw new Error('no nodes found for chain entity migration');
@@ -37,7 +44,7 @@ export default async function (models, chain?: string): Promise<void> {
 
     const nodeUrl = constructSubstrateUrl(node.url);
     try {
-      const api = await SubstrateEvents.createApi(nodeUrl, selectSpec(node.chain));
+      const api = await SubstrateEvents.createApi(nodeUrl, node.Chain.substrate_spec);
 
       log.info('Fetching councillor and validator lists...');
       const validators = await api.derive.staking?.validators();

@@ -8,7 +8,7 @@ import m from 'mithril';
 import { CommentRefreshOption } from 'controllers/server/comments';
 import ChainEntityController, { EntityRefreshOption } from 'controllers/server/chain_entities';
 import { IChainModule, IAccountsModule, IBlockInfo } from './interfaces';
-import { ChainBase, ChainClass } from './types';
+import { ChainBase } from './types';
 import { Account, NodeInfo, ProposalModule } from '.';
 
 // Extended by a chain's main implementation. Responsible for module
@@ -126,7 +126,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
   }
 
   public abstract base: ChainBase;
-  public abstract class: ChainClass;
 
   public networkStatus: ApiStatus = ApiStatus.Disconnected;
   public networkError: string;

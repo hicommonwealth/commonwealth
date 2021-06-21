@@ -6,10 +6,9 @@ import { Button, ButtonGroup, Icon, Icons, PopoverMenu, MenuItem, MenuDivider } 
 
 import app from 'state';
 import { ProposalType } from 'identifiers';
-import { ChainClass, ChainBase } from 'models';
+import { ChainBase, ChainNetwork } from 'models';
 import NewThreadModal from 'views/modals/new_thread_modal';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import Token from 'controllers/chain/ethereum/token/adapter';
 
 export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]>, mobile?: boolean) => {
   const activeAccount = app.user.activeAccount;
@@ -29,7 +28,7 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
       label: 'New text proposal',
       iconLeft: mobile ? Icons.PLUS : undefined,
     }),
-    app.chain?.base === ChainBase.Substrate && app.chain?.class !== ChainClass.Plasm && [
+    app.chain?.base === ChainBase.Substrate && app.chain?.network !== ChainNetwork.Plasm && [
       m(MenuItem, {
         onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
           type: ProposalType.SubstrateTreasuryProposal

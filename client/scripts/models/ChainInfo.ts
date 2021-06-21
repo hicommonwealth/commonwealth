@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import { RegisteredTypes } from '@polkadot/types/types';
 import app from 'state';
 import { RoleInfo, RolePermission } from 'models';
 import { ChainNetwork, ChainBase } from './types';
@@ -27,11 +28,12 @@ class ChainInfo {
   public members: RoleInfo[];
   public type: string;
   public readonly ss58Prefix: string;
+  public substrateSpec: RegisteredTypes;
 
   constructor({
     id, network, symbol, name, iconUrl, description, website, discord, element, telegram, github,
     customDomain, blockExplorerIds, collapsedOnHomepage, featuredTopics, topics, adminsAndMods,
-    base, ss58_prefix, type
+    base, ss58_prefix, type, substrateSpec
   }) {
     this.id = id;
     this.network = network;
@@ -53,6 +55,7 @@ class ChainInfo {
     this.adminsAndMods = adminsAndMods || [];
     this.type = type;
     this.ss58Prefix = ss58_prefix;
+    this.substrateSpec = substrateSpec;
   }
 
   public static fromJSON({
@@ -75,7 +78,8 @@ class ChainInfo {
     adminsAndMods,
     base,
     ss58_prefix,
-    type
+    type,
+    substrate_spec,
   }) {
     let blockExplorerIdsParsed;
     try {
@@ -104,7 +108,8 @@ class ChainInfo {
       adminsAndMods,
       base,
       ss58_prefix,
-      type
+      type,
+      substrateSpec: substrate_spec,
     });
   }
 

@@ -1,4 +1,4 @@
-import { IChainAdapter, ChainBase, ChainClass, NodeInfo } from 'models';
+import { IChainAdapter, ChainBase, NodeInfo } from 'models';
 import { IApp } from 'state';
 
 import { NearToken } from 'adapters/chain/near/types';
@@ -7,7 +7,6 @@ import { NearAccounts } from './account';
 
 export default class Near extends IChainAdapter<NearToken, any> {
   public base = ChainBase.NEAR;
-  public class = ChainClass.Near;
   public chain: NearChain;
   public accounts: NearAccounts;
 
