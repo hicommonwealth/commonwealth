@@ -1,6 +1,6 @@
 import Rascal from 'rascal';
 import config from './RabbitMQconfig.json';
-import {factory, formatFilename} from '../../../shared/logging';
+import { factory, formatFilename } from '../../../shared/logging';
 
 
 const log = factory.getLogger(formatFilename(__filename));

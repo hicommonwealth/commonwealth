@@ -86,6 +86,7 @@
     "@types/websocket": "^1.0.0",
     "@types/ws": "^7.2.4",
     "@walletconnect/web3-provider": "^1.4.1",
+    "amqplib": "^0.8.0",
     "assert": "^2.0.0",
     "async-rwlock": "^1.1.1",
     "autoprefixer": "^10.2.5",
