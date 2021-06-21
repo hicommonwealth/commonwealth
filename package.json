@@ -162,6 +162,7 @@
     "quill-image-drop-and-paste": "^1.0.4",
     "quill-image-uploader": "^1.0.2",
     "quill-mention": "^2.2.7",
+    "rascal": "^13.0.3",
     "rollbar": "^2.6.1",
     "rxjs": "^6.6.3",
     "sass-loader": "^10.1.1",
