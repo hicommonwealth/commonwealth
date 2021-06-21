@@ -1,11 +1,19 @@
 @import 'client/styles/shared';
 
 .AaveProposalDetail {
-    p {
-        margin-top: 16px;
+    > div {
+        display: flex;
+        margin-bottom: 23px;
+        p {
+            display: flex;
+            justify-content: left;
+        }
     }
-    p + p {
-        margin-top: 4px;
+    p {
+        font-size: 18px;
+    }
+    .aave-voting, .aave-requirements {
+        flex-direction: column;
     }
     .proposal-injected-status {
         font-weight: 600;
@@ -42,5 +50,19 @@
     }
     .cui-button + .cui-button {
         margin-top: 6px;
+    }
+    .card-subheader {
+        color: #666666;
+        margin-bottom: 5px;
+        &.proposal-description {
+            margin-bottom: 23px;
+        }
+    }
+    .detail-highlight {
+        color: #4723AD;
+        padding-right: 13px;
+        &.emphasize {
+            font-weight: 600;
+        }
     }
 }

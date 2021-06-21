@@ -264,12 +264,12 @@ const ProposalsPage: m.Component<{}> = {
       m('.clear'),
       m(Listing, {
         content: activeProposalContent,
-        columnHeader: 'Active Proposals',
+        columnHeader: 'Active',
       }),
       m('.clear'),
       m(Listing, {
         content: inactiveProposalContent,
-        columnHeader: 'Inactive Proposals',
+        columnHeader: 'Inactive',
       }),
       m('.clear'),
     ]);
