@@ -46,7 +46,7 @@
     "@babel/polyfill": "^7.2.5",
     "@babel/preset-env": "^7.2.3",
     "@babel/register": "^7.4.0",
-    "@commonwealth/chain-events": "0.6.3",
+    "@commonwealth/chain-events": "0.6.4",
     "@cosmjs/launchpad": "^0.24.0-alpha.13",
     "@edgeware/node-types": "3.3.3",
     "@glidejs/glide": "^3.4.1",
