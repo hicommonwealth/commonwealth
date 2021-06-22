@@ -186,11 +186,24 @@ export default class AaveProposal extends Proposal<
     return +turnoutBn / 10000;
   }
 
-  public get minimumQuorum() {
-    return +this._Executor.minimumQuorum / 10000
+  // (FOR VOTES - AGAINST VOTES) / voting supply
+  public get voteDifferential() {
+    if (!this._votingSupplyAtStart || this._votingSupplyAtStart.isZero()) {
+      return null;
+    }
+    const votes = this.getVotes();
+    const yesPower = sumVotes(votes.filter((v) => v.choice));
+    const noPower = sumVotes(votes.filter((v) => !v.choice));
+    if (yesPower.isZero() && noPower.isZero()) return 0;
+    const differential = yesPower.sub(noPower).muln(10000).div(this._votingSupplyAtStart);
+    return +differential / 10000;
   }
 
-  public get voteDifferential() {
+  public get minimumQuorum() {
+    return +this._Executor.minimumQuorum / 10000;
+  }
+
+  public get minimumVoteDifferential() {
     return +this._Executor.voteDifferential / 1000;
   }
 
@@ -246,7 +259,7 @@ export default class AaveProposal extends Proposal<
       console.error(
         'Failed to fetch total voting supply at proposal start block, using hardcoded dydx value.'
       );
-      this._votingSupplyAtStart = Web3.utils.toWei(new BN(1_000_000_000), 'ether')
+      this._votingSupplyAtStart = Web3.utils.toWei(new BN(1_000_000_000), 'ether');
     }
     console.log(this._Executor);
     this._minVotingPowerNeeded = this._votingSupplyAtStart

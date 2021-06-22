@@ -57,7 +57,7 @@ const AaveDetail = {
         ]),
         m('.aave-differential-requirement', [
           m('p.detail-highlight.emphasize', [
-            (proposal.voteDifferential * 100).toFixed(0),
+            (proposal.minimumVoteDifferential * 100).toFixed(0),
             '%',
           ]),
           m('p', ' differential')
