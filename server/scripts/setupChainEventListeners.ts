@@ -137,9 +137,13 @@ const setupChainEventListeners = async (
     }
   });
 
-  // feed the events into the different their respective handlers
+  // feed the events into their respective handlers
   async function processEvents(event: CWEvent): Promise<void> {
     const eventHandlers = handlers[event.chain];
+    if (eventHandlers === undefined || eventHandlers === null) {
+      log.info(`Processing events from ${event.chain} is not enabled`);
+      return;
+    }
     let prevResult = null;
     for (const handler of eventHandlers) {
       try {
