@@ -50,7 +50,7 @@ const AaveDetail = {
         ]),
         m('.aave-differential', [
           m('p.detail-highlight.emphasize', [
-            (proposal.voteDifferential * 100),
+            roundVote(proposal.voteDifferential * 100),
             '%',
           ]),
           m('p', ' differential'),
