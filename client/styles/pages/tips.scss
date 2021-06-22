@@ -9,18 +9,19 @@
     }
 
     .TipDetail {
-        .b-row {
-            padding-top: 5px;
-            display: flex;
+        .group {
+            margin-bottom: 12px;
 
-            &.waiting {
-                color: $text-color-light;
+            .t-row {
+                padding-top: 5px;
+                display: flex;
+
+                .reason {
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
             }
-        }
-
-        .b-col {
-            min-width: 24px;
-            margin-right: 5px;
         }
     }
 }

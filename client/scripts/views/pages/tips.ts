@@ -22,7 +22,7 @@ import User from '../components/widgets/user';
 const TipDetail: m.Component<{ tip: SubstrateTreasuryTip }> = {
   view: (vnode) => {
     const { tip } = vnode.attrs;
-    const { who } = tip.data;
+    const { who, reason } = tip.data;
     const beneficiary = app.chain.accounts.get(who);
     return m('.TipDetail', {
       onclick: (e) => {
@@ -30,15 +30,25 @@ const TipDetail: m.Component<{ tip: SubstrateTreasuryTip }> = {
         e.stopPropagation();
       }
     }, [
-      m('.b-row', [
-        m('p', 'Beneficiary'),
+      m('.group', [
+        m('.t-row', [
+          m('p', 'Reason'),
+        ]),
+        m('.t-row', [
+          m('.reason', reason),
+        ]),
       ]),
-      m('.b-row', [
-        m(User, {
-          user: beneficiary,
-          popover: true,
-          showAddressWithDisplayName: true,
-        }),
+      m('.group', [
+        m('.t-row', [
+          m('p', 'Beneficiary'),
+        ]),
+        m('.t-row', [
+          m(User, {
+            user: beneficiary,
+            popover: true,
+            showAddressWithDisplayName: true,
+          }),
+        ]),
       ]),
     ]);
   }

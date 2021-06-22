@@ -70,6 +70,7 @@ import LinkedProposalsEmbed from './linked_proposals_embed';
 import User from '../../components/widgets/user';
 import MarkdownFormattedText from '../../components/markdown_formatted_text';
 import { createTXModal } from '../../modals/tx_signing_modal';
+import { SubstrateAccount } from '../../../controllers/chain/substrate/account';
 
 
 const ProposalHeader: m.Component<{
@@ -860,36 +861,39 @@ const ViewProposalPage: m.Component<{
             ]),
           ]),
           m('.tip-contributions', [
-            m('.title', 'Contribute'),
-            m('.mb-12', [
-              m('.label', 'Amount'),
-              m(Input, {
-                name: 'amount',
-                placeholder: 'Enter tip amount',
-                autocomplete: 'off',
-                fluid: true,
-                oninput: (e) => {
-                  const result = (e.target as any).value;
-                  vnode.state.tipAmount = result.length > 0
-                    ? app.chain.chain.coins(parseFloat(result), true) : undefined;
-                  m.redraw();
+            proposal.canVoteFrom(app.user.activeAccount as SubstrateAccount)
+            && m('.contribute', [
+              m('.title', 'Contribute'),
+              m('.mb-12', [
+                m('.label', 'Amount'),
+                m(Input, {
+                  name: 'amount',
+                  placeholder: 'Enter tip amount',
+                  autocomplete: 'off',
+                  fluid: true,
+                  oninput: (e) => {
+                    const result = (e.target as any).value;
+                    vnode.state.tipAmount = result.length > 0
+                      ? app.chain.chain.coins(parseFloat(result), true) : undefined;
+                    m.redraw();
+                  },
+                })
+              ]),
+              m(Button, {
+                disabled: vnode.state.tipAmount === undefined,
+                intent: 'primary',
+                rounded: true,
+                label: 'Submit Transaction',
+                onclick: (e) => {
+                  e.preventDefault();
+                  createTXModal(proposal.submitVoteTx(
+                    new DepositVote(app.user.activeAccount, vnode.state.tipAmount)
+                  ));
                 },
-              })
+                tabindex: 4,
+                type: 'submit',
+              }),
             ]),
-            m(Button, {
-              disabled: vnode.state.tipAmount === undefined,
-              intent: 'primary',
-              rounded: true,
-              label: 'Submit Transaction',
-              onclick: (e) => {
-                e.preventDefault();
-                createTXModal(proposal.submitVoteTx(
-                  new DepositVote(app.user.activeAccount, vnode.state.tipAmount)
-                ));
-              },
-              tabindex: 4,
-              type: 'submit',
-            }),
             contributors.length > 0 && [
               m('.contributors .title', 'Contributors'),
               contributors.map(({ account, deposit }) => (

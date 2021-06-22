@@ -4,6 +4,10 @@
   display: flex;
   padding: 24px 12px;
 
+  .contribute {
+    margin-top: 64px;
+  }
+
   .title {
     font-size: 32px;
     font-weight: 500;
@@ -53,7 +57,6 @@
     }
 
     .contributors {
-      margin-top: 64px;
       margin-bottom: 32px;
     }
 
@@ -64,8 +67,6 @@
 
       .amount {
         flex: 0 0 30%;
-        overflow: hidden;
-        white-space: nowrap;
         margin-right: 12px;
         display: flex;
         align-items: center;
