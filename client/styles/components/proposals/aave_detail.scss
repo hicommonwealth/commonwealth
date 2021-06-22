@@ -3,8 +3,8 @@
 .AaveProposalDetail {
     display: grid;
     grid-template-rows: 3fr 4fr 3fr;
-    row-gap: 23px;
-    max-height: 250px;
+    row-gap: 22px;
+    max-height: 254px;
     > div {
         display: flex;
         max-width: 100%;
@@ -26,6 +26,12 @@
             .detail-highlight {
                 overflow-x: hidden;
             }
+            .collapsed-line-height {
+                line-height: .8;
+            }
+            .card-subheader {
+                margin-top: 2px;
+            }
         }
         .aave-status {
             max-width: calc(30%);
@@ -46,6 +52,7 @@
     .proposal-injected-status {
         margin-bottom: 4px;
         color: $text-color-black;
+        line-height: .9;
     }
     .b-box {
         border: 1px solid $border-color-lightest;

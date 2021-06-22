@@ -22,10 +22,12 @@ const AaveDetail = {
       m('.aave-metadata', [
         m('.aave-author', [
           m('.card-subheader', 'Author'),
-          m('p.detail-highlight', [
-            // TODO: format as User
-            proposal.ipfsData?.author || proposal.data.proposer,
-          ]),
+          // TODO: format as User
+          proposal.ipfsData?.author
+            ? proposal.ipfsData.author.split(' (').map((ele, idx) => {
+              return idx === 0 ? m('p.collapsed-line-height', ele) : m('p.card-subheader', ele.slice(0, ele.length - 1))
+            })
+            : m('p', proposal.data.proposer),
         ]),
         m('.aave-status', [
           m('.card-subheader', 'Status'),
