@@ -40,6 +40,7 @@ http {
 			# if ($http_x_forwarded_proto != "https") {
 			#   return 301 https://$host$request_uri;
 			# }
+
       # Enable password protection
       auth_basic           "Access Restricted";
       auth_basic_user_file /app/.htpasswd;
