@@ -173,7 +173,7 @@ export default class AaveProposal extends Proposal<
     const yesPower = sumVotes(votes.filter((v) => v.choice));
     const noPower = sumVotes(votes.filter((v) => !v.choice));
     if (yesPower.isZero() && noPower.isZero()) return 0;
-    const supportBn = yesPower.muln(1000).div(yesPower.add(noPower));
+    const supportBn = yesPower.muln(10000).div(yesPower.add(noPower));
     return +supportBn / 10000;
   }
 
@@ -184,6 +184,27 @@ export default class AaveProposal extends Proposal<
     const totalPowerVoted = sumVotes(this.getVotes());
     const turnoutBn = totalPowerVoted.muln(10000).div(this._votingSupplyAtStart);
     return +turnoutBn / 10000;
+  }
+
+  // (FOR VOTES - AGAINST VOTES) / voting supply
+  public get voteDifferential() {
+    if (!this._votingSupplyAtStart || this._votingSupplyAtStart.isZero()) {
+      return null;
+    }
+    const votes = this.getVotes();
+    const yesPower = sumVotes(votes.filter((v) => v.choice));
+    const noPower = sumVotes(votes.filter((v) => !v.choice));
+    const forProportion = yesPower.muln(10000).div(this._votingSupplyAtStart);
+    const againstProportion = noPower.muln(10000).div(this._votingSupplyAtStart);
+    return (+forProportion - +againstProportion) / 10000;
+  }
+
+  public get minimumQuorum() {
+    return +this._Executor.minimumQuorum / 10000;
+  }
+
+  public get minimumVoteDifferential() {
+    return +this._Executor.voteDifferential / 10000;
   }
 
   private _votingSupplyAtStart: BN;
@@ -230,37 +251,20 @@ export default class AaveProposal extends Proposal<
     if (this.state === AaveTypes.ProposalState.EXPIRED) {
       this.complete(this._Gov.store);
     }
-    if (this.completed) {
-      return;
-    }
 
-    // TODO: this case will be true always except pending -- do we need to check?
-    if (this._Gov.app.chain.block.height > this.data.startBlock) {
-      let totalVotingSupplyAtStart: BigNumber;
-      try {
-        // dydx version
-        totalVotingSupplyAtStart = await this._Gov.api.Strategy.getVotingSupplyAt(this.data.startBlock);
-      } catch (e) {
-        // aave version
-        try {
-          totalVotingSupplyAtStart = await this._Gov.api.Strategy.getTotalVotingSupplyAt(this.data.startBlock);
-        } catch (e2) {
-          console.error(
-            'Failed to fetch total voting supply at proposal start block, voting power computations will fail.'
-          );
-          this._initialized = true;
-          return;
-        }
-      }
+    try {
+      const totalVotingSupplyAtStart = await this._Gov.api.Strategy.getVotingSupplyAt(this.data.startBlock);
       this._votingSupplyAtStart = new BN(totalVotingSupplyAtStart.toString());
-      this._minVotingPowerNeeded = new BN(
-        totalVotingSupplyAtStart
-          .mul(this._Executor.minimumQuorum.toString())
-          .div(10000)
-          .toString()
+    } catch (e2) {
+      console.error(
+        'Failed to fetch total voting supply at proposal start block, using hardcoded dydx value.'
       );
+      this._votingSupplyAtStart = Web3.utils.toWei(new BN(1_000_000_000), 'ether');
     }
 
+    this._minVotingPowerNeeded = this._votingSupplyAtStart
+      .mul(this._Executor.minimumQuorum)
+      .divn(10000);
     this._initialized = true;
   }
 

@@ -201,7 +201,7 @@ const ProposalsPage: m.Component<{}> = {
       && !activeMarlinProposals?.length
       && !activeAaveProposals?.length
       ? [ m('.no-proposals', 'No active proposals') ]
-      : (activeDemocracyProposals || []).map((proposal) => m(ProposalCard, { proposal }))
+      : [ m('.active-proposals', [(activeDemocracyProposals || []).map((proposal) => m(ProposalCard, { proposal }))
         .concat((activeCouncilProposals || []).map((proposal) => m(ProposalCard, { proposal })))
         .concat((activeCosmosProposals || []).map((proposal) => m(ProposalCard, { proposal })))
         .concat((activeMolochProposals || []).map((proposal) => m(ProposalCard, { proposal })))
@@ -209,7 +209,8 @@ const ProposalsPage: m.Component<{}> = {
         .concat((activeAaveProposals || []).map((proposal) => m(ProposalCard, {
           proposal,
           injectedContent: AaveDetail,
-        })));
+        })))]
+      )];
 
     // inactive proposals
     const inactiveDemocracyProposals = onSubstrate
@@ -236,7 +237,7 @@ const ProposalsPage: m.Component<{}> = {
       && !inactiveMarlinProposals?.length
       && !inactiveAaveProposals?.length
       ? [ m('.no-proposals', 'No past proposals') ]
-      : (inactiveDemocracyProposals || []).map((proposal) => m(ProposalCard, { proposal }))
+      : [ m('.inactive-proposals', [(inactiveDemocracyProposals || []).map((proposal) => m(ProposalCard, { proposal }))
         .concat((inactiveCouncilProposals || []).map((proposal) => m(ProposalCard, { proposal })))
         .concat((inactiveCosmosProposals || []).map((proposal) => m(ProposalCard, { proposal })))
         .concat((inactiveMolochProposals || []).map((proposal) => m(ProposalCard, { proposal })))
@@ -244,7 +245,8 @@ const ProposalsPage: m.Component<{}> = {
         .concat((inactiveAaveProposals || []).map((proposal) => m(ProposalCard, {
           proposal,
           injectedContent: AaveDetail,
-        })));
+        }))) ]
+      )];
 
     // XXX: display these
     const visibleTechnicalCommitteeProposals = app.chain
@@ -264,12 +266,12 @@ const ProposalsPage: m.Component<{}> = {
       m('.clear'),
       m(Listing, {
         content: activeProposalContent,
-        columnHeader: 'Active Proposals',
+        columnHeader: 'Active',
       }),
       m('.clear'),
       m(Listing, {
         content: inactiveProposalContent,
-        columnHeader: 'Inactive Proposals',
+        columnHeader: 'Inactive',
       }),
       m('.clear'),
     ]);

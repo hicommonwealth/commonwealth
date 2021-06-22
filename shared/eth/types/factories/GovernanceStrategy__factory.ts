@@ -138,7 +138,7 @@ const _abi = [
         type: "uint256",
       },
     ],
-    name: "getTotalVotingSupplyAt",
+    name: "getVotingSupplyAt",
     outputs: [
       {
         internalType: "uint256",
