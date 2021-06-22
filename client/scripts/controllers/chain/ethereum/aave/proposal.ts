@@ -253,7 +253,7 @@ export default class AaveProposal extends Proposal<
     }
 
     try {
-      const totalVotingSupplyAtStart = await this._Gov.api.Strategy.getTotalVotingSupplyAt(this.data.startBlock);
+      const totalVotingSupplyAtStart = await this._Gov.api.Strategy.getVotingSupplyAt(this.data.startBlock);
       this._votingSupplyAtStart = new BN(totalVotingSupplyAtStart.toString());
     } catch (e2) {
       console.error(
@@ -261,7 +261,7 @@ export default class AaveProposal extends Proposal<
       );
       this._votingSupplyAtStart = Web3.utils.toWei(new BN(1_000_000_000), 'ether');
     }
-    console.log(this._Executor);
+
     this._minVotingPowerNeeded = this._votingSupplyAtStart
       .mul(this._Executor.minimumQuorum)
       .divn(10000);
