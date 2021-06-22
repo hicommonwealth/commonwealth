@@ -1,0 +1,46 @@
+@import 'client/styles/shared';
+
+.AaveProposalDetail {
+    p {
+        margin-top: 16px;
+    }
+    p + p {
+        margin-top: 4px;
+    }
+    .proposal-injected-status {
+        font-weight: 600;
+        line-height: 1.1;
+        margin-bottom: 4px;
+        color: $text-color-black;
+        &.pass {
+            color: $positive-bg-color;
+        }
+        &.fail {
+            color: $negative-bg-color;
+        }
+    }
+    .b-box {
+        border: 1px solid $border-color-lightest;
+        border-radius: 8px;
+        border-bottom: none;
+        margin-bottom: 18px;
+        .b-row {
+            padding: 0 10px;
+            padding-top: 5px;
+            border-bottom: 1px solid $border-color-lightest;
+            display: flex;
+            &.waiting {
+                color: $text-color-light;
+            }
+            &:last-child {
+                border-radius: 0 0 8px 8px;
+            }
+        }
+        .b-col {
+            min-width: 24px;
+        }
+    }
+    .cui-button + .cui-button {
+        margin-top: 6px;
+    }
+}

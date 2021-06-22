@@ -1,5 +1,6 @@
 import 'components/proposals/voting_results.scss';
 import m from 'mithril';
+import app from 'state';
 
 import { formatCoin } from 'adapters/currency'; // TODO: remove formatCoin, only use coins.format()
 import User from 'views/components/widgets/user';
@@ -10,6 +11,8 @@ import { MolochProposalVote, MolochVote } from 'controllers/chain/ethereum/moloc
 import { MarlinProposalVote, MarlinVote } from 'controllers/chain/ethereum/marlin/proposal';
 import { SubstrateCollectiveVote } from 'controllers/chain/substrate/collective_proposal';
 import { SubstrateDemocracyVote } from 'controllers/chain/substrate/democracy_referendum';
+import { AaveProposalVote } from 'controllers/chain/ethereum/aave/proposal';
+import Marlin from 'controllers/chain/ethereum/marlin/adapter';
 
 const COLLAPSE_VOTERS_AFTER = 6; // if there are >6 voters, collapse remaining under "Show more"
 
@@ -25,11 +28,13 @@ const VoteListing: m.Component<{
   view: (vnode) => {
     const { proposal, votes, amount, weight } = vnode.attrs;
     const balanceWeighted = proposal.votingUnit === VotingUnit.CoinVote
-      || proposal.votingUnit === VotingUnit.ConvictionCoinVote;
+      || proposal.votingUnit === VotingUnit.ConvictionCoinVote
+      || proposal.votingUnit === VotingUnit.PowerVote;
 
     if (!vnode.state.balancesCache) vnode.state.balancesCache = {};
     if (!vnode.state.balancesCacheInitialized) vnode.state.balancesCacheInitialized = {};
 
+    // TODO: show turnout if specific votes not found
     return m('.VoteListing', [
       votes.length === 0
         ? m('.no-votes', 'No votes')
@@ -46,15 +51,48 @@ const VoteListing: m.Component<{
               } else {
                 // fetch balance and store in cache
                 vnode.state.balancesCacheInitialized[vote.account.address] = true;
-                vote.account.balance.then((b) => {
-                  balance = b;
-                  vnode.state.balancesCache[vote.account.address] = formatCoin(b, true);
+                if (vote instanceof AaveProposalVote) {
+                  balance = vote.power;
+                  vnode.state.balancesCache[vote.account.address] = vote.format();
                   m.redraw();
-                });
-                balance = '--';
+                } else if (vote instanceof MarlinProposalVote) {
+                  (app.chain as Marlin).chain.balanceOf(vote.account.address).then((b) => {
+                    balance = b;
+                    vnode.state.balancesCache[vote.account.address] = formatCoin(app.chain.chain.coins(b), true);
+                    m.redraw();
+                  });
+                  balance = '--';
+                } else {
+                  vote.account.balance.then((b) => {
+                    balance = b;
+                    vnode.state.balancesCache[vote.account.address] = formatCoin(b, true);
+                    m.redraw();
+                  });
+                  balance = '--';
+                }
               }
             }
             switch (true) {
+              case (vote instanceof CosmosVote):
+                return m('.vote', [
+                  m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
+                  // (balanceWeighted && balance) && m('.vote-balance', balance),
+                ]);
+              case (vote instanceof MolochProposalVote):
+                return m('.vote', [
+                  m('.vote-voter', m(User, { user: vote.account, linkify: true })),
+                  balance && m('.vote-balance', balance),
+                ]);
+              case (vote instanceof MarlinProposalVote):
+                return m('.vote', [
+                  m('.vote-voter', m(User, { user: vote.account, linkify: true })),
+                  balance && m('.vote-balance', balance),
+                ]);
+              case (vote instanceof AaveProposalVote):
+                return m('.vote', [
+                  m('.vote-voter', m(User, { user: vote.account, linkify: true })),
+                  balance && m('.vote-balance', balance),
+                ]);
               case (vote instanceof BinaryVote):
                 switch (true) {
                   case (vote instanceof SubstrateDemocracyVote):
@@ -80,24 +118,6 @@ const VoteListing: m.Component<{
                   m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
                   m('.vote-deposit', formatCoin((vote as DepositVote<any>).deposit, true)),
                 ]);
-              case (vote instanceof CosmosVote):
-                return m('.vote', [
-                  m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
-                  m('.vote-choice', (vote as CosmosVote).choice.toString()),
-                  // (balanceWeighted && balance) && m('.vote-balance', balance),
-                ]);
-              case (vote instanceof MolochProposalVote):
-                return m('.vote', [
-                  m('.vote-voter', m(User, { user: vote.account, linkify: true })),
-                  m('.vote-choice', (vote as MolochProposalVote).choice.toString()),
-                  balance && m('.vote-balance', balance),
-                ]);
-              case (vote instanceof MarlinProposalVote):
-                return m('.vote', [
-                  m('.vote-voter', m(User, { user: vote.account, linkify: true })),
-                  m('.vote-choice', (vote as MarlinProposalVote).choice.toString()),
-                  balance && m('.vote-balance', balance),
-                ]);
               default:
                 return m('.vote', [
                   m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
@@ -109,7 +129,7 @@ const VoteListing: m.Component<{
   }
 };
 
-const VotingResults: m.Component<{ proposal }> = {
+const VotingResults: m.Component<{ proposal: AnyProposal }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     const votes = proposal.getVotes();

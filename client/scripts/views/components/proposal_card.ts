@@ -3,6 +3,7 @@ import 'components/proposal_card.scss';
 import m from 'mithril';
 import moment from 'moment';
 import { Icon, Icons, Tag } from 'construct-ui';
+import { AaveTypes } from '@commonwealth/chain-events';
 
 import app from 'state';
 import { slugify } from 'utils';
@@ -17,7 +18,7 @@ import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collect
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
 import MolochProposal, { MolochProposalState } from 'controllers/chain/ethereum/moloch/proposal';
-import MarlinProposal, { MarlinProposalState, MarlinProposalVote } from 'controllers/chain/ethereum/marlin/proposal';
+import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 
 import Countdown from 'views/components/countdown';
 
@@ -27,6 +28,7 @@ export const getStatusClass = (proposal: AnyProposal) => proposal.isPassing === 
       : proposal.isPassing === ProposalStatus.Failed ? 'fail' : '';
 
 export const getStatusText = (proposal: AnyProposal, showCountdown: boolean) => {
+  console.log(proposal);
   if (proposal.completed && proposal instanceof SubstrateDemocracyProposal) {
     if (proposal.isPassing === ProposalStatus.Passed) return 'Passed, moved to referendum';
     return 'Cancelled';
@@ -40,6 +42,11 @@ export const getStatusText = (proposal: AnyProposal, showCountdown: boolean) => 
     if (proposal.isPassing === ProposalStatus.Passed) return 'Passed';
     if (proposal.isPassing === ProposalStatus.Failed) return 'Motion closed';
     return 'Completed';
+  } else if (proposal.completed && proposal instanceof AaveProposal) {
+    if (proposal.state === AaveTypes.ProposalState.CANCELED) return 'Cancelled';
+    if (proposal.state === AaveTypes.ProposalState.EXECUTED) return 'Executed';
+    if (proposal.state === AaveTypes.ProposalState.EXPIRED) return 'Expired';
+    if (proposal.state === AaveTypes.ProposalState.FAILED) return 'Did not pass';
   } else if (proposal.completed) {
     if (proposal.isPassing === ProposalStatus.Passed) return 'Passed';
     if (proposal.isPassing === ProposalStatus.Failed) return 'Did not pass';
@@ -61,22 +68,44 @@ export const getStatusText = (proposal: AnyProposal, showCountdown: boolean) => 
               : proposal.endTime.kind === 'unavailable'
                 ? '' : '';
 
-  return (proposal instanceof MolochProposal && proposal.state === MolochProposalState.NotStarted)
-    ? 'Waiting to start'
-    : (proposal instanceof MolochProposal && proposal.state === MolochProposalState.GracePeriod)
-      ? [ (proposal.isPassing === ProposalStatus.Passed ? 'Passed, ' : 'Failed, '), countdown, ' in grace period' ]
-      : (proposal instanceof MolochProposal && proposal.state === MolochProposalState.InProcessingQueue)
-        ? 'In processing queue'
-        : (proposal instanceof MolochProposal && proposal.state === MolochProposalState.ReadyToProcess)
-          ? 'Ready to process'
-          : proposal.isPassing === ProposalStatus.Passed
-            ? [ 'Passed, enacting in ', countdown.length === 2 ? countdown[0] : '???' ]
-            : proposal.isPassing === ProposalStatus.Failed ? 'Did not pass'
-              : (proposal.isPassing === ProposalStatus.Passing && proposal instanceof SubstrateDemocracyProposal)
-                ? [ 'Expected to pass and move to referendum, ', countdown ]
-                : proposal.isPassing === ProposalStatus.Passing ? [ 'Passing, ', countdown ]
-                  : proposal.isPassing === ProposalStatus.Failing ? [ 'Not passing, ', countdown ]
-                    : proposal.isPassing === ProposalStatus.None ? '' : '';
+  if (proposal instanceof MolochProposal) {
+    if (proposal.state === MolochProposalState.NotStarted)
+      return 'Waiting to start';
+    if (proposal.state === MolochProposalState.GracePeriod)
+      return [
+        (proposal.isPassing === ProposalStatus.Passed ? 'Passed, ' : 'Failed, '),
+        countdown,
+        ' in grace period'
+      ];
+    if (proposal.state === MolochProposalState.InProcessingQueue)
+      return 'In processing queue';
+    if (proposal.state === MolochProposalState.ReadyToProcess)
+      return 'Ready to process';
+  }
+
+  if (proposal instanceof AaveProposal) {
+    if (proposal.state === AaveTypes.ProposalState.ACTIVE)
+      return [ proposal.isPassing === ProposalStatus.Passing ? 'Passing, ' : 'Not passing, ', countdown ];
+    if (proposal.state === AaveTypes.ProposalState.PENDING)
+      return [ 'Pending, ', countdown ];
+    if (proposal.state === AaveTypes.ProposalState.QUEUED)
+      return [ 'Queued, ', countdown ];
+    if (proposal.state === AaveTypes.ProposalState.SUCCEEDED)
+      return 'Ready to queue';
+    if (proposal.state === AaveTypes.ProposalState.EXPIRED) return 'Expired';
+  }
+
+  if (proposal.isPassing === ProposalStatus.Passed)
+    return [ 'Passed, enacting in ', countdown.length === 2 ? countdown[0] : '???' ];
+  if (proposal.isPassing === ProposalStatus.Failed)
+    return 'Did not pass';
+  if (proposal.isPassing === ProposalStatus.Passing && proposal instanceof SubstrateDemocracyProposal)
+    return [ 'Expected to pass and move to referendum, ', countdown ];
+  if (proposal.isPassing === ProposalStatus.Passing)
+    return [ 'Passing, ', countdown ];
+  if (proposal.isPassing === ProposalStatus.Failing)
+    return [ 'Not passing, ', countdown ];
+  return '';
 };
 
 // export const getSecondaryStatusText = (proposal: AnyProposal): string | null => {
@@ -141,7 +170,7 @@ const ProposalCard: m.Component<{ proposal: AnyProposal, injectedContent? }> = {
             return m(Tag, {
               label: (originatingProposalOrMotion instanceof SubstrateDemocracyProposal)
                 ? `PROP #${originatingProposalOrMotion.identifier}`
-                  : (originatingProposalOrMotion instanceof SubstrateCollectiveProposal)
+                : (originatingProposalOrMotion instanceof SubstrateCollectiveProposal)
                   ? `MOT #${originatingProposalOrMotion.identifier}` : 'MISSING PROP',
               intent: 'primary',
               rounded: true,
@@ -173,7 +202,13 @@ const ProposalCard: m.Component<{ proposal: AnyProposal, injectedContent? }> = {
         //   && m('.proposal-action', [ 'Approves TRES-', proposal.call?.args[0] ]),
         // linked referenda
         injectedContent
-          ? m('.proposal-injected', injectedContent)
+          ? m('.proposal-injected', [
+            m(injectedContent, {
+              proposal,
+              statusClass: getStatusClass(proposal),
+              statusText: getStatusText(proposal, true),
+            })
+          ])
           : m('.proposal-status', { class: getStatusClass(proposal) }, getStatusText(proposal, true)),
         // thread link
         proposal.threadId && m('.proposal-thread-link', [

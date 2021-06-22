@@ -33,7 +33,7 @@ import { Layout, LoadingLayout } from 'views/layout';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import LoginModal from 'views/modals/login_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';
-import Login from './views/components/login';
+import { AaveTypes, MarlinTypes, MolochTypes } from '@commonwealth/chain-events';
 
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/landing');
@@ -274,20 +274,27 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
     )).default;
     newChain = new Near(n, app);
     initApi = true;
-  } else if (n.chain.network === ChainNetwork.Moloch || n.chain.network === ChainNetwork.Metacartel) {
+  } else if (MolochTypes.EventChains.find((c) => c === n.chain.network)) {
     const Moloch = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "moloch-main" */
       './controllers/chain/ethereum/moloch/adapter'
     )).default;
     newChain = new Moloch(n, app);
-  } else if (n.chain.network === ChainNetwork.Marlin || n.chain.network === ChainNetwork.MarlinTestnet) {
+  } else if (MarlinTypes.EventChains.find((c) => c === n.chain.network)) {
     const Marlin = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "marlin-main" */
       './controllers/chain/ethereum/marlin/adapter'
     )).default;
     newChain = new Marlin(n, app);
+  } else if (AaveTypes.EventChains.find((c) => c === n.chain.network)) {
+    const Aave = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "aave-main" */
+      './controllers/chain/ethereum/aave/adapter'
+    )).default;
+    newChain = new Aave(n, app);
   } else if (n.chain.type === 'token') {
     const Token = (await import(
     //   /* webpackMode: "lazy" */

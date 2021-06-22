@@ -34,6 +34,8 @@ export enum ChainNetwork {
   Moloch = 'moloch',
   Marlin = 'marlin',
   MarlinTestnet = 'marlin-testnet',
+  Aave = 'aave',
+  AaveLocal = 'aave-local',
   Metacartel = 'metacartel',
   ALEX = 'alex',
   Commonwealth = 'commonwealth',
@@ -121,6 +123,7 @@ export enum VotingUnit {
   OnePersonOneVote = '1p1v',
   CoinVote = 'coin',
   ConvictionCoinVote = 'conviction_coin',
+  PowerVote = 'power',
   None = 'none',
 }
 
