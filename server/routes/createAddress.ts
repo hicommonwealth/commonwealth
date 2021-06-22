@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../../shared/logging';
+import AddressSwapper from '../util/addressSwapper';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -28,8 +29,12 @@ const createAddress = async (models, req: Request, res: Response, next: NextFunc
     return next(new Error(Errors.InvalidChain));
   }
 
+  const encodedAddress = chain.base === 'substrate'
+    ? AddressSwapper({ address: req.body.address, currentPrefix: chain.ss58_prefix })
+    : req.body.address;
+
   const existingAddress = await models.Address.scope('withPrivateData').findOne({
-    where: { chain: req.body.chain, address: req.body.address }
+    where: { chain: req.body.chain, address: encodedAddress }
   });
 
   if (existingAddress) {
@@ -66,7 +71,7 @@ const createAddress = async (models, req: Request, res: Response, next: NextFunc
       const newObj = await models.Address.createWithToken(
         req.user ? req.user.id : null,
         req.body.chain,
-        req.body.address,
+        encodedAddress,
         req.body.keytype
       );
 

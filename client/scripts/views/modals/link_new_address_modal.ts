@@ -348,10 +348,7 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
 
       if (!vnode.state.error) {
         try {
-          vnode.state.newAddress = await createUserWithAddress(AddressSwapper({
-            address,
-            currentPrefix: (app.chain as Substrate).chain.ss58Format,
-          }), vnode.state.isEd25519 ? 'ed25519' : undefined, targetCommunity);
+          vnode.state.newAddress = await createUserWithAddress(address, vnode.state.isEd25519 ? 'ed25519' : undefined, targetCommunity);
         } catch (err) {
           vnode.state.error = err.responseJSON ? err.responseJSON.error : 'Failed to create user.';
         }
