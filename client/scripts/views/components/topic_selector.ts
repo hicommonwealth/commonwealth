@@ -3,6 +3,7 @@ import 'components/topic_selector.scss';
 import m from 'mithril';
 import { SelectList, ListItem, Callout, Button, Icons } from 'construct-ui';
 import { OffchainTopic } from 'models';
+import BN from 'bn.js';
 
 const TopicSelector: m.Component<{
   defaultTopic?: OffchainTopic | string | boolean;
@@ -57,7 +58,7 @@ const TopicSelector: m.Component<{
     const addTopic = (topic?) => {
       const newTopic = topic || (document.getElementsByClassName('autocomplete-topic-input')[0]
         .firstChild as HTMLInputElement).value;
-      topics.push({ name: newTopic, id: null, description: '', telegram: '', token_threshold: 0 });
+      topics.push({ name: newTopic, id: null, description: '', telegram: '', token_threshold: new BN(0) });
       setTimeout(() => { selectedTopic = newTopic; m.redraw(); }, 1);
       updateFormData(newTopic);
       if (!topic) manuallyClosePopover();

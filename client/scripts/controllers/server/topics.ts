@@ -4,9 +4,10 @@ import _ from 'lodash';
 import { TopicStore } from 'stores';
 import { OffchainTopic } from 'models';
 import app from 'state';
+import BN from 'bn.js';
 
 const modelFromServer = (topic) => {
-  return new OffchainTopic(topic.name, topic.id, topic.description, topic.telegram, topic.community_id, topic.chain_id, topic.token_threshold);
+  return new OffchainTopic(topic.name, topic.id, topic.description, topic.telegram, topic.community_id, topic.chain_id, new BN(topic.token_threshold));
 };
 
 class TopicsController {
@@ -47,7 +48,7 @@ class TopicsController {
     }
   }
 
-  public async setTokenThreshold(topic: OffchainTopic, token_threshold: number) {
+  public async setTokenThreshold(topic: OffchainTopic, token_threshold: string) {
     try {
       const response = await $.post(`${app.serverUrl()}/setTopicThreshold`, {
         'topic_id': topic.id,
@@ -86,7 +87,7 @@ class TopicsController {
     }
   }
 
-  public async add(name: string, description: string, telegram: string, token_threshold: number = 0) {
+  public async add(name: string, description: string, telegram: string, token_threshold: string = '0') {
     try {
       const chainOrCommObj = (app.activeChainId())
         ? { 'chain': app.activeChainId() }

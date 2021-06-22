@@ -30,14 +30,14 @@ const createTopic = async (models, req, res: Response, next: NextFunction) => {
 
   const chainOrCommObj2 = community ? { community_id: community.id } : { chain_id: chain.id };
 
-  const token_threshold = parseInt(req.body.token_threshold, 10);
-  if (Number.isNaN(token_threshold)) {
+  const token_threshold_test = parseInt(req.body.token_threshold, 10);
+  if (Number.isNaN(token_threshold_test)) {
     return next(new Error(Errors.InvalidTokenThreshold));
   }
   const options = {
     name: req.body.name,
     description: req.body.description,
-    token_threshold,
+    token_threshold: req.body.token_threshold,
     ...chainOrCommObj2,
   };
 

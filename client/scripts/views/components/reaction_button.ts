@@ -8,6 +8,8 @@ import app, { LoginState } from 'state';
 import { IUniqueId, Proposal, OffchainComment, OffchainThread, AnyProposal, AddressInfo } from 'models';
 import User from 'views/components/widgets/user';
 import Token from 'controllers/chain/ethereum/token/adapter';
+import BN from 'bn.js';
+
 import SelectAddressModal from '../modals/select_address_modal';
 import LoginModal from '../modals/login_modal';
 
@@ -36,9 +38,12 @@ const ReactionButton: m.Component<{
 
     const isCommunity = !!app.activeCommunityId();
 
-    const tokenPostingThreshold = post instanceof OffchainThread ? app.topics.getByName(post.topic.name, app.activeId()).token_threshold : 0;
+    const tokenBalance = (app.chain as Token).tokenBalance;
+    const tokenPostingThreshold = post instanceof OffchainThread ? app.topics.getByName(post.topic.name, app.activeId()).token_threshold : new BN(0);
     const disabled = vnode.state.loading
-      || (!isCommunity && (app.chain as Token).isToken && tokenPostingThreshold > (app.chain as Token).tokenBalance);
+      || tokenBalance == null
+      || (!isCommunity && (app.chain as Token).isToken && tokenPostingThreshold
+       && tokenPostingThreshold.gt(tokenBalance));
     const activeAddress = app.user.activeAccount?.address;
     const rxn = reactions.find((r) => r.reaction && r.author === activeAddress);
     const hasReacted : boolean = !!rxn;

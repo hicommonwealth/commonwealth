@@ -1,3 +1,4 @@
+import BN from 'bn.js';
 class OffchainTopic {
   public readonly name: string;
   public readonly id: number;
@@ -5,7 +6,7 @@ class OffchainTopic {
   public readonly telegram: string;
   public readonly communityId?: string;
   public readonly chainId?: string;
-  public readonly token_threshold?: number;
+  public readonly token_threshold?: BN;
 
   constructor(name, id, description, telegram, communityId, chainId, token_threshold) {
     this.name = name;

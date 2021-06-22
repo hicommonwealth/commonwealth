@@ -5,6 +5,7 @@ import EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import { ChainBase, IChainAdapter, NodeInfo } from 'models';
 import { IApp } from 'state';
+import BN from 'bn.js';
 
 import EthereumTokenChain from './chain';
 import TokenApi from './api';
@@ -19,7 +20,7 @@ export default class Token extends IChainAdapter<EthereumCoin, EthereumAccount> 
   public chain: EthereumTokenChain;
   public accounts: EthereumAccounts;
   public hasToken: boolean = false;
-  public tokenBalance: number = 0;
+  public tokenBalance: BN = new BN(0);
 
   constructor(meta: NodeInfo, app: IApp) {
     super(meta, app);
@@ -59,6 +60,6 @@ export default class Token extends IChainAdapter<EthereumCoin, EthereumAccount> 
     const account = this.accounts.get(activeAddress);
     const balance = await account.tokenBalance(this.contractAddress);
     this.hasToken = balance && !balance.isZero();
-    this.tokenBalance = balance.toNumber();
+    this.tokenBalance = balance;
   }
 }

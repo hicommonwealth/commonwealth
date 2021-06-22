@@ -4,22 +4,22 @@ import m from 'mithril';
 import app from 'state';
 import $ from 'jquery';
 import { Button, Input, Form, FormGroup, FormLabel } from 'construct-ui';
-
+import BN from 'bn.js';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { CompactModalExitButton } from 'views/modal';
-
+import { expandTokenAmount } from 'helpers';
 interface INewTopicModalForm {
   id: number,
   name: string,
   description: string,
-  token_threshold: number
+  token_threshold: string
 }
 
 const NewTopicModal: m.Component<{
   id: number,
   name: string,
   description: string,
-  token_threshold: number
+  token_threshold: string
 }, {
   error: any,
   form: INewTopicModalForm,
@@ -70,7 +70,7 @@ const NewTopicModal: m.Component<{
             }),
           ]),
           m(FormGroup, [
-            m(FormLabel, { for: 'token_threshold' }, 'Number of tokens needed to post'),
+            m(FormLabel, { for: 'token_threshold' }, `Number of tokens needed to post (${app.chain.meta.chain.symbol})`),
             m(Input, {
               title: 'Token threshold',
               class: 'topic-form-token-threshold',
@@ -79,7 +79,7 @@ const NewTopicModal: m.Component<{
               value: vnode.state.form.token_threshold,
               oninput: (e) => {
                 // restrict it to numerical input
-                if (e.target.value === '' || /^-?\d+$/.test(e.target.value)) {
+                if (e.target.value === '' || /^\d+\.?\d*$/.test(e.target.value)) {
                   vnode.state.form.token_threshold = (e.target as any).value;
                 }
               }
@@ -94,7 +94,7 @@ const NewTopicModal: m.Component<{
               if (!vnode.state.form.name.trim()) return;
               app.topics.add(
                 vnode.state.form.name, vnode.state.form.description, null,
-                vnode.state.form.token_threshold
+                expandTokenAmount(vnode.state.form.token_threshold, app.chain.meta.chain.decimals)
               ).then(() => {
                 vnode.state.saving = false;
                 m.redraw();

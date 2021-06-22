@@ -7,9 +7,9 @@ module.exports = {
         'OffchainTopics',
         'token_threshold',
         {
-          type: Sequelize.INTEGER,
+          type: Sequelize.STRING,
           allowNull: false,
-          defaultValue: 0,
+          defaultValue: '0',
         },
         { transaction: t }
       );
@@ -22,9 +22,9 @@ module.exports = {
         'OffchainTopics',
         'token_threshold',
         {
-          type: Sequelize.INTEGER,
+          type: Sequelize.STRING,
           allowNull: false,
-          defaultValue: 0,
+          defaultValue: '0',
         },
         { transaction: t }
       );

@@ -27,11 +27,12 @@ class ChainInfo {
   public members: RoleInfo[];
   public type: string;
   public readonly ss58Prefix: string;
+  public decimals: number;
 
   constructor({
     id, network, symbol, name, iconUrl, description, website, discord, element, telegram, github,
     customDomain, blockExplorerIds, collapsedOnHomepage, featuredTopics, topics, adminsAndMods,
-    base, ss58_prefix, type
+    base, ss58_prefix, type, decimals
   }) {
     this.id = id;
     this.network = network;
@@ -53,6 +54,7 @@ class ChainInfo {
     this.adminsAndMods = adminsAndMods || [];
     this.type = type;
     this.ss58Prefix = ss58_prefix;
+    this.decimals = decimals;
   }
 
   public static fromJSON({
@@ -75,7 +77,8 @@ class ChainInfo {
     adminsAndMods,
     base,
     ss58_prefix,
-    type
+    type,
+    decimals
   }) {
     let blockExplorerIdsParsed;
     try {
@@ -104,7 +107,8 @@ class ChainInfo {
       adminsAndMods,
       base,
       ss58_prefix,
-      type
+      type,
+      decimals: parseInt(decimals, 10)
     });
   }
 

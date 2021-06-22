@@ -13,6 +13,8 @@ import QuillEditor from 'views/components/quill_editor';
 import User from 'views/components/widgets/user';
 
 import Token from 'controllers/chain/ethereum/token/adapter';
+import BN from 'bn.js';
+import { formatTokenAmount } from 'helpers';
 import { GlobalStatus } from './body';
 
 const CreateComment: m.Component<{
@@ -121,7 +123,6 @@ const CreateComment: m.Component<{
     )?.token_threshold;
 
     const { error, sendingComment, uploadsInProgress } = vnode.state;
-
     return m('.CreateComment', {
       class: parentType === CommentParent.Comment ? 'new-comment-child' : 'new-thread-child'
     }, [
@@ -170,8 +171,9 @@ const CreateComment: m.Component<{
               tabindex: vnode.attrs.tabindex,
             }),
             m('.token-requirement', [
-              tokenPostingThreshold > 0
-                ? `Commenting in ${activeTopicName} requires ${tokenPostingThreshold} ${app.chain.meta.chain.symbol}`
+              tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0))
+                ? `Commenting in ${activeTopicName} requires 
+                ${formatTokenAmount(tokenPostingThreshold.toString(), app.chain.meta.chain.decimals)} ${app.chain.meta.chain.symbol}`
                 : null
             ]),
             m('.form-bottom', [
@@ -180,7 +182,7 @@ const CreateComment: m.Component<{
                 type: 'submit',
                 compact: true,
                 disabled: getSetGlobalEditingStatus(GlobalStatus.Get) || sendingComment || uploadsInProgress > 0
-                   || (app.activeChainId() && (app.chain as Token).isToken && tokenPostingThreshold > (app.chain as Token).tokenBalance),
+                   || (app.activeChainId() && (app.chain as Token).isToken && tokenPostingThreshold.gt((app.chain as Token).tokenBalance)),
                 rounded: true,
                 onclick: submitComment,
                 label: (uploadsInProgress > 0)

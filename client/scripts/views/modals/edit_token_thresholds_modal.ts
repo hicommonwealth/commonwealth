@@ -1,12 +1,14 @@
 import 'modals/new_topic_modal.scss';
-
+import 'modals/edit_token_thresholds_modal.scss';
 import m from 'mithril';
 import app from 'state';
 import $ from 'jquery';
-import { Button, Input, Form, FormGroup, FormLabel } from 'construct-ui';
+import { Button, Col, Input, Form, FormGroup, FormLabel, Grid, Spinner } from 'construct-ui';
+import BN from 'bn.js';
 
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { CompactModalExitButton } from 'views/modal';
+import { expandTokenAmount, formatTokenAmount } from 'helpers';
 import { OffchainTopic } from '../../models';
 
 interface INewTopicModalForm {
@@ -16,31 +18,33 @@ interface INewTopicModalForm {
   token_threshold: number
 }
 
-const EditTokenThresholdsRow: m.Component<{ topic: OffchainTopic }, { new_token_threshold: number }> = {
+const EditTokenThresholdsRow: m.Component<{ topic: OffchainTopic }, { new_token_threshold: string }> = {
   view: (vnode) => {
     const { topic } = vnode.attrs;
+    const decimals = app.chain.meta.chain.decimals ? app.chain.meta.chain.decimals : 18;
+
     if (!vnode.state.new_token_threshold) {
-      vnode.state.new_token_threshold = topic.token_threshold;
+      vnode.state.new_token_threshold = formatTokenAmount(topic.token_threshold.toString(), decimals);
     }
+
     return m(Form, [
-      m('tr', [
-        m('td', [ topic.name ]),
-        m('td', [ m(Input, {
-          value: vnode.state.new_token_threshold,
-          oninput: (e) => {
-            vnode.state.new_token_threshold = (e.target as any).value;
-          },
-        }) ]),
-        m('td', [ m(Button, {
-          label: 'Update',
-          intent: 'primary',
-          rounded: true,
-          onclick: async (e) => {
-            e.preventDefault();
-            app.topics.setTokenThreshold(topic, vnode.state.new_token_threshold);
-          }
-        })])
-      ])
+      m('.topic-name', [ topic.name ]),
+      m('div',  [ m(Input, {
+        value: vnode.state.new_token_threshold,
+        oninput: (e) => {
+          vnode.state.new_token_threshold = (e.target as any).value;
+        },
+      }),
+      m(Button, {
+        label: 'Update',
+        intent: 'primary',
+        rounded: true,
+        onclick: async (e) => {
+          e.preventDefault();
+          app.topics.setTokenThreshold(topic, expandTokenAmount(vnode.state.new_token_threshold.toString(), decimals));
+        },
+      })
+      ]),
     ]);
   }
 };
@@ -64,7 +68,7 @@ const EditTokenThresholdsModal: m.Component<{
 
     const topics =  app.topics.getByCommunity(app.activeId());
 
-    return m('.NewTopicModal', [
+    return m('.EditTokenThresholdsModal', [
       m('.compact-modal-title', [
         m('h3', 'Edit token thresholds'),
         m(CompactModalExitButton),
@@ -75,7 +79,7 @@ const EditTokenThresholdsModal: m.Component<{
         return 0;
       }).map((topic) => {
         return m(EditTokenThresholdsRow, { topic });
-      })),
+      }))
     ]);
   }
 };
