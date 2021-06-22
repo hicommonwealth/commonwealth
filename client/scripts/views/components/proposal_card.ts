@@ -145,7 +145,6 @@ const ProposalCard: m.Component<{ proposal: AnyProposal, injectedContent? }> = {
         },
       }, [
         m('.proposal-card-metadata', [
-          // tag
           m(Tag, {
             label: [
               chainEntityTypeToProposalShortName(proposalSlugToChainEntityType(proposal.slug)),
@@ -186,9 +185,7 @@ const ProposalCard: m.Component<{ proposal: AnyProposal, injectedContent? }> = {
             size: 'xs',
             class: 'proposal-became-tag',
           }),
-          // title
           m('.proposal-title', proposal.title),
-          // metadata
           proposal instanceof SubstrateTreasuryProposal && m('.proposal-amount', proposal.value?.format(true)),
           proposal instanceof SubstrateDemocracyReferendum && m('.proposal-amount', proposal.threshold),
           proposal instanceof AaveProposal && m('p.card-subheader.proposal-description', proposal.ipfsData?.shortDescription || 'Proposal'),
