@@ -2,11 +2,9 @@ import 'pages/view_proposal/index.scss';
 import 'components/proposals/voting_results.scss';
 import 'components/proposals/voting_actions.scss';
 
-import $ from 'jquery';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 import { Spinner, Button } from 'construct-ui';
-import getProvider from '@snapshot-labs/snapshot.js/src/utils/provider';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';

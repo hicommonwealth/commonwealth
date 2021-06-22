@@ -5,7 +5,6 @@ import app from 'state';
 import $ from 'jquery';
 import { Button } from 'construct-ui';
 import { bufferToHex } from 'ethereumjs-util';
-import { version } from '@snapshot-labs/snapshot.js/src/constants.json';
 
 import { _explorer, _n, _shorten } from 'helpers/snapshot_utils/snapshot_utils';
 import { notifyError } from 'controllers/app/notifications';
@@ -81,7 +80,7 @@ const ConfirmSnapshotVoteModal: m.Component<{
 							const msg: any = {
 								address: author.address,
 								msg: JSON.stringify({
-									version,
+									version: '0.1.3',
 									timestamp: (Date.now() / 1e3).toFixed(),
 									space: space.key,
 									type: 'vote',

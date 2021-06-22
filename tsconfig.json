@@ -19,9 +19,6 @@
     "lib": [
       "esnext",
       "dom",
-      "dom.iterable",
-      "scripthost",
-      "es2018",
     ]
   },
   "include": [

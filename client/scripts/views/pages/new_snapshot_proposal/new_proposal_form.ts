@@ -10,10 +10,7 @@ import DatePicker from 'mithril-datepicker';
 // import TimePicker from 'mithril-timepicker';
 import moment from 'moment';
 import { bufferToHex } from 'ethereumjs-util';
-import getProvider from '@snapshot-labs/snapshot.js/src/utils/provider';
-import { getBlockNumber, signMessage } from '@snapshot-labs/snapshot.js/src/utils/web3';
-import { version } from '@snapshot-labs/snapshot.js/src/constants.json';
-import { getScores } from 'helpers/snapshot_utils/snapshot_utils';
+import snapshotJs from '@snapshot-labs/snapshot.js';
 
 import app from 'state';
 import snapshotClient from 'helpers/snapshot_utils/snapshot_client';
@@ -95,14 +92,14 @@ const newThread = async (
       : JSON.stringify(quillEditorState.editor.getContents());
 
   form.body = bodyText;
-  form.snapshot = await getBlockNumber(getProvider(space.network));
+  form.snapshot = await snapshotJs.utils.getBlockNumber(snapshotJs.utils.getProvider(space.network));
   form.metadata.network = space.network;
   form.metadata.strategies = space.strategies;
 
   const msg: any = {
     address: author.address,
     msg: JSON.stringify({
-      version,
+      version: '0.1.3',
       timestamp: (Date.now() / 1e3).toFixed(),
       space: space.key,
       type: 'proposal',
@@ -173,11 +170,11 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
       );
       let space = spaces[vnode.attrs.snapshotId];
 
-      getScores(
+      snapshotJs.utils.getScores(
         space.key,
         space.strategies,
         space.network,
-        getProvider(space.network),
+        snapshotJs.utils.getProvider(space.network),
         [app.user.activeAccount.address]
       ).then(response => {
         let scores = response
