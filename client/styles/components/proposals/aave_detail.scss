@@ -2,7 +2,7 @@
 
 .AaveProposalDetail {
     display: grid;
-    grid-template-rows: 1fr 1fr 1fr;
+    grid-template-rows: 3fr 4fr 3fr;
     row-gap: 23px;
     max-height: 250px;
     > div {
@@ -33,7 +33,7 @@
     }
     .aave-voting, .aave-requirements {
         flex-direction: column;
-        .aave-support, .aave-turnout,
+        .aave-support, .aave-turnout, .aave-differential,
         .aave-turnout-requirement,
         .aave-differential-requirement {
             display: grid;

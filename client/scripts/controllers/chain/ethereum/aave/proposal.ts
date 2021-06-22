@@ -173,7 +173,7 @@ export default class AaveProposal extends Proposal<
     const yesPower = sumVotes(votes.filter((v) => v.choice));
     const noPower = sumVotes(votes.filter((v) => !v.choice));
     if (yesPower.isZero() && noPower.isZero()) return 0;
-    const supportBn = yesPower.muln(1000).div(yesPower.add(noPower));
+    const supportBn = yesPower.muln(10000).div(yesPower.add(noPower));
     return +supportBn / 10000;
   }
 
@@ -204,7 +204,7 @@ export default class AaveProposal extends Proposal<
   }
 
   public get minimumVoteDifferential() {
-    return +this._Executor.voteDifferential / 1000;
+    return +this._Executor.voteDifferential / 10000;
   }
 
   private _votingSupplyAtStart: BN;

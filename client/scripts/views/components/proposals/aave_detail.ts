@@ -2,7 +2,10 @@ import 'components/proposals/aave_detail.scss';
 
 import AaveProposal from 'client/scripts/controllers/chain/ethereum/aave/proposal';
 import m from 'mithril';
-import moment from 'moment';
+
+const roundVote = (percentage) => {
+  return percentage.toFixed(2).split('.0')[0].slice(0, 4)
+}
 
 const AaveDetail = {
   view: (vnode: m.Vnode<{ proposal: AaveProposal, statusClass: string, statusText: any }>) => {
@@ -33,31 +36,38 @@ const AaveDetail = {
         m('.card-subheader', 'Voting'),
         m('.aave-turnout', [
          m('p.detail-highlight.emphasize', [
-           (proposal.turnout * 100).toFixed(2).slice(0, 4),
+           roundVote(proposal.turnout * 100),
            '%',
          ]),
          m('p', ' of token holders'),
-       ]),
+        ]),
         m('.aave-support', [
           m('p.detail-highlight.emphasize', [
-            (proposal.support * 100).toFixed(2).slice(0, 4),
+            roundVote(proposal.support * 100),
             '%',
           ]),
           m('p', ' in favor'),
+        ]),
+        m('.aave-differential', [
+          m('p.detail-highlight.emphasize', [
+            (proposal.voteDifferential * 100),
+            '%',
+          ]),
+          m('p', ' differential'),
         ]),
       ]),
       m('.aave-requirements', [
         m('.card-subheader', 'Required to pass'),
         m('.aave-turnout-requirement', [
           m('p.detail-highlight.emphasize', [
-            (proposal.minimumQuorum * 100).toFixed(0),
+            (proposal.minimumQuorum * 100),
             '%',
           ]),
           m('p', ' of token holders'),
         ]),
         m('.aave-differential-requirement', [
           m('p.detail-highlight.emphasize', [
-            (proposal.minimumVoteDifferential * 100).toFixed(0),
+            (proposal.minimumVoteDifferential * 100),
             '%',
           ]),
           m('p', ' differential')
