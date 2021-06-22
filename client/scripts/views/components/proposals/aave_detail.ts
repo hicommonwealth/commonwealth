@@ -2,10 +2,11 @@ import 'components/proposals/aave_detail.scss';
 
 import AaveProposal from 'client/scripts/controllers/chain/ethereum/aave/proposal';
 import m from 'mithril';
+import User from '../widgets/user';
 
 const roundVote = (percentage) => {
-  return percentage.toFixed(2).split('.0')[0].slice(0, 4)
-}
+  return percentage.toFixed(2).split('.0')[0].slice(0, 4);
+};
 
 const AaveDetail = {
   view: (vnode: m.Vnode<{ proposal: AaveProposal, statusClass: string, statusText: any }>) => {
@@ -22,12 +23,13 @@ const AaveDetail = {
       m('.aave-metadata', [
         m('.aave-author', [
           m('.card-subheader', 'Author'),
-          // TODO: format as User
           proposal.ipfsData?.author
             ? proposal.ipfsData.author.split(' (').map((ele, idx) => {
-              return idx === 0 ? m('p.collapsed-line-height', ele) : m('p.card-subheader', ele.slice(0, ele.length - 1))
+              return idx === 0
+                ? m('p.collapsed-line-height', ele)
+                : m('p.card-subheader', ele.slice(0, ele.length - 1));
             })
-            : m('p', proposal.data.proposer),
+            : m(User, { user: proposal.author, popover: true }),
         ]),
         m('.aave-status', [
           m('.card-subheader', 'Status'),
@@ -37,11 +39,11 @@ const AaveDetail = {
       m('.aave-voting', [
         m('.card-subheader', 'Voting'),
         m('.aave-turnout', [
-         m('p.detail-highlight.emphasize', [
-           roundVote(proposal.turnout * 100),
-           '%',
-         ]),
-         m('p', ' of token holders'),
+          m('p.detail-highlight.emphasize', [
+            roundVote(proposal.turnout * 100),
+            '%',
+          ]),
+          m('p', ' of token holders'),
         ]),
         m('.aave-support', [
           m('p.detail-highlight.emphasize', [
