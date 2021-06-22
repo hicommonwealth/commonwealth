@@ -1,9 +1,14 @@
 @import 'client/styles/shared';
 
 .AaveProposalDetail {
+    display: grid;
+    grid-template-rows: 1fr 1fr 1fr;
+    row-gap: 23px;
+    max-height: 250px;
     > div {
         display: flex;
-        margin-bottom: 23px;
+        max-width: 100%;
+        overflow: hidden;
         p {
             display: flex;
             justify-content: left;
@@ -12,20 +17,35 @@
     p {
         font-size: 18px;
     }
+    .aave-metadata {
+        display: flex;
+        max-width: 100%;
+        .aave-author {
+            max-width: calc(70% - 15px);
+            padding-right: 15px;
+            .detail-highlight {
+                overflow-x: hidden;
+            }
+        }
+        .aave-status {
+            max-width: calc(30%);
+        }
+    }
     .aave-voting, .aave-requirements {
         flex-direction: column;
+        .aave-support, .aave-turnout,
+        .aave-turnout-requirement,
+        .aave-differential-requirement {
+            display: grid;
+            grid-template-columns: 52px auto;
+            .detail-highlight {
+                justify-self: end;
+            }
+        }
     }
     .proposal-injected-status {
-        font-weight: 600;
-        line-height: 1.1;
         margin-bottom: 4px;
         color: $text-color-black;
-        &.pass {
-            color: $positive-bg-color;
-        }
-        &.fail {
-            color: $negative-bg-color;
-        }
     }
     .b-box {
         border: 1px solid $border-color-lightest;
@@ -51,16 +71,9 @@
     .cui-button + .cui-button {
         margin-top: 6px;
     }
-    .card-subheader {
-        color: #666666;
-        margin-bottom: 5px;
-        &.proposal-description {
-            margin-bottom: 23px;
-        }
-    }
     .detail-highlight {
         color: #4723AD;
-        padding-right: 13px;
+        padding-right: 8px;
         &.emphasize {
             font-weight: 600;
         }

@@ -238,9 +238,6 @@ export default class AaveProposal extends Proposal<
     if (this.state === AaveTypes.ProposalState.EXPIRED) {
       this.complete(this._Gov.store);
     }
-    if (this.completed) {
-      return;
-    }
 
     try {
       const totalVotingSupplyAtStart = await this._Gov.api.Strategy.getTotalVotingSupplyAt(this.data.startBlock);

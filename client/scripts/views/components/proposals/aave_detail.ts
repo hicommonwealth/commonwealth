@@ -16,60 +16,52 @@ const AaveDetail = {
         e.stopPropagation();
       }
     }, [
-      m('p', [
-        m('.card-subheader.proposal-description', [
-          proposal.ipfsData?.shortDescription || '',
-        ]),
-      ]),
       m('.aave-metadata', [
-        m('div', [
+        m('.aave-author', [
           m('.card-subheader', 'Author'),
-          m('p', [
-            m('.detail-highlight', [
-              // TODO: format as User
-              proposal.ipfsData?.author || proposal.data.proposer,
-            ]),
+          m('p.detail-highlight', [
+            // TODO: format as User
+            proposal.ipfsData?.author || proposal.data.proposer,
           ]),
         ]),
-        m('div', [
+        m('.aave-status', [
           m('.card-subheader', 'Status'),
           m('.proposal-injected-status', { class: statusClass }, statusText),
         ]),
       ]),
       m('.aave-voting', [
         m('.card-subheader', 'Voting'),
-        m('p', [
-          m('.detail-highlight.emphasize', [
-            proposal.support,
+        m('.aave-turnout', [
+         m('p.detail-highlight.emphasize', [
+           (proposal.turnout * 100).toFixed(2).slice(0, 4),
+           '%',
+         ]),
+         m('p', ' of token holders'),
+       ]),
+        m('.aave-support', [
+          m('p.detail-highlight.emphasize', [
+            (proposal.support * 100).toFixed(2).slice(0, 4),
             '%',
           ]),
-          ' in favor',
-        ]),
-        proposal.turnout
-        && m('p', [
-          m('.detail-highlight.emphasize', [
-            proposal.turnout,
-            '%',
-          ]),
-          ' of token holders voted',
+          m('p', ' in favor'),
         ]),
       ]),
       m('.aave-requirements', [
         m('.card-subheader', 'Required to pass'),
-        m('p', [
-          m('.detail-highlight.emphasize', [
-            proposal.minimumQuorum * 100,
+        m('.aave-turnout-requirement', [
+          m('p.detail-highlight.emphasize', [
+            (proposal.minimumQuorum * 100).toFixed(0),
             '%',
           ]),
-          ' of token holders',
+          m('p', ' of token holders'),
         ]),
-        m('p', [
-          m('.detail-highlight.emphasize', [
-            proposal.voteDifferential * 100,
+        m('.aave-differential-requirement', [
+          m('p.detail-highlight.emphasize', [
+            (proposal.voteDifferential * 100).toFixed(0),
             '%',
           ]),
-          ' differential'
-        ]),
+          m('p', ' differential')
+        ])
       ])
     ]);
   }

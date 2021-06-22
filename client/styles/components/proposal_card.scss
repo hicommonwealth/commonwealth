@@ -10,9 +10,21 @@
         min-height: 260px;
         width: 100%;
     }
+    .proposal-card-metadata {
+        min-height: 115px;
+        max-height: 115px;
+        margin-bottom: 18px;
+        overflow-y: hidden;
+    }
     .proposal-injected {
         margin-bottom: 4px;
         padding: 0 2px;
+    }
+    .card-subheader {
+        color: #666666;
+        margin-bottom: 5px;
+        font-size: 14px;
+        line-height: 1.1;
     }
     .cui-tag {
         background: #F6F6F6;
