@@ -194,9 +194,9 @@ export default class AaveProposal extends Proposal<
     const votes = this.getVotes();
     const yesPower = sumVotes(votes.filter((v) => v.choice));
     const noPower = sumVotes(votes.filter((v) => !v.choice));
-    if (yesPower.isZero() && noPower.isZero()) return 0;
-    const differential = yesPower.sub(noPower).muln(10000).div(this._votingSupplyAtStart);
-    return +differential / 10000;
+    const forProportion = yesPower.muln(10000).div(this._votingSupplyAtStart);
+    const againstProportion = noPower.muln(10000).div(this._votingSupplyAtStart);
+    return (+forProportion - +againstProportion) / 10000;
   }
 
   public get minimumQuorum() {
