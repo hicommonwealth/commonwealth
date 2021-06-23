@@ -41,6 +41,7 @@ import { fetchStats } from './server/routes/getEdgewareLockdropStats';
 import migrateChainEntities from './server/scripts/migrateChainEntities';
 import migrateIdentities from './server/scripts/migrateIdentities';
 import migrateCouncillorValidatorFlags from './server/scripts/migrateCouncillorValidatorFlags';
+import addDecimalsToTokens from './server/scripts/addMissingDecimalsToTokens';
 
 // set up express async error handling hack
 require('express-async-errors');
@@ -55,13 +56,15 @@ async function main() {
   const SHOULD_UPDATE_EVENTS = process.env.UPDATE_EVENTS === 'true';
   const SHOULD_UPDATE_BALANCES = process.env.UPDATE_BALANCES === 'true';
   const SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS = process.env.UPDATE_EDGEWARE_LOCKDROP_STATS === 'true';
+  const SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS = process.env.SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS === 'true';
 
   const NO_CLIENT_SERVER = process.env.NO_CLIENT === 'true'
     || SHOULD_SEND_EMAILS
     || SHOULD_RESET_DB
     || SHOULD_UPDATE_EVENTS
     || SHOULD_UPDATE_BALANCES
-    || SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS;
+    || SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS
+    || SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS;
 
   // CLI parameters used to configure specific tasks
   const SKIP_EVENT_CATCHUP = process.env.SKIP_EVENT_CATCHUP === 'true';
@@ -98,7 +101,6 @@ async function main() {
       return 1;
     }
   };
-
   let rc = null;
   if (RUN_AS_LISTENER) {
     // hack to keep process running indefinitely
@@ -132,6 +134,15 @@ async function main() {
       rc = 0;
     } catch (e) {
       log.error('Failed adding Lockdrop statistics into the DB: ', e.message);
+      rc = 1;
+    }
+  } else if (SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS) {
+    try {
+      const numChanged = await addDecimalsToTokens(models);
+      log.info(`Finished adding decimals, ${numChanged} rows updated`);
+      rc = 0;
+    } catch (e) {
+      log.error('Failed adding missing decimals to tokens: ', e.message);
       rc = 1;
     }
   } else if (ENTITY_MIGRATION) {

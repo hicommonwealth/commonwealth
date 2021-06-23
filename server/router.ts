@@ -119,7 +119,6 @@ import TokenBalanceCache from './util/tokenBalanceCache';
 import bulkEntities from './routes/bulkEntities';
 import { getTokensFromLists } from './routes/getTokensFromLists';
 import getTokenForum from './routes/getTokenForum';
-import addMissingDecimalsToTokens from './routes/addMissingDecimalsToTokens';
 import getSubstrateSpec from './routes/getSubstrateSpec';
 import editSubstrateSpec from './routes/editSubstrateSpec';
 
@@ -181,7 +180,6 @@ function setupRouter(
   router.get('/communityStats', passport.authenticate('jwt', { session: false }), communityStats.bind(this, models));
   router.get('/getTokensFromLists', getTokensFromLists.bind(this, models, tokenBalanceCache));
   router.get('/getTokenForum', getTokenForum.bind(this, models, tokenBalanceCache));
-  router.get('/addMissingDecimalsToTokens', addMissingDecimalsToTokens.bind(this, models));
 
   // offchain threads
   // TODO: Change to POST /thread
