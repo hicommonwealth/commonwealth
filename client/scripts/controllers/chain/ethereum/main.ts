@@ -2,14 +2,13 @@ import EthereumChain from 'controllers/chain/ethereum/chain';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
-import { IChainAdapter, ChainBase, ChainClass, NodeInfo } from 'models';
+import { IChainAdapter, ChainBase, NodeInfo } from 'models';
 import { IApp } from 'state';
 
 // TODO: hook up underlyung functionality of this boilerplate
 //       (e.g., EthereumChain and EthereumAccount methods, etc.)
 class Ethereum extends IChainAdapter<EthereumCoin, EthereumAccount> {
   public readonly base = ChainBase.Ethereum;
-  public readonly class = ChainClass.Ethereum;
   public chain: EthereumChain;
   public accounts: EthereumAccounts;
 

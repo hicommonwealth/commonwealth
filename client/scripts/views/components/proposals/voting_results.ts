@@ -1,8 +1,5 @@
 import 'components/proposals/voting_results.scss';
-import app from 'state';
 import m from 'mithril';
-import { VoteOutcome } from '@edgeware/node-types';
-import { u8aToString } from '@polkadot/util';
 
 import { formatCoin } from 'adapters/currency'; // TODO: remove formatCoin, only use coins.format()
 import User from 'views/components/widgets/user';

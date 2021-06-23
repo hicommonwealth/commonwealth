@@ -31,6 +31,7 @@ const createReaction = async (
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));
+<<<<<<< HEAD
   const { reaction, comment_id, proposal_id, thread_id } = req.body;
 
   if (chain && chain.type === 'token') {
@@ -62,6 +63,8 @@ const createReaction = async (
       }
     }
   }
+=======
+>>>>>>> master
 
   let proposal;
   let root_type;

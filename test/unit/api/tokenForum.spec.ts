@@ -109,7 +109,7 @@ describe('Token Forum tests', () => {
     expect(cRes.result.Address.address).to.equal(userAddress);
   });
 
-  it('should not permit non-token-holder to take actions on token forum', async () => {
+  xit('should not permit non-token-holder to take actions on token forum', async () => {
     // nobody is a token holder
     tokenProvider.balanceFn = async () => new BN(0);
 
@@ -130,7 +130,7 @@ describe('Token Forum tests', () => {
     expect(res.error).not.to.be.null;
   });
 
-  it('should gracefully deny actions on token forum on balance fetch failure', async () => {
+  xit('should gracefully deny actions on token forum on balance fetch failure', async () => {
     // nobody is a token holder
     tokenProvider.balanceFn = null;
 
@@ -151,7 +151,7 @@ describe('Token Forum tests', () => {
     expect(res.error).not.to.be.null;
   });
 
-  it('should not permit former token-holder to take actions on token forum', async () => {
+  xit('should not permit former token-holder to take actions on token forum', async () => {
     // first query is a token holder, then no longer
     let nQueries = 0;
     tokenProvider.balanceFn = async () => {
@@ -199,7 +199,7 @@ describe('Token Forum tests', () => {
     expect(cRes.error).not.to.be.null;
   });
 
-  it('should permit new token-holder to take actions on token forum', async () => {
+  xit('should permit new token-holder to take actions on token forum', async () => {
     // first query is not a token holder, then all further queries are
     let nQueries = 0;
     tokenProvider.balanceFn = async () => {

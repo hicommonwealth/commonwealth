@@ -1,4 +1,5 @@
 import * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
+import { RegisteredTypes } from '@polkadot/types/types';
 
 import { AddressAttributes } from './address';
 import { ChainNodeInstance, ChainNodeAttributes } from './chain_node';
@@ -29,6 +30,7 @@ export interface ChainAttributes {
   customDomain: string;
   type: string;
   decimals?: number;
+  substrate_spec: RegisteredTypes;
 
   // associations
   ChainNodes?: ChainNodeAttributes[] | ChainNodeAttributes['id'][];
@@ -75,6 +77,7 @@ export default (
     collapsed_on_homepage: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: true },
     type: { type: dataTypes.STRING, allowNull: false },
     decimals: { type: dataTypes.INTEGER, allowNull: true },
+    substrate_spec: { type: dataTypes.JSONB, allowNull: true },
   }, {
     timestamps: false,
     underscored: true,

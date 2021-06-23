@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import { RegisteredTypes } from '@polkadot/types/types';
 import app from 'state';
 import { RoleInfo, RolePermission } from 'models';
 import { ChainNetwork, ChainBase } from './types';
@@ -28,11 +29,12 @@ class ChainInfo {
   public type: string;
   public readonly ss58Prefix: string;
   public decimals: number;
+  public substrateSpec: RegisteredTypes;
 
   constructor({
     id, network, symbol, name, iconUrl, description, website, discord, element, telegram, github,
     customDomain, blockExplorerIds, collapsedOnHomepage, featuredTopics, topics, adminsAndMods,
-    base, ss58_prefix, type, decimals
+    base, ss58_prefix, type, decimals, substrateSpec
   }) {
     this.id = id;
     this.network = network;
@@ -55,6 +57,7 @@ class ChainInfo {
     this.type = type;
     this.ss58Prefix = ss58_prefix;
     this.decimals = decimals;
+    this.substrateSpec = substrateSpec;
   }
 
   public static fromJSON({
@@ -78,7 +81,8 @@ class ChainInfo {
     base,
     ss58_prefix,
     type,
-    decimals
+    decimals,
+    substrate_spec,
   }) {
     let blockExplorerIdsParsed;
     try {
@@ -108,7 +112,8 @@ class ChainInfo {
       base,
       ss58_prefix,
       type,
-      decimals: parseInt(decimals, 10)
+      decimals: parseInt(decimals, 10),
+      substrateSpec: substrate_spec,
     });
   }
 

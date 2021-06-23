@@ -5,7 +5,7 @@ import { slugify } from 'utils';
 import Token from 'controllers/chain/ethereum/token/adapter';
 
 import { ITXModalData } from './interfaces';
-import { ChainBase, ChainClass } from './types';
+import { ChainBase } from './types';
 import ChainInfo from './ChainInfo';
 import Profile from './Profile';
 
@@ -13,9 +13,7 @@ abstract class Account<C extends Coin> {
   public readonly serverUrl : string;
   public readonly address: string;
   public readonly chain: ChainInfo;
-
   public readonly chainBase: ChainBase;
-  public readonly chainClass: ChainClass;
   public get freeBalance() { return this.balance; }
   public abstract balance: Promise<C>;
   public abstract sendBalanceTx(recipient: Account<C>, amount: C): Promise<ITXModalData> | ITXModalData;
@@ -45,7 +43,6 @@ abstract class Account<C extends Coin> {
     this.app = _app;
     this.chain = chain;
     this.chainBase = (_app.chain) ? _app.chain.base : null;
-    this.chainClass = (_app.chain) ? _app.chain.class : null;
     this.address = address;
     this._profile = _app.profiles.getProfile(chain.id, address);
     this._encoding = encoding;
