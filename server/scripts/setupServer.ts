@@ -1,6 +1,7 @@
 import WebSocket from 'ws';
 import http from 'http';
 import express from 'express';
+import fs from 'fs';
 import { Express } from 'express-serve-static-core';
 import { DEFAULT_PORT } from '../config';
 import setupWebsocketServer from '../socket';
@@ -44,6 +45,9 @@ const setupServer = (app: Express, wss: WebSocket.Server, sessionParser: express
   server.listen(port);
   server.on('error', onError);
   server.on('listening', onListen);
+
+  // initialize nginx
+  fs.closeSync(fs.openSync('/tmp/app-initialized', 'w'));
 };
 
 export default setupServer;
