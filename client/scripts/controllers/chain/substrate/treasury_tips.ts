@@ -18,7 +18,7 @@ class SubstrateTreasuryTips extends ProposalModule<
   private _members: SubstrateAccount[];
   public get members() { return this._members; }
   public isMember(account: SubstrateAccount): boolean {
-    return this._members.find((m) => m.address === account.address) !== undefined;
+    return account && this._members.find((m) => m.address === account.address) !== undefined;
   }
 
   constructor(app: IApp) {
