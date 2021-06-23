@@ -31,6 +31,7 @@ export interface TokenForumMeta {
   name: string;
   symbol: string;
   balanceThreshold?: BN;
+  decimals: number;
 }
 
 export class TokenBalanceProvider {
@@ -74,7 +75,8 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
         address: chain.ChainNodes[0].address,
         name: chain.name,
         symbol: chain.symbol,
-        iconUrl: chain.icon_url
+        iconUrl: chain.icon_url,
+        decimals: chain.decimals
       }));
 
     try {
@@ -87,6 +89,7 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
             name: o.name,
             symbol: o.symbol,
             iconUrl: o.logoURI,
+            decimals: o.decimals
           };
         });
 

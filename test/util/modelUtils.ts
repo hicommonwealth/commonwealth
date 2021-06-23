@@ -302,6 +302,7 @@ export const createTokenMeta = (): TokenForumMeta[] => {
       symbol: 'alex',
       name: 'Alex',
       iconUrl: '',
+      decimals: 18
     }
   ];
 };

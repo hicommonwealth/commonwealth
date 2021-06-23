@@ -52,8 +52,6 @@ const createReaction = async (
           const stage = root_id.substring(0, root_id.indexOf('_'));
           const topic_id = root_id.substring(root_id.indexOf('_') + 1);
           thread = await models.OffchainThread.findOne({ where:{ stage, id: topic_id } });
-        } else if (proposal_id) {
-          // TODO
         }
         const threshold = (await models.OffchainTopic.findOne({ where: { id: thread.topic_id } })).token_threshold;
         const tokenBalance = await tokenBalanceCache.getBalance(chain.id, req.body.address);

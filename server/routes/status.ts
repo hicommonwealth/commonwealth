@@ -11,26 +11,6 @@ import { Erc20DetailedFactory } from '../../eth/types/Erc20DetailedFactory';
 
 const log = factory.getLogger(formatFilename(__filename));
 
-const addDecimalsToTokens = async (models, chains) => {
-  chains.forEach(async (chain) => {
-    if (chain.type === 'token'
-      && (chain.decimals === undefined || chain.decimals === null)) {
-      const chainNode = await models.ChainNode.findOne({
-        where: { chain: chain.id },
-      });
-
-      const web3Provider = new Web3.providers.HttpProvider(`https://mainnet.infura.io/v3/${INFURA_API_KEY}`);
-      const provider = new providers.Web3Provider(web3Provider);
-      const api = Erc20DetailedFactory.connect(chainNode.address, provider);
-      const decimals = await api.decimals();
-
-      chain.decimals = decimals;
-      await chain.save();
-    }
-  });
-  return chains;
-};
-
 const status = async (models, req: Request, res: Response, next: NextFunction) => {
   const { Op } = models.sequelize;
   const [
@@ -48,7 +28,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
           as: 'topics',
         },
       ]
-    }).then((_chains) => addDecimalsToTokens(models, _chains)),
+    }),
     models.ChainNode.findAll({
       include: [
         {
