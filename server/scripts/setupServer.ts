@@ -9,7 +9,7 @@ import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 const setupServer = (app: Express, wss: WebSocket.Server, sessionParser: express.RequestHandler) => {
-  const port = process.env.PORT || DEFAULT_PORT;
+  const port = process.env.LOCAL_PORT || process.env.PORT || DEFAULT_PORT;
   app.set('port', port);
   const server = http.createServer(app);
 
