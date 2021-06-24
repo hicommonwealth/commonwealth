@@ -43,3 +43,18 @@ export const AaveViewProposalDetail: m.Component<{ proposal: AaveProposal }, {}>
     ]);
   }
 };
+
+export const AaveViewProposalSummary: m.Component<{ proposal: AaveProposal }, {}> = {
+  view: (vnode) => {
+    const { proposal } = vnode.attrs;
+    return m('.AaveViewProposalSummary', {
+      onclick: (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }, [
+      m('h3', 'Simple Summary'),
+      m('.aave-summary', proposal.ipfsData.description)
+    ]);
+  }
+};
