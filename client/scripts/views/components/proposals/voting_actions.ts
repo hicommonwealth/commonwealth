@@ -110,17 +110,17 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     const { votingModalOpen } = vnode.state;
-    if (proposal instanceof SubstrateTreasuryProposal) {
-      return;
-      // TODO: Set up actions to create a council or democracy proposal
-      // return m(CannotVote, { action: 'Send to council or democracy' });
-    } else if (!app.isLoggedIn()) {
-      return m(CannotVote, { action: 'Log in to vote' });
-    } else if (!app.user.activeAccount) {
-      return m(CannotVote, { action: 'Connect an address to vote' });
-    } else if (!proposal.canVoteFrom(app.user.activeAccount)) {
-      return m(CannotVote, { action: 'Cannot vote from this address' });
-    }
+    // if (proposal instanceof SubstrateTreasuryProposal) {
+    //   return;
+    //   // TODO: Set up actions to create a council or democracy proposal
+    //   // return m(CannotVote, { action: 'Send to council or democracy' });
+    // } else if (!app.isLoggedIn()) {
+    //   return m(CannotVote, { action: 'Log in to vote' });
+    // } else if (!app.user.activeAccount) {
+    //   return m(CannotVote, { action: 'Connect an address to vote' });
+    // } else if (!proposal.canVoteFrom(app.user.activeAccount)) {
+    //   return m(CannotVote, { action: 'Cannot vote from this address' });
+    // }
 
     let user;
     if (proposal instanceof SubstrateDemocracyProposal

@@ -17,6 +17,7 @@
     .veto-button {
         display: inline-block;
         padding: 0 5px;
+        border-radius: 10px;
         button {
             display: block;
             width: 100%;
@@ -32,6 +33,14 @@
     }
     .approve-button {
         width: 100%;
+    }
+    .yes-button {
+        background: #EBFFFD;
+        border: 2px solid #C5EEE9;
+    }
+    .no-button {
+        background: #FFF1F4;
+        border: 2px solid #FFD4DC;
     }
 }
 

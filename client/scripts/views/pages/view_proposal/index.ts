@@ -56,7 +56,7 @@ import {
   ProposalTitleEditor,
   ProposalTitleEditMenuItem,
 } from './header';
-import { AaveProposalDetail } from './aave_proposal_detail';
+import { AaveViewProposalDetail } from './aave_view_proposal_detail';
 import {
   activeQuillEditorHasText, GlobalStatus, ProposalBodyAvatar, ProposalBodyAuthor, ProposalBodyCreated,
   ProposalBodyLastEdited, ProposalBodyCancelEdit, ProposalBodySaveEdit,
@@ -821,7 +821,7 @@ const ViewProposalPage: m.Component<{
       !(proposal instanceof OffchainThread)
         && m(LinkedProposalsEmbed, { proposal }),
       (proposal instanceof AaveProposal)
-        && m(AaveProposalDetail, { proposal }),
+        && m(AaveViewProposalDetail, { proposal }),
       !(proposal instanceof OffchainThread)
         && m(ProposalVotingResults, { proposal }),
       !(proposal instanceof OffchainThread)

@@ -11,6 +11,7 @@ export const AaveViewProposalDetail: m.Component<{ proposal: AaveProposal }, {}>
         e.stopPropagation();
       }
     }, [
+      m('h3', 'Voting'),
       m('.aave-turnout', [
         m('p.detail-highlight.emphasize', [
           roundVote(proposal.turnout * 100),

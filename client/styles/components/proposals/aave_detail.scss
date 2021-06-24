@@ -1,6 +1,6 @@
 @import 'client/styles/shared';
 
-.AaveProposalDetail {
+.AaveProposalCardDetail {
     display: grid;
     grid-template-rows: 3fr 4fr 3fr;
     row-gap: 22px;
@@ -84,5 +84,22 @@
         &.emphasize {
             font-weight: 600;
         }
+    }
+}
+
+.AaveViewProposalDetail {
+    h3 {
+        font-size: 23px;
+        line-height: 28px;
+        font-weight: 500;
+    }
+    p {
+        font-size: 18px;
+    }
+    p.detail-highlight-emphasize {
+        color: #4723AD;
+        font-size: 24px;
+        font-weight: 600;
+        margin-right: 15px;
     }
 }
