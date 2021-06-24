@@ -840,3 +840,5 @@ const ViewProposalPage: m.Component<{
     ]);
   }
 };
+
+export default ViewProposalPage;

@@ -110,17 +110,17 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     const { votingModalOpen } = vnode.state;
-    // if (proposal instanceof SubstrateTreasuryProposal) {
-    //   return;
-    //   // TODO: Set up actions to create a council or democracy proposal
-    //   // return m(CannotVote, { action: 'Send to council or democracy' });
-    // } else if (!app.isLoggedIn()) {
-    //   return m(CannotVote, { action: 'Log in to vote' });
-    // } else if (!app.user.activeAccount) {
-    //   return m(CannotVote, { action: 'Connect an address to vote' });
-    // } else if (!proposal.canVoteFrom(app.user.activeAccount)) {
-    //   return m(CannotVote, { action: 'Cannot vote from this address' });
-    // }
+    if (proposal instanceof SubstrateTreasuryProposal) {
+      return;
+      // TODO: Set up actions to create a council or democracy proposal
+      // return m(CannotVote, { action: 'Send to council or democracy' });
+    } else if (!app.isLoggedIn()) {
+      return m(CannotVote, { action: 'Log in to vote' });
+    } else if (!app.user.activeAccount) {
+      return m(CannotVote, { action: 'Connect an address to vote' });
+    } else if (!proposal.canVoteFrom(app.user.activeAccount)) {
+      return m(CannotVote, { action: 'Cannot vote from this address' });
+    }
 
     let user;
     if (proposal instanceof SubstrateDemocracyProposal
@@ -423,7 +423,6 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
     let buttons;
     const yesButton = m('.yes-button', [
       m(Button, {
-        intent: 'positive',
         disabled: !canVote || hasVotedYes || votingModalOpen,
         onclick: voteYes,
         label: hasVotedYes ? 'Voted yes' : 'Vote yes',
@@ -433,7 +432,6 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
     ]);
     const noButton = m('.no-button', [
       m(Button, {
-        intent: 'negative',
         disabled: !canVote || hasVotedNo || votingModalOpen,
         onclick: voteNo,
         label: hasVotedNo ? 'Voted no' : 'Vote no',
@@ -492,14 +490,6 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
         label: proposal.isCanceled ? 'Cancelled' : 'Cancel',
         compact: true,
       }),
-    ]) : (proposal instanceof AaveProposal) ? m('.veto-button', [
-      m(Button, {
-        intent: 'negative',
-        disabled: !proposal.isCancellable || votingModalOpen,
-        onclick: cancelProposal,
-        label: proposal.data.cancelled ? 'Cancelled' : 'Cancel',
-        compact: true,
-      }),
     ]) : null;
     // V2 only: moloch: sponsor
     // const sponsorButton = (proposal.votingType === VotingType.MolochYesNo) && m('.yes-button', [
@@ -527,32 +517,32 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
     ]);
 
     // aave: queue / execute
-    const queueButton = (proposal instanceof AaveProposal) && m('.yes-button', [
-      m(Button, {
-        intent: 'none',
-        disabled: proposal.state !== AaveTypes.ProposalState.SUCCEEDED || votingModalOpen,
-        onclick: () => proposal.queueTx().then(() => m.redraw()),
-        label: proposal.data.queued || proposal.data.executed ? 'Queued' : 'Queue',
-        compact: true,
-        rounded: true,
-      })
-    ]);
-    const executeButton = (proposal instanceof AaveProposal) && m('.yes-button', [
-      m(Button, {
-        intent: 'none',
-        disabled: !proposal.isExecutable || votingModalOpen,
-        onclick: () => proposal.executeTx().then(() => m.redraw()),
-        label: proposal.data.executed ? 'Executed' : 'Execute',
-        compact: true,
-        rounded: true,
-      })
-    ]);
+    // const queueButton = (proposal instanceof AaveProposal) && m('.yes-button', [
+    //   m(Button, {
+    //     intent: 'none',
+    //     disabled: proposal.state !== AaveTypes.ProposalState.SUCCEEDED || votingModalOpen,
+    //     onclick: () => proposal.queueTx().then(() => m.redraw()),
+    //     label: proposal.data.queued || proposal.data.executed ? 'Queued' : 'Queue',
+    //     compact: true,
+    //     rounded: true,
+    //   })
+    // ]);
+    // const executeButton = (proposal instanceof AaveProposal) && m('.yes-button', [
+    //   m(Button, {
+    //     intent: 'none',
+    //     disabled: !proposal.isExecutable || votingModalOpen,
+    //     onclick: () => proposal.executeTx().then(() => m.redraw()),
+    //     label: proposal.data.executed ? 'Executed' : 'Execute',
+    //     compact: true,
+    //     rounded: true,
+    //   })
+    // ]);
 
     let votingActionObj;
     // TODO: other specialized proposals go at top
     if (proposal instanceof AaveProposal) {
       votingActionObj = [
-        m('.button-row', [yesButton, noButton, queueButton, executeButton, cancelButton]),
+        m('.button-row', [yesButton, noButton]),
       ];
     } else if (proposal.votingType === VotingType.SimpleYesNoVoting) {
       votingActionObj = [
@@ -600,7 +590,7 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
       votingActionObj = m(CannotVote, { action: 'Unsupported proposal type' });
     }
 
-    return m('.VotingActions', [votingActionObj]);
+    return m(`.VotingActions${(proposal instanceof AaveProposal ? '.AaveProposal' : '')}`, [votingActionObj]);
   },
 };
 

@@ -26,19 +26,26 @@ export const AaveViewProposalDetail: m.Component<{ proposal: AaveProposal }, {}>
         ]),
         m('p', ' in favor'),
       ]),
+      m('.aave-differential', [
+        m('p.detail-highlight.emphasize', [
+          roundVote(proposal.voteDifferential * 100),
+          '%',
+        ]),
+        m('p', ' differential'),
+      ]),
       m('.aave-turnout-requirement', [
         m('p.detail-highlight.emphasize', [
           (proposal.minimumQuorum * 100),
           '%',
         ]),
-        m('p', ' of token holders'),
+        m('p', ' of token holders required to pass'),
       ]),
       m('.aave-differential-requirement', [
         m('p.detail-highlight.emphasize', [
           (proposal.minimumVoteDifferential * 100),
           '%',
         ]),
-        m('p', ' differential')
+        m('p', ' differential required to pass')
       ])
     ]);
   }
@@ -47,6 +54,7 @@ export const AaveViewProposalDetail: m.Component<{ proposal: AaveProposal }, {}>
 export const AaveViewProposalSummary: m.Component<{ proposal: AaveProposal }, {}> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
+    if (!proposal.ipfsData?.shortDescription) return;
     return m('.AaveViewProposalSummary', {
       onclick: (e) => {
         e.preventDefault();
@@ -54,7 +62,7 @@ export const AaveViewProposalSummary: m.Component<{ proposal: AaveProposal }, {}
       }
     }, [
       m('h3', 'Simple Summary'),
-      m('.aave-summary', proposal.ipfsData.description)
+      m('.aave-summary', proposal.ipfsData?.shortDescription)
     ]);
   }
 };

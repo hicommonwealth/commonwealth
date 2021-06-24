@@ -34,13 +34,43 @@
     .approve-button {
         width: 100%;
     }
+}
+
+.VotingActions.AaveProposal {
+    padding: 0;
+    background: none;
+    .button-row {
+        display: flex;
+        justify-content: space-between;
+    }
+    .yes-button, .no-button {
+        width: 48%;
+        max-width: 48%;
+        padding: 0px;
+        button {
+            width: 100%;
+            height: 55px;
+            border-radius: 10px;
+        }
+    }
     .yes-button {
-        background: #EBFFFD;
-        border: 2px solid #C5EEE9;
+        button {
+            background: #EBFFFD;
+            border: 2px solid #C5EEE9;
+            color: #009785;
+            text-transform: capitalize;
+            font-size: 24px;
+            margin-right: 10px;
+        }
     }
     .no-button {
-        background: #FFF1F4;
-        border: 2px solid #FFD4DC;
+        button {
+            background: #FFF1F4 !important;
+            border: 2px solid #FFD4DC !important;
+            color:  #C60024;
+            text-transform: capitalize;
+            font-size: 24px;
+        }
     }
 }
 
