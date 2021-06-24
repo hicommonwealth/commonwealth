@@ -821,7 +821,7 @@ const NewProposalForm = {
               m(FormLabel, 'Proposal Executor'),
               m(DropdownFormField, {
                 choices: (app.chain as Aave).governance.api.Executors.map(
-                  (r) => ({ name: 'executor', value: r.address, label: `${r.address}` })
+                  (r) => ({ name: 'executor', value: r.address, label: `${r.delay / (60 * 60 * 24)} Day(s) Voting` })
                 ),
                 callback: (result) => {
                   vnode.state.executor = result;
