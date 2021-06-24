@@ -66,6 +66,7 @@ import {
 } from './body';
 import CreateComment from './create_comment';
 import LinkedProposalsEmbed from './linked_proposals_embed';
+import { AaveTypes } from '@commonwealth/chain-events';
 
 const ProposalHeader: m.Component<{
   commentCount: number;
@@ -122,6 +123,20 @@ const ProposalHeader: m.Component<{
     }, [
       m('.proposal-top', [
         m('.proposal-top-left', [
+          !(proposal instanceof OffchainThread)
+            && m('.proposal-meta-top', [
+              m(ProposalHeaderOnchainId, { proposal }),
+              (proposal instanceof AaveProposal) && m('.yes-button', [
+                m(Button, {
+                  intent: 'none',
+                  disabled: proposal.state !== AaveTypes.ProposalState.SUCCEEDED,
+                  onclick: () => proposal.queueTx().then(() => m.redraw()),
+                  label: proposal.data.queued || proposal.data.executed ? 'Queued' : 'Queue',
+                  compact: true,
+                  rounded: true,
+                })
+              ]),
+            ]),
           !vnode.state.editing
             && m('.proposal-title', [
               m(ProposalHeaderTitle, { proposal }),
@@ -217,7 +232,6 @@ const ProposalHeader: m.Component<{
                 }),
             ]
             : [
-              m(ProposalHeaderOnchainId, { proposal }),
               m(ProposalHeaderOnchainStatus, { proposal }),
               m(ProposalBodyAuthor, { item: proposal }),
               app.isLoggedIn()
@@ -809,7 +823,6 @@ const ViewProposalPage: m.Component<{
     };
 
     const { replyParent } = vnode.state;
-    console.log((proposal instanceof AaveProposal));
     return m(Sublayout, { class: 'ViewProposalPage', showNewProposalButton: true, title: headerTitle }, [
       m(ProposalHeader, {
         proposal,

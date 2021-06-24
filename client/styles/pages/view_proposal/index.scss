@@ -73,6 +73,22 @@ $discussion-title-font-size: 1.45rem;
             .proposal-body-meta {
                 margin-bottom: 12px;
             }
+            .proposal-meta-top {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 12px;
+                height: 35px;
+                .ProposalHeaderOnchainId {
+                    font-size: 18px;
+                    color: black;
+                }
+                button {
+                    background: linear-gradient(268.96deg, #00DB8C 2.02%, #1BDEBB 94.68%);
+                    border-radius: 8px;
+                    height: inherit;
+                    color: white;
+                }
+            }
         }
         .proposal-content {
             display: flex;
