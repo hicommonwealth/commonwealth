@@ -27,7 +27,7 @@ import NewProposalPage from 'views/pages/new_proposal/index';
 import PageNotFound from 'views/pages/404';
 import Listing from 'views/pages/listing';
 import ErrorPage from 'views/pages/error';
-import AaveDetail from '../components/proposals/aave_detail';
+import AaveProposalCardDetail from '../components/proposals/aave_proposal_card_detail';
 import { AaveTypes, MarlinTypes } from '@commonwealth/chain-events';
 
 const SubstrateProposalStats: m.Component<{}, {}> = {
@@ -208,7 +208,7 @@ const ProposalsPage: m.Component<{}> = {
         .concat((activeMarlinProposals || []).map((proposal) => m(ProposalCard, { proposal })))
         .concat((activeAaveProposals || []).map((proposal) => m(ProposalCard, {
           proposal,
-          injectedContent: AaveDetail,
+          injectedContent: AaveProposalCardDetail,
         })))]
       )];
 
@@ -244,7 +244,7 @@ const ProposalsPage: m.Component<{}> = {
         .concat((inactiveMarlinProposals || []).map((proposal) => m(ProposalCard, { proposal })))
         .concat((inactiveAaveProposals || []).map((proposal) => m(ProposalCard, {
           proposal,
-          injectedContent: AaveDetail,
+          injectedContent: AaveProposalCardDetail,
         }))) ]
       )];
 
