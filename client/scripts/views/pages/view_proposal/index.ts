@@ -44,6 +44,7 @@ import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_
 
 import { SocialSharingCarat } from 'views/components/social_sharing_carat';
 
+import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import {
   ProposalHeaderExternalLink, ProposalHeaderBlockExplorerLink, ProposalHeaderVotingInterfaceLink,
   ProposalHeaderOffchainPoll,
@@ -55,6 +56,7 @@ import {
   ProposalTitleEditor,
   ProposalTitleEditMenuItem,
 } from './header';
+import { AaveProposalDetail } from './aave_proposal_detail';
 import {
   activeQuillEditorHasText, GlobalStatus, ProposalBodyAvatar, ProposalBodyAuthor, ProposalBodyCreated,
   ProposalBodyLastEdited, ProposalBodyCancelEdit, ProposalBodySaveEdit,
@@ -64,7 +66,6 @@ import {
 } from './body';
 import CreateComment from './create_comment';
 import LinkedProposalsEmbed from './linked_proposals_embed';
-
 
 const ProposalHeader: m.Component<{
   commentCount: number;
@@ -808,6 +809,7 @@ const ViewProposalPage: m.Component<{
     };
 
     const { replyParent } = vnode.state;
+    console.log((proposal instanceof AaveProposal));
     return m(Sublayout, { class: 'ViewProposalPage', showNewProposalButton: true, title: headerTitle }, [
       m(ProposalHeader, {
         proposal,
@@ -818,6 +820,8 @@ const ViewProposalPage: m.Component<{
       }),
       !(proposal instanceof OffchainThread)
         && m(LinkedProposalsEmbed, { proposal }),
+      (proposal instanceof AaveProposal)
+        && m(AaveProposalDetail, { proposal }),
       !(proposal instanceof OffchainThread)
         && m(ProposalVotingResults, { proposal }),
       !(proposal instanceof OffchainThread)
@@ -833,5 +837,3 @@ const ViewProposalPage: m.Component<{
     ]);
   }
 };
-
-export default ViewProposalPage;

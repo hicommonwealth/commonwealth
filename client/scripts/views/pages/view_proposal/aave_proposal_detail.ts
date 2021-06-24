@@ -1,41 +1,16 @@
-import 'components/proposals/aave_detail.scss';
-
 import AaveProposal from 'client/scripts/controllers/chain/ethereum/aave/proposal';
 import m from 'mithril';
-import User from '../widgets/user';
+import { roundVote } from '../../components/proposals/aave_detail';
 
-export const roundVote = (percentage) => {
-  return percentage.toFixed(2).split('.0')[0].slice(0, 4);
-};
-
-const AaveDetail = {
-  view: (vnode: m.Vnode<{ proposal: AaveProposal, statusClass: string, statusText: any }>) => {
-    const { proposal, statusClass, statusText } = vnode.attrs;
-    // TODO: move executor display to entire page
-    // TODO: display stats about voting turnout/etc
-    const executor = proposal.Executor;
+export const AaveProposalDetail: m.Component<{ proposal: AaveProposal }, {}> = {
+  view: (vnode) => {
+    const { proposal } = vnode.attrs;
     return m('.AaveProposalDetail', {
       onclick: (e) => {
         e.preventDefault();
         e.stopPropagation();
       }
     }, [
-      m('.aave-metadata', [
-        m('.aave-author', [
-          m('.card-subheader', 'Author'),
-          proposal.ipfsData?.author
-            ? proposal.ipfsData.author.split(' (').map((ele, idx) => {
-              return idx === 0
-                ? m('p.collapsed-line-height', ele)
-                : m('p.card-subheader', ele.slice(0, ele.length - 1));
-            })
-            : m(User, { user: proposal.author, popover: true }),
-        ]),
-        m('.aave-status', [
-          m('.card-subheader', 'Status'),
-          m('.proposal-injected-status', { class: statusClass }, statusText),
-        ]),
-      ]),
       m('.aave-voting', [
         m('.card-subheader', 'Voting'),
         m('.aave-turnout', [
@@ -80,5 +55,3 @@ const AaveDetail = {
     ]);
   }
 };
-
-export default AaveDetail;
