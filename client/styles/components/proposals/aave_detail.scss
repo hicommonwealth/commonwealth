@@ -1,6 +1,6 @@
 @import 'client/styles/shared';
 
-.AaveProposalDetail {
+.AaveProposalCardDetail {
     display: grid;
     grid-template-rows: 3fr 4fr 3fr;
     row-gap: 22px;
@@ -86,3 +86,35 @@
         }
     }
 }
+
+.AaveViewProposalDetail, .AaveViewProposalSummary {
+    margin-top: 28px;
+    h3 {
+        font-size: 23px;
+        line-height: 28px;
+        font-weight: 500;
+        margin-bottom: 8px;
+    }
+    div {
+        display: flex;
+        justify-content: left;
+        border-bottom: 1px solid #EEEEEE;
+        line-height: 2;
+        align-items: baseline;
+    }
+    div:last-child {
+        border-bottom: none;
+    }
+    p {
+        font-size: 18px;
+        flex: 8;
+    }
+    p.detail-highlight.emphasize {
+        flex: 1;
+        color: #4723AD;
+        font-size: 24px;
+        font-weight: 600;
+        min-width: 80px;
+    }
+}
+
