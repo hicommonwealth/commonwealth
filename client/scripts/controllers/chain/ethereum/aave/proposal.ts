@@ -3,11 +3,11 @@ import BN from 'bn.js';
 import Web3 from 'web3';
 import $ from 'jquery';
 import bs58 from 'bs58';
+import { AaveTypes } from '@commonwealth/chain-events';
 import { BigNumber } from 'ethers';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import { IAaveProposalResponse } from 'adapters/chain/aave/types';
 import { formatNumberLong } from 'adapters/currency';
-import { AaveTypes } from '@commonwealth/chain-events';
 
 import {
   Proposal,
@@ -43,6 +43,8 @@ export class AaveProposalVote implements IVote<EthereumCoin> {
     return `${formatNumberLong(+Web3.utils.fromWei(this.power))} POWER`;
   }
 }
+
+const ONE_HUNDRED_WITH_PRECISION = 10000;
 
 const backportEntityToAdapter = (entity: ChainEntity): IAaveProposalResponse => {
   const startEvent = entity.chainEvents.find((e) => e.data.kind === AaveTypes.EventKind.ProposalCreated);
@@ -173,8 +175,8 @@ export default class AaveProposal extends Proposal<
     const yesPower = sumVotes(votes.filter((v) => v.choice));
     const noPower = sumVotes(votes.filter((v) => !v.choice));
     if (yesPower.isZero() && noPower.isZero()) return 0;
-    const supportBn = yesPower.muln(10000).div(yesPower.add(noPower));
-    return +supportBn / 10000;
+    const supportBn = yesPower.muln(ONE_HUNDRED_WITH_PRECISION).div(yesPower.add(noPower));
+    return +supportBn / ONE_HUNDRED_WITH_PRECISION;
   }
 
   public get turnout() {
@@ -182,8 +184,8 @@ export default class AaveProposal extends Proposal<
       return null;
     }
     const totalPowerVoted = sumVotes(this.getVotes());
-    const turnoutBn = totalPowerVoted.muln(10000).div(this._votingSupplyAtStart);
-    return +turnoutBn / 10000;
+    const turnoutBn = totalPowerVoted.muln(ONE_HUNDRED_WITH_PRECISION).div(this._votingSupplyAtStart);
+    return +turnoutBn / ONE_HUNDRED_WITH_PRECISION;
   }
 
   // (FOR VOTES - AGAINST VOTES) / voting supply
@@ -194,17 +196,17 @@ export default class AaveProposal extends Proposal<
     const votes = this.getVotes();
     const yesPower = sumVotes(votes.filter((v) => v.choice));
     const noPower = sumVotes(votes.filter((v) => !v.choice));
-    const forProportion = yesPower.muln(10000).div(this._votingSupplyAtStart);
-    const againstProportion = noPower.muln(10000).div(this._votingSupplyAtStart);
-    return (+forProportion - +againstProportion) / 10000;
+    const forProportion = yesPower.muln(ONE_HUNDRED_WITH_PRECISION).div(this._votingSupplyAtStart);
+    const againstProportion = noPower.muln(ONE_HUNDRED_WITH_PRECISION).div(this._votingSupplyAtStart);
+    return (+forProportion - +againstProportion) / ONE_HUNDRED_WITH_PRECISION;
   }
 
   public get minimumQuorum() {
-    return +this._Executor.minimumQuorum / 10000;
+    return +this._Executor.minimumQuorum / ONE_HUNDRED_WITH_PRECISION;
   }
 
   public get minimumVoteDifferential() {
-    return +this._Executor.voteDifferential / 10000;
+    return +this._Executor.voteDifferential / ONE_HUNDRED_WITH_PRECISION;
   }
 
   private _votingSupplyAtStart: BN;
@@ -222,8 +224,8 @@ export default class AaveProposal extends Proposal<
     const votes = this.getVotes();
     const yesVotes = votes.filter((v) => v.choice);
     const noVotes = votes.filter((v) => !v.choice);
-    const forProportion = sumVotes(yesVotes).muln(10000).div(this._votingSupplyAtStart);
-    const againstProportion = sumVotes(noVotes).muln(10000).div(this._votingSupplyAtStart)
+    const forProportion = sumVotes(yesVotes).muln(ONE_HUNDRED_WITH_PRECISION).div(this._votingSupplyAtStart);
+    const againstProportion = sumVotes(noVotes).muln(ONE_HUNDRED_WITH_PRECISION).div(this._votingSupplyAtStart)
       .add(this._Executor.voteDifferential);
     return forProportion.gt(againstProportion);
   }
@@ -253,7 +255,7 @@ export default class AaveProposal extends Proposal<
     }
 
     try {
-      const totalVotingSupplyAtStart = await this._Gov.api.Strategy.getVotingSupplyAt(this.data.startBlock);
+      const totalVotingSupplyAtStart = await this._Gov.api.Strategy.getTotalVotingSupplyAt(this.data.startBlock);
       this._votingSupplyAtStart = new BN(totalVotingSupplyAtStart.toString());
     } catch (e2) {
       console.error(
@@ -264,7 +266,7 @@ export default class AaveProposal extends Proposal<
 
     this._minVotingPowerNeeded = this._votingSupplyAtStart
       .mul(this._Executor.minimumQuorum)
-      .divn(10000);
+      .divn(ONE_HUNDRED_WITH_PRECISION);
     this._initialized = true;
   }
 

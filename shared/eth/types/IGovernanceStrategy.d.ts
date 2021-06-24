@@ -22,7 +22,7 @@ interface IGovernanceStrategyInterface extends ethers.utils.Interface {
   functions: {
     "getPropositionPowerAt(address,uint256)": FunctionFragment;
     "getTotalPropositionSupplyAt(uint256)": FunctionFragment;
-    "getVotingSupplyAt(uint256)": FunctionFragment;
+    "getTotalVotingSupplyAt(uint256)": FunctionFragment;
     "getVotingPowerAt(address,uint256)": FunctionFragment;
   };
 
@@ -35,7 +35,7 @@ interface IGovernanceStrategyInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "getVotingSupplyAt",
+    functionFragment: "getTotalVotingSupplyAt",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
@@ -52,7 +52,7 @@ interface IGovernanceStrategyInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getVotingSupplyAt",
+    functionFragment: "getTotalVotingSupplyAt",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -129,12 +129,12 @@ export class IGovernanceStrategy extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    getVotingSupplyAt(
+    getTotalVotingSupplyAt(
       blockNumber: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    "getVotingSupplyAt(uint256)"(
+    "getTotalVotingSupplyAt(uint256)"(
       blockNumber: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
@@ -174,12 +174,12 @@ export class IGovernanceStrategy extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  getVotingSupplyAt(
+  getTotalVotingSupplyAt(
     blockNumber: BigNumberish,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  "getVotingSupplyAt(uint256)"(
+  "getTotalVotingSupplyAt(uint256)"(
     blockNumber: BigNumberish,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
@@ -219,12 +219,12 @@ export class IGovernanceStrategy extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    getVotingSupplyAt(
+    getTotalVotingSupplyAt(
       blockNumber: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "getVotingSupplyAt(uint256)"(
+    "getTotalVotingSupplyAt(uint256)"(
       blockNumber: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -267,12 +267,12 @@ export class IGovernanceStrategy extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    getVotingSupplyAt(
+    getTotalVotingSupplyAt(
       blockNumber: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "getVotingSupplyAt(uint256)"(
+    "getTotalVotingSupplyAt(uint256)"(
       blockNumber: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -313,12 +313,12 @@ export class IGovernanceStrategy extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    getVotingSupplyAt(
+    getTotalVotingSupplyAt(
       blockNumber: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "getVotingSupplyAt(uint256)"(
+    "getTotalVotingSupplyAt(uint256)"(
       blockNumber: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
