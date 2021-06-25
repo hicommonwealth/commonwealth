@@ -114,6 +114,9 @@ export const cancelProposal = (e, state, proposal, onModalClose) => {
   mixpanel.people.set({
     'Last Thread Created': new Date().toISOString()
   });
+  if (!onModalClose) {
+    onModalClose = () => undefined;
+  }
   if (proposal instanceof MolochProposal) {
     proposal.abortTx()
       .then(() => { onModalClose(); m.redraw(); })
