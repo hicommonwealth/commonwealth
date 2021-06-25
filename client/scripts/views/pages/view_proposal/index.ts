@@ -126,16 +126,15 @@ const ProposalHeader: m.Component<{
           !(proposal instanceof OffchainThread)
             && m('.proposal-meta-top', [
               m(ProposalHeaderOnchainId, { proposal }),
-              (proposal instanceof AaveProposal) && m('.yes-button', [
-                m(Button, {
-                  intent: 'none',
-                  disabled: proposal.state !== AaveTypes.ProposalState.SUCCEEDED,
-                  onclick: () => proposal.queueTx().then(() => m.redraw()),
-                  label: proposal.data.queued || proposal.data.executed ? 'Queued' : 'Queue',
-                  compact: true,
-                  rounded: true,
-                })
-              ]),
+              (proposal instanceof AaveProposal) && m('.endTime', (proposal as AaveProposal).endTime),
+              (proposal instanceof AaveProposal) && m(Button, {
+                intent: 'none',
+                disabled: proposal.state !== AaveTypes.ProposalState.SUCCEEDED,
+                onclick: () => proposal.queueTx().then(() => m.redraw()),
+                label: proposal.data.queued || proposal.data.executed ? 'Queued' : 'Queue',
+                compact: true,
+                rounded: true,
+              })
             ]),
           !vnode.state.editing
             && m('.proposal-title', [

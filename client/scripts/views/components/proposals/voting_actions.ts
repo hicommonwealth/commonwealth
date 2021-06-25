@@ -590,7 +590,10 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
       votingActionObj = m(CannotVote, { action: 'Unsupported proposal type' });
     }
 
-    return m(`.VotingActions${(proposal instanceof AaveProposal ? '.AaveProposal' : '')}`, [votingActionObj]);
+    return m(`.VotingActions${(proposal instanceof AaveProposal ? '.AaveProposal' : '')}`, [
+      m('h3', 'Cast Your Vote'),
+      votingActionObj
+    ]);
   },
 };
 
