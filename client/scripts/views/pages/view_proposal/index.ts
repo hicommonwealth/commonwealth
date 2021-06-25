@@ -125,10 +125,14 @@ const ProposalHeader: m.Component<{
         m('.proposal-top-left', [
           !(proposal instanceof OffchainThread)
             && m('.proposal-meta-top', [
-              m(ProposalHeaderOnchainId, { proposal }),
-              m(QueueButton, { proposal }),
-              m(ExecuteButton, { proposal }),
-              m(CancelButton, { proposal })
+              m('.proposal-meta-top-left', [
+                m(ProposalHeaderOnchainId, { proposal }),
+              ]),
+              m('.proposal-meta-top-right', [
+                m(QueueButton, { proposal }),
+                m(ExecuteButton, { proposal }),
+                m(CancelButton, { proposal })
+              ])
             ]),
           !vnode.state.editing
             && m('.proposal-title', [

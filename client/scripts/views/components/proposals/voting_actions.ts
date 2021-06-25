@@ -137,8 +137,8 @@ export const QueueButton: m.Component<{ proposal, votingModalOpen? }, {}> = {
   view: (vnode) => {
     const { proposal, votingModalOpen } = vnode.attrs;
     return (proposal instanceof AaveProposal)
-      // && proposal.state === AaveTypes.ProposalState.SUCCEEDED
-      && m('.yes-button', [
+      && proposal.state === AaveTypes.ProposalState.SUCCEEDED
+      && m('.QueueButton', [
         m(Button, {
           intent: 'none',
           disabled: proposal.state !== AaveTypes.ProposalState.SUCCEEDED || votingModalOpen,
@@ -155,8 +155,8 @@ export const ExecuteButton: m.Component<{ proposal, votingModalOpen? }, {}> = {
   view: (vnode) => {
     const { proposal, votingModalOpen } = vnode.attrs;
     return (proposal instanceof AaveProposal)
-      // && proposal.isExecutable
-      && m('.yes-button', [
+      && proposal.isExecutable
+      && m('.ExecuteButton', [
         m(Button, {
           intent: 'none',
           disabled: !proposal.isExecutable || votingModalOpen,
@@ -190,8 +190,8 @@ export const CancelButton: m.Component<{ proposal, votingModalOpen?, user?, onMo
         label: proposal.isCanceled ? 'Cancelled' : 'Cancel',
         compact: true,
       }),
-    ]) : ((proposal instanceof AaveProposal) /*&& proposal.isCancellable*/)
-      ? m('.veto-button', [
+    ]) : ((proposal instanceof AaveProposal) && proposal.isCancellable)
+      ? m('.CancelButton', [
         m(Button, {
           disabled: !proposal.isCancellable || votingModalOpen,
           onclick: (e) => cancelProposal(e, vnode.state, proposal, onModalClose),
