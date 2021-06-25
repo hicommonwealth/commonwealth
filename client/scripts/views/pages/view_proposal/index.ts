@@ -33,7 +33,7 @@ import PollEditor from 'views/components/poll_editor';
 import {
   TopicEditorMenuItem, ThreadSubscriptionMenuItem
 } from 'views/pages/discussions/discussion_row_menu';
-import ProposalVotingActions from 'views/components/proposals/voting_actions';
+import ProposalVotingActions, { CancelButton, ExecuteButton, QueueButton } from 'views/components/proposals/voting_actions';
 import ProposalVotingResults from 'views/components/proposals/voting_results';
 import PageLoading from 'views/pages/loading';
 import PageNotFound from 'views/pages/404';
@@ -126,15 +126,9 @@ const ProposalHeader: m.Component<{
           !(proposal instanceof OffchainThread)
             && m('.proposal-meta-top', [
               m(ProposalHeaderOnchainId, { proposal }),
-              (proposal instanceof AaveProposal) && m('.endTime', (proposal as AaveProposal).endTime),
-              (proposal instanceof AaveProposal) && m(Button, {
-                intent: 'none',
-                disabled: proposal.state !== AaveTypes.ProposalState.SUCCEEDED,
-                onclick: () => proposal.queueTx().then(() => m.redraw()),
-                label: proposal.data.queued || proposal.data.executed ? 'Queued' : 'Queue',
-                compact: true,
-                rounded: true,
-              })
+              m(QueueButton, { proposal }),
+              m(ExecuteButton, { proposal }),
+              m(CancelButton, { proposal })
             ]),
           !vnode.state.editing
             && m('.proposal-title', [
@@ -231,8 +225,8 @@ const ProposalHeader: m.Component<{
                 }),
             ]
             : [
-              m(ProposalHeaderOnchainStatus, { proposal }),
               m(ProposalBodyAuthor, { item: proposal }),
+              m(ProposalHeaderOnchainStatus, { proposal }),
               app.isLoggedIn()
               && (isAdmin || isAuthor)
               && !getSetGlobalEditingStatus(GlobalStatus.Get)
