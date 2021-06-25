@@ -53,6 +53,12 @@ $discussion-title-font-size: 1.45rem;
             }
         }
     }
+    h3 {
+        font-size: 23px;
+        line-height: 28px;
+        font-weight: 500;
+        margin-bottom: 8px;
+    }
 
     //
     // header
@@ -72,6 +78,44 @@ $discussion-title-font-size: 1.45rem;
             }
             .proposal-body-meta {
                 margin-bottom: 12px;
+            }
+            .proposal-meta-top {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 12px;
+                height: 35px;
+                button {
+                    margin-left: 17px;
+                    border-radius: 8px;
+                    height: 39px;
+                    font-size: 18px;
+                    text-transform: uppercase;
+                }
+                .proposal-meta-top-left {
+                    display: flex;
+                    align-items: center;
+                }
+                .proposal-meta-top-right {
+                    display: flex;
+                    .ExecuteButton, .QueueButton {
+                        button {
+                            color: white;
+                            background: linear-gradient(268.96deg, #00DB8C 2.02%, #1BDEBB 94.68%);
+                        }
+                    }
+                    .CancelButton {
+                        button {
+                            color: #FF002E;
+                            border: 1px solid #FF002E;
+                            background: #FFFFFF;
+                        }
+    
+                    }
+                }
+                .ProposalHeaderOnchainId {
+                    font-size: 18px;
+                    color: black;
+                }
             }
         }
         .proposal-content {

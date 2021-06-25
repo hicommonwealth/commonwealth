@@ -140,7 +140,7 @@ export default class AaveProposal extends Proposal<
     if (blockNumber <= this.data.startBlock) return AaveTypes.ProposalState.PENDING;
     if (blockNumber <= this.data.endBlock) return AaveTypes.ProposalState.ACTIVE;
     if (this._isPassed() === false) return AaveTypes.ProposalState.FAILED;
-    if (!this.data.executionTime) return AaveTypes.ProposalState.SUCCEEDED;
+    if (!this.data.executionTime && !this.data.queued) return AaveTypes.ProposalState.SUCCEEDED;
     if (this.data.executed) return AaveTypes.ProposalState.EXECUTED;
     if (blockTimestamp > (this.data.executionTime + this._Executor.gracePeriod)) return AaveTypes.ProposalState.EXPIRED;
     if (this.data.queued) return AaveTypes.ProposalState.QUEUED;
@@ -338,6 +338,7 @@ export default class AaveProposal extends Proposal<
 
   public get isCancellable() {
     return !(this.state === AaveTypes.ProposalState.CANCELED
+      || this.state === AaveTypes.ProposalState.FAILED
       || this.state === AaveTypes.ProposalState.EXECUTED
       || this.state === AaveTypes.ProposalState.EXPIRED);
   }
