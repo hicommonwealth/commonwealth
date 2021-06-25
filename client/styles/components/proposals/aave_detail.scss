@@ -111,7 +111,9 @@
     }
     p.detail-highlight.emphasize {
         flex: 1;
-        color: #4723AD;
+        background: linear-gradient(to right, #335FB7, #D48CDD);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
         font-size: 24px;
         font-weight: 600;
         min-width: 80px;

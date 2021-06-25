@@ -33,7 +33,7 @@ import PollEditor from 'views/components/poll_editor';
 import {
   TopicEditorMenuItem, ThreadSubscriptionMenuItem
 } from 'views/pages/discussions/discussion_row_menu';
-import ProposalVotingActions from 'views/components/proposals/voting_actions';
+import ProposalVotingActions, { CancelButton, ExecuteButton, QueueButton } from 'views/components/proposals/voting_actions';
 import ProposalVotingResults from 'views/components/proposals/voting_results';
 import PageLoading from 'views/pages/loading';
 import PageNotFound from 'views/pages/404';
@@ -66,6 +66,7 @@ import {
 } from './body';
 import CreateComment from './create_comment';
 import LinkedProposalsEmbed from './linked_proposals_embed';
+import { AaveTypes } from '@commonwealth/chain-events';
 
 const ProposalHeader: m.Component<{
   commentCount: number;
@@ -122,6 +123,17 @@ const ProposalHeader: m.Component<{
     }, [
       m('.proposal-top', [
         m('.proposal-top-left', [
+          !(proposal instanceof OffchainThread)
+            && m('.proposal-meta-top', [
+              m('.proposal-meta-top-left', [
+                m(ProposalHeaderOnchainId, { proposal }),
+              ]),
+              m('.proposal-meta-top-right', [
+                m(QueueButton, { proposal }),
+                m(ExecuteButton, { proposal }),
+                m(CancelButton, { proposal })
+              ])
+            ]),
           !vnode.state.editing
             && m('.proposal-title', [
               m(ProposalHeaderTitle, { proposal }),
@@ -217,9 +229,8 @@ const ProposalHeader: m.Component<{
                 }),
             ]
             : [
-              m(ProposalHeaderOnchainId, { proposal }),
-              m(ProposalHeaderOnchainStatus, { proposal }),
               m(ProposalBodyAuthor, { item: proposal }),
+              m(ProposalHeaderOnchainStatus, { proposal }),
               app.isLoggedIn()
               && (isAdmin || isAuthor)
               && !getSetGlobalEditingStatus(GlobalStatus.Get)
@@ -809,7 +820,6 @@ const ViewProposalPage: m.Component<{
     };
 
     const { replyParent } = vnode.state;
-    console.log((proposal instanceof AaveProposal));
     return m(Sublayout, { class: 'ViewProposalPage', showNewProposalButton: true, title: headerTitle }, [
       m(ProposalHeader, {
         proposal,
