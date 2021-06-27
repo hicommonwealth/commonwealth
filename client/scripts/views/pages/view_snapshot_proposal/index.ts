@@ -10,7 +10,6 @@ import app from 'state';
 import Sublayout from 'views/sublayout';
 import { SnapshotProposal, VotingType } from 'models';
 import ConfirmSnapshotVoteModal from 'views/modals/confirm_snapshot_vote_modal';
-import snapshotClient from 'helpers/snapshot_utils/snapshot_client';
 import { formatSpace, getProposal, getPower } from 'helpers/snapshot_utils/snapshot_utils';
 
 import { ProposalHeaderTitle } from './header';
@@ -224,7 +223,7 @@ const ViewProposalPage: m.Component<{
       const allProposals: SnapshotProposal[] = app.snapshot.proposalStore.getAll();
       vnode.state.proposal = allProposals.filter(proposal => proposal.ipfsHash === vnode.attrs.identifier)[0];
 
-      snapshotClient.getSpaces().then(response => {
+      app.snapshot.client.getSpaces().then(response => {
         let spaces: any = Object.fromEntries(
           Object.entries(response).map(space => [
             space[0],

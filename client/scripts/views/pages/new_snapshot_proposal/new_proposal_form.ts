@@ -13,7 +13,7 @@ import { bufferToHex } from 'ethereumjs-util';
 import snapshotJs from '@snapshot-labs/snapshot.js';
 
 import app from 'state';
-import snapshotClient from 'helpers/snapshot_utils/snapshot_client';
+
 import { formatSpace } from 'helpers/snapshot_utils/snapshot_utils';
 
 import { notifyError } from 'controllers/app/notifications';
@@ -161,7 +161,7 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
       type: 'single-choice'
     };
 
-    snapshotClient.getSpaces().then(response => {
+    app.snapshot.client.getSpaces().then(response => {
       let spaces: any = Object.fromEntries(
         Object.entries(response).map(space => [
           space[0],

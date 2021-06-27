@@ -1,16 +1,17 @@
 import $ from 'jquery';
-import app from 'state';
-import m from 'mithril';
+import Snapshot from '@snapshot-labs/snapshot.js';
 import { SnapshotProposalStore } from 'stores';
 import { SnapshotProposal } from '../../models';
+
+const hubUrl = process.env.SNAPSHOT_APP_HUB_URL || 'https://testnet.snapshot.org';
 
 class SnapshotController {
   private _proposalStore: SnapshotProposalStore = new SnapshotProposalStore();
   // private _votes = new Store<SnapshotVote>();
   public get proposalStore() { return this._proposalStore; }
+  public client = new Snapshot.Client(hubUrl);
 
   public async fetchSnapshotProposals(snapshot: string) {
-    const hubUrl = process.env.SNAPSHOT_HUB_URL || 'https://testnet.snapshot.org';
     const response = await $.get(`${hubUrl}/api/${snapshot}/proposals`);
     // if (response.status !== 'Success') {
     //   throw new Error(`Cannot fetch snapshot proposals: ${response.status}`);
