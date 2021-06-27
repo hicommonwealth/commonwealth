@@ -33,6 +33,7 @@ import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import LoginModal from 'views/modals/login_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';
 import Login from './views/components/login';
+import { formatSpace } from './helpers/snapshot_utils/snapshot_utils';
 
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/landing');
@@ -47,6 +48,7 @@ const APPLICATION_UPDATE_ACTION = 'Okay';
 // On logout: called to reset everything
 export async function initAppState(updateSelectedNode = true): Promise<void> {
   return new Promise((resolve, reject) => {
+    
     $.get(`${app.serverUrl()}/status`).then((data) => {
       app.config.chains.clear();
       app.config.nodes.clear();
@@ -114,6 +116,14 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
         app.config.chains.getAll().find((c) => c.customDomain === host) !== undefined
           || app.config.communities.getAll().find((c) => c.customDomain === host) !== undefined
       );
+      app.snapshot.client.getSpaces().then(response => {
+        app.snapshot.spaces = Object.fromEntries(
+          Object.entries(response).map(space => [
+            space[0],
+            formatSpace(space[0], space[1])
+          ])
+        );
+      });
 
       resolve();
     }).catch((err: any) => {
@@ -413,8 +423,6 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
     return false;
   } else {
     app.chain = newChain;
-    const snapshotId = app.chain?.meta.chain.snapshot;
-    app.snapshot.fetchSnapshotProposals(snapshotId);
   }
   if (initApi) {
     app.chain.initApi(); // required for loading NearAccounts

@@ -8,7 +8,7 @@ import { Spinner, Button } from 'construct-ui';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
-import { SnapshotProposal, VotingType } from 'models';
+import { SnapshotProposal } from 'models';
 import ConfirmSnapshotVoteModal from 'views/modals/confirm_snapshot_vote_modal';
 import { formatSpace, getProposal, getPower } from 'helpers/snapshot_utils/snapshot_utils';
 
@@ -30,7 +30,7 @@ const ProposalHeader: m.Component<{
 
     // Original posters have full editorial control, while added collaborators
     // merely have access to the body and title
-		
+
     const proposalLink = `/${app.activeId()}/snapshot-proposal/${vnode.attrs.snapshotId}/${proposal.ipfsHash}`;
 
     return m('.ProposalHeader', {
@@ -43,14 +43,14 @@ const ProposalHeader: m.Component<{
           ]),
           m('.proposal-body-meta', [
             m(ProposalBodyCreated, { item: proposal, link: proposalLink }),
-	          m(ProposalBodyLastEdited, { item: proposal }),
-	          m(ProposalBodyAuthor, { item: proposal })
+            m(ProposalBodyLastEdited, { item: proposal }),
+            m(ProposalBodyAuthor, { item: proposal })
           ]),
-      	]),
+        ]),
       ]),
       m('.proposal-content', [
         m('.proposal-content-left', [
-	        m(ProposalBodyText, { item: proposal })
+          m(ProposalBodyText, { item: proposal })
         ]),
       ]),
     ]);
@@ -117,10 +117,10 @@ const VoteView: m.Component<{ votes: Vote[] }> = {
 
 const VoteAction: m.Component<{
   space: any,
-	proposal: any,
-	id: string,
-	totalScore: number,
-	scores: any[],
+  proposal: any,
+  id: string,
+  totalScore: number,
+  scores: any[],
   choices: string[],
 }, {
   votingModalOpen: boolean
@@ -223,51 +223,44 @@ const ViewProposalPage: m.Component<{
       const allProposals: SnapshotProposal[] = app.snapshot.proposalStore.getAll();
       vnode.state.proposal = allProposals.filter(proposal => proposal.ipfsHash === vnode.attrs.identifier)[0];
 
-      app.snapshot.client.getSpaces().then(response => {
-        let spaces: any = Object.fromEntries(
-          Object.entries(response).map(space => [
-            space[0],
-            formatSpace(space[0], space[1])
-          ])
-        );
-        let space = spaces[vnode.attrs.snapshotId];
-        vnode.state.space = space;
+      let space = app.snapshot.spaces[vnode.attrs.snapshotId];
+      vnode.state.space = space;
 
-        getProposal(space, vnode.attrs.identifier).then(proposalObj => {
-          const { proposal, votes } = proposalObj;
-          vnode.state.snapshotProposal = proposal;
-          let voteArray: Vote[] = [];
+      getProposal(space, vnode.attrs.identifier).then(proposalObj => {
+        const { proposal, votes } = proposalObj;
+        vnode.state.snapshotProposal = proposal;
+        let voteArray: Vote[] = [];
 
-          for (const key in votes) {
-            let vote: Vote = {
-              voterAddress: '',
-              choice: '',
-              timestamp: '',
-            };
-            vote.voterAddress = key,
-            vote.timestamp = votes[key].msg.timestamp;
-            vote.choice = votes[key].msg.payload.choice === 1 ? 'yes' : 'no';
-            voteArray.push(vote);
-          }
-          vnode.state.votes = voteArray;
-          const author = app.user.activeAccount;
+        for (const key in votes) {
+          let vote: Vote = {
+            voterAddress: '',
+            choice: '',
+            timestamp: '',
+          };
+          vote.voterAddress = key,
+          vote.timestamp = votes[key].msg.timestamp;
+          vote.choice = votes[key].msg.payload.choice === 1 ? 'yes' : 'no';
+          voteArray.push(vote);
+        }
+        vnode.state.votes = voteArray;
+        const author = app.user.activeAccount;
 
-          if (author && proposal.address) {
-            getPower(
-              space,
-              author.address,
-              proposal.msg.payload.snapshot
-            ).then(power => {
-              const { scores, totalScore } = power;
-              vnode.state.scores = scores;
-              vnode.state.totalScore = totalScore;
-              m.redraw();
-            });
-          }
-        })
-      });
+        if (author && proposal.address) {
+          getPower(
+            space,
+            author.address,
+            proposal.msg.payload.snapshot
+          ).then(power => {
+            const { scores, totalScore } = power;
+            vnode.state.scores = scores;
+            vnode.state.totalScore = totalScore;
+            m.redraw();
+          });
+        }
+      })
     });
   },
+
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'ViewSnapShotProposalPage' });
     mixpanel.track('Proposal Funnel', {
@@ -277,6 +270,7 @@ const ViewProposalPage: m.Component<{
       'Scope': app.activeId(),
     });
   },
+
   view: (vnode) => {
     const author = app.user.activeAccount;
 

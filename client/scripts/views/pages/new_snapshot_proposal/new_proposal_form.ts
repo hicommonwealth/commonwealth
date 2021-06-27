@@ -161,31 +161,24 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
       type: 'single-choice'
     };
 
-    app.snapshot.client.getSpaces().then(response => {
-      let spaces: any = Object.fromEntries(
-        Object.entries(response).map(space => [
-          space[0],
-          formatSpace(space[0], space[1])
-        ])
-      );
-      let space = spaces[vnode.attrs.snapshotId];
+    let space = app.snapshot.spaces[vnode.attrs.snapshotId];
+    console.log(space);
 
-      snapshotJs.utils.getScores(
-        space.key,
-        space.strategies,
-        space.network,
-        snapshotJs.utils.getProvider(space.network),
-        [app.user.activeAccount.address]
-      ).then(response => {
-        let scores = response
-          .map(score => Object.values(score).reduce((a, b) => (a as number) + (b as number), 0))
-          .reduce((a, b) => (a as number) + (b as number), 0);
-        vnode.state.userScore = scores as number;
-        vnode.state.space = space;
-        vnode.state.members = space.members;
+    snapshotJs.utils.getScores(
+      space.key,
+      space.strategies,
+      space.network,
+      snapshotJs.utils.getProvider(space.network),
+      [app.user.activeAccount.address]
+    ).then(response => {
+      let scores = response
+        .map(score => Object.values(score).reduce((a, b) => (a as number) + (b as number), 0))
+        .reduce((a, b) => (a as number) + (b as number), 0);
+      vnode.state.userScore = scores as number;
+      vnode.state.space = space;
+      vnode.state.members = space.members;
 
-        m.redraw();
-      });
+      m.redraw();
     });
   },
 

@@ -10,6 +10,7 @@ class SnapshotController {
   // private _votes = new Store<SnapshotVote>();
   public get proposalStore() { return this._proposalStore; }
   public client = new Snapshot.Client(hubUrl);
+  public spaces: any;
 
   public async fetchSnapshotProposals(snapshot: string) {
     const response = await $.get(`${hubUrl}/api/${snapshot}/proposals`);
