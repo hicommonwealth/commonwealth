@@ -344,7 +344,7 @@ export const removeOrAddClasslistToAllElements = (
   });
 };
 
-export const expandTokenAmount = (input: string, decimals: number) : string => {
+export const tokensToTokenBaseUnits = (input: string, decimals: number) : string => {
   // necessary unfortunately because BN.js can't parse decimal strings
   const parts = input.split('.');
   const zeroesToAdd = parts[1] ? decimals - parts[1].length : decimals;
@@ -353,7 +353,7 @@ export const expandTokenAmount = (input: string, decimals: number) : string => {
   return parts[0] + (parts[1] ? parts[1] : '') + '0'.repeat(zeroesToAdd);
 };
 
-export const formatTokenAmount = (input: string, decimals: number) => {
+export const tokenBaseUnitsToTokens = (input: string, decimals: number) => {
   if (input === '0') return '0';
   let partOne = ''; // part before decimal point
   let partTwo = ''; // part after

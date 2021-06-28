@@ -8,7 +8,7 @@ import BN from 'bn.js';
 
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { CompactModalExitButton } from 'views/modal';
-import { expandTokenAmount, formatTokenAmount } from 'helpers';
+import { tokensToTokenBaseUnits, tokenBaseUnitsToTokens } from 'helpers';
 import { OffchainTopic } from '../../models';
 
 interface INewTopicModalForm {
@@ -24,7 +24,7 @@ const EditTokenThresholdsRow: m.Component<{ topic: OffchainTopic }, { new_token_
     const decimals = app.chain.meta.chain.decimals ? app.chain.meta.chain.decimals : 18;
 
     if (!vnode.state.new_token_threshold) {
-      vnode.state.new_token_threshold = formatTokenAmount(topic.token_threshold.toString(), decimals);
+      vnode.state.new_token_threshold = tokenBaseUnitsToTokens(topic.token_threshold.toString(), decimals);
     }
 
     return m(Form, [
@@ -41,7 +41,7 @@ const EditTokenThresholdsRow: m.Component<{ topic: OffchainTopic }, { new_token_
         rounded: true,
         onclick: async (e) => {
           e.preventDefault();
-          app.topics.setTokenThreshold(topic, expandTokenAmount(vnode.state.new_token_threshold.toString(), decimals));
+          app.topics.setTokenThreshold(topic, tokensToTokenBaseUnits(vnode.state.new_token_threshold.toString(), decimals));
         },
       })
       ]),

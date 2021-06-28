@@ -7,7 +7,7 @@ import { Button, Input, Form, FormGroup, FormLabel } from 'construct-ui';
 import BN from 'bn.js';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { CompactModalExitButton } from 'views/modal';
-import { expandTokenAmount } from 'helpers';
+import { tokensToTokenBaseUnits } from 'helpers';
 interface INewTopicModalForm {
   id: number,
   name: string,
@@ -94,7 +94,7 @@ const NewTopicModal: m.Component<{
               if (!vnode.state.form.name.trim()) return;
               app.topics.add(
                 vnode.state.form.name, vnode.state.form.description, null,
-                expandTokenAmount(vnode.state.form.token_threshold, app.chain.meta.chain.decimals)
+                tokensToTokenBaseUnits(vnode.state.form.token_threshold, app.chain.meta.chain.decimals)
               ).then(() => {
                 vnode.state.saving = false;
                 m.redraw();

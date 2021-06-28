@@ -14,7 +14,7 @@ import User from 'views/components/widgets/user';
 
 import Token from 'controllers/chain/ethereum/token/adapter';
 import BN from 'bn.js';
-import { formatTokenAmount } from 'helpers';
+import { tokenBaseUnitsToTokens } from 'helpers';
 import { GlobalStatus } from './body';
 
 const CreateComment: m.Component<{
@@ -173,7 +173,7 @@ const CreateComment: m.Component<{
             m('.token-requirement', [
               tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0))
                 ? `Commenting in ${activeTopicName} requires 
-                ${formatTokenAmount(tokenPostingThreshold.toString(), app.chain.meta.chain.decimals)} ${app.chain.meta.chain.symbol}`
+                ${tokenBaseUnitsToTokens(tokenPostingThreshold.toString(), app.chain.meta.chain.decimals)} ${app.chain.meta.chain.symbol}`
                 : null
             ]),
             m('.form-bottom', [
