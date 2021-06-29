@@ -472,32 +472,38 @@ export const ProposalHeaderPrivacyMenuItems: m.Component<{
 export const ProposalSidebarPollEditorModule: m.Component<{ proposal, openPollEditor: Function }, { isOpen: boolean }> = {
   view: (vnode) => {
     const { proposal, openPollEditor } = vnode.attrs;
-    return m(Button, {
-      class: 'ProposalSidebarPollEditorModule',
-      rounded: true,
-      compact: true,
-      disabled: !!proposal.offchainVotingEndsAt,
-      label: proposal.offchainVotingEndsAt ? 'Off-chain polling enabled' : 'Create poll',
-      onclick: (e) => {
-        e.preventDefault();
-        openPollEditor();
-      },
-    });
+    return m('.ProposalSidebarPollEditorModule', [
+      m('.placeholder-copy', 'Add an offchain poll to this thread?'),
+      m(Button, {
+        rounded: true,
+        compact: true,
+        fluid: true,
+        disabled: !!proposal.offchainVotingEndsAt,
+        label: proposal.offchainVotingEndsAt ? 'Polling enabled' : 'Create a poll',
+        onclick: (e) => {
+          e.preventDefault();
+          openPollEditor();
+        },
+      })
+    ]);
   }
 };
 
 export const ProposalSidebarStageEditorModule: m.Component<{ openStageEditor: Function }, { isOpen: boolean }> = {
   view: (vnode) => {
     const { openStageEditor } = vnode.attrs;
-    return m(Button, {
-      class: 'ProposalSidebarStageEditorModule',
-      rounded: true,
-      compact: true,
-      label: 'Connect a proposal',
-      onclick: (e) => {
-        e.preventDefault();
-        openStageEditor();
-      },
-    });
+    return m('.ProposalSidebarStageEditorModule', [
+      m('.placeholder-copy', 'Connect an on-chain proposal?'),
+      m(Button, {
+        rounded: true,
+        compact: true,
+        fluid: true,
+        label: 'Connect a proposal',
+        onclick: (e) => {
+          e.preventDefault();
+          openStageEditor();
+        },
+      })
+    ]);
   }
 };

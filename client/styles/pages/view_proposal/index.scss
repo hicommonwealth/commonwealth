@@ -372,9 +372,20 @@ $discussion-title-font-size: 1.45rem;
         }
     }
 
-    .ProposalSidebarStageEditorModule .cui-button,
-    .ProposalSidebarPollEditorModule .cui-button {
-        margin-bottom: 8px;
+    .ProposalSidebarStageEditorModule,
+    .ProposalSidebarPollEditorModule {
+        border-radius: 10px;
+        border: 1px solid tint($border-color-lightest, 26%);
+        padding: 22px 18px 21px;
+        margin-bottom: 24px;
+        .placeholder-copy {
+            line-height: 1.2;
+            color: shade($text-color-light, 10%);
+            margin: 0 2px;
+        }
+        .cui-button {
+            margin-top: 14px;
+        }
     }
 
     .QuillEditor {

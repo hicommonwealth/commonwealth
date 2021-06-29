@@ -79,9 +79,9 @@
         }
     }
     .sublayout-right-col {
-        flex: 1.5;
+        flex: 1.75;
         padding: 36px 20px;
-        max-width: calc(#{$sidebar-width});
+        max-width: calc(#{$sidebar-width} + 32px);
     }
     .hide-sidebar & {
         .sublayout-main-col {
