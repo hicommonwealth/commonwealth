@@ -606,6 +606,7 @@ $(() => {
     '/:scope/proposals':         importRoute('views/pages/proposals', { scoped: true }),
     '/:scope/treasury':          importRoute('views/pages/treasury', { scoped: true }),
     '/:scope/bounties':          importRoute('views/pages/bounties', { scoped: true }),
+    '/:scope/tips':              importRoute('views/pages/tips', { scoped: true }),
     '/:scope/proposal/:type/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
     '/:scope/council':           importRoute('views/pages/council', { scoped: true }),
     '/:scope/delegate':          importRoute('views/pages/delegate', { scoped: true, }),

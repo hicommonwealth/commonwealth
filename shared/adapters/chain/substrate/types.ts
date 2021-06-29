@@ -66,6 +66,17 @@ export interface ISubstrateTreasuryProposal extends IIdentifiable {
   proposer: string;
 }
 
+export interface ISubstrateTreasuryTip extends IIdentifiable {
+  hash: string;
+  reason: string;
+  who: string;
+  finder: string;
+  deposit: u128;
+  findersFee: boolean;
+  closing?: number;
+  payout?: u128;
+}
+
 export interface ISubstrateBounty extends IIdentifiable {
   index: number;
   proposer: string;
