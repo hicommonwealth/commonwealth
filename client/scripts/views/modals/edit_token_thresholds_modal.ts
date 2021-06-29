@@ -9,6 +9,7 @@ import BN from 'bn.js';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { CompactModalExitButton } from 'views/modal';
 import { tokensToTokenBaseUnits, tokenBaseUnitsToTokens } from 'helpers';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { OffchainTopic } from '../../models';
 
 interface INewTopicModalForm {
@@ -18,13 +19,17 @@ interface INewTopicModalForm {
   token_threshold: number
 }
 
-const EditTokenThresholdsRow: m.Component<{ topic: OffchainTopic }, { new_token_threshold: string }> = {
+const EditTopicThresholdsRow: m.Component<{ topic: OffchainTopic }, { new_token_threshold: string }> = {
   view: (vnode) => {
     const { topic } = vnode.attrs;
     const decimals = app.chain.meta.chain.decimals ? app.chain.meta.chain.decimals : 18;
+    if (vnode.state.new_token_threshold === null || vnode.state.new_token_threshold === undefined) {
+      console.log('!!topic.token_threshold == ', !!topic.token_threshold);
 
-    if (!vnode.state.new_token_threshold) {
-      vnode.state.new_token_threshold = tokenBaseUnitsToTokens(topic.token_threshold.toString(), decimals);
+      vnode.state.new_token_threshold = topic.token_threshold
+        ? tokenBaseUnitsToTokens(topic.token_threshold.toString(), decimals) : '0';
+      console.log('vnode.state.new_token_threshold, ', vnode.state.new_token_threshold);
+
     }
 
     return m(Form, [
@@ -32,7 +37,10 @@ const EditTokenThresholdsRow: m.Component<{ topic: OffchainTopic }, { new_token_
       m('div',  [ m(Input, {
         value: vnode.state.new_token_threshold,
         oninput: (e) => {
-          vnode.state.new_token_threshold = (e.target as any).value;
+          const threshold = (e.target as any).value;
+          if (threshold.match(/^\d*?\.?\d*?$/)) {
+            vnode.state.new_token_threshold = threshold;
+          }
         },
       }),
       m(Button, {
@@ -41,15 +49,23 @@ const EditTokenThresholdsRow: m.Component<{ topic: OffchainTopic }, { new_token_
         rounded: true,
         onclick: async (e) => {
           e.preventDefault();
-          app.topics.setTokenThreshold(topic, tokensToTokenBaseUnits(vnode.state.new_token_threshold.toString(), decimals));
+          app.topics.setTopicThreshold(topic,
+            tokensToTokenBaseUnits(vnode.state.new_token_threshold.toString(), decimals))
+            .then((status) => {
+              if (status === 'Success') {
+                notifySuccess('Successfully updated threshold value');
+              } else {
+                notifyError('Could not update threshold value');
+              }
+            });
         },
-      })
+      }),
       ]),
     ]);
   }
 };
 
-const EditTokenThresholdsModal: m.Component<{
+const EditTopicThresholdsModal: m.Component<{
   id: number,
   name: string,
   description: string,
@@ -68,20 +84,21 @@ const EditTokenThresholdsModal: m.Component<{
 
     const topics =  app.topics.getByCommunity(app.activeId());
 
-    return m('.EditTokenThresholdsModal', [
+    return m('.EditTopicThresholdsModal', [
       m('.compact-modal-title', [
-        m('h3', 'Edit token thresholds'),
+        m('h3', 'Edit topic thresholds'),
         m(CompactModalExitButton),
       ]),
-      m('.compact-modal-body', topics.sort((a, b) => {
+      m('.compact-modal-body', topics.length > 0 ? topics.sort((a, b) => {
         if (a.name < b.name) { return -1; }
         if (a.name > b.name) { return 1; }
         return 0;
       }).map((topic) => {
-        return m(EditTokenThresholdsRow, { topic });
-      }))
+        return m(EditTopicThresholdsRow, { topic });
+      })
+        : 'There are no topics in this community yet')
     ]);
   }
 };
 
-export default EditTokenThresholdsModal;
+export default EditTopicThresholdsModal;

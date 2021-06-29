@@ -370,5 +370,6 @@ export const tokenBaseUnitsToTokens = (input: string, decimals: number) => {
   while (partTwo.charAt(partTwo.length - 1) === '0') {
     partTwo = partTwo.slice(0, -1);
   }
+
   return `${partOne}${partTwo.length ? '.' : ''}${partTwo}`;
 };

@@ -18,9 +18,10 @@ import EmptyTopicPlaceholder, { EmptyStagePlaceholder } from 'views/components/e
 import LoadingRow from 'views/components/loading_row';
 import Listing from 'views/pages/listing';
 import NewTopicModal from 'views/modals/new_topic_modal';
-import EditTokenThresholdsModal from 'views/modals/edit_token_thresholds_modal';
+import EditTopicThresholdsModal from 'views/modals/edit_topic_thresholds_modal';
 import EditTopicModal from 'views/modals/edit_topic_modal';
 import CreateInviteModal from 'views/modals/create_invite_modal';
+import Token from 'controllers/chain/ethereum/token/adapter';
 
 import { INITIAL_PAGE_SIZE } from 'controllers/server/threads';
 import PinnedListing from './pinned_listing';
@@ -67,11 +68,11 @@ export const CommunityOptionsPopover: m.Component<{ isAdmin: boolean, isMod: boo
             app.modals.create({ modal: NewTopicModal });
           }
         }),
-        isAdmin && m(MenuItem, {
-          label: 'Edit token thresholds',
+        isAdmin && (app.chain as Token).isToken && m(MenuItem, {
+          label: 'Edit topic thresholds',
           onclick: (e) => {
             e.preventDefault();
-            app.modals.create({ modal: EditTokenThresholdsModal });
+            app.modals.create({ modal: EditTopicThresholdsModal });
           }
         }),
         (app.community?.meta.invitesEnabled || isAdmin) && m(MenuItem, {

@@ -8,7 +8,7 @@ class OffchainTopic {
   public readonly chainId?: string;
   public readonly token_threshold?: BN;
 
-  constructor(name, id, description, telegram, communityId, chainId, token_threshold) {
+  constructor(name, id, description, telegram, communityId, chainId, token_threshold?) {
     this.name = name;
     this.id = id;
     this.description = description;

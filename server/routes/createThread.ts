@@ -36,29 +36,8 @@ const createThread = async (
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));
 
-  const { topic_name, topic_id, title, body, kind, stage, url, readOnly } = req.body;
-
-  if (chain && chain.type === 'token') {
-    // skip check for admins
-    const isAdmin = await models.Role.findAll({
-      where: {
-        address_id: author.id,
-        chain_id: chain.id,
-        permission: ['admin'],
-      },
-    });
-    if (isAdmin.length === 0) {
-      try {
-        const threshold = (await models.OffchainTopic.findOne({ where: { id: topic_id } })).token_threshold;
-        const tokenBalance = await tokenBalanceCache.getBalance(chain.id, req.body.address);
-
-        if (tokenBalance.lt(threshold)) return next(new Error(Errors.InsufficientTokenBalance));
-      } catch (e) {
-        log.error(`hasToken failed: ${e.message}`);
-        return next(new Error(Errors.CouldNotFetchTokenBalance));
-      }
-    }
-  }
+  const { topic_name, title, body, kind, stage, url, readOnly } = req.body;
+  let { topic_id } = req.body;
 
   if (kind === 'forum') {
     if (!title || !title.trim()) {
@@ -148,12 +127,35 @@ const createThread = async (
         },
       });
       threadContent['topic_id'] = offchainTopic.id;
+      topic_id = offchainTopic.id;
     } catch (err) {
       return next(err);
     }
   } else {
     if ((community || chain).topics?.length) {
       return next(Error('Must pass a topic_name string and/or a numeric topic_id'));
+    }
+  }
+
+  if (chain && chain.type === 'token') {
+    // skip check for admins
+    const isAdmin = await models.Role.findAll({
+      where: {
+        address_id: author.id,
+        chain_id: chain.id,
+        permission: ['admin'],
+      },
+    });
+    if (isAdmin.length === 0) {
+      try {
+        const threshold = (await models.OffchainTopic.findOne({ where: { id: topic_id } })).token_threshold;
+        const tokenBalance = await tokenBalanceCache.getBalance(chain.id, req.body.address);
+
+        if (threshold && tokenBalance.lt(threshold)) return next(new Error(Errors.InsufficientTokenBalance));
+      } catch (e) {
+        log.error(`hasToken failed: ${e.message}`);
+        return next(new Error(Errors.CouldNotFetchTokenBalance));
+      }
     }
   }
 

@@ -45,7 +45,7 @@ export default (
     created_at: { type: dataTypes.DATE, allowNull: false },
     updated_at: { type: dataTypes.DATE, allowNull: false },
     deleted_at: { type: dataTypes.DATE, allowNull: true },
-    token_threshold: { type: dataTypes.INTEGER, allowNull: false }
+    token_threshold: { type: dataTypes.INTEGER, allowNull: true }
   }, {
     underscored: true,
     paranoid: true,

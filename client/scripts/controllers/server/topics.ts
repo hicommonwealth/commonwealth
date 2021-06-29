@@ -7,7 +7,11 @@ import app from 'state';
 import BN from 'bn.js';
 
 const modelFromServer = (topic) => {
-  return new OffchainTopic(topic.name, topic.id, topic.description, topic.telegram, topic.community_id, topic.chain_id, new BN(topic.token_threshold));
+  if (topic.token_threshold !== null) {
+    return new OffchainTopic(topic.name, topic.id, topic.description, topic.telegram, topic.community_id, topic.chain_id, new BN(topic.token_threshold));
+  } else {
+    return new OffchainTopic(topic.name, topic.id, topic.description, topic.telegram, topic.community_id, topic.chain_id);
+  }
 };
 
 class TopicsController {
@@ -48,14 +52,14 @@ class TopicsController {
     }
   }
 
-  public async setTokenThreshold(topic: OffchainTopic, token_threshold: string) {
+  public async setTopicThreshold(topic: OffchainTopic, token_threshold: string) {
     try {
       const response = await $.post(`${app.serverUrl()}/setTopicThreshold`, {
         'topic_id': topic.id,
         'token_threshold': token_threshold,
         'jwt': app.user.jwt
       });
-      return response.result;
+      return response.status;
     } catch (err) {
       console.log('Failed to edit topic');
       throw new Error((err.responseJSON && err.responseJSON.error)

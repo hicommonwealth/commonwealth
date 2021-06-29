@@ -8,7 +8,7 @@ module.exports = {
         'token_threshold',
         {
           type: Sequelize.STRING,
-          allowNull: false,
+          allowNull: true,
           defaultValue: '0',
         },
         { transaction: t }
@@ -23,7 +23,7 @@ module.exports = {
         'token_threshold',
         {
           type: Sequelize.STRING,
-          allowNull: false,
+          allowNull: true,
           defaultValue: '0',
         },
         { transaction: t }
