@@ -179,14 +179,17 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
 
     const onProposalPage = (p) => (
       p.startsWith(`/${app.activeChainId()}/proposals`)
-        || p.startsWith(`/${app.activeChainId()}/proposal/councilmotion`)
         || p.startsWith(`/${app.activeChainId()}/proposal/democracyproposal`));
     const onReferendaPage = (p) => p.startsWith(`/${app.activeChainId()}/referenda`)
       || p.startsWith(`/${app.activeChainId()}/proposal/referendum`);
     const onTreasuryPage = (p) => p.startsWith(`/${app.activeChainId()}/treasury`)
       || p.startsWith(`/${app.activeChainId()}/proposal/treasuryproposal`);
     const onBountiesPage = (p) => p.startsWith(`/${app.activeChainId()}/bounties`);
+
     const onCouncilPage = (p) => p.startsWith(`/${app.activeChainId()}/council`);
+    const onMotionPage = (p) => (
+      p.startsWith(`/${app.activeChainId()}/motions`)
+        || p.startsWith(`/${app.activeChainId()}/proposal/councilmotion`));
 
     const onValidatorsPage = (p) => p.startsWith(`/${app.activeChainId()}/validators`);
     const onNotificationsPage = (p) => p.startsWith('/notifications');
@@ -219,7 +222,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           fluid: true,
           rounded: true,
           active: onProposalPage(m.route.get()),
-          label: app.chain?.base === ChainBase.Substrate ? 'Proposals & Motions' : 'Proposals',
+          label: 'Proposals',
           onclick: (e) => {
             e.preventDefault();
             m.route.set(`/${app.activeChainId()}/proposals`);
@@ -262,6 +265,18 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           onclick: (e) => {
             e.preventDefault();
             m.route.set(`/${app.activeChainId()}/council`);
+          },
+        }),
+      // motions (substrate only)
+      !app.community && (app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Darwinia)
+        && m(Button, {
+          fluid: true,
+          rounded: true,
+          active: onMotionPage(m.route.get()),
+          label: 'Motions',
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set(`/${app.activeChainId()}/motions`);
           },
         }),
       // validators (substrate only)
