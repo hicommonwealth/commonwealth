@@ -182,9 +182,12 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         || p.startsWith(`/${app.activeChainId()}/proposal/democracyproposal`));
     const onReferendaPage = (p) => p.startsWith(`/${app.activeChainId()}/referenda`)
       || p.startsWith(`/${app.activeChainId()}/proposal/referendum`);
+
     const onTreasuryPage = (p) => p.startsWith(`/${app.activeChainId()}/treasury`)
       || p.startsWith(`/${app.activeChainId()}/proposal/treasuryproposal`);
     const onBountiesPage = (p) => p.startsWith(`/${app.activeChainId()}/bounties`);
+    const onTipsPage = (p) => p.startsWith(`/${app.activeChainId()}/tips`)
+      || p.startsWith(`/${app.activeChainId()}/proposal/treasurytip`);
 
     const onCouncilPage = (p) => p.startsWith(`/${app.activeChainId()}/council`);
     const onMotionPage = (p) => (
@@ -252,6 +255,19 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           onclick: (e) => {
             e.preventDefault();
             m.route.set(`/${app.activeChainId()}/bounties`);
+          },
+        }),
+      // tips (substrate only)
+      // TODO: which chains?
+      !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Centrifuge
+        && m(Button, {
+          fluid: true,
+          rounded: true,
+          active: onTipsPage(m.route.get()),
+          label: 'Tips',
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set(`/${app.activeChainId()}/tips`);
           },
         }),
       m('.sidebar-spacer'),
