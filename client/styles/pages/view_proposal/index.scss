@@ -1,7 +1,6 @@
 @import 'client/styles/shared';
 
 $discussion-outer-padding: 60px;
-$discussion-separator-padding: 30px; // padding around horizontal rule between header and body
 $discussion-meta-padding: 12px;      // padding between comment meta & comment content
 $discussion-reaction-padding: 18px;  // padding between comment content & comment reaction
 $discussion-comment-padding: 28px;   // padding between comment content & avatar
@@ -34,7 +33,7 @@ $discussion-title-font-size: 1.45rem;
     .ProposalHeader,
     .ProposalComment,
     .CreateComment {
-        padding-top: 36px;
+        padding-top: 40px;
         @include xs-max {
             padding-top: 30px;
         }
@@ -61,7 +60,7 @@ $discussion-title-font-size: 1.45rem;
         position: relative;
         .proposal-top {
             display: flex;
-            padding-bottom: $discussion-separator-padding;
+            padding-bottom: 20px;
             border-bottom: 1px solid $background-color-light;
         }
         .proposal-top-left {
@@ -76,7 +75,7 @@ $discussion-title-font-size: 1.45rem;
         }
         .proposal-content {
             display: flex;
-            padding-top: $discussion-separator-padding;
+            padding-top: 40px;
         }
         .proposal-content-left {
 
@@ -373,10 +372,9 @@ $discussion-title-font-size: 1.45rem;
         }
     }
 
-    .ProposalHeaderStageEditorButton.cui-button,
-    .ProposalHeaderPollEditorButton.cui-button {
-        margin-top: 18px;
-        margin-right: 10px;
+    .ProposalSidebarStageEditorModule .cui-button,
+    .ProposalSidebarPollEditorModule .cui-button {
+        margin-bottom: 8px;
     }
 
     .QuillEditor {

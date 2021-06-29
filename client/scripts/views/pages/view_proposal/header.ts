@@ -292,39 +292,6 @@ export const ProposalHeaderStage: m.Component<{ proposal: OffchainThread }> = {
   }
 };
 
-export const ProposalHeaderPollEditorButton: m.Component<{ proposal, openPollEditor: Function }, { isOpen: boolean }> = {
-  view: (vnode) => {
-    const { proposal, openPollEditor } = vnode.attrs;
-    return m(Button, {
-      class: 'ProposalHeaderPollEditorButton',
-      rounded: true,
-      compact: true,
-      disabled: !!proposal.offchainVotingEndsAt,
-      label: proposal.offchainVotingEndsAt ? 'Off-chain polling enabled' : 'Start off-chain polling',
-      onclick: (e) => {
-        e.preventDefault();
-        openPollEditor();
-      },
-    });
-  }
-};
-
-export const ProposalHeaderStageEditorButton: m.Component<{ openStageEditor: Function }, { isOpen: boolean }> = {
-  view: (vnode) => {
-    const { openStageEditor } = vnode.attrs;
-    return m(Button, {
-      class: 'ProposalHeaderStageEditorButton',
-      rounded: true,
-      compact: true,
-      label: 'Connect on-chain proposal',
-      onclick: (e) => {
-        e.preventDefault();
-        openStageEditor();
-      },
-    });
-  }
-};
-
 export const ProposalHeaderOnchainId: m.Component<{ proposal: AnyProposal }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
@@ -499,5 +466,38 @@ export const ProposalHeaderPrivacyMenuItems: m.Component<{
         label: proposal.readOnly ? 'Unlock thread' : 'Lock thread',
       }),
     ];
+  }
+};
+
+export const ProposalSidebarPollEditorModule: m.Component<{ proposal, openPollEditor: Function }, { isOpen: boolean }> = {
+  view: (vnode) => {
+    const { proposal, openPollEditor } = vnode.attrs;
+    return m(Button, {
+      class: 'ProposalSidebarPollEditorModule',
+      rounded: true,
+      compact: true,
+      disabled: !!proposal.offchainVotingEndsAt,
+      label: proposal.offchainVotingEndsAt ? 'Off-chain polling enabled' : 'Create poll',
+      onclick: (e) => {
+        e.preventDefault();
+        openPollEditor();
+      },
+    });
+  }
+};
+
+export const ProposalSidebarStageEditorModule: m.Component<{ openStageEditor: Function }, { isOpen: boolean }> = {
+  view: (vnode) => {
+    const { openStageEditor } = vnode.attrs;
+    return m(Button, {
+      class: 'ProposalSidebarStageEditorModule',
+      rounded: true,
+      compact: true,
+      label: 'Connect a proposal',
+      onclick: (e) => {
+        e.preventDefault();
+        openStageEditor();
+      },
+    });
   }
 };

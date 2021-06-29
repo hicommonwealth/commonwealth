@@ -53,7 +53,7 @@ const PollEditor: m.Component<{
         onClose: () => {
           vnode.attrs.onChangeHandler();
         },
-        title: 'Start off-chain polling',
+        title: 'Create poll',
         transitionDuration: 200,
         footer: m(`.${Classes.ALIGN_RIGHT}`, [
           m(Button, {

@@ -155,7 +155,7 @@ const StageEditor: m.Component<{
             vnode.state.isOpen = false;
           }
         },
-        title: 'Connect on-chain proposal',
+        title: 'Connect a proposal',
         transitionDuration: 200,
         footer: m(`.${Classes.ALIGN_RIGHT}`, [
           m(Button, {
