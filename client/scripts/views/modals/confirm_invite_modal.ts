@@ -65,7 +65,9 @@ const ConfirmInviteModal: m.Component<{}, {
           ? isMobile
             ? 'selected mobile'
             : 'selected'
-          : '',
+          : isMobile
+            ? 'mobile'
+            : '',
         onclick: (e) => {
           e.preventDefault();
           vnode.state.selectedAddress = account.address;
