@@ -16,9 +16,9 @@ export const getNextOffchainPollEndingTime = (now) => {
 };
 
 export const getNextOffchainPollEndingTimeIsDangerouslyClose = (now, endingTime) => {
-  now.utc().add(5, 'days')
-  endingTime.utc()
-}
+  now.utc().add(5, 'days');
+  endingTime.utc();
+};
 
 export const slugify = (str: string): string => {
   // Remove any character that isn't a alphanumeric character or a
@@ -141,7 +141,7 @@ export const renderQuillDeltaToText = (delta, paragraphSeparator = '\n\n') => {
   }).filter((parent) => !!parent).join(paragraphSeparator);
 };
 
-export function formatAddressShort(address: string, chain: string) {
+export function formatAddressShort(address: string, chain?: string) {
   if (!address) return;
   if (chain === 'near') {
     return `@${address}`;

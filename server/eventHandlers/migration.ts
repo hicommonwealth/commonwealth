@@ -23,15 +23,23 @@ export default class extends IEventHandler {
   public async handle(event: CWEvent<IChainEventData>) {
     // case by entity type to determine what value to look for
     const createOrUpdateModel = async (fieldName, fieldValue) => {
-      const dbEventType = await this._models.ChainEventType.findOne({ where: {
-        chain: this._chain,
-        event_name: event.data.kind.toString(),
-      } });
+      // locate event type and add event (and event type if needed) to database
+      const [ dbEventType, created ] = await this._models.ChainEventType.findOrCreate({
+        where: {
+          id: `${this._chain}-${event.data.kind.toString()}`,
+          chain: this._chain,
+          event_name: event.data.kind.toString(),
+        }
+      });
       if (!dbEventType) {
         log.error(`unknown event type: ${event.data.kind}`);
         return;
       } else {
-        log.trace(`found chain event type: ${dbEventType.id}`);
+        if (created) {
+          log.info(`created chain event type: ${dbEventType.id}`);
+        } else {
+          log.trace(`found chain event type: ${dbEventType.id}`);
+        }
       }
       const queryFieldName = `event_data.${fieldName}`;
       const existingEvent = await this._models.ChainEvent.findOne({ where: {
