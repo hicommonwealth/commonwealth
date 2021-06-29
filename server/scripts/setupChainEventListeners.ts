@@ -153,9 +153,9 @@ const setupChainEventListeners = async (
     }
   }
 
-  const InitSubscriber = new Consumer();
-  await InitSubscriber.init();
-  await InitSubscriber.consumeEvents(processEvents);
+  const consumer = new Consumer();
+  await consumer.init();
+  await consumer.consumeEvents(processEvents);
 
   return {};
 };
