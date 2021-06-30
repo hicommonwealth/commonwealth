@@ -8,7 +8,6 @@ import { Erc20Factory } from '../../eth/types/Erc20Factory';
 import { TokenResponse } from '../../shared/types';
 
 import JobRunner from './cacheJobRunner';
-import TokenListCache from './tokenListCache';
 import { slugify } from '../../shared/utils';
 
 import { factory, formatFilename } from '../../shared/logging';
@@ -49,13 +48,11 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
   private _contracts: TokenForumMeta[];
 
   constructor(
-    private readonly _listCache: TokenListCache,
     noBalancePruneTimeS: number = 5 * 60,
     private readonly _hasBalancePruneTimeS: number = 24 * 60 * 60,
     private readonly _balanceProvider = new TokenBalanceProvider(),
   ) {
     super({}, noBalancePruneTimeS);
-    this._listCache = new TokenListCache();
   }
 
   private async _connectTokens(models): Promise<TokenForumMeta[]> {
@@ -78,7 +75,7 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
       }));
 
     try {
-      const tokensFromListsResponses = await this._listCache.getTokens();
+      const tokensFromListsResponses = await models.Token.findAll();
       const tokensFromLists: TokenForumMeta[] = tokensFromListsResponses
         .map((o) => {
           return {
@@ -130,10 +127,6 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
       }
     });
     return this.start(models, prefetchedTokenMeta);
-  }
-
-  public getTokens(): Promise<TokenResponse[]> {
-    return this._listCache.getTokens();
   }
 
   // query a user's balance on a given token contract and save in cache

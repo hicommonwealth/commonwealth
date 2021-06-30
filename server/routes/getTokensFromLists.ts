@@ -10,7 +10,7 @@ export const getTokensFromLists = async (
   next: NextFunction
 ) => {
   try {
-    const tokens = await tokenBalanceCache.getTokens();
+    const tokens = await models.Token.findAll();
     const chains = await models.Chain.findAll();
     const chainNames = chains.map((chain) => chain.name.toLowerCase());
     const filteredTokens = tokens.filter((token) => !chainNames.includes(token.name.toLowerCase()));
