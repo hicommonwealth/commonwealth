@@ -74,7 +74,7 @@ async function main() {
   const RUN_AS_LISTENER = process.env.RUN_AS_LISTENER === 'true';
 
   const identityFetchCache = new IdentityFetchCache(10 * 60);
-  const tokenBalanceCache = new TokenBalanceCache();
+  const tokenBalanceCache = new TokenBalanceCache(models);
   const listenChainEvents = async () => {
     try {
       // configure chain list from events

@@ -33,7 +33,7 @@ const identityFetchCache = new IdentityFetchCache(0);
 
 // always prune both token and non-token holders asap
 const mockTokenBalanceProvider = new MockTokenBalanceProvider();
-const tokenBalanceCache = new TokenBalanceCache(0, 0, mockTokenBalanceProvider);
+const tokenBalanceCache = new TokenBalanceCache(models, 0, 0, mockTokenBalanceProvider);
 const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
 let server;
 

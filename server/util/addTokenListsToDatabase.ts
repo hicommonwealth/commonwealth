@@ -31,17 +31,16 @@ async function addTokenListsToDatabase(models) {
 
   return Promise.all(tokens.map(async (token) => {
     // see if it already has it
-    const existing = await models.Token.findOne({ where: { address: token.address } });
-    if (!existing) {
-      return models.Token.create({
+    return models.Token.findOrCreate({
+      where: {
         name: token.name,
         address: token.address,
         symbol: token.symbol,
-        decimals: token.decimals,
-      }).catch((e) => {
-        log.info(`Could not add ${token.name}: ${e.message}`);
-      });
-    }
+        decimals: token.decimals
+      }
+    }).catch((e) => {
+      log.info(`Could not add ${token.name}: ${e.message}`);
+    });
   }));
 }
 

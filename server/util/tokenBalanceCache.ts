@@ -45,21 +45,22 @@ export class TokenBalanceProvider {
 }
 
 export default class TokenBalanceCache extends JobRunner<CacheT> {
-  private _contracts: TokenForumMeta[];
-
+  private models;
   constructor(
+    models,
     noBalancePruneTimeS: number = 5 * 60,
     private readonly _hasBalancePruneTimeS: number = 24 * 60 * 60,
     private readonly _balanceProvider = new TokenBalanceProvider(),
   ) {
     super({}, noBalancePruneTimeS);
+    this.models = models;
   }
 
-  private async _connectTokens(models): Promise<TokenForumMeta[]> {
+  private async getTokens(): Promise<TokenForumMeta[]> {
     // initialize metadata from database
-    const dbTokens = await models['Chain'].findAll({
+    const dbTokens = await this.models['Chain'].findAll({
       where: { type: 'token' },
-      include: [ models['ChainNode'] ],
+      include: [ this.models['ChainNode'] ],
     });
 
     // TODO: support customized balance thresholds
@@ -75,19 +76,18 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
       }));
 
     try {
-      const tokensFromListsResponses = await models.Token.findAll();
-      const tokensFromLists: TokenForumMeta[] = tokensFromListsResponses
-        .map((o) => {
-          return {
-            id: slugify(o.name),
-            address: o.address,
-            name: o.name,
-            symbol: o.symbol,
-            iconUrl: o.logoURI,
-          };
-        });
-
-      return [...tokens, ...tokensFromLists];
+      return tokens.concat(
+        (await this.models.Token.findAll()
+          .map((o) => {
+            return {
+              id: slugify(o.name),
+              address: o.address,
+              name: o.name,
+              symbol: o.symbol,
+              iconUrl: o.logoURI,
+            };
+          }))
+      );
     } catch (e) {
       log.error('An error occurred trying to access token lists', e.message);
     }
@@ -95,28 +95,28 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     return tokens;
   }
 
-  public getToken(searchAddress: string): TokenForumMeta {
-    return this._contracts.find(({ address }) => address === searchAddress);
+  public getToken(searchAddress: string): Promise<TokenForumMeta> {
+    return this.getTokens().then((o) => o.find(({ address }) => { return address.toLowerCase() === searchAddress.toLowerCase(); }));
   }
 
   public async start(models?, prefetchedTokenMeta?: TokenForumMeta[]) {
+    let tokenMeta;
     if (!prefetchedTokenMeta) {
-      const tokenMeta = await this._connectTokens(models);
-      this._contracts = tokenMeta;
+      tokenMeta = await this.getTokens();
     } else {
-      this._contracts = prefetchedTokenMeta;
+      tokenMeta = prefetchedTokenMeta;
     }
 
     // write init values into saved cache
     await this.access(async (cache) => {
-      for (const { id } of this._contracts) {
+      for (const { id } of tokenMeta) {
         cache[id] = { };
       }
     });
 
     // kick off job
     super.start();
-    log.info(`Started Token Balance Cache with ${this._contracts.length} tokens.`);
+    log.info(`Started Token Balance Cache with ${tokenMeta.length} tokens.`);
   }
 
   public async reset(models?, prefetchedTokenMeta?: TokenForumMeta[]) {
@@ -131,7 +131,7 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
 
   // query a user's balance on a given token contract and save in cache
   public async hasToken(contractId: string, address: string, network = 'mainnet'): Promise<boolean> {
-    const tokenMeta = this._contracts.find(({ id }) => id === contractId);
+    const tokenMeta = await this.getTokens().then((o)=>o.find(({ id }) => id === contractId));
     if (!tokenMeta) throw new Error('unsupported token');
     const threshold = tokenMeta.balanceThreshold || new BN(1);
 
