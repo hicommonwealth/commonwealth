@@ -36,8 +36,9 @@ const updateThreadPolling = async (models, req: Request, res: Response, next: Ne
       const parsedContent = JSON.parse(req.body.content);
       if (!parsedContent.name || !parsedContent.choices
           || typeof parsedContent.name !== 'string'
+          || parsedContent.name.trim() === ''
           || !Array.isArray(parsedContent.choices)
-          || !parsedContent.choices.every((c) => typeof c === 'string'))
+          || !parsedContent.choices.every((c) => typeof c === 'string' && c.trim() !== ''))
         return next(new Error(Errors.InvalidContent));
     } catch (e) {
       return next(new Error(Errors.InvalidContent));

@@ -99,6 +99,7 @@ export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread 
       m('.offchain-poll-header', [
         proposal.offchainVotingOptions?.name || (pollingEnded ? 'Poll closed' : 'Poll open')
       ]),
+      !proposal.offchainVotingOptions?.choices && m('.offchain-poll-invalid', '[Error loading poll]'),
       m('.offchain-poll-options', proposal.offchainVotingOptions?.choices?.map((option) => {
         const hasVoted = app.user.activeAccount
           && proposal.getOffchainVoteFor(app.user.activeAccount.chain.id, app.user.activeAccount.address);
