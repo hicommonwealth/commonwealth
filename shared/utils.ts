@@ -146,10 +146,10 @@ export function formatAddressShort(address: string, chain?: string) {
   if (chain === 'near') {
     return `@${address}`;
   } else if (chain === 'straightedge') {
-    return `${address.slice(0, 9)}…`;
+    return `${address.slice(0, 9)}`;
   } else if (chain === 'cosmos') {
-    return `${address.slice(0, 9)}…`;
+    return `${address.slice(0, 9)}`;
   } else {
-    return `${address.slice(0, 5)}…`;
+    return `${address.slice(0, 4)}`;
   }
 }

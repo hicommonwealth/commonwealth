@@ -9,7 +9,6 @@ import { Button, Icon, Icons, Tag, Tooltip, MenuItem, Input } from 'construct-ui
 import {
   pluralize, link, externalLink, extractDomain,
   offchainThreadStageToLabel,
-  offchainVoteToLabel,
 } from 'helpers';
 import {
   proposalSlugToFriendlyName,
@@ -84,84 +83,71 @@ export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread 
       OffchainVoteOptions.OPPOSE_2,
     ];
 
-    const tooltipContent = !app.isLoggedIn() ? 'Log in to vote'
-      : !app.user.activeAccount ? 'Connect an address to vote'
-        : (proposal.getOffchainVoteFor(app.user.activeAccount.chain.id, app.user.activeAccount.address)) ? [
-          'Click to update vote'
-        ] : [
-          'Click to vote as ',
-          m(User, { user: app.user.activeAccount }),
-        ];
-
     const pollingEnded = proposal.offchainVotingEndsAt?.isBefore(moment().utc());
+    const canVote = app.isLoggedIn() && app.user.activeAccount && !pollingEnded &&
+      !proposal.getOffchainVoteFor(app.user.activeAccount.chain.id, app.user.activeAccount.address);
+
+    const vote = async (option, hasVoted, isSelected) => {
+      if (!app.isLoggedIn() || !app.user.activeAccount || isSelected) return;
+
+      const confirmed = await confirmationModalWithText(hasVoted ? 'Update your vote?' : 'Confirm your vote?')();
+      if (!confirmed) return;
+      // submit vote
+      proposal.submitOffchainVote(
+        proposal.chain,
+        proposal.community,
+        app.user.activeAccount.chain.id,
+        app.user.activeAccount.address,
+        option,
+      ).catch(async () => {
+        await alertModalWithText('Error submitting vote. Maybe the poll has already ended?')();
+      });
+    };
 
     return m('.ProposalHeaderOffchainPoll', [
-      m('.offchain-poll-header', pollingEnded ? [
-        'Poll closed'
-      ] : [
-        'Poll open - closes in ',
-        // weird hack because we overwrote the moment formatter to display "just now" for future dates
-        moment().from(proposal.offchainVotingEndsAt).replace(' ago', ''),
-      ]),
-      m(Tooltip, {
-        class: 'offchain-poll-row-tooltip',
-        content: tooltipContent,
-        position: 'right',
-        trigger: m('.offchain-poll-row', {
-          class: pollingEnded ? 'offchain-poll-ended' : '',
-        }, [
-          options.map((option) => {
-            const hasVoted = app.user.activeAccount
-              && proposal.getOffchainVoteFor(app.user.activeAccount.chain.id, app.user.activeAccount.address);
-            const isSelected = hasVoted
-              && proposal.getOffchainVoteFor(app.user.activeAccount.chain.id, app.user.activeAccount.address).option === option;
-            return m('.offchain-poll-col', {
-              style: `background: ${offchainVoteToLabel(option)}`,
-              onclick: async () => {
-                if (!app.isLoggedIn() || !app.user.activeAccount || isSelected) return;
-
-                const confirmed = await confirmationModalWithText(hasVoted ? 'Update your vote?' : 'Confirm your vote?')();
-                if (!confirmed) return;
-                // submit vote
-                proposal.submitOffchainVote(
-                  proposal.chain,
-                  proposal.community,
-                  app.user.activeAccount.chain.id,
-                  app.user.activeAccount.address,
-                  option,
-                ).catch(async () => {
-                  await alertModalWithText('Error submitting vote. Maybe the poll has already ended?')();
-                });
-              }
-            }, [
-              isSelected ? m(Icon, { name: Icons.CHECK }) : ''
-            ]);
-          }),
-        ]),
-      }),
-      m('.offchain-poll-respondents', [
-        proposal.offchainVotes.length > 0
-          && options.map((option) => m('.offchain-poll-respondents-col', [
-            proposal.offchainVotes.filter((vote) => vote.option === option).length > 0
-              ? m(UserGallery, {
-                avatarSize: 16,
-                popover: true,
-                maxUsers: 3,
-                users: proposal.offchainVotes
-                  .filter((vote) => vote.option === option)
-                  .map((vote) => new AddressInfo(null, vote.address, vote.author_chain, null, null))
-              }) : ''
-          ]))
-      ]),
+      m('.offchain-poll-header', pollingEnded ? 'Poll closed' : 'Poll open'),
+      m('.offchain-poll-options', options.map((option) => {
+        const hasVoted = app.user.activeAccount
+          && proposal.getOffchainVoteFor(app.user.activeAccount.chain.id, app.user.activeAccount.address);
+        const isSelected = hasVoted?.option === option;
+        return m('.offchain-poll-option', [
+          m('.offchain-poll-option-left', option),
+          m('.offchain-poll-option-right', [
+            m(Button, {
+              onclick: vote.bind(this, option, hasVoted, isSelected),
+              label: isSelected ? 'Voted' : 'Vote',
+              size: 'sm',
+              rounded: true,
+              disabled: hasVoted ? true : false,
+              style: hasVoted ? 'pointer-events: none' : '',
+              iconLeft: isSelected ? Icons.CHECK : null,
+              compact: true,
+            }),
+          ]),
+        ]);
+      })),
       m('.offchain-poll-caption', [
-        proposal.offchainVotes.length === 0
-          ? 'No votes yet'
-          : pluralize(proposal.offchainVotes.length, 'vote'),
-        ' · ',
-        pollingEnded
-          ? 'Ended '
-          : 'Voting ends ',
+        !pollingEnded && [
+          // weird hack because we overwrote the moment formatter to display "just now" for future dates
+          moment().from(proposal.offchainVotingEndsAt).replace(' ago', ''), ' left'
+        ],
+        m('br'),
+        pollingEnded ? 'Ended ' : 'Ends ',
         proposal.offchainVotingEndsAt?.format('lll'),
+      ]),
+      m('.offchain-poll-header', 'Voters'),
+      m('.offchain-poll-voters', [
+        proposal.offchainVotes.map((vote) => m('.offchain-poll-voter', [
+          m('.offchain-poll-voter-user', [
+            m(User, {
+              avatarSize: 16,
+              popover: true,
+              user: new AddressInfo(null, vote.address, vote.author_chain, null, null),
+              hideIdentityIcon: true,
+            }),
+          ]),
+          m('.offchain-poll-voter-choice', vote.option),
+        ])),
       ]),
     ]);
   }
@@ -272,23 +258,17 @@ export const ProposalHeaderStage: m.Component<{ proposal: OffchainThread }> = {
     if (!proposal) return;
     if (proposal.stage === OffchainThreadStage.Discussion) return;
 
-    return m('.ProposalHeaderStage', [
-      m(Button, {
-        rounded: true,
-        compact: true,
-        size: 'xs',
-        href: `/${proposal.chain || proposal.community}?stage=${proposal.stage}`,
-        onclick: (e) => {
-          e.preventDefault();
-          m.route.set(`/${proposal.chain || proposal.community}?stage=${proposal.stage}`);
-        },
-        label: offchainThreadStageToLabel(proposal.stage),
-        intent: proposal.stage === OffchainThreadStage.ProposalInReview ? 'positive'
-          : proposal.stage === OffchainThreadStage.Voting ? 'positive'
-            : proposal.stage === OffchainThreadStage.Passed ? 'positive'
-              : proposal.stage === OffchainThreadStage.Failed ? 'negative' : 'none',
-      }),
-    ]);
+    return m('a.ProposalHeaderStage', {
+      href: `/${proposal.chain || proposal.community}?stage=${proposal.stage}`,
+      onclick: (e) => {
+        e.preventDefault();
+        m.route.set(`/${proposal.chain || proposal.community}?stage=${proposal.stage}`);
+      },
+      class: proposal.stage === OffchainThreadStage.ProposalInReview ? 'positive'
+        : proposal.stage === OffchainThreadStage.Voting ? 'positive'
+          : proposal.stage === OffchainThreadStage.Passed ? 'positive'
+            : proposal.stage === OffchainThreadStage.Failed ? 'negative' : 'none',
+    }, offchainThreadStageToLabel(proposal.stage));
   }
 };
 
@@ -493,12 +473,12 @@ export const ProposalSidebarStageEditorModule: m.Component<{ openStageEditor: Fu
   view: (vnode) => {
     const { openStageEditor } = vnode.attrs;
     return m('.ProposalSidebarStageEditorModule', [
-      m('.placeholder-copy', 'Connect an on-chain proposal?'),
+      m('.placeholder-copy', 'Does this thread have an on-chain proposal?'),
       m(Button, {
         rounded: true,
         compact: true,
         fluid: true,
-        label: 'Connect a proposal',
+        label: 'Set proposal status',
         onclick: (e) => {
           e.preventDefault();
           openStageEditor();

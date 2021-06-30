@@ -80,8 +80,12 @@
     }
     .sublayout-right-col {
         flex: 1.75;
-        padding: 36px 20px;
+        padding: 36px 0 36px 36px;
         max-width: calc(#{$sidebar-width} + 32px);
+        @include xl-min {
+            padding: 36px 20px 36px 32px;
+            max-width: calc(#{$sidebar-width} + 48px);
+        }
     }
     .hide-sidebar & {
         .sublayout-main-col {

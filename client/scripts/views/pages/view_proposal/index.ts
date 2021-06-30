@@ -133,6 +133,7 @@ const ProposalHeader: m.Component<{
             }),
           m('.proposal-body-meta', proposal instanceof OffchainThread
             ? [
+              m(ProposalHeaderStage, { proposal }),
               m(ProposalHeaderTopics, { proposal }),
               m(ProposalBodyCreated, { item: proposal, link: proposalLink }),
               m(ProposalBodyLastEdited, { item: proposal }),
@@ -918,23 +919,24 @@ const ViewProposalPage: m.Component<{
       showNewProposalButton: true,
       title: headerTitle,
       rightContent: [
-        proposal instanceof OffchainThread && m(ProposalHeaderStage, { proposal }),
-          isAuthor && proposal instanceof OffchainThread
-            && m(ProposalSidebarPollEditorModule, {
-              proposal,
-              openPollEditor: () => {
-                vnode.state.pollEditorIsOpen = true;
-              }
-            }),
-          (isAuthor || isAdmin) && proposal instanceof OffchainThread
-            && m(ProposalSidebarStageEditorModule, {
-              openStageEditor: () => {
-                vnode.state.stageEditorIsOpen = true;
-              }
-            }),
-          proposal instanceof OffchainThread
-            && proposal.hasOffchainPoll
-            && m(ProposalHeaderOffchainPoll, { proposal }),
+        proposal instanceof OffchainThread
+          && proposal.hasOffchainPoll
+          && m(ProposalHeaderOffchainPoll, { proposal }),
+        proposal instanceof OffchainThread
+          && isAuthor
+          && !proposal.hasOffchainPoll
+          && m(ProposalSidebarPollEditorModule, {
+            proposal,
+            openPollEditor: () => {
+              vnode.state.pollEditorIsOpen = true;
+            }
+          }),
+        (isAuthor || isAdmin) && proposal instanceof OffchainThread
+          && m(ProposalSidebarStageEditorModule, {
+            openStageEditor: () => {
+              vnode.state.stageEditorIsOpen = true;
+            }
+          }),
       ]
     }, [
       m(ProposalHeader, {
