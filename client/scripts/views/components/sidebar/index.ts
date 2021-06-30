@@ -232,19 +232,19 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
             m.route.set(`/${app.activeChainId()}/proposals`);
           },
         }),
-      // motions (substrate only)
-      !app.community && (app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Darwinia)
-        && m(Button, {
-          fluid: true,
-          rounded: true,
-          active: onMotionPage(m.route.get()),
-          label: 'Motions',
-          class: 'sub-button',
-          onclick: (e) => {
-            e.preventDefault();
-            m.route.set(`/${app.activeChainId()}/motions`);
-          },
-        }),
+      // // motions (substrate only)
+      // !app.community && (app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Darwinia)
+      //   && m(Button, {
+      //     fluid: true,
+      //     rounded: true,
+      //     active: onMotionPage(m.route.get()),
+      //     label: 'Motions',
+      //     class: 'sub-button',
+      //     onclick: (e) => {
+      //       e.preventDefault();
+      //       m.route.set(`/${app.activeChainId()}/motions`);
+      //     },
+      //   }),
       // council (substrate only)
       !app.community && app.chain?.base === ChainBase.Substrate
         && m(Button, {
