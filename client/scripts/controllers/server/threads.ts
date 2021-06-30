@@ -291,7 +291,8 @@ class ThreadsController {
     });
   }
 
-  public async setPolling(args: { threadId: number }) {
+  public async setPolling(args: { threadId: number, name: string, choices: string[] }) {
+    const { threadId, name, choices } = args;
     // start polling
     await $.ajax({
       url: `${app.serverUrl()}/updateThreadPolling`,
@@ -299,11 +300,12 @@ class ThreadsController {
       data: {
         'chain': app.activeChainId(),
         'community': app.activeCommunityId(),
-        'thread_id': args.threadId,
-        'jwt': app.user.jwt
+        'jwt': app.user.jwt,
+        'thread_id': threadId,
+        content: JSON.stringify({ name, choices }),
       },
       success: (response) => {
-        const thread = this._store.getByIdentifier(args.threadId);
+        const thread = this._store.getByIdentifier(threadId);
         if (!thread) {
           // TODO: sometimes the thread may not be in the store
           location.reload();

@@ -80,7 +80,8 @@ export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread 
     const vote = async (option, hasVoted, isSelected) => {
       if (!app.isLoggedIn() || !app.user.activeAccount || isSelected) return;
 
-      const confirmed = await confirmationModalWithText(hasVoted ? 'Update your vote?' : 'Confirm your vote?')();
+      const confirmationText = `Submit your vote for '${option}'? This cannot be changed.`;
+      const confirmed = await confirmationModalWithText(confirmationText)();
       if (!confirmed) return;
       // submit vote
       proposal.submitOffchainVote(
@@ -96,9 +97,9 @@ export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread 
 
     return m('.ProposalHeaderOffchainPoll', [
       m('.offchain-poll-header', [
-        proposal.offchainVotingOptions?.poll || (pollingEnded ? 'Poll closed' : 'Poll open')
+        proposal.offchainVotingOptions?.name || (pollingEnded ? 'Poll closed' : 'Poll open')
       ]),
-      m('.offchain-poll-options', proposal.offchainVotingOptions?.options?.map((option) => {
+      m('.offchain-poll-options', proposal.offchainVotingOptions?.choices?.map((option) => {
         const hasVoted = app.user.activeAccount
           && proposal.getOffchainVoteFor(app.user.activeAccount.chain.id, app.user.activeAccount.address);
         const isSelected = hasVoted?.option === option;

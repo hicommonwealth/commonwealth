@@ -4,7 +4,7 @@ module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.addColumn('OffchainThreads', 'offchain_voting_options', {
       type: Sequelize.STRING,
-      defaultValue: '{"poll": "Do you support this proposal?", "options": ["Yes", "No"]}',
+      defaultValue: '{"name": "Do you support this proposal?", "choices": ["Yes", "No"]}',
       allowNull: false
     });
   },

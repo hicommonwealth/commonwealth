@@ -924,7 +924,7 @@ const ViewProposalPage: m.Component<{
           && m(ProposalHeaderOffchainPoll, { proposal }),
         proposal instanceof OffchainThread
           && isAuthor
-          && !proposal.hasOffchainPoll
+          && !proposal.offchainVotingEndsAt
           && m(ProposalSidebarPollEditorModule, {
             proposal,
             openPollEditor: () => {

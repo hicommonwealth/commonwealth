@@ -10,9 +10,10 @@ import OffchainTopic from './OffchainTopic';
 import OffchainVote from './OffchainVote';
 import { VersionHistory } from '../controllers/server/threads';
 
+// field names copied from snapshot
 interface OffchainVotingOptions {
-  poll: string;
-  options: string[];
+  name: string;
+  choices: string[];
 }
 
 class OffchainThread implements IUniqueId {
