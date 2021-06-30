@@ -80,7 +80,7 @@ export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread 
     const vote = async (option, hasVoted, isSelected) => {
       if (!app.isLoggedIn() || !app.user.activeAccount || isSelected) return;
 
-      const confirmationText = `Submit your vote for '${option}'? This cannot be changed.`;
+      const confirmationText = `Submit your vote for '${option}'?`;
       const confirmed = await confirmationModalWithText(confirmationText)();
       if (!confirmed) return;
       // submit vote
@@ -111,8 +111,8 @@ export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread 
               label: isSelected ? 'Voted' : 'Vote',
               size: 'sm',
               rounded: true,
-              disabled: hasVoted ? true : false,
-              style: hasVoted ? 'pointer-events: none' : '',
+              disabled: (pollingEnded || isSelected) ? true : false,
+              style: (pollingEnded || isSelected) ? 'pointer-events: none' : '',
               iconLeft: isSelected ? Icons.CHECK : null,
               compact: true,
             }),
@@ -130,11 +130,13 @@ export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread 
       ]),
       m('.offchain-poll-header', 'Voters'),
       m('.offchain-poll-voters', [
+        proposal.offchainVotes.length === 0 && m('.offchain-poll-no-voters', 'Nobody has voted'),
         proposal.offchainVotes.map((vote) => m('.offchain-poll-voter', [
           m('.offchain-poll-voter-user', [
             m(User, {
               avatarSize: 16,
               popover: true,
+              linkify: true,
               user: new AddressInfo(null, vote.address, vote.author_chain, null, null),
               hideIdentityIcon: true,
             }),
@@ -198,7 +200,6 @@ export const ProposalHeaderThreadLinkedChainEntity: m.Component<{ proposal: Offc
         [
           `${chainEntityTypeToProposalName(chainEntity.type)} #${chainEntity.typeId}`,
           chainEntity.completed === 't' ? ' (Completed) ' : ' ',
-          m(Icon, { name: Icons.EXTERNAL_LINK }),
         ],
       ),
     ]);
@@ -462,16 +463,27 @@ export const ProposalSidebarPollEditorModule: m.Component<{ proposal, openPollEd
   }
 };
 
-export const ProposalSidebarStageEditorModule: m.Component<{ openStageEditor: Function }, { isOpen: boolean }> = {
+export const ProposalSidebarStageEditorModule: m.Component<{
+  proposal: OffchainThread,
+  openStageEditor: Function
+}, {
+  isOpen: boolean
+}> = {
   view: (vnode) => {
-    const { openStageEditor } = vnode.attrs;
+    const { proposal, openStageEditor } = vnode.attrs;
+
     return m('.ProposalSidebarStageEditorModule', [
-      m('.placeholder-copy', 'Does this thread have an on-chain proposal?'),
+      proposal.chainEntities.length > 0
+        ? m('.placeholder-copy', 'Proposals for this thread:')
+        : m('.placeholder-copy', 'Connect an on-chain proposal?'),
+      proposal.chainEntities.map((chainEntity) => {
+        return m(ProposalHeaderThreadLinkedChainEntity, { proposal, chainEntity });
+      }),
       m(Button, {
         rounded: true,
         compact: true,
         fluid: true,
-        label: 'Set proposal status',
+        label: 'Connect a proposal',
         onclick: (e) => {
           e.preventDefault();
           openStageEditor();

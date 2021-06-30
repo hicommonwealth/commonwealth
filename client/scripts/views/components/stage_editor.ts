@@ -155,7 +155,7 @@ const StageEditor: m.Component<{
             vnode.state.isOpen = false;
           }
         },
-        title: 'Set proposal status',
+        title: 'Update proposal status',
         transitionDuration: 200,
         footer: m(`.${Classes.ALIGN_RIGHT}`, [
           m(Button, {

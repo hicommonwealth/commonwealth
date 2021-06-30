@@ -245,11 +245,6 @@ const ProposalHeader: m.Component<{
             proposal instanceof OffchainThread
               && proposal.kind === OffchainThreadKind.Link
               && m(ProposalHeaderExternalLink, { proposal }),
-            proposal instanceof OffchainThread
-              && proposal.chainEntities.length > 0
-              && proposal.chainEntities.map((chainEntity) => {
-                return m(ProposalHeaderThreadLinkedChainEntity, { proposal, chainEntity });
-              }),
             !(proposal instanceof OffchainThread)
               && (proposal['blockExplorerLink'] || proposal['votingInterfaceLink'] || proposal.threadId)
               && m('.proposal-body-link', [
@@ -933,6 +928,7 @@ const ViewProposalPage: m.Component<{
           }),
         (isAuthor || isAdmin) && proposal instanceof OffchainThread
           && m(ProposalSidebarStageEditorModule, {
+            proposal,
             openStageEditor: () => {
               vnode.state.stageEditorIsOpen = true;
             }

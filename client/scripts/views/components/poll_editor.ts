@@ -40,7 +40,7 @@ const PollEditor: m.Component<{
               vnode.state.enabled = (e.target as any).checked;
             }
           }),
-          m('h4', 'Question'),
+          m('h4', { class: vnode.state.enabled ? '' : 'disabled' }, 'Question'),
           m(Input, {
             class: 'poll-editor-choices-question',
             name: 'Question',
@@ -52,7 +52,7 @@ const PollEditor: m.Component<{
               vnode.state.name = (e.target as any).value;
             }
           }),
-          m('h4', 'Choices'),
+          m('h4', { class: vnode.state.enabled ? '' : 'disabled' }, 'Choices'),
           m('.poll-editor-choices', [
             m('.poll-editor-choice-buttons', [
               vnode.state.choices?.map((choice: string, index: number) => m(Input, {

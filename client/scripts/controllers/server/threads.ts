@@ -311,6 +311,8 @@ class ThreadsController {
           location.reload();
           return;
         }
+        thread.offchainVotingOptions = { name, choices };
+        thread.offchainVotingNumVotes = 0;
         thread.offchainVotingEndsAt = moment(response.result.offchain_voting_ends_at);
         return;
       },

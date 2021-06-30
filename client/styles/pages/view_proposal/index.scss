@@ -113,7 +113,6 @@ $discussion-title-font-size: 1.45rem;
                 }
             }
         }
-        .ProposalHeaderThreadLinkedChainEntity,
         .ProposalHeaderExternalLink,
         .ProposalHeaderBlockExplorerLink,
         .ProposalHeaderVotingInterfaceLink,
@@ -296,10 +295,7 @@ $discussion-title-font-size: 1.45rem;
         .placeholder-copy {
             line-height: 1.2;
             color: shade($text-color-light, 10%);
-            margin: 0 2px;
-        }
-        .cui-button {
-            margin-top: 14px;
+            margin: 2px 0 12px;
         }
     }
     .ProposalHeaderOffchainPoll {
@@ -312,7 +308,8 @@ $discussion-title-font-size: 1.45rem;
             .offchain-poll-option {
                 display: flex;
                 .offchain-poll-option-left {
-                    margin: 4px 0;
+                    margin: 6px 0;
+                    line-height: 1.1;
                     flex: 1;
                 }
             }
@@ -322,8 +319,12 @@ $discussion-title-font-size: 1.45rem;
             color: $text-color-light;
             margin-bottom: 24px;
         }
+        .offchain-poll-no-voters {
+            font-size: 16px;
+            color: $text-color-light;
+        }
         .offchain-poll-voters {
-            margin-top: 16px;
+            margin-top: 10px;
             .offchain-poll-voter {
                 display: flex;
                 .User {

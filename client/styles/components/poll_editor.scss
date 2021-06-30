@@ -11,6 +11,9 @@
     h4 {
         margin: 12px 0 14px;
     }
+    h4.disabled {
+        color: $text-color-light;
+    }
     .poll-editor-choices-question {
         margin-bottom: 16px;
     }
