@@ -21,7 +21,6 @@ import {
   OffchainThread,
   OffchainThreadKind,
   OffchainThreadStage,
-  OffchainVoteOptions,
   AnyProposal,
   AddressInfo,
 } from 'models';
@@ -74,15 +73,6 @@ export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread 
         });
     }
 
-    const options = [
-      OffchainVoteOptions.SUPPORT_2,
-      OffchainVoteOptions.SUPPORT,
-      OffchainVoteOptions.NEUTRAL_SUPPORT,
-      OffchainVoteOptions.NEUTRAL_OPPOSE,
-      OffchainVoteOptions.OPPOSE,
-      OffchainVoteOptions.OPPOSE_2,
-    ];
-
     const pollingEnded = proposal.offchainVotingEndsAt?.isBefore(moment().utc());
     const canVote = app.isLoggedIn() && app.user.activeAccount && !pollingEnded &&
       !proposal.getOffchainVoteFor(app.user.activeAccount.chain.id, app.user.activeAccount.address);
@@ -105,8 +95,10 @@ export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread 
     };
 
     return m('.ProposalHeaderOffchainPoll', [
-      m('.offchain-poll-header', pollingEnded ? 'Poll closed' : 'Poll open'),
-      m('.offchain-poll-options', options.map((option) => {
+      m('.offchain-poll-header', [
+        proposal.offchainVotingOptions?.poll || (pollingEnded ? 'Poll closed' : 'Poll open')
+      ]),
+      m('.offchain-poll-options', proposal.offchainVotingOptions?.options?.map((option) => {
         const hasVoted = app.user.activeAccount
           && proposal.getOffchainVoteFor(app.user.activeAccount.chain.id, app.user.activeAccount.address);
         const isSelected = hasVoted?.option === option;

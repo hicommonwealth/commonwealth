@@ -4,11 +4,16 @@ import app from 'state';
 import moment from 'moment';
 
 import { IUniqueId } from './interfaces';
-import { OffchainThreadKind, OffchainThreadStage, OffchainVoteOptions } from './types';
+import { OffchainThreadKind, OffchainThreadStage } from './types';
 import OffchainAttachment from './OffchainAttachment';
 import OffchainTopic from './OffchainTopic';
 import OffchainVote from './OffchainVote';
 import { VersionHistory } from '../controllers/server/threads';
+
+interface OffchainVotingOptions {
+  poll: string;
+  options: string[];
+}
 
 class OffchainThread implements IUniqueId {
   public readonly author: string;
@@ -47,7 +52,7 @@ class OffchainThread implements IUniqueId {
     // return _hasOffchainPoll;
   }
 
-  public offchainVotingOptions: string;
+  public offchainVotingOptions: OffchainVotingOptions;
   public offchainVotingNumVotes: number;
   public offchainVotingEndsAt: moment.Moment | null;
   public offchainVotes: OffchainVote[]; // lazy loaded
@@ -57,11 +62,11 @@ class OffchainThread implements IUniqueId {
   public setOffchainVotes(voteData) {
     const votes = voteData.map((data) => {
       const { address, author_chain, thread_id, option } = data;
-      return new OffchainVote({ address, author_chain, thread_id, option: +option });
+      return new OffchainVote({ address, author_chain, thread_id, option });
     });
     this.offchainVotes = votes;
   }
-  public async submitOffchainVote(chain: string, community: string, authorChain: string, address: string, option: OffchainVoteOptions) {
+  public async submitOffchainVote(chain: string, community: string, authorChain: string, address: string, option: string) {
     const thread_id = this.id;
     return $.post(`${app.serverUrl()}/updateOffchainVote`, {
       thread_id,
@@ -166,7 +171,9 @@ class OffchainThread implements IUniqueId {
         completed: ce.completed,
       };
     }) : [];
-    this.offchainVotingOptions = offchainVotingOptions;
+    try {
+      this.offchainVotingOptions = JSON.parse(offchainVotingOptions);
+    } catch (e) {}
     this.offchainVotingEndsAt = offchainVotingEndsAt ? moment(offchainVotingEndsAt) : null;
     this.offchainVotingNumVotes = offchainVotingNumVotes;
     this.offchainVotes = offchainVotes || [];
