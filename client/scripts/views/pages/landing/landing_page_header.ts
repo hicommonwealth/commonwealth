@@ -91,7 +91,7 @@ const HeaderLandingPage: m.Component<IAttrs, IState> = {
                   m(
                     'a',
                     {
-                      class: 'text-2xl  lg:text-base text-gray-500 leading-none',
+                      class: 'text-2xl lg:text-base text-gray-500 leading-none',
                       onclick: () => redirectClick(nav.redirectTo),
                     },
                     nav.text
