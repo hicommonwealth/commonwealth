@@ -45,6 +45,7 @@ export const modelFromServer = (thread) => {
     pinned,
     collaborators,
     chain_entities,
+    offchain_voting_options,
     offchain_voting_ends_at,
     offchain_voting_votes,
     reactions
@@ -105,6 +106,7 @@ export const modelFromServer = (thread) => {
     chainEntities: chain_entities,
     versionHistory: versionHistoryProcessed,
     lastEdited: lastEditedProcessed,
+    offchainVotingOptions: offchain_voting_options,
     offchainVotingEndsAt: offchain_voting_ends_at,
     offchainVotingNumVotes: offchain_voting_votes,
   });

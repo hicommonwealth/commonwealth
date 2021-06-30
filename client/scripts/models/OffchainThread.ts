@@ -47,6 +47,7 @@ class OffchainThread implements IUniqueId {
     // return _hasOffchainPoll;
   }
 
+  public offchainVotingOptions: string;
   public offchainVotingNumVotes: number;
   public offchainVotingEndsAt: moment.Moment | null;
   public offchainVotes: OffchainVote[]; // lazy loaded
@@ -108,6 +109,7 @@ class OffchainThread implements IUniqueId {
     collaborators,
     chainEntities,
     lastEdited,
+    offchainVotingOptions,
     offchainVotingEndsAt,
     offchainVotingNumVotes,
     offchainVotes,
@@ -132,6 +134,7 @@ class OffchainThread implements IUniqueId {
     collaborators?: any[],
     chainEntities?: any[],
     lastEdited?: moment.Moment,
+    offchainVotingOptions?: string,
     offchainVotingEndsAt?: string | moment.Moment | null,
     offchainVotingNumVotes?: number,
     offchainVotes?: OffchainVote[],
@@ -163,6 +166,7 @@ class OffchainThread implements IUniqueId {
         completed: ce.completed,
       };
     }) : [];
+    this.offchainVotingOptions = offchainVotingOptions;
     this.offchainVotingEndsAt = offchainVotingEndsAt ? moment(offchainVotingEndsAt) : null;
     this.offchainVotingNumVotes = offchainVotingNumVotes;
     this.offchainVotes = offchainVotes || [];
