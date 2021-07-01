@@ -126,11 +126,17 @@ const User: m.Component<{
                   ? `/${m.route.param('scope') || profile.chain}/account/${profile.address}?base=${profile.chain}`
                   : 'javascript:'
                 ), [
-                  profile ? (showAddressWithDisplayName ? profile.displayNameWithAddress : profile.displayName) : addrShort,
+                  !profile ? addrShort : !showAddressWithDisplayName ? profile.displayName : [
+                    profile.displayName,
+                    m('.id-short', formatAddressShort(profile.address, profile.chain)),
+                  ],
                   getRoleTags(false),
                 ])
               : m('a.user-display-name.username', [
-                profile ? (showAddressWithDisplayName ? profile.displayNameWithAddress : profile.displayName) : addrShort,
+                !profile ? addrShort : !showAddressWithDisplayName ? profile.displayName : [
+                  profile.displayName,
+                  m('.id-short', formatAddressShort(profile.address, profile.chain)),
+                ],
                 getRoleTags(false),
               ])
           ],
@@ -154,9 +160,10 @@ const User: m.Component<{
             profile
               ? `/${m.route.param('scope') || profile.chain}/account/${profile.address}?base=${profile.chain}`
               : 'javascript:',
-            profile ? [
-              (showAddressWithDisplayName ? profile.displayNameWithAddress : profile.displayName)
-            ] : addrShort)
+                 !profile ? addrShort : !showAddressWithDisplayName ? profile.displayName : [
+                   profile.displayName,
+                   m('.id-short', formatAddressShort(profile.address, profile.chain)),
+                 ])
       ]),
       profile?.address && m('.user-address', formatAddressShort(profile.address, profile.chain)),
       friendlyChainName && m('.user-chain', friendlyChainName),

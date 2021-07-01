@@ -45,7 +45,7 @@ export const Layout: m.Component<{
       }, [
         m(Sublayout, { errorLayout: [
           m('p', { style: 'color: #222' }, `Application error: ${app.loadingError}`),
-          m('p', { style: 'color: #222' }, 'Please try again at another time'),
+          m('p', { style: 'color: #222' }, 'Please try again later'),
         ] }),
         m(AppModals),
         m(AppToasts),
