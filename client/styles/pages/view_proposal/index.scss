@@ -297,6 +297,9 @@ $discussion-title-font-size: 1.45rem;
             color: shade($text-color-light, 10%);
             margin: 2px 0 12px;
         }
+        .proposal-chain-entities {
+            margin-bottom: 12px;
+        }
     }
     .ProposalHeaderOffchainPoll {
         .offchain-poll-header {

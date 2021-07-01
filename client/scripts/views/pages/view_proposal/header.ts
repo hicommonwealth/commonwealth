@@ -476,15 +476,17 @@ export const ProposalSidebarStageEditorModule: m.Component<{
     return m('.ProposalSidebarStageEditorModule', [
       proposal.chainEntities.length > 0
         ? m('.placeholder-copy', 'Proposals for this thread:')
-        : m('.placeholder-copy', 'Connect an on-chain proposal?'),
-      proposal.chainEntities.map((chainEntity) => {
-        return m(ProposalHeaderThreadLinkedChainEntity, { proposal, chainEntity });
-      }),
+        : m('.placeholder-copy', app.chain ? 'Connect an on-chain proposal?' : 'Set a voting stage for this thread?'),
+      proposal.chainEntities.length > 0 && m('.proposal-chain-entities', [
+        proposal.chainEntities.map((chainEntity) => {
+          return m(ProposalHeaderThreadLinkedChainEntity, { proposal, chainEntity });
+        }),
+      ]),
       m(Button, {
         rounded: true,
         compact: true,
         fluid: true,
-        label: 'Connect a proposal',
+        label: app.chain ? 'Connect a proposal' : 'Update status',
         onclick: (e) => {
           e.preventDefault();
           openStageEditor();
