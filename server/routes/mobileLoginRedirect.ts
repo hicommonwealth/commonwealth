@@ -57,7 +57,7 @@ const mobileLoginRedirect = async (models, magic: Magic, req: Request, res: Resp
   const redirectUrl = `${
     decodeURIComponent(redirectDeeplink)
   }?screen=Validate&jwt=${jwtToken}&mode=${isSignup ? 'signup' : 'login'}`;
-  return res.redirect(303, redirectUrl);
+  return res.json({ status: 'Success', result: { redirectUrl } });
 };
 
 export default mobileLoginRedirect;
