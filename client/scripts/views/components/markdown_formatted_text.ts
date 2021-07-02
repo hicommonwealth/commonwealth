@@ -10,10 +10,7 @@ import smartTruncate from 'smart-truncate';
 
 const renderer = new marked.Renderer();
 renderer.link = (href, title, text) => {
-  if (href.contains('://localhost') || href.contains('://commonwealth.im/')) {
-    return `<a href="${href}">${text}</a>`;
-  }
-  return `<a target="_blank" href="${href}">${text}</a>`;
+  return `<a ${!href.contains('://commonwealth.im/') && 'target="_blank"'} href="${href}">${text}</a>`;
 };
 
 marked.setOptions({
