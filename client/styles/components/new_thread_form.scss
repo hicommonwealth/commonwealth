@@ -45,6 +45,10 @@
     }
     &.has-drafts .new-thread-form-body {
         max-width: calc(100% - 205px);
+        @include xs-max {
+            max-width: 100%;
+            margin-right: 28px;
+        }
     }
     .new-thread-form-body {
         padding-bottom: 24px;
