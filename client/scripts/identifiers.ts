@@ -116,10 +116,10 @@ export const chainEntityTypeToProposalName = (t: string) => {
 };
 
 export const chainEntityTypeToProposalShortName = (t: string) => {
-  if (t === 'treasury-proposal') return 'TRES';
-  else if (t === 'democracy-referendum') return 'REF';
-  else if (t === 'democracy-proposal') return 'PROP';
-  else if (t === 'collective-proposal') return 'MOT';
-  else if (t === 'tip-proposal') return 'TIP';
-  else if (t === 'treasury-bounty') return 'BNTY'; // TODO
+  if (t === 'treasury-proposal') return 'Tres';
+  else if (t === 'democracy-referendum') return 'Ref';
+  else if (t === 'democracy-proposal') return 'Prop';
+  else if (t === 'collective-proposal') return 'Mot';
+  else if (t === 'tip-proposal') return 'Tip';
+  else if (t === 'treasury-bounty') return 'Bounty';
 };

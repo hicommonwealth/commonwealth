@@ -26,7 +26,8 @@
                 }
             }
             .discussion-row-linked-poll,
-            .discussion-row-linked-chain-entity {
+            .discussion-row-linked-chain-entity,
+            .discussion-row-stage-btn {
                 font-size: 13px;
                 padding: 0 7px;
                 min-height: 19px;
@@ -40,17 +41,6 @@
                 border: none;
                 line-height: 1.5;
                 opacity: 0.94;
-            }
-            .discussion-row-stage {
-                &.primary {
-                    color: tint($primary-bg-color, 12%) !important;
-                }
-                &.positive {
-                    color: tint($positive-bg-color, 12%) !important;
-                }
-                &.negative {
-                    color: tint($negative-bg-color, 12%) !important;
-                }
             }
             a.proposal-topic {
                 display: inline-block;
@@ -129,8 +119,5 @@
                 top: 1px;
             }
         }
-    }
-    &:hover .row-right .discussion-row-stage {
-        background: shade($background-color-white-hover, 3%);
     }
 }
