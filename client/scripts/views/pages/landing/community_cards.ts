@@ -179,6 +179,26 @@ const NewCommunityCard: m.Component<{}> = {
   }
 };
 
+const NewSnapshotSpaceCard: m.Component<{}> = {
+  view: (vnode) => {
+    return m(Card, {
+      elevation: 1,
+      interactive: true,
+      class: 'home-card NewCommunityCard',
+      onclick: (e) => {
+        e.preventDefault();
+        m.route.set('/setup-snapshot-space');
+      }
+    }, [
+      m('.card-right', [
+        m('h3', 'Create a Snapshot Space'),
+        m('p.action', 'Create a new snapshot space for Commonwealth'),
+        m('a.learn-more', { href: '#' }, m.trust('Learn more &raquo;')),
+      ]),
+    ]);
+  }
+};
+
 const HomepageCommunityCards: m.Component<{}, {}> = {
   view: (vnode) => {
     const chains = {};
@@ -228,6 +248,7 @@ const HomepageCommunityCards: m.Component<{}, {}> = {
       ]),
       m('.other-list', [
         m(NewCommunityCard),
+        m(NewSnapshotSpaceCard),
         m(LockdropToolsCard),
         m('.clear'),
       ]),

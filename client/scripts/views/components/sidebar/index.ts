@@ -171,10 +171,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
     const showCommonwealthMenuOptions = app.chain?.class === ChainClass.Commonwealth;
 
     const showMarlinOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Marlin;
-    const showSubmitSnapshotProposalOptions = app.user.activeAccount && app.chain?.meta.chain.snapshot && 
-      (app.chain?.network === ChainNetwork.Yearn ||
-        app.chain?.network === ChainNetwork.Fei ||
-        app.chain?.network === ChainNetwork.Sushi);
+    const showSubmitSnapshotProposalOptions = app.user.activeAccount && app.chain?.meta.chain.snapshot
 
     const onSnapshotProposal = (p) => p.startsWith(`/${app.activeId()}/snapshot-proposals`);
     const onProposalPage = (p) => (
@@ -339,7 +336,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         },
         label: 'Approve tokens',
       }),
-      app.chain?.meta.chain.snapshot !== null
+      showSubmitSnapshotProposalOptions
       && m(Button, {
         rounded: true,
         fluid: true,

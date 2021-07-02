@@ -681,7 +681,8 @@ $(() => {
 
     // Search
     '/search':                   importRoute('views/pages/search', { scoped: false, deferChain: true }),
-
+    '/setup-snapshot-space':     importRoute('views/pages/setup_snapshot_space', { scoped: false, deferChain: true }),
+    '/:scope/setting-snapshot-space': importRoute('views/pages/setup_snapshot_space/setting', { scoped: false, deferChain: true }),
 
     // Login page
     '/login':                    importRoute('views/pages/login', { scoped: false }),
