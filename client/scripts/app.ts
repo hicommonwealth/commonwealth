@@ -130,10 +130,12 @@ export async function deinitChainOrCommunity() {
     app.chain.networkStatus = ApiStatus.Disconnected;
     app.chain.deinitServer();
     await app.chain.deinit();
+    console.log('Finished deinitializing chain');
     app.chain = null;
   }
   if (app.community) {
     await app.community.deinit();
+    console.log('Finished deinitializing community');
     app.community = null;
   }
   app.user.setSelectedNode(null);
@@ -310,9 +312,14 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
   const finalizeInitialization = await newChain.initServer();
 
   // If the user is still on the initializing node, finalize the
-  // initialization; otherwise, abort and return false
+  // initialization; otherwise, abort, deinit, and return false.
+  //
+  // Also make sure the state is sufficiently reset so that the
+  // next redraw cycle will reinitialize any needed chain.
   if (!finalizeInitialization) {
+    console.log('Chain loading aborted');
     app.chainPreloading = false;
+    app.chain = null;
     return false;
   } else {
     app.chain = newChain;
