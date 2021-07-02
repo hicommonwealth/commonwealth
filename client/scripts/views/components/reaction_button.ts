@@ -126,7 +126,8 @@ const ReactionButton: m.Component<{
         class: 'ReactionButtonTooltip',
         content: tooltipPopover,
         trigger: rxnButton,
-        hoverOpenDelay: 1000
+        hoverOpenDelay: 1000,
+        hoverCloseDelay: 10000
       })
       : rxnButton;
   }
