@@ -1,3 +1,4 @@
+import ENS from '@ensdomains/ensjs'
 import gateways from './gateways.json';
 import networks from './networks.json';
 import numeral from 'numeral';
@@ -117,4 +118,36 @@ export function _shorten(str: string, key?: any): string {
   if (limit)
     return str.length > limit ? `${str.slice(0, limit).trim()}...` : str;
   return shorten(str);
+}
+
+export async function getSpaceUri(id) {
+  let uri = await getSpaceUriFromTextRecord(id);
+  if (!uri) uri = await getSpaceUriFromContentHash(id);
+  return uri;
+}
+
+export async function getSpaceUriFromTextRecord(id) {
+  let uri: any = false;
+  try {
+    const ensAddress = '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e';
+    const ens = new ENS({ provider: Snapshot.utils.getProvider('1'), ensAddress });
+    uri = await ens.name(id).getText('snapshot');
+  } catch (e) {
+    console.log('getSpaceUriFromTextRecord failed', id, e);
+  }
+  return uri;
+}
+
+export async function getSpaceUriFromContentHash(id) {
+  let uri: any = false;
+  try {
+    const { protocolType, decoded } = await Snapshot.utils.resolveContent(
+      Snapshot.utils.getProvider('1'),
+      id
+    );
+    if (protocolType && decoded) uri = `${protocolType}://${decoded}`;
+  } catch (e) {
+    console.log('getSpaceUriFromContentHash failed', id, e);
+  }
+  return uri;
 }
