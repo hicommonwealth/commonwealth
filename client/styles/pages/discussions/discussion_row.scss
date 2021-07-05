@@ -9,32 +9,6 @@
             a {
                 line-height: 1.2;
             }
-            .spacer {
-                display: inline-block;
-                width: 8px;
-            }
-            a.external-discussion-link {
-                font-size: 17px !important;
-                color: $primary-bg-color !important;
-                &:hover {
-                    text-decoration: underline;
-                }
-            }
-            .discussion-row-stage,
-            .discussion-row-linked-poll,
-            .discussion-row-linked-chain-entity {
-                font-size: 14px;
-                padding: 0 8px;
-                min-height: 19px;
-                height: initial;
-                pointer-events: none;
-                user-select: none;
-                position: relative;
-                top: -1px;
-                margin: -2px 0;
-                margin-right: 6px;
-                border: none;
-            }
         }
         .row-subheader {
             position: relative;
@@ -50,6 +24,23 @@
                 &::after {
                     content: ' ';
                 }
+            }
+            .discussion-row-linked-poll,
+            .discussion-row-linked-chain-entity,
+            .discussion-row-stage-btn {
+                font-size: 13px;
+                padding: 0 7px;
+                min-height: 19px;
+                height: initial;
+                pointer-events: none;
+                user-select: none;
+                position: relative;
+                top: -2px;
+                margin: -2px 0;
+                margin-right: 6px;
+                border: none;
+                line-height: 1.5;
+                opacity: 0.94;
             }
             a.proposal-topic {
                 display: inline-block;
@@ -120,28 +111,6 @@
                 border-radius: 6px;
             }
         }
-        .discussion-row-stage {
-            font-size: 15px;
-            padding: 0 8px;
-            min-height: 20px;
-            height: initial;
-            pointer-events: none;
-            user-select: none;
-            position: relative;
-            top: -1px;
-            margin-left: 8px;
-            border: none;
-            background: tint($background-color-light, 1%);
-            &.cui-button.cui-primary {
-                background: $primary-bg-color;
-            }
-            &.cui-button.cui-positive {
-                background: $positive-bg-color;
-            }
-            &.cui-button.cui-negative {
-                background: $negative-bg-color;
-            }
-        }
         .discussion-row-menu {
             width: 28px;
             position: relative;
@@ -150,8 +119,5 @@
                 top: 1px;
             }
         }
-    }
-    &:hover .row-right .discussion-row-stage {
-        background: shade($background-color-white-hover, 3%);
     }
 }

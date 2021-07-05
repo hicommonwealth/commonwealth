@@ -28,9 +28,10 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }>
         return m('.RoleChild', [
           m(User, {
             user: new AddressInfo(addr.id, addr.address, addr.chain, null, addr.is_magic), //role.Address, // make AddressInfo?
-            popover: false,
+            popover: true,
             linkify: false,
             hideAvatar: false,
+            hideIdentityIcon: true,
           }),
           m(Icon, {
             name: Icons.X,

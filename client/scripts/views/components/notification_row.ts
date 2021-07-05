@@ -359,8 +359,7 @@ const NotificationRow: m.Component<{
             && category !== `${NotificationCategories.NewThread}`
             && m('.comment-body-excerpt', notificationBody),
           m('.comment-body-bottom-wrap', [
-            // TODO: add a formatter
-            m('.comment-body-created', createdAt.format()),
+            m('.comment-body-created', moment(createdAt).fromNow()),
             !notification.isRead && m('.comment-body-mark-as-read', {
               onclick: (e) => {
                 e.preventDefault();

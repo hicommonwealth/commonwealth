@@ -88,6 +88,19 @@
         cursor: inherit;
         text-decoration: initial;
     }
+    .id-short {
+        display: inline-block;
+        font-size: 75%;
+        font-weight: 500;
+        position: relative;
+        top: -1px;
+        margin-left: 4px;
+        background: $background-color-light;
+        border-radius: 99px;
+        padding: 4px 6px 0;
+        line-height: 0.9;
+        text-decoration: none !important;
+    }
     &.linkified a.user-display-name {
         cursor: pointer;
     }
