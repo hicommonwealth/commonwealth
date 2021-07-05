@@ -143,7 +143,7 @@ export const renderQuillDeltaToText = (delta, paragraphSeparator = '\n\n') => {
 
 export function formatAddressShort(
   address: string,
-  chain: string,
+  chain?: string,
   includeEllipsis?: boolean,
   maxCharLength?: number
 ) {
