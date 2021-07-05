@@ -47,7 +47,7 @@ const User: m.Component<{
     let account : Account<any>;
     let profile; // profile is used to retrieve the chain and address later
     let role;
-    const addrShort = formatAddressShort(user.address, typeof user.chain === 'string' ? user.chain : user.chain?.id, maxCharLength);
+    const addrShort = formatAddressShort(user.address, typeof user.chain === 'string' ? user.chain : user.chain?.id, false, maxCharLength);
     const friendlyChainName = app.config.chains.getById(typeof user.chain === 'string' ? user.chain : user.chain?.id)?.name;
 
     const adminsAndMods = app.chain
@@ -171,12 +171,12 @@ const User: m.Component<{
             profile
               ? `/${m.route.param('scope') || profile.chain}/account/${profile.address}?base=${profile.chain}`
               : 'javascript:',
-                 !profile ? addrShort : !showAddressWithDisplayName ? profile.displayName : [
-                   profile.displayName,
-                   m('.id-short', formatAddressShort(profile.address, profile.chain)),
-                 ])
+            !profile ? addrShort : !showAddressWithDisplayName ? profile.displayName : [
+              profile.displayName,
+              m('.id-short', formatAddressShort(profile.address, profile.chain)),
+            ])
       ]),
-      profile?.address && m('.user-address', formatAddressShort(profile.address, profile.chain, maxCharLength)),
+      profile?.address && m('.user-address', formatAddressShort(profile.address, profile.chain, false, maxCharLength)),
       friendlyChainName && m('.user-chain', friendlyChainName),
       getRoleTags(true), // always show roleTags in .UserPopover
     ]);
@@ -273,7 +273,7 @@ export const UserBlock: m.Component<{
             ? highlightedAddress
             : showFullAddress
               ? profile.address
-              : formatAddressShort(profile.address, profile.chain, maxCharLength),
+              : formatAddressShort(profile.address, profile.chain, false, maxCharLength),
           profile?.address && showChainName && ' · ',
           showChainName && (typeof user.chain === 'string' ? user.chain : user.chain.name),
         ]),
