@@ -60,7 +60,7 @@ export const getMemberPreview = (addr, closeResultsFn, searchTerm, tabIndex, sho
         searchTerm,
         avatarSize: 24,
         showAddressWithDisplayName: true,
-        showFullAddress: true,
+        addressDisplayOptions: { showFullAddress: true },
         showChainName,
       }),
     ]),

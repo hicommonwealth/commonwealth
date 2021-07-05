@@ -141,15 +141,13 @@ export const renderQuillDeltaToText = (delta, paragraphSeparator = '\n\n') => {
   }).filter((parent) => !!parent).join(paragraphSeparator);
 };
 
-export function formatAddressShort(address: string, chain: string) {
+export function formatAddressShort(address: string, chain: string, maxCharLength?: number) {
   if (!address) return;
   if (chain === 'near') {
     return `@${address}`;
-  } else if (chain === 'straightedge') {
-    return `${address.slice(0, 9)}…`;
-  } else if (chain === 'cosmos') {
-    return `${address.slice(0, 9)}…`;
+  } else if (chain === 'straightedge' || chain === 'cosmos') {
+    return `${address.slice(0, maxCharLength || 9)}…`;
   } else {
-    return `${address.slice(0, 5)}…`;
+    return `${address.slice(0, maxCharLength || 5)}…`;
   }
 }
