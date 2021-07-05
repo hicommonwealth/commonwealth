@@ -37,9 +37,9 @@ const User: m.Component<{
     // TODO: Fix showRole logic to fetch the role from chain
     const {
       avatarOnly, hideAvatar, hideIdentityIcon, showAddressWithDisplayName,
-      user, linkify, popover, showRole, addressDisplayOptions
+      user, linkify, popover, showRole
     } = vnode.attrs;
-    const { showFullAddress, autoTruncate, maxCharLength } = addressDisplayOptions;
+    const { showFullAddress, autoTruncate, maxCharLength } = vnode.attrs.addressDisplayOptions || {};
     const avatarSize = vnode.attrs.avatarSize || 16;
     const showAvatar = !hideAvatar;
     if (!user) return;
@@ -211,7 +211,7 @@ export const UserBlock: m.Component<{
       selected, compact, linkify, addressDisplayOptions
     } = vnode.attrs;
 
-    const { showFullAddress, autoTruncate, maxCharLength } = addressDisplayOptions;
+    const { showFullAddress, autoTruncate, maxCharLength } = vnode.attrs.addressDisplayOptions || {};
 
     let profile;
     if (user instanceof AddressInfo) {
