@@ -1,6 +1,7 @@
 
 import { Request, Response, NextFunction } from 'express';
 import { sequelize } from '../database';
+import { Op } from 'sequelize';
 import TokenBalanceCache from '../util/tokenBalanceCache';
 
 import { factory, formatFilename } from '../../shared/logging';
@@ -17,7 +18,7 @@ const getTokenForum = async (
   if (!address) {
     return res.json({ status: 'Failure', message: 'Must provide token address' });
   }
-  const token = await tokenBalanceCache.getToken(address);
+  const token = await models.Token.findOne({ where: { address: { [Op.iLike]: address } }});
   if (token) {
     try {
       const result = await sequelize.transaction(async (t) => {

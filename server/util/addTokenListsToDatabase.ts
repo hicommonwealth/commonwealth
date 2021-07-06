@@ -1,5 +1,6 @@
 import fetch from 'node-fetch';
 import _ from 'underscore';
+import { slugify } from '../../shared/utils';
 
 import { TokenResponse } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
@@ -30,9 +31,9 @@ async function addTokenListsToDatabase(models) {
   const tokens: TokenResponse[] = _.flatten(responseData.map((d) => d.tokens));
 
   return Promise.all(tokens.map(async (token) => {
-    // see if it already has it
     return models.Token.findOrCreate({
       where: {
+        id: slugify(token.name),
         name: token.name,
         address: token.address,
         symbol: token.symbol,
@@ -40,6 +41,7 @@ async function addTokenListsToDatabase(models) {
       }
     }).catch((e) => {
       log.info(`Could not add ${token.name}: ${e.message}`);
+      throw e;
     });
   }));
 }
