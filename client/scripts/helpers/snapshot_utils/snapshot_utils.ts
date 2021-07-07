@@ -1,12 +1,8 @@
 import { cloneDeep } from 'lodash';
 import { apolloClient, PROPOSAL_VOTES_QUERY } from '../apollo';
-import gateways from './gateways.json';
 import networks from './networks.json';
 import numeral from 'numeral';
 import Snapshot from '@snapshot-labs/snapshot.js';
-import app from 'state';
-
-const gateway = process.env.SNAPSHOT_IPFS_GATEWAY || gateways[0];
 
 export function jsonParse(input, fallback?) {
   if (typeof input !== 'string') {

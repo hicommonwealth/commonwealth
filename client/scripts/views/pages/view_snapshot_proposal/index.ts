@@ -231,15 +231,15 @@ const ViewProposalPage: m.Component<{
         vnode.state.snapshotProposal = proposal;
         let voteArray: Vote[] = [];
 
-        for (const key in votes) {
+        for (const element of votes) {
           let vote: Vote = {
             voterAddress: '',
             choice: '',
             timestamp: '',
           };
-          vote.voterAddress = key,
-          vote.timestamp = votes[key].msg.timestamp;
-          vote.choice = votes[key].msg.payload.choice === 1 ? 'yes' : 'no';
+          vote.voterAddress = element.voter,
+          vote.timestamp = element.created;
+          vote.choice = element.choice === 1 ? 'yes' : 'no';
           voteArray.push(vote);
         }
         vnode.state.votes = voteArray;

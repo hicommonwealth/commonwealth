@@ -41,6 +41,15 @@ import(/* webpackPrefetch: true */ 'views/pages/commonwealth');
 import(/* webpackPrefetch: true */ 'views/pages/discussions');
 import(/* webpackPrefetch: true */ 'views/pages/view_proposal');
 
+declare global {
+  interface ObjectConstructor {
+    fromEntries(xs: [string|number|symbol, any][]): object
+  }
+}
+
+const fromEntries = (xs: [string|number|symbol, any][]) =>
+  Object.fromEntries ? Object.fromEntries(xs) : xs.reduce((acc, [key, value]) => ({...acc, [key]: value}), {});
+
 const APPLICATION_UPDATE_MESSAGE = 'A new version of the application has been released. Please save your work and refresh.';
 const APPLICATION_UPDATE_ACTION = 'Okay';
 

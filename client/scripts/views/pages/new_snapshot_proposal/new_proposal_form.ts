@@ -162,7 +162,6 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
     };
 
     let space = app.snapshot.spaces[vnode.attrs.snapshotId];
-    console.log(space);
 
     snapshotJs.utils.getScores(
       space.key,
