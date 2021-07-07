@@ -145,8 +145,8 @@ export function formatAddressShort(address: string, chain?: string) {
   if (!address) return;
   if (chain === 'near') {
     return `@${address}`;
-  } else if (chain === 'straightedge' || chain === 'cosmos') {
-    return `${address.slice(0, 9)}…`;
+  } else if (chain === 'straightedge' || chain === 'cosmos' || chain === 'osmosis') {
+    return `${address.slice(0, 9)}…}`;
   } else {
     return `${address.slice(0, 5)}…`;
   }

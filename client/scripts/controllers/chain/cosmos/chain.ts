@@ -1,9 +1,8 @@
 import {
   ITXModalData,
-  TransactionStatus,
   NodeInfo,
   IChainModule,
-  ITXData,
+  TransactionStatus,
 } from 'models';
 import m from 'mithril';
 import _ from 'lodash';

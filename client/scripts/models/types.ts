@@ -29,6 +29,7 @@ export enum ChainNetwork {
   Centrifuge = 'centrifuge',
   Cosmos = 'cosmos',
   Straightedge = 'straightedge',
+  Osmosis = 'osmosis',
   Ethereum = 'ethereum',
   NEAR = 'near',
   Moloch = 'moloch',
@@ -43,7 +44,6 @@ export enum ChainNetwork {
   Crust = 'crust',
   CosmosHub = 'cosmos-hub',
   Gaia13k = 'gaia-13k',
-  Osmosis = 'osmosis',
 }
 
 // This function returns a default chain for a chainbase

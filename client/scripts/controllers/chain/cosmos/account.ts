@@ -1,8 +1,9 @@
 import _ from 'lodash';
 import BN from 'bn.js';
 import { IApp } from 'state';
-import { CosmosToken } from 'controllers/chain/cosmos/types';
-import { Account, IAccountsModule } from 'models';
+import { CosmosToken } from 'adapters/chain/cosmos/types';
+import CosmosChain from 'controllers/chain/cosmos/chain';
+import { Account, IAccountsModule, ITXModalData } from 'models';
 import { AccountsStore } from 'stores';
 import {
   Secp256k1HdWallet,
@@ -16,8 +17,6 @@ import {
 } from '@cosmjs/launchpad';
 import { BondStatus } from '@cosmjs/launchpad/build/lcdapi/staking';
 import { Secp256k1Pubkey } from '@cosmjs/amino';
-
-import CosmosChain from './chain';
 
 export interface ICosmosValidator {
   // TODO: add more properties (commission, unbonding, jailed, etc)
@@ -66,15 +65,12 @@ export class CosmosAccount extends Account<CosmosToken> {
     this._client = new SigningCosmosClient(this._Chain.url, address, wallet);
   }
 
-  // TODO: these should be sync, or we need to change rest of code to match
   protected async addressFromMnemonic(mnemonic: string): Promise<string> {
-    const wallet = await Secp256k1HdWallet.fromMnemonic(mnemonic);
-    const [{ address }] = await wallet.getAccounts();
-    return address;
+    throw new Error('unsupported');
   }
 
   protected async addressFromSeed(seed: string): Promise<string> {
-    return this.addressFromMnemonic(seed);
+    throw new Error('unsupported');
   }
 
   public async signMessage(message: string): Promise<string> {
@@ -250,18 +246,6 @@ export class CosmosAccounts implements IAccountsModule<CosmosToken, CosmosAccoun
     } catch (e) {
       return null;
     }
-  }
-
-  public async fromMnemonic(mnemonic: string) {
-    const wallet = await Secp256k1HdWallet.fromMnemonic(mnemonic);
-    const [{ address }] = await wallet.getAccounts();
-    const acct = new CosmosAccount(this.app, this._Chain, this, address);
-    await acct.setMnemonic(mnemonic);
-    await acct.setWallet(wallet);
-    return acct;
-  }
-  public async fromSeed(seed: string) {
-    return this.fromMnemonic(seed);
   }
 
   public deinit() {

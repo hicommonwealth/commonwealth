@@ -10,8 +10,6 @@ import { ChainBaseIcon } from 'views/components/chain_icon';
 import { baseToNetwork } from 'models/types';
 import _ from 'underscore';
 
-import Token from 'controllers/chain/ethereum/token/adapter';
-
 const CHAINBASE_WITH_CLI = [
   ChainBase.Substrate
 ];
