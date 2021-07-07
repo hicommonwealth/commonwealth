@@ -4,9 +4,9 @@ import 'components/markdown_formatted_text.scss';
 import $ from 'jquery';
 import m from 'mithril';
 import DOMPurify from 'dompurify';
-import marked from 'marked';
 import { findAll } from 'highlight-words-core';
 import smartTruncate from 'smart-truncate';
+const marked = require('marked');
 
 const renderer = new marked.Renderer();
 renderer.link = (href, title, text) => {
