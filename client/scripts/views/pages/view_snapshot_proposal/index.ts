@@ -226,7 +226,7 @@ const ViewProposalPage: m.Component<{
       let space = app.snapshot.spaces[vnode.attrs.snapshotId];
       vnode.state.space = space;
 
-      getProposal(space, vnode.attrs.identifier).then(proposalObj => {
+      getProposal(vnode.attrs.identifier).then(proposalObj => {
         const { proposal, votes } = proposalObj;
         vnode.state.snapshotProposal = proposal;
         let voteArray: Vote[] = [];

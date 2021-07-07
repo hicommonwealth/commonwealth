@@ -1,3 +1,5 @@
+import { cloneDeep } from 'lodash';
+import { apolloClient, PROPOSAL_VOTES_QUERY } from '../apollo';
 import gateways from './gateways.json';
 import networks from './networks.json';
 import numeral from 'numeral';
@@ -47,21 +49,32 @@ export function formatProposal(proposal) {
   return proposal;
 }
 
-export async function getProposal(space, id) {
+export async function getProposal(id) {
   try {
     console.time('getProposal.data');
-    const provider = Snapshot.utils.getProvider(space.network);
-      const response = await Promise.all([
-      Snapshot.utils.ipfsGet(gateway, id),
-      app.snapshot.client.getVotes(space.key, id),
-      Snapshot.utils.getBlockNumber(provider),
-    ]);
+    const response = await apolloClient.query({
+      query: PROPOSAL_VOTES_QUERY,
+      variables: {
+        id
+      }
+    });
     console.timeEnd('getProposal.data');
-    const [, votes, blockNumber] = response;
-    let [proposal]: any = response;
-    proposal = formatProposal(proposal);
-    proposal.ipfsHash = id;
-    return { proposal, votes, blockNumber };
+
+    const proposalResClone = cloneDeep(response);
+    const proposal = proposalResClone.data.proposal;
+    const votes = proposalResClone.data.votes;
+
+    if (proposal?.plugins?.daoModule) {
+      // The Dao Module has been renamed to SafeSnap
+      // Previous proposals have to be renamed
+      proposal.plugins.safeSnap = proposal.plugins.daoModule;
+      delete proposal.plugins.daoModule;
+    }
+
+    return {
+      proposal,
+      votes
+    };
   } catch (e) {
     console.log(e);
     return e;
