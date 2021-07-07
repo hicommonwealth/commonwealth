@@ -247,7 +247,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/substrate/main'
     )).default;
     newChain = new Substrate(n, app);
-  } else if (n.chain.network === ChainNetwork.Cosmos) {
+  } else if (n.chain.base === ChainBase.CosmosSDK) {
     const Cosmos = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "cosmos-main" */

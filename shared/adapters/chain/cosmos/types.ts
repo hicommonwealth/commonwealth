@@ -1,15 +1,5 @@
 import BN from 'bn.js';
 import { Coin } from 'adapters/currency';
-import { IIdentifiable, ICompletable } from '../../shared';
-
-export class CosmosValidatorToken extends Coin {
-  constructor(n: number | string | BN, inDollars: boolean = false) {
-    if (typeof n === 'string') {
-      n = parseInt(n, 10);
-    }
-    super('validatortoken', n, inDollars);
-  }
-}
 
 export class CosmosToken extends Coin {
   constructor(denom: string, n: number | string | BN, inDollars: boolean = false) {

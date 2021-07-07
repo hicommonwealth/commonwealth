@@ -145,9 +145,7 @@ export function formatAddressShort(address: string, chain?: string, includeEllip
   if (!address) return;
   if (chain === 'near') {
     return `@${address}`;
-  } else if (chain === 'straightedge') {
-    return `${address.slice(0, 9)}${includeEllipsis ? '…' : ''}`;
-  } else if (chain === 'cosmos') {
+  } else if (chain === 'straightedge' || chain === 'cosmos' || chain === 'osmosis') {
     return `${address.slice(0, 9)}${includeEllipsis ? '…' : ''}`;
   } else {
     return `${address.slice(0, 4)}${includeEllipsis ? '…' : ''}`;
