@@ -170,7 +170,7 @@
     "sass-loader": "^10.1.1",
     "secp256k1": "^4.0.2",
     "sequelize": "^4.42.0",
-    "sequelize-cli": "^5.4.0",
+    "sequelize-cli": "^6.2.0",
     "serve-favicon": "^2.5.0",
     "sleep-promise": "^8.0.1",
     "smart-truncate": "^1.0.1",
