@@ -6,9 +6,6 @@ import { hexToUtf8 } from 'web3-utils';
 import { Button, Input } from 'construct-ui';
 
 import app from 'state';
-import { CosmosVoteChoice } from 'adapters/chain/cosmos/types';
-import { CosmosAccount } from 'controllers/chain/cosmos/account';
-import { CosmosVote, CosmosProposal } from 'controllers/chain/cosmos/proposal';
 import { ProposalStatus, BinaryVote, DepositVote, VotingType, AnyProposal } from 'models';
 import { SubstrateDemocracyReferendum, convictionToWeight } from 'controllers/chain/substrate/democracy_referendum';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
@@ -126,8 +123,6 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
         || proposal instanceof SubstratePhragmenElection
         || proposal instanceof SubstrateCollectiveProposal) {
       user = app.user.activeAccount as SubstrateAccount;
-    } else if (proposal instanceof CosmosProposal) {
-      user = app.user.activeAccount as CosmosAccount;
     } else if (proposal instanceof MolochProposal) {
       user = app.user.activeAccount as EthereumAccount;
     } else if (proposal instanceof MarlinProposal) {
@@ -171,8 +166,6 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
         ));
       } else if (proposal instanceof SubstrateCollectiveProposal) {
         createTXModal(proposal.submitVoteTx(new BinaryVote(user, true), onModalClose));
-      } else if (proposal instanceof CosmosProposal) {
-        createTXModal(proposal.submitVoteTx(new CosmosVote(user, CosmosVoteChoice.YES), null, onModalClose));
       } else if (proposal instanceof MolochProposal) {
         proposal.submitVoteWebTx(new MolochProposalVote(user, MolochVote.YES))
           .then(() => m.redraw())
@@ -215,8 +208,6 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
           convictionToWeight(vnode.state.conviction)), onModalClose));
       } else if (proposal instanceof SubstrateCollectiveProposal) {
         createTXModal(proposal.submitVoteTx(new BinaryVote(user, false), onModalClose));
-      } else if (proposal instanceof CosmosProposal) {
-        createTXModal(proposal.submitVoteTx(new CosmosVote(user, CosmosVoteChoice.NO), null, onModalClose));
       } else if (proposal instanceof MolochProposal) {
         proposal.submitVoteWebTx(new MolochProposalVote(user, MolochVote.NO)).then(() => m.redraw());
       } else if (proposal instanceof MarlinProposal) {
@@ -297,46 +288,6 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
         return notifyError('Invalid proposal type');
       }
     };
-    const voteAbstain = (e) => {
-      e.preventDefault();
-      vnode.state.votingModalOpen = true;
-      mixpanel.track('Proposal Funnel', {
-        'Step No': 3,
-        'Step': 'Vote Abstain',
-        'Proposal Name': `${proposal.slug}: ${proposal.identifier}`,
-        'Scope': app.activeId(),
-      });
-      mixpanel.people.increment('Votes');
-      mixpanel.people.set({
-        'Last Thread Created': new Date().toISOString()
-      });
-      if (proposal instanceof CosmosProposal) {
-        createTXModal(proposal.submitVoteTx(new CosmosVote(user, CosmosVoteChoice.ABSTAIN), null, onModalClose));
-      } else {
-        vnode.state.votingModalOpen = false;
-        return notifyError('Invalid proposal type');
-      }
-    };
-    const voteVeto = (e) => {
-      e.preventDefault();
-      vnode.state.votingModalOpen = true;
-      mixpanel.track('Proposal Funnel', {
-        'Step No': 3,
-        'Step': 'Vote Veto',
-        'Proposal Name': `${proposal.slug}: ${proposal.identifier}`,
-        'Scope': app.activeId(),
-      });
-      mixpanel.people.increment('Votes');
-      mixpanel.people.set({
-        'Last Thread Created': new Date().toISOString()
-      });
-      if (proposal instanceof CosmosProposal) {
-        createTXModal(proposal.submitVoteTx(new CosmosVote(user, CosmosVoteChoice.VETO), null, onModalClose));
-      } else {
-        vnode.state.votingModalOpen = false;
-        return notifyError('Invalid proposal type');
-      }
-    };
 
     const voteForChoice = (e, choice) => {
       e.preventDefault();
@@ -360,15 +311,6 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
         return vote.account.address === user.address;
       }).length > 0;
       hasVotedForAnyChoice = hasVotedYes;
-    } else if (proposal instanceof CosmosProposal) {
-      hasVotedYes = user && proposal.getVotes()
-        .filter((vote) => vote.choice === CosmosVoteChoice.YES && vote.account.address === user.address).length > 0;
-      hasVotedNo = user && proposal.getVotes()
-        .filter((vote) => vote.choice === CosmosVoteChoice.NO && vote.account.address === user.address).length > 0;
-      hasVotedAbstain = user && proposal.getVotes()
-        .filter((vote) => vote.choice === CosmosVoteChoice.ABSTAIN && vote.account.address === user.address).length > 0;
-      hasVotedVeto = user && proposal.getVotes()
-        .filter((vote) => vote.choice === CosmosVoteChoice.VETO && vote.account.address === user.address).length > 0;
     } else if (proposal instanceof MolochProposal) {
       hasVotedYes = user && proposal.getVotes()
         .filter((vote) => vote.choice === MolochVote.YES && vote.account.address === user.address).length > 0;
@@ -429,28 +371,6 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
         disabled: !canVote || votingModalOpen,
         onclick: voteYes,
         label: (hasVotedYes && !canVote) ? 'Already approved' : 'Second',
-        compact: true,
-        rounded: true,
-      }),
-    ]);
-    // cosmos: abstain
-    const abstainButton = m('.abstain-button', [
-      m(Button, {
-        intent: 'warning',
-        disabled: !canVote || hasVotedAbstain || votingModalOpen,
-        onclick: voteAbstain,
-        label: hasVotedAbstain ? 'Abstained' : 'Abstain',
-        compact: true,
-        rounded: true,
-      }),
-    ]);
-    // cosmos: veto
-    const noWithVetoButton = m('.veto-button', [
-      m(Button, {
-        intent: 'warning',
-        disabled: !canVote || hasVotedVeto || votingModalOpen,
-        onclick: voteVeto,
-        label: hasVotedVeto ? 'Vetoed' : 'Veto',
         compact: true,
         rounded: true,
       }),
@@ -521,11 +441,6 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
         m('.button-row', multiDepositApproveButton),
         m(ProposalExtensions, { proposal }),
       ];
-    } else if (proposal.votingType === VotingType.YesNoAbstainVeto) {
-      votingActionObj = [
-        m('.button-row', [yesButton, noButton, abstainButton, noWithVetoButton]),
-        m(ProposalExtensions, { proposal }),
-      ];
     } else if (proposal.votingType === VotingType.MultiOptionVoting && buttons.length > 0) {
       votingActionObj = [
         m('button-row', buttons),
@@ -539,7 +454,7 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
     } else if (proposal.votingType === VotingType.MarlinYesNo) {
       votingActionObj = [
         m('.button-row', [yesButton, noButton, /** executeButton, queueButton, */ cancelButton])
-      ]
+      ];
     } else if (proposal.votingType === VotingType.RankedChoiceVoting) {
       votingActionObj = m(CannotVote, { action: 'Unsupported proposal type' });
     } else if (proposal.votingType === VotingType.None) {

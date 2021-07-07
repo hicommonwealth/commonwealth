@@ -12,7 +12,6 @@ export enum ProposalType {
   PhragmenCandidacy = 'phragmenelection',
   SubstrateTreasuryProposal = 'treasuryproposal',
   OffchainThread = 'discussion',
-  CosmosProposal = 'cosmosproposal',
   MolochProposal = 'molochproposal',
   MarlinProposal = 'marlinproposal',
 }
@@ -35,8 +34,6 @@ export const proposalSlugToClass = () => {
     mmap.set('treasuryproposal', (app.chain as any).treasury);
     mmap.set('bountyproposal', (app.chain as any).bounties);
     mmap.set('treasurytip', (app.chain as any).tips);
-  } else if (app.chain.base === ChainBase.CosmosSDK) {
-    mmap.set('cosmosproposal', (app.chain as any).governance);
   }
   if (app.chain.network === ChainNetwork.Kusama || app.chain.network === ChainNetwork.Polkadot) {
     mmap.set('technicalcommitteemotion', (app.chain as any).technicalCommittee);
@@ -69,7 +66,6 @@ export const proposalSlugToFriendlyName = new Map<string, string>([
   ['treasurytip', 'Treasury Tip'],
   ['discussion', 'Discussion Thread'],
   ['marlinproposal', 'Proposal'],
-  ['cosmosproposal', 'Proposal'],
   ['molochproposal', 'Proposal']
 ]);
 

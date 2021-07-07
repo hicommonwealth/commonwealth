@@ -95,7 +95,7 @@ const MarlinProposalStats: m.Component<{}, {}> = {
         m(Button, {
           intent: 'primary',
           onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
-            type: ProposalType.CosmosProposal
+            type: ProposalType.MarlinProposal
           }),
           label: 'New proposal',
         }),
@@ -117,9 +117,6 @@ function getModules(): ProposalModule<any, any, any>[] {
       chain.democracyProposals,
       chain.democracy
     ];
-  } else if (app.chain.base === ChainBase.CosmosSDK) {
-    const chain = (app.chain as Cosmos);
-    return [ chain.governance ];
   } else {
     throw new Error('invalid chain');
   }
@@ -179,9 +176,6 @@ const ProposalsPage: m.Component<{}> = {
       && (app.chain as Substrate).democracyProposals.store.getAll().filter((p) => !p.completed);
     const activeCouncilProposals = onSubstrate
       && (app.chain as Substrate).council.store.getAll().filter((p) => !p.completed);
-    const activeCosmosProposals = (app.chain && app.chain.base === ChainBase.CosmosSDK)
-      && (app.chain as Cosmos).governance.store.getAll()
-        .filter((p) => !p.completed).sort((a, b) => +b.identifier - +a.identifier);
     const activeMolochProposals = onMoloch
       && (app.chain as Moloch).governance.store.getAll().filter((p) => !p.completed)
         .sort((p1, p2) => +p2.data.timestamp - +p1.data.timestamp);
@@ -191,13 +185,11 @@ const ProposalsPage: m.Component<{}> = {
 
     const activeProposalContent = !activeDemocracyProposals?.length
       && !activeCouncilProposals?.length
-      && !activeCosmosProposals?.length
       && !activeMolochProposals?.length
       && !activeMarlinProposals?.length
       ? [ m('.no-proposals', 'No active proposals') ]
       : (activeDemocracyProposals || []).map((proposal) => m(ProposalCard, { proposal }))
         .concat((activeCouncilProposals || []).map((proposal) => m(ProposalCard, { proposal })))
-        .concat((activeCosmosProposals || []).map((proposal) => m(ProposalCard, { proposal })))
         .concat((activeMolochProposals || []).map((proposal) => m(ProposalCard, { proposal })))
         .concat((activeMarlinProposals || []).map((proposal) => m(ProposalCard, { proposal })));
 
@@ -206,9 +198,6 @@ const ProposalsPage: m.Component<{}> = {
       && (app.chain as Substrate).democracyProposals.store.getAll().filter((p) => p.completed);
     const inactiveCouncilProposals = onSubstrate
       && (app.chain as Substrate).council.store.getAll().filter((p) => p.completed);
-    const inactiveCosmosProposals = (app.chain && app.chain.base === ChainBase.CosmosSDK)
-      && (app.chain as Cosmos).governance.store.getAll()
-        .filter((p) => p.completed).sort((a, b) => +b.identifier - +a.identifier);
     const inactiveMolochProposals = onMoloch
       && (app.chain as Moloch).governance.store.getAll().filter((p) => p.completed)
         .sort((p1, p2) => +p2.data.timestamp - +p1.data.timestamp);
@@ -218,13 +207,11 @@ const ProposalsPage: m.Component<{}> = {
 
     const inactiveProposalContent = !inactiveDemocracyProposals?.length
       && !inactiveCouncilProposals?.length
-      && !inactiveCosmosProposals?.length
       && !inactiveMolochProposals?.length
       && !inactiveMarlinProposals?.length
       ? [ m('.no-proposals', 'No past proposals') ]
       : (inactiveDemocracyProposals || []).map((proposal) => m(ProposalCard, { proposal }))
         .concat((inactiveCouncilProposals || []).map((proposal) => m(ProposalCard, { proposal })))
-        .concat((inactiveCosmosProposals || []).map((proposal) => m(ProposalCard, { proposal })))
         .concat((inactiveMolochProposals || []).map((proposal) => m(ProposalCard, { proposal })))
         .concat((inactiveMarlinProposals || []).map((proposal) => m(ProposalCard, { proposal })));
 

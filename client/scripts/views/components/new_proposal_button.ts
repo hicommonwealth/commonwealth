@@ -18,16 +18,9 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
       label: 'New thread',
       iconLeft: mobile ? Icons.PLUS : undefined,
     }),
-    (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
+    (app.chain?.base === ChainBase.Substrate)
       && !mobile
       && m(MenuDivider),
-    app.chain?.base === ChainBase.CosmosSDK && m(MenuItem, {
-      onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
-        type: ProposalType.CosmosProposal
-      }),
-      label: 'New text proposal',
-      iconLeft: mobile ? Icons.PLUS : undefined,
-    }),
     app.chain?.base === ChainBase.Substrate && app.chain?.network !== ChainNetwork.Plasm && [
       m(MenuItem, {
         onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {

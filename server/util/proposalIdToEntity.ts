@@ -28,7 +28,6 @@ export default async function (models, chain: string, identifier: string) {
     case 'marlinproposal': {
       return findEntity(MarlinTypes.EntityKind.Proposal.toString());
     }
-    // TODO: cosmosproposal
     // ignore council elections -- no commenting on them
     default: {
       return null;

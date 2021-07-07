@@ -123,10 +123,6 @@ const NewProposalForm = {
       hasPhragmenInfo = true;
       const elections = (app.chain as Substrate).phragmenElections;
       dataLoaded = !!elections.initialized;
-    } else if (proposalTypeEnum === ProposalType.CosmosProposal) {
-      hasTitleAndDescription = true;
-      hasDepositChooser = true;
-      dataLoaded = !!(app.chain as Cosmos).governance.initialized;
     } else if (proposalTypeEnum === ProposalType.MolochProposal) {
       hasMolochFields = true;
     } else if (proposalTypeEnum === ProposalType.MarlinProposal) {
@@ -273,17 +269,6 @@ const NewProposalForm = {
           'Proposal Type': 'Phragmen Council Candidacy',
           'Thread Type': 'Proposal',
         });
-      } else if (proposalTypeEnum === ProposalType.CosmosProposal) {
-        const deposit = vnode.state.deposit
-          ? new CosmosToken((app.chain as Cosmos).governance.minDeposit.denom, vnode.state.deposit, false)
-          : (app.chain as Cosmos).governance.minDeposit;
-        args = [author, vnode.state.form.title, vnode.state.form.description, deposit];
-        mixpanel.track('Create Thread', {
-          'Step No': 2,
-          'Step' : 'Submit Proposal',
-          'Proposal Type': 'Cosmos',
-          'Thread Type': 'Proposal',
-        });
       } else if (proposalTypeEnum === ProposalType.MolochProposal) {
         // TODO: check that applicant is valid ETH address in hex
         if (!vnode.state.applicantAddress) throw new Error('Invalid applicant address');
@@ -365,8 +350,6 @@ const NewProposalForm = {
     // shorthands
     const isSubstrate = app.chain.base === ChainBase.Substrate;
     const asSubstrate = (app.chain as Substrate);
-    const isCosmos = app.chain.base === ChainBase.CosmosSDK;
-    const asCosmos = (app.chain as Cosmos);
 
     if (!dataLoaded) {
       if (app.chain?.base === ChainBase.Substrate && (app.chain as Substrate).chain?.timedOut) {
@@ -548,17 +531,13 @@ const NewProposalForm = {
           ],
           hasDepositChooser && [
             m(FormGroup, [
-              m(FormLabel, `Deposit (${app.chain.base === ChainBase.Substrate
-                ? app.chain.currency
-                : (app.chain as Cosmos).governance.minDeposit.denom})`),
+              m(FormLabel, `Deposit (${app.chain.currency})`),
               m(Input, {
                 name: 'deposit',
-                placeholder: `Min: ${app.chain.base === ChainBase.Substrate
-                  ? (app.chain as Substrate).democracyProposals.minimumDeposit.inDollars
-                  : +(app.chain as Cosmos).governance.minDeposit}`,
-                oncreate: (vvnode) => $(vvnode.dom).val(app.chain.base === ChainBase.Substrate
-                  ? (app.chain as Substrate).democracyProposals.minimumDeposit.inDollars
-                  : +(app.chain as Cosmos).governance.minDeposit),
+                placeholder: `Min: ${(app.chain as Substrate).democracyProposals.minimumDeposit.inDollars}`,
+                oncreate: (vvnode) => $(vvnode.dom).val(
+                  (app.chain as Substrate).democracyProposals.minimumDeposit.inDollars
+                ),
                 oninput: (e) => {
                   const result = (e.target as any).value;
                   vnode.state.deposit = parseFloat(result);

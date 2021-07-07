@@ -101,7 +101,6 @@ export enum VotingType {
   SimpleYesNoVoting = 'binary',
   ConvictionYesNoVoting = 'binary_conviction',
   SimpleYesApprovalVoting = 'approval',
-  YesNoAbstainVeto = 'yes_no_abstain_veto',
   RankedChoiceVoting = 'rankedchoice',
   MultiOptionVoting = 'multioption',
   None = 'none',

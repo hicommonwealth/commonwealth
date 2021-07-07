@@ -4,8 +4,6 @@ import m from 'mithril';
 import { formatCoin } from 'adapters/currency'; // TODO: remove formatCoin, only use coins.format()
 import User from 'views/components/widgets/user';
 import { VotingType, VotingUnit, IVote, DepositVote, BinaryVote, AnyProposal } from 'models';
-import { CosmosVote, CosmosProposal } from 'controllers/chain/cosmos/proposal';
-import { CosmosVoteChoice } from 'adapters/chain/cosmos/types';
 import { MolochProposalVote, MolochVote } from 'controllers/chain/ethereum/moloch/proposal';
 import { MarlinProposalVote, MarlinVote } from 'controllers/chain/ethereum/marlin/proposal';
 import { SubstrateCollectiveVote } from 'controllers/chain/substrate/collective_proposal';
@@ -36,7 +34,7 @@ const VoteListing: m.Component<{
         : votes.map(
           (vote) => {
             let balance;
-            if (balanceWeighted && !(vote instanceof CosmosVote)) {
+            if (balanceWeighted) {
               // fetch and display balances
               if (vnode.state.balancesCache[vote.account.address]) {
                 balance = vnode.state.balancesCache[vote.account.address];
@@ -79,12 +77,6 @@ const VoteListing: m.Component<{
                 return m('.vote', [
                   m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
                   m('.vote-deposit', formatCoin((vote as DepositVote<any>).deposit, true)),
-                ]);
-              case (vote instanceof CosmosVote):
-                return m('.vote', [
-                  m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
-                  m('.vote-choice', (vote as CosmosVote).choice.toString()),
-                  // (balanceWeighted && balance) && m('.vote-balance', balance),
                 ]);
               case (vote instanceof MolochProposalVote):
                 return m('.vote', [
@@ -202,59 +194,6 @@ const VotingResults: m.Component<{ proposal }> = {
             })
           ]),
         ])
-      ]);
-    } else if (proposal.votingType === VotingType.YesNoAbstainVeto) {
-      return m('.VotingResults', [
-        m('.results-column', [
-          m('.results-header', `Yes (${votes.filter((v) => v.choice === CosmosVoteChoice.YES).length})`),
-          m('.results-cell', [
-            m(VoteListing, {
-              proposal,
-              votes: votes.filter((v) => v.choice === CosmosVoteChoice.YES)
-            })
-          ]),
-        ]),
-        m('.results-column', [
-          m('.results-header', `No (${votes.filter((v) => v.choice === CosmosVoteChoice.NO).length})`),
-          m('.results-cell', [
-            m(VoteListing, {
-              proposal,
-              votes: votes.filter((v) => v.choice === CosmosVoteChoice.NO)
-            })
-          ]),
-        ]),
-        m('.results-column', [
-          m('.results-header', `Abstained (${votes.filter((v) => v.choice === CosmosVoteChoice.ABSTAIN).length})`),
-          m('.results-cell', [
-            m(VoteListing, {
-              proposal,
-              votes: votes.filter((v) => v.choice === CosmosVoteChoice.ABSTAIN)
-            })
-          ]),
-        ]),
-        m('.results-column', [
-          m('.results-header', `No with veto (${votes.filter((v) => v.choice === CosmosVoteChoice.VETO).length})`),
-          m('.results-cell', [
-            m(VoteListing, {
-              proposal,
-              votes: votes.filter((v) => v.choice === CosmosVoteChoice.VETO)
-            })
-          ]),
-        ])
-      ]);
-    } else if (proposal.votingType === VotingType.SimpleYesApprovalVoting
-               && proposal instanceof CosmosProposal) {
-      // special case for cosmos proposals in deposit stage
-      return m('.VotingResults', [
-        m('.results-column', [
-          m('.results-header', `Approved ${proposal.depositorsAsVotes.length}`),
-          m('.results-cell', [
-            m(VoteListing, {
-              proposal,
-              votes: proposal.depositorsAsVotes
-            })
-          ]),
-        ]),
       ]);
     } else if (proposal.votingType === VotingType.SimpleYesApprovalVoting) {
       return m('.VotingResults', [

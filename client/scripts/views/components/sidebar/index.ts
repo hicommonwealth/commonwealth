@@ -163,8 +163,8 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
     //   ? (app.chain as any).governance.store.getAll().filter((p) => !p.completed).length : 0;
 
     const hasProposals = app.chain && !app.community && (
-      app.chain.base === ChainBase.CosmosSDK
-        || (app.chain.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Plasm)
+      // TODO: auto-select or store this
+      (app.chain.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Plasm)
         || app.chain.network === ChainNetwork.Moloch
         || app.chain.network === ChainNetwork.Marlin
         || app.chain.network === ChainNetwork.MarlinTestnet
@@ -217,7 +217,6 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         }),
       // proposals (substrate, cosmos, moloch & marlin only)
       !app.community && ((app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Darwinia)
-                         || app.chain?.base === ChainBase.CosmosSDK
                          || app.chain?.network === ChainNetwork.Moloch
                          || app.chain?.network === ChainNetwork.Marlin
                          || app.chain?.network === ChainNetwork.MarlinTestnet)
