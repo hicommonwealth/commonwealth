@@ -44,17 +44,20 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
         ? EntityRefreshOption.AllEntities
         : EntityRefreshOption.CompletedEntities;
 
-      await this.chainEntities.refresh(this.meta.chain.id, refresh);
-      await this.app.comments.refreshAll(
-        this.meta.chain.id,
-        null,
-        CommentRefreshOption.LoadProposalComments
-      );
-      response = await $.get(`${this.app.serverUrl()}/bulkOffchain`, {
-        chain: this.id,
-        community: null,
-        jwt: this.app.user.jwt,
-      });
+      let _unused1, _unused2;
+      [_unused1, _unused2, response] = await Promise.all([
+        this.chainEntities.refresh(this.meta.chain.id, refresh),
+        this.app.comments.refreshAll(
+          this.meta.chain.id,
+          null,
+          CommentRefreshOption.LoadProposalComments
+        ),
+        $.get(`${this.app.serverUrl()}/bulkOffchain`, {
+          chain: this.id,
+          community: null,
+          jwt: this.app.user.jwt,
+        }),
+      ]);
     } else {
       response = await $.get(`${this.app.serverUrl()}/bulkOffchain`, {
         chain: this.id,
