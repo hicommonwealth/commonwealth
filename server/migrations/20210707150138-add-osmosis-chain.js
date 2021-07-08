@@ -21,7 +21,7 @@ module.exports = {
       await queryInterface.bulkInsert('ChainNodes', [{
         chain: 'osmosis',
         // TODO: is this URL correct for what we need?
-        url: 'osmosis-1--lcd--full.datahub.figment.io',
+        url: 'https://lcd-osmosis.keplr.app',
       }], { transaction: t });
     });
   },
