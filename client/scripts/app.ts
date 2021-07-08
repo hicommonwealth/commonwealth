@@ -11,6 +11,7 @@ import $ from 'jquery';
 import { FocusManager } from 'construct-ui';
 import moment from 'moment';
 import mixpanel from 'mixpanel-browser';
+import _ from 'underscore';
 
 import app, { ApiStatus, LoginState } from 'state';
 import {
@@ -41,15 +42,6 @@ import(/* webpackPrefetch: true */ 'views/pages/commonwealth');
 import(/* webpackPrefetch: true */ 'views/pages/discussions');
 import(/* webpackPrefetch: true */ 'views/pages/view_proposal');
 
-declare global {
-  interface ObjectConstructor {
-    fromEntries(xs: [string|number|symbol, any][]): object
-  }
-}
-
-const fromEntries = (xs: [string|number|symbol, any][]) =>
-  Object.fromEntries ? Object.fromEntries(xs) : xs.reduce((acc, [key, value]) => ({...acc, [key]: value}), {});
-
 const APPLICATION_UPDATE_MESSAGE = 'A new version of the application has been released. Please save your work and refresh.';
 const APPLICATION_UPDATE_ACTION = 'Okay';
 
@@ -57,7 +49,6 @@ const APPLICATION_UPDATE_ACTION = 'Okay';
 // On logout: called to reset everything
 export async function initAppState(updateSelectedNode = true): Promise<void> {
   return new Promise((resolve, reject) => {
-    
     $.get(`${app.serverUrl()}/status`).then((data) => {
       app.config.chains.clear();
       app.config.nodes.clear();
@@ -125,15 +116,14 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
         app.config.chains.getAll().find((c) => c.customDomain === host) !== undefined
           || app.config.communities.getAll().find((c) => c.customDomain === host) !== undefined
       );
-      app.snapshot.client.getSpaces().then(response => {
-        app.snapshot.spaces = Object.fromEntries(
-          Object.entries(response).map(space => [
+      app.snapshot.client.getSpaces().then((response) => {
+        app.snapshot.spaces = _.object(
+          Object.entries(response).map((space) => [
             space[0],
             formatSpace(space[0], space[1])
           ])
         );
       });
-
       resolve();
     }).catch((err: any) => {
       app.loadingError = err.responseJSON?.error || 'Error loading application state';

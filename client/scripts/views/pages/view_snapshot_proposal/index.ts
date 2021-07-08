@@ -25,7 +25,7 @@ const ProposalHeader: m.Component<{
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     if (!proposal) {
-      return m('.topic-loading-spinner-wrap', [ m(Spinner, { active: true, size: 'lg' }) ])
+      return m('.topic-loading-spinner-wrap', [ m(Spinner, { active: true, size: 'lg' }) ]);
     }
 
     // Original posters have full editorial control, while added collaborators
@@ -34,7 +34,7 @@ const ProposalHeader: m.Component<{
     const proposalLink = `/${app.activeId()}/snapshot-proposal/${vnode.attrs.snapshotId}/${proposal.ipfsHash}`;
 
     return m('.ProposalHeader', {
-      class: `proposal-snapshot`
+      class: 'proposal-snapshot'
     }, [
       m('.proposal-top', [
         m('.proposal-top-left', [
@@ -72,30 +72,34 @@ const VoteRow: m.Component<{
       // m('.row-right', vnode.attrs.vote.choice)
     ]);
   }
-}
+};
 
 const VoteView: m.Component<{ votes: Vote[] }> = {
   view: (vnode) => {
     const { votes } = vnode.attrs;
 
-    let voteYesListing = [];
-    let voteNoListing = [];
+    const voteYesListing = [];
+    const voteNoListing = [];
 
     voteYesListing.push(m('.vote-group-wrap', votes
       .map((vote) => {
-        if (vote.choice === 'yes'){
+        if (vote.choice === 'yes') {
           return m(VoteRow, { vote });
+        } else {
+          return null;
         }
       })
-    ));
+      .filter((v) => !!v)));
 
     voteNoListing.push(m('.vote-group-wrap', votes
       .map((vote) => {
-        if (vote.choice === 'no'){
+        if (vote.choice === 'no') {
           return m(VoteRow, { vote });
+        } else {
+          return null;
         }
       })
-    ));
+      .filter((v) => !!v)));
 
     // TODO: fix up this function for cosmos votes
     return m('.VotingResults', [
@@ -126,10 +130,10 @@ const VoteAction: m.Component<{
   votingModalOpen: boolean
 }> = {
   view: (vnode) => {
-    let { choices } = vnode.attrs;
-    let canVote = true;
-    let hasVotedYes = false;
-    let hasVotedNo = false;
+    const { choices } = vnode.attrs;
+    const canVote = true;
+    const hasVotedYes = false;
+    const hasVotedNo = false;
     const { votingModalOpen } = vnode.state;
 
     const onModalClose = () => {
@@ -192,8 +196,7 @@ const VoteAction: m.Component<{
       })
     ]);
 
-    let votingActionObj;
-    votingActionObj = [
+    const votingActionObj = [
       m('.button-row', [yesButton, noButton]),
     ];
 
@@ -219,25 +222,25 @@ const ViewProposalPage: m.Component<{
     vnode.state.scores = [];
 
     const snapshotId = vnode.attrs.snapshotId;
-    app.snapshot.fetchSnapshotProposals(snapshotId).then(response => {
+    app.snapshot.fetchSnapshotProposals(snapshotId).then((response) => {
       const allProposals: SnapshotProposal[] = app.snapshot.proposalStore.getAll();
-      vnode.state.proposal = allProposals.filter(proposal => proposal.ipfsHash === vnode.attrs.identifier)[0];
+      vnode.state.proposal = allProposals.filter((proposal) => proposal.ipfsHash === vnode.attrs.identifier)[0];
 
-      let space = app.snapshot.spaces[vnode.attrs.snapshotId];
+      const space = app.snapshot.spaces[vnode.attrs.snapshotId];
       vnode.state.space = space;
 
-      getProposal(vnode.attrs.identifier).then(proposalObj => {
+      getProposal(vnode.attrs.identifier).then((proposalObj) => {
         const { proposal, votes } = proposalObj;
         vnode.state.snapshotProposal = proposal;
-        let voteArray: Vote[] = [];
+        const voteArray: Vote[] = [];
 
         for (const element of votes) {
-          let vote: Vote = {
+          const vote: Vote = {
             voterAddress: '',
             choice: '',
             timestamp: '',
           };
-          vote.voterAddress = element.voter,
+          vote.voterAddress = element.voter;
           vote.timestamp = element.created;
           vote.choice = element.choice === 1 ? 'yes' : 'no';
           voteArray.push(vote);
@@ -250,14 +253,16 @@ const ViewProposalPage: m.Component<{
             space,
             author.address,
             proposal.msg.payload.snapshot
-          ).then(power => {
+          ).then((power) => {
             const { scores, totalScore } = power;
             vnode.state.scores = scores;
             vnode.state.totalScore = totalScore;
             m.redraw();
           });
+        } else {
+          m.redraw();
         }
-      })
+      });
     });
   },
 
@@ -274,7 +279,7 @@ const ViewProposalPage: m.Component<{
   view: (vnode) => {
     const author = app.user.activeAccount;
 
-    return m(Sublayout, { class: 'ViewProposalPage', title: "Snapshot Proposal" }, [
+    return m(Sublayout, { class: 'ViewProposalPage', title: 'Snapshot Proposal' }, [
       m(ProposalHeader, {
         snapshotId: vnode.attrs.snapshotId,
         proposal: vnode.state.proposal,

@@ -75,7 +75,7 @@ export const ProposalBodyText: m.Component<{ item: SnapshotProposal }> = {
     const { item } = vnode.attrs;
     if (!item) return;
 
-    const body = item.body
+    const body = item.body;
     if (!body) return;
 
     return m('.ProposalBodyText', [
