@@ -131,9 +131,11 @@ export class CosmosProposal extends Proposal<
       voters: [],
       tally: null,
     };
-    if (depositResp) {
+    if (depositResp?.result) {
       for (const deposit of depositResp.result) {
-        state.depositors.push([ deposit.depositor, new BN(deposit.amount[0].amount) ]);
+        if (deposit.amount && deposit.amount[0]) {
+          state.depositors.push([ deposit.depositor, new BN(deposit.amount[0].amount) ]);
+        }
       }
     }
     if (voteResp) {

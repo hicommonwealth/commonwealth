@@ -97,7 +97,7 @@ class CosmosGovernance extends ProposalModule<
           identifier: p.id,
           completed: isCompleted(p.proposal_status),
           status: p.proposal_status as CosmosProposalState,
-          totalDeposit: p.total_deposit ? new BN(p.total_deposit[0].amount) : new BN(0),
+          totalDeposit: p.total_deposit && p.total_deposit[0] ? new BN(p.total_deposit[0].amount) : new BN(0),
           depositors: [],
           voters: [],
           tally: marshalTally(p.final_tally_result),
