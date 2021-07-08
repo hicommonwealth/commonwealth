@@ -73,15 +73,6 @@ export enum OffchainThreadStage {
   Failed = 'failed',
 }
 
-export enum OffchainVoteOptions {
-  SUPPORT_2,
-  SUPPORT,
-  NEUTRAL_SUPPORT,
-  NEUTRAL_OPPOSE,
-  OPPOSE,
-  OPPOSE_2,
-}
-
 export enum TransactionStatus {
   'Ready',
   'Success',

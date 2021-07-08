@@ -45,6 +45,7 @@ export const modelFromServer = (thread) => {
     pinned,
     collaborators,
     chain_entities,
+    offchain_voting_options,
     offchain_voting_ends_at,
     offchain_voting_votes,
     reactions
@@ -105,6 +106,7 @@ export const modelFromServer = (thread) => {
     chainEntities: chain_entities,
     versionHistory: versionHistoryProcessed,
     lastEdited: lastEditedProcessed,
+    offchainVotingOptions: offchain_voting_options,
     offchainVotingEndsAt: offchain_voting_ends_at,
     offchainVotingNumVotes: offchain_voting_votes,
   });
@@ -289,7 +291,8 @@ class ThreadsController {
     });
   }
 
-  public async setPolling(args: { threadId: number }) {
+  public async setPolling(args: { threadId: number, name: string, choices: string[] }) {
+    const { threadId, name, choices } = args;
     // start polling
     await $.ajax({
       url: `${app.serverUrl()}/updateThreadPolling`,
@@ -297,16 +300,19 @@ class ThreadsController {
       data: {
         'chain': app.activeChainId(),
         'community': app.activeCommunityId(),
-        'thread_id': args.threadId,
-        'jwt': app.user.jwt
+        'jwt': app.user.jwt,
+        'thread_id': threadId,
+        content: JSON.stringify({ name, choices }),
       },
       success: (response) => {
-        const thread = this._store.getByIdentifier(args.threadId);
+        const thread = this._store.getByIdentifier(threadId);
         if (!thread) {
           // TODO: sometimes the thread may not be in the store
           location.reload();
           return;
         }
+        thread.offchainVotingOptions = { name, choices };
+        thread.offchainVotingNumVotes = 0;
         thread.offchainVotingEndsAt = moment(response.result.offchain_voting_ends_at);
         return;
       },

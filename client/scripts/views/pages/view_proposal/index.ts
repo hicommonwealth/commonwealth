@@ -51,12 +51,13 @@ import {
   ProposalHeaderExternalLink, ProposalHeaderBlockExplorerLink, ProposalHeaderVotingInterfaceLink,
   ProposalHeaderOffchainPoll,
   ProposalHeaderThreadLink, ProposalHeaderThreadLinkedChainEntity,
-  ProposalHeaderTopics, ProposalHeaderTitle, ProposalHeaderStage, ProposalHeaderStageEditorButton,
-  ProposalHeaderPollEditorButton,
+  ProposalHeaderTopics, ProposalHeaderTitle, ProposalHeaderStage,
   ProposalHeaderOnchainId, ProposalHeaderOnchainStatus, ProposalHeaderSpacer, ProposalHeaderViewCount,
   ProposalHeaderPrivacyMenuItems,
   ProposalTitleEditor,
   ProposalTitleEditMenuItem,
+  ProposalSidebarStageEditorModule,
+  ProposalSidebarPollEditorModule,
 } from './header';
 import {
   activeQuillEditorHasText, GlobalStatus, ProposalBodyAvatar, ProposalBodyAuthor, ProposalBodyCreated,
@@ -79,42 +80,33 @@ const ProposalHeader: m.Component<{
   getSetGlobalEditingStatus: CallableFunction;
   getSetGlobalReplyStatus: CallableFunction;
   proposal: AnyProposal | OffchainThread;
-}, {
   isAuthor: boolean;
   isEditor: boolean;
   isAdmin: boolean;
+  stageEditorIsOpen: boolean;
+  pollEditorIsOpen: boolean;
+  closePollEditor: Function;
+  closeStageEditor: Function;
+}, {
   savedEdit: string;
   editing: boolean;
   saving: boolean;
   quillEditorState: any;
   currentText: any;
   topicEditorIsOpen: boolean;
-  stageEditorIsOpen: boolean;
-  pollEditorIsOpen: boolean;
   editPermissionsIsOpen: boolean;
 }> = {
   view: (vnode) => {
-    const { commentCount, proposal, getSetGlobalEditingStatus, getSetGlobalReplyStatus, viewCount } = vnode.attrs;
-
-    const isAdmin = (app.user.isRoleOfCommunity({
-      role: 'admin',
-      chain: app.activeChainId(),
-      community: app.activeCommunityId()
-    }) || app.user.isRoleOfCommunity({
-      role: 'moderator',
-      chain: app.activeChainId(),
-      community: app.activeCommunityId()
-    }));
-
-    // Original posters have full editorial control, while added collaborators
-    // merely have access to the body and title
-    const { activeAccount } = app.user;
-    const authorChain = (proposal instanceof OffchainThread) ? proposal.authorChain : app.activeId();
-    const authorAddress = (proposal instanceof OffchainThread) ? proposal.author : proposal.author?.address;
-    const isAuthor = (activeAccount?.address === authorAddress && activeAccount?.chain.id === authorChain);
-    const isEditor = (proposal as OffchainThread).collaborators?.filter((c) => {
-      return (c.address === activeAccount?.address && c.chain === activeAccount?.chain.id);
-    }).length > 0;
+    const {
+      commentCount,
+      proposal,
+      getSetGlobalEditingStatus,
+      getSetGlobalReplyStatus,
+      viewCount,
+      isAuthor,
+      isEditor,
+      isAdmin,
+    } = vnode.attrs;
 
     const attachments = (proposal instanceof OffchainThread) ? (proposal as OffchainThread).attachments : false;
     const proposalLink = `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-`
@@ -132,8 +124,6 @@ const ProposalHeader: m.Component<{
           !vnode.state.editing
             && m('.proposal-title', [
               m(ProposalHeaderTitle, { proposal }),
-              m.trust(' &nbsp; '),
-              proposal instanceof OffchainThread && m(ProposalHeaderStage, { proposal }),
             ]),
           vnode.state.editing
             && m(ProposalTitleEditor, {
@@ -143,6 +133,7 @@ const ProposalHeader: m.Component<{
             }),
           m('.proposal-body-meta', proposal instanceof OffchainThread
             ? [
+              m(ProposalHeaderStage, { proposal }),
               m(ProposalHeaderTopics, { proposal }),
               m(ProposalBodyCreated, { item: proposal, link: proposalLink }),
               m(ProposalBodyLastEdited, { item: proposal }),
@@ -200,7 +191,7 @@ const ProposalHeader: m.Component<{
                   onChangeHandler: (topic: OffchainTopic) => { proposal.topic = topic; m.redraw(); },
                   openStateHandler: (v) => { vnode.state.topicEditorIsOpen = v; m.redraw(); },
                 }),
-              vnode.state.stageEditorIsOpen
+              vnode.attrs.stageEditorIsOpen
                 && proposal instanceof OffchainThread
                 && m(StageEditor, {
                   thread: vnode.attrs.proposal as OffchainThread,
@@ -210,15 +201,17 @@ const ProposalHeader: m.Component<{
                     proposal.chainEntities = chainEntities;
                     m.redraw();
                   },
-                  openStateHandler: (v) => { vnode.state.stageEditorIsOpen = v; m.redraw(); },
+                  openStateHandler: (v) => {
+                    if (!v) vnode.attrs.closeStageEditor();
+                    m.redraw();
+                  },
                 }),
-              vnode.state.pollEditorIsOpen
+              vnode.attrs.pollEditorIsOpen
                 && proposal instanceof OffchainThread
                 && m(PollEditor, {
                   thread: vnode.attrs.proposal as OffchainThread,
                   onChangeHandler: () => {
-                    // TODO
-                    vnode.state.pollEditorIsOpen = false;
+                    vnode.attrs.closePollEditor();
                     m.redraw();
                   },
                 }),
@@ -252,11 +245,6 @@ const ProposalHeader: m.Component<{
             proposal instanceof OffchainThread
               && proposal.kind === OffchainThreadKind.Link
               && m(ProposalHeaderExternalLink, { proposal }),
-            proposal instanceof OffchainThread
-              && proposal.chainEntities.length > 0
-              && proposal.chainEntities.map((chainEntity) => {
-                return m(ProposalHeaderThreadLinkedChainEntity, { proposal, chainEntity });
-              }),
             !(proposal instanceof OffchainThread)
               && (proposal['blockExplorerLink'] || proposal['votingInterfaceLink'] || proposal.threadId)
               && m('.proposal-body-link', [
@@ -265,22 +253,6 @@ const ProposalHeader: m.Component<{
                 proposal['votingInterfaceLink'] && m(ProposalHeaderVotingInterfaceLink, { proposal }),
               ]),
           ]),
-          isAuthor && proposal instanceof OffchainThread
-            && m(ProposalHeaderPollEditorButton, {
-              proposal,
-              openPollEditor: () => {
-                vnode.state.pollEditorIsOpen = true;
-              }
-            }),
-          (isAuthor || isAdmin) && proposal instanceof OffchainThread
-            && m(ProposalHeaderStageEditorButton, {
-              openStageEditor: () => {
-                vnode.state.stageEditorIsOpen = true;
-              }
-            }),
-          proposal instanceof OffchainThread
-            && proposal.hasOffchainPoll
-            && m(ProposalHeaderOffchainPoll, { proposal }),
         ]),
       ]),
       proposal instanceof OffchainThread && m('.proposal-content', [
@@ -557,6 +529,8 @@ const ViewProposalPage: m.Component<{
   proposal: AnyProposal | OffchainThread,
   threadFetched,
   threadFetchFailed,
+  pollEditorIsOpen: boolean,
+  stageEditorIsOpen: boolean,
   tipAmount: number,
 }> = {
   oncreate: (vnode) => {
@@ -818,7 +792,26 @@ const ViewProposalPage: m.Component<{
       }
     };
 
+    // Original posters have full editorial control, while added collaborators
+    // merely have access to the body and title
     const { replyParent } = vnode.state;
+    const { activeAccount } = app.user;
+
+    const authorChain = (proposal instanceof OffchainThread) ? proposal.authorChain : app.activeId();
+    const authorAddress = (proposal instanceof OffchainThread) ? proposal.author : proposal.author?.address;
+    const isAuthor = (activeAccount?.address === authorAddress && activeAccount?.chain.id === authorChain);
+    const isEditor = (proposal as OffchainThread).collaborators?.filter((c) => {
+      return (c.address === activeAccount?.address && c.chain === activeAccount?.chain.id);
+    }).length > 0;
+    const isAdmin = (app.user.isRoleOfCommunity({
+      role: 'admin',
+      chain: app.activeChainId(),
+      community: app.activeCommunityId()
+    }) || app.user.isRoleOfCommunity({
+      role: 'moderator',
+      chain: app.activeChainId(),
+      community: app.activeCommunityId()
+    }));
 
     if (proposal instanceof SubstrateTreasuryTip) {
       const { author, title, data:{ who, reason } } = proposal;
@@ -916,13 +909,45 @@ const ViewProposalPage: m.Component<{
       ]);
     }
 
-    return m(Sublayout, { class: 'ViewProposalPage', showNewProposalButton: true, title: headerTitle }, [
+    return m(Sublayout, {
+      class: 'ViewProposalPage',
+      showNewProposalButton: true,
+      title: headerTitle,
+      rightContent: [
+        proposal instanceof OffchainThread
+          && proposal.hasOffchainPoll
+          && m(ProposalHeaderOffchainPoll, { proposal }),
+        proposal instanceof OffchainThread
+          && isAuthor
+          && !proposal.offchainVotingEndsAt
+          && m(ProposalSidebarPollEditorModule, {
+            proposal,
+            openPollEditor: () => {
+              vnode.state.pollEditorIsOpen = true;
+            }
+          }),
+        (isAuthor || isAdmin) && proposal instanceof OffchainThread
+          && m(ProposalSidebarStageEditorModule, {
+            proposal,
+            openStageEditor: () => {
+              vnode.state.stageEditorIsOpen = true;
+            }
+          }),
+      ]
+    }, [
       m(ProposalHeader, {
         proposal,
         commentCount,
         viewCount,
         getSetGlobalEditingStatus,
-        getSetGlobalReplyStatus
+        getSetGlobalReplyStatus,
+        isAuthor,
+        isEditor,
+        isAdmin,
+        stageEditorIsOpen: vnode.state.stageEditorIsOpen,
+        pollEditorIsOpen: vnode.state.pollEditorIsOpen,
+        closeStageEditor: () => { vnode.state.stageEditorIsOpen = false; m.redraw(); },
+        closePollEditor: () => { vnode.state.pollEditorIsOpen = false; m.redraw(); },
       }),
       !(proposal instanceof OffchainThread)
         && m(LinkedProposalsEmbed, { proposal }),

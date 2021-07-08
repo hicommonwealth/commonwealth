@@ -6,17 +6,32 @@
     }
     .cui-switch {
         color: $text-color-black;
+        margin-bottom: 20px;
     }
-    p {
-        margin: 0;
+    h4 {
+        margin: 12px 0 14px;
+    }
+    h4.disabled {
+        color: $text-color-light;
+    }
+    .poll-editor-choices-question {
         margin-bottom: 16px;
     }
-    p.secondary {
-        margin: 0;
-        margin-top: 16px;
-        color: $text-color-medium;
+    .poll-editor-choices {
+        .poll-editor-choice-buttons {
+            margin: 4px 0;
+        }
+        .poll-editor-choice {
+            margin-bottom: 4px;
+        }
+        .cui-input,
+        .cui-button {
+            margin-bottom: 8px;
+        }
     }
-    p + p {
-        margin: 0 !important;
+
+    .poll-editor-footer {
+        margin: 22px 0 0;
+        color: $text-color-medium;
     }
 }
