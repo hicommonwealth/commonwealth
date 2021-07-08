@@ -3,6 +3,7 @@ import {
   NodeInfo,
   IChainModule,
   TransactionStatus,
+  ITXData,
 } from 'models';
 import m from 'mithril';
 import _ from 'lodash';
