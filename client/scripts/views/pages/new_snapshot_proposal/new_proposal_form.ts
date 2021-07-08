@@ -29,7 +29,7 @@ DatePicker.localize({
     month: 'short',
     year: 'numeric'
   }
-})
+});
 
 interface IThreadForm {
   name: string;
@@ -48,14 +48,14 @@ enum NewThreadErrors {
   NoChoices = 'Choices cannot be blank!',
   NoStartDate = 'Start Date cannot be blank!',
   NoEndDate = 'End Date cannot be blank!',
-  SomethingWentWrong = "Something went wrong!"
+  SomethingWentWrong = 'Something went wrong!'
 }
 
 const newThread = async (
   form,
   quillEditorState,
   author,
-  space, 
+  space,
   snapshotId
 ) => {
   const topics = app.chain
@@ -107,23 +107,24 @@ const newThread = async (
     })
   };
 
-  const msgBuffer = bufferToHex(new Buffer(msg.msg, 'utf8'));
-  msg.sig = await (window as any).ethereum.request({method: 'personal_sign', params: [msgBuffer, author.address]});
+  const msgBuffer = bufferToHex(Buffer.from(msg.msg, 'utf8'));
 
-  let result = await $.post(`${app.serverUrl()}/snapshotAPI/sendMessage`, { ...msg });
+  // TODO: do not use window.ethereum here
+  msg.sig = await (window as any).ethereum.request({ method: 'personal_sign', params: [msgBuffer, author.address] });
 
-  if (result.status === "Failure") {
+  const result = await $.post(`${app.serverUrl()}/snapshotAPI/sendMessage`, { ...msg });
+
+  if (result.status === 'Failure') {
     mixpanel.track('Create Snapshot Proposal', {
       'Step No': 2,
       'Step' : 'Incorrect Proposal',
     });
 
-    const errorMessage =
-      result && result.message.error_description
-        ? `${result.message.error_description}`
-        : NewThreadErrors.SomethingWentWrong;
+    const errorMessage =      result && result.message.error_description
+      ? `${result.message.error_description}`
+      : NewThreadErrors.SomethingWentWrong;
     throw new Error(errorMessage);
-  } else if (result.status === "Success") {
+  } else if (result.status === 'Success') {
     await app.user.notifications.refresh();
     m.route.set(`/${app.activeId()}/snapshot-proposal/${snapshotId}/${result.message.ipfsHash}`);
     mixpanel.track('Create Snapshot Proposal', {
@@ -161,7 +162,7 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
       type: 'single-choice'
     };
 
-    let space = app.snapshot.spaces[vnode.attrs.snapshotId];
+    const space = app.snapshot.spaces[vnode.attrs.snapshotId];
 
     snapshotJs.utils.getScores(
       space.key,
@@ -169,9 +170,9 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
       space.network,
       snapshotJs.utils.getProvider(space.network),
       [app.user.activeAccount.address]
-    ).then(response => {
-      let scores = response
-        .map(score => Object.values(score).reduce((a, b) => (a as number) + (b as number), 0))
+    ).then((response) => {
+      const scores = response
+        .map((score) => Object.values(score).reduce((a, b) => (a as number) + (b as number), 0))
         .reduce((a, b) => (a as number) + (b as number), 0);
       vnode.state.userScore = scores as number;
       vnode.state.space = space;
@@ -207,12 +208,12 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
 
     const showScoreWarning = vnode.state.space.filters?.minScore > 0 && !hasMinScore && !isMember && vnode.state.userScore !== null;
 
-    let isValid = vnode.state.space !== undefined && 
-      (!vnode.state.space.filters?.onlyMembers ||
-        (vnode.state.space.filters?.onlyMembers && isMember)) &&
-        (vnode.state.space.filters?.minScore === 0 ||
-          (vnode.state.space.filters?.minScore > 0 && vnode.state.userScore) ||
-          isMember);
+    const isValid = vnode.state.space !== undefined
+      && (!vnode.state.space.filters?.onlyMembers
+        || (vnode.state.space.filters?.onlyMembers && isMember))
+        && (vnode.state.space.filters?.minScore === 0
+          || (vnode.state.space.filters?.minScore > 0 && vnode.state.userScore)
+          || isMember);
 
     return m('.NewThreadForm', {
       oncreate: (vvnode) => {
@@ -220,16 +221,16 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
       },
     }, [
       m('.new-thread-form-body', [
-        vnode.state.space.filters?.onlyMembers && !isMember && 
-        m(Callout, {
+        vnode.state.space.filters?.onlyMembers && !isMember
+        && m(Callout, {
           class: 'no-profile-callout',
           intent: 'primary',
           content: [
             'You need to be a member of the space in order to submit a proposal.',
           ],
         }),
-        showScoreWarning && 
-        m(Callout, {
+        showScoreWarning
+        && m(Callout, {
           class: 'no-profile-callout',
           intent: 'primary',
           content: [
@@ -314,21 +315,19 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
               {
                 locale: 'en-us',
                 weekStart: 0,
-                onchange: function(chosenDate){
+                onchange(chosenDate) {
                   vnode.state.form.start = moment(chosenDate).unix();
                 }
-              }
-            ),
+              }),
             m('h4', 'End Date'),
             m(DatePicker,
               {
                 locale: 'en-us',
                 weekStart: 0,
-                onchange: function(chosenDate){
+                onchange(chosenDate) {
                   vnode.state.form.end = moment(chosenDate).unix();
                 }
-              }
-            ),
+              }),
           ]),
         ]),
       ]),

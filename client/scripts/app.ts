@@ -117,6 +117,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
           || app.config.communities.getAll().find((c) => c.customDomain === host) !== undefined
       );
       app.snapshot.client.getSpaces().then((response) => {
+        console.log(response);
         app.snapshot.spaces = _.object(
           Object.entries(response).map((space) => [
             space[0],

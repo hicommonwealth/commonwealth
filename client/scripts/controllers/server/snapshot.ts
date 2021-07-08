@@ -18,7 +18,7 @@ class SnapshotController {
     //   throw new Error(`Cannot fetch snapshot proposals: ${response.status}`);
     // }
     this._proposalStore.clear();
-    for (const key in response) {
+    for (const key of Object.keys(response)) {
       this._proposalStore.add(new SnapshotProposal(
         key,
         response[key].address,
@@ -31,7 +31,7 @@ class SnapshotController {
         response[key].authorIpfsHash,
         response[key].relayerIpfsHash,
         response[key].msg.payload.choices,
-      ))
+      ));
     }
   }
 }

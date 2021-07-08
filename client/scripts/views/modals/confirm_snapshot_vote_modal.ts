@@ -12,7 +12,7 @@ import { notifyError } from 'controllers/app/notifications';
 import { CompactModalExitButton } from 'views/modal';
 
 enum NewVoteErrors {
-  SomethingWentWrong = "Something went wrong!"
+  SomethingWentWrong = 'Something went wrong!'
 }
 
 const ConfirmSnapshotVoteModal: m.Component<{
@@ -29,7 +29,7 @@ const ConfirmSnapshotVoteModal: m.Component<{
 }> = {
   view: (vnode) => {
     const author = app.user.activeAccount;
-    const {proposal, space, id, selectedChoice, totalScore, scores, snapshot} = vnode.attrs;
+    const { proposal, space, id, selectedChoice, totalScore, scores, snapshot } = vnode.attrs;
 
     return m('.ConfirmSnapshotVoteModal', [
       m('.compact-modal-title', [
@@ -44,18 +44,18 @@ const ConfirmSnapshotVoteModal: m.Component<{
         ]),
         m('.vote-info', [
           m('.d-flex', [
-            m('span', {class: 'text-blue'}, 'Option'),
+            m('span', { class: 'text-blue' }, 'Option'),
             m('span', `${proposal.msg.payload.choices[selectedChoice]}`)
           ]),
           m('.d-flex', [
-            m('span', {class: 'text-blue'}, 'Snapshot'),
-            m('a', { href: `${_explorer(space.network, proposal.msg.payload.snapshot, 'block')}`, target: '_blank'}, [
+            m('span', { class: 'text-blue' }, 'Snapshot'),
+            m('a', { href: `${_explorer(space.network, proposal.msg.payload.snapshot, 'block')}`, target: '_blank' }, [
               `${_n(proposal.msg.payload.snapshot, '0,0')}`,
-              m('i', {class: 'iconexternal-link'})
+              m('i', { class: 'iconexternal-link' })
             ]),
           ]),
           m('.d-flex', [
-            m('span', {class: 'text-blue'}, 'Your voting power'),
+            m('span', { class: 'text-blue' }, 'Your voting power'),
             m('span', `${_n(totalScore)} ${_shorten(space.symbol, 'symbol')}`)
           ]),
         ]),
@@ -65,8 +65,8 @@ const ConfirmSnapshotVoteModal: m.Component<{
             disabled: vnode.state.saving,
             rounded: true,
             onclick: async (e) => {
-            e.preventDefault();
-            $(e.target).trigger('modalexit');
+              e.preventDefault();
+              $(e.target).trigger('modalexit');
             },
             label: 'Cancel',
           }),
@@ -91,18 +91,19 @@ const ConfirmSnapshotVoteModal: m.Component<{
                   }
                 })
               };
-              const msgBuffer = bufferToHex(new Buffer(msg.msg, 'utf8'));
-              msg.sig = await (window as any).ethereum.request({method: 'personal_sign', params: [msgBuffer, author.address]});
+              const msgBuffer = bufferToHex(Buffer.from(msg.msg, 'utf8'));
 
-              let result = await $.post(`${app.serverUrl()}/snapshotAPI/sendMessage`, { ...msg });
+              // TODO: do not use window.ethereum here
+              msg.sig = await (window as any).ethereum.request({ method: 'personal_sign', params: [msgBuffer, author.address] });
 
-              if (result.status === "Failure") {
-                const errorMessage =
-                  result && result.message.error_description
-                    ? `${result.message.error_description}`
-                    : NewVoteErrors.SomethingWentWrong;
+              const result = await $.post(`${app.serverUrl()}/snapshotAPI/sendMessage`, { ...msg });
+
+              if (result.status === 'Failure') {
+                const errorMessage =                  result && result.message.error_description
+                  ? `${result.message.error_description}`
+                  : NewVoteErrors.SomethingWentWrong;
                 notifyError(errorMessage);
-              } else if (result.status === "Success") {
+              } else if (result.status === 'Success') {
                 $(e.target).trigger('modalexit');
                 m.route.set(`/${app.activeId()}/snapshot-proposal/${space.key}`);
               }

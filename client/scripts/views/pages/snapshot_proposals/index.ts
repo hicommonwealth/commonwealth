@@ -89,10 +89,11 @@ const SnapshotProposalsPage: m.Component<{ topic?: string, snapshotId: string },
       'Page Name': 'Snapshot Proposals Page',
       Scope: app.activeId(),
     });
-    const snapshotId = vnode.attrs.snapshotId
-    app.snapshot.fetchSnapshotProposals(snapshotId).then(response => {
+    console.log(vnode);
+    const snapshotId = vnode.attrs.snapshotId;
+    app.snapshot.fetchSnapshotProposals(snapshotId).then((response) => {
       vnode.state.listing = app.snapshot.proposalStore.getAll()
-      .map((proposal) => m(ProposalRow, { snapshotId, proposal }))
+        .map((proposal) => m(ProposalRow, { snapshotId, proposal }));
 
       m.redraw();
     });
@@ -101,11 +102,11 @@ const SnapshotProposalsPage: m.Component<{ topic?: string, snapshotId: string },
   oninit: (vnode) => {
     vnode.state.listing = [];
   },
-  
+
   view: (vnode) => {
-    let listing = [];
+    const listing = [];
     listing.push(m('.discussion-group-wrap', vnode.state.listing));
-    
+
     return m(Sublayout, {
       class: 'DiscussionsPage',
       title: 'Snapshot Proposals',
