@@ -294,7 +294,7 @@ async function main() {
   setupMiddleware();
   setupPassport(models);
 
-  await tokenBalanceCache.start(models);
+  await tokenBalanceCache.start();
   setupAPI(app, models, viewCountCache, identityFetchCache, tokenBalanceCache);
   setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
   setupErrorHandlers(app, rollbar);
