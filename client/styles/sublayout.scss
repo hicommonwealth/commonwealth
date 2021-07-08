@@ -201,6 +201,7 @@
         position: relative;
         min-height: calc(100vh - 140px);
         padding: 1px 0; // prevent margins from flowing outside the container
+        padding-bottom: 80px;
     }
     .token-banner {
         padding: 8px 0 2px;
