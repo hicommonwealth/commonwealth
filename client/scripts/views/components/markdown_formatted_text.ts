@@ -10,13 +10,12 @@ const marked = require('marked');
 
 const renderer = new marked.Renderer();
 renderer.link = (href, title, text) => {
-  return `<a target="_blank" href="${href}">${text}</a>`;
+  return `<a ${!href.contains('://commonwealth.im/') && 'target="_blank"'} href="${href}">${text}</a>`;
 };
 
 marked.setOptions({
   renderer,
   gfm: true, // use github flavored markdown
-  sanitize: true, // extra sanitize pass
   smartypants: true,
   smartLists: true,
   xhtml: true,

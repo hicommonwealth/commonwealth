@@ -34,7 +34,7 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
         m.redraw();
         vnode.state.selectedIndex = null;
         // select the address, and close the form
-        notifySuccess(`Joined with ${formatAddressShort(addressInfo.address, addressInfo.chain)}`);
+        notifySuccess(`Joined with ${formatAddressShort(addressInfo.address, addressInfo.chain, true)}`);
         setActiveAccount(account).then(() => {
           m.redraw();
           $(e.target).trigger('modalexit');

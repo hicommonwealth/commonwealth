@@ -69,6 +69,10 @@
         @include xs-max {
             width: calc(100vw - 20px);
         }
+        .UserGallery .overflow-users-wrap .overflow-users {
+            top: -27.5%;
+            font-size: 80%;
+        }
     }
     .cui-menu {
         max-width: 340px;

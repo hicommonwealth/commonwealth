@@ -534,7 +534,7 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
               m('p', 'Use the secret phrase to sign this message:'),
               m(CodeBlock, { clickToSelect: true }, [
                 // eslint-disable-next-line max-len
-                `echo "${vnode.state.newAddress.validationToken}" | subkey sign ${vnode.state.isEd25519 ? '--scheme ed25519 ' : ''} "`,
+                `echo "${vnode.state.newAddress.validationToken}" | subkey sign ${vnode.state.isEd25519 ? '--scheme ed25519 ' : '--suri'} "`,
                 m('span.no-select', 'secret phrase'),
                 '"',
               ]),
