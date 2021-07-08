@@ -211,7 +211,7 @@ const InviteButton: m.Component<IInviteButtonAttrs, { loading: boolean, }> = {
       disabled,
       rounded: true,
       type: 'submit',
-      label: selection === 'address' || selection === 'email' ? 'Send Invite' : 'Add',
+      label: selection === 'email' ? 'Send Invite' : 'Add address',
       onclick: (e) => {
         e.preventDefault();
         const address = invitedAddress;
@@ -444,14 +444,25 @@ const CreateInviteModal: m.Component<{
 
     if (selectedChain?.base === ChainBase.Substrate) {
       try {
-        console.log(vnode.state.searchAddressTerm);
-        decodeAddress(vnode.state.searchAddressTerm);
+        if (vnode.state.searchAddressTerm?.length) {
+          decodeAddress(vnode.state.searchAddressTerm);
+        } else {
+          isAddressValid = false;
+        }
       } catch (e) {
         isAddressValid = false;
         console.error(e);
       }
-    } else if (chainInfo?.base === ChainBase.Ethereum) {
-      isAddressValid = Web3.utils.checkAddressChecksum(vnode.state.searchAddressTerm);
+    } else if (selectedChain?.base === ChainBase.Ethereum) {
+      try {
+        if (vnode.state.searchAddressTerm?.length) {
+          isAddressValid = Web3.utils.checkAddressChecksum(vnode.state.searchAddressTerm);
+        } else {
+          isAddressValid = false;
+        }
+      } catch (e) {
+        isAddressValid = false;
+      }
     } else {
       // TODO: check Cosmos & Near?
     }
@@ -574,7 +585,7 @@ const CreateInviteModal: m.Component<{
               m.redraw();
             },
             invitedAddress: vnode.state.searchAddressTerm,
-            invitedAddressChain: vnode.state.invitedAddressChain,
+            invitedAddressChain: selectedChainId,
             ...chainOrCommunityObj
           }),
         ]),
