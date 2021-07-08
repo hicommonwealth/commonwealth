@@ -28,6 +28,10 @@ import {
   setupAuthExtension,
   setupGovExtension,
   setupStakingExtension,
+  setupBankExtension,
+  setupSupplyExtension,
+  BankExtension,
+  SupplyExtension,
   StakingExtension
 } from '@cosmjs/launchpad';
 import { CosmosAccount } from './account';
@@ -41,7 +45,12 @@ export interface ICosmosTXData extends ITXData {
   gas: number;
 }
 
-export type CosmosApiType = LcdClient & StakingExtension & AuthExtension & GovExtension;
+export type CosmosApiType = LcdClient
+  & StakingExtension
+  & AuthExtension
+  & GovExtension
+  & BankExtension
+  & SupplyExtension;
 
 class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
   private _url: string;
@@ -98,6 +107,8 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       setupAuthExtension,
       setupGovExtension,
       setupStakingExtension,
+      setupBankExtension,
+      setupSupplyExtension,
     );
     if (this.app.chain.networkStatus === ApiStatus.Disconnected) {
       this.app.chain.networkStatus = ApiStatus.Connecting;
