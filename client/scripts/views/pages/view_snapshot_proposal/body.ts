@@ -4,10 +4,12 @@ import m from 'mithril';
 
 import { updateRoute } from 'app';
 import { formatLastUpdated } from 'helpers';
-import { SnapshotProposal } from 'models';
+import { AddressInfo, SnapshotProposal } from 'models';
 
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import moment from 'moment';
+import app from 'state';
+import User from '../../components/widgets/user';
 
 export const ProposalBodyAuthor: m.Component<{ item: SnapshotProposal }> = {
   view: (vnode) => {
@@ -15,13 +17,14 @@ export const ProposalBodyAuthor: m.Component<{ item: SnapshotProposal }> = {
     if (!item) return;
     if (!item.authorAddress) return;
 
+
+
     return m('.ProposalBodyAuthor', [
-      m('a', {
-        href: '#',
-        onclick: async (e) => {
-          e.preventDefault();
-        }
-      }, `Author ${item.authorAddress}`)
+      m(User, {
+        user: new AddressInfo(null, item.authorAddress, app.activeId(), null), // TODO: activeID becomes chain_base, fix
+        linkify: true,
+        popover: true
+      }),
     ]);
   }
 };

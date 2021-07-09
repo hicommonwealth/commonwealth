@@ -8,7 +8,7 @@ import { Spinner, Button } from 'construct-ui';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
-import { SnapshotProposal } from 'models';
+import { AddressInfo, SnapshotProposal } from 'models';
 import ConfirmSnapshotVoteModal from 'views/modals/confirm_snapshot_vote_modal';
 import { formatSpace, getProposal, getPower } from 'helpers/snapshot_utils/snapshot_utils';
 
@@ -17,6 +17,7 @@ import {
   ProposalBodyAuthor, ProposalBodyCreated,
   ProposalBodyLastEdited, ProposalBodyText,
 } from './body';
+import User from '../../components/widgets/user';
 
 const ProposalHeader: m.Component<{
   snapshotId: string
@@ -68,8 +69,13 @@ const VoteRow: m.Component<{
 }> = {
   view: (vnode) => {
     return m('.ViewRow', [
-      m('.row-left', vnode.attrs.vote.voterAddress),
-      // m('.row-right', vnode.attrs.vote.choice)
+      m('.row-left', [
+        m(User, {
+          user: new AddressInfo(null, vnode.attrs.vote.voterAddress, app.activeId(), null), // TODO: activeID becomes chain_base, fix
+          linkify: true,
+          popover: true
+        }),
+      ]),
     ]);
   }
 };
@@ -101,7 +107,6 @@ const VoteView: m.Component<{ votes: Vote[] }> = {
       })
       .filter((v) => !!v)));
 
-    // TODO: fix up this function for cosmos votes
     return m('.VotingResults', [
       m('.results-column', [
         m('.results-header', `Voted yes (${votes.filter((v) => v.choice === 'yes').length})`),
