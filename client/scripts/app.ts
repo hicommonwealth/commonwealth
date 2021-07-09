@@ -318,23 +318,23 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
     const Yearn = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "commonwealth-main" */
-      './controllers/chain/ethereum/yearn/adapter'
+      './controllers/chain/ethereum/snapshot/adapter'
     )).default;
     newChain = new Yearn(n, app);
   } else if (n.chain.network === ChainNetwork.Fei) {
     const Fei = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "commonwealth-main" */
-      './controllers/chain/ethereum/fei/adapter'
+      './controllers/chain/ethereum/snapshot/adapter'
     )).default;
     newChain = new Fei(n, app);
   } else if (n.chain.network === ChainNetwork.Sushi) {
-    const Sushi = (await import(
+    const Snapshot = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "commonwealth-main" */
-      './controllers/chain/ethereum/sushi/adapter'
+      './controllers/chain/ethereum/snapshot/adapter'
     )).default;
-    newChain = new Sushi(n, app);
+    newChain = new Snapshot(n, app);
   } else {
     throw new Error('Invalid chain');
   }
