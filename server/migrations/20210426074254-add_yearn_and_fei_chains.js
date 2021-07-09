@@ -61,7 +61,7 @@ module.exports = {
       }, {
         chain: 'demo',
         url: 'wss://ropsten.infura.io/ws',
-        address: '0x956F47F50A910163D8BF957Cf5846D573E7f87CA'
+        address: '0x89368d67c4fe7aebd22c9503566c3e563a2f586c'
       }], { transaction: t });
     });
   },
@@ -83,6 +83,14 @@ module.exports = {
       await queryInterface.bulkDelete('ChainEventTypes', { chain: 'fei' }, { transaction: t });
       await queryInterface.bulkDelete('ChainNodes', { chain: 'fei' }, { transaction: t });
       await queryInterface.bulkDelete('Chains', { id: ['fei'] }, { transaction: t });
+
+      await queryInterface.bulkDelete('OffchainReactions', { chain: 'demo' }, { transaction: t });
+      await queryInterface.bulkDelete('OffchainComments', { chain: 'demo' }, { transaction: t });
+      await queryInterface.bulkDelete('OffchainThreads', { chain: 'demo' }, { transaction: t });
+      await queryInterface.bulkDelete('Addresses', { chain: 'demo' }, { transaction: t });
+      await queryInterface.bulkDelete('ChainEventTypes', { chain: 'demo' }, { transaction: t });
+      await queryInterface.bulkDelete('ChainNodes', { chain: 'demo' }, { transaction: t });
+      await queryInterface.bulkDelete('Chains', { id: ['demo'] }, { transaction: t });
     });
   }
 };
