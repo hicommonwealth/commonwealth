@@ -3,7 +3,7 @@ import Snapshot from '@snapshot-labs/snapshot.js';
 import { SnapshotProposalStore } from 'stores';
 import { SnapshotProposal } from '../../models';
 
-const hubUrl = process.env.SNAPSHOT_APP_HUB_URL || 'https://hub.snapshot.org';
+const hubUrl = process.env.SNAPSHOT_APP_HUB_URL || 'https://testnet.snapshot.org';
 
 class SnapshotController {
   private _proposalStore: SnapshotProposalStore = new SnapshotProposalStore();

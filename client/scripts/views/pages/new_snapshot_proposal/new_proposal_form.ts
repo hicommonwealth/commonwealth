@@ -214,14 +214,14 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
             'You need to be a member of the space in order to submit a proposal.',
           ],
         }),
-        showScoreWarning
-          ? m(Callout, {
-            class: 'no-profile-callout',
-            intent: 'primary',
-            content: [
-              `You need to have a minimum of ${vnode.state.space.filters.minScore} ${vnode.state.space.symbol} in order to submit a proposal`
-            ],
-          }) : m(Spinner, { active: true, }),
+        // showScoreWarning
+        //   ? m(Callout, {
+        //     class: 'no-profile-callout',
+        //     intent: 'primary',
+        //     content: [
+        //       `You need to have a minimum of ${vnode.state.space.filters.minScore} ${vnode.state.space.symbol} in order to submit a proposal`
+        //     ],
+        //   }) : m(Spinner, { active: true, }),
         m('.new-snapshot-proposal-form', [
           m(Form, [
             m(FormGroup, [

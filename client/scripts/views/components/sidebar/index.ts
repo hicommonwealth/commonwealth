@@ -180,7 +180,8 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
     const showSubmitSnapshotProposalOptions = app.user.activeAccount && app.chain?.meta.chain.snapshot && 
       (app.chain?.network === ChainNetwork.Yearn ||
         app.chain?.network === ChainNetwork.Fei ||
-        app.chain?.network === ChainNetwork.Sushi);
+        app.chain?.network === ChainNetwork.Sushi) ||
+        app.chain?.network === ChainNetwork.Demo;
 
     const onSnapshotProposal = (p) => p.startsWith(`/${app.activeId()}/snapshot-proposals`);
     const onProposalPage = (p) => (
