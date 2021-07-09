@@ -8,7 +8,7 @@ module.exports = {
         symbol: 'YFI',
         name: 'Yearn',
         icon_url: '/static/img/protocols/yearn.png',
-        type: 'token',
+        type: 'chain',
         network: 'yearn',
         active: true,
         description: 'A general-purpose confidential smart contract platform for DApps and DeFi.',
@@ -24,7 +24,7 @@ module.exports = {
         symbol: 'FEI',
         name: 'fei',
         icon_url: '/static/img/protocols/fei.png',
-        type: 'token',
+        type: 'chain',
         network: 'fei',
         active: true,
         description: 'The stablecoin for DeFi.',
@@ -34,20 +34,8 @@ module.exports = {
         github: 'https://github.com/fei-protocol/fei-protocol-core',
         collapsed_on_homepage: false,
         base: 'ethereum',
-        snapshot: 'fei.eth'
-      },
-      {
-        id: 'demos',
-        symbol: 'DEMOS',
-        name: 'demos',
-        icon_url: '/static/img/protocols/eth.png',
-        type: 'token',
-        network: 'demos',
-        active: true,
-        collapsed_on_homepage: false,
-        base: 'ethereum',
         snapshot: 'polarcat.eth'
-      }
+      },
       ], { transaction: t });
 
       await queryInterface.bulkInsert('ChainNodes', [{
