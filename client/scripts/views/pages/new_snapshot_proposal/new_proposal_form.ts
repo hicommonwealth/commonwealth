@@ -1,13 +1,10 @@
 import 'pages/new_proposal_page.scss';
-import 'mithril-datepicker/src/style.css';
-import 'mithril-timepicker/src/style.css';
 
 import $ from 'jquery';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 import { Input, Form, FormLabel, FormGroup, Button, Callout } from 'construct-ui';
-import DatePicker from 'mithril-datepicker';
-// import TimePicker from 'mithril-timepicker';
+
 import moment from 'moment';
 import { bufferToHex } from 'ethereumjs-util';
 import snapshotJs from '@snapshot-labs/snapshot.js';
@@ -18,18 +15,6 @@ import { formatSpace } from 'helpers/snapshot_utils/snapshot_utils';
 
 import { notifyError } from 'controllers/app/notifications';
 import QuillEditor from 'views/components/quill_editor';
-
-DatePicker.localize({
-  weekStart: 1,
-  locale: 'en',
-  prevNextTitles: ['1M', '1Y', '10Y'],
-  formatOptions: {
-    weekday: 'short',
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric'
-  }
-});
 
 interface IThreadForm {
   name: string;
