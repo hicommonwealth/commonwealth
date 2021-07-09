@@ -1,22 +1,19 @@
 import _ from 'lodash';
 import BN from 'bn.js';
 import { IApp } from 'state';
-import { CosmosToken } from 'adapters/chain/cosmos/types';
 import CosmosChain from 'controllers/chain/cosmos/chain';
+import { CosmosToken } from 'controllers/chain/cosmos/types';
 import { Account, IAccountsModule, ITXModalData } from 'models';
 import { AccountsStore } from 'stores';
 import {
-  Secp256k1HdWallet,
   AuthAccountsResponse,
-  StdSignDoc,
-  Msg,
-  StdTx,
-  StdFee,
-  SigningCosmosClient,
-  encodeSecp256k1Pubkey,
+  MsgSend,
+  MsgDelegate,
+  MsgUndelegate,
+  MsgBeginRedelegate,
+  MsgWithdrawDelegatorReward,
 } from '@cosmjs/launchpad';
 import { BondStatus } from '@cosmjs/launchpad/build/lcdapi/staking';
-import { Secp256k1Pubkey } from '@cosmjs/amino';
 
 export interface ICosmosValidator {
   // TODO: add more properties (commission, unbonding, jailed, etc)
@@ -34,12 +31,6 @@ export class CosmosAccount extends Account<CosmosToken> {
   private _Accounts: CosmosAccounts;
 
   // TODO: add delegations, validations
-  private _wallet: Secp256k1HdWallet;
-  private _pubKey: Secp256k1Pubkey;
-  private _client: SigningCosmosClient;
-  public get pubKey() { return this._pubKey; }
-  public get client() { return this._client; }
-
   private _balance: CosmosToken;
   public get balance() { return this.updateBalance().then(() => this._balance); }
 
@@ -58,13 +49,6 @@ export class CosmosAccount extends Account<CosmosToken> {
     this._Accounts.store.add(this);
   }
 
-  public async setWallet(wallet: Secp256k1HdWallet) {
-    this._wallet = wallet;
-    const [{ address, pubkey }] = await wallet.getAccounts();
-    this._pubKey = encodeSecp256k1Pubkey(pubkey);
-    this._client = new SigningCosmosClient(this._Chain.url, address, wallet);
-  }
-
   protected async addressFromMnemonic(mnemonic: string): Promise<string> {
     throw new Error('unsupported');
   }
@@ -74,18 +58,7 @@ export class CosmosAccount extends Account<CosmosToken> {
   }
 
   public async signMessage(message: string): Promise<string> {
-    const aminoMsg: StdSignDoc = JSON.parse(message);
-    if (!this._wallet) {
-      throw new Error('Wallet required to sign.');
-    }
-    const [{ address }] = await this._wallet.getAccounts();
-    const resp = await this._wallet.signAmino(address, aminoMsg);
-    return resp.signature.signature;
-  }
-
-  public async signMsg(msg: Msg, fee: StdFee, memo?: string): Promise<StdTx> {
-    const signed = await this._client.sign([ msg ], fee, memo);
-    return signed;
+    throw new Error('unsupported');
   }
 
   public updateBalance = _.throttle(async () => {
@@ -119,92 +92,69 @@ export class CosmosAccount extends Account<CosmosToken> {
     return this._balance;
   });
 
-  public sendBalanceTx(recipient: CosmosAccount, amount: CosmosToken, memo: string = '') {
-    const args = {
-      toAddress: recipient.address,
-      amounts: [ { denom: amount.denom, amount: amount.toString() } ]
-    };
-    const txFn = (gas: number) => this._Chain.tx(
-      'MsgSend', this.address, args, memo, gas, this._Chain.denom
-    );
-    return this._Chain.createTXModalData(
-      this,
-      txFn,
-      'MsgSend',
-      `${this.address} sent ${amount.format()} to ${recipient.address}`,
-      // TODO: add these for other txs
-      (success: boolean) => {
-        if (success) {
-          this.updateBalance();
-          recipient.updateBalance();
-        }
-      },
-    );
+  public sendBalanceTx(recipient: Account<CosmosToken>, amount: CosmosToken):
+    ITXModalData | Promise<ITXModalData> {
+    throw new Error('Method not implemented.');
   }
 
-  public delegateTx(validatorAddress: string, amount: CosmosToken, memo: string = '') {
-    const args = {
-      validatorAddress,
-      amount: amount.toString(),
-      denom: amount.denom,
+  public async sendTx(recipient: CosmosAccount, amount: CosmosToken) {
+    const msg: MsgSend = {
+      type: 'cosmos-sdk/MsgSend',
+      value: {
+        from_address: this.address,
+        to_address: recipient.address,
+        amount: [ { denom: amount.denom, amount: amount.toString() } ],
+      }
     };
-    const txFn = (gas: number) => this._Chain.tx(
-      'MsgDelegate', this.address, args, memo, gas, this._Chain.denom
-    );
-    return this._Chain.createTXModalData(
-      this,
-      txFn,
-      'MsgDelegate',
-      `${this.address} delegated ${amount.format()} to ${validatorAddress}`
-    );
+    await this._Chain.sendTx(this, msg);
   }
 
-  public undelegateTx(validatorAddress: string, amount: CosmosToken, memo: string = '') {
-    const args = {
-      validatorAddress,
-      amount: amount.toString(),
-      denom: amount.denom,
+  public async delegateTx(validatorAddress: string, amount: CosmosToken) {
+    const msg: MsgDelegate = {
+      type: 'cosmos-sdk/MsgDelegate',
+      value: {
+        delegator_address: this.address,
+        validator_address: validatorAddress,
+        amount: amount.toCoinObject(),
+      }
     };
-    const txFn = (gas: number) => this._Chain.tx(
-      'MsgUndelegate', this.address, args, memo, gas, this._Chain.denom
-    );
-    return this._Chain.createTXModalData(
-      this,
-      txFn,
-      'MsgUndelegate',
-      `${this.address} undelegated ${amount.format()} from ${validatorAddress}`
-    );
+    await this._Chain.sendTx(this, msg);
   }
 
-  public redelegateTx(validatorSource: string, validatorDest: string, amount: CosmosToken, memo: string = '') {
-    const args = {
-      validatorSourceAddress: validatorSource,
-      validatorDestinationAddress: validatorDest,
-      amount: amount.toString(),
-      denom: amount.denom,
+  public async undelegateTx(validatorAddress: string, amount: CosmosToken) {
+    const msg: MsgUndelegate = {
+      type: 'cosmos-sdk/MsgUndelegate',
+      value: {
+        delegator_address: this.address,
+        validator_address: validatorAddress,
+        amount: amount.toCoinObject(),
+      }
     };
-    const txFn = (gas: number) => this._Chain.tx(
-      'MsgRedelegate', this.address, args, memo, gas, this._Chain.denom
-    );
-    return this._Chain.createTXModalData(
-      this,
-      txFn,
-      'MsgRedelegate',
-      `${this.address} redelegated ${amount.format()} from ${validatorSource} to ${validatorDest}`
-    );
+    await this._Chain.sendTx(this, msg);
   }
 
-  public withdrawDelegationRewardTx(validatorAddress: string, memo: string = '') {
-    const args = { validatorAddress };
-    const txFn = (gas: number) => this._Chain.tx(
-      'MsgWithdrawDelegationReward', this.address, args, memo, gas, this._Chain.denom
-    );
-    return this._Chain.createTXModalData(
-      this,
-      txFn,
-      'MsgDelegate',
-      `${this.address} withdrew reward from ${validatorAddress}`
-    );
+  public async redelegateTx(validatorSource: string, validatorDest: string, amount: CosmosToken) {
+    const msg: MsgBeginRedelegate = {
+      type: 'cosmos-sdk/MsgBeginRedelegate',
+      value: {
+        delegator_address: this.address,
+        validator_src_address: validatorSource,
+        validator_dst_address: validatorDest,
+        amount: amount.toCoinObject(),
+      }
+    };
+    await this._Chain.sendTx(this, msg);
+  }
+
+  public async withdrawDelegationRewardTx(validatorAddress: string) {
+    const msg: MsgWithdrawDelegatorReward = {
+      type: 'cosmos-sdk/MsgWithdrawDelegationReward',
+      value: {
+        delegator_address: this.address,
+        validator_address: validatorAddress,
+      }
+    };
+    await this._Chain.sendTx(this, msg);
   }
 }
 

@@ -7,6 +7,7 @@ import {
   Proposal,
   Tally,
 } from '@cosmjs/launchpad/build/lcdapi/gov';
+import { MsgSubmitProposal } from '@cosmjs/launchpad/build/msgs';
 import _ from 'underscore';
 import {
   ITXModalData,
@@ -111,20 +112,38 @@ class CosmosGovernance extends ProposalModule<
     proposals.forEach((p) => new CosmosProposal(this._Chain, this._Accounts, this, p));
   }
 
-  // TODO: cosmos-api only supports text proposals and not parameter_change or software_upgrade
   public createTx(
     sender: CosmosAccount, title: string, description: string, initialDeposit: CosmosToken, memo: string = ''
   ): ITXModalData {
-    const args = { title, description, initialDeposits: [initialDeposit.toCoinObject()] };
-    const txFn = (gas: number) => this._Chain.tx(
-      'MsgSubmitProposal', sender.address, args, memo, gas, this._Chain.denom
-    );
-    return this._Chain.createTXModalData(
-      sender,
-      txFn,
-      'MsgSubmitProposal',
-      `${sender.address} submits proposal: ${title}.`,
-    );
+    throw new Error('unsupported');
+  }
+
+  // TODO: support multiple deposit types
+  // TODO: support multiple proposal types (not just text)
+  public async submitProposalTx(
+    sender: CosmosAccount,
+    title: string,
+    description: string,
+    initialDeposit: CosmosToken,
+  ) {
+    throw new Error('proposal submission not yet implemented');
+    /*
+    const msg: MsgSubmitProposal = {
+      type: 'cosmos-sdk/MsgSubmitProposal',
+      value: {
+        content: {
+          type: 'cosmos-sdk/TextProposal',
+          value: {
+            description,
+            title,
+          },
+        },
+        initial_deposit: [ initialDeposit.toCoinObject() ],
+        proposer: sender.address,
+      }
+    };
+    await this._Chain.sendTx(sender, msg);
+    */
   }
 }
 

@@ -171,7 +171,9 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
       } else if (proposal instanceof SubstrateCollectiveProposal) {
         createTXModal(proposal.submitVoteTx(new BinaryVote(user, true), onModalClose));
       } else if (proposal instanceof CosmosProposal) {
-        createTXModal(proposal.submitVoteTx(new CosmosVote(user, 'Yes'), null, onModalClose));
+        proposal.voteTx(new CosmosVote(user, 'Yes'))
+          .then(() => m.redraw())
+          .catch((err) => notifyError(err.toString()));
       } else if (proposal instanceof MolochProposal) {
         proposal.submitVoteWebTx(new MolochProposalVote(user, MolochVote.YES))
           .then(() => m.redraw())
@@ -538,7 +540,7 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
     } else if (proposal.votingType === VotingType.MarlinYesNo) {
       votingActionObj = [
         m('.button-row', [yesButton, noButton, /** executeButton, queueButton, */ cancelButton])
-      ]
+      ];
     } else if (proposal.votingType === VotingType.RankedChoiceVoting) {
       votingActionObj = m(CannotVote, { action: 'Unsupported proposal type' });
     } else if (proposal.votingType === VotingType.None) {

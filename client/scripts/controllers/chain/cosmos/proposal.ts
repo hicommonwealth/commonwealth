@@ -1,5 +1,6 @@
 import BN from 'bn.js';
 import { GovDepositsResponse, GovTallyResponse, GovVotesResponse } from '@cosmjs/launchpad';
+import { MsgDeposit, MsgVote } from '@cosmjs/launchpad/build/msgs';
 import {
   Proposal,
   ITXModalData,
@@ -40,6 +41,15 @@ export class CosmosVote implements IVote<CosmosToken> {
   constructor(account: CosmosAccount, choice: CosmosVoteChoice) {
     this.account = account;
     this.choice = choice;
+  }
+  public get option(): number {
+    switch (this.choice) {
+      case 'Yes': return 1;
+      case 'Abstain': return 2;
+      case 'No': return 3;
+      case 'NoWithVeto': return 4;
+      default: return 0;
+    }
   }
 }
 
@@ -214,37 +224,38 @@ export class CosmosProposal extends Proposal<
   }
 
   // TRANSACTIONS
-  public submitDepositTx(depositor: CosmosAccount, amount: CosmosToken, memo: string = '') {
+  public async submitDepositTx(depositor: CosmosAccount, amount: CosmosToken) {
     if (this.status !== 'DepositPeriod') {
       throw new Error('proposal not in deposit period');
     }
-    const args = { proposalId: this.data.identifier, amounts: [amount] };
-    const txFn = (gas: number) => this._Chain.tx(
-      'MsgDeposit', depositor.address, args, memo, gas, this._Chain.denom,
-    );
-    return this._Chain.createTXModalData(
-      depositor,
-      txFn,
-      'MsgDeposit',
-      `${depositor.address} deposited ${amount.toNumber} to proposal ${this.data.identifier}`,
-    );
+    const msg: MsgDeposit = {
+      type: 'cosmos-sdk/MsgDeposit',
+      value: {
+        proposal_id: +this.data.identifier,
+        depositor: depositor.address,
+        amount: [ amount.toCoinObject() ],
+      }
+    };
+    await this._Chain.sendTx(depositor, msg);
+  }
+
+  public async voteTx(vote: CosmosVote) {
+    // if (this.status !== 'VotingPeriod') {
+    //   throw new Error('proposal not in voting period');
+    // }
+    const msg: MsgVote = {
+      type: 'cosmos-sdk/MsgVote',
+      value: {
+        proposal_id: +this.data.identifier,
+        voter: vote.account.address,
+        option: vote.option,
+      }
+    };
+    await this._Chain.sendTx(vote.account, msg);
   }
 
   public submitVoteTx(vote: CosmosVote, memo: string = '', cb?): ITXModalData {
-    if (this.status !== 'VotingPeriod') {
-      throw new Error('proposal not in voting period');
-    }
-    const args = { proposalId: this.data.identifier, option: vote.choice };
-    const txFn = (gas: number) => this._Chain.tx(
-      'MsgVote', vote.account.address, args, memo, gas, this._Chain.denom,
-    );
-    return this._Chain.createTXModalData(
-      vote.account,
-      txFn,
-      'MsgVote',
-      `${vote.account} voted ${vote.choice} on proposal ${this.data.identifier}`,
-      cb
-    );
+    throw new Error('unsupported');
   }
 
   // fetches all votes on a completed proposal -- active proposal are automatically kept updated
@@ -269,7 +280,7 @@ export class CosmosProposal extends Proposal<
       for (const voter of voteResp.result) {
         const vote = voteToEnum(voter.option);
         if (vote) {
-          this.addOrUpdateVote({ account: this._Accounts.fromAddress(voter.voter), choice: vote });
+          this.addOrUpdateVote(new CosmosVote(this._Accounts.fromAddress(voter.voter), vote));
         } else {
           console.error(`voter: ${voter.voter} has invalid vote option: ${voter.option}`);
         }
@@ -285,7 +296,7 @@ export class CosmosProposal extends Proposal<
     this._status = state.status;
     this._tally = state.tally;
     for (const [ voterAddr, choice ] of state.voters) {
-      this.addOrUpdateVote({ account: this._Accounts.fromAddress(voterAddr), choice });
+      this.addOrUpdateVote(new CosmosVote(this._Accounts.fromAddress(voterAddr), choice));
     }
     for (const [ depositor, deposit ] of state.depositors) {
       this._depositors[depositor] = deposit;

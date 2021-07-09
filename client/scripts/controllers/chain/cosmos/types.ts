@@ -1,6 +1,7 @@
 import BN from 'bn.js';
 import { Coin } from 'adapters/currency';
 import { IIdentifiable, ICompletable } from 'adapters/shared';
+import { coin } from '@cosmjs/amino';
 
 export class CosmosToken extends Coin {
   constructor(denom: string, n: number | string | BN, inDollars: boolean = false) {
@@ -18,7 +19,7 @@ export class CosmosToken extends Coin {
   }
 
   public toCoinObject() {
-    return { amount: this.toNumber(), denom: this.denom };
+    return coin(this.toNumber(), this.denom);
   }
 }
 

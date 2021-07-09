@@ -2,8 +2,8 @@ import {
   ITXModalData,
   NodeInfo,
   IChainModule,
-  TransactionStatus,
   ITXData,
+  ChainBase,
 } from 'models';
 import m from 'mithril';
 import _ from 'lodash';
@@ -11,7 +11,6 @@ import { ApiStatus, IApp } from 'state';
 import moment from 'moment';
 import { BlocktimeHelper } from 'helpers';
 import BN from 'bn.js';
-import { EventEmitter } from 'events';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
 
 import {
@@ -32,9 +31,13 @@ import {
   setupSupplyExtension,
   BankExtension,
   SupplyExtension,
-  StakingExtension
+  StakingExtension,
+  BroadcastMode,
+  isBroadcastTxSuccess
 } from '@cosmjs/launchpad';
+import { AminoMsg } from '@cosmjs/amino';
 import { CosmosAccount } from './account';
+import KeplrWebWalletController from '../../app/webWallets/keplr_web_wallet';
 
 export interface ICosmosTXData extends ITXData {
   chainId: string;
@@ -122,8 +125,8 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     const fetchBlockJob = async () => {
       const block = await this._api.blocksLatest();
       const height = +block.block.header.height;
-      const time = moment(block.block.header.time);
-      if (height !== this.app.chain.block.height) {
+      if (height > this.app.chain.block.height) {
+        const time = moment(block.block.header.time);
         this._blocktimeHelper.stamp(moment(time));
         this.app.chain.block.height = height;
         m.redraw();
@@ -146,37 +149,34 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     }
   }
 
-  private async _simulate(msg: Msg, memo: string): Promise<number> {
-    // TODO
-    return 180000;
-  }
+  public async sendTx(account: CosmosAccount, tx: AminoMsg): Promise<string> {
+    // TODO: error handling
+    const wallets = this.app.wallets.availableWallets(ChainBase.CosmosSDK);
+    if (!wallets) throw new Error('No cosmos wallet found');
 
-  public async tx(
-    txName: string,
-    senderAddress: string,
-    args: object,
-    memo: string = '',
-    gas?: number,
-    gasDenom: string = 'uatom',
-  ) {
-    const msg: Msg = {
-      type: txName,
-      value: args,
+    // TODO: support multiple wallets
+    const wallet = wallets[0] as KeplrWebWalletController;
+    const client = await wallet.getClient(this.app.chain.meta.url, account.address);
+
+    // these parameters will be overridden by the client
+    // TODO: can it be simulated?
+    const DEFAULT_FEE: StdFee = {
+      gas: '180000',
+      amount: [{ amount: (2.5e-8).toFixed(9), denom: this.denom }]
     };
+    const DEFAULT_MEMO = '';
 
-    // estimate the needed gas amount
-    if (!gas) {
-      gas = await this._simulate(msg, memo);
+    // send the transaction using keplr-supported signing client
+    const result = await client.signAndBroadcast([ tx ], DEFAULT_FEE, DEFAULT_MEMO);
+    if (isBroadcastTxFailure(result)) {
+      console.log(result);
+      throw new Error('TX Broadcast failed.');
+    } else if (isBroadcastTxSuccess(result)) {
+      console.log(result);
+      return result.transactionHash;
+    } else {
+      throw new Error('Unknown broadcast result');
     }
-
-    // generate unsigned version for CLI
-    // TODO: test!
-    const result = await this._api.auth.account(senderAddress);
-    const { sequence, account_number: accountNumber } = result.result.value;
-    const DEFAULT_GAS_PRICE = [{ amount: (2.5e-8).toFixed(9), denom: gasDenom }];
-    const fee = { amount: DEFAULT_GAS_PRICE, gas: `${gas}` };
-    const messageToSign = makeSignDoc([ msg ], fee, this.chainId, memo, sequence, accountNumber);
-    return { msg, memo, fee, cmdData: { messageToSign, chainId: this.chainId, sequence, accountNumber, gas } };
   }
 
   public createTXModalData(
@@ -186,75 +186,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     objName: string,
     cb?: (success: boolean) => void,
   ): ITXModalData {
-    const events = new EventEmitter();
-    return {
-      author,
-      txType: txName,
-      cb,
-      txData: {
-        events,
-        unsignedData: async (): Promise<ICosmosTXData> => {
-          const { cmdData: { messageToSign, chainId, accountNumber, gas, sequence } } = await txFunc();
-          return {
-            call: JSON.stringify({ type: 'cosmos-sdk/StdTx', value: messageToSign }),
-            chainId,
-            gas,
-            accountNumber,
-            sequence,
-          };
-        },
-        transact: (signature?: string, computedGas?: number): void => {
-          // perform transaction and coerce into compatible observable
-          txFunc(computedGas).then(async ({ msg, memo, fee }) => {
-            let txResult: BroadcastTxResult;
-
-            // sign and make TX
-            try {
-              let stdTx: StdTx;
-              if (!signature) {
-                // create StdTx through API
-                stdTx = await author.client.sign([ msg as Msg ], fee as StdFee, memo);
-              } else {
-                // manually construct StdTx using signature
-                stdTx = makeStdTx(
-                  { memo, fee, msgs: [ msg ] },
-                  { signature, pub_key: author.pubKey },
-                );
-              }
-              txResult = await author.client.broadcastTx(stdTx);
-            } catch (e) {
-              events.emit(TransactionStatus.Error.toString(), { err: e.message });
-            }
-
-            // handle result of broadcast
-            if (isBroadcastTxFailure(txResult)) {
-              // TODO: test
-              events.emit(TransactionStatus.Error.toString(), { err: txResult.rawLog });
-              return;
-            }
-            try {
-              const indexedTx = await author.client.getTx(txResult.transactionHash);
-              const height = indexedTx.height;
-              const block = await author.client.getBlock(height);
-              events.emit(TransactionStatus.Success.toString(), {
-                blocknum: height,
-                timestamp: moment(block.header.time),
-                hash: block.id,
-              });
-            } catch (e) {
-              // TODO: failed to fetch TX from block, but successfully broadcast?
-              events.emit(TransactionStatus.Success.toString(), {
-                blocknum: this.app.chain.block.height,
-                timestamp: moment(),
-                hash: '--',
-              });
-            }
-          }).catch((err) => {
-            console.error(err);
-          });
-        },
-      }
-    };
+    throw new Error('unsupported');
   }
 }
 

@@ -1,6 +1,6 @@
 import app from 'state';
 
-import { AccountData, OfflineSigner } from '@cosmjs/launchpad';
+import { AccountData, OfflineSigner, SigningCosmosClient } from '@cosmjs/launchpad';
 
 import { Account, ChainBase, IWebWallet } from 'models';
 import { validationTokenToSignDoc } from 'adapters/chain/cosmos/keys';
@@ -17,6 +17,8 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
   private _enabled: boolean;
   private _enabling: boolean = false;
   private _chainId: string;
+  private _offlineSigner: OfflineSigner;
+  private _client: SigningCosmosClient;
 
   public readonly name = 'keplr';
   public readonly label = 'Cosmos Wallet (Keplr)';
@@ -34,6 +36,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
   public get accounts() {
     return this._accounts || [];
   }
+  public get api() { return window.keplr; }
 
   public async validateWithAccount(account: Account<any>): Promise<void> {
     if (!this._chainId || !window.keplr?.signAmino) throw new Error('Missing or misconfigured web wallet');
@@ -45,6 +48,24 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
   }
 
   // ACTIONS
+  public async getClient(url: string, account: string): Promise<SigningCosmosClient> {
+    if (!this.enabled || app.chain.meta.chain.id !== this._chainId) {
+      this._offlineSigner = null;
+      this._client = null;
+      await this.enable();
+      if (!this.enabled) {
+        throw new Error(`Failed to enable keplr for ${app.chain.meta.chain.id}.`);
+      }
+    }
+    if (this.accounts[0].address !== account) {
+      throw new Error('Incorrect signing account');
+    }
+    if (!this._client) {
+      this._client = new SigningCosmosClient(url, account, this._offlineSigner);
+    }
+    return this._client;
+  }
+
   public async enable() {
     console.log('Attempting to enable Keplr web wallet');
 
@@ -60,8 +81,8 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
       this._chainId = app.chain.meta.chain.id;
       await window.keplr.enable(this._chainId);
       console.log(`Enabled web wallet for ${this._chainId}`);
-      const offlineSigner = window.keplr.getOfflineSigner(this._chainId);
-      this._accounts = await offlineSigner.getAccounts();
+      this._offlineSigner = window.keplr.getOfflineSigner(this._chainId);
+      this._accounts = await this._offlineSigner.getAccounts();
       this._enabled = true;
       this._enabling = false;
     } catch (error) {
