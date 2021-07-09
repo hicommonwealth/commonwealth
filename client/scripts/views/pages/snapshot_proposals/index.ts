@@ -104,6 +104,8 @@ const SnapshotProposalsPage: m.Component<{ topic?: string, snapshotId: string },
   },
 
   view: (vnode) => {
+    if (!vnode.state.listing.length) return m(Spinner, { active: true, fill: true });
+
     const listing = [];
     listing.push(m('.discussion-group-wrap', vnode.state.listing));
 
