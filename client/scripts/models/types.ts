@@ -30,6 +30,7 @@ export enum ChainNetwork {
   Cosmos = 'cosmos',
   Straightedge = 'straightedge',
   Osmosis = 'osmosis',
+  Injective = 'injective',
   Ethereum = 'ethereum',
   NEAR = 'near',
   Moloch = 'moloch',

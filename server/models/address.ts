@@ -9,9 +9,8 @@ import { stringToU8a, hexToU8a } from '@polkadot/util';
 import { KeypairType } from '@polkadot/util-crypto/types';
 
 import { serializeSignDoc, decodeSignature } from '@cosmjs/launchpad';
-import { rawSecp256k1PubkeyToRawAddress } from '@cosmjs/amino';
 import { Secp256k1, Secp256k1Signature, Sha256 } from '@cosmjs/crypto';
-import { AminoSignResponse, pubkeyToAddress, encodeAminoPubkey } from '@cosmjs/amino';
+import { AminoSignResponse, pubkeyToAddress } from '@cosmjs/amino';
 
 import nacl from 'tweetnacl';
 import { KeyringOptions } from '@polkadot/keyring/types';
@@ -246,7 +245,9 @@ export default (
         ? 'str'
         : chain.network === 'osmosis'
           ? 'osmo'
-          : chain.network;
+          : chain.network === 'injective'
+            ? 'inj'
+            : chain.network;
       const generatedAddress = pubkeyToAddress(stdSignature.pub_key, bech32Prefix);
       const generatedAddressWithCosmosPrefix = pubkeyToAddress(stdSignature.pub_key, 'cosmos');
 
