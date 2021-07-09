@@ -3,7 +3,7 @@ import 'pages/new_proposal_page.scss';
 import $ from 'jquery';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
-import { Input, Form, FormLabel, FormGroup, Button, Callout } from 'construct-ui';
+import { Input, Form, FormLabel, FormGroup, Button, Callout, Spinner } from 'construct-ui';
 
 import moment from 'moment';
 import { bufferToHex } from 'ethereumjs-util';
@@ -215,13 +215,13 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
           ],
         }),
         showScoreWarning
-        && m(Callout, {
-          class: 'no-profile-callout',
-          intent: 'primary',
-          content: [
-            `You need to have a minimum of ${vnode.state.space.filters.minScore} ${vnode.state.space.symbol} in order to submit a proposal`
-          ],
-        }),
+          ? m(Callout, {
+            class: 'no-profile-callout',
+            intent: 'primary',
+            content: [
+              `You need to have a minimum of ${vnode.state.space.filters.minScore} ${vnode.state.space.symbol} in order to submit a proposal`
+            ],
+          }) : m(Spinner, { active: true, }),
         m('.new-snapshot-proposal-form', [
           m(Form, [
             m(FormGroup, [
