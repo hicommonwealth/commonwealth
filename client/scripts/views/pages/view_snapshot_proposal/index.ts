@@ -37,7 +37,7 @@ const ProposalHeader: m.Component<{
     return m('.ProposalHeader', {
       class: 'proposal-snapshot'
     }, [
-      m('.proposal-top', [
+      m('.snapshot-proposal-top', [
         m('.proposal-top-left', [
           m('.proposal-title', [
             m(ProposalHeaderTitle, { proposal })
