@@ -186,10 +186,20 @@ export function formatLastUpdated(timestamp) {
   if (timestamp.isBefore(moment().subtract(365, 'days'))) return timestamp.format('MMM D YYYY');
   const formatted = timestamp.fromNow(true);
   return `${formatted
-      .replace(' days', 'd')
-      .replace(' day', 'd')
-      .replace(' hours', 'h')
-      .replace(' hour', 'h')} ago`;
+    .replace(' days', 'd')
+    .replace(' day', 'd')
+    .replace(' hours', 'h')
+    .replace(' hour', 'h')} ago`;
+}
+
+export function formatTimestamp(timestamp) {
+  if (timestamp.isBefore(moment().subtract(365, 'days'))) return timestamp.format('MMM D YYYY');
+  const formatted = timestamp.fromNow(true);
+  return `${formatted
+    .replace(' days', 'd')
+    .replace(' day', 'd')
+    .replace(' hours', 'h')
+    .replace(' hour', 'h')}`;
 }
 
 // duplicated in adapters/currency.ts
