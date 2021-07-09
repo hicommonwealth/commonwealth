@@ -117,7 +117,7 @@ const SnapshotProposalsPage: m.Component<{ topic?: string, snapshotId: string },
     }, [
       (app.chain || app.community) && [
         m('.discussions-main', [
-          m(SnapshotProposalStagesBar, {}),
+          // m(SnapshotProposalStagesBar, {}),
           listing.length === 0
             ? m('.topic-loading-spinner-wrap', [ m(Spinner, { active: true, size: 'lg' }) ])
             : m(Listing, { content: listing }),
