@@ -39,16 +39,7 @@ export const ProposalBodyCreated: m.Component<{
     const time = moment(+item.start * 1000);
 
     return m('.ProposalBodyCreated', [
-      m('a', {
-        href: link,
-        onclick: (e) => {
-          e.preventDefault();
-          const target = link;
-          if (target === document.location.href) return;
-          // use updateRoute instead of m.route.set to avoid resetting scroll point
-          updateRoute(target, {}, { replace: true });
-        }
-      }, `Created ${formatLastUpdated(time)}`)
+      m('', `Created ${formatLastUpdated(time)}`)
     ]);
   }
 };
@@ -63,12 +54,7 @@ export const ProposalBodyLastEdited: m.Component<{ item: SnapshotProposal }> = {
     const time = moment(+item.end * 1000);
 
     return m('.ProposalBodyLastEdited', [
-      m('a', {
-        href: '#',
-        onclick: async (e) => {
-          e.preventDefault();
-        }
-      }, `Edited ${formatLastUpdated(time)}`)
+      m('', `Edited ${formatLastUpdated(time)}`)
     ]);
   }
 };
