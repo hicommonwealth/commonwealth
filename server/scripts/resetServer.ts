@@ -1155,6 +1155,18 @@ const resetServer = (models): Promise<number> => {
           type: 'token',
           base: 'ethereum',
         }),
+        models.Chain.create({
+          id: 'demos',
+          symbol: 'demos',
+          name: 'demos',
+          icon_url: '/static/img/protocols/eth.png',
+          type: 'token',
+          network: 'demos',
+          active: true,
+          collapsed_on_homepage: false,
+          base: 'ethereum',
+          snapshot: 'polarcat.eth',
+        })
       ]);
 
       // Specific chains
