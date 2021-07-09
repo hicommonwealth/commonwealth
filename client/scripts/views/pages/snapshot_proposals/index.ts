@@ -91,7 +91,9 @@ const SnapshotProposalsPage: m.Component<{ topic?: string, snapshotId: string },
     });
     console.log(vnode);
     const snapshotId = vnode.attrs.snapshotId;
+    console.log(snapshotId);
     app.snapshot.fetchSnapshotProposals(snapshotId).then((response) => {
+      console.log(response);
       vnode.state.listing = app.snapshot.proposalStore.getAll()
         .map((proposal) => m(ProposalRow, { snapshotId, proposal }));
 
