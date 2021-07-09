@@ -8,7 +8,7 @@ import gql from 'graphql-tag';
 // HTTP connection to the API
 const httpLink = createHttpLink({
   // You should use an absolute URL here
-  uri: `${process.env.SNAPSHOT_HUB_URL || 'https://testnet.snapshot.org'}/graphql`
+  uri: `${process.env.SNAPSHOT_HUB_URL || 'https://hub.snapshot.org'}/graphql`
 });
 
 // Create the apollo client
