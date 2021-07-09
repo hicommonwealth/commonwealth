@@ -34,7 +34,7 @@ module.exports = {
         github: 'https://github.com/fei-protocol/fei-protocol-core',
         collapsed_on_homepage: false,
         base: 'ethereum',
-        snapshot: 'polarcat.eth'
+        snapshot: 'fei.eth'
       },
       ], { transaction: t });
 
