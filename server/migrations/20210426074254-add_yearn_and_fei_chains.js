@@ -36,6 +36,18 @@ module.exports = {
         base: 'ethereum',
         snapshot: 'fei.eth'
       },
+      {
+        id: 'demo',
+        symbol: 'DEMO',
+        name: 'demo',
+        icon_url: '/static/img/protocols/eth.png',
+        type: 'chain',
+        network: 'demo',
+        active: true,
+        collapsed_on_homepage: false,
+        base: 'ethereum',
+        snapshot: 'polarcat.eth'
+      },
       ], { transaction: t });
 
       await queryInterface.bulkInsert('ChainNodes', [{
@@ -45,6 +57,10 @@ module.exports = {
       }, {
         chain: 'fei',
         url: 'wss://mainnet.infura.io/ws',
+        address: '0x956F47F50A910163D8BF957Cf5846D573E7f87CA'
+      }, {
+        chain: 'demo',
+        url: 'wss://ropsten.infura.io/ws',
         address: '0x956F47F50A910163D8BF957Cf5846D573E7f87CA'
       }], { transaction: t });
     });

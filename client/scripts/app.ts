@@ -335,6 +335,13 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/ethereum/snapshot/adapter'
     )).default;
     newChain = new Snapshot(n, app);
+  } else if (n.chain.network === ChainNetwork.Demo) {
+    const Snapshot = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "commonwealth-main" */
+      './controllers/chain/ethereum/snapshot/adapter'
+    )).default;
+    newChain = new Snapshot(n, app);
   } else {
     throw new Error('Invalid chain');
   }
