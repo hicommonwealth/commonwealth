@@ -136,7 +136,7 @@ const VoteAction: m.Component<{
 }> = {
   view: (vnode) => {
     const { choices } = vnode.attrs;
-    const canVote = true;
+    const canVote = true; // TODO: remove these hardcoded values;
     const hasVotedYes = false;
     const hasVotedNo = false;
     const { votingModalOpen } = vnode.state;
