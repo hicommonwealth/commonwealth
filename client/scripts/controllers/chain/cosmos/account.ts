@@ -5,14 +5,13 @@ import CosmosChain from 'controllers/chain/cosmos/chain';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
 import { Account, IAccountsModule, ITXModalData } from 'models';
 import { AccountsStore } from 'stores';
+import { AuthAccountsResponse } from '@cosmjs/launchpad';
 import {
-  AuthAccountsResponse,
-  MsgSend,
-  MsgDelegate,
-  MsgUndelegate,
-  MsgBeginRedelegate,
-  MsgWithdrawDelegatorReward,
-} from '@cosmjs/launchpad';
+  MsgSendEncodeObject,
+  MsgDelegateEncodeObject,
+  MsgUndelegateEncodeObject,
+  MsgWithdrawDelegatorRewardEncodeObject,
+} from '@cosmjs/stargate';
 import { BondStatus } from '@cosmjs/launchpad/build/lcdapi/staking';
 
 export interface ICosmosValidator {
@@ -98,11 +97,11 @@ export class CosmosAccount extends Account<CosmosToken> {
   }
 
   public async sendTx(recipient: CosmosAccount, amount: CosmosToken) {
-    const msg: MsgSend = {
-      type: 'cosmos-sdk/MsgSend',
+    const msg: MsgSendEncodeObject = {
+      typeUrl: '/cosmos.bank.v1beta1.MsgSend',
       value: {
-        from_address: this.address,
-        to_address: recipient.address,
+        fromAddress: this.address,
+        toAddress: recipient.address,
         amount: [ { denom: amount.denom, amount: amount.toString() } ],
       }
     };
@@ -110,11 +109,11 @@ export class CosmosAccount extends Account<CosmosToken> {
   }
 
   public async delegateTx(validatorAddress: string, amount: CosmosToken) {
-    const msg: MsgDelegate = {
-      type: 'cosmos-sdk/MsgDelegate',
+    const msg: MsgDelegateEncodeObject = {
+      typeUrl: '/cosmos.staking.v1beta1.MsgDelegate',
       value: {
-        delegator_address: this.address,
-        validator_address: validatorAddress,
+        delegatorAddress: this.address,
+        validatorAddress,
         amount: amount.toCoinObject(),
       }
     };
@@ -122,24 +121,11 @@ export class CosmosAccount extends Account<CosmosToken> {
   }
 
   public async undelegateTx(validatorAddress: string, amount: CosmosToken) {
-    const msg: MsgUndelegate = {
-      type: 'cosmos-sdk/MsgUndelegate',
+    const msg: MsgUndelegateEncodeObject = {
+      typeUrl: '/cosmos.staking.v1beta1.MsgUndelegate',
       value: {
-        delegator_address: this.address,
-        validator_address: validatorAddress,
-        amount: amount.toCoinObject(),
-      }
-    };
-    await this._Chain.sendTx(this, msg);
-  }
-
-  public async redelegateTx(validatorSource: string, validatorDest: string, amount: CosmosToken) {
-    const msg: MsgBeginRedelegate = {
-      type: 'cosmos-sdk/MsgBeginRedelegate',
-      value: {
-        delegator_address: this.address,
-        validator_src_address: validatorSource,
-        validator_dst_address: validatorDest,
+        delegatorAddress: this.address,
+        validatorAddress,
         amount: amount.toCoinObject(),
       }
     };
@@ -147,11 +133,11 @@ export class CosmosAccount extends Account<CosmosToken> {
   }
 
   public async withdrawDelegationRewardTx(validatorAddress: string) {
-    const msg: MsgWithdrawDelegatorReward = {
-      type: 'cosmos-sdk/MsgWithdrawDelegationReward',
+    const msg: MsgWithdrawDelegatorRewardEncodeObject = {
+      typeUrl: '/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward',
       value: {
-        delegator_address: this.address,
-        validator_address: validatorAddress,
+        delegatorAddress: this.address,
+        validatorAddress,
       }
     };
     await this._Chain.sendTx(this, msg);

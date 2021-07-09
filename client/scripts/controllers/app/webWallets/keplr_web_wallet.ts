@@ -1,6 +1,7 @@
 import app from 'state';
 
-import { AccountData, OfflineSigner, SigningCosmosClient } from '@cosmjs/launchpad';
+import { SigningStargateClient } from '@cosmjs/stargate';
+import { OfflineDirectSigner, AccountData } from '@cosmjs/proto-signing';
 
 import { Account, ChainBase, IWebWallet } from 'models';
 import { validationTokenToSignDoc } from 'adapters/chain/cosmos/keys';
@@ -17,8 +18,8 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
   private _enabled: boolean;
   private _enabling: boolean = false;
   private _chainId: string;
-  private _offlineSigner: OfflineSigner;
-  private _client: SigningCosmosClient;
+  private _offlineSigner: OfflineDirectSigner;
+  private _client: SigningStargateClient;
 
   public readonly name = 'keplr';
   public readonly label = 'Cosmos Wallet (Keplr)';
@@ -48,7 +49,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
   }
 
   // ACTIONS
-  public async getClient(url: string, account: string): Promise<SigningCosmosClient> {
+  public async getClient(url: string, account: string): Promise<SigningStargateClient> {
     if (!this.enabled || app.chain.meta.chain.id !== this._chainId) {
       this._offlineSigner = null;
       this._client = null;
@@ -61,7 +62,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
       throw new Error('Incorrect signing account');
     }
     if (!this._client) {
-      this._client = new SigningCosmosClient(url, account, this._offlineSigner);
+      this._client = await SigningStargateClient.connectWithSigner(url, this._offlineSigner);
     }
     return this._client;
   }

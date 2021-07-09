@@ -1,6 +1,5 @@
 import BN from 'bn.js';
 import { GovDepositsResponse, GovTallyResponse, GovVotesResponse } from '@cosmjs/launchpad';
-import { MsgDeposit, MsgVote } from '@cosmjs/launchpad/build/msgs';
 import {
   Proposal,
   ITXModalData,
@@ -225,6 +224,7 @@ export class CosmosProposal extends Proposal<
 
   // TRANSACTIONS
   public async submitDepositTx(depositor: CosmosAccount, amount: CosmosToken) {
+    /*
     if (this.status !== 'DepositPeriod') {
       throw new Error('proposal not in deposit period');
     }
@@ -237,12 +237,15 @@ export class CosmosProposal extends Proposal<
       }
     };
     await this._Chain.sendTx(depositor, msg);
+    */
+    throw new Error('deposit not yet implemented');
   }
 
   public async voteTx(vote: CosmosVote) {
-    // if (this.status !== 'VotingPeriod') {
-    //   throw new Error('proposal not in voting period');
-    // }
+    /*
+    if (this.status !== 'VotingPeriod') {
+      throw new Error('proposal not in voting period');
+    }
     const msg: MsgVote = {
       type: 'cosmos-sdk/MsgVote',
       value: {
@@ -252,6 +255,8 @@ export class CosmosProposal extends Proposal<
       }
     };
     await this._Chain.sendTx(vote.account, msg);
+    */
+    throw new Error('voting not yet implemented');
   }
 
   public submitVoteTx(vote: CosmosVote, memo: string = '', cb?): ITXModalData {

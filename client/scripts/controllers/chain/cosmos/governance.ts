@@ -7,7 +7,6 @@ import {
   Proposal,
   Tally,
 } from '@cosmjs/launchpad/build/lcdapi/gov';
-import { MsgSubmitProposal } from '@cosmjs/launchpad/build/msgs';
 import _ from 'underscore';
 import {
   ITXModalData,
@@ -126,7 +125,6 @@ class CosmosGovernance extends ProposalModule<
     description: string,
     initialDeposit: CosmosToken,
   ) {
-    throw new Error('proposal submission not yet implemented');
     /*
     const msg: MsgSubmitProposal = {
       type: 'cosmos-sdk/MsgSubmitProposal',
@@ -144,6 +142,7 @@ class CosmosGovernance extends ProposalModule<
     };
     await this._Chain.sendTx(sender, msg);
     */
+    throw new Error('proposal submission not yet implemented');
   }
 }
 

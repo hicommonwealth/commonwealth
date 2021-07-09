@@ -14,16 +14,10 @@ import BN from 'bn.js';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
 
 import {
-  makeStdTx,
-  StdTx,
   StdFee,
-  BroadcastTxResult,
-  isBroadcastTxFailure,
   AuthExtension,
   GovExtension,
   LcdClient,
-  makeSignDoc,
-  Msg,
   setupAuthExtension,
   setupGovExtension,
   setupStakingExtension,
@@ -32,10 +26,9 @@ import {
   BankExtension,
   SupplyExtension,
   StakingExtension,
-  BroadcastMode,
-  isBroadcastTxSuccess
 } from '@cosmjs/launchpad';
-import { AminoMsg } from '@cosmjs/amino';
+import { isBroadcastTxSuccess, isBroadcastTxFailure } from '@cosmjs/stargate';
+import { EncodeObject } from '@cosmjs/proto-signing';
 import { CosmosAccount } from './account';
 import KeplrWebWalletController from '../../app/webWallets/keplr_web_wallet';
 
@@ -149,7 +142,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     }
   }
 
-  public async sendTx(account: CosmosAccount, tx: AminoMsg): Promise<string> {
+  public async sendTx(account: CosmosAccount, tx: EncodeObject): Promise<string> {
     // TODO: error handling
     const wallets = this.app.wallets.availableWallets(ChainBase.CosmosSDK);
     if (!wallets) throw new Error('No cosmos wallet found');
@@ -167,7 +160,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     const DEFAULT_MEMO = '';
 
     // send the transaction using keplr-supported signing client
-    const result = await client.signAndBroadcast([ tx ], DEFAULT_FEE, DEFAULT_MEMO);
+    const result = await client.signAndBroadcast(account.address, [ tx ], DEFAULT_FEE, DEFAULT_MEMO);
     if (isBroadcastTxFailure(result)) {
       console.log(result);
       throw new Error('TX Broadcast failed.');

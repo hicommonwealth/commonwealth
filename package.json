@@ -49,6 +49,8 @@
     "@commonwealth/chain-events": "0.6.5",
     "@cosmjs/amino": "^0.25.5",
     "@cosmjs/launchpad": "^0.25.5",
+    "@cosmjs/proto-signing": "^0.25.5",
+    "@cosmjs/stargate": "^0.25.5",
     "@edgeware/node-types": "3.3.3",
     "@glidejs/glide": "^3.4.1",
     "@keplr-wallet/types": "^0.9.0-alpha.1",
