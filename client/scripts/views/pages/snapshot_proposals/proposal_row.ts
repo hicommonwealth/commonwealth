@@ -27,7 +27,7 @@ const ProposalRow: m.Component<{ snapshotId: string, proposal: SnapshotProposal 
         m('span.proposal-topic-name', `${proposal.ipfsHash}`),
       ]),
       m('.created-at m-l-20', link('a', proposalLink, (now > time) ? `Ended ${formatLastUpdated(time)}`
-        : `Ending ${formatTimestamp(moment(+proposal.end * 1000))}`)),
+        : `Ending in ${formatTimestamp(moment(+proposal.end * 1000))}`)),
     ];
 
     return m(ProposalListingRow, {
