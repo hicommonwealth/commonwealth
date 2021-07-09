@@ -270,6 +270,7 @@ export default (
       || chain.network === 'metacartel'
       || chain.network === 'commonwealth'
       || chain.type === 'token'
+      || chain.network === 'demo'
     ) {
       //
       // ethereum address handling
