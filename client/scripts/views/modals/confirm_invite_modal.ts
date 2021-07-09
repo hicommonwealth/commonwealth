@@ -73,7 +73,7 @@ const ConfirmInviteModal: m.Component<{}, {
           vnode.state.selectedAddress = account.address;
         },
       }, [
-        m(UserBlock, { user: account, showChainName: true, showFullAddress: !isMobile })
+        m(UserBlock, { user: account, showChainName: true, addressDisplayOptions: { showFullAddress: !isMobile } })
       ]);
     };
 
