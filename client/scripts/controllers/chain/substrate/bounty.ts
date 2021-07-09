@@ -7,7 +7,6 @@ import {
   VotingType, VotingUnit, ChainEntity, ChainEvent,
 } from 'models';
 import { SubstrateTypes } from '@commonwealth/chain-events';
-import { formatAddressShort } from '../../../../../shared/utils';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateBountyTreasury from './bountyTreasury';

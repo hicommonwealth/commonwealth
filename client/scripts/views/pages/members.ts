@@ -107,7 +107,7 @@ const MembersPage : m.Component<{}, { membersRequested: boolean, membersLoaded: 
             m(User, { user: profile, hideAvatar: true, popover: true, showRole: true }),
             profile.headline
               ? m('.members-item-headline', profile.headline)
-              : m('.members-item-address', formatAddressShort(profile.address, profile.chain)),
+              : m('.members-item-address', formatAddressShort(profile.address, profile.chain, true)),
             info.count > 0 && m('.members-item-posts', [
               pluralize(info.count, 'post'),
               ' this month'

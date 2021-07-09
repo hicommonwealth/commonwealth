@@ -64,7 +64,8 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
           SELECT addr.id AS addr_id, addr.address AS addr_address,
             addr.chain AS addr_chain, thread_id, thread_title,
             thread_community, thread_chain, thread_created, threads.kind, threads.stage,
-            threads.read_only, threads.body, threads.offchain_voting_votes, threads.offchain_voting_ends_at,
+            threads.read_only, threads.body, threads.offchain_voting_options,
+            threads.offchain_voting_votes, threads.offchain_voting_ends_at,
             threads.url, threads.pinned, topics.id AS topic_id, topics.name AS topic_name,
             topics.description AS topic_description, topics.chain_id AS topic_chain,
             topics.telegram AS topic_telegram,
@@ -73,7 +74,8 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
           RIGHT JOIN (
             SELECT t.id AS thread_id, t.title AS thread_title, t.address_id,
               t.created_at AS thread_created, t.community AS thread_community,
-              t.chain AS thread_chain, t.read_only, t.body, t.offchain_voting_votes, t.offchain_voting_ends_at,
+              t.chain AS thread_chain, t.read_only, t.body,
+              t.offchain_voting_options, t.offchain_voting_votes, t.offchain_voting_ends_at,
               t.stage, t.url, t.pinned, t.topic_id, t.kind, ARRAY_AGG(DISTINCT
                 CONCAT(
                   '{ "address": "', editors.address, '", "chain": "', editors.chain, '" }'
@@ -150,6 +152,7 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
             created_at: t.thread_created,
             collaborators,
             chain_entities,
+            offchain_voting_options: t.offchain_voting_options,
             offchain_voting_votes: t.offchain_voting_votes,
             offchain_voting_ends_at: t.offchain_voting_ends_at,
             Address: {
