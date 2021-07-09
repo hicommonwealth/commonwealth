@@ -217,7 +217,7 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
 
     return m('.NewThreadForm', {
       oncreate: (vvnode) => {
-        $(vvnode.dom).find('.cui-input input').prop('autocomplete', 'off').focus();
+        // $(vvnode.dom).find('.cui-input input').prop('autocomplete', 'off').focus();
       },
     }, [
       m('.new-thread-form-body', [
@@ -239,9 +239,10 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
         }),
         m('.new-snapshot-proposal-form', [
           m(Form, [
-            m(FormGroup, { span: { xs: 12, sm: 12 }, order: 2 }, [
+            m(FormGroup, [
+              m(FormLabel, 'Question/Proposal'),
               m(Input, {
-                placeholder: 'Question',
+                placeholder: 'Should 0xMaki be our new Mayor?',
                 oninput: (e) => {
                   e.redraw = false; // do not redraw on input
                   const { value } = e.target as any;
@@ -252,7 +253,59 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
                 tabindex: 1,
               }),
             ]),
-            m(FormGroup, { order: 4 }, [
+            m(FormGroup, [
+              m(FormGroup, [
+                m(FormLabel, 'Choice 1'),
+                m(Input, {
+                  name: 'targets',
+                  placeholder: 'Yes',
+                  oninput: (e) => {
+                    const result = (e.target as any).value;
+                    vnode.state.form.choices[0] = result;
+                    m.redraw();
+                  },
+                }),
+              ]),
+              m(FormGroup, [
+                m(FormLabel, 'Choice 2'),
+                m(Input, {
+                  name: 'targets',
+                  placeholder: 'No',
+                  oninput: (e) => {
+                    const result = (e.target as any).value;
+                    vnode.state.form.choices[1] = result;
+                    m.redraw();
+                  },
+                }),
+              ]),
+            ]),
+            m(FormGroup, [
+              m(FormGroup, [
+                m(FormLabel, 'Start Date:'),
+                m(Input, {
+                  name: 'targets',
+                  placeholder: 'May 1, 1995',
+                  oninput: (e) => {
+                    const result = (e.target as any).value;
+                    vnode.state.form.start = result;
+                    m.redraw();
+                  },
+                }),
+              ]),
+              m(FormGroup, [
+                m(FormLabel, 'End Date:'),
+                m(Input, {
+                  name: 'targets',
+                  placeholder: 'May 22, 1995',
+                  oninput: (e) => {
+                    const result = (e.target as any).value;
+                    vnode.state.form.end = result;
+                    m.redraw();
+                  },
+                }),
+              ]),
+            ]),
+            m(FormGroup, [
               m(QuillEditor, {
                 contentsDoc: '', // Prevent the editor from being filled in with previous content
                 oncreateBind: (state) => {
@@ -283,51 +336,6 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
                 },
               }),
             ]),
-          ]),
-          m(Form, [
-            m('h4', 'Choices'),
-            m(FormGroup, [
-              m(FormLabel, 'Choice 1'),
-              m(Input, {
-                name: 'targets',
-                placeholder: 'Yes',
-                oninput: (e) => {
-                  const result = (e.target as any).value;
-                  vnode.state.form.choices[0] = result;
-                  m.redraw();
-                },
-              }),
-            ]),
-            m(FormGroup, [
-              m(FormLabel, 'Choice 2'),
-              m(Input, {
-                name: 'targets',
-                placeholder: 'No',
-                oninput: (e) => {
-                  const result = (e.target as any).value;
-                  vnode.state.form.choices[1] = result;
-                  m.redraw();
-                },
-              }),
-            ]),
-            m('h4', 'Start Date'),
-            m(DatePicker,
-              {
-                locale: 'en-us',
-                weekStart: 0,
-                onchange(chosenDate) {
-                  vnode.state.form.start = moment(chosenDate).unix();
-                }
-              }),
-            m('h4', 'End Date'),
-            m(DatePicker,
-              {
-                locale: 'en-us',
-                weekStart: 0,
-                onchange(chosenDate) {
-                  vnode.state.form.end = moment(chosenDate).unix();
-                }
-              }),
           ]),
         ]),
       ]),
