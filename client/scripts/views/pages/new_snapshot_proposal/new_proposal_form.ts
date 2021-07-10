@@ -223,7 +223,7 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
         //     ],
         //   }) : m(Spinner, { active: true, }),
         m('.new-snapshot-proposal-form', [
-          m(Form, [
+          m(Form, { style:'width:100%' }, [
             m(FormGroup, [
               m(FormLabel, 'Question/Proposal'),
               m(Input, {
@@ -235,7 +235,6 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
                   localStorage.setItem(`${app.activeId()}-new-snapshot-proposal-name`, vnode.state.form.name);
                 },
                 defaultValue: vnode.state.form.name,
-                tabindex: 1,
               }),
             ]),
             m(FormGroup, [
