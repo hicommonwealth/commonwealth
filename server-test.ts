@@ -30,12 +30,17 @@ const app = express();
 const SequelizeStore = SessionSequelizeStore(session.Store);
 // set cache TTL to 1 second to test invalidation
 const viewCountCache = new ViewCountCache(1, 10 * 60);
-const identityFetchCache = new IdentityFetchCache(0);
+const identityFetchCache = new IdentityFetchCache(models);
 
 // always prune both token and non-token holders asap
 const tokenListCache = new TokenListCache();
 const mockTokenBalanceProvider = new MockTokenBalanceProvider();
-const tokenBalanceCache = new TokenBalanceCache(tokenListCache, 0, 0, mockTokenBalanceProvider);
+const tokenBalanceCache = new TokenBalanceCache(
+  tokenListCache,
+  0,
+  0,
+  mockTokenBalanceProvider
+);
 const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
 let server;
 
@@ -52,7 +57,7 @@ const sessionParser = session({
   secret: SESSION_SECRET,
   store: sessionStore,
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: true
 });
 
 // serve static files
@@ -77,7 +82,7 @@ app.use((req, res, next) => {
 const setupErrorHandlers = () => {
   // catch 404 and forward to error handler
   app.use((req, res, next) => {
-    const err : any = new Error('Not Found');
+    const err: any = new Error('Not Found');
     err.status = 404;
     next(err);
   });
@@ -88,7 +93,7 @@ const setupErrorHandlers = () => {
   });
 };
 
-const resetServer = (debug=false): Promise<void> => {
+const resetServer = (debug = false): Promise<void> => {
   if (debug) console.log('Resetting database...');
 
   return new Promise((resolve) => {
@@ -99,19 +104,19 @@ const resetServer = (debug=false): Promise<void> => {
         email: 'drewstone329@gmail.com',
         emailVerified: true,
         isAdmin: true,
-        lastVisited: '{}',
+        lastVisited: '{}'
       });
 
       // For all smart contract support chains
       await models['ContractCategory'].create({
         name: 'Tokens',
         description: 'Token related contracts',
-        color: '#4a90e2',
+        color: '#4a90e2'
       });
       await models['ContractCategory'].create({
         name: 'DAOs',
         description: 'DAO related contracts',
-        color: '#9013fe',
+        color: '#9013fe'
       });
       // Initialize different chain + node URLs
       const edgMain = await models['Chain'].create({
@@ -123,7 +128,7 @@ const resetServer = (debug=false): Promise<void> => {
         active: true,
         type: 'chain',
         base: 'substrate',
-        ss58_prefix: '7',
+        ss58_prefix: '7'
       });
       const eth = await models['Chain'].create({
         id: 'ethereum',
@@ -133,7 +138,7 @@ const resetServer = (debug=false): Promise<void> => {
         icon_url: '/static/img/protocols/eth.png',
         active: true,
         type: 'chain',
-        base: 'ethereum',
+        base: 'ethereum'
       });
       const alex = await models['Chain'].create({
         id: 'alex',
@@ -143,7 +148,7 @@ const resetServer = (debug=false): Promise<void> => {
         icon_url: '/static/img/protocols/eth.png',
         active: true,
         type: 'token',
-        base: 'ethereum',
+        base: 'ethereum'
       });
 
       // Admin roles for specific communities
@@ -155,7 +160,7 @@ const resetServer = (debug=false): Promise<void> => {
           selected: true,
           verification_token: 'PLACEHOLDER',
           verification_token_expires: null,
-          verified: new Date(),
+          verified: new Date()
         }),
         models['Address'].create({
           address: '5DJA5ZCobDS3GVn8D2E5YRiotDqGkR2FN1bg6LtfNUmuadwX',
@@ -163,7 +168,7 @@ const resetServer = (debug=false): Promise<void> => {
           verification_token: 'PLACEHOLDER',
           verification_token_expires: null,
           verified: true,
-          keytype: 'sr25519',
+          keytype: 'sr25519'
         }),
         models['Address'].create({
           address: 'ik52qFh92pboSctWPSFKtQwGEpypzz2m6D5ZRP8AYxqjHpM',
@@ -171,7 +176,7 @@ const resetServer = (debug=false): Promise<void> => {
           verification_token: 'PLACEHOLDER',
           verification_token_expires: null,
           verified: true,
-          keytype: 'sr25519',
+          keytype: 'sr25519'
         }),
         models['Address'].create({
           address: 'js4NB7G3bqEsSYq4ruj9Lq24QHcoKaqauw6YDPD7hMr1Roj',
@@ -179,8 +184,8 @@ const resetServer = (debug=false): Promise<void> => {
           verification_token: 'PLACEHOLDER',
           verification_token_expires: null,
           verified: true,
-          keytype: 'sr25519',
-        }),
+          keytype: 'sr25519'
+        })
       ]);
 
       // Notification Categories
@@ -194,23 +199,23 @@ const resetServer = (debug=false): Promise<void> => {
       });
       await models['NotificationCategory'].create({
         name: NotificationCategories.NewComment,
-        description: 'someone makes a new comment',
+        description: 'someone makes a new comment'
       });
       await models['NotificationCategory'].create({
         name: NotificationCategories.NewMention,
-        description: 'someone @ mentions a user',
+        description: 'someone @ mentions a user'
       });
       await models['NotificationCategory'].create({
         name: NotificationCategories.NewCollaboration,
-        description: 'someone collaborates with a user',
+        description: 'someone collaborates with a user'
       });
       await models['NotificationCategory'].create({
         name: NotificationCategories.ChainEvent,
-        description: 'a chain event occurs',
+        description: 'a chain event occurs'
       });
       await models['NotificationCategory'].create({
         name: NotificationCategories.NewReaction,
-        description: 'someone reacts to a post',
+        description: 'someone reacts to a post'
       });
 
       // Admins need to be subscribed to mentions and collaborations
@@ -218,13 +223,13 @@ const resetServer = (debug=false): Promise<void> => {
         subscriber_id: drew.id,
         category_id: NotificationCategories.NewMention,
         object_id: `user-${drew.id}`,
-        is_active: true,
+        is_active: true
       });
       await models['Subscription'].create({
         subscriber_id: drew.id,
         category_id: NotificationCategories.NewCollaboration,
         object_id: `user-${drew.id}`,
-        is_active: true,
+        is_active: true
       });
 
       // Communities
@@ -233,15 +238,23 @@ const resetServer = (debug=false): Promise<void> => {
         name: 'Staking',
         creator_id: 1,
         description: 'All things staking',
-        default_chain: 'ethereum',
+        default_chain: 'ethereum'
       });
 
       const nodes = [
-        [ 'mainnet1.edgewa.re', 'edgeware' ],
-        [ 'wss://mainnet.infura.io/ws', 'ethereum' ],
-        [ 'wss://ropsten.infura.io/ws', 'alex', '0xFab46E002BbF0b4509813474841E0716E6730136'],
+        ['mainnet1.edgewa.re', 'edgeware'],
+        ['wss://mainnet.infura.io/ws', 'ethereum'],
+        [
+          'wss://ropsten.infura.io/ws',
+          'alex',
+          '0xFab46E002BbF0b4509813474841E0716E6730136'
+        ]
       ];
-      await Promise.all(nodes.map(([ url, chain, address ]) => (models['ChainNode'].create({ chain, url, address }))));
+      await Promise.all(
+        nodes.map(([url, chain, address]) =>
+          models['ChainNode'].create({ chain, url, address })
+        )
+      );
 
       // initialize chain event types
       // we don't need to do this on regular reset, because incoming
@@ -253,7 +266,7 @@ const resetServer = (debug=false): Promise<void> => {
             return models['ChainEventType'].create({
               id: `${chain}-${event_name}`,
               chain,
-              event_name,
+              event_name
             });
           })
         );
