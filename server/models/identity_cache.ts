@@ -1,6 +1,7 @@
 import * as Sequelize from 'sequelize';
 
 export interface IdentityCacheAttributes {
+  id?: number;
   chain: string;
   address: string;
 }
@@ -19,10 +20,15 @@ export default (
   const IdentityCache = sequelize.define<
     IdentityCacheInstance,
     IdentityCacheAttributes
-  >('IdentityCache', {
-    chain: { type: dataTypes.STRING, allowNull: false },
-    address: { type: dataTypes.STRING, allowNull: false }
-  });
+  >(
+    'IdentityCache',
+    {
+      id: { type: dataTypes.STRING, primaryKey: true },
+      chain: { type: dataTypes.STRING, allowNull: false },
+      address: { type: dataTypes.STRING, allowNull: false }
+    },
+    { timestamps: false }
+  );
 
   IdentityCache.associate = (models) => {
     models.IdentityCache.belongsTo(models.Chain, {
