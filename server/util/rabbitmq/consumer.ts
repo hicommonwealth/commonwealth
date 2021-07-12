@@ -55,6 +55,7 @@ export class Consumer implements IConsumer {
     queueName: string
   ): Promise<any> {
     let subscription;
+    log.info(`Subscribing to ${queueName}`);
     try {
       if (!this._subscribers.includes(queueName))
         throw new Error('Subscription does not exist');

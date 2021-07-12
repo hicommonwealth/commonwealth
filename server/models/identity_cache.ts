@@ -1,7 +1,6 @@
 import * as Sequelize from 'sequelize';
 
 export interface IdentityCacheAttributes {
-  id?: number;
   chain: string;
   address: string;
 }
@@ -23,7 +22,6 @@ export default (
   >(
     'IdentityCache',
     {
-      id: { type: dataTypes.STRING, primaryKey: true },
       chain: { type: dataTypes.STRING, allowNull: false },
       address: { type: dataTypes.STRING, allowNull: false }
     },

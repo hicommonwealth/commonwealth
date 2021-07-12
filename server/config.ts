@@ -57,4 +57,11 @@ export const MAGIC_API_KEY = process.env.MAGIC_API_KEY;
 export const MAGIC_SUPPORTED_BASES = process.env.MAGIC_SUPPORTED_BASES?.split(',') || ['ethereum', 'substrate'];
 export const MAGIC_DEFAULT_CHAIN = process.env.MAGIC_DEFAULT_CHAIN || 'ethereum';
 
-export const DEFAULT_COMMONWEALTH_LOGO = 'https://commonwealth.im/static/img/logo.png';
+export const DEFAULT_COMMONWEALTH_LOGO =
+  'https://commonwealth.im/static/img/logo.png';
+
+export const HANDLE_IDENTITY =
+  process.env.HANDLE_IDENTITY === 'publish' ||
+  process.env.HANDLE_IDENTITY === 'handle'
+    ? process.env.HANDLE_IDENTITY
+    : null;

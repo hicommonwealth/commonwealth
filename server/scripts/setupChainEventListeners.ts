@@ -7,6 +7,8 @@ import {
   CWEvent
 } from '@commonwealth/chain-events';
 
+import { HANDLE_IDENTITY } from '../config';
+
 import * as WebSocket from 'ws';
 import fs from 'fs';
 import EventStorageHandler, {
@@ -29,10 +31,6 @@ const log = factory.getLogger(formatFilename(__filename));
 // emit globally any transfer over 1% of total issuance
 // TODO: config this
 const BALANCE_TRANSFER_THRESHOLD_PERMILL: number = 10_000;
-
-const envIden = process.env.HANDLE_Identity;
-export const HANDLE_IDENTITY =
-  envIden === 'publish' || envIden === 'handle' ? envIden : null;
 
 const discoverReconnectRange = async (
   _models,
@@ -211,6 +209,7 @@ const setupChainEventListeners = async (
 
   const identityHandlers: { [key: string]: IEventHandler } = {};
   async function processIdentityEvents(event: CWEvent): Promise<void> {
+    log.info(`>>>>>>>>>>>>>>>>>Handling identity event: ${event}`);
     if (!identityHandlers[event.chain])
       identityHandlers[event.chain] = new IdentityHandler(_models, event.chain);
 
@@ -223,9 +222,7 @@ const setupChainEventListeners = async (
   }
 
   let rbbtMqConfig =
-    HANDLE_IDENTITY === 'publish'
-      ? '../src/rabbitmq/WithIdentityQueueConfig.json'
-      : null;
+    HANDLE_IDENTITY === 'publish' ? './WithIdentityQueueConfig.json' : null;
   const consumer = new Consumer(getRabbitMQConfig(rbbtMqConfig));
   await consumer.init();
 
