@@ -115,7 +115,6 @@ const StageEditor: m.Component<{
         closeOnOutsideClick: true,
         class: 'StageEditorDialog',
         content: [
-          m('p', 'Once you\'ve created an on-chain proposal for this thread, connect it here.'),
           m('.stage-options', [
             [
               OffchainThreadStage.Discussion,
@@ -126,6 +125,7 @@ const StageEditor: m.Component<{
             ].map((targetStage) => m(Button, {
               class: 'discussions-stage',
               active: vnode.state.stage === targetStage,
+              iconLeft: vnode.state.stage === targetStage ? Icons.CHECK : null,
               rounded: true,
               size: 'sm',
               label: offchainThreadStageToLabel(targetStage),
@@ -155,7 +155,7 @@ const StageEditor: m.Component<{
             vnode.state.isOpen = false;
           }
         },
-        title: 'Connect on-chain proposal',
+        title: 'Update proposal status',
         transitionDuration: 200,
         footer: m(`.${Classes.ALIGN_RIGHT}`, [
           m(Button, {
