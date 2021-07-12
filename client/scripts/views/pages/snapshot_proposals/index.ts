@@ -28,20 +28,19 @@ const SnapshotProposalStagesBar: m.Component<{
   onChangeFilter: (value: SnapshotProposalFilter) => void
 }, {}> = {
   view: (vnode) => {
-    const options = [SnapshotProposalFilter.Core, SnapshotProposalFilter.Community, SnapshotProposalFilter.Active, SnapshotProposalFilter.Ended];
-
     return m('.DiscussionStagesBar.discussions-stages', [
-      m(ButtonGroup, options.map((option: SnapshotProposalFilter) => m(Button, {
-        rounded: true,
-        compact: true,
-        size: 'sm',
-        class: `discussions-stage ${vnode.attrs.selected === option ? 'active' : ''}`,
-        onclick: (e) => {
-          e.preventDefault();
-          vnode.attrs.onChangeFilter(option);
-        },
-        label: option
-      })))
+      Object.values(SnapshotProposalFilter)
+        .map((option: SnapshotProposalFilter) => m(Button, {
+          rounded: true,
+          compact: true,
+          size: 'sm',
+          class: `discussions-stage ${vnode.attrs.selected === option ? 'active' : ''}`,
+          onclick: (e) => {
+            e.preventDefault();
+            vnode.attrs.onChangeFilter(option);
+          },
+          label: option
+        }))
     ]);
   }
 };
@@ -108,7 +107,7 @@ const SnapshotProposalsPage: m.Component<{ topic?: string, snapshotId: string },
 
     return m(Sublayout, {
       class: 'DiscussionsPage',
-      title: 'Snapshot Proposals',
+      title: 'Proposals',
       description: '',
       showNewProposalButton: true,
     }, [
@@ -117,7 +116,9 @@ const SnapshotProposalsPage: m.Component<{ topic?: string, snapshotId: string },
           m(SnapshotProposalStagesBar, { selected: selectedFilter, onChangeFilter }),
           m(Listing, {
             content: [
-              m('.discussion-group-wrap', proposals.map((proposal) => m(ProposalRow, { snapshotId, proposal })))
+              m('.discussion-group-wrap', proposals.length > 0
+                ? proposals.map((proposal) => m(ProposalRow, { snapshotId, proposal }))
+                : m('.no-proposals', `No ${vnode.state.selectedFilter} proposals found.`))
             ]
           })
         ])
