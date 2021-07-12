@@ -104,7 +104,7 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
       m(InputPropertyRow, {
         title: 'Additional Stages',
         defaultValue: vnode.state.additionalStages,
-        placeholder: '["Temperature Check", "Consensus Check"]',
+        placeholder: 'Optional: ["Temperature Check", "Consensus Check"]',
         onChangeHandler: (v) => { vnode.state.additionalStages = v; },
       }),
       m(InputPropertyRow, {

@@ -35,8 +35,8 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
     vnode.state.element = vnode.attrs.chain.element;
     vnode.state.telegram = vnode.attrs.chain.telegram;
     vnode.state.github = vnode.attrs.chain.github;
-    vnode.state.stagesEnabled = vnode.attrs.community.stagesEnabled;
-    vnode.state.additionalStages = vnode.attrs.community.additionalStages;
+    vnode.state.stagesEnabled = vnode.attrs.chain.stagesEnabled;
+    vnode.state.additionalStages = vnode.attrs.chain.additionalStages;
     vnode.state.customDomain = vnode.attrs.chain.customDomain;
     vnode.state.iconUrl = vnode.attrs.chain.iconUrl;
     vnode.state.network = vnode.attrs.chain.network;
@@ -95,14 +95,12 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
           title: 'Stages',
           defaultValue: vnode.attrs.chain.stagesEnabled,
           onToggle: (checked) => { vnode.state.stagesEnabled = checked; },
-          caption: (checked) => checked
-            ? 'Allow tagging threads with the progress of a governance proposal'
-            : 'Stages disabled',
+          caption: () => 'Tag threads with proposal progress',
         }),
         m(InputPropertyRow, {
-          title: 'Additional Stages',
+          title: 'Add Stages',
           defaultValue: vnode.state.additionalStages,
-          placeholder: '["Temperature Check", "Consensus Check"]',
+          placeholder: 'Optional: ["Temperature Check", "Consensus Check"]',
           onChangeHandler: (v) => { vnode.state.additionalStages = v; },
         }),
         m(InputPropertyRow, {
