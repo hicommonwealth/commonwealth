@@ -21,23 +21,7 @@ export function offchainThreadStageToLabel(stage: OffchainThreadStage) {
   } else if (stage === OffchainThreadStage.Failed) {
     return 'Not Passed';
   } else {
-    return 'Other';
-  }
-}
-
-export function offchainThreadStageToIndex(stage: OffchainThreadStage) {
-  if (stage === OffchainThreadStage.Discussion) {
-    return 1;
-  } else if (stage === OffchainThreadStage.ProposalInReview) {
-    return 2;
-  } else if (stage === OffchainThreadStage.Voting) {
-    return 3;
-  } else if (stage === OffchainThreadStage.Passed) {
-    return 4;
-  } else if (stage === OffchainThreadStage.Failed) {
-    return 5;
-  } else {
-    return 6;
+    return stage;
   }
 }
 

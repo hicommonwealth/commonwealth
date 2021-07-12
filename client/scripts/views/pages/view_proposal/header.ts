@@ -262,7 +262,7 @@ export const ProposalHeaderStage: m.Component<{ proposal: OffchainThread }> = {
       class: proposal.stage === OffchainThreadStage.ProposalInReview ? 'positive'
         : proposal.stage === OffchainThreadStage.Voting ? 'positive'
           : proposal.stage === OffchainThreadStage.Passed ? 'positive'
-            : proposal.stage === OffchainThreadStage.Failed ? 'negative' : 'none',
+            : proposal.stage === OffchainThreadStage.Failed ? 'negative' : 'positive',
     }, offchainThreadStageToLabel(proposal.stage));
   }
 };
