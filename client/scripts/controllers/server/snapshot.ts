@@ -31,6 +31,7 @@ class SnapshotController {
         response[key].authorIpfsHash,
         response[key].relayerIpfsHash,
         response[key].msg.payload.choices,
+        response[key].msg.private
       ));
     }
   }
