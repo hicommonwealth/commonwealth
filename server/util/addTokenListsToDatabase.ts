@@ -43,7 +43,9 @@ async function addTokenListsToDatabase(models) {
       log.info(`Could not add ${token.name}: ${e.message}`);
       throw e;
     });
-  }));
+  }))
+    .then(() => { return 1; /* success */ })
+    .catch(() => { return 0; /* failure */ });
 }
 
 
