@@ -17,6 +17,8 @@ interface ICommunityMetadataManagementState {
   element: string;
   telegram: string;
   github: string;
+  stagesEnabled: boolean;
+  additionalStages: string;
   customDomain: string;
 }
 
@@ -39,6 +41,8 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
     vnode.state.element = vnode.attrs.community.element;
     vnode.state.telegram = vnode.attrs.community.telegram;
     vnode.state.github = vnode.attrs.community.github;
+    vnode.state.stagesEnabled = vnode.attrs.community.stagesEnabled;
+    vnode.state.additionalStages = vnode.attrs.community.additionalStages;
     vnode.state.customDomain = vnode.attrs.community.customDomain;
   },
   view: (vnode) => {
@@ -89,6 +93,20 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
         placeholder: 'https://github.com',
         onChangeHandler: (v) => { vnode.state.github = v; },
       }),
+      m(TogglePropertyRow, {
+        title: 'Stages',
+        defaultValue: vnode.attrs.community.stagesEnabled,
+        onToggle: (checked) => { vnode.state.stagesEnabled = checked; },
+        caption: (checked) => checked
+          ? 'Allow tagging threads with the progress of a governance proposal'
+          : 'Stages disabled',
+      }),
+      m(InputPropertyRow, {
+        title: 'Additional Stages',
+        defaultValue: vnode.state.additionalStages,
+        placeholder: '["Temperature Check", "Consensus Check"]',
+        onChangeHandler: (v) => { vnode.state.additionalStages = v; },
+      }),
       m(InputPropertyRow, {
         title: 'Domain',
         defaultValue: vnode.state.customDomain,
@@ -137,6 +155,8 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
           element,
           telegram,
           github,
+          stagesEnabled,
+          additionalStages,
           customDomain,
           invitesEnabled,
           privacyEnabled,
@@ -151,6 +171,8 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
             element,
             telegram,
             github,
+            stagesEnabled,
+            additionalStages,
             customDomain,
             privacyEnabled,
             invitesEnabled,

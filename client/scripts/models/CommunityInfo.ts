@@ -14,6 +14,8 @@ interface CommunityData {
   telegram: string;
   github: string;
   visible: boolean;
+  stagesEnabled: boolean,
+  additionalStages: string,
   customDomain: string;
   invitesEnabled: boolean,
   privacyEnabled: boolean,
@@ -33,6 +35,8 @@ class CommunityInfo {
   public readonly visible: boolean;
   public invitesEnabled: boolean;
   public privacyEnabled: boolean;
+  public stagesEnabled: boolean;
+  public additionalStages: string;
   public customDomain: string;
   public readonly collapsedOnHomepage: boolean;
   public readonly featuredTopics: string[];
@@ -43,6 +47,7 @@ class CommunityInfo {
   // TODO: convert this to accept opject with params instead
   constructor({
     id, name, description, iconUrl, website, discord, element, telegram, github, defaultChain, visible,
+    stagesEnabled, additionalStages,
     customDomain, invitesEnabled, privacyEnabled, collapsedOnHomepage, featuredTopics, topics, adminsAndMods
   }) {
     this.id = id;
@@ -56,6 +61,8 @@ class CommunityInfo {
     this.github = github;
     this.defaultChain = defaultChain;
     this.visible = visible;
+    this.stagesEnabled = stagesEnabled;
+    this.additionalStages = additionalStages;
     this.customDomain = customDomain;
     this.invitesEnabled = invitesEnabled;
     this.privacyEnabled = privacyEnabled;
@@ -77,6 +84,8 @@ class CommunityInfo {
     github,
     defaultChain: default_chain,
     visible,
+    stagesEnabled,
+    additionalStages,
     customDomain,
     invitesEnabled,
     privacyEnabled,
@@ -97,6 +106,8 @@ class CommunityInfo {
       github,
       defaultChain: default_chain,
       visible,
+      stagesEnabled,
+      additionalStages,
       customDomain,
       invitesEnabled,
       privacyEnabled,
@@ -160,6 +171,8 @@ class CommunityInfo {
     name,
     iconUrl,
     privacyEnabled,
+    stagesEnabled,
+    additionalStages,
     customDomain,
     website,
     discord,
@@ -178,6 +191,8 @@ class CommunityInfo {
       'element': element,
       'telegram': telegram,
       'github': github,
+      'stagesEnabled': stagesEnabled,
+      'additionalStages': additionalStages,
       'customDomain': customDomain,
       'privacy': privacyEnabled,
       'invites': invitesEnabled,
@@ -192,6 +207,8 @@ class CommunityInfo {
     this.element = updatedCommunity.element;
     this.telegram = updatedCommunity.telegram;
     this.github = updatedCommunity.github;
+    this.stagesEnabled = stagesEnabled;
+    this.additionalStages = additionalStages;
     this.customDomain = updatedCommunity.customDomain;
     this.privacyEnabled = updatedCommunity.privacyEnabled;
     this.invitesEnabled = updatedCommunity.invitesEnabled;
