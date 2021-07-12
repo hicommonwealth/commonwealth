@@ -18,6 +18,7 @@ import {
   ProposalBodyLastEdited, ProposalBodyText,
 } from './body';
 import User from '../../components/widgets/user';
+import { SocialSharingCarat } from '../../components/social_sharing_carat';
 
 const ProposalHeader: m.Component<{
   snapshotId: string
@@ -45,7 +46,8 @@ const ProposalHeader: m.Component<{
           m('.proposal-body-meta', [
             m(ProposalBodyCreated, { item: proposal, link: proposalLink }),
             m(ProposalBodyLastEdited, { item: proposal }),
-            m(ProposalBodyAuthor, { item: proposal })
+            m(ProposalBodyAuthor, { item: proposal }),
+            m('.CommentSocialHeader', [ m(SocialSharingCarat) ]),
           ]),
         ]),
       ]),
