@@ -6,13 +6,17 @@ import { Button, ButtonGroup, Icon, Icons, PopoverMenu, MenuItem, MenuDivider } 
 
 import app from 'state';
 import { ProposalType } from 'identifiers';
-import { ChainClass, ChainBase } from 'models';
+import { ChainBase, ChainNetwork } from 'models';
 import NewThreadModal from 'views/modals/new_thread_modal';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import Token from 'controllers/chain/ethereum/token/adapter';
 
 export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]>, mobile?: boolean) => {
   const activeAccount = app.user.activeAccount;
+  const showSnapshotOptions = app.user.activeAccount
+    && app.chain?.meta.chain.snapshot
+    && (app.chain?.network === ChainNetwork.Yearn
+      || app.chain?.network === ChainNetwork.Fei
+      || app.chain?.network === ChainNetwork.Sushi);
   return [
     m(MenuItem, {
       onclick: () => { m.route.set(`/${app.activeId()}/new/thread`); },
@@ -29,7 +33,7 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
       label: 'New text proposal',
       iconLeft: mobile ? Icons.PLUS : undefined,
     }),
-    app.chain?.base === ChainBase.Substrate && app.chain?.class !== ChainClass.Plasm && [
+    app.chain?.base === ChainBase.Substrate && app.chain?.network !== ChainNetwork.Plasm && [
       m(MenuItem, {
         onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
           type: ProposalType.SubstrateTreasuryProposal
@@ -59,7 +63,22 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
         label: 'New bounty proposal',
         iconLeft: mobile ? Icons.PLUS : undefined,
       }),
+      m(MenuItem, {
+        onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
+          type: ProposalType.SubstrateTreasuryTip,
+        }),
+        label: 'New tip',
+        iconLeft: mobile ? Icons.PLUS : undefined,
+      }),
     ],
+    (showSnapshotOptions || app.chain?.network === ChainNetwork.Demo) && m(MenuItem, {
+      onclick: (e) => {
+        e.preventDefault();
+        m.route.set(`/${app.activeChainId()}/new/snapshot-proposal/${app.chain.meta.chain.snapshot}`);
+      },
+      label: 'New proposal',
+      iconLeft: mobile ? Icons.PLUS : undefined,
+    }),
   ];
 };
 
@@ -75,8 +94,7 @@ export const MobileNewProposalButton: m.Component<{}, { councilCandidates?: Arra
         hoverCloseDelay: 0,
         hasArrow: false,
         trigger: m(Button, {
-          disabled: !app.user.activeAccount
-            || (app.activeChainId() && (app.chain as Token).isToken && !(app.chain as Token).hasToken),
+          disabled: !app.user.activeAccount,
           label: m(Icon, { name: Icons.PLUS }),
         }),
         inline: true,
@@ -109,8 +127,7 @@ const NewProposalButton: m.Component<{
         class: 'NewProposalButton',
         label: 'New thread',
         fluid,
-        disabled: !app.user.activeAccount
-          || (app.chain && (app.chain as Token).isToken && !(app.chain as Token).hasToken),
+        disabled: !app.user.activeAccount,
         onclick: () => app.modals.create({ modal: NewThreadModal }),
       });
     }
@@ -124,8 +141,7 @@ const NewProposalButton: m.Component<{
         hoverCloseDelay: 0,
         hasArrow: false,
         trigger: m(Button, {
-          disabled: !app.user.activeAccount
-            || ((app.chain as Token).isToken && !(app.chain as Token).hasToken),
+          disabled: !app.user.activeAccount,
           label: 'New thread',
         }),
         position: 'bottom-end',
@@ -136,8 +152,7 @@ const NewProposalButton: m.Component<{
         content: getNewProposalMenu(councilCandidates),
       }),
       m(Button, {
-        disabled: !app.user.activeAccount
-          || ((app.chain as Token).isToken && !(app.chain as Token).hasToken),
+        disabled: !app.user.activeAccount,
         iconLeft: Icons.EDIT,
         fluid,
         onclick: () => app.modals.create({ modal: NewThreadModal }),

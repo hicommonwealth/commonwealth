@@ -3,11 +3,13 @@ import 'modals/create_invite_modal.scss';
 import m from 'mithril';
 import $ from 'jquery';
 import mixpanel from 'mixpanel-browser';
-import { Button, Input, Form, FormGroup, FormLabel, Select } from 'construct-ui';
+import { Button, Input, Form, FormGroup, FormLabel, Select, RadioGroup } from 'construct-ui';
 
 import app from 'state';
-import { CommunityInfo, ChainInfo, RoleInfo } from 'models';
+import { CommunityInfo, ChainInfo, RoleInfo, ChainBase } from 'models';
 import { CompactModalExitButton } from 'views/modal';
+import { checkAddress } from '@polkadot/util-crypto';
+import Web3 from 'web3';
 
 interface IInviteButtonAttrs {
   selection: string,
@@ -18,24 +20,30 @@ interface IInviteButtonAttrs {
   invitedAddressChain?: string,
   community?: CommunityInfo,
   chain?: ChainInfo,
+  disabled?: boolean
 }
 
-const InviteButton: m.Component<IInviteButtonAttrs, { disabled: boolean, }> = {
+function validateEmail(email) {
+  const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return re.test(String(email).toLowerCase());
+}
+
+const InviteButton: m.Component<IInviteButtonAttrs, { loading: boolean, }> = {
   oninit: (vnode) => {
-    vnode.state.disabled = false;
+    vnode.state.loading = false;
   },
   view: (vnode) => {
     const { selection, successCallback, failureCallback,
-      invitedAddress, invitedEmail, invitedAddressChain, community, chain } = vnode.attrs;
+      invitedAddress, invitedEmail, invitedAddressChain, community, chain, disabled } = vnode.attrs;
     return m(Button, {
       class: 'create-invite-button',
       intent: 'primary',
       name: selection,
-      loading: vnode.state.disabled,
+      loading: vnode.state.loading,
+      disabled,
       rounded: true,
       type: 'submit',
-      label: selection === 'address'
-        ? 'Invite Commonwealth user' : selection === 'email' ? 'Invite email' : 'Add',
+      label: selection === 'address' || selection === 'email' ? 'Send Invite' : 'Add',
       onclick: (e) => {
         e.preventDefault();
         const address = invitedAddress;
@@ -46,7 +54,7 @@ const InviteButton: m.Component<IInviteButtonAttrs, { disabled: boolean, }> = {
         if (selection === 'address' && (address === '' || address === null)) return;
         if (selection === 'email' && (emailAddress === '' || emailAddress === null)) return;
 
-        vnode.state.disabled = true;
+        vnode.state.loading = true;
         successCallback(false);
         failureCallback(false);
 
@@ -75,7 +83,7 @@ const InviteButton: m.Component<IInviteButtonAttrs, { disabled: boolean, }> = {
           auth: true,
           jwt: app.user.jwt,
         }).then((response) => {
-          vnode.state.disabled = false;
+          vnode.state.loading = false;
           if (response.status === 'Success') {
             successCallback(true);
             if (postType === '/addMember') {
@@ -101,7 +109,7 @@ const InviteButton: m.Component<IInviteButtonAttrs, { disabled: boolean, }> = {
           });
         }, (err) => {
           failureCallback(true, err.responseJSON.error);
-          vnode.state.disabled = false;
+          vnode.state.loading = false;
           m.redraw();
         });
       }
@@ -129,26 +137,25 @@ const CreateInviteLink: m.Component<{
       ? { chain: chain.id }
       : { community: community.id };
     return m(Form, { class: 'CreateInviteLink' }, [
+      m(FormGroup, { span: 12 }, [
+        m('h2.invite-link-title', 'Generate Invite Link'),
+      ]),
       m(FormGroup, { span: 4 }, [
-        m(FormLabel, { for: 'uses', }, 'Generate invite link'),
-        m(Select, {
+        m(FormLabel, { for: 'uses', }, 'Number of Uses'),
+        m(RadioGroup, {
           name: 'uses',
-          defaultValue: vnode.state.inviteUses,
           options: [
             { value: 'none', label: 'Unlimited uses' },
             { value: '1', label: 'One time use' },
-            // { value: '2', label: 'Twice' },
           ],
-          onchange: (e) => {
-            vnode.state.inviteUses = (e.target as any).value;
-          },
+          value: vnode.state.inviteUses,
+          onchange: (e: Event) => { vnode.state.inviteUses = (e.target as any).value; },
         }),
       ]),
       m(FormGroup, { span: 4 }, [
         m(FormLabel, { for: 'time' }, 'Expires after'),
-        m(Select, {
+        m(RadioGroup, {
           name: 'time',
-          defaultValue: vnode.state.inviteTime,
           options: [
             { value: 'none', label: 'Never expires' },
             { value: '24h', label: '24 hours' },
@@ -156,9 +163,8 @@ const CreateInviteLink: m.Component<{
             { value: '1w', label: '1 week' },
             { value: '30d', label: '30 days' },
           ],
-          onchange: (e) => {
-            vnode.state.inviteTime = (e.target as any).value;
-          },
+          value: vnode.state.inviteTime,
+          onchange: (e: Event) => { vnode.state.inviteTime = (e.target as any).value; },
         }),
       ]),
       m(FormGroup, { span: 4 }),
@@ -187,14 +193,27 @@ const CreateInviteLink: m.Component<{
           label: 'Get invite link'
         }),
       ]),
-      m(FormGroup, { span: 8 }, [
+      m(FormGroup, { span: 8, class: 'copy-link-line' }, [
         m(Input, {
+          id: 'invite-link-pastebin',
           class: 'invite-link-pastebin',
           fluid: true,
           readonly: true,
           placeholder: 'Click to generate a link',
           value: `${vnode.state.link}`,
         }),
+        m('img', {
+          src: 'static/img/copy_default.svg',
+          alt: '',
+          class: 'mx-auto',
+          onclick: (e) => {
+            const copyText = document.getElementById('invite-link-pastebin') as HTMLInputElement;
+            copyText.select();
+            copyText.setSelectionRange(0, 99999); /* For mobile devices */
+
+            document.execCommand('copy');
+          }
+        })
       ]),
     ]);
   }
@@ -225,6 +244,21 @@ const CreateInviteModal: m.Component<{
       : communityInfo ? { community: communityInfo }
         : null;
     if (!chainOrCommunityObj) return;
+
+    const selectedChainId = vnode.state.invitedAddressChain || (chainInfo ? chainInfo.id : app.config.chains.getAll()[0].id);
+    const selectedChain = app.config.chains.getById(selectedChainId);
+    let isAddressValid = true;
+
+    if (selectedChain?.base === ChainBase.Substrate) {
+      [isAddressValid] = checkAddress(vnode.state.invitedAddress, parseInt(selectedChain.ss58Prefix, 10));
+    } else if (chainInfo?.base === ChainBase.Ethereum) {
+      isAddressValid = Web3.utils.checkAddressChecksum(vnode.state.invitedAddress);
+    } else {
+      // TODO: check Cosmos & Near?
+    }
+
+    const isEmailValid = validateEmail(vnode.state.invitedEmail);
+
     return m('.CreateInviteModal', [
       m('.compact-modal-title', [
         m('h3', 'Invite members'),
@@ -258,7 +292,8 @@ const CreateInviteModal: m.Component<{
               fluid: true,
               name: 'address',
               autocomplete: 'off',
-              placeholder: 'Address',
+              placeholder: 'Paste address',
+              class: !vnode.state.invitedAddress?.length ? '' : isAddressValid ? 'valid' : 'invalid',
               oninput: (e) => {
                 vnode.state.invitedAddress = (e.target as any).value;
               }
@@ -266,8 +301,10 @@ const CreateInviteModal: m.Component<{
           ]),
           m(InviteButton, {
             selection: 'address',
+            disabled: !isAddressValid,
             successCallback: (v: boolean) => {
               vnode.state.success = v;
+              vnode.state.invitedAddress = '';
               m.redraw();
             },
             failureCallback: (v: boolean, err?: string,) => {
@@ -287,7 +324,8 @@ const CreateInviteModal: m.Component<{
               fluid: true,
               name: 'emailAddress',
               autocomplete: 'off',
-              placeholder: 'satoshi@protonmail.com',
+              placeholder: 'Enter email',
+              class: !vnode.state.invitedEmail?.length ? '' : isEmailValid ? 'valid' : 'invalid',
               oninput: (e) => {
                 vnode.state.invitedEmail = (e.target as any).value;
               }
@@ -295,8 +333,10 @@ const CreateInviteModal: m.Component<{
           ]),
           m(InviteButton, {
             selection: 'email',
+            disabled: !isEmailValid,
             successCallback: (v: boolean) => {
               vnode.state.success = v;
+              vnode.state.invitedEmail = '';
               m.redraw();
             },
             failureCallback: (v: boolean, err?: string,) => {
@@ -308,6 +348,7 @@ const CreateInviteModal: m.Component<{
             ...chainOrCommunityObj
           }),
         ]),
+        m('div.divider'),
         m(CreateInviteLink, { ...chainOrCommunityObj }),
         vnode.state.success && m('.success-message', [
           'Success! Your invite was sent',

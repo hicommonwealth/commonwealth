@@ -35,12 +35,13 @@ export interface OffchainCommunityAttributes {
   StarredCommunities?: StarredCommunityAttributes[] | StarredCommunityAttributes['id'][];
 }
 
-export interface OffchainComunityInstance
+export interface OffchainCommunityInstance
 extends Sequelize.Instance<OffchainCommunityAttributes>, OffchainCommunityAttributes {
 
 }
 
-export interface OffchainCommunityModel extends Sequelize.Model<OffchainComunityInstance, OffchainCommunityAttributes> {
+export interface OffchainCommunityModel
+extends Sequelize.Model<OffchainCommunityInstance, OffchainCommunityAttributes> {
 
 }
 
@@ -48,7 +49,7 @@ export default (
   sequelize: Sequelize.Sequelize,
   dataTypes: Sequelize.DataTypes,
 ): OffchainCommunityModel => {
-  const OffchainCommunity = sequelize.define<OffchainComunityInstance, OffchainCommunityAttributes>(
+  const OffchainCommunity = sequelize.define<OffchainCommunityInstance, OffchainCommunityAttributes>(
     'OffchainCommunity', {
       id: { type: dataTypes.STRING, primaryKey: true },
       name: { type: dataTypes.STRING, allowNull: false },

@@ -358,7 +358,7 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
       }
     }
 
-    // TODO: search for cosmos proposals, if ChainClass is Cosmos
+    // TODO: search for cosmos proposals, if ChainBase is Cosmos
     const comments = vnode.state.comments
       .sort((a, b) => +b.createdAt - +a.createdAt);
     const proposals = vnode.state.threads

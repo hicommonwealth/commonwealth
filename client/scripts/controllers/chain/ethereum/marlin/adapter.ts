@@ -4,7 +4,7 @@ import { MPondFactory } from 'MPondFactory';
 
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
-import { ChainBase, ChainClass, IChainAdapter, ChainEntity, ChainEvent, NodeInfo } from 'models';
+import { ChainBase, IChainAdapter, ChainEntity, ChainEvent, NodeInfo } from 'models';
 
 import ChainEntityController from 'controllers/server/chain_entities';
 import { IApp } from 'state';
@@ -18,7 +18,6 @@ import MarlinHolders from './holders';
 
 export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount> {
   public readonly base = ChainBase.Ethereum;
-  public readonly class = ChainClass.Marlin;
   public chain: MarlinChain;
   public accounts: EthereumAccounts;
   public marlinAccounts:  MarlinHolders;

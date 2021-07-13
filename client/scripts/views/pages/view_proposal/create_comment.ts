@@ -168,8 +168,7 @@ const CreateComment: m.Component<{
                 intent: 'primary',
                 type: 'submit',
                 compact: true,
-                disabled: getSetGlobalEditingStatus(GlobalStatus.Get) || sendingComment || uploadsInProgress > 0
-                  || (app.activeChainId() && (app.chain as Token).isToken && !(app.chain as Token).hasToken),
+                disabled: getSetGlobalEditingStatus(GlobalStatus.Get) || sendingComment || uploadsInProgress > 0,
                 rounded: true,
                 onclick: submitComment,
                 label: (uploadsInProgress > 0)
