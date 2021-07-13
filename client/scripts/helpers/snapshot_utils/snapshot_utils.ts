@@ -90,9 +90,7 @@ export async function getPower(space, address, snapshot) {
       // @ts-ignore
       blockTag
     );
-    scores = scores.map((score: any) =>
-      Object.values(score).reduce((a, b: any) => a + b, 0)
-    );
+    scores = scores.map((score: any) => Object.values(score).reduce((a, b: any) => a + b, 0));
     return {
       scores,
       totalScore: scores.reduce((a, b: any) => a + b, 0)
