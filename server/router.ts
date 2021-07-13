@@ -118,6 +118,8 @@ import TokenBalanceCache from './util/tokenBalanceCache';
 import bulkEntities from './routes/bulkEntities';
 import { getTokensFromLists } from './routes/getTokensFromLists';
 import getTokenForum from './routes/getTokenForum';
+import getSubstrateSpec from './routes/getSubstrateSpec';
+import editSubstrateSpec from './routes/editSubstrateSpec';
 
 import { sendMessage } from './routes/snapshotAPI';
 
@@ -130,6 +132,13 @@ function setupRouter(
 ) {
   const router = express.Router();
   router.get('/status', status.bind(this, models));
+
+  router.get('/getSubstrateSpec', getSubstrateSpec.bind(this, models));
+  router.post(
+    '/editSubstrateSpec',
+    passport.authenticate('jwt', { session: false }),
+    editSubstrateSpec.bind(this, models)
+  );
 
   // TODO: Change to POST /gist
   router.post('/createGist', passport.authenticate('jwt', { session: false }), createGist.bind(this, models));
@@ -209,7 +218,11 @@ function setupRouter(
     updateThreadLinkedChainEntities.bind(this, models),
   );
 
-  router.post('/updateOffchainVote', passport.authenticate('jwt', { session: false }), updateOffchainVote.bind(this, models));
+  router.post(
+    '/updateOffchainVote',
+    passport.authenticate('jwt', { session: false }),
+    updateOffchainVote.bind(this, models)
+  );
   router.get('/viewOffchainVotes', viewOffchainVotes.bind(this, models));
 
   router.get('/fetchEntityTitle', fetchEntityTitle.bind(this, models));

@@ -25,7 +25,7 @@ nvm install
 ```
 
 - if for some reason, nvm still doesnt work, try using
-````
+```
     source ~/.nvm/nvm.sh
 ```
 

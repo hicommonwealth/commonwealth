@@ -5,7 +5,7 @@ import moment from 'moment';
 import _ from 'lodash';
 
 import app from 'state';
-import { formatLastUpdated, link } from 'helpers';
+import { formatLastUpdated, formatTimestamp, link } from 'helpers';
 
 import { SnapshotProposal } from 'models';
 import ProposalListingRow from 'views/components/proposal_listing_row';
@@ -23,11 +23,13 @@ const ProposalRow: m.Component<{ snapshotId: string, proposal: SnapshotProposal 
       link('a', proposalLink, proposal.name),
     ];
     const rowSubheader = [
-      proposal.ipfsHash && link('a.proposal-topic', proposalLink, [
+      m('.created-at', link('a', proposalLink, (now > time)
+        ? `Ended ${formatLastUpdated(time)}`
+        : `Ending in ${formatTimestamp(moment(+proposal.end * 1000))}`)),
+      m('span.m-l-20', ' · '),
+      proposal.ipfsHash && link('a.proposal-topic.m-l-20', proposalLink, [
         m('span.proposal-topic-name', `${proposal.ipfsHash}`),
       ]),
-      m('.created-at m-l-20', link('a', proposalLink, (now > time) ? `Ended ${formatLastUpdated(time)}` 
-        : `Ending ${formatLastUpdated(moment(+proposal.end * 1000))}`)),
     ];
 
     return m(ProposalListingRow, {

@@ -43,7 +43,10 @@ export enum ChainNetwork {
   Yearn = 'yearn',
   Fei = 'fei',
   Sushi = 'sushi',
-  Crust = 'crust'
+  Crust = 'crust',
+  CosmosHub = 'cosmos-hub',
+  Gaia13k = 'gaia-13k',
+  Demo = 'demo',
 }
 
 // This function returns a default chain for a chainbase
@@ -55,37 +58,6 @@ export function baseToNetwork(n: ChainBase): ChainNetwork {
     case ChainBase.NEAR: return ChainNetwork.NEAR;
     default: return null;
   }
-}
-
-// TODO: this should be deprecated, and replaced with ChainNetwork in most instances
-export enum ChainClass {
-  Clover = 'clover',
-  Edgeware = 'edgeware',
-  EdgewareTestnet = 'edgeware-testnet',
-  HydraDX = 'hydradx',
-  Kusama = 'kusama',
-  Kulupu = 'kulupu',
-  Polkadot = 'polkadot',
-  Plasm = 'plasm',
-  Stafi = 'stafi',
-  Darwinia = 'darwinia',
-  Phala = 'phala',
-  Centrifuge = 'centrifuge',
-  CosmosHub = 'cosmos-hub',
-  Gaia13k = 'gaia-13k',
-  Straightedge = 'straightedge',
-  Ethereum = 'ethereum',
-  Near = 'near',
-  Moloch = 'moloch',
-  Marlin = 'marlin',
-  MarlinTestnet = 'marlin-testnet',
-  ALEX = 'alex',
-  Commonwealth = 'commonwealth',
-  Yearn = 'yearn',
-  Fei = 'fei',
-  Sushi = 'sushi',
-  Crust = 'crust',
-  ERC20 = 'erc20',
 }
 
 // TODO: this is inconsistently used
@@ -102,15 +74,6 @@ export enum OffchainThreadStage {
   Voting = 'voting',
   Passed = 'passed',
   Failed = 'failed',
-}
-
-export enum OffchainVoteOptions {
-  SUPPORT_2,
-  SUPPORT,
-  NEUTRAL_SUPPORT,
-  NEUTRAL_OPPOSE,
-  OPPOSE,
-  OPPOSE_2,
 }
 
 export enum TransactionStatus {

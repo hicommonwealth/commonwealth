@@ -29,6 +29,7 @@
     .invite-addresses {
         max-height: 209px;
         overflow-y: auto;
+        overflow-x: hidden;
         box-shadow: 1px 1px 4px inset rgba(0, 0, 0, 0.1);
         border-radius: 4px;
     }

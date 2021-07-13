@@ -44,13 +44,63 @@ const getLastSeenDivider = (hasText = true) => {
   ]);
 };
 
+export const CommunityOptionsPopover: m.Component<{ isAdmin: boolean, isMod: boolean }, {}> = {
+  view: (vnode) => {
+    const { isAdmin, isMod } = vnode.attrs;
+    if (!isAdmin && !isMod && !app.community?.meta.invitesEnabled) return;
+    return m(PopoverMenu, {
+      class: 'community-options-popover',
+      position: 'bottom',
+      transitionDuration: 0,
+      hoverCloseDelay: 0,
+      closeOnContentClick: true,
+      trigger: m(Icon, {
+        name: Icons.CHEVRON_DOWN,
+        style: 'margin-left: 6px;',
+      }),
+      content: [
+        isAdmin && m(MenuItem, {
+          label: 'New topic',
+          onclick: (e) => {
+            e.preventDefault();
+            app.modals.create({ modal: NewTopicModal });
+          }
+        }),
+        (app.community?.meta.invitesEnabled || isAdmin) && m(MenuItem, {
+          label: 'Invite members',
+          onclick: (e) => {
+            e.preventDefault();
+            const data = app.activeCommunityId()
+              ? { communityInfo: app.community.meta } : { chainInfo: app.chain.meta.chain };
+            app.modals.create({
+              modal: CreateInviteModal,
+              data,
+            });
+          },
+        }),
+        isAdmin && m(MenuItem, {
+          label: 'Manage community',
+          onclick: (e) => {
+            e.preventDefault();
+            app.modals.lazyCreate('manage_community_modal');
+          }
+        }),
+        (isAdmin || isMod) && app.activeId() && m(MenuItem, {
+          label: 'Analytics',
+          onclick: (e) => m.route.set(`/${app.activeId()}/analytics`),
+        }),
+      ],
+    });
+  }
+};
+
 const DiscussionStagesBar: m.Component<{ topic: string, stage: string }, {}> = {
   view: (vnode) => {
     const { topic, stage } = vnode.attrs;
 
     const featuredTopicIds = app.community?.meta?.featuredTopics || app.chain?.meta?.chain?.featuredTopics;
     const topics = app.topics.getByCommunity(app.activeId()).map(({ id, name, description, telegram }) => {
-        return { id, name, description, telegram, featured_order: featuredTopicIds.indexOf(`${id}`) };
+      return { id, name, description, telegram, featured_order: featuredTopicIds.indexOf(`${id}`) };
     });
     const featuredTopics = topics.filter((t) => t.featured_order !== -1)
       .sort((a, b) => Number(a.featured_order) - Number(b.featured_order));
@@ -173,7 +223,7 @@ const DiscussionStagesBar: m.Component<{ topic: string, stage: string }, {}> = {
 };
 
 const DiscussionsPage: m.Component<{ topic?: string }, {
-  lookback?: { [community: string]: moment.Moment} ;
+  lookback?: { [community: string]: moment.Moment};
   postsDepleted: { [community: string]: boolean };
   topicInitialized: { [community: string]: boolean };
   lastSubpage: string;
@@ -431,49 +481,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
       title: [
         'Discussions',
         (isAdmin || isMod || app.community?.meta.invitesEnabled)
-          && m(PopoverMenu, {
-            class: 'sidebar-edit-topic',
-            position: 'bottom',
-            transitionDuration: 0,
-            hoverCloseDelay: 0,
-            closeOnContentClick: true,
-            trigger: m(Icon, {
-              name: Icons.CHEVRON_DOWN,
-              style: 'margin-left: 6px;',
-            }),
-            content: [
-              isAdmin && m(MenuItem, {
-                label: 'New topic',
-                onclick: (e) => {
-                  e.preventDefault();
-                  app.modals.create({ modal: NewTopicModal });
-                }
-              }),
-              (app.community?.meta.invitesEnabled || isAdmin) && m(MenuItem, {
-                label: 'Invite members',
-                onclick: (e) => {
-                  e.preventDefault();
-                  const data = app.activeCommunityId()
-                    ? { communityInfo: app.community.meta } : { chainInfo: app.chain.meta.chain };
-                  app.modals.create({
-                    modal: CreateInviteModal,
-                    data,
-                  });
-                },
-              }),
-              isAdmin && m(MenuItem, {
-                label: 'Manage community',
-                onclick: (e) => {
-                  e.preventDefault();
-                  app.modals.lazyCreate('manage_community_modal');
-                }
-              }),
-              (isAdmin || isMod) && app.activeId() && m(MenuItem, {
-                label: 'Analytics',
-                onclick: (e) => m.route.set(`/${app.activeId()}/analytics`),
-              }),
-            ],
-          }),
+        && m(CommunityOptionsPopover, { isAdmin, isMod })
       ],
       description: topicDescription,
       showNewProposalButton: true,

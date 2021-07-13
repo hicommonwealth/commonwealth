@@ -5,10 +5,11 @@ import { SubstrateCouncil, SubstrateTechnicalCommittee } from 'controllers/chain
 import SubstrateTreasury from 'controllers/chain/substrate/treasury';
 import SubstrateBountyTreasury from 'controllers/chain/substrate/bountyTreasury';
 import ChainEntityController from 'controllers/server/chain_entities';
-import { IChainAdapter, ChainBase, ChainClass, NodeInfo } from 'models';
+import { IChainAdapter, ChainBase, NodeInfo, ChainNetwork } from 'models';
 import { IApp } from 'state';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import SubstratePhragmenElections from './phragmen_elections';
+import SubstrateTreasuryTips from './treasury_tips';
 import SubstrateIdentities from './identities';
 import SubstrateChain from './shared';
 
@@ -23,10 +24,10 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public treasury: SubstrateTreasury;
   public bounties: SubstrateBountyTreasury;
   public identities: SubstrateIdentities;
+  public tips: SubstrateTreasuryTips;
   public readonly chainEntities = new ChainEntityController();
 
   public readonly base = ChainBase.Substrate;
-  public readonly class: ChainClass;
 
   public get timedOut() {
     console.log(this.chain);
@@ -36,10 +37,8 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   constructor(
     meta: NodeInfo,
     app: IApp,
-    _class: ChainClass,
   ) {
     super(meta, app);
-    this.class = _class;
     this.chain = new SubstrateChain(this.app);
     this.accounts = new SubstrateAccounts(this.app);
     this.phragmenElections = new SubstratePhragmenElections(this.app);
@@ -49,17 +48,16 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     this.democracy = new SubstrateDemocracy(this.app);
     this.treasury = new SubstrateTreasury(this.app);
     this.bounties = new SubstrateBountyTreasury(this.app);
+    this.tips = new SubstrateTreasuryTips(this.app);
     this.identities = new SubstrateIdentities(this.app);
   }
 
   public async initApi(additionalOptions?) {
     if (this.apiInitialized) return;
-    await this.chain.resetApi(this.meta, additionalOptions);
+    await this.chain.resetApi(this.meta, additionalOptions || this.meta.chain.substrateSpec);
     await this.chain.initMetadata();
     await this.accounts.init(this.chain);
-    if (this.class !== ChainClass.Plasm) {
-      await this.identities.init(this.chain, this.accounts);
-    }
+    await this.identities.init(this.chain, this.accounts);
     await super.initApi();
   }
 
@@ -80,6 +78,7 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
       this.democracy,
       this.treasury,
       this.bounties,
+      this.tips,
       this.identities,
     ].map((m) => m.initialized ? m.deinit() : Promise.resolve()));
     this.accounts.deinit();

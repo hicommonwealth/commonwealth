@@ -16,7 +16,7 @@
 
     .cui-table.metadata-management-table {
         td {
-            padding: 10px 28px 0 !important;
+            padding: 5px 28px 0 !important;
             border-bottom: none !important;
         }
         tr:first-child td {
@@ -34,7 +34,7 @@
         }
     }
     .ManageRoleRow {
-        padding: 6px 0;
+        margin: 10px 0 0;
     }
 
     .panel-left {
@@ -47,12 +47,20 @@
         @media (min-width: 800px) {
             width: 60%;
         }
+        td textarea {
+            width: 100%;
+            min-width: 100%;
+            resize: none;
+        }
+        td > .cui-input {
+            position: relative;
+            top: -3px;
+        }
         .RoleChild {
             display: inline-block;
-            padding-right: 6px;
-
+            padding-right: 12px;
             .role-x-icon {
-                padding-left: 2px;
+                margin-left: 4px;
             }
         }
         .metadata-management-table {
@@ -65,14 +73,18 @@
         }
         .TogglePropertyRow {
             td {
-                padding-top: 16px;
+                padding-top: 12px !important;
             }
             .cui-switch {
+                display: inline-block;
                 margin-right: 5px;
             }
             .switch-caption {
+                display: inline-block;
                 color: $text-color-light;
                 font-size: 94%;
+                position: relative;
+                top: 1px;
             }
         }
     }
