@@ -214,8 +214,6 @@ const DiscussionStagesBar: m.Component<{ topic: string, stage: string }, {}> = {
             },
             label: [
               `${offchainThreadStageToLabel(targetStage)}`,
-              targetStage === OffchainThreadStage.ProposalInReview
-                && [ ' ', m('.discussions-stage-count', `${app.threads.numPrevotingThreads}`) ],
               targetStage === OffchainThreadStage.Voting
                 && [ ' ', m('.discussions-stage-count', `${app.threads.numVotingThreads}`) ],
             ],
