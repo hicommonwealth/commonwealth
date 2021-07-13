@@ -68,7 +68,6 @@ import {
 } from './body';
 import CreateComment from './create_comment';
 import LinkedProposalsEmbed from './linked_proposals_embed';
-import { bufferToHex } from 'ethereumjs-util';
 import User from '../../components/widgets/user';
 import MarkdownFormattedText from '../../components/markdown_formatted_text';
 import { createTXModal } from '../../modals/tx_signing_modal';

@@ -17,15 +17,6 @@ import { notifyError } from 'controllers/app/notifications';
 import QuillEditor from 'views/components/quill_editor';
 import { idToProposal } from 'identifiers';
 import { capitalize } from 'lodash';
-
-
-declare global {
-  interface ObjectConstructor {
-    fromEntries(xs: [string|number|symbol, any][]): object
-  }
-}
-
-
 interface IThreadForm {
   name: string;
   body: string;
