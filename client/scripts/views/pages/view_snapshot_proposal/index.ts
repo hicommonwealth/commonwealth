@@ -2,20 +2,24 @@ import 'pages/view_proposal/index.scss';
 import 'components/proposals/voting_results.scss';
 import 'components/proposals/voting_actions.scss';
 
-import $ from 'jquery';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 import { Spinner, Button } from 'construct-ui';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
-import {SnapshotProposal } from 'models';
+import { AddressInfo, SnapshotProposal } from 'models';
+import ConfirmSnapshotVoteModal from 'views/modals/confirm_snapshot_vote_modal';
+import { getProposal, getPower } from 'helpers/snapshot_utils/snapshot_utils';
 
+import { notifyError } from 'controllers/app/notifications';
 import { ProposalHeaderTitle } from './header';
 import {
   ProposalBodyAuthor, ProposalBodyCreated,
   ProposalBodyLastEdited, ProposalBodyText,
 } from './body';
+import User from '../../components/widgets/user';
+import { SocialSharingCarat } from '../../components/social_sharing_carat';
 
 const ProposalHeader: m.Component<{
   snapshotId: string
@@ -24,32 +28,33 @@ const ProposalHeader: m.Component<{
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     if (!proposal) {
-      return m('.topic-loading-spinner-wrap', [ m(Spinner, { active: true, size: 'lg' }) ])
+      return m('.topic-loading-spinner-wrap', [ m(Spinner, { active: true, size: 'lg' }) ]);
     }
 
     // Original posters have full editorial control, while added collaborators
     // merely have access to the body and title
-		
+
     const proposalLink = `/${app.activeId()}/snapshot-proposal/${vnode.attrs.snapshotId}/${proposal.ipfsHash}`;
 
     return m('.ProposalHeader', {
-      class: `proposal-snapshot`
+      class: 'proposal-snapshot'
     }, [
-      m('.proposal-top', [
+      m('.snapshot-proposal-top', [
         m('.proposal-top-left', [
           m('.proposal-title', [
             m(ProposalHeaderTitle, { proposal })
           ]),
           m('.proposal-body-meta', [
             m(ProposalBodyCreated, { item: proposal, link: proposalLink }),
-	          m(ProposalBodyLastEdited, { item: proposal }),
-	          m(ProposalBodyAuthor, { item: proposal })
+            m(ProposalBodyLastEdited, { item: proposal }),
+            m(ProposalBodyAuthor, { item: proposal }),
+            m('.CommentSocialHeader', [ m(SocialSharingCarat) ]),
           ]),
-      	]),
+        ]),
       ]),
       m('.proposal-content', [
         m('.proposal-content-left', [
-	        m(ProposalBodyText, { item: proposal })
+          m(ProposalBodyText, { item: proposal })
         ]),
       ]),
     ]);
@@ -67,36 +72,44 @@ const VoteRow: m.Component<{
 }> = {
   view: (vnode) => {
     return m('.ViewRow', [
-      m('.row-left', vnode.attrs.vote.voterAddress),
-      // m('.row-right', vnode.attrs.vote.choice)
+      m('.row-left', [
+        m(User, {
+          user: new AddressInfo(null, vnode.attrs.vote.voterAddress, app.activeId(), null), // TODO: activeID becomes chain_base, fix
+          linkify: true,
+          popover: true
+        }),
+      ]),
     ]);
   }
-}
+};
 
 const VoteView: m.Component<{ votes: Vote[] }> = {
   view: (vnode) => {
     const { votes } = vnode.attrs;
 
-    let voteYesListing = [];
-    let voteNoListing = [];
+    const voteYesListing = [];
+    const voteNoListing = [];
 
     voteYesListing.push(m('.vote-group-wrap', votes
       .map((vote) => {
-        if (vote.choice === 'yes'){
+        if (vote.choice === 'yes') {
           return m(VoteRow, { vote });
+        } else {
+          return null;
         }
       })
-    ));
+      .filter((v) => !!v)));
 
     voteNoListing.push(m('.vote-group-wrap', votes
       .map((vote) => {
-        if (vote.choice === 'no'){
+        if (vote.choice === 'no') {
           return m(VoteRow, { vote });
+        } else {
+          return null;
         }
       })
-    ));
+      .filter((v) => !!v)));
 
-    // TODO: fix up this function for cosmos votes
     return m('.VotingResults', [
       m('.results-column', [
         m('.results-header', `Voted yes (${votes.filter((v) => v.choice === 'yes').length})`),
@@ -115,15 +128,20 @@ const VoteView: m.Component<{ votes: Vote[] }> = {
 };
 
 const VoteAction: m.Component<{
+  space: any,
+  proposal: any,
+  id: string,
+  totalScore: number,
+  scores: any[],
   choices: string[],
 }, {
   votingModalOpen: boolean
 }> = {
   view: (vnode) => {
-    let { choices } = vnode.attrs;
-    let canVote = true;
-    let hasVotedYes = false;
-    let hasVotedNo = false;
+    const { choices } = vnode.attrs;
+    const canVote = true; // TODO: remove these hardcoded values;
+    const hasVotedYes = false;
+    const hasVotedNo = false;
     const { votingModalOpen } = vnode.state;
 
     const onModalClose = () => {
@@ -131,15 +149,46 @@ const VoteAction: m.Component<{
       m.redraw();
     };
 
-    const voteYes = async (e) => {
-      e.preventDefault();
-      vnode.state.votingModalOpen = false;
+    const voteYes = async (event) => {
+      event.preventDefault();
+      try {
+        app.modals.create({
+          modal: ConfirmSnapshotVoteModal,
+          data: {
+            space: vnode.attrs.space,
+            proposal: vnode.attrs.proposal,
+            id: vnode.attrs.id,
+            selectedChoice: 0,
+            totalScore: vnode.attrs.totalScore,
+            scores: vnode.attrs.scores,
+            snapshot: vnode.attrs.proposal.msg.payload.snapshot
+          }
+        });
+        vnode.state.votingModalOpen = true;
+      } catch (err) {
+        notifyError('Voting failed');
+      }
     };
 
-    const voteNo = (e) => {
-      e.preventDefault();
-      vnode.state.votingModalOpen = false;
-      // open modal and check canVote and create vote
+    const voteNo = (event) => {
+      event.preventDefault();
+      try {
+        app.modals.create({
+          modal: ConfirmSnapshotVoteModal,
+          data: {
+            space: vnode.attrs.space,
+            proposal: vnode.attrs.proposal,
+            id: vnode.attrs.id,
+            selectedChoice: 1,
+            totalScore: vnode.attrs.totalScore,
+            scores: vnode.attrs.scores,
+            snapshot: vnode.attrs.proposal.msg.payload.snapshot,
+          }
+        });
+        vnode.state.votingModalOpen = true;
+      } catch (err) {
+        notifyError('Voting failed');
+      }
     };
 
     const yesButton = m('.yes-button', [
@@ -163,14 +212,13 @@ const VoteAction: m.Component<{
       })
     ]);
 
-    let votingActionObj;
-    votingActionObj = [
+    const votingActionObj = [
       m('.button-row', [yesButton, noButton]),
     ];
 
     return m('.VotingActions', [votingActionObj]);
   }
-}
+};
 
 const ViewProposalPage: m.Component<{
   scope: string,
@@ -179,40 +227,61 @@ const ViewProposalPage: m.Component<{
 }, {
   proposal: SnapshotProposal,
   votes: Vote[],
+  space: any,
+  snapshotProposal: any,
+  totalScore: number,
+  scores: number[]
 }> = {
   oninit: (vnode) => {
     vnode.state.votes = [];
+    vnode.state.totalScore = 0;
+    vnode.state.scores = [];
 
     const snapshotId = vnode.attrs.snapshotId;
-    app.snapshot.fetchSnapshotProposals(snapshotId).then(response => {
-      
+    app.snapshot.fetchSnapshotProposals(snapshotId).then((response) => {
       const allProposals: SnapshotProposal[] = app.snapshot.proposalStore.getAll();
-      vnode.state.proposal = allProposals.filter(proposal => proposal.ipfsHash === vnode.attrs.identifier)[0];
+      vnode.state.proposal = allProposals.filter((proposal) => proposal.ipfsHash === vnode.attrs.identifier)[0];
 
-      if (vnode.state.proposal) {
-        const hubUrl = process.env.SNAPSHOT_APP_HUB_URL || 'https://testnet.snapshot.org';
-        $.get(`${hubUrl}/api/${snapshotId}/proposal/${vnode.state.proposal.ipfsHash}`).then((response) => {
-          if (response.status !== 'Success') {
-            var i = 0;
-            let votes: Vote[] = [];
-            for (const key in response) {
-              let vote: Vote = {
-                voterAddress: '',
-                choice: '',
-                timestamp: '',
-              };
-              vote.voterAddress = key,
-              vote.timestamp = response[key].msg.timestamp;
-              vote.choice = response[key].msg.payload.choice === 1 ? 'yes' : 'no';
-              votes.push(vote);
-            }
-            vnode.state.votes = votes;
+      const space = app.snapshot.spaces[vnode.attrs.snapshotId];
+      vnode.state.space = space;
+
+      getProposal(vnode.attrs.identifier).then((proposalObj) => {
+        const { proposal, votes } = proposalObj;
+        vnode.state.snapshotProposal = proposal;
+        const voteArray: Vote[] = [];
+
+        for (const element of votes) {
+          const vote: Vote = {
+            voterAddress: '',
+            choice: '',
+            timestamp: '',
+          };
+          vote.voterAddress = element.voter;
+          vote.timestamp = element.created;
+          vote.choice = element.choice === 1 ? 'yes' : 'no';
+          voteArray.push(vote);
+        }
+        vnode.state.votes = voteArray;
+        const author = app.user.activeAccount;
+
+        if (author && proposal.address) {
+          getPower(
+            space,
+            author.address,
+            proposal.msg.payload.snapshot
+          ).then((power) => {
+            const { scores, totalScore } = power;
+            vnode.state.scores = scores;
+            vnode.state.totalScore = totalScore;
             m.redraw();
-          }
-        });
-      }
+          });
+        } else {
+          m.redraw();
+        }
+      });
     });
   },
+
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'ViewSnapShotProposalPage' });
     mixpanel.track('Proposal Funnel', {
@@ -222,15 +291,25 @@ const ViewProposalPage: m.Component<{
       'Scope': app.activeId(),
     });
   },
+
   view: (vnode) => {
-    return m(Sublayout, { class: 'ViewProposalPage', title: "Snapshot Proposal" }, [
+    const author = app.user.activeAccount;
+
+    return m(Sublayout, { class: 'ViewProposalPage', title: 'Snapshot Proposal' }, [
       m(ProposalHeader, {
         snapshotId: vnode.attrs.snapshotId,
         proposal: vnode.state.proposal,
       }),
       m('.PinnedDivider', m('hr')),
       vnode.state.votes && m(VoteView, { votes: vnode.state.votes }),
-      vnode.state.proposal && m(VoteAction, { choices: vnode.state.proposal.choices})
+      vnode.state.proposal && author && m(VoteAction, {
+        space: vnode.state.space,
+        proposal: vnode.state.snapshotProposal,
+        id: vnode.attrs.identifier,
+        totalScore: vnode.state.totalScore,
+        scores: vnode.state.scores,
+        choices: vnode.state.proposal.choices
+      })
     ]);
   }
 };

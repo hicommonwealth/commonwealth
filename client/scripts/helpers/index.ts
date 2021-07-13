@@ -182,10 +182,20 @@ export function formatLastUpdated(timestamp) {
   if (timestamp.isBefore(moment().subtract(365, 'days'))) return timestamp.format('MMM D YYYY');
   const formatted = timestamp.fromNow(true);
   return `${formatted
-      .replace(' days', 'd')
-      .replace(' day', 'd')
-      .replace(' hours', 'h')
-      .replace(' hour', 'h')} ago`;
+    .replace(' days', 'd')
+    .replace(' day', 'd')
+    .replace(' hours', 'h')
+    .replace(' hour', 'h')} ago`;
+}
+
+export function formatTimestamp(timestamp) {
+  if (timestamp.isBefore(moment().subtract(365, 'days'))) return timestamp.format('MMM D YYYY');
+  const formatted = timestamp.fromNow(true);
+  return `${formatted
+    .replace(' days', 'd')
+    .replace(' day', 'd')
+    .replace(' hours', 'h')
+    .replace(' hour', 'h')}`;
 }
 
 // duplicated in adapters/currency.ts
@@ -307,17 +317,6 @@ export const loadScript = (scriptURI) => {
     document.head.appendChild(script);
   });
 };
-
-export function formatSpace(key, space) {
-  space = {
-    key,
-    ...space,
-    members: space.members || [],
-    filters: space.filters || {}
-  };
-  if (!space.filters.minScore) space.filters.minScore = 0;
-  return space;
-}
 
 export const removeOrAddClasslistToAllElements = (
   cardList: ICardListItem[],

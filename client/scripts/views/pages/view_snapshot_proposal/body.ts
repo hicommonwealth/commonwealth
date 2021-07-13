@@ -4,10 +4,12 @@ import m from 'mithril';
 
 import { updateRoute } from 'app';
 import { formatLastUpdated } from 'helpers';
-import { SnapshotProposal } from 'models';
+import { AddressInfo, SnapshotProposal } from 'models';
 
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import moment from 'moment';
+import app from 'state';
+import User from '../../components/widgets/user';
 
 export const ProposalBodyAuthor: m.Component<{ item: SnapshotProposal }> = {
   view: (vnode) => {
@@ -15,13 +17,14 @@ export const ProposalBodyAuthor: m.Component<{ item: SnapshotProposal }> = {
     if (!item) return;
     if (!item.authorAddress) return;
 
+
+
     return m('.ProposalBodyAuthor', [
-      m('a', {
-        href: '#',
-        onclick: async (e) => {
-          e.preventDefault();
-        }
-      }, `Author ${item.authorAddress}`)
+      m(User, {
+        user: new AddressInfo(null, item.authorAddress, app.activeId(), null), // TODO: activeID becomes chain_base, fix
+        linkify: true,
+        popover: true
+      }),
     ]);
   }
 };
@@ -36,16 +39,7 @@ export const ProposalBodyCreated: m.Component<{
     const time = moment(+item.start * 1000);
 
     return m('.ProposalBodyCreated', [
-      m('a', {
-        href: link,
-        onclick: (e) => {
-          e.preventDefault();
-          const target = link;
-          if (target === document.location.href) return;
-          // use updateRoute instead of m.route.set to avoid resetting scroll point
-          updateRoute(target, {}, { replace: true });
-        }
-      }, `Created ${formatLastUpdated(time)}`)
+      m('', `Created ${formatLastUpdated(time)}`)
     ]);
   }
 };
@@ -60,12 +54,7 @@ export const ProposalBodyLastEdited: m.Component<{ item: SnapshotProposal }> = {
     const time = moment(+item.end * 1000);
 
     return m('.ProposalBodyLastEdited', [
-      m('a', {
-        href: '#',
-        onclick: async (e) => {
-          e.preventDefault();
-        }
-      }, `Edited ${formatLastUpdated(time)}`)
+      m('', `Edited ${formatLastUpdated(time)}`)
     ]);
   }
 };
@@ -75,7 +64,7 @@ export const ProposalBodyText: m.Component<{ item: SnapshotProposal }> = {
     const { item } = vnode.attrs;
     if (!item) return;
 
-    const body = item.body
+    const body = item.body;
     if (!body) return;
 
     return m('.ProposalBodyText', [

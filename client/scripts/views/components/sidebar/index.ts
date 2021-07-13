@@ -177,10 +177,6 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
     const showCommonwealthMenuOptions = app.chain?.network === ChainNetwork.Commonwealth;
 
     const showMarlinOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Marlin;
-    const showSubmitSnapshotProposalOptions = app.user.activeAccount && app.chain?.meta.chain.snapshot && 
-      (app.chain?.network === ChainNetwork.Yearn ||
-        app.chain?.network === ChainNetwork.Fei ||
-        app.chain?.network === ChainNetwork.Sushi);
 
     const onSnapshotProposal = (p) => p.startsWith(`/${app.activeId()}/snapshot-proposals`);
     const onProposalPage = (p) => (
@@ -389,20 +385,11 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         rounded: true,
         fluid: true,
         active: onSnapshotProposal(m.route.get()),
-        label: 'Snapshot Proposals',
+        label: 'Proposals',
         onclick: (e) => {
           e.preventDefault();
           m.route.set(`/${app.activeChainId()}/snapshot-proposals/${app.chain.meta.chain.snapshot}`);
         },
-      }),
-      showSubmitSnapshotProposalOptions && m(Button, {
-        fluid: true,
-        rounded: true,
-        onclick: (e) => {
-          e.preventDefault();
-          m.route.set(`/${app.activeChainId()}/new/snapshot-proposal/${app.chain.meta.chain.snapshot}`);
-        },
-        label: 'Submit a Proposal',
       }),
       showCommonwealthMenuOptions && m(Button, {
         fluid: true,

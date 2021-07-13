@@ -11,6 +11,7 @@ import $ from 'jquery';
 import { FocusManager } from 'construct-ui';
 import moment from 'moment';
 import mixpanel from 'mixpanel-browser';
+import _ from 'underscore';
 
 import app, { ApiStatus, LoginState } from 'state';
 import {
@@ -34,6 +35,7 @@ import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import LoginModal from 'views/modals/login_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';
 import Login from './views/components/login';
+import { formatSpace } from './helpers/snapshot_utils/snapshot_utils';
 
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/landing');
@@ -117,7 +119,15 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
         app.config.chains.getAll().find((c) => c.customDomain === host) !== undefined
           || app.config.communities.getAll().find((c) => c.customDomain === host) !== undefined
       );
-
+      app.snapshot.client.getSpaces().then((response) => {
+        console.log(response);
+        app.snapshot.spaces = _.object(
+          Object.entries(response).map((space) => [
+            space[0],
+            formatSpace(space[0], space[1])
+          ])
+        );
+      });
       resolve();
     }).catch((err: any) => {
       app.loadingError = err.responseJSON?.error || 'Error loading application state';
@@ -310,23 +320,30 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
     const Yearn = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "commonwealth-main" */
-      './controllers/chain/ethereum/yearn/adapter'
+      './controllers/chain/ethereum/snapshot/adapter'
     )).default;
     newChain = new Yearn(n, app);
   } else if (n.chain.network === ChainNetwork.Fei) {
     const Fei = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "commonwealth-main" */
-      './controllers/chain/ethereum/fei/adapter'
+      './controllers/chain/ethereum/snapshot/adapter'
     )).default;
     newChain = new Fei(n, app);
   } else if (n.chain.network === ChainNetwork.Sushi) {
-    const Sushi = (await import(
+    const Snapshot = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "commonwealth-main" */
-      './controllers/chain/ethereum/sushi/adapter'
+      './controllers/chain/ethereum/snapshot/adapter'
     )).default;
-    newChain = new Sushi(n, app);
+    newChain = new Snapshot(n, app);
+  } else if (n.chain.network === ChainNetwork.Demo) {
+    const Snapshot = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "commonwealth-main" */
+      './controllers/chain/ethereum/snapshot/adapter'
+    )).default;
+    newChain = new Snapshot(n, app);
   } else {
     throw new Error('Invalid chain');
   }
@@ -346,8 +363,6 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
     return false;
   } else {
     app.chain = newChain;
-    const snapshotId = app.chain?.meta.chain.snapshot;
-    app.snapshot.fetchSnapshotProposals(snapshotId);
   }
   if (initApi) {
     app.chain.initApi(); // required for loading NearAccounts

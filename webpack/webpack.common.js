@@ -89,7 +89,6 @@ module.exports = {
           path.resolve(__dirname, '../client'),
           path.resolve(__dirname, '../shared'),
           path.resolve(__dirname, '../eth/types'),
-          path.resolve(__dirname, '../node_modules/@snapshot-labs/snapshot.js'),
         ],
         use: {
           loader: 'ts-loader'
