@@ -21,6 +21,7 @@ import { formatSpace } from 'helpers';
 
 import { notifyError } from 'controllers/app/notifications';
 import QuillEditor from 'views/components/quill_editor';
+import { idToProposal } from 'identifiers';
 
 
 declare global {
@@ -208,6 +209,23 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
 
   view: (vnode) => {
     if (!app.community && !app.chain) return;
+
+    const pathVars = m.parsePathname(window.location.href);
+    let fromProposal = null;
+    let fromProposalBody = null;
+    if (pathVars.params.fromProposalType && pathVars.params.fromProposalId) {
+      fromProposal = idToProposal(pathVars.params.fromProposalType, pathVars.params.fromProposalId);
+      vnode.state.form.name = fromProposal.title;
+      if (fromProposal.body) {
+        try {
+          const parsedBody = JSON.parse(fromProposal.body);
+          fromProposalBody = parsedBody.ops[0].insert;
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }
+
     const author = app.user.activeAccount;
     const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
     if (vnode.state.quillEditorState?.container) {
@@ -234,6 +252,9 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
       // (vnode.state.space.filters?.minScore === 0 ||
       //   (vnode.state.space.filters?.minScore > 0 && vnode.state.userScore) ||
       //   isMember);
+
+    const today = new Date();
+    const nextWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 7);
 
     return m('.NewThreadForm', {
       oncreate: (vvnode) => {
@@ -266,7 +287,7 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
             ]),
             m(FormGroup, { order: 4 }, [
               m(QuillEditor, {
-                contentsDoc: '', // Prevent the editor from being filled in with previous content
+                contentsDoc: fromProposalBody || '', // Prevent the editor from being filled in with previous content
                 oncreateBind: (state) => {
                   vnode.state.quillEditorState = state;
                 },
@@ -325,6 +346,7 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
             m('h4', 'Start Date'),
             m(DatePicker,
               {
+                date: today,
                 locale: 'en-us',
                 weekStart: 0,
                 onchange: function(chosenDate){
@@ -335,6 +357,7 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
             m('h4', 'End Date'),
             m(DatePicker,
               {
+                date: nextWeek,
                 locale: 'en-us',
                 weekStart: 0,
                 onchange: function(chosenDate){
