@@ -25,6 +25,18 @@ export function offchainThreadStageToLabel(stage: OffchainThreadStage) {
   }
 }
 
+export function parseCustomStages(str) {
+  // Parse additionalStages into a `string[]` and then cast to OffchainThreadStage[]
+  // If parsing fails, return an empty array.
+  let arr;
+  try {
+    arr = Array.from(JSON.parse(str));
+  } catch (e) {
+    return [];
+  }
+  return arr.map((s) => s?.toString()).filter(s => s) as unknown as OffchainThreadStage[];
+}
+
 /*
  * mithril link helper
  */
