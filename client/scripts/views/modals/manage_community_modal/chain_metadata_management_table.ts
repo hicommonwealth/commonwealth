@@ -95,12 +95,14 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
           title: 'Stages',
           defaultValue: vnode.attrs.chain.stagesEnabled,
           onToggle: (checked) => { vnode.state.stagesEnabled = checked; },
-          caption: () => 'Tag threads with proposal progress',
+          caption: (checked) => checked
+            ? 'Show proposal progress on threads'
+            : 'Don\'t show progress on threads',
         }),
         m(InputPropertyRow, {
-          title: 'Add Stages',
+          title: 'Custom Stages',
           defaultValue: vnode.state.additionalStages,
-          placeholder: 'Optional: ["Temperature Check", "Consensus Check"]',
+          placeholder: '["Temperature Check", "Consensus Check"]',
           onChangeHandler: (v) => { vnode.state.additionalStages = v; },
         }),
         m(InputPropertyRow, {

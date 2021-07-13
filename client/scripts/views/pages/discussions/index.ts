@@ -97,6 +97,9 @@ export const CommunityOptionsPopover: m.Component<{ isAdmin: boolean, isMod: boo
 const DiscussionStagesBar: m.Component<{ topic: string, stage: string }, {}> = {
   view: (vnode) => {
     const { topic, stage } = vnode.attrs;
+    if (!app.chain?.meta?.chain && !app.community?.meta) return;
+
+    const { stagesEnabled } = app.chain?.meta?.chain || app.community?.meta;
 
     const featuredTopicIds = app.community?.meta?.featuredTopics || app.chain?.meta?.chain?.featuredTopics;
     const topics = app.topics.getByCommunity(app.activeId()).map(({ id, name, description, telegram }) => {
@@ -170,7 +173,7 @@ const DiscussionStagesBar: m.Component<{ topic: string, stage: string }, {}> = {
           })),
         ]),
       }),
-      m(PopoverMenu, {
+      stagesEnabled && m(PopoverMenu, {
         trigger: m(Button, {
           rounded: true,
           compact: true,

@@ -98,13 +98,13 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
         defaultValue: vnode.attrs.community.stagesEnabled,
         onToggle: (checked) => { vnode.state.stagesEnabled = checked; },
         caption: (checked) => checked
-          ? 'Allow tagging threads with the progress of a governance proposal'
-          : 'Stages disabled',
+          ? 'Show proposal progress on threads'
+          : 'Don\'t show progress on threads',
       }),
       m(InputPropertyRow, {
-        title: 'Additional Stages',
+        title: 'Custom Stages',
         defaultValue: vnode.state.additionalStages,
-        placeholder: 'Optional: ["Temperature Check", "Consensus Check"]',
+        placeholder: '["Temperature Check", "Consensus Check"]',
         onChangeHandler: (v) => { vnode.state.additionalStages = v; },
       }),
       m(InputPropertyRow, {
