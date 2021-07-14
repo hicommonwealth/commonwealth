@@ -169,6 +169,10 @@ class ThreadsController {
     return result;
   }
 
+  public getById(id: number) {
+    return this._store.getByIdentifier(id);
+  }
+
   public async create(
     address: string,
     kind: string,

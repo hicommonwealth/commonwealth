@@ -41,8 +41,16 @@ const ReactionButton: m.Component<{
     const tokenBalance = app.chain && (app.chain as Token).tokenBalance;
     const isAdmin = app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
 
-    const tokenPostingThreshold = post instanceof OffchainThread && post.topic && app.topics
-      ? app.topics.getByName(post.topic.name, app.activeId()).token_threshold : new BN(0);
+    let tokenPostingThreshold;
+    if( post instanceof OffchainThread && post.topic && app.topics) {
+      tokenPostingThreshold = app.topics.getByName((post as OffchainThread).topic.name, app.activeId()).token_threshold
+    } else if (post instanceof OffchainComment) {
+      // post.rootProposal has typescript typedef number but in practice seems to be a string
+      const parentThread = app.threads.getById(parseInt(post.rootProposal.toString().split('_')[1], 10));
+      tokenPostingThreshold = app.topics.getByName((parentThread).topic.name, app.activeId()).token_threshold
+    } else {
+      tokenPostingThreshold = new BN(0);
+    }
     const disabled = vnode.state.loading
       || (
         (!isCommunity && (app.chain as Token).isToken)
