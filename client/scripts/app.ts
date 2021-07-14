@@ -84,6 +84,8 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
           privacyEnabled: community.privacyEnabled,
           featuredTopics: community.featured_topics,
           topics: community.topics,
+          stagesEnabled: community.stagesEnabled,
+          additionalStages: community.additionalStages,
           customDomain: community.customDomain,
           adminsAndMods: [],
         }));

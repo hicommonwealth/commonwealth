@@ -150,7 +150,7 @@ const ProposalCard: m.Component<{ proposal: AnyProposal, injectedContent? }> = {
             return m(Tag, {
               label: (originatingProposalOrMotion instanceof SubstrateDemocracyProposal)
                 ? `PROP #${originatingProposalOrMotion.identifier}`
-                  : (originatingProposalOrMotion instanceof SubstrateCollectiveProposal)
+                : (originatingProposalOrMotion instanceof SubstrateCollectiveProposal)
                   ? `MOT #${originatingProposalOrMotion.identifier}` : 'MISSING PROP',
               intent: 'primary',
               rounded: true,

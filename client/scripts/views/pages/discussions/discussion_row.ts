@@ -88,7 +88,7 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
           intent: proposal.stage === OffchainThreadStage.ProposalInReview ? 'positive'
             : proposal.stage === OffchainThreadStage.Voting ? 'positive'
               : proposal.stage === OffchainThreadStage.Passed ? 'positive'
-                : proposal.stage === OffchainThreadStage.Failed ? 'negative' : null,
+                : proposal.stage === OffchainThreadStage.Failed ? 'negative' : 'positive',
           size: 'xs',
           compact: true,
           label: offchainThreadStageToLabel(proposal.stage),

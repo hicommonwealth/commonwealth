@@ -6,7 +6,7 @@ import { uuidv4 } from 'lib/util';
 import { QueryList, ListItem, Button, Classes, Dialog, InputSelect, Icon, Icons, MenuItem } from 'construct-ui';
 
 import app from 'state';
-import { offchainThreadStageToLabel } from 'helpers';
+import { offchainThreadStageToLabel, parseCustomStages } from 'helpers';
 import { ChainEntity, OffchainThread, OffchainThreadStage } from 'models';
 import { chainEntityTypeToProposalName } from 'identifiers';
 import ChainEntityController, { EntityRefreshOption } from 'controllers/server/chain_entities';
@@ -104,6 +104,9 @@ const StageEditor: m.Component<{
     vnode.attrs.thread.chainEntities.forEach((ce) => vnode.state.chainEntitiesToSet.push(ce));
   },
   view: (vnode) => {
+    if (!app.chain?.meta?.chain && !app.community?.meta) return;
+    const { additionalStages } = app.chain?.meta?.chain || app.community?.meta;
+
     return m('.StageEditor', [
       !vnode.attrs.popoverMenu && m('a', {
         href: '#',
@@ -119,6 +122,7 @@ const StageEditor: m.Component<{
             [
               OffchainThreadStage.Discussion,
               OffchainThreadStage.ProposalInReview,
+              ...parseCustomStages(additionalStages),
               OffchainThreadStage.Voting,
               OffchainThreadStage.Passed,
               OffchainThreadStage.Failed,

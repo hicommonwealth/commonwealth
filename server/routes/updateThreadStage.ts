@@ -9,6 +9,7 @@ export const Errors = {
   NoStage: 'Must pass in stage',
   NoThread: 'Cannot find thread',
   NotAdminOrOwner: 'Not an admin or owner of this thread',
+  InvalidStage: 'Invalid stage',
 };
 
 const updateThreadStage = async (models, req: Request, res: Response, next: NextFunction) => {
@@ -36,6 +37,26 @@ const updateThreadStage = async (models, req: Request, res: Response, next: Next
         return r.offchain_community_id === thread.community || r.chain_id === thread.chain;
       });
       if (!role) return next(new Error(Errors.NotAdminOrOwner));
+    }
+
+    // fetch available stages
+    let additionalStages = [];
+    let entity;
+    if (thread.community) {
+      entity = await models.OffchainCommunity.findOne({ where: { id: thread.community } });
+    } else if (thread.chain) {
+      entity = await models.Chain.findOne({ where: { id: thread.chain } });
+    }
+    try {
+      additionalStages = Array.from(JSON.parse(entity.additionalStages)).map(s => s.toString()).filter(s => s);
+    } catch (e) {}
+
+    // validate stage
+    const availableStages = [
+      'discussion', 'proposal_in_review', 'voting', 'passed', 'failed', ...additionalStages
+    ];
+    if (availableStages.indexOf(stage) === -1) {
+      return next(new Error(Errors.InvalidStage));
     }
 
     await thread.update({ stage });
