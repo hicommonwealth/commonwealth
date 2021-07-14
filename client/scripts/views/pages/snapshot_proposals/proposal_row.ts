@@ -1,4 +1,4 @@
-import 'pages/snapshot/view_proposal.scss';
+import 'pages/snapshot/list_proposal.scss';
 
 import m from 'mithril';
 import moment from 'moment';
@@ -19,36 +19,38 @@ const ProposalRow: m.Component<{ snapshotId: string, proposal: SnapshotProposal 
 
     const time = moment(+proposal.end * 1000);
     const now = moment();
-    const endTime = (now < time) && `Ends in ${formatTimestamp(moment(+proposal.end * 1000))}`;
+    const endTime = `Ends in ${formatTimestamp(moment(+proposal.end * 1000))}`;
 
-    return m('.SnapshotProposalCard', {
-      'onclick': (e) => {
-        if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
-        e.preventDefault();
-        localStorage[`${app.activeId()}-proposals-scrollY`] = window.scrollY;
-        m.route.set(proposalLink);
-      },
-    }, [
-      m('.title', proposal.name),
-      m('.body', proposal.body),
-      m('.other-details', [
-        m('', [
-          m('.submitted-by', 'submitted by'),
-          m('.author-address', m(User, {
-            user: new AddressInfo(null, proposal.authorAddress, app.activeId(), null),
-            linkify: true,
-            popover: true
-          })),
+    return m('.snapshot-proposals-list', [
+      m('.card-style', {
+        'onclick': (e) => {
+          if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
+          e.preventDefault();
+          localStorage[`${app.activeId()}-proposals-scrollY`] = window.scrollY;
+          m.route.set(proposalLink);
+        },
+      }, [
+        m('.title', proposal.name),
+        m('.body', proposal.body),
+        m('.other-details', [
+          m('', [
+            m('.submitted-by', 'submitted by'),
+            m('.author-address', m(User, {
+              user: new AddressInfo(null, proposal.authorAddress, app.activeId(), null),
+              linkify: true,
+              popover: true
+            })),
+          ]),
+          (now < time) ? [
+            m('.active-proposal', [
+              m('', endTime),
+              m('.active-text', 'Active'),
+            ])
+          ] : [
+            m('.closed-proposal', 'Closed')
+          ]
         ]),
-        (now < time) ? [
-          m('.active-proposal', [
-            m('', endTime),
-            m('.active-text', 'Active'),
-          ])
-        ] : [
-          m('.closed-proposal', 'Closed')
-        ]
-      ]),
+      ])
     ]);
   }
 };

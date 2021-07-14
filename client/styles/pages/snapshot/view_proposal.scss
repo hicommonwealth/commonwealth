@@ -1,65 +1,117 @@
-@import 'client/styles/shared';
+.view-snapshot-proposal-page {
+  display: flex;
+  justify-content: space-between;
 
-.SnapshotProposalCard {
-  width: 70%;
-  border: 1px solid $border-color;
-  border-radius: 8px;
-  padding: 32px 24px 24px;
-  box-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.1);
-  margin-bottom: 48px;
-  cursor: pointer;
+  .proposal-content {
+    width: 65%;
 
-  .title {
-    font-size: 24px;
-    font-weight: 500;
-  }
+    margin-top: 40px;
 
-  .body {
-    margin-top: 10px;
-  }
+    .back-button {
+      color: #999999;
+      display: flex;
 
-  .other-details {
-    margin-top: 14px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+      .back-icon {
+        margin-right: 14px;
+      }
 
-    .submitted-by {
-      display: inline;
-      color: #666666;
-      margin-right: 16px;
+      .back-button-text {
+        text-transform: uppercase;
+      }
     }
 
-    .author-address {
-      display: inline;
-      background-color: #F7F4FF;
-      padding: 8px 14px 4px;
-      border-radius: 9999px;
-    }
-
-    .closed-proposal {
-      background-color: #999999;
-      border-radius: 9999px;
-      padding: 8px 14px 4px;
-      color: white;
+    .proposal-title {
+      margin-top: 24px;
+      font-size: 32px;
       font-weight: 500;
     }
 
-    .active-proposal {
-      border-radius: 9999px;
-      background-color: #F4F4F4;
-      display: flex;
+    .proposal-hash {
+      font-weight: 600;
       color: #666666;
+      margin-top: 6px;
+    }
 
-      &>* {
-        padding: 8px 14px 4px;
+    .mt-32 {
+      margin-top: 32px;
+    }
+
+    .cast-vote {
+      font-size: 24px;
+      font-weight: 500;
+      margin-top: 64px;
+    }
+
+    .snapshot-votes {
+      margin-top: 10px;
+
+      .cui-radio {
+        display: block;
+        margin-bottom: 14px;
+      }
+    }
+
+    .votes-title {
+      margin-top: 64px;
+      display: flex;
+      align-items: baseline;
+
+      .title {
+        font-size: 24px;
+        font-weight: 500;
+        margin-right: 8px;
       }
 
-      .active-text {
-        background-color: #00C0A9;
-        border-radius: 9999px;
-        font-weight: 500;
+      .vote-count {
+        background-color: #666666;
         color: white;
+        font-weight: 500;
+        border-radius: 9999px;
+        padding: 8px 12px 3px;
+      }
+    }
+  }
+
+  .proposal-info {
+    width: 25%;
+    margin-top: 88px;
+
+    .title {
+      font-size: 32px;
+      font-weight: 500;
+    }
+
+    .mt-72 {
+      margin-top: 72px;
+    }
+
+    .info-block {
+      display: flex;
+      margin-top: 16px;
+
+      .labels {
+        color: #666666;
+        margin-right: 24px;
+        flex-shrink: 0;
+
+        &>* {
+          margin-bottom: 10px;
+        }
+      }
+
+      .values {
+        overflow: hidden;
+
+        .-mt-10 {
+          margin-top: -10px;
+        }
+
+        &>* {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          margin-bottom: 10px;
+        }
       }
     }
   }

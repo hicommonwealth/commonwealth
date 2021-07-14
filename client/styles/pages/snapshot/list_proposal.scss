@@ -1,0 +1,68 @@
+@import 'client/styles/shared';
+
+.snapshot-proposals-list {
+  .card-style {
+    width: 70%;
+    border: 1px solid $border-color;
+    border-radius: 8px;
+    padding: 32px 24px 24px;
+    box-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.1);
+    margin-bottom: 48px;
+    cursor: pointer;
+  }
+
+  .title {
+    font-size: 24px;
+    font-weight: 500;
+  }
+
+  .body {
+    margin-top: 10px;
+  }
+
+  .other-details {
+    margin-top: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+
+    .submitted-by {
+      display: inline;
+      color: #666666;
+      margin-right: 16px;
+    }
+
+    .author-address {
+      display: inline;
+      background-color: #F7F4FF;
+      padding: 8px 14px 4px;
+      border-radius: 9999px;
+    }
+
+    .closed-proposal {
+      background-color: #999999;
+      border-radius: 9999px;
+      padding: 8px 14px 4px;
+      color: white;
+      font-weight: 500;
+    }
+
+    .active-proposal {
+      border-radius: 9999px;
+      background-color: #F4F4F4;
+      display: flex;
+      color: #666666;
+
+      &>* {
+        padding: 8px 14px 4px;
+      }
+
+      .active-text {
+        background-color: #00C0A9;
+        border-radius: 9999px;
+        font-weight: 500;
+        color: white;
+      }
+    }
+  }
+}
