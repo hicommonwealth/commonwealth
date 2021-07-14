@@ -1,5 +1,6 @@
+import 'modals/edit_topic_thresholds_modal.scss';
 import 'modals/new_topic_modal.scss';
-import 'modals/edit_token_thresholds_modal.scss';
+
 import m from 'mithril';
 import app from 'state';
 import $ from 'jquery';
