@@ -28,7 +28,12 @@ const SnapshotProposalStagesBar: m.Component<{
   onChangeFilter: (value: SnapshotProposalFilter) => void
 }, {}> = {
   view: (vnode) => {
-    const options = [SnapshotProposalFilter.Core, SnapshotProposalFilter.Community, SnapshotProposalFilter.Active, SnapshotProposalFilter.Ended];
+    const options = [
+      // SnapshotProposalFilter.Core,
+      // SnapshotProposalFilter.Community,
+      SnapshotProposalFilter.Active,
+      SnapshotProposalFilter.Ended
+    ];
 
     return m('.DiscussionStagesBar.discussions-stages', [
       m(ButtonGroup, options.map((option: SnapshotProposalFilter) => m(Button, {
@@ -75,7 +80,7 @@ const SnapshotProposalsPage: m.Component<{ topic?: string, snapshotId: string },
   oninit: (vnode) => {
     vnode.state.loadingProposals = true;
     vnode.state.allProposals = [];
-    vnode.state.selectedFilter = SnapshotProposalFilter.Core;
+    vnode.state.selectedFilter = SnapshotProposalFilter.Active;
   },
 
   view: (vnode) => {
