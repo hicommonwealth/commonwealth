@@ -122,6 +122,8 @@ const CreateComment: m.Component<{
       app.activeId()
     )?.token_threshold;
 
+    const isAdmin = app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
+
     const { error, sendingComment, uploadsInProgress } = vnode.state;
     return m('.CreateComment', {
       class: parentType === CommentParent.Comment ? 'new-comment-child' : 'new-thread-child'
@@ -181,9 +183,9 @@ const CreateComment: m.Component<{
                 intent: 'primary',
                 type: 'submit',
                 compact: true,
-                disabled: (!app.isAdapterReady) || getSetGlobalEditingStatus(GlobalStatus.Get) || sendingComment || uploadsInProgress > 0
-                   || (app.activeChainId() && (app.chain as Token).isToken && tokenPostingThreshold
-                   && tokenPostingThreshold.gt((app.chain as Token).tokenBalance)),
+                disabled: getSetGlobalEditingStatus(GlobalStatus.Get) || sendingComment || uploadsInProgress > 0
+                   || (app.activeChainId() && (app.chain as Token).isToken
+                   && ((!app.isAdapterReady) || (!isAdmin && tokenPostingThreshold && tokenPostingThreshold.gt((app.chain as Token).tokenBalance)))),
                 rounded: true,
                 onclick: submitComment,
                 label: (uploadsInProgress > 0)

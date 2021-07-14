@@ -95,7 +95,7 @@ const NewTopicModal: m.Component<{
               app.topics.add(
                 vnode.state.form.name, vnode.state.form.description, null,
                 tokensToTokenBaseUnits(vnode.state.form.token_threshold ? vnode.state.form.token_threshold : '0', 
-                  app.chain.meta.chain.decimals)
+                  app.chain.meta.chain.decimals ? app.chain.meta.chain.decimals : 18)
               ).then(() => {
                 vnode.state.saving = false;
                 m.redraw();

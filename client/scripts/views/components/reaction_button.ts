@@ -38,12 +38,17 @@ const ReactionButton: m.Component<{
 
     const isCommunity = !!app.activeCommunityId();
 
-    const tokenBalance = (app.chain as Token).tokenBalance;
-    const tokenPostingThreshold = post instanceof OffchainThread ? app.topics.getByName(post.topic.name, app.activeId()).token_threshold : new BN(0);
+    const tokenBalance = app.chain && (app.chain as Token).tokenBalance;
+    const isAdmin = app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
+
+    const tokenPostingThreshold = post instanceof OffchainThread && post.topic && app.topics
+      ? app.topics.getByName(post.topic.name, app.activeId()).token_threshold : new BN(0);
     const disabled = vnode.state.loading
-      || tokenBalance == null
-      || (!isCommunity && (app.chain as Token).isToken && tokenPostingThreshold
-       && tokenPostingThreshold.gt(tokenBalance));
+      || (
+        (!isCommunity && (app.chain as Token).isToken)
+        && !isAdmin
+        && (tokenBalance == null || (tokenPostingThreshold && tokenPostingThreshold.gt(tokenBalance)))
+      );
     const activeAddress = app.user.activeAccount?.address;
     const rxn = reactions.find((r) => r.reaction && r.author === activeAddress);
     const hasReacted : boolean = !!rxn;

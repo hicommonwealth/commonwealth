@@ -41,7 +41,6 @@ import { fetchStats } from './server/routes/getEdgewareLockdropStats';
 import migrateChainEntities from './server/scripts/migrateChainEntities';
 import migrateIdentities from './server/scripts/migrateIdentities';
 import migrateCouncillorValidatorFlags from './server/scripts/migrateCouncillorValidatorFlags';
-import addDecimalsToTokens from './server/scripts/addMissingDecimalsToTokens';
 
 // set up express async error handling hack
 require('express-async-errors');
@@ -134,15 +133,6 @@ async function main() {
       rc = 0;
     } catch (e) {
       log.error('Failed adding Lockdrop statistics into the DB: ', e.message);
-      rc = 1;
-    }
-  } else if (SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS) {
-    try {
-      const numChanged = await addDecimalsToTokens(models);
-      log.info(`Finished adding decimals, ${numChanged} rows updated`);
-      rc = 0;
-    } catch (e) {
-      log.error('Failed adding missing decimals to tokens: ', e.message);
       rc = 1;
     }
   } else if (ENTITY_MIGRATION) {
