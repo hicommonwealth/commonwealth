@@ -4,7 +4,7 @@ import 'pages/view_proposal/tips.scss';
 import $ from 'jquery';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
-import { PopoverMenu, MenuDivider, Icon, Icons, Button, Input } from 'construct-ui';
+import { PopoverMenu, MenuDivider, MenuItem, Icon, Icons, Button, Input  } from 'construct-ui';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
@@ -163,6 +163,14 @@ const ProposalHeader: m.Component<{
                     && m(ProposalBodyDeleteMenuItem, { item: proposal }),
                   (isAuthor || isAdmin)
                     && m(ProposalHeaderPrivacyMenuItems, { proposal, getSetGlobalEditingStatus }),
+                  (isAuthor || isAdmin) && (app.chain?.meta.chain.snapshot !== null)
+                    && m(MenuItem, {
+                      onclick: (e) => {
+                        m.route.set(`/${app.activeChainId()}/new/snapshot-proposal/${app.chain.meta.chain.snapshot}`
+                        + `?fromProposalType=${proposal.slug}&fromProposalId=${proposal.id}`);
+                      },
+                      label: 'Snapshot proposal from thread',
+                    }),
                   (isAuthor || isAdmin)
                     && m(MenuDivider),
                   m(ThreadSubscriptionMenuItem, { proposal: proposal as OffchainThread }),
