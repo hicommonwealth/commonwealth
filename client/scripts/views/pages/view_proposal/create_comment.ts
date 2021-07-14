@@ -181,7 +181,7 @@ const CreateComment: m.Component<{
                 intent: 'primary',
                 type: 'submit',
                 compact: true,
-                disabled: getSetGlobalEditingStatus(GlobalStatus.Get) || sendingComment || uploadsInProgress > 0
+                disabled: (!app.isAdapterReady) || getSetGlobalEditingStatus(GlobalStatus.Get) || sendingComment || uploadsInProgress > 0
                    || (app.activeChainId() && (app.chain as Token).isToken && tokenPostingThreshold
                    && tokenPostingThreshold.gt((app.chain as Token).tokenBalance)),
                 rounded: true,

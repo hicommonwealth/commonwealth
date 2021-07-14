@@ -439,6 +439,7 @@ export const NewThreadForm: m.Component<{
 
     const discussionDrafts = app.user.discussionDrafts.store.getByCommunity(app.activeId());
     const { fromDraft, postType, saving } = vnode.state;
+    const isAdmin = app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
 
     return m('.NewThreadForm', {
       class: `${postType === PostType.Link ? 'link-post' : ''} `
@@ -622,7 +623,7 @@ export const NewThreadForm: m.Component<{
                   ? vnode.state.activeTopic
                   : localStorage.getItem(`${app.activeId()}-active-topic`),
                 topics: app.topics.getByCommunity(app.activeId()).filter((t) => {
-                  return (app.chain as Token).tokenBalance.gte(t.token_threshold);
+                  return isAdmin || (app.chain as Token).tokenBalance.gte(t.token_threshold);
                 }),
                 featuredTopics: app.topics.getByCommunity(app.activeId())
                   .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),

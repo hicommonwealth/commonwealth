@@ -131,7 +131,7 @@
     "lity": "^2.3.1",
     "lodash": "^4.17.11",
     "magic-sdk": "^4.1.0",
-    "marked": "^2.0.0",
+    "marked": "2.0.0",
     "mini-css-extract-plugin": "^0.4.4",
     "mithril": "^2.0.4",
     "mithril-infinite": "^1.2.9",
