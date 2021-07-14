@@ -15,8 +15,8 @@ import { formatSpace } from 'helpers/snapshot_utils/snapshot_utils';
 
 import { notifyError } from 'controllers/app/notifications';
 import QuillEditor from 'views/components/quill_editor';
+import { idToProposal } from 'identifiers';
 import { capitalize } from 'lodash';
-
 interface IThreadForm {
   name: string;
   body: string;
@@ -25,7 +25,7 @@ interface IThreadForm {
   end: number;
   snapshot: number,
   metadata: {},
-  type: string
+  type: string,
 }
 
 enum NewThreadErrors {
@@ -132,11 +132,15 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
   space: any,
   members: string[],
   userScore: any,
+  isFromExistingProposal: boolean,
   initialized: boolean,
   snapshotScoresFetched: boolean,
 }> = {
   view: (vnode) => {
     if (!app.community && !app.chain) return;
+
+    const pathVars = m.parsePathname(window.location.href);
+
     if (!app.snapshot.spaces) return;
     if (!vnode.state.initialized) {
       vnode.state.initialized = true;
@@ -154,6 +158,19 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
         type: 'single-choice'
       };
 
+      if (pathVars.params.fromProposalType && pathVars.params.fromProposalId) {
+        const fromProposal = idToProposal(pathVars.params.fromProposalType, pathVars.params.fromProposalId);
+        vnode.state.form.name = fromProposal.title;
+        vnode.state.isFromExistingProposal = true;
+        if (fromProposal.body) {
+          try {
+            const parsedBody = JSON.parse(fromProposal.body);
+            vnode.state.form.body = parsedBody.ops[0].insert;
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      }
       const space = app.snapshot.spaces[vnode.attrs.snapshotId];
 
       snapshotJs.utils.getScores(
@@ -205,6 +222,8 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
           || (vnode.state.space.filters?.minScore > 0 && vnode.state.userScore)
           || isMember);
 
+    const today = new Date();
+    const nextWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 7);
     return m('.NewThreadForm', {
       oncreate: (vvnode) => {
         // $(vvnode.dom).find('.cui-input input').prop('autocomplete', 'off').focus();
@@ -272,6 +291,7 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
               m(FormGroup, [
                 m(FormLabel, 'Start Date:'),
                 m(Input, {
+                  defaultValue: vnode.state.isFromExistingProposal ? today.toDateString() : ' ',
                   name: 'targets',
                   placeholder: 'May 1, 1995',
                   oninput: (e) => {
@@ -284,6 +304,7 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
               m(FormGroup, [
                 m(FormLabel, 'End Date:'),
                 m(Input, {
+                  defaultValue: vnode.state.isFromExistingProposal ? nextWeek.toDateString() : ' ',
                   name: 'targets',
                   placeholder: 'May 22, 1995',
                   oninput: (e) => {
@@ -296,7 +317,7 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
             ]),
             m(FormGroup, [
               m(QuillEditor, {
-                contentsDoc: '', // Prevent the editor from being filled in with previous content
+                contentsDoc: vnode.state.form.body ? vnode.state.form.body : ' ', // Prevent the editor from being filled in with previous content
                 oncreateBind: (state) => {
                   vnode.state.quillEditorState = state;
                 },
