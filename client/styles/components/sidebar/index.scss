@@ -1,6 +1,10 @@
 @import 'client/styles/shared';
 
 @mixin sidebar {
+    .cui-button.sub-button {
+        margin-left: 18px;
+        width: calc(100% - 18px);
+    }
     .cui-button.cui-align-center {
         justify-content: left;
     }
@@ -11,6 +15,9 @@
     .cui-button.element-button, .cui-button.discord-button {
         padding: 0 10px;
         margin-right: 8px;
+        &:last-child {
+            margin-right: 0;
+        }
     }
     .cui-button.telegram-button {
         border-color: tint(#2480cc, 70%);
@@ -145,6 +152,17 @@
     .CommunitySelector {
         margin: 0 0 14px;
     }
+    .create-community {
+        margin: 0 0 14px;
+        height: 38px;
+        width: 38px;
+        padding: 0;
+
+        .cui-icon {
+            position: relative;
+            top: -2px;
+        }
+    }
     .SidebarQuickSwitcherItem {
         height: 38px;
         width: 38px;
@@ -269,7 +287,7 @@
     @include sidebar();
 }
 
-.cui-popover.sidebar-edit-topic .cui-menu,
-.cui-popover.sidebar-add-topic .cui-menu {
+.cui-popover.community-options-popover .cui-menu,
+.cui-popover.community-options-popover .cui-menu {
     padding: 4px 0;
 }

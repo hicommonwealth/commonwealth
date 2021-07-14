@@ -54,7 +54,6 @@ export function linkExistingAddressToChainOrCommunity(
 }
 
 export async function setActiveAccount(account: Account<any>): Promise<void> {
-  console.log('set active account');
   const chain = app.activeChainId();
   const community = app.activeCommunityId();
   const role = app.user.getRoleInCommunity({ account, chain, community });

@@ -1,26 +1,3 @@
-import { spec as EdgewareSpec } from '@edgeware/node-types';
-import { RegisteredTypes } from '@polkadot/types/types';
-import StafiSpec from './adapters/chain/stafi/spec';
-import HydraSpec from './adapters/chain/hydradx/spec';
-import KulupuSpec from './adapters/chain/kulupu/spec';
-import CloverSpec from './adapters/chain/clover/spec';
-
-export function selectSpec(chain: string): RegisteredTypes {
-  if (chain.includes('edgeware')) {
-    return EdgewareSpec;
-  } else if (chain === 'stafi') {
-    return StafiSpec;
-  } else if (chain === 'clover') {
-    return CloverSpec;
-  } else if (chain === 'hydradx') {
-    return { types: HydraSpec };
-  } else if (chain === 'kulupu') {
-    return KulupuSpec;
-  } else {
-    return {};
-  }
-}
-
 export function constructSubstrateUrl(url: string): string {
   const secureNodes = [
     'edgewa.re',
@@ -34,6 +11,7 @@ export function constructSubstrateUrl(url: string): string {
     'poc3.phala.network',
     'api.clover.finance',
     'rpc-01.snakenet.hydradx.io',
+    'api.crust.network/',
   ];
   const hasProtocol = url.indexOf('wss://') !== -1 || url.indexOf('ws://') !== -1;
   url = hasProtocol ? url.split('://')[1] : url;

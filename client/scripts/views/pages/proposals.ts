@@ -7,15 +7,9 @@ import moment from 'moment';
 import BN from 'bn.js';
 
 import app from 'state';
-import { formatCoin } from 'adapters/currency';
-import { formatDuration, blockperiodToDuration } from 'helpers';
 import { ProposalType } from 'identifiers';
-import { ChainClass, ChainBase, ChainNetwork, ProposalModule } from 'models';
+import { ChainBase, ChainNetwork, ProposalModule } from 'models';
 
-import Edgeware from 'controllers/chain/edgeware/main';
-import {
-  convictionToWeight, convictionToLocktime, convictions
-} from 'controllers/chain/substrate/democracy_referendum';
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
@@ -65,24 +59,6 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
               })
               : '--',
           ]),
-        ]),
-        app.chain?.class !== ChainClass.Plasm && m('', [
-          m(Button, {
-            rounded: true,
-            class: activeAccount ? '' : 'disabled',
-            onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
-              type: ProposalType.SubstrateDemocracyProposal
-            }),
-            label: 'New democracy proposal',
-          }),
-          m(Button, {
-            rounded: true,
-            class: activeAccount && (activeAccount as any).isCouncillor ? '' : 'disabled',
-            onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
-              type: ProposalType.SubstrateCollectiveProposal
-            }),
-            label: 'New council motion',
-          }),
         ]),
       ]),
     ]);
@@ -190,7 +166,7 @@ const ProposalsPage: m.Component<{}> = {
     }
 
     const onSubstrate = app.chain && app.chain.base === ChainBase.Substrate;
-    const onMoloch = app.chain && app.chain.class === ChainClass.Moloch;
+    const onMoloch = app.chain && app.chain.network === ChainNetwork.Moloch;
     const onMarlin = app.chain && (
       app.chain.network === ChainNetwork.Marlin || app.chain.network === ChainNetwork.MarlinTestnet
     );
@@ -255,7 +231,7 @@ const ProposalsPage: m.Component<{}> = {
 
     // XXX: display these
     const visibleTechnicalCommitteeProposals = app.chain
-      && (app.chain.class === ChainClass.Kusama || app.chain.class === ChainClass.Polkadot)
+      && (app.chain.network === ChainNetwork.Kusama || app.chain.network === ChainNetwork.Polkadot)
       && (app.chain as Substrate).technicalCommittee.store.getAll();
 
     return m(Sublayout, {

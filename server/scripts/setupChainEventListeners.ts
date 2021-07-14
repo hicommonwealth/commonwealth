@@ -13,7 +13,7 @@ import IdentityHandler from '../eventHandlers/identity';
 import UserFlagsHandler from '../eventHandlers/userFlags';
 import ProfileCreationHandler from '../eventHandlers/profileCreation';
 import { sequelize } from '../database';
-import { constructSubstrateUrl, selectSpec } from '../../shared/substrate';
+import { constructSubstrateUrl } from '../../shared/substrate';
 import { factory, formatFilename } from '../../shared/logging';
 import { ChainNodeInstance } from '../models/chain_node';
 const log = factory.getLogger(formatFilename(__filename));
@@ -77,7 +77,7 @@ const setupChainEventListeners = async (
   }
 
   log.info('Setting up event listeners...');
-  const generateHandlers = (node, storageConfig: StorageFilterConfig = {}) => {
+  const generateHandlers = (node: ChainNodeInstance, storageConfig: StorageFilterConfig = {}) => {
     // writes events into the db as ChainEvents rows
     const storageHandler = new EventStorageHandler(models, node.chain, storageConfig);
 
@@ -122,7 +122,7 @@ const setupChainEventListeners = async (
     let subscriber: IEventSubscriber<any, any>;
     if (chainSupportedBy(node.chain, SubstrateTypes.EventChains)) {
       const nodeUrl = constructSubstrateUrl(node.url);
-      const api = await SubstrateEvents.createApi(nodeUrl, selectSpec(node.chain));
+      const api = await SubstrateEvents.createApi(nodeUrl, node.Chain.substrate_spec);
       const excludedEvents = [
         SubstrateTypes.EventKind.Reward,
         SubstrateTypes.EventKind.TreasuryRewardMinting,

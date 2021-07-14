@@ -23,11 +23,10 @@ import { BlocktimeHelper } from 'helpers';
 import {
   NodeInfo,
   ITXModalData,
-  ITransactionResult,
   TransactionStatus,
   IChainModule,
   ITXData,
-  ChainClass,
+  ChainNetwork,
 } from 'models';
 
 import { SubstrateEvents } from '@commonwealth/chain-events';
@@ -424,7 +423,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     const senderBalance = await sender.freeBalance;
     const netBalance = additionalDeposit ? senderBalance.sub(additionalDeposit) : senderBalance;
     let fees: SubstrateCoin;
-    if (sender.chainClass === ChainClass.Edgeware) {
+    if (sender.chain.network === ChainNetwork.Edgeware) {
       // XXX: we cannot compute tx fees on edgeware yet, so we are forced to assume no fees
       //   besides explicit additional fees
       fees = additionalDeposit || this.coins(0);
@@ -477,12 +476,12 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
           const txResultHandler = (result: SubmittableResult) => {
             const status = result.status;
             if (status.isReady) {
-              notifySuccess(`Pending ${txName}: "${objName}"`);
+              console.log(`Pending ${txName}: "${objName}"`);
               events.emit(TransactionStatus.Ready.toString(), {});
             } else if (status.isFinalized || status.isInBlock) {
               for (const e of result.events) {
                 if (this.api.events.system.ExtrinsicSuccess.is(e.event)) {
-                  notifySuccess(`Confirmed ${txName}: "${objName}"`);
+                  notifySuccess(`Confirmed ${txName}`);
                   events.emit(TransactionStatus.Success.toString(), {
                     hash: status.isFinalized ? status.asFinalized.toHex() : status.asInBlock.toHex(),
                     blocknum: this.app.chain.block.height,

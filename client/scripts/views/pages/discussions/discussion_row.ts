@@ -40,31 +40,34 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
     const discussionLink = `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-`
       + `${slugify(proposal.title)}`;
 
-    const rowHeader: any = [
-      (propType === OffchainThreadKind.Link && proposal.url)
-        && externalLink('a.external-discussion-link', proposal.url, [
-          extractDomain(proposal.url),
+    const rowHeader: any = link('a', discussionLink, proposal.title);
+    const rowSubheader = [
+      proposal.readOnly && [
+        m('.discussion-locked', [
+          m(Tag, {
+            size: 'xs',
+            label: [
+              m(Icon, { name: Icons.LOCK, size: 'xs' }),
+            ],
+          }),
         ]),
-      (propType === OffchainThreadKind.Link && proposal.url)
-        && m('span.spacer', ' '),
-      link('a', discussionLink, proposal.title),
+      ],
       proposal instanceof OffchainThread
         && (proposal.offchainVotingEndsAt || proposal.offchainVotingNumVotes)
         && [
-          m('span.spacer', m.trust(' &nbsp; ')),
           m(Button, {
             class: 'discussion-row-linked-poll',
-            label: 'POLL',
+            label: 'Poll',
             contentRight: pluralize(proposal.offchainVotingNumVotes, 'vote'),
-            intent: 'positive',
+            intent: 'warning',
             size: 'xs',
-            rounded: true,
             compact: true,
           }),
         ],
       proposal.chainEntities?.length > 0 && [
-        m('span.spacer', m.trust(' &nbsp; ')),
-        proposal.chainEntities.map((ce) => {
+        proposal.chainEntities.sort((a, b) => {
+          return a.typeId - b.typeId;
+        }).map((ce) => {
           if (!chainEntityTypeToProposalShortName(ce.type)) return;
           return m(Button, {
             class: 'discussion-row-linked-chain-entity',
@@ -74,65 +77,71 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
             ],
             intent: 'primary',
             size: 'xs',
-            rounded: true,
             compact: true,
           });
         }),
       ],
-    ];
-    const rowSubheader = [
-      proposal.readOnly && m('.discussion-locked', [
-        m(Tag, {
+      proposal instanceof OffchainThread
+        && proposal.stage !== OffchainThreadStage.Discussion
+        && m(Button, {
+          class: 'discussion-row-stage-btn',
+          intent: proposal.stage === OffchainThreadStage.ProposalInReview ? 'positive'
+            : proposal.stage === OffchainThreadStage.Voting ? 'positive'
+              : proposal.stage === OffchainThreadStage.Passed ? 'positive'
+                : proposal.stage === OffchainThreadStage.Failed ? 'negative' : 'positive',
           size: 'xs',
-          label: [
-            m(Icon, { name: Icons.LOCK, size: 'xs' }),
-          ],
+          compact: true,
+          label: offchainThreadStageToLabel(proposal.stage),
         }),
-      ]),
-      proposal.topic && link('a.proposal-topic', `/${app.activeId()}/discussions/${proposal.topic.name}`, [
-        m('span.proposal-topic-name', `${proposal.topic.name}`),
-      ]),
+      proposal instanceof OffchainThread && (
+        proposal.stage !== OffchainThreadStage.Discussion
+          || proposal.chainEntities?.length > 0
+          || (proposal.offchainVotingEndsAt || proposal.offchainVotingNumVotes)
+          || proposal.readOnly) && ' ', // en space
+      (propType === OffchainThreadKind.Link && proposal.url)
+        && [
+          externalLink('a.external-discussion-link', proposal.url, `Link: ${extractDomain(proposal.url)}`),
+          ' ', // em space
+        ],
+      proposal.topic && [
+        link('a.proposal-topic', `/${app.activeId()}/discussions/${proposal.topic.name}`, [
+          m('span.proposal-topic-name', `${proposal.topic.name}`),
+        ]),
+        ' ', // em space
+      ],
       m(User, {
         user: new AddressInfo(null, proposal.author, proposal.authorChain, null),
         linkify: true,
         popover: true,
         hideAvatar: true,
         showAddressWithDisplayName: true,
+        hideIdentityIcon: true,
       }),
       proposal instanceof OffchainThread && proposal.collaborators && proposal.collaborators.length > 0
-        && m('span.proposal-collaborators', [ ' +', proposal.collaborators.length ]),
+        && [
+          ' ', // regular space
+          m('span.proposal-collaborators', ` +${proposal.collaborators.length}`),
+        ],
+      ' ', // em space
       m('.created-at', link('a', discussionLink, `Last active ${formatLastUpdated(getLastUpdated(proposal))}`)),
       m('.mobile-comment-count', [
+        ' ', // em space
         m(Icon, { name: Icons.MESSAGE_SQUARE }),
         app.comments.nComments(proposal),
       ]),
-    ];
+    ] as any;
 
     const rowMetadata = [
       m('.discussion-row-right-meta', [
-        // offchain polls off, show stage & replyers
         m(UserGallery, {
           avatarSize: 20,
           popover: true,
-          maxUsers: 4,
+          maxUsers: 2,
           users: app.comments.uniqueCommenters(
             proposal,
             proposal.author,
             proposal.authorChain
           )
-        }),
-        m(Button, {
-          class: 'discussion-row-stage',
-          label: offchainThreadStageToLabel(proposal.stage),
-          intent: proposal.stage === OffchainThreadStage.Discussion ? 'none'
-            : proposal.stage === OffchainThreadStage.ProposalInReview ? 'positive'
-              : proposal.stage === OffchainThreadStage.Voting ? 'positive'
-                : proposal.stage === OffchainThreadStage.Passed ? 'positive'
-                  : proposal.stage === OffchainThreadStage.Failed ? 'negative'
-                    : proposal.stage === OffchainThreadStage.Abandoned ? 'negative' : 'none',
-          size: 'xs',
-          rounded: true,
-          compact: true,
         }),
       ]),
       app.isLoggedIn() && m('.discussion-row-menu', [

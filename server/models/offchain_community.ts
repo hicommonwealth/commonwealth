@@ -21,6 +21,8 @@ export interface OffchainCommunityAttributes {
   featured_topics?: string[];
   privacyEnabled?: boolean;
   invitesEnabled?: boolean;
+  stagesEnabled: boolean;
+  additionalStages: string;
   customDomain?: string;
   collapsed_on_homepage: boolean;
   created_at?: Date;
@@ -35,12 +37,13 @@ export interface OffchainCommunityAttributes {
   StarredCommunities?: StarredCommunityAttributes[] | StarredCommunityAttributes['id'][];
 }
 
-export interface OffchainComunityInstance
+export interface OffchainCommunityInstance
 extends Sequelize.Instance<OffchainCommunityAttributes>, OffchainCommunityAttributes {
 
 }
 
-export interface OffchainCommunityModel extends Sequelize.Model<OffchainComunityInstance, OffchainCommunityAttributes> {
+export interface OffchainCommunityModel
+extends Sequelize.Model<OffchainCommunityInstance, OffchainCommunityAttributes> {
 
 }
 
@@ -48,7 +51,7 @@ export default (
   sequelize: Sequelize.Sequelize,
   dataTypes: Sequelize.DataTypes,
 ): OffchainCommunityModel => {
-  const OffchainCommunity = sequelize.define<OffchainComunityInstance, OffchainCommunityAttributes>(
+  const OffchainCommunity = sequelize.define<OffchainCommunityInstance, OffchainCommunityAttributes>(
     'OffchainCommunity', {
       id: { type: dataTypes.STRING, primaryKey: true },
       name: { type: dataTypes.STRING, allowNull: false },
@@ -69,6 +72,8 @@ export default (
       // XXX: mixing camelCase and underscore_case is bad practice
       privacyEnabled: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
       invitesEnabled: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+      stagesEnabled: { type: dataTypes.BOOLEAN, allowNull: true, defaultValue: true },
+      additionalStages: { type: dataTypes.STRING, allowNull: true },
       customDomain: { type: dataTypes.STRING, allowNull: true, },
       collapsed_on_homepage: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: true },
     }, {

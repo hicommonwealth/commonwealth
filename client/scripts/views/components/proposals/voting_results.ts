@@ -1,8 +1,5 @@
 import 'components/proposals/voting_results.scss';
-import app from 'state';
 import m from 'mithril';
-import { VoteOutcome } from '@edgeware/node-types';
-import { u8aToString } from '@polkadot/util';
 
 import { formatCoin } from 'adapters/currency'; // TODO: remove formatCoin, only use coins.format()
 import User from 'views/components/widgets/user';
@@ -121,7 +118,7 @@ const VotingResults: m.Component<{ proposal }> = {
     if (proposal.votingType === VotingType.SimpleYesNoVoting) {
       return m('.VotingResults', [
         m('.results-column', [
-          m('.results-header', `Voted yes (${votes.filter((v) => v.choice === true).length})`),
+          m('.results-header', `Yes (${votes.filter((v) => v.choice === true).length})`),
           m('.results-cell', [
             m(VoteListing, {
               proposal,
@@ -130,7 +127,7 @@ const VotingResults: m.Component<{ proposal }> = {
           ]),
         ]),
         m('.results-column', [
-          m('.results-header', `Voted no (${votes.filter((v) => v.choice === false).length})`),
+          m('.results-header', `No (${votes.filter((v) => v.choice === false).length})`),
           m('.results-cell', [
             m(VoteListing, {
               proposal,
@@ -142,7 +139,7 @@ const VotingResults: m.Component<{ proposal }> = {
     } else if (proposal.votingType === VotingType.MolochYesNo) {
       return m('.VotingResults', [
         m('.results-column', [
-          m('.results-header', `Voted yes (${votes.filter((v) => v.choice === MolochVote.YES).length})`),
+          m('.results-header', `Yes (${votes.filter((v) => v.choice === MolochVote.YES).length})`),
           m('.results-cell', [
             m(VoteListing, {
               proposal,
@@ -151,7 +148,7 @@ const VotingResults: m.Component<{ proposal }> = {
           ]),
         ]),
         m('.results-column', [
-          m('.results-header', `Voted no (${votes.filter((v) => v.choice === MolochVote.NO).length})`),
+          m('.results-header', `No (${votes.filter((v) => v.choice === MolochVote.NO).length})`),
           m('.results-cell', [
             m(VoteListing, {
               proposal,
@@ -163,7 +160,7 @@ const VotingResults: m.Component<{ proposal }> = {
     } else if (proposal.votingType === VotingType.MarlinYesNo) {
       return m('.ProposalVotingResults', [
         m('.results-column', [
-          m('.results-header', `Voted yes (${votes.filter((v) => v.choice === MarlinVote.YES).length})`),
+          m('.results-header', `Yes (${votes.filter((v) => v.choice === MarlinVote.YES).length})`),
           m('.results-cell', [
             m(VoteListing, {
               proposal,
@@ -172,7 +169,7 @@ const VotingResults: m.Component<{ proposal }> = {
           ]),
         ]),
         m('.results-column', [
-          m('.results-header', `Voted no (${votes.filter((v) => v.choice === MarlinVote.NO).length})`),
+          m('.results-header', `No (${votes.filter((v) => v.choice === MarlinVote.NO).length})`),
           m('.results-cell', [
             m(VoteListing, {
               proposal,
@@ -184,7 +181,7 @@ const VotingResults: m.Component<{ proposal }> = {
     } else if (proposal.votingType === VotingType.ConvictionYesNoVoting) {
       return m('.VotingResults', [
         m('.results-column', [
-          m('.results-header', `Voted yes (${votes.filter((v) => v.choice === true).length})`),
+          m('.results-header', `Yes (${votes.filter((v) => v.choice === true).length})`),
           m('.results-cell', [
             m(VoteListing, {
               proposal,
@@ -195,7 +192,7 @@ const VotingResults: m.Component<{ proposal }> = {
           ]),
         ]),
         m('.results-column', [
-          m('.results-header', `Voted no (${votes.filter((v) => v.choice === false).length})`),
+          m('.results-header', `No (${votes.filter((v) => v.choice === false).length})`),
           m('.results-cell', [
             m(VoteListing, {
               proposal,
@@ -209,7 +206,7 @@ const VotingResults: m.Component<{ proposal }> = {
     } else if (proposal.votingType === VotingType.YesNoAbstainVeto) {
       return m('.VotingResults', [
         m('.results-column', [
-          m('.results-header', `Voted yes (${votes.filter((v) => v.choice === CosmosVoteChoice.YES).length})`),
+          m('.results-header', `Yes (${votes.filter((v) => v.choice === CosmosVoteChoice.YES).length})`),
           m('.results-cell', [
             m(VoteListing, {
               proposal,
@@ -218,7 +215,7 @@ const VotingResults: m.Component<{ proposal }> = {
           ]),
         ]),
         m('.results-column', [
-          m('.results-header', `Voted no (${votes.filter((v) => v.choice === CosmosVoteChoice.NO).length})`),
+          m('.results-header', `No (${votes.filter((v) => v.choice === CosmosVoteChoice.NO).length})`),
           m('.results-cell', [
             m(VoteListing, {
               proposal,
@@ -227,7 +224,7 @@ const VotingResults: m.Component<{ proposal }> = {
           ]),
         ]),
         m('.results-column', [
-          m('.results-header', `Voted abstain (${votes.filter((v) => v.choice === CosmosVoteChoice.ABSTAIN).length})`),
+          m('.results-header', `Abstained (${votes.filter((v) => v.choice === CosmosVoteChoice.ABSTAIN).length})`),
           m('.results-cell', [
             m(VoteListing, {
               proposal,
@@ -236,7 +233,7 @@ const VotingResults: m.Component<{ proposal }> = {
           ]),
         ]),
         m('.results-column', [
-          m('.results-header', `Voted veto (${votes.filter((v) => v.choice === CosmosVoteChoice.VETO).length})`),
+          m('.results-header', `No with veto (${votes.filter((v) => v.choice === CosmosVoteChoice.VETO).length})`),
           m('.results-cell', [
             m(VoteListing, {
               proposal,

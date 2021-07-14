@@ -7,8 +7,8 @@ import mixpanel from 'mixpanel-browser';
 import moment from 'moment';
 import app from 'state';
 
-import { Spinner, Button, ButtonGroup, Icons, Icon, PopoverMenu, MenuItem } from 'construct-ui';
-import { pluralize, offchainThreadStageToLabel } from 'helpers';
+import { Spinner, Button, ButtonGroup, Icons, Icon, PopoverMenu, MenuItem, MenuDivider } from 'construct-ui';
+import { pluralize, offchainThreadStageToLabel, parseCustomStages } from 'helpers';
 import { NodeInfo, CommunityInfo, OffchainThreadStage, OffchainThread } from 'models';
 
 import { updateLastVisited } from 'controllers/app/login';
@@ -44,58 +44,188 @@ const getLastSeenDivider = (hasText = true) => {
   ]);
 };
 
+export const CommunityOptionsPopover: m.Component<{ isAdmin: boolean, isMod: boolean }, {}> = {
+  view: (vnode) => {
+    const { isAdmin, isMod } = vnode.attrs;
+    if (!isAdmin && !isMod && !app.community?.meta.invitesEnabled) return;
+    return m(PopoverMenu, {
+      class: 'community-options-popover',
+      position: 'bottom',
+      transitionDuration: 0,
+      hoverCloseDelay: 0,
+      closeOnContentClick: true,
+      trigger: m(Icon, {
+        name: Icons.CHEVRON_DOWN,
+        style: 'margin-left: 6px;',
+      }),
+      content: [
+        isAdmin && m(MenuItem, {
+          label: 'New topic',
+          onclick: (e) => {
+            e.preventDefault();
+            app.modals.create({ modal: NewTopicModal });
+          }
+        }),
+        (app.community?.meta.invitesEnabled || isAdmin) && m(MenuItem, {
+          label: 'Invite members',
+          onclick: (e) => {
+            e.preventDefault();
+            const data = app.activeCommunityId()
+              ? { communityInfo: app.community.meta } : { chainInfo: app.chain.meta.chain };
+            app.modals.create({
+              modal: CreateInviteModal,
+              data,
+            });
+          },
+        }),
+        isAdmin && m(MenuItem, {
+          label: 'Manage community',
+          onclick: (e) => {
+            e.preventDefault();
+            app.modals.lazyCreate('manage_community_modal');
+          }
+        }),
+        (isAdmin || isMod) && app.activeId() && m(MenuItem, {
+          label: 'Analytics',
+          onclick: (e) => m.route.set(`/${app.activeId()}/analytics`),
+        }),
+      ],
+    });
+  }
+};
+
 const DiscussionStagesBar: m.Component<{ topic: string, stage: string }, {}> = {
   view: (vnode) => {
     const { topic, stage } = vnode.attrs;
+
+    if (!app.chain?.meta?.chain && !app.community?.meta) return;
+    const { stagesEnabled, additionalStages } = app.chain?.meta?.chain || app.community?.meta;
+
+    const featuredTopicIds = app.community?.meta?.featuredTopics || app.chain?.meta?.chain?.featuredTopics;
+    const topics = app.topics.getByCommunity(app.activeId()).map(({ id, name, description, telegram }) => {
+      return { id, name, description, telegram, featured_order: featuredTopicIds.indexOf(`${id}`) };
+    });
+    const featuredTopics = topics.filter((t) => t.featured_order !== -1)
+      .sort((a, b) => Number(a.featured_order) - Number(b.featured_order));
+    const otherTopics = topics.filter((t) => t.featured_order === -1)
+      .sort((a, b) => a.name.localeCompare(b.name));
+
+    const selectedTopic = topics.find((t) => topic && topic === t.name);
+    const selectedStage = [
+      OffchainThreadStage.Discussion,
+      OffchainThreadStage.ProposalInReview,
+      OffchainThreadStage.Voting,
+      OffchainThreadStage.Passed,
+      OffchainThreadStage.Failed,
+    ].find((s) => s === stage as any);
+
     return m('.DiscussionStagesBar.discussions-stages', [
-      m(ButtonGroup, [
-        m(Button, {
+      topics.length > 0 && m(PopoverMenu, {
+        trigger: m(Button, {
           rounded: true,
           compact: true,
+          class: 'discussions-topic',
+          label: selectedTopic ? `Filter: ${topic}` : 'All Discussions',
+          iconRight: Icons.CHEVRON_DOWN,
           size: 'sm',
-          class: 'discussions-stage',
-          onclick: (e) => {
-            e.preventDefault();
-            m.route.set(topic ? `/${app.activeId()}/discussions/${encodeURI(topic.trim())}` : `/${app.activeId()}`);
-          },
-          active: !stage,
-          label: 'All Stages'
         }),
-        [
-          OffchainThreadStage.Discussion,
-          OffchainThreadStage.ProposalInReview,
-          OffchainThreadStage.Voting,
-          OffchainThreadStage.Passed,
-          OffchainThreadStage.Failed,
-          OffchainThreadStage.Abandoned,
-        ].map((targetStage, index) => m(Button, {
-          class: 'discussions-stage',
-          active: stage === targetStage,
+        inline: true,
+        hasArrow: false,
+        transitionDuration: 0,
+        closeOnContentClick: true,
+        class: 'DiscussionStagesBarTopicsPopover',
+        content: m('.discussions-topic-items', [
+          m(MenuItem, {
+            active: (m.route.get() === `/${app.activeId()}` || !topic),
+            iconLeft: (m.route.get() === `/${app.activeId()}` || !topic) ? Icons.CHECK : null,
+            label: 'All Discussions',
+            onclick: () => { m.route.set(`/${app.activeId()}`); },
+          }),
+          m(MenuDivider),
+          // featured topics
+          featuredTopics.concat(otherTopics).map(({ id, name, description, telegram }, idx) => m(MenuItem, {
+            key: name,
+            active: (m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name.toString().trim())}`
+                     || (topic && topic === name)),
+            iconLeft: (m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name.toString().trim())}`
+                        || (topic && topic === name)) ? Icons.CHECK : null,
+            onclick: (e) => {
+              e.preventDefault();
+              m.route.set(`/${app.activeId()}/discussions/${name}`);
+            },
+            label: m('.topic-menu-item', [
+              m('.topic-menu-item-name', name),
+              app.user?.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() }) && m(Button, {
+                size: 'xs',
+                label: 'Edit',
+                class: 'edit-topic-button',
+                compact: true,
+                rounded: true,
+                onclick: (e) => {
+                  e.preventDefault();
+                  app.modals.create({
+                    modal: EditTopicModal,
+                    data: { id, name, description, telegram },
+                  });
+                }
+              }),
+            ]),
+          })),
+        ]),
+      }),
+      stagesEnabled && m(PopoverMenu, {
+        trigger: m(Button, {
           rounded: true,
+          compact: true,
+          class: 'discussions-stage',
+          label: selectedStage ? `Filter: ${offchainThreadStageToLabel(selectedStage)}` : 'All Stages',
+          iconRight: Icons.CHEVRON_DOWN,
           size: 'sm',
-          onclick: (e) => {
-            e.preventDefault();
-            m.route.set(
-              topic
-                ? `/${app.activeId()}/discussions/${encodeURI(topic.trim())}?stage=${targetStage}`
-                : `/${app.activeId()}?stage=${targetStage}`
-            );
-          },
-          label: [
-            `${offchainThreadStageToLabel(targetStage)}`,
-            targetStage === OffchainThreadStage.ProposalInReview
-              && [ ' ', m('.discussions-stage-count', `${app.threads.numPrevotingThreads}`) ],
-            targetStage === OffchainThreadStage.Voting
-              && [ ' ', m('.discussions-stage-count', `${app.threads.numVotingThreads}`) ],
-          ],
-        })),
-      ]),
+        }),
+        inline: true,
+        hasArrow: false,
+        transitionDuration: 0,
+        closeOnContentClick: true,
+        class: 'DiscussionStagesBarTopicsPopover',
+        content: m('.discussions-stage-items', [
+          m(MenuItem, {
+            onclick: (e) => {
+              e.preventDefault();
+              m.route.set(`/${app.activeId()}`);
+            },
+            active: !stage,
+            iconLeft: !stage ? Icons.CHECK : null,
+            label: 'All Stages'
+          }),
+          m(MenuDivider),
+          [
+            // OffchainThreadStage.Discussion,
+            OffchainThreadStage.ProposalInReview,
+            ...parseCustomStages(additionalStages),
+            OffchainThreadStage.Voting,
+            OffchainThreadStage.Passed,
+            OffchainThreadStage.Failed,
+          ].map((targetStage, index) => m(MenuItem, {
+            active: stage === targetStage,
+            iconLeft: stage === targetStage ? Icons.CHECK : null,
+            onclick: (e) => {
+              e.preventDefault();
+              m.route.set(`/${app.activeId()}?stage=${targetStage}`);
+            },
+            label: [
+              `${offchainThreadStageToLabel(targetStage)}`,
+              targetStage === OffchainThreadStage.Voting
+                && [ ' ', m('.discussions-stage-count', `${app.threads.numVotingThreads}`) ],
+            ],
+          })),
+        ]),
+      }),
     ]);
   }
 };
 
 const DiscussionsPage: m.Component<{ topic?: string }, {
-  lookback?: { [community: string]: moment.Moment} ;
+  lookback?: { [community: string]: moment.Moment};
   postsDepleted: { [community: string]: boolean };
   topicInitialized: { [community: string]: boolean };
   lastSubpage: string;
@@ -140,7 +270,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
     const stage = m.route.param('stage');
     const activeEntity = app.community ? app.community : app.chain;
     if (!activeEntity) return m(PageLoading, {
-      title: topic || 'Discussions',
+      title: 'Discussions',
       showNewProposalButton: true,
     });
 
@@ -148,7 +278,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
 
     // add chain compatibility (node info?)
     if (app.community && !activeEntity?.serverLoaded) return m(PageLoading, {
-      title: topic || 'Discussions',
+      title: 'Discussions',
       showNewProposalButton: true,
     });
 
@@ -262,7 +392,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
         if (!topicId) {
           return m(Sublayout, {
             class: 'DiscussionsPage',
-            title: topic || 'Discussions',
+            title: 'Discussions',
             showNewProposalButton: true,
           }, [
             m(EmptyTopicPlaceholder, {
@@ -330,92 +460,18 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
     let topicId;
     let topicName;
     let topicDescription;
-    let topicTelegram;
     if (topic && app.activeId()) {
       const topics = app.topics.getByCommunity(app.activeId());
       const topicObject = topics.find((t) => t.name === topic);
       topicId = topicObject?.id;
       topicName = topicObject?.name;
       topicDescription = topicObject?.description;
-      topicTelegram = topicObject?.telegram;
     }
 
     localStorage.setItem(`${app.activeId()}-lookback-${subpage}`, `${vnode.state.lookback[subpage].unix()}`);
     const stillFetching = (allThreads.length === 0 && vnode.state.postsDepleted[subpage] === false);
     const emptyTopic = (allThreads.length === 0 && vnode.state.postsDepleted[subpage] === true && !stage);
     const emptyStage = (allThreads.length === 0 && vnode.state.postsDepleted[subpage] === true && !!stage);
-
-    const featuredTopics = {};
-    const otherTopics = {};
-    const featuredTopicIds = app.community?.meta?.featuredTopics || app.chain?.meta?.chain?.featuredTopics;
-
-    const getTopicRow = (key, name, description, telegram) => m(Button, {
-      rounded: true,
-      compact: true,
-      class: 'discussions-topic',
-      key,
-      active: (m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name.toString().trim())}`
-               || (topic && topic === key)),
-      onclick: (e) => {
-        e.preventDefault();
-        m.route.set(`/${app.activeId()}/discussions/${name}`);
-      },
-      label: [
-        name,
-        telegram && m(PopoverMenu, {
-          inline: true,
-          transitionDuration: 0,
-          closeOnContentClick: true,
-          closeOnOutsideClick: true,
-          hasArrow: false,
-          content: [
-            m(MenuItem, {
-              href: telegram,
-              size: 'sm',
-              onclick: (e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                window.open(telegram);
-              },
-              label: `Open ${name} Telegram chat`,
-            }),
-          ],
-          trigger: m('a.topic-telegram', [ ' ', m(Icon, { name: Icons.MORE_HORIZONTAL }) ]),
-        }),
-      ],
-      size: 'sm',
-    });
-
-    const allTopicsListItem = m(Button, {
-      rounded: true,
-      compact: true,
-      class: 'discussions-topic',
-      active: (m.route.get() === `/${app.activeId()}` || !topic),
-      onclick: (e) => {
-        e.preventDefault();
-        m.route.set(`/${app.activeId()}`);
-      },
-      label: 'All Discussions',
-      size: 'sm',
-    });
-
-    app.topics.getByCommunity(app.activeId()).forEach(({ id, name, description, telegram }) => {
-      if (featuredTopicIds.includes(`${id}`)) {
-        featuredTopics[name] = { id, name, description, telegram, featured_order: featuredTopicIds.indexOf(`${id}`) };
-      } else {
-        otherTopics[name] = { id, name, description, telegram };
-      }
-    });
-    const otherTopicListItems = Object.keys(otherTopics)
-      .sort((a, b) => otherTopics[a].name.localeCompare(otherTopics[b].name))
-      .map((name, idx) => getTopicRow(
-        otherTopics[name].name, name, otherTopics[name].description, otherTopics[name].telegram
-      ));
-    const featuredTopicListItems = Object.keys(featuredTopics)
-      .sort((a, b) => Number(featuredTopics[a].featured_order) - Number(featuredTopics[b].featured_order))
-      .map((name, idx) => getTopicRow(
-        featuredTopics[name].name, name, featuredTopics[name].description, featuredTopics[name].telegram
-      ));
 
     const isAdmin = app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
     const isMod = app.user.isRoleOfCommunity({
@@ -424,111 +480,16 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
 
     return m(Sublayout, {
       class: 'DiscussionsPage',
-      title: topic ? [
-        topic,
-        m.route.get().startsWith(`/${app.activeId()}/discussions/${encodeURI(topicName)}`)
-          && app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
-          && m(PopoverMenu, {
-            class: 'sidebar-edit-topic',
-            position: 'bottom',
-            transitionDuration: 0,
-            hoverCloseDelay: 0,
-            closeOnContentClick: true,
-            trigger: m(Icon, {
-              name: Icons.CHEVRON_DOWN,
-              style: 'margin-left: 6px;',
-            }),
-            content: [
-              m(MenuItem, {
-                label: 'New topic',
-                onclick: (e) => {
-                  e.preventDefault();
-                  app.modals.create({ modal: NewTopicModal });
-                }
-              }),
-              m(MenuItem, {
-                label: 'Edit topic',
-                onclick: (e) => {
-                  e.preventDefault();
-                  app.modals.create({
-                    modal: EditTopicModal,
-                    data: { description: topicDescription, id: topicId, name: topicName, telegram: topicTelegram }
-                  });
-                }
-              }),
-            ],
-          }),
-      ] : [
+      title: [
         'Discussions',
         (isAdmin || isMod || app.community?.meta.invitesEnabled)
-          && m(PopoverMenu, {
-            class: 'sidebar-edit-topic',
-            position: 'bottom',
-            transitionDuration: 0,
-            hoverCloseDelay: 0,
-            closeOnContentClick: true,
-            trigger: m(Icon, {
-              name: Icons.CHEVRON_DOWN,
-              style: 'margin-left: 6px;',
-            }),
-            content: [
-              isAdmin && m(MenuItem, {
-                label: 'New topic',
-                onclick: (e) => {
-                  e.preventDefault();
-                  app.modals.create({ modal: NewTopicModal });
-                }
-              }),
-              (app.community?.meta.invitesEnabled || isAdmin) && m(MenuItem, {
-                label: 'Invite members',
-                onclick: (e) => {
-                  e.preventDefault();
-                  const data = app.activeCommunityId()
-                    ? { communityInfo: app.community.meta } : { chainInfo: app.chain.meta.chain };
-                  app.modals.create({
-                    modal: CreateInviteModal,
-                    data,
-                  });
-                },
-              }),
-              isAdmin && m(MenuItem, {
-                label: 'Manage community',
-                onclick: (e) => {
-                  e.preventDefault();
-                  app.modals.lazyCreate('manage_community_modal');
-                }
-              }),
-              (isAdmin || isMod) && app.activeId() && m(MenuItem, {
-                label: 'Analytics',
-                onclick: (e) => m.route.set(`/${app.activeId()}/analytics`),
-              }),
-            ],
-          }),
+        && m(CommunityOptionsPopover, { isAdmin, isMod })
       ],
       description: topicDescription,
       showNewProposalButton: true,
     }, [
       (app.chain || app.community) && [
         m('.discussions-main', [
-          // topics
-          app.topics.getByCommunity(app.activeId()).length > 0 && m('.discussions-topics', {
-            // onupdate: (vvnode) => {
-            //   if (app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
-            //       && !vnode.state.dragulaInitialized) {
-            //     vnode.state.dragulaInitialized = true;
-            //     dragula([vvnode.dom]).on('drop', async (el, target, source) => {
-            //       const reorder = Array.from(source.children).map((child) => {
-            //         return (child as HTMLElement).id;
-            //       });
-            //       await app.community.meta.updateFeaturedTopics(reorder);
-            //     });
-            //   }
-            // }
-          }, [
-            allTopicsListItem,
-            featuredTopicListItems,
-            otherTopicListItems,
-          ]),
           m(DiscussionStagesBar, { topic: topicName, stage }),
           (app.chain && (!activeEntity || !activeEntity.serverLoaded || stillFetching))
             ? m('.discussions-main', [

@@ -2,7 +2,7 @@ import 'components/reaction_button.scss';
 
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
-import { Tooltip } from 'construct-ui';
+import { Popover } from 'construct-ui';
 
 import app, { LoginState } from 'state';
 import { IUniqueId, Proposal, OffchainComment, OffchainThread, AnyProposal, AddressInfo } from 'models';
@@ -28,6 +28,7 @@ const ReactionButton: m.Component<{
   view: (vnode) => {
     const { post, type, displayAsLink, tooltip, large } = vnode.attrs;
     const reactions = app.reactions.getByPost(post);
+
     let dislikes;
     let likes;
     if (type === ReactionType.Like) likes = reactions.filter((r) => r.reaction === 'like');
@@ -121,11 +122,12 @@ const ReactionButton: m.Component<{
     ]);
 
     return (tooltip && reactors.length)
-      ? m(Tooltip, {
+      ? m(Popover, {
         class: 'ReactionButtonTooltip',
+        interactionType: 'hover',
         content: tooltipPopover,
         trigger: rxnButton,
-        hoverOpenDelay: 1000
+        hoverOpenDelay: 100
       })
       : rxnButton;
   }

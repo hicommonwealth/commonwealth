@@ -34,7 +34,7 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
         m.redraw();
         vnode.state.selectedIndex = null;
         // select the address, and close the form
-        notifySuccess(`Joined with ${formatAddressShort(addressInfo.address, addressInfo.chain)}`);
+        notifySuccess(`Joined with ${formatAddressShort(addressInfo.address, addressInfo.chain, true)}`);
         setActiveAccount(account).then(() => {
           m.redraw();
           $(e.target).trigger('modalexit');
@@ -88,13 +88,7 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
       m('.compact-modal-body', [
         activeAccountsByRole.length === 0 ? m('.select-address-placeholder', [
           m('p', [
-            `Connect ${articlize(app.chain?.meta?.chain.name || 'Web3')} address to participate in this community. `,
-          ]),
-          m('p', [
-            'This address will serve as your identity when you post, comment, or vote.'
-          ]),
-          m('p', [
-            'You may need to download a Web3 wallet to get started:'
+            `Connect ${articlize(app.chain?.meta?.chain.name || 'Web3')} address to join this community: `,
           ]),
         ]) : m('.select-address-options', [
           activeAccountsByRole.map(([account, role], index) => role && m('.select-address-option.existing', [

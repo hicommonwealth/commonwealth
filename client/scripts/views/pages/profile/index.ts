@@ -185,6 +185,8 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
     if (loading || !app.chain?.accounts) return m(PageLoading, { showNewProposalButton: true });
     if (!profile) {
       return m(PageNotFound, { message: 'Invalid address provided' });
+    } else if (!account) {
+      return m(PageLoading, { showNewProposalButton: true });
     }
 
     const account = app.chain.accounts.get(profile.address);
@@ -200,7 +202,7 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
       loadProfile();
     }
 
-    // TODO: search for cosmos proposals, if ChainClass is Cosmos
+    // TODO: search for cosmos proposals, if ChainBase is Cosmos
     const comments = vnode.state.comments
       .sort((a, b) => +b.createdAt - +a.createdAt);
     const proposals = vnode.state.threads

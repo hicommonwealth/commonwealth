@@ -2,6 +2,8 @@ import 'components/addresses/address_input_typeahead.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
+import User from 'views/components/widgets/user';
+import { AddressInfo } from 'models';
 import { InputSelect, ListItem } from 'construct-ui';
 
 import app from 'state';
@@ -53,7 +55,18 @@ const AddressInputTypeahead: m.Component<{ options: any, oninput }, { selectedIt
       checkmark: false,
       closeOnSelect: true,
       itemRender: (item: AddressInputTypeaheadItem) => m(ListItem, {
-        label: item.name || item.address,
+        label: [
+          m(User, {
+            user: new AddressInfo(null, item.address, item.chain, null),
+            avatarOnly: true,
+            avatarSize: 18,
+          }),
+          item.name ? [
+            m('strong', item.name),
+            ' ',
+            m('span.lighter', item.address),
+          ] : item.address
+        ],
         selected: vnode.state.selectedItem && vnode.state.selectedItem.address === item.address
       }),
       itemPredicate: (query: string, item: AddressInputTypeaheadItem) => {
