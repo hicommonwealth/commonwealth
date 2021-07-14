@@ -21,8 +21,8 @@ class ChainInfo {
   public stagesEnabled: boolean;
   public additionalStages: string;
   public customDomain: string;
-  public readonly blockExplorerIds: { [id: string]: string };
   public snapshot: string;
+  public readonly blockExplorerIds: { [id: string]: string };
   public readonly collapsedOnHomepage: boolean;
   public readonly featuredTopics: string[];
   public readonly topics: OffchainTopic[];
