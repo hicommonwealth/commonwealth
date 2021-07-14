@@ -90,16 +90,18 @@ const SnapshotProposalsPage: m.Component<{ topic?: string, snapshotId: string },
         case SnapshotProposalFilter.Community:
           return proposal.private;
         case SnapshotProposalFilter.Active:
-          return moment(+proposal.end * 1000) < moment();
-        case SnapshotProposalFilter.Ended:
           return moment(+proposal.end * 1000) >= moment();
+        case SnapshotProposalFilter.Ended:
+          return moment(+proposal.end * 1000) < moment();
         default:
           break;
       }
       return true;
     };
 
-    const proposals = allProposals.filter((proposal: SnapshotProposal) => checkProposalByFilter(proposal, selectedFilter));
+    const proposals = allProposals.filter(
+      (proposal: SnapshotProposal) => checkProposalByFilter(proposal, selectedFilter)
+    );
 
     const onChangeFilter = (value: SnapshotProposalFilter) => {
       vnode.state.selectedFilter = value;
