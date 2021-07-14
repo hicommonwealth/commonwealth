@@ -1,7 +1,7 @@
 import 'pages/discussions/discussion_row.scss';
 
 import m from 'mithril';
-import moment from 'moment-twitter';
+import moment from 'moment';
 import _ from 'lodash';
 
 import app from 'state';

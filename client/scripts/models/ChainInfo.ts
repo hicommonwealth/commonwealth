@@ -80,6 +80,7 @@ class ChainInfo {
     stagesEnabled,
     additionalStages,
     customDomain,
+    snapshot,
     blockExplorerIds,
     collapsed_on_homepage,
     featured_topics,

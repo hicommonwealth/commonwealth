@@ -45,7 +45,7 @@ export enum ChainNetwork {
   Gaia13k = 'gaia-13k',
   Yearn = 'yearn',
   Sushi = 'sushi',
-  Fei = 'fei'
+  Fei = 'fei',
   Demo = 'demo',
 }
 

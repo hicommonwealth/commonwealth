@@ -3,7 +3,7 @@ import 'pages/discussions/index.scss';
 import _ from 'lodash';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
-import moment from 'moment-twitter';
+import moment from 'moment';
 import app from 'state';
 
 import { Spinner, Button, ButtonGroup } from 'construct-ui';
