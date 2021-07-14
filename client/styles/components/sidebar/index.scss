@@ -285,6 +285,12 @@
     .cui-button {
         margin-bottom: 4px;
     }
+    .cui-button.cui-rounded:active,
+    .cui-button.cui-rounded.cui-active,
+    .cui-button.cui-rounded:hover {
+        background: linear-gradient(to left, #91FFA0, #FBFF91, #FF9191);
+        border-color: white;
+    }
 }
 
 .Sidebar {

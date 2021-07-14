@@ -10,23 +10,37 @@
         min-height: 260px;
         width: 100%;
     }
+    .proposal-card-metadata {
+        min-height: 115px;
+        max-height: 115px;
+        margin-bottom: 18px;
+        overflow-y: hidden;
+    }
     .proposal-injected {
-        margin-top: 16px;
         margin-bottom: 4px;
         padding: 0 2px;
     }
-
+    .card-subheader {
+        color: #666666;
+        margin-bottom: 5px;
+        font-size: 14px;
+        line-height: 1.1;
+    }
     .cui-tag {
-        font-weight: 600;
-        min-height: none;
-        height: 21px;
+        background: #F6F6F6;
+        border-radius: 4px;
+        height: 30px;
+        color: black;
+        border-color: transparent;
+        font-weight: 500;
     }
     .cui-tag.proposal-became-tag {
         background: tint($primary-bg-color, 40%);
         border-color: tint($primary-bg-color, 40%);
     }
     .proposal-title {
-        font-weight: 600;
+        font-size: 18px;
+        font-weight: 500;
         line-height: 1.1;
         margin: 9px 0 6px;
     }
@@ -37,13 +51,13 @@
     .proposal-action {
         display: inline-block;
         color: $text-color-light;
-        font-weight: 600;
+        font-weight: 500;
         font-size: 80%;
         text-transform: uppercase;
     }
     .proposal-thread-link {
         line-height: 1;
-        font-weight: 600;
+        font-weight: 500;
         //
         padding: 12px 15px 6px;
         background: $background-color-light;
@@ -70,7 +84,7 @@
     .proposal-status {
         position: absolute;
         bottom: 14px;
-        font-weight: 600;
+        font-weight: 500;
         line-height: 1.1;
         margin-bottom: 4px;
         color: $text-color-black;
