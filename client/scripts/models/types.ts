@@ -64,21 +64,13 @@ export enum OffchainThreadKind {
   Request = 'request',
 }
 
+// TODO: this list should be shared with the server
 export enum OffchainThreadStage {
   Discussion = 'discussion',
   ProposalInReview = 'proposal_in_review',
   Voting = 'voting',
   Passed = 'passed',
   Failed = 'failed',
-}
-
-export enum OffchainVoteOptions {
-  SUPPORT_2,
-  SUPPORT,
-  NEUTRAL_SUPPORT,
-  NEUTRAL_OPPOSE,
-  OPPOSE,
-  OPPOSE_2,
 }
 
 export enum TransactionStatus {

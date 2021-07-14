@@ -18,6 +18,8 @@ class ChainInfo {
   public element: string;
   public telegram: string;
   public github: string;
+  public stagesEnabled: boolean;
+  public additionalStages: string;
   public customDomain: string;
   public readonly blockExplorerIds: { [id: string]: string };
   public readonly collapsedOnHomepage: boolean;
@@ -33,6 +35,7 @@ class ChainInfo {
 
   constructor({
     id, network, symbol, name, iconUrl, description, website, discord, element, telegram, github,
+    stagesEnabled, additionalStages,
     customDomain, blockExplorerIds, collapsedOnHomepage, featuredTopics, topics, adminsAndMods,
     base, ss58_prefix, type, decimals, substrateSpec
   }) {
@@ -48,6 +51,8 @@ class ChainInfo {
     this.element = element;
     this.telegram = telegram;
     this.github = github;
+    this.stagesEnabled = stagesEnabled;
+    this.additionalStages = additionalStages;
     this.customDomain = customDomain;
     this.blockExplorerIds = blockExplorerIds;
     this.collapsedOnHomepage = collapsedOnHomepage;
@@ -72,6 +77,8 @@ class ChainInfo {
     element,
     telegram,
     github,
+    stagesEnabled,
+    additionalStages,
     customDomain,
     blockExplorerIds,
     collapsed_on_homepage,
@@ -103,6 +110,8 @@ class ChainInfo {
       element,
       telegram,
       github,
+      stagesEnabled,
+      additionalStages,
       customDomain,
       blockExplorerIds: blockExplorerIdsParsed,
       collapsedOnHomepage: collapsed_on_homepage,
@@ -165,10 +174,10 @@ class ChainInfo {
   }
 
   // TODO: change to accept an object
-  public async updateChainData(
-    name: string, description: string, website: string, discord: string, element: string, telegram: string,
-    github: string, customDomain: string
-  ) {
+  public async updateChainData({
+    name, description, website, discord, element, telegram,
+    github, stagesEnabled, additionalStages, customDomain
+  }) {
     // TODO: Change to PUT /chain
     const r = await $.post(`${app.serverUrl()}/updateChain`, {
       'id': app.activeChainId(),
@@ -179,6 +188,8 @@ class ChainInfo {
       'element': element,
       'telegram': telegram,
       'github': github,
+      'stagesEnabled': stagesEnabled,
+      'additionalStages': additionalStages,
       'customDomain': customDomain,
       'jwt': app.user.jwt,
     });
@@ -190,6 +201,8 @@ class ChainInfo {
     this.element = updatedChain.element;
     this.telegram = updatedChain.telegram;
     this.github = updatedChain.github;
+    this.stagesEnabled = updatedChain.stagesEnabled;
+    this.additionalStages = updatedChain.additionalStages;
     this.customDomain = updatedChain.customDomain;
   }
 

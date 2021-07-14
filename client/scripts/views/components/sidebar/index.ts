@@ -179,14 +179,20 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
 
     const onProposalPage = (p) => (
       p.startsWith(`/${app.activeChainId()}/proposals`)
-        || p.startsWith(`/${app.activeChainId()}/proposal/councilmotion`)
         || p.startsWith(`/${app.activeChainId()}/proposal/democracyproposal`));
     const onReferendaPage = (p) => p.startsWith(`/${app.activeChainId()}/referenda`)
       || p.startsWith(`/${app.activeChainId()}/proposal/referendum`);
+
     const onTreasuryPage = (p) => p.startsWith(`/${app.activeChainId()}/treasury`)
       || p.startsWith(`/${app.activeChainId()}/proposal/treasuryproposal`);
     const onBountiesPage = (p) => p.startsWith(`/${app.activeChainId()}/bounties`);
+    const onTipsPage = (p) => p.startsWith(`/${app.activeChainId()}/tips`)
+      || p.startsWith(`/${app.activeChainId()}/proposal/treasurytip`);
+
     const onCouncilPage = (p) => p.startsWith(`/${app.activeChainId()}/council`);
+    const onMotionPage = (p) => (
+      p.startsWith(`/${app.activeChainId()}/motions`)
+        || p.startsWith(`/${app.activeChainId()}/proposal/councilmotion`));
 
     const onValidatorsPage = (p) => p.startsWith(`/${app.activeChainId()}/validators`);
     const onNotificationsPage = (p) => p.startsWith('/notifications');
@@ -219,12 +225,40 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           fluid: true,
           rounded: true,
           active: onProposalPage(m.route.get()),
-          label: app.chain?.base === ChainBase.Substrate ? 'Proposals & Motions' : 'Proposals',
+          label: 'Proposals',
+          class: app.chain?.base === ChainBase.Substrate ? 'sub-button' : '',
           onclick: (e) => {
             e.preventDefault();
             m.route.set(`/${app.activeChainId()}/proposals`);
           },
         }),
+      // // motions (substrate only)
+      // !app.community && (app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Darwinia)
+      //   && m(Button, {
+      //     fluid: true,
+      //     rounded: true,
+      //     active: onMotionPage(m.route.get()),
+      //     label: 'Motions',
+      //     class: 'sub-button',
+      //     onclick: (e) => {
+      //       e.preventDefault();
+      //       m.route.set(`/${app.activeChainId()}/motions`);
+      //     },
+      //   }),
+      // council (substrate only)
+      !app.community && app.chain?.base === ChainBase.Substrate
+        && m(Button, {
+          fluid: true,
+          rounded: true,
+          active: onCouncilPage(m.route.get()),
+          label: 'Councillors',
+          class: 'sub-button',
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set(`/${app.activeChainId()}/council`);
+          },
+        }),
+      m('.sidebar-spacer'),
       // treasury (substrate only)
       !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Centrifuge
         && m(Button, {
@@ -246,24 +280,27 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           rounded: true,
           active: onBountiesPage(m.route.get()),
           label: 'Bounties',
+          class: 'sub-button',
           onclick: (e) => {
             e.preventDefault();
             m.route.set(`/${app.activeChainId()}/bounties`);
           },
         }),
-      m('.sidebar-spacer'),
-      // council (substrate only)
-      !app.community && app.chain?.base === ChainBase.Substrate
+      // tips (substrate only)
+      // TODO: which chains?
+      !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Centrifuge
         && m(Button, {
           fluid: true,
           rounded: true,
-          active: onCouncilPage(m.route.get()),
-          label: 'Councillors',
+          active: onTipsPage(m.route.get()),
+          label: 'Tips',
+          class: 'sub-button',
           onclick: (e) => {
             e.preventDefault();
-            m.route.set(`/${app.activeChainId()}/council`);
+            m.route.set(`/${app.activeChainId()}/tips`);
           },
         }),
+      m('.sidebar-spacer'),
       // validators (substrate only)
       !app.community && app.chain?.base === ChainBase.Substrate
         && app.chain?.network !== ChainNetwork.Kulupu && app.chain?.network !== ChainNetwork.Darwinia

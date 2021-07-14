@@ -1,8 +1,6 @@
 import m from 'mithril';
 import jdenticon from 'jdenticon';
 
-import { formatAddressShort } from '../../../shared/utils';
-
 class Profile {
   private _name: string;
   private _headline: string;
@@ -86,13 +84,6 @@ class Profile {
   get displayName() : string {
     if (!this._initialized) return 'Loading...';
     return this.name || 'Anonymous';
-  }
-
-  get displayNameWithAddress() : string {
-    if (!this._initialized) return 'Loading...';
-    return this.name
-      ? `${this.name} · ${formatAddressShort(this.address, this.chain)}`
-      : formatAddressShort(this.address, this.chain);
   }
 
   public getAvatar(size: number) {

@@ -8,7 +8,7 @@ import moment from 'moment';
 import app from 'state';
 
 import { Spinner, Button, ButtonGroup, Icons, Icon, PopoverMenu, MenuItem, MenuDivider } from 'construct-ui';
-import { pluralize, offchainThreadStageToLabel } from 'helpers';
+import { pluralize, offchainThreadStageToLabel, parseCustomStages } from 'helpers';
 import { NodeInfo, CommunityInfo, OffchainThreadStage, OffchainThread } from 'models';
 
 import { updateLastVisited } from 'controllers/app/login';
@@ -107,6 +107,9 @@ const DiscussionStagesBar: m.Component<{ topic: string, stage: string }, {}> = {
   view: (vnode) => {
     const { topic, stage } = vnode.attrs;
 
+    if (!app.chain?.meta?.chain && !app.community?.meta) return;
+    const { stagesEnabled, additionalStages } = app.chain?.meta?.chain || app.community?.meta;
+
     const featuredTopicIds = app.community?.meta?.featuredTopics || app.chain?.meta?.chain?.featuredTopics;
     const topics = app.topics.getByCommunity(app.activeId()).map(({ id, name, description, telegram }) => {
       return { id, name, description, telegram, featured_order: featuredTopicIds.indexOf(`${id}`) };
@@ -179,7 +182,7 @@ const DiscussionStagesBar: m.Component<{ topic: string, stage: string }, {}> = {
           })),
         ]),
       }),
-      m(PopoverMenu, {
+      stagesEnabled && m(PopoverMenu, {
         trigger: m(Button, {
           rounded: true,
           compact: true,
@@ -207,6 +210,7 @@ const DiscussionStagesBar: m.Component<{ topic: string, stage: string }, {}> = {
           [
             // OffchainThreadStage.Discussion,
             OffchainThreadStage.ProposalInReview,
+            ...parseCustomStages(additionalStages),
             OffchainThreadStage.Voting,
             OffchainThreadStage.Passed,
             OffchainThreadStage.Failed,
@@ -219,8 +223,6 @@ const DiscussionStagesBar: m.Component<{ topic: string, stage: string }, {}> = {
             },
             label: [
               `${offchainThreadStageToLabel(targetStage)}`,
-              targetStage === OffchainThreadStage.ProposalInReview
-                && [ ' ', m('.discussions-stage-count', `${app.threads.numPrevotingThreads}`) ],
               targetStage === OffchainThreadStage.Voting
                 && [ ' ', m('.discussions-stage-count', `${app.threads.numVotingThreads}`) ],
             ],

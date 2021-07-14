@@ -82,6 +82,8 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
           privacyEnabled: community.privacyEnabled,
           featuredTopics: community.featured_topics,
           topics: community.topics,
+          stagesEnabled: community.stagesEnabled,
+          additionalStages: community.additionalStages,
           customDomain: community.customDomain,
           adminsAndMods: [],
         }));
@@ -130,10 +132,12 @@ export async function deinitChainOrCommunity() {
     app.chain.networkStatus = ApiStatus.Disconnected;
     app.chain.deinitServer();
     await app.chain.deinit();
+    console.log('Finished deinitializing chain');
     app.chain = null;
   }
   if (app.community) {
     await app.community.deinit();
+    console.log('Finished deinitializing community');
     app.community = null;
   }
   app.user.setSelectedNode(null);
@@ -310,9 +314,14 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
   const finalizeInitialization = await newChain.initServer();
 
   // If the user is still on the initializing node, finalize the
-  // initialization; otherwise, abort and return false
+  // initialization; otherwise, abort, deinit, and return false.
+  //
+  // Also make sure the state is sufficiently reset so that the
+  // next redraw cycle will reinitialize any needed chain.
   if (!finalizeInitialization) {
+    console.log('Chain loading aborted');
     app.chainPreloading = false;
+    app.chain = null;
     return false;
   } else {
     app.chain = newChain;
@@ -606,6 +615,7 @@ $(() => {
     '/:scope/proposals':         importRoute('views/pages/proposals', { scoped: true }),
     '/:scope/treasury':          importRoute('views/pages/treasury', { scoped: true }),
     '/:scope/bounties':          importRoute('views/pages/bounties', { scoped: true }),
+    '/:scope/tips':              importRoute('views/pages/tips', { scoped: true }),
     '/:scope/proposal/:type/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
     '/:scope/council':           importRoute('views/pages/council', { scoped: true }),
     '/:scope/delegate':          importRoute('views/pages/delegate', { scoped: true, }),
@@ -630,6 +640,10 @@ $(() => {
     // NEAR login
     '/:scope/finishNearLogin':    importRoute('views/pages/finish_near_login', { scoped: true }),
   });
+
+  const script = document.createElement('noscript');
+  m.render(script, m.trust('<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KRWH69V" height="0" width="0" style="display:none;visibility:hidden"></iframe>'));
+  document.body.insertBefore(script, document.body.firstChild);
 
   // initialize construct-ui focus manager
   FocusManager.showFocusOnlyOnTab();

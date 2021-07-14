@@ -52,6 +52,14 @@
   top: 20px;
 }
 
+.tokenSectionContainer {
+  max-width: 95%;
+}
+
+.chatIconsContainer {
+  display: flex;
+}
+
 li.LandingPageHeaderLoginButton.ml-10.pt-2 {
   white-space: nowrap;
   a.btn-primary.pb-3.text-white {
@@ -72,20 +80,6 @@ li.LandingPageHeaderLoginButton.ml-10.pt-2 {
 li.LandingPageMenuButton.ml-10.pt-2 {
   white-space: nowrap;
   background: white;
-  // a.btn-primary.pb-3.text-white {
-  //   padding-top: 14px;
-  //   padding-bottom: 9px;
-  //   color: $text-color-white;
-  //   text-decoration: none;
-  //   cursor: pointer;
-  //   &:hover {
-  //     background-color: $background-color-black-hover;
-  //   }
-  //   img {
-  //     position: relative;
-  //     top: -2px;
-  //   }
-  // }
 }
 
 .HeaderLandingPage {
@@ -100,20 +94,39 @@ li.LandingPageMenuButton.ml-10.pt-2 {
   top: -100px;
 }
 
-header.landing-header {
-  @media (min-width: 1023px) {
-    width: 91%;
+.fixed-header {
+  width: 100%;
+  max-width: 1244px;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+  top: 0px;
+  margin-top: 0;
+  left: 50%;
+  transform: translate(-50%, 0);
+}
+
+header {
+  border-radius: 50px;
+  transition: border-radius 0.15s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+header {
+  @media (max-width: 1023px) {
+    border-radius: 33px;
+    &.fixed-header {
+      width: calc(100% - 2rem);
+    }
   }
 
-  @media (min-width: 1100px) {
-    width: 85%;
-  }
+  // @media (min-width: 1100px) {
+  //   width: 85%;
+  // }
 
-  @media (min-width: 1300px) {
-    width: 75%;
-  }
+  // @media (min-width: 1300px) {
+  //   width: 75%;
+  // }
 
-  @media (min-width: 1500px) {
-    width: 90%;
-  }
+  // @media (min-width: 1500px) {
+  //   width: 90%;
+  // }
 }
