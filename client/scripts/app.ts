@@ -35,6 +35,7 @@ import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import LoginModal from 'views/modals/login_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';
 import { AaveTypes, MarlinTypes, MolochTypes } from '@commonwealth/chain-events';
+import { formatSpace } from './helpers/snapshot_utils/snapshot_utils';
 
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/landing');
