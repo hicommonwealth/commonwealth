@@ -58,9 +58,14 @@ $discussion-title-font-size: 1.45rem;
     //
     .ProposalHeader {
         position: relative;
-        .snapshot-proposal-top {
-            display: flex;
-            border-bottom: 1px solid $background-color-light;
+        &.proposal-snapshot {
+            .snapshot-proposal-top {
+                display: flex;
+                border-bottom: 1px solid $background-color-light;
+            }
+            .proposal-content {
+                padding: 25px 0;
+            }
         }
         .proposal-top {
             display: flex;

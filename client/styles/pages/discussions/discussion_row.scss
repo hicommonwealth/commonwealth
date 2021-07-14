@@ -96,8 +96,9 @@
                 }
             }
             .m-l-20 {
+                color: $text-color-light;
                 @media(min-width: 800px){
-                    margin-left: 20px;
+                    margin-left: 10px;
                 }
             }
         }

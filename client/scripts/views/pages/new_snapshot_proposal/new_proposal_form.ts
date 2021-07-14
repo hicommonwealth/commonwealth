@@ -15,6 +15,7 @@ import { formatSpace } from 'helpers/snapshot_utils/snapshot_utils';
 
 import { notifyError } from 'controllers/app/notifications';
 import QuillEditor from 'views/components/quill_editor';
+import { capitalize } from 'lodash';
 
 interface IThreadForm {
   name: string;
@@ -130,45 +131,49 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
   saving: boolean,
   space: any,
   members: string[],
-  userScore: any
+  userScore: any,
+  initialized: boolean,
+  snapshotScoresFetched: boolean,
 }> = {
-  oninit: (vnode) => {
-    vnode.state.space = {};
-    vnode.state.members = [];
-    vnode.state.userScore = null;
-    vnode.state.form = {
-      name: '',
-      body: '',
-      choices: ['Yes', 'No'],
-      start: 0,
-      end: 0,
-      snapshot: 0,
-      metadata: {},
-      type: 'single-choice'
-    };
-
-    const space = app.snapshot.spaces[vnode.attrs.snapshotId];
-
-    snapshotJs.utils.getScores(
-      space.key,
-      space.strategies,
-      space.network,
-      snapshotJs.utils.getProvider(space.network),
-      [app.user.activeAccount.address]
-    ).then((response) => {
-      const scores = response
-        .map((score) => Object.values(score).reduce((a, b) => (a as number) + (b as number), 0))
-        .reduce((a, b) => (a as number) + (b as number), 0);
-      vnode.state.userScore = scores as number;
-      vnode.state.space = space;
-      vnode.state.members = space.members;
-
-      m.redraw();
-    });
-  },
-
   view: (vnode) => {
     if (!app.community && !app.chain) return;
+    if (!app.snapshot.spaces) return;
+    if (!vnode.state.initialized) {
+      vnode.state.initialized = true;
+      vnode.state.space = {};
+      vnode.state.members = [];
+      vnode.state.userScore = null;
+      vnode.state.form = {
+        name: '',
+        body: '',
+        choices: ['Yes', 'No'],
+        start: 0,
+        end: 0,
+        snapshot: 0,
+        metadata: {},
+        type: 'single-choice'
+      };
+
+      const space = app.snapshot.spaces[vnode.attrs.snapshotId];
+
+      snapshotJs.utils.getScores(
+        space.key,
+        space.strategies,
+        space.network,
+        snapshotJs.utils.getProvider(space.network),
+        [app.user.activeAccount.address]
+      ).then((response) => {
+        const scores = response
+          .map((score) => Object.values(score).reduce((a, b) => (a as number) + (b as number), 0))
+          .reduce((a, b) => (a as number) + (b as number), 0);
+        vnode.state.userScore = scores as number;
+        vnode.state.space = space;
+        vnode.state.members = space.members;
+        vnode.state.snapshotScoresFetched = true;
+        m.redraw();
+      });
+    }
+    if (!vnode.state.snapshotScoresFetched) return;
     const author = app.user.activeAccount;
     const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
     if (vnode.state.quillEditorState?.container) {
@@ -295,7 +300,7 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
                 oncreateBind: (state) => {
                   vnode.state.quillEditorState = state;
                 },
-                placeholder: 'What is your proposal',
+                placeholder: 'What is your proposal?',
                 editorNamespace: 'new-proposal',
                 tabindex: 2,
               })
@@ -315,7 +320,7 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
                     clearLocalStorage();
                   } catch (err) {
                     vnode.state.saving = false;
-                    notifyError(err.message);
+                    notifyError(capitalize(err.message));
                   }
                 },
               }),

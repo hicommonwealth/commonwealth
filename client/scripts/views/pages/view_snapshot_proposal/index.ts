@@ -10,14 +10,16 @@ import app from 'state';
 import Sublayout from 'views/sublayout';
 import { AddressInfo, SnapshotProposal } from 'models';
 import ConfirmSnapshotVoteModal from 'views/modals/confirm_snapshot_vote_modal';
-import { formatSpace, getProposal, getPower } from 'helpers/snapshot_utils/snapshot_utils';
+import { getProposal, getPower } from 'helpers/snapshot_utils/snapshot_utils';
 
+import { notifyError } from 'controllers/app/notifications';
 import { ProposalHeaderTitle } from './header';
 import {
   ProposalBodyAuthor, ProposalBodyCreated,
   ProposalBodyLastEdited, ProposalBodyText,
 } from './body';
 import User from '../../components/widgets/user';
+import { SocialSharingCarat } from '../../components/social_sharing_carat';
 
 const ProposalHeader: m.Component<{
   snapshotId: string
@@ -45,7 +47,8 @@ const ProposalHeader: m.Component<{
           m('.proposal-body-meta', [
             m(ProposalBodyCreated, { item: proposal, link: proposalLink }),
             m(ProposalBodyLastEdited, { item: proposal }),
-            m(ProposalBodyAuthor, { item: proposal })
+            m(ProposalBodyAuthor, { item: proposal }),
+            m('.CommentSocialHeader', [ m(SocialSharingCarat) ]),
           ]),
         ]),
       ]),
@@ -146,38 +149,46 @@ const VoteAction: m.Component<{
       m.redraw();
     };
 
-    const voteYes = async (e) => {
-      e.preventDefault();
-      vnode.state.votingModalOpen = false;
-      app.modals.create({
-        modal: ConfirmSnapshotVoteModal,
-        data: {
-          space: vnode.attrs.space,
-          proposal: vnode.attrs.proposal,
-          id: vnode.attrs.id,
-          selectedChoice: 0,
-          totalScore: vnode.attrs.totalScore,
-          scores: vnode.attrs.scores,
-          snapshot: vnode.attrs.proposal.msg.payload.snapshot
-        }
-      });
+    const voteYes = async (event) => {
+      event.preventDefault();
+      try {
+        app.modals.create({
+          modal: ConfirmSnapshotVoteModal,
+          data: {
+            space: vnode.attrs.space,
+            proposal: vnode.attrs.proposal,
+            id: vnode.attrs.id,
+            selectedChoice: 0,
+            totalScore: vnode.attrs.totalScore,
+            scores: vnode.attrs.scores,
+            snapshot: vnode.attrs.proposal.msg.payload.snapshot
+          }
+        });
+        vnode.state.votingModalOpen = true;
+      } catch (err) {
+        notifyError('Voting failed');
+      }
     };
 
-    const voteNo = (e) => {
-      e.preventDefault();
-      vnode.state.votingModalOpen = false;
-      app.modals.create({
-        modal: ConfirmSnapshotVoteModal,
-        data: {
-          space: vnode.attrs.space,
-          proposal: vnode.attrs.proposal,
-          id: vnode.attrs.id,
-          selectedChoice: 1,
-          totalScore: vnode.attrs.totalScore,
-          scores: vnode.attrs.scores,
-          snapshot: vnode.attrs.proposal.msg.payload.snapshot,
-        }
-      });
+    const voteNo = (event) => {
+      event.preventDefault();
+      try {
+        app.modals.create({
+          modal: ConfirmSnapshotVoteModal,
+          data: {
+            space: vnode.attrs.space,
+            proposal: vnode.attrs.proposal,
+            id: vnode.attrs.id,
+            selectedChoice: 1,
+            totalScore: vnode.attrs.totalScore,
+            scores: vnode.attrs.scores,
+            snapshot: vnode.attrs.proposal.msg.payload.snapshot,
+          }
+        });
+        vnode.state.votingModalOpen = true;
+      } catch (err) {
+        notifyError('Voting failed');
+      }
     };
 
     const yesButton = m('.yes-button', [
