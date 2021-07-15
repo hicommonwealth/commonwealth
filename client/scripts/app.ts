@@ -316,34 +316,6 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/ethereum/commonwealth/adapter'
     )).default;
     newChain = new Commonwealth(n, app);
-  } else if (n.chain.network === ChainNetwork.Yearn) {
-    const Yearn = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "commonwealth-main" */
-      './controllers/chain/ethereum/snapshot/adapter'
-    )).default;
-    newChain = new Yearn(n, app);
-  } else if (n.chain.network === ChainNetwork.Fei) {
-    const Fei = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "commonwealth-main" */
-      './controllers/chain/ethereum/snapshot/adapter'
-    )).default;
-    newChain = new Fei(n, app);
-  } else if (n.chain.network === ChainNetwork.Sushi) {
-    const Snapshot = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "commonwealth-main" */
-      './controllers/chain/ethereum/snapshot/adapter'
-    )).default;
-    newChain = new Snapshot(n, app);
-  } else if (n.chain.network === ChainNetwork.Demo) {
-    const Snapshot = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "commonwealth-main" */
-      './controllers/chain/ethereum/snapshot/adapter'
-    )).default;
-    newChain = new Snapshot(n, app);
   } else {
     throw new Error('Invalid chain');
   }
