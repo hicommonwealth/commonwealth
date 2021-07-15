@@ -115,7 +115,7 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
           placeholder: 'gov.edgewa.re',
           onChangeHandler: (v) => { vnode.state.customDomain = v; },
         }),
-        (app.chain as Token).isToken ? m(InputPropertyRow, {
+        app.chain?.meta.chain.base === 'ethereum' ? m(InputPropertyRow, {
           title: 'Snapshot',
           defaultValue: vnode.state.snapshot,
           placeholder: vnode.state.network,
@@ -156,7 +156,7 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
             snapshot
           } = vnode.state;
 
-          if (snapshot !== '' && !(/^[a-z]+\.eth/).test(snapshot)) {
+          if (snapshot && snapshot !== '' && !(/^[a-z]+\.eth/).test(snapshot)) {
             notifyError('Snapshot name must be in the form of *.eth');
             return;
           }
