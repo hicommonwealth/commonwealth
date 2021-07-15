@@ -15,7 +15,7 @@ class TokenListCache {
     private readonly _cachingPeriodS = TWENTY_FOUR_HOURS,
     private readonly _tokenListUrls = [
       // 'https://tokens.coingecko.com/uniswap/all.json',
-      // 'https://gateway.ipfs.io/ipns/tokens.uniswap.org',
+      'https://gateway.ipfs.io/ipns/tokens.uniswap.org',
       // 'https://raw.githubusercontent.com/jab416171/uniswap-pairtokens/master/uniswap_pair_tokens.json',
       // 'https://app.tryroll.com/tokens.json',
     ],
