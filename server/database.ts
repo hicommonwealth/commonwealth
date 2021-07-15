@@ -12,9 +12,9 @@ export const sequelize = new Sequelize(DATABASE_URI, {
   operatorsAliases: false,
   logging: (process.env.NODE_ENV === 'test') ? false : (msg) => { log.trace(msg); },
   dialectOptions: (process.env.NODE_ENV !== 'production') ? {
-    // requestTimeout: 10000,
+    requestTimeout: 10000,
   } : {
-    // requestTimeout: 10000,
+    requestTimeout: 10000,
     ssl: { rejectUnauthorized: false }
   },
   pool: {
