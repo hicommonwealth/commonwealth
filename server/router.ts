@@ -1,6 +1,7 @@
 import express from 'express';
 import webpack from 'webpack';
 import passport from 'passport';
+import { GITHUB_OAUTH_CALLBACK } from './config';
 
 import status from './routes/status';
 import createGist from './routes/createGist';
@@ -20,6 +21,7 @@ import getAddressStatus from './routes/getAddressStatus';
 import selectNode from './routes/selectNode';
 import startEmailLogin from './routes/startEmailLogin';
 import finishEmailLogin from './routes/finishEmailLogin';
+import githubLogin from './routes/githubLogin';
 import createComment from './routes/createComment';
 import editComment from './routes/editComment';
 import deleteComment from './routes/deleteComment';
@@ -462,11 +464,9 @@ function setupRouter(
   router.post('/auth/magic', passport.authenticate('magic'), (req, res, next) => {
     return res.json({ status: 'Success', result: req.user.toJSON() });
   });
-  router.get('/auth/github', passport.authenticate('github'));
-  router.get(
-    '/auth/github/callback',
-    passport.authenticate('github', { successRedirect: '/', failureRedirect: '/#!/login' }),
-  );
+  router.get('/auth/github', githubLogin.bind(this, models));
+  router.get('/auth/github/callback', githubLogin.bind(this, models));
+
   // logout
   router.get('/logout', logout.bind(this, models));
 

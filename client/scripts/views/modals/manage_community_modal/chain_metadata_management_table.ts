@@ -108,8 +108,9 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
         m(InputPropertyRow, {
           title: 'Domain',
           defaultValue: vnode.state.customDomain,
-          placeholder: 'gov.edgewa.re',
+          placeholder: 'Contact support', // gov.edgewa.re
           onChangeHandler: (v) => { vnode.state.customDomain = v; },
+          disabled: true, // Custom domains should be admin configurable only
         }),
         m('tr', [
           m('td', 'Admins'),
