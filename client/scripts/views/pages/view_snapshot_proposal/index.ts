@@ -1,7 +1,3 @@
-import 'pages/view_proposal/index.scss';
-import 'components/proposals/voting_results.scss';
-import 'components/proposals/voting_actions.scss';
-
 import 'pages/snapshot/view_proposal.scss';
 import 'pages/snapshot/list_proposal.scss';
 
@@ -335,7 +331,11 @@ const ViewProposalPage: m.Component<{
   view: (vnode) => {
     const { proposal, votes, snapshotProposal, scores } = vnode.state;
 
-    return m(Sublayout, { class: 'ViewProposalPage', title: 'Snapshot Proposal' }, [
+    return m(Sublayout, {
+      class: 'ViewProposalPage',
+      title: 'Snapshot Proposal',
+      showNewProposalButton: true,
+    }, [
       m('.view-snapshot-proposal-page', [
         snapshotProposal ? [
           m('.proposal-content', [
