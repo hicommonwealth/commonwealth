@@ -1,9 +1,11 @@
 import $ from 'jquery';
 import m from 'mithril';
+import app from 'state';
 import { Button, Table } from 'construct-ui';
 
 import { ChainNetwork } from 'models';
 import { notifyError } from 'controllers/app/notifications';
+import Token from 'controllers/chain/ethereum/token/adapter';
 import { IChainOrCommMetadataManagementAttrs } from './community_metadata_management_table';
 import { TogglePropertyRow, InputPropertyRow, ManageRolesRow } from './metadata_rows';
 
@@ -113,12 +115,12 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
           placeholder: 'gov.edgewa.re',
           onChangeHandler: (v) => { vnode.state.customDomain = v; },
         }),
-        m(InputPropertyRow, {
+        app.chain?.meta.chain.base === 'ethereum' ? m(InputPropertyRow, {
           title: 'Snapshot',
           defaultValue: vnode.state.snapshot,
           placeholder: vnode.state.network,
           onChangeHandler: (v) => { vnode.state.snapshot = v; },
-        }),
+        }) : null,
         m('tr', [
           m('td', 'Admins'),
           m('td', [ m(ManageRolesRow, {
@@ -153,6 +155,12 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
             customDomain,
             snapshot
           } = vnode.state;
+
+          if (snapshot && snapshot !== '' && !(/^[a-z]+\.eth/).test(snapshot)) {
+            notifyError('Snapshot name must be in the form of *.eth');
+            return;
+          }
+
           try {
             await vnode.attrs.chain.updateChainData({
               name,
