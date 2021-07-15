@@ -290,6 +290,10 @@
     .cui-button.cui-rounded:hover {
         background: linear-gradient(to left, #91FFA0, #FBFF91, #FF9191);
         border-color: white;
+
+        // @TODO: Remove this and figure out a better solution
+        background: #6966FF;
+        color: white;
     }
 }
 
