@@ -64,10 +64,10 @@ export default function (
 
           // reset liveness timers
           if (ws.aliveTimer) clearTimeout(ws.aliveTimer);
-          ws.aliveTimer = setTimeout(() => { ws.isAlive = false; }, ALIVE_TIMEOUT);
+          ws.aliveTimer = global.setTimeout(() => { ws.isAlive = false; }, ALIVE_TIMEOUT);
 
           if (ws.expirationTimer) clearTimeout(ws.expirationTimer);
-          ws.expirationTimer = setTimeout(() => {
+          ws.expirationTimer = global.setTimeout(() => {
             // TODO: do i need to manually close the socket here?
             console.log(`Websocket ${sessionId} expired, emitting close`);
             wss.emit(WebsocketEventType.Close);

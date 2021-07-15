@@ -140,6 +140,9 @@ $cui-popover-arrow-border-color: lighten($cui-base-border-color, 8%);
 //
 // construct theme overrides
 //
+html, body {
+    padding-right: 0 !important;
+}
 .cui-button {
     font-size: inherit;
 }

@@ -11,6 +11,7 @@ import $ from 'jquery';
 import { FocusManager } from 'construct-ui';
 import moment from 'moment';
 import mixpanel from 'mixpanel-browser';
+import _ from 'underscore';
 
 import app, { ApiStatus, LoginState } from 'state';
 import {
@@ -34,6 +35,7 @@ import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import LoginModal from 'views/modals/login_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';
 import { AaveTypes, MarlinTypes, MolochTypes } from '@commonwealth/chain-events';
+import { formatSpace } from './helpers/snapshot_utils/snapshot_utils';
 
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/landing');
@@ -82,6 +84,8 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
           privacyEnabled: community.privacyEnabled,
           featuredTopics: community.featured_topics,
           topics: community.topics,
+          stagesEnabled: community.stagesEnabled,
+          additionalStages: community.additionalStages,
           customDomain: community.customDomain,
           adminsAndMods: [],
         }));
@@ -115,7 +119,15 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
         app.config.chains.getAll().find((c) => c.customDomain === host) !== undefined
           || app.config.communities.getAll().find((c) => c.customDomain === host) !== undefined
       );
-
+      app.snapshot.client.getSpaces().then((response) => {
+        console.log(response);
+        app.snapshot.spaces = _.object(
+          Object.entries(response).map((space) => [
+            space[0],
+            formatSpace(space[0], space[1])
+          ])
+        );
+      });
       resolve();
     }).catch((err: any) => {
       app.loadingError = err.responseJSON?.error || 'Error loading application state';
@@ -130,10 +142,12 @@ export async function deinitChainOrCommunity() {
     app.chain.networkStatus = ApiStatus.Disconnected;
     app.chain.deinitServer();
     await app.chain.deinit();
+    console.log('Finished deinitializing chain');
     app.chain = null;
   }
   if (app.community) {
     await app.community.deinit();
+    console.log('Finished deinitializing community');
     app.community = null;
   }
   app.user.setSelectedNode(null);
@@ -309,6 +323,34 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/ethereum/commonwealth/adapter'
     )).default;
     newChain = new Commonwealth(n, app);
+  } else if (n.chain.network === ChainNetwork.Yearn) {
+    const Yearn = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "commonwealth-main" */
+      './controllers/chain/ethereum/snapshot/adapter'
+    )).default;
+    newChain = new Yearn(n, app);
+  } else if (n.chain.network === ChainNetwork.Fei) {
+    const Fei = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "commonwealth-main" */
+      './controllers/chain/ethereum/snapshot/adapter'
+    )).default;
+    newChain = new Fei(n, app);
+  } else if (n.chain.network === ChainNetwork.Sushi) {
+    const Snapshot = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "commonwealth-main" */
+      './controllers/chain/ethereum/snapshot/adapter'
+    )).default;
+    newChain = new Snapshot(n, app);
+  } else if (n.chain.network === ChainNetwork.Demo) {
+    const Snapshot = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "commonwealth-main" */
+      './controllers/chain/ethereum/snapshot/adapter'
+    )).default;
+    newChain = new Snapshot(n, app);
   } else {
     throw new Error('Invalid chain');
   }
@@ -317,9 +359,14 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
   const finalizeInitialization = await newChain.initServer();
 
   // If the user is still on the initializing node, finalize the
-  // initialization; otherwise, abort and return false
+  // initialization; otherwise, abort, deinit, and return false.
+  //
+  // Also make sure the state is sufficiently reset so that the
+  // next redraw cycle will reinitialize any needed chain.
   if (!finalizeInitialization) {
+    console.log('Chain loading aborted');
     app.chainPreloading = false;
+    app.chain = null;
     return false;
   } else {
     app.chain = newChain;
@@ -609,16 +656,20 @@ $(() => {
     '/:scope/discussions/:topic': importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
     '/:scope/search':            importRoute('views/pages/search', { scoped: true, deferChain: true }),
     '/:scope/members':           importRoute('views/pages/members', { scoped: true, deferChain: true }),
+    '/:scope/snapshot-proposals/:snapshotId': importRoute('views/pages/snapshot_proposals', { scoped: true, deferChain: true }),
+    '/:scope/snapshot-proposal/:snapshotId/:identifier': importRoute('views/pages/view_snapshot_proposal', { scoped: true }),
     '/:scope/chat':              importRoute('views/pages/chat', { scoped: true, deferChain: true }),
     '/:scope/referenda':         importRoute('views/pages/referenda', { scoped: true }),
     '/:scope/proposals':         importRoute('views/pages/proposals', { scoped: true }),
     '/:scope/treasury':          importRoute('views/pages/treasury', { scoped: true }),
     '/:scope/bounties':          importRoute('views/pages/bounties', { scoped: true }),
+    '/:scope/tips':              importRoute('views/pages/tips', { scoped: true }),
     '/:scope/proposal/:type/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
     '/:scope/council':           importRoute('views/pages/council', { scoped: true }),
     '/:scope/delegate':          importRoute('views/pages/delegate', { scoped: true, }),
     '/:scope/login':             importRoute('views/pages/login', { scoped: true, deferChain: true }),
     '/:scope/new/thread':        importRoute('views/pages/new_thread', { scoped: true, deferChain: true }),
+    '/:scope/new/snapshot-proposal/:snapshotId': importRoute('views/pages/new_snapshot_proposal', { scoped: true, deferChain: true }),
     '/:scope/new/proposal/:type': importRoute('views/pages/new_proposal/index', { scoped: true }),
     '/:scope/admin':             importRoute('views/pages/admin', { scoped: true }),
     '/:scope/spec_settings':     importRoute('views/pages/spec_settings', { scoped: true, deferChain: true }),
@@ -638,6 +689,10 @@ $(() => {
     // NEAR login
     '/:scope/finishNearLogin':    importRoute('views/pages/finish_near_login', { scoped: true }),
   });
+
+  const script = document.createElement('noscript');
+  m.render(script, m.trust('<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KRWH69V" height="0" width="0" style="display:none;visibility:hidden"></iframe>'));
+  document.body.insertBefore(script, document.body.firstChild);
 
   // initialize construct-ui focus manager
   FocusManager.showFocusOnlyOnTab();

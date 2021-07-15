@@ -228,12 +228,12 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
         m(
           'div',
           {
-            class: 'mb-20',
+            class: 'mb-20 overflow-x-scroll',
           },
           m('img', {
             src: 'static/img/wealthTable.svg',
             alt: '',
-            class: 'mx-auto',
+            class: 'cwTable mx-auto',
           })
         ),
       ]),

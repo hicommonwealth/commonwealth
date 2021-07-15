@@ -38,7 +38,7 @@ export const getMemberResult = (addr, searchTerm) => {
         user: profile,
         searchTerm,
         avatarSize: 36,
-        showFullAddress: true,
+        addressDisplayOptions: { showFullAddress: true },
         showChainName: !scope,
       }),
     ]),

@@ -4,13 +4,13 @@ import 'components/markdown_formatted_text.scss';
 import $ from 'jquery';
 import m from 'mithril';
 import DOMPurify from 'dompurify';
-const marked = require('marked');
 import { findAll } from 'highlight-words-core';
 import smartTruncate from 'smart-truncate';
+const marked = require('marked');
 
 const renderer = new marked.Renderer();
 renderer.link = (href, title, text) => {
-  return `<a target="_blank" href="${href}">${text}</a>`;
+  return `<a ${!href.contains('://commonwealth.im/') && 'target="_blank"'} href="${href}">${text}</a>`;
 };
 
 marked.setOptions({
