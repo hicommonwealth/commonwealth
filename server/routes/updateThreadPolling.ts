@@ -10,6 +10,7 @@ export const Errors = {
   AlreadyPolling: 'There is already an active offchain poll for this thread',
   NoThreadId: 'Must provide thread_id',
   NoThread: 'Cannot find thread',
+  InvalidContent: 'Invalid poll content',
   NotAuthor: 'Only the thread author can start polling',
 };
 
@@ -30,10 +31,24 @@ const updateThreadPolling = async (models, req: Request, res: Response, next: Ne
       return next(new Error(Errors.NotAuthor));
     }
 
+    // Check that req.body.content is valid JSON, matching { name: string, choices: string[] }
+    try {
+      const parsedContent = JSON.parse(req.body.content);
+      if (!parsedContent.name || !parsedContent.choices
+          || typeof parsedContent.name !== 'string'
+          || parsedContent.name.trim() === ''
+          || !Array.isArray(parsedContent.choices)
+          || !parsedContent.choices.every((c) => typeof c === 'string' && c.trim() !== ''))
+        return next(new Error(Errors.InvalidContent));
+    } catch (e) {
+      return next(new Error(Errors.InvalidContent));
+    }
+
     // We assume that the server-side time is in sync with client-side time here
     if (thread.offchain_voting_ends_at) return next(new Error(Errors.AlreadyPolling));
     await thread.update({
-      offchain_voting_ends_at: getNextOffchainPollEndingTime(moment())
+      offchain_voting_ends_at: getNextOffchainPollEndingTime(moment()),
+      offchain_voting_options: req.body.content,
     });
 
     const finalThread = await models.OffchainThread.findOne({

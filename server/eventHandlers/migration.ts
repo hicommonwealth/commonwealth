@@ -31,7 +31,12 @@ export default class extends IEventHandler {
           event_name: event.data.kind.toString(),
         }
       });
-      log.trace(`${created ? 'created' : 'found'} chain event type: ${dbEventType.id}`);
+      if (!dbEventType) {
+        log.error(`unknown event type: ${event.data.kind}`);
+        return;
+      } else {
+        log.trace(`${created ? 'created' : 'found'} chain event type: ${dbEventType.id}`);
+      }
       const queryFieldName = `event_data.${fieldName}`;
       const queryArgs = eventType === EntityEventKind.Vote
         ? {

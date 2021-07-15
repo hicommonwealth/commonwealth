@@ -43,9 +43,13 @@ export enum ChainNetwork {
   ERC20 = 'erc20',
   Clover = 'clover',
   HydraDX = 'hydradx',
+  Yearn = 'yearn',
+  Fei = 'fei',
+  Sushi = 'sushi',
   Crust = 'crust',
   CosmosHub = 'cosmos-hub',
   Gaia13k = 'gaia-13k',
+  Demo = 'demo',
 }
 
 // This function returns a default chain for a chainbase
@@ -67,21 +71,13 @@ export enum OffchainThreadKind {
   Request = 'request',
 }
 
+// TODO: this list should be shared with the server
 export enum OffchainThreadStage {
   Discussion = 'discussion',
   ProposalInReview = 'proposal_in_review',
   Voting = 'voting',
   Passed = 'passed',
   Failed = 'failed',
-}
-
-export enum OffchainVoteOptions {
-  SUPPORT_2,
-  SUPPORT,
-  NEUTRAL_SUPPORT,
-  NEUTRAL_OPPOSE,
-  OPPOSE,
-  OPPOSE_2,
 }
 
 export enum TransactionStatus {

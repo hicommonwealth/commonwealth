@@ -17,6 +17,7 @@ import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_
 import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
+import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 import MolochProposal, { MolochProposalState } from 'controllers/chain/ethereum/moloch/proposal';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 

@@ -84,7 +84,7 @@ We also use certain environment variables to configure the application itself:
 To download and restore the production database, and run migrations:
 
 ```
-pg_dump $(heroku config:get DATABASE_URL --app commonwealthapp) --verbose --exclude-table-data="public.\"Sessions\"" --exclude-table-data="public.\"DiscussionDrafts\"" --exclude-table-data="public.\"LoginTokens\"" --exclude-table-data="public.\"Notifications\"" --exclude-table-data="public.\"SocialAccounts\"" --exclude-table-data="public.\"Webhooks\"" --exclude-table-data="public.\"ChainEvents\"" --no-privileges --no-owner -f latest.dump
+pg_dump $(heroku config:get DATABASE_URL --app commonwealthapp) --verbose --exclude-table-data="public.\"Sessions\"" --exclude-table-data="public.\"DiscussionDrafts\"" --exclude-table-data="public.\"LoginTokens\"" --exclude-table-data="public.\"Notifications\"" --exclude-table-data="public.\"EdgewareLockdropEverythings\"" --exclude-table-data="public.\"EdgewareLockdropBalances\"" --exclude-table-data="public.\"EdgewareLockdropEvents\"" --exclude-table-data="public.\"SocialAccounts\"" --exclude-table-data="public.\"Webhooks\"" --exclude-table-data="public.\"ChainEvents\"" --no-privileges --no-owner -f latest.dump
 
 npx sequelize db:drop
 npx sequelize db:create

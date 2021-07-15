@@ -84,7 +84,7 @@ const ViewVotersModal: m.Component<IViewVotersModalAttrs> = {
 
     return m('.ViewVotersModal', [
       m('.compact-modal-title', [
-        m('h3', `Voters for ${formatAddressShort(address, chain.id)}`),
+        m('h3', `Voters for ${formatAddressShort(address, chain.id, true)}`),
         m(CompactModalExitButton),
       ]),
       m('.compact-modal-body', [
