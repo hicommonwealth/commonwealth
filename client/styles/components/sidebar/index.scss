@@ -125,10 +125,10 @@
     bottom: 0;
     left: 0;
     padding: 0 14px;
-    width: $quick-switcher-width;
+    width: 100%;
     border-right: 1px solid $border-color-off-white;
     z-index: 3;
-    // overflow-y: auto;
+    overflow-y: auto;
     @include sm-max {
         display: none;
     }
