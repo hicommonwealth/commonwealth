@@ -76,7 +76,7 @@ const updateChain = async (models, req: Request, res: Response, next: NextFuncti
   chain.stagesEnabled = stagesEnabled;
   chain.additionalStages = additionalStages;
   chain.customDomain = customDomain;
-  if (snapshot) chain.snapshot = snapshot;
+  if (chain.base === 'ethereum') chain.snapshot = snapshot;
   if (req.body['featured_topics[]']) chain.featured_topics = req.body['featured_topics[]'];
 
   await chain.save();
