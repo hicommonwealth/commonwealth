@@ -20,6 +20,7 @@ interface ICommunityMetadataManagementState {
   stagesEnabled: boolean;
   additionalStages: string;
   customDomain: string;
+  terms: string;
 }
 
 export interface IChainOrCommMetadataManagementAttrs {
@@ -44,6 +45,7 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
     vnode.state.stagesEnabled = vnode.attrs.community.stagesEnabled;
     vnode.state.additionalStages = vnode.attrs.community.additionalStages;
     vnode.state.customDomain = vnode.attrs.community.customDomain;
+    vnode.state.terms = vnode.attrs.community.terms;
   },
   view: (vnode) => {
     return m('.CommunityMetadataManagementTable', [m(Table, {
@@ -113,6 +115,12 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
         placeholder: 'gov.edgewa.re',
         onChangeHandler: (v) => { vnode.state.customDomain = v; },
       }),
+      m(InputPropertyRow, {
+        title: 'Terms of Service',
+        defaultValue: vnode.state.terms,
+        placeholder: 'Users upon entering forum with address will see this',
+        onChangeHandler: (v) => { vnode.state.terms = v; },
+      }),
       m(TogglePropertyRow, {
         title: 'Privacy',
         defaultValue: vnode.attrs.community.privacyEnabled,
@@ -158,6 +166,7 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
           stagesEnabled,
           additionalStages,
           customDomain,
+          terms,
           invitesEnabled,
           privacyEnabled,
         } = vnode.state;
@@ -174,6 +183,7 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
             stagesEnabled,
             additionalStages,
             customDomain,
+            terms,
             privacyEnabled,
             invitesEnabled,
           });

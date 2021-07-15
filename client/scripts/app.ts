@@ -85,6 +85,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
           stagesEnabled: community.stagesEnabled,
           additionalStages: community.additionalStages,
           customDomain: community.customDomain,
+          terms: community.terms,
           adminsAndMods: [],
         }));
       });
