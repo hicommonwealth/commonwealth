@@ -1,8 +1,8 @@
 import { cloneDeep } from 'lodash';
-import { apolloClient, PROPOSAL_VOTES_QUERY } from '../apollo';
-import networks from './networks.json';
 import numeral from 'numeral';
 import Snapshot from '@snapshot-labs/snapshot.js';
+import { apolloClient, PROPOSAL_VOTES_QUERY } from '../apollo';
+import networks from './networks.json';
 
 export function jsonParse(input, fallback?) {
   if (typeof input !== 'string') {
@@ -83,16 +83,15 @@ export async function getPower(space, address, snapshot) {
     const blockTag = snapshot > blockNumber ? 'latest' : parseInt(snapshot);
     let scores: any = await Snapshot.utils.getScores(
       space.key,
-      space.strategies,
+      space.strategies[1].params.strategies[0],
       space.network,
       Snapshot.utils.getProvider(space.network),
-      [address],
+      address,
       // @ts-ignore
       blockTag
     );
-    scores = scores.map((score: any) =>
-      Object.values(score).reduce((a, b: any) => a + b, 0)
-    );
+    console.log('s', scores);
+    scores = scores.map((score: any) => Object.values(score).reduce((a, b: any) => a + b, 0));
     return {
       scores,
       totalScore: scores.reduce((a, b: any) => a + b, 0)

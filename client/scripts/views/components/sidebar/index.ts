@@ -385,7 +385,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         rounded: true,
         fluid: true,
         active: onSnapshotProposal(m.route.get()),
-        label: 'Snapshot Proposals',
+        label: 'Snapshot',
         onclick: (e) => {
           e.preventDefault();
           m.route.set(`/${app.activeChainId()}/snapshot-proposals/${app.chain.meta.chain.snapshot}`);
