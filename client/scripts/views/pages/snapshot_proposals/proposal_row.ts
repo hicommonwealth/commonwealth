@@ -8,6 +8,7 @@ import app from 'state';
 import { formatTimestamp } from 'helpers';
 
 import { AddressInfo, SnapshotProposal } from 'models';
+import { Card } from 'construct-ui';
 import User from '../../components/widgets/user';
 
 const ProposalRow: m.Component<{ snapshotId: string, proposal: SnapshotProposal }, { expanded: boolean }> = {
@@ -21,36 +22,37 @@ const ProposalRow: m.Component<{ snapshotId: string, proposal: SnapshotProposal 
     const now = moment();
     const endTime = `Ends in ${formatTimestamp(moment(+proposal.end * 1000))}`;
 
-    return m('.snapshot-proposals-list', [
-      m('.card-style', {
-        'onclick': (e) => {
-          if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
-          e.preventDefault();
-          localStorage[`${app.activeId()}-proposals-scrollY`] = window.scrollY;
-          m.route.set(proposalLink);
-        },
-      }, [
-        m('.title', proposal.name),
-        m('.body', proposal.body),
-        m('.other-details', [
-          m('', [
-            m('.submitted-by', 'submitted by'),
-            m('.author-address', m(User, {
-              user: new AddressInfo(null, proposal.authorAddress, app.activeId(), null),
-              linkify: true,
-              popover: true
-            })),
-          ]),
-          (now < time) ? [
-            m('.active-proposal', [
-              m('', endTime),
-              m('.active-text', 'Active'),
-            ])
-          ] : [
-            m('.closed-proposal', 'Closed')
-          ]
+    return m(Card, {
+      class:'snapshot-proposals-list',
+      elevation:1,
+      interactive: true,
+      onclick: (e) => {
+        if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
+        e.preventDefault();
+        localStorage[`${app.activeId()}-proposals-scrollY`] = window.scrollY;
+        m.route.set(proposalLink);
+      },
+    }, [
+      m('.title', proposal.name),
+      m('.body', proposal.body),
+      m('.other-details', [
+        m('', [
+          m('.submitted-by', 'submitted by'),
+          m('.author-address', m(User, {
+            user: new AddressInfo(null, proposal.authorAddress, app.activeId(), null),
+            linkify: true,
+            popover: true
+          })),
         ]),
-      ])
+        (now < time) ? [
+          m('.active-proposal', [
+            m('', endTime),
+            m('.active-text', 'Active'),
+          ])
+        ] : [
+          m('.closed-proposal', 'Closed')
+        ]
+      ]),
     ]);
   }
 };
