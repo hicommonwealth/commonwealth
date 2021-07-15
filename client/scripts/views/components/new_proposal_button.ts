@@ -12,6 +12,11 @@ import { SubstrateAccount } from 'controllers/chain/substrate/account';
 
 export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]>, mobile?: boolean) => {
   const activeAccount = app.user.activeAccount;
+  const showSnapshotOptions = app.user.activeAccount
+    && app.chain?.meta.chain.snapshot
+    && (app.chain?.network === ChainNetwork.Yearn
+      || app.chain?.network === ChainNetwork.Fei
+      || app.chain?.network === ChainNetwork.Sushi);
   return [
     m(MenuItem, {
       onclick: () => { m.route.set(`/${app.activeId()}/new/thread`); },
@@ -58,7 +63,22 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
         label: 'New bounty proposal',
         iconLeft: mobile ? Icons.PLUS : undefined,
       }),
+      m(MenuItem, {
+        onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
+          type: ProposalType.SubstrateTreasuryTip,
+        }),
+        label: 'New tip',
+        iconLeft: mobile ? Icons.PLUS : undefined,
+      }),
     ],
+    (showSnapshotOptions || app.chain?.network === ChainNetwork.Demo) && m(MenuItem, {
+      onclick: (e) => {
+        e.preventDefault();
+        m.route.set(`/${app.activeChainId()}/new/snapshot-proposal/${app.chain.meta.chain.snapshot}`);
+      },
+      label: 'New proposal',
+      iconLeft: mobile ? Icons.PLUS : undefined,
+    }),
   ];
 };
 

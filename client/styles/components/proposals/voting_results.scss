@@ -2,6 +2,7 @@
 
 .VotingResults {
     display: flex;
+    background-color: $background-color-light;
     justify-content: space-between;
     margin-top: 25px;
     flex-wrap: wrap;

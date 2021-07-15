@@ -44,6 +44,7 @@
             display: inline-flex;
             flex-direction: column;
             align-self: center;
+            max-width: 100%;
             .row-header,
             .row-header a {
                 color: $text-color-black;
@@ -53,6 +54,10 @@
             }
             .row-subheader {
                 margin-top: 3px;
+                @media (min-width: 800px){
+                    display: flex;
+                    align-items: baseline;
+                }
                 > * {
                     display: inline;
                 }

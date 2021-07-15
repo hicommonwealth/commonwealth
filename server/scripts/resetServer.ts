@@ -41,7 +41,9 @@ const nodes = [
   [ 'ws://127.0.0.1:8545', 'aave-local', '0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9'],
   [ 'ws://api.clover.finance', 'clover'],
   [ 'wss://rpc-01.snakenet.hydradx.io', 'hydradx'],
-  [ 'wss://ropsten.infura.io/ws', 'alex-ropsten', '0xFab46E002BbF0b4509813474841E0716E6730136']
+  [ 'wss://ropsten.infura.io/ws', 'alex-ropsten', '0xFab46E002BbF0b4509813474841E0716E6730136'],
+  [ 'wss://ropsten.infura.io/ws', 'demos'],
+
 ];
 
 const specs = {
@@ -1193,6 +1195,18 @@ const resetServer = (models): Promise<number> => {
           type: 'token',
           base: 'ethereum',
         }),
+        models.Chain.create({
+          id: 'demos',
+          symbol: 'demos',
+          name: 'demos',
+          icon_url: '/static/img/protocols/eth.png',
+          type: 'token',
+          network: 'demos',
+          active: true,
+          collapsed_on_homepage: false,
+          base: 'ethereum',
+          snapshot: 'polarcat.eth',
+        })
       ]);
 
       // Specific chains

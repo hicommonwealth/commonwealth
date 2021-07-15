@@ -3,7 +3,7 @@ import { ICardListItem } from 'models/interfaces';
 import moment from 'moment';
 
 import app from 'state';
-import { OffchainThreadStage, OffchainVoteOptions } from 'models';
+import { OffchainThreadStage } from 'models';
 
 export async function sleep(msec) {
   return new Promise((resolve) => setTimeout(resolve, msec));
@@ -21,36 +21,20 @@ export function offchainThreadStageToLabel(stage: OffchainThreadStage) {
   } else if (stage === OffchainThreadStage.Failed) {
     return 'Not Passed';
   } else {
-    return 'Other';
+    return stage;
   }
 }
 
-export function offchainThreadStageToIndex(stage: OffchainThreadStage) {
-  if (stage === OffchainThreadStage.Discussion) {
-    return 1;
-  } else if (stage === OffchainThreadStage.ProposalInReview) {
-    return 2;
-  } else if (stage === OffchainThreadStage.Voting) {
-    return 3;
-  } else if (stage === OffchainThreadStage.Passed) {
-    return 4;
-  } else if (stage === OffchainThreadStage.Failed) {
-    return 5;
-  } else {
-    return 6;
+export function parseCustomStages(str) {
+  // Parse additionalStages into a `string[]` and then cast to OffchainThreadStage[]
+  // If parsing fails, return an empty array.
+  let arr;
+  try {
+    arr = Array.from(JSON.parse(str));
+  } catch (e) {
+    return [];
   }
-}
-
-export function offchainVoteToLabel(option) {
-  switch (option) {
-    case OffchainVoteOptions.SUPPORT_2: return '#a2d16d';
-    case OffchainVoteOptions.SUPPORT: return '#c4dbac';
-    case OffchainVoteOptions.NEUTRAL_SUPPORT: return '#d6ddef';
-    case OffchainVoteOptions.NEUTRAL_OPPOSE: return '#d3d6dc';
-    case OffchainVoteOptions.OPPOSE: return '#ecc9a0';
-    case OffchainVoteOptions.OPPOSE_2: return '#fb9191';
-    default: // invalid
-  }
+  return arr.map((s) => s?.toString()).filter(s => s) as unknown as OffchainThreadStage[];
 }
 
 /*
@@ -198,10 +182,20 @@ export function formatLastUpdated(timestamp) {
   if (timestamp.isBefore(moment().subtract(365, 'days'))) return timestamp.format('MMM D YYYY');
   const formatted = timestamp.fromNow(true);
   return `${formatted
-      .replace(' days', 'd')
-      .replace(' day', 'd')
-      .replace(' hours', 'h')
-      .replace(' hour', 'h')} ago`;
+    .replace(' days', 'd')
+    .replace(' day', 'd')
+    .replace(' hours', 'h')
+    .replace(' hour', 'h')} ago`;
+}
+
+export function formatTimestamp(timestamp) {
+  if (timestamp.isBefore(moment().subtract(365, 'days'))) return timestamp.format('MMM D YYYY');
+  const formatted = timestamp.fromNow(true);
+  return `${formatted
+    .replace(' days', 'd')
+    .replace(' day', 'd')
+    .replace(' hours', 'h')
+    .replace(' hour', 'h')}`;
 }
 
 // duplicated in adapters/currency.ts
@@ -323,7 +317,6 @@ export const loadScript = (scriptURI) => {
     document.head.appendChild(script);
   });
 };
-
 
 export const removeOrAddClasslistToAllElements = (
   cardList: ICardListItem[],
