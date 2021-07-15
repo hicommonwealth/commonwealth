@@ -44,14 +44,6 @@ const updateChain = async (models, req: Request, res: Response, next: NextFuncti
 
   const { active, icon_url, symbol, type, name, description, website, discord, element, telegram, github, stagesEnabled, additionalStages, customDomain, snapshot } = req.body;
 
-  if (snapshot && !(/^[a-z]+\.eth/).test(snapshot)) {
-    return next(new Error(Errors.InvalidSnapshot));
-  }
-
-  if (snapshot && chain.base !== 'ethereum') {
-    return next(new Error(Errors.SnapshotOnlyOnEthereum));
-  }
-
   if (website && !urlHasValidHTTPPrefix(website)) {
     return next(new Error(Errors.InvalidWebsite));
   } else if (discord && !urlHasValidHTTPPrefix(discord)) {
@@ -64,6 +56,10 @@ const updateChain = async (models, req: Request, res: Response, next: NextFuncti
     return next(new Error(Errors.InvalidGithub));
   } else if (customDomain && customDomain.includes('commonwealth')) {
     return next(new Error(Errors.InvalidCustomDomain));
+  } else if (snapshot && !(/^[a-z]+\.eth/).test(snapshot)) {
+    return next(new Error(Errors.InvalidSnapshot));
+  } else if (snapshot && chain.base !== 'ethereum') {
+    return next(new Error(Errors.SnapshotOnlyOnEthereum));
   }
 
   if (name) chain.name = name;
@@ -80,7 +76,7 @@ const updateChain = async (models, req: Request, res: Response, next: NextFuncti
   chain.stagesEnabled = stagesEnabled;
   chain.additionalStages = additionalStages;
   chain.customDomain = customDomain;
-  chain.snapshot = snapshot;
+  if (snapshot) chain.snapshot = snapshot;
   if (req.body['featured_topics[]']) chain.featured_topics = req.body['featured_topics[]'];
 
   await chain.save();
