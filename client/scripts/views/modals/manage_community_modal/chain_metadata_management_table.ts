@@ -116,7 +116,7 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
         m(InputPropertyRow, {
           title: 'Terms of Service',
           defaultValue: vnode.state.terms,
-          placeholder: 'Users upon entering forum with address will see this',
+          placeholder: 'Url that new users see',
           onChangeHandler: (v) => { vnode.state.terms = v; },
         }),
         m('tr', [
