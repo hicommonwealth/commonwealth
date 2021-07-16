@@ -147,7 +147,7 @@ export const ProposalBodyLastEdited: m.Component<{ item: OffchainThread | Offcha
       return;
     }
 
-    return m('.ProposalBodyLastEnded', [
+    return m('.ProposalBodyLastEdited', [
       m('a', {
         href: '#',
         onclick: async (e) => {
