@@ -12,7 +12,6 @@ class SnapshotController {
   public spaces: any;
 
   public async fetchSnapshotProposals(snapshot: string) {
-    console.log('process.env',process.env)
     const response = await $.get(`${hubUrl}/api/${snapshot}/proposals`);
     // if (response.status !== 'Success') {
     //   throw new Error(`Cannot fetch snapshot proposals: ${response.status}`);
