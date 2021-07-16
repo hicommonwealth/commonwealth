@@ -1,15 +1,25 @@
 @import 'client/styles/shared';
 
 .create-snapshot-proposal {
-  width: 60%;
+  @media (min-width:1024px) {
+    width: 60%;
+  }
 
   .title {
     font-size: 24px;
     font-weight: 500;
   }
 
-  .mt-40 {
-    margin-top: 40px;
+  .mt-56 {
+    margin-top: 56px;
+  }
+
+  .mt-120 {
+    margin-top: 120px;
+  }
+
+  .mt-6 {
+    margin-top: 6px;
   }
 
   .mb-16 {
@@ -26,7 +36,47 @@
 
   .choice {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     margin-bottom: 14px;
+
+    .choice-input {
+      flex: 1;
+    }
+
+    .close-icon {
+      width: 24px;
+      height: 24px;
+      opacity: 0.5;
+      margin-left: 24px;
+    }
+  }
+
+  .primary-button {
+    text-transform: uppercase;
+    border-radius: 8px;
+    float: right;
+    color: #4723AD;
+  }
+
+  .secondary-button {
+    text-transform: uppercase;
+    border-radius: 8px;
+    float: right;
+  }
+
+  .vote-system-title {
+    font-weight: 500;
+  }
+
+  .vote-system-subtitle {
+    color: #666666;
+    margin-bottom: 14px;
+  }
+
+  .date-selector {
+    .cui-radio {
+      display: block;
+      margin-bottom: 14px;
+    }
   }
 }
