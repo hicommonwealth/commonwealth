@@ -3,7 +3,7 @@ import 'pages/snapshot/list_proposal.scss';
 
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
-import { Spinner, Button, RadioGroup } from 'construct-ui';
+import { Spinner, Button, RadioGroup, TabItem, Tabs } from 'construct-ui';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
@@ -30,15 +30,6 @@ const ProposalContent: m.Component<{
     // merely have access to the body and title
 
     return [
-      // eslint-disable-next-line no-restricted-globals
-      m('.back-button', { 'onclick': () => history.back() }, [
-        m('img', {
-          class: 'back-icon',
-          src: '/static/img/arrow-right-black.svg',
-          alt: 'Go Back',
-        }),
-        m('.back-button-text', 'Back')
-      ]),
       m('.proposal-title', proposal.name),
       m('.proposal-hash', `#${proposal.ipfsHash}`),
       m('.snapshot-proposals-list', [
@@ -83,7 +74,7 @@ const ProposalContent: m.Component<{
           m('.t-head', [
             m('.user-column', 'User'),
             m('.vote-column', 'Vote'),
-            // m('.power-column', 'Power'),
+            m('.power-column', 'Power'),
           ]),
           votes.map((vote) => m('.vote-row', [
             m('.user-column', m(User, {
@@ -92,7 +83,7 @@ const ProposalContent: m.Component<{
               popover: true
             })),
             m('.vote-column', vote.choice),
-            // m('.power-column', vote.timestamp),
+            m('.power-column', 'Power'),
           ])),
         ]),
       ],
@@ -269,12 +260,14 @@ const ViewProposalPage: m.Component<{
   space: any,
   snapshotProposal: any,
   totalScore: number,
-  scores: number[]
+  scores: number[],
+  activeTab: string
 }> = {
   oninit: (vnode) => {
     vnode.state.votes = [];
     vnode.state.totalScore = 0;
     vnode.state.scores = [];
+    vnode.state.activeTab = 'Proposal';
 
     const snapshotId = vnode.attrs.snapshotId;
     app.snapshot.fetchSnapshotProposals(snapshotId).then((response) => {
@@ -329,7 +322,7 @@ const ViewProposalPage: m.Component<{
   },
 
   view: (vnode) => {
-    const { proposal, votes, snapshotProposal, scores } = vnode.state;
+    const { proposal, votes, snapshotProposal, scores, activeTab } = vnode.state;
 
     return m(Sublayout, {
       class: 'ViewProposalPage',
@@ -338,67 +331,95 @@ const ViewProposalPage: m.Component<{
     }, [
       m('.view-snapshot-proposal-page', [
         snapshotProposal ? [
-          m('.proposal-content', [
-            m(ProposalContent, {
-              snapshotId: vnode.attrs.snapshotId,
-              proposal,
-              votes,
+          // eslint-disable-next-line no-restricted-globals
+          m('.back-button', { 'onclick': () => history.back() }, [
+            m('img', {
+              class: 'back-icon',
+              src: '/static/img/arrow-right-black.svg',
+              alt: 'Go Back',
+            }),
+            m('.back-button-text', 'Back')
+          ]),
+          m(Tabs, {
+            align:'left',
+            class:'snapshot-tabs'
+          }, [
+            m(TabItem, {
+              label:'Proposal',
+              active: activeTab === 'Proposal',
+              onclick: () => { vnode.state.activeTab = 'Proposal'; },
+            }),
+            m(TabItem, {
+              label:'Info & Results',
+              active: activeTab === 'Info & Results',
+              onclick: () => { vnode.state.activeTab = 'Info & Results'; },
             }),
           ]),
-          m('.proposal-info', [
-            m('.title', 'Information'),
-            m('.info-block', [
-              m('.labels', [
-                m('', 'Author'),
-                m('', 'IPFS'),
-                m('', 'Voting System'),
-                m('', 'Start Date'),
-                m('', 'End Date'),
-                m('', 'Snapshot'),
-              ]),
-              m('.values', [
-                m(User, {
-                  user: new AddressInfo(null, proposal.authorAddress, app.activeId(), null),
-                  linkify: true,
-                  popover: true
+          m('.proposal-body', [
+            activeTab !== 'Info & Results' && [
+              m('.proposal-content', [
+                m(ProposalContent, {
+                  snapshotId: vnode.attrs.snapshotId,
+                  proposal,
+                  votes,
                 }),
-                m('a', {
-                  class:'snapshot-link -mt-10',
-                  href: `https://ipfs.fleek.co/ipfs/${proposal.ipfsHash}`,
-                  target:'_blank'
-                }, [
-                  m('.truncate', `#${proposal.ipfsHash}`),
-                  m('img', {
-                    class: 'external-link-icon',
-                    src: '/static/img/ExternalLink.svg',
-                    alt: 'Etherscan link',
-                  }),
+              ]),
+            ],
+            m('.proposal-info', [
+              m('.title', 'Information'),
+              m('.info-block', [
+                m('.labels', [
+                  m('', 'Author'),
+                  m('', 'IPFS'),
+                  m('', 'Voting System'),
+                  m('', 'Start Date'),
+                  m('', 'End Date'),
+                  m('', 'Snapshot'),
                 ]),
-                m('.snapshot-type', snapshotProposal.type.split('-').join(' ').concat(' voting')),
-                m('', moment(+proposal.start * 1000).format('lll')),
-                m('', moment(+proposal.end * 1000).format('lll')),
-                m('a', {
-                  class:'snapshot-link',
-                  href: `https://etherscan.io/block/${snapshotProposal.snapshot}`,
-                  target:'_blank'
-                }, [
-                  m('.truncate', `#${snapshotProposal.snapshot}`),
-                  m('img', {
-                    class: 'external-link-icon',
-                    src: '/static/img/ExternalLink.svg',
-                    alt: 'Etherscan link',
+                m('.values', [
+                  m(User, {
+                    user: new AddressInfo(null, proposal.authorAddress, app.activeId(), null),
+                    linkify: true,
+                    popover: true
                   }),
-                ]),
-              ])
-            ]),
-            m('.title .mt-72', 'Current Results'),
-            proposal.choices.map((choice) => [
-              m('.result-choice', choice),
-              m('progress', {
-                class:'result-progress',
-                max:'100',
-                value:81.8
-              }),
+                  m('a', {
+                    class:'snapshot-link -mt-10',
+                    href: `https://ipfs.fleek.co/ipfs/${proposal.ipfsHash}`,
+                    target:'_blank'
+                  }, [
+                    m('.truncate', `#${proposal.ipfsHash}`),
+                    m('img', {
+                      class: 'external-link-icon',
+                      src: '/static/img/ExternalLink.svg',
+                      alt: 'Etherscan link',
+                    }),
+                  ]),
+                  m('.snapshot-type', snapshotProposal.type.split('-').join(' ').concat(' voting')),
+                  m('', moment(+proposal.start * 1000).format('lll')),
+                  m('', moment(+proposal.end * 1000).format('lll')),
+                  m('a', {
+                    class:'snapshot-link',
+                    href: `https://etherscan.io/block/${snapshotProposal.snapshot}`,
+                    target:'_blank'
+                  }, [
+                    m('.truncate', `#${snapshotProposal.snapshot}`),
+                    m('img', {
+                      class: 'external-link-icon',
+                      src: '/static/img/ExternalLink.svg',
+                      alt: 'Etherscan link',
+                    }),
+                  ]),
+                ])
+              ]),
+              m('.title .mt-72', 'Current Results'),
+              proposal.choices.map((choice) => [
+                m('.result-choice', choice),
+                m('progress', {
+                  class:'result-progress',
+                  max:'100',
+                  value:81.8
+                }),
+              ]),
             ]),
           ]),
         ] : m('.topic-loading-spinner-wrap', [ m(Spinner, { active: true, size: 'lg' }) ])

@@ -1,4 +1,4 @@
-import 'pages/new_proposal_page.scss';
+import 'pages/snapshot/create_proposal.scss';
 
 import $ from 'jquery';
 import m from 'mithril';
@@ -135,7 +135,11 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
   isFromExistingProposal: boolean,
   initialized: boolean,
   snapshotScoresFetched: boolean,
+  choices: string[],
 }> = {
+  oninit:(vnode) => {
+    vnode.state.choices = [null, null];
+  },
   view: (vnode) => {
     if (!app.community && !app.chain) return;
 
@@ -224,131 +228,174 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
 
     const today = new Date();
     const nextWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 7);
-    return m('.NewThreadForm', {
-      oncreate: (vvnode) => {
-        // $(vvnode.dom).find('.cui-input input').prop('autocomplete', 'off').focus();
-      },
-    }, [
-      m('.new-thread-form-body', [
-        vnode.state.space.filters?.onlyMembers && !isMember
-        && m(Callout, {
-          class: 'no-profile-callout',
-          intent: 'primary',
-          content: [
-            'You need to be a member of the space in order to submit a proposal.',
-          ],
-        }),
-        // showScoreWarning
-        //   ? m(Callout, {
-        //     class: 'no-profile-callout',
-        //     intent: 'primary',
-        //     content: [
-        //       `You need to have a minimum of ${vnode.state.space.filters.minScore} ${vnode.state.space.symbol} in order to submit a proposal`
-        //     ],
-        //   }) : m(Spinner, { active: true, }),
-        m('.new-snapshot-proposal-form', [
-          m(Form, { style:'width:100%' }, [
-            m(FormGroup, [
-              m(FormLabel, 'Question/Proposal'),
-              m(Input, {
-                placeholder: 'Should 0xMaki be our new Mayor?',
-                oninput: (e) => {
-                  e.redraw = false; // do not redraw on input
-                  const { value } = e.target as any;
-                  vnode.state.form.name = value;
-                  localStorage.setItem(`${app.activeId()}-new-snapshot-proposal-name`, vnode.state.form.name);
-                },
-                defaultValue: vnode.state.form.name,
-              }),
-            ]),
-            m(FormGroup, [
-              m(FormGroup, [
-                m(FormLabel, 'Choice 1'),
-                m(Input, {
-                  name: 'targets',
-                  placeholder: 'Yes',
-                  oninput: (e) => {
-                    const result = (e.target as any).value;
-                    vnode.state.form.choices[0] = result;
-                    m.redraw();
-                  },
-                }),
-              ]),
-              m(FormGroup, [
-                m(FormLabel, 'Choice 2'),
-                m(Input, {
-                  name: 'targets',
-                  placeholder: 'No',
-                  oninput: (e) => {
-                    const result = (e.target as any).value;
-                    vnode.state.form.choices[1] = result;
-                    m.redraw();
-                  },
-                }),
-              ]),
-            ]),
-            m(FormGroup, [
-              m(FormGroup, [
-                m(FormLabel, 'Start Date:'),
-                m(Input, {
-                  defaultValue: vnode.state.isFromExistingProposal ? today.toDateString() : ' ',
-                  name: 'targets',
-                  placeholder: 'May 1, 1995',
-                  oninput: (e) => {
-                    const result = (e.target as any).value;
-                    vnode.state.form.start = result;
-                    m.redraw();
-                  },
-                }),
-              ]),
-              m(FormGroup, [
-                m(FormLabel, 'End Date:'),
-                m(Input, {
-                  defaultValue: vnode.state.isFromExistingProposal ? nextWeek.toDateString() : ' ',
-                  name: 'targets',
-                  placeholder: 'May 22, 1995',
-                  oninput: (e) => {
-                    const result = (e.target as any).value;
-                    vnode.state.form.end = result;
-                    m.redraw();
-                  },
-                }),
-              ]),
-            ]),
-            m(FormGroup, [
-              m(QuillEditor, {
-                contentsDoc: vnode.state.form.body ? vnode.state.form.body : ' ', // Prevent the editor from being filled in with previous content
-                oncreateBind: (state) => {
-                  vnode.state.quillEditorState = state;
-                },
-                placeholder: 'What is your proposal?',
-                editorNamespace: 'new-proposal',
-                tabindex: 2,
-              })
-            ]),
-            m(FormGroup, { order: 5 }, [
-              m(Button, {
-                intent: 'primary',
-                label: 'Publish',
-                name: 'submit',
-                disabled: !author || vnode.state.saving || !isValid,
-                rounded: true,
-                onclick: async (e) => {
-                  vnode.state.saving = true;
-                  try {
-                    await newLink(vnode.state.form, vnode.state.quillEditorState, author, vnode.state.space, vnode.attrs.snapshotId);
-                    vnode.state.saving = false;
-                    clearLocalStorage();
-                  } catch (err) {
-                    vnode.state.saving = false;
-                    notifyError(capitalize(err.message));
-                  }
-                },
-              }),
-            ]),
-          ]),
+    // return m('.NewThreadForm', {
+    //   oncreate: (vvnode) => {
+    //     // $(vvnode.dom).find('.cui-input input').prop('autocomplete', 'off').focus();
+    //   },
+    // }, [
+    //   m('.new-thread-form-body', [
+    //     vnode.state.space.filters?.onlyMembers && !isMember
+    //     && m(Callout, {
+    //       class: 'no-profile-callout',
+    //       intent: 'primary',
+    //       content: [
+    //         'You need to be a member of the space in order to submit a proposal.',
+    //       ],
+    //     }),
+    //     // showScoreWarning
+    //     //   ? m(Callout, {
+    //     //     class: 'no-profile-callout',
+    //     //     intent: 'primary',
+    //     //     content: [
+    //     //       `You need to have a minimum of ${vnode.state.space.filters.minScore} ${vnode.state.space.symbol} in order to submit a proposal`
+    //     //     ],
+    //     //   }) : m(Spinner, { active: true, }),
+    //     m('.new-snapshot-proposal-form', [
+    //       m(Form, { style:'width:100%' }, [
+    //         m(FormGroup, [
+    //           m(FormLabel, 'Question/Proposal'),
+    //           m(Input, {
+    //             placeholder: 'Should 0xMaki be our new Mayor?',
+    //             oninput: (e) => {
+    //               e.redraw = false; // do not redraw on input
+    //               const { value } = e.target as any;
+    //               vnode.state.form.name = value;
+    //               localStorage.setItem(`${app.activeId()}-new-snapshot-proposal-name`, vnode.state.form.name);
+    //             },
+    //             defaultValue: vnode.state.form.name,
+    //           }),
+    //         ]),
+    //         m(FormGroup, [
+    //           m(FormGroup, [
+    //             m(FormLabel, 'Choice 1'),
+    //             m(Input, {
+    //               name: 'targets',
+    //               placeholder: 'Yes',
+    //               oninput: (e) => {
+    //                 const result = (e.target as any).value;
+    //                 vnode.state.form.choices[0] = result;
+    //                 m.redraw();
+    //               },
+    //             }),
+    //           ]),
+    //           m(FormGroup, [
+    //             m(FormLabel, 'Choice 2'),
+    //             m(Input, {
+    //               name: 'targets',
+    //               placeholder: 'No',
+    //               oninput: (e) => {
+    //                 const result = (e.target as any).value;
+    //                 vnode.state.form.choices[1] = result;
+    //                 m.redraw();
+    //               },
+    //             }),
+    //           ]),
+    //         ]),
+    //         m(FormGroup, [
+    //           m(FormGroup, [
+    //             m(FormLabel, 'Start Date:'),
+    //             m(Input, {
+    //               defaultValue: vnode.state.isFromExistingProposal ? today.toDateString() : ' ',
+    //               name: 'targets',
+    //               placeholder: 'May 1, 1995',
+    //               oninput: (e) => {
+    //                 const result = (e.target as any).value;
+    //                 vnode.state.form.start = result;
+    //                 m.redraw();
+    //               },
+    //             }),
+    //           ]),
+    //           m(FormGroup, [
+    //             m(FormLabel, 'End Date:'),
+    //             m(Input, {
+    //               defaultValue: vnode.state.isFromExistingProposal ? nextWeek.toDateString() : ' ',
+    //               name: 'targets',
+    //               placeholder: 'May 22, 1995',
+    //               oninput: (e) => {
+    //                 const result = (e.target as any).value;
+    //                 vnode.state.form.end = result;
+    //                 m.redraw();
+    //               },
+    //             }),
+    //           ]),
+    //         ]),
+    //         m(FormGroup, [
+    //           m(QuillEditor, {
+    //             contentsDoc: vnode.state.form.body ? vnode.state.form.body : ' ', // Prevent the editor from being filled in with previous content
+    //             oncreateBind: (state) => {
+    //               vnode.state.quillEditorState = state;
+    //             },
+    //             placeholder: 'What is your proposal?',
+    //             editorNamespace: 'new-proposal',
+    //             tabindex: 2,
+    //           })
+    //         ]),
+    //         m(FormGroup, { order: 5 }, [
+    //           m(Button, {
+    //             intent: 'primary',
+    //             label: 'Publish',
+    //             name: 'submit',
+    //             disabled: !author || vnode.state.saving || !isValid,
+    //             rounded: true,
+    //             onclick: async (e) => {
+    //               vnode.state.saving = true;
+    //               try {
+    //                 await newLink(vnode.state.form, vnode.state.quillEditorState, author, vnode.state.space, vnode.attrs.snapshotId);
+    //                 vnode.state.saving = false;
+    //                 clearLocalStorage();
+    //               } catch (err) {
+    //                 vnode.state.saving = false;
+    //                 notifyError(capitalize(err.message));
+    //               }
+    //             },
+    //           }),
+    //         ]),
+    //       ]),
+    //     ]),
+    //   ]),
+    // ]);
+
+    return m('.create-snapshot-proposal', [
+      m(Form, [
+        m('.title', 'Main Info'),
+        m(FormGroup, [
+          m(FormLabel, 'Title'),
+          m(Input, {
+            placeholder: 'Enter the proposal title',
+            oninput: (e) => {
+              e.redraw = false; // do not redraw on input
+              const { value } = e.target as any;
+              vnode.state.form.name = value;
+            },
+            defaultValue: vnode.state.form.name,
+          }),
+        ]),
+        m(FormGroup, [
+          m(FormLabel, 'Description'),
+          m(QuillEditor, {
+            contentsDoc: vnode.state.form.body ? vnode.state.form.body : ' ', // Prevent the editor from being filled in with previous content
+            oncreateBind: (state) => {
+              vnode.state.quillEditorState = state;
+            },
+            placeholder: 'What is your proposal?',
+            editorNamespace: 'new-proposal',
+            tabindex: 2,
+          })
         ]),
       ]),
+      m('.title .mt-40 .mb-16', 'Choices'),
+      vnode.state.choices.map((choice, index) => m('.choice', [
+        m('.title .mr-18 .w-1-ch', index + 1),
+        m(Input, {
+          placeholder: 'Enter choice',
+          oninput: (e) => {
+            e.redraw = false; // do not redraw on input
+            const { value } = e.target as any;
+            // vnode.state.form.name = value;
+          },
+          // defaultValue: vnode.state.form.name,
+        }),
+      ])),
     ]);
   }
 };

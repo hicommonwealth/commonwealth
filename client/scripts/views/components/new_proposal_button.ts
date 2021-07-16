@@ -71,14 +71,6 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
         iconLeft: mobile ? Icons.PLUS : undefined,
       }),
     ],
-    (showSnapshotOptions || app.chain?.network === ChainNetwork.Demo) && m(MenuItem, {
-      onclick: (e) => {
-        e.preventDefault();
-        m.route.set(`/${app.activeChainId()}/new/snapshot-proposal/${app.chain.meta.chain.snapshot}`);
-      },
-      label: 'New proposal',
-      iconLeft: mobile ? Icons.PLUS : undefined,
-    }),
   ];
 };
 

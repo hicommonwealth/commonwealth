@@ -6,13 +6,14 @@ import mixpanel from 'mixpanel-browser';
 import moment from 'moment';
 import app from 'state';
 
-import { Spinner, Button, ButtonGroup } from 'construct-ui';
+import { Spinner, Button, Tabs, TabItem } from 'construct-ui';
 
 import Sublayout from 'views/sublayout';
 import Listing from 'views/pages/listing';
 
 import { SnapshotProposal } from 'client/scripts/models';
 import ProposalRow from './proposal_row';
+import { NewProposalForm } from '../new_snapshot_proposal/new_proposal_form';
 
 export const ALL_PROPOSALS_KEY = 'COMMONWEALTH_ALL_PROPOSALS';
 
@@ -55,6 +56,7 @@ const SnapshotProposalsPage: m.Component<{ topic?: string, snapshotId: string },
   allProposals: any;
   loadingProposals: boolean;
   selectedFilter: SnapshotProposalFilter;
+  activeTab: string;
 }> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', {
@@ -75,10 +77,11 @@ const SnapshotProposalsPage: m.Component<{ topic?: string, snapshotId: string },
     vnode.state.loadingProposals = true;
     vnode.state.allProposals = [];
     vnode.state.selectedFilter = SnapshotProposalFilter.Core;
+    vnode.state.activeTab = 'Proposals';
   },
 
   view: (vnode) => {
-    const { loadingProposals, allProposals, selectedFilter } = vnode.state;
+    const { loadingProposals, allProposals, selectedFilter, activeTab } = vnode.state;
     const { snapshotId } = vnode.attrs;
 
     if (loadingProposals) return m(Spinner, { active: true, fill: true });
@@ -115,14 +118,32 @@ const SnapshotProposalsPage: m.Component<{ topic?: string, snapshotId: string },
     }, [
       (app.chain || app.community) && [
         m('.discussions-main', [
-          m(SnapshotProposalStagesBar, { selected: selectedFilter, onChangeFilter }),
-          m(Listing, {
-            content: [
-              m('.discussion-group-wrap', proposals.length > 0
-                ? proposals.map((proposal) => m(ProposalRow, { snapshotId, proposal }))
-                : m('.no-proposals', `No ${vnode.state.selectedFilter} proposals found.`))
-            ]
-          })
+          m(Tabs, {
+            align:'left',
+            class:'snapshot-tabs'
+          }, [
+            m(TabItem, {
+              label:'Proposals',
+              active: activeTab === 'Proposals',
+              onclick: () => { vnode.state.activeTab = 'Proposals'; },
+            }),
+            m(TabItem, {
+              label:'New Proposal',
+              active: activeTab === 'New Proposal',
+              onclick: () => { vnode.state.activeTab = 'New Proposal'; },
+            }),
+          ]),
+          activeTab === 'Proposals' && [
+            m(SnapshotProposalStagesBar, { selected: selectedFilter, onChangeFilter }),
+            m(Listing, {
+              content: [
+                m('.discussion-group-wrap', proposals.length > 0
+                  ? proposals.map((proposal) => m(ProposalRow, { snapshotId, proposal }))
+                  : m('.no-proposals', `No ${vnode.state.selectedFilter} proposals found.`))
+              ]
+            })
+          ],
+          activeTab === 'New Proposal' && m(NewProposalForm, { snapshotId:vnode.attrs.snapshotId }),
         ])
       ]
     ]);

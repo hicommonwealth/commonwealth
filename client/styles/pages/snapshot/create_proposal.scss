@@ -1,0 +1,32 @@
+@import 'client/styles/shared';
+
+.create-snapshot-proposal {
+  width: 60%;
+
+  .title {
+    font-size: 24px;
+    font-weight: 500;
+  }
+
+  .mt-40 {
+    margin-top: 40px;
+  }
+
+  .mb-16 {
+    margin-bottom: 16px;
+  }
+
+  .mr-18 {
+    margin-right: 18px;
+  }
+
+  .w-1-ch {
+    min-width: 1ch;
+  }
+
+  .choice {
+    display: flex;
+    align-items: baseline;
+    margin-bottom: 14px;
+  }
+}

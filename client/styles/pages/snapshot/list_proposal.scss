@@ -1,9 +1,9 @@
 @import 'client/styles/shared';
 
 .snapshot-proposals-list {
-  width: 70%;
-  margin-bottom: 48px;
-  max-width: none !important;
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 20px;
 
   .title {
     font-size: 24px;
@@ -16,7 +16,11 @@
 
   .other-details {
     margin-top: 14px;
-    display: flex;
+
+    @media (min-width:600px) {
+      display: flex;
+    }
+
     justify-content: space-between;
     align-items: baseline;
 
@@ -34,16 +38,26 @@
     }
 
     .closed-proposal {
+      @media(max-width: 600px) {
+        margin-top: 14px;
+      }
+
       background-color: #999999;
       border-radius: 9999px;
+      max-width: max-content;
       padding: 8px 14px 4px;
       color: white;
       font-weight: 500;
     }
 
     .active-proposal {
-      border-radius: 9999px;
+      @media(max-width: 600px) {
+        margin-top: 14px;
+      }
+
       background-color: #F4F4F4;
+      border-radius: 9999px;
+      max-width: max-content;
       display: flex;
       color: #666666;
 
