@@ -30,7 +30,6 @@ const ConfirmSnapshotVoteModal: m.Component<{
   view: (vnode) => {
     const author = app.user.activeAccount;
     const { proposal, space, id, selectedChoice, totalScore, scores, snapshot } = vnode.attrs;
-
     return m('.ConfirmSnapshotVoteModal', [
       m('.compact-modal-title', [
         m('h3', 'Confirm vote'),
@@ -38,19 +37,19 @@ const ConfirmSnapshotVoteModal: m.Component<{
       ]),
       m('.compact-modal-body', [
         m('h4', [
-          `Are you sure you want to vote "${proposal.msg.payload.choices[selectedChoice]}"?`,
+          `Are you sure you want to vote "${proposal.choices[selectedChoice]}"?`,
           m('br'),
           'This action cannot be undone.'
         ]),
         m('.vote-info', [
           m('.d-flex', [
             m('span', { class: 'text-blue' }, 'Option'),
-            m('span', `${proposal.msg.payload.choices[selectedChoice]}`)
+            m('span', `${proposal.choices[selectedChoice]}`)
           ]),
           m('.d-flex', [
             m('span', { class: 'text-blue' }, 'Snapshot'),
-            m('a', { href: `${_explorer(space.network, proposal.msg.payload.snapshot, 'block')}`, target: '_blank' }, [
-              `${_n(proposal.msg.payload.snapshot, '0,0')}`,
+            m('a', { href: `${_explorer(space.network, proposal.snapshot, 'block')}`, target: '_blank' }, [
+              `${_n(proposal.snapshot, '0,0')}`,
               m('i', { class: 'iconexternal-link' })
             ]),
           ]),

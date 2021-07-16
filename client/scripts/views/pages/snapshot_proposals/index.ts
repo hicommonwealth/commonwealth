@@ -90,9 +90,9 @@ const SnapshotProposalsPage: m.Component<{ topic?: string, snapshotId: string },
         case SnapshotProposalFilter.Community:
           return proposal.private;
         case SnapshotProposalFilter.Active:
-          return moment(+proposal.end * 1000) < moment();
-        case SnapshotProposalFilter.Ended:
           return moment(+proposal.end * 1000) >= moment();
+        case SnapshotProposalFilter.Ended:
+          return moment(+proposal.end * 1000) < moment();
         default:
           break;
       }

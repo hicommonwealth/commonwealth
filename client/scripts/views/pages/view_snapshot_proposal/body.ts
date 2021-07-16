@@ -44,7 +44,7 @@ export const ProposalBodyCreated: m.Component<{
   }
 };
 
-export const ProposalBodyLastEdited: m.Component<{ item: SnapshotProposal }> = {
+export const ProposalBodyEnded: m.Component<{ item: SnapshotProposal }> = {
   view: (vnode) => {
     const { item } = vnode.attrs;
     if (!item) return;
@@ -53,8 +53,8 @@ export const ProposalBodyLastEdited: m.Component<{ item: SnapshotProposal }> = {
     }
     const time = moment(+item.end * 1000);
 
-    return m('.ProposalBodyLastEdited', [
-      m('', `Edited ${formatLastUpdated(time)}`)
+    return m('.ProposalBodyLastEnded', [
+      m('', `Ended ${formatLastUpdated(time)}`)
     ]);
   }
 };
