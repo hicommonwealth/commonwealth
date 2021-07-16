@@ -22,9 +22,44 @@ const ProposalContent: m.Component<{
   snapshotId: string
   proposal: SnapshotProposal
   votes: Vote[]
-}, {}> = {
+  scope: string
+  identifier: string
+  space:any
+  snapshotProposal: any,
+  totalScore: number,
+  scores: number[],
+}, {
+  chosenOption:string
+  votingModalOpen:boolean
+}> = {
   view: (vnode) => {
-    const { proposal, votes } = vnode.attrs;
+    const { proposal, votes, snapshotProposal, space, identifier, totalScore, scores } = vnode.attrs;
+
+    const onModalClose = () => {
+      vnode.state.votingModalOpen = false;
+      m.redraw();
+    };
+
+    const handleVote = async (event) => {
+      event.preventDefault();
+      try {
+        app.modals.create({
+          modal: ConfirmSnapshotVoteModal,
+          data: {
+            space,
+            proposal,
+            id: identifier,
+            selectedChoice: vnode.state.chosenOption,
+            totalScore,
+            scores,
+            snapshot: snapshotProposal.snapshot,
+          }
+        });
+        vnode.state.votingModalOpen = true;
+      } catch (err) {
+        notifyError('Voting failed');
+      }
+    };
 
     // Original posters have full editorial control, while added collaborators
     // merely have access to the body and title
@@ -59,11 +94,13 @@ const ProposalContent: m.Component<{
       m(RadioGroup, {
         class:'snapshot-votes',
         options: proposal.choices,
-        // onchange: (e: Event) => this.selected = (e.currentTarget as HTMLInputElement).value
+        value: vnode.state.chosenOption,
+        onchange: (e: Event) => { vnode.state.chosenOption = (e.currentTarget as HTMLInputElement).value; }
       }),
       m(Button, {
         label:'Vote',
-        disabled: true,
+        disabled: !vnode.state.chosenOption,
+        onclick:handleVote,
       }),
       votes.length > 0 && [
         m('.votes-title', [
@@ -96,159 +133,6 @@ interface Vote {
   choice: string,
   timestamp: string
 }
-
-// const VoteRow: m.Component<{
-//   vote: Vote
-// }> = {
-//   view: (vnode) => {
-//     return m('.ViewRow', [
-//       m('.row-left', [
-//         m(User, {
-//           user: new AddressInfo(null, vnode.attrs.vote.voterAddress, app.activeId(), null), // TODO: activeID becomes chain_base, fix
-//           linkify: true,
-//           popover: true
-//         }),
-//       ]),
-//     ]);
-//   }
-// };
-
-// const VoteView: m.Component<{ votes: Vote[] }> = {
-//   view: (vnode) => {
-//     const { votes } = vnode.attrs;
-
-//     const voteYesListing = [];
-//     const voteNoListing = [];
-
-//     voteYesListing.push(m('.vote-group-wrap', votes
-//       .map((vote) => {
-//         if (vote.choice === 'yes') {
-//           return m(VoteRow, { vote });
-//         } else {
-//           return null;
-//         }
-//       })
-//       .filter((v) => !!v)));
-
-//     voteNoListing.push(m('.vote-group-wrap', votes
-//       .map((vote) => {
-//         if (vote.choice === 'no') {
-//           return m(VoteRow, { vote });
-//         } else {
-//           return null;
-//         }
-//       })
-//       .filter((v) => !!v)));
-
-//     return m('.VotingResults', [
-//       m('.results-column', [
-//         m('.results-header', `Voted yes (${votes.filter((v) => v.choice === 'yes').length})`),
-//         m('.results-cell', [
-//           voteYesListing
-//         ]),
-//       ]),
-//       m('.results-column', [
-//         m('.results-header', `Voted no (${votes.filter((v) => v.choice === 'no').length})`),
-//         m('.results-cell', [
-//           voteNoListing
-//         ]),
-//       ])
-//     ]);
-//   }
-// };
-
-// const VoteAction: m.Component<{
-//   space: any,
-//   proposal: any,
-//   id: string,
-//   totalScore: number,
-//   scores: any[],
-//   choices: string[],
-// }, {
-//   votingModalOpen: boolean
-// }> = {
-//   view: (vnode) => {
-//     const { choices } = vnode.attrs;
-//     const canVote = true; // TODO: remove these hardcoded values;
-//     const hasVotedYes = false;
-//     const hasVotedNo = false;
-//     const { votingModalOpen } = vnode.state;
-
-//     const onModalClose = () => {
-//       vnode.state.votingModalOpen = false;
-//       m.redraw();
-//     };
-
-//     const voteYes = async (event) => {
-//       event.preventDefault();
-//       try {
-//         app.modals.create({
-//           modal: ConfirmSnapshotVoteModal,
-//           data: {
-//             space: vnode.attrs.space,
-//             proposal: vnode.attrs.proposal,
-//             id: vnode.attrs.id,
-//             selectedChoice: 0,
-//             totalScore: vnode.attrs.totalScore,
-//             scores: vnode.attrs.scores,
-//             snapshot: vnode.attrs.proposal.msg.payload.snapshot
-//           }
-//         });
-//         vnode.state.votingModalOpen = true;
-//       } catch (err) {
-//         notifyError('Voting failed');
-//       }
-//     };
-
-//     const voteNo = (event) => {
-//       event.preventDefault();
-//       try {
-//         app.modals.create({
-//           modal: ConfirmSnapshotVoteModal,
-//           data: {
-//             space: vnode.attrs.space,
-//             proposal: vnode.attrs.proposal,
-//             id: vnode.attrs.id,
-//             selectedChoice: 1,
-//             totalScore: vnode.attrs.totalScore,
-//             scores: vnode.attrs.scores,
-//             snapshot: vnode.attrs.proposal.msg.payload.snapshot,
-//           }
-//         });
-//         vnode.state.votingModalOpen = true;
-//       } catch (err) {
-//         notifyError('Voting failed');
-//       }
-//     };
-
-//     const yesButton = m('.yes-button', [
-//       m(Button, {
-//         intent: 'positive',
-//         disabled: !canVote || hasVotedYes || votingModalOpen,
-//         onclick: voteYes,
-//         label: hasVotedYes ? `Voted "${choices[0]}"` : `Vote "${choices[0]}"`,
-//         compact: true,
-//         rounded: true,
-//       }),
-//     ]);
-//     const noButton = m('.no-button', [
-//       m(Button, {
-//         intent: 'negative',
-//         disabled: !canVote || hasVotedNo || votingModalOpen,
-//         onclick: voteNo,
-//         label: hasVotedNo ? `Voted "${choices[1]}"` : `Vote "${choices[1]}"`,
-//         compact: true,
-//         rounded: true,
-//       })
-//     ]);
-
-//     const votingActionObj = [
-//       m('.button-row', [yesButton, noButton]),
-//     ];
-
-//     return m('.VotingActions', [votingActionObj]);
-//   }
-// };
 
 const ViewProposalPage: m.Component<{
   scope: string,
@@ -322,7 +206,7 @@ const ViewProposalPage: m.Component<{
   },
 
   view: (vnode) => {
-    const { proposal, votes, snapshotProposal, scores, activeTab } = vnode.state;
+    const { proposal, votes, snapshotProposal, totalScore, scores, activeTab } = vnode.state;
 
     return m(Sublayout, {
       class: 'ViewProposalPage',
@@ -362,6 +246,12 @@ const ViewProposalPage: m.Component<{
                   snapshotId: vnode.attrs.snapshotId,
                   proposal,
                   votes,
+                  space:vnode.state.space,
+                  scope:vnode.attrs.scope,
+                  identifier:vnode.attrs.identifier,
+                  snapshotProposal,
+                  totalScore,
+                  scores,
                 }),
               ]),
             ],
