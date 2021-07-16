@@ -4,6 +4,7 @@ class SnapshotProposal {
 	public readonly timestamp: string;
 	public readonly start: string;
 	public readonly end: string;
+	public readonly snapshot: string;
 	public readonly name: string;
 	public readonly body: string;
 	public readonly sig: string;
@@ -12,12 +13,13 @@ class SnapshotProposal {
 	public readonly choices: string[];
 	public readonly private?: boolean;
 
-	constructor(ipfsHash, authorAddress, timestamp, start, end, name, body, sig, authorIpfsHash, relayerIpfsHash, choices, _private) {
+	constructor(ipfsHash, authorAddress, timestamp, start, end, snapshot, name, body, sig, authorIpfsHash, relayerIpfsHash, choices, _private) {
 	  this.ipfsHash = ipfsHash;
 	  this.authorAddress = authorAddress;
 	  this.timestamp = timestamp;
 	  this.start = start;
 	  this.end = end;
+	  this.snapshot = snapshot;
 	  this.name = name;
 	  this.body = body;
 	  this.sig = sig;

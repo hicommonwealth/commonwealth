@@ -5,6 +5,7 @@ import 'components/proposals/voting_actions.scss';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 import { Spinner, Button } from 'construct-ui';
+import moment from 'moment';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
@@ -16,7 +17,7 @@ import { notifyError } from 'controllers/app/notifications';
 import { ProposalHeaderTitle } from './header';
 import {
   ProposalBodyAuthor, ProposalBodyCreated,
-  ProposalBodyLastEdited, ProposalBodyText,
+  ProposalBodyEnded, ProposalBodyText,
 } from './body';
 import User from '../../components/widgets/user';
 import { SocialSharingCarat } from '../../components/social_sharing_carat';
@@ -46,7 +47,7 @@ const ProposalHeader: m.Component<{
           ]),
           m('.proposal-body-meta', [
             m(ProposalBodyCreated, { item: proposal, link: proposalLink }),
-            m(ProposalBodyLastEdited, { item: proposal }),
+            m(ProposalBodyEnded, { item: proposal }),
             m(ProposalBodyAuthor, { item: proposal }),
             m('.CommentSocialHeader', [ m(SocialSharingCarat) ]),
           ]),
@@ -83,9 +84,12 @@ const VoteRow: m.Component<{
   }
 };
 
-const VoteView: m.Component<{ votes: Vote[] }> = {
+const VoteView: m.Component<{ votes: Vote[] }, { numLoadedYes: number, numLoadedNo: number }> = {
   view: (vnode) => {
     const { votes } = vnode.attrs;
+    console.log("vote viiew!!!")
+    if (!vnode.state.numLoadedYes) { vnode.state.numLoadedYes = 10; }
+    if (!vnode.state.numLoadedNo) { vnode.state.numLoadedNo = 10; }
 
     const voteYesListing = [];
     const voteNoListing = [];
@@ -98,7 +102,8 @@ const VoteView: m.Component<{ votes: Vote[] }> = {
           return null;
         }
       })
-      .filter((v) => !!v)));
+      .filter((v) => !!v)
+      .slice(0, vnode.state.numLoadedYes)));
 
     voteNoListing.push(m('.vote-group-wrap', votes
       .map((vote) => {
@@ -108,20 +113,29 @@ const VoteView: m.Component<{ votes: Vote[] }> = {
           return null;
         }
       })
-      .filter((v) => !!v)));
+      .filter((v) => !!v)
+      .slice(0, vnode.state.numLoadedNo)));
 
-    return m('.VotingResults', [
+      return m('.VotingResults', [
       m('.results-column', [
         m('.results-header', `Voted yes (${votes.filter((v) => v.choice === 'yes').length})`),
         m('.results-cell', [
           voteYesListing
         ]),
+        votes.filter((v) => v.choice === 'yes').length ? m(Button, {
+          label: 'Load more',
+          onclick: () => { vnode.state.numLoadedYes += 10; m.redraw(); },
+        }) : null
       ]),
       m('.results-column', [
         m('.results-header', `Voted no (${votes.filter((v) => v.choice === 'no').length})`),
         m('.results-cell', [
           voteNoListing
         ]),
+        votes.filter((v) => v.choice === 'no').length > vnode.state.numLoadedNo ? m(Button, {
+          label: 'Load more',
+          onclick: () => { vnode.state.numLoadedNo += 10; m.redraw(); },
+        }) : null
       ])
     ]);
   }
@@ -161,7 +175,7 @@ const VoteAction: m.Component<{
             selectedChoice: 0,
             totalScore: vnode.attrs.totalScore,
             scores: vnode.attrs.scores,
-            snapshot: vnode.attrs.proposal.msg.payload.snapshot
+            snapshot: vnode.attrs.proposal.snapshot
           }
         });
         vnode.state.votingModalOpen = true;
@@ -182,7 +196,7 @@ const VoteAction: m.Component<{
             selectedChoice: 1,
             totalScore: vnode.attrs.totalScore,
             scores: vnode.attrs.scores,
-            snapshot: vnode.attrs.proposal.msg.payload.snapshot,
+            snapshot: vnode.attrs.proposal.snapshot,
           }
         });
         vnode.state.votingModalOpen = true;
@@ -268,7 +282,7 @@ const ViewProposalPage: m.Component<{
           getPower(
             space,
             author.address,
-            proposal.msg.payload.snapshot
+            proposal.snapshot
           ).then((power) => {
             const { scores, totalScore } = power;
             vnode.state.scores = scores;
@@ -295,6 +309,10 @@ const ViewProposalPage: m.Component<{
   view: (vnode) => {
     const author = app.user.activeAccount;
 
+    const isActive = vnode.state.proposal
+    && moment(+vnode.state.proposal.start * 1000) <= moment()
+    && moment(+vnode.state.proposal.end * 1000) > moment();
+
     return m(Sublayout, { class: 'ViewProposalPage', title: 'Snapshot Proposal' }, [
       m(ProposalHeader, {
         snapshotId: vnode.attrs.snapshotId,
@@ -302,7 +320,7 @@ const ViewProposalPage: m.Component<{
       }),
       m('.PinnedDivider', m('hr')),
       vnode.state.votes && m(VoteView, { votes: vnode.state.votes }),
-      vnode.state.proposal && author && m(VoteAction, {
+      isActive && author && m(VoteAction, {
         space: vnode.state.space,
         proposal: vnode.state.snapshotProposal,
         id: vnode.attrs.identifier,

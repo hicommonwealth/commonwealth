@@ -4,7 +4,6 @@ import { SnapshotProposalStore } from 'stores';
 import { SnapshotProposal } from '../../models';
 
 const hubUrl = process.env.SNAPSHOT_APP_HUB_URL || 'https://testnet.snapshot.org';
-
 class SnapshotController {
   private _proposalStore: SnapshotProposalStore = new SnapshotProposalStore();
   // private _votes = new Store<SnapshotVote>();
@@ -13,6 +12,7 @@ class SnapshotController {
   public spaces: any;
 
   public async fetchSnapshotProposals(snapshot: string) {
+    console.log('process.env',process.env)
     const response = await $.get(`${hubUrl}/api/${snapshot}/proposals`);
     // if (response.status !== 'Success') {
     //   throw new Error(`Cannot fetch snapshot proposals: ${response.status}`);
@@ -25,6 +25,7 @@ class SnapshotController {
         +response[key].msg.timestamp,
         response[key].msg.payload.start,
         response[key].msg.payload.end,
+        response[key].msg.payload.snapshot,
         response[key].msg.payload.name,
         response[key].msg.payload.body,
         response[key].sig,
