@@ -1,14 +1,17 @@
 // TODO: change imports to chain-events when new chain-events package is ready to be included as a dependency
-import { listeners, startProducer } from '../src/listener';
-import { createListener } from '../src/listener/createListener';
-import { deleteListener, getRabbitMQConfig } from '../src/listener/util';
-import { factory, formatFilename } from '../src/logging';
-import { StorageFetcher } from '../src/chains/substrate';
-import Identity from '../src/identity';
+import { factory, formatFilename } from '../../shared/logging';
+import Identity from '../eventHandlers/pgIdentity';
 import { Pool } from 'pg';
 import _ from 'underscore';
-import { producer } from '../src/listener';
 import format from 'pg-format';
+
+import {
+  createListener,
+  chainSupportedBy,
+  SubstrateTypes,
+  getRabbitMQConfig,
+  RabbitMqHandler
+} from '@commonwealth/chain-events';
 
 const log = factory.getLogger(formatFilename(__filename));
 export const WORKER_NUMBER: number = Number(process.env.WORKER_NUMBER) || 0;
@@ -25,8 +28,11 @@ export const HANDLE_IDENTITY =
 // The number of minutes to wait between each run -- rounded to the nearest whole number
 export const REPEAT_TIME = Math.round(Number(process.env.REPEAT_TIME)) || 10;
 
+// stores all the listeners a dbNode has active
+const listeners: any[] = [];
+
 // TODO: API-WS from infinitely attempting reconnection i.e. mainnet1
-async function dbNodeProcess() {
+async function mainProcess(producer: RabbitMqHandler) {
   const pool = new Pool({
     connectionString: DATABASE_URI
   });
@@ -44,29 +50,46 @@ async function dbNodeProcess() {
   );
 
   // initialize listeners first (before dealing with identity)
-  // TODO: fork off listeners as their own processes if needed (requires major changes to listener/handler structure)
   for (const chain of myChainData) {
     // start listeners that aren't already active
     if (!listeners[chain.id]) {
       log.info(`Starting listener for ${chain.id}...`);
-      await createListener(chain.id, {
+      listeners[chain.id] = await createListener(chain.id, {
         archival: false,
         url: chain.url,
         spec: chain.spec,
-        skipCatchup: false
+        skipCatchup: false,
+        verbose: false,
+        enricherConfig: { balanceTransferThresholdPermill: 1_000 } // 0.1% of total issuance
       });
+
+      // if chain is a substrate chain add the excluded events
+      let excludedEvents = [];
+      if (chainSupportedBy(chain.id, SubstrateTypes.EventChains))
+        excludedEvents = [
+          SubstrateTypes.EventKind.Reward,
+          SubstrateTypes.EventKind.TreasuryRewardMinting,
+          SubstrateTypes.EventKind.TreasuryRewardMintingV2,
+          SubstrateTypes.EventKind.HeartbeatReceived
+        ];
+
+      // add the rabbitmq handler for this chain
+      listeners[chain.id].eventHandlers['rabbitmq'] = {
+        handler: producer,
+        excludedEvents
+      };
+
+      // subscribe to the chain to begin listening for events
+      await listeners[chain.id].subscribe();
     }
-    // restart the listener if specs were updated
+    // restart the listener if specs were updated (only substrate chains)
     else {
-      if (!_.isEqual(chain.spec, listeners[chain.id].args.spec)) {
+      if (
+        chainSupportedBy(chain.id, SubstrateTypes.EventChains) &&
+        !_.isEqual(chain.spec, listeners[chain.id].options.spec)
+      ) {
         log.info(`Spec for ${chain} changed... restarting listener`);
-        deleteListener(chain.id);
-        await createListener(chain.id, {
-          archival: false,
-          url: chain.url,
-          spec: chain.spec,
-          skipCatchup: false
-        });
+        await listeners[chain.id].updateSpec(chain.spec);
       }
     }
   }
@@ -79,6 +102,9 @@ async function dbNodeProcess() {
 
   // loop through chains again this time dealing with identity
   for (const chain of myChainData) {
+    // skip chains that aren't Substrate chains
+    if (!chainSupportedBy(chain.id, SubstrateTypes.EventChains)) continue;
+
     log.info(`Fetching identities on ${chain.id}`);
     // fetch identities to fetch on this chain
     query = format(
@@ -94,14 +120,7 @@ async function dbNodeProcess() {
       log.info(`No identities to fetch for ${chain.id}`);
       continue;
     }
-
-    // initialize storage fetcher if it doesn't exist
-    if (!listeners[chain.id].storageFetcher)
-      listeners[chain.id].storageFetcher = new StorageFetcher(
-        listeners[chain.id].subscriber.api
-      );
-
-    // get identity events
+    // get identity events using the storage fetcher
     let identityEvents = await listeners[
       chain.id
     ].storageFetcher.fetchIdentities(identitiesToFetch);
@@ -143,11 +162,43 @@ log.info('db-node initialization');
 // if we need to publish identity events to a queue use the appropriate config file
 let rbbtMqConfig =
   HANDLE_IDENTITY == 'publish' ? './WithIdentityQueueConfig.json' : null;
-startProducer(getRabbitMQConfig(rbbtMqConfig))
+const producer = new RabbitMqHandler(getRabbitMQConfig(rbbtMqConfig));
+producer
+  .init()
   .then(() => {
-    return dbNodeProcess();
+    return mainProcess(producer);
   })
   .then(() => {
-    // first run may take some time so start the clock after its done
-    setInterval(dbNodeProcess, REPEAT_TIME * 60000);
+    setInterval(mainProcess, REPEAT_TIME * 60000, producer);
   });
+
+// export async function getTokenLists() {
+//   let data: any = await Promise.all(
+//     tokenListUrls.map((url) =>
+//       fetch(url)
+//         .then((o) => o.json())
+//         .catch((e) => console.error(e))
+//     )
+//   );
+//   data = data.map((o) => o && o.tokens).flat();
+//   data = data.filter((o) => o); //remove undefined
+//   return data;
+// }
+
+// export async function getSubstrateSpecs(chain: EventSupportingChainT) {
+//   let url: string = `${process.env.SUBSTRATE_SPEC_ENDPOINT ||
+//     'http://localhost:8080/api/getSubstrateSpec'}?chain=${chain}`;
+//
+//   console.log(`Getting ${chain} spec at url ${url}`);
+//
+//   let data: any = await fetch(url)
+//     .then((res) => res.json())
+//     .then((json) => json.result)
+//     .catch((err) => console.error(err));
+//
+//   return data;
+// }
+
+// let tokens = await getTokenLists();
+// let tokenAddresses = tokens.map((o) => o.address);
+// const api = await Erc20Events.createApi(listenerArg.url, tokenAddresses);

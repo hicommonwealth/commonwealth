@@ -9,7 +9,7 @@ import { findAll } from 'highlight-words-core';
 import smartTruncate from 'smart-truncate';
 
 const renderer = new marked.Renderer();
-renderer.link = (href, title, text) => {
+renderer['link'] = (href, title, text) => {
   return `<a target="_blank" href="${href}">${text}</a>`;
 };
 
@@ -18,7 +18,7 @@ marked.setOptions({
   gfm: true, // use github flavored markdown
   smartypants: true,
   smartLists: true,
-  xhtml: true,
+  xhtml: true
 });
 
 const MarkdownFormattedText : m.Component<{
