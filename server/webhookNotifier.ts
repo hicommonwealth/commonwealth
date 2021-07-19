@@ -87,7 +87,7 @@ const send = async (models, content: WebhookContent) => {
   try {
     address = await models.Address.findOne({ where: { address: content.user, chain: content.author_chain } });
   } catch (err) {
-    // pass nothing if no matching address is found
+    console.log("There's no address")
   }
 
   // if a community is passed with the content, we know that it is from an offchain community
@@ -107,10 +107,7 @@ const send = async (models, content: WebhookContent) => {
   });
   const chainOrCommwebhookUrls = [];
   chainOrCommWebhooks.forEach((wh) => {
-    // We currently only support slack webhooks
-    if (validURL(wh.url)) {
-      chainOrCommwebhookUrls.push(wh.url);
-    }
+    chainOrCommwebhookUrls.push(wh.url);
   });
 
   const {
@@ -251,14 +248,41 @@ const send = async (models, content: WebhookContent) => {
             },
           }]
         };
-      } else if (url.indexOf('matrix') !== -1) {
-        // TODO: matrix format and URL pattern matcher unimplemented
-        // return {
-        //   'text': `${getFiltered(content, address).join('\n')}`,
-        //   'format': 'plain',
-        //   'displayName': 'Commonwealth',
-        //   'avatarUrl': 'http://commonwealthLogoGoesHere'
-        // };
+      } else if (url.indexOf('telegram.org') !== -1) {
+        let getUpdatesUrl = url.split('/@').slice(0, -1).join('@');
+
+        let getChatUsername = url.split('/@');
+        getChatUsername = '@'+getChatUsername[1];
+
+        const botToken = 'bot1662899908:AAGuGPpsYzfM2KzAGjveaois9TUN-OMggC4';
+        getUpdatesUrl = `https://api.telegram.org/${botToken}`;
+        url = getUpdatesUrl+'/sendMessage';
+
+        webhookData = isChainEvent ? {
+          chat_id: getChatUsername,
+          text: `<a href="${chainEventLink}"><b>${title}</b></a>\n\n${fulltext}`,
+          parse_mode: 'HTML',
+          reply_markup: {
+            'resize_keyboard': true,
+            'inline_keyboard': [
+              [
+                { 'text': 'Read more on commonwealth', 'url': chainEventLink }
+              ]
+            ]
+          }
+        } : {
+          chat_id: getChatUsername,
+          text: `<b>Author:</b> <a href="${actorAccountLink}">${actor}</a>\n<a href="${actedOnLink}"><b>${notificationTitlePrefix + actedOn}</b></a> \r\n\n${notificationExcerpt.replace(REGEX_EMOJI, '')}`,
+          parse_mode: 'HTML',
+          reply_markup: {
+            'resize_keyboard': true,
+            'inline_keyboard': [
+              [
+                { 'text': 'Read more on commonwealth', 'url': actedOnLink }
+              ]
+            ]
+          }
+        };
       } else {
         // TODO: other formats unimplemented
       }

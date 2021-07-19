@@ -146,7 +146,7 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
             });
           }),
           webhooks.length === 0 && m(ListItem, {
-            contentLeft: 'No webhooks yet. Slack and Discord webhooks are supported.'
+            contentLeft: 'No webhooks yet. Slack, Discord, and Telegram webhooks are supported. While Slack and Discord need full URLs. For Telegram, please paste the group handle you want to add a Webhook to.'
           }),
         ]),
       ]),
