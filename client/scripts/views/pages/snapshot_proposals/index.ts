@@ -17,8 +17,8 @@ import ProposalRow from './proposal_row';
 export const ALL_PROPOSALS_KEY = 'COMMONWEALTH_ALL_PROPOSALS';
 
 enum SnapshotProposalFilter {
-  // Core = 'Core',
-  // Community = 'Community',
+  Core = 'Core',
+  Community = 'Community',
   Active = 'Active',
   Ended = 'Ended',
 }
@@ -34,6 +34,7 @@ const SnapshotProposalStagesBar: m.Component<{
           rounded: true,
           compact: true,
           size: 'sm',
+          disabled: option === SnapshotProposalFilter.Core || option === SnapshotProposalFilter.Community,
           class: `discussions-stage ${vnode.attrs.selected === option ? 'active' : ''}`,
           onclick: (e) => {
             e.preventDefault();
@@ -85,10 +86,9 @@ const SnapshotProposalsPage: m.Component<{ topic?: string, snapshotId: string },
 
     const checkProposalByFilter = (proposal: SnapshotProposal, option: SnapshotProposalFilter) => {
       switch (option) {
-        // case SnapshotProposalFilter.Core:
-        //   return !proposal.private;
-        // case SnapshotProposalFilter.Community:
-        //   return proposal.private;
+        case SnapshotProposalFilter.Core:
+        case SnapshotProposalFilter.Community:
+          return true;
         case SnapshotProposalFilter.Active:
           return moment(+proposal.end * 1000) >= moment();
         case SnapshotProposalFilter.Ended:
