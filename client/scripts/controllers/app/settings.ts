@@ -6,7 +6,7 @@ import { notifyError } from 'controllers/app/notifications';
 class SettingsController {
   public static async disableRichText(value: boolean) {
     if (!app.isLoggedIn()) return;
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       $.post(`${app.serverUrl()}/writeUserSetting`, {
         jwt: app.user.jwt,
         key: 'disableRichText',

@@ -40,9 +40,13 @@ export enum ChainNetwork {
   ERC20 = 'erc20',
   Clover = 'clover',
   HydraDX = 'hydradx',
+  Yearn = 'yearn',
+  Fei = 'fei',
+  Sushi = 'sushi',
   Crust = 'crust',
   CosmosHub = 'cosmos-hub',
   Gaia13k = 'gaia-13k',
+  Demo = 'demo',
 }
 
 // This function returns a default chain for a chainbase

@@ -430,14 +430,14 @@ const TXSigningModalStates: {
 
       vnode.state.timer = 0;
       // TODO: set a timeout? We currently have no failure case due to how event handling works.
-      vnode.state.timerHandle = setInterval(() => {
+      vnode.state.timerHandle = global.setInterval(() => {
         vnode.state.timer++;
         m.redraw();
       }, 1000);
       // for edgeware mainnet, timeout after 10 sec
       // TODO: remove this after the runtime upgrade to Substrate 2.0 rc3+
       if (app.chain?.meta?.chain?.id === 'edgeware') {
-        vnode.state.timeoutHandle = setTimeout(() => {
+        vnode.state.timeoutHandle = global.setTimeout(() => {
           clearInterval(vnode.state.timeoutHandle);
           vnode.attrs.next('SentTransactionSuccess', {
             hash: 'Not available'

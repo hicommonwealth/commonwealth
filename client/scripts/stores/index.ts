@@ -7,6 +7,7 @@ export { default as NotificationStore } from './NotificationStore';
 export { default as OffchainCommunitiesStore } from './OffchainCommunitiesStore';
 export { default as ProfileStore } from './ProfileStore';
 export { default as ProposalStore } from './ProposalStore';
+export { default as SnapshotProposalStore } from './SnapshotProposalStore';
 export { default as ReactionStore } from './ReactionStore';
 export { default as Store } from './Store';
 export { default as TopicStore } from './TopicStore';

@@ -264,9 +264,13 @@ export default (
     } else if (chain.network === 'ethereum'
       || chain.network === 'moloch'
       || chain.network === 'alex'
+      || chain.network === 'yearn'
+      || chain.network === 'fei'
+      || chain.network === 'sushi'
       || chain.network === 'metacartel'
       || chain.network === 'commonwealth'
       || chain.type === 'token'
+      || chain.network === 'demo'
     ) {
       //
       // ethereum address handling

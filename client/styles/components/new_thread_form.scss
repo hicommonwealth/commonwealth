@@ -42,7 +42,15 @@
 
     .new-thread-form-body {
         max-width: 100%;
+        .new-snapshot-proposal-form {
+            display: flex;
+
+            form:last-child {
+                display: block;
+            }
+        }
     }
+
     &.has-drafts .new-thread-form-body {
         max-width: calc(100% - 205px);
         @include xs-max {

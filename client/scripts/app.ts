@@ -5,12 +5,14 @@ import 'construct.scss';
 // import 'tailwindcss/tailwind.css';
 import '../styles/style.css';
 import '../styles/lib/style.css';
+import 'simplepicker/dist/simplepicker.css';
 
 import m from 'mithril';
 import $ from 'jquery';
 import { FocusManager } from 'construct-ui';
 import moment from 'moment';
 import mixpanel from 'mixpanel-browser';
+import _ from 'underscore';
 
 import app, { ApiStatus, LoginState } from 'state';
 import {
@@ -34,6 +36,7 @@ import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import LoginModal from 'views/modals/login_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';
 import Login from './views/components/login';
+import { formatSpace } from './helpers/snapshot_utils/snapshot_utils';
 
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/landing');
@@ -117,7 +120,15 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
         app.config.chains.getAll().find((c) => c.customDomain === host) !== undefined
           || app.config.communities.getAll().find((c) => c.customDomain === host) !== undefined
       );
-
+      app.snapshot.client.getSpaces().then((response) => {
+        console.log(response);
+        app.snapshot.spaces = _.object(
+          Object.entries(response).map((space) => [
+            space[0],
+            formatSpace(space[0], space[1])
+          ])
+        );
+      });
       resolve();
     }).catch((err: any) => {
       app.loadingError = err.responseJSON?.error || 'Error loading application state';
@@ -610,6 +621,8 @@ $(() => {
     '/:scope/discussions/:topic': importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
     '/:scope/search':            importRoute('views/pages/search', { scoped: true, deferChain: true }),
     '/:scope/members':           importRoute('views/pages/members', { scoped: true, deferChain: true }),
+    '/:scope/snapshot-proposals/:snapshotId': importRoute('views/pages/snapshot_proposals', { scoped: true, deferChain: true }),
+    '/:scope/snapshot-proposal/:snapshotId/:identifier': importRoute('views/pages/view_snapshot_proposal', { scoped: true }),
     '/:scope/chat':              importRoute('views/pages/chat', { scoped: true, deferChain: true }),
     '/:scope/referenda':         importRoute('views/pages/referenda', { scoped: true }),
     '/:scope/proposals':         importRoute('views/pages/proposals', { scoped: true }),
@@ -621,6 +634,7 @@ $(() => {
     '/:scope/delegate':          importRoute('views/pages/delegate', { scoped: true, }),
     '/:scope/login':             importRoute('views/pages/login', { scoped: true, deferChain: true }),
     '/:scope/new/thread':        importRoute('views/pages/new_thread', { scoped: true, deferChain: true }),
+    '/:scope/new/snapshot-proposal/:snapshotId': importRoute('views/pages/new_snapshot_proposal', { scoped: true, deferChain: true }),
     '/:scope/new/proposal/:type': importRoute('views/pages/new_proposal/index', { scoped: true }),
     '/:scope/admin':             importRoute('views/pages/admin', { scoped: true }),
     '/:scope/spec_settings':     importRoute('views/pages/spec_settings', { scoped: true, deferChain: true }),

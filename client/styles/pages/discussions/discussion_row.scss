@@ -45,6 +45,9 @@
             a.proposal-topic {
                 display: inline-block;
                 color: $text-color-light;
+                overflow: hidden;
+                max-width: 100%;
+                text-overflow: ellipsis;
             }
             .mobile-comment-count {
                 display: none !important;
@@ -90,6 +93,12 @@
                 }
                 > a.user-display-name {
                     color: $primary-bg-color;
+                }
+            }
+            .m-l-20 {
+                color: $text-color-light;
+                @media(min-width: 800px){
+                    margin-left: 10px;
                 }
             }
         }

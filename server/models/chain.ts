@@ -32,6 +32,7 @@ export interface ChainAttributes {
   customDomain: string;
   type: string;
   substrate_spec: RegisteredTypes;
+  snapshot: string;
 
   // associations
   ChainNodes?: ChainNodeAttributes[] | ChainNodeAttributes['id'][];
@@ -80,6 +81,7 @@ export default (
     collapsed_on_homepage: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: true },
     type: { type: dataTypes.STRING, allowNull: false },
     substrate_spec: { type: dataTypes.JSONB, allowNull: true },
+    snapshot: { type: dataTypes.STRING, allowNull: true },
   }, {
     timestamps: false,
     underscored: true,
