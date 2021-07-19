@@ -17,6 +17,7 @@ import { notifyError } from 'controllers/app/notifications';
 import QuillEditor from 'views/components/quill_editor';
 import { idToProposal } from 'identifiers';
 import { capitalize } from 'lodash';
+import SimplePicker from 'simplepicker';
 interface IThreadForm {
   name: string;
   body: string;
@@ -291,26 +292,34 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
               m(FormGroup, [
                 m(FormLabel, 'Start Date:'),
                 m(Input, {
-                  defaultValue: vnode.state.isFromExistingProposal ? today.toDateString() : ' ',
+                  // defaultValue: vnode.state.isFromExistingProposal ? today.toDateString() : ' ',
                   name: 'targets',
                   placeholder: 'May 1, 1995',
-                  oninput: (e) => {
-                    const result = (e.target as any).value;
-                    vnode.state.form.start = result;
-                    m.redraw();
+                  value: moment(vnode.state.form.start || new Date()).format('DD MMM YYYY hh:mm A'),
+                  onclick: () => {
+                    const myPicker = new SimplePicker({ zIndex: 1000 });
+                    myPicker.open();
+                    myPicker.on('submit', (date: Date, readableDate: string) => {
+                      vnode.state.form.start = date.getTime();
+                      m.redraw();
+                    });
                   },
                 }),
               ]),
               m(FormGroup, [
                 m(FormLabel, 'End Date:'),
                 m(Input, {
-                  defaultValue: vnode.state.isFromExistingProposal ? nextWeek.toDateString() : ' ',
+                  // defaultValue: vnode.state.isFromExistingProposal ? nextWeek.toDateString() : ' ',
                   name: 'targets',
                   placeholder: 'May 22, 1995',
-                  oninput: (e) => {
-                    const result = (e.target as any).value;
-                    vnode.state.form.end = result;
-                    m.redraw();
+                  value: moment(vnode.state.form.end || new Date()).format('DD MMM YYYY hh:mm A'),
+                  onclick: () => {
+                    const myPicker = new SimplePicker({ zIndex: 1000 });
+                    myPicker.open();
+                    myPicker.on('submit', (date: Date, readableDate: string) => {
+                      vnode.state.form.end = date.getTime();
+                      m.redraw();
+                    });
                   },
                 }),
               ]),

@@ -17,8 +17,8 @@ import ProposalRow from './proposal_row';
 export const ALL_PROPOSALS_KEY = 'COMMONWEALTH_ALL_PROPOSALS';
 
 enum SnapshotProposalFilter {
-  Core = 'Core',
-  Community = 'Community',
+  // Core = 'Core',
+  // Community = 'Community',
   Active = 'Active',
   Ended = 'Ended',
 }
@@ -74,7 +74,7 @@ const SnapshotProposalsPage: m.Component<{ topic?: string, snapshotId: string },
   oninit: (vnode) => {
     vnode.state.loadingProposals = true;
     vnode.state.allProposals = [];
-    vnode.state.selectedFilter = SnapshotProposalFilter.Core;
+    vnode.state.selectedFilter = SnapshotProposalFilter.Active;
   },
 
   view: (vnode) => {
@@ -85,10 +85,10 @@ const SnapshotProposalsPage: m.Component<{ topic?: string, snapshotId: string },
 
     const checkProposalByFilter = (proposal: SnapshotProposal, option: SnapshotProposalFilter) => {
       switch (option) {
-        case SnapshotProposalFilter.Core:
-          return !proposal.private;
-        case SnapshotProposalFilter.Community:
-          return proposal.private;
+        // case SnapshotProposalFilter.Core:
+        //   return !proposal.private;
+        // case SnapshotProposalFilter.Community:
+        //   return proposal.private;
         case SnapshotProposalFilter.Active:
           return moment(+proposal.end * 1000) >= moment();
         case SnapshotProposalFilter.Ended:

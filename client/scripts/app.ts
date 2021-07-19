@@ -5,6 +5,7 @@ import 'construct.scss';
 // import 'tailwindcss/tailwind.css';
 import '../styles/style.css';
 import '../styles/lib/style.css';
+import 'simplepicker/dist/simplepicker.css';
 
 import m from 'mithril';
 import $ from 'jquery';
