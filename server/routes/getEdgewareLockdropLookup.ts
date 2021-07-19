@@ -118,11 +118,11 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
 
   const locks = await Promise.all(contracts.map(async c => {
     // eslint-disable-next-line no-return-await
-    return await fetchLocks(network, address, c);
+    return await fetchLocks(network as string, address, c);
   }));
   const signals = await Promise.all(contracts.map(async c => {
     // eslint-disable-next-line no-return-await
-    return await fetchSignals(network, address, c);
+    return await fetchSignals(network as string, address, c);
   }));
   const results = _.merge(_.merge(locks[0], locks[1]), _.merge(signals[0], signals[1]));
   return res.json({ status: 'Success', results });

@@ -7,7 +7,7 @@ const edgewareLockdropEvents = async (models, req: Request, res: Response, next:
   const filters : any = {};
   if (req.query.origin) filters.origin =
     models.sequelize.where(models.sequelize.fn('LOWER', models.sequelize.col('origin')),
-                           'LIKE', `%${req.query.origin.toLowerCase()}%`);
+                           'LIKE', `%${String(req.query.origin).toLowerCase()}%`);
   if (req.query.name) filters.name = req.query.name;
 
   const events = await models.EdgewareLockdropEvent.findAll({ where: filters, order: ['timestamp'] });

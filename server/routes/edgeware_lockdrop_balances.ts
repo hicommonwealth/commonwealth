@@ -7,7 +7,7 @@ const edgewareLockdropBalances = async (models, req: Request, res: Response, nex
   const filters : any = {};
   if (req.query.address) filters.address =
     models.sequelize.where(models.sequelize.fn('LOWER', models.sequelize.col('address')),
-                           'LIKE', `%${req.query.address.toLowerCase()}%`);
+                           'LIKE', `%${String(req.query.address).toLowerCase()}%`);
 
   const balances = await models.EdgewareLockdropBalance.findAll({ where: filters });
   res.json({ balances });
