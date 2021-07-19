@@ -1209,21 +1209,17 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@commonwealth/chain-events@git+https://git@github.com/timolegros/chain-events#build":
+"@commonwealth/chain-events@file:.yalc/@commonwealth/chain-events":
   version "0.6.5"
-  resolved "git+https://git@github.com/timolegros/chain-events#bbff6b9690cedd9e0b46e0b2f429e437d51cd916"
   dependencies:
     "@edgeware/node-types" "^3.3.3"
     amqplib "^0.8.0"
     bn.js "^5.1.3"
     ethereum-block-by-date "^1.2.2"
     ethers "^4.0.39"
-    express "^4.17.1"
     lodash "^4.17.21"
     node-fetch "^2.6.1"
-    pg "^8.6.0"
-    pg-format "^1.0.4"
-    rascal "^13.1.0"
+    rascal "^13.0.3"
     sleep-promise "^8.0.1"
     typescript-logging "^0.6.4"
     underscore "^1.10.2"
@@ -10303,10 +10299,10 @@ markdown-table@^1.1.0:
   resolved "https://registry.yarnpkg.com/markdown-table/-/markdown-table-1.1.3.tgz#9fcb69bcfdb8717bfd0398c6ec2d93036ef8de60"
   integrity sha512-1RUZVgQlpJSPWYbFSpmudq5nHY1doEIv89gBtF0s4gW1GF2XorxcA/70M5vq7rLv0a6mhOUccRsqkwhwLCIQ2Q==
 
-marked@^2.0.0:
-  version "2.1.3"
-  resolved "https://registry.yarnpkg.com/marked/-/marked-2.1.3.tgz#bd017cef6431724fd4b27e0657f5ceb14bff3753"
-  integrity sha512-/Q+7MGzaETqifOMWYEA7HVMaZb4XbcRfaOzcSsHZEith83KGlvaSG33u0SKu89Mj5h+T8V2hM+8O45Qc5XTgwA==
+marked@2.0.5:
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/marked/-/marked-2.0.5.tgz#2d15c759b9497b0e7b5b57f4c2edabe1002ef9e7"
+  integrity sha512-yfCEUXmKhBPLOzEC7c+tc4XZdIeTdGoRCZakFMkCxodr7wDXqoapIME4wjcpBPJLNyUnKJ3e8rb8wlAgnLnaDw==
 
 mathml-tag-names@^2.1.1:
   version "2.1.3"
@@ -12048,11 +12044,6 @@ pg-connection-string@^2.5.0:
   resolved "https://registry.yarnpkg.com/pg-connection-string/-/pg-connection-string-2.5.0.tgz#538cadd0f7e603fc09a12590f3b8a452c2c0cf34"
   integrity sha512-r5o/V/ORTA6TmUnyWZR9nCj1klXCO2CEKNRlVuJptZe85QuhFayC7WeMic7ndayT5IRIR0S0xFxFi2ousartlQ==
 
-pg-format@^1.0.4:
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/pg-format/-/pg-format-1.0.4.tgz#27734236c2ad3f4e5064915a59334e20040a828e"
-  integrity sha1-J3NCNsKtP05QZJFaWTNOIAQKgo4=
-
 pg-int8@1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/pg-int8/-/pg-int8-1.0.1.tgz#943bd463bf5b71b4170115f80f8efc9a0c0eb78c"
@@ -12079,7 +12070,7 @@ pg-types@^2.1.0:
     postgres-date "~1.0.4"
     postgres-interval "^1.1.0"
 
-pg@^8.0.3, pg@^8.6.0:
+pg@^8.0.3:
   version "8.6.0"
   resolved "https://registry.yarnpkg.com/pg/-/pg-8.6.0.tgz#e222296b0b079b280cce106ea991703335487db2"
   integrity sha512-qNS9u61lqljTDFvmk/N66EeGq3n6Ujzj0FFyNMGQr6XuEv4tgNTXvJQTfJdcvGit5p5/DWPu+wj920hAJFI+QQ==
@@ -13386,7 +13377,7 @@ range-parser@^1.2.1, range-parser@~1.2.0, range-parser@~1.2.1:
   resolved "https://registry.yarnpkg.com/range-parser/-/range-parser-1.2.1.tgz#3cf37023d199e1c24d1a55b84800c2f3e6468031"
   integrity sha512-Hrgsx+orqoygnmhFbKaHE6c296J+HTAQXoxEF6gNupROmmGJRoyzfG3ccAveqCBrwr/2yxQ5BVd/GTl5agOwSg==
 
-rascal@^13.1.0:
+rascal@^13.0.3, rascal@^13.1.0:
   version "13.1.0"
   resolved "https://registry.yarnpkg.com/rascal/-/rascal-13.1.0.tgz#29b8ae0caebbec03de0c5c0ba68e49077a2fec57"
   integrity sha512-D1rpRCrwsG50lcnJyNkHQI7cXION0VowOf+ZZtvTYPizBsLuEqeLkqyCW0gdH/9RTXdWPn3KG31/FuCgaUH3mw==
@@ -16151,10 +16142,10 @@ typescript-logging@^0.6.4:
   dependencies:
     stacktrace-js "1.3.1"
 
-typescript@^3.8.2:
-  version "3.9.10"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.9.10.tgz#70f3910ac7a51ed6bef79da7800690b19bf778b8"
-  integrity sha512-w6fIxVE/H1PkLKcCPsFqKE7Kv7QUwhU8qQY2MueZXWx5cPZdwFupLgKK3vntcK98BtNHZtAF4LA/yl2a7k8R6Q==
+typescript@4.3.4:
+  version "4.3.4"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.3.4.tgz#3f85b986945bcf31071decdd96cf8bfa65f9dcbc"
+  integrity sha512-uauPG7XZn9F/mo+7MrsRjyvbxFpzemRjKEZXS4AK83oP2KKOJPvb+9cO/gmnv8arWZvhnjVOXz7B49m1l0e9Ew==
 
 typical@^2.6.0, typical@^2.6.1:
   version "2.6.1"
