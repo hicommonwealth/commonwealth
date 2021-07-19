@@ -228,12 +228,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
   if (app.chain && n === app.chain.meta) {
     return;
   }
-  if ((Object.values(ChainNetwork) as any).indexOf(n.chain.network) === -1
-    && n.chain.type !== 'token'
-  ) {
-    throw new Error('invalid chain');
-  }
-
+  
   // Shut down old chain if applicable
   await deinitChainOrCommunity();
   app.chainPreloading = true;

@@ -48,6 +48,13 @@ const addChainNode = async (models, req: Request, res: Response, next: NextFunct
       icon_url: req.body.icon_url,
       active: true,
       base: req.body.base,
+      website: req.body.website ? req.body.website : '',
+      discord: req.body.discord ? req.body.discord : '',
+      telegram: req.body.telegram ? req.body.telegram : '',
+      github: req.body.github ? req.body.github : '',
+      element: req.body.element ? req.body.element : '',
+      description: req.body.description ? req.body.description : '',
+      type: req.body.type ? req.body.type : 'chain',
     });
   }
 
