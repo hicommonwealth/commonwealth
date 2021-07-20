@@ -11,6 +11,7 @@ import {
   Callout, Tabs, TabItem, Form, FormGroup, Input, Button,
   Icon, Icons, List, ListItem, Tag,
 } from 'construct-ui';
+import web3 from 'web3';
 
 import app from 'state';
 
@@ -623,7 +624,8 @@ export const NewThreadForm: m.Component<{
                   ? vnode.state.activeTopic
                   : localStorage.getItem(`${app.activeId()}-active-topic`),
                 topics: app.topics && app.topics.getByCommunity(app.activeId()).filter((t) => {
-                  return isAdmin || (app.chain && (app.chain as Token).tokenBalance.gte(t.token_threshold));
+                  // @To-do // Change this because right now the forum threshold is hardcoded to zero
+                  return isAdmin || (app.chain && web3.utils.toBN(0).gte(t.token_threshold));
                 }),
                 featuredTopics: app.topics.getByCommunity(app.activeId())
                   .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
