@@ -118,7 +118,7 @@ const Sublayout: m.Component<{
           ]),
           hero
             ? m('.sublayout-hero', hero)
-            : (app.isLoggedIn() && (app.chain as Token)?.isToken && !(app.chain as Token)?.hasToken)
+            : (app.isLoggedIn() && (app.chain as Token)?.isToken && !app.user.activeAccount)
               ? m('.sublayout-hero.token-banner', [
                 m('.token-banner-content', `Link ${app.chain.meta.chain.symbol} address to participate in this community`),
               ]) : '',
