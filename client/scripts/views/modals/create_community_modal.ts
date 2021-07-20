@@ -125,6 +125,7 @@ const OffchainCommunityForm: m.Component<OffchainCommunityFormAttrs, OffchainCom
             privacyEnabled,
             isAuthenticatedForum,
           } = vnode.state;
+
           try {
             $.post(`${app.serverUrl()}/createCommunity`, {
               name,
@@ -166,6 +167,7 @@ interface SubstrateFormState {
   telegram: string,
   github: string,
   description: string,
+  substrate_spec: string,
 }
 
 const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
@@ -179,6 +181,7 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
     vnode.state.telegram = '';
     vnode.state.github = '';
     vnode.state.description = '';
+    vnode.state.substrate_spec = '';
   },
   view: (vnode) => {
     return m('.compact-modal-body-max', [
@@ -210,6 +213,13 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
           defaultValue: vnode.state.description,
           onChangeHandler: (v) => { vnode.state.description = v; },
           textarea: true,
+        }),
+        m(InputPropertyRow, {
+          title: 'Spec (JSON)',
+          defaultValue: vnode.state.substrate_spec,
+          textarea: true,
+          placeholder: `{"types": {"Address": "MultiAddress", "ChainId": "u8", "Reveals": "Vec<(AccountId, Vec<VoteOutcome>)>", "Balance2": "u128", "VoteData": {"stage": "VoteStage", "initiator": "AccountId", "vote_type": "VoteType", "tally_type": "TallyType", "is_commit_reveal": "bool"}, "VoteType": {"_enum": ["Binary", "MultiOption", "RankedChoice"]}, "TallyType": {"_enum": ["OnePerson", "OneCoin"]}, "VoteStage": {"_enum": ["PreVoting", "Commit", "Voting", "Completed"]}, "ResourceId": "[u8; 32]", "VoteRecord": {"id": "u64", "data": "VoteData", "reveals": "Reveals", "outcomes": "Vec<VoteOutcome>", "commitments": "Commitments"}, "AccountInfo": "AccountInfoWithRefCount", "Commitments": "Vec<(AccountId, VoteOutcome)>", "VoteOutcome": "[u8; 32]", "VotingTally": "Option<Vec<(VoteOutcome, u128)>>", "DepositNonce": "u64", "LookupSource": "MultiAddress", "ProposalTitle": "Bytes", "ProposalVotes": {"staus": "ProposalStatus", "expiry": "BlockNumber", "votes_for": "Vec<AccountId>", "votes_against": "Vec<AccountId>"}, "ProposalRecord": {"index": "u32", "stage": "VoteStage", "title": "Text", "author": "AccountId", "vote_id": "u64", "contents": "Text", "transition_time": "u32"}, "ProposalStatus": {"_enum": ["Initiated", "Approved", "Rejected"]}, "ProposalContents": "Bytes"}}`,
+          onChangeHandler: (v) => { vnode.state.substrate_spec = v; },
         }),
         m(InputPropertyRow, {
           title: 'Website',
@@ -256,7 +266,14 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
             element,
             telegram,
             github,
+            substrate_spec,
           } = vnode.state;
+          try {
+            JSON.parse(substrate_spec);
+          } catch (err) {
+            notifyError('Spec provided has invalid JSON');
+            return;
+          }
           try {
             $.post(`${app.serverUrl()}/addChainNode`, {
               name,
@@ -268,6 +285,7 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
               element,
               telegram,
               github,
+              substrate_spec,
               jwt: app.user.jwt,
               type: 'chain',
               id: slugify(name),

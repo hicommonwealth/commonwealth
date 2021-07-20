@@ -11,6 +11,7 @@ export const Errors = {
   MissingParams: 'Must provide chain ID, name, symbol, network, and node url',
   NodeExists: 'Node already exists',
   MustSpecifyContract: 'This is a contract, you must specify a contract address',
+  InvalidJSON: 'Substrate spec supplied has invalid JSON'
 };
 
 const addChainNode = async (models, req: Request, res: Response, next: NextFunction) => {
@@ -22,6 +23,13 @@ const addChainNode = async (models, req: Request, res: Response, next: NextFunct
   }
   if (!req.body.id || !req.body.name || !req.body.symbol || !req.body.network || !req.body.node_url || !req.body.base) {
     return next(new Error(Errors.MissingParams));
+  }
+  if (req.body.substrate_spec) {
+    try {
+      JSON.parse(req.body.substrate_spec);
+    } catch (err) {
+      return next(new Error(Errors.InvalidJSON));
+    }
   }
 
   let chain = await models.Chain.findOne({ where: {
@@ -48,6 +56,7 @@ const addChainNode = async (models, req: Request, res: Response, next: NextFunct
       icon_url: req.body.icon_url,
       active: true,
       base: req.body.base,
+      substrate_spec: req.body.substrate_spec ? req.body.substrate_spec : '',
       website: req.body.website ? req.body.website : '',
       discord: req.body.discord ? req.body.discord : '',
       telegram: req.body.telegram ? req.body.telegram : '',
