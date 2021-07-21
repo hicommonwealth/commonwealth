@@ -11,7 +11,7 @@ in order to use the consumer here.
 - Use `git clone https://github.com/timolegros/chain-events.git` to clone the chain-events repo into another directory
 - Use `git checkout tim.rabbitmq` to switch to the branch with rabbitmq
 - Run `yalc publish` to publish the package locally
-- Navigate to the root of this project and run `yalc add @commonwealth/chain-events@0.6.5`
+- Navigate to the root of this project and run `yalc add @commonwealth/new-chain-events@0.6.5`
 - Run `yarn build`
 - Run `yarn start` and the app will automatically start reading events of the queue if there are any
 

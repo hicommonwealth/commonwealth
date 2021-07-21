@@ -3,7 +3,7 @@
  */
 
 import _ from 'underscore';
-import { SubstrateTypes, SubstrateEvents, chainSupportedBy } from '@commonwealth/chain-events';
+import { SubstrateTypes, SubstrateEvents, chainSupportedBy } from '@commonwealth/new-chain-events';
 import { AccountId, Balance } from '@polkadot/types/interfaces';
 import { Vec } from '@polkadot/types';
 import { Codec } from '@polkadot/types/types';

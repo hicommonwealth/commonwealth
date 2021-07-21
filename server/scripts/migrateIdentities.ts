@@ -6,7 +6,7 @@
  */
 
 import _ from 'underscore';
-import { SubstrateTypes, SubstrateEvents, chainSupportedBy } from '@commonwealth/chain-events';
+import { SubstrateTypes, SubstrateEvents, chainSupportedBy } from '@commonwealth/new-chain-events';
 import { OffchainProfileInstance } from '../models/offchain_profile';
 import IdentityEventHandler from '../eventHandlers/identity';
 import { ChainNodeInstance } from '../models/chain_node';

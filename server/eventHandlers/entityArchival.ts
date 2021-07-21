@@ -11,7 +11,7 @@ import {
   IChainEntityKind,
   IChainEventData,
   SubstrateTypes
-} from '@commonwealth/chain-events';
+} from '@commonwealth/new-chain-events';
 
 import { factory, formatFilename } from '../../shared/logging';
 import { IWebsocketsPayload, WebsocketMessageType } from '../../shared/types';

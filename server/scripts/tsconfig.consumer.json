@@ -12,7 +12,7 @@
     "downlevelIteration": true,
     "traceResolution": true
   },
-  "files": ["../client/scripts/setupChainEventListeners/ts"],
+  "files": ["./setupChainEventListeners.ts", "./dbNode.ts"],
   "exclude": [
     "../node_modules",
     "../client/scripts/controllers/chain/ethereum/contracts/*",

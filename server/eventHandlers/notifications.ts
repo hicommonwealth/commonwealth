@@ -2,7 +2,7 @@
  * Generic handler that transforms events into notifications.
  */
 import WebSocket from 'ws';
-import { IEventHandler, CWEvent, IChainEventKind } from '@commonwealth/chain-events';
+import { IEventHandler, CWEvent, IChainEventKind } from '@commonwealth/new-chain-events';
 import { NotificationCategories } from '../../shared/types';
 
 import { factory, formatFilename } from '../../shared/logging';

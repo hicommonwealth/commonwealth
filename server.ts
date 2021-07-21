@@ -1,8 +1,3 @@
-import {
-  SubstrateEvents,
-  SubstrateTypes,
-  chainSupportedBy
-} from '@commonwealth/chain-events';
 import session from 'express-session';
 import Rollbar from 'rollbar';
 import express from 'express';

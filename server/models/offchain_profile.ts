@@ -1,6 +1,6 @@
 import * as Sequelize from 'sequelize';
 
-import { SubstrateTypes } from '@commonwealth/chain-events';
+import { SubstrateTypes } from '@commonwealth/new-chain-events';
 import { AddressAttributes } from './address';
 
 export interface OffchainProfileAttributes {

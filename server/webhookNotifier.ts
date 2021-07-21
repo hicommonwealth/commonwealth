@@ -1,7 +1,7 @@
 import request from 'superagent';
 import { Op } from 'sequelize';
 import { capitalize } from 'lodash';
-import { SubstrateEvents } from '@commonwealth/chain-events';
+import { SubstrateEvents } from '@commonwealth/new-chain-events';
 
 import { NotificationCategories } from '../shared/types';
 import { smartTrim, validURL, renderQuillDeltaToText } from '../shared/utils';

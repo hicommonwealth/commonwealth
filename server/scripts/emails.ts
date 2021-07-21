@@ -5,7 +5,7 @@ import {
   SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents,
   IEventLabel, IEventTitle, IChainEventData, chainSupportedBy,
   MarlinTypes, MarlinEvents
-} from '@commonwealth/chain-events';
+} from '@commonwealth/new-chain-events';
 
 import { SENDGRID_API_KEY, SERVER_URL } from '../config';
 import { factory, formatFilename } from '../../shared/logging';

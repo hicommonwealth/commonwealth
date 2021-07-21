@@ -1,5 +1,5 @@
 import Rascal from 'rascal';
-import { CWEvent, IEventHandler } from '@commonwealth/chain-events';
+import { CWEvent, IEventHandler } from '@commonwealth/new-chain-events';
 import { factory, formatFilename } from '../../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));

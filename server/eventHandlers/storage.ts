@@ -1,7 +1,7 @@
 /**
  * Generic handler that stores the event in the database.
  */
-import { IEventHandler, CWEvent, IChainEventKind, SubstrateTypes } from '@commonwealth/chain-events';
+import { IEventHandler, CWEvent, IChainEventKind, SubstrateTypes } from '@commonwealth/new-chain-events';
 import Sequelize from 'sequelize';
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));

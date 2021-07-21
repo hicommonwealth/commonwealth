@@ -1,4 +1,4 @@
-import { SubstrateTypes, chainSupportedBy } from '@commonwealth/chain-events';
+import { SubstrateTypes, chainSupportedBy } from '@commonwealth/new-chain-events';
 import { Request, Response, NextFunction } from 'express';
 import Sequelize from 'sequelize';
 import {

@@ -5,7 +5,7 @@ import {
   SubstrateTypes,
   chainSupportedBy,
   CWEvent
-} from '@commonwealth/chain-events';
+} from '@commonwealth/new-chain-events';
 
 import { HANDLE_IDENTITY } from '../config';
 
@@ -174,7 +174,7 @@ const setupChainEventListeners = async (
   };
 
   // Create instances of all the handlers needed to process the events we want from the queue
-  const handlers = {};
+  const handlers: { [key: string]: IEventHandler[] } = {};
   nodes.forEach((node) => {
     if (chainSupportedBy(node.chain, SubstrateTypes.EventChains)) {
       const excludedEvents = [
