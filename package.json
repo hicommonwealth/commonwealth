@@ -47,7 +47,8 @@
     "@babel/polyfill": "^7.2.5",
     "@babel/preset-env": "^7.2.3",
     "@babel/register": "^7.4.0",
-    "@commonwealth/chain-events": "file:.yalc/@commonwealth/chain-events",
+    "@commonwealth/chain-events": "^0.6.5",
+    "@commonwealth/new-chain-events": "git+https://git@github.com/timolegros/chain-events.git#build",
     "@cosmjs/launchpad": "^0.24.0-alpha.13",
     "@edgeware/node-types": "3.3.3",
     "@glidejs/glide": "^3.4.1",
@@ -187,6 +188,7 @@
     "typechain": "^2.0.0",
     "typescript": "4.3.4",
     "typescript-logging": "^0.6.4",
+    "underscore": "^1.13.1",
     "velocity": "^0.7.2",
     "web3": "^1.3.1",
     "webpack": "^4.36.0",
@@ -194,7 +196,6 @@
     "webpack-dev-middleware": "^3.7.2",
     "webpack-hot-middleware": "^2.25.0",
     "webpack-merge": "^4.1.4",
-    "webpack-node-externals": "^1.7.2",
     "ws": "^7.2.1"
   },
   "devDependencies": {

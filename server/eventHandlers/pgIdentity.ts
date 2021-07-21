@@ -1,5 +1,6 @@
-import { Types as SubstrateTypes } from '../src/chains/substrate/index';
-import { CWEvent, IChainEventData, IEventHandler } from './interfaces';
+import { SubstrateTypes } from '@commonwealth/new-chain-events';
+import { CWEvent, IChainEventData, IEventHandler } from '@commonwealth/new-chain-events';
+// @ts-ignore
 import _ from 'underscore';
 import format from 'pg-format';
 

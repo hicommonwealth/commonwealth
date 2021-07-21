@@ -2,6 +2,7 @@
 import { factory, formatFilename } from '../../shared/logging';
 import Identity from '../eventHandlers/pgIdentity';
 import { Pool } from 'pg';
+// @ts-ignore
 import _ from 'underscore';
 import format from 'pg-format';
 
@@ -11,7 +12,7 @@ import {
   SubstrateTypes,
   getRabbitMQConfig,
   RabbitMqHandler
-} from '@commonwealth/chain-events';
+} from '@commonwealth/new-chain-events';
 
 const log = factory.getLogger(formatFilename(__filename));
 export const WORKER_NUMBER: number = Number(process.env.WORKER_NUMBER) || 0;

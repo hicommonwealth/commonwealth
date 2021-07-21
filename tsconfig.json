@@ -25,9 +25,6 @@
     "./eth/types",
   ],
   "exclude": [
-    "./node_modules",
-    "./server/scripts/dbNode.ts",
-    "./server/util/rabbitmq/consumer.ts",
-    "./server/scripts/setupChainEventListeners.ts"
+    "./node_modules"
   ]
 }

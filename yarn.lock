@@ -1209,17 +1209,38 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@commonwealth/chain-events@file:.yalc/@commonwealth/chain-events":
+"@commonwealth/chain-events@^0.6.5":
   version "0.6.5"
+  resolved "https://registry.yarnpkg.com/@commonwealth/chain-events/-/chain-events-0.6.5.tgz#5c9274287326579c8e8d19654022a08721eaa8a7"
+  integrity sha512-JikH+hqy++6TOUaCWkfAsRZL3TmJ2PC26kXvvBjbyBKLDAXwF1geOE8qkqixeiUS1kFORcbEHz5++lDi4GbYIA==
+  dependencies:
+    "@edgeware/node-types" "^3.3.3"
+    bn.js "^5.1.3"
+    ethereum-block-by-date "^1.2.2"
+    ethers "^4.0.39"
+    lodash "^4.17.21"
+    sleep-promise "^8.0.1"
+    typescript-logging "^0.6.4"
+    underscore "^1.10.2"
+    web3 "^1.3.1"
+    web3-core "^1.3.1"
+    web3-utils "^1.3.1"
+
+"@commonwealth/new-chain-events@git+https://git@github.com/timolegros/chain-events.git#build":
+  version "0.6.5"
+  resolved "git+https://git@github.com/timolegros/chain-events.git#0739ca15980d86d1b15f2d8c09c466f54bd24ff4"
   dependencies:
     "@edgeware/node-types" "^3.3.3"
     amqplib "^0.8.0"
     bn.js "^5.1.3"
     ethereum-block-by-date "^1.2.2"
     ethers "^4.0.39"
+    express "^4.17.1"
     lodash "^4.17.21"
     node-fetch "^2.6.1"
-    rascal "^13.0.3"
+    pg "^8.6.0"
+    pg-format "^1.0.4"
+    rascal "^13.1.0"
     sleep-promise "^8.0.1"
     typescript-logging "^0.6.4"
     underscore "^1.10.2"
@@ -12044,6 +12065,11 @@ pg-connection-string@^2.5.0:
   resolved "https://registry.yarnpkg.com/pg-connection-string/-/pg-connection-string-2.5.0.tgz#538cadd0f7e603fc09a12590f3b8a452c2c0cf34"
   integrity sha512-r5o/V/ORTA6TmUnyWZR9nCj1klXCO2CEKNRlVuJptZe85QuhFayC7WeMic7ndayT5IRIR0S0xFxFi2ousartlQ==
 
+pg-format@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/pg-format/-/pg-format-1.0.4.tgz#27734236c2ad3f4e5064915a59334e20040a828e"
+  integrity sha1-J3NCNsKtP05QZJFaWTNOIAQKgo4=
+
 pg-int8@1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/pg-int8/-/pg-int8-1.0.1.tgz#943bd463bf5b71b4170115f80f8efc9a0c0eb78c"
@@ -12070,7 +12096,7 @@ pg-types@^2.1.0:
     postgres-date "~1.0.4"
     postgres-interval "^1.1.0"
 
-pg@^8.0.3:
+pg@^8.0.3, pg@^8.6.0:
   version "8.6.0"
   resolved "https://registry.yarnpkg.com/pg/-/pg-8.6.0.tgz#e222296b0b079b280cce106ea991703335487db2"
   integrity sha512-qNS9u61lqljTDFvmk/N66EeGq3n6Ujzj0FFyNMGQr6XuEv4tgNTXvJQTfJdcvGit5p5/DWPu+wj920hAJFI+QQ==
@@ -13277,9 +13303,9 @@ querystring@0.2.0, querystring@^0.2.0:
   integrity sha1-sgmEkgO7Jd+CDadW50cAWHhSFiA=
 
 querystringify@^2.1.1:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/querystringify/-/querystringify-2.1.1.tgz#60e5a5fd64a7f8bfa4d2ab2ed6fdf4c85bad154e"
-  integrity sha512-w7fLxIRCRT7U8Qu53jQnJyPkYZIaR4n5151KMfcJlO/A9397Wxb1amJvROTK6TOnp7PfoAmg/qXiNHI+08jRfA==
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/querystringify/-/querystringify-2.2.0.tgz#3345941b4153cb9d082d8eee4cda2016a9aef7f6"
+  integrity sha512-FIqgj2EUvTa7R50u0rGsyTftzjYmv/a3hO345bZNrqabNqjtgiDMgmo4mkUjd+nzU5oF3dClKqFIPUKybUyqoQ==
 
 quick-lru@^1.0.0:
   version "1.1.0"
@@ -13377,7 +13403,7 @@ range-parser@^1.2.1, range-parser@~1.2.0, range-parser@~1.2.1:
   resolved "https://registry.yarnpkg.com/range-parser/-/range-parser-1.2.1.tgz#3cf37023d199e1c24d1a55b84800c2f3e6468031"
   integrity sha512-Hrgsx+orqoygnmhFbKaHE6c296J+HTAQXoxEF6gNupROmmGJRoyzfG3ccAveqCBrwr/2yxQ5BVd/GTl5agOwSg==
 
-rascal@^13.0.3, rascal@^13.1.0:
+rascal@^13.1.0:
   version "13.1.0"
   resolved "https://registry.yarnpkg.com/rascal/-/rascal-13.1.0.tgz#29b8ae0caebbec03de0c5c0ba68e49077a2fec57"
   integrity sha512-D1rpRCrwsG50lcnJyNkHQI7cXION0VowOf+ZZtvTYPizBsLuEqeLkqyCW0gdH/9RTXdWPn3KG31/FuCgaUH3mw==
@@ -16208,7 +16234,7 @@ underscore@1.9.1:
   resolved "https://registry.yarnpkg.com/underscore/-/underscore-1.9.1.tgz#06dce34a0e68a7babc29b365b8e74b8925203961"
   integrity sha512-5/4etnCkd9c8gwgowi5/om/mYO5ajCaOgdzj/oW+0eQV9WxKBDZw5+ycmKmeaTXjInS/W0BzpGLo2xR2aBwZdg==
 
-underscore@^1.10.2:
+underscore@^1.10.2, underscore@^1.13.1:
   version "1.13.1"
   resolved "https://registry.yarnpkg.com/underscore/-/underscore-1.13.1.tgz#0c1c6bd2df54b6b69f2314066d65b6cde6fcf9d1"
   integrity sha512-hzSoAVtJF+3ZtiFX0VgfFPHEDRm7Y/QPjGyNo4TVdnDTdft3tr8hEkD25a1jC+TjTuE7tkHGKkhwCgs9dgBB2g==
@@ -17217,10 +17243,10 @@ webpack-merge@^4.1.4:
   dependencies:
     lodash "^4.17.15"
 
-webpack-node-externals@^1.7.2:
-  version "1.7.2"
-  resolved "https://registry.yarnpkg.com/webpack-node-externals/-/webpack-node-externals-1.7.2.tgz#6e1ee79ac67c070402ba700ef033a9b8d52ac4e3"
-  integrity sha512-ajerHZ+BJKeCLviLUUmnyd5B4RavLF76uv3cs6KNuO8W+HuQaEs0y0L7o40NQxdPy5w0pcv8Ew7yPUAQG0UdCg==
+webpack-node-externals@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/webpack-node-externals/-/webpack-node-externals-3.0.0.tgz#1a3407c158d547a9feb4229a9e3385b7b60c9917"
+  integrity sha512-LnL6Z3GGDPht/AigwRh2dvL9PQPFQ8skEpVrWZXLWBYmqcaojHNN0onvHzie6rq7EWKrrBfPYqNEzTJgiwEQDQ==
 
 webpack-sources@^1.1.0, webpack-sources@^1.4.0, webpack-sources@^1.4.1:
   version "1.4.3"
