@@ -6,7 +6,6 @@ import mixpanel from 'mixpanel-browser';
 import { Input, Form, FormLabel, FormGroup, Button, Callout, Spinner } from 'construct-ui';
 
 import moment from 'moment';
-import { bufferToHex } from 'ethereumjs-util';
 import snapshotJs from '@snapshot-labs/snapshot.js';
 
 import app from 'state';
@@ -18,6 +17,9 @@ import QuillEditor from 'views/components/quill_editor';
 import { idToProposal } from 'identifiers';
 import { capitalize } from 'lodash';
 import SimplePicker from 'simplepicker';
+import { ChainBase, IWebWallet } from 'models';
+import MetamaskWebWalletController from '../../../controllers/app/webWallets/metamask_web_wallet';
+
 interface IThreadForm {
   name: string;
   body: string;
@@ -94,11 +96,8 @@ const newThread = async (
     })
   };
 
-  const msgBuffer = bufferToHex(Buffer.from(msg.msg, 'utf8'));
-
-  // TODO: do not use window.ethereum here
-  msg.sig = await (window as any).ethereum.request({ method: 'personal_sign', params: [msgBuffer, author.address] });
-
+  const wallet = (app.wallets.getByName('metamask') as MetamaskWebWalletController);
+  msg.sig = await wallet.signMessage(msg.msg);
   const result = await $.post(`${app.serverUrl()}/snapshotAPI/sendMessage`, { ...msg });
 
   if (result.status === 'Failure') {
