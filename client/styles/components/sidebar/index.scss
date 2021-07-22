@@ -134,19 +134,17 @@
     width: $quick-switcher-width;
     border-right: 1px solid $border-color-off-white;
     z-index: 3;
-    // overflow-y: auto;
+    display: flex;
+    flex-direction: column;
     @include sm-max {
         display: none;
     }
     .community-nav-bar {
-        position: sticky;
         padding: 0 14px;
-        background-color: inherit;
     }
     .scrollable-community-bar {
-        overflow-y: scroll;
-        padding: 0 14px 14px;
-        height: 100%;
+        padding: 0 14px;
+        overflow-y: auto;
     }
     .scrollable-community-bar::-webkit-scrollbar {
         width: 0;
