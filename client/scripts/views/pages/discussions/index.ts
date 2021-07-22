@@ -473,7 +473,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
     const emptyTopic = (allThreads.length === 0 && vnode.state.postsDepleted[subpage] === true && !stage);
     const emptyStage = (allThreads.length === 0 && vnode.state.postsDepleted[subpage] === true && !!stage);
 
-    const isAdmin = app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
+    const isAdmin = app.user.isSiteAdmin || app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
     const isMod = app.user.isRoleOfCommunity({
       role: 'moderator', chain: app.activeChainId(), community: app.activeCommunityId()
     });

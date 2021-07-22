@@ -35,7 +35,7 @@ const updateChain = async (models, req: Request, res: Response, next: NextFuncti
         permission: 'admin',
       },
     });
-    if (!userMembership) {
+    if (!req.user.isAdmin && !userMembership) {
       return next(new Error(Errors.NotAdmin));
     }
   }
