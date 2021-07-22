@@ -18,7 +18,7 @@ import { idToProposal } from 'identifiers';
 import { capitalize } from 'lodash';
 import SimplePicker from 'simplepicker';
 import { ChainBase, IWebWallet } from 'models';
-import MetamaskWebWalletController from '../../../controllers/app/webWallets/metamask_web_wallet';
+import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web_wallet';
 
 interface IThreadForm {
   name: string;
