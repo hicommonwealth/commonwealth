@@ -5,7 +5,7 @@
  */
 
 import _ from 'underscore';
-import { SubstrateTypes, SubstrateEvents, chainSupportedBy } from '@commonwealth/new-chain-events';
+import { SubstrateTypes, SubstrateEvents, chainSupportedBy } from '@commonwealth/chain-events';
 
 import MigrationHandler from '../eventHandlers/migration';
 import EntityArchivalHandler from '../eventHandlers/entityArchival';

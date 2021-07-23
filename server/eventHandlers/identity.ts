@@ -4,7 +4,7 @@ import {
   CWEvent,
   IChainEventData,
   SubstrateTypes
-} from '@commonwealth/new-chain-events';
+} from '@commonwealth/chain-events';
 import { OffchainProfileInstance } from '../models/offchain_profile';
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));

@@ -10,9 +10,13 @@ import {
   createListener,
   chainSupportedBy,
   SubstrateTypes,
-  getRabbitMQConfig,
-  RabbitMqHandler
-} from '@commonwealth/new-chain-events';
+} from '@commonwealth/chain-events';
+
+import {
+  RabbitMqHandler,
+  RabbitMqProducer,
+  getRabbitMQConfig
+} from 'ce-rabbitmq-plugin';
 
 const log = factory.getLogger(formatFilename(__filename));
 export const WORKER_NUMBER: number = Number(process.env.WORKER_NUMBER) || 0;
@@ -50,6 +54,7 @@ async function mainProcess(producer: RabbitMqHandler) {
     (chain, index) => index % NUM_WORKERS === WORKER_NUMBER
   );
 
+  // TODO: a chain should be deleted if it is no longer assigned to this node
   // initialize listeners first (before dealing with identity)
   for (const chain of myChainData) {
     // start listeners that aren't already active

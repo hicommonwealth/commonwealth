@@ -4,13 +4,15 @@ import {
   EventSupportingChains,
   SubstrateTypes,
   chainSupportedBy,
-  CWEvent
-} from '@commonwealth/new-chain-events';
+  CWEvent,
+} from '@commonwealth/chain-events';
+
+import { RabbitMqIdentityConfig, RabbitMqDefaultConfig } from 'ce-rabbitmq-plugin';
 
 import { HANDLE_IDENTITY } from '../config';
 
 import * as WebSocket from 'ws';
-import fs from 'fs';
+import * as fs from 'fs';
 import EventStorageHandler, {
   StorageFilterConfig
 } from '../eventHandlers/storage';
@@ -24,7 +26,6 @@ import { constructSubstrateUrl } from '../../shared/substrate';
 import { factory, formatFilename } from '../../shared/logging';
 import { ChainNodeInstance } from '../models/chain_node';
 import { Consumer } from '../util/rabbitmq/consumer';
-import config from '../util/rabbitmq/RabbitMQconfig.json';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -57,7 +58,7 @@ const discoverReconnectRange = async (
 
 // returns either the RabbitMQ config specified by the filepath or the default config
 export function getRabbitMQConfig(filepath?: string) {
-  if (typeof filepath === 'string' && filepath.length === 0) return config;
+  if (typeof filepath === 'string' && filepath.length === 0) return RabbitMqDefaultConfig;
   else {
     try {
       const raw = fs.readFileSync(filepath);
@@ -65,7 +66,7 @@ export function getRabbitMQConfig(filepath?: string) {
     } catch (error) {
       console.error(`Failed to load the configuration file at: ${filepath}`);
       console.warn('Using default RabbitMQ configuration');
-      return config;
+      return RabbitMqDefaultConfig;
     }
   }
 }
