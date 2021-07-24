@@ -245,19 +245,22 @@ const setupChainEventListeners = async (
 const SKIP_EVENT_CATCHUP = process.env.SKIP_EVENT_CATCHUP === 'true';
 const CHAIN_EVENTS = process.env.CHAIN_EVENTS;
 
-// configure chain list from events
-let chains: string[] | 'all' | 'none' = 'all';
-if (CHAIN_EVENTS === 'none' || CHAIN_EVENTS === 'all') {
-  chains = CHAIN_EVENTS;
-} else if (CHAIN_EVENTS) {
-  chains = CHAIN_EVENTS.split(',');
+if (!process.env.RUN_AS_LISTENER) {
+  // configure chain list from events
+  let chains: string[] | 'all' | 'none' = 'all';
+  if (CHAIN_EVENTS === 'none' || CHAIN_EVENTS === 'all') {
+    chains = CHAIN_EVENTS;
+  } else if (CHAIN_EVENTS) {
+    chains = CHAIN_EVENTS.split(',');
+  }
+
+  try {
+    log.info('Starting listener process');
+    setupChainEventListeners(models, null, chains, SKIP_EVENT_CATCHUP);
+  } catch (e) {
+    console.error(`Chain event listener setup failed: ${e.message}`);
+  }
 }
 
-try {
-  log.info('Starting listener process');
-  setupChainEventListeners(models, null, chains, SKIP_EVENT_CATCHUP);
-} catch (e) {
-  console.error(`Chain event listener setup failed: ${e.message}`);
-}
 
 export default setupChainEventListeners;
