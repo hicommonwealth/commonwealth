@@ -38,9 +38,6 @@
     "type": "git",
     "url": "git+https://github.com/hicommonwealth/commonwealth.git"
   },
-  "typeRoots": [
-    "./node_modules/@types"
-  ],
   "keywords": [],
   "dependencies": {
     "@audius/hedgehog": "^1.0.5",
