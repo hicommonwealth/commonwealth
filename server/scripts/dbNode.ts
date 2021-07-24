@@ -10,11 +10,12 @@ import {
   createListener,
   chainSupportedBy,
   SubstrateTypes,
+  Listener,
+  createNode
 } from '@commonwealth/chain-events';
 
 import {
   RabbitMqHandler,
-  RabbitMqProducer,
   getRabbitMQConfig
 } from 'ce-rabbitmq-plugin';
 
@@ -34,7 +35,11 @@ export const HANDLE_IDENTITY =
 export const REPEAT_TIME = Math.round(Number(process.env.REPEAT_TIME)) || 10;
 
 // stores all the listeners a dbNode has active
-const listeners: any[] = [];
+const listeners: { [key: string]: Listener} = {};
+
+// start the chain-events express app when testing in order to have access to the listener methods via localhost
+let app;
+if (process.env.TESTING) app = createNode(listeners)
 
 // TODO: API-WS from infinitely attempting reconnection i.e. mainnet1
 async function mainProcess(producer: RabbitMqHandler) {
