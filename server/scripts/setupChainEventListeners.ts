@@ -239,6 +239,7 @@ const setupChainEventListeners = async (
     );
   }
 
+  if (process.env.TESTING) process.send("consumer started")
   return {};
 };
 

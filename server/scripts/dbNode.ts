@@ -1,46 +1,40 @@
-// TODO: change imports to chain-events when new chain-events package is ready to be included as a dependency
 import { factory, formatFilename } from '../../shared/logging';
 import Identity from '../eventHandlers/pgIdentity';
 import { Pool } from 'pg';
-// @ts-ignore
 import _ from 'underscore';
 import format from 'pg-format';
-
 import {
   createListener,
   chainSupportedBy,
   SubstrateTypes,
   Listener,
-  createNode
+  SubstrateListener
 } from '@commonwealth/chain-events';
-
 import {
   RabbitMqHandler,
   getRabbitMQConfig
 } from 'ce-rabbitmq-plugin';
 
 const log = factory.getLogger(formatFilename(__filename));
+
+
+// env var
 export const WORKER_NUMBER: number = Number(process.env.WORKER_NUMBER) || 0;
 export const NUM_WORKERS: number = Number(process.env.NUM_WORKERS) || 1;
 export const DATABASE_URI =
   !process.env.DATABASE_URL || process.env.NODE_ENV === 'development'
     ? 'postgresql://commonwealth:edgeware@localhost/commonwealth'
     : process.env.DATABASE_URL;
-
 const envIden = process.env.HANDLE_IDENTITY;
 export const HANDLE_IDENTITY =
   envIden === 'publish' || envIden === 'handle' ? envIden : null;
-
 // The number of minutes to wait between each run -- rounded to the nearest whole number
 export const REPEAT_TIME = Math.round(Number(process.env.REPEAT_TIME)) || 10;
 
 // stores all the listeners a dbNode has active
-const listeners: { [key: string]: Listener} = {};
-
-// start the chain-events express app when testing in order to have access to the listener methods via localhost
-let app;
-if (process.env.TESTING) app = createNode(listeners)
-
+const listeners: { [key: string]: any} = {};
+// TODO: skipCatchup behavior fix?
+// TODO: error handling for pg queries
 // TODO: API-WS from infinitely attempting reconnection i.e. mainnet1
 async function mainProcess(producer: RabbitMqHandler) {
   const pool = new Pool({
@@ -52,20 +46,36 @@ async function mainProcess(producer: RabbitMqHandler) {
     // TODO: handle this
   });
 
-  let query = `SELECT "Chains"."id", "substrate_spec", "url", "ChainNodes"."chain" FROM "Chains" JOIN "ChainNodes" ON "Chains"."id"="ChainNodes"."chain" WHERE "Chains"."has_chain_events_listener"='true';`;
+  let query = `SELECT "Chains"."id", "substrate_spec", "url", "address",  "ChainNodes"."chain" FROM "Chains" JOIN "ChainNodes" ON "Chains"."id"="ChainNodes"."chain" WHERE "Chains"."has_chain_events_listener"='true';`;
 
   const allChains = (await pool.query(query)).rows;
   const myChainData = allChains.filter(
     (chain, index) => index % NUM_WORKERS === WORKER_NUMBER
   );
 
-  // TODO: a chain should be deleted if it is no longer assigned to this node
+  // delete listeners for chains that are no longer assigned to this node
+  const myChains = myChainData.map(row => row.id)
+  Object.keys(listeners).forEach((chain) => {
+    if (!myChains.includes(chain)) {
+      listeners[chain].unsubscribe();
+      listeners[chain] = null;
+    }
+  })
+
   // initialize listeners first (before dealing with identity)
   for (const chain of myChainData) {
     // start listeners that aren't already active
     if (!listeners[chain.id]) {
       log.info(`Starting listener for ${chain.id}...`);
+      //TODO: discuss Marlin contract addresses (only 1 is present in db)
       listeners[chain.id] = await createListener(chain.id, {
+        MolochContractVersion: 2,
+        MolochContractAddress: chain.address,
+        MarlinContractAddress: {
+          comp: '0xEa2923b099b4B588FdFAD47201d747e3b9599A5f', // TESTNET
+          governorAlpha: '0xeDAA76873524f6A203De2Fa792AD97E459Fca6Ff', // TESTNET
+          timelock: '0x7d89D52c464051FcCbe35918cf966e2135a17c43', // TESTNET
+        },
         archival: false,
         url: chain.url,
         spec: chain.spec,
@@ -97,17 +107,22 @@ async function mainProcess(producer: RabbitMqHandler) {
     else {
       if (
         chainSupportedBy(chain.id, SubstrateTypes.EventChains) &&
-        !_.isEqual(chain.spec, listeners[chain.id].options.spec)
+        !_.isEqual(chain.spec, (<SubstrateListener>listeners[chain.id]).options.spec)
       ) {
         log.info(`Spec for ${chain} changed... restarting listener`);
-        await listeners[chain.id].updateSpec(chain.spec);
+        await (<SubstrateListener>listeners[chain.id]).updateSpec(chain.spec);
       }
     }
   }
 
   if (HANDLE_IDENTITY == null) {
     await pool.end();
-    log.info('Finished scheduled process.');
+    log.info(`Finished scheduled process.`);
+    if (process.env.TESTING) {
+      const listenerOptions = {}
+      for (const chain in listeners) listenerOptions[chain] = listeners[chain].options
+      console.log(`Listener Validation:${JSON.stringify(listenerOptions)}`)
+    }
     return;
   }
 
@@ -164,6 +179,11 @@ async function mainProcess(producer: RabbitMqHandler) {
 
   await pool.end();
   log.info('Finished scheduled process.');
+  if (process.env.TESTING) {
+    const listenerOptions = {}
+    for (const chain in listeners) listenerOptions[chain] = listeners[chain].options
+    console.log(`Listener Validation:${JSON.stringify(listenerOptions)}`)
+  }
   return;
 }
 
