@@ -18,7 +18,6 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
   view: (vnode) => {
     const activeAccountsByRole: Array<[Account<any>, RoleInfo]> = app.user.getActiveAccountsByRole();
     const activeEntityInfo = app.community ? app.community.meta : app.chain?.meta?.chain;
-
     const createRole = (e) => {
       vnode.state.loading = true;
 

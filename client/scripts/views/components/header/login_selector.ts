@@ -290,6 +290,8 @@ const LoginSelector: m.Component<{
       }
     }
 
+    const hasTermsOfServie = app.chain?.meta?.chain?.terms || app.community?.meta?.terms;
+
     return m(ButtonGroup, { class: 'LoginSelector' }, [
       (app.chain || app.community)
         && !app.chainPreloading
@@ -298,7 +300,7 @@ const LoginSelector: m.Component<{
         && m(Button, {
           class: 'login-selector-left',
           onclick: async (e) => {
-            if (samebaseAddresses.length === 1) {
+            if (samebaseAddresses.length === 1 && !hasTermsOfServie) {
               const originAddressInfo = samebaseAddresses[0];
 
               if (originAddressInfo) {
