@@ -93,7 +93,7 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
           meta.terms
           && m('p', [
             `By linking an address, you agree to ${app.chain?.meta?.chain?.name || app.community?.meta?.name}'s `,
-            link('a', meta.terms, 'terms of service'),
+            m('a', { href: meta.terms, target: '_blank' }, 'terms of service'),
             '.'
           ])
         ]) : m('.select-address-options', [
