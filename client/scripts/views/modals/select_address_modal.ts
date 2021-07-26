@@ -7,7 +7,7 @@ import { Tag, Button, Icon, Icons } from 'construct-ui';
 import app from 'state';
 import { Account, RoleInfo, ChainBase } from 'models';
 import { UserBlock } from 'views/components/widgets/user';
-import { articlize, isSameAccount, formatAsTitleCase } from 'helpers';
+import { articlize, isSameAccount, formatAsTitleCase, link } from 'helpers';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { setActiveAccount } from 'controllers/app/login';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
@@ -80,7 +80,7 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
     };
 
     // const chainbase = (app.chain?.meta?.chain?.base.length != 0) ? app.chain?.meta?.chain?.base : ChainBase.Ethereum;
-    
+
     const meta = app.chain ? app.chain.meta.chain : app.community.meta;
 
     return m('.SelectAddressModal', [
@@ -89,11 +89,13 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
       ]),
       m('.compact-modal-body', [
         activeAccountsByRole.length === 0 ? m('.select-address-placeholder', [
-          m('p', [
-            `Connect ${articlize(app.chain?.meta?.chain.name || 'Web3')} address to join this community. `,
-            meta.terms && `By linking an address, you agree to ${articlize(app.chain?.meta?.chain.name || 'Web3')}'s`,
-            { text: 'terms of service', externalLink: meta.terms }
-          ]),
+          m('p', `Connect ${articlize(app.chain?.meta?.chain.name || 'Web3')} address to join this community. `),
+          meta.terms
+          && m('p', [
+            `By linking an address, you agree to ${app.chain?.meta?.chain?.name || app.community?.meta?.name}'s `,
+            link('a', meta.terms, 'terms of service'),
+            '.'
+          ])
         ]) : m('.select-address-options', [
           activeAccountsByRole.map(([account, role], index) => role && m('.select-address-option.existing', [
             m('.select-address-option-left', [
