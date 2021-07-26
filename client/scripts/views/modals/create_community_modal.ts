@@ -7,12 +7,13 @@ import app from 'state';
 import { slugify } from 'utils';
 import mixpanel from 'mixpanel-browser';
 import { Table, Tabs, TabItem, Button } from 'construct-ui';
+import { ApiPromise, WsProvider } from '@polkadot/api';
+import { constructSubstrateUrl } from 'substrate';
+
 import { CompactModalExitButton } from 'views/modal';
-import { notifyError } from 'controllers/app/notifications';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { InputPropertyRow, TogglePropertyRow } from './manage_community_modal/metadata_rows';
 import { initAppState } from '../../app';
-
-
 
 interface OffchainCommunityFormAttrs {}
 interface OffchainCommunityFormState {
@@ -252,6 +253,27 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
           onChangeHandler: (v) => { vnode.state.github = v; },
         }),
       ]),
+      m(Button, {
+        label: 'Test',
+        onclick: async (e) => {
+          // deinit substrate API if one exists
+          if (app.chain.apiInitialized) {
+            await app.chain.deinit();
+          }
+
+          // create new API
+          const provider = new WsProvider(constructSubstrateUrl(vnode.state.nodeUrl), false);
+          try {
+            await provider.connect();
+            const api = await ApiPromise.create({ throwOnConnect: true, provider, ...JSON.parse(vnode.state.substrate_spec) });
+            await api.disconnect();
+            notifySuccess('Test has passed');
+          } catch (err) {
+            console.error(err.message);
+            notifyError('Test API initialization failed');
+          }
+        }
+      }),
       m(Button, {
         label: 'Save changes',
         intent: 'primary',
