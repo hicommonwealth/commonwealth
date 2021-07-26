@@ -81,7 +81,7 @@ export default (
     collapsed_on_homepage: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: true },
     type: { type: dataTypes.STRING, allowNull: false },
     substrate_spec: { type: dataTypes.JSONB, allowNull: true },
-    terms: { type: dataTypes.STRING, allowNull: true },
+    terms: { type: dataTypes.TEXT, allowNull: true },
   }, {
     timestamps: false,
     underscored: true,

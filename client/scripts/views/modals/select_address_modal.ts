@@ -14,7 +14,7 @@ import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import LoginWithWalletDropdown from 'views/components/login_with_wallet_dropdown';
 import { formatAddressShort } from '../../../../shared/utils';
 
-const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: boolean }> = {
+const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: boolean, termsOpen: boolean }> = {
   view: (vnode) => {
     const activeAccountsByRole: Array<[Account<any>, RoleInfo]> = app.user.getActiveAccountsByRole();
     const activeEntityInfo = app.community ? app.community.meta : app.chain?.meta?.chain;
@@ -80,7 +80,7 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
     };
 
     // const chainbase = (app.chain?.meta?.chain?.base.length != 0) ? app.chain?.meta?.chain?.base : ChainBase.Ethereum;
-    
+
     const meta = app.chain ? app.chain.meta.chain : app.community.meta;
 
     return m('.SelectAddressModal', [
@@ -89,11 +89,18 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
       ]),
       m('.compact-modal-body', [
         activeAccountsByRole.length === 0 ? m('.select-address-placeholder', [
-          m('p', [
-            `Connect ${articlize(app.chain?.meta?.chain.name || 'Web3')} address to join this community. `,
-            meta.terms && `By linking an address, you agree to ${articlize(app.chain?.meta?.chain.name || 'Web3')}'s`,
-            { text: 'terms of service', externalLink: meta.terms }
+          m('p', `Connect ${articlize(app.chain?.meta?.chain.name || 'Web3')} address to join this community. `),
+          meta.terms
+          && m('p', [
+            `By linking an address, you agree to ${app.chain?.meta?.chain.name || app.community?.name}'s `,
+            m('a', {
+              href: '#',
+              onclick: () => { vnode.state.termsOpen = !vnode.state.termsOpen; },
+            }, 'terms of service'),
+            '.'
           ]),
+          vnode.state.termsOpen
+          && m('.community-terms-of-service', meta.terms)
         ]) : m('.select-address-options', [
           activeAccountsByRole.map(([account, role], index) => role && m('.select-address-option.existing', [
             m('.select-address-option-left', [

@@ -4,11 +4,11 @@ module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.addColumn('OffchainCommunities', 'terms', {
-        type: Sequelize.STRING,
+        type: Sequelize.TEXT,
         allowNull: true,
       }, { transaction: t });
       await queryInterface.addColumn('Chains', 'terms', {
-        type: Sequelize.STRING,
+        type: Sequelize.TEXT,
         allowNull: true,
       }, { transaction: t });
     });
