@@ -66,7 +66,7 @@ export default (
       telegram: { type: dataTypes.STRING, allowNull: true },
       github: { type: dataTypes.STRING, allowNull: true },
       featured_topics: { type: dataTypes.ARRAY(dataTypes.STRING), allowNull: false, defaultValue: [] },
-      terms: { type: dataTypes.TEXT, allowNull: true },
+      terms: { type: dataTypes.STRING, allowNull: true },
       // auth_forum: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
       // auth_condition: { type: DataTypes.STRING, allowNull: true, defaultValue: null }, // For Auth Forum Checking
       // ^^^ other names: community_config, OffchainCommunityConfiguration, CommunityConditions
