@@ -6,11 +6,11 @@ import Web3 from 'web3';
 
 import Keyring, { decodeAddress } from '@polkadot/keyring';
 import { stringToU8a, hexToU8a } from '@polkadot/util';
+import { KeypairType } from '@polkadot/util-crypto/types';
 
 import { serializeSignDoc, decodeSignature } from '@cosmjs/launchpad';
 import { Secp256k1, Secp256k1Signature, Sha256 } from '@cosmjs/crypto';
-import { fromBase64 } from '@cosmjs/encoding';
-import { getCosmosAddress } from '@lunie/cosmos-keys'; // used to check address validity. TODO: remove
+import { AminoSignResponse, pubkeyToAddress } from '@cosmjs/amino';
 
 import nacl from 'tweetnacl';
 import { KeyringOptions } from '@polkadot/keyring/types';
@@ -205,60 +205,81 @@ export default (
       return false;
     }
 
-    let isValid;
+    let isValid: boolean;
     if (chain.base === 'substrate') {
       //
       // substrate address handling
       //
       const address = decodeAddress(addressModel.address);
       const keyringOptions: KeyringOptions = { type: 'sr25519' };
-      if (addressModel.keytype) {
-        if (addressModel.keytype !== 'sr25519' && addressModel.keytype !== 'ed25519') {
-          log.error('invalid keytype');
-          return false;
+      if (!addressModel.keytype || (addressModel.keytype === 'sr25519' || addressModel.keytype === 'ed25519')) {
+        if (addressModel.keytype) {
+          keyringOptions.type = addressModel.keytype as KeypairType;
         }
-        keyringOptions.type = addressModel.keytype;
+        keyringOptions.ss58Format = chain.ss58_prefix ?? 42;
+        const signerKeyring = new Keyring(keyringOptions).addFromAddress(address);
+        const signedMessageNewline = stringToU8a(`${addressModel.verification_token}\n`);
+        const signedMessageNoNewline = stringToU8a(addressModel.verification_token);
+        const signatureU8a = signatureString.slice(0, 2) === '0x'
+          ? hexToU8a(signatureString)
+          : hexToU8a(`0x${signatureString}`);
+        isValid = signerKeyring.verify(signedMessageNewline, signatureU8a, address)
+          || signerKeyring.verify(signedMessageNoNewline, signatureU8a, address);
+      } else {
+        log.error('Invalid keytype.');
+        isValid = false;
       }
-      keyringOptions.ss58Format = chain.ss58_prefix ?? 42;
-      const signerKeyring = new Keyring(keyringOptions).addFromAddress(address);
-      const signedMessageNewline = stringToU8a(`${addressModel.verification_token}\n`);
-      const signedMessageNoNewline = stringToU8a(addressModel.verification_token);
-      const signatureU8a = signatureString.slice(0, 2) === '0x'
-        ? hexToU8a(signatureString)
-        : hexToU8a(`0x${signatureString}`);
-      isValid = signerKeyring.verify(signedMessageNewline, signatureU8a, address)
-        || signerKeyring.verify(signedMessageNoNewline, signatureU8a, address);
     } else if (chain.base === 'cosmos') {
       //
       // cosmos-sdk address handling
       //
-      const signatureData = JSON.parse(signatureString);
-      const pk = Buffer.from(signatureData.signature.pub_key.value, 'base64');
+
+      // provided string should be serialized AminoSignResponse object
+      const { signed, signature: stdSignature }: AminoSignResponse = JSON.parse(signatureString);
 
       // we generate an address from the actual public key and verify that it matches,
       // this prevents people from using a different key to sign the message than
       // the account they registered with.
-      const bech32Prefix = chain.network === 'cosmos'
-        ? 'cosmos'
-        : chain.network === 'straightedge' ? 'str' : chain.network;
-      const generatedAddress = getCosmosAddress(pk, bech32Prefix);
-      const generatedAddressWithCosmosPrefix = getCosmosAddress(pk, 'cosmos');
+      // TODO: ensure osmosis works
+      const bech32Prefix = chain.network === 'straightedge'
+        ? 'str'
+        : chain.network === 'osmosis'
+          ? 'osmo'
+          : chain.network === 'injective'
+            ? 'inj'
+            : chain.network;
+      const generatedAddress = pubkeyToAddress(stdSignature.pub_key, bech32Prefix);
+      const generatedAddressWithCosmosPrefix = pubkeyToAddress(stdSignature.pub_key, 'cosmos');
 
       if (generatedAddress === addressModel.address || generatedAddressWithCosmosPrefix === addressModel.address) {
-        // get tx doc that was signed
-        const signDoc = await validationTokenToSignDoc(addressModel.address, addressModel.verification_token.trim());
+        const generatedSignDoc = validationTokenToSignDoc(
+          chain.id,
+          addressModel.verification_token.trim(),
+          signed.fee,
+          signed.memo,
+        );
 
-        // check for signature validity
-        // see the last test in @cosmjs/launchpad/src/secp256k1wallet.spec.ts for reference
-        const { pubkey, signature } = decodeSignature(signatureData.signature);
-        const secpSignature = Secp256k1Signature.fromFixedLength(fromBase64(signatureData.signature.signature));
-        if (serializeSignDoc(signatureData.signed).toString() !== serializeSignDoc(signDoc).toString()) {
-          isValid = false;
-        } else {
-          const messageHash = new Sha256(serializeSignDoc(signDoc)).digest();
+        // ensure correct document was signed
+        if (serializeSignDoc(signed).toString() === serializeSignDoc(generatedSignDoc).toString()) {
+          // ensure valid signature
+          // see the last test in @cosmjs/launchpad/src/secp256k1wallet.spec.ts for reference
+          const { pubkey, signature } = decodeSignature(stdSignature);
+          const secpSignature = Secp256k1Signature.fromFixedLength(signature);
+          const messageHash = new Sha256(serializeSignDoc(generatedSignDoc)).digest();
           isValid = await Secp256k1.verifySignature(secpSignature, messageHash, pubkey);
+          if (!isValid) {
+            log.error('Signature verification failed.');
+          }
+        } else {
+          log.error(`Sign doc not matched. Generated: ${
+            JSON.stringify(generatedSignDoc)
+          }, found: ${
+            JSON.stringify(signed)
+          }.`);
+          isValid = false;
         }
       } else {
+        log.error(`Address not matched. Generated ${generatedAddress}, found ${addressModel.address}.`);
         isValid = false;
       }
     } else if (chain.network === 'ethereum'
