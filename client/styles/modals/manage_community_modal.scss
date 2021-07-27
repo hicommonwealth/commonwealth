@@ -16,7 +16,8 @@
 
     .cui-table.metadata-management-table {
         td {
-            padding: 5px 28px 0 !important;
+            line-height: 1.1;
+            padding: 5px 0 0 28px !important;
             border-bottom: none !important;
         }
         tr:first-child td {
@@ -72,12 +73,18 @@
             }
         }
         .TogglePropertyRow {
+            td:first-child {
+                padding-top: 7px !important;
+            }
             td {
-                padding-top: 12px !important;
+                padding-top: 14px !important;
+                padding-bottom: 4px !important;
             }
             .cui-switch {
                 display: inline-block;
                 margin-right: 5px;
+                position: relative;
+                top: -2px;
             }
             .switch-caption {
                 display: inline-block;
@@ -85,6 +92,11 @@
                 font-size: 94%;
                 position: relative;
                 top: 1px;
+            }
+        }
+        .TogglePropertyRow + .TogglePropertyRow {
+            td {
+                padding-bottom: 0 !important;
             }
         }
     }

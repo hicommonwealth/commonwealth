@@ -65,7 +65,7 @@ const MembersPage : m.Component<{}, { membersRequested: boolean, membersLoaded: 
       });
     }
 
-    const isAdmin = app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
+    const isAdmin = app.user.isSiteAdmin || app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
     const isMod = app.user.isRoleOfCommunity({
       role: 'moderator', chain: app.activeChainId(), community: app.activeCommunityId()
     });

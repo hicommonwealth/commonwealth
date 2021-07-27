@@ -95,12 +95,12 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
     return m('section.TokensCommunityComponent', {
       class: 'bg-gray-700'
     }, [
-      m('div', { class: 'xl:container relative mx-auto' }, [
+      m('div', { class: 'relative mx-auto', style: 'max-width:1400px' }, [
         m('div', { class: 'md:flex md:flex-row' }, [
           m('div',
-            { class: 'lg:h-720 flex items-center justify-start md:w-2/4' }, [
+            { class: 'flex items-center justify-center md:w-2/4' }, [
               m('div',
-                { class: 'px-8 mt-32 mb-10 md:my-40 lg:px-14 xl:px-0 xl:pr-32' },
+                { class: 'mt-32 mb-10 md:my-40 lg:px-14 xl:px-0 xl:pr-32 tokenSectionContainer' },
                 [
                   m('h1', { class: 'text-4xl font-bold mb-5 leading-10' }, [
                     'A ',
@@ -158,19 +158,58 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
                       }),
                     ]),
                   ]),
-                  // m('div.TokensCommunityConnectWalletButton', [
-                  //   m('p', [
-                  //     m('span', { class: 'mr-5 text-lg' }, 'or'),
-                  //     m(
-                  //       'a',
-                  //       {
-                  //         class: 'btn-outline rounded-lg pb-2 pt-3 px-3',
-                  //         href: '',
-                  //       },
-                  //       'Connect Wallet'
-                  //     ),
-                  //   ])
-                  // ]),
+                  m('div', { class: 'block lg:flex' }, [
+                    m('h1', { class: 'text-2xl font-bold mb-5 leading-10 md:text-4xl' }, [
+                      'We’re also here'
+                    ]),
+                    m('div', [
+                      m(
+                        'a',
+                        {
+                          class: 'lg:ml-12',
+                          href: 'https://discord.gg/yK3x5HcsXG',
+                          target: '_blank'
+                        },
+                        [
+                          m('img', {
+                            class: 'inline mr-1.5',
+                            src: 'static/img/discordIcon.svg',
+                            alt: 'Discord',
+                          })
+                        ]
+                      ),
+                      m(
+                        'a',
+                        {
+                          class: 'mx-6 lg:mx-3',
+                          href: 'https://t.me/HiCommonwealth',
+                          target: '_blank'
+                        },
+                        [
+                          m('img', {
+                            class: 'inline mr-1.5',
+                            src: 'static/img/telegramIcon.svg',
+                            alt: 'Telegram',
+                          })
+                        ]
+                      ),
+                      m(
+                        'a',
+                        {
+                          class: 'lg:mx-3',
+                          href: 'https://twitter.com/hicommonwealth',
+                          target: '_blank'
+                        },
+                        [
+                          m('img', {
+                            class: 'inline mr-1.5',
+                            src: 'static/img/twitterIcon.svg',
+                            alt: 'Twitter',
+                          })
+                        ]
+                      )
+                    ])
+                  ])
                 ])
             ]),
           m('div', {
