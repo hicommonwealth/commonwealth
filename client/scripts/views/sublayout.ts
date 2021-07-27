@@ -54,7 +54,7 @@ const Sublayout: m.Component<{
 
     const ICON_SIZE = 22;
     const sublayoutHeaderLeft = m('.sublayout-header-left', [
-      (!app.activeId() && (m.route.get() === '/' || m.route.get().startsWith('/?'))) ? [
+      (!app.activeId() && !app.isCustomDomain() && (m.route.get() === '/' || m.route.get().startsWith('/?'))) ? [
         m('h3', 'Commonwealth')
       ] : chain ? [
         m(ChainIcon, { size: ICON_SIZE, chain }),
