@@ -80,7 +80,6 @@ const ConfirmInviteModal: m.Component<{}, {
     const activeInvite = invites[location].community_id
       ? app.config.communities.getById(invites[location].community_id)
       : app.config.chains.getById(invites[location].chain_id);
-
     const hasTermsOfService = !!activeInvite.terms;
 
     return m('.ConfirmInviteModal', [

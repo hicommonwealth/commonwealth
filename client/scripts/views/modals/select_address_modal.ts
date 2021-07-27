@@ -80,7 +80,8 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
 
     // const chainbase = (app.chain?.meta?.chain?.base.length != 0) ? app.chain?.meta?.chain?.base : ChainBase.Ethereum;
 
-    const meta = app.chain ? app.chain.meta?.chain : app.community?.meta;
+    const activeCommunityMeta = app.chain ? app.chain.meta?.chain : app.community?.meta;
+    const hasTermsOfService = !!activeCommunityMeta.terms;
 
     return m('.SelectAddressModal', [
       m('.compact-modal-title', [
@@ -121,10 +122,10 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
             ]),
           ])),
         ]),
-        !!meta.terms
+        hasTermsOfService
         && m('p.terms-of-service', [
-          `By linking an address, you agree to ${meta.name}'s `,
-          m('a', { href: meta.terms, target: '_blank' }, 'terms of service'),
+          `By linking an address, you agree to ${activeCommunityMeta.name}'s `,
+          m('a', { href: activeCommunityMeta.terms, target: '_blank' }, 'terms of service'),
           '.'
         ]),
         activeAccountsByRole.length !== 0 && m(Button, {

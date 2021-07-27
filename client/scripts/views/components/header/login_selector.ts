@@ -290,7 +290,8 @@ const LoginSelector: m.Component<{
       }
     }
 
-    const hasTermsOfService = app.chain ? app.chain.meta?.chain : app.community?.meta;
+    const activeCommunityMeta = app.chain ? app.chain.meta?.chain : app.community?.meta;
+    const hasTermsOfService = !!activeCommunityMeta.terms;
 
     return m(ButtonGroup, { class: 'LoginSelector' }, [
       (app.chain || app.community)
