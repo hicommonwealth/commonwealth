@@ -7,20 +7,18 @@ import { redirectWithLoginSuccess, redirectWithLoginError } from './finishEmailL
 const log = factory.getLogger(formatFilename(__filename));
 
 const finishOAuthLogin = async (models, req: Request, res: Response, next: NextFunction) => {
-  // If a previous login already exists, do nothing
-  // TODO: Show some kind of indication that no new login occurred
-  const previousUser = req.user;
-  if (req.user && req.user.email && req.user.emailVerified) {
-    return redirectWithLoginSuccess(res, req.user.email);
-  }
-
   const token = req.query.token;
   if (!token) {
     return redirectWithLoginError(res, 'Missing token');
   }
 
+  // Clear any previous login
+  if (req.user) {
+    req.logout();
+  }
+
   // Validate login token
-  const tokenObj = await models.LoginToken.findOne({ where: { token, email: null } });
+  const tokenObj = await models.LoginToken.findOne({ where: { token } });
   if (!tokenObj) {
     return redirectWithLoginError(res, 'Invalid token');
   }
@@ -28,15 +26,14 @@ const finishOAuthLogin = async (models, req: Request, res: Response, next: NextF
     return redirectWithLoginError(res, 'Token expired');
   }
 
-  // Redirect to the correct source domain, if necessary
-  // If we are already on the correct domain, continue to log in any social account associated with the LoginToken
-  const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+  // If we are already on the correct domain, continue to log in any
+  // social account associated with the LoginToken. Otherwise redirect
   const hostname = req.headers['x-forwarded-host'] || req.hostname;
-  if (tokenObj.domain !== `${protocol}://${hostname}`) {
-    return res.redirect(`${protocol}://${hostname}/api/finishOAuthLogin?token={token}`);
+  if (tokenObj.domain !== hostname) {
+    return res.redirect(`https://${tokenObj.domain}/api/finishOAuthLogin?token=${token}`);
   }
 
-  // Mark as used
+  // Mark LoginToken as used
   tokenObj.used = true;
   await tokenObj.save();
 

@@ -14,7 +14,7 @@ const startOAuthLogin = async (models, req: Request, res: Response, next: NextFu
         models.OffchainCommunity.findOne({ where: { customDomain: req.query.from } }),
       ]);
       if (chain || community) {
-        const tokenObj = await models.LoginToken.createForOAuth();
+        const tokenObj = await models.LoginToken.createForOAuth(req.query.from);
         successRedirect = `/api/finishOAuthLogin?token=${tokenObj.token}`;
       }
     } catch (e) { console.log('Error:', e); }
