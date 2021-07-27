@@ -1,6 +1,7 @@
 import Sequelize from 'sequelize';
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../../shared/logging';
+import testSubstrateSpec from '../util/testSubstrateSpec';
 
 const Op = Sequelize.Op;
 const log = factory.getLogger(formatFilename(__filename));
@@ -25,11 +26,7 @@ const addChainNode = async (models, req: Request, res: Response, next: NextFunct
     return next(new Error(Errors.MissingParams));
   }
   if (req.body.substrate_spec) {
-    try {
-      JSON.parse(req.body.substrate_spec);
-    } catch (err) {
-      return next(new Error(Errors.InvalidJSON));
-    }
+    testSubstrateSpec(req.body.substrate_spec, req.body.node_url, next);
   }
 
   let chain = await models.Chain.findOne({ where: {

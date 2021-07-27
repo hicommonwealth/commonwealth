@@ -316,7 +316,7 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
             }).then(async (res) => {
               await initAppState(false);
               $(e.target).trigger('modalexit');
-              m.route.set(`/${res.result.id}`);
+              m.route.set(`/${res.result.chain}`);
             });
           } catch (err) {
             notifyError(err.responseJSON?.error || 'Creating new community failed');
