@@ -23,19 +23,19 @@ export class OffchainAccount extends Account<Coin> {
   public async signMessage(message: string): Promise<string> {
     throw new Error('Method not implemented.');
   }
-  protected addressFromMnemonic(mnemonic: string): string {
+  protected addressFromMnemonic(mnemonic: string): Promise<string> {
     throw new Error('Method not implemented.');
   }
-  protected addressFromSeed(seed: string): string {
+  protected addressFromSeed(seed: string): Promise<string> {
     throw new Error('Method not implemented.');
   }
   protected seed?: string;
   protected mnemonic?: string;
 
-  public setSeed(seed: string): void {
+  public setSeed(seed: string): Promise<void> {
     throw new Error('Method not implemented.');
   }
-  public setMnemonic(mnemonic: string): void {
+  public setMnemonic(mnemonic: string): Promise<void> {
     throw new Error('Method not implemented.');
   }
   public setValidationToken(token: string): void {
