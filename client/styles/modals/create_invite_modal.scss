@@ -4,13 +4,27 @@
   form {
     margin: 0;
     max-width: 560px;
+    .chain-select-group {
+      max-width: calc(33.3% - 5px);
+      .chain-select-label {
+        display: block;
+      }
+    }
+    .address-input-group {
+      max-width: calc(66.7% - 5px);
+    }
     h4 {
       margin-top: 0;
       margin-bottom: 16px;
     }
   }
-  .chainSelectLabel {
-    display: block;
+  .add-address-form {
+    column-gap: 10px;
+    .cui-form-group {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;;
+    }
   }
   form + form {
     margin-top: 40px;

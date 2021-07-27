@@ -83,7 +83,6 @@ export const getMemberPreview = (addr, enterAddressFn, closeResultsFn, searchTer
         searchTerm,
         avatarSize: 24,
         showAddressWithDisplayName: true,
-        showFullAddress: true,
         showChainName,
       }),
     ]),
@@ -241,7 +240,6 @@ const InviteButton: m.Component<IInviteButtonAttrs, { loading: boolean, }> = {
           : community ? { community:  community.id }
             : null;
         if (!chainOrCommunityObj) return;
-
         $.post(app.serverUrl() + postType, {
           address: app.user.activeAccount.address,
           ...chainOrCommunityObj,
@@ -418,9 +416,11 @@ const CreateInviteModal: m.Component<{
   searchAddressTerm: string;
   inputTimeout: any;
   hideResults: boolean;
-  isTyping: boolean;
+  isTyping: boolean; // only monitors address search
   results: any[];
   closeResults: Function;
+  isAddressValid: boolean;
+  newAddressToValidate: boolean;
   enterAddress: Function;
   errorText: string;
 }> = {
@@ -440,31 +440,25 @@ const CreateInviteModal: m.Component<{
 
     const selectedChainId = vnode.state.invitedAddressChain || (chainInfo ? chainInfo.id : app.config.chains.getAll()[0].id);
     const selectedChain = app.config.chains.getById(selectedChainId);
-    let isAddressValid = true;
 
-    if (selectedChain?.base === ChainBase.Substrate) {
-      try {
-        if (vnode.state.searchAddressTerm?.length) {
+    if (vnode.state.isTyping) {
+      vnode.state.isAddressValid = false;
+    }
+
+    if (vnode.state.searchAddressTerm?.length > 0 && !vnode.state.isTyping && vnode.state.newAddressToValidate) {
+      if (selectedChain?.base === ChainBase.Substrate) {
+        try {
           decodeAddress(vnode.state.searchAddressTerm);
-        } else {
-          isAddressValid = false;
+          vnode.state.isAddressValid = true;
+        } catch (e) {
+          console.log(e);
         }
-      } catch (e) {
-        isAddressValid = false;
-        console.error(e);
+      } else if (selectedChain?.base === ChainBase.Ethereum) {
+        vnode.state.isAddressValid = Web3.utils.checkAddressChecksum(vnode.state.searchAddressTerm);
+      } else {
+        // TODO: check Cosmos & Near?
       }
-    } else if (selectedChain?.base === ChainBase.Ethereum) {
-      try {
-        if (vnode.state.searchAddressTerm?.length) {
-          isAddressValid = Web3.utils.checkAddressChecksum(vnode.state.searchAddressTerm);
-        } else {
-          isAddressValid = false;
-        }
-      } catch (e) {
-        isAddressValid = false;
-      }
-    } else {
-      // TODO: check Cosmos & Near?
+      vnode.state.newAddressToValidate = false;
     }
 
     const isEmailValid = validateEmail(vnode.state.invitedEmail);
@@ -484,7 +478,10 @@ const CreateInviteModal: m.Component<{
         : m(List, { class: 'search-results-list' }, results);
 
     vnode.state.closeResults = () => { vnode.state.hideResults = true; };
-    vnode.state.enterAddress = (address: string) => { vnode.state.searchAddressTerm = address; };
+    vnode.state.enterAddress = (address: string) => {
+      vnode.state.searchAddressTerm = address;
+      vnode.state.newAddressToValidate = true;
+    };
 
     return m('.CreateInviteModal', [
       m('.compact-modal-title', [
@@ -492,9 +489,9 @@ const CreateInviteModal: m.Component<{
         m(CompactModalExitButton),
       ]),
       m('.compact-modal-body', [
-        m(Form, [
-          m(FormGroup, { span: 4 }, [
-            m(FormLabel, { class: 'chainSelectLabel' }, 'Community'),
+        m(Form, { class: 'add-address-form' }, [
+          m(FormGroup, { class: 'chain-select-group', span: 4 }, [
+            m(FormLabel, { class: 'chain-select-label' }, 'Community'),
             m(SelectList, {
               closeOnSelect: true,
               items: chainInfo
@@ -535,13 +532,13 @@ const CreateInviteModal: m.Component<{
               checkmark: false
             }),
           ]),
-          m(FormGroup, { span: 8, style: { 'position': 'relative' } }, [
+          m(FormGroup, { class: 'address-input-group', span: 8, style: { 'position': 'relative' } }, [
             m(FormLabel, 'Address'),
             m(Input, {
               fluid: true,
               name: 'address',
               autocomplete: 'off',
-              placeholder: 'Type to search...',
+              placeholder: 'Type to search by name or address',
               value: vnode.state.searchAddressTerm,
               style: 'height: 40px',
               oninput: (e) => {
@@ -573,7 +570,7 @@ const CreateInviteModal: m.Component<{
           ]),
           m(InviteButton, {
             selection: 'address',
-            disabled: !isAddressValid,
+            disabled: !vnode.state.isAddressValid,
             successCallback: (v: boolean) => {
               vnode.state.success = v;
               vnode.state.searchAddressTerm = '';
@@ -589,7 +586,7 @@ const CreateInviteModal: m.Component<{
             ...chainOrCommunityObj
           }),
         ]),
-        m(Form, [
+        m(Form, { class: 'invite-email-form' }, [
           m(FormGroup, [
             m(FormLabel, 'Email'),
             m(Input, {
