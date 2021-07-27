@@ -80,7 +80,7 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
 
     // const chainbase = (app.chain?.meta?.chain?.base.length != 0) ? app.chain?.meta?.chain?.base : ChainBase.Ethereum;
 
-    const meta = app.chain ? app.chain.meta.chain : app.community.meta;
+    const hasTermsOfService = app.chain ? app.chain.meta?.chain.terms : app.community?.meta.terms;
 
     return m('.SelectAddressModal', [
       m('.compact-modal-title', [
@@ -89,12 +89,6 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
       m('.compact-modal-body', [
         activeAccountsByRole.length === 0 ? m('.select-address-placeholder', [
           m('p', `Connect ${articlize(app.chain?.meta?.chain.name || 'Web3')} address to join this community. `),
-          meta.terms
-          && m('p', [
-            `By linking an address, you agree to ${app.chain?.meta?.chain?.name || app.community?.meta?.name}'s `,
-            m('a', { href: meta.terms, target: '_blank' }, 'terms of service'),
-            '.'
-          ])
         ]) : m('.select-address-options', [
           activeAccountsByRole.map(([account, role], index) => role && m('.select-address-option.existing', [
             m('.select-address-option-left', [
@@ -126,6 +120,12 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
               role.is_user_default && m(Tag, { label: 'Last used', rounded: true, size: 'sm' }),
             ]),
           ])),
+        ]),
+        meta.terms
+        && m('p', [
+          `By linking an address, you agree to ${app.chain?.meta?.chain?.name || app.community?.meta?.name}'s `,
+          m('a', { href: meta.terms, target: '_blank' }, 'terms of service'),
+          '.'
         ]),
         activeAccountsByRole.length !== 0 && m(Button, {
           label: 'Join community with address',
