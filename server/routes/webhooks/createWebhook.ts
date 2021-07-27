@@ -21,7 +21,7 @@ const createWebhook = async (models, req: Request, res: Response, next: NextFunc
       permission: ['admin']
     },
   });
-  if (adminRoles.length === 0) return next(new Error(Errors.NotAdmin));
+  if (!req.user.isAdmin && adminRoles.length === 0) return next(new Error(Errors.NotAdmin));
   // check if webhook url exists already in the community
   if (!req.body.webhookUrl) return next(new Error(Errors.MissingWebhook));
   const existingWebhook = await models.Webhook.findOne({

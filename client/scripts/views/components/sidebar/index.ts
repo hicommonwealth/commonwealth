@@ -2,19 +2,16 @@ import 'components/sidebar/index.scss';
 
 import m from 'mithril';
 import _ from 'lodash';
-import $ from 'jquery';
-import dragula from 'dragula';
 import {
-  Button, Popover, PopoverMenu, MenuItem, Icon, Icons, Tag, Tooltip, Spinner, Select
+  Button, PopoverMenu, MenuItem, Icon, Icons, Tooltip
 } from 'construct-ui';
 
 import { selectNode, initChain } from 'app';
 
-import app, { ApiStatus } from 'state';
+import app from 'state';
 import { ProposalType } from 'identifiers';
-import { link, removeUrlPrefix } from 'helpers';
-import { ChainClass, ChainBase, ChainNetwork, ChainInfo, CommunityInfo, AddressInfo, NodeInfo } from 'models';
-import NewTopicModal from 'views/modals/new_topic_modal';
+import { link } from 'helpers';
+import { ChainBase, ChainNetwork, ChainInfo, CommunityInfo, NodeInfo } from 'models';
 
 import SubscriptionButton from 'views/components/subscription_button';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
@@ -162,34 +159,40 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
     // const allSubstrateGovernanceProposals = substrateGovernanceProposals;
     // const cosmosGovernanceProposals = (app.chain?.loaded && app.chain?.base === ChainBase.CosmosSDK)
     //   ? (app.chain as any).governance.store.getAll().filter((p) => !p.completed).length : 0;
-    // const molochProposals = (app.chain?.loaded && app.chain?.class === ChainClass.Moloch)
+    // const molochProposals = (app.chain?.loaded && app.chain?.network === ChainNetwork.Moloch)
     //   ? (app.chain as any).governance.store.getAll().filter((p) => !p.completed).length : 0;
 
     const hasProposals = app.chain && !app.community && (
       app.chain.base === ChainBase.CosmosSDK
         || (app.chain.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Plasm)
-        || app.chain.class === ChainClass.Moloch
+        || app.chain.network === ChainNetwork.Moloch
         || app.chain.network === ChainNetwork.Marlin
         || app.chain.network === ChainNetwork.MarlinTestnet
-        || app.chain.class === ChainClass.Commonwealth);
+        || app.chain.network === ChainNetwork.Commonwealth);
     if (!hasProposals) return;
 
-    const showMolochMenuOptions = app.user.activeAccount && app.chain?.class === ChainClass.Moloch;
+    const showMolochMenuOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Moloch;
     const showMolochMemberOptions = showMolochMenuOptions && (app.user.activeAccount as any)?.shares?.gtn(0);
-    const showCommonwealthMenuOptions = app.chain?.class === ChainClass.Commonwealth;
+    const showCommonwealthMenuOptions = app.chain?.network === ChainNetwork.Commonwealth;
 
     const showMarlinOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Marlin;
 
     const onProposalPage = (p) => (
       p.startsWith(`/${app.activeChainId()}/proposals`)
-        || p.startsWith(`/${app.activeChainId()}/proposal/councilmotion`)
         || p.startsWith(`/${app.activeChainId()}/proposal/democracyproposal`));
     const onReferendaPage = (p) => p.startsWith(`/${app.activeChainId()}/referenda`)
       || p.startsWith(`/${app.activeChainId()}/proposal/referendum`);
+
     const onTreasuryPage = (p) => p.startsWith(`/${app.activeChainId()}/treasury`)
       || p.startsWith(`/${app.activeChainId()}/proposal/treasuryproposal`);
     const onBountiesPage = (p) => p.startsWith(`/${app.activeChainId()}/bounties`);
+    const onTipsPage = (p) => p.startsWith(`/${app.activeChainId()}/tips`)
+      || p.startsWith(`/${app.activeChainId()}/proposal/treasurytip`);
+
     const onCouncilPage = (p) => p.startsWith(`/${app.activeChainId()}/council`);
+    const onMotionPage = (p) => (
+      p.startsWith(`/${app.activeChainId()}/motions`)
+        || p.startsWith(`/${app.activeChainId()}/proposal/councilmotion`));
 
     const onValidatorsPage = (p) => p.startsWith(`/${app.activeChainId()}/validators`);
     const onNotificationsPage = (p) => p.startsWith('/notifications');
@@ -215,19 +218,47 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
       // proposals (substrate, cosmos, moloch & marlin only)
       !app.community && ((app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Darwinia)
                          || app.chain?.base === ChainBase.CosmosSDK
-                         || app.chain?.class === ChainClass.Moloch
+                         || app.chain?.network === ChainNetwork.Moloch
                          || app.chain?.network === ChainNetwork.Marlin
                          || app.chain?.network === ChainNetwork.MarlinTestnet)
         && m(Button, {
           fluid: true,
           rounded: true,
           active: onProposalPage(m.route.get()),
-          label: app.chain?.base === ChainBase.Substrate ? 'Proposals & Motions' : 'Proposals',
+          label: 'Proposals',
+          class: app.chain?.base === ChainBase.Substrate ? 'sub-button' : '',
           onclick: (e) => {
             e.preventDefault();
             m.route.set(`/${app.activeChainId()}/proposals`);
           },
         }),
+      // // motions (substrate only)
+      // !app.community && (app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Darwinia)
+      //   && m(Button, {
+      //     fluid: true,
+      //     rounded: true,
+      //     active: onMotionPage(m.route.get()),
+      //     label: 'Motions',
+      //     class: 'sub-button',
+      //     onclick: (e) => {
+      //       e.preventDefault();
+      //       m.route.set(`/${app.activeChainId()}/motions`);
+      //     },
+      //   }),
+      // council (substrate only)
+      !app.community && app.chain?.base === ChainBase.Substrate
+        && m(Button, {
+          fluid: true,
+          rounded: true,
+          active: onCouncilPage(m.route.get()),
+          label: 'Councillors',
+          class: 'sub-button',
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set(`/${app.activeChainId()}/council`);
+          },
+        }),
+      m('.sidebar-spacer'),
       // treasury (substrate only)
       !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Centrifuge
         && m(Button, {
@@ -249,27 +280,30 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           rounded: true,
           active: onBountiesPage(m.route.get()),
           label: 'Bounties',
+          class: 'sub-button',
           onclick: (e) => {
             e.preventDefault();
             m.route.set(`/${app.activeChainId()}/bounties`);
           },
         }),
-      m('.sidebar-spacer'),
-      // council (substrate only)
-      !app.community && app.chain?.base === ChainBase.Substrate
+      // tips (substrate only)
+      // TODO: which chains?
+      !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Centrifuge
         && m(Button, {
           fluid: true,
           rounded: true,
-          active: onCouncilPage(m.route.get()),
-          label: 'Councillors',
+          active: onTipsPage(m.route.get()),
+          label: 'Tips',
+          class: 'sub-button',
           onclick: (e) => {
             e.preventDefault();
-            m.route.set(`/${app.activeChainId()}/council`);
+            m.route.set(`/${app.activeChainId()}/tips`);
           },
         }),
+      m('.sidebar-spacer'),
       // validators (substrate only)
       !app.community && app.chain?.base === ChainBase.Substrate
-        && app.chain?.class !== ChainClass.Kulupu && app.chain?.class !== ChainClass.Darwinia
+        && app.chain?.network !== ChainNetwork.Kulupu && app.chain?.network !== ChainNetwork.Darwinia
         && m(Button, {
           fluid: true,
           rounded: true,

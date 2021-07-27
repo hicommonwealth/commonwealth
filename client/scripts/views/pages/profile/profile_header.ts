@@ -116,7 +116,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
           ]),
           m('.info-row', [
             account.profile?.headline && m('span.profile-headline', account.profile.headline),
-            m('span.username', formatAddressShort(account.address, account.chain)),
+            m('span.username', formatAddressShort(account.address, account.chain, true)),
             !vnode.state.copied && m('a.copy-address', {
               href: '#',
               onclick: (e) => {

@@ -8,7 +8,7 @@ import m from 'mithril';
 import { CommentRefreshOption } from 'controllers/server/comments';
 import ChainEntityController, { EntityRefreshOption } from 'controllers/server/chain_entities';
 import { IChainModule, IAccountsModule, IBlockInfo } from './interfaces';
-import { ChainBase, ChainClass } from './types';
+import { ChainBase } from './types';
 import { Account, NodeInfo, ProposalModule } from '.';
 
 // Extended by a chain's main implementation. Responsible for module
@@ -44,17 +44,20 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
         ? EntityRefreshOption.AllEntities
         : EntityRefreshOption.CompletedEntities;
 
-      await this.chainEntities.refresh(this.meta.chain.id, refresh);
-      await this.app.comments.refreshAll(
-        this.meta.chain.id,
-        null,
-        CommentRefreshOption.LoadProposalComments
-      );
-      response = await $.get(`${this.app.serverUrl()}/bulkOffchain`, {
-        chain: this.id,
-        community: null,
-        jwt: this.app.user.jwt,
-      });
+      let _unused1, _unused2;
+      [_unused1, _unused2, response] = await Promise.all([
+        this.chainEntities.refresh(this.meta.chain.id, refresh),
+        this.app.comments.refreshAll(
+          this.meta.chain.id,
+          null,
+          CommentRefreshOption.LoadProposalComments
+        ),
+        $.get(`${this.app.serverUrl()}/bulkOffchain`, {
+          chain: this.id,
+          community: null,
+          jwt: this.app.user.jwt,
+        }),
+      ]);
     } else {
       response = await $.get(`${this.app.serverUrl()}/bulkOffchain`, {
         chain: this.id,
@@ -71,9 +74,9 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     }
 
     const {
-      threads, comments, reactions, topics, admins, activeUsers, numPrevotingThreads, numVotingThreads
+      threads, comments, reactions, topics, admins, activeUsers, numVotingThreads
     } = response.result;
-    this.app.threads.initialize(threads, numPrevotingThreads, numVotingThreads, true);
+    this.app.threads.initialize(threads, numVotingThreads, true);
     this.app.comments.initialize(comments, false);
     this.app.reactions.initialize(reactions, true);
     this.app.topics.initialize(topics, true);
@@ -126,7 +129,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
   }
 
   public abstract base: ChainBase;
-  public abstract class: ChainClass;
 
   public networkStatus: ApiStatus = ApiStatus.Disconnected;
   public networkError: string;

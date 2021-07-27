@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import { RegisteredTypes } from '@polkadot/types/types';
 import app from 'state';
 import { RoleInfo, RolePermission } from 'models';
 import { ChainNetwork, ChainBase } from './types';
@@ -17,6 +18,8 @@ class ChainInfo {
   public element: string;
   public telegram: string;
   public github: string;
+  public stagesEnabled: boolean;
+  public additionalStages: string;
   public customDomain: string;
   public readonly blockExplorerIds: { [id: string]: string };
   public readonly collapsedOnHomepage: boolean;
@@ -27,11 +30,13 @@ class ChainInfo {
   public members: RoleInfo[];
   public type: string;
   public readonly ss58Prefix: string;
+  public substrateSpec: RegisteredTypes;
 
   constructor({
     id, network, symbol, name, iconUrl, description, website, discord, element, telegram, github,
+    stagesEnabled, additionalStages,
     customDomain, blockExplorerIds, collapsedOnHomepage, featuredTopics, topics, adminsAndMods,
-    base, ss58_prefix, type
+    base, ss58_prefix, type, substrateSpec
   }) {
     this.id = id;
     this.network = network;
@@ -45,6 +50,8 @@ class ChainInfo {
     this.element = element;
     this.telegram = telegram;
     this.github = github;
+    this.stagesEnabled = stagesEnabled;
+    this.additionalStages = additionalStages;
     this.customDomain = customDomain;
     this.blockExplorerIds = blockExplorerIds;
     this.collapsedOnHomepage = collapsedOnHomepage;
@@ -53,6 +60,7 @@ class ChainInfo {
     this.adminsAndMods = adminsAndMods || [];
     this.type = type;
     this.ss58Prefix = ss58_prefix;
+    this.substrateSpec = substrateSpec;
   }
 
   public static fromJSON({
@@ -67,6 +75,8 @@ class ChainInfo {
     element,
     telegram,
     github,
+    stagesEnabled,
+    additionalStages,
     customDomain,
     blockExplorerIds,
     collapsed_on_homepage,
@@ -75,7 +85,8 @@ class ChainInfo {
     adminsAndMods,
     base,
     ss58_prefix,
-    type
+    type,
+    substrate_spec,
   }) {
     let blockExplorerIdsParsed;
     try {
@@ -96,6 +107,8 @@ class ChainInfo {
       element,
       telegram,
       github,
+      stagesEnabled,
+      additionalStages,
       customDomain,
       blockExplorerIds: blockExplorerIdsParsed,
       collapsedOnHomepage: collapsed_on_homepage,
@@ -104,7 +117,8 @@ class ChainInfo {
       adminsAndMods,
       base,
       ss58_prefix,
-      type
+      type,
+      substrateSpec: substrate_spec,
     });
   }
 
@@ -156,10 +170,10 @@ class ChainInfo {
   }
 
   // TODO: change to accept an object
-  public async updateChainData(
-    name: string, description: string, website: string, discord: string, element: string, telegram: string,
-    github: string, customDomain: string
-  ) {
+  public async updateChainData({
+    name, description, website, discord, element, telegram,
+    github, stagesEnabled, additionalStages, customDomain
+  }) {
     // TODO: Change to PUT /chain
     const r = await $.post(`${app.serverUrl()}/updateChain`, {
       'id': app.activeChainId(),
@@ -170,6 +184,8 @@ class ChainInfo {
       'element': element,
       'telegram': telegram,
       'github': github,
+      'stagesEnabled': stagesEnabled,
+      'additionalStages': additionalStages,
       'customDomain': customDomain,
       'jwt': app.user.jwt,
     });
@@ -181,6 +197,8 @@ class ChainInfo {
     this.element = updatedChain.element;
     this.telegram = updatedChain.telegram;
     this.github = updatedChain.github;
+    this.stagesEnabled = updatedChain.stagesEnabled;
+    this.additionalStages = updatedChain.additionalStages;
     this.customDomain = updatedChain.customDomain;
   }
 

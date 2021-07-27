@@ -5,7 +5,7 @@ import { slugify } from 'utils';
 import Token from 'controllers/chain/ethereum/token/adapter';
 
 import { ITXModalData } from './interfaces';
-import { ChainBase, ChainClass } from './types';
+import { ChainBase } from './types';
 import ChainInfo from './ChainInfo';
 import Profile from './Profile';
 
@@ -13,15 +13,13 @@ abstract class Account<C extends Coin> {
   public readonly serverUrl : string;
   public readonly address: string;
   public readonly chain: ChainInfo;
-
   public readonly chainBase: ChainBase;
-  public readonly chainClass: ChainClass;
   public get freeBalance() { return this.balance; }
   public abstract balance: Promise<C>;
   public abstract sendBalanceTx(recipient: Account<C>, amount: C): Promise<ITXModalData> | ITXModalData;
   public abstract signMessage(message: string): Promise<string>;
-  protected abstract addressFromMnemonic(mnemonic: string): string;
-  protected abstract addressFromSeed(seed: string): string;
+  protected abstract addressFromMnemonic(mnemonic: string): Promise<string>;
+  protected abstract addressFromSeed(seed: string): Promise<string>;
 
   // The account's seed or mnemonic, used to generate their private key
   protected seed?: string;
@@ -45,7 +43,6 @@ abstract class Account<C extends Coin> {
     this.app = _app;
     this.chain = chain;
     this.chainBase = (_app.chain) ? _app.chain.base : null;
-    this.chainClass = (_app.chain) ? _app.chain.class : null;
     this.address = address;
     this._profile = _app.profiles.getProfile(chain.id, address);
     this._encoding = encoding;
@@ -57,14 +54,16 @@ abstract class Account<C extends Coin> {
   public getMnemonic() {
     return this.mnemonic;
   }
-  public setSeed(seed: string) {
-    if (this.addressFromSeed(seed) !== this.address) {
+  public async setSeed(seed: string): Promise<void> {
+    const address = await this.addressFromSeed(seed);
+    if (address !== this.address) {
       throw new Error('address does not match seed');
     }
     this.seed = seed;
   }
-  public setMnemonic(mnemonic: string) {
-    if (this.addressFromMnemonic(mnemonic) !== this.address) {
+  public async setMnemonic(mnemonic: string): Promise<void> {
+    const address = await this.addressFromMnemonic(mnemonic);
+    if (address !== this.address) {
       throw new Error('address does not match mnemonic');
     }
     this.mnemonic = mnemonic;

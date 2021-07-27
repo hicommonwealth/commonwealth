@@ -29,6 +29,8 @@ export enum ChainNetwork {
   Centrifuge = 'centrifuge',
   Cosmos = 'cosmos',
   Straightedge = 'straightedge',
+  Osmosis = 'osmosis',
+  Injective = 'injective',
   Ethereum = 'ethereum',
   NEAR = 'near',
   Moloch = 'moloch',
@@ -41,6 +43,8 @@ export enum ChainNetwork {
   Clover = 'clover',
   HydraDX = 'hydradx',
   Crust = 'crust',
+  CosmosHub = 'cosmos-hub',
+  Gaia13k = 'gaia-13k',
 }
 
 // This function returns a default chain for a chainbase
@@ -54,34 +58,6 @@ export function baseToNetwork(n: ChainBase): ChainNetwork {
   }
 }
 
-// TODO: this should be deprecated, and replaced with ChainNetwork in most instances
-export enum ChainClass {
-  Clover = 'clover',
-  Edgeware = 'edgeware',
-  EdgewareTestnet = 'edgeware-testnet',
-  HydraDX = 'hydradx',
-  Kusama = 'kusama',
-  Kulupu = 'kulupu',
-  Polkadot = 'polkadot',
-  Plasm = 'plasm',
-  Stafi = 'stafi',
-  Darwinia = 'darwinia',
-  Phala = 'phala',
-  Centrifuge = 'centrifuge',
-  CosmosHub = 'cosmos-hub',
-  Gaia13k = 'gaia-13k',
-  Straightedge = 'straightedge',
-  Ethereum = 'ethereum',
-  Near = 'near',
-  Moloch = 'moloch',
-  Marlin = 'marlin',
-  MarlinTestnet = 'marlin-testnet',
-  ALEX = 'alex',
-  Commonwealth = 'commonwealth',
-  Crust = 'crust',
-  ERC20 = 'erc20',
-}
-
 // TODO: this is inconsistently used
 export enum OffchainThreadKind {
   Forum = 'forum',
@@ -90,21 +66,13 @@ export enum OffchainThreadKind {
   Request = 'request',
 }
 
+// TODO: this list should be shared with the server
 export enum OffchainThreadStage {
   Discussion = 'discussion',
   ProposalInReview = 'proposal_in_review',
   Voting = 'voting',
   Passed = 'passed',
   Failed = 'failed',
-}
-
-export enum OffchainVoteOptions {
-  SUPPORT_2,
-  SUPPORT,
-  NEUTRAL_SUPPORT,
-  NEUTRAL_OPPOSE,
-  OPPOSE,
-  OPPOSE_2,
 }
 
 export enum TransactionStatus {

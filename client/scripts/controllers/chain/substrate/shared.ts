@@ -23,11 +23,10 @@ import { BlocktimeHelper } from 'helpers';
 import {
   NodeInfo,
   ITXModalData,
-  ITransactionResult,
   TransactionStatus,
   IChainModule,
   ITXData,
-  ChainClass,
+  ChainNetwork,
 } from 'models';
 
 import { SubstrateEvents } from '@commonwealth/chain-events';
@@ -420,7 +419,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     const senderBalance = await sender.freeBalance;
     const netBalance = additionalDeposit ? senderBalance.sub(additionalDeposit) : senderBalance;
     let fees: SubstrateCoin;
-    if (sender.chainClass === ChainClass.Edgeware) {
+    if (sender.chain.network === ChainNetwork.Edgeware) {
       // XXX: we cannot compute tx fees on edgeware yet, so we are forced to assume no fees
       //   besides explicit additional fees
       fees = additionalDeposit || this.coins(0);
