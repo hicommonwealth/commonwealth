@@ -25,6 +25,7 @@ export interface LoginTokenInstance extends Sequelize.Instance<LoginTokenAttribu
 
 export interface LoginTokenModel extends Sequelize.Model<LoginTokenInstance, LoginTokenAttributes> {
   createForEmail?: (email: string, path?: string) => Promise<LoginTokenInstance>;
+  createForOAuth?: () => Promise<LoginTokenInstance>;
 }
 
 export default (
@@ -51,6 +52,16 @@ export default (
     const token = crypto.randomBytes(24).toString('hex');
     const expires = new Date(+(new Date()) + LOGIN_TOKEN_EXPIRES_IN * 60 * 1000);
     const result = await LoginToken.create({ email, expires, token, redirect_path: path });
+    return result;
+  };
+
+  // This creates a LoginToken that is tied to no particular email or social account.
+  // It is up to the implementer to store the ID of the generated LoginToken on a SocialAccount
+  // for it to be looked up later.
+  LoginToken.createForOAuth = async (): Promise<LoginTokenInstance> => {
+    const token = crypto.randomBytes(24).toString('hex');
+    const expires = new Date(+(new Date()) + LOGIN_TOKEN_EXPIRES_IN * 60 * 1000);
+    const result = await LoginToken.create({ email: '', expires, token });
     return result;
   };
 

@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 
 import { GITHUB_OAUTH_CALLBACK } from '../config';
 
-const githubLogin = async (models, req: Request, res: Response, next: NextFunction) => {
+const startOAuthLogin = async (models, req: Request, res: Response, next: NextFunction) => {
   // Look up req.query.from, and only pass on the query param if the domain is valid
   let successRedirect = '/';
   let failureRedirect = '#!/login';
@@ -13,8 +13,11 @@ const githubLogin = async (models, req: Request, res: Response, next: NextFuncti
         models.Chain.findOne({ where: { customDomain: req.query.from } }),
         models.OffchainCommunity.findOne({ where: { customDomain: req.query.from } }),
       ]);
-      if (chain || community) successRedirect = `/?from=${req.query.from}`;
-    } catch (e) {}
+      if (chain || community) {
+        const tokenObj = await models.LoginToken.createForOAuth();
+        successRedirect = `/api/finishOAuthLogin?token=${tokenObj.token}`;
+      }
+    } catch (e) { console.log('Error:', e); }
   }
 
   passport.authenticate('github', {
@@ -25,4 +28,4 @@ const githubLogin = async (models, req: Request, res: Response, next: NextFuncti
 };
 
 
-export default githubLogin;
+export default startOAuthLogin;
