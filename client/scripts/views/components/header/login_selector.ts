@@ -291,7 +291,7 @@ const LoginSelector: m.Component<{
     }
 
     const activeCommunityMeta = app.chain ? app.chain.meta?.chain : app.community?.meta;
-    const hasTermsOfService = !!activeCommunityMeta.terms;
+    const hasTermsOfService = !!activeCommunityMeta?.terms;
 
     return m(ButtonGroup, { class: 'LoginSelector' }, [
       (app.chain || app.community)

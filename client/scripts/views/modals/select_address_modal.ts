@@ -81,7 +81,7 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
     // const chainbase = (app.chain?.meta?.chain?.base.length != 0) ? app.chain?.meta?.chain?.base : ChainBase.Ethereum;
 
     const activeCommunityMeta = app.chain ? app.chain.meta?.chain : app.community?.meta;
-    const hasTermsOfService = !!activeCommunityMeta.terms;
+    const hasTermsOfService = !!activeCommunityMeta?.terms;
 
     return m('.SelectAddressModal', [
       m('.compact-modal-title', [
