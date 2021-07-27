@@ -29,7 +29,7 @@ import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
 import Community from 'controllers/chain/community/main';
 import WebsocketController from 'controllers/server/socket/index';
 
-import { Layout, LoadingLayout } from 'views/layout';
+import { Layout } from 'views/layout';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import LoginModal from 'views/modals/login_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';
@@ -477,7 +477,7 @@ $(() => {
   const redirectRoute = (path: string | Function) => ({
     render: (vnode) => {
       m.route.set((typeof path === 'string' ? path : path(vnode.attrs)), {}, { replace: true });
-      return m(LoadingLayout);
+      return m(Layout);
     }
   });
 
@@ -509,11 +509,7 @@ $(() => {
     },
     render: (vnode) => {
       const { scoped, hideSidebar } = attrs;
-      // handle custom domains, for routes that need special handling
-      const host = document.location.host;
 
-      // normal render
-      let deferChain = attrs.deferChain;
       const scope = typeof scoped === 'string'
         // string => scope is defined by route
         ? scoped
@@ -539,10 +535,13 @@ $(() => {
       // Special case to defer chain loading specifically for viewing an offchain thread. We need
       // a special case because OffchainThreads and on-chain proposals are all viewed through the
       // same "/:scope/proposal/:type/:id" route.
+      let deferChain = attrs.deferChain;
       if (path === 'views/pages/view_proposal/index' && vnode.attrs.type === 'discussion') {
         deferChain = true;
       }
-      if (app.chain?.meta.chain.type === 'token') deferChain = false;
+      if (app.chain?.meta.chain.type === 'token') {
+        deferChain = false;
+      }
       return m(Layout, { scope, deferChain, hideSidebar }, [ vnode ]);
     },
   });
