@@ -116,6 +116,8 @@ const ProposalHeader: m.Component<{
       || proposal instanceof SubstrateTreasuryTip
       || proposal instanceof SubstrateTreasuryProposal);
 
+    const hasBody = !!(proposal as AnyProposal).description;
+
     return m('.ProposalHeader', {
       class: `proposal-${proposal.slug}`
     }, [
@@ -281,6 +283,9 @@ const ProposalHeader: m.Component<{
           !vnode.state.editing
             && m(ProposalBodyReaction, { item: proposal }),
         ]),
+      ]),
+      !(proposal instanceof OffchainThread) && hasBody && m('.proposal-content', [
+        m(ProposalBodyText, { item: proposal }),
       ]),
     ]);
   }
@@ -734,18 +739,6 @@ const ViewProposalPage: m.Component<{
     const viewCount : number = vnode.state.viewCount;
     const commentCount : number = app.comments.nComments(proposal);
     const voterCount : number = proposal instanceof OffchainThread ? 0 : proposal.getVotes().length;
-
-    const hasBody: boolean = proposal instanceof OffchainThread
-      ? (proposal as OffchainThread).body && (() => {
-        const body = (proposal as OffchainThread).body;
-        try {
-          const doc = JSON.parse(body);
-          return !(doc.ops.length === 1 && doc.ops[0].insert.trim() === '');
-        } catch (e) {
-          return (`${body}`).trim() !== '';
-        }
-      })()
-      : !!(proposal as AnyProposal).description;
 
     const getSetGlobalEditingStatus = (call: string, status?: boolean) => {
       if (call === GlobalStatus.Get) return vnode.state.editing;
