@@ -485,7 +485,6 @@ $(() => {
     scoped: string | boolean;
     hideSidebar?: boolean;
     deferChain?: boolean;
-    redirectCustomDomain?: boolean;
   }
 
   let hasCompletedSuccessfulPageLoad = false;
@@ -509,27 +508,9 @@ $(() => {
       });
     },
     render: (vnode) => {
-      const { scoped, hideSidebar, redirectCustomDomain } = attrs;
+      const { scoped, hideSidebar } = attrs;
       // handle custom domains, for routes that need special handling
       const host = document.location.host;
-      if (redirectCustomDomain) {
-        const hasLoadedAll = app.config.chains.getAll().length !== 0 || app.config.communities.getAll().length !== 0;
-        const matchingChain = app.config.chains.getAll().find((c) => c.customDomain === host);
-        const matchingCommunity = app.config.communities.getAll().find((c) => c.customDomain === host);
-
-        // keep the page loading until chains & communities have been fetched
-        if (!hasLoadedAll) return m(LoadingLayout);
-
-        // redirect into the community
-        if (matchingChain) {
-          m.route.set(`/${matchingChain.id}`, {}, { replace: true });
-          return m(LoadingLayout);
-        }
-        if (matchingCommunity) {
-          m.route.set(`/${matchingCommunity.id}`, {}, { replace: true });
-          return m(LoadingLayout);
-        }
-      }
 
       // normal render
       let deferChain = attrs.deferChain;
@@ -538,7 +519,7 @@ $(() => {
         ? scoped
         : scoped
           // true => scope is derived from path
-          ? vnode.attrs.scope.toString()
+          ? (vnode.attrs.scope?.toString() || 'edgeware') // XXXXX
           // false => scope is null
           : null;
 
@@ -558,7 +539,7 @@ $(() => {
       // Special case to defer chain loading specifically for viewing an offchain thread. We need
       // a special case because OffchainThreads and on-chain proposals are all viewed through the
       // same "/:scope/proposal/:type/:id" route.
-      if (vnode.attrs.scope && path === 'views/pages/view_proposal/index' && vnode.attrs.type === 'discussion') {
+      if (path === 'views/pages/view_proposal/index' && vnode.attrs.type === 'discussion') {
         deferChain = true;
       }
       if (app.chain?.meta.chain.type === 'token') deferChain = false;
@@ -566,79 +547,141 @@ $(() => {
     },
   });
 
+  const isCustomDomain = true;
+  const activeAcct = app.user.activeAccount;
   m.route(document.body, '/', {
-    // Legacy redirects
-    '/unlock':                   redirectRoute('/edgeware/unlock'),
-    '/stats/edgeware':           redirectRoute('/edgeware/stats'),
-    '/home':                     redirectRoute(`/${app.activeId() || app.config.defaultChain}/`),
-    '/discussions':              redirectRoute(`/${app.activeId() || app.config.defaultChain}/`),
-
-    // Landing pages
-    '/':                         importRoute('views/pages/landing', { scoped: false, hideSidebar: true, redirectCustomDomain: true }),
-    '/whyCommonwealth':          importRoute('views/pages/commonwealth', { scoped: false, hideSidebar: true }),
+    // Sitewide pages
     '/about':                    importRoute('views/pages/landing/about', { scoped: false }),
     '/terms':                    importRoute('views/pages/landing/terms', { scoped: false }),
     '/privacy':                  importRoute('views/pages/landing/privacy', { scoped: false }),
     '/components':               importRoute('views/pages/components', { scoped: false, hideSidebar: true }),
-
-    // Search
-    '/search':                   importRoute('views/pages/search', { scoped: false, deferChain: true }),
-
-
-    // Login page
-    '/login':                    importRoute('views/pages/login', { scoped: false }),
-    '/settings':                 importRoute('views/pages/settings', { scoped: false }),
-    '/notifications':            redirectRoute(() => '/edgeware/notifications'),
-    '/:scope/notifications':     importRoute('views/pages/notifications', { scoped: true, deferChain: true }),
-    '/notificationsList':        redirectRoute(() => '/edgeware/notificationsList'),
-    '/:scope/notificationsList': importRoute('views/pages/notificationsList', { scoped: true, deferChain: true }),
-
-    // Edgeware lockdrop
-    '/edgeware/unlock':          importRoute('views/pages/unlock_lockdrop', { scoped: false }),
-    '/edgeware/stats':           importRoute('views/stats/edgeware', { scoped: false }),
-
-    // Commonwealth protocol
-    '/:scope/projects':          importRoute('views/pages/commonwealth/projects', { scoped: true }),
-    // '/:scope/backers':           importRoute('views/pages/commonwealth/backers', { scoped: true }),
-    '/:scope/collectives':       importRoute('views/pages/commonwealth/collectives', { scoped: true }),
-
-    // Chain pages
-    '/:scope/home':              redirectRoute((attrs) => `/${attrs.scope}/`),
-    '/:scope/discussions':       redirectRoute((attrs) => `/${attrs.scope}/`),
-
-    '/:scope':                   importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
-    '/:scope/discussions/:topic': importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
-    '/:scope/search':            importRoute('views/pages/search', { scoped: true, deferChain: true }),
-    '/:scope/members':           importRoute('views/pages/members', { scoped: true, deferChain: true }),
-    '/:scope/chat':              importRoute('views/pages/chat', { scoped: true, deferChain: true }),
-    '/:scope/referenda':         importRoute('views/pages/referenda', { scoped: true }),
-    '/:scope/proposals':         importRoute('views/pages/proposals', { scoped: true }),
-    '/:scope/treasury':          importRoute('views/pages/treasury', { scoped: true }),
-    '/:scope/bounties':          importRoute('views/pages/bounties', { scoped: true }),
-    '/:scope/tips':              importRoute('views/pages/tips', { scoped: true }),
-    '/:scope/proposal/:type/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
-    '/:scope/council':           importRoute('views/pages/council', { scoped: true }),
-    '/:scope/delegate':          importRoute('views/pages/delegate', { scoped: true, }),
-    '/:scope/login':             importRoute('views/pages/login', { scoped: true, deferChain: true }),
-    '/:scope/new/thread':        importRoute('views/pages/new_thread', { scoped: true, deferChain: true }),
-    '/:scope/new/proposal/:type': importRoute('views/pages/new_proposal/index', { scoped: true }),
-    '/:scope/admin':             importRoute('views/pages/admin', { scoped: true }),
-    '/:scope/spec_settings':     importRoute('views/pages/spec_settings', { scoped: true, deferChain: true }),
-    '/:scope/settings':          importRoute('views/pages/settings', { scoped: true }),
-    '/:scope/analytics':         importRoute('views/pages/stats', { scoped: true, deferChain: true }),
-    '/:scope/web3login':         importRoute('views/pages/web3login', { scoped: true }),
-
-    '/:scope/account/:address':  importRoute('views/pages/profile', { scoped: true, deferChain: true }),
-    '/:scope/account':           redirectRoute((attrs) => {
-      return (app.user.activeAccount)
-        ? `/${attrs.scope}/account/${app.user.activeAccount.address}`
-        : `/${attrs.scope}/`;
+    ...(isCustomDomain ? {
+      '/':                       importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
+      '/search':                 importRoute('views/pages/search', { scoped: false, deferChain: true }),
+      // Notifications
+      '/notifications':          importRoute('views/pages/notifications', { scoped: true, deferChain: true }),
+      '/notificationsList':      importRoute('views/pages/notificationsList', { scoped: true, deferChain: true }),
+      // CMN
+      '/projects':               importRoute('views/pages/commonwealth/projects', { scoped: true }),
+      '/backers':                importRoute('views/pages/commonwealth/backers', { scoped: true }),
+      '/collectives':            importRoute('views/pages/commonwealth/collectives', { scoped: true }),
+      // NEAR
+      '/finishNearLogin':        importRoute('views/pages/finish_near_login', { scoped: true }),
+      // Discussions
+      '/home':                   redirectRoute((attrs) => `/${attrs.scope}/`),
+      '/discussions':            redirectRoute((attrs) => `/${attrs.scope}/`),
+      '/discussions/:topic':     importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
+      '/members':                importRoute('views/pages/members', { scoped: true, deferChain: true }),
+      '/chat':                   importRoute('views/pages/chat', { scoped: true, deferChain: true }),
+      '/new/thread':             importRoute('views/pages/new_thread', { scoped: true, deferChain: true }),
+      // Profiles
+      '/account/:address':       importRoute('views/pages/profile', { scoped: true, deferChain: true }),
+      '/account':                redirectRoute((a) => activeAcct ? `/account/${activeAcct.address}` : '/'),
+      // Governance
+      '/referenda':              importRoute('views/pages/referenda', { scoped: true }),
+      '/proposals':              importRoute('views/pages/proposals', { scoped: true }),
+      '/council':                importRoute('views/pages/council', { scoped: true }),
+      '/delegate':               importRoute('views/pages/delegate', { scoped: true, }),
+      '/proposal/:type/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
+      '/new/proposal/:type':     importRoute('views/pages/new_proposal/index', { scoped: true }),
+      // Treasury
+      '/treasury':               importRoute('views/pages/treasury', { scoped: true }),
+      '/bounties':               importRoute('views/pages/bounties', { scoped: true }),
+      '/tips':                   importRoute('views/pages/tips', { scoped: true }),
+      '/validators':             importRoute('views/pages/validators', { scoped: true }),
+      // Settings
+      '/login':                  importRoute('views/pages/login', { scoped: true, deferChain: true }),
+      '/web3login':              importRoute('views/pages/web3login', { scoped: true }),
+      // Admin
+      '/admin':                  importRoute('views/pages/admin', { scoped: true }),
+      '/spec_settings':          importRoute('views/pages/spec_settings', { scoped: true, deferChain: true }),
+      '/settings':               importRoute('views/pages/settings', { scoped: true }),
+      '/analytics':              importRoute('views/pages/stats', { scoped: true, deferChain: true }),
+      // Redirects
+      '/:scope/notifications':      redirectRoute(() => '/notifications'),
+      '/:scope/notificationsList':  redirectRoute(() => '/notificationsList'),
+      '/:scope/projects':           redirectRoute(() => '/projects'),
+      '/:scope/backers':            redirectRoute(() => '/backers'),
+      '/:scope/collectives':        redirectRoute(() => '/collectives'),
+      '/:scope/finishNearLogin':    redirectRoute(() => '/finishNearLogin'),
+      '/:scope/home':               redirectRoute(() => '/'),
+      '/:scope/discussions':        redirectRoute(() => '/'),
+      '/:scope':                    redirectRoute(() => '/'),
+      '/:scope/discussions/:topic': redirectRoute((attrs) => `/discussions/${attrs.topic}/`),
+      '/:scope/search':             redirectRoute(() => '/search'),
+      '/:scope/members':            redirectRoute(() => '/members'),
+      '/:scope/chat':               redirectRoute(() => '/chat'),
+      '/:scope/new/thread':         redirectRoute(() => '/new/thread'),
+      '/:scope/account/:address':   redirectRoute((attrs) => `/account/${attrs.address}/`),
+      '/:scope/account':            redirectRoute(() => activeAcct ? `/account/${activeAcct.address}` : '/'),
+      '/:scope/referenda':          redirectRoute(() => '/referenda'),
+      '/:scope/proposals':          redirectRoute(() => '/proposals'),
+      '/:scope/council':            redirectRoute(() => '/council'),
+      '/:scope/delegate':           redirectRoute(() => '/delegate'),
+      '/:scope/proposal/:type/:identifier': redirectRoute((attrs) => `/proposal/${attrs.type}/${attrs.identifier}/`),
+      '/:scope/new/proposal/:type':  redirectRoute((attrs) => `/new/proposal/${attrs.type}/`),
+      '/:scope/treasury':           redirectRoute(() => '/treasury'),
+      '/:scope/bounties':           redirectRoute(() => '/bounties'),
+      '/:scope/tips':               redirectRoute(() => '/tips'),
+      '/:scope/validators':         redirectRoute(() => '/validators'),
+      '/:scope/login':              redirectRoute(() => '/login'),
+      '/:scope/web3login':          redirectRoute(() => '/web3login'),
+      '/:scope/settings':           redirectRoute(() => '/settings'),
+      '/:scope/admin':              redirectRoute(() => '/admin'),
+      '/:scope/spec_settings':      redirectRoute(() => '/spec_settings'),
+      '/:scope/analytics':          redirectRoute(() => '/analytics'),
+    } : {
+      '/':                         importRoute('views/pages/landing', { scoped: false, hideSidebar: true }),
+      '/search':                   importRoute('views/pages/search', { scoped: false, deferChain: true }),
+      '/whyCommonwealth':          importRoute('views/pages/commonwealth', { scoped: false, hideSidebar: true }),
+      // Notifications
+      '/notifications':            redirectRoute(() => '/edgeware/notifications'),
+      '/:scope/notifications':     importRoute('views/pages/notifications', { scoped: true, deferChain: true }),
+      '/notificationsList':        redirectRoute(() => '/edgeware/notificationsList'),
+      '/:scope/notificationsList': importRoute('views/pages/notificationsList', { scoped: true, deferChain: true }),
+      // CMN
+      '/:scope/projects':          importRoute('views/pages/commonwealth/projects', { scoped: true }),
+      '/:scope/backers':           importRoute('views/pages/commonwealth/backers', { scoped: true }),
+      '/:scope/collectives':       importRoute('views/pages/commonwealth/collectives', { scoped: true }),
+      // NEAR
+      '/:scope/finishNearLogin':   importRoute('views/pages/finish_near_login', { scoped: true }),
+      // Discussions
+      '/home':                     redirectRoute('/'), // legacy redirect, here for compatibility only
+      '/discussions':              redirectRoute('/'), // legacy redirect, here for compatibility only
+      '/:scope/home':              redirectRoute((attrs) => `/${attrs.scope}/`),
+      '/:scope/discussions':       redirectRoute((attrs) => `/${attrs.scope}/`),
+      '/:scope':                   importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
+      '/:scope/discussions/:topic': importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
+      '/:scope/search':            importRoute('views/pages/search', { scoped: true, deferChain: true }),
+      '/:scope/members':           importRoute('views/pages/members', { scoped: true, deferChain: true }),
+      '/:scope/chat':              importRoute('views/pages/chat', { scoped: true, deferChain: true }),
+      '/:scope/new/thread':        importRoute('views/pages/new_thread', { scoped: true, deferChain: true }),
+      // Profiles
+      '/:scope/account/:address':  importRoute('views/pages/profile', { scoped: true, deferChain: true }),
+      '/:scope/account':           redirectRoute((a) => activeAcct ? `/${a.scope}/account/${activeAcct.address}` : `/${a.scope}/`),
+      // Governance
+      '/:scope/referenda':         importRoute('views/pages/referenda', { scoped: true }),
+      '/:scope/proposals':         importRoute('views/pages/proposals', { scoped: true }),
+      '/:scope/council':           importRoute('views/pages/council', { scoped: true }),
+      '/:scope/delegate':          importRoute('views/pages/delegate', { scoped: true, }),
+      '/:scope/proposal/:type/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
+      '/:scope/new/proposal/:type': importRoute('views/pages/new_proposal/index', { scoped: true }),
+      // Treasury
+      '/:scope/treasury':          importRoute('views/pages/treasury', { scoped: true }),
+      '/:scope/bounties':          importRoute('views/pages/bounties', { scoped: true }),
+      '/:scope/tips':              importRoute('views/pages/tips', { scoped: true }),
+      '/:scope/validators':        importRoute('views/pages/validators', { scoped: true }),
+      // Settings
+      '/login':                    importRoute('views/pages/login', { scoped: false }),
+      '/:scope/login':             importRoute('views/pages/login', { scoped: true, deferChain: true }),
+      '/:scope/web3login':         importRoute('views/pages/web3login', { scoped: true }),
+      // Admin
+      '/settings':                 importRoute('views/pages/settings', { scoped: false }),
+      '/:scope/settings':          importRoute('views/pages/settings', { scoped: true }),
+      '/:scope/admin':             importRoute('views/pages/admin', { scoped: true }),
+      '/:scope/spec_settings':     importRoute('views/pages/spec_settings', { scoped: true, deferChain: true }),
+      '/:scope/analytics':         importRoute('views/pages/stats', { scoped: true, deferChain: true }),
     }),
-
-    '/:scope/validators':        importRoute('views/pages/validators', { scoped: true }),
-
-    // NEAR login
-    '/:scope/finishNearLogin':    importRoute('views/pages/finish_near_login', { scoped: true }),
   });
 
   const script = document.createElement('noscript');

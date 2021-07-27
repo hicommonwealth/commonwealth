@@ -60,7 +60,7 @@ export interface IApp {
   activeChainId(): string;
   activeCommunityId(): string;
   activeId(): string;
-  defaultScope(): string;
+  customDomainId(): string;
 
   toasts: ToastStore;
   modals: ModalStore;
@@ -125,7 +125,9 @@ const app: IApp = {
   activeChainId: () => app.chain?.id,
   activeCommunityId: () => app.community?.meta.id,
   activeId: () => app.community ? app.activeCommunityId() : app.activeChainId(),
-  defaultScope: () => app.config.defaultChain,
+  customDomainId: () => {
+    return 'edgeware'; // XXXXX
+  },
 
   toasts: getToastStore(),
   modals: getModalStore(),
@@ -138,26 +140,16 @@ const app: IApp = {
     invites: [],
   },
   // TODO: Collect all getters into an object
-  loginStatusLoaded: () => {
-    return app.loginState !== LoginState.NotLoaded;
-  },
-  isLoggedIn: () => {
-    return app.loginState === LoginState.LoggedIn;
-  },
-  isProduction: () => {
-    return document.location.origin.indexOf('commonwealth.im') !== -1;
-  },
-  serverUrl: () => '/api',
+  loginStatusLoaded: () => app.loginState !== LoginState.NotLoaded,
+  isLoggedIn:        () => app.loginState === LoginState.LoggedIn,
+  isProduction:      () => document.location.origin.indexOf('commonwealth.im') !== -1,
+  serverUrl:         () => '/api',
 
   loadingError: null,
 
-  isCustomDomain: () => {
-    return app._isCustomDomain;
-  },
-  setIsCustomDomain: (option: boolean) => {
-    app._isCustomDomain = option;
-  },
   _isCustomDomain: false,
+  isCustomDomain: () => app._isCustomDomain,
+  setIsCustomDomain: (option: boolean) => { app._isCustomDomain = option; },
 
   _lastNavigatedFrom: null,
   _lastNavigatedBack: false,
