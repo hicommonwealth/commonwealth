@@ -249,20 +249,13 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/substrate/main'
     )).default;
     newChain = new Substrate(n, app);
-  } else if (n.chain.network === ChainNetwork.Cosmos) {
+  } else if (n.chain.base === ChainBase.CosmosSDK) {
     const Cosmos = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "cosmos-main" */
       './controllers/chain/cosmos/main'
     )).default;
     newChain = new Cosmos(n, app);
-  } else if (n.chain.network === ChainNetwork.Straightedge) {
-    const Straightedge = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "straightedge-main" */
-      './controllers/chain/straightedge/main'
-    )).default;
-    newChain = new Straightedge(n, app);
   } else if (n.chain.network === ChainNetwork.Ethereum) {
     const Ethereum = (await import(
       /* webpackMode: "lazy" */

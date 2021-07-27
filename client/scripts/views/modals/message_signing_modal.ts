@@ -24,21 +24,22 @@ const MessageSigningSeedOrMnemonicOption = {
         m(Button, {
           type: 'submit',
           rounded: true,
-          onclick: (e) => {
+          onclick: async (e) => {
             e.preventDefault();
             vnode.state.error = null;
             const $parent = $(vnode.dom);
             const mnemonic = $parent.find('textarea.mnemonic').val().toString().trim();
-            account.setMnemonic(mnemonic);
-            account.validate().then(() => {
+            try {
+              await account.setMnemonic(mnemonic);
+              await account.validate();
               $parent.trigger('modalcomplete');
               setTimeout(() => {
                 $(vnode.dom).trigger('modalexit');
               }, 0);
-            }, (err) => {
+            } catch (err) {
               vnode.state.error = err.responseJSON ? err.responseJSON.error : 'Signature check failed.';
               m.redraw();
-            });
+            }
           },
           label: 'Sign message'
         }),
