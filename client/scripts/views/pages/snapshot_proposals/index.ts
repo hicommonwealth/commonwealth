@@ -82,7 +82,16 @@ const SnapshotProposalsPage: m.Component<{ topic?: string, snapshotId: string },
     const { loadingProposals, allProposals, selectedFilter } = vnode.state;
     const { snapshotId } = vnode.attrs;
 
-    if (loadingProposals) return m(Spinner, { active: true, fill: true });
+    if (loadingProposals) {
+      return m(Sublayout, {
+        class: 'DiscussionsPage',
+        title: 'Proposals',
+        description: '',
+        showNewProposalButton: true,
+      }, [
+        m(Spinner, { active: true, fill: true })
+      ]);
+    }
 
     const checkProposalByFilter = (proposal: SnapshotProposal, option: SnapshotProposalFilter) => {
       switch (option) {

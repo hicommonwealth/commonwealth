@@ -13,6 +13,13 @@
     @include xs-max {
         width: initial;
     }
+    .topic-loading-spinner-wrap {
+        height: 120px;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 }
 
 .NewProposalForm {

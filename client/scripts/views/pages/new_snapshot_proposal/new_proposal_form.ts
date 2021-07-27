@@ -137,11 +137,12 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
   snapshotScoresFetched: boolean,
 }> = {
   view: (vnode) => {
-    if (!app.community && !app.chain) return;
+    const getLoadingPage = () => m('.topic-loading-spinner-wrap', [ m(Spinner, { active: true, size: 'lg' }) ]);
+    if (!app.community && !app.chain) return getLoadingPage();
 
     const pathVars = m.parsePathname(window.location.href);
 
-    if (!app.snapshot.spaces) return;
+    if (!app.snapshot.spaces) return getLoadingPage();
     if (!vnode.state.initialized) {
       vnode.state.initialized = true;
       vnode.state.space = {};
@@ -190,7 +191,7 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
         m.redraw();
       });
     }
-    if (!vnode.state.snapshotScoresFetched) return;
+    if (!vnode.state.snapshotScoresFetched) return getLoadingPage();
     const author = app.user.activeAccount;
     const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
     if (vnode.state.quillEditorState?.container) {
