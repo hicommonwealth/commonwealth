@@ -23,7 +23,7 @@ const createTopic = async (models, req, res: Response, next: NextFunction) => {
       ...chainOrCommObj,
     },
   });
-  if (adminRoles.length === 0) {
+  if (!req.user.isAdmin && adminRoles.length === 0) {
     return next(new Error(Errors.MustBeAdmin));
   }
 

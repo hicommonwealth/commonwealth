@@ -5,7 +5,7 @@ import { formatCoin } from 'adapters/currency'; // TODO: remove formatCoin, only
 import User from 'views/components/widgets/user';
 import { VotingType, VotingUnit, IVote, DepositVote, BinaryVote, AnyProposal } from 'models';
 import { CosmosVote, CosmosProposal } from 'controllers/chain/cosmos/proposal';
-import { CosmosVoteChoice } from 'adapters/chain/cosmos/types';
+import { CosmosVoteChoice } from 'controllers/chain/cosmos/types';
 import { MolochProposalVote, MolochVote } from 'controllers/chain/ethereum/moloch/proposal';
 import { MarlinProposalVote, MarlinVote } from 'controllers/chain/ethereum/marlin/proposal';
 import { SubstrateCollectiveVote } from 'controllers/chain/substrate/collective_proposal';
@@ -206,38 +206,38 @@ const VotingResults: m.Component<{ proposal }> = {
     } else if (proposal.votingType === VotingType.YesNoAbstainVeto) {
       return m('.VotingResults', [
         m('.results-column', [
-          m('.results-header', `Yes (${votes.filter((v) => v.choice === CosmosVoteChoice.YES).length})`),
+          m('.results-header', `Voted yes (${votes.filter((v) => v.choice === 'Yes').length})`),
           m('.results-cell', [
             m(VoteListing, {
               proposal,
-              votes: votes.filter((v) => v.choice === CosmosVoteChoice.YES)
+              votes: votes.filter((v) => v.choice === 'Yes')
             })
           ]),
         ]),
         m('.results-column', [
-          m('.results-header', `No (${votes.filter((v) => v.choice === CosmosVoteChoice.NO).length})`),
+          m('.results-header', `Voted no (${votes.filter((v) => v.choice === 'No').length})`),
           m('.results-cell', [
             m(VoteListing, {
               proposal,
-              votes: votes.filter((v) => v.choice === CosmosVoteChoice.NO)
+              votes: votes.filter((v) => v.choice === 'No')
             })
           ]),
         ]),
         m('.results-column', [
-          m('.results-header', `Abstained (${votes.filter((v) => v.choice === CosmosVoteChoice.ABSTAIN).length})`),
+          m('.results-header', `Voted abstain (${votes.filter((v) => v.choice === 'Abstain').length})`),
           m('.results-cell', [
             m(VoteListing, {
               proposal,
-              votes: votes.filter((v) => v.choice === CosmosVoteChoice.ABSTAIN)
+              votes: votes.filter((v) => v.choice === 'Abstain')
             })
           ]),
         ]),
         m('.results-column', [
-          m('.results-header', `No with veto (${votes.filter((v) => v.choice === CosmosVoteChoice.VETO).length})`),
+          m('.results-header', `Voted veto (${votes.filter((v) => v.choice === 'NoWithVeto').length})`),
           m('.results-cell', [
             m(VoteListing, {
               proposal,
-              votes: votes.filter((v) => v.choice === CosmosVoteChoice.VETO)
+              votes: votes.filter((v) => v.choice === 'NoWithVeto')
             })
           ]),
         ])

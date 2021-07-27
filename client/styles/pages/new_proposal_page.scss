@@ -16,7 +16,9 @@
 }
 
 .NewProposalForm {
-    max-width: 85%;
+    @media (min-width: 1024px){
+        max-width: 85%;
+    }
     textarea {
         min-height: 200px;
     }
@@ -27,5 +29,12 @@
     }
     .cui-overlay-inline {
         display: block;
+    }
+    .cui-grid {
+        max-width: 100%;
+
+        &>* {
+            max-width: 100%;
+        }
     }
 }
