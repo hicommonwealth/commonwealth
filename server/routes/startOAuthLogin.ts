@@ -4,7 +4,6 @@ import { Request, Response, NextFunction } from 'express';
 import { GITHUB_OAUTH_CALLBACK } from '../config';
 
 const startOAuthLogin = async (models, req: Request, res: Response, next: NextFunction) => {
-  // Look up req.query.from, and only pass on the query param if the domain is valid
   let successRedirect = '/';
   let failureRedirect = '#!/login';
   if (req.query.from) {
@@ -15,7 +14,8 @@ const startOAuthLogin = async (models, req: Request, res: Response, next: NextFu
       ]);
       if (chain || community) {
         const tokenObj = await models.LoginToken.createForOAuth(req.query.from);
-        successRedirect = `/api/finishOAuthLogin?token=${tokenObj.token}`;
+        successRedirect = `https://${req.query.from}/api/finishOAuthLogin?token=${tokenObj.token}`;
+        (req as any).loginTokenForRedirect = tokenObj.id;
       }
     } catch (e) { console.log('Error:', e); }
   }
@@ -26,6 +26,5 @@ const startOAuthLogin = async (models, req: Request, res: Response, next: NextFu
     failureRedirect: failureRedirect,
   } as any)(req, res, next); // TODO: extend AuthenticateOptions typing used here
 };
-
 
 export default startOAuthLogin;

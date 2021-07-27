@@ -267,6 +267,20 @@ function setupPassport(models) {
     // Existing Github account. If there is already a user logged-in,
     // transfer the Github link to the current user.
     if (githubAccount !== null) {
+      // Handle OAuth for custom domains.
+      //
+      // If req.query.from is a valid custom domain for a community,
+      // associate our LoginToken with this Github account. We will
+      // redirect to [customdomain] afterwards and consume this
+      // LoginToken to get a new login session.
+      if ((req as any).loginTokenForRedirect) {
+        const tokenObj = await models.LoginToken.findOne({
+          where: { id: (req as any).loginTokenForRedirect }
+        });
+        tokenObj.social_account = githubAccount.id;
+        await tokenObj.save();
+      }
+
       // Update profile data on the SocialAccount.
       if (accessToken !== githubAccount.access_token
         || refreshToken !== githubAccount.refresh_token
@@ -329,6 +343,21 @@ function setupPassport(models) {
         location: profile._json.location,
       }
     });
+
+    // Handle OAuth for custom domains.
+    //
+    // If req.query.from is a valid custom domain for a community,
+    // associate our LoginToken with this Github account. We will
+    // redirect to [customdomain] afterwards and consume this
+    // LoginToken to get a new login session.
+    if ((req as any).loginTokenForRedirect) {
+      const tokenObj = await models.LoginToken.findOne({
+        where: { id: (req as any).loginTokenForRedirect }
+      });
+      tokenObj.social_account = newGithubAccount.id;
+      await tokenObj.save();
+    }
+
     if (req.user) {
       await newGithubAccount.setUser(req.user);
       return cb(null, req.user);

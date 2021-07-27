@@ -18,8 +18,8 @@ const finishOAuthLogin = async (models, req: Request, res: Response, next: NextF
   }
 
   // Validate login token
-  const tokenObj = await models.LoginToken.findOne({ where: { token } });
-  if (!tokenObj) {
+  const tokenObj = await models.LoginToken.findOne({ where: { token, email: '' } });
+  if (!tokenObj || !tokenObj.social_account) {
     return redirectWithLoginError(res, 'Invalid token');
   }
   if (+new Date() >= +tokenObj.expires) {
@@ -39,7 +39,7 @@ const finishOAuthLogin = async (models, req: Request, res: Response, next: NextF
 
   // Log in the user associated with the verified email,
   // or create a new user if none exists
-  const socialAccount = await models.SocialAccount.findOne({ where: { login_token_id: tokenObj.id } });
+  const socialAccount = await models.SocialAccount.findOne({ where: { id: tokenObj.social_account } });
   const existingUser = await models.User.scope('withPrivateData').findOne({ where: { id: socialAccount.user_id } });
 
   if (existingUser) {
