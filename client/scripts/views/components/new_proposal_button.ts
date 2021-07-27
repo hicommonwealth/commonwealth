@@ -109,9 +109,7 @@ const NewProposalButton: m.Component<{
     if (!app.activeId()) return;
 
     // just a button for communities, or chains without governance
-    if (app.community || threadOnly
-     || (app.chain?.base !== ChainBase.CosmosSDK && app.chain?.base !== ChainBase.Substrate)
-     || (app.chain?.base === ChainBase.Substrate && app.chain?.network === ChainNetwork.Plasm)) {
+    if (app.community || threadOnly) {
       return m(Button, {
         class: 'NewProposalButton',
         label: 'New thread',
