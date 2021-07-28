@@ -18,7 +18,6 @@ export const ChainCommunityErrors = {
 const lookupCommunityIsVisibleToUser = async (
   models, params, user
 ): Promise<[ChainInstance, OffchainCommunityInstance, string]> => {
-  console.log('params.chain', params.chain, params.community);
   const chain = await models.Chain.findOne({
     where: {
       id: params.chain || null,
