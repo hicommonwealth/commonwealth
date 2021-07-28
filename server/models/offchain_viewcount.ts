@@ -1,4 +1,5 @@
 import * as Sequelize from 'sequelize';
+import { BuildOptions, DataTypes, Model } from 'sequelize';
 
 import { ChainAttributes } from './chain';
 import { OffchainCommunityAttributes } from './offchain_community';
@@ -16,28 +17,26 @@ export interface OffchainViewCountAttributes {
 }
 
 export interface OffchainViewCountInstance
-extends Sequelize.Instance<OffchainViewCountAttributes>, OffchainViewCountAttributes {
+extends Model<OffchainViewCountAttributes>, OffchainViewCountAttributes {
 
 }
 
-export interface OffchainViewCountModel
-extends Sequelize.Model<OffchainViewCountInstance, OffchainViewCountAttributes> {
-
-}
+type OffchainViewCountModelStatic = typeof Model
+    & { associate: (models: any) => void }
+    & { new(values?: Record<string, unknown>, options?: BuildOptions): OffchainViewCountInstance }
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): OffchainViewCountModel => {
-  const OffchainViewCount = sequelize.define<
-    OffchainViewCountInstance, OffchainViewCountAttributes
-  >('OffchainViewCount', {
+  dataTypes: typeof DataTypes,
+): OffchainViewCountModelStatic => {
+  const OffchainViewCount = <OffchainViewCountModelStatic>sequelize.define('OffchainViewCount', {
     id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     chain: { type: dataTypes.STRING },
     community: { type: dataTypes.STRING },
     object_id: { type: dataTypes.INTEGER, allowNull: false },
     view_count: { type: dataTypes.INTEGER, allowNull: false },
   }, {
+    tableName: 'OffchainViewCounts',
     underscored: true,
     timestamps: false,
     indexes: [

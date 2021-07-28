@@ -1,4 +1,5 @@
 import * as Sequelize from 'sequelize';
+import { BuildOptions, Model, DataTypes } from 'sequelize';
 
 export interface ChatMessageAttributes {
   id?: number;
@@ -11,26 +12,27 @@ export interface ChatMessageAttributes {
 }
 
 export interface ChatMessageInstance
-extends Sequelize.Instance<ChatMessageAttributes>, ChatMessageAttributes {
+extends Model<ChatMessageAttributes>, ChatMessageAttributes {
 
 }
 
-export interface ChatMessageModel
-extends Sequelize.Model<ChatMessageInstance, ChatMessageAttributes> {
 
-}
+type ChatMessageModelStatic = typeof Model
+    & { associate: (models: any) => void }
+    & { new(values?: Record<string, unknown>, options?: BuildOptions): ChatMessageInstance }
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): ChatMessageModel => {
-  const ChatMessage = sequelize.define<ChatMessageInstance, ChatMessageAttributes>('ChatMessage', {
+  dataTypes: typeof DataTypes,
+): ChatMessageModelStatic => {
+  const ChatMessage = <ChatMessageModelStatic>sequelize.define('ChatMessage', {
     id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     chain: { type: dataTypes.STRING, allowNull: false },
     address: { type: dataTypes.STRING, allowNull: false },
     text: { type: dataTypes.TEXT, allowNull: false },
     room: { type: dataTypes.STRING, allowNull: false },
   }, {
+    tableName: 'ChatMessages',
     underscored: true,
     timestamps: true,
     indexes: [

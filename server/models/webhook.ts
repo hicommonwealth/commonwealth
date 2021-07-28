@@ -1,5 +1,5 @@
 import * as Sequelize from 'sequelize';
-
+import { BuildOptions, DataTypes, Model } from 'sequelize';
 import { ChainAttributes } from './chain';
 import { OffchainCommunityAttributes } from './offchain_community';
 
@@ -15,25 +15,24 @@ export interface WebhookAttributes {
   OffchainCommunity?: OffchainCommunityAttributes;
 }
 
-export interface WebhookInstance extends Sequelize.Instance<WebhookAttributes>, WebhookAttributes {
+export interface WebhookInstance extends Model<WebhookAttributes>, WebhookAttributes {}
 
-}
-
-export interface WebhookModel extends Sequelize.Model<WebhookInstance, WebhookAttributes> {
-
-}
+type WebhookModelStatic = typeof Sequelize.Model
+    & { associate: (models: any) => void }
+    & { new(values?: Record<string, unknown>, options?: Sequelize.BuildOptions): WebhookInstance }
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): WebhookModel => {
-  const Webhook = sequelize.define<WebhookInstance, WebhookAttributes>('Webhook', {
+  dataTypes: typeof DataTypes,
+): WebhookModelStatic => {
+  const Webhook = <WebhookModelStatic>sequelize.define('Webhook', {
     id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     url: { type: dataTypes.STRING, allowNull: false },
     chain_id: { type: dataTypes.STRING, allowNull: true },
     offchain_community_id: { type: dataTypes.STRING, allowNull: true },
     categories: { type: dataTypes.ARRAY(dataTypes.STRING), allowNull: false, defaultValue: [] },
   }, {
+    tableName: 'Webhooks',
     underscored: true,
     indexes: [
       { fields: ['url'] },

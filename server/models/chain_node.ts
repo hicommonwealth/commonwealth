@@ -1,4 +1,5 @@
 import * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
+import { BuildOptions, Model, DataTypes } from 'sequelize';
 import { ChainInstance, ChainAttributes } from './chain';
 
 export interface ChainNodeAttributes {
@@ -11,25 +12,26 @@ export interface ChainNodeAttributes {
   Chain?: ChainAttributes;
 }
 
-export interface ChainNodeInstance extends Sequelize.Instance<ChainNodeAttributes>, ChainNodeAttributes {
+export interface ChainNodeInstance extends Model<ChainNodeAttributes>, ChainNodeAttributes {
   // TODO: add mixins as needed
   getChain: Sequelize.BelongsToGetAssociationMixin<ChainInstance>;
 }
 
-export interface ChainNodeModel extends Sequelize.Model<ChainNodeInstance, ChainNodeAttributes> {
-
-}
+type ChainNodeModelStatic = typeof Model
+    & { associate: (models: any) => void }
+    & { new(values?: Record<string, unknown>, options?: BuildOptions): ChainNodeInstance }
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes
-): ChainNodeModel => {
-  const ChainNode = sequelize.define<ChainNodeInstance, ChainNodeAttributes>('ChainNode', {
+  dataTypes: typeof DataTypes
+): ChainNodeModelStatic => {
+  const ChainNode = <ChainNodeModelStatic>sequelize.define('ChainNode', {
     id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     chain: { type: dataTypes.STRING, allowNull: false },
     url: { type: dataTypes.STRING, allowNull: false },
     address: { type: dataTypes.STRING, allowNull: true },
   }, {
+    tableName: 'ChainNodes',
     timestamps: false,
     underscored: true,
     indexes: [

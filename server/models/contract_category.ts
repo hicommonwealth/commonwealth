@@ -1,4 +1,5 @@
 import * as Sequelize from 'sequelize';
+import { BuildOptions, Model, DataTypes } from 'sequelize';
 
 export interface ContractCategoryAttributes {
   id?: number;
@@ -10,24 +11,23 @@ export interface ContractCategoryAttributes {
 }
 
 export interface ContractCategoryInstance
-extends Sequelize.Instance<ContractCategoryAttributes>, ContractCategoryAttributes {
+extends Model<ContractCategoryAttributes>, ContractCategoryAttributes {}
 
-}
-
-export interface ContractCategoryModel extends Sequelize.Model<ContractCategoryInstance, ContractCategoryAttributes> {
-
-}
+type ContractCategoryModelStatic = typeof Model
+    & { associate: (models: any) => void }
+    & { new(values?: Record<string, unknown>, options?: BuildOptions): ContractCategoryInstance }
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): ContractCategoryModel => {
-  const ContractCategory = sequelize.define<ContractCategoryInstance, ContractCategoryAttributes>('ContractCategory', {
+  dataTypes: typeof DataTypes,
+): ContractCategoryModelStatic => {
+  const ContractCategory = <ContractCategoryModelStatic>sequelize.define('ContractCategory', {
     id:          { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     name:        { type: dataTypes.STRING, allowNull: false },
     description: { type: dataTypes.TEXT, allowNull: false },
     color:       { type: dataTypes.STRING, allowNull: false },
   }, {
+    tableName: 'ContractCategories',
     underscored: true,
   });
 

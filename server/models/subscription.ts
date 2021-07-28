@@ -1,6 +1,6 @@
 import _ from 'underscore';
 import WebSocket from 'ws';
-import Sequelize from 'sequelize';
+import Sequelize, { DataTypes } from 'sequelize';
 import send, { WebhookContent } from '../webhookNotifier';
 import { SENDGRID_API_KEY, SERVER_URL } from '../config';
 import { UserAttributes } from './user';
@@ -51,20 +51,18 @@ export interface SubscriptionAttributes {
 }
 
 export interface SubscriptionInstance
-extends Sequelize.Instance<SubscriptionAttributes>, SubscriptionAttributes {
+extends Sequelize.Model<SubscriptionAttributes>, SubscriptionAttributes {}
 
-}
-
-export interface SubscriptionModel
-extends Sequelize.Model<SubscriptionInstance, SubscriptionAttributes> {
-  emitNotifications?: any;
-}
+type SubscriptionModelStatic = typeof Sequelize.Model
+    & { associate: (models: any) => void }
+    & { emitNotifications?: any; }
+    & { new(values?: Record<string, unknown>, options?: Sequelize.BuildOptions): SubscriptionInstance }
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): SubscriptionModel => {
-  const Subscription: SubscriptionModel = sequelize.define<SubscriptionInstance, SubscriptionAttributes>(
+  dataTypes: typeof DataTypes,
+): SubscriptionModelStatic => {
+  const Subscription = <SubscriptionModelStatic>sequelize.define(
     'Subscription', {
       id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
       subscriber_id: { type: dataTypes.INTEGER, allowNull: false },
@@ -79,6 +77,7 @@ export default (
       chain_event_type_id: { type: dataTypes.STRING, allowNull: true },
       chain_entity_id: { type: dataTypes.INTEGER, allowNull: true },
     }, {
+      tableName: 'Subscriptions',
       underscored: true,
       indexes: [
         { fields: ['subscriber_id'] },

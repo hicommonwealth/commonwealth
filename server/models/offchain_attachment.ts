@@ -1,4 +1,5 @@
 import * as Sequelize from 'sequelize';
+import { BuildOptions, Model, DataTypes } from 'sequelize';
 
 import { OffchainCommentAttributes } from './offchain_comment';
 import { OffchainThreadAttributes } from './offchain_thread';
@@ -18,21 +19,18 @@ export interface OffchainAttachmentAttributes {
 }
 
 export interface OffchainAttachmentInstance
-extends Sequelize.Instance<OffchainAttachmentAttributes>, OffchainAttachmentAttributes {
+extends Model<OffchainAttachmentAttributes>, OffchainAttachmentAttributes {}
 
-}
 
-export interface OffchainAttachmentModel extends Sequelize.Model<
-  OffchainAttachmentInstance, OffchainAttachmentAttributes
-> {
-
-}
+type OffchainAttachmentModelStatic = typeof Model
+    & { associate: (models: any) => void }
+    & { new(values?: Record<string, unknown>, options?: BuildOptions): OffchainAttachmentInstance }
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): OffchainAttachmentModel => {
-  const OffchainAttachment = sequelize.define<OffchainAttachmentInstance, OffchainAttachmentAttributes>(
+  dataTypes: typeof DataTypes,
+): OffchainAttachmentModelStatic => {
+  const OffchainAttachment = <OffchainAttachmentModelStatic>sequelize.define(
     'OffchainAttachment', {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       attachable: { type: dataTypes.STRING, allowNull: false },
@@ -42,6 +40,7 @@ export default (
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
     }, {
+      tableName: 'OffchainAttachments',
       underscored: true,
       indexes: [
         { fields: ['attachable', 'attachment_id'] },

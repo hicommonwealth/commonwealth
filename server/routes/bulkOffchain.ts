@@ -4,7 +4,7 @@
 // because it's easy to miss catching errors inside the promise executor, but we use it in this file
 // because the bulk offchain queries are heavily optimized so communities can load quickly.
 //
-import { QueryTypes } from 'sequelize';
+import { QueryTypes, Op } from 'sequelize';
 import { Response, NextFunction, Request } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { factory, formatFilename } from '../../shared/logging';
@@ -16,7 +16,6 @@ export const Errors = { };
 
 // Topics, comments, reactions, members+admins, threads
 const bulkOffchain = async (models, req: Request, res: Response, next: NextFunction) => {
-  const { Op } = models.sequelize;
   const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
   if (error) return next(new Error(error));
 
@@ -180,13 +179,14 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
         }).concat(threads);
 
         // Comments
-        const comments = await models.OffchainComment.findAll({
+        const offchainComments = await models.OffchainComment.findAll({
           where: {
             root_id: root_ids
           },
           include: [models.Address, models.OffchainAttachment],
           order: [['created_at', 'DESC']],
-        }).map((c, idx) => {
+        });
+        const comments = offchainComments.map((c, idx) => {
           const row = c.toJSON();
           const last_edited = getLastEdited(row);
           row['last_edited'] = last_edited;

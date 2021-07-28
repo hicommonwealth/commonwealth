@@ -19,7 +19,8 @@ const getCommunitiesAndChains = async (models, req: Request, res: Response, next
   let userAddressIds;
   let userRoles;
   if (user) {
-    userAddressIds = await user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
+    const addresses = await user.getAddresses();
+    userAddressIds = addresses.filter((addr) => !!addr.verified).map((addr) => addr.id);
     userRoles = await models.Role.findAll({
       where: {
         address_id: userAddressIds,

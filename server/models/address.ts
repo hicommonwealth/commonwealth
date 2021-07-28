@@ -1,6 +1,7 @@
 (global as any).window = { location: { href: '/' } };
 
 import * as Sequelize from 'sequelize';
+import { Model, BuildOptions, DataTypes } from 'sequelize';
 import crypto from 'crypto';
 import Web3 from 'web3';
 
@@ -51,11 +52,11 @@ export interface AddressAttributes {
   Roles?: RoleAttributes[];
 }
 
-export interface AddressInstance extends Sequelize.Instance<AddressAttributes>, AddressAttributes {
+export interface AddressInstance extends Model<AddressAttributes>, AddressCreationAttributes {
   // no mixins used yet
 }
 
-export interface AddressModel extends Sequelize.Model<AddressInstance, AddressAttributes> {
+export interface AddressCreationAttributes extends AddressAttributes {
   // static methods
   createEmpty?: (
     chain: string,
@@ -84,7 +85,7 @@ export interface AddressModel extends Sequelize.Model<AddressInstance, AddressAt
   ) => Promise<AddressInstance>;
 
   verifySignature?: (
-    models: Sequelize.Models,
+    models: any,
     chain: ChainInstance,
     addressModel: AddressInstance,
     user_id: number,
@@ -92,11 +93,17 @@ export interface AddressModel extends Sequelize.Model<AddressInstance, AddressAt
   ) => Promise<boolean>;
 }
 
+
+type AddressModelStatic = typeof Model
+    & { associate: (models: any) => void }
+    & AddressCreationAttributes
+    & { new(values?: Record<string, unknown>, options?: BuildOptions): AddressInstance }
+
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): AddressModel => {
-  const Address: AddressModel = sequelize.define<AddressInstance, AddressAttributes>('Address', {
+  dataTypes: typeof DataTypes,
+): AddressModelStatic => {
+  const Address: AddressModelStatic = <AddressModelStatic>sequelize.define('Address', {
     id:                         { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     address:                    { type: dataTypes.STRING, allowNull: false },
     chain:                      { type: dataTypes.STRING, allowNull: false },
@@ -106,14 +113,15 @@ export default (
     keytype:                    { type: dataTypes.STRING, allowNull: true },
     name:                       { type: dataTypes.STRING, allowNull: true },
     last_active:                { type: dataTypes.DATE, allowNull: true },
-    created_at:                 { type: dataTypes.DATE, allowNull: false },
-    updated_at:                 { type: dataTypes.DATE, allowNull: false },
+    created_at:                 { type: dataTypes.DATE, allowNull: false, defaultValue: dataTypes.NOW },
+    updated_at:                 { type: dataTypes.DATE, allowNull: false, defaultValue: dataTypes.NOW },
     user_id:                    { type: dataTypes.INTEGER, allowNull: true },
     is_councillor:              { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     is_validator:               { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     is_magic:                   { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
   }, {
     underscored: true,
+    tableName: 'Addresses',
     indexes: [
       { fields: ['address', 'chain'], unique: true },
       { fields: ['user_id'] },
@@ -122,11 +130,6 @@ export default (
     defaultScope: {
       attributes: {
         exclude: [ 'verification_token', 'verification_token_expires', 'created_at', 'updated_at' ],
-      }
-    },
-    scopes: {
-      withPrivateData: {
-        attributes: {}
       }
     },
   });
@@ -194,7 +197,7 @@ export default (
   // passed from the frontend to show exactly what was signed.
   // Supports Substrate, Ethereum, Cosmos, and NEAR.
   Address.verifySignature = async (
-    models: Sequelize.Models,
+    models: any,
     chain: ChainInstance,
     addressModel: AddressInstance,
     user_id: number,

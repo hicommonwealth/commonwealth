@@ -1,4 +1,5 @@
 import * as Sequelize from 'sequelize';
+import { Model, BuildOptions, DataTypes } from 'sequelize';
 
 import { ChainEventTypeAttributes } from './chain_event_type';
 import { ChainEntityAttributes } from './chain_entity';
@@ -17,34 +18,33 @@ export interface ChainEventAttributes {
 }
 
 export interface ChainEventInstance
-extends Sequelize.Instance<ChainEventAttributes>, ChainEventAttributes {
+extends Model<ChainEventAttributes>, ChainEventAttributes {}
 
-}
-
-export interface ChainEventModel extends Sequelize.Model<ChainEventInstance, ChainEventAttributes> {
-
-}
+type ChainEventModelStatic = typeof Model
+    & { associate: (models: any) => void }
+    & { new(values?: Record<string, unknown>, options?: BuildOptions): ChainEventInstance }
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): ChainEventModel => {
-  const ChainEvent = sequelize.define<ChainEventInstance, ChainEventAttributes>('ChainEvent', {
+  dataTypes: typeof DataTypes,
+): ChainEventModelStatic => {
+  const ChainEvent = <ChainEventModelStatic>sequelize.define('ChainEvent', {
     id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     chain_event_type_id: { type: dataTypes.STRING, allowNull: false },
     block_number: { type: dataTypes.INTEGER, allowNull: false },
     entity_id: { type: dataTypes.INTEGER, allowNull: true },
     event_data: { type: dataTypes.JSONB, allowNull: false },
-    created_at: { type: dataTypes.DATE, allowNull: false },
-    updated_at: { type: dataTypes.DATE, allowNull: false },
+    created_at: { type: dataTypes.DATE, allowNull: false, defaultValue: dataTypes.NOW },
+    updated_at: { type: dataTypes.DATE, allowNull: false, defaultValue: dataTypes.NOW },
   }, {
+    tableName: 'ChainEvents',
     timestamps: true,
     underscored: true,
     paranoid: false,
     indexes: [
       { fields: ['id'] },
       { fields: ['block_number', 'chain_event_type_id'] },
-    ]
+    ],
   });
 
   ChainEvent.associate = (models) => {

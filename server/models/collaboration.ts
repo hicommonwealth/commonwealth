@@ -1,4 +1,5 @@
 import * as Sequelize from 'sequelize';
+import { BuildOptions, Model, DataTypes } from 'sequelize';
 
 export interface CollaborationAttributes {
   address_id: number;
@@ -8,27 +9,26 @@ export interface CollaborationAttributes {
 }
 
 export interface CollaborationInstance
-extends Sequelize.Instance<CollaborationAttributes>, CollaborationAttributes {
+extends Model<CollaborationAttributes>, CollaborationAttributes {
   // no mixins used yet
 }
 
-export interface CollaborationModel extends Sequelize.Model<
-  CollaborationInstance, CollaborationAttributes
-> {
-  // no static methods yet
-}
+type CollaborationModelStatic = typeof Model
+    & { associate: (models: any) => void }
+    & { new(values?: Record<string, unknown>, options?: BuildOptions): CollaborationInstance }
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): CollaborationModel => {
-  const Collaboration = sequelize.define<CollaborationInstance, CollaborationAttributes>(
+  dataTypes: typeof DataTypes,
+): CollaborationModelStatic => {
+  const Collaboration = <CollaborationModelStatic>sequelize.define(
     'Collaboration', {
       address_id: { type: dataTypes.INTEGER, allowNull: false },
       offchain_thread_id: { type: dataTypes.INTEGER, allowNull: false },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
     }, {
+      tableName: 'Collaborations',
       timestamps: true,
       underscored: true,
     }

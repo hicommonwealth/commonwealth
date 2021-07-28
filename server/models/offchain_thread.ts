@@ -1,4 +1,5 @@
 import * as Sequelize from 'sequelize';
+import { BuildOptions, DataTypes, Model } from 'sequelize';
 
 import { AddressAttributes } from './address';
 import { ChainAttributes } from './chain';
@@ -39,19 +40,19 @@ export interface OffchainThreadAttributes {
   ChainEntity?: ChainEntityAttributes;
 }
 
-export interface OffchainThreadInstance extends Sequelize.Instance<OffchainThreadAttributes>, OffchainThreadAttributes {
+export interface OffchainThreadInstance extends Model<OffchainThreadAttributes>, OffchainThreadAttributes {
   // no mixins used
 }
 
-export interface OffchainThreadModel extends Sequelize.Model<OffchainThreadInstance, OffchainThreadAttributes> {
-
-}
+type OffchainThreadModelStatic = typeof Model
+    & { associate: (models: any) => void }
+    & { new(values?: Record<string, unknown>, options?: BuildOptions): OffchainThreadInstance }
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): OffchainThreadModel => {
-  const OffchainThread = sequelize.define<OffchainThreadInstance, OffchainThreadAttributes>('OffchainThread', {
+  dataTypes: typeof DataTypes,
+): OffchainThreadModelStatic => {
+  const OffchainThread = <OffchainThreadModelStatic>sequelize.define('OffchainThread', {
     id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     address_id: { type: dataTypes.INTEGER, allowNull: false },
     title: { type: dataTypes.TEXT, allowNull: false },
@@ -76,6 +77,7 @@ export default (
     deleted_at: { type: dataTypes.DATE, allowNull: true },
   }, {
     underscored: true,
+    tableName: 'OffchainThreads',
     paranoid: true,
     indexes: [
       { fields: ['address_id'] },

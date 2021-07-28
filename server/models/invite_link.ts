@@ -1,4 +1,5 @@
 import * as Sequelize from 'sequelize';
+import { BuildOptions, Model, DataTypes } from 'sequelize';
 
 import { OffchainCommunityAttributes } from './offchain_community';
 
@@ -25,20 +26,18 @@ export interface InviteLinkAttributes {
 }
 
 export interface InviteLinkInstance
-extends Sequelize.Instance<InviteLinkAttributes>, InviteLinkAttributes {
+extends Model<InviteLinkAttributes>, InviteLinkAttributes {}
 
-}
 
-export interface InviteLinkModel
-extends Sequelize.Model<InviteLinkInstance, InviteLinkAttributes> {
-
-}
+type InviteLinkModelStatic = typeof Model
+    & { associate: (models: any) => void }
+    & { new(values?: Record<string, unknown>, options?: BuildOptions): InviteLinkInstance }
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): InviteLinkModel => {
-  const InviteLink = sequelize.define<InviteLinkInstance, InviteLinkAttributes>('InviteLink', {
+  dataTypes: typeof DataTypes,
+): InviteLinkModelStatic => {
+  const InviteLink = <InviteLinkModelStatic>sequelize.define('InviteLink', {
     id: { type: dataTypes.STRING, primaryKey: true, allowNull: false },
     community_id: { type: dataTypes.STRING, allowNull: true },
     chain_id: { type: dataTypes.STRING, allowNull: true },
@@ -53,6 +52,7 @@ export default (
       allowNull: false,
     },
   }, {
+    tableName: 'InviteLinks',
     underscored: true,
     indexes: [
       { fields: ['id'] },

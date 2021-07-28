@@ -1,3 +1,4 @@
+import { Op } from 'sequelize';
 import { Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 
@@ -8,7 +9,6 @@ export const Errors = {
 };
 
 const createTopic = async (models, req, res: Response, next: NextFunction) => {
-  const { Op } = models.sequelize;
   const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
   if (!req.user) return next(new Error(Errors.NotLoggedIn));

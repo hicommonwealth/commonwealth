@@ -1,4 +1,5 @@
 import * as Sequelize from 'sequelize';
+import { BuildOptions, Model, DataTypes } from 'sequelize';
 
 export interface NotificationCategoryAttributes {
   name: string;
@@ -8,25 +9,22 @@ export interface NotificationCategoryAttributes {
 }
 
 export interface NotificationCategoryInstance
-extends Sequelize.Instance<NotificationCategoryAttributes>, NotificationCategoryAttributes {
+extends Model<NotificationCategoryAttributes>, NotificationCategoryAttributes {}
 
-}
 
-export interface NotificationCategoryModel
-extends Sequelize.Model<NotificationCategoryInstance, NotificationCategoryAttributes> {
-
-}
+type NotificationCategoryModelStatic = typeof Model
+    & { associate: (models: any) => void }
+    & { new(values?: Record<string, unknown>, options?: BuildOptions): NotificationCategoryInstance }
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): NotificationCategoryModel => {
-  const NotificationCategory = sequelize.define<
-    NotificationCategoryInstance, NotificationCategoryAttributes
-  >('NotificationCategory', {
+  dataTypes: typeof DataTypes,
+): NotificationCategoryModelStatic => {
+  const NotificationCategory = <NotificationCategoryModelStatic>sequelize.define('NotificationCategory', {
     name: { type: dataTypes.STRING, primaryKey: true },
     description: { type: dataTypes.TEXT, allowNull: false },
   }, {
+    tableName: 'NotificationCategories',
     underscored: true,
   });
   return NotificationCategory;

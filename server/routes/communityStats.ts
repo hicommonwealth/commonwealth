@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 
 const communityStats = async (models, req: Request, res: Response, next: NextFunction) => {
-  const { Op } = models.sequelize;
   const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
   if (error) return next(new Error(error));
 

@@ -1,4 +1,5 @@
 import * as Sequelize from 'sequelize';
+import { BuildOptions, Model, DataTypes } from 'sequelize';
 
 export interface EdgewareLockdropEventAttributes {
   id?: number;
@@ -10,23 +11,17 @@ export interface EdgewareLockdropEventAttributes {
 }
 
 export interface EdgewareLockdropEventInstance
-extends Sequelize.Instance<EdgewareLockdropEventAttributes>, EdgewareLockdropEventAttributes {
+extends Model<EdgewareLockdropEventAttributes>, EdgewareLockdropEventAttributes {}
 
-}
-
-export interface EdgewareLockdropEventModel extends Sequelize.Model<
-  EdgewareLockdropEventInstance, EdgewareLockdropEventAttributes
-> {
-
-}
+type EdgewareLockdropEventModelStatic = typeof Model
+    & { associate: (models: any) => void }
+    & { new(values?: Record<string, unknown>, options?: BuildOptions): EdgewareLockdropEventInstance }
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): EdgewareLockdropEventModel => {
-  const EdgewareLockdropEvent = sequelize.define<
-    EdgewareLockdropEventInstance, EdgewareLockdropEventAttributes
-  >('EdgewareLockdropEvent', {
+  dataTypes: typeof DataTypes,
+): EdgewareLockdropEventModelStatic => {
+  const EdgewareLockdropEvent = <EdgewareLockdropEventModelStatic>sequelize.define('EdgewareLockdropEvent', {
     id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     origin: { type: dataTypes.STRING, allowNull: false },
     blocknum: { type: dataTypes.INTEGER, allowNull: false },
@@ -34,6 +29,7 @@ export default (
     name: { type: dataTypes.STRING, allowNull: false },
     data: { type: dataTypes.TEXT, allowNull: true },
   }, {
+    tableName: 'EdgewareLockdropEvents',
     underscored: true,
     timestamps: false,
     indexes: [

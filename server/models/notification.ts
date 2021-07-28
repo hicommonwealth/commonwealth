@@ -1,4 +1,5 @@
 import * as Sequelize from 'sequelize';
+import { BuildOptions, Model, DataTypes } from 'sequelize';
 
 import { SubscriptionAttributes } from './subscription';
 
@@ -14,29 +15,28 @@ export interface NotificationAttributes {
 }
 
 export interface NotificationInstance
-extends Sequelize.Instance<NotificationAttributes>, NotificationAttributes {
+extends Model<NotificationAttributes>, NotificationAttributes {}
 
-}
-
-export interface NotificationModel extends Sequelize.Model<NotificationInstance, NotificationAttributes> {
-
-}
+type NotificationModelStatic = typeof Model
+    & { associate: (models: any) => void }
+    & { new(values?: Record<string, unknown>, options?: BuildOptions): NotificationInstance }
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): NotificationModel => {
-  const Notification = sequelize.define<NotificationInstance, NotificationAttributes>('Notification', {
+  dataTypes: typeof DataTypes,
+): NotificationModelStatic => {
+  const Notification = <NotificationModelStatic>sequelize.define('Notification', {
     id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     subscription_id: { type: dataTypes.INTEGER, allowNull: false },
     notification_data: { type: dataTypes.TEXT, allowNull: false },
     is_read: { type: dataTypes.BOOLEAN, defaultValue: false, allowNull: false },
     chain_event_id: { type: dataTypes.INTEGER, allowNull: true },
   }, {
+    tableName: 'Notifications',
     underscored: true,
     indexes: [
       { fields: ['subscription_id'] },
-    ]
+    ],
   });
 
   Notification.associate = (models) => {

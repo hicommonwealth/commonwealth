@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
-import Sequelize from 'sequelize';
+import { Sequelize, DataTypes } from 'sequelize';
+import { Pool } from 'sequelize-pool';
 
 import { DATABASE_URI } from './config';
 
@@ -9,7 +10,7 @@ const log = factory.getLogger(formatFilename(__filename));
 
 export const sequelize = new Sequelize(DATABASE_URI, {
   // disable string operators (https://github.com/sequelize/sequelize/issues/8417)
-  operatorsAliases: false,
+  // operatorsAliases: false,
   logging: (process.env.NODE_ENV === 'test') ? false : (msg) => { log.trace(msg); },
   dialectOptions: (process.env.NODE_ENV !== 'production') ? {
     // requestTimeout: 10000,
@@ -34,7 +35,10 @@ const db = {
 fs.readdirSync(`${__dirname}/models`)
   .filter((file) => file.indexOf('.') !== 0 && file !== 'index.js')
   .forEach((file) => {
-    const model = sequelize.import(path.join(__dirname, 'models', file));
+    // eslint-disable-next-line global-require,import/no-dynamic-require
+    const module = require(path.join(__dirname, 'models', file));
+    const func = module.default ? module.default : module;
+    const model = func(sequelize, DataTypes);
     if (!db[model.name]) {
       db[model.name] = model;
     }

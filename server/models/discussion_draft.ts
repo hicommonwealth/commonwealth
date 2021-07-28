@@ -1,3 +1,4 @@
+
 module.exports = (sequelize, DataTypes) => {
   const DiscussionDraft = sequelize.define('DiscussionDraft', {
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
@@ -9,6 +10,7 @@ module.exports = (sequelize, DataTypes) => {
     community: { type: DataTypes.STRING, allowNull: true },
     attachment: { type: DataTypes.INTEGER, allowNull: true },
   }, {
+    tableName: 'DiscussionDrafts',
     timestamps: true,
     underscored: true,
     indexes: [

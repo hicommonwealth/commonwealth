@@ -1,6 +1,6 @@
 import * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { RegisteredTypes } from '@polkadot/types/types';
-
+import { BuildOptions, Model, DataTypes } from 'sequelize';
 import { AddressAttributes } from './address';
 import { ChainNodeInstance, ChainNodeAttributes } from './chain_node';
 import { StarredCommunityAttributes } from './starred_community';
@@ -8,6 +8,7 @@ import { OffchainTopicAttributes } from './offchain_topic';
 import { OffchainThreadAttributes } from './offchain_thread';
 import { OffchainCommentAttributes } from './offchain_comment';
 import { UserAttributes } from './user';
+
 
 export interface ChainAttributes {
   id?: string;
@@ -44,20 +45,20 @@ export interface ChainAttributes {
   ChainObjectVersion?; // TODO
 }
 
-export interface ChainInstance extends Sequelize.Instance<ChainAttributes>, ChainAttributes {
+export interface ChainInstance extends Model<ChainAttributes>, ChainAttributes {
   // add mixins as needed
   getChainNodes: Sequelize.HasManyGetAssociationsMixin<ChainNodeInstance>;
 }
 
-export interface ChainModel extends Sequelize.Model<ChainInstance, ChainAttributes> {
-
-}
+type ChainModelStatic = typeof Model
+    & { associate: (models: any) => void }
+    & { new(values?: Record<string, unknown>, options?: BuildOptions): ChainInstance }
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): ChainModel => {
-  const Chain = sequelize.define<ChainInstance, ChainAttributes>('Chain', {
+  dataTypes: typeof DataTypes,
+): ChainModelStatic => {
+  const Chain = <ChainModelStatic>sequelize.define('Chain', {
     id: { type: dataTypes.STRING, primaryKey: true },
     name: { type: dataTypes.STRING, allowNull: false },
     description: { type: dataTypes.STRING, allowNull: true },
@@ -81,6 +82,7 @@ export default (
     type: { type: dataTypes.STRING, allowNull: false },
     substrate_spec: { type: dataTypes.JSONB, allowNull: true },
   }, {
+    tableName: 'Chains',
     timestamps: false,
     underscored: true,
   });

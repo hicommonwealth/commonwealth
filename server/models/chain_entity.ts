@@ -1,8 +1,9 @@
 import * as Sequelize from 'sequelize';
-
+import { BuildOptions, Model, DataTypes } from 'sequelize';
 import { ChainAttributes } from './chain';
 import { OffchainThreadAttributes } from './offchain_thread';
 import { ChainEventAttributes } from './chain_event';
+
 
 export interface ChainEntityAttributes {
   id?: number;
@@ -22,18 +23,17 @@ export interface ChainEntityAttributes {
 }
 
 export interface ChainEntityInstance
-extends Sequelize.Instance<ChainEntityAttributes>, ChainEntityAttributes {
+extends Model<ChainEntityAttributes>, ChainEntityAttributes {}
 
-}
+type ChainEntityModelStatic = typeof Model
+    & { associate: (models: any) => void }
+    & { new(values?: Record<string, unknown>, options?: BuildOptions): ChainEntityInstance }
 
-export interface ChainEntityModel extends Sequelize.Model<ChainEntityInstance, ChainEntityAttributes> {
-
-}
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): ChainEntityModel => {
-  const ChainEntity = sequelize.define<ChainEntityInstance, ChainEntityAttributes>('ChainEntity', {
+  dataTypes: typeof DataTypes,
+): ChainEntityModelStatic => {
+  const ChainEntity = <ChainEntityModelStatic>sequelize.define<ChainEntityInstance, ChainEntityAttributes>('ChainEntity', {
     id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     chain: { type: dataTypes.STRING, allowNull: false },
     type: { type: dataTypes.STRING, allowNull: false },
@@ -43,9 +43,10 @@ export default (
     title: { type: dataTypes.STRING, allowNull: true },
     author: { type: dataTypes.STRING, allowNull: true },
 
-    created_at: { type: dataTypes.DATE, allowNull: false },
-    updated_at: { type: dataTypes.DATE, allowNull: false },
+    created_at: { type: dataTypes.DATE, allowNull: false, defaultValue: dataTypes.NOW },
+    updated_at: { type: dataTypes.DATE, allowNull: false, defaultValue: dataTypes.NOW },
   }, {
+    tableName: 'ChainEntities',
     timestamps: true,
     underscored: true,
     paranoid: false,

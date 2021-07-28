@@ -1,4 +1,5 @@
 import * as Sequelize from 'sequelize';
+import { BuildOptions, DataTypes, Model } from 'sequelize';
 
 import { OffchainThreadAttributes } from './offchain_thread';
 
@@ -18,19 +19,17 @@ export interface OffchainVoteAttributes {
 }
 
 export interface OffchainVoteInstance
-extends Sequelize.Instance<OffchainVoteAttributes>, OffchainVoteAttributes {
-}
+extends Model<OffchainVoteAttributes>, OffchainVoteAttributes {}
 
-export interface OffchainVoteModel extends Sequelize.Model<
-  OffchainVoteInstance, OffchainVoteAttributes
-> {
-}
+type OffchainVoteModelStatic = typeof Model
+    & { associate: (models: any) => void }
+    & { new(values?: Record<string, unknown>, options?: BuildOptions): OffchainVoteInstance }
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): OffchainVoteModel => {
-  const OffchainVote = sequelize.define<OffchainVoteInstance, OffchainVoteAttributes>(
+  dataTypes: typeof DataTypes,
+): OffchainVoteModelStatic => {
+  const OffchainVote = <OffchainVoteModelStatic>sequelize.define(
     'OffchainVote', {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       thread_id: { type: dataTypes.INTEGER, allowNull: false },
@@ -42,6 +41,7 @@ export default (
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
     }, {
+      tableName: 'OffchainVotes',
       underscored: true,
       indexes: [
         { fields: ['thread_id'] },

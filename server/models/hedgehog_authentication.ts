@@ -1,4 +1,5 @@
 import * as Sequelize from 'sequelize';
+import { BuildOptions, Model, DataTypes } from 'sequelize';
 
 export interface HedgehogAuthenticationAttributes {
   iv: string;
@@ -9,28 +10,23 @@ export interface HedgehogAuthenticationAttributes {
 }
 
 export interface HedgehogAuthenticationInstance
-extends Sequelize.Instance<HedgehogAuthenticationAttributes>, HedgehogAuthenticationAttributes {
+extends Model<HedgehogAuthenticationAttributes>, HedgehogAuthenticationAttributes {}
 
-}
-
-export interface HedgehogAuthenticationModel extends Sequelize.Model<
-  HedgehogAuthenticationInstance, HedgehogAuthenticationAttributes
-> {
-
-}
+type HedgehogAuthenticationModelStatic = typeof Model
+    & { associate: (models: any) => void }
+    & { new(values?: Record<string, unknown>, options?: BuildOptions): HedgehogAuthenticationInstance }
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): HedgehogAuthenticationModel => {
-  const HedgehogAuthentication = sequelize.define<
-    HedgehogAuthenticationInstance, HedgehogAuthenticationAttributes
-  >('HedgehogAuthentication', {
+  dataTypes: typeof DataTypes,
+): HedgehogAuthenticationModelStatic => {
+  const HedgehogAuthentication = <HedgehogAuthenticationModelStatic>sequelize.define('HedgehogAuthentication', {
     iv:         { type: dataTypes.STRING, allowNull: false },
     cipherText: { type: dataTypes.STRING, allowNull: false },
     lookupKey:  { type: dataTypes.STRING, allowNull: false, unique: true, primaryKey: true },
   }, {
-    underscored: true
+    tableName: 'HedgehogAuthentications',
+    underscored: true,
   });
 
   return HedgehogAuthentication;

@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { Op } from 'sequelize';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { factory, formatFilename } from '../../shared/logging';
 
@@ -9,7 +10,6 @@ export const Errors = {
 };
 
 const bulkComments = async (models, req: Request, res: Response, next: NextFunction) => {
-  const { Op } = models.sequelize;
   const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
   if (error) return next(new Error(error));
 

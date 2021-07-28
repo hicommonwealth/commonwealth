@@ -1,4 +1,5 @@
 import * as Sequelize from 'sequelize';
+import { BuildOptions, DataTypes, Model } from 'sequelize';
 
 import { ChainAttributes } from './chain';
 import { OffchainCommunityAttributes } from './offchain_community';
@@ -21,30 +22,31 @@ export interface OffchainTopicAttributes {
   threads?: OffchainThreadAttributes[] | OffchainTopicAttributes['id'][];
 }
 
-export interface OffchainTopicInstance extends Sequelize.Instance<OffchainTopicAttributes>, OffchainTopicAttributes {
+export interface OffchainTopicInstance extends Model<OffchainTopicAttributes>, OffchainTopicAttributes {
   // no mixins used
   // TODO: do we need to implement the "as" stuff here?
 }
 
-export interface OffchainTopicModel extends Sequelize.Model<OffchainTopicInstance, OffchainTopicAttributes> {
-
-}
+type OffchainTopicModelStatic = typeof Model
+    & { associate: (models: any) => void }
+    & { new(values?: Record<string, unknown>, options?: BuildOptions): OffchainTopicInstance }
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): OffchainTopicModel => {
-  const OffchainTopic = sequelize.define<OffchainTopicInstance, OffchainTopicAttributes>('OffchainTopic', {
+  dataTypes: typeof DataTypes,
+): OffchainTopicModelStatic => {
+  const OffchainTopic = <OffchainTopicModelStatic>sequelize.define('OffchainTopic', {
     id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     name: { type: dataTypes.STRING, allowNull: false },
     description: { type: dataTypes.TEXT, allowNull: false, defaultValue: '' },
     telegram: { type: dataTypes.STRING, allowNull: true },
     chain_id: { type: dataTypes.STRING, allowNull: true },
     community_id: { type: dataTypes.STRING, allowNull: true },
-    created_at: { type: dataTypes.DATE, allowNull: false },
-    updated_at: { type: dataTypes.DATE, allowNull: false },
+    created_at: { type: dataTypes.DATE, allowNull: false, defaultValue: dataTypes.NOW },
+    updated_at: { type: dataTypes.DATE, allowNull: false, defaultValue: dataTypes.NOW },
     deleted_at: { type: dataTypes.DATE, allowNull: true },
   }, {
+    tableName: 'OffchainTopics',
     underscored: true,
     paranoid: true,
     defaultScope: {

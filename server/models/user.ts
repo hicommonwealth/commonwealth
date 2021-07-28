@@ -1,4 +1,5 @@
 import * as Sequelize from 'sequelize';
+import { BuildOptions, DataTypes, Model } from 'sequelize';
 
 import { AddressInstance, AddressAttributes } from './address';
 import { ChainAttributes } from './chain';
@@ -27,7 +28,7 @@ export interface UserAttributes {
   Chains?: ChainAttributes[] | ChainAttributes['id'][];
 }
 
-export interface UserInstance extends Sequelize.Instance<UserAttributes>, UserAttributes {
+export interface UserInstance extends Model<UserAttributes>, UserAttributes {
   getSelectedNode: Sequelize.BelongsToGetAssociationMixin<ChainNodeInstance>;
   setSelectedNode: Sequelize.BelongsToSetAssociationMixin<ChainNodeInstance, ChainNodeInstance['id']>;
 
@@ -39,15 +40,15 @@ export interface UserInstance extends Sequelize.Instance<UserAttributes>, UserAt
   setSocialAccounts: Sequelize.HasManySetAssociationsMixin<SocialAccountInstance, SocialAccountInstance['id']>;
 }
 
-export interface UserModel extends Sequelize.Model<UserInstance, UserAttributes> {
-
-}
+type UserModelStatic = typeof Sequelize.Model
+    & { associate: (models: any) => void }
+    & { new(values?: Record<string, unknown>, options?: Sequelize.BuildOptions): UserInstance }
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): UserModel => {
-  const User = sequelize.define<UserInstance, UserAttributes>('User', {
+  dataTypes: typeof DataTypes,
+): UserModelStatic => {
+  const User = <UserModelStatic>sequelize.define('User', {
     id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     email: { type: dataTypes.STRING },
     emailVerified: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
@@ -62,9 +63,10 @@ export default (
     disableRichText: { type: dataTypes.BOOLEAN, defaultValue: false, allowNull: false },
     magicIssuer: { type: dataTypes.STRING, allowNull: true },
     lastMagicLoginAt: { type: dataTypes.INTEGER, allowNull: true },
-    created_at: { type: dataTypes.DATE, allowNull: false },
-    updated_at: { type: dataTypes.DATE, allowNull: false },
+    created_at: { type: dataTypes.DATE, allowNull: false, defaultValue: dataTypes.NOW },
+    updated_at: { type: dataTypes.DATE, allowNull: false, defaultValue: dataTypes.NOW },
   }, {
+    tableName: 'Users',
     underscored: true,
     indexes: [
       { fields: ['email'], unique: true },
@@ -78,12 +80,9 @@ export default (
       }
     },
     scopes: {
-      withPrivateData: {
-        attributes: {},
-      }
-    },
+      withPrivateData: {}
+    }
   });
-
   User.associate = (models) => {
     models.User.belongsTo(models.ChainNode, { as: 'selectedNode', constraints: false });
     models.User.hasMany(models.Address);

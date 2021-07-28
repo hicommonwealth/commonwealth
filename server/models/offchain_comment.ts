@@ -1,4 +1,5 @@
 import * as Sequelize from 'sequelize';
+import { BuildOptions, Model, DataTypes } from 'sequelize';
 
 import { AddressAttributes } from './address';
 import { ChainAttributes } from './chain';
@@ -28,19 +29,20 @@ export interface OffchainCommentAttributes {
 }
 
 export interface OffchainCommentInstance
-extends Sequelize.Instance<OffchainCommentAttributes>, OffchainCommentAttributes {
+extends Model<OffchainCommentAttributes>, OffchainCommentAttributes {
   // no mixins used
 }
 
-export interface OffchainCommentModel extends Sequelize.Model<OffchainCommentInstance, OffchainCommentAttributes> {
 
-}
+type OffchainCommentModelStatic = typeof Model
+    & { associate: (models: any) => void }
+    & { new(values?: Record<string, unknown>, options?: BuildOptions): OffchainCommentInstance }
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): OffchainCommentModel => {
-  const OffchainComment = sequelize.define<OffchainCommentInstance, OffchainCommentAttributes>('OffchainComment', {
+  dataTypes: typeof DataTypes,
+): OffchainCommentModelStatic => {
+  const OffchainComment = <OffchainCommentModelStatic>sequelize.define('OffchainComment', {
     id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     chain: { type: dataTypes.STRING, allowNull: true },
     root_id: { type: dataTypes.STRING, allowNull: false },
@@ -55,6 +57,7 @@ export default (
     updated_at: { type: dataTypes.DATE, allowNull: false },
     deleted_at: { type: dataTypes.DATE, allowNull: true },
   }, {
+    tableName: 'OffchainComments',
     underscored: true,
     paranoid: true,
     indexes: [

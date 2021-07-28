@@ -1,4 +1,4 @@
-import { QueryTypes } from 'sequelize';
+import { QueryTypes, Op } from 'sequelize';
 import jwt from 'jsonwebtoken';
 import _ from 'lodash';
 import { Request, Response, NextFunction } from 'express';
@@ -9,7 +9,6 @@ import '../types';
 const log = factory.getLogger(formatFilename(__filename));
 
 const status = async (models, req: Request, res: Response, next: NextFunction) => {
-  const { Op } = models.sequelize;
   const [
     chains,
     nodes,
@@ -74,9 +73,11 @@ GROUP BY CONCAT("OffchainThreads".chain, "OffchainThreads".community);
       loggedIn: false,
     });
   }
+
+  const unfilteredAddresses = await user.getAddresses();
   // TODO: fetch all this data with a single query
   const [addresses, socialAccounts, selectedNode, isAdmin, disableRichText, lastVisited] = await Promise.all([
-    user.getAddresses().filter((address) => !!address.verified),
+    unfilteredAddresses.filter((address) => !!address.verified),
     user.getSocialAccounts(),
     user.getSelectedNode(),
     user.isAdmin,
