@@ -151,7 +151,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     const wallet = wallets[0] as KeplrWebWalletController;
     const client = await wallet.getClient(this.app.chain.meta.url, account.address);
 
-    // these parameters will be overridden by the client
+    // these parameters will be overridden by the wallet
     // TODO: can it be simulated?
     const DEFAULT_FEE: StdFee = {
       gas: '180000',
@@ -163,7 +163,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     const result = await client.signAndBroadcast(account.address, [ tx ], DEFAULT_FEE, DEFAULT_MEMO);
     if (isBroadcastTxFailure(result)) {
       console.log(result);
-      throw new Error('TX Broadcast failed.');
+      throw new Error('TX execution failed.');
     } else if (isBroadcastTxSuccess(result)) {
       console.log(result);
       return result.transactionHash;
