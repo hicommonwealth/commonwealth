@@ -11,7 +11,7 @@ const nodes = [
   [ 'wss://beresheet1.edgewa.re', 'edgeware-testnet' ],
   [ 'wss://beresheet2.edgewa.re', 'edgeware-testnet' ],
   [ 'wss://beresheet3.edgewa.re', 'edgeware-testnet' ],
-  [ 'ws://mainnet1.edgewa.re:9944', 'edgeware' ],
+  [ 'ws://mainnet2.edgewa.re:9944', 'edgeware' ],
   // [ 'localhost:9944', 'kusama-local' ],
   [ 'wss://kusama-rpc.polkadot.io', 'kusama' ],
   [ 'wss://rpc.polkadot.io', 'polkadot' ],
@@ -28,16 +28,16 @@ const nodes = [
   [ 'https://rpc.nearprotocol.com', 'near' ],
   [ 'wss://mainnet.infura.io/ws', 'moloch', '0x1fd169A4f5c59ACf79d0Fd5d91D1201EF1Bce9f1'],
   [ 'wss://rpc.kulupu.corepaper.org/ws', 'kulupu'],
-  [ 'wss://rpc.plasmnet.io/ws', 'plasm'],
-  [ 'wss://scan-rpc.stafi.io/ws', 'stafi'],
+  [ 'wss://rpc.plasmnet.io/', 'plasm'],
+  [ 'wss://scan-rpc.stafi.io/', 'stafi'],
   [ 'wss://api.crust.network/', 'crust'],
-  [ 'wss://cc1.darwinia.network/ws', 'darwinia'],
-  [ 'wss://poc3.phala.com/ws', 'phala'],
+  [ 'wss://cc1.darwinia.network/', 'darwinia'],
+  [ 'wss://poc3.phala.com/', 'phala'],
   [ 'wss://fullnode.centrifuge.io', 'centrifuge'],
   [ 'wss://mainnet.infura.io/ws', 'marlin', '0xEa2923b099b4B588FdFAD47201d747e3b9599A5f'],
-  [ 'ws://127.0.0.1:9545', 'marlin-local', '0xe0D6a92B91B83D5c8A95557f1c966cAFd97f7171'], // TODO: Can't seem to keep this consistent which each local deploy
-  [ 'ws://api.clover.finance', 'clover'],
-  [ 'wss://rpc-01.snakenet.hydradx.io', 'hydradx'],
+  [ 'ws://127.0.0.1:9545', 'marlin-local', '0xe0D6a92B91B83D5c8A95557f1c966cAFd97f7171'],
+  [ 'ws://api.clover.finance/', 'clover'],
+  [ 'wss://rpc-01.snakenet.hydradx.io/', 'hydradx'],
   [ 'wss://ropsten.infura.io/ws', 'alex-ropsten', '0xFab46E002BbF0b4509813474841E0716E6730136']
 ];
 
