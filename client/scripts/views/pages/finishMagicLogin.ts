@@ -25,7 +25,9 @@ const finishLogin = async (vnode: m.Vnode<{}, IFinishLoginState>) => {
   ] });
 
   try {
-    const didToken = await magic.auth.loginWithCredential();
+    // TODO: can fetch w mithril?
+    const credential = window.location.search;
+    const didToken = await magic.auth.loginWithCredential(credential);
     const response = await $.getJSON(
       `${app.serverUrl()}/mobileLoginRedirect`,
       { didToken, redirectDeeplink: 'exp://exp.host/@10x/commonwealth-rn' },

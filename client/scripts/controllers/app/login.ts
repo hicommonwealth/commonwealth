@@ -271,7 +271,12 @@ export async function loginWithMagicLink(email: string) {
       rpcUrl: 'ws://localhost:9944',
     })
   ] });
-  const didToken = await magic.auth.loginWithMagicLink({ email });
+  const didToken = await magic.auth.loginWithMagicLink({
+    email,
+    // redirectURI: `${window.location.origin}/finishMagicLogin`,
+  });
+  // console.log(didToken);
+  // return;
   const response = await $.post({
     url: `${app.serverUrl()}/auth/magic`,
     headers: {
