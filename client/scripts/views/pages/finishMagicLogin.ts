@@ -37,6 +37,7 @@ const finishLogin = async (vnode: m.Vnode<{}, IFinishLoginState>) => {
     console.error(e);
     vnode.state.error = e.message;
   }
+  m.redraw();
 };
 
 const FinishMagicLogin: m.Component<{}, IFinishLoginState> = {
