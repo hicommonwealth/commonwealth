@@ -17,7 +17,8 @@ import {
 
 const log = factory.getLogger(formatFilename(__filename));
 
-
+// TODO: change console logging to log
+// TODO: if listener start fails revert hasChainEventsListener to false in db and trigger error function to be discussed with JB
 // env var
 export const WORKER_NUMBER: number = Number(process.env.WORKER_NUMBER) || 0;
 export const NUM_WORKERS: number = Number(process.env.NUM_WORKERS) || 1;
@@ -46,7 +47,7 @@ async function mainProcess(producer: RabbitMqHandler) {
     // TODO: handle this
   });
 
-  let query = `SELECT "Chains"."id", "substrate_spec", "url", "address",  "ChainNodes"."chain" FROM "Chains" JOIN "ChainNodes" ON "Chains"."id"="ChainNodes"."chain" WHERE "Chains"."has_chain_events_listener"='true';`;
+  let query = `SELECT "Chains"."id", "substrate_spec", "url", "address", "base", "ChainNodes"."chain" FROM "Chains" JOIN "ChainNodes" ON "Chains"."id"="ChainNodes"."chain" WHERE "Chains"."has_chain_events_listener"='true';`;
 
   const allChains = (await pool.query(query)).rows;
   const myChainData = allChains.filter(
@@ -68,6 +69,7 @@ async function mainProcess(producer: RabbitMqHandler) {
     if (!listeners[chain.id]) {
       log.info(`Starting listener for ${chain.id}...`);
       //TODO: discuss Marlin contract addresses (only 1 is present in db)
+
       listeners[chain.id] = await createListener(chain.id, {
         MolochContractVersion: 2,
         MolochContractAddress: chain.address,
@@ -78,11 +80,16 @@ async function mainProcess(producer: RabbitMqHandler) {
         },
         archival: false,
         url: chain.url,
-        spec: chain.spec,
+        spec: chain.substrate_spec,
         skipCatchup: false,
         verbose: false,
-        enricherConfig: { balanceTransferThresholdPermill: 1_000 } // 0.1% of total issuance
-      });
+        enricherConfig: { balanceTransferThresholdPermill: 1_000 },// 0.1% of total issuance
+      },
+        true,
+        chain.base
+        );
+
+
 
       // if chain is a substrate chain add the excluded events
       let excludedEvents = [];
@@ -106,7 +113,7 @@ async function mainProcess(producer: RabbitMqHandler) {
     // restart the listener if specs were updated (only substrate chains)
     else {
       if (
-        chainSupportedBy(chain.id, SubstrateTypes.EventChains) &&
+        chain.base == 'substrate' &&
         !_.isEqual(chain.spec, (<SubstrateListener>listeners[chain.id]).options.spec)
       ) {
         log.info(`Spec for ${chain} changed... restarting listener`);

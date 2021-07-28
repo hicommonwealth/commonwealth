@@ -92,7 +92,7 @@ async function getChains(pool): Promise<[{id: string, url: string, substrate_spe
 
 const listenerUrls = {
   polkadot: 'wss://rpc.polkadot.io',
-  edgeware: 'ws://mainnet1.edgewa.re:9944',
+  edgeware: 'ws://mainnet2.edgewa.re:9944',
   kusama: 'wss://kusama-rpc.polkadot.io',
   hydradx: 'wss://rpc-01.snakenet.hydradx.io',
   kulupu: 'wss://rpc.kulupu.corepaper.org/ws',
@@ -116,7 +116,7 @@ const listenerOptions = {
     archival: false,
     startBlock: 0,
     url: listenerUrls['polkadot'],
-    spec: {"types": {"Address": "MultiAddress", "ChainId": "u8", "Reveals": "Vec<(AccountId, Vec<VoteOutcome>)>", "Balance2": "u128", "VoteData": {"stage": "VoteStage", "initiator": "AccountId", "vote_type": "VoteType", "tally_type": "TallyType", "is_commit_reveal": "bool"}, "VoteType": {"_enum": ["Binary", "MultiOption", "RankedChoice"]}, "TallyType": {"_enum": ["OnePerson", "OneCoin"]}, "VoteStage": {"_enum": ["PreVoting", "Commit", "Voting", "Completed"]}, "ResourceId": "[u8; 32]", "VoteRecord": {"id": "u64", "data": "VoteData", "reveals": "Reveals", "outcomes": "Vec<VoteOutcome>", "commitments": "Commitments"}, "AccountInfo": "AccountInfoWithRefCount", "Commitments": "Vec<(AccountId, VoteOutcome)>", "VoteOutcome": "[u8; 32]", "VotingTally": "Option<Vec<(VoteOutcome, u128)>>", "DepositNonce": "u64", "LookupSource": "MultiAddress", "ProposalTitle": "Bytes", "ProposalVotes": {"staus": "ProposalStatus", "expiry": "BlockNumber", "votes_for": "Vec<AccountId>", "votes_against": "Vec<AccountId>"}, "ProposalRecord": {"index": "u32", "stage": "VoteStage", "title": "Text", "author": "AccountId", "vote_id": "u64", "contents": "Text", "transition_time": "u32"}, "ProposalStatus": {"_enum": ["Initiated", "Approved", "Rejected"]}, "ProposalContents": "Bytes"}},
+    spec: {},
     skipCatchup: false,
     enricherConfig: { balanceTransferThresholdPermill: 1_000 }
   },
@@ -124,7 +124,7 @@ const listenerOptions = {
     archival: false,
     startBlock: 0,
     url: listenerUrls['edgeware'],
-    spec: null,
+    spec: {"types": {"Address": "MultiAddress", "ChainId": "u8", "Reveals": "Vec<(AccountId, Vec<VoteOutcome>)>", "Balance2": "u128", "VoteData": {"stage": "VoteStage", "initiator": "AccountId", "vote_type": "VoteType", "tally_type": "TallyType", "is_commit_reveal": "bool"}, "VoteType": {"_enum": ["Binary", "MultiOption", "RankedChoice"]}, "TallyType": {"_enum": ["OnePerson", "OneCoin"]}, "VoteStage": {"_enum": ["PreVoting", "Commit", "Voting", "Completed"]}, "ResourceId": "[u8; 32]", "VoteRecord": {"id": "u64", "data": "VoteData", "reveals": "Reveals", "outcomes": "Vec<VoteOutcome>", "commitments": "Commitments"}, "AccountInfo": "AccountInfoWithRefCount", "Commitments": "Vec<(AccountId, VoteOutcome)>", "VoteOutcome": "[u8; 32]", "VotingTally": "Option<Vec<(VoteOutcome, u128)>>", "DepositNonce": "u64", "LookupSource": "MultiAddress", "ProposalTitle": "Bytes", "ProposalVotes": {"staus": "ProposalStatus", "expiry": "BlockNumber", "votes_for": "Vec<AccountId>", "votes_against": "Vec<AccountId>"}, "ProposalRecord": {"index": "u32", "stage": "VoteStage", "title": "Text", "author": "AccountId", "vote_id": "u64", "contents": "Text", "transition_time": "u32"}, "ProposalStatus": {"_enum": ["Initiated", "Approved", "Rejected"]}, "ProposalContents": "Bytes"}},
     skipCatchup: false,
     enricherConfig: { balanceTransferThresholdPermill: 1_000 }
   },
@@ -132,7 +132,7 @@ const listenerOptions = {
     archival: false,
     startBlock: 0,
     url: listenerUrls['kusama'],
-    spec: null,
+    spec: {},
     skipCatchup: false,
     enricherConfig: { balanceTransferThresholdPermill: 1_000 }
   },
@@ -174,12 +174,15 @@ const listenerOptions = {
 function verifyListener(chains: string[], listeners: any) {
   for (const chain of chains) {
     // if (!_.isEqual(listenerOptions[chain], listeners[chain].options)) return false
-    assert.deepEqual(listenerOptions[chain], listeners[chain])
+    assert.deepEqual(listeners[chain], listenerOptions[chain])
   }
   return true;
 }
 
-const supportedChains = ['polkadot', 'kusama', 'edgeware', 'kulupu', 'hydradx', 'moloch', 'marlin']
+// TODO: darwinia url can't connect
+// TODO: plasm METADATA: Unknown types found, no types for OfferOf, Parameters
+// TODO: stafi REGISTRY: Unable to resolve type ChainId, it will fail on construction
+const supportedChains = ['stafi']
 
 // LOOP through all the chains individually to test functionality for all chains
 setTimeout(async () => {
@@ -208,7 +211,7 @@ setTimeout(async () => {
       chains.forEach((chain, chainIndex) => {
         if (!supportedChains.includes(chain.id)) return;
         describe.only(`Tests for a ${chain.id} chain-events node`, () => {
-          it.only('Should start a node with the correct listener', (done) => {
+          it.only(`Should start a node with a ${chain.id} listener`, (done) => {
             populateIdentityCache(pool).then(() => {
               child = spawn(`ts-node`,
                 [`${__dirname}../../../server/scripts/dbNode.ts`],

@@ -943,30 +943,6 @@
     web3-core "^1.3.1"
     web3-utils "^1.3.1"
 
-"@commonwealth/chain-events@git+https://github.com/timolegros/chain-events.git#tim.OOP":
-  version "0.6.5"
-  resolved "git+https://github.com/timolegros/chain-events.git#c6071e2f0b0449dfd34e5d98409ec366bab3689d"
-  dependencies:
-    "@edgeware/node-types" "^3.3.3"
-    "@polkadot/api" "4.16.2"
-    "@polkadot/api-derive" "4.16.2"
-    "@polkadot/types" "4.16.2"
-    "@polkadot/util" "6.11.1"
-    bn.js "^5.1.3"
-    ethereum-block-by-date "^1.2.2"
-    ethers "^4.0.39"
-    express "^4.17.1"
-    lodash "^4.17.21"
-    node-fetch "^2.6.1"
-    pg "^8.6.0"
-    pg-format "^1.0.4"
-    sleep-promise "^8.0.1"
-    typescript-logging "^0.6.4"
-    underscore "^1.10.2"
-    web3 "^1.3.1"
-    web3-core "^1.3.1"
-    web3-utils "^1.3.1"
-
 "@cosmjs/crypto@^0.20.0":
   version "0.20.1"
   resolved "https://registry.yarnpkg.com/@cosmjs/crypto/-/crypto-0.20.1.tgz#7765e7a0573818fbaa232e473d77742ff73e8446"

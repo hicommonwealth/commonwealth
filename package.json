@@ -49,7 +49,7 @@
     "@babel/polyfill": "^7.2.5",
     "@babel/preset-env": "^7.2.3",
     "@babel/register": "^7.4.0",
-    "@commonwealth/chain-events": "git+https://github.com/timolegros/chain-events.git#tim.OOP",
+    "@commonwealth/chain-events": "file:.yalc/@commonwealth/chain-events",
     "@cosmjs/launchpad": "^0.24.0-alpha.13",
     "@edgeware/node-types": "3.3.3",
     "@glidejs/glide": "^3.4.1",
