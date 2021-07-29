@@ -9,7 +9,7 @@ export const redirectWithLoginSuccess = (res, email, path?, confirmation?, newAc
   // Returns new if we are creating a new account
   const url = `${SERVER_URL}/?loggedin=true&email=${email}&new=${newAcct}${path ? `&path=${encodeURIComponent(path)}` : ''}${confirmation ? '&confirmation=success' : ''}`;
   getStatsDInstance().set('cw.users.unique', res.user.id);
-  getStatsDInstance().increment('cw.users.logged_in', res.user.id);
+  getStatsDInstance().increment('cw.users.logged_in');
   return res.redirect(url);
 };
 
