@@ -22,6 +22,7 @@ interface IChainMetadataManagementState {
   stagesEnabled: boolean;
   additionalStages: string;
   customDomain: string;
+  terms: string;
   network: ChainNetwork;
   symbol: string;
 }
@@ -38,6 +39,7 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
     vnode.state.stagesEnabled = vnode.attrs.chain.stagesEnabled;
     vnode.state.additionalStages = vnode.attrs.chain.additionalStages;
     vnode.state.customDomain = vnode.attrs.chain.customDomain;
+    vnode.state.terms = vnode.attrs.chain.terms;
     vnode.state.iconUrl = vnode.attrs.chain.iconUrl;
     vnode.state.network = vnode.attrs.chain.network;
     vnode.state.symbol = vnode.attrs.chain.symbol;
@@ -112,6 +114,12 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
           onChangeHandler: (v) => { vnode.state.customDomain = v; },
           disabled: true, // Custom domains should be admin configurable only
         }),
+        m(InputPropertyRow, {
+          title: 'Terms of Service',
+          defaultValue: vnode.state.terms,
+          placeholder: 'Url that new users see',
+          onChangeHandler: (v) => { vnode.state.terms = v; },
+        }),
         m('tr', [
           m('td', 'Admins'),
           m('td', [ m(ManageRolesRow, {
@@ -143,7 +151,8 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
             github,
             stagesEnabled,
             additionalStages,
-            customDomain
+            customDomain,
+            terms
           } = vnode.state;
           try {
             await vnode.attrs.chain.updateChainData({
@@ -156,7 +165,8 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
               github,
               stagesEnabled,
               additionalStages,
-              customDomain
+              customDomain,
+              terms
             });
             $(e.target).trigger('modalexit');
           } catch (err) {

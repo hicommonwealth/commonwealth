@@ -83,7 +83,8 @@ const Sublayout: m.Component<{
       app.isLoggedIn() && m(InvitesMenu),
       app.isLoggedIn() && m(NotificationsMenu),
       showNewProposalButton
-      && (narrowBrowserWidth ? m(MobileNewProposalButton) : m(NewProposalButton, { fluid: false })),
+      && (narrowBrowserWidth ? m(MobileNewProposalButton) : m(NewProposalButton, { fluid: false, threadOnly: !chain })),
+      // above threadOnly option assumes all chains have proposals beyond threads
     ]);
 
     if (vnode.attrs.loadingLayout) return [
