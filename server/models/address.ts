@@ -113,13 +113,16 @@ export default (
     keytype:                    { type: dataTypes.STRING, allowNull: true },
     name:                       { type: dataTypes.STRING, allowNull: true },
     last_active:                { type: dataTypes.DATE, allowNull: true },
-    created_at:                 { type: dataTypes.DATE, allowNull: false, defaultValue: dataTypes.NOW },
-    updated_at:                 { type: dataTypes.DATE, allowNull: false, defaultValue: dataTypes.NOW },
+    created_at:                 { type: dataTypes.DATE, allowNull: false },
+    updated_at:                 { type: dataTypes.DATE, allowNull: false },
     user_id:                    { type: dataTypes.INTEGER, allowNull: true },
     is_councillor:              { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     is_validator:               { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     is_magic:                   { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
   }, {
+    timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
     underscored: true,
     tableName: 'Addresses',
     indexes: [

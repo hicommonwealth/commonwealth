@@ -42,12 +42,13 @@ export default (
     completed: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     title: { type: dataTypes.STRING, allowNull: true },
     author: { type: dataTypes.STRING, allowNull: true },
-
-    created_at: { type: dataTypes.DATE, allowNull: false, defaultValue: dataTypes.NOW },
-    updated_at: { type: dataTypes.DATE, allowNull: false, defaultValue: dataTypes.NOW },
+    created_at: { type: dataTypes.DATE, allowNull: false },
+    updated_at: { type: dataTypes.DATE, allowNull: false },
   }, {
     tableName: 'ChainEntities',
     timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
     underscored: true,
     paranoid: false,
     indexes: [

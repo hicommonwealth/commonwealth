@@ -44,9 +44,12 @@ export default (
       defaultValue: 'member',
       allowNull: false,
     },
-    created_at: { type: dataTypes.DATE, allowNull: false, defaultValue: dataTypes.NOW },
-    updated_at: { type: dataTypes.DATE, allowNull: false, defaultValue: dataTypes.NOW },
+    created_at: { type: dataTypes.DATE, allowNull: false },
+    updated_at: { type: dataTypes.DATE, allowNull: false },
   }, {
+    timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
     tableName: 'Roles',
     underscored: true,
     indexes: [

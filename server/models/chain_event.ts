@@ -34,11 +34,13 @@ export default (
     block_number: { type: dataTypes.INTEGER, allowNull: false },
     entity_id: { type: dataTypes.INTEGER, allowNull: true },
     event_data: { type: dataTypes.JSONB, allowNull: false },
-    created_at: { type: dataTypes.DATE, allowNull: false, defaultValue: dataTypes.NOW },
-    updated_at: { type: dataTypes.DATE, allowNull: false, defaultValue: dataTypes.NOW },
+    created_at: { type: dataTypes.DATE, allowNull: false },
+    updated_at: { type: dataTypes.DATE, allowNull: false },
   }, {
     tableName: 'ChainEvents',
     timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
     underscored: true,
     paranoid: false,
     indexes: [
