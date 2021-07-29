@@ -1,10 +1,12 @@
 import fs from 'fs';
 import path from 'path';
-import Sequelize from 'sequelize';
+import Sequelize, { QueryTypes } from 'sequelize';
 
 import { DATABASE_URI } from './config';
 
 import { factory, formatFilename } from '../shared/logging';
+import { getStatsDInstance } from './util/metrics';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 export const sequelize = new Sequelize(DATABASE_URI, {
@@ -39,6 +41,13 @@ fs.readdirSync(`${__dirname}/models`)
       db[model.name] = model;
     }
   });
+
+
+sequelize.afterCreate(async () => {
+  const count = await sequelize.query('SELECT count(*) from pg_stat_activity where datname = \'commonwealth\' and state=\'active\';', { type: QueryTypes.SELECT });
+  getStatsDInstance().gauge('cw.connection.pool', count);
+});
+
 
 // setup associations
 Object.keys(db).forEach((modelName) => {

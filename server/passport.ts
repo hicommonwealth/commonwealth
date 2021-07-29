@@ -11,8 +11,8 @@ import { Strategy as MagicStrategy } from 'passport-magic';
 
 import { sequelize } from './database';
 import { factory, formatFilename } from '../shared/logging';
+import { getStatsDInstance } from './util/metrics';
 const log = factory.getLogger(formatFilename(__filename));
-
 
 import {
   JWT_SECRET, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_OAUTH_CALLBACK, MAGIC_API_KEY, MAGIC_SUPPORTED_BASES,
@@ -339,8 +339,9 @@ function setupPassport(models) {
       return cb(null, newUser);
     }
   }));
-
   passport.serializeUser<any>((user, done) => {
+    getStatsDInstance().increment('cw.users.logged_in');
+    getStatsDInstance().set('cw.users.unique', user.id);
     done(null, user.id);
   });
 

@@ -120,6 +120,7 @@ import { getTokensFromLists } from './routes/getTokensFromLists';
 import getTokenForum from './routes/getTokenForum';
 import getSubstrateSpec from './routes/getSubstrateSpec';
 import editSubstrateSpec from './routes/editSubstrateSpec';
+import { getStatsDInstance } from './util/metrics';
 
 function setupRouter(
   app,
@@ -129,6 +130,16 @@ function setupRouter(
   tokenBalanceCache: TokenBalanceCache
 ) {
   const router = express.Router();
+
+  router.use((req, res, next) => {
+    getStatsDInstance().increment(`cw.path.${req.path.slice(1)}.called`);
+    const start = Date.now();
+    res.on('finish', () => {
+      const latency = Date.now() - start;
+      getStatsDInstance().histogram(`cw.path.${req.path.slice(1)}.latency`, latency);
+    });
+    next();
+  });
   router.get('/status', status.bind(this, models));
 
   router.get('/getSubstrateSpec', getSubstrateSpec.bind(this, models));
