@@ -28,6 +28,7 @@ const finishOAuthLogin = async (models, req: Request, res: Response, next: NextF
 
   // If we are already on the correct domain, continue to log in any
   // social account associated with the LoginToken. Otherwise redirect
+  // to the correct domain
   const hostname = req.headers['x-forwarded-host'] || req.hostname;
   if (tokenObj.domain !== hostname) {
     return res.redirect(`https://${tokenObj.domain}/api/finishOAuthLogin?token=${token}`);
