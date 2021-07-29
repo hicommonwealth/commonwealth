@@ -28,16 +28,14 @@ import {
   DropdownFormField,
   RadioSelectorFormField
 } from 'views/components/forms';
+import User from 'views/components/widgets/user';
 import EdgewareFunctionPicker from 'views/components/edgeware_function_picker';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 import TopicSelector from 'views/components/topic_selector';
 import ErrorPage from 'views/pages/error';
 import SubstrateBountyTreasury from 'controllers/chain/substrate/bountyTreasury';
-import { AaveProposalArgs } from 'client/scripts/controllers/chain/ethereum/aave/governance';
-import Aave from 'client/scripts/controllers/chain/ethereum/aave/adapter';
-import User from '../../components/widgets/user';
-import { AaveProposalArgs } from 'client/scripts/controllers/chain/ethereum/aave/governance';
-import Aave from 'client/scripts/controllers/chain/ethereum/aave/adapter';
+import { AaveProposalArgs } from 'controllers/chain/ethereum/aave/governance';
+import Aave from 'controllers/chain/ethereum/aave/adapter';
 
 // this should be titled the Substrate/Edgeware new proposal form
 const NewProposalForm = {
@@ -945,17 +943,17 @@ const NewProposalForm = {
             ]),
             m(FormGroup, [
               m(FormLabel, 'Reason'),
-                m(TextArea, {
-                  name: 'reason',
-                  placeholder: 'What’s the reason you want to tip the beneficiary?',
-                  oninput: (e) => {
-                    const result = (e.target as any).value;
-                    if (vnode.state.form.description === result) return;
-                    vnode.state.form.description = result;
-                    m.redraw();
-                  },
-                }),
-            ]),                  
+              m(TextArea, {
+                name: 'reason',
+                placeholder: 'What’s the reason you want to tip the beneficiary?',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  if (vnode.state.form.description === result) return;
+                  vnode.state.form.description = result;
+                  m.redraw();
+                },
+              }),
+            ]),
           ],
           hasAaveFields && [
             m('h2', 'New Aave Proposal:'),

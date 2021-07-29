@@ -111,7 +111,6 @@ export default class AaveGovernance extends ProposalModule<
     const entities = this.app.chain.chainEntities.store.getByType(AaveTypes.EntityKind.Proposal);
     entities.forEach((e) => this._entityConstructor(e));
     console.log(`Found ${entities.length} proposals!`);
-    console.log(this.store.getAll());
 
     await Promise.all(this.store.getAll().map((p) => p.init()));
 

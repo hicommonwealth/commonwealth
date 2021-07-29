@@ -29,7 +29,6 @@ export const getStatusClass = (proposal: AnyProposal) => proposal.isPassing === 
       : proposal.isPassing === ProposalStatus.Failed ? 'fail' : '';
 
 export const getStatusText = (proposal: AnyProposal, showCountdown: boolean) => {
-  console.log(proposal);
   if (proposal.completed && proposal instanceof SubstrateDemocracyProposal) {
     if (proposal.isPassing === ProposalStatus.Passed) return 'Passed, moved to referendum';
     return 'Cancelled';
