@@ -145,64 +145,63 @@ const ProposalCard: m.Component<{ proposal: AnyProposal, injectedContent? }> = {
           m.route.set(proposalLink); // avoid resetting scroll point
         },
       }, [
-        // tag
-        m(Tag, {
-          label: [
-            chainEntityTypeToProposalShortName(proposalSlugToChainEntityType(proposal.slug)),
-            ' ',
-            proposal.shortIdentifier,
-          ],
-          intent: 'primary',
-          rounded: true,
-          size: 'xs',
-        }),
-        (proposal instanceof SubstrateDemocracyProposal || proposal instanceof SubstrateCollectiveProposal)
-          && proposal.getReferendum()
-          && m(Tag, {
-            label: `REF #${proposal.getReferendum().identifier}`,
+        m('.proposal-card-metadata', [
+          m(Tag, {
+            label: [
+              chainEntityTypeToProposalShortName(proposalSlugToChainEntityType(proposal.slug)),
+              ' ',
+              proposal.shortIdentifier,
+            ],
+            intent: 'primary',
+            rounded: true,
+            size: 'xs',
+          }),
+          (proposal instanceof SubstrateDemocracyProposal || proposal instanceof SubstrateCollectiveProposal)
+            && proposal.getReferendum()
+            && m(Tag, {
+              label: `REF #${proposal.getReferendum().identifier}`,
+              intent: 'primary',
+              rounded: true,
+              size: 'xs',
+              class: 'proposal-became-tag',
+            }),
+          proposal instanceof SubstrateDemocracyReferendum
+            && (() => {
+              const originatingProposalOrMotion = proposal.getProposalOrMotion(proposal.preimage);
+              return m(Tag, {
+                label: (originatingProposalOrMotion instanceof SubstrateDemocracyProposal)
+                  ? `PROP #${originatingProposalOrMotion.identifier}`
+                  : (originatingProposalOrMotion instanceof SubstrateCollectiveProposal)
+                    ? `MOT #${originatingProposalOrMotion.identifier}` : 'MISSING PROP',
+                intent: 'primary',
+                rounded: true,
+                size: 'xs',
+                class: 'proposal-became-tag',
+              });
+            })(),
+          proposal instanceof SubstrateTreasuryProposal && !proposal.data.index && m(Tag, {
+            label: 'MISSING DATA',
             intent: 'primary',
             rounded: true,
             size: 'xs',
             class: 'proposal-became-tag',
           }),
-        proposal instanceof SubstrateDemocracyReferendum
-          && (() => {
-            const originatingProposalOrMotion = proposal.getProposalOrMotion(proposal.preimage);
-            return m(Tag, {
-              label: (originatingProposalOrMotion instanceof SubstrateDemocracyProposal)
-                ? `PROP #${originatingProposalOrMotion.identifier}`
-                : (originatingProposalOrMotion instanceof SubstrateCollectiveProposal)
-                  ? `MOT #${originatingProposalOrMotion.identifier}` : 'MISSING PROP',
-              intent: 'primary',
-              rounded: true,
-              size: 'xs',
-              class: 'proposal-became-tag',
-            });
-          })(),
-        proposal instanceof SubstrateTreasuryProposal && !proposal.data.index && m(Tag, {
-          label: 'MISSING DATA',
-          intent: 'primary',
-          rounded: true,
-          size: 'xs',
-          class: 'proposal-became-tag',
-        }),
-        // title
-        m('.proposal-title', proposal.title),
-        // metadata
-        proposal instanceof SubstrateTreasuryProposal && m('.proposal-amount', proposal.value?.format(true)),
-        proposal instanceof SubstrateDemocracyReferendum && m('.proposal-amount', proposal.threshold),
-        proposal instanceof SubstrateTreasuryTip && m('.proposal-amount', proposal.support.format(true)),
-        // // linked treasury proposals
-        // proposal instanceof SubstrateDemocracyReferendum && proposal.preimage?.section === 'treasury'
-        //   && proposal.preimage?.method === 'approveProposal'
-        //   && m('.proposal-action', [ 'Approves TRES-', proposal.preimage?.args[0] ]),
-        // proposal instanceof SubstrateDemocracyProposal && proposal.preimage?.section === 'treasury'
-        //   && proposal.preimage?.method === 'approveProposal'
-        //   && m('.proposal-action', [ 'Approves TRES-', proposal.preimage?.args[0] ]),
-        // proposal instanceof SubstrateCollectiveProposal && proposal.call?.section === 'treasury'
-        //   && proposal.call?.method === 'approveProposal'
-        //   && m('.proposal-action', [ 'Approves TRES-', proposal.call?.args[0] ]),
-        // linked referenda
+          m('.proposal-title', proposal.title),
+          proposal instanceof SubstrateTreasuryProposal && m('.proposal-amount', proposal.value?.format(true)),
+          proposal instanceof SubstrateDemocracyReferendum && m('.proposal-amount', proposal.threshold),
+          proposal instanceof AaveProposal && m('p.card-subheader.proposal-description', proposal.ipfsData?.shortDescription || 'Proposal'),
+          // // linked treasury proposals
+          // proposal instanceof SubstrateDemocracyReferendum && proposal.preimage?.section === 'treasury'
+          //   && proposal.preimage?.method === 'approveProposal'
+          //   && m('.proposal-action', [ 'Approves TRES-', proposal.preimage?.args[0] ]),
+          // proposal instanceof SubstrateDemocracyProposal && proposal.preimage?.section === 'treasury'
+          //   && proposal.preimage?.method === 'approveProposal'
+          //   && m('.proposal-action', [ 'Approves TRES-', proposal.preimage?.args[0] ]),
+          // proposal instanceof SubstrateCollectiveProposal && proposal.call?.section === 'treasury'
+          //   && proposal.call?.method === 'approveProposal'
+          //   && m('.proposal-action', [ 'Approves TRES-', proposal.call?.args[0] ]),
+          // linked referenda
+        ]),
         injectedContent
           ? m('.proposal-injected', [
             m(injectedContent, {

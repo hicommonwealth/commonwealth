@@ -170,7 +170,8 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         || MolochTypes.EventChains.find((c) => c === app.chain.network)
         || MarlinTypes.EventChains.find((c) => c === app.chain.network)
         || AaveTypes.EventChains.find((c) => c === app.chain.network)
-        || app.chain.network === ChainNetwork.Commonwealth);
+        || app.chain.network === ChainNetwork.Commonwealth
+        || app.chain?.meta.chain.snapshot);
     if (!hasProposals) return;
 
     const showMolochMenuOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Moloch;
@@ -179,6 +180,9 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
 
     const showMarlinOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Marlin;
     const showAaveOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Aave;
+
+    const onSnapshotProposal = (p) => p.startsWith(`/${app.activeId()}/snapshot-proposals`);
+    const onSnapshotProposalCreation = (p) => p.startsWith(`/${app.activeId()}/new/snapshot-proposal/`);
 
     const onProposalPage = (p) => (
       p.startsWith(`/${app.activeChainId()}/proposals`)
@@ -344,18 +348,8 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           e.preventDefault();
           m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.AaveProposal });
         },
-        label: 'Submit Proposal',
+        label: 'Submit On-Chain P...',
         active: m.route.get() === `/${app.activeChainId()}/new/proposal/${ProposalType.AaveProposal}`,
-      }),
-      showAaveOptions && m(Button, {
-        fluid: true,
-        rounded: true,
-        onclick: (e) => {
-          e.preventDefault();
-          m.route.set(`/${app.activeChainId()}/delegate`);
-        },
-        label: 'Delegate',
-        active: m.route.get() === `/${app.activeChainId()}/delegate`,
       }),
       showMolochMemberOptions && m(Button, {
         fluid: true,
@@ -400,6 +394,29 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           });
         },
         label: 'Approve tokens',
+      }),
+      m('.sidebar-spacer'),
+      app.chain?.meta.chain.snapshot !== null
+      && m(Button, {
+        rounded: true,
+        fluid: true,
+        active: onSnapshotProposal(m.route.get()),
+        label: 'Snapshot Proposals',
+        onclick: (e) => {
+          e.preventDefault();
+          m.route.set(`/${app.activeChainId()}/snapshot-proposals/${app.chain.meta.chain.snapshot}`);
+        },
+      }),
+      app.chain?.meta.chain.snapshot !== null && app.user.activeAccount
+      && m(Button, {
+        rounded: true,
+        fluid: true,
+        active: onSnapshotProposalCreation(m.route.get()),
+        label: 'New Snapshot Pr...',
+        onclick: (e) => {
+          e.preventDefault();
+          m.route.set(`/${app.activeChainId()}/new/snapshot-proposal/${app.chain.meta.chain.snapshot}`);
+        },
       }),
       showCommonwealthMenuOptions && m(Button, {
         fluid: true,

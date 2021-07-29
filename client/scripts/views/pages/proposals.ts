@@ -27,7 +27,7 @@ import NewProposalPage from 'views/pages/new_proposal/index';
 import PageNotFound from 'views/pages/404';
 import Listing from 'views/pages/listing';
 import ErrorPage from 'views/pages/error';
-import AaveDetail from '../components/proposals/aave_detail';
+import AaveProposalCardDetail from '../components/proposals/aave_proposal_card_detail';
 import { AaveTypes, MarlinTypes } from '@commonwealth/chain-events';
 
 const SubstrateProposalStats: m.Component<{}, {}> = {
@@ -201,15 +201,16 @@ const ProposalsPage: m.Component<{}> = {
       && !activeMarlinProposals?.length
       && !activeAaveProposals?.length
       ? [ m('.no-proposals', 'No active proposals') ]
-      : (activeDemocracyProposals || []).map((proposal) => m(ProposalCard, { proposal }))
+      : [ m('.active-proposals', [(activeDemocracyProposals || []).map((proposal) => m(ProposalCard, { proposal }))
         .concat((activeCouncilProposals || []).map((proposal) => m(ProposalCard, { proposal })))
         .concat((activeCosmosProposals || []).map((proposal) => m(ProposalCard, { proposal })))
         .concat((activeMolochProposals || []).map((proposal) => m(ProposalCard, { proposal })))
         .concat((activeMarlinProposals || []).map((proposal) => m(ProposalCard, { proposal })))
         .concat((activeAaveProposals || []).map((proposal) => m(ProposalCard, {
           proposal,
-          injectedContent: AaveDetail,
-        })));
+          injectedContent: AaveProposalCardDetail,
+        })))]
+      )];
 
     // inactive proposals
     const inactiveDemocracyProposals = onSubstrate
@@ -236,15 +237,16 @@ const ProposalsPage: m.Component<{}> = {
       && !inactiveMarlinProposals?.length
       && !inactiveAaveProposals?.length
       ? [ m('.no-proposals', 'No past proposals') ]
-      : (inactiveDemocracyProposals || []).map((proposal) => m(ProposalCard, { proposal }))
+      : [ m('.inactive-proposals', [(inactiveDemocracyProposals || []).map((proposal) => m(ProposalCard, { proposal }))
         .concat((inactiveCouncilProposals || []).map((proposal) => m(ProposalCard, { proposal })))
         .concat((inactiveCosmosProposals || []).map((proposal) => m(ProposalCard, { proposal })))
         .concat((inactiveMolochProposals || []).map((proposal) => m(ProposalCard, { proposal })))
         .concat((inactiveMarlinProposals || []).map((proposal) => m(ProposalCard, { proposal })))
         .concat((inactiveAaveProposals || []).map((proposal) => m(ProposalCard, {
           proposal,
-          injectedContent: AaveDetail,
-        })));
+          injectedContent: AaveProposalCardDetail,
+        }))) ]
+      )];
 
     // XXX: display these
     const visibleTechnicalCommitteeProposals = app.chain
@@ -264,12 +266,12 @@ const ProposalsPage: m.Component<{}> = {
       m('.clear'),
       m(Listing, {
         content: activeProposalContent,
-        columnHeader: 'Active Proposals',
+        columnHeader: 'Active',
       }),
       m('.clear'),
       m(Listing, {
         content: inactiveProposalContent,
-        columnHeader: 'Inactive Proposals',
+        columnHeader: 'Inactive',
       }),
       m('.clear'),
     ]);

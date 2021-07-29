@@ -36,6 +36,8 @@ import SubstrateBountyTreasury from 'controllers/chain/substrate/bountyTreasury'
 import { AaveProposalArgs } from 'client/scripts/controllers/chain/ethereum/aave/governance';
 import Aave from 'client/scripts/controllers/chain/ethereum/aave/adapter';
 import User from '../../components/widgets/user';
+import { AaveProposalArgs } from 'client/scripts/controllers/chain/ethereum/aave/governance';
+import Aave from 'client/scripts/controllers/chain/ethereum/aave/adapter';
 
 // this should be titled the Substrate/Edgeware new proposal form
 const NewProposalForm = {
@@ -217,15 +219,15 @@ const NewProposalForm = {
         if (vnode.state.councilMotionType === 'createExternalProposal') {
           args = [author, threshold, EdgewareFunctionPicker.getMethod(),
             EdgewareFunctionPicker.getMethod().encodedLength];
-          createFunc = ([a, t, m, l]) => (app.chain as Substrate).council.createExternalProposal(a, t, m, l);
+          createFunc = ([a, t, mt, l]) => (app.chain as Substrate).council.createExternalProposal(a, t, mt, l);
         } else if (vnode.state.councilMotionType === 'createExternalProposalMajority') {
           args = [author, threshold, EdgewareFunctionPicker.getMethod(),
             EdgewareFunctionPicker.getMethod().encodedLength];
-          createFunc = ([a, t, m, l]) => (app.chain as Substrate).council.createExternalProposalMajority(a, t, m, l);
+          createFunc = ([a, t, mt, l]) => (app.chain as Substrate).council.createExternalProposalMajority(a, t, mt, l);
         } else if (vnode.state.councilMotionType === 'createExternalProposalDefault') {
           args = [author, threshold, EdgewareFunctionPicker.getMethod(),
             EdgewareFunctionPicker.getMethod().encodedLength];
-          createFunc = ([a, t, m, l]) => (app.chain as Substrate).council.createExternalProposalDefault(a, t, m, l);
+          createFunc = ([a, t, mt, l]) => (app.chain as Substrate).council.createExternalProposalDefault(a, t, mt, l);
         } else if (vnode.state.councilMotionType === 'createFastTrack') {
           args = [author, threshold, vnode.state.nextExternalProposalHash,
             vnode.state.votingPeriod, vnode.state.enactmentDelay];
@@ -343,22 +345,27 @@ const NewProposalForm = {
         if (!vnode.state.executor) throw new Error('Invalid executor');
         if (!vnode.state.targets) throw new Error('No targets');
         if (!vnode.state.values) throw new Error('No values');
-        if (!vnode.state.signatures) throw new Error('No signatures');
+        // signatures optional
+        if (!vnode.state.signatures) {
+          vnode.state.signatures = '';
+        }
         if (!vnode.state.calldatas) throw new Error('No calldatas');
         if (!vnode.state.withDelegateCalls) throw new Error('No withDelegateCalls');
         if (!vnode.state.ipfsHash) throw new Error('No ipfs hash');
-        const targets: string[] = vnode.state.targets.split(',');
-        const values: string[] = vnode.state.values.split(',');
-        const calldatas: string[] = vnode.state.calldatas.split(',');
-        // TODO: this wont work with a signature like "_setCollateralFactor(address,uint256)"
-        const signatures: string[] = vnode.state.signatures.split(',');
-        const withDelegateCalls: boolean[] = vnode.state.withDelegateCalls
-          .split(',')
+
+        // TODO: support multiple calls
+        const targets: string[] = [ vnode.state.targets ];
+        const values: string[] = [ vnode.state.values ];
+        const calldatas: string[] = [ vnode.state.calldatas ];
+        const signatures: string[] = [ vnode.state.signatures ];
+        const withDelegateCalls: boolean[] = [ vnode.state.withDelegateCalls ]
           .map((v: string): boolean => {
             if (v.trim().toLowerCase() === 'true') return true;
             if (v.trim().toLowerCase() === 'false') return false;
             throw new Error(`invalid withDelegateCalls string: ${v}`);
           });
+
+        // TODO: preload this ipfs value to ensure it's correct
         const ipfsHash = utils.formatBytes32String(vnode.state.ipfsHash);
         const details: AaveProposalArgs = {
           executor: vnode.state.executor as string,
@@ -932,18 +939,119 @@ const NewProposalForm = {
                 oninput: (e) => {
                   const result = (e.target as any).value;
                   vnode.state.form.beneficiary = result;
+                  m.redraw();
                 },
               }),
             ]),
             m(FormGroup, [
               m(FormLabel, 'Reason'),
-              m(TextArea, {
-                name: 'reason',
-                placeholder: 'What’s the reason you want to tip the beneficiary?',
+                m(TextArea, {
+                  name: 'reason',
+                  placeholder: 'What’s the reason you want to tip the beneficiary?',
+                  oninput: (e) => {
+                    const result = (e.target as any).value;
+                    if (vnode.state.form.description === result) return;
+                    vnode.state.form.description = result;
+                    m.redraw();
+                  },
+                }),
+            ]),                  
+          ],
+          hasAaveFields && [
+            m('h2', 'New Aave Proposal:'),
+            m(FormGroup, [
+              m(FormLabel, 'Proposer (you)'),
+              m(Input, {
+                name: 'proposer',
+                value: `${app.user.activeAccount.address}`,
+                disabled: true,
+              }),
+            ]),
+            // TODO: validate this is the correct length, or else hash it ourselves
+            m(FormGroup, [
+              m(FormLabel, 'Proposal IPFS Hash'),
+              m(Input, {
+                name: 'ipfsHash',
+                placeholder: 'Proposal IPFS Hash',
                 oninput: (e) => {
                   const result = (e.target as any).value;
-                  if (vnode.state.form.description === result) return;
-                  vnode.state.form.description = result;
+                  vnode.state.ipfsHash = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Proposal Executor'),
+              m(DropdownFormField, {
+                choices: (app.chain as Aave).governance.api.Executors.map(
+                  (r) => ({ name: 'executor', value: r.address, label: `${r.delay / (60 * 60 * 24)} Day(s) Voting` })
+                ),
+                callback: (result) => {
+                  vnode.state.executor = result;
+                  m.redraw();
+                },
+                callbackOnInit: true,
+              }),
+            ]),
+            // TODO: display offchain copy re AIPs and ARCs from https://docs.aave.com/governance/
+            // TODO: make this a form where you add target + value + calldata + signature + withDelegate
+            //  pairings one by one
+            m(FormGroup, [
+              m(FormLabel, 'Proposal Target'),
+              m(Input, {
+                name: 'targets',
+                placeholder: 'Proposal Target',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.targets = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Proposal Value'),
+              m(Input, {
+                name: 'values',
+                placeholder: 'Proposal Value',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.values = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Proposal Calldata'),
+              m(Input, {
+                name: 'calldatas',
+                placeholder: 'Proposal Calldata',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.calldatas = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Proposal Signature'),
+              m(Input, {
+                name: 'signatures',
+                placeholder: 'Proposal Signature',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.signatures = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Proposal Delegate Call'),
+              m(Input, {
+                name: 'withDelegateCalls',
+                placeholder: 'false',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.withDelegateCalls = result;
                   m.redraw();
                 },
               }),

@@ -3,11 +3,11 @@ import BN from 'bn.js';
 import Web3 from 'web3';
 import $ from 'jquery';
 import bs58 from 'bs58';
+import { AaveTypes } from '@commonwealth/chain-events';
 import { BigNumber } from 'ethers';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import { IAaveProposalResponse } from 'adapters/chain/aave/types';
 import { formatNumberLong } from 'adapters/currency';
-import { AaveTypes } from '@commonwealth/chain-events';
 
 import {
   Proposal,
@@ -43,6 +43,8 @@ export class AaveProposalVote implements IVote<EthereumCoin> {
     return `${formatNumberLong(+Web3.utils.fromWei(this.power))} POWER`;
   }
 }
+
+const ONE_HUNDRED_WITH_PRECISION = 10000;
 
 const backportEntityToAdapter = (entity: ChainEntity): IAaveProposalResponse => {
   const startEvent = entity.chainEvents.find((e) => e.data.kind === AaveTypes.EventKind.ProposalCreated);
@@ -138,7 +140,7 @@ export default class AaveProposal extends Proposal<
     if (blockNumber <= this.data.startBlock) return AaveTypes.ProposalState.PENDING;
     if (blockNumber <= this.data.endBlock) return AaveTypes.ProposalState.ACTIVE;
     if (this._isPassed() === false) return AaveTypes.ProposalState.FAILED;
-    if (!this.data.executionTime) return AaveTypes.ProposalState.SUCCEEDED;
+    if (!this.data.executionTime && !this.data.queued) return AaveTypes.ProposalState.SUCCEEDED;
     if (this.data.executed) return AaveTypes.ProposalState.EXECUTED;
     if (blockTimestamp > (this.data.executionTime + this._Executor.gracePeriod)) return AaveTypes.ProposalState.EXPIRED;
     if (this.data.queued) return AaveTypes.ProposalState.QUEUED;
@@ -173,8 +175,8 @@ export default class AaveProposal extends Proposal<
     const yesPower = sumVotes(votes.filter((v) => v.choice));
     const noPower = sumVotes(votes.filter((v) => !v.choice));
     if (yesPower.isZero() && noPower.isZero()) return 0;
-    const supportBn = yesPower.muln(1000).div(yesPower.add(noPower));
-    return +supportBn / 10000;
+    const supportBn = yesPower.muln(ONE_HUNDRED_WITH_PRECISION).div(yesPower.add(noPower));
+    return +supportBn / ONE_HUNDRED_WITH_PRECISION;
   }
 
   public get turnout() {
@@ -182,16 +184,29 @@ export default class AaveProposal extends Proposal<
       return null;
     }
     const totalPowerVoted = sumVotes(this.getVotes());
-    const turnoutBn = totalPowerVoted.muln(10000).div(this._votingSupplyAtStart);
-    return +turnoutBn / 10000;
+    const turnoutBn = totalPowerVoted.muln(ONE_HUNDRED_WITH_PRECISION).div(this._votingSupplyAtStart);
+    return +turnoutBn / ONE_HUNDRED_WITH_PRECISION;
+  }
+
+  // (FOR VOTES - AGAINST VOTES) / voting supply
+  public get voteDifferential() {
+    if (!this._votingSupplyAtStart || this._votingSupplyAtStart.isZero()) {
+      return null;
+    }
+    const votes = this.getVotes();
+    const yesPower = sumVotes(votes.filter((v) => v.choice));
+    const noPower = sumVotes(votes.filter((v) => !v.choice));
+    const forProportion = yesPower.muln(ONE_HUNDRED_WITH_PRECISION).div(this._votingSupplyAtStart);
+    const againstProportion = noPower.muln(ONE_HUNDRED_WITH_PRECISION).div(this._votingSupplyAtStart);
+    return (+forProportion - +againstProportion) / ONE_HUNDRED_WITH_PRECISION;
   }
 
   public get minimumQuorum() {
-    return +this._Executor.minimumQuorum / 10000
+    return +this._Executor.minimumQuorum / ONE_HUNDRED_WITH_PRECISION;
   }
 
-  public get voteDifferential() {
-    return +this._Executor.voteDifferential / 1000;
+  public get minimumVoteDifferential() {
+    return +this._Executor.voteDifferential / ONE_HUNDRED_WITH_PRECISION;
   }
 
   private _votingSupplyAtStart: BN;
@@ -209,8 +224,8 @@ export default class AaveProposal extends Proposal<
     const votes = this.getVotes();
     const yesVotes = votes.filter((v) => v.choice);
     const noVotes = votes.filter((v) => !v.choice);
-    const forProportion = sumVotes(yesVotes).muln(10000).div(this._votingSupplyAtStart);
-    const againstProportion = sumVotes(noVotes).muln(10000).div(this._votingSupplyAtStart)
+    const forProportion = sumVotes(yesVotes).muln(ONE_HUNDRED_WITH_PRECISION).div(this._votingSupplyAtStart);
+    const againstProportion = sumVotes(noVotes).muln(ONE_HUNDRED_WITH_PRECISION).div(this._votingSupplyAtStart)
       .add(this._Executor.voteDifferential);
     return forProportion.gt(againstProportion);
   }
@@ -238,23 +253,20 @@ export default class AaveProposal extends Proposal<
     if (this.state === AaveTypes.ProposalState.EXPIRED) {
       this.complete(this._Gov.store);
     }
-    if (this.completed) {
-      return;
-    }
 
     try {
-      const totalVotingSupplyAtStart = await this._Gov.api.Strategy.getVotingSupplyAt(this.data.startBlock);
+      const totalVotingSupplyAtStart = await this._Gov.api.Strategy.getTotalVotingSupplyAt(this.data.startBlock);
       this._votingSupplyAtStart = new BN(totalVotingSupplyAtStart.toString());
-    } catch (e) {
-      console.error(`Failed to fetch total voting supply: ${e.message}`);
-      // this._votingSupplyAtStart = Web3.utils.toWei(new BN(1_000_000_000), 'ether')
-      this._initialized = true;
-      return;
+    } catch (e2) {
+      console.error(
+        'Failed to fetch total voting supply at proposal start block, using hardcoded value.'
+      );
+      this._votingSupplyAtStart = Web3.utils.toWei(new BN(1_000_000_000), 'ether');
     }
 
     this._minVotingPowerNeeded = this._votingSupplyAtStart
       .mul(this._Executor.minimumQuorum)
-      .divn(10000);
+      .divn(ONE_HUNDRED_WITH_PRECISION);
     this._initialized = true;
   }
 
@@ -326,6 +338,7 @@ export default class AaveProposal extends Proposal<
 
   public get isCancellable() {
     return !(this.state === AaveTypes.ProposalState.CANCELED
+      || this.state === AaveTypes.ProposalState.FAILED
       || this.state === AaveTypes.ProposalState.EXECUTED
       || this.state === AaveTypes.ProposalState.EXPIRED);
   }

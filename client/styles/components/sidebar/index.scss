@@ -1,6 +1,10 @@
 @import 'client/styles/shared';
 
 @mixin sidebar {
+    .cui-button.cui-active {
+        background: linear-gradient(268.91deg, #91BFFF -61.91%, #91FFA0 2.69%, #FBFF91 60.22%, #FF9191 131.89%);
+        border: 1px transparent;
+    }
     .cui-button.sub-button {
         margin-left: 18px;
         width: calc(100% - 18px);
@@ -280,6 +284,16 @@
     }
     .cui-button {
         margin-bottom: 4px;
+    }
+    .cui-button.cui-rounded:active,
+    .cui-button.cui-rounded.cui-active,
+    .cui-button.cui-rounded:hover {
+        background: linear-gradient(to left, #91FFA0, #FBFF91, #FF9191);
+        border-color: white;
+
+        // @TODO: Remove this and figure out a better solution
+        background: #6966FF;
+        color: white;
     }
 }
 

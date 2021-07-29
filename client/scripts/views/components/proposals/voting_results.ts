@@ -11,7 +11,7 @@ import { MolochProposalVote, MolochVote } from 'controllers/chain/ethereum/moloc
 import { MarlinProposalVote, MarlinVote } from 'controllers/chain/ethereum/marlin/proposal';
 import { SubstrateCollectiveVote } from 'controllers/chain/substrate/collective_proposal';
 import { SubstrateDemocracyVote } from 'controllers/chain/substrate/democracy_referendum';
-import { AaveProposalVote } from 'controllers/chain/ethereum/aave/proposal';
+import AaveProposal, { AaveProposalVote } from 'controllers/chain/ethereum/aave/proposal';
 import Marlin from 'controllers/chain/ethereum/marlin/adapter';
 
 const COLLAPSE_VOTERS_AFTER = 6; // if there are >6 voters, collapse remaining under "Show more"
@@ -137,7 +137,7 @@ const VotingResults: m.Component<{ proposal: AnyProposal }> = {
     // TODO: fix up this function for cosmos votes
     if (proposal.votingType === VotingType.SimpleYesNoVoting) {
       return m('.VotingResults', [
-        m('.results-column', [
+        m('.results-column.yes-votes', [
           m('.results-header', `Yes (${votes.filter((v) => v.choice === true).length})`),
           m('.results-cell', [
             m(VoteListing, {
@@ -146,7 +146,7 @@ const VotingResults: m.Component<{ proposal: AnyProposal }> = {
             })
           ]),
         ]),
-        m('.results-column', [
+        m('.results-column.no-votes', [
           m('.results-header', `No (${votes.filter((v) => v.choice === false).length})`),
           m('.results-cell', [
             m(VoteListing, {
@@ -158,7 +158,7 @@ const VotingResults: m.Component<{ proposal: AnyProposal }> = {
       ]);
     } else if (proposal.votingType === VotingType.MolochYesNo) {
       return m('.VotingResults', [
-        m('.results-column', [
+        m('.results-column.yes-votes', [
           m('.results-header', `Yes (${votes.filter((v) => v.choice === MolochVote.YES).length})`),
           m('.results-cell', [
             m(VoteListing, {
@@ -167,8 +167,37 @@ const VotingResults: m.Component<{ proposal: AnyProposal }> = {
             })
           ]),
         ]),
-        m('.results-column', [
+        m('.results-column.no-votes', [
           m('.results-header', `No (${votes.filter((v) => v.choice === MolochVote.NO).length})`),
+          m('.results-cell', [
+            m(VoteListing, {
+              proposal,
+              votes: votes.filter((v) => v.choice === MolochVote.NO)
+            })
+          ]),
+        ])
+      ]);
+    } else if (proposal instanceof AaveProposal) {
+      return m('.VotingResults', [
+        m('.results-column.yes-votes', [
+          m('.results-header', `Yes (${votes.filter((v) => v.choice === MolochVote.YES).length})`),
+          m('.results-subheader', [
+            m('span', 'User'),
+            m('span', 'Power')
+          ]),
+          m('.results-cell', [
+            m(VoteListing, {
+              proposal,
+              votes: votes.filter((v) => v.choice === MolochVote.YES)
+            })
+          ]),
+        ]),
+        m('.results-column.no-votes', [
+          m('.results-header', `No (${votes.filter((v) => v.choice === MolochVote.NO).length})`),
+          m('.results-subheader', [
+            m('span', 'User'),
+            m('span', 'Power')
+          ]),
           m('.results-cell', [
             m(VoteListing, {
               proposal,
@@ -179,7 +208,7 @@ const VotingResults: m.Component<{ proposal: AnyProposal }> = {
       ]);
     } else if (proposal.votingType === VotingType.MarlinYesNo) {
       return m('.ProposalVotingResults', [
-        m('.results-column', [
+        m('.results-column.yes-votes', [
           m('.results-header', `Yes (${votes.filter((v) => v.choice === MarlinVote.YES).length})`),
           m('.results-cell', [
             m(VoteListing, {
@@ -188,7 +217,7 @@ const VotingResults: m.Component<{ proposal: AnyProposal }> = {
             })
           ]),
         ]),
-        m('.results-column', [
+        m('.results-column.no-votes', [
           m('.results-header', `No (${votes.filter((v) => v.choice === MarlinVote.NO).length})`),
           m('.results-cell', [
             m(VoteListing, {
@@ -200,7 +229,7 @@ const VotingResults: m.Component<{ proposal: AnyProposal }> = {
       ]);
     } else if (proposal.votingType === VotingType.ConvictionYesNoVoting) {
       return m('.VotingResults', [
-        m('.results-column', [
+        m('.results-column.yes-votes', [
           m('.results-header', `Yes (${votes.filter((v) => v.choice === true).length})`),
           m('.results-cell', [
             m(VoteListing, {
@@ -211,7 +240,7 @@ const VotingResults: m.Component<{ proposal: AnyProposal }> = {
             })
           ]),
         ]),
-        m('.results-column', [
+        m('.results-column.no-votes', [
           m('.results-header', `No (${votes.filter((v) => v.choice === false).length})`),
           m('.results-cell', [
             m(VoteListing, {
