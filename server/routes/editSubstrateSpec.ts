@@ -27,8 +27,9 @@ const editSubstrateSpec = async (models, req: Request, res: Response, next: Next
   const nodes = await chain.getChainNodes();
   if (!nodes.length) return next(new Error('no chain nodes found'));
 
+  let sanitizedSpec;
   try {
-    const sanitizedSpec = await testSubstrateSpec(req.body.spec, nodes[0].url);
+    sanitizedSpec = await testSubstrateSpec(req.body.spec, nodes[0].url);
   } catch (e) {
     return next(new Error('Failed to validate Substrate Spec'));
   }
