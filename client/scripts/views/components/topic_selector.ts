@@ -90,6 +90,7 @@ const TopicSelector: m.Component<{
       onSelect,
       popoverAttrs: {
         transitionDuration: 0,
+        hasArrow: false,
       },
       trigger: m(Button, {
         align: 'left',

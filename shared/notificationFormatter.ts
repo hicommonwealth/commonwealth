@@ -32,7 +32,7 @@ export const getForumNotificationCopy = async (models, notification_data: IPostN
     }]
   });
   let authorName;
-  const author_addr_short = formatAddressShort(author_address, author_chain);
+  const author_addr_short = formatAddressShort(author_address, author_chain, true);
   try {
     authorName = authorProfile.Address.name || JSON.parse(authorProfile.data).name || author_addr_short;
   } catch (e) {

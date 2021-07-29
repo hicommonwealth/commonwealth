@@ -16,6 +16,7 @@ export const Errors = {
   InvalidTelegram: 'Telegram must begin with https://t.me/',
   InvalidGithub: 'Github must begin with https://github.com/',
   InvalidCustomDomain: 'Custom domain may not include "commonwealth"',
+  InvalidTerms: 'Terms of Service must begin with https://',
 };
 
 const updateChain = async (models, req: Request, res: Response, next: NextFunction) => {
@@ -35,12 +36,12 @@ const updateChain = async (models, req: Request, res: Response, next: NextFuncti
         permission: 'admin',
       },
     });
-    if (!userMembership) {
+    if (!req.user.isAdmin && !userMembership) {
       return next(new Error(Errors.NotAdmin));
     }
   }
 
-  const { active, icon_url, symbol, type, name, description, website, discord, element, telegram, github, customDomain } = req.body;
+  const { active, icon_url, symbol, type, name, description, website, discord, element, telegram, github, stagesEnabled, additionalStages, customDomain, terms } = req.body;
 
   if (website && !urlHasValidHTTPPrefix(website)) {
     return next(new Error(Errors.InvalidWebsite));
@@ -54,6 +55,8 @@ const updateChain = async (models, req: Request, res: Response, next: NextFuncti
     return next(new Error(Errors.InvalidGithub));
   } else if (customDomain && customDomain.includes('commonwealth')) {
     return next(new Error(Errors.InvalidCustomDomain));
+  } else if (terms && !urlHasValidHTTPPrefix(terms)) {
+    return next(new Error(Errors.InvalidTerms));
   }
 
   if (name) chain.name = name;
@@ -67,7 +70,10 @@ const updateChain = async (models, req: Request, res: Response, next: NextFuncti
   chain.element = element;
   chain.telegram = telegram;
   chain.github = github;
+  chain.stagesEnabled = stagesEnabled;
+  chain.additionalStages = additionalStages;
   chain.customDomain = customDomain;
+  chain.terms = terms;
   if (req.body['featured_topics[]']) chain.featured_topics = req.body['featured_topics[]'];
 
   await chain.save();

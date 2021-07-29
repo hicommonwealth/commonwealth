@@ -24,7 +24,7 @@ const NewTopicModal: m.Component<{
   saving: boolean,
 }> = {
   view: (vnode) => {
-    if (!app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })) return null;
+    if (!app.user.isSiteAdmin && !app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })) return null;
     const { id, name, description } = vnode.attrs;
     if (!vnode.state.form) {
       vnode.state.form = { id, name, description };

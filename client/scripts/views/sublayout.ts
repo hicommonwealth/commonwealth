@@ -12,8 +12,10 @@ import LoginSelector from 'views/components/header/login_selector';
 import Sidebar from 'views/components/sidebar';
 import MobileHeader from 'views/mobile/mobile_header';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
+import FooterLandingPage from 'views/pages/landing/landing_page_footer';
 import Token from 'controllers/chain/ethereum/token/adapter';
 import { SearchBar } from './components/search_bar';
+
 
 const Sublayout: m.Component<{
   // overrides
@@ -24,6 +26,7 @@ const Sublayout: m.Component<{
   class?: string,
   title?: any,                        // displayed at the top of the layout
   description?: string,               // displayed at the top of the layout
+  rightContent?: any,
   hero?: any,
   showNewProposalButton?: boolean,
   showCouncilMenu?: boolean,
@@ -36,6 +39,7 @@ const Sublayout: m.Component<{
     const {
       title,
       description,
+      rightContent,
       hero,
       showNewProposalButton,
       showCouncilMenu,
@@ -79,7 +83,8 @@ const Sublayout: m.Component<{
       app.isLoggedIn() && m(InvitesMenu),
       app.isLoggedIn() && m(NotificationsMenu),
       showNewProposalButton
-      && (narrowBrowserWidth ? m(MobileNewProposalButton) : m(NewProposalButton, { fluid: false })),
+      && (narrowBrowserWidth ? m(MobileNewProposalButton) : m(NewProposalButton, { fluid: false, threadOnly: !chain })),
+      // above threadOnly option assumes all chains have proposals beyond threads
     ]);
 
     if (vnode.attrs.loadingLayout) return [
@@ -126,8 +131,24 @@ const Sublayout: m.Component<{
               m('.sublayout-main-col', [
                 vnode.children
               ]),
+              rightContent && m('.sublayout-right-col', rightContent),
             ]),
           ]),
+          m(FooterLandingPage, {
+            list: [
+              { text: 'Blog', externalLink: 'https://blog.commonwealth.im' },
+              { text: 'Jobs', externalLink: 'https://angel.co/company/commonwealth-labs/jobs' },
+              { text:  'Terms', redirectTo:  '/terms' },
+              { text:  'Privacy', redirectTo: '/privacy' },
+              { text: 'Discord', externalLink: 'https://discord.gg/ZFQCKUMP' },
+              { text: 'Telegram', externalLink: 'https://t.me/HiCommonwealth' }
+              // { text:  'Use Cases' },
+              // { text:  'Crowdfunding' },
+              // { text:  'Developers' },
+              // { text:  'About us' },
+              // { text:  'Careers' }
+            ],
+          }),
         ]),
       ]),
     ];

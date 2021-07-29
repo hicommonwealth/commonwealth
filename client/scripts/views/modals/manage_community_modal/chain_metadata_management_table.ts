@@ -5,7 +5,7 @@ import { Button, Table } from 'construct-ui';
 import { ChainNetwork } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 import { IChainOrCommMetadataManagementAttrs } from './community_metadata_management_table';
-import { InputPropertyRow, ManageRolesRow } from './metadata_rows';
+import { TogglePropertyRow, InputPropertyRow, ManageRolesRow } from './metadata_rows';
 
 interface IChainMetadataManagementState {
   name: string;
@@ -19,7 +19,10 @@ interface IChainMetadataManagementState {
   loadingFinished: boolean;
   loadingStarted: boolean;
   iconUrl: string;
+  stagesEnabled: boolean;
+  additionalStages: string;
   customDomain: string;
+  terms: string;
   network: ChainNetwork;
   symbol: string;
 }
@@ -33,7 +36,10 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
     vnode.state.element = vnode.attrs.chain.element;
     vnode.state.telegram = vnode.attrs.chain.telegram;
     vnode.state.github = vnode.attrs.chain.github;
+    vnode.state.stagesEnabled = vnode.attrs.chain.stagesEnabled;
+    vnode.state.additionalStages = vnode.attrs.chain.additionalStages;
     vnode.state.customDomain = vnode.attrs.chain.customDomain;
+    vnode.state.terms = vnode.attrs.chain.terms;
     vnode.state.iconUrl = vnode.attrs.chain.iconUrl;
     vnode.state.network = vnode.attrs.chain.network;
     vnode.state.symbol = vnode.attrs.chain.symbol;
@@ -87,11 +93,31 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
           placeholder: 'https://github.com',
           onChangeHandler: (v) => { vnode.state.github = v; },
         }),
+        m(TogglePropertyRow, {
+          title: 'Stages',
+          defaultValue: vnode.attrs.chain.stagesEnabled,
+          onToggle: (checked) => { vnode.state.stagesEnabled = checked; },
+          caption: (checked) => checked
+            ? 'Show proposal progress on threads'
+            : 'Don\'t show progress on threads',
+        }),
+        m(InputPropertyRow, {
+          title: 'Custom Stages',
+          defaultValue: vnode.state.additionalStages,
+          placeholder: '["Temperature Check", "Consensus Check"]',
+          onChangeHandler: (v) => { vnode.state.additionalStages = v; },
+        }),
         m(InputPropertyRow, {
           title: 'Domain',
           defaultValue: vnode.state.customDomain,
           placeholder: 'gov.edgewa.re',
           onChangeHandler: (v) => { vnode.state.customDomain = v; },
+        }),
+        m(InputPropertyRow, {
+          title: 'Terms of Service',
+          defaultValue: vnode.state.terms,
+          placeholder: 'Url that new users see',
+          onChangeHandler: (v) => { vnode.state.terms = v; },
         }),
         m('tr', [
           m('td', 'Admins'),
@@ -114,9 +140,33 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
         label: 'Save changes',
         intent: 'primary',
         onclick: async (e) => {
-          const { name, description, website, discord, element, telegram, github, customDomain } = vnode.state;
+          const {
+            name,
+            description,
+            website,
+            discord,
+            element,
+            telegram,
+            github,
+            stagesEnabled,
+            additionalStages,
+            customDomain,
+            terms
+          } = vnode.state;
           try {
-            await vnode.attrs.chain.updateChainData(name, description, website, discord, element, telegram, github, customDomain);
+            await vnode.attrs.chain.updateChainData({
+              name,
+              description,
+              website,
+              discord,
+              element,
+              telegram,
+              github,
+              stagesEnabled,
+              additionalStages,
+              customDomain,
+              terms
+            });
             $(e.target).trigger('modalexit');
           } catch (err) {
             notifyError(err.responseJSON?.error || 'Chain update failed');
