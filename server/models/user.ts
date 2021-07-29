@@ -63,9 +63,10 @@ export default (
     disableRichText: { type: dataTypes.BOOLEAN, defaultValue: false, allowNull: false },
     magicIssuer: { type: dataTypes.STRING, allowNull: true },
     lastMagicLoginAt: { type: dataTypes.INTEGER, allowNull: true },
-    created_at: { type: dataTypes.DATE, allowNull: false, defaultValue: dataTypes.NOW },
-    updated_at: { type: dataTypes.DATE, allowNull: false, defaultValue: dataTypes.NOW },
   }, {
+    timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
     tableName: 'Users',
     underscored: true,
     indexes: [

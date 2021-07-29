@@ -25,6 +25,7 @@ export const Errors = {
 const updateProfile = async (
   models, identityFetchCache: IdentityFetchCache, req: Request, res: Response, next: NextFunction
 ) => {
+
   if (!req.body.chain || !req.body.address || !req.body.data) {
     return next(new Error(Errors.MissingParams));
   }
@@ -35,13 +36,13 @@ const updateProfile = async (
   } catch (e) {
     return next(new Error(Errors.NotBlob));
   }
-
-  const address = await models.Address.find({
+  const address = await models.Address.findOne({
     where: {
       chain: req.body.chain,
       address: req.body.address,
-    }
+    },
   });
+
   if (!address || !address.id) {
     return next(new Error(Errors.InvalidProfile));
   }

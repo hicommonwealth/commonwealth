@@ -24,7 +24,7 @@ const createInviteLink = async (models, req, res, next) => {
   if (community && !community.invitesEnabled) {
     const requesterIsAdminOrMod = await models.Role.findAll({
       where: {
-        address_id: req.user.address_id, // this is overriding the search, bc null
+        address_id: req.user.get({ raw: true }).address_id || null, // this is overriding the search, bc null
         offchain_community_id: community.id,
         permission: ['admin', 'moderator'],
       },
@@ -41,7 +41,6 @@ const createInviteLink = async (models, req, res, next) => {
   if (isNaN(uses)) {
     return next(new Error(Errors.InvalidUses));
   }
-
   // check to see if unlimited time + unlimited usage already exists
   if (uses === null && time === 'none') {
     const foreverInvite = await models.InviteLink.findOne({
@@ -66,7 +65,7 @@ const createInviteLink = async (models, req, res, next) => {
   const inviteLink = await models.InviteLink.create({
     id: inviteId,
     // community_id: community.id,
-    ... chainOrCommunityObj,
+    ...chainOrCommunityObj,
     creator_id: req.user.id,
     active: true,
     multi_use: uses,

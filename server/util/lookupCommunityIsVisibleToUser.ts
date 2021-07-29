@@ -53,7 +53,7 @@ const lookupCommunityIsVisibleToUser = async (
 
   if (community && community.privacyEnabled && !user?.isAdmin) {
     if (!user) return [null, null, ChainCommunityErrors.NoUserProvided];
-    const userAddressIds = await user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
+    const userAddressIds = (await user.getAddresses({ raw: true })).filter((addr) => !!addr.verified).map((addr) => addr.id);
     const userMembership = await models.Role.findOne({
       where: {
         address_id: userAddressIds,

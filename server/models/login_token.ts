@@ -44,9 +44,10 @@ export default (
     expires: { type: dataTypes.DATE, allowNull: false },
     redirect_path: { type: dataTypes.STRING, allowNull: true },
     used: { type: dataTypes.DATE, allowNull: true },
-    created_at: { type: dataTypes.DATE, allowNull: false },
-    updated_at: { type: dataTypes.DATE, allowNull: false },
   }, {
+    timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
     tableName: 'LoginTokens',
     underscored: true,
     indexes: [

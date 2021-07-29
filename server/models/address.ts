@@ -132,6 +132,9 @@ export default (
         exclude: [ 'verification_token', 'verification_token_expires', 'created_at', 'updated_at' ],
       }
     },
+    scopes: {
+      withPrivateData: {}
+    },
   });
 
   Address.createEmpty = (
