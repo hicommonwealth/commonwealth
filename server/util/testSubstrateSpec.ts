@@ -27,7 +27,7 @@ const testSubstrateSpec = async (specString: string, nodeUrl: string, cb) => {
   try {
     await provider.connect();
   } catch (err) {
-    return cb(new Error('failed to connect to node url'));
+    throw new Error('failed to connect to node url');
   }
   try {
     const api = await ApiPromise.create({ provider, ...sanitizedSpec });
@@ -36,7 +36,7 @@ const testSubstrateSpec = async (specString: string, nodeUrl: string, cb) => {
     log.info(`Fetched version: ${version.specName}:${version.specVersion} and properties ${JSON.stringify(props)}`);
     return sanitizedSpec;
   } catch (err) {
-    return cb(new Error(`failed to initialize polkadot api: ${err.message}`));
+    throw new Error(`failed to initialize polkadot api: ${err.message}`);
   }
 };
 
