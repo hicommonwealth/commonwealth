@@ -6,14 +6,14 @@ import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
-const testSubstrateSpec = async (specString: string, nodeUrl: string, cb) => {
+const testSubstrateSpec = async (specString: string, nodeUrl: string) => {
   // test out spec
   // get spec from request
   let unpackedSpec: RegisteredTypes;
   try {
     unpackedSpec = JSON.parse(specString);
   } catch (e) {
-    return cb(new Error('Could not parse spec data'));
+    throw new Error('Could not parse spec data');
   }
   const sanitizedSpec: RegisteredTypes = {
     types: unpackedSpec['types'],

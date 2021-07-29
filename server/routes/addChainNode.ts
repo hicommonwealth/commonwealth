@@ -26,7 +26,11 @@ const addChainNode = async (models, req: Request, res: Response, next: NextFunct
     return next(new Error(Errors.MissingParams));
   }
   if (req.body.substrate_spec) {
-    testSubstrateSpec(req.body.substrate_spec, req.body.node_url, next);
+    try {
+      await testSubstrateSpec(req.body.substrate_spec, req.body.node_url);
+    } catch (e) {
+      return next(new Error('Failed to validate Substrate Spec'));
+    }
   }
 
   let chain = await models.Chain.findOne({ where: {
