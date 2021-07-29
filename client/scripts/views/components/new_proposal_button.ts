@@ -12,12 +12,27 @@ import { SubstrateAccount } from 'controllers/chain/substrate/account';
 
 export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]>, mobile?: boolean) => {
   const activeAccount = app.user.activeAccount;
+
+  const topics = app.topics.getByCommunity(app.activeId()).map(({ id, name, featuredInNewPost }) => {
+    return { id, name, featuredInNewPost };
+  }).filter((t) => t.featuredInNewPost).sort((a, b) => a.name.localeCompare(b.name));
+
   return [
     m(MenuItem, {
       onclick: () => { m.route.set(`/${app.activeId()}/new/thread`); },
       label: 'New thread',
       iconLeft: mobile ? Icons.PLUS : undefined,
     }),
+    topics.map((t) => (
+      m(MenuItem, {
+        onclick: (e) => {
+          localStorage.setItem(`${app.activeId()}-active-topic`, t.name);
+          m.route.set(`/${app.chain.id}/new/thread`);
+        },
+        label: `New ${t.name} Thread`,
+        iconLeft: mobile ? Icons.PLUS : undefined,
+      })
+    )),
     (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
       && !mobile
       && m(MenuDivider),
