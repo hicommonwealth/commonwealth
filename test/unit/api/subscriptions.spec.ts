@@ -685,9 +685,12 @@ describe('Subscriptions Tests', () => {
       });
       it('should fail when not the owner of the notification', async () => {
         expect(notifications).to.not.be.null;
-        const notification_ids = notifications.map((n) => { return n.id; });
+        // create fake user who doesn't have any notifications
+        const user = await models['User'].create({ email: 'test@dummy.com' });
+        // get existing notif in the DB
+        const notification_ids = (await models.Notification.findAll()).map((n) => { return n.id; });
         const result = await modelUtils.createAndVerifyAddress({ chain });
-        const newJwt = jwt.sign({ id: result.user_id, email: result.email }, JWT_SECRET);
+        const newJwt = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET);
         const res = await chai.request(app)
           .post('/api/markNotificationsRead')
           .set('Accept', 'application/json')
