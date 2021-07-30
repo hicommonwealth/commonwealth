@@ -68,8 +68,8 @@ export async function migrateChainEntity(chain: string): Promise<void> {
     } else if (chainSupportedBy(chain, AaveTypes.EventChains)) {
       const api = await AaveEvents.createApi(node.url, node.address);
       fetcher = new AaveEvents.StorageFetcher(api);
-      // TODO: remove once testing completed
-      range.startBlock = chain === 'aave' ? 12200000 : 0;
+      // range.startBlock = chain === 'aave' ? 12200000 : 0;
+      range.startBlock = 0;
     } else {
       throw new Error('Unsupported migration chain');
     }
