@@ -33,6 +33,7 @@ export interface ChainAttributes {
   type: string;
   substrate_spec: RegisteredTypes;
   snapshot: string;
+  terms: string;
 
   // associations
   ChainNodes?: ChainNodeAttributes[] | ChainNodeAttributes['id'][];
@@ -82,6 +83,7 @@ export default (
     type: { type: dataTypes.STRING, allowNull: false },
     substrate_spec: { type: dataTypes.JSONB, allowNull: true },
     snapshot: { type: dataTypes.STRING, allowNull: true },
+    terms: { type: dataTypes.STRING, allowNull: true },
   }, {
     timestamps: false,
     underscored: true,

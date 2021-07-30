@@ -17,7 +17,8 @@ export const Errors = {
   InvalidGithub: 'Github must begin with https://github.com/',
   InvalidCustomDomain: 'Custom domain may not include "commonwealth"',
   InvalidSnapshot: 'Snapshot must fit the naming pattern of *.eth',
-  SnapshotOnlyOnEthereum: 'Snapshot data may only be added to chains with Ethereum base'
+  SnapshotOnlyOnEthereum: 'Snapshot data may only be added to chains with Ethereum base',
+  InvalidTerms: 'Terms of Service must begin with https://',
 };
 
 const updateChain = async (models, req: Request, res: Response, next: NextFunction) => {
@@ -37,12 +38,12 @@ const updateChain = async (models, req: Request, res: Response, next: NextFuncti
         permission: 'admin',
       },
     });
-    if (!userMembership) {
+    if (!req.user.isAdmin && !userMembership) {
       return next(new Error(Errors.NotAdmin));
     }
   }
 
-  const { active, icon_url, symbol, type, name, description, website, discord, element, telegram, github, stagesEnabled, additionalStages, customDomain, snapshot } = req.body;
+  const { active, icon_url, symbol, type, name, description, website, discord, element, telegram, github, stagesEnabled, additionalStages, customDomain, snapshot, terms } = req.body;
 
   if (website && !urlHasValidHTTPPrefix(website)) {
     return next(new Error(Errors.InvalidWebsite));
@@ -60,6 +61,8 @@ const updateChain = async (models, req: Request, res: Response, next: NextFuncti
     return next(new Error(Errors.InvalidSnapshot));
   } else if (snapshot && chain.base !== 'ethereum') {
     return next(new Error(Errors.SnapshotOnlyOnEthereum));
+  } else if (terms && !urlHasValidHTTPPrefix(terms)) {
+    return next(new Error(Errors.InvalidTerms));
   }
 
   if (name) chain.name = name;
@@ -76,6 +79,7 @@ const updateChain = async (models, req: Request, res: Response, next: NextFuncti
   chain.stagesEnabled = stagesEnabled;
   chain.additionalStages = additionalStages;
   chain.customDomain = customDomain;
+  chain.terms = terms;
   if (chain.base === 'ethereum') chain.snapshot = snapshot;
   if (req.body['featured_topics[]']) chain.featured_topics = req.body['featured_topics[]'];
 
