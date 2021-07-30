@@ -7,6 +7,7 @@ const startOAuthLogin = async (models, req: Request, res: Response, next: NextFu
   let successRedirect = '/';
   let failureRedirect = '#!/login';
   if (req.query.from) {
+    // Validate that req.query.from matches an existing Chain or Community
     try {
       const [chain, community] = await Promise.all([
         models.Chain.findOne({ where: { customDomain: req.query.from } }),

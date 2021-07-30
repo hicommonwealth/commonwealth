@@ -291,19 +291,6 @@ function setupPassport(models) {
         await githubAccount.save();
       }
 
-      // Check that we are not on a custom domain
-      if (req.hostname !== req.query.from) {
-        const [chain, community] = await Promise.all([
-          // TODO: import models
-           models.Chain.findOne({ where: { customDomain: req.query.from } }),
-           models.OffchainCommunity.findOne({ where: { customDomain: req.query.from } }),
-         ]);
-        if (chain || community) {
-          // Redirect to req.query.from, to a route that logs the user in
-          // perhaps using finishEmailLogin
-        }
-      }
-
       // Check associations and log in the correct user.
       const user = await githubAccount.getUser();
       if (req.user === null && user === null) {
