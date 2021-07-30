@@ -46,13 +46,15 @@ const editTopic = async (models, req: Request, res: Response, next: NextFunction
     return next(new Error(Errors.NotAdmin));
   }
 
-  const { id, name, description, telegram, featured_order } = req.body;
+  const { id, name, description, telegram, featured_order, featured_in_sidebar, featured_in_new_post } = req.body;
   try {
     const topic = await models.OffchainTopic.findOne({ where: { id } });
     if (!topic) return next(new Error(Errors.TopicNotFound));
     if (name) topic.name = name;
     if (name || description) topic.description = description;
     if (name || telegram) topic.telegram = telegram;
+    topic.featured_in_sidebar = featured_in_sidebar;
+    topic.featured_in_new_post = featured_in_new_post;
     await topic.save();
 
     if (featured_order) {
