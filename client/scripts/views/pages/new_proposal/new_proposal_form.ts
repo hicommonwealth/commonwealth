@@ -4,7 +4,7 @@ import $ from 'jquery';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 import { utils } from 'ethers';
-import { Input, TextArea, Form, FormLabel, FormGroup, Button, Grid, Col, Spinner } from 'construct-ui';
+import { Input, TextArea, Form, FormLabel, FormGroup, Button, Grid, Col, Spinner, RadioGroup } from 'construct-ui';
 import BN from 'bn.js';
 import { blake2AsHex } from '@polkadot/util-crypto';
 
@@ -432,6 +432,7 @@ const NewProposalForm = {
     }
 
     const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
+    const executors = (app.chain as Aave).governance.api.Executors;
 
     return m(Form, { class: 'NewProposalForm' }, [
       m(Grid, [
@@ -847,15 +848,11 @@ const NewProposalForm = {
             ]),
             m(FormGroup, [
               m(FormLabel, 'Proposal Executor'),
-              m(DropdownFormField, {
-                choices: (app.chain as Aave).governance.api.Executors.map(
-                  (r) => ({ name: 'executor', value: r.address, label: `${r.address}` })
-                ),
-                callback: (result) => {
-                  vnode.state.executor = result;
-                  m.redraw();
-                },
-                callbackOnInit: true,
+              m(RadioGroup, {
+                options: executors.map((r) => r.address),
+                name: 'executor-1',
+                onchange: (e) => { vnode.state.executor = (e.currentTarget as HTMLInputElement).value; console.log((e.currentTarget as HTMLInputElement).value) },
+                value: vnode.state.executor,
               }),
             ]),
             // TODO: display offchain copy re AIPs and ARCs from https://docs.aave.com/governance/
@@ -980,15 +977,11 @@ const NewProposalForm = {
             ]),
             m(FormGroup, [
               m(FormLabel, 'Proposal Executor'),
-              m(DropdownFormField, {
-                choices: (app.chain as Aave).governance.api.Executors.map(
-                  (r) => ({ name: 'executor', value: r.address, label: `${r.delay / (60 * 60 * 24)} Day(s) Voting` })
-                ),
-                callback: (result) => {
-                  vnode.state.executor = result;
-                  m.redraw();
-                },
-                callbackOnInit: true,
+              m(RadioGroup, {
+                options: executors.map((r) => new Option(`${r.delay / (60 * 60 * 24)} Day(s) Voting`, r.address) ),
+                name: 'executor-2',
+                onchange: (e) => { vnode.state.executor = (e.currentTarget as HTMLInputElement).value;},
+                value: vnode.state.executor,
               }),
             ]),
             // TODO: display offchain copy re AIPs and ARCs from https://docs.aave.com/governance/
