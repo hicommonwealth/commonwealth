@@ -13,7 +13,7 @@ interface IEditTopicModalForm {
   id: number,
   name: string,
   featured_in_sidebar: boolean,
-  featured_in_new_post: boolean
+  featured_in_new_post: boolean,
 }
 
 const EditTopicModal : m.Component<{
@@ -21,7 +21,7 @@ const EditTopicModal : m.Component<{
   id: number,
   name: string,
   featured_in_sidebar: boolean,
-  featured_in_new_post: boolean
+  featured_in_new_post: boolean,
 }, {
   error: any,
   form: IEditTopicModalForm,

@@ -101,13 +101,27 @@ const DiscussionStagesBar: m.Component<{ topic: string; stage: string }, {}> = {
 
     const featuredTopicIds = app.community?.meta?.featuredTopics || app.chain?.meta?.chain?.featuredTopics;
     const topics = app.topics.getByCommunity(app.activeId()).map(({ id, name, description, telegram, featuredInSidebar, featuredInNewPost }) => {
-      return { id, name, description, telegram, featured_order: featuredTopicIds.indexOf(`${id}`), featured_in_sidebar: featuredInSidebar, featured_in_new_post: featuredInNewPost };
+      return {
+        id,
+        name,
+        description,
+        telegram,
+        featured_order: featuredTopicIds.indexOf(`${id}`),
+        featured_in_sidebar: featuredInSidebar,
+        featured_in_new_post: featuredInNewPost,
+      };
     });
     const featuredTopics = topics.filter((t) => t.featured_order !== -1).sort((a, b) => Number(a.featured_order) - Number(b.featured_order));
     const otherTopics = topics.filter((t) => t.featured_order === -1).sort((a, b) => a.name.localeCompare(b.name));
 
     const selectedTopic = topics.find((t) => topic && topic === t.name);
-    const selectedStage = [OffchainThreadStage.Discussion, OffchainThreadStage.ProposalInReview, OffchainThreadStage.Voting, OffchainThreadStage.Passed, OffchainThreadStage.Failed].find(
+    const selectedStage = [
+      OffchainThreadStage.Discussion,
+      OffchainThreadStage.ProposalInReview,
+      OffchainThreadStage.Voting,
+      OffchainThreadStage.Passed,
+      OffchainThreadStage.Failed
+    ].find(
       (s) => s === (stage as any)
     );
 

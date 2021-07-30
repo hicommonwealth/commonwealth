@@ -122,7 +122,7 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
           rounded: true,
           active: onFeaturedDiscussionPage(m.route.get(), t.name),
           label: t.name,
-          class: app.chain?.base === ChainBase.Substrate ? 'sub-button' : '',
+          class: 'sub-button',
           onclick: (e) => {
             e.preventDefault();
             m.route.set(`/${app.activeChainId()}/discussions/${t.name}`);

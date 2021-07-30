@@ -13,7 +13,7 @@ interface INewTopicModalForm {
   name: string,
   description: string,
   featured_in_sidebar: boolean,
-  featured_in_new_post: boolean
+  featured_in_new_post: boolean,
 }
 
 const NewTopicModal: m.Component<{
@@ -21,7 +21,7 @@ const NewTopicModal: m.Component<{
   name: string,
   description: string,
   featured_in_sidebar: boolean,
-  featured_in_new_post: boolean
+  featured_in_new_post: boolean,
 }, {
   error: any,
   form: INewTopicModalForm,
