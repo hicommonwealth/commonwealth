@@ -19,6 +19,7 @@ import {
   EventSupportingChains,
 } from '@commonwealth/chain-events';
 
+import models from '../database';
 import MigrationHandler from '../eventHandlers/migration';
 import EntityArchivalHandler from '../eventHandlers/entityArchival';
 import { ChainNodeInstance } from '../models/chain_node';
@@ -28,7 +29,9 @@ import { constructSubstrateUrl } from '../../shared/substrate';
 
 const log = factory.getLogger(formatFilename(__filename));
 
-export async function migrateChainEntity(models, chain: string): Promise<void> {
+const ENTITY_MIGRATION = process.env.ENTITY_MIGRATION;
+
+export async function migrateChainEntity(chain: string): Promise<void> {
   // 1. fetch the node and url of supported/selected chains
   log.info(`Fetching node info for ${chain}...`);
   if (!chain) {
@@ -39,7 +42,7 @@ export async function migrateChainEntity(models, chain: string): Promise<void> {
   }
 
   // query one node for each supported chain
-  const node: ChainNodeInstance = await models.ChainNode.findOne({ where: { chain } });
+  const node: ChainNodeInstance = await models['ChainNode'].findOne({ where: { chain } });
   if (!node) {
     throw new Error('no nodes found for chain entity migration');
   }
@@ -89,8 +92,26 @@ export async function migrateChainEntity(models, chain: string): Promise<void> {
   }
 }
 
-export async function migrateChainEntities(models): Promise<void> {
+export async function migrateChainEntities(): Promise<void> {
   for (const chain of EventSupportingChains) {
-    await migrateChainEntity(models, chain);
+    await migrateChainEntity(chain);
   }
 }
+
+async function main() {
+  // "all" means run for all supported chains, otherwise we pass in the name of
+  // the specific chain to migrate
+  log.info('Started migrating chain entities into the DB');
+  try {
+    await (ENTITY_MIGRATION === 'all'
+      ? migrateChainEntities()
+      : migrateChainEntity(ENTITY_MIGRATION));
+    log.info('Finished migrating chain entities into the DB');
+    process.exit(0);
+  } catch (e) {
+    log.error('Failed migrating chain entities into the DB: ', e.message);
+    process.exit(1);
+  }
+}
+
+main();
