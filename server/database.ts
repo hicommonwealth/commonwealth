@@ -43,12 +43,6 @@ fs.readdirSync(`${__dirname}/models`)
   });
 
 
-sequelize.afterCreate(async () => {
-  const count = await sequelize.query('SELECT count(*) from pg_stat_activity where datname = \'commonwealth\' and state=\'active\';', { type: QueryTypes.SELECT });
-  getStatsDInstance().gauge('cw.connection.pool', count);
-});
-
-
 // setup associations
 Object.keys(db).forEach((modelName) => {
   if ('associate' in db[modelName]) {
