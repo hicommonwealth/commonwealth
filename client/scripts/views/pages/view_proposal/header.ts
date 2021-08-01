@@ -1,10 +1,11 @@
 import $ from 'jquery';
 import m from 'mithril';
 import moment from 'moment';
-import app from 'state';
-import { slugify } from 'utils';
-
 import { Button, Icon, Icons, Tag, Tooltip, MenuItem, Input } from 'construct-ui';
+
+import app from 'state';
+import { navigateToSubpage } from 'app';
+import { slugify } from 'utils';
 
 import {
   pluralize, link, externalLink, extractDomain,
@@ -257,7 +258,7 @@ export const ProposalHeaderStage: m.Component<{ proposal: OffchainThread }> = {
       href: `/${proposal.chain || proposal.community}?stage=${proposal.stage}`,
       onclick: (e) => {
         e.preventDefault();
-        m.route.set(`/${proposal.chain || proposal.community}?stage=${proposal.stage}`);
+        navigateToSubpage(`?stage=${proposal.stage}`);
       },
       class: proposal.stage === OffchainThreadStage.ProposalInReview ? 'positive'
         : proposal.stage === OffchainThreadStage.Voting ? 'positive'
@@ -328,7 +329,8 @@ export const ProposalTitleSaveEdit: m.Component<{
   view: (vnode) => {
     const { proposal, getSetGlobalEditingStatus, parentState } = vnode.attrs;
     if (!proposal) return;
-    const proposalLink = `/${app.activeChainId()}/proposal/${proposal.slug}/${proposal.identifier}`
+    const proposalLink = (app.isCustomDomain() ? '' : `/${app.activeId()}`)
+      + `/proposal/${proposal.slug}/${proposal.identifier}`
       + `-${slugify(proposal.title)}`;
 
     return m('.ProposalTitleSaveEdit', [

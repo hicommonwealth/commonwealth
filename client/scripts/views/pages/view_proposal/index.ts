@@ -7,6 +7,7 @@ import mixpanel from 'mixpanel-browser';
 import { PopoverMenu, MenuDivider, Icon, Icons, Button, Input } from 'construct-ui';
 
 import app from 'state';
+import { navigateToSubpage } from 'app';
 import Sublayout from 'views/sublayout';
 import { idToProposal, ProposalType, proposalSlugToClass } from 'identifiers';
 import { slugify } from 'utils';
@@ -640,7 +641,7 @@ const ViewProposalPage: m.Component<{
     const { proposal } = vnode.state;
     if (proposalRecentlyEdited) vnode.state.recentlyEdited = false;
     if (identifier !== `${proposalId}-${slugify(proposal.title)}`) {
-      m.route.set(`/${app.activeId()}/proposal/${proposal.slug}/${proposalId}-${slugify(proposal.title)}`, {},
+      navigateToSubpage(`/proposal/${proposal.slug}/${proposalId}-${slugify(proposal.title)}`, {},
         { replace: true });
     }
 

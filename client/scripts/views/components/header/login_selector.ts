@@ -186,13 +186,13 @@ export const LoginSelectorMenuRight: m.Component<{ mobile?: boolean }, {}> = {
     return m(Menu, { class: 'LoginSelectorMenu' }, [
       m(MenuItem, {
         onclick: () => (app.activeChainId() || app.activeCommunityId())
-          ? m.route.set(`/${app.activeChainId() || app.activeCommunityId()}/notifications`)
+          ? navigateToSubpage('/notifications')
           : m.route.set('/notifications'),
         label: m('.label-wrap', [ mobile && m(CustomBellIcon), m('span', 'Notification settings') ]),
       }),
       m(MenuItem, {
         onclick: () => app.activeChainId()
-          ? m.route.set(`/${app.activeChainId()}/settings`)
+          ? navigateToSubpage('/settings')
           : m.route.set('/settings'),
         label: m('.label-wrap', [ mobile && m(CustomUserIcon), m('span', 'Account settings') ]),
       }),

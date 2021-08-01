@@ -60,14 +60,14 @@ const Sublayout: m.Component<{
       ] : chain ? [
         m(ChainIcon, { size: ICON_SIZE, chain }),
         m('h4.sublayout-header-heading', [
-          link('a', `/${app.activeId()}`, chain.name),
+          link('a', (app.isCustomDomain() ? '/' : `/${app.activeId()}`), chain.name),
           title && m('span.breadcrumb', m.trust('/')),
           title
         ]),
       ] : community ? [
         m(CommunityIcon, { size: ICON_SIZE, community }),
         m('h4.sublayout-header-heading', [
-          link('a', `/${app.activeId()}`, community.name),
+          link('a', (app.isCustomDomain() ? '/' : `/${app.activeId()}`), community.name),
           community.privacyEnabled && m(Icon, { name: Icons.LOCK, size: 'xs' }),
           title && m('span.breadcrumb', m.trust('/')),
           title
@@ -124,7 +124,7 @@ const Sublayout: m.Component<{
               ? m('.sublayout-hero.token-banner', [
                 m('.token-banner-content', `Link ${app.chain.meta.chain.symbol} address to participate in this community`),
               ]) : '',
-            terms ? 
+            terms ?
               m('.token-banner-terms', [
                 m('span', `Please read the `),
                 m('a', {
