@@ -126,8 +126,7 @@ export const ProposalBodyCreated: m.Component<{
             e.preventDefault();
             const target = isThread ? `${link}?comment=body` : link;
             if (target === document.location.href) return;
-            // use updateRoute instead of m.route.set to avoid resetting scroll point
-            updateRoute(target, {}, { replace: true });
+            history.replaceState(history.state, '', target);
             jumpHighlightComment((isThread ? 'body' : item.id), false, 500);
           }
         }, item.createdAt.fromNow())
