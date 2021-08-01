@@ -46,7 +46,7 @@ const APPLICATION_UPDATE_ACTION = 'Okay';
 
 // On login: called to initialize the logged-in state, available chains, and other metadata at /api/status
 // On logout: called to reset everything
-export async function initAppState(updateSelectedNode = true): Promise<void> {
+export async function initAppState(updateSelectedNode = true, customDomain = null): Promise<void> {
   return new Promise((resolve, reject) => {
     $.get(`${app.serverUrl()}/status`).then((data) => {
       app.config.chains.clear();
@@ -113,11 +113,9 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       }
 
       // update whether we're on a custom domain
-      const host = document.location.host;
-      app.setIsCustomDomain(
-        app.config.chains.getAll().find((c) => c.customDomain === host) !== undefined
-          || app.config.communities.getAll().find((c) => c.customDomain === host) !== undefined
-      );
+      if (customDomain) {
+        app.setCustomDomain(customDomain);
+      }
 
       resolve();
     }).catch((err: any) => {
@@ -454,7 +452,10 @@ moment.updateLocale('en', {
   }
 });
 
-$(() => {
+Promise.all([
+  $.ready,
+  $.get('/api/domain'),
+]).then(([ ready, { customDomain } ]) => {
   // set window error handler
   // ignore ResizeObserver error: https://stackoverflow.com/questions/49384120/resizeobserver-loop-limit-exceeded
   const resizeObserverLoopErrRe = /^ResizeObserver loop limit exceeded/;
@@ -511,7 +512,7 @@ $(() => {
         ? scoped
         : scoped
           // true => scope is derived from path
-          ? (vnode.attrs.scope?.toString() || 'edgeware') // XXXXX
+          ? (vnode.attrs.scope?.toString() || customDomain)
           // false => scope is null
           : null;
 
@@ -542,7 +543,7 @@ $(() => {
     },
   });
 
-  const isCustomDomain = true;
+  const isCustomDomain = !!customDomain;
   const activeAcct = app.user.activeAccount;
   m.route(document.body, '/', {
     // Sitewide pages
@@ -745,7 +746,7 @@ $(() => {
   }
 
   // initialize the app
-  initAppState().then(() => {
+  initAppState(true, customDomain).then(() => {
     // setup notifications and websocket if not already set up
     if (!app.socket) {
       let jwt;

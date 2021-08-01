@@ -60,7 +60,6 @@ export interface IApp {
   activeChainId(): string;
   activeCommunityId(): string;
   activeId(): string;
-  customDomainId(): string;
 
   toasts: ToastStore;
   modals: ModalStore;
@@ -81,9 +80,10 @@ export interface IApp {
   serverUrl(): string;
   loadingError: string;
 
+  _customDomainId: string;
   isCustomDomain(): boolean;
-  setIsCustomDomain(option: boolean): void;
-  _isCustomDomain: boolean;
+  customDomainId(): string;
+  setCustomDomain(d: string): void;
 
   _lastNavigatedBack: boolean;
   _lastNavigatedFrom: string;
@@ -125,9 +125,6 @@ const app: IApp = {
   activeChainId: () => app.chain?.id,
   activeCommunityId: () => app.community?.meta.id,
   activeId: () => app.community ? app.activeCommunityId() : app.activeChainId(),
-  customDomainId: () => {
-    return 'edgeware'; // XXXXX
-  },
 
   toasts: getToastStore(),
   modals: getModalStore(),
@@ -147,9 +144,10 @@ const app: IApp = {
 
   loadingError: null,
 
-  _isCustomDomain: false,
-  isCustomDomain: () => app._isCustomDomain,
-  setIsCustomDomain: (option: boolean) => { app._isCustomDomain = option; },
+  _customDomainId: null,
+  isCustomDomain: () => app._customDomainId !== null,
+  customDomainId: () => { return app._customDomainId; },
+  setCustomDomain: (d) => { app._customDomainId = d; },
 
   _lastNavigatedFrom: null,
   _lastNavigatedBack: false,
