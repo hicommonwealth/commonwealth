@@ -10,7 +10,7 @@ import smartTruncate from 'smart-truncate';
 
 const renderer = new marked.Renderer();
 renderer['link'] = (href, title, text) => {
-  return `<a target="_blank" href="${href}">${text}</a>`;
+  return `<a ${href.indexOf('://commonwealth.im/') !== -1 && 'target="_blank"'} href="${href}">${text}</a>`;
 };
 
 marked.setOptions({
@@ -18,7 +18,7 @@ marked.setOptions({
   gfm: true, // use github flavored markdown
   smartypants: true,
   smartLists: true,
-  xhtml: true
+  xhtml: true,
 });
 
 const MarkdownFormattedText : m.Component<{

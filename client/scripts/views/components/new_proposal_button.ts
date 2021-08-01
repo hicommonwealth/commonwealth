@@ -12,12 +12,25 @@ import { SubstrateAccount } from 'controllers/chain/substrate/account';
 
 export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]>, mobile?: boolean) => {
   const activeAccount = app.user.activeAccount;
+
+  const topics = app.topics.getByCommunity(app.activeId()).reduce((acc, current) => current.featuredInNewPost ? [...acc, current] : acc, []).sort((a, b) => a.name.localeCompare(b.name));
+
   return [
     m(MenuItem, {
       onclick: () => { m.route.set(`/${app.activeId()}/new/thread`); },
       label: 'New thread',
       iconLeft: mobile ? Icons.PLUS : undefined,
     }),
+    topics.map((t) => (
+      m(MenuItem, {
+        onclick: (e) => {
+          localStorage.setItem(`${app.activeId()}-active-topic`, t.name);
+          m.route.set(`/${app.chain.id}/new/thread`);
+        },
+        label: `New ${t.name} Thread`,
+        iconLeft: mobile ? Icons.PLUS : undefined,
+      })
+    )),
     (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
       && !mobile
       && m(MenuDivider),
@@ -56,6 +69,13 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
           type: ProposalType.SubstrateBountyProposal,
         }),
         label: 'New bounty proposal',
+        iconLeft: mobile ? Icons.PLUS : undefined,
+      }),
+      m(MenuItem, {
+        onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
+          type: ProposalType.SubstrateTreasuryTip,
+        }),
+        label: 'New tip',
         iconLeft: mobile ? Icons.PLUS : undefined,
       }),
     ],

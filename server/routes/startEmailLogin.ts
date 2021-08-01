@@ -1,7 +1,7 @@
 import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
 import {
-  SERVER_URL, SENDGRID_API_KEY, LOGIN_RATE_LIMIT_MINS, LOGIN_RATE_LIMIT_TRIES, MAGIC_SUPPORTED_BASES,
+  SENDGRID_API_KEY, LOGIN_RATE_LIMIT_MINS, LOGIN_RATE_LIMIT_TRIES, MAGIC_SUPPORTED_BASES,
   MAGIC_DEFAULT_CHAIN
 } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
@@ -19,6 +19,9 @@ export const Errors = {
 };
 
 const startEmailLogin = async (models, req: Request, res: Response, next: NextFunction) => {
+  const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+  const hostname = req.headers['x-forwarded-host'] || req.hostname;
+
   if (req.user && req.user.email) {
     return next(new Error(Errors.AlreadyLoggedIn));
   }
@@ -85,7 +88,8 @@ const startEmailLogin = async (models, req: Request, res: Response, next: NextFu
   // create and email the token
   const path = req.body.path;
   const tokenObj = await models.LoginToken.createForEmail(email, path);
-  const loginLink = `${SERVER_URL}/api/finishLogin?token=${tokenObj.token}&email=${encodeURIComponent(email)}`;
+
+  const loginLink = `${protocol}://${hostname}/api/finishLogin?token=${tokenObj.token}&email=${encodeURIComponent(email)}`;
   const msg = {
     to: email,
     from: 'Commonwealth <no-reply@commonwealth.im>',

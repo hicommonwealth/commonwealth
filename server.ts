@@ -53,16 +53,14 @@ async function main() {
   const SHOULD_RESET_DB = process.env.RESET_DB === 'true';
   const SHOULD_UPDATE_EVENTS = process.env.UPDATE_EVENTS === 'true';
   const SHOULD_UPDATE_BALANCES = process.env.UPDATE_BALANCES === 'true';
-  const SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS =
-    process.env.UPDATE_EDGEWARE_LOCKDROP_STATS === 'true';
+  const SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS = process.env.UPDATE_EDGEWARE_LOCKDROP_STATS === 'true';
 
-  const NO_CLIENT_SERVER =
-    process.env.NO_CLIENT === 'true' ||
-    SHOULD_SEND_EMAILS ||
-    SHOULD_RESET_DB ||
-    SHOULD_UPDATE_EVENTS ||
-    SHOULD_UPDATE_BALANCES ||
-    SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS;
+  const NO_CLIENT_SERVER = process.env.NO_CLIENT === 'true'
+    || SHOULD_SEND_EMAILS
+    || SHOULD_RESET_DB
+    || SHOULD_UPDATE_EVENTS
+    || SHOULD_UPDATE_BALANCES
+    || SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS;
 
   // CLI parameters used to configure specific tasks
   const SKIP_EVENT_CATCHUP = process.env.SKIP_EVENT_CATCHUP === 'true';
@@ -134,10 +132,7 @@ async function main() {
     // the specific chain to migrate
     log.info('Started migrating chain entities into the DB');
     try {
-      await migrateChainEntities(
-        models,
-        ENTITY_MIGRATION === 'all' ? undefined : ENTITY_MIGRATION
-      );
+      await migrateChainEntities(models, ENTITY_MIGRATION === 'all' ? undefined : ENTITY_MIGRATION);
       log.info('Finished migrating chain entities into the DB');
       rc = 0;
     } catch (e) {
@@ -161,10 +156,7 @@ async function main() {
       log.info('Finished migrating councillor and validator flags into the DB');
       rc = 0;
     } catch (e) {
-      log.error(
-        'Failed migrating councillor and validator flags into the DB: ',
-        e.message
-      );
+      log.error('Failed migrating councillor and validator flags into the DB: ', e.message);
       rc = 1;
     }
   }
@@ -177,23 +169,18 @@ async function main() {
   const WITH_PRERENDER = process.env.WITH_PRERENDER;
   const NO_PRERENDER = process.env.NO_PRERENDER || NO_CLIENT_SERVER;
 
-  const rollbar =
-    process.env.NODE_ENV === 'production' &&
-    new Rollbar({
-      accessToken: ROLLBAR_SERVER_TOKEN,
-      environment: process.env.NODE_ENV,
-      captureUncaught: true,
-      captureUnhandledRejections: true
-    });
+  const rollbar = process.env.NODE_ENV === 'production' && new Rollbar({
+    accessToken: ROLLBAR_SERVER_TOKEN,
+    environment: process.env.NODE_ENV,
+    captureUncaught: true,
+    captureUnhandledRejections: true,
+  });
 
   const compiler = DEV ? webpack(devWebpackConfig) : webpack(prodWebpackConfig);
   const SequelizeStore = SessionSequelizeStore(session.Store);
-  const devMiddleware =
-    DEV && !NO_CLIENT_SERVER
-      ? webpackDevMiddleware(compiler, {
-          publicPath: '/build'
-        })
-      : null;
+  const devMiddleware = (DEV && !NO_CLIENT_SERVER) ? webpackDevMiddleware(compiler, {
+    publicPath: '/build',
+  }) : null;
   const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
   const viewCountCache = new ViewCountCache(2 * 60, 10 * 60);
 
@@ -209,7 +196,7 @@ async function main() {
     db: models.sequelize,
     tableName: 'Sessions',
     checkExpirationInterval: 15 * 60 * 1000, // Clean up expired sessions every 15 minutes
-    expiration: 7 * 24 * 60 * 60 * 1000 // Set session expiration to 7 days
+    expiration: 7 * 24 * 60 * 60 * 1000, // Set session expiration to 7 days
   });
 
   sessionStore.sync();
@@ -218,7 +205,7 @@ async function main() {
     secret: SESSION_SECRET,
     store: sessionStore,
     resave: false,
-    saveUninitialized: true
+    saveUninitialized: true,
   });
 
   const setupMiddleware = () => {
@@ -233,21 +220,10 @@ async function main() {
     });
 
     // redirect to https:// unless we are using a test domain
-    app.use(
-      redirectToHTTPS(
-        DEV
-          ? [
-              /gov.edgewa.re:(\d{4})/,
-              /gov2.edgewa.re:(\d{4})/,
-              /gov3.edgewa.re:(\d{4})/,
-              /localhost:(\d{4})/,
-              /127.0.0.1:(\d{4})/
-            ]
-          : [/localhost:(\d{4})/, /127.0.0.1:(\d{4})/],
-        [],
-        301
-      )
-    );
+    app.use(redirectToHTTPS([
+      /localhost:(\d{4})/,
+      /127.0.0.1:(\d{4})/
+    ], [], 301));
 
     // serve the compiled app
     if (!NO_CLIENT_SERVER) {
@@ -289,6 +265,7 @@ async function main() {
   })();
 
   const sendFile = (res) => res.sendFile(`${__dirname}/build/index.html`);
+
 
   // Only run prerender in DEV environment if the WITH_PRERENDER flag is provided.
   // On the other hand, run prerender by default on production.

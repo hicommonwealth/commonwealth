@@ -1,0 +1,76 @@
+@import 'client/styles/shared';
+
+.TipDetailPage {
+  display: flex;
+  padding: 24px 12px;
+
+  .contribute {
+    margin-bottom: 64px;
+  }
+
+  .title {
+    font-size: 32px;
+    font-weight: 500;
+    margin-bottom: 32px;
+  }
+
+  .proposal-page-row {
+    margin-bottom: 18px;
+  }
+
+  .denominator {
+    background: linear-gradient(239.17deg, #E1EBFF 27.75%, #FBDAFF 82.04%);
+    border-radius: 4px;
+    padding: 4px 6px 0;
+    margin-right: 12px;
+  }
+
+  .tip-details {
+    width: 65%;
+    flex: 1 1 auto;
+
+    .label {
+      font-weight: 600;
+      padding-bottom: 8px;
+    }
+
+    .tip-reason {
+      width: 75%;
+    }
+
+    .amount {
+      display: flex;
+      align-items: center;
+    }
+  }
+
+  .tip-contributions {
+    width: 35%;
+    flex: 1 1 auto;
+
+    .mb-12 {
+      margin-bottom: 12px;
+    }
+
+    .label {
+      font-weight: 600;
+    }
+
+    .contributors {
+      margin-bottom: 32px;
+    }
+
+    .contributors-row {
+      display: flex;
+      margin-bottom: 18px;
+      overflow: hidden;
+
+      .amount {
+        flex: 0 0 30%;
+        margin-right: 12px;
+        display: flex;
+        align-items: center;
+      }
+    }
+  }
+}

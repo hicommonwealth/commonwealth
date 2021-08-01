@@ -3,7 +3,7 @@ import 'modals/new_topic_modal.scss';
 import m from 'mithril';
 import app from 'state';
 import $ from 'jquery';
-import { Button, Input, Form, FormGroup, FormLabel } from 'construct-ui';
+import { Button, Input, Form, FormGroup, FormLabel, Checkbox } from 'construct-ui';
 
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { CompactModalExitButton } from 'views/modal';
@@ -12,22 +12,26 @@ interface INewTopicModalForm {
   id: number,
   name: string,
   description: string,
+  featured_in_sidebar: boolean,
+  featured_in_new_post: boolean,
 }
 
 const NewTopicModal: m.Component<{
   id: number,
   name: string,
   description: string,
+  featured_in_sidebar: boolean,
+  featured_in_new_post: boolean,
 }, {
   error: any,
   form: INewTopicModalForm,
   saving: boolean,
 }> = {
   view: (vnode) => {
-    if (!app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })) return null;
-    const { id, name, description } = vnode.attrs;
+    if (!app.user.isSiteAdmin && !app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })) return null;
+    const { id, name, description, featured_in_sidebar, featured_in_new_post } = vnode.attrs;
     if (!vnode.state.form) {
-      vnode.state.form = { id, name, description };
+      vnode.state.form = { id, name, description, featured_in_sidebar, featured_in_new_post };
     }
 
     return m('.NewTopicModal', [
@@ -67,6 +71,24 @@ const NewTopicModal: m.Component<{
               }
             }),
           ]),
+          m(FormGroup, [
+            m(Checkbox, {
+              label: 'Featured in Sidebar',
+              checked: vnode.state.form.featured_in_sidebar,
+              onchange: (e) => {
+                vnode.state.form.featured_in_sidebar = !vnode.state.form.featured_in_sidebar;
+              },
+            }),
+          ]),
+          m(FormGroup, [
+            m(Checkbox, {
+              label: 'Featured in New Post',
+              checked: vnode.state.form.featured_in_new_post,
+              onchange: (e) => {
+                vnode.state.form.featured_in_new_post = !vnode.state.form.featured_in_new_post;
+              },
+            }),
+          ]),
           m(Button, {
             intent: 'primary',
             disabled: vnode.state.saving,
@@ -75,7 +97,7 @@ const NewTopicModal: m.Component<{
               e.preventDefault();
               if (!vnode.state.form.name.trim()) return;
               app.topics.add(
-                vnode.state.form.name, vnode.state.form.description, null,
+                vnode.state.form.name, vnode.state.form.description, null, vnode.state.form.featured_in_sidebar, vnode.state.form.featured_in_new_post
               ).then(() => {
                 vnode.state.saving = false;
                 m.redraw();

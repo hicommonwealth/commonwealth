@@ -85,6 +85,11 @@ export const TopicEditorMenuItem: m.Component<{ openTopicEditor: Function }, { i
 export const StageEditorMenuItem: m.Component<{ openStageEditor: Function }, { isOpen: boolean }> = {
   view: (vnode) => {
     const { openStageEditor } = vnode.attrs;
+
+    if (!app.chain?.meta?.chain && !app.community?.meta) return;
+    const { stagesEnabled } = app.chain?.meta?.chain || app.community?.meta;
+    if (!stagesEnabled) return;
+
     return m('.StageEditorMenuItem', [
       m(MenuItem, {
         fluid: true,
