@@ -17,6 +17,9 @@
       "queues": {
         "eventsQueue": {
           "assert": true
+        },
+        "identityQueue": {
+          "assert": true
         }
       },
       "bindings": {
@@ -25,6 +28,12 @@
           "destination": "eventsQueue",
           "destinationType": "queue",
           "bindingKey": "eQueue"
+        },
+        "identityBinding": {
+          "source": "eventsExchange",
+          "destination": "identityQueue",
+          "destinationType": "queue",
+          "bindingKey": "iQueue"
         }
       },
       "publications": {
@@ -33,12 +42,23 @@
           "queue": "eventsQueue",
           "confirm": true,
           "timeout": 10000
+        },
+        "identityPub": {
+          "vhost": "/",
+          "queue": "identityQueue",
+          "confirm": true,
+          "timeout": 10000
         }
       },
       "subscriptions": {
         "eventsSub": {
           "vhost": "/",
           "queue":"eventsQueue",
+          "contentType": "application/json"
+        },
+        "identitySub": {
+          "vhost": "/",
+          "queue":"identityQueue",
           "contentType": "application/json"
         }
       }

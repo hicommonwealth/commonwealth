@@ -7,7 +7,8 @@ import {
   CWEvent,
 } from '@commonwealth/chain-events';
 
-import { RabbitMqIdentityConfig, RabbitMqDefaultConfig } from 'ce-rabbitmq-plugin';
+import { RabbitMqDefaultConfig } from 'ce-rabbitmq-plugin';
+import IQRbbtConfig from '../util/rabbitmq/WithIdentityQueueConfig.json'
 
 import { HANDLE_IDENTITY } from '../config';
 
@@ -19,6 +20,7 @@ import EventStorageHandler, {
 import EventNotificationHandler from '../eventHandlers/notifications';
 import EntityArchivalHandler from '../eventHandlers/entityArchival';
 import IdentityHandler from '../eventHandlers/identity';
+import pgIdentity from '../eventHandlers/pgIdentity';
 import UserFlagsHandler from '../eventHandlers/userFlags';
 import ProfileCreationHandler from '../eventHandlers/profileCreation';
 import models, { sequelize } from '../database';
@@ -26,7 +28,12 @@ import { constructSubstrateUrl } from '../../shared/substrate';
 import { factory, formatFilename } from '../../shared/logging';
 import { ChainNodeInstance } from '../models/chain_node';
 import { Consumer } from '../util/rabbitmq/consumer';
+import { Pool } from 'pg';
 
+export const DATABASE_URI =
+  !process.env.DATABASE_URL || process.env.NODE_ENV === 'development'
+    ? 'postgresql://commonwealth:edgeware@localhost/commonwealth'
+    : process.env.DATABASE_URL;
 const log = factory.getLogger(formatFilename(__filename));
 
 // emit globally any transfer over 1% of total issuance
@@ -77,16 +84,26 @@ const setupChainEventListeners = async (
   chains: string[] | 'all' | 'none',
   skipCatchup?: boolean
 ): Promise<{}> => {
+  const pool = new Pool({
+    connectionString: DATABASE_URI
+  });
+
+  pool.on('error', (err, client) => {
+    console.error('Unexpected error on idle client', err);
+    // TODO: handle this
+  });
+
   const queryNode = (c: string): Promise<ChainNodeInstance> =>
     _models.ChainNode.findOne({
-      where: { chain: c },
-      include: [
-        {
-          model: _models.Chain,
-          where: { active: true },
-          required: true
-        }
-      ]
+      where: { chain: c }
+      //TODO: the below code cause the node to not be found
+      // include: [
+      //   {
+      //     model: _models.Chain,
+      //     where: { active: true },
+      //     required: true
+      //   }
+      // ]
     });
   log.info('Fetching node urls...');
   await sequelize.authenticate();
@@ -177,24 +194,14 @@ const setupChainEventListeners = async (
   // Create instances of all the handlers needed to process the events we want from the queue
   const handlers: { [key: string]: IEventHandler[] } = {};
   nodes.forEach((node) => {
-    if (chainSupportedBy(node.chain, SubstrateTypes.EventChains)) {
-      const excludedEvents = [
-        SubstrateTypes.EventKind.Reward,
-        SubstrateTypes.EventKind.TreasuryRewardMinting,
-        SubstrateTypes.EventKind.TreasuryRewardMintingV2,
-        SubstrateTypes.EventKind.HeartbeatReceived
-      ];
-      handlers[node.chain] = generateHandlers(node, { excludedEvents });
-    } else {
-      handlers[node.chain] = generateHandlers(node);
-    }
+    handlers[node.chain] = generateHandlers(node);
   });
 
   // feed the events into their respective handlers
   async function processClassicEvents(event: CWEvent): Promise<void> {
     const eventHandlers = handlers[event.chain];
     if (eventHandlers === undefined || eventHandlers === null) {
-      log.info(`Processing events from ${event.chain} is not enabled`);
+      log.info(`There are no event handlers for ${event.chain}`);
       return;
     }
     let prevResult = null;
@@ -210,9 +217,9 @@ const setupChainEventListeners = async (
 
   const identityHandlers: { [key: string]: IEventHandler } = {};
   async function processIdentityEvents(event: CWEvent): Promise<void> {
-    log.info(`>>>>>>>>>>>>>>>>>Handling identity event: ${event}`);
     if (!identityHandlers[event.chain])
-      identityHandlers[event.chain] = new IdentityHandler(_models, event.chain);
+      identityHandlers[event.chain] = new pgIdentity(event.chain, pool)
+      // identityHandlers[event.chain] = new IdentityHandler(_models, event.chain);
 
     const handler = identityHandlers[event.chain];
     try {
@@ -222,25 +229,26 @@ const setupChainEventListeners = async (
     }
   }
 
+  let eventsSubscriber, identitySubscriber;
   let rbbtMqConfig =
-    HANDLE_IDENTITY === 'publish' ? './WithIdentityQueueConfig.json' : null;
-  const consumer = new Consumer(getRabbitMQConfig(rbbtMqConfig));
+    HANDLE_IDENTITY === 'publish' ? IQRbbtConfig : RabbitMqDefaultConfig;
+  const consumer = new Consumer(rbbtMqConfig);
   await consumer.init();
 
-  const eventsSubscriber = await consumer.consumeEvents(
+  eventsSubscriber = await consumer.consumeEvents(
     processClassicEvents,
     'eventsSub'
   );
 
   if (HANDLE_IDENTITY === 'publish') {
-    const identitySubscriber = await consumer.consumeEvents(
+    identitySubscriber = await consumer.consumeEvents(
       processIdentityEvents,
       'identitySub'
     );
   }
 
-  if (process.env.TESTING) process.send("consumer started")
-  return {};
+  console.log('consumer started')
+  return {eventsSubscriber, identitySubscriber};
 };
 
 const SKIP_EVENT_CATCHUP = process.env.SKIP_EVENT_CATCHUP === 'true';
@@ -255,9 +263,12 @@ if (!process.env.RUN_AS_LISTENER) {
     chains = CHAIN_EVENTS.split(',');
   }
 
+  let subs
   try {
     log.info('Starting listener process');
-    setupChainEventListeners(models, null, chains, SKIP_EVENT_CATCHUP);
+    setupChainEventListeners(models, null, chains, SKIP_EVENT_CATCHUP).then((subscribers) => {
+      subs = subscribers
+    })
   } catch (e) {
     console.error(`Chain event listener setup failed: ${e.message}`);
   }

@@ -12,8 +12,9 @@ import {
 } from '@commonwealth/chain-events';
 import {
   RabbitMqHandler,
-  getRabbitMQConfig
+  RabbitMqDefaultConfig
 } from 'ce-rabbitmq-plugin';
+import IQRbbtConfig from '../util/rabbitmq/WithIdentityQueueConfig.json'
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -32,6 +33,11 @@ export const HANDLE_IDENTITY =
 // The number of minutes to wait between each run -- rounded to the nearest whole number
 export const REPEAT_TIME = Math.round(Number(process.env.REPEAT_TIME)) || 10;
 
+
+async function handleFatalError(error: Error, chain?: string, type?: string): Promise<void> {
+  log.error(String(error));
+}
+
 // stores all the listeners a dbNode has active
 const listeners: { [key: string]: any} = {};
 // TODO: skipCatchup behavior fix?
@@ -47,7 +53,7 @@ async function mainProcess(producer: RabbitMqHandler) {
     // TODO: handle this
   });
 
-  let query = `SELECT "Chains"."id", "substrate_spec", "url", "address", "base", "ChainNodes"."chain" FROM "Chains" JOIN "ChainNodes" ON "Chains"."id"="ChainNodes"."chain" WHERE "Chains"."has_chain_events_listener"='true';`;
+  let query = `SELECT "Chains"."id", "substrate_spec", "url", "address", "base" FROM "Chains" JOIN "ChainNodes" ON "Chains"."id"="ChainNodes"."chain" WHERE "Chains"."has_chain_events_listener"='true';`;
 
   const allChains = (await pool.query(query)).rows;
   const myChainData = allChains.filter(
@@ -65,31 +71,27 @@ async function mainProcess(producer: RabbitMqHandler) {
 
   // initialize listeners first (before dealing with identity)
   for (const chain of myChainData) {
-    // start listeners that aren't already active
+    // start listeners that aren't already active - this means for any duplicate chain nodes
+    // it will start a listener for the first successful chain node url in the db
     if (!listeners[chain.id]) {
       log.info(`Starting listener for ${chain.id}...`);
-      //TODO: discuss Marlin contract addresses (only 1 is present in db)
-
-      listeners[chain.id] = await createListener(chain.id, {
-        MolochContractVersion: 2,
-        MolochContractAddress: chain.address,
-        MarlinContractAddress: {
-          comp: '0xEa2923b099b4B588FdFAD47201d747e3b9599A5f', // TESTNET
-          governorAlpha: '0xeDAA76873524f6A203De2Fa792AD97E459Fca6Ff', // TESTNET
-          timelock: '0x7d89D52c464051FcCbe35918cf966e2135a17c43', // TESTNET
-        },
-        archival: false,
-        url: chain.url,
-        spec: chain.substrate_spec,
-        skipCatchup: false,
-        verbose: false,
-        enricherConfig: { balanceTransferThresholdPermill: 1_000 },// 0.1% of total issuance
-      },
-        true,
-        chain.base
+      try {
+        listeners[chain.id] = await createListener(chain.id, {
+            Erc20TokenAddresses: [chain.address],
+            archival: false,
+            url: chain.url,
+            spec: chain.substrate_spec,
+            skipCatchup: false,
+            verbose: false,
+            enricherConfig: { balanceTransferThresholdPermill: 1_000 },// 0.1% of total issuance
+          },
+          true,
+          chain.base
         );
-
-
+      } catch (error) {
+        await handleFatalError(error, chain, 'listener-startup');
+        continue;
+      }
 
       // if chain is a substrate chain add the excluded events
       let excludedEvents = [];
@@ -107,17 +109,23 @@ async function mainProcess(producer: RabbitMqHandler) {
         excludedEvents
       };
 
-      // subscribe to the chain to begin listening for events
-      await listeners[chain.id].subscribe();
+      try {
+        // subscribe to the chain to begin listening for events
+        await listeners[chain.id].subscribe();
+      } catch (error) {
+        await handleFatalError(error, chain.id, 'listener-subscribe')
+      }
     }
     // restart the listener if specs were updated (only substrate chains)
-    else {
-      if (
-        chain.base == 'substrate' &&
-        !_.isEqual(chain.spec, (<SubstrateListener>listeners[chain.id]).options.spec)
-      ) {
-        log.info(`Spec for ${chain} changed... restarting listener`);
+    else if (
+      chain.base == 'substrate' &&
+      !_.isEqual(chain.spec, (<SubstrateListener>listeners[chain.id]).options.spec)
+    ) {
+      log.info(`Spec for ${chain} changed... restarting listener`);
+      try {
         await (<SubstrateListener>listeners[chain.id]).updateSpec(chain.spec);
+      } catch (error) {
+        await handleFatalError(error, chain.id, 'update-spec')
       }
     }
   }
@@ -136,27 +144,43 @@ async function mainProcess(producer: RabbitMqHandler) {
   // loop through chains again this time dealing with identity
   for (const chain of myChainData) {
     // skip chains that aren't Substrate chains
-    if (!chainSupportedBy(chain.id, SubstrateTypes.EventChains)) continue;
+    if (chain.base != 'substrate') continue;
 
     log.info(`Fetching identities on ${chain.id}`);
-    // fetch identities to fetch on this chain
-    query = format(
-      `SELECT * FROM "IdentityCaches" WHERE "chain"=%L;`,
-      chain.id
-    );
-    const identitiesToFetch = (await pool.query(query)).rows.map(
-      (c) => c.address
-    );
+
+    let identitiesToFetch;
+    try {
+      // fetch identities to fetch on this chain
+      query = format(
+        `SELECT * FROM "IdentityCaches" WHERE "chain"=%L;`,
+        chain.id
+      );
+      identitiesToFetch = (await pool.query(query)).rows.map(
+        (c) => c.address
+      );
+    } catch (error) {
+      await handleFatalError(error, chain.id, 'get-identity-cache');
+      continue;
+    }
+
 
     // if no identities are cached go to next chain
     if (identitiesToFetch.length == 0) {
       log.info(`No identities to fetch for ${chain.id}`);
       continue;
     }
-    // get identity events using the storage fetcher
-    let identityEvents = await listeners[
-      chain.id
-    ].storageFetcher.fetchIdentities(identitiesToFetch);
+
+    let identityEvents;
+    try {
+      // get identity events using the storage fetcher
+      identityEvents = await listeners[
+        chain.id
+        ].storageFetcher.fetchIdentities(identitiesToFetch);
+    } catch (error) {
+      await handleFatalError(error, chain.id, 'fetch-chain-identities');
+      continue;
+    }
+
 
     // if no identity events are found the go to next chain
     if (identityEvents.length == 0) {
@@ -178,8 +202,14 @@ async function mainProcess(producer: RabbitMqHandler) {
       }
     }
 
-    query = format(`DELETE FROM "IdentityCaches" WHERE "chain"=%L;`, chain.id);
-    await pool.query(query);
+    // clear the identity cache for this chain
+    try {
+      query = format(`DELETE FROM "IdentityCaches" WHERE "chain"=%L;`, chain.id);
+      await pool.query(query);
+    } catch (error) {
+      await handleFatalError(error, chain.id, 'clear-identity-cache');
+      continue;
+    }
 
     log.info(`Identity cache for ${chain.id} cleared`);
   }
@@ -199,8 +229,8 @@ log.info('db-node initialization');
 
 // if we need to publish identity events to a queue use the appropriate config file
 let rbbtMqConfig =
-  HANDLE_IDENTITY == 'publish' ? './WithIdentityQueueConfig.json' : null;
-const producer = new RabbitMqHandler(getRabbitMQConfig(rbbtMqConfig));
+  HANDLE_IDENTITY == 'publish' ? IQRbbtConfig : RabbitMqDefaultConfig;
+const producer = new RabbitMqHandler(rbbtMqConfig);
 producer
   .init()
   .then(() => {
@@ -208,7 +238,11 @@ producer
   })
   .then(() => {
     setInterval(mainProcess, REPEAT_TIME * 60000, producer);
-  });
+  })
+  .catch((err) => {
+    // TODO: any error caught here is critical - no events will be produced
+    handleFatalError(err, null, 'unknown');
+  })
 
 // export async function getTokenLists() {
 //   let data: any = await Promise.all(

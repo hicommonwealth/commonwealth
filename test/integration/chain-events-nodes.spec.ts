@@ -1,35 +1,15 @@
 import chai from 'chai';
-import path from 'path';
-const { assert } = chai;
-import { spawn } from 'child_process';
-import _ from 'underscore';
-import { Pool } from 'pg';
+import { spawn, ChildProcess } from 'child_process';
+import { Pool, Client } from 'pg';
 import format from 'pg-format';
-import { chainSupportedBy, SubstrateTypes } from '@commonwealth/chain-events';
+import fetch from 'node-fetch'
 
+const { assert } = chai;
 
-// TODO populate this with the number of identities we are populating in the identity cache for each chain
-const numIdentityCache = {
-  polkadot: 1,
-  edgeware: 1,
-  kusama: 1,
-  hydradx: 1,
+// only chains in this array will be tested (can be augmented to pull all chains in db)
+const supportedChains = ['polkadot']
 
-}
-
-const identityQueries = [
-  `INSERT INTO "Addresses" (address, chain, verification_token, created_at, updated_at, is_councillor, is_validator, is_magic) 
-VALUES ('1629Shw6w88GnyXyyUbRtX7YFipQnjScGKcWr1BaRiMhvmAg', 'polkadot', '1', '2020-05-01', '20-05-01', DEFAULT, DEFAULT, DEFAULT);`,
-    `INSERT INTO "Addresses" (address, chain, verification_token, created_at, updated_at, is_councillor, is_validator, is_magic)
-VALUES ('hwR8hAatmmdupBLXQSxLUPBa8GhRomLD9hf6iRtFeXs8fcY', 'edgeware', '1', '2020-05-01', '20-05-01', DEFAULT, DEFAULT, DEFAULT);`,
-  `INSERT INTO "Addresses" (address, chain, verification_token, created_at, updated_at, is_councillor, is_validator, is_magic)
-VALUES ('J9nD3s7zssCX7bion1xctAF6xcVexcpy2uwy4jTm9JL8yuK', 'kusama', '1', '2020-05-01', '20-05-01', DEFAULT, DEFAULT, DEFAULT);`,
-  `INSERT INTO "Addresses" (address, chain, verification_token, created_at, updated_at, is_councillor, is_validator, is_magic)
-VALUES ('HqdGVRB4MXz1osLR77mfWoo536cWasTYsuAbVuicHdiKQXf', 'hydradx', '1', '2020-05-01', '20-05-01', DEFAULT, DEFAULT, DEFAULT);`,
-  `INSERT INTO "Addresses" (address, chain, verification_token, created_at, updated_at, is_councillor, is_validator, is_magic)
-VALUES ('2cRhzxw34v2yB8rdP35wB5vkkJe3f4pCSgCbzRmapzv7hWK9', 'kulupu', '1', '2020-05-01', '20-05-01', DEFAULT, DEFAULT, DEFAULT);`,
-]
-
+// fetched identity should match the identities in this object
 const fetchedIdentities = {
   polkadot: {
     address: '1629Shw6w88GnyXyyUbRtX7YFipQnjScGKcWr1BaRiMhvmAg',
@@ -38,75 +18,21 @@ const fetchedIdentities = {
     data: null
   },
   edgeware: {
-    address: 'hwR8hAatmmdupBLXQSxLUPBa8GhRomLD9hf6iRtFeXs8fcY',
-    identity: "Drew"
+    address: 'kc9xgozPze2cvTDgnto1Ad497MJQPKm1eMozr5QsS7A9Uic',
+    identity: "Bison Trail 8" //Co.
   },
   kusama: {
-    address: 'J9nD3s7zssCX7bion1xctAF6xcVexcpy2uwy4jTm9JL8yuK',
-    identity: 'Jaco'
+    address: 'Etj64GQ5Mzm98HijdnvqjxMyK8xemPtLTpWdnwEiEvFygJa',
+    identity: 'Dan Reecer'
   },
   hydradx: {
     address: 'HqdGVRB4MXz1osLR77mfWoo536cWasTYsuAbVuicHdiKQXf',
     identity: 'GalacticCouncil'
   },
   kulupu: {
-    address: '2cRhzxw34v2yB8rdP35wB5vkkJe3f4pCSgCbzRmapzv7hWK9',
-    identity: 'sgaragagghu'
+    address: '2f6TZDnK1sfCwkZkE69Xq6yRxnqbhw8qajwhWSzrv9gkPeTL',
+    identity: 'Dan'
   }
-
-}
-
-async function populateIdentityCache(pool): Promise<void> {
-  for (const query of identityQueries) {
-    try {
-      await pool.query(query)
-    } catch (error) {
-      if (String(error).includes('duplicate key')) continue;
-      console.log(`Error executing the following query: ${query}`)
-      throw error
-    }
-  }
-}
-
-async function verifyIdentityChanges(pool, chain: string): Promise<boolean> {
-  let query = format(`SELECT "id", "address" FROM "Addresses" WHERE "address"=%L`,
-    fetchedIdentities[chain].address);
-  const id = (await pool.query(query)).rows[0].id;
-
-  query = format(`SELECT "identity" FROM "OffchainProfiles" WHERE "address_id"=%L`, id);
-  const identity = (await pool.query(query)).rows[0].address_id;
-
-  return identity == fetchedIdentities[chain].identity;
-}
-
-function delay(interval) {
-  return it('delaying...', (done) => {
-    setTimeout(() => done(), interval);
-  }).timeout(interval + 100);
-}
-
-async function getChains(pool): Promise<[{id: string, url: string, substrate_spec: string}]> {
-  const query = `SELECT "Chains"."id", "substrate_spec", "url" FROM "Chains" JOIN "ChainNodes" ON "Chains"."id"="ChainNodes"."chain" WHERE "Chains"."has_chain_events_listener"='true';`;
-  return (await pool.query(query)).rows
-}
-
-const listenerUrls = {
-  polkadot: 'wss://rpc.polkadot.io',
-  edgeware: 'ws://mainnet2.edgewa.re:9944',
-  kusama: 'wss://kusama-rpc.polkadot.io',
-  hydradx: 'wss://rpc-01.snakenet.hydradx.io',
-  kulupu: 'wss://rpc.kulupu.corepaper.org/ws',
-  clover: 'ws://api.clover.finance',
-  stafi: 'wss://scan-rpc.stafi.io/ws',
-  near: 'https://rpc.nearprotocol.com',
-  moloch: 'wss://mainnet.infura.io/ws',
-  plasm: 'wss://rpc.plasmnet.io/ws',
-  crust: 'wss://api.crust.network/',
-  darwinia: 'wss://cc1.darwinia.network/ws',
-  phala: 'wss://poc3.phala.com/ws',
-  centrifuge: 'wss://fullnode.centrifuge.io',
-  marlin: 'wss://mainnet.infura.io/ws',
-  'alex-ropsten': 'wss://ropsten.infura.io/ws'
 }
 
 // list all the listeners we want to test and their associated settings
@@ -115,7 +41,7 @@ const listenerOptions = {
   polkadot: {
     archival: false,
     startBlock: 0,
-    url: listenerUrls['polkadot'],
+    url: 'wss://rpc.polkadot.io',
     spec: {},
     skipCatchup: false,
     enricherConfig: { balanceTransferThresholdPermill: 1_000 }
@@ -123,7 +49,7 @@ const listenerOptions = {
   edgeware: {
     archival: false,
     startBlock: 0,
-    url: listenerUrls['edgeware'],
+    url: 'ws://mainnet2.edgewa.re:9944',
     spec: {"types": {"Address": "MultiAddress", "ChainId": "u8", "Reveals": "Vec<(AccountId, Vec<VoteOutcome>)>", "Balance2": "u128", "VoteData": {"stage": "VoteStage", "initiator": "AccountId", "vote_type": "VoteType", "tally_type": "TallyType", "is_commit_reveal": "bool"}, "VoteType": {"_enum": ["Binary", "MultiOption", "RankedChoice"]}, "TallyType": {"_enum": ["OnePerson", "OneCoin"]}, "VoteStage": {"_enum": ["PreVoting", "Commit", "Voting", "Completed"]}, "ResourceId": "[u8; 32]", "VoteRecord": {"id": "u64", "data": "VoteData", "reveals": "Reveals", "outcomes": "Vec<VoteOutcome>", "commitments": "Commitments"}, "AccountInfo": "AccountInfoWithRefCount", "Commitments": "Vec<(AccountId, VoteOutcome)>", "VoteOutcome": "[u8; 32]", "VotingTally": "Option<Vec<(VoteOutcome, u128)>>", "DepositNonce": "u64", "LookupSource": "MultiAddress", "ProposalTitle": "Bytes", "ProposalVotes": {"staus": "ProposalStatus", "expiry": "BlockNumber", "votes_for": "Vec<AccountId>", "votes_against": "Vec<AccountId>"}, "ProposalRecord": {"index": "u32", "stage": "VoteStage", "title": "Text", "author": "AccountId", "vote_id": "u64", "contents": "Text", "transition_time": "u32"}, "ProposalStatus": {"_enum": ["Initiated", "Approved", "Rejected"]}, "ProposalContents": "Bytes"}},
     skipCatchup: false,
     enricherConfig: { balanceTransferThresholdPermill: 1_000 }
@@ -131,7 +57,7 @@ const listenerOptions = {
   kusama: {
     archival: false,
     startBlock: 0,
-    url: listenerUrls['kusama'],
+    url: 'wss://kusama-rpc.polkadot.io',
     spec: {},
     skipCatchup: false,
     enricherConfig: { balanceTransferThresholdPermill: 1_000 }
@@ -139,7 +65,7 @@ const listenerOptions = {
   kulupu: {
     archival: false,
     startBlock: 0,
-    url: listenerUrls['kulupu'],
+    url: 'wss://rpc.kulupu.corepaper.org/ws',
     spec: {"typesBundle": {"spec": {"kulupu": {"types": [{"types": {"Era": {"finalBlockHash": "H256", "finalStateRoot": "H256", "genesisBlockHash": "H256"}, "CurvePoint": {"start": "BlockNumber", "reward": "Balance", "taxation": "Perbill"}, "Difficulty": "U256", "DifficultyAndTimestamp": {"timestamp": "Moment", "difficulty": "Difficulty"}}, "minmax": [0, null]}, {"types": {"Address": "MultiAddress", "LookupSource": "MultiAddress"}, "minmax": [13, null]}, {"types": {"CampaignIdentifier": "[u8; 4]"}, "minmax": [17, null]}]}}}},
     skipCatchup: false,
     enricherConfig: { balanceTransferThresholdPermill: 1_000 }
@@ -147,29 +73,114 @@ const listenerOptions = {
   hydradx: {
     archival: false,
     startBlock: 0,
-    url: listenerUrls['hydradx'],
+    url: 'wss://rpc-01.snakenet.hydradx.io',
     spec: null,
     skipCatchup: false,
     enricherConfig: { balanceTransferThresholdPermill: 1_000 },
   },
   moloch: {
-    url: listenerUrls['moloch'],
+    url: 'wss://mainnet.infura.io/ws',
     skipCatchup: false,
     contractAddress: '0x1fd169A4f5c59ACf79d0Fd5d91D1201EF1Bce9f1',
     contractVersion: 2
   },
   marlin: {
-    url: listenerUrls['marlin'],
+    url: 'wss://mainnet.infura.io/ws',
     skipCatchup: false,
     contractAddresses: {
       comp: '0xEa2923b099b4B588FdFAD47201d747e3b9599A5f', // TESTNET
       governorAlpha: '0xeDAA76873524f6A203De2Fa792AD97E459Fca6Ff', // TESTNET
       timelock: '0x7d89D52c464051FcCbe35918cf966e2135a17c43', // TESTNET
     }
+  },
+  susd: {
+    url: "wss://mainnet.infura.io/ws",
+    tokenAddresses: ["0x57ab1ec28d129707052df4df418d58a2d46d5f51"]
   }
 }
 
+// clears the IdentityCaches, OffchainProfiles, and Addresses tables of the test data
+async function clearDB(pool) {
+  const addresses = Object.values(fetchedIdentities).map(value => value.address)
 
+  let query;
+  try {
+    // clear identity cache
+    query = format(`DELETE FROM "IdentityCaches" WHERE "address" IN (%L)`, addresses);
+    await pool.query(query);
+
+    // clear OffchainProfiles
+    query = format(`SELECT "id" FROM "Addresses" WHERE "address" IN (%L)`, addresses)
+    const IDs = (await pool.query(query)).rows.map(obj => obj.id);
+    query = format(`DELETE FROM "OffchainProfiles" WHERE "address_id" IN (%L)`, IDs);
+    await pool.query(query)
+
+    // clear Addresses
+    query = format(`DELETE FROM "Addresses" WHERE "address" IN (%L)`, addresses);
+    await pool.query(query)
+  } catch (error) {
+    console.log(query);
+    throw error
+  }
+}
+
+// clears the rabbitmq events and identity queues
+async function clearQueues(): Promise<void> {
+  let res = await fetch('http://localhost:15672/api/queues/%2F/identityQueue/contents', {
+    'method': 'DELETE',
+    'headers': {
+      'Authorization': 'Basic Z3Vlc3Q6Z3Vlc3Q='
+    }
+  })
+  if (res.status != 204) throw new Error("Could not clear the identity queue")
+
+  res = await fetch('http://localhost:15672/api/queues/%2F/eventsQueue/contents', {
+    'method': 'DELETE',
+    'headers': {
+      'Authorization': 'Basic Z3Vlc3Q6Z3Vlc3Q='
+    }
+  })
+  if (res.status != 204) throw new Error("Could not clear the events queue")
+}
+
+// populates the Address, OffchainProfiles, and IdentityCaches tables with test data
+async function prepareDB(client): Promise<void> {
+  let query
+  try {
+    for (const [chain, data] of Object.entries(fetchedIdentities)) {
+      query = format(`INSERT INTO "Addresses" (address, chain, verification_token, created_at, updated_at, is_councillor, is_validator, is_magic) VALUES (%L, %L, '1', '2020-05-01', '20-05-01', DEFAULT, DEFAULT, DEFAULT)`,
+        data.address, chain);
+      await client.query(query);
+
+      query = `INSERT INTO "OffchainProfiles" (address_id) VALUES (lastval())`
+      await client.query(query);
+
+      query = format(`INSERT INTO "IdentityCaches" (chain, address) VALUES (%L, %L)`, chain, data.address)
+      await client.query(query);
+    }
+  } catch (error) {
+    console.log('Error executing:', query);
+    throw error;
+  }
+
+  return;
+}
+
+async function verifyIdentityChanges(pool, chain: string): Promise<boolean> {
+  let query = format(`SELECT "id", "address" FROM "Addresses" WHERE "address"=%L`,
+    fetchedIdentities[chain].address);
+  const id = (await pool.query(query)).rows[0].id;
+
+  query = format(`SELECT "identity" FROM "OffchainProfiles" WHERE "address_id"=%L`, id);
+  const identity = (await pool.query(query)).rows[0].identity;
+
+  return identity == fetchedIdentities[chain].identity;
+}
+
+async function getChains(pool): Promise<[{id: string, url: string, substrate_spec: string, base: string}]> {
+  const query = `SELECT "Chains"."id", "substrate_spec", "url", "base" FROM "Chains" JOIN "ChainNodes" ON "Chains"."id"="ChainNodes"."chain" WHERE "Chains"."has_chain_events_listener"='true';`;
+  return (await pool.query(query)).rows
+}
 
 function verifyListener(chains: string[], listeners: any) {
   for (const chain of chains) {
@@ -179,141 +190,204 @@ function verifyListener(chains: string[], listeners: any) {
   return true;
 }
 
-// TODO: darwinia url can't connect
-// TODO: plasm METADATA: Unknown types found, no types for OfferOf, Parameters
-// TODO: stafi REGISTRY: Unable to resolve type ChainId, it will fail on construction
-const supportedChains = ['stafi']
+// the following code ensures that child processes are terminated before the main process exits due to any reason
+function childExit(children: ChildProcess[]) {
+  process.stdin.resume()
+  function exitHandler() {
+    console.log("Ending child processes")
+    for (let child of children) {
+      if (child) {
+        child.kill();
+        child = null;
+      }
+    }
+    console.log("All child processes closed")
+  }
+//do something when app is closing
+  process.on('exit', exitHandler);
+//catches ctrl+c event
+  process.on('SIGINT', exitHandler);
+// catches "kill pid" (for example: nodemon restart)
+  process.on('SIGUSR1', exitHandler);
+  process.on('SIGUSR2', exitHandler);
+//catches uncaught exceptions
+  process.on('uncaughtException', exitHandler);
+}
 
-// LOOP through all the chains individually to test functionality for all chains
+// a drop in test case to delay further test cases (used to wait for events) - only use when absolutely necessary (latency reasons)
+function delay(interval) {
+  return it.only('delaying...', (done) => {
+    setTimeout(() => done(), interval);
+  }).timeout(interval + 100);
+}
+
 setTimeout(async () => {
-  let pool;
-  let chains: [{id: string, url: string, substrate_spec: string}];
+  let chains: [{id: string, url: string, substrate_spec: string, base: string}];
 
-  pool = new Pool({
+  const pool = new Pool({
     connectionString: 'postgresql://commonwealth:edgeware@localhost/commonwealth'
   });
-
   pool.on('error', (err, client) => {
     console.error('Unexpected error on idle client', err);
     assert.fail()
   });
 
-  chains = await getChains(pool)
+  const client = new Client({
+    connectionString: 'postgresql://commonwealth:edgeware@localhost/commonwealth'
+  })
+  await client.connect()
 
-  describe.only('Tests for starting chain-event nodes', () => {
-    after(() => {
-      pool.end()
-    })
+  chains = await getChains(pool);
+  await clearDB(pool);
+  await clearQueues();
+  await prepareDB(client);
 
-    // TODO: figure out a good method of testing if events are actually produced
-    describe.only('Tests for single chain per node', () => {
-      let child, consumer;
-      chains.forEach((chain, chainIndex) => {
-        if (!supportedChains.includes(chain.id)) return;
-        describe.only(`Tests for a ${chain.id} chain-events node`, () => {
-          it.only(`Should start a node with a ${chain.id} listener`, (done) => {
-            populateIdentityCache(pool).then(() => {
-              child = spawn(`ts-node`,
-                [`${__dirname}../../../server/scripts/dbNode.ts`],
-                {env: { ...process.env, TESTING:'true', WORKER_NUMBER:String(chainIndex), NUM_WORKERS:'29', HANDLE_IDENTITY:'publish'}}
-              );
-              child.on('error', (error) => {
-                console.log(error)
-                assert.fail()
-              })
+  // TODO: figure out a good method of testing if events are actually produced
+  describe.only('Tests for single chain per node', () => {
+    pool.on('error', (err, client) => {
+      console.error('Unexpected error on idle client', err);
+      assert.fail();
+    });
 
-              console.log(`\n${chain.id}:`)
-              child.stdout.on('data', (data) => {
-                data = String(data)
-                console.log(`${data}`);
-                if (data.includes('Listener Validation')) {
-                 let listeners = JSON.parse(data.substring(data.indexOf(':') + 1))
-                  verifyListener([chain.id], listeners)
-                  done()
-                }
-              });
+    chains.forEach((chain, chainIndex) => {
+      if (!supportedChains.includes(chain.id)) return;
+      describe.only(`Tests for a ${chain.id} chain-events node`, () => {
+        it.only(`Should start a node with a ${chain.id} listener`, (done) => {
+          let child = spawn(`ts-node`,
+            [`${__dirname}../../../server/scripts/dbNode.ts`],
+            {env: { ...process.env, TESTING:'true', WORKER_NUMBER:String(chainIndex), NUM_WORKERS:String(chains.length - 1), HANDLE_IDENTITY:'publish', INFURA_API_KEY: '8e25780c4d574b3cbf53c306a841d09f'}}
+          );
 
-              child.stderr.on('data', (data) => {
-                console.error(`child stderr:\n${data}`);
-                if (!data.includes('Unable to determine offline time range')) {
-                  assert.fail()
-                }
-              });
-            })
-          }).timeout(30000)
+          childExit([child]);
 
-          // only substrate chains use the identity cache
-          if (chainSupportedBy(chain.id, SubstrateTypes.EventChains) && chain.id != 'stafi' && chain.id != 'clover') {
-            // check publish functionality
-            it('Should publish identity events and clear the identity cache', async () => {
-              // check identity cache is empty
-              const query = format(`SELECT * FROM "IdentityCaches" WHERE "chain"=%L;`, chain)
-              assert((await pool.query(query)).rows.length == 0)
+          child.on('error', (error) => {
+            console.log(error)
+            assert.fail()
+          })
 
-              // check the proper number of messages have been queued in the identity queue
-              const res = await fetch('http://guest:guest@127.0.0.1:15672/api/queues/');
-              const data = await res.json();
-              const identityQueue = data.filter((obj) => obj.name == 'identityQueue')
-              assert.equal(identityQueue.messages, numIdentityCache[chain.id]);
+          console.log(`\n${chain.id}:`)
+          child.stdout.on('data', (data) => {
+            data = String(data)
+            console.log(`${data}`);
+            if (data.includes('Listener Validation')) {
+              let listeners = JSON.parse(data.substring(data.indexOf(':') + 1))
+              verifyListener([chain.id], listeners)
+              done()
+            }
+          });
 
-              return;
-            })
+          child.stderr.on('data', (data) => {
+            console.error(`child stderr:\n${data}`);
+            if (!data.includes('Unable to determine offline time range')) {
+              assert.fail()
+            }
+          });
+        }).timeout(30000)
 
-            // check handle functionality
-            it.skip('Should handle identity events and clear the identity cache', async () => {
-              // check identity cache is empty
-              const query = format(`SELECT * FROM "IdentityCaches" WHERE "chain"=%L;`, chain)
-              assert((await pool.query(query)).rows.length == 0)
+        // only substrate chains use the identity cache
+        if (chain.base == 'substrate' && chain.id != 'stafi' && chain.id != 'clover') {
+          // check publish functionality
+          it.only('Should clear the identity cache', async () => {
+            // check identity cache is empty
+            const query = `SELECT * FROM "IdentityCaches" WHERE "chain"='polkadot';`
+            assert((await pool.query(query)).rows.length == 0)
+          })
 
-              // check that no identity events are queued in the identity queue
-              const res = await fetch('http://guest:guest@127.0.0.1:15672/api/queues/');
-              const data = await res.json();
-              const identityQueue = data.filter((obj) => obj.name == 'identityQueue')
-              assert.equal(identityQueue.messages, 0);
+          // delay briefly due to message latency
+          delay(10000);
 
-              assert.isTrue(await verifyIdentityChanges(pool, chain.id));
-
-              return;
-            })
-          }
-        })
-
-        describe('Tests for the chain-events consumer', () => {
-          it('Should start the chain-events consumer', async () => {
-            consumer = spawn('ts-node',
-              ['--project ../../server/scripts/tsconfig.consumer.json', '../../server/scripts/setupChainEventListeners.ts'],
-              {env: { ...process.env, TESTING:'true'}}
-            )
-            consumer.on('error', assert.fail)
-            consumer.on('message', (data) => {
-              assert.equal(data, 'consumer started')
-            })
+          it.only('Should publish a message to the identity queue', async () => {
+            // check the proper number of messages have been queued in the identity queue
+            const res = await fetch('http://127.0.0.1:15672/api/queues/', {
+              method: 'GET',
+              headers: {
+                'Authorization': 'Basic Z3Vlc3Q6Z3Vlc3Q='
+              }
+            });
+            const data = await res.json();
+            const identityQueue = data.filter((obj) => obj.name == 'identityQueue')[0]
+            assert.equal(identityQueue.messages, 1);
             return;
           })
 
-          // only substrate chains use the identity cache
-          if (chainSupportedBy(chain.id, SubstrateTypes.EventChains) && chain.id != 'stafi' && chain.id != 'clover') {
-            it('Should delay to give consumer time to process identity events', (done) => {
-              delay(5000);
-              done();
-            })
+          // check handle functionality
+          it.skip('Should handle identity events and clear the identity cache', async () => {
+            // check identity cache is empty
+            const query = format(`SELECT * FROM "IdentityCaches" WHERE "chain"=%L;`, chain)
+            assert((await pool.query(query)).rows.length == 0)
 
-            it('Should consume identity events', async () => {
-              assert.isTrue(await verifyIdentityChanges(pool, chain.id))
-              // stop this chain-events node
-              child.kill()
-              return;
+            // check that no identity events are queued in the identity queue
+            const res = await fetch('http://127.0.0.1:15672/api/queues/', {
+              method: 'GET',
+              headers: {
+                'Authorization': 'Basic Z3Vlc3Q6Z3Vlc3Q='
+              }
             })
-          }
-        })
+            const data = await res.json();
+            const identityQueue = data.filter((obj) => obj.name == 'identityQueue')
+            assert.equal(identityQueue.messages, 0);
+
+            assert.isTrue(await verifyIdentityChanges(pool, chain.id));
+
+            return;
+          })
+        }
+      })
+
+      describe.only('Tests for the chain-events consumer', () => {
+        it.only('Should start the chain-events consumer',(done) => {
+          let consumer;
+          consumer = spawn('ts-node',
+            [`${__dirname}../../../server.ts`],
+            {env: { ...process.env, TESTING:'true', HANDLE_IDENTITY:'publish', RUN_AS_LISTENER:'true', CHAIN_EVENTS: 'polkadot'}}
+          )
+
+          childExit([consumer]);
+
+          consumer.on('error', (error) => {
+            console.log(error)
+            assert.fail()
+          })
+
+          console.log(`\n${chain.id}:`)
+          consumer.stdout.on('data', (data) => {
+            data = String(data)
+            console.log(`${data}`);
+            if (data.includes('consumer started')) {
+              done()
+            }
+          });
+
+          consumer.stderr.on('data', (data) => {
+            console.error(`child stderr:\n${data}`);
+            assert.fail();
+          });
+        }).timeout(30000);
+
+        // only substrate chains use the identity cache
+        if (chain.base === 'substrate' && chain.id != 'stafi' && chain.id != 'clover') {
+          delay(5000)
+
+          it.only('Should consume identity events', async () => {
+            assert.isTrue(await verifyIdentityChanges(pool, chain.id))
+
+            // makre sure identity queue is empty
+            const res = await fetch('http://127.0.0.1:15672/api/queues/', {
+              method: 'GET',
+              headers: {
+                'Authorization': 'Basic Z3Vlc3Q6Z3Vlc3Q='
+              }
+            })
+            const data = await res.json();
+            const identityQueue = data.filter(obj => obj.name == 'identityQueue')[0]
+            assert.equal(identityQueue.messages, 0);
+
+            return;
+          })
+        }
       })
     })
-
-    describe('Tests for multiple chains per node', () => {
-
-    })
   })
-
   run()
 }, 5000)
 
