@@ -174,7 +174,7 @@ const ProposalHeader: m.Component<{
                 inline: true,
                 trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
               }),
-              m('.CommentSocialHeader', [ m(SocialSharingCarat)]),
+              !app.isCustomDomain() && m('.CommentSocialHeader', [ m(SocialSharingCarat)]),
               // This is the new social carat menu
               vnode.state.editPermissionsIsOpen
                 && proposal instanceof OffchainThread
@@ -363,7 +363,7 @@ const ProposalComment: m.Component<{
               trigger: m(Icon, { name: Icons.CHEVRON_DOWN })
             })
           ],
-          m('.CommentSocialHeader', [ m(SocialSharingCarat, { commentID: comment.id })])
+          !app.isCustomDomain() && m('.CommentSocialHeader', [ m(SocialSharingCarat, { commentID: comment.id })])
           // For now, we are limiting threading to 1 level deep
           // Comments whose parents are other comments should not display the reply option
           // !vnode.state.editing

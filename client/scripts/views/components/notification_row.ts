@@ -239,6 +239,8 @@ const NotificationRow: m.Component<{
       const chainId = notification.chainEvent.type.chain;
       const chainName = app.config.chains.getById(chainId)?.name;
       let label: IEventLabel;
+
+      if (app.isCustomDomain() && chainId !== app.customDomainId()) return;
       if (chainSupportedBy(chainId, SubstrateTypes.EventChains)) {
         label = SubstrateEvents.Label(
           notification.chainEvent.blockNumber,
@@ -320,7 +322,7 @@ const NotificationRow: m.Component<{
       const notificationData = notifications.map((notif) => typeof notif.data === 'string'
         ? JSON.parse(notif.data)
         : notif.data);
-      const {
+      let {
         authorInfo,
         createdAt,
         notificationHeader,
@@ -328,6 +330,15 @@ const NotificationRow: m.Component<{
         path,
         pageJump
       } = getBatchNotificationFields(category, notificationData);
+
+      if (app.isCustomDomain()) {
+        if (path.indexOf(`https://commonwealth.im/${app.customDomainId()}/`) !== 0
+            && path.indexOf(`http://localhost:8080/${app.customDomainId()}/`) !== 0) return;
+        path = path
+          .replace(`https://commonwealth.im/${app.customDomainId()}/`, '/')
+          .replace(`http://localhost:8080/${app.customDomainId()}/`, '/');
+      }
+
       return m('li.NotificationRow', {
         class: notification.isRead ? '' : 'unread',
         key: notification.id,
@@ -366,7 +377,7 @@ const NotificationRow: m.Component<{
                 e.preventDefault();
                 e.stopPropagation();
                 vnode.state.markingRead = true;
-                app.user.notifications.markAsRead(notifications).then(() => {
+                app.user.notifications.markAsRead(notifications)?.then(() => {
                   vnode.state.markingRead = false;
                   m.redraw();
                 }).catch(() => {
