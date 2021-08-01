@@ -143,12 +143,12 @@ const Sublayout: m.Component<{
               rightContent && m('.sublayout-right-col', rightContent),
             ]),
           ]),
-          m(FooterLandingPage, {
+          !app.isCustomDomain() && m(FooterLandingPage, {
             list: [
               { text: 'Blog', externalLink: 'https://blog.commonwealth.im' },
               { text: 'Jobs', externalLink: 'https://angel.co/company/commonwealth-labs/jobs' },
-              { text:  'Terms', redirectTo:  '/terms' },
-              { text:  'Privacy', redirectTo: '/privacy' },
+              { text: 'Terms', redirectTo:  '/terms' },
+              { text: 'Privacy', redirectTo: '/privacy' },
               { text: 'Discord', externalLink: 'https://discord.gg/ZFQCKUMP' },
               { text: 'Telegram', externalLink: 'https://t.me/HiCommonwealth' }
               // { text:  'Use Cases' },
