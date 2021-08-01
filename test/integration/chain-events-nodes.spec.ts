@@ -366,7 +366,7 @@ setTimeout(async () => {
 
         // only substrate chains use the identity cache
         if (chain.base === 'substrate' && chain.id != 'stafi' && chain.id != 'clover') {
-          delay(5000)
+          delay(10000)
 
           it.only('Should consume identity events', async () => {
             assert.isTrue(await verifyIdentityChanges(pool, chain.id))
