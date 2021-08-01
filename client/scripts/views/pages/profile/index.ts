@@ -8,6 +8,7 @@ import $ from 'jquery';
 import Web3 from 'web3';
 
 import app from 'state';
+import { navigateToSubpage } from 'app';
 import { OffchainThread, OffchainComment, OffchainAttachment, Profile, ChainBase } from 'models';
 
 import Sublayout from 'views/sublayout';
@@ -188,7 +189,7 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
       if (!valid) {
         try {
           const encoded = encodeAddress(decodedAddress, ss58Prefix);
-          m.route.set(`/${app.activeId()}/account/${encoded}${baseSuffix ? `?base=${baseSuffix}` : ''}`);
+          navigateToSubpage(`/account/${encoded}${baseSuffix ? `?base=${baseSuffix}` : ''}`);
         } catch (e) {
           // do nothing if can't encode address
         }
@@ -199,7 +200,7 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
       if (!valid) {
         try {
           const checksumAddress = Web3.utils.toChecksumAddress(address);
-          m.route.set(`/${app.activeId()}/account/${checksumAddress}${baseSuffix ? `?base=${baseSuffix}` : ''}`);
+          navigateToSubpage(`/account/${checksumAddress}${baseSuffix ? `?base=${baseSuffix}` : ''}`);
         } catch (e) {
           // do nothing if can't get checksumAddress
         }

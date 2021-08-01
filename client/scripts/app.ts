@@ -229,7 +229,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
   if (app.chain && n === app.chain.meta) {
     return;
   }
-  
+
   // Shut down old chain if applicable
   await deinitChainOrCommunity();
   app.chainPreloading = true;
@@ -411,6 +411,13 @@ m.route.set = (...args) => {
   if (html) html.scrollTo(0, 0);
   const body = document.getElementsByTagName('body')[0];
   if (body) body.scrollTo(0, 0);
+};
+export const navigateToSubpage = (...args) => {
+  // prepend community if we are not on a custom domain
+  if (!app.isCustomDomain()) {
+    args[0] = `${app.activeId()}/${args[0]}`;
+  }
+  m.route.set.apply(this, args);
 };
 
 const _onpopstate = window.onpopstate;

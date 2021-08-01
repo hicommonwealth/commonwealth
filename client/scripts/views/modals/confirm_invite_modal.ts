@@ -11,7 +11,7 @@ import { notifyError } from 'controllers/app/notifications';
 import User, { UserBlock } from 'views/components/widgets/user';
 import { CompactModalExitButton } from 'views/modal';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
-import { initAppState } from 'app';
+import { initAppState, navigateToSubpage } from 'app';
 
 const SideMenu: m.Component<{invites, onChangeHandler, location}, {}> = {
   view: (vnode) => {

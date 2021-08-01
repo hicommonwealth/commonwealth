@@ -109,7 +109,8 @@ const ProposalHeader: m.Component<{
     } = vnode.attrs;
 
     const attachments = (proposal instanceof OffchainThread) ? (proposal as OffchainThread).attachments : false;
-    const proposalLink = `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-`
+    const proposalLink = (app.isCustomDomain() ? '' : `/${app.activeId()}`)
+      + `/proposal/${proposal.slug}/${proposal.identifier}-`
       + `${slugify(proposal.title)}`;
     const proposalTitleIsEditable = (proposal instanceof SubstrateDemocracyProposal
       || proposal instanceof SubstrateCollectiveProposal
@@ -318,7 +319,8 @@ const ProposalComment: m.Component<{
     if (!comment) return;
     const parentType = comment.parentComment ? CommentParent.Comment : CommentParent.Proposal;
 
-    const commentLink = `/${app.activeId()}/proposal/${proposal.slug}/`
+    const commentLink = (app.isCustomDomain() ? '' : `/${app.activeId()}`)
+      + `/proposal/${proposal.slug}/`
       + `${proposal.identifier}-${slugify(proposal.title)}?comment=${comment.id}`;
 
     return m('.ProposalComment', {

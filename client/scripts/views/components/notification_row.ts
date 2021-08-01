@@ -10,6 +10,7 @@ import {
 } from '@commonwealth/chain-events';
 
 import app from 'state';
+import { navigateToSubpage } from 'app';
 import { NotificationCategories } from 'types';
 import { ProposalType } from 'identifiers';
 import { Notification, AddressInfo } from 'models';
@@ -289,7 +290,7 @@ const NotificationRow: m.Component<{
           const notificationArray: Notification[] = [];
           notificationArray.push(notification);
           app.user.notifications.markAsRead(notificationArray).then(() => m.redraw());
-          await m.route.set(`/${app.activeId() || 'edgeware'}/notificationsList?id=${notification.id}`);
+          await navigateToSubpage(`/notificationsList?id=${notification.id}`);
           m.redraw.sync();
         },
       }, [
