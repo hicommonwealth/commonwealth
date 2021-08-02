@@ -71,7 +71,6 @@ const MarkdownFormattedText : m.Component<{
         class: collapse ? 'collapsed' : '',
       }, vnode.state.cachedResultWithHighlights);
     }
-
     const unsanitized = marked(doc.toString());
     const sanitized = hideFormatting
       ? DOMPurify.sanitize(unsanitized, { ALLOWED_TAGS: ['a'], ADD_ATTR: ['target'] })

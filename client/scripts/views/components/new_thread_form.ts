@@ -146,12 +146,11 @@ const newThread = async (
       ? quillEditorState.editor.getText()
       : JSON.stringify(quillEditorState.editor.getContents());
 
-  let { topicName, topicId, threadTitle, linkTitle, url } = form;
+  const { topicName, topicId, threadTitle, linkTitle, url } = form;
   const title = threadTitle || linkTitle;
   const attachments = [];
   const chainId = app.activeCommunityId() ? null : app.activeChainId();
   const communityId = app.activeCommunityId();
-
   let result;
   try {
     // see if app.chain.network is existing in network lists and if app.chain.isToken
@@ -162,7 +161,7 @@ const newThread = async (
       chainId,
       communityId,
       title,
-      (topicName) ? topicName : 'General', // if no topic name set to default
+      topicName || 'General', // if no topic name set to default
       topicId,
       bodyText,
       url,
