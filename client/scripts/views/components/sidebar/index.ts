@@ -65,25 +65,29 @@ const SidebarQuickSwitcher: m.Component<{}> = {
 
     const size = 36;
     return m('.SidebarQuickSwitcher', [
-      m(Button, {
-        class: 'sidebar-home-link',
-        rounded: true,
-        label: m(Icon, { name: Icons.HOME }),
-        onclick: (e) => {
-          e.preventDefault();
-          m.route.set('/');
-        },
-      }),
-      m(CommunitySelector),
-      app.user.isSiteAdmin && m(Button, {
-        class: 'create-community',
-        rounded: true,
-        label: m(Icon, { name: Icons.PLUS }),
-        onclick: (e) => {
-          app.modals.create({ modal: CreateCommunityModal });
-        },
-      }),
-      starredCommunities.map((item) => m(SidebarQuickSwitcherItem, { item, size })),
+      m('.community-nav-bar', [
+        m(Button, {
+          class: 'sidebar-home-link',
+          rounded: true,
+          label: m(Icon, { name: Icons.HOME }),
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set('/');
+          },
+        }),
+        m(CommunitySelector),
+        app.user.isSiteAdmin && m(Button, {
+          class: 'create-community',
+          rounded: true,
+          label: m(Icon, { name: Icons.PLUS }),
+          onclick: (e) => {
+            app.modals.create({ modal: CreateCommunityModal });
+          },
+        }),
+      ]),
+      m('.scrollable-community-bar', [
+        starredCommunities.map((item) => m(SidebarQuickSwitcherItem, { item, size })),
+      ]),
     ]);
   }
 };
@@ -94,10 +98,14 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
       || p.startsWith(`/${app.activeId()}/discussions/`)
       || p.startsWith(`/${app.activeId()}/proposal/discussion/`)
       || p.startsWith(`/${app.activeId()}?`);
-    const onSearchPage = (p) => p.startsWith(`/${app.activeId()}/search`);
+    const onFeaturedDiscussionPage = (p, f) => p === `/${app.activeId()}/discussions/${f}`
+      || p === `/${app.activeId()}/discussions/${f}/`;
     const onMembersPage = (p) => p.startsWith(`/${app.activeId()}/members`)
       || p.startsWith(`/${app.activeId()}/account/`);
-    const onChatPage = (p) => p === `/${app.activeId()}/chat`;
+
+    const topics = app.topics.getByCommunity(app.activeId()).map(({ id, name, featuredInSidebar }) => {
+      return { id, name, featuredInSidebar };
+    }).filter((t) => t.featuredInSidebar).sort((a, b) => a.name.localeCompare(b.name));
 
     return m('.OffchainNavigationModule.SidebarModule', [
       // m('.section-header', 'Discuss'),
@@ -112,6 +120,19 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
           m.route.set(`/${app.activeId()}`);
         },
       }),
+      topics.map((t) => (
+        m(Button, {
+          fluid: true,
+          rounded: true,
+          active: onFeaturedDiscussionPage(m.route.get(), t.name),
+          label: t.name,
+          class: 'sub-button',
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set(`/${app.activeChainId()}/discussions/${t.name}`);
+          },
+        })
+      )),
       // m(Button, {
       //   rounded: true,
       //   fluid: true,

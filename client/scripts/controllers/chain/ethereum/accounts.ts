@@ -74,16 +74,16 @@ class EthereumAccounts implements IAccountsModule<EthereumCoin, EthereumAccount>
     }
   }
 
-  public fromSeed(seed: string): EthereumAccount {
+  public async fromSeed(seed: string): Promise<EthereumAccount> {
     const address = addressFromSeed(seed);
     const acct = this.fromAddress(address);
-    acct.setSeed(seed);
+    await acct.setSeed(seed);
     return acct;
   }
-  public fromMnemonic(mnemonic: string): EthereumAccount {
+  public async fromMnemonic(mnemonic: string): Promise<EthereumAccount> {
     const address = addressFromMnemonic(mnemonic);
     const acct = this.fromAddress(address);
-    acct.setMnemonic(mnemonic);
+    await acct.setMnemonic(mnemonic);
     return acct;
   }
 

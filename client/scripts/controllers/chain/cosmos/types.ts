@@ -1,15 +1,7 @@
 import BN from 'bn.js';
 import { Coin } from 'adapters/currency';
-import { IIdentifiable, ICompletable } from '../../shared';
-
-export class CosmosValidatorToken extends Coin {
-  constructor(n: number | string | BN, inDollars: boolean = false) {
-    if (typeof n === 'string') {
-      n = parseInt(n, 10);
-    }
-    super('validatortoken', n, inDollars);
-  }
-}
+import { IIdentifiable, ICompletable } from 'adapters/shared';
+import { coin } from '@cosmjs/amino';
 
 export class CosmosToken extends Coin {
   constructor(denom: string, n: number | string | BN, inDollars: boolean = false) {
@@ -27,35 +19,18 @@ export class CosmosToken extends Coin {
   }
 
   public toCoinObject() {
-    return { amount: this.toNumber(), denom: this.denom };
+    return coin(this.toNumber(), this.denom);
   }
 }
 
-export enum CosmosProposalType {
-  'text',
-  'upgrade',
-  'parameter',
-}
-
-export enum CosmosVoteChoice {
-  YES = 'Yes',
-  NO = 'No',
-  VETO = 'NoWithVeto',
-  ABSTAIN = 'Abstain',
-}
-
-export enum CosmosProposalState {
-  DEPOSIT_PERIOD = 'DepositPeriod',
-  VOTING_PERIOD = 'VotingPeriod',
-  PASSED = 'Passed',
-  REJECTED = 'Rejected',
-}
-
+export type CosmosProposalType = 'text' | 'upgrade' | 'parameter';
+export type CosmosVoteChoice = 'Yes' | 'No' | 'NoWithVeto' | 'Abstain';
+export type CosmosProposalState = 'DepositPeriod' | 'VotingPeriod' | 'Passed' | 'Rejected';
 export interface ICosmosProposalTally {
-  yes: number;
-  abstain: number;
-  no: number;
-  noWithVeto: number;
+  yes: BN;
+  abstain: BN;
+  no: BN;
+  noWithVeto: BN;
 }
 
 export interface ICosmosProposal extends IIdentifiable {
@@ -75,8 +50,8 @@ export interface ICosmosProposal extends IIdentifiable {
 // TODO: note that these vote number values are in terms of _stake_
 export interface ICosmosProposalState extends ICompletable {
   status: CosmosProposalState;
-  depositors: Array<[ string, number ]>;
-  totalDeposit: number;
+  depositors: Array<[ string, BN ]>;
+  totalDeposit: BN;
   voters: Array<[ string, CosmosVoteChoice ]>;
   tally: ICosmosProposalTally;
 }

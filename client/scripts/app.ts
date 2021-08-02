@@ -85,6 +85,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
           stagesEnabled: community.stagesEnabled,
           additionalStages: community.additionalStages,
           customDomain: community.customDomain,
+          terms: community.terms,
           adminsAndMods: [],
         }));
       });
@@ -228,12 +229,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
   if (app.chain && n === app.chain.meta) {
     return;
   }
-  if ((Object.values(ChainNetwork) as any).indexOf(n.chain.network) === -1
-    && n.chain.type !== 'token'
-  ) {
-    throw new Error('invalid chain');
-  }
-
+  
   // Shut down old chain if applicable
   await deinitChainOrCommunity();
   app.chainPreloading = true;
@@ -249,20 +245,13 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/substrate/main'
     )).default;
     newChain = new Substrate(n, app);
-  } else if (n.chain.network === ChainNetwork.Cosmos) {
+  } else if (n.chain.base === ChainBase.CosmosSDK) {
     const Cosmos = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "cosmos-main" */
       './controllers/chain/cosmos/main'
     )).default;
     newChain = new Cosmos(n, app);
-  } else if (n.chain.network === ChainNetwork.Straightedge) {
-    const Straightedge = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "straightedge-main" */
-      './controllers/chain/straightedge/main'
-    )).default;
-    newChain = new Straightedge(n, app);
   } else if (n.chain.network === ChainNetwork.Ethereum) {
     const Ethereum = (await import(
       /* webpackMode: "lazy" */

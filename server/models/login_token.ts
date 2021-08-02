@@ -11,6 +11,8 @@ export interface LoginTokenAttributes {
   email?: string;
   expires: Date;
   redirect_path?: string;
+  domain?: string;
+  social_account?: number;
   used?: Date;
 
   created_at?: Date;
@@ -24,8 +26,9 @@ export interface LoginTokenInstance extends Model<LoginTokenAttributes>, LoginTo
   // no mixins used yet
 }
 
-export interface LoginTokenCreationAttributes extends LoginTokenAttributes {
-   createForEmail?: (email: string, path?: string) => Promise<LoginTokenInstance>;
+export interface LoginTokenModel extends Sequelize.Model<LoginTokenInstance, LoginTokenAttributes> {
+  createForEmail?: (email: string, path?: string) => Promise<LoginTokenInstance>;
+  createForOAuth?: (domain: string, social_account: number) => Promise<LoginTokenInstance>;
 }
 
 type LoginTokenModelStatic = typeof Model
@@ -43,6 +46,8 @@ export default (
     email: { type: dataTypes.STRING, allowNull: true },
     expires: { type: dataTypes.DATE, allowNull: false },
     redirect_path: { type: dataTypes.STRING, allowNull: true },
+    domain: { type: dataTypes.STRING, allowNull: true },
+    social_account: { type: dataTypes.INTEGER, allowNull: true },
     used: { type: dataTypes.DATE, allowNull: true },
   }, {
     timestamps: true,
@@ -59,6 +64,17 @@ export default (
     const token = crypto.randomBytes(24).toString('hex');
     const expires = new Date(+(new Date()) + LOGIN_TOKEN_EXPIRES_IN * 60 * 1000);
     const result = await LoginToken.create({ email, expires, token, redirect_path: path });
+    return result;
+  };
+
+  // This creates a LoginToken that is tied to no particular email or social account.
+  // It is up to the implementer to store the ID of the generated LoginToken on a SocialAccount
+  // for it to be looked up later.
+  LoginToken.createForOAuth = async (domain: string, social_account: number)
+  : Promise<LoginTokenInstance> => {
+    const token = crypto.randomBytes(24).toString('hex');
+    const expires = new Date(+(new Date()) + LOGIN_TOKEN_EXPIRES_IN * 60 * 1000);
+    const result = await LoginToken.create({ email: '', expires, token, domain, social_account });
     return result;
   };
 

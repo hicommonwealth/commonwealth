@@ -13,7 +13,6 @@ import { ITXModalData, TransactionStatus, ChainBase, IWebWallet, ITXData, ITrans
 import PolkadotWebWalletController from 'controllers/app/webWallets/polkadot_web_wallet';
 import Substrate from 'controllers/chain/substrate/main';
 import { ISubstrateTXData } from 'controllers/chain/substrate/shared';
-import { ICosmosTXData } from 'controllers/chain/cosmos/chain';
 
 import AddressSwapper from 'views/components/addresses/address_swapper';
 import CodeBlock from 'views/components/widgets/code_block';
@@ -149,46 +148,10 @@ const TXSigningCLIOption: m.Component<TXSigningCLIOptionAttrs, ITXSigningCLIOpti
       vnode.attrs.txData.transact(...args);
     };
 
-    // TODO: this is substrate specific, add a cosmos codepath
     let signBlock = m(CodeBlock, { clickToSelect: true }, [ 'Loading transaction data... ']);
     let instructions;
     let submitAction;
-    if (vnode.state.calldata && app.chain && app.chain.base === ChainBase.CosmosSDK) {
-      const calldata = vnode.state.calldata as ICosmosTXData;
-      instructions = m('.instructions', [
-        'Save the transaction\'s JSON data to a file: ',
-        m(CodeBlock, { clickToSelect: true }, `echo '${calldata.call}' > tx.json`),
-        ' and then sign the transaction, using the appropriate account:'
-      ]);
-      signBlock = m('.gaiacli-codeblock', [
-        m(CodeBlock, { clickToSelect: true }, [
-          `gaiacli tx sign \\
-  --chain-id=${calldata.chainId} \\
-  --account-number=${calldata.accountNumber} \\
-  --sequence=${calldata.sequence} \\
-  --signature-only --offline \\
-  --from=`,
-          m('span.no-select', '<key name> <tx.json>'),
-        ])
-      ]);
-      submitAction = m(Button, {
-        intent: 'primary',
-        type: 'submit',
-        rounded: true,
-        onclick: (e) => {
-          e.preventDefault();
-          // try {
-          const signedBlob = $(vnode.dom).find('textarea.signedtx').val().toString()
-            .trim();
-          const signature = JSON.parse(signedBlob);
-          transact(signature, calldata.gas);
-          // } catch (e) {
-          //  throw new Error('Failed to execute signed transaction');
-          // }
-        },
-        label: 'Send transaction',
-      });
-    } else if (vnode.state.calldata && app.chain && app.chain.base === ChainBase.Substrate) {
+    if (vnode.state.calldata && app.chain && app.chain.base === ChainBase.Substrate) {
       const calldata = vnode.state.calldata as ISubstrateTXData;
       instructions = m('.instructions', [
         'Use subkey to sign this transaction:'
@@ -228,7 +191,7 @@ const TXSigningCLIOption: m.Component<TXSigningCLIOptionAttrs, ITXSigningCLIOpti
       m(TextArea, {
         class: 'signedtx',
         fluid: true,
-        placeholder: app.chain && app.chain.base === ChainBase.CosmosSDK ? 'Signature JSON' : 'Signed TX',
+        placeholder: 'Signed TX',
       }),
       vnode.state.error && m('.error-message', vnode.state.error),
       submitAction,
@@ -320,15 +283,15 @@ const TXSigningSeedOrMnemonicOption: m.Component<TXSigningSeedOrMnemonicOptionAt
           intent: 'primary',
           type: 'submit',
           rounded: true,
-          onclick: (e) => {
+          onclick: async (e) => {
             e.preventDefault();
             const newKey = `${$(vnode.dom).find('textarea.mnemonic').val().toString()
               .trim()}`;
             try {
               if (mnemonicValidate(newKey)) {
-                vnode.attrs.author.setMnemonic(newKey);
+                await vnode.attrs.author.setMnemonic(newKey);
               } else {
-                vnode.attrs.author.setSeed(newKey);
+                await vnode.attrs.author.setSeed(newKey);
               }
               transact();
             } catch (err) {
