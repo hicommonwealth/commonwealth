@@ -7,32 +7,27 @@ import {
   createListener,
   chainSupportedBy,
   SubstrateTypes,
-  Listener,
   SubstrateListener
 } from '@commonwealth/chain-events';
 import {
   RabbitMqHandler,
-  RabbitMqDefaultConfig
 } from 'ce-rabbitmq-plugin';
-import IQRbbtConfig from '../util/rabbitmq/WithIdentityQueueConfig.json'
+import { DATABASE_URI, HANDLE_IDENTITY } from '../config'
+import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
+console.log(RabbitMQConfig)
 
 const log = factory.getLogger(formatFilename(__filename));
 
+// TODO: RollBar error reporting
 // TODO: change console logging to log
-// TODO: if listener start fails revert hasChainEventsListener to false in db and trigger error function to be discussed with JB
+// TODO: if listener start fails revert hasChainEventsListener to false in db
+
 // env var
-export const WORKER_NUMBER: number = Number(process.env.WORKER_NUMBER) || 0;
-export const NUM_WORKERS: number = Number(process.env.NUM_WORKERS) || 1;
-export const DATABASE_URI =
-  !process.env.DATABASE_URL || process.env.NODE_ENV === 'development'
-    ? 'postgresql://commonwealth:edgeware@localhost/commonwealth'
-    : process.env.DATABASE_URL;
-const envIden = process.env.HANDLE_IDENTITY;
-export const HANDLE_IDENTITY =
-  envIden === 'publish' || envIden === 'handle' ? envIden : null;
+const WORKER_NUMBER: number = Number(process.env.WORKER_NUMBER) || 0;
+const NUM_WORKERS: number = Number(process.env.NUM_WORKERS) || 1;
+
 // The number of minutes to wait between each run -- rounded to the nearest whole number
 export const REPEAT_TIME = Math.round(Number(process.env.REPEAT_TIME)) || 10;
-
 
 async function handleFatalError(error: Error, chain?: string, type?: string): Promise<void> {
   log.error(String(error));
@@ -227,10 +222,7 @@ async function mainProcess(producer: RabbitMqHandler) {
 // begin process
 log.info('db-node initialization');
 
-// if we need to publish identity events to a queue use the appropriate config file
-let rbbtMqConfig =
-  HANDLE_IDENTITY == 'publish' ? IQRbbtConfig : RabbitMqDefaultConfig;
-const producer = new RabbitMqHandler(rbbtMqConfig);
+const producer = new RabbitMqHandler(RabbitMQConfig);
 producer
   .init()
   .then(() => {

@@ -919,34 +919,9 @@
     "@babel/helper-validator-identifier" "^7.14.9"
     to-fast-properties "^2.0.0"
 
-"@commonwealth/chain-events@git+https://git@github.com/timolegros/chain-events.git#tim.OOP":
+"@commonwealth/chain-events@git+https://github.com/timolegros/chain-events.git#tim.OOP":
   version "0.6.5"
-  resolved "git+https://git@github.com/timolegros/chain-events.git#b21d28e42c4d11e5cffab72999a1d9299c64bee5"
-  dependencies:
-    "@edgeware/node-types" "^3.3.3"
-    "@polkadot/api" "4.16.2"
-    "@polkadot/api-derive" "4.16.2"
-    "@polkadot/types" "4.16.2"
-    "@polkadot/util" "6.11.1"
-    bn.js "^5.1.3"
-    ce-rabbitmq-plugin "git+https://github.com/timolegros/ce-rabbitmq-plugin.git#main"
-    ethereum-block-by-date "^1.2.2"
-    ethers "^4.0.39"
-    express "^4.17.1"
-    lodash "^4.17.21"
-    node-fetch "^2.6.1"
-    pg "^8.6.0"
-    pg-format "^1.0.4"
-    sleep-promise "^8.0.1"
-    typescript-logging "^0.6.4"
-    underscore "^1.10.2"
-    web3 "^1.3.1"
-    web3-core "^1.3.1"
-    web3-utils "^1.3.1"
-
-"@commonwealth/chain-events@git+https://github.com/timolegros/chain-events.git#build":
-  version "0.6.5"
-  resolved "git+https://github.com/timolegros/chain-events.git#db863a8a633ee0c3260ad7a2d39ec9dcde2e86f0"
+  resolved "git+https://github.com/timolegros/chain-events.git#a9c9e18baa19d5bbfbfb133db4d534ea81fd71a5"
   dependencies:
     "@edgeware/node-types" "^3.3.3"
     "@polkadot/api" "4.16.2"
@@ -3986,9 +3961,9 @@ ccount@^1.0.0:
 
 "ce-rabbitmq-plugin@git+https://github.com/timolegros/ce-rabbitmq-plugin.git#main":
   version "1.0.0"
-  resolved "git+https://github.com/timolegros/ce-rabbitmq-plugin.git#2ecacfeb6d382db9f310ae1d1218186dfcbdcc18"
+  resolved "git+https://github.com/timolegros/ce-rabbitmq-plugin.git#47594628d89ace004a2e559346bf8b7b725dea93"
   dependencies:
-    "@commonwealth/chain-events" "git+https://github.com/timolegros/chain-events.git#build"
+    "@commonwealth/chain-events" "git+https://github.com/timolegros/chain-events.git#tim.OOP"
     amqplib "^0.8.0"
     rascal "^13.1.0"
 
@@ -5778,9 +5753,9 @@ error-stack-parser@^2.0.4:
     stackframe "^1.1.1"
 
 es-abstract@^1.17.2, es-abstract@^1.18.0-next.1, es-abstract@^1.18.0-next.2, es-abstract@^1.18.2:
-  version "1.18.4"
-  resolved "https://registry.yarnpkg.com/es-abstract/-/es-abstract-1.18.4.tgz#c6b7a1acd6bb1c8b5afeb54a53c46ad02fab346d"
-  integrity sha512-xjDAPJRxKc1uoTkdW8MEk7Fq/2bzz3YoCADYniDV7+KITCUdu9c90fj1aKI7nEZFZxRrHlDo3wtma/C6QkhlXQ==
+  version "1.18.5"
+  resolved "https://registry.yarnpkg.com/es-abstract/-/es-abstract-1.18.5.tgz#9b10de7d4c206a3581fd5b2124233e04db49ae19"
+  integrity sha512-DDggyJLoS91CkJjgauM5c0yZMjiD1uK3KcaCeAmffGwZ+ODWzOkPN4QwRbsK5DOFf06fywmyLci3ZD8jLGhVYA==
   dependencies:
     call-bind "^1.0.2"
     es-to-primitive "^1.2.1"
