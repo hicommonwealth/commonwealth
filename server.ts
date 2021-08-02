@@ -1,4 +1,3 @@
-import { SubstrateEvents, SubstrateTypes, chainSupportedBy } from '@commonwealth/chain-events';
 import session from 'express-session';
 import Rollbar from 'rollbar';
 import express from 'express';
@@ -71,7 +70,7 @@ async function main() {
   const CHAIN_EVENTS = process.env.CHAIN_EVENTS;
   const RUN_AS_LISTENER = process.env.RUN_AS_LISTENER === 'true';
 
-  const identityFetchCache = new IdentityFetchCache(10 * 60);
+  const identityFetchCache = new IdentityFetchCache(models);
   const tokenListCache = new TokenListCache();
   const tokenBalanceCache = new TokenBalanceCache(tokenListCache);
   const listenChainEvents = async () => {
@@ -83,15 +82,9 @@ async function main() {
       } else if (CHAIN_EVENTS) {
         chains = CHAIN_EVENTS.split(',');
       }
-      const subscribers = await setupChainEventListeners(models, null, chains, SKIP_EVENT_CATCHUP);
-      // construct storageFetchers needed for the identity cache
-      const fetchers = {};
-      for (const [ chain, subscriber ] of Object.entries(subscribers)) {
-        if (chainSupportedBy(chain, SubstrateTypes.EventChains)) {
-          fetchers[chain] = new SubstrateEvents.StorageFetcher(subscriber.api);
-        }
-      }
-      await identityFetchCache.start(models, fetchers);
+
+      await setupChainEventListeners(models, null, chains, SKIP_EVENT_CATCHUP);
+
       return 0;
     } catch (e) {
       console.error(`Chain event listener setup failed: ${e.message}`);
@@ -227,13 +220,7 @@ async function main() {
     });
 
     // redirect to https:// unless we are using a test domain
-    app.use(redirectToHTTPS(DEV ? [
-      /gov.edgewa.re:(\d{4})/,
-      /gov2.edgewa.re:(\d{4})/,
-      /gov3.edgewa.re:(\d{4})/,
-      /localhost:(\d{4})/,
-      /127.0.0.1:(\d{4})/
-    ] : [
+    app.use(redirectToHTTPS([
       /localhost:(\d{4})/,
       /127.0.0.1:(\d{4})/
     ], [], 301));

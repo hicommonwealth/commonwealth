@@ -107,11 +107,11 @@ export default class EthereumAccount extends Account<EthereumCoin> {
     this._Accounts.store.add(this);
   }
 
-  protected addressFromMnemonic(mnemonic: string) {
+  protected async addressFromMnemonic(mnemonic: string) {
     return addressFromMnemonic(mnemonic);
   }
 
-  protected addressFromSeed(seed: string) {
+  protected async addressFromSeed(seed: string) {
     return addressFromSeed(seed);
   }
 

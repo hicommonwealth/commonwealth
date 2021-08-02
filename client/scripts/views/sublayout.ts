@@ -12,8 +12,10 @@ import LoginSelector from 'views/components/header/login_selector';
 import Sidebar from 'views/components/sidebar';
 import MobileHeader from 'views/mobile/mobile_header';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
+import FooterLandingPage from 'views/pages/landing/landing_page_footer';
 import Token from 'controllers/chain/ethereum/token/adapter';
 import { SearchBar } from './components/search_bar';
+
 
 const Sublayout: m.Component<{
   // overrides
@@ -49,6 +51,7 @@ const Sublayout: m.Component<{
     const chain = app.chain ? app.chain.meta.chain : null;
     const community = app.community ? app.community.meta : null;
     const narrowBrowserWidth = (window.innerWidth > 767.98) && (window.innerWidth < 850);
+    const terms = app.chain ? app.chain.meta.chain.terms : null;
 
     const ICON_SIZE = 22;
     const sublayoutHeaderLeft = m('.sublayout-header-left', [
@@ -81,7 +84,8 @@ const Sublayout: m.Component<{
       app.isLoggedIn() && m(InvitesMenu),
       app.isLoggedIn() && m(NotificationsMenu),
       showNewProposalButton
-      && (narrowBrowserWidth ? m(MobileNewProposalButton) : m(NewProposalButton, { fluid: false })),
+      && (narrowBrowserWidth ? m(MobileNewProposalButton) : m(NewProposalButton, { fluid: false, threadOnly: !chain })),
+      // above threadOnly option assumes all chains have proposals beyond threads
     ]);
 
     if (vnode.attrs.loadingLayout) return [
@@ -120,6 +124,14 @@ const Sublayout: m.Component<{
               ? m('.sublayout-hero.token-banner', [
                 m('.token-banner-content', `Link ${app.chain.meta.chain.symbol} address to participate in this community`),
               ]) : '',
+            terms ? 
+              m('.token-banner-terms', [
+                m('span', `Please read the `),
+                m('a', {
+                  href: terms,
+                }, 'terms and conditions'),
+                m('span', ` before interacting with this community.`)
+            ]) : '' ,
           m('.sublayout-body', [
             m(`.sublayout-grid${vnode.attrs.centerGrid ? '.flex-center' : ''}`, [
               !hideSidebar && m('.sublayout-sidebar-col', [
@@ -131,6 +143,21 @@ const Sublayout: m.Component<{
               rightContent && m('.sublayout-right-col', rightContent),
             ]),
           ]),
+          m(FooterLandingPage, {
+            list: [
+              { text: 'Blog', externalLink: 'https://blog.commonwealth.im' },
+              { text: 'Jobs', externalLink: 'https://angel.co/company/commonwealth-labs/jobs' },
+              { text:  'Terms', redirectTo:  '/terms' },
+              { text:  'Privacy', redirectTo: '/privacy' },
+              { text: 'Discord', externalLink: 'https://discord.gg/ZFQCKUMP' },
+              { text: 'Telegram', externalLink: 'https://t.me/HiCommonwealth' }
+              // { text:  'Use Cases' },
+              // { text:  'Crowdfunding' },
+              // { text:  'Developers' },
+              // { text:  'About us' },
+              // { text:  'Careers' }
+            ],
+          }),
         ]),
       ]),
     ];

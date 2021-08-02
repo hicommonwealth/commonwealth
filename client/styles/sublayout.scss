@@ -77,6 +77,9 @@
         @include sm-max {
             padding: 0;
         }
+        @include xs-max {
+            min-width: calc(100vw - 80px);
+        }
     }
     .sublayout-right-col {
         flex: 1.75;
@@ -85,6 +88,11 @@
         @include xl-min {
             padding: 36px 20px 36px 32px;
             max-width: calc(#{$sidebar-width} + 48px);
+        }
+        @include xs-max {
+            padding-left: 20px;
+            padding-right: 20px;
+            min-width: calc(#{$sidebar-width} + 20px);
         }
     }
     .hide-sidebar & {
@@ -201,6 +209,7 @@
         position: relative;
         min-height: calc(100vh - 140px);
         padding: 1px 0; // prevent margins from flowing outside the container
+        padding-bottom: 80px;
     }
     .token-banner {
         padding: 8px 0 2px;
@@ -209,5 +218,11 @@
         text-align: center;
     }
     .token-banner-content {
+    }
+    
+    .token-banner-terms {
+      background-color: #fdf5f9;
+      text-align: center;
+      padding: 5px 0 5px 0;
     }
 }

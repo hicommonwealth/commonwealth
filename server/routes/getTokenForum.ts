@@ -17,7 +17,7 @@ const getTokenForum = async (
   if (!address) {
     return res.json({ status: 'Failure', message: 'Must provide token address' });
   }
-  const token = tokenBalanceCache.getToken(address);
+  const token = tokenBalanceCache.getToken(address as string);
   if (token) {
     try {
       const result = await sequelize.transaction(async (t) => {

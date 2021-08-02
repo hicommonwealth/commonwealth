@@ -266,7 +266,6 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
 
   const [threads, comments, reactions] = threadsCommentsReactions as any;
 
-  const numPrevotingThreads = threadsInVoting.filter((t) => t.stage === 'proposal_in_review').length;
   const numVotingThreads = threadsInVoting.filter((t) => t.stage === 'voting').length;
 
   return res.json({
@@ -274,7 +273,6 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
     result: {
       topics: topics.map((t) => t.toJSON()),
       //
-      numPrevotingThreads,
       numVotingThreads,
       threads, // already converted to JSON earlier
       comments, // already converted to JSON earlier

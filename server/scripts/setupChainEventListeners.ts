@@ -1,39 +1,58 @@
-import WebSocket from 'ws';
-import _ from 'underscore';
 import {
-  IDisconnectedRange, IEventHandler, EventSupportingChains, IEventSubscriber,
-  SubstrateTypes, SubstrateEvents, MolochTypes, MolochEvents, chainSupportedBy,
-  MarlinTypes, MarlinEvents,
+  IDisconnectedRange,
+  IEventHandler,
+  EventSupportingChains,
+  SubstrateTypes,
+  chainSupportedBy,
+  CWEvent,
 } from '@commonwealth/chain-events';
 
-import EventStorageHandler, { StorageFilterConfig } from '../eventHandlers/storage';
+import { RabbitMqDefaultConfig } from 'ce-rabbitmq-plugin';
+import IQRbbtConfig from '../util/rabbitmq/WithIdentityQueueConfig.json'
+
+import { HANDLE_IDENTITY } from '../config';
+
+import * as WebSocket from 'ws';
+import * as fs from 'fs';
+import EventStorageHandler, {
+  StorageFilterConfig
+} from '../eventHandlers/storage';
 import EventNotificationHandler from '../eventHandlers/notifications';
 import EntityArchivalHandler from '../eventHandlers/entityArchival';
 import IdentityHandler from '../eventHandlers/identity';
+import pgIdentity from '../eventHandlers/pgIdentity';
 import UserFlagsHandler from '../eventHandlers/userFlags';
 import ProfileCreationHandler from '../eventHandlers/profileCreation';
-import { sequelize } from '../database';
+import models, { sequelize } from '../database';
 import { constructSubstrateUrl } from '../../shared/substrate';
 import { factory, formatFilename } from '../../shared/logging';
 import { ChainNodeInstance } from '../models/chain_node';
+import { Consumer } from '../util/rabbitmq/consumer';
+import { Pool } from 'pg';
+
+export const DATABASE_URI =
+  !process.env.DATABASE_URL || process.env.NODE_ENV === 'development'
+    ? 'postgresql://commonwealth:edgeware@localhost/commonwealth'
+    : process.env.DATABASE_URL;
 const log = factory.getLogger(formatFilename(__filename));
 
 // emit globally any transfer over 1% of total issuance
 // TODO: config this
 const BALANCE_TRANSFER_THRESHOLD_PERMILL: number = 10_000;
 
-const discoverReconnectRange = async (models, chain: string): Promise<IDisconnectedRange> => {
-  const lastChainEvent = await models.ChainEvent.findAll({
+const discoverReconnectRange = async (
+  _models,
+  chain: string
+): Promise<IDisconnectedRange> => {
+  const lastChainEvent = await _models.ChainEvent.findAll({
     limit: 1,
-    order: [ [ 'block_number', 'DESC' ]],
+    order: [['block_number', 'DESC']],
     // this $...$ queries the data inside the include (ChainEvents don't have `chain` but ChainEventTypes do)...
     // we might be able to replicate this behavior with where and required: true inside the include
     where: {
-      '$ChainEventType.chain$': chain,
+      '$ChainEventType.chain$': chain
     },
-    include: [
-      { model: models.ChainEventType }
-    ]
+    include: [{ model: _models.ChainEventType }]
   });
   if (lastChainEvent && lastChainEvent.length > 0 && lastChainEvent[0]) {
     const lastEventBlockNumber = lastChainEvent[0].block_number;
@@ -44,28 +63,64 @@ const discoverReconnectRange = async (models, chain: string): Promise<IDisconnec
   }
 };
 
+// returns either the RabbitMQ config specified by the filepath or the default config
+export function getRabbitMQConfig(filepath?: string) {
+  if (typeof filepath === 'string' && filepath.length === 0) return RabbitMqDefaultConfig;
+  else {
+    try {
+      const raw = fs.readFileSync(filepath);
+      return JSON.parse(raw.toString());
+    } catch (error) {
+      console.error(`Failed to load the configuration file at: ${filepath}`);
+      console.warn('Using default RabbitMQ configuration');
+      return RabbitMqDefaultConfig;
+    }
+  }
+}
+
 const setupChainEventListeners = async (
-  models, wss: WebSocket.Server, chains: string[] | 'all' | 'none', skipCatchup?: boolean
-): Promise<{ [chain: string]: IEventSubscriber<any, any> }> => {
-  const queryNode = (c: string): Promise<ChainNodeInstance> => models.ChainNode.findOne({
-    where: { chain: c },
-    include: [{
-      model: models.Chain,
-      where: { active: true },
-      required: true,
-    }],
+  _models,
+  wss: WebSocket.Server,
+  chains: string[] | 'all' | 'none',
+  skipCatchup?: boolean
+): Promise<{}> => {
+  const pool = new Pool({
+    connectionString: DATABASE_URI
   });
+
+  pool.on('error', (err, client) => {
+    console.error('Unexpected error on idle client', err);
+    // TODO: handle this
+  });
+
+  const queryNode = (c: string): Promise<ChainNodeInstance> =>
+    _models.ChainNode.findOne({
+      where: { chain: c }
+      //TODO: the below code cause the node to not be found
+      // include: [
+      //   {
+      //     model: _models.Chain,
+      //     where: { active: true },
+      //     required: true
+      //   }
+      // ]
+    });
   log.info('Fetching node urls...');
   await sequelize.authenticate();
   const nodes: ChainNodeInstance[] = [];
   if (chains === 'all') {
-    const n = (await Promise.all(EventSupportingChains.map((c) => queryNode(c)))).filter((c) => !!c);
+    const n = (
+      await Promise.all(EventSupportingChains.map((c) => queryNode(c)))
+    ).filter((c) => !!c);
     nodes.push(...n);
   } else if (chains !== 'none') {
-    const n = (await Promise.all(EventSupportingChains
-      .filter((c) => chains.includes(c))
-      .map((c) => queryNode(c))))
-      .filter((c) => !!c);
+    const n = (
+      await Promise.all(
+        EventSupportingChains.filter((c) => chains.includes(c)).map((c) =>
+          queryNode(c)
+        )
+      )
+    ).filter((c) => !!c);
     nodes.push(...n);
   } else {
     log.info('No event listeners configured.');
@@ -77,40 +132,58 @@ const setupChainEventListeners = async (
   }
 
   log.info('Setting up event listeners...');
-  const generateHandlers = (node: ChainNodeInstance, storageConfig: StorageFilterConfig = {}) => {
+  const generateHandlers = (
+    node: ChainNodeInstance,
+    storageConfig: StorageFilterConfig = {}
+  ) => {
     // writes events into the db as ChainEvents rows
-    const storageHandler = new EventStorageHandler(models, node.chain, storageConfig);
+    const storageHandler = new EventStorageHandler(
+      _models,
+      node.chain,
+      storageConfig
+    );
 
     // emits notifications by writing into the db's Notifications table, and also optionally
     // sending a notification to the client via websocket
     const excludedNotificationEvents = [
-      SubstrateTypes.EventKind.DemocracyTabled,
+      SubstrateTypes.EventKind.DemocracyTabled
     ];
-    const notificationHandler = new EventNotificationHandler(models, wss, excludedNotificationEvents);
+    const notificationHandler = new EventNotificationHandler(
+      _models,
+      wss,
+      excludedNotificationEvents
+    );
 
     // creates and updates ChainEntity rows corresponding with entity-related events
-    const entityArchivalHandler = new EntityArchivalHandler(models, node.chain, wss);
+    const entityArchivalHandler = new EntityArchivalHandler(
+      _models,
+      node.chain,
+      wss
+    );
 
     // creates empty Address and OffchainProfile models for users who perform certain
     // actions, like voting on proposals or registering an identity
-    const profileCreationHandler = new ProfileCreationHandler(models, node.chain);
+    const profileCreationHandler = new ProfileCreationHandler(
+      _models,
+      node.chain
+    );
 
     // the set of handlers, run sequentially on all incoming chain events
     const handlers: IEventHandler[] = [
       storageHandler,
       notificationHandler,
       entityArchivalHandler,
-      profileCreationHandler,
+      profileCreationHandler
     ];
 
     // only handle identities and user flags on substrate chains
     if (chainSupportedBy(node.chain, SubstrateTypes.EventChains)) {
       // populates identity information in OffchainProfiles when received (Substrate only)
-      const identityHandler = new IdentityHandler(models, node.chain);
+      const identityHandler = new IdentityHandler(_models, node.chain);
 
       // populates is_validator and is_councillor flags on Addresses when validator and
       // councillor sets are updated (Substrate only)
-      const userFlagsHandler = new UserFlagsHandler(models, node.chain);
+      const userFlagsHandler = new UserFlagsHandler(_models, node.chain);
 
       handlers.push(identityHandler, userFlagsHandler);
     }
@@ -118,70 +191,88 @@ const setupChainEventListeners = async (
     return handlers;
   };
 
-  const subscribers = await Promise.all(nodes.map(async (node) => {
-    let subscriber: IEventSubscriber<any, any>;
-    if (chainSupportedBy(node.chain, SubstrateTypes.EventChains)) {
-      const nodeUrl = constructSubstrateUrl(node.url);
-      const api = await SubstrateEvents.createApi(nodeUrl, node.Chain.substrate_spec);
-      const excludedEvents = [
-        SubstrateTypes.EventKind.Reward,
-        SubstrateTypes.EventKind.TreasuryRewardMinting,
-        SubstrateTypes.EventKind.TreasuryRewardMintingV2,
-        SubstrateTypes.EventKind.HeartbeatReceived,
-      ];
+  // Create instances of all the handlers needed to process the events we want from the queue
+  const handlers: { [key: string]: IEventHandler[] } = {};
+  nodes.forEach((node) => {
+    handlers[node.chain] = generateHandlers(node);
+  });
 
-      const handlers = generateHandlers(node, { excludedEvents });
-      subscriber = await SubstrateEvents.subscribeEvents({
-        chain: node.chain,
-        handlers,
-        skipCatchup,
-        discoverReconnectRange: () => discoverReconnectRange(models, node.chain),
-        api,
-        enricherConfig: {
-          balanceTransferThresholdPermill: BALANCE_TRANSFER_THRESHOLD_PERMILL,
-        }
-      });
-    } else if (chainSupportedBy(node.chain, MolochTypes.EventChains)) {
-      const contractVersion = 1;
-      const api = await MolochEvents.createApi(node.url, contractVersion, node.address);
-      const handlers = generateHandlers(node);
-      subscriber = await MolochEvents.subscribeEvents({
-        chain: node.chain,
-        handlers,
-        skipCatchup,
-        discoverReconnectRange: () => discoverReconnectRange(models, node.chain),
-        api,
-        contractVersion,
-      });
-    } else if (chainSupportedBy(node.chain, MarlinTypes.EventChains)) {
-      const governorAlphaContractAddress = '0x777992c2E4EDF704e49680468a9299C6679e37F6';
-      const timelockContractAddress = '0x42Bf58AD084595e9B6C5bb2aA04050B0C291264b';
-      const api = await MarlinEvents.createApi(
-        node.url, {
-          comp: node.address,
-          governorAlpha: governorAlphaContractAddress,
-          timelock: timelockContractAddress,
-        }
-      );
-      const handlers = generateHandlers(node);
-      subscriber = await MarlinEvents.subscribeEvents({
-        chain: node.chain,
-        handlers,
-        skipCatchup,
-        discoverReconnectRange: () => discoverReconnectRange(models, node.chain),
-        api,
-      });
+  // feed the events into their respective handlers
+  async function processClassicEvents(event: CWEvent): Promise<void> {
+    const eventHandlers = handlers[event.chain];
+    if (eventHandlers === undefined || eventHandlers === null) {
+      log.info(`There are no event handlers for ${event.chain}`);
+      return;
     }
-
-    // hook for clean exit
-    process.on('SIGTERM', () => {
-      if (subscriber) {
-        subscriber.unsubscribe();
+    let prevResult = null;
+    for (const handler of eventHandlers) {
+      try {
+        prevResult = await handler.handle(event, prevResult);
+      } catch (err) {
+        log.error(`Event handle failure: ${err.message}`);
+        break;
       }
-    });
-    return [ node.chain, subscriber ];
-  }));
-  return _.object<{ [chain: string]:  IEventSubscriber<any, any> }>(subscribers);
+    }
+  }
+
+  const identityHandlers: { [key: string]: IEventHandler } = {};
+  async function processIdentityEvents(event: CWEvent): Promise<void> {
+    if (!identityHandlers[event.chain])
+      identityHandlers[event.chain] = new pgIdentity(event.chain, pool)
+      // identityHandlers[event.chain] = new IdentityHandler(_models, event.chain);
+
+    const handler = identityHandlers[event.chain];
+    try {
+      await handler.handle(event, null);
+    } catch (err) {
+      log.error(`Event handle failure: ${err.message}`);
+    }
+  }
+
+  let eventsSubscriber, identitySubscriber;
+  let rbbtMqConfig =
+    HANDLE_IDENTITY === 'publish' ? IQRbbtConfig : RabbitMqDefaultConfig;
+  const consumer = new Consumer(rbbtMqConfig);
+  await consumer.init();
+
+  eventsSubscriber = await consumer.consumeEvents(
+    processClassicEvents,
+    'eventsSub'
+  );
+
+  if (HANDLE_IDENTITY === 'publish') {
+    identitySubscriber = await consumer.consumeEvents(
+      processIdentityEvents,
+      'identitySub'
+    );
+  }
+
+  console.log('consumer started')
+  return {eventsSubscriber, identitySubscriber};
 };
+
+const SKIP_EVENT_CATCHUP = process.env.SKIP_EVENT_CATCHUP === 'true';
+const CHAIN_EVENTS = process.env.CHAIN_EVENTS;
+
+if (!process.env.RUN_AS_LISTENER) {
+  // configure chain list from events
+  let chains: string[] | 'all' | 'none' = 'all';
+  if (CHAIN_EVENTS === 'none' || CHAIN_EVENTS === 'all') {
+    chains = CHAIN_EVENTS;
+  } else if (CHAIN_EVENTS) {
+    chains = CHAIN_EVENTS.split(',');
+  }
+
+  let subs
+  try {
+    log.info('Starting listener process');
+    setupChainEventListeners(models, null, chains, SKIP_EVENT_CATCHUP).then((subscribers) => {
+      subs = subscribers
+    })
+  } catch (e) {
+    console.error(`Chain event listener setup failed: ${e.message}`);
+  }
+}
+
 
 export default setupChainEventListeners;

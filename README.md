@@ -6,8 +6,9 @@ Discussions and governance for blockchain networks.
 
 ## Quickstart
 
-Install dependencies:
-```
+###Install dependencies:
+**Postgres**
+```bash
 brew install node yarn postgresql
 brew services start postgresql
 psql postgres -c "CREATE ROLE commonwealth WITH LOGIN PASSWORD 'edgeware'; ALTER ROLE commonwealth CREATEDB;"
@@ -17,15 +18,32 @@ psql postgres -h 127.0.0.1 -U commonwealth -c "CREATE DATABASE commonwealth;"
 This should give you a Postgres server installed and running with user
 "commonwealth" and password "edgeware".
 
+**RabbitMQ - optional**
+
+*Installing RabbitMQ is only necessary if you intend to run chain-event listeners locally.*
+
+Install RabbitMQ using the guide for your OS: https://www.rabbitmq.com/download.html
+
+Once installed run the following commands to create a user:
+```bash
+sudo rabbitmqctl add_user commonwealth edgeware
+sudo rabbitmqctl set_user_tags commonwealth administrator
+sudo rabbitmqctl set_permissions -p / commonwealth ".*" ".*" ".*"
+```
+
+This should give you a RabbitMQ server with user "commonwealth" and password "edgeware"
+
+**nvm**
+
 For development, you should also install nvm:
 
-```
+```bash
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
 nvm install
 ```
 
-- if for some reason, nvm still doesnt work, try using
-```
+- if for some reason, nvm still doesn't work, try using
+```bash
     source ~/.nvm/nvm.sh
 ```
 
@@ -84,7 +102,7 @@ We also use certain environment variables to configure the application itself:
 To download and restore the production database, and run migrations:
 
 ```
-pg_dump $(heroku config:get DATABASE_URL --app commonwealthapp) --verbose --exclude-table-data="public.\"Sessions\"" --exclude-table-data="public.\"DiscussionDrafts\"" --exclude-table-data="public.\"LoginTokens\"" --exclude-table-data="public.\"Notifications\"" --exclude-table-data="public.\"SocialAccounts\"" --exclude-table-data="public.\"Webhooks\"" --exclude-table-data="public.\"ChainEvents\"" --no-privileges --no-owner -f latest.dump
+pg_dump $(heroku config:get DATABASE_URL --app commonwealthapp) --verbose --exclude-table-data="public.\"Sessions\"" --exclude-table-data="public.\"DiscussionDrafts\"" --exclude-table-data="public.\"LoginTokens\"" --exclude-table-data="public.\"Notifications\"" --exclude-table-data="public.\"EdgewareLockdropEverythings\"" --exclude-table-data="public.\"EdgewareLockdropBalances\"" --exclude-table-data="public.\"EdgewareLockdropEvents\"" --exclude-table-data="public.\"SocialAccounts\"" --exclude-table-data="public.\"Webhooks\"" --exclude-table-data="public.\"ChainEvents\"" --no-privileges --no-owner -f latest.dump
 
 npx sequelize db:drop
 npx sequelize db:create
@@ -185,6 +203,24 @@ You should now set up any databases and services needed. In particular:
 - Schedule a daily task for sending notification email digests:
   `SEND_EMAILS=true ts-node --project tsconfig.node.json server.ts`
   at 1pm UTC / 6am PT / 9am ET / 3pm CEST
+
+## Custom Domains
+
+To configure a custom domain, you should:
+
+- Add the custom domain to Heroku
+- Add the custom domain to Magic
+- Set the customDomain field in the Chains or OffchainCommunities
+  row in the database, corresponding to the community to be served on
+  that domain.
+
+You can test the custom domain by setting it in your /etc/hosts file
+and running a local SSL proxy, for example:
+
+```
+npm install -g local-ssl-proxy
+local-ssl-proxy --source 443 --target 8080
+```
 
 ## Chat Server
 

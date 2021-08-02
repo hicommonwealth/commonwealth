@@ -9,8 +9,8 @@ import { findAll } from 'highlight-words-core';
 import smartTruncate from 'smart-truncate';
 
 const renderer = new marked.Renderer();
-renderer.link = (href, title, text) => {
-  return `<a target="_blank" href="${href}">${text}</a>`;
+renderer['link'] = (href, title, text) => {
+  return `<a ${href.indexOf('://commonwealth.im/') !== -1 && 'target="_blank"'} href="${href}">${text}</a>`;
 };
 
 marked.setOptions({

@@ -51,7 +51,6 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
             ],
           }),
         ]),
-        ' ', // em space
       ],
       proposal instanceof OffchainThread
         && (proposal.offchainVotingEndsAt || proposal.offchainVotingNumVotes)
@@ -64,7 +63,6 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
             size: 'xs',
             compact: true,
           }),
-          ' ', // en space
         ],
       proposal.chainEntities?.length > 0 && [
         proposal.chainEntities.sort((a, b) => {
@@ -82,19 +80,24 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
             compact: true,
           });
         }),
-        ' ', // en space
       ],
       proposal instanceof OffchainThread
         && proposal.stage !== OffchainThreadStage.Discussion
-        && m('.discussion-row-stage', {
-          class: proposal.stage === OffchainThreadStage.ProposalInReview ? 'positive'
+        && m(Button, {
+          class: 'discussion-row-stage-btn',
+          intent: proposal.stage === OffchainThreadStage.ProposalInReview ? 'positive'
             : proposal.stage === OffchainThreadStage.Voting ? 'positive'
               : proposal.stage === OffchainThreadStage.Passed ? 'positive'
-                : proposal.stage === OffchainThreadStage.Failed ? 'negative' : 'none',
-        }, [
-          offchainThreadStageToLabel(proposal.stage),
-          ' ', // em space
-        ]),
+                : proposal.stage === OffchainThreadStage.Failed ? 'negative' : 'positive',
+          size: 'xs',
+          compact: true,
+          label: offchainThreadStageToLabel(proposal.stage),
+        }),
+      proposal instanceof OffchainThread && (
+        proposal.stage !== OffchainThreadStage.Discussion
+          || proposal.chainEntities?.length > 0
+          || (proposal.offchainVotingEndsAt || proposal.offchainVotingNumVotes)
+          || proposal.readOnly) && ' ', // en space
       (propType === OffchainThreadKind.Link && proposal.url)
         && [
           externalLink('a.external-discussion-link', proposal.url, `Link: ${extractDomain(proposal.url)}`),
