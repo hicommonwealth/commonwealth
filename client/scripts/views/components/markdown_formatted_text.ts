@@ -10,7 +10,7 @@ import smartTruncate from 'smart-truncate';
 
 const renderer = new marked.Renderer();
 renderer.link = (href, title, text) => {
-  return `<a ${href.indexOf('://commonwealth.im/') !== -1 && 'target="_blank"'} href="${href}">${text}</a>`;
+  return `<a ${!href.contains('://commonwealth.im/') && 'target="_blank"'} href="${href}">${text}</a>`;
 };
 
 marked.setOptions({
@@ -71,11 +71,14 @@ const MarkdownFormattedText : m.Component<{
         class: collapse ? 'collapsed' : '',
       }, vnode.state.cachedResultWithHighlights);
     }
+    console.log({ doc: doc.toString() });
     const unsanitized = marked(doc.toString());
+    console.log({ unsanitized });
     const sanitized = hideFormatting
       ? DOMPurify.sanitize(unsanitized, { ALLOWED_TAGS: ['a'], ADD_ATTR: ['target'] })
       : DOMPurify.sanitize(unsanitized, { USE_PROFILES: { html: true }, ADD_ATTR: ['target'] });
     const results = m.trust(sanitized);
+    console.log({ results });
 
     return m('.MarkdownFormattedText', {
       class: collapse ? 'collapsed' : '',

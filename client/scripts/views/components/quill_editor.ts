@@ -42,6 +42,21 @@ const sliceFromLastWhitespace = (str) => {
   return str.slice(sliceI);
 };
 
+// Provides markdown image support by converting
+// hybrid QFT/MD delta to pure MD.
+export const addMarkdownImageToText = (ops) => {
+  let finalText = '';
+  ops.forEach((op) => {
+    if (!op || !op.insert) return;
+    if (op.insert.image?.length) {
+      finalText += `![](${op.insert.image})`;
+    } else if (typeof op.insert === 'string') {
+      finalText += op.insert;
+    }
+  });
+  return finalText;
+};
+
 const instantiateEditor = (
   $editor: any,
   theme: string,
@@ -56,7 +71,7 @@ const instantiateEditor = (
   const Keyboard = Quill.import('modules/keyboard');
   const Clipboard = Quill.import('modules/clipboard') as any;
   let quill;
-
+  console.log({ imageUploader });
   // Set up markdown mode helper
   const isMarkdownMode = () => $editor.parent('.markdown-mode').length > 0;
 
@@ -535,6 +550,7 @@ const instantiateEditor = (
         auth: true,
         jwt: app.user.jwt,
       }).then((response) => {
+        console.log(response);
         if (response.status !== 'Success') {
           document.getElementsByClassName('spinner-wrap')[0].remove();
           alert('Upload failed');
@@ -553,6 +569,7 @@ const instantiateEditor = (
           resolve(trimmedURL);
           console.log(`Upload succeeded: ${trimmedURL}`);
         }).catch((err) => {
+          console.log(err);
           // file not uploaded
           document.getElementsByClassName('spinner-wrap')[0].remove();
           alert('Upload failed');
@@ -642,7 +659,7 @@ const instantiateEditor = (
       },
       clipboard: {
         matchers: [
-	  [
+  [
             Node.ELEMENT_NODE,
             (node, delta) => {
 	      return delta.compose(

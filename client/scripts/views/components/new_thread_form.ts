@@ -21,7 +21,7 @@ import { OffchainTopic, OffchainThreadKind, OffchainThreadStage, CommunityInfo, 
 import { updateLastVisited } from 'controllers/app/login';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
-import QuillEditor from 'views/components/quill_editor';
+import QuillEditor, { addMarkdownImageToText } from 'views/components/quill_editor';
 import TopicSelector from 'views/components/topic_selector';
 import EditProfileModal from 'views/modals/edit_profile_modal';
 
@@ -143,9 +143,11 @@ const newThread = async (
   const mentionsEle = document.getElementsByClassName('ql-mention-list-container')[0];
   if (mentionsEle) (mentionsEle as HTMLElement).style.visibility = 'hidden';
   const bodyText = !quillEditorState ? ''
-    : quillEditorState.markdownMode
-      ? quillEditorState.editor.getText()
-      : JSON.stringify(quillEditorState.editor.getContents());
+    : !quillEditorState.markdownMode
+      ? JSON.stringify(quillEditorState.editor.getContents())
+      : quillEditorState.editor.getContents()?.ops?.length > 1
+        ? addMarkdownImageToText(quillEditorState.editor.getContents().ops)
+        : quillEditorState.editor.getText();
 
   const { topicName, topicId, threadTitle, linkTitle, url } = form;
   const title = threadTitle || linkTitle;
