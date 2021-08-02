@@ -5,7 +5,7 @@ import lity from 'lity';
 import $ from 'jquery';
 import _ from 'lodash';
 
-import { updateRoute } from 'app';
+import { updateRoute, navigateToSubpage } from 'app';
 import app from 'state';
 import { pluralize } from 'helpers';
 import {
@@ -126,8 +126,7 @@ export const ProposalBodyCreated: m.Component<{
             e.preventDefault();
             const target = isThread ? `${link}?comment=body` : link;
             if (target === document.location.href) return;
-            // use updateRoute instead of m.route.set to avoid resetting scroll point
-            updateRoute(target, {}, { replace: true });
+            history.replaceState(history.state, '', target);
             jumpHighlightComment((isThread ? 'body' : item.id), false, 500);
           }
         }, item.createdAt.fromNow())
@@ -243,7 +242,7 @@ export const ProposalBodyDeleteMenuItem: m.Component<{
         )();
         if (!confirmed) return;
         (isThread ? app.threads : app.comments).delete(item).then(() => {
-          if (isThread) m.route.set(`/${app.activeId()}/`);
+          if (isThread) navigateToSubpage('/');
           if (refresh) refresh();
           m.redraw();
           // TODO: set notification bar for 'thread deleted/comment deleted'
@@ -538,7 +537,7 @@ export const ProposalBodySaveEdit: m.Component<{
           parentState.saving = true;
           if (item instanceof OffchainThread) {
             app.threads.edit(item, itemText, parentState.updatedTitle).then(() => {
-              m.route.set(`/${app.activeId()}/proposal/${item.slug}/${item.id}`);
+              navigateToSubpage(`/proposal/${item.slug}/${item.id}`);
               parentState.editing = false;
               parentState.saving = false;
               clearEditingLocalStorage(item, true);

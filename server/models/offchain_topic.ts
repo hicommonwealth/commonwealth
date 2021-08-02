@@ -15,6 +15,8 @@ export interface OffchainTopicAttributes {
   updated_at?: Date;
   deleted_at?: Date;
   token_threshold: number;
+  featured_in_sidebar: boolean;
+  featured_in_new_post: boolean;
 
   // associations
   community?: OffchainCommunityAttributes;
@@ -45,7 +47,9 @@ export default (
     created_at: { type: dataTypes.DATE, allowNull: false },
     updated_at: { type: dataTypes.DATE, allowNull: false },
     deleted_at: { type: dataTypes.DATE, allowNull: true },
-    token_threshold: { type: dataTypes.INTEGER, allowNull: true }
+    token_threshold: { type: dataTypes.INTEGER, allowNull: true },
+    featured_in_sidebar: { type: dataTypes.BOOLEAN, allowNull: true, defaultValue: false },
+    featured_in_new_post: { type: dataTypes.BOOLEAN, allowNull: true, defaultValue: false },
   }, {
     underscored: true,
     paranoid: true,

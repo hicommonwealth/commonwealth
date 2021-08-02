@@ -25,12 +25,8 @@ const EditTopicThresholdsRow: m.Component<{ topic: OffchainTopic }, { new_token_
     const { topic } = vnode.attrs;
     const decimals = app.chain.meta.chain.decimals ? app.chain.meta.chain.decimals : 18;
     if (vnode.state.new_token_threshold === null || vnode.state.new_token_threshold === undefined) {
-      console.log('!!topic.token_threshold == ', !!topic.token_threshold);
-
       vnode.state.new_token_threshold = topic.token_threshold
         ? tokenBaseUnitsToTokens(topic.token_threshold.toString(), decimals) : '0';
-      console.log('vnode.state.new_token_threshold, ', vnode.state.new_token_threshold);
-
     }
 
     return m(Form, [
@@ -77,8 +73,10 @@ const EditTopicThresholdsModal: m.Component<{
   saving: boolean,
 }> = {
   view: (vnode) => {
-    if (!app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })) return null;
+    if (!app.user.isSiteAdmin
+      && !app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })) return null;
     const { id, name, description, token_threshold } = vnode.attrs;
+
     if (!vnode.state.form) {
       vnode.state.form = { id, name, description, token_threshold };
     }

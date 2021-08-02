@@ -33,6 +33,7 @@ export interface ChainAttributes {
   type: string;
   decimals?: number;
   substrate_spec: RegisteredTypes;
+  terms: string;
 
   // associations
   ChainNodes?: ChainNodeAttributes[] | ChainNodeAttributes['id'][];
@@ -82,6 +83,7 @@ export default (
     type: { type: dataTypes.STRING, allowNull: false },
     decimals: { type: dataTypes.INTEGER, allowNull: true },
     substrate_spec: { type: dataTypes.JSONB, allowNull: true },
+    terms: { type: dataTypes.STRING, allowNull: true },
   }, {
     timestamps: false,
     underscored: true,

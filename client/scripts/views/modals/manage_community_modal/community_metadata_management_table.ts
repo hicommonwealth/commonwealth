@@ -20,6 +20,7 @@ interface ICommunityMetadataManagementState {
   stagesEnabled: boolean;
   additionalStages: string;
   customDomain: string;
+  terms: string;
 }
 
 export interface IChainOrCommMetadataManagementAttrs {
@@ -44,6 +45,7 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
     vnode.state.stagesEnabled = vnode.attrs.community.stagesEnabled;
     vnode.state.additionalStages = vnode.attrs.community.additionalStages;
     vnode.state.customDomain = vnode.attrs.community.customDomain;
+    vnode.state.terms = vnode.attrs.community.terms;
   },
   view: (vnode) => {
     return m('.CommunityMetadataManagementTable', [m(Table, {
@@ -110,8 +112,15 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
       m(InputPropertyRow, {
         title: 'Domain',
         defaultValue: vnode.state.customDomain,
-        placeholder: 'gov.edgewa.re',
+        placeholder: 'Contact support', // gov.edgewa.re
         onChangeHandler: (v) => { vnode.state.customDomain = v; },
+        disabled: true, // Custom domains should be admin configurable only
+      }),
+      m(InputPropertyRow, {
+        title: 'Terms of Service',
+        defaultValue: vnode.state.terms,
+        placeholder: 'Url that new users see',
+        onChangeHandler: (v) => { vnode.state.terms = v; },
       }),
       m(TogglePropertyRow, {
         title: 'Privacy',
@@ -158,6 +167,7 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
           stagesEnabled,
           additionalStages,
           customDomain,
+          terms,
           invitesEnabled,
           privacyEnabled,
         } = vnode.state;
@@ -174,6 +184,7 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
             stagesEnabled,
             additionalStages,
             customDomain,
+            terms,
             privacyEnabled,
             invitesEnabled,
           });

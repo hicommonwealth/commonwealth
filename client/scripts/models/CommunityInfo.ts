@@ -17,6 +17,7 @@ interface CommunityData {
   stagesEnabled: boolean,
   additionalStages: string,
   customDomain: string;
+  terms: string;
   invitesEnabled: boolean,
   privacyEnabled: boolean,
 }
@@ -38,6 +39,7 @@ class CommunityInfo {
   public stagesEnabled: boolean;
   public additionalStages: string;
   public customDomain: string;
+  public terms: string;
   public readonly collapsedOnHomepage: boolean;
   public readonly featuredTopics: string[];
   public readonly topics: OffchainTopic[];
@@ -48,7 +50,7 @@ class CommunityInfo {
   constructor({
     id, name, description, iconUrl, website, discord, element, telegram, github, defaultChain, visible,
     stagesEnabled, additionalStages,
-    customDomain, invitesEnabled, privacyEnabled, collapsedOnHomepage, featuredTopics, topics, adminsAndMods
+    customDomain, terms, invitesEnabled, privacyEnabled, collapsedOnHomepage, featuredTopics, topics, adminsAndMods
   }) {
     this.id = id;
     this.name = name;
@@ -64,6 +66,7 @@ class CommunityInfo {
     this.stagesEnabled = stagesEnabled;
     this.additionalStages = additionalStages;
     this.customDomain = customDomain;
+    this.terms = terms;
     this.invitesEnabled = invitesEnabled;
     this.privacyEnabled = privacyEnabled;
     this.collapsedOnHomepage = collapsedOnHomepage;
@@ -87,6 +90,7 @@ class CommunityInfo {
     stagesEnabled,
     additionalStages,
     customDomain,
+    terms,
     invitesEnabled,
     privacyEnabled,
     collapsedOnHomepage: collapsed_on_homepage,
@@ -109,6 +113,7 @@ class CommunityInfo {
       stagesEnabled,
       additionalStages,
       customDomain,
+      terms,
       invitesEnabled,
       privacyEnabled,
       collapsedOnHomepage: collapsed_on_homepage,
@@ -174,6 +179,7 @@ class CommunityInfo {
     stagesEnabled,
     additionalStages,
     customDomain,
+    terms,
     website,
     discord,
     element,
@@ -194,6 +200,7 @@ class CommunityInfo {
       'stagesEnabled': stagesEnabled,
       'additionalStages': additionalStages,
       'customDomain': customDomain,
+      'terms': terms,
       'privacy': privacyEnabled,
       'invites': invitesEnabled,
       'jwt': app.user.jwt,
@@ -210,6 +217,7 @@ class CommunityInfo {
     this.stagesEnabled = stagesEnabled;
     this.additionalStages = additionalStages;
     this.customDomain = updatedCommunity.customDomain;
+    this.terms = updatedCommunity.terms;
     this.privacyEnabled = updatedCommunity.privacyEnabled;
     this.invitesEnabled = updatedCommunity.invitesEnabled;
   }

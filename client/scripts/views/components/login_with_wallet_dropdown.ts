@@ -5,15 +5,14 @@ import $ from 'jquery';
 import { Button, PopoverMenu, MenuItem, MenuDivider, Icon, Icons } from 'construct-ui';
 
 import app from 'state';
+import { navigateToSubpage } from 'app';
 import { ChainBase, IWebWallet } from 'models';
 import { ChainBaseIcon } from 'views/components/chain_icon';
 import { baseToNetwork } from 'models/types';
 import _ from 'underscore';
 
-import Token from 'controllers/chain/ethereum/token/adapter';
-
 const CHAINBASE_WITH_CLI = [
-  ChainBase.CosmosSDK, ChainBase.Substrate
+  ChainBase.Substrate
 ];
 
 const LoginWithWalletDropdown: m.Component<{
@@ -65,7 +64,7 @@ const LoginWithWalletDropdown: m.Component<{
         onclick: (e) => {
           $('.Login').trigger('modalexit');
           const defaultChainId = baseToNetwork(base);
-          m.route.set(`/${app.chain?.id || defaultChainId}/web3login`, web3loginParams);
+          navigateToSubpage('/web3login', web3loginParams);
           app.modals.lazyCreate('link_new_address_modal', {
             loggingInWithAddress,
             joiningChain,
@@ -76,7 +75,7 @@ const LoginWithWalletDropdown: m.Component<{
             prepopulateAddress,
             successCallback: () => {
               if (next === '/?') {
-                m.route.set(`/${app.chain?.id || defaultChainId}`);
+                navigateToSubpage('/');
               } else {
                 m.route.set(next);
               }

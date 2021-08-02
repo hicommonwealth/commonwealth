@@ -228,13 +228,7 @@ async function main() {
     });
 
     // redirect to https:// unless we are using a test domain
-    app.use(redirectToHTTPS(DEV ? [
-      /gov.edgewa.re:(\d{4})/,
-      /gov2.edgewa.re:(\d{4})/,
-      /gov3.edgewa.re:(\d{4})/,
-      /localhost:(\d{4})/,
-      /127.0.0.1:(\d{4})/
-    ] : [
+    app.use(redirectToHTTPS([
       /localhost:(\d{4})/,
       /127.0.0.1:(\d{4})/
     ], [], 301));

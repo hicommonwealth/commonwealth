@@ -3,8 +3,9 @@ import 'modals/new_topic_modal.scss';
 import m from 'mithril';
 import app from 'state';
 import $ from 'jquery';
-import { Button, Input, Form, FormGroup, FormLabel } from 'construct-ui';
+import { Button, Input, Form, FormGroup, FormLabel, Checkbox } from 'construct-ui';
 import BN from 'bn.js';
+
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { CompactModalExitButton } from 'views/modal';
 import { tokensToTokenBaseUnits } from 'helpers';
@@ -13,6 +14,8 @@ interface INewTopicModalForm {
   name: string,
   description: string,
   token_threshold: string
+  featured_in_sidebar: boolean,
+  featured_in_new_post: boolean,
 }
 
 const NewTopicModal: m.Component<{
@@ -20,16 +23,19 @@ const NewTopicModal: m.Component<{
   name: string,
   description: string,
   token_threshold: string
+  featured_in_sidebar: boolean,
+  featured_in_new_post: boolean,
 }, {
   error: any,
   form: INewTopicModalForm,
   saving: boolean,
 }> = {
   view: (vnode) => {
-    if (!app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })) return null;
-    const { id, name, description, token_threshold } = vnode.attrs;
+    if (!app.user.isSiteAdmin && !app.user.isAdminOfEntity({ chain: app.activeChainId(),
+      community: app.activeCommunityId() })) return null;
+    const { id, name, description, featured_in_sidebar, token_threshold, featured_in_new_post } = vnode.attrs;
     if (!vnode.state.form) {
-      vnode.state.form = { id, name, description, token_threshold };
+      vnode.state.form = { id, name, description, token_threshold, featured_in_sidebar, featured_in_new_post };
     }
 
     return m('.NewTopicModal', [
@@ -85,6 +91,24 @@ const NewTopicModal: m.Component<{
               }
             })
           ]),
+          m(FormGroup, [
+            m(Checkbox, {
+              label: 'Featured in Sidebar',
+              checked: vnode.state.form.featured_in_sidebar,
+              onchange: (e) => {
+                vnode.state.form.featured_in_sidebar = !vnode.state.form.featured_in_sidebar;
+              },
+            }),
+          ]),
+          m(FormGroup, [
+            m(Checkbox, {
+              label: 'Featured in New Post',
+              checked: vnode.state.form.featured_in_new_post,
+              onchange: (e) => {
+                vnode.state.form.featured_in_new_post = !vnode.state.form.featured_in_new_post;
+              },
+            }),
+          ]),
           m(Button, {
             intent: 'primary',
             disabled: vnode.state.saving,
@@ -94,6 +118,7 @@ const NewTopicModal: m.Component<{
               if (!vnode.state.form.name.trim()) return;
               app.topics.add(
                 vnode.state.form.name, vnode.state.form.description, null,
+                vnode.state.form.featured_in_sidebar, vnode.state.form.featured_in_new_post,
                 tokensToTokenBaseUnits(vnode.state.form.token_threshold ? vnode.state.form.token_threshold : '0', 
                   app.chain.meta.chain.decimals ? app.chain.meta.chain.decimals : 18)
               ).then(() => {

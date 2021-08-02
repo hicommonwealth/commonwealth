@@ -7,6 +7,7 @@ import mixpanel from 'mixpanel-browser';
 import { PopoverMenu, MenuDivider, Icon, Icons, Button, Input } from 'construct-ui';
 
 import app from 'state';
+import { navigateToSubpage } from 'app';
 import Sublayout from 'views/sublayout';
 import { idToProposal, ProposalType, proposalSlugToClass } from 'identifiers';
 import { slugify } from 'utils';
@@ -109,12 +110,15 @@ const ProposalHeader: m.Component<{
     } = vnode.attrs;
 
     const attachments = (proposal instanceof OffchainThread) ? (proposal as OffchainThread).attachments : false;
-    const proposalLink = `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-`
+    const proposalLink = (app.isCustomDomain() ? '' : `/${app.activeId()}`)
+      + `/proposal/${proposal.slug}/${proposal.identifier}-`
       + `${slugify(proposal.title)}`;
     const proposalTitleIsEditable = (proposal instanceof SubstrateDemocracyProposal
       || proposal instanceof SubstrateCollectiveProposal
       || proposal instanceof SubstrateTreasuryTip
       || proposal instanceof SubstrateTreasuryProposal);
+
+    const hasBody = !!(proposal as AnyProposal).description;
 
     return m('.ProposalHeader', {
       class: `proposal-${proposal.slug}`
@@ -170,7 +174,7 @@ const ProposalHeader: m.Component<{
                 inline: true,
                 trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
               }),
-              m('.CommentSocialHeader', [ m(SocialSharingCarat)]),
+              !app.isCustomDomain() && m('.CommentSocialHeader', [ m(SocialSharingCarat)]),
               // This is the new social carat menu
               vnode.state.editPermissionsIsOpen
                 && proposal instanceof OffchainThread
@@ -282,6 +286,9 @@ const ProposalHeader: m.Component<{
             && m(ProposalBodyReaction, { item: proposal }),
         ]),
       ]),
+      !(proposal instanceof OffchainThread) && hasBody && m('.proposal-content', [
+        m(ProposalBodyText, { item: proposal }),
+      ]),
     ]);
   }
 };
@@ -313,7 +320,8 @@ const ProposalComment: m.Component<{
     if (!comment) return;
     const parentType = comment.parentComment ? CommentParent.Comment : CommentParent.Proposal;
 
-    const commentLink = `/${app.activeId()}/proposal/${proposal.slug}/`
+    const commentLink = (app.isCustomDomain() ? '' : `/${app.activeId()}`)
+      + `/proposal/${proposal.slug}/`
       + `${proposal.identifier}-${slugify(proposal.title)}?comment=${comment.id}`;
 
     return m('.ProposalComment', {
@@ -355,7 +363,7 @@ const ProposalComment: m.Component<{
               trigger: m(Icon, { name: Icons.CHEVRON_DOWN })
             })
           ],
-          m('.CommentSocialHeader', [ m(SocialSharingCarat, { commentID: comment.id })])
+          !app.isCustomDomain() && m('.CommentSocialHeader', [ m(SocialSharingCarat, { commentID: comment.id })])
           // For now, we are limiting threading to 1 level deep
           // Comments whose parents are other comments should not display the reply option
           // !vnode.state.editing
@@ -633,7 +641,7 @@ const ViewProposalPage: m.Component<{
     const { proposal } = vnode.state;
     if (proposalRecentlyEdited) vnode.state.recentlyEdited = false;
     if (identifier !== `${proposalId}-${slugify(proposal.title)}`) {
-      m.route.set(`/${app.activeId()}/proposal/${proposal.slug}/${proposalId}-${slugify(proposal.title)}`, {},
+      navigateToSubpage(`/proposal/${proposal.slug}/${proposalId}-${slugify(proposal.title)}`, {},
         { replace: true });
     }
 
@@ -734,18 +742,6 @@ const ViewProposalPage: m.Component<{
     const viewCount : number = vnode.state.viewCount;
     const commentCount : number = app.comments.nComments(proposal);
     const voterCount : number = proposal instanceof OffchainThread ? 0 : proposal.getVotes().length;
-
-    const hasBody: boolean = proposal instanceof OffchainThread
-      ? (proposal as OffchainThread).body && (() => {
-        const body = (proposal as OffchainThread).body;
-        try {
-          const doc = JSON.parse(body);
-          return !(doc.ops.length === 1 && doc.ops[0].insert.trim() === '');
-        } catch (e) {
-          return (`${body}`).trim() !== '';
-        }
-      })()
-      : !!(proposal as AnyProposal).description;
 
     const getSetGlobalEditingStatus = (call: string, status?: boolean) => {
       if (call === GlobalStatus.Get) return vnode.state.editing;

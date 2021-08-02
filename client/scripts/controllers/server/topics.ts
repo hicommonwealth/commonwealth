@@ -8,9 +8,12 @@ import BN from 'bn.js';
 
 const modelFromServer = (topic) => {
   if (topic.token_threshold !== null) {
-    return new OffchainTopic(topic.name, topic.id, topic.description, topic.telegram, topic.community_id, topic.chain_id, new BN(topic.token_threshold));
+    return new OffchainTopic(topic.name, topic.id, topic.description, topic.telegram,
+      topic.community_id, topic.chain_id, topic.featured_in_sidebar, topic.featured_in_new_post,
+      new BN(topic.token_threshold));
   } else {
-    return new OffchainTopic(topic.name, topic.id, topic.description, topic.telegram, topic.community_id, topic.chain_id);
+    return new OffchainTopic(topic.name, topic.id, topic.description, topic.telegram,
+      topic.community_id, topic.chain_id, topic.featured_in_sidebar, topic.featured_in_new_post);
   }
 };
 
@@ -34,6 +37,8 @@ class TopicsController {
         'name': topic.name,
         'description': topic.description,
         'telegram': topic.telegram,
+        'featured_in_sidebar': topic.featuredInSidebar,
+        'featured_in_new_post': topic.featuredInNewPost,
         'featured_order': featured_order,
         'address': app.user.activeAccount.address,
         'jwt': app.user.jwt
@@ -91,7 +96,8 @@ class TopicsController {
     }
   }
 
-  public async add(name: string, description: string, telegram: string, token_threshold: string = '0') {
+  public async add(name: string, description: string, telegram: string, featured_in_sidebar: boolean,
+    featured_in_new_post: boolean, token_threshold: string = '0') {
     try {
       const chainOrCommObj = (app.activeChainId())
         ? { 'chain': app.activeChainId() }
@@ -102,6 +108,8 @@ class TopicsController {
         'name': name,
         'description': description,
         'telegram': telegram,
+        'featured_in_sidebar': featured_in_sidebar,
+        'featured_in_new_post': featured_in_new_post,
         'jwt': app.user.jwt,
         'token_threshold': token_threshold
       });
