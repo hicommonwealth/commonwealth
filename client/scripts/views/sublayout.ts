@@ -104,7 +104,6 @@ const Sublayout: m.Component<{
         }),
       ]),
     ];
-
     return [
       m('.layout-container', [
         m('.Sublayout', { class: vnode.attrs.class }, [

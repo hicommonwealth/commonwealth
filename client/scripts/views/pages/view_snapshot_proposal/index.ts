@@ -87,7 +87,6 @@ const VoteRow: m.Component<{
 const VoteView: m.Component<{ votes: Vote[] }, { numLoadedYes: number, numLoadedNo: number }> = {
   view: (vnode) => {
     const { votes } = vnode.attrs;
-    console.log("vote viiew!!!")
     if (!vnode.state.numLoadedYes) { vnode.state.numLoadedYes = 10; }
     if (!vnode.state.numLoadedNo) { vnode.state.numLoadedNo = 10; }
 

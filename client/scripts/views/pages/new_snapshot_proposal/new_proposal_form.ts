@@ -79,7 +79,7 @@ const newThread = async (
     : quillEditorState.markdownMode
       ? quillEditorState.editor.getText()
       : JSON.stringify(quillEditorState.editor.getContents());
-
+  
   form.body = bodyText;
   form.snapshot = await snapshotJs.utils.getBlockNumber(snapshotJs.utils.getProvider(space.network));
   form.metadata.network = space.network;
@@ -97,6 +97,9 @@ const newThread = async (
   };
 
   const wallet = (app.wallets.getByName('metamask') as MetamaskWebWalletController);
+  if (!wallet.enabling && !wallet.enabled) {
+    await wallet?.enable();
+  }
   msg.sig = await wallet.signMessage(msg.msg);
   const result = await $.post(`${app.serverUrl()}/snapshotAPI/sendMessage`, { ...msg });
 
