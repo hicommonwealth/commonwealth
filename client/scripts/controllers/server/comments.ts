@@ -139,8 +139,6 @@ class CommentsController {
     parentCommentId: any = null,
     attachments?: string[],
   ) {
-    console.log(unescapedText);
-    console.log(encodeURIComponent(unescapedText));
     try {
       // TODO: Change to POST /comment
       const res = await $.post(`${app.serverUrl()}/createComment`, {
