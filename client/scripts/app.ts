@@ -413,7 +413,7 @@ m.route.set = (...args) => {
 export const navigateToSubpage = (...args) => {
   // prepend community if we are not on a custom domain
   if (!app.isCustomDomain()) {
-    args[0] = `${app.activeId()}/${args[0]}`;
+    args[0] = `/${app.activeId()}${args[0]}`;
   }
   m.route.set.apply(this, args);
 };
