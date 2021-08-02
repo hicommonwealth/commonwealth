@@ -22,13 +22,13 @@ export interface LoginTokenAttributes {
   SocialAccounts?: SocialAccountAttributes[];
 }
 
-export interface LoginTokenInstance extends Model<LoginTokenAttributes>, LoginTokenAttributes {
-  // no mixins used yet
+export interface LoginTokenCreationAttributes extends  LoginTokenAttributes {
+   createForEmail?: (email: string, path?: string) => Promise<LoginTokenInstance>;
+  createForOAuth?: (domain: string, social_account: number) => Promise<LoginTokenInstance>;
 }
 
-export interface LoginTokenModel extends Sequelize.Model<LoginTokenInstance, LoginTokenAttributes> {
-  createForEmail?: (email: string, path?: string) => Promise<LoginTokenInstance>;
-  createForOAuth?: (domain: string, social_account: number) => Promise<LoginTokenInstance>;
+export interface LoginTokenInstance extends Model<LoginTokenAttributes>, LoginTokenAttributes {
+  // no mixins used yet
 }
 
 type LoginTokenModelStatic = typeof Model
