@@ -7,13 +7,11 @@ import {
   CWEvent,
 } from '@commonwealth/chain-events';
 
-import { RabbitMqDefaultConfig } from 'ce-rabbitmq-plugin';
-import IQRbbtConfig from '../util/rabbitmq/WithIdentityQueueConfig.json'
+import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
 
 import { HANDLE_IDENTITY } from '../config';
 
 import * as WebSocket from 'ws';
-import * as fs from 'fs';
 import EventStorageHandler, {
   StorageFilterConfig
 } from '../eventHandlers/storage';
@@ -24,20 +22,16 @@ import pgIdentity from '../eventHandlers/pgIdentity';
 import UserFlagsHandler from '../eventHandlers/userFlags';
 import ProfileCreationHandler from '../eventHandlers/profileCreation';
 import models, { sequelize } from '../database';
-import { constructSubstrateUrl } from '../../shared/substrate';
 import { factory, formatFilename } from '../../shared/logging';
 import { ChainNodeInstance } from '../models/chain_node';
 import { Consumer } from '../util/rabbitmq/consumer';
 import { Pool } from 'pg';
 
-export const DATABASE_URI =
-  !process.env.DATABASE_URL || process.env.NODE_ENV === 'development'
-    ? 'postgresql://commonwealth:edgeware@localhost/commonwealth'
-    : process.env.DATABASE_URL;
+import { DATABASE_URI } from '../config'
+
 const log = factory.getLogger(formatFilename(__filename));
 
 // emit globally any transfer over 1% of total issuance
-// TODO: config this
 const BALANCE_TRANSFER_THRESHOLD_PERMILL: number = 10_000;
 
 const discoverReconnectRange = async (
@@ -62,21 +56,6 @@ const discoverReconnectRange = async (
     return { startBlock: null };
   }
 };
-
-// returns either the RabbitMQ config specified by the filepath or the default config
-export function getRabbitMQConfig(filepath?: string) {
-  if (typeof filepath === 'string' && filepath.length === 0) return RabbitMqDefaultConfig;
-  else {
-    try {
-      const raw = fs.readFileSync(filepath);
-      return JSON.parse(raw.toString());
-    } catch (error) {
-      console.error(`Failed to load the configuration file at: ${filepath}`);
-      console.warn('Using default RabbitMQ configuration');
-      return RabbitMqDefaultConfig;
-    }
-  }
-}
 
 const setupChainEventListeners = async (
   _models,
@@ -230,9 +209,8 @@ const setupChainEventListeners = async (
   }
 
   let eventsSubscriber, identitySubscriber;
-  let rbbtMqConfig =
-    HANDLE_IDENTITY === 'publish' ? IQRbbtConfig : RabbitMqDefaultConfig;
-  const consumer = new Consumer(rbbtMqConfig);
+
+  const consumer = new Consumer(RabbitMQConfig);
   await consumer.init();
 
   eventsSubscriber = await consumer.consumeEvents(
