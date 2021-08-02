@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { Op } from 'sequelize';
 import { factory, formatFilename } from '../../shared/logging';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 
@@ -20,7 +21,6 @@ export const Errors = {
 };
 
 const updateChain = async (models, req: Request, res: Response, next: NextFunction) => {
-  const { Op } = models.sequelize;
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   if (!req.body.id) return next(new Error(Errors.NoChainId));
   if (req.body.network) return next(new Error(Errors.CantChangeNetwork));
@@ -28,11 +28,11 @@ const updateChain = async (models, req: Request, res: Response, next: NextFuncti
   const chain = await models.Chain.findOne({ where: { id: req.body.id } });
   if (!chain) return next(new Error(Errors.NoChainFound));
   else {
-    const userAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
+    const userAddressIds = (await req.user.getAddresses()).filter((addr) => !!addr.verified).map((addr) => addr.id);
     const userMembership = await models.Role.findOne({
       where: {
         address_id: { [Op.in]: userAddressIds },
-        chain_id: chain.id,
+        chain_id: chain.id || null,
         permission: 'admin',
       },
     });
