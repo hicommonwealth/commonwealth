@@ -19,7 +19,7 @@ const updateThreadPinned = async (models, req: Request, res: Response, next: Nex
         id: thread_id,
       },
     });
-    const userOwnedAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
+    const userOwnedAddressIds = (await req.user.getAddresses()).filter((addr) => !!addr.verified).map((addr) => addr.id);
 
     // only community mods and admin can pin
     const roles = await models.Role.findAll({

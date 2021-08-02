@@ -43,7 +43,7 @@ const editDraft = async (models, req: Request, res: Response, next: NextFunction
   };
 
   try {
-    const userOwnedAddressIds = (await req.user.getAddresses({ raw: true })).filter((addr) => !!addr.verified).map((addr) => addr.id);
+    const userOwnedAddressIds = (await req.user.getAddresses()).filter((addr) => !!addr.verified).map((addr) => addr.id);
     const draft = await models.DiscussionDraft.findOne({
       where: {
         id,

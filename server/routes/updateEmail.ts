@@ -32,14 +32,14 @@ const updateEmail = async (models, req: Request, res: Response, next: NextFuncti
   const existingUser = await models.User.findOne({
     where: {
       email,
-      id: { [Sequelize.Op.ne]: req.user.get({ raw: true }).id }
+      id: { [Sequelize.Op.ne]: req.user.id }
     }
   });
   if (existingUser) return next(new Error(Errors.EmailInUse));
 
   const user = await models.User.scope('withPrivateData').findOne({
     where: {
-      id: req.user.get({ raw: true }).id,
+      id: req.user.id,
     },
     include: [{
       model: models.Address,
@@ -67,7 +67,7 @@ const updateEmail = async (models, req: Request, res: Response, next: NextFuncti
 
   // create and email the token
   const tokenObj = await models.LoginToken.createForEmail(email);
-  const loginLink = `${SERVER_URL}/api/finishLogin?token=${tokenObj.get({ raw: true }).token}&email=${encodeURIComponent(email)}&confirmation=success`;
+  const loginLink = `${SERVER_URL}/api/finishLogin?token=${tokenObj.token}&email=${encodeURIComponent(email)}&confirmation=success`;
   const msg = {
     to: email,
     from: 'Commonwealth <no-reply@commonwealth.im>',
