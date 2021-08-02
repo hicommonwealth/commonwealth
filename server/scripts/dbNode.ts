@@ -14,7 +14,6 @@ import {
 } from 'ce-rabbitmq-plugin';
 import { DATABASE_URI, HANDLE_IDENTITY } from '../config'
 import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
-console.log(RabbitMQConfig)
 
 const log = factory.getLogger(formatFilename(__filename));
 
