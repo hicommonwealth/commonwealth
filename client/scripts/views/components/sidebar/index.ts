@@ -65,25 +65,29 @@ const SidebarQuickSwitcher: m.Component<{}> = {
 
     const size = 36;
     return m('.SidebarQuickSwitcher', [
-      m(Button, {
-        class: 'sidebar-home-link',
-        rounded: true,
-        label: m(Icon, { name: Icons.HOME }),
-        onclick: (e) => {
-          e.preventDefault();
-          m.route.set('/');
-        },
-      }),
-      m(CommunitySelector),
-      app.user.isSiteAdmin && m(Button, {
-        class: 'create-community',
-        rounded: true,
-        label: m(Icon, { name: Icons.PLUS }),
-        onclick: (e) => {
-          app.modals.create({ modal: CreateCommunityModal });
-        },
-      }),
-      starredCommunities.map((item) => m(SidebarQuickSwitcherItem, { item, size })),
+      m('.community-nav-bar', [
+        m(Button, {
+          class: 'sidebar-home-link',
+          rounded: true,
+          label: m(Icon, { name: Icons.HOME }),
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set('/');
+          },
+        }),
+        m(CommunitySelector),
+        app.user.isSiteAdmin && m(Button, {
+          class: 'create-community',
+          rounded: true,
+          label: m(Icon, { name: Icons.PLUS }),
+          onclick: (e) => {
+            app.modals.create({ modal: CreateCommunityModal });
+          },
+        }),
+      ]),
+      m('.scrollable-community-bar', [
+        starredCommunities.map((item) => m(SidebarQuickSwitcherItem, { item, size })),
+      ]),
     ]);
   }
 };
