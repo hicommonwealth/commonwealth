@@ -689,7 +689,6 @@ describe('Subscriptions Tests', () => {
         const user = await models['User'].create({ email: 'test@dummy.com' });
         // get existing notif in the DB
         const notification_ids = (await models.Notification.findAll()).map((n) => { return n.id; });
-        const result = await modelUtils.createAndVerifyAddress({ chain });
         const newJwt = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET);
         const res = await chai.request(app)
           .post('/api/markNotificationsRead')
