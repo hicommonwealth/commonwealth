@@ -5,6 +5,7 @@ import _ from 'lodash';
 import { Button, ButtonGroup, Icon, Icons, PopoverMenu, MenuItem, MenuDivider } from 'construct-ui';
 
 import app from 'state';
+import { navigateToSubpage } from 'app';
 import { ProposalType } from 'identifiers';
 import { ChainBase, ChainNetwork } from 'models';
 import NewThreadModal from 'views/modals/new_thread_modal';
@@ -12,17 +13,30 @@ import { SubstrateAccount } from 'controllers/chain/substrate/account';
 
 export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]>, mobile?: boolean) => {
   const activeAccount = app.user.activeAccount;
+
+  const topics = app.topics.getByCommunity(app.activeId()).reduce((acc, current) => current.featuredInNewPost ? [...acc, current] : acc, []).sort((a, b) => a.name.localeCompare(b.name));
+
   return [
     m(MenuItem, {
-      onclick: () => { m.route.set(`/${app.activeId()}/new/thread`); },
+      onclick: () => { navigateToSubpage('/new/thread'); },
       label: 'New thread',
       iconLeft: mobile ? Icons.PLUS : undefined,
     }),
+    topics.map((t) => (
+      m(MenuItem, {
+        onclick: (e) => {
+          localStorage.setItem(`${app.activeId()}-active-topic`, t.name);
+          navigateToSubpage('/new/thread');
+        },
+        label: `New ${t.name} Thread`,
+        iconLeft: mobile ? Icons.PLUS : undefined,
+      })
+    )),
     (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
       && !mobile
       && m(MenuDivider),
     app.chain?.base === ChainBase.CosmosSDK && m(MenuItem, {
-      onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
+      onclick: (e) => navigateToSubpage('/new/proposal/:type', {
         type: ProposalType.CosmosProposal
       }),
       label: 'New text proposal',
@@ -30,14 +44,14 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
     }),
     app.chain?.base === ChainBase.Substrate && app.chain?.network !== ChainNetwork.Plasm && [
       m(MenuItem, {
-        onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
+        onclick: (e) => navigateToSubpage('/new/proposal/:type', {
           type: ProposalType.SubstrateTreasuryProposal
         }),
         label: 'New treasury proposal',
         iconLeft: mobile ? Icons.PLUS : undefined,
       }),
       m(MenuItem, {
-        onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
+        onclick: (e) => navigateToSubpage('/new/proposal/:type', {
           type: ProposalType.SubstrateDemocracyProposal
         }),
         label: 'New democracy proposal',
@@ -45,21 +59,21 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
       }),
       m(MenuItem, {
         class: activeAccount && (activeAccount as any).isCouncillor ? '' : 'disabled',
-        onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
+        onclick: (e) => navigateToSubpage('/new/proposal/:type', {
           type: ProposalType.SubstrateCollectiveProposal
         }),
         label: 'New council motion',
         iconLeft: mobile ? Icons.PLUS : undefined,
       }),
       m(MenuItem, {
-        onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
+        onclick: (e) => navigateToSubpage('/new/proposal/:type', {
           type: ProposalType.SubstrateBountyProposal,
         }),
         label: 'New bounty proposal',
         iconLeft: mobile ? Icons.PLUS : undefined,
       }),
       m(MenuItem, {
-        onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
+        onclick: (e) => navigateToSubpage('/new/proposal/:type', {
           type: ProposalType.SubstrateTreasuryTip,
         }),
         label: 'New tip',

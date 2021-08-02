@@ -75,7 +75,7 @@ const HeaderLandingPage: m.Component<IAttrs, IState> = {
         [
           m('img', {
             class: 'w-40 md:w-48 lg:w-60',
-            src: 'static/img/logo.svg',
+            src: '/static/img/logo.svg',
             alt: 'Commonwealth',
             style: m.route.get() === '/' ? '' : 'cursor:pointer',
             onclick: () => redirectClick('/'),

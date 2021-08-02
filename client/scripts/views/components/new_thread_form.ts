@@ -13,6 +13,7 @@ import {
 } from 'construct-ui';
 
 import app from 'state';
+import { navigateToSubpage } from 'app';
 
 import { detectURL } from 'helpers/threads';
 import { OffchainTopic, OffchainThreadKind, OffchainThreadStage, CommunityInfo, NodeInfo } from 'models';
@@ -181,7 +182,7 @@ const newThread = async (
 
   await app.user.notifications.refresh();
 
-  m.route.set(`/${app.activeId()}/proposal/discussion/${result.id}`);
+  navigateToSubpage(`/proposal/discussion/${result.id}`);
 
   if (result.topic) {
     try {
@@ -484,7 +485,7 @@ export const NewThreadForm: m.Component<{
               onclick: (e) => {
                 vnode.state.overwriteConfirmationModal = true;
                 localStorage.setItem(`${app.activeId()}-from-draft`, `${fromDraft}`);
-                m.route.set(`/${app.activeId()}/new/thread`);
+                navigateToSubpage(`/new/thread`);
                 $(e.target).trigger('modalexit');
               },
             }),

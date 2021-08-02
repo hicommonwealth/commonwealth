@@ -78,11 +78,11 @@ export class NearAccount extends Account<NearToken> {
     });
   }
 
-  protected addressFromMnemonic(mnemonic: string): string {
+  protected addressFromMnemonic(mnemonic: string): Promise<string> {
     throw new Error('not valid on Near protocol');
   }
 
-  protected addressFromSeed(seed: string): string {
+  protected addressFromSeed(seed: string): Promise<string> {
     throw new Error('not valid on Near protocol');
   }
 }

@@ -134,7 +134,7 @@ const User: m.Component<{
             linkify
               ? link('a.user-display-name.username',
                 (profile
-                  ? `/${m.route.param('scope') || profile.chain}/account/${profile.address}?base=${profile.chain}`
+                  ? `/${app.activeId() || profile.chain}/account/${profile.address}?base=${profile.chain}`
                   : 'javascript:'
                 ), [
                   !profile ? addrShort : !showAddressWithDisplayName ? profile.displayName : [
@@ -169,7 +169,7 @@ const User: m.Component<{
           ? m(app.cachedIdentityWidget, { account, linkify: true, profile, hideIdentityIcon, addrShort, showAddressWithDisplayName: false })
           : link('a.user-display-name',
             profile
-              ? `/${m.route.param('scope') || profile.chain}/account/${profile.address}?base=${profile.chain}`
+              ? `/${app.activeId() || profile.chain}/account/${profile.address}?base=${profile.chain}`
               : 'javascript:',
             !profile ? addrShort : !showAddressWithDisplayName ? profile.displayName : [
               profile.displayName,
@@ -284,7 +284,7 @@ export const UserBlock: m.Component<{
     ];
 
     const userLink = profile
-      ? `/${m.route.param('scope') || profile.chain}/account/${profile.address}?base=${profile.chain}`
+      ? `/${app.activeId() || profile.chain}/account/${profile.address}?base=${profile.chain}`
       : 'javascript:';
 
     return linkify

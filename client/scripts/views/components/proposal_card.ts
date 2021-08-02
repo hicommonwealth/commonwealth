@@ -5,6 +5,7 @@ import moment from 'moment';
 import { Icon, Icons, Tag } from 'construct-ui';
 
 import app from 'state';
+import { navigateToSubpage } from 'app';
 import { slugify } from 'utils';
 import { Coin } from 'adapters/currency';
 import { blocknumToDuration, formatLastUpdated, formatPercentShort, link, pluralize } from 'helpers';
@@ -112,8 +113,6 @@ const ProposalCard: m.Component<{ proposal: AnyProposal, injectedContent? }> = {
   view: (vnode) => {
     const { proposal, injectedContent } = vnode.attrs;
     const { author, createdAt, slug, identifier, title } = proposal;
-    const proposalLink = `/${app.activeChainId()}/proposal/${proposal.slug}/${proposal.identifier}`
-      + `-${slugify(proposal.title)}`;
 
     return m('.ProposalCard', [
       m('.proposal-card-top', {
@@ -121,7 +120,8 @@ const ProposalCard: m.Component<{ proposal: AnyProposal, injectedContent? }> = {
           e.stopPropagation();
           e.preventDefault();
           localStorage[`${app.activeId()}-proposals-scrollY`] = window.scrollY;
-          m.route.set(proposalLink); // avoid resetting scroll point
+          navigateToSubpage(`/proposal/${proposal.slug}/${proposal.identifier}`
+                                   + `-${slugify(proposal.title)}`); // avoid resetting scroll point
         },
       }, [
         // tag
@@ -150,7 +150,7 @@ const ProposalCard: m.Component<{ proposal: AnyProposal, injectedContent? }> = {
             return m(Tag, {
               label: (originatingProposalOrMotion instanceof SubstrateDemocracyProposal)
                 ? `PROP #${originatingProposalOrMotion.identifier}`
-                  : (originatingProposalOrMotion instanceof SubstrateCollectiveProposal)
+                : (originatingProposalOrMotion instanceof SubstrateCollectiveProposal)
                   ? `MOT #${originatingProposalOrMotion.identifier}` : 'MISSING PROP',
               intent: 'primary',
               rounded: true,
@@ -193,7 +193,7 @@ const ProposalCard: m.Component<{ proposal: AnyProposal, injectedContent? }> = {
               e.stopPropagation();
               e.preventDefault();
               localStorage[`${app.activeId()}-proposals-scrollY`] = window.scrollY;
-              m.route.set(`/${app.activeId()}/proposal/discussion/${proposal.threadId}`);
+              navigateToSubpage(`/proposal/discussion/${proposal.threadId}`);
               // avoid resetting scroll point
             },
           }, [

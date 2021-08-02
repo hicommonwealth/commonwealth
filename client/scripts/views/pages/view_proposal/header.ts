@@ -1,10 +1,11 @@
 import $ from 'jquery';
 import m from 'mithril';
 import moment from 'moment';
-import app from 'state';
-import { slugify } from 'utils';
-
 import { Button, Icon, Icons, Tag, Tooltip, MenuItem, Input } from 'construct-ui';
+
+import app from 'state';
+import { navigateToSubpage } from 'app';
+import { slugify } from 'utils';
 
 import {
   pluralize, link, externalLink, extractDomain,
@@ -257,12 +258,12 @@ export const ProposalHeaderStage: m.Component<{ proposal: OffchainThread }> = {
       href: `/${proposal.chain || proposal.community}?stage=${proposal.stage}`,
       onclick: (e) => {
         e.preventDefault();
-        m.route.set(`/${proposal.chain || proposal.community}?stage=${proposal.stage}`);
+        navigateToSubpage(`?stage=${proposal.stage}`);
       },
       class: proposal.stage === OffchainThreadStage.ProposalInReview ? 'positive'
         : proposal.stage === OffchainThreadStage.Voting ? 'positive'
           : proposal.stage === OffchainThreadStage.Passed ? 'positive'
-            : proposal.stage === OffchainThreadStage.Failed ? 'negative' : 'none',
+            : proposal.stage === OffchainThreadStage.Failed ? 'negative' : 'positive',
     }, offchainThreadStageToLabel(proposal.stage));
   }
 };
@@ -328,7 +329,8 @@ export const ProposalTitleSaveEdit: m.Component<{
   view: (vnode) => {
     const { proposal, getSetGlobalEditingStatus, parentState } = vnode.attrs;
     if (!proposal) return;
-    const proposalLink = `/${app.activeChainId()}/proposal/${proposal.slug}/${proposal.identifier}`
+    const proposalLink = (app.isCustomDomain() ? '' : `/${app.activeId()}`)
+      + `/proposal/${proposal.slug}/${proposal.identifier}`
       + `-${slugify(proposal.title)}`;
 
     return m('.ProposalTitleSaveEdit', [
@@ -473,10 +475,14 @@ export const ProposalSidebarStageEditorModule: m.Component<{
   view: (vnode) => {
     const { proposal, openStageEditor } = vnode.attrs;
 
+    if (!app.chain?.meta?.chain && !app.community?.meta) return;
+    const { stagesEnabled } = app.chain?.meta?.chain || app.community?.meta;
+    if (!stagesEnabled) return;
+
     return m('.ProposalSidebarStageEditorModule', [
       proposal.chainEntities.length > 0
         ? m('.placeholder-copy', 'Proposals for this thread:')
-        : m('.placeholder-copy', app.chain ? 'Connect an on-chain proposal?' : 'Set a voting stage for this thread?'),
+        : m('.placeholder-copy', app.chain ? 'Connect an on-chain proposal?' : 'Track the progress of this thread?'),
       proposal.chainEntities.length > 0 && m('.proposal-chain-entities', [
         proposal.chainEntities.map((chainEntity) => {
           return m(ProposalHeaderThreadLinkedChainEntity, { proposal, chainEntity });
