@@ -146,7 +146,7 @@ const createThread = async (
         permission: ['admin'],
       },
     });
-    if (isAdmin.length === 0) {
+    if (!req.user.isAdmin && isAdmin.length === 0) {
       try {
         const threshold = (await models.OffchainTopic.findOne({ where: { id: topic_id } })).token_threshold;
         const tokenBalance = await tokenBalanceCache.getBalance(chain.id, req.body.address);

@@ -50,7 +50,7 @@ const createComment = async (
         permission: ['admin'],
       },
     });
-    if (isAdmin.length === 0) {
+    if (!req.user.isAdmin && isAdmin.length === 0) {
       try {
         const stage = root_id.substring(0, root_id.indexOf('_'));
         const topic_id = root_id.substring(root_id.indexOf('_') + 1);

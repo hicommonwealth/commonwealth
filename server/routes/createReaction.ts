@@ -42,7 +42,7 @@ const createReaction = async (
         permission: ['admin'],
       },
     });
-    if (isAdmin.length === 0) {
+    if (!req.user.isAdmin && isAdmin.length === 0) {
       try {
         let thread;
         if (thread_id) {

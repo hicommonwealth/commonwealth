@@ -39,7 +39,8 @@ const ReactionButton: m.Component<{
     const isCommunity = !!app.activeCommunityId();
 
     const tokenBalance = app.chain && (app.chain as Token).tokenBalance;
-    const isAdmin = app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
+    const isAdmin = app.user.isSiteAdmin
+      || app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
 
     let tokenPostingThreshold;
     if( post instanceof OffchainThread && post.topic && app.topics) {

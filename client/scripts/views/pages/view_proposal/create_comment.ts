@@ -122,7 +122,7 @@ const CreateComment: m.Component<{
       app.activeId()
     )?.token_threshold;
 
-    const isAdmin = app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
+    const isAdmin = app.user.isSiteAdmin || app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
 
     const { error, sendingComment, uploadsInProgress } = vnode.state;
     return m('.CreateComment', {
