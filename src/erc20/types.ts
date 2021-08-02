@@ -1,11 +1,11 @@
-import { Event } from 'ethers';
-import { Web3Provider } from 'ethers/providers';
+import { Web3Provider } from '@ethersproject/providers';
 
-import { Erc20 } from './contractTypes/Erc20';
+import { TypedEvent } from '../contractTypes/commons';
+import { ERC20 } from '../contractTypes';
 
 // API is imported contracts classes
 interface IErc20Contracts {
-  tokens: Erc20[];
+  tokens: ERC20[];
   provider: Web3Provider;
 }
 
@@ -13,7 +13,7 @@ export type Api = IErc20Contracts;
 
 export const EventChains = ['erc20'] as const;
 
-export type RawEvent = Event;
+export type RawEvent = TypedEvent<any>;
 
 // eslint-disable-next-line no-shadow
 export enum EventKind {

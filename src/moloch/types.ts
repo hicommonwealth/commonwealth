@@ -1,9 +1,6 @@
-import { Event } from 'ethers';
-
 import { ISubscribeOptions } from '../interfaces';
-
-import { Moloch1 } from './contractTypes/Moloch1';
-import { Moloch2 } from './contractTypes/Moloch2';
+import { TypedEvent } from '../contractTypes/commons';
+import { Moloch1, Moloch2 } from '../contractTypes';
 
 type UnPromisify<T> = T extends Promise<infer U> ? U : T;
 export type ProposalV1 = UnPromisify<
@@ -17,7 +14,8 @@ export type Api = Moloch1 | Moloch2;
 
 export const EventChains = ['moloch', 'moloch-local'] as const;
 
-export type RawEvent = Event;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type RawEvent = TypedEvent<any>;
 
 export interface SubscribeOptions extends ISubscribeOptions<Api> {
   contractVersion: 1 | 2;

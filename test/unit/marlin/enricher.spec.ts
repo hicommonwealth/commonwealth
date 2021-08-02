@@ -121,7 +121,7 @@ describe('Marlin Event Enricher Filter Tests', () => {
       id: 1,
       proposer: 'sender',
       targets: ['hello'],
-      values: ['hello2'],
+      3: ['hello2'],
       signatures: ['hello3'],
       calldatas: ['hello4'],
       startBlock: blockNumber,

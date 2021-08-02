@@ -17,13 +17,14 @@ import {
   TreasuryProposal,
   Proposal,
   Votes,
+  PropIndex,
   OpenTip,
 } from '@polkadot/types/interfaces';
 import { Codec } from '@polkadot/types/types';
 import { DeriveProposalImage } from '@polkadot/api-derive/types';
 import { isFunction, hexToString } from '@polkadot/util';
 
-import { CWEvent, IStorageFetcher } from '../interfaces';
+import { CWEvent, IChainEntityKind, IStorageFetcher } from '../interfaces';
 import { factory, formatFilename } from '../logging';
 
 import {
@@ -47,6 +48,7 @@ import {
   ITreasuryBountyBecameActive,
   ITreasuryBountyAwarded,
   ITreasuryBountyEvents,
+  EntityKind,
   INewTip,
   ITipVoted,
   ITipClosing,
@@ -109,6 +111,38 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
       // remove null values
       .filter((v) => !!v);
     return cwEvents;
+  }
+
+  public async fetchOne(
+    id: string,
+    kind: IChainEntityKind,
+    moduleName?: 'council' | 'technicalCommittee'
+  ): Promise<CWEvent<IEventData>[]> {
+    if (!Object.values(EntityKind).find((k) => k === kind)) {
+      log.error(`Invalid entity kind: ${kind}`);
+      return [];
+    }
+    const blockNumber = +(await this._api.rpc.chain.getHeader()).number;
+    switch (kind as EntityKind) {
+      case EntityKind.CollectiveProposal:
+        return this.fetchCollectiveProposals(moduleName, blockNumber, id);
+      case EntityKind.DemocracyPreimage:
+        return this.fetchDemocracyPreimages([id]);
+      case EntityKind.DemocracyProposal:
+        return this.fetchDemocracyProposals(blockNumber, id);
+      case EntityKind.DemocracyReferendum:
+        return this.fetchDemocracyReferenda(blockNumber, id);
+      case EntityKind.SignalingProposal:
+        return this.fetchSignalingProposals(blockNumber, id);
+      case EntityKind.TreasuryBounty:
+        return this.fetchBounties(blockNumber, id);
+      case EntityKind.TreasuryProposal:
+        return this.fetchTreasuryProposals(blockNumber, id);
+      case EntityKind.TipProposal:
+        return this.fetchTips(blockNumber, id);
+      default:
+        return null;
+    }
   }
 
   public async fetch(): Promise<CWEvent<IEventData>[]> {
@@ -179,47 +213,70 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
   }
 
   public async fetchDemocracyProposals(
-    blockNumber: number
+    blockNumber: number,
+    id?: string
   ): Promise<CWEvent<IDemocracyProposed>[]> {
     if (!this._api.query.democracy) {
       return [];
     }
-    log.info('Fetching democracy proposals...');
+    log.info('Migrating democracy proposals...');
     const publicProps = await this._api.query.democracy.publicProps();
-    const deposits: Array<Option<
-      [BalanceOf, Vec<AccountId>] & Codec
-    >> = await this._api.queryMulti(
-      publicProps.map(([idx]) => [this._api.query.democracy.depositOf, idx])
-    );
-    const proposedEvents = _.zip(publicProps, deposits)
-      .map(
-        ([[idx, hash, proposer], depositOpt]): IDemocracyProposed => {
-          if (!depositOpt.isSome) return null;
+    const constructEvent = (
+      prop: [PropIndex, Hash, AccountId] & Codec,
+      depositOpt: Option<[Vec<AccountId> | BalanceOf, BalanceOf] & Codec>
+    ): IDemocracyProposed => {
+      if (!depositOpt.isSome) return null;
 
-          // handle kusama vs edgeware depositOpt order
-          const depositors = depositOpt.unwrap();
-          let deposit: BalanceOf;
-          if (isFunction((depositors[1] as BalanceOf).mul)) {
-            [, deposit] = depositors;
-          } else {
-            [deposit] = depositors;
-          }
-          return {
-            kind: EventKind.DemocracyProposed,
-            proposalIndex: +idx,
-            proposalHash: hash.toString(),
-            proposer: proposer.toString(),
-            deposit: deposit.toString(),
-          };
-        }
-      )
-      .filter((e) => !!e);
-    log.info(`Found ${proposedEvents.length} democracy proposals!`);
-    return proposedEvents.map((data) => ({ blockNumber, data }));
+      // handle kusama vs edgeware depositOpt order
+      const depositors = depositOpt.unwrap();
+      let deposit: BalanceOf;
+      if (isFunction((depositors[0] as BalanceOf).mul)) {
+        [deposit] = depositors as [BalanceOf, unknown] & Codec;
+      } else {
+        [, deposit] = depositors;
+      }
+      return {
+        kind: EventKind.DemocracyProposed,
+        proposalIndex: +prop[0],
+        proposalHash: prop[1].toString(),
+        proposer: prop[2].toString(),
+        deposit: deposit.toString(),
+      };
+    };
+    if (id === undefined) {
+      const deposits: Array<Option<
+        [BalanceOf, Vec<AccountId>] & Codec
+      >> = await this._api.queryMulti(
+        publicProps.map(([idx]) => [this._api.query.democracy.depositOf, idx])
+      );
+      const proposedEvents = _.zip(publicProps, deposits)
+        .map(([prop, depositOpt]) => constructEvent(prop, depositOpt))
+        .filter((e) => !!e);
+      log.info(`Found ${proposedEvents.length} democracy proposals!`);
+      return proposedEvents.map((data) => ({ blockNumber, data }));
+      // eslint-disable-next-line no-else-return
+    } else {
+      const publicProp = publicProps.find(([idx]) => +idx === +id);
+      if (!publicProp) {
+        log.error(`Democracy proposal ${id} not found!`);
+        return null;
+      }
+      const depositOpt = await this._api.query.democracy.depositOf(
+        publicProp[0]
+      );
+      const evt = constructEvent(publicProp, depositOpt);
+      return [
+        {
+          blockNumber,
+          data: evt,
+        },
+      ];
+    }
   }
 
   public async fetchDemocracyReferenda(
-    blockNumber: number
+    blockNumber: number,
+    id?: string
   ): Promise<CWEvent<IDemocracyStarted | IDemocracyPassed>[]> {
     if (!this._api.query.democracy) {
       log.info('Democracy module not detected.');
@@ -258,11 +315,24 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
         ];
       })
     );
-    log.info(`Found ${startEvents.length} democracy referenda!`);
-    return [...startEvents, ...passedEvents].map((data) => ({
+    const results = [...startEvents, ...passedEvents].map((data) => ({
       blockNumber,
       data,
     }));
+
+    // no easier way to only fetch one than to fetch em all
+    if (id !== undefined) {
+      const data = results.filter(
+        ({ data: { referendumIndex } }) => referendumIndex === +id
+      );
+      if (data.length === 0) {
+        log.error(`No referendum found with id ${id}!`);
+        return null;
+      }
+      return data;
+    }
+    log.info(`Found ${startEvents.length} democracy referenda!`);
+    return results;
   }
 
   // must pass proposal hashes found in prior events
@@ -302,7 +372,8 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
   }
 
   public async fetchTreasuryProposals(
-    blockNumber: number
+    blockNumber: number,
+    id?: string
   ): Promise<CWEvent<ITreasuryProposed>[]> {
     if (!this._api.query.treasury) {
       log.info('Treasury module not detected.');
@@ -312,25 +383,48 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
     log.info('Migrating treasury proposals...');
     const approvals = await this._api.query.treasury.approvals();
     const nProposals = await this._api.query.treasury.proposalCount();
-    const proposalIds: number[] = [];
 
+    if (id !== undefined) {
+      const proposal = await this._api.query.treasury.proposals(+id);
+      if (!proposal.isSome) {
+        log.error(`No treasury proposal found with id ${id}!`);
+        return null;
+      }
+      const { proposer, value, beneficiary, bond } = proposal.unwrap();
+      return [
+        {
+          blockNumber,
+          data: {
+            kind: EventKind.TreasuryProposed,
+            proposalIndex: +id,
+            proposer: proposer.toString(),
+            value: value.toString(),
+            beneficiary: beneficiary.toString(),
+            bond: bond.toString(),
+          },
+        },
+      ];
+    }
+
+    const proposalIds: number[] = [];
     for (let i = 0; i < +nProposals; i++) {
-      if (!approvals.some((id) => +id === i)) {
+      if (!approvals.some((idx) => +idx === i)) {
         proposalIds.push(i);
       }
     }
+
     const proposals = await this._api.query.treasury.proposals.multi<
       Option<TreasuryProposal>
     >(proposalIds);
     const proposedEvents = proposalIds
-      .map((id, index) => {
+      .map((idx, index) => {
         if (!proposals[index] || !proposals[index].isSome) return null;
         const { proposer, value, beneficiary, bond } = proposals[
           index
         ].unwrap();
         return {
           kind: EventKind.TreasuryProposed,
-          proposalIndex: +id,
+          proposalIndex: +idx,
           proposer: proposer.toString(),
           value: value.toString(),
           beneficiary: beneficiary.toString(),
@@ -343,7 +437,8 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
   }
 
   public async fetchBounties(
-    blockNumber: number
+    blockNumber: number,
+    id?: string
   ): Promise<CWEvent<ITreasuryBountyEvents>[]> {
     // TODO: List all relevant events explicitly?
     if (
@@ -396,21 +491,107 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
       }
     }
 
+    // no easier way to only fetch one than to fetch em all
+    const results = events.map((data) => ({ blockNumber, data }));
+    if (id !== undefined) {
+      const data = results.filter(
+        ({ data: { bountyIndex } }) => bountyIndex === +id
+      );
+      if (data.length === 0) {
+        log.error(`No bounty found with id ${id}!`);
+        return null;
+      }
+      return data;
+    }
     log.info(`Found ${bounties.length} bounties!`);
-    return events.map((data) => ({ blockNumber, data }));
+    return results;
   }
 
   public async fetchCollectiveProposals(
     moduleName: 'council' | 'technicalCommittee',
-    blockNumber: number
+    blockNumber: number,
+    id?: string
   ): Promise<CWEvent<ICollectiveProposed | ICollectiveVoted>[]> {
     if (!this._api.query[moduleName]) {
       log.info(`${moduleName} module not detected.`);
       return [];
     }
 
+    const constructEvent = (
+      hash: Hash,
+      proposalOpt: Option<Proposal>,
+      votesOpt: Option<Votes>
+    ) => {
+      if (
+        !hash ||
+        !proposalOpt ||
+        !votesOpt ||
+        !proposalOpt.isSome ||
+        !votesOpt.isSome
+      )
+        return null;
+      const proposal = proposalOpt.unwrap();
+      const votes = votesOpt.unwrap();
+      return [
+        {
+          kind: EventKind.CollectiveProposed,
+          collectiveName: moduleName,
+          proposalIndex: +votes.index,
+          proposalHash: hash.toString(),
+          threshold: +votes.threshold,
+          call: {
+            method: proposal.method,
+            section: proposal.section,
+            args: proposal.args.map((arg) => arg.toString()),
+          },
+
+          // unknown
+          proposer: '',
+        } as ICollectiveProposed,
+        ...votes.ayes.map(
+          (who) =>
+            ({
+              kind: EventKind.CollectiveVoted,
+              collectiveName: moduleName,
+              proposalHash: hash.toString(),
+              voter: who.toString(),
+              vote: true,
+            } as ICollectiveVoted)
+        ),
+        ...votes.nays.map(
+          (who) =>
+            ({
+              kind: EventKind.CollectiveVoted,
+              collectiveName: moduleName,
+              proposalHash: hash.toString(),
+              voter: who.toString(),
+              vote: false,
+            } as ICollectiveVoted)
+        ),
+      ];
+    };
+
     log.info(`Migrating ${moduleName} proposals...`);
     const proposalHashes = await this._api.query[moduleName].proposals();
+
+    // fetch one
+    if (id !== undefined) {
+      const hash = proposalHashes.find((h) => h.toString() === id);
+      if (!hash) {
+        log.error(`No collective proposal found with hash ${id}!`);
+        return null;
+      }
+      const proposalOpt = await this._api.query[moduleName].proposalOf(hash);
+      const votesOpt = await this._api.query[moduleName].voting(hash);
+      const events = constructEvent(hash, proposalOpt, votesOpt);
+      if (!events) {
+        log.error(`No collective proposal found with hash ${id}!`);
+        return null;
+      }
+      return events.map((data) => ({ blockNumber, data }));
+    }
+
+    // fetch all
     const proposals: Array<Option<Proposal>> = await Promise.all(
       proposalHashes.map(async (h) => {
         try {
@@ -430,53 +611,7 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
         .map((hash, index) => {
           const proposalOpt = proposals[index];
           const votesOpt = proposalVotes[index];
-          if (
-            !hash ||
-            !proposalOpt ||
-            !votesOpt ||
-            !proposalOpt.isSome ||
-            !votesOpt.isSome
-          )
-            return null;
-          const proposal = proposalOpt.unwrap();
-          const votes = votesOpt.unwrap();
-          return [
-            {
-              kind: EventKind.CollectiveProposed,
-              collectiveName: moduleName,
-              proposalIndex: +votes.index,
-              proposalHash: hash.toString(),
-              threshold: +votes.threshold,
-              call: {
-                method: proposal.method,
-                section: proposal.section,
-                args: proposal.args.map((arg) => arg.toString()),
-              },
-
-              // unknown
-              proposer: '',
-            } as ICollectiveProposed,
-            ...votes.ayes.map(
-              (who) =>
-                ({
-                  kind: EventKind.CollectiveVoted,
-                  collectiveName: moduleName,
-                  proposalHash: hash.toString(),
-                  voter: who.toString(),
-                  vote: true,
-                } as ICollectiveVoted)
-            ),
-            ...votes.nays.map(
-              (who) =>
-                ({
-                  kind: EventKind.CollectiveVoted,
-                  collectiveName: moduleName,
-                  proposalHash: hash.toString(),
-                  voter: who.toString(),
-                  vote: false,
-                } as ICollectiveVoted)
-            ),
-          ];
+          return constructEvent(hash, proposalOpt, votesOpt);
         })
         .filter((es) => !!es)
     );
@@ -492,7 +627,8 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
   }
 
   public async fetchTips(
-    blockNumber: number
+    blockNumber: number,
+    hash?: string
   ): Promise<CWEvent<INewTip | ITipVoted | ITipClosing>[]> {
     if (!this._api.query.tips) {
       log.info('Tips module not detected.');
@@ -503,64 +639,69 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
     const openTipKeys = await this._api.query.tips.tips.keys();
     const results: CWEvent<INewTip | ITipVoted | ITipClosing>[] = [];
     for (const key of openTipKeys) {
-      const hash = key.args[0].toString();
-      try {
-        const tip = await this._api.rpc.state.getStorage<Option<OpenTip>>(key);
-        if (tip.isSome) {
-          const {
-            reason: reasonHash,
-            who,
-            finder,
-            deposit,
-            closes,
-            tips: tipVotes,
-            findersFee,
-          } = tip.unwrap();
-          const reason = await this._api.query.tips.reasons(reasonHash);
-          if (reason.isSome) {
-            // newtip events
-            results.push({
-              blockNumber,
-              data: {
-                kind: EventKind.NewTip,
-                proposalHash: hash,
-                who: who.toString(),
-                reason: hexToString(reason.unwrap().toString()),
-                finder: finder.toString(),
-                deposit: deposit.toString(),
-                findersFee: findersFee.valueOf(),
-              },
-            });
-
-            // n tipvoted events
-            for (const [voter, amount] of tipVotes) {
+      const h = key.args[0].toString();
+      // support fetchOne
+      if (!hash || hash === h) {
+        try {
+          const tip = await this._api.rpc.state.getStorage<Option<OpenTip>>(
+            key
+          );
+          if (tip.isSome) {
+            const {
+              reason: reasonHash,
+              who,
+              finder,
+              deposit,
+              closes,
+              tips: tipVotes,
+              findersFee,
+            } = tip.unwrap();
+            const reason = await this._api.query.tips.reasons(reasonHash);
+            if (reason.isSome) {
+              // newtip events
               results.push({
                 blockNumber,
                 data: {
-                  kind: EventKind.TipVoted,
-                  proposalHash: hash,
-                  who: voter.toString(),
-                  value: amount.toString(),
+                  kind: EventKind.NewTip,
+                  proposalHash: h,
+                  who: who.toString(),
+                  reason: hexToString(reason.unwrap().toString()),
+                  finder: finder.toString(),
+                  deposit: deposit.toString(),
+                  findersFee: findersFee.valueOf(),
                 },
               });
-            }
 
-            // tipclosing event
-            if (closes.isSome) {
-              const closesAt = +closes.unwrap();
-              results.push({
-                blockNumber,
-                data: {
-                  kind: EventKind.TipClosing,
-                  proposalHash: hash,
-                  closing: closesAt,
-                },
-              });
+              // n tipvoted events
+              for (const [voter, amount] of tipVotes) {
+                results.push({
+                  blockNumber,
+                  data: {
+                    kind: EventKind.TipVoted,
+                    proposalHash: h,
+                    who: voter.toString(),
+                    value: amount.toString(),
+                  },
+                });
+              }
+
+              // tipclosing event
+              if (closes.isSome) {
+                const closesAt = +closes.unwrap();
+                results.push({
+                  blockNumber,
+                  data: {
+                    kind: EventKind.TipClosing,
+                    proposalHash: hash,
+                    closing: closesAt,
+                  },
+                });
+              }
             }
           }
+        } catch (e) {
+          log.error(`Unable to fetch tip "${key.args[0]}"!`);
         }
-      } catch (e) {
-        log.error(`Unable to fetch tip "${key.args[0]}"!`);
       }
     }
 
@@ -570,7 +711,8 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
   }
 
   public async fetchSignalingProposals(
-    blockNumber: number
+    blockNumber: number,
+    id?: string
   ): Promise<
     CWEvent<
       | ISignalingNewProposal
@@ -682,7 +824,20 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
       ...completedEvents,
     ];
     // we could plausibly populate the completed events with block numbers, but not necessary
+    const results = events.map((data) => ({ blockNumber, data }));
+
+    // no easier way to only fetch one than to fetch em all
+    if (id !== undefined) {
+      const data = results.filter(
+        ({ data: { proposalHash } }) => proposalHash === id
+      );
+      if (data.length === 0) {
+        log.error(`No referendum found with id ${id}!`);
+        return null;
+      }
+      return data;
+    }
     log.info(`Found ${newProposalEvents.length} signaling proposals!`);
-    return events.map((data) => ({ blockNumber, data }));
+    return results;
   }
 }

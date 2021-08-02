@@ -1,7 +1,7 @@
 /**
  * Fetches events from Marlin contract in real time.
  */
-import { Listener } from 'ethers/providers';
+import { Listener } from '@ethersproject/providers';
 
 import { IEventSubscriber } from '../interfaces';
 import { factory, formatFilename } from '../logging';
@@ -34,9 +34,9 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
       this._verbose ? log.info(logStr) : log.trace(logStr);
       cb(event);
     };
-    this._api.comp.addListener('*', this._listener);
-    this._api.governorAlpha.addListener('*', this._listener);
-    this._api.timelock.addListener('*', this._listener);
+    this._api.comp.on('*', this._listener);
+    this._api.governorAlpha.on('*', this._listener);
+    this._api.timelock.on('*', this._listener);
   }
 
   public unsubscribe(): void {

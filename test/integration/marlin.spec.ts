@@ -2,18 +2,18 @@
 /* eslint-disable global-require */
 /* eslint-disable no-unused-expressions */
 import { EventEmitter } from 'events';
-import { resolve } from 'path';
 
-import { providers, Signer } from 'ethers';
-import { BigNumberish } from 'ethers/utils';
+import { providers, Signer, BigNumberish } from 'ethers';
 import chai, { expect } from 'chai';
 
-import { MPondFactory } from '../../eth/types/MPondFactory';
-import { MPond } from '../../eth/types/MPond';
-import { GovernorAlphaFactory } from '../../eth/types/GovernorAlphaFactory';
-import { GovernorAlpha } from '../../eth/types/GovernorAlpha';
-import { TimelockFactory } from '../../eth/types/TimelockFactory';
-import { Timelock } from '../../eth/types/Timelock';
+import {
+  MPond__factory as MPondFactory,
+  MPond,
+  GovernorAlphaMock__factory as GovernorAlphaFactory,
+  GovernorAlphaMock as GovernorAlpha,
+  TimelockMock__factory as TimelockFactory,
+  TimelockMock as Timelock,
+} from '../../src/contractTypes';
 import {
   Api,
   IEventData,
@@ -22,9 +22,10 @@ import {
   ITransfer,
   IProposalCreated,
   IProposalQueued,
-  IProposalExecuted,
   IQueueTransaction,
+  IProposalExecuted,
   IExecuteTransaction,
+  IVoteCast,
 } from '../../src/marlin/types';
 import { subscribeEvents } from '../../src/marlin/subscribeFunc';
 import { IEventHandler, CWEvent, IChainEventData } from '../../src/interfaces';
@@ -36,10 +37,22 @@ function getProvider(): providers.Web3Provider {
     allowUnlimitedContractSize: true,
     gasLimit: 1000000000,
     time: new Date(1000),
-    pnuemonic: 'Alice',
+    mnemonic: 'Alice',
     // logger: console,
   });
   return new providers.Web3Provider(web3Provider);
+}
+
+// eslint-disable-next-line no-shadow
+enum ProposalState {
+  Pending = 0,
+  Active = 1,
+  Canceled = 2,
+  Defeated = 3,
+  Succeeded = 4,
+  Queued = 5,
+  Expired = 6,
+  Executed = 7,
 }
 
 async function deployMPond(
@@ -80,11 +93,26 @@ class MarlinEventHandler extends IEventHandler {
 
   public async handle(event: CWEvent<IEventData>): Promise<IChainEventData> {
     this.emitter.emit(event.data.kind.toString(), event);
-    this.emitter.emit('*', event);
     return null;
   }
 }
 
+function assertEvent<T extends IEventData>(
+  handler: MarlinEventHandler,
+  event: EventKind,
+  cb: (evt: CWEvent<T>) => void
+) {
+  return new Promise<void>((resolve, reject) => {
+    handler.emitter.on(event, (evt: CWEvent<T>) => {
+      try {
+        cb(evt);
+        resolve();
+      } catch (e) {
+        reject(e);
+      }
+    });
+  });
+}
 interface ISetupData {
   api: Api;
   comp: MPond;
@@ -101,17 +129,19 @@ async function setupSubscription(subscribe = true): Promise<ISetupData> {
   const [member, bridge] = addresses;
   const signer = provider.getSigner(member);
   const comp = await deployMPond(signer, member, bridge);
-  const timelock = await deployTimelock(signer, member, 172800);
+  const timelock = await deployTimelock(signer, member, 2 * 60); // 2 minutes delay
   const governorAlpha = await deployGovernorAlpha(
     signer,
     timelock.address,
     comp.address,
     member
   );
-  // await timelock.setPendingAdmin(governorAlpha.address, { from: timelock.address});
+
+  // TODO: Adminship seems messed up, can't do queue() calls
+  // await governorAlpha.__executeSetTimelockPendingAdmin(member, 0);
+  // console.log('member: ', member);
   // console.log('timelock admin address: ', await timelock.admin());
-  // console.log('governorAlpha Address:', governorAlpha.address);
-  // TODO: Fix this somehow, need to make governorAlpha admin of timelock... :le-penseur:
+  // console.log('governorAlpha guardian:', await governorAlpha.guardian());
   const api = { comp, governorAlpha, timelock };
   const emitter = new EventEmitter();
   const handler = new MarlinEventHandler(emitter);
@@ -126,302 +156,329 @@ async function setupSubscription(subscribe = true): Promise<ISetupData> {
   return { api, comp, timelock, governorAlpha, addresses, provider, handler };
 }
 
-describe('Marlin Event Integration Tests', () => {
-  let api;
-  let comp: MPond;
-  let timelock: Timelock;
-  let governorAlpha: GovernorAlpha;
-  let addresses: string[];
-  let provider: providers.Web3Provider;
-  let handler: MarlinEventHandler;
+async function performDelegation(
+  handler: MarlinEventHandler,
+  comp: MPond,
+  from: string,
+  to: string,
+  amount: BigNumberish
+): Promise<void> {
+  await comp.delegate(to, amount);
+  await Promise.all([
+    assertEvent(handler, EventKind.DelegateChanged, (evt) => {
+      assert.deepEqual(evt.data, {
+        kind: EventKind.DelegateChanged,
+        delegator: from,
+        toDelegate: to,
+        fromDelegate: '0x0000000000000000000000000000000000000000',
+      });
+    }),
+    assertEvent(
+      handler,
+      EventKind.DelegateVotesChanged,
+      (evt: CWEvent<IDelegateVotesChanged>) => {
+        const { kind, delegate, previousBalance, newBalance } = evt.data;
+        assert.deepEqual(
+          {
+            kind,
+            delegate,
+            previousBalance: previousBalance.toString(),
+            newBalance: newBalance.toString(),
+          },
+          {
+            kind: EventKind.DelegateVotesChanged,
+            delegate: to,
+            previousBalance: '0',
+            newBalance: amount.toString(),
+          }
+        );
+      }
+    ),
+  ]);
+}
 
-  before('should setup a new subscription', async () => {
-    const setup = await setupSubscription();
-    api = setup.api;
-    comp = setup.comp;
-    timelock = setup.timelock;
-    governorAlpha = setup.governorAlpha;
-    addresses = setup.addresses;
-    provider = setup.provider;
-    handler = setup.handler;
-  });
-  it('should deploy all three contracts', async () => {
-    expect(api).to.not.be.null;
-    expect(comp).to.not.be.null;
-    expect(timelock).to.not.be.null;
-    expect(governorAlpha).to.not.be.null;
-    expect(addresses).to.not.be.null;
-    expect(provider).to.not.be.null;
-    expect(handler).to.not.be.null;
-  });
+async function createProposal(
+  handler: MarlinEventHandler,
+  gov: GovernorAlpha,
+  comp: MPond,
+  from: string
+): Promise<void> {
+  const proposalMinimum = await gov.proposalThreshold();
+  const delegateAmount = proposalMinimum.mul(3);
+  await performDelegation(handler, comp, from, from, delegateAmount);
 
-  describe('COMP contract function events', () => {
-    it('initial address should have all the tokens ', async () => {
-      // test volume
-      const balance = await comp.balanceOf(addresses[0]);
-      expect(balance).to.not.be.equal(0);
+  const targets = ['0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b'];
+  const values = ['0'];
+  const signatures = ['_setCollateralFactor(address,uint256)'];
+  const calldatas = [
+    '0x000000000000000000000000C11B1268C1A384E55C48C2391D8D480264A3A7F40000000000000000000000000000000000000000000000000853A0D2313C0000',
+  ];
+  await gov.propose(targets, values, signatures, calldatas, 'test description');
+  await assertEvent(
+    handler,
+    EventKind.ProposalCreated,
+    (evt: CWEvent<IProposalCreated>) => {
+      const { kind, proposer, description } = evt.data;
+      assert.deepEqual(
+        {
+          kind,
+          proposer,
+          description,
+        },
+        {
+          kind: EventKind.ProposalCreated,
+          proposer: from,
+          description: 'test description',
+        }
+      );
+    }
+  );
+}
+
+async function proposeAndVote(
+  handler: MarlinEventHandler,
+  provider: providers.Web3Provider,
+  gov: GovernorAlpha,
+  comp: MPond,
+  from: string,
+  voteYes: boolean
+) {
+  await createProposal(handler, gov, comp, from);
+
+  // Wait for proposal to activate
+  const activeProposals = await gov.latestProposalIds(from);
+  const { startBlock } = await gov.proposals(activeProposals);
+  const currentBlock = await provider.getBlockNumber();
+  const blockDelta = startBlock.sub(currentBlock).add(1);
+  const timeDelta = blockDelta.mul(15);
+  await provider.send('evm_increaseTime', [+timeDelta]);
+  for (let i = 0; i < +blockDelta; ++i) {
+    await provider.send('evm_mine', []);
+  }
+
+  const state = await gov.state(activeProposals);
+  expect(state).to.be.equal(ProposalState.Active);
+
+  // VoteCast Event
+  const voteWeight = await comp.getPriorVotes(from, startBlock);
+  await gov.castVote(activeProposals, voteYes);
+  await assertEvent(handler, EventKind.VoteCast, (evt: CWEvent<IVoteCast>) => {
+    assert.deepEqual(evt.data, {
+      kind: EventKind.VoteCast,
+      id: +activeProposals,
+      voter: from,
+      support: voteYes,
+      votes: voteWeight.toString(),
     });
+  });
+}
+
+async function proposeAndWait(
+  handler: MarlinEventHandler,
+  provider: providers.Web3Provider,
+  gov: GovernorAlpha,
+  comp: MPond,
+  from: string,
+  voteYes: boolean
+) {
+  await proposeAndVote(handler, provider, gov, comp, from, voteYes);
+  const activeProposals = await gov.latestProposalIds(from);
+
+  const votingPeriodInBlocks = +(await gov.votingPeriod());
+  await provider.send('evm_increaseTime', [votingPeriodInBlocks * 15]);
+  for (let i = 0; i < votingPeriodInBlocks; i++) {
+    await provider.send('evm_mine', []);
+  }
+  const state = await gov.state(activeProposals);
+  if (voteYes) {
+    expect(state).to.be.equal(ProposalState.Succeeded);
+  } else {
+    expect(state).to.be.equal(ProposalState.Defeated); // 3 is 'Defeated'
+  }
+}
+
+async function proposeAndQueue(
+  handler: MarlinEventHandler,
+  provider: providers.Web3Provider,
+  gov: GovernorAlpha,
+  comp: MPond,
+  from: string
+) {
+  await proposeAndWait(handler, provider, gov, comp, from, true);
+
+  const activeProposals = await gov.latestProposalIds(from);
+  await gov.queue(activeProposals);
+  await Promise.all([
+    assertEvent(
+      handler,
+      EventKind.ProposalQueued,
+      (evt: CWEvent<IProposalQueued>) => {
+        const { kind, id } = evt.data;
+        assert.deepEqual(
+          {
+            kind,
+            id,
+          },
+          {
+            kind: EventKind.ProposalQueued,
+            id: activeProposals,
+          }
+        );
+      }
+    ),
+    assertEvent(
+      handler,
+      EventKind.QueueTransaction,
+      (evt: CWEvent<IQueueTransaction>) => {
+        const { kind } = evt.data;
+        assert.deepEqual(
+          {
+            kind,
+          },
+          {
+            kind: EventKind.QueueTransaction,
+          }
+        );
+      }
+    ),
+  ]);
+}
+
+describe('Marlin Event Integration Tests', () => {
+  describe('COMP contract function events', () => {
     it('initial address should transfer tokens to an address', async () => {
+      const { comp, addresses, handler } = await setupSubscription();
+      // test volume
       const initialBalance = await comp.balanceOf(addresses[0]);
+      expect(+initialBalance).to.not.be.equal(0);
       const newUser = await comp.balanceOf(addresses[2]);
       assert.isAtMost(+newUser, 0);
       assert.isAtLeast(+initialBalance, 100000);
       await comp.transfer(addresses[2], 100);
       const newUserNewBalance = await comp.balanceOf(addresses[2]);
       assert.isAtLeast(+newUserNewBalance, 100);
-      await new Promise<void>((r) => {
-        handler.emitter.on(
-          EventKind.Transfer.toString(),
-          (evt: CWEvent<ITransfer>) => {
-            const { kind, from, to, amount } = evt.data;
-            assert.deepEqual(
-              {
-                kind,
-                from,
-                to,
-                amount: amount.toString(),
-              },
-              {
-                kind: EventKind.Transfer,
-                from: addresses[0],
-                to: addresses[2],
-                amount: newUserNewBalance.toString(),
-              }
-            );
-            r();
-          }
-        );
-      });
+      await assertEvent(
+        handler,
+        EventKind.Transfer,
+        (evt: CWEvent<ITransfer>) => {
+          const { kind, from, to, amount } = evt.data;
+          assert.deepEqual(
+            {
+              kind,
+              from,
+              to,
+              amount: amount.toString(),
+            },
+            {
+              kind: EventKind.Transfer,
+              from: addresses[0],
+              to: addresses[2],
+              amount: newUserNewBalance.toString(),
+            }
+          );
+        }
+      );
     });
+
     it('initial address should delegate to address 2', async () => {
-      const initialBalance = await comp.balanceOf(addresses[0]);
-      // delegate
-      await comp.delegate(addresses[2], 1000);
-      await Promise.all([
-        handler.emitter.on(
-          EventKind.DelegateChanged.toString(),
-          (evt: CWEvent<IEventData>) => {
-            assert.deepEqual(evt.data, {
-              kind: EventKind.DelegateChanged,
-              delegator: addresses[0],
-              toDelegate: addresses[2],
-              fromDelegate: '0x0000000000000000000000000000000000000000',
-            });
-            resolve();
-          }
-        ),
-        handler.emitter.on(
-          EventKind.DelegateVotesChanged.toString(),
-          (evt: CWEvent<IDelegateVotesChanged>) => {
-            const { kind, delegate, previousBalance, newBalance } = evt.data;
-            assert.deepEqual(
-              {
-                kind,
-                delegate,
-                previousBalance: previousBalance.toString(),
-                newBalance: newBalance.toString(),
-              },
-              {
-                kind: EventKind.DelegateVotesChanged,
-                delegate: addresses[2],
-                previousBalance: '0',
-                newBalance: initialBalance.toString(),
-              }
-            );
-            resolve();
-          }
-        ),
-      ]);
+      const { comp, addresses, handler } = await setupSubscription();
+      await performDelegation(handler, comp, addresses[0], addresses[2], 1000);
     });
+
     it('initial address should delegate to itself', async () => {
-      // DelegateChanged & Delegate Votes Changed Events
-      const initialBalance = await comp.balanceOf(addresses[0]);
-      await comp.balanceOf(addresses[1]);
-      // delegate
-      await comp.delegate(addresses[0], 1000);
-      await Promise.all([
-        handler.emitter.on(
-          EventKind.DelegateChanged.toString(),
-          (evt: CWEvent<IEventData>) => {
-            assert.deepEqual(evt.data, {
-              kind: EventKind.DelegateChanged,
-              delegator: addresses[0],
-              toDelegate: addresses[0],
-              fromDelegate: '0x0000000000000000000000000000000000000000',
-            });
-            resolve();
-          }
-        ),
-        handler.emitter.on(
-          EventKind.DelegateVotesChanged.toString(),
-          (evt: CWEvent<IDelegateVotesChanged>) => {
-            const { kind, delegate, previousBalance, newBalance } = evt.data;
-            assert.deepEqual(
-              {
-                kind,
-                delegate,
-                previousBalance: previousBalance.toString(),
-                newBalance: newBalance.toString(),
-              },
-              {
-                kind: EventKind.DelegateVotesChanged,
-                delegate: addresses[0],
-                previousBalance: '0',
-                newBalance: initialBalance.toString(),
-              }
-            );
-            resolve();
-          }
-        ),
-      ]);
+      const { comp, addresses, handler } = await setupSubscription();
+      await performDelegation(handler, comp, addresses[0], addresses[0], 1000);
     });
   });
 
   describe('GovernorAlpha contract function events', () => {
-    before('it should setupSubscriber and delegate', async () => {
-      const initialBalance = await comp.balanceOf(addresses[0]);
-      const proposalMinimum = await governorAlpha.proposalThreshold();
-      await comp.delegate(addresses[0], proposalMinimum);
-      await Promise.all([
-        handler.emitter.on(
-          EventKind.DelegateChanged.toString(),
-          (evt: CWEvent<IEventData>) => {
-            assert.deepEqual(evt.data, {
-              kind: EventKind.DelegateChanged,
-              delegator: addresses[0],
-              toDelegate: addresses[0],
-              fromDelegate: '0x0000000000000000000000000000000000000000',
-            });
-            resolve();
-          }
-        ),
-        handler.emitter.on(
-          EventKind.DelegateVotesChanged.toString(),
-          (evt: CWEvent<IDelegateVotesChanged>) => {
-            const { kind, delegate, previousBalance, newBalance } = evt.data;
-            assert.deepEqual(
-              {
-                kind,
-                delegate,
-                previousBalance: previousBalance.toString(),
-                newBalance: newBalance.toString(),
-              },
-              {
-                kind: EventKind.DelegateVotesChanged,
-                delegate: addresses[0],
-                previousBalance: '0',
-                newBalance: initialBalance.toString(),
-              }
-            );
-            resolve();
-          }
-        ),
-      ]);
-    });
     it('should create a proposal', async () => {
-      // ProposalCreated Event
-      const targets = ['0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b'];
-      const values = [0];
-      const signatures = ['_setCollateralFactor(address,uint256)'];
-      const calldatas = [
-        '0x000000000000000000000000C11B1268C1A384E55C48C2391D8D480264A3A7F40000000000000000000000000000000000000000000000000853A0D2313C0000',
-      ];
-      await governorAlpha.propose(
-        targets,
-        values,
-        signatures,
-        calldatas,
-        'test description'
-      );
-      await new Promise<void>((r) => {
-        handler.emitter.on(
-          EventKind.ProposalCreated.toString(),
-          (evt: CWEvent<IProposalCreated>) => {
-            const { kind, proposer, description } = evt.data;
-            assert.deepEqual(
-              {
-                kind,
-                proposer,
-                description,
-              },
-              {
-                kind: EventKind.ProposalCreated,
-                proposer: addresses[0],
-                description: 'test description',
-              }
-            );
-            r();
-          }
-        );
-      });
+      const {
+        governorAlpha,
+        comp,
+        addresses,
+        handler,
+      } = await setupSubscription();
+      await createProposal(handler, governorAlpha, comp, addresses[0]);
     });
+
     it('proposal castvote', async () => {
-      // ProposalCreated Event
-      // VoteCast Event
-      const activeProposals = await governorAlpha.latestProposalIds(
-        addresses[0]
+      const {
+        governorAlpha,
+        comp,
+        addresses,
+        handler,
+        provider,
+      } = await setupSubscription();
+      await proposeAndVote(
+        handler,
+        provider,
+        governorAlpha,
+        comp,
+        addresses[0],
+        true
       );
-      await provider.send('evm_increaseTime', [1]);
-      await provider.send('evm_mine', []);
-      const vote = await governorAlpha.castVote(activeProposals, true);
-      assert.notEqual(vote, null);
     });
 
-    xit('should succeed upon 3 days simulation (should take awhile, lag)', async () => {
-      const activeProposals = await governorAlpha.latestProposalIds(
-        addresses[0]
+    it('should fail once not active', async () => {
+      const {
+        governorAlpha,
+        comp,
+        addresses,
+        handler,
+        provider,
+      } = await setupSubscription();
+      await proposeAndWait(
+        handler,
+        provider,
+        governorAlpha,
+        comp,
+        addresses[0],
+        false
       );
-      await provider.send('evm_increaseTime', [19500]); // 3 x 6500 (blocks/day)
-      for (let i = 0; i < 19500; i++) {
-        await provider.send('evm_mine', []);
-      }
-      const state = await governorAlpha.state(activeProposals);
-      expect(state).to.be.equal(4); // 4 is 'Succeeded'
-    }).timeout(1000000);
+    });
 
-    xit('should be queued and executed', async (done) => {
+    it('should succeed once not active', async () => {
+      const {
+        governorAlpha,
+        comp,
+        addresses,
+        handler,
+        provider,
+      } = await setupSubscription();
+      await proposeAndWait(
+        handler,
+        provider,
+        governorAlpha,
+        comp,
+        addresses[0],
+        true
+      );
+    });
+
+    xit('should be queued and executed', async () => {
+      const {
+        governorAlpha,
+        comp,
+        addresses,
+        handler,
+        provider,
+      } = await setupSubscription();
+      await proposeAndQueue(
+        handler,
+        provider,
+        governorAlpha,
+        comp,
+        addresses[0]
+      );
       const activeProposals = await governorAlpha.latestProposalIds(
         addresses[0]
       );
-      await governorAlpha.queue(activeProposals);
-      await Promise.all([
-        handler.emitter.on(
-          EventKind.ProposalQueued.toString(),
-          (evt: CWEvent<IProposalQueued>) => {
-            const { kind, id } = evt.data;
-            assert.deepEqual(
-              {
-                kind,
-                id,
-              },
-              {
-                kind: EventKind.ProposalQueued,
-                id: activeProposals,
-              }
-            );
-            resolve();
-          }
-        ),
-        handler.emitter.on(
-          EventKind.QueueTransaction.toString(),
-          (evt: CWEvent<IQueueTransaction>) => {
-            const { kind } = evt.data;
-            assert.deepEqual(
-              {
-                kind,
-              },
-              {
-                kind: EventKind.QueueTransaction,
-              }
-            );
-            resolve();
-          }
-        ),
-      ]);
       await governorAlpha.execute(activeProposals);
       await Promise.all([
-        handler.emitter.on(
-          EventKind.ProposalExecuted.toString(),
+        assertEvent(
+          handler,
+          EventKind.ProposalExecuted,
           (evt: CWEvent<IProposalExecuted>) => {
             const { kind, id } = evt.data;
             assert.deepEqual(
@@ -434,11 +491,11 @@ describe('Marlin Event Integration Tests', () => {
                 id: activeProposals,
               }
             );
-            resolve();
           }
         ),
-        handler.emitter.on(
-          EventKind.ExecuteTransaction.toString(),
+        assertEvent(
+          handler,
+          EventKind.ProposalExecuted,
           (evt: CWEvent<IExecuteTransaction>) => {
             const { kind } = evt.data;
             assert.deepEqual(
@@ -449,11 +506,40 @@ describe('Marlin Event Integration Tests', () => {
                 kind: EventKind.ExecuteTransaction,
               }
             );
-            resolve();
           }
         ),
       ]);
-      done();
     });
+  });
+
+  xit('should expire in queue', async () => {
+    const {
+      governorAlpha,
+      comp,
+      timelock,
+      addresses,
+      handler,
+      provider,
+    } = await setupSubscription();
+    await proposeAndQueue(handler, provider, governorAlpha, comp, addresses[0]);
+
+    // advance beyond grace period so it expires despite successful votes
+    const activeProposals = await governorAlpha.latestProposalIds(addresses[0]);
+    const gracePeriod = await timelock.GRACE_PERIOD();
+    const proposal = await governorAlpha.proposals(activeProposals);
+    const expirationTime = +gracePeriod.add(proposal.eta);
+    const currentBlock = await provider.getBlockNumber();
+    const { timestamp } = await provider.getBlock(currentBlock);
+    const timeUntilExpiration = expirationTime - timestamp;
+    const timeToAdvance = timeUntilExpiration + 15;
+    const blocksToAdvance = Math.ceil(timeToAdvance / 15);
+    await provider.send('evm_increaseTime', [timeToAdvance]);
+    for (let i = 0; i < blocksToAdvance; i++) {
+      await provider.send('evm_mine', []);
+    }
+
+    // ensure state is set to expired
+    const state = await governorAlpha.state(activeProposals);
+    expect(state).to.be.equal(ProposalState.Expired);
   });
 });

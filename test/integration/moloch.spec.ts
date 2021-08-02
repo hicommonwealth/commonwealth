@@ -5,10 +5,12 @@ import { EventEmitter } from 'events';
 import { providers } from 'ethers';
 import chai from 'chai';
 
-import { Moloch1Factory } from '../../eth/types/Moloch1Factory';
-import { Moloch1 } from '../../eth/types/Moloch1';
-import { TokenFactory } from '../../eth/types/TokenFactory';
-import { Token } from '../../eth/types/Token';
+import {
+  Moloch1__factory as Moloch1Factory,
+  Moloch1,
+  Token__factory as TokenFactory,
+  Token,
+} from '../../src/contractTypes';
 import {
   Api,
   IEventData,

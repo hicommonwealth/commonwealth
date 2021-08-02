@@ -1,6 +1,6 @@
 {
   "name": "@commonwealth/chain-events",
-  "version": "0.6.5",
+  "version": "0.7.0",
   "description": "Listen to various chains for events.",
   "license": "GPL-3.0",
   "files": [
@@ -9,7 +9,8 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
+    "build": "rimraf dist/ && tsc",
+    "compile-contracts": "cd eth && npx hardhat compile",
     "prepare": "npx install-peers",
     "unit-test": "nyc ts-mocha --config ./.mocharc.json ./test/unit/**/*.spec.ts",
     "marlin-test": "nyc ts-mocha --config ./.mocharc.json ./test/integration/marlin.spec.ts",
@@ -21,7 +22,7 @@
     "scrape": "ts-node -T ./scripts/scraper.ts",
     "ganache": "ganache-cli -m \"Alice\" -p 9545 -l 800000000 --allowUnlimitedContractSize",
     "batch-poll": "ts-node -T ./scripts/batchPoller.ts",
-    "preyalcpublish": "tsc"
+    "preyalcpublish": "yarn build"
   },
   "engines": {
     "node": ">=14"
@@ -42,10 +43,14 @@
   },
   "dependencies": {
     "@edgeware/node-types": "^3.3.3",
+    "@ethersproject/abi": "^5.0.0",
+    "@ethersproject/bytes": "^5.0.0",
+    "@ethersproject/providers": "^5.0.0",
     "bn.js": "^5.1.3",
-    "ethereum-block-by-date": "^1.2.2",
-    "ethers": "^4.0.39",
+    "ethereum-block-by-date": "^1.4.0",
+    "ethers": "^5.0.0",
     "lodash": "^4.17.21",
+    "moment": "^2.29.1",
     "sleep-promise": "^8.0.1",
     "typescript-logging": "^0.6.4",
     "underscore": "^1.10.2",
@@ -54,12 +59,13 @@
     "web3-utils": "^1.3.1"
   },
   "devDependencies": {
+    "@aave/aave-token": "^1.0.4",
     "@babel/core": "^7.10.3",
     "@babel/polyfill": "^7.10.1",
     "@babel/register": "^7.10.3",
     "@istanbuljs/nyc-config-typescript": "^0.1.3",
     "@openzeppelin/contracts": "^2.4.0",
-    "@typechain/ethers-v4": "^1.0.0",
+    "@typechain/ethers-v5": "^6.0.0",
     "@types/bn.js": "^4.11.6",
     "@types/chai": "^4.2.11",
     "@types/mocha": "^7.0.2",
@@ -69,22 +75,27 @@
     "@typescript-eslint/eslint-plugin": "^4.22.0",
     "@typescript-eslint/parser": "^4.22.0",
     "chai": "^4.2.0",
+    "dotenv": "^10.0.0",
     "eslint": "^7.14.0",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-config-prettier": "^6.10.1",
     "eslint-plugin-import": "^2.20.0",
     "eslint-plugin-prettier": "^3.1.2",
     "ganache-cli": "^6.9.1",
+    "hardhat": "^2.3.0",
+    "hardhat-typechain": "^0.3.5",
     "install-peers-cli": "^2.2.0",
     "jsdom": "^16.2.2",
     "jsdom-global": "^3.0.2",
     "mocha": "^8.2.1",
     "nyc": "^15.1.0",
     "prettier": "2.0.2",
+    "rimraf": "^3.0.2",
+    "ts-generator": "^0.1.1",
     "ts-mocha": "^8.0.0",
     "ts-node": "^8.10.2",
-    "typechain": "^2.0.0",
-    "typescript": "^3.8.2",
+    "typechain": "^4.0.1",
+    "typescript": "^4.0.0",
     "yargs": "^16.1.0"
   }
 }

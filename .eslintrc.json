@@ -19,7 +19,7 @@
       }
     }
   },
-  "ignorePatterns": ["contractTypes/"],
+  "ignorePatterns": ["contractTypes", "eth", "dist"],
   "rules": {  
     "@typescript-eslint/interface-name-prefix": "off",
     "import/prefer-default-export": 0,

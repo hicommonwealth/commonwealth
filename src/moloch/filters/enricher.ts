@@ -1,9 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { Contract } from 'ethers';
 import { hexToNumberString, hexToNumber as web3HexToNumber } from 'web3-utils';
 
-import { Moloch1 } from '../contractTypes/Moloch1';
+import { TypedEventFilter } from '../../contractTypes/commons';
+import { Moloch1 } from '../../contractTypes';
 import { CWEvent } from '../../interfaces';
 import { EventKind, RawEvent, IEventData, Api } from '../types';
+
+type GetEventArgs<T> = T extends TypedEventFilter<any, infer Y> ? Y : never;
+type GetArgType<
+  C extends Contract,
+  Name extends keyof C['filters']
+> = GetEventArgs<ReturnType<C['filters'][Name]>>;
 
 // these functions unwrap the uint type received from chain,
 // which is an object like { _hex: <value> }, into a string/number
@@ -39,7 +47,7 @@ export async function Enrich(
         applicant,
         tokenTribute,
         sharesRequested,
-      } = rawData.args as any;
+      } = rawData.args as GetArgType<Moloch1, 'SubmitProposal'>;
       // TODO: pull these out into class, perhaps
       const proposal = await (api as Moloch1).proposalQueue(proposalIndex);
       const startingPeriod = +proposal.startingPeriod;
@@ -68,7 +76,7 @@ export async function Enrich(
         delegateKey,
         memberAddress,
         uintVote,
-      } = rawData.args as any;
+      } = rawData.args as GetArgType<Moloch1, 'SubmitVote'>;
       const member = await (api as Moloch1).members(memberAddress);
       return {
         blockNumber,
@@ -92,7 +100,7 @@ export async function Enrich(
         tokenTribute,
         sharesRequested,
         didPass,
-      } = rawData.args as any;
+      } = rawData.args as GetArgType<Moloch1, 'ProcessProposal'>;
       const proposal = await (api as Moloch1).proposalQueue(proposalIndex);
       return {
         blockNumber,
@@ -110,7 +118,10 @@ export async function Enrich(
       };
     }
     case EventKind.Ragequit: {
-      const { memberAddress, sharesToBurn } = rawData.args as any;
+      const { memberAddress, sharesToBurn } = rawData.args as GetArgType<
+        Moloch1,
+        'Ragequit'
+      >;
       return {
         blockNumber,
         excludeAddresses: [memberAddress],
@@ -122,7 +133,10 @@ export async function Enrich(
       };
     }
     case EventKind.Abort: {
-      const { proposalIndex, applicantAddress } = rawData.args as any;
+      const { proposalIndex, applicantAddress } = rawData.args as GetArgType<
+        Moloch1,
+        'Abort'
+      >;
       return {
         blockNumber,
         excludeAddresses: [applicantAddress],
@@ -134,7 +148,10 @@ export async function Enrich(
       };
     }
     case EventKind.UpdateDelegateKey: {
-      const { memberAddress, newDelegateKey } = rawData.args as any;
+      const { memberAddress, newDelegateKey } = rawData.args as GetArgType<
+        Moloch1,
+        'UpdateDelegateKey'
+      >;
       return {
         blockNumber,
         // TODO: we only alert the new delegate that the key was changed
@@ -148,7 +165,10 @@ export async function Enrich(
       };
     }
     case EventKind.SummonComplete: {
-      const { summoner, shares } = rawData.args as any;
+      const { summoner, shares } = rawData.args as GetArgType<
+        Moloch1,
+        'SummonComplete'
+      >;
       return {
         blockNumber,
         data: {

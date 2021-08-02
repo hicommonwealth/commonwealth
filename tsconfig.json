@@ -2,6 +2,9 @@
   "compilerOptions": {
     "allowJs": true,
     "target": "es6",
+    "lib": [
+      "es2019"
+    ],
     "moduleResolution": "node",
     "module": "commonjs",
     "allowSyntheticDefaultImports": true,

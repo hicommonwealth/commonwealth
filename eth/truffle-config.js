@@ -1,3 +1,4 @@
+/* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable quotes */
 /* eslint-disable no-multi-spaces */
 
@@ -29,11 +30,11 @@ module.exports = {
     // options below to some value.
     //
     development: {
-      host: "127.0.0.1",     // Localhost (default: none)
-      port: 9545,            // Standard Ethereum port (default: none)
-      network_id: "*",       // Any network (default: none)
+      host: '127.0.0.1', // Localhost (default: none)
+      port: 9545,        // Standard Ethereum port (default: none)
+      network_id: '*',   // Any network (default: none)
       gas: 8000000,
-      gasPrice: 2000,  // 20 gwei (in wei) (default: 100 gwei)
+      gasPrice: 2000,    // 20 gwei (in wei) (default: 100 gwei)
     },
 
     // Another network with more advanced options...
@@ -55,7 +56,7 @@ module.exports = {
   // Configure your compilers
   compilers: {
     solc: {
-      // version: "0.5.1",    // Fetch exact version from solc-bin (default: truffle's version)
+      // version: '0.5.1',    // Fetch exact version from solc-bin (default: truffle's version)
       // docker: true,        // Use "0.5.1" you've installed locally with docker (default: false)
       // settings: {          // See the solidity docs for advice about optimization and evmVersion
       //  optimizer: {
@@ -64,6 +65,6 @@ module.exports = {
       //  },
       //  evmVersion: "byzantium"
       // }
-    }
-  }
+    },
+  },
 };

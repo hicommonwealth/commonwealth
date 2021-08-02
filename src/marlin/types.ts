@@ -1,8 +1,5 @@
-import { Event } from 'ethers';
-
-import { MPond } from './contractTypes/MPond';
-import { GovernorAlpha } from './contractTypes/GovernorAlpha';
-import { Timelock } from './contractTypes/Timelock';
+import { TypedEvent } from '../contractTypes/commons';
+import { MPond, GovernorAlpha, Timelock } from '../contractTypes';
 
 // Used to unwrap promises returned by contract functions
 type UnPromisify<T> = T extends Promise<infer U> ? U : T;
@@ -25,7 +22,8 @@ export type Api = IMarlinContracts;
 
 export const EventChains = ['marlin', 'marlin-local'] as const;
 
-export type RawEvent = Event;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type RawEvent = TypedEvent<any>;
 
 // eslint-disable-next-line no-shadow
 export enum EntityKind {

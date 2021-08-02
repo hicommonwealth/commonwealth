@@ -12,23 +12,17 @@ export class StorageFetcher extends IStorageFetcher<Api> {
     super(_api);
   }
 
-  private _votingPeriod: number; // The duration of voting on a proposal, in blocks
-
-  private _votingDelay: number; // The delay before voting on a proposal may take place, once proposed
-
   private _currentBlock: number;
-
-  private _currentTimestamp: number;
 
   private async _eventsFromProposal(
     index: number,
     proposal: Proposal,
-    startTime: number,
     startBlock: number
   ): Promise<CWEvent<IEventData>[]> {
     // Only GovernorAlpha events are on Proposals
     const events: CWEvent<IEventData>[] = [];
     // All proposals had to have at least been created
+    // TODO: fetch these from events rather than storage
     const createdEvent: CWEvent<IEventData> = {
       blockNumber: startBlock,
       data: {
@@ -40,7 +34,7 @@ export class StorageFetcher extends IStorageFetcher<Api> {
         signatures: [], //  TODO: not on proposal...
         calldatas: [], //  TODO: not on proposal...
         startBlock,
-        endBlock: proposal.endBlock.toNumber(),
+        endBlock: +proposal.endBlock,
         description: '', // TODO: not on proposal...
       },
     };
@@ -48,10 +42,10 @@ export class StorageFetcher extends IStorageFetcher<Api> {
     // Some proposals might have been canceled too
     if (proposal.canceled) {
       const canceledEvent: CWEvent<IEventData> = {
-        blockNumber: proposal.endBlock.toNumber(),
+        blockNumber: Math.min(this._currentBlock, +proposal.endBlock),
         data: {
           kind: EventKind.ProposalCanceled,
-          id: proposal.id.toNumber(),
+          id: +proposal.id,
         },
       };
       events.push(canceledEvent);
@@ -60,11 +54,11 @@ export class StorageFetcher extends IStorageFetcher<Api> {
     if ((await this._api.governorAlpha.state(proposal.id)) === 5) {
       // state 5 is queued
       const queuedEvent: CWEvent<IEventData> = {
-        blockNumber: proposal.endBlock.toNumber(),
+        blockNumber: Math.min(this._currentBlock, +proposal.endBlock),
         data: {
           kind: EventKind.ProposalQueued,
-          id: proposal.id.toNumber(),
-          eta: proposal.eta.toNumber(),
+          id: +proposal.id,
+          eta: +proposal.eta,
         },
       };
       events.push(queuedEvent);
@@ -73,15 +67,37 @@ export class StorageFetcher extends IStorageFetcher<Api> {
     if ((await this._api.governorAlpha.state(proposal.id)) === 7) {
       // state 7 is executed
       const proposalExecuted: CWEvent<IEventData> = {
-        blockNumber: proposal.endBlock.toNumber(),
+        blockNumber: Math.min(this._currentBlock, +proposal.endBlock),
         data: {
           kind: EventKind.ProposalExecuted,
-          id: proposal.id.toNumber(),
+          id: +proposal.id,
         },
       };
       events.push(proposalExecuted);
     }
     // Vote Cast events are unfetchable
+    return events;
+  }
+
+  public async fetchOne(id: string): Promise<CWEvent<IEventData>[]> {
+    this._currentBlock = +(await this._api.governorAlpha.provider.getBlockNumber());
+    log.info(`Current block: ${this._currentBlock}.`);
+    if (!this._currentBlock) {
+      log.error('Failed to fetch current block! Aborting fetch.');
+      return [];
+    }
+
+    const proposal: Proposal = await this._api.governorAlpha.proposals(id);
+    if (+proposal.id === 0) {
+      log.error(`Marlin proposal ${id} not found.`);
+      return [];
+    }
+
+    const events = await this._eventsFromProposal(
+      proposal.id.toNumber(),
+      proposal,
+      +proposal.startBlock
+    );
     return events;
   }
 
@@ -97,15 +113,8 @@ export class StorageFetcher extends IStorageFetcher<Api> {
     range?: IDisconnectedRange,
     fetchAllCompleted = false
   ): Promise<CWEvent<IEventData>[]> {
-    // we need to fetch a few constants to convert voting periods into blocks
-    this._votingDelay = +(await this._api.governorAlpha.votingDelay());
-    this._votingPeriod = +(await this._api.governorAlpha.votingPeriod());
     this._currentBlock = +(await this._api.governorAlpha.provider.getBlockNumber());
     log.info(`Current block: ${this._currentBlock}.`);
-    this._currentTimestamp = (
-      await this._api.governorAlpha.provider.getBlock(this._currentBlock)
-    ).timestamp;
-    log.info(`Current timestamp: ${this._currentTimestamp}.`);
     if (!this._currentBlock) {
       log.error('Failed to fetch current block! Aborting fetch.');
       return [];
@@ -136,47 +145,25 @@ export class StorageFetcher extends IStorageFetcher<Api> {
     const queueLength = +(await this._api.governorAlpha.proposalCount());
     const results: CWEvent<IEventData>[] = [];
 
+    let nFetched = 0;
     for (let i = 0; i < queueLength; i++) {
       // work backwards through the queue, starting with the most recent
-      const queuePosition = queueLength - i - 1;
+      const queuePosition = queueLength - i;
       const proposal: Proposal = await this._api.governorAlpha.proposals(
         queuePosition
       );
       // fetch actual proposal
-      // const proposal: Proposal = await this._api.governorAlpha.proposalQueue(proposalIndex);
       log.debug(`Fetched Marlin proposal ${proposal.id} from storage.`);
+      const startBlock = +proposal.startBlock;
 
-      // compute starting time and derive closest block number
-      const startingPeriod = +proposal.startBlock;
-      const proposalStartingTime =
-        startingPeriod * this._votingPeriod + this._currentBlock;
-      log.debug(`Fetching block for timestamp ${proposalStartingTime}.`);
-      let proposalStartBlock: number;
-      try {
-        const block = await this._dater.getDate(proposalStartingTime * 1000);
-        proposalStartBlock = block.block;
-        log.debug(
-          `For timestamp ${block.date}, fetched ETH block #${block.block}.`
-        );
-      } catch (e) {
-        log.error(
-          `Unable to fetch closest block to timestamp ${proposalStartingTime}: ${e.message}`
-        );
-        log.error('Skipping proposal event fetch.');
-        // eslint-disable-next-line no-continue
-        continue;
-      }
-      if (
-        proposalStartBlock >= range.startBlock &&
-        proposalStartBlock <= range.endBlock
-      ) {
+      if (startBlock >= range.startBlock && startBlock <= range.endBlock) {
         const events = await this._eventsFromProposal(
           proposal.id.toNumber(),
           proposal,
-          proposalStartingTime,
-          proposalStartBlock
+          startBlock
         );
         results.push(...events);
+        nFetched += 1;
 
         // halt fetch once we find a completed/executed proposal in order to save data
         // we may want to run once without this, in order to fetch backlog, or else develop a pagination
@@ -190,15 +177,19 @@ export class StorageFetcher extends IStorageFetcher<Api> {
           );
           break;
         }
-      } else if (proposalStartBlock < range.startBlock) {
+        if (range.maxResults && nFetched >= range.maxResults) {
+          log.debug(`Fetched ${nFetched} proposals, halting fetch.`);
+          break;
+        }
+      } else if (startBlock < range.startBlock) {
         log.debug(
-          `Marlin proposal start block (${proposalStartBlock}) is before ${range.startBlock}, ending fetch.`
+          `Marlin proposal start block (${startBlock}) is before ${range.startBlock}, ending fetch.`
         );
         break;
-      } else if (proposalStartBlock > range.endBlock) {
+      } else if (startBlock > range.endBlock) {
         // keep walking backwards until within range
         log.debug(
-          `Marlin proposal start block (${proposalStartBlock}) is after ${range.endBlock}, ending fetch.`
+          `Marlin proposal start block (${startBlock}) is after ${range.endBlock}, ending fetch.`
         );
       }
     }

@@ -4,8 +4,8 @@ import sleep from 'sleep-promise';
 
 import { CWEvent, SubscribeFunc, ISubscribeOptions } from '../interfaces';
 import { factory, formatFilename } from '../logging';
+import { ERC20__factory as ERC20Factory } from '../contractTypes';
 
-import { Erc20Factory } from './contractTypes/Erc20Factory';
 import { Subscriber } from './subscriber';
 import { Processor } from './processor';
 import { IEventData, RawEvent, Api } from './types';
@@ -28,12 +28,13 @@ export async function createApi(
   retryTimeMs = 10 * 1000
 ): Promise<Api> {
   if (ethNetworkUrl.includes('infura')) {
+    const networkPrefix = ethNetworkUrl.split('infura')[0];
     if (process && process.env) {
       const { INFURA_API_KEY } = process.env;
       if (!INFURA_API_KEY) {
         throw new Error('no infura key found!');
       }
-      ethNetworkUrl = `wss://mainnet.infura.io/ws/v3/${INFURA_API_KEY}`;
+      ethNetworkUrl = `${networkPrefix}infura.io/ws/v3/${INFURA_API_KEY}`;
     } else {
       throw new Error('must use nodejs to connect to infura provider!');
     }
@@ -49,7 +50,7 @@ export async function createApi(
     const provider = new providers.Web3Provider(web3Provider);
 
     const tokenContracts = tokenAddresses.map((o) =>
-      Erc20Factory.connect(o, provider)
+      ERC20Factory.connect(o, provider)
     );
     const deployResults = await Promise.all(
       tokenContracts.map((o) =>
