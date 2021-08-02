@@ -8,6 +8,7 @@ import $ from 'jquery';
 import Web3 from 'web3';
 
 import app from 'state';
+import { navigateToSubpage } from 'app';
 import { OffchainThread, OffchainComment, OffchainAttachment, Profile, ChainBase } from 'models';
 
 import Sublayout from 'views/sublayout';
@@ -175,9 +176,7 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
     vnode.state.comments = [];
     vnode.state.refreshProfile = false;
 
-    const chain = (m.route.param('base'))
-      ? m.route.param('base')
-      : m.route.param('scope');
+    const chain = m.route.param('base') || app.customDomainId() || m.route.param('scope');
     const { address } = vnode.attrs;
     const chainInfo = app.config.chains.getById(chain);
     const baseSuffix = m.route.param('base');
@@ -190,7 +189,7 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
       if (!valid) {
         try {
           const encoded = encodeAddress(decodedAddress, ss58Prefix);
-          m.route.set(`/${m.route.param('scope')}/account/${encoded}${baseSuffix ? `?base=${baseSuffix}` : ''}`);
+          navigateToSubpage(`/account/${encoded}${baseSuffix ? `?base=${baseSuffix}` : ''}`);
         } catch (e) {
           // do nothing if can't encode address
         }
@@ -201,7 +200,7 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
       if (!valid) {
         try {
           const checksumAddress = Web3.utils.toChecksumAddress(address);
-          m.route.set(`/${m.route.param('scope')}/account/${checksumAddress}${baseSuffix ? `?base=${baseSuffix}` : ''}`);
+          navigateToSubpage(`/account/${checksumAddress}${baseSuffix ? `?base=${baseSuffix}` : ''}`);
         } catch (e) {
           // do nothing if can't get checksumAddress
         }
@@ -213,9 +212,7 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
   },
   view: (vnode) => {
     const loadProfile = async () => {
-      const chain = (m.route.param('base'))
-        ? m.route.param('base')
-        : m.route.param('scope');
+      const chain = m.route.param('base') || app.customDomainId() || m.route.param('scope');
       const { address } = vnode.attrs;
       const chainInfo = app.config.chains.getById(chain);
       let valid = false;

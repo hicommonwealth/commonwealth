@@ -7,6 +7,7 @@ import moment from 'moment';
 import BN from 'bn.js';
 
 import app from 'state';
+import { navigateToSubpage } from 'app';
 import { ProposalType } from 'identifiers';
 import { ChainBase, ChainNetwork, ProposalModule } from 'models';
 
@@ -94,7 +95,7 @@ const MarlinProposalStats: m.Component<{}, {}> = {
         ]),
         m(Button, {
           intent: 'primary',
-          onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
+          onclick: (e) => navigateToSubpage('/new/proposal/:type', {
             type: ProposalType.CosmosProposal
           }),
           label: 'New proposal',

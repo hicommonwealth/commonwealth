@@ -3,6 +3,7 @@ import webpack from 'webpack';
 import passport from 'passport';
 import { GITHUB_OAUTH_CALLBACK } from './config';
 
+import domain from './routes/domain';
 import status from './routes/status';
 import createGist from './routes/createGist';
 
@@ -132,6 +133,7 @@ function setupRouter(
   tokenBalanceCache: TokenBalanceCache
 ) {
   const router = express.Router();
+  router.get('/domain', domain.bind(this, models));
   router.get('/status', status.bind(this, models));
 
   router.get('/getSubstrateSpec', getSubstrateSpec.bind(this, models));
