@@ -21,11 +21,10 @@ import { OffchainTopic, OffchainThreadKind, OffchainThreadStage, CommunityInfo, 
 import { updateLastVisited } from 'controllers/app/login';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
-import QuillEditor, { addMarkdownImageToText } from 'views/components/quill_editor';
+import QuillEditor from 'views/components/quill_editor';
 import TopicSelector from 'views/components/topic_selector';
 import EditProfileModal from 'views/modals/edit_profile_modal';
 
-import Token from 'controllers/chain/ethereum/token/adapter';
 import QuillFormattedText from './quill_formatted_text';
 import MarkdownFormattedText from './markdown_formatted_text';
 
@@ -143,17 +142,16 @@ const newThread = async (
   const mentionsEle = document.getElementsByClassName('ql-mention-list-container')[0];
   if (mentionsEle) (mentionsEle as HTMLElement).style.visibility = 'hidden';
   const bodyText = !quillEditorState ? ''
-    : !quillEditorState.markdownMode
-      ? JSON.stringify(quillEditorState.editor.getContents())
-      : quillEditorState.editor.getContents()?.ops?.length > 1
-        ? addMarkdownImageToText(quillEditorState.editor.getContents().ops)
-        : quillEditorState.editor.getText();
+    : quillEditorState.markdownMode
+      ? quillEditorState.editor.getText()
+      : JSON.stringify(quillEditorState.editor.getContents());
 
   const { topicName, topicId, threadTitle, linkTitle, url } = form;
   const title = threadTitle || linkTitle;
   const attachments = [];
   const chainId = app.activeCommunityId() ? null : app.activeChainId();
   const communityId = app.activeCommunityId();
+
   let result;
   try {
     // see if app.chain.network is existing in network lists and if app.chain.isToken
@@ -185,7 +183,7 @@ const newThread = async (
   await app.user.notifications.refresh();
 
   navigateToSubpage(`/proposal/discussion/${result.id}`);
-
+  
   if (result.topic) {
     try {
       const topicNames = Array.isArray(activeEntity?.meta?.topics)

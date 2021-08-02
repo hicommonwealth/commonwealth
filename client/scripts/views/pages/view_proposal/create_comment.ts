@@ -9,7 +9,7 @@ import app from 'state';
 import { OffchainThread, OffchainComment, AnyProposal } from 'models';
 import { CommentParent } from 'controllers/server/comments';
 import EditProfileModal from 'views/modals/edit_profile_modal';
-import QuillEditor, { addMarkdownImageToText } from 'views/components/quill_editor';
+import QuillEditor from 'views/components/quill_editor';
 import User from 'views/components/widgets/user';
 
 import Token from 'controllers/chain/ethereum/token/adapter';
@@ -64,13 +64,10 @@ const CreateComment: m.Component<{
       if (mentionsEle) (mentionsEle as HTMLElement).style.visibility = 'hidden';
 
 
-      const commentText = !quillEditorState.markdownMode
-        ? JSON.stringify(quillEditorState.editor.getContents())
-        : quillEditorState.editor.getContents()?.ops?.length > 1
-          ? addMarkdownImageToText(quillEditorState.editor.getContents().ops)
-          : quillEditorState.editor.getText();
-      console.log({ commentText });
-      debugger
+      const commentText = quillEditorState.markdownMode
+        ? quillEditorState.editor.getText()
+        : JSON.stringify(quillEditorState.editor.getContents());
+
       const attachments = [];
       // const attachments = vnode.state.files ?
       //   vnode.state.files.map((f) => f.uploadURL.replace(/\?.*/, '')) : [];
