@@ -45,6 +45,8 @@ const networkUrls = {
 
   aave: 'wss://mainnet.infura.io/ws',
   'aave-local': 'ws://127.0.0.1:9545',
+  'dydx-ropsten': 'wss://ropsten.infura.io/ws',
+  'dydx': 'wss://mainnet.infura.io/ws',
 
   erc20: 'wss://mainnet.infura.io/ws',
 } as const;
@@ -64,6 +66,8 @@ const contracts = {
   marlin: '0x777992c2E4EDF704e49680468a9299C6679e37F6',
   aave: '0xEC568fffba86c094cf06b22134B23074DFE2252c',
   'aave-local': '0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9',
+  'dydx-ropsten': '0x6938240Ba19cB8a614444156244b658f650c8D5c',
+  dydx: '0x7E9B1672616FF6D6629Ef2879419aaE79A9018D2',
 };
 
 const { argv } = yargs
