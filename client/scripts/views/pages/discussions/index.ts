@@ -6,6 +6,7 @@ import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 import moment from 'moment';
 import app from 'state';
+import { navigateToSubpage } from 'app';
 
 import { Spinner, Button, ButtonGroup, Icons, Icon, PopoverMenu, MenuItem, MenuDivider } from 'construct-ui';
 import { pluralize, offchainThreadStageToLabel, parseCustomStages } from 'helpers';
@@ -85,7 +86,7 @@ export const CommunityOptionsPopover: m.Component<{ isAdmin: boolean; isMod: boo
           && app.activeId()
           && m(MenuItem, {
             label: 'Analytics',
-            onclick: (e) => m.route.set(`/${app.activeId()}/analytics`),
+            onclick: (e) => navigateToSubpage('/analytics'),
           }),
       ],
     });
@@ -147,7 +148,7 @@ const DiscussionStagesBar: m.Component<{ topic: string; stage: string }, {}> = {
               iconLeft: m.route.get() === `/${app.activeId()}` || !topic ? Icons.CHECK : null,
               label: 'All Discussions',
               onclick: () => {
-                m.route.set(`/${app.activeId()}`);
+                navigateToSubpage('/');
               },
             }),
             m(MenuDivider),
@@ -158,7 +159,7 @@ const DiscussionStagesBar: m.Component<{ topic: string; stage: string }, {}> = {
               iconLeft: m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name.toString().trim())}` || (topic && topic === name) ? Icons.CHECK : null,
               onclick: (e) => {
                 e.preventDefault();
-                m.route.set(`/${app.activeId()}/discussions/${name}`);
+                navigateToSubpage(`/discussions/${name}`);
               },
               label: m('.topic-menu-item', [
                 m('.topic-menu-item-name', name),
@@ -200,7 +201,7 @@ const DiscussionStagesBar: m.Component<{ topic: string; stage: string }, {}> = {
             m(MenuItem, {
               onclick: (e) => {
                 e.preventDefault();
-                m.route.set(`/${app.activeId()}`);
+                navigateToSubpage('/');
               },
               active: !stage,
               iconLeft: !stage ? Icons.CHECK : null,
@@ -219,7 +220,7 @@ const DiscussionStagesBar: m.Component<{ topic: string; stage: string }, {}> = {
               iconLeft: stage === targetStage ? Icons.CHECK : null,
               onclick: (e) => {
                 e.preventDefault();
-                m.route.set(`/${app.activeId()}?stage=${targetStage}`);
+                navigateToSubpage(`/?stage=${targetStage}`);
               },
               label: [`${offchainThreadStageToLabel(targetStage)}`, targetStage === OffchainThreadStage.Voting && [' ', m('.discussions-stage-count', `${app.threads.numVotingThreads}`)]],
             })),
