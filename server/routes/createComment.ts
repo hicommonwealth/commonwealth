@@ -233,7 +233,7 @@ const createComment = async (
       mentionedAddresses = await Promise.all(mentions.map(async (mention) => {
         const user = await models.Address.findOne({
           where: {
-            chain: mention[0],
+            chain: mention[0] || null,
             address: mention[1],
           },
           include: [ models.User, models.Role ]

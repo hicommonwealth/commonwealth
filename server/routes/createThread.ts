@@ -233,8 +233,8 @@ const createThread = async (
         try {
           return models.Address.findOne({
             where: {
-              chain: mention[0],
-              address: mention[1],
+              chain: mention[0] || null,
+              address: mention[1] || null,
             },
             include: [ models.User, models.Role ]
           });

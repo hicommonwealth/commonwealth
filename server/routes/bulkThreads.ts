@@ -155,13 +155,13 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       return data;
     });
 
-    comments = await models.OffchainComment.findAll({
+    comments = (await models.OffchainComment.findAll({
       where: {
         root_id: root_ids
       },
       include: [models.Address, models.OffchainAttachment],
       order: [['created_at', 'DESC']],
-    }).map((c, idx) => {
+    })).map((c, idx) => {
       const row = c.toJSON();
       const last_edited = getLastEdited(row);
       row['last_edited'] = last_edited;
@@ -172,7 +172,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       ? { community: community.id, }
       : { chain: chain.id, };
 
-    threads = await models.OffchainThread.findAll({
+    threads = (await models.OffchainThread.findAll({
       where: whereOptions,
       include: [
         {
@@ -191,19 +191,19 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       ],
       exclude: [ 'version_history' ],
       order: [['created_at', 'DESC']],
-    }).map((t, idx) => {
+    })).map((t, idx) => {
       const row = t.toJSON();
       const last_edited = getLastEdited(row);
       row['last_edited'] = last_edited;
       return row;
     });
 
-    comments = await models.OffchainComment.findAll({
+    comments = (await models.OffchainComment.findAll({
       where: whereOptions,
       include: [models.Address, models.OffchainAttachment],
       exclude: [ 'version_history' ],
       order: [['created_at', 'DESC']],
-    }).map((c, idx) => {
+    })).map((c, idx) => {
       const row = c.toJSON();
       const last_edited = getLastEdited(row);
       row['last_edited'] = last_edited;
