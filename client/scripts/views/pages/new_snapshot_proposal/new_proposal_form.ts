@@ -3,27 +3,24 @@ import 'pages/new_proposal_page.scss';
 import $ from 'jquery';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
-import { Input, Form, FormLabel, FormGroup, Button, Callout, Spinner } from 'construct-ui';
+import { Input, Form, FormLabel, FormGroup, Button, Callout, Spinner, RadioGroup } from 'construct-ui';
 
 import moment from 'moment';
 import snapshotJs from '@snapshot-labs/snapshot.js';
 
 import app from 'state';
 
-import { formatSpace } from 'helpers/snapshot_utils/snapshot_utils';
-
 import { notifyError } from 'controllers/app/notifications';
 import QuillEditor from 'views/components/quill_editor';
 import { idToProposal } from 'identifiers';
 import { capitalize } from 'lodash';
-import SimplePicker from 'simplepicker';
-import { ChainBase, IWebWallet } from 'models';
-import MetamaskWebWalletController from '../../../controllers/app/webWallets/metamask_web_wallet';
+import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web_wallet';
 
 interface IThreadForm {
   name: string;
   body: string;
   choices: string[];
+  range: string;
   start: number;
   end: number;
   snapshot: number,
@@ -140,11 +137,12 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
   snapshotScoresFetched: boolean,
 }> = {
   view: (vnode) => {
-    if (!app.community && !app.chain) return;
+    const getLoadingPage = () => m('.topic-loading-spinner-wrap', [ m(Spinner, { active: true, size: 'lg' }) ]);
+    if (!app.community && !app.chain) return getLoadingPage();
 
     const pathVars = m.parsePathname(window.location.href);
 
-    if (!app.snapshot.spaces) return;
+    if (!app.snapshot.spaces) return getLoadingPage();
     if (!vnode.state.initialized) {
       vnode.state.initialized = true;
       vnode.state.space = {};
@@ -154,8 +152,9 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
         name: '',
         body: '',
         choices: ['Yes', 'No'],
-        start: 0,
-        end: 0,
+        range: '3d',
+        start: new Date().getTime(),
+        end: moment().add(3, 'days').toDate().getTime(),
         snapshot: 0,
         metadata: {},
         type: 'single-choice'
@@ -193,7 +192,7 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
         m.redraw();
       });
     }
-    if (!vnode.state.snapshotScoresFetched) return;
+    if (!vnode.state.snapshotScoresFetched) return getLoadingPage();
     const author = app.user.activeAccount;
     const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
     if (vnode.state.quillEditorState?.container) {
@@ -291,40 +290,38 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
               ]),
             ]),
             m(FormGroup, [
-              m(FormGroup, [
-                m(FormLabel, 'Start Date:'),
-                m(Input, {
-                  // defaultValue: vnode.state.isFromExistingProposal ? today.toDateString() : ' ',
-                  name: 'targets',
-                  placeholder: 'May 1, 1995',
-                  value: moment(vnode.state.form.start || new Date()).format('DD MMM YYYY hh:mm A'),
-                  onclick: () => {
-                    const myPicker = new SimplePicker({ zIndex: 1000 });
-                    myPicker.open();
-                    myPicker.on('submit', (date: Date, readableDate: string) => {
-                      vnode.state.form.start = date.getTime();
-                      m.redraw();
-                    });
-                  },
-                }),
-              ]),
-              m(FormGroup, [
-                m(FormLabel, 'End Date:'),
-                m(Input, {
-                  // defaultValue: vnode.state.isFromExistingProposal ? nextWeek.toDateString() : ' ',
-                  name: 'targets',
-                  placeholder: 'May 22, 1995',
-                  value: moment(vnode.state.form.end || new Date()).format('DD MMM YYYY hh:mm A'),
-                  onclick: () => {
-                    const myPicker = new SimplePicker({ zIndex: 1000 });
-                    myPicker.open();
-                    myPicker.on('submit', (date: Date, readableDate: string) => {
-                      vnode.state.form.end = date.getTime();
-                      m.redraw();
-                    });
-                  },
-                }),
-              ]),
+              m(FormLabel, { for: 'period' }, 'Date Range:'),
+              m(RadioGroup, {
+                name: 'period',
+                options: [
+                  { value: '3d', label: '3-day' },
+                  { value: '7d', label: '7-day' },
+                  { value: '2w', label: '2 weeks' },
+                  { value: '4w', label: '4 weeks' },
+                ],
+                value: vnode.state.form.range,
+                onchange: (e: Event) => {
+                  vnode.state.form.range = (e.target as any).value;
+                  vnode.state.form.start = new Date().getTime();
+                  switch (vnode.state.form.range) {
+                    case '3d':
+                      vnode.state.form.end = moment().add(3, 'days').toDate().getTime();
+                      break;
+                    case '7d':
+                      vnode.state.form.end = moment().add(7, 'days').toDate().getTime();
+                      break;
+                    case '2w':
+                      vnode.state.form.end = moment().add(2, 'weeks').toDate().getTime();
+                      break;
+                    case '4w':
+                      vnode.state.form.end = moment().add(4, 'weeks').toDate().getTime();
+                      break;
+                    default:
+                      break;
+                  }
+                  console.log(vnode.state.form);
+                },
+              }),
             ]),
             m(FormGroup, [
               m(QuillEditor, {

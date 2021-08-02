@@ -10,6 +10,8 @@ import { _explorer, _n, _shorten } from 'helpers/snapshot_utils/snapshot_utils';
 import { notifyError } from 'controllers/app/notifications';
 
 import { CompactModalExitButton } from 'views/modal';
+import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web_wallet';
+
 
 enum NewVoteErrors {
   SomethingWentWrong = 'Something went wrong!'
@@ -90,10 +92,9 @@ const ConfirmSnapshotVoteModal: m.Component<{
                   }
                 })
               };
-              const msgBuffer = bufferToHex(Buffer.from(msg.msg, 'utf8'));
 
-              // TODO: do not use window.ethereum here
-              msg.sig = await (window as any).ethereum.request({ method: 'personal_sign', params: [msgBuffer, author.address] });
+              const wallet = (app.wallets.getByName('metamask') as MetamaskWebWalletController);
+              msg.sig = await wallet.signMessage(msg.msg);
 
               const result = await $.post(`${app.serverUrl()}/snapshotAPI/sendMessage`, { ...msg });
 

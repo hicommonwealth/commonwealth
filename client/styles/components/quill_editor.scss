@@ -20,6 +20,7 @@
 
 .QuillEditor {
     position: relative;
+    word-break: break-word;
     ::selection {
         background: $primary-bg-color;
         color: $text-color-white;

@@ -11,7 +11,7 @@ import app from 'state';
 import { ITXModalData, ProposalModule, ChainBase, OffchainThreadKind, OffchainThreadStage, ChainNetwork } from 'models';
 import { ProposalType, proposalSlugToClass, proposalSlugToFriendlyName } from 'identifiers';
 import { formatCoin } from 'adapters/currency';
-import { CosmosToken } from 'adapters/chain/cosmos/types';
+import { CosmosToken } from 'controllers/chain/cosmos/types';
 
 import { notifyError } from 'controllers/app/notifications';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';

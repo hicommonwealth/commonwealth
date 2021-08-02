@@ -17,12 +17,25 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
     && (app.chain?.network === ChainNetwork.Yearn
       || app.chain?.network === ChainNetwork.Fei
       || app.chain?.network === ChainNetwork.Sushi);
+
+  const topics = app.topics.getByCommunity(app.activeId()).reduce((acc, current) => current.featuredInNewPost ? [...acc, current] : acc, []).sort((a, b) => a.name.localeCompare(b.name));
+
   return [
     m(MenuItem, {
       onclick: () => { m.route.set(`/${app.activeId()}/new/thread`); },
       label: 'New thread',
       iconLeft: mobile ? Icons.PLUS : undefined,
     }),
+    topics.map((t) => (
+      m(MenuItem, {
+        onclick: (e) => {
+          localStorage.setItem(`${app.activeId()}-active-topic`, t.name);
+          m.route.set(`/${app.chain.id}/new/thread`);
+        },
+        label: `New ${t.name} Thread`,
+        iconLeft: mobile ? Icons.PLUS : undefined,
+      })
+    )),
     (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
       && !mobile
       && m(MenuDivider),

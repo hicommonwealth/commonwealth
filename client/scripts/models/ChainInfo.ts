@@ -22,6 +22,7 @@ class ChainInfo {
   public additionalStages: string;
   public customDomain: string;
   public snapshot: string;
+  public terms: string;
   public readonly blockExplorerIds: { [id: string]: string };
   public readonly collapsedOnHomepage: boolean;
   public readonly featuredTopics: string[];
@@ -36,7 +37,7 @@ class ChainInfo {
   constructor({
     id, network, symbol, name, iconUrl, description, website, discord, element, telegram, github,
     stagesEnabled, additionalStages,
-    customDomain, snapshot, blockExplorerIds, collapsedOnHomepage, featuredTopics, topics, adminsAndMods,
+    customDomain, snapshot, terms, blockExplorerIds, collapsedOnHomepage, featuredTopics, topics, adminsAndMods,
     base, ss58_prefix, type, substrateSpec
   }) {
     this.id = id;
@@ -55,6 +56,7 @@ class ChainInfo {
     this.additionalStages = additionalStages;
     this.customDomain = customDomain;
     this.snapshot = snapshot;
+    this.terms = terms;
     this.blockExplorerIds = blockExplorerIds;
     this.collapsedOnHomepage = collapsedOnHomepage;
     this.featuredTopics = featuredTopics || [];
@@ -81,6 +83,7 @@ class ChainInfo {
     additionalStages,
     customDomain,
     snapshot,
+    terms,
     blockExplorerIds,
     collapsed_on_homepage,
     featured_topics,
@@ -114,6 +117,7 @@ class ChainInfo {
       additionalStages,
       customDomain,
       snapshot,
+      terms,
       blockExplorerIds: blockExplorerIdsParsed,
       collapsedOnHomepage: collapsed_on_homepage,
       featuredTopics: featured_topics,
@@ -176,7 +180,7 @@ class ChainInfo {
   // TODO: change to accept an object
   public async updateChainData({
     name, description, website, discord, element, telegram,
-    github, stagesEnabled, additionalStages, customDomain, snapshot
+    github, stagesEnabled, additionalStages, customDomain, snapshot, terms
   }) {
     // TODO: Change to PUT /chain
     const r = await $.post(`${app.serverUrl()}/updateChain`, {
@@ -192,6 +196,7 @@ class ChainInfo {
       'additionalStages': additionalStages,
       'customDomain': customDomain,
       'snapshot': snapshot,
+      'terms': terms,
       'jwt': app.user.jwt,
     });
     const updatedChain: ChainInfo = r.result;
@@ -206,6 +211,7 @@ class ChainInfo {
     this.additionalStages = updatedChain.additionalStages;
     this.customDomain = updatedChain.customDomain;
     this.snapshot = updatedChain.snapshot;
+    this.terms = updatedChain.terms;
   }
 
   public addFeaturedTopic(topic: string) {
