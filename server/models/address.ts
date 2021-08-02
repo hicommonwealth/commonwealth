@@ -282,13 +282,7 @@ export default (
         log.error(`Address not matched. Generated ${generatedAddress}, found ${addressModel.address}.`);
         isValid = false;
       }
-    } else if (chain.network === 'ethereum'
-      || chain.network === 'moloch'
-      || chain.network === 'alex'
-      || chain.network === 'metacartel'
-      || chain.network === 'commonwealth'
-      || chain.type === 'token'
-    ) {
+    } else if (chain.base === 'ethereum') {
       //
       // ethereum address handling
       //

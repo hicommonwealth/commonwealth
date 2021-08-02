@@ -17,16 +17,20 @@ import {
   ChainEvent,
 } from 'models';
 
-import MarlinHolder from './holder';
-import MarlinHolders from './holders';
 import MarlinAPI from './api';
 import MarlinGovernance from './governance';
+import { attachSigner } from '../contractApi';
+import EthereumAccount from '../account';
+import EthereumAccounts from '../accounts';
+import MarlinChain from './chain';
 
+// eslint-disable-next-line no-shadow
 export enum MarlinVote {
   YES = 1,
   NO = 0
 }
 
+// eslint-disable-next-line no-shadow
 export enum MarlinProposalState {
   Pending,
   Active,
@@ -39,10 +43,10 @@ export enum MarlinProposalState {
 }
 
 export class MarlinProposalVote implements IVote<EthereumCoin> {
-  public readonly account: MarlinHolder;
+  public readonly account: EthereumAccount;
   public readonly choice: MarlinVote;
 
-  constructor(member: MarlinHolder, choice: MarlinVote) {
+  constructor(member: EthereumAccount, choice: MarlinVote) {
     this.account = member;
     this.choice = choice;
   }
@@ -120,14 +124,14 @@ const backportEntityToAdapter = (
   return proposal;
 };
 
-
 export default class MarlinProposal extends Proposal<
   MarlinAPI,
   EthereumCoin,
   IMarlinProposalResponse,
   MarlinProposalVote
 > {
-  private _Holders: MarlinHolders;
+  private _Accounts: EthereumAccounts;
+  private _Chain: MarlinChain;
   private _Gov: MarlinGovernance;
 
   public get shortIdentifier() { return `MarlinProposal-${this.data.identifier}`; }
@@ -156,7 +160,7 @@ export default class MarlinProposal extends Proposal<
     return ProposalStatus.Passing;
   }
 
-  public get author() { return this._Holders.get(this.data.proposer); }
+  public get author() { return this._Accounts.get(this.data.proposer); }
 
   public get votingType() { return VotingType.MarlinYesNo; }
   public get votingUnit() { return VotingUnit.CoinVote; }
@@ -190,14 +194,16 @@ export default class MarlinProposal extends Proposal<
   }
 
   constructor(
-    Holders: MarlinHolders,
+    Accounts: EthereumAccounts,
+    Chain: MarlinChain,
     Gov: MarlinGovernance,
     entity: ChainEntity,
   ) {
     // must set identifier before super() because of how response object is named
     super('marlinproposal', backportEntityToAdapter(Gov, entity));
 
-    this._Holders = Holders;
+    this._Accounts = Accounts;
+    this._Chain = Chain;
     this._Gov = Gov;
 
     entity.chainEvents.sort((e1, e2) => e1.blockNumber - e2.blockNumber).forEach((e) => this.update(e));
@@ -208,7 +214,7 @@ export default class MarlinProposal extends Proposal<
   public update(e: ChainEvent) {
   }
 
-  public canVoteFrom(account: MarlinHolder) {
+  public canVoteFrom(account: EthereumAccount) {
     // We need to check the delegate of account to perform voting checks. Delegates must
     // be fetched from chain, which requires async calls, making this impossible to implement.
     return true;
@@ -219,7 +225,10 @@ export default class MarlinProposal extends Proposal<
       throw new Error('proposal already canceled');
     }
 
-    const tx = await this._Gov.api.governorAlphaContract.cancel(
+    const address = this._Gov.app.user.activeAccount.address;
+    const contract = await attachSigner(this._Gov.app.wallets, address, this._Gov.api.Contract);
+
+    const tx = await contract.cancel(
       this.data.identifier,
       { gasLimit: this._Gov.api.gasLimit }
     );
@@ -233,12 +242,12 @@ export default class MarlinProposal extends Proposal<
   // web wallet TX only
   public async submitVoteWebTx(vote: MarlinProposalVote) {
     const address = vote.account.address;
-    const contract = await this._Gov.api.attachSigner(
+    const contract = await attachSigner(
       this._Gov.app.wallets,
       address,
-      this._Gov.api.governorAlphaContract
+      this._Gov.api.Contract
     );
-    if (!(await this._Holders.isDelegate(address))) {
+    if (!(await this._Chain.isDelegate(address))) {
       throw new Error('sender must be valid delegate');
     }
 

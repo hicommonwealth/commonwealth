@@ -11,6 +11,7 @@ import $ from 'jquery';
 import { FocusManager } from 'construct-ui';
 import moment from 'moment';
 import mixpanel from 'mixpanel-browser';
+import _ from 'underscore';
 
 import app, { ApiStatus, LoginState } from 'state';
 import {
@@ -33,7 +34,8 @@ import { Layout } from 'views/layout';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import LoginModal from 'views/modals/login_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';
-import Login from './views/components/login';
+import { AaveTypes, MarlinTypes, MolochTypes } from '@commonwealth/chain-events';
+import { formatSpace } from './helpers/snapshot_utils/snapshot_utils';
 
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/landing');
@@ -112,7 +114,15 @@ export async function initAppState(updateSelectedNode = true, customDomain = nul
         app.user.setSelectedNode(NodeInfo.fromJSON(data.user.selectedNode));
       }
 
-      // update whether we're on a custom domain
+      app.snapshot.client.getSpaces().then((response) => {
+        console.log(response);
+        app.snapshot.spaces = _.object(
+          Object.entries(response).map((space) => [
+            space[0],
+            formatSpace(space[0], space[1])
+          ])
+        );
+      });
       if (customDomain) {
         app.setCustomDomain(customDomain);
       }
@@ -265,20 +275,27 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
     )).default;
     newChain = new Near(n, app);
     initApi = true;
-  } else if (n.chain.network === ChainNetwork.Moloch || n.chain.network === ChainNetwork.Metacartel) {
+  } else if (MolochTypes.EventChains.find((c) => c === n.chain.network)) {
     const Moloch = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "moloch-main" */
       './controllers/chain/ethereum/moloch/adapter'
     )).default;
     newChain = new Moloch(n, app);
-  } else if (n.chain.network === ChainNetwork.Marlin || n.chain.network === ChainNetwork.MarlinTestnet) {
+  } else if (MarlinTypes.EventChains.find((c) => c === n.chain.network)) {
     const Marlin = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "marlin-main" */
       './controllers/chain/ethereum/marlin/adapter'
     )).default;
     newChain = new Marlin(n, app);
+  } else if (AaveTypes.EventChains.find((c) => c === n.chain.network)) {
+    const Aave = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "aave-main" */
+      './controllers/chain/ethereum/aave/adapter'
+    )).default;
+    newChain = new Aave(n, app);
   } else if (n.chain.type === 'token') {
     const Token = (await import(
     //   /* webpackMode: "lazy" */
@@ -293,6 +310,34 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/ethereum/commonwealth/adapter'
     )).default;
     newChain = new Commonwealth(n, app);
+  } else if (n.chain.network === ChainNetwork.Yearn) {
+    const Yearn = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "commonwealth-main" */
+      './controllers/chain/ethereum/snapshot/adapter'
+    )).default;
+    newChain = new Yearn(n, app);
+  } else if (n.chain.network === ChainNetwork.Fei) {
+    const Fei = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "commonwealth-main" */
+      './controllers/chain/ethereum/snapshot/adapter'
+    )).default;
+    newChain = new Fei(n, app);
+  } else if (n.chain.network === ChainNetwork.Sushi) {
+    const Snapshot = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "commonwealth-main" */
+      './controllers/chain/ethereum/snapshot/adapter'
+    )).default;
+    newChain = new Snapshot(n, app);
+  } else if (n.chain.network === ChainNetwork.Demo) {
+    const Snapshot = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "commonwealth-main" */
+      './controllers/chain/ethereum/snapshot/adapter'
+    )).default;
+    newChain = new Snapshot(n, app);
   } else {
     throw new Error('Invalid chain');
   }
@@ -413,7 +458,7 @@ m.route.set = (...args) => {
 export const navigateToSubpage = (...args) => {
   // prepend community if we are not on a custom domain
   if (!app.isCustomDomain()) {
-    args[0] = `${app.activeId()}/${args[0]}`;
+    args[0] = `/${app.activeId()}${args[0]}`;
   }
   m.route.set.apply(this, args);
 };
@@ -552,6 +597,9 @@ Promise.all([
     '/privacy':                  importRoute('views/pages/landing/privacy', { scoped: false }),
     '/components':               importRoute('views/pages/components', { scoped: false, hideSidebar: true }),
     ...(isCustomDomain ? {
+      //
+      // Custom domain routes
+      //
       '/':                       importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
       '/search':                 importRoute('views/pages/search', { scoped: false, deferChain: true }),
       // Notifications
@@ -568,6 +616,8 @@ Promise.all([
       '/discussions':            redirectRoute((attrs) => `/${attrs.scope}/`),
       '/discussions/:topic':     importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
       '/members':                importRoute('views/pages/members', { scoped: true, deferChain: true }),
+      '/snapshot-proposals/:snapshotId': importRoute('views/pages/snapshot_proposals', { scoped: true, deferChain: true }),
+      '/snapshot-proposal/:snapshotId/:identifier': importRoute('views/pages/view_snapshot_proposal', { scoped: true }),  
       '/chat':                   importRoute('views/pages/chat', { scoped: true, deferChain: true }),
       '/new/thread':             importRoute('views/pages/new_thread', { scoped: true, deferChain: true }),
       // Profiles
@@ -580,6 +630,7 @@ Promise.all([
       '/delegate':               importRoute('views/pages/delegate', { scoped: true, }),
       '/proposal/:type/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
       '/new/proposal/:type':     importRoute('views/pages/new_proposal/index', { scoped: true }),
+      '/new/snapshot-proposal/:snapshotId': importRoute('views/pages/new_snapshot_proposal', { scoped: true, deferChain: true }),
       // Treasury
       '/treasury':               importRoute('views/pages/treasury', { scoped: true }),
       '/bounties':               importRoute('views/pages/bounties', { scoped: true }),
@@ -606,6 +657,8 @@ Promise.all([
       '/:scope/discussions/:topic': redirectRoute((attrs) => `/discussions/${attrs.topic}/`),
       '/:scope/search':             redirectRoute(() => '/search'),
       '/:scope/members':            redirectRoute(() => '/members'),
+      '/:scope/snapshot-proposals/:snapshotId': redirectRoute((attrs) => `/snapshot-proposals/${attrs.snapshotId}`),
+      '/:scope/snapshot-proposal/:snapshotId/:identifier': redirectRoute((attrs) => `/snapshot-proposals/${attrs.snapshotId}/${attrs.identifier}`),
       '/:scope/chat':               redirectRoute(() => '/chat'),
       '/:scope/new/thread':         redirectRoute(() => '/new/thread'),
       '/:scope/account/:address':   redirectRoute((attrs) => `/account/${attrs.address}/`),
@@ -616,6 +669,7 @@ Promise.all([
       '/:scope/delegate':           redirectRoute(() => '/delegate'),
       '/:scope/proposal/:type/:identifier': redirectRoute((attrs) => `/proposal/${attrs.type}/${attrs.identifier}/`),
       '/:scope/new/proposal/:type':  redirectRoute((attrs) => `/new/proposal/${attrs.type}/`),
+      '/:scope/new/snapshot-proposal/:snapshotId': redirectRoute((attrs) => `/new/snapshot-proposal/${attrs.snapshotId}`),
       '/:scope/treasury':           redirectRoute(() => '/treasury'),
       '/:scope/bounties':           redirectRoute(() => '/bounties'),
       '/:scope/tips':               redirectRoute(() => '/tips'),
@@ -627,6 +681,9 @@ Promise.all([
       '/:scope/spec_settings':      redirectRoute(() => '/spec_settings'),
       '/:scope/analytics':          redirectRoute(() => '/analytics'),
     } : {
+      //
+      // Scoped routes
+      //
       '/':                         importRoute('views/pages/landing', { scoped: false, hideSidebar: true }),
       '/search':                   importRoute('views/pages/search', { scoped: false, deferChain: true }),
       '/whyCommonwealth':          importRoute('views/pages/commonwealth', { scoped: false, hideSidebar: true }),
@@ -650,6 +707,8 @@ Promise.all([
       '/:scope/discussions/:topic': importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
       '/:scope/search':            importRoute('views/pages/search', { scoped: true, deferChain: true }),
       '/:scope/members':           importRoute('views/pages/members', { scoped: true, deferChain: true }),
+      '/:scope/snapshot-proposals/:snapshotId': importRoute('views/pages/snapshot_proposals', { scoped: true, deferChain: true }),
+      '/:scope/snapshot-proposal/:snapshotId/:identifier': importRoute('views/pages/view_snapshot_proposal', { scoped: true }),  
       '/:scope/chat':              importRoute('views/pages/chat', { scoped: true, deferChain: true }),
       '/:scope/new/thread':        importRoute('views/pages/new_thread', { scoped: true, deferChain: true }),
       // Profiles
@@ -662,6 +721,8 @@ Promise.all([
       '/:scope/delegate':          importRoute('views/pages/delegate', { scoped: true, }),
       '/:scope/proposal/:type/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
       '/:scope/new/proposal/:type': importRoute('views/pages/new_proposal/index', { scoped: true }),
+      '/:scope/new/snapshot-proposal/:snapshotId': importRoute('views/pages/new_snapshot_proposal', { scoped: true, deferChain: true }),
+
       // Treasury
       '/:scope/treasury':          importRoute('views/pages/treasury', { scoped: true }),
       '/:scope/bounties':          importRoute('views/pages/bounties', { scoped: true }),

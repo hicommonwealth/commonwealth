@@ -1,6 +1,6 @@
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 
-import { Erc20Factory } from 'Erc20Factory';
+import { ERC20__factory } from 'eth/types';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import { ChainBase, IChainAdapter, NodeInfo } from 'models';
@@ -30,7 +30,7 @@ export default class Token extends IChainAdapter<EthereumCoin, EthereumAccount> 
     await this.chain.resetApi(this.meta);
     await this.chain.initMetadata();
     await this.accounts.init(this.chain);
-    const api = new TokenApi(Erc20Factory.connect, this.meta.address, this.chain.api.currentProvider as any);
+    const api = new TokenApi(ERC20__factory.connect, this.meta.address, this.chain.api.currentProvider as any);
     await api.init();
     this.chain.contractApi = api;
     await super.initApi();

@@ -9,6 +9,7 @@ import EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumChain from 'controllers/chain/ethereum/chain';
 
 import MolochMembers from './members';
+import { attachSigner } from '../contractApi';
 
 export default class MolochMember extends EthereumAccount {
   private _isMember: boolean;
@@ -75,7 +76,7 @@ export default class MolochMember extends EthereumAccount {
   }
 
   public async updateDelegateKeyTx(delegateKey: string) {
-    const contract = await this._Members.api.attachSigner(this.app.wallets, this.address);
+    const contract = await attachSigner(this.app.wallets, this.address, this._Members.api.Contract);
     if (!(await this._Members.isMember(this.address))) {
       throw new Error('caller must be member');
     }
@@ -112,7 +113,7 @@ export default class MolochMember extends EthereumAccount {
 
 
   public async ragequitTx(sharesToBurn: BN) {
-    const contract = await this._Members.api.attachSigner(this.app.wallets, this.address);
+    const contract = await attachSigner(this.app.wallets, this.address, this._Members.api.Contract);
     if (!(await this._Members.isMember(this.address))) {
       throw new Error('sender must be member');
     }

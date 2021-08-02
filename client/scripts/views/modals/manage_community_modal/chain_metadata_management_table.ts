@@ -25,6 +25,7 @@ interface IChainMetadataManagementState {
   terms: string;
   network: ChainNetwork;
   symbol: string;
+  snapshot: string;
 }
 
 const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAttrs, IChainMetadataManagementState> = {
@@ -43,6 +44,7 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
     vnode.state.iconUrl = vnode.attrs.chain.iconUrl;
     vnode.state.network = vnode.attrs.chain.network;
     vnode.state.symbol = vnode.attrs.chain.symbol;
+    vnode.state.snapshot = vnode.attrs.chain.snapshot;
   },
   view: (vnode) => {
     return m('.ChainMetadataManagementTable', [
@@ -120,6 +122,12 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
           placeholder: 'Url that new users see',
           onChangeHandler: (v) => { vnode.state.terms = v; },
         }),
+        m(InputPropertyRow, {
+          title: 'Snapshot',
+          defaultValue: vnode.state.snapshot,
+          placeholder: vnode.state.network,
+          onChangeHandler: (v) => { vnode.state.snapshot = v; },
+        }),
         m('tr', [
           m('td', 'Admins'),
           m('td', [ m(ManageRolesRow, {
@@ -152,7 +160,8 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
             stagesEnabled,
             additionalStages,
             customDomain,
-            terms
+            terms,
+            snapshot,
           } = vnode.state;
           try {
             await vnode.attrs.chain.updateChainData({
@@ -166,7 +175,8 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
               stagesEnabled,
               additionalStages,
               customDomain,
-              terms
+              terms,
+              snapshot,
             });
             $(e.target).trigger('modalexit');
           } catch (err) {
