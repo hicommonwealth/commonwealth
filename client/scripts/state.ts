@@ -61,7 +61,6 @@ export interface IApp {
   activeChainId(): string;
   activeCommunityId(): string;
   activeId(): string;
-  defaultScope(): string;
 
   toasts: ToastStore;
   modals: ModalStore;
@@ -82,9 +81,10 @@ export interface IApp {
   serverUrl(): string;
   loadingError: string;
 
+  _customDomainId: string;
   isCustomDomain(): boolean;
-  setIsCustomDomain(option: boolean): void;
-  _isCustomDomain: boolean;
+  customDomainId(): string;
+  setCustomDomain(d: string): void;
 
   _lastNavigatedBack: boolean;
   _lastNavigatedFrom: string;
@@ -127,7 +127,6 @@ const app: IApp = {
   activeChainId: () => app.chain?.id,
   activeCommunityId: () => app.community?.meta.id,
   activeId: () => app.community ? app.activeCommunityId() : app.activeChainId(),
-  defaultScope: () => app.config.defaultChain,
 
   toasts: getToastStore(),
   modals: getModalStore(),
@@ -140,26 +139,17 @@ const app: IApp = {
     invites: [],
   },
   // TODO: Collect all getters into an object
-  loginStatusLoaded: () => {
-    return app.loginState !== LoginState.NotLoaded;
-  },
-  isLoggedIn: () => {
-    return app.loginState === LoginState.LoggedIn;
-  },
-  isProduction: () => {
-    return document.location.origin.indexOf('commonwealth.im') !== -1;
-  },
-  serverUrl: () => '/api',
+  loginStatusLoaded: () => app.loginState !== LoginState.NotLoaded,
+  isLoggedIn:        () => app.loginState === LoginState.LoggedIn,
+  isProduction:      () => document.location.origin.indexOf('commonwealth.im') !== -1,
+  serverUrl:         () => '/api',
 
   loadingError: null,
 
-  isCustomDomain: () => {
-    return app._isCustomDomain;
-  },
-  setIsCustomDomain: (option: boolean) => {
-    app._isCustomDomain = option;
-  },
-  _isCustomDomain: false,
+  _customDomainId: null,
+  isCustomDomain: () => app._customDomainId !== null,
+  customDomainId: () => { return app._customDomainId; },
+  setCustomDomain: (d) => { app._customDomainId = d; },
 
   _lastNavigatedFrom: null,
   _lastNavigatedBack: false,

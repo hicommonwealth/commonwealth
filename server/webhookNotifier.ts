@@ -178,7 +178,7 @@ const send = async (models, content: WebhookContent) => {
   if (!previewImageUrl) {
     // if no embedded image url or the chain/community doesn't have a logo, show the Commonwealth logo as the preview image
     previewImageUrl = previewImageUrl || DEFAULT_COMMONWEALTH_LOGO;
-    previewAltText = previewAltText || 'CommonWealth';
+    previewAltText = previewAltText || 'Commonwealth';
   }
 
   await Promise.all(chainOrCommwebhookUrls

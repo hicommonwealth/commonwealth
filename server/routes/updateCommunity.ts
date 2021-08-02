@@ -70,10 +70,14 @@ const updateCommunity = async (models, req: Request, res: Response, next: NextFu
   community.github = github;
   community.stagesEnabled = stagesEnabled;
   community.additionalStages = additionalStages;
-  community.customDomain = customDomain;
   community.terms = terms;
   community.invitesEnabled = invites || false;
   community.privacyEnabled = privacy || false;
+  // Under our current security policy, custom domains must be set by trusted
+  // administrators only. Otherwise an attacker could configure a custom domain and
+  // use the code they run to steal login tokens for arbitrary users.
+  //
+  // community.customDomain = customDomain;
   await community.save();
 
   // @TODO -> make sure this gets changed... on the front end, only allow one image to be attached

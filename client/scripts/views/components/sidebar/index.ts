@@ -6,8 +6,7 @@ import {
   Button, PopoverMenu, MenuItem, Icon, Icons, Tooltip
 } from 'construct-ui';
 
-import { selectNode, initChain } from 'app';
-
+import { selectNode, initChain, navigateToSubpage } from 'app';
 import app from 'state';
 import { ProposalType } from 'identifiers';
 import { link } from 'helpers';
@@ -67,25 +66,29 @@ const SidebarQuickSwitcher: m.Component<{}> = {
 
     const size = 36;
     return m('.SidebarQuickSwitcher', [
-      m(Button, {
-        class: 'sidebar-home-link',
-        rounded: true,
-        label: m(Icon, { name: Icons.HOME }),
-        onclick: (e) => {
-          e.preventDefault();
-          m.route.set('/');
-        },
-      }),
-      m(CommunitySelector),
-      app.user.isSiteAdmin && m(Button, {
-        class: 'create-community',
-        rounded: true,
-        label: m(Icon, { name: Icons.PLUS }),
-        onclick: (e) => {
-          app.modals.create({ modal: CreateCommunityModal });
-        },
-      }),
-      starredCommunities.map((item) => m(SidebarQuickSwitcherItem, { item, size })),
+      m('.community-nav-bar', [
+        m(Button, {
+          class: 'sidebar-home-link',
+          rounded: true,
+          label: m(Icon, { name: Icons.HOME }),
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set('/');
+          },
+        }),
+        m(CommunitySelector),
+        app.user.isSiteAdmin && m(Button, {
+          class: 'create-community',
+          rounded: true,
+          label: m(Icon, { name: Icons.PLUS }),
+          onclick: (e) => {
+            app.modals.create({ modal: CreateCommunityModal });
+          },
+        }),
+      ]),
+      m('.scrollable-community-bar', [
+        starredCommunities.map((item) => m(SidebarQuickSwitcherItem, { item, size })),
+      ]),
     ]);
   }
 };
@@ -115,7 +118,7 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
         label: 'Discussions',
         onclick: (e) => {
           e.preventDefault();
-          m.route.set(`/${app.activeId()}`);
+          navigateToSubpage('/');
         },
       }),
       topics.map((t) => (
@@ -127,7 +130,7 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
           class: 'sub-button',
           onclick: (e) => {
             e.preventDefault();
-            m.route.set(`/${app.activeChainId()}/discussions/${t.name}`);
+            navigateToSubpage(`/discussions/${t.name}`);
           },
         })
       )),
@@ -139,7 +142,7 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
       //   label: 'Search',
       //   onclick: (e) => {
       //     e.preventDefault();
-      //     m.route.set(`/${app.activeId()}/search`);
+      //     navigateToSubpage('/search');
       //   },
       // }),
       m(Button, {
@@ -150,7 +153,7 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
         label: 'Members',
         onclick: (e) => {
           e.preventDefault();
-          m.route.set(`/${app.activeId()}/members`);
+          navigateToSubpage('/members');
         },
       }),
       // m(Button, {
@@ -160,7 +163,7 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
       //   label: 'Chat',
       //   onclick: (e) => {
       //     e.preventDefault();
-      //     m.route.set(`/${app.activeId()}/chat`);
+      //     navigateToSubpage('/chat');
       //   },
       // }),
     ]);
@@ -235,7 +238,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           label: 'Referenda',
           onclick: (e) => {
             e.preventDefault();
-            m.route.set(`/${app.activeChainId()}/referenda`);
+            navigateToSubpage(`/referenda`);
           },
           contentRight: [], // TODO
         }),
@@ -253,7 +256,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           class: app.chain?.base === ChainBase.Substrate ? 'sub-button' : '',
           onclick: (e) => {
             e.preventDefault();
-            m.route.set(`/${app.activeChainId()}/proposals`);
+            navigateToSubpage(`/proposals`);
           },
         }),
       // // motions (substrate only)
@@ -266,7 +269,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
       //     class: 'sub-button',
       //     onclick: (e) => {
       //       e.preventDefault();
-      //       m.route.set(`/${app.activeChainId()}/motions`);
+      //       navigateToSubpage(`/motions`);
       //     },
       //   }),
       // council (substrate only)
@@ -279,7 +282,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           class: 'sub-button',
           onclick: (e) => {
             e.preventDefault();
-            m.route.set(`/${app.activeChainId()}/council`);
+            navigateToSubpage(`/council`);
           },
         }),
       m('.sidebar-spacer'),
@@ -292,7 +295,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           label: 'Treasury',
           onclick: (e) => {
             e.preventDefault();
-            m.route.set(`/${app.activeChainId()}/treasury`);
+            navigateToSubpage(`/treasury`);
           },
         }),
       // bounties (substrate only)
@@ -307,7 +310,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           class: 'sub-button',
           onclick: (e) => {
             e.preventDefault();
-            m.route.set(`/${app.activeChainId()}/bounties`);
+            navigateToSubpage(`/bounties`);
           },
         }),
       // tips (substrate only)
@@ -321,7 +324,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           class: 'sub-button',
           onclick: (e) => {
             e.preventDefault();
-            m.route.set(`/${app.activeChainId()}/tips`);
+            navigateToSubpage(`/tips`);
           },
         }),
       m('.sidebar-spacer'),
@@ -335,7 +338,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           label: 'Validators',
           onclick: (e) => {
             e.preventDefault();
-            m.route.set(`/${app.activeChainId()}/validators`);
+            navigateToSubpage(`/validators`);
           },
         }),
       showMarlinOptions && m(Button, {
@@ -343,7 +346,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         rounded: true,
         onclick: (e) => {
           e.preventDefault();
-          m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.MarlinProposal });
+          navigateToSubpage(`/new/proposal/:type`, { type: ProposalType.MarlinProposal });
         },
         label: 'Submit Proposal',
         active: m.route.get() === `/${app.activeChainId()}/new/proposal/${ProposalType.MarlinProposal}`,
@@ -353,7 +356,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         rounded: true,
         onclick: (e) => {
           e.preventDefault();
-          m.route.set(`/${app.activeChainId()}/delegate`);
+          navigateToSubpage(`/delegate`);
         },
         label: 'Delegate',
         active: m.route.get() === `/${app.activeChainId()}/delegate`,
@@ -373,7 +376,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         rounded: true,
         onclick: (e) => {
           e.preventDefault();
-          m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.MolochProposal });
+          navigateToSubpage(`/new/proposal/:type`, { type: ProposalType.MolochProposal });
         },
         label: 'New proposal',
       }),
@@ -442,7 +445,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         active: m.route.get().startsWith(`/${app.activeChainId()}/projects`),
         onclick: (e) => {
           e.preventDefault();
-          m.route.set(`/${app.activeChainId()}/projects`);
+          navigateToSubpage(`/projects`);
         },
       }),
       // showCommonwealthMenuOptions && m(Button, {
@@ -452,7 +455,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
       //   active: m.route.get().startsWith(`/${app.activeChainId()}/backers`),
       //   onclick: (e) => {
       //     e.preventDefault();
-      //     m.route.set(`/${app.activeChainId()}/backers`);
+      //     navigateToSubpage(`/backers`);
       //   },
       // }),
       showCommonwealthMenuOptions && m(Button, {
@@ -462,7 +465,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         active: m.route.get().startsWith(`/${app.activeChainId()}/collectives`),
         onclick: (e) => {
           e.preventDefault();
-          m.route.set(`/${app.activeChainId()}/collectives`);
+          navigateToSubpage(`/collectives`);
         },
       }),
     ]);

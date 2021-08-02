@@ -6,6 +6,7 @@ import { Icon, Icons, Tag } from 'construct-ui';
 import { AaveTypes } from '@commonwealth/chain-events';
 
 import app from 'state';
+import { navigateToSubpage } from 'app';
 import { slugify } from 'utils';
 import { Coin } from 'adapters/currency';
 import { blocknumToDuration, formatLastUpdated, formatPercentShort, link, pluralize } from 'helpers';
@@ -132,8 +133,6 @@ const ProposalCard: m.Component<{ proposal: AnyProposal, injectedContent? }> = {
   view: (vnode) => {
     const { proposal, injectedContent } = vnode.attrs;
     const { author, createdAt, slug, identifier, title } = proposal;
-    const proposalLink = `/${app.activeChainId()}/proposal/${proposal.slug}/${proposal.identifier}`
-      + `-${slugify(proposal.title)}`;
 
     return m('.ProposalCard', [
       m('.proposal-card-top', {
@@ -141,7 +140,8 @@ const ProposalCard: m.Component<{ proposal: AnyProposal, injectedContent? }> = {
           e.stopPropagation();
           e.preventDefault();
           localStorage[`${app.activeId()}-proposals-scrollY`] = window.scrollY;
-          m.route.set(proposalLink); // avoid resetting scroll point
+          navigateToSubpage(`/proposal/${proposal.slug}/${proposal.identifier}`
+                                   + `-${slugify(proposal.title)}`); // avoid resetting scroll point
         },
       }, [
         m('.proposal-card-metadata', [
@@ -218,7 +218,7 @@ const ProposalCard: m.Component<{ proposal: AnyProposal, injectedContent? }> = {
               e.stopPropagation();
               e.preventDefault();
               localStorage[`${app.activeId()}-proposals-scrollY`] = window.scrollY;
-              m.route.set(`/${app.activeId()}/proposal/discussion/${proposal.threadId}`);
+              navigateToSubpage(`/proposal/discussion/${proposal.threadId}`);
               // avoid resetting scroll point
             },
           }, [

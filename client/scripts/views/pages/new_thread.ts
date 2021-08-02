@@ -5,6 +5,7 @@ import _ from 'lodash';
 import mixpanel from 'mixpanel-browser';
 
 import app from 'state';
+import { navigateToSubpage } from 'app';
 import { notifyInfo } from 'controllers/app/notifications';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
@@ -17,7 +18,7 @@ const NewThreadPage: m.Component<{}> = {
   view: (vnode: VnodeDOM) => {
     if (!app.isLoggedIn()) {
       notifyInfo('You need to log in first');
-      m.route.set(`/${app.activeChainId()}/login`);
+      navigateToSubpage('/login');
       return;
     }
 

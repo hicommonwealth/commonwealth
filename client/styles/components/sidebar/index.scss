@@ -135,13 +135,24 @@
     top: 0;
     bottom: 0;
     left: 0;
-    padding: 0 14px;
     width: $quick-switcher-width;
     border-right: 1px solid $border-color-off-white;
     z-index: 3;
-    // overflow-y: auto;
+    display: flex;
+    flex-direction: column;
     @include sm-max {
         display: none;
+    }
+    .community-nav-bar {
+        padding: 0 14px;
+    }
+    .scrollable-community-bar {
+        padding: 0 14px;
+        overflow-y: auto;
+    }
+    .scrollable-community-bar::-webkit-scrollbar {
+        width: 0;
+        background: transparent;
     }
     .sidebar-home-link.cui-button {
         margin: 15px 0 14px;

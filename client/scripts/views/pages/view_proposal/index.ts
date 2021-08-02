@@ -7,6 +7,7 @@ import mixpanel from 'mixpanel-browser';
 import { PopoverMenu, MenuDivider, MenuItem, Icon, Icons, Button, Input  } from 'construct-ui';
 
 import app from 'state';
+import { navigateToSubpage } from 'app';
 import Sublayout from 'views/sublayout';
 import { idToProposal, ProposalType, proposalSlugToClass } from 'identifiers';
 import { slugify } from 'utils';
@@ -110,7 +111,8 @@ const ProposalHeader: m.Component<{
     } = vnode.attrs;
 
     const attachments = (proposal instanceof OffchainThread) ? (proposal as OffchainThread).attachments : false;
-    const proposalLink = `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-`
+    const proposalLink = (app.isCustomDomain() ? '' : `/${app.activeId()}`)
+      + `/proposal/${proposal.slug}/${proposal.identifier}-`
       + `${slugify(proposal.title)}`;
     const proposalTitleIsEditable = (proposal instanceof SubstrateDemocracyProposal
       || proposal instanceof SubstrateCollectiveProposal
@@ -192,6 +194,7 @@ const ProposalHeader: m.Component<{
                 inline: true,
                 trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
               }),
+              !app.isCustomDomain() && m('.CommentSocialHeader', [ m(SocialSharingCarat)]),
               // This is the new social carat menu
               m('.CommentSocialHeader', [ m(SocialSharingCarat)]),
               vnode.state.editPermissionsIsOpen
@@ -337,7 +340,8 @@ const ProposalComment: m.Component<{
     if (!comment) return;
     const parentType = comment.parentComment ? CommentParent.Comment : CommentParent.Proposal;
 
-    const commentLink = `/${app.activeId()}/proposal/${proposal.slug}/`
+    const commentLink = (app.isCustomDomain() ? '' : `/${app.activeId()}`)
+      + `/proposal/${proposal.slug}/`
       + `${proposal.identifier}-${slugify(proposal.title)}?comment=${comment.id}`;
 
     return m('.ProposalComment', {
@@ -379,7 +383,7 @@ const ProposalComment: m.Component<{
               trigger: m(Icon, { name: Icons.CHEVRON_DOWN })
             })
           ],
-          m('.CommentSocialHeader', [ m(SocialSharingCarat, { commentID: comment.id })])
+          !app.isCustomDomain() && m('.CommentSocialHeader', [ m(SocialSharingCarat, { commentID: comment.id })])
           // For now, we are limiting threading to 1 level deep
           // Comments whose parents are other comments should not display the reply option
           // !vnode.state.editing
@@ -657,7 +661,7 @@ const ViewProposalPage: m.Component<{
     const { proposal } = vnode.state;
     if (proposalRecentlyEdited) vnode.state.recentlyEdited = false;
     if (identifier !== `${proposalId}-${slugify(proposal.title)}`) {
-      m.route.set(`/${app.activeId()}/proposal/${proposal.slug}/${proposalId}-${slugify(proposal.title)}`, {},
+      navigateToSubpage(`/proposal/${proposal.slug}/${proposalId}-${slugify(proposal.title)}`, {},
         { replace: true });
     }
 
