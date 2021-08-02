@@ -1,9 +1,11 @@
 import 'modals/edit_topic_modal.scss';
 
 import m from 'mithril';
-import app from 'state';
 import $ from 'jquery';
 import { Button, Input, Form, FormGroup, FormLabel, Checkbox } from 'construct-ui';
+
+import app from 'state';
+import { navigateToSubpage } from 'app';
 
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { CompactModalExitButton } from 'views/modal';
@@ -46,7 +48,7 @@ const EditTopicModal : m.Component<{
         featuredInNewPost: form.featured_in_new_post
       };
       await app.topics.edit(topicInfo);
-      m.route.set(`/${app.activeId()}/discussions/${encodeURI(form.name.toString().trim())}`);
+      navigateToSubpage(`/discussions/${encodeURI(form.name.toString().trim())}`);
     };
 
     const deleteTopic = async (form) => {
@@ -57,7 +59,7 @@ const EditTopicModal : m.Component<{
         chainId: app.activeChainId(),
       };
       await app.topics.remove(topicInfo);
-      m.route.set(`/${app.activeId()}`);
+      navigateToSubpage('/');
     };
 
     return m('.EditTopicModal', [
@@ -143,7 +145,7 @@ const EditTopicModal : m.Component<{
                 if (!confirmed) return;
                 deleteTopic(vnode.state.form).then(() => {
                   $(e.target).trigger('modalexit');
-                  m.route.set(`/${app.activeId()}/`);
+                  navigateToSubpage('/');
                 }).catch((err) => {
                   vnode.state.saving = false;
                   m.redraw();
