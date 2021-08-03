@@ -29,11 +29,12 @@ export interface ChainAttributes {
   collapsed_on_homepage: boolean;
   active: boolean;
   stagesEnabled: boolean;
-  additionalStages: string;
+  customStages: string;
   customDomain: string;
   type: string;
   substrate_spec: RegisteredTypes;
   terms: string;
+  snapshot: string;
 
   // associations
   ChainNodes?: ChainNodeAttributes[] | ChainNodeAttributes['id'][];
@@ -76,13 +77,14 @@ export default (
     icon_url: { type: dataTypes.STRING },
     active: { type: dataTypes.BOOLEAN },
     stagesEnabled: { type: dataTypes.BOOLEAN, allowNull: true, defaultValue: true },
-    additionalStages: { type: dataTypes.STRING, allowNull: true },
+    customStages: { type: dataTypes.STRING, allowNull: true },
     customDomain: { type: dataTypes.STRING, allowNull: true, },
     blockExplorerIds: { type: dataTypes.STRING, allowNull: true, },
     collapsed_on_homepage: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: true },
     type: { type: dataTypes.STRING, allowNull: false },
     substrate_spec: { type: dataTypes.JSONB, allowNull: true },
     terms: { type: dataTypes.STRING, allowNull: true },
+    snapshot: { type: dataTypes.STRING, allowNull: true },
   }, {
     tableName: 'Chains',
     timestamps: false,

@@ -36,12 +36,12 @@ const updateCommunity = async (models, req: Request, res: Response, next: NextFu
         offchain_community_id: community.id,
       },
     });
-    if (!userRole || userRole.permission !== 'admin') {
+    if (!req.user.isAdmin && (!userRole || userRole.permission !== 'admin')) {
       return next(new Error(Errors.NotAdmin));
     }
   }
 
-  const { iconUrl, name, description, website, discord, element, telegram, github, stagesEnabled, additionalStages, customDomain, invites, privacy, terms } = req.body;
+  const { iconUrl, name, description, website, discord, element, telegram, github, stagesEnabled, customStages, customDomain, invites, privacy, terms } = req.body;
 
   if (website && !urlHasValidHTTPPrefix(website)) {
     return next(new Error(Errors.InvalidWebsite));
@@ -69,7 +69,7 @@ const updateCommunity = async (models, req: Request, res: Response, next: NextFu
   community.telegram = telegram;
   community.github = github;
   community.stagesEnabled = stagesEnabled;
-  community.additionalStages = additionalStages;
+  community.customStages = customStages;
   community.terms = terms;
   community.invitesEnabled = invites || false;
   community.privacyEnabled = privacy || false;

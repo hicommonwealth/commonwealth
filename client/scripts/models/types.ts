@@ -36,15 +36,21 @@ export enum ChainNetwork {
   Moloch = 'moloch',
   Marlin = 'marlin',
   MarlinTestnet = 'marlin-testnet',
+  Aave = 'aave',
+  AaveLocal = 'aave-local',
   Metacartel = 'metacartel',
   ALEX = 'alex',
   Commonwealth = 'commonwealth',
   ERC20 = 'erc20',
   Clover = 'clover',
   HydraDX = 'hydradx',
+  Yearn = 'yearn',
+  Fei = 'fei',
+  Sushi = 'sushi',
   Crust = 'crust',
   CosmosHub = 'cosmos-hub',
   Gaia13k = 'gaia-13k',
+  Demo = 'demo',
 }
 
 // This function returns a default chain for a chainbase
@@ -115,6 +121,7 @@ export enum VotingUnit {
   OnePersonOneVote = '1p1v',
   CoinVote = 'coin',
   ConvictionCoinVote = 'conviction_coin',
+  PowerVote = 'power',
   None = 'none',
 }
 

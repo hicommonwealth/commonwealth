@@ -4,7 +4,7 @@ import { capitalize } from 'lodash';
 import {
   SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents,
   IEventLabel, IEventTitle, IChainEventData, chainSupportedBy,
-  MarlinTypes, MarlinEvents
+  MarlinTypes, MarlinEvents, AaveTypes, AaveEvents
 } from '@commonwealth/chain-events';
 
 import { SENDGRID_API_KEY, SERVER_URL } from '../config';
@@ -22,29 +22,24 @@ sgMail.setApiKey(SENDGRID_API_KEY);
 
 export const createImmediateNotificationEmailObject = async (notification_data, category_id, models) => {
   if (notification_data.chainEvent !== undefined) {
-    let chainEventLabel: IEventLabel;
     // chainEventLabel?.label
     // chainEventLabel?.heading
 
-    if (SubstrateTypes.EventChains.includes(notification_data.chainEventType?.chain)) {
-      chainEventLabel = SubstrateEvents.Label(
-        notification_data.chainEvent?.blockNumber,
-        notification_data.chainEventType?.chain,
-        (notification_data as IChainEventNotificationData).chainEvent.event_data as IChainEventData
-      );
-    } else if (MolochTypes.EventChains.includes(notification_data.chainEventType?.chain)) {
-      chainEventLabel = MolochEvents.Label(
-        notification_data.chainEvent?.blockNumber,
-        notification_data.chainEventType?.chain,
-        (notification_data as IChainEventNotificationData).chainEvent.event_data,
-      );
-    } else if (MarlinTypes.EventChains.includes(notification_data.chainEventType?.chain)) {
-      chainEventLabel = MarlinEvents.Label(
-        notification_data.chainEvent?.blockNumber,
-        notification_data.chainEventType?.chain,
-        (notification_data as IChainEventNotificationData).chainEvent.event_data,
-      );
+    let labelerFn;
+    if (chainSupportedBy(notification_data.chainEventType?.chain, SubstrateEvents.Types.EventChains)) {
+      labelerFn = SubstrateEvents.Label;
+    } else if (chainSupportedBy(notification_data.chainEventType?.chain, MolochEvents.Types.EventChains)) {
+      labelerFn = MolochEvents.Label;
+    } else if (chainSupportedBy(notification_data.chainEventType?.chain, MarlinEvents.Types.EventChains)) {
+      labelerFn = MarlinEvents.Label;
+    } else if (chainSupportedBy(notification_data.chainEventType?.chain, AaveEvents.Types.EventChains)) {
+      labelerFn = AaveEvents.Label;
     }
+    const chainEventLabel = labelerFn && labelerFn(
+      notification_data.chainEvent?.blockNumber,
+      notification_data.chainEventType?.chain,
+      notification_data.chainEvent.event_data
+    );
     if (!chainEventLabel) return;
 
     const subject = (process.env.NODE_ENV !== 'production' ? '[dev] ' : '')

@@ -13,8 +13,19 @@ import { SubstrateAccount } from 'controllers/chain/substrate/account';
 
 export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]>, mobile?: boolean) => {
   const activeAccount = app.user.activeAccount;
+  const showSnapshotOptions = app.user.activeAccount
+    && app.chain?.meta.chain.snapshot
+    && (app.chain?.network === ChainNetwork.Yearn
+      || app.chain?.network === ChainNetwork.Fei
+      || app.chain?.network === ChainNetwork.Sushi);
 
-  const topics = app.topics.getByCommunity(app.activeId()).reduce((acc, current) => current.featuredInNewPost ? [...acc, current] : acc, []).sort((a, b) => a.name.localeCompare(b.name));
+  const topics = app.topics.getByCommunity(
+    app.activeId()
+  ).reduce(
+    (acc, current) => current.featuredInNewPost
+      ? [...acc, current]
+      : acc, []
+  ).sort((a, b) => a.name.localeCompare(b.name));
 
   return [
     m(MenuItem, {
@@ -80,6 +91,14 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
         iconLeft: mobile ? Icons.PLUS : undefined,
       }),
     ],
+    (showSnapshotOptions || app.chain?.network === ChainNetwork.Demo) && m(MenuItem, {
+      onclick: (e) => {
+        e.preventDefault();
+        m.route.set(`/${app.activeChainId()}/new/snapshot-proposal/${app.chain.meta.chain.snapshot}`);
+      },
+      label: 'New proposal',
+      iconLeft: mobile ? Icons.PLUS : undefined,
+    }),
   ];
 };
 
