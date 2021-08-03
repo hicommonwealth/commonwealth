@@ -7,6 +7,7 @@ import moment from 'moment';
 import Quill from 'quill-2.0-dev/quill';
 import { Tag, Tooltip } from 'construct-ui';
 import ImageUploader from 'quill-image-uploader';
+import Image from 'quill/formats/image';
 import QuillImageDropAndPaste from 'quill-image-drop-and-paste';
 import { MarkdownShortcuts } from 'lib/markdownShortcuts';
 import QuillMention from 'quill-mention';
@@ -569,32 +570,29 @@ const instantiateEditor = (
   // handle drag-and-drop and paste events
   const imageHandler = async (imageDataUrl, type) => {
     if (!type) type = 'image/png';
+    const index = (quill.getSelection() || {}).index || quill.getLength();
 
     // filter out base64 format images from Quill
     const contents = quill.getContents();
     const indexesToFilter = [];
-    contents.ops.forEach((op, index) => {
+    contents.ops.forEach((op, idx) => {
       if (op.insert?.image?.startsWith('data:image/jpeg;base64')
           || op.insert?.image?.startsWith('data:image/gif;base64')
-          || op.insert?.image?.startsWith('data:image/png;base64')) indexesToFilter.push(index);
+          || op.insert?.image?.startsWith('data:image/png;base64')) indexesToFilter.push(idx);
     });
-    contents.ops = contents.ops.filter((op, index) => indexesToFilter.indexOf(index) === -1);
+    contents.ops = contents.ops.filter((op, idx) => indexesToFilter.indexOf(idx) === -1);
     quill.setContents(contents.ops); // must set contents to contents.ops for some reason
 
-    // TODO: less jenky MD check
-    const isMarkdown = quill.options.modules.markdownShortcuts.suppress();
+    const isMarkdown = $('.QuillEditor').hasClass('markdown-mode');
     const file = dataURLtoFile(imageDataUrl, type);
     quill.enable(false);
     uploadImg(file).then((response) => {
       quill.enable(true);
       if (typeof response === 'string' && detectURL(response)) {
-        const index = (quill.getSelection() || {}).index || quill.getLength();
-        if (!index) return;
-        if (isMarkdown) {
+        if (isMarkdown && !!index) {
           quill.insertText(index, `![](${response})`, 'user');
-        } else {
-          quill.insertEmbed(index, 'image', response, 'user');
         }
+        quill.setSelection(index + (isMarkdown ? 5 + response.length : 1), 0);
       }
     }).catch((err) => {
       notifyError('Failed to upload image. Was it a valid JPG, PNG, or GIF?');
@@ -630,6 +628,8 @@ const instantiateEditor = (
       imageDropAndPaste: {
         handler: imageHandler
       },
+      // TODO: Currently works, but throws Parchment error. Smooth functionality
+      // requires troubleshooting
       imageUploader: imageUploader ? {
         upload: uploadImg
       } : false,
