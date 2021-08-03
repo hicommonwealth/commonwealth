@@ -187,8 +187,6 @@ const ProposalHeader: m.Component<{
                 trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
               }),
               !app.isCustomDomain() && m('.CommentSocialHeader', [ m(SocialSharingCarat)]),
-              // This is the new social carat menu
-              m('.CommentSocialHeader', [ m(SocialSharingCarat)]),
               vnode.state.editPermissionsIsOpen
                 && proposal instanceof OffchainThread
                 && m(ProposalEditorPermissions, {
