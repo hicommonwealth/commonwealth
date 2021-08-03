@@ -23,10 +23,8 @@ export class Consumer implements IConsumer {
   }
 
   public async init(): Promise<void> {
-    // this assumes the vhost is '/' --> change soon
-    const cnct = this._vhost.connection;
-    console.info(
-      `Rascal connecting to RabbitMQ: ${cnct.protocol}://${cnct.user}:*****@${cnct.hostname}:${cnct.port}/`
+    log.info(
+      `Rascal connecting to RabbitMQ: ${this._vhost.connection}`
     );
     this.broker = await Rascal.BrokerAsPromised.create(
       Rascal.withDefaultConfig(this._rabbitMQConfig)
@@ -39,7 +37,7 @@ export class Consumer implements IConsumer {
       );
     });
     this.broker.on('blocked', (reason, { vhost, connectionUrl }) => {
-      log.info(
+      log.warn(
         `Vhost: ${vhost} was blocked using connection: ${connectionUrl}. Reason: ${reason}`
       );
     });
@@ -63,7 +61,6 @@ export class Consumer implements IConsumer {
       subscription
         .on('message', (message, content, ackOrNack) => {
           eventProcessor(content);
-          // console.log(message, content);
           ackOrNack();
         })
         .on('error', (err, messageId) => {

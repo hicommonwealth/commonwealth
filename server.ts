@@ -35,7 +35,6 @@ import setupPrerenderServer from './server/scripts/setupPrerenderService';
 import { sendBatchedNotificationEmails } from './server/scripts/emails';
 import setupAPI from './server/router';
 import setupPassport from './server/passport';
-import setupChainEventListeners from './server/scripts/setupChainEventListeners';
 import { fetchStats } from './server/routes/getEdgewareLockdropStats';
 import migrateChainEntities from './server/scripts/migrateChainEntities';
 import migrateIdentities from './server/scripts/migrateIdentities';
@@ -73,37 +72,9 @@ async function main() {
   const identityFetchCache = new IdentityFetchCache(models);
   const tokenListCache = new TokenListCache();
   const tokenBalanceCache = new TokenBalanceCache(tokenListCache);
-  const listenChainEvents = async () => {
-    try {
-      // configure chain list from events
-      let chains: string[] | 'all' | 'none' = 'all';
-      if (CHAIN_EVENTS === 'none' || CHAIN_EVENTS === 'all') {
-        chains = CHAIN_EVENTS;
-      } else if (CHAIN_EVENTS) {
-        chains = CHAIN_EVENTS.split(',');
-      }
-
-      await setupChainEventListeners(models, null, chains, SKIP_EVENT_CATCHUP);
-
-      return 0;
-    } catch (e) {
-      console.error(`Chain event listener setup failed: ${e.message}`);
-      return 1;
-    }
-  };
 
   let rc = null;
-  if (RUN_AS_LISTENER) {
-    // hack to keep process running indefinitely
-    process.stdin.resume();
-    listenChainEvents().then((retcode) => {
-      if (retcode) {
-        process.exit(retcode);
-      }
-      // if recode === 0, continue indefinitely
-    });
-    return;
-  } else if (SHOULD_SEND_EMAILS) {
+  if (SHOULD_SEND_EMAILS) {
     rc = await sendBatchedNotificationEmails(models);
   } else if (SHOULD_RESET_DB) {
     rc = await resetServer(models);
@@ -283,15 +254,6 @@ async function main() {
   setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
   setupErrorHandlers(app, rollbar);
 
-  if (CHAIN_EVENTS) {
-    const exitCode = await listenChainEvents();
-    console.log(`setup chain events listener with code: ${exitCode}`);
-    if (exitCode) {
-      await models.sequelize.close();
-      await closeMiddleware();
-      process.exit(exitCode);
-    }
-  }
   setupServer(app, wss, sessionParser);
 }
 

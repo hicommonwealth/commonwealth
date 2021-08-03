@@ -44,7 +44,7 @@ const listenerOptions = {
     url: 'wss://rpc.polkadot.io',
     spec: {},
     skipCatchup: false,
-    enricherConfig: { balanceTransferThresholdPermill: 1_000 }
+    enricherConfig: { balanceTransferThresholdPermill: 10_000 }
   },
   edgeware: {
     archival: false,
@@ -52,7 +52,7 @@ const listenerOptions = {
     url: 'ws://mainnet2.edgewa.re:9944',
     spec: {"types": {"Address": "MultiAddress", "ChainId": "u8", "Reveals": "Vec<(AccountId, Vec<VoteOutcome>)>", "Balance2": "u128", "VoteData": {"stage": "VoteStage", "initiator": "AccountId", "vote_type": "VoteType", "tally_type": "TallyType", "is_commit_reveal": "bool"}, "VoteType": {"_enum": ["Binary", "MultiOption", "RankedChoice"]}, "TallyType": {"_enum": ["OnePerson", "OneCoin"]}, "VoteStage": {"_enum": ["PreVoting", "Commit", "Voting", "Completed"]}, "ResourceId": "[u8; 32]", "VoteRecord": {"id": "u64", "data": "VoteData", "reveals": "Reveals", "outcomes": "Vec<VoteOutcome>", "commitments": "Commitments"}, "AccountInfo": "AccountInfoWithRefCount", "Commitments": "Vec<(AccountId, VoteOutcome)>", "VoteOutcome": "[u8; 32]", "VotingTally": "Option<Vec<(VoteOutcome, u128)>>", "DepositNonce": "u64", "LookupSource": "MultiAddress", "ProposalTitle": "Bytes", "ProposalVotes": {"staus": "ProposalStatus", "expiry": "BlockNumber", "votes_for": "Vec<AccountId>", "votes_against": "Vec<AccountId>"}, "ProposalRecord": {"index": "u32", "stage": "VoteStage", "title": "Text", "author": "AccountId", "vote_id": "u64", "contents": "Text", "transition_time": "u32"}, "ProposalStatus": {"_enum": ["Initiated", "Approved", "Rejected"]}, "ProposalContents": "Bytes"}},
     skipCatchup: false,
-    enricherConfig: { balanceTransferThresholdPermill: 1_000 }
+    enricherConfig: { balanceTransferThresholdPermill: 10_000 }
   },
   kusama: {
     archival: false,
@@ -60,7 +60,7 @@ const listenerOptions = {
     url: 'wss://kusama-rpc.polkadot.io',
     spec: {},
     skipCatchup: false,
-    enricherConfig: { balanceTransferThresholdPermill: 1_000 }
+    enricherConfig: { balanceTransferThresholdPermill: 10_000 }
   },
   kulupu: {
     archival: false,
@@ -68,7 +68,7 @@ const listenerOptions = {
     url: 'wss://rpc.kulupu.corepaper.org/ws',
     spec: {"typesBundle": {"spec": {"kulupu": {"types": [{"types": {"Era": {"finalBlockHash": "H256", "finalStateRoot": "H256", "genesisBlockHash": "H256"}, "CurvePoint": {"start": "BlockNumber", "reward": "Balance", "taxation": "Perbill"}, "Difficulty": "U256", "DifficultyAndTimestamp": {"timestamp": "Moment", "difficulty": "Difficulty"}}, "minmax": [0, null]}, {"types": {"Address": "MultiAddress", "LookupSource": "MultiAddress"}, "minmax": [13, null]}, {"types": {"CampaignIdentifier": "[u8; 4]"}, "minmax": [17, null]}]}}}},
     skipCatchup: false,
-    enricherConfig: { balanceTransferThresholdPermill: 1_000 }
+    enricherConfig: { balanceTransferThresholdPermill: 10_000 }
   },
   hydradx: {
     archival: false,
@@ -76,7 +76,7 @@ const listenerOptions = {
     url: 'wss://rpc-01.snakenet.hydradx.io',
     spec: null,
     skipCatchup: false,
-    enricherConfig: { balanceTransferThresholdPermill: 1_000 },
+    enricherConfig: { balanceTransferThresholdPermill: 10_000 },
   },
   moloch: {
     url: 'wss://mainnet.infura.io/ws',
@@ -242,7 +242,8 @@ setTimeout(async () => {
   await clearQueues();
   await prepareDB(client);
 
-  // TODO: figure out a good method of testing if events are actually produced
+  // TODO: figure out a good method of testing if events are actually produced => set reconnectRange to some known block with
+  // TODO: a certain amount of events then check if those events were added to the databases in ChainEvents
   describe.only('Tests for single chain per node', () => {
     pool.on('error', (err, client) => {
       console.error('Unexpected error on idle client', err);
@@ -262,7 +263,7 @@ setTimeout(async () => {
 
           child.on('error', (error) => {
             console.log(error)
-            assert.fail()
+            assert.fail(String(error))
           })
 
           console.log(`\n${chain.id}:`)
@@ -279,7 +280,7 @@ setTimeout(async () => {
           child.stderr.on('data', (data) => {
             console.error(`child stderr:\n${data}`);
             if (!data.includes('Unable to determine offline time range')) {
-              assert.fail()
+              assert.fail(String(data))
             }
           });
         }).timeout(30000)
@@ -338,8 +339,8 @@ setTimeout(async () => {
         it.only('Should start the chain-events consumer',(done) => {
           let consumer;
           consumer = spawn('ts-node',
-            [`${__dirname}../../../server.ts`],
-            {env: { ...process.env, TESTING:'true', HANDLE_IDENTITY:'publish', RUN_AS_LISTENER:'true', CHAIN_EVENTS: 'polkadot'}}
+            [`${__dirname}../../../server/scripts/setupChainEventListeners`],
+            {env: { ...process.env, HANDLE_IDENTITY:'publish'}}
           )
 
           childExit([consumer]);

@@ -7,7 +7,7 @@ import format from 'pg-format';
 export default class extends IEventHandler {
   private _pool;
 
-  constructor(private readonly _chain: string, private readonly pool) {
+  constructor(private readonly pool) {
     super();
     this._pool = pool;
   }
@@ -39,7 +39,7 @@ export default class extends IEventHandler {
       let query = format(
         `SELECT * FROM "Addresses" WHERE "address"=%L AND "chain"=%L;`,
         who,
-        this._chain
+        event.chain
       );
       const profiles = (await this._pool.query(query)).rows;
 

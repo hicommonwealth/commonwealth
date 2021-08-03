@@ -15,7 +15,7 @@ export interface StorageFilterConfig {
 export default class extends IEventHandler {
   constructor(
     private readonly _models,
-    private readonly _chain: string,
+    private readonly _chain?: string,
     private readonly _filterConfig: StorageFilterConfig = {},
   ) {
     super();
@@ -36,6 +36,8 @@ export default class extends IEventHandler {
   }
 
   private async _shouldSkip(event: CWEvent): Promise<boolean> {
+    const chain = event.chain || this._chain
+
     if (this._filterConfig.excludedEvents?.includes(event.data.kind)) return true;
     const addressesExist = async (addresses: string[]) => {
       const addressModels = await this._models.Address.findAll({
@@ -44,7 +46,7 @@ export default class extends IEventHandler {
             // TODO: we need to ensure the chain prefixes are correct here
             [Op.in]: addresses,
           },
-          chain: this._chain,
+          chain,
         },
       });
       return !!addressModels?.length;
@@ -66,6 +68,8 @@ export default class extends IEventHandler {
    * NOTE: this may modify the event.
    */
   public async handle(event: CWEvent) {
+    const chain = event.chain || this._chain
+
     event = this.truncateEvent(event);
     log.debug(`Received event: ${JSON.stringify(event, null, 2)}`);
     const shouldSkip = await this._shouldSkip(event);
@@ -77,8 +81,8 @@ export default class extends IEventHandler {
     // locate event type and add event (and event type if needed) to database
     const [ dbEventType, created ] = await this._models.ChainEventType.findOrCreate({
       where: {
-        id: `${this._chain}-${event.data.kind.toString()}`,
-        chain: this._chain,
+        id: `${chain}-${event.data.kind.toString()}`,
+        chain: chain,
         event_name: event.data.kind.toString(),
       }
     });

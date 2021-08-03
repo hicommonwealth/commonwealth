@@ -11,7 +11,7 @@ const log = factory.getLogger(formatFilename(__filename));
 export default class extends IEventHandler {
   constructor(
     private readonly _models,
-    private readonly _chain: string,
+    private readonly _chain?: string,
   ) {
     super();
   }
@@ -21,13 +21,15 @@ export default class extends IEventHandler {
    * events depending whether we've seen them before.
    */
   public async handle(event: CWEvent<IChainEventData>) {
+    const chain = event.chain || this._chain
+
     // case by entity type to determine what value to look for
     const createOrUpdateModel = async (fieldName, fieldValue) => {
       // locate event type and add event (and event type if needed) to database
       const [ dbEventType, created ] = await this._models.ChainEventType.findOrCreate({
         where: {
-          id: `${this._chain}-${event.data.kind.toString()}`,
-          chain: this._chain,
+          id: `${chain}-${event.data.kind.toString()}`,
+          chain: chain,
           event_name: event.data.kind.toString(),
         }
       });

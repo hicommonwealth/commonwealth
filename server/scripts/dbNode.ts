@@ -18,8 +18,7 @@ import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
 const log = factory.getLogger(formatFilename(__filename));
 
 // TODO: RollBar error reporting
-// TODO: change console logging to log
-// TODO: if listener start fails revert hasChainEventsListener to false in db
+// TODO: if listener start fails (after 3 times?) revert hasChainEventsListener to false in db
 
 // env var
 const WORKER_NUMBER: number = Number(process.env.WORKER_NUMBER) || 0;
@@ -34,8 +33,7 @@ async function handleFatalError(error: Error, chain?: string, type?: string): Pr
 
 // stores all the listeners a dbNode has active
 const listeners: { [key: string]: any} = {};
-// TODO: skipCatchup behavior fix?
-// TODO: error handling for pg queries
+
 // TODO: API-WS from infinitely attempting reconnection i.e. mainnet1
 async function mainProcess(producer: RabbitMqHandler) {
   const pool = new Pool({
@@ -43,8 +41,7 @@ async function mainProcess(producer: RabbitMqHandler) {
   });
 
   pool.on('error', (err, client) => {
-    console.error('Unexpected error on idle client', err);
-    // TODO: handle this
+    log.error('Unexpected error on idle client', err);
   });
 
   let query = `SELECT "Chains"."id", "substrate_spec", "url", "address", "base" FROM "Chains" JOIN "ChainNodes" ON "Chains"."id"="ChainNodes"."chain" WHERE "Chains"."has_chain_events_listener"='true';`;
@@ -63,6 +60,23 @@ async function mainProcess(producer: RabbitMqHandler) {
     }
   })
 
+  let discoverReconnectRange = async (chain: string) => {
+    let latestBlock
+    try {
+      const eventTypes = (await pool.query(format(`SELECT "id" FROM "ChainEventTypes" WHERE "chain"=%L`, chain))).rows.map(obj => obj.id)
+      latestBlock = (await pool.query(format(`SELECT MAX("block_number") FROM "ChainEvents" WHERE "chain_event_type_id" IN (%L)`, eventTypes))).rows
+    } catch (error) {
+      log.warn('An error occurred while discovering offline time range', error)
+    }
+    if (latestBlock && latestBlock.length > 0 && latestBlock[0] && latestBlock[0].max) {
+      const lastEventBlockNumber = latestBlock[0].max;
+      log.info(`Discovered chain event in db at block ${lastEventBlockNumber}.`);
+      return { startBlock: lastEventBlockNumber + 1 };
+    } else {
+      return { startBlock: null };
+    }
+  }
+
   // initialize listeners first (before dealing with identity)
   for (const chain of myChainData) {
     // start listeners that aren't already active - this means for any duplicate chain nodes
@@ -71,14 +85,15 @@ async function mainProcess(producer: RabbitMqHandler) {
       log.info(`Starting listener for ${chain.id}...`);
       try {
         listeners[chain.id] = await createListener(chain.id, {
-            Erc20TokenAddresses: [chain.address],
-            archival: false,
-            url: chain.url,
-            spec: chain.substrate_spec,
-            skipCatchup: false,
-            verbose: false,
-            enricherConfig: { balanceTransferThresholdPermill: 1_000 },// 0.1% of total issuance
-          },
+          Erc20TokenAddresses: [chain.address],
+          archival: false,
+          url: chain.url,
+          spec: chain.substrate_spec,
+          skipCatchup: false,
+          verbose: false,
+          enricherConfig: { balanceTransferThresholdPermill: 10_000 },
+          discoverReconnectRange: discoverReconnectRange
+        },
           true,
           chain.base
         );
@@ -130,7 +145,7 @@ async function mainProcess(producer: RabbitMqHandler) {
     if (process.env.TESTING) {
       const listenerOptions = {}
       for (const chain in listeners) listenerOptions[chain] = listeners[chain].options
-      console.log(`Listener Validation:${JSON.stringify(listenerOptions)}`)
+      log.info(`Listener Validation:${JSON.stringify(listenerOptions)}`)
     }
     return;
   }
@@ -184,7 +199,7 @@ async function mainProcess(producer: RabbitMqHandler) {
 
     if (HANDLE_IDENTITY === 'handle') {
       // initialize identity handler
-      const identityHandler = new Identity(chain.id, pool);
+      const identityHandler = new Identity(pool);
 
       await Promise.all(
         identityEvents.map((e) => identityHandler.handle(e, null))
