@@ -823,7 +823,6 @@ const NewProposalForm = {
             ]),
           ],
           hasAaveFields && [
-            m('h2', 'New Aave Proposal:'),
             m(FormGroup, [
               m(FormLabel, 'Proposer (you)'),
               m(Input, {
@@ -956,7 +955,6 @@ const NewProposalForm = {
             ]),
           ],
           hasAaveFields && [
-            m('h2', 'New Aave Proposal:'),
             m(FormGroup, [
               m(FormLabel, 'Proposer (you)'),
               m(Input, {
