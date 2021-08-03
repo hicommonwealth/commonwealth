@@ -26,7 +26,7 @@ export function offchainThreadStageToLabel(stage: OffchainThreadStage) {
 }
 
 export function parseCustomStages(str) {
-  // Parse additionalStages into a `string[]` and then cast to OffchainThreadStage[]
+  // Parse customStages into a `string[]` and then cast to OffchainThreadStage[]
   // If parsing fails, return an empty array.
   let arr;
   try {

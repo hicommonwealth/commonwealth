@@ -20,7 +20,7 @@ interface IChainMetadataManagementState {
   loadingStarted: boolean;
   iconUrl: string;
   stagesEnabled: boolean;
-  additionalStages: string;
+  customStages: string;
   customDomain: string;
   terms: string;
   network: ChainNetwork;
@@ -37,7 +37,7 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
     vnode.state.telegram = vnode.attrs.chain.telegram;
     vnode.state.github = vnode.attrs.chain.github;
     vnode.state.stagesEnabled = vnode.attrs.chain.stagesEnabled;
-    vnode.state.additionalStages = vnode.attrs.chain.additionalStages;
+    vnode.state.customStages = vnode.attrs.chain.customStages;
     vnode.state.customDomain = vnode.attrs.chain.customDomain;
     vnode.state.terms = vnode.attrs.chain.terms;
     vnode.state.iconUrl = vnode.attrs.chain.iconUrl;
@@ -103,9 +103,9 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
         }),
         m(InputPropertyRow, {
           title: 'Custom Stages',
-          defaultValue: vnode.state.additionalStages,
+          defaultValue: vnode.state.customStages,
           placeholder: '["Temperature Check", "Consensus Check"]',
-          onChangeHandler: (v) => { vnode.state.additionalStages = v; },
+          onChangeHandler: (v) => { vnode.state.customStages = v; },
         }),
         m(InputPropertyRow, {
           title: 'Domain',
@@ -150,7 +150,7 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
             telegram,
             github,
             stagesEnabled,
-            additionalStages,
+            customStages,
             customDomain,
             terms
           } = vnode.state;
@@ -164,7 +164,7 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
               telegram,
               github,
               stagesEnabled,
-              additionalStages,
+              customStages,
               customDomain,
               terms
             });
