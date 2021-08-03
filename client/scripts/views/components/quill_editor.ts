@@ -56,7 +56,6 @@ const instantiateEditor = (
   const Keyboard = Quill.import('modules/keyboard');
   const Clipboard = Quill.import('modules/clipboard') as any;
   let quill;
-
   // Set up markdown mode helper
   const isMarkdownMode = () => $editor.parent('.markdown-mode').length > 0;
 
@@ -582,13 +581,20 @@ const instantiateEditor = (
     contents.ops = contents.ops.filter((op, index) => indexesToFilter.indexOf(index) === -1);
     quill.setContents(contents.ops); // must set contents to contents.ops for some reason
 
+    // TODO: less jenky MD check
+    const isMarkdown = quill.options.modules.markdownShortcuts.suppress();
     const file = dataURLtoFile(imageDataUrl, type);
     quill.enable(false);
     uploadImg(file).then((response) => {
       quill.enable(true);
       if (typeof response === 'string' && detectURL(response)) {
         const index = (quill.getSelection() || {}).index || quill.getLength();
-        if (index) quill.insertEmbed(index, 'image', response, 'user');
+        if (!index) return;
+        if (isMarkdown) {
+          quill.insertText(index, `![](${response})`, 'user');
+        } else {
+          quill.insertEmbed(index, 'image', response, 'user');
+        }
       }
     }).catch((err) => {
       notifyError('Failed to upload image. Was it a valid JPG, PNG, or GIF?');
@@ -642,7 +648,7 @@ const instantiateEditor = (
       },
       clipboard: {
         matchers: [
-	  [
+  [
             Node.ELEMENT_NODE,
             (node, delta) => {
 	      return delta.compose(

@@ -71,7 +71,6 @@ class SubstrateTreasury extends ProposalModule<
     this._spendPeriod = +(ChainInfo.api.consts.treasury.spendPeriod as BlockNumber);
     this._burnPct = +(ChainInfo.api.consts.treasury.burn as Permill) / 1_000_000;
 
-
     const TREASURY_ACCOUNT = u8aToHex(stringToU8a('modlpy/trsry'.padEnd(32, '\0')));
     const pot = await ChainInfo.api.derive.balances.account(TREASURY_ACCOUNT);
     this._pot = this._Chain.coins(pot.freeBalance);

@@ -21,7 +21,7 @@ class CommunitiesController {
     if (chain && community) throw new Error('Invalid');
     if (!app.isLoggedIn()) throw new Error('Must be logged in');
 
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       const params = chain ? {
         chain,
         star: status,

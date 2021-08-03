@@ -41,7 +41,7 @@ const updateChain = async (models, req: Request, res: Response, next: NextFuncti
     }
   }
 
-  const { active, icon_url, symbol, type, name, description, website, discord, element, telegram, github, stagesEnabled, customStages, customDomain, terms } = req.body;
+  const { active, icon_url, symbol, type, name, description, website, discord, element, telegram, github, stagesEnabled, customStages, customDomain, terms, snapshot, } = req.body;
 
   if (website && !urlHasValidHTTPPrefix(website)) {
     return next(new Error(Errors.InvalidWebsite));
@@ -73,6 +73,7 @@ const updateChain = async (models, req: Request, res: Response, next: NextFuncti
   chain.stagesEnabled = stagesEnabled;
   chain.customStages = customStages;
   chain.terms = terms;
+  chain.snapshot = snapshot;
   // Under our current security policy, custom domains must be set by trusted
   // administrators only. Otherwise an attacker could configure a custom domain and
   // use the code they run to steal login tokens for arbitrary users.
