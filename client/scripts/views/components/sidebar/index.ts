@@ -368,7 +368,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           e.preventDefault();
           m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.AaveProposal });
         },
-        label: 'Submit On-Chain P...',
+        label: 'Submit Proposal',
         active: m.route.get() === `/${app.activeChainId()}/new/proposal/${ProposalType.AaveProposal}`,
       }),
       showMolochMemberOptions && m(Button, {
