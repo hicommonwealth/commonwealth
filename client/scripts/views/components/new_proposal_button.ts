@@ -14,7 +14,13 @@ import { SubstrateAccount } from 'controllers/chain/substrate/account';
 export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]>, mobile?: boolean) => {
   const activeAccount = app.user.activeAccount;
 
-  const topics = app.topics.getByCommunity(app.activeId()).reduce((acc, current) => current.featuredInNewPost ? [...acc, current] : acc, []).sort((a, b) => a.name.localeCompare(b.name));
+  const topics = app.topics.getByCommunity(
+    app.activeId()
+  ).reduce(
+    (acc, current) => current.featuredInNewPost
+      ? [...acc, current]
+      : acc, []
+  ).sort((a, b) => a.name.localeCompare(b.name));
 
   return [
     m(MenuItem, {

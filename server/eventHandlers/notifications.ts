@@ -30,24 +30,29 @@ export default class extends IEventHandler {
       log.trace('Skipping event!');
       return dbEvent;
     }
-    const dbEventType = await dbEvent.getChainEventType();
-    if (!dbEventType) {
-      log.error('Failed to fetch event type! Ignoring.');
-      return;
-    }
+    try {
+      const dbEventType = await dbEvent.getChainEventType();
+      if (!dbEventType) {
+        log.error('Failed to fetch event type! Ignoring.');
+        return;
+      }
 
-    // locate subscriptions generate notifications as needed
-    const dbNotifications = await this._models.Subscription.emitNotifications(
-      this._models,
-      NotificationCategories.ChainEvent,
-      dbEventType.id,
-      { chainEvent: dbEvent, chainEventType: dbEventType },
-      { chainEvent: dbEvent, chainEventType: dbEventType }, // TODO: add webhook data once specced out
-      this._wss,
-      event.excludeAddresses,
-      event.includeAddresses,
-    );
-    log.trace(`Emitted ${dbNotifications.length} notifications.`);
-    return dbEvent;
+      // locate subscriptions generate notifications as needed
+      const dbNotifications = await this._models.Subscription.emitNotifications(
+        this._models,
+        NotificationCategories.ChainEvent,
+        dbEventType.id,
+        { chainEvent: dbEvent, chainEventType: dbEventType },
+        { chainEvent: dbEvent, chainEventType: dbEventType }, // TODO: add webhook data once specced out
+        this._wss,
+        event.excludeAddresses,
+        event.includeAddresses,
+      );
+      log.info(`Emitted ${dbNotifications.length} notifications.`);
+      return dbEvent;
+    } catch (e) {
+      log.error(`Failed to generate notification: ${e.message}!`);
+      return dbEvent;
+    }
   }
 }

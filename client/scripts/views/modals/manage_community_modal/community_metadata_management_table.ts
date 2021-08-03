@@ -18,7 +18,7 @@ interface ICommunityMetadataManagementState {
   telegram: string;
   github: string;
   stagesEnabled: boolean;
-  additionalStages: string;
+  customStages: string;
   customDomain: string;
   terms: string;
 }
@@ -43,7 +43,7 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
     vnode.state.telegram = vnode.attrs.community.telegram;
     vnode.state.github = vnode.attrs.community.github;
     vnode.state.stagesEnabled = vnode.attrs.community.stagesEnabled;
-    vnode.state.additionalStages = vnode.attrs.community.additionalStages;
+    vnode.state.customStages = vnode.attrs.community.customStages;
     vnode.state.customDomain = vnode.attrs.community.customDomain;
     vnode.state.terms = vnode.attrs.community.terms;
   },
@@ -105,9 +105,9 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
       }),
       m(InputPropertyRow, {
         title: 'Custom Stages',
-        defaultValue: vnode.state.additionalStages,
+        defaultValue: vnode.state.customStages,
         placeholder: '["Temperature Check", "Consensus Check"]',
-        onChangeHandler: (v) => { vnode.state.additionalStages = v; },
+        onChangeHandler: (v) => { vnode.state.customStages = v; },
       }),
       m(InputPropertyRow, {
         title: 'Domain',
@@ -165,7 +165,7 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
           telegram,
           github,
           stagesEnabled,
-          additionalStages,
+          customStages,
           customDomain,
           terms,
           invitesEnabled,
@@ -182,7 +182,7 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
             telegram,
             github,
             stagesEnabled,
-            additionalStages,
+            customStages,
             customDomain,
             terms,
             privacyEnabled,

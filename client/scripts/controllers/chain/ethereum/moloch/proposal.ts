@@ -21,6 +21,7 @@ import MolochMember from './member';
 import MolochMembers from './members';
 import MolochAPI from './api';
 import MolochGovernance from './governance';
+import { attachSigner } from '../contractApi';
 
 export enum MolochVote {
   NULL = 'Null',
@@ -314,7 +315,7 @@ export default class MolochProposal extends Proposal<
   // web wallet TX only
   public async submitVoteWebTx(vote: MolochProposalVote) {
     const address = vote.account.address;
-    const contract = await this._Members.api.attachSigner(this._Members.app.wallets, address);
+    const contract = await attachSigner(this._Members.app.wallets, address, this._Members.api.Contract);
 
     if (!(await this._Members.isDelegate(address))) {
       throw new Error('sender must be valid delegate');
@@ -360,7 +361,7 @@ export default class MolochProposal extends Proposal<
   public async processTx() {
     // TODO: is this the correct user to process?
     const address = this._Members.app.user.activeAccount.address;
-    const contract = await this._Members.api.attachSigner(this._Members.app.wallets, address);
+    const contract = await attachSigner(this._Members.app.wallets, address, this._Members.api.Contract);
 
     if (this.state !== MolochProposalState.ReadyToProcess) {
       throw new Error('proposal not ready to process');
@@ -379,7 +380,7 @@ export default class MolochProposal extends Proposal<
 
   public async abortTx() {
     const address = this.applicantAddress;
-    const contract = await this._Members.api.attachSigner(this._Members.app.wallets, address);
+    const contract = await attachSigner(this._Members.app.wallets, address, this._Members.api.Contract);
 
     if (this.isAborted) {
       throw new Error('proposal already aborted');

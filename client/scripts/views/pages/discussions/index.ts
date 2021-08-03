@@ -103,7 +103,7 @@ const DiscussionStagesBar: m.Component<{ topic: string; stage: string }, {}> = {
     const { topic, stage } = vnode.attrs;
 
     if (!app.chain?.meta?.chain && !app.community?.meta) return;
-    const { stagesEnabled, additionalStages } = app.chain?.meta?.chain || app.community?.meta;
+    const { stagesEnabled, customStages } = app.chain?.meta?.chain || app.community?.meta;
 
     const featuredTopicIds = app.community?.meta?.featuredTopics || app.chain?.meta?.chain?.featuredTopics;
     const topics = app.topics.getByCommunity(app.activeId()).map(({ id, name, description, telegram, featuredInSidebar, featuredInNewPost }) => {
@@ -121,13 +121,15 @@ const DiscussionStagesBar: m.Component<{ topic: string; stage: string }, {}> = {
     const otherTopics = topics.filter((t) => t.featured_order === -1).sort((a, b) => a.name.localeCompare(b.name));
 
     const selectedTopic = topics.find((t) => topic && topic === t.name);
-    const selectedStage = [
+    const stages = !customStages ? [
       OffchainThreadStage.Discussion,
       OffchainThreadStage.ProposalInReview,
       OffchainThreadStage.Voting,
       OffchainThreadStage.Passed,
       OffchainThreadStage.Failed
-    ].find(
+    ] : parseCustomStages(customStages);
+
+    const selectedStage = stages.find(
       (s) => s === (stage as any)
     );
 
@@ -213,14 +215,7 @@ const DiscussionStagesBar: m.Component<{ topic: string; stage: string }, {}> = {
               label: 'All Stages',
             }),
             m(MenuDivider),
-            [
-              // OffchainThreadStage.Discussion,
-              OffchainThreadStage.ProposalInReview,
-              ...parseCustomStages(additionalStages),
-              OffchainThreadStage.Voting,
-              OffchainThreadStage.Passed,
-              OffchainThreadStage.Failed,
-            ].map((targetStage, index) => m(MenuItem, {
+            stages.map((targetStage, index) => m(MenuItem, {
               active: stage === targetStage,
               iconLeft: stage === targetStage ? Icons.CHECK : null,
               onclick: (e) => {

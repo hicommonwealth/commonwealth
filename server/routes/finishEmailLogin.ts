@@ -2,11 +2,14 @@ import { Request, Response, NextFunction } from 'express';
 import { SERVER_URL } from '../config';
 import { NotificationCategories } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
+import { getStatsDInstance } from '../util/metrics';
 
 const log = factory.getLogger(formatFilename(__filename));
 
 export const redirectWithLoginSuccess = (res, email, path?, confirmation?, newAcct = false) => {
   // Returns new if we are creating a new account
+  getStatsDInstance().set('cw.users.unique', res.user.id);
+  getStatsDInstance().increment('cw.users.logged_in');
   const url = `/?loggedin=true&email=${email}&new=${newAcct}${path ? `&path=${encodeURIComponent(path)}` : ''}${confirmation ? '&confirmation=success' : ''}`;
   return res.redirect(url);
 };
@@ -21,7 +24,6 @@ const finishEmailLogin = async (models, req: Request, res: Response, next: NextF
   if (req.user && req.user.email && req.user.emailVerified) {
     return redirectWithLoginSuccess(res, req.user.email);
   }
-
   const token = req.query.token;
   const email = req.query.email;
   const confirmation = req.query.confirmation;
@@ -99,7 +101,6 @@ const finishEmailLogin = async (models, req: Request, res: Response, next: NextF
       object_id: `user-${newUser.id}`,
       is_active: true,
     });
-
     req.login(newUser, (err) => {
       if (err) return redirectWithLoginError(res, 'Could not log in with user at ' + email);
       return redirectWithLoginSuccess(res, email, tokenObj.redirect_path, confirmation, true);
