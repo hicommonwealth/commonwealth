@@ -5,7 +5,7 @@ import {
 
 import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
 
-import { HANDLE_IDENTITY } from '../config';
+import { HANDLE_IDENTITY, DATABASE_URI } from '../config';
 
 import * as WebSocket from 'ws';
 import EventNotificationHandler from '../eventHandlers/notifications';
@@ -19,8 +19,6 @@ import { Consumer } from '../util/rabbitmq/consumer';
 import { Pool } from 'pg';
 import models from '../database'
 
-import { DATABASE_URI } from '../config'
-
 const log = factory.getLogger(formatFilename(__filename));
 
 
@@ -29,7 +27,10 @@ const setupChainEventListeners = async (
   wss: WebSocket.Server,
 ): Promise<{}> => {
   const pool = new Pool({
-    connectionString: DATABASE_URI
+    connectionString: DATABASE_URI,
+    ssl: {
+      rejectUnauthorized: false
+    }
   });
 
   pool.on('error', (err, client) => {
