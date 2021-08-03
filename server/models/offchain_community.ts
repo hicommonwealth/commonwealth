@@ -23,7 +23,7 @@ export interface OffchainCommunityAttributes {
   privacyEnabled?: boolean;
   invitesEnabled?: boolean;
   stagesEnabled: boolean;
-  additionalStages: string;
+  customStages: string;
   customDomain?: string;
   collapsed_on_homepage: boolean;
   created_at?: Date;
@@ -75,7 +75,7 @@ export default (
       privacyEnabled: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
       invitesEnabled: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
       stagesEnabled: { type: dataTypes.BOOLEAN, allowNull: true, defaultValue: true },
-      additionalStages: { type: dataTypes.STRING, allowNull: true },
+      customStages: { type: dataTypes.STRING, allowNull: true },
       customDomain: { type: dataTypes.STRING, allowNull: true, },
       collapsed_on_homepage: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: true },
     }, {

@@ -35,7 +35,6 @@ import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import LoginModal from 'views/modals/login_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';
 import { AaveTypes, MarlinTypes, MolochTypes } from '@commonwealth/chain-events';
-import { formatSpace } from './helpers/snapshot_utils/snapshot_utils';
 
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/landing');
@@ -85,7 +84,7 @@ export async function initAppState(updateSelectedNode = true, customDomain = nul
           featuredTopics: community.featured_topics,
           topics: community.topics,
           stagesEnabled: community.stagesEnabled,
-          additionalStages: community.additionalStages,
+          customStages: community.customStages,
           customDomain: community.customDomain,
           terms: community.terms,
           adminsAndMods: [],
@@ -114,15 +113,6 @@ export async function initAppState(updateSelectedNode = true, customDomain = nul
         app.user.setSelectedNode(NodeInfo.fromJSON(data.user.selectedNode));
       }
 
-      app.snapshot.client.getSpaces().then((response) => {
-        console.log(response);
-        app.snapshot.spaces = _.object(
-          Object.entries(response).map((space) => [
-            space[0],
-            formatSpace(space[0], space[1])
-          ])
-        );
-      });
       if (customDomain) {
         app.setCustomDomain(customDomain);
       }
@@ -310,34 +300,6 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/ethereum/commonwealth/adapter'
     )).default;
     newChain = new Commonwealth(n, app);
-  } else if (n.chain.network === ChainNetwork.Yearn) {
-    const Yearn = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "commonwealth-main" */
-      './controllers/chain/ethereum/snapshot/adapter'
-    )).default;
-    newChain = new Yearn(n, app);
-  } else if (n.chain.network === ChainNetwork.Fei) {
-    const Fei = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "commonwealth-main" */
-      './controllers/chain/ethereum/snapshot/adapter'
-    )).default;
-    newChain = new Fei(n, app);
-  } else if (n.chain.network === ChainNetwork.Sushi) {
-    const Snapshot = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "commonwealth-main" */
-      './controllers/chain/ethereum/snapshot/adapter'
-    )).default;
-    newChain = new Snapshot(n, app);
-  } else if (n.chain.network === ChainNetwork.Demo) {
-    const Snapshot = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "commonwealth-main" */
-      './controllers/chain/ethereum/snapshot/adapter'
-    )).default;
-    newChain = new Snapshot(n, app);
   } else {
     throw new Error('Invalid chain');
   }
@@ -616,8 +578,6 @@ Promise.all([
       '/discussions':            redirectRoute((attrs) => `/${attrs.scope}/`),
       '/discussions/:topic':     importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
       '/members':                importRoute('views/pages/members', { scoped: true, deferChain: true }),
-      '/snapshot-proposals/:snapshotId': importRoute('views/pages/snapshot_proposals', { scoped: true, deferChain: true }),
-      '/snapshot-proposal/:snapshotId/:identifier': importRoute('views/pages/view_snapshot_proposal', { scoped: true }),  
       '/chat':                   importRoute('views/pages/chat', { scoped: true, deferChain: true }),
       '/new/thread':             importRoute('views/pages/new_thread', { scoped: true, deferChain: true }),
       // Profiles
@@ -630,7 +590,6 @@ Promise.all([
       '/delegate':               importRoute('views/pages/delegate', { scoped: true, }),
       '/proposal/:type/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
       '/new/proposal/:type':     importRoute('views/pages/new_proposal/index', { scoped: true }),
-      '/new/snapshot-proposal/:snapshotId': importRoute('views/pages/new_snapshot_proposal', { scoped: true, deferChain: true }),
       // Treasury
       '/treasury':               importRoute('views/pages/treasury', { scoped: true }),
       '/bounties':               importRoute('views/pages/bounties', { scoped: true }),
@@ -657,8 +616,6 @@ Promise.all([
       '/:scope/discussions/:topic': redirectRoute((attrs) => `/discussions/${attrs.topic}/`),
       '/:scope/search':             redirectRoute(() => '/search'),
       '/:scope/members':            redirectRoute(() => '/members'),
-      '/:scope/snapshot-proposals/:snapshotId': redirectRoute((attrs) => `/snapshot-proposals/${attrs.snapshotId}`),
-      '/:scope/snapshot-proposal/:snapshotId/:identifier': redirectRoute((attrs) => `/snapshot-proposals/${attrs.snapshotId}/${attrs.identifier}`),
       '/:scope/chat':               redirectRoute(() => '/chat'),
       '/:scope/new/thread':         redirectRoute(() => '/new/thread'),
       '/:scope/account/:address':   redirectRoute((attrs) => `/account/${attrs.address}/`),
@@ -669,7 +626,6 @@ Promise.all([
       '/:scope/delegate':           redirectRoute(() => '/delegate'),
       '/:scope/proposal/:type/:identifier': redirectRoute((attrs) => `/proposal/${attrs.type}/${attrs.identifier}/`),
       '/:scope/new/proposal/:type':  redirectRoute((attrs) => `/new/proposal/${attrs.type}/`),
-      '/:scope/new/snapshot-proposal/:snapshotId': redirectRoute((attrs) => `/new/snapshot-proposal/${attrs.snapshotId}`),
       '/:scope/treasury':           redirectRoute(() => '/treasury'),
       '/:scope/bounties':           redirectRoute(() => '/bounties'),
       '/:scope/tips':               redirectRoute(() => '/tips'),
@@ -707,8 +663,6 @@ Promise.all([
       '/:scope/discussions/:topic': importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
       '/:scope/search':            importRoute('views/pages/search', { scoped: true, deferChain: true }),
       '/:scope/members':           importRoute('views/pages/members', { scoped: true, deferChain: true }),
-      '/:scope/snapshot-proposals/:snapshotId': importRoute('views/pages/snapshot_proposals', { scoped: true, deferChain: true }),
-      '/:scope/snapshot-proposal/:snapshotId/:identifier': importRoute('views/pages/view_snapshot_proposal', { scoped: true }),  
       '/:scope/chat':              importRoute('views/pages/chat', { scoped: true, deferChain: true }),
       '/:scope/new/thread':        importRoute('views/pages/new_thread', { scoped: true, deferChain: true }),
       // Profiles
@@ -721,7 +675,6 @@ Promise.all([
       '/:scope/delegate':          importRoute('views/pages/delegate', { scoped: true, }),
       '/:scope/proposal/:type/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
       '/:scope/new/proposal/:type': importRoute('views/pages/new_proposal/index', { scoped: true }),
-      '/:scope/new/snapshot-proposal/:snapshotId': importRoute('views/pages/new_snapshot_proposal', { scoped: true, deferChain: true }),
 
       // Treasury
       '/:scope/treasury':          importRoute('views/pages/treasury', { scoped: true }),

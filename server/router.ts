@@ -124,8 +124,7 @@ import { getTokensFromLists } from './routes/getTokensFromLists';
 import getTokenForum from './routes/getTokenForum';
 import getSubstrateSpec from './routes/getSubstrateSpec';
 import editSubstrateSpec from './routes/editSubstrateSpec';
-
-import { sendMessage } from './routes/snapshotAPI';
+import { getStatsDInstance } from './util/metrics';
 
 function setupRouter(
   app,
@@ -135,6 +134,17 @@ function setupRouter(
   tokenBalanceCache: TokenBalanceCache
 ) {
   const router = express.Router();
+
+  router.use((req, res, next) => {
+    getStatsDInstance().increment(`cw.path.${req.path.slice(1)}.called`);
+    const start = Date.now();
+    res.on('finish', () => {
+      const latency = Date.now() - start;
+      getStatsDInstance().histogram(`cw.path.${req.path.slice(1)}.latency`, latency);
+    });
+    next();
+  });
+
   router.get('/domain', domain.bind(this, models));
   router.get('/status', status.bind(this, models));
 
@@ -483,8 +493,6 @@ function setupRouter(
 
   // TODO: Change to GET /entities
   router.get('/bulkEntities', bulkEntities.bind(this, models));
-
-  router.post('/snapshotAPI/sendMessage', sendMessage.bind(this));
 
   app.use('/api', router);
 }
