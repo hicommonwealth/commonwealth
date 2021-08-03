@@ -1,6 +1,10 @@
 @import 'client/styles/shared';
 
 @mixin sidebar {
+    .cui-button.cui-active {
+        background: linear-gradient(268.91deg, #91BFFF -61.91%, #91FFA0 2.69%, #FBFF91 60.22%, #FF9191 131.89%);
+        border: 1px transparent;
+    }
     .cui-button.sub-button {
         margin-left: 18px;
         width: calc(100% - 18px);
@@ -131,13 +135,24 @@
     top: 0;
     bottom: 0;
     left: 0;
-    padding: 0 14px;
     width: $quick-switcher-width;
     border-right: 1px solid $border-color-off-white;
     z-index: 3;
-    // overflow-y: auto;
+    display: flex;
+    flex-direction: column;
     @include sm-max {
         display: none;
+    }
+    .community-nav-bar {
+        padding: 0 14px;
+    }
+    .scrollable-community-bar {
+        padding: 0 14px;
+        overflow-y: auto;
+    }
+    .scrollable-community-bar::-webkit-scrollbar {
+        width: 0;
+        background: transparent;
     }
     .sidebar-home-link.cui-button {
         margin: 15px 0 14px;
@@ -280,6 +295,16 @@
     }
     .cui-button {
         margin-bottom: 4px;
+    }
+    .cui-button.cui-rounded:active,
+    .cui-button.cui-rounded.cui-active,
+    .cui-button.cui-rounded:hover {
+        background: linear-gradient(to left, #91FFA0, #FBFF91, #FF9191);
+        border-color: white;
+
+        // @TODO: Remove this and figure out a better solution
+        background: #6966FF;
+        color: white;
     }
 }
 

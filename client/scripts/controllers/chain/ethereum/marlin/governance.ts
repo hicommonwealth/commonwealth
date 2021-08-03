@@ -3,11 +3,12 @@ import { ProposalModule, ITXModalData } from 'models';
 import { IMarlinProposalResponse } from 'adapters/chain/marlin/types';
 import { IApp } from 'state';
 
-import { BigNumberish } from 'ethers/utils';
+import { BigNumberish } from 'ethers';
 import MarlinAPI from './api';
 import MarlinProposal from './proposal';
-import MarlinHolders from './holders';
 import MarlinChain from './chain';
+import { attachSigner } from '../contractApi';
+import EthereumAccounts from '../accounts';
 
 export interface MarlinProposalArgs {
   targets: string[],
@@ -32,8 +33,8 @@ export default class MarlinGovernance extends ProposalModule<
   private _votingPeriod: BN;
 
   private _api: MarlinAPI;
-  private _Holders: MarlinHolders;
-
+  private _Chain: MarlinChain;
+  private _Accounts: EthereumAccounts;
 
   // GETTERS
   // Contract Constants
@@ -46,16 +47,18 @@ export default class MarlinGovernance extends ProposalModule<
   public get api() { return this._api; }
   public get usingServerChainEntities() { return this._usingServerChainEntities; }
 
-
   // INIT / DEINIT
   constructor(app: IApp, private _usingServerChainEntities = false) {
-    super(app, (e) => new MarlinProposal(this._Holders, this, e));
+    super(app, (e) => new MarlinProposal(this._Accounts, this._Chain, this, e));
   }
 
   // METHODS
 
   public async castVote(proposalId: number, support: boolean) {
-    const tx = await this._api.governorAlphaContract.castVote(proposalId, support);
+    const address = this.app.user.activeAccount.address;
+    const contract = await attachSigner(this.app.wallets, address, this._api.Contract);
+
+    const tx = await contract.castVote(proposalId, support);
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
       throw new Error(`Failed to cast vote on proposal #${proposalId}`);
@@ -66,13 +69,12 @@ export default class MarlinGovernance extends ProposalModule<
 
   public async propose(args: MarlinProposalArgs) {
     const address = this.app.user.activeAccount.address;
-    const contract = await this.api.attachSigner(this.app.wallets, address, this._api.governorAlphaContract);
+    const contract = await attachSigner(this.app.wallets, address, this._api.Contract);
 
     const { targets, values, signatures, calldatas, description } = args;
     if (!targets || !values || !signatures || !calldatas || !description) return;
-    if (!(await this._Holders.isDelegate(address))) throw new Error('sender must be valid delegate');
-    const priorDelegates = await this._Holders.get(address)
-      .priorDelegates(this._api.Provider.blockNumber);
+    if (!(await this._Chain.isDelegate(address))) throw new Error('sender must be valid delegate');
+    const priorDelegates = await this._Chain.priorDelegates(address, this._api.Provider.blockNumber);
     if (this.proposalThreshold < priorDelegates) {
       throw new Error('sender must have requisite delegates');
     }
@@ -91,7 +93,7 @@ export default class MarlinGovernance extends ProposalModule<
   }
 
   public async state(proposalId: BigNumberish): Promise<number> {
-    const state = await this._api.governorAlphaContract.state(proposalId);
+    const state = await this._api.Contract.state(proposalId);
     if (state === null) {
       throw new Error(`Failed to get state for proposal #${proposalId}`);
     }
@@ -99,7 +101,10 @@ export default class MarlinGovernance extends ProposalModule<
   }
 
   public async execute(proposalId: number) {
-    const tx = await this._api.governorAlphaContract.execute(proposalId);
+    const address = this.app.user.activeAccount.address;
+    const contract = await attachSigner(this.app.wallets, address, this._api.Contract);
+
+    const tx = await contract.execute(proposalId);
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
       throw new Error(`Failed to execute proposal #${proposalId}`);
@@ -107,7 +112,10 @@ export default class MarlinGovernance extends ProposalModule<
   }
 
   public async queue(proposalId: number) {
-    const tx = await this._api.governorAlphaContract.queue(proposalId);
+    const address = this.app.user.activeAccount.address;
+    const contract = await attachSigner(this.app.wallets, address, this._api.Contract);
+
+    const tx = await contract.queue(proposalId);
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
       throw new Error(`Failed to queue proposal #${proposalId}`);
@@ -115,23 +123,26 @@ export default class MarlinGovernance extends ProposalModule<
   }
 
   public async cancel(proposalId: number) {
-    const tx = await this._api.governorAlphaContract.cancel(proposalId);
+    const address = this.app.user.activeAccount.address;
+    const contract = await attachSigner(this.app.wallets, address, this._api.Contract);
+
+    const tx = await contract.cancel(proposalId);
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
       throw new Error(`Failed to cancel proposal #${proposalId}`);
     }
   }
 
-  public async init(chain: MarlinChain, Holders: MarlinHolders) {
-    const api = chain.marlinApi;
-    this._Holders = Holders;
-    this._api = api;
+  public async init(chain: MarlinChain, Accounts: EthereumAccounts) {
+    this._api = chain.marlinApi;
+    this._Chain = chain;
+    this._Accounts = Accounts;
 
-    this._quorumVotes = new BN((await this._api.governorAlphaContract.quorumVotes()).toString());
-    this._proposalThreshold = new BN((await this._api.governorAlphaContract.proposalThreshold()).toString());
-    this._proposalMaxOperations = new BN((await this._api.governorAlphaContract.proposalMaxOperations()).toString());
-    this._votingDelay = new BN((await this._api.governorAlphaContract.votingDelay()).toString());
-    this._votingPeriod = new BN((await this._api.governorAlphaContract.votingPeriod()).toString());
+    this._quorumVotes = new BN((await this._api.Contract.quorumVotes()).toString());
+    this._proposalThreshold = new BN((await this._api.Contract.proposalThreshold()).toString());
+    this._proposalMaxOperations = new BN((await this._api.Contract.proposalMaxOperations()).toString());
+    this._votingDelay = new BN((await this._api.Contract.votingDelay()).toString());
+    this._votingPeriod = new BN((await this._api.Contract.votingPeriod()).toString());
     this._initialized = true;
   }
 

@@ -1,3 +1,4 @@
+import { Request, Response, NextFunction } from 'express';
 import { SERVER_URL } from '../config';
 import { NotificationCategories } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
@@ -7,17 +8,16 @@ const log = factory.getLogger(formatFilename(__filename));
 
 export const redirectWithLoginSuccess = (res, email, path?, confirmation?, newAcct = false) => {
   // Returns new if we are creating a new account
-  const url = `${SERVER_URL}/?loggedin=true&email=${email}&new=${newAcct}${path ? `&path=${encodeURIComponent(path)}` : ''}${confirmation ? '&confirmation=success' : ''}`;
   getStatsDInstance().set('cw.users.unique', res.user.id);
   getStatsDInstance().increment('cw.users.logged_in');
+  const url = `/?loggedin=true&email=${email}&new=${newAcct}${path ? `&path=${encodeURIComponent(path)}` : ''}${confirmation ? '&confirmation=success' : ''}`;
   return res.redirect(url);
 };
 
 export const redirectWithLoginError = (res, message) => {
-  const url = SERVER_URL + `/?loggedin=false&loginerror=${encodeURIComponent(message)}`;
+  const url = `/?loggedin=false&loginerror=${encodeURIComponent(message)}`;
   return res.redirect(url);
 };
-import { Request, Response, NextFunction } from 'express';
 
 const finishEmailLogin = async (models, req: Request, res: Response, next: NextFunction) => {
   const previousUser = req.user;

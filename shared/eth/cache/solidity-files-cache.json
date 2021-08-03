@@ -1,0 +1,2545 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "/home/jnaviask/cw/commonwealth/node_modules/@openzeppelin/contracts/math/SafeMath.sol": {
+      "lastModificationDate": 1621600339552,
+      "contentHash": "d208da96b6f6c1d204ee8248087cf2d7",
+      "sourceName": "@openzeppelin/contracts/math/SafeMath.sol",
+      "solcConfig": {
+        "version": "0.5.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "petersburg",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "SafeMath"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol": {
+      "lastModificationDate": 1621600344644,
+      "contentHash": "183ff1f5e5f04bcfa85cee597bcb0236",
+      "sourceName": "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+      "solcConfig": {
+        "version": "0.5.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "petersburg",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "IERC20"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/node_modules/@openzeppelin/contracts/ownership/Ownable.sol": {
+      "lastModificationDate": 1621600339552,
+      "contentHash": "cd44b8402a71c35a4f725f828ced4cae",
+      "sourceName": "@openzeppelin/contracts/ownership/Ownable.sol",
+      "solcConfig": {
+        "version": "0.5.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "petersburg",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../GSN/Context.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "Ownable"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/node_modules/@openzeppelin/contracts/GSN/Context.sol": {
+      "lastModificationDate": 1621600339548,
+      "contentHash": "32a66f6f4d0584b403f26f8e5e4d17b5",
+      "sourceName": "@openzeppelin/contracts/GSN/Context.sol",
+      "solcConfig": {
+        "version": "0.5.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "petersburg",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "Context"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/node_modules/@openzeppelin/contracts/token/ERC777/ERC777.sol": {
+      "lastModificationDate": 1621600344640,
+      "contentHash": "b99f0d3d8891876f51b43dbb274c5f42",
+      "sourceName": "@openzeppelin/contracts/token/ERC777/ERC777.sol",
+      "solcConfig": {
+        "version": "0.5.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "petersburg",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../GSN/Context.sol",
+        "./IERC777.sol",
+        "./IERC777Recipient.sol",
+        "./IERC777Sender.sol",
+        "../../token/ERC20/IERC20.sol",
+        "../../math/SafeMath.sol",
+        "../../utils/Address.sol",
+        "../../introspection/IERC1820Registry.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "ERC777"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/node_modules/@openzeppelin/contracts/token/ERC777/IERC777.sol": {
+      "lastModificationDate": 1621600344640,
+      "contentHash": "917c9d8b5420a5305b17079044b2edfa",
+      "sourceName": "@openzeppelin/contracts/token/ERC777/IERC777.sol",
+      "solcConfig": {
+        "version": "0.5.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "petersburg",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "IERC777"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/node_modules/@openzeppelin/contracts/token/ERC777/IERC777Recipient.sol": {
+      "lastModificationDate": 1621600344640,
+      "contentHash": "c8356252aa47e25f2207afe31af8f3e4",
+      "sourceName": "@openzeppelin/contracts/token/ERC777/IERC777Recipient.sol",
+      "solcConfig": {
+        "version": "0.5.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "petersburg",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "IERC777Recipient"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/node_modules/@openzeppelin/contracts/token/ERC777/IERC777Sender.sol": {
+      "lastModificationDate": 1621600344640,
+      "contentHash": "e93388eb410b16a1252b3a5b157ff1eb",
+      "sourceName": "@openzeppelin/contracts/token/ERC777/IERC777Sender.sol",
+      "solcConfig": {
+        "version": "0.5.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "petersburg",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "IERC777Sender"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/node_modules/@openzeppelin/contracts/utils/Address.sol": {
+      "lastModificationDate": 1621600339560,
+      "contentHash": "a41701ff3cdbb98920cd49750549d127",
+      "sourceName": "@openzeppelin/contracts/utils/Address.sol",
+      "solcConfig": {
+        "version": "0.5.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "petersburg",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.5.5"
+      ],
+      "artifacts": [
+        "Address"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/node_modules/@openzeppelin/contracts/introspection/IERC1820Registry.sol": {
+      "lastModificationDate": 1621600339548,
+      "contentHash": "b5d83d6f12509787adf2ffd784ca10c3",
+      "sourceName": "@openzeppelin/contracts/introspection/IERC1820Registry.sol",
+      "solcConfig": {
+        "version": "0.5.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "petersburg",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "IERC1820Registry"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol": {
+      "lastModificationDate": 1621600344640,
+      "contentHash": "81c352cf56ebc1ee63da6fd3da32310b",
+      "sourceName": "@openzeppelin/contracts/token/ERC721/ERC721.sol",
+      "solcConfig": {
+        "version": "0.5.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "petersburg",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../GSN/Context.sol",
+        "./IERC721.sol",
+        "./IERC721Receiver.sol",
+        "../../math/SafeMath.sol",
+        "../../utils/Address.sol",
+        "../../drafts/Counters.sol",
+        "../../introspection/ERC165.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "ERC721"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/node_modules/@openzeppelin/contracts/token/ERC721/IERC721.sol": {
+      "lastModificationDate": 1621600344640,
+      "contentHash": "521544d4b3261c8e186ffde31310f84f",
+      "sourceName": "@openzeppelin/contracts/token/ERC721/IERC721.sol",
+      "solcConfig": {
+        "version": "0.5.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "petersburg",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../introspection/IERC165.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "IERC721"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/node_modules/@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol": {
+      "lastModificationDate": 1621600344640,
+      "contentHash": "68f1063a3b1ba2ea6f98738f0b959bb2",
+      "sourceName": "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol",
+      "solcConfig": {
+        "version": "0.5.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "petersburg",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "IERC721Receiver"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/node_modules/@openzeppelin/contracts/drafts/Counters.sol": {
+      "lastModificationDate": 1621600339548,
+      "contentHash": "2e4e5055539646b55f7d05ea1436d66a",
+      "sourceName": "@openzeppelin/contracts/drafts/Counters.sol",
+      "solcConfig": {
+        "version": "0.5.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "petersburg",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../math/SafeMath.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "Counters"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/node_modules/@openzeppelin/contracts/introspection/ERC165.sol": {
+      "lastModificationDate": 1621600339548,
+      "contentHash": "0b47821c476c3f23aa689c2d6d8134de",
+      "sourceName": "@openzeppelin/contracts/introspection/ERC165.sol",
+      "solcConfig": {
+        "version": "0.5.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "petersburg",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IERC165.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "ERC165"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/node_modules/@openzeppelin/contracts/introspection/IERC165.sol": {
+      "lastModificationDate": 1621600339548,
+      "contentHash": "90b6ff61fbb96331143b12e0803eedcd",
+      "sourceName": "@openzeppelin/contracts/introspection/IERC165.sol",
+      "solcConfig": {
+        "version": "0.5.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "petersburg",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "IERC165"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol": {
+      "lastModificationDate": 1621600344644,
+      "contentHash": "22fd452b5721fdbf411ef554c2c80b76",
+      "sourceName": "@openzeppelin/contracts/token/ERC20/ERC20.sol",
+      "solcConfig": {
+        "version": "0.5.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "petersburg",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../GSN/Context.sol",
+        "./IERC20.sol",
+        "../../math/SafeMath.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "ERC20"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/node_modules/@aave/aave-token/contracts/token/AaveToken.sol": {
+      "lastModificationDate": 1622827438319,
+      "contentHash": "0b998abecc295aa101628224a100d603",
+      "sourceName": "@aave/aave-token/contracts/token/AaveToken.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../open-zeppelin/ERC20.sol",
+        "../interfaces/ITransferHook.sol",
+        "../utils/VersionedInitializable.sol",
+        "../open-zeppelin/SafeMath.sol"
+      ],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "AaveToken"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/node_modules/@aave/aave-token/contracts/open-zeppelin/ERC20.sol": {
+      "lastModificationDate": 1622827438319,
+      "contentHash": "e119abac181194cd14259346e0b67ce5",
+      "sourceName": "@aave/aave-token/contracts/open-zeppelin/ERC20.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./Context.sol",
+        "../interfaces/IERC20.sol",
+        "./SafeMath.sol",
+        "./Address.sol"
+      ],
+      "versionPragmas": [
+        "^0.7.5"
+      ],
+      "artifacts": [
+        "ERC20"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/node_modules/@aave/aave-token/contracts/interfaces/ITransferHook.sol": {
+      "lastModificationDate": 1622827438319,
+      "contentHash": "ccc5a79ae4a195dee026c32a905b4fbf",
+      "sourceName": "@aave/aave-token/contracts/interfaces/ITransferHook.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "ITransferHook"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/node_modules/@aave/aave-token/contracts/utils/VersionedInitializable.sol": {
+      "lastModificationDate": 1622827438319,
+      "contentHash": "196f68401e5666d2c2fbd4fb2b8bf3fe",
+      "sourceName": "@aave/aave-token/contracts/utils/VersionedInitializable.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "VersionedInitializable"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/node_modules/@aave/aave-token/contracts/open-zeppelin/SafeMath.sol": {
+      "lastModificationDate": 1622827438319,
+      "contentHash": "518fea8eabd2249b119db6360ee6e737",
+      "sourceName": "@aave/aave-token/contracts/open-zeppelin/SafeMath.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.7.5"
+      ],
+      "artifacts": [
+        "SafeMath"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/node_modules/@aave/aave-token/contracts/open-zeppelin/Context.sol": {
+      "lastModificationDate": 1622827438319,
+      "contentHash": "ed5ceec77fe91523955253390385875d",
+      "sourceName": "@aave/aave-token/contracts/open-zeppelin/Context.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.7.5"
+      ],
+      "artifacts": [
+        "Context"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/node_modules/@aave/aave-token/contracts/interfaces/IERC20.sol": {
+      "lastModificationDate": 1622827438319,
+      "contentHash": "ccc213596370d9d9c74bc3eac0a9d9ac",
+      "sourceName": "@aave/aave-token/contracts/interfaces/IERC20.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "IERC20"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/node_modules/@aave/aave-token/contracts/open-zeppelin/Address.sol": {
+      "lastModificationDate": 1622827438319,
+      "contentHash": "f46221be9e8fee851fc058e4b409d2c1",
+      "sourceName": "@aave/aave-token/contracts/open-zeppelin/Address.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.7.5"
+      ],
+      "artifacts": [
+        "Address"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/node_modules/@aave/aave-token/contracts/token/base/GovernancePowerDelegationERC20.sol": {
+      "lastModificationDate": 1622827439263,
+      "contentHash": "2a93f5bd960f8bf7faf31ae855bed3ff",
+      "sourceName": "@aave/aave-token/contracts/token/base/GovernancePowerDelegationERC20.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../open-zeppelin/SafeMath.sol",
+        "../../open-zeppelin/ERC20.sol",
+        "../../interfaces/IGovernancePowerDelegationToken.sol"
+      ],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "GovernancePowerDelegationERC20"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/node_modules/@aave/aave-token/contracts/interfaces/IGovernancePowerDelegationToken.sol": {
+      "lastModificationDate": 1622827438319,
+      "contentHash": "c2477d7691a1cd7d1f5f3dd181ce9c08",
+      "sourceName": "@aave/aave-token/contracts/interfaces/IGovernancePowerDelegationToken.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "IGovernancePowerDelegationToken"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/node_modules/@aave/aave-token/contracts/token/AaveTokenV2.sol": {
+      "lastModificationDate": 1622827438319,
+      "contentHash": "2bf0d036570be64824ea39e923e10e22",
+      "sourceName": "@aave/aave-token/contracts/token/AaveTokenV2.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../open-zeppelin/ERC20.sol",
+        "../interfaces/ITransferHook.sol",
+        "../utils/VersionedInitializable.sol",
+        "./base/GovernancePowerDelegationERC20.sol",
+        "../open-zeppelin/SafeMath.sol"
+      ],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "AaveTokenV2"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/Marlin/Timelock.sol": {
+      "lastModificationDate": 1622827417915,
+      "contentHash": "5db33f7810fb6b85895f99aab24cfca1",
+      "sourceName": "contracts/Marlin/Timelock.sol",
+      "solcConfig": {
+        "version": "0.5.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "petersburg",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/math/SafeMath.sol"
+      ],
+      "versionPragmas": [
+        ">=0.4.21 <0.7.0"
+      ],
+      "artifacts": [
+        "Timelock"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/MolochV2/Moloch.sol": {
+      "lastModificationDate": 1622827417915,
+      "contentHash": "bf7dff80727b341b5551d364cb68978b",
+      "sourceName": "contracts/MolochV2/Moloch.sol",
+      "solcConfig": {
+        "version": "0.5.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "petersburg",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/math/SafeMath.sol",
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "./GuildBank.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.3"
+      ],
+      "artifacts": [
+        "Moloch2"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/MolochV2/GuildBank.sol": {
+      "lastModificationDate": 1622827417915,
+      "contentHash": "0a3f256ef14f6cf3bfe576505082c429",
+      "sourceName": "contracts/MolochV2/GuildBank.sol",
+      "solcConfig": {
+        "version": "0.5.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "petersburg",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/ownership/Ownable.sol",
+        "@openzeppelin/contracts/math/SafeMath.sol",
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.3"
+      ],
+      "artifacts": [
+        "GuildBank2"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/MolochV2/Helper.sol": {
+      "lastModificationDate": 1622827417915,
+      "contentHash": "68d77f8e1c298f5164e6ddd4096bb1ad",
+      "sourceName": "contracts/MolochV2/Helper.sol",
+      "solcConfig": {
+        "version": "0.5.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "petersburg",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC20/ERC20.sol",
+        "@openzeppelin/contracts/token/ERC721/ERC721.sol",
+        "@openzeppelin/contracts/token/ERC777/ERC777.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "Helper"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/MolochV1/GuildBank.sol": {
+      "lastModificationDate": 1622827417915,
+      "contentHash": "6cbebf4f1f9091edfacc8baf235e93e4",
+      "sourceName": "contracts/MolochV1/GuildBank.sol",
+      "solcConfig": {
+        "version": "0.5.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "petersburg",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "@openzeppelin/contracts/ownership/Ownable.sol",
+        "@openzeppelin/contracts/math/SafeMath.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.3"
+      ],
+      "artifacts": [
+        "GuildBank1"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/MolochV1/Moloch.sol": {
+      "lastModificationDate": 1622827417915,
+      "contentHash": "78046efd40c5c17048b1f9adb4b2cff1",
+      "sourceName": "contracts/MolochV1/Moloch.sol",
+      "solcConfig": {
+        "version": "0.5.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "petersburg",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/math/SafeMath.sol",
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "./GuildBank.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.3"
+      ],
+      "artifacts": [
+        "Moloch1"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/MolochV1/oz/ERC20.sol": {
+      "lastModificationDate": 1622827417915,
+      "contentHash": "2d789384bcd85604ac088b6a8e577c79",
+      "sourceName": "contracts/MolochV1/oz/ERC20.sol",
+      "solcConfig": {
+        "version": "0.5.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "petersburg",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IERC20.sol",
+        "./SafeMath.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.2"
+      ],
+      "artifacts": [
+        "ERC20"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/MolochV1/oz/IERC20.sol": {
+      "lastModificationDate": 1622827417915,
+      "contentHash": "c4b9722866e5f2ce911dffe13d60ddaa",
+      "sourceName": "contracts/MolochV1/oz/IERC20.sol",
+      "solcConfig": {
+        "version": "0.5.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "petersburg",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.5.2"
+      ],
+      "artifacts": [
+        "IERC20"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/MolochV1/oz/SafeMath.sol": {
+      "lastModificationDate": 1622827417915,
+      "contentHash": "871d67eab68a325ed7adea6eefc0a6a8",
+      "sourceName": "contracts/MolochV1/oz/SafeMath.sol",
+      "solcConfig": {
+        "version": "0.5.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "petersburg",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.5.2"
+      ],
+      "artifacts": [
+        "SafeMath"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/MolochV1/Token.sol": {
+      "lastModificationDate": 1622827417915,
+      "contentHash": "6db10d95f5d747bc3d480fe20bfa321b",
+      "sourceName": "contracts/MolochV1/Token.sol",
+      "solcConfig": {
+        "version": "0.5.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "petersburg",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./oz/ERC20.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.2"
+      ],
+      "artifacts": [
+        "Token"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/AAVE/mocks/SelfdestructTransfer.sol": {
+      "lastModificationDate": 1622827417915,
+      "contentHash": "ed16f0edec9773b8bc25fc80e145c3c0",
+      "sourceName": "contracts/AAVE/mocks/SelfdestructTransfer.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.6.12"
+      ],
+      "artifacts": [
+        "SelfdestructTransfer"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/Marlin/GovernorAlpha.sol": {
+      "lastModificationDate": 1622827417915,
+      "contentHash": "75ebd248a23b28d6dd6c2cda9c82d597",
+      "sourceName": "contracts/Marlin/GovernorAlpha.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.4.21 <0.7.0"
+      ],
+      "artifacts": [
+        "GovernorAlpha",
+        "MPondInterface",
+        "TimelockInterface"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/Marlin/MPond.sol": {
+      "lastModificationDate": 1622827417915,
+      "contentHash": "db91352c0ae4a34c862bfd8fc859f51e",
+      "sourceName": "contracts/Marlin/MPond.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.4.21 <0.7.0"
+      ],
+      "artifacts": [
+        "MPond"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/Migrations.sol": {
+      "lastModificationDate": 1622827417915,
+      "contentHash": "12fd2380819c237d4200d96c2b893ae7",
+      "sourceName": "contracts/Migrations.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.4.21 <0.7.0"
+      ],
+      "artifacts": [
+        "Migrations"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/AAVE/dependencies/open-zeppelin/Address.sol": {
+      "lastModificationDate": 1622827417907,
+      "contentHash": "a277a38926173e10ff85d81045b78ce9",
+      "sourceName": "contracts/AAVE/dependencies/open-zeppelin/Address.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "Address"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/AAVE/dependencies/open-zeppelin/BaseUpgradeabilityProxy.sol": {
+      "lastModificationDate": 1622827417911,
+      "contentHash": "d1d48c097b0d270739a305dae2b66357",
+      "sourceName": "contracts/AAVE/dependencies/open-zeppelin/BaseUpgradeabilityProxy.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./Proxy.sol",
+        "./Address.sol"
+      ],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "BaseUpgradeabilityProxy"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/AAVE/dependencies/open-zeppelin/Proxy.sol": {
+      "lastModificationDate": 1622827417911,
+      "contentHash": "00c754ef12972849020b756b1117eb09",
+      "sourceName": "contracts/AAVE/dependencies/open-zeppelin/Proxy.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "Proxy"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/AAVE/dependencies/open-zeppelin/InitializableUpgradeabilityProxy.sol": {
+      "lastModificationDate": 1622827417911,
+      "contentHash": "723bfd109d4849d4b41b4d5796e04d0e",
+      "sourceName": "contracts/AAVE/dependencies/open-zeppelin/InitializableUpgradeabilityProxy.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./BaseUpgradeabilityProxy.sol"
+      ],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "InitializableUpgradeabilityProxy"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/AAVE/dependencies/open-zeppelin/InitializableAdminUpgradeabilityProxy.sol": {
+      "lastModificationDate": 1622827417911,
+      "contentHash": "fcea10e05a9c69a66a9d6706b3ed4675",
+      "sourceName": "contracts/AAVE/dependencies/open-zeppelin/InitializableAdminUpgradeabilityProxy.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./BaseAdminUpgradeabilityProxy.sol",
+        "./InitializableUpgradeabilityProxy.sol"
+      ],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "InitializableAdminUpgradeabilityProxy"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/AAVE/dependencies/open-zeppelin/BaseAdminUpgradeabilityProxy.sol": {
+      "lastModificationDate": 1622827417911,
+      "contentHash": "5d44a5902ff8cebcdf6ef2ecb1faa170",
+      "sourceName": "contracts/AAVE/dependencies/open-zeppelin/BaseAdminUpgradeabilityProxy.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./UpgradeabilityProxy.sol"
+      ],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "BaseAdminUpgradeabilityProxy"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/AAVE/dependencies/open-zeppelin/UpgradeabilityProxy.sol": {
+      "lastModificationDate": 1622827417911,
+      "contentHash": "5e5997c0c94a647c0a6115a999646065",
+      "sourceName": "contracts/AAVE/dependencies/open-zeppelin/UpgradeabilityProxy.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./BaseUpgradeabilityProxy.sol"
+      ],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "UpgradeabilityProxy"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/AAVE/dependencies/open-zeppelin/Context.sol": {
+      "lastModificationDate": 1622827417911,
+      "contentHash": "a47ebfadd2e21e8d0a9cb398b3e9d3f5",
+      "sourceName": "contracts/AAVE/dependencies/open-zeppelin/Context.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "Context"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/AAVE/dependencies/open-zeppelin/Ownable.sol": {
+      "lastModificationDate": 1622827417911,
+      "contentHash": "a2d8c1d60675d28ea83f831f63b833df",
+      "sourceName": "contracts/AAVE/dependencies/open-zeppelin/Ownable.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./Context.sol"
+      ],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "Ownable"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/AAVE/governance/AaveGovernanceV2.sol": {
+      "lastModificationDate": 1622827417911,
+      "contentHash": "6cabe48985f64873b49e69c76e39bf6b",
+      "sourceName": "contracts/AAVE/governance/AaveGovernanceV2.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../interfaces/IVotingStrategy.sol",
+        "../interfaces/IExecutorWithTimelock.sol",
+        "../interfaces/IProposalValidator.sol",
+        "../interfaces/IGovernanceStrategy.sol",
+        "../interfaces/IAaveGovernanceV2.sol",
+        "../dependencies/open-zeppelin/Ownable.sol",
+        "../dependencies/open-zeppelin/SafeMath.sol",
+        "../misc/Helpers.sol"
+      ],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "AaveGovernanceV2"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/AAVE/interfaces/IVotingStrategy.sol": {
+      "lastModificationDate": 1622827417915,
+      "contentHash": "893b56e7e6782298462a659c824ceb78",
+      "sourceName": "contracts/AAVE/interfaces/IVotingStrategy.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "IVotingStrategy"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/AAVE/interfaces/IExecutorWithTimelock.sol": {
+      "lastModificationDate": 1622827417911,
+      "contentHash": "60ac5ebeb5ab8ba0516aaa3621728391",
+      "sourceName": "contracts/AAVE/interfaces/IExecutorWithTimelock.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IAaveGovernanceV2.sol"
+      ],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "IExecutorWithTimelock"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/AAVE/interfaces/IProposalValidator.sol": {
+      "lastModificationDate": 1622827417915,
+      "contentHash": "2475b8a67a3e33bac3001bbd020d5195",
+      "sourceName": "contracts/AAVE/interfaces/IProposalValidator.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IAaveGovernanceV2.sol"
+      ],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "IProposalValidator"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/AAVE/interfaces/IGovernanceStrategy.sol": {
+      "lastModificationDate": 1622827417915,
+      "contentHash": "64b52a6ce44a880dfef1d2ae271fad80",
+      "sourceName": "contracts/AAVE/interfaces/IGovernanceStrategy.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "IGovernanceStrategy"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/AAVE/interfaces/IAaveGovernanceV2.sol": {
+      "lastModificationDate": 1622827417911,
+      "contentHash": "42957c095b64103806fe228299f25638",
+      "sourceName": "contracts/AAVE/interfaces/IAaveGovernanceV2.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IExecutorWithTimelock.sol"
+      ],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "IAaveGovernanceV2"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/AAVE/dependencies/open-zeppelin/SafeMath.sol": {
+      "lastModificationDate": 1622827417911,
+      "contentHash": "b068409c6ed83b5ab749cc3fa9951c44",
+      "sourceName": "contracts/AAVE/dependencies/open-zeppelin/SafeMath.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "SafeMath"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/AAVE/misc/Helpers.sol": {
+      "lastModificationDate": 1622827417915,
+      "contentHash": "965a972705863224b8640a12fd6e2a97",
+      "sourceName": "contracts/AAVE/misc/Helpers.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": []
+    },
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/AAVE/governance/ProposalValidator.sol": {
+      "lastModificationDate": 1622827417911,
+      "contentHash": "43cc3ea1e8941a493e99217217bf6d08",
+      "sourceName": "contracts/AAVE/governance/ProposalValidator.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../interfaces/IAaveGovernanceV2.sol",
+        "../interfaces/IGovernanceStrategy.sol",
+        "../interfaces/IProposalValidator.sol",
+        "../dependencies/open-zeppelin/SafeMath.sol"
+      ],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "ProposalValidator"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/AAVE/mocks/FlashAttacks.sol": {
+      "lastModificationDate": 1622827417915,
+      "contentHash": "d96618bfab7199a40f8d2227e7ca4cf2",
+      "sourceName": "contracts/AAVE/mocks/FlashAttacks.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../interfaces/IAaveGovernanceV2.sol",
+        "./interfaces/IERC20.sol",
+        "../interfaces/IExecutorWithTimelock.sol"
+      ],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "FlashAttacks"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/AAVE/mocks/interfaces/IERC20.sol": {
+      "lastModificationDate": 1622827417915,
+      "contentHash": "e31fae0867b26fbbf2093b709f244514",
+      "sourceName": "contracts/AAVE/mocks/interfaces/IERC20.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "IERC20"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/AAVE/governance/ExecutorWithTimelock.sol": {
+      "lastModificationDate": 1622827417911,
+      "contentHash": "da7554ed7da55421314685649613e832",
+      "sourceName": "contracts/AAVE/governance/ExecutorWithTimelock.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../interfaces/IExecutorWithTimelock.sol",
+        "../interfaces/IAaveGovernanceV2.sol",
+        "../dependencies/open-zeppelin/SafeMath.sol"
+      ],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "ExecutorWithTimelock"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/AAVE/governance/Executor.sol": {
+      "lastModificationDate": 1622827417911,
+      "contentHash": "bf180f435e78d329459be867dbcaeec1",
+      "sourceName": "contracts/AAVE/governance/Executor.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./ExecutorWithTimelock.sol",
+        "./ProposalValidator.sol"
+      ],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "Executor"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/AAVE/governance/GovernanceStrategy.sol": {
+      "lastModificationDate": 1622827417911,
+      "contentHash": "4faab1c2d0127a7706aa1669caf450c4",
+      "sourceName": "contracts/AAVE/governance/GovernanceStrategy.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../interfaces/IGovernanceStrategy.sol",
+        "../interfaces/IERC20.sol",
+        "../interfaces/IGovernancePowerDelegationToken.sol"
+      ],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "GovernanceStrategy"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/AAVE/interfaces/IERC20.sol": {
+      "lastModificationDate": 1622827417911,
+      "contentHash": "b95cdf222151c9a9083e139ea148afcc",
+      "sourceName": "contracts/AAVE/interfaces/IERC20.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "IERC20"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/AAVE/interfaces/IGovernancePowerDelegationToken.sol": {
+      "lastModificationDate": 1622827417911,
+      "contentHash": "26a80705ff1011552c8beeee4e776bbd",
+      "sourceName": "contracts/AAVE/interfaces/IGovernancePowerDelegationToken.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "IGovernancePowerDelegationToken"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/AAVE/mocks/AaveTokenV1Mock.sol": {
+      "lastModificationDate": 1622827417915,
+      "contentHash": "d01529556a7d1ccb416ae3dc87117ba3",
+      "sourceName": "contracts/AAVE/mocks/AaveTokenV1Mock.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@aave/aave-token/contracts/token/AaveToken.sol"
+      ],
+      "versionPragmas": [],
+      "artifacts": [
+        "AaveTokenV1Mock"
+      ]
+    },
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/AAVE/mocks/AaveTokenV2Mock.sol": {
+      "lastModificationDate": 1622827417915,
+      "contentHash": "4cd16aafdebb3e292550e7b1f95148f2",
+      "sourceName": "contracts/AAVE/mocks/AaveTokenV2Mock.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@aave/aave-token/contracts/token/AaveTokenV2.sol"
+      ],
+      "versionPragmas": [],
+      "artifacts": [
+        "AaveTokenV2Mock"
+      ]
+    }
+  }
+}

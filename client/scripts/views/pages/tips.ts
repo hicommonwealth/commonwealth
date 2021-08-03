@@ -1,8 +1,10 @@
 import 'pages/tips.scss';
 
 import m from 'mithril';
-import app from 'state';
 import { Button, Tag } from 'construct-ui';
+
+import app from 'state';
+import { navigateToSubpage } from 'app';
 
 import { formatCoin } from 'adapters/currency';
 import { ProposalType } from 'identifiers';
@@ -138,7 +140,7 @@ const TipsPage: m.Component<{}> = {
             m(Button, {
               rounded: true,
               class: activeAccount ? '' : 'disabled',
-              onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
+              onclick: (e) => navigateToSubpage('/new/proposal/:type', {
                 type: ProposalType.SubstrateTreasuryTip,
               }),
               label: 'New tip',
