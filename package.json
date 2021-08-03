@@ -161,6 +161,7 @@
     "morgan": "^1.9.1",
     "nearlib": "^0.17.0",
     "node-sass": "^5.0.0",
+    "node-statsd": "^0.1.1",
     "nodemon": "^1.18.10",
     "numeral": "^2.0.6",
     "optimize-css-assets-webpack-plugin": "^5.0.3",
