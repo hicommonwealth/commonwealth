@@ -19,7 +19,7 @@ class ChainInfo {
   public telegram: string;
   public github: string;
   public stagesEnabled: boolean;
-  public additionalStages: string;
+  public customStages: string;
   public customDomain: string;
   public terms: string;
   public snapshot: string;
@@ -36,7 +36,7 @@ class ChainInfo {
 
   constructor({
     id, network, symbol, name, iconUrl, description, website, discord, element, telegram, github,
-    stagesEnabled, additionalStages,
+    stagesEnabled, customStages,
     customDomain, snapshot, terms, blockExplorerIds, collapsedOnHomepage, featuredTopics, topics, adminsAndMods,
     base, ss58_prefix, type, substrateSpec
   }) {
@@ -53,7 +53,7 @@ class ChainInfo {
     this.telegram = telegram;
     this.github = github;
     this.stagesEnabled = stagesEnabled;
-    this.additionalStages = additionalStages;
+    this.customStages = customStages;
     this.customDomain = customDomain;
     this.terms = terms;
     this.snapshot = snapshot;
@@ -80,7 +80,7 @@ class ChainInfo {
     telegram,
     github,
     stagesEnabled,
-    additionalStages,
+    customStages,
     customDomain,
     terms,
     snapshot,
@@ -114,7 +114,7 @@ class ChainInfo {
       telegram,
       github,
       stagesEnabled,
-      additionalStages,
+      customStages,
       customDomain,
       terms,
       snapshot,
@@ -180,7 +180,7 @@ class ChainInfo {
   // TODO: change to accept an object
   public async updateChainData({
     name, description, website, discord, element, telegram,
-    github, stagesEnabled, additionalStages, customDomain, terms, snapshot,
+    github, stagesEnabled, customStages, customDomain, terms, snapshot,
   }) {
     // TODO: Change to PUT /chain
     const r = await $.post(`${app.serverUrl()}/updateChain`, {
@@ -193,7 +193,7 @@ class ChainInfo {
       'telegram': telegram,
       'github': github,
       'stagesEnabled': stagesEnabled,
-      'additionalStages': additionalStages,
+      'customStages': customStages,
       'customDomain': customDomain,
       'terms': terms,
       'snapshot': snapshot,
@@ -208,7 +208,7 @@ class ChainInfo {
     this.telegram = updatedChain.telegram;
     this.github = updatedChain.github;
     this.stagesEnabled = updatedChain.stagesEnabled;
-    this.additionalStages = updatedChain.additionalStages;
+    this.customStages = updatedChain.customStages;
     this.customDomain = updatedChain.customDomain;
     this.snapshot = updatedChain.snapshot;
   }
