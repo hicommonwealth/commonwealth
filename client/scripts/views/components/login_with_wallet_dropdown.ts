@@ -99,7 +99,10 @@ const LoginWithWalletDropdown: m.Component<{
       }
     };
 
-    const chainbase = app.chain?.meta?.chain?.base;
+    let chainbase = app.chain?.meta?.chain?.base;
+    if (!chainbase && app.customDomainId() && app.config.chains.getById(app.customDomainId())) {
+      chainbase = app.config.chains.getById(app.customDomainId()).base;
+    }
     const menuItems = (chainbase && CHAINBASE_WITH_CLI.indexOf(chainbase) !== -1)
       ? [
         ...getMenuItemsForChainBase(chainbase),
