@@ -38,3 +38,52 @@
         }
     }
 }
+
+.AaveGovernance {
+    margin-bottom: 24px;
+
+    .executor {
+        background-color: #F4F4F4;
+        padding: 16px 16px 10px;
+        border-radius: 8px;
+        border: 1px solid #DDDDDD;
+        min-width: 100%;
+        margin-bottom: 20px;
+        cursor: pointer;
+
+        .label {
+            font-size: 14px;
+            color: #666666;
+        }
+
+        .mt-16 {
+            margin-top: 16px;
+        }
+    }
+
+    .tabs {
+        margin-left: -15px;
+    }
+
+    .ml-12 {
+        margin-left: 12px;
+    }
+
+    .button {
+        border-radius: 8px;
+        font-weight: 500;
+        color: #999999;
+    }
+
+    .active {
+        border-color: #6966FF;
+        color: #6966FF;
+    }
+
+    .tab-selector {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+}
