@@ -37,7 +37,10 @@ const listeners: { [key: string]: any} = {};
 // TODO: API-WS from infinitely attempting reconnection i.e. mainnet1
 async function mainProcess(producer: RabbitMqHandler) {
   const pool = new Pool({
-    connectionString: DATABASE_URI
+    connectionString: DATABASE_URI,
+    ssl: {
+      rejectUnauthorized: false
+    }
   });
 
   pool.on('error', (err, client) => {
