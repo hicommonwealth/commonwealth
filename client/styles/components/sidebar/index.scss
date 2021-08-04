@@ -1,6 +1,10 @@
 @import 'client/styles/shared';
 
 @mixin sidebar {
+    .cui-button.cui-active {
+        background: linear-gradient(268.91deg, #91BFFF -61.91%, #91FFA0 2.69%, #FBFF91 60.22%, #FF9191 131.89%);
+        border: 1px solid transparent;
+    }
     .cui-button.sub-button {
         margin-left: 18px;
         width: calc(100% - 18px);
@@ -23,7 +27,7 @@
         border-color: tint(#2480cc, 70%);
         color: #2480cc;
         &:hover {
-            border-color: #2480cc;
+            border-color: transparent;
         }
         .cui-button-label {
             flex: 1;
@@ -34,7 +38,7 @@
             top: -3px;
             left: -1px;
             path {
-                stroke: #2480cc;
+                stroke: currentColor;
             }
         }
     }
@@ -42,7 +46,7 @@
         border-color: tint(#0cbd8b, 70%);
         color: #0cbd8b;
         &:hover {
-            border-color: #0cbd8b;
+            border-color: transparent;
         }
         .cui-button-label {
             flex: 1;
@@ -52,7 +56,7 @@
             position: relative;
             top: -4px;
             path {
-                stroke: #0cbd8b;
+                stroke: currentColor;
             }
         }
     }
@@ -60,7 +64,7 @@
         border-color: tint(#677bc4, 70%);
         color: #677bc4;
         &:hover {
-            border-color: #677bc4;
+            border-color: transparent;
         }
         .cui-button-label {
             flex: 1;
@@ -70,7 +74,7 @@
             position: relative;
             top: -4px;
             path {
-                fill: #677bc4;
+                fill: currentColor;
             }
         }
     }
@@ -78,7 +82,7 @@
         border-color: tint(#222222, 70%);
         color: #222222;
         &:hover {
-            border-color: #222222;
+            border-color: transparent;
         }
         .cui-button-label {
             flex: 1;
@@ -88,7 +92,7 @@
             position: relative;
             top: -3px;
             path {
-                fill: #222222;
+                fill: currentColor;
             }
         }
     }
@@ -291,6 +295,16 @@
     }
     .cui-button {
         margin-bottom: 4px;
+    }
+    .cui-button.cui-rounded:active,
+    .cui-button.cui-rounded.cui-active,
+    .cui-button.cui-rounded:hover {
+        background: linear-gradient(to left, #91FFA0, #FBFF91, #FF9191);
+        border-color: white;
+
+        // @TODO: Remove this and figure out a better solution
+        background: #6966FF;
+        color: white;
     }
 }
 

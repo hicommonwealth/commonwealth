@@ -30,7 +30,7 @@ export default function (
   logging: boolean
 ) {
   server.on(WebsocketEventType.Upgrade, (req: express.Request, socket: net.Socket, head) => {
-    log.info('\nParsing session from request...\n');
+    log.trace('\nParsing session from request...\n');
     sessionParser(req, {} as express.Response, () => {
       if (!req.session) {
         log.error('No session found.');
@@ -38,7 +38,7 @@ export default function (
         return;
       }
 
-      log.info('Session is parsed!');
+      log.trace('Session is parsed!');
 
       wss.handleUpgrade(req, socket, head, (ws) => {
         wss.emit(WebsocketEventType.Connection, ws, req);
@@ -64,12 +64,12 @@ export default function (
 
           // reset liveness timers
           if (ws.aliveTimer) clearTimeout(ws.aliveTimer);
-          ws.aliveTimer = setTimeout(() => { ws.isAlive = false; }, ALIVE_TIMEOUT);
+          ws.aliveTimer = global.setTimeout(() => { ws.isAlive = false; }, ALIVE_TIMEOUT);
 
           if (ws.expirationTimer) clearTimeout(ws.expirationTimer);
-          ws.expirationTimer = setTimeout(() => {
+          ws.expirationTimer = global.setTimeout(() => {
             // TODO: do i need to manually close the socket here?
-            console.log(`Websocket ${sessionId} expired, emitting close`);
+            log.trace(`Websocket ${sessionId} expired, emitting close`);
             wss.emit(WebsocketEventType.Close);
           }, EXPIRATION_TIME);
 
@@ -93,7 +93,7 @@ export default function (
     });
 
     ws.on(WebsocketEventType.Close, () => {
-      console.log(`Received close event for websocket ${sessionId}`);
+      log.trace(`Received close event for websocket ${sessionId}`);
       if (sessionMap[sessionId]) {
         delete sessionMap[sessionId];
       }

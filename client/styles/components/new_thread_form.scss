@@ -43,6 +43,7 @@
     .new-thread-form-body {
         max-width: 100%;
     }
+
     &.has-drafts .new-thread-form-body {
         max-width: calc(100% - 205px);
         @include xs-max {

@@ -11,6 +11,7 @@ import $ from 'jquery';
 import { FocusManager } from 'construct-ui';
 import moment from 'moment';
 import mixpanel from 'mixpanel-browser';
+import _ from 'underscore';
 
 import app, { ApiStatus, LoginState } from 'state';
 import {
@@ -33,7 +34,7 @@ import { Layout } from 'views/layout';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import LoginModal from 'views/modals/login_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';
-import Login from './views/components/login';
+import { AaveTypes, MarlinTypes, MolochTypes } from '@commonwealth/chain-events';
 
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/landing');
@@ -83,7 +84,7 @@ export async function initAppState(updateSelectedNode = true, customDomain = nul
           featuredTopics: community.featured_topics,
           topics: community.topics,
           stagesEnabled: community.stagesEnabled,
-          additionalStages: community.additionalStages,
+          customStages: community.customStages,
           customDomain: community.customDomain,
           terms: community.terms,
           adminsAndMods: [],
@@ -112,7 +113,6 @@ export async function initAppState(updateSelectedNode = true, customDomain = nul
         app.user.setSelectedNode(NodeInfo.fromJSON(data.user.selectedNode));
       }
 
-      // update whether we're on a custom domain
       if (customDomain) {
         app.setCustomDomain(customDomain);
       }
@@ -265,20 +265,27 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
     )).default;
     newChain = new Near(n, app);
     initApi = true;
-  } else if (n.chain.network === ChainNetwork.Moloch || n.chain.network === ChainNetwork.Metacartel) {
+  } else if (MolochTypes.EventChains.find((c) => c === n.chain.network)) {
     const Moloch = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "moloch-main" */
       './controllers/chain/ethereum/moloch/adapter'
     )).default;
     newChain = new Moloch(n, app);
-  } else if (n.chain.network === ChainNetwork.Marlin || n.chain.network === ChainNetwork.MarlinTestnet) {
+  } else if (MarlinTypes.EventChains.find((c) => c === n.chain.network)) {
     const Marlin = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "marlin-main" */
       './controllers/chain/ethereum/marlin/adapter'
     )).default;
     newChain = new Marlin(n, app);
+  } else if (AaveTypes.EventChains.find((c) => c === n.chain.network)) {
+    const Aave = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "aave-main" */
+      './controllers/chain/ethereum/aave/adapter'
+    )).default;
+    newChain = new Aave(n, app);
   } else if (n.chain.type === 'token') {
     const Token = (await import(
     //   /* webpackMode: "lazy" */
@@ -552,6 +559,9 @@ Promise.all([
     '/privacy':                  importRoute('views/pages/landing/privacy', { scoped: false }),
     '/components':               importRoute('views/pages/components', { scoped: false, hideSidebar: true }),
     ...(isCustomDomain ? {
+      //
+      // Custom domain routes
+      //
       '/':                       importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
       '/search':                 importRoute('views/pages/search', { scoped: false, deferChain: true }),
       // Notifications
@@ -627,6 +637,9 @@ Promise.all([
       '/:scope/spec_settings':      redirectRoute(() => '/spec_settings'),
       '/:scope/analytics':          redirectRoute(() => '/analytics'),
     } : {
+      //
+      // Scoped routes
+      //
       '/':                         importRoute('views/pages/landing', { scoped: false, hideSidebar: true }),
       '/search':                   importRoute('views/pages/search', { scoped: false, deferChain: true }),
       '/whyCommonwealth':          importRoute('views/pages/commonwealth', { scoped: false, hideSidebar: true }),
@@ -662,6 +675,7 @@ Promise.all([
       '/:scope/delegate':          importRoute('views/pages/delegate', { scoped: true, }),
       '/:scope/proposal/:type/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
       '/:scope/new/proposal/:type': importRoute('views/pages/new_proposal/index', { scoped: true }),
+
       // Treasury
       '/:scope/treasury':          importRoute('views/pages/treasury', { scoped: true }),
       '/:scope/bounties':          importRoute('views/pages/bounties', { scoped: true }),

@@ -1,5 +1,5 @@
 
-import { Moloch1Factory } from 'Moloch1Factory';
+import { Moloch1__factory } from 'eth/types';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 
 import EthereumAccount from 'controllers/chain/ethereum/account';
@@ -34,7 +34,7 @@ export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount>
     await this.chain.resetApi(this.meta);
     await this.chain.initMetadata();
     await this.ethAccounts.init(this.chain);
-    const api = new MolochAPI(Moloch1Factory.connect, this.meta.address, this.chain.api.currentProvider as any);
+    const api = new MolochAPI(Moloch1__factory.connect, this.meta.address, this.chain.api.currentProvider as any);
     await api.init();
     this.chain.molochApi = api;
     await this.accounts.init(api);

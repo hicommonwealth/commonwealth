@@ -3,6 +3,7 @@
 .VotingResults {
     display: flex;
     background-color: $background-color-light;
+    justify-content: space-between;
     margin-top: 25px;
     flex-wrap: wrap;
     border-radius: 3px;
@@ -10,15 +11,46 @@
     .results-column {
         display: flex;
         flex-direction: column;
+        background-color: $background-color-light;
+        padding: 18px 0 12px;
         flex: 1;
-        padding: 18px 26px 12px;
-        min-width: 50%;
+        width: 48%;
+        max-width: 48%;
+        border-radius: 10px;
+        .results-cell, .results-header,
+        .results-subheader > span {
+            padding: 0 26px;
+        }
         .results-header {
             font-weight: 500;
-            margin-bottom: 8px;
+            margin-bottom: 28px;
+        }
+        .results-subheader {
+            display: flex;
+            justify-content: space-between;
+            color: #666666;
+            font-size: 18px;
+            font-weight: 500;
+            border-bottom: 1px solid #DDDDDD;
+            line-height: 2;
+            margin-bottom: 20px;
         }
         .results-header, .results-cell {
             min-width: calc(50% - 15px);
+        }
+        &.yes-votes {
+            border: 2px solid #C5EEE9;
+            .results-header {
+                font-size: 24px;
+                color: #009785;
+            }
+        }
+        &.no-votes {
+            border: 2px solid #FFD5DC;
+            .results-header {
+                font-size: 24px;
+                color: #C60024;
+            }
         }
     }
     @include lg-max {
@@ -26,13 +58,6 @@
         width: 100%;
         .results-header, .results-cell {
             width: 100%;
-        }
-    }
-    .results-column:nth-child(even) {
-        border-left: 1px solid $background-color-light-hover;
-        @include lg-max {
-            border-left: none;
-            border-top: 1px solid $background-color-light-hover;
         }
     }
     .vote {
