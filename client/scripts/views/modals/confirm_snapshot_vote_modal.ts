@@ -94,6 +94,9 @@ const ConfirmSnapshotVoteModal: m.Component<{
               };
 
               const wallet = (app.wallets.getByName('metamask') as MetamaskWebWalletController);
+              if (!wallet.enabling && !wallet.enabled) {
+                await wallet?.enable();
+              }
               msg.sig = await wallet.signMessage(msg.msg);
 
               const result = await $.post(`${app.serverUrl()}/snapshotAPI/sendMessage`, { ...msg });
@@ -105,7 +108,7 @@ const ConfirmSnapshotVoteModal: m.Component<{
                 notifyError(errorMessage);
               } else if (result.status === 'Success') {
                 $(e.target).trigger('modalexit');
-                m.route.set(`/${app.activeId()}/snapshot-proposal/${space.key}`);
+                m.route.set(`/${app.activeId()}/snapshot-proposals/${space.key}`);
               }
               vnode.state.saving = false;
             },

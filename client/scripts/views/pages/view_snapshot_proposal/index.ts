@@ -121,7 +121,7 @@ const VoteView: m.Component<{ votes: Vote[] }, { numLoadedYes: number, numLoaded
         m('.results-cell', [
           voteYesListing
         ]),
-        votes.filter((v) => v.choice === 'yes').length ? m(Button, {
+        votes.filter((v) => v.choice === 'yes').length > vnode.state.numLoadedYes ? m(Button, {
           label: 'Load more',
           onclick: () => { vnode.state.numLoadedYes += 10; m.redraw(); },
         }) : null
@@ -249,6 +249,7 @@ const ViewProposalPage: m.Component<{
     vnode.state.votes = [];
     vnode.state.totalScore = 0;
     vnode.state.scores = [];
+    const getLoadingPage = () => m('.topic-loading-spinner-wrap', [ m(Spinner, { active: true, size: 'lg' }) ]);
 
     const snapshotId = vnode.attrs.snapshotId;
     app.snapshot.fetchSnapshotProposals(snapshotId).then((response) => {
@@ -292,6 +293,10 @@ const ViewProposalPage: m.Component<{
           m.redraw();
         }
       });
+
+      if (!vnode.state.snapshotProposal) {
+        return getLoadingPage();
+      }
     });
   },
 
