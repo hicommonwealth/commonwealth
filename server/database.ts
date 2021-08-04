@@ -5,7 +5,6 @@ import { Sequelize, DataTypes, QueryTypes } from 'sequelize';
 import { DATABASE_URI } from './config';
 
 import { factory, formatFilename } from '../shared/logging';
-import { getStatsDInstance } from './util/metrics';
 
 const log = factory.getLogger(formatFilename(__filename));
 
