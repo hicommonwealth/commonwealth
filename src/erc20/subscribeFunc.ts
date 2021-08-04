@@ -1,7 +1,6 @@
-import { providers } from 'ethers';
-import Web3 from 'web3';
 import sleep from 'sleep-promise';
 
+import { createProvider } from '../eth';
 import { CWEvent, SubscribeFunc, ISubscribeOptions } from '../interfaces';
 import { factory, formatFilename } from '../logging';
 import { ERC20__factory as ERC20Factory } from '../contractTypes';
@@ -27,27 +26,8 @@ export async function createApi(
   tokenAddresses: string[],
   retryTimeMs = 10 * 1000
 ): Promise<Api> {
-  if (ethNetworkUrl.includes('infura')) {
-    const networkPrefix = ethNetworkUrl.split('infura')[0];
-    if (process && process.env) {
-      const { INFURA_API_KEY } = process.env;
-      if (!INFURA_API_KEY) {
-        throw new Error('no infura key found!');
-      }
-      ethNetworkUrl = `${networkPrefix}infura.io/ws/v3/${INFURA_API_KEY}`;
-    } else {
-      throw new Error('must use nodejs to connect to infura provider!');
-    }
-  }
   try {
-    const web3Provider = new Web3.providers.WebsocketProvider(ethNetworkUrl, {
-      reconnect: {
-        auto: true,
-        delay: retryTimeMs,
-        onTimeout: true,
-      },
-    });
-    const provider = new providers.Web3Provider(web3Provider);
+    const provider = createProvider(ethNetworkUrl);
 
     const tokenContracts = tokenAddresses.map((o) =>
       ERC20Factory.connect(o, provider)

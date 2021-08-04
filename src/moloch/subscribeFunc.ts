@@ -1,8 +1,7 @@
-import { providers } from 'ethers';
-import Web3 from 'web3';
 import EthDater from 'ethereum-block-by-date';
 import sleep from 'sleep-promise';
 
+import { createProvider } from '../eth';
 import {
   Moloch1__factory as Moloch1Factory,
   Moloch2__factory as Moloch2Factory,
@@ -28,27 +27,8 @@ export async function createApi(
   contractAddress: string,
   retryTimeMs = 10 * 1000
 ): Promise<Api> {
-  if (ethNetworkUrl.includes('infura')) {
-    const networkPrefix = ethNetworkUrl.split('infura')[0];
-    if (process && process.env) {
-      const { INFURA_API_KEY } = process.env;
-      if (!INFURA_API_KEY) {
-        throw new Error('no infura key found!');
-      }
-      ethNetworkUrl = `${networkPrefix}infura.io/ws/v3/${INFURA_API_KEY}`;
-    } else {
-      throw new Error('must use nodejs to connect to infura provider!');
-    }
-  }
   try {
-    const web3Provider = new Web3.providers.WebsocketProvider(ethNetworkUrl, {
-      reconnect: {
-        auto: true,
-        delay: retryTimeMs,
-        onTimeout: true,
-      },
-    });
-    const provider = new providers.Web3Provider(web3Provider);
+    const provider = createProvider(ethNetworkUrl);
     const contract =
       contractVersion === 1
         ? Moloch1Factory.connect(contractAddress, provider)

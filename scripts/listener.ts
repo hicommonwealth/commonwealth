@@ -46,7 +46,7 @@ const networkUrls = {
   aave: 'wss://mainnet.infura.io/ws',
   'aave-local': 'ws://127.0.0.1:9545',
   'dydx-ropsten': 'wss://ropsten.infura.io/ws',
-  'dydx': 'wss://mainnet.infura.io/ws',
+  dydx: 'wss://mainnet.infura.io/ws',
 
   erc20: 'wss://mainnet.infura.io/ws',
 } as const;
