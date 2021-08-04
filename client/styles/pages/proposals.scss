@@ -1,7 +1,6 @@
 @import 'client/styles/shared';
 
 .ProposalsPage {
-    padding-bottom: 60px;
     @include gov-explainer;
     .active-proposals, .inactive-proposals {
         display: flex;
