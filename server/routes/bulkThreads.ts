@@ -231,13 +231,11 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
     replacements,
     type: QueryTypes.SELECT
   });
-  const numPrevotingThreads = threadsInVoting.filter((t) => t.stage === 'proposal_in_review').length;
   const numVotingThreads = threadsInVoting.filter((t) => t.stage === 'voting').length;
 
   return res.json({
     status: 'Success',
     result: {
-      numPrevotingThreads,
       numVotingThreads,
       threads,
       comments, // already converted to JSON earlier

@@ -1,45 +1,51 @@
+import BN from 'bn.js';
+import {
+  GovParametersDepositResponse,
+  GovParametersTallyingResponse,
+  GovParametersType,
+  GovParametersVotingResponse,
+  Proposal,
+  Tally,
+} from '@cosmjs/launchpad/build/lcdapi/gov';
 import _ from 'underscore';
 import {
   ITXModalData,
   ProposalModule,
 } from 'models';
 import {
-  ICosmosProposal, CosmosToken, ICosmosProposalTally
-} from 'adapters/chain/cosmos/types';
-import { CosmosApi } from 'adapters/chain/cosmos/api';
+  ICosmosProposal, CosmosToken, ICosmosProposalTally, CosmosProposalType, CosmosProposalState
+} from 'controllers/chain/cosmos/types';
 import { CosmosAccount, CosmosAccounts } from './account';
-import CosmosChain from './chain';
+import CosmosChain, { CosmosApiType } from './chain';
 import { CosmosProposal } from './proposal';
 
 const isCompleted = (status: string): boolean => {
   return status === 'Passed' || status === 'Rejected' || status === 'Failed';
 };
 
-export const marshalTally = (tally): ICosmosProposalTally => {
+export const marshalTally = (tally: Tally): ICosmosProposalTally => {
   if (!tally) return null;
   return {
-    yes: +tally.yes,
-    abstain: +tally.abstain,
-    no: +tally.no,
-    noWithVeto: +tally.no_with_veto,
+    yes: new BN(tally.yes),
+    abstain: new BN(tally.abstain),
+    no: new BN(tally.no),
+    noWithVeto: new BN(tally.no_with_veto),
   };
 };
 
 class CosmosGovernance extends ProposalModule<
-  CosmosApi,
+  CosmosApiType,
   ICosmosProposal,
   CosmosProposal
 > {
   private _votingPeriodNs: number;
   private _yesThreshold: number;
   private _vetoThreshold: number;
-  private _penalty: number;
   private _maxDepositPeriodNs: number;
   private _minDeposit: CosmosToken;
   public get votingPeriodNs() { return this._votingPeriodNs; }
   public get yesThreshold() { return this._yesThreshold; }
   public get vetoThreshold() { return this._vetoThreshold; }
-  public get penalty() { return this._penalty; }
   public get maxDepositPeriodNs() { return this._maxDepositPeriodNs; }
   public get minDeposit() { return this._minDeposit; }
 
@@ -51,17 +57,23 @@ class CosmosGovernance extends ProposalModule<
     this._Accounts = Accounts;
 
     // query chain-wide params
-    const [ depositParams, tallyingParams, votingParams ] = await Promise.all([
-      this._Chain.api.query.govDepositParameters(),
-      this._Chain.api.query.govTallyingParameters(),
-      this._Chain.api.query.govVotingParameters(),
-    ]);
-    this._votingPeriodNs = +votingParams.voting_period;
-    this._yesThreshold = +tallyingParams.threshold;
-    this._vetoThreshold = +tallyingParams.veto;
-    this._penalty = +tallyingParams.governance_penalty;
-    this._maxDepositPeriodNs = +depositParams.max_deposit_period;
-    this._minDeposit = new CosmosToken(depositParams.min_deposit[0].denom, +depositParams.min_deposit[0].amount);
+    const depositParams = await this._Chain.api.gov.parameters(
+      GovParametersType.Deposit
+    ) as GovParametersDepositResponse;
+    const tallyingParams = await this._Chain.api.gov.parameters(
+      GovParametersType.Tallying
+    ) as GovParametersTallyingResponse;
+    const votingParams = await this._Chain.api.gov.parameters(
+      GovParametersType.Voting
+    ) as GovParametersVotingResponse;
+    this._votingPeriodNs = +votingParams.result.voting_period;
+    this._yesThreshold = +tallyingParams.result.threshold;
+    this._vetoThreshold = +tallyingParams.result.veto;
+    this._maxDepositPeriodNs = +depositParams.result.max_deposit_period;
+    this._minDeposit = new CosmosToken(
+      depositParams.result.min_deposit[0].denom,
+      new BN(depositParams.result.min_deposit[0].amount),
+    );
 
     // query existing proposals
     await this._initProposals();
@@ -69,58 +81,68 @@ class CosmosGovernance extends ProposalModule<
   }
 
   private async _initProposals(): Promise<void> {
-    const api = this._Chain.api;
-    const msgToIProposal = (p): ICosmosProposal => {
-      // handle older cosmoshub types
-      const content = p.content || p.proposal_content;
+    const msgToIProposal = (p: Proposal): ICosmosProposal => {
+      const content = p.content;
       return {
-        identifier: p.id || p.proposal_id,
-        type: content.type,
+        identifier: p.id,
+        type: content.type as CosmosProposalType,
         title: content.value.title,
         description: content.value.description,
         submitTime: p.submit_time,
         depositEndTime: p.deposit_end_time,
         votingEndTime: p.voting_end_time,
         votingStartTime: p.voting_start_time,
-        proposer: p.proposer || null,
+        proposer: null,
         state: {
-          identifier: p.id || p.proposal_id,
+          identifier: p.id,
           completed: isCompleted(p.proposal_status),
-          status: p.proposal_status,
-          totalDeposit: p.total_deposit ? +p.total_deposit.amount : 0,
+          status: p.proposal_status as CosmosProposalState,
+          totalDeposit: p.total_deposit && p.total_deposit[0] ? new BN(p.total_deposit[0].amount) : new BN(0),
           depositors: [],
           voters: [],
           tally: marshalTally(p.final_tally_result),
         }
       };
     };
-    const proposalResps = await Promise.all([
-      api.queryUrl('/gov/proposals?status=deposit_period', null, null, false),
-      api.queryUrl('/gov/proposals?status=voting_period', null, null, false),
-      api.queryUrl('/gov/proposals?status=passed', null, null, false),
-      // limit the number of rejected proposals we fetch
-      api.queryUrl('/gov/proposals?status=rejected', 1, 10, false),
-    ]);
-
-    const proposalMsgs = _.flatten(proposalResps.map((ps) => ps || [])).sort((p1, p2) => +p2.id - +p1.id);
-    const proposals = proposalMsgs.map((p) => msgToIProposal(p));
+    const proposalsResponse = await this._Chain.api.gov.proposals();
+    const proposals = proposalsResponse.result
+      .map((p) => msgToIProposal(p))
+      .sort((p1, p2) => +p2.identifier - +p1.identifier);
     proposals.forEach((p) => new CosmosProposal(this._Chain, this._Accounts, this, p));
   }
 
-  // TODO: cosmos-api only supports text proposals and not parameter_change or software_upgrade
   public createTx(
     sender: CosmosAccount, title: string, description: string, initialDeposit: CosmosToken, memo: string = ''
   ): ITXModalData {
-    const args = { title, description, initialDeposits: [initialDeposit.toCoinObject()] };
-    const txFn = (gas: number) => this._Chain.api.tx(
-      'MsgSubmitProposal', sender.address, args, memo, gas, this._Chain.denom
-    );
-    return this._Chain.createTXModalData(
-      sender,
-      txFn,
-      'MsgSubmitProposal',
-      `${sender.address} submits proposal: ${title}.`,
-    );
+    throw new Error('unsupported');
+  }
+
+  // TODO: support multiple deposit types
+  // TODO: support multiple proposal types (not just text)
+  public async submitProposalTx(
+    sender: CosmosAccount,
+    title: string,
+    description: string,
+    initialDeposit: CosmosToken,
+  ) {
+    /*
+    const msg: MsgSubmitProposal = {
+      type: 'cosmos-sdk/MsgSubmitProposal',
+      value: {
+        content: {
+          type: 'cosmos-sdk/TextProposal',
+          value: {
+            description,
+            title,
+          },
+        },
+        initial_deposit: [ initialDeposit.toCoinObject() ],
+        proposer: sender.address,
+      }
+    };
+    await this._Chain.sendTx(sender, msg);
+    */
+    throw new Error('proposal submission not yet implemented');
   }
 }
 

@@ -1,35 +1,17 @@
-import { AsyncSendable } from 'ethers/providers';
+import { GovernorAlpha, MPond, MPond__factory } from 'eth/types';
 
-import { MPond } from 'MPond';
-import { GovernorAlpha } from 'GovernorAlpha';
-import { GovernorAlphaFactory } from 'GovernorAlphaFactory';
+import ContractApi from 'controllers/chain/ethereum/contractApi';
 
-import ContractApi, { ContractFactoryT } from 'controllers/chain/ethereum/contractApi';
+export default class MarlinAPI extends ContractApi<GovernorAlpha> {
+  private _MPondAddress: string;
+  public get MPondAddress() { return this._MPondAddress; }
 
-export default class MarlinAPI extends ContractApi<MPond> {
-  private _GovernorAlphaAddress: string;
-  private _GovernorAlphaContract: GovernorAlpha;
-  private _Symbol: string;
-
-  public get governorAlphaAddress() { return this._GovernorAlphaAddress; }
-  public get governorAlphaContract(): GovernorAlpha { return this._GovernorAlphaContract; }
-
-  public get symbol(): string { return this._Symbol; }
-
-  constructor(
-    factory: ContractFactoryT<MPond>,
-    mPondAddress: string,
-    governorAlphaAddress: string,
-    web3Provider: AsyncSendable,
-  ) {
-    super(factory, mPondAddress, web3Provider);
-    this._GovernorAlphaAddress = governorAlphaAddress;
-    this._GovernorAlphaContract = GovernorAlphaFactory.connect(governorAlphaAddress, this.Provider);
-  }
+  private _MPond: MPond;
+  public get MPond() { return this._MPond; }
 
   public async init() {
-    // MPond is the token
-    await super.init(this.contractAddress);
-    this._Symbol = await this.Contract.symbol();
+    await super.init();
+    this._MPondAddress = await this.Contract.MPond();
+    this._MPond = MPond__factory.connect(this._MPondAddress, this.Contract.signer || this.Contract.provider);
   }
 }

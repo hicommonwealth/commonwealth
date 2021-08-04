@@ -31,13 +31,25 @@
 }
 
 .ChainEntitiesSelector {
-    padding: 22px 22px 0;
+    padding: 0;
     border: 1px solid #ddd;
     margin: 10px 8px 20px;
     border-radius: 5px;
+    .cui-control-group {
+        margin-bottom: 0;
+    }
+    .cui-input input {
+        border-top: none;
+        border-right: none;
+        border-left: none;
+        border-bottom-color: $border-color-light;
+        height: 44px;
+        border-radius: 0;
+    }
     .cui-list {
-        min-height: 200px;
-        max-height: 200px;
+        min-height: 150px;
+        max-height: 150px;
+        border-radius: 5px;
         .cui-active {
             background: initial;
         }

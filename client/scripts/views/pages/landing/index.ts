@@ -240,14 +240,14 @@ const LandingPage: m.Component<{}, IState> = {
               alt: '',
               title: 'Claim your token',
               text:
-              ' We generate pages for your favorite community and address from real-time chain actvity. Claim yours. ',
+              ' We generate pages for your favorite community and address from real-time chain activity. Claim yours. ',
             },
             {
               img: 'static/img/bell.svg',
               alt: '',
               title: 'Stay updated',
               text:
-              ' Be the first to know when community events are happening with in-app, email, and mobile push notiications. ',
+              ' Be the first to know when community events are happening with in-app, email, and mobile push notifications. ',
             },
             {
               img: 'static/img/calendar.svg',
@@ -318,7 +318,7 @@ const LandingPage: m.Component<{}, IState> = {
             { text:  'Terms', redirectTo:  '/terms' },
             { text:  'Privacy', redirectTo: '/privacy' },
             { text: 'Why Commonwealth?', redirectTo: '/whyCommonwealth' },
-            { text: 'Discord', externalLink: 'https://discord.gg/ZFQCKUMP' },
+            { text: 'Discord', externalLink: 'https://discord.gg/yK3x5HcsXG' },
             { text: 'Telegram', externalLink: 'https://t.me/HiCommonwealth' }
           ],
         }),

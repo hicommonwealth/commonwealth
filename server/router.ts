@@ -1,7 +1,9 @@
 import express from 'express';
 import webpack from 'webpack';
 import passport from 'passport';
+import { GITHUB_OAUTH_CALLBACK } from './config';
 
+import domain from './routes/domain';
 import status from './routes/status';
 import createGist from './routes/createGist';
 
@@ -20,6 +22,8 @@ import getAddressStatus from './routes/getAddressStatus';
 import selectNode from './routes/selectNode';
 import startEmailLogin from './routes/startEmailLogin';
 import finishEmailLogin from './routes/finishEmailLogin';
+import finishOAuthLogin from './routes/finishOAuthLogin';
+import startOAuthLogin from './routes/startOAuthLogin';
 import createComment from './routes/createComment';
 import editComment from './routes/editComment';
 import deleteComment from './routes/deleteComment';
@@ -120,6 +124,7 @@ import { getTokensFromLists } from './routes/getTokensFromLists';
 import getTokenForum from './routes/getTokenForum';
 import getSubstrateSpec from './routes/getSubstrateSpec';
 import editSubstrateSpec from './routes/editSubstrateSpec';
+import { getStatsDInstance } from './util/metrics';
 
 function setupRouter(
   app,
@@ -129,6 +134,18 @@ function setupRouter(
   tokenBalanceCache: TokenBalanceCache
 ) {
   const router = express.Router();
+
+  router.use((req, res, next) => {
+    getStatsDInstance().increment(`cw.path.${req.path.slice(1)}.called`);
+    const start = Date.now();
+    res.on('finish', () => {
+      const latency = Date.now() - start;
+      getStatsDInstance().histogram(`cw.path.${req.path.slice(1)}.latency`, latency);
+    });
+    next();
+  });
+
+  router.get('/domain', domain.bind(this, models));
   router.get('/status', status.bind(this, models));
 
   router.get('/getSubstrateSpec', getSubstrateSpec.bind(this, models));
@@ -459,14 +476,15 @@ function setupRouter(
   // login
   router.post('/login', startEmailLogin.bind(this, models));
   router.get('/finishLogin', finishEmailLogin.bind(this, models));
+
+  router.get('/auth/github', startOAuthLogin.bind(this, models));
+  router.get('/auth/github/callback', startOAuthLogin.bind(this, models));
+  router.get('/finishOAuthLogin', finishOAuthLogin.bind(this, models));
+
   router.post('/auth/magic', passport.authenticate('magic'), (req, res, next) => {
     return res.json({ status: 'Success', result: req.user.toJSON() });
   });
-  router.get('/auth/github', passport.authenticate('github'));
-  router.get(
-    '/auth/github/callback',
-    passport.authenticate('github', { successRedirect: '/', failureRedirect: '/#!/login' }),
-  );
+
   // logout
   router.get('/logout', logout.bind(this, models));
 

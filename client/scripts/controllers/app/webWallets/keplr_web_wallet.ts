@@ -1,6 +1,7 @@
 import app from 'state';
 
-import { AccountData, OfflineSigner, SigningCosmosClient } from '@cosmjs/launchpad';
+import { SigningStargateClient } from '@cosmjs/stargate';
+import { OfflineDirectSigner, AccountData } from '@cosmjs/proto-signing';
 
 import { Account, ChainBase, IWebWallet } from 'models';
 import { validationTokenToSignDoc } from 'adapters/chain/cosmos/keys';
@@ -13,10 +14,12 @@ declare global {
 
 class KeplrWebWalletController implements IWebWallet<AccountData> {
   // GETTERS/SETTERS
-  private _offlineSigner: OfflineSigner;
   private _accounts: readonly AccountData[];
   private _enabled: boolean;
   private _enabling: boolean = false;
+  private _chainId: string;
+  private _offlineSigner: OfflineDirectSigner;
+  private _client: SigningStargateClient;
 
   public readonly name = 'keplr';
   public readonly label = 'Cosmos Wallet (Keplr)';
@@ -34,34 +37,36 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
   public get accounts() {
     return this._accounts || [];
   }
-  public get offlineSigner() {
-    return this._offlineSigner;
-  }
+  public get api() { return window.keplr; }
 
   public async validateWithAccount(account: Account<any>): Promise<void> {
-    if (!this.offlineSigner) throw new Error('Missing or misconfigured web wallet');
-    const client = new SigningCosmosClient(
-      // TODO: Figure out our own nodes, these are ported from the Keplr example code.
-      app.chain.meta.chain.network === 'cosmos'
-        ? 'https://node-cosmoshub-3.keplr.app/rest'
-        : app.chain.meta.chain.network === 'straightedge'
-          ? 'https://node-straightedge-2.keplr.app/rest'
-          : '',
-      account.address,
-      this.offlineSigner,
-    );
+    if (!this._chainId || !window.keplr?.signAmino) throw new Error('Missing or misconfigured web wallet');
 
     // Get the verification token & placeholder TX to send
-    const signDoc = await validationTokenToSignDoc(account.address, account.validationToken);
-
-    // Some typing and versioning issues here...signAmino should be available but it's not
-    const signature = await ((client as any).signer.signAmino
-      ? (client as any).signer.signAmino(account.address, signDoc)
-      : (client as any).signer.sign(account.address, signDoc));
+    const signDoc = validationTokenToSignDoc(this._chainId, account.validationToken);
+    const signature = await window.keplr.signAmino(this._chainId, account.address, signDoc);
     return account.validate(JSON.stringify(signature));
   }
 
   // ACTIONS
+  public async getClient(url: string, account: string): Promise<SigningStargateClient> {
+    if (!this.enabled || app.chain.meta.chain.id !== this._chainId) {
+      this._offlineSigner = null;
+      this._client = null;
+      await this.enable();
+      if (!this.enabled) {
+        throw new Error(`Failed to enable keplr for ${app.chain.meta.chain.id}.`);
+      }
+    }
+    if (this.accounts[0].address !== account) {
+      throw new Error('Incorrect signing account');
+    }
+    if (!this._client) {
+      this._client = await SigningStargateClient.connectWithSigner(url, this._offlineSigner);
+    }
+    return this._client;
+  }
+
   public async enable() {
     console.log('Attempting to enable Keplr web wallet');
 
@@ -70,19 +75,14 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
       return;
     }
 
-    // get the chain id to enable
-    if (!app.chain?.id || !app.chain?.meta?.chain?.id) return;
-    const chainId = app.chain.meta.chain.id === 'straightedge' ? 'straightedge-2'
-      : app.chain.meta.chain.id === 'cosmos' ? 'cosmoshub-3'
-        : null;
-    if (!chainId) return;
-
     // enable
     this._enabling = true;
     try {
-      await window.keplr.enable(chainId);
-      console.log(`Enabled web wallet for ${chainId}`);
-      this._offlineSigner = window.getOfflineSigner(chainId);
+      // enabling without version (i.e. cosmoshub instead of cosmoshub-4) should work
+      this._chainId = app.chain.meta.chain.id;
+      await window.keplr.enable(this._chainId);
+      console.log(`Enabled web wallet for ${this._chainId}`);
+      this._offlineSigner = window.keplr.getOfflineSigner(this._chainId);
       this._accounts = await this._offlineSigner.getAccounts();
       this._enabled = true;
       this._enabling = false;

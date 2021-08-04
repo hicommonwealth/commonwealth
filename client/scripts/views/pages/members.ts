@@ -7,6 +7,7 @@ import moment from 'moment';
 import { Input, List, ListItem, PopoverMenu, MenuItem, Icon, Icons, Tag } from 'construct-ui';
 
 import app from 'state';
+import { navigateToSubpage } from 'app';
 import { AddressInfo, AbridgedThread } from 'models';
 import { pluralize, link } from 'helpers';
 
@@ -65,7 +66,7 @@ const MembersPage : m.Component<{}, { membersRequested: boolean, membersLoaded: 
       });
     }
 
-    const isAdmin = app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
+    const isAdmin = app.user.isSiteAdmin || app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
     const isMod = app.user.isRoleOfCommunity({
       role: 'moderator', chain: app.activeChainId(), community: app.activeCommunityId()
     });
@@ -97,7 +98,7 @@ const MembersPage : m.Component<{}, { membersRequested: boolean, membersLoaded: 
           onclick: (e) => {
             e.preventDefault();
             localStorage[`${app.activeId()}-members-scrollY`] = window.scrollY;
-            m.route.set(`/${app.activeId()}/account/${info.address}?base=${info.chain}`);
+            navigateToSubpage(`/account/${info.address}?base=${info.chain}`);
           }
         }, [
           m('.members-item-icon', [
