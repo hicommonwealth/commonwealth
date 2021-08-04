@@ -1,7 +1,6 @@
 import fs from 'fs';
 import path from 'path';
 import { Sequelize, DataTypes, QueryTypes } from 'sequelize';
-import { Pool } from 'sequelize-pool';
 
 import { DATABASE_URI } from './config';
 
