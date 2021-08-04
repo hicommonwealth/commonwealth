@@ -253,33 +253,3 @@ producer
     handleFatalError(err, null, 'unknown');
   })
 
-// export async function getTokenLists() {
-//   let data: any = await Promise.all(
-//     tokenListUrls.map((url) =>
-//       fetch(url)
-//         .then((o) => o.json())
-//         .catch((e) => console.error(e))
-//     )
-//   );
-//   data = data.map((o) => o && o.tokens).flat();
-//   data = data.filter((o) => o); //remove undefined
-//   return data;
-// }
-
-// export async function getSubstrateSpecs(chain: EventSupportingChainT) {
-//   let url: string = `${process.env.SUBSTRATE_SPEC_ENDPOINT ||
-//     'http://localhost:8080/api/getSubstrateSpec'}?chain=${chain}`;
-//
-//   console.log(`Getting ${chain} spec at url ${url}`);
-//
-//   let data: any = await fetch(url)
-//     .then((res) => res.json())
-//     .then((json) => json.result)
-//     .catch((err) => console.error(err));
-//
-//   return data;
-// }
-
-// let tokens = await getTokenLists();
-// let tokenAddresses = tokens.map((o) => o.address);
-// const api = await Erc20Events.createApi(listenerArg.url, tokenAddresses);
