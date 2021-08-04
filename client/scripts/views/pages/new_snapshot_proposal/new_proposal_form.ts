@@ -76,11 +76,16 @@ const newThread = async (
     : quillEditorState.markdownMode
       ? quillEditorState.editor.getText()
       : JSON.stringify(quillEditorState.editor.getContents());
-  
+
   form.body = bodyText;
   form.snapshot = await snapshotJs.utils.getBlockNumber(snapshotJs.utils.getProvider(space.network));
   form.metadata.network = space.network;
   form.metadata.strategies = space.strategies;
+
+  // Format form for proper validation
+  delete form.range;
+  form.start /= 1000;
+  form.end /= 1000;
 
   const msg: any = {
     address: author.address,
@@ -319,7 +324,6 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
                     default:
                       break;
                   }
-                  console.log(vnode.state.form);
                 },
               }),
             ]),
