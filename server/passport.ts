@@ -368,7 +368,9 @@ function setupPassport(models) {
   }));
   passport.serializeUser<any>((user, done) => {
     getStatsDInstance().increment('cw.users.logged_in');
-    getStatsDInstance().set('cw.users.unique', user.id);
+    if (user?.id) {
+      getStatsDInstance().set('cw.users.unique', user.id);
+    }
     done(null, user.id);
   });
 
