@@ -1,7 +1,7 @@
 import {
   SubstrateTypes,
   CWEvent,
-} from '@commonwealth/chain-events';
+} from '@commonwealth/chain-events'; // TODO: remove this?
 
 import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
 
@@ -26,7 +26,7 @@ const setupChainEventListeners = async (
   _models,
   wss: WebSocket.Server,
 ): Promise<{}> => {
-  const pool = new Pool({
+  const pool = new Pool({ // TODO: convert to sequelize - remove pgIdentity from CW (not from CE)
     connectionString: DATABASE_URI,
     ssl: {
       rejectUnauthorized: false
@@ -77,7 +77,7 @@ const setupChainEventListeners = async (
   const substrateEventHandlers = [identityHandler, userFlagsHandler]
 
   // get all chains that
-  const substrateChains = (await pool.query(`SELECT "id" FROM "Chains" WHERE "base"='substrate'`)).rows
+  const substrateChains = (await pool.query(`SELECT "id" FROM "Chains" WHERE "base"='substrate'`)).rows.map(obj => obj.id)
 
   // feed the events into their respective handlers
   async function processClassicEvents(event: CWEvent): Promise<void> {
@@ -127,7 +127,7 @@ const setupChainEventListeners = async (
     );
   }
 
-  log.info('consumer started')
+  log.info('Consumer started')
   return {eventsSubscriber, identitySubscriber};
 };
 
@@ -136,7 +136,7 @@ async function main() {
     log.info('Starting consumer...')
     await setupChainEventListeners(models, null)
   } catch (error) {
-    log.fatal('Chain event listener setup failed', error);
+    log.fatal('Consumer setup failed', error);
   }
 }
 

@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "build": "webpack --config webpack/webpack.config.prod.js --progress",
+    "build": "webpack --config webpack/webpack.config.prod.js --progress && tsc --project tsconfig.consumer.json",
     "build-contracts": "./scripts/build-contracts.sh",
     "build:css": "tailwindcss build client/styles/style.css -o client/styles/lib/style.css",
     "stylelint": "stylelint client/styles/*",

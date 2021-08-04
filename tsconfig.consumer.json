@@ -12,13 +12,22 @@
     "downlevelIteration": true,
     "traceResolution": true
   },
-  "files": ["./setupChainEventListeners.ts", "./dbNode.ts"],
+  "files": [
+    "server/scripts/setupChainEventListeners.ts",
+    "server/scripts/dbNode.ts",
+  ],
+  "include": [
+    "server/models/*",
+    "server/models/"
+  ],
   "exclude": [
-    "../node_modules",
-    "../client/scripts/controllers/chain/ethereum/contracts/*",
-    "../shared/adapters",
-    "../",
-    "../eth/types",
-    "../client"
+    "server/passport.ts",
+    "server/router.ts",
+    "server/webhookNotifier.ts",
+    "server/socket",
+    "server/migrations",
+    "node_modules",
+    "build",
+    "dist",
   ]
 }
