@@ -95,7 +95,7 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
     return m('section.TokensCommunityComponent', {
       class: 'bg-gray-700'
     }, [
-      m('div', { class: 'relative mx-auto', style: 'max-width:1400px' }, [
+      m('div', { class: 'relative mx-auto' }, [
         m('div', { class: 'md:flex md:flex-row' }, [
           m('div',
             { class: 'flex items-center justify-center md:w-2/4' }, [
