@@ -2878,11 +2878,6 @@
   resolved "https://registry.yarnpkg.com/@types/abstract-leveldown/-/abstract-leveldown-5.0.1.tgz#3c7750d0186b954c7f2d2f6acc8c3c7ba0c3412e"
   integrity sha512-wYxU3kp5zItbxKmeRYCEplS2MW7DzyBnxPGj+GJVHZEUZiK/nn5Ei1sUFgURDh+X051+zsGe28iud3oHjrYWQQ==
 
-"@types/bluebird@*":
-  version "3.5.30"
-  resolved "https://registry.npmjs.org/@types/bluebird/-/bluebird-3.5.30.tgz"
-  integrity sha512-8LhzvcjIoqoi1TghEkRMkbbmM+jhHnBokPGkJWjclMK+Ks0MxEBow3/p2/iFTZ+OIbJHQDSfpgdZEb+af3gfVw==
-
 "@types/bn.js@^4.11.3", "@types/bn.js@^4.11.5", "@types/bn.js@^4.11.6":
   version "4.11.6"
   resolved "https://registry.npmjs.org/@types/bn.js/-/bn.js-4.11.6.tgz"
@@ -2936,13 +2931,6 @@
   version "3.4.33"
   resolved "https://registry.npmjs.org/@types/connect/-/connect-3.4.33.tgz"
   integrity sha512-2+FrkXY4zllzTNfJth7jOqEHC+enpLeGslEhpnTAkg21GkRrWV4SsAtqchtT4YS9/nODBU2/ZfsBY2X4J/dX7A==
-  dependencies:
-    "@types/node" "*"
-
-"@types/continuation-local-storage@*":
-  version "3.2.2"
-  resolved "https://registry.npmjs.org/@types/continuation-local-storage/-/continuation-local-storage-3.2.2.tgz"
-  integrity sha512-aItm+aYPJ4rT1cHmAxO+OdWjSviQ9iB5UKb5f0Uvgln0N4hS2mcDodHtPiqicYBXViUYhqyBjhA5uyOcT+S34Q==
   dependencies:
     "@types/node" "*"
 
@@ -3056,7 +3044,7 @@
     "@types/abstract-leveldown" "*"
     "@types/node" "*"
 
-"@types/lodash@*", "@types/lodash@^4.14.123":
+"@types/lodash@^4.14.123":
   version "4.14.149"
   resolved "https://registry.npmjs.org/@types/lodash/-/lodash-4.14.149.tgz"
   integrity sha512-ijGqzZt/b7BfzcK9vTrS6MFljQRPn5BFWOx8oE0GYxribu6uV+aA9zZuXI1zc/etK9E8nrgdoF2+LgUw7+9tJQ==
@@ -3240,16 +3228,6 @@
   dependencies:
     "@types/node" "*"
 
-"@types/sequelize@^4.28.10":
-  version "4.28.10"
-  resolved "https://registry.yarnpkg.com/@types/sequelize/-/sequelize-4.28.10.tgz#514b716718d4f6f398daaff78c05153534f2104e"
-  integrity sha512-GKbEbl6uyEYTPvU2JZvmqZHfpwTTjaZvNSd2gFJrhcxUL1bcyG7i+S8Od2L0/+skrk2bBINl7J1Sugo0mgIY3g==
-  dependencies:
-    "@types/bluebird" "*"
-    "@types/continuation-local-storage" "*"
-    "@types/lodash" "*"
-    "@types/validator" "*"
-
 "@types/serve-static@*":
   version "1.13.3"
   resolved "https://registry.npmjs.org/@types/serve-static/-/serve-static-1.13.3.tgz"
@@ -3285,11 +3263,6 @@
   version "2.0.3"
   resolved "https://registry.npmjs.org/@types/unist/-/unist-2.0.3.tgz"
   integrity sha512-FvUupuM3rlRsRtCN+fDudtmytGO6iHJuuRKS1Ss0pG5z8oX0diNEw94UEL7hgDbpN94rgaK5R7sWm6RrSkZuAQ==
-
-"@types/validator@*":
-  version "13.0.0"
-  resolved "https://registry.npmjs.org/@types/validator/-/validator-13.0.0.tgz"
-  integrity sha512-WAy5txG7aFX8Vw3sloEKp5p/t/Xt8jD3GRD9DacnFv6Vo8ubudAsRTXgxpQwU0mpzY/H8U4db3roDuCMjShBmw==
 
 "@types/vfile-message@*":
   version "2.0.0"
