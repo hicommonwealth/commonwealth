@@ -293,6 +293,22 @@ const NotificationRow: m.Component<{
         class: notification.isRead ? '' : 'unread',
         key: notification.id,
         id: notification.id,
+        oncontextmenu: async (e) => {
+          e.preventDefault();
+          if (vnode.state.scrollOrStop) { vnode.state.scrollOrStop = false; return; }
+          const notificationArray: Notification[] = [];
+          notificationArray.push(notification);
+          app.user.notifications.markAsRead(notificationArray).then(() => m.redraw());
+
+          let newPath = window.location.origin;
+
+          if (!app.isCustomDomain()) {
+            newPath += `/${app.activeId()}`;
+          }
+          window.open(`${newPath}/notificationsList?id=${notification.id}`, '_blank');
+
+          m.redraw.sync();
+        },
         onclick: async () => {
           if (vnode.state.scrollOrStop) { vnode.state.scrollOrStop = false; return; }
           const notificationArray: Notification[] = [];
@@ -349,6 +365,12 @@ const NotificationRow: m.Component<{
         class: notification.isRead ? '' : 'unread',
         key: notification.id,
         id: notification.id,
+        oncontextmenu: async (e) => {
+          e.preventDefault();
+          app.user.notifications.markAsRead(notifications);
+          window.open(path.replace(/ /g, '%20'), '_blank');
+          if (pageJump) setTimeout(() => pageJump(), 1);
+        },
         onclick: async () => {
           app.user.notifications.markAsRead(notifications);
           await m.route.set(path.replace(/ /g, '%20')); // fix for improperly generated notification paths
