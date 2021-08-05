@@ -693,6 +693,7 @@ export const ProposalBodyEditor: m.Component<{
         oncreateBind: (state) => {
           parentState.quillEditorState = state;
         },
+        imageUploader: true,
         tabindex: 1,
         theme: 'snow',
         editorNamespace: isThread

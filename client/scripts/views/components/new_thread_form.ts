@@ -562,6 +562,7 @@ export const NewThreadForm: m.Component<{
               },
               placeholder: 'Comment (optional)',
               editorNamespace: 'new-link',
+              imageUploader: true,
               tabindex: 4,
             })
           ]),
@@ -654,6 +655,7 @@ export const NewThreadForm: m.Component<{
                 vnode.state.quillEditorState = state;
               },
               editorNamespace: 'new-discussion',
+              imageUploader: true,
               tabindex: 3,
             }),
           ]),
