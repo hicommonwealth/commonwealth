@@ -1,10 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import { SERVER_URL } from '../config';
 import { NotificationCategories } from '../../shared/types';
-import { factory, formatFilename } from '../../shared/logging';
+import log from '../../shared/logging';
 import { redirectWithLoginSuccess, redirectWithLoginError } from './finishEmailLogin';
 
-const log = factory.getLogger(formatFilename(__filename));
 
 const finishOAuthLogin = async (models, req: Request, res: Response, next: NextFunction) => {
   const token = req.query.token;

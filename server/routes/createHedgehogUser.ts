@@ -1,9 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { successResponse } from '../util/apiHelpers';
 import { redirectWithLoginError, redirectWithLoginSuccess } from './finishEmailLogin';
-import { factory, formatFilename } from '../../shared/logging';
-
-const log = factory.getLogger(formatFilename(__filename));
+import log from '../../shared/logging';
 
 export const Errors = {
   AccountExists: 'Account already exists for user, try logging in',

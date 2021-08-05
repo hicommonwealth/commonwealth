@@ -20,9 +20,8 @@ import { ChainAttributes, ChainInstance } from './chain';
 import { UserAttributes } from './user';
 import { OffchainProfileAttributes } from './offchain_profile';
 import { RoleAttributes } from './role';
-import { factory, formatFilename } from '../../shared/logging';
+import log from '../../shared/logging';
 import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
-const log = factory.getLogger(formatFilename(__filename));
 
 // tslint:disable-next-line
 const ethUtil = require('ethereumjs-util');

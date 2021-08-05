@@ -5,8 +5,7 @@ import WebSocket from 'ws';
 import { IEventHandler, CWEvent, IChainEventKind } from '@commonwealth/chain-events';
 import { NotificationCategories } from '../../shared/types';
 
-import { factory, formatFilename } from '../../shared/logging';
-const log = factory.getLogger(formatFilename(__filename));
+import log from '../../shared/logging';
 
 export default class extends IEventHandler {
   constructor(

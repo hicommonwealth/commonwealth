@@ -6,8 +6,7 @@ import { IEventHandler, CWEvent, IChainEventKind, SubstrateTypes } from '@common
 import Sequelize from 'sequelize';
 const Op = Sequelize.Op;
 
-import { factory, formatFilename } from '../../shared/logging';
-const log = factory.getLogger(formatFilename(__filename));
+import log from '../../shared/logging';
 
 // A mapping of supported Event Kinds to create empty profiles for, along with
 // the specific field to use in fetching the address.

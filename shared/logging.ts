@@ -1,3 +1,4 @@
+/*
 import {
   LoggerFactory,
   LoggerFactoryOptions,
@@ -29,3 +30,10 @@ const factoryControl = control.getLoggerFactoryControl(0);
 // (so all existing/new loggers from this factory will log to Debug)
 const logLevel = process.env.NODE_ENV !== 'production' ? 'Debug' : 'Info';
 factoryControl.change({ group: 'all', logLevel } as LogGroupControlSettings);
+*/
+import { Logger } from 'tslog';
+const log = new Logger({
+  minLevel: process.env.NODE_ENV !== 'production' ? 'debug' : 'info',
+  colorizePrettyLogs: process.env.NODE_ENV !== 'production',
+});
+export default log;

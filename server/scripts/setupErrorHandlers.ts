@@ -1,5 +1,4 @@
-import { factory, formatFilename } from '../../shared/logging';
-const log = factory.getLogger(formatFilename(__filename));
+import log from '../../shared/logging';
 
 const setupErrorHandlers = (app, rollbar) => {
   // catch 404 and forward to error handler

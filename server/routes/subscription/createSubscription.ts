@@ -1,9 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import proposalIdToEntity from '../../util/proposalIdToEntity';
 import Errors from './errors';
-import { factory, formatFilename } from '../../../shared/logging';
-
-const log = factory.getLogger(formatFilename(__filename));
+import log from '../../../shared/logging';
 
 export default async (models, req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {

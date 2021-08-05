@@ -2,8 +2,7 @@ import fetch from 'node-fetch';
 import _ from 'underscore';
 
 import { TokenResponse } from '../../shared/types';
-import { factory, formatFilename } from '../../shared/logging';
-const log = factory.getLogger(formatFilename(__filename));
+import log from '../../shared/logging';
 
 const TWENTY_FOUR_HOURS = 86400000;
 

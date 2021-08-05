@@ -3,8 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import { sequelize } from '../database';
 import TokenBalanceCache from '../util/tokenBalanceCache';
 
-import { factory, formatFilename } from '../../shared/logging';
-const log = factory.getLogger(formatFilename(__filename));
+import log from '../../shared/logging';
 
 const getTokenForum = async (
   models,

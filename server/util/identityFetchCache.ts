@@ -2,8 +2,7 @@ import { SubstrateEvents } from '@commonwealth/chain-events';
 import IdentityEventHandler from '../eventHandlers/identity';
 import JobRunner from './cacheJobRunner';
 
-import { factory, formatFilename } from '../../shared/logging';
-const log = factory.getLogger(formatFilename(__filename));
+import log from '../../shared/logging';
 
 // list of identities to fetch
 type CacheT = { [chain: string]: string[] }

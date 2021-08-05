@@ -4,9 +4,7 @@ import Sequelize, { QueryTypes } from 'sequelize';
 
 import { DATABASE_URI } from './config';
 
-import { factory, formatFilename } from '../shared/logging';
-
-const log = factory.getLogger(formatFilename(__filename));
+import log from '../shared/logging';
 
 export const sequelize = new Sequelize(DATABASE_URI, {
   // disable string operators (https://github.com/sequelize/sequelize/issues/8417)
@@ -40,7 +38,6 @@ fs.readdirSync(`${__dirname}/models`)
       db[model.name] = model;
     }
   });
-
 
 // setup associations
 Object.keys(db).forEach((modelName) => {

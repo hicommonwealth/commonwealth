@@ -11,9 +11,8 @@ import { Codec } from '@polkadot/types/types';
 import UserFlagsHandler from '../eventHandlers/userFlags';
 import { ChainNodeInstance } from '../models/chain_node';
 
-import { factory, formatFilename } from '../../shared/logging';
+import log from '../../shared/logging';
 import { constructSubstrateUrl } from '../../shared/substrate';
-const log = factory.getLogger(formatFilename(__filename));
 
 export default async function (models, chain?: string): Promise<void> {
   // 1. fetch the node and url of supported/selected chains
