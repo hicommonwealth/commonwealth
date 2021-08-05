@@ -1,5 +1,7 @@
 import crypto from 'crypto';
 
+import tsmodels from '../database';
+const models = tsmodels as any;
 import { NotificationCategories } from '../../shared/types';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
@@ -775,7 +777,7 @@ const specs = {
   },
 };
 
-const resetServer = (models): Promise<number> => {
+const resetServer = (): Promise<number> => {
   log.debug('Resetting database...');
   return new Promise((resolve) => {
     models.sequelize.sync({ force: true }).then(async () => {
@@ -1434,4 +1436,22 @@ const resetServer = (models): Promise<number> => {
   });
 };
 
-export default resetServer;
+async function main() {
+  if (!process.argv.slice(2).includes('-y')) {
+    console.log('Reset Server is deprecated functionality.');
+    console.log('Unless you know what you\'re doing, please use `yarn reset-db && yarn load-db` instead.');
+    console.log('To reset the server anyway, rerun with the \'-y\' flag.');
+    process.exit(1);
+  }
+  log.info('Beginning reset server...');
+  let rc: number;
+  try {
+    rc = await resetServer();
+  } catch (e) {
+    log.error(`Reset server failed: ${e.message}`);
+    rc = -1;
+  }
+  process.exit(rc);
+}
+
+main();
