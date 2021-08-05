@@ -6,11 +6,9 @@ import sleep from 'sleep-promise';
 
 import { IEventSubscriber } from '../interfaces';
 import { ERC20__factory as ERC20Factory } from '../contractTypes';
-import { factory, formatFilename } from '../logging';
+import log from '../logging';
 
 import { RawEvent, Api, Token } from './types';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 export class Subscriber extends IEventSubscriber<Api, RawEvent> {
   private _name: string;

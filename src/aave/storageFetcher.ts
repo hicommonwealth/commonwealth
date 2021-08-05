@@ -4,7 +4,7 @@ import {
   IDisconnectedRange,
   isEntityCompleted,
 } from '../interfaces';
-import { factory, formatFilename } from '../logging';
+import log from '../logging';
 
 import {
   IEventData,
@@ -15,8 +15,6 @@ import {
   IVoteEmitted,
   EventChains,
 } from './types';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 export class StorageFetcher extends IStorageFetcher<Api> {
   constructor(protected readonly _api: Api) {

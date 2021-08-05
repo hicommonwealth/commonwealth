@@ -7,15 +7,13 @@ import {
   SubscribeFunc,
   ISubscribeOptions,
 } from '../interfaces';
-import { factory, formatFilename } from '../logging';
+import log from '../logging';
 
 import { Subscriber } from './subscriber';
 import { Poller } from './poller';
 import { Processor } from './processor';
 import { Block, IEventData } from './types';
 import { EnricherConfig } from './filters/enricher';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 export interface ISubstrateSubscribeOptions
   extends ISubscribeOptions<ApiPromise> {

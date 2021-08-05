@@ -8,7 +8,7 @@ import {
   SubscribeFunc,
   ISubscribeOptions,
 } from '../interfaces';
-import { factory, formatFilename } from '../logging';
+import log from '../logging';
 import {
   MPond__factory as MPondFactory,
   GovernorAlpha__factory as GovernorAlphaFactory,
@@ -19,8 +19,6 @@ import { Subscriber } from './subscriber';
 import { Processor } from './processor';
 import { StorageFetcher } from './storageFetcher';
 import { IEventData, RawEvent, Api } from './types';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 /**
  * Attempts to open an API connection, retrying if it cannot be opened.

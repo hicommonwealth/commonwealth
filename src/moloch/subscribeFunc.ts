@@ -7,14 +7,12 @@ import {
   Moloch2__factory as Moloch2Factory,
 } from '../contractTypes';
 import { IDisconnectedRange, CWEvent, SubscribeFunc } from '../interfaces';
-import { factory, formatFilename } from '../logging';
+import log from '../logging';
 
 import { Subscriber } from './subscriber';
 import { Processor } from './processor';
 import { StorageFetcher } from './storageFetcher';
 import { IEventData, RawEvent, Api, SubscribeOptions } from './types';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 /**
  * Attempts to open an API connection, retrying if it cannot be opened.

@@ -2,15 +2,13 @@ import sleep from 'sleep-promise';
 
 import { createProvider } from '../eth';
 import { CWEvent, SubscribeFunc, ISubscribeOptions } from '../interfaces';
-import { factory, formatFilename } from '../logging';
+import log from '../logging';
 import { ERC20__factory as ERC20Factory } from '../contractTypes';
 
 import { Subscriber } from './subscriber';
 import { Processor } from './processor';
 import { IEventData, RawEvent, Api } from './types';
 import { EnricherConfig } from './filters/enricher';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 export interface IErc20SubscribeOptions extends ISubscribeOptions<Api> {
   enricherConfig?: EnricherConfig;
