@@ -3,4 +3,8 @@
 .ProposalsPage {
     padding-bottom: 60px;
     @include gov-explainer;
+    .active-proposals, .inactive-proposals {
+        display: flex;
+        flex-wrap: wrap;
+    }
 }

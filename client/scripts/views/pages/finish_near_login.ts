@@ -3,7 +3,7 @@ import mixpanel from 'mixpanel-browser';
 import * as nearlib from 'nearlib';
 
 import app from 'state';
-import { initAppState } from 'app';
+import { initAppState, navigateToSubpage } from 'app';
 
 import { updateActiveAddresses, createUserWithAddress, setActiveAccount } from 'controllers/app/login';
 import Near from 'controllers/chain/near/main';
@@ -38,14 +38,14 @@ const redirectToNextPage = () => {
         localStorage.removeItem('nearPostAuthRedirect');
         m.route.set(postAuth.path, {}, { replace: true });
       } else {
-        m.route.set(`/${app.activeChainId()}/`, { replace: true });
+        navigateToSubpage('/', { replace: true });
       }
       return;
     } catch (e) {
       console.log('Error restoring path from localStorage');
     }
   }
-  m.route.set(`/${app.activeChainId()}/`, { replace: true });
+  navigateToSubpage('/', { replace: true });
 };
 
 const FinishNearLogin: m.Component<{}, IState> = {

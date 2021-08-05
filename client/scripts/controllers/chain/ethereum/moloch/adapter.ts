@@ -1,10 +1,10 @@
 
-import { Moloch1Factory } from 'Moloch1Factory';
+import { Moloch1__factory } from 'eth/types';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
-import { ChainBase, ChainClass, IChainAdapter, NodeInfo } from 'models';
+import { ChainBase, IChainAdapter, NodeInfo } from 'models';
 
 import ChainEntityController from 'controllers/server/chain_entities';
 import { IApp } from 'state';
@@ -16,7 +16,6 @@ import MolochGovernance from './governance';
 
 export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount> {
   public readonly base = ChainBase.Ethereum;
-  public readonly class = ChainClass.Moloch;
   public chain: MolochChain;
   public ethAccounts: EthereumAccounts;
   public accounts: MolochMembers;
@@ -35,7 +34,7 @@ export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount>
     await this.chain.resetApi(this.meta);
     await this.chain.initMetadata();
     await this.ethAccounts.init(this.chain);
-    const api = new MolochAPI(Moloch1Factory.connect, this.meta.address, this.chain.api.currentProvider as any);
+    const api = new MolochAPI(Moloch1__factory.connect, this.meta.address, this.chain.api.currentProvider as any);
     await api.init();
     this.chain.molochApi = api;
     await this.accounts.init(api);

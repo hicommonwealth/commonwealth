@@ -3,15 +3,16 @@ import 'pages/new_proposal_page.scss';
 import $ from 'jquery';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
+import { utils } from 'ethers';
 import { Input, TextArea, Form, FormLabel, FormGroup, Button, Grid, Col, Spinner } from 'construct-ui';
 import BN from 'bn.js';
 import { blake2AsHex } from '@polkadot/util-crypto';
 
 import app from 'state';
-import { ITXModalData, ProposalModule, ChainBase, ChainClass, OffchainThreadKind, OffchainThreadStage } from 'models';
-import { ProposalType, proposalSlugToClass, proposalSlugToFriendlyName } from 'identifiers';
+import { ITXModalData, ProposalModule, ChainBase, OffchainThreadKind, OffchainThreadStage, ChainNetwork } from 'models';
+import { ProposalType, proposalSlugToClass } from 'identifiers';
 import { formatCoin } from 'adapters/currency';
-import { CosmosToken } from 'adapters/chain/cosmos/types';
+import { CosmosToken } from 'controllers/chain/cosmos/types';
 
 import { notifyError } from 'controllers/app/notifications';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
@@ -20,7 +21,6 @@ import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collect
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
-import MarlinHolder from 'controllers/chain/ethereum/marlin/holder';
 import Marlin from 'controllers/chain/ethereum/marlin/adapter';
 import { MarlinProposalArgs } from 'controllers/chain/ethereum/marlin/governance';
 
@@ -28,11 +28,14 @@ import {
   DropdownFormField,
   RadioSelectorFormField
 } from 'views/components/forms';
+import User from 'views/components/widgets/user';
 import EdgewareFunctionPicker from 'views/components/edgeware_function_picker';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 import TopicSelector from 'views/components/topic_selector';
 import ErrorPage from 'views/pages/error';
 import SubstrateBountyTreasury from 'controllers/chain/substrate/bountyTreasury';
+import { AaveProposalArgs } from 'controllers/chain/ethereum/aave/governance';
+import Aave from 'controllers/chain/ethereum/aave/adapter';
 
 // this should be titled the Substrate/Edgeware new proposal form
 const NewProposalForm = {
@@ -48,7 +51,7 @@ const NewProposalForm = {
 
     if (!author) return m('div', 'Must be logged in');
     if (!callback) return m('div', 'Must have callback');
-    if (app.chain?.class === ChainClass.Plasm) return m('div', 'Unsupported network');
+    if (app.chain?.network === ChainNetwork.Plasm) return m('div', 'Unsupported network');
 
     let hasCouncilMotionChooser : boolean;
     let hasAction : boolean;
@@ -57,11 +60,14 @@ const NewProposalForm = {
     let hasTitleAndDescription : boolean;
     let hasBountyTitle : boolean;
     let hasTopics : boolean;
-    let hasBeneficiaryAndAmount : boolean;
+    let hasBeneficiary : boolean;
+    let hasAmount: boolean;
     let hasPhragmenInfo : boolean;
     let hasDepositChooser : boolean;
     // bounty proposal
     let hasBountyValue : boolean;
+    // tip
+    let hasTipsFields : boolean;
     // council motion
     let hasVotingPeriodAndDelaySelector : boolean;
     let hasReferendumSelector : boolean;
@@ -72,6 +78,8 @@ const NewProposalForm = {
     let hasMolochFields : boolean;
     // marlin proposal
     let hasMarlinFields : boolean;
+    // aave proposal
+    let hasAaveFields: boolean;
     // data loaded
     let dataLoaded : boolean = true;
 
@@ -100,7 +108,8 @@ const NewProposalForm = {
       hasTitleAndDescription = true;
       hasTopics = true;
     } else if (proposalTypeEnum === ProposalType.SubstrateTreasuryProposal) {
-      hasBeneficiaryAndAmount = true;
+      hasBeneficiary = true;
+      hasAmount = true;
       const treasury = (app.chain as Substrate).treasury;
       dataLoaded = !!treasury.initialized;
     } else if (proposalTypeEnum === ProposalType.SubstrateBountyProposal) {
@@ -108,6 +117,12 @@ const NewProposalForm = {
       hasBountyValue = true;
       const bountyTreasury = (app.chain as Substrate).bounties;
       dataLoaded = !!bountyTreasury.initialized;
+    } else if (proposalTypeEnum === ProposalType.SubstrateTreasuryTip) {
+      hasTipsFields = true;
+      // TODO: this is only true if the proposer is doing reportAwesome()
+      //   we need special code for newTip().
+      const tips = (app.chain as Substrate).tips;
+      dataLoaded = !!tips.initialized;
     } else if (proposalTypeEnum === ProposalType.PhragmenCandidacy) {
       hasPhragmenInfo = true;
       const elections = (app.chain as Substrate).phragmenElections;
@@ -120,6 +135,8 @@ const NewProposalForm = {
       hasMolochFields = true;
     } else if (proposalTypeEnum === ProposalType.MarlinProposal) {
       hasMarlinFields = true;
+    } else if (proposalTypeEnum === ProposalType.AaveProposal) {
+      hasAaveFields = true;
     } else {
       return m('.NewProposalForm', 'Invalid proposal type');
     }
@@ -200,15 +217,15 @@ const NewProposalForm = {
         if (vnode.state.councilMotionType === 'createExternalProposal') {
           args = [author, threshold, EdgewareFunctionPicker.getMethod(),
             EdgewareFunctionPicker.getMethod().encodedLength];
-          createFunc = ([a, t, m, l]) => (app.chain as Substrate).council.createExternalProposal(a, t, m, l);
+          createFunc = ([a, t, mt, l]) => (app.chain as Substrate).council.createExternalProposal(a, t, mt, l);
         } else if (vnode.state.councilMotionType === 'createExternalProposalMajority') {
           args = [author, threshold, EdgewareFunctionPicker.getMethod(),
             EdgewareFunctionPicker.getMethod().encodedLength];
-          createFunc = ([a, t, m, l]) => (app.chain as Substrate).council.createExternalProposalMajority(a, t, m, l);
+          createFunc = ([a, t, mt, l]) => (app.chain as Substrate).council.createExternalProposalMajority(a, t, mt, l);
         } else if (vnode.state.councilMotionType === 'createExternalProposalDefault') {
           args = [author, threshold, EdgewareFunctionPicker.getMethod(),
             EdgewareFunctionPicker.getMethod().encodedLength];
-          createFunc = ([a, t, m, l]) => (app.chain as Substrate).council.createExternalProposalDefault(a, t, m, l);
+          createFunc = ([a, t, mt, l]) => (app.chain as Substrate).council.createExternalProposalDefault(a, t, mt, l);
         } else if (vnode.state.councilMotionType === 'createFastTrack') {
           args = [author, threshold, vnode.state.nextExternalProposalHash,
             vnode.state.votingPeriod, vnode.state.enactmentDelay];
@@ -248,6 +265,11 @@ const NewProposalForm = {
         args = [author, vnode.state.form.value, vnode.state.form.title];
         createFunc = ([a, v, t]) => (app.chain as Substrate).bounties.createTx(a, v, t);
         return createTXModal(createFunc(args)).then(done);
+      } else if (proposalTypeEnum === ProposalType.SubstrateBountyProposal) {
+        if (!vnode.state.form.reason) throw new Error('Invalid reason');
+        if (!vnode.state.form.beneficiary) throw new Error('Invalid beneficiary address');
+        const beneficiary = app.chain.accounts.get(vnode.state.form.beneficiary);
+        args = [vnode.state.form.reason, beneficiary];
       } else if (proposalTypeEnum === ProposalType.PhragmenCandidacy) {
         args = [author];
         createFunc = ([a]) => (app.chain as Substrate).phragmenElections.activeElection.submitCandidacyTx(a);
@@ -314,8 +336,60 @@ const NewProposalForm = {
           .then((result) => done(result))
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
+        return;
+      } else if (proposalTypeEnum === ProposalType.AaveProposal) {
+        vnode.state.proposer = app.user?.activeAccount?.address;
+        if (!vnode.state.proposer) throw new Error('Invalid address / not logged in');
+        if (!vnode.state.executor) throw new Error('Invalid executor');
+        if (!vnode.state.targets) throw new Error('No targets');
+        if (!vnode.state.values) throw new Error('No values');
+        // signatures optional
+        if (!vnode.state.signatures) {
+          vnode.state.signatures = '';
+        }
+        if (!vnode.state.calldatas) throw new Error('No calldatas');
+        if (!vnode.state.withDelegateCalls) throw new Error('No withDelegateCalls');
+        if (!vnode.state.ipfsHash) throw new Error('No ipfs hash');
 
+        // TODO: support multiple calls
+        const targets: string[] = [ vnode.state.targets ];
+        const values: string[] = [ vnode.state.values ];
+        const calldatas: string[] = [ vnode.state.calldatas ];
+        const signatures: string[] = [ vnode.state.signatures ];
+        const withDelegateCalls: boolean[] = [ vnode.state.withDelegateCalls ]
+          .map((v: string): boolean => {
+            if (v.trim().toLowerCase() === 'true') return true;
+            if (v.trim().toLowerCase() === 'false') return false;
+            throw new Error(`invalid withDelegateCalls string: ${v}`);
+          });
+
+        // TODO: preload this ipfs value to ensure it's correct
+        const ipfsHash = utils.formatBytes32String(vnode.state.ipfsHash);
+        const details: AaveProposalArgs = {
+          executor: vnode.state.executor as string,
+          targets,
+          values,
+          calldatas,
+          signatures,
+          withDelegateCalls,
+          ipfsHash,
+        };
+        (app.chain as Aave).governance.propose(details)
+          .then((result) => done(result))
+          .then(() => m.redraw())
+          .catch((err) => notifyError(err.toString()));
+        return;
         // @TODO: Create Proposal via WebTx
+      } else if (proposalTypeEnum === ProposalType.SubstrateTreasuryTip) {
+        if (!vnode.state.form.beneficiary) throw new Error('Invalid beneficiary address');
+        const beneficiary = app.chain.accounts.get(vnode.state.form.beneficiary);
+        args = [author, vnode.state.form.description, beneficiary];
+        mixpanel.track('Create Thread', {
+          'Step No': 2,
+          'Step' : 'Submit Proposal',
+          'Proposal Type': 'Tip',
+          'Thread Type': 'Proposal',
+        });
       } else {
         mixpanel.track('Create Thread', {
           'Step No': 2,
@@ -436,12 +510,12 @@ const NewProposalForm = {
               }),
             ]),
           ],
-          hasBeneficiaryAndAmount && [
+          hasBeneficiary && [
             m(FormGroup, [
               m(FormLabel, 'Beneficiary'),
               m(Input, {
                 name: 'beneficiary',
-                placeholder: 'Beneficiary of treasury proposal',
+                placeholder: 'Beneficiary of proposal',
                 defaultValue: author.address,
                 oncreate: (vvnode) => {
                   vnode.state.form.beneficiary = author.address;
@@ -453,12 +527,14 @@ const NewProposalForm = {
                 },
               }),
             ]),
+          ],
+          hasAmount && [
             m(FormGroup, [
               m(FormLabel, `Amount (${app.chain.chain.denom})`),
               m(Input, {
                 name: 'amount',
                 autofocus: true,
-                placeholder: 'Amount of treasury proposal',
+                placeholder: 'Amount of proposal',
                 autocomplete: 'off',
                 oninput: (e) => {
                   const result = (e.target as any).value;
@@ -741,6 +817,237 @@ const NewProposalForm = {
                 oninput: (e) => {
                   const result = (e.target as any).value;
                   vnode.state.description = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+          ],
+          hasAaveFields && [
+            m(FormGroup, [
+              m(FormLabel, 'Proposer (you)'),
+              m(Input, {
+                name: 'proposer',
+                value: `${app.user.activeAccount.address}`,
+                disabled: true,
+              }),
+            ]),
+            // TODO: validate this is the correct length, or else hash it ourselves
+            m(FormGroup, [
+              m(FormLabel, 'Proposal IPFS Hash'),
+              m(Input, {
+                name: 'ipfsHash',
+                placeholder: 'Proposal IPFS Hash',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.ipfsHash = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Proposal Executor'),
+              m(DropdownFormField, {
+                choices: (app.chain as Aave).governance.api.Executors.map(
+                  (r) => ({ name: 'executor', value: r.address, label: `${r.address}` })
+                ),
+                callback: (result) => {
+                  vnode.state.executor = result;
+                  m.redraw();
+                },
+                callbackOnInit: true,
+              }),
+            ]),
+            // TODO: display offchain copy re AIPs and ARCs from https://docs.aave.com/governance/
+            // TODO: make this a form where you add target + value + calldata + signature + withDelegate
+            //  pairings one by one
+            m(FormGroup, [
+              m(FormLabel, 'Proposal Targets'),
+              m(Input, {
+                name: 'targets',
+                placeholder: 'Proposal Targets',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.targets = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Proposal Values'),
+              m(Input, {
+                name: 'values',
+                placeholder: 'Proposal Values',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.values = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Proposal Calldatas'),
+              m(Input, {
+                name: 'calldatas',
+                placeholder: 'Proposal Calldatas',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.calldatas = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Proposal Signatures'),
+              m(Input, {
+                name: 'signatures',
+                placeholder: 'Proposal Signatures',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.signatures = result;
+                  m.redraw();
+                },
+              }),
+              m(FormLabel, 'Proposal Delegate Calls'),
+              m(Input, {
+                name: 'withDelegateCalls',
+                placeholder: 'Proposal Delegate Calls (false,true,false...)',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.withDelegateCalls = result;
+                },
+              }),
+            ]),
+          ],
+          hasTipsFields && [
+            m(FormGroup, [
+              m('.label', 'Finder'),
+              m(User, {
+                user: author,
+                linkify: true,
+                popover: true,
+                showAddressWithDisplayName: true,
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Beneficiary'),
+              m(Input, {
+                name: 'beneficiary',
+                placeholder: 'Beneficiary of treasury proposal',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.form.beneficiary = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Reason'),
+              m(TextArea, {
+                name: 'reason',
+                placeholder: 'What’s the reason you want to tip the beneficiary?',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  if (vnode.state.form.description === result) return;
+                  vnode.state.form.description = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+          ],
+          hasAaveFields && [
+            m(FormGroup, [
+              m(FormLabel, 'Proposer (you)'),
+              m(Input, {
+                name: 'proposer',
+                value: `${app.user.activeAccount.address}`,
+                disabled: true,
+              }),
+            ]),
+            // TODO: validate this is the correct length, or else hash it ourselves
+            m(FormGroup, [
+              m(FormLabel, 'Proposal IPFS Hash'),
+              m(Input, {
+                name: 'ipfsHash',
+                placeholder: 'Proposal IPFS Hash',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.ipfsHash = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Proposal Executor'),
+              m(DropdownFormField, {
+                choices: (app.chain as Aave).governance.api.Executors.map(
+                  (r) => ({ name: 'executor', value: r.address, label: `${r.delay / (60 * 60 * 24)} Day(s) Voting` })
+                ),
+                callback: (result) => {
+                  vnode.state.executor = result;
+                  m.redraw();
+                },
+                callbackOnInit: true,
+              }),
+            ]),
+            // TODO: display offchain copy re AIPs and ARCs from https://docs.aave.com/governance/
+            // TODO: make this a form where you add target + value + calldata + signature + withDelegate
+            //  pairings one by one
+            m(FormGroup, [
+              m(FormLabel, 'Proposal Target'),
+              m(Input, {
+                name: 'targets',
+                placeholder: 'Proposal Target',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.targets = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Proposal Value'),
+              m(Input, {
+                name: 'values',
+                placeholder: 'Proposal Value',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.values = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Proposal Calldata'),
+              m(Input, {
+                name: 'calldatas',
+                placeholder: 'Proposal Calldata',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.calldatas = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Proposal Signature'),
+              m(Input, {
+                name: 'signatures',
+                placeholder: 'Proposal Signature',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.signatures = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Proposal Delegate Call'),
+              m(Input, {
+                name: 'withDelegateCalls',
+                placeholder: 'false',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.withDelegateCalls = result;
                   m.redraw();
                 },
               }),

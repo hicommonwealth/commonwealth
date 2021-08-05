@@ -39,7 +39,6 @@ import setupAPI from './server/router';
 import setupPassport from './server/passport';
 import setupChainEventListeners from './server/scripts/setupChainEventListeners';
 import { fetchStats } from './server/routes/getEdgewareLockdropStats';
-import migrateChainEntities from './server/scripts/migrateChainEntities';
 import migrateIdentities from './server/scripts/migrateIdentities';
 import migrateCouncillorValidatorFlags from './server/scripts/migrateCouncillorValidatorFlags';
 
@@ -66,7 +65,6 @@ async function main() {
 
   // CLI parameters used to configure specific tasks
   const SKIP_EVENT_CATCHUP = process.env.SKIP_EVENT_CATCHUP === 'true';
-  const ENTITY_MIGRATION = process.env.ENTITY_MIGRATION;
   const IDENTITY_MIGRATION = process.env.IDENTITY_MIGRATION;
   const FLAG_MIGRATION = process.env.FLAG_MIGRATION;
   const CHAIN_EVENTS = process.env.CHAIN_EVENTS;
@@ -138,18 +136,6 @@ async function main() {
       rc = 0;
     } catch (e) {
       log.error('Failed adding Lockdrop statistics into the DB: ', e.message);
-      rc = 1;
-    }
-  } else if (ENTITY_MIGRATION) {
-    // "all" means run for all supported chains, otherwise we pass in the name of
-    // the specific chain to migrate
-    log.info('Started migrating chain entities into the DB');
-    try {
-      await migrateChainEntities(models, ENTITY_MIGRATION === 'all' ? undefined : ENTITY_MIGRATION);
-      log.info('Finished migrating chain entities into the DB');
-      rc = 0;
-    } catch (e) {
-      log.error('Failed migrating chain entities into the DB: ', e.message);
       rc = 1;
     }
   } else if (IDENTITY_MIGRATION) {
@@ -233,13 +219,7 @@ async function main() {
     });
 
     // redirect to https:// unless we are using a test domain
-    app.use(redirectToHTTPS(DEV ? [
-      /gov.edgewa.re:(\d{4})/,
-      /gov2.edgewa.re:(\d{4})/,
-      /gov3.edgewa.re:(\d{4})/,
-      /localhost:(\d{4})/,
-      /127.0.0.1:(\d{4})/
-    ] : [
+    app.use(redirectToHTTPS([
       /localhost:(\d{4})/,
       /127.0.0.1:(\d{4})/
     ], [], 301));
@@ -284,7 +264,6 @@ async function main() {
   })();
 
   const sendFile = (res) => res.sendFile(`${__dirname}/build/index.html`);
-
 
   // Only run prerender in DEV environment if the WITH_PRERENDER flag is provided.
   // On the other hand, run prerender by default on production.

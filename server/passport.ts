@@ -11,8 +11,8 @@ import { Strategy as MagicStrategy } from 'passport-magic';
 
 import { sequelize } from './database';
 import { factory, formatFilename } from '../shared/logging';
+import { getStatsDInstance } from './util/metrics';
 const log = factory.getLogger(formatFilename(__filename));
-
 
 import {
   JWT_SECRET, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_OAUTH_CALLBACK, MAGIC_API_KEY, MAGIC_SUPPORTED_BASES,
@@ -267,7 +267,21 @@ function setupPassport(models) {
     // Existing Github account. If there is already a user logged-in,
     // transfer the Github link to the current user.
     if (githubAccount !== null) {
-      // update profile data
+      // Handle OAuth for custom domains.
+      //
+      // If req.query.from is a valid custom domain for a community,
+      // associate our LoginToken with this Github account. We will
+      // redirect to [customdomain] afterwards and consume this
+      // LoginToken to get a new login session.
+      if ((req as any).loginTokenForRedirect) {
+        const tokenObj = await models.LoginToken.findOne({
+          where: { id: (req as any).loginTokenForRedirect }
+        });
+        tokenObj.social_account = githubAccount.id;
+        await tokenObj.save();
+      }
+
+      // Update profile data on the SocialAccount.
       if (accessToken !== githubAccount.access_token
         || refreshToken !== githubAccount.refresh_token
         || profile.username !== githubAccount.provider_username) {
@@ -276,7 +290,8 @@ function setupPassport(models) {
         githubAccount.provider_username = profile.username;
         await githubAccount.save();
       }
-      // check associations and log in the correct user
+
+      // Check associations and log in the correct user.
       const user = await githubAccount.getUser();
       if (req.user === null && user === null) {
         const newUser = await models.User.create({ email: null });
@@ -284,12 +299,9 @@ function setupPassport(models) {
         return cb(null, newUser);
       } else if (req.user && req.user !== user) {
         // Github user has a user attached, and we're logged in to
-        // a different user. Move the Github link to the new user.
-        // await githubAccount.setUser(req.user);
-        // return cb(null, req.user);
-        // TODO: We should probably just block the login, rather than moving the Github account
-        log.error('Github already linked to ');
-        return cb(null, null);
+        // a different user. Log out the previous user.
+        req.logout();
+        return cb(null, user);
       } else {
         // Github account has a user attached, and we either aren't
         // logged in, or we're already logged in to that account.
@@ -318,6 +330,21 @@ function setupPassport(models) {
         location: profile._json.location,
       }
     });
+
+    // Handle OAuth for custom domains.
+    //
+    // If req.query.from is a valid custom domain for a community,
+    // associate our LoginToken with this Github account. We will
+    // redirect to [customdomain] afterwards and consume this
+    // LoginToken to get a new login session.
+    if ((req as any).loginTokenForRedirect) {
+      const tokenObj = await models.LoginToken.findOne({
+        where: { id: (req as any).loginTokenForRedirect }
+      });
+      tokenObj.social_account = newGithubAccount.id;
+      await tokenObj.save();
+    }
+
     if (req.user) {
       await newGithubAccount.setUser(req.user);
       return cb(null, req.user);
@@ -339,8 +366,11 @@ function setupPassport(models) {
       return cb(null, newUser);
     }
   }));
-
   passport.serializeUser<any>((user, done) => {
+    getStatsDInstance().increment('cw.users.logged_in');
+    if (user?.id) {
+      getStatsDInstance().set('cw.users.unique', user.id);
+    }
     done(null, user.id);
   });
 

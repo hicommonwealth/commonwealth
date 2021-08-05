@@ -29,7 +29,7 @@ const bulkEntities = async (models, req: Request, res: Response, next: NextFunct
       },
       {
         model: models.OffchainThread,
-        // attributes: ['title'],
+        attributes: ['title'],
         // required: false,
       }
     ],

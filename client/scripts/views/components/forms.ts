@@ -6,6 +6,7 @@ import { Button, CustomSelect } from 'construct-ui';
 
 interface IDropdownFormFieldAttrs {
   callback?: CallableFunction;
+  callbackOnInit?: boolean;
   choices: IDropdownFormFieldChoice[];
   defaultValue?: string;
   value?: string;
@@ -23,6 +24,11 @@ interface IDropdownFormFieldChoice {
 }
 
 export const DropdownFormField: m.Component<IDropdownFormFieldAttrs> = {
+  oninit: (vnode: m.VnodeDOM<IDropdownFormFieldAttrs>) => {
+    if (vnode.attrs.callbackOnInit && vnode.attrs.callback) {
+      vnode.attrs.callback(vnode.attrs.defaultValue || vnode.attrs.choices[0].value);
+    }
+  },
   view: (vnode: m.VnodeDOM<IDropdownFormFieldAttrs>) => {
     const { choices, name, defaultValue, subtitle, title } = vnode.attrs;
     if (!choices  || choices.length === 0) {

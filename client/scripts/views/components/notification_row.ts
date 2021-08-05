@@ -5,11 +5,12 @@ import _ from 'lodash';
 import m from 'mithril';
 import moment from 'moment';
 import {
-  SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents, IEventLabel, chainSupportedBy,
+  SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents, IEventLabel, chainSupportedBy, MarlinTypes, MarlinEvents, AaveTypes, AaveEvents,
   // MarlinEvents
 } from '@commonwealth/chain-events';
 
 import app from 'state';
+import { navigateToSubpage } from 'app';
 import { NotificationCategories } from 'types';
 import { ProposalType } from 'identifiers';
 import { Notification, AddressInfo } from 'models';
@@ -238,6 +239,8 @@ const NotificationRow: m.Component<{
       const chainId = notification.chainEvent.type.chain;
       const chainName = app.config.chains.getById(chainId)?.name;
       let label: IEventLabel;
+
+      if (app.isCustomDomain() && chainId !== app.customDomainId()) return;
       if (chainSupportedBy(chainId, SubstrateTypes.EventChains)) {
         label = SubstrateEvents.Label(
           notification.chainEvent.blockNumber,
@@ -250,12 +253,18 @@ const NotificationRow: m.Component<{
           chainId,
           notification.chainEvent.data,
         );
-      // } else if (chainSupportedBy(chainId, MarlinTypes.EventChains)) {
-      //   label = MarlinEvents.Label(
-      //     notification.chainEvent.blockNumber,
-      //     chainId,
-      //     notification.chainEvent.data,
-      //   )
+      } else if (chainSupportedBy(chainId, MarlinTypes.EventChains)) {
+        label = MarlinEvents.Label(
+          notification.chainEvent.blockNumber,
+          chainId,
+          notification.chainEvent.data,
+        );
+      } else if (chainSupportedBy(chainId, AaveTypes.EventChains)) {
+        label = AaveEvents.Label(
+          notification.chainEvent.blockNumber,
+          chainId,
+          notification.chainEvent.data,
+        );
       } else {
         throw new Error(`invalid notification chain: ${chainId}`);
       }
@@ -289,7 +298,7 @@ const NotificationRow: m.Component<{
           const notificationArray: Notification[] = [];
           notificationArray.push(notification);
           app.user.notifications.markAsRead(notificationArray).then(() => m.redraw());
-          await m.route.set(`/${app.activeId() || 'edgeware'}/notificationsList?id=${notification.id}`);
+          await navigateToSubpage(`/notificationsList?id=${notification.id}`);
           m.redraw.sync();
         },
       }, [
@@ -319,7 +328,7 @@ const NotificationRow: m.Component<{
       const notificationData = notifications.map((notif) => typeof notif.data === 'string'
         ? JSON.parse(notif.data)
         : notif.data);
-      const {
+      let {
         authorInfo,
         createdAt,
         notificationHeader,
@@ -327,6 +336,15 @@ const NotificationRow: m.Component<{
         path,
         pageJump
       } = getBatchNotificationFields(category, notificationData);
+
+      if (app.isCustomDomain()) {
+        if (path.indexOf(`https://commonwealth.im/${app.customDomainId()}/`) !== 0
+            && path.indexOf(`http://localhost:8080/${app.customDomainId()}/`) !== 0) return;
+        path = path
+          .replace(`https://commonwealth.im/${app.customDomainId()}/`, '/')
+          .replace(`http://localhost:8080/${app.customDomainId()}/`, '/');
+      }
+
       return m('li.NotificationRow', {
         class: notification.isRead ? '' : 'unread',
         key: notification.id,
@@ -359,14 +377,13 @@ const NotificationRow: m.Component<{
             && category !== `${NotificationCategories.NewThread}`
             && m('.comment-body-excerpt', notificationBody),
           m('.comment-body-bottom-wrap', [
-            // TODO: add a formatter
-            m('.comment-body-created', createdAt.format()),
+            m('.comment-body-created', moment(createdAt).fromNow()),
             !notification.isRead && m('.comment-body-mark-as-read', {
               onclick: (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 vnode.state.markingRead = true;
-                app.user.notifications.markAsRead(notifications).then(() => {
+                app.user.notifications.markAsRead(notifications)?.then(() => {
                   vnode.state.markingRead = false;
                   m.redraw();
                 }).catch(() => {

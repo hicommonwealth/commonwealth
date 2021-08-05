@@ -3,7 +3,7 @@ import _ from 'underscore';
 import {
   IDisconnectedRange, IEventHandler, EventSupportingChains, IEventSubscriber,
   SubstrateTypes, SubstrateEvents, MolochTypes, MolochEvents, chainSupportedBy,
-  MarlinTypes, MarlinEvents, Erc20Events
+  MarlinTypes, MarlinEvents, Erc20Events, isSupportedChain, AaveTypes, AaveEvents,
 } from '@commonwealth/chain-events';
 
 import EventStorageHandler, { StorageFilterConfig } from '../eventHandlers/storage';
@@ -13,7 +13,7 @@ import IdentityHandler from '../eventHandlers/identity';
 import UserFlagsHandler from '../eventHandlers/userFlags';
 import ProfileCreationHandler from '../eventHandlers/profileCreation';
 import { sequelize } from '../database';
-import { constructSubstrateUrl, selectSpec } from '../../shared/substrate';
+import { constructSubstrateUrl } from '../../shared/substrate';
 import { factory, formatFilename } from '../../shared/logging';
 import { ChainNodeInstance } from '../models/chain_node';
 const log = factory.getLogger(formatFilename(__filename));
@@ -85,9 +85,14 @@ const setupChainEventListeners = async (
   }
 
   log.info('Setting up event listeners...');
-  const generateHandlers = (node, storageConfig: StorageFilterConfig = {}) => {
+  const generateHandlers = (node: ChainNodeInstance, storageConfig: StorageFilterConfig = {}) => {
+    const chain = node.chain;
+    if (!chain || !isSupportedChain(chain)) {
+      throw new Error(`invalid event chain: ${chain}`);
+    }
+
     // writes events into the db as ChainEvents rows
-    const storageHandler = new EventStorageHandler(models, node.chain, storageConfig);
+    const storageHandler = new EventStorageHandler(models, chain, storageConfig);
 
     // emits notifications by writing into the db's Notifications table, and also optionally
     // sending a notification to the client via websocket
@@ -97,7 +102,7 @@ const setupChainEventListeners = async (
     const notificationHandler = new EventNotificationHandler(models, wss, excludedNotificationEvents);
 
     // creates and updates ChainEntity rows corresponding with entity-related events
-    const entityArchivalHandler = new EntityArchivalHandler(models, node.chain, wss);
+    const entityArchivalHandler = new EntityArchivalHandler(models, chain, wss);
 
     // creates empty Address and OffchainProfile models for users who perform certain
     // actions, like voting on proposals or registering an identity
@@ -130,7 +135,7 @@ const setupChainEventListeners = async (
     let subscriber: IEventSubscriber<any, any>;
     if (chainSupportedBy(node.chain, SubstrateTypes.EventChains)) {
       const nodeUrl = constructSubstrateUrl(node.url);
-      const api = await SubstrateEvents.createApi(nodeUrl, selectSpec(node.chain));
+      const api = await SubstrateEvents.createApi(nodeUrl, node.Chain.substrate_spec);
       const excludedEvents = [
         SubstrateTypes.EventKind.Reward,
         SubstrateTypes.EventKind.TreasuryRewardMinting,
@@ -162,14 +167,8 @@ const setupChainEventListeners = async (
         contractVersion,
       });
     } else if (chainSupportedBy(node.chain, MarlinTypes.EventChains)) {
-      const governorAlphaContractAddress = '0x777992c2E4EDF704e49680468a9299C6679e37F6';
-      const timelockContractAddress = '0x42Bf58AD084595e9B6C5bb2aA04050B0C291264b';
       const api = await MarlinEvents.createApi(
-        node.url, {
-          comp: node.address,
-          governorAlpha: governorAlphaContractAddress,
-          timelock: timelockContractAddress,
-        }
+        node.url, node.address,
       );
       const handlers = generateHandlers(node);
       subscriber = await MarlinEvents.subscribeEvents({
@@ -178,6 +177,19 @@ const setupChainEventListeners = async (
         skipCatchup,
         discoverReconnectRange: () => discoverReconnectRange(models, node.chain),
         api,
+      });
+    } else if (chainSupportedBy(node.chain, AaveTypes.EventChains)) {
+      const api = await AaveEvents.createApi(
+        node.url, node.address,
+      );
+      const handlers = generateHandlers(node);
+      subscriber = await AaveEvents.subscribeEvents({
+        chain: node.chain,
+        handlers,
+        skipCatchup,
+        discoverReconnectRange: () => discoverReconnectRange(models, node.chain),
+        api,
+        verbose: true,
       });
     }
 

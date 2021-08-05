@@ -6,7 +6,7 @@ import { uuidv4 } from 'lib/util';
 import { QueryList, ListItem, Button, Classes, Dialog, InputSelect, Icon, Icons, MenuItem } from 'construct-ui';
 
 import app from 'state';
-import { offchainThreadStageToLabel } from 'helpers';
+import { offchainThreadStageToLabel, parseCustomStages } from 'helpers';
 import { ChainEntity, OffchainThread, OffchainThreadStage } from 'models';
 import { chainEntityTypeToProposalName } from 'identifiers';
 import ChainEntityController, { EntityRefreshOption } from 'controllers/server/chain_entities';
@@ -104,6 +104,17 @@ const StageEditor: m.Component<{
     vnode.attrs.thread.chainEntities.forEach((ce) => vnode.state.chainEntitiesToSet.push(ce));
   },
   view: (vnode) => {
+    if (!app.chain?.meta?.chain && !app.community?.meta) return;
+
+    const { customStages } = app.chain?.meta?.chain || app.community?.meta;
+    const stages = !customStages ? [
+      OffchainThreadStage.Discussion,
+      OffchainThreadStage.ProposalInReview,
+      OffchainThreadStage.Voting,
+      OffchainThreadStage.Passed,
+      OffchainThreadStage.Failed
+    ] : parseCustomStages(customStages);
+
     return m('.StageEditor', [
       !vnode.attrs.popoverMenu && m('a', {
         href: '#',
@@ -115,17 +126,11 @@ const StageEditor: m.Component<{
         closeOnOutsideClick: true,
         class: 'StageEditorDialog',
         content: [
-          m('p', 'Once you\'ve created an on-chain proposal for this thread, connect it here.'),
           m('.stage-options', [
-            [
-              OffchainThreadStage.Discussion,
-              OffchainThreadStage.ProposalInReview,
-              OffchainThreadStage.Voting,
-              OffchainThreadStage.Passed,
-              OffchainThreadStage.Failed,
-            ].map((targetStage) => m(Button, {
+            stages.map((targetStage) => m(Button, {
               class: 'discussions-stage',
               active: vnode.state.stage === targetStage,
+              iconLeft: vnode.state.stage === targetStage ? Icons.CHECK : null,
               rounded: true,
               size: 'sm',
               label: offchainThreadStageToLabel(targetStage),
@@ -155,7 +160,7 @@ const StageEditor: m.Component<{
             vnode.state.isOpen = false;
           }
         },
-        title: 'Connect on-chain proposal',
+        title: 'Update proposal status',
         transitionDuration: 200,
         footer: m(`.${Classes.ALIGN_RIGHT}`, [
           m(Button, {

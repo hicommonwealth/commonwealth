@@ -10,6 +10,14 @@ import app from 'state';
 import { Account, AddressInfo, ChainInfo, ChainBase, Profile } from 'models';
 import { formatAddressShort } from '../../../../../shared/utils';
 
+// Address can be shown in full, autotruncated with formatAddressShort(),
+// or set to a custom max character length
+export interface IAddressDisplayOptions {
+  showFullAddress?: boolean;
+  autoTruncate?: boolean;
+  maxCharLength?: number;
+}
+
 const User: m.Component<{
   user: Account<any> | AddressInfo | Profile;
   avatarSize?: number;
@@ -17,6 +25,7 @@ const User: m.Component<{
   hideAvatar?: boolean;
   hideIdentityIcon?: boolean; // applies to substrate identities, also hides councillor icons
   showAddressWithDisplayName?: boolean; // show address inline with the display name
+  addressDisplayOptions?: IAddressDisplayOptions, // display full or truncated address
   linkify?: boolean;
   onclick?: any;
   popover?: boolean;
@@ -27,8 +36,10 @@ const User: m.Component<{
   view: (vnode) => {
     // TODO: Fix showRole logic to fetch the role from chain
     const {
-      avatarOnly, hideAvatar, hideIdentityIcon, showAddressWithDisplayName, user, linkify, popover, showRole
+      avatarOnly, hideAvatar, hideIdentityIcon, showAddressWithDisplayName,
+      user, linkify, popover, showRole
     } = vnode.attrs;
+    const { showFullAddress, autoTruncate, maxCharLength } = vnode.attrs.addressDisplayOptions || {};
     const avatarSize = vnode.attrs.avatarSize || 16;
     const showAvatar = !hideAvatar;
     if (!user) return;
@@ -36,7 +47,7 @@ const User: m.Component<{
     let account : Account<any>;
     let profile; // profile is used to retrieve the chain and address later
     let role;
-    const addrShort = formatAddressShort(user.address, typeof user.chain === 'string' ? user.chain : user.chain?.id);
+    const addrShort = formatAddressShort(user.address, typeof user.chain === 'string' ? user.chain : user.chain?.id, false, maxCharLength);
     const friendlyChainName = app.config.chains.getById(typeof user.chain === 'string' ? user.chain : user.chain?.id)?.name;
 
     const adminsAndMods = app.chain
@@ -123,14 +134,20 @@ const User: m.Component<{
             linkify
               ? link('a.user-display-name.username',
                 (profile
-                  ? `/${m.route.param('scope') || profile.chain}/account/${profile.address}?base=${profile.chain}`
+                  ? `/${app.activeId() || profile.chain}/account/${profile.address}?base=${profile.chain}`
                   : 'javascript:'
                 ), [
-                  profile ? (showAddressWithDisplayName ? profile.displayNameWithAddress : profile.displayName) : addrShort,
+                  !profile ? addrShort : !showAddressWithDisplayName ? profile.displayName : [
+                    profile.displayName,
+                    m('.id-short', formatAddressShort(profile.address, profile.chain)),
+                  ],
                   getRoleTags(false),
                 ])
               : m('a.user-display-name.username', [
-                profile ? (showAddressWithDisplayName ? profile.displayNameWithAddress : profile.displayName) : addrShort,
+                !profile ? addrShort : !showAddressWithDisplayName ? profile.displayName : [
+                  profile.displayName,
+                  m('.id-short', formatAddressShort(profile.address, profile.chain)),
+                ],
                 getRoleTags(false),
               ])
           ],
@@ -152,13 +169,14 @@ const User: m.Component<{
           ? m(app.cachedIdentityWidget, { account, linkify: true, profile, hideIdentityIcon, addrShort, showAddressWithDisplayName: false })
           : link('a.user-display-name',
             profile
-              ? `/${m.route.param('scope') || profile.chain}/account/${profile.address}?base=${profile.chain}`
+              ? `/${app.activeId() || profile.chain}/account/${profile.address}?base=${profile.chain}`
               : 'javascript:',
-            profile ? [
-              (showAddressWithDisplayName ? profile.displayNameWithAddress : profile.displayName)
-            ] : addrShort)
+            !profile ? addrShort : !showAddressWithDisplayName ? profile.displayName : [
+              profile.displayName,
+              m('.id-short', formatAddressShort(profile.address, profile.chain)),
+            ])
       ]),
-      profile?.address && m('.user-address', formatAddressShort(profile.address, profile.chain)),
+      profile?.address && m('.user-address', formatAddressShort(profile.address, profile.chain, false, maxCharLength)),
       friendlyChainName && m('.user-chain', friendlyChainName),
       getRoleTags(true), // always show roleTags in .UserPopover
     ]);
@@ -184,7 +202,7 @@ export const UserBlock: m.Component<{
   popover?: boolean,
   showRole?: boolean,
   showAddressWithDisplayName?: boolean,
-  showFullAddress?: boolean,
+  addressDisplayOptions?: IAddressDisplayOptions,
   searchTerm?: string,
   showChainName?: boolean,
   hideOnchainRole?: boolean,
@@ -197,8 +215,10 @@ export const UserBlock: m.Component<{
     const {
       user, hideIdentityIcon, popover, showRole, searchTerm,
       hideOnchainRole, showAddressWithDisplayName, showChainName,
-      selected, compact, linkify, showFullAddress
+      selected, compact, linkify, addressDisplayOptions
     } = vnode.attrs;
+
+    const { showFullAddress, autoTruncate, maxCharLength } = vnode.attrs.addressDisplayOptions || {};
 
     let profile;
     if (user instanceof AddressInfo) {
@@ -241,6 +261,7 @@ export const UserBlock: m.Component<{
             hideAvatar: true,
             hideIdentityIcon,
             showAddressWithDisplayName,
+            addressDisplayOptions,
             popover,
             showRole,
           }),
@@ -250,7 +271,9 @@ export const UserBlock: m.Component<{
         }, [
           highlightSearchTerm
             ? highlightedAddress
-            : showFullAddress ? profile.address : formatAddressShort(profile.address, profile.chain),
+            : showFullAddress
+              ? profile.address
+              : formatAddressShort(profile.address, profile.chain, false, maxCharLength),
           profile?.address && showChainName && ' · ',
           showChainName && (typeof user.chain === 'string' ? user.chain : user.chain.name),
         ]),
@@ -261,7 +284,7 @@ export const UserBlock: m.Component<{
     ];
 
     const userLink = profile
-      ? `/${m.route.param('scope') || profile.chain}/account/${profile.address}?base=${profile.chain}`
+      ? `/${app.activeId() || profile.chain}/account/${profile.address}?base=${profile.chain}`
       : 'javascript:';
 
     return linkify

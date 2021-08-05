@@ -1,10 +1,11 @@
 import fs from 'fs';
 import path from 'path';
-import Sequelize from 'sequelize';
+import Sequelize, { QueryTypes } from 'sequelize';
 
 import { DATABASE_URI } from './config';
 
 import { factory, formatFilename } from '../shared/logging';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 export const sequelize = new Sequelize(DATABASE_URI, {
@@ -12,16 +13,16 @@ export const sequelize = new Sequelize(DATABASE_URI, {
   operatorsAliases: false,
   logging: (process.env.NODE_ENV === 'test') ? false : (msg) => { log.trace(msg); },
   dialectOptions: (process.env.NODE_ENV !== 'production') ? {
-    // requestTimeout: 10000,
+    requestTimeout: 40000,
   } : {
-    // requestTimeout: 10000,
+    requestTimeout: 40000,
     ssl: { rejectUnauthorized: false }
   },
   pool: {
     max: 10,
     min: 0,
-    acquire: 30000,
-    idle: 10000,
+    acquire: 40000,
+    idle: 40000,
   }
 });
 
@@ -39,6 +40,7 @@ fs.readdirSync(`${__dirname}/models`)
       db[model.name] = model;
     }
   });
+
 
 // setup associations
 Object.keys(db).forEach((modelName) => {

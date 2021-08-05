@@ -18,9 +18,12 @@ export interface OffchainCommunityAttributes {
   element?: string;
   telegram?: string;
   github?: string;
+  terms?: string;
   featured_topics?: string[];
   privacyEnabled?: boolean;
   invitesEnabled?: boolean;
+  stagesEnabled: boolean;
+  customStages: string;
   customDomain?: string;
   collapsed_on_homepage: boolean;
   created_at?: Date;
@@ -35,12 +38,13 @@ export interface OffchainCommunityAttributes {
   StarredCommunities?: StarredCommunityAttributes[] | StarredCommunityAttributes['id'][];
 }
 
-export interface OffchainComunityInstance
+export interface OffchainCommunityInstance
 extends Sequelize.Instance<OffchainCommunityAttributes>, OffchainCommunityAttributes {
 
 }
 
-export interface OffchainCommunityModel extends Sequelize.Model<OffchainComunityInstance, OffchainCommunityAttributes> {
+export interface OffchainCommunityModel
+extends Sequelize.Model<OffchainCommunityInstance, OffchainCommunityAttributes> {
 
 }
 
@@ -48,7 +52,7 @@ export default (
   sequelize: Sequelize.Sequelize,
   dataTypes: Sequelize.DataTypes,
 ): OffchainCommunityModel => {
-  const OffchainCommunity = sequelize.define<OffchainComunityInstance, OffchainCommunityAttributes>(
+  const OffchainCommunity = sequelize.define<OffchainCommunityInstance, OffchainCommunityAttributes>(
     'OffchainCommunity', {
       id: { type: dataTypes.STRING, primaryKey: true },
       name: { type: dataTypes.STRING, allowNull: false },
@@ -62,6 +66,7 @@ export default (
       telegram: { type: dataTypes.STRING, allowNull: true },
       github: { type: dataTypes.STRING, allowNull: true },
       featured_topics: { type: dataTypes.ARRAY(dataTypes.STRING), allowNull: false, defaultValue: [] },
+      terms: { type: dataTypes.STRING, allowNull: true },
       // auth_forum: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
       // auth_condition: { type: DataTypes.STRING, allowNull: true, defaultValue: null }, // For Auth Forum Checking
       // ^^^ other names: community_config, OffchainCommunityConfiguration, CommunityConditions
@@ -69,6 +74,8 @@ export default (
       // XXX: mixing camelCase and underscore_case is bad practice
       privacyEnabled: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
       invitesEnabled: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+      stagesEnabled: { type: dataTypes.BOOLEAN, allowNull: true, defaultValue: true },
+      customStages: { type: dataTypes.STRING, allowNull: true },
       customDomain: { type: dataTypes.STRING, allowNull: true, },
       collapsed_on_homepage: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: true },
     }, {

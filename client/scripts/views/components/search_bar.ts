@@ -51,7 +51,8 @@ const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the datab
 export const getMemberPreview = (addr, closeResultsFn, searchTerm, tabIndex, showChainName?) => {
   const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
   if (addr.name) profile.initialize(addr.name, null, null, null, null);
-  const userLink = `/${m.route.param('scope') || addr.chain}/account/${addr.address}?base=${addr.chain}`;
+  const userLink = (app.isCustomDomain() ? '' : `/${app.activeId() || addr.chain}`)
+    + `/account/${addr.address}?base=${addr.chain}`;
   return m(ListItem, {
     tabIndex,
     label: m('a.search-results-item', [
@@ -60,7 +61,7 @@ export const getMemberPreview = (addr, closeResultsFn, searchTerm, tabIndex, sho
         searchTerm,
         avatarSize: 24,
         showAddressWithDisplayName: true,
-        showFullAddress: true,
+        addressDisplayOptions: { showFullAddress: true },
         showChainName,
       }),
     ]),
@@ -449,10 +450,10 @@ export const SearchBar : m.Component<{}, {
       m(Input, {
         name: 'search',
         placeholder: 'Type to search...',
-        autofocus: !isMobile,
+        autofocus: false, // !isMobile,
         fluid: true,
         tabIndex: -10,
-        contentLeft: m(SearchIcon),
+        contentLeft: m(SearchIcon, { isMobile }),
         contentRight: cancelInputIcon || chainOrCommIcon,
         defaultValue: m.route.param('q') || vnode.state.searchTerm,
         value: vnode.state.searchTerm,

@@ -1,11 +1,12 @@
 import request from 'superagent';
 import { Op } from 'sequelize';
 import { capitalize } from 'lodash';
-import { SubstrateEvents, Erc20Events } from '@commonwealth/chain-events';
+import {
+  AaveEvents, chainSupportedBy, MarlinEvents, MolochEvents, SubstrateEvents, Erc20Events
+} from '@commonwealth/chain-events';
 
 import { NotificationCategories } from '../shared/types';
 import { smartTrim, validURL, renderQuillDeltaToText } from '../shared/utils';
-import { getForumNotificationCopy } from '../shared/notificationFormatter';
 import { SERVER_URL, SLACK_FEEDBACK_WEBHOOK, DEFAULT_COMMONWEALTH_LOGO } from './config';
 
 export interface WebhookContent {
@@ -26,21 +27,25 @@ const REGEX_EMOJI = /([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF
 const getFilteredContent = (content, address) => {
   let event;
   if (content.chainEvent && content.chainEventType) {
-    // Check to see if it's an Erc20 event... TODO is there a better way to do this?
-    if (content.chainEvent.event_data.kind === 'approval'
-    || content.chainEvent.event_data.kind === 'transfer') {
-      event = Erc20Events.Label(
-        content.chainEvent.block_number,
-        content.chainEventType.chain,
-        content.chainEvent.event_data
-      );
-    } else {
-      event = SubstrateEvents.Label(
-        content.chainEvent.block_number,
-        content.chainEventType.chain,
-        content.chainEvent.event_data
-      );
+    let labelerFn;
+    if (chainSupportedBy(content.chainEventType.chain, SubstrateEvents.Types.EventChains)) {
+      labelerFn = SubstrateEvents.Label;
+    } else if (chainSupportedBy(content.chainEventType.chain, MolochEvents.Types.EventChains)) {
+      labelerFn = MolochEvents.Label;
+    } else if (chainSupportedBy(content.chainEventType.chain, MarlinEvents.Types.EventChains)) {
+      labelerFn = MarlinEvents.Label;
+    } else if (chainSupportedBy(content.chainEventType.chain, AaveEvents.Types.EventChains)) {
+      labelerFn = AaveEvents.Label;
+    } else if (content.chainEvent.event_data.kind === 'approval' || content.chainEvent.event_data.kind === 'transfer') {
+      // TODO: improve this ERC20 detection
+      labelerFn = Erc20Events.Label;
     }
+    if (!labelerFn) throw new Error('unknown chain event');
+    event = labelerFn(
+      content.chainEvent.block_number,
+      content.chainEventType.chain,
+      content.chainEvent.event_data
+    );
     const title = `${capitalize(content.chainEventType.chain)}`;
     const chainEventLink = `${SERVER_URL}/${content.chainEventType.chain}`;
     const fulltext = `${event.heading} on ${capitalize(content.chainEventType?.chain)} at block`
@@ -177,7 +182,7 @@ const send = async (models, content: WebhookContent) => {
   if (!previewImageUrl) {
     // if no embedded image url or the chain/community doesn't have a logo, show the Commonwealth logo as the preview image
     previewImageUrl = previewImageUrl || DEFAULT_COMMONWEALTH_LOGO;
-    previewAltText = previewAltText || 'CommonWealth';
+    previewAltText = previewAltText || 'Commonwealth';
   }
 
   await Promise.all(chainOrCommwebhookUrls

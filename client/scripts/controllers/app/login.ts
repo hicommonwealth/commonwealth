@@ -53,7 +53,6 @@ export function linkExistingAddressToChainOrCommunity(
 }
 
 export async function setActiveAccount(account: Account<any>): Promise<void> {
-  console.log('set active account');
   const chain = app.activeChainId();
   const community = app.activeCommunityId();
   const role = app.user.getRoleInCommunity({ account, chain, community });
@@ -195,38 +194,6 @@ export function updateActiveUser(data) {
     app.user.setLastVisited(data.lastVisited);
     app.user.setUnseenPosts(data.unseenPosts);
   }
-}
-
-// called from within the client only
-// creates SubstrateAccount with only a private key
-export async function createUserWithSeed(seed: string): Promise<Account<any>> {
-  // Look for unlocked account with the same seed
-  const existingDevAccount = app.user.activeAccounts.find((user) => user.getSeed() === seed);
-  if (existingDevAccount) {
-    throw new Error('User with this seed already exists');
-  }
-
-  const account = (app.chain.accounts as any).fromSeed(seed);
-  // Look for account with the same public key
-  const existingUser = app.user.activeAccounts.find((user) => user.address === account.address);
-  if (existingUser) {
-    account.setSeed(seed);
-    // TODO: what should we do here?
-  }
-  const response = await createAccount(account);
-  account.setValidationToken(response.result.verification_token);
-  account.setAddressId(response.result.id);
-  await account.validate();
-  return account;
-}
-
-export async function createUserWithMnemonic(mnemonic: string): Promise<Account<any>> {
-  const account = (app.chain.accounts as any).fromMnemonic(mnemonic);
-  const response = await createAccount(account);
-  account.setValidationToken(response.result.verification_token);
-  account.setAddressId(response.result.id);
-  await account.validate();
-  return account;
 }
 
 export async function createUserWithAddress(

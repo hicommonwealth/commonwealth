@@ -23,7 +23,7 @@ const createTopic = async (models, req, res: Response, next: NextFunction) => {
       ...chainOrCommObj,
     },
   });
-  if (adminRoles.length === 0) {
+  if (!req.user.isAdmin && adminRoles.length === 0) {
     return next(new Error(Errors.MustBeAdmin));
   }
 
@@ -32,6 +32,8 @@ const createTopic = async (models, req, res: Response, next: NextFunction) => {
   const options = {
     name: req.body.name,
     description: req.body.description,
+    featured_in_sidebar: req.body.featured_in_sidebar,
+    featured_in_new_post: req.body.featured_in_new_post,
     ...chainOrCommObj2,
   };
 

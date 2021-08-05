@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import { RegisteredTypes } from '@polkadot/types/types';
 import app from 'state';
 import { RoleInfo, RolePermission } from 'models';
 import { ChainNetwork, ChainBase } from './types';
@@ -17,7 +18,11 @@ class ChainInfo {
   public element: string;
   public telegram: string;
   public github: string;
+  public stagesEnabled: boolean;
+  public customStages: string;
   public customDomain: string;
+  public terms: string;
+  public snapshot: string;
   public readonly blockExplorerIds: { [id: string]: string };
   public readonly collapsedOnHomepage: boolean;
   public readonly featuredTopics: string[];
@@ -27,11 +32,13 @@ class ChainInfo {
   public members: RoleInfo[];
   public type: string;
   public readonly ss58Prefix: string;
+  public substrateSpec: RegisteredTypes;
 
   constructor({
     id, network, symbol, name, iconUrl, description, website, discord, element, telegram, github,
-    customDomain, blockExplorerIds, collapsedOnHomepage, featuredTopics, topics, adminsAndMods,
-    base, ss58_prefix, type
+    stagesEnabled, customStages,
+    customDomain, snapshot, terms, blockExplorerIds, collapsedOnHomepage, featuredTopics, topics, adminsAndMods,
+    base, ss58_prefix, type, substrateSpec
   }) {
     this.id = id;
     this.network = network;
@@ -45,7 +52,11 @@ class ChainInfo {
     this.element = element;
     this.telegram = telegram;
     this.github = github;
+    this.stagesEnabled = stagesEnabled;
+    this.customStages = customStages;
     this.customDomain = customDomain;
+    this.terms = terms;
+    this.snapshot = snapshot;
     this.blockExplorerIds = blockExplorerIds;
     this.collapsedOnHomepage = collapsedOnHomepage;
     this.featuredTopics = featuredTopics || [];
@@ -53,6 +64,7 @@ class ChainInfo {
     this.adminsAndMods = adminsAndMods || [];
     this.type = type;
     this.ss58Prefix = ss58_prefix;
+    this.substrateSpec = substrateSpec;
   }
 
   public static fromJSON({
@@ -67,7 +79,11 @@ class ChainInfo {
     element,
     telegram,
     github,
+    stagesEnabled,
+    customStages,
     customDomain,
+    terms,
+    snapshot,
     blockExplorerIds,
     collapsed_on_homepage,
     featured_topics,
@@ -75,7 +91,8 @@ class ChainInfo {
     adminsAndMods,
     base,
     ss58_prefix,
-    type
+    type,
+    substrate_spec,
   }) {
     let blockExplorerIdsParsed;
     try {
@@ -96,7 +113,11 @@ class ChainInfo {
       element,
       telegram,
       github,
+      stagesEnabled,
+      customStages,
       customDomain,
+      terms,
+      snapshot,
       blockExplorerIds: blockExplorerIdsParsed,
       collapsedOnHomepage: collapsed_on_homepage,
       featuredTopics: featured_topics,
@@ -104,7 +125,8 @@ class ChainInfo {
       adminsAndMods,
       base,
       ss58_prefix,
-      type
+      type,
+      substrateSpec: substrate_spec,
     });
   }
 
@@ -156,10 +178,10 @@ class ChainInfo {
   }
 
   // TODO: change to accept an object
-  public async updateChainData(
-    name: string, description: string, website: string, discord: string, element: string, telegram: string,
-    github: string, customDomain: string
-  ) {
+  public async updateChainData({
+    name, description, website, discord, element, telegram,
+    github, stagesEnabled, customStages, customDomain, terms, snapshot,
+  }) {
     // TODO: Change to PUT /chain
     const r = await $.post(`${app.serverUrl()}/updateChain`, {
       'id': app.activeChainId(),
@@ -170,7 +192,11 @@ class ChainInfo {
       'element': element,
       'telegram': telegram,
       'github': github,
+      'stagesEnabled': stagesEnabled,
+      'customStages': customStages,
       'customDomain': customDomain,
+      'terms': terms,
+      'snapshot': snapshot,
       'jwt': app.user.jwt,
     });
     const updatedChain: ChainInfo = r.result;
@@ -181,7 +207,10 @@ class ChainInfo {
     this.element = updatedChain.element;
     this.telegram = updatedChain.telegram;
     this.github = updatedChain.github;
+    this.stagesEnabled = updatedChain.stagesEnabled;
+    this.customStages = updatedChain.customStages;
     this.customDomain = updatedChain.customDomain;
+    this.snapshot = updatedChain.snapshot;
   }
 
   public addFeaturedTopic(topic: string) {

@@ -8,6 +8,7 @@ import $ from 'jquery';
 import Web3 from 'web3';
 
 import app from 'state';
+import { navigateToSubpage } from 'app';
 import { OffchainThread, OffchainComment, OffchainAttachment, Profile, ChainBase } from 'models';
 
 import Sublayout from 'views/sublayout';
@@ -16,6 +17,7 @@ import PageLoading from 'views/pages/loading';
 import Tabs from 'views/components/widgets/tabs';
 
 import { decodeAddress, checkAddress, encodeAddress } from '@polkadot/util-crypto';
+import { Bech32 } from '@cosmjs/encoding';
 import { setActiveAccount } from 'controllers/app/login';
 import ProfileHeader from './profile_header';
 import ProfileContent from './profile_content';
@@ -149,6 +151,7 @@ const getProfileStatus = (account) => {
   });
 };
 
+// eslint-disable-next-line no-shadow
 export enum UserContent {
   All = 'posts',
   Threads = 'threads',
@@ -165,6 +168,141 @@ interface IProfilePageState {
   refreshProfile: boolean;
 }
 
+const checkCosmosAddress = (address: string): boolean => {
+  try {
+    // 50 character max string length to throw on pubkey
+    const { prefix, data } = Bech32.decode(address, 50);
+    // TODO: should we verify prefix as well?
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
+
+const loadProfile = async (vnode: m.Vnode<{ address: string, setIdentity?: boolean }, IProfilePageState>) => {
+  const chain = m.route.param('base') || app.customDomainId() || m.route.param('scope');
+  const { address } = vnode.attrs;
+  const chainInfo = app.config.chains.getById(chain);
+  let valid = false;
+
+  if (chainInfo?.base === ChainBase.Substrate) {
+    const ss58Prefix = parseInt(chainInfo.ss58Prefix, 10);
+    [valid] = checkAddress(address, ss58Prefix);
+  } else if (chainInfo?.base === ChainBase.Ethereum) {
+    valid = Web3.utils.checkAddressChecksum(address);
+  } else if (chainInfo?.base === ChainBase.CosmosSDK) {
+    valid = checkCosmosAddress(address);
+  }
+  if (!valid) {
+    return;
+  }
+  vnode.state.loading = true;
+  vnode.state.initialized = true;
+  try {
+    const response = await $.ajax({
+      url: `${app.serverUrl()}/profile`,
+      type: 'GET',
+      data: {
+        address,
+        chain,
+        jwt: app.user.jwt,
+      },
+    });
+
+    const { result } = response;
+    vnode.state.loaded = true;
+    vnode.state.loading = false;
+    const a = result.account;
+    const profile = new Profile(a.chain, a.address);
+    if (a.OffchainProfile) {
+      const profileData = JSON.parse(a.OffchainProfile.data);
+      // ignore off-chain name if substrate id exists
+      if (a.OffchainProfile.identity) {
+        profile.initializeWithChain(
+          a.OffchainProfile.identity,
+          profileData?.headline,
+          profileData?.bio,
+          profileData?.avatarUrl,
+          a.OffchainProfile.judgements,
+          a.last_active,
+          a.is_councillor,
+          a.is_validator,
+        );
+      } else {
+        profile.initialize(
+          profileData?.name,
+          profileData?.headline,
+          profileData?.bio,
+          profileData?.avatarUrl,
+          a.last_active,
+          a.is_councillor,
+          a.is_validator
+        );
+      }
+    } else {
+      profile.initializeEmpty();
+    }
+    const account = {
+      profile,
+      chain: a.chain,
+      address: a.address,
+      id: a.id,
+      name: a.name,
+      user_id: a.user_id,
+    };
+    vnode.state.account = account;
+    vnode.state.threads = result.threads.map((t) => threadModelFromServer(t));
+    vnode.state.comments = result.comments.map((c) => commentModelFromServer(c));
+    m.redraw();
+  } catch (err) {
+    // for certain chains, display addresses not in db if formatted properly
+    if (chainInfo?.base === ChainBase.Substrate) {
+      try {
+        decodeAddress(address);
+        vnode.state.account = {
+          profile: null,
+          chain,
+          address,
+          id: null,
+          name: null,
+          user_id: null,
+        };
+      } catch (e) {
+        // do nothing if can't decode
+      }
+    } else if (chainInfo?.base === ChainBase.Ethereum) {
+      if (Web3.utils.checkAddressChecksum(address)) {
+        vnode.state.account = {
+          profile: null,
+          chain,
+          address,
+          id: null,
+          name: null,
+          user_id: null,
+        };
+      }
+    } else if (chainInfo?.base === ChainBase.CosmosSDK) {
+      if (checkCosmosAddress(address)) {
+        vnode.state.account = {
+          profile: null,
+          chain,
+          address,
+          id: null,
+          name: null,
+          user_id: null,
+        };
+      }
+    }
+    vnode.state.loaded = true;
+    vnode.state.loading = false;
+    m.redraw();
+    if (!vnode.state.account)
+      throw new Error((err.responseJSON && err.responseJSON.error)
+        ? err.responseJSON.error
+        : 'Failed to find profile');
+  }
+};
+
 const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProfilePageState> = {
   oninit: (vnode) => {
     vnode.state.account = null;
@@ -175,9 +313,7 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
     vnode.state.comments = [];
     vnode.state.refreshProfile = false;
 
-    const chain = (m.route.param('base'))
-      ? m.route.param('base')
-      : m.route.param('scope');
+    const chain = m.route.param('base') || app.customDomainId() || m.route.param('scope');
     const { address } = vnode.attrs;
     const chainInfo = app.config.chains.getById(chain);
     const baseSuffix = m.route.param('base');
@@ -190,7 +326,7 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
       if (!valid) {
         try {
           const encoded = encodeAddress(decodedAddress, ss58Prefix);
-          m.route.set(`/${m.route.param('scope')}/account/${encoded}${baseSuffix ? `?base=${baseSuffix}` : ''}`);
+          navigateToSubpage(`/account/${encoded}${baseSuffix ? `?base=${baseSuffix}` : ''}`);
         } catch (e) {
           // do nothing if can't encode address
         }
@@ -201,7 +337,7 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
       if (!valid) {
         try {
           const checksumAddress = Web3.utils.toChecksumAddress(address);
-          m.route.set(`/${m.route.param('scope')}/account/${checksumAddress}${baseSuffix ? `?base=${baseSuffix}` : ''}`);
+          navigateToSubpage(`/account/${checksumAddress}${baseSuffix ? `?base=${baseSuffix}` : ''}`);
         } catch (e) {
           // do nothing if can't get checksumAddress
         }
@@ -212,130 +348,14 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
     mixpanel.track('PageVisit', { 'Page Name': 'LoginPage' });
   },
   view: (vnode) => {
-    const loadProfile = async () => {
-      const chain = (m.route.param('base'))
-        ? m.route.param('base')
-        : m.route.param('scope');
-      const { address } = vnode.attrs;
-      const chainInfo = app.config.chains.getById(chain);
-      let valid = false;
-
-      if (chainInfo?.base === ChainBase.Substrate) {
-        const ss58Prefix = parseInt(chainInfo.ss58Prefix, 10);
-        [valid] = checkAddress(address, ss58Prefix);
-      } else if (chainInfo?.base === ChainBase.Ethereum) {
-        valid = Web3.utils.checkAddressChecksum(address);
-      }
-      if (!valid) {
-        return;
-      }
-      vnode.state.loading = true;
-      vnode.state.initialized = true;
-      try {
-        const response = await $.ajax({
-          url: `${app.serverUrl()}/profile`,
-          type: 'GET',
-          data: {
-            address,
-            chain,
-            jwt: app.user.jwt,
-          },
-        });
-
-        const { result } = response;
-        vnode.state.loaded = true;
-        vnode.state.loading = false;
-        const a = result.account;
-        const profile = new Profile(a.chain, a.address);
-        if (a.OffchainProfile) {
-          const profileData = JSON.parse(a.OffchainProfile.data);
-          // ignore off-chain name if substrate id exists
-          if (a.OffchainProfile.identity) {
-            profile.initializeWithChain(
-              a.OffchainProfile.identity,
-              profileData?.headline,
-              profileData?.bio,
-              profileData?.avatarUrl,
-              a.OffchainProfile.judgements,
-              a.last_active,
-              a.is_councillor,
-              a.is_validator,
-            );
-          } else {
-            profile.initialize(
-              profileData?.name,
-              profileData?.headline,
-              profileData?.bio,
-              profileData?.avatarUrl,
-              a.last_active,
-              a.is_councillor,
-              a.is_validator
-            );
-          }
-        } else {
-          profile.initializeEmpty();
-        }
-        const account = {
-          profile,
-          chain: a.chain,
-          address: a.address,
-          id: a.id,
-          name: a.name,
-          user_id: a.user_id,
-        };
-        vnode.state.account = account;
-        vnode.state.threads = result.threads.map((t) => threadModelFromServer(t));
-        vnode.state.comments = result.comments.map((c) => commentModelFromServer(c));
-        m.redraw();
-      } catch (err) {
-        console.log(err);
-        // for certain chains, display addresses not in db if formatted properly
-        if (chainInfo?.base === ChainBase.Substrate) {
-          try {
-            decodeAddress(address);
-            vnode.state.account = {
-              profile: null,
-              chain,
-              address,
-              id: null,
-              name: null,
-              user_id: null,
-            };
-          } catch (e) {
-            // do nothing if can't decode
-          }
-        } else if (chainInfo?.base === ChainBase.Ethereum) {
-          if (Web3.utils.checkAddressChecksum(address)) {
-            vnode.state.account = {
-              profile: null,
-              chain,
-              address,
-              id: null,
-              name: null,
-              user_id: null,
-            };
-          }
-        } else if (chainInfo?.base === ChainBase.CosmosSDK) {
-          // TODO
-        }
-        vnode.state.loaded = true;
-        vnode.state.loading = false;
-        m.redraw();
-        if (!vnode.state.account)
-          throw new Error((err.responseJSON && err.responseJSON.error)
-            ? err.responseJSON.error
-            : 'Failed to find profile');
-      }
-    };
-
     const { setIdentity } = vnode.attrs;
     const { account, loaded, loading, refreshProfile } = vnode.state;
     if (!loading && !loaded) {
-      loadProfile();
+      loadProfile(vnode);
     }
     if (account && account.address !== vnode.attrs.address) {
       vnode.state.loaded = false;
-      loadProfile();
+      loadProfile(vnode);
     }
     if (loading) return m(PageLoading, { showNewProposalButton: true });
     if (!account && !vnode.state.initialized) {
@@ -347,7 +367,7 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
     const { onOwnProfile, onLinkedProfile, displayBanner, currentAddressInfo } = getProfileStatus(account);
 
     if (refreshProfile) {
-      loadProfile();
+      loadProfile(vnode);
       vnode.state.refreshProfile = false;
       if (onOwnProfile) {
         setActiveAccount(account).then(() => {
@@ -358,7 +378,7 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
       }
     }
 
-    // TODO: search for cosmos proposals, if ChainClass is Cosmos
+    // TODO: search for cosmos proposals, if ChainBase is Cosmos
     const comments = vnode.state.comments
       .sort((a, b) => +b.createdAt - +a.createdAt);
     const proposals = vnode.state.threads
@@ -395,6 +415,7 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
                 account,
                 type: UserContent.All,
                 content: allContent,
+                // eslint-disable-next-line max-len
                 localStorageScrollYKey: `profile-${vnode.attrs.address}-${m.route.param('base')}-${app.activeId()}-scrollY`,
               })
             }, {
@@ -403,6 +424,7 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
                 account,
                 type: UserContent.Threads,
                 content: proposals,
+                // eslint-disable-next-line max-len
                 localStorageScrollYKey: `profile-${vnode.attrs.address}-${m.route.param('base')}-${app.activeId()}-scrollY`,
               }),
             }, {
@@ -411,6 +433,7 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
                 account,
                 type: UserContent.Comments,
                 content: comments,
+                // eslint-disable-next-line max-len
                 localStorageScrollYKey: `profile-${vnode.attrs.address}-${m.route.param('base')}-${app.activeId()}-scrollY`,
               }),
             }]),
