@@ -3,7 +3,7 @@ import { BuildOptions, Model, DataTypes } from 'sequelize';
 import { ChainAttributes } from './chain';
 import { OffchainThreadAttributes } from './offchain_thread';
 import { ChainEventAttributes } from './chain_event';
-
+import { ModelStatic } from '../../shared/types';
 
 export interface ChainEntityAttributes {
   id?: number;
@@ -25,9 +25,7 @@ export interface ChainEntityAttributes {
 export interface ChainEntityInstance
 extends Model<ChainEntityAttributes>, ChainEntityAttributes {}
 
-type ChainEntityModelStatic = typeof Model
-    & { associate: (models: any) => void }
-    & { new(values?: Record<string, unknown>, options?: BuildOptions): ChainEntityInstance }
+type ChainEntityModelStatic = ModelStatic<ChainEntityInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,

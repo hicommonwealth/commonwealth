@@ -1,6 +1,6 @@
 import * as Sequelize from 'sequelize';
-import { BuildOptions, DataTypes, Model } from 'sequelize';
-
+import { DataTypes, Model } from 'sequelize';
+import { ModelStatic } from '../../shared/types';
 import { AddressAttributes } from './address';
 import { ChainAttributes } from './chain';
 import { OffchainCommunityAttributes } from './offchain_community';
@@ -44,9 +44,7 @@ export interface OffchainThreadInstance extends Model<OffchainThreadAttributes>,
   // no mixins used
 }
 
-type OffchainThreadModelStatic = typeof Model
-    & { associate: (models: any) => void }
-    & { new(values?: Record<string, unknown>, options?: BuildOptions): OffchainThreadInstance }
+type OffchainThreadModelStatic = ModelStatic<OffchainThreadInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,

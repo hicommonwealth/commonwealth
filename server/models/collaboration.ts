@@ -1,5 +1,6 @@
 import * as Sequelize from 'sequelize';
 import { BuildOptions, Model, DataTypes } from 'sequelize';
+import { ModelStatic } from '../../shared/types';
 
 export interface CollaborationAttributes {
   address_id: number;
@@ -13,9 +14,7 @@ extends Model<CollaborationAttributes>, CollaborationAttributes {
   // no mixins used yet
 }
 
-type CollaborationModelStatic = typeof Model
-    & { associate: (models: any) => void }
-    & { new(values?: Record<string, unknown>, options?: BuildOptions): CollaborationInstance }
+type CollaborationModelStatic = ModelStatic<CollaborationInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,

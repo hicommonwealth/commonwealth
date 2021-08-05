@@ -1,5 +1,6 @@
 import * as Sequelize from 'sequelize';
-import { BuildOptions, Model, DataTypes } from 'sequelize';
+import { Model, DataTypes } from 'sequelize';
+import { ModelStatic } from '../../shared/types';
 
 import { AddressAttributes } from './address';
 import { ChainAttributes } from './chain';
@@ -33,10 +34,7 @@ extends Model<OffchainCommentAttributes>, OffchainCommentAttributes {
   // no mixins used
 }
 
-
-type OffchainCommentModelStatic = typeof Model
-    & { associate: (models: any) => void }
-    & { new(values?: Record<string, unknown>, options?: BuildOptions): OffchainCommentInstance }
+type OffchainCommentModelStatic =  ModelStatic<OffchainCommentInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,

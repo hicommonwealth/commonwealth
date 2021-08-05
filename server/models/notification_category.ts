@@ -1,5 +1,6 @@
 import * as Sequelize from 'sequelize';
-import { BuildOptions, Model, DataTypes } from 'sequelize';
+import { Model, DataTypes } from 'sequelize';
+import { ModelStatic } from '../../shared/types';
 
 export interface NotificationCategoryAttributes {
   name: string;
@@ -11,10 +12,7 @@ export interface NotificationCategoryAttributes {
 export interface NotificationCategoryInstance
 extends Model<NotificationCategoryAttributes>, NotificationCategoryAttributes {}
 
-
-type NotificationCategoryModelStatic = typeof Model
-    & { associate: (models: any) => void }
-    & { new(values?: Record<string, unknown>, options?: BuildOptions): NotificationCategoryInstance }
+type NotificationCategoryModelStatic = ModelStatic<NotificationCategoryInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,

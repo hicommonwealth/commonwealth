@@ -1,8 +1,9 @@
 import * as Sequelize from 'sequelize';
-import { Model, BuildOptions, DataTypes } from 'sequelize';
+import { Model, DataTypes } from 'sequelize';
 
 import { SubstrateTypes } from '@commonwealth/chain-events';
 import { AddressAttributes } from './address';
+import { ModelStatic } from '../../shared/types';
 
 export interface OffchainProfileAttributes {
   address_id: number;
@@ -17,9 +18,7 @@ export interface OffchainProfileAttributes {
 export interface OffchainProfileInstance
 extends Model<OffchainProfileAttributes>, OffchainProfileAttributes {}
 
-type OffchainProfileModelStatic = typeof Model
-    & { associate: (models: any) => void }
-    & { new(values?: Record<string, unknown>, options?: BuildOptions): OffchainProfileInstance }
+type OffchainProfileModelStatic = ModelStatic<OffchainProfileInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,

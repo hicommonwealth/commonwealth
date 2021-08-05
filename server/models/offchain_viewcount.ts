@@ -1,6 +1,6 @@
 import * as Sequelize from 'sequelize';
-import { BuildOptions, DataTypes, Model } from 'sequelize';
-
+import { DataTypes, Model } from 'sequelize';
+import { ModelStatic } from '../../shared/types';
 import { ChainAttributes } from './chain';
 import { OffchainCommunityAttributes } from './offchain_community';
 import { OffchainThreadAttributes } from './offchain_thread';
@@ -21,9 +21,7 @@ extends Model<OffchainViewCountAttributes>, OffchainViewCountAttributes {
 
 }
 
-type OffchainViewCountModelStatic = typeof Model
-    & { associate: (models: any) => void }
-    & { new(values?: Record<string, unknown>, options?: BuildOptions): OffchainViewCountInstance }
+type OffchainViewCountModelStatic = ModelStatic<OffchainViewCountInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,

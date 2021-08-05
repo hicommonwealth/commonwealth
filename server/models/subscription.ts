@@ -8,7 +8,7 @@ import { NotificationCategoryAttributes } from './notification_category';
 import { NotificationAttributes } from './notification';
 import {
   WebsocketMessageType, IWebsocketsPayload,
-  IPostNotificationData, ICommunityNotificationData, IChainEventNotificationData
+  IPostNotificationData, ICommunityNotificationData, IChainEventNotificationData, ModelStatic
 } from '../../shared/types';
 import { createImmediateNotificationEmailObject, sendImmediateNotificationEmail } from '../scripts/emails';
 import { factory, formatFilename } from '../../shared/logging';
@@ -53,10 +53,7 @@ export interface SubscriptionAttributes {
 export interface SubscriptionInstance
 extends Sequelize.Model<SubscriptionAttributes>, SubscriptionAttributes {}
 
-type SubscriptionModelStatic = typeof Sequelize.Model
-    & { associate: (models: any) => void }
-    & { emitNotifications?: any; }
-    & { new(values?: Record<string, unknown>, options?: Sequelize.BuildOptions): SubscriptionInstance }
+type SubscriptionModelStatic = ModelStatic<SubscriptionInstance> & { emitNotifications?: any; }
 
 export default (
   sequelize: Sequelize.Sequelize,

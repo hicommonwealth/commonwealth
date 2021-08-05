@@ -1,5 +1,6 @@
 import * as Sequelize from 'sequelize';
-import { BuildOptions, Model, DataTypes } from 'sequelize';
+import { Model, DataTypes } from 'sequelize';
+import { ModelStatic } from '../../shared/types';
 
 import { OffchainCommunityAttributes } from './offchain_community';
 
@@ -28,10 +29,7 @@ export interface InviteLinkAttributes {
 export interface InviteLinkInstance
 extends Model<InviteLinkAttributes>, InviteLinkAttributes {}
 
-
-type InviteLinkModelStatic = typeof Model
-    & { associate: (models: any) => void }
-    & { new(values?: Record<string, unknown>, options?: BuildOptions): InviteLinkInstance }
+type InviteLinkModelStatic = ModelStatic<InviteLinkInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,

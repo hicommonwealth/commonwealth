@@ -1,5 +1,6 @@
 import * as Sequelize from 'sequelize';
 import { BuildOptions, Model, DataTypes } from 'sequelize';
+import { ModelStatic } from '../../shared/types';
 
 import { ChainAttributes } from './chain';
 import { ContractCategoryAttributes } from './contract_category';
@@ -20,9 +21,7 @@ export interface ContractItemAttributes {
 export interface ContractItemInstance
 extends Model<ContractItemAttributes>, ContractItemAttributes {}
 
-type ContractItemModelStatic = typeof Model
-    & { associate: (models: any) => void }
-    & { new(values?: Record<string, unknown>, options?: BuildOptions): ContractItemInstance }
+type ContractItemModelStatic = ModelStatic<ContractItemInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,

@@ -1,6 +1,6 @@
 import * as Sequelize from 'sequelize';
-import { BuildOptions, Model, DataTypes } from 'sequelize';
-
+import { Model, DataTypes } from 'sequelize';
+import { ModelStatic } from '../../shared/types';
 import { OffchainCommentAttributes } from './offchain_comment';
 import { OffchainThreadAttributes } from './offchain_thread';
 
@@ -21,10 +21,7 @@ export interface OffchainAttachmentAttributes {
 export interface OffchainAttachmentInstance
 extends Model<OffchainAttachmentAttributes>, OffchainAttachmentAttributes {}
 
-
-type OffchainAttachmentModelStatic = typeof Model
-    & { associate: (models: any) => void }
-    & { new(values?: Record<string, unknown>, options?: BuildOptions): OffchainAttachmentInstance }
+type OffchainAttachmentModelStatic = ModelStatic<OffchainAttachmentInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,

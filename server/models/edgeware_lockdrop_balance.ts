@@ -1,5 +1,6 @@
 import * as Sequelize from 'sequelize';
-import { BuildOptions, Model, DataTypes } from 'sequelize';
+import { Model, DataTypes } from 'sequelize';
+import { ModelStatic } from '../../shared/types';
 
 export interface EdgewareLockdropBalanceAttributes {
   id?: number;
@@ -11,10 +12,7 @@ export interface EdgewareLockdropBalanceAttributes {
 export interface EdgewareLockdropBalanceInstance
 extends Model<EdgewareLockdropBalanceAttributes>, EdgewareLockdropBalanceAttributes {}
 
-
-type EdgewareLockdropBalanceModelStatic = typeof Model
-    & { associate: (models: any) => void }
-    & { new(values?: Record<string, unknown>, options?: BuildOptions): EdgewareLockdropBalanceInstance }
+type EdgewareLockdropBalanceModelStatic = ModelStatic<EdgewareLockdropBalanceInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,

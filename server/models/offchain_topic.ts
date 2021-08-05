@@ -1,6 +1,6 @@
 import * as Sequelize from 'sequelize';
-import { BuildOptions, DataTypes, Model } from 'sequelize';
-
+import { DataTypes, Model } from 'sequelize';
+import { ModelStatic } from '../../shared/types';
 import { ChainAttributes } from './chain';
 import { OffchainCommunityAttributes } from './offchain_community';
 import { OffchainThreadAttributes } from './offchain_thread';
@@ -29,9 +29,7 @@ export interface OffchainTopicInstance extends Model<OffchainTopicAttributes>, O
   // TODO: do we need to implement the "as" stuff here?
 }
 
-type OffchainTopicModelStatic = typeof Model
-    & { associate: (models: any) => void }
-    & { new(values?: Record<string, unknown>, options?: BuildOptions): OffchainTopicInstance }
+type OffchainTopicModelStatic = ModelStatic<OffchainTopicInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,

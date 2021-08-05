@@ -1,6 +1,6 @@
 import * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { RegisteredTypes } from '@polkadot/types/types';
-import { BuildOptions, Model, DataTypes } from 'sequelize';
+import { Model, DataTypes } from 'sequelize';
 import { AddressAttributes } from './address';
 import { ChainNodeInstance, ChainNodeAttributes } from './chain_node';
 import { StarredCommunityAttributes } from './starred_community';
@@ -8,6 +8,7 @@ import { OffchainTopicAttributes } from './offchain_topic';
 import { OffchainThreadAttributes } from './offchain_thread';
 import { OffchainCommentAttributes } from './offchain_comment';
 import { UserAttributes } from './user';
+import { ModelStatic } from '../../shared/types';
 
 
 export interface ChainAttributes {
@@ -52,9 +53,7 @@ export interface ChainInstance extends Model<ChainAttributes>, ChainAttributes {
   getChainNodes: Sequelize.HasManyGetAssociationsMixin<ChainNodeInstance>;
 }
 
-type ChainModelStatic = typeof Model
-    & { associate: (models: any) => void }
-    & { new(values?: Record<string, unknown>, options?: BuildOptions): ChainInstance }
+type ChainModelStatic = ModelStatic <ChainInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,
@@ -88,7 +87,7 @@ export default (
   }, {
     tableName: 'Chains',
     timestamps: false,
-    underscored: true,
+    underscored: false,
   });
 
   Chain.associate = (models) => {

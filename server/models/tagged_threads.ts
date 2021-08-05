@@ -1,5 +1,6 @@
 import * as Sequelize from 'sequelize';
-import { BuildOptions, DataTypes, Model } from 'sequelize';
+import { DataTypes, Model } from 'sequelize';
+import { ModelStatic } from '../../shared/types';
 
 export interface TaggedThreadAttributes {
   topic_id: string;
@@ -11,9 +12,7 @@ export interface TaggedThreadAttributes {
 export interface TaggedThreadInstance
 extends Model<TaggedThreadAttributes>, TaggedThreadAttributes {}
 
-type TaggedThreadModelStatic = typeof Sequelize.Model
-    & { associate: (models: any) => void }
-    & { new(values?: Record<string, unknown>, options?: Sequelize.BuildOptions): TaggedThreadInstance }
+type TaggedThreadModelStatic = ModelStatic<TaggedThreadInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,

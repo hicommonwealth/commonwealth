@@ -1,5 +1,6 @@
 import * as Sequelize from 'sequelize';
-import { BuildOptions, DataTypes, Model } from 'sequelize';
+import { DataTypes, Model } from 'sequelize';
+import { ModelStatic } from '../../shared/types';
 import { UserInstance, UserAttributes } from './user';
 
 export interface SocialAccountAttributes {
@@ -21,9 +22,7 @@ export interface SocialAccountInstance extends Model<SocialAccountAttributes>, S
   setUser: Sequelize.BelongsToSetAssociationMixin<UserInstance, UserInstance['id']>;
 }
 
-type SocialAccountModelStatic = typeof Model
-    & { associate: (models: any) => void }
-    & { new(values?: Record<string, unknown>, options?: BuildOptions): SocialAccountInstance }
+type SocialAccountModelStatic =  ModelStatic<SocialAccountInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,

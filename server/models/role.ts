@@ -1,8 +1,9 @@
 import * as Sequelize from 'sequelize';
-import { BuildOptions, DataTypes, Model } from 'sequelize';
+import { DataTypes, Model } from 'sequelize';
 import { AddressAttributes } from './address';
 import { OffchainCommunityAttributes } from './offchain_community';
 import { ChainAttributes } from './chain';
+import { ModelStatic } from '../../shared/types';
 
 export type Permission = 'admin' | 'moderator' | 'member';
 
@@ -24,9 +25,7 @@ export interface RoleAttributes {
 
 export interface RoleInstance extends Model<RoleAttributes>, RoleAttributes {}
 
-type RoleModelStatic = typeof Model
-    & { associate: (models: any) => void }
-    & { new(values?: Record<string, unknown>, options?: BuildOptions): RoleInstance }
+type RoleModelStatic = ModelStatic<RoleInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,

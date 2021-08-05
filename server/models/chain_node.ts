@@ -1,6 +1,7 @@
 import * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { BuildOptions, Model, DataTypes } from 'sequelize';
 import { ChainInstance, ChainAttributes } from './chain';
+import { ModelStatic } from '../../shared/types';
 
 export interface ChainNodeAttributes {
   id?: number;
@@ -17,9 +18,7 @@ export interface ChainNodeInstance extends Model<ChainNodeAttributes>, ChainNode
   getChain: Sequelize.BelongsToGetAssociationMixin<ChainInstance>;
 }
 
-type ChainNodeModelStatic = typeof Model
-    & { associate: (models: any) => void }
-    & { new(values?: Record<string, unknown>, options?: BuildOptions): ChainNodeInstance }
+type ChainNodeModelStatic = ModelStatic<ChainNodeInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,

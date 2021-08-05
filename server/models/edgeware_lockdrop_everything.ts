@@ -1,5 +1,6 @@
 import * as Sequelize from 'sequelize';
-import { BuildOptions, Model, DataTypes } from 'sequelize';
+import { Model, DataTypes } from 'sequelize';
+import { ModelStatic } from '../../shared/types';
 
 export interface EdgewareLockdropEverythingAttributes {
   id?: number;
@@ -12,9 +13,7 @@ export interface EdgewareLockdropEverythingAttributes {
 export interface EdgewareLockdropEverythingInstance
 extends Model<EdgewareLockdropEverythingAttributes>, EdgewareLockdropEverythingAttributes {}
 
-type EdgewareLockdropEverythingModelStatic = typeof Model
-    & { associate: (models: any) => void }
-    & { new(values?: Record<string, unknown>, options?: BuildOptions): EdgewareLockdropEverythingInstance }
+type EdgewareLockdropEverythingModelStatic = ModelStatic<EdgewareLockdropEverythingInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,

@@ -78,6 +78,10 @@ export default (
       collapsed_on_homepage: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: true },
     }, {
       tableName: 'OffchainCommunities',
+      timestamps: true,
+      createdAt: 'created_at',
+      updatedAt: 'updated_at',
+      deletedAt: 'deleted_at',
       underscored: false,
       paranoid: true,
       indexes: [

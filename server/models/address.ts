@@ -1,7 +1,7 @@
 (global as any).window = { location: { href: '/' } };
 
 import * as Sequelize from 'sequelize';
-import { Model, BuildOptions, DataTypes } from 'sequelize';
+import { Model, DataTypes } from 'sequelize';
 import crypto from 'crypto';
 import Web3 from 'web3';
 
@@ -15,7 +15,7 @@ import { AminoSignResponse, pubkeyToAddress } from '@cosmjs/amino';
 
 import nacl from 'tweetnacl';
 import { KeyringOptions } from '@polkadot/keyring/types';
-import { NotificationCategories } from '../../shared/types';
+import { NotificationCategories, ModelStatic } from '../../shared/types';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { ChainAttributes, ChainInstance } from './chain';
 import { UserAttributes } from './user';
@@ -93,11 +93,7 @@ export interface AddressCreationAttributes extends AddressAttributes {
   ) => Promise<boolean>;
 }
 
-
-type AddressModelStatic = typeof Model
-    & { associate: (models: any) => void }
-    & AddressCreationAttributes
-    & { new(values?: Record<string, unknown>, options?: BuildOptions): AddressInstance }
+type AddressModelStatic = ModelStatic<AddressInstance> & AddressCreationAttributes
 
 export default (
   sequelize: Sequelize.Sequelize,

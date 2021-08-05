@@ -1,5 +1,6 @@
 import * as Sequelize from 'sequelize';
-import { BuildOptions, DataTypes, Model } from 'sequelize';
+import { DataTypes, Model } from 'sequelize';
+import { ModelStatic } from '../../shared/types';
 
 export interface WaitlistRegistrationAttributes {
   user_id: number;
@@ -12,9 +13,7 @@ export interface WaitlistRegistrationAttributes {
 export interface WaitlistRegistrationInstance
 extends Model<WaitlistRegistrationAttributes>, WaitlistRegistrationAttributes {}
 
-type WaitlistRegistrationModelStatic = typeof Sequelize.Model
-    & { associate: (models: any) => void }
-    & { new(values?: Record<string, unknown>, options?: Sequelize.BuildOptions): WaitlistRegistrationInstance }
+type WaitlistRegistrationModelStatic = ModelStatic<WaitlistRegistrationInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,

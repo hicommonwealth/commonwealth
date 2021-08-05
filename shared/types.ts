@@ -1,3 +1,4 @@
+import { Model, BuildOptions } from 'sequelize';
 // This is a const and not an enum because of a weird webpack error.
 // It has the same syntax, though, so it should be OK, as long as we don't
 // modify any of the values.
@@ -103,3 +104,7 @@ export type TokenResponse = {
   decimals: number;
   logoURI?: string;
 };
+
+export type ModelStatic<T extends Model> = typeof Model
+    & { associate: (models: any) => void }
+    & { new(values?: Record<string, unknown>, options?: BuildOptions): T }

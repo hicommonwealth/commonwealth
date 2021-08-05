@@ -68,7 +68,7 @@ export default (
     createdAt: 'created_at',
     updatedAt: 'updated_at',
     tableName: 'Users',
-    underscored: true,
+    underscored: false,
     indexes: [
       { fields: ['email'], unique: true },
     ],

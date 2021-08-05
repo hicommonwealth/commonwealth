@@ -1,6 +1,6 @@
 import * as Sequelize from 'sequelize';
-import { BuildOptions, Model, DataTypes } from 'sequelize';
-
+import { Model, DataTypes } from 'sequelize';
+import { ModelStatic } from '../../shared/types';
 import { SubscriptionAttributes } from './subscription';
 
 export interface NotificationAttributes {
@@ -17,9 +17,7 @@ export interface NotificationAttributes {
 export interface NotificationInstance
 extends Model<NotificationAttributes>, NotificationAttributes {}
 
-type NotificationModelStatic = typeof Model
-    & { associate: (models: any) => void }
-    & { new(values?: Record<string, unknown>, options?: BuildOptions): NotificationInstance }
+type NotificationModelStatic = ModelStatic<NotificationInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,

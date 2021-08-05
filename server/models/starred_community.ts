@@ -1,6 +1,6 @@
 import * as Sequelize from 'sequelize';
-import { BuildOptions, DataTypes, Model } from 'sequelize';
-
+import { DataTypes, Model } from 'sequelize';
+import { ModelStatic } from '../../shared/types';
 import { UserAttributes } from './user';
 import { ChainAttributes } from './chain';
 import { OffchainCommunityAttributes } from './offchain_community';
@@ -24,9 +24,7 @@ StarredCommunityAttributes {
   // no mixins used
 }
 
-type StarredCommunityModelStatic = typeof Model
-    & { associate: (models: any) => void }
-    & { new(values?: Record<string, unknown>, options?: BuildOptions): StarredCommunityInstance }
+type StarredCommunityModelStatic = ModelStatic<StarredCommunityInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,

@@ -1,7 +1,8 @@
 import * as Sequelize from 'sequelize';
-import { BuildOptions, DataTypes, Model } from 'sequelize';
+import { DataTypes, Model } from 'sequelize';
 import { ChainAttributes } from './chain';
 import { OffchainCommunityAttributes } from './offchain_community';
+import { ModelStatic } from '../../shared/types';
 
 export interface WebhookAttributes {
   id?: number;
@@ -17,9 +18,7 @@ export interface WebhookAttributes {
 
 export interface WebhookInstance extends Model<WebhookAttributes>, WebhookAttributes {}
 
-type WebhookModelStatic = typeof Sequelize.Model
-    & { associate: (models: any) => void }
-    & { new(values?: Record<string, unknown>, options?: Sequelize.BuildOptions): WebhookInstance }
+type WebhookModelStatic = ModelStatic<WebhookInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,

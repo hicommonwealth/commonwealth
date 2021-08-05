@@ -1,5 +1,6 @@
 import * as Sequelize from 'sequelize';
 import { Model, BuildOptions, DataTypes } from 'sequelize';
+import { ModelStatic } from '../../shared/types';
 
 import { ChainEventTypeAttributes } from './chain_event_type';
 import { ChainEntityAttributes } from './chain_entity';
@@ -20,9 +21,7 @@ export interface ChainEventAttributes {
 export interface ChainEventInstance
 extends Model<ChainEventAttributes>, ChainEventAttributes {}
 
-type ChainEventModelStatic = typeof Model
-    & { associate: (models: any) => void }
-    & { new(values?: Record<string, unknown>, options?: BuildOptions): ChainEventInstance }
+type ChainEventModelStatic = ModelStatic<ChainEventInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,

@@ -1,9 +1,9 @@
 import * as Sequelize from 'sequelize';
-import { BuildOptions, Model, DataTypes } from 'sequelize';
-
+import { Model, DataTypes } from 'sequelize';
 import crypto from 'crypto';
 import { LOGIN_TOKEN_EXPIRES_IN } from '../config';
 import { SocialAccountAttributes } from './social_account';
+import { ModelStatic } from '../../shared/types';
 
 export interface LoginTokenAttributes {
   id?: number;
@@ -31,10 +31,7 @@ export interface LoginTokenInstance extends Model<LoginTokenAttributes>, LoginTo
   // no mixins used yet
 }
 
-type LoginTokenModelStatic = typeof Model
-    & { associate: (models: any) => void }
-    & LoginTokenCreationAttributes
-    & { new(values?: Record<string, unknown>, options?: BuildOptions): LoginTokenInstance }
+type LoginTokenModelStatic = ModelStatic<LoginTokenInstance> & LoginTokenCreationAttributes
 
 export default (
   sequelize: Sequelize.Sequelize,
