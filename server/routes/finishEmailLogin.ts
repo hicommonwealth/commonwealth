@@ -8,7 +8,9 @@ const log = factory.getLogger(formatFilename(__filename));
 
 export const redirectWithLoginSuccess = (res, email, path?, confirmation?, newAcct = false) => {
   // Returns new if we are creating a new account
-  getStatsDInstance().set('cw.users.unique', res.user.id);
+  if (res?.user?.id) {
+    getStatsDInstance().set('cw.users.unique', res.user.id);
+  }
   getStatsDInstance().increment('cw.users.logged_in');
   const url = `/?loggedin=true&email=${email}&new=${newAcct}${path ? `&path=${encodeURIComponent(path)}` : ''}${confirmation ? '&confirmation=success' : ''}`;
   return res.redirect(url);
