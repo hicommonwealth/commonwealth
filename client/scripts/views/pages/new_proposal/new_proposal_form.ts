@@ -52,7 +52,7 @@ const NewProposalForm = {
       value: null,
       calldata: null,
       signature: null,
-      withDelegateCall: null,
+      withDelegateCall: false,
     }];
   },
   view: (vnode) => {
@@ -369,25 +369,9 @@ const NewProposalForm = {
             throw new Error(`No target for Call ${i + 1}`);
           }
 
-          if (aaveProposal.value) {
-            values.push(aaveProposal.value);
-          } else {
-            throw new Error(`No value for Call ${i + 1}`);
-          }
-
-          if (aaveProposal.calldata) {
-            calldatas.push(aaveProposal.calldata);
-          } else {
-            throw new Error(`No calldata for Call ${i + 1}`);
-          }
-
-          if (aaveProposal.withDelegateCall) {
-            withDelegateCalls.push(aaveProposal.withDelegateCall);
-          } else {
-            throw new Error(`No delegate call selected for Call ${i + 1}`);
-          }
-
-          // signature is optional
+          values.push(aaveProposal.value || '0');
+          calldatas.push(aaveProposal.calldata || '');
+          withDelegateCalls.push(aaveProposal.withDelegateCall || false);
           signatures.push(aaveProposal.signature || '');
         }
         // TODO: preload this ipfs value to ensure it's correct
@@ -917,7 +901,7 @@ const NewProposalForm = {
                         value: null,
                         calldata: null,
                         signature: null,
-                        withDelegateCall: null,
+                        withDelegateCall: false,
                       });
                     },
                   }),
