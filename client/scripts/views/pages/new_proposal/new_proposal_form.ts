@@ -365,28 +365,31 @@ const NewProposalForm = {
           const aaveProposal = vnode.state.aaveProposalState[i];
           if (aaveProposal.target) {
             targets.push(aaveProposal.target);
+          } else {
+            throw new Error(`No target for Call ${i + 1}`);
           }
+
           if (aaveProposal.value) {
             values.push(aaveProposal.value);
+          } else {
+            throw new Error(`No value for Call ${i + 1}`);
           }
+
           if (aaveProposal.calldata) {
             calldatas.push(aaveProposal.calldata);
+          } else {
+            throw new Error(`No calldata for Call ${i + 1}`);
           }
-          if (aaveProposal.signature) {
-            signatures.push(aaveProposal.signature);
-          }
+
           if (aaveProposal.withDelegateCall) {
             withDelegateCalls.push(aaveProposal.withDelegateCall);
+          } else {
+            throw new Error(`No delegate call selected for Call ${i + 1}`);
           }
+
+          // signature is optional
+          signatures.push(aaveProposal.signature || '');
         }
-        if (targets.length === 0) throw new Error('No targets');
-        if (values.length === 0) throw new Error('No values');
-        // signatures optional
-        // if (signatures.length === 0) {
-        //   signatures = '';
-        // }
-        if (values.length === 0) throw new Error('No calldatas');
-        if (withDelegateCalls.length === 0) throw new Error('No withDelegateCalls');
         // TODO: preload this ipfs value to ensure it's correct
         const ipfsHash = utils.formatBytes32String(vnode.state.ipfsHash);
         const details: AaveProposalArgs = {
@@ -972,7 +975,10 @@ const NewProposalForm = {
               }),
             ]),
             m(FormGroup, [
-              m(FormLabel, 'Signature'),
+              m('.flex-label', [
+                m(FormLabel, 'Signature'),
+                m('.helper-text', 'Optional'),
+              ]),
               m(Input, {
                 name: 'signatures',
                 placeholder: 'Add a signature',

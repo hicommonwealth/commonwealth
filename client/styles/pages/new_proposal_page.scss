@@ -74,6 +74,17 @@
         margin-left: 12px;
     }
 
+    .flex-label {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+
+        .helper-text {
+            font-size: 14px;
+            color: #999999;
+        }
+    }
+
     .button {
         border-radius: 8px;
         font-weight: 500;
