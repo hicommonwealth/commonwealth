@@ -71,8 +71,8 @@ export default class extends IEventHandler {
     log.debug(`Received event: ${JSON.stringify(event, null, 2)}`);
 
     // locate event type and add event (and event type if needed) to database
-    let chain;
-    if (this._chain === 'erc20') {
+    let chain = this._chain;
+    if (chain === 'erc20') {
       const address = (event.data as Erc20Types.ITransfer).contractAddress.toLowerCase();
       const tokenChain = await this._models.ChainNode.findOne({
         where: {
@@ -82,9 +82,10 @@ export default class extends IEventHandler {
       if (tokenChain) {
         chain = tokenChain.chain;
       } else {
-        log.trace(`Token ${address} not registered in database`);
+        log.error(`Token ${address} not registered in database, skipping!`);
+        return;
       }
-    } else { chain = this._chain; }
+    }
 
     const shouldSkip = await this._shouldSkip(event, chain);
     if (shouldSkip) {

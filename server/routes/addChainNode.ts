@@ -16,8 +16,7 @@ export const Errors = {
   InvalidJSON: 'Substrate spec supplied has invalid JSON'
 };
 
-const addChainNode = async (models,
-  req: Request, res: Response, next: NextFunction) => {
+const addChainNode = async (models, req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {
     return next(new Error(Errors.NotLoggedIn));
   }

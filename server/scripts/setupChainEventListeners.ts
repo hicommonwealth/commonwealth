@@ -208,6 +208,7 @@ const setupChainEventListeners = async (
       include: [{
         model: models.Chain,
         where: { type: 'token' },
+        required: true,
       }],
     });
     const erc20Addresses = erc20Nodes.map((o) => o.address);
@@ -229,7 +230,9 @@ const setupChainEventListeners = async (
       handlers: [ storageHandler, notificationHandler ],
       skipCatchup,
       api,
-      discoverReconnectRange: async () => discoverReconnectRange(models, 'erc20'),
+      // TODO: discover reconnect range for erc20 will need to provide the specific token's
+      //   name at reconnect attempt, so we omit it for now.
+      // discoverReconnectRange: async () => discoverReconnectRange(models, 'erc20'),
       enricherConfig: {
         balanceTransferThreshold: BALANCE_TRANSFER_THRESHOLD,
       }
