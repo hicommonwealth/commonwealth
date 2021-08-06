@@ -597,8 +597,7 @@ const Sidebar: m.Component<{ hideQuickSwitcher? }, {}> = {
         m('br'),
         m('br'),
           m(Button, {
-            class: 'PoweredBy h-24 w-36',
-            label: 'Powered by',
+            class: 'PoweredBy h-12',
             onclick: (e) => {
               
             },

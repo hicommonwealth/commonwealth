@@ -307,12 +307,26 @@
         color: white;
     }
     .PoweredBy{
-        background: #F9F9F9;
-        width: 9.5rem;
-        border-radius: 1rem;
+        height: 60.99px;
+        width: 171.43px;
+        position: absolute;
+        border-radius: 8px;
         border-color: #F9F9F9;
-        display: inline-flex;
-        align-items: flex-start;
+        font-size: 14px;
+        background-image: url("/static/img/powered-by.svg");
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+    .PoweredBy:hover{
+        height: 60.99px;
+        width: 171.43px;
+        position: absolute;
+        border-radius: 8px;
+        border-image:linear-gradient(45deg,#335FB7,#D48CDD) 10;
+        font-size: 14px;
+        background-image: url("/static/img/powered-by-2.svg");
+        background-repeat: no-repeat;
+        background-position: center;
     }
 }
 

@@ -96,6 +96,14 @@ const MobileSidebar: m.Component<{}, { activeTab: string, showNewThreadOptions: 
       (app.chain || app.community) && m(ExternalLinksModule),
       app.isLoggedIn() && (app.chain || app.community) && m(SubscriptionButton),
       app.chain && m(ChainStatusModule),
+      m('br'),
+        m('br'),
+          m(MenuItem, {
+            class: 'PoweredBy h-12',
+            onclick: (e) => {
+              
+            },
+          })
     ]);
     const AllCommunitiesMenu = m(Menu, { class: 'AllCommunitiesMenu' }, [
       m(CommunitySelector, { showListOnly: true, showHomeButtonAtTop: true })
