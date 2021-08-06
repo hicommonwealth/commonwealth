@@ -6,7 +6,6 @@ export interface EdgewareLockdropEverythingAttributes {
   createdAt: Date;
   id?: number;
   data?: string;
-  created_at?: Date;
   updated_at?: Date;
 }
 

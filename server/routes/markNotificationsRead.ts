@@ -1,6 +1,6 @@
 import Sequelize from 'sequelize';
 import { Request, Response, NextFunction } from 'express';
-import { sequelize } from '../database';
+import { sequelize, DB } from '../database';
 import { factory, formatFilename } from '../../shared/logging';
 
 const Op = Sequelize.Op;
@@ -12,7 +12,7 @@ export const Errors = {
   WrongOwner: 'Notification not owned by user',
 };
 
-export default async (models, req: Request, res: Response, next: NextFunction) => {
+export default async (models: DB, req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {
     return next(new Error(Errors.NotLoggedIn));
   }

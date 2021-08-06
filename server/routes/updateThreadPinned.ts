@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import { factory, formatFilename } from '../../shared/logging';
+import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -9,7 +10,7 @@ export const Errors = {
   NoThread: 'Cannot find thread',
 };
 
-const updateThreadPinned = async (models, req: Request, res: Response, next: NextFunction) => {
+const updateThreadPinned = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const { thread_id } = req.body;
   if (!thread_id) return next(new Error(Errors.NoThread));
 
@@ -44,7 +45,7 @@ const updateThreadPinned = async (models, req: Request, res: Response, next: Nex
         },
         {
           model: models.Address,
-          through: models.Collaboration,
+          // through: models.Collaboration,
           as: 'collaborators'
         },
         models.OffchainAttachment,

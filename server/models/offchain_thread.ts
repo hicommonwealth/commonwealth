@@ -24,7 +24,7 @@ export interface OffchainThreadAttributes {
   read_only?: boolean;
   version_history?: string[];
 
-  offchain_voting_options: string;
+  offchain_voting_options?: string;
   offchain_voting_ends_at?: Date;
   offchain_voting_votes?: number;
 

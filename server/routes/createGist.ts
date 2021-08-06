@@ -3,6 +3,7 @@ import request from 'superagent';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import { u8aConcat, stringToU8a, compactAddLength } from '@polkadot/util';
 import { Request, Response, NextFunction } from 'express';
+import { DB } from '../database';
 
 export const hashTwo = (left: string, right: string) => {
   return blake2AsHex(
@@ -13,7 +14,7 @@ export const hashTwo = (left: string, right: string) => {
   );
 };
 
-const createGist = async (models, req: Request, res: Response, next: NextFunction) => {
+const createGist = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {
     return next(new Error('Not logged in'));
   }
@@ -29,7 +30,7 @@ const createGist = async (models, req: Request, res: Response, next: NextFunctio
   if (!req.body.description) {
     return res.status(400).json({ error: 'No description provided' });
   }
-  const socialAccount = await models.SocialAccount.findOne({ where: { provider: 'github', user_id: req.user.id } });
+  const socialAccount = await models.SocialAccount.findOne({ where: { provider: 'github', provider_userid: req.user.id } });
   if (!socialAccount) {
     return next(new Error('No linked Github account'));
   }

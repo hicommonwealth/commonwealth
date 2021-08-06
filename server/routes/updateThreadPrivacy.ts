@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import { factory, formatFilename } from '../../shared/logging';
+import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -11,7 +12,7 @@ export const Errors = {
   NotAdmin: 'Not an admin',
 };
 
-const updateThreadPrivacy = async (models, req: Request, res: Response, next: NextFunction) => {
+const updateThreadPrivacy = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const { thread_id, read_only } = req.body;
   if (!thread_id) return next(new Error(Errors.NoThreadId));
   if (!read_only) return next(new Error(Errors.NoReadOnly));
@@ -48,7 +49,7 @@ const updateThreadPrivacy = async (models, req: Request, res: Response, next: Ne
         },
         {
           model: models.Address,
-          through: models.Collaboration,
+          // through: models.Collaboration,
           as: 'collaborators'
         },
         models.OffchainAttachment,

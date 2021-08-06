@@ -2,13 +2,14 @@ import { QueryTypes, Op } from 'sequelize';
 import jwt from 'jsonwebtoken';
 import _ from 'lodash';
 import { Request, Response, NextFunction } from 'express';
-import { JWT_SECRET, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } from '../config';
+import { JWT_SECRET } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
 import '../types';
+import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
 
-const status = async (models, req: Request, res: Response, next: NextFunction) => {
+const status = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const [
     chains,
     nodes,
@@ -46,10 +47,13 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
 
   const thirtyDaysAgo = new Date((new Date() as any) - 1000 * 24 * 60 * 60 * 30);
   const { user } = req;
-
+  type ThreadCountQueryData = {
+    concat: string;
+    count: number;
+  }
   if (!user) {
     const threadCount = {};
-    const threadCountQueryData = await models.sequelize.query(`
+    const threadCountQueryData: ThreadCountQueryData[] = await models.sequelize.query(`
 SELECT CONCAT("OffchainThreads".chain, "OffchainThreads".community), COUNT("OffchainThreads".id)
   FROM "OffchainThreads"
   LEFT JOIN "OffchainCommunities"
@@ -61,6 +65,7 @@ WHERE "OffchainThreads".updated_at > :thirtyDaysAgo
        OR NOT "OffchainCommunities"."privacyEnabled")
 GROUP BY CONCAT("OffchainThreads".chain, "OffchainThreads".community);
 `, { replacements: { thirtyDaysAgo }, type: QueryTypes.SELECT });
+    // eslint-disable-next-line no-return-assign
     threadCountQueryData.forEach((ct) => threadCount[ct.concat] = ct.count);
 
     return res.json({
@@ -86,7 +91,7 @@ GROUP BY CONCAT("OffchainThreads".chain, "OffchainThreads".community);
   ]);
 
   // look up my roles & private communities
-  const myAddressIds = Array.from(addresses.map((address) => address.id));
+  const myAddressIds: number[] = Array.from(addresses.map((address) => address.id));
   const roles = await models.Role.findAll({
     where: {
       address_id: { [Op.in]: myAddressIds },
@@ -121,7 +126,7 @@ GROUP BY CONCAT("OffchainThreads".chain, "OffchainThreads".community);
   const allCommunities : any = _.uniqBy(publicCommunities.concat(privateCommunities), 'id');
 
   const threadCount = {};
-    const threadCountQueryData = await models.sequelize.query(`
+    const threadCountQueryData: ThreadCountQueryData[] = await models.sequelize.query(`
 SELECT CONCAT("OffchainThreads".chain, "OffchainThreads".community), COUNT("OffchainThreads".id)
   FROM "OffchainThreads"
   LEFT JOIN "OffchainCommunities"
@@ -134,9 +139,10 @@ WHERE "OffchainThreads".updated_at > :thirtyDaysAgo
     OR "OffchainCommunities".id IN(:visiblePrivateCommunityIds))
 GROUP BY CONCAT("OffchainThreads".chain, "OffchainThreads".community);
 `, { replacements: {
-  thirtyDaysAgo,
-  visiblePrivateCommunityIds: privateCommunities.length > 0 ? privateCommunities.map((c) => c.id) : ['NO_COMMUNITY'],
-}, type: QueryTypes.SELECT });
+    thirtyDaysAgo,
+    visiblePrivateCommunityIds: privateCommunities.length > 0 ? privateCommunities.map((c) => c.id) : ['NO_COMMUNITY'],
+  },
+  type: QueryTypes.SELECT });
   threadCountQueryData.forEach((ct) => threadCount[ct.concat] = ct.count);
 
   // get starred communities for user

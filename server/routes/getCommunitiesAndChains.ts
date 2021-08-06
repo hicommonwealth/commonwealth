@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import Sequelize from 'sequelize';
-import lookupCommunityIsVisibleToUser from 'server/util/lookupCommunityIsVisibleToUser';
+import { DB } from '../database';
 const { Op } = Sequelize;
 
 const DEFAULT_SEARCH_LIMIT = 100;
 
-const getCommunitiesAndChains = async (models, req: Request, res: Response, next: NextFunction) => {
+const getCommunitiesAndChains = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const { user } = req;
   const { searchTerm, limit } = req.query;
   const params = {
@@ -36,6 +36,7 @@ const getCommunitiesAndChains = async (models, req: Request, res: Response, next
       return !!userMembership;
     }
   });
+  // @ts-ignore
   const chainsAndCommunities = chains.concat(visibleCommunities);
 
   return res.json({ status: 'Success', result: chainsAndCommunities.map((p) => p.toJSON()) });

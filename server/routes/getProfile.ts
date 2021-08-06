@@ -1,8 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-
 import { Op } from 'sequelize';
-import _ from 'lodash';
 import { factory, formatFilename } from '../../shared/logging';
+import { DB } from '../database';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
@@ -11,7 +10,7 @@ export const Errors = {
   NoAddressFound: 'No address found',
 };
 
-const getProfile = async (models, req: Request, res: Response, next: NextFunction) => {
+const getProfile = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const { chain, address } = req.query;
   if (!chain) return next(new Error(Errors.NoChain));
   if (!address) return next(new Error(Errors.NoAddress));

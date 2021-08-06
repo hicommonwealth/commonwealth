@@ -8,6 +8,7 @@ import {
   PROFILE_NAME_MIN_CHARS
 } from '../../shared/types';
 import IdentityFetchCache from '../util/identityFetchCache';
+import { DB } from '../database';
 
 const { Op } = Sequelize;
 
@@ -23,7 +24,7 @@ export const Errors = {
 };
 
 const updateProfile = async (
-  models, identityFetchCache: IdentityFetchCache, req: Request, res: Response, next: NextFunction
+  models: DB, identityFetchCache: IdentityFetchCache, req: Request, res: Response, next: NextFunction
 ) => {
 
   if (!req.body.chain || !req.body.address || !req.body.data) {

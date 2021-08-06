@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import { factory, formatFilename } from '../../shared/logging';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
+import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -20,7 +21,7 @@ export const Errors = {
   InvalidTerms: 'Terms of Service must begin with https://',
 };
 
-const updateChain = async (models, req: Request, res: Response, next: NextFunction) => {
+const updateChain = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   if (!req.body.id) return next(new Error(Errors.NoChainId));
   if (req.body.network) return next(new Error(Errors.CantChangeNetwork));

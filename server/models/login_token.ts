@@ -23,7 +23,7 @@ export interface LoginTokenAttributes {
 }
 
 export interface LoginTokenCreationAttributes extends  LoginTokenAttributes {
-   createForEmail?: (email: string, path?: string) => Promise<LoginTokenInstance>;
+  createForEmail?: (email: string, path?: string) => Promise<LoginTokenInstance>;
   createForOAuth?: (domain: string, social_account: number) => Promise<LoginTokenInstance>;
 }
 

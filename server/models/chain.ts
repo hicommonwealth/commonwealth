@@ -1,10 +1,10 @@
 import * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { RegisteredTypes } from '@polkadot/types/types';
 import { Model, DataTypes } from 'sequelize';
-import { AddressAttributes } from './address';
+import {AddressAttributes, AddressInstance} from './address';
 import { ChainNodeInstance, ChainNodeAttributes } from './chain_node';
 import { StarredCommunityAttributes } from './starred_community';
-import { OffchainTopicAttributes } from './offchain_topic';
+import {OffchainTopicAttributes, OffchainTopicInstance} from './offchain_topic';
 import { OffchainThreadAttributes } from './offchain_thread';
 import { OffchainCommentAttributes } from './offchain_comment';
 import { UserAttributes } from './user';
@@ -50,6 +50,10 @@ export interface ChainAttributes {
 export interface ChainInstance extends Model<ChainAttributes>, ChainAttributes {
   // add mixins as needed
   getChainNodes: Sequelize.HasManyGetAssociationsMixin<ChainNodeInstance>;
+  hasAddresses: Sequelize.HasManyHasAssociationsMixin<AddressInstance, AddressInstance['id']>;
+  getAddresses: Sequelize.HasManyGetAssociationsMixin<AddressInstance>;
+  getTopics: Sequelize.HasManyGetAssociationsMixin<OffchainTopicInstance>;
+  removeTopics: Sequelize.HasManyRemoveAssociationsMixin<OffchainTopicInstance, OffchainTopicInstance['id']>;
 }
 
 export type ChainModelStatic = ModelStatic<ChainInstance>

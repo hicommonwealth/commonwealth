@@ -4,6 +4,7 @@ import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUs
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl } from '../../shared/utils';
 import { NotificationCategories, ProposalType } from '../../shared/types';
+import { DB } from '../database';
 
 export const Errors = {
   InvalidThread: 'Must provide a valid thread_id',
@@ -12,7 +13,7 @@ export const Errors = {
   IncorrectOwner: 'Not owned by this user',
 };
 
-const addEditors = async (models, req: Request, res: Response, next: NextFunction) => {
+const addEditors = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   if (!req.body?.thread_id) {
     return next(new Error(Errors.InvalidThread));
   }
@@ -148,14 +149,14 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
   const finalEditors = await models.Collaboration.findAll({
     where: { offchain_thread_id: thread.id },
     include: [{
-      model: models.Address,
+      model: models.Address, as: 'Address'
     }]
   });
 
   return res.json({
     status: 'Success',
     result: {
-      collaborators: finalEditors.map((e) => e.Address.toJSON())
+      collaborators: finalEditors.map(async (e) => (await e.getAddress()).toJSON())
     },
   });
 };

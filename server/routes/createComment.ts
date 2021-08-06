@@ -2,6 +2,7 @@ import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { NotificationCategories } from '../../shared/types';
+import { DB } from '../database';
 
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
@@ -28,7 +29,7 @@ export const Errors = {
 };
 
 const createComment = async (
-  models,
+  models: DB,
   tokenBalanceCache: TokenBalanceCache,
   req: Request,
   res: Response,

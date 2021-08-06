@@ -9,13 +9,17 @@ import { Response, NextFunction, Request } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { factory, formatFilename } from '../../shared/logging';
 import { getLastEdited } from '../util/getLastEdited';
+import { DB } from '../database';
+import { OffchainTopicInstance } from '../models/offchain_topic';
+import { RoleInstance } from '../models/role';
+import { OffchainThreadInstance } from '../models/offchain_thread';
 
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = { };
 
 // Topics, comments, reactions, members+admins, threads
-const bulkOffchain = async (models, req: Request, res: Response, next: NextFunction) => {
+const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
   if (error) return next(new Error(error));
 
@@ -28,7 +32,7 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
     : { chain: chain.id };
 
   // parallelized queries
-  const [topics, threadsCommentsReactions, admins, mostActiveUsers, threadsInVoting] = await Promise.all([
+  const [topics, threadsCommentsReactions, admins, mostActiveUsers, threadsInVoting] = await <Promise<[OffchainTopicInstance[], unknown, RoleInstance[], unknown, OffchainThreadInstance[]]>>Promise.all([
     // topics
     models.OffchainTopic.findAll({
       where: community
@@ -48,7 +52,7 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
             },
             {
               model: models.Address,
-              through: models.Collaboration,
+              // through: models.Collaboration,
               as: 'collaborators'
             },
             {
@@ -56,7 +60,7 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
               as: 'topic'
             }
           ],
-          exclude: [ 'version_history' ],
+          attributes: { exclude: [ 'version_history' ] },
         });
 
         const query = `
@@ -195,7 +199,9 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
 
         // Reactions
         const matchThreadsOrComments = [
+          // @ts-ignore
           { thread_id: allThreads.map((thread) => thread.id) },
+          // @ts-ignore
           { comment_id: comments.map((comment) => comment.id) },
         ];
         const reactions = await models.OffchainReaction.findAll({
@@ -235,10 +241,11 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
         const monthlyComments = await models.OffchainComment.findAll({ where, include: [ models.Address ] });
         const monthlyThreads = await models.OffchainThread.findAll({
           where,
+          attributes: { exclude: [ 'version_history' ] },
           include: [ { model: models.Address, as: 'Address' } ],
-          exclude: [ 'version_history' ],
         });
 
+        // @ts-ignore
         monthlyComments.concat(monthlyThreads).forEach((post) => {
           if (!post.Address) return;
           const addr = post.Address.address;

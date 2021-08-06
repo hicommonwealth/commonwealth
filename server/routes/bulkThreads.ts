@@ -4,11 +4,13 @@ import { QueryTypes, Op } from 'sequelize';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { factory, formatFilename } from '../../shared/logging';
 import { getLastEdited } from '../util/getLastEdited';
+import { DB } from '../database';
+import { OffchainThreadInstance } from '../models/offchain_thread';
 
 const log = factory.getLogger(formatFilename(__filename));
 
 // bulkThreads takes a date param and fetches the most recent 20 threads before that date
-const bulkThreads = async (models, req: Request, res: Response, next: NextFunction) => {
+const bulkThreads = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
   if (error) return next(new Error(error));
   const { cutoff_date, topic_id, stage } = req.query;
@@ -181,7 +183,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
         },
         {
           model: models.Address,
-          through: models.Collaboration,
+          // through: models.Collaboration,
           as: 'collaborators'
         },
         {
@@ -189,7 +191,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
           as: 'topic'
         }
       ],
-      exclude: [ 'version_history' ],
+      attributes: { exclude: [ 'version_history' ] },
       order: [['created_at', 'DESC']],
     })).map((t, idx) => {
       const row = t.toJSON();
@@ -201,7 +203,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
     comments = (await models.OffchainComment.findAll({
       where: whereOptions,
       include: [models.Address, models.OffchainAttachment],
-      exclude: [ 'version_history' ],
+      attributes: { exclude: [ 'version_history' ] },
       order: [['created_at', 'DESC']],
     })).map((c, idx) => {
       const row = c.toJSON();
@@ -226,7 +228,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
      SELECT id, title, stage FROM "OffchainThreads"
      WHERE ${communityOptions} AND (stage = 'proposal_in_review' OR stage = 'voting')`;
 
-  const threadsInVoting = await models.sequelize.query(countsQuery, {
+  const threadsInVoting: OffchainThreadInstance[] = await models.sequelize.query(countsQuery, {
     replacements,
     type: QueryTypes.SELECT
   });

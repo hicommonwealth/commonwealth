@@ -2,6 +2,7 @@ import Sequelize from 'sequelize';
 import { Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { NotificationCategories } from '../../shared/types';
+import { DB } from '../database';
 
 export const Errors = {
   InvalidChainComm: 'Invalid chain or community',
@@ -11,7 +12,7 @@ export const Errors = {
 };
 
 const createRole = async (
-  models,
+  models: DB,
   req,
   res: Response,
   next: NextFunction

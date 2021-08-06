@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 import { factory, formatFilename } from '../../shared/logging';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -11,7 +12,7 @@ export const Errors = {
   InvalidUses: 'Must provide a valid number of uses',
 };
 
-const createInviteLink = async (models, req, res, next) => {
+const createInviteLink = async (models: DB, req, res, next) => {
   const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
@@ -64,7 +65,6 @@ const createInviteLink = async (models, req, res, next) => {
 
   const inviteLink = await models.InviteLink.create({
     id: inviteId,
-    // community_id: community.id,
     ...chainOrCommunityObj,
     creator_id: req.user.id,
     active: true,

@@ -1,10 +1,11 @@
 import _ from 'lodash';
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../../shared/logging';
+import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
 
-const bulkProfiles = async (models, req: Request, res: Response, next: NextFunction) => {
+const bulkProfiles = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   let chains;
   let addrs;
   if (req.body['chains[]'] && typeof req.body['chains[]'] === 'string') {

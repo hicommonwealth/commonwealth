@@ -1,6 +1,7 @@
 import { Op } from 'sequelize';
 import { Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import { DB } from '../database';
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
@@ -8,7 +9,7 @@ export const Errors = {
   MustBeAdmin: 'Must be an admin',
 };
 
-const createTopic = async (models, req, res: Response, next: NextFunction) => {
+const createTopic = async (models: DB, req, res: Response, next: NextFunction) => {
   const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
@@ -39,7 +40,7 @@ const createTopic = async (models, req, res: Response, next: NextFunction) => {
 
   const newTopic = await models.OffchainTopic.findOrCreate({
     where: options,
-    default: options,
+    // default: options,
   });
 
   return res.json({ status: 'Success', result: newTopic[0].toJSON() });

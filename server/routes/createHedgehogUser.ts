@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { successResponse } from '../util/apiHelpers';
-import { redirectWithLoginError, redirectWithLoginSuccess } from './finishEmailLogin';
 import { factory, formatFilename } from '../../shared/logging';
+import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -11,7 +10,7 @@ export const Errors = {
   MissingField: 'Missing one of the required fields: username, walletAddress',
 };
 
-export default async (models, req: Request, res: Response, next: NextFunction) => {
+export default async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const body = req.body;
 
   if (body.username && body.walletAddress) {

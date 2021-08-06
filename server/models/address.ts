@@ -19,9 +19,9 @@ import { NotificationCategories } from '../../shared/types';
 import { ModelStatic } from './types';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { ChainAttributes, ChainInstance } from './chain';
-import { UserAttributes } from './user';
-import { OffchainProfileAttributes } from './offchain_profile';
-import { RoleAttributes } from './role';
+import { UserAttributes, UserInstance } from './user';
+import { OffchainProfileAttributes, OffchainProfileInstance } from './offchain_profile';
+import { RoleAttributes, RoleInstance } from './role';
 import { factory, formatFilename } from '../../shared/logging';
 import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
 const log = factory.getLogger(formatFilename(__filename));
@@ -55,6 +55,10 @@ export interface AddressAttributes {
 
 export interface AddressInstance extends Model<AddressAttributes>, AddressCreationAttributes {
   // no mixins used yet
+  getChain: Sequelize.BelongsToGetAssociationMixin<ChainInstance>;
+  getUser: Sequelize.BelongsToGetAssociationMixin<UserInstance>;
+  getOffchainProfile: Sequelize.BelongsToGetAssociationMixin<OffchainProfileInstance>;
+  getRoles: Sequelize.HasManyGetAssociationsMixin<RoleInstance>;
 }
 
 export interface AddressCreationAttributes extends AddressAttributes {

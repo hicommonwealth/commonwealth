@@ -1,7 +1,9 @@
+import { QueryTypes }  from 'sequelize';
 import { Request, Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import { DB } from '../database';
 
-const communityStats = async (models, req: Request, res: Response, next: NextFunction) => {
+const communityStats = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
   if (error) return next(new Error(error));
 
@@ -23,7 +25,7 @@ LEFT JOIN ${table} ON ${table}.created_at::date = seq.date
 WHERE ${chain ? chainParam : communityParam} = ?
 GROUP BY seq.date
 ORDER BY seq.date DESC;`, {
-      type: models.sequelize.QueryTypes.SELECT,
+      type: QueryTypes.SELECT,
       replacements: chain ? [ chain.id ] : [ community.id ]
     });
   };
@@ -35,7 +37,7 @@ ORDER BY seq.date DESC;`, {
   const totalObjectsQuery = async (table, chainParam = 'chain_id', communityParam = 'offchain_community_id') => {
     return models.sequelize.query(
       `SELECT COUNT(id) AS new_items FROM ${table} WHERE ${chain ? chainParam : communityParam} = ?;`, {
-        type: models.sequelize.QueryTypes.SELECT,
+        type: QueryTypes.SELECT,
         replacements: chain ? [ chain.id ] : [ community.id ]
       }
     );
@@ -62,7 +64,7 @@ ON objs.created_at::date = seq.date
 GROUP BY seq.date
 ORDER BY seq.date DESC;
 `, {
-    type: models.sequelize.QueryTypes.SELECT,
+    type: QueryTypes.SELECT,
     replacements: chain ? [ chain.id, chain.id, chain.id ] : [ community.id, community.id, community.id ]
   });
 

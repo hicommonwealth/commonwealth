@@ -4,7 +4,7 @@ import send, { WebhookContent } from '../webhookNotifier';
 import { SERVER_URL } from '../config';
 import { UserAttributes } from './user';
 import { NotificationCategoryAttributes } from './notification_category';
-import { NotificationAttributes } from './notification';
+import {NotificationAttributes, NotificationInstance} from './notification';
 import { ModelStatic } from './types';
 import {
   IPostNotificationData, ICommunityNotificationData, IChainEventNotificationData,
@@ -50,7 +50,9 @@ export interface SubscriptionAttributes {
 }
 
 export interface SubscriptionInstance
-extends Sequelize.Model<SubscriptionAttributes>, SubscriptionAttributes {}
+extends Sequelize.Model<SubscriptionAttributes>, SubscriptionAttributes {
+  getNotifications: Sequelize.HasManyGetAssociationsMixin<NotificationInstance>;
+}
 
 export type SubscriptionModelStatic = ModelStatic<SubscriptionInstance> & { emitNotifications?: any; }
 

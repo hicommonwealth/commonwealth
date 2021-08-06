@@ -8,13 +8,14 @@ export enum InviteLinkTimeLimit {
   '24h' = '24h',
   '48h' = '48h',
   '1w' = '1w',
+  '1m' = '1m',
   '30d' = '30d',
   'none' = 'none',
 }
 
 export interface InviteLinkAttributes {
   creator_id: number;
-  id?: number;
+  id?: string;
   community_id?: string;
   chain_id?: string;
   active?: boolean;
