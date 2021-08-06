@@ -30,7 +30,7 @@ const setupChainEventListeners = async (
     connectionString: DATABASE_URI,
     ssl: {
       rejectUnauthorized: false
-    }
+    },
   });
 
   pool.on('error', (err, client) => {

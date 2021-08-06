@@ -35,13 +35,8 @@ async function handleFatalError(error: Error, chain?: string, type?: string): Pr
 const listeners: { [key: string]: any} = {};
 
 // TODO: API-WS from infinitely attempting reconnection i.e. mainnet1
-async function mainProcess(producer: RabbitMqHandler) {
-  const pool = new Pool({
-    connectionString: DATABASE_URI,
-    ssl: {
-      rejectUnauthorized: false
-    }
-  });
+async function mainProcess(producer: RabbitMqHandler, pool) {
+  log.info('Starting scheduled process');
 
   pool.on('error', (err, client) => {
     log.error('Unexpected error on idle client', err);
@@ -58,7 +53,8 @@ async function mainProcess(producer: RabbitMqHandler) {
   const myChains = myChainData.map(row => row.id)
   Object.keys(listeners).forEach((chain) => {
     if (!myChains.includes(chain)) {
-      listeners[chain].unsubscribe();
+      log.info(`[${chain}]: Deleting chain...`)
+      if (listeners[chain]) listeners[chain].unsubscribe();
       listeners[chain] = null;
     }
   })
@@ -69,11 +65,11 @@ async function mainProcess(producer: RabbitMqHandler) {
       const eventTypes = (await pool.query(format(`SELECT "id" FROM "ChainEventTypes" WHERE "chain"=%L`, chain))).rows.map(obj => obj.id)
       latestBlock = (await pool.query(format(`SELECT MAX("block_number") FROM "ChainEvents" WHERE "chain_event_type_id" IN (%L)`, eventTypes))).rows
     } catch (error) {
-      log.warn('An error occurred while discovering offline time range', error)
+      log.warn(`[${chain}]: An error occurred while discovering offline time range`, error)
     }
     if (latestBlock && latestBlock.length > 0 && latestBlock[0] && latestBlock[0].max) {
       const lastEventBlockNumber = latestBlock[0].max;
-      log.info(`Discovered chain event in db at block ${lastEventBlockNumber}.`);
+      log.info(`[${chain}]: Discovered chain event in db at block ${lastEventBlockNumber}.`);
       return { startBlock: lastEventBlockNumber + 1 };
     } else {
       return { startBlock: null };
@@ -101,6 +97,7 @@ async function mainProcess(producer: RabbitMqHandler) {
           chain.base
         );
       } catch (error) {
+        listeners[chain.id] = null;
         await handleFatalError(error, chain, 'listener-startup');
         continue;
       }
@@ -131,11 +128,11 @@ async function mainProcess(producer: RabbitMqHandler) {
     // restart the listener if specs were updated (only substrate chains)
     else if (
       chain.base == 'substrate' &&
-      !_.isEqual(chain.spec, (<SubstrateListener>listeners[chain.id]).options.spec)
+      !_.isEqual(chain.substrate_spec, (<SubstrateListener>listeners[chain.id]).options.spec)
     ) {
-      log.info(`Spec for ${chain} changed... restarting listener`);
+      log.info(`Spec for ${chain.id} changed... restarting listener`);
       try {
-        await (<SubstrateListener>listeners[chain.id]).updateSpec(chain.spec);
+        await (<SubstrateListener>listeners[chain.id]).updateSpec(chain.substrate_spec);
       } catch (error) {
         await handleFatalError(error, chain.id, 'update-spec')
       }
@@ -143,7 +140,6 @@ async function mainProcess(producer: RabbitMqHandler) {
   }
 
   if (HANDLE_IDENTITY == null) {
-    await pool.end();
     log.info(`Finished scheduled process.`);
     if (process.env.TESTING) {
       const listenerOptions = {}
@@ -153,10 +149,15 @@ async function mainProcess(producer: RabbitMqHandler) {
     return;
   }
 
-  // loop through chains again this time dealing with identity
+  // loop through chains that have active listeners again this time dealing with identity
   for (const chain of myChainData) {
     // skip chains that aren't Substrate chains
     if (chain.base != 'substrate') continue;
+
+    if (!listeners[chain.id]) {
+      log.warn(`There is no active listener for ${chain.id} - cannot fetch identity`);
+      continue;
+    }
 
     log.info(`Fetching identities on ${chain.id}`);
 
@@ -226,7 +227,6 @@ async function mainProcess(producer: RabbitMqHandler) {
     log.info(`Identity cache for ${chain.id} cleared`);
   }
 
-  await pool.end();
   log.info('Finished scheduled process.');
   if (process.env.TESTING) {
     const listenerOptions = {}
@@ -240,13 +240,25 @@ async function mainProcess(producer: RabbitMqHandler) {
 log.info('db-node initialization');
 
 const producer = new RabbitMqHandler(RabbitMQConfig);
+const pool = new Pool({
+  connectionString: DATABASE_URI,
+  ssl: {
+    rejectUnauthorized: false
+  },
+  max: 3
+});
 producer
   .init()
   .then(() => {
-    return mainProcess(producer);
+    // listeners may use the pool at any time to detect the disconnectedRange
+    // a single client may be a bottleneck if multiple listeners go down and attempt
+    // to discoverReconnectRange --- could checkout a client in discoverReconnect but that
+    // could cause db crash if listening to several hundred chains that all crash
+    // consult jake
+    return mainProcess(producer, pool);
   })
   .then(() => {
-    setInterval(mainProcess, REPEAT_TIME * 60000, producer);
+    setInterval(mainProcess, REPEAT_TIME * 60000, producer, pool);
   })
   .catch((err) => {
     // TODO: any error caught here is critical - no events will be produced
