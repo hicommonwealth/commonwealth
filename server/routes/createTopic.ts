@@ -15,7 +15,7 @@ const createTopic = async (models, req, res: Response, next: NextFunction) => {
   if (!req.body.name) return next(new Error(Errors.TopicRequired));
 
   const chainOrCommObj = community ? { offchain_community_id: community.id } : { chain_id: chain.id };
-  const userAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
+  const userAddressIds = (await req.user.getAddresses()).filter((addr) => !!addr.verified).map((addr) => addr.id);
   const adminRoles = await models.Role.findAll({
     where: {
       address_id: { [Op.in]: userAddressIds },

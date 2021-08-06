@@ -1,6 +1,6 @@
 import * as Sequelize from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
-import { ModelStatic } from '../../shared/types';
+import { ModelStatic } from './types';
 
 import { OffchainCommunityAttributes } from './offchain_community';
 
@@ -13,10 +13,10 @@ export enum InviteLinkTimeLimit {
 }
 
 export interface InviteLinkAttributes {
+  creator_id: number;
   id?: number;
   community_id?: string;
   chain_id?: string;
-  creator_id: number;
   active?: boolean;
   multi_use?: number;
   used?: number;
@@ -29,7 +29,7 @@ export interface InviteLinkAttributes {
 export interface InviteLinkInstance
 extends Model<InviteLinkAttributes>, InviteLinkAttributes {}
 
-type InviteLinkModelStatic = ModelStatic<InviteLinkInstance>
+export type InviteLinkModelStatic = ModelStatic<InviteLinkInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,

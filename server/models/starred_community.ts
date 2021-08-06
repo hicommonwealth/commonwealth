@@ -1,13 +1,13 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes, Model } from 'sequelize';
-import { ModelStatic } from '../../shared/types';
+import { ModelStatic } from './types';
 import { UserAttributes } from './user';
 import { ChainAttributes } from './chain';
 import { OffchainCommunityAttributes } from './offchain_community';
 
 export interface StarredCommunityAttributes {
-  id?: number;
   user_id: number;
+  id?: number;
   chain?: string;
   community?: string;
   created_at?: Date;
@@ -24,7 +24,7 @@ StarredCommunityAttributes {
   // no mixins used
 }
 
-type StarredCommunityModelStatic = ModelStatic<StarredCommunityInstance>
+export type StarredCommunityModelStatic = ModelStatic<StarredCommunityInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,

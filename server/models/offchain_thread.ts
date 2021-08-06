@@ -1,6 +1,6 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes, Model } from 'sequelize';
-import { ModelStatic } from '../../shared/types';
+import { ModelStatic } from './types';
 import { AddressAttributes } from './address';
 import { ChainAttributes } from './chain';
 import { OffchainCommunityAttributes } from './offchain_community';
@@ -8,13 +8,13 @@ import { OffchainAttachmentAttributes } from './offchain_attachment';
 import { ChainEntityAttributes } from './chain_entity';
 
 export interface OffchainThreadAttributes {
-  id?: number;
   address_id: number;
   title: string;
-  body?: string;
-  plaintext?: string;
   kind: string;
   stage: string;
+  id?: number;
+  body?: string;
+  plaintext?: string;
   url?: string;
   topic_id?: number;
   pinned?: boolean;
@@ -44,7 +44,7 @@ export interface OffchainThreadInstance extends Model<OffchainThreadAttributes>,
   // no mixins used
 }
 
-type OffchainThreadModelStatic = ModelStatic<OffchainThreadInstance>
+export type OffchainThreadModelStatic = ModelStatic<OffchainThreadInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,

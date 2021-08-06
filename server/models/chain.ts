@@ -8,34 +8,33 @@ import { OffchainTopicAttributes } from './offchain_topic';
 import { OffchainThreadAttributes } from './offchain_thread';
 import { OffchainCommentAttributes } from './offchain_comment';
 import { UserAttributes } from './user';
-import { ModelStatic } from '../../shared/types';
-
+import { ModelStatic } from './types';
 
 export interface ChainAttributes {
-  id?: string;
   name: string;
+  symbol: string;
+  network: string;
+  base: string;
+  icon_url: string;
+  active: boolean;
+  type: string;
+  id?: string;
   description?: string;
   discord?: string;
   element?: string;
   website?: string;
   telegram?: string;
   github?: string;
-  featured_topics: string[];
-  symbol: string;
-  network: string;
-  base: string;
   ss58_prefix?: number;
-  icon_url: string;
-  blockExplorerIds: string;
-  collapsed_on_homepage: boolean;
-  active: boolean;
-  stagesEnabled: boolean;
-  customStages: string;
-  customDomain: string;
-  type: string;
-  substrate_spec: RegisteredTypes;
-  terms: string;
-  snapshot: string;
+  stagesEnabled?: boolean;
+  customStages?: string;
+  customDomain?: string;
+  blockExplorerIds?: string;
+  collapsed_on_homepage?: boolean;
+  featured_topics?: string[];
+  substrate_spec?: RegisteredTypes;
+  terms?: string;
+  snapshot?: string;
 
   // associations
   ChainNodes?: ChainNodeAttributes[] | ChainNodeAttributes['id'][];
@@ -53,7 +52,7 @@ export interface ChainInstance extends Model<ChainAttributes>, ChainAttributes {
   getChainNodes: Sequelize.HasManyGetAssociationsMixin<ChainNodeInstance>;
 }
 
-type ChainModelStatic = ModelStatic <ChainInstance>
+export type ChainModelStatic = ModelStatic<ChainInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,

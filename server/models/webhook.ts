@@ -2,14 +2,14 @@ import * as Sequelize from 'sequelize';
 import { DataTypes, Model } from 'sequelize';
 import { ChainAttributes } from './chain';
 import { OffchainCommunityAttributes } from './offchain_community';
-import { ModelStatic } from '../../shared/types';
+import { ModelStatic } from './types';
 
 export interface WebhookAttributes {
-  id?: number;
   url: string;
+  categories: string[];
+  id?: number;
   chain_id?: string;
   offchain_community_id?: string;
-  categories: string[];
   created_at?: Date;
   updated_at?: Date;
   Chain?: ChainAttributes;
@@ -18,7 +18,7 @@ export interface WebhookAttributes {
 
 export interface WebhookInstance extends Model<WebhookAttributes>, WebhookAttributes {}
 
-type WebhookModelStatic = ModelStatic<WebhookInstance>
+export type WebhookModelStatic = ModelStatic<WebhookInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,

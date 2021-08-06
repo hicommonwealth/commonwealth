@@ -1,15 +1,15 @@
 import * as Sequelize from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
-import { ModelStatic } from '../../shared/types';
+import { ModelStatic } from './types';
 import { OffchainCommentAttributes } from './offchain_comment';
 import { OffchainThreadAttributes } from './offchain_thread';
 
 export interface OffchainAttachmentAttributes {
-  id?: number;
   attachable: string;
   attachment_id: number;
   url: string;
   description: string;
+  id?: number;
   created_at?: Date;
   updated_at?: Date;
 
@@ -21,7 +21,7 @@ export interface OffchainAttachmentAttributes {
 export interface OffchainAttachmentInstance
 extends Model<OffchainAttachmentAttributes>, OffchainAttachmentAttributes {}
 
-type OffchainAttachmentModelStatic = ModelStatic<OffchainAttachmentInstance>
+export type OffchainAttachmentModelStatic = ModelStatic<OffchainAttachmentInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,

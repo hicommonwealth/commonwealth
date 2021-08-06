@@ -1,6 +1,6 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes, Model } from 'sequelize';
-import { ModelStatic } from '../../shared/types';
+import { ModelStatic } from './types';
 
 export interface WaitlistRegistrationAttributes {
   user_id: number;
@@ -13,7 +13,7 @@ export interface WaitlistRegistrationAttributes {
 export interface WaitlistRegistrationInstance
 extends Model<WaitlistRegistrationAttributes>, WaitlistRegistrationAttributes {}
 
-type WaitlistRegistrationModelStatic = ModelStatic<WaitlistRegistrationInstance>
+export type WaitlistRegistrationModelStatic = ModelStatic<WaitlistRegistrationInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,

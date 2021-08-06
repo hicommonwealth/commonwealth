@@ -1,16 +1,16 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes, Model } from 'sequelize';
-import { ModelStatic } from '../../shared/types';
+import { ModelStatic } from './types';
 import { ChainAttributes } from './chain';
 import { OffchainCommunityAttributes } from './offchain_community';
 import { OffchainThreadAttributes } from './offchain_thread';
 
 export interface OffchainViewCountAttributes {
+  object_id: number;
+  view_count: number;
   id?: number;
   chain?: string;
   community?: string;
-  object_id: number;
-  view_count: number;
   Chain?: ChainAttributes;
   OffchainCommunity?: OffchainCommunityAttributes;
   OffchainThread?: OffchainThreadAttributes;
@@ -21,7 +21,7 @@ extends Model<OffchainViewCountAttributes>, OffchainViewCountAttributes {
 
 }
 
-type OffchainViewCountModelStatic = ModelStatic<OffchainViewCountInstance>
+export type OffchainViewCountModelStatic = ModelStatic<OffchainViewCountInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,

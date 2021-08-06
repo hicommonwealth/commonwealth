@@ -1,6 +1,6 @@
 import * as Sequelize from 'sequelize';
-import { BuildOptions, Model, DataTypes } from 'sequelize';
-
+import { Model, DataTypes } from 'sequelize';
+import { ModelStatic } from './types';
 import { AddressAttributes } from './address';
 import { ChainAttributes } from './chain';
 import { StarredCommunityAttributes } from './starred_community';
@@ -12,7 +12,9 @@ export interface OffchainCommunityAttributes {
   name: string;
   creator_id: number;
   default_chain: string;
-  iconUrl: string;
+  featured_topics?: string[];
+  privacyEnabled?: boolean;
+  invitesEnabled?: boolean;
   description?: string;
   website?: string;
   discord?: string;
@@ -20,13 +22,11 @@ export interface OffchainCommunityAttributes {
   telegram?: string;
   github?: string;
   terms?: string;
-  featured_topics?: string[];
-  privacyEnabled?: boolean;
-  invitesEnabled?: boolean;
-  stagesEnabled: boolean;
-  customStages: string;
   customDomain?: string;
-  collapsed_on_homepage: boolean;
+  iconUrl?: string;
+  stagesEnabled?: boolean;
+  customStages?: string;
+  collapsed_on_homepage?: boolean;
   created_at?: Date;
   updated_at?: Date;
   deleted_at?: Date;
@@ -42,9 +42,7 @@ export interface OffchainCommunityAttributes {
 export interface OffchainCommunityInstance
 extends Model<OffchainCommunityAttributes>, OffchainCommunityAttributes {}
 
-type OffchainCommunityModelStatic = typeof Model
-    & { associate: (models: any) => void }
-    & { new(values?: Record<string, unknown>, options?: BuildOptions): OffchainCommunityInstance }
+export type OffchainCommunityModelStatic = ModelStatic<OffchainCommunityInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,

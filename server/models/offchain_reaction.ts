@@ -1,18 +1,18 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes, Model } from 'sequelize';
-import { ModelStatic } from '../../shared/types';
+import { ModelStatic } from './types';
 import { ChainAttributes } from './chain';
 import { OffchainCommunityAttributes } from './offchain_community';
 import { AddressAttributes } from './address';
 
 export interface OffchainReactionAttributes {
+  address_id: number;
+  reaction: string;
   id?: number;
   chain?: string;
   thread_id?: number;
   proposal_id?: number;
   comment_id?: number;
-  address_id: number;
-  reaction: string;
   community?: string;
   created_at?: Date;
   updated_at?: Date;
@@ -24,7 +24,7 @@ export interface OffchainReactionAttributes {
 export interface OffchainReactionInstance
 extends Model<OffchainReactionAttributes>, OffchainReactionAttributes {}
 
-type OffchainReactionModelStatic = ModelStatic<OffchainReactionInstance>
+export type OffchainReactionModelStatic = ModelStatic<OffchainReactionInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,

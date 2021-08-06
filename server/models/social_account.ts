@@ -1,15 +1,15 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes, Model } from 'sequelize';
-import { ModelStatic } from '../../shared/types';
+import { ModelStatic } from './types';
 import { UserInstance, UserAttributes } from './user';
 
 export interface SocialAccountAttributes {
-  id?: number;
   provider: string;
   provider_username: string;
   provider_userid: string;
   access_token: string;
   refresh_token: string;
+  id?: number;
   created_at?: Date;
   updated_at?: Date;
 
@@ -22,7 +22,7 @@ export interface SocialAccountInstance extends Model<SocialAccountAttributes>, S
   setUser: Sequelize.BelongsToSetAssociationMixin<UserInstance, UserInstance['id']>;
 }
 
-type SocialAccountModelStatic =  ModelStatic<SocialAccountInstance>
+export type SocialAccountModelStatic =  ModelStatic<SocialAccountInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,

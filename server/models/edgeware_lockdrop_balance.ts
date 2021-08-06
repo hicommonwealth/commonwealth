@@ -1,18 +1,18 @@
 import * as Sequelize from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
-import { ModelStatic } from '../../shared/types';
+import { ModelStatic } from './types';
 
 export interface EdgewareLockdropBalanceAttributes {
-  id?: number;
   address: string;
   balance: string;
   blocknum: number;
+  id?: number;
 }
 
 export interface EdgewareLockdropBalanceInstance
 extends Model<EdgewareLockdropBalanceAttributes>, EdgewareLockdropBalanceAttributes {}
 
-type EdgewareLockdropBalanceModelStatic = ModelStatic<EdgewareLockdropBalanceInstance>
+export type EdgewareLockdropBalanceModelStatic = ModelStatic<EdgewareLockdropBalanceInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,

@@ -1,6 +1,6 @@
 import * as Sequelize from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
-import { ModelStatic } from '../../shared/types';
+import { ModelStatic } from './types';
 
 import { AddressAttributes } from './address';
 import { ChainAttributes } from './chain';
@@ -8,14 +8,14 @@ import { OffchainCommunityAttributes } from './offchain_community';
 import { OffchainAttachmentAttributes } from './offchain_attachment';
 
 export interface OffchainCommentAttributes {
-  id?: number;
-  chain?: string;
   root_id: string;
-  parent_id?: string;
-  child_comments?: number[];
   address_id: number;
   text: string;
   plaintext: string;
+  id?: number;
+  chain?: string;
+  parent_id?: string;
+  child_comments?: number[];
   community?: string;
   version_history?: string[];
   created_at?: Date;
@@ -34,7 +34,7 @@ extends Model<OffchainCommentAttributes>, OffchainCommentAttributes {
   // no mixins used
 }
 
-type OffchainCommentModelStatic =  ModelStatic<OffchainCommentInstance>
+export type OffchainCommentModelStatic =  ModelStatic<OffchainCommentInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,

@@ -1,22 +1,22 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes, Model } from 'sequelize';
-import { ModelStatic } from '../../shared/types';
+import { ModelStatic } from './types';
 import { ChainAttributes } from './chain';
 import { OffchainCommunityAttributes } from './offchain_community';
 import { OffchainThreadAttributes } from './offchain_thread';
 
 export interface OffchainTopicAttributes {
-  id?: number;
   name: string;
-  description?: string;
-  telegram?: string;
   chain_id: string;
   community_id: string;
+  featured_in_sidebar: boolean;
+  featured_in_new_post: boolean;
+  id?: number;
+  description?: string;
+  telegram?: string;
   created_at?: Date;
   updated_at?: Date;
   deleted_at?: Date;
-  featured_in_sidebar: boolean;
-  featured_in_new_post: boolean;
 
   // associations
   community?: OffchainCommunityAttributes;
@@ -29,7 +29,7 @@ export interface OffchainTopicInstance extends Model<OffchainTopicAttributes>, O
   // TODO: do we need to implement the "as" stuff here?
 }
 
-type OffchainTopicModelStatic = ModelStatic<OffchainTopicInstance>
+export type OffchainTopicModelStatic = ModelStatic<OffchainTopicInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,

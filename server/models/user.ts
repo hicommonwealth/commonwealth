@@ -1,6 +1,6 @@
 import * as Sequelize from 'sequelize';
-import { BuildOptions, DataTypes, Model } from 'sequelize';
-
+import { DataTypes, Model } from 'sequelize';
+import { ModelStatic } from './types';
 import { AddressInstance, AddressAttributes } from './address';
 import { ChainAttributes } from './chain';
 import { ChainNodeInstance, ChainNodeAttributes } from './chain_node';
@@ -9,13 +9,13 @@ import { SocialAccountInstance, SocialAccountAttributes } from './social_account
 export type EmailNotificationInterval = 'daily' | 'never';
 
 export interface UserAttributes {
-  id?: number;
   email: string;
+  id?: number;
   emailVerified?: boolean;
   isAdmin?: boolean;
   lastVisited?: string;
   disableRichText?: boolean;
-  emailNotificationInterval: EmailNotificationInterval;
+  emailNotificationInterval?: EmailNotificationInterval;
   magicIssuer?: string;
   lastMagicLoginAt?: number;
   created_at?: Date;
@@ -40,9 +40,7 @@ export interface UserInstance extends Model<UserAttributes>, UserAttributes {
   setSocialAccounts: Sequelize.HasManySetAssociationsMixin<SocialAccountInstance, SocialAccountInstance['id']>;
 }
 
-type UserModelStatic = typeof Sequelize.Model
-    & { associate: (models: any) => void }
-    & { new(values?: Record<string, unknown>, options?: Sequelize.BuildOptions): UserInstance }
+export type UserModelStatic = ModelStatic<UserInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,

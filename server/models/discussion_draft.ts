@@ -1,6 +1,28 @@
+import * as Sequelize from 'sequelize';
+import { DataTypes, Model } from 'sequelize';
+import { ModelStatic } from './types';
 
-module.exports = (sequelize, DataTypes) => {
-  const DiscussionDraft = sequelize.define('DiscussionDraft', {
+export interface DiscussionDraftAttributes {
+  id: number;
+  address_id: number;
+  title?: string;
+  topic?: string;
+  body?: string;
+  chain?: string;
+  community?: string;
+  attachment?: string;
+}
+
+export interface DiscussionDraftInstance
+    extends Model<DiscussionDraftAttributes>, DiscussionDraftAttributes {}
+
+export type DiscussionDraftModelStatic = ModelStatic<DiscussionDraftInstance>
+
+export default (
+  sequelize: Sequelize.Sequelize,
+  dataTypes: typeof DataTypes
+) => {
+  const DiscussionDraft = <DiscussionDraftModelStatic>sequelize.define('DiscussionDraft', {
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     address_id: { type: DataTypes.INTEGER, allowNull: false },
     title: { type: DataTypes.TEXT, allowNull: true },

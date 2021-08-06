@@ -19,7 +19,7 @@ const deleteReaction = async (models, req: Request, res: Response, next: NextFun
   }
 
   try {
-    const userOwnedAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
+    const userOwnedAddressIds = (await req.user.getAddresses()).filter((addr) => !!addr.verified).map((addr) => addr.id);
     const reaction = await models.OffchainReaction.findOne({
       where: {
         id: req.body.reaction_id,

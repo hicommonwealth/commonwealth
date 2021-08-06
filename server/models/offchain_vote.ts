@@ -1,16 +1,16 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes, Model } from 'sequelize';
-import { ModelStatic } from '../../shared/types';
+import { ModelStatic } from './types';
 import { OffchainThreadAttributes } from './offchain_thread';
 
 export interface OffchainVoteAttributes {
-  id?: number;
   thread_id: number;
   option: string;
   address: string;
   author_chain: string;
   chain: string;
   community: string;
+  id?: number;
   created_at?: Date;
   updated_at?: Date;
 
@@ -21,7 +21,7 @@ export interface OffchainVoteAttributes {
 export interface OffchainVoteInstance
 extends Model<OffchainVoteAttributes>, OffchainVoteAttributes {}
 
-type OffchainVoteModelStatic = ModelStatic<OffchainVoteInstance>
+export type OffchainVoteModelStatic = ModelStatic<OffchainVoteInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,

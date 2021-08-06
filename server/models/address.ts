@@ -15,7 +15,8 @@ import { AminoSignResponse, pubkeyToAddress } from '@cosmjs/amino';
 
 import nacl from 'tweetnacl';
 import { KeyringOptions } from '@polkadot/keyring/types';
-import { NotificationCategories, ModelStatic } from '../../shared/types';
+import { NotificationCategories } from '../../shared/types';
+import { ModelStatic } from './types';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { ChainAttributes, ChainInstance } from './chain';
 import { UserAttributes } from './user';
@@ -29,10 +30,10 @@ const log = factory.getLogger(formatFilename(__filename));
 const ethUtil = require('ethereumjs-util');
 
 export interface AddressAttributes {
-  id?: number;
   address: string;
   chain: string;
   verification_token: string;
+  id?: number;
   verification_token_expires?: Date;
   verified?: Date;
   keytype?: string;
@@ -93,7 +94,7 @@ export interface AddressCreationAttributes extends AddressAttributes {
   ) => Promise<boolean>;
 }
 
-type AddressModelStatic = ModelStatic<AddressInstance> & AddressCreationAttributes
+export type AddressModelStatic = ModelStatic<AddressInstance> & AddressCreationAttributes
 
 export default (
   sequelize: Sequelize.Sequelize,

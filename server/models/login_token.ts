@@ -3,13 +3,13 @@ import { Model, DataTypes } from 'sequelize';
 import crypto from 'crypto';
 import { LOGIN_TOKEN_EXPIRES_IN } from '../config';
 import { SocialAccountAttributes } from './social_account';
-import { ModelStatic } from '../../shared/types';
+import { ModelStatic } from './types';
 
 export interface LoginTokenAttributes {
-  id?: number;
   token: string;
-  email?: string;
   expires: Date;
+  id?: number;
+  email?: string;
   redirect_path?: string;
   domain?: string;
   social_account?: number;
@@ -31,7 +31,7 @@ export interface LoginTokenInstance extends Model<LoginTokenAttributes>, LoginTo
   // no mixins used yet
 }
 
-type LoginTokenModelStatic = ModelStatic<LoginTokenInstance> & LoginTokenCreationAttributes
+export type LoginTokenModelStatic = ModelStatic<LoginTokenInstance> & LoginTokenCreationAttributes
 
 export default (
   sequelize: Sequelize.Sequelize,

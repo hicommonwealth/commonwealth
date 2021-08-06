@@ -1,13 +1,13 @@
 import * as Sequelize from 'sequelize';
-import { BuildOptions, Model, DataTypes } from 'sequelize';
-import { ModelStatic } from '../../shared/types';
+import { Model, DataTypes } from 'sequelize';
+import { ModelStatic } from './types';
 
 export interface ChatMessageAttributes {
-  id?: number;
   chain: string;
   address: string;
   text: string;
   room: string;
+  id?: number;
   created_at?: Date;
   updated_at?: Date;
 }
@@ -17,7 +17,7 @@ extends Model<ChatMessageAttributes>, ChatMessageAttributes {
 
 }
 
-type ChatMessageModelStatic = ModelStatic<ChatMessageInstance>
+export type ChatMessageModelStatic = ModelStatic<ChatMessageInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,

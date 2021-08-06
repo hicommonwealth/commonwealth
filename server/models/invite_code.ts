@@ -1,16 +1,16 @@
 import * as Sequelize from 'sequelize';
-import { BuildOptions, Model, DataTypes } from 'sequelize';
-import { ModelStatic } from '../../shared/types';
+import { Model, DataTypes } from 'sequelize';
+import { ModelStatic } from './types';
 
 import { OffchainCommunityAttributes } from './offchain_community';
 import { ChainAttributes } from './chain';
 
 export interface InviteCodeAttributes {
+  creator_id: number;
   id?: string;
   community_id?: string;
   community_name?: string;
   chain_id?: string;
-  creator_id: number;
   invited_email?: string;
   used?: boolean;
   created_at?: Date;
@@ -22,7 +22,7 @@ export interface InviteCodeAttributes {
 export interface InviteCodeInstance
 extends Model<InviteCodeAttributes>, InviteCodeAttributes {}
 
-type InviteCodeModelStatic = ModelStatic<InviteCodeInstance>
+export type InviteCodeModelStatic = ModelStatic<InviteCodeInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,

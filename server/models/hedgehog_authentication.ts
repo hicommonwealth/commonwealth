@@ -1,6 +1,6 @@
 import * as Sequelize from 'sequelize';
-import { BuildOptions, Model, DataTypes } from 'sequelize';
-import { ModelStatic } from '../../shared/types';
+import { Model, DataTypes } from 'sequelize';
+import { ModelStatic } from './types';
 
 export interface HedgehogAuthenticationAttributes {
   iv: string;
@@ -13,7 +13,7 @@ export interface HedgehogAuthenticationAttributes {
 export interface HedgehogAuthenticationInstance
 extends Model<HedgehogAuthenticationAttributes>, HedgehogAuthenticationAttributes {}
 
-type HedgehogAuthenticationModelStatic = ModelStatic<HedgehogAuthenticationInstance>
+export type HedgehogAuthenticationModelStatic = ModelStatic<HedgehogAuthenticationInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,

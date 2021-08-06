@@ -1,12 +1,12 @@
 import * as Sequelize from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
-import { ModelStatic } from '../../shared/types';
+import { ModelStatic } from './types';
 
 export interface ContractCategoryAttributes {
-  id?: number;
   name: string;
   description: string;
   color: string;
+  id?: number;
   created_at?: Date;
   updated_at?: Date;
 }
@@ -14,7 +14,7 @@ export interface ContractCategoryAttributes {
 export interface ContractCategoryInstance
 extends Model<ContractCategoryAttributes>, ContractCategoryAttributes {}
 
-type ContractCategoryModelStatic = ModelStatic<ContractCategoryInstance>
+export type ContractCategoryModelStatic = ModelStatic<ContractCategoryInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,

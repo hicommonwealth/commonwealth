@@ -1,15 +1,15 @@
 import * as Sequelize from 'sequelize';
-import { BuildOptions, Model, DataTypes } from 'sequelize';
+import { Model, DataTypes } from 'sequelize';
 import { ChainAttributes } from './chain';
 import { OffchainThreadAttributes } from './offchain_thread';
 import { ChainEventAttributes } from './chain_event';
-import { ModelStatic } from '../../shared/types';
+import { ModelStatic } from './types';
 
 export interface ChainEntityAttributes {
-  id?: number;
   chain: string;
   type: string;
   type_id: string;
+  id?: number;
   thread_id?: number;
   title?: string;
   author?: string;
@@ -25,7 +25,7 @@ export interface ChainEntityAttributes {
 export interface ChainEntityInstance
 extends Model<ChainEntityAttributes>, ChainEntityAttributes {}
 
-type ChainEntityModelStatic = ModelStatic<ChainEntityInstance>
+export type ChainEntityModelStatic = ModelStatic<ChainEntityInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,

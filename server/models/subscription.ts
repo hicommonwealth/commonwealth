@@ -1,14 +1,13 @@
-import _ from 'underscore';
 import WebSocket from 'ws';
 import Sequelize, { DataTypes } from 'sequelize';
 import send, { WebhookContent } from '../webhookNotifier';
-import { SENDGRID_API_KEY, SERVER_URL } from '../config';
+import { SERVER_URL } from '../config';
 import { UserAttributes } from './user';
 import { NotificationCategoryAttributes } from './notification_category';
 import { NotificationAttributes } from './notification';
+import { ModelStatic } from './types';
 import {
-  WebsocketMessageType, IWebsocketsPayload,
-  IPostNotificationData, ICommunityNotificationData, IChainEventNotificationData, ModelStatic
+  IPostNotificationData, ICommunityNotificationData, IChainEventNotificationData,
 } from '../../shared/types';
 import { createImmediateNotificationEmailObject, sendImmediateNotificationEmail } from '../scripts/emails';
 import { factory, formatFilename } from '../../shared/logging';
@@ -24,10 +23,10 @@ const log = factory.getLogger(formatFilename(__filename));
 const { Op } = Sequelize;
 
 export interface SubscriptionAttributes {
-  id?: number;
   subscriber_id: number;
   category_id: string;
   object_id: string;
+  id?: number;
   is_active?: boolean;
   immediate_email?: boolean;
   created_at?: Date;
@@ -53,7 +52,7 @@ export interface SubscriptionAttributes {
 export interface SubscriptionInstance
 extends Sequelize.Model<SubscriptionAttributes>, SubscriptionAttributes {}
 
-type SubscriptionModelStatic = ModelStatic<SubscriptionInstance> & { emitNotifications?: any; }
+export type SubscriptionModelStatic = ModelStatic<SubscriptionInstance> & { emitNotifications?: any; }
 
 export default (
   sequelize: Sequelize.Sequelize,

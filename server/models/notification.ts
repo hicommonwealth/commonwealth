@@ -1,12 +1,12 @@
 import * as Sequelize from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
-import { ModelStatic } from '../../shared/types';
+import { ModelStatic } from './types';
 import { SubscriptionAttributes } from './subscription';
 
 export interface NotificationAttributes {
-  id?: number;
   subscription_id: number;
   notification_data: string;
+  id?: number;
   is_read?: boolean;
   chain_event_id?: number;
   created_at?: Date;
@@ -17,7 +17,7 @@ export interface NotificationAttributes {
 export interface NotificationInstance
 extends Model<NotificationAttributes>, NotificationAttributes {}
 
-type NotificationModelStatic = ModelStatic<NotificationInstance>
+export type NotificationModelStatic = ModelStatic<NotificationInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,
