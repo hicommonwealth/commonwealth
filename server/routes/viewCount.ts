@@ -1,9 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import ViewCountCache from '../util/viewCountCache';
 import { sequelize } from '../database';
-import { factory, formatFilename } from '../../shared/logging';
-
-const log = factory.getLogger(formatFilename(__filename));
+import log from '../../shared/logging';
 
 export const Errors = {
   NoObjectId: 'Must provide object ID',

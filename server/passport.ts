@@ -10,9 +10,8 @@ import { Magic, MagicUserMetadata } from '@magic-sdk/admin';
 import { Strategy as MagicStrategy } from 'passport-magic';
 
 import { sequelize } from './database';
-import { factory, formatFilename } from '../shared/logging';
+import log from '../shared/logging';
 import { getStatsDInstance } from './util/metrics';
-const log = factory.getLogger(formatFilename(__filename));
 
 import {
   JWT_SECRET, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_OAUTH_CALLBACK, MAGIC_API_KEY, MAGIC_SUPPORTED_BASES,

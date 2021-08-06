@@ -1,6 +1,4 @@
-import { factory, formatFilename } from '../../shared/logging';
-
-const log = factory.getLogger(formatFilename(__filename));
+import log from '../../shared/logging';
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',

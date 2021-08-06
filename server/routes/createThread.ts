@@ -9,8 +9,7 @@ import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
 import { parseUserMentions } from '../util/parseUserMentions';
 import TokenBalanceCache from '../util/tokenBalanceCache';
 
-import { factory, formatFilename } from '../../shared/logging';
-const log = factory.getLogger(formatFilename(__filename));
+import log from '../../shared/logging';
 
 export const Errors = {
   ForumMissingTitle: 'Forum posts must include a title',

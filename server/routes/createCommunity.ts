@@ -1,9 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { NotificationCategories } from '../../shared/types';
 import { slugify } from '../../shared/utils';
-import { factory, formatFilename } from '../../shared/logging';
-
-const log = factory.getLogger(formatFilename(__filename));
+import log from '../../shared/logging';
 
 export const Errors = {
   NoName: 'Must provide community name',
