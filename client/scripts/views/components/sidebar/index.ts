@@ -594,7 +594,16 @@ const Sidebar: m.Component<{ hideQuickSwitcher? }, {}> = {
         m('br'),
         app.isLoggedIn() && (app.chain || app.community) && m(SubscriptionButton),
         app.chain && m(ChainStatusModule),
-      ])
+        m('br'),
+        m('br'),
+          m(Button, {
+            class: 'PoweredBy h-24 w-36',
+            label: 'Powered by',
+            onclick: (e) => {
+              
+            },
+          })
+      ]),
     ];
   },
 };
