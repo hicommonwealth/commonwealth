@@ -42,7 +42,7 @@ async function mainProcess(producer: RabbitMqHandler, pool) {
     log.error('Unexpected error on idle client', err);
   });
 
-  let query = `SELECT "Chains"."id", "substrate_spec", "url", "address", "base" FROM "Chains" JOIN "ChainNodes" ON "Chains"."id"="ChainNodes"."chain" WHERE "Chains"."has_chain_events_listener"='true';`;
+  let query = `SELECT "Chains"."id", "substrate_spec", "url", "address", "base", "type", "network" FROM "Chains" JOIN "ChainNodes" ON "Chains"."id"="ChainNodes"."chain" WHERE "Chains"."has_chain_events_listener"='true';`;
 
   const allChains = (await pool.query(query)).rows;
   const myChainData = allChains.filter(
@@ -55,7 +55,7 @@ async function mainProcess(producer: RabbitMqHandler, pool) {
     if (!myChains.includes(chain)) {
       log.info(`[${chain}]: Deleting chain...`)
       if (listeners[chain]) listeners[chain].unsubscribe();
-      listeners[chain] = null;
+      delete listeners[chain];
     }
   })
 
@@ -76,15 +76,23 @@ async function mainProcess(producer: RabbitMqHandler, pool) {
     }
   }
 
+  // TODO: start listeners in parallel so connection stalling from one doesn't hold up the others
   // initialize listeners first (before dealing with identity)
   for (const chain of myChainData) {
     // start listeners that aren't already active - this means for any duplicate chain nodes
     // it will start a listener for the first successful chain node url in the db
     if (!listeners[chain.id]) {
       log.info(`Starting listener for ${chain.id}...`);
+
+      // if the 'chain' is a DAO then it has its own Listener in CE so its base is not the chain it is built on
+      let base = chain.base;
+      if (chain.type === 'dao') {
+        base = chain.network
+      }
+
       try {
         listeners[chain.id] = await createListener(chain.id, {
-          Erc20TokenAddresses: [chain.address],
+          address: chain.address,
           archival: false,
           url: chain.url,
           spec: chain.substrate_spec,
@@ -94,7 +102,7 @@ async function mainProcess(producer: RabbitMqHandler, pool) {
           discoverReconnectRange: discoverReconnectRange
         },
           true,
-          chain.base
+          base
         );
       } catch (error) {
         listeners[chain.id] = null;

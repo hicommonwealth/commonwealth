@@ -10,7 +10,7 @@ import {
   EntityEventKind,
   IChainEntityKind,
   IChainEventData,
-  SubstrateTypes
+  SubstrateTypes, EventSupportingChainT
 } from '@commonwealth/chain-events';
 
 import { factory, formatFilename } from '../../shared/logging';
@@ -126,13 +126,13 @@ export default class extends IEventHandler {
       return dbEvent;
     };
 
-    const entity = eventToEntity(event.data.kind);
+    const entity = eventToEntity(chain as EventSupportingChainT, event.data.kind);
     if (!entity) {
       log.info(`no archival action needed for event of kind ${event.data.kind.toString()}`);
       return dbEvent;
     }
     const [ entityKind, updateType ] = entity;
-    const fieldName = entityToFieldName(entityKind);
+    const fieldName = entityToFieldName(chain as EventSupportingChainT, entityKind);
     const fieldValue = event.data[fieldName].toString();
     const author = event.data['proposer'];
     switch (updateType) {
@@ -146,8 +146,7 @@ export default class extends IEventHandler {
         return updateEntityFn(entityKind, fieldValue, true);
       }
       default: {
-        // should be exhaustive
-        const dummy: never = updateType;
+        return null
       }
     }
   }
