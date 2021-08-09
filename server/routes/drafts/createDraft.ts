@@ -2,7 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 
 import lookupCommunityIsVisibleToUser from '../../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../../util/lookupAddressIsOwnedByUser';
-import log from '../../../shared/logging';
+import { factory, formatFilename } from '../../../shared/logging';
+const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   InsufficientData: 'Drafts must include title, body, or attachment',

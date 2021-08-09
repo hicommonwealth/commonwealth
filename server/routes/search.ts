@@ -2,7 +2,9 @@
 import { Request, Response, NextFunction } from 'express';
 import { QueryTypes } from 'sequelize';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
-import log from '../../shared/logging';
+import { factory, formatFilename } from '../../shared/logging';
+
+const log = factory.getLogger(formatFilename(__filename));
 
 const Errors = {
   UnexpectedError: 'Unexpected error',
