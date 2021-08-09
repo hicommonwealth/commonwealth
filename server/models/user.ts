@@ -40,27 +40,24 @@ export interface UserInstance extends Model<UserAttributes>, UserAttributes {
   setSocialAccounts: Sequelize.HasManySetAssociationsMixin<SocialAccountInstance, SocialAccountInstance['id']>;
 }
 
-export type UserModelStatic = ModelStatic<UserInstance>
-
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-): UserModelStatic => {
-  const User = <UserModelStatic>sequelize.define('User', {
-    id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-    email: { type: dataTypes.STRING },
-    emailVerified: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+): ModelStatic<UserAttributes, UserInstance> => {
+  const User = sequelize.define('User', {
+    id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    email: { type: DataTypes.STRING },
+    emailVerified: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     emailNotificationInterval: {
-      type: dataTypes.ENUM,
+      type: DataTypes.ENUM,
       values: ['daily', 'never'],
       defaultValue: 'never',
       allowNull: false,
     },
-    isAdmin: { type: dataTypes.BOOLEAN, defaultValue: false },
-    lastVisited: { type: dataTypes.TEXT, allowNull: false, defaultValue: '{}' },
-    disableRichText: { type: dataTypes.BOOLEAN, defaultValue: false, allowNull: false },
-    magicIssuer: { type: dataTypes.STRING, allowNull: true },
-    lastMagicLoginAt: { type: dataTypes.INTEGER, allowNull: true },
+    isAdmin: { type: DataTypes.BOOLEAN, defaultValue: false },
+    lastVisited: { type: DataTypes.TEXT, allowNull: false, defaultValue: '{}' },
+    disableRichText: { type: DataTypes.BOOLEAN, defaultValue: false, allowNull: false },
+    magicIssuer: { type: DataTypes.STRING, allowNull: true },
+    lastMagicLoginAt: { type: DataTypes.INTEGER, allowNull: true },
   }, {
     timestamps: true,
     createdAt: 'created_at',
@@ -81,13 +78,14 @@ export default (
     scopes: {
       withPrivateData: {}
     }
-  });
+  }) as ModelStatic<UserAttributes, UserInstance>;
+
   User.associate = (models) => {
-    models.User.belongsTo(models.ChainNode, { as: 'selectedNode', constraints: false });
-    models.User.hasMany(models.Address);
-    models.User.hasMany(models.SocialAccount);
-    models.User.hasMany(models.StarredCommunity);
-    models.User.belongsToMany(models.Chain, { through: models.WaitlistRegistration });
+    User.belongsTo(models.ChainNode, { as: 'selectedNode', constraints: false });
+    User.hasMany(models.Address);
+    User.hasMany(models.SocialAccount);
+    User.hasMany(models.StarredCommunity);
+    User.belongsToMany(models.Chain, { through: models.WaitlistRegistration });
   };
 
   return User;

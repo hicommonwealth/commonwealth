@@ -1,99 +1,49 @@
-import fs from 'fs';
-import path from 'path';
-import { Sequelize, DataTypes } from 'sequelize';
+import { Sequelize } from 'sequelize';
 
 import { DATABASE_URI } from './config';
 
 import { factory, formatFilename } from '../shared/logging';
 
-import AddressFactory, { AddressModelStatic } from './models/address';
-import ChainFactory, { ChainModelStatic } from './models/chain';
-import ChainEntityFactory, { ChainEntityModelStatic } from './models/chain_entity';
-import ChainEventFactory, { ChainEventModelStatic } from './models/chain_event';
-import ChainEventTypeFactory, { ChainEventTypeModelStatic } from './models/chain_event_type';
-import ChainNodeFactory, { ChainNodeModelStatic } from './models/chain_node';
-import ChatMessageFactory, { ChatMessageModelStatic } from './models/chat_message';
-import CollaborationFactory, { CollaborationModelStatic } from './models/collaboration';
-import ContractCategoryFactory, { ContractCategoryModelStatic } from './models/contract_category';
-import ContractItemFactory, { ContractItemModelStatic } from './models/contract_item';
-import DiscussionDraftFactory, { DiscussionDraftModelStatic } from './models/discussion_draft';
-import EdgewareLockdropBalanceFactory, { EdgewareLockdropBalanceModelStatic } from './models/edgeware_lockdrop_balance';
-import EdgewareLockdropEventFactory, { EdgewareLockdropEventModelStatic } from './models/edgeware_lockdrop_event';
-import EdgewareLockdropEverythingFactory, { EdgewareLockdropEverythingModelStatic }
-  from './models/edgeware_lockdrop_everything';
-import HedgehogAuthenticationFactory, { HedgehogAuthenticationModelStatic } from './models/hedgehog_authentication';
-import HedgehogUserFactory, { HedgehogUserModelStatic } from './models/hedgehog_user';
-import InviteCodeFactory, { InviteCodeModelStatic } from './models/invite_code';
-import InviteLinkFactory, { InviteLinkModelStatic } from './models/invite_link';
-import LoginTokenFactory, { LoginTokenModelStatic } from './models/login_token';
-import NotificationFactory, { NotificationModelStatic } from './models/notification';
-import NotificationCategoryFactory, { NotificationCategoryModelStatic } from './models/notification_category';
-import OffchainAttachmentFactory, { OffchainAttachmentModelStatic } from './models/offchain_attachment';
-import OffchainCommentFactory, { OffchainCommentModelStatic } from './models/offchain_comment';
-import OffchainCommunityFactory, { OffchainCommunityModelStatic } from './models/offchain_community';
-import OffchainProfileFactory, { OffchainProfileModelStatic } from './models/offchain_profile';
-import OffchainReactionFactory, { OffchainReactionModelStatic } from './models/offchain_reaction';
-import OffchainThreadFactory, { OffchainThreadModelStatic } from './models/offchain_thread';
-import OffchainTopicFactory, { OffchainTopicModelStatic } from './models/offchain_topic';
-import OffchainViewCountFactory, { OffchainViewCountModelStatic } from './models/offchain_viewcount';
-import OffchainVoteFactory, { OffchainVoteModelStatic } from './models/offchain_vote';
-import RoleFactory, { RoleModelStatic } from './models/role';
-import SocialAccountFactory, { SocialAccountModelStatic } from './models/social_account';
-import StarredCommunityFactory, { StarredCommunityModelStatic } from './models/starred_community';
-import SubscriptionFactory, { SubscriptionModelStatic } from './models/subscription';
-import TaggedThreadFactory, { TaggedThreadModelStatic } from './models/tagged_threads';
-import UserModelFactory, { UserModelStatic } from './models/user';
-import WaitlistRegistrationFactory, { WaitlistRegistrationModelStatic } from './models/waitlist_registration';
-import WebhookFactory, { WebhookModelStatic } from './models/webhook';
+import AddressFactory from './models/address';
+import ChainFactory from './models/chain';
+import ChainEntityFactory from './models/chain_entity';
+import ChainEventFactory from './models/chain_event';
+import ChainEventTypeFactory from './models/chain_event_type';
+import ChainNodeFactory from './models/chain_node';
+import ChatMessageFactory from './models/chat_message';
+import CollaborationFactory from './models/collaboration';
+import ContractCategoryFactory from './models/contract_category';
+import ContractItemFactory from './models/contract_item';
+import DiscussionDraftFactory from './models/discussion_draft';
+import EdgewareLockdropBalanceFactory from './models/edgeware_lockdrop_balance';
+import EdgewareLockdropEventFactory from './models/edgeware_lockdrop_event';
+import EdgewareLockdropEverythingFactory from './models/edgeware_lockdrop_everything';
+import HedgehogAuthenticationFactory from './models/hedgehog_authentication';
+import HedgehogUserFactory from './models/hedgehog_user';
+import InviteCodeFactory from './models/invite_code';
+import InviteLinkFactory from './models/invite_link';
+import LoginTokenFactory from './models/login_token';
+import NotificationFactory from './models/notification';
+import NotificationCategoryFactory from './models/notification_category';
+import OffchainAttachmentFactory from './models/offchain_attachment';
+import OffchainCommentFactory from './models/offchain_comment';
+import OffchainCommunityFactory from './models/offchain_community';
+import OffchainProfileFactory from './models/offchain_profile';
+import OffchainReactionFactory from './models/offchain_reaction';
+import OffchainThreadFactory from './models/offchain_thread';
+import OffchainTopicFactory from './models/offchain_topic';
+import OffchainViewCountFactory from './models/offchain_viewcount';
+import OffchainVoteFactory from './models/offchain_vote';
+import RoleFactory from './models/role';
+import SocialAccountFactory from './models/social_account';
+import StarredCommunityFactory from './models/starred_community';
+import SubscriptionFactory from './models/subscription';
+import TaggedThreadFactory from './models/tagged_threads';
+import UserModelFactory from './models/user';
+import WaitlistRegistrationFactory from './models/waitlist_registration';
+import WebhookFactory from './models/webhook';
 
 const log = factory.getLogger(formatFilename(__filename));
-
-export type Models = {
-    Address: AddressModelStatic;
-    Chain: ChainModelStatic;
-    ChainEntity: ChainEntityModelStatic;
-    ChainEvent: ChainEventModelStatic;
-    ChainEventType: ChainEventTypeModelStatic;
-    ChainNode: ChainNodeModelStatic;
-    ChatMessage: ChatMessageModelStatic;
-    Collaboration: CollaborationModelStatic;
-    ContractCategory: ContractCategoryModelStatic;
-    ContractItem: ContractItemModelStatic;
-    DiscussionDraft: DiscussionDraftModelStatic;
-    EdgewareLockdropBalance: EdgewareLockdropBalanceModelStatic;
-    EdgewareLockdropEvent: EdgewareLockdropEventModelStatic;
-    EdgewareLockdropEverything: EdgewareLockdropEverythingModelStatic;
-    HedgehogAuthentication: HedgehogAuthenticationModelStatic;
-    HedgehogUser: HedgehogUserModelStatic;
-    InviteCode: InviteCodeModelStatic;
-    InviteLink: InviteLinkModelStatic;
-    LoginToken: LoginTokenModelStatic;
-    Notification: NotificationModelStatic;
-    NotificationCategory: NotificationCategoryModelStatic;
-    OffchainAttachment: OffchainAttachmentModelStatic;
-    OffchainComment: OffchainCommentModelStatic;
-    OffchainCommunity: OffchainCommunityModelStatic;
-    OffchainProfile: OffchainProfileModelStatic;
-    OffchainReaction: OffchainReactionModelStatic;
-    OffchainThread: OffchainThreadModelStatic;
-    OffchainTopic: OffchainTopicModelStatic;
-    OffchainViewCount: OffchainViewCountModelStatic;
-    OffchainVote: OffchainVoteModelStatic;
-    Role: RoleModelStatic;
-    SocialAccount: SocialAccountModelStatic;
-    StarredCommunity: StarredCommunityModelStatic;
-    Subscription: SubscriptionModelStatic;
-    TaggedThread: TaggedThreadModelStatic;
-    User: UserModelStatic;
-    WaitlistRegistration: WaitlistRegistrationModelStatic;
-    Webhook: WebhookModelStatic;
-}
-
-export interface DB extends Models{
-    sequelize: Sequelize;
-    Sequelize: typeof Sequelize;
-}
-
 export const sequelize = new Sequelize(DATABASE_URI, {
   // disable string operators (https://github.com/sequelize/sequelize/issues/8417)
   // operatorsAliases: false,
@@ -112,49 +62,48 @@ export const sequelize = new Sequelize(DATABASE_URI, {
   }
 });
 
-export const Address = AddressFactory(sequelize, DataTypes);
-const models: Models = {
-  Address: AddressFactory(sequelize, DataTypes),
-  Chain: ChainFactory(sequelize, DataTypes),
-  ChainEntity: ChainEntityFactory(sequelize, DataTypes),
-  ChainEvent: ChainEventFactory(sequelize, DataTypes),
-  ChainEventType:  ChainEventTypeFactory(sequelize, DataTypes),
-  ChainNode: ChainNodeFactory(sequelize, DataTypes),
-  ChatMessage: ChatMessageFactory(sequelize, DataTypes),
-  Collaboration: CollaborationFactory(sequelize, DataTypes),
-  ContractCategory: ContractCategoryFactory(sequelize, DataTypes),
-  ContractItem: ContractItemFactory(sequelize, DataTypes),
-  DiscussionDraft: DiscussionDraftFactory(sequelize, DataTypes),
-  EdgewareLockdropBalance: EdgewareLockdropBalanceFactory(sequelize, DataTypes),
-  EdgewareLockdropEvent: EdgewareLockdropEventFactory(sequelize, DataTypes),
-  EdgewareLockdropEverything: EdgewareLockdropEverythingFactory(sequelize, DataTypes),
-  HedgehogAuthentication: HedgehogAuthenticationFactory(sequelize, DataTypes),
-  HedgehogUser: HedgehogUserFactory(sequelize, DataTypes),
-  InviteCode: InviteCodeFactory(sequelize, DataTypes),
-  InviteLink: InviteLinkFactory(sequelize, DataTypes),
-  LoginToken: LoginTokenFactory(sequelize, DataTypes),
-  Notification: NotificationFactory(sequelize, DataTypes),
-  NotificationCategory: NotificationCategoryFactory(sequelize, DataTypes),
-  OffchainAttachment: OffchainAttachmentFactory(sequelize, DataTypes),
-  OffchainComment: OffchainCommentFactory(sequelize, DataTypes),
-  OffchainCommunity: OffchainCommunityFactory(sequelize, DataTypes),
-  OffchainProfile: OffchainProfileFactory(sequelize, DataTypes),
-  OffchainReaction: OffchainReactionFactory(sequelize, DataTypes),
-  OffchainThread: OffchainThreadFactory(sequelize, DataTypes),
-  OffchainTopic: OffchainTopicFactory(sequelize, DataTypes),
-  OffchainViewCount: OffchainViewCountFactory(sequelize, DataTypes),
-  OffchainVote: OffchainVoteFactory(sequelize, DataTypes),
-  Role: RoleFactory(sequelize, DataTypes),
-  SocialAccount: SocialAccountFactory(sequelize, DataTypes),
-  StarredCommunity: StarredCommunityFactory(sequelize, DataTypes),
-  Subscription: SubscriptionFactory(sequelize, DataTypes),
-  TaggedThread: TaggedThreadFactory(sequelize, DataTypes),
-  User: UserModelFactory(sequelize, DataTypes),
-  WaitlistRegistration: WaitlistRegistrationFactory(sequelize, DataTypes),
-  Webhook: WebhookFactory(sequelize, DataTypes),
+const models = {
+  Address: AddressFactory(sequelize),
+  Chain: ChainFactory(sequelize),
+  ChainEntity: ChainEntityFactory(sequelize),
+  ChainEvent: ChainEventFactory(sequelize),
+  ChainEventType:  ChainEventTypeFactory(sequelize),
+  ChainNode: ChainNodeFactory(sequelize),
+  ChatMessage: ChatMessageFactory(sequelize),
+  Collaboration: CollaborationFactory(sequelize),
+  ContractCategory: ContractCategoryFactory(sequelize),
+  ContractItem: ContractItemFactory(sequelize),
+  DiscussionDraft: DiscussionDraftFactory(sequelize),
+  EdgewareLockdropBalance: EdgewareLockdropBalanceFactory(sequelize),
+  EdgewareLockdropEvent: EdgewareLockdropEventFactory(sequelize),
+  EdgewareLockdropEverything: EdgewareLockdropEverythingFactory(sequelize),
+  HedgehogAuthentication: HedgehogAuthenticationFactory(sequelize),
+  HedgehogUser: HedgehogUserFactory(sequelize),
+  InviteCode: InviteCodeFactory(sequelize),
+  InviteLink: InviteLinkFactory(sequelize),
+  LoginToken: LoginTokenFactory(sequelize),
+  Notification: NotificationFactory(sequelize),
+  NotificationCategory: NotificationCategoryFactory(sequelize),
+  OffchainAttachment: OffchainAttachmentFactory(sequelize),
+  OffchainComment: OffchainCommentFactory(sequelize),
+  OffchainCommunity: OffchainCommunityFactory(sequelize),
+  OffchainProfile: OffchainProfileFactory(sequelize),
+  OffchainReaction: OffchainReactionFactory(sequelize),
+  OffchainThread: OffchainThreadFactory(sequelize),
+  OffchainTopic: OffchainTopicFactory(sequelize),
+  OffchainViewCount: OffchainViewCountFactory(sequelize),
+  OffchainVote: OffchainVoteFactory(sequelize),
+  Role: RoleFactory(sequelize),
+  SocialAccount: SocialAccountFactory(sequelize),
+  StarredCommunity: StarredCommunityFactory(sequelize),
+  Subscription: SubscriptionFactory(sequelize),
+  TaggedThread: TaggedThreadFactory(sequelize),
+  User: UserModelFactory(sequelize),
+  WaitlistRegistration: WaitlistRegistrationFactory(sequelize),
+  Webhook: WebhookFactory(sequelize),
 };
 
-const db: DB = {
+const db = {
   sequelize,
   Sequelize,
   ...models,
