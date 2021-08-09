@@ -1,5 +1,7 @@
 import { EventKind } from '../types';
-import log from '../../logging';
+import { factory, formatFilename } from '../../logging';
+
+const log = factory.getLogger(formatFilename(__filename));
 
 /**
  * This is the Type Parser function, which takes a raw Event

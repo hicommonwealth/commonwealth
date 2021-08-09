@@ -4,9 +4,11 @@
 import { ApiPromise } from '@polkadot/api';
 
 import { IEventPoller, IDisconnectedRange } from '../interfaces';
-import log from '../logging';
+import { factory, formatFilename } from '../logging';
 
 import { Block } from './types';
+
+const log = factory.getLogger(formatFilename(__filename));
 
 export class Poller extends IEventPoller<ApiPromise, Block> {
   /**

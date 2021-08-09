@@ -1,10 +1,12 @@
 import EthDater from 'ethereum-block-by-date';
 
 import { CWEvent, IStorageFetcher, IDisconnectedRange } from '../interfaces';
-import log from '../logging';
+import { factory, formatFilename } from '../logging';
 import { Moloch1, Moloch2 } from '../contractTypes';
 
 import { IEventData, EventKind, Api, ProposalV1, ProposalV2 } from './types';
+
+const log = factory.getLogger(formatFilename(__filename));
 
 export class StorageFetcher extends IStorageFetcher<Api> {
   constructor(

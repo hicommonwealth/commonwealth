@@ -4,9 +4,11 @@
 import { Listener } from '@ethersproject/providers';
 
 import { IEventSubscriber } from '../interfaces';
-import log from '../logging';
+import { factory, formatFilename } from '../logging';
 
 import { RawEvent, Api } from './types';
+
+const log = factory.getLogger(formatFilename(__filename));
 
 export class Subscriber extends IEventSubscriber<Api, RawEvent> {
   private _name: string;

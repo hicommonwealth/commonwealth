@@ -2,11 +2,13 @@
  * Processes Aave events.
  */
 import { IEventProcessor, CWEvent } from '../interfaces';
-import log from '../logging';
+import { factory, formatFilename } from '../logging';
 
 import { ParseType } from './filters/type_parser';
 import { Enrich } from './filters/enricher';
 import { IEventData, RawEvent, Api } from './types';
+
+const log = factory.getLogger(formatFilename(__filename));
 
 export class Processor extends IEventProcessor<Api, RawEvent> {
   /**

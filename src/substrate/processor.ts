@@ -5,11 +5,13 @@ import { ApiPromise } from '@polkadot/api';
 import { Extrinsic, Event } from '@polkadot/types/interfaces';
 
 import { IEventProcessor, CWEvent } from '../interfaces';
-import log from '../logging';
+import { factory, formatFilename } from '../logging';
 
 import { Block, isEvent, IEventData } from './types';
 import { ParseType } from './filters/type_parser';
 import { Enrich, EnricherConfig } from './filters/enricher';
+
+const log = factory.getLogger(formatFilename(__filename));
 
 export class Processor extends IEventProcessor<ApiPromise, Block> {
   constructor(

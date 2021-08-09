@@ -25,7 +25,7 @@ import { DeriveProposalImage } from '@polkadot/api-derive/types';
 import { isFunction, hexToString } from '@polkadot/util';
 
 import { CWEvent, IChainEntityKind, IStorageFetcher } from '../interfaces';
-import log from '../logging';
+import { factory, formatFilename } from '../logging';
 
 import {
   EventKind,
@@ -53,6 +53,8 @@ import {
   ITipVoted,
   ITipClosing,
 } from './types';
+
+const log = factory.getLogger(formatFilename(__filename));
 
 export class StorageFetcher extends IStorageFetcher<ApiPromise> {
   public async fetchIdentities(

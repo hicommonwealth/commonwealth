@@ -6,9 +6,11 @@ import { VoidFn } from '@polkadot/api/types';
 import { Header, RuntimeVersion } from '@polkadot/types/interfaces';
 
 import { IEventSubscriber } from '../interfaces';
-import log from '../logging';
+import { factory, formatFilename } from '../logging';
 
 import { Block } from './types';
+
+const log = factory.getLogger(formatFilename(__filename));
 
 export class Subscriber extends IEventSubscriber<ApiPromise, Block> {
   private _subscription: VoidFn;
