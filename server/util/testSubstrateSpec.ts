@@ -2,7 +2,9 @@ import { ApiPromise, WsProvider } from '@polkadot/api';
 import { RegisteredTypes } from '@polkadot/types/types';
 
 import { constructSubstrateUrl } from '../../shared/substrate';
-import log from '../../shared/logging';
+import { factory, formatFilename } from '../../shared/logging';
+
+const log = factory.getLogger(formatFilename(__filename));
 
 const testSubstrateSpec = async (specString: string, nodeUrl: string) => {
   // test out spec

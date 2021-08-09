@@ -8,12 +8,13 @@ import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl, getProposalUrlWithoutObject, renderQuillDeltaToText } from '../../shared/utils';
 import proposalIdToEntity from '../util/proposalIdToEntity';
 import TokenBalanceCache from '../util/tokenBalanceCache';
-import log from '../../shared/logging';
+import { factory, formatFilename } from '../../shared/logging';
 
 import { SENDGRID_API_KEY } from '../config';
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 
+const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   MissingRootId: 'Must provide root_id',

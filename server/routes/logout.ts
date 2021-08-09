@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
-import log from '../../shared/logging';
+import { factory, formatFilename } from '../../shared/logging';
 
+const log = factory.getLogger(formatFilename(__filename));
 import { getStatsDInstance } from '../util/metrics';
 
 const logout = async (models, req: Request, res: Response) => {

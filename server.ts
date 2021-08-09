@@ -18,7 +18,8 @@ import logger from 'morgan';
 import prerenderNode from 'prerender-node';
 import devWebpackConfig from './webpack/webpack.config.dev.js';
 import prodWebpackConfig from './webpack/webpack.config.prod.js';
-import log from './shared/logging';
+import { factory, formatFilename } from './shared/logging';
+const log = factory.getLogger(formatFilename(__filename));
 
 import ViewCountCache from './server/util/viewCountCache';
 import IdentityFetchCache from './server/util/identityFetchCache';

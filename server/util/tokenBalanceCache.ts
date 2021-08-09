@@ -11,7 +11,8 @@ import JobRunner from './cacheJobRunner';
 import TokenListCache from './tokenListCache';
 import { slugify } from '../../shared/utils';
 
-import log from '../../shared/logging';
+import { factory, formatFilename } from '../../shared/logging';
+const log = factory.getLogger(formatFilename(__filename));
 
 // map of addresses to balances
 interface CacheT {
