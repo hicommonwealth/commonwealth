@@ -47,7 +47,7 @@ const createCommunity = async (models, req: Request, res: Response, next: NextFu
   }
 
   const address = await models.Address.findOne({
-    where: { user_id: req.user.id, chain: 'ethereum' },
+    where: { user_id: req.user.id },
   });
   if (!address || address.user_id !== req.user.id) {
     return next(new Error(Errors.InvalidAddress));

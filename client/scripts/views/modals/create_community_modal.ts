@@ -12,7 +12,7 @@ import { constructSubstrateUrl } from 'substrate';
 
 import { CompactModalExitButton } from 'views/modal';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { InputPropertyRow, TogglePropertyRow } from './manage_community_modal/metadata_rows';
+import { InputPropertyRow, TogglePropertyRow, SelectPropertyRow } from './manage_community_modal/metadata_rows';
 import { initAppState } from '../../app';
 
 interface OffchainCommunityFormAttrs {}
@@ -31,6 +31,7 @@ interface OffchainCommunityFormState {
   element: string;
   telegram: string;
   github: string;
+  defaultChain: string;
 }
 
 const OffchainCommunityForm: m.Component<OffchainCommunityFormAttrs, OffchainCommunityFormState> = {
@@ -46,8 +47,16 @@ const OffchainCommunityForm: m.Component<OffchainCommunityFormAttrs, OffchainCom
     vnode.state.isAuthenticatedForum = false;
     vnode.state.privacyEnabled = false;
     vnode.state.invitesEnabled = false;
+    const defaultChains = app.config.chains.getAll()
+      .map((_) => _.id)
+      .filter((chain) => app.user.getAllRolesInCommunity({ chain }).length > 0);
+    vnode.state.defaultChain = defaultChains.length > 0 ? defaultChains[0] : 'ethereum';
   },
   view: (vnode) => {
+    const defaultChains = app.config.chains.getAll()
+      .map((_) => _.id)
+      .filter((chain) => app.user.getAllRolesInCommunity({ chain }).length > 0);
+
     return m('.compact-modal-body-max', [
       m('.CommunityMetadataManagementTable', [m(Table, {
         bordered: false,
@@ -108,6 +117,14 @@ const OffchainCommunityForm: m.Component<OffchainCommunityFormAttrs, OffchainCom
           onToggle: (checked) => { vnode.state.invitesEnabled = checked; },
           caption: (checked) => checked ? 'Anyone can invite new members' : 'Admins/mods can invite new members',
         }),
+        m(SelectPropertyRow, {
+          title: 'Default Chain',
+          options: defaultChains,
+          value: vnode.state.defaultChain,
+          onchange: (value) => {
+            vnode.state.defaultChain = value;
+          }
+        }),
       ]),
       m(Button, {
         label: 'Save changes',
@@ -125,6 +142,7 @@ const OffchainCommunityForm: m.Component<OffchainCommunityFormAttrs, OffchainCom
             invitesEnabled,
             privacyEnabled,
             isAuthenticatedForum,
+            defaultChain
           } = vnode.state;
 
           try {
@@ -141,6 +159,7 @@ const OffchainCommunityForm: m.Component<OffchainCommunityFormAttrs, OffchainCom
               privacyEnabled,
               isAuthenticatedForum,
               jwt: app.user.jwt,
+              default_chain: defaultChain
             }).then(async (res) => {
               await initAppState(false);
               $(e.target).trigger('modalexit');

@@ -77,7 +77,7 @@ const SidebarQuickSwitcher: m.Component<{}> = {
           },
         }),
         m(CommunitySelector),
-        app.user.isSiteAdmin && m(Button, {
+        m(Button, {
           class: 'create-community',
           rounded: true,
           label: m(Icon, { name: Icons.PLUS }),
