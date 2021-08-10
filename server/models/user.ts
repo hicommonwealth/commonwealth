@@ -1,5 +1,6 @@
 import * as Sequelize from 'sequelize';
-
+import { DataTypes, Model } from 'sequelize';
+import { ModelStatic } from './types';
 import { AddressInstance, AddressAttributes } from './address';
 import { ChainAttributes } from './chain';
 import { ChainNodeInstance, ChainNodeAttributes } from './chain_node';
@@ -8,13 +9,13 @@ import { SocialAccountInstance, SocialAccountAttributes } from './social_account
 export type EmailNotificationInterval = 'daily' | 'never';
 
 export interface UserAttributes {
-  id?: number;
   email: string;
+  id?: number;
   emailVerified?: boolean;
   isAdmin?: boolean;
   lastVisited?: string;
   disableRichText?: boolean;
-  emailNotificationInterval: EmailNotificationInterval;
+  emailNotificationInterval?: EmailNotificationInterval;
   magicIssuer?: string;
   lastMagicLoginAt?: number;
   created_at?: Date;
@@ -27,7 +28,7 @@ export interface UserAttributes {
   Chains?: ChainAttributes[] | ChainAttributes['id'][];
 }
 
-export interface UserInstance extends Sequelize.Instance<UserAttributes>, UserAttributes {
+export interface UserInstance extends Model<UserAttributes>, UserAttributes {
   getSelectedNode: Sequelize.BelongsToGetAssociationMixin<ChainNodeInstance>;
   setSelectedNode: Sequelize.BelongsToSetAssociationMixin<ChainNodeInstance, ChainNodeInstance['id']>;
 
@@ -39,15 +40,13 @@ export interface UserInstance extends Sequelize.Instance<UserAttributes>, UserAt
   setSocialAccounts: Sequelize.HasManySetAssociationsMixin<SocialAccountInstance, SocialAccountInstance['id']>;
 }
 
-export interface UserModel extends Sequelize.Model<UserInstance, UserAttributes> {
-
-}
+export type UserModelStatic = ModelStatic<UserInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): UserModel => {
-  const User = sequelize.define<UserInstance, UserAttributes>('User', {
+  dataTypes: typeof DataTypes,
+): UserModelStatic => {
+  const User = <UserModelStatic>sequelize.define('User', {
     id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     email: { type: dataTypes.STRING },
     emailVerified: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
@@ -62,10 +61,12 @@ export default (
     disableRichText: { type: dataTypes.BOOLEAN, defaultValue: false, allowNull: false },
     magicIssuer: { type: dataTypes.STRING, allowNull: true },
     lastMagicLoginAt: { type: dataTypes.INTEGER, allowNull: true },
-    created_at: { type: dataTypes.DATE, allowNull: false },
-    updated_at: { type: dataTypes.DATE, allowNull: false },
   }, {
-    underscored: true,
+    timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
+    tableName: 'Users',
+    underscored: false,
     indexes: [
       { fields: ['email'], unique: true },
     ],
@@ -78,12 +79,9 @@ export default (
       }
     },
     scopes: {
-      withPrivateData: {
-        attributes: {},
-      }
-    },
+      withPrivateData: {}
+    }
   });
-
   User.associate = (models) => {
     models.User.belongsTo(models.ChainNode, { as: 'selectedNode', constraints: false });
     models.User.hasMany(models.Address);

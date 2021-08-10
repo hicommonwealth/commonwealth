@@ -1,42 +1,39 @@
 import * as Sequelize from 'sequelize';
-
+import { Model, DataTypes } from 'sequelize';
 import { ChainEventAttributes } from './chain_event';
 import { ChainAttributes } from './chain';
+import { ModelStatic } from './types';
 
 export interface ChainEventTypeAttributes {
   id: string;
   chain: string;
   event_name: string;
-
   ChainEvents?: ChainEventAttributes[];
   Chain?: ChainAttributes;
 }
 
 export interface ChainEventTypeInstance
-extends Sequelize.Instance<ChainEventTypeAttributes>, ChainEventTypeAttributes {
+extends Model<ChainEventTypeAttributes>, ChainEventTypeAttributes {}
 
-}
-
-export interface ChainEventTypeModel extends Sequelize.Model<ChainEventTypeInstance, ChainEventTypeAttributes> {
-
-}
+export type ChainEventTypeModelStatic = ModelStatic<ChainEventTypeInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): ChainEventTypeModel => {
-  const ChainEventType = sequelize.define<ChainEventTypeInstance, ChainEventTypeAttributes>('ChainEventType', {
+  dataTypes: typeof DataTypes,
+): ChainEventTypeModelStatic => {
+  const ChainEventType = <ChainEventTypeModelStatic>sequelize.define('ChainEventType', {
     // id = chain-event_name (event_name is value of string enum)
     id: { type: dataTypes.STRING, primaryKey: true },
     chain: { type: dataTypes.STRING, allowNull: false },
     event_name: { type: dataTypes.STRING, allowNull: false },
   }, {
+    tableName: 'ChainEventTypes',
     timestamps: false,
     underscored: true,
     indexes: [
       { fields: ['id'] },
       { fields: ['chain', 'event_name'] },
-    ]
+    ],
   });
 
   ChainEventType.associate = (models) => {

@@ -1,15 +1,17 @@
 import * as Sequelize from 'sequelize';
+import { Model, DataTypes } from 'sequelize';
+import { ModelStatic } from './types';
 
 import { ChainAttributes } from './chain';
 import { ContractCategoryAttributes } from './contract_category';
 
 export interface ContractItemAttributes {
-  id?: number;
   chain: string;
   name: string;
   description: string;
   color: string;
   category_id: number;
+  id?: number;
   created_at?: Date;
   updated_at?: Date;
   Chain?: ChainAttributes;
@@ -17,20 +19,15 @@ export interface ContractItemAttributes {
 }
 
 export interface ContractItemInstance
-extends Sequelize.Instance<ContractItemAttributes>, ContractItemAttributes {
+extends Model<ContractItemAttributes>, ContractItemAttributes {}
 
-}
-
-export interface ContractItemModel
-extends Sequelize.Model<ContractItemInstance, ContractItemAttributes> {
-
-}
+export type ContractItemModelStatic = ModelStatic<ContractItemInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): ContractItemModel => {
-  const ContractItem = sequelize.define<ContractItemInstance, ContractItemAttributes>('ContractItem', {
+  dataTypes: typeof DataTypes,
+): ContractItemModelStatic => {
+  const ContractItem = <ContractItemModelStatic>sequelize.define('ContractItem', {
     id:          { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true, allowNull: false },
     chain:       { type: dataTypes.STRING, allowNull: false },
     name:        { type: dataTypes.STRING, allowNull: false },
@@ -38,6 +35,7 @@ export default (
     color:       { type: dataTypes.STRING, allowNull: false },
     category_id: { type: dataTypes.INTEGER, allowNull: false },
   }, {
+    tableName: 'ContractItems',
     underscored: true,
   });
 

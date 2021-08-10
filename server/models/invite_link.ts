@@ -1,4 +1,6 @@
 import * as Sequelize from 'sequelize';
+import { Model, DataTypes } from 'sequelize';
+import { ModelStatic } from './types';
 
 import { OffchainCommunityAttributes } from './offchain_community';
 
@@ -6,15 +8,16 @@ export enum InviteLinkTimeLimit {
   '24h' = '24h',
   '48h' = '48h',
   '1w' = '1w',
+  '1m' = '1m',
   '30d' = '30d',
   'none' = 'none',
 }
 
 export interface InviteLinkAttributes {
-  id?: number;
+  creator_id: number;
+  id?: string;
   community_id?: string;
   chain_id?: string;
-  creator_id: number;
   active?: boolean;
   multi_use?: number;
   used?: number;
@@ -25,20 +28,15 @@ export interface InviteLinkAttributes {
 }
 
 export interface InviteLinkInstance
-extends Sequelize.Instance<InviteLinkAttributes>, InviteLinkAttributes {
+extends Model<InviteLinkAttributes>, InviteLinkAttributes {}
 
-}
-
-export interface InviteLinkModel
-extends Sequelize.Model<InviteLinkInstance, InviteLinkAttributes> {
-
-}
+export type InviteLinkModelStatic = ModelStatic<InviteLinkInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): InviteLinkModel => {
-  const InviteLink = sequelize.define<InviteLinkInstance, InviteLinkAttributes>('InviteLink', {
+  dataTypes: typeof DataTypes,
+): InviteLinkModelStatic => {
+  const InviteLink = <InviteLinkModelStatic>sequelize.define('InviteLink', {
     id: { type: dataTypes.STRING, primaryKey: true, allowNull: false },
     community_id: { type: dataTypes.STRING, allowNull: true },
     chain_id: { type: dataTypes.STRING, allowNull: true },
@@ -53,6 +51,7 @@ export default (
       allowNull: false,
     },
   }, {
+    tableName: 'InviteLinks',
     underscored: true,
     indexes: [
       { fields: ['id'] },

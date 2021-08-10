@@ -1,4 +1,6 @@
 import * as Sequelize from 'sequelize';
+import { DataTypes, Model } from 'sequelize';
+import { ModelStatic } from './types';
 
 export interface WaitlistRegistrationAttributes {
   user_id: number;
@@ -9,21 +11,15 @@ export interface WaitlistRegistrationAttributes {
 }
 
 export interface WaitlistRegistrationInstance
-extends Sequelize.Instance<WaitlistRegistrationAttributes>, WaitlistRegistrationAttributes {
+extends Model<WaitlistRegistrationAttributes>, WaitlistRegistrationAttributes {}
 
-}
-
-export interface WaitlistRegistrationModel extends Sequelize.Model<
-  WaitlistRegistrationInstance, WaitlistRegistrationAttributes
-> {
-
-}
+export type WaitlistRegistrationModelStatic = ModelStatic<WaitlistRegistrationInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): WaitlistRegistrationModel => {
-  const WaitlistRegistration = sequelize.define<WaitlistRegistrationInstance, WaitlistRegistrationAttributes>(
+  dataTypes: typeof DataTypes,
+): WaitlistRegistrationModelStatic => {
+  const WaitlistRegistration = <WaitlistRegistrationModelStatic>sequelize.define(
     'WaitlistRegistration', {
       user_id: { type: dataTypes.INTEGER, allowNull: false },
       chain_id: { type: dataTypes.STRING, allowNull: false },
@@ -31,6 +27,7 @@ export default (
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
     }, {
+      tableName: 'WaitlistRegistrations',
       timestamps: true,
       underscored: true,
     }

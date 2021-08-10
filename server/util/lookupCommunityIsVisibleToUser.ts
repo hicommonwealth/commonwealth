@@ -14,12 +14,13 @@ export const ChainCommunityErrors = {
   NotMember: 'User is not member of private community',
 };
 
+// sequelize 5.0 does not accept undefined key in where clause
 const lookupCommunityIsVisibleToUser = async (
   models, params, user
 ): Promise<[ChainInstance, OffchainCommunityInstance, string]> => {
   const chain = await models.Chain.findOne({
     where: {
-      id: params.chain,
+      id: params.chain || null,
     },
     include: [
       {
@@ -32,7 +33,7 @@ const lookupCommunityIsVisibleToUser = async (
   });
   const community = await models.OffchainCommunity.findOne({
     where: {
-      id: params.community,
+      id: params.community || null,
     },
     include: {
       model: models.OffchainTopic,
@@ -52,7 +53,7 @@ const lookupCommunityIsVisibleToUser = async (
 
   if (community && community.privacyEnabled && !user?.isAdmin) {
     if (!user) return [null, null, ChainCommunityErrors.NoUserProvided];
-    const userAddressIds = await user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
+    const userAddressIds = (await user.getAddresses()).filter((addr) => !!addr.verified).map((addr) => addr.id);
     const userMembership = await models.Role.findOne({
       where: {
         address_id: userAddressIds,

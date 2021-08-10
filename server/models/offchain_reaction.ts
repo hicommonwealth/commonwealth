@@ -1,17 +1,18 @@
 import * as Sequelize from 'sequelize';
-
+import { DataTypes, Model } from 'sequelize';
+import { ModelStatic } from './types';
 import { ChainAttributes } from './chain';
 import { OffchainCommunityAttributes } from './offchain_community';
 import { AddressAttributes } from './address';
 
 export interface OffchainReactionAttributes {
+  address_id: number;
+  reaction: string;
   id?: number;
   chain?: string;
   thread_id?: number;
   proposal_id?: number;
   comment_id?: number;
-  address_id: number;
-  reaction: string;
   community?: string;
   created_at?: Date;
   updated_at?: Date;
@@ -21,19 +22,15 @@ export interface OffchainReactionAttributes {
 }
 
 export interface OffchainReactionInstance
-extends Sequelize.Instance<OffchainReactionAttributes>, OffchainReactionAttributes {
+extends Model<OffchainReactionAttributes>, OffchainReactionAttributes {}
 
-}
-
-export interface OffchainReactionModel extends Sequelize.Model<OffchainReactionInstance, OffchainReactionAttributes> {
-
-}
+export type OffchainReactionModelStatic = ModelStatic<OffchainReactionInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): OffchainReactionModel => {
-  const OffchainReaction = sequelize.define<OffchainReactionInstance, OffchainReactionAttributes>('OffchainReaction', {
+  dataTypes: typeof DataTypes,
+): OffchainReactionModelStatic => {
+  const OffchainReaction = <OffchainReactionModelStatic>sequelize.define('OffchainReaction', {
     id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     chain: { type: dataTypes.STRING, allowNull: true },
     thread_id: { type: dataTypes.INTEGER, allowNull: true },
@@ -43,6 +40,7 @@ export default (
     reaction: { type: dataTypes.STRING, allowNull: false },
     community: { type: dataTypes.STRING, allowNull: true },
   }, {
+    tableName: 'OffchainReactions',
     underscored: true,
     indexes: [
       { fields: ['id'] },

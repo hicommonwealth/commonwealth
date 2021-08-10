@@ -10,14 +10,16 @@ export const roundVote = (percentage) => {
 
 const AaveProposalCardDetail = {
   view: (vnode: m.Vnode<{ proposal: AaveProposal, statusClass: string, statusText: any }>) => {
-    const { proposal, statusClass, statusText } = vnode.attrs;
+    const { proposal, statusClass } = vnode.attrs;
+    const statusText = Array.isArray(vnode.attrs.statusText)
+      ? vnode.attrs.statusText[0]?.split(',')[0]
+      : vnode.attrs.statusText;
     // TODO: move executor display to entire page
     // TODO: display stats about voting turnout/etc
     const executor = proposal.Executor;
     return m('.AaveProposalCardDetail', {
       onclick: (e) => {
         e.preventDefault();
-        e.stopPropagation();
       }
     }, [
       m('.aave-metadata', [
