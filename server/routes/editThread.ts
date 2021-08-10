@@ -17,7 +17,7 @@ export const Errors = {
 };
 
 const editThread = async (models, req: Request, res: Response, next: NextFunction) => {
-  const { body, title, kind, stage, thread_id, version_history, } = req.body;
+  const { body, title, kind, stage, thread_id, version_history, url } = req.body;
   if (!thread_id) {
     return next(new Error(Errors.NoThreadId));
   }
@@ -104,6 +104,9 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
     })();
     if (title) {
       thread.title = title;
+    }
+    if (url && thread.kind === 'link') {
+      thread.url = url;
     }
     await thread.save();
     await attachFiles();
