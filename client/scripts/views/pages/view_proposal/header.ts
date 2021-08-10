@@ -423,17 +423,16 @@ export const ProposalTitleEditor: m.Component<{
 
 export const ProposalLinkEditor: m.Component<{
   item: OffchainThread | AnyProposal,
-  getSetGlobalEditingStatus,
   parentState
 }> = {
   oninit: (vnode) => {
     vnode.attrs.parentState.updatedUrl = (vnode.attrs.item as OffchainThread).url;
   },
   view: (vnode) => {
-    const { item, parentState, getSetGlobalEditingStatus } = vnode.attrs;
+    const { item, parentState } = vnode.attrs;
     if (!item) return;
 
-    return m('.ProposalTitleEditor', [
+    return m('.ProposalLinkEditor', [
       m(Input, {
         size: 'lg',
         name: 'edit-thread-url',
@@ -477,7 +476,12 @@ export const ProposalHeaderPrivacyMenuItems: m.Component<{
   }
 };
 
-export const ProposalSidebarPollEditorModule: m.Component<{ proposal, openPollEditor: Function }, { isOpen: boolean }> = {
+export const ProposalSidebarPollEditorModule: m.Component<{
+  proposal,
+  openPollEditor: Function
+}, {
+  isOpen: boolean
+}> = {
   view: (vnode) => {
     const { proposal, openPollEditor } = vnode.attrs;
     return m('.ProposalSidebarPollEditorModule', [

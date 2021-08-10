@@ -266,7 +266,6 @@ const ProposalHeader: m.Component<{
                   ? m(ProposalHeaderExternalLink, { proposal })
                   : m(ProposalLinkEditor, {
                     item: proposal,
-                    getSetGlobalEditingStatus,
                     parentState: vnode.state
                   })
               ],
