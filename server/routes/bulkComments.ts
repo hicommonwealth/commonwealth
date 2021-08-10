@@ -1,8 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
-import log from '../../shared/logging';
+import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
+
+const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   MutuallyExclusive: 'Cannot select mutually exclusive offchain threads and proposals only options',

@@ -1,7 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../../util/lookupCommunityIsVisibleToUser';
 import Errors from './errors';
-import log from '../../../shared/logging';
+import { factory, formatFilename } from '../../../shared/logging';
+
+const log = factory.getLogger(formatFilename(__filename));
 
 const getWebhooks = async (models, req: Request, res: Response, next: NextFunction) => {
   const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);

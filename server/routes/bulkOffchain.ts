@@ -7,13 +7,14 @@
 import { QueryTypes, Op } from 'sequelize';
 import { Response, NextFunction, Request } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
-import log from '../../shared/logging';
+import { factory, formatFilename } from '../../shared/logging';
 import { getLastEdited } from '../util/getLastEdited';
 import { DB } from '../database';
 import { OffchainTopicInstance } from '../models/offchain_topic';
 import { RoleInstance } from '../models/role';
 import { OffchainThreadInstance } from '../models/offchain_thread';
 
+const log = factory.getLogger(formatFilename(__filename));
 export const Errors = { };
 
 // Topics, comments, reactions, members+admins, threads

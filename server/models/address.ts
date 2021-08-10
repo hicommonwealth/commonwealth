@@ -19,11 +19,12 @@ import { NotificationCategories } from '../../shared/types';
 import { ModelStatic } from './types';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { ChainAttributes, ChainInstance } from './chain';
-import log from '../../shared/logging';
-import { RoleAttributes, RoleInstance } from './role';
-import { OffchainProfileAttributes, OffchainProfileInstance } from './offchain_profile';
-import { UserAttributes, UserInstance } from './user';
+import {UserAttributes, UserInstance} from './user';
+import {OffchainProfileAttributes, OffchainProfileInstance} from './offchain_profile';
+import {RoleAttributes, RoleInstance} from './role';
+import { factory, formatFilename } from '../../shared/logging';
 import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
+const log = factory.getLogger(formatFilename(__filename));
 
 // tslint:disable-next-line
 const ethUtil = require('ethereumjs-util');

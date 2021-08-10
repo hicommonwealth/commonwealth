@@ -38,6 +38,7 @@ export interface OffchainThreadAttributes {
   Address?: AddressAttributes;
   OffchainAttachments?: OffchainAttachmentAttributes[] | OffchainAttachmentAttributes['id'][];
   ChainEntity?: ChainEntityAttributes;
+  collaborators?: AddressAttributes[]
 }
 
 export interface OffchainThreadInstance extends Model<OffchainThreadAttributes>, OffchainThreadAttributes {

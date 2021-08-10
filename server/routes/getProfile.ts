@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
+import { factory, formatFilename } from '../../shared/logging';
+const log = factory.getLogger(formatFilename(__filename));
 import { DB } from '../database';
-import log from '../../shared/logging';
-import _ from 'lodash';
 
 export const Errors = {
   NoChain: 'No base chain provided in query',

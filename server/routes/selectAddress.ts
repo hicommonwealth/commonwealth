@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import log from '../../shared/logging';
+import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
 
+const log = factory.getLogger(formatFilename(__filename));
 const selectAddress = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   if (!req.user) return next(new Error('Not logged in'));
   if (!req.body.address) return next(new Error('Must provide address'));

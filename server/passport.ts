@@ -9,9 +9,10 @@ import { encodeAddress } from '@polkadot/util-crypto';
 import { Magic, MagicUserMetadata } from '@magic-sdk/admin';
 import { Strategy as MagicStrategy } from 'passport-magic';
 
-import { DB, sequelize } from './database';
-import log from '../shared/logging';
+import { sequelize, DB } from './database';
+import { factory, formatFilename } from '../shared/logging';
 import { getStatsDInstance } from './util/metrics';
+const log = factory.getLogger(formatFilename(__filename));
 
 import {
   JWT_SECRET, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_OAUTH_CALLBACK, MAGIC_API_KEY, MAGIC_SUPPORTED_BASES,
@@ -317,17 +318,6 @@ function setupPassport(models: DB) {
       provider_username: profile.username,
       access_token: accessToken,
       refresh_token: refreshToken,
-      metadata: {
-        display_name: profile.displayName,
-        profile_url: profile.profileURL,
-        avatar_url: profile.photos.length > 0 && profile.photos[0].value,
-        bio: profile._json.bio,
-        updated_at: profile._json.updated_at,
-        created_at: profile._json.created_at,
-        company: profile._json.company,
-        blog: profile._json.blog,
-        location: profile._json.location,
-      }
     });
 
     // Handle OAuth for custom domains.
@@ -345,6 +335,7 @@ function setupPassport(models: DB) {
     }
 
     if (req.user) {
+      // @ts-ignore
       await newGithubAccount.setUser(req.user);
       return cb(null, req.user);
     } else {

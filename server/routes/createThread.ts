@@ -10,7 +10,8 @@ import { parseUserMentions } from '../util/parseUserMentions';
 import TokenBalanceCache from '../util/tokenBalanceCache';
 import { DB } from '../database';
 
-import log from '../../shared/logging';
+import { factory, formatFilename } from '../../shared/logging';
+const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   ForumMissingTitle: 'Forum posts must include a title',

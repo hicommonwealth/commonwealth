@@ -2,10 +2,12 @@ import { QueryTypes, Op } from 'sequelize';
 import jwt from 'jsonwebtoken';
 import _ from 'lodash';
 import { Request, Response, NextFunction } from 'express';
-import log from '../../shared/logging';
+import { JWT_SECRET, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } from '../config';
+import { factory, formatFilename } from '../../shared/logging';
 import '../types';
 import { DB } from '../database';
 
+const log = factory.getLogger(formatFilename(__filename));
 
 const status = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const [

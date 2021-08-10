@@ -10,7 +10,7 @@ import {
   IPostNotificationData, ICommunityNotificationData, IChainEventNotificationData,
 } from '../../shared/types';
 import { createImmediateNotificationEmailObject, sendImmediateNotificationEmail } from '../scripts/emails';
-import log from '../../shared/logging';
+import { factory, formatFilename } from '../../shared/logging';
 import { ChainAttributes } from './chain';
 import { OffchainCommunityAttributes } from './offchain_community';
 import { OffchainThreadAttributes } from './offchain_thread';
@@ -18,6 +18,7 @@ import { OffchainCommentAttributes } from './offchain_comment';
 import { ChainEventTypeAttributes } from './chain_event_type';
 import { ChainEntityAttributes } from './chain_entity';
 
+const log = factory.getLogger(formatFilename(__filename));
 
 const { Op } = Sequelize;
 

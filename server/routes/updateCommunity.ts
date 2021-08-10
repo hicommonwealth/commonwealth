@@ -1,8 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
-import log from '../../shared/logging';
+import { factory, formatFilename } from '../../shared/logging';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import { DB } from '../database';
 
+const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
@@ -84,6 +85,7 @@ const updateCommunity = async (models: DB, req: Request, res: Response, next: Ne
   if (req.body['attachments[]']) {
     await Promise.all(req.body['attachments[]'].map((url) => models.OffchainAttachment.create({
       attachable: 'community',
+      // @ts-ignore
       attachment_id: community.id,
       description: 'image',
       url,

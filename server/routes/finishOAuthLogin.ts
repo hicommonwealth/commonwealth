@@ -1,9 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import { NotificationCategories } from '../../shared/types';
-import log from '../../shared/logging';
+import { factory, formatFilename } from '../../shared/logging';
 import { redirectWithLoginSuccess, redirectWithLoginError } from './finishEmailLogin';
 import { DB } from '../database';
 
+const log = factory.getLogger(formatFilename(__filename));
 const finishOAuthLogin = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const token = req.query.token;
   if (!token) {

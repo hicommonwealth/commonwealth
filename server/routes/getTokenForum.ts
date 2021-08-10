@@ -2,7 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import { sequelize, DB } from '../database';
 import TokenBalanceCache from '../util/tokenBalanceCache';
 
-import log from '../../shared/logging';
+import { factory, formatFilename } from '../../shared/logging';
+const log = factory.getLogger(formatFilename(__filename));
 
 const getTokenForum = async (
   models: DB,
@@ -28,7 +29,6 @@ const getTokenForum = async (
             icon_url: token.iconUrl,
             symbol: token.symbol,
             name: token.name,
-            default_chain: 'ethereum',
             base: 'ethereum',
           },
           transaction: t,
@@ -36,8 +36,9 @@ const getTokenForum = async (
         const [ node ] = await models.ChainNode.findOrCreate({
           where: { chain: token.id },
           defaults: {
+            chain: token.id,
             url: 'wss://mainnet.infura.io/ws',
-            address: token.address
+            address: token.address,
           },
           transaction: t,
         });
