@@ -29,7 +29,7 @@ const addEditors = async (models: DB, req: Request, res: Response, next: NextFun
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));
 
-  const userOwnedAddressIds = await (req.user as any).getAddresses()
+  const userOwnedAddressIds = (await req.user.getAddresses())
     .filter((addr) => !!addr.verified).map((addr) => addr.id);
   const thread = await models.OffchainThread.findOne({
     where: {

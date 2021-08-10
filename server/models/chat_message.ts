@@ -32,6 +32,8 @@ export default (
   }, {
     tableName: 'ChatMessages',
     underscored: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
     timestamps: true,
     indexes: [
       { fields: ['created_at'] },

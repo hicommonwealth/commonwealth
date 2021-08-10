@@ -77,6 +77,8 @@ export default (
     }, {
       tableName: 'Subscriptions',
       underscored: true,
+      createdAt: 'created_at',
+      updatedAt: 'updated_at',
       indexes: [
         { fields: ['subscriber_id'] },
         { fields: ['category_id', 'object_id', 'is_active'] },

@@ -20,7 +20,8 @@ const updateThreadLinkedChainEntities = async (models: DB, req: Request, res: Re
     },
   });
   if (!thread) return next(new Error(Errors.NoThread));
-  const userOwnedAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
+  const userOwnedAddressIds = (await req.user.getAddresses())
+    .filter((addr) => !!addr.verified).map((addr) => addr.id);
   if (!userOwnedAddressIds.includes(thread.address_id)) { // is not author
     const roles = await models.Role.findAll({
       where: {

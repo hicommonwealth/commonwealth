@@ -24,6 +24,8 @@ export default (
     walletAddress: { type: dataTypes.STRING, allowNull: true },
   }, {
     tableName: 'HedgehogUsers',
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
     underscored: true,
   });
 

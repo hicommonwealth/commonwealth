@@ -27,6 +27,8 @@ export default (
     color:       { type: dataTypes.STRING, allowNull: false },
   }, {
     tableName: 'ContractCategories',
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
     underscored: true,
   });
 

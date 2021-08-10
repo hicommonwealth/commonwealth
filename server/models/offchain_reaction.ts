@@ -42,6 +42,8 @@ export default (
   }, {
     tableName: 'OffchainReactions',
     underscored: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
     indexes: [
       { fields: ['id'] },
       { fields: ['chain', 'thread_id', 'proposal_id', 'comment_id'] },

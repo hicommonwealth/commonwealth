@@ -39,6 +39,8 @@ export default (
     }, {
       tableName: 'OffchainAttachments',
       underscored: true,
+      createdAt: 'created_at',
+      updatedAt: 'updated_at',
       indexes: [
         { fields: ['attachable', 'attachment_id'] },
       ],

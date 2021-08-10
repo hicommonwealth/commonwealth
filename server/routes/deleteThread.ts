@@ -21,7 +21,7 @@ const deleteThread = async (models: DB, req: Request, res: Response, next: NextF
   }
 
   try {
-    const userOwnedAddressIds = await req.user.getAddresses()
+    const userOwnedAddressIds = (await req.user.getAddresses())
       .filter((addr) => !!addr.verified).map((addr) => addr.id);
 
     // allow either the author or admin/mods to delete threads

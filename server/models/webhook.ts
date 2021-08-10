@@ -33,6 +33,8 @@ export default (
   }, {
     tableName: 'Webhooks',
     underscored: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
     indexes: [
       { fields: ['url'] },
       { fields: ['chain_id'] },

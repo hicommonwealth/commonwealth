@@ -16,7 +16,7 @@ const updateChainEntityTitle = async (models: DB, req: Request, res: Response, n
 
   const entity = await proposalIdToEntity(models, chain.id, unique_id);
   if (!entity) return next(new Error(Errors.NoEntity));
-  const userOwnedAddressObjects = await req.user.getAddresses()
+  const userOwnedAddressObjects = (await req.user.getAddresses())
     .filter((addr) => !!addr.verified);
   const userOwnedAddresses = userOwnedAddressObjects.map((addr) => addr.address);
   const userOwnedAddressIds = userOwnedAddressObjects.map((addr) => addr.id);

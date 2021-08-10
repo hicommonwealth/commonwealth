@@ -36,6 +36,8 @@ export default (
     category_id: { type: dataTypes.INTEGER, allowNull: false },
   }, {
     tableName: 'ContractItems',
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
     underscored: true,
   });
 

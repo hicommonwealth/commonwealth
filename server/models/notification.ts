@@ -32,6 +32,8 @@ export default (
   }, {
     tableName: 'Notifications',
     underscored: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
     indexes: [
       { fields: ['subscription_id'] },
     ],
