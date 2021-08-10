@@ -1,12 +1,12 @@
 import { Response, NextFunction, Request } from 'express';
-import { Op } from 'sequelize';
+import { DB } from '../database';
 
 export const Errors = {
   NeedChain: 'Must provide a chain to fetch entities from',
   InvalidChain: 'Invalid chain',
 };
 
-const bulkEntities = async (models, req: Request, res: Response, next: NextFunction) => {
+const bulkEntities = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   if (!req.query.chain) {
     return next(new Error(Errors.NeedChain));
   }

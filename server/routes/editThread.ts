@@ -7,6 +7,7 @@ import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
 import { NotificationCategories, ProposalType } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
+import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -16,7 +17,7 @@ export const Errors = {
   IncorrectOwner: 'Not owned by this user',
 };
 
-const editThread = async (models, req: Request, res: Response, next: NextFunction) => {
+const editThread = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const { body, title, kind, stage, thread_id, version_history, } = req.body;
   if (!thread_id) {
     return next(new Error(Errors.NoThreadId));
@@ -113,7 +114,7 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
         { model: models.Address, as: 'Address' },
         {
           model: models.Address,
-          through: models.Collaboration,
+          // through: models.Collaboration,
           as: 'collaborators'
         },
         models.OffchainAttachment,

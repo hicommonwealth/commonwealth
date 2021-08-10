@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import { SERVER_URL } from '../config';
 import { NotificationCategories } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
 import { getStatsDInstance } from '../util/metrics';
+import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -21,7 +21,7 @@ export const redirectWithLoginError = (res, message) => {
   return res.redirect(url);
 };
 
-const finishEmailLogin = async (models, req: Request, res: Response, next: NextFunction) => {
+const finishEmailLogin = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const previousUser = req.user;
   if (req.user && req.user.email && req.user.emailVerified) {
     return redirectWithLoginSuccess(res, req.user.email);
@@ -44,7 +44,7 @@ const finishEmailLogin = async (models, req: Request, res: Response, next: NextF
   if (+new Date() >= +tokenObj.expires) {
     return redirectWithLoginError(res, 'Token expired');
   }
-  tokenObj.used = true;
+  tokenObj.used = new Date();
   await tokenObj.save();
 
   // Log in the user associated with the verified email
@@ -61,7 +61,7 @@ const finishEmailLogin = async (models, req: Request, res: Response, next: NextF
           previousUser.getSocialAccounts(),
           previousUser.getAddresses().filter((address) => !!address.verified),
           existingUser.getSocialAccounts(),
-          existingUser.getAddresses().filter((address) => !!address.verified),
+          (await existingUser.getAddresses()).filter((address) => !!address.verified),
         ]);
         await existingUser.setSocialAccounts(oldSocialAccounts.concat(newSocialAccounts));
         await existingUser.setAddresses(oldAddresses.concat(newAddresses));

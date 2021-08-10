@@ -1,11 +1,10 @@
-import Sequelize from 'sequelize';
+import { Op } from 'sequelize';
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../../shared/logging';
 import testSubstrateSpec from '../util/testSubstrateSpec';
+import { DB } from '../database';
 
-const Op = Sequelize.Op;
 const log = factory.getLogger(formatFilename(__filename));
-
 export const Errors = {
   NotLoggedIn: 'Not logged in',
   MustBeAdmin: 'Must be admin',
@@ -15,7 +14,7 @@ export const Errors = {
   InvalidJSON: 'Substrate spec supplied has invalid JSON'
 };
 
-const addChainNode = async (models, req: Request, res: Response, next: NextFunction) => {
+const addChainNode = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {
     return next(new Error(Errors.NotLoggedIn));
   }
@@ -43,7 +42,7 @@ const addChainNode = async (models, req: Request, res: Response, next: NextFunct
     ]
   } });
   if (chain) {
-    const existingNode = await models.ChainNode.find({ where: {
+    const existingNode = await models.ChainNode.findOne({ where: {
       chain: chain.id,
       url: req.body.node_url,
     } });

@@ -1,9 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-
 import { Op } from 'sequelize';
-import _ from 'lodash';
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
+import { DB } from '../database';
 
 export const Errors = {
   NoChain: 'No base chain provided in query',
@@ -11,7 +10,7 @@ export const Errors = {
   NoAddressFound: 'No address found',
 };
 
-const getProfile = async (models, req: Request, res: Response, next: NextFunction) => {
+const getProfile = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const { chain, address } = req.query;
   if (!chain) return next(new Error(Errors.NoChain));
   if (!address) return next(new Error(Errors.NoAddress));
@@ -22,7 +21,7 @@ const getProfile = async (models, req: Request, res: Response, next: NextFunctio
   const visibleCommunityIds = publicCommunities.map((c) => c.id);
 
   if (req.user) {
-    const addresses = await req.user.getAddresses().filter((a) => !!a.verified);
+    const addresses = (await req.user.getAddresses()).filter((a) => !!a.verified);
     const addressIds = addresses.map((a) => a.id);
     const roles = await models.Role.findAll({
       where: {

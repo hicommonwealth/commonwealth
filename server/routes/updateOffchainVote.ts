@@ -1,7 +1,7 @@
 import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
 
-import { sequelize } from '../database';
+import { sequelize, DB } from '../database';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 
@@ -11,7 +11,7 @@ export const Errors = {
   PollingClosed: 'Polling already finished',
 };
 
-const updateOffchainVote = async (models, req: Request, res: Response, next: NextFunction) => {
+const updateOffchainVote = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);

@@ -2,6 +2,7 @@
 import { Response, NextFunction } from 'express';
 import { QueryTypes } from 'sequelize';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import { DB } from '../database';
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
@@ -11,7 +12,7 @@ export const Errors = {
   DeleteFail: 'Could not delete topic',
 };
 
-const deleteTopic = async (models, req, res: Response, next: NextFunction) => {
+const deleteTopic = async (models: DB, req, res: Response, next: NextFunction) => {
   const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
   if (!req.user) {
