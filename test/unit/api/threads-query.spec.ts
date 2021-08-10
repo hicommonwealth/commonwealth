@@ -23,7 +23,6 @@ describe('Thread queries', () => {
     }))[0];
     expect(address.id).to.not.be.null;
     expect(address.id).to.be.greaterThan(0);
-    console.log('address', address)
     const thread = (await models.OffchainThread.findOrCreate({
       where: {
         address_id: address.id,
@@ -34,12 +33,11 @@ describe('Thread queries', () => {
     }))[0];
     expect(thread.id).to.be.greaterThan(0);
     expect(thread.address_id).to.to.be.greaterThan(0);
-    await models.Collaboration.findOrCreate({
+    const collaboration = await models.Collaboration.findOrCreate({
       where: {
-        offchain_thread_id: thread.id,
         address_id: thread.address_id,
+        offchain_thread_id: thread.id,
       },
-      // fields: ['offchain_thread_id', 'address_id']
     });
     const threads = await models.OffchainThread.findAll({
       where: { id: thread.id },
@@ -66,8 +64,7 @@ describe('Thread queries', () => {
     expect(threads[0].Address.id).to.not.be.null;
     expect(threads).length.above(0);
     expect(threads[0].collaborators).length.above(0);
-    threads[0].collaborators.map(({ id, address }) => {
-      expect(address).to.not.be.null;
+    threads[0].collaborators.map(({ id }) => {
       expect(id).to.equal(address.id);
     });
   });
