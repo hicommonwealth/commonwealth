@@ -113,7 +113,7 @@ export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread 
               label: isSelected ? 'Voted' : 'Vote',
               size: 'sm',
               rounded: true,
-              disabled: !!((pollingEnded || isSelected)),
+              disabled: !!(pollingEnded || isSelected),
               style: (pollingEnded || isSelected) ? 'pointer-events: none' : '',
               iconLeft: isSelected ? Icons.CHECK : null,
               compact: true,
