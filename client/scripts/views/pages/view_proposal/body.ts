@@ -27,7 +27,7 @@ import VersionHistoryModal from 'views/modals/version_history_modal';
 import ReactionButton, { ReactionType } from 'views/components/reaction_button';
 import { MenuItem, Button, Dialog, QueryList, Classes, ListItem, Icon, Icons, Popover } from 'construct-ui';
 import { notifyError, notifyInfo, notifySuccess } from 'controllers/app/notifications';
-import { detectURL } from 'helpers/threads';
+import { validURL } from '../../../../../shared/utils';
 
 export enum GlobalStatus {
   Get = 'get',
@@ -530,7 +530,7 @@ export const ProposalBodySaveEdit: m.Component<{
         onclick: (e) => {
           e.preventDefault();
           if (parentState.updatedUrl) {
-            if (!detectURL(parentState.updatedUrl)) {
+            if (!validURL(parentState.updatedUrl)) {
               notifyError('Must provide a valid URL.');
               return;
             }
