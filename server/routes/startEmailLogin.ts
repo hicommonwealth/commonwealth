@@ -4,11 +4,12 @@ import {
   SENDGRID_API_KEY, LOGIN_RATE_LIMIT_MINS, LOGIN_RATE_LIMIT_TRIES, MAGIC_SUPPORTED_BASES,
   MAGIC_DEFAULT_CHAIN
 } from '../config';
-import log from '../../shared/logging';
+import { factory, formatFilename } from '../../shared/logging';
 import { DynamicTemplate } from '../../shared/types';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
+const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   AlreadyLoggedIn: 'Already logged in',

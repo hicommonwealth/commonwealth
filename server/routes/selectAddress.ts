@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import log from '../../shared/logging';
+import { factory, formatFilename } from '../../shared/logging';
+
+const log = factory.getLogger(formatFilename(__filename));
 
 const selectAddress = async (models, req: Request, res: Response, next: NextFunction) => {
   if (!req.user) return next(new Error('Not logged in'));

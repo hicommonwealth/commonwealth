@@ -1,7 +1,9 @@
 import moment from 'moment';
 import crypto from 'crypto';
 import { SERVER_URL } from '../config';
-import log from '../../shared/logging';
+import { factory, formatFilename } from '../../shared/logging';
+
+const log = factory.getLogger(formatFilename(__filename));
 
 const redirectWithError = (res, message: string) => {
   const uri = `${SERVER_URL}/?invitemessage=failure&message=${encodeURIComponent(message)}`;

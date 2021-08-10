@@ -6,7 +6,8 @@ import * as net from 'net';
 import { WebsocketEventType, WebsocketMessageType, IWebsocketsPayload } from '../../shared/types';
 import { JWT_SECRET } from '../config';
 
-import log from '../../shared/logging';
+import { factory, formatFilename } from '../../shared/logging';
+const log = factory.getLogger(formatFilename(__filename));
 
 const ALIVE_TIMEOUT = 30 * 1000; // heartbeats are 15 seconds
 const EXPIRATION_TIME = 15 * 60 * 1000; // 15 minutes, same as session expiration
