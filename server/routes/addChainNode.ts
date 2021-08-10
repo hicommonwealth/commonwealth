@@ -25,9 +25,11 @@ const addChainNode = async (models, req: Request, res: Response, next: NextFunct
   if (!req.body.id || !req.body.name || !req.body.symbol || !req.body.network || !req.body.node_url || !req.body.base) {
     return next(new Error(Errors.MissingParams));
   }
+
+  let sanitizedSpec;
   if (req.body.substrate_spec) {
     try {
-      await testSubstrateSpec(req.body.substrate_spec, req.body.node_url);
+      sanitizedSpec = await testSubstrateSpec(req.body.substrate_spec, req.body.node_url);
     } catch (e) {
       return next(new Error('Failed to validate Substrate Spec'));
     }
@@ -57,7 +59,7 @@ const addChainNode = async (models, req: Request, res: Response, next: NextFunct
       icon_url: req.body.icon_url,
       active: true,
       base: req.body.base,
-      substrate_spec: req.body.substrate_spec ? req.body.substrate_spec : '',
+      substrate_spec: sanitizedSpec || '',
       website: req.body.website ? req.body.website : '',
       discord: req.body.discord ? req.body.discord : '',
       telegram: req.body.telegram ? req.body.telegram : '',
