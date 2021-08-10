@@ -1,10 +1,10 @@
 import * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { RegisteredTypes } from '@polkadot/types/types';
 import { Model, DataTypes } from 'sequelize';
-import {AddressAttributes, AddressInstance} from './address';
+import { AddressAttributes, AddressInstance } from './address';
 import { ChainNodeInstance, ChainNodeAttributes } from './chain_node';
 import { StarredCommunityAttributes } from './starred_community';
-import {OffchainTopicAttributes, OffchainTopicInstance} from './offchain_topic';
+import { OffchainTopicAttributes, OffchainTopicInstance } from './offchain_topic';
 import { OffchainThreadAttributes } from './offchain_thread';
 import { OffchainCommentAttributes } from './offchain_comment';
 import { UserAttributes } from './user';

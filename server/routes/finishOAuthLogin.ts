@@ -1,10 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { NotificationCategories } from '../../shared/types';
-import { factory, formatFilename } from '../../shared/logging';
-import { redirectWithLoginError } from './finishEmailLogin';
+import log from '../../shared/logging';
+import { redirectWithLoginSuccess, redirectWithLoginError } from './finishEmailLogin';
 import { DB } from '../database';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 const finishOAuthLogin = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const token = req.query.token;
@@ -41,7 +39,7 @@ const finishOAuthLogin = async (models: DB, req: Request, res: Response, next: N
   // Log in the user associated with the verified email,
   // or create a new user if none exists
   const socialAccount = await models.SocialAccount.findOne({ where: { id: tokenObj.social_account } });
-  const existingUser = await models.User.scope('withPrivateData').findOne({ where: { id: socialAccount.provider_userid } });
+  const existingUser = await socialAccount.getUser({ scope: 'withPrivateData' });
 
   if (existingUser) {
     req.login(existingUser, async (err) => {

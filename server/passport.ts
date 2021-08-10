@@ -9,10 +9,9 @@ import { encodeAddress } from '@polkadot/util-crypto';
 import { Magic, MagicUserMetadata } from '@magic-sdk/admin';
 import { Strategy as MagicStrategy } from 'passport-magic';
 
-import { sequelize } from './database';
-import { factory, formatFilename } from '../shared/logging';
+import { DB, sequelize } from './database';
+import log from '../shared/logging';
 import { getStatsDInstance } from './util/metrics';
-const log = factory.getLogger(formatFilename(__filename));
 
 import {
   JWT_SECRET, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_OAUTH_CALLBACK, MAGIC_API_KEY, MAGIC_SUPPORTED_BASES,
@@ -25,7 +24,7 @@ const GithubStrategy = passportGithub.Strategy;
 const JWTStrategy = passportJWT.Strategy;
 const ExtractJWT = passportJWT.ExtractJwt;
 
-function setupPassport(models) {
+function setupPassport(models: DB) {
   passport.use(new JWTStrategy({
     jwtFromRequest: ExtractJWT.fromExtractors([
       ExtractJWT.fromBodyField('jwt'),

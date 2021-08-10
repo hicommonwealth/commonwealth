@@ -7,11 +7,11 @@ import { OffchainThreadAttributes } from './offchain_thread';
 
 export interface OffchainTopicAttributes {
   name: string;
-  chain_id: string;
-  community_id: string;
   featured_in_sidebar: boolean;
   featured_in_new_post: boolean;
   id?: number;
+  chain_id?: string;
+  community_id?: string;
   description?: string;
   telegram?: string;
   created_at?: Date;

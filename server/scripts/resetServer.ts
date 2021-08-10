@@ -4,8 +4,9 @@ import tsmodels from '../database';
 const models = tsmodels as any;
 import { NotificationCategories } from '../../shared/types';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
-import { factory, formatFilename } from '../../shared/logging';
-const log = factory.getLogger(formatFilename(__filename));
+import tsmodels from '../database';
+const models = tsmodels as any;
+import log from '../../shared/logging';
 
 const nodes = [
   [ 'ws://localhost:9944', 'edgeware-local' ],

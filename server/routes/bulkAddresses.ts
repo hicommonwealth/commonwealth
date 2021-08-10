@@ -2,10 +2,8 @@
 import Sequelize from 'sequelize';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 const { Op } = Sequelize;
-import { factory, formatFilename } from '../../shared/logging';
+import log from '../../shared/logging';
 import { DB } from '../database';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 // the bulkAddress route takes a chain/community (mandatory) and a limit & order (both optional)
 // If a chain is supplied, queried addresses are limited to being on said chain.

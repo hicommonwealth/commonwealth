@@ -5,11 +5,9 @@ import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUs
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { NotificationCategories } from '../../shared/types';
 import { getProposalUrl, getProposalUrlWithoutObject, renderQuillDeltaToText } from '../../shared/utils';
-import { factory, formatFilename } from '../../shared/logging';
+import log from '../../shared/logging';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { DB } from '../database';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   NoId: 'Must provide id',

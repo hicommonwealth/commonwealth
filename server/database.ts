@@ -4,7 +4,7 @@ import { Sequelize, DataTypes } from 'sequelize';
 
 import { DATABASE_URI } from './config';
 
-import { factory, formatFilename } from '../shared/logging';
+import log from '../shared/logging';
 
 import AddressFactory, { AddressModelStatic } from './models/address';
 import ChainFactory, { ChainModelStatic } from './models/chain';
@@ -46,7 +46,6 @@ import UserModelFactory, { UserModelStatic } from './models/user';
 import WaitlistRegistrationFactory, { WaitlistRegistrationModelStatic } from './models/waitlist_registration';
 import WebhookFactory, { WebhookModelStatic } from './models/webhook';
 
-const log = factory.getLogger(formatFilename(__filename));
 
 export type Models = {
     Address: AddressModelStatic;

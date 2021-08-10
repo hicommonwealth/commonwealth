@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import Sequelize from 'sequelize';
 import { DB } from '../database';
+import { ChainInstance } from "../models/chain";
+import { OffchainCommunityInstance } from "../models/offchain_community";
 const { Op } = Sequelize;
 
 const DEFAULT_SEARCH_LIMIT = 100;
@@ -14,7 +16,7 @@ const getCommunitiesAndChains = async (models: DB, req: Request, res: Response, 
   if (searchTerm) {
     params['where'] = { name: { [Op.iLike]: `%${searchTerm}%` } };
   }
-  const chains = await models.Chain.findAll(params);
+  const chains: (ChainInstance | OffchainCommunityInstance)[] = await models.Chain.findAll(params);
   const communities = await models.OffchainCommunity.findAll(params);
   let userAddressIds;
   let userRoles;
@@ -36,7 +38,6 @@ const getCommunitiesAndChains = async (models: DB, req: Request, res: Response, 
       return !!userMembership;
     }
   });
-  // @ts-ignore
   const chainsAndCommunities = chains.concat(visibleCommunities);
 
   return res.json({ status: 'Success', result: chainsAndCommunities.map((p) => p.toJSON()) });

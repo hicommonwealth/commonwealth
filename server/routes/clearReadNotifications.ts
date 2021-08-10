@@ -1,8 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { sequelize, DB } from '../database';
-import { factory, formatFilename } from '../../shared/logging';
-
-const log = factory.getLogger(formatFilename(__filename));
+import log from '../../shared/logging';
+import { sequelize, DB, } from '../database';
 
 export default async (models: DB, req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {

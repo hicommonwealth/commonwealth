@@ -8,14 +8,13 @@ import {
 } from '@commonwealth/chain-events';
 
 import { SENDGRID_API_KEY, SERVER_URL } from '../config';
-import { factory, formatFilename } from '../../shared/logging';
+import log from '../../shared/logging';
 import { getForumNotificationCopy } from '../../shared/notificationFormatter';
 import {
   IPostNotificationData, NotificationCategories,
   DynamicTemplate, IChainEventNotificationData
 } from '../../shared/types';
 
-const log = factory.getLogger(formatFilename(__filename));
 
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);

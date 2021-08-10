@@ -1,10 +1,9 @@
 import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
-import { factory, formatFilename } from '../../shared/logging';
+import log from '../../shared/logging';
 import { getNextOffchainPollEndingTime } from '../../shared/utils';
 import { DB } from '../database';
 
-const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   AlreadyPolling: 'There is already an active offchain poll for this thread',

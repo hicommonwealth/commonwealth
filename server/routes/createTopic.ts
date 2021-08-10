@@ -40,7 +40,7 @@ const createTopic = async (models: DB, req, res: Response, next: NextFunction) =
 
   const newTopic = await models.OffchainTopic.findOrCreate({
     where: options,
-    // default: options,
+    defaults: options,
   });
 
   return res.json({ status: 'Success', result: newTopic[0].toJSON() });

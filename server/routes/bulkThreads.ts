@@ -2,12 +2,10 @@
 import { Request, Response, NextFunction } from 'express';
 import { QueryTypes, Op } from 'sequelize';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
-import { factory, formatFilename } from '../../shared/logging';
+import log from '../../shared/logging';
 import { getLastEdited } from '../util/getLastEdited';
 import { DB } from '../database';
 import { OffchainThreadInstance } from '../models/offchain_thread';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 // bulkThreads takes a date param and fetches the most recent 20 threads before that date
 const bulkThreads = async (models: DB, req: Request, res: Response, next: NextFunction) => {
@@ -199,7 +197,6 @@ const bulkThreads = async (models: DB, req: Request, res: Response, next: NextFu
       row['last_edited'] = last_edited;
       return row;
     });
-
     comments = (await models.OffchainComment.findAll({
       where: whereOptions,
       include: [models.Address, models.OffchainAttachment],

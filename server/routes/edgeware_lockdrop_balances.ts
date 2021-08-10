@@ -1,8 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { factory, formatFilename } from '../../shared/logging';
+import log from '../../shared/logging';
 import { DB } from '../database';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 const edgewareLockdropBalances = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const filters : any = {};

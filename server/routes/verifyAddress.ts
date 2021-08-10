@@ -1,9 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import { factory, formatFilename } from '../../shared/logging';
+import log from '../../shared/logging';
+import { DB } from '../database';
 import { DynamicTemplate } from '../../shared/types';
 const sgMail = require('@sendgrid/mail');
-const log = factory.getLogger(formatFilename(__filename));
-import { DB } from '../database';
 
 export const Errors = {
   NoAddress: 'Must provide address',

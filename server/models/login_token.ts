@@ -24,7 +24,7 @@ export interface LoginTokenAttributes {
 
 export interface LoginTokenCreationAttributes extends  LoginTokenAttributes {
   createForEmail?: (email: string, path?: string) => Promise<LoginTokenInstance>;
-  createForOAuth?: (domain: string, social_account: number) => Promise<LoginTokenInstance>;
+  createForOAuth?: (domain: string, social_account?: number) => Promise<LoginTokenInstance>;
 }
 
 export interface LoginTokenInstance extends Model<LoginTokenAttributes>, LoginTokenAttributes {
@@ -67,7 +67,7 @@ export default (
   // This creates a LoginToken that is tied to no particular email or social account.
   // It is up to the implementer to store the ID of the generated LoginToken on a SocialAccount
   // for it to be looked up later.
-  LoginToken.createForOAuth = async (domain: string, social_account: number)
+  LoginToken.createForOAuth = async (domain: string, social_account?: number)
   : Promise<LoginTokenInstance> => {
     const token = crypto.randomBytes(24).toString('hex');
     const expires = new Date(+(new Date()) + LOGIN_TOKEN_EXPIRES_IN * 60 * 1000);

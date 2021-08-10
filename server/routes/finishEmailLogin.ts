@@ -1,10 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import { NotificationCategories } from '../../shared/types';
-import { factory, formatFilename } from '../../shared/logging';
+import log from '../../shared/logging';
 import { getStatsDInstance } from '../util/metrics';
 import { DB } from '../database';
 
-const log = factory.getLogger(formatFilename(__filename));
 
 export const redirectWithLoginSuccess = (res, email, path?, confirmation?, newAcct = false) => {
   // Returns new if we are creating a new account
@@ -44,7 +43,6 @@ const finishEmailLogin = async (models: DB, req: Request, res: Response, next: N
   if (+new Date() >= +tokenObj.expires) {
     return redirectWithLoginError(res, 'Token expired');
   }
-  // tokenObj.used = true;
   tokenObj.used = new Date();
   await tokenObj.save();
 

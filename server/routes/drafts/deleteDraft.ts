@@ -2,9 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import lookupAddressIsOwnedByUser from '../../util/lookupAddressIsOwnedByUser';
 import lookupCommunityIsVisibleToUser from '../../util/lookupCommunityIsVisibleToUser';
-import { factory, formatFilename } from '../../../shared/logging';
-
-const log = factory.getLogger(formatFilename(__filename));
+import log from '../../../shared/logging';
 
 export const Errors = {
   NoId: 'Must provide id',

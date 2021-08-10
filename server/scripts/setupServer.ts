@@ -4,8 +4,7 @@ import express from 'express';
 import { Express } from 'express-serve-static-core';
 import { DEFAULT_PORT } from '../config';
 import setupWebsocketServer from '../socket';
-import { factory, formatFilename } from '../../shared/logging';
-const log = factory.getLogger(formatFilename(__filename));
+import log from '../../shared/logging';
 
 const setupServer = (app: Express, wss: WebSocket.Server, sessionParser: express.RequestHandler) => {
   const port = process.env.PORT || DEFAULT_PORT;

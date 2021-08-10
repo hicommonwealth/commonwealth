@@ -11,8 +11,7 @@ import { OffchainProfileInstance } from '../models/offchain_profile';
 import IdentityEventHandler from '../eventHandlers/identity';
 import { ChainNodeInstance } from '../models/chain_node';
 import { constructSubstrateUrl } from '../../shared/substrate';
-import { factory, formatFilename } from '../../shared/logging';
-const log = factory.getLogger(formatFilename(__filename));
+import log from '../../shared/logging';
 
 export default async function (models, chain?: string): Promise<void> {
   // 1. fetch the node and url of supported/selected chains

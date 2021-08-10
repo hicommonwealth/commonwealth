@@ -24,10 +24,9 @@ import MigrationHandler from '../eventHandlers/migration';
 import EntityArchivalHandler from '../eventHandlers/entityArchival';
 import { ChainNodeInstance } from '../models/chain_node';
 
-import { factory, formatFilename } from '../../shared/logging';
+import log from '../../shared/logging';
 import { constructSubstrateUrl } from '../../shared/substrate';
 
-const log = factory.getLogger(formatFilename(__filename));
 
 const ENTITY_MIGRATION = process.env.ENTITY_MIGRATION;
 

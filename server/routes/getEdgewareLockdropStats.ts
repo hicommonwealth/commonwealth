@@ -11,10 +11,8 @@ import {
   getSignalsForAddress
 } from './getEdgewareLockdropLookup';
 const { toBN } = Web3.utils;
-import { factory, formatFilename } from '../../shared/logging';
+import log from '../../shared/logging';
 import { DB } from '../database';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 const MAINNET_LOCKDROP_ORIG = '0x1b75B90e60070d37CfA9d87AFfD124bB345bf70a';
 const MAINNET_LOCKDROP = '0xFEC6F679e32D45E22736aD09dFdF6E3368704e31';

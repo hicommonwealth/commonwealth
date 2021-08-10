@@ -2,10 +2,9 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import lookupAddressIsOwnedByUser from '../../util/lookupAddressIsOwnedByUser';
-import { factory, formatFilename } from '../../../shared/logging';
+import log from '../../../shared/logging';
 import lookupCommunityIsVisibleToUser from '../../util/lookupCommunityIsVisibleToUser';
 
-const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   NoId: 'Must supply draft ID.',
