@@ -60,6 +60,7 @@ import {
   ProposalTitleEditMenuItem,
   ProposalSidebarStageEditorModule,
   ProposalSidebarPollEditorModule,
+  ProposalLinkEditor,
 } from './header';
 import { AaveViewProposalDetail, AaveViewProposalSummary } from './aave_view_proposal_detail';
 import {
@@ -97,6 +98,8 @@ const ProposalHeader: m.Component<{
   currentText: any;
   topicEditorIsOpen: boolean;
   editPermissionsIsOpen: boolean;
+  updatedTitle: string;
+  updatedUrl: string;
 }> = {
   view: (vnode) => {
     const {
@@ -111,8 +114,8 @@ const ProposalHeader: m.Component<{
     } = vnode.attrs;
 
     const attachments = (proposal instanceof OffchainThread) ? (proposal as OffchainThread).attachments : false;
-    const proposalLink = (app.isCustomDomain() ? '' : `/${app.activeId()}`)
-      + `/proposal/${proposal.slug}/${proposal.identifier}-`
+    const proposalLink = `${app.isCustomDomain() ? '' : `/${app.activeId()}`
+    }/proposal/${proposal.slug}/${proposal.identifier}-`
       + `${slugify(proposal.title)}`;
     const proposalTitleIsEditable = (proposal instanceof SubstrateDemocracyProposal
       || proposal instanceof SubstrateCollectiveProposal
@@ -258,7 +261,14 @@ const ProposalHeader: m.Component<{
           m('.proposal-body-link', [
             proposal instanceof OffchainThread
               && proposal.kind === OffchainThreadKind.Link
-              && m(ProposalHeaderExternalLink, { proposal }),
+              && [
+                !vnode.state.editing
+                  ? m(ProposalHeaderExternalLink, { proposal })
+                  : m(ProposalLinkEditor, {
+                    item: proposal,
+                    parentState: vnode.state
+                  })
+              ],
             !(proposal instanceof OffchainThread)
               && (proposal['blockExplorerLink'] || proposal['votingInterfaceLink'] || proposal.threadId)
               && m('.proposal-body-link', [
@@ -330,8 +340,8 @@ const ProposalComment: m.Component<{
     if (!comment) return;
     const parentType = comment.parentComment ? CommentParent.Comment : CommentParent.Proposal;
 
-    const commentLink = (app.isCustomDomain() ? '' : `/${app.activeId()}`)
-      + `/proposal/${proposal.slug}/`
+    const commentLink = `${app.isCustomDomain() ? '' : `/${app.activeId()}`
+    }/proposal/${proposal.slug}/`
       + `${proposal.identifier}-${slugify(proposal.title)}?comment=${comment.id}`;
 
     return m('.ProposalComment', {
