@@ -32,6 +32,7 @@ interface OffchainCommunityFormState {
   telegram: string;
   github: string;
   defaultChain: string;
+  saving: boolean;
 }
 
 const OffchainCommunityForm: m.Component<OffchainCommunityFormAttrs, OffchainCommunityFormState> = {
@@ -47,6 +48,7 @@ const OffchainCommunityForm: m.Component<OffchainCommunityFormAttrs, OffchainCom
     vnode.state.isAuthenticatedForum = false;
     vnode.state.privacyEnabled = false;
     vnode.state.invitesEnabled = false;
+    vnode.state.saving = false;
     const defaultChains = app.config.chains.getAll()
       .map((_) => _.id)
       .filter((chain) => app.user.getAllRolesInCommunity({ chain }).length > 0);
@@ -129,6 +131,7 @@ const OffchainCommunityForm: m.Component<OffchainCommunityFormAttrs, OffchainCom
       m(Button, {
         label: 'Save changes',
         intent: 'primary',
+        disabled: vnode.state.saving,
         onclick: async (e) => {
           const {
             name,
@@ -144,6 +147,8 @@ const OffchainCommunityForm: m.Component<OffchainCommunityFormAttrs, OffchainCom
             isAuthenticatedForum,
             defaultChain
           } = vnode.state;
+
+          vnode.state.saving = true;
 
           $.post(`${app.serverUrl()}/createCommunity`, {
             name,
@@ -165,6 +170,8 @@ const OffchainCommunityForm: m.Component<OffchainCommunityFormAttrs, OffchainCom
             m.route.set(`/${res.result.id}`);
           }).catch((err: any) => {
             notifyError(err.responseJSON?.error || 'Creating new community failed');
+          }).done(() => {
+            vnode.state.saving = false;
           });
         },
       }),
@@ -186,6 +193,7 @@ interface SubstrateFormState {
   github: string,
   description: string,
   substrate_spec: string,
+  saving: boolean
 }
 
 const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
@@ -200,6 +208,7 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
     vnode.state.github = '';
     vnode.state.description = '';
     vnode.state.substrate_spec = '';
+    vnode.state.saving = false;
   },
   view: (vnode) => {
     return m('.compact-modal-body-max', [
@@ -294,6 +303,7 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
       m(Button, {
         label: 'Save changes',
         intent: 'primary',
+        disabled: vnode.state.saving,
         onclick: async (e) => {
           const {
             name,
@@ -313,6 +323,7 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
             notifyError('Spec provided has invalid JSON');
             return;
           }
+          vnode.state.saving = true;
           $.post(`${app.serverUrl()}/addChainNode`, {
             name,
             description,
@@ -335,6 +346,8 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
             m.route.set(`/${res.result.chain}`);
           }).catch((err: any) => {
             notifyError(err.responseJSON?.error || 'Creating new community failed');
+          }).done(() => {
+            vnode.state.saving = false;
           });
         },
       }),
