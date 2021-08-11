@@ -170,7 +170,7 @@ const OffchainCommunityForm: m.Component<OffchainCommunityFormAttrs, OffchainCom
             m.route.set(`/${res.result.id}`);
           }).catch((err: any) => {
             notifyError(err.responseJSON?.error || 'Creating new community failed');
-          }).done(() => {
+          }).always(() => {
             vnode.state.saving = false;
           });
         },
@@ -346,7 +346,7 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
             m.route.set(`/${res.result.chain}`);
           }).catch((err: any) => {
             notifyError(err.responseJSON?.error || 'Creating new community failed');
-          }).done(() => {
+          }).always(() => {
             vnode.state.saving = false;
           });
         },
