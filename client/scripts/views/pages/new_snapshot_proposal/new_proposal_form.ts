@@ -102,6 +102,7 @@ const newThread = async (
     })
   };
 
+  // TODO: support WalletConnect
   const wallet = (app.wallets.getByName('metamask') as MetamaskWebWalletController);
   if (!wallet.enabling && !wallet.enabled) {
     await wallet?.enable();
@@ -222,11 +223,16 @@ const NewProposalForm: m.Component<{snapshotId: string}, {
       localStorage.removeItem(`${app.activeId()}-new-snapshot-proposal-name`);
     };
 
-    const isMember = author && author.address && vnode.state.members.includes(author.address.toLowerCase());
+    const isMember = author
+      && author.address
+      && !!vnode.state.members.find((member) => member.toLowerCase() === author.address.toLowerCase());
 
     const hasMinScore = vnode.state.userScore >= vnode.state.space.filters?.minScore;
 
-    const showScoreWarning = vnode.state.space.filters?.minScore > 0 && !hasMinScore && !isMember && vnode.state.userScore !== null;
+    const showScoreWarning = vnode.state.space.filters?.minScore > 0
+      && !hasMinScore
+      && !isMember
+      && vnode.state.userScore !== null;
 
     const isValid = vnode.state.space !== undefined
       && (!vnode.state.space.filters?.onlyMembers
