@@ -1,6 +1,7 @@
 import crypto from 'crypto';
-import { EventSupportingChains, SubstrateTypes, MolochTypes, chainSupportedBy } from '@commonwealth/chain-events';
 
+import tsmodels from '../database';
+const models = tsmodels as any;
 import { NotificationCategories } from '../../shared/types';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
@@ -37,9 +38,13 @@ const nodes = [
   [ 'wss://fullnode.centrifuge.io', 'centrifuge'],
   [ 'wss://mainnet.infura.io/ws', 'marlin', '0xEa2923b099b4B588FdFAD47201d747e3b9599A5f'],
   [ 'ws://127.0.0.1:9545', 'marlin-local', '0xe0D6a92B91B83D5c8A95557f1c966cAFd97f7171'],
-  [ 'ws://api.clover.finance/', 'clover'],
-  [ 'wss://rpc-01.snakenet.hydradx.io/', 'hydradx'],
-  [ 'wss://ropsten.infura.io/ws', 'alex-ropsten', '0xFab46E002BbF0b4509813474841E0716E6730136']
+  [ 'wss://mainnet.infura.io/ws', 'aave', '0xEC568fffba86c094cf06b22134B23074DFE2252c'],
+  [ 'ws://127.0.0.1:8545', 'aave-local', '0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9'],
+  [ 'ws://api.clover.finance', 'clover'],
+  [ 'wss://rpc-01.snakenet.hydradx.io', 'hydradx'],
+  [ 'wss://ropsten.infura.io/ws', 'alex-ropsten', '0xFab46E002BbF0b4509813474841E0716E6730136'],
+  [ 'wss://ropsten.infura.io/ws', 'demos'],
+
 ];
 
 const specs = {
@@ -772,7 +777,7 @@ const specs = {
   },
 };
 
-const resetServer = (models): Promise<number> => {
+const resetServer = (): Promise<number> => {
   log.debug('Resetting database...');
   return new Promise((resolve) => {
     models.sequelize.sync({ force: true }).then(async () => {
@@ -1124,6 +1129,7 @@ const resetServer = (models): Promise<number> => {
           icon_url: '/static/img/protocols/eth.png',
           active: true,
           type: 'dao',
+          base: 'ethereum',
           collapsed_on_homepage: false,
         }),
         models.Chain.create({
@@ -1134,6 +1140,28 @@ const resetServer = (models): Promise<number> => {
           icon_url: '/static/img/protocols/eth.png',
           active: true,
           type: 'dao',
+          base: 'ethereum',
+        }),
+        models.Chain.create({
+          id: 'aave',
+          network: 'aave',
+          symbol: 'AAVE',
+          name: 'Aave',
+          icon_url: '/static/img/protocols/aave.png',
+          active: true,
+          type: 'dao',
+          base: 'ethereum',
+          collapsed_on_homepage: false,
+        }),
+        models.Chain.create({
+          id: 'aave-local',
+          network: 'aave',
+          symbol: 'AAVE',
+          name: 'Aave (local)',
+          icon_url: '/static/img/protocols/aave.png',
+          active: true,
+          type: 'dao',
+          base: 'ethereum',
         }),
         models.Chain.create({
           id: 'clover',
@@ -1143,6 +1171,7 @@ const resetServer = (models): Promise<number> => {
           icon_url: '/static/img/protocols/clover.png',
           active: true,
           type: 'chain',
+          base: 'substrate',
           collapsed_on_homepage: false,
           substrate_spec: specs['clover'],
         }),
@@ -1154,6 +1183,7 @@ const resetServer = (models): Promise<number> => {
           icon_url: '/static/img/protocols/hydradx.png',
           active: true,
           type: 'chain',
+          base: 'substrate',
           collapsed_on_homepage: false,
           substrate_spec: specs['hydradx'],
         }),
@@ -1193,7 +1223,7 @@ const resetServer = (models): Promise<number> => {
         ethLocal, eth,
         nearLocal, nearTestnet,
         moloch, metacartel, molochLocal,
-        marlin, marlinLocal,
+        marlin, marlinLocal, aave, aaveLocal,
         alexRopsten,
       ] = chains;
 
@@ -1406,4 +1436,22 @@ const resetServer = (models): Promise<number> => {
   });
 };
 
-export default resetServer;
+async function main() {
+  if (!process.argv.slice(2).includes('-y')) {
+    console.log('Reset Server is deprecated functionality.');
+    console.log('Unless you know what you\'re doing, please use `yarn reset-db && yarn load-db` instead.');
+    console.log('To reset the server anyway, rerun with the \'-y\' flag.');
+    process.exit(1);
+  }
+  log.info('Beginning reset server...');
+  let rc: number;
+  try {
+    rc = await resetServer();
+  } catch (e) {
+    log.error(`Reset server failed: ${e.message}`);
+    rc = -1;
+  }
+  process.exit(rc);
+}
+
+main();

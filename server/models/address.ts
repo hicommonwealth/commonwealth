@@ -1,6 +1,7 @@
 (global as any).window = { location: { href: '/' } };
 
 import * as Sequelize from 'sequelize';
+import { Model, DataTypes } from 'sequelize';
 import crypto from 'crypto';
 import Web3 from 'web3';
 
@@ -15,11 +16,12 @@ import { AminoSignResponse, pubkeyToAddress } from '@cosmjs/amino';
 import nacl from 'tweetnacl';
 import { KeyringOptions } from '@polkadot/keyring/types';
 import { NotificationCategories } from '../../shared/types';
+import { ModelStatic } from './types';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { ChainAttributes, ChainInstance } from './chain';
-import { UserAttributes } from './user';
-import { OffchainProfileAttributes } from './offchain_profile';
-import { RoleAttributes } from './role';
+import {UserAttributes, UserInstance} from './user';
+import {OffchainProfileAttributes, OffchainProfileInstance} from './offchain_profile';
+import {RoleAttributes, RoleInstance} from './role';
 import { factory, formatFilename } from '../../shared/logging';
 import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
 const log = factory.getLogger(formatFilename(__filename));
@@ -28,10 +30,10 @@ const log = factory.getLogger(formatFilename(__filename));
 const ethUtil = require('ethereumjs-util');
 
 export interface AddressAttributes {
-  id?: number;
   address: string;
   chain: string;
   verification_token: string;
+  id?: number;
   verification_token_expires?: Date;
   verified?: Date;
   keytype?: string;
@@ -51,11 +53,15 @@ export interface AddressAttributes {
   Roles?: RoleAttributes[];
 }
 
-export interface AddressInstance extends Sequelize.Instance<AddressAttributes>, AddressAttributes {
+export interface AddressInstance extends Model<AddressAttributes>, AddressCreationAttributes {
   // no mixins used yet
+  getChain: Sequelize.BelongsToGetAssociationMixin<ChainInstance>;
+  getUser: Sequelize.BelongsToGetAssociationMixin<UserInstance>;
+  getOffchainProfile: Sequelize.BelongsToGetAssociationMixin<OffchainProfileInstance>;
+  getRoles: Sequelize.HasManyGetAssociationsMixin<RoleInstance>;
 }
 
-export interface AddressModel extends Sequelize.Model<AddressInstance, AddressAttributes> {
+export interface AddressCreationAttributes extends AddressAttributes {
   // static methods
   createEmpty?: (
     chain: string,
@@ -84,7 +90,7 @@ export interface AddressModel extends Sequelize.Model<AddressInstance, AddressAt
   ) => Promise<AddressInstance>;
 
   verifySignature?: (
-    models: Sequelize.Models,
+    models: any,
     chain: ChainInstance,
     addressModel: AddressInstance,
     user_id: number,
@@ -92,11 +98,13 @@ export interface AddressModel extends Sequelize.Model<AddressInstance, AddressAt
   ) => Promise<boolean>;
 }
 
+export type AddressModelStatic = ModelStatic<AddressInstance> & AddressCreationAttributes
+
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): AddressModel => {
-  const Address: AddressModel = sequelize.define<AddressInstance, AddressAttributes>('Address', {
+  dataTypes: typeof DataTypes,
+): AddressModelStatic => {
+  const Address: AddressModelStatic = <AddressModelStatic>sequelize.define('Address', {
     id:                         { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     address:                    { type: dataTypes.STRING, allowNull: false },
     chain:                      { type: dataTypes.STRING, allowNull: false },
@@ -113,7 +121,11 @@ export default (
     is_validator:               { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     is_magic:                   { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
   }, {
+    timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
     underscored: true,
+    tableName: 'Addresses',
     indexes: [
       { fields: ['address', 'chain'], unique: true },
       { fields: ['user_id'] },
@@ -125,9 +137,7 @@ export default (
       }
     },
     scopes: {
-      withPrivateData: {
-        attributes: {}
-      }
+      withPrivateData: {}
     },
   });
 
@@ -194,7 +204,7 @@ export default (
   // passed from the frontend to show exactly what was signed.
   // Supports Substrate, Ethereum, Cosmos, and NEAR.
   Address.verifySignature = async (
-    models: Sequelize.Models,
+    models: any,
     chain: ChainInstance,
     addressModel: AddressInstance,
     user_id: number,
@@ -282,17 +292,7 @@ export default (
         log.error(`Address not matched. Generated ${generatedAddress}, found ${addressModel.address}.`);
         isValid = false;
       }
-    } else if (chain.network === 'ethereum'
-      || chain.network === 'moloch'
-      || chain.network === 'alex'
-      || chain.network === 'yearn'
-      || chain.network === 'fei'
-      || chain.network === 'sushi'
-      || chain.network === 'metacartel'
-      || chain.network === 'commonwealth'
-      || chain.type === 'token'
-      || chain.network === 'demo'
-    ) {
+    } else if (chain.base === 'ethereum') {
       //
       // ethereum address handling
       //

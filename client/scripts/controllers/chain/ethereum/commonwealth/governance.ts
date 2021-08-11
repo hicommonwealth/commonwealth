@@ -12,9 +12,7 @@ import { EntityRefreshOption } from 'controllers/server/chain_entities';
 import { IApp } from 'state';
 
 // import CommonwealthProposal from './proposal';
-import CommonwealthMembers from './members';
 import CommonwealthAPI from './api';
-import CommonwealthMember from './member';
 import Commonwealth from './adapter';
 import CommonwealthChain from './chain';
 
@@ -39,7 +37,6 @@ export default class CommonwealthGovernance extends ProposalModule<
   // private _guildBank: string;
 
   private _api: CommonwealthAPI;
-  private _Members: CommonwealthMembers;
 
   // GETTERS
   // public get proposalCount() { return this._proposalCount; }
@@ -67,9 +64,8 @@ export default class CommonwealthGovernance extends ProposalModule<
     });
   }
 
-  public async init(chain: CommonwealthChain, Members: CommonwealthMembers) {
+  public async init(chain: CommonwealthChain) {
     const api = chain.commonwealthApi;
-    this._Members = Members;
     this._api = api;
     // this._guildBank = await this._api.Contract.guildBank();
 

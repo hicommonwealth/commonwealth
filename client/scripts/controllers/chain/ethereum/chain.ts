@@ -1,6 +1,7 @@
 import { ApiStatus, IApp } from 'state';
 import Web3 from 'web3';
 import m from 'mithril';
+import moment from 'moment';
 
 import {
   NodeInfo,
@@ -59,16 +60,29 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
   public get totalbalance() { return this._totalbalance; }
 
   public async initApi(node?: NodeInfo): Promise<any> {
-    // TODO: support local/etc
-    const infuraId = INFURA_ID;
-    const url = `wss://mainnet.infura.io/ws/v3/${infuraId}`;
-    try {
-      const provider = new Web3.providers.WebsocketProvider(url);
-      this._api = new Web3(provider);
-    } catch (error) {
-      console.log('Could not connect to Ethereum using remote node');
-      this.app.chain.networkStatus = ApiStatus.Disconnected;
-      throw error;
+    if (node.url.includes('infura')) {
+      const infuraId = INFURA_ID;
+      const networkPrefix = node.url.split('infura')[0];
+      const url = `${networkPrefix}infura.io/ws/v3/${infuraId}`;
+      try {
+        const provider = new Web3.providers.WebsocketProvider(url);
+        this._api = new Web3(provider);
+      } catch (error) {
+        console.log('Could not connect to Ethereum using infura');
+        this.app.chain.networkStatus = ApiStatus.Disconnected;
+        throw error;
+      }
+    } else {
+      // support local/etc
+      try {
+        // TODO: support http?
+        const provider = new Web3.providers.WebsocketProvider(node.url);
+        this._api = new Web3(provider);
+      } catch (error) {
+        console.log(`Could not connect to Ethereum on ${node.url}`);
+        this.app.chain.networkStatus = ApiStatus.Disconnected;
+        throw error;
+      }
     }
 
     const isListening = await this._api.eth.net.isListening();
@@ -78,12 +92,14 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
     this._api.eth.getBlock('latest').then((headers) => {
       if (this.app.chain) {
         this.app.chain.block.height = headers.number;
+        this.app.chain.block.lastTime = moment.unix(+headers.timestamp);
         m.redraw();
       }
     });
     this._api.eth.subscribe('newBlockHeaders', (err, headers) => {
       if (this.app.chain) {
         this.app.chain.block.height = headers.number;
+        this.app.chain.block.lastTime = moment.unix(+headers.timestamp);
         m.redraw();
       }
     });

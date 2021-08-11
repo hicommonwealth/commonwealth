@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import { NotificationCategories } from '../../shared/types';
 import { slugify } from '../../shared/utils';
 import { factory, formatFilename } from '../../shared/logging';
+import { DB } from '../database';
+import { RoleAttributes } from '../models/role';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -16,7 +18,7 @@ export const Errors = {
   InvalidAddress: 'Tried to create this community with an invalid address',
 };
 
-const createCommunity = async (models, req: Request, res: Response, next: NextFunction) => {
+const createCommunity = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {
     return next(new Error('Not logged in'));
   }
@@ -69,7 +71,7 @@ const createCommunity = async (models, req: Request, res: Response, next: NextFu
   };
   // get community for assigning role
   const community = await models.OffchainCommunity.create(communityContent);
-  const roleContent = {
+  const roleContent: RoleAttributes = {
     address_id: address.id,
     offchain_community_id: community.id,
     permission: 'admin',

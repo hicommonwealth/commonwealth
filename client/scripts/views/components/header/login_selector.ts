@@ -8,6 +8,7 @@ import mixpanel from 'mixpanel-browser';
 import { Button, ButtonGroup, Icon, Icons, Menu, MenuItem, MenuDivider, Popover } from 'construct-ui';
 
 import app from 'state';
+import { navigateToSubpage } from 'app';
 import { AddressInfo, ChainBase, ChainInfo, CommunityInfo } from 'models';
 import { isSameAccount, pluralize } from 'helpers';
 import { initAppState } from 'app';
@@ -140,10 +141,10 @@ export const LoginSelectorMenuLeft: m.Component<{
           onclick: () => {
             const pf = app.user.activeAccount.profile;
             if (app.chain) {
-              m.route.set(`/${app.activeId()}/account/${pf.address}`);
+              navigateToSubpage(`/account/${pf.address}`);
             } else if (app.community) {
               const a = app.user.activeAccount;
-              m.route.set(`/${app.activeId()}/account/${pf.address}?base=${pf.chain || a.chain.id}`);
+              navigateToSubpage(`/account/${pf.address}?base=${pf.chain || a.chain.id}`);
             }
           },
           label: m('.label-wrap', [ mobile && m(CustomEyeIcon), m('span', 'View profile') ]),
@@ -185,13 +186,13 @@ export const LoginSelectorMenuRight: m.Component<{ mobile?: boolean }, {}> = {
     return m(Menu, { class: 'LoginSelectorMenu' }, [
       m(MenuItem, {
         onclick: () => (app.activeChainId() || app.activeCommunityId())
-          ? m.route.set(`/${app.activeChainId() || app.activeCommunityId()}/notifications`)
+          ? navigateToSubpage('/notifications')
           : m.route.set('/notifications'),
         label: m('.label-wrap', [ mobile && m(CustomBellIcon), m('span', 'Notification settings') ]),
       }),
       m(MenuItem, {
         onclick: () => app.activeChainId()
-          ? m.route.set(`/${app.activeChainId()}/settings`)
+          ? navigateToSubpage('/settings')
           : m.route.set('/settings'),
         label: m('.label-wrap', [ mobile && m(CustomUserIcon), m('span', 'Account settings') ]),
       }),

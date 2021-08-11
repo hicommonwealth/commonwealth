@@ -3,13 +3,15 @@ import 'pages/new_proposal_page.scss';
 import $ from 'jquery';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
-import { Input, TextArea, Form, FormLabel, FormGroup, Button, Grid, Col, Spinner } from 'construct-ui';
+import { utils } from 'ethers';
+import { Input, TextArea, Form, FormLabel, FormGroup,
+  Button, Grid, Col, Spinner, Tabs, TabItem, PopoverMenu, Icons, MenuItem } from 'construct-ui';
 import BN from 'bn.js';
 import { blake2AsHex } from '@polkadot/util-crypto';
 
 import app from 'state';
 import { ITXModalData, ProposalModule, ChainBase, OffchainThreadKind, OffchainThreadStage, ChainNetwork } from 'models';
-import { ProposalType, proposalSlugToClass, proposalSlugToFriendlyName } from 'identifiers';
+import { ProposalType, proposalSlugToClass } from 'identifiers';
 import { formatCoin } from 'adapters/currency';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
 
@@ -20,7 +22,6 @@ import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collect
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
-import MarlinHolder from 'controllers/chain/ethereum/marlin/holder';
 import Marlin from 'controllers/chain/ethereum/marlin/adapter';
 import { MarlinProposalArgs } from 'controllers/chain/ethereum/marlin/governance';
 
@@ -28,18 +29,31 @@ import {
   DropdownFormField,
   RadioSelectorFormField
 } from 'views/components/forms';
+import User from 'views/components/widgets/user';
 import EdgewareFunctionPicker from 'views/components/edgeware_function_picker';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 import TopicSelector from 'views/components/topic_selector';
 import ErrorPage from 'views/pages/error';
 import SubstrateBountyTreasury from 'controllers/chain/substrate/bountyTreasury';
-import User from '../../components/widgets/user';
+import { AaveProposalArgs } from 'controllers/chain/ethereum/aave/governance';
+import Aave from 'controllers/chain/ethereum/aave/adapter';
 
 // this should be titled the Substrate/Edgeware new proposal form
 const NewProposalForm = {
   form: { },
   oncreate: (vnode) => {
     vnode.state.toggleValue = 'proposal';
+  },
+  oninit: (vnode) => {
+    vnode.state.aaveTabCount = 1;
+    vnode.state.activeAaveTabIndex = 0;
+    vnode.state.aaveProposalState = [{
+      target: null,
+      value: null,
+      calldata: null,
+      signature: null,
+      withDelegateCall: false,
+    }];
   },
   view: (vnode) => {
     const callback = vnode.attrs.callback;
@@ -76,6 +90,8 @@ const NewProposalForm = {
     let hasMolochFields : boolean;
     // marlin proposal
     let hasMarlinFields : boolean;
+    // aave proposal
+    let hasAaveFields: boolean;
     // data loaded
     let dataLoaded : boolean = true;
 
@@ -131,6 +147,8 @@ const NewProposalForm = {
       hasMolochFields = true;
     } else if (proposalTypeEnum === ProposalType.MarlinProposal) {
       hasMarlinFields = true;
+    } else if (proposalTypeEnum === ProposalType.AaveProposal) {
+      hasAaveFields = true;
     } else {
       return m('.NewProposalForm', 'Invalid proposal type');
     }
@@ -211,15 +229,15 @@ const NewProposalForm = {
         if (vnode.state.councilMotionType === 'createExternalProposal') {
           args = [author, threshold, EdgewareFunctionPicker.getMethod(),
             EdgewareFunctionPicker.getMethod().encodedLength];
-          createFunc = ([a, t, m, l]) => (app.chain as Substrate).council.createExternalProposal(a, t, m, l);
+          createFunc = ([a, t, mt, l]) => (app.chain as Substrate).council.createExternalProposal(a, t, mt, l);
         } else if (vnode.state.councilMotionType === 'createExternalProposalMajority') {
           args = [author, threshold, EdgewareFunctionPicker.getMethod(),
             EdgewareFunctionPicker.getMethod().encodedLength];
-          createFunc = ([a, t, m, l]) => (app.chain as Substrate).council.createExternalProposalMajority(a, t, m, l);
+          createFunc = ([a, t, mt, l]) => (app.chain as Substrate).council.createExternalProposalMajority(a, t, mt, l);
         } else if (vnode.state.councilMotionType === 'createExternalProposalDefault') {
           args = [author, threshold, EdgewareFunctionPicker.getMethod(),
             EdgewareFunctionPicker.getMethod().encodedLength];
-          createFunc = ([a, t, m, l]) => (app.chain as Substrate).council.createExternalProposalDefault(a, t, m, l);
+          createFunc = ([a, t, mt, l]) => (app.chain as Substrate).council.createExternalProposalDefault(a, t, mt, l);
         } else if (vnode.state.councilMotionType === 'createFastTrack') {
           args = [author, threshold, vnode.state.nextExternalProposalHash,
             vnode.state.votingPeriod, vnode.state.enactmentDelay];
@@ -330,7 +348,48 @@ const NewProposalForm = {
           .then((result) => done(result))
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
+        return;
+      } else if (proposalTypeEnum === ProposalType.AaveProposal) {
+        vnode.state.proposer = app.user?.activeAccount?.address;
+        if (!vnode.state.proposer) throw new Error('Invalid address / not logged in');
+        if (!vnode.state.executor) throw new Error('Invalid executor');
+        if (!vnode.state.ipfsHash) throw new Error('No ipfs hash');
 
+        const targets = [];
+        const values = [];
+        const calldatas = [];
+        const signatures = [];
+        const withDelegateCalls = [];
+
+        for (let i = 0; i < vnode.state.aaveTabCount; i++) {
+          const aaveProposal = vnode.state.aaveProposalState[i];
+          if (aaveProposal.target) {
+            targets.push(aaveProposal.target);
+          } else {
+            throw new Error(`No target for Call ${i + 1}`);
+          }
+
+          values.push(aaveProposal.value || '0');
+          calldatas.push(aaveProposal.calldata || '');
+          withDelegateCalls.push(aaveProposal.withDelegateCall || false);
+          signatures.push(aaveProposal.signature || '');
+        }
+        // TODO: preload this ipfs value to ensure it's correct
+        const ipfsHash = utils.formatBytes32String(vnode.state.ipfsHash);
+        const details: AaveProposalArgs = {
+          executor: vnode.state.executor as string,
+          targets,
+          values,
+          calldatas,
+          signatures,
+          withDelegateCalls,
+          ipfsHash,
+        };
+        (app.chain as Aave).governance.propose(details)
+          .then((result) => done(result))
+          .then(() => m.redraw())
+          .catch((err) => notifyError(err.toString()));
+        return;
         // @TODO: Create Proposal via WebTx
       } else if (proposalTypeEnum === ProposalType.SubstrateTreasuryTip) {
         if (!vnode.state.form.beneficiary) throw new Error('Invalid beneficiary address');
@@ -384,6 +443,8 @@ const NewProposalForm = {
     }
 
     const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
+
+    const { activeAaveTabIndex, aaveProposalState } = vnode.state;
 
     return m(Form, { class: 'NewProposalForm' }, [
       m(Grid, [
@@ -774,6 +835,161 @@ const NewProposalForm = {
               }),
             ]),
           ],
+          hasAaveFields && m('.AaveGovernance', [
+            m(FormGroup, [
+              m(FormLabel, 'Proposer (you)'),
+              m('', [
+                m(User, {
+                  user: author,
+                  linkify: true,
+                  popover: true,
+                  showAddressWithDisplayName: true,
+                }),
+              ]),
+            ]),
+            // TODO: validate this is the correct length, or else hash it ourselves
+            m(FormGroup, [
+              m(FormLabel, 'IPFS Hash'),
+              m(Input, {
+                name: 'ipfsHash',
+                placeholder: 'Proposal IPFS Hash',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.ipfsHash = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Executor'),
+              (app.chain as Aave).governance
+                .api
+                .Executors
+                .map((r) => m(`.executor ${vnode.state.executor === r.address && '.selected-executor'}`, {
+                  onclick: () => { vnode.state.executor = r.address; }
+                }, [
+                  m('.label', 'Address'),
+                  m('', r.address),
+                  m('.label .mt-16', 'Time Delay'),
+                  m('', `${r.delay / (60 * 60 * 24)} Day(s)`),
+                ])),
+            ]),
+            // TODO: display offchain copy re AIPs and ARCs from https://docs.aave.com/governance/
+            m('.tab-selector', [
+              m(Tabs, {
+                align: 'left',
+                class: 'tabs',
+              }, [
+                aaveProposalState.map((_, index) => m(TabItem, {
+                  key: index,
+                  label: `Call ${index + 1}`,
+                  active: activeAaveTabIndex === index,
+                  onclick: () => { vnode.state.activeAaveTabIndex = index; },
+                })),
+              ]),
+              m(PopoverMenu, {
+                closeOnContentClick: true,
+                content: [
+                  m(MenuItem, {
+                    iconLeft: Icons.EDIT_2,
+                    label: 'Add',
+                    onclick: () => {
+                      vnode.state.aaveTabCount++;
+                      vnode.state.activeAaveTabIndex = vnode.state.aaveTabCount - 1;
+                      vnode.state.aaveProposalState.push({
+                        target: null,
+                        value: null,
+                        calldata: null,
+                        signature: null,
+                        withDelegateCall: false,
+                      });
+                    },
+                  }),
+                  m(MenuItem, {
+                    iconLeft: Icons.TRASH_2,
+                    label: 'Delete',
+                    disabled: vnode.state.activeAaveTabIndex === 0,
+                    onclick: () => {
+                      vnode.state.aaveTabCount--;
+                      vnode.state.activeAaveTabIndex = vnode.state.aaveTabCount - 1;
+                      vnode.state.aaveProposalState.pop();
+                    },
+                  }),
+                ],
+                trigger: m(Button, { iconLeft: Icons.MORE_HORIZONTAL, basic: true })
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Target'),
+              m(Input, {
+                name: 'targets',
+                placeholder: 'Add Target',
+                value: aaveProposalState[activeAaveTabIndex].target,
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.aaveProposalState[activeAaveTabIndex].target = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Value'),
+              m(Input, {
+                name: 'values',
+                placeholder: 'Enter amount',
+                value: aaveProposalState[activeAaveTabIndex].value,
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.aaveProposalState[activeAaveTabIndex].value = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Calldata'),
+              m(Input, {
+                name: 'calldatas',
+                placeholder: 'Add Calldata',
+                value: aaveProposalState[activeAaveTabIndex].calldata,
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.aaveProposalState[activeAaveTabIndex].calldata = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m('.flex-label', [
+                m(FormLabel, 'Signature'),
+                m('.helper-text', 'Optional'),
+              ]),
+              m(Input, {
+                name: 'signatures',
+                placeholder: 'Add a signature',
+                value: aaveProposalState[activeAaveTabIndex].signature,
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.aaveProposalState[activeAaveTabIndex].signature = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Delegate Call'),
+              m('', [
+                m(Button, {
+                  label:'TRUE',
+                  class: `button ${aaveProposalState[activeAaveTabIndex].withDelegateCall === true && 'active'}`,
+                  onclick: () => { vnode.state.aaveProposalState[activeAaveTabIndex].withDelegateCall = true; }
+                }),
+                m(Button, {
+                  label:'FALSE',
+                  class: `ml-12 button ${aaveProposalState[activeAaveTabIndex].withDelegateCall === false && 'active'}`,
+                  onclick: () => { vnode.state.aaveProposalState[activeAaveTabIndex].withDelegateCall = false; }
+                }),
+              ]),
+            ]),
+          ]),
           hasTipsFields && [
             m(FormGroup, [
               m('.label', 'Finder'),
@@ -792,6 +1008,7 @@ const NewProposalForm = {
                 oninput: (e) => {
                   const result = (e.target as any).value;
                   vnode.state.form.beneficiary = result;
+                  m.redraw();
                 },
               }),
             ]),

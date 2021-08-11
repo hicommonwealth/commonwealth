@@ -5,7 +5,7 @@ import lity from 'lity';
 import $ from 'jquery';
 import _ from 'lodash';
 
-import { updateRoute } from 'app';
+import { updateRoute, navigateToSubpage } from 'app';
 import app from 'state';
 import { pluralize } from 'helpers';
 import {
@@ -27,6 +27,7 @@ import VersionHistoryModal from 'views/modals/version_history_modal';
 import ReactionButton, { ReactionType } from 'views/components/reaction_button';
 import { MenuItem, Button, Dialog, QueryList, Classes, ListItem, Icon, Icons, Popover } from 'construct-ui';
 import { notifyError, notifyInfo, notifySuccess } from 'controllers/app/notifications';
+import { validURL } from '../../../../../shared/utils';
 
 export enum GlobalStatus {
   Get = 'get',
@@ -126,8 +127,7 @@ export const ProposalBodyCreated: m.Component<{
             e.preventDefault();
             const target = isThread ? `${link}?comment=body` : link;
             if (target === document.location.href) return;
-            // use updateRoute instead of m.route.set to avoid resetting scroll point
-            updateRoute(target, {}, { replace: true });
+            history.replaceState(history.state, '', target);
             jumpHighlightComment((isThread ? 'body' : item.id), false, 500);
           }
         }, item.createdAt.fromNow())
@@ -243,7 +243,7 @@ export const ProposalBodyDeleteMenuItem: m.Component<{
         )();
         if (!confirmed) return;
         (isThread ? app.threads : app.comments).delete(item).then(() => {
-          if (isThread) m.route.set(`/${app.activeId()}/`);
+          if (isThread) navigateToSubpage('/');
           if (refresh) refresh();
           m.redraw();
           // TODO: set notification bar for 'thread deleted/comment deleted'
@@ -529,16 +529,21 @@ export const ProposalBodySaveEdit: m.Component<{
         rounded: true,
         onclick: (e) => {
           e.preventDefault();
+          if (parentState.updatedUrl) {
+            if (!validURL(parentState.updatedUrl)) {
+              notifyError('Must provide a valid URL.');
+              return;
+            }
+          }
           parentState.saving = true;
           parentState.quillEditorState.editor.enable(false);
           const { quillEditorState } = parentState;
           const itemText = quillEditorState.markdownMode
             ? quillEditorState.editor.getText()
             : JSON.stringify(quillEditorState.editor.getContents());
-          parentState.saving = true;
           if (item instanceof OffchainThread) {
-            app.threads.edit(item, itemText, parentState.updatedTitle).then(() => {
-              m.route.set(`/${app.activeId()}/proposal/${item.slug}/${item.id}`);
+            app.threads.edit(item, itemText, parentState.updatedTitle, parentState.updatedUrl).then(() => {
+              navigateToSubpage(`/proposal/${item.slug}/${item.id}`);
               parentState.editing = false;
               parentState.saving = false;
               clearEditingLocalStorage(item, true);
@@ -694,6 +699,7 @@ export const ProposalBodyEditor: m.Component<{
         oncreateBind: (state) => {
           parentState.quillEditorState = state;
         },
+        imageUploader: true,
         tabindex: 1,
         theme: 'snow',
         editorNamespace: isThread

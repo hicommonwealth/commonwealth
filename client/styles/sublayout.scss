@@ -104,8 +104,8 @@
     }
     @include md-max {
         .sublayout-main-col {
-            width: 100%;
-            max-width: none;
+            min-width: 100%;
+            max-width: 100%;
             padding: 0;
         }
     }
@@ -219,10 +219,17 @@
     }
     .token-banner-content {
     }
-    
+
     .token-banner-terms {
       background-color: #fdf5f9;
       text-align: center;
       padding: 5px 0 5px 0;
+
+      .close-button {
+        position: absolute;
+        right: 1rem;
+        line-height: 1.5;
+        cursor: pointer;
+      }
     }
 }

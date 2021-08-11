@@ -26,7 +26,7 @@ export function formatNumberShort(num: number) {
 const nf = new Intl.NumberFormat();
 
 // duplicated in client/scripts/helpers.ts
-function formatNumberLong(num : number) {
+export function formatNumberLong(num : number) {
   // format small numbers with decimals, large numbers with commas
   if (num === 0) return '0';
   if (num < 0.000001) return num.toFixed(20).replace(/0*$/, '');

@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
+import { Op } from 'sequelize';
 import { factory, formatFilename } from '../../shared/logging';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
+import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -21,8 +23,7 @@ export const Errors = {
   InvalidTerms: 'Terms of Service must begin with https://',
 };
 
-const updateChain = async (models, req: Request, res: Response, next: NextFunction) => {
-  const { Op } = models.sequelize;
+const updateChain = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   if (!req.body.id) return next(new Error(Errors.NoChainId));
   if (req.body.network) return next(new Error(Errors.CantChangeNetwork));
@@ -30,11 +31,11 @@ const updateChain = async (models, req: Request, res: Response, next: NextFuncti
   const chain = await models.Chain.findOne({ where: { id: req.body.id } });
   if (!chain) return next(new Error(Errors.NoChainFound));
   else {
-    const userAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
+    const userAddressIds = (await req.user.getAddresses()).filter((addr) => !!addr.verified).map((addr) => addr.id);
     const userMembership = await models.Role.findOne({
       where: {
         address_id: { [Op.in]: userAddressIds },
-        chain_id: chain.id,
+        chain_id: chain.id || null,
         permission: 'admin',
       },
     });
@@ -43,7 +44,24 @@ const updateChain = async (models, req: Request, res: Response, next: NextFuncti
     }
   }
 
-  const { active, icon_url, symbol, type, name, description, website, discord, element, telegram, github, stagesEnabled, additionalStages, customDomain, snapshot, terms } = req.body;
+  const {
+    active,
+    icon_url,
+    symbol,
+    type,
+    name,
+    description,
+    website,
+    discord,
+    element,
+    telegram,
+    github,
+    stagesEnabled,
+    customStages,
+    customDomain,
+    terms,
+    snapshot,
+  } = req.body;
 
   if (website && !urlHasValidHTTPPrefix(website)) {
     return next(new Error(Errors.InvalidWebsite));
@@ -77,10 +95,14 @@ const updateChain = async (models, req: Request, res: Response, next: NextFuncti
   chain.telegram = telegram;
   chain.github = github;
   chain.stagesEnabled = stagesEnabled;
-  chain.additionalStages = additionalStages;
-  chain.customDomain = customDomain;
+  chain.customStages = customStages;
   chain.terms = terms;
-  if (chain.base === 'ethereum') chain.snapshot = snapshot;
+  chain.snapshot = snapshot;
+  // Under our current security policy, custom domains must be set by trusted
+  // administrators only. Otherwise an attacker could configure a custom domain and
+  // use the code they run to steal login tokens for arbitrary users.
+  //
+  // chain.customDomain = customDomain;
   if (req.body['featured_topics[]']) chain.featured_topics = req.body['featured_topics[]'];
 
   await chain.save();

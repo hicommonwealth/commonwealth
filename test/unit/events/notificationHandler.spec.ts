@@ -27,7 +27,7 @@ const setupUserAndEventSubscriptions = async (email, address, chain) => {
     user_id: user.id,
     address,
     chain,
-    selected: true,
+    // selected: true,
     verification_token: 'PLACEHOLDER',
     verification_token_expires: null,
     verified: new Date(),
