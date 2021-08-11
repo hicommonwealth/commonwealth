@@ -33,7 +33,7 @@ export interface ChainAttributes {
   collapsed_on_homepage?: boolean;
   featured_topics?: string[];
   substrate_spec?: RegisteredTypes;
-  has_chain_events_listener: string;
+  has_chain_events_listener: boolean;
   terms?: string;
   snapshot?: string;
 
@@ -86,7 +86,7 @@ export default (
     collapsed_on_homepage: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: true },
     type: { type: dataTypes.STRING, allowNull: false },
     substrate_spec: { type: dataTypes.JSONB, allowNull: true },
-    has_chain_events_listener: { type: dataTypes.STRING, allowNull: false, defaultValue: false },
+    has_chain_events_listener: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     terms: { type: dataTypes.STRING, allowNull: true },
     snapshot: { type: dataTypes.STRING, allowNull: true },
   }, {

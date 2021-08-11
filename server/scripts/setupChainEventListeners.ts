@@ -1,8 +1,7 @@
 import {
   SubstrateTypes,
   CWEvent,
-} from '@commonwealth/chain-events'; // TODO: remove this?
-
+} from '@commonwealth/chain-events';
 import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
 
 import { HANDLE_IDENTITY, DATABASE_URI } from '../config';
@@ -78,7 +77,8 @@ const setupChainEventListeners = async (
   const substrateEventHandlers = [identityHandler, userFlagsHandler]
 
   // get all chains that
-  const substrateChains = (await pool.query(`SELECT "id" FROM "Chains" WHERE "base"='substrate'`)).rows.map(obj => obj.id)
+  const substrateChains = (await pool.query(`SELECT "id" FROM "Chains" WHERE "base"='substrate';`)).rows.map(obj => obj.id)
+  const erc20Tokens = (await pool.query(`SELECT "id" FROM "Chains" WHERE "base"='ethereum' AND "type"='token';`)).rows.map(obj => obj.id)
 
   // feed the events into their respective handlers
   async function processClassicEvents(event: CWEvent): Promise<void> {
@@ -87,8 +87,11 @@ const setupChainEventListeners = async (
       try {
         prevResult = await handler.handle(event, prevResult);
       } catch (err) {
-        log.error(`Classic event handle failure for the following event: ${JSON.stringify(event, null, 2)}`, err);
-        break;
+        // unknown chain event originates from the webhookNotifier which does not support erc20 events and thus throws if an erc20 event is given
+        if (err.message != 'unknown chain event') {
+          log.error(`Classic event handle failure for the following event: ${JSON.stringify(event, null, 2)}`, err);
+          break;
+        }
       }
     }
     if (substrateChains.includes(event.chain)) {

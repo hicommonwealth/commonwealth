@@ -27,7 +27,7 @@ const finishEmailLogin = async (models: DB, req: Request, res: Response, next: N
     return redirectWithLoginSuccess(res, req.user.email);
   }
   const token = req.query.token;
-  const email = req.query.email;
+  const email = <string>req.query.email;
   const confirmation = req.query.confirmation;
   if (!token) {
     return redirectWithLoginError(res, 'Missing token');

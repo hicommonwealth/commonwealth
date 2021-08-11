@@ -11,7 +11,7 @@ const getCommunitiesAndChains = async (models: DB, req: Request, res: Response, 
   const { user } = req;
   const { searchTerm, limit } = req.query;
   const params = {
-    limit: limit || DEFAULT_SEARCH_LIMIT
+    limit: Number(limit) || DEFAULT_SEARCH_LIMIT
   };
   if (searchTerm) {
     params['where'] = { name: { [Op.iLike]: `%${searchTerm}%` } };

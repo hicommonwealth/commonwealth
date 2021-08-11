@@ -1,4 +1,6 @@
 import * as Sequelize from 'sequelize';
+import { Model, DataTypes } from 'sequelize';
+import { ModelStatic } from './types';
 
 export interface IdentityCacheAttributes {
   chain: string;
@@ -6,20 +8,16 @@ export interface IdentityCacheAttributes {
 }
 
 export interface IdentityCacheInstance
-  extends Sequelize.Instance<IdentityCacheAttributes>,
+  extends Sequelize.Model<IdentityCacheAttributes>,
     IdentityCacheAttributes {}
 
-export interface IdentityCacheModel
-  extends Sequelize.Model<IdentityCacheInstance, IdentityCacheAttributes> {}
+export type IdentityCacheStatic = ModelStatic<IdentityCacheInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes
-): IdentityCacheModel => {
-  const IdentityCache = sequelize.define<
-    IdentityCacheInstance,
-    IdentityCacheAttributes
-  >(
+  dataTypes: typeof DataTypes
+): IdentityCacheStatic => {
+  const IdentityCache = <IdentityCacheStatic>sequelize.define(
     'IdentityCache',
     {
       chain: { type: dataTypes.STRING, allowNull: false },
@@ -29,10 +27,7 @@ export default (
   );
 
   IdentityCache.associate = (models) => {
-    models.IdentityCache.belongsTo(models.Chain, {
-      foreignKey: 'chain',
-      targetKey: 'id'
-    });
+    models.IdentityCache.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
   };
 
   return IdentityCache;

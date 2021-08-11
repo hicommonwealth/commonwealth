@@ -124,6 +124,7 @@ const resetServer = (debug = false): Promise<void> => {
         type: 'chain',
         base: 'substrate',
         ss58_prefix: 7,
+        has_chain_events_listener: false
       });
       const eth = await models['Chain'].create({
         id: 'ethereum',
@@ -134,6 +135,7 @@ const resetServer = (debug = false): Promise<void> => {
         active: true,
         type: 'chain',
         base: 'ethereum',
+        has_chain_events_listener: false
       });
       const alex = await models['Chain'].create({
         id: 'alex',
@@ -144,6 +146,7 @@ const resetServer = (debug = false): Promise<void> => {
         active: true,
         type: 'token',
         base: 'ethereum',
+        has_chain_events_listener: false
       });
       const yearn = await models['Chain'].create({
         id: 'yearn',
@@ -154,7 +157,8 @@ const resetServer = (debug = false): Promise<void> => {
         active: true,
         type: 'chain',
         base: 'ethereum',
-        snapshot: 'ybaby.eth'
+        snapshot: 'ybaby.eth',
+        has_chain_events_listener: false
       });
       const sushi = await models['Chain'].create({
         id: 'sushi',
@@ -165,7 +169,8 @@ const resetServer = (debug = false): Promise<void> => {
         active: true,
         type: 'chain',
         base: 'ethereum',
-        snapshot: 'sushi'
+        snapshot: 'sushi',
+        has_chain_events_listener: false
       });
 
       // Admin roles for specific communities

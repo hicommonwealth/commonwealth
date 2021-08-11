@@ -15,7 +15,7 @@ const startOAuthLogin = async (models: DB, req: Request, res: Response, next: Ne
         models.OffchainCommunity.findOne({ where: { customDomain: req.query.from } }),
       ]);
       if (chain || community) {
-        const tokenObj = await models.LoginToken.createForOAuth(req.query.from);
+        const tokenObj = await models.LoginToken.createForOAuth(<string>req.query.from);
         successRedirect = `https://${req.query.from}/api/finishOAuthLogin?token=${tokenObj.token}`;
         (req as any).loginTokenForRedirect = tokenObj.id;
       }

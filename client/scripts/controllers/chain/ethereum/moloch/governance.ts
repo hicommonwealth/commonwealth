@@ -86,12 +86,12 @@ export default class MolochGovernance extends ProposalModule<
     } else {
       console.log('Fetching moloch proposals from chain.');
       const fetcher = new MolochEvents.StorageFetcher(
-        api.Contract,
+        <any>api.Contract,
         1,
         new EthDater((this.app.chain as Moloch).chain.api)
       );
-      const subscriber = new MolochEvents.Subscriber(api.Contract, this.app.chain.id);
-      const processor = new MolochEvents.Processor(api.Contract, 1);
+      const subscriber = new MolochEvents.Subscriber(<any>api.Contract, this.app.chain.id);
+      const processor = new MolochEvents.Processor(<any>api.Contract, 1);
       await this.app.chain.chainEntities.fetchEntities(this.app.chain.id, () => fetcher.fetch());
       await this.app.chain.chainEntities.subscribeEntities(
         this.app.chain.id,
