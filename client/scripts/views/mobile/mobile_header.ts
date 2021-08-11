@@ -8,12 +8,14 @@ import app, { LoginState } from 'state';
 
 import NotificationsMenu from 'views/components/header/notifications_menu';
 import { SearchBar } from 'views/components/search_bar';
+import CreateCommunityModal from 'views/modals/create_community_modal';
 import MobileSidebar from './mobile_sidebar';
 import { CustomHamburgerIcon } from './mobile_icons';
 
-const MobileHeader: m.Component<{}, { sidebarOpen: boolean }> = {
+const MobileHeader: m.Component<{showCreateCommunityButton?: boolean}, { sidebarOpen: boolean }> = {
   view: (vnode) => {
     const { sidebarOpen } = vnode.state;
+    const { showCreateCommunityButton } = vnode.attrs;
     // Because onClick never happens when logging out we must set manually
     return m('.MobileHeader', [
       m('img.mobile-logo', {
@@ -23,6 +25,14 @@ const MobileHeader: m.Component<{}, { sidebarOpen: boolean }> = {
       m(SearchBar),
       m('.mobile-header-right', [
         app.isLoggedIn() && m(NotificationsMenu, { small: false }),
+        app.isLoggedIn() && showCreateCommunityButton ? m(Button, {
+          class: 'create-community',
+          label: m(Icon, { name: Icons.PLUS }),
+          compact: true,
+          onclick: (e) => {
+            app.modals.create({ modal: CreateCommunityModal });
+          },
+        }) : '',
         m(PopoverMenu, {
           class: 'MobileHeaderPopoverMenu',
           transitionDuration: 0,

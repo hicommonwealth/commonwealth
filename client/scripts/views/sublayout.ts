@@ -14,6 +14,7 @@ import MobileHeader from 'views/mobile/mobile_header';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import FooterLandingPage from 'views/pages/landing/landing_page_footer';
 import Token from 'controllers/chain/ethereum/token/adapter';
+import CreateCommunityModal from 'views/modals/create_community_modal';
 import { SearchBar } from './components/search_bar';
 
 const Sublayout: m.Component<{
@@ -28,6 +29,7 @@ const Sublayout: m.Component<{
   rightContent?: any,
   hero?: any,
   showNewProposalButton?: boolean,
+  showCreateCommunityButton?: boolean,
   showCouncilMenu?: boolean,
   hideSidebar?: boolean,
   hideSearch?: boolean,
@@ -41,6 +43,7 @@ const Sublayout: m.Component<{
       rightContent,
       hero,
       showNewProposalButton,
+      showCreateCommunityButton,
       showCouncilMenu,
       hideSidebar,
       hideSearch,
@@ -83,6 +86,14 @@ const Sublayout: m.Component<{
     const sublayoutHeaderRight = m('.sublayout-header-right', [
       m(LoginSelector),
       app.isLoggedIn() && m(InvitesMenu),
+      app.isLoggedIn() && showCreateCommunityButton ? m(Button, {
+        class: 'create-community',
+        label: m(Icon, { name: Icons.PLUS }),
+        compact: true,
+        onclick: (e) => {
+          app.modals.create({ modal: CreateCommunityModal });
+        },
+      }) : '',
       app.isLoggedIn() && m(NotificationsMenu),
       showNewProposalButton
       && (narrowBrowserWidth ? m(MobileNewProposalButton) : m(NewProposalButton, { fluid: false, threadOnly: !chain })),
@@ -113,7 +124,7 @@ const Sublayout: m.Component<{
     return [
       m('.layout-container', [
         m('.Sublayout', { class: vnode.attrs.class }, [
-          m(MobileHeader),
+          m(MobileHeader, { showCreateCommunityButton }),
           m('.sublayout-header', { class: !title ? 'no-title' : '' }, [
             m('.sublayout-header-inner', [
               sublayoutHeaderLeft,

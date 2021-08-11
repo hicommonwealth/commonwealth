@@ -350,6 +350,7 @@ const LandingPage: m.Component<{}, IState> = {
     } else {
       return m(Sublayout, {
         class: 'Homepage',
+        showCreateCommunityButton: true
       }, [
         m(CommunityCards),
       ]);
