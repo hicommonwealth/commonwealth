@@ -77,7 +77,7 @@ const SidebarQuickSwitcher: m.Component<{}> = {
           },
         }),
         m(CommunitySelector),
-        m(Button, {
+        !!app.user.activeAccount && m(Button, {
           class: 'create-community',
           rounded: true,
           label: m(Icon, { name: Icons.PLUS }),

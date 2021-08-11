@@ -145,29 +145,27 @@ const OffchainCommunityForm: m.Component<OffchainCommunityFormAttrs, OffchainCom
             defaultChain
           } = vnode.state;
 
-          try {
-            $.post(`${app.serverUrl()}/createCommunity`, {
-              name,
-              description,
-              iconUrl,
-              website,
-              discord,
-              element,
-              telegram,
-              github,
-              invitesEnabled,
-              privacyEnabled,
-              isAuthenticatedForum,
-              jwt: app.user.jwt,
-              default_chain: defaultChain
-            }).then(async (res) => {
-              await initAppState(false);
-              $(e.target).trigger('modalexit');
-              m.route.set(`/${res.result.id}`);
-            });
-          } catch (err) {
+          $.post(`${app.serverUrl()}/createCommunity`, {
+            name,
+            description,
+            iconUrl,
+            website,
+            discord,
+            element,
+            telegram,
+            github,
+            invitesEnabled,
+            privacyEnabled,
+            isAuthenticatedForum,
+            jwt: app.user.jwt,
+            default_chain: defaultChain
+          }).then(async (res) => {
+            await initAppState(false);
+            $(e.target).trigger('modalexit');
+            m.route.set(`/${res.result.id}`);
+          }).catch((err: any) => {
             notifyError(err.responseJSON?.error || 'Creating new community failed');
-          }
+          });
         },
       }),
       ]),
@@ -315,38 +313,35 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
             notifyError('Spec provided has invalid JSON');
             return;
           }
-          try {
-            $.post(`${app.serverUrl()}/addChainNode`, {
-              name,
-              description,
-              node_url : nodeUrl,
-              symbol,
-              website,
-              discord,
-              element,
-              telegram,
-              github,
-              substrate_spec,
-              jwt: app.user.jwt,
-              type: 'chain',
-              id: slugify(name),
-              base: 'substrate',
-              network: slugify(name)
-            }).then(async (res) => {
-              await initAppState(false);
-              $(e.target).trigger('modalexit');
-              m.route.set(`/${res.result.chain}`);
-            });
-          } catch (err) {
+          $.post(`${app.serverUrl()}/addChainNode`, {
+            name,
+            description,
+            node_url : nodeUrl,
+            symbol,
+            website,
+            discord,
+            element,
+            telegram,
+            github,
+            substrate_spec,
+            jwt: app.user.jwt,
+            type: 'chain',
+            id: slugify(name),
+            base: 'substrate',
+            network: slugify(name)
+          }).then(async (res) => {
+            await initAppState(false);
+            $(e.target).trigger('modalexit');
+            m.route.set(`/${res.result.chain}`);
+          }).catch((err: any) => {
             notifyError(err.responseJSON?.error || 'Creating new community failed');
-          }
+          });
         },
       }),
       ]),
     ]);
   }
 };
-
 
 interface CreateCommunityAttrs {}
 interface CreateCommunityState {
@@ -379,7 +374,7 @@ const CreateCommunityModal: m.Component<CreateCommunityAttrs, CreateCommunitySta
           active: vnode.state.activeForm === 'offchain',
           onclick: () => { vnode.state.activeForm = 'offchain'; return null; },
         }),
-        m(TabItem, {
+        app.user.isSiteAdmin && m(TabItem, {
           label: 'Substrate',
           active: vnode.state.activeForm === 'substrate',
           onclick: () => { vnode.state.activeForm = 'substrate'; return null; },
