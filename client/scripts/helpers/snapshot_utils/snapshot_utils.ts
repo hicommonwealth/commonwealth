@@ -1,5 +1,5 @@
 import { cloneDeep } from 'lodash';
-import { apolloClient, PROPOSAL_VOTES_QUERY } from '../apollo';
+import { apolloClient, PROPOSAL_VOTES_QUERY, PROPOSALS_QUERY } from '../apollo';
 import networks from './networks.json';
 import numeral from 'numeral';
 import Snapshot from '@snapshot-labs/snapshot.js';
@@ -43,6 +43,20 @@ export function formatProposal(proposal) {
   }
 
   return proposal;
+}
+
+export async function getProposals(space: string) {
+  const proposalsObj = await apolloClient.query({
+    query: PROPOSALS_QUERY,
+    variables: {
+      space,
+      state: 'all',
+      // TODO: configure to fetch all
+      first: 6,
+      skip: 0,
+    }
+  });
+  return proposalsObj;
 }
 
 export async function getProposal(id) {
