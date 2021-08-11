@@ -65,10 +65,6 @@ async function mainProcess(producer: RabbitMqHandler, pool) {
 
   log.info('Starting scheduled process');
 
-  pool.on('error', (err, client) => {
-    log.error('Unexpected error on idle client', err);
-  });
-
   let query = `SELECT "Chains"."id", "substrate_spec", "url", "address", "base", "type", "network" FROM "Chains" JOIN "ChainNodes" ON "Chains"."id"="ChainNodes"."chain" WHERE "Chains"."has_chain_events_listener"='true';`;
   const allChains = (await pool.query(query)).rows;
 
@@ -342,6 +338,11 @@ const pool = new Pool({
   },
   max: 3
 });
+
+pool.on('error', (err, client) => {
+  log.error('Unexpected error on idle client', err);
+});
+
 producer
   .init()
   .then(() => {
