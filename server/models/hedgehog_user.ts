@@ -1,30 +1,31 @@
 import * as Sequelize from 'sequelize';
+import { Model, DataTypes } from 'sequelize';
+import { ModelStatic } from './types';
 
 export interface HedgehogUserAttributes {
-  id?: number;
   username: string;
   walletAddress: string;
+  id?: number;
   created_at?: Date;
   updated_at?: Date;
 }
 
-export interface HedgehogUserInstance extends Sequelize.Instance<HedgehogUserAttributes>, HedgehogUserAttributes {
+export interface HedgehogUserInstance extends Model<HedgehogUserAttributes>, HedgehogUserAttributes {}
 
-}
-
-export interface HedgehogUserModel extends Sequelize.Model<HedgehogUserInstance, HedgehogUserAttributes> {
-
-}
+export type HedgehogUserModelStatic = ModelStatic<HedgehogUserInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): HedgehogUserModel => {
-  const HedgehogUser = sequelize.define<HedgehogUserInstance, HedgehogUserAttributes>('HedgehogUser', {
+  dataTypes: typeof DataTypes,
+): HedgehogUserModelStatic => {
+  const HedgehogUser = <HedgehogUserModelStatic>sequelize.define('HedgehogUser', {
     id:            { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true, allowNull: false },
     username:      { type: dataTypes.STRING, allowNull: false, unique: true },
     walletAddress: { type: dataTypes.STRING, allowNull: true },
   }, {
+    tableName: 'HedgehogUsers',
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
     underscored: true,
   });
 

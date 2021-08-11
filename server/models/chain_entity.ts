@@ -1,14 +1,15 @@
 import * as Sequelize from 'sequelize';
-
+import { Model, DataTypes } from 'sequelize';
 import { ChainAttributes } from './chain';
 import { OffchainThreadAttributes } from './offchain_thread';
 import { ChainEventAttributes } from './chain_event';
+import { ModelStatic } from './types';
 
 export interface ChainEntityAttributes {
-  id?: number;
   chain: string;
   type: string;
   type_id: string;
+  id?: number;
   thread_id?: number;
   title?: string;
   author?: string;
@@ -22,18 +23,15 @@ export interface ChainEntityAttributes {
 }
 
 export interface ChainEntityInstance
-extends Sequelize.Instance<ChainEntityAttributes>, ChainEntityAttributes {
+extends Model<ChainEntityAttributes>, ChainEntityAttributes {}
 
-}
+export type ChainEntityModelStatic = ModelStatic<ChainEntityInstance>
 
-export interface ChainEntityModel extends Sequelize.Model<ChainEntityInstance, ChainEntityAttributes> {
-
-}
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): ChainEntityModel => {
-  const ChainEntity = sequelize.define<ChainEntityInstance, ChainEntityAttributes>('ChainEntity', {
+  dataTypes: typeof DataTypes,
+): ChainEntityModelStatic => {
+  const ChainEntity = <ChainEntityModelStatic>sequelize.define<ChainEntityInstance, ChainEntityAttributes>('ChainEntity', {
     id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     chain: { type: dataTypes.STRING, allowNull: false },
     type: { type: dataTypes.STRING, allowNull: false },
@@ -42,11 +40,13 @@ export default (
     completed: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     title: { type: dataTypes.STRING, allowNull: true },
     author: { type: dataTypes.STRING, allowNull: true },
-
     created_at: { type: dataTypes.DATE, allowNull: false },
     updated_at: { type: dataTypes.DATE, allowNull: false },
   }, {
+    tableName: 'ChainEntities',
     timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
     underscored: true,
     paranoid: false,
     indexes: [

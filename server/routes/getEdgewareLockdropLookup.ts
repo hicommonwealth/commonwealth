@@ -4,6 +4,7 @@ import _ from 'lodash';
 import { Request, Response, NextFunction } from 'express';
 import { INFURA_API_KEY } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
+import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -103,7 +104,7 @@ const fetchSignals = async (network = 'mainnet', address, contract) => {
   return results;
 };
 
-export default async (models, req: Request, res: Response, next: NextFunction) => {
+export default async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const address = req.query.address;
   const network = req.query.network || 'mainnet';
 

@@ -29,8 +29,12 @@ const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the datab
 export const getMemberResult = (addr, searchTerm) => {
   const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
   if (addr.name) profile.initialize(addr.name, null, null, null, null);
+
+  if (app.isCustomDomain() && app.customDomainId() !== addr.chain) return;
+
   const scope = m.route.param('chain');
   const userLink = `/${scope || addr.chain}/account/${addr.address}?base=${addr.chain}`;
+
   return m(ListItem, {
     contentLeft: m(MemberIcon),
     label: m('a.search-results-item', [
@@ -80,6 +84,9 @@ export const getCommunityResult = (community) => {
 export const getDiscussionResult = (thread, searchTerm) => {
   const proposalId = thread.proposalid;
   const chainOrComm = thread.chain || thread.offchain_community;
+
+  if (app.isCustomDomain() && app.customDomainId() !== chainOrComm) return;
+
   return m(ListItem, {
     onclick: (e) => {
       m.route.set((thread.type === 'thread')
@@ -214,7 +221,7 @@ const SearchPage : m.Component<{
 
     const communityScope = m.route.param('comm');
     const chainScope = m.route.param('chain');
-    const scope = communityScope || chainScope;
+    const scope = app.isCustomDomain() ? app.customDomainId() : (communityScope || chainScope);
 
     const searchTerm = m.route.param('q')?.toLowerCase();
     if (!searchTerm) {
@@ -281,7 +288,7 @@ const SearchPage : m.Component<{
           vnode.state.activeTab = SearchType.Top;
         },
       }),
-      !scope
+      !scope && !app.isCustomDomain()
       && m(TabItem, {
         label: 'Communities',
         active: activeTab === SearchType.Community,
@@ -324,8 +331,9 @@ const SearchPage : m.Component<{
           '\'',
           scope
             ? ` in ${capitalize(scope)}.`
-            : ' across all communities.',
+            : app.isCustomDomain() ? '' : ' across all communities.',
           scope
+            && !app.isCustomDomain()
             && [
               ' ',
               m('a.search-all-communities', {

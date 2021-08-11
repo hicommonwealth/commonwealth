@@ -8,7 +8,7 @@
     "outDir": "./build",
     "baseUrl": ".",
     "paths": {
-      "*": ["../*", "../shared/*", "../client/scripts/*", "../eth/types/*"]
+      "*": ["../*", "../shared/*", "../client/scripts/*"]
     },
     "resolveJsonModule": true,
     "esModuleInterop": true,

@@ -11,7 +11,7 @@ import { notifyError } from 'controllers/app/notifications';
 import User, { UserBlock } from 'views/components/widgets/user';
 import { CompactModalExitButton } from 'views/modal';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
-import { initAppState } from 'app';
+import { initAppState, navigateToSubpage } from 'app';
 
 const SideMenu: m.Component<{invites, onChangeHandler, location}, {}> = {
   view: (vnode) => {
@@ -199,7 +199,11 @@ const ConfirmInviteModal: m.Component<{}, {
                   const web3loginParams = joiningCommunity ? { prev, next, joiningCommunity } : { prev, next };
 
                   // redirect to /web3login to connect to the chain
-                  m.route.set(`/${app.chain?.id || defaultChainId}/web3login`, web3loginParams);
+                  if (app.activeId()) {
+                    navigateToSubpage('/web3login', web3loginParams);
+                  } else {
+                    m.route.set(`${defaultChainId}/web3login`, web3loginParams);
+                  }
 
                   // show web3 login modal
                   app.modals.lazyCreate('link_new_address_modal', {

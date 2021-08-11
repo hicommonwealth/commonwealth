@@ -1,7 +1,7 @@
 import request from 'superagent';
 import { Op } from 'sequelize';
 import { capitalize } from 'lodash';
-import { SubstrateEvents } from '@commonwealth/chain-events';
+import { AaveEvents, chainSupportedBy, MarlinEvents, MolochEvents, SubstrateEvents } from '@commonwealth/chain-events';
 
 import { NotificationCategories } from '../shared/types';
 import { smartTrim, validURL, renderQuillDeltaToText } from '../shared/utils';
@@ -29,17 +29,22 @@ const REGEX_EMOJI = /([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF
 const getFilteredContent = (content, address) => {
   let event;
   if (content.chainEvent && content.chainEventType) {
-    try {
-      event = SubstrateEvents.Label(
-        content.chainEvent.block_number,
-        content.chainEventType.chain,
-        content.chainEvent.event_data
-      );
-    } catch (error) {
-      log.warn(`Webhooks only support Substrate events`);
-      throw new Error('Non-Substrate events not supported')
+    let labelerFn;
+    if (chainSupportedBy(content.chainEventType.chain, SubstrateEvents.Types.EventChains)) {
+      labelerFn = SubstrateEvents.Label;
+    } else if (chainSupportedBy(content.chainEventType.chain, MolochEvents.Types.EventChains)) {
+      labelerFn = MolochEvents.Label;
+    } else if (chainSupportedBy(content.chainEventType.chain, MarlinEvents.Types.EventChains)) {
+      labelerFn = MarlinEvents.Label;
+    } else if (chainSupportedBy(content.chainEventType.chain, AaveEvents.Types.EventChains)) {
+      labelerFn = AaveEvents.Label;
     }
-
+    if (!labelerFn) throw new Error('unknown chain event');
+    event = labelerFn(
+      content.chainEvent.block_number,
+      content.chainEventType.chain,
+      content.chainEvent.event_data
+    );
     const title = `${capitalize(content.chainEventType.chain)}`;
     const chainEventLink = `${SERVER_URL}/${content.chainEventType.chain}`;
     const fulltext = `${event.heading} on ${capitalize(content.chainEventType?.chain)} at block`
@@ -122,18 +127,10 @@ const send = async (models, content: WebhookContent) => {
     }
   });
 
-  let result;
-  try {
-    result = getFilteredContent(content, address);
-  } catch (error) {
-    return;
-
-  }
   const {
     community, actor, action, actedOn, actedOnLink, notificationTitlePrefix, notificationExcerpt, notificationPreviewImageUrl, // forum events
     title, chainEventLink, fulltext // chain events
-  } = result;
-
+  } = getFilteredContent(content, address);
   const isChainEvent = !!chainEventLink;
 
   let actorAvatarUrl = null;
@@ -184,7 +181,7 @@ const send = async (models, content: WebhookContent) => {
   if (!previewImageUrl) {
     // if no embedded image url or the chain/community doesn't have a logo, show the Commonwealth logo as the preview image
     previewImageUrl = previewImageUrl || DEFAULT_COMMONWEALTH_LOGO;
-    previewAltText = previewAltText || 'CommonWealth';
+    previewAltText = previewAltText || 'Commonwealth';
   }
 
   await Promise.all(chainOrCommwebhookUrls

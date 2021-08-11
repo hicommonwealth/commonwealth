@@ -3,6 +3,7 @@ import webpack from 'webpack';
 import passport from 'passport';
 import { GITHUB_OAUTH_CALLBACK } from './config';
 
+import domain from './routes/domain';
 import status from './routes/status';
 import createGist from './routes/createGist';
 
@@ -123,15 +124,29 @@ import { getTokensFromLists } from './routes/getTokensFromLists';
 import getTokenForum from './routes/getTokenForum';
 import getSubstrateSpec from './routes/getSubstrateSpec';
 import editSubstrateSpec from './routes/editSubstrateSpec';
+import { getStatsDInstance } from './util/metrics';
+import { DB } from './database';
 
 function setupRouter(
   app,
-  models,
+  models: DB,
   viewCountCache: ViewCountCache,
   identityFetchCache: IdentityFetchCache,
   tokenBalanceCache: TokenBalanceCache
 ) {
   const router = express.Router();
+
+  router.use((req, res, next) => {
+    getStatsDInstance().increment(`cw.path.${req.path.slice(1)}.called`);
+    const start = Date.now();
+    res.on('finish', () => {
+      const latency = Date.now() - start;
+      getStatsDInstance().histogram(`cw.path.${req.path.slice(1)}.latency`, latency);
+    });
+    next();
+  });
+
+  router.get('/domain', domain.bind(this, models));
   router.get('/status', status.bind(this, models));
 
   router.get('/getSubstrateSpec', getSubstrateSpec.bind(this, models));

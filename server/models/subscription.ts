@@ -1,14 +1,13 @@
-import _ from 'underscore';
 import WebSocket from 'ws';
-import Sequelize from 'sequelize';
+import Sequelize, { DataTypes } from 'sequelize';
 import send, { WebhookContent } from '../webhookNotifier';
-import { SENDGRID_API_KEY, SERVER_URL } from '../config';
+import { SERVER_URL } from '../config';
 import { UserAttributes } from './user';
 import { NotificationCategoryAttributes } from './notification_category';
-import { NotificationAttributes } from './notification';
+import {NotificationAttributes, NotificationInstance} from './notification';
+import { ModelStatic } from './types';
 import {
-  WebsocketMessageType, IWebsocketsPayload,
-  IPostNotificationData, ICommunityNotificationData, IChainEventNotificationData
+  IPostNotificationData, ICommunityNotificationData, IChainEventNotificationData,
 } from '../../shared/types';
 import { createImmediateNotificationEmailObject, sendImmediateNotificationEmail } from '../scripts/emails';
 import { factory, formatFilename } from '../../shared/logging';
@@ -24,10 +23,10 @@ const log = factory.getLogger(formatFilename(__filename));
 const { Op } = Sequelize;
 
 export interface SubscriptionAttributes {
-  id?: number;
   subscriber_id: number;
   category_id: string;
   object_id: string;
+  id?: number;
   is_active?: boolean;
   immediate_email?: boolean;
   created_at?: Date;
@@ -51,20 +50,17 @@ export interface SubscriptionAttributes {
 }
 
 export interface SubscriptionInstance
-extends Sequelize.Instance<SubscriptionAttributes>, SubscriptionAttributes {
-
+extends Sequelize.Model<SubscriptionAttributes>, SubscriptionAttributes {
+  getNotifications: Sequelize.HasManyGetAssociationsMixin<NotificationInstance>;
 }
 
-export interface SubscriptionModel
-extends Sequelize.Model<SubscriptionInstance, SubscriptionAttributes> {
-  emitNotifications?: any;
-}
+export type SubscriptionModelStatic = ModelStatic<SubscriptionInstance> & { emitNotifications?: any; }
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): SubscriptionModel => {
-  const Subscription: SubscriptionModel = sequelize.define<SubscriptionInstance, SubscriptionAttributes>(
+  dataTypes: typeof DataTypes,
+): SubscriptionModelStatic => {
+  const Subscription = <SubscriptionModelStatic>sequelize.define(
     'Subscription', {
       id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
       subscriber_id: { type: dataTypes.INTEGER, allowNull: false },
@@ -79,7 +75,10 @@ export default (
       chain_event_type_id: { type: dataTypes.STRING, allowNull: true },
       chain_entity_id: { type: dataTypes.INTEGER, allowNull: true },
     }, {
+      tableName: 'Subscriptions',
       underscored: true,
+      createdAt: 'created_at',
+      updatedAt: 'updated_at',
       indexes: [
         { fields: ['subscriber_id'] },
         { fields: ['category_id', 'object_id', 'is_active'] },

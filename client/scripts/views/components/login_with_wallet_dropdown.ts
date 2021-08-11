@@ -5,6 +5,7 @@ import $ from 'jquery';
 import { Button, PopoverMenu, MenuItem, MenuDivider, Icon, Icons } from 'construct-ui';
 
 import app from 'state';
+import { navigateToSubpage } from 'app';
 import { ChainBase, IWebWallet } from 'models';
 import { ChainBaseIcon } from 'views/components/chain_icon';
 import { baseToNetwork } from 'models/types';
@@ -63,7 +64,11 @@ const LoginWithWalletDropdown: m.Component<{
         onclick: (e) => {
           $('.Login').trigger('modalexit');
           const defaultChainId = baseToNetwork(base);
-          m.route.set(`/${app.chain?.id || defaultChainId}/web3login`, web3loginParams);
+          if (app.activeChainId()) {
+            navigateToSubpage('/web3login', web3loginParams);
+          } else {
+            m.route.set(`${defaultChainId}/web3login`, web3loginParams);
+          }
           app.modals.lazyCreate('link_new_address_modal', {
             loggingInWithAddress,
             joiningChain,
@@ -74,7 +79,7 @@ const LoginWithWalletDropdown: m.Component<{
             prepopulateAddress,
             successCallback: () => {
               if (next === '/?') {
-                m.route.set(`/${app.chain?.id || defaultChainId}`);
+                navigateToSubpage('/');
               } else {
                 m.route.set(next);
               }
@@ -94,7 +99,10 @@ const LoginWithWalletDropdown: m.Component<{
       }
     };
 
-    const chainbase = app.chain?.meta?.chain?.base;
+    let chainbase = app.chain?.meta?.chain?.base;
+    if (!chainbase && app.customDomainId() && app.config.chains.getById(app.customDomainId())) {
+      chainbase = app.config.chains.getById(app.customDomainId()).base;
+    }
     const menuItems = (chainbase && CHAINBASE_WITH_CLI.indexOf(chainbase) !== -1)
       ? [
         ...getMenuItemsForChainBase(chainbase),

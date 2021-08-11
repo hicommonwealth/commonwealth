@@ -2,6 +2,7 @@ import 'pages/discussions/discussion_row_menu.scss';
 
 import m from 'mithril';
 import app from 'state';
+import { navigateToSubpage } from 'app';
 import { MenuItem, PopoverMenu, Icon, Icons, MenuDivider } from 'construct-ui';
 
 import { NotificationCategories } from 'types';
@@ -58,7 +59,7 @@ export const ThreadDeletionMenuItem: m.Component<{ proposal: OffchainThread }> =
         const confirmed = await confirmationModalWithText('Delete this entire thread?')();
         if (!confirmed) return;
         app.threads.delete(proposal).then(() => {
-          m.route.set(`/${app.activeId()}/`);
+          navigateToSubpage('/');
         });
       },
       label: 'Delete',

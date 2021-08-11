@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import { DB } from '../database';
 
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
@@ -7,7 +8,7 @@ const log = factory.getLogger(formatFilename(__filename));
 /**
  * Get the specs for any supported Substrate chains i.e. api/getSubstrateSpec?chain='chainName'
  */
-const getSubstrateSpec = async (models, req: Request, res: Response, next: NextFunction) => {
+const getSubstrateSpec = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const [chain,, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
   if (error) return next(new Error(error));
   if (!chain) return next(new Error('Unknown chain.'));

@@ -28,6 +28,7 @@ import { notifyError } from 'controllers/app/notifications';
 import Listing from './listing';
 import ErrorPage from './error';
 import loadSubstrateModules from '../components/load_substrate_modules';
+import { SubstrateBounty } from 'client/scripts/controllers/chain/substrate/bounty';
 
 function getModules() {
   if (!app || !app.chain || !app.chain.loaded) {
@@ -51,14 +52,14 @@ const bountyStatusToLabel = (bounty) => {
 };
 
 const BountyDetail = {
-  view: (vnode) => {
-    const { bounty } = vnode.attrs;
+  view: (vnode: m.Vnode<{ proposal: SubstrateBounty }>) => {
+    const { proposal: bounty } = vnode.attrs;
     const isCouncillor = app.chain
       && ((app.chain as Substrate).phragmenElections.members || [])
-      .map((a) => app.chain.accounts.get(a))
-      .find((a) => a.chain === app.user.activeAccount?.chain && a.address === app.user.activeAccount?.address);
+        .map((a) => app.chain.accounts.get(a))
+        .find((a) => a.chain === app.user.activeAccount?.chain && a.address === app.user.activeAccount?.address);
     const isCurator = app.user.activeAccount?.address === bounty.curator;
-    const isRecipient = app.user.activeAccount?.address === bounty.recipient;
+    const isRecipient = app.user.activeAccount?.address === bounty.beneficiary;
 
     const buttonAttrs = {
       fluid: true,
@@ -157,7 +158,10 @@ const BountyDetail = {
               )();
               if (!confirmed) return;
               await createTXModal(
-                (app.chain as Substrate).bounties.acceptCuratorTx(app.user?.activeAccount as SubstrateAccount, bounty.identifier)
+                (app.chain as Substrate).bounties.acceptCuratorTx(
+                  app.user?.activeAccount as SubstrateAccount,
+                  bounty.data.index,
+                )
               );
             }
           }),
@@ -187,7 +191,7 @@ const BountyDetail = {
                 data: { bountyId: bounty.identifier }
               });
             }
-          }) ,
+          }),
           m(Button, {
             ...buttonAttrs,
             label: 'Extend expiry',
@@ -256,7 +260,10 @@ const BountyDetail = {
                 'Claim your bounty payout?', 'Yes'
               )();
               if (confirmed) {
-                (app.chain as Substrate).bounties.claimBountyTx(app.user.activeAccount as SubstrateAccount, bounty.identifier);
+                (app.chain as Substrate).bounties.claimBountyTx(
+                  app.user.activeAccount as SubstrateAccount,
+                  bounty.data.index,
+                );
               }
             }
           }),
@@ -270,7 +277,7 @@ const BountyDetail = {
           m('p', [
             'Recipient: ',
             m(User, {
-              user: new AddressInfo(null, bounty.recipient, app.chain.id, null),
+              user: new AddressInfo(null, bounty.beneficiary, app.chain.id, null),
               linkify: true,
             }),
           ]),
@@ -314,25 +321,27 @@ const BountiesPage: m.Component<{}> = {
     const modLoading = loadSubstrateModules('Bounties', getModules);
     if (modLoading) return modLoading;
 
-    const activeBounties = (app.chain as Substrate).bounties.store.getAll().filter((p) => !p.completed && !p.isPendingPayout)
+    const activeBounties = (app.chain as Substrate).bounties.store.getAll()
+      .filter((p) => !p.completed && !p.isPendingPayout)
       .sort((a, b) => +a.identifier - +b.identifier);
-    const pendingBounties = (app.chain as Substrate).bounties.store.getAll().filter((p) => !p.completed && p.isPendingPayout)
+    const pendingBounties = (app.chain as Substrate).bounties.store.getAll()
+      .filter((p) => !p.completed && p.isPendingPayout)
       .sort((a, b) => +a.identifier - +b.identifier);
     const inactiveBounties = (app.chain as Substrate).bounties.store.getAll().filter((p) => p.completed)
       .sort((a, b) => +a.identifier - +b.identifier);
     const activeBountyContent = activeBounties.length
       ? activeBounties.map((bounty) => m(ProposalCard, {
         proposal: bounty,
-        injectedContent: m(BountyDetail, { bounty }),
+        injectedContent: BountyDetail,
       }))
       : [ m('.no-proposals', 'None') ];
 
     const pendingBountyContent = pendingBounties.length
-      ? pendingBounties.map((bounty) => m(ProposalCard, { proposal: bounty, injectedContent: m(BountyDetail, { bounty }), }))
+      ? pendingBounties.map((bounty) => m(ProposalCard, { proposal: bounty, injectedContent: BountyDetail, }))
       : [ m('.no-proposals', 'None') ];
 
     const inactiveBountyContent = inactiveBounties.length
-      ? inactiveBounties.map((bounty) => m(ProposalCard, { proposal: bounty, injectedContent: m(BountyDetail, { bounty }), }))
+      ? inactiveBounties.map((bounty) => m(ProposalCard, { proposal: bounty, injectedContent: BountyDetail, }))
       : [ m('.no-proposals', 'None') ];
 
     return m(Sublayout, {

@@ -27,7 +27,6 @@ import TokenListCache from './server/util/tokenListCache';
 import { SESSION_SECRET, ROLLBAR_SERVER_TOKEN } from './server/config';
 import models from './server/database';
 import { updateEvents, updateBalances } from './server/util/eventPoller';
-import resetServer from './server/scripts/resetServer';
 import setupAppRoutes from './server/scripts/setupAppRoutes';
 import setupServer from './server/scripts/setupServer';
 import setupErrorHandlers from './server/scripts/setupErrorHandlers';
@@ -36,7 +35,6 @@ import { sendBatchedNotificationEmails } from './server/scripts/emails';
 import setupAPI from './server/router';
 import setupPassport from './server/passport';
 import { fetchStats } from './server/routes/getEdgewareLockdropStats';
-import migrateChainEntities from './server/scripts/migrateChainEntities';
 import migrateIdentities from './server/scripts/migrateIdentities';
 import migrateCouncillorValidatorFlags from './server/scripts/migrateCouncillorValidatorFlags';
 
@@ -49,21 +47,18 @@ async function main() {
 
   // CLI parameters for which task to run
   const SHOULD_SEND_EMAILS = process.env.SEND_EMAILS === 'true';
-  const SHOULD_RESET_DB = process.env.RESET_DB === 'true';
   const SHOULD_UPDATE_EVENTS = process.env.UPDATE_EVENTS === 'true';
   const SHOULD_UPDATE_BALANCES = process.env.UPDATE_BALANCES === 'true';
   const SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS = process.env.UPDATE_EDGEWARE_LOCKDROP_STATS === 'true';
 
   const NO_CLIENT_SERVER = process.env.NO_CLIENT === 'true'
     || SHOULD_SEND_EMAILS
-    || SHOULD_RESET_DB
     || SHOULD_UPDATE_EVENTS
     || SHOULD_UPDATE_BALANCES
     || SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS;
 
   // CLI parameters used to configure specific tasks
   const SKIP_EVENT_CATCHUP = process.env.SKIP_EVENT_CATCHUP === 'true';
-  const ENTITY_MIGRATION = process.env.ENTITY_MIGRATION;
   const IDENTITY_MIGRATION = process.env.IDENTITY_MIGRATION;
   const FLAG_MIGRATION = process.env.FLAG_MIGRATION;
   const CHAIN_EVENTS = process.env.CHAIN_EVENTS;
@@ -76,8 +71,6 @@ async function main() {
   let rc = null;
   if (SHOULD_SEND_EMAILS) {
     rc = await sendBatchedNotificationEmails(models);
-  } else if (SHOULD_RESET_DB) {
-    rc = await resetServer(models);
   } else if (SHOULD_UPDATE_EVENTS) {
     rc = await updateEvents(app, models);
   } else if (SHOULD_UPDATE_BALANCES) {
@@ -96,18 +89,6 @@ async function main() {
       rc = 0;
     } catch (e) {
       log.error('Failed adding Lockdrop statistics into the DB: ', e.message);
-      rc = 1;
-    }
-  } else if (ENTITY_MIGRATION) {
-    // "all" means run for all supported chains, otherwise we pass in the name of
-    // the specific chain to migrate
-    log.info('Started migrating chain entities into the DB');
-    try {
-      await migrateChainEntities(models, ENTITY_MIGRATION === 'all' ? undefined : ENTITY_MIGRATION);
-      log.info('Finished migrating chain entities into the DB');
-      rc = 0;
-    } catch (e) {
-      log.error('Failed migrating chain entities into the DB: ', e.message);
       rc = 1;
     }
   } else if (IDENTITY_MIGRATION) {
@@ -236,7 +217,6 @@ async function main() {
   })();
 
   const sendFile = (res) => res.sendFile(`${__dirname}/build/index.html`);
-
 
   // Only run prerender in DEV environment if the WITH_PRERENDER flag is provided.
   // On the other hand, run prerender by default on production.

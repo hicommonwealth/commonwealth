@@ -10,7 +10,8 @@ import {
   EntityEventKind,
   IChainEntityKind,
   IChainEventData,
-  SubstrateTypes, EventSupportingChainT
+  SubstrateTypes,
+  EventSupportingChainT
 } from '@commonwealth/chain-events';
 
 import { factory, formatFilename } from '../../shared/logging';
@@ -52,7 +53,7 @@ export default class extends IEventHandler {
    * `dbEvent` is the database entry corresponding to the `event`.
    */
   public async handle(event: CWEvent<IChainEventData>, dbEvent) {
-    // if chain is stored in the event than that will override the class property
+    // if chain is stored in the event then that will override the class property
     // (allows backwards compatibility between reduced memory consuming chain consumer/handlers and other scripts)
     const chain = event.chain || this._chain
     if (!dbEvent) {
@@ -76,11 +77,11 @@ export default class extends IEventHandler {
         completed = true;
       }
       const params = author
-        ? { type: type.toString(), type_id, chain, completed, author }
-        : { type: type.toString(), type_id, chain, completed };
+        ? { type: type.toString(), type_id, chain,  author }
+        : { type: type.toString(), type_id, chain };
       const [ dbEntity, created ] = await this._models.ChainEntity.findOrCreate({
         where: params,
-        default: { },
+        default: { completed },
       });
       if (created) {
         log.info(`Created db entity, ${type.toString()}: ${type_id}.`);
@@ -139,7 +140,8 @@ export default class extends IEventHandler {
       case EntityEventKind.Create: {
         return createEntityFn(entityKind, fieldValue, author);
       }
-      case EntityEventKind.Update: {
+      case EntityEventKind.Update:
+      case EntityEventKind.Vote: {
         return updateEntityFn(entityKind, fieldValue);
       }
       case EntityEventKind.Complete: {
