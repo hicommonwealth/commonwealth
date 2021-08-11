@@ -18,24 +18,51 @@ import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
 const log = factory.getLogger(formatFilename(__filename));
 
 // TODO: RollBar error reporting
-// TODO: if listener start fails (after 3 times?) revert hasChainEventsListener to false in db
 
 // env var
 const WORKER_NUMBER: number = Number(process.env.WORKER_NUMBER) || 0;
 const NUM_WORKERS: number = Number(process.env.NUM_WORKERS) || 1;
 
-// The number of minutes to wait between each run -- rounded to the nearest whole number
-export const REPEAT_TIME = Math.round(Number(process.env.REPEAT_TIME)) || 10;
+// counts the number of errors occurring for each chain - resets every 24 hours (to remove any temporary connection errors)
+// this is only meant to stop a chain from repeatedly causing errors every REPEAT_TIME
+let chainErrors: { [chain: string]: number } = {}
 
-async function handleFatalError(error: Error, chain?: string, type?: string): Promise<void> {
-  log.error(String(error));
+// counts the number of mainProcess runs
+let runCount = 0
+
+// The number of minutes to wait between each run -- rounded to the nearest whole number
+export const REPEAT_TIME = Math.round(Number(process.env.REPEAT_TIME)) || 1;
+
+// any fatal error is handle through here
+async function handleFatalError(error: Error, pool, chain?: string, type?: string): Promise<void> {
+  log.error(`${chain ? '[' + chain + ']: ' : ''}${String(error)}`);
+
+  if (chain && chain != 'erc20' && chainErrors[chain] >= 4) {
+    listeners[chain].unsubscribe();
+    delete listeners[chain];
+
+    const query = format(`UPDATE "Chains" SET "has_chain_events_listener"='false' WHERE "id"=%L`, chain)
+    try {
+      pool.query(query);
+    } catch (error) {
+      log.fatal(`Unable to disabled ${chain}`)
+    }
+  } else if (chain) ++chainErrors[chain];
 }
 
 // stores all the listeners a dbNode has active
 const listeners: { [key: string]: any} = {};
 
-// TODO: API-WS from infinitely attempting reconnection i.e. mainnet1
+// the function that executes every REPEAT_TIME
 async function mainProcess(producer: RabbitMqHandler, pool) {
+  // reset the chainError counts at the end of every day
+  if (runCount > 1440 / REPEAT_TIME) {
+    runCount = 1;
+    chainErrors = {}
+  } else {
+    ++runCount;
+  }
+
   log.info('Starting scheduled process');
 
   pool.on('error', (err, client) => {
@@ -43,26 +70,22 @@ async function mainProcess(producer: RabbitMqHandler, pool) {
   });
 
   let query = `SELECT "Chains"."id", "substrate_spec", "url", "address", "base", "type", "network" FROM "Chains" JOIN "ChainNodes" ON "Chains"."id"="ChainNodes"."chain" WHERE "Chains"."has_chain_events_listener"='true';`;
-
   const allChains = (await pool.query(query)).rows;
-  const myChainData = allChains.filter(
+
+  // gets the chains specific to this node
+  let myChainData = allChains.filter(
     (chain, index) => index % NUM_WORKERS === WORKER_NUMBER
   );
 
-  // delete listeners for chains that are no longer assigned to this node
-  const myChains = myChainData.map(row => row.id)
-  Object.keys(listeners).forEach((chain) => {
-    if (!myChains.includes(chain)) {
-      log.info(`[${chain}]: Deleting chain...`)
-      if (listeners[chain]) listeners[chain].unsubscribe();
-      delete listeners[chain];
-    }
-  })
-
+  // passed to listeners that support it
   let discoverReconnectRange = async (chain: string) => {
     let latestBlock
     try {
       const eventTypes = (await pool.query(format(`SELECT "id" FROM "ChainEventTypes" WHERE "chain"=%L`, chain))).rows.map(obj => obj.id)
+      if (eventTypes.length === 0) {
+        log.info(`[${chain}]: No events in database to get last block number from`);
+        return { startBlock: null };
+      }
       latestBlock = (await pool.query(format(`SELECT MAX("block_number") FROM "ChainEvents" WHERE "chain_event_type_id" IN (%L)`, eventTypes))).rows
     } catch (error) {
       log.warn(`[${chain}]: An error occurred while discovering offline time range`, error)
@@ -75,6 +98,70 @@ async function mainProcess(producer: RabbitMqHandler, pool) {
       return { startBlock: null };
     }
   }
+
+  // group erc20 tokens together in order to start only one listener for all erc20 tokens
+  const erc20Tokens = myChainData.filter((chain) => chain.type === 'token' && chain.base === 'ethereum')
+  const erc20TokenAddresses = erc20Tokens.map(chain => chain.address)
+  const erc20TokenNames = erc20Tokens.map(chain => chain.id)
+
+  // don't start a new erc20 listener if it is causing errors
+  if (!chainErrors['erc20'] || chainErrors['erc20'] < 4) {
+    // start a listener if: it doesn't exist yet OR it exists but the tokens have changed
+    if (erc20Tokens.length > 0 && (!listeners['erc20'] || (listeners['erc20'] && !_.isEqual(erc20TokenAddresses, listeners['erc20'].options.tokenAddresses)))) {
+      // clear the listener if it already exists and the tokens have changed
+      if (listeners['erc20']) {
+        listeners['erc20'].unsubscribe();
+        delete listeners['erc20']
+      }
+
+      // start a listener
+      log.info(`Starting listener for ${erc20TokenNames}...`);
+      try {
+        listeners['erc20'] = await createListener('erc20', {
+          url: 'wss://mainnet.infura.io/ws',
+          tokenAddresses: erc20Tokens.map(chain => chain.address),
+          tokenNames: erc20TokenNames,
+          verbose: false
+        }, true, 'erc20')
+
+        // add the rabbitmq handler for this chain
+        listeners['erc20'].eventHandlers['rabbitmq'] = { handler: producer };
+      } catch (error) {
+        delete listeners['erc20'];
+        await handleFatalError(error, pool, 'erc20', 'listener-startup');
+      }
+
+      // if listener has started at this point then subscribe
+      if (listeners['erc20']) {
+        try {
+          // subscribe to the chain to begin listening for events
+          await listeners['erc20'].subscribe();
+        } catch (error) {
+          await handleFatalError(error, pool, 'erc20', 'listener-subscribe')
+        }
+      }
+    } else if (listeners['erc20'] && erc20Tokens.length === 0) {
+      // delete the listener if there are no tokens to listen to
+      log.info('[erc20]: Deleting erc20 listener...')
+      listeners['erc20'].unsubscribe();
+      delete listeners['erc20'];
+    }
+  } else {
+    log.fatal('[erc20]: There are outstanding errors that need to be resolved before creating a new erc20 listener!')
+  }
+
+  // remove erc20 tokens from myChainData
+  myChainData = myChainData.filter((chain) => chain.type != 'token' && chain.base != 'ethereum')
+
+  // delete listeners for chains that are no longer assigned to this node (skip erc20)
+  const myChains = myChainData.map(row => row.id)
+  Object.keys(listeners).forEach((chain) => {
+    if (!myChains.includes(chain) && chain != 'erc20') {
+      log.info(`[${chain}]: Deleting chain...`)
+      if (listeners[chain]) listeners[chain].unsubscribe();
+      delete listeners[chain];
+    }
+  })
 
   // TODO: start listeners in parallel so connection stalling from one doesn't hold up the others
   // initialize listeners first (before dealing with identity)
@@ -105,8 +192,8 @@ async function mainProcess(producer: RabbitMqHandler, pool) {
           base
         );
       } catch (error) {
-        listeners[chain.id] = null;
-        await handleFatalError(error, chain, 'listener-startup');
+        delete listeners[chain.id];
+        await handleFatalError(error, pool, chain, 'listener-startup');
         continue;
       }
 
@@ -130,7 +217,7 @@ async function mainProcess(producer: RabbitMqHandler, pool) {
         // subscribe to the chain to begin listening for events
         await listeners[chain.id].subscribe();
       } catch (error) {
-        await handleFatalError(error, chain.id, 'listener-subscribe')
+        await handleFatalError(error, pool, chain.id, 'listener-subscribe')
       }
     }
     // restart the listener if specs were updated (only substrate chains)
@@ -142,7 +229,7 @@ async function mainProcess(producer: RabbitMqHandler, pool) {
       try {
         await (<SubstrateListener>listeners[chain.id]).updateSpec(chain.substrate_spec);
       } catch (error) {
-        await handleFatalError(error, chain.id, 'update-spec')
+        await handleFatalError(error, pool, chain.id, 'update-spec')
       }
     }
   }
@@ -180,7 +267,7 @@ async function mainProcess(producer: RabbitMqHandler, pool) {
         (c) => c.address
       );
     } catch (error) {
-      await handleFatalError(error, chain.id, 'get-identity-cache');
+      await handleFatalError(error, pool, chain.id, 'get-identity-cache');
       continue;
     }
 
@@ -198,7 +285,7 @@ async function mainProcess(producer: RabbitMqHandler, pool) {
         chain.id
         ].storageFetcher.fetchIdentities(identitiesToFetch);
     } catch (error) {
-      await handleFatalError(error, chain.id, 'fetch-chain-identities');
+      await handleFatalError(error, pool, chain.id, 'fetch-chain-identities');
       continue;
     }
 
@@ -228,7 +315,7 @@ async function mainProcess(producer: RabbitMqHandler, pool) {
       query = format(`DELETE FROM "IdentityCaches" WHERE "chain"=%L;`, chain.id);
       await pool.query(query);
     } catch (error) {
-      await handleFatalError(error, chain.id, 'clear-identity-cache');
+      await handleFatalError(error, pool, chain.id, 'clear-identity-cache');
       continue;
     }
 
@@ -270,6 +357,6 @@ producer
   })
   .catch((err) => {
     // TODO: any error caught here is critical - no events will be produced
-    handleFatalError(err, null, 'unknown');
+    handleFatalError(err, pool, null, 'unknown');
   })
 

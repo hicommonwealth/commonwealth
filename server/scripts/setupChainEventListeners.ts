@@ -41,6 +41,7 @@ const setupChainEventListeners = async (
   // writes events into the db as ChainEvents rows
   const storageHandler = new EventStorageHandler(
     _models,
+    null
   );
 
   // emits notifications by writing into the db's Notifications table, and also optionally
@@ -62,17 +63,17 @@ const setupChainEventListeners = async (
   // creates empty Address and OffchainProfile models for users who perform certain
   // actions, like voting on proposals or registering an identity
   const profileCreationHandler = new ProfileCreationHandler(
-    _models
+    _models, null
   );
 
   const allChainEventHandlers = [storageHandler, notificationHandler, entityArchivalHandler, profileCreationHandler]
 
   // populates identity information in OffchainProfiles when received (Substrate only)
-  const identityHandler = new IdentityHandler(_models);
+  const identityHandler = new IdentityHandler(_models, null);
 
   // populates is_validator and is_councillor flags on Addresses when validator and
   // councillor sets are updated (Substrate only)
-  const userFlagsHandler = new UserFlagsHandler(_models);
+  const userFlagsHandler = new UserFlagsHandler(_models, null);
 
   const substrateEventHandlers = [identityHandler, userFlagsHandler]
 
@@ -86,7 +87,7 @@ const setupChainEventListeners = async (
       try {
         prevResult = await handler.handle(event, prevResult);
       } catch (err) {
-        log.error(`Event handle failure: ${err.message}`);
+        log.error(`Classic event handle failure for the following event: ${JSON.stringify(event, null, 2)}`, err);
         break;
       }
     }
@@ -95,7 +96,7 @@ const setupChainEventListeners = async (
         try {
           prevResult = await handler.handle(event, prevResult);
         } catch (err) {
-          log.error(`Event handle failure: ${err.message}`);
+          log.error(`Substrate event handle failure: ${err.message}`);
           break;
         }
       }
@@ -106,7 +107,7 @@ const setupChainEventListeners = async (
     try {
       await identityHandler.handle(event, null);
     } catch (err) {
-      log.error(`Event handle failure: ${err.message}`);
+      log.error(`Identity event handle failure: ${err.message}`);
     }
   }
 

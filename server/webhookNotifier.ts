@@ -8,6 +8,9 @@ import { smartTrim, validURL, renderQuillDeltaToText } from '../shared/utils';
 import { getForumNotificationCopy } from '../shared/notificationFormatter';
 import { SERVER_URL, SLACK_FEEDBACK_WEBHOOK, DEFAULT_COMMONWEALTH_LOGO } from './config';
 
+import { factory, formatFilename } from '../shared/logging';
+const log = factory.getLogger(formatFilename(__filename));
+
 export interface WebhookContent {
   notificationCategory: string;
   chain?: string;
@@ -26,11 +29,17 @@ const REGEX_EMOJI = /([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF
 const getFilteredContent = (content, address) => {
   let event;
   if (content.chainEvent && content.chainEventType) {
-    event = SubstrateEvents.Label(
-      content.chainEvent.block_number,
-      content.chainEventType.chain,
-      content.chainEvent.event_data
-    );
+    try {
+      event = SubstrateEvents.Label(
+        content.chainEvent.block_number,
+        content.chainEventType.chain,
+        content.chainEvent.event_data
+      );
+    } catch (error) {
+      log.warn(`Webhooks only support Substrate events`);
+      throw new Error('Non-Substrate events not supported')
+    }
+
     const title = `${capitalize(content.chainEventType.chain)}`;
     const chainEventLink = `${SERVER_URL}/${content.chainEventType.chain}`;
     const fulltext = `${event.heading} on ${capitalize(content.chainEventType?.chain)} at block`
@@ -113,10 +122,18 @@ const send = async (models, content: WebhookContent) => {
     }
   });
 
+  let result;
+  try {
+    result = getFilteredContent(content, address);
+  } catch (error) {
+    return;
+
+  }
   const {
     community, actor, action, actedOn, actedOnLink, notificationTitlePrefix, notificationExcerpt, notificationPreviewImageUrl, // forum events
     title, chainEventLink, fulltext // chain events
-  } = getFilteredContent(content, address);
+  } = result;
+
   const isChainEvent = !!chainEventLink;
 
   let actorAvatarUrl = null;
