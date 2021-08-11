@@ -36,8 +36,6 @@ import { Layout } from 'views/layout';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import LoginModal from 'views/modals/login_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';
-import Login from './views/components/login';
-import { formatSpace } from './helpers/snapshot_utils/snapshot_utils';
 
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/landing');
@@ -120,15 +118,6 @@ export async function initAppState(updateSelectedNode = true, customDomain = nul
       if (customDomain) {
         app.setCustomDomain(customDomain);
       }
-      app.snapshot.client.getSpaces().then((response) => {
-        console.log(response);
-        app.snapshot.spaces = _.object(
-          Object.entries(response).map((space) => [
-            space[0],
-            formatSpace(space[0], space[1])
-          ])
-        );
-      });
 
       resolve();
     }).catch((err: any) => {

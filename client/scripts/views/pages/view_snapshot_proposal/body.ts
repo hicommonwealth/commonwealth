@@ -2,26 +2,24 @@ import 'pages/view_proposal/editor_permissions.scss';
 
 import m from 'mithril';
 
-import { updateRoute } from 'app';
 import { formatLastUpdated } from 'helpers';
-import { AddressInfo, SnapshotProposal } from 'models';
+import { AddressInfo } from 'models';
 
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
+import User from 'views/components/widgets/user';
+import { SnapshotProposal } from 'helpers/snapshot_utils';
 import moment from 'moment';
 import app from 'state';
-import User from '../../components/widgets/user';
 
 export const ProposalBodyAuthor: m.Component<{ item: SnapshotProposal }> = {
   view: (vnode) => {
     const { item } = vnode.attrs;
     if (!item) return;
-    if (!item.authorAddress) return;
-
-
+    if (!item.author) return;
 
     return m('.ProposalBodyAuthor', [
       m(User, {
-        user: new AddressInfo(null, item.authorAddress, app.activeId(), null), // TODO: activeID becomes chain_base, fix
+        user: new AddressInfo(null, item.author, app.activeId(), null), // TODO: activeID becomes chain_base, fix
         linkify: true,
         popover: true
       }),
@@ -35,7 +33,7 @@ export const ProposalBodyCreated: m.Component<{
   view: (vnode) => {
     const { item, link } = vnode.attrs;
     if (!item) return;
-    if (!item.timestamp) return;
+    if (!item.created) return;
     const time = moment(+item.start * 1000);
 
     return m('.ProposalBodyCreated', [

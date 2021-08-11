@@ -22,6 +22,30 @@ export const apolloClient = new ApolloClient({
   }
 });
 
+export const SPACE_QUERY = gql`
+  query Space(
+    $space: String
+  ) {
+    space(id: $space) {
+      id
+      name
+      about
+      symbol
+      private
+      network
+      filters {
+        minScore
+        onlyMembers
+      }
+      strategies {
+        name
+        params
+      }
+      members
+    }
+  }
+`;
+
 export const PROPOSALS_QUERY = gql`
   query Proposals(
     $first: Int!
@@ -57,31 +81,18 @@ export const PROPOSALS_QUERY = gql`
 `;
 
 export const PROPOSAL_VOTES_QUERY = gql`
-  query($id: String!) {
-    proposal(id: $id) {
-      id
-      title
-      body
-      choices
-      start
-      end
-      snapshot
-      state
-      author
-      created
-      plugins
-      network
-      type
-      strategies {
-        name
-        params
+  query Votes(
+    $proposalHash: String!
+  ) {
+    votes (
+      first: 10000
+      skip: 0
+      where: {
+        proposal: $proposalHash
       }
-      space {
-        id
-        name
-      }
-    }
-    votes(first: 10000, where: { proposal: $id }) {
+      orderBy: "created",
+      orderDirection: desc
+    ) {
       id
       voter
       created

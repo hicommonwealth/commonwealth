@@ -10,11 +10,13 @@ import snapshotJs from '@snapshot-labs/snapshot.js';
 
 import app from 'state';
 
+import { Account } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 import QuillEditor from 'views/components/quill_editor';
 import { idToProposal } from 'identifiers';
 import { capitalize } from 'lodash';
 import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web_wallet';
+import { SnapshotSpace } from 'client/scripts/helpers/snapshot_utils';
 
 interface IThreadForm {
   name: string;
@@ -40,9 +42,9 @@ enum NewThreadErrors {
 const newThread = async (
   form,
   quillEditorState,
-  author,
-  space,
-  snapshotId
+  author: Account<any>,
+  space: SnapshotSpace,
+  snapshotId: string,
 ) => {
   const topics = app.chain
     ? app.chain.meta.chain.topics
@@ -78,6 +80,8 @@ const newThread = async (
       : JSON.stringify(quillEditorState.editor.getContents());
 
   form.body = bodyText;
+
+  // TODO: do without snapshotjs
   form.snapshot = await snapshotJs.utils.getBlockNumber(snapshotJs.utils.getProvider(space.network));
   form.metadata.network = space.network;
   form.metadata.strategies = space.strategies;
@@ -92,7 +96,7 @@ const newThread = async (
     msg: JSON.stringify({
       version: '0.1.3',
       timestamp: (Date.now() / 1e3).toFixed(),
-      space: space.key,
+      space: space.id,
       type: 'proposal',
       payload: form
     })
@@ -125,16 +129,16 @@ const newThread = async (
   }
 };
 
-const newLink = async (form, quillEditorState, author, space, snapshotId) => {
+const newLink = async (form, quillEditorState, author: Account<any>, space: SnapshotSpace, snapshotId: string) => {
   const errors = await newThread(form, quillEditorState, author, space, snapshotId);
   return errors;
 };
 
-export const NewProposalForm: m.Component<{snapshotId: string}, {
+const NewProposalForm: m.Component<{snapshotId: string}, {
   form: IThreadForm,
   quillEditorState,
   saving: boolean,
-  space: any,
+  space: SnapshotSpace,
   members: string[],
   userScore: any,
   isFromExistingProposal: boolean,
@@ -147,10 +151,12 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
 
     const pathVars = m.parsePathname(window.location.href);
 
-    if (!app.snapshot.spaces) return getLoadingPage();
+    if (!app.snapshot.initialized) {
+      app.snapshot.init(vnode.attrs.snapshotId).then(() => m.redraw());
+      return getLoadingPage();
+    }
     if (!vnode.state.initialized) {
       vnode.state.initialized = true;
-      vnode.state.space = {};
       vnode.state.members = [];
       vnode.state.userScore = null;
       vnode.state.form = {
@@ -178,10 +184,10 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
           }
         }
       }
-      const space = app.snapshot.spaces[vnode.attrs.snapshotId];
+      const space = app.snapshot.space;
 
       snapshotJs.utils.getScores(
-        space.key,
+        space.id,
         space.strategies,
         space.network,
         snapshotJs.utils.getProvider(space.network),
@@ -329,7 +335,8 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
             ]),
             m(FormGroup, [
               m(QuillEditor, {
-                contentsDoc: vnode.state.form.body ? vnode.state.form.body : ' ', // Prevent the editor from being filled in with previous content
+                // Prevent the editor from being filled in with previous content
+                contentsDoc: vnode.state.form.body ? vnode.state.form.body : ' ',
                 oncreateBind: (state) => {
                   vnode.state.quillEditorState = state;
                 },
@@ -348,7 +355,13 @@ export const NewProposalForm: m.Component<{snapshotId: string}, {
                 onclick: async (e) => {
                   vnode.state.saving = true;
                   try {
-                    await newLink(vnode.state.form, vnode.state.quillEditorState, author, vnode.state.space, vnode.attrs.snapshotId);
+                    await newLink(
+                      vnode.state.form,
+                      vnode.state.quillEditorState,
+                      author,
+                      vnode.state.space,
+                      vnode.attrs.snapshotId,
+                    );
                     vnode.state.saving = false;
                     clearLocalStorage();
                   } catch (err) {

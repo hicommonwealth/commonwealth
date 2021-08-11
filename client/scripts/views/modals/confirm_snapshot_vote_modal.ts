@@ -4,34 +4,30 @@ import m from 'mithril';
 import app from 'state';
 import $ from 'jquery';
 import { Button } from 'construct-ui';
-import { bufferToHex } from 'ethereumjs-util';
 
-import { _explorer, _n, _shorten } from 'helpers/snapshot_utils/snapshot_utils';
+import { SnapshotProposal, SnapshotSpace, _n, _shorten } from 'helpers/snapshot_utils';
 import { notifyError } from 'controllers/app/notifications';
 
 import { CompactModalExitButton } from 'views/modal';
 import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web_wallet';
-
 
 enum NewVoteErrors {
   SomethingWentWrong = 'Something went wrong!'
 }
 
 const ConfirmSnapshotVoteModal: m.Component<{
-  space,
-  proposal,
-  id,
-  selectedChoice,
-  totalScore,
-  scores,
-  snapshot
+  space: SnapshotSpace,
+  proposal: SnapshotProposal,
+  id: string,
+  selectedChoice: string,
+  totalScore: number,
 }, {
   error: any,
   saving: boolean,
 }> = {
   view: (vnode) => {
     const author = app.user.activeAccount;
-    const { proposal, space, id, selectedChoice, totalScore, scores, snapshot } = vnode.attrs;
+    const { proposal, space, id, selectedChoice, totalScore } = vnode.attrs;
     return m('.ConfirmSnapshotVoteModal', [
       m('.compact-modal-title', [
         m('h3', 'Confirm vote'),
@@ -48,13 +44,14 @@ const ConfirmSnapshotVoteModal: m.Component<{
             m('span', { class: 'text-blue' }, 'Option'),
             m('span', `${proposal.choices[selectedChoice]}`)
           ]),
-          m('.d-flex', [
-            m('span', { class: 'text-blue' }, 'Snapshot'),
-            m('a', { href: `${_explorer(space.network, proposal.snapshot, 'block')}`, target: '_blank' }, [
-              `${_n(proposal.snapshot, '0,0')}`,
-              m('i', { class: 'iconexternal-link' })
-            ]),
-          ]),
+          // TODO: this links out to the block explorer specific to each space, which we don't hardcode
+          // m('.d-flex', [
+          //   m('span', { class: 'text-blue' }, 'Snapshot'),
+          //   m('a', { href: `${_explorer(space.network, proposal.snapshot, 'block')}`, target: '_blank' }, [
+          //     `${_n(proposal.snapshot, '0,0')}`,
+          //     m('i', { class: 'iconexternal-link' })
+          //   ]),
+          // ]),
           m('.d-flex', [
             m('span', { class: 'text-blue' }, 'Your voting power'),
             m('span', `${_n(totalScore)} ${_shorten(space.symbol, 'symbol')}`)
@@ -83,7 +80,7 @@ const ConfirmSnapshotVoteModal: m.Component<{
                 msg: JSON.stringify({
                   version: '0.1.3',
                   timestamp: (Date.now() / 1e3).toFixed(),
-                  space: space.key,
+                  space: space.id,
                   type: 'vote',
                   payload: {
                     proposal: id,
@@ -108,7 +105,7 @@ const ConfirmSnapshotVoteModal: m.Component<{
                 notifyError(errorMessage);
               } else if (result.status === 'Success') {
                 $(e.target).trigger('modalexit');
-                m.route.set(`/${app.activeId()}/snapshot-proposals/${space.key}`);
+                m.route.set(`/${app.activeId()}/snapshot-proposals/${space.id}`);
               }
               vnode.state.saving = false;
             },

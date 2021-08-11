@@ -2,16 +2,15 @@ import 'pages/discussions/index.scss';
 
 import _ from 'lodash';
 import m from 'mithril';
-import mixpanel from 'mixpanel-browser';
 import moment from 'moment';
 import app from 'state';
 
-import { Spinner, Button, ButtonGroup } from 'construct-ui';
+import { Spinner, Button } from 'construct-ui';
 
 import Sublayout from 'views/sublayout';
 import Listing from 'views/pages/listing';
 
-import { SnapshotProposal } from 'client/scripts/models';
+import { SnapshotProposal } from 'helpers/snapshot_utils';
 import ProposalRow from './proposal_row';
 
 export const ALL_PROPOSALS_KEY = 'COMMONWEALTH_ALL_PROPOSALS';
@@ -53,36 +52,19 @@ const SnapshotProposalsPage: m.Component<{ topic?: string, snapshotId: string },
   lastSubpage: string;
   lastVisitedUpdated?: boolean;
   onscroll: any;
-  allProposals: any;
-  loadingProposals: boolean;
   selectedFilter: SnapshotProposalFilter;
 }> = {
-  oncreate: (vnode) => {
-    mixpanel.track('PageVisit', {
-      'Page Name': 'Snapshot Proposals Page',
-      Scope: app.activeId(),
-    });
-    const snapshotId = vnode.attrs.snapshotId;
-    app.snapshot.fetchSnapshotProposals(snapshotId).then((response) => {
-      vnode.state.allProposals = app.snapshot.proposalStore.getAll();
-
-      m.redraw();
-    }).finally(() => {
-      vnode.state.loadingProposals = false;
-    });
-  },
-
   oninit: (vnode) => {
-    vnode.state.loadingProposals = true;
-    vnode.state.allProposals = [];
     vnode.state.selectedFilter = SnapshotProposalFilter.Active;
   },
 
   view: (vnode) => {
-    const { loadingProposals, allProposals, selectedFilter } = vnode.state;
+    const { selectedFilter } = vnode.state;
     const { snapshotId } = vnode.attrs;
-
-    if (loadingProposals) {
+    if (!app.snapshot.initialized) {
+      app.snapshot.init(snapshotId).then(() => {
+        m.redraw();
+      });
       return m(Sublayout, {
         class: 'DiscussionsPage',
         title: 'Proposals',
@@ -108,7 +90,9 @@ const SnapshotProposalsPage: m.Component<{ topic?: string, snapshotId: string },
       return true;
     };
 
-    const proposals = allProposals.filter((proposal: SnapshotProposal) => checkProposalByFilter(proposal, selectedFilter));
+    const proposals = app.snapshot.proposals.filter(
+      (proposal: SnapshotProposal) => checkProposalByFilter(proposal, selectedFilter)
+    );
 
     const onChangeFilter = (value: SnapshotProposalFilter) => {
       vnode.state.selectedFilter = value;

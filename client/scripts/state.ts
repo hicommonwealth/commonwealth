@@ -12,7 +12,7 @@ import RecentActivityController from './controllers/app/recent_activity';
 import ProfilesController from './controllers/server/profiles';
 import CommentsController from './controllers/server/comments';
 import ThreadsController from './controllers/server/threads';
-import SnapshotController from './controllers/server/snapshot';
+import SnapshotController from './controllers/chain/snapshot';
 import ReactionsController from './controllers/server/reactions';
 import WebsocketController from './controllers/server/socket';
 import TopicsController from './controllers/server/topics';
