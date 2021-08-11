@@ -599,8 +599,8 @@ const Sidebar: m.Component<{ hideQuickSwitcher? }, {}> = {
         m('br'),
       ]),
       m('', [
-        m(Button, {
-          class: 'PoweredBy',
+        m("a", {
+          class: 'PoweredBy Sidebar',
           onclick: (e) => {
             window.open('https://commonwealth.im/');
           },
