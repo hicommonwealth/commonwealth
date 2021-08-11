@@ -206,7 +206,6 @@ const NewProposalForm: m.Component<{snapshotId: string}, {
     }
     if (!vnode.state.snapshotScoresFetched) return getLoadingPage();
     const author = app.user.activeAccount;
-    const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
     if (vnode.state.quillEditorState?.container) {
       vnode.state.quillEditorState.container.tabIndex = 8;
     }
@@ -257,14 +256,14 @@ const NewProposalForm: m.Component<{snapshotId: string}, {
             'You need to be a member of the space in order to submit a proposal.',
           ],
         }),
-        // showScoreWarning
-        //   ? m(Callout, {
-        //     class: 'no-profile-callout',
-        //     intent: 'primary',
-        //     content: [
-        //       `You need to have a minimum of ${vnode.state.space.filters.minScore} ${vnode.state.space.symbol} in order to submit a proposal`
-        //     ],
-        //   }) : m(Spinner, { active: true, }),
+        showScoreWarning
+          ? m(Callout, {
+            class: 'no-profile-callout',
+            intent: 'primary',
+            content: [
+              `You need to have a minimum of ${vnode.state.space.filters.minScore} ${vnode.state.space.symbol} in order to submit a proposal`
+            ],
+          }) : m(Spinner, { active: true, }),
         m('.new-snapshot-proposal-form', [
           m(Form, { style:'width:100%' }, [
             m(FormGroup, [

@@ -122,7 +122,6 @@ const VoteView: m.Component<{ votes: SnapshotProposalVote[] }, { numLoadedYes: n
         m('.results-cell', [
           voteYesListing
         ]),
-        // TODO: have "load more" run a new query rather than just revealing more previously-loaded votes
         votes.filter((v) => v.choice === SnapshotVoteChoice.YES).length > vnode.state.numLoadedYes ? m(Button, {
           label: 'Load more',
           onclick: () => { vnode.state.numLoadedYes += 10; m.redraw(); },
