@@ -416,8 +416,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         label: 'Approve tokens',
       }),
       m('.sidebar-spacer'),
-      app.chain?.meta.chain.snapshot !== null
-      && m(Button, {
+      app.chain?.meta.chain.snapshot && m(Button, {
         rounded: true,
         fluid: true,
         active: onSnapshotProposal(m.route.get()),
@@ -427,8 +426,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           m.route.set(`/${app.activeChainId()}/snapshot-proposals/${app.chain.meta.chain.snapshot}`);
         },
       }),
-      app.chain?.meta.chain.snapshot !== null && app.user.activeAccount
-      && m(Button, {
+      app.chain?.meta.chain.snapshot && app.user.activeAccount && m(Button, {
         rounded: true,
         fluid: true,
         active: onSnapshotProposalCreation(m.route.get()),
