@@ -953,7 +953,7 @@
 
 "@commonwealth/chain-events@git+https://git@github.com/timolegros/chain-events.git#tim.OOP":
   version "0.7.5"
-  resolved "git+https://git@github.com/timolegros/chain-events.git#f3a580b6106c16555259b28fdb31c74403d8ef8c"
+  resolved "git+https://git@github.com/timolegros/chain-events.git#5689e2d6d200cec397ab9c22a311fb168fff7c03"
   dependencies:
     "@edgeware/node-types" "^3.3.3"
     "@ethersproject/abi" "^5.0.0"
@@ -4608,7 +4608,7 @@ ccount@^1.0.0:
 
 "ce-rabbitmq-plugin@git+https://git@github.com/timolegros/ce-rabbitmq-plugin.git#main":
   version "1.0.0"
-  resolved "git+https://git@github.com/timolegros/ce-rabbitmq-plugin.git#348706c32b361089f1b294f652795aa2310517e5"
+  resolved "git+https://git@github.com/timolegros/ce-rabbitmq-plugin.git#c07f9e817a92a81acfd0800008616ea2f0350dff"
   dependencies:
     "@commonwealth/chain-events" "git+https://git@github.com/timolegros/chain-events.git#tim.OOP"
     amqplib "^0.8.0"
