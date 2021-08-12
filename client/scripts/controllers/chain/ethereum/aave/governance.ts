@@ -10,7 +10,6 @@ import AaveChain from './chain';
 import { attachSigner } from '../contractApi';
 import AaveApi from './api';
 import EthereumAccounts from '../accounts';
-import { IAaveGovernanceV2 } from '@commonwealth/chain-events/dist/contractTypes';
 
 export interface AaveProposalArgs {
   executor: Executor | string,
@@ -125,10 +124,10 @@ export default class AaveGovernance extends ProposalModule<
     // fetch proposals from chain
     // console.log('Fetching aave proposals from chain.');
     // TODO: add tokens if desired
-    const chainEventsContracts: AaveTypes.Api = { governance: <IAaveGovernanceV2>this._api.Governance };
+    const chainEventsContracts: AaveTypes.Api = { governance: <any>this._api.Governance };
     // const fetcher = new AaveEvents.StorageFetcher(chainEventsContracts);
-    const subscriber = new AaveEvents.Subscriber(chainEventsContracts, this.app.chain.id);
-    const processor = new AaveEvents.Processor(chainEventsContracts);
+    const subscriber = new AaveEvents.Subscriber(<any>chainEventsContracts, this.app.chain.id);
+    const processor = new AaveEvents.Processor(<any>chainEventsContracts);
     // await this.app.chain.chainEntities.fetchEntities(this.app.chain.id, () => fetcher.fetch());
     await this.app.chain.chainEntities.subscribeEntities(
       this.app.chain.id,

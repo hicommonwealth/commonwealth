@@ -77,7 +77,7 @@ export default class MolochGovernance extends ProposalModule<
     this._periodDuration = new BN((await this._api.Contract.periodDuration()).toString(), 10);
     this._proposalDeposit = new BN((await this._api.Contract.proposalDeposit()).toString(), 10);
 
-    // fetch all proposals
+    // // fetch all proposals
     if (this._usingServerChainEntities) {
       console.log('Fetching moloch proposals from backend.');
       await this.app.chain.chainEntities.refresh(this.app.chain.id, EntityRefreshOption.AllEntities);
