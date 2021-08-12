@@ -12,7 +12,7 @@ import { constructSubstrateUrl } from 'substrate';
 
 import { CompactModalExitButton } from 'views/modal';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { InputPropertyRow, TogglePropertyRow } from './manage_community_modal/metadata_rows';
+import { InputPropertyRow, TogglePropertyRow, SelectPropertyRow } from './manage_community_modal/metadata_rows';
 import { initAppState } from '../../app';
 
 interface OffchainCommunityFormAttrs {}
@@ -31,6 +31,8 @@ interface OffchainCommunityFormState {
   element: string;
   telegram: string;
   github: string;
+  defaultChain: string;
+  saving: boolean;
 }
 
 const OffchainCommunityForm: m.Component<OffchainCommunityFormAttrs, OffchainCommunityFormState> = {
@@ -46,8 +48,17 @@ const OffchainCommunityForm: m.Component<OffchainCommunityFormAttrs, OffchainCom
     vnode.state.isAuthenticatedForum = false;
     vnode.state.privacyEnabled = false;
     vnode.state.invitesEnabled = false;
+    vnode.state.saving = false;
+    const defaultChains = app.config.chains.getAll()
+      .map((_) => _.id)
+      .filter((chain) => app.user.getAllRolesInCommunity({ chain }).length > 0);
+    vnode.state.defaultChain = defaultChains.length > 0 ? defaultChains[0] : 'ethereum';
   },
   view: (vnode) => {
+    const defaultChains = app.config.chains.getAll()
+      .map((_) => _.id)
+      .filter((chain) => app.user.getAllRolesInCommunity({ chain }).length > 0);
+
     return m('.compact-modal-body-max', [
       m('.CommunityMetadataManagementTable', [m(Table, {
         bordered: false,
@@ -108,10 +119,19 @@ const OffchainCommunityForm: m.Component<OffchainCommunityFormAttrs, OffchainCom
           onToggle: (checked) => { vnode.state.invitesEnabled = checked; },
           caption: (checked) => checked ? 'Anyone can invite new members' : 'Admins/mods can invite new members',
         }),
+        m(SelectPropertyRow, {
+          title: 'Default Chain',
+          options: defaultChains,
+          value: vnode.state.defaultChain,
+          onchange: (value) => {
+            vnode.state.defaultChain = value;
+          }
+        }),
       ]),
       m(Button, {
         label: 'Save changes',
         intent: 'primary',
+        disabled: vnode.state.saving,
         onclick: async (e) => {
           const {
             name,
@@ -125,30 +145,34 @@ const OffchainCommunityForm: m.Component<OffchainCommunityFormAttrs, OffchainCom
             invitesEnabled,
             privacyEnabled,
             isAuthenticatedForum,
+            defaultChain
           } = vnode.state;
 
-          try {
-            $.post(`${app.serverUrl()}/createCommunity`, {
-              name,
-              description,
-              iconUrl,
-              website,
-              discord,
-              element,
-              telegram,
-              github,
-              invitesEnabled,
-              privacyEnabled,
-              isAuthenticatedForum,
-              jwt: app.user.jwt,
-            }).then(async (res) => {
-              await initAppState(false);
-              $(e.target).trigger('modalexit');
-              m.route.set(`/${res.result.id}`);
-            });
-          } catch (err) {
+          vnode.state.saving = true;
+
+          $.post(`${app.serverUrl()}/createCommunity`, {
+            name,
+            description,
+            iconUrl,
+            website,
+            discord,
+            element,
+            telegram,
+            github,
+            invitesEnabled,
+            privacyEnabled,
+            isAuthenticatedForum,
+            jwt: app.user.jwt,
+            default_chain: defaultChain
+          }).then(async (res) => {
+            await initAppState(false);
+            $(e.target).trigger('modalexit');
+            m.route.set(`/${res.result.id}`);
+          }).catch((err: any) => {
             notifyError(err.responseJSON?.error || 'Creating new community failed');
-          }
+          }).always(() => {
+            vnode.state.saving = false;
+          });
         },
       }),
       ]),
@@ -169,6 +193,7 @@ interface SubstrateFormState {
   github: string,
   description: string,
   substrate_spec: string,
+  saving: boolean
 }
 
 const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
@@ -183,6 +208,7 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
     vnode.state.github = '';
     vnode.state.description = '';
     vnode.state.substrate_spec = '';
+    vnode.state.saving = false;
   },
   view: (vnode) => {
     return m('.compact-modal-body-max', [
@@ -277,6 +303,7 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
       m(Button, {
         label: 'Save changes',
         intent: 'primary',
+        disabled: vnode.state.saving,
         onclick: async (e) => {
           const {
             name,
@@ -296,38 +323,38 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
             notifyError('Spec provided has invalid JSON');
             return;
           }
-          try {
-            $.post(`${app.serverUrl()}/addChainNode`, {
-              name,
-              description,
-              node_url : nodeUrl,
-              symbol,
-              website,
-              discord,
-              element,
-              telegram,
-              github,
-              substrate_spec,
-              jwt: app.user.jwt,
-              type: 'chain',
-              id: slugify(name),
-              base: 'substrate',
-              network: slugify(name)
-            }).then(async (res) => {
-              await initAppState(false);
-              $(e.target).trigger('modalexit');
-              m.route.set(`/${res.result.chain}`);
-            });
-          } catch (err) {
+          vnode.state.saving = true;
+          $.post(`${app.serverUrl()}/addChainNode`, {
+            name,
+            description,
+            node_url : nodeUrl,
+            symbol,
+            website,
+            discord,
+            element,
+            telegram,
+            github,
+            substrate_spec,
+            jwt: app.user.jwt,
+            type: 'chain',
+            id: slugify(name),
+            base: 'substrate',
+            network: slugify(name)
+          }).then(async (res) => {
+            await initAppState(false);
+            $(e.target).trigger('modalexit');
+            m.route.set(`/${res.result.chain}`);
+          }).catch((err: any) => {
             notifyError(err.responseJSON?.error || 'Creating new community failed');
-          }
+          }).always(() => {
+            vnode.state.saving = false;
+          });
         },
       }),
       ]),
     ]);
   }
 };
-
 
 interface CreateCommunityAttrs {}
 interface CreateCommunityState {
@@ -360,7 +387,7 @@ const CreateCommunityModal: m.Component<CreateCommunityAttrs, CreateCommunitySta
           active: vnode.state.activeForm === 'offchain',
           onclick: () => { vnode.state.activeForm = 'offchain'; return null; },
         }),
-        m(TabItem, {
+        app.user.isSiteAdmin && m(TabItem, {
           label: 'Substrate',
           active: vnode.state.activeForm === 'substrate',
           onclick: () => { vnode.state.activeForm = 'substrate'; return null; },

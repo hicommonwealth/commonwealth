@@ -1,6 +1,6 @@
 import m from 'mithril';
 import $ from 'jquery';
-import { Input, TextArea, Icon, Icons, Switch } from 'construct-ui';
+import { Input, TextArea, Icon, Icons, Switch, Select } from 'construct-ui';
 import app from 'state';
 import User from 'views/components/widgets/user';
 import { AddressInfo } from 'models';
@@ -146,6 +146,28 @@ export const TogglePropertyRow: m.Component<{
           },
         }),
         vnode.attrs.caption && m('.switch-caption', vnode.attrs.caption(vnode.state.checked)),
+      ])
+    ]);
+  },
+};
+
+export const SelectPropertyRow: m.Component<{
+  title: string,
+  options: string[],
+  value: string,
+  onchange: Function
+}, { selected: string }> = {
+  view: (vnode) => {
+    return m('tr.SelectPropertyRow', [
+      m('td', vnode.attrs.title),
+      m('td', [
+        m(Select, {
+          options: vnode.attrs.options,
+          onchange: (e) => {
+            vnode.attrs.onchange((e.currentTarget as HTMLInputElement).value);
+          },
+          defaultValue: vnode.attrs.value,
+        }),
       ])
     ]);
   },

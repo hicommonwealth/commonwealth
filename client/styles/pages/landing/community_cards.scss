@@ -55,6 +55,7 @@
         }
         .card-right {
             flex: 1;
+            overflow: hidden;
             .card-right-top {
                 display: flex;
             }
@@ -65,7 +66,7 @@
                 margin: 8px 0 5px;
                 line-height: 1.1;
                 white-space: nowrap;
-                text-overflow: ellipse;
+                text-overflow: ellipsis;
                 overflow: hidden;
                 .cui-icon {
                     position: relative;
