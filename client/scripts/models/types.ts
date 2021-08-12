@@ -49,7 +49,7 @@ export enum ChainNetwork {
   Crust = 'crust',
   CosmosHub = 'cosmoshub',
   Gaia13k = 'gaia-13k',
-  Demo = 'demo',
+  Dydx = 'dydx',
 }
 
 // This function returns a default chain for a chainbase
