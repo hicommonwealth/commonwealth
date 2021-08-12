@@ -163,8 +163,9 @@ const VoteAction: m.Component<{
       m.redraw();
     };
 
-    const voteYes = async (event) => {
-      event.preventDefault();
+    const voteYes = async (e) => {
+      e.preventDefault();
+      console.log(`vnode.attrs.proposal ${vnode.attrs.proposal}`);
       try {
         app.modals.create({
           modal: ConfirmSnapshotVoteModal,
@@ -180,12 +181,13 @@ const VoteAction: m.Component<{
         });
         vnode.state.votingModalOpen = true;
       } catch (err) {
+        console.log(err);
         notifyError('Voting failed');
       }
     };
 
-    const voteNo = (event) => {
-      event.preventDefault();
+    const voteNo = (e) => {
+      e.preventDefault();
       try {
         app.modals.create({
           modal: ConfirmSnapshotVoteModal,
@@ -304,6 +306,9 @@ const ViewProposalPage: m.Component<{
     && moment(+vnode.state.proposal.start * 1000) <= moment()
     && moment(+vnode.state.proposal.end * 1000) > moment();
 
+    console.log(vnode.state.snapshotProposal);
+    console.log(vnode.state.proposal);
+
     return m(Sublayout, { class: 'ViewProposalPage', title: 'Snapshot Proposal' }, [
       m(ProposalHeader, {
         snapshotId: vnode.attrs.snapshotId,
@@ -313,7 +318,7 @@ const ViewProposalPage: m.Component<{
       vnode.state.votes && m(VoteView, { votes: vnode.state.votes }),
       isActive && author && m(VoteAction, {
         space: vnode.state.space,
-        proposal: vnode.state.snapshotProposal,
+        proposal: vnode.state.proposal,
         id: vnode.attrs.identifier,
         totalScore: vnode.state.totalScore,
         scores: vnode.state.scores,

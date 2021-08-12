@@ -99,7 +99,7 @@ const ConfirmSnapshotVoteModal: m.Component<{
               const result = await $.post(`${app.serverUrl()}/snapshotAPI/sendMessage`, { ...msg });
 
               if (result.status === 'Failure') {
-                const errorMessage =                  result && result.message.error_description
+                const errorMessage = result && result.message.error_description
                   ? `${result.message.error_description}`
                   : NewVoteErrors.SomethingWentWrong;
                 notifyError(errorMessage);
