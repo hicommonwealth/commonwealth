@@ -9,6 +9,7 @@ import { stringToU8a, u8aToHex } from '@polkadot/util';
 import { factory, formatFilename } from '../../shared/logging';
 import app from '../../server-test';
 import models from '../../server/database';
+import { Permission } from '../../server/models/role';
 import { TokenBalanceProvider, TokenForumMeta } from '../../server/util/tokenBalanceCache';
 const ethUtil = require('ethereumjs-util');
 const log = factory.getLogger(formatFilename(__filename));
@@ -213,7 +214,7 @@ export interface AssignRoleArgs {
     chain_id?: string,
     offchain_community_id?: string,
   };
-  role: string;
+  role: Permission;
 }
 
 export const assignRole = async (args: AssignRoleArgs) => {

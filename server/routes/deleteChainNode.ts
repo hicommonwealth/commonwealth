@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../../shared/logging';
+import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -11,7 +12,7 @@ export const Errors = {
   NodeNotFound: 'Node not found',
 };
 
-const deleteChainNode = async (models, req: Request, res: Response, next: NextFunction) => {
+const deleteChainNode = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {
     return next(new Error(Errors.NotLoggedIn));
   }
@@ -28,9 +29,12 @@ const deleteChainNode = async (models, req: Request, res: Response, next: NextFu
   if (!chain) {
     return next(new Error(Errors.ChainNotFound));
   }
+
   const node = await models.ChainNode.findOne({
-    chain: chain.id,
-    url: req.body.node_url,
+    where: {
+      chain: chain.id,
+      url: req.body.node_url,
+    },
   });
   if (!node) {
     return next(new Error(Errors.NodeNotFound));

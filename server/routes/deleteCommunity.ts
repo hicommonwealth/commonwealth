@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import { Op } from 'sequelize';
 import { factory, formatFilename } from '../../shared/logging';
+import { DB } from '../database';
+import { Op } from 'sequelize';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -11,7 +12,7 @@ export const Errors = {
   NotCreate: 'Only the original creator can delete this community',
 };
 
-const deleteCommunity = async (models, req: Request, res: Response, next: NextFunction) => {
+const deleteCommunity = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   // TODO: re-implement this route if we decide that admins should be able to delete a community
   return next(new Error(Errors.Unimplemented));
 

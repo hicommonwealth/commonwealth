@@ -2,20 +2,21 @@ import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import proposalIdToEntity from '../util/proposalIdToEntity';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import { DB } from '../database';
 
 export const Errors = {
   NoEntity: 'Cannot find entity',
   NotAdminOrOwner: 'Not an admin or owner of this entity',
 };
 
-const updateChainEntityTitle = async (models, req: Request, res: Response, next: NextFunction) => {
+const updateChainEntityTitle = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
   const { unique_id, title } = req.body;
 
   const entity = await proposalIdToEntity(models, chain.id, unique_id);
   if (!entity) return next(new Error(Errors.NoEntity));
-  const userOwnedAddressObjects = await req.user.getAddresses()
+  const userOwnedAddressObjects = (await req.user.getAddresses())
     .filter((addr) => !!addr.verified);
   const userOwnedAddresses = userOwnedAddressObjects.map((addr) => addr.address);
   const userOwnedAddressIds = userOwnedAddressObjects.map((addr) => addr.id);
