@@ -261,25 +261,26 @@ const ViewProposalPage: m.Component<{
       const space = app.snapshot.space;
       vnode.state.space = space;
 
-      getVotes(vnode.state.proposal.ipfs).then((votes) => {
-        vnode.state.votes = votes;
-        const author = app.user.activeAccount;
+      const votes = await getVotes(vnode.state.proposal.ipfs);
+      vnode.state.votes = votes;
+      const author = app.user.activeAccount;
 
-        if (author) {
-          getPower(
+      if (author) {
+        try {
+          const power = await getPower(
             space,
             author.address,
             vnode.state.proposal.snapshot
-          ).then((power) => {
-            const { scores, totalScore } = power;
-            vnode.state.scores = scores;
-            vnode.state.totalScore = totalScore;
-            m.redraw();
-          });
-        } else {
-          m.redraw();
+          );
+          const { scores, totalScore } = power;
+          vnode.state.scores = scores;
+          vnode.state.totalScore = totalScore;
+        } catch (e) {
+          console.error(`Could not fetch scores: ${e.message}`);
         }
-      });
+      }
+
+      m.redraw();
     };
 
     const snapshotId = vnode.attrs.snapshotId;
@@ -303,8 +304,6 @@ const ViewProposalPage: m.Component<{
     const isActive = vnode.state.proposal
     && moment(+vnode.state.proposal.start * 1000) <= moment()
     && moment(+vnode.state.proposal.end * 1000) > moment();
-
-    console.log(vnode.state.proposal);
 
     return m(Sublayout, { class: 'ViewProposalPage', title: 'Snapshot Proposal' }, [
       m(ProposalHeader, {

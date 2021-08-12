@@ -75,28 +75,23 @@ export async function getVotes(proposalHash: string): Promise<SnapshotProposalVo
   return response.data.votes;
 }
 
-export async function getPower(space: SnapshotSpace, address, snapshot) {
-  try {
-    // TODO: do without snapshotjs
-    const blockNumber = await Snapshot.utils.getBlockNumber(Snapshot.utils.getProvider(space.network));
-    const blockTag = snapshot > blockNumber ? 'latest' : parseInt(snapshot, 10);
-    let scores: any = await Snapshot.utils.getScores(
-      space.id,
-      space.strategies,
-      space.network,
-      Snapshot.utils.getProvider(space.network),
-      [address],
-      blockTag
-    );
-    scores = scores.map((score: any) => Object.values(score).reduce((a, b: any) => a + b, 0));
-    return {
-      scores,
-      totalScore: scores.reduce((a, b: any) => a + b, 0)
-    };
-  } catch (e) {
-    console.log(e);
-    return e;
-  }
+export async function getPower(space: SnapshotSpace, address: string, snapshot: string) {
+  // TODO: do without snapshotjs
+  const blockNumber = await Snapshot.utils.getBlockNumber(Snapshot.utils.getProvider(space.network));
+  const blockTag = +snapshot > blockNumber ? 'latest' : +snapshot;
+  const scores: Array<{ [who: string]: number }> = await Snapshot.utils.getScores(
+    space.id,
+    space.strategies,
+    space.network,
+    Snapshot.utils.getProvider(space.network),
+    [address],
+    blockTag,
+  );
+  const summedScores = scores.map((score) => Object.values(score).reduce((a, b) => a + b, 0));
+  return {
+    scores: summedScores,
+    totalScore: summedScores.reduce((a, b) => a + b, 0)
+  };
 }
 
 export function _n(number: number, format = '(0.[00]a)') {

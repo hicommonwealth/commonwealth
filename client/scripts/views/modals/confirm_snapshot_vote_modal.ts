@@ -90,6 +90,7 @@ const ConfirmSnapshotVoteModal: m.Component<{
                 })
               };
 
+              // TODO: support WalletConnect
               const wallet = (app.wallets.getByName('metamask') as MetamaskWebWalletController);
               if (!wallet.enabling && !wallet.enabled) {
                 await wallet?.enable();
