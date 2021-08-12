@@ -426,16 +426,16 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           m.route.set(`/${app.activeChainId()}/snapshot-proposals/${app.chain.meta.chain.snapshot}`);
         },
       }),
-      app.chain?.meta.chain.snapshot && app.user.activeAccount && m(Button, {
-        rounded: true,
-        fluid: true,
-        active: onSnapshotProposalCreation(m.route.get()),
-        label: 'New Snapshot Pr...',
-        onclick: (e) => {
-          e.preventDefault();
-          m.route.set(`/${app.activeChainId()}/new/snapshot-proposal/${app.chain.meta.chain.snapshot}`);
-        },
-      }),
+      // app.chain?.meta.chain.snapshot && app.user.activeAccount && m(Button, {
+      //   rounded: true,
+      //   fluid: true,
+      //   active: onSnapshotProposalCreation(m.route.get()),
+      //   label: 'New Snapshot Pr...',
+      //   onclick: (e) => {
+      //     e.preventDefault();
+      //     m.route.set(`/${app.activeChainId()}/new/snapshot-proposal/${app.chain.meta.chain.snapshot}`);
+      //   },
+      // }),
       showCommonwealthMenuOptions && m(Button, {
         fluid: true,
         rounded: true,

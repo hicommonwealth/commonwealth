@@ -306,7 +306,6 @@ const ViewProposalPage: m.Component<{
     && moment(+vnode.state.proposal.start * 1000) <= moment()
     && moment(+vnode.state.proposal.end * 1000) > moment();
 
-    console.log(vnode.state.snapshotProposal);
     console.log(vnode.state.proposal);
 
     return m(Sublayout, { class: 'ViewProposalPage', title: 'Snapshot Proposal' }, [
