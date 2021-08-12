@@ -10,6 +10,8 @@ import { notifyError } from 'controllers/app/notifications';
 
 import { CompactModalExitButton } from 'views/modal';
 import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web_wallet';
+import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
+import { ChainBase } from 'models';
 
 enum NewVoteErrors {
   SomethingWentWrong = 'Something went wrong!'
@@ -90,24 +92,30 @@ const ConfirmSnapshotVoteModal: m.Component<{
                 })
               };
 
-              // TODO: support WalletConnect
-              const wallet = (app.wallets.getByName('metamask') as MetamaskWebWalletController);
-              if (!wallet.enabling && !wallet.enabled) {
-                await wallet?.enable();
-              }
-              msg.sig = await wallet.signMessage(msg.msg);
+              try {
+                const wallet = await app.wallets.locateWallet(author.address, ChainBase.Ethereum);
+                if (!(wallet instanceof MetamaskWebWalletController
+                  || wallet instanceof WalletConnectWebWalletController
+                )) {
+                  throw new Error('Invalid wallet.');
+                }
+                msg.sig = await wallet.signMessage(msg.msg);
 
-              const result = await $.post(`${app.serverUrl()}/snapshotAPI/sendMessage`, { ...msg });
-
-              if (result.status === 'Failure') {
-                const errorMessage = result && result.message.error_description
-                  ? `${result.message.error_description}`
-                  : NewVoteErrors.SomethingWentWrong;
+                const result = await $.post(`${app.serverUrl()}/snapshotAPI/sendMessage`, { ...msg });
+                if (result.status === 'Failure') {
+                  const errorMessage = result && result.message.error_description
+                    ? `${result.message.error_description}`
+                    : NewVoteErrors.SomethingWentWrong;
+                  notifyError(errorMessage);
+                } else if (result.status === 'Success') {
+                  $(e.target).trigger('modalexit');
+                  m.route.set(`/${app.activeId()}/snapshot-proposals/${space.id}`);
+                }
+              } catch (err) {
+                const errorMessage = err.message;
                 notifyError(errorMessage);
-              } else if (result.status === 'Success') {
-                $(e.target).trigger('modalexit');
-                m.route.set(`/${app.activeId()}/snapshot-proposals/${space.id}`);
               }
+
               vnode.state.saving = false;
             },
             label: 'Vote',

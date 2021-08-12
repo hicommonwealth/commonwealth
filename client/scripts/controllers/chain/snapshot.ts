@@ -18,6 +18,11 @@ class SnapshotController {
 
   // private _votes = new Store<SnapshotVote>();
 
+  public async refreshProposals() {
+    const newProposals = await getProposals(this.space.id);
+    this._proposals = newProposals;
+  }
+
   public async init(space: string) {
     if (this._initializing) return;
     this._initializing = true;

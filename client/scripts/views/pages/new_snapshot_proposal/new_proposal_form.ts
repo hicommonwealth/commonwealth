@@ -10,12 +10,13 @@ import snapshotJs from '@snapshot-labs/snapshot.js';
 
 import app from 'state';
 
-import { Account } from 'models';
+import { Account, ChainBase } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 import QuillEditor from 'views/components/quill_editor';
 import { idToProposal } from 'identifiers';
 import { capitalize } from 'lodash';
 import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web_wallet';
+import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import { SnapshotSpace } from 'client/scripts/helpers/snapshot_utils';
 
 interface IThreadForm {
@@ -102,31 +103,28 @@ const newThread = async (
     })
   };
 
-  // TODO: support WalletConnect
-  const wallet = (app.wallets.getByName('metamask') as MetamaskWebWalletController);
-  if (!wallet.enabling && !wallet.enabled) {
-    await wallet?.enable();
-  }
-  msg.sig = await wallet.signMessage(msg.msg);
-  const result = await $.post(`${app.serverUrl()}/snapshotAPI/sendMessage`, { ...msg });
+  try {
+    const wallet = await app.wallets.locateWallet(author.address, ChainBase.Ethereum);
+    if (!(wallet instanceof MetamaskWebWalletController
+      || wallet instanceof WalletConnectWebWalletController
+    )) {
+      throw new Error('Invalid wallet.');
+    }
+    msg.sig = await wallet.signMessage(msg.msg);
 
-  if (result.status === 'Failure') {
-    mixpanel.track('Create Snapshot Proposal', {
-      'Step No': 2,
-      'Step' : 'Incorrect Proposal',
-    });
-
-    const errorMessage =      result && result.message.error_description
-      ? `${result.message.error_description}`
-      : NewThreadErrors.SomethingWentWrong;
-    throw new Error(errorMessage);
-  } else if (result.status === 'Success') {
-    await app.user.notifications.refresh();
-    m.route.set(`/${app.activeId()}/snapshot-proposal/${snapshotId}/${result.message.ipfsHash}`);
-    mixpanel.track('Create Snapshot Proposal', {
-      'Step No': 2,
-      Step: 'Filled in Snapshot Proposal',
-    });
+    const result = await $.post(`${app.serverUrl()}/snapshotAPI/sendMessage`, { ...msg });
+    if (result.status === 'Failure') {
+      const errorMessage = result && result.message.error_description
+        ? `${result.message.error_description}`
+        : NewThreadErrors.SomethingWentWrong;
+      throw new Error(errorMessage);
+    } else if (result.status === 'Success') {
+      await app.user.notifications.refresh();
+      await app.snapshot.refreshProposals();
+      m.route.set(`/${app.activeId()}/snapshot-proposal/${snapshotId}/${result.message.ipfsHash}`);
+    }
+  } catch (err) {
+    notifyError(err.message);
   }
 };
 
