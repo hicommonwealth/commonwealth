@@ -596,7 +596,7 @@ const Sidebar: m.Component<{ hideQuickSwitcher? }, {}> = {
         app.chain && m(ChainStatusModule),
         app.isCustomDomain && m(SidebarQuickSwitcher),
       ]),
-      app.isCustomDomain(),
+      app.isCustomDomain() &&
       m('a', {
         class: 'PoweredBy',
         onclick: (e) => {
