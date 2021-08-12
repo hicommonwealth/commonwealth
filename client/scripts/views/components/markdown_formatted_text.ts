@@ -9,7 +9,7 @@ import smartTruncate from 'smart-truncate';
 const marked = require('marked');
 
 const renderer = new marked.Renderer();
-renderer['link'] = (href, title, text) => {
+renderer.link = (href, title, text) => {
   return `<a ${href.indexOf('://commonwealth.im/') !== -1 && 'target="_blank"'} href="${href}">${text}</a>`;
 };
 
