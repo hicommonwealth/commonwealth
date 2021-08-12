@@ -598,6 +598,7 @@ const Sidebar: m.Component<{ hideQuickSwitcher? }, {}> = {
         m('br'),
         m('br'),
       ]),
+      app.isCustomDomain(),
       m('a', {
         class: 'PoweredBy',
         onclick: (e) => {
