@@ -595,8 +595,6 @@ const Sidebar: m.Component<{ hideQuickSwitcher? }, {}> = {
         app.isLoggedIn() && (app.chain || app.community) && m(SubscriptionButton),
         app.chain && m(ChainStatusModule),
         app.isCustomDomain && m(SidebarQuickSwitcher),
-        m('br'),
-        m('br'),
       ]),
       app.isCustomDomain(),
       m('a', {
