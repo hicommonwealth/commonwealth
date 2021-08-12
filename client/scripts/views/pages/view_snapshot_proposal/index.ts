@@ -142,11 +142,11 @@ const VoteView: m.Component<{ votes: SnapshotProposalVote[] }, { numLoadedYes: n
 };
 
 const VoteAction: m.Component<{
-  space: any,
-  proposal: any,
+  space: SnapshotSpace,
+  proposal: SnapshotProposal,
   id: string,
   totalScore: number,
-  scores: any[],
+  scores: number[],
   choices: string[],
 }, {
   votingModalOpen: boolean
@@ -252,54 +252,52 @@ const ViewProposalPage: m.Component<{
     vnode.state.votes = [];
     vnode.state.totalScore = 0;
     vnode.state.scores = [];
-    const getLoadingPage = () => m('.topic-loading-spinner-wrap', [ m(Spinner, { active: true, size: 'lg' }) ]);
+    const loadVotes = async () => {
+      vnode.state.proposal = app.snapshot.proposals.find(
+        (proposal) => proposal.ipfs === vnode.attrs.identifier
+      );
+      // TODO: if proposal not found, throw error
+
+      const space = app.snapshot.space;
+      vnode.state.space = space;
+
+      getVotes(vnode.state.proposal.ipfs).then((votes) => {
+        vnode.state.votes = votes;
+        const author = app.user.activeAccount;
+
+        if (author) {
+          getPower(
+            space,
+            author.address,
+            vnode.state.proposal.snapshot
+          ).then((power) => {
+            const { scores, totalScore } = power;
+            vnode.state.scores = scores;
+            vnode.state.totalScore = totalScore;
+            m.redraw();
+          });
+        } else {
+          m.redraw();
+        }
+      });
+    };
 
     const snapshotId = vnode.attrs.snapshotId;
     if (!app.snapshot.initialized) {
-      app.snapshot.init(snapshotId).then(() => m.redraw());
-      return getLoadingPage();
+      app.snapshot.init(snapshotId).then(() => {
+        loadVotes();
+      });
+    } else {
+      loadVotes();
     }
-
-    vnode.state.proposal = app.snapshot.proposals.find(
-      (proposal) => proposal.ipfs === vnode.attrs.identifier
-    );
-    // TODO: if proposal not found, throw error
-
-    const space = app.snapshot.space;
-    vnode.state.space = space;
-
-    getVotes(vnode.state.proposal.ipfs).then((votes) => {
-      vnode.state.votes = votes;
-      const author = app.user.activeAccount;
-
-      if (author) {
-        getPower(
-          space,
-          author.address,
-          vnode.state.proposal.snapshot
-        ).then((power) => {
-          const { scores, totalScore } = power;
-          vnode.state.scores = scores;
-          vnode.state.totalScore = totalScore;
-          m.redraw();
-        });
-      } else {
-        m.redraw();
-      }
-    });
-  },
-
-  oncreate: (vnode) => {
-    mixpanel.track('PageVisit', { 'Page Name': 'ViewSnapShotProposalPage' });
-    mixpanel.track('Proposal Funnel', {
-      'Step No': 1,
-      'Step': 'Viewing Snapshot Proposal',
-      'Snapshot Proposal IpfsHash': `${vnode.attrs.identifier}`,
-      'Scope': app.activeId(),
-    });
   },
 
   view: (vnode) => {
+    const getLoadingPage = () => m('.topic-loading-spinner-wrap', [ m(Spinner, { active: true, size: 'lg' }) ]);
+    if (!vnode.state.votes) {
+      return getLoadingPage();
+    }
+
     const author = app.user.activeAccount;
 
     const isActive = vnode.state.proposal
