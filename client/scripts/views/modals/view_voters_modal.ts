@@ -2,9 +2,12 @@ import 'modals/view_voters_modal.scss';
 
 import $ from 'jquery';
 import m from 'mithril';
+
+import app from 'state';
+import { navigateToSubpage } from 'app';
+
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { CompactModalExitButton } from 'views/modal';
-import app from 'state';
 import { PhragmenElectionVote } from 'controllers/chain/substrate/phragmen_election';
 import { formatAddressShort } from '../../../../shared/utils';
 import User from '../components/widgets/user';
@@ -20,7 +23,7 @@ const VoterRow: m.Component<IVoterRowAttrs> = {
     return m('.VoterRow', {
       onclick: (e) => {
         e.preventDefault();
-        m.route.set(`/${app.activeChainId()}/account/${account.address}`);
+        navigateToSubpage(`/account/${account.address}`);
         $(vnode.dom).trigger('modalexit');
       }
     }, [

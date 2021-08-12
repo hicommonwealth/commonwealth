@@ -77,6 +77,9 @@
         @include sm-max {
             padding: 0;
         }
+        @include xs-max {
+            min-width: calc(100vw - 80px);
+        }
     }
     .sublayout-right-col {
         flex: 1.75;
@@ -85,6 +88,11 @@
         @include xl-min {
             padding: 36px 20px 36px 32px;
             max-width: calc(#{$sidebar-width} + 48px);
+        }
+        @include xs-max {
+            padding-left: 20px;
+            padding-right: 20px;
+            min-width: calc(#{$sidebar-width} + 20px);
         }
     }
     .hide-sidebar & {
@@ -96,8 +104,8 @@
     }
     @include md-max {
         .sublayout-main-col {
-            width: 100%;
-            max-width: none;
+            min-width: 100%;
+            max-width: 100%;
             padding: 0;
         }
     }
@@ -210,5 +218,18 @@
         text-align: center;
     }
     .token-banner-content {
+    }
+
+    .token-banner-terms {
+      background-color: #fdf5f9;
+      text-align: center;
+      padding: 5px 0 5px 0;
+
+      .close-button {
+        position: absolute;
+        right: 1rem;
+        line-height: 1.5;
+        cursor: pointer;
+      }
     }
 }

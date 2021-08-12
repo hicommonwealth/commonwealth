@@ -6,6 +6,7 @@ import mixpanel from 'mixpanel-browser';
 import { Tag } from 'construct-ui';
 
 import app, { ApiStatus } from 'state';
+import { navigateToSubpage } from 'app';
 import { ProposalType } from 'identifiers';
 import { pluralize, link } from 'helpers';
 import { formatCoin } from 'adapters/currency';
@@ -230,7 +231,7 @@ const CouncilPage: m.Component<{}> = {
                   if (activeAccountIsCandidate) {
                     return;
                   }
-                  m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.PhragmenCandidacy });
+                  navigateToSubpage(`/new/proposal/:type`, { type: ProposalType.PhragmenCandidacy });
                 },
               }, activeAccountIsCandidate ? 'Already a council candidate' : 'Run for council'),
             ]),

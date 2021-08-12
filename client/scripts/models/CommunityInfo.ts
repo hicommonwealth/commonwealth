@@ -15,8 +15,9 @@ interface CommunityData {
   github: string;
   visible: boolean;
   stagesEnabled: boolean,
-  additionalStages: string,
+  customStages: string,
   customDomain: string;
+  terms: string;
   invitesEnabled: boolean,
   privacyEnabled: boolean,
 }
@@ -36,8 +37,9 @@ class CommunityInfo {
   public invitesEnabled: boolean;
   public privacyEnabled: boolean;
   public stagesEnabled: boolean;
-  public additionalStages: string;
+  public customStages: string;
   public customDomain: string;
+  public terms: string;
   public readonly collapsedOnHomepage: boolean;
   public readonly featuredTopics: string[];
   public readonly topics: OffchainTopic[];
@@ -47,8 +49,8 @@ class CommunityInfo {
   // TODO: convert this to accept opject with params instead
   constructor({
     id, name, description, iconUrl, website, discord, element, telegram, github, defaultChain, visible,
-    stagesEnabled, additionalStages,
-    customDomain, invitesEnabled, privacyEnabled, collapsedOnHomepage, featuredTopics, topics, adminsAndMods
+    stagesEnabled, customStages,
+    customDomain, terms, invitesEnabled, privacyEnabled, collapsedOnHomepage, featuredTopics, topics, adminsAndMods
   }) {
     this.id = id;
     this.name = name;
@@ -62,8 +64,9 @@ class CommunityInfo {
     this.defaultChain = defaultChain;
     this.visible = visible;
     this.stagesEnabled = stagesEnabled;
-    this.additionalStages = additionalStages;
+    this.customStages = customStages;
     this.customDomain = customDomain;
+    this.terms = terms;
     this.invitesEnabled = invitesEnabled;
     this.privacyEnabled = privacyEnabled;
     this.collapsedOnHomepage = collapsedOnHomepage;
@@ -85,8 +88,9 @@ class CommunityInfo {
     defaultChain: default_chain,
     visible,
     stagesEnabled,
-    additionalStages,
+    customStages,
     customDomain,
+    terms,
     invitesEnabled,
     privacyEnabled,
     collapsedOnHomepage: collapsed_on_homepage,
@@ -107,8 +111,9 @@ class CommunityInfo {
       defaultChain: default_chain,
       visible,
       stagesEnabled,
-      additionalStages,
+      customStages,
       customDomain,
+      terms,
       invitesEnabled,
       privacyEnabled,
       collapsedOnHomepage: collapsed_on_homepage,
@@ -172,8 +177,9 @@ class CommunityInfo {
     iconUrl,
     privacyEnabled,
     stagesEnabled,
-    additionalStages,
+    customStages,
     customDomain,
+    terms,
     website,
     discord,
     element,
@@ -192,8 +198,9 @@ class CommunityInfo {
       'telegram': telegram,
       'github': github,
       'stagesEnabled': stagesEnabled,
-      'additionalStages': additionalStages,
+      'customStages': customStages,
       'customDomain': customDomain,
+      'terms': terms,
       'privacy': privacyEnabled,
       'invites': invitesEnabled,
       'jwt': app.user.jwt,
@@ -208,8 +215,9 @@ class CommunityInfo {
     this.telegram = updatedCommunity.telegram;
     this.github = updatedCommunity.github;
     this.stagesEnabled = stagesEnabled;
-    this.additionalStages = additionalStages;
+    this.customStages = customStages;
     this.customDomain = updatedCommunity.customDomain;
+    this.terms = updatedCommunity.terms;
     this.privacyEnabled = updatedCommunity.privacyEnabled;
     this.invitesEnabled = updatedCommunity.invitesEnabled;
   }

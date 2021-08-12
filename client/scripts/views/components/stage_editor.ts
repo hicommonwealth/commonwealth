@@ -105,7 +105,15 @@ const StageEditor: m.Component<{
   },
   view: (vnode) => {
     if (!app.chain?.meta?.chain && !app.community?.meta) return;
-    const { additionalStages } = app.chain?.meta?.chain || app.community?.meta;
+
+    const { customStages } = app.chain?.meta?.chain || app.community?.meta;
+    const stages = !customStages ? [
+      OffchainThreadStage.Discussion,
+      OffchainThreadStage.ProposalInReview,
+      OffchainThreadStage.Voting,
+      OffchainThreadStage.Passed,
+      OffchainThreadStage.Failed
+    ] : parseCustomStages(customStages);
 
     return m('.StageEditor', [
       !vnode.attrs.popoverMenu && m('a', {
@@ -119,14 +127,7 @@ const StageEditor: m.Component<{
         class: 'StageEditorDialog',
         content: [
           m('.stage-options', [
-            [
-              OffchainThreadStage.Discussion,
-              OffchainThreadStage.ProposalInReview,
-              ...parseCustomStages(additionalStages),
-              OffchainThreadStage.Voting,
-              OffchainThreadStage.Passed,
-              OffchainThreadStage.Failed,
-            ].map((targetStage) => m(Button, {
+            stages.map((targetStage) => m(Button, {
               class: 'discussions-stage',
               active: vnode.state.stage === targetStage,
               iconLeft: vnode.state.stage === targetStage ? Icons.CHECK : null,

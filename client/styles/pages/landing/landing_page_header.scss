@@ -60,6 +60,17 @@
   display: flex;
 }
 
+.LandingPageHeaderLoginButton {
+  cursor: pointer;
+  img {
+    position: relative;
+    top: -2px;
+  }
+  a {
+    text-decoration: none !important;
+    padding-bottom: 0.55rem;
+  }
+}
 li.LandingPageHeaderLoginButton.ml-10.pt-2 {
   white-space: nowrap;
   a.btn-primary.pb-3.text-white {

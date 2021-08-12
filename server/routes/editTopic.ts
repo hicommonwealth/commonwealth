@@ -2,6 +2,7 @@
 import { Request, Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { factory, formatFilename } from '../../shared/logging';
+import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -13,7 +14,7 @@ export const Errors = {
   TopicNotFound: 'Topic not found'
 };
 
-const editTopic = async (models, req: Request, res: Response, next: NextFunction) => {
+const editTopic = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
   if (!req.body.id) {
@@ -46,13 +47,15 @@ const editTopic = async (models, req: Request, res: Response, next: NextFunction
     return next(new Error(Errors.NotAdmin));
   }
 
-  const { id, name, description, telegram, featured_order } = req.body;
+  const { id, name, description, telegram, featured_order, featured_in_sidebar, featured_in_new_post } = req.body;
   try {
     const topic = await models.OffchainTopic.findOne({ where: { id } });
     if (!topic) return next(new Error(Errors.TopicNotFound));
     if (name) topic.name = name;
     if (name || description) topic.description = description;
     if (name || telegram) topic.telegram = telegram;
+    topic.featured_in_sidebar = featured_in_sidebar;
+    topic.featured_in_new_post = featured_in_new_post;
     await topic.save();
 
     if (featured_order) {

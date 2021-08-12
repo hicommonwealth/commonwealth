@@ -20,10 +20,12 @@ interface IChainMetadataManagementState {
   loadingStarted: boolean;
   iconUrl: string;
   stagesEnabled: boolean;
-  additionalStages: string;
+  customStages: string;
   customDomain: string;
+  terms: string;
   network: ChainNetwork;
   symbol: string;
+  snapshot: string;
 }
 
 const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAttrs, IChainMetadataManagementState> = {
@@ -36,11 +38,13 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
     vnode.state.telegram = vnode.attrs.chain.telegram;
     vnode.state.github = vnode.attrs.chain.github;
     vnode.state.stagesEnabled = vnode.attrs.chain.stagesEnabled;
-    vnode.state.additionalStages = vnode.attrs.chain.additionalStages;
+    vnode.state.customStages = vnode.attrs.chain.customStages;
     vnode.state.customDomain = vnode.attrs.chain.customDomain;
+    vnode.state.terms = vnode.attrs.chain.terms;
     vnode.state.iconUrl = vnode.attrs.chain.iconUrl;
     vnode.state.network = vnode.attrs.chain.network;
     vnode.state.symbol = vnode.attrs.chain.symbol;
+    vnode.state.snapshot = vnode.attrs.chain.snapshot;
   },
   view: (vnode) => {
     return m('.ChainMetadataManagementTable', [
@@ -101,15 +105,28 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
         }),
         m(InputPropertyRow, {
           title: 'Custom Stages',
-          defaultValue: vnode.state.additionalStages,
+          defaultValue: vnode.state.customStages,
           placeholder: '["Temperature Check", "Consensus Check"]',
-          onChangeHandler: (v) => { vnode.state.additionalStages = v; },
+          onChangeHandler: (v) => { vnode.state.customStages = v; },
         }),
         m(InputPropertyRow, {
           title: 'Domain',
           defaultValue: vnode.state.customDomain,
-          placeholder: 'gov.edgewa.re',
+          placeholder: 'Contact support', // gov.edgewa.re
           onChangeHandler: (v) => { vnode.state.customDomain = v; },
+          disabled: true, // Custom domains should be admin configurable only
+        }),
+        m(InputPropertyRow, {
+          title: 'Terms of Service',
+          defaultValue: vnode.state.terms,
+          placeholder: 'Url that new users see',
+          onChangeHandler: (v) => { vnode.state.terms = v; },
+        }),
+        m(InputPropertyRow, {
+          title: 'Snapshot',
+          defaultValue: vnode.state.snapshot,
+          placeholder: vnode.state.network,
+          onChangeHandler: (v) => { vnode.state.snapshot = v; },
         }),
         m('tr', [
           m('td', 'Admins'),
@@ -141,8 +158,10 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
             telegram,
             github,
             stagesEnabled,
-            additionalStages,
-            customDomain
+            customStages,
+            customDomain,
+            terms,
+            snapshot,
           } = vnode.state;
           try {
             await vnode.attrs.chain.updateChainData({
@@ -154,8 +173,10 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
               telegram,
               github,
               stagesEnabled,
-              additionalStages,
-              customDomain
+              customStages,
+              customDomain,
+              terms,
+              snapshot,
             });
             $(e.target).trigger('modalexit');
           } catch (err) {

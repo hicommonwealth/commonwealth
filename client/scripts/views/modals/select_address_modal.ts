@@ -7,7 +7,7 @@ import { Tag, Button, Icon, Icons } from 'construct-ui';
 import app from 'state';
 import { Account, RoleInfo, ChainBase } from 'models';
 import { UserBlock } from 'views/components/widgets/user';
-import { articlize, isSameAccount, formatAsTitleCase } from 'helpers';
+import { articlize, isSameAccount, formatAsTitleCase, link } from 'helpers';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { setActiveAccount } from 'controllers/app/login';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
@@ -18,7 +18,6 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
   view: (vnode) => {
     const activeAccountsByRole: Array<[Account<any>, RoleInfo]> = app.user.getActiveAccountsByRole();
     const activeEntityInfo = app.community ? app.community.meta : app.chain?.meta?.chain;
-
     const createRole = (e) => {
       vnode.state.loading = true;
 
@@ -81,6 +80,9 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
 
     const chainbase = (app.chain?.meta?.chain?.base.length != 0) ? app.chain?.meta?.chain?.base : ChainBase.Ethereum;
 
+    const activeCommunityMeta = app.chain ? app.chain.meta?.chain : app.community?.meta;
+    const hasTermsOfService = !!activeCommunityMeta?.terms;
+
     return m('.SelectAddressModal', [
       m('.compact-modal-title', [
         m('h3', 'Manage addresses'),
@@ -121,6 +123,12 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
               role.is_user_default && m(Tag, { label: 'Last used', rounded: true, size: 'sm' }),
             ]),
           ])),
+        ]),
+        hasTermsOfService
+        && m('p.terms-of-service', [
+          `By linking an address, you agree to ${activeCommunityMeta.name}'s `,
+          m('a', { href: activeCommunityMeta.terms, target: '_blank' }, 'terms of service'),
+          '.'
         ]),
         activeAccountsByRole.length !== 0 && m(Button, {
           label: 'Join community with address',

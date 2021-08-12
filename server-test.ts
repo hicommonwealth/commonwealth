@@ -123,7 +123,7 @@ const resetServer = (debug=false): Promise<void> => {
         active: true,
         type: 'chain',
         base: 'substrate',
-        ss58_prefix: '7',
+        ss58_prefix: 7,
       });
       const eth = await models['Chain'].create({
         id: 'ethereum',
@@ -145,6 +145,28 @@ const resetServer = (debug=false): Promise<void> => {
         type: 'token',
         base: 'ethereum',
       });
+      const yearn = await models['Chain'].create({
+        id: 'yearn',
+        network: 'yearn',
+        symbol: 'YFI',
+        name: 'Yearn',
+        icon_url: '/static/img/protocols/yearn.png',
+        active: true,
+        type: 'chain',
+        base: 'ethereum',
+        snapshot: 'ybaby.eth'
+      });
+      const sushi = await models['Chain'].create({
+        id: 'sushi',
+        network: 'sushi',
+        symbol: 'SUSHI',
+        name: 'Sushi',
+        icon_url: '/static/img/protocols/sushi.png',
+        active: true,
+        type: 'chain',
+        base: 'ethereum',
+        snapshot: 'sushi'
+      });
 
       // Admin roles for specific communities
       await Promise.all([
@@ -152,7 +174,7 @@ const resetServer = (debug=false): Promise<void> => {
           user_id: 1,
           address: '0x34C3A5ea06a3A67229fb21a7043243B0eB3e853f',
           chain: 'ethereum',
-          selected: true,
+          // selected: true,
           verification_token: 'PLACEHOLDER',
           verification_token_expires: null,
           verified: new Date(),
@@ -162,7 +184,7 @@ const resetServer = (debug=false): Promise<void> => {
           chain: 'edgeware',
           verification_token: 'PLACEHOLDER',
           verification_token_expires: null,
-          verified: true,
+          verified: new Date(),
           keytype: 'sr25519',
         }),
         models['Address'].create({
@@ -170,7 +192,7 @@ const resetServer = (debug=false): Promise<void> => {
           chain: 'edgeware',
           verification_token: 'PLACEHOLDER',
           verification_token_expires: null,
-          verified: true,
+          verified: new Date(),
           keytype: 'sr25519',
         }),
         models['Address'].create({
@@ -178,7 +200,7 @@ const resetServer = (debug=false): Promise<void> => {
           chain: 'edgeware',
           verification_token: 'PLACEHOLDER',
           verification_token_expires: null,
-          verified: true,
+          verified: new Date(),
           keytype: 'sr25519',
         }),
       ]);
@@ -240,6 +262,8 @@ const resetServer = (debug=false): Promise<void> => {
         [ 'mainnet1.edgewa.re', 'edgeware' ],
         [ 'wss://mainnet.infura.io/ws', 'ethereum' ],
         [ 'wss://ropsten.infura.io/ws', 'alex', '0xFab46E002BbF0b4509813474841E0716E6730136'],
+        [ 'wss://mainnet.infura.io/ws', 'yearn', '0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e'],
+        [ 'wss://mainnet.infura.io/ws', 'sushi', '0x6b3595068778dd592e39a122f4f5a5cf09c90fe2'],
       ];
       await Promise.all(nodes.map(([ url, chain, address ]) => (models['ChainNode'].create({ chain, url, address }))));
 

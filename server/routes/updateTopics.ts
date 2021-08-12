@@ -1,5 +1,6 @@
 /* eslint-disable quotes */
 import { Response, NextFunction } from 'express';
+import { DB } from '../database';
 
 enum UpdateTopicsErrors {
   NoUser = 'Not logged in',
@@ -10,7 +11,7 @@ enum UpdateTopicsErrors {
   NoPermission = `You do not have permission to edit post's topics`
 }
 
-const updateTopics = async (models, req, res: Response, next: NextFunction) => {
+const updateTopics = async (models: DB, req, res: Response, next: NextFunction) => {
   if (!req.user) return next(new Error(UpdateTopicsErrors.NoUser));
   if (!req.body.thread_id) return next(new Error(UpdateTopicsErrors.NoThread));
   if (!req.body.address) return next(new Error(UpdateTopicsErrors.NoAddr));

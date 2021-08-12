@@ -1,27 +1,31 @@
-import { SERVER_URL } from '../config';
+import { Request, Response, NextFunction } from 'express';
 import { NotificationCategories } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
+import { getStatsDInstance } from '../util/metrics';
+import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
 
 export const redirectWithLoginSuccess = (res, email, path?, confirmation?, newAcct = false) => {
   // Returns new if we are creating a new account
-  const url = `${SERVER_URL}/?loggedin=true&email=${email}&new=${newAcct}${path ? `&path=${encodeURIComponent(path)}` : ''}${confirmation ? '&confirmation=success' : ''}`;
+  if (res?.user?.id) {
+    getStatsDInstance().set('cw.users.unique', res.user.id);
+  }
+  getStatsDInstance().increment('cw.users.logged_in');
+  const url = `/?loggedin=true&email=${email}&new=${newAcct}${path ? `&path=${encodeURIComponent(path)}` : ''}${confirmation ? '&confirmation=success' : ''}`;
   return res.redirect(url);
 };
 
 export const redirectWithLoginError = (res, message) => {
-  const url = SERVER_URL + `/?loggedin=false&loginerror=${encodeURIComponent(message)}`;
+  const url = `/?loggedin=false&loginerror=${encodeURIComponent(message)}`;
   return res.redirect(url);
 };
-import { Request, Response, NextFunction } from 'express';
 
-const finishEmailLogin = async (models, req: Request, res: Response, next: NextFunction) => {
+const finishEmailLogin = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const previousUser = req.user;
   if (req.user && req.user.email && req.user.emailVerified) {
     return redirectWithLoginSuccess(res, req.user.email);
   }
-
   const token = req.query.token;
   const email = req.query.email;
   const confirmation = req.query.confirmation;
@@ -40,7 +44,7 @@ const finishEmailLogin = async (models, req: Request, res: Response, next: NextF
   if (+new Date() >= +tokenObj.expires) {
     return redirectWithLoginError(res, 'Token expired');
   }
-  tokenObj.used = true;
+  tokenObj.used = new Date();
   await tokenObj.save();
 
   // Log in the user associated with the verified email
@@ -55,9 +59,9 @@ const finishEmailLogin = async (models, req: Request, res: Response, next: NextF
         const [oldSocialAccounts, oldAddresses,
                newSocialAccounts, newAddresses] = await Promise.all([
           previousUser.getSocialAccounts(),
-          previousUser.getAddresses().filter((address) => !!address.verified),
+          (await previousUser.getAddresses()).filter((address) => !!address.verified),
           existingUser.getSocialAccounts(),
-          existingUser.getAddresses().filter((address) => !!address.verified),
+          (await existingUser.getAddresses()).filter((address) => !!address.verified),
         ]);
         await existingUser.setSocialAccounts(oldSocialAccounts.concat(newSocialAccounts));
         await existingUser.setAddresses(oldAddresses.concat(newAddresses));
@@ -99,7 +103,6 @@ const finishEmailLogin = async (models, req: Request, res: Response, next: NextF
       object_id: `user-${newUser.id}`,
       is_active: true,
     });
-
     req.login(newUser, (err) => {
       if (err) return redirectWithLoginError(res, 'Could not log in with user at ' + email);
       return redirectWithLoginSuccess(res, email, tokenObj.redirect_path, confirmation, true);

@@ -18,8 +18,9 @@ interface ICommunityMetadataManagementState {
   telegram: string;
   github: string;
   stagesEnabled: boolean;
-  additionalStages: string;
+  customStages: string;
   customDomain: string;
+  terms: string;
 }
 
 export interface IChainOrCommMetadataManagementAttrs {
@@ -42,8 +43,9 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
     vnode.state.telegram = vnode.attrs.community.telegram;
     vnode.state.github = vnode.attrs.community.github;
     vnode.state.stagesEnabled = vnode.attrs.community.stagesEnabled;
-    vnode.state.additionalStages = vnode.attrs.community.additionalStages;
+    vnode.state.customStages = vnode.attrs.community.customStages;
     vnode.state.customDomain = vnode.attrs.community.customDomain;
+    vnode.state.terms = vnode.attrs.community.terms;
   },
   view: (vnode) => {
     return m('.CommunityMetadataManagementTable', [m(Table, {
@@ -103,15 +105,22 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
       }),
       m(InputPropertyRow, {
         title: 'Custom Stages',
-        defaultValue: vnode.state.additionalStages,
+        defaultValue: vnode.state.customStages,
         placeholder: '["Temperature Check", "Consensus Check"]',
-        onChangeHandler: (v) => { vnode.state.additionalStages = v; },
+        onChangeHandler: (v) => { vnode.state.customStages = v; },
       }),
       m(InputPropertyRow, {
         title: 'Domain',
         defaultValue: vnode.state.customDomain,
-        placeholder: 'gov.edgewa.re',
+        placeholder: 'Contact support', // gov.edgewa.re
         onChangeHandler: (v) => { vnode.state.customDomain = v; },
+        disabled: true, // Custom domains should be admin configurable only
+      }),
+      m(InputPropertyRow, {
+        title: 'Terms of Service',
+        defaultValue: vnode.state.terms,
+        placeholder: 'Url that new users see',
+        onChangeHandler: (v) => { vnode.state.terms = v; },
       }),
       m(TogglePropertyRow, {
         title: 'Privacy',
@@ -156,8 +165,9 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
           telegram,
           github,
           stagesEnabled,
-          additionalStages,
+          customStages,
           customDomain,
+          terms,
           invitesEnabled,
           privacyEnabled,
         } = vnode.state;
@@ -172,8 +182,9 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
             telegram,
             github,
             stagesEnabled,
-            additionalStages,
+            customStages,
             customDomain,
+            terms,
             privacyEnabled,
             invitesEnabled,
           });

@@ -13,6 +13,7 @@ import {
 } from 'construct-ui';
 
 import app from 'state';
+import { navigateToSubpage } from 'app';
 
 import { detectURL } from 'helpers/threads';
 import { OffchainTopic, OffchainThreadKind, OffchainThreadStage, CommunityInfo, NodeInfo } from 'models';
@@ -24,10 +25,8 @@ import QuillEditor from 'views/components/quill_editor';
 import TopicSelector from 'views/components/topic_selector';
 import EditProfileModal from 'views/modals/edit_profile_modal';
 
-import Token from 'controllers/chain/ethereum/token/adapter';
 import QuillFormattedText from './quill_formatted_text';
 import MarkdownFormattedText from './markdown_formatted_text';
-
 
 interface IThreadForm {
   topicName?: string;
@@ -146,7 +145,7 @@ const newThread = async (
       ? quillEditorState.editor.getText()
       : JSON.stringify(quillEditorState.editor.getContents());
 
-  let { topicName, topicId, threadTitle, linkTitle, url } = form;
+  const { topicName, topicId, threadTitle, linkTitle, url } = form;
   const title = threadTitle || linkTitle;
   const attachments = [];
   const chainId = app.activeCommunityId() ? null : app.activeChainId();
@@ -162,7 +161,7 @@ const newThread = async (
       chainId,
       communityId,
       title,
-      (topicName) ? topicName : 'General', // if no topic name set to default
+      topicName || 'General', // if no topic name set to default
       topicId,
       bodyText,
       url,
@@ -182,8 +181,8 @@ const newThread = async (
 
   await app.user.notifications.refresh();
 
-  m.route.set(`/${app.activeId()}/proposal/discussion/${result.id}`);
-
+  navigateToSubpage(`/proposal/discussion/${result.id}`);
+  
   if (result.topic) {
     try {
       const topicNames = Array.isArray(activeEntity?.meta?.topics)
@@ -485,7 +484,7 @@ export const NewThreadForm: m.Component<{
               onclick: (e) => {
                 vnode.state.overwriteConfirmationModal = true;
                 localStorage.setItem(`${app.activeId()}-from-draft`, `${fromDraft}`);
-                m.route.set(`/${app.activeId()}/new/thread`);
+                navigateToSubpage(`/new/thread`);
                 $(e.target).trigger('modalexit');
               },
             }),
@@ -562,6 +561,7 @@ export const NewThreadForm: m.Component<{
               },
               placeholder: 'Comment (optional)',
               editorNamespace: 'new-link',
+              imageUploader: true,
               tabindex: 4,
             })
           ]),
@@ -654,6 +654,7 @@ export const NewThreadForm: m.Component<{
                 vnode.state.quillEditorState = state;
               },
               editorNamespace: 'new-discussion',
+              imageUploader: true,
               tabindex: 3,
             }),
           ]),

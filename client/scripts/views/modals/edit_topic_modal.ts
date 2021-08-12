@@ -1,9 +1,11 @@
 import 'modals/edit_topic_modal.scss';
 
 import m from 'mithril';
-import app from 'state';
 import $ from 'jquery';
-import { Button, Input, Form, FormGroup, FormLabel } from 'construct-ui';
+import { Button, Input, Form, FormGroup, FormLabel, Checkbox } from 'construct-ui';
+
+import app from 'state';
+import { navigateToSubpage } from 'app';
 
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { CompactModalExitButton } from 'views/modal';
@@ -12,12 +14,16 @@ interface IEditTopicModalForm {
   description: string,
   id: number,
   name: string,
+  featured_in_sidebar: boolean,
+  featured_in_new_post: boolean,
 }
 
 const EditTopicModal : m.Component<{
   description: string,
   id: number,
   name: string,
+  featured_in_sidebar: boolean,
+  featured_in_new_post: boolean,
 }, {
   error: any,
   form: IEditTopicModalForm,
@@ -25,9 +31,9 @@ const EditTopicModal : m.Component<{
 }> = {
   view: (vnode) => {
     if (!app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })) return null;
-    const { id, name, description } = vnode.attrs;
+    const { id, name, description, featured_in_sidebar, featured_in_new_post } = vnode.attrs;
     if (!vnode.state.form) {
-      vnode.state.form = { id, name, description };
+      vnode.state.form = { id, name, description, featured_in_sidebar, featured_in_new_post };
     }
 
     const updateTopic = async (form) => {
@@ -38,9 +44,11 @@ const EditTopicModal : m.Component<{
         communityId: app.activeCommunityId(),
         chainId: app.activeChainId(),
         telegram: null,
+        featuredInSidebar: form.featured_in_sidebar,
+        featuredInNewPost: form.featured_in_new_post
       };
       await app.topics.edit(topicInfo);
-      m.route.set(`/${app.activeId()}/discussions/${encodeURI(form.name.toString().trim())}`);
+      navigateToSubpage(`/discussions/${encodeURI(form.name.toString().trim())}`);
     };
 
     const deleteTopic = async (form) => {
@@ -51,7 +59,7 @@ const EditTopicModal : m.Component<{
         chainId: app.activeChainId(),
       };
       await app.topics.remove(topicInfo);
-      m.route.set(`/${app.activeId()}`);
+      navigateToSubpage('/');
     };
 
     return m('.EditTopicModal', [
@@ -93,6 +101,24 @@ const EditTopicModal : m.Component<{
             }),
           ]),
           m(FormGroup, [
+            m(Checkbox, {
+              label: 'Featured in Sidebar',
+              checked: vnode.state.form.featured_in_sidebar,
+              onchange: (e) => {
+                vnode.state.form.featured_in_sidebar = !vnode.state.form.featured_in_sidebar;
+              },
+            }),
+          ]),
+          m(FormGroup, [
+            m(Checkbox, {
+              label: 'Featured in New Post',
+              checked: vnode.state.form.featured_in_new_post,
+              onchange: (e) => {
+                vnode.state.form.featured_in_new_post = !vnode.state.form.featured_in_new_post;
+              },
+            }),
+          ]),
+          m(FormGroup, [
             m(Button, {
               intent: 'primary',
               disabled: vnode.state.saving,
@@ -119,7 +145,7 @@ const EditTopicModal : m.Component<{
                 if (!confirmed) return;
                 deleteTopic(vnode.state.form).then(() => {
                   $(e.target).trigger('modalexit');
-                  m.route.set(`/${app.activeId()}/`);
+                  navigateToSubpage('/');
                 }).catch((err) => {
                   vnode.state.saving = false;
                   m.redraw();
