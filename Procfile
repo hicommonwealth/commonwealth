@@ -1,4 +1,6 @@
 web: ts-node -P tsconfig.node.json -T server.ts
-ceConsumer: HANDLE_IDENTITY=publish node build/server/scripts/setupChainEventListeners.js
-ceNode0: REPEAT_TIME=1 WORKER_NUMBER=0 NUM_WORKERS=1 NODE_ENV=production HANDLE_IDENTITY=publish node build/server/scripts/dbNode.js
+ceConsumer: node build/server/scripts/setupChainEventListeners.js
+ceNode0: WORKER_NUMBER=0 node build/server/scripts/dbNode.js
+ceNode1: WORKER_NUMBER=1 node build/server/scripts/dbNode.js
+ceNode2: WORKER_NUMBER=3 node build/server/scripts/dbNode.js
 release: npx sequelize-cli db:migrate --config server/sequelize.json
