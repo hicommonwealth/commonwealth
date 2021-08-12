@@ -594,8 +594,15 @@ const Sidebar: m.Component<{ hideQuickSwitcher? }, {}> = {
         m('br'),
         app.isLoggedIn() && (app.chain || app.community) && m(SubscriptionButton),
         app.chain && m(ChainStatusModule),
-      ])
-    ];
+      ]),
+      app.isCustomDomain() &&
+      m('a', {
+        class: 'PoweredBy',
+        onclick: (e) => {
+          window.open('https://commonwealth.im/');
+        },
+      }),
+    ]
   },
 };
 
