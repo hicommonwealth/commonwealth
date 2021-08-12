@@ -12575,6 +12575,11 @@ multihashes@~0.4.15:
     bs58 "^4.0.1"
     varint "^5.0.0"
 
+mustache@^4.0.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/mustache/-/mustache-4.2.0.tgz#e5892324d60a12ec9c2a73359edca52972bf6f64"
+  integrity sha512-71ippSywq5Yb7/tVYyGbkBggbU8H3u5Rz56fH60jGFgr8uHwxs+aSKeqmluIVzM0m0kB7xQjKS6qPfd0b2ZoqQ==
+
 nan@^2.0.8, nan@^2.12.1, nan@^2.13.2, nan@^2.14.0:
   version "2.14.0"
   resolved "https://registry.npmjs.org/nan/-/nan-2.14.0.tgz"
@@ -12617,10 +12622,10 @@ natural-compare@^1.4.0:
   resolved "https://registry.npmjs.org/natural-compare/-/natural-compare-1.4.0.tgz"
   integrity sha1-Sr6/7tdUHywnrPspvbvRXI1bpPc=
 
-nearlib@^0.17.0:
-  version "0.17.3"
-  resolved "https://registry.npmjs.org/nearlib/-/nearlib-0.17.3.tgz"
-  integrity sha512-RCwVJtW95C8mpYEVwDRDa/JyDnRORjERr5mX8tsvC9gCnA2KfRq60RKfl/OyeHk+waJWqAuq9xoc50fTk19AJA==
+nearlib@^0.22.0:
+  version "0.22.0"
+  resolved "https://registry.yarnpkg.com/nearlib/-/nearlib-0.22.0.tgz#e7e9ed88752fb533c0920720f962f97395ddfec6"
+  integrity sha512-6yTc5Ti5oHFak8GSvuzHF7gTRIXRDIs822LiIqJWqoJ5emWktAZqWowS9taAazfG/joU2H0B3WX5Z46oIv4U0w==
   dependencies:
     "@types/bn.js" "^4.11.5"
     bn.js "^5.0.0"
@@ -12628,6 +12633,7 @@ nearlib@^0.17.0:
     error-polyfill "^0.1.2"
     http-errors "^1.7.2"
     js-sha256 "^0.9.0"
+    mustache "^4.0.0"
     node-fetch "^2.3.0"
     text-encoding-utf-8 "^1.0.2"
     tweetnacl "^1.0.1"
