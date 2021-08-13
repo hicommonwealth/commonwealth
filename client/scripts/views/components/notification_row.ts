@@ -279,7 +279,7 @@ const NotificationRow: m.Component<{
       }
 
       if (!label) {
-        return link('a.NotificationRow', {
+        return m('li.NotificationRow', {
           class: notification.isRead ? '' : 'unread',
           key: notification.id,
           id: notification.id,
