@@ -9,8 +9,7 @@ module.exports = {
         address: { type: Sequelize.STRING, allowNull: false, primaryKey: true },
         symbol: { type: Sequelize.STRING, allowNull: false },
         decimals: { type: Sequelize.INTEGER, allowNull: false },
-        createdAt: { type: Sequelize.DATE, allowNull: false },
-        updatedAt: { type: Sequelize.DATE, allowNull: false },
+        icon_url: { type: Sequelize.STRING, allowNull: true },
       }, { transaction: t });
     });
   },

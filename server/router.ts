@@ -66,7 +66,6 @@ import getInviteLinks from './routes/getInviteLinks';
 import deleteGithubAccount from './routes/deleteGithubAccount';
 import getProfile from './routes/getProfile';
 
-
 import createRole from './routes/createRole';
 import deleteRole from './routes/deleteRole';
 import setDefaultRole from './routes/setDefaultRole';
@@ -197,8 +196,8 @@ function setupRouter(
   // TODO: Change to PUT /community
   router.post('/updateCommunity', passport.authenticate('jwt', { session: false }), updateCommunity.bind(this, models));
   router.get('/communityStats', passport.authenticate('jwt', { session: false }), communityStats.bind(this, models));
-  router.get('/getTokensFromLists', getTokensFromLists.bind(this, models, tokenBalanceCache));
-  router.get('/getTokenForum', getTokenForum.bind(this, models, tokenBalanceCache));
+  router.get('/getTokensFromLists', getTokensFromLists.bind(this, models));
+  router.get('/getTokenForum', getTokenForum.bind(this, models));
 
   // offchain threads
   // TODO: Change to POST /thread

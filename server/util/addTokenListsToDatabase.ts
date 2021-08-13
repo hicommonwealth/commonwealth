@@ -1,13 +1,12 @@
 import fetch from 'node-fetch';
 import _ from 'underscore';
 import { slugify } from '../../shared/utils';
-
+import { DB } from '../database';
 import { TokenResponse } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-
-async function addTokenListsToDatabase(models) {
+async function addTokenListsToDatabase(models: DB) {
   const _tokenListUrls = [
     'https://tokens.coingecko.com/uniswap/all.json',
     'https://gateway.ipfs.io/ipns/tokens.uniswap.org',
@@ -37,7 +36,8 @@ async function addTokenListsToDatabase(models) {
         name: token.name,
         address: token.address,
         symbol: token.symbol,
-        decimals: token.decimals
+        decimals: token.decimals,
+        icon_url: token.logoURI,
       }
     }).catch((e) => {
       log.info(`Could not add ${token.name}: ${e.message}`);
@@ -47,6 +47,5 @@ async function addTokenListsToDatabase(models) {
     .then(() => { return 1; /* success */ })
     .catch(() => { return 0; /* failure */ });
 }
-
 
 export default addTokenListsToDatabase;

@@ -1,11 +1,8 @@
-
 import { Request, Response, NextFunction } from 'express';
-import TokenBalanceCache from '../util/tokenBalanceCache';
 import { DB } from '../database';
 
 export const getTokensFromLists = async (
   models: DB,
-  tokenBalanceCache: TokenBalanceCache,
   req: Request,
   res: Response,
   next: NextFunction
