@@ -175,3 +175,35 @@ export const KulupuChainNotificationTypes = {
     'kulupu-vote-delegated',
   ],
 };
+
+export const DydxChainNotificationTypes = {
+  Governance: [
+    'proposal-canceled',
+    'proposal-created',
+    'proposal-executed',
+    'proposal-queued',
+    'vote-emitted',
+  ],
+  Token: [
+    'delegate-changed',
+    'delegated-power-changed',
+    'transfer',
+    'approval',
+  ]
+}
+
+export const AaveChainNotificationTypes = {
+  Governance: [
+    'proposal-canceled',
+    'proposal-created',
+    'proposal-executed',
+    'proposal-queued',
+    'vote-emitted',
+  ],
+  Token: [
+    'delegate-changed',
+    'delegated-power-changed',
+    'transfer',
+    'approval',
+  ]
+}

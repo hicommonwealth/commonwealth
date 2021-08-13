@@ -26,6 +26,8 @@ export enum ProposalType {
   OffchainThread = 'discussion',
   CosmosProposal = 'cosmosproposal',
   MolochProposal = 'molochproposal',
+  AaveProposal = 'aaveproposal',
+  MarlinProposal = 'marlinproposal',
 }
 
 export enum WebsocketEventType {
