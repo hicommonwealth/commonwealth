@@ -58,7 +58,7 @@ const Sublayout: m.Component<{
         m('h3', 'Commonwealth')
       ] : chain ? [
         m('.ChainIcon',[
-          link('a', (!app.isCustomDomain() ? `/${app.activeId()}` : app.customDomainId() ), [
+          link('a', (!app.isCustomDomain() ? `/${app.activeId()}` : '/' ), [
             m(ChainIcon, { size: ICON_SIZE, chain })
           ])
         ]),      
@@ -69,7 +69,7 @@ const Sublayout: m.Component<{
         ]),
       ] : community ? [
         m('.ChainIcon',[
-          link('a', (!app.isCustomDomain() ? `/${app.activeId()}` : app.customDomainId() ), [
+          link('a', (!app.isCustomDomain() ? `/${app.activeId()}` : '/' ), [
             m(CommunityIcon, { size: ICON_SIZE, community })
           ])
         ]),
