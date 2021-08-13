@@ -28,6 +28,12 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
       label: 'New thread',
       iconLeft: mobile ? Icons.PLUS : undefined,
     }),
+    m(MenuItem, {
+      onclick: () => { 
+        m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.AaveProposal }); },
+      label: 'Submit proposal',
+      iconLeft: mobile ? Icons.PLUS : undefined,
+    }), 
     topics.map((t) => (
       m(MenuItem, {
         onclick: (e) => {
