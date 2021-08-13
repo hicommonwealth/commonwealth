@@ -13,6 +13,8 @@ import { SubstrateAccount } from 'controllers/chain/substrate/account';
 
 export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]>, mobile?: boolean) => {
   const activeAccount = app.user.activeAccount;
+  const showSnapshotOptions = app.user.activeAccount
+    && app.chain?.meta.chain.snapshot;
 
   const topics = app.topics.getByCommunity(
     app.activeId()
@@ -86,6 +88,14 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
         iconLeft: mobile ? Icons.PLUS : undefined,
       }),
     ],
+    showSnapshotOptions && m(MenuItem, {
+      onclick: (e) => {
+        e.preventDefault();
+        m.route.set(`/${app.activeChainId()}/new/snapshot-proposal/${app.chain.meta.chain.snapshot}`);
+      },
+      label: 'New Snapshot Proposal',
+      iconLeft: mobile ? Icons.PLUS : undefined,
+    }),
   ];
 };
 

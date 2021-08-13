@@ -5,6 +5,7 @@ import 'construct.scss';
 // import 'tailwindcss/tailwind.css';
 import '../styles/style.css';
 import '../styles/lib/style.css';
+import 'simplepicker/dist/simplepicker.css';
 
 import m from 'mithril';
 import $ from 'jquery';
@@ -13,6 +14,7 @@ import moment from 'moment';
 import mixpanel from 'mixpanel-browser';
 import _ from 'underscore';
 
+import { AaveTypes, MarlinTypes, MolochTypes } from '@commonwealth/chain-events';
 import app, { ApiStatus, LoginState } from 'state';
 import {
   ChainInfo,
@@ -34,7 +36,6 @@ import { Layout } from 'views/layout';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import LoginModal from 'views/modals/login_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';
-import { AaveTypes, MarlinTypes, MolochTypes } from '@commonwealth/chain-events';
 
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/landing');
@@ -42,6 +43,7 @@ import(/* webpackPrefetch: true */ 'views/pages/commonwealth');
 import(/* webpackPrefetch: true */ 'views/pages/discussions');
 import(/* webpackPrefetch: true */ 'views/pages/view_proposal');
 
+// eslint-disable-next-line max-len
 const APPLICATION_UPDATE_MESSAGE = 'A new version of the application has been released. Please save your work and refresh.';
 const APPLICATION_UPDATE_ACTION = 'Okay';
 
@@ -508,6 +510,7 @@ Promise.all([
           alertModalWithText(APPLICATION_UPDATE_MESSAGE, APPLICATION_UPDATE_ACTION)();
         }
         // return to the last page, if it was on commonwealth
+        // eslint-disable-next-line no-restricted-globals
         if (hasCompletedSuccessfulPageLoad) history.back();
       });
     },
@@ -534,7 +537,6 @@ Promise.all([
           }
         }
       }
-
 
       // Special case to defer chain loading specifically for viewing an offchain thread. We need
       // a special case because OffchainThreads and on-chain proposals are all viewed through the
@@ -603,6 +605,17 @@ Promise.all([
       '/spec_settings':          importRoute('views/pages/spec_settings', { scoped: true, deferChain: true }),
       '/settings':               importRoute('views/pages/settings', { scoped: true }),
       '/analytics':              importRoute('views/pages/stats', { scoped: true, deferChain: true }),
+
+      '/snapshot-proposals/:snapshotId': importRoute(
+        'views/pages/snapshot_proposals', { scoped: true, deferChain: true }
+      ),
+      '/snapshot-proposal/:snapshotId/:identifier': importRoute(
+        'views/pages/view_snapshot_proposal', { scoped: true }
+      ),
+      '/new/snapshot-proposal/:snapshotId': importRoute(
+        'views/pages/new_snapshot_proposal', { scoped: true, deferChain: true }
+      ),
+
       // Redirects
       '/:scope/notifications':      redirectRoute(() => '/notifications'),
       '/:scope/notificationsList':  redirectRoute(() => '/notificationsList'),
@@ -636,6 +649,15 @@ Promise.all([
       '/:scope/admin':              redirectRoute(() => '/admin'),
       '/:scope/spec_settings':      redirectRoute(() => '/spec_settings'),
       '/:scope/analytics':          redirectRoute(() => '/analytics'),
+      '/:scope/snapshot-proposals/:snapshotId':redirectRoute(
+        (attrs) => `/snapshot-proposals/${attrs.snapshotId}`
+      ),
+      '/:scope/snapshot-proposal/:snapshotId/:identifier': redirectRoute(
+        (attrs) => `/snapshot-proposal/${attrs.snapshotId}/${attrs.identifier}`
+      ),
+      '/:scope/new/snapshot-proposal/:snapshotId':redirectRoute(
+        (attrs) => `/new/snapshot-proposal/${attrs.snapshotId}`
+      ),
     } : {
       //
       // Scoped routes
@@ -667,7 +689,9 @@ Promise.all([
       '/:scope/new/thread':        importRoute('views/pages/new_thread', { scoped: true, deferChain: true }),
       // Profiles
       '/:scope/account/:address':  importRoute('views/pages/profile', { scoped: true, deferChain: true }),
-      '/:scope/account':           redirectRoute((a) => activeAcct ? `/${a.scope}/account/${activeAcct.address}` : `/${a.scope}/`),
+      '/:scope/account':           redirectRoute(
+        (a) => activeAcct ? `/${a.scope}/account/${activeAcct.address}` : `/${a.scope}/`
+      ),
       // Governance
       '/:scope/referenda':         importRoute('views/pages/referenda', { scoped: true }),
       '/:scope/proposals':         importRoute('views/pages/proposals', { scoped: true }),
@@ -691,10 +715,21 @@ Promise.all([
       '/:scope/admin':             importRoute('views/pages/admin', { scoped: true }),
       '/:scope/spec_settings':     importRoute('views/pages/spec_settings', { scoped: true, deferChain: true }),
       '/:scope/analytics':         importRoute('views/pages/stats', { scoped: true, deferChain: true }),
+
+      '/:scope/snapshot-proposals/:snapshotId': importRoute(
+        'views/pages/snapshot_proposals', { scoped: true, deferChain: true }
+      ),
+      '/:scope/snapshot-proposal/:snapshotId/:identifier': importRoute(
+        'views/pages/view_snapshot_proposal', { scoped: true }
+      ),
+      '/:scope/new/snapshot-proposal/:snapshotId': importRoute(
+        'views/pages/new_snapshot_proposal', { scoped: true, deferChain: true }
+      ),
     }),
   });
 
   const script = document.createElement('noscript');
+  // eslint-disable-next-line max-len
   m.render(script, m.trust('<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KRWH69V" height="0" width="0" style="display:none;visibility:hidden"></iframe>'));
   document.body.insertBefore(script, document.body.firstChild);
 

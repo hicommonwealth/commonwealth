@@ -189,6 +189,7 @@
     "sequelize": "^6.6.5",
     "sequelize-cli": "^6.2.0",
     "serve-favicon": "^2.5.0",
+    "simplepicker": "^2.0.4",
     "sleep-promise": "^8.0.1",
     "smart-truncate": "^1.0.1",
     "source-map": "^0.7.3",
