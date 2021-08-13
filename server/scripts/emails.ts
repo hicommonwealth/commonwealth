@@ -1,4 +1,4 @@
-import Sequelize from 'sequelize';
+import Sequelize, { Op } from 'sequelize';
 import moment from 'moment';
 import { capitalize } from 'lodash';
 import {
@@ -191,7 +191,6 @@ export const sendBatchedNotificationEmails = async (models): Promise<number> => 
 
     log.info(`Sending to ${users.length} users`);
 
-    const { Op } = models.sequelize;
     const last24hours = new Date((new Date() as any) - 24 * 60 * 60 * 1000);
     await Promise.all(users.map(async (user) => {
       const notifications = await models.Notification.findAll({

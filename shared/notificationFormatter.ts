@@ -27,7 +27,7 @@ export const getForumNotificationCopy = async (models, notification_data: IPostN
   const authorProfile = await models.OffchainProfile.findOne({
     include: [{
       model: models.Address,
-      where: { address: author_address, chain: author_chain },
+      where: { address: author_address, chain: author_chain || null },
       required: true,
     }]
   });
@@ -38,7 +38,6 @@ export const getForumNotificationCopy = async (models, notification_data: IPostN
   } catch (e) {
     authorName = author_addr_short;
   }
-
   // author profile link
   const authorPath = `https://commonwealth.im/${author_chain}/account/${author_address}?base=${author_chain}`;
 
@@ -50,8 +49,8 @@ export const getForumNotificationCopy = async (models, notification_data: IPostN
           : null);
   const objectCopy = decodeURIComponent(root_title).trim();
   const communityObject = chain_id
-    ? await models.Chain.findOne({ where: { id: chain_id } })
-    : await models.OffchainCommunity.findOne({ where: { id: community_id } });
+    ? await models.Chain.findOne({ where: { id: chain_id || null } })
+    : await models.OffchainCommunity.findOne({ where: { id: community_id || null } });
   const communityCopy = communityObject ? `in ${communityObject.name}` : '';
   const excerpt = (() => {
     const text = decodeURIComponent(comment_text);

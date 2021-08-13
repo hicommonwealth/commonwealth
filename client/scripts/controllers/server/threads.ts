@@ -227,6 +227,7 @@ class ThreadsController {
     proposal: OffchainThread,
     body: string,
     title: string,
+    url?: string,
     attachments?: string[],
   ) {
     const newBody = body || proposal.body;
@@ -245,6 +246,7 @@ class ThreadsController {
         'stage': proposal.stage,
         'body': encodeURIComponent(newBody),
         'title': newTitle,
+        'url': url,
         'attachments[]': attachments,
         'jwt': app.user.jwt
       },

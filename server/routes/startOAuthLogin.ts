@@ -1,9 +1,10 @@
 import passport from 'passport';
 import { Request, Response, NextFunction } from 'express';
+import { DB } from '../database';
 
 import { GITHUB_OAUTH_CALLBACK } from '../config';
 
-const startOAuthLogin = async (models, req: Request, res: Response, next: NextFunction) => {
+const startOAuthLogin = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   let successRedirect = '/';
   let failureRedirect = '#!/login';
   if (req.query.from) {

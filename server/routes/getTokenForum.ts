@@ -1,14 +1,12 @@
-
 import { Request, Response, NextFunction } from 'express';
-import { sequelize } from '../database';
-import TokenBalanceCache from '../util/tokenBalanceCache';
+import { Op } from 'sequelize';
+import { sequelize, DB } from '../database';
 
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 const getTokenForum = async (
-  models,
-  tokenBalanceCache: TokenBalanceCache,
+  models: DB,
   req: Request,
   res: Response,
   next: NextFunction
@@ -17,7 +15,7 @@ const getTokenForum = async (
   if (!address) {
     return res.json({ status: 'Failure', message: 'Must provide token address' });
   }
-  const token = tokenBalanceCache.getToken(address);
+  const token = await models.Token.findOne({ where: { address: { [Op.iLike]: address } } });
   if (token) {
     try {
       const result = await sequelize.transaction(async (t) => {
@@ -27,10 +25,9 @@ const getTokenForum = async (
             active: true,
             network: token.id,
             type: 'token',
-            icon_url: token.iconUrl,
+            icon_url: token.icon_url,
             symbol: token.symbol,
             name: token.name,
-            default_chain: 'ethereum',
             base: 'ethereum',
           },
           transaction: t,
@@ -38,8 +35,9 @@ const getTokenForum = async (
         const [ node ] = await models.ChainNode.findOrCreate({
           where: { chain: token.id },
           defaults: {
+            chain: token.id,
             url: 'wss://mainnet.infura.io/ws',
-            address: token.address
+            address: token.address,
           },
           transaction: t,
         });

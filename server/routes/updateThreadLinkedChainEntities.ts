@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import { DB } from '../database';
 
 export const Errors = {
   NoThread: 'Cannot find thread',
@@ -8,7 +9,7 @@ export const Errors = {
   ChainEntityAlreadyHasThread: 'Proposal linked to another thread',
 };
 
-const updateThreadLinkedChainEntities = async (models, req: Request, res: Response, next: NextFunction) => {
+const updateThreadLinkedChainEntities = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
   const { thread_id } = req.body;
@@ -19,7 +20,8 @@ const updateThreadLinkedChainEntities = async (models, req: Request, res: Respon
     },
   });
   if (!thread) return next(new Error(Errors.NoThread));
-  const userOwnedAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
+  const userOwnedAddressIds = (await req.user.getAddresses())
+    .filter((addr) => !!addr.verified).map((addr) => addr.id);
   if (!userOwnedAddressIds.includes(thread.address_id)) { // is not author
     const roles = await models.Role.findAll({
       where: {
@@ -71,7 +73,7 @@ const updateThreadLinkedChainEntities = async (models, req: Request, res: Respon
       },
       {
         model: models.Address,
-        through: models.Collaboration,
+        // through: models.Collaboration,
         as: 'collaborators'
       },
       models.OffchainAttachment,

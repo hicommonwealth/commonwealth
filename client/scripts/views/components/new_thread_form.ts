@@ -28,7 +28,6 @@ import EditProfileModal from 'views/modals/edit_profile_modal';
 import QuillFormattedText from './quill_formatted_text';
 import MarkdownFormattedText from './markdown_formatted_text';
 
-
 interface IThreadForm {
   topicName?: string;
   topicId?: number;
