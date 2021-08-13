@@ -14,7 +14,7 @@ import { navigateToSubpage } from 'app';
 import { NotificationCategories } from 'types';
 import { ProposalType } from 'identifiers';
 import { Notification, AddressInfo } from 'models';
-import { pluralize } from 'helpers';
+import { link, pluralize } from 'helpers';
 import { IPostNotificationData } from 'shared/types';
 
 import QuillFormattedText from 'views/components/quill_formatted_text';
@@ -279,7 +279,7 @@ const NotificationRow: m.Component<{
       }
 
       if (!label) {
-        return m('li.NotificationRow', {
+        return link('a.NotificationRow', {
           class: notification.isRead ? '' : 'unread',
           key: notification.id,
           id: notification.id,
@@ -289,35 +289,7 @@ const NotificationRow: m.Component<{
           ]),
         ]);
       }
-      return m('li.NotificationRow', {
-        class: notification.isRead ? '' : 'unread',
-        key: notification.id,
-        id: notification.id,
-        oncontextmenu: async (e) => {
-          e.preventDefault();
-          if (vnode.state.scrollOrStop) { vnode.state.scrollOrStop = false; return; }
-          const notificationArray: Notification[] = [];
-          notificationArray.push(notification);
-          app.user.notifications.markAsRead(notificationArray).then(() => m.redraw());
-
-          let newPath = window.location.origin;
-
-          if (!app.isCustomDomain()) {
-            newPath += `/${app.activeId()}`;
-          }
-          window.open(`${newPath}/notificationsList?id=${notification.id}`, '_blank');
-
-          m.redraw.sync();
-        },
-        onclick: async () => {
-          if (vnode.state.scrollOrStop) { vnode.state.scrollOrStop = false; return; }
-          const notificationArray: Notification[] = [];
-          notificationArray.push(notification);
-          app.user.notifications.markAsRead(notificationArray).then(() => m.redraw());
-          await navigateToSubpage(`/notificationsList?id=${notification.id}`);
-          m.redraw.sync();
-        },
-      }, [
+      return link('a.NotificationRow', (`/notificationsList?id=${notification.id}`), [
         m('.comment-body', [
           m('.comment-body-top.chain-event-notification-top', [
             `${label.heading} on ${chainName}`,
@@ -339,7 +311,19 @@ const NotificationRow: m.Component<{
           m('.comment-body-bottom', `Block ${notification.chainEvent.blockNumber}`),
           m('.comment-body-excerpt', label.label),
         ]),
-      ]);
+      ], {
+        class: notification.isRead ? '' : 'unread',
+        key: notification.id,
+        id: notification.id,
+        onclick: async () => {
+          if (vnode.state.scrollOrStop) { vnode.state.scrollOrStop = false; return; }
+          const notificationArray: Notification[] = [];
+          notificationArray.push(notification);
+          app.user.notifications.markAsRead(notificationArray).then(() => m.redraw());
+          // await navigateToSubpage(`/notificationsList?id=${notification.id}`);
+          m.redraw.sync();
+        },
+      });
     } else {
       const notificationData = notifications.map((notif) => typeof notif.data === 'string'
         ? JSON.parse(notif.data)
@@ -361,22 +345,7 @@ const NotificationRow: m.Component<{
           .replace(`http://localhost:8080/${app.customDomainId()}/`, '/');
       }
 
-      return m('li.NotificationRow', {
-        class: notification.isRead ? '' : 'unread',
-        key: notification.id,
-        id: notification.id,
-        oncontextmenu: async (e) => {
-          e.preventDefault();
-          app.user.notifications.markAsRead(notifications);
-          window.open(path.replace(/ /g, '%20'), '_blank');
-          if (pageJump) setTimeout(() => pageJump(), 1);
-        },
-        onclick: async () => {
-          app.user.notifications.markAsRead(notifications);
-          await m.route.set(path.replace(/ /g, '%20')); // fix for improperly generated notification paths
-          if (pageJump) setTimeout(() => pageJump(), 1);
-        },
-      }, [
+      return link('a.NotificationRow', path.replace(/ /g, '%20'), [
         authorInfo.length === 1
           ? m(User, {
             user: new AddressInfo(
@@ -418,7 +387,16 @@ const NotificationRow: m.Component<{
             ]),
           ])
         ]),
-      ]);
+      ], {
+        class: notification.isRead ? '' : 'unread',
+        key: notification.id,
+        id: notification.id,
+        onclick: async () => {
+          app.user.notifications.markAsRead(notifications);
+          await m.route.set(path.replace(/ /g, '%20')); // fix for improperly generated notification paths
+          if (pageJump) setTimeout(() => pageJump(), 1);
+        },
+      });
     }
   },
 };
