@@ -405,6 +405,7 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
         m(InputPropertyRow, {
           title: 'Address',
           defaultValue: vnode.state.address,
+          placeholder: '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984',
           onChangeHandler: (v) => {
             vnode.state.address = v;
             vnode.state.loaded = false;
