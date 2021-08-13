@@ -104,8 +104,8 @@
     }
     @include md-max {
         .sublayout-main-col {
-            width: 100%;
-            // max-width: none;
+            min-width: 100%;
+            max-width: 100%;
             padding: 0;
         }
     }

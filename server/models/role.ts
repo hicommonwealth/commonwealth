@@ -1,17 +1,19 @@
 import * as Sequelize from 'sequelize';
+import { DataTypes, Model } from 'sequelize';
 import { AddressAttributes } from './address';
 import { OffchainCommunityAttributes } from './offchain_community';
 import { ChainAttributes } from './chain';
+import { ModelStatic } from './types';
 
 export type Permission = 'admin' | 'moderator' | 'member';
 
 export interface RoleAttributes {
-  id?: number;
   address_id: number;
+  permission: Permission;
+  id?: number;
   offchain_community_id?: string;
   chain_id?: string;
   is_user_default?: boolean;
-  permission: Permission;
   created_at?: Date;
   updated_at?: Date;
 
@@ -21,19 +23,15 @@ export interface RoleAttributes {
   Chain?: ChainAttributes;
 }
 
-export interface RoleInstance extends Sequelize.Instance<RoleAttributes>, RoleAttributes {
+export interface RoleInstance extends Model<RoleAttributes>, RoleAttributes {}
 
-}
-
-export interface RoleModel extends Sequelize.Model<RoleInstance, RoleAttributes> {
-
-}
+export type RoleModelStatic = ModelStatic<RoleInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): RoleModel => {
-  const Role = sequelize.define<RoleInstance, RoleAttributes>('Role', {
+  dataTypes: typeof DataTypes,
+): RoleModelStatic => {
+  const Role = <RoleModelStatic>sequelize.define('Role', {
     id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     address_id: { type: dataTypes.INTEGER, allowNull: false },
     offchain_community_id: { type: dataTypes.STRING, allowNull: true },
@@ -48,6 +46,10 @@ export default (
     created_at: { type: dataTypes.DATE, allowNull: false },
     updated_at: { type: dataTypes.DATE, allowNull: false },
   }, {
+    timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
+    tableName: 'Roles',
     underscored: true,
     indexes: [
       { fields: ['address_id'] },

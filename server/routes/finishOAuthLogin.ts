@@ -1,12 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
-import { SERVER_URL } from '../config';
 import { NotificationCategories } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
 import { redirectWithLoginSuccess, redirectWithLoginError } from './finishEmailLogin';
+import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
-
-const finishOAuthLogin = async (models, req: Request, res: Response, next: NextFunction) => {
+const finishOAuthLogin = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const token = req.query.token;
   if (!token) {
     return redirectWithLoginError(res, 'Missing token');
@@ -35,13 +34,13 @@ const finishOAuthLogin = async (models, req: Request, res: Response, next: NextF
   }
 
   // Mark LoginToken as used
-  tokenObj.used = true;
+  tokenObj.used = new Date();
   await tokenObj.save();
 
   // Log in the user associated with the verified email,
   // or create a new user if none exists
   const socialAccount = await models.SocialAccount.findOne({ where: { id: tokenObj.social_account } });
-  const existingUser = await models.User.scope('withPrivateData').findOne({ where: { id: socialAccount.user_id } });
+  const existingUser = await socialAccount.getUser({ scope: 'withPrivateData' });
 
   if (existingUser) {
     req.login(existingUser, async (err) => {

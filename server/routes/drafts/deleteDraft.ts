@@ -23,7 +23,7 @@ const deleteDraft = async (models, req: Request, res: Response, next: NextFuncti
   }
 
   try {
-    const userOwnedAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
+    const userOwnedAddressIds = (await req.user.getAddresses()).filter((addr) => !!addr.verified).map((addr) => addr.id);
     const draft = await models.DiscussionDraft.findOne({
       where: {
         id: req.body.id,

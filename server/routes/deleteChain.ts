@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../../shared/logging';
+import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -11,7 +12,7 @@ export const Errors = {
   CannotDeleteChain: 'Cannot delete a chain with registered addresses',
 };
 
-const deleteChain = async (models, req: Request, res: Response, next: NextFunction) => {
+const deleteChain = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {
     return next(new Error(Errors.NotLoggedIn));
   }
@@ -30,8 +31,8 @@ const deleteChain = async (models, req: Request, res: Response, next: NextFuncti
   }
 
   // make sure no addresses are associated
-  const hasAddresses = await chain.hasAddresses();
-  if (hasAddresses) {
+  const hasAddresses = await chain.getAddresses();
+  if (hasAddresses && hasAddresses.length) {
     return next(new Error(Errors.CannotDeleteChain));
   }
 

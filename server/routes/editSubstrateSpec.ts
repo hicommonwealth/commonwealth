@@ -1,9 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import { DB } from '../database';
 
 import testSubstrateSpec from '../util/testSubstrateSpec';
 
-const editSubstrateSpec = async (models, req: Request, res: Response, next: NextFunction) => {
+const editSubstrateSpec = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const [chain,, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
   if (!chain) return next(new Error('Unknown chain.'));

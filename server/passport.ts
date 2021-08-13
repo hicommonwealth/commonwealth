@@ -9,7 +9,7 @@ import { encodeAddress } from '@polkadot/util-crypto';
 import { Magic, MagicUserMetadata } from '@magic-sdk/admin';
 import { Strategy as MagicStrategy } from 'passport-magic';
 
-import { sequelize } from './database';
+import { sequelize, DB } from './database';
 import { factory, formatFilename } from '../shared/logging';
 import { getStatsDInstance } from './util/metrics';
 const log = factory.getLogger(formatFilename(__filename));
@@ -25,7 +25,7 @@ const GithubStrategy = passportGithub.Strategy;
 const JWTStrategy = passportJWT.Strategy;
 const ExtractJWT = passportJWT.ExtractJwt;
 
-function setupPassport(models) {
+function setupPassport(models: DB) {
   passport.use(new JWTStrategy({
     jwtFromRequest: ExtractJWT.fromExtractors([
       ExtractJWT.fromBodyField('jwt'),
@@ -318,17 +318,6 @@ function setupPassport(models) {
       provider_username: profile.username,
       access_token: accessToken,
       refresh_token: refreshToken,
-      metadata: {
-        display_name: profile.displayName,
-        profile_url: profile.profileURL,
-        avatar_url: profile.photos.length > 0 && profile.photos[0].value,
-        bio: profile._json.bio,
-        updated_at: profile._json.updated_at,
-        created_at: profile._json.created_at,
-        company: profile._json.company,
-        blog: profile._json.blog,
-        location: profile._json.location,
-      }
     });
 
     // Handle OAuth for custom domains.
@@ -346,6 +335,7 @@ function setupPassport(models) {
     }
 
     if (req.user) {
+      // @ts-ignore
       await newGithubAccount.setUser(req.user);
       return cb(null, req.user);
     } else {

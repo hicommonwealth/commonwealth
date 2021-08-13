@@ -26,14 +26,14 @@ import {
   AddressInfo,
 } from 'models';
 
-import { notifyError } from 'controllers/app/notifications';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import UserGallery from 'views/components/widgets/user_gallery';
 import { getStatusClass, getStatusText } from 'views/components/proposal_card';
 import User from 'views/components/widgets/user';
-import { notifySuccess } from 'controllers/app/notifications';
-import { activeQuillEditorHasText, GlobalStatus } from './body';
+
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';
+import { activeQuillEditorHasText, GlobalStatus } from './body';
 
 export const ProposalHeaderExternalLink: m.Component<{ proposal: AnyProposal | OffchainThread }> = {
   view: (vnode) => {
@@ -60,9 +60,9 @@ export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread 
       vnode.state.offchainVotes = {};
       vnode.state.offchainVotes[proposal.id] = [];
       // fetch from backend, and then set
-      $.get(`/api/viewOffchainVotes?thread_id=${proposal.id}` +
-            (app.activeChainId() ? `&chain=${app.activeChainId()}`
-             : app.activeCommunityId() ? `&community=${app.activeCommunityId()}` : ''))
+      $.get(`/api/viewOffchainVotes?thread_id=${proposal.id}${
+        app.activeChainId() ? `&chain=${app.activeChainId()}`
+          : app.activeCommunityId() ? `&community=${app.activeCommunityId()}` : ''}`)
         .then((result) => {
           if (result.result.length === 0) return;
           if (result.result[0].thread_id !== proposal.id) return;
@@ -75,8 +75,8 @@ export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread 
     }
 
     const pollingEnded = proposal.offchainVotingEndsAt?.isBefore(moment().utc());
-    const canVote = app.isLoggedIn() && app.user.activeAccount && !pollingEnded &&
-      !proposal.getOffchainVoteFor(app.user.activeAccount.chain.id, app.user.activeAccount.address);
+    const canVote = app.isLoggedIn() && app.user.activeAccount && !pollingEnded
+      && !proposal.getOffchainVoteFor(app.user.activeAccount.chain.id, app.user.activeAccount.address);
 
     const vote = async (option, hasVoted, isSelected) => {
       if (!app.isLoggedIn() || !app.user.activeAccount || isSelected) return;
@@ -113,7 +113,7 @@ export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread 
               label: isSelected ? 'Voted' : 'Vote',
               size: 'sm',
               rounded: true,
-              disabled: (pollingEnded || isSelected) ? true : false,
+              disabled: !!(pollingEnded || isSelected),
               style: (pollingEnded || isSelected) ? 'pointer-events: none' : '',
               iconLeft: isSelected ? Icons.CHECK : null,
               compact: true,
@@ -133,17 +133,17 @@ export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread 
       m('.offchain-poll-header', 'Voters'),
       m('.offchain-poll-voters', [
         proposal.offchainVotes.length === 0 && m('.offchain-poll-no-voters', 'Nobody has voted'),
-        proposal.offchainVotes.map((vote) => m('.offchain-poll-voter', [
+        proposal.offchainVotes.map((vote_) => m('.offchain-poll-voter', [
           m('.offchain-poll-voter-user', [
             m(User, {
               avatarSize: 16,
               popover: true,
               linkify: true,
-              user: new AddressInfo(null, vote.address, vote.author_chain, null, null),
+              user: new AddressInfo(null, vote_.address, vote_.author_chain, null, null),
               hideIdentityIcon: true,
             }),
           ]),
-          m('.offchain-poll-voter-choice', vote.option),
+          m('.offchain-poll-voter-choice', vote_.option),
         ])),
       ]),
     ]);
@@ -329,8 +329,8 @@ export const ProposalTitleSaveEdit: m.Component<{
   view: (vnode) => {
     const { proposal, getSetGlobalEditingStatus, parentState } = vnode.attrs;
     if (!proposal) return;
-    const proposalLink = (app.isCustomDomain() ? '' : `/${app.activeId()}`)
-      + `/proposal/${proposal.slug}/${proposal.identifier}`
+    const proposalLink = `${app.isCustomDomain() ? '' : `/${app.activeId()}`
+    }/proposal/${proposal.slug}/${proposal.identifier}`
       + `-${slugify(proposal.title)}`;
 
     return m('.ProposalTitleSaveEdit', [
@@ -343,7 +343,10 @@ export const ProposalTitleSaveEdit: m.Component<{
         onclick: (e) => {
           e.preventDefault();
           parentState.saving = true;
-          app.chain.chainEntities.updateEntityTitle(proposal.uniqueIdentifier, parentState.updatedTitle).then((response) => {
+          app.chain.chainEntities.updateEntityTitle(
+            proposal.uniqueIdentifier,
+            parentState.updatedTitle
+          ).then((response) => {
             m.route.set(proposalLink);
             parentState.editing = false;
             parentState.saving = false;
@@ -418,6 +421,33 @@ export const ProposalTitleEditor: m.Component<{
   }
 };
 
+export const ProposalLinkEditor: m.Component<{
+  item: OffchainThread | AnyProposal,
+  parentState
+}> = {
+  oninit: (vnode) => {
+    vnode.attrs.parentState.updatedUrl = (vnode.attrs.item as OffchainThread).url;
+  },
+  view: (vnode) => {
+    const { item, parentState } = vnode.attrs;
+    if (!item) return;
+
+    return m('.ProposalLinkEditor', [
+      m(Input, {
+        size: 'lg',
+        name: 'edit-thread-url',
+        autocomplete: 'off',
+        oninput: (e) => {
+          const { value } = (e as any).target;
+          parentState.updatedUrl = value;
+        },
+        defaultValue: parentState.updatedUrl,
+        tabindex: 1,
+      })
+    ]);
+  }
+};
+
 export const ProposalHeaderPrivacyMenuItems: m.Component<{
   proposal: AnyProposal | OffchainThread,
   getSetGlobalEditingStatus: CallableFunction
@@ -446,7 +476,12 @@ export const ProposalHeaderPrivacyMenuItems: m.Component<{
   }
 };
 
-export const ProposalSidebarPollEditorModule: m.Component<{ proposal, openPollEditor: Function }, { isOpen: boolean }> = {
+export const ProposalSidebarPollEditorModule: m.Component<{
+  proposal,
+  openPollEditor: Function
+}, {
+  isOpen: boolean
+}> = {
   view: (vnode) => {
     const { proposal, openPollEditor } = vnode.attrs;
     return m('.ProposalSidebarPollEditorModule', [

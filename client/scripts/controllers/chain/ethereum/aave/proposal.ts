@@ -250,7 +250,7 @@ export default class AaveProposal extends Proposal<
 
     // special case for expiration because no event is emitted
     // TODO: hook onto specific block and set expired automatically
-    if (this.state === AaveTypes.ProposalState.EXPIRED) {
+    if (this.state === AaveTypes.ProposalState.EXPIRED || this.state === AaveTypes.ProposalState.FAILED) {
       this.complete(this._Gov.store);
     }
 

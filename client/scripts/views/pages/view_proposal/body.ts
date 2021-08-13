@@ -27,6 +27,7 @@ import VersionHistoryModal from 'views/modals/version_history_modal';
 import ReactionButton, { ReactionType } from 'views/components/reaction_button';
 import { MenuItem, Button, Dialog, QueryList, Classes, ListItem, Icon, Icons, Popover } from 'construct-ui';
 import { notifyError, notifyInfo, notifySuccess } from 'controllers/app/notifications';
+import { validURL } from '../../../../../shared/utils';
 
 export enum GlobalStatus {
   Get = 'get',
@@ -528,15 +529,20 @@ export const ProposalBodySaveEdit: m.Component<{
         rounded: true,
         onclick: (e) => {
           e.preventDefault();
+          if (parentState.updatedUrl) {
+            if (!validURL(parentState.updatedUrl)) {
+              notifyError('Must provide a valid URL.');
+              return;
+            }
+          }
           parentState.saving = true;
           parentState.quillEditorState.editor.enable(false);
           const { quillEditorState } = parentState;
           const itemText = quillEditorState.markdownMode
             ? quillEditorState.editor.getText()
             : JSON.stringify(quillEditorState.editor.getContents());
-          parentState.saving = true;
           if (item instanceof OffchainThread) {
-            app.threads.edit(item, itemText, parentState.updatedTitle).then(() => {
+            app.threads.edit(item, itemText, parentState.updatedTitle, parentState.updatedUrl).then(() => {
               navigateToSubpage(`/proposal/${item.slug}/${item.id}`);
               parentState.editing = false;
               parentState.saving = false;
