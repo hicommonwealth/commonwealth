@@ -24,7 +24,6 @@ const log = factory.getLogger(formatFilename(__filename));
 import ViewCountCache from './server/util/viewCountCache';
 import IdentityFetchCache from './server/util/identityFetchCache';
 import TokenBalanceCache from './server/util/tokenBalanceCache';
-import addTokenListsToDatabase from './server/util/addTokenListsToDatabase';
 import { SESSION_SECRET, ROLLBAR_SERVER_TOKEN } from './server/config';
 import models from './server/database';
 import { updateEvents, updateBalances } from './server/util/eventPoller';
@@ -52,14 +51,12 @@ async function main() {
   const SHOULD_UPDATE_EVENTS = process.env.UPDATE_EVENTS === 'true';
   const SHOULD_UPDATE_BALANCES = process.env.UPDATE_BALANCES === 'true';
   const SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS = process.env.UPDATE_EDGEWARE_LOCKDROP_STATS === 'true';
-  const SHOULD_LOAD_DATABASE_FROM_TOKEN_LISTS = process.env.SHOULD_LOAD_DATABASE_FROM_TOKEN_LISTS === 'true';
 
   const NO_CLIENT_SERVER = process.env.NO_CLIENT === 'true'
     || SHOULD_SEND_EMAILS
     || SHOULD_UPDATE_EVENTS
     || SHOULD_UPDATE_BALANCES
-    || SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS
-    || SHOULD_LOAD_DATABASE_FROM_TOKEN_LISTS;
+    || SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS;
 
   // CLI parameters used to configure specific tasks
   const SKIP_EVENT_CATCHUP = process.env.SKIP_EVENT_CATCHUP === 'true';
@@ -110,8 +107,6 @@ async function main() {
     rc = await sendBatchedNotificationEmails(models);
   } else if (SHOULD_UPDATE_EVENTS) {
     rc = await updateEvents(app, models);
-  } else if (SHOULD_LOAD_DATABASE_FROM_TOKEN_LISTS) {
-    rc = await addTokenListsToDatabase(models);
   } else if (SHOULD_UPDATE_BALANCES) {
     try {
       rc = await updateBalances(app, models);

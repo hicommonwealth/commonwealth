@@ -4,14 +4,14 @@ import { slugify } from '../../shared/utils';
 import { DB } from '../database';
 import { TokenResponse } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
+import { TokenAttributes } from '../models/token';
 const log = factory.getLogger(formatFilename(__filename));
 
-async function addTokenListsToDatabase(models: DB) {
+async function addTokenListsToDatabase(models: DB): Promise<void> {
   const _tokenListUrls = [
+    'https://app.tryroll.com/tokens.json',
     'https://tokens.coingecko.com/uniswap/all.json',
     'https://gateway.ipfs.io/ipns/tokens.uniswap.org',
-    'https://raw.githubusercontent.com/jab416171/uniswap-pairtokens/master/uniswap_pair_tokens.json',
-    'https://app.tryroll.com/tokens.json',
   ];
 
   const responseData = await Promise.all(
@@ -29,23 +29,27 @@ async function addTokenListsToDatabase(models: DB) {
 
   const tokens: TokenResponse[] = _.flatten(responseData.map((d) => d.tokens));
 
-  return Promise.all(tokens.map(async (token) => {
-    return models.Token.findOrCreate({
-      where: {
+  for (const token of tokens) {
+    if (token.chainId === 1) {
+      // only support eth mainnet tokens
+      const where: TokenAttributes = {
         id: slugify(token.name),
         name: token.name,
         address: token.address,
         symbol: token.symbol,
         decimals: token.decimals,
-        icon_url: token.logoURI,
+      };
+      if (token.logoURI) {
+        where.icon_url = token.logoURI;
       }
-    }).catch((e) => {
-      log.info(`Could not add ${token.name}: ${e.message}`);
-      throw e;
-    });
-  }))
-    .then(() => { return 1; /* success */ })
-    .catch(() => { return 0; /* failure */ });
+      try {
+        await models.Token.findOrCreate({ where });
+      } catch (e) {
+        log.info(`Could not add ${token.name}: ${e.message}`);
+        log.info(JSON.stringify(where, null, 2));
+      }
+    }
+  }
 }
 
 export default addTokenListsToDatabase;

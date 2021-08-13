@@ -27,7 +27,7 @@ export default (
     name: { type: dataTypes.STRING, allowNull: false },
     address: { type: dataTypes.STRING, allowNull: false },
     symbol: { type: dataTypes.STRING, allowNull: false },
-    icon_url: { type: dataTypes.STRING, allowNull: true },
+    icon_url: { type: dataTypes.STRING(1024), allowNull: true },
   }, {
     tableName: 'Tokens',
     timestamps: false,
