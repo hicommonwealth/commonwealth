@@ -11,13 +11,6 @@ export interface IMarlinProposalResponse {
   id: string;
 
   proposer: string; // author
-  description: string;
-
-  targets: string[];
-  values: string[];
-  signatures: string[];
-  calldatas: string[];
-
   startBlock: number;
   endBlock: number;
   eta: number; // The timestamp that the proposal will be available for execution, set once the vote succeeds

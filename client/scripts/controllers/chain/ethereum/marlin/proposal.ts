@@ -67,11 +67,6 @@ const backportEntityToAdapter = (
   const identifier = `${(startEvent.data as MarlinTypes.IProposalCreated).id}`;
   const id = identifier;
   const proposer = `${(startEvent.data as MarlinTypes.IProposalCreated).proposer}`;
-  const description = `${(startEvent.data as MarlinTypes.IProposalCreated).description}`;
-  const targets = (startEvent.data as MarlinTypes.IProposalCreated).targets;
-  const values = (startEvent.data as MarlinTypes.IProposalCreated).values;
-  const signatures = (startEvent.data as MarlinTypes.IProposalCreated).signatures;
-  const calldatas = (startEvent.data as MarlinTypes.IProposalCreated).calldatas;
   const startBlock = (startEvent.data as MarlinTypes.IProposalCreated).startBlock;
   const endBlock = (startEvent.data as MarlinTypes.IProposalCreated).endBlock;
   const eta = null;
@@ -88,11 +83,6 @@ const backportEntityToAdapter = (
     identifier,
     id,
     proposer,
-    description,
-    targets,
-    values,
-    signatures,
-    calldatas,
     startBlock,
     endBlock,
     eta,
@@ -101,25 +91,6 @@ const backportEntityToAdapter = (
     canceled,
     executed,
   };
-
-  // TODO: Remove after working
-  // const proposal: IMarlinProposalResponse = {
-  //   identifier: null,
-  //   id: null,
-  //   proposer: null,
-  //   description: null,
-  //   targets: null,
-  //   values: null,
-  //   signatures: null,
-  //   calldatas: null,
-  //   startBlock: null,
-  //   endBlock: null,
-  //   eta: null,
-  //   forVotes: null,
-  //   againstVotes: null,
-  //   canceled: null,
-  //   executed: null,
-  // };
 
   return proposal;
 };
@@ -136,21 +107,7 @@ export default class MarlinProposal extends Proposal<
 
   public get shortIdentifier() { return `MarlinProposal-${this.data.identifier}`; }
   public get title(): string {
-    try {
-      const parsed = JSON.parse(this.data.description);
-      // eslint-disable-next-line no-prototype-builtins
-      if (parsed && parsed.hasOwnProperty('title')) {
-        return parsed.title as string;
-      } else {
-        return this.data.description;
-      }
-    } catch {
-      if (this.data.description) {
-        return this.data.description;
-      } else {
-        return `Marlin Proposal #${this.data.identifier}`;
-      }
-    }
+    return `Marlin Proposal #${this.data.identifier}`;
   }
   public get description(): string {
     return '';
@@ -168,9 +125,12 @@ export default class MarlinProposal extends Proposal<
   public get startingPeriod() { return +this.data.startBlock; }
   public get votingPeriodEnd() { return this.startingPeriod + +this._Gov.votingPeriod; }
 
+  private _state: MarlinProposalState;
   public async state(): Promise<MarlinProposalState> {
-    const state = await this._Gov.state(this.identifier);
-    return state;
+    if (!this._state) {
+      this._state = await this._Gov.state(this.identifier);
+    }
+    return this._state;
   }
 
   public get endTime(): ProposalEndTime { // TODO: Get current block and subtract from endBlock * 15s

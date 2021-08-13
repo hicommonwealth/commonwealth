@@ -3,6 +3,7 @@ import 'pages/delegate.scss';
 import m from 'mithril';
 import app from 'state';
 import { ChainNetwork } from 'models';
+import { AaveTypes, MarlinTypes } from '@commonwealth/chain-events';
 
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
@@ -11,7 +12,6 @@ import Aave from 'controllers/chain/ethereum/aave/adapter';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { Grid, Col, List, Form, FormGroup, FormLabel, Input, Button } from 'construct-ui';
 import PageNotFound from './404';
-import { AaveTypes, MarlinTypes } from '@commonwealth/chain-events';
 
 const DelegateStats: m.Component<{ currentDelegate: string, }> = {
   view: (vnode) => {
