@@ -41,11 +41,11 @@ import RoleFactory, { RoleModelStatic } from './models/role';
 import SocialAccountFactory, { SocialAccountModelStatic } from './models/social_account';
 import StarredCommunityFactory, { StarredCommunityModelStatic } from './models/starred_community';
 import SubscriptionFactory, { SubscriptionModelStatic } from './models/subscription';
+import TokenFactory, { TokenModelStatic } from './models/token';
 import TaggedThreadFactory, { TaggedThreadModelStatic } from './models/tagged_threads';
 import UserModelFactory, { UserModelStatic } from './models/user';
 import WaitlistRegistrationFactory, { WaitlistRegistrationModelStatic } from './models/waitlist_registration';
 import WebhookFactory, { WebhookModelStatic } from './models/webhook';
-
 
 export type Models = {
     Address: AddressModelStatic;
@@ -82,6 +82,7 @@ export type Models = {
     SocialAccount: SocialAccountModelStatic;
     StarredCommunity: StarredCommunityModelStatic;
     Subscription: SubscriptionModelStatic;
+    Token: TokenModelStatic;
     TaggedThread: TaggedThreadModelStatic;
     User: UserModelStatic;
     WaitlistRegistration: WaitlistRegistrationModelStatic;
@@ -149,6 +150,7 @@ const models: Models = {
   SocialAccount: SocialAccountFactory(sequelize, DataTypes),
   StarredCommunity: StarredCommunityFactory(sequelize, DataTypes),
   Subscription: SubscriptionFactory(sequelize, DataTypes),
+  Token: TokenFactory(sequelize, DataTypes),
   TaggedThread: TaggedThreadFactory(sequelize, DataTypes),
   User: UserModelFactory(sequelize, DataTypes),
   WaitlistRegistration: WaitlistRegistrationFactory(sequelize, DataTypes),

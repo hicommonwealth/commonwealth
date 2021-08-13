@@ -1,13 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
+import { Op } from 'sequelize';
 import { sequelize, DB } from '../database';
-import TokenBalanceCache from '../util/tokenBalanceCache';
 
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 const getTokenForum = async (
   models: DB,
-  tokenBalanceCache: TokenBalanceCache,
   req: Request,
   res: Response,
   next: NextFunction
@@ -16,7 +15,7 @@ const getTokenForum = async (
   if (!address) {
     return res.json({ status: 'Failure', message: 'Must provide token address' });
   }
-  const token = tokenBalanceCache.getToken(address);
+  const token = await models.Token.findOne({ where: { address: { [Op.iLike]: address } } });
   if (token) {
     try {
       const result = await sequelize.transaction(async (t) => {
@@ -26,7 +25,7 @@ const getTokenForum = async (
             active: true,
             network: token.id,
             type: 'token',
-            icon_url: token.iconUrl,
+            icon_url: token.icon_url,
             symbol: token.symbol,
             name: token.name,
             base: 'ethereum',
