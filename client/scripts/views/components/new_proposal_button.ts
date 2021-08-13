@@ -40,7 +40,11 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
         iconLeft: mobile ? Icons.PLUS : undefined,
       })
     )),
-    (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
+    (app.chain?.network === ChainNetwork.Aave || 
+      app.chain?.network === ChainNetwork.dYdX ||
+      app.chain?.network === ChainNetwork.Marlin ||
+      app.chain?.base === ChainBase.CosmosSDK || 
+      app.chain?.base === ChainBase.Substrate)
       && !mobile
       && m(MenuDivider),
     app.chain?.base === ChainBase.CosmosSDK && m(MenuItem, {
@@ -48,6 +52,21 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
         type: ProposalType.CosmosProposal
       }),
       label: 'New text proposal',
+      iconLeft: mobile ? Icons.PLUS : undefined,
+    }),
+    app.chain?.base === ChainBase.Ethereum && app.chain?.network === ChainNetwork.Aave
+     && m(MenuItem, {
+      onclick: (e) => navigateToSubpage('/new/proposal/:type', {
+        type: ProposalType.AaveProposal
+      }),
+      label: 'New On-Chain Proposal',
+      iconLeft: mobile ? Icons.PLUS : undefined,
+    }),
+    app.chain?.base === ChainBase.Ethereum && app.chain?.network === ChainNetwork.Marlin && m(MenuItem, {
+      onclick: (e) => navigateToSubpage('/new/proposal/:type', {
+        type: ProposalType.MarlinProposal
+      }),
+      label: 'New On-Chain Proposal',
       iconLeft: mobile ? Icons.PLUS : undefined,
     }),
     app.chain?.base === ChainBase.Substrate && app.chain?.network !== ChainNetwork.Plasm && [
