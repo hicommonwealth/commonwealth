@@ -39,6 +39,7 @@ import deleteCommunity from './routes/deleteCommunity';
 import updateCommunity from './routes/updateCommunity';
 import communityStats from './routes/communityStats';
 import getCommunitiesAndChains from './routes/getCommunitiesAndChains';
+import createChain from './routes/createChain';
 import viewCount from './routes/viewCount';
 import updateEmail from './routes/updateEmail';
 
@@ -65,7 +66,6 @@ import acceptInviteLink from './routes/acceptInviteLink';
 import getInviteLinks from './routes/getInviteLinks';
 import deleteGithubAccount from './routes/deleteGithubAccount';
 import getProfile from './routes/getProfile';
-
 
 import createRole from './routes/createRole';
 import deleteRole from './routes/deleteRole';
@@ -199,6 +199,8 @@ function setupRouter(
   router.get('/communityStats', passport.authenticate('jwt', { session: false }), communityStats.bind(this, models));
   router.get('/getTokensFromLists', getTokensFromLists.bind(this, models, tokenBalanceCache));
   router.get('/getTokenForum', getTokenForum.bind(this, models, tokenBalanceCache));
+  // TODO: Change to POST /chain
+  router.post('/createChain', passport.authenticate('jwt', { session: false }), createChain.bind(this, models));
 
   // offchain threads
   // TODO: Change to POST /thread

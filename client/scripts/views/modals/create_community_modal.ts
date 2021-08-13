@@ -9,6 +9,7 @@ import mixpanel from 'mixpanel-browser';
 import { Table, Tabs, TabItem, Button } from 'construct-ui';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { constructSubstrateUrl } from 'substrate';
+import Web3 from 'web3';
 
 import { CompactModalExitButton } from 'views/modal';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
@@ -245,7 +246,7 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
           title: 'Spec (JSON)',
           defaultValue: vnode.state.substrate_spec,
           textarea: true,
-          placeholder: `{"types": {"Address": "MultiAddress", "ChainId": "u8", "Reveals": "Vec<(AccountId, Vec<VoteOutcome>)>", "Balance2": "u128", "VoteData": {"stage": "VoteStage", "initiator": "AccountId", "vote_type": "VoteType", "tally_type": "TallyType", "is_commit_reveal": "bool"}, "VoteType": {"_enum": ["Binary", "MultiOption", "RankedChoice"]}, "TallyType": {"_enum": ["OnePerson", "OneCoin"]}, "VoteStage": {"_enum": ["PreVoting", "Commit", "Voting", "Completed"]}, "ResourceId": "[u8; 32]", "VoteRecord": {"id": "u64", "data": "VoteData", "reveals": "Reveals", "outcomes": "Vec<VoteOutcome>", "commitments": "Commitments"}, "AccountInfo": "AccountInfoWithRefCount", "Commitments": "Vec<(AccountId, VoteOutcome)>", "VoteOutcome": "[u8; 32]", "VotingTally": "Option<Vec<(VoteOutcome, u128)>>", "DepositNonce": "u64", "LookupSource": "MultiAddress", "ProposalTitle": "Bytes", "ProposalVotes": {"staus": "ProposalStatus", "expiry": "BlockNumber", "votes_for": "Vec<AccountId>", "votes_against": "Vec<AccountId>"}, "ProposalRecord": {"index": "u32", "stage": "VoteStage", "title": "Text", "author": "AccountId", "vote_id": "u64", "contents": "Text", "transition_time": "u32"}, "ProposalStatus": {"_enum": ["Initiated", "Approved", "Rejected"]}, "ProposalContents": "Bytes"}}`,
+          placeholder: '{"types": {"Address": "MultiAddress", "ChainId": "u8", "Reveals": "Vec<(AccountId, Vec<VoteOutcome>)>", "Balance2": "u128", "VoteData": {"stage": "VoteStage", "initiator": "AccountId", "vote_type": "VoteType", "tally_type": "TallyType", "is_commit_reveal": "bool"}, "VoteType": {"_enum": ["Binary", "MultiOption", "RankedChoice"]}, "TallyType": {"_enum": ["OnePerson", "OneCoin"]}, "VoteStage": {"_enum": ["PreVoting", "Commit", "Voting", "Completed"]}, "ResourceId": "[u8; 32]", "VoteRecord": {"id": "u64", "data": "VoteData", "reveals": "Reveals", "outcomes": "Vec<VoteOutcome>", "commitments": "Commitments"}, "AccountInfo": "AccountInfoWithRefCount", "Commitments": "Vec<(AccountId, VoteOutcome)>", "VoteOutcome": "[u8; 32]", "VotingTally": "Option<Vec<(VoteOutcome, u128)>>", "DepositNonce": "u64", "LookupSource": "MultiAddress", "ProposalTitle": "Bytes", "ProposalVotes": {"staus": "ProposalStatus", "expiry": "BlockNumber", "votes_for": "Vec<AccountId>", "votes_against": "Vec<AccountId>"}, "ProposalRecord": {"index": "u32", "stage": "VoteStage", "title": "Text", "author": "AccountId", "vote_id": "u64", "contents": "Text", "transition_time": "u32"}, "ProposalStatus": {"_enum": ["Initiated", "Approved", "Rejected"]}, "ProposalContents": "Bytes"}}',
           onChangeHandler: (v) => { vnode.state.substrate_spec = v; },
         }),
         m(InputPropertyRow, {
@@ -356,6 +357,188 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
   }
 };
 
+interface ERC20FormAttrs {}
+
+interface ERC20FormState {
+  address: string,
+  name: string,
+  symbol: string,
+  icon_url: string,
+  website: string,
+  discord: string,
+  element: string,
+  telegram: string,
+  github: string,
+  description: string,
+  saving: boolean,
+  loaded: boolean,
+  error: string
+}
+
+const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
+  oninit: (vnode) => {
+    vnode.state.address = '';
+    vnode.state.name = '';
+    vnode.state.symbol = '';
+    vnode.state.icon_url = '';
+    vnode.state.website = '';
+    vnode.state.discord = '';
+    vnode.state.element = '';
+    vnode.state.telegram = '';
+    vnode.state.github = '';
+    vnode.state.description = '';
+    vnode.state.saving = false;
+    vnode.state.loaded = false;
+    vnode.state.error = '';
+  },
+  view: (vnode) => {
+    const validAddress = Web3.utils.isAddress(vnode.state.address);
+    const disableField = !validAddress || !vnode.state.loaded;
+
+    return m('.compact-modal-body-max', [
+      m('.CommunityMetadataManagementTable', [m(Table, {
+        bordered: false,
+        interactive: false,
+        striped: false,
+        class: 'metadata-management-table',
+      }, [
+        m(InputPropertyRow, {
+          title: 'Address',
+          defaultValue: vnode.state.address,
+          onChangeHandler: (v) => {
+            vnode.state.address = v;
+            vnode.state.loaded = false;
+            if (Web3.utils.isAddress(v)) {
+              $.get(`${app.serverUrl()}/getTokenForum`, { address: v }).then(async (res) => {
+                vnode.state.name = res?.result?.chain?.name || '';
+                vnode.state.symbol = res?.result?.chain?.symbol || '';
+                vnode.state.icon_url = res?.result?.chain?.icon_url || '';
+                vnode.state.description = res?.result?.chain?.description || '';
+                vnode.state.website = res?.result?.chain?.website || '';
+                vnode.state.discord = res?.result?.chain?.discord || '';
+                vnode.state.element = res?.result?.chain?.element || '';
+                vnode.state.telegram = res?.result?.chain?.telegram || '';
+                vnode.state.github = res?.result?.chain?.github || '';
+                vnode.state.loaded = true;
+              }).catch((err: any) => {
+                notifyError(err.responseJSON?.error || 'Failed to load Token Information');
+              });
+            }
+          },
+        }),
+        m(InputPropertyRow, {
+          title: 'Name',
+          defaultValue: vnode.state.name,
+          disabled: disableField,
+          onChangeHandler: (v) => { vnode.state.name = v; },
+        }),
+        m(InputPropertyRow, {
+          title: 'Symbol',
+          disabled: disableField,
+          defaultValue: vnode.state.symbol,
+          placeholder: 'XYZ',
+          onChangeHandler: (v) => { vnode.state.symbol = v; },
+        }),
+        m(InputPropertyRow, {
+          title: 'Icon URL',
+          disabled: disableField,
+          defaultValue: vnode.state.icon_url,
+          placeholder: 'https://',
+          onChangeHandler: (v) => { vnode.state.icon_url = v; },
+        }),
+        m(InputPropertyRow, {
+          title: 'Description',
+          disabled: disableField,
+          defaultValue: vnode.state.description,
+          onChangeHandler: (v) => { vnode.state.description = v; },
+          textarea: true,
+        }),
+        m(InputPropertyRow, {
+          title: 'Website',
+          disabled: disableField,
+          defaultValue: vnode.state.website,
+          placeholder: 'https://example.com',
+          onChangeHandler: (v) => { vnode.state.website = v; },
+        }),
+        m(InputPropertyRow, {
+          title: 'Discord',
+          disabled: disableField,
+          defaultValue: vnode.state.discord,
+          placeholder: 'https://discord.com/invite',
+          onChangeHandler: (v) => { vnode.state.discord = v; },
+        }),
+        m(InputPropertyRow, {
+          title: 'Element',
+          disabled: disableField,
+          defaultValue: vnode.state.element,
+          placeholder: 'https://matrix.to/#',
+          onChangeHandler: (v) => { vnode.state.element = v; },
+        }),
+        m(InputPropertyRow, {
+          title: 'Telegram',
+          disabled: disableField,
+          defaultValue: vnode.state.telegram,
+          placeholder: 'https://t.me',
+          onChangeHandler: (v) => { vnode.state.telegram = v; },
+        }),
+        m(InputPropertyRow, {
+          title: 'Github',
+          disabled: disableField,
+          defaultValue: vnode.state.github,
+          placeholder: 'https://github.com',
+          onChangeHandler: (v) => { vnode.state.github = v; },
+        }),
+      ]),
+      m(Button, {
+        label: 'Save changes',
+        intent: 'primary',
+        disabled: vnode.state.saving || !validAddress || !vnode.state.loaded,
+        onclick: async (e) => {
+          const {
+            address,
+            name,
+            description,
+            symbol,
+            icon_url,
+            website,
+            discord,
+            element,
+            telegram,
+            github,
+          } = vnode.state;
+          vnode.state.saving = true;
+          $.post(`${app.serverUrl()}/createChain`, {
+            address,
+            name,
+            description,
+            icon_url,
+            symbol,
+            website,
+            discord,
+            element,
+            telegram,
+            github,
+            jwt: app.user.jwt,
+            type: 'token',
+            base: 'ethereum',
+            network: slugify(name),
+            node_url: 'wss://mainnet.infura.io/ws',
+          }).then(async (res) => {
+            await initAppState(false);
+            $(e.target).trigger('modalexit');
+            m.route.set(`/${res.result.chain?.id}`);
+          }).catch((err: any) => {
+            notifyError(err.responseJSON?.error || 'Creating new ERC20 community failed');
+          }).always(() => {
+            vnode.state.saving = false;
+          });
+        },
+      }),
+      ]),
+    ]);
+  }
+};
+
 interface CreateCommunityAttrs {}
 interface CreateCommunityState {
   activeForm: string;
@@ -387,13 +570,20 @@ const CreateCommunityModal: m.Component<CreateCommunityAttrs, CreateCommunitySta
           active: vnode.state.activeForm === 'offchain',
           onclick: () => { vnode.state.activeForm = 'offchain'; return null; },
         }),
+        m(TabItem, {
+          label: 'ERC20',
+          active: vnode.state.activeForm === 'erc20',
+          onclick: () => { vnode.state.activeForm = 'erc20'; return null; },
+        }),
         app.user.isSiteAdmin && m(TabItem, {
           label: 'Substrate',
           active: vnode.state.activeForm === 'substrate',
           onclick: () => { vnode.state.activeForm = 'substrate'; return null; },
         }),
       ]),
-      vnode.state.activeForm === 'offchain' ? m(OffchainCommunityForm) : m(SubstrateForm)
+      vnode.state.activeForm === 'offchain' && m(OffchainCommunityForm),
+      vnode.state.activeForm === 'erc20' && m(ERC20Form),
+      vnode.state.activeForm === 'substrate' && m(SubstrateForm),
     ]);
   }
 };
