@@ -1,4 +1,6 @@
 import * as Sequelize from 'sequelize';
+import { Model, DataTypes } from 'sequelize';
+import { ModelStatic } from './types';
 
 export interface HedgehogAuthenticationAttributes {
   iv: string;
@@ -9,28 +11,23 @@ export interface HedgehogAuthenticationAttributes {
 }
 
 export interface HedgehogAuthenticationInstance
-extends Sequelize.Instance<HedgehogAuthenticationAttributes>, HedgehogAuthenticationAttributes {
+extends Model<HedgehogAuthenticationAttributes>, HedgehogAuthenticationAttributes {}
 
-}
-
-export interface HedgehogAuthenticationModel extends Sequelize.Model<
-  HedgehogAuthenticationInstance, HedgehogAuthenticationAttributes
-> {
-
-}
+export type HedgehogAuthenticationModelStatic = ModelStatic<HedgehogAuthenticationInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): HedgehogAuthenticationModel => {
-  const HedgehogAuthentication = sequelize.define<
-    HedgehogAuthenticationInstance, HedgehogAuthenticationAttributes
-  >('HedgehogAuthentication', {
+  dataTypes: typeof DataTypes,
+): HedgehogAuthenticationModelStatic => {
+  const HedgehogAuthentication = <HedgehogAuthenticationModelStatic>sequelize.define('HedgehogAuthentication', {
     iv:         { type: dataTypes.STRING, allowNull: false },
     cipherText: { type: dataTypes.STRING, allowNull: false },
     lookupKey:  { type: dataTypes.STRING, allowNull: false, unique: true, primaryKey: true },
   }, {
-    underscored: true
+    tableName: 'HedgehogAuthentications',
+    underscored: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
   });
 
   return HedgehogAuthentication;

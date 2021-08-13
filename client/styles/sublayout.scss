@@ -104,8 +104,8 @@
     }
     @include md-max {
         .sublayout-main-col {
-            width: 100%;
-            // max-width: none;
+            min-width: 100%;
+            max-width: 100%;
             padding: 0;
         }
     }
@@ -160,7 +160,7 @@
             }
             .CommunitySelector,
             .sublayout-header-heading {
-                display: inline-block;
+                display: flex;
             }
             h3 {
                 font-size: 1.15rem;
@@ -190,6 +190,13 @@
                         content: ' ';
                         width: 5px;
                     }
+                }
+
+                .sublayout-header-heading-wrapper {
+                    max-width: 200px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
                 }
             }
         }

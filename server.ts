@@ -28,7 +28,6 @@ import addTokenListsToDatabase from './server/util/addTokenListsToDatabase';
 import { SESSION_SECRET, ROLLBAR_SERVER_TOKEN } from './server/config';
 import models from './server/database';
 import { updateEvents, updateBalances } from './server/util/eventPoller';
-import resetServer from './server/scripts/resetServer';
 import setupAppRoutes from './server/scripts/setupAppRoutes';
 import setupServer from './server/scripts/setupServer';
 import setupErrorHandlers from './server/scripts/setupErrorHandlers';
@@ -50,7 +49,6 @@ async function main() {
 
   // CLI parameters for which task to run
   const SHOULD_SEND_EMAILS = process.env.SEND_EMAILS === 'true';
-  const SHOULD_RESET_DB = process.env.RESET_DB === 'true';
   const SHOULD_UPDATE_EVENTS = process.env.UPDATE_EVENTS === 'true';
   const SHOULD_UPDATE_BALANCES = process.env.UPDATE_BALANCES === 'true';
   const SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS = process.env.UPDATE_EDGEWARE_LOCKDROP_STATS === 'true';
@@ -58,7 +56,6 @@ async function main() {
 
   const NO_CLIENT_SERVER = process.env.NO_CLIENT === 'true'
     || SHOULD_SEND_EMAILS
-    || SHOULD_RESET_DB
     || SHOULD_UPDATE_EVENTS
     || SHOULD_UPDATE_BALANCES
     || SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS
@@ -111,8 +108,6 @@ async function main() {
     return;
   } else if (SHOULD_SEND_EMAILS) {
     rc = await sendBatchedNotificationEmails(models);
-  } else if (SHOULD_RESET_DB) {
-    rc = await resetServer(models);
   } else if (SHOULD_UPDATE_EVENTS) {
     rc = await updateEvents(app, models);
   } else if (SHOULD_LOAD_DATABASE_FROM_TOKEN_LISTS) {

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../../shared/logging';
+import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -11,7 +12,7 @@ export const Errors = {
   InvalidSetting: 'Invalid setting',
 };
 
-const writeUserSetting = async (models, req: Request, res: Response, next: NextFunction) => {
+const writeUserSetting = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const { key, value } = req.body;
 
   if (!req.user) {

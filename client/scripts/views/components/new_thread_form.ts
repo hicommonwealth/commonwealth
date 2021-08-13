@@ -28,7 +28,6 @@ import EditProfileModal from 'views/modals/edit_profile_modal';
 import QuillFormattedText from './quill_formatted_text';
 import MarkdownFormattedText from './markdown_formatted_text';
 
-
 interface IThreadForm {
   topicName?: string;
   topicId?: number;
@@ -562,6 +561,7 @@ export const NewThreadForm: m.Component<{
               },
               placeholder: 'Comment (optional)',
               editorNamespace: 'new-link',
+              imageUploader: true,
               tabindex: 4,
             })
           ]),
@@ -654,6 +654,7 @@ export const NewThreadForm: m.Component<{
                 vnode.state.quillEditorState = state;
               },
               editorNamespace: 'new-discussion',
+              imageUploader: true,
               tabindex: 3,
             }),
           ]),

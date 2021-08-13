@@ -10,6 +10,7 @@ const testSubstrateSpec = async (specString: string, nodeUrl: string) => {
   // test out spec
   // get spec from request
   let unpackedSpec: RegisteredTypes;
+  log.info('Parsing spec...');
   try {
     unpackedSpec = JSON.parse(specString);
   } catch (e) {
@@ -23,6 +24,7 @@ const testSubstrateSpec = async (specString: string, nodeUrl: string) => {
     typesSpec: unpackedSpec['typesSpec'],
   };
 
+  log.info('Connecting to node...');
   const provider = new WsProvider(constructSubstrateUrl(nodeUrl), false);
   try {
     await provider.connect();
@@ -30,12 +32,17 @@ const testSubstrateSpec = async (specString: string, nodeUrl: string) => {
     throw new Error('failed to connect to node url');
   }
   try {
+    log.info('Fetching chain properties...');
     const api = await ApiPromise.create({ provider, ...sanitizedSpec });
     const version = api.runtimeVersion;
     const props = await api.rpc.system.properties();
     log.info(`Fetched version: ${version.specName}:${version.specVersion} and properties ${JSON.stringify(props)}`);
+    log.info('Disconnecting from chain...');
+    await api.disconnect();
     return sanitizedSpec;
   } catch (err) {
+    log.info('Disconnecting from provider in error...');
+    await provider.disconnect();
     throw new Error(`failed to initialize polkadot api: ${err.message}`);
   }
 };

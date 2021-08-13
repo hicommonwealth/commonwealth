@@ -21,7 +21,7 @@
         display: flex;
         max-width: 100%;
         .aave-author {
-            max-width: calc(70% - 15px);
+            width: calc(70% - 15px);
             padding-right: 15px;
             .detail-highlight {
                 overflow-x: hidden;
@@ -45,7 +45,7 @@
             display: grid;
             grid-template-columns: 52px auto;
             .detail-highlight {
-                justify-self: end;
+                justify-self: start;
             }
         }
     }

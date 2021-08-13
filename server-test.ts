@@ -121,7 +121,7 @@ const resetServer = (debug=false): Promise<void> => {
         active: true,
         type: 'chain',
         base: 'substrate',
-        ss58_prefix: '7',
+        ss58_prefix: 7,
       });
       const eth = await models['Chain'].create({
         id: 'ethereum',
@@ -172,7 +172,7 @@ const resetServer = (debug=false): Promise<void> => {
           user_id: 1,
           address: '0x34C3A5ea06a3A67229fb21a7043243B0eB3e853f',
           chain: 'ethereum',
-          selected: true,
+          // selected: true,
           verification_token: 'PLACEHOLDER',
           verification_token_expires: null,
           verified: new Date(),
@@ -182,7 +182,7 @@ const resetServer = (debug=false): Promise<void> => {
           chain: 'edgeware',
           verification_token: 'PLACEHOLDER',
           verification_token_expires: null,
-          verified: true,
+          verified: new Date(),
           keytype: 'sr25519',
         }),
         models['Address'].create({
@@ -190,7 +190,7 @@ const resetServer = (debug=false): Promise<void> => {
           chain: 'edgeware',
           verification_token: 'PLACEHOLDER',
           verification_token_expires: null,
-          verified: true,
+          verified: new Date(),
           keytype: 'sr25519',
         }),
         models['Address'].create({
@@ -198,7 +198,7 @@ const resetServer = (debug=false): Promise<void> => {
           chain: 'edgeware',
           verification_token: 'PLACEHOLDER',
           verification_token_expires: null,
-          verified: true,
+          verified: new Date(),
           keytype: 'sr25519',
         }),
       ]);

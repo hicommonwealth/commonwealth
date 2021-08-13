@@ -125,10 +125,13 @@ import getTokenForum from './routes/getTokenForum';
 import getSubstrateSpec from './routes/getSubstrateSpec';
 import editSubstrateSpec from './routes/editSubstrateSpec';
 import { getStatsDInstance } from './util/metrics';
+import { DB } from './database';
+
+import { sendMessage } from './routes/snapshotAPI';
 
 function setupRouter(
   app,
-  models,
+  models: DB,
   viewCountCache: ViewCountCache,
   identityFetchCache: IdentityFetchCache,
   tokenBalanceCache: TokenBalanceCache
@@ -493,6 +496,8 @@ function setupRouter(
 
   // TODO: Change to GET /entities
   router.get('/bulkEntities', bulkEntities.bind(this, models));
+
+  router.post('/snapshotAPI/sendMessage', sendMessage.bind(this));
 
   app.use('/api', router);
 }

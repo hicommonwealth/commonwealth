@@ -8,6 +8,7 @@ import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
 import { parseUserMentions } from '../util/parseUserMentions';
 import TokenBalanceCache from '../util/tokenBalanceCache';
+import { DB } from '../database';
 
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
@@ -24,7 +25,7 @@ export const Errors = {
 };
 
 const createThread = async (
-  models,
+  models: DB,
   tokenBalanceCache: TokenBalanceCache,
   req: Request,
   res: Response,
@@ -233,8 +234,8 @@ const createThread = async (
         try {
           return models.Address.findOne({
             where: {
-              chain: mention[0],
-              address: mention[1],
+              chain: mention[0] || null,
+              address: mention[1] || null,
             },
             include: [ models.User, models.Role ]
           });

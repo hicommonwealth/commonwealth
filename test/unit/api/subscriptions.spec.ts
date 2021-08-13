@@ -188,16 +188,16 @@ describe('Subscriptions Tests', () => {
     });
 
     it('should make new-comment subscription on chainEntity', async () => {
-      let res = await models['ChainEntity'].create({
+      const entityInstance = await models['ChainEntity'].create({
         chain: 'edgeware',
         type: 'treasury-proposal',
         type_id: '6',
         completed: false,
       });
-      const object_id = `treasuryproposal_${res.type_id}`;
+      const object_id = `treasuryproposal_${entityInstance.type_id}`;
       const is_active = true;
       const category = NotificationCategories.NewComment;
-      res = await chai.request(app)
+      const res = await chai.request(app)
         .post('/api/createSubscription')
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, category, is_active, object_id, chain_id: 'edgeware' });
@@ -209,16 +209,16 @@ describe('Subscriptions Tests', () => {
     });
 
     it('should fail to make new-comment subscription on chainEntity without chain', async () => {
-      let res = await models['ChainEntity'].create({
+      const chainEntity = await models['ChainEntity'].create({
         chain: 'edgeware',
         type: 'treasury-proposal',
         type_id: '6',
         completed: false,
       });
-      const object_id = `treasuryproposal_${res.type_id}`;
+      const object_id = `treasuryproposal_${chainEntity.type_id}`;
       const is_active = true;
       const category = NotificationCategories.NewComment;
-      res = await chai.request(app)
+      const res = await chai.request(app)
         .post('/api/createSubscription')
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, category, is_active, object_id, });
@@ -262,7 +262,6 @@ describe('Subscriptions Tests', () => {
       expect(res.body.error).to.be.equal(Errors.NoThread);
     });
 
-
     it('should make chain-event subscription', async () => {
       const object_id = 'edgeware-democracy-proposed';
       const is_active = true;
@@ -277,7 +276,6 @@ describe('Subscriptions Tests', () => {
       expect(res.body.result.object_id).to.equal(`${object_id}`);
       expect(res.body.result.is_active).to.be.equal(true);
     });
-
 
     it('should fail to make chain-event subscription with invalid type', async () => {
       const object_id = 'edgeware-onchain-party';
@@ -339,9 +337,8 @@ describe('Subscriptions Tests', () => {
       expect(res.body.error).to.be.equal(Errors.NoCategoryAndObjectId);
     });
 
-
     it('should check /viewSubscriptions for all', async () => {
-      const res1 = await modelUtils.createSubscription({
+      const subscription = await modelUtils.createSubscription({
         object_id: community,
         jwt: jwtToken,
         is_active: true,
@@ -686,7 +683,7 @@ describe('Subscriptions Tests', () => {
       it('should fail when not the owner of the notification', async () => {
         expect(notifications).to.not.be.null;
         // create fake user who doesn't have any notifications
-        const user = await models['User'].create({ email: 'test@dummy.com' });
+        const user = await models.User.create({ email: 'test@dummy.com' });
         // get existing notif in the DB
         const notification_ids = (await models['Notification'].findAll()).map((n) => { return n.id; });
         const result = await modelUtils.createAndVerifyAddress({ chain });
