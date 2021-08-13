@@ -12575,6 +12575,11 @@ multihashes@~0.4.15:
     bs58 "^4.0.1"
     varint "^5.0.0"
 
+mustache@^4.0.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/mustache/-/mustache-4.2.0.tgz#e5892324d60a12ec9c2a73359edca52972bf6f64"
+  integrity sha512-71ippSywq5Yb7/tVYyGbkBggbU8H3u5Rz56fH60jGFgr8uHwxs+aSKeqmluIVzM0m0kB7xQjKS6qPfd0b2ZoqQ==
+
 nan@^2.0.8, nan@^2.12.1, nan@^2.13.2, nan@^2.14.0:
   version "2.14.0"
   resolved "https://registry.npmjs.org/nan/-/nan-2.14.0.tgz"
@@ -12617,10 +12622,10 @@ natural-compare@^1.4.0:
   resolved "https://registry.npmjs.org/natural-compare/-/natural-compare-1.4.0.tgz"
   integrity sha1-Sr6/7tdUHywnrPspvbvRXI1bpPc=
 
-nearlib@^0.17.0:
-  version "0.17.3"
-  resolved "https://registry.npmjs.org/nearlib/-/nearlib-0.17.3.tgz"
-  integrity sha512-RCwVJtW95C8mpYEVwDRDa/JyDnRORjERr5mX8tsvC9gCnA2KfRq60RKfl/OyeHk+waJWqAuq9xoc50fTk19AJA==
+nearlib@^0.22.0:
+  version "0.22.0"
+  resolved "https://registry.yarnpkg.com/nearlib/-/nearlib-0.22.0.tgz#e7e9ed88752fb533c0920720f962f97395ddfec6"
+  integrity sha512-6yTc5Ti5oHFak8GSvuzHF7gTRIXRDIs822LiIqJWqoJ5emWktAZqWowS9taAazfG/joU2H0B3WX5Z46oIv4U0w==
   dependencies:
     "@types/bn.js" "^4.11.5"
     bn.js "^5.0.0"
@@ -12628,6 +12633,7 @@ nearlib@^0.17.0:
     error-polyfill "^0.1.2"
     http-errors "^1.7.2"
     js-sha256 "^0.9.0"
+    mustache "^4.0.0"
     node-fetch "^2.3.0"
     text-encoding-utf-8 "^1.0.2"
     tweetnacl "^1.0.1"
@@ -16317,7 +16323,7 @@ semver-diff@^2.0.0:
   dependencies:
     semver "^5.0.3"
 
-"semver@2 || 3 || 4 || 5", semver@^5.0.3, semver@^5.1.0, semver@^5.3.0, semver@^5.4.1, semver@^5.5.0, semver@^5.6.0, semver@^5.7.0, semver@^5.7.1:
+"semver@2 || 3 || 4 || 5", semver@^5.0.1, semver@^5.0.3, semver@^5.1.0, semver@^5.3.0, semver@^5.4.1, semver@^5.5.0, semver@^5.6.0, semver@^5.7.0, semver@^5.7.1:
   version "5.7.1"
   resolved "https://registry.npmjs.org/semver/-/semver-5.7.1.tgz"
   integrity sha512-sauaDf/PZdVgrLTNYHRtpXa1iRiKcaebiKQ1BJdpQlWH2lCvexQdX55snPFyK7QzpudqbCI0qXFfOasHdyNDGQ==
@@ -16604,6 +16610,14 @@ simple-swizzle@^0.2.2:
   integrity sha1-pNprY1/8zMoz9w0Xy5JZLeleVXo=
   dependencies:
     is-arrayish "^0.3.1"
+
+simplepicker@^2.0.4:
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/simplepicker/-/simplepicker-2.0.4.tgz#a8c24dc1058a467be3e91d2623285f009c97c3fd"
+  integrity sha512-A3XnoPRFuVEKaleQP2sdpK8DVav91kMmUexU3GSFsszU79GUwJSJx9vTmgzqPngjbfxTA2OHVOP3SDfT396VZg==
+  dependencies:
+    ts-loader "^5.4.3"
+    typescript "^3.4.5"
 
 simplestatemanager@^4.1.1:
   version "4.1.1"
@@ -17887,6 +17901,17 @@ ts-invariant@^0.8.0:
   dependencies:
     tslib "^2.1.0"
 
+ts-loader@^5.4.3:
+  version "5.4.5"
+  resolved "https://registry.yarnpkg.com/ts-loader/-/ts-loader-5.4.5.tgz#a0c1f034b017a9344cef0961bfd97cc192492b8b"
+  integrity sha512-XYsjfnRQCBum9AMRZpk2rTYSVpdZBpZK+kDh0TeT3kxmQNBDVIeUjdPjY5RZry4eIAb8XHc4gYSUiUWPYvzSRw==
+  dependencies:
+    chalk "^2.3.0"
+    enhanced-resolve "^4.0.0"
+    loader-utils "^1.0.2"
+    micromatch "^3.1.4"
+    semver "^5.0.1"
+
 ts-loader@^6.2.0:
   version "6.2.1"
   resolved "https://registry.npmjs.org/ts-loader/-/ts-loader-6.2.1.tgz"
@@ -18135,6 +18160,11 @@ typescript-logging@^0.6.4:
   integrity sha512-jXISCGFyp4Q1uKLKi3zF0o8rwjeEipcIO7+C+jRttks3Ci8+8jDi9e87Jmz+8xuzZq+OcKJhDkiyHriqaWb+4A==
   dependencies:
     stacktrace-js "1.3.1"
+
+typescript@^3.4.5:
+  version "3.9.10"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.9.10.tgz#70f3910ac7a51ed6bef79da7800690b19bf778b8"
+  integrity sha512-w6fIxVE/H1PkLKcCPsFqKE7Kv7QUwhU8qQY2MueZXWx5cPZdwFupLgKK3vntcK98BtNHZtAF4LA/yl2a7k8R6Q==
 
 typescript@^4.2.0:
   version "4.3.5"

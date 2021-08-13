@@ -127,6 +127,8 @@ import editSubstrateSpec from './routes/editSubstrateSpec';
 import { getStatsDInstance } from './util/metrics';
 import { DB } from './database';
 
+import { sendMessage } from './routes/snapshotAPI';
+
 function setupRouter(
   app,
   models: DB,
@@ -494,6 +496,8 @@ function setupRouter(
 
   // TODO: Change to GET /entities
   router.get('/bulkEntities', bulkEntities.bind(this, models));
+
+  router.post('/snapshotAPI/sendMessage', sendMessage.bind(this));
 
   app.use('/api', router);
 }

@@ -37,6 +37,7 @@ export enum ChainNetwork {
   MarlinTestnet = 'marlin-testnet',
   Aave = 'aave',
   AaveLocal = 'aave-local',
+  dYdX = 'dydx',
   Metacartel = 'metacartel',
   ALEX = 'alex',
   Commonwealth = 'commonwealth',

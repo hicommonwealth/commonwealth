@@ -12,25 +12,7 @@ export async function attachSigner<CT extends Contract>(
   sender: string,
   contract: CT
 ): Promise<CT> {
-  const availableWallets = wallets.availableWallets(ChainBase.Ethereum);
-  if (availableWallets.length === 0) {
-    throw new Error('No wallet available');
-  }
-
-  let signingWallet: IWebWallet<string>;
-  for (const wallet of availableWallets) {
-    if (!wallet.enabled) {
-      await wallet.enable();
-    }
-    // TODO: ensure that we can find any wallet, even if non-string accounts
-    if (wallet.accounts.find((acc) => acc === sender)) {
-      signingWallet = wallet;
-    }
-  }
-  if (!signingWallet) {
-    throw new Error('TX sender not found in wallet');
-  }
-
+  const signingWallet = await wallets.locateWallet(sender, ChainBase.Ethereum);
   let signer: JsonRpcSigner;
   if (signingWallet instanceof MetamaskWebWalletController
     || signingWallet instanceof WalletConnectWebWalletController) {

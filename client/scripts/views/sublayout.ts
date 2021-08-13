@@ -16,7 +16,6 @@ import FooterLandingPage from 'views/pages/landing/landing_page_footer';
 import Token from 'controllers/chain/ethereum/token/adapter';
 import { SearchBar } from './components/search_bar';
 
-
 const Sublayout: m.Component<{
   // overrides
   loadingLayout?: boolean,
@@ -67,7 +66,9 @@ const Sublayout: m.Component<{
       ] : community ? [
         m(CommunityIcon, { size: ICON_SIZE, community }),
         m('h4.sublayout-header-heading', [
-          link('a', (app.isCustomDomain() ? '/' : `/${app.activeId()}`), community.name),
+          m('div.sublayout-header-heading-wrapper', [
+            link('a', (app.isCustomDomain() ? '/' : `/${app.activeId()}`), community.name),
+          ]),
           community.privacyEnabled && m(Icon, { name: Icons.LOCK, size: 'xs' }),
           title && m('span.breadcrumb', m.trust('/')),
           title
