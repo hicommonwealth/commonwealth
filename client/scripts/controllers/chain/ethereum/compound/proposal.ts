@@ -83,13 +83,13 @@ export default class CompoundProposal extends Proposal<
       const parsed = JSON.parse(this.data.description);
       // eslint-disable-next-line no-prototype-builtins
       if (parsed && parsed.hasOwnProperty('title')) {
-        return parsed.title as string;
+        return (parsed.title as string).slice(0, 255);
       } else {
-        return this.data.description;
+        return this.data.description.slice(0, 255);
       }
     } catch {
       if (this.data.description) {
-        return this.data.description;
+        return this.data.description.slice(0, 255);
       } else {
         return `Marlin Proposal #${this.data.identifier}`;
       }
@@ -98,15 +98,14 @@ export default class CompoundProposal extends Proposal<
   public get description(): string {
     try {
       const parsed = JSON.parse(this.data.description);
-      console.log(parsed);
       // eslint-disable-next-line no-prototype-builtins
       if (parsed && parsed.hasOwnProperty('description')) {
         return parsed.description as string;
       } else {
-        return '';
+        return this.data.description;
       }
     } catch {
-      return '';
+      return this.data.description;
     }
   }
 
