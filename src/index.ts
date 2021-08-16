@@ -1,8 +1,8 @@
 export * from './interfaces';
 export * as MolochEvents from './moloch/index';
 export * as MolochTypes from './moloch/types';
-export * as MarlinEvents from './marlin/index';
-export * as MarlinTypes from './marlin/types';
+export * as CompoundEvents from './compound/index';
+export * as CompoundTypes from './compound/types';
 export * as AaveEvents from './aave/index';
 export * as AaveTypes from './aave/types';
 export * as SubstrateEvents from './substrate/index';

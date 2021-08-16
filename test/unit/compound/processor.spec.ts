@@ -1,7 +1,7 @@
 import chai from 'chai';
 
-import { Processor } from '../../../src/marlin/processor';
-import { Api, RawEvent, EventKind } from '../../../src/marlin/types';
+import { Processor } from '../../../src/compound/processor';
+import { Api, RawEvent, EventKind } from '../../../src/compound/types';
 
 const { assert } = chai;
 
@@ -14,33 +14,27 @@ const constructEvent = (data): RawEvent => {
   } as RawEvent;
 };
 
-describe('Marlin Event Processor Tests', () => {
+describe('Compound Event Processor Tests', () => {
   it('should process a raw event into a CWEvent', async () => {
     const processor = new Processor(({} as unknown) as Api);
-    const kind = EventKind.DelegateChanged;
-    const fromDelegate = 'previousAddress';
-    const toDelegate = 'toAddress';
-    const delegator = 'fromAddress';
-    const event = constructEvent({
-      delegator,
-      toDelegate,
-      fromDelegate,
-    });
+    const kind = EventKind.ProposalQueued;
+    const id = 5;
+    const eta = 10;
+    const event = constructEvent({ id, eta });
 
     event.blockNumber = blockNumber;
-    event.event = 'DelegateChanged';
+    event.event = 'ProposalQueued';
 
     const result = await processor.process(event);
     assert.deepEqual(result, [
       {
         blockNumber,
+        excludeAddresses: [],
         data: {
           kind,
-          delegator,
-          toDelegate,
-          fromDelegate,
+          id,
+          eta,
         },
-        excludeAddresses: [delegator],
       },
     ]);
   });

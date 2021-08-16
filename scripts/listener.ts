@@ -11,7 +11,7 @@ import {
   IEventHandler,
   CWEvent,
   SubstrateEvents,
-  MarlinEvents,
+  CompoundEvents,
   MolochEvents,
   EventSupportingChains,
   AaveEvents,
@@ -42,6 +42,7 @@ const networkUrls = {
 
   marlin: 'wss://mainnet.infura.io/ws',
   'marlin-local': 'ws://127.0.0.1:9545',
+  uniswap: 'wss://mainnet.infura.io/ws',
 
   aave: 'wss://mainnet.infura.io/ws',
   'aave-local': 'ws://127.0.0.1:9545',
@@ -68,6 +69,7 @@ const contracts = {
   'aave-local': '0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9',
   'dydx-ropsten': '0x6938240Ba19cB8a614444156244b658f650c8D5c',
   dydx: '0x7E9B1672616FF6D6629Ef2879419aaE79A9018D2',
+  uniswap: '0x5e4be8Bc9637f0EAA1A755019e06A68ce081D58F',
 };
 
 const { argv } = yargs
@@ -205,14 +207,13 @@ if (chainSupportedBy(network, SubstrateEvents.Types.EventChains)) {
       verbose: true,
     });
   });
-} else if (chainSupportedBy(network, MarlinEvents.Types.EventChains)) {
+} else if (chainSupportedBy(network, CompoundEvents.Types.EventChains)) {
   if (!contract) throw new Error(`no contract address for ${network}`);
-  MarlinEvents.createApi(url, contract).then(async (api) => {
-    const dater = new EthDater(api.governorAlpha.provider);
-    const fetcher = new MarlinEvents.StorageFetcher(api, dater);
+  CompoundEvents.createApi(url, contract).then(async (api) => {
+    const fetcher = new CompoundEvents.StorageFetcher(api);
     try {
       const fetched = await fetcher.fetch(
-        { startBlock: 0, maxResults: 1 },
+        undefined, // { startBlock: 0, maxResults: 1 },
         true
       );
       // const fetched = await fetcher.fetchOne('2');
@@ -221,7 +222,7 @@ if (chainSupportedBy(network, SubstrateEvents.Types.EventChains)) {
       console.log(err);
       console.error(`Got error from fetcher: ${JSON.stringify(err, null, 2)}.`);
     }
-    MarlinEvents.subscribeEvents({
+    CompoundEvents.subscribeEvents({
       chain: network,
       api,
       handlers: [new StandaloneEventHandler()],

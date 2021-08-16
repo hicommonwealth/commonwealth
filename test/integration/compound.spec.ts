@@ -18,16 +18,13 @@ import {
   Api,
   IEventData,
   EventKind,
-  IDelegateVotesChanged,
-  ITransfer,
   IProposalCreated,
   IProposalQueued,
-  IQueueTransaction,
   IProposalExecuted,
-  IExecuteTransaction,
   IVoteCast,
-} from '../../src/marlin/types';
-import { subscribeEvents } from '../../src/marlin/subscribeFunc';
+  ProposalState,
+} from '../../src/compound/types';
+import { subscribeEvents } from '../../src/compound/subscribeFunc';
 import { IEventHandler, CWEvent, IChainEventData } from '../../src/interfaces';
 
 const { assert } = chai;
@@ -41,18 +38,6 @@ function getProvider(): providers.Web3Provider {
     // logger: console,
   });
   return new providers.Web3Provider(web3Provider);
-}
-
-// eslint-disable-next-line no-shadow
-enum ProposalState {
-  Pending = 0,
-  Active = 1,
-  Canceled = 2,
-  Defeated = 3,
-  Succeeded = 4,
-  Queued = 5,
-  Expired = 6,
-  Executed = 7,
 }
 
 async function deployMPond(
@@ -86,7 +71,7 @@ async function deployTimelock(
   return timelock;
 }
 
-class MarlinEventHandler extends IEventHandler {
+class CompoundEventHandler extends IEventHandler {
   constructor(public readonly emitter: EventEmitter) {
     super();
   }
@@ -98,7 +83,7 @@ class MarlinEventHandler extends IEventHandler {
 }
 
 function assertEvent<T extends IEventData>(
-  handler: MarlinEventHandler,
+  handler: CompoundEventHandler,
   event: EventKind,
   cb: (evt: CWEvent<T>) => void
 ) {
@@ -120,7 +105,7 @@ interface ISetupData {
   governorAlpha: GovernorAlpha;
   addresses: string[];
   provider: providers.Web3Provider;
-  handler: MarlinEventHandler;
+  handler: CompoundEventHandler;
 }
 
 async function setupSubscription(subscribe = true): Promise<ISetupData> {
@@ -142,9 +127,9 @@ async function setupSubscription(subscribe = true): Promise<ISetupData> {
   // console.log('member: ', member);
   // console.log('timelock admin address: ', await timelock.admin());
   // console.log('governorAlpha guardian:', await governorAlpha.guardian());
-  const api = { comp, governorAlpha, timelock };
+  const api = governorAlpha;
   const emitter = new EventEmitter();
-  const handler = new MarlinEventHandler(emitter);
+  const handler = new CompoundEventHandler(emitter);
   if (subscribe) {
     await subscribeEvents({
       chain: 'marlin-local',
@@ -157,13 +142,14 @@ async function setupSubscription(subscribe = true): Promise<ISetupData> {
 }
 
 async function performDelegation(
-  handler: MarlinEventHandler,
+  handler: CompoundEventHandler,
   comp: MPond,
   from: string,
   to: string,
   amount: BigNumberish
 ): Promise<void> {
   await comp.delegate(to, amount);
+  /*
   await Promise.all([
     assertEvent(handler, EventKind.DelegateChanged, (evt) => {
       assert.deepEqual(evt.data, {
@@ -195,10 +181,11 @@ async function performDelegation(
       }
     ),
   ]);
+  */
 }
 
 async function createProposal(
-  handler: MarlinEventHandler,
+  handler: CompoundEventHandler,
   gov: GovernorAlpha,
   comp: MPond,
   from: string
@@ -218,17 +205,15 @@ async function createProposal(
     handler,
     EventKind.ProposalCreated,
     (evt: CWEvent<IProposalCreated>) => {
-      const { kind, proposer, description } = evt.data;
+      const { kind, proposer } = evt.data;
       assert.deepEqual(
         {
           kind,
           proposer,
-          description,
         },
         {
           kind: EventKind.ProposalCreated,
           proposer: from,
-          description: 'test description',
         }
       );
     }
@@ -236,7 +221,7 @@ async function createProposal(
 }
 
 async function proposeAndVote(
-  handler: MarlinEventHandler,
+  handler: CompoundEventHandler,
   provider: providers.Web3Provider,
   gov: GovernorAlpha,
   comp: MPond,
@@ -274,7 +259,7 @@ async function proposeAndVote(
 }
 
 async function proposeAndWait(
-  handler: MarlinEventHandler,
+  handler: CompoundEventHandler,
   provider: providers.Web3Provider,
   gov: GovernorAlpha,
   comp: MPond,
@@ -298,7 +283,7 @@ async function proposeAndWait(
 }
 
 async function proposeAndQueue(
-  handler: MarlinEventHandler,
+  handler: CompoundEventHandler,
   provider: providers.Web3Provider,
   gov: GovernorAlpha,
   comp: MPond,
@@ -326,25 +311,10 @@ async function proposeAndQueue(
         );
       }
     ),
-    assertEvent(
-      handler,
-      EventKind.QueueTransaction,
-      (evt: CWEvent<IQueueTransaction>) => {
-        const { kind } = evt.data;
-        assert.deepEqual(
-          {
-            kind,
-          },
-          {
-            kind: EventKind.QueueTransaction,
-          }
-        );
-      }
-    ),
   ]);
 }
 
-describe('Marlin Event Integration Tests', () => {
+describe('Compound Event Integration Tests', () => {
   describe('COMP contract function events', () => {
     it('initial address should transfer tokens to an address', async () => {
       const { comp, addresses, handler } = await setupSubscription();
@@ -357,6 +327,7 @@ describe('Marlin Event Integration Tests', () => {
       await comp.transfer(addresses[2], 100);
       const newUserNewBalance = await comp.balanceOf(addresses[2]);
       assert.isAtLeast(+newUserNewBalance, 100);
+      /*
       await assertEvent(
         handler,
         EventKind.Transfer,
@@ -378,6 +349,7 @@ describe('Marlin Event Integration Tests', () => {
           );
         }
       );
+      */
     });
 
     it('initial address should delegate to address 2', async () => {
@@ -489,21 +461,6 @@ describe('Marlin Event Integration Tests', () => {
               {
                 kind: EventKind.ProposalExecuted,
                 id: activeProposals,
-              }
-            );
-          }
-        ),
-        assertEvent(
-          handler,
-          EventKind.ProposalExecuted,
-          (evt: CWEvent<IExecuteTransaction>) => {
-            const { kind } = evt.data;
-            assert.deepEqual(
-              {
-                kind,
-              },
-              {
-                kind: EventKind.ExecuteTransaction,
               }
             );
           }
