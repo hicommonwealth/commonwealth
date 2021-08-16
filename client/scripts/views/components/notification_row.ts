@@ -289,41 +289,45 @@ const NotificationRow: m.Component<{
           ]),
         ]);
       }
-      return link('a.NotificationRow', (`/notificationsList?id=${notification.id}`), [
-        m('.comment-body', [
-          m('.comment-body-top.chain-event-notification-top', [
-            `${label.heading} on ${chainName}`,
-            !vnode.attrs.onListPage && m(Icon, {
-              name: Icons.X,
-              onmousedown: (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-              },
-              onclick: (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                vnode.state.scrollOrStop = true;
-                app.user.notifications.clear([notification]);
-                m.redraw();
-              },
-            })
+      return link(
+        'a.NotificationRow',
+        `/notificationsList?id=${notification.id}`,
+        [
+          m('.comment-body', [
+            m('.comment-body-top.chain-event-notification-top', [
+              `${label.heading} on ${chainName}`,
+              !vnode.attrs.onListPage && m(Icon, {
+                name: Icons.X,
+                onmousedown: (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                },
+                onclick: (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  vnode.state.scrollOrStop = true;
+                  app.user.notifications.clear([notification]);
+                  m.redraw();
+                },
+              })
+            ]),
+            m('.comment-body-bottom', `Block ${notification.chainEvent.blockNumber}`),
+            m('.comment-body-excerpt', label.label),
           ]),
-          m('.comment-body-bottom', `Block ${notification.chainEvent.blockNumber}`),
-          m('.comment-body-excerpt', label.label),
-        ]),
-      ], {
-        class: notification.isRead ? '' : 'unread',
-        key: notification.id,
-        id: notification.id,
-        onclick: async () => {
+        ], {
+          class: notification.isRead ? '' : 'unread',
+          key: notification.id,
+          id: notification.id,
+        },
+        null,
+        () => {
           if (vnode.state.scrollOrStop) { vnode.state.scrollOrStop = false; return; }
           const notificationArray: Notification[] = [];
           notificationArray.push(notification);
           app.user.notifications.markAsRead(notificationArray).then(() => m.redraw());
-          // await navigateToSubpage(`/notificationsList?id=${notification.id}`);
-          m.redraw.sync();
         },
-      });
+        () => m.redraw.sync(),
+      );
     } else {
       const notificationData = notifications.map((notif) => typeof notif.data === 'string'
         ? JSON.parse(notif.data)
@@ -345,58 +349,59 @@ const NotificationRow: m.Component<{
           .replace(`http://localhost:8080/${app.customDomainId()}/`, '/');
       }
 
-      return link('a.NotificationRow', path.replace(/ /g, '%20'), [
-        authorInfo.length === 1
-          ? m(User, {
-            user: new AddressInfo(
-              null,
-              (authorInfo[0] as [string, string])[1],
-              (authorInfo[0] as [string, string])[0],
-              null
-            ),
-            avatarOnly: true,
-            avatarSize: 26,
-          })
-          : m(UserGallery, {
-            users: authorInfo.map((auth) => new AddressInfo(null, auth[1], auth[0], null)),
-            avatarSize: 26,
-          }),
-        m('.comment-body', [
-          m('.comment-body-title', notificationHeader),
-          notificationBody
-            && category !== `${NotificationCategories.NewReaction}`
-            && category !== `${NotificationCategories.NewThread}`
-            && m('.comment-body-excerpt', notificationBody),
-          m('.comment-body-bottom-wrap', [
-            m('.comment-body-created', moment(createdAt).fromNow()),
-            !notification.isRead && m('.comment-body-mark-as-read', {
-              onclick: (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                vnode.state.markingRead = true;
-                app.user.notifications.markAsRead(notifications)?.then(() => {
-                  vnode.state.markingRead = false;
-                  m.redraw();
-                }).catch(() => {
-                  vnode.state.markingRead = false;
-                  m.redraw();
-                });
-              }
-            }, [
-              vnode.state.markingRead ? m(Spinner, { size: 'xs', active: true }) : 'Mark as read',
-            ]),
-          ])
-        ]),
-      ], {
-        class: notification.isRead ? '' : 'unread',
-        key: notification.id,
-        id: notification.id,
-        onclick: async () => {
-          app.user.notifications.markAsRead(notifications);
-          await m.route.set(path.replace(/ /g, '%20')); // fix for improperly generated notification paths
-          if (pageJump) setTimeout(() => pageJump(), 1);
+      return link(
+        'a.NotificationRow',
+        path.replace(/ /g, '%20'), [
+          authorInfo.length === 1
+            ? m(User, {
+              user: new AddressInfo(
+                null,
+                (authorInfo[0] as [string, string])[1],
+                (authorInfo[0] as [string, string])[0],
+                null
+              ),
+              avatarOnly: true,
+              avatarSize: 26,
+            })
+            : m(UserGallery, {
+              users: authorInfo.map((auth) => new AddressInfo(null, auth[1], auth[0], null)),
+              avatarSize: 26,
+            }),
+          m('.comment-body', [
+            m('.comment-body-title', notificationHeader),
+            notificationBody
+              && category !== `${NotificationCategories.NewReaction}`
+              && category !== `${NotificationCategories.NewThread}`
+              && m('.comment-body-excerpt', notificationBody),
+            m('.comment-body-bottom-wrap', [
+              m('.comment-body-created', moment(createdAt).fromNow()),
+              !notification.isRead && m('.comment-body-mark-as-read', {
+                onclick: (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  vnode.state.markingRead = true;
+                  app.user.notifications.markAsRead(notifications)?.then(() => {
+                    vnode.state.markingRead = false;
+                    m.redraw();
+                  }).catch(() => {
+                    vnode.state.markingRead = false;
+                    m.redraw();
+                  });
+                }
+              }, [
+                vnode.state.markingRead ? m(Spinner, { size: 'xs', active: true }) : 'Mark as read',
+              ]),
+            ])
+          ]),
+        ], {
+          class: notification.isRead ? '' : 'unread',
+          key: notification.id,
+          id: notification.id,
         },
-      });
+        null,
+        () => app.user.notifications.markAsRead(notifications),
+        pageJump ? () => setTimeout(() => pageJump(), 1) : null,
+      );
     }
   },
 };
