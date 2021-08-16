@@ -1,8 +1,9 @@
 import BN from 'bn.js';
 import { ProposalModule, ITXModalData } from 'models';
 import { IMarlinProposalResponse } from 'adapters/chain/marlin/types';
+import { MarlinEvents, MarlinTypes } from '@commonwealth/chain-events';
 import { IApp } from 'state';
-
+import { EntityRefreshOption } from 'controllers/server/chain_entities';
 import { BigNumberish } from 'ethers';
 import MarlinAPI from './api';
 import MarlinProposal from './proposal';
@@ -14,7 +15,7 @@ export interface MarlinProposalArgs {
   targets: string[],
   values: string[],
   signatures: string[],
-  calldatas: string[], // TODO: CHECK IF THIS IS RIGHT
+  calldatas: string[],
   description: string,
 }
 
@@ -31,6 +32,7 @@ export default class MarlinGovernance extends ProposalModule<
   private _proposalMaxOperations: BN;
   private _votingDelay: BN;
   private _votingPeriod: BN;
+  private _gracePeriod: BN;
 
   private _api: MarlinAPI;
   private _Chain: MarlinChain;
@@ -43,6 +45,7 @@ export default class MarlinGovernance extends ProposalModule<
   public get proposalMaxOperations() { return this._proposalMaxOperations; }
   public get votingDelay() { return this._votingDelay; }
   public get votingPeriod() { return this._votingPeriod; }
+  public get gracePeriod() { return this._gracePeriod; }
 
   public get api() { return this._api; }
   public get usingServerChainEntities() { return this._usingServerChainEntities; }
@@ -143,6 +146,38 @@ export default class MarlinGovernance extends ProposalModule<
     this._proposalMaxOperations = new BN((await this._api.Contract.proposalMaxOperations()).toString());
     this._votingDelay = new BN((await this._api.Contract.votingDelay()).toString());
     this._votingPeriod = new BN((await this._api.Contract.votingPeriod()).toString());
+    this._gracePeriod = new BN((await this._api.Timelock.GRACE_PERIOD()).toString());
+
+    // load server proposals
+    console.log('Fetching marlin proposals from backend.');
+    await this.app.chain.chainEntities.refresh(this.app.chain.id, EntityRefreshOption.AllEntities);
+    const entities = this.app.chain.chainEntities.store.getByType(MarlinTypes.EntityKind.Proposal);
+    entities.forEach((e) => this._entityConstructor(e));
+    console.log(`Found ${entities.length} proposals!`);
+
+    // no init logic currently needed
+    // await Promise.all(this.store.getAll().map((p) => p.init()));
+
+    // register new chain-event handlers
+    this.app.chain.chainEntities.registerEntityHandler(
+      MarlinTypes.EntityKind.Proposal, (entity, event) => {
+        this.updateProposal(entity, event);
+      }
+    );
+
+    // fetch proposals from chain
+    // console.log('Fetching marlin proposals from chain.');
+    const chainEventsContracts: MarlinTypes.Api = { governorAlpha: this._api.Contract };
+    // const fetcher = new AaveEvents.StorageFetcher(chainEventsContracts);
+    const subscriber = new MarlinEvents.Subscriber(chainEventsContracts, this.app.chain.id);
+    const processor = new MarlinEvents.Processor(chainEventsContracts);
+    // await this.app.chain.chainEntities.fetchEntities(this.app.chain.id, () => fetcher.fetch());
+    await this.app.chain.chainEntities.subscribeEntities(
+      this.app.chain.id,
+      subscriber,
+      processor,
+    );
+
     this._initialized = true;
   }
 

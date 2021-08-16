@@ -12,6 +12,7 @@ import {
   isSupportedChain,
   IStorageFetcher,
   MarlinTypes,
+  MarlinEvents,
   MolochTypes,
   AaveTypes,
   AaveEvents,
@@ -63,8 +64,10 @@ export async function migrateChainEntity(chain: string): Promise<void> {
       // TODO: construct dater
       throw new Error('Moloch migration not yet implemented.');
     } else if (chainSupportedBy(chain, MarlinTypes.EventChains)) {
-      // TODO: construct dater
-      throw new Error('Marlin migration not yet implemented.');
+      const api = await MarlinEvents.createApi(node.url, node.address);
+      fetcher = new MarlinEvents.StorageFetcher(api);
+      // range.startBlock = chain === 'aave' ? 12200000 : 0;
+      range.startBlock = 0;
     } else if (chainSupportedBy(chain, AaveTypes.EventChains)) {
       const api = await AaveEvents.createApi(node.url, node.address);
       fetcher = new AaveEvents.StorageFetcher(api);

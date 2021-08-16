@@ -19,7 +19,7 @@ export default class MarlinChain extends EthereumChain {
       selectedNode.address,
       this.api.currentProvider as any
     );
-    this.marlinApi.init();
+    await this.marlinApi.init();
   }
 
   public deinit() {
@@ -29,12 +29,12 @@ export default class MarlinChain extends EthereumChain {
   }
 
   public async priorDelegates(address: string, blockNumber: number | string) {
-    const delegates = await this.marlinApi.Contract.getPriorVotes(address, blockNumber);
+    const delegates = await this.marlinApi.MPond.getPriorVotes(address, blockNumber);
     return new BN(delegates.toString(), 10) || new BN(0);
   }
 
   public async balanceOf(address: string) {
-    const balance = await this.marlinApi.Contract.balanceOf(address);
+    const balance = await this.marlinApi.MPond.balanceOf(address);
     console.log('balanceOf Marlin Accounts', balance);
     return new BN(balance.toString(), 10) || new BN(0);
   }

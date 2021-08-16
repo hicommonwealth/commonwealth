@@ -56,12 +56,9 @@ const VoteListing: m.Component<{
                   vnode.state.balancesCache[vote.account.address] = vote.format();
                   m.redraw();
                 } else if (vote instanceof MarlinProposalVote) {
-                  (app.chain as Marlin).chain.balanceOf(vote.account.address).then((b) => {
-                    balance = b;
-                    vnode.state.balancesCache[vote.account.address] = formatCoin(app.chain.chain.coins(b), true);
-                    m.redraw();
-                  });
-                  balance = '--';
+                  balance = formatCoin(app.chain.chain.coins(vote.power), true);
+                  vnode.state.balancesCache[vote.account.address] = balance;
+                  m.redraw();
                 } else {
                   vote.account.balance.then((b) => {
                     balance = b;

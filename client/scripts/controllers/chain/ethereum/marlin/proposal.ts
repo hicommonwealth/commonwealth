@@ -1,4 +1,5 @@
 import moment from 'moment';
+import BN from 'bn.js';
 
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import { IMarlinProposalResponse } from 'adapters/chain/marlin/types';
@@ -30,25 +31,15 @@ export enum MarlinVote {
   NO = 0
 }
 
-// eslint-disable-next-line no-shadow
-export enum MarlinProposalState {
-  Pending,
-  Active,
-  Canceled,
-  Defeated,
-  Succeeded,
-  Queued,
-  Expired,
-  Executed
-}
-
 export class MarlinProposalVote implements IVote<EthereumCoin> {
   public readonly account: EthereumAccount;
   public readonly choice: MarlinVote;
+  public readonly power: BN;
 
-  constructor(member: EthereumAccount, choice: MarlinVote) {
+  constructor(member: EthereumAccount, choice: MarlinVote, power?: BN) {
     this.account = member;
     this.choice = choice;
+    this.power = power || new BN(0);
   }
 }
 
@@ -57,43 +48,24 @@ const backportEntityToAdapter = (
   entity: ChainEntity
 ): IMarlinProposalResponse => {
   const startEvent = entity.chainEvents.find((e) => e.data.kind === MarlinTypes.EventKind.ProposalCreated);
-  const canceledEvent = entity.chainEvents.find((e) => e.data.kind === MarlinTypes.EventKind.ProposalCanceled);
-  const executedEvent = entity.chainEvents.find((e) => e.data.kind === MarlinTypes.EventKind.ProposalExecuted);
-  const voteEvents = entity.chainEvents.filter((e) => e.data.kind === MarlinTypes.EventKind.VoteCast);
-  if (!startEvent) {
-    throw new Error('Proposal start event not found!');
-  }
-
-  const identifier = `${(startEvent.data as MarlinTypes.IProposalCreated).id}`;
-  const id = identifier;
-  const proposer = `${(startEvent.data as MarlinTypes.IProposalCreated).proposer}`;
-  const startBlock = (startEvent.data as MarlinTypes.IProposalCreated).startBlock;
-  const endBlock = (startEvent.data as MarlinTypes.IProposalCreated).endBlock;
-  const eta = null;
-
-  const voteReducer = (acc, vote) => acc + vote.votes.toNumber();
-  const forVotesArray = voteEvents.filter((e) => (e.data as MarlinTypes.IVoteCast).support);
-  const forVotes = forVotesArray.reduce(voteReducer, 0);
-  const againstVotesArray = voteEvents.filter((e) => !(e.data as MarlinTypes.IVoteCast).support);
-  const againstVotes = againstVotesArray.reduce(voteReducer, 0);
-  const canceled = !!canceledEvent;
-  const executed = !!executedEvent;
-
-  const proposal: IMarlinProposalResponse = {
-    identifier,
-    id,
-    proposer,
-    startBlock,
-    endBlock,
-    eta,
-    forVotes,
-    againstVotes,
-    canceled,
-    executed,
+  const startData = startEvent.data as MarlinTypes.IProposalCreated;
+  return {
+    identifier: `${startData.id}`,
+    queued: false,
+    executed: false,
+    cancelled: false,
+    completed: false,
+    ...startData,
   };
-
-  return proposal;
 };
+
+const ONE_HUNDRED_WITH_PRECISION = 10000;
+
+function sumVotes(vs: MarlinProposalVote[]): BN {
+  return vs.reduce((prev, curr) => {
+    return prev.add(curr.power);
+  }, new BN(0));
+}
 
 export default class MarlinProposal extends Proposal<
   MarlinAPI,
@@ -114,7 +86,29 @@ export default class MarlinProposal extends Proposal<
   }
 
   public get isPassing(): ProposalStatus {
-    return ProposalStatus.Passing;
+    switch (this.state) {
+      case MarlinTypes.ProposalState.Canceled:
+        return ProposalStatus.Canceled;
+      case MarlinTypes.ProposalState.Succeeded:
+      case MarlinTypes.ProposalState.Queued:
+      case MarlinTypes.ProposalState.Executed:
+        return ProposalStatus.Passed;
+      case MarlinTypes.ProposalState.Expired:
+      case MarlinTypes.ProposalState.Defeated:
+        return ProposalStatus.Failed;
+      case MarlinTypes.ProposalState.Active: {
+        const votes = this.getVotes();
+        const yesPower = sumVotes(votes.filter((v) => v.choice));
+        const noPower = sumVotes(votes.filter((v) => !v.choice));
+        const isMajority = yesPower > noPower;
+        const isQuorum = yesPower > this._Gov.quorumVotes;
+        // TODO: should we omit quorum here for display purposes?
+        return isMajority && isQuorum ? ProposalStatus.Passing : ProposalStatus.Failing;
+      }
+      default:
+        // PENDING
+        return ProposalStatus.None;
+    }
   }
 
   public get author() { return this._Accounts.get(this.data.proposer); }
@@ -125,30 +119,59 @@ export default class MarlinProposal extends Proposal<
   public get startingPeriod() { return +this.data.startBlock; }
   public get votingPeriodEnd() { return this.startingPeriod + +this._Gov.votingPeriod; }
 
-  private _state: MarlinProposalState;
-  public async state(): Promise<MarlinProposalState> {
-    if (!this._state) {
-      this._state = await this._Gov.state(this.identifier);
-    }
-    return this._state;
+  public get state(): MarlinTypes.ProposalState {
+    const blockNumber = this._Gov.app.chain.block.height;
+    const blockTimestamp = this._Gov.app.chain.block.lastTime.unix();
+    if (this.data.cancelled) return MarlinTypes.ProposalState.Canceled;
+    if (blockNumber <= this.data.startBlock) return MarlinTypes.ProposalState.Pending;
+    if (blockNumber <= this.data.endBlock) return MarlinTypes.ProposalState.Active;
+
+    const votes = this.getVotes();
+    const yesPower = sumVotes(votes.filter((v) => v.choice));
+    const noPower = sumVotes(votes.filter((v) => !v.choice));
+    if (yesPower <= noPower || yesPower <= this._Gov.quorumVotes)
+      return MarlinTypes.ProposalState.Defeated;
+    if (!this.data.eta) return MarlinTypes.ProposalState.Succeeded;
+    if (this.data.executed) return MarlinTypes.ProposalState.Executed;
+    if (blockTimestamp >= +this._Gov.gracePeriod.addn(this.data.eta))
+      return MarlinTypes.ProposalState.Expired;
+    return MarlinTypes.ProposalState.Queued;
   }
 
-  public get endTime(): ProposalEndTime { // TODO: Get current block and subtract from endBlock * 15s
-    return { kind: 'fixed', time: moment.unix(this.data.endBlock) };
+  public get endTime(): ProposalEndTime {
+    const state = this.state;
+
+    // waiting to start
+    if (state === MarlinTypes.ProposalState.Pending) return { kind: 'fixed_block', blocknum: this.data.startBlock };
+
+    // started
+    if (state === MarlinTypes.ProposalState.Active) return { kind: 'fixed_block', blocknum: this.data.endBlock };
+
+    // queued but not ready for execution
+    if (state === MarlinTypes.ProposalState.Queued) return { kind: 'fixed', time: moment(this.data.eta) };
+
+    // unavailable if: waiting to passed/failed but not in queue, or completed
+    return { kind: 'unavailable' };
   }
 
   public get endBlock(): ProposalEndTime {
     return this.endTime;
   }
 
-  public get isCanceled() {
-    return this.data.canceled;
+  public get isCancelled() {
+    return this.data.cancelled;
   }
 
   public get support() {
-    return 0;
+    const votes = this.getVotes();
+    const yesPower = sumVotes(votes.filter((v) => v.choice));
+    const noPower = sumVotes(votes.filter((v) => !v.choice));
+    if (yesPower.isZero() && noPower.isZero()) return 0;
+    const supportBn = yesPower.muln(ONE_HUNDRED_WITH_PRECISION).div(yesPower.add(noPower));
+    return +supportBn / ONE_HUNDRED_WITH_PRECISION;
   }
 
+  // TODO: should this be relative to total supply or quorum required?
   public get turnout() {
     return null;
   }
@@ -168,10 +191,46 @@ export default class MarlinProposal extends Proposal<
 
     entity.chainEvents.sort((e1, e2) => e1.blockNumber - e2.blockNumber).forEach((e) => this.update(e));
     this._initialized = true;
+    console.log(this);
     this._Gov.store.add(this);
   }
 
   public update(e: ChainEvent) {
+    switch (e.data.kind) {
+      case MarlinTypes.EventKind.ProposalCreated: {
+        break;
+      }
+      case MarlinTypes.EventKind.VoteCast: {
+        const power = new BN(e.data.votes);
+        const vote = new MarlinProposalVote(
+          this._Accounts.get(e.data.voter),
+          e.data.support ? MarlinVote.YES : MarlinVote.NO,
+          power,
+        );
+        this.addOrUpdateVote(vote);
+        break;
+      }
+      case MarlinTypes.EventKind.ProposalCanceled: {
+        this._data.cancelled = true;
+        this._data.completed = true;
+        this.complete(this._Gov.store);
+        break;
+      }
+      case MarlinTypes.EventKind.ProposalQueued: {
+        this._data.queued = true;
+        this._data.eta = e.data.eta;
+        break;
+      }
+      case MarlinTypes.EventKind.ProposalExecuted: {
+        this._data.queued = false;
+        this._data.executed = true;
+        this.complete(this._Gov.store);
+        break;
+      }
+      default: {
+        break;
+      }
+    }
   }
 
   public canVoteFrom(account: EthereumAccount) {
@@ -181,8 +240,8 @@ export default class MarlinProposal extends Proposal<
   }
 
   public async cancelTx() {
-    if (this.isCanceled) {
-      throw new Error('proposal already canceled');
+    if (this.isCancelled) {
+      throw new Error('proposal already cancelled');
     }
 
     const address = this._Gov.app.user.activeAccount.address;
@@ -194,7 +253,7 @@ export default class MarlinProposal extends Proposal<
     );
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
-      throw new Error('failed to canceled proposal');
+      throw new Error('failed to cancelled proposal');
     }
     return txReceipt;
   }
@@ -211,7 +270,7 @@ export default class MarlinProposal extends Proposal<
       throw new Error('sender must be valid delegate');
     }
 
-    if (await this.state() !== MarlinProposalState.Active) {
+    if (this.state !== MarlinTypes.ProposalState.Active) {
       throw new Error('proposal not in active period');
     }
 

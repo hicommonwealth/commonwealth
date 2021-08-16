@@ -28,13 +28,12 @@ import MolochProposal, {
 } from 'controllers/chain/ethereum/moloch/proposal';
 import MarlinProposal, {
   MarlinProposalVote,
-  MarlinProposalState,
   MarlinVote
 } from 'controllers/chain/ethereum/marlin/proposal';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import { notifyError } from 'controllers/app/notifications';
 import AaveProposal, { AaveProposalVote } from 'controllers/chain/ethereum/aave/proposal';
-import { AaveTypes } from '@commonwealth/chain-events';
+import { AaveTypes, MarlinTypes } from '@commonwealth/chain-events';
 
 const CannotVote: m.Component<{ action }> = {
   view: (vnode) => {
@@ -187,9 +186,9 @@ export const CancelButton: m.Component<{ proposal, votingModalOpen?, user?, onMo
     ]) : (proposal instanceof MarlinProposal) ? m('.veto-button', [
       m(Button, {
         intent: 'negative',
-        disabled: proposal.isCanceled || votingModalOpen,
+        disabled: proposal.isCancelled || votingModalOpen,
         onclick: (e) => cancelProposal(e, vnode.state, proposal, onModalClose),
-        label: proposal.isCanceled ? 'Cancelled' : 'Cancel',
+        label: proposal.isCancelled ? 'Cancelled' : 'Cancel',
         compact: true,
       }),
     ]) : ((proposal instanceof AaveProposal) && proposal.isCancellable)
@@ -483,7 +482,7 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
       canVote = false;
     } else if (proposal instanceof MolochProposal && proposal.state !== MolochProposalState.Voting) {
       canVote = false;
-    } else if (proposal instanceof MarlinProposal  /* && (await proposal.state()) !== MarlinProposalState.Active */) {
+    } else if (proposal instanceof MarlinProposal && proposal.state !== MarlinTypes.ProposalState.Active) {
       canVote = false; // TODO: Fix proposal.state function above to not return promise
     } else if (hasVotedForAnyChoice) {
       // enable re-voting for particular types
