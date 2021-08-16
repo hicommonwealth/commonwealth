@@ -57,6 +57,9 @@ async function main(chain: string, eventsPath: string) {
         required: true,
       }],
     });
+    if (!node) {
+      throw new Error(`Chain not found: ${chain}`);
+    }
     handlers = generateHandlers(node);
   } catch (err) {
     log.error(`Failed to load event handlers: ${err.message}`);
