@@ -32,7 +32,7 @@ export default class CompoundGovernance extends ProposalModule<
   private _proposalMaxOperations: BN;
   private _votingDelay: BN;
   private _votingPeriod: BN;
-  private _gracePeriod: BN;
+  // private _gracePeriod: BN;
 
   private _api: CompoundAPI;
   private _Chain: CompoundChain;
@@ -45,7 +45,7 @@ export default class CompoundGovernance extends ProposalModule<
   public get proposalMaxOperations() { return this._proposalMaxOperations; }
   public get votingDelay() { return this._votingDelay; }
   public get votingPeriod() { return this._votingPeriod; }
-  public get gracePeriod() { return this._gracePeriod; }
+  // public get gracePeriod() { return this._gracePeriod; }
 
   public get api() { return this._api; }
   public get usingServerChainEntities() { return this._usingServerChainEntities; }
@@ -146,7 +146,7 @@ export default class CompoundGovernance extends ProposalModule<
     this._proposalMaxOperations = new BN((await this._api.Contract.proposalMaxOperations()).toString());
     this._votingDelay = new BN((await this._api.Contract.votingDelay()).toString());
     this._votingPeriod = new BN((await this._api.Contract.votingPeriod()).toString());
-    this._gracePeriod = new BN((await this._api.Timelock.GRACE_PERIOD()).toString());
+    // this._gracePeriod = new BN((await this._api.Timelock.GRACE_PERIOD()).toString());
 
     // load server proposals
     console.log('Fetching compound proposals from backend.');
