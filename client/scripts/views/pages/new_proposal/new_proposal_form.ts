@@ -22,8 +22,8 @@ import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collect
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
-import Marlin from 'controllers/chain/ethereum/marlin/adapter';
-import { MarlinProposalArgs } from 'controllers/chain/ethereum/marlin/governance';
+import Compound from 'controllers/chain/ethereum/compound/adapter';
+import { CompoundProposalArgs } from 'controllers/chain/ethereum/compound/governance';
 
 import {
   DropdownFormField,
@@ -88,8 +88,8 @@ const NewProposalForm = {
     let hasThreshold : boolean;
     // moloch proposal
     let hasMolochFields : boolean;
-    // marlin proposal
-    let hasMarlinFields : boolean;
+    // compound proposal
+    let hasCompoundFields : boolean;
     // aave proposal
     let hasAaveFields: boolean;
     // data loaded
@@ -145,8 +145,8 @@ const NewProposalForm = {
       dataLoaded = !!(app.chain as Cosmos).governance.initialized;
     } else if (proposalTypeEnum === ProposalType.MolochProposal) {
       hasMolochFields = true;
-    } else if (proposalTypeEnum === ProposalType.MarlinProposal) {
-      hasMarlinFields = true;
+    } else if (proposalTypeEnum === ProposalType.CompoundProposal) {
+      hasCompoundFields = true;
     } else if (proposalTypeEnum === ProposalType.AaveProposal) {
       hasAaveFields = true;
     } else {
@@ -321,7 +321,7 @@ const NewProposalForm = {
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
         return;
-      } else if (proposalTypeEnum === ProposalType.MarlinProposal) {
+      } else if (proposalTypeEnum === ProposalType.CompoundProposal) {
         vnode.state.proposer = app.user?.activeAccount?.address;
         if (!vnode.state.proposer) throw new Error('Invalid address / not logged in');
         if (!vnode.state.description) throw new Error('Invalid description');
@@ -337,14 +337,14 @@ const NewProposalForm = {
           && valuesArray.length !== calldatasArray.length
           && calldatasArray.length !== signaturesArray.length)
           throw new Error('Array lengths do not match');
-        const details: MarlinProposalArgs = {
+        const details: CompoundProposalArgs = {
           targets: targetsArray.toString(),
           values: valuesArray.toString(),
           signatures: signaturesArray.toString(),
           calldatas: calldatasArray.toString(),
           description: vnode.state.description,
         };
-        (app.chain as Marlin).governance.propose(details)
+        (app.chain as Compound).governance.propose(details)
           .then((result) => done(result))
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
@@ -764,8 +764,8 @@ const NewProposalForm = {
               }),
             ]),
           ],
-          hasMarlinFields && [
-            m('h2', 'New Marlin Proposal:'),
+          hasCompoundFields && [
+            m('h2', 'New Compound Proposal:'),
             m(FormGroup, [
               m(FormLabel, 'Proposal Targets'),
               m(Input, {

@@ -47,7 +47,7 @@ abstract class ContractApi<ContractT extends Contract> {
     this.Contract = factory(this.contractAddress, this.Provider);
   }
 
-  public async init(): Promise<void> {
+  public async init(...args): Promise<void> {
     await this.Contract.deployed();
   }
 }

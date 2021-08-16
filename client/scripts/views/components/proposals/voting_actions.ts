@@ -26,14 +26,14 @@ import MolochProposal, {
   MolochVote,
   MolochProposalState
 } from 'controllers/chain/ethereum/moloch/proposal';
-import MarlinProposal, {
-  MarlinProposalVote,
-  MarlinVote
-} from 'controllers/chain/ethereum/marlin/proposal';
+import CompoundProposal, {
+  CompoundProposalVote,
+  CompoundVote
+} from 'controllers/chain/ethereum/compound/proposal';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import { notifyError } from 'controllers/app/notifications';
 import AaveProposal, { AaveProposalVote } from 'controllers/chain/ethereum/aave/proposal';
-import { AaveTypes, MarlinTypes } from '@commonwealth/chain-events';
+import { AaveTypes, CompoundTypes } from '@commonwealth/chain-events';
 
 const CannotVote: m.Component<{ action }> = {
   view: (vnode) => {
@@ -119,7 +119,7 @@ export const cancelProposal = (e, state, proposal, onModalClose) => {
     proposal.abortTx()
       .then(() => { onModalClose(); m.redraw(); })
       .catch((err) => { onModalClose(); notifyError(err.toString()); });
-  } else if (proposal instanceof MarlinProposal) {
+  } else if (proposal instanceof CompoundProposal) {
     proposal.cancelTx()
       .then(() => { onModalClose(); m.redraw(); })
       .catch((err) => { onModalClose(); notifyError(err.toString()); });
@@ -183,7 +183,7 @@ export const CancelButton: m.Component<{ proposal, votingModalOpen?, user?, onMo
         compact: true,
         rounded: true,
       }),
-    ]) : (proposal instanceof MarlinProposal) ? m('.veto-button', [
+    ]) : (proposal instanceof CompoundProposal) ? m('.veto-button', [
       m(Button, {
         intent: 'negative',
         disabled: proposal.isCancelled || votingModalOpen,
@@ -233,7 +233,7 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
     } else if (proposal instanceof CosmosProposal) {
       user = app.user.activeAccount as CosmosAccount;
     } else if (proposal instanceof MolochProposal
-      || proposal instanceof MarlinProposal
+      || proposal instanceof CompoundProposal
       || proposal instanceof AaveProposal
     ) {
       user = app.user.activeAccount as EthereumAccount;
@@ -284,8 +284,8 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
         proposal.submitVoteWebTx(new MolochProposalVote(user, MolochVote.YES))
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
-      } else if (proposal instanceof MarlinProposal) {
-        proposal.submitVoteWebTx(new MarlinProposalVote(user, MarlinVote.YES))
+      } else if (proposal instanceof CompoundProposal) {
+        proposal.submitVoteWebTx(new CompoundProposalVote(user, CompoundVote.YES))
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
       } else if (proposal instanceof AaveProposal) {
@@ -330,8 +330,8 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
         createTXModal(proposal.submitVoteTx(new CosmosVote(user, 'No'), null, onModalClose));
       } else if (proposal instanceof MolochProposal) {
         proposal.submitVoteWebTx(new MolochProposalVote(user, MolochVote.NO)).then(() => m.redraw());
-      } else if (proposal instanceof MarlinProposal) {
-        proposal.submitVoteWebTx(new MarlinProposalVote(user, MarlinVote.NO))
+      } else if (proposal instanceof CompoundProposal) {
+        proposal.submitVoteWebTx(new CompoundProposalVote(user, CompoundVote.NO))
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
       } else if (proposal instanceof AaveProposal) {
@@ -462,11 +462,11 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
         .filter((vote) => vote.choice === MolochVote.YES && vote.account.address === user.address).length > 0;
       hasVotedNo = user && proposal.getVotes()
         .filter((vote) => vote.choice === MolochVote.NO && vote.account.address === user.address).length > 0;
-    } else if (proposal instanceof MarlinProposal) {
+    } else if (proposal instanceof CompoundProposal) {
       hasVotedYes = user && proposal.getVotes()
-        .filter((vote) => vote.choice === MarlinVote.YES && vote.account.address === user.address).length > 0;
+        .filter((vote) => vote.choice === CompoundVote.YES && vote.account.address === user.address).length > 0;
       hasVotedNo = user && proposal.getVotes()
-        .filter((vote) => vote.choice === MarlinVote.NO && vote.account.address === user.address).length > 0;
+        .filter((vote) => vote.choice === CompoundVote.NO && vote.account.address === user.address).length > 0;
     } else if (proposal instanceof AaveProposal) {
       hasVotedYes = user && proposal.getVotes()
         .find((vote) => vote.choice && vote.account.address === user.address);
@@ -482,7 +482,7 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
       canVote = false;
     } else if (proposal instanceof MolochProposal && proposal.state !== MolochProposalState.Voting) {
       canVote = false;
-    } else if (proposal instanceof MarlinProposal && proposal.state !== MarlinTypes.ProposalState.Active) {
+    } else if (proposal instanceof CompoundProposal && proposal.state !== CompoundTypes.ProposalState.Active) {
       canVote = false; // TODO: Fix proposal.state function above to not return promise
     } else if (hasVotedForAnyChoice) {
       // enable re-voting for particular types
@@ -618,7 +618,7 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
         ]),
         m(ProposalExtensions, { proposal }) ]
       ];
-    } else if (proposal.votingType === VotingType.MarlinYesNo) {
+    } else if (proposal.votingType === VotingType.CompoundYesNo) {
       votingActionObj = [
         m('.button-row', [
           yesButton,

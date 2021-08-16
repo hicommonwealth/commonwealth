@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
   "contractName": "Timelock",
-  "sourceName": "contracts/Marlin/Timelock.sol",
+  "sourceName": "contracts/compound/Timelock.sol",
   "abi": [
     {
       "constant": false,
