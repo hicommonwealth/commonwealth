@@ -33,6 +33,7 @@ import createReaction from './routes/createReaction';
 import deleteReaction from './routes/deleteReaction';
 import viewReactions from './routes/viewReactions';
 import bulkReactions from './routes/bulkReactions';
+import reactionsCounts from './routes/reactionsCounts';
 import starCommunity from './routes/starCommunity';
 import createCommunity from './routes/createCommunity';
 import deleteCommunity from './routes/deleteCommunity';
@@ -307,6 +308,7 @@ function setupRouter(
   router.get('/viewReactions', viewReactions.bind(this, models));
   // TODO: Change to GET /reactions
   router.get('/bulkReactions', bulkReactions.bind(this, models));
+  router.post('/reactionsCounts', reactionsCounts.bind(this, models));
 
   // generic invite link
   // TODO: Change to POST /inviteLink

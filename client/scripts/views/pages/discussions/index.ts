@@ -258,7 +258,7 @@ const DiscussionsPage: m.Component<
     vnode.state.lookback = {};
     vnode.state.postsDepleted = {};
     vnode.state.topicInitialized = {};
-    vnode.state.topicInitialized[ALL_PROPOSALS_KEY] = true;
+    vnode.state.topicInitialized[ALL_PROPOSALS_KEY] = false;
     const topic = vnode.attrs.topic;
     const stage = m.route.param('stage');
     const subpage = topic || stage ? `${topic || ''}#${stage || ''}` : ALL_PROPOSALS_KEY;

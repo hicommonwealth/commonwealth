@@ -76,6 +76,7 @@ import User from '../../components/widgets/user';
 import MarkdownFormattedText from '../../components/markdown_formatted_text';
 import { createTXModal } from '../../modals/tx_signing_modal';
 import { SubstrateAccount } from '../../../controllers/chain/substrate/account';
+import {modelFromServer as modelReactionCountFromServer} from "controllers/server/reactionCounts";
 
 const ProposalHeader: m.Component<{
   commentCount: number;
@@ -678,11 +679,23 @@ const ViewProposalPage: m.Component<{
       (app.activeCommunityId()
         ? app.comments.refresh(proposal, null, app.activeCommunityId())
         : app.comments.refresh(proposal, app.activeChainId(), null))
-        .then((result) => {
+        .then(async (result) => {
           vnode.state.comments = app.comments.getByProposal(proposal).filter((c) => c.parentComment === null);
+
+          //fetch reactions
+          const { result: reactionCounts } = await $.post(`${app.serverUrl()}/reactionsCounts`, {
+            comment_ids: vnode.state.comments.map((comment) => comment.id),
+            active_address: app.user.activeAccount?.address
+          });
+          app.reactionCounts.deinit()
+          for (const rc of reactionCounts) {
+            app.reactionCounts.store.add(modelReactionCountFromServer(rc));
+          }
           m.redraw();
         }).catch((err) => {
-          notifyError('Failed to load comments');
+          notifyError('Failed to load comments'
+
+          );
           vnode.state.comments = [];
           m.redraw();
         });
