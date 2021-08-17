@@ -410,7 +410,7 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
             vnode.state.address = v;
             vnode.state.loaded = false;
             if (Web3.utils.isAddress(v)) {
-              $.get(`${app.serverUrl()}/getTokenForum`, { address: v }).then(async (res) => {
+              $.get(`${app.serverUrl()}/getTokenForum`, { address: v, allowUncached: true }).then(async (res) => {
                 vnode.state.name = res?.result?.chain?.name || '';
                 vnode.state.symbol = res?.result?.chain?.symbol || '';
                 vnode.state.icon_url = res?.result?.chain?.icon_url || '';

@@ -49,6 +49,9 @@ const getTokenForum = async (
       return res.json({ status: 'Failure', message: 'Failed to find or create chain' });
     }
   } else {
+    if (req.body.allowUncached) {
+      return res.json({ status: 'Success', result: { chain: null, node: null } });
+    }
     return res.json({ status: 'Failure', message: 'Token does not exist' });
   }
 };
