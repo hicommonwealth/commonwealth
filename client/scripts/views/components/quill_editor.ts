@@ -160,7 +160,7 @@ const instantiateEditor = (
       if (!html && files.length > 0) {
         this.quill.uploader.upload(range, files);
       } else {
-        this.onPaste(range, isMarkdownMode() ? { html: null, text } : { html, text });
+        this.onPaste(range, isMarkdownMode() ? { text } : { html, text });
       }
     }
   }
