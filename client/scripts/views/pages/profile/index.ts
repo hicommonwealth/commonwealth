@@ -192,6 +192,8 @@ const loadProfile = async (vnode: m.Vnode<{ address: string, setIdentity?: boole
     valid = Web3.utils.checkAddressChecksum(address);
   } else if (chainInfo?.base === ChainBase.CosmosSDK) {
     valid = checkCosmosAddress(address);
+  } else if (chainInfo?.base === ChainBase.NEAR) {
+    valid = true;
   }
   if (!valid) {
     return;

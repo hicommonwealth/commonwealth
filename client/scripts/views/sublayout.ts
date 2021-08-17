@@ -16,7 +16,6 @@ import FooterLandingPage from 'views/pages/landing/landing_page_footer';
 import Token from 'controllers/chain/ethereum/token/adapter';
 import { SearchBar } from './components/search_bar';
 
-
 const Sublayout: m.Component<{
   // overrides
   loadingLayout?: boolean,
@@ -58,16 +57,26 @@ const Sublayout: m.Component<{
       (!app.activeId() && !app.isCustomDomain() && (m.route.get() === '/' || m.route.get().startsWith('/?'))) ? [
         m('h3', 'Commonwealth')
       ] : chain ? [
-        m(ChainIcon, { size: ICON_SIZE, chain }),
+        m('.ChainIcon',[
+          link('a', (!app.isCustomDomain() ? `/${app.activeId()}` : '/' ), [
+            m(ChainIcon, { size: ICON_SIZE, chain })
+          ])
+        ]),      
         m('h4.sublayout-header-heading', [
           link('a', (app.isCustomDomain() ? '/' : `/${app.activeId()}`), chain.name),
           title && m('span.breadcrumb', m.trust('/')),
           title
         ]),
       ] : community ? [
-        m(CommunityIcon, { size: ICON_SIZE, community }),
+        m('.ChainIcon',[
+          link('a', (!app.isCustomDomain() ? `/${app.activeId()}` : '/' ), [
+            m(CommunityIcon, { size: ICON_SIZE, community })
+          ])
+        ]),
         m('h4.sublayout-header-heading', [
-          link('a', (app.isCustomDomain() ? '/' : `/${app.activeId()}`), community.name),
+          m('div.sublayout-header-heading-wrapper', [
+            link('a', (app.isCustomDomain() ? '/' : `/${app.activeId()}`), community.name),
+          ]),
           community.privacyEnabled && m(Icon, { name: Icons.LOCK, size: 'xs' }),
           title && m('span.breadcrumb', m.trust('/')),
           title

@@ -1,33 +1,34 @@
 import * as Sequelize from 'sequelize';
+import { Model, DataTypes } from 'sequelize';
+import { ModelStatic } from './types';
 
 export interface ContractCategoryAttributes {
-  id?: number;
   name: string;
   description: string;
   color: string;
+  id?: number;
   created_at?: Date;
   updated_at?: Date;
 }
 
 export interface ContractCategoryInstance
-extends Sequelize.Instance<ContractCategoryAttributes>, ContractCategoryAttributes {
+extends Model<ContractCategoryAttributes>, ContractCategoryAttributes {}
 
-}
-
-export interface ContractCategoryModel extends Sequelize.Model<ContractCategoryInstance, ContractCategoryAttributes> {
-
-}
+export type ContractCategoryModelStatic = ModelStatic<ContractCategoryInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): ContractCategoryModel => {
-  const ContractCategory = sequelize.define<ContractCategoryInstance, ContractCategoryAttributes>('ContractCategory', {
+  dataTypes: typeof DataTypes,
+): ContractCategoryModelStatic => {
+  const ContractCategory = <ContractCategoryModelStatic>sequelize.define('ContractCategory', {
     id:          { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     name:        { type: dataTypes.STRING, allowNull: false },
     description: { type: dataTypes.TEXT, allowNull: false },
     color:       { type: dataTypes.STRING, allowNull: false },
   }, {
+    tableName: 'ContractCategories',
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
     underscored: true,
   });
 

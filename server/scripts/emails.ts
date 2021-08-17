@@ -1,4 +1,4 @@
-import Sequelize from 'sequelize';
+import Sequelize, { Op } from 'sequelize';
 import moment from 'moment';
 import { capitalize } from 'lodash';
 import {
@@ -173,7 +173,7 @@ export const sendImmediateNotificationEmail = async (subscription, emailObject) 
   emailObject.bcc = 'raymond+bcc@commonwealth.im';
 
   try {
-    console.log('sending immediate notification email');
+    console.log(`sending immediate notification email to ${emailObject.to}`);
     await sgMail.send(emailObject);
   } catch (e) {
     console.log('Failed to send immediate notification email', e?.response?.body?.errors);
@@ -191,7 +191,6 @@ export const sendBatchedNotificationEmails = async (models): Promise<number> => 
 
     log.info(`Sending to ${users.length} users`);
 
-    const { Op } = models.sequelize;
     const last24hours = new Date((new Date() as any) - 24 * 60 * 60 * 1000);
     await Promise.all(users.map(async (user) => {
       const notifications = await models.Notification.findAll({

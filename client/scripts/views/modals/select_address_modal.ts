@@ -78,7 +78,7 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
       });
     };
 
-    // const chainbase = (app.chain?.meta?.chain?.base.length != 0) ? app.chain?.meta?.chain?.base : ChainBase.Ethereum;
+    const chainbase = (app.chain?.meta?.chain?.base.length != 0) ? app.chain?.meta?.chain?.base : ChainBase.Ethereum;
 
     const activeCommunityMeta = app.chain ? app.chain.meta?.chain : app.community?.meta;
     const hasTermsOfService = !!activeCommunityMeta?.terms;
@@ -89,7 +89,9 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
       ]),
       m('.compact-modal-body', [
         activeAccountsByRole.length === 0 ? m('.select-address-placeholder', [
-          m('p', `Connect ${articlize(app.chain?.meta?.chain.name || 'Web3')} address to join this community. `),
+          m('p', [
+            `Connect ${(chainbase[0].toUpperCase() + chainbase.slice(1) || 'Web3')} address to join this community: `,
+          ]),
         ]) : m('.select-address-options', [
           activeAccountsByRole.map(([account, role], index) => role && m('.select-address-option.existing', [
             m('.select-address-option-left', [

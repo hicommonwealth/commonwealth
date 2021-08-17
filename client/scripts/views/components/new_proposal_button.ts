@@ -13,6 +13,8 @@ import { SubstrateAccount } from 'controllers/chain/substrate/account';
 
 export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]>, mobile?: boolean) => {
   const activeAccount = app.user.activeAccount;
+  const showSnapshotOptions = app.user.activeAccount
+    && app.chain?.meta.chain.snapshot;
 
   const topics = app.topics.getByCommunity(
     app.activeId()
@@ -38,7 +40,11 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
         iconLeft: mobile ? Icons.PLUS : undefined,
       })
     )),
-    (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
+    (app.chain?.network === ChainNetwork.Aave || 
+      app.chain?.network === ChainNetwork.dYdX ||
+      app.chain?.network === ChainNetwork.Marlin ||
+      app.chain?.base === ChainBase.CosmosSDK || 
+      app.chain?.base === ChainBase.Substrate)
       && !mobile
       && m(MenuDivider),
     app.chain?.base === ChainBase.CosmosSDK && m(MenuItem, {
@@ -46,6 +52,21 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
         type: ProposalType.CosmosProposal
       }),
       label: 'New text proposal',
+      iconLeft: mobile ? Icons.PLUS : undefined,
+    }),
+    app.chain?.base === ChainBase.Ethereum && app.chain?.network === ChainNetwork.Aave
+     && m(MenuItem, {
+      onclick: (e) => navigateToSubpage('/new/proposal/:type', {
+        type: ProposalType.AaveProposal
+      }),
+      label: 'New On-Chain Proposal',
+      iconLeft: mobile ? Icons.PLUS : undefined,
+    }),
+    app.chain?.base === ChainBase.Ethereum && app.chain?.network === ChainNetwork.Marlin && m(MenuItem, {
+      onclick: (e) => navigateToSubpage('/new/proposal/:type', {
+        type: ProposalType.MarlinProposal
+      }),
+      label: 'New On-Chain Proposal',
       iconLeft: mobile ? Icons.PLUS : undefined,
     }),
     app.chain?.base === ChainBase.Substrate && app.chain?.network !== ChainNetwork.Plasm && [
@@ -86,6 +107,14 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
         iconLeft: mobile ? Icons.PLUS : undefined,
       }),
     ],
+    showSnapshotOptions && m(MenuItem, {
+      onclick: (e) => {
+        e.preventDefault();
+        m.route.set(`/${app.activeChainId()}/new/snapshot-proposal/${app.chain.meta.chain.snapshot}`);
+      },
+      label: 'New Snapshot Proposal',
+      iconLeft: mobile ? Icons.PLUS : undefined,
+    }),
   ];
 };
 

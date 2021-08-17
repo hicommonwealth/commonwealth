@@ -7,6 +7,7 @@ import {
 import { factory, formatFilename } from '../../shared/logging';
 import { DynamicTemplate } from '../../shared/types';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import { DB } from '../database';
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 const log = factory.getLogger(formatFilename(__filename));
@@ -18,7 +19,7 @@ export const Errors = {
   ChainOrCommunityRequired: 'Must be within existing chain or community to register',
 };
 
-const startEmailLogin = async (models, req: Request, res: Response, next: NextFunction) => {
+const startEmailLogin = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const protocol = req.headers['x-forwarded-proto'] || req.protocol;
   const hostname = req.headers['x-forwarded-host'] || req.hostname;
 

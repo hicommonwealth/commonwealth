@@ -104,8 +104,8 @@
     }
     @include md-max {
         .sublayout-main-col {
-            width: 100%;
-            // max-width: none;
+            min-width: 100%;
+            max-width: 100%;
             padding: 0;
         }
     }
@@ -148,8 +148,11 @@
             margin-top: 0 !important;
             flex: 3;
             white-space: nowrap;
-            max-width: min-content;
-            > .ChainIcon,
+            > .ChainIcon{
+                width: 22px;
+                height: 22px;
+                margin-right: 10px;
+            }
             > .CommunityIcon {
                 display: inline-block;
                 margin-right: 14px;
@@ -160,7 +163,7 @@
             }
             .CommunitySelector,
             .sublayout-header-heading {
-                display: inline-block;
+                display: flex;
             }
             h3 {
                 font-size: 1.15rem;
@@ -190,6 +193,13 @@
                         content: ' ';
                         width: 5px;
                     }
+                }
+
+                .sublayout-header-heading-wrapper {
+                    max-width: 200px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
                 }
             }
         }
