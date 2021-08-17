@@ -52,8 +52,6 @@
         }
     }
     .sublayout-sidebar-col {
-        flex: 1;
-        padding-right: 48px;
         max-width: $sidebar-width;
         .Sidebar {
             max-width: 190px; // sidebar button width
@@ -72,8 +70,7 @@
     .sublayout-main-col {
         flex: 3;
         padding: 0;
-        padding-right: 20px;
-        max-width: calc(100% - #{$sidebar-width});
+        padding: 36px;
         @include sm-max {
             padding: 0;
         }
