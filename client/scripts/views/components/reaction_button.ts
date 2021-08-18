@@ -20,12 +20,25 @@ export enum ReactionType {
   Dislike = 'dislike'
 }
 
+type ReactionButtonState = {
+  loading: boolean
+  reactors: any
+  reactionCounts: ReactionCount<any>
+  likes: number
+  dislikes: number
+  hasReacted: boolean
+}
 
-const getDisplayedReactorsForPopup = (vnode:  m.Vnode<{post: OffchainThread | AnyProposal | OffchainComment<any>,
-  type: ReactionType, displayAsLink?: boolean, tooltip?: boolean, large?: boolean},
-    m._NoLifecycle<m.Component<{post: OffchainThread | AnyProposal | OffchainComment<any>,
-      type: ReactionType, displayAsLink?: boolean, tooltip?: boolean, large?: boolean},
-        {loading: boolean, reactors: any, likes: number, dislikes: number}> & {loading: boolean, reactors: any, likes: number, dislikes: number}>>) => {
+type ReactionButtonAttrs = {
+  post: OffchainThread | AnyProposal | OffchainComment<any>;
+  type: ReactionType;
+  displayAsLink?: boolean;
+  tooltip?: boolean;
+  large?: boolean;
+}
+
+
+const getDisplayedReactorsForPopup = (vnode: m.Vnode<ReactionButtonAttrs, ReactionButtonState>) => {
   const { reactors = [], likes = 0, dislikes = 0 } = vnode.state
   const slicedReactors = reactors.slice(0, MAX_VISIBLE_REACTING_ACCOUNTS).map((rxn_) => {
     const { Address: { address, chain } } = rxn_
@@ -59,13 +72,7 @@ const fetchReactionsByPost = async (post: OffchainThread | AnyProposal | Offchai
 }
 
 
-const ReactionButton: m.Component<{
-  post: OffchainThread | AnyProposal | OffchainComment<any>;
-  type: ReactionType;
-  displayAsLink?: boolean;
-  tooltip?: boolean;
-  large?: boolean;
-}, { loading: boolean, reactors: any, reactionCounts: ReactionCount<any>, likes: number, dislikes: number, hasReacted: boolean }> = {
+const ReactionButton: m.Component<ReactionButtonAttrs, ReactionButtonState> = {
   view: (vnode) => {
     const { post, type, displayAsLink, tooltip, large } = vnode.attrs;
     const reactionCounts = app.reactionCounts.getByPost(post)

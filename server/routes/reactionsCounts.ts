@@ -6,7 +6,14 @@ import { OffchainReactionInstance} from "../models/offchain_reaction";
 
 const log = factory.getLogger(formatFilename(__filename));
 
-// fetch reaction counts and whether user has reacted
+/*
+2 queries:
+- First gets the count of reactions for each thread/comment or proposal
+- Second gets the list of reactions from the user active address
+
+The reduce function goes through each result returned by query that counts
+and checks whether there's a match between thread/comment/proposal ids
+ */
 const reactionsCounts = async (models: DB, req: Request, res: Response, next: NextFunction) => {
     const { active_address } = req.body
     const thread_ids = req.body['thread_ids[]'];
