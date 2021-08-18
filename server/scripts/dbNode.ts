@@ -7,8 +7,9 @@ import {
   createListener,
   chainSupportedBy,
   SubstrateTypes,
-  SubstrateListener
+  SubstrateEvents
 } from '@commonwealth/chain-events';
+
 import {
   RabbitMqHandler,
 } from 'ce-rabbitmq-plugin';
@@ -118,7 +119,7 @@ async function mainProcess(producer: RabbitMqHandler, pool) {
           tokenAddresses: erc20Tokens.map(chain => chain.address),
           tokenNames: erc20TokenNames,
           verbose: false
-        }, true, 'erc20')
+        }, 'erc20')
 
         // add the rabbitmq handler for this chain
         listeners['erc20'].eventHandlers['rabbitmq'] = { handler: producer };
@@ -171,6 +172,7 @@ async function mainProcess(producer: RabbitMqHandler, pool) {
       let base = chain.base;
       if (chain.type === 'dao') {
         base = chain.network
+        // TODO: deal with compound base
       }
 
       try {
@@ -183,10 +185,7 @@ async function mainProcess(producer: RabbitMqHandler, pool) {
           verbose: false,
           enricherConfig: { balanceTransferThresholdPermill: 10_000 },
           discoverReconnectRange: discoverReconnectRange
-        },
-          true,
-          base
-        );
+        }, base);
       } catch (error) {
         delete listeners[chain.id];
         await handleFatalError(error, pool, chain, 'listener-startup');
@@ -219,11 +218,11 @@ async function mainProcess(producer: RabbitMqHandler, pool) {
     // restart the listener if specs were updated (only substrate chains)
     else if (
       chain.base == 'substrate' &&
-      !_.isEqual(chain.substrate_spec, (<SubstrateListener>listeners[chain.id]).options.spec)
+      !_.isEqual(chain.substrate_spec, (<SubstrateEvents.Listener>listeners[chain.id]).options.spec)
     ) {
       log.info(`Spec for ${chain.id} changed... restarting listener`);
       try {
-        await (<SubstrateListener>listeners[chain.id]).updateSpec(chain.substrate_spec);
+        await (<SubstrateEvents.Listener>listeners[chain.id]).updateSpec(chain.substrate_spec);
       } catch (error) {
         await handleFatalError(error, pool, chain.id, 'update-spec')
       }

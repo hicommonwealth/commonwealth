@@ -52,7 +52,7 @@
     "@babel/polyfill": "^7.2.5",
     "@babel/preset-env": "^7.2.3",
     "@babel/register": "^7.4.0",
-    "@commonwealth/chain-events": "git+https://git@github.com/timolegros/chain-events.git#tim.OOP",
+    "@commonwealth/chain-events": "git+https://git@github.com/hicommonwealth/chain-events.git#tim.OOP",
     "@cosmjs/amino": "^0.25.5",
     "@cosmjs/launchpad": "^0.25.5",
     "@cosmjs/proto-signing": "^0.25.5",

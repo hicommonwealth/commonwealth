@@ -8,6 +8,7 @@ const { assert } = chai;
 
 // only chains in this array will be tested (can be augmented to pull all chains in db)
 const supportedChains = ['polkadot']
+const dbNodeIgnoreErrors = ['METADATA: Unknown types found', 'Unable to determine offline time range']
 
 // fetched identity should match the identities in this object
 const fetchedIdentities = {
@@ -242,8 +243,6 @@ setTimeout(async () => {
   await clearQueues();
   await prepareDB(client);
 
-  // TODO: figure out a good method of testing if events are actually produced => set reconnectRange to some known block with
-  // TODO: a certain amount of events then check if those events were added to the databases in ChainEvents
   describe.only('Tests for single chain per node', () => {
     pool.on('error', (err, client) => {
       console.error('Unexpected error on idle client', err);
@@ -256,7 +255,7 @@ setTimeout(async () => {
         it.only(`Should start a node with a ${chain.id} listener`, (done) => {
           let child = spawn(`ts-node`,
             [`${__dirname}../../../server/scripts/dbNode.ts`],
-            {env: { ...process.env, TESTING:'true', WORKER_NUMBER:String(chainIndex), NUM_WORKERS:String(chains.length - 1), HANDLE_IDENTITY:'publish', INFURA_API_KEY: '8e25780c4d574b3cbf53c306a841d09f'}}
+            {env: { ...process.env, TESTING:'true', WORKER_NUMBER:String(chainIndex), NUM_WORKERS:String(chains.length), HANDLE_IDENTITY:'publish', INFURA_API_KEY: '8e25780c4d574b3cbf53c306a841d09f'}}
           );
 
           childExit([child]);
@@ -279,7 +278,7 @@ setTimeout(async () => {
 
           child.stderr.on('data', (data) => {
             console.error(`child stderr:\n${data}`);
-            if (!data.includes('Unable to determine offline time range')) {
+            if (!dbNodeIgnoreErrors.map(o => data.includes(o)).includes(true)) {
               assert.fail(String(data))
             }
           });
@@ -354,7 +353,7 @@ setTimeout(async () => {
           consumer.stdout.on('data', (data) => {
             data = String(data)
             console.log(`${data}`);
-            if (data.includes('consumer started')) {
+            if (data.includes('Consumer started')) {
               done()
             }
           });
