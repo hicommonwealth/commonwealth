@@ -1,4 +1,4 @@
-// import { MarlinTypes } from '@commonwealth/chain-events';
+// import { CompoundTypes } from '@commonwealth/chain-events';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 
 import EthereumAccount from 'controllers/chain/ethereum/account';
@@ -9,33 +9,33 @@ import ChainEntityController from 'controllers/server/chain_entities';
 import { IApp } from 'state';
 
 import { notifyError } from 'controllers/app/notifications';
-import { MarlinTypes } from '@commonwealth/chain-events';
-import MarlinChain from './chain';
-import MarlinGovernance from './governance';
+import { CompoundTypes } from '@commonwealth/chain-events';
+import CompoundChain from './chain';
+import CompoundGovernance from './governance';
 
-export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount> {
+export default class Compound extends IChainAdapter<EthereumCoin, EthereumAccount> {
   public readonly base = ChainBase.Ethereum;
-  public chain: MarlinChain;
+  public chain: CompoundChain;
   public accounts: EthereumAccounts;
-  public governance: MarlinGovernance;
+  public governance: CompoundGovernance;
   public readonly chainEntities = new ChainEntityController();
 
   constructor(meta: NodeInfo, app: IApp) {
     super(meta, app);
-    this.chain = new MarlinChain(this.app);
+    this.chain = new CompoundChain(this.app);
     this.accounts = new EthereumAccounts(this.app);
-    this.governance = new MarlinGovernance(this.app);
+    this.governance = new CompoundGovernance(this.app);
     this.accounts.init(this.chain);
   }
 
   public handleEntityUpdate(entity: ChainEntity, event: ChainEvent): void {
     switch (entity.type) {
-      case MarlinTypes.EntityKind.Proposal: {
+      case CompoundTypes.EntityKind.Proposal: {
         this.governance.updateProposal(entity, event);
         break;
       }
       default: {
-        console.error('Received invalid marlin chain entity!');
+        console.error('Received invalid compound chain entity!');
         break;
       }
     }
@@ -45,7 +45,7 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
     try {
       await this.chain.init(this.meta);
       // TODO: Fix the global eth block height setting
-      this.block.height = await this.chain.marlinApi.Provider.getBlockNumber();
+      this.block.height = await this.chain.compoundApi.Provider.getBlockNumber();
       await super.initApi();
     } catch (e) {
       this._failed = true;
@@ -54,18 +54,18 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
   }
 
   public async initData() {
-    console.log('Marlin initData()');
+    console.log('Compound initData()');
     await this.chain.initEventLoop();
     await this.governance.init(this.chain, this.accounts);
     await super.initData();
   }
 
   public async deinit() {
-    console.log('Marlin deinit()');
+    console.log('Compound deinit()');
     await super.deinit();
     this.governance.deinit();
     this.accounts.deinit();
     this.chain.deinit();
-    console.log('Ethereum/Marlin stopped.');
+    console.log('Ethereum/compound stopped.');
   }
 }

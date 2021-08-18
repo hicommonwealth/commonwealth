@@ -371,7 +371,7 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
       vnode.state.step === LinkNewAddressSteps.Step1VerifyWithWebWallet ? m('.link-address-step', [
         linkAddressHeader,
         m('.link-address-step-narrow', [
-          webWallet?.accounts?.length === 0
+          webWallet?.accounts?.length === 0 && app.chain.base !== ChainBase.NEAR
             && m(Button, {
               class: 'account-adder',
               intent: 'primary',
@@ -462,18 +462,18 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
               : app.chain.networkStatus !== ApiStatus.Connected
                 ? [ ]
                 : [ webWallet?.accounts.map(
-                (addressOrAccount) => m(LinkAccountItem, {
-                  account: typeof addressOrAccount === 'string'
-                    ? { address: addressOrAccount }
-                    : addressOrAccount,
-                  base: app.chain.base,
-                  targetCommunity,
-                  accountVerifiedCallback,
-                  errorCallback: (error) => { notifyError(error); },
-                  linkNewAddressModalVnode: vnode,
-                  webWallet,
-                })
-              )]
+                  (addressOrAccount) => m(LinkAccountItem, {
+                    account: typeof addressOrAccount === 'string'
+                      ? { address: addressOrAccount }
+                      : addressOrAccount,
+                    base: app.chain.base,
+                    targetCommunity,
+                    accountVerifiedCallback,
+                    errorCallback: (error) => { notifyError(error); },
+                    linkNewAddressModalVnode: vnode,
+                    webWallet,
+                  })
+                )]
           ]),
           vnode.state.error && m('.error-message', vnode.state.error),
         ]),

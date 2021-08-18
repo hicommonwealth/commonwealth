@@ -65,7 +65,7 @@ describe('Token Forum tests', () => {
   });
 
   beforeEach(async () => {
-    await tbc.reset(null, modelUtils.createTokenMeta());
+    await tbc.reset(modelUtils.createTokenMeta());
   });
 
   it('should permit token-holder to take actions on token forum', async () => {

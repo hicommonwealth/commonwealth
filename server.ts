@@ -23,7 +23,6 @@ const log = factory.getLogger(formatFilename(__filename));
 import ViewCountCache from './server/util/viewCountCache';
 import IdentityFetchCache from './server/util/identityFetchCache';
 import TokenBalanceCache from './server/util/tokenBalanceCache';
-import TokenListCache from './server/util/tokenListCache';
 import { SESSION_SECRET, ROLLBAR_SERVER_TOKEN } from './server/config';
 import models from './server/database';
 import { updateEvents, updateBalances } from './server/util/eventPoller';
@@ -65,8 +64,7 @@ async function main() {
   const RUN_AS_LISTENER = process.env.RUN_AS_LISTENER === 'true';
 
   const identityFetchCache = new IdentityFetchCache(models);
-  const tokenListCache = new TokenListCache();
-  const tokenBalanceCache = new TokenBalanceCache(tokenListCache);
+  const tokenBalanceCache = new TokenBalanceCache(models);
 
   let rc = null;
   if (SHOULD_SEND_EMAILS) {
@@ -229,7 +227,7 @@ async function main() {
   setupMiddleware();
   setupPassport(models);
 
-  await tokenBalanceCache.start(models);
+  await tokenBalanceCache.start();
   setupAPI(app, models, viewCountCache, identityFetchCache, tokenBalanceCache);
   setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
   setupErrorHandlers(app, rollbar);

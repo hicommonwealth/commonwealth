@@ -87,8 +87,8 @@ export default (
     type: { type: dataTypes.STRING, allowNull: false },
     substrate_spec: { type: dataTypes.JSONB, allowNull: true },
     has_chain_events_listener: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
-    terms: { type: dataTypes.STRING, allowNull: true },
     snapshot: { type: dataTypes.STRING, allowNull: true },
+    terms: { type: dataTypes.STRING, allowNull: true },
   }, {
     tableName: 'Chains',
     timestamps: false,
