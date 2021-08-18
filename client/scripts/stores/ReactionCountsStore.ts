@@ -4,40 +4,40 @@ import {AbridgedThread, AnyProposal, OffchainComment, OffchainReaction, Offchain
 
 
 class ReactionCountsStore  extends IdStore<ReactionCount<any>>  {
-    private _storePost: { [identifier: string]: ReactionCount<any> } = {};
+    private _storeRC: { [identifier: string]: ReactionCount<any> } = {};
 
     public add(reactionCount: ReactionCount<any>) {
         const identifier = this.getIdentifier(reactionCount);
-        const reactionAlreadyInStore = (this._storePost[identifier] || null);
+        const reactionAlreadyInStore = (this._storeRC[identifier] || null);
         if (!reactionAlreadyInStore) {
             super.add(reactionCount);
-            if (!this._storePost[identifier]) {
-                this._storePost[identifier] = null;
+            if (!this._storeRC[identifier]) {
+                this._storeRC[identifier] = null;
             }
-            this._storePost[identifier] = reactionCount;
+            this._storeRC[identifier] = reactionCount;
         }
         return this;
     }
 
-    public remove(reactionCount: ReactionCount<any>) {
-        super.remove(reactionCount);
+
+    public update(reactionCount: ReactionCount<any>) {
         const identifier = this.getIdentifier(reactionCount);
-        const proposal = this._storePost[identifier];
-        if (!proposal) {
+        if (!this._storeRC[identifier]) {
             throw new Error('Reaction count not in proposals store');
         }
-        delete this._storePost[identifier];
+        super.update(reactionCount)
+        this._storeRC[identifier] = reactionCount
         return this;
     }
 
     public clear() {
         super.clear();
-        this._storePost = {};
+        this._storeRC = {};
     }
 
     public getReactionCountByPost(post: OffchainThread | AbridgedThread | AnyProposal | OffchainComment<any>): ReactionCount<any> {
         const identifier = this.getPostIdentifier(post);
-        return this._storePost[identifier] || null;
+        return this._storeRC[identifier] || null;
     }
 
     public getIdentifier(reactionCount: ReactionCount<any>) {
