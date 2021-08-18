@@ -17,6 +17,7 @@ import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import PageLoading from 'views/pages/loading';
 import LoginWithWalletDropdown from 'views/components/login_with_wallet_dropdown';
 import { formatAddressShort } from '../../../../../shared/utils';
+import MarkdownFormattedText from '../../components/markdown_formatted_text';
 
 const editIdentityAction = (account, currentIdentity: SubstrateIdentity, vnode) => {
   const chainObj = app.config.chains.getById(account.chain);
@@ -103,10 +104,9 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
     };
 
     return m('.ProfileHeader', [
-      m('.cover'),
       m('.bio-main', [
         m('.bio-left', [ // TODO: Rename class to non-bio to avoid confusion with Bio component
-          m('.avatar', account.profile?.getAvatar(90)),
+          account.profile && m('.avatar', account.profile?.getAvatar(90)),
         ]),
         m('.bio-right', [
           m('.name-row', [
@@ -114,25 +114,20 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
               ? m(User, { user: account, hideAvatar: true, showRole: true })
               : account.address),
           ]),
+          m('.address-block-left', [
+            m('.address', `${account.address.slice(0, 6)}...${account.address.slice(account.address.length - 6)}`),
+            m('img', {
+              src: '/static/img/copy_default.svg',
+              alt: '',
+              class: 'cursor-pointer',
+              onclick: (e) => {
+                window.navigator.clipboard.writeText(account.address)
+                  .then(() => notifySuccess('Copied address to clipboard'));
+              }
+            }),
+          ]),
           m('.info-row', [
             account.profile?.headline && m('span.profile-headline', account.profile.headline),
-            m('span.username', formatAddressShort(account.address, account.chain, true)),
-            !vnode.state.copied && m('a.copy-address', {
-              href: '#',
-              onclick: (e) => {
-                e.preventDefault();
-                clipboard.writeText(account.address);
-                vnode.state.copied = true;
-                setTimeout(() => {
-                  $(e.target).next('.copy-done').fadeOut(1000).promise()
-                    .done(() => {
-                      vnode.state.copied = false;
-                      m.redraw();
-                    });
-                }, 1500);
-              }
-            }, 'Copy address'),
-            vnode.state.copied && m('span.copy-done', 'Copied'),
             m('.space'),
             isClaimable && m(LoginWithWalletDropdown, {
               prepopulateAddress: account.address,
@@ -145,6 +140,14 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
         ]),
         m('.bio-actions-breakpoint'),
         m('.bio-actions', [
+          account.profile && account.profile.bio
+            ? m('p', [
+              m(MarkdownFormattedText, { doc: account.profile.bio })
+            ])
+            : m('.no-items', [
+              (account.profile && account.profile.name) ? account.profile.name : 'This account',
+              ' hasn\'t created a bio'
+            ]),
           onOwnProfile ? [
             editIdentityAction(account, vnode.state.identity, vnode),
             m(Button, {
