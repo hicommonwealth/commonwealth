@@ -12,6 +12,7 @@ import { notifyError } from 'controllers/app/notifications';
 
 export const modelFromServer = (reactionCount) => {
     return new ReactionCount(
+        reactionCount.id,
         reactionCount.thread_id,
         reactionCount.comment_id,
         reactionCount.proposal_id,

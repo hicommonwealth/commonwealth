@@ -684,12 +684,14 @@ const ViewProposalPage: m.Component<{
 
           //fetch reactions
           const { result: reactionCounts } = await $.post(`${app.serverUrl()}/reactionsCounts`, {
+            thread_ids: [proposalId],
             comment_ids: vnode.state.comments.map((comment) => comment.id),
             active_address: app.user.activeAccount?.address
           });
-          app.reactionCounts.deinit()
+          // app.reactionCounts.deinit()
           for (const rc of reactionCounts) {
-            app.reactionCounts.store.add(modelReactionCountFromServer(rc));
+            const id = app.reactionCounts.store.getIdentifier(reactionCounts)
+            app.reactionCounts.store.add(modelReactionCountFromServer({ ...rc, id }));
           }
           m.redraw();
         }).catch((err) => {

@@ -501,12 +501,13 @@ class ThreadsController {
       active_address: app.user.activeAccount?.address
     });
     for (const rc of reactionCounts) {
-      const existing = app.reactionCounts.store.getById(reactionCounts.id);
+      const id = app.reactionCounts.store.getIdentifier(reactionCounts)
+      const existing = app.reactionCounts.store.getById(id);
       if (existing) {
         app.reactionCounts.store.remove(existing);
       }
       try {
-        app.reactionCounts.store.add(modelReactionCountFromServer(rc));
+        app.reactionCounts.store.add(modelReactionCountFromServer({ ...rc, id }));
       } catch (e) {
         console.error(e.message);
       }

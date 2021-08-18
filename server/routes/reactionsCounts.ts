@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { Sequelize } from 'sequelize'
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
-import {OffchainReactionInstance} from "../models/offchain_reaction";
+import { OffchainReactionInstance} from "../models/offchain_reaction";
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -25,25 +25,26 @@ const reactionsCounts = async (models: DB, req: Request, res: Response, next: Ne
                     group: ['thread_id', 'comment_id', 'proposal_id', 'reaction'],
                     attributes: ['thread_id', 'comment_id', 'proposal_id', 'reaction',
                         [Sequelize.fn('COUNT', countField), 'count']],
-                    where: {
-                        thread_id: thread_ids || null,
-                        proposal_id: proposal_ids || null,
-                        comment_id: comment_ids || null
-                    },
+                    where: Sequelize.or(
+                     { thread_id: thread_ids || [] },
+                          {  proposal_id: proposal_ids || [] },
+                          { comment_id: comment_ids || [] }
+                    ),
                 }),
                 models.OffchainReaction.findAll({
                     attributes: ['thread_id', 'comment_id', 'proposal_id'],
-                    where: {
-                        thread_id: thread_ids || null,
-                        proposal_id: proposal_ids || null,
-                        comment_id: comment_ids || null
-                    },
+                    where: Sequelize.or(
+                        { thread_id: thread_ids || [] },
+                        {  proposal_id: proposal_ids || [] },
+                        { comment_id: comment_ids || [] }
+                    ),
                     include: [{
                         model: models.Address,
                         where: { address: active_address }
                     }]
                 })
             ])
+            console.log(reactionsCounts.map((a) => a.toJSON()))
             return res.json({
                 status: 'Success',
                 result: reactionsCounts.reduce((acc, rc) => {

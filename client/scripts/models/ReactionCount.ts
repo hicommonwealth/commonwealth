@@ -9,8 +9,8 @@ class ReactionCount<T extends IUniqueId> {
     public readonly likes: number;
     public readonly dislikes: number;
 
-    constructor(threadId, commentId, proposalId, hasReacted, likes, dislikes = 0) {
-    this.id = `discussion-${threadId}` || `comment-${commentId}` || `proposal-${proposalId}`;
+    constructor(id, threadId, commentId, proposalId, hasReacted, likes, dislikes = 0) {
+    this.id = id;
     this.threadId = threadId;
     this.commentId = commentId;
     this.proposalId = proposalId;
