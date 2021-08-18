@@ -681,7 +681,6 @@ const ViewProposalPage: m.Component<{
         : app.comments.refresh(proposal, app.activeChainId(), null))
         .then(async (result) => {
           vnode.state.comments = app.comments.getByProposal(proposal).filter((c) => c.parentComment === null);
-
           //fetch reactions
           const { result: reactionCounts } = await $.post(`${app.serverUrl()}/reactionsCounts`, {
             thread_ids: [proposalId],
@@ -690,7 +689,7 @@ const ViewProposalPage: m.Component<{
           });
           // app.reactionCounts.deinit()
           for (const rc of reactionCounts) {
-            const id = app.reactionCounts.store.getIdentifier(reactionCounts)
+            const id = app.reactionCounts.store.getIdentifier(rc)
             app.reactionCounts.store.add(modelReactionCountFromServer({ ...rc, id }));
           }
           m.redraw();

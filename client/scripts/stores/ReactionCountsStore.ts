@@ -30,6 +30,16 @@ class ReactionCountsStore  extends IdStore<ReactionCount<any>>  {
         return this;
     }
 
+    public remove(reactionCount: ReactionCount<any>) {
+        super.remove(reactionCount);
+        const identifier = this.getIdentifier(reactionCount);
+        if (!this._storeRC[identifier]) {
+            throw new Error('Reaction not in proposals store');
+        }
+        delete this._storeRC[identifier];
+        return this;
+    }
+
     public clear() {
         super.clear();
         this._storeRC = {};
@@ -40,8 +50,7 @@ class ReactionCountsStore  extends IdStore<ReactionCount<any>>  {
         return this._storeRC[identifier] || null;
     }
 
-    public getIdentifier(reactionCount: ReactionCount<any>) {
-        const { threadId, commentId, proposalId } = reactionCount;
+    public getIdentifier({ threadId, commentId, proposalId }) {
         return threadId
             ? `discussion-${threadId}`
             : proposalId

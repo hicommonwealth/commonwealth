@@ -44,21 +44,21 @@ const reactionsCounts = async (models: DB, req: Request, res: Response, next: Ne
                     }]
                 })
             ])
-            console.log(reactionsCounts.map((a) => a.toJSON()))
             return res.json({
                 status: 'Success',
                 result: reactionsCounts.reduce((acc, rc) => {
                     const rcJSon: any = rc.toJSON()
+                    const { thread_id: threadId, comment_id: commentId, proposal_id: proposalId, reaction, count } = rcJSon
                     const id = rcJSon.thread_id || rcJSon.comment_id || rcJSon.proposal_id
                     const index = acc.findIndex(({ thread_id, comment_id, proposal_id }) => (id === thread_id || id === comment_id
                         || id === proposal_id))
-                    const has_reacted = myReactions.some(({ thread_id, comment_id, proposal_id }) => {
+                    const hasReacted = myReactions.some(({ thread_id, comment_id, proposal_id }) => {
                         return (id === thread_id || id === comment_id || id === proposal_id)
                     })
                     if (index > 0) {
-                        acc[index][rcJSon.reaction] = rcJSon.count;
+                        acc[index][reaction] = count;
                     } else {
-                        acc.push({ ...rcJSon, [rcJSon.reaction]: rcJSon.count, has_reacted })
+                        acc.push({ threadId, commentId, proposalId, [reaction]: count, hasReacted })
                     }
                     return acc
                 }, [])

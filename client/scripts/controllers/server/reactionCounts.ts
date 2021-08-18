@@ -11,14 +11,8 @@ import { AbridgedThread, AnyProposal, OffchainComment, OffchainThread, Proposal}
 import { notifyError } from 'controllers/app/notifications';
 
 export const modelFromServer = (reactionCount) => {
-    return new ReactionCount(
-        reactionCount.id,
-        reactionCount.thread_id,
-        reactionCount.comment_id,
-        reactionCount.proposal_id,
-        reactionCount.has_reacted,
-        parseInt(reactionCount.like),
-    );
+    const { id, threadId, commentId, proposalId, hasReacted, like } = reactionCount
+    return new ReactionCount(id, threadId, commentId, proposalId, hasReacted, parseInt(like));
 };
 
 class ReactionCountController {
@@ -52,12 +46,13 @@ class ReactionCountController {
             const { result } = response;
             const reactionCount = this.getByPost(post)
             if (!reactionCount) {
-                // todo create in DB/add to the store if it's the first like
-                console.log('create rcount in the store')
+                const { thread_id: threadId, proposal_id: proposalId, comment_id: commentId } = result
+                const id = this.store.getIdentifier({ threadId, proposalId, commentId })
+                const rc = { id, threadId, proposalId, commentId, hasReacted: true, like: 1 }
+                this.store.add(modelFromServer(rc))
             } else {
                 this.store.update({ ...reactionCount, likes: reactionCount.likes + 1, hasReacted: true })
             }
-
         } catch (err) {
             notifyError('Failed to save reaction');
         }
@@ -72,10 +67,8 @@ class ReactionCountController {
             })
             _this.store.update(reactionCount);
             if (reactionCount.likes === 0 && reactionCount.dislikes === 0) {
-                // todo remove if there's no likes anymore
-                console.log('todo remove the rcount from the store')
+                _this.store.remove(reactionCount);
             }
-
         } catch(e) {
             console.error(e);
             notifyError('Failed to update reaction count');

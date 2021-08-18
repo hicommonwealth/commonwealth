@@ -501,7 +501,7 @@ class ThreadsController {
       active_address: app.user.activeAccount?.address
     });
     for (const rc of reactionCounts) {
-      const id = app.reactionCounts.store.getIdentifier(reactionCounts)
+      const id = app.reactionCounts.store.getIdentifier(rc)
       const existing = app.reactionCounts.store.getById(id);
       if (existing) {
         app.reactionCounts.store.remove(existing);

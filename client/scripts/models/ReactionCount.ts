@@ -7,7 +7,7 @@ class ReactionCount<T extends IUniqueId> {
     public readonly proposalId: number | string;
     public readonly hasReacted: boolean;
     public readonly likes: number;
-    public readonly dislikes: number;
+    public readonly dislikes?: number;
 
     constructor(id, threadId, commentId, proposalId, hasReacted, likes, dislikes = 0) {
     this.id = id;
