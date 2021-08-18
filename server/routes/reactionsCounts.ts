@@ -38,7 +38,7 @@ const reactionsCounts = async (models: DB, req: Request, res: Response, next: Ne
                           { comment_id: comment_ids || [] }
                     ),
                 }),
-                models.OffchainReaction.findAll({
+                active_address ? models.OffchainReaction.findAll({
                     attributes: ['thread_id', 'comment_id', 'proposal_id'],
                     where: Sequelize.or(
                         { thread_id: thread_ids || [] },
@@ -49,7 +49,7 @@ const reactionsCounts = async (models: DB, req: Request, res: Response, next: Ne
                         model: models.Address,
                         where: { address: active_address }
                     }]
-                })
+                }): []
             ])
             return res.json({
                 status: 'Success',
