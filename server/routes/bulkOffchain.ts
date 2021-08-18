@@ -179,8 +179,8 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
         const allThreads = pinnedThreads.map((t) => {
           root_ids.push(`discussion_${t.id}`);
           return t.toJSON();
-        })
-            // .concat(threads);
+        });
+        // .concat(threads);
 
         // Comments
         const offchainComments = await models.OffchainComment.findAll({

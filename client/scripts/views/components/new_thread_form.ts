@@ -182,7 +182,7 @@ const newThread = async (
   await app.user.notifications.refresh();
 
   navigateToSubpage(`/proposal/discussion/${result.id}`);
-  
+
   if (result.topic) {
     try {
       const topicNames = Array.isArray(activeEntity?.meta?.topics)
@@ -484,7 +484,7 @@ export const NewThreadForm: m.Component<{
               onclick: (e) => {
                 vnode.state.overwriteConfirmationModal = true;
                 localStorage.setItem(`${app.activeId()}-from-draft`, `${fromDraft}`);
-                navigateToSubpage(`/new/thread`);
+                navigateToSubpage('/new/thread');
                 $(e.target).trigger('modalexit');
               },
             }),

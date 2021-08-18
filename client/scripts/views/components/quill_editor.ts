@@ -648,7 +648,7 @@ const instantiateEditor = (
       },
       clipboard: {
         matchers: [
-  [
+          [
             Node.ELEMENT_NODE,
             (node, delta) => {
 	      return delta.compose(
@@ -661,7 +661,7 @@ const instantiateEditor = (
               );
 	    }
 	  ]
-	]
+        ]
       }
     },
     placeholder,

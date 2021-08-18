@@ -42,8 +42,8 @@ export const createImmediateNotificationEmailObject = async (notification_data, 
     );
     if (!chainEventLabel) return;
 
-    const subject = (process.env.NODE_ENV !== 'production' ? '[dev] ' : '')
-      + `${chainEventLabel.heading} event on ${capitalize(notification_data.chainEventType?.chain)}`;
+    const subject = `${process.env.NODE_ENV !== 'production' ? '[dev] ' : ''
+    }${chainEventLabel.heading} event on ${capitalize(notification_data.chainEventType?.chain)}`;
 
     return {
       from: 'Commonwealth <no-reply@commonwealth.im>',
@@ -156,8 +156,8 @@ const createNotificationDigestEmailObject = async (user, notifications, models) 
     templateId: DynamicTemplate.BatchNotifications,
     dynamic_template_data: {
       notifications: emailObjArray,
-      subject: (process.env.NODE_ENV !== 'production' ? '[dev] ' : '')
-        + `${notifications.length} new notification${notifications.length === 1 ? '' : 's'}`,
+      subject: `${process.env.NODE_ENV !== 'production' ? '[dev] ' : ''
+      }${notifications.length} new notification${notifications.length === 1 ? '' : 's'}`,
       user: user.email,
     },
   };

@@ -17,7 +17,6 @@ export default class extends IEventHandler {
     super();
   }
 
-
   /**
    * Handles an identity-related event by writing the corresponding update into
    * the database.

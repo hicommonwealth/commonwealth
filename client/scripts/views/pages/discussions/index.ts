@@ -165,7 +165,7 @@ const DiscussionStagesBar: m.Component<{ topic: string; stage: string }, {}> = {
               },
               label: m('.topic-menu-item', [
                 m('.topic-menu-item-name', name),
-                  app.user?.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
+                app.user?.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
                     && m(Button, {
                       size: 'xs',
                       label: 'Edit',
@@ -483,7 +483,7 @@ const DiscussionsPage: m.Component<
       chain: app.activeChainId(),
       community: app.activeCommunityId(),
     });
-
+    console.log('still fetching', stillFetching);
     return m(
       Sublayout,
       {

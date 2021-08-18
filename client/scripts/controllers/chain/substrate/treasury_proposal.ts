@@ -135,7 +135,6 @@ export class SubstrateTreasuryProposal
 
     entity.chainEvents.forEach((e) => this.update(e));
 
-
     if (!this._completed) {
       const slug = chainEntityTypeToProposalSlug(entity.type);
       const uniqueId = `${slug}_${entity.typeId}`;

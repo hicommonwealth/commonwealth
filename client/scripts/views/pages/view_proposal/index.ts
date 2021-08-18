@@ -49,6 +49,7 @@ import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 import { SocialSharingCarat } from 'views/components/social_sharing_carat';
 
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
+import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
 import {
   ProposalHeaderExternalLink, ProposalHeaderBlockExplorerLink, ProposalHeaderVotingInterfaceLink,
   ProposalHeaderOffchainPoll,
@@ -76,7 +77,6 @@ import User from '../../components/widgets/user';
 import MarkdownFormattedText from '../../components/markdown_formatted_text';
 import { createTXModal } from '../../modals/tx_signing_modal';
 import { SubstrateAccount } from '../../../controllers/chain/substrate/account';
-import {modelFromServer as modelReactionCountFromServer} from "controllers/server/reactionCounts";
 
 const ProposalHeader: m.Component<{
   commentCount: number;
@@ -681,7 +681,7 @@ const ViewProposalPage: m.Component<{
         : app.comments.refresh(proposal, app.activeChainId(), null))
         .then(async (result) => {
           vnode.state.comments = app.comments.getByProposal(proposal).filter((c) => c.parentComment === null);
-          //fetch reactions
+          // fetch reactions
           const { result: reactionCounts } = await $.post(`${app.serverUrl()}/reactionsCounts`, {
             thread_ids: [proposalId],
             comment_ids: vnode.state.comments.map((comment) => comment.id),
@@ -689,14 +689,12 @@ const ViewProposalPage: m.Component<{
           });
           // app.reactionCounts.deinit()
           for (const rc of reactionCounts) {
-            const id = app.reactionCounts.store.getIdentifier(rc)
+            const id = app.reactionCounts.store.getIdentifier(rc);
             app.reactionCounts.store.add(modelReactionCountFromServer({ ...rc, id }));
           }
           m.redraw();
         }).catch((err) => {
-          notifyError('Failed to load comments'
-
-          );
+          notifyError('Failed to load comments');
           vnode.state.comments = [];
           m.redraw();
         });

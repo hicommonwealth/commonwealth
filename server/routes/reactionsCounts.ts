@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import { Sequelize } from 'sequelize'
+import { Sequelize } from 'sequelize';
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
-import { OffchainReactionInstance} from "../models/offchain_reaction";
+import { OffchainReactionInstance } from '../models/offchain_reaction';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -70,11 +70,12 @@ const reactionsCounts = async (models: DB, req: Request, res: Response, next: Ne
                     return acc
                 }, [])
             });
+        } else {
+            return res.json({ result: [] });
         }
     } catch (err) {
         return next(new Error(err));
     }
-
 };
 
 export default reactionsCounts;

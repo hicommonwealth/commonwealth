@@ -313,7 +313,6 @@ class ThreadsController {
         thread.offchainVotingOptions = { name, choices };
         thread.offchainVotingNumVotes = 0;
         thread.offchainVotingEndsAt = moment(response.result.offchain_voting_ends_at);
-        return;
       },
       error: (err) => {
         console.log('Failed to start polling');
@@ -501,7 +500,7 @@ class ThreadsController {
       active_address: app.user.activeAccount?.address
     });
     for (const rc of reactionCounts) {
-      const id = app.reactionCounts.store.getIdentifier(rc)
+      const id = app.reactionCounts.store.getIdentifier(rc);
       const existing = app.reactionCounts.store.getById(id);
       if (existing) {
         app.reactionCounts.store.remove(existing);

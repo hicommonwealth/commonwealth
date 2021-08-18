@@ -8,10 +8,10 @@ import app from 'state';
 import { Proposal, OffchainComment, OffchainThread, AnyProposal, AddressInfo } from 'models';
 import User from 'views/components/widgets/user';
 import Token from 'controllers/chain/ethereum/token/adapter';
+import $ from 'jquery';
+import ReactionCount from 'models/ReactionCount';
 import SelectAddressModal from '../modals/select_address_modal';
 import LoginModal from '../modals/login_modal';
-import $ from 'jquery';
-import ReactionCount from "models/ReactionCount";
 
 const MAX_VISIBLE_REACTING_ACCOUNTS = 10;
 
@@ -37,22 +37,22 @@ type ReactionButtonAttrs = {
   large?: boolean;
 }
 
-
 const getDisplayedReactorsForPopup = (vnode: m.Vnode<ReactionButtonAttrs, ReactionButtonState>) => {
-  const { reactors = [], likes = 0, dislikes = 0 } = vnode.state
+  const { reactors = [], likes = 0, dislikes = 0 } = vnode.state;
   const slicedReactors = reactors.slice(0, MAX_VISIBLE_REACTING_ACCOUNTS).map((rxn_) => {
-    const { Address: { address, chain } } = rxn_
+    const { Address: { address, chain } } = rxn_;
     return m('.reacting-user', m(User, {
       user: new AddressInfo(null, address, chain, null),
       linkify: true
-    }))})
+    }));
+  });
 
   if (vnode.state.reactors && slicedReactors.length < (likes + dislikes)) {
     const diff = (likes + dislikes) - slicedReactors.length;
     slicedReactors.push(m('.reacting-user .truncated-reacting-users', `and ${diff} more`));
   }
   return slicedReactors;
-}
+};
 
 const fetchReactionsByPost = async (post: OffchainThread | AnyProposal | OffchainComment<any>) => {
   let thread_id, proposal_id, comment_id;
@@ -68,28 +68,26 @@ const fetchReactionsByPost = async (post: OffchainThread | AnyProposal | Offchai
     comment_id,
     proposal_id,
   });
-  return result
-}
-
+  return result;
+};
 
 const ReactionButton: m.Component<ReactionButtonAttrs, ReactionButtonState> = {
   view: (vnode) => {
     const { post, type, displayAsLink, tooltip, large } = vnode.attrs;
-    const reactionCounts = app.reactionCounts.getByPost(post)
-    const { likes = 0, dislikes = 0, hasReacted } = reactionCounts || {}
+    const reactionCounts = app.reactionCounts.getByPost(post);
+    const { likes = 0, dislikes = 0, hasReacted } = reactionCounts || {};
     vnode.state.reactionCounts = reactionCounts;
     vnode.state.likes = likes;
-    vnode.state.dislikes = dislikes
+    vnode.state.dislikes = dislikes;
 
     const isCommunity = !!app.activeCommunityId();
 
     const disabled = vnode.state.loading
       || (!isCommunity && (app.chain as Token).isToken && !(app.chain as Token).hasToken);
     const activeAddress = app.user.activeAccount?.address;
-    vnode.state.hasReacted = hasReacted
+    vnode.state.hasReacted = hasReacted;
     let hasReactedType;
     if (hasReacted) hasReactedType = ReactionType.Like;
-
 
     const rxnButton = m('.ReactionButton', {
       class: `${(disabled ? 'disabled' : type === hasReactedType ? 'active' : '')
@@ -98,7 +96,7 @@ const ReactionButton: m.Component<ReactionButtonAttrs, ReactionButtonState> = {
         + (type === ReactionType.Like ? ' like' : '')
         + (type === ReactionType.Dislike ? ' dislike' : '')}`,
       onmouseenter:  async (e) => {
-        vnode.state.reactors = await fetchReactionsByPost(post)
+        vnode.state.reactors = await fetchReactionsByPost(post);
       },
       onclick: async (e) => {
         const { reactors, reactionCounts } = vnode.state;
@@ -118,9 +116,15 @@ const ReactionButton: m.Component<ReactionButtonAttrs, ReactionButtonState> = {
           const chainId = app.activeCommunityId() ? null : app.activeChainId();
           const communityId = app.activeCommunityId();
           if (hasReacted) {
-            const reaction = (await fetchReactionsByPost(post)).find((r) => r.reaction === hasReactedType && r.Address.address === activeAddress);
+            const reaction = (await fetchReactionsByPost(post)).find((r) => {
+              return (r.reaction === hasReactedType && r.Address.address === activeAddress);
+            });
             vnode.state.loading = true;
-            app.reactionCounts.delete(reaction, { ...reactionCounts, likes: likes - 1, hasReacted: false }).then(() => {
+            app.reactionCounts.delete(reaction, {
+              ...reactionCounts,
+              likes: likes - 1,
+              hasReacted: false
+            }).then(() => {
               if ((hasReactedType === ReactionType.Like && type === ReactionType.Dislike)
                 || (hasReactedType === ReactionType.Dislike && type === ReactionType.Like)) {
                 app.reactions.create(app.user.activeAccount.address, post, type, chainId, communityId).then(() => {

@@ -10,8 +10,8 @@ import Marlin from 'controllers/chain/ethereum/marlin/adapter';
 import Aave from 'controllers/chain/ethereum/aave/adapter';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { Grid, Col, List, Form, FormGroup, FormLabel, Input, Button } from 'construct-ui';
-import PageNotFound from './404';
 import { AaveTypes, MarlinTypes } from '@commonwealth/chain-events';
+import PageNotFound from './404';
 
 const DelegateStats: m.Component<{ currentDelegate: string, }> = {
   view: (vnode) => {

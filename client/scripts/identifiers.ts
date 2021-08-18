@@ -1,8 +1,8 @@
 import { StorageModule, ChainBase, ProposalModule, ChainNetwork } from 'models';
 import { ProposalStore } from 'stores';
+import { AaveTypes, MarlinTypes, MolochTypes } from '@commonwealth/chain-events';
 import app from './state';
 import ThreadsController from './controllers/server/threads';
-import { AaveTypes, MarlinTypes, MolochTypes } from '@commonwealth/chain-events';
 
 // eslint-disable-next-line no-shadow
 export enum ProposalType {

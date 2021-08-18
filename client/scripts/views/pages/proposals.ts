@@ -28,8 +28,8 @@ import NewProposalPage from 'views/pages/new_proposal/index';
 import PageNotFound from 'views/pages/404';
 import Listing from 'views/pages/listing';
 import ErrorPage from 'views/pages/error';
-import AaveProposalCardDetail from '../components/proposals/aave_proposal_card_detail';
 import { AaveTypes, MarlinTypes } from '@commonwealth/chain-events';
+import AaveProposalCardDetail from '../components/proposals/aave_proposal_card_detail';
 
 const SubstrateProposalStats: m.Component<{}, {}> = {
   view: (vnode) => {
@@ -210,8 +210,7 @@ const ProposalsPage: m.Component<{}> = {
         .concat((activeAaveProposals || []).map((proposal) => m(ProposalCard, {
           proposal,
           injectedContent: AaveProposalCardDetail,
-        })))]
-      )];
+        })))])];
 
     // inactive proposals
     const inactiveDemocracyProposals = onSubstrate
@@ -246,8 +245,7 @@ const ProposalsPage: m.Component<{}> = {
         .concat((inactiveAaveProposals || []).map((proposal) => m(ProposalCard, {
           proposal,
           injectedContent: AaveProposalCardDetail,
-        }))) ]
-      )];
+        }))) ])];
 
     // XXX: display these
     const visibleTechnicalCommitteeProposals = app.chain
