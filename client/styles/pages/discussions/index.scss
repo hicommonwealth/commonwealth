@@ -51,6 +51,18 @@
                 top: -3px;
             }
         }
+        .stage-menu-item {
+            display: flex;
+            .stage-menu-item-name {
+                flex: 1;
+                position: relative;
+                top: 1px;
+            }
+            .cui-button {
+                position: relative;
+                top: -3px;
+            }
+        }
     }
     .cui-button.discussions-topic,
     .cui-button.discussions-stage {

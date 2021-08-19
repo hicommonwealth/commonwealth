@@ -165,7 +165,7 @@ const DiscussionStagesBar: m.Component<{ topic: string; stage: string }, {}> = {
               },
               label: m('.topic-menu-item', [
                 m('.topic-menu-item-name', name),
-                  app.user?.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
+                app.user?.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
                     && m(Button, {
                       size: 'xs',
                       label: 'Edit',
@@ -217,7 +217,28 @@ const DiscussionStagesBar: m.Component<{ topic: string; stage: string }, {}> = {
                 e.preventDefault();
                 navigateToSubpage(`/?stage=${targetStage}`);
               },
-              label: [`${offchainThreadStageToLabel(targetStage)}`, targetStage === OffchainThreadStage.Voting && [' ', m('.discussions-stage-count', `${app.threads.numVotingThreads}`)]],
+              label: m('.stage-menu-item', [
+                m('.stage-menu-item-name', [
+                  `${offchainThreadStageToLabel(targetStage)}`,
+                  targetStage === OffchainThreadStage.Voting
+                    && [' ', m('.discussions-stage-count', `${app.threads.numVotingThreads}`)],
+                ]),
+                app.user?.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
+                  && m(Button, {
+                    size: 'xs',
+                    label: 'Edit',
+                    class: 'edit-stage-button',
+                    compact: true,
+                    rounded: true,
+                    onclick: (e) => {
+                      e.preventDefault();
+                      // app.modals.create({
+                      //   modal: EditTopicModal,
+                      //   data: { id, name, description, telegram, featured_in_sidebar, featured_in_new_post },
+                      // });
+                    },
+                  }),
+              ]),
             })),
           ]),
         }),
