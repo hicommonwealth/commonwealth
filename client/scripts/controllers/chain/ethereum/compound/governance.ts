@@ -167,8 +167,8 @@ export default class CompoundGovernance extends ProposalModule<
 
     // fetch proposals from chain
     // const fetcher = new AaveEvents.StorageFetcher(chainEventsContracts);
-    const subscriber = new CompoundEvents.Subscriber(this._api.Contract, this.app.chain.id);
-    const processor = new CompoundEvents.Processor(this._api.Contract);
+    const subscriber = new CompoundEvents.Subscriber(<any>this._api.Contract, this.app.chain.id);
+    const processor = new CompoundEvents.Processor(<any>this._api.Contract);
     // await this.app.chain.chainEntities.fetchEntities(this.app.chain.id, () => fetcher.fetch());
     await this.app.chain.chainEntities.subscribeEntities(
       this.app.chain.id,

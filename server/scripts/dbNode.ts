@@ -148,7 +148,7 @@ async function mainProcess(producer: RabbitMqHandler, pool) {
   }
 
   // remove erc20 tokens from myChainData
-  myChainData = myChainData.filter((chain) => chain.type != 'token' && chain.base != 'ethereum')
+  myChainData = myChainData.filter((chain) => chain.type != 'token' || chain.base != 'ethereum')
 
   // delete listeners for chains that are no longer assigned to this node (skip erc20)
   const myChains = myChainData.map(row => row.id)
@@ -160,20 +160,17 @@ async function mainProcess(producer: RabbitMqHandler, pool) {
     }
   })
 
-  // TODO: start listeners in parallel so connection stalling from one doesn't hold up the others
   // initialize listeners first (before dealing with identity)
   for (const chain of myChainData) {
-    // start listeners that aren't already active - this means for any duplicate chain nodes
+    // start listeners that aren't already created or subscribed - this means for any duplicate chain nodes
     // it will start a listener for the first successful chain node url in the db
-    if (!listeners[chain.id]) {
+    if (!listeners[chain.id] || !listeners[chain.id].subscribed) {
       log.info(`Starting listener for ${chain.id}...`);
 
-      // if the 'chain' is a DAO then it has its own Listener in CE so its base is not the chain it is built on
+      // base is used to override built-in event chains in chain-events - only used for substrate chains in this case
+      // i.e. does not override event chains type for marlin/moloch/DAO's
       let base = chain.base;
-      if (chain.type === 'dao') {
-        base = chain.network
-        // TODO: deal with compound base
-      }
+      if (chain.type === 'dao') base = null;
 
       try {
         listeners[chain.id] = await createListener(chain.id, {
@@ -345,11 +342,6 @@ pool.on('error', (err, client) => {
 producer
   .init()
   .then(() => {
-    // listeners may use the pool at any time to detect the disconnectedRange
-    // a single client may be a bottleneck if multiple listeners go down and attempt
-    // to discoverReconnectRange --- could checkout a client in discoverReconnect but that
-    // could cause db crash if listening to several hundred chains that all crash
-    // consult jake
     return mainProcess(producer, pool);
   })
   .then(() => {
