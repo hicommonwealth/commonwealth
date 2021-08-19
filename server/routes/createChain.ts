@@ -18,6 +18,7 @@ export const Errors = {
   NoNodeUrl: 'Must provide node url',
   InvalidNodeUrl: 'Node url must begin with http://, https://, ws://, wss://',
   InvalidBase: 'Must provide valid chain base',
+  ChainAddressExists: 'The address already exists',
   ChainIDExists: 'The id for this chain already exists, please choose another id',
   ChainNameExists: 'The name for this chain already exists, please choose another name',
   InvalidIconUrl: 'Icon url must begin with https://',
@@ -71,6 +72,13 @@ const createChain = async (
     const code = await web3.eth.getCode(req.body.address);
     if (code === '0x') {
       return next(new Error(Errors.InvalidAddress));
+    }
+
+    const existingChainNode = await models.ChainNode.findOne({
+      where: { address: req.body.address }
+    });
+    if (existingChainNode) {
+      return next(new Error(Errors.ChainAddressExists));
     }
   }
 

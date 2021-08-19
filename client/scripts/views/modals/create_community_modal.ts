@@ -419,7 +419,6 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
             vnode.state.loaded = false;
             if (Web3.utils.isAddress(v)) {
               $.get(`${app.serverUrl()}/getTokenForum`, { address: v, allowUncached: true }).then(async (res) => {
-                console.log(res);
                 if (res.status === 'Success') {
                   vnode.state.name = res?.result?.chain?.name || '';
                   vnode.state.id = slugify(vnode.state.name);
@@ -444,6 +443,7 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
         m(InputPropertyRow, {
           title: 'ID',
           defaultValue: vnode.state.id,
+          value: vnode.state.id,
           disabled: disableField,
           onChangeHandler: (v) => { vnode.state.id = v; },
         }),
@@ -451,7 +451,7 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
           title: 'Name',
           defaultValue: vnode.state.name,
           disabled: disableField,
-          onChangeHandler: (v) => { vnode.state.name = v; vnode.state.id = slugify(vnode.state.name); },
+          onChangeHandler: (v) => { vnode.state.name = v; vnode.state.id = slugify(v); },
         }),
         m(InputPropertyRow, {
           title: 'Symbol',
