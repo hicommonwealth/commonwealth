@@ -259,7 +259,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/ethereum/main'
     )).default;
     newChain = new Ethereum(n, app);
-  } else if (n.chain.network === ChainNetwork.NEAR) {
+  } else if (n.chain.base === ChainBase.NEAR) {
     const Near = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "near-main" */
