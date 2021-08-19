@@ -411,16 +411,21 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
             vnode.state.loaded = false;
             if (Web3.utils.isAddress(v)) {
               $.get(`${app.serverUrl()}/getTokenForum`, { address: v, allowUncached: true }).then(async (res) => {
-                vnode.state.name = res?.result?.chain?.name || '';
-                vnode.state.symbol = res?.result?.chain?.symbol || '';
-                vnode.state.icon_url = res?.result?.chain?.icon_url || '';
-                vnode.state.description = res?.result?.chain?.description || '';
-                vnode.state.website = res?.result?.chain?.website || '';
-                vnode.state.discord = res?.result?.chain?.discord || '';
-                vnode.state.element = res?.result?.chain?.element || '';
-                vnode.state.telegram = res?.result?.chain?.telegram || '';
-                vnode.state.github = res?.result?.chain?.github || '';
-                vnode.state.loaded = true;
+                console.log(res);
+                if (res.status === 'Success') {
+                  vnode.state.name = res?.result?.chain?.name || '';
+                  vnode.state.symbol = res?.result?.chain?.symbol || '';
+                  vnode.state.icon_url = res?.result?.chain?.icon_url || '';
+                  vnode.state.description = res?.result?.chain?.description || '';
+                  vnode.state.website = res?.result?.chain?.website || '';
+                  vnode.state.discord = res?.result?.chain?.discord || '';
+                  vnode.state.element = res?.result?.chain?.element || '';
+                  vnode.state.telegram = res?.result?.chain?.telegram || '';
+                  vnode.state.github = res?.result?.chain?.github || '';
+                  vnode.state.loaded = true;
+                } else {
+                  notifyError(res.message);
+                }
               }).catch((err: any) => {
                 notifyError(err.responseJSON?.error || 'Failed to load Token Information');
               });
