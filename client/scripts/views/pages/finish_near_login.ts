@@ -1,6 +1,6 @@
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
-import * as nearlib from 'nearlib';
+import { WalletAccount } from 'near-api-js';
 
 import app from 'state';
 import { initAppState, navigateToSubpage } from 'app';
@@ -99,7 +99,7 @@ const FinishNearLogin: m.Component<{}, IState> = {
     // TODO: share one wallet account across all actual accounts and swap out
     //   login data from localStorage as needed.
       vnode.state.validating = true;
-      const wallet = new nearlib.WalletAccount((app.chain as Near).chain.api, null);
+      const wallet = new WalletAccount((app.chain as Near).chain.api, null);
       if (wallet.isSignedIn()) {
         const acct: NearAccount = app.chain.accounts.get(wallet.getAccountId());
         acct.updateKeypair().then((gotKeypair) => {

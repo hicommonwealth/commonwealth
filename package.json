@@ -161,7 +161,7 @@
     "moment": "^2.23.0",
     "moment-locales-webpack-plugin": "^1.1.0",
     "morgan": "^1.9.1",
-    "nearlib": "^0.22.0",
+    "near-api-js": "^0.42.0",
     "node-sass": "^5.0.0",
     "node-statsd": "^0.1.1",
     "nodemon": "^1.18.10",

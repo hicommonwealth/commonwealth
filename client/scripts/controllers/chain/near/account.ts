@@ -1,10 +1,10 @@
+/* eslint-disable no-use-before-define */
 import { Account, IAccountsModule, ITXModalData } from 'models';
 import { NearToken } from 'adapters/chain/near/types';
 import { IApp } from 'state';
 import { AccountsStore } from 'stores';
-import * as nearlib from 'nearlib';
-import { AccountState } from 'nearlib/lib/account';
-import { BrowserLocalStorageKeyStore } from 'nearlib/lib/key_stores';
+import { keyStores, Account as NearJsAccount, KeyPair } from 'near-api-js';
+import { AccountView } from 'near-api-js/lib/providers/provider';
 import NearChain from './chain';
 
 // NOTE: this is the actual type of validators in the NodeStatus struct,
@@ -22,13 +22,13 @@ export interface INearValidators {
 }
 
 export class NearAccount extends Account<NearToken> {
-  private _nearlibAccount: nearlib.Account;
-  private _keyPair: nearlib.KeyPair;
+  private _nearlibAccount: NearJsAccount;
+  private _keyPair: KeyPair;
   private _Accounts: NearAccounts;
   private _Chain: NearChain;
   constructor(app: IApp, Chain: NearChain, Accounts: NearAccounts, address: string) {
     super(app, app.chain.meta.chain, address);
-    this._nearlibAccount = new nearlib.Account(Chain.api.connection, address);
+    this._nearlibAccount = new NearJsAccount(Chain.api.connection, address);
     this._Chain = Chain;
     this._Accounts = Accounts;
     this.updateKeypair(); // async action -- should be quick tho
@@ -37,7 +37,7 @@ export class NearAccount extends Account<NearToken> {
 
   public get balance(): Promise<NearToken> {
     return this._nearlibAccount.state().then(
-      (s: AccountState) => {
+      (s: AccountView) => {
         return this._Chain.coins(s.amount, false);
       }
     );
@@ -91,7 +91,7 @@ export class NearAccounts implements IAccountsModule<NearToken, NearAccount> {
   private _Chain: NearChain;
   private _store: AccountsStore<NearAccount> = new AccountsStore();
   public get store() { return this._store; }
-  public readonly keyStore: BrowserLocalStorageKeyStore;
+  public readonly keyStore: keyStores.BrowserLocalStorageKeyStore;
 
   private _validators: INearValidators = {};
   public get validators() { return this._validators; }
@@ -101,7 +101,7 @@ export class NearAccounts implements IAccountsModule<NearToken, NearAccount> {
 
   constructor(app: IApp) {
     this._app = app;
-    this.keyStore = new BrowserLocalStorageKeyStore(localStorage);
+    this.keyStore = new keyStores.BrowserLocalStorageKeyStore(localStorage);
   }
 
   public get(address: string): NearAccount {

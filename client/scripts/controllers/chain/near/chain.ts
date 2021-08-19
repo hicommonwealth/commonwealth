@@ -2,11 +2,10 @@ import { IChainModule, ITXModalData, NodeInfo } from 'models';
 import { NearToken } from 'adapters/chain/near/types';
 import BN from 'bn.js';
 import { ApiStatus, IApp } from 'state';
-import { Near as NearApi, connect as nearConnect } from 'nearlib/lib/near';
-import { BrowserLocalStorageKeyStore } from 'nearlib/lib/key_stores';
+import { Near as NearApi, connect as nearConnect, keyStores } from 'near-api-js';
+import { NodeStatusResult } from 'near-api-js/lib/providers/provider';
 import moment from 'moment';
 import * as m from 'mithril';
-import { NodeStatusResult } from 'nearlib/lib/providers/provider';
 import { NearAccount } from './account';
 
 class NearChain implements IChainModule<NearToken, NearAccount> {
@@ -45,7 +44,7 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
       nodeUrl: node.url,
       walletUrl: 'https://wallet.nearprotocol.com', // TODO: alternatives?
       deps: {
-        keyStore: new BrowserLocalStorageKeyStore(),
+        keyStore: new keyStores.BrowserLocalStorageKeyStore(),
       },
     };
 

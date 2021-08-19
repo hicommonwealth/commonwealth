@@ -1,4 +1,4 @@
-import { Near as NearApi } from 'nearlib/lib/near';
+import { Near as NearApi } from 'near-api-js';
 
 import { IVote, Proposal, ProposalEndTime, VotingType, VotingUnit, ProposalStatus, ITXModalData } from 'models';
 import { NearToken } from 'adapters/chain/near/types';
