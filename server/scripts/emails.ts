@@ -173,7 +173,7 @@ export const sendImmediateNotificationEmail = async (subscription, emailObject) 
   emailObject.bcc = 'raymond+bcc@commonwealth.im';
 
   try {
-    console.log('sending immediate notification email');
+    console.log(`sending immediate notification email to ${emailObject.to}`);
     await sgMail.send(emailObject);
   } catch (e) {
     console.log('Failed to send immediate notification email', e?.response?.body?.errors);

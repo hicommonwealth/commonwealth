@@ -53,7 +53,7 @@ const updateThreadStage = async (models: DB, req: Request, res: Response, next: 
     } catch (e) {}
 
     // validate stage
-    const availableStages = !customStages ? [
+    const availableStages = customStages.length === 0 ? [
       'discussion', 'proposal_in_review', 'voting', 'passed', 'failed',
     ] : customStages;
 

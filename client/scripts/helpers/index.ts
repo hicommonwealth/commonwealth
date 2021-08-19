@@ -1,4 +1,4 @@
-import m from 'mithril';
+import m, { RouteOptions } from 'mithril';
 import { ICardListItem } from 'models/interfaces';
 import moment from 'moment';
 
@@ -57,7 +57,15 @@ export function externalLink(selector, target, children) {
   }, children);
 }
 
-export function link(selector: string, target: string, children, extraAttrs?: object, saveScrollPositionAs?: string) {
+export function link(
+  selector: string,
+  target: string,
+  children,
+  extraAttrs?: object,
+  saveScrollPositionAs?: string,
+  beforeRouteSet?: Function,
+  afterRouteSet?: Function,
+) {
   const attrs = {
     href: target,
     onclick: (e) => {
@@ -70,11 +78,17 @@ export function link(selector: string, target: string, children, extraAttrs?: ob
       if (saveScrollPositionAs) {
         localStorage[saveScrollPositionAs] = window.scrollY;
       }
-
-      if (window.location.href.split('?')[0] === target.split('?')[0]) {
-        m.route.set(target, {}, { replace: true });
+      if (beforeRouteSet) beforeRouteSet();
+      const routeArgs: [string, any?, RouteOptions?] = window.location.href.split('?')[0] === target.split('?')[0]
+        ? [target, {}, { replace: true }]
+        : [target];
+      if (afterRouteSet) {
+        (async () => {
+          await m.route.set(...routeArgs);
+          afterRouteSet();
+        })();
       } else {
-        m.route.set(target);
+        m.route.set(...routeArgs);
       }
     },
   };
