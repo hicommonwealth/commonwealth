@@ -98,6 +98,7 @@ export default class extends IEventHandler {
     }
 
     // create event in db
+    // TODO: we should reconsider duplicate event handling at some point
     const dbEvent = await this._models.ChainEvent.create({
       chain_event_type_id: dbEventType.id,
       block_number: event.blockNumber,

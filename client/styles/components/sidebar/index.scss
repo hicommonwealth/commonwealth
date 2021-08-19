@@ -140,6 +140,7 @@
     z-index: 3;
     display: flex;
     flex-direction: column;
+    background: #fff;
     @include sm-max {
         display: none;
     }
