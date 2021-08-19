@@ -11,7 +11,7 @@ export const Errors = {
   NoName: 'Must provide name',
   InvalidNameLength: 'Name should not exceed 255',
   NoSymbol: 'Must provide symbol',
-  InvalidSymbolLength: 'Symbol should not exceed 255',
+  InvalidSymbolLength: 'Symbol should not exceed 9',
   NoType: 'Must provide chain type',
   NoBase: 'Must provide chain base',
   NoNodeUrl: 'Must provide node url',
@@ -45,7 +45,7 @@ const createChain = async (
   if (!req.body.symbol || !req.body.symbol.trim()) {
     return next(new Error(Errors.NoSymbol));
   }
-  if (req.body.symbol.length > 255) {
+  if (req.body.symbol.length > 9) {
     return next(new Error(Errors.InvalidSymbolLength));
   }
   if (!req.body.type || !req.body.type.trim()) {
