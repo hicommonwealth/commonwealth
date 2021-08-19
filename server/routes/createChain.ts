@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import Web3 from 'web3';
+import { Op } from 'sequelize';
 import { INFURA_API_KEY } from '../config';
-import { slugify, urlHasValidHTTPPrefix } from '../../shared/utils';
+import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import { DB } from '../database';
 
 import { factory, formatFilename } from '../../shared/logging';
@@ -17,6 +18,7 @@ export const Errors = {
   NoNodeUrl: 'Must provide node url',
   InvalidNodeUrl: 'Node url must begin with http://, https://, ws://, wss://',
   InvalidBase: 'Must provide valid chain base',
+  ChainIDExists: 'The id for this chain already exists, please choose another id',
   ChainNameExists: 'The name for this chain already exists, please choose another name',
   InvalidIconUrl: 'Icon url must begin with https://',
   InvalidWebsite: 'Website must begin with https://',
@@ -97,21 +99,23 @@ const createChain = async (
   }
 
   const oldChain = await models.Chain.findOne({
-    where: { name: req.body.name },
+    where: { [Op.or]: [{ name: req.body.name }, { id: req.body.id }]  },
   });
-  if (oldChain) {
+  if (oldChain && oldChain.id === req.body.id) {
+    return next(new Error(Errors.ChainIDExists));
+  }
+  if (oldChain && oldChain.name === req.body.name) {
     return next(new Error(Errors.ChainNameExists));
   }
 
-  const createdId = slugify(req.body.name);
   const chainContent = {
-    id: createdId,
+    id: req.body.id,
     name: req.body.name,
     symbol: req.body.symbol,
     icon_url: req.body.icon_url,
     description: req.body.description,
     active: true,
-    network: createdId,
+    network: req.body.id,
     type: req.body.type,
     website: req.body.website,
     discord: req.body.discord,
@@ -123,7 +127,7 @@ const createChain = async (
   const chain = await models.Chain.create(chainContent);
 
   const chainNodeContent = {
-    chain: createdId,
+    chain: req.body.id,
     url: req.body.node_url,
     address: req.body.address,
   };

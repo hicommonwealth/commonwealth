@@ -367,6 +367,7 @@ interface ERC20FormAttrs {}
 
 interface ERC20FormState {
   address: string,
+  id: string,
   name: string,
   symbol: string,
   icon_url: string,
@@ -384,6 +385,7 @@ interface ERC20FormState {
 const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
   oninit: (vnode) => {
     vnode.state.address = '';
+    vnode.state.id = '';
     vnode.state.name = '';
     vnode.state.symbol = '';
     vnode.state.icon_url = '';
@@ -420,6 +422,7 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
                 console.log(res);
                 if (res.status === 'Success') {
                   vnode.state.name = res?.result?.chain?.name || '';
+                  vnode.state.id = slugify(vnode.state.name);
                   vnode.state.symbol = res?.result?.chain?.symbol || '';
                   vnode.state.icon_url = res?.result?.chain?.icon_url || '';
                   vnode.state.description = res?.result?.chain?.description || '';
@@ -439,10 +442,16 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
           },
         }),
         m(InputPropertyRow, {
+          title: 'ID',
+          defaultValue: vnode.state.id,
+          disabled: disableField,
+          onChangeHandler: (v) => { vnode.state.id = v; },
+        }),
+        m(InputPropertyRow, {
           title: 'Name',
           defaultValue: vnode.state.name,
           disabled: disableField,
-          onChangeHandler: (v) => { vnode.state.name = v; },
+          onChangeHandler: (v) => { vnode.state.name = v; vnode.state.id = slugify(vnode.state.name); },
         }),
         m(InputPropertyRow, {
           title: 'Symbol',
@@ -508,6 +517,7 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
         onclick: async (e) => {
           const {
             address,
+            id,
             name,
             description,
             symbol,
@@ -521,6 +531,7 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
           vnode.state.saving = true;
           $.post(`${app.serverUrl()}/createChain`, {
             address,
+            id,
             name,
             description,
             icon_url,
