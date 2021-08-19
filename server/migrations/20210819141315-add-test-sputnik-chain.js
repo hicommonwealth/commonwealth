@@ -18,6 +18,8 @@ module.exports = {
         github: '',
       }], { transaction: t });
 
+      // TODO: update URL for near mainnet
+
       await queryInterface.bulkInsert('ChainNodes', [{
         chain: 'codame.sputnik-dao.near',
         url: 'https://rpc.mainnet.near.org',

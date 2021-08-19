@@ -18,6 +18,7 @@ export enum ProposalType {
   MolochProposal = 'molochproposal',
   MarlinProposal = 'marlinproposal',
   AaveProposal = 'aaveproposal',
+  SputnikProposal = 'sputnikproposal',
 }
 
 export const proposalSlugToClass = () => {
@@ -53,6 +54,9 @@ export const proposalSlugToClass = () => {
   if (AaveTypes.EventChains.find((c) => c === app.chain.network)) {
     mmap.set('aaveproposal', (app.chain as any).governance);
   }
+  if (app.chain.network === ChainNetwork.Sputnik) {
+    mmap.set('sputnikproposal', (app.chain as any).dao);
+  }
   return mmap;
 };
 
@@ -78,6 +82,7 @@ export const proposalSlugToFriendlyName = new Map<string, string>([
   ['cosmosproposal', 'Proposal'],
   ['molochproposal', 'Proposal'],
   ['aaveproposal', 'Proposal'],
+  ['sputnikproposal', 'Proposal'],
 ]);
 
 export const idToProposal = (slug, id) => {

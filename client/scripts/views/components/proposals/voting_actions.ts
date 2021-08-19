@@ -628,6 +628,9 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
           m(CancelButton, { proposal, votingModalOpen, user, onModalClose })
         ])
       ];
+    } else if (proposal.votingType === VotingType.YesNoReject) {
+      // TODO: support sputnik voting
+      votingActionObj = m(CannotVote, { action: 'Unsupported proposal type' });
     } else if (proposal.votingType === VotingType.RankedChoiceVoting) {
       votingActionObj = m(CannotVote, { action: 'Unsupported proposal type' });
     } else if (proposal.votingType === VotingType.None) {

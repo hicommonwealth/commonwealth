@@ -11,14 +11,9 @@ export default class NearSputnik extends Near {
     this.dao = new NearSputnikDao(app);
   }
 
-  public async initApi() {
-    await super.initApi();
-    await this.dao.init(this.chain, this.accounts);
-  }
-
   public async initData() {
+    await this.dao.init(this.chain, this.accounts);
     await super.initData();
-    // TODO?
   }
 
   public async deinit() {
