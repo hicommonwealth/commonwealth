@@ -18,6 +18,7 @@ import PageLoading from 'views/pages/loading';
 import LoginWithWalletDropdown from 'views/components/login_with_wallet_dropdown';
 import { formatAddressShort } from '../../../../../shared/utils';
 import MarkdownFormattedText from '../../components/markdown_formatted_text';
+import { alertModalWithText } from '../../modals/alert_modal';
 
 const editIdentityAction = (account, currentIdentity: SubstrateIdentity, vnode) => {
   const chainObj = app.config.chains.getById(account.chain);
@@ -138,16 +139,16 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
             }),
           ]),
         ]),
-        m('.bio-actions-breakpoint'),
-        m('.bio-actions', [
-          account.profile && account.profile.bio
-            ? m('p', [
-              m(MarkdownFormattedText, { doc: account.profile.bio })
-            ])
-            : m('.no-items', [
-              (account.profile && account.profile.name) ? account.profile.name : 'This account',
-              ' hasn\'t created a bio'
-            ]),
+      ]),
+      m('.bio-actions', [
+        account.profile && account.profile.bio && m(Button, {
+          intent: 'warning',
+          onclick: () => {
+            alertModalWithText(account.profile.bio, 'Close')();
+          },
+          label: 'View Bio'
+        }),
+        m('', [
           onOwnProfile ? [
             editIdentityAction(account, vnode.state.identity, vnode),
             m(Button, {
@@ -191,7 +192,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
             // TODO: actions for others' accounts
             ]
         ]),
-      ])
+      ]),
     ]);
   }
 };

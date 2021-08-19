@@ -234,7 +234,7 @@
     margin: 16px 0;
 
     .cui-button {
-      margin-right: 16px;
+      margin: 6px 16px 6px 0;
       border-radius: 8px;
       padding: 5px 15px 5px 15px;
       background: #FFFFFF;
@@ -322,6 +322,11 @@
     }
   }
   .bio-actions {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-top: 12px;
+
     @include md-max {
       a.btn,
       .cui-button {

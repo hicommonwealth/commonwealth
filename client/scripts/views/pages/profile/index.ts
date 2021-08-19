@@ -403,7 +403,7 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
           addressInfo: currentAddressInfo
         }),
         m('.row.row-narrow.forum-row', [
-          m('.col-xs-12 .col-lg-8', [
+          m('.col-xs-12 .col-md-8', [
             m(ProfileHeader, {
               account,
               setIdentity,
@@ -440,7 +440,7 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
               }),
             }]),
           ]),
-          m('.xs-display-none .col-lg-4', [
+          m('.xs-display-none .col-md-4', [
             m(ProfileBio, {
               account,
               setIdentity,
