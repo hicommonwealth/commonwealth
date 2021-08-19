@@ -16,6 +16,12 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { InputPropertyRow, TogglePropertyRow, SelectPropertyRow } from './manage_community_modal/metadata_rows';
 import { initAppState } from '../../app';
 
+enum CommunityType {
+  OffchainCommunity = 'offchain',
+  Erc20Community = 'erc20',
+  SubstrateCommunity = 'substrate'
+}
+
 interface OffchainCommunityFormAttrs {}
 interface OffchainCommunityFormState {
   disabled: boolean;
@@ -558,7 +564,7 @@ const CreateCommunityModal: m.Component<CreateCommunityAttrs, CreateCommunitySta
     });
   },
   oninit: (vnode) => {
-    vnode.state.activeForm = 'offchain';
+    vnode.state.activeForm = CommunityType.OffchainCommunity;
   },
   view: (vnode: m.VnodeDOM<CreateCommunityAttrs, CreateCommunityState>) => {
     return m('.ManageCommunityModal', [
@@ -573,23 +579,23 @@ const CreateCommunityModal: m.Component<CreateCommunityAttrs, CreateCommunitySta
       }, [
         m(TabItem, {
           label: 'Offchain Community',
-          active: vnode.state.activeForm === 'offchain',
+          active: vnode.state.activeForm === CommunityType.OffchainCommunity,
           onclick: () => { vnode.state.activeForm = 'offchain'; return null; },
         }),
         m(TabItem, {
           label: 'ERC20',
-          active: vnode.state.activeForm === 'erc20',
+          active: vnode.state.activeForm === CommunityType.Erc20Community,
           onclick: () => { vnode.state.activeForm = 'erc20'; return null; },
         }),
         app.user.isSiteAdmin && m(TabItem, {
           label: 'Substrate',
-          active: vnode.state.activeForm === 'substrate',
+          active: vnode.state.activeForm === CommunityType.SubstrateCommunity,
           onclick: () => { vnode.state.activeForm = 'substrate'; return null; },
         }),
       ]),
-      vnode.state.activeForm === 'offchain' && m(OffchainCommunityForm),
-      vnode.state.activeForm === 'erc20' && m(ERC20Form),
-      vnode.state.activeForm === 'substrate' && m(SubstrateForm),
+      vnode.state.activeForm === CommunityType.OffchainCommunity && m(OffchainCommunityForm),
+      vnode.state.activeForm === CommunityType.Erc20Community && m(ERC20Form),
+      vnode.state.activeForm === CommunityType.SubstrateCommunity && m(SubstrateForm),
     ]);
   }
 };
