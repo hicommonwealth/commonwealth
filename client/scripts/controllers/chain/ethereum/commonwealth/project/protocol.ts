@@ -1,4 +1,4 @@
-import BN from 'bn.js';
+// import BN from 'bn.js';
 
 import { IApp } from 'state';
 import { Project__factory, CWToken__factory } from 'eth/types';
