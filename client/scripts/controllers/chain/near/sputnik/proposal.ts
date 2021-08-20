@@ -1,28 +1,20 @@
 import { Near as NearApi } from 'near-api-js';
 import BN from 'bn.js';
 import moment from 'moment';
-import { IVote, Proposal, ProposalEndTime, VotingType, VotingUnit, ProposalStatus, ITXModalData } from 'models';
+import { Proposal, ProposalEndTime, VotingType, VotingUnit, ProposalStatus, ITXModalData } from 'models';
 import { NearToken } from 'adapters/chain/near/types';
-import { IIdentifiable } from 'adapters/shared';
-import { NearAccount, NearAccounts } from 'controllers/chain/near/account';
+import { NearAccounts } from 'controllers/chain/near/account';
 import NearChain from 'controllers/chain/near/chain';
-import NearSputnikDao, {
-  NearSputnikGetProposalResponse,
+import NearSputnikDao from './dao';
+import {
+  INearSputnikProposal,
+  NearSputnikVote,
   NearSputnikProposalStatus,
-  NearSputnikVoteString,
-} from './dao';
-
-export type INearSputnikProposal = IIdentifiable & NearSputnikGetProposalResponse;
-
-export class NearSputnikVote implements IVote<NearToken> {
-  public readonly account: NearAccount;
-  public readonly choice: NearSputnikVoteString;
-
-  constructor(member: NearAccount, choice: NearSputnikVoteString) {
-    this.account = member;
-    this.choice = choice;
-  }
-}
+  isAddMemberToRole,
+  isRemoveMemberFromRole,
+  isTransfer,
+  isFunctionCall,
+} from './types';
 
 export default class NearSputnikProposal extends Proposal<
   NearApi,
@@ -35,43 +27,43 @@ export default class NearSputnikProposal extends Proposal<
     return `#${this.identifier.toString()}`;
   }
   public get title() {
-    const yoktoNear = 1000000000000000000000000;
+    const yoktoNear = new BN('1000000000000000000000000');
     // TODO: fetch decimals from https://github.com/AngelBlock/sputnik-dao-2-mockup/blob/dev/src/ProposalPage.jsx#L48
     const decimals = 18;
-    // taken from https://github.com/AngelBlock/sputnik-dao-2-mockup/blob/dev/src/ProposalPage.jsx#L188
-    if (typeof this.data.kind === 'string') {
-      if (this.data.kind === 'ChangeConfig') return 'Change Config: ';
-      if (this.data.kind === 'ChangePolicy') return 'Change Policy: ';
-      if (this.data.kind === 'UpgradeSelf') return `UpgradeSelf: ${this.data.target}`;
-      if (this.data.kind === 'UpgradeRemote') return `UpgradeRemote: ${this.data.target}`;
-      if (this.data.kind === 'Transfer') return `Transfer: ${this.data.target}`;
-      if (this.data.kind === 'SetStakingContract') return `SetStakingContract: ${this.data.target}`;
-      if (this.data.kind === 'AddBounty') return `AddBounty: ${this.data.target}`;
-      if (this.data.kind === 'BountyDone') return `BountyDone: ${this.data.target}`;
-      if (this.data.kind === 'Vote') return `Vote: ${this.data.target}`;
-      return `Sputnik Proposal ${this.identifier}`;
-    } else {
-      if (this.data.kind.AddMemberToRole && this.data.kind.AddMemberToRole.role === 'council')
-        return `Add ${this.data.kind.AddMemberToRole.member_id} to the council`;
-      if (this.data.kind.RemoveMemberFromRole && this.data.kind.RemoveMemberFromRole.role === 'council')
-        return `Remove ${this.data.kind.RemoveMemberFromRole.member_id} from the council`;
-      if (this.data.kind.Transfer && this.data.kind.Transfer.token_id === '')
-        return `${'Request for payout Ⓝ'}${
-          (this.data.kind.Transfer.amount / yoktoNear).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-        } to ${this.data.kind.Transfer.receiver_id}`;
-      if (decimals && this.data.kind.Transfer && this.data.kind.Transfer.token_id !== '')
-        return `Request for payout ${
-          this.data.kind.Transfer.token_id.split('.')[0].toUpperCase()
-        }${
-          (new BN(this.data.kind.Transfer.amount).div(new BN(10).pow(new BN(`${decimals}`))).toNumber().toFixed(2)
-            .replace(/\B(?=(\d{3})+(?!\d))/g, ','))
-        } to ${
-          this.data.kind.Transfer.receiver_id
-        }`;
-      if (this.data.kind.FunctionCall && this.data.kind.FunctionCall.actions[0].method_name === 'create_token')
-        return 'Create token';
-      return `Sputnik Proposal ${this.identifier}`;
-    }
+    // naming taken from https://github.com/AngelBlock/sputnik-dao-2-mockup/blob/dev/src/ProposalPage.jsx#L188
+    if (this.data.kind === 'ChangeConfig') return 'Change Config: ';
+    if (this.data.kind === 'ChangePolicy') return 'Change Policy: ';
+    if (this.data.kind === 'UpgradeSelf') return `UpgradeSelf: ${this.data.target}`;
+    if (this.data.kind === 'UpgradeRemote') return `UpgradeRemote: ${this.data.target}`;
+    if (this.data.kind === 'Transfer') return `Transfer: ${this.data.target}`;
+    if (this.data.kind === 'SetStakingContract') return `SetStakingContract: ${this.data.target}`;
+    if (this.data.kind === 'AddBounty') return `AddBounty: ${this.data.target}`;
+    if (this.data.kind === 'BountyDone') return `BountyDone: ${this.data.target}`;
+    if (this.data.kind === 'Vote') return `Vote: ${this.data.target}`;
+    if (isAddMemberToRole(this.data.kind) && this.data.kind.AddMemberToRole.role === 'council')
+      return `Add ${this.data.kind.AddMemberToRole.member_id} to the council`;
+    if (isRemoveMemberFromRole(this.data.kind) && this.data.kind.RemoveMemberFromRole.role === 'council')
+      return `Remove ${this.data.kind.RemoveMemberFromRole.member_id} from the council`;
+    if (isTransfer(this.data.kind) && this.data.kind.Transfer.token_id === '')
+      return `${'Request for payout Ⓝ'}${
+        (new BN(this.data.kind.Transfer.amount))
+          .div(yoktoNear)
+          .toNumber()
+          .toFixed(2)
+          .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+      } to ${this.data.kind.Transfer.receiver_id}`;
+    if (decimals && isTransfer(this.data.kind) && this.data.kind.Transfer.token_id !== '')
+      return `Request for payout ${
+        this.data.kind.Transfer.token_id.split('.')[0].toUpperCase()
+      }${
+        (new BN(this.data.kind.Transfer.amount).div(new BN(10).pow(new BN(`${decimals}`))).toNumber().toFixed(2)
+          .replace(/\B(?=(\d{3})+(?!\d))/g, ','))
+      } to ${
+        this.data.kind.Transfer.receiver_id
+      }`;
+    if (isFunctionCall(this.data.kind) && this.data.kind.FunctionCall.actions[0].method_name === 'create_token')
+      return 'Create token';
+    return `Sputnik Proposal ${this.identifier}`;
   }
   public get description() { return this.data.description; }
   public get author() { return this._Accounts.get(this.data.proposer); }

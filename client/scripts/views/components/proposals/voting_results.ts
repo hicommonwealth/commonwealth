@@ -13,7 +13,7 @@ import { SubstrateCollectiveVote } from 'controllers/chain/substrate/collective_
 import { SubstrateDemocracyVote } from 'controllers/chain/substrate/democracy_referendum';
 import AaveProposal, { AaveProposalVote } from 'controllers/chain/ethereum/aave/proposal';
 import Marlin from 'controllers/chain/ethereum/marlin/adapter';
-import { NearSputnikVoteString } from 'controllers/chain/near/sputnik/dao';
+import { NearSputnikVoteString } from 'controllers/chain/near/sputnik/types';
 
 const COLLAPSE_VOTERS_AFTER = 6; // if there are >6 voters, collapse remaining under "Show more"
 

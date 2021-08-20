@@ -3,61 +3,11 @@ import { ITXModalData, ProposalModule } from 'models';
 import { NearAccounts } from 'controllers/chain/near/account';
 import NearChain from 'controllers/chain/near/chain';
 import NearSputnikProposal from './proposal';
-import type { INearSputnikProposal } from './proposal';
-
-// eslint-disable-next-line no-shadow
-export enum NearSputnikProposalStatus {
-  InProgress = 'InProgress',
-  Approved = 'Approved',
-  Rejected = 'Rejected',
-  Removed = 'Removed',
-  Expired = 'Expired',
-  Moved = 'Moved',
-}
-
-// eslint-disable-next-line no-shadow
-export enum NearSputnikVoteString {
-  Approve = 'Approve',
-  Reject = 'Reject',
-  Remove = 'Remove',
-}
-
-type VotePolicy = {
-  weight_kind: string, // TODO
-  quorum: string, // U128
-  threshold: object, // TODO
-};
-
-type RolePermission = {
-  name: string,
-  kind: string,
-  permissions: string[],
-  vote_policy: { [kind: string]: VotePolicy },
-};
-
-export type NearSputnikPolicy = {
-  roles: RolePermission[],
-  default_vote_policy: VotePolicy,
-  proposal_bond: string, // U128
-  proposal_period: string, // nanoseconds
-  bounty_bond: string, // U128
-  bounty_forgiveness_period: string, // nanoseconds
-};
-
-// proposal type returned by get_proposals query
-export type NearSputnikGetProposalResponse = {
-  id: number,
-  description: string,
-  // see https://github.com/near-daos/sputnik-dao-contract/blob/master/sputnikdao2/src/proposals.rs#L48
-  kind: { [kind: string]: any } | string,
-  target?: string, // TODO: test
-  proposer: string, // AccoundId
-  status: NearSputnikProposalStatus,
-  submission_time: string, // nanoseconds
-  // who will be e.g. "council" in the case of a class of voters
-  vote_counts: { [who: string]: [ number, number, number ] }, // yes / no / remove = spam
-  votes: { [who: string]: NearSputnikVoteString, },
-};
+import type {
+  INearSputnikProposal,
+  NearSputnikPolicy,
+  NearSputnikGetProposalResponse,
+} from './types';
 
 export default class NearSputnikDao extends ProposalModule<
   NearApi,
