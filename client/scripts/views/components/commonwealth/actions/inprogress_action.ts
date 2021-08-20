@@ -5,12 +5,17 @@ import { Input, FormGroup, Button } from 'construct-ui';
 import m from 'mithril';
 import BN from 'bn.js';
 
-import { CWProject } from 'models/CWProtocol';
+import { CMNProject } from 'models';
 import app from 'state';
 
 const floatRegex = /^[0-9]*\.?[0-9]*$/;
 
-const ActionModule: m.Component<{callback: (isBack: boolean) => void, actionDisabled: boolean, submitting: number}, {}> = {
+const ActionModule: m.Component<
+{
+  callback: (isBack: boolean) => void,
+  actionDisabled: boolean, submitting:
+  number
+}, {}> = {
   view: (vnode) => {
     const { callback, actionDisabled, submitting } = vnode.attrs;
 
@@ -22,7 +27,7 @@ const ActionModule: m.Component<{callback: (isBack: boolean) => void, actionDisa
         fluid: true,
         intent: 'primary',
         disabled: actionDisabled,
-        onclick: async(e) => { await callback(true); }
+        onclick: async (e) => { await callback(true); }
       }),
       m(Button, {
         class: 'contribute-button',
@@ -31,13 +36,19 @@ const ActionModule: m.Component<{callback: (isBack: boolean) => void, actionDisa
         fluid: true,
         intent: 'primary',
         disabled: actionDisabled,
-        onclick: async(e) => { await callback(false); }
+        onclick: async (e) => { await callback(false); }
       }),
     ];
   }
-}
+};
 
-const InProgressActionCard: m.Component<{project: CWProject, protocol: any}, {amount: any, error: string, submitting: number}> = {
+const InProgressActionCard: m.Component<
+{
+  project: CMNProject, protocol: any
+},
+{
+  amount: any, error: string, submitting: number
+}> = {
   oncreate: (vnode) => {
     vnode.state.error = '';
     vnode.state.amount = 0;
@@ -74,7 +85,7 @@ const InProgressActionCard: m.Component<{project: CWProject, protocol: any}, {am
       ]),
       vnode.state.error && vnode.state.error !== '' && m('p.error', vnode.state.error),
       m(ActionModule, {
-        callback: async(isBacker) => {
+        callback: async (isBacker) => {
           if (!vnode.state.amount || vnode.state.amount.toString() === new BN(0).toString()) {
             vnode.state.error = 'Please enter the amount';
           } else {
@@ -96,7 +107,6 @@ const InProgressActionCard: m.Component<{project: CWProject, protocol: any}, {am
       }),
     ]);
   }
-}
-
+};
 
 export default InProgressActionCard;

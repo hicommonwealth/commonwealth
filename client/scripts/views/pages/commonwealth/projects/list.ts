@@ -7,17 +7,17 @@ import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import Listing from 'views/pages/listing';
 import ProjectCard from 'views/components/commonwealth/project_card';
-import { CWProject } from 'models/CWProtocol';
+import { CMNProject } from 'models';
 
 const connectionReady = () => {
   if (!app.chain) return false;
   const protocol = (app.chain as any).protocol;
   if (!protocol || !protocol.initialized || !protocol.projectStore) return false;
   return true;
-}
+};
 
-const ProjectsPage: m.Component<{}, {initialized: boolean, projects: CWProject[]}> = {
-  onupdate: async(vnode) => {
+const ProjectsPage: m.Component<{}, {initialized: boolean, projects: CMNProject[]}> = {
+  onupdate: async (vnode) => {
     if (!connectionReady()) return;
     vnode.state.projects = await (app.chain as any).protocol.syncProjects();
     if (!vnode.state.initialized) {
@@ -30,9 +30,17 @@ const ProjectsPage: m.Component<{}, {initialized: boolean, projects: CWProject[]
     if (!connectionReady() || !vnode.state.initialized) return m(PageLoading);
 
     const { projects } = vnode.state;
-    const activeProjectsContent = projects.filter((p) => p.status === 'In Progress').map((p) => m(ProjectCard, { project: p }));
-    const failedProjects = projects.filter((p) => p.status === 'Failed').map((p) => m(ProjectCard, { project: p }));
-    const successedProjects = projects.filter((p) => p.status === 'Successed').map((p) => m(ProjectCard, { project: p }));
+    const activeProjectsContent = projects
+      .filter((p) => p.status === 'In Progress')
+      .map((p) => m(ProjectCard, { project: p }));
+
+    const failedProjects = projects
+      .filter((p) => p.status === 'Failed')
+      .map((p) => m(ProjectCard, { project: p }));
+
+    const successedProjects = projects
+      .filter((p) => p.status === 'Successed')
+      .map((p) => m(ProjectCard, { project: p }));
 
     return m(Sublayout, {
       class: 'ProjectsPage',
@@ -41,7 +49,7 @@ const ProjectsPage: m.Component<{}, {initialized: boolean, projects: CWProject[]
     }, [
       m('.stats-box', [
         m('div', [
-          'This is a UI version that use offchain local data, a production version will interact with real chain and contract data.',
+          'This is a UI version, not a production version',
         ]),
         m('div', '- Please login and connect your wallet'),
         m('div', '- Protocol information (like protocolFee and feeTo) will be set by admin or Protocol manager'),

@@ -5,13 +5,13 @@ import { Input, FormGroup, Button } from 'construct-ui';
 import m from 'mithril';
 
 import app from 'state';
-import { CWProject } from 'models/CWProtocol';
+import { CMNProject } from 'models';
 import { CWUser } from '../members_card';
 
 const floatRegex = /^[0-9]*\.?[0-9]*$/;
 
 const FailedActionCard: m.Component<{
-  project: CWProject,
+  project: CMNProject,
   protocol: any,
   backers: CWUser[]
 }, {

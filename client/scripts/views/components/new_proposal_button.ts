@@ -194,8 +194,7 @@ const NewProposalButton: m.Component<{
           hoverCloseDelay: 0,
           hasArrow: false,
           trigger: m(Button, {
-            disabled: !app.user.activeAccount
-              || ((app.chain as Token).isToken && !(app.chain as Token).hasToken),
+            disabled: !app.user.activeAccount,
             label: 'New thread',
           }),
           position: 'bottom-end',
@@ -206,8 +205,7 @@ const NewProposalButton: m.Component<{
           content: getNewProjectMenu(),
         }),
         m(Button, {
-          disabled: !app.user.activeAccount
-            || ((app.chain as Token).isToken && !(app.chain as Token).hasToken),
+          disabled: !app.user.activeAccount,
           iconLeft: Icons.EDIT,
           fluid,
           onclick: () => app.modals.create({ modal: NewThreadModal }),

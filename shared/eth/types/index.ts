@@ -52,6 +52,9 @@ export type { Token } from "./Token";
 export type { GuildBank2 } from "./GuildBank2";
 export type { Helper } from "./Helper";
 export type { Moloch2 } from "./Moloch2";
+export type { Project } from "./Project";
+export type { ProjectFactory } from "./ProjectFactory";
+export type { CWToken } from "./CWToken";
 
 export { IERC20__factory } from "./factories/IERC20__factory";
 export { IGovernancePowerDelegationToken__factory } from "./factories/IGovernancePowerDelegationToken__factory";
@@ -104,3 +107,7 @@ export { Token__factory } from "./factories/Token__factory";
 export { GuildBank2__factory } from "./factories/GuildBank2__factory";
 export { Helper__factory } from "./factories/Helper__factory";
 export { Moloch2__factory } from "./factories/Moloch2__factory";
+export { CWToken__factory } from "./factories/CWToken__factory";
+export { ProjectFactory__factory } from "./factories/ProjectFactory__factory";
+export { Project__factory } from "./factories/Project__factory";
+

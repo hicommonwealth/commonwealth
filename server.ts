@@ -93,7 +93,6 @@ async function main() {
         chains,
         SKIP_EVENT_CATCHUP
       );
-      // construct storageFetchers needed for the identity cache
       const fetchers = {};
       for (const [node, subscriber] of subscribers) {
         if (node.Chain.base === ChainBase.Substrate) {

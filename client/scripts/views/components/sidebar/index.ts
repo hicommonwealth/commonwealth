@@ -1,5 +1,6 @@
 import 'components/sidebar/index.scss';
 
+import { AaveTypes, MarlinTypes, MolochTypes } from '@commonwealth/chain-events';
 import m from 'mithril';
 import _ from 'lodash';
 import {
@@ -18,7 +19,6 @@ import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import CommunitySelector from 'views/components/sidebar/community_selector';
 import CreateCommunityModal from 'views/modals/create_community_modal';
-import { CWPModule, CWPChainStatusModule, isCommonProtocolMenu } from './common_protocol';
 
 import { discordIcon, telegramIcon, elementIcon, githubIcon, websiteIcon } from './icons';
 
@@ -446,10 +446,18 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         fluid: true,
         rounded: true,
         label: 'Collectives',
+        active: m.route.get().startsWith(`/${app.activeChainId()}/collectives`),
         onclick: (e) => {
           e.preventDefault();
           navigateToSubpage('/collectives');
         },
+      }),
+    ]);
+  }
+};
+
+export const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
+  view: (vnode) => {
     const url = app.chain?.meta?.url;
     if (!url) return;
 

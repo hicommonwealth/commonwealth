@@ -33,11 +33,7 @@ export { default as ChainEntity } from './ChainEntity';
 export { default as StarredCommunity } from './StarredCommunity';
 export { default as Webhook } from './Webhook';
 
-export {
-  CWProject,
-  CWProtocol,
-  CWProtocolMembers
-} from './CWProtocol';
+export { CMNProject, CMNProjectMembers, CMNProjectProtocol } from './CMNProject';
 
 export { DepositVote, BinaryVote } from './votes';
 
