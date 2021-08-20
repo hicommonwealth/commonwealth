@@ -1,3 +1,4 @@
+import BN from 'bn.js';
 import { Near as NearApi } from 'near-api-js';
 import { ITXModalData, ProposalModule } from 'models';
 import { NearAccounts } from 'controllers/chain/near/account';
@@ -19,12 +20,15 @@ export default class NearSputnikDao extends ProposalModule<
   private _policy: NearSputnikPolicy;
   public get policy() { return this._policy; }
 
+  private _tokenSupply: BN;
+  public get tokenSupply() { return this._tokenSupply; }
+
   // INIT / DEINIT
   public async init(chain: NearChain, accounts: NearAccounts) {
     this._Chain = chain;
     this._Accounts = accounts;
     this._policy = await this.query('get_policy', {});
-    console.log(this._policy);
+    this._tokenSupply = new BN(await this.query('delegation_total_supply', {}));
     const res: NearSputnikGetProposalResponse[] = await this.query('get_proposals', { from_index: 0, limit: 100 });
     res.forEach((p) => new NearSputnikProposal(
       this._Chain,
@@ -33,7 +37,6 @@ export default class NearSputnikDao extends ProposalModule<
       { ...p, identifier: `${p.id}` },
     ));
     // TODO: support bounties
-    console.log(this);
     this._initialized = true;
   }
 

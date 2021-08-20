@@ -3,7 +3,7 @@ import BN from 'bn.js';
 import moment from 'moment';
 import { Proposal, ProposalEndTime, VotingType, VotingUnit, ProposalStatus, ITXModalData } from 'models';
 import { NearToken } from 'adapters/chain/near/types';
-import { NearAccounts } from 'controllers/chain/near/account';
+import { NearAccount, NearAccounts } from 'controllers/chain/near/account';
 import NearChain from 'controllers/chain/near/chain';
 import NearSputnikDao from './dao';
 import {
@@ -14,6 +14,12 @@ import {
   isRemoveMemberFromRole,
   isTransfer,
   isFunctionCall,
+  getVotePolicy,
+  VotePolicy,
+  WeightKind,
+  isWeight,
+  getUserRoles,
+  getTotalSupply,
 } from './types';
 
 export default class NearSputnikProposal extends Proposal<
@@ -22,7 +28,7 @@ export default class NearSputnikProposal extends Proposal<
   INearSputnikProposal,
   NearSputnikVote
 > {
-  // TODO: fix
+  // TODO: get the correct short id
   public get shortIdentifier() {
     return `#${this.identifier.toString()}`;
   }
@@ -71,14 +77,20 @@ export default class NearSputnikProposal extends Proposal<
   public get votingType() {
     return VotingType.YesNoReject;
   }
-
-  // TODO: get from policy
   public get votingUnit() {
-    return VotingUnit.OnePersonOneVote;
+    return this._votePolicy.weight_kind === WeightKind.RoleWeight
+      ? VotingUnit.OnePersonOneVote
+      : VotingUnit.CoinVote;
   }
 
-  public canVoteFrom(account) {
-    return true;
+  public canVoteFrom(account: NearAccount) {
+    // technically we should check on each role separately, but for now we
+    // confirm they have all 3 voting roles
+    const permissions = getUserRoles(this._Dao.policy, account.address);
+    const permissionTypes = permissions.map((p) => p.split(':')[1]);
+    return permissionTypes.includes('VoteApprove')
+      && permissionTypes.includes('VoteReject')
+      && permissionTypes.includes('VoteRemove');
   }
 
   private _Chain: NearChain;
@@ -86,6 +98,8 @@ export default class NearSputnikProposal extends Proposal<
   private _Dao: NearSputnikDao;
 
   private _endTimeS: number;
+  private _votePolicy: VotePolicy;
+  private _totalSupply: BN;
 
   constructor(
     Chain: NearChain,
@@ -97,6 +111,10 @@ export default class NearSputnikProposal extends Proposal<
     this._Chain = Chain;
     this._Accounts = Accounts;
     this._Dao = Dao;
+
+    // init constants from data
+    this._votePolicy = getVotePolicy(Dao.policy, data.kind);
+    this._totalSupply = getTotalSupply(Dao.policy, this._votePolicy, Dao.tokenSupply);
 
     const periodS = +this._Dao.policy.proposal_period.slice(0, this._Dao.policy.proposal_period.length - 9);
     const submissionTimeS = +this.data.submission_time.slice(0, this.data.submission_time.length - 9);
@@ -110,11 +128,22 @@ export default class NearSputnikProposal extends Proposal<
       data.status = NearSputnikProposalStatus.Expired;
       this.complete(this._Dao.store);
     }
-    // TODO: add weights to votes as needed
+    // TODO: fetch weights for each voter? is this necessary?
     for (const [voter, choice] of Object.entries(data.votes)) {
       this.addOrUpdateVote(new NearSputnikVote(this._Accounts.get(voter), choice));
     }
     this._Dao.store.add(this);
+  }
+
+  private _getVoteCounts(): [BN, BN, BN] {
+    const counts = this.data.vote_counts;
+    if (Object.keys(counts).length === 0) {
+      return [new BN(0), new BN(0), new BN(0)];
+    } else {
+      // TODO: don't just use the first value on the object, do a proper role check
+      const [yes, no, remove] = Object.values(this.data.vote_counts)[0];
+      return [new BN(yes), new BN(no), new BN(remove)];
+    }
   }
 
   public update() {
@@ -122,14 +151,19 @@ export default class NearSputnikProposal extends Proposal<
   }
 
   get support() {
-    // TODO: use policy to guide implementation
-    return 0;
+    // TODO: don't just use the first value on the object, do a proper role check
+    const [yes] = Object.values(this.data.vote_counts)[0];
+    // will be either total vote weight or # of yes votes depending on type
+    return yes;
   }
 
-  // TODO: this will either require fetching all members of the voting role,
-  // or doing a coin weight vs total delegated amount
+  // percentage of voters or percentage of tokens depending on type of vote
   get turnout() {
-    return 0;
+    const PRECISION = 10_000;
+    const [yes, no, remove] = this._getVoteCounts();
+    const totalVoted = yes.add(no).add(remove);
+    const pctVoted = totalVoted.muln(PRECISION).div(this._totalSupply).toNumber() / PRECISION;
+    return pctVoted;
   }
 
   get endTime(): ProposalEndTime {
@@ -138,8 +172,29 @@ export default class NearSputnikProposal extends Proposal<
 
   get isPassing(): ProposalStatus {
     if (this.data.status === NearSputnikProposalStatus.InProgress) {
-      // TODO: base on policy threshold
-      return ProposalStatus.Passing;
+      // TODO: check quorum in addition to just threshold
+      let threshold: BN;
+      if (isWeight(this._votePolicy.threshold)) {
+        // weight threshold: must have enough votes
+        threshold = BN.min(
+          this._totalSupply,
+          new BN(this._votePolicy.threshold),
+        );
+      } else {
+        // ratio threshold: must have sufficient proportion
+        const [numerator, denominator] = this._votePolicy.threshold;
+        threshold = BN.min(
+          this._totalSupply.muln(+numerator).divn(+denominator).addn(1),
+          this._totalSupply,
+        );
+      }
+      const [yes, no, remove] = this._getVoteCounts();
+      if (yes.gte(threshold)) {
+        return ProposalStatus.Passing;
+      } else {
+        // TODO: compute separate states for ready to pass/fail/remove
+        return ProposalStatus.Failing;
+      }
     } else if (this.data.status === NearSputnikProposalStatus.Approved) {
       return ProposalStatus.Passed;
     } else {
