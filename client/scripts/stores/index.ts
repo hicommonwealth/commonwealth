@@ -16,4 +16,4 @@ export { default as PersistentStore } from './PersistentStore';
 
 export { UpdateType, IHasId, ISerializable, IHasAddress } from './interfaces';
 
-export { CWProtocolStore, CWProtocolMembersStore } from './CWProtocolStore';
+export { CMNProjectStore, CMNProjectMembersStore } from './CMNProjectStore';

@@ -3,17 +3,18 @@ import { EthereumCoin } from 'shared/adapters/chain/ethereum/types';
 
 type ProjectStatus = 'In Progress' | 'Successed' | 'Failed';
 
-export interface CWUser {
+export interface CMNUser {
   balance: number;
   address: string;
 }
-export class CWProject { 
+
+export class CMNProject {
   public readonly name: string;
   public readonly description: string;
   public readonly ipfsHash: string;
   public readonly cwUrl: string;
   public readonly beneficiary: string;
-  public readonly acceptedToken: string;
+  public readonly acceptedTokens: string[];
   public readonly nominations: Array<string>;
   public readonly endTime: Date;
   public readonly projectHash: string;
@@ -33,7 +34,7 @@ export class CWProject {
     ipfsHash,
     cwUrl,
     beneficiary,
-    acceptedToken,
+    acceptedTokens,
     nominations,
     threshold,
     endTime,
@@ -51,7 +52,7 @@ export class CWProject {
     this.ipfsHash = ipfsHash;
     this.cwUrl = cwUrl;
     this.beneficiary = beneficiary;
-    this.acceptedToken = acceptedToken;
+    this.acceptedTokens = acceptedTokens;
     this.nominations = nominations;
     this.threshold = threshold;
     this.endTime = endTime;
@@ -66,50 +67,49 @@ export class CWProject {
   }
 }
 
-export class CWProtocol {
+export class CMNProjectProtocol {
   public readonly id: string;
   public protocolFee: BN;
   public feeTo: string;
-  public projects: CWProject[];
+  public projects: CMNProject[];
   public updated_at: Date;
 
   constructor(id, protocolFee, feeTo, projects) {
-   this.protocolFee = protocolFee;
-   this.feeTo = feeTo;
-   this.id = id;
-   this.projects = projects;
-   this.updated_at = new Date();
+    this.protocolFee = protocolFee;
+    this.feeTo = feeTo;
+    this.id = id;
+    this.projects = projects;
+    this.updated_at = new Date();
   }
 
   public static fromJSON({ id, protocolFee, feeTo, projects }) {
-    return new CWProtocol(id, protocolFee, feeTo, projects);
+    return new CMNProjectProtocol(id, protocolFee, feeTo, projects);
   }
 
-  public setProjects(_projects: CWProject[]) {
+  public setProjects(_projects: CMNProject[]) {
     this.projects = _projects;
     this.updated_at = new Date();
   }
 }
 
-export class CWProtocolMembers {
+export class CMNProjectMembers {
   public readonly id: string;
-  public backers: CWUser[];
-  public curators: CWUser[];
+  public backers: CMNUser[];
+  public curators: CMNUser[];
   public updated_at: Date;
 
   constructor(id, backers, curators) {
-   this.id = id;
-   this.backers = backers;
-   this.curators = curators;
-   this.updated_at = new Date();
+    this.id = id;
+    this.backers = backers;
+    this.curators = curators;
+    this.updated_at = new Date();
   }
 
   public static fromJSON({ id, backers, curators }) {
-    return new CWProtocolMembers(id, backers, curators);
+    return new CMNProjectMembers(id, backers, curators);
   }
 
-
-  public setParticipants(backers: CWUser[], curators: CWUser[]) {
+  public setParticipants(backers: CMNUser[], curators: CMNUser[]) {
     this.backers = backers;
     this.curators = curators;
     this.updated_at = new Date();

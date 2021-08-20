@@ -1,19 +1,17 @@
 import 'components/commonwealth/action_card.scss';
 
 import { utils } from 'ethers';
-// import { Button } from 'construct-ui';
 import m from 'mithril';
-
 import app from 'state';
-import { CWProject } from 'models/CWProtocol';
+import { CMNProject } from 'models';
 
 import InProgressActionCard from './inprogress_action';
 import SuccsedActionCard from './successed_action';
 import FailedActionCard from './failed_action';
-import { CWUser } from '../members_card'
+import { CWUser } from '../members_card';
 
 const ActionCard: m.Component<{
-  project: CWProject,
+  project: CMNProject,
   protocol: any,
   curators: CWUser[],
   backers: CWUser[],

@@ -1,8 +1,8 @@
 import EthereumChain from '../chain';
-import CommonwealthAPI from './api';
+import CMNProjectAPI from './project/api';
 
 // Thin wrapper over EthereumChain to guarantee the `init()` implementation
 // on the Governance module works as expected.
-export default class CommonwealthChain extends EthereumChain {
-  public CommonwealthAPI: CommonwealthAPI;
+export default class CMNChain extends EthereumChain {
+  public CMNProjectApi: CMNProjectAPI;
 }

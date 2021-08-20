@@ -1,5 +1,6 @@
 import 'components/sidebar/index.scss';
 
+import { AaveTypes, MarlinTypes, MolochTypes } from '@commonwealth/chain-events';
 import m from 'mithril';
 import _ from 'lodash';
 import {
@@ -18,10 +19,8 @@ import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import CommunitySelector from 'views/components/sidebar/community_selector';
 import CreateCommunityModal from 'views/modals/create_community_modal';
-import { CWPModule, CWPChainStatusModule, isCommonProtocolMenu } from './common_protocol';
 
 import { discordIcon, telegramIcon, elementIcon, githubIcon, websiteIcon } from './icons';
-import { AaveTypes, MarlinTypes, MolochTypes } from '@commonwealth/chain-events';
 
 const SidebarQuickSwitcherItem: m.Component<{ item, size }> = {
   view: (vnode) => {
@@ -242,7 +241,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           label: 'Referenda',
           onclick: (e) => {
             e.preventDefault();
-            navigateToSubpage(`/referenda`);
+            navigateToSubpage('/referenda');
           },
           contentRight: [], // TODO
         }),
@@ -260,7 +259,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           class: app.chain?.base === ChainBase.Substrate ? 'sub-button' : '',
           onclick: (e) => {
             e.preventDefault();
-            navigateToSubpage(`/proposals`);
+            navigateToSubpage('/proposals');
           },
         }),
       // // motions (substrate only)
@@ -286,7 +285,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           class: 'sub-button',
           onclick: (e) => {
             e.preventDefault();
-            navigateToSubpage(`/council`);
+            navigateToSubpage('/council');
           },
         }),
       m('.sidebar-spacer'),
@@ -299,7 +298,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           label: 'Treasury',
           onclick: (e) => {
             e.preventDefault();
-            navigateToSubpage(`/treasury`);
+            navigateToSubpage('/treasury');
           },
         }),
       // bounties (substrate only)
@@ -314,7 +313,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           class: 'sub-button',
           onclick: (e) => {
             e.preventDefault();
-            navigateToSubpage(`/bounties`);
+            navigateToSubpage('/bounties');
           },
         }),
       // tips (substrate only)
@@ -328,7 +327,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           class: 'sub-button',
           onclick: (e) => {
             e.preventDefault();
-            navigateToSubpage(`/tips`);
+            navigateToSubpage('/tips');
           },
         }),
       m('.sidebar-spacer'),
@@ -342,7 +341,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           label: 'Validators',
           onclick: (e) => {
             e.preventDefault();
-            navigateToSubpage(`/validators`);
+            navigateToSubpage('/validators');
           },
         }),
       // showMarlinOptions && m(Button, {
@@ -360,7 +359,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         rounded: true,
         onclick: (e) => {
           e.preventDefault();
-          navigateToSubpage(`/delegate`);
+          navigateToSubpage('/delegate');
         },
         label: 'Delegate',
         active: m.route.get() === `/${app.activeChainId()}/delegate`,
@@ -380,7 +379,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         rounded: true,
         onclick: (e) => {
           e.preventDefault();
-          navigateToSubpage(`/new/proposal/:type`, { type: ProposalType.MolochProposal });
+          navigateToSubpage('/new/proposal/:type', { type: ProposalType.MolochProposal });
         },
         label: 'New proposal',
       }),
@@ -447,7 +446,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         active: m.route.get().startsWith(`/${app.activeChainId()}/projects`),
         onclick: (e) => {
           e.preventDefault();
-          navigateToSubpage(`/projects`);
+          navigateToSubpage('/projects');
         },
       }),
       // showCommonwealthMenuOptions && m(Button, {
@@ -464,10 +463,18 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         fluid: true,
         rounded: true,
         label: 'Collectives',
+        active: m.route.get().startsWith(`/${app.activeChainId()}/collectives`),
         onclick: (e) => {
           e.preventDefault();
-          navigateToSubpage(`/collectives`);
+          navigateToSubpage('/collectives');
         },
+      }),
+    ]);
+  }
+};
+
+export const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
+  view: (vnode) => {
     const url = app.chain?.meta?.url;
     if (!url) return;
 
@@ -617,14 +624,14 @@ const Sidebar: m.Component<{ hideQuickSwitcher? }, {}> = {
         app.isLoggedIn() && (app.chain || app.community) && m(SubscriptionButton),
         app.chain && m(ChainStatusModule),
       ]),
-      app.isCustomDomain() &&
-      m('a', {
+      app.isCustomDomain()
+      && m('a', {
         class: 'PoweredBy',
         onclick: (e) => {
           window.open('https://commonwealth.im/');
         },
       }),
-    ]
+    ];
   },
 };
 

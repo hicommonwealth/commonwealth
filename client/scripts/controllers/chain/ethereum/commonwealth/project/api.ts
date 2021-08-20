@@ -2,36 +2,44 @@ import { utils } from 'ethers';
 import BN from 'bn.js';
 import $ from 'jquery';
 
-import ContractApi from 'controllers/chain/ethereum/contractApi';
-import { EthereumCoin } from 'adapters/chain/ethereum/types';
+import { ProjectFactory as CMNProjectProtocolContract, Project as CMNProjectContract } from 'eth/types';
+import { CMNProject } from '../../../../../models';
+import ContractApi from '../../contractApi';
 
-import { CwProtocol as CWProtocolContract } from 'CWProtocol';
-import { CwProjectFactory as CWProjectFactory } from 'CwProjectFactory';
-import { CwProject as CWProjectContract } from 'CwProject';
-import { CWProject } from 'models/CWProtocol';
+export interface ProjectMetaData {
+  name: string
+  description: string,
+  creator: string,
+  beneficiary: string,
+  threshold: number,
+  curatorFee: number,
+  period: number,
+  acceptedTokens: string[]
+}
 
 export const EtherAddress = '0x0000000000000000000000000000000000000000';
-export default class CommonwealthAPI extends ContractApi<CWProtocolContract> {
-  private _projectAPIs;
+
+export default class CMNProjectAPI extends ContractApi<CMNProjectProtocolContract> {
+  private _projectApis;
 
   public async init() {
-    this._projectAPIs = {};
+    this._projectApis = {};
     super.init();
   }
-  
+
   public getProjectAPI(projAddress: string) {
-    if (Object.keys(this._projectAPIs).includes(projAddress)) {
-      return this._projectAPIs[projAddress];
+    if (Object.keys(this._projectApis).includes(projAddress)) {
+      return this._projectApis[projAddress];
     }
     return null;
   }
 
-  public setProjectAPI(projAddress: string, projectAPI: ContractApi<CWProjectContract>) {
-    this._projectAPIs[projAddress] = projectAPI;
+  public setProjectAPI(projAddress: string, projectAPI: ContractApi<CMNProjectContract>) {
+    this._projectApis[projAddress] = projectAPI;
   }
 
   public async getProjectDetails(projAddress: string) {
-    const projContract: CWProjectContract = await CWProjectFactory.connect(projAddress, this.Provider);
+    const projContract = this._projectApis[projAddress];
 
     const name = await projContract.name();
     const ipfsHash = await projContract.ipfsHash();
@@ -39,19 +47,18 @@ export default class CommonwealthAPI extends ContractApi<CWProtocolContract> {
     const beneficiary = await projContract.beneficiary();
     const curatorFee = await projContract.curatorFee();
     const creator = await projContract.creator();
-
     const threshold = await projContract.threshold();
     const totalFunding = await projContract.totalFunding();
+    const acceptedTokens = await projContract.acceptedTokens();
+    const funded = await projContract.funded();
+    const lockedWithdraw = await projContract.lockedWithdraw();
+    const daedline = (new BN((await projContract.deadline()).toString()).mul(new BN(1000))).toNumber();
+    const endTime = new Date(daedline);
 
     const projectHash = utils.solidityKeccak256(
       ['address', 'address', 'bytes32', 'uint256'],
       [creator, beneficiary, name, threshold.toString()]
     );
-
-    const daedline = (new BN((await projContract.deadline()).toString()).mul(new BN(1000))).toNumber();
-    const endTime = new Date(daedline);
-    const funded = await projContract.funded();
-    const lockedWithdraw = await projContract.lockedWithdraw();
 
     let status = 'In Progress';
     if ((new Date()).getTime() - endTime.getTime() > 0) {
@@ -65,21 +72,21 @@ export default class CommonwealthAPI extends ContractApi<CWProtocolContract> {
     const bToken = await projContract.bToken();
     const cToken = await projContract.cToken();
 
-    const newProj = new CWProject(
+    const newProj = new CMNProject(
       utils.parseBytes32String(name),
       '',
       utils.parseBytes32String(ipfsHash),
       utils.parseBytes32String(cwUrl),
       beneficiary,
-      '0x00', // aceptedTokens
+      acceptedTokens, // aceptedTokens
       [], // nominations,
-      new EthereumCoin('ETH', new BN(threshold.toString()), false), //threshold,
+      threshold, // decimals in 8
       endTime,
       curatorFee,
       projectHash,
       status,
       lockedWithdraw,
-      new EthereumCoin('ETH', new BN(totalFunding.toString()), false), //totalFunding,
+      totalFunding, // decimals in 8
       bToken,
       cToken,
       projAddress,
@@ -88,12 +95,12 @@ export default class CommonwealthAPI extends ContractApi<CWProtocolContract> {
   }
 
   public async retrieveAllProjects() {
-    const projects: CWProject[] =  [];
-    const allProjectLenght = new BN((await this.Contract.allProjectsLength()).toString(), 10);
-    if (allProjectLenght.gt(new BN(0))) {
-      const projectAddresses = await this.Contract.getAllProjects();
-      for (let i=0; i<projectAddresses.length; i++) {
-        const proj: CWProject = await this.getProjectDetails(projectAddresses[i]);
+    const projects: CMNProject[] =  [];
+    const projectAddresses = await this.Contract.getAllProjects();
+    // const allProjectLenght = new BN((await this.Contract.allProjectsLength()).toString(), 10);
+    if (projectAddresses.length > 0) {
+      for (let i = 0; i < projectAddresses.length; i++) {
+        const proj: CMNProject = await this.getProjectDetails(projectAddresses[i]);
         projects.push(proj);
       }
     }
@@ -118,7 +125,7 @@ export default class CommonwealthAPI extends ContractApi<CWProtocolContract> {
         const newItem = {
           address: item.address,
           balance: item.balance,
-        }
+        };
         return newItem;
       });
     }
@@ -127,22 +134,14 @@ export default class CommonwealthAPI extends ContractApi<CWProtocolContract> {
   }
 
   public async createProject(
-    contract: CWProtocolContract,
-    u_name: string,
-    acceptedTokens: string[],
-    u_description: string,
-    creator: string,
-    beneficiary: string,
-
-    threshold: number,
-    curatorFee: number,
-    u_period: number, // in days
+    contract: CMNProjectProtocolContract,
+    params: ProjectMetaData
   ) {
-    const name = utils.formatBytes32String(u_name);
+    const name = utils.formatBytes32String(params.name);
     const ipfsHash = utils.formatBytes32String('0x01');
     const cwUrl = utils.formatBytes32String('commonwealth.im');
-    const nominations = [creator, beneficiary];
-    const endtime = Math.ceil(Math.ceil(Date.now() / 1000) + u_period * 24 * 60 * 60);
+    const nominations = [params.creator, params.beneficiary];
+    const endtime = Math.ceil(Math.ceil(Date.now() / 1000) + params.period * 24 * 60 * 60); // in days
 
     let transactionSuccessed: boolean;
     try {
@@ -150,17 +149,16 @@ export default class CommonwealthAPI extends ContractApi<CWProtocolContract> {
         name,
         ipfsHash,
         cwUrl,
-        beneficiary,
-        acceptedTokens,
+        params.beneficiary,
+        params.acceptedTokens,
         nominations,
-        threshold.toString(),
+        params.threshold.toString(),
         endtime,
-        curatorFee.toString(),
-        '', // projectID
+        params.curatorFee.toString(),
       );
       const txReceipt = await tx.wait();
       transactionSuccessed = txReceipt.status === 1;
-    } catch(err) {
+    } catch (err) {
       transactionSuccessed = false;
     }
     return {
@@ -169,59 +167,51 @@ export default class CommonwealthAPI extends ContractApi<CWProtocolContract> {
     };
   }
 
-  public async back(
-    contract: CWProjectContract,
-    amount: number,
-    tokenAddress: string,
-  ) {
+  public async back(contract: CMNProjectContract, amount: number, tokenAddress: string) {
     if (tokenAddress === EtherAddress) {
       let transactionSuccessed: boolean;
       try {
-        const tx = await contract.backWithETH({value: amount});
+        const tx = await contract.backWithETH({ value: amount });
         const txReceipt = await tx.wait();
         transactionSuccessed = txReceipt.status === 1;
-      } catch(err) {
+      } catch (err) {
         transactionSuccessed = false;
       }
       return {
         status: transactionSuccessed ? 'success' : 'failed',
         error: transactionSuccessed ? '' : 'Failed to process backWithETH transaction'
       };
+    } else {
+      // logic to ERC20 token backing
     }
   }
 
-  public async curate(
-    contract: CWProjectContract,
-    amount: number,
-    tokenAddress: string,
-  ) {
+  public async curate(contract: CMNProjectContract, amount: number, tokenAddress: string) {
     if (tokenAddress === EtherAddress) {
       let transactionSuccessed: boolean;
       try {
-        const tx = await contract.curateWithETH({value: amount});
+        const tx = await contract.curateWithETH({ value: amount });
         const txReceipt = await tx.wait();
         transactionSuccessed = txReceipt.status === 1;
-      } catch(err) {
+      } catch (err) {
         transactionSuccessed = false;
       }
       return {
         status: transactionSuccessed ? 'success' : 'failed',
         error: transactionSuccessed ? '' : 'Failed to process curateWithETH transaction'
       };
+    } else {
+      // logic to ERC20 token curating
     }
   }
 
-  public async redeemBToken(
-    contract: CWProjectContract,
-    amount: number,
-    tokenAddress: string,
-  ) {
+  public async redeemBToken(contract: CMNProjectContract, amount: number, tokenAddress: string) {
     let transactionSuccessed: boolean;
     try {
       const tx = await contract.redeemBToken(tokenAddress, amount, { gasLimit: 3000000 });
       const txReceipt = await tx.wait();
       transactionSuccessed = txReceipt.status === 1;
-    } catch(err) {
+    } catch (err) {
       transactionSuccessed = false;
     }
     return {
@@ -230,17 +220,13 @@ export default class CommonwealthAPI extends ContractApi<CWProtocolContract> {
     };
   }
 
-  public async redeemCToken(
-    contract: CWProjectContract,
-    amount: number,
-    tokenAddress: string,
-  ) {
+  public async redeemCToken(contract: CMNProjectContract, amount: number, tokenAddress: string) {
     let transactionSuccessed: boolean;
     try {
       const tx = await contract.redeemCToken(tokenAddress, amount, { gasLimit: 3000000 });
       const txReceipt = await tx.wait();
       transactionSuccessed = txReceipt.status === 1;
-    } catch(err) {
+    } catch (err) {
       transactionSuccessed = false;
     }
     return {
@@ -249,13 +235,13 @@ export default class CommonwealthAPI extends ContractApi<CWProtocolContract> {
     };
   }
 
-  public async withdraw(contract: CWProjectContract) {
+  public async withdraw(contract: CMNProjectContract) {
     let transactionSuccessed: boolean;
     try {
       const tx = await contract.withdraw({ gasLimit: 3000000 });
       const txReceipt = await tx.wait();
       transactionSuccessed = txReceipt.status === 1;
-    } catch(err) {
+    } catch (err) {
       transactionSuccessed = false;
     }
     return {

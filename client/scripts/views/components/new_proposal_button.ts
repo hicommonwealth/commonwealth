@@ -40,11 +40,11 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
         iconLeft: mobile ? Icons.PLUS : undefined,
       })
     )),
-    (app.chain?.network === ChainNetwork.Aave || 
-      app.chain?.network === ChainNetwork.dYdX ||
-      app.chain?.network === ChainNetwork.Marlin ||
-      app.chain?.base === ChainBase.CosmosSDK || 
-      app.chain?.base === ChainBase.Substrate)
+    (app.chain?.network === ChainNetwork.Aave
+      || app.chain?.network === ChainNetwork.dYdX
+      || app.chain?.network === ChainNetwork.Marlin
+      || app.chain?.base === ChainBase.CosmosSDK
+      || app.chain?.base === ChainBase.Substrate)
       && !mobile
       && m(MenuDivider),
     app.chain?.base === ChainBase.CosmosSDK && m(MenuItem, {
@@ -55,13 +55,13 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
       iconLeft: mobile ? Icons.PLUS : undefined,
     }),
     app.chain?.base === ChainBase.Ethereum && app.chain?.network === ChainNetwork.Aave
-     && m(MenuItem, {
-      onclick: (e) => navigateToSubpage('/new/proposal/:type', {
-        type: ProposalType.AaveProposal
+      && m(MenuItem, {
+        onclick: (e) => navigateToSubpage('/new/proposal/:type', {
+          type: ProposalType.AaveProposal
+        }),
+        label: 'New On-Chain Proposal',
+        iconLeft: mobile ? Icons.PLUS : undefined,
       }),
-      label: 'New On-Chain Proposal',
-      iconLeft: mobile ? Icons.PLUS : undefined,
-    }),
     app.chain?.base === ChainBase.Ethereum && app.chain?.network === ChainNetwork.Marlin && m(MenuItem, {
       onclick: (e) => navigateToSubpage('/new/proposal/:type', {
         type: ProposalType.MarlinProposal
@@ -183,8 +183,7 @@ const NewProposalButton: m.Component<{
           hoverCloseDelay: 0,
           hasArrow: false,
           trigger: m(Button, {
-            disabled: !app.user.activeAccount
-              || ((app.chain as Token).isToken && !(app.chain as Token).hasToken),
+            disabled: !app.user.activeAccount,
             label: 'New thread',
           }),
           position: 'bottom-end',
@@ -195,8 +194,7 @@ const NewProposalButton: m.Component<{
           content: getNewProjectMenu(),
         }),
         m(Button, {
-          disabled: !app.user.activeAccount
-            || ((app.chain as Token).isToken && !(app.chain as Token).hasToken),
+          disabled: !app.user.activeAccount,
           iconLeft: Icons.EDIT,
           fluid,
           onclick: () => app.modals.create({ modal: NewThreadModal }),

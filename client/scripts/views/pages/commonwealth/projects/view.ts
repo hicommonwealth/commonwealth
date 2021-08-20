@@ -1,3 +1,4 @@
+/* eslint-disable no-mixed-operators */
 import 'pages/commonwealth/projects/view.scss';
 
 import m from 'mithril';
@@ -6,35 +7,33 @@ import { utils } from 'ethers';
 import app from 'state';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
-import { CWProject } from 'models/CWProtocol';
-
 import ActionModule from 'views/components/commonwealth/actions/action_card';
-
+import { CMNProject } from 'models';
 
 function secondsToDhms(seconds) {
   seconds = Number(seconds);
 
   if (seconds >= 0) {
-    var d = Math.floor(seconds / (3600*24));
-    var h = Math.floor(seconds % (3600*24) / 3600);
-    var m = Math.floor(seconds % 3600 / 60);
-    var s = Math.floor(seconds % 60);
-    
-    var dDisplay = d > 0 ? d + (d == 1 ? " day, " : " days, ") : "";
-    var hDisplay = h > 0 ? h + (h == 1 ? " hour, " : " hours, ") : "";
-    var mDisplay = m > 0 ? m + (m == 1 ? " minute, " : " minutes, ") : "";
-    var sDisplay = s > 0 ? s + (s == 1 ? " second" : " seconds") : "";
+    const dd = Math.floor(seconds / (3600 * 24));
+    const hh = Math.floor(seconds % (3600 * 24) / 3600);
+    const mm = Math.floor(seconds % 3600 / 60);
+    const ss = Math.floor(seconds % 60);
+
+    const dDisplay = dd > 0 ? dd + (dd === 1 ? ' day, ' : ' days, ') : '';
+    const hDisplay = hh > 0 ? hh + (hh === 1 ? ' hour, ' : ' hours, ') : '';
+    const mDisplay = mm > 0 ? mm + (mm === 1 ? ' minute, ' : ' minutes, ') : '';
+    const sDisplay = ss > 0 ? ss + (ss === 1 ? ' second' : ' seconds') : '';
     return dDisplay + hDisplay + mDisplay + sDisplay;
   }
   return '0 seconds';
 }
-  
+
 const ProjectContentModule: m.Component<{
-  project: CWProject,
+  project: CMNProject,
   leftInSeconds: number,
   forceUpdateStatus: () => void,
 }, {}> = {
-  oncreate: async(vnode) => {
+  oncreate: async (vnode) => {
     if (vnode.attrs.leftInSeconds > 0) {
       setTimeout(() => { m.redraw(); }, 1000);
     } else {
@@ -43,8 +42,10 @@ const ProjectContentModule: m.Component<{
   },
   view: (vnode) => {
     const { project, leftInSeconds } = vnode.attrs;
-    const leftTime = project.status === 'In Progress' ? `${secondsToDhms(leftInSeconds)} left`: project.status;
-    const textColorStyle = { color: project.status === 'In Progress' ? 'blue': project.status === 'Successed' ? 'green' : 'red' }
+    const leftTime = project.status === 'In Progress' ? `${secondsToDhms(leftInSeconds)} left` : project.status;
+    const textColorStyle = {
+      color: project.status === 'In Progress' ? 'blue' : project.status === 'Successed' ? 'green' : 'red'
+    };
 
     return m('.col-lg-8 .content-area', [
       m('div.project-name', project.name),
@@ -52,23 +53,23 @@ const ProjectContentModule: m.Component<{
         m('span', 'A project by created by'),
         m('span.bold', ` ${project.beneficiary}`),
       ]),
-      m('div.project-description', { style: textColorStyle}, leftTime),
+      m('div.project-description', { style: textColorStyle }, leftTime),
       m('div.project-description', project.description)
     ]);
   }
-}
+};
 
 const ViewProjectPage: m.Component<{
   projectHash: string
 },
 {
   initialized: boolean,
-  project: CWProject,
+  project: CMNProject,
 }> = {
-  oncreate: async(vnode) => {
+  oncreate: async (vnode) => {
     vnode.state.initialized = false;
   },
-  onupdate: async(vnode) => {
+  onupdate: async (vnode) => {
     if (!app.chain || vnode.state.initialized) return;
 
     const protocol = (app.chain as any).protocol;
@@ -106,7 +107,6 @@ const ViewProjectPage: m.Component<{
       m('.text', `${utils.formatEther(curator.balance)}ETH`),
     ]));
 
-
     return m(Sublayout, {
       class: 'ProjectPage',
       title: 'Projects',
@@ -114,12 +114,12 @@ const ViewProjectPage: m.Component<{
     }, [
       m('.container', [
         m('.row', [
-          m(ProjectContentModule, { 
+          m(ProjectContentModule, {
             project,
             leftInSeconds,
-            forceUpdateStatus: async() => {
+            forceUpdateStatus: async () => {
               vnode.state.initialized = false;
-              await protocol.syncProjects(); 
+              await protocol.syncProjects();
               vnode.state.initialized = true;
             }
           }),
@@ -128,18 +128,21 @@ const ViewProjectPage: m.Component<{
         m('.row .members-card', [
           m('.col-lg-6', [
             m('.title', 'Backers'),
-            m('.text .mt-10px', `Backers' funds will go to the project if the funding threshold is reached.`),
+            m('.text .mt-10px', 'Backer funds will go to the project if the funding threshold is reached.'),
             backersContent
           ]),
           m('.col-lg-6', [
             m('.title', 'Curator'),
-            m('.text .mt-10px', `Curators received 5% of the total raise if the project is successful. You should curate.`),
+            m(
+              '.text .mt-10px',
+              'Curators received 5% of the total raise if the project is successful. You should curate.'
+            ),
             curatorsContent,
           ])
         ])
       ]),
     ]);
   }
-}
+};
 
 export default ViewProjectPage;

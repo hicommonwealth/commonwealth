@@ -65,16 +65,6 @@ import acceptInviteLink from './routes/acceptInviteLink';
 import getInviteLinks from './routes/getInviteLinks';
 import deleteGithubAccount from './routes/deleteGithubAccount';
 import getProfile from './routes/getProfile';
-import {
-  builkProjects,
-  createProject,
-  backProject,
-  curateProject,
-  redeemBToken,
-  redeemCToken,
-  withdraw,
-  getCollatoralAmount,
-} from './routes/cwProtocol';
 
 import createRole from './routes/createRole';
 import deleteRole from './routes/deleteRole';

@@ -76,7 +76,8 @@ async function main() {
       } else if (CHAIN_EVENTS) {
         chains = CHAIN_EVENTS.split(',');
       }
-      const subscribers = await setupChainEventListeners(models, null, chains, SKIP_EVENT_CATCHUP);
+      // const subscribers = await setupChainEventListeners(models, null, chains, SKIP_EVENT_CATCHUP);
+      const subscribers = await setupChainEventListeners(null, chains, SKIP_EVENT_CATCHUP);
       // construct storageFetchers needed for the identity cache
       const fetchers = {};
       for (const [ chain, subscriber ] of Object.entries(subscribers)) {

@@ -1,53 +1,50 @@
-import { EthereumCoin } from 'adapters/chain/ethereum/types';
-
 import { IApp } from 'state';
+
+import { ProjectFactory__factory as CMNProjectProtocolContract } from 'eth/types';
+import { EthereumCoin } from 'shared/adapters/chain/ethereum/types';
 import ChainEntityController from 'controllers/server/chain_entities';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
-import { ChainBase, IChainAdapter, NodeInfo } from 'models';
 
-import { CwProtocolFactory as CWProtocolFactory } from 'CwProtocolFactory';
+import { ChainBase, IChainAdapter, NodeInfo } from '../../../../models';
 
+import CMNChain from './chain';
+import CMNProjectApi from './project/api';
+import CMNProjectProtocol from './project/protocol';
 
-import CommonwealthChain from './chain';
-import CommonwealthAPI from './api';
-import CommonwealthProtocol from './protocol';
-import CommonwealthGovernance from './governance';
-
-export default class Commonwealth extends IChainAdapter<EthereumCoin, EthereumAccount> {
+export default class CMNAdapter extends IChainAdapter<EthereumCoin, EthereumAccount> {
   public readonly base = ChainBase.Ethereum;
-  public chain: CommonwealthChain;
-  public governance: CommonwealthGovernance;
+  public chain: CMNChain;
   public accounts: EthereumAccounts; // consider backers or curators
-  public protocol: CommonwealthProtocol; //  may be replaced with protoco
+  public protocol: CMNProjectProtocol; //  may be replaced with protoco
   public readonly chainEntities = new ChainEntityController();
 
   constructor(meta: NodeInfo, app: IApp) {
     super(meta, app);
-    this.chain = new CommonwealthChain(this.app);
+    this.chain = new CMNChain(this.app);
     this.accounts = new EthereumAccounts(this.app);
-    this.governance = new CommonwealthGovernance(this.app, !this.usingServerChainEntities);
-    this.protocol = new CommonwealthProtocol(this.app);
+    this.protocol = new CMNProjectProtocol(this.app);
   }
 
   public async initApi() {
     await this.chain.resetApi(this.meta);
     await this.chain.initMetadata();
     await this.accounts.init(this.chain);
-    // const api = new CommonwealthAPI(() => null, this.meta.address, this.chain.api.currentProvider as any);
-    const api = new CommonwealthAPI(
-      CWProtocolFactory.connect,
-      this.meta.address, // CW Protocol deployed address: '0xa995cc3127BDB3E26B3c12c317E3Fa170424f0Eb'
+
+    const projectApi = new CMNProjectApi(
+      CMNProjectProtocolContract.connect,
+      this.meta.address,
       this.chain.api.currentProvider as any
     );
-    await api.init();
-    this.chain.CommonwealthAPI = api;
+    await projectApi.init();
+    this.chain.CMNProjectApi = projectApi;
+
+    await this.chain.initEventLoop();
     await super.initApi();
   }
 
   public async initData() {
     await this.chain.initEventLoop();
-    await this.governance.init(this.chain);
     await this.protocol.init(this.chain);
     await super.initData();
   }
@@ -55,7 +52,6 @@ export default class Commonwealth extends IChainAdapter<EthereumCoin, EthereumAc
   public async deinit() {
     await super.deinit();
     this.protocol.deinit();  // protocol.deinit
-    this.governance.deinit();
     this.accounts.deinit();
     this.chain.deinitMetadata();
     this.chain.deinitEventLoop();

@@ -130,7 +130,6 @@ export async function initAppState(updateSelectedNode = true, customDomain = nul
 export async function deinitChainOrCommunity() {
   app.isAdapterReady = false;
   if (app.chain) {
-    
     app.chain.networkStatus = ApiStatus.Disconnected;
     app.chain.deinitServer();
     await app.chain.deinit();
@@ -227,8 +226,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
   }
 
   // Check for valid chain selection, and that we need to switch
-  if (app.chain && n === app.chain.meta) 
-  {
+  if (app.chain && n === app.chain.meta) {
     return;
   }
 
@@ -354,12 +352,12 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
 // and not already initialized.
 export async function initChain(): Promise<void> {
   if (!app.chain || !app.chain.meta || app.chain.loaded) return;
-  
+
   if (!app.chain.apiInitialized) {
     await app.chain.initApi();
   }
   app.chain.deferred = false;
-  const n = app.chain.meta;  
+  const n = app.chain.meta;
   await app.chain.initData();
 
   // Emit chain as updated
@@ -551,7 +549,6 @@ Promise.all([
       if (app.chain?.meta.chain.type === 'token') {
         deferChain = false;
       }
-      if (app.chain instanceof Token) deferChain = false;
       return m(Layout, { scope, deferChain, hideSidebar }, [ vnode ]);
     },
   });

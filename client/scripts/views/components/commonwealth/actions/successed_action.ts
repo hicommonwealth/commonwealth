@@ -6,9 +6,8 @@ import m from 'mithril';
 import BN from 'bn.js';
 
 import app from 'state';
-import { CWProject } from 'models/CWProtocol';
+import { CMNProject } from 'models';
 import { CWUser } from '../members_card';
-
 
 const floatRegex = /^[0-9]*\.?[0-9]*$/;
 
@@ -28,7 +27,7 @@ const ActionModule: m.Component<{
         fluid: true,
         intent: 'primary',
         disabled: !redeemAble,
-        onclick: async(e) => { await callback(false) }
+        onclick: async (e) => { await callback(false); }
       }),
       m(Button, {
         class: 'contribute-button',
@@ -37,14 +36,14 @@ const ActionModule: m.Component<{
         rounded: true,
         fluid: true,
         intent: 'primary',
-        onclick: async(e) => { await callback(true) }
+        onclick: async (e) => { await callback(true); }
       }),
     ];
   }
-}
+};
 
 const SuccsedActionCard: m.Component<{
-  project: CWProject,
+  project: CMNProject,
   protocol: any,
   curators: CWUser[]
 },
@@ -60,7 +59,9 @@ const SuccsedActionCard: m.Component<{
   },
   view: (vnode) => {
     const { project, protocol, curators } = vnode.attrs;
-    const { submitting } = vnode.state; // 0: not in progress, 1: in progress of withdrawing, 2: in progress of redeeming cTokens
+
+    // 0: not in progress, 1: in progress of withdrawing, 2: in progress of redeeming cTokens
+    const { submitting } = vnode.state;
 
     let withdrawAble = false;
     let redeemAble = false;
@@ -101,7 +102,7 @@ const SuccsedActionCard: m.Component<{
       ]),
       vnode.state.error && vnode.state.error !== '' && m('p.error', vnode.state.error),
       m(ActionModule, {
-        callback: async(isWithdraw: boolean) => {
+        callback: async (isWithdraw: boolean) => {
           if (!app.user.activeAccount) return;
           const author = app.user.activeAccount.address;
           vnode.state.submitting = isWithdraw ? 1 : 2;
@@ -128,7 +129,6 @@ const SuccsedActionCard: m.Component<{
       })
     ]);
   }
-}
-
+};
 
 export default SuccsedActionCard;

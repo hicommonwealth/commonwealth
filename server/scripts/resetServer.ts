@@ -1,6 +1,4 @@
 import crypto from 'crypto';
-import BN from 'bn.js';
-import { EventSupportingChains, SubstrateTypes, MolochTypes, chainSupportedBy } from '@commonwealth/chain-events';
 
 import tsmodels from '../database';
 const models = tsmodels as any;
@@ -18,11 +16,8 @@ const nodes = [
   // [ 'localhost:9944', 'kusama-local' ],
   [ 'wss://kusama-rpc.polkadot.io', 'kusama' ],
   [ 'wss://rpc.polkadot.io', 'polkadot' ],
+  // [ 'ws://127.0.0.1:7545', 'ethereum-local' ],
   // [ 'wss://mainnet.infura.io/ws', 'ethereum' ],
-  [ 'wss://kovan.infura.io/ws', 'ethereum-kovan' ],   // ethereum kovan
-  [ 'ws://127.0.0.1:7545', 'ethereum-local' ],  // ethereum local
-  [ 'wss://kovan.infura.io/ws', 'common-protocol-kovan', '0xbF16874590d645aDD89577bEeB96D4Fc07046999' ],   // CWP using kovan etherum
-  [ 'ws://127.0.0.1:7545', 'common-protocol-local', '0x5FbDB2315678afecb367f032d93F642f64180aa3' ],  // CWP using local ethreum
   // [ '18.223.143.102:9944', 'edgeware-testnet' ],
   // [ '157.230.218.41:9944', 'edgeware-testnet' ],
   // [ '157.230.125.18:9944', 'edgeware-testnet' ],
@@ -33,7 +28,6 @@ const nodes = [
   [ 'wss://straightedge.commonwealth.im', 'straightedge' ],
   [ 'http://localhost:3030', 'near-local' ],
   [ 'https://rpc.nearprotocol.com', 'near' ],
-  [ 'wss://mainnet.infura.io/ws', 'moloch', '0x1fd169A4f5c59ACf79d0Fd5d91D1201EF1Bce9f1'],
   [ 'wss://mainnet.infura.io/ws', 'moloch', '0x1fd169A4f5c59ACf79d0Fd5d91D1201EF1Bce9f1'],
   [ 'wss://rpc.kulupu.corepaper.org/ws', 'kulupu'],
   [ 'wss://rpc.plasmnet.io/', 'plasm'],
@@ -1053,16 +1047,6 @@ const resetServer = (): Promise<number> => {
         //   base: 'ethereum',
         // }),
         models.Chain.create({
-          id: 'ethereum-kovan',
-          network: 'ethereum',
-          symbol: 'ETH',
-          name: 'Ethereum (kovan)',
-          icon_url: '/static/img/protocols/eth.png',
-          active: true,
-          type: 'chain',
-          base: 'ethereum',
-        }),
-        models.Chain.create({
           id: 'ethereum-local',
           network: 'ethereum',
           symbol: 'ETH',
@@ -1225,27 +1209,6 @@ const resetServer = (): Promise<number> => {
           base: 'ethereum',
           snapshot: 'polarcat.eth',
         })
-        // for CWP
-        models.Chain.create({
-          id: 'common-protocol-kovan',
-          network: 'CMN-kovan',
-          symbol: 'ETH',
-          name: 'Common Protocol (kovan)',
-          icon_url: '/static/img/protocols/eth.png',
-          active: true,
-          type: 'chain',
-          base: 'ethereum',
-        }),
-        models.Chain.create({
-          id: 'common-protocol-local',
-          network: 'CMN-local',
-          symbol: 'ETH',
-          name: 'Common Protocol (local)',
-          icon_url: '/static/img/protocols/eth.png',
-          active: false,
-          type: 'chain',
-          base: 'ethereum',
-        }),
       ]);
 
       // Specific chains
