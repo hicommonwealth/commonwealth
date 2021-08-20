@@ -19,6 +19,7 @@ import EmptyTopicPlaceholder, { EmptyStagePlaceholder } from 'views/components/e
 import LoadingRow from 'views/components/loading_row';
 import Listing from 'views/pages/listing';
 import NewTopicModal from 'views/modals/new_topic_modal';
+import NewStageModal from 'views/modals/new_stage_modal';
 import EditTopicModal from 'views/modals/edit_topic_modal';
 import CreateInviteModal from 'views/modals/create_invite_modal';
 
@@ -60,6 +61,14 @@ export const CommunityOptionsPopover: m.Component<{ isAdmin: boolean; isMod: boo
             onclick: (e) => {
               e.preventDefault();
               app.modals.create({ modal: NewTopicModal });
+            },
+          }),
+        isAdmin
+          && m(MenuItem, {
+            label: 'New stage',
+            onclick: (e) => {
+              e.preventDefault();
+              app.modals.create({ modal: NewStageModal });
             },
           }),
         (app.community?.meta.invitesEnabled || isAdmin)

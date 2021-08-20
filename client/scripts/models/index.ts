@@ -18,6 +18,7 @@ export { default as OffchainAttachment } from './OffchainAttachment';
 export { default as OffchainComment } from './OffchainComment';
 export { default as OffchainReaction } from './OffchainReaction';
 export { default as OffchainTopic } from './OffchainTopic';
+export { default as OffchainStage } from './OffchainStage';
 export { default as OffchainThread } from './OffchainThread';
 export { default as OffchainVote } from './OffchainVote';
 export { default as Profile } from './Profile';

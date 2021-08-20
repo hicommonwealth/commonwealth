@@ -17,6 +17,7 @@ export interface OffchainThreadAttributes {
   plaintext?: string;
   url?: string;
   topic_id?: number;
+  stage_id?: number;
   pinned?: boolean;
   chain?: string;
   community?: string;
@@ -61,6 +62,7 @@ export default (
     stage: { type: dataTypes.TEXT, allowNull: false, defaultValue: 'discussion' },
     url: { type: dataTypes.TEXT, allowNull: true },
     topic_id: { type: dataTypes.INTEGER, allowNull: true },
+    stage_id: { type: dataTypes.INTEGER, allowNull: true },
     pinned: { type: dataTypes.BOOLEAN, defaultValue: false, allowNull: false },
     chain: { type: dataTypes.STRING, allowNull: true },
     community: { type: dataTypes.STRING, allowNull: true },
@@ -122,6 +124,10 @@ export default (
       as: 'topic',
       foreignKey: 'topic_id',
     });
+    // models.OffchainThread.belongsTo(models.OffchainStage, {
+    //   as: 'stage',
+    //   foreignKey: 'stage_id',
+    // });
     models.OffchainThread.belongsToMany(models.Role, {
       through: 'read_only_roles_threads',
       as: 'read_only_roles',

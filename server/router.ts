@@ -106,6 +106,11 @@ import updateTopics from './routes/updateTopics';
 import editTopic from './routes/editTopic';
 import deleteTopic from './routes/deleteTopic';
 import bulkTopics from './routes/bulkTopics';
+import createStage from './routes/createStage';
+import updateStage from './routes/updateStage';
+import editStage from './routes/editStage';
+import deleteStage from './routes/deleteStage';
+import bulkStages from './routes/bulkStages';
 import bulkOffchain from './routes/bulkOffchain';
 
 import edgewareLockdropLookup from './routes/getEdgewareLockdropLookup';

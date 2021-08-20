@@ -18,6 +18,7 @@ module.exports = {
       await queryInterface.createTable('OffchainStages', {
         id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
         name: { type: Sequelize.STRING, allowNull: false },
+        description: { type: Sequelize.STRING, allowNull: true },
         chain_id: { type: Sequelize.STRING, allowNull: true },
         community_id: { type: Sequelize.STRING, allowNull: true },
         featured_in_sidebar: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: false },
@@ -29,10 +30,12 @@ module.exports = {
         for (const chain of chains) {
           const arr = parseCustomStages(chain.customStages);
           arr.forEach((stage) => {
-            stages.push({
-              name: stage,
-              chain_id: chain.id
-            });
+            if (stages.findIndex((item) => item.name === stage && item.chain_id === chain.id) < 0) {
+              stages.push({
+                name: stage,
+                chain_id: chain.id
+              });
+            }
           });
         }
       }
@@ -41,14 +44,55 @@ module.exports = {
         for (const community of communities) {
           const arr = parseCustomStages(community.customStages);
           arr.forEach((stage) => {
-            stages.push({
-              name: stage,
-              community_id: community.id
-            });
+            if (stages.findIndex((item) => item.name === stage && item.community_id === community.id) < 0) {
+              stages.push({
+                name: stage,
+                community_id: community.id
+              });
+            }
           });
         }
       }
+      const [threads] = await queryInterface.sequelize.query('SELECT id, chain, community, stage FROM "OffchainThreads";');
+      if (threads && threads.length) {
+        for (const thread of threads) {
+          const { chain, community, stage } = thread;
+          if (chain && stages.findIndex((item) => item.name === thread.stage && item.chain_id === chain) < 0) {
+            stages.push({
+              name: stage,
+              chain_id: chain
+            });
+          }
+          if (
+            community && stages.findIndex((item) => item.name === thread.stage && item.community_id === community) < 0
+          ) {
+            stages.push({
+              name: stage,
+              community_id: community
+            });
+          }
+        }
+      }
       await queryInterface.bulkInsert('OffchainStages', stages);
+      const threadsDefinition = await queryInterface.describeTable('OffchainThreads');
+      if (!threadsDefinition.stage_id) {
+        await queryInterface.addColumn('OffchainThreads', 'stage_id', {
+          type: Sequelize.INTEGER,
+          allowNull: true,
+        });
+      }
+      if (threads && threads.length) {
+        for (const thread of threads) {
+          const index = stages.findIndex((item) => {
+            if (item.name !== thread.stage) return false;
+            if (thread.chain) return thread.chain === item.chain_id;
+            return thread.community === item.community_id;
+          });
+          await queryInterface.bulkUpdate('OffchainThreads', {
+            stage_id: index + 1,
+          }, { id: thread.id });
+        }
+      }
       return new Promise((resolve, reject) => resolve());
     } catch (e) {
       return new Promise((resolve, reject) => reject(e));
@@ -56,6 +100,12 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('OffchainStages');
+    try {
+      await queryInterface.dropTable('OffchainStages');
+      await queryInterface.removeColumn('OffchainThreads', 'stage_id');
+      return new Promise((resolve, reject) => resolve());
+    } catch (e) {
+      return new Promise((resolve, reject) => reject(e));
+    }
   }
 };

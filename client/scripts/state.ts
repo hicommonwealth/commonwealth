@@ -16,6 +16,7 @@ import SnapshotController from './controllers/chain/snapshot';
 import ReactionsController from './controllers/server/reactions';
 import WebsocketController from './controllers/server/socket';
 import TopicsController from './controllers/server/topics';
+import StagesController from './controllers/server/stages';
 import CommunitiesController from './controllers/server/communities';
 import UserController from './controllers/server/user/index';
 import WebWalletController from './controllers/app/web_wallets';
@@ -50,6 +51,7 @@ export interface IApp {
   snapshot: SnapshotController;
   reactions: ReactionsController;
   topics: TopicsController;
+  stages: StagesController;
   communities: CommunitiesController;
   user: UserController;
   wallets: WebWalletController;
@@ -116,6 +118,7 @@ const app: IApp = {
   snapshot: new SnapshotController(),
   reactions: new ReactionsController(),
   topics: new TopicsController(),
+  stages: new StagesController(),
   communities: new CommunitiesController(),
   user: new UserController(),
   wallets: new WebWalletController(),
