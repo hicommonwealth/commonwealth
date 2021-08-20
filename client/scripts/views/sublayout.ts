@@ -61,14 +61,14 @@ const Sublayout: m.Component<{
           link('a', (!app.isCustomDomain() ? `/${app.activeId()}` : '/' ), [
             m(ChainIcon, { size: ICON_SIZE, chain })
           ])
-        ]),      
+        ]),
         m('h4.sublayout-header-heading', [
           link('a', (app.isCustomDomain() ? '/' : `/${app.activeId()}`), chain.name),
           title && m('span.breadcrumb', m.trust('/')),
           title
         ]),
       ] : community ? [
-        m('.ChainIcon',[
+        m('.ChainIcon', [
           link('a', (!app.isCustomDomain() ? `/${app.activeId()}` : '/' ), [
             m(CommunityIcon, { size: ICON_SIZE, community })
           ])
