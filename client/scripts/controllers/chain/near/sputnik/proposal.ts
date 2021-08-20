@@ -101,9 +101,11 @@ export default class NearSputnikProposal extends Proposal<
     const periodS = +this._Dao.policy.proposal_period.slice(0, this._Dao.policy.proposal_period.length - 9);
     const submissionTimeS = +this.data.submission_time.slice(0, this.data.submission_time.length - 9);
     this._endTimeS = submissionTimeS + periodS;
+    const nowS = moment.now() / 1000;
     if (data.status !== NearSputnikProposalStatus.InProgress) {
       this.complete(this._Dao.store);
-    } else if (this._endTimeS < +(Date.now())) {
+    } else if (this._endTimeS < nowS) {
+      console.log(`Marking proposal ${this.identifier} expired, by ${nowS - this._endTimeS} seconds.`);
       // special case for expiration that hasn't yet been triggered
       data.status = NearSputnikProposalStatus.Expired;
       this.complete(this._Dao.store);
