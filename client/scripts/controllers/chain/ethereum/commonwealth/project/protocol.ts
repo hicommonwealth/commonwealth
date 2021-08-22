@@ -43,6 +43,7 @@ export default class ProjectProtocol {
     const projects: CMNProject[] = await this._api.retrieveAllProjects();
 
     this._projectStore.add(new CMNProjectProtocol('cmn_projects', protocolFee, feeTo, projects));
+    this._initialized = true;
   }
 
   public async deinit() {

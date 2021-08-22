@@ -51,8 +51,7 @@ export enum ChainNetwork {
   Dydx = 'dydx',
   Clover = 'clover',
   HydraDX = 'hydradx',
-  CMNKovan = 'CMN-kovan',
-  CMNLocal = 'CMN-local',
+  CMNKovan = 'cmn-kovan',
 }
 
 // This function returns a default chain for a chainbase
