@@ -235,7 +235,15 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
   // Import top-level chain adapter lazily, to facilitate code split.
   let newChain;
   let initApi; // required for NEAR
-  if (n.chain.base === ChainBase.Substrate) {
+  if (n.chain.id === ChainNetwork.CMNKovan) {
+    const Commonwealth = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "commonwealth-main" */
+      './controllers/chain/ethereum/commonwealth/adapter'
+    )).default;
+    console.log('=====>commonwealth');
+    newChain = new Commonwealth(n, app);
+  } else if (n.chain.base === ChainBase.Substrate) {
     const Substrate = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "substrate-main" */
@@ -300,13 +308,6 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/ethereum/token/adapter'
     )).default;
     newChain = new Token(n, app);
-  } else if (n.chain.network === ChainNetwork.CMNKovan || n.chain.network === ChainNetwork.CMNLocal) {
-    const Commonwealth = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "commonwealth-main" */
-      './controllers/chain/ethereum/commonwealth/adapter'
-    )).default;
-    newChain = new Commonwealth(n, app);
   } else {
     throw new Error('Invalid chain');
   }
