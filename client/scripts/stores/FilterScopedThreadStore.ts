@@ -118,22 +118,21 @@ class FilterScopedThreadStore extends IdStore<OffchainThread> {
     }
   }
 
-  // TODO: not sure if this is right
-  // public removeStage(community: string, stageName: string) {
-  //   const communityStore = this._threadsByCommunity[community];
-  //   if (communityStore) {
-  //     delete this._threadsByCommunity[community][`${stageName || ''}#`];
-  //     // TODO: also delete topic#stage for all stages
-  //     if (communityStore[ALL_PROPOSALS_KEY]) {
-  //       communityStore[ALL_PROPOSALS_KEY].forEach((thread) => {
-  //         if (thread.stage?.name === stageName) {
-  //           thread.stage = null;
-  //           this.update(thread);
-  //         }
-  //       });
-  //     }
-  //   }
-  // }
+  public removeStage(community: string, stageName: string) {
+    const communityStore = this._threadsByCommunity[community];
+    if (communityStore) {
+      delete this._threadsByCommunity[community][`${stageName || ''}#`];
+      // TODO: also delete topic#stage for all stages
+      if (communityStore[ALL_PROPOSALS_KEY]) {
+        communityStore[ALL_PROPOSALS_KEY].forEach((thread) => {
+          if (thread.stage?.name === stageName) {
+            thread.stage = null;
+            this.update(thread);
+          }
+        });
+      }
+    }
+  }
 }
 
 export default FilterScopedThreadStore;

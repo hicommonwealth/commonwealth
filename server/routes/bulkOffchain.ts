@@ -272,14 +272,14 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
 
   const [threads, comments, reactions] = threadsCommentsReactions as any;
 
-  const numVotingThreads = threadsInVoting.filter((t) => t.stage === 'voting').length;
+  // const numVotingThreads = threadsInVoting.filter((t) => t.stage === 'voting').length;
 
   return res.json({
     status: 'Success',
     result: {
       topics: topics.map((t) => t.toJSON()),
       //
-      numVotingThreads,
+      numVotingThreads: 0,
       threads, // already converted to JSON earlier
       comments, // already converted to JSON earlier
       reactions: reactions.map((r) => r.toJSON()),

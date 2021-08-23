@@ -11,7 +11,6 @@ export interface OffchainThreadAttributes {
   address_id: number;
   title: string;
   kind: string;
-  stage: string;
   id?: number;
   body?: string;
   plaintext?: string;
@@ -59,7 +58,6 @@ export default (
     body: { type: dataTypes.TEXT, allowNull: true },
     plaintext: { type: dataTypes.TEXT, allowNull: true },
     kind: { type: dataTypes.TEXT, allowNull: false },
-    stage: { type: dataTypes.TEXT, allowNull: false, defaultValue: 'discussion' },
     url: { type: dataTypes.TEXT, allowNull: true },
     topic_id: { type: dataTypes.INTEGER, allowNull: true },
     stage_id: { type: dataTypes.INTEGER, allowNull: true },
@@ -124,10 +122,10 @@ export default (
       as: 'topic',
       foreignKey: 'topic_id',
     });
-    // models.OffchainThread.belongsTo(models.OffchainStage, {
-    //   as: 'stage',
-    //   foreignKey: 'stage_id',
-    // });
+    models.OffchainThread.belongsTo(models.OffchainStage, {
+      as: 'stage',
+      foreignKey: 'stage_id',
+    });
     models.OffchainThread.belongsToMany(models.Role, {
       through: 'read_only_roles_threads',
       as: 'read_only_roles',

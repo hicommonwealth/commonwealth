@@ -40,7 +40,6 @@ export {
   ChainBase,
   ChainNetwork,
   OffchainThreadKind,
-  OffchainThreadStage,
   TransactionStatus,
   ProposalStatus,
   VotingType,

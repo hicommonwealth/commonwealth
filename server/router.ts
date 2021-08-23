@@ -74,7 +74,6 @@ import getUploadSignature from './routes/getUploadSignature';
 import createThread from './routes/createThread';
 import editThread from './routes/editThread';
 import updateThreadPolling from './routes/updateThreadPolling';
-import updateThreadStage from './routes/updateThreadStage';
 import updateThreadPrivacy from './routes/updateThreadPrivacy';
 import updateThreadPinned from './routes/updateThreadPinned';
 import updateThreadLinkedChainEntities from './routes/updateThreadLinkedChainEntities';
@@ -107,7 +106,7 @@ import editTopic from './routes/editTopic';
 import deleteTopic from './routes/deleteTopic';
 import bulkTopics from './routes/bulkTopics';
 import createStage from './routes/createStage';
-import updateStage from './routes/updateStage';
+import updateStages from './routes/updateStages';
 import editStage from './routes/editStage';
 import deleteStage from './routes/deleteStage';
 import bulkStages from './routes/bulkStages';
@@ -220,11 +219,6 @@ function setupRouter(
     updateThreadPolling.bind(this, models),
   );
   router.post(
-    '/updateThreadStage',
-    passport.authenticate('jwt', { session: false }),
-    updateThreadStage.bind(this, models),
-  );
-  router.post(
     '/updateThreadPrivacy',
     passport.authenticate('jwt', { session: false }),
     updateThreadPrivacy.bind(this, models),
@@ -298,6 +292,18 @@ function setupRouter(
   router.post('/deleteTopic', passport.authenticate('jwt', { session: false }), deleteTopic.bind(this, models));
   // TODO: Change to GET /topics
   router.get('/bulkTopics', bulkTopics.bind(this, models));
+
+  // offchain stages
+  // TODO: Change to POST /stage
+  router.post('/createStage', passport.authenticate('jwt', { session: false }), createStage.bind(this, models));
+  // TODO: Change to PUT /stages
+  router.post('/updateStages', passport.authenticate('jwt', { session: false }), updateStages.bind(this, models));
+  // TODO: Change to PUT /stage
+  router.post('/editStage', passport.authenticate('jwt', { session: false }), editStage.bind(this, models));
+  // TODO: Change to DELETE /stage
+  router.post('/deleteStage', passport.authenticate('jwt', { session: false }), deleteStage.bind(this, models));
+  // TODO: Change to GET /stages
+  router.get('/bulkStages', bulkStages.bind(this, models));
 
   // offchain reactions
   // TODO: Change to POST /reaction

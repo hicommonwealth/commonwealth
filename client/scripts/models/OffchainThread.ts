@@ -4,11 +4,12 @@ import app from 'state';
 import moment from 'moment';
 
 import { IUniqueId } from './interfaces';
-import { OffchainThreadKind, OffchainThreadStage } from './types';
+import { OffchainThreadKind } from './types';
 import OffchainAttachment from './OffchainAttachment';
 import OffchainTopic from './OffchainTopic';
 import OffchainVote from './OffchainVote';
 import { VersionHistory } from '../controllers/server/threads';
+import OffchainStage from './OffchainStage';
 
 // field names copied from snapshot
 interface OffchainVotingOptions {
@@ -26,7 +27,7 @@ class OffchainThread implements IUniqueId {
   public readonly plaintext: string;
   public readonly pinned: boolean;
   public readonly kind: OffchainThreadKind;
-  public stage: OffchainThreadStage;
+  public stage: OffchainStage;
   public readonly attachments: OffchainAttachment[];
   public readonly readOnly: boolean;
 
@@ -127,7 +128,7 @@ class OffchainThread implements IUniqueId {
     createdAt: moment.Moment,
     topic: OffchainTopic,
     kind: OffchainThreadKind,
-    stage: OffchainThreadStage,
+    stage: OffchainStage,
     versionHistory: VersionHistory[],
     community: string,
     chain: string,

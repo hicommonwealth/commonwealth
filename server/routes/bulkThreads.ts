@@ -223,19 +223,22 @@ const bulkThreads = async (models: DB, req: Request, res: Response, next: NextFu
   });
 
   const countsQuery = `
-     SELECT id, title, stage FROM "OffchainThreads"
-     WHERE ${communityOptions} AND (stage = 'proposal_in_review' OR stage = 'voting')`;
+     SELECT thread.id, thread.title, stage.name as stage.name
+     FROM "OffchainThreads" AS "thread"
+     LEFT OUTER JOIN "OffchainStages" AS "stage" ON stage.id = thread.stage_id
+     WHERE ${communityOptions} AND (stage.name = 'proposal_in_review' OR stage.name = 'voting')`;
 
   const threadsInVoting: OffchainThreadInstance[] = await models.sequelize.query(countsQuery, {
     replacements,
     type: QueryTypes.SELECT
   });
-  const numVotingThreads = threadsInVoting.filter((t) => t.stage === 'voting').length;
+  console.log(threadsInVoting);
+  // const numVotingThreads = threadsInVoting.filter((t) => t.stage.name === 'voting').length;
 
   return res.json({
     status: 'Success',
     result: {
-      numVotingThreads,
+      numVotingThreads: 0,
       threads,
       comments, // already converted to JSON earlier
       reactions: reactions.map((r) => r.toJSON()),

@@ -312,7 +312,6 @@ class ThreadsController {
         thread.offchainVotingOptions = { name, choices };
         thread.offchainVotingNumVotes = 0;
         thread.offchainVotingEndsAt = moment(response.result.offchain_voting_ends_at);
-        return;
       },
       error: (err) => {
         console.log('Failed to start polling');
@@ -324,13 +323,13 @@ class ThreadsController {
 
   public async setStage(args: { threadId: number, stage: OffchainThreadStage }) {
     await $.ajax({
-      url: `${app.serverUrl()}/updateThreadStage`,
+      url: `${app.serverUrl()}/updateStages`,
       type: 'POST',
       data: {
         'chain': app.activeChainId(),
         'community': app.activeCommunityId(),
         'thread_id': args.threadId,
-        'stage': args.stage,
+        'stage_name': args.stage,
         'jwt': app.user.jwt
       },
       success: (response) => {

@@ -11,7 +11,7 @@ enum UpdateStageErrors {
   NoPermission = `You do not have permission to edit post's stage`
 }
 
-const updateStage = async (models: DB, req, res: Response, next: NextFunction) => {
+const updateStages = async (models: DB, req, res: Response, next: NextFunction) => {
   if (!req.user) return next(new Error(UpdateStageErrors.NoUser));
   if (!req.body.thread_id) return next(new Error(UpdateStageErrors.NoThread));
   if (!req.body.address) return next(new Error(UpdateStageErrors.NoAddr));
@@ -66,4 +66,4 @@ const updateStage = async (models: DB, req, res: Response, next: NextFunction) =
   return res.json({ status: 'Success', result: newStage.toJSON() });
 };
 
-export default updateStage;
+export default updateStages;

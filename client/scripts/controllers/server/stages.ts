@@ -27,7 +27,7 @@ class StagesController {
   public getByName(name, communityId) { return this._store.getByName(name, communityId); }
   public addToStore(stage: OffchainStage) { return this._store.add(modelFromServer(stage)); }
 
-  public async edit(stage: OffchainStage, featured_order?: boolean) {
+  public async edit(stage: OffchainStage) {
     try {
       // TODO: Change to PUT /stage
       const response = await $.post(`${app.serverUrl()}/editStage`, {
@@ -38,7 +38,6 @@ class StagesController {
         'description': stage.description,
         'featured_in_sidebar': stage.featuredInSidebar,
         'featured_in_new_post': stage.featuredInNewPost,
-        'featured_order': featured_order,
         'address': app.user.activeAccount.address,
         'jwt': app.user.jwt
       });
@@ -58,7 +57,7 @@ class StagesController {
 
   public async update(threadId: number, stageName: string, stageId?: number) {
     try {
-      const response = await $.post(`${app.serverUrl()}/updateStage`, {
+      const response = await $.post(`${app.serverUrl()}/updateStages`, {
         'jwt': app.user.jwt,
         'thread_id': threadId,
         'stage_id': stageId,
@@ -119,7 +118,7 @@ class StagesController {
       this._store.remove(this._store.getById(stage.id));
       const activeEntity = stage.communityId || stage.chainId;
       // TODO: need uncomment the next line
-      // app.threads.listingStore.removeStage(activeEntity, stage.name);
+      app.threads.listingStore.removeStage(activeEntity, stage.name);
     } catch (err) {
       console.log('Failed to delete stage');
       throw new Error((err.responseJSON && err.responseJSON.error)

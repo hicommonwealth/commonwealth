@@ -47,7 +47,7 @@ const editStage = async (models: DB, req: Request, res: Response, next: NextFunc
     return next(new Error(Errors.NotAdmin));
   }
 
-  const { id, name, description, featured_order, featured_in_sidebar, featured_in_new_post } = req.body;
+  const { id, name, description, featured_in_sidebar, featured_in_new_post } = req.body;
   try {
     const stage = await models.OffchainStage.findOne({ where: { id } });
     if (!stage) return next(new Error(Errors.StageNotFound));
