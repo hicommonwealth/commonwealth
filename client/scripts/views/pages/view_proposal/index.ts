@@ -76,6 +76,7 @@ import User from '../../components/widgets/user';
 import MarkdownFormattedText from '../../components/markdown_formatted_text';
 import { createTXModal } from '../../modals/tx_signing_modal';
 import { SubstrateAccount } from '../../../controllers/chain/substrate/account';
+import { CommunityPoolSpendProposal } from '@cosmjs/stargate/build/codec/cosmos/distribution/v1beta1/distribution';
 
 const ProposalHeader: m.Component<{
   commentCount: number;
@@ -468,9 +469,12 @@ const ProposalComments: m.Component<{
       if (commentId) jumpHighlightComment(commentId);
     }
 
-    const nestedReply = (comment, replyParentId_) => {
+    const nestedReplyForm = (comment) => {
       // if current comment is replyParent, & no posts are being edited, a nested comment form is rendered
-      if (replyParentId_ && comment.id === replyParentId_ && !getSetGlobalEditingStatus(GlobalStatus.Get)) {
+      if (
+        getSetGlobalReplyStatus(GlobalStatus.Get) === comment.id
+        && !getSetGlobalEditingStatus(GlobalStatus.Get)
+      ) {
         return m(CreateComment, {
           callback: createdCommentCallback,
           cancellable: true,
@@ -497,19 +501,19 @@ const ProposalComments: m.Component<{
             comment: child,
             getSetGlobalEditingStatus,
             getSetGlobalReplyStatus,
-            // parent: comment,
+            parent: parentComment,
             proposal,
             callback: createdCommentCallback,
             isLast: false, // TODO: implement isLast
           }),
           !!child.childComments.length
-            && recursivelyGatherChildComments(furtherChildren, child, threadLevel + 1)
+            && recursivelyGatherChildComments(furtherChildren, child, threadLevel + 1),
+          nestedReplyForm(child),
         ]);
       });
     };
 
-    const renderComments = (comments_, replyParentId_) => {
-      console.log(comments_);
+    const renderComments = (comments_) => {
       return comments_.map((comment, index) => {
         const childComments = app.comments.getByProposal(proposal)
           .filter((c) => c.parentComment === comment.id);
@@ -526,9 +530,7 @@ const ProposalComments: m.Component<{
           // if comment has children, they are fetched & rendered
           !!childComments.length
             && recursivelyGatherChildComments(childComments, comment, 1),
-          replyParentId_
-            && replyParentId_ === comment.id
-            && nestedReply(comment, replyParentId_),
+          nestedReplyForm(comment),
         ]);
       });
     };
@@ -539,7 +541,7 @@ const ProposalComments: m.Component<{
     }, [
       // show comments
       comments
-      && m('.proposal-comments', renderComments(comments, replyParentId)),
+      && m('.proposal-comments', renderComments(comments)),
       // create comment
       app.user.activeAccount
         && !getSetGlobalReplyStatus(GlobalStatus.Get)
@@ -798,6 +800,7 @@ const ViewProposalPage: m.Component<{
       }
     };
 
+    // TODO: Can this be removed?
     const getSetGlobalReplyStatus = (call: string, parentId?: number, suppressScrollToForm?: boolean) => {
       if (call === GlobalStatus.Get) return vnode.state.replyParentId;
       if (call === GlobalStatus.Set) {
