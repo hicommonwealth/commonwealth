@@ -5,7 +5,7 @@ import app from 'state';
 import $ from 'jquery';
 import { Button, Input, Form, FormGroup, FormLabel, Checkbox } from 'construct-ui';
 
-import { confirmationModalWithText } from 'views/modals/confirm_modal';
+import QuillEditor from 'views/components/quill_editor';
 import { CompactModalExitButton } from 'views/modal';
 
 interface INewTopicModalForm {
@@ -26,12 +26,24 @@ const NewTopicModal: m.Component<{
   error: any,
   form: INewTopicModalForm,
   saving: boolean,
+  quillEditorState,
 }> = {
   view: (vnode) => {
     if (!app.user.isSiteAdmin && !app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })) return null;
     const { id, name, description, featured_in_sidebar, featured_in_new_post } = vnode.attrs;
     if (!vnode.state.form) {
       vnode.state.form = { id, name, description, featured_in_sidebar, featured_in_new_post };
+    }
+    let disabled = false;
+    if (!vnode.state.form.name || !vnode.state.form.name.trim()) disabled = true;
+
+    if (vnode.state.form.featured_in_new_post
+      && vnode.state.quillEditorState
+      && vnode.state.quillEditorState.editor
+      && vnode.state.quillEditorState.editor.editor.isBlank()
+    ) {
+      console.log(vnode.state.quillEditorState.editor.editor.isBlank());
+      disabled = true;
     }
 
     return m('.NewTopicModal', [
@@ -89,15 +101,43 @@ const NewTopicModal: m.Component<{
               },
             }),
           ]),
+          vnode.state.form.featured_in_new_post && m(FormGroup, [
+            m(QuillEditor, {
+              contentsDoc: '',
+              oncreateBind: (state) => {
+                vnode.state.quillEditorState = state;
+              },
+              editorNamespace: 'new-discussion',
+              imageUploader: true,
+              tabindex: 3,
+            }),
+          ]),
           m(Button, {
             intent: 'primary',
-            disabled: vnode.state.saving,
+            disabled: vnode.state.saving || disabled,
             rounded: true,
             onclick: async (e) => {
               e.preventDefault();
-              if (!vnode.state.form.name.trim()) return;
+              const { quillEditorState, form } = vnode.state;
+
+              if (quillEditorState) {
+                quillEditorState.editor.enable(false);
+              }
+
+              const mentionsEle = document.getElementsByClassName('ql-mention-list-container')[0];
+              if (mentionsEle) (mentionsEle as HTMLElement).style.visibility = 'hidden';
+              const default_offchain_template = !quillEditorState ? ''
+                : quillEditorState.markdownMode
+                  ? quillEditorState.editor.getText()
+                  : JSON.stringify(quillEditorState.editor.getContents());
+
               app.topics.add(
-                vnode.state.form.name, vnode.state.form.description, null, vnode.state.form.featured_in_sidebar, vnode.state.form.featured_in_new_post
+                form.name,
+                form.description,
+                null,
+                form.featured_in_sidebar,
+                form.featured_in_new_post,
+                default_offchain_template
               ).then(() => {
                 vnode.state.saving = false;
                 m.redraw();

@@ -8,6 +8,7 @@ import app from 'state';
 import { navigateToSubpage } from 'app';
 
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
+import QuillEditor from 'views/components/quill_editor';
 import { CompactModalExitButton } from 'views/modal';
 
 interface IEditTopicModalForm {
@@ -15,7 +16,7 @@ interface IEditTopicModalForm {
   id: number,
   name: string,
   featured_in_sidebar: boolean,
-  featured_in_new_post: boolean,
+  featured_in_new_post: boolean
 }
 
 const EditTopicModal : m.Component<{
@@ -24,19 +25,36 @@ const EditTopicModal : m.Component<{
   name: string,
   featured_in_sidebar: boolean,
   featured_in_new_post: boolean,
+  default_offchain_template: string
 }, {
   error: any,
   form: IEditTopicModalForm,
   saving: boolean,
+  quillEditorState,
 }> = {
   view: (vnode) => {
     if (!app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })) return null;
-    const { id, name, description, featured_in_sidebar, featured_in_new_post } = vnode.attrs;
+    const { id, name, description, featured_in_sidebar, featured_in_new_post, default_offchain_template } = vnode.attrs;
     if (!vnode.state.form) {
       vnode.state.form = { id, name, description, featured_in_sidebar, featured_in_new_post };
     }
 
     const updateTopic = async (form) => {
+      const { quillEditorState } = vnode.state;
+      if (form.featured_in_new_post && quillEditorState.editor.editor.isBlank()) {
+        return;
+      }
+
+      if (quillEditorState) {
+        quillEditorState.editor.enable(false);
+      }
+
+      const mentionsEle = document.getElementsByClassName('ql-mention-list-container')[0];
+      if (mentionsEle) (mentionsEle as HTMLElement).style.visibility = 'hidden';
+      const bodyText = !quillEditorState ? ''
+        : quillEditorState.markdownMode
+          ? quillEditorState.editor.getText()
+          : JSON.stringify(quillEditorState.editor.getContents());
       const topicInfo = {
         id,
         description: form.description,
@@ -45,7 +63,8 @@ const EditTopicModal : m.Component<{
         chainId: app.activeChainId(),
         telegram: null,
         featuredInSidebar: form.featured_in_sidebar,
-        featuredInNewPost: form.featured_in_new_post
+        featuredInNewPost: form.featured_in_new_post,
+        defaultOffchainTemplate: bodyText
       };
       await app.topics.edit(topicInfo);
       navigateToSubpage(`/discussions/${encodeURI(form.name.toString().trim())}`);
@@ -116,6 +135,43 @@ const EditTopicModal : m.Component<{
               onchange: (e) => {
                 vnode.state.form.featured_in_new_post = !vnode.state.form.featured_in_new_post;
               },
+            }),
+          ]),
+          vnode.state.form.featured_in_new_post && m(FormGroup, [
+            m(QuillEditor, {
+              contentsDoc: '',
+              oncreateBind: (state) => {
+                vnode.state.quillEditorState = state;
+
+                let newDraftMarkdown;
+                let newDraftDelta;
+                if (default_offchain_template) {
+                  try {
+                    newDraftDelta = JSON.parse(default_offchain_template);
+                    if (!newDraftDelta.ops) throw new Error();
+                  } catch (e) {
+                    newDraftMarkdown = default_offchain_template;
+                  }
+                }
+                // If the text format of the loaded draft differs from the current editor's mode,
+                // we update the current editor's mode accordingly, to preserve formatting
+                if (newDraftDelta && vnode.state.quillEditorState.markdownMode) {
+                  vnode.state.quillEditorState.markdownMode = false;
+                } else if (newDraftMarkdown && !vnode.state.quillEditorState.markdownMode) {
+                  vnode.state.quillEditorState.markdownMode = true;
+                }
+                if (newDraftDelta) {
+                  vnode.state.quillEditorState.editor.setContents(newDraftDelta);
+                } else if (newDraftMarkdown) {
+                  vnode.state.quillEditorState.editor.setText(newDraftMarkdown);
+                } else {
+                  vnode.state.quillEditorState.editor.setContents('');
+                  vnode.state.quillEditorState.editor.setText('');
+                }
+              },
+              editorNamespace: 'new-discussion',
+              imageUploader: true,
+              tabindex: 3,
             }),
           ]),
           m(FormGroup, [

@@ -101,7 +101,7 @@ const DiscussionStagesBar: m.Component<{ topic: string; stage: string }, {}> = {
     const { stagesEnabled, customStages } = app.chain?.meta?.chain || app.community?.meta;
 
     const featuredTopicIds = app.community?.meta?.featuredTopics || app.chain?.meta?.chain?.featuredTopics;
-    const topics = app.topics.getByCommunity(app.activeId()).map(({ id, name, description, telegram, featuredInSidebar, featuredInNewPost }) => {
+    const topics = app.topics.getByCommunity(app.activeId()).map(({ id, name, description, telegram, featuredInSidebar, featuredInNewPost, defaultOffchainTemplate }) => {
       return {
         id,
         name,
@@ -110,6 +110,7 @@ const DiscussionStagesBar: m.Component<{ topic: string; stage: string }, {}> = {
         featured_order: featuredTopicIds.indexOf(`${id}`),
         featured_in_sidebar: featuredInSidebar,
         featured_in_new_post: featuredInNewPost,
+        default_offchain_template: defaultOffchainTemplate
       };
     });
     const featuredTopics = topics.filter((t) => t.featured_order !== -1).sort((a, b) => Number(a.featured_order) - Number(b.featured_order));
@@ -155,7 +156,7 @@ const DiscussionStagesBar: m.Component<{ topic: string; stage: string }, {}> = {
             }),
             m(MenuDivider),
             // featured topics
-            featuredTopics.concat(otherTopics).map(({ id, name, description, telegram, featured_in_sidebar, featured_in_new_post }, idx) => m(MenuItem, {
+            featuredTopics.concat(otherTopics).map(({ id, name, description, telegram, featured_in_sidebar, featured_in_new_post, default_offchain_template }, idx) => m(MenuItem, {
               key: name,
               active: m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name.toString().trim())}` || (topic && topic === name),
               iconLeft: m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name.toString().trim())}` || (topic && topic === name) ? Icons.CHECK : null,
@@ -165,7 +166,7 @@ const DiscussionStagesBar: m.Component<{ topic: string; stage: string }, {}> = {
               },
               label: m('.topic-menu-item', [
                 m('.topic-menu-item-name', name),
-                  app.user?.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
+                app.user?.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
                     && m(Button, {
                       size: 'xs',
                       label: 'Edit',
@@ -176,7 +177,7 @@ const DiscussionStagesBar: m.Component<{ topic: string; stage: string }, {}> = {
                         e.preventDefault();
                         app.modals.create({
                           modal: EditTopicModal,
-                          data: { id, name, description, telegram, featured_in_sidebar, featured_in_new_post },
+                          data: { id, name, description, telegram, featured_in_sidebar, featured_in_new_post, default_offchain_template },
                         });
                       },
                     }),

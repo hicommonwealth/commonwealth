@@ -182,7 +182,7 @@ const newThread = async (
   await app.user.notifications.refresh();
 
   navigateToSubpage(`/proposal/discussion/${result.id}`);
-  
+
   if (result.topic) {
     try {
       const topicNames = Array.isArray(activeEntity?.meta?.topics)
@@ -380,6 +380,7 @@ export const NewThreadForm: m.Component<{
       localStorage.removeItem(`${app.activeId()}-new-discussion-storedTitle`);
       localStorage.removeItem(`${app.activeId()}-new-discussion-storedText`);
       localStorage.removeItem(`${app.activeId()}-active-topic`);
+      localStorage.removeItem(`${app.activeId()}-active-topic-default-template`);
       localStorage.removeItem(`${app.activeId()}-post-type`);
     }
   },
@@ -433,6 +434,7 @@ export const NewThreadForm: m.Component<{
         localStorage.removeItem(`${app.activeId()}-new-link-storedLink`);
       }
       localStorage.removeItem(`${app.activeId()}-active-topic`);
+      localStorage.removeItem(`${app.activeId()}-active-topic-default-template`);
       localStorage.removeItem(`${app.activeId()}-post-type`);
     };
 
@@ -484,7 +486,7 @@ export const NewThreadForm: m.Component<{
               onclick: (e) => {
                 vnode.state.overwriteConfirmationModal = true;
                 localStorage.setItem(`${app.activeId()}-from-draft`, `${fromDraft}`);
-                navigateToSubpage(`/new/thread`);
+                navigateToSubpage('/new/thread');
                 $(e.target).trigger('modalexit');
               },
             }),
@@ -558,6 +560,34 @@ export const NewThreadForm: m.Component<{
               contentsDoc: '', // Prevent the editor from being filled in with previous content
               oncreateBind: (state) => {
                 vnode.state.quillEditorState = state;
+                const default_offchain_template = localStorage.getItem(`${app.activeId()}-active-topic-default-template`);
+
+                if (default_offchain_template) {
+                  let newDraftMarkdown;
+                  let newDraftDelta;
+                  try {
+                    newDraftDelta = JSON.parse(default_offchain_template);
+                    if (!newDraftDelta.ops) throw new Error();
+                  } catch (e) {
+                    newDraftMarkdown = default_offchain_template;
+                  }
+
+                  // If the text format of the loaded draft differs from the current editor's mode,
+                  // we update the current editor's mode accordingly, to preserve formatting
+                  if (newDraftDelta && vnode.state.quillEditorState.markdownMode) {
+                    vnode.state.quillEditorState.markdownMode = false;
+                  } else if (newDraftMarkdown && !vnode.state.quillEditorState.markdownMode) {
+                    vnode.state.quillEditorState.markdownMode = true;
+                  }
+                  if (newDraftDelta) {
+                    vnode.state.quillEditorState.editor.setContents(newDraftDelta);
+                  } else if (newDraftMarkdown) {
+                    vnode.state.quillEditorState.editor.setText(newDraftMarkdown);
+                  } else {
+                    vnode.state.quillEditorState.editor.setContents('');
+                    vnode.state.quillEditorState.editor.setText('');
+                  }
+                }
               },
               placeholder: 'Comment (optional)',
               editorNamespace: 'new-link',
@@ -652,6 +682,35 @@ export const NewThreadForm: m.Component<{
               contentsDoc: '',
               oncreateBind: (state) => {
                 vnode.state.quillEditorState = state;
+
+                const default_offchain_template = localStorage.getItem(`${app.activeId()}-active-topic-default-template`);
+
+                if (default_offchain_template) {
+                  let newDraftMarkdown;
+                  let newDraftDelta;
+                  try {
+                    newDraftDelta = JSON.parse(default_offchain_template);
+                    if (!newDraftDelta.ops) throw new Error();
+                  } catch (e) {
+                    newDraftMarkdown = default_offchain_template;
+                  }
+
+                  // If the text format of the loaded draft differs from the current editor's mode,
+                  // we update the current editor's mode accordingly, to preserve formatting
+                  if (newDraftDelta && vnode.state.quillEditorState.markdownMode) {
+                    vnode.state.quillEditorState.markdownMode = false;
+                  } else if (newDraftMarkdown && !vnode.state.quillEditorState.markdownMode) {
+                    vnode.state.quillEditorState.markdownMode = true;
+                  }
+                  if (newDraftDelta) {
+                    vnode.state.quillEditorState.editor.setContents(newDraftDelta);
+                  } else if (newDraftMarkdown) {
+                    vnode.state.quillEditorState.editor.setText(newDraftMarkdown);
+                  } else {
+                    vnode.state.quillEditorState.editor.setContents('');
+                    vnode.state.quillEditorState.editor.setText('');
+                  }
+                }
               },
               editorNamespace: 'new-discussion',
               imageUploader: true,
