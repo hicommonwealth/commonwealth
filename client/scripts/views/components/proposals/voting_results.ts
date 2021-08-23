@@ -203,7 +203,7 @@ const VotingResults: m.Component<{ proposal: AnyProposal }> = {
         ])
       ]);
     } else if (proposal.votingType === VotingType.CompoundYesNo) {
-      return m('.ProposalVotingResults', [
+      return m('.VotingResults', [
         m('.results-column.yes-votes', [
           m('.results-header', `Yes (${votes.filter((v) => v.choice === CompoundVote.YES).length})`),
           m('.results-cell', [
