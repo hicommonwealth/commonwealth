@@ -90,7 +90,6 @@ const createComment = async (
   const version_history : string[] = [ JSON.stringify(firstVersion) ];
   const commentContent = {
     root_id,
-    child_comments: [],
     text,
     plaintext,
     version_history,
@@ -108,24 +107,6 @@ const createComment = async (
     comment = await models.OffchainComment.create(commentContent);
   } catch (err) {
     return next(err);
-  }
-
-  let parentComment;
-  if (parent_id) {
-    // TODO: this query is unnecessary, we queried for parentComment earlier
-    parentComment = await models.OffchainComment.findOne({
-      where: community ? {
-        id: parent_id,
-        community: community.id,
-      } : {
-        id: parent_id,
-        chain: chain.id,
-      }
-    });
-    const arr = parentComment.child_comments;
-    arr.push(+comment.id);
-    parentComment.child_comments = arr;
-    await parentComment.save();
   }
 
   // TODO: attachments can likely be handled like mentions (see lines 10 & 11)

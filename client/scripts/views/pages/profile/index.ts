@@ -67,7 +67,6 @@ const commentModelFromServer = (comment) => {
     proposal,
     id: comment.id,
     createdAt: moment(comment.created_at),
-    childComments: comment.child_comments,
     rootProposal: comment.root_id,
     parentComment: comment.parent_id,
     community: comment.community,

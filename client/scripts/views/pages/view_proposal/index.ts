@@ -506,7 +506,7 @@ const ProposalComments: m.Component<{
             callback: createdCommentCallback,
             isLast: false, // TODO: implement isLast
           }),
-          !!child.childComments.length
+          !!furtherChildren.length
             && recursivelyGatherChildComments(furtherChildren, child, threadLevel + 1),
           nestedReplyForm(child),
         ]);
