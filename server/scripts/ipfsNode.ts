@@ -1,6 +1,5 @@
 // TODO: add index.json for default chain communities - is it necessary?
-// TODO: encryption (add columns to db for privacyEnabled + encryption key)/remove testing sequelize
-// TODO: create ipfs redirect route for encrypted communities
+// TODO: bundle file pushes with pushPaths - connectionRefusals
 
 import { Buckets, PrivateKey } from '@textile/hub';
 import { factory, formatFilename } from '../../shared/logging';
@@ -17,6 +16,17 @@ const IPFS_BACKUP_REPEAT = Number(process.env.IPFS_BACKUP_REPEAT) || 60;
 // so that we're not re-uploading the same content to IPFS again (isn't a big issue but can be computationally expensive)
 const IPFS_LAST_UPDATE = Number(process.env.IPFS_LAST_UPDATE) || 1800;
 
+// boolean where true means we should encrypt then upload private communities and
+// false means we completely ignore private communities
+const IPFS_PRIVATE_COMMUNITIES = !!process.env.IPFS_PRIVATE_COMMUNITIES || false;
+
+// the string id of a chain or community to upload to IPFS. Used primarily for testing or
+// for migrating specific backup changes
+const IPFS_ONLY_CHAIN_OR_COMM = process.env.IPFS_ONLY_CHAIN_OR_COMM || null
+
+// the combination of IPFS_LAST_UPDATE and IPFS_ONLY_CHAIN_OR_COMM allows us to
+// completely refresh the ipfs bucket for any specific community
+
 async function main() {
   const user = await PrivateKey.fromRandom();
   const bucketClient = await Buckets.withKeyInfo({ key: process.env.HUB_CW_KEY });
@@ -24,42 +34,43 @@ async function main() {
 
   now = new Date()
 
-  // try {
-  //   await updateAddresses(bucketClient)
-  // } catch (error) {
-  //   await handleFatalError(error, 'addresses')
-  // }
-  //
-  // try {
-  //   await updatePublicCommunities(bucketClient)
-  // } catch (error) {
-  //   await handleFatalError(error, 'communities')
-  // }
-  //
-  // try {
-  //   await updatePublicThreads(bucketClient)
-  // } catch (error) {
-  //   await handleFatalError(error, 'threads')
-  // }
-  //
-  // try {
-  //   await updatePublicComments(bucketClient)
-  // } catch (error) {
-  //   await handleFatalError(error, 'comments')
-  // }
-  //
-  // try {
-  //   await updatePublicReactions(bucketClient)
-  // } catch (error) {
-  //   await handleFatalError(error, 'reactions')
-  // }
-  //
-  // try {
-  //   await updatePublicTopics(bucketClient)
-  // } catch (error) {
-  //   await handleFatalError(error, 'topics')
-  // }
-  await sequelizeTester();
+  try {
+    await updateAddresses(bucketClient)
+  } catch (error) {
+    await handleFatalError(error, 'addresses')
+  }
+
+  try {
+    await updatePublicCommunities(bucketClient)
+  } catch (error) {
+    await handleFatalError(error, 'communities')
+  }
+
+  try {
+    await updatePublicThreads(bucketClient)
+  } catch (error) {
+    await handleFatalError(error, 'threads')
+  }
+
+  try {
+    await updatePublicComments(bucketClient)
+  } catch (error) {
+    await handleFatalError(error, 'comments')
+  }
+
+  try {
+    await updatePublicReactions(bucketClient)
+  } catch (error) {
+    await handleFatalError(error, 'reactions')
+  }
+
+  try {
+    await updatePublicTopics(bucketClient)
+  } catch (error) {
+    await handleFatalError(error, 'topics')
+  }
+
+  // await sequelizeTester();
 
   lastUpdate = now
 
@@ -76,7 +87,8 @@ async function handleFatalError(error: Error, source: string) {
  * @param bucketClient An instance of the textile bucket api client
  */
 async function updateAddresses(bucketClient) {
-  await getOrCreateBucket(bucketClient, 'Addresses', null, false)
+  if (IPFS_ONLY_CHAIN_OR_COMM) return; // don't update addresses if updating a specific community
+  await getOrCreateBucket(bucketClient, 'Addresses', false)
 
   // get all addresses that have been updated + their associated roles
   const updatedAddresses = await models.Address.findAll({
@@ -103,7 +115,7 @@ async function updateAddresses(bucketClient) {
     },
   })
 
-  // filter ids for the addresses that have been updated
+  // get ids for the addresses that have been updated
   const addressIds = updatedAddresses.map(o => o.id);
   // get all addresses ids from the updated roles that are not already in the addressIds array
   const queryAddressIds = updatedRoles.filter(o => !addressIds.includes(o.address_id)).map(o => o.address_id)
@@ -123,7 +135,21 @@ async function updateAddresses(bucketClient) {
     ],
   })
 
-  const allNewAddressData = updatedAddresses.concat(moreAddresses);
+  let allNewAddressData = updatedAddresses.concat(moreAddresses);
+
+
+  // if a specific chain/community is passed only get addresses for the chain/the communities default chain
+  if (IPFS_ONLY_CHAIN_OR_COMM) {
+    let chain = IPFS_ONLY_CHAIN_OR_COMM;
+    const chains = (await models.Chain.findAll()).map(o => o.id);
+    if (!chains.includes(IPFS_ONLY_CHAIN_OR_COMM)) {
+      chain = (await models.OffchainCommunity.findOne({
+        where: { 'id': IPFS_ONLY_CHAIN_OR_COMM }
+      })).default_chain
+    }
+    allNewAddressData = allNewAddressData.filter(o => o.chain === chain)
+  }
+
   // // push all the new address data to ipfs
   for (const data of allNewAddressData) {
     const roles = {}
@@ -132,7 +158,7 @@ async function updateAddresses(bucketClient) {
       else if (role.chain_id) roles[role.chain_id] = role.permission;
     });
     const result = await bucketClient.pushPath(
-      buckets.addressBucket.root.key,
+      buckets['Addresses'].root.key,
       `${data.address}.json`,
       Buffer.from(JSON.stringify({
         chain: data.chain,
@@ -153,7 +179,7 @@ async function updateAddresses(bucketClient) {
  * @param bucketClient
  */
 async function updatePublicCommunities(bucketClient) {
-  const communities = await models.OffchainCommunity.findAll({
+  let communities = await models.OffchainCommunity.findAll({
     attributes: ['id', 'name', 'default_chain', 'description', 'website', 'discord', 'telegram', 'github'],
     where: {
       'updated_at': {
@@ -164,8 +190,15 @@ async function updatePublicCommunities(bucketClient) {
     }
   })
 
+  // filter out private communities
+  if (!IPFS_PRIVATE_COMMUNITIES) {
+    communities = communities.filter(o => !o.privacyEnabled)
+  }
+
   for (const comm of communities) {
-    await getOrCreateBucket(bucketClient, comm.id, null, !!comm.privacyEnabled)
+    if (IPFS_ONLY_CHAIN_OR_COMM && IPFS_ONLY_CHAIN_OR_COMM != comm.id) continue;
+
+    await getOrCreateBucket(bucketClient, comm.id, !!comm.privacyEnabled)
 
     const result = await bucketClient.pushPath(
       buckets[comm.id].root.key,
@@ -177,7 +210,7 @@ async function updatePublicCommunities(bucketClient) {
 }
 
 async function updatePublicThreads(bucketClient) {
-  const updatedThreads = (await models.OffchainThread.findAll({
+  let updatedThreads = (await models.OffchainThread.findAll({
     attributes: ['id', 'title', 'body', 'chain', 'community', 'kind', 'url', 'stage', 'topic_id'],
     where: {
       'updated_at': {
@@ -200,8 +233,14 @@ async function updatePublicThreads(bucketClient) {
     ],
   }))
 
+  if (!IPFS_PRIVATE_COMMUNITIES) {
+    updatedThreads = updatedThreads.filter(o => !o.OffchainCommunity?.privacyEnabled)
+  }
+
   for (const thread of updatedThreads) {
-    const bucketName = await getOrCreateBucket(bucketClient, thread.community, thread.chain, !!thread.OffchainCommunity?.privacyEnabled)
+    const bucketName = thread.community || thread.chain;
+    if (IPFS_ONLY_CHAIN_OR_COMM && IPFS_ONLY_CHAIN_OR_COMM != bucketName) continue;
+    await getOrCreateBucket(bucketClient, bucketName, !!thread.OffchainCommunity?.privacyEnabled)
 
     const result = await bucketClient.pushPath(
       buckets[bucketName].root.key,
@@ -222,7 +261,7 @@ async function updatePublicThreads(bucketClient) {
 
 // root id gives use the id of the thread
 async function updatePublicComments(bucketClient) {
-  const comments = (await models.OffchainComment.findAll({
+  let comments = (await models.OffchainComment.findAll({
     attributes: ['id', 'chain', 'community', 'text', 'root_id'],
     where: {
       'updated_at': {
@@ -244,8 +283,14 @@ async function updatePublicComments(bucketClient) {
     ]
   }))
 
+  if (!IPFS_PRIVATE_COMMUNITIES) {
+    comments = comments.filter(o => !o.OffchainCommunity?.privacyEnabled)
+  }
+
   for (const comment of comments) {
-    const bucketName = await getOrCreateBucket(bucketClient, comment.community, comment.chain, !!comment.OffchainCommunity?.privacyEnabled)
+    const bucketName = comment.community || comment.chain;
+    if (IPFS_ONLY_CHAIN_OR_COMM && IPFS_ONLY_CHAIN_OR_COMM != bucketName) continue;
+    await getOrCreateBucket(bucketClient, bucketName, !!comment.OffchainCommunity?.privacyEnabled)
 
     const result = await bucketClient.pushPath(
       buckets[bucketName].root.key,
@@ -261,7 +306,7 @@ async function updatePublicComments(bucketClient) {
 }
 
 async function updatePublicReactions(bucketClient) {
-  const reactions = (await models.OffchainReaction.findAll({
+  let reactions = (await models.OffchainReaction.findAll({
     attributes: ['id', 'chain', 'reaction', 'community', 'thread_id', 'comment_id', 'proposal_id'],
     where: {
       'updated_at': {
@@ -282,8 +327,14 @@ async function updatePublicReactions(bucketClient) {
     ]
   }))
 
+  if (!IPFS_PRIVATE_COMMUNITIES) {
+    reactions = reactions.filter(o => !o.OffchainCommunity?.privacyEnabled)
+  }
+
   for (const reaction of reactions) {
-    const bucketName = await getOrCreateBucket(bucketClient, reaction.community, reaction.chain, !!reaction.OffchainCommunity?.privacyEnabled)
+    const bucketName = reaction.community || reaction.chain
+    if (IPFS_ONLY_CHAIN_OR_COMM && IPFS_ONLY_CHAIN_OR_COMM != bucketName) continue;
+    await getOrCreateBucket(bucketClient, bucketName, !!reaction.OffchainCommunity?.privacyEnabled)
 
     const result = await bucketClient.pushPath(
       buckets[bucketName].root.key,
@@ -301,7 +352,7 @@ async function updatePublicReactions(bucketClient) {
 }
 
 async function updatePublicTopics(bucketClient) {
-  const topics = (await models.OffchainTopic.findAll({
+  let topics = (await models.OffchainTopic.findAll({
     attributes: ['id', 'name', 'deleted_at', 'chain_id', 'community_id', 'description', 'telegram'],
     where: {
       'updated_at': {
@@ -319,8 +370,14 @@ async function updatePublicTopics(bucketClient) {
     ]
   }))
 
+  if (!IPFS_PRIVATE_COMMUNITIES) {
+    topics = topics.filter(o => !o.community?.privacyEnabled)
+  }
+
   for (const topic of topics) {
-    const bucketName = await getOrCreateBucket(bucketClient, topic.community_id, topic.chain_id, !!topic.community?.privacyEnabled)
+    const bucketName = topic.community_id || topic.chain_id;
+    if (IPFS_ONLY_CHAIN_OR_COMM && IPFS_ONLY_CHAIN_OR_COMM != bucketName) continue;
+    await getOrCreateBucket(bucketClient, bucketName, !!topic.community?.privacyEnabled)
 
     const result = await bucketClient.pushPath(
       buckets[bucketName].root.key,
@@ -336,9 +393,7 @@ async function updatePublicTopics(bucketClient) {
   }
 }
 
-async function getOrCreateBucket(bucketClient: Buckets, community: string, chain: string, encrypted?: boolean): Promise<string> {
-  const bucketName = community ? community : chain;
-
+async function getOrCreateBucket(bucketClient: Buckets, bucketName: string, encrypted?: boolean): Promise<string> {
   if (!buckets[bucketName]) {
     buckets[bucketName] = await bucketClient.getOrCreate(bucketName, { encrypted: !!encrypted });
     if (!buckets[bucketName].root) {
@@ -379,23 +434,27 @@ async function updateBucketCache(bucketName: string, pushPathResult: PushPathRes
 }
 
 async function sequelizeTester() {
-  const result = await models.OffchainTopic.findAll({
-    attributes: ['id', 'name', 'deleted_at', 'chain_id', 'community_id', 'description', 'telegram'],
+  const result = await models.OffchainThread.findAll({
+    attributes: ['id', 'title', 'body', 'chain', 'community', 'kind', 'url', 'stage', 'topic_id'],
     where: {
       'updated_at': {
         [Op.gt]: lastUpdate,
         [Op.lte]: now,
       },
-      'deleted_at': null
+      'deleted_at': null,
     },
     include: [
       {
+        model: models.Address,
+        as: 'Address',
+        required: true,
+        attributes: ['address']
+      },
+      {
         model: models.OffchainCommunity,
-        as: 'community',
-        required: false,
         attributes: ['privacyEnabled']
       }
-    ]
+    ],
   })
 
   console.log(JSON.stringify(result))
