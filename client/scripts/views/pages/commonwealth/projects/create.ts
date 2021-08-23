@@ -168,7 +168,9 @@ const NewProjectForm = {
                   m.redraw();
                 },
               }),
-              vnode.state.error && vnode.state.error.id === 'curatorFee' && m('p.error-text', vnode.state.error.message),
+              vnode.state.error
+               && vnode.state.error.id === 'curatorFee'
+               && m('p.error-text', vnode.state.error.message),
             ]),
             //  ipfsHash, cwUrl, creator, projectID
           ],
@@ -177,14 +179,14 @@ const NewProjectForm = {
               intent: 'primary',
               rounded: true,
               disabled: (
-                !vnode.state.form.name ||
-                !vnode.state.form.beneficiary ||
-                !vnode.state.form.threshold ||
-                !vnode.state.form.curatorFee ||
-                submitting
+                !vnode.state.form.name
+                || !vnode.state.form.beneficiary
+                || !vnode.state.form.threshold
+                || !vnode.state.form.curatorFee
+                || submitting
               ),
               label: submitting ? 'Createing now' : 'Create a new Project',
-              onclick: async(e) => {
+              onclick: async (e) => {
                 e.preventDefault();
                 if (vnode.state.form.threshold.toString()  === new BN(0).toString()) {
                   vnode.state.error = {
@@ -201,8 +203,8 @@ const NewProjectForm = {
                     threshold: vnode.state.form.threshold,
                     curatorFee: vnode.state.form.curatorFee,
                     deadline: vnode.state.form.deadline,
-                  }
-                  vnode.attrs.callback(projectData)
+                  };
+                  vnode.attrs.callback(projectData);
                 }
               },
               tabindex: 4,
@@ -213,7 +215,7 @@ const NewProjectForm = {
       ]),
     ]);
   }
-}
+};
 
 const NewProjectPage: m.Component<{ type }, { submitting: boolean, createError: string }> = {
   view: (vnode) => {
@@ -232,7 +234,7 @@ const NewProjectPage: m.Component<{ type }, { submitting: boolean, createError: 
     }, [
       m('.forum-container', [
         m(NewProjectForm, {
-          callback: async(projectData: any) => {
+          callback: async (projectData: any) => {
             const author = app.user.activeAccount.address;
             vnode.state.submitting = true;
             const res = await protocol.createProject(

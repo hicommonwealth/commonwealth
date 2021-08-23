@@ -2,9 +2,9 @@ import './commonwealth.scss';
 import m from 'mithril';
 
 import GeometricPatternSection from './geometric_pattern_section';
-import HeaderLandingPage from '../landing/landing_page_header';
-import FooterLandingPage from '../landing/landing_page_footer';
-import LandingPageButton from '../landing/landing_page_button';
+import HeaderLandingPage from '../../landing/landing_page_header';
+import FooterLandingPage from '../../landing/landing_page_footer';
+import LandingPageButton from '../../landing/landing_page_button';
 
 const WhyCommonWealthView: m.Component<{}, {}> = {
   view: (vnode) => {

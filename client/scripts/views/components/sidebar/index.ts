@@ -3,9 +3,7 @@ import 'components/sidebar/index.scss';
 import { AaveTypes, MarlinTypes, MolochTypes } from '@commonwealth/chain-events';
 import m from 'mithril';
 import _ from 'lodash';
-import {
-  Button, PopoverMenu, MenuItem, Icon, Icons, Tooltip
-} from 'construct-ui';
+import { Button, PopoverMenu, MenuItem, Icon, Icons, Tooltip } from 'construct-ui';
 
 import { selectNode, initChain, navigateToSubpage } from 'app';
 import app from 'state';
@@ -594,14 +592,47 @@ export const ExternalLinksModule: m.Component<{}, {}> = {
   }
 };
 
+const CMNProtocolModule: m.Component<{}> = {
+  view: (vnode) => {
+    const projectsRoute = `/${app.activeChainId()}/projects`;
+    const collectivesRoute = `/${app.activeChainId()}/collectives`;
+    return m('.OffchainNavigationModule.SidebarModule', [
+      m('br'),
+      m(Button, {
+        fluid: true,
+        rounded: true,
+        label: 'Projects',
+        active: m.route.get().startsWith(projectsRoute),
+        onclick: (e) => {
+          e.preventDefault();
+          m.route.set(projectsRoute);
+        },
+      }),
+      m(Button, {
+        fluid: true,
+        rounded: true,
+        label: 'Collectives',
+        disabled: true,
+        active: m.route.get().startsWith(collectivesRoute),
+        onclick: (e) => {
+          e.preventDefault();
+          m.route.set(collectivesRoute);
+        },
+      }),
+    ]);
+  }
+};
+
 const Sidebar: m.Component<{ hideQuickSwitcher? }, {}> = {
   view: (vnode) => {
+    const isCommonProtocol = app.chain && app.chain && app.chain.id === 'cmn-protocol';
+
     return [
       !app.isCustomDomain() && m(SidebarQuickSwitcher),
       m('.Sidebar', [
         (app.chain || app.community) && m(OffchainNavigationModule),
         (app.chain || app.community) && m(OnchainNavigationModule),
-        // isCommonProtocolMenu() && m(CWPModule), // for CWP Projects & Collectives
+        isCommonProtocol && m(CMNProtocolModule), // for CMN Protocol
         (app.chain || app.community) && m(ExternalLinksModule),
         m('br'),
         app.isLoggedIn() && (app.chain || app.community) && m(SubscriptionButton),
