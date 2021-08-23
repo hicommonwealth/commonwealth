@@ -420,13 +420,20 @@ const ProposalComment: m.Component<{
             && m(ProposalBodyEditor, { item: comment, parentState: vnode.state }),
         ]),
         m('.comment-body-bottom', [
-          vnode.state.editing && m('.comment-body-bottom-left', [
-            m(ProposalBodySaveEdit, { item: comment, getSetGlobalEditingStatus, parentState: vnode.state, callback }),
-            m(ProposalBodyCancelEdit, { item: comment, getSetGlobalEditingStatus, parentState: vnode.state }),
-          ]),
-          m('.comment-body-bottom-right', [
-            !vnode.state.editing && m(ProposalBodyReaction, { item: comment }),
-          ]),
+          vnode.state.editing
+            ? m('.comment-edit-buttons', [
+              m(ProposalBodySaveEdit, { item: comment, getSetGlobalEditingStatus, parentState: vnode.state, callback }),
+              m(ProposalBodyCancelEdit, { item: comment, getSetGlobalEditingStatus, parentState: vnode.state }),
+            ])
+            : m('.comment-response-row', [
+              m(ProposalBodyReaction, { item: comment }),
+              m(Icon, {
+                name: Icons.MESSAGE_SQUARE,
+                onclick: (e) => {
+                  getSetGlobalReplyStatus(GlobalStatus.Set, comment.id);
+                }
+              })
+            ]),
         ]),
       ]),
     ]);
@@ -451,6 +458,7 @@ const ProposalComments: m.Component<{
       proposal, comments, createdCommentCallback, getSetGlobalEditingStatus,
       getSetGlobalReplyStatus, replyParent
     } = vnode.attrs;
+    debugger
     // Jump to the comment indicated in the URL upon page load. Avoid
     // using m.route.param('comment') because it may return stale
     // results from a previous page if route transition hasn't finished
@@ -462,9 +470,9 @@ const ProposalComments: m.Component<{
       if (commentId) jumpHighlightComment(commentId);
     }
 
-    const nestedReply = (comment, replyParent2) => {
+    const nestedReply = (comment, replyParent_) => {
       // if current comment is replyParent, & no posts are being edited, a nested comment form is rendered
-      if (replyParent2 && comment.id === replyParent2 && !getSetGlobalEditingStatus(GlobalStatus.Get)) {
+      if (replyParent_ && comment.id === replyParent_ && !getSetGlobalEditingStatus(GlobalStatus.Get)) {
         return m(CreateComment, {
           callback: createdCommentCallback,
           cancellable: true,
@@ -476,7 +484,7 @@ const ProposalComments: m.Component<{
       }
     };
 
-    const recursivelyGatherChildComments = (comment, replyParent2) => {
+    const recursivelyGatherChildComments = (comment, replyParent_) => {
       return comment.childComments.map((id) => {
         const child = app.comments.getById(id);
         if (!child) return;
@@ -491,13 +499,14 @@ const ProposalComments: m.Component<{
             isLast: false, // TODO: implement isLast
           }),
           !!child.childComments.length
-            && m('.child-comments-wrap', recursivelyGatherChildComments(child, replyParent2))
+            && m('.child-comments-wrap', recursivelyGatherChildComments(child, replyParent_))
         ]);
       });
     };
 
-    const AllComments = (comments2, replyParent2) => {
-      return comments2.map((comment, index) => {
+    const renderComments = (comments_, replyParent_) => {
+      console.log(comments_);
+      return comments_.map((comment, index) => {
         return ([
           m(ProposalComment, {
             comment,
@@ -506,14 +515,14 @@ const ProposalComments: m.Component<{
             parent: proposal,
             proposal,
             callback: createdCommentCallback,
-            isLast: index === comments2.length - 1,
+            isLast: index === comments_.length - 1,
           }),
           // if comment has children, they are fetched & rendered
           !!comment.childComments.length
-            && m('.child-comments-wrap', recursivelyGatherChildComments(comment, replyParent2)),
-          replyParent2
-            && replyParent2 === comment.id
-            && nestedReply(comment, replyParent2),
+            && m('.child-comments-wrap', recursivelyGatherChildComments(comment, replyParent_)),
+          replyParent_
+            && replyParent_ === comment.id
+            && nestedReply(comment, replyParent_),
         ]);
       });
     };
@@ -524,7 +533,7 @@ const ProposalComments: m.Component<{
     }, [
       // show comments
       comments
-      && m('.proposal-comments', AllComments(comments, replyParent)),
+      && m('.proposal-comments', renderComments(comments, replyParent)),
       // create comment
       app.user.activeAccount
         && !getSetGlobalReplyStatus(GlobalStatus.Get)
@@ -679,7 +688,7 @@ const ViewProposalPage: m.Component<{
         ? app.comments.refresh(proposal, null, app.activeCommunityId())
         : app.comments.refresh(proposal, app.activeChainId(), null))
         .then((result) => {
-          vnode.state.comments = app.comments.getByProposal(proposal).filter((c) => c.parentComment === null);
+          vnode.state.comments = app.comments.getByProposal(proposal);
           m.redraw();
         }).catch((err) => {
           notifyError('Failed to load comments');
