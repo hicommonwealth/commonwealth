@@ -1,5 +1,6 @@
 import 'pages/members.scss';
 
+import $ from 'jquery';
 import m from 'mithril';
 import _ from 'lodash';
 import { Tag, Table } from 'construct-ui';
@@ -18,8 +19,22 @@ interface MemberInfo {
   count: number;
 }
 
-const MembersPage : m.Component<{}, { membersRequested: boolean, membersLoaded: MemberInfo[] }> = {
+const MEMBERS_PER_PAGE = 20;
+
+const MembersPage : m.Component<{}, { membersRequested: boolean, membersLoaded: MemberInfo[],
+membersToShow: number }> = {
   view: (vnode) => {
+    $(window).on('scroll', () => {
+      if ($(window).scrollTop() + $(window).height() === $(document).height()) {
+        if (vnode.state.membersToShow < vnode.state.membersLoaded.length) {
+          vnode.state.membersToShow += MEMBERS_PER_PAGE;
+        }
+        m.redraw();
+      }
+    });
+
+    if (!vnode.state.membersToShow) { vnode.state.membersToShow = MEMBERS_PER_PAGE; }
+
     const activeEntity = app.community ? app.community : app.chain;
     if (!activeEntity) return m(PageLoading, {
       message: 'Loading members',
@@ -91,7 +106,7 @@ const MembersPage : m.Component<{}, { membersRequested: boolean, membersLoaded: 
           m('th', 'Member'),
           m('th.align-right', 'Posts/ Month'),
         ]),
-        vnode.state.membersLoaded.map((info) => {
+        vnode.state.membersLoaded.slice(0, vnode.state.membersToShow).map((info) => {
           const profile = app.profiles.getProfile(info.chain, info.address);
           return m('tr', [
             m('td.members-item-info', [
