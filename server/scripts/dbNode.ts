@@ -20,9 +20,14 @@ const log = factory.getLogger(formatFilename(__filename));
 
 // TODO: RollBar error reporting
 
-// env var
+// the number of the current worker
 const WORKER_NUMBER: number = Number(process.env.WORKER_NUMBER) || 0;
+
+// the total number of workers
 const NUM_WORKERS: number = Number(process.env.NUM_WORKERS) || 1;
+
+// The number of minutes to wait between each run -- rounded to the nearest whole number
+const REPEAT_TIME = Math.round(Number(process.env.REPEAT_TIME)) || 1;
 
 // counts the number of errors occurring for each chain - resets every 24 hours (to remove any temporary connection errors)
 // this is only meant to stop a chain from repeatedly causing errors every REPEAT_TIME
@@ -30,9 +35,6 @@ let chainErrors: { [chain: string]: number } = {}
 
 // counts the number of mainProcess runs
 let runCount = 0
-
-// The number of minutes to wait between each run -- rounded to the nearest whole number
-export const REPEAT_TIME = Math.round(Number(process.env.REPEAT_TIME)) || 1;
 
 // any fatal error is handle through here
 async function handleFatalError(error: Error, pool, chain?: string, type?: string): Promise<void> {
