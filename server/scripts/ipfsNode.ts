@@ -9,58 +9,72 @@ import { GetOrCreateResponse } from '@textile/buckets/dist/cjs/types';
 
 const log = factory.getLogger(formatFilename(__filename));
 
+// the number of seconds to wait between each backup
+const IPFS_BACKUP_REPEAT = process.env.IPFS_BACKUP_REPEAT || 60;
+
 async function main() {
   const user = await PrivateKey.fromRandom();
   const bucketClient = await Buckets.withKeyInfo({ key: process.env.HUB_CW_KEY });
   const token = await bucketClient.getToken(user);
 
-  try {
-    await updateAddresses(bucketClient)
-  } catch (error) {
-    console.error('Address updating error')
-    throw error
-  }
+  now = new Date()
 
-  try {
-    await updatePublicCommunities(bucketClient)
-  } catch (error) {
-    console.error('Community updating error')
-    throw error
-  }
+  // try {
+  //   await updateAddresses(bucketClient)
+  // } catch (error) {
+  //   await handleFatalError(error, 'addresses')
+  // }
+  //
+  // try {
+  //   await updatePublicCommunities(bucketClient)
+  // } catch (error) {
+  //   await handleFatalError(error, 'communities')
+  // }
+  //
+  // try {
+  //   await updatePublicThreads(bucketClient)
+  // } catch (error) {
+  //   await handleFatalError(error, 'threads')
+  // }
+  //
+  // try {
+  //   await updatePublicComments(bucketClient)
+  // } catch (error) {
+  //   await handleFatalError(error, 'comments')
+  // }
+  //
+  // try {
+  //   await updatePublicReactions(bucketClient)
+  // } catch (error) {
+  //   await handleFatalError(error, 'reactions')
+  // }
+  //
+  // try {
+  //   await updatePublicTopics(bucketClient)
+  // } catch (error) {
+  //   await handleFatalError(error, 'topics')
+  // }
+  await sequelizeTester();
 
-  try {
-    await updatePublicThreads(bucketClient)
-  } catch (error) {
-    console.error('Thread updating error')
-    throw error
-  }
-
-  try {
-    await updatePublicComments(bucketClient)
-  } catch (error) {
-    console.error('Comment updating error')
-    throw error
-  }
-
-  try {
-    await updatePublicReactions(bucketClient)
-  } catch (error) {
-    console.error('Reaction updating error')
-    throw error
-  }
-  // await sequelizeTester();
+  lastUpdate = now
 
   return bucketClient
 }
 
-// TODO: add index.json for default chain communities
+async function handleFatalError(error: Error, source: string) {
+  log.error(`${source} updating error between ${lastUpdate} and ${now}`, error)
+  // TODO: error handling + Rollbar
+}
+
+// TODO: add index.json for default chain communities - is it necessary?
 // TODO: lastUpdate has to be stored in DB or elsewhere since when script restarts it should restart from 1970
-// TODO: error handling + Rollbar
 let bucketClient;
 // TODO: empty the buckets every so often
 const buckets: { [key: string]: GetOrCreateResponse } = {}
 let lastUpdate = new Date(); // set this to 1970 for first run
-lastUpdate.setHours(lastUpdate.getHours()-24);
+lastUpdate.setHours(lastUpdate.getHours()-96);
+let now = new Date();
+// now.setHours(now.getHours()-24)
 main().then((client) => {}
   // setInterval(main, 30000)
 ).then(() => {
@@ -89,7 +103,8 @@ async function updateAddresses(bucketClient) {
     attributes: ['id', 'address', 'chain'],
     where: {
       'updated_at': {
-        [Op.gt]: lastUpdate
+        [Op.gt]: lastUpdate,
+        [Op.lte]: now,
       }
     },
     include: [
@@ -102,7 +117,8 @@ async function updateAddresses(bucketClient) {
     attributes: ['address_id'],
     where: {
       'updated_at': {
-        [Op.gt]: lastUpdate
+        [Op.gt]: lastUpdate,
+        [Op.lte]: now,
       }
     },
   })
@@ -160,7 +176,8 @@ async function updatePublicCommunities(bucketClient) {
     attributes: ['id', 'name', 'default_chain', 'description', 'website', 'discord', 'telegram', 'github'],
     where: {
       'updated_at': {
-        [Op.gt]: lastUpdate
+        [Op.gt]: lastUpdate,
+        [Op.lte]: now,
       },
       'deleted_at': null,
       'privacyEnabled': false
@@ -192,9 +209,10 @@ async function updatePublicThreads(bucketClient) {
     attributes: ['id', 'title', 'body', 'chain', 'community', 'kind', 'url', 'stage', 'topic_id'],
     where: {
       'updated_at': {
-        [Op.gt]: lastUpdate
+        [Op.gt]: lastUpdate,
+        [Op.lte]: now,
       },
-      'deleted_at': null,
+      'deleted_at': null
     },
     include: [
       {
@@ -214,15 +232,8 @@ async function updatePublicThreads(bucketClient) {
   })
 
   for (const thread of updatedThreads) {
-    const bucketName = thread.community ? thread.community : thread.chain;
-    if (!buckets[bucketName]) {
-      buckets[bucketName] = await bucketClient.getOrCreate(bucketName);
-      if (!buckets[bucketName].root) {
-        throw new Error('Failed to open bucket');
-      }
-      log.info(`IPNS address of Users bucket: ${buckets[bucketName].root.key}`);
-      log.info(`https://ipfs.io/ipns/${buckets[bucketName].root.key}`);
-    }
+    const bucketName = await getOrCreateBucket(bucketClient, thread.community, thread.chain)
+
     await bucketClient.pushPath(
       buckets[bucketName].root.key,
       `threads/${thread.id}.json`,
@@ -245,9 +256,10 @@ async function updatePublicComments(bucketClient) {
     attributes: ['id', 'chain', 'community', 'text', 'root_id'],
     where: {
       'updated_at': {
-        [Op.gt]: lastUpdate
+        [Op.gt]: lastUpdate,
+        [Op.lte]: now,
       },
-      'deleted_at': null,
+      'deleted_at': null
     },
     include: [
       {
@@ -266,15 +278,7 @@ async function updatePublicComments(bucketClient) {
   })
 
   for (const comment of comments) {
-    const bucketName = comment.community ? comment.community : comment.chain;
-    if (!buckets[bucketName]) {
-      buckets[bucketName] = await bucketClient.getOrCreate(bucketName);
-      if (!buckets[bucketName].root) {
-        throw new Error('Failed to open bucket');
-      }
-      log.info(`IPNS address of Users bucket: ${buckets[bucketName].root.key}`);
-      log.info(`https://ipfs.io/ipns/${buckets[bucketName].root.key}`);
-    }
+    const bucketName = await getOrCreateBucket(bucketClient, comment.community, comment.chain)
 
     await bucketClient.pushPath(
       buckets[bucketName].root.key,
@@ -293,7 +297,8 @@ async function updatePublicReactions(bucketClient) {
     attributes: ['id', 'chain', 'reaction', 'community', 'thread_id', 'comment_id', 'proposal_id'],
     where: {
       'updated_at': {
-        [Op.gt]: lastUpdate
+        [Op.gt]: lastUpdate,
+        [Op.lte]: now,
       },
     },
     include: [
@@ -313,16 +318,7 @@ async function updatePublicReactions(bucketClient) {
   })
 
   for (const reaction of reactions) {
-    const bucketName = reaction.community ? reaction.community : reaction.chain
-    console.log(JSON.stringify(reaction), bucketName);
-    if (!buckets[bucketName]) {
-      buckets[bucketName] = await bucketClient.getOrCreate(bucketName);
-      if (!buckets[bucketName].root) {
-        throw new Error('Failed to open bucket');
-      }
-      log.info(`IPNS address of Users bucket: ${buckets[bucketName].root.key}`);
-      log.info(`https://ipfs.io/ipns/${buckets[bucketName].root.key}`);
-    }
+    const bucketName = await getOrCreateBucket(bucketClient, reaction.community, reaction.chain)
 
     await bucketClient.pushPath(
       buckets[bucketName].root.key,
@@ -343,12 +339,14 @@ async function updatePublicTopics(bucketClient) {
     where: {
       'updated_at': {
         [Op.gt]: lastUpdate,
-        'deleted_at': null
+        [Op.lte]: now,
       },
+      'deleted_at': null
     },
     include: [
       {
         model: models.OffchainCommunity,
+        as: 'community',
         attributes: ['privacyEnabled']
       }
     ]
@@ -358,16 +356,7 @@ async function updatePublicTopics(bucketClient) {
   })
 
   for (const topic of topics) {
-    const bucketName = topic.community_id ? topic.community_id : topic.chain_id;
-    console.log(JSON.stringify(topic), bucketName);
-    if (!buckets[bucketName]) {
-      buckets[bucketName] = await bucketClient.getOrCreate(bucketName);
-      if (!buckets[bucketName].root) {
-        throw new Error('Failed to open bucket');
-      }
-      log.info(`IPNS address of Users bucket: ${buckets[bucketName].root.key}`);
-      log.info(`https://ipfs.io/ipns/${buckets[bucketName].root.key}`);
-    }
+    const bucketName = await getOrCreateBucket(bucketClient, topic.community_id, topic.chain_id)
 
     await bucketClient.pushPath(
       buckets[bucketName].root.key,
@@ -381,35 +370,40 @@ async function updatePublicTopics(bucketClient) {
   }
 }
 
+async function getOrCreateBucket(bucketClient: Buckets, community: string, chain: string): Promise<string> {
+  const bucketName = community ? community : chain;
+  if (!buckets[bucketName]) {
+    buckets[bucketName] = await bucketClient.getOrCreate(bucketName);
+    if (!buckets[bucketName].root) {
+      throw new Error('Failed to open bucket');
+    }
+    log.info(`IPNS address of ${bucketName} bucket: ${buckets[bucketName].root.key}`);
+    log.info(`https://ipfs.io/ipns/${buckets[bucketName].root.key}`);
+  }
+
+  return bucketName
+}
+
 async function sequelizeTester() {
-  const result = await models.OffchainComment.findAll({
-    attributes: ['id', 'chain', 'community', 'text', 'root_id'],
+  const result = await models.OffchainTopic.findAll({
+    attributes: ['id', 'name', 'deleted_at', 'chain_id', 'community_id', 'description', 'telegram'],
     where: {
       'updated_at': {
-        [Op.gt]: lastUpdate
+        [Op.gt]: lastUpdate,
+        [Op.lte]: now,
       },
-      'deleted_at': null,
+      'deleted_at': null
     },
     include: [
       {
-        model: models.Address,
-        required: true,
-        attributes: ['address']
-      },
-      {
         model: models.OffchainCommunity,
+        as: 'community',
+        required: false,
         attributes: ['privacyEnabled']
       }
     ]
   })
 
   console.log(JSON.stringify(result))
-}
-
-async function bucketManagement(bucketClient: Buckets) {
-  // await bucketClient.remove('bafzbeiamkfqyemughngc3z2grv7hykllastjzswpgimjzyrbtbyoinpgpe');
-  // await bucketClient.remove('bafzbeibauqemtha344lt7gm724tgcnzmg44fs7sukllfe3yo6s6q3suuxa');
-  // await bucketClient.remove('bafzbeigup4wh4zh3qc3xcfd5mnfmqkjacpixnmvwweyfpigl745lsudsiy');
-  await bucketClient.remove('bafzbeihjhcvsm5jbfrj2f7h2v7qjbzsdvlfevsqicbo7pwev74v4kiyt3i');
-  await bucketClient.remove('bafzbeihodwrewpnhhbrwedg4653bbgkz655w76qwroop25pbfn7gj7efqm');
+  return;
 }
