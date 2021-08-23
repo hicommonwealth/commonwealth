@@ -1,5 +1,6 @@
 // TODO: add index.json for default chain communities - is it necessary?
-
+// TODO: encryption (add columns to db for privacyEnabled + encryption key)/remove testing sequelize
+// TODO: create ipfs redirect route for encrypted communities
 
 import { Buckets, PrivateKey } from '@textile/hub';
 import { factory, formatFilename } from '../../shared/logging';
@@ -70,24 +71,12 @@ async function handleFatalError(error: Error, source: string) {
   // TODO: error handling + Rollbar
 }
 
-const buckets: { [key: string]: GetOrCreateResponse } = {}
-
-let lastUpdate = new Date();
-lastUpdate.setSeconds(lastUpdate.getSeconds() - IPFS_LAST_UPDATE);
-let now;
-
-main().then((client) =>
-  setInterval(main, IPFS_BACKUP_REPEAT * 1000)
-).catch((error) => {
-  log.error('An error occurred in the ipfs node', error)
-})
-
 /**
  * Updates any address or address related data such as chain and roles on ipfs
  * @param bucketClient An instance of the textile bucket api client
  */
 async function updateAddresses(bucketClient) {
-  await getOrCreateBucket(bucketClient, 'Addresses', null)
+  await getOrCreateBucket(bucketClient, 'Addresses', null, false)
 
   // get all addresses that have been updated + their associated roles
   const updatedAddresses = await models.Address.findAll({
@@ -172,21 +161,11 @@ async function updatePublicCommunities(bucketClient) {
         [Op.lte]: now,
       },
       'deleted_at': null,
-      'privacyEnabled': false
     }
   })
 
   for (const comm of communities) {
-    if (!buckets[comm.id]) {
-      const communityBucket = await bucketClient.getOrCreate(comm.id);
-      if (!communityBucket.root) {
-        throw new Error('Failed to open bucket');
-      }
-      log.info(`IPNS address of Users bucket: ${communityBucket.root.key}`);
-      log.info(`https://ipfs.io/ipns/${communityBucket.root.key}`);
-      buckets[comm.id] = communityBucket
-    }
-
+    await getOrCreateBucket(bucketClient, comm.id, null, !!comm.privacyEnabled)
 
     const result = await bucketClient.pushPath(
       buckets[comm.id].root.key,
@@ -219,13 +198,10 @@ async function updatePublicThreads(bucketClient) {
         attributes: ['privacyEnabled']
       }
     ],
-  })).filter((o) => {
-    if (o.OffchainCommunity) return !o.OffchainCommunity.privacyEnabled
-    else return true // if there is no off-chain community than it is a default chain community which does not have privacyEnabled
-  })
+  }))
 
   for (const thread of updatedThreads) {
-    const bucketName = await getOrCreateBucket(bucketClient, thread.community, thread.chain)
+    const bucketName = await getOrCreateBucket(bucketClient, thread.community, thread.chain, !!thread.OffchainCommunity?.privacyEnabled)
 
     const result = await bucketClient.pushPath(
       buckets[bucketName].root.key,
@@ -266,13 +242,10 @@ async function updatePublicComments(bucketClient) {
         attributes: ['privacyEnabled']
       }
     ]
-  })).filter((o) => {
-    if (o.OffchainCommunity) return !o.OffchainCommunity.privacyEnabled
-    else return true // if there is no off-chain community than it is a default chain community which does not have privacyEnabled
-  })
+  }))
 
   for (const comment of comments) {
-    const bucketName = await getOrCreateBucket(bucketClient, comment.community, comment.chain)
+    const bucketName = await getOrCreateBucket(bucketClient, comment.community, comment.chain, !!comment.OffchainCommunity?.privacyEnabled)
 
     const result = await bucketClient.pushPath(
       buckets[bucketName].root.key,
@@ -307,13 +280,10 @@ async function updatePublicReactions(bucketClient) {
         attributes: ['privacyEnabled']
       }
     ]
-  })).filter((o) => {
-    if (o.OffchainCommunity) return !o.OffchainCommunity.privacyEnabled
-    else return true // if there is no off-chain community than it is a default chain community which does not have privacyEnabled
-  })
+  }))
 
   for (const reaction of reactions) {
-    const bucketName = await getOrCreateBucket(bucketClient, reaction.community, reaction.chain)
+    const bucketName = await getOrCreateBucket(bucketClient, reaction.community, reaction.chain, !!reaction.OffchainCommunity?.privacyEnabled)
 
     const result = await bucketClient.pushPath(
       buckets[bucketName].root.key,
@@ -347,13 +317,10 @@ async function updatePublicTopics(bucketClient) {
         attributes: ['privacyEnabled']
       }
     ]
-  })).filter((o) => {
-    if (o.community) return !o.community.privacyEnabled
-    else return true // if there is no off-chain community than it is a default chain community which does not have privacyEnabled
-  })
+  }))
 
   for (const topic of topics) {
-    const bucketName = await getOrCreateBucket(bucketClient, topic.community_id, topic.chain_id)
+    const bucketName = await getOrCreateBucket(bucketClient, topic.community_id, topic.chain_id, !!topic.community?.privacyEnabled)
 
     const result = await bucketClient.pushPath(
       buckets[bucketName].root.key,
@@ -369,11 +336,11 @@ async function updatePublicTopics(bucketClient) {
   }
 }
 
-async function getOrCreateBucket(bucketClient: Buckets, community: string, chain: string): Promise<string> {
+async function getOrCreateBucket(bucketClient: Buckets, community: string, chain: string, encrypted?: boolean): Promise<string> {
   const bucketName = community ? community : chain;
 
   if (!buckets[bucketName]) {
-    buckets[bucketName] = await bucketClient.getOrCreate(bucketName);
+    buckets[bucketName] = await bucketClient.getOrCreate(bucketName, { encrypted: !!encrypted });
     if (!buckets[bucketName].root) {
       throw new Error('Failed to open bucket');
     }
@@ -381,10 +348,16 @@ async function getOrCreateBucket(bucketClient: Buckets, community: string, chain
     // save a bucket instance in the db if it doesn't already exist
     const bucketCache = (await models.BucketCache.findAll()).map(o => o.name);
     if (!bucketCache.includes(bucketName)) {
+      const links = await bucketClient.links(buckets[bucketName].root.key);
       await models.BucketCache.create({
         name: bucketName,
-        ipns: buckets[bucketName].root.key,
-        ipfs: buckets[bucketName].root.path.split('/')[2]
+        ipns_cid: buckets[bucketName].root.key,
+        ipfs_cid: buckets[bucketName].root.path.split('/')[2],
+        thread_link: links.url,
+        ipns_link: links.ipns,
+        bucket_website: links.www,
+        encrypted: !!encrypted,
+        token: links.url.split('?token=')[1]
       })
     }
 
@@ -397,7 +370,7 @@ async function getOrCreateBucket(bucketClient: Buckets, community: string, chain
 
 async function updateBucketCache(bucketName: string, pushPathResult: PushPathResult) {
   await models.BucketCache.update({
-    ipfs: pushPathResult.root.split('/')[2]
+    ipfs_cid: pushPathResult.root.split('/')[2]
   }, {
     where: {
       name: bucketName
@@ -428,3 +401,17 @@ async function sequelizeTester() {
   console.log(JSON.stringify(result))
   return;
 }
+
+
+
+const buckets: { [key: string]: GetOrCreateResponse } = {}
+
+let lastUpdate = new Date();
+lastUpdate.setSeconds(lastUpdate.getSeconds() - IPFS_LAST_UPDATE);
+let now;
+
+main().then((client) =>
+  setInterval(main, IPFS_BACKUP_REPEAT * 1000)
+).catch((error) => {
+  log.error('An error occurred in the ipfs node', error)
+})

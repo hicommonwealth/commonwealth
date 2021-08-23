@@ -5,8 +5,13 @@ import { ModelStatic } from './types';
 
 export interface BucketCacheAttributes {
   name: string;
-  ipns: string;
-  ipfs: string;
+  ipns_cid: string;
+  ipfs_cid: string;
+  thread_link: string;
+  ipns_link: string;
+  bucket_website: string;
+  encrypted: boolean;
+  token?: string;
   created_at?: Date;
   updated_at?: Date;
 }
@@ -23,8 +28,13 @@ export default (
   const BucketCache = <BucketCacheModelStatic>sequelize.define<BucketCacheInstance, BucketCacheAttributes>(
     'BucketCache', {
       name: { type: dataTypes.STRING, primaryKey: true },
-      ipns: { type: dataTypes.STRING, allowNull: false },
-      ipfs: { type: dataTypes.STRING, allowNull: false },
+      ipns_cid: { type: dataTypes.STRING, allowNull: false },
+      ipfs_cid: { type: dataTypes.STRING, allowNull: false },
+      thread_link: { type: dataTypes.STRING, allowNull: false },
+      ipns_link: { type: dataTypes.STRING, allowNull: false },
+      bucket_website: { type: dataTypes.STRING, allowNull: false },
+      encrypted: { type: dataTypes.BOOLEAN, allowNull: false},
+      token: { type: dataTypes.STRING, allowNull: true },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
     }, {
