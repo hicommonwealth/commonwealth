@@ -39,7 +39,7 @@ import { alertModalWithText } from 'views/modals/alert_modal';
 
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/landing');
-import(/* webpackPrefetch: true */ 'views/pages/commonwealth');
+import(/* webpackPrefetch: true */ 'views/pages/commonwealth/why');
 import(/* webpackPrefetch: true */ 'views/pages/discussions');
 import(/* webpackPrefetch: true */ 'views/pages/view_proposal');
 
@@ -238,7 +238,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
   // Import top-level chain adapter lazily, to facilitate code split.
   let newChain;
   let initApi; // required for NEAR
-  if (n.chain.id === ChainNetwork.CMNKovan) {
+  if (n.chain.id === ChainNetwork.CMNProtocol) {
     const Commonwealth = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "commonwealth-main" */
@@ -570,10 +570,6 @@ Promise.all([
       // Notifications
       '/notifications':          importRoute('views/pages/notifications', { scoped: true, deferChain: true }),
       '/notificationsList':      importRoute('views/pages/notificationsList', { scoped: true, deferChain: true }),
-      // CMN
-      '/projects':               importRoute('views/pages/commonwealth/projects', { scoped: true }),
-      '/backers':                importRoute('views/pages/commonwealth/backers', { scoped: true }),
-      '/collectives':            importRoute('views/pages/commonwealth/collectives', { scoped: true }),
       // NEAR
       '/finishNearLogin':        importRoute('views/pages/finish_near_login', { scoped: true }),
       // Discussions
@@ -620,9 +616,6 @@ Promise.all([
       // Redirects
       '/:scope/notifications':      redirectRoute(() => '/notifications'),
       '/:scope/notificationsList':  redirectRoute(() => '/notificationsList'),
-      '/:scope/projects':           redirectRoute(() => '/projects'),
-      '/:scope/backers':            redirectRoute(() => '/backers'),
-      '/:scope/collectives':        redirectRoute(() => '/collectives'),
       '/:scope/finishNearLogin':    redirectRoute(() => '/finishNearLogin'),
       '/:scope/home':               redirectRoute(() => '/'),
       '/:scope/discussions':        redirectRoute(() => '/'),
@@ -666,16 +659,22 @@ Promise.all([
       //
       '/':                         importRoute('views/pages/landing', { scoped: false, hideSidebar: false }),
       '/search':                   importRoute('views/pages/search', { scoped: false, deferChain: true }),
-      '/whyCommonwealth':          importRoute('views/pages/commonwealth', { scoped: false, hideSidebar: true }),
+      '/whyCommonwealth':          importRoute('views/pages/commonwealth/why', { scoped: false, hideSidebar: true }),
       // Notifications
       '/notifications':            redirectRoute(() => '/edgeware/notifications'),
       '/:scope/notifications':     importRoute('views/pages/notifications', { scoped: true, deferChain: true }),
       '/notificationsList':        redirectRoute(() => '/edgeware/notificationsList'),
       '/:scope/notificationsList': importRoute('views/pages/notificationsList', { scoped: true, deferChain: true }),
-      // CMN
-      '/:scope/projects':          importRoute('views/pages/commonwealth/projects', { scoped: true }),
-      '/:scope/backers':           importRoute('views/pages/commonwealth/backers', { scoped: true }),
-      '/:scope/collectives':       importRoute('views/pages/commonwealth/collectives', { scoped: true }),
+
+      // CMN Project
+      '/:scope/projects':               importRoute('views/pages/commonwealth/projects', { scoped: true }),
+      '/:scope/new/project':            importRoute('views/pages/commonwealth/projects/create', { scoped: true }),
+      '/:scope/project/projectHash':    importRoute('views/pages/commonwealth/projects/view', { scoped: true }),
+
+      // CMN Collective
+      '/:scope/backers':                importRoute('views/pages/commonwealth/backers', { scoped: true }),
+      '/:scope/collectives':            importRoute('views/pages/commonwealth/collectives', { scoped: true }),
+
       // NEAR
       '/:scope/finishNearLogin':   importRoute('views/pages/finish_near_login', { scoped: true }),
       // Discussions
