@@ -1,16 +1,20 @@
+// TODO: add index.json for default chain communities - is it necessary?
 
-// TODO: add sigterm pool.end for dbNode (use same as from chain_spec tests)
 
 import { Buckets, PrivateKey } from '@textile/hub';
 import { factory, formatFilename } from '../../shared/logging';
 import models from '../database';
 import { Op } from 'sequelize';
-import { GetOrCreateResponse } from '@textile/buckets/dist/cjs/types';
+import { GetOrCreateResponse, PushPathResult } from '@textile/buckets/dist/cjs/types';
 
 const log = factory.getLogger(formatFilename(__filename));
 
 // the number of seconds to wait between each backup
-const IPFS_BACKUP_REPEAT = process.env.IPFS_BACKUP_REPEAT || 60;
+const IPFS_BACKUP_REPEAT = Number(process.env.IPFS_BACKUP_REPEAT) || 60;
+
+// the number of seconds since the last IPFS updated - when redeploying/restarting this should be updated
+// so that we're not re-uploading the same content to IPFS again (isn't a big issue but can be computationally expensive)
+const IPFS_LAST_UPDATE = Number(process.env.IPFS_LAST_UPDATE) || 1800;
 
 async function main() {
   const user = await PrivateKey.fromRandom();
@@ -66,20 +70,15 @@ async function handleFatalError(error: Error, source: string) {
   // TODO: error handling + Rollbar
 }
 
-// TODO: add index.json for default chain communities - is it necessary?
-// TODO: lastUpdate has to be stored in DB or elsewhere since when script restarts it should restart from 1970
-let bucketClient;
-// TODO: empty the buckets every so often
 const buckets: { [key: string]: GetOrCreateResponse } = {}
-let lastUpdate = new Date(); // set this to 1970 for first run
-lastUpdate.setHours(lastUpdate.getHours()-96);
-let now = new Date();
-// now.setHours(now.getHours()-24)
-main().then((client) => {}
-  // setInterval(main, 30000)
-).then(() => {
 
-}).catch((error) => {
+let lastUpdate = new Date();
+lastUpdate.setSeconds(lastUpdate.getSeconds() - IPFS_LAST_UPDATE);
+let now;
+
+main().then((client) =>
+  setInterval(main, IPFS_BACKUP_REPEAT * 1000)
+).catch((error) => {
   log.error('An error occurred in the ipfs node', error)
 })
 
@@ -88,15 +87,7 @@ main().then((client) => {}
  * @param bucketClient An instance of the textile bucket api client
  */
 async function updateAddresses(bucketClient) {
-  if (!buckets.addressBucket) {
-    let addressBucket = await bucketClient.getOrCreate('Addresses');
-    if (!addressBucket.root) {
-      throw new Error('Failed to open bucket');
-    }
-    log.info(`IPNS address of Users bucket: ${addressBucket.root.key}`)
-    log.info(`https://ipfs.io/ipns/${addressBucket.root.key}`)
-    buckets.addressBucket = addressBucket
-  }
+  await getOrCreateBucket(bucketClient, 'Addresses', null)
 
   // get all addresses that have been updated + their associated roles
   const updatedAddresses = await models.Address.findAll({
@@ -151,7 +142,7 @@ async function updateAddresses(bucketClient) {
       if (role.offchain_community_id) roles[role.offchain_community_id] = role.permission;
       else if (role.chain_id) roles[role.chain_id] = role.permission;
     });
-    await bucketClient.pushPath(
+    const result = await bucketClient.pushPath(
       buckets.addressBucket.root.key,
       `${data.address}.json`,
       Buffer.from(JSON.stringify({
@@ -160,6 +151,7 @@ async function updateAddresses(bucketClient) {
         roles
       }))
     )
+    await updateBucketCache('Addresses', result);
   }
 }
 
@@ -196,11 +188,12 @@ async function updatePublicCommunities(bucketClient) {
     }
 
 
-    await bucketClient.pushPath(
+    const result = await bucketClient.pushPath(
       buckets[comm.id].root.key,
       'index.json',
       Buffer.from(JSON.stringify(comm))
     )
+    await updateBucketCache(comm.id, result);
   }
 }
 
@@ -234,7 +227,7 @@ async function updatePublicThreads(bucketClient) {
   for (const thread of updatedThreads) {
     const bucketName = await getOrCreateBucket(bucketClient, thread.community, thread.chain)
 
-    await bucketClient.pushPath(
+    const result = await bucketClient.pushPath(
       buckets[bucketName].root.key,
       `threads/${thread.id}.json`,
       Buffer.from(JSON.stringify({
@@ -247,6 +240,7 @@ async function updatePublicThreads(bucketClient) {
         topic: thread.topic_id
       }))
     )
+    await updateBucketCache(bucketName, result);
   }
 }
 
@@ -280,7 +274,7 @@ async function updatePublicComments(bucketClient) {
   for (const comment of comments) {
     const bucketName = await getOrCreateBucket(bucketClient, comment.community, comment.chain)
 
-    await bucketClient.pushPath(
+    const result = await bucketClient.pushPath(
       buckets[bucketName].root.key,
       `comments/${comment.id}.json`,
       Buffer.from(JSON.stringify({
@@ -289,6 +283,7 @@ async function updatePublicComments(bucketClient) {
         root_id: comment.root_id
       }))
     )
+    await updateBucketCache(bucketName, result);
   }
 }
 
@@ -320,7 +315,7 @@ async function updatePublicReactions(bucketClient) {
   for (const reaction of reactions) {
     const bucketName = await getOrCreateBucket(bucketClient, reaction.community, reaction.chain)
 
-    await bucketClient.pushPath(
+    const result = await bucketClient.pushPath(
       buckets[bucketName].root.key,
       `reactions/${reaction.id}.json`,
       Buffer.from(JSON.stringify({
@@ -330,6 +325,8 @@ async function updatePublicReactions(bucketClient) {
         proposal_id: reaction.proposal_id
       }))
     )
+
+    await updateBucketCache(bucketName, result);
   }
 }
 
@@ -358,7 +355,7 @@ async function updatePublicTopics(bucketClient) {
   for (const topic of topics) {
     const bucketName = await getOrCreateBucket(bucketClient, topic.community_id, topic.chain_id)
 
-    await bucketClient.pushPath(
+    const result = await bucketClient.pushPath(
       buckets[bucketName].root.key,
       `topics/${topic.id}.json`,
       Buffer.from(JSON.stringify({
@@ -367,21 +364,45 @@ async function updatePublicTopics(bucketClient) {
         telegram: topic.telegram
       }))
     )
+
+    await updateBucketCache(bucketName, result);
   }
 }
 
 async function getOrCreateBucket(bucketClient: Buckets, community: string, chain: string): Promise<string> {
   const bucketName = community ? community : chain;
+
   if (!buckets[bucketName]) {
     buckets[bucketName] = await bucketClient.getOrCreate(bucketName);
     if (!buckets[bucketName].root) {
       throw new Error('Failed to open bucket');
     }
+
+    // save a bucket instance in the db if it doesn't already exist
+    const bucketCache = (await models.BucketCache.findAll()).map(o => o.name);
+    if (!bucketCache.includes(bucketName)) {
+      await models.BucketCache.create({
+        name: bucketName,
+        ipns: buckets[bucketName].root.key,
+        ipfs: buckets[bucketName].root.path.split('/')[2]
+      })
+    }
+
     log.info(`IPNS address of ${bucketName} bucket: ${buckets[bucketName].root.key}`);
     log.info(`https://ipfs.io/ipns/${buckets[bucketName].root.key}`);
   }
 
   return bucketName
+}
+
+async function updateBucketCache(bucketName: string, pushPathResult: PushPathResult) {
+  await models.BucketCache.update({
+    ipfs: pushPathResult.root.split('/')[2]
+  }, {
+    where: {
+      name: bucketName
+    }
+  })
 }
 
 async function sequelizeTester() {
