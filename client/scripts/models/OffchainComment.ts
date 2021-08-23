@@ -16,7 +16,7 @@ class OffchainComment<T extends IUniqueId> {
   public readonly community?: string;
   public readonly authorChain?: string;
   public readonly parentComment: number;
-  public readonly rootProposal: number;
+  public readonly rootProposal: string;
   public readonly childComments: number[];
   public readonly versionHistory: VersionHistory[];
   public readonly lastEdited: moment.Moment;

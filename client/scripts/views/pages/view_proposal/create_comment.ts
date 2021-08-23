@@ -111,7 +111,7 @@ const CreateComment: m.Component<{
         'Last Comment Created': new Date().toISOString()
       });
 
-      getSetGlobalReplyStatus(GlobalStatus.Set, false, true);
+      getSetGlobalReplyStatus(GlobalStatus.Set, null, true);
     };
 
     const { error, sendingComment, uploadsInProgress } = vnode.state;
@@ -184,7 +184,7 @@ const CreateComment: m.Component<{
                   rounded: true,
                   onclick: (e) => {
                     e.preventDefault();
-                    getSetGlobalReplyStatus(GlobalStatus.Set, false, true);
+                    getSetGlobalReplyStatus(GlobalStatus.Set, null, true);
                   },
                   label: 'Cancel'
                 }),

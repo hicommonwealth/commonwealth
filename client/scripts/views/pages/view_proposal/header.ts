@@ -311,7 +311,7 @@ export const ProposalTitleEditMenuItem: m.Component<{
             const confirmed = await confirmationModalWithText('Unsubmitted replies will be lost. Continue?')();
             if (!confirmed) return;
           }
-          getSetGlobalReplyStatus(GlobalStatus.Set, false, true);
+          getSetGlobalReplyStatus(GlobalStatus.Set, null, true);
         }
         parentState.editing = true;
         getSetGlobalEditingStatus(GlobalStatus.Set, true);
