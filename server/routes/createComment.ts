@@ -25,6 +25,7 @@ export const Errors = {
   CantCommentOnReadOnly: 'Cannot comment when thread is read_only',
   InsufficientTokenBalance: 'Users need to hold some of the community\'s tokens to comment',
   CouldNotFetchTokenBalance: 'Unable to fetch user\'s token balance',
+  NestingTooDeep: 'Maximum nested comment level is 2'
 };
 
 const createComment = async (
@@ -49,10 +50,10 @@ const createComment = async (
     }
   })();
 
-  // TODO: 'let parentComment' here, saves one db query
+  let parentComment;
   if (parent_id) {
     // check that parent comment is in the same community
-    const parentCommentIsVisibleToUser = await models.OffchainComment.findOne({
+    parentComment = await models.OffchainComment.findOne({
       where: community ? {
         id: parent_id,
         community: community.id,
@@ -61,7 +62,24 @@ const createComment = async (
         chain: chain.id,
       }
     });
-    if (!parentCommentIsVisibleToUser) return next(new Error(Errors.InvalidParent));
+    if (!parentComment) return next(new Error(Errors.InvalidParent));
+  }
+
+  // Backend check to ensure comments are never nested more than three levels deep:
+  // top-level, child, and grandchild
+  if (parentComment.parent_id) {
+    const grandparentComment = await models.OffchainComment.findOne({
+      where: community ? {
+        id: parentComment.parent_id,
+        community: community.id,
+      } : {
+        id: parentComment.parent_id,
+        chain: chain.id,
+      }
+    });
+    if (grandparentComment.parent_id) {
+      return next(new Error(Errors.NestingTooDeep));
+    }
   }
 
   if (!root_id) {

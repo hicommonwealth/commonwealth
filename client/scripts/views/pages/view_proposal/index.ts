@@ -76,7 +76,8 @@ import User from '../../components/widgets/user';
 import MarkdownFormattedText from '../../components/markdown_formatted_text';
 import { createTXModal } from '../../modals/tx_signing_modal';
 import { SubstrateAccount } from '../../../controllers/chain/substrate/account';
-import { CommunityPoolSpendProposal } from '@cosmjs/stargate/build/codec/cosmos/distribution/v1beta1/distribution';
+
+const MAX_THREAD_LEVEL = 2;
 
 const ProposalHeader: m.Component<{
   commentCount: number;
@@ -491,6 +492,9 @@ const ProposalComments: m.Component<{
       parentComment: OffchainComment<any>,
       threadLevel: number = 1
     ) => {
+      // Remove this check + /createComment server-side checks to allow >2 lvls of threading
+      const canContinueThreading = threadLevel <= MAX_THREAD_LEVEL;
+      console.log({ canContinueThreading });
       return childComments.map((child: OffchainComment<any>) => {
         if (!child) return;
         const furtherChildren = app.comments.getByProposal(proposal).filter((c) => c.parentComment === child.id);
@@ -507,8 +511,10 @@ const ProposalComments: m.Component<{
             isLast: false, // TODO: implement isLast
           }),
           !!furtherChildren.length
+            && canContinueThreading
             && recursivelyGatherChildComments(furtherChildren, child, threadLevel + 1),
-          nestedReplyForm(child),
+          canContinueThreading
+            && nestedReplyForm(child),
         ]);
       });
     };
