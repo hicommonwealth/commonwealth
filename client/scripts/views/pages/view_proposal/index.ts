@@ -93,6 +93,7 @@ export interface IProposalPageState {
   recentlyEdited: boolean,
   replying: boolean,
   parentCommentId: number, // if null or undefined, reply is thread-scoped
+  recentlySubmitted: number, // comment ID for CSS highlight transitions
   highlightedComment: boolean,
   prefetch: IPrefetch,
   comments,
@@ -533,6 +534,7 @@ const ProposalComments: m.Component<{
   getSetGlobalEditingStatus: CallableFunction;
   proposalPageState: IProposalPageState;
   user?: any;
+  recentlySubmitted?: number;
 }, {
   commentError: any;
   dom;
@@ -1040,7 +1042,8 @@ const ViewProposalPage: m.Component<{
         comments,
         createdCommentCallback,
         getSetGlobalEditingStatus,
-        proposalPageState: vnode.state
+        proposalPageState: vnode.state,
+        recentlySubmitted: vnode.state.recentlySubmitted
       }),
     ]);
   }

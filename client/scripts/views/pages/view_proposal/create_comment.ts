@@ -15,6 +15,7 @@ import User from 'views/components/widgets/user';
 import { notifyError } from 'controllers/app/notifications';
 import { GlobalStatus } from './body';
 import { IProposalPageState } from '.';
+import jumpHighlightComment from './jump_to_comment';
 
 const CreateComment: m.Component<{
   callback: CallableFunction,
@@ -88,10 +89,12 @@ const CreateComment: m.Component<{
           vnode.state.quillEditorState.clearUnsavedChanges();
         }
         vnode.state.sendingComment = false;
+        proposalPageState.recentlySubmitted = res.id;
         // TODO: Instead of completely refreshing notifications, just add the comment to subscriptions
         // once we are receiving notifications from the websocket
         await app.user.notifications.refresh();
         m.redraw();
+        jumpHighlightComment(res.id);
       } catch (err) {
         console.log(err);
         notifyError(err.message || 'Comment submission failed.');

@@ -154,7 +154,8 @@ class CommentsController {
         'jwt': app.user.jwt,
       });
       const { result } = res;
-      this._store.add(modelFromServer(result));
+      const newComment = modelFromServer(result);
+      this._store.add(newComment);
       const activeEntity = app.activeCommunityId() ? app.community : app.chain;
       updateLastVisited(app.activeCommunityId()
         ? (activeEntity.meta as CommunityInfo)
@@ -164,6 +165,7 @@ class CommentsController {
         const parent = this._store.getById(+result.parent_id);
         parent.childComments.push(result.id);
       }
+      return newComment;
     } catch (err) {
       console.log('Failed to create comment');
       throw new Error((err.responseJSON && err.responseJSON.error)

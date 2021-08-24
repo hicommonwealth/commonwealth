@@ -12,11 +12,21 @@ $discussion-title-font-size: 1.45rem;
 
 @mixin supports-jump-highlight() {
     &.highlighted {
-        background-color: $background-color-unread;
+        border-radius: 20px;
+        background-color: $background-color-new-comment;
+        z-index: -2;
+        .thread-connector {
+            background: #00C0A9;
+        }
     }
     &.highlighted.highlightAnimationComplete {
-        background-color: $text-color-white;
+        background-color: transparent;
         transition: background-color 1s ease-in-out;
+        z-index: 0;
+        .thread-connector {
+            background: $background-color-light;
+            transition: background 1s ease-in-out;
+        }
     }
 }
 
@@ -81,6 +91,11 @@ $discussion-title-font-size: 1.45rem;
             .cancel-editing {
                 margin-right: 15px;
             }
+        }
+    }
+    .threading-level-1 {
+        .new-comment-child {
+            margin-left: 108px !important;
         }
     }
     .threading-level-2 {
@@ -270,8 +285,11 @@ $discussion-title-font-size: 1.45rem;
         .threading-level {
             margin-left: 54px;
         }
-        .comment-child, .new-comment-child {
+        .comment-child {
             margin-left: 36px;
+        }
+        .new-comment-child {
+            margin-left: 72px;
         }
         .ProposalBodyReaction, .InlineReplyButton {
             margin-top: $discussion-reaction-padding;
