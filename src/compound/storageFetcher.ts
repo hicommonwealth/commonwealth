@@ -55,7 +55,7 @@ export class StorageFetcher extends IStorageFetcher<Api> {
 
     // populate range fully if not given
     if (!range) {
-      range = { startBlock: 0, endBlock: this._currentBlock };
+      range = { startBlock: 0 };
     } else if (!range.startBlock) {
       range.startBlock = 0;
     } else if (range.startBlock >= this._currentBlock) {
@@ -68,11 +68,8 @@ export class StorageFetcher extends IStorageFetcher<Api> {
       log.error(`Invalid fetch range: ${range.startBlock}-${range.endBlock}.`);
       return [];
     }
-    if (!range.endBlock) {
-      range.endBlock = this._currentBlock;
-    }
     log.info(
-      `Fetching Aave entities for range: ${range.startBlock}-${range.endBlock}.`
+      `Fetching Compound entities for range: ${range.startBlock}-${range.endBlock}.`
     );
 
     const proposalCreatedEvents = await this._api.queryFilter(
@@ -88,7 +85,7 @@ export class StorageFetcher extends IStorageFetcher<Api> {
         null
       ),
       range.startBlock,
-      range.endBlock
+      range.endBlock || 'latest'
     );
 
     // sort in descending order (newest first)
@@ -98,22 +95,22 @@ export class StorageFetcher extends IStorageFetcher<Api> {
     const voteCastEvents = await this._api.queryFilter(
       this._api.filters.VoteCast(null, null, null, null),
       range.startBlock,
-      range.endBlock
+      range.endBlock || 'latest'
     );
     const proposalQueuedEvents = await this._api.queryFilter(
       this._api.filters.ProposalQueued(null, null),
       range.startBlock,
-      range.endBlock
+      range.endBlock || 'latest'
     );
     const proposalCanceledEvents = await this._api.queryFilter(
       this._api.filters.ProposalCanceled(null),
       range.startBlock,
-      range.endBlock
+      range.endBlock || 'latest'
     );
     const proposalExecutedEvents = await this._api.queryFilter(
       this._api.filters.ProposalExecuted(null),
       range.startBlock,
-      range.endBlock
+      range.endBlock || 'latest'
     );
 
     const proposals = await Promise.all(

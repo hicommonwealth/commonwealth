@@ -69,7 +69,7 @@ const contracts = {
   'aave-local': '0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9',
   'dydx-ropsten': '0x6938240Ba19cB8a614444156244b658f650c8D5c',
   dydx: '0x7E9B1672616FF6D6629Ef2879419aaE79A9018D2',
-  uniswap: '0x5e4be8Bc9637f0EAA1A755019e06A68ce081D58F',
+  uniswap: '0xc4e172459f1e7939d522503b81afaac1014ce6f6',
 };
 
 const { argv } = yargs

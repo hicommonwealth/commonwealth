@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Contract } from 'ethers';
+import { Contract, utils } from 'ethers';
 
 import { GovernorAlpha } from '../../contractTypes';
 import { TypedEventFilter } from '../../contractTypes/commons';
@@ -34,13 +34,39 @@ export async function Enrich(
       };
     }
     case EventKind.ProposalCreated: {
-      const {
+      // workaround to switch description decoding to "bytes" in order to
+      // avoid unicode decoding errors involving invalid codepoints
+      // to reproduce: try the uniswap governor alpha
+      // also works around the "results" field being unqueryable using the TypedEvent
+      const result = utils.defaultAbiCoder.decode(
+        [
+          'uint',
+          'address',
+          'address[]',
+          'uint[]',
+          'string[]',
+          'bytes[]',
+          'uint',
+          'uint',
+          'bytes',
+        ],
+        rawData.data
+      );
+      const [
         id,
         proposer,
+        targets,
+        values,
+        signatures,
+        calldatas,
         startBlock,
         endBlock,
-        description,
-      } = rawData.args as GetArgType<GovernorAlpha, 'ProposalCreated'>;
+        descriptionBytes,
+      ] = result;
+      const description = utils.toUtf8String(
+        descriptionBytes,
+        utils.Utf8ErrorFuncs.ignore
+      );
 
       return {
         blockNumber,
@@ -49,6 +75,10 @@ export async function Enrich(
           kind,
           id: +id,
           proposer,
+          targets,
+          values: values.map((v) => v.toString()),
+          signatures,
+          calldatas,
           startBlock: +startBlock,
           endBlock: +endBlock,
           description,
