@@ -178,7 +178,7 @@ const ProposalHeader: m.Component<{
                       vnode.state.topicEditorIsOpen = true;
                     }
                   }),
-                  (isAuthor || isAdmin)
+                  (isAuthor || isAdmin  || app.user.isSiteAdmin)
                     && m(ProposalBodyDeleteMenuItem, { item: proposal }),
                   (isAuthor || isAdmin)
                     && m(ProposalHeaderPrivacyMenuItems, { proposal, getSetGlobalEditingStatus }),
