@@ -7,13 +7,19 @@ export const ChainIcon: m.Component<{ chain: ChainInfo, onclick?: Function, size
   view: (vnode) => {
     const { onclick } = vnode.attrs;
     const size = vnode.attrs.size || 32;
+    const iconUrl = vnode.attrs.chain.iconUrl || (vnode.attrs.chain as any).icon_url;
 
     return m('.ChainIcon', { class: onclick ? 'onclick' : '' }, [
-      m('img.chain-icon', {
+      iconUrl ? m('img.chain-icon', {
         style: `width: ${size}px; height: ${size}px;`,
-        src: vnode.attrs.chain.iconUrl || (vnode.attrs.chain as any).icon_url,
+        src: iconUrl,
         onclick
-      }),
+      }) : m('.chain-icon.no-image', {
+        style: `width: ${size}px; height: ${size}px;`,
+        onclick
+      }, [
+        m('span', vnode.attrs.chain.name.slice(0, 1))
+      ]),
     ]);
   }
 };

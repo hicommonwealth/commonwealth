@@ -160,7 +160,7 @@ const instantiateEditor = (
       if (!html && files.length > 0) {
         this.quill.uploader.upload(range, files);
       } else {
-        this.onPaste(range, isMarkdownMode() ? { html: text, text } : { html, text });
+        this.onPaste(range, isMarkdownMode() ? { text } : { html, text });
       }
     }
   }
@@ -651,7 +651,7 @@ const instantiateEditor = (
           [
             Node.ELEMENT_NODE,
             (node, delta) => {
-	      return delta.compose(
+              return delta.compose(
                 new Delta().retain(delta.length(), {
                   header: false,
                   align: false,
@@ -659,8 +659,8 @@ const instantiateEditor = (
                   background: false,
                 })
               );
-	    }
-	  ]
+            }
+          ]
         ]
       }
     },
