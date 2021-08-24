@@ -176,31 +176,6 @@ export const ProposalBodyLastEdited: m.Component<{ item: OffchainThread | Offcha
   }
 };
 
-export const ProposalBodyReplyMenuItem: m.Component<{
-  item: OffchainComment<any>,
-  proposalPageState: IProposalPageState,
-  parentType?,
-  parentState
-}> = {
-  view: (vnode) => {
-    const { item, parentType, parentState, proposalPageState } = vnode.attrs;
-    if (!item) return;
-
-    return m(MenuItem, {
-      label: 'Comment',
-      onclick: async (e) => {
-        e.preventDefault();
-        if (proposalPageState.replying && activeQuillEditorHasText()) {
-          const confirmed = await confirmationModalWithText('Unsent comments will be lost. Continue?')();
-          if (!confirmed) return;
-        }
-        proposalPageState.replying = false;
-        proposalPageState.parentCommentId = null;
-      },
-    });
-  }
-};
-
 export const ProposalBodyEditMenuItem: m.Component<{
   item: OffchainThread | OffchainComment<any>,
   parentState

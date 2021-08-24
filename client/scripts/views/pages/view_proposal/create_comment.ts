@@ -173,12 +173,17 @@ const CreateComment: m.Component<{
                 intent: 'primary',
                 type: 'submit',
                 compact: true,
-                disabled: getSetGlobalEditingStatus(GlobalStatus.Get) || sendingComment || uploadsInProgress > 0,
+                disabled: (
+                  getSetGlobalEditingStatus(GlobalStatus.Get)
+                  || vnode.state.quillEditorState?.editor?.editor?.isBlank()
+                  || sendingComment
+                  || uploadsInProgress > 0
+                ),
                 rounded: true,
                 onclick: submitComment,
                 label: (uploadsInProgress > 0)
                   ? 'Uploading...'
-                  : parentType === CommentParent.Proposal ? 'Post comment' : 'Reply to comment'
+                  : 'Submit'
               }),
               cancellable
                 && m(Button, {

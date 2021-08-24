@@ -38,8 +38,7 @@ $discussion-title-font-size: 1.45rem;
             padding-top: 30px;
         }
     }
-    .ProposalComments.no-active-account,
-    .CreateComment {
+    .ProposalComments.no-active-account {
         padding-bottom: $discussion-outer-padding;
     }
     .proposal-body-bottom, .comment-body-bottom {
