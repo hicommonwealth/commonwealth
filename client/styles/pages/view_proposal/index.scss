@@ -54,7 +54,10 @@ $discussion-title-font-size: 1.45rem;
             .InlineReplyButton,
             .ProposalBodyReaction {
                 margin-right: 10%;
+                padding: 6px;
                 &:hover {
+                    background: #F7F4FF;
+                    border-radius: 8px;
                     .cui-icon, .reply-count, .reactions-count {
                         color: #4723AD;
                     }
@@ -78,6 +81,11 @@ $discussion-title-font-size: 1.45rem;
             .cancel-editing {
                 margin-right: 15px;
             }
+        }
+    }
+    .threading-level-2 {
+        .InlineReplyButton {
+            display: none;
         }
     }
     h3 {
