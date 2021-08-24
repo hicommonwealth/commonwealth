@@ -63,24 +63,25 @@ const createComment = async (
       }
     });
     if (!parentComment) return next(new Error(Errors.InvalidParent));
-  }
 
-  // Backend check to ensure comments are never nested more than three levels deep:
-  // top-level, child, and grandchild
-  if (parentComment.parent_id) {
-    const grandparentComment = await models.OffchainComment.findOne({
-      where: community ? {
-        id: parentComment.parent_id,
-        community: community.id,
-      } : {
-        id: parentComment.parent_id,
-        chain: chain.id,
+    // Backend check to ensure comments are never nested more than three levels deep:
+    // top-level, child, and grandchild
+    if (parentComment.parent_id) {
+      const grandparentComment = await models.OffchainComment.findOne({
+        where: community ? {
+          id: parentComment.parent_id,
+          community: community.id,
+        } : {
+          id: parentComment.parent_id,
+          chain: chain.id,
+        }
+      });
+      if (grandparentComment?.parent_id) {
+        return next(new Error(Errors.NestingTooDeep));
       }
-    });
-    if (grandparentComment.parent_id) {
-      return next(new Error(Errors.NestingTooDeep));
     }
   }
+
 
   if (!root_id) {
     return next(new Error(Errors.MissingRootId));

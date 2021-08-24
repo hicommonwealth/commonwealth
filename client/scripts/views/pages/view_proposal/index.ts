@@ -810,7 +810,6 @@ const ViewProposalPage: m.Component<{
     const getSetGlobalReplyStatus = (call: string, parentId?: number, suppressScrollToForm?: boolean) => {
       if (call === GlobalStatus.Get) return vnode.state.replyParentId;
       if (call === GlobalStatus.Set) {
-        if (!parentId) console.error('Must pass parentId when setting global reply status.');
         vnode.state.replyParentId = parentId;
         m.redraw.sync();
 
@@ -819,7 +818,6 @@ const ViewProposalPage: m.Component<{
 
         // scroll to new reply form if parentId is available, scroll to proposal-level comment form otherwise
         setTimeout(() => {
-          debugger
           const $reply = parentId
             ? $(`.comment-${parentId}`).nextAll('.CreateComment')
             : $('.ProposalComments > .CreateComment');
