@@ -65,6 +65,7 @@ export async function initAppState(updateSelectedNode = true, customDomain = nul
           url: node.url,
           chain: app.config.chains.getById(node.chain),
           address: node.address,
+          token_name: node.token_name,
         }));
       });
       data.communities.sort((a, b) => a.id - b.id).map((community) => {
