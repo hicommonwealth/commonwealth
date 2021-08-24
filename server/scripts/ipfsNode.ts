@@ -27,10 +27,13 @@ const IPFS_ONLY_CHAIN_OR_COMM = process.env.IPFS_ONLY_CHAIN_OR_COMM || null
 // the combination of IPFS_LAST_UPDATE and IPFS_ONLY_CHAIN_OR_COMM allows us to
 // completely refresh the ipfs bucket for any specific community
 
+// boolean where true means all bucket pushes happen asynchronously
+const IPFS_ASYNC_PUSH = process.env.IPFS_ASYNC_PUSH || true
+
 async function main() {
-  const user = await PrivateKey.fromRandom();
-  const bucketClient = await Buckets.withKeyInfo({ key: process.env.HUB_CW_KEY });
-  const token = await bucketClient.getToken(user);
+  // const user = await PrivateKey.fromRandom();
+  let bucketClient = await Buckets.withKeyInfo({ key: process.env.HUB_CW_KEY });
+  // const token = await bucketClient.getToken(user);
 
   now = new Date()
 
@@ -168,6 +171,8 @@ async function updateAddresses(bucketClient) {
     )
     await updateBucketCache('Addresses', result);
   }
+
+  log.info('Finished updating addresses')
 }
 
 /**
@@ -195,18 +200,27 @@ async function updatePublicCommunities(bucketClient) {
     communities = communities.filter(o => !o.privacyEnabled)
   }
 
+  const promises = [];
   for (const comm of communities) {
     if (IPFS_ONLY_CHAIN_OR_COMM && IPFS_ONLY_CHAIN_OR_COMM != comm.id) continue;
 
     await getOrCreateBucket(bucketClient, comm.id, !!comm.privacyEnabled)
 
-    const result = await bucketClient.pushPath(
+    const data = [
       buckets[comm.id].root.key,
       'index.json',
       Buffer.from(JSON.stringify(comm))
-    )
-    await updateBucketCache(comm.id, result);
+    ]
+
+    if (IPFS_ASYNC_PUSH) promises.push(bucketClient.pushPath(...data))
+    else {
+      const result = await bucketClient.pushPath(...data)
+      await updateBucketCache(comm.id, result);
+    }
   }
+
+  if (IPFS_ASYNC_PUSH) await Promise.all(promises)
+  log.info('Finished updating communities')
 }
 
 async function updatePublicThreads(bucketClient) {
@@ -237,12 +251,13 @@ async function updatePublicThreads(bucketClient) {
     updatedThreads = updatedThreads.filter(o => !o.OffchainCommunity?.privacyEnabled)
   }
 
+  const promises = [];
   for (const thread of updatedThreads) {
     const bucketName = thread.community || thread.chain;
     if (IPFS_ONLY_CHAIN_OR_COMM && IPFS_ONLY_CHAIN_OR_COMM != bucketName) continue;
     await getOrCreateBucket(bucketClient, bucketName, !!thread.OffchainCommunity?.privacyEnabled)
 
-    const result = await bucketClient.pushPath(
+    const data = [
       buckets[bucketName].root.key,
       `threads/${thread.id}.json`,
       Buffer.from(JSON.stringify({
@@ -254,9 +269,16 @@ async function updatePublicThreads(bucketClient) {
         stage: thread.stage,
         topic: thread.topic_id
       }))
-    )
-    await updateBucketCache(bucketName, result);
+    ]
+    if (IPFS_ASYNC_PUSH) promises.push(bucketClient.pushPath(...data))
+    else {
+      const result = await bucketClient.pushPath(...data)
+      await updateBucketCache(bucketName, result);
+    }
   }
+  if (IPFS_ASYNC_PUSH) await Promise.all(promises)
+
+  log.info('Finished updating threads')
 }
 
 // root id gives use the id of the thread
@@ -287,12 +309,13 @@ async function updatePublicComments(bucketClient) {
     comments = comments.filter(o => !o.OffchainCommunity?.privacyEnabled)
   }
 
+  const promises = [];
   for (const comment of comments) {
     const bucketName = comment.community || comment.chain;
     if (IPFS_ONLY_CHAIN_OR_COMM && IPFS_ONLY_CHAIN_OR_COMM != bucketName) continue;
     await getOrCreateBucket(bucketClient, bucketName, !!comment.OffchainCommunity?.privacyEnabled)
 
-    const result = await bucketClient.pushPath(
+    const data = [
       buckets[bucketName].root.key,
       `comments/${comment.id}.json`,
       Buffer.from(JSON.stringify({
@@ -300,9 +323,17 @@ async function updatePublicComments(bucketClient) {
         text: comment.text,
         root_id: comment.root_id
       }))
-    )
-    await updateBucketCache(bucketName, result);
+    ]
+
+    if (IPFS_ASYNC_PUSH) promises.push(bucketClient.pushPath(...data))
+    else {
+      const result = await bucketClient.pushPath(...data)
+      await updateBucketCache(bucketName, result);
+    }
   }
+
+  if (IPFS_ASYNC_PUSH) await Promise.all(promises)
+  log.info('Finished updating comments')
 }
 
 async function updatePublicReactions(bucketClient) {
@@ -331,12 +362,13 @@ async function updatePublicReactions(bucketClient) {
     reactions = reactions.filter(o => !o.OffchainCommunity?.privacyEnabled)
   }
 
+  const promises = [];
   for (const reaction of reactions) {
     const bucketName = reaction.community || reaction.chain
     if (IPFS_ONLY_CHAIN_OR_COMM && IPFS_ONLY_CHAIN_OR_COMM != bucketName) continue;
     await getOrCreateBucket(bucketClient, bucketName, !!reaction.OffchainCommunity?.privacyEnabled)
 
-    const result = await bucketClient.pushPath(
+    const data = [
       buckets[bucketName].root.key,
       `reactions/${reaction.id}.json`,
       Buffer.from(JSON.stringify({
@@ -345,10 +377,17 @@ async function updatePublicReactions(bucketClient) {
         comment_id: reaction.comment_id,
         proposal_id: reaction.proposal_id
       }))
-    )
+    ];
 
-    await updateBucketCache(bucketName, result);
+    if (IPFS_ASYNC_PUSH) promises.push(bucketClient.pushPath(...data))
+    else {
+      const result = await bucketClient.pushPath(...data);
+      await updateBucketCache(bucketName, result);
+    }
   }
+
+  if (IPFS_ASYNC_PUSH) await Promise.all(promises)
+  log.info('Finished updating reactions')
 }
 
 async function updatePublicTopics(bucketClient) {
@@ -374,12 +413,13 @@ async function updatePublicTopics(bucketClient) {
     topics = topics.filter(o => !o.community?.privacyEnabled)
   }
 
+  const promises = [];
   for (const topic of topics) {
     const bucketName = topic.community_id || topic.chain_id;
     if (IPFS_ONLY_CHAIN_OR_COMM && IPFS_ONLY_CHAIN_OR_COMM != bucketName) continue;
     await getOrCreateBucket(bucketClient, bucketName, !!topic.community?.privacyEnabled)
 
-    const result = await bucketClient.pushPath(
+    const data = [
       buckets[bucketName].root.key,
       `topics/${topic.id}.json`,
       Buffer.from(JSON.stringify({
@@ -387,10 +427,17 @@ async function updatePublicTopics(bucketClient) {
         description: topic.description,
         telegram: topic.telegram
       }))
-    )
+    ];
 
-    await updateBucketCache(bucketName, result);
+    if (IPFS_ASYNC_PUSH) promises.push(bucketClient.pushPath(...data))
+    else {
+      const result = await bucketClient.pushPath(...data)
+      await updateBucketCache(bucketName, result);
+    }
   }
+
+  if (IPFS_ASYNC_PUSH) await Promise.all(promises)
+  log.info('Finished updating topics')
 }
 
 async function getOrCreateBucket(bucketClient: Buckets, bucketName: string, encrypted?: boolean): Promise<string> {
