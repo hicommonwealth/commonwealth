@@ -28,6 +28,7 @@ import ReactionButton, { ReactionType } from 'views/components/reaction_button';
 import { MenuItem, Button, Dialog, QueryList, Classes, ListItem, Icon, Icons, Popover } from 'construct-ui';
 import { notifyError, notifyInfo, notifySuccess } from 'controllers/app/notifications';
 import { validURL } from '../../../../../shared/utils';
+import { IProposalPageState } from '.';
 
 export enum GlobalStatus {
   Get = 'get',
@@ -176,31 +177,38 @@ export const ProposalBodyLastEdited: m.Component<{ item: OffchainThread | Offcha
 };
 
 export const ProposalBodyReplyMenuItem: m.Component<{
-  item: OffchainComment<any>, getSetGlobalReplyStatus, parentType?, parentState
+  item: OffchainComment<any>,
+  proposalPageState: IProposalPageState,
+  parentType?,
+  parentState
 }> = {
   view: (vnode) => {
-    const { item, parentType, parentState, getSetGlobalReplyStatus } = vnode.attrs;
+    const { item, parentType, parentState, proposalPageState } = vnode.attrs;
     if (!item) return;
 
     return m(MenuItem, {
       label: 'Comment',
       onclick: async (e) => {
         e.preventDefault();
-        if (getSetGlobalReplyStatus(GlobalStatus.Get) && activeQuillEditorHasText()) {
+        if (proposalPageState.replying && activeQuillEditorHasText()) {
           const confirmed = await confirmationModalWithText('Unsent comments will be lost. Continue?')();
           if (!confirmed) return;
         }
-        getSetGlobalReplyStatus(GlobalStatus.Set, item.id);
+        proposalPageState.replying = false;
+        proposalPageState.parentCommentId = null;
       },
     });
   }
 };
 
 export const ProposalBodyEditMenuItem: m.Component<{
-  item: OffchainThread | OffchainComment<any>, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState
+  item: OffchainThread | OffchainComment<any>,
+  parentState
+  proposalPageState: IProposalPageState,
+  getSetGlobalEditingStatus,
 }> = {
   view: (vnode) => {
-    const { item, getSetGlobalEditingStatus, getSetGlobalReplyStatus, parentState } = vnode.attrs;
+    const { item, getSetGlobalEditingStatus, proposalPageState, parentState } = vnode.attrs;
     if (!item) return;
     if (item instanceof OffchainThread && item.readOnly) return;
     const isThread = item instanceof OffchainThread;
@@ -211,12 +219,13 @@ export const ProposalBodyEditMenuItem: m.Component<{
       onclick: async (e) => {
         e.preventDefault();
         parentState.currentText = item instanceof OffchainThread ? item.body : item.text;
-        if (getSetGlobalReplyStatus(GlobalStatus.Get)) {
+        if (proposalPageState.replying) {
           if (activeQuillEditorHasText()) {
             const confirmed = await confirmationModalWithText('Unsubmitted replies will be lost. Continue?')();
             if (!confirmed) return;
           }
-          getSetGlobalReplyStatus(GlobalStatus.Set, null, true);
+          proposalPageState.replying = false;
+          proposalPageState.parentCommentId = null;
         }
         parentState.editing = true;
         getSetGlobalEditingStatus(GlobalStatus.Set, true);

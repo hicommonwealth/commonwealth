@@ -79,11 +79,52 @@ import { SubstrateAccount } from '../../../controllers/chain/substrate/account';
 
 const MAX_THREAD_LEVEL = 2;
 
+interface IPrefetch {
+  [identifier: string]: {
+    commentsStarted: boolean,
+    viewCountStarted: boolean,
+    profilesStarted: boolean,
+    profilesFinished: boolean,
+  }
+}
+
+export interface IProposalPageState {
+  editing: boolean,
+  recentlyEdited: boolean,
+  replying: boolean,
+  parentCommentId: number, // if null or undefined, reply is thread-scoped
+  highlightedComment: boolean,
+  prefetch: IPrefetch,
+  comments,
+  viewCount: number,
+  proposal: AnyProposal | OffchainThread,
+  threadFetched,
+  threadFetchFailed,
+  pollEditorIsOpen: boolean,
+  stageEditorIsOpen: boolean,
+  tipAmount: number,
+}
+
+const InlineReplyButton: m.Component<{ commentReplyCount: number, onclick }, {}> = {
+  view: (vnode) => {
+    const { commentReplyCount, onclick } = vnode.attrs;
+    return m('.InlineReplyButton', {
+      onclick
+    }, [
+      m(Icon, {
+        name: Icons.MESSAGE_SQUARE,
+        size: Size.XL,
+      }),
+      m('.reply-count', commentReplyCount)
+    ]);
+  }
+};
+
 const ProposalHeader: m.Component<{
   commentCount: number;
   viewCount: number;
   getSetGlobalEditingStatus: CallableFunction;
-  getSetGlobalReplyStatus: CallableFunction;
+  proposalPageState: IProposalPageState;
   proposal: AnyProposal | OffchainThread;
   isAuthor: boolean;
   isEditor: boolean;
@@ -108,7 +149,7 @@ const ProposalHeader: m.Component<{
       commentCount,
       proposal,
       getSetGlobalEditingStatus,
-      getSetGlobalReplyStatus,
+      proposalPageState,
       viewCount,
       isAuthor,
       isEditor,
@@ -168,7 +209,10 @@ const ProposalHeader: m.Component<{
                 content: [
                   (isEditor || isAuthor)
                     && m(ProposalBodyEditMenuItem, {
-                      item: proposal, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state,
+                      item: proposal,
+                      proposalPageState: vnode.attrs.proposalPageState,
+                      getSetGlobalEditingStatus,
+                      parentState: vnode.state,
                     }),
                   isAuthor && m(EditPermissionsButton, {
                     openEditPermissions: () => {
@@ -259,7 +303,7 @@ const ProposalHeader: m.Component<{
                 content: [
                   m(ProposalTitleEditMenuItem, {
                     item: proposal,
-                    getSetGlobalReplyStatus,
+                    proposalPageState,
                     getSetGlobalEditingStatus,
                     parentState: vnode.state,
                   }),
@@ -312,6 +356,13 @@ const ProposalHeader: m.Component<{
             !vnode.state.editing
               && m('.proposal-response-row', [
                 m(ProposalBodyReaction, { item: proposal }),
+                m(InlineReplyButton, {
+                  commentReplyCount: commentCount,
+                  onclick: (e) => {
+                    proposalPageState.replying = !proposalPageState.replying;
+                    proposalPageState.parentCommentId = null;
+                  }
+                })
               ])
           ])
         ]),
@@ -323,25 +374,10 @@ const ProposalHeader: m.Component<{
   }
 };
 
-const InlineReplyButton: m.Component<{ commentReplyCount: number, onclick }, {}> = {
-  view: (vnode) => {
-    const { commentReplyCount, onclick } = vnode.attrs;
-    return m('.InlineReplyButton', {
-      onclick
-    }, [
-      m(Icon, {
-        name: Icons.MESSAGE_SQUARE,
-        size: Size.XL,
-      }),
-      m('.reply-count', commentReplyCount)
-    ]);
-  }
-};
-
 const ProposalComment: m.Component<{
   comment: OffchainComment<any>;
   getSetGlobalEditingStatus: CallableFunction;
-  getSetGlobalReplyStatus: CallableFunction;
+  proposalPageState: IProposalPageState;
   parent?: AnyProposal | OffchainComment<any> | OffchainThread;
   proposal: AnyProposal | OffchainThread;
   callback?: Function;
@@ -356,7 +392,7 @@ const ProposalComment: m.Component<{
     const {
       comment,
       getSetGlobalEditingStatus,
-      getSetGlobalReplyStatus,
+      proposalPageState,
       proposal,
       callback,
       isLast
@@ -395,7 +431,7 @@ const ProposalComment: m.Component<{
               closeOnContentClick: true,
               content: [
                 m(ProposalBodyEditMenuItem, {
-                  item: comment, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state,
+                  item: comment, proposalPageState, getSetGlobalEditingStatus, parentState: vnode.state,
                 }),
                 m(ProposalBodyDeleteMenuItem, { item: comment, refresh: () => callback(), }),
                 // parentType === CommentParent.Proposal // For now, we are limiting threading to 1 level deep
@@ -449,7 +485,8 @@ const ProposalComment: m.Component<{
               m(InlineReplyButton, {
                 commentReplyCount,
                 onclick: (e) => {
-                  getSetGlobalReplyStatus(GlobalStatus.Set, comment.id);
+                  proposalPageState.replying = !proposalPageState.replying;
+                  proposalPageState.parentCommentId = proposalPageState.replying ? comment.id : null;
                 }
               })
             ]),
@@ -464,8 +501,8 @@ const ProposalComments: m.Component<{
   comments: Array<OffchainComment<any>>;
   createdCommentCallback: CallableFunction;
   getSetGlobalEditingStatus: CallableFunction;
-  getSetGlobalReplyStatus: CallableFunction;
-  replyParentId: number;
+  proposalPageState: IProposalPageState;
+  parentCommentId: number;
   user?: any;
 }, {
   commentError: any;
@@ -475,7 +512,7 @@ const ProposalComments: m.Component<{
   view: (vnode) => {
     const {
       proposal, comments, createdCommentCallback, getSetGlobalEditingStatus,
-      getSetGlobalReplyStatus, replyParentId
+      proposalPageState, parentCommentId
     } = vnode.attrs;
     // Jump to the comment indicated in the URL upon page load. Avoid
     // using m.route.param('comment') because it may return stale
@@ -488,22 +525,22 @@ const ProposalComments: m.Component<{
       if (commentId) jumpHighlightComment(commentId);
     }
 
-    const nestedReplyForm = (comment) => {
-      // if current comment is replyParent, & no posts are being edited, a nested comment form is rendered
-      if (
-        getSetGlobalReplyStatus(GlobalStatus.Get) === comment.id
-        && !getSetGlobalEditingStatus(GlobalStatus.Get)
-      ) {
-        return m(CreateComment, {
-          callback: createdCommentCallback,
-          cancellable: true,
-          getSetGlobalEditingStatus,
-          getSetGlobalReplyStatus,
-          parentComment: comment,
-          rootProposal: proposal
-        });
-      }
-    };
+    // const nestedReplyForm = (comment) => {
+    //   // if current comment is replyParent, & no posts are being edited, a nested comment form is rendered
+    //   if (
+    //     getSetGlobalReplyStatus(GlobalStatus.Get) === comment.id
+    //     && !getSetGlobalEditingStatus(GlobalStatus.Get)
+    //   ) {
+    //     return m(CreateComment, {
+    //       callback: createdCommentCallback,
+    //       cancellable: true,
+    //       getSetGlobalEditingStatus,
+    //       getSetGlobalReplyStatus,
+    //       parentComment: comment,
+    //       rootProposal: proposal
+    //     });
+    //   }
+    // };
 
     const recursivelyGatherChildComments = (
       childComments: OffchainComment<any>[],
@@ -521,7 +558,7 @@ const ProposalComments: m.Component<{
           m(ProposalComment, {
             comment: child,
             getSetGlobalEditingStatus,
-            getSetGlobalReplyStatus,
+            proposalPageState,
             parent: parentComment,
             proposal,
             callback: createdCommentCallback,
@@ -530,8 +567,8 @@ const ProposalComments: m.Component<{
           !!furtherChildren.length
             && canContinueThreading
             && recursivelyGatherChildComments(furtherChildren, child, threadLevel + 1),
-          canContinueThreading
-            && nestedReplyForm(child),
+          // canContinueThreading
+          //   && nestedReplyForm(child),
         ]);
       });
     };
@@ -544,7 +581,7 @@ const ProposalComments: m.Component<{
           m(ProposalComment, {
             comment,
             getSetGlobalEditingStatus,
-            getSetGlobalReplyStatus,
+            proposalPageState,
             parent: proposal,
             proposal,
             callback: createdCommentCallback,
@@ -553,7 +590,7 @@ const ProposalComments: m.Component<{
           // if comment has children, they are fetched & rendered
           !!childComments.length
             && recursivelyGatherChildComments(childComments, comment, 1),
-          nestedReplyForm(comment),
+          // nestedReplyForm(comment),
         ]);
       });
     };
@@ -566,15 +603,6 @@ const ProposalComments: m.Component<{
       comments
       && m('.proposal-comments', renderComments(comments)),
       // create comment
-      app.user.activeAccount
-        && !getSetGlobalReplyStatus(GlobalStatus.Get)
-        && m(CreateComment, {
-          callback: createdCommentCallback,
-          cancellable: false,
-          getSetGlobalEditingStatus,
-          getSetGlobalReplyStatus,
-          rootProposal: proposal,
-        }),
       // errors
       vnode.state.commentError
         && m('.comments-error', vnode.state.commentError),
@@ -582,33 +610,10 @@ const ProposalComments: m.Component<{
   }
 };
 
-interface IPrefetch {
-  [identifier: string]: {
-    commentsStarted: boolean,
-    viewCountStarted: boolean,
-    profilesStarted: boolean,
-    profilesFinished: boolean,
-  }
-}
-
 const ViewProposalPage: m.Component<{
   identifier: string,
   type: string
-}, {
-  editing: boolean,
-  recentlyEdited: boolean,
-  replyParentId: number,
-  highlightedComment: boolean,
-  prefetch: IPrefetch,
-  comments,
-  viewCount: number,
-  proposal: AnyProposal | OffchainThread,
-  threadFetched,
-  threadFetchFailed,
-  pollEditorIsOpen: boolean,
-  stageEditorIsOpen: boolean,
-  tipAmount: number,
-}> = {
+}, IProposalPageState> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'ViewProposalPage' });
     mixpanel.track('Proposal Funnel', {
@@ -824,43 +829,43 @@ const ViewProposalPage: m.Component<{
     };
 
     // TODO: Can this be removed?
-    const getSetGlobalReplyStatus = (call: string, parentId?: number, suppressScrollToForm?: boolean) => {
-      if (call === GlobalStatus.Get) return vnode.state.replyParentId;
-      if (call === GlobalStatus.Set) {
-        vnode.state.replyParentId = parentId;
-        m.redraw.sync();
+    // const getSetGlobalReplyStatus = (call: string, parentId?: number, suppressScrollToForm?: boolean) => {
+    //   if (call === GlobalStatus.Get) return vnode.state.parentCommentId;
+    //   if (call === GlobalStatus.Set) {
+    //     vnode.state.parentCommentId = parentId;
+    //     m.redraw.sync();
 
-        // if we are canceling out of a reply, don't scroll to the newly restored reply form
-        if (suppressScrollToForm) return;
+    //     // if we are canceling out of a reply, don't scroll to the newly restored reply form
+    //     if (suppressScrollToForm) return;
 
-        // scroll to new reply form if parentId is available, scroll to proposal-level comment form otherwise
-        setTimeout(() => {
-          const $reply = parentId
-            ? $(`.comment-${parentId}`).nextAll('.CreateComment')
-            : $('.ProposalComments > .CreateComment');
+    //     // scroll to new reply form if parentId is available, scroll to proposal-level comment form otherwise
+    //     setTimeout(() => {
+    //       const $reply = parentId
+    //         ? $(`.comment-${parentId}`).nextAll('.CreateComment')
+    //         : $('.ProposalComments > .CreateComment');
 
-          // if the reply is at least partly offscreen, scroll it entirely into view
-          const scrollTop = $('html, body').scrollTop();
-          const replyTop = $reply.offset()?.top;
-          if (scrollTop + $(window).height() < replyTop + $reply.outerHeight())
-            $('html, body').animate({ scrollTop: replyTop + $reply.outerHeight() - $(window).height() + 40 }, 500);
+    //       // if the reply is at least partly offscreen, scroll it entirely into view
+    //       const scrollTop = $('html, body').scrollTop();
+    //       const replyTop = $reply.offset()?.top;
+    //       if (scrollTop + $(window).height() < replyTop + $reply.outerHeight())
+    //         $('html, body').animate({ scrollTop: replyTop + $reply.outerHeight() - $(window).height() + 40 }, 500);
 
-          // highlight the reply form
-          const animationDelayTime = 2000;
-          $reply.addClass('highlighted');
-          setTimeout(() => {
-            $reply.removeClass('highlighted');
-          }, animationDelayTime + 500);
+    //       // highlight the reply form
+    //       const animationDelayTime = 2000;
+    //       $reply.addClass('highlighted');
+    //       setTimeout(() => {
+    //         $reply.removeClass('highlighted');
+    //       }, animationDelayTime + 500);
 
-          // focus the reply form
-          $reply.find('.ql-editor').focus();
-        }, 1);
-      }
-    };
+    //       // focus the reply form
+    //       $reply.find('.ql-editor').focus();
+    //     }, 1);
+    //   }
+    // };
 
     // Original posters have full editorial control, while added collaborators
     // merely have access to the body and title
-    const { replyParentId } = vnode.state;
+    const { parentCommentId } = vnode.state;
     const { activeAccount } = app.user;
 
     const authorChain = (proposal instanceof OffchainThread) ? proposal.authorChain : app.activeId();
@@ -1006,7 +1011,7 @@ const ViewProposalPage: m.Component<{
         commentCount,
         viewCount,
         getSetGlobalEditingStatus,
-        getSetGlobalReplyStatus,
+        proposalPageState: vnode.state,
         isAuthor,
         isEditor,
         isAdmin,
@@ -1026,13 +1031,22 @@ const ViewProposalPage: m.Component<{
         && m(ProposalVotingResults, { proposal }),
       !(proposal instanceof OffchainThread)
         && m(ProposalVotingActions, { proposal }),
+      vnode.state.replying
+      && m(CreateComment, {
+        callback: createdCommentCallback,
+        cancellable: true,
+        getSetGlobalEditingStatus,
+        proposalPageState: vnode.state,
+        parentComment: null,
+        rootProposal: proposal
+      }),
       m(ProposalComments, {
         proposal,
         comments,
         createdCommentCallback,
-        replyParentId,
+        parentCommentId,
         getSetGlobalEditingStatus,
-        getSetGlobalReplyStatus
+        proposalPageState: vnode.state
       }),
     ]);
   }

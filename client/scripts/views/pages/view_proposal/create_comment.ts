@@ -14,12 +14,13 @@ import User from 'views/components/widgets/user';
 
 import { notifyError } from 'controllers/app/notifications';
 import { GlobalStatus } from './body';
+import { IProposalPageState } from '.';
 
 const CreateComment: m.Component<{
   callback: CallableFunction,
   cancellable?: boolean,
   getSetGlobalEditingStatus: CallableFunction,
-  getSetGlobalReplyStatus: CallableFunction,
+  proposalPageState: IProposalPageState,
   parentComment?: OffchainComment<any>,
   rootProposal: AnyProposal | OffchainThread,
   tabindex?: number,
@@ -35,7 +36,7 @@ const CreateComment: m.Component<{
       callback,
       cancellable,
       getSetGlobalEditingStatus,
-      getSetGlobalReplyStatus,
+      proposalPageState,
       rootProposal
     } = vnode.attrs;
     let { parentComment } = vnode.attrs;
@@ -113,7 +114,8 @@ const CreateComment: m.Component<{
         'Last Comment Created': new Date().toISOString()
       });
 
-      getSetGlobalReplyStatus(GlobalStatus.Set, null, true);
+      proposalPageState.replying = false;
+      proposalPageState.parentCommentId = null;
     };
 
     const { error, sendingComment, uploadsInProgress } = vnode.state;
@@ -186,7 +188,8 @@ const CreateComment: m.Component<{
                   rounded: true,
                   onclick: (e) => {
                     e.preventDefault();
-                    getSetGlobalReplyStatus(GlobalStatus.Set, null, true);
+                    proposalPageState.replying = false;
+                    proposalPageState.parentCommentId = null;
                   },
                   label: 'Cancel'
                 }),
