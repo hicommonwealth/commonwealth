@@ -4,7 +4,7 @@ import 'pages/view_proposal/tips.scss';
 import $ from 'jquery';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
-import { PopoverMenu, MenuDivider, MenuItem, Icon, Icons, Button, Input  } from 'construct-ui';
+import { PopoverMenu, MenuDivider, MenuItem, Icon, Icons, Button, Input, Size  } from 'construct-ui';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -297,28 +297,42 @@ const ProposalHeader: m.Component<{
         m('.proposal-content-right', [
           !vnode.state.editing
             && m(ProposalBodyText, { item: proposal }),
-
           !vnode.state.editing
             && attachments
             && attachments.length > 0
             && m(ProposalBodyAttachments, { item: proposal }),
-
           vnode.state.editing
             && m(ProposalBodyEditor, { item: proposal, parentState: vnode.state }),
-
-          vnode.state.editing
-            && m('.proposal-body-button-group', [
-              m(ProposalBodySaveEdit, { item: proposal, getSetGlobalEditingStatus, parentState: vnode.state }),
-              m(ProposalBodyCancelEdit, { item: proposal, getSetGlobalEditingStatus, parentState: vnode.state }),
-            ]),
-
-          !vnode.state.editing
-            && m(ProposalBodyReaction, { item: proposal }),
+          m('.proposal-body-bottom', [
+            vnode.state.editing
+              && m('.proposal-body-button-group', [
+                m(ProposalBodySaveEdit, { item: proposal, getSetGlobalEditingStatus, parentState: vnode.state }),
+                m(ProposalBodyCancelEdit, { item: proposal, getSetGlobalEditingStatus, parentState: vnode.state }),
+              ]),
+            !vnode.state.editing
+              && m('.proposal-response-row', [
+                m(ProposalBodyReaction, { item: proposal }),
+              ])
+          ])
         ]),
       ]),
       !(proposal instanceof OffchainThread) && hasBody && m('.proposal-content', [
         m(ProposalBodyText, { item: proposal }),
       ]),
+    ]);
+  }
+};
+
+const InlineReplyButton: m.Component<{ commentReplyCount: number, onclick }, {}> = {
+  view: (vnode) => {
+    const { commentReplyCount, onclick } = vnode.attrs;
+    return m('.InlineReplyButton', [
+      m(Icon, {
+        name: Icons.MESSAGE_SQUARE,
+        size: Size.XL,
+        onclick,
+      }),
+      m('.reply-count', commentReplyCount)
     ]);
   }
 };
@@ -353,6 +367,9 @@ const ProposalComment: m.Component<{
     }/proposal/${proposal.slug}/`
       + `${proposal.identifier}-${slugify(proposal.title)}?comment=${comment.id}`;
 
+    const commentReplyCount = app.comments.getByProposal(proposal)
+      .filter((c) => c.parentComment === comment.id)
+      .length;
     return m('.ProposalComment', {
       class: `${parentType}-child comment-${comment.id}`,
       onchange: () => m.redraw(), // TODO: avoid catching bubbled input events
@@ -428,8 +445,8 @@ const ProposalComment: m.Component<{
             ])
             : m('.comment-response-row', [
               m(ProposalBodyReaction, { item: comment }),
-              m(Icon, {
-                name: Icons.MESSAGE_SQUARE,
+              m(InlineReplyButton, {
+                commentReplyCount,
                 onclick: (e) => {
                   getSetGlobalReplyStatus(GlobalStatus.Set, comment.id);
                 }
@@ -494,7 +511,6 @@ const ProposalComments: m.Component<{
     ) => {
       // Remove this check + /createComment server-side checks to allow >2 lvls of threading
       const canContinueThreading = threadLevel <= MAX_THREAD_LEVEL;
-      console.log({ canContinueThreading });
       return childComments.map((child: OffchainComment<any>) => {
         if (!child) return;
         const furtherChildren = app.comments.getByProposal(proposal).filter((c) => c.parentComment === child.id);

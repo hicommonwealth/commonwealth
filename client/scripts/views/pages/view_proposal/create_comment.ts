@@ -12,7 +12,7 @@ import EditProfileModal from 'views/modals/edit_profile_modal';
 import QuillEditor from 'views/components/quill_editor';
 import User from 'views/components/widgets/user';
 
-import Token from 'controllers/chain/ethereum/token/adapter';
+import { notifyError } from 'controllers/app/notifications';
 import { GlobalStatus } from './body';
 
 const CreateComment: m.Component<{
@@ -92,6 +92,8 @@ const CreateComment: m.Component<{
         await app.user.notifications.refresh();
         m.redraw();
       } catch (err) {
+        console.log(err);
+        notifyError(err.message || 'Comment submission failed.');
         if (vnode.state.quillEditorState.editor) {
           vnode.state.quillEditorState.editor.enable();
         }

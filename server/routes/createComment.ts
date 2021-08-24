@@ -25,7 +25,7 @@ export const Errors = {
   CantCommentOnReadOnly: 'Cannot comment when thread is read_only',
   InsufficientTokenBalance: 'Users need to hold some of the community\'s tokens to comment',
   CouldNotFetchTokenBalance: 'Unable to fetch user\'s token balance',
-  NestingTooDeep: 'Maximum nested comment level is 2'
+  NestingTooDeep: 'Comments can only be nested 2 levels deep'
 };
 
 const createComment = async (

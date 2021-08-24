@@ -45,7 +45,35 @@ $discussion-title-font-size: 1.45rem;
     .proposal-body-bottom, .comment-body-bottom {
         display: flex;
         justify-content: space-between;
-        .proposal-body-button-group, .comment-body-bottom-right {
+        .comment-response-row,
+        .proposal-response-row {
+            width: 100%;
+            display: flex;
+            max-width: 300px;
+            align-items: center;
+            .InlineReplyButton,
+            .ProposalBodyReaction {
+                margin-right: 10%;
+                &:hover {
+                    .cui-icon, .reply-count, .reactions-count {
+                        color: #4723AD;
+                    }
+                }
+                .cui-icon, .reply-count, .reactions-count {
+                    color: black;
+                    font-weight: 500;
+                }
+                .cui-icon {
+                    margin-right: 13px;
+                }
+                .reply-count, .reactions-count {
+                    position: relative;
+                    top: 2px;
+                }
+            }
+        }
+        .proposal-body-button-group, .comment-body-bottom-right,
+        .comment-edit-buttons {
             margin-top: 18px;
             .cancel-editing {
                 margin-right: 15px;
@@ -225,7 +253,7 @@ $discussion-title-font-size: 1.45rem;
     }
 
     .ProposalHeader .proposal-content {
-        .ProposalBodyReaction {
+        .ProposalBodyReaction, .InlineReplyButton {
             margin-top: $discussion-reaction-padding;
         }
     }
@@ -237,7 +265,7 @@ $discussion-title-font-size: 1.45rem;
         .comment-child, .new-comment-child {
             margin-left: 36px;
         }
-        .ProposalBodyReaction {
+        .ProposalBodyReaction, .InlineReplyButton {
             margin-top: $discussion-reaction-padding;
         }
     }
@@ -416,6 +444,9 @@ $discussion-title-font-size: 1.45rem;
     }
     .ProposalBodyReaction {
         display: inline-block;
+    }
+    .InlineReplyButton {
+        display: flex;
     }
     .ProposalBodyText.proposal-body-placeholder {
         &, .User .user-display-name {
