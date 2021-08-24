@@ -55,6 +55,7 @@ $discussion-title-font-size: 1.45rem;
             .ProposalBodyReaction {
                 margin-right: 10%;
                 padding: 6px;
+                cursor: pointer;
                 &:hover {
                     background: #F7F4FF;
                     border-radius: 8px;

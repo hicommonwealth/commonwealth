@@ -326,11 +326,12 @@ const ProposalHeader: m.Component<{
 const InlineReplyButton: m.Component<{ commentReplyCount: number, onclick }, {}> = {
   view: (vnode) => {
     const { commentReplyCount, onclick } = vnode.attrs;
-    return m('.InlineReplyButton', [
+    return m('.InlineReplyButton', {
+      onclick
+    }, [
       m(Icon, {
         name: Icons.MESSAGE_SQUARE,
         size: Size.XL,
-        onclick,
       }),
       m('.reply-count', commentReplyCount)
     ]);
