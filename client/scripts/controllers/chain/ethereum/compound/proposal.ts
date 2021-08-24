@@ -226,7 +226,6 @@ export default class CompoundProposal extends Proposal<
 
     // special case for expiration because no event is emitted
     if (this.state === CompoundTypes.ProposalState.Expired || this.state === CompoundTypes.ProposalState.Defeated) {
-      console.log(entity.chainEvents.filter((v) => v.data.kind !== CompoundTypes.EventKind.VoteCast));
       this.complete(this._Gov.store);
     }
 

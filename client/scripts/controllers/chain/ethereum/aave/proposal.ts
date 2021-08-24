@@ -248,12 +248,6 @@ export default class AaveProposal extends Proposal<
       this._ipfsData = ipfsData;
     }).catch((e) => console.error(`Failed to fetch ipfs data for ${this._ipfsAddress}`));
 
-    // special case for expiration because no event is emitted
-    // TODO: hook onto specific block and set expired automatically
-    if (this.state === AaveTypes.ProposalState.EXPIRED || this.state === AaveTypes.ProposalState.FAILED) {
-      this.complete(this._Gov.store);
-    }
-
     try {
       const totalVotingSupplyAtStart = await this._Gov.api.Strategy.getTotalVotingSupplyAt(this.data.startBlock);
       this._votingSupplyAtStart = new BN(totalVotingSupplyAtStart.toString());
@@ -267,7 +261,14 @@ export default class AaveProposal extends Proposal<
     this._minVotingPowerNeeded = this._votingSupplyAtStart
       .mul(this._Executor.minimumQuorum)
       .divn(ONE_HUNDRED_WITH_PRECISION);
+
     this._initialized = true;
+
+    // special case for expiration because no event is emitted
+    // TODO: hook onto specific block and set expired automatically
+    if (this.state === AaveTypes.ProposalState.EXPIRED || this.state === AaveTypes.ProposalState.FAILED) {
+      this.complete(this._Gov.store);
+    }
   }
 
   constructor(
