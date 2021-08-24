@@ -4,7 +4,7 @@ import { capitalize } from 'lodash';
 import {
   SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents,
   IEventLabel, IEventTitle, IChainEventData, chainSupportedBy,
-  MarlinTypes, MarlinEvents, AaveTypes, AaveEvents
+  CompoundTypes, CompoundEvents, AaveTypes, AaveEvents
 } from '@commonwealth/chain-events';
 
 import { SENDGRID_API_KEY, SERVER_URL } from '../config';
@@ -30,8 +30,8 @@ export const createImmediateNotificationEmailObject = async (notification_data, 
       labelerFn = SubstrateEvents.Label;
     } else if (chainSupportedBy(notification_data.chainEventType?.chain, MolochEvents.Types.EventChains)) {
       labelerFn = MolochEvents.Label;
-    } else if (chainSupportedBy(notification_data.chainEventType?.chain, MarlinEvents.Types.EventChains)) {
-      labelerFn = MarlinEvents.Label;
+    } else if (chainSupportedBy(notification_data.chainEventType?.chain, CompoundEvents.Types.EventChains)) {
+      labelerFn = CompoundEvents.Label;
     } else if (chainSupportedBy(notification_data.chainEventType?.chain, AaveEvents.Types.EventChains)) {
       labelerFn = AaveEvents.Label;
     }

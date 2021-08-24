@@ -3,14 +3,14 @@ import 'pages/delegate.scss';
 import m from 'mithril';
 import app from 'state';
 import { ChainNetwork } from 'models';
+import { AaveTypes, CompoundTypes } from '@commonwealth/chain-events';
 
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
-import Marlin from 'controllers/chain/ethereum/marlin/adapter';
+import Compound from 'controllers/chain/ethereum/compound/adapter';
 import Aave from 'controllers/chain/ethereum/aave/adapter';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { Grid, Col, List, Form, FormGroup, FormLabel, Input, Button } from 'construct-ui';
-import { AaveTypes, MarlinTypes } from '@commonwealth/chain-events';
 import PageNotFound from './404';
 
 const DelegateStats: m.Component<{ currentDelegate: string, }> = {
@@ -61,8 +61,8 @@ interface IDelegateFormState {
 }
 
 const getDelegate = async (vnode: m.Vnode<{}, IDelegateFormState>) => {
-  if (MarlinTypes.EventChains.find((c) => c === app.chain.network)) {
-    vnode.state.currentDelegate = await (app.chain as Marlin).chain.getDelegate();
+  if (CompoundTypes.EventChains.find((c) => c === app.chain.network)) {
+    vnode.state.currentDelegate = await (app.chain as Compound).chain.getDelegate();
   } else if (AaveTypes.EventChains.find((c) => c === app.chain.network)) {
     // TODO: switch on delegation type
     vnode.state.currentDelegate = await (app.chain as Aave).chain.getDelegate(app.user.activeAccount.address, 'voting');
@@ -73,8 +73,8 @@ const getDelegate = async (vnode: m.Vnode<{}, IDelegateFormState>) => {
 const setDelegate = async (vnode: m.Vnode<{}, IDelegateFormState>) => {
   if (app.chain.apiInitialized) {
     let delegationPromise: Promise<any>;
-    if (MarlinTypes.EventChains.find((c) => c === app.chain.network)) {
-      delegationPromise = (app.chain as Marlin).chain.setDelegate(
+    if (CompoundTypes.EventChains.find((c) => c === app.chain.network)) {
+      delegationPromise = (app.chain as Compound).chain.setDelegate(
         vnode.state.form.address, vnode.state.form.amount
       );
     } else if (AaveTypes.EventChains.find((c) => c === app.chain.network)) {
@@ -103,7 +103,7 @@ const DelegateForm: m.Component<{}, IDelegateFormState> = {
   },
   view: (vnode) => {
     const { form, loading } = vnode.state;
-    const hasValue = app.chain.network === ChainNetwork.Marlin || app.chain.network === ChainNetwork.MarlinTestnet;
+    const hasValue = app.chain.network === ChainNetwork.Compound;
     return [
       m(DelegateStats, {
         currentDelegate: vnode.state.currentDelegate,
@@ -172,7 +172,7 @@ const DelegatePage: m.Component<{}> = {
       if (
         app.chain
         && app.chain.loaded
-        && !MarlinTypes.EventChains.find((c) => c === app.chain.network)
+        && !CompoundTypes.EventChains.find((c) => c === app.chain.network)
         && !AaveTypes.EventChains.find((c) => c === app.chain.network)
       ) {
         return m(PageNotFound, {
