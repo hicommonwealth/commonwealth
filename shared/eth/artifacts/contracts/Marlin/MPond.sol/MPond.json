@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
   "contractName": "MPond",
-  "sourceName": "contracts/Marlin/MPond.sol",
+  "sourceName": "contracts/compound/MPond.sol",
   "abi": [
     {
       "inputs": [

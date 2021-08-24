@@ -20,7 +20,7 @@ import CommunitySelector from 'views/components/sidebar/community_selector';
 import CreateCommunityModal from 'views/modals/create_community_modal';
 
 import { discordIcon, telegramIcon, elementIcon, githubIcon, websiteIcon } from './icons';
-import { AaveTypes, MarlinTypes, MolochTypes } from '@commonwealth/chain-events';
+import { AaveTypes, CompoundTypes, MolochTypes } from '@commonwealth/chain-events';
 
 const SidebarQuickSwitcherItem: m.Component<{ item, size }> = {
   view: (vnode) => {
@@ -188,7 +188,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
       app.chain.base === ChainBase.CosmosSDK
         || (app.chain.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Plasm)
         || MolochTypes.EventChains.find((c) => c === app.chain.network)
-        || MarlinTypes.EventChains.find((c) => c === app.chain.network)
+        || CompoundTypes.EventChains.find((c) => c === app.chain.network)
         || AaveTypes.EventChains.find((c) => c === app.chain.network)
         || app.chain.network === ChainNetwork.Commonwealth
         || app.chain?.meta.chain.snapshot);
@@ -198,7 +198,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
     const showMolochMemberOptions = showMolochMenuOptions && (app.user.activeAccount as any)?.shares?.gtn(0);
     const showCommonwealthMenuOptions = app.chain?.network === ChainNetwork.Commonwealth;
 
-    const showMarlinOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Marlin;
+    const showCompoundOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Compound;
     const showAaveOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Aave;
 
     const onSnapshotProposal = (p) => p.startsWith(`/${app.activeId()}/snapshot-proposals`);
@@ -242,11 +242,11 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           },
           contentRight: [], // TODO
         }),
-      // proposals (substrate, cosmos, moloch & marlin only)
+      // proposals (substrate, cosmos, moloch & compound only)
       !app.community && ((app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Darwinia)
                          || app.chain?.base === ChainBase.CosmosSDK
                          || MolochTypes.EventChains.find((c) => c === app.chain.network)
-                         || MarlinTypes.EventChains.find((c) => c === app.chain.network)
+                         || CompoundTypes.EventChains.find((c) => c === app.chain.network)
                          || AaveTypes.EventChains.find((c) => c === app.chain.network))
         && m(Button, {
           fluid: true,
@@ -341,17 +341,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
             navigateToSubpage(`/validators`);
           },
         }),
-      // showMarlinOptions && m(Button, {
-      //   fluid: true,
-      //   rounded: true,
-      //   onclick: (e) => {
-      //     e.preventDefault();
-      //     navigateToSubpage(`/new/proposal/:type`, { type: ProposalType.MarlinProposal });
-      //   },
-      //   label: 'Submit Proposal',
-      //   active: m.route.get() === `/${app.activeChainId()}/new/proposal/${ProposalType.MarlinProposal}`,
-      // }),
-      showMarlinOptions && m(Button, {
+      showCompoundOptions && m(Button, {
         fluid: true,
         rounded: true,
         onclick: (e) => {
