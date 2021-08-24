@@ -137,12 +137,12 @@ export const cancelProposal = (e, state, proposal, onModalClose) => {
 export const QueueButton: m.Component<{ proposal, votingModalOpen? }, {}> = {
   view: (vnode) => {
     const { proposal, votingModalOpen } = vnode.attrs;
-    return (proposal instanceof AaveProposal)
-      && proposal.state === AaveTypes.ProposalState.SUCCEEDED
+    return (proposal instanceof AaveProposal || proposal instanceof CompoundProposal)
+      && proposal.isQueueable
       && m('.QueueButton', [
         m(Button, {
           intent: 'none',
-          disabled: proposal.state !== AaveTypes.ProposalState.SUCCEEDED || votingModalOpen,
+          disabled: proposal.isQueueable || votingModalOpen,
           onclick: () => proposal.queueTx().then(() => m.redraw()),
           label: proposal.data.queued || proposal.data.executed ? 'Queued' : 'Queue',
           compact: true,
@@ -155,7 +155,7 @@ export const QueueButton: m.Component<{ proposal, votingModalOpen? }, {}> = {
 export const ExecuteButton: m.Component<{ proposal, votingModalOpen? }, {}> = {
   view: (vnode) => {
     const { proposal, votingModalOpen } = vnode.attrs;
-    return (proposal instanceof AaveProposal)
+    return (proposal instanceof AaveProposal || proposal instanceof CompoundProposal)
       && proposal.isExecutable
       && m('.ExecuteButton', [
         m(Button, {

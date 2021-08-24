@@ -343,6 +343,10 @@ export default class AaveProposal extends Proposal<
       || this.state === AaveTypes.ProposalState.EXPIRED);
   }
 
+  public get isQueueable() {
+    return this.state === AaveTypes.ProposalState.SUCCEEDED;
+  }
+
   public async cancelTx() {
     if (this.data.cancelled) {
       throw new Error('proposal already canceled');
