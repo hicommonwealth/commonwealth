@@ -7,7 +7,7 @@ import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import Listing from 'views/pages/listing';
 import ProjectCard from 'views/components/commonwealth/project_card';
-import TokenInputField from 'views/components/commonwealth/token_input';
+import SelectTokensField from 'views/components/commonwealth/select_tokens'
 import { CMNProject } from 'models';
 
 const connectionReady = () => {
@@ -19,9 +19,30 @@ const connectionReady = () => {
 
 const ProjectsPage: m.Component<{}, {initialized: boolean, projects: CMNProject[]}> = {
   onupdate: async (vnode) => {
+    if (!connectionReady()) return;
+    vnode.state.projects = await (app.chain as any).protocol.syncProjects();
+    if (!vnode.state.initialized) {
+      vnode.state.initialized = true;
+      m.redraw();
+    }
   },
 
   view: (vnode) => {
+    if (!connectionReady() || !vnode.state.initialized) return m(PageLoading);
+
+    const { projects } = vnode.state;
+    const activeProjectsContent = projects
+      .filter((p) => p.status === 'In Progress')
+      .map((p) => m(ProjectCard, { project: p }));
+
+    const failedProjects = projects
+      .filter((p) => p.status === 'Failed')
+      .map((p) => m(ProjectCard, { project: p }));
+
+    const successedProjects = projects
+      .filter((p) => p.status === 'Successed')
+      .map((p) => m(ProjectCard, { project: p }));
+
     return m(Sublayout, {
       class: 'ProjectsPage',
       title: 'Projects',
@@ -37,12 +58,22 @@ const ProjectsPage: m.Component<{}, {initialized: boolean, projects: CMNProject[
         m('div', '- Backers can redeem BTokens when project funding is failed'),
         m('div', '- Beneficiary can only withdraw when project funding is successed'),
       ]),
-      m(TokenInputField, {
-
+      m(Listing, {
+        content: activeProjectsContent,
+        columnHeader: `${activeProjectsContent.length === 0 ? 'No' : ''} Active Projects`,
+      }),
+      m('.clear'),
+      m(Listing, {
+        content: successedProjects,
+        columnHeader: `${successedProjects.length === 0 ? 'No' : ''} Successed Projects`,
+      }),
+      m('.clear'),
+      m(Listing, {
+        content: failedProjects,
+        columnHeader: `${failedProjects.length === 0 ? 'No' : ''} Failed Projects`,
       }),
     ]);
   }
-
 };
 
 export default ProjectsPage;
