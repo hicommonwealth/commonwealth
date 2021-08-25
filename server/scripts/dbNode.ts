@@ -118,7 +118,7 @@ async function mainProcess(producer: RabbitMqHandler, pool) {
       try {
         listeners['erc20'] = await createListener('erc20', {
           url: 'wss://mainnet.infura.io/ws',
-          tokenAddresses: erc20Tokens.map(chain => chain.address),
+          tokenAddresses: erc20TokenAddresses,
           tokenNames: erc20TokenNames,
           verbose: false
         }, 'erc20')
@@ -170,9 +170,12 @@ async function mainProcess(producer: RabbitMqHandler, pool) {
       log.info(`Starting listener for ${chain.id}...`);
 
       // base is used to override built-in event chains in chain-events - only used for substrate chains in this case
-      // i.e. does not override event chains type for marlin/moloch/DAO's
-      let base = chain.base;
-      if (chain.type === 'dao') base = null;
+      // NOTE: All erc20 tokens (type='token' base='ethereum') are removed at this point
+      let base;
+      if (chain.base === 'substrate') base = 'substrate';
+      else if (chain.network === 'compound') base = 'compound';
+      else if (chain.network === 'aave') base = 'aave';
+
 
       try {
         listeners[chain.id] = await createListener(chain.id, {

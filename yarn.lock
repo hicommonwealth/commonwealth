@@ -951,6 +951,34 @@
     "@babel/helper-validator-identifier" "^7.14.9"
     to-fast-properties "^2.0.0"
 
+"@commonwealth/chain-events@^0.8.0":
+  version "0.8.0"
+  resolved "https://registry.yarnpkg.com/@commonwealth/chain-events/-/chain-events-0.8.0.tgz#9b2ee42b8e5e6868f7825bb83869cf4f67d23c29"
+  integrity sha512-WHtba7J2fm+xnL/IPxD/ShoM/cpYv3DNJctgthqnlrre9pGG8iEMVbNjs41DgzA1siff5s2yiUqGVA2FfUpvAw==
+  dependencies:
+    "@edgeware/node-types" "^3.3.3"
+    "@ethersproject/abi" "^5.0.0"
+    "@ethersproject/bytes" "^5.0.0"
+    "@ethersproject/providers" "^5.0.0"
+    "@polkadot/api" "4.16.2"
+    "@polkadot/api-derive" "4.16.2"
+    "@polkadot/types" "4.16.2"
+    "@polkadot/util" "6.11.1"
+    bn.js "^5.1.3"
+    ethereum-block-by-date "^1.4.0"
+    ethers "^5.0.0"
+    lodash "^4.17.21"
+    moment "^2.29.1"
+    node-fetch "^2.6.1"
+    pg "^8.6.0"
+    pg-format "^1.0.4"
+    sleep-promise "^8.0.1"
+    typescript-logging "^0.6.4"
+    underscore "^1.10.2"
+    web3 "^1.3.1"
+    web3-core "^1.3.1"
+    web3-utils "^1.3.1"
+
 "@commonwealth/chain-events@git+https://git@github.com/timolegros/chain-events.git#tim.build":
   version "0.7.9"
   resolved "git+https://git@github.com/timolegros/chain-events.git#000a3f311f8c6f9af780618c79b7253eb105245a"

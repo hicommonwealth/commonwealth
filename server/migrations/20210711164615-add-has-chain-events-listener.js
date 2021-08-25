@@ -19,7 +19,7 @@ module.exports = {
       // sets has_chain_events_listener to true for all existing chains
       // TODO: should all current chains default to true?
       await queryInterface.sequelize.query(
-        `UPDATE "Chains" SET "has_chain_events_listener" = true`,
+        `UPDATE "Chains" SET "has_chain_events_listener" = false`,
         { transaction }
       );
 
