@@ -1,7 +1,7 @@
 import chai from 'chai';
 
-import { Processor } from '../../../src/moloch/processor';
-import { Api, RawEvent, EventKind } from '../../../src/moloch/types';
+import { Processor } from '../../../src/chains/moloch/processor';
+import { Api, RawEvent, EventKind } from '../../../src/chains/moloch/types';
 
 const { assert } = chai;
 

@@ -2,8 +2,8 @@ import { EventEmitter } from 'events';
 
 import chai from 'chai';
 
-import { Subscriber } from '../../../src/moloch/subscriber';
-import { Api, RawEvent } from '../../../src/moloch/types';
+import { Subscriber } from '../../../src/chains/moloch/subscriber';
+import { Api, RawEvent } from '../../../src/chains/moloch/types';
 
 const { assert } = chai;
 

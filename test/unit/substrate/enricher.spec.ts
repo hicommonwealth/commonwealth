@@ -31,12 +31,12 @@ import {
   ReportIdOf,
 } from '@polkadot/types/interfaces/offences';
 
-import { Enrich } from '../../../src/substrate/filters/enricher';
+import { Enrich } from '../../../src/chains/substrate/filters/enricher';
 import {
   BlockNumber,
   EventKind,
   IdentityJudgement,
-} from '../../../src/substrate/types';
+} from '../../../src/chains/substrate/types';
 
 import {
   constructFakeApi,

@@ -28,10 +28,10 @@ import {
   IDelegateChanged,
   IDelegatedPowerChanged,
   ITransfer,
-} from '../../src/aave/types';
-import { subscribeEvents } from '../../src/aave/subscribeFunc';
+} from '../../src/chains/aave/types';
+import { subscribeEvents } from '../../src/chains/aave/subscribeFunc';
 import { IEventHandler, CWEvent, IChainEventData } from '../../src/interfaces';
-import { StorageFetcher } from '../../src/aave/storageFetcher';
+import { StorageFetcher } from '../../src/chains/aave/storageFetcher';
 
 function getProvider(): providers.Web3Provider {
   const web3Provider = require('ganache-cli').provider({

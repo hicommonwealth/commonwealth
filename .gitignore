@@ -9,8 +9,8 @@ yarn-error.log
 coverage/
 
 .env
-dist/
 *.tgz
 
 .yalc/
 yalc.lock
+/dist/

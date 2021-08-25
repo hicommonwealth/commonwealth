@@ -1,7 +1,7 @@
 import chai from 'chai';
 import { Hash, EventRecord, RuntimeVersion } from '@polkadot/types/interfaces';
 
-import { Subscriber } from '../../../src/substrate/subscriber';
+import { Subscriber } from '../../../src/chains/substrate/subscriber';
 
 import { constructFakeApi } from './testUtil';
 

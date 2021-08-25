@@ -1,6 +1,6 @@
 {
   "name": "@commonwealth/chain-events",
-  "version": "0.7.10",
+  "version": "0.8.0",
   "description": "Listen to various chains for events.",
   "license": "GPL-3.0",
   "files": [
@@ -9,9 +9,8 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "rimraf dist/ && tsc",
+    "build": "rimraf dist/ && tsc --project tsconfig.json && copyfiles -u 1 \"./src/**/*.d.ts\" \"dist\"",
     "compile-contracts": "cd eth && npx hardhat compile",
-    "prepare": "npx install-peers",
     "unit-test": "nyc ts-mocha --config ./.mocharc.json ./test/unit/**/*.spec.ts",
     "compound-test": "nyc ts-mocha --config ./.mocharc.json ./test/integration/compound.spec.ts",
     "integration-test": "nyc ts-mocha --config ./.mocharc.json ./test/integration/*.spec.ts",
@@ -35,22 +34,23 @@
     "url": "https://github.com/hicommonwealth/chain-events/issues"
   },
   "homepage": "https://github.com/hicommonwealth/chain-events#readme",
-  "peerDependencies": {
-    "@polkadot/api": "4.9.2",
-    "@polkadot/api-derive": "4.9.2",
-    "@polkadot/types": "4.9.2",
-    "@polkadot/util": "^6.3.1"
-  },
   "dependencies": {
     "@edgeware/node-types": "^3.3.3",
     "@ethersproject/abi": "^5.0.0",
     "@ethersproject/bytes": "^5.0.0",
     "@ethersproject/providers": "^5.0.0",
+    "@polkadot/api": "4.16.2",
+    "@polkadot/api-derive": "4.16.2",
+    "@polkadot/types": "4.16.2",
+    "@polkadot/util": "6.11.1",
     "bn.js": "^5.1.3",
     "ethereum-block-by-date": "^1.4.0",
     "ethers": "^5.0.0",
     "lodash": "^4.17.21",
     "moment": "^2.29.1",
+    "node-fetch": "^2.6.1",
+    "pg": "^8.6.0",
+    "pg-format": "^1.0.4",
     "sleep-promise": "^8.0.1",
     "typescript-logging": "^0.6.4",
     "underscore": "^1.10.2",
@@ -75,6 +75,7 @@
     "@typescript-eslint/eslint-plugin": "^4.22.0",
     "@typescript-eslint/parser": "^4.22.0",
     "chai": "^4.2.0",
+    "copyfiles": "^2.4.1",
     "dotenv": "^10.0.0",
     "eslint": "^7.14.0",
     "eslint-config-airbnb-base": "^14.0.0",
@@ -95,7 +96,7 @@
     "ts-mocha": "^8.0.0",
     "ts-node": "^8.10.2",
     "typechain": "^4.0.1",
-    "typescript": "^4.0.0",
+    "typescript": "^4.3.4",
     "yargs": "^16.1.0"
   }
 }

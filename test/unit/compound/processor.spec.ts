@@ -1,7 +1,7 @@
 import chai from 'chai';
 
-import { Processor } from '../../../src/compound/processor';
-import { Api, RawEvent, EventKind } from '../../../src/compound/types';
+import { Processor } from '../../../src/chains/compound/processor';
+import { Api, RawEvent, EventKind } from '../../../src/chains/compound/types';
 
 const { assert } = chai;
 

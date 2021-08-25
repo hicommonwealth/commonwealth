@@ -1,7 +1,7 @@
 import chai from 'chai';
 
-import { Processor } from '../../../src/aave/processor';
-import { Api, RawEvent, EventKind } from '../../../src/aave/types';
+import { Processor } from '../../../src/chains/aave/processor';
+import { Api, RawEvent, EventKind } from '../../../src/chains/aave/types';
 
 const { assert } = chai;
 

@@ -35,8 +35,8 @@ import {
   INewTip,
   ITipVoted,
   ITipClosing,
-} from '../../../src/substrate/types';
-import { StorageFetcher } from '../../../src/substrate/storageFetcher';
+} from '../../../src/chains/substrate/types';
+import { StorageFetcher } from '../../../src/chains/substrate/storageFetcher';
 
 import {
   constructFakeApi,

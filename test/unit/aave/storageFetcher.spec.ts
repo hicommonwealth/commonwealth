@@ -1,8 +1,12 @@
 import chai from 'chai';
 import { BigNumber } from 'ethers';
 
-import { StorageFetcher } from '../../../src/aave/storageFetcher';
-import { EventKind, Proposal, ProposalState } from '../../../src/aave/types';
+import { StorageFetcher } from '../../../src/chains/aave/storageFetcher';
+import {
+  EventKind,
+  Proposal,
+  ProposalState,
+} from '../../../src/chains/aave/types';
 import { AaveGovernanceV2 } from '../../../src/contractTypes';
 
 const { assert } = chai;

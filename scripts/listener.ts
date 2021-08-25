@@ -16,7 +16,7 @@ import {
   EventSupportingChains,
   AaveEvents,
   Erc20Events,
-} from '../dist/index';
+} from '../src/index';
 
 import { HydraDXSpec } from './specs/hydraDX';
 import { KulupuSpec } from './specs/kulupu';

@@ -1,7 +1,7 @@
 import chai from 'chai';
 
-import { EventKind, RawEvent, Api } from '../../../src/compound/types';
-import { Enrich } from '../../../src/compound/filters/enricher';
+import { EventKind, RawEvent, Api } from '../../../src/chains/compound/types';
+import { Enrich } from '../../../src/chains/compound/filters/enricher';
 
 const { assert } = chai;
 

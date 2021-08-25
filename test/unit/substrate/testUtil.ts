@@ -5,7 +5,7 @@ import { Option } from '@polkadot/types';
 import { IdentityJudgement, AccountVote } from '@polkadot/types/interfaces';
 import { Codec } from '@polkadot/types/types';
 
-import { IdentityJudgement as JudgementEnum } from '../../../src/substrate/types';
+import { IdentityJudgement as JudgementEnum } from '../../../src/chains/substrate/types';
 
 export function constructOption<T extends Codec>(value?: T): Option<T> {
   if (value) {

@@ -18,8 +18,8 @@ import {
   ISubmitProposal,
   IProcessProposal,
   IAbort,
-} from '../../src/moloch/types';
-import { subscribeEvents } from '../../src/moloch/subscribeFunc';
+} from '../../src/chains/moloch/types';
+import { subscribeEvents } from '../../src/chains/moloch/subscribeFunc';
 import {
   IEventHandler,
   CWEvent,

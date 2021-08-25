@@ -1,12 +1,12 @@
 import chai from 'chai';
 
-import { StorageFetcher } from '../../../src/moloch/storageFetcher';
+import { StorageFetcher } from '../../../src/chains/moloch/storageFetcher';
 import {
   ProposalV1,
   EventKind,
   ISubmitProposal,
   IProcessProposal,
-} from '../../../src/moloch/types';
+} from '../../../src/chains/moloch/types';
 import { Moloch1 } from '../../../src/contractTypes';
 
 const { assert } = chai;

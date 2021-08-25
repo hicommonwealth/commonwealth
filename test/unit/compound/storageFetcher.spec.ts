@@ -1,12 +1,12 @@
 import chai from 'chai';
 import { BigNumber } from 'ethers';
 
-import { StorageFetcher } from '../../../src/compound/storageFetcher';
+import { StorageFetcher } from '../../../src/chains/compound/storageFetcher';
 import {
   EventKind,
   Proposal,
   ProposalState,
-} from '../../../src/compound/types';
+} from '../../../src/chains/compound/types';
 import { GovernorAlpha } from '../../../src/contractTypes';
 
 const { assert } = chai;

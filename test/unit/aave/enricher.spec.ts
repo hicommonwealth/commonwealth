@@ -6,8 +6,8 @@ import {
   RawEvent,
   Api,
   DelegationType,
-} from '../../../src/aave/types';
-import { Enrich } from '../../../src/aave/filters/enricher';
+} from '../../../src/chains/aave/types';
+import { Enrich } from '../../../src/chains/aave/filters/enricher';
 
 const { assert } = chai;
 

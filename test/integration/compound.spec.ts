@@ -23,8 +23,8 @@ import {
   IProposalExecuted,
   IVoteCast,
   ProposalState,
-} from '../../src/compound/types';
-import { subscribeEvents } from '../../src/compound/subscribeFunc';
+} from '../../src/chains/compound/types';
+import { subscribeEvents } from '../../src/chains/compound/subscribeFunc';
 import { IEventHandler, CWEvent, IChainEventData } from '../../src/interfaces';
 
 const { assert } = chai;
