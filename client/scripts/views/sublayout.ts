@@ -68,7 +68,7 @@ const Sublayout: m.Component<{
           title
         ]),
       ] : community ? [
-        m('.ChainIcon',[
+        m('.ChainIcon', [
           link('a', (!app.isCustomDomain() ? `/${app.activeId()}` : '/' ), [
             m(CommunityIcon, { size: ICON_SIZE, community })
           ])
