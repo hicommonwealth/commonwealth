@@ -1,0 +1,15 @@
+.TokenInput {
+  display: flex;
+
+  input,
+  button {
+    border-radius: 0;
+    height: 39.59px;
+  }
+
+  input {
+    border-left: none;
+    border-right: none;
+    width: 400px;
+  }
+}
