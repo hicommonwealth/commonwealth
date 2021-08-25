@@ -112,6 +112,7 @@ const ReactionButton: m.Component<ReactionButtonAttrs, ReactionButtonState> = {
             modal: SelectAddressModal,
           });
         } else {
+          const { address: userAddress, chain } = app.user.activeAccount
           // if it's a community use the app.user.activeAccount.chain.id instead of author chain
           const chainId = app.activeCommunityId() ? null : app.activeChainId();
           const communityId = app.activeCommunityId();
@@ -125,9 +126,10 @@ const ReactionButton: m.Component<ReactionButtonAttrs, ReactionButtonState> = {
               likes: likes - 1,
               hasReacted: false
             }).then(() => {
+              vnode.state.reactors = reactors.filter(({ Address }) => Address.address !== userAddress);
               if ((hasReactedType === ReactionType.Like && type === ReactionType.Dislike)
                 || (hasReactedType === ReactionType.Dislike && type === ReactionType.Like)) {
-                app.reactions.create(app.user.activeAccount.address, post, type, chainId, communityId).then(() => {
+                app.reactions.create(userAddress, post, type, chainId, communityId).then(() => {
                   vnode.state.loading = false;
                   m.redraw();
                 });
@@ -138,9 +140,12 @@ const ReactionButton: m.Component<ReactionButtonAttrs, ReactionButtonState> = {
             });
           } else {
             vnode.state.loading = true;
-            app.reactionCounts.create(app.user.activeAccount.address, post, type, chainId, communityId)
+            app.reactionCounts.create(userAddress, post, type, chainId, communityId)
               .then(() => {
                 vnode.state.loading = false;
+                vnode.state.reactors = [ ...reactors, {
+                  Address: { address: userAddress, chain }
+                }];
                 m.redraw();
               });
           }
