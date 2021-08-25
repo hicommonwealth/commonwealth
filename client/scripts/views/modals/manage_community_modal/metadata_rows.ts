@@ -27,7 +27,7 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }>
           .length;
         return m('.RoleChild', [
           m(User, {
-            user: new AddressInfo(addr.id, addr.address, addr.chain, null, addr.is_magic), //role.Address, // make AddressInfo?
+            user: new AddressInfo(addr.id, addr.address, addr.chain, null, addr.is_magic), // role.Address, // make AddressInfo?
             popover: true,
             linkify: false,
             hideAvatar: false,
@@ -100,19 +100,21 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }>
 export const InputPropertyRow: m.Component<{
   title: string,
   defaultValue: string,
+  value?: string,
   disabled?: boolean,
   onChangeHandler: Function,
   placeholder?: string,
   textarea?: boolean,
 }> = {
   view: (vnode) => {
-    const { title, defaultValue, disabled, onChangeHandler, placeholder, textarea } = vnode.attrs;
+    const { title, defaultValue, value, disabled, onChangeHandler, placeholder, textarea } = vnode.attrs;
 
     return m('tr.InputPropertyRow', [
       m('td', { class: 'title-column', }, title),
       m('td', [
         m((textarea ? TextArea : Input), {
           defaultValue,
+          value,
           placeholder,
           fluid: true,
           disabled: disabled || false,
