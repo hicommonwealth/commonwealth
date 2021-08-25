@@ -6,6 +6,8 @@ import { factory, formatFilename } from '../../shared/logging';
 import models from '../database';
 import { Op } from 'sequelize';
 import { GetOrCreateResponse, PushPathResult } from '@textile/buckets/dist/cjs/types';
+import { Readable } from 'stream';
+
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -14,6 +16,7 @@ const IPFS_BACKUP_REPEAT = Number(process.env.IPFS_BACKUP_REPEAT) || 60;
 
 // the number of seconds since the last IPFS updated - when redeploying/restarting this should be updated
 // so that we're not re-uploading the same content to IPFS again (isn't a big issue but can be computationally expensive)
+// alternatively the last update time can be stored in the database but that seems too much for one table
 const IPFS_LAST_UPDATE = Number(process.env.IPFS_LAST_UPDATE) || 1800;
 
 // boolean where true means we should encrypt then upload private communities and
@@ -21,13 +24,17 @@ const IPFS_LAST_UPDATE = Number(process.env.IPFS_LAST_UPDATE) || 1800;
 const IPFS_PRIVATE_COMMUNITIES = !!process.env.IPFS_PRIVATE_COMMUNITIES || false;
 
 // the string id of a chain or community to upload to IPFS. Used primarily for testing or
-// for migrating specific backup changes
+// for migrating specific community/chain data to ipfs
 const IPFS_ONLY_CHAIN_OR_COMM = process.env.IPFS_ONLY_CHAIN_OR_COMM || null
+
+// the api key for the cw organization
+const HUB_CW_KEY = process.env.HUB_CW_KEY
 
 // the combination of IPFS_LAST_UPDATE and IPFS_ONLY_CHAIN_OR_COMM allows us to
 // completely refresh the ipfs bucket for any specific community
 
-// boolean where true means all bucket pushes happen asynchronously
+// boolean where true means all bucket pushes happen asynchronously and false
+// means they happen asynchronously
 const IPFS_ASYNC_PUSH = process.env.IPFS_ASYNC_PUSH || true
 
 async function main() {
@@ -37,43 +44,43 @@ async function main() {
 
   now = new Date()
 
-  try {
-    await updateAddresses(bucketClient)
-  } catch (error) {
-    await handleFatalError(error, 'addresses')
-  }
+  // try {
+  //   await updateAddresses(bucketClient)
+  // } catch (error) {
+  //   await handleFatalError(error, 'addresses')
+  // }
+  //
+  // try {
+  //   await updatePublicCommunities(bucketClient)
+  // } catch (error) {
+  //   await handleFatalError(error, 'communities')
+  // }
+  //
+  // try {
+  //   await updatePublicThreads(bucketClient)
+  // } catch (error) {
+  //   await handleFatalError(error, 'threads')
+  // }
+  //
+  // try {
+  //   await updatePublicComments(bucketClient)
+  // } catch (error) {
+  //   await handleFatalError(error, 'comments')
+  // }
+  //
+  // try {
+  //   await updatePublicReactions(bucketClient)
+  // } catch (error) {
+  //   await handleFatalError(error, 'reactions')
+  // }
+  //
+  // try {
+  //   await updatePublicTopics(bucketClient)
+  // } catch (error) {
+  //   await handleFatalError(error, 'topics')
+  // }
 
-  try {
-    await updatePublicCommunities(bucketClient)
-  } catch (error) {
-    await handleFatalError(error, 'communities')
-  }
-
-  try {
-    await updatePublicThreads(bucketClient)
-  } catch (error) {
-    await handleFatalError(error, 'threads')
-  }
-
-  try {
-    await updatePublicComments(bucketClient)
-  } catch (error) {
-    await handleFatalError(error, 'comments')
-  }
-
-  try {
-    await updatePublicReactions(bucketClient)
-  } catch (error) {
-    await handleFatalError(error, 'reactions')
-  }
-
-  try {
-    await updatePublicTopics(bucketClient)
-  } catch (error) {
-    await handleFatalError(error, 'topics')
-  }
-
-  // await sequelizeTester();
+  await sequelizeTester();
 
   lastUpdate = now
 
@@ -406,6 +413,10 @@ async function updatePublicTopics(bucketClient) {
         as: 'community',
         attributes: ['privacyEnabled']
       }
+    ],
+    order: [
+      ['chain_id', 'DESC'],
+      ['community_id', 'DESC']
     ]
   }))
 
@@ -413,30 +424,35 @@ async function updatePublicTopics(bucketClient) {
     topics = topics.filter(o => !o.community?.privacyEnabled)
   }
 
-  const promises = [];
+  let prevBucketName = null;
+  let bucketStreams = [];
   for (const topic of topics) {
     const bucketName = topic.community_id || topic.chain_id;
+
     if (IPFS_ONLY_CHAIN_OR_COMM && IPFS_ONLY_CHAIN_OR_COMM != bucketName) continue;
     await getOrCreateBucket(bucketClient, bucketName, !!topic.community?.privacyEnabled)
 
-    const data = [
-      buckets[bucketName].root.key,
-      `topics/${topic.id}.json`,
-      Buffer.from(JSON.stringify({
+    const data = {
+      path: `topics/${topic.id}.json`,
+      content: Readable.from(Buffer.from(JSON.stringify({
         name: topic.name,
         description: topic.description,
         telegram: topic.telegram
-      }))
-    ];
+      })))
+    }
 
-    if (IPFS_ASYNC_PUSH) promises.push(bucketClient.pushPath(...data))
-    else {
-      const result = await bucketClient.pushPath(...data)
-      await updateBucketCache(bucketName, result);
+    if (prevBucketName == bucketName) {
+      bucketStreams.push(data)
+    } else {
+
+      // these CANNOT be done in parallel because buckets works similar to git so parallel execution could cause
+      // pushing to the wrong bucket head
+      for await (const itr of bucketClient.pushPaths(buckets[prevBucketName].root.key, bucketStreams)) {}
+      bucketStreams = [data];
+      prevBucketName = bucketName;
     }
   }
 
-  if (IPFS_ASYNC_PUSH) await Promise.all(promises)
   log.info('Finished updating topics')
 }
 
@@ -481,28 +497,28 @@ async function updateBucketCache(bucketName: string, pushPathResult: PushPathRes
 }
 
 async function sequelizeTester() {
-  const result = await models.OffchainThread.findAll({
-    attributes: ['id', 'title', 'body', 'chain', 'community', 'kind', 'url', 'stage', 'topic_id'],
+  const result = await models.OffchainTopic.findAll({
+    attributes: ['id', 'name', 'deleted_at', 'chain_id', 'community_id', 'description', 'telegram'],
     where: {
       'updated_at': {
         [Op.gt]: lastUpdate,
         [Op.lte]: now,
       },
-      'deleted_at': null,
+      'deleted_at': null
     },
     include: [
       {
-        model: models.Address,
-        as: 'Address',
-        required: true,
-        attributes: ['address']
-      },
-      {
         model: models.OffchainCommunity,
+        as: 'community',
         attributes: ['privacyEnabled']
       }
     ],
+    order: [
+      ['chain_id', 'DESC'],
+      ['community_id', 'DESC']
+    ]
   })
+
 
   console.log(JSON.stringify(result))
   return;
