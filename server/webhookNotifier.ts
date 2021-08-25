@@ -270,8 +270,42 @@ const send = async (models, content: WebhookContent) => {
         //   'displayName': 'Commonwealth',
         //   'avatarUrl': 'http://commonwealthLogoGoesHere'
         // };
-      } else {
-        // TODO: other formats unimplemented
+      } else if (url.indexOf('telegram') !== -1) {
+        webhookData = isChainEvent ? {
+          username: 'Commonwealth',
+          avatar_url: DEFAULT_COMMONWEALTH_LOGO,
+          embeds: [{
+            author: {
+              name: 'New chain event',
+              url: chainEventLink,
+              icon_url: previewImageUrl
+            },
+            title,
+            url: chainEventLink,
+            description: fulltext,
+            color: 15258703,
+            thumbnail: {
+              'url': previewImageUrl
+            },
+          }]
+        } : {
+          username: 'Commonwealth',
+          avatar_url: DEFAULT_COMMONWEALTH_LOGO,
+          embeds: [{
+            author: {
+              name: actor,
+              url: actorAccountLink,
+              icon_url: actorAvatarUrl
+            },
+            title: notificationTitlePrefix + actedOn,
+            url: actedOnLink,
+            description: notificationExcerpt.replace(REGEX_EMOJI, ''), // discord webhook description doesn't accept emoji
+            color: 15258703,
+            thumbnail: {
+              'url': previewImageUrl
+            },
+          }]
+        };
       }
 
       if (!webhookData) {
