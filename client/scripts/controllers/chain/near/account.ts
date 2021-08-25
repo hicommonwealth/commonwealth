@@ -22,13 +22,15 @@ export interface INearValidators {
 }
 
 export class NearAccount extends Account<NearToken> {
-  private _nearlibAccount: NearJsAccount;
+  private _walletConnection: NearJsAccount;
+  public get walletConnection() { return this._walletConnection; }
+
   private _keyPair: KeyPair;
   private _Accounts: NearAccounts;
   private _Chain: NearChain;
   constructor(app: IApp, Chain: NearChain, Accounts: NearAccounts, address: string) {
     super(app, app.chain.meta.chain, address);
-    this._nearlibAccount = new NearJsAccount(Chain.api.connection, address);
+    this._walletConnection = new NearJsAccount(Chain.api.connection, address);
     this._Chain = Chain;
     this._Accounts = Accounts;
     this.updateKeypair(); // async action -- should be quick tho
@@ -36,7 +38,7 @@ export class NearAccount extends Account<NearToken> {
   }
 
   public get balance(): Promise<NearToken> {
-    return this._nearlibAccount.state().then(
+    return this._walletConnection.state().then(
       (s: AccountView) => {
         return this._Chain.coins(s.amount, false);
       }

@@ -42,7 +42,8 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
     this._config = {
       networkId: node.chain.id === 'near-local' ? 'local' : 'default',
       nodeUrl: node.url,
-      walletUrl: 'https://wallet.nearprotocol.com', // TODO: alternatives?
+      // TODO: configure wallet URL for beta/testnet
+      walletUrl: 'https://wallet.near.org/',
       deps: {
         keyStore: new keyStores.BrowserLocalStorageKeyStore(),
       },

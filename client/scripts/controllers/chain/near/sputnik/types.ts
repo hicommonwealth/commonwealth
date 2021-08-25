@@ -118,7 +118,7 @@ type AddMemberToRole = { AddMemberToRole: { role: string, member_id: AccountId }
 type RemoveMemberFromRole = { RemoveMemberFromRole : { role: string, member_id: AccountId } };
 type Transfer = { Transfer: { token_id: AccountId, amount: U128, receiver_id: AccountId, msg?: string } };
 type FunctionCall = { FunctionCall: { actions: NearSputnikActionCall[], receiver_id: AccountId } };
-type NearSputnikProposalKind = 'ChangeConfig'
+export type NearSputnikProposalKind = 'ChangeConfig'
   | 'ChangePolicy'
   | 'UpgradeSelf'
   | 'UpgradeRemote'
