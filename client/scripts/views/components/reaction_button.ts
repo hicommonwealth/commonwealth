@@ -112,7 +112,7 @@ const ReactionButton: m.Component<ReactionButtonAttrs, ReactionButtonState> = {
             modal: SelectAddressModal,
           });
         } else {
-          const { address: userAddress, chain } = app.user.activeAccount
+          const { address: userAddress, chain } = app.user.activeAccount;
           // if it's a community use the app.user.activeAccount.chain.id instead of author chain
           const chainId = app.activeCommunityId() ? null : app.activeChainId();
           const communityId = app.activeCommunityId();

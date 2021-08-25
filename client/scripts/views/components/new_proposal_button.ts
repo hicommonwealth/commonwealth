@@ -40,11 +40,11 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
         iconLeft: mobile ? Icons.PLUS : undefined,
       })
     )),
-    (app.chain?.network === ChainNetwork.Aave || 
-      app.chain?.network === ChainNetwork.dYdX ||
-      app.chain?.network === ChainNetwork.Compound ||
-      app.chain?.base === ChainBase.CosmosSDK || 
-      app.chain?.base === ChainBase.Substrate)
+    (app.chain?.network === ChainNetwork.Aave
+      || app.chain?.network === ChainNetwork.dYdX
+      || app.chain?.network === ChainNetwork.Compound
+      || app.chain?.base === ChainBase.CosmosSDK
+      || app.chain?.base === ChainBase.Substrate)
       && !mobile
       && m(MenuDivider),
     app.chain?.base === ChainBase.CosmosSDK && m(MenuItem, {
