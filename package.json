@@ -80,6 +80,7 @@
     "@popperjs/core": "^2.0.6",
     "@sendgrid/mail": "^6.5.0",
     "@snapshot-labs/snapshot.js": "^0.1.9",
+    "@terra-money/terra.js": "^2.0.4",
     "@typechain/ethers-v5": "^6.0.0",
     "@types/bluebird": "^3.5.36",
     "@types/bn.js": "^4.11.6",
