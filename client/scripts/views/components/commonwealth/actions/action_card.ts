@@ -12,7 +12,7 @@ import { CWUser } from '../members_card';
 
 const ActionCard: m.Component<{
   project: CMNProject,
-  protocol: any,
+  projectProtocol: any,
   curators: CWUser[],
   backers: CWUser[],
 },
@@ -26,7 +26,7 @@ const ActionCard: m.Component<{
     vnode.state.amount = 0;
   },
   view: (vnode) => {
-    const { project, protocol, curators, backers } = vnode.attrs;
+    const { project, projectProtocol, curators, backers } = vnode.attrs;
     const threshold = utils.formatEther(project.threshold.asBN.toString());
     const totalFunding = utils.formatEther(project.totalFunding.asBN.toString());
     const acceptedTokenStr = project.totalFunding.denom;
@@ -51,17 +51,17 @@ const ActionCard: m.Component<{
         ]),
       ]),
       project.status === 'In Progress' && m(InProgressActionCard, {
-        project: project,
-        protocol: protocol
+        project,
+        projectProtocol,
       }),
       project.status === 'Successed' && m(SuccsedActionCard, {
-        project: project,
-        protocol: protocol,
+        project,
+        projectProtocol,
         curators
       }),
       project.status === 'Failed' && m(FailedActionCard, {
-        project: project,
-        protocol: protocol,
+        project,
+        projectProtocol,
         backers
       }),
       notLoggedIn && m('p.display-txt', 'Please login first')
@@ -76,7 +76,6 @@ const ActionCard: m.Component<{
       // }),
     ]);
   }
-}
-
+};
 
 export default ActionCard;

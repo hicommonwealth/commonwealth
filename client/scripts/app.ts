@@ -244,7 +244,6 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       /* webpackChunkName: "commonwealth-main" */
       './controllers/chain/ethereum/commonwealth/adapter'
     )).default;
-    console.log('=====>commonwealth');
     newChain = new Commonwealth(n, app);
   } else if (n.chain.base === ChainBase.Substrate) {
     const Substrate = (await import(

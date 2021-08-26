@@ -23,15 +23,15 @@ const UserComp: m.Component<{user: CWUser}> = {
 
 const connectionReady = () => {
   if (!app.chain) return false;
-  const protocol = (app.chain as any).protocol;
-  if (!protocol || !protocol.initialized || !protocol.memberStore) return false;
+  const projectProtocol = (app.chain as any).projectProtocol;
+  if (!projectProtocol || !projectProtocol.initialized || !projectProtocol.memberStore) return false;
   return true;
 };
 
 const MembersModule: m.Component<
   {
     project: CMNProject,
-    protocol: any
+    projectProtocol: any
   },
   {
     initialized: boolean,
@@ -42,7 +42,7 @@ const MembersModule: m.Component<
   onupdate: async (vnode) => {
     if (!connectionReady()) return;
     const { project } = vnode.attrs;
-    const { backers, curators } = await (app.chain as any).protocol.syncMembers(
+    const { backers, curators } = await (app.chain as any).projectProtocol.syncMembers(
       project.bToken, project.cToken, project.projectHash
     );
     vnode.state.backers = backers;

@@ -12,4 +12,15 @@
     border-right: none;
     width: 400px;
   }
+
+  .SelectTokensField {
+    .cui-overlay,
+    .cui-select-list {
+      width: 100%;
+    }
+  
+    .cui-overlay {
+      display: block !important;
+    }
+  }
 }

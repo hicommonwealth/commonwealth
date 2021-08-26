@@ -7,6 +7,7 @@ import 'pages/new_proposal_page.scss';
 
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
+import SelectToken from 'views/components/commonwealth/select_token';
 
 import app from 'state';
 
@@ -107,20 +108,52 @@ const NewProjectForm = {
             ]),
             // acceptedToken
             m(FormGroup, [
-              m(FormLabel, 'Backer with Ether'),
-              m(Checkbox, {
-                checked: true,
-                disabled: true,
-                style: { margin: '0 0 0 5px' },
-                onchange: async (e) => {
-                  // e.preventDefault();
-                  // m.redraw();
+              m(FormLabel, () => {
+                const { tokens } = vnode.state.form;
+                if (tokens.length === 0) {
+                  return 'Please select Accepted Tokens';
+                }
+                let label = 'Accepted Tokens: ';
+                for (let i = 0; i < tokens.length; i++) {
+                  label += `${tokens[i].symbol}, `;
+                }
+                return label;
+              }),
+              m(SelectToken, {
+                tokens: [
+                  {
+                    id: 'ETH',
+                    name: 'ETH',
+                    address: {
+                      kovan: '',
+                      mainnet: ''
+                    },
+                    decimals: 18,
+                    symbol: 'ETH',
+                    icon_url: ''
+                  },
+                  {
+                    id: 'USDT',
+                    name: 'USDT',
+                    address: {
+                      kovan: '',
+                      mainnet: ''
+                    },
+                    decimals: 6,
+                    symbol: 'USDT',
+                    icon_url: ''
+                  },
+                ],
+                selectedTokens: vnode.state.form.tokens || [],
+                updateTokens: (tokens) => {
+                  vnode.state.form.tokens = tokens;
+                  m.redraw();
                 }
               }),
             ]),
             // threshold
             m(FormGroup, [
-              m(FormLabel, `Threshold Amount (${app.chain.chain.denom})`),
+              m(FormLabel, 'Threshold Amount in USD'),
               m(Input, {
                 disabled: submitting,
                 name: 'threshold',
@@ -217,13 +250,13 @@ const NewProjectForm = {
   }
 };
 
-const NewProjectPage: m.Component<{ type }, { submitting: boolean, createError: string }> = {
+const NewProjectPage: m.Component<{}, { submitting: boolean, createError: string }> = {
   view: (vnode) => {
     if (!app.chain) {
       return m(PageLoading);
     }
-    const protocol = (app.chain as any).protocol;
-    if (!protocol || !protocol.initialized) {
+    const projectProtocol = (app.chain as any).projectProtocol;
+    if (!projectProtocol || !projectProtocol.initialized) {
       return m(PageLoading);
     }
 
@@ -235,20 +268,21 @@ const NewProjectPage: m.Component<{ type }, { submitting: boolean, createError: 
       m('.forum-container', [
         m(NewProjectForm, {
           callback: async (projectData: any) => {
-            const author = app.user.activeAccount.address;
-            vnode.state.submitting = true;
-            const res = await protocol.createProject(
-              projectData.name,
-              projectData.description,
-              author,
-              projectData.beneficiary,
-              projectData.threshold,
-              parseFloat(projectData.curatorFee),
-              parseFloat(projectData.deadline),
-            );
-            vnode.state.createError = res.error;
-            vnode.state.submitting = false;
-            m.redraw();
+            console.log('====>', projectData);
+            // const author = app.user.activeAccount.address;
+            // vnode.state.submitting = true;
+            // const res = await projectProtocol.createProject(
+            //   projectData.name,
+            //   projectData.description,
+            //   author,
+            //   projectData.beneficiary,
+            //   projectData.threshold,
+            //   parseFloat(projectData.curatorFee),
+            //   parseFloat(projectData.deadline),
+            // );
+            // vnode.state.createError = res.error;
+            // vnode.state.submitting = false;
+            // m.redraw();
           },
           submitting: vnode.state.submitting,
         }),

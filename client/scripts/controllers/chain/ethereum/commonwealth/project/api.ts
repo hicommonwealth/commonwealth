@@ -2,9 +2,12 @@ import { utils } from 'ethers';
 import BN from 'bn.js';
 import $ from 'jquery';
 
-import { ProjectFactory as CMNProjectProtocolContract, Project as CMNProjectContract } from 'eth/types';
+import { ProjectFactory as CMNProjectProtocolContract, Project as CMNProjectContract, ERC20__factory } from 'eth/types';
+import TokenApi from '../../token/api';
+
 import { CMNProject } from '../../../../../models';
 import ContractApi from '../../contractApi';
+import EthereumChain from '../../chain';
 
 export interface ProjectMetaData {
   name: string
@@ -25,6 +28,42 @@ export default class CMNProjectAPI extends ContractApi<CMNProjectProtocolContrac
   public async init() {
     this._projectApis = {};
     super.init();
+  }
+
+  public async getProjectAcceptedTokens(contract: CMNProjectContract, chain: EthereumChain) {
+    // TODO: this data should be retrived from contract
+
+    const tokenAddresses = [
+      '0x0fdb03df7cd3cc9d6831328acb8ac25d420543e5', // USDC
+      '0xb6762aec2b3cd39d31651cb48f38d1cd4fdafb8b', // USDT
+    ];
+
+    const acceptedTokens = tokenAddresses.map((addr) => new TokenApi(
+      ERC20__factory.connect,
+      addr,
+      chain.api.currentProvider as any
+    ));
+
+    return acceptedTokens;
+  }
+
+  public async getProtocolAcceptedTokens(chain: EthereumChain) {
+    // TODO: this data should be retrived from contract
+
+    const tokenAddresses = [
+      '0x0fdb03df7cd3cc9d6831328acb8ac25d420543e5', // USDC
+      '0xb6762aec2b3cd39d31651cb48f38d1cd4fdafb8b', // USDT
+      '0xa0a5ad2296b38bd3e3eb59aaeaf1589e8d9a29a9', // WBTC
+      '0xc4375b7de8af5a38a93548eb8453a498222c4ff2', // DAI
+    ];
+
+    const acceptedTokens = tokenAddresses.map((addr) => new TokenApi(
+      ERC20__factory.connect,
+      addr,
+      chain.api.currentProvider as any
+    ));
+
+    return acceptedTokens;
   }
 
   public getProjectAPI(projAddress: string) {

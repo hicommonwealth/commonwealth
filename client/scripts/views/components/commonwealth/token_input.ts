@@ -1,8 +1,7 @@
 import 'components/commonwealth/token_input.scss';
 
 import m from 'mithril';
-import { Input, Button } from 'construct-ui';
-import SelectTokensField from './select_tokens';
+import { CustomSelect, ListItem, Icon, Icons, IOption, Input, Button  } from 'construct-ui';
 
 export type Token = {
   id: string;
@@ -16,48 +15,37 @@ export type Token = {
   icon_url: string;
 }
 
-export const tokens = [
-  {
-    id: 'ETH',
-    name: 'ETH',
-    address: {
-      kovan: '',
-      mainnet: ''
-    },
-    decimals: 18,
-    symbol: 'ETH',
-    icon_url: ''
-  },
-  {
-    id: 'USDT',
-    name: 'USDT',
-    address: {
-      kovan: '',
-      mainnet: ''
-    },
-    decimals: 6,
-    symbol: 'USDT',
-    icon_url: ''
-  },
-];
-
-interface IAttrs {
-}
-
-interface IState {
-  token: Token,
-  balance: number,
-}
-
-const TokenInputField: m.Component<IAttrs, IState> = {
+const TokenInputField: m.Component<
+  { tokens: Token[] },
+  { token: Token, balance: number }
+> = {
   view: (vnode) => {
+    const { tokens } = vnode.attrs;
+    const options = tokens.map(({ id, name }) => {
+      return {
+        label: name,
+        value: id
+      };
+    });
+
     return m('.TokenInput', [
-      m(SelectTokensField, {
-        defaultToken: vnode.state.token || tokens[0],
-        onChange: (newToken: Token) => {
-          vnode.state.token = newToken;
-        }
-      }),
+      m('.SelectTokensField', [
+        m(CustomSelect, {
+          defaultValue: options[0].value,
+          itemRender: (item, isSelected, index) => m(ListItem, {
+            contentLeft: m(Icon, {
+              name: index % 2 ? Icons.FILE_PLUS : Icons.USERS
+            }),
+            label: (item as IOption).label,
+            selected: isSelected
+          }),
+          options,
+          onSelect: (s) => {
+            const selectedToken = tokens.filter(({ id }) => id === (s as any).value)[0];
+            vnode.state.token = selectedToken;
+          }
+        })
+      ]),
       m(Input, {
         placeholder: 'Type your amount to back',
         oninput: (e) => {
