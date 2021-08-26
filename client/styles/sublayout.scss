@@ -52,8 +52,6 @@
         }
     }
     .sublayout-sidebar-col {
-        flex: 1;
-        padding-right: 48px;
         max-width: $sidebar-width;
         .Sidebar {
             max-width: 190px; // sidebar button width
@@ -72,8 +70,7 @@
     .sublayout-main-col {
         flex: 3;
         padding: 0;
-        padding-right: 20px;
-        max-width: calc(100% - #{$sidebar-width});
+        padding: 36px;
         @include sm-max {
             padding: 0;
         }
@@ -116,8 +113,7 @@
         }
         margin: 0 auto;
         border-bottom: 1px solid $border-color-off-white;
-        padding: 24px 0 22px;
-        padding-right: 20px;
+        padding: 24px;
         @include md-max {
             @include narrowBrowserHeader();
             padding-right: 0;
@@ -136,6 +132,9 @@
             max-width: $layout-max-width;
             padding: 0 $layout-padding;
             margin: 0 auto;
+            .SearchBar {
+                flex: 8;
+            }
             .hide-sidebar & {
                 max-width: 840px;
                 margin: 0 auto;
@@ -146,7 +145,7 @@
             display: flex;
             align-items: center;
             margin-top: 0 !important;
-            flex: 3;
+            flex: 2;
             white-space: nowrap;
             > .ChainIcon{
                 width: 22px;
@@ -206,7 +205,7 @@
         .sublayout-header-right {
             display: flex;
             align-items: center;
-            flex: 1;
+            flex: 2;
             text-align: right;
             flex-direction: row-reverse;
             > .cui-button,

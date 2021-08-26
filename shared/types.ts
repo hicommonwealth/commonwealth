@@ -27,7 +27,7 @@ export enum ProposalType {
   CosmosProposal = 'cosmosproposal',
   MolochProposal = 'molochproposal',
   AaveProposal = 'aaveproposal',
-  MarlinProposal = 'marlinproposal',
+  CompoundProposal = 'compoundproposal',
 }
 
 export enum WebsocketEventType {

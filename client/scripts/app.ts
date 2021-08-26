@@ -14,7 +14,7 @@ import moment from 'moment';
 import mixpanel from 'mixpanel-browser';
 import _ from 'underscore';
 
-import { AaveTypes, MarlinTypes, MolochTypes } from '@commonwealth/chain-events';
+import { AaveTypes, CompoundTypes, MolochTypes } from '@commonwealth/chain-events';
 import app, { ApiStatus, LoginState } from 'state';
 import {
   ChainInfo,
@@ -65,6 +65,7 @@ export async function initAppState(updateSelectedNode = true, customDomain = nul
           url: node.url,
           chain: app.config.chains.getById(node.chain),
           address: node.address,
+          token_name: node.token_name,
         }));
       });
       data.communities.sort((a, b) => a.id - b.id).map((community) => {
@@ -274,13 +275,13 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/ethereum/moloch/adapter'
     )).default;
     newChain = new Moloch(n, app);
-  } else if (MarlinTypes.EventChains.find((c) => c === n.chain.network)) {
-    const Marlin = (await import(
+  } else if (CompoundTypes.EventChains.find((c) => c === n.chain.network || c === n.chain.id)) {
+    const Compound = (await import(
       /* webpackMode: "lazy" */
-      /* webpackChunkName: "marlin-main" */
-      './controllers/chain/ethereum/marlin/adapter'
+      /* webpackChunkName: "compound-main" */
+      './controllers/chain/ethereum/compound/adapter'
     )).default;
-    newChain = new Marlin(n, app);
+    newChain = new Compound(n, app);
   } else if (AaveTypes.EventChains.find((c) => c === n.chain.network)) {
     const Aave = (await import(
       /* webpackMode: "lazy" */

@@ -6,7 +6,7 @@ import { GITHUB_OAUTH_CALLBACK } from '../config';
 
 const startOAuthLogin = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   let successRedirect = '/';
-  let failureRedirect = '#!/login';
+  const failureRedirect = '#!/login';
   if (req.query.from) {
     // Validate that req.query.from matches an existing Chain or Community
     try {
@@ -24,8 +24,8 @@ const startOAuthLogin = async (models: DB, req: Request, res: Response, next: Ne
 
   passport.authenticate('github', {
     callbackURL: `${GITHUB_OAUTH_CALLBACK}?from=${encodeURIComponent(req.hostname)}`,
-    successRedirect: successRedirect,
-    failureRedirect: failureRedirect,
+    successRedirect,
+    failureRedirect,
   } as any)(req, res, next); // TODO: extend AuthenticateOptions typing used here
 };
 

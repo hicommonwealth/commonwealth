@@ -14,6 +14,7 @@ import CommentsController from './controllers/server/comments';
 import ThreadsController from './controllers/server/threads';
 import SnapshotController from './controllers/chain/snapshot';
 import ReactionsController from './controllers/server/reactions';
+import ReactionCountsController from './controllers/server/reactionCounts';
 import WebsocketController from './controllers/server/socket';
 import TopicsController from './controllers/server/topics';
 import CommunitiesController from './controllers/server/communities';
@@ -49,6 +50,7 @@ export interface IApp {
   threads: ThreadsController;
   snapshot: SnapshotController;
   reactions: ReactionsController;
+  reactionCounts: ReactionCountsController;
   topics: TopicsController;
   communities: CommunitiesController;
   user: UserController;
@@ -115,6 +117,7 @@ const app: IApp = {
   threads: new ThreadsController(),
   snapshot: new SnapshotController(),
   reactions: new ReactionsController(),
+  reactionCounts: new ReactionCountsController(),
   topics: new TopicsController(),
   communities: new CommunitiesController(),
   user: new UserController(),

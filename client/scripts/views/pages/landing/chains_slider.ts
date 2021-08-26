@@ -2,12 +2,10 @@ import m from 'mithril';
 import 'pages/landing/chains_slider.scss';
 import { Chain } from './index';
 
-
 interface IState {
   chains: Chain[];
   oncreateSlider: Function;
 }
-
 
 const TokensChainsComponent: m.Component<IState, IState> = {
   oninit: (vnode) => {
@@ -60,7 +58,7 @@ const TokensChainsComponent: m.Component<IState, IState> = {
                       {
                         id:`card_${index}`,
                         class: 'glide__slide mt-4 pb-8',
-  
+
                         onclick: (e) => {
                           e.preventDefault();
                           localStorage['home-scrollY'] = window.scrollY;
