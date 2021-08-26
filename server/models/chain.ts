@@ -33,7 +33,7 @@ export interface ChainAttributes {
   collapsed_on_homepage?: boolean;
   featured_topics?: string[];
   substrate_spec?: RegisteredTypes;
-  has_chain_events_listener: boolean;
+  has_chain_events_listener?: boolean;
   terms?: string;
   snapshot?: string;
 

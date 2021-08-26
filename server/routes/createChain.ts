@@ -130,7 +130,7 @@ const createChain = async (
     telegram: req.body.telegram,
     github: req.body.github,
     element: req.body.element,
-    base: req.body.base
+    base: req.body.base,
   };
   const chain = await models.Chain.create(chainContent);
 

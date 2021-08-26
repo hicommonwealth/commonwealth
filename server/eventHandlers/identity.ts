@@ -53,7 +53,7 @@ export default class extends IEventHandler {
     // update profile data depending on event
     if (event.data.kind === SubstrateTypes.EventKind.IdentitySet) {
       profile.identity = event.data.displayName;
-      profile.judgements = _.object<[AccountId, IdentityJudgement][]>(event.data.judgements)
+      profile.judgements = _.object<{ [registrar: string]: IdentityJudgement; }>(event.data.judgements)
       await profile.save();
 
       // write a comment about the new identity
