@@ -11,7 +11,7 @@ const domain = async (models: DB, req: Request, res: Response, next: NextFunctio
       models.OffchainCommunity.findOne({ where: { customDomain: hostname } }),
     ]);
     if (chain || community) {
-      return res.json({ customDomain: chain ? chain.id : community.id })
+      return res.json({ customDomain: chain ? chain.id : community.id });
     }
   } catch (e) {}
 

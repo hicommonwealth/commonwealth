@@ -21,6 +21,7 @@ import { notifyError } from 'controllers/app/notifications';
 import { updateLastVisited } from 'controllers/app/login';
 import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
 import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
+import { modelFromServer as modelReactionCountFromServer }  from 'controllers/server/reactionCounts';
 
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
@@ -316,7 +317,6 @@ class ThreadsController {
         thread.offchainVotingOptions = { name, choices };
         thread.offchainVotingNumVotes = 0;
         thread.offchainVotingEndsAt = moment(response.result.offchain_voting_ends_at);
-        return;
       },
       error: (err) => {
         console.log('Failed to start polling');
@@ -471,7 +471,7 @@ class ThreadsController {
     if (response.status !== 'Success') {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);
     }
-    const { threads, comments, reactions } = response.result;
+    const { threads, comments } = response.result;
     for (const thread of threads) {
       const modeledThread = modelFromServer(thread);
       if (!thread.Address) {
@@ -499,13 +499,18 @@ class ThreadsController {
         console.error(e.message);
       }
     }
-    for (const reaction of reactions) {
-      const existing = app.reactions.store.getById(reaction.id);
+    const { result: reactionCounts } = await $.post(`${app.serverUrl()}/reactionsCounts`, {
+      thread_ids: threads.map((thread) => thread.id),
+      active_address: app.user.activeAccount?.address
+    });
+    for (const rc of reactionCounts) {
+      const id = app.reactionCounts.store.getIdentifier(rc);
+      const existing = app.reactionCounts.store.getById(id);
       if (existing) {
-        app.reactions.store.remove(existing);
+        app.reactionCounts.store.remove(existing);
       }
       try {
-        app.reactions.store.add(modelReactionFromServer(reaction));
+        app.reactionCounts.store.add(modelReactionCountFromServer({ ...rc, id }));
       } catch (e) {
         console.error(e.message);
       }

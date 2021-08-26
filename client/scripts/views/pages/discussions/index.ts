@@ -170,7 +170,7 @@ const DiscussionStagesBar: m.Component<{ topic: string; stage: string }, {}> = {
               },
               label: m('.topic-menu-item', [
                 m('.topic-menu-item-name', name),
-                  app.user?.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
+                app.user?.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
                     && m(Button, {
                       size: 'xs',
                       label: 'Edit',
@@ -263,7 +263,7 @@ const DiscussionsPage: m.Component<
     vnode.state.lookback = {};
     vnode.state.postsDepleted = {};
     vnode.state.topicInitialized = {};
-    vnode.state.topicInitialized[ALL_PROPOSALS_KEY] = true;
+    vnode.state.topicInitialized[ALL_PROPOSALS_KEY] = false;
     const topic = vnode.attrs.topic;
     const stage = m.route.param('stage');
     const subpage = topic || stage ? `${topic || ''}#${stage || ''}` : ALL_PROPOSALS_KEY;
@@ -489,7 +489,7 @@ const DiscussionsPage: m.Component<
       chain: app.activeChainId(),
       community: app.activeCommunityId(),
     });
-
+    console.log('still fetching', stillFetching);
     return m(
       Sublayout,
       {

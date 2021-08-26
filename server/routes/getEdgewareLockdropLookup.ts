@@ -91,7 +91,6 @@ export const getSignalsForAddress = async (userAddress, lockdropContractAddress,
   return results;
 };
 
-
 const fetchLocks = async (network = 'mainnet', address, contract) => {
   const web3 = setupWeb3Provider(network);
   const results = await getLocksForAddress(address, contract, web3);
@@ -117,11 +116,11 @@ export default async (models: DB, req: Request, res: Response, next: NextFunctio
     ? [MAINNET_LOCKDROP_ORIG, MAINNET_LOCKDROP]
     : [ROPSTEN_LOCKDROP];
 
-  const locks = await Promise.all(contracts.map(async c => {
+  const locks = await Promise.all(contracts.map(async (c) => {
     // eslint-disable-next-line no-return-await
     return await fetchLocks(network, address, c);
   }));
-  const signals = await Promise.all(contracts.map(async c => {
+  const signals = await Promise.all(contracts.map(async (c) => {
     // eslint-disable-next-line no-return-await
     return await fetchSignals(network, address, c);
   }));

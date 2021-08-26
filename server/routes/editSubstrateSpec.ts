@@ -42,5 +42,4 @@ const editSubstrateSpec = async (models: DB, req: Request, res: Response, next: 
   return res.json({ status: 'Success', result: chain.toJSON() });
 };
 
-
 export default editSubstrateSpec;

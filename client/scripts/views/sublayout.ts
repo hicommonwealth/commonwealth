@@ -57,8 +57,8 @@ const Sublayout: m.Component<{
       (!app.activeId() && !app.isCustomDomain() && (m.route.get() === '/' || m.route.get().startsWith('/?'))) ? [
         m('h3', 'Commonwealth')
       ] : chain ? [
-        m('.ChainIcon',[
-          link('a', (!app.isCustomDomain() ? `/${app.activeId()}` : '/' ), [
+        m('.ChainIcon', [
+          link('a', (!app.isCustomDomain() ? `/${app.activeId()}` : '/'), [
             m(ChainIcon, { size: ICON_SIZE, chain })
           ])
         ]),
@@ -69,7 +69,7 @@ const Sublayout: m.Component<{
         ]),
       ] : community ? [
         m('.ChainIcon', [
-          link('a', (!app.isCustomDomain() ? `/${app.activeId()}` : '/' ), [
+          link('a', (!app.isCustomDomain() ? `/${app.activeId()}` : '/'), [
             m(CommunityIcon, { size: ICON_SIZE, community })
           ])
         ]),

@@ -34,7 +34,7 @@ export function parseCustomStages(str) {
   } catch (e) {
     return [];
   }
-  return arr.map((s) => s?.toString()).filter(s => s) as unknown as OffchainThreadStage[];
+  return arr.map((s) => s?.toString()).filter((s) => s) as unknown as OffchainThreadStage[];
 }
 
 /*

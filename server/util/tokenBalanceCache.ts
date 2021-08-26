@@ -83,8 +83,8 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
   }
 
   public async hasToken(contractId: string, address: string, network = 'mainnet'): Promise<boolean> {
-    const tokenMeta = await this.models.Chain.findOne({ where: { id: contractId } }) ||
-      await this.models.Chain.Token({ where: { id: contractId } });
+    const tokenMeta = await this.models.Chain.findOne({ where: { id: contractId } })
+      || await this.models.Chain.Token({ where: { id: contractId } });
 
     if (!tokenMeta) throw new Error('unsupported token');
     const threshold = tokenMeta.balanceThreshold || new BN(1);
