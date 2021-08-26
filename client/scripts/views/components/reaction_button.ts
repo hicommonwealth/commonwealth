@@ -34,10 +34,7 @@ const ReactionButton: m.Component<{
     if (type === ReactionType.Like) likes = reactions.filter((r) => r.reaction === 'like');
     if (type === ReactionType.Dislike) dislikes = reactions.filter((r) => r.reaction === 'dislike');
 
-    const isCommunity = !!app.activeCommunityId();
-
-    const disabled = vnode.state.loading
-      || (!isCommunity && (app.chain as Token).isToken && !(app.chain as Token).hasToken);
+    const disabled = vnode.state.loading;
     const activeAddress = app.user.activeAccount?.address;
     const rxn = reactions.find((r) => r.reaction && r.author === activeAddress);
     const hasReacted : boolean = !!rxn;
