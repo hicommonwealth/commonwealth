@@ -43,7 +43,7 @@ const ProfileCommentGroup : m.Component<IProfileCommentGroupAttrs> = {
           ),
           ' in ',
           link('a', `/${proposal.chain || proposal.community}`,
-            ` ${ proposal.chain || proposal.community }`),
+            ` ${proposal.chain || proposal.community}`),
         ],
         comments[0] && comments[0].createdAt && [
           m.trust(' &middot; '),

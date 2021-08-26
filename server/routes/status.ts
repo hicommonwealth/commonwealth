@@ -126,7 +126,7 @@ GROUP BY CONCAT("OffchainThreads".chain, "OffchainThreads".community);
   const allCommunities : any = _.uniqBy(publicCommunities.concat(privateCommunities), 'id');
 
   const threadCount = {};
-    const threadCountQueryData: ThreadCountQueryData[] = await models.sequelize.query(`
+  const threadCountQueryData: ThreadCountQueryData[] = await models.sequelize.query(`
 SELECT CONCAT("OffchainThreads".chain, "OffchainThreads".community), COUNT("OffchainThreads".id)
   FROM "OffchainThreads"
   LEFT JOIN "OffchainCommunities"
