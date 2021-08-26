@@ -21,7 +21,6 @@ import { NotificationCategories } from './shared/types';
 import ViewCountCache from './server/util/viewCountCache';
 import IdentityFetchCache from './server/util/identityFetchCache';
 import TokenBalanceCache from './server/util/tokenBalanceCache';
-import TokenListCache from './server/util/tokenListCache';
 import { MockTokenBalanceProvider } from './test/util/modelUtils';
 
 require('express-async-errors');
@@ -33,9 +32,8 @@ const viewCountCache = new ViewCountCache(1, 10 * 60);
 const identityFetchCache = new IdentityFetchCache(0);
 
 // always prune both token and non-token holders asap
-const tokenListCache = new TokenListCache();
 const mockTokenBalanceProvider = new MockTokenBalanceProvider();
-const tokenBalanceCache = new TokenBalanceCache(tokenListCache, 0, 0, mockTokenBalanceProvider);
+const tokenBalanceCache = new TokenBalanceCache(models, 0, 0, mockTokenBalanceProvider);
 const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
 let server;
 
@@ -123,7 +121,7 @@ const resetServer = (debug=false): Promise<void> => {
         active: true,
         type: 'chain',
         base: 'substrate',
-        ss58_prefix: '7',
+        ss58_prefix: 7,
       });
       const eth = await models['Chain'].create({
         id: 'ethereum',
@@ -174,7 +172,7 @@ const resetServer = (debug=false): Promise<void> => {
           user_id: 1,
           address: '0x34C3A5ea06a3A67229fb21a7043243B0eB3e853f',
           chain: 'ethereum',
-          selected: true,
+          // selected: true,
           verification_token: 'PLACEHOLDER',
           verification_token_expires: null,
           verified: new Date(),
@@ -184,7 +182,7 @@ const resetServer = (debug=false): Promise<void> => {
           chain: 'edgeware',
           verification_token: 'PLACEHOLDER',
           verification_token_expires: null,
-          verified: true,
+          verified: new Date(),
           keytype: 'sr25519',
         }),
         models['Address'].create({
@@ -192,7 +190,7 @@ const resetServer = (debug=false): Promise<void> => {
           chain: 'edgeware',
           verification_token: 'PLACEHOLDER',
           verification_token_expires: null,
-          verified: true,
+          verified: new Date(),
           keytype: 'sr25519',
         }),
         models['Address'].create({
@@ -200,7 +198,7 @@ const resetServer = (debug=false): Promise<void> => {
           chain: 'edgeware',
           verification_token: 'PLACEHOLDER',
           verification_token_expires: null,
-          verified: true,
+          verified: new Date(),
           keytype: 'sr25519',
         }),
       ]);

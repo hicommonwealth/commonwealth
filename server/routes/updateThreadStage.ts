@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import { factory, formatFilename } from '../../shared/logging';
+import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -12,7 +13,7 @@ export const Errors = {
   InvalidStage: 'Invalid stage',
 };
 
-const updateThreadStage = async (models, req: Request, res: Response, next: NextFunction) => {
+const updateThreadStage = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const { thread_id, stage } = req.body;
   if (!thread_id) return next(new Error(Errors.NoThreadId));
   if (!stage) return next(new Error(Errors.NoStage));
@@ -25,7 +26,7 @@ const updateThreadStage = async (models, req: Request, res: Response, next: Next
       },
     });
     if (!thread) return next(new Error(Errors.NoThread));
-    const userOwnedAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
+    const userOwnedAddressIds = (await req.user.getAddresses()).filter((addr) => !!addr.verified).map((addr) => addr.id);
     if (!userOwnedAddressIds.includes(thread.address_id)) { // is not author
       const roles = await models.Role.findAll({
         where: {
@@ -52,7 +53,7 @@ const updateThreadStage = async (models, req: Request, res: Response, next: Next
     } catch (e) {}
 
     // validate stage
-    const availableStages = !customStages ? [
+    const availableStages = customStages.length === 0 ? [
       'discussion', 'proposal_in_review', 'voting', 'passed', 'failed',
     ] : customStages;
 
@@ -71,7 +72,7 @@ const updateThreadStage = async (models, req: Request, res: Response, next: Next
         },
         {
           model: models.Address,
-          through: models.Collaboration,
+          // through: models.Collaboration,
           as: 'collaborators'
         },
         models.OffchainAttachment,

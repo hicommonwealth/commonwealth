@@ -1,4 +1,6 @@
 import * as Sequelize from 'sequelize';
+import { DataTypes, Model } from 'sequelize';
+import { ModelStatic } from './types';
 
 export interface TaggedThreadAttributes {
   topic_id: string;
@@ -8,24 +10,23 @@ export interface TaggedThreadAttributes {
 }
 
 export interface TaggedThreadInstance
-extends Sequelize.Instance<TaggedThreadAttributes>, TaggedThreadAttributes {
+extends Model<TaggedThreadAttributes>, TaggedThreadAttributes {}
 
-}
-
-export interface TaggedThreadModel extends Sequelize.Model<TaggedThreadInstance, TaggedThreadAttributes> {
-
-}
+export type TaggedThreadModelStatic = ModelStatic<TaggedThreadInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): TaggedThreadModel => {
-  const TaggedThread = sequelize.define<TaggedThreadInstance, TaggedThreadAttributes>('TaggedThread', {
+  dataTypes: typeof DataTypes,
+): TaggedThreadModelStatic => {
+  const TaggedThread = <TaggedThreadModelStatic>sequelize.define('TaggedThread', {
     topic_id: { type: dataTypes.STRING, allowNull: false },
     thread_id: { type: dataTypes.INTEGER, allowNull: false },
   }, {
+    tableName: 'TaggedThreads',
     timestamps: true,
     underscored: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
   });
   return TaggedThread;
 };

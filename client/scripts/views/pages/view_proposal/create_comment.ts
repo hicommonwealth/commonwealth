@@ -170,6 +170,7 @@ const CreateComment: m.Component<{
                 submitComment();
                 m.redraw(); // ensure button is disabled
               },
+              imageUploader: true,
               tabindex: vnode.attrs.tabindex,
             }),
             m('.token-requirement', [

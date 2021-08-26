@@ -1,6 +1,6 @@
 import m from 'mithril';
 import $ from 'jquery';
-import { Input, TextArea, Icon, Icons, Switch } from 'construct-ui';
+import { Input, TextArea, Icon, Icons, Switch, Select } from 'construct-ui';
 import app from 'state';
 import User from 'views/components/widgets/user';
 import { AddressInfo } from 'models';
@@ -27,7 +27,7 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }>
           .length;
         return m('.RoleChild', [
           m(User, {
-            user: new AddressInfo(addr.id, addr.address, addr.chain, null, addr.is_magic), //role.Address, // make AddressInfo?
+            user: new AddressInfo(addr.id, addr.address, addr.chain, null, addr.is_magic), // role.Address, // make AddressInfo?
             popover: true,
             linkify: false,
             hideAvatar: false,
@@ -100,19 +100,21 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }>
 export const InputPropertyRow: m.Component<{
   title: string,
   defaultValue: string,
+  value?: string,
   disabled?: boolean,
   onChangeHandler: Function,
   placeholder?: string,
   textarea?: boolean,
 }> = {
   view: (vnode) => {
-    const { title, defaultValue, disabled, onChangeHandler, placeholder, textarea } = vnode.attrs;
+    const { title, defaultValue, value, disabled, onChangeHandler, placeholder, textarea } = vnode.attrs;
 
     return m('tr.InputPropertyRow', [
       m('td', { class: 'title-column', }, title),
       m('td', [
         m((textarea ? TextArea : Input), {
           defaultValue,
+          value,
           placeholder,
           fluid: true,
           disabled: disabled || false,
@@ -146,6 +148,28 @@ export const TogglePropertyRow: m.Component<{
           },
         }),
         vnode.attrs.caption && m('.switch-caption', vnode.attrs.caption(vnode.state.checked)),
+      ])
+    ]);
+  },
+};
+
+export const SelectPropertyRow: m.Component<{
+  title: string,
+  options: string[],
+  value: string,
+  onchange: Function
+}, { selected: string }> = {
+  view: (vnode) => {
+    return m('tr.SelectPropertyRow', [
+      m('td', vnode.attrs.title),
+      m('td', [
+        m(Select, {
+          options: vnode.attrs.options,
+          onchange: (e) => {
+            vnode.attrs.onchange((e.currentTarget as HTMLInputElement).value);
+          },
+          defaultValue: vnode.attrs.value,
+        }),
       ])
     ]);
   },

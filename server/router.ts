@@ -39,6 +39,7 @@ import deleteCommunity from './routes/deleteCommunity';
 import updateCommunity from './routes/updateCommunity';
 import communityStats from './routes/communityStats';
 import getCommunitiesAndChains from './routes/getCommunitiesAndChains';
+import createChain from './routes/createChain';
 import viewCount from './routes/viewCount';
 import updateEmail from './routes/updateEmail';
 
@@ -65,7 +66,6 @@ import acceptInviteLink from './routes/acceptInviteLink';
 import getInviteLinks from './routes/getInviteLinks';
 import deleteGithubAccount from './routes/deleteGithubAccount';
 import getProfile from './routes/getProfile';
-
 
 import createRole from './routes/createRole';
 import deleteRole from './routes/deleteRole';
@@ -126,10 +126,13 @@ import getTokenForum from './routes/getTokenForum';
 import getSubstrateSpec from './routes/getSubstrateSpec';
 import editSubstrateSpec from './routes/editSubstrateSpec';
 import { getStatsDInstance } from './util/metrics';
+import { DB } from './database';
+
+import { sendMessage } from './routes/snapshotAPI';
 
 function setupRouter(
   app,
-  models,
+  models: DB,
   viewCountCache: ViewCountCache,
   identityFetchCache: IdentityFetchCache,
   tokenBalanceCache: TokenBalanceCache
@@ -195,8 +198,10 @@ function setupRouter(
   // TODO: Change to PUT /community
   router.post('/updateCommunity', passport.authenticate('jwt', { session: false }), updateCommunity.bind(this, models));
   router.get('/communityStats', passport.authenticate('jwt', { session: false }), communityStats.bind(this, models));
-  router.get('/getTokensFromLists', getTokensFromLists.bind(this, models, tokenBalanceCache));
-  router.get('/getTokenForum', getTokenForum.bind(this, models, tokenBalanceCache));
+  router.get('/getTokensFromLists', getTokensFromLists.bind(this, models));
+  router.get('/getTokenForum', getTokenForum.bind(this, models));
+  // TODO: Change to POST /chain
+  router.post('/createChain', passport.authenticate('jwt', { session: false }), createChain.bind(this, models));
 
   // offchain threads
   // TODO: Change to POST /thread
@@ -495,6 +500,8 @@ function setupRouter(
 
   // TODO: Change to GET /entities
   router.get('/bulkEntities', bulkEntities.bind(this, models));
+
+  router.post('/snapshotAPI/sendMessage', sendMessage.bind(this));
 
   app.use('/api', router);
 }

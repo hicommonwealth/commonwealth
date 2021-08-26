@@ -19,6 +19,26 @@ export default class WebWalletController {
     return this._wallets.find((w) => w.name === name);
   }
 
+  public async locateWallet(address: string, chain?: ChainBase): Promise<IWebWallet<any>> {
+    const availableWallets = this.availableWallets(chain);
+    if (availableWallets.length === 0) {
+      throw new Error('No wallet available');
+    }
+
+    for (const wallet of availableWallets) {
+      if (!wallet.enabled) {
+        await wallet.enable();
+      }
+      // TODO: ensure that we can find any wallet, even if non-string accounts
+      if (wallet.accounts.find((acc) => acc === address)) {
+        console.log(`Found wallet: ${wallet.name}`);
+        return wallet;
+      }
+      // TODO: disable if not found
+    }
+    throw new Error(`No wallet found for ${address}`);
+  }
+
   constructor() {
     this._wallets = [
       new PolkadotWebWalletController(),

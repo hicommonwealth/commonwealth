@@ -21,8 +21,8 @@ class ChainInfo {
   public stagesEnabled: boolean;
   public customStages: string;
   public customDomain: string;
-  public terms: string;
   public snapshot: string;
+  public terms: string;
   public readonly blockExplorerIds: { [id: string]: string };
   public readonly collapsedOnHomepage: boolean;
   public readonly featuredTopics: string[];
@@ -56,6 +56,7 @@ class ChainInfo {
     this.stagesEnabled = stagesEnabled;
     this.customStages = customStages;
     this.customDomain = customDomain;
+    this.snapshot = snapshot;
     this.terms = terms;
     this.snapshot = snapshot;
     this.blockExplorerIds = blockExplorerIds;
@@ -84,8 +85,8 @@ class ChainInfo {
     stagesEnabled,
     customStages,
     customDomain,
-    terms,
     snapshot,
+    terms,
     blockExplorerIds,
     collapsed_on_homepage,
     featured_topics,
@@ -119,8 +120,8 @@ class ChainInfo {
       stagesEnabled,
       customStages,
       customDomain,
-      terms,
       snapshot,
+      terms,
       blockExplorerIds: blockExplorerIdsParsed,
       collapsedOnHomepage: collapsed_on_homepage,
       featuredTopics: featured_topics,
@@ -199,8 +200,8 @@ class ChainInfo {
       'stagesEnabled': stagesEnabled,
       'customStages': customStages,
       'customDomain': customDomain,
-      'terms': terms,
       'snapshot': snapshot,
+      'terms': terms,
       'jwt': app.user.jwt,
     });
     const updatedChain: ChainInfo = r.result;
@@ -215,6 +216,7 @@ class ChainInfo {
     this.customStages = updatedChain.customStages;
     this.customDomain = updatedChain.customDomain;
     this.snapshot = updatedChain.snapshot;
+    this.terms = updatedChain.terms;
   }
 
   public addFeaturedTopic(topic: string) {

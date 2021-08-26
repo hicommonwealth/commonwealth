@@ -224,6 +224,7 @@ $text-size-mobile-header: 22px;
     @include xs-max {
         width: 100%;
         max-width: none;
+        margin-right: 0px;
     }
     @include xl-min {
         width: calc(33% - 24px);

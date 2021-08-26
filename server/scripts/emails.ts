@@ -1,10 +1,10 @@
-import Sequelize from 'sequelize';
+import Sequelize, { Op } from 'sequelize';
 import moment from 'moment';
 import { capitalize } from 'lodash';
 import {
   SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents,
   IEventLabel, IEventTitle, IChainEventData, chainSupportedBy,
-  MarlinTypes, MarlinEvents, AaveTypes, AaveEvents
+  CompoundTypes, CompoundEvents, AaveTypes, AaveEvents
 } from '@commonwealth/chain-events';
 
 import { SENDGRID_API_KEY, SERVER_URL } from '../config';
@@ -30,8 +30,8 @@ export const createImmediateNotificationEmailObject = async (notification_data, 
       labelerFn = SubstrateEvents.Label;
     } else if (chainSupportedBy(notification_data.chainEventType?.chain, MolochEvents.Types.EventChains)) {
       labelerFn = MolochEvents.Label;
-    } else if (chainSupportedBy(notification_data.chainEventType?.chain, MarlinEvents.Types.EventChains)) {
-      labelerFn = MarlinEvents.Label;
+    } else if (chainSupportedBy(notification_data.chainEventType?.chain, CompoundEvents.Types.EventChains)) {
+      labelerFn = CompoundEvents.Label;
     } else if (chainSupportedBy(notification_data.chainEventType?.chain, AaveEvents.Types.EventChains)) {
       labelerFn = AaveEvents.Label;
     }
@@ -173,7 +173,7 @@ export const sendImmediateNotificationEmail = async (subscription, emailObject) 
   emailObject.bcc = 'raymond+bcc@commonwealth.im';
 
   try {
-    console.log('sending immediate notification email');
+    console.log(`sending immediate notification email to ${emailObject.to}`);
     await sgMail.send(emailObject);
   } catch (e) {
     console.log('Failed to send immediate notification email', e?.response?.body?.errors);
@@ -191,7 +191,6 @@ export const sendBatchedNotificationEmails = async (models): Promise<number> => 
 
     log.info(`Sending to ${users.length} users`);
 
-    const { Op } = models.sequelize;
     const last24hours = new Date((new Date() as any) - 24 * 60 * 60 * 1000);
     await Promise.all(users.map(async (user) => {
       const notifications = await models.Notification.findAll({
