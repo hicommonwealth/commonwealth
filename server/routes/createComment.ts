@@ -12,6 +12,7 @@ import TokenBalanceCache from '../util/tokenBalanceCache';
 import { factory, formatFilename } from '../../shared/logging';
 
 import { SENDGRID_API_KEY } from '../config';
+import BN from 'bn.js';
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 
@@ -58,7 +59,7 @@ const createComment = async (
         const threshold = (await models.OffchainTopic.findOne({ where: { id: thread.topic_id } })).token_threshold;
         const tokenBalance = await tokenBalanceCache.getBalance(chain.id, req.body.address);
 
-        if (threshold && tokenBalance.lt(threshold)) return next(new Error(Errors.InsufficientTokenBalance));
+        if (threshold && tokenBalance.lt(new BN(threshold))) return next(new Error(Errors.InsufficientTokenBalance));
       } catch (e) {
         log.error(`hasToken failed: ${e.message}`);
         return next(new Error(Errors.CouldNotFetchTokenBalance));

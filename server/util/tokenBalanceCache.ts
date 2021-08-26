@@ -65,7 +65,7 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
           cache[id] = { };
         }
       });
-    } 
+    }
 
     // kick off job
     super.start();
@@ -83,8 +83,8 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
   }
 
   public async hasToken(contractId: string, address: string, network = 'mainnet'): Promise<boolean> {
-    const tokenMeta = await this.models.Chain.findOne({ where: { id: contractId }}) || 
-      await this.models.Chain.Token({ where: { id: contractId }});
+    const tokenMeta = await this.models.Chain.findOne({ where: { id: contractId } }) ||
+      await this.models.Chain.Token({ where: { id: contractId } });
 
     if (!tokenMeta) throw new Error('unsupported token');
     const threshold = tokenMeta.balanceThreshold || new BN(1);
@@ -94,7 +94,7 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
 
   // query a user's balance on a given token contract and save in cache
   public async getBalance(contractId: string, address: string, network = 'mainnet'): Promise<BN> {
-    const tokenMeta = this._contracts.find(({ id }) => id === contractId);
+    const tokenMeta = await this.models.Chain.findOne({ where: { id: contractId } });
     if (!tokenMeta) throw new Error('unsupported token');
 
     // first check the cache for the token balance
