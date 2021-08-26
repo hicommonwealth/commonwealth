@@ -11,6 +11,7 @@ import TokenBalanceCache from '../util/tokenBalanceCache';
 import { DB } from '../database';
 
 import { factory, formatFilename } from '../../shared/logging';
+import BN from 'bn.js';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
@@ -152,7 +153,7 @@ const createThread = async (
         const threshold = (await models.OffchainTopic.findOne({ where: { id: topic_id } })).token_threshold;
         const tokenBalance = await tokenBalanceCache.getBalance(chain.id, req.body.address);
 
-        if (threshold && tokenBalance.lt(threshold)) return next(new Error(Errors.InsufficientTokenBalance));
+        if (threshold && tokenBalance.lt(new BN(threshold))) return next(new Error(Errors.InsufficientTokenBalance));
       } catch (e) {
         log.error(`hasToken failed: ${e.message}`);
         return next(new Error(Errors.CouldNotFetchTokenBalance));
