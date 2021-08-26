@@ -276,7 +276,7 @@ const send = async (models, content: WebhookContent) => {
         let getChatUsername = url.split('/@');
         getChatUsername = '@'+getChatUsername[1];
 
-        const botToken = 'bot1662899908:AAGuGPpsYzfM2KzAGjveaois9TUN-OMggC4';
+        const botToken = process.env.TELEGRAM_BOT_TOKEN;
         getUpdatesUrl = `https://api.telegram.org/${botToken}`;
         url = getUpdatesUrl+'/sendMessage';
 
