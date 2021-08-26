@@ -268,6 +268,14 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
     )).default;
     newChain = new Near(n, app);
     initApi = true;
+  } else if (n.chain.network === ChainNetwork.Sputnik) {
+    const Sputnik = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "sputnik-main" */
+      './controllers/chain/near/sputnik/adapter'
+    )).default;
+    newChain = new Sputnik(n, app);
+    initApi = true;
   } else if (MolochTypes.EventChains.find((c) => c === n.chain.network)) {
     const Moloch = (await import(
       /* webpackMode: "lazy" */

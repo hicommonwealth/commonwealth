@@ -1,12 +1,13 @@
 // import 'modals/create_community_modal.scss';
 import 'modals/manage_community_modal.scss';
 
+import BN from 'bn.js';
 import m from 'mithril';
 import $ from 'jquery';
 import app from 'state';
 import { slugify } from 'utils';
 import mixpanel from 'mixpanel-browser';
-import { Table, Tabs, TabItem, Button } from 'construct-ui';
+import { Table, Tabs, TabItem, Button, MenuDivider } from 'construct-ui';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { constructSubstrateUrl } from 'substrate';
 import Web3 from 'web3';
@@ -290,7 +291,7 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
         label: 'Test',
         onclick: async (e) => {
           // deinit substrate API if one exists
-          if (app.chain.apiInitialized) {
+          if (app.chain?.apiInitialized) {
             await app.chain.deinit();
           }
 
@@ -298,7 +299,11 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
           const provider = new WsProvider(constructSubstrateUrl(vnode.state.nodeUrl), false);
           try {
             await provider.connect();
-            const api = await ApiPromise.create({ throwOnConnect: true, provider, ...JSON.parse(vnode.state.substrate_spec) });
+            const api = await ApiPromise.create({
+              throwOnConnect: true,
+              provider,
+              ...JSON.parse(vnode.state.substrate_spec)
+            });
             await api.disconnect();
             notifySuccess('Test has passed');
           } catch (err) {
@@ -602,6 +607,11 @@ const CreateCommunityModal: m.Component<CreateCommunityAttrs, CreateCommunitySta
           label: 'Substrate',
           active: vnode.state.activeForm === CommunityType.SubstrateCommunity,
           onclick: () => { vnode.state.activeForm = 'substrate'; return null; },
+        }),
+        m(TabItem, {
+          label: 'Sputnik',
+          active: vnode.state.activeForm === 'sputnik',
+          onclick: () => { vnode.state.activeForm = 'sputnik'; return null; },
         }),
       ]),
       vnode.state.activeForm === CommunityType.OffchainCommunity && m(OffchainCommunityForm),

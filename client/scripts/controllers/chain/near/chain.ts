@@ -2,12 +2,11 @@ import { IChainModule, ITXModalData, NodeInfo } from 'models';
 import { NearToken } from 'adapters/chain/near/types';
 import BN from 'bn.js';
 import { ApiStatus, IApp } from 'state';
-import { Near as NearApi, connect as nearConnect } from 'nearlib/lib/near';
-import { BrowserLocalStorageKeyStore } from 'nearlib/lib/key_stores';
+import { Near as NearApi, connect as nearConnect } from 'near-api-js';
+import { NodeStatusResult } from 'near-api-js/lib/providers/provider';
 import moment from 'moment';
 import * as m from 'mithril';
-import { NodeStatusResult } from 'nearlib/lib/providers/provider';
-import { NearAccount } from './account';
+import { NearAccounts, NearAccount } from './account';
 
 class NearChain implements IChainModule<NearToken, NearAccount> {
   private _api: NearApi;
@@ -39,14 +38,13 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
     this._app = app;
   }
 
-  public async init(node: NodeInfo, reset = false) {
+  public async init(node: NodeInfo, accounts: NearAccounts, reset = false) {
     this._config = {
-      networkId: node.chain.id === 'near-local' ? 'local' : 'default',
+      // TODO: configure wallet for beta/testnet
+      networkId: node.chain.id === 'near-local' ? 'local' : 'mainnet',
       nodeUrl: node.url,
-      walletUrl: 'https://wallet.nearprotocol.com', // TODO: alternatives?
-      deps: {
-        keyStore: new BrowserLocalStorageKeyStore(),
-      },
+      walletUrl: 'https://wallet.near.org/',
+      keyStore: accounts.keyStore,
     };
 
     this._api = await nearConnect(this.config);

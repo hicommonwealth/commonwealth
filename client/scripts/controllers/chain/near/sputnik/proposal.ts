@@ -1,0 +1,238 @@
+import { Near as NearApi, Contract } from 'near-api-js';
+import BN from 'bn.js';
+import moment from 'moment';
+import { Proposal, ProposalEndTime, VotingType, VotingUnit, ProposalStatus, ITXModalData } from 'models';
+import { NearToken } from 'adapters/chain/near/types';
+import { NearAccount, NearAccounts } from 'controllers/chain/near/account';
+import NearChain from 'controllers/chain/near/chain';
+import { notifyError } from 'controllers/app/notifications';
+import NearSputnikDao from './dao';
+import {
+  INearSputnikProposal,
+  NearSputnikVote,
+  NearSputnikProposalStatus,
+  isAddMemberToRole,
+  isRemoveMemberFromRole,
+  isTransfer,
+  isFunctionCall,
+  getVotePolicy,
+  VotePolicy,
+  WeightKind,
+  isWeight,
+  getUserRoles,
+  getTotalSupply,
+} from './types';
+
+export default class NearSputnikProposal extends Proposal<
+  NearApi,
+  NearToken,
+  INearSputnikProposal,
+  NearSputnikVote
+> {
+  // TODO: get the correct short id
+  public get shortIdentifier() {
+    return `#${this.identifier.toString()}`;
+  }
+  public get title() {
+    const yoktoNear = new BN('1000000000000000000000000');
+    // TODO: fetch decimals from https://github.com/AngelBlock/sputnik-dao-2-mockup/blob/dev/src/ProposalPage.jsx#L48
+    const decimals = 18;
+    // naming taken from https://github.com/AngelBlock/sputnik-dao-2-mockup/blob/dev/src/ProposalPage.jsx#L188
+    if (this.data.kind === 'ChangeConfig') return 'Change Config: ';
+    if (this.data.kind === 'ChangePolicy') return 'Change Policy: ';
+    if (this.data.kind === 'UpgradeSelf') return `UpgradeSelf: ${this.data.target}`;
+    if (this.data.kind === 'UpgradeRemote') return `UpgradeRemote: ${this.data.target}`;
+    if (this.data.kind === 'Transfer') return `Transfer: ${this.data.target}`;
+    if (this.data.kind === 'SetStakingContract') return `SetStakingContract: ${this.data.target}`;
+    if (this.data.kind === 'AddBounty') return `AddBounty: ${this.data.target}`;
+    if (this.data.kind === 'BountyDone') return `BountyDone: ${this.data.target}`;
+    if (this.data.kind === 'Vote') return `Vote: ${this.data.target}`;
+    if (isAddMemberToRole(this.data.kind) && this.data.kind.AddMemberToRole.role === 'council')
+      return `Add ${this.data.kind.AddMemberToRole.member_id} to the council`;
+    if (isRemoveMemberFromRole(this.data.kind) && this.data.kind.RemoveMemberFromRole.role === 'council')
+      return `Remove ${this.data.kind.RemoveMemberFromRole.member_id} from the council`;
+    if (isTransfer(this.data.kind) && this.data.kind.Transfer.token_id === '')
+      return `${'Request for payout Ⓝ'}${
+        (new BN(this.data.kind.Transfer.amount))
+          .div(yoktoNear)
+          .toNumber()
+          .toFixed(2)
+          .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+      } to ${this.data.kind.Transfer.receiver_id}`;
+    if (decimals && isTransfer(this.data.kind) && this.data.kind.Transfer.token_id !== '')
+      return `Request for payout ${
+        this.data.kind.Transfer.token_id.split('.')[0].toUpperCase()
+      }${
+        (new BN(this.data.kind.Transfer.amount).div(new BN(10).pow(new BN(`${decimals}`))).toNumber().toFixed(2)
+          .replace(/\B(?=(\d{3})+(?!\d))/g, ','))
+      } to ${
+        this.data.kind.Transfer.receiver_id
+      }`;
+    if (isFunctionCall(this.data.kind) && this.data.kind.FunctionCall.actions[0].method_name === 'create_token')
+      return 'Create token';
+    return `Sputnik Proposal ${this.identifier}`;
+  }
+  public get description() { return this.data.description; }
+  public get author() { return this._Accounts.get(this.data.proposer); }
+
+  public get votingType() {
+    return VotingType.YesNoReject;
+  }
+  public get votingUnit() {
+    return this._votePolicy.weight_kind === WeightKind.RoleWeight
+      ? VotingUnit.OnePersonOneVote
+      : VotingUnit.CoinVote;
+  }
+
+  public canVoteFrom(account: NearAccount) {
+    // technically we should check on each role separately, but for now we
+    // confirm they have all 3 voting roles
+    const permissions = getUserRoles(this._Dao.policy, account.address);
+    const permissionTypes = permissions.map((p) => p.split(':')[1]);
+    return permissionTypes.includes('VoteApprove')
+      && permissionTypes.includes('VoteReject')
+      && permissionTypes.includes('VoteRemove');
+  }
+
+  private _Chain: NearChain;
+  private _Accounts: NearAccounts;
+  private _Dao: NearSputnikDao;
+
+  private _endTimeS: number;
+  private _votePolicy: VotePolicy;
+  private _totalSupply: BN;
+
+  constructor(
+    Chain: NearChain,
+    Accounts: NearAccounts,
+    Dao: NearSputnikDao,
+    data: INearSputnikProposal
+  ) {
+    super('sputnikproposal', data);
+    this._Chain = Chain;
+    this._Accounts = Accounts;
+    this._Dao = Dao;
+
+    // init constants from data
+    this._votePolicy = getVotePolicy(Dao.policy, data.kind);
+    this._totalSupply = getTotalSupply(Dao.policy, this._votePolicy, Dao.tokenSupply);
+
+    const periodS = +this._Dao.policy.proposal_period.slice(0, this._Dao.policy.proposal_period.length - 9);
+    const submissionTimeS = +this.data.submission_time.slice(0, this.data.submission_time.length - 9);
+    this._endTimeS = submissionTimeS + periodS;
+    const nowS = moment.now() / 1000;
+    if (data.status !== NearSputnikProposalStatus.InProgress) {
+      this.complete(this._Dao.store);
+    } else if (this._endTimeS < nowS) {
+      console.log(`Marking proposal ${this.identifier} expired, by ${nowS - this._endTimeS} seconds.`);
+      // special case for expiration that hasn't yet been triggered
+      data.status = NearSputnikProposalStatus.Expired;
+      this.complete(this._Dao.store);
+    }
+    // TODO: fetch weights for each voter? is this necessary?
+    for (const [voter, choice] of Object.entries(data.votes)) {
+      this.addOrUpdateVote(new NearSputnikVote(this._Accounts.get(voter), choice));
+    }
+    this._Dao.store.add(this);
+  }
+
+  private _getVoteCounts(): [BN, BN, BN] {
+    const counts = this.data.vote_counts;
+    if (Object.keys(counts).length === 0) {
+      return [new BN(0), new BN(0), new BN(0)];
+    } else {
+      // TODO: don't just use the first value on the object, do a proper role check
+      const [yes, no, remove] = Object.values(this.data.vote_counts)[0];
+      return [new BN(yes), new BN(no), new BN(remove)];
+    }
+  }
+
+  public update() {
+    throw new Error('unimplemented');
+  }
+
+  get support() {
+    // TODO: don't just use the first value on the object, do a proper role check
+    const [yes] = Object.values(this.data.vote_counts)[0];
+    // will be either total vote weight or # of yes votes depending on type
+    return yes;
+  }
+
+  // percentage of voters or percentage of tokens depending on type of vote
+  get turnout() {
+    const PRECISION = 10_000;
+    const [yes, no, remove] = this._getVoteCounts();
+    const totalVoted = yes.add(no).add(remove);
+    const pctVoted = totalVoted.muln(PRECISION).div(this._totalSupply).toNumber() / PRECISION;
+    return pctVoted;
+  }
+
+  get endTime(): ProposalEndTime {
+    return { kind: 'fixed', time: moment.unix(this._endTimeS) };
+  }
+
+  get isPassing(): ProposalStatus {
+    if (this.data.status === NearSputnikProposalStatus.InProgress) {
+      // TODO: check quorum in addition to just threshold
+      let threshold: BN;
+      if (isWeight(this._votePolicy.threshold)) {
+        // weight threshold: must have enough votes
+        threshold = BN.min(
+          this._totalSupply,
+          new BN(this._votePolicy.threshold),
+        );
+      } else {
+        // ratio threshold: must have sufficient proportion
+        const [numerator, denominator] = this._votePolicy.threshold;
+        threshold = BN.min(
+          this._totalSupply.muln(+numerator).divn(+denominator).addn(1),
+          this._totalSupply,
+        );
+      }
+      const [yes, no, remove] = this._getVoteCounts();
+      if (yes.gte(threshold)) {
+        return ProposalStatus.Passing;
+      } else {
+        // TODO: compute separate states for ready to pass/fail/remove
+        return ProposalStatus.Failing;
+      }
+    } else if (this.data.status === NearSputnikProposalStatus.Approved) {
+      return ProposalStatus.Passed;
+    } else {
+      return ProposalStatus.Failed;
+    }
+  }
+
+  public async submitVoteWebTx(vote: NearSputnikVote) {
+    // init contract via wallet connection
+    const account = this._Dao.app.user.activeAccount as NearAccount;
+    if (account.address !== vote.account.address) {
+      throw new Error('Invalid vote address!');
+    }
+
+    const walletConnection = account.walletConnection;
+    const contract = new Contract(
+      walletConnection,
+      this._Dao.app.activeChainId(),
+      { changeMethods: [ 'act_proposal' ], viewMethods: [] },
+    );
+
+    // TODO: user checks
+
+    // perform tx
+    try {
+      console.log((contract as any).act_proposal);
+      await (contract as any).act_proposal({
+        id: this.data.id,
+        action: `Vote${vote.choice}`,
+      }, '250000000000000'); // TODO: configure gas?
+    } catch (e) {
+      console.error(e);
+      notifyError('Failed to send vote.');
+    }
+  }
+
+  public submitVoteTx(vote: NearSputnikVote): ITXModalData {
+    throw new Error('unsupported');
+  }
+}
