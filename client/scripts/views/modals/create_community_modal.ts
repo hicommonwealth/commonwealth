@@ -6,11 +6,12 @@ import $ from 'jquery';
 import app from 'state';
 import { slugify } from 'utils';
 import mixpanel from 'mixpanel-browser';
-import { Table, Tabs, TabItem, Button } from 'construct-ui';
+import { Table, Tabs, TabItem, Button, MenuDivider } from 'construct-ui';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { constructSubstrateUrl } from 'substrate';
 
 import { CompactModalExitButton } from 'views/modal';
+import NearSputnikDao from 'controllers/chain/near/sputnik/dao';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { InputPropertyRow, TogglePropertyRow, SelectPropertyRow } from './manage_community_modal/metadata_rows';
 import { initAppState } from '../../app';
@@ -245,7 +246,8 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
           title: 'Spec (JSON)',
           defaultValue: vnode.state.substrate_spec,
           textarea: true,
-          placeholder: `{"types": {"Address": "MultiAddress", "ChainId": "u8", "Reveals": "Vec<(AccountId, Vec<VoteOutcome>)>", "Balance2": "u128", "VoteData": {"stage": "VoteStage", "initiator": "AccountId", "vote_type": "VoteType", "tally_type": "TallyType", "is_commit_reveal": "bool"}, "VoteType": {"_enum": ["Binary", "MultiOption", "RankedChoice"]}, "TallyType": {"_enum": ["OnePerson", "OneCoin"]}, "VoteStage": {"_enum": ["PreVoting", "Commit", "Voting", "Completed"]}, "ResourceId": "[u8; 32]", "VoteRecord": {"id": "u64", "data": "VoteData", "reveals": "Reveals", "outcomes": "Vec<VoteOutcome>", "commitments": "Commitments"}, "AccountInfo": "AccountInfoWithRefCount", "Commitments": "Vec<(AccountId, VoteOutcome)>", "VoteOutcome": "[u8; 32]", "VotingTally": "Option<Vec<(VoteOutcome, u128)>>", "DepositNonce": "u64", "LookupSource": "MultiAddress", "ProposalTitle": "Bytes", "ProposalVotes": {"staus": "ProposalStatus", "expiry": "BlockNumber", "votes_for": "Vec<AccountId>", "votes_against": "Vec<AccountId>"}, "ProposalRecord": {"index": "u32", "stage": "VoteStage", "title": "Text", "author": "AccountId", "vote_id": "u64", "contents": "Text", "transition_time": "u32"}, "ProposalStatus": {"_enum": ["Initiated", "Approved", "Rejected"]}, "ProposalContents": "Bytes"}}`,
+          // eslint-disable-next-line max-len
+          placeholder: '{"types": {"Address": "MultiAddress", "ChainId": "u8", "Reveals": "Vec<(AccountId, Vec<VoteOutcome>)>", "Balance2": "u128", "VoteData": {"stage": "VoteStage", "initiator": "AccountId", "vote_type": "VoteType", "tally_type": "TallyType", "is_commit_reveal": "bool"}, "VoteType": {"_enum": ["Binary", "MultiOption", "RankedChoice"]}, "TallyType": {"_enum": ["OnePerson", "OneCoin"]}, "VoteStage": {"_enum": ["PreVoting", "Commit", "Voting", "Completed"]}, "ResourceId": "[u8; 32]", "VoteRecord": {"id": "u64", "data": "VoteData", "reveals": "Reveals", "outcomes": "Vec<VoteOutcome>", "commitments": "Commitments"}, "AccountInfo": "AccountInfoWithRefCount", "Commitments": "Vec<(AccountId, VoteOutcome)>", "VoteOutcome": "[u8; 32]", "VotingTally": "Option<Vec<(VoteOutcome, u128)>>", "DepositNonce": "u64", "LookupSource": "MultiAddress", "ProposalTitle": "Bytes", "ProposalVotes": {"staus": "ProposalStatus", "expiry": "BlockNumber", "votes_for": "Vec<AccountId>", "votes_against": "Vec<AccountId>"}, "ProposalRecord": {"index": "u32", "stage": "VoteStage", "title": "Text", "author": "AccountId", "vote_id": "u64", "contents": "Text", "transition_time": "u32"}, "ProposalStatus": {"_enum": ["Initiated", "Approved", "Rejected"]}, "ProposalContents": "Bytes"}}`',
           onChangeHandler: (v) => { vnode.state.substrate_spec = v; },
         }),
         m(InputPropertyRow, {
@@ -283,7 +285,7 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
         label: 'Test',
         onclick: async (e) => {
           // deinit substrate API if one exists
-          if (app.chain.apiInitialized) {
+          if (app.chain?.apiInitialized) {
             await app.chain.deinit();
           }
 
@@ -291,7 +293,11 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
           const provider = new WsProvider(constructSubstrateUrl(vnode.state.nodeUrl), false);
           try {
             await provider.connect();
-            const api = await ApiPromise.create({ throwOnConnect: true, provider, ...JSON.parse(vnode.state.substrate_spec) });
+            const api = await ApiPromise.create({
+              throwOnConnect: true,
+              provider,
+              ...JSON.parse(vnode.state.substrate_spec)
+            });
             await api.disconnect();
             notifySuccess('Test has passed');
           } catch (err) {
@@ -356,6 +362,155 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
   }
 };
 
+interface SputnikFormAttrs {}
+
+interface SputnikFormState {
+  name: string,
+  description: string,
+  initialValue: string,
+  website: string,
+  discord: string,
+  element: string,
+  telegram: string,
+  github: string,
+  createNew: boolean,
+  saving: boolean
+}
+
+const SputnikForm: m.Component<SputnikFormAttrs, SputnikFormState> = {
+  oninit: (vnode) => {
+    vnode.state.name = '';
+    vnode.state.initialValue = '';
+    vnode.state.website = '';
+    vnode.state.discord = '';
+    vnode.state.element = '';
+    vnode.state.telegram = '';
+    vnode.state.github = '';
+    vnode.state.description = '';
+    vnode.state.createNew = false;
+    vnode.state.saving = false;
+  },
+  view: (vnode) => {
+    return m('.compact-modal-body-max', [
+      m('.CommunityMetadataManagementTable', [m(Table, {
+        bordered: false,
+        interactive: false,
+        striped: false,
+        class: 'metadata-management-table',
+      }, [
+        m(InputPropertyRow, {
+          title: 'Name',
+          defaultValue: vnode.state.name,
+          onChangeHandler: (v) => { vnode.state.name = v; },
+          placeholder: 'genesis.sputnik-dao.near',
+        }),
+        m(InputPropertyRow, {
+          title: 'Description',
+          defaultValue: vnode.state.description,
+          onChangeHandler: (v) => { vnode.state.description = v; },
+          textarea: true,
+        }),
+        m(TogglePropertyRow, {
+          title: 'Deploy',
+          defaultValue: vnode.state.createNew,
+          onToggle: (checked) => { vnode.state.createNew = checked; },
+          caption: (checked) => checked ? 'Deploying new DAO' : 'Adding existing DAO',
+        }),
+        vnode.state.createNew && m(InputPropertyRow, {
+          title: 'Initial Value',
+          defaultValue: vnode.state.initialValue,
+          onChangeHandler: (v) => { vnode.state.initialValue = v; },
+          placeholder: '5',
+        }),
+        // TODO: add divider to distinguish on-chain data
+        m(InputPropertyRow, {
+          title: 'Website',
+          defaultValue: vnode.state.website,
+          placeholder: 'https://example.com',
+          onChangeHandler: (v) => { vnode.state.website = v; },
+        }),
+        m(InputPropertyRow, {
+          title: 'Discord',
+          defaultValue: vnode.state.discord,
+          placeholder: 'https://discord.com/invite',
+          onChangeHandler: (v) => { vnode.state.discord = v; },
+        }),
+        m(InputPropertyRow, {
+          title: 'Element',
+          defaultValue: vnode.state.element,
+          placeholder: 'https://matrix.to/#',
+          onChangeHandler: (v) => { vnode.state.element = v; },
+        }),
+        m(InputPropertyRow, {
+          title: 'Telegram',
+          defaultValue: vnode.state.telegram,
+          placeholder: 'https://t.me',
+          onChangeHandler: (v) => { vnode.state.telegram = v; },
+        }),
+        m(InputPropertyRow, {
+          title: 'Github',
+          defaultValue: vnode.state.github,
+          placeholder: 'https://github.com',
+          onChangeHandler: (v) => { vnode.state.github = v; },
+        }),
+      ]),
+      m(Button, {
+        label: 'Save changes',
+        intent: 'primary',
+        disabled: vnode.state.saving,
+        onclick: async (e) => {
+          const {
+            name,
+            description,
+            initialValue,
+            website,
+            discord,
+            element,
+            telegram,
+            github,
+            createNew,
+          } = vnode.state;
+          vnode.state.saving = true;
+          if (createNew) {
+            // TODO: login and get account
+            // TODO: validate value
+            // await NearSputnikDao.createDaoTx(account, name, description, initialValue);
+            // TODO: ensure creation was successful
+            console.log('Created DAO successfully!');
+          }
+          try {
+            // TODO: ensure id format is correct
+            const res = await $.post(`${app.serverUrl()}/addChainNode`, {
+              name,
+              description,
+              node_url: 'https://rpc.mainnet.near.org',
+              symbol: 'NEAR',
+              website,
+              discord,
+              element,
+              telegram,
+              github,
+              jwt: app.user.jwt,
+              type: 'dao',
+              id: name,
+              base: 'near',
+              network: 'sputnik'
+            });
+            await initAppState(false);
+            $(e.target).trigger('modalexit');
+            m.route.set(`/${res.result.chain}`);
+          } catch (err) {
+            notifyError(err.responseJSON?.error || 'Creating new community failed');
+          } finally {
+            vnode.state.saving = false;
+          }
+        },
+      }),
+      ]),
+    ]);
+  }
+};
+
 interface CreateCommunityAttrs {}
 interface CreateCommunityState {
   activeForm: string;
@@ -392,8 +547,16 @@ const CreateCommunityModal: m.Component<CreateCommunityAttrs, CreateCommunitySta
           active: vnode.state.activeForm === 'substrate',
           onclick: () => { vnode.state.activeForm = 'substrate'; return null; },
         }),
+        m(TabItem, {
+          label: 'Sputnik',
+          active: vnode.state.activeForm === 'sputnik',
+          onclick: () => { vnode.state.activeForm = 'sputnik'; return null; },
+        }),
       ]),
-      vnode.state.activeForm === 'offchain' ? m(OffchainCommunityForm) : m(SubstrateForm)
+      vnode.state.activeForm === 'offchain'
+        ? m(OffchainCommunityForm)
+        : vnode.state.activeForm === 'substrate'
+          ? m(SubstrateForm) : m(SputnikForm)
     ]);
   }
 };
