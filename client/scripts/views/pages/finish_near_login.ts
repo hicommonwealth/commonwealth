@@ -120,7 +120,7 @@ const FinishNearLogin: m.Component<{}, IState> = {
             vnode.state.validatedAccount = acct;
             console.log('Validation success');
           } catch (err) {
-            vnode.state.validationError = err.responseJSON ? err.responseJSON.error : JSON.stringify(err);
+            vnode.state.validationError = err.responseJSON ? err.responseJSON.error : err.message;
           } finally {
             vnode.state.validationCompleted = true;
             vnode.state.validating = false;
