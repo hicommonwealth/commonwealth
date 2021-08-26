@@ -73,14 +73,14 @@ async function main() {
   // } catch (error) {
   //   await handleFatalError(error, 'reactions')
   // }
-  //
-  // try {
-  //   await updatePublicTopics(bucketClient)
-  // } catch (error) {
-  //   await handleFatalError(error, 'topics')
-  // }
 
-  await sequelizeTester();
+  try {
+    await updatePublicTopics(bucketClient)
+  } catch (error) {
+    await handleFatalError(error, 'topics')
+  }
+
+  // await sequelizeTester();
 
   lastUpdate = now
 
@@ -369,31 +369,36 @@ async function updatePublicReactions(bucketClient) {
     reactions = reactions.filter(o => !o.OffchainCommunity?.privacyEnabled)
   }
 
-  const promises = [];
-  for (const reaction of reactions) {
+  let bucketStreams = [];
+  for (let i = 0; i < reactions.length; ++i) {
+    const reaction = reactions[i];
     const bucketName = reaction.community || reaction.chain
+
+    const nextReaction = reactions[i+1];
+    const nextBucketName = nextReaction?.community || nextReaction?.chain;
+
     if (IPFS_ONLY_CHAIN_OR_COMM && IPFS_ONLY_CHAIN_OR_COMM != bucketName) continue;
     await getOrCreateBucket(bucketClient, bucketName, !!reaction.OffchainCommunity?.privacyEnabled)
 
-    const data = [
-      buckets[bucketName].root.key,
-      `reactions/${reaction.id}.json`,
-      Buffer.from(JSON.stringify({
+    console.log(i)
+    const data = {
+      path: `reactions/${reaction.id}.json`,
+      content: Readable.from(Buffer.from(JSON.stringify({
         reaction: reaction.reaction,
         thread_id: reaction.thread_id,
         comment_id: reaction.comment_id,
         proposal_id: reaction.proposal_id
-      }))
-    ];
+      })))
+    }
 
-    if (IPFS_ASYNC_PUSH) promises.push(bucketClient.pushPath(...data))
-    else {
-      const result = await bucketClient.pushPath(...data);
-      await updateBucketCache(bucketName, result);
+    bucketStreams.push(data);
+    if (bucketName != nextBucketName) {
+      for await (const itr of bucketClient.pushPaths(buckets[bucketName].root.key, bucketStreams)) {
+        console.log('yes')
+      }
+      bucketStreams = [];
     }
   }
-
-  if (IPFS_ASYNC_PUSH) await Promise.all(promises)
   log.info('Finished updating reactions')
 }
 
@@ -424,10 +429,13 @@ async function updatePublicTopics(bucketClient) {
     topics = topics.filter(o => !o.community?.privacyEnabled)
   }
 
-  let prevBucketName = null;
   let bucketStreams = [];
-  for (const topic of topics) {
+  for (let i = 0; i < topics.length; i++) {
+    const topic = topics[i];
     const bucketName = topic.community_id || topic.chain_id;
+
+    const nextTopic = topics[i+1];
+    const nextBucketName = nextTopic?.community_id || topic?.chain_id;
 
     if (IPFS_ONLY_CHAIN_OR_COMM && IPFS_ONLY_CHAIN_OR_COMM != bucketName) continue;
     await getOrCreateBucket(bucketClient, bucketName, !!topic.community?.privacyEnabled)
@@ -440,26 +448,19 @@ async function updatePublicTopics(bucketClient) {
         telegram: topic.telegram
       })))
     }
-
-    if (prevBucketName == bucketName) {
-      bucketStreams.push(data)
-    } else {
-
-      // these CANNOT be done in parallel because buckets works similar to git so parallel execution could cause
-      // pushing to the wrong bucket head
-      for await (const itr of bucketClient.pushPaths(buckets[prevBucketName].root.key, bucketStreams)) {}
-      bucketStreams = [data];
-      prevBucketName = bucketName;
+    bucketStreams.push(data)
+    if (bucketName != nextBucketName) {
+      for await (const itr of bucketClient.pushPaths(buckets[bucketName].root.key, bucketStreams)) {}
+      bucketStreams = [];
     }
   }
-
   log.info('Finished updating topics')
 }
 
 async function getOrCreateBucket(bucketClient: Buckets, bucketName: string, encrypted?: boolean): Promise<string> {
   if (!buckets[bucketName]) {
     buckets[bucketName] = await bucketClient.getOrCreate(bucketName, { encrypted: !!encrypted });
-    if (!buckets[bucketName].root) {
+    if (!buckets[bucketName]?.root) {
       throw new Error('Failed to open bucket');
     }
 
