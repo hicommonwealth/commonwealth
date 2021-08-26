@@ -51,7 +51,12 @@ export class NearAccount extends Account<NearToken> {
     if (!this._walletConnection.connection?.signer) {
       throw new Error('no signer found!');
     }
-    const { publicKey, signature } = await this._walletConnection.connection.signer.signMessage(Buffer.from(message));
+    const { publicKey, signature } = await this._walletConnection.connection.signer.signMessage(
+      Buffer.from(message),
+      this.address,
+      // TODO: configure for beta/testnet
+      'mainnet',
+    );
     return JSON.stringify({
       signature: Buffer.from(signature).toString('base64'),
       publicKey: Buffer.from(publicKey.data).toString('base64')
