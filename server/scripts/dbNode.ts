@@ -12,7 +12,7 @@ import {
 
 import {
   RabbitMqHandler,
-} from 'ce-rabbitmq-plugin';
+} from '@commonwealth/ce-rabbitmq-plugin';
 import { DATABASE_URI, HANDLE_IDENTITY } from '../config'
 import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
 
