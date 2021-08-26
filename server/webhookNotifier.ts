@@ -271,40 +271,39 @@ const send = async (models, content: WebhookContent) => {
         //   'avatarUrl': 'http://commonwealthLogoGoesHere'
         // };
       } else if (url.indexOf('telegram') !== -1) {
+        let getUpdatesUrl = url.split('/@').slice(0, -1).join('@');
+
+        let getChatUsername = url.split('/@');
+        getChatUsername = '@'+getChatUsername[1];
+
+        const botToken = 'bot1662899908:AAGuGPpsYzfM2KzAGjveaois9TUN-OMggC4';
+        getUpdatesUrl = `https://api.telegram.org/${botToken}`;
+        url = getUpdatesUrl+'/sendMessage';
+
         webhookData = isChainEvent ? {
-          username: 'Commonwealth',
-          avatar_url: DEFAULT_COMMONWEALTH_LOGO,
-          embeds: [{
-            author: {
-              name: 'New chain event',
-              url: chainEventLink,
-              icon_url: previewImageUrl
-            },
-            title,
-            url: chainEventLink,
-            description: fulltext,
-            color: 15258703,
-            thumbnail: {
-              'url': previewImageUrl
-            },
-          }]
+          chat_id: getChatUsername,
+          text: `<a href="${chainEventLink}"><b>${title}</b></a>\n\n${fulltext}`,
+          parse_mode: 'HTML',
+          reply_markup: {
+            'resize_keyboard': true,
+            'inline_keyboard': [
+              [
+                { 'text': 'Read more on commonwealth', 'url': chainEventLink }
+              ]
+            ]
+          }
         } : {
-          username: 'Commonwealth',
-          avatar_url: DEFAULT_COMMONWEALTH_LOGO,
-          embeds: [{
-            author: {
-              name: actor,
-              url: actorAccountLink,
-              icon_url: actorAvatarUrl
-            },
-            title: notificationTitlePrefix + actedOn,
-            url: actedOnLink,
-            description: notificationExcerpt.replace(REGEX_EMOJI, ''), // discord webhook description doesn't accept emoji
-            color: 15258703,
-            thumbnail: {
-              'url': previewImageUrl
-            },
-          }]
+          chat_id: getChatUsername,
+          text: `<b>Author:</b> <a href="${actorAccountLink}">${actor}</a>\n<a href="${actedOnLink}"><b>${notificationTitlePrefix + actedOn}</b></a> \r\n\n${notificationExcerpt.replace(REGEX_EMOJI, '')}`,
+          parse_mode: 'HTML',
+          reply_markup: {
+            'resize_keyboard': true,
+            'inline_keyboard': [
+              [
+                { 'text': 'Read more on commonwealth', 'url': actedOnLink }
+              ]
+            ]
+          }
         };
       }
 
