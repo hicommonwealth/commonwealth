@@ -15,13 +15,11 @@ declare global {
       user?: User;
       wss: WebSocket.Server;
     }
-  }
-}
 
-declare module "express-session" {
-  interface SessionData {
-    passport?: {
-      user?: number;
+    interface SessionData {
+      passport?: {
+        user?: number;
+      }
     }
   }
 }

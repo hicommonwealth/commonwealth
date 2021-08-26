@@ -7,7 +7,7 @@ const edgewareLockdropBalances = async (models: DB, req: Request, res: Response,
   const filters : any = {};
   // eslint-disable-next-line max-len
   if (req.query.address) filters.address = models.Sequelize.where(models.Sequelize.fn('LOWER', models.Sequelize.col('address')),
-    'LIKE', `%${String(req.query.address).toLowerCase()}%`);
+    'LIKE', `%${req.query.address.toLowerCase()}%`);
 
   const balances = await models.EdgewareLockdropBalance.findAll({ where: filters });
   res.json({ balances });

@@ -77,7 +77,7 @@ export default class MolochGovernance extends ProposalModule<
     this._periodDuration = new BN((await this._api.Contract.periodDuration()).toString(), 10);
     this._proposalDeposit = new BN((await this._api.Contract.proposalDeposit()).toString(), 10);
 
-    // // fetch all proposals
+    // fetch all proposals
     if (this._usingServerChainEntities) {
       console.log('Fetching moloch proposals from backend.');
       await this.app.chain.chainEntities.refresh(this.app.chain.id, EntityRefreshOption.AllEntities);
@@ -86,12 +86,12 @@ export default class MolochGovernance extends ProposalModule<
     } else {
       console.log('Fetching moloch proposals from chain.');
       const fetcher = new MolochEvents.StorageFetcher(
-        <any>api.Contract,
+        api.Contract,
         1,
         new EthDater((this.app.chain as Moloch).chain.api)
       );
-      const subscriber = new MolochEvents.Subscriber(<any>api.Contract, this.app.chain.id);
-      const processor = new MolochEvents.Processor(<any>api.Contract, 1);
+      const subscriber = new MolochEvents.Subscriber(api.Contract, this.app.chain.id);
+      const processor = new MolochEvents.Processor(api.Contract, 1);
       await this.app.chain.chainEntities.fetchEntities(this.app.chain.id, () => fetcher.fetch());
       await this.app.chain.chainEntities.subscribeEntities(
         this.app.chain.id,
