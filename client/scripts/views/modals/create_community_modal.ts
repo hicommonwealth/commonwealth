@@ -290,7 +290,7 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
         label: 'Test',
         onclick: async (e) => {
           // deinit substrate API if one exists
-          if (app.chain.apiInitialized) {
+          if (app.chain?.apiInitialized) {
             await app.chain.deinit();
           }
 
