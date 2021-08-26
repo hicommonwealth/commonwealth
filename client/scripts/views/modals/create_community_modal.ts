@@ -1,6 +1,7 @@
 // import 'modals/create_community_modal.scss';
 import 'modals/manage_community_modal.scss';
 
+import BN from 'bn.js';
 import m from 'mithril';
 import $ from 'jquery';
 import app from 'state';
@@ -12,6 +13,7 @@ import { constructSubstrateUrl } from 'substrate';
 
 import { CompactModalExitButton } from 'views/modal';
 import NearSputnikDao from 'controllers/chain/near/sputnik/dao';
+import { NearAccount } from 'controllers/chain/near/account';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { InputPropertyRow, TogglePropertyRow, SelectPropertyRow } from './manage_community_modal/metadata_rows';
 import { initAppState } from '../../app';
@@ -402,7 +404,7 @@ const SputnikForm: m.Component<SputnikFormAttrs, SputnikFormState> = {
           title: 'Name',
           defaultValue: vnode.state.name,
           onChangeHandler: (v) => { vnode.state.name = v; },
-          placeholder: 'genesis.sputnik-dao.near',
+          placeholder: 'genesis',
         }),
         m(InputPropertyRow, {
           title: 'Description',
@@ -414,11 +416,16 @@ const SputnikForm: m.Component<SputnikFormAttrs, SputnikFormState> = {
           title: 'Deploy',
           defaultValue: vnode.state.createNew,
           onToggle: (checked) => { vnode.state.createNew = checked; },
-          caption: (checked) => checked ? 'Deploying new DAO' : 'Adding existing DAO',
+          caption: (checked) => !(app.user?.activeAccount instanceof NearAccount)
+            ? 'Must log into NEAR account to deploy'
+            : checked
+              ? 'Deploying new DAO' : 'Adding existing DAO',
+          disabled: !(app.user?.activeAccount instanceof NearAccount),
         }),
-        vnode.state.createNew && m(InputPropertyRow, {
+        m(InputPropertyRow, {
           title: 'Initial Value',
           defaultValue: vnode.state.initialValue,
+          disabled: !vnode.state.createNew,
           onChangeHandler: (v) => { vnode.state.initialValue = v; },
           placeholder: '5',
         }),
@@ -472,16 +479,23 @@ const SputnikForm: m.Component<SputnikFormAttrs, SputnikFormState> = {
           } = vnode.state;
           vnode.state.saving = true;
           if (createNew) {
-            // TODO: login and get account
-            // TODO: validate value
-            // await NearSputnikDao.createDaoTx(account, name, description, initialValue);
-            // TODO: ensure creation was successful
-            console.log('Created DAO successfully!');
+            // TODO: validate
+            // https://github.com/AngelBlock/sputnik-dao-2-mockup/blob/dev/src/Selector.jsx#L159
+            try {
+              const account = app.user.activeAccount as NearAccount;
+              const v = new BN(initialValue);
+              await NearSputnikDao.createDaoTx(account, name, description, v);
+              console.log('Created DAO successfully!');
+            } catch (err) {
+              notifyError(err.responseJSON?.error || 'Creating DAO failed');
+              vnode.state.saving = false;
+              return;
+            }
           }
           try {
             // TODO: ensure id format is correct
             const res = await $.post(`${app.serverUrl()}/addChainNode`, {
-              name,
+              name: `${name}.sputnik-dao.near`,
               description,
               node_url: 'https://rpc.mainnet.near.org',
               symbol: 'NEAR',
@@ -492,7 +506,7 @@ const SputnikForm: m.Component<SputnikFormAttrs, SputnikFormState> = {
               github,
               jwt: app.user.jwt,
               type: 'dao',
-              id: name,
+              id: `${name}.sputnik-dao.near`,
               base: 'near',
               network: 'sputnik'
             });

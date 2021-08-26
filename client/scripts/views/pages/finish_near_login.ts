@@ -68,7 +68,7 @@ const FinishNearLogin: m.Component<{}, IState> = {
       }, [
         m('h3', `NEAR account log in error: ${vnode.state.validationError}`),
         m('button.formular-button-primary', {
-          onclick: async (e) => {
+          onclick: (e) => {
             e.preventDefault();
             redirectToNextPage();
           }
@@ -95,50 +95,45 @@ const FinishNearLogin: m.Component<{}, IState> = {
         }),
       ]);
     } else if (!vnode.state.validating) {
-    // chain loaded and on near -- finish login
-    // TODO: share one wallet account across all actual accounts and swap out
-    //   login data from localStorage as needed.
-      vnode.state.validating = true;
-      const wallet = new WalletAccount((app.chain as Near).chain.api, null);
-      if (wallet.isSignedIn()) {
-        const acct: NearAccount = app.chain.accounts.get(wallet.getAccountId());
-        acct.updateKeypair().then((gotKeypair) => {
-          if (!gotKeypair) {
-            throw new Error('unable to fetch keypair from localStorage');
-          }
-          return createUserWithAddress(acct.address);
-        })
-          .then(() => {
-            return acct.validate();
-          })
-          .then(async () => {
+      // chain loaded and on near -- finish login
+      // TODO: share one wallet account across all actual accounts and swap out
+      //   login data from localStorage as needed.
+      const validate = async () => {
+        vnode.state.validating = true;
+        const wallet = new WalletAccount((app.chain as Near).chain.api, null);
+        console.log(wallet);
+        if (wallet.isSignedIn()) {
+          try {
+            const acct: NearAccount = app.chain.accounts.get(wallet.getAccountId());
+            console.log(acct);
+            await createUserWithAddress(acct.address);
+            await acct.validate();
             if (!app.isLoggedIn()) {
               await initAppState();
               const chain = app.user.selectedNode
                 ? app.user.selectedNode.chain
                 : app.config.nodes.getByChain(app.activeChainId())[0].chain;
+              console.log(chain);
               await updateActiveAddresses(chain);
             }
             await setActiveAccount(acct);
-          })
-          .then(() => {
-            vnode.state.validationCompleted = true;
-            vnode.state.validating = false;
             vnode.state.validatedAccount = acct;
-            m.redraw();
-          })
-          .catch((err) => {
-            vnode.state.validationCompleted = true;
+            console.log('Validation success');
+          } catch (err) {
             vnode.state.validationError = err.responseJSON ? err.responseJSON.error : JSON.stringify(err);
+          } finally {
+            vnode.state.validationCompleted = true;
             vnode.state.validating = false;
             m.redraw();
-          });
-      } else {
-        vnode.state.validationError = 'Sign-in failed.';
-        vnode.state.validating = false;
-        vnode.state.validationCompleted = true;
-        m.redraw();
-      }
+          }
+        } else {
+          vnode.state.validationError = 'Sign-in failed.';
+          vnode.state.validating = false;
+          vnode.state.validationCompleted = true;
+          m.redraw();
+        }
+      };
+      validate();
     } else {
       // validation in progress
     }

@@ -3,7 +3,7 @@ import { Account, IAccountsModule, ITXModalData } from 'models';
 import { NearToken } from 'adapters/chain/near/types';
 import { IApp } from 'state';
 import { AccountsStore } from 'stores';
-import { keyStores, Account as NearJsAccount, KeyPair } from 'near-api-js';
+import { keyStores, Account as NearJsAccount } from 'near-api-js';
 import { AccountView } from 'near-api-js/lib/providers/provider';
 import NearChain from './chain';
 
@@ -25,7 +25,6 @@ export class NearAccount extends Account<NearToken> {
   private _walletConnection: NearJsAccount;
   public get walletConnection() { return this._walletConnection; }
 
-  private _keyPair: KeyPair;
   private _Accounts: NearAccounts;
   private _Chain: NearChain;
   constructor(app: IApp, Chain: NearChain, Accounts: NearAccounts, address: string) {
@@ -33,7 +32,6 @@ export class NearAccount extends Account<NearToken> {
     this._walletConnection = new NearJsAccount(Chain.api.connection, address);
     this._Chain = Chain;
     this._Accounts = Accounts;
-    this.updateKeypair(); // async action -- should be quick tho
     this._Accounts.store.add(this);
   }
 
@@ -49,31 +47,11 @@ export class NearAccount extends Account<NearToken> {
     throw new Error('tx not supported on NEAR protocol');
   }
 
-  public hasKeypair(): boolean {
-    return !!this._keyPair;
-  }
-
-  // This must be called successfully before we can sign a message or
-  // use the account in any way that requires a key.
-  public async updateKeypair(): Promise<boolean> {
-    return new Promise(async (resolve) => {
-      this._keyPair = await this._Accounts.keyStore.getKey(this._Chain.api.connection.networkId, this.address);
-      // if a keypair is found, return
-      if (this._keyPair) {
-        return resolve(!!this._keyPair);
-      }
-      // otherwise, call updateKeypair again with a delay
-      setTimeout(async () => {
-        resolve(await this.updateKeypair());
-      }, 1000);
-    });
-  }
-
   public async signMessage(message: string): Promise<string> {
-    if (!this._keyPair) {
-      throw new Error('no keypair found!');
+    if (!this._walletConnection.connection?.signer) {
+      throw new Error('no signer found!');
     }
-    const { signature, publicKey } = this._keyPair.sign(Buffer.from(message));
+    const { publicKey, signature } = await this._walletConnection.connection.signer.signMessage(Buffer.from(message));
     return JSON.stringify({
       signature: Buffer.from(signature).toString('base64'),
       publicKey: Buffer.from(publicKey.data).toString('base64')
@@ -103,7 +81,7 @@ export class NearAccounts implements IAccountsModule<NearToken, NearAccount> {
 
   constructor(app: IApp) {
     this._app = app;
-    this.keyStore = new keyStores.BrowserLocalStorageKeyStore(localStorage);
+    this.keyStore = new keyStores.BrowserLocalStorageKeyStore();
   }
 
   public get(address: string): NearAccount {

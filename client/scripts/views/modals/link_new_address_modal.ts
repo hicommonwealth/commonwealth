@@ -455,7 +455,10 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
                     wallet.signOut();
                   }
                   const redirectUrl = `${window.location.origin}/${app.activeChainId()}/finishNearLogin`;
-                  wallet.requestSignIn('commonwealth', 'commonwealth', redirectUrl, redirectUrl);
+                  wallet.requestSignIn({
+                    successUrl: redirectUrl,
+                    failureUrl: redirectUrl
+                  });
                 },
                 label: 'Continue to NEAR wallet'
               }) ]
