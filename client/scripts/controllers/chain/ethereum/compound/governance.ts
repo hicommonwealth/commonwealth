@@ -55,21 +55,6 @@ export default class CompoundGovernance extends ProposalModule<
     super(app, (e) => new CompoundProposal(this._Accounts, this._Chain, this, e));
   }
 
-  // METHODS
-
-  public async castVote(proposalId: number, support: boolean) {
-    const address = this.app.user.activeAccount.address;
-    const contract = await attachSigner(this.app.wallets, address, this._api.Contract);
-
-    const tx = await contract.castVote(proposalId, support);
-    const txReceipt = await tx.wait();
-    if (txReceipt.status !== 1) {
-      throw new Error(`Failed to cast vote on proposal #${proposalId}`);
-    }
-  }
-
-  // PROPOSE
-
   public async propose(args: CompoundProposalArgs) {
     const address = this.app.user.activeAccount.address;
     const contract = await attachSigner(this.app.wallets, address, this._api.Contract);
@@ -85,9 +70,10 @@ export default class CompoundGovernance extends ProposalModule<
       throw new Error('applicant cannot be 0');
     }
 
+    const gasLimit = await contract.estimateGas.propose(targets, values, signatures, calldatas, description);
     const tx = await contract.propose(
       targets, values, signatures, calldatas, description,
-      { gasLimit: this._api.gasLimit },
+      { gasLimit },
     );
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
@@ -101,39 +87,6 @@ export default class CompoundGovernance extends ProposalModule<
       throw new Error(`Failed to get state for proposal #${proposalId}`);
     }
     return state;
-  }
-
-  public async execute(proposalId: number) {
-    const address = this.app.user.activeAccount.address;
-    const contract = await attachSigner(this.app.wallets, address, this._api.Contract);
-
-    const tx = await contract.execute(proposalId);
-    const txReceipt = await tx.wait();
-    if (txReceipt.status !== 1) {
-      throw new Error(`Failed to execute proposal #${proposalId}`);
-    }
-  }
-
-  public async queue(proposalId: number) {
-    const address = this.app.user.activeAccount.address;
-    const contract = await attachSigner(this.app.wallets, address, this._api.Contract);
-
-    const tx = await contract.queue(proposalId);
-    const txReceipt = await tx.wait();
-    if (txReceipt.status !== 1) {
-      throw new Error(`Failed to queue proposal #${proposalId}`);
-    }
-  }
-
-  public async cancel(proposalId: number) {
-    const address = this.app.user.activeAccount.address;
-    const contract = await attachSigner(this.app.wallets, address, this._api.Contract);
-
-    const tx = await contract.cancel(proposalId);
-    const txReceipt = await tx.wait();
-    if (txReceipt.status !== 1) {
-      throw new Error(`Failed to cancel proposal #${proposalId}`);
-    }
   }
 
   public async init(chain: CompoundChain, Accounts: EthereumAccounts) {
@@ -167,8 +120,8 @@ export default class CompoundGovernance extends ProposalModule<
 
     // fetch proposals from chain
     // const fetcher = new AaveEvents.StorageFetcher(chainEventsContracts);
-    const subscriber = new CompoundEvents.Subscriber(<any>this._api.Contract, this.app.chain.id);
-    const processor = new CompoundEvents.Processor(<any>this._api.Contract);
+    const subscriber = new CompoundEvents.Subscriber(this._api.Contract, this.app.chain.id);
+    const processor = new CompoundEvents.Processor(this._api.Contract);
     // await this.app.chain.chainEntities.fetchEntities(this.app.chain.id, () => fetcher.fetch());
     await this.app.chain.chainEntities.subscribeEntities(
       this.app.chain.id,
