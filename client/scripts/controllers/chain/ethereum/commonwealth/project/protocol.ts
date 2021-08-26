@@ -1,13 +1,10 @@
-// import BN from 'bn.js';
-
-import { IApp } from 'state';
 import { Project__factory, CWToken__factory } from 'eth/types';
 import { CMNProjectStore, CMNProjectMembersStore } from '../../../../../stores';
 import { CMNProjectProtocol, CMNProject, CMNProjectMembers } from '../../../../../models';
 
 import CMNProjectAPI, { EtherAddress, ProjectMetaData } from './api';
-import CMNChain from '../chain';
 import { attachSigner } from '../../contractApi';
+import EthereumChain from '../../chain';
 
 export default class ProjectProtocol {
   private _projectStore = new CMNProjectStore();
@@ -16,34 +13,21 @@ export default class ProjectProtocol {
   private _memberStore = new CMNProjectMembersStore();
   public get memberStore() { return this._memberStore; }
 
-  private _chain: CMNChain;
+  private _chain: EthereumChain;
   private _api: CMNProjectAPI;
 
   private _syncPeriod = 5 * 60 * 1000; // update in every 5 mins
 
-  private _initialized: boolean = false;
-  public get initialized() { return this._initialized; }
-
-  private _app: IApp;
-  public get app() { return this._app; }
-
-  constructor(app: IApp) {
-    this._app = app;
-  }
-
-  public async init(chain: CMNChain) {
+  public async init(chain: EthereumChain, api: CMNProjectAPI) {
     this._chain = chain;
-    this._api = this._chain.CMNProjectApi;
+    this._api = api;
 
     const protocolData = await this._api.Contract.protocolData();
-
-    // const protocolFee = new BN((await this._api.Contract.protocolFee()).toString(), 10);
     const protocolFee = protocolData.protocolFee;
     const feeTo = protocolData.feeTo;
     const projects: CMNProject[] = await this._api.retrieveAllProjects();
 
     this._projectStore.add(new CMNProjectProtocol('cmn_projects', protocolFee, feeTo, projects));
-    this._initialized = true;
   }
 
   public async deinit() {
@@ -51,7 +35,7 @@ export default class ProjectProtocol {
     this.memberStore.clear();
   }
 
-  public async getProjectContractApi(projAddress: string, signer: string) {
+  public async getProjectContractApi(projAddress: string, signer?: string) {
     let projectApi = this._api.getProjectAPI(projAddress);
     if (!projectApi) {
       projectApi = await Project__factory.connect(
@@ -60,8 +44,11 @@ export default class ProjectProtocol {
       );
       this._api.setProjectAPI(projAddress, projectApi);
     }
-    const contract = await projectApi.attachSigner(this._chain.app.wallets, signer);
-    return contract;
+    if (signer) {
+      const contract = await projectApi.attachSigner(this._chain.app.wallets, signer);
+      return contract;
+    }
+    return projectApi;
   }
 
   public async syncMembers(bTokenAddress: string, cTokenAddress: string, projectHash: string) {
@@ -148,5 +135,14 @@ export default class ProjectProtocol {
       throw new Error('failed to approve amount');
     }
     return approvalTxReceipt;
+  }
+
+  public async getAcceptedTokens(project?: CMNProject) {
+    if (project) {
+      const projContractAPI = await this.getProjectContractApi(project.address);
+      return this._api.getProjectAcceptedTokens(projContractAPI, this._chain);
+    } else {
+      return this._api.getProtocolAcceptedTokens(this._chain);
+    }
   }
 }

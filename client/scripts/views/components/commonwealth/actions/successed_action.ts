@@ -44,7 +44,7 @@ const ActionModule: m.Component<{
 
 const SuccsedActionCard: m.Component<{
   project: CMNProject,
-  protocol: any,
+  projectProtocol: any,
   curators: CWUser[]
 },
 {
@@ -58,7 +58,7 @@ const SuccsedActionCard: m.Component<{
     vnode.state.submitting = 0;
   },
   view: (vnode) => {
-    const { project, protocol, curators } = vnode.attrs;
+    const { project, projectProtocol, curators } = vnode.attrs;
 
     // 0: not in progress, 1: in progress of withdrawing, 2: in progress of redeeming cTokens
     const { submitting } = vnode.state;
@@ -108,11 +108,11 @@ const SuccsedActionCard: m.Component<{
           vnode.state.submitting = isWithdraw ? 1 : 2;
           let res;
           if (isWithdraw) {
-            res = await protocol.withdraw(project, author);
+            res = await projectProtocol.withdraw(project, author);
           } else if (!vnode.state.amount || vnode.state.amount.toString() === new BN(0).toString()) {
             vnode.state.error = 'Please enter the amount';
           } else {
-            res = await protocol.redeemTokens(
+            res = await projectProtocol.redeemTokens(
               vnode.state.amount,
               false,
               project,

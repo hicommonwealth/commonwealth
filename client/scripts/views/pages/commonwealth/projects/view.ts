@@ -72,12 +72,12 @@ const ViewProjectPage: m.Component<{
   onupdate: async (vnode) => {
     if (!app.chain || vnode.state.initialized) return;
 
-    const protocol = (app.chain as any).protocol;
-    if (!protocol || !protocol.initialized || !protocol.projectStore) return;
+    const projectProtocol = (app.chain as any).projectProtocol;
+    if (!projectProtocol || !projectProtocol.initialized || !projectProtocol.projectStore) return;
 
-    const projects = await (app.chain as any).protocol.syncProjects();
+    const projects = await (app.chain as any).projectProtocol.syncProjects();
     const project = projects.filter((item) => item.projectHash === vnode.attrs.projectHash)[0];
-    await (app.chain as any).protocol.syncMembers(project.bToken, project.cToken, project.projectHash);
+    await (app.chain as any).projectProtocol.syncMembers(project.bToken, project.cToken, project.projectHash);
     vnode.state.project = project;
     vnode.state.initialized = true;
     m.redraw();
@@ -89,8 +89,8 @@ const ViewProjectPage: m.Component<{
       return m(PageLoading);
     }
 
-    const protocol = (app.chain as any).protocol;
-    const mStore = protocol.memberStore.getById(project.projectHash);
+    const projectProtocol = (app.chain as any).projectProtocol;
+    const mStore = projectProtocol.memberStore.getById(project.projectHash);
     const backers = mStore.backers || [];
     const curators = mStore.curators || [];
 
@@ -119,11 +119,11 @@ const ViewProjectPage: m.Component<{
             leftInSeconds,
             forceUpdateStatus: async () => {
               vnode.state.initialized = false;
-              await protocol.syncProjects();
+              await projectProtocol.syncProjects();
               vnode.state.initialized = true;
             }
           }),
-          m(ActionModule, { project, protocol, backers, curators })
+          m(ActionModule, { project, projectProtocol, backers, curators })
         ]),
         m('.row .members-card', [
           m('.col-lg-6', [
