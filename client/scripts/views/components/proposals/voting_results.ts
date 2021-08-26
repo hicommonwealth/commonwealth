@@ -8,11 +8,10 @@ import { VotingType, VotingUnit, IVote, DepositVote, BinaryVote, AnyProposal } f
 import { CosmosVote, CosmosProposal } from 'controllers/chain/cosmos/proposal';
 import { CosmosVoteChoice } from 'controllers/chain/cosmos/types';
 import { MolochProposalVote, MolochVote } from 'controllers/chain/ethereum/moloch/proposal';
-import { MarlinProposalVote, MarlinVote } from 'controllers/chain/ethereum/marlin/proposal';
+import { CompoundProposalVote, CompoundVote } from 'controllers/chain/ethereum/compound/proposal';
 import { SubstrateCollectiveVote } from 'controllers/chain/substrate/collective_proposal';
 import { SubstrateDemocracyVote } from 'controllers/chain/substrate/democracy_referendum';
 import AaveProposal, { AaveProposalVote } from 'controllers/chain/ethereum/aave/proposal';
-import Marlin from 'controllers/chain/ethereum/marlin/adapter';
 
 const COLLAPSE_VOTERS_AFTER = 6; // if there are >6 voters, collapse remaining under "Show more"
 
@@ -55,13 +54,10 @@ const VoteListing: m.Component<{
                   balance = vote.power;
                   vnode.state.balancesCache[vote.account.address] = vote.format();
                   m.redraw();
-                } else if (vote instanceof MarlinProposalVote) {
-                  (app.chain as Marlin).chain.balanceOf(vote.account.address).then((b) => {
-                    balance = b;
-                    vnode.state.balancesCache[vote.account.address] = formatCoin(app.chain.chain.coins(b), true);
-                    m.redraw();
-                  });
-                  balance = '--';
+                } else if (vote instanceof CompoundProposalVote) {
+                  balance = formatCoin(app.chain.chain.coins(vote.power), true);
+                  vnode.state.balancesCache[vote.account.address] = balance;
+                  m.redraw();
                 } else {
                   vote.account.balance.then((b) => {
                     balance = b;
@@ -83,7 +79,7 @@ const VoteListing: m.Component<{
                   m('.vote-voter', m(User, { user: vote.account, linkify: true })),
                   balance && m('.vote-balance', balance),
                 ]);
-              case (vote instanceof MarlinProposalVote):
+              case (vote instanceof CompoundProposalVote):
                 return m('.vote', [
                   m('.vote-voter', m(User, { user: vote.account, linkify: true })),
                   balance && m('.vote-balance', balance),
@@ -206,23 +202,23 @@ const VotingResults: m.Component<{ proposal: AnyProposal }> = {
           ]),
         ])
       ]);
-    } else if (proposal.votingType === VotingType.MarlinYesNo) {
-      return m('.ProposalVotingResults', [
+    } else if (proposal.votingType === VotingType.CompoundYesNo) {
+      return m('.VotingResults', [
         m('.results-column.yes-votes', [
-          m('.results-header', `Yes (${votes.filter((v) => v.choice === MarlinVote.YES).length})`),
+          m('.results-header', `Yes (${votes.filter((v) => v.choice === CompoundVote.YES).length})`),
           m('.results-cell', [
             m(VoteListing, {
               proposal,
-              votes: votes.filter((v) => v.choice === MarlinVote.YES)
+              votes: votes.filter((v) => v.choice === CompoundVote.YES)
             })
           ]),
         ]),
         m('.results-column.no-votes', [
-          m('.results-header', `No (${votes.filter((v) => v.choice === MarlinVote.NO).length})`),
+          m('.results-header', `No (${votes.filter((v) => v.choice === CompoundVote.NO).length})`),
           m('.results-cell', [
             m(VoteListing, {
               proposal,
-              votes: votes.filter((v) => v.choice === MarlinVote.NO)
+              votes: votes.filter((v) => v.choice === CompoundVote.NO)
             })
           ]),
         ])
