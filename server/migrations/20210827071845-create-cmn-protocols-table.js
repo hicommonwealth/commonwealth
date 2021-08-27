@@ -13,17 +13,6 @@ module.exports = {
         created_at: { type: Sequelize.DATE, allowNull: false },
         updated_at: { type: Sequelize.DATE, allowNull: false },
       }, { transaction: t });
-
-      await queryInterface.bulkInsert('CMNProtocol', [{
-        id: 'kovan-ethereum-protocol',
-        name: 'Kovan Ethereum CMN Protocol',
-        project_protocol: '0x2e0afB46978c0826904D35E46842546eB73Ab9C9',
-        collective_protocol: '0xEFd442A95Be7a29DF5E02CA533a1f65Ed59BEda2',
-        chain: 'ethereum-kovan',
-        active: true,
-        created_at: new Date(),
-        updated_at: new Date()
-      }], { transaction: t });
     });
 
     return new Promise((resolve, reject) => {
@@ -32,11 +21,8 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    return queryInterface.sequelize.transaction((t) => {
-      return Promise.all([
-        queryInterface.bulkDelete('CMNProtocol', { id: 'kovan-ethereum-protocol' }, { transaction: t }),
-        queryInterface.dropTable('CMNProtocol', { transaction: t }),
-      ]);
+    return queryInterface.sequelize.transaction(async (t) => {
+      await  queryInterface.dropTable('CMNProtocol', { transaction: t });
     });
   }
 };
