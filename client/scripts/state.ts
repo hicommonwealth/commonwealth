@@ -22,6 +22,7 @@ import CommunitiesController from './controllers/server/communities';
 import UserController from './controllers/server/user/index';
 import WebWalletController from './controllers/app/web_wallets';
 import { InviteCodeAttributes } from 'types';
+import CMNProtocolController from './controllers/chain/ethereum/commonwealth/adapter';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -39,6 +40,7 @@ export interface IApp {
   socket: WebsocketController;
   chain: IChainAdapter<any, any>;
   community: ICommunityAdapter<any, any>;
+  cmnProtocol: CMNProtocolController;
 
   chainPreloading: boolean;
   chainAdapterReady: EventEmitter;
@@ -104,6 +106,7 @@ const app: IApp = {
   socket: null,
   chain: null,
   community: null,
+  cmnProtocol: new CMNProtocolController(),
 
   chainPreloading: false,
   chainAdapterReady: new EventEmitter(),

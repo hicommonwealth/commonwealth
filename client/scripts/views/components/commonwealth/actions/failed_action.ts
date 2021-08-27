@@ -12,7 +12,7 @@ const floatRegex = /^[0-9]*\.?[0-9]*$/;
 
 const FailedActionCard: m.Component<{
   project: CMNProject,
-  projectProtocol: any,
+  project_protocol: any,
   backers: CWUser[]
 }, {
   amount: any,
@@ -24,7 +24,7 @@ const FailedActionCard: m.Component<{
     vnode.state.amount = 0;
   },
   view: (vnode) => {
-    const { project, projectProtocol, backers } = vnode.attrs;
+    const { project, project_protocol, backers } = vnode.attrs;
     const { submitting } = vnode.state;
     const actionDisabled = !app.user.activeAccount || !app.isLoggedIn() || submitting;
 
@@ -75,7 +75,7 @@ const FailedActionCard: m.Component<{
             } else {
               const author = app.user.activeAccount.address;
               vnode.state.submitting = true;
-              const res = await projectProtocol.redeemTokens(
+              const res = await project_protocol.redeemTokens(
                 vnode.state.amount,
                 true,
                 project,

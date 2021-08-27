@@ -206,6 +206,29 @@ export async function selectCommunity(c?: CommunityInfo): Promise<boolean> {
   return true;
 }
 
+async function initCMNProtocol(chainId: string) {
+  if (!chainId || chainId === '') return;
+  const response = await $.get(`${app.serverUrl()}/getCMNProtocols`, { chain: chainId });
+  if (response.status !== 'Success') return;
+  const { protocol } = response.result;
+  if (!protocol && !protocol.name) return;
+  if (app.cmnProtocol && app.cmnProtocol.name === protocol.name) return; // no need to reinitialize
+
+  const CMNProtocol = (await import(
+    /* webpackMode: "lazy" */
+    /* webpackChunkName: "commonwealth-main" */
+    './controllers/chain/ethereum/commonwealth/adapter'
+  )).default;
+  const cmnProtocol = new CMNProtocol();
+  app.cmnProtocol = cmnProtocol;
+  await app.cmnProtocol.init(
+    protocol.name,
+    app,
+    protocol.project_protocol,
+    protocol.collective_protocol
+  );
+}
+
 // called by the user, when clicking on the chain/node switcher menu
 // returns a boolean reflecting whether initialization of chain via the
 // initChain fn ought to proceed or abort
@@ -235,14 +258,8 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
   // Import top-level chain adapter lazily, to facilitate code split.
   let newChain;
   let initApi; // required for NEAR
-  if (n.chain.id === ChainNetwork.CMNProtocol) {
-    const Commonwealth = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "commonwealth-main" */
-      './controllers/chain/ethereum/commonwealth/adapter'
-    )).default;
-    newChain = new Commonwealth(n, app);
-  } else if (n.chain.base === ChainBase.Substrate) {
+
+  if (n.chain.base === ChainBase.Substrate) {
     const Substrate = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "substrate-main" */
@@ -335,6 +352,10 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
 
   // Instantiate active addresses before chain fully loads
   await updateActiveAddresses(n.chain);
+
+  if (app.chain) {
+    await initCMNProtocol(app.activeChainId());
+  }
 
   // Update default on server if logged in
   if (app.isLoggedIn()) {

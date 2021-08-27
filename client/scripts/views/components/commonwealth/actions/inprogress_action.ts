@@ -44,7 +44,7 @@ const ActionModule: m.Component<
 
 const InProgressActionCard: m.Component<
 {
-  project: CMNProject, projectProtocol: any
+  project: CMNProject, project_protocol: any
 },
 {
   amount: any, error: string, submitting: number
@@ -54,7 +54,7 @@ const InProgressActionCard: m.Component<
     vnode.state.amount = 0;
   },
   view: (vnode) => {
-    const { projectProtocol, project } = vnode.attrs;
+    const { project_protocol, project } = vnode.attrs;
     const { submitting } = vnode.state; // 0: not in progress, 1: in progress of backing, 2: in progress of curating
     const actionDisabled = !app.user.activeAccount || !app.isLoggedIn() || submitting > 0;
 
@@ -91,7 +91,7 @@ const InProgressActionCard: m.Component<
           } else {
             const author = app.user.activeAccount.address;
             vnode.state.submitting = isBacker ? 1 : 2;
-            const res = await projectProtocol.backOrCurate(
+            const res = await project_protocol.backOrCurate(
               vnode.state.amount,
               project,
               isBacker,

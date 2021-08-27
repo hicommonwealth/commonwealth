@@ -42,6 +42,7 @@ import updateCommunity from './routes/updateCommunity';
 import communityStats from './routes/communityStats';
 import getCommunitiesAndChains from './routes/getCommunitiesAndChains';
 import createChain from './routes/createChain';
+import getCMNProtocols from './routes/getCMNProtocols';
 import viewCount from './routes/viewCount';
 import updateEmail from './routes/updateEmail';
 
@@ -197,7 +198,11 @@ function setupRouter(
 
   // offchain communities
   router.post('/starCommunity', passport.authenticate('jwt', { session: false }), starCommunity.bind(this, models));
+
   router.get('/getCommunitiesAndChains', getCommunitiesAndChains.bind(this, models));
+
+  // cmn protocol
+  router.get('/getCMNProtocols', getCMNProtocols.bind(this, models));
 
   // offchain community admin routes
   // TODO: Change to POST /community
