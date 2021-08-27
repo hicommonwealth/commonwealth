@@ -4,6 +4,7 @@ import WalletConnectWebWalletController from './webWallets/walletconnect_web_wal
 import KeplrWebWalletController from './webWallets/keplr_web_wallet';
 import PolkadotWebWalletController from './webWallets/polkadot_web_wallet';
 import NearWebWalletController from './webWallets/near_web_wallet';
+import TerraStationWebWalletController from './webWallets/terra_station_web_wallet';
 
 export default class WebWalletController {
   private _wallets: IWebWallet<any>[];
@@ -46,6 +47,7 @@ export default class WebWalletController {
       new WalletConnectWebWalletController(),
       new KeplrWebWalletController(),
       new NearWebWalletController(),
+      new TerraStationWebWalletController(),
     ];
   }
 }
