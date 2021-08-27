@@ -43,7 +43,7 @@ const MembersModule: m.Component<
     if (!connectionReady()) return;
     const { project } = vnode.attrs;
     const { backers, curators } = await (app.chain as any).project_protocol.syncMembers(
-      project.bToken, project.cToken, project.projectHash
+      project
     );
     vnode.state.backers = backers;
     vnode.state.curators = curators;

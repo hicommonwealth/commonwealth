@@ -6,8 +6,8 @@ module.exports = {
       await queryInterface.bulkInsert('CMNProtocol', [{
         id: 'kovan-ethereum-protocol',
         name: 'Kovan Ethereum CMN Protocol',
-        project_protocol: '0x2e0afB46978c0826904D35E46842546eB73Ab9C9',
-        collective_protocol: '0xEFd442A95Be7a29DF5E02CA533a1f65Ed59BEda2',
+        project_protocol: '0x93AdF9e24Fda3C5F525A5eC1742DA227EfC51574',
+        collective_protocol: '0xE08A86B417B90299d6dFD944F36dCd2613a49F72',
         chain: 'ethereum-kovan',
         active: true,
         created_at: new Date(),
@@ -16,7 +16,7 @@ module.exports = {
 
       await queryInterface.bulkInsert('Addresses', [
         {
-          address: '0x2e0afB46978c0826904D35E46842546eB73Ab9C9',
+          address: '0x93AdF9e24Fda3C5F525A5eC1742DA227EfC51574',
           chain: 'ethereum-kovan',
           created_at: new Date(),
           updated_at: new Date(),
@@ -24,7 +24,7 @@ module.exports = {
           name: 'CMN Protocol Project Factory'
         },
         {
-          address: '0xEFd442A95Be7a29DF5E02CA533a1f65Ed59BEda2',
+          address: '0xE08A86B417B90299d6dFD944F36dCd2613a49F72',
           chain: 'ethereum-kovan',
           created_at: new Date(),
           updated_at: new Date(),

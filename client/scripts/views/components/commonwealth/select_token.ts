@@ -2,49 +2,53 @@ import 'components/commonwealth/select_token.scss';
 
 import m from 'mithril';
 import { CustomSelect, ListItem, Icon, Icons, IOption, Input, Button  } from 'construct-ui';
-import { Token } from './token_input';
 
 const SelectToken: m.Component<
-  { tokens: Token[], updateTokens: (tokens: Token[]) => void, selectedTokens: Token[] },
+  {
+    tokens: string[],
+    updateTokens: (tokens: string[]) => void,
+    selectedTokens: string[]
+  },
   {}
 > = {
   view: (vnode) => {
     const { tokens, selectedTokens } = vnode.attrs;
-    const options = tokens.map(({ symbol, name }) => {
-      return {
-        label: name,
-        value: symbol
-      };
+    const options = tokens.map((symbol) => {
+      return { label: symbol, value: symbol };
     });
 
     return m('.selectToken', [
       m('.SelectTokensField', [
         m(CustomSelect, {
-          defaultValue: options[0].value,
-          itemRender: (item) => {
-            const label = (item as IOption).label as string;
-            const isSelected = (selectedTokens || []).map(({ symbol }) => symbol).includes(label);
+          itemRender: (s) => {
+            const sSymbol = (s as any).value;
+            const isSelected = selectedTokens.includes(sSymbol);
             return m(ListItem, {
               contentLeft: isSelected && m(Icon, {
                 name: Icons.CHECK
               }),
-              label,
+              label: sSymbol,
               selected: isSelected
             });
           },
           options,
           onSelect: (s) => {
-            const newToken = tokens.filter(({ symbol }) => symbol === (s as any).value)[0];
-            const selectedTokenSymbols = (selectedTokens || []).map(({ symbol }) => symbol);
-            if (selectedTokenSymbols.includes(newToken.symbol)) {
-              vnode.attrs.updateTokens(
-                selectedTokens.filter(({ symbol }) => symbol !== newToken.symbol)
-              );
+            const sSymbol = (s as any).value;
+            if (selectedTokens.includes(sSymbol)) {
+              vnode.attrs.updateTokens(selectedTokens.filter((token) => token !== sSymbol));
             } else {
-              vnode.attrs.updateTokens(selectedTokens.concat([newToken]));
+              vnode.attrs.updateTokens(selectedTokens.concat([sSymbol]));
             }
           }
-        })
+        }),
+        m(
+          'p',
+          { class: 'mt-1' },
+          [
+            m('span', 'You selected: '),
+            m('span', { style: 'color: red;' }, selectedTokens.join(', ')),
+          ]
+        ),
       ]),
     ]);
   }

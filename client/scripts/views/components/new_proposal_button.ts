@@ -184,7 +184,7 @@ const NewProposalButton: m.Component<{
     if (!app.chain && !app.community) return;
     if (!app.activeId()) return;
 
-    if (app.chain.id && app.chain.id.includes('cmn-protocol')) {
+    if (app.cmnProtocol && app.cmnProtocol.chainId === app.activeChainId()) {
       return m(ButtonGroup, {
         class: 'NewProposalButton',
       }, [

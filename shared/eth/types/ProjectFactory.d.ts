@@ -25,7 +25,7 @@ interface ProjectFactoryInterface extends ethers.utils.Interface {
     "addAcceptedTokens(address[])": FunctionFragment;
     "allProjects(uint256)": FunctionFragment;
     "createProject(bytes32,bytes32,bytes32,address,address[],address[],uint256,uint256,uint256)": FunctionFragment;
-    "getAcceptedTokens()": FunctionFragment;
+    "getAllAcceptedTokens()": FunctionFragment;
     "getAllProjects()": FunctionFragment;
     "getProtocolData()": FunctionFragment;
     "isAcceptedToken(address)": FunctionFragment;
@@ -67,7 +67,7 @@ interface ProjectFactoryInterface extends ethers.utils.Interface {
     ]
   ): string;
   encodeFunctionData(
-    functionFragment: "getAcceptedTokens",
+    functionFragment: "getAllAcceptedTokens",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -127,7 +127,7 @@ interface ProjectFactoryInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getAcceptedTokens",
+    functionFragment: "getAllAcceptedTokens",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -246,7 +246,7 @@ export class ProjectFactory extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    getAcceptedTokens(overrides?: CallOverrides): Promise<[string[]]>;
+    getAllAcceptedTokens(overrides?: CallOverrides): Promise<[string[]]>;
 
     getAllProjects(overrides?: CallOverrides): Promise<[string[]]>;
 
@@ -333,7 +333,7 @@ export class ProjectFactory extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  getAcceptedTokens(overrides?: CallOverrides): Promise<string[]>;
+  getAllAcceptedTokens(overrides?: CallOverrides): Promise<string[]>;
 
   getAllProjects(overrides?: CallOverrides): Promise<string[]>;
 
@@ -415,7 +415,7 @@ export class ProjectFactory extends BaseContract {
       overrides?: CallOverrides
     ): Promise<string>;
 
-    getAcceptedTokens(overrides?: CallOverrides): Promise<string[]>;
+    getAllAcceptedTokens(overrides?: CallOverrides): Promise<string[]>;
 
     getAllProjects(overrides?: CallOverrides): Promise<string[]>;
 
@@ -505,7 +505,7 @@ export class ProjectFactory extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    getAcceptedTokens(overrides?: CallOverrides): Promise<BigNumber>;
+    getAllAcceptedTokens(overrides?: CallOverrides): Promise<BigNumber>;
 
     getAllProjects(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -576,7 +576,9 @@ export class ProjectFactory extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    getAcceptedTokens(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    getAllAcceptedTokens(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     getAllProjects(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

@@ -218,8 +218,6 @@ export default (
       return false;
     }
 
-    console.log('====>chain.base', chain, chain.base);
-
     let isValid: boolean;
     if (chain.base === ChainBase.Substrate) {
       //
@@ -331,25 +329,18 @@ export default (
       // ethereum address handling
       //
       const msgBuffer = Buffer.from(addressModel.verification_token.trim());
-      console.log('====>msgBuffer', msgBuffer);
       // toBuffer() doesn't work if there is a newline
       const msgHash = ethUtil.hashPersonalMessage(msgBuffer);
-      console.log('====>msgHash', msgHash);
       const ethSignatureBuffer = ethUtil.toBuffer(signatureString.trim());
-      console.log('====>ethSignatureBuffer', ethSignatureBuffer);
       const ethSignatureParams = ethUtil.fromRpcSig(ethSignatureBuffer);
-      console.log('====>ethSignatureParams', ethSignatureParams);
       const publicKey = ethUtil.ecrecover(
         msgHash,
         ethSignatureParams.v,
         ethSignatureParams.r,
         ethSignatureParams.s
       );
-      console.log('====>publicKey', publicKey);
       const addressBuffer = ethUtil.publicToAddress(publicKey);
-      console.log('====>addressBuffer', addressBuffer);
       const lowercaseAddress = ethUtil.bufferToHex(addressBuffer);
-      console.log('====>lowercaseAddress', lowercaseAddress);
       try {
         const address = Web3.utils.toChecksumAddress(lowercaseAddress);
         isValid = (addressModel.address === address);

@@ -676,7 +676,6 @@ Promise.all([
       '/:scope/council':            redirectRoute(() => '/council'),
       '/:scope/delegate':           redirectRoute(() => '/delegate'),
       '/:scope/proposal/:type/:identifier': redirectRoute((attrs) => `/proposal/${attrs.type}/${attrs.identifier}/`),
-      '/:scope/project/:identifier': importRoute('views/pages/view_project/index', { scoped: true }), // CWP
       '/:scope/new/proposal/:type':  redirectRoute((attrs) => `/new/proposal/${attrs.type}/`),
       '/:scope/treasury':           redirectRoute(() => '/treasury'),
       '/:scope/bounties':           redirectRoute(() => '/bounties'),
@@ -719,7 +718,7 @@ Promise.all([
       // CMN Project
       '/:scope/projects':               importRoute('views/pages/commonwealth/projects', { scoped: true }),
       '/:scope/new/project':            importRoute('views/pages/commonwealth/projects/create', { scoped: true }),
-      '/:scope/project/projectHash':    importRoute('views/pages/commonwealth/projects/view', { scoped: true }),
+      '/:scope/project/:projectHash':    importRoute('views/pages/commonwealth/projects/view', { scoped: true }),
 
       // CMN Collective
       '/:scope/backers':                importRoute('views/pages/commonwealth/backers', { scoped: true }),

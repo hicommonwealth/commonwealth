@@ -1,10 +1,14 @@
-import { Project__factory, CWToken__factory } from 'eth/types';
+import { utils } from 'ethers';
+import BN from 'bn.js';
+
+import { Project__factory, CWToken__factory, ERC20__factory } from 'eth/types';
 import { CMNProjectStore, CMNProjectMembersStore } from '../../../../../stores';
 import { CMNProjectProtocol, CMNProject, CMNProjectMembers } from '../../../../../models';
 
 import CMNProjectAPI, { EtherAddress, ProjectMetaData } from './api';
 import { attachSigner } from '../../contractApi';
 import EthereumChain from '../../chain';
+import { tmpTokenData } from '../tokens';
 
 export default class ProjectProtocol {
   private _projectStore = new CMNProjectStore();
@@ -16,6 +20,7 @@ export default class ProjectProtocol {
   private _chain: EthereumChain;
   private _api: CMNProjectAPI;
 
+  private _syncing = 0;
   private _syncPeriod = 5 * 60 * 1000; // update in every 5 mins
 
   public async init(chain: EthereumChain, api: CMNProjectAPI) {
@@ -25,7 +30,7 @@ export default class ProjectProtocol {
     const protocolData = await this._api.Contract.protocolData();
     const protocolFee = protocolData.protocolFee;
     const feeTo = protocolData.feeTo;
-    const projects: CMNProject[] = await this._api.retrieveAllProjects();
+    const projects: CMNProject[] = await this.retrieveAllProjects();
 
     this._projectStore.add(new CMNProjectProtocol('cmn_projects', protocolFee, feeTo, projects));
   }
@@ -35,12 +40,82 @@ export default class ProjectProtocol {
     this.memberStore.clear();
   }
 
+  public async getProjectDetails(projAddress: string) {
+    const projContract = await this.getProjectContractApi(projAddress);
+    const metaData = await projContract.metaData();
+
+    const { name, ipfsHash, cwUrl, beneficiary, creator, id, factory } = metaData;
+    const curatorFee = await projContract.curatorFee();
+    const threshold = await projContract.threshold();
+    const totalFunding = await projContract.totalFunding();
+    const funded = await projContract.funded();
+    const lockedWithdraw = await projContract.lockedWithdraw();
+    const daedline = (new BN((await projContract.deadline()).toString()).mul(new BN(1000))).toNumber();
+    const endTime = new Date(daedline);
+
+    const projectHash = utils.solidityKeccak256(
+      ['address', 'address', 'bytes32', 'uint256'],
+      [creator, beneficiary, name, threshold.toString()]
+    );
+
+    let status = 'In Progress';
+    if ((new Date()).getTime() - endTime.getTime() > 0) {
+      if (funded) {
+        status = 'Successed';
+      } else {
+        status = 'Failed';
+      }
+    }
+
+    const acceptedTokens = await projContract.getAcceptedTokens();
+    const bTokens = {};
+    const cTokens = {};
+    for (let i = 0; i < acceptedTokens.length; i++) {
+      bTokens[acceptedTokens[i]] = await projContract.getBToken(acceptedTokens[i]);
+      cTokens[acceptedTokens[i]] = await projContract.getCToken(acceptedTokens[i]);
+    }
+
+    const newProj = new CMNProject(
+      utils.parseBytes32String(name),
+      '',
+      utils.parseBytes32String(ipfsHash),
+      utils.parseBytes32String(cwUrl),
+      beneficiary,
+      acceptedTokens, // aceptedTokens
+      [], // nominations,
+      threshold, // decimals in 8
+      endTime,
+      curatorFee,
+      projectHash,
+      status,
+      lockedWithdraw,
+      totalFunding, // decimals in 8
+      bTokens,
+      cTokens,
+      projAddress,
+    );
+
+    return newProj;
+  }
+
+  public async retrieveAllProjects() {
+    const projects: CMNProject[] =  [];
+    const projectAddresses = await this._api.Contract.getAllProjects();
+
+    for (let i = 0; i < projectAddresses.length; i++) {
+      const proj: CMNProject = await this.getProjectDetails(projectAddresses[i]);
+      projects.push(proj);
+    }
+    console.log('===>projects', projects);
+    return projects;
+  }
+
   public async getProjectContractApi(projAddress: string, signer?: string) {
     let projectApi = this._api.getProjectAPI(projAddress);
     if (!projectApi) {
       projectApi = await Project__factory.connect(
         projAddress,
-        this._chain.api.currentProvider as any
+        this._api.Provider
       );
       this._api.setProjectAPI(projAddress, projectApi);
     }
@@ -51,51 +126,52 @@ export default class ProjectProtocol {
     return projectApi;
   }
 
-  public async syncMembers(bTokenAddress: string, cTokenAddress: string, projectHash: string) {
-    let mStore = this._memberStore.getById(projectHash);
-    let curators = [];
-    let backers = [];
+  public async syncMembers(project: CMNProject) {
+    const { bTokens, cTokens, acceptedTokens, projectHash } = project;
+    console.log('====>project', project);
 
-    if (!mStore || !mStore.updated_at) {
-      // init when no memberStore
-      curators = await this._api.getTokenHolders(cTokenAddress);
-      backers = await this._api.getTokenHolders(bTokenAddress);
-      mStore = new CMNProjectMembers(projectHash, backers, curators);
-      this._memberStore.add(mStore);
-    } else {
-      // only update after 1 hour from the last update
-      const afterHours = Math.floor(Math.abs(new Date().getTime() - mStore.updated_at.getTime()) / this._syncPeriod);
-      if (afterHours > 0) {
-        curators = await this._api.getTokenHolders(cTokenAddress);
-        backers = await this._api.getTokenHolders(bTokenAddress);
-        mStore.setParticipants(backers, curators);
-      } else {
-        curators = mStore.curators;
-        backers = mStore.backers;
+    let mStore = this._memberStore.getById(projectHash);
+
+    const backers = {};
+    const curators = {};
+
+    if (
+      mStore
+      && mStore.updated_at
+      && (Math.floor((Math.abs(new Date().getTime() - mStore.updated_at.getTime())) / this._syncPeriod) < 1)
+    ) {
+      return { curators: mStore.curators, backers: mStore.backers };
+    }
+
+    for (let i = 0; i < acceptedTokens.length; i++) {
+      const token = acceptedTokens[i];
+      if (bTokens[token]) {
+        backers[token] = await this._api.getTokenHolders(bTokens[token]);
+      }
+      if (cTokens[token]) {
+        curators[token] = await this._api.getTokenHolders(cTokens[token]);
       }
     }
 
-    return { backers, curators };
+    if (!mStore || !mStore.updated_at) {
+      mStore = new CMNProjectMembers(projectHash, backers, curators);
+      this._memberStore.add(mStore);
+    } else {
+      mStore.setParticipants(backers, curators);
+    }
   }
 
   public async syncProjects(force = false) {
     const pStore = this._projectStore.getById('cmn_projects');
-    const afterHours = Math.floor(
-      Math.abs(new Date().getTime() - pStore.updated_at.getTime()) / this._syncPeriod
-    ); // diff in hours
+    const needSync = Math.floor(Math.abs(new Date().getTime() - pStore.updated_at.getTime()) / this._syncPeriod) > 0;
 
-    let projects: CMNProject[] = [];
-    if (force || afterHours > 1) {
-      projects =  await this._api.retrieveAllProjects();
-      pStore.setProjects(projects);
-    } else {
-      projects = pStore.projects;
+    if (force || needSync) {
+      pStore.setProjects(await this.retrieveAllProjects());
     }
-    return projects;
+    return pStore.projects;
   }
 
   public async createProject(params: ProjectMetaData) {
-    params.acceptedTokens = [EtherAddress];
     const contract = await attachSigner(this._chain.app.wallets, params.creator, this._api.Contract);
     return this._api.createProject(contract, params);
   }
@@ -118,7 +194,7 @@ export default class ProjectProtocol {
   }
 
   public async approveCWToken(project: CMNProject, isBToken: boolean, from: string, amount: number) {
-    const tokenAdddress = isBToken ? project.bToken : project.cToken;
+    const tokenAdddress = isBToken ? project.bTokens : project.cTokens;
     const tokenApi = CWToken__factory.connect(
       tokenAdddress,
       this._chain.api.currentProvider as any
@@ -138,11 +214,23 @@ export default class ProjectProtocol {
   }
 
   public async getAcceptedTokens(project?: CMNProject) {
+    let tokenAddresses = [];
     if (project) {
       const projContractAPI = await this.getProjectContractApi(project.address);
-      return this._api.getProjectAcceptedTokens(projContractAPI, this._chain);
+      tokenAddresses = await this._api.getAcceptedTokens(projContractAPI);
     } else {
-      return this._api.getProtocolAcceptedTokens(this._chain);
+      tokenAddresses = await this._api.getAcceptedTokens();
     }
+
+    const tokensData = [];
+    for (let i = 0; i < tokenAddresses.length; i++) {
+      const index = tmpTokenData.findIndex(
+        (t) => t.address.toLowerCase() === tokenAddresses[i].toLowerCase()
+      );
+      if (index > -1) {
+        tokensData.push(tmpTokenData[index]);
+      }
+    }
+    return tokensData;
   }
 }
