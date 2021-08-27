@@ -1,5 +1,6 @@
 // TODO: add index.json for default chain communities - is it necessary?
 // TODO: bundle file pushes with pushPaths - connectionRefusals
+// TODO: config file setup
 
 import { Buckets, PrivateKey } from '@textile/hub';
 import { factory, formatFilename } from '../../shared/logging';
@@ -90,6 +91,11 @@ async function main() {
 async function handleFatalError(error: Error, source: string) {
   log.error(`${source} updating error between ${lastUpdate} and ${now}`, error)
   // TODO: error handling + Rollbar
+}
+
+// TODO: index bucket
+async function updateIndex(bucketClient) {
+  // list of chains/communities
 }
 
 /**
@@ -229,6 +235,9 @@ async function updatePublicCommunities(bucketClient) {
   if (IPFS_ASYNC_PUSH) await Promise.all(promises)
   log.info('Finished updating communities')
 }
+
+//TODO: default chain
+async function updateDefaultChains(bucketClient) {}
 
 async function updatePublicThreads(bucketClient) {
   let updatedThreads = (await models.OffchainThread.findAll({
