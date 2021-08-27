@@ -21,7 +21,7 @@ export default class NearSputnikDao extends ProposalModule<
   public static async createDaoTx(creator: NearAccount, name: string, purpose: string, value: BN) {
     // get contract info from https://github.com/AngelBlock/sputnik-dao-2-mockup/blob/dev/src/config.js
     // following is mainnet
-    const contractName = 'sputnik-dao.near';
+    const contractName = 'sputnik2.near';
     const pk = '2gtDEwdLuUBawzFLAnCS9gUso3Ph76bRzMpVrtb66f3J';
 
     // init contract via wallet connection
