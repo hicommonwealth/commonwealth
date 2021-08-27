@@ -1,5 +1,6 @@
 import { Account, ChainBase, IWebWallet } from 'models';
 import { Coins, Extension, Msg, MsgSend } from '@terra-money/terra.js';
+import { MsgWithdrawDelegationReward } from '@terra-money/terra.js/dist/core/distribution/msgs/MsgWithdrawDelegationReward';
 
 class TerraStationWebWalletController implements IWebWallet<string> {
   private _enabled: boolean;
@@ -55,8 +56,11 @@ class TerraStationWebWalletController implements IWebWallet<string> {
 
   public async validateWithAccount(account: Account<any>): Promise<void> {
     // TODO: sign arbitrary transaction?
+    this._extension.on('onSign', (payload) => {
+      console.log(payload)
+    })
     const msgs: Msg[] = [
-      new MsgSend(this._accounts[0], this._accounts[0], new Coins('1'))
+      new MsgWithdrawDelegationReward(this._accounts[0], this._accounts[0])
     ]
     try {
       // this._extension.send('sign', account.validationToken)
