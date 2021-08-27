@@ -490,7 +490,8 @@ const SputnikForm: m.Component<SputnikFormAttrs, SputnikFormState> = {
               await NearSputnikDao.createDaoTx(account, name, description, v);
               console.log('Created DAO successfully!');
             } catch (err) {
-              notifyError(err.responseJSON?.error || 'Creating DAO failed');
+              notifyError(err.responseJSON?.error || 'Creating DAO failed.');
+              console.error(err.responseJSON?.error || err.message);
               vnode.state.saving = false;
               return;
             }
