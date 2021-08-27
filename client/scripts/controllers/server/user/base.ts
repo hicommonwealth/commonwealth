@@ -165,6 +165,5 @@ export default class {
     this._starredCommunities.splice(index, 1);
   }
 
-
   public setUnseenPosts(unseenPosts: object): void { this._setUnseenPosts(unseenPosts); }
 }
