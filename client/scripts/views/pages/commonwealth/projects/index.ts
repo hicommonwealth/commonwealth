@@ -10,9 +10,9 @@ import ProjectCard from 'views/components/commonwealth/project_card';
 import { CMNProject } from 'models';
 
 const connectionReady = () => {
-  if (!app.chain) return false;
-  const project_protocol = (app.chain as any).project_protocol;
-  if (!project_protocol || !project_protocol.initialized || !project_protocol.projectStore) return false;
+  if (!app.chain || !app.cmnProtocol || !app.cmnProtocol.initialized) return false;
+  if (app.activeChainId() !== app.cmnProtocol.chainId) return false;
+
   return true;
 };
 
@@ -20,7 +20,7 @@ const ProjectsPage: m.Component<{}, {initialized: boolean, projects: CMNProject[
   onupdate: async (vnode) => {
     if (!connectionReady()) return;
 
-    vnode.state.projects = await (app.chain as any).project_protocol.syncProjects();
+    vnode.state.projects = await app.cmnProtocol.project_protocol.syncProjects();
     if (!vnode.state.initialized) {
       vnode.state.initialized = true;
       m.redraw();

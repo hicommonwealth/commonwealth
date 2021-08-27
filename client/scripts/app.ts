@@ -209,13 +209,18 @@ export async function selectCommunity(c?: CommunityInfo): Promise<boolean> {
   return true;
 }
 
-async function initCMNProtocol(chainId: string) {
-  if (!chainId || chainId === '') return;
-  const response = await $.get(`${app.serverUrl()}/getCMNProtocols`, { chain: chainId });
+async function initCMNProtocol() {
+  if (!app.activeChainId() || app.activeChainId() === '') return;
+  const response = await $.get(`${app.serverUrl()}/getCMNProtocols`, { chain: app.activeChainId() });
   if (response.status !== 'Success') return;
+  // if (response.result.protocol)
   const { protocol } = response.result;
-  if (!protocol && !protocol.name) return;
-  if (app.cmnProtocol && app.cmnProtocol.name === protocol.name) return; // no need to reinitialize
+  if (!protocol) return;
+
+  if (app.cmnProtocol
+    && app.cmnProtocol.chainId === protocol.chain
+    && app.cmnProtocol.initialized
+  ) return; // no need to reinitialize
 
   const CMNProtocol = (await import(
     /* webpackMode: "lazy" */
@@ -225,11 +230,12 @@ async function initCMNProtocol(chainId: string) {
   const cmnProtocol = new CMNProtocol();
   app.cmnProtocol = cmnProtocol;
   await app.cmnProtocol.init(
-    protocol.name,
+    protocol.chain,
     app,
     protocol.project_protocol,
     protocol.collective_protocol
   );
+  m.redraw();
 }
 
 // called by the user, when clicking on the chain/node switcher menu
@@ -283,6 +289,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/ethereum/main'
     )).default;
     newChain = new Ethereum(n, app);
+    initApi = true;
   } else if (n.chain.network === ChainNetwork.NEAR) {
     const Near = (await import(
       /* webpackMode: "lazy" */
@@ -290,7 +297,6 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/near/main'
     )).default;
     newChain = new Near(n, app);
-    initApi = true;
   } else if (MolochTypes.EventChains.find((c) => c === n.chain.network)) {
     const Moloch = (await import(
       /* webpackMode: "lazy" */
@@ -349,7 +355,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
   await updateActiveAddresses(n.chain);
 
   if (app.chain) {
-    await initCMNProtocol(app.activeChainId());
+    await initCMNProtocol();
   }
 
   // Update default on server if logged in

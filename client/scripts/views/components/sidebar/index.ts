@@ -642,14 +642,15 @@ const CMNProtocolModule: m.Component<{}> = {
 
 const Sidebar: m.Component<{ hideQuickSwitcher? }, {}> = {
   view: (vnode) => {
-    const isCommonProtocol = app.chain && app.chain && app.chain.id === 'cmn-protocol';
-
+    const hasCMNProtocol = app.cmnProtocol
+      && app.cmnProtocol.initialized
+      && app.cmnProtocol.chainId === app.activeChainId();
     return [
       !app.isCustomDomain() && m(SidebarQuickSwitcher),
       m('.Sidebar', [
         (app.chain || app.community) && m(OffchainNavigationModule),
         (app.chain || app.community) && m(OnchainNavigationModule),
-        isCommonProtocol && m(CMNProtocolModule), // for CMN Protocol
+        hasCMNProtocol && m(CMNProtocolModule), // for CMN Protocol
         (app.chain || app.community) && m(ExternalLinksModule),
         m('br'),
         app.isLoggedIn() && (app.chain || app.community) && m(SubscriptionButton),

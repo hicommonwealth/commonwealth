@@ -11,6 +11,7 @@ module.exports = {
           icon_url: '/static/img/protocols/eth.png',
           name: 'Ethereum Kovan Testnet',
           active: true,
+          base: 'ethereum',
         }], { transaction: t });
 
         await queryInterface.bulkInsert('ChainNodes', [{
