@@ -11,8 +11,8 @@ import { CMNProject } from 'models';
 
 const connectionReady = () => {
   if (!app.chain) return false;
-  const projectProtocol = (app.chain as any).projectProtocol;
-  if (!projectProtocol || !projectProtocol.initialized || !projectProtocol.projectStore) return false;
+  const project_protocol = (app.chain as any).project_protocol;
+  if (!project_protocol || !project_protocol.initialized || !project_protocol.projectStore) return false;
   return true;
 };
 
@@ -20,7 +20,7 @@ const ProjectsPage: m.Component<{}, {initialized: boolean, projects: CMNProject[
   onupdate: async (vnode) => {
     if (!connectionReady()) return;
 
-    vnode.state.projects = await (app.chain as any).projectProtocol.syncProjects();
+    vnode.state.projects = await (app.chain as any).project_protocol.syncProjects();
     if (!vnode.state.initialized) {
       vnode.state.initialized = true;
       m.redraw();

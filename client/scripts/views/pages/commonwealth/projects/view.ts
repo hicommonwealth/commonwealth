@@ -72,12 +72,12 @@ const ViewProjectPage: m.Component<{
   onupdate: async (vnode) => {
     if (!app.chain || vnode.state.initialized) return;
 
-    const projectProtocol = (app.chain as any).projectProtocol;
-    if (!projectProtocol || !projectProtocol.initialized || !projectProtocol.projectStore) return;
+    const project_protocol = (app.chain as any).project_protocol;
+    if (!project_protocol || !project_protocol.initialized || !project_protocol.projectStore) return;
 
-    const projects = await (app.chain as any).projectProtocol.syncProjects();
+    const projects = await (app.chain as any).project_protocol.syncProjects();
     const project = projects.filter((item) => item.projectHash === vnode.attrs.projectHash)[0];
-    await (app.chain as any).projectProtocol.syncMembers(project.bToken, project.cToken, project.projectHash);
+    await (app.chain as any).project_protocol.syncMembers(project.bToken, project.cToken, project.projectHash);
     vnode.state.project = project;
     vnode.state.initialized = true;
     m.redraw();
@@ -89,8 +89,8 @@ const ViewProjectPage: m.Component<{
       return m(PageLoading);
     }
 
-    const projectProtocol = (app.chain as any).projectProtocol;
-    const mStore = projectProtocol.memberStore.getById(project.projectHash);
+    const project_protocol = (app.chain as any).project_protocol;
+    const mStore = project_protocol.memberStore.getById(project.projectHash);
     const backers = mStore.backers || [];
     const curators = mStore.curators || [];
 
@@ -119,11 +119,11 @@ const ViewProjectPage: m.Component<{
             leftInSeconds,
             forceUpdateStatus: async () => {
               vnode.state.initialized = false;
-              await projectProtocol.syncProjects();
+              await project_protocol.syncProjects();
               vnode.state.initialized = true;
             }
           }),
-          m(ActionModule, { project, projectProtocol, backers, curators })
+          m(ActionModule, { project, project_protocol, backers, curators })
         ]),
         m('.row .members-card', [
           m('.col-lg-6', [

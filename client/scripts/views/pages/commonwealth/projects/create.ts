@@ -255,8 +255,8 @@ const NewProjectPage: m.Component<{}, { submitting: boolean, createError: string
     if (!app.chain) {
       return m(PageLoading);
     }
-    const projectProtocol = (app.chain as any).projectProtocol;
-    if (!projectProtocol || !projectProtocol.initialized) {
+    const project_protocol = (app.chain as any).project_protocol;
+    if (!project_protocol || !project_protocol.initialized) {
       return m(PageLoading);
     }
 
@@ -271,7 +271,7 @@ const NewProjectPage: m.Component<{}, { submitting: boolean, createError: string
             console.log('====>', projectData);
             // const author = app.user.activeAccount.address;
             // vnode.state.submitting = true;
-            // const res = await projectProtocol.createProject(
+            // const res = await project_protocol.createProject(
             //   projectData.name,
             //   projectData.description,
             //   author,

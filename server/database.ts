@@ -37,6 +37,7 @@ import OffchainThreadFactory, { OffchainThreadModelStatic } from './models/offch
 import OffchainTopicFactory, { OffchainTopicModelStatic } from './models/offchain_topic';
 import OffchainViewCountFactory, { OffchainViewCountModelStatic } from './models/offchain_viewcount';
 import OffchainVoteFactory, { OffchainVoteModelStatic } from './models/offchain_vote';
+import CMNProtocol, { CMNProtocolModelStatic } from './models/cmn_protocol';
 import RoleFactory, { RoleModelStatic } from './models/role';
 import SocialAccountFactory, { SocialAccountModelStatic } from './models/social_account';
 import StarredCommunityFactory, { StarredCommunityModelStatic } from './models/starred_community';
@@ -87,6 +88,7 @@ export type Models = {
     User: UserModelStatic;
     WaitlistRegistration: WaitlistRegistrationModelStatic;
     Webhook: WebhookModelStatic;
+    CMNProtocol: CMNProtocolModelStatic;
 }
 
 export interface DB extends Models{
@@ -140,6 +142,7 @@ const models: Models = {
   OffchainAttachment: OffchainAttachmentFactory(sequelize, DataTypes),
   OffchainComment: OffchainCommentFactory(sequelize, DataTypes),
   OffchainCommunity: OffchainCommunityFactory(sequelize, DataTypes),
+  CMNProtocol: CMNProtocol(sequelize, DataTypes),
   OffchainProfile: OffchainProfileFactory(sequelize, DataTypes),
   OffchainReaction: OffchainReactionFactory(sequelize, DataTypes),
   OffchainThread: OffchainThreadFactory(sequelize, DataTypes),

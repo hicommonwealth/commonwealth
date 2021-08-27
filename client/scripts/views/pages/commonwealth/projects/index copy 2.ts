@@ -12,8 +12,8 @@ import { CMNProject } from 'models';
 
 const connectionReady = () => {
   if (!app.chain) return false;
-  const projectProtocol = (app.chain as any).projectProtocol;
-  if (!projectProtocol || !projectProtocol.initialized || !projectProtocol.projectStore) return false;
+  const project_protocol = (app.chain as any).project_protocol;
+  if (!project_protocol || !project_protocol.initialized || !project_protocol.projectStore) return false;
   return true;
 };
 
