@@ -71,6 +71,7 @@
         flex: 3;
         padding: 0;
         padding: 36px;
+        max-width: calc(100% - 72px); // horizontal padding * 2
         @include sm-max {
             padding: 0;
         }
