@@ -52,6 +52,8 @@
         }
     }
     .sublayout-sidebar-col {
+        flex: 1;
+        padding-right: 48px;
         max-width: $sidebar-width;
         .Sidebar {
             max-width: 190px; // sidebar button width
@@ -70,8 +72,8 @@
     .sublayout-main-col {
         flex: 3;
         padding: 0;
-        padding: 36px;
-        max-width: calc(100% - 72px); // horizontal padding * 2
+        padding-right: 20px;
+        max-width: calc(100% - #{$sidebar-width});
         @include sm-max {
             padding: 0;
         }
@@ -114,7 +116,8 @@
         }
         margin: 0 auto;
         border-bottom: 1px solid $border-color-off-white;
-        padding: 24px;
+        padding: 24px 0 22px;
+        padding-right: 20px;
         @include md-max {
             @include narrowBrowserHeader();
             padding-right: 0;
