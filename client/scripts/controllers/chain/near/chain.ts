@@ -31,6 +31,11 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
     return this._nodeStatus;
   }
 
+  private _networkId = 'testnet';
+  public get isMainnet() {
+    return this._networkId === 'mainnet';
+  }
+
   private _app: IApp;
   public get app() { return this._app; }
 
@@ -39,10 +44,13 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
   }
 
   public async init(node: NodeInfo, accounts: NearAccounts, reset = false) {
+    const networkSuffix = node.chain.id.split('.').pop();
+    this._networkId = node.chain.id === 'near-testnet' || networkSuffix === 'testnet'
+      ? 'testnet' : 'mainnet';
     this._config = {
-      networkId: node.chain.id === 'near-testnet' ? 'testnet' : 'mainnet',
+      networkId: this.isMainnet ? 'mainnet' : 'testnet',
       nodeUrl: node.url,
-      walletUrl: node.chain.id === 'near-testnet' ? 'https://wallet.testnet.near.org/' : 'https://wallet.near.org/',
+      walletUrl: this.isMainnet ? 'https://wallet.near.org/' : 'https://wallet.testnet.near.org/',
       keyStore: accounts.keyStore,
     };
 
@@ -83,7 +91,7 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
       }
     };
     await syncFn();
-    // this._syncHandle = setInterval(syncFn, 2000);
+    this._syncHandle = setInterval(syncFn, 2000);
   }
 
   public async deinit(): Promise<void> {

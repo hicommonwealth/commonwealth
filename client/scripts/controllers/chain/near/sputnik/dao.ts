@@ -21,8 +21,12 @@ export default class NearSputnikDao extends ProposalModule<
   public static async createDaoTx(creator: NearAccount, name: string, purpose: string, value: BN) {
     // get contract info from https://github.com/AngelBlock/sputnik-dao-2-mockup/blob/dev/src/config.js
     // following is mainnet
-    const contractName = 'sputnik2.near';
-    const pk = '2gtDEwdLuUBawzFLAnCS9gUso3Ph76bRzMpVrtb66f3J';
+    const contractName = creator.walletConnection.connection.networkId === 'mainnet'
+      ? 'sputnik2.near'
+      : 'sputnikv2.testnet';
+    const pk = creator.walletConnection.connection.networkId === 'mainnet'
+      ? '2gtDEwdLuUBawzFLAnCS9gUso3Ph76bRzMpVrtb66f3J'
+      : 'G8JpvUhKqfr89puEKgbBqUxQzCMfJfPSRvKw4EJoiZpZ';
 
     // init contract via wallet connection
     const walletConnection = creator.walletConnection;
@@ -44,21 +48,16 @@ export default class NearSputnikDao extends ProposalModule<
     };
     const yoktoNear = new BN('1000000000000000000000000');
     const amountYokto = value.mul(yoktoNear).toString();
-    try {
-      const args = Buffer.from(JSON.stringify(argsList)).toString('base64');
-      await (factoryContract as any).create(
-        {
-          name,
-          public_key: pk,
-          args,
-        },
-        '150000000000000',
-        amountYokto,
-      );
-    } catch (e) {
-      console.error(e);
-      notifyError('Failed to create DAO.');
-    }
+    const args = Buffer.from(JSON.stringify(argsList)).toString('base64');
+    await (factoryContract as any).create(
+      {
+        name,
+        public_key: pk,
+        args,
+      },
+      '150000000000000',
+      amountYokto,
+    );
   }
 
   private _Chain: NearChain;

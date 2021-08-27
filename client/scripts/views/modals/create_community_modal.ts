@@ -6,10 +6,12 @@ import m from 'mithril';
 import $ from 'jquery';
 import app from 'state';
 import { slugify } from 'utils';
+import { ChainBase } from 'models';
 import mixpanel from 'mixpanel-browser';
 import { Table, Tabs, TabItem, Button, MenuDivider } from 'construct-ui';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { constructSubstrateUrl } from 'substrate';
+import Near from 'controllers/chain/near/main';
 
 import { CompactModalExitButton } from 'views/modal';
 import NearSputnikDao from 'controllers/chain/near/sputnik/dao';
@@ -416,11 +418,12 @@ const SputnikForm: m.Component<SputnikFormAttrs, SputnikFormState> = {
           title: 'Deploy',
           defaultValue: vnode.state.createNew,
           onToggle: (checked) => { vnode.state.createNew = checked; },
-          caption: (checked) => !(app.user?.activeAccount instanceof NearAccount)
-            ? 'Must log into NEAR account to deploy'
-            : checked
-              ? 'Deploying new DAO' : 'Adding existing DAO',
-          disabled: !(app.user?.activeAccount instanceof NearAccount),
+          caption: (checked) => app.chain.base !== ChainBase.NEAR ? 'Must be on NEAR chain to deploy'
+            : !(app.user?.activeAccount instanceof NearAccount)
+              ? 'Must log into NEAR account to deploy'
+              : checked
+                ? 'Deploying new DAO' : 'Adding existing DAO',
+          disabled: !(app.user?.activeAccount instanceof NearAccount) || app.chain.base !== ChainBase.NEAR,
         }),
         m(InputPropertyRow, {
           title: 'Initial Value',
@@ -494,11 +497,14 @@ const SputnikForm: m.Component<SputnikFormAttrs, SputnikFormState> = {
           }
           try {
             // TODO: ensure id format is correct
+            const id = (app.chain as Near).chain.isMainnet ? `${name}.sputnik-dao.near` : `${name}.sputnikv2.testnet`;
             const res = await $.post(`${app.serverUrl()}/addChainNode`, {
-              name: `${name}.sputnik-dao.near`,
+              name: id,
               description,
-              node_url: 'https://rpc.mainnet.near.org',
-              symbol: 'NEAR',
+              node_url: (app.chain as Near).chain.isMainnet
+                ? 'https://rpc.mainnet.near.org'
+                : 'https://rpc.testnet.near.org',
+              symbol: (app.chain as Near).chain.isMainnet ? 'NEAR' : 'tNEAR',
               website,
               discord,
               element,
@@ -506,7 +512,7 @@ const SputnikForm: m.Component<SputnikFormAttrs, SputnikFormState> = {
               github,
               jwt: app.user.jwt,
               type: 'dao',
-              id: `${name}.sputnik-dao.near`,
+              id,
               base: 'near',
               network: 'sputnik'
             });

@@ -52,7 +52,7 @@ export class NearAccount extends Account<NearToken> {
       throw new Error('no signer found!');
     }
     const kp = await this._Accounts.keyStore.getKey(
-      this._Accounts.app.activeId() === 'near-testnet' ? 'testnet' : 'mainnet',
+      this._Chain.isMainnet ? 'mainnet' : 'testnet',
       this.address
     );
     const { publicKey, signature } = kp.sign(Buffer.from(message));
