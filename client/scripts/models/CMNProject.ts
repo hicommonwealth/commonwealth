@@ -20,8 +20,8 @@ export class CMNProject {
   public readonly projectHash: string;
   public readonly status: ProjectStatus;
   public readonly withdrawIsDone: boolean;
-  public readonly cToken: string; // cToken address
-  public readonly bToken: string; // bToken address
+  public readonly cTokens: any; // cTokens address
+  public readonly bTokens: any; // bTokens address
 
   public readonly threshold: EthereumCoin;
   public readonly totalFunding: EthereumCoin;
@@ -43,8 +43,8 @@ export class CMNProject {
     status,
     lockedWithdraw,
     totalFunding,
-    bToken,
-    cToken,
+    bTokens,
+    cTokens,
     projAddress
   ) {
     this.name = name;
@@ -61,8 +61,8 @@ export class CMNProject {
     this.status = status;
     this.withdrawIsDone = lockedWithdraw;
     this.totalFunding = totalFunding;
-    this.bToken = bToken;
-    this.cToken = cToken;
+    this.bTokens = bTokens;
+    this.cTokens = cTokens;
     this.address = projAddress;
   }
 }
@@ -94,8 +94,8 @@ export class CMNProjectProtocol {
 
 export class CMNProjectMembers {
   public readonly id: string;
-  public backers: CMNUser[];
-  public curators: CMNUser[];
+  public backers: any;
+  public curators: any;
   public updated_at: Date;
 
   constructor(id, backers, curators) {
@@ -109,7 +109,7 @@ export class CMNProjectMembers {
     return new CMNProjectMembers(id, backers, curators);
   }
 
-  public setParticipants(backers: CMNUser[], curators: CMNUser[]) {
+  public setParticipants(backers: any, curators: any) {
     this.backers = backers;
     this.curators = curators;
     this.updated_at = new Date();

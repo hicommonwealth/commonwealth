@@ -5,17 +5,17 @@ import m from 'mithril';
 import { Tag } from 'construct-ui';
 import app from 'state';
 import { CMNProject } from 'models';
+import BN from 'bn.js';
 
 const ProjectCard: m.Component<{project: CMNProject}> = {
   view: (vnode) => {
     const { project } = vnode.attrs;
-
-    // const thredLink = `/${app.activeChainId()}/proposal/discussion/${project.threadId}`; // proposal => project
     const bgColor = project.status === 'In Progress' ? 'blue' : (project.status === 'Successed') ? 'green' : 'red';
-    const totalFunding = utils.formatEther(project.totalFunding.asBN.toString());
+    const totalFunding = new BN(project.totalFunding.toString()).div(new BN(100000000)).toString();
+
     const displayText = project.withdrawIsDone
       ? `Withdraw is done. Total Funding was ${totalFunding} Ether`
-      : `Total Funding: ${totalFunding} Ether`;
+      : `Total Funding: ${totalFunding} USD`;
 
     return m('.ProjectCard', [
       m('.project-card-top', {
@@ -40,15 +40,8 @@ const ProjectCard: m.Component<{project: CMNProject}> = {
       m('.project-card-bottom', {
         onclick: (e) => {
           e.preventDefault();
-          // if (project.threadId) {
-          //   m.route.set(thredLink);
-          // }
         }
       }, [
-        // // thread link
-        // project.threadId ? m('.project-thread-link', [
-        //   m('a', { href: thredLink }, 'Go to thread'),
-        // ]) : m('.no-linked-thread', 'No linked thread'),
         m('.no-linked-thread', 'No linked thread')
       ]),
     ]);

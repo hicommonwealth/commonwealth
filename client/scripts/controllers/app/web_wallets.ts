@@ -33,6 +33,7 @@ export default class WebWalletController {
       // TODO: ensure that we can find any wallet, even if non-string accounts
       if (wallet.accounts.find((acc) => acc === address)) {
         foundWallet = wallet;
+        break; // For CWP
       }
       // TODO: disable if not found
     }

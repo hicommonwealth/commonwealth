@@ -2,7 +2,12 @@ import { utils } from 'ethers';
 import BN from 'bn.js';
 import $ from 'jquery';
 
-import { ProjectFactory as CMNProjectProtocolContract, Project as CMNProjectContract, ERC20__factory } from 'eth/types';
+import {
+  ProjectFactory as CMNProjectProtocolContract,
+  Project as CMNProjectContract,
+  Project__factory,
+  ERC20__factory
+} from 'eth/types';
 import TokenApi from '../../token/api';
 
 import { CMNProject } from '../../../../../models';
@@ -14,15 +19,18 @@ export interface ProjectMetaData {
   description: string,
   creator: string,
   beneficiary: string,
+  acceptedTokens: string[]
   threshold: number,
   curatorFee: number,
-  period: number,
-  acceptedTokens: string[]
+  deadline: number,
 }
 
 export const EtherAddress = '0x0000000000000000000000000000000000000000';
 
 export default class CMNProjectAPI extends ContractApi<CMNProjectProtocolContract> {
+  public readonly gasLimit: number = 3000000;
+
+  private _chain: EthereumChain;
   private _projectApis;
 
   public async init() {
@@ -30,40 +38,13 @@ export default class CMNProjectAPI extends ContractApi<CMNProjectProtocolContrac
     super.init();
   }
 
-  public async getProjectAcceptedTokens(contract: CMNProjectContract, chain: EthereumChain) {
-    // TODO: this data should be retrived from contract
-
-    const tokenAddresses = [
-      '0x0fdb03df7cd3cc9d6831328acb8ac25d420543e5', // USDC
-      '0xb6762aec2b3cd39d31651cb48f38d1cd4fdafb8b', // USDT
-    ];
-
-    const acceptedTokens = tokenAddresses.map((addr) => new TokenApi(
-      ERC20__factory.connect,
-      addr,
-      chain.api.currentProvider as any
-    ));
-
-    return acceptedTokens;
-  }
-
-  public async getProtocolAcceptedTokens(chain: EthereumChain) {
-    // TODO: this data should be retrived from contract
-
-    const tokenAddresses = [
-      '0x0fdb03df7cd3cc9d6831328acb8ac25d420543e5', // USDC
-      '0xb6762aec2b3cd39d31651cb48f38d1cd4fdafb8b', // USDT
-      '0xa0a5ad2296b38bd3e3eb59aaeaf1589e8d9a29a9', // WBTC
-      '0xc4375b7de8af5a38a93548eb8453a498222c4ff2', // DAI
-    ];
-
-    const acceptedTokens = tokenAddresses.map((addr) => new TokenApi(
-      ERC20__factory.connect,
-      addr,
-      chain.api.currentProvider as any
-    ));
-
-    return acceptedTokens;
+  public async getAcceptedTokens(projContract?: CMNProjectContract) {
+    if (projContract) {
+      const tokenAddresses = await projContract.getAllAcceptedTokens();
+      return tokenAddresses;
+    }
+    const tokenAddresses = await this.Contract.getAllAcceptedTokens();
+    return tokenAddresses;
   }
 
   public getProjectAPI(projAddress: string) {
@@ -75,75 +56,6 @@ export default class CMNProjectAPI extends ContractApi<CMNProjectProtocolContrac
 
   public setProjectAPI(projAddress: string, projectAPI: ContractApi<CMNProjectContract>) {
     this._projectApis[projAddress] = projectAPI;
-  }
-
-  public async getProjectDetails(projAddress: string) {
-    const projContract = this._projectApis[projAddress];
-
-    const name = await projContract.name();
-    const ipfsHash = await projContract.ipfsHash();
-    const cwUrl = await projContract.cwUrl();
-    const beneficiary = await projContract.beneficiary();
-    const curatorFee = await projContract.curatorFee();
-    const creator = await projContract.creator();
-    const threshold = await projContract.threshold();
-    const totalFunding = await projContract.totalFunding();
-    const acceptedTokens = await projContract.acceptedTokens();
-    const funded = await projContract.funded();
-    const lockedWithdraw = await projContract.lockedWithdraw();
-    const daedline = (new BN((await projContract.deadline()).toString()).mul(new BN(1000))).toNumber();
-    const endTime = new Date(daedline);
-
-    const projectHash = utils.solidityKeccak256(
-      ['address', 'address', 'bytes32', 'uint256'],
-      [creator, beneficiary, name, threshold.toString()]
-    );
-
-    let status = 'In Progress';
-    if ((new Date()).getTime() - endTime.getTime() > 0) {
-      if (funded) {
-        status = 'Successed';
-      } else {
-        status = 'Failed';
-      }
-    }
-
-    const bToken = await projContract.bToken();
-    const cToken = await projContract.cToken();
-
-    const newProj = new CMNProject(
-      utils.parseBytes32String(name),
-      '',
-      utils.parseBytes32String(ipfsHash),
-      utils.parseBytes32String(cwUrl),
-      beneficiary,
-      acceptedTokens, // aceptedTokens
-      [], // nominations,
-      threshold, // decimals in 8
-      endTime,
-      curatorFee,
-      projectHash,
-      status,
-      lockedWithdraw,
-      totalFunding, // decimals in 8
-      bToken,
-      cToken,
-      projAddress,
-    );
-    return newProj;
-  }
-
-  public async retrieveAllProjects() {
-    const projects: CMNProject[] =  [];
-    const projectAddresses = await this.Contract.getAllProjects();
-    // const allProjectLenght = new BN((await this.Contract.allProjectsLength()).toString(), 10);
-    if (projectAddresses.length > 0) {
-      for (let i = 0; i < projectAddresses.length; i++) {
-        const proj: CMNProject = await this.getProjectDetails(projectAddresses[i]);
-        projects.push(proj);
-      }
-    }
-    return projects;
   }
 
   public async getTokenHolders(tokenAddress: string) {
@@ -180,7 +92,10 @@ export default class CMNProjectAPI extends ContractApi<CMNProjectProtocolContrac
     const ipfsHash = utils.formatBytes32String('0x01');
     const cwUrl = utils.formatBytes32String('commonwealth.im');
     const nominations = [params.creator, params.beneficiary];
-    const endtime = Math.ceil(Math.ceil(Date.now() / 1000) + params.period * 24 * 60 * 60); // in days
+    const endtime = Math.ceil(Math.ceil(Date.now() / 1000) + params.deadline * 24 * 60 * 60); // in days
+
+    const curatorFee = params.curatorFee * 100;
+    const threshold = new BN(params.threshold).mul(new BN(10).pow(new BN(8)));
 
     let transactionSuccessed: boolean;
     try {
@@ -191,9 +106,10 @@ export default class CMNProjectAPI extends ContractApi<CMNProjectProtocolContrac
         params.beneficiary,
         params.acceptedTokens,
         nominations,
-        params.threshold.toString(),
+        threshold.toString(),
         endtime,
-        params.curatorFee.toString(),
+        curatorFee.toString(),
+        { gasLimit: this.gasLimit }
       );
       const txReceipt = await tx.wait();
       transactionSuccessed = txReceipt.status === 1;

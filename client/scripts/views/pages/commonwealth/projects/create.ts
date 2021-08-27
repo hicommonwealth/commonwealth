@@ -8,20 +8,24 @@ import 'pages/new_proposal_page.scss';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import SelectToken from 'views/components/commonwealth/select_token';
+import { ProjectMetaData } from 'controllers/chain/ethereum/commonwealth/project/api';
 
 import app from 'state';
+
+import { connectionReady } from './index';
 
 const floatRegex = /^[0-9]*\.?[0-9]*$/;
 
 const NewProjectForm = {
-  form: {},
+  form: { tokens: [] },
   view: (vnode) => {
-    const callback = vnode.attrs.callback;
+    const { callback, acceptedTokens, submitting } = vnode.attrs;
     const author = app.user.activeAccount;
-    const submitting = vnode.attrs.submitting;
 
     if (!author) return m('div', 'Must be logged in');
     if (!callback) return m('div', 'Must have callback');
+    if (!acceptedTokens) return m('div', 'No accepted Tokens');
+    if (acceptedTokens.length === 0) return m('div', 'No accepted Tokens');
 
     return m(Form, { class: 'NewProposalForm' }, [
       m(Grid, [
@@ -108,48 +112,19 @@ const NewProjectForm = {
             ]),
             // acceptedToken
             m(FormGroup, [
-              m(FormLabel, () => {
-                const { tokens } = vnode.state.form;
-                if (tokens.length === 0) {
-                  return 'Please select Accepted Tokens';
-                }
-                let label = 'Accepted Tokens: ';
-                for (let i = 0; i < tokens.length; i++) {
-                  label += `${tokens[i].symbol}, `;
-                }
-                return label;
-              }),
+              m(FormLabel, 'Please select Accepted Tokens'),
               m(SelectToken, {
-                tokens: [
-                  {
-                    id: 'ETH',
-                    name: 'ETH',
-                    address: {
-                      kovan: '',
-                      mainnet: ''
-                    },
-                    decimals: 18,
-                    symbol: 'ETH',
-                    icon_url: ''
-                  },
-                  {
-                    id: 'USDT',
-                    name: 'USDT',
-                    address: {
-                      kovan: '',
-                      mainnet: ''
-                    },
-                    decimals: 6,
-                    symbol: 'USDT',
-                    icon_url: ''
-                  },
-                ],
-                selectedTokens: vnode.state.form.tokens || [],
+                tokens: acceptedTokens,
+                selectedTokens: vnode.state.form.tokens,
                 updateTokens: (tokens) => {
                   vnode.state.form.tokens = tokens;
+                  console.log('==>updateTokens', vnode.state.form.tokens);
                   m.redraw();
                 }
               }),
+              vnode.state.error
+              && vnode.state.error.id === 'acceptedTokens'
+              && m('p.error-text', vnode.state.error.message),
             ]),
             // threshold
             m(FormGroup, [
@@ -163,10 +138,11 @@ const NewProjectForm = {
                 oninput: (e) => {
                   const result = (e.target as any).value;
                   if (floatRegex.test(result)) {
-                    vnode.state.form.threshold = utils.parseEther(result);
+                    vnode.state.form.threshold = result;
+                    // utils.parseEther(result);
                     vnode.state.error = undefined;
                   } else {
-                    vnode.state.form.threshold = undefined;
+                    vnode.state.form.threshold = '0';
                     vnode.state.error = {
                       message: 'Invalid input value',
                       id: 'threshold'
@@ -221,10 +197,16 @@ const NewProjectForm = {
               label: submitting ? 'Createing now' : 'Create a new Project',
               onclick: async (e) => {
                 e.preventDefault();
-                if (vnode.state.form.threshold.toString()  === new BN(0).toString()) {
+                if (vnode.state.form.threshold.toString()  === '0') {
                   vnode.state.error = {
                     message: 'Can not be zero',
                     id: 'threshold'
+                  };
+                  m.redraw();
+                } else if (vnode.state.form.tokens.length === 0) {
+                  vnode.state.error = {
+                    message: 'Did not select Accepted Tokens',
+                    id: 'acceptedTokens'
                   };
                   m.redraw();
                 } else {
@@ -236,6 +218,7 @@ const NewProjectForm = {
                     threshold: vnode.state.form.threshold,
                     curatorFee: vnode.state.form.curatorFee,
                     deadline: vnode.state.form.deadline,
+                    acceptedTokens: vnode.state.form.tokens
                   };
                   vnode.attrs.callback(projectData);
                 }
@@ -250,15 +233,22 @@ const NewProjectForm = {
   }
 };
 
-const NewProjectPage: m.Component<{}, { submitting: boolean, createError: string }> = {
+const NewProjectPage: m.Component<{}, {
+  submitting: boolean,
+  createError: string,
+  acceptedTokens: any[],
+  initialized: boolean
+}> = {
+  onupdate: async (vnode) => {
+    if (!connectionReady) return;
+    const project_protocol = app.cmnProtocol.project_protocol;
+    if (!project_protocol) return;
+    vnode.state.acceptedTokens = await project_protocol.getAcceptedTokens();
+    vnode.state.initialized = true;
+  },
   view: (vnode) => {
-    if (!app.chain) {
-      return m(PageLoading);
-    }
-    const project_protocol = (app.chain as any).project_protocol;
-    if (!project_protocol || !project_protocol.initialized) {
-      return m(PageLoading);
-    }
+    if (!vnode.state.initialized) return m(PageLoading);
+    const { acceptedTokens } = vnode.state;
 
     return m(Sublayout, {
       class: 'NewProposalPage',
@@ -268,23 +258,31 @@ const NewProjectPage: m.Component<{}, { submitting: boolean, createError: string
       m('.forum-container', [
         m(NewProjectForm, {
           callback: async (projectData: any) => {
-            console.log('====>', projectData);
-            // const author = app.user.activeAccount.address;
-            // vnode.state.submitting = true;
-            // const res = await project_protocol.createProject(
-            //   projectData.name,
-            //   projectData.description,
-            //   author,
-            //   projectData.beneficiary,
-            //   projectData.threshold,
-            //   parseFloat(projectData.curatorFee),
-            //   parseFloat(projectData.deadline),
-            // );
-            // vnode.state.createError = res.error;
-            // vnode.state.submitting = false;
-            // m.redraw();
+            const acceptedTokenAddresses = [];
+            for (let i = 0; i < projectData.acceptedTokens.length; i++) {
+              const index = acceptedTokens.findIndex((at) => at.symbol === projectData.acceptedTokens[i]);
+              acceptedTokenAddresses.push(acceptedTokens[index].address);
+            }
+
+            const creator = app.user.activeAccount.address;
+            vnode.state.submitting = true;
+            const params: ProjectMetaData = {
+              name: projectData.name,
+              description: projectData.description,
+              creator,
+              beneficiary: projectData.beneficiary,
+              threshold: parseFloat(projectData.threshold),
+              curatorFee: parseFloat(projectData.curatorFee),
+              deadline: parseFloat(projectData.deadline),
+              acceptedTokens: acceptedTokenAddresses
+            };
+            const res = await app.cmnProtocol.project_protocol.createProject(params);
+            vnode.state.createError = res.error;
+            vnode.state.submitting = false;
+            m.redraw();
           },
           submitting: vnode.state.submitting,
+          acceptedTokens: acceptedTokens.map((token) => token.symbol) || []
         }),
         // vnode.state.createError !== '' && m('p.error-text', vnode.state.createError)
         m('p.error-text', vnode.state.createError)
