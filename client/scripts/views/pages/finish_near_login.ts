@@ -100,12 +100,10 @@ const FinishNearLogin: m.Component<{}, IState> = {
       //   login data from localStorage as needed.
       const validate = async () => {
         vnode.state.validating = true;
-        const wallet = new WalletAccount((app.chain as Near).chain.api, null);
-        console.log(wallet);
+        const wallet = new WalletAccount((app.chain as Near).chain.api, 'commonwealth_near');
         if (wallet.isSignedIn()) {
           try {
             const acct: NearAccount = app.chain.accounts.get(wallet.getAccountId());
-            console.log(acct);
             await createUserWithAddress(acct.address);
             await acct.validate();
             if (!app.isLoggedIn()) {
@@ -113,12 +111,10 @@ const FinishNearLogin: m.Component<{}, IState> = {
               const chain = app.user.selectedNode
                 ? app.user.selectedNode.chain
                 : app.config.nodes.getByChain(app.activeChainId())[0].chain;
-              console.log(chain);
               await updateActiveAddresses(chain);
             }
             await setActiveAccount(acct);
             vnode.state.validatedAccount = acct;
-            console.log('Validation success');
           } catch (err) {
             vnode.state.validationError = err.responseJSON ? err.responseJSON.error : err.message;
           } finally {

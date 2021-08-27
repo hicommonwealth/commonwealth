@@ -51,12 +51,11 @@ export class NearAccount extends Account<NearToken> {
     if (!this._walletConnection.connection?.signer) {
       throw new Error('no signer found!');
     }
-    const { publicKey, signature } = await this._walletConnection.connection.signer.signMessage(
-      Buffer.from(message),
-      this.address,
-      // TODO: configure for beta/testnet
-      'mainnet',
+    const kp = await this._Accounts.keyStore.getKey(
+      this._Accounts.app.activeId() === 'near-testnet' ? 'testnet' : 'mainnet',
+      this.address
     );
+    const { publicKey, signature } = kp.sign(Buffer.from(message));
     return JSON.stringify({
       signature: Buffer.from(signature).toString('base64'),
       publicKey: Buffer.from(publicKey.data).toString('base64')
@@ -86,7 +85,7 @@ export class NearAccounts implements IAccountsModule<NearToken, NearAccount> {
 
   constructor(app: IApp) {
     this._app = app;
-    this.keyStore = new keyStores.BrowserLocalStorageKeyStore();
+    this.keyStore = new keyStores.BrowserLocalStorageKeyStore(localStorage);
   }
 
   public get(address: string): NearAccount {

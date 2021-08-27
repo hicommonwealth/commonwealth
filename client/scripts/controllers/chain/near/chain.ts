@@ -2,7 +2,7 @@ import { IChainModule, ITXModalData, NodeInfo } from 'models';
 import { NearToken } from 'adapters/chain/near/types';
 import BN from 'bn.js';
 import { ApiStatus, IApp } from 'state';
-import { Near as NearApi, connect as nearConnect } from 'near-api-js';
+import { Near as NearApi, connect as nearConnect, keyStores } from 'near-api-js';
 import { NodeStatusResult } from 'near-api-js/lib/providers/provider';
 import moment from 'moment';
 import * as m from 'mithril';
@@ -40,10 +40,9 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
 
   public async init(node: NodeInfo, accounts: NearAccounts, reset = false) {
     this._config = {
-      // TODO: configure wallet for beta/testnet
-      networkId: 'mainnet',
+      networkId: node.chain.id === 'near-testnet' ? 'testnet' : 'mainnet',
       nodeUrl: node.url,
-      walletUrl: 'https://wallet.near.org/',
+      walletUrl: node.chain.id === 'near-testnet' ? 'https://wallet.testnet.near.org/' : 'https://wallet.near.org/',
       keyStore: accounts.keyStore,
     };
 
@@ -84,7 +83,7 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
       }
     };
     await syncFn();
-    this._syncHandle = setInterval(syncFn, 2000);
+    // this._syncHandle = setInterval(syncFn, 2000);
   }
 
   public async deinit(): Promise<void> {

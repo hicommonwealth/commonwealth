@@ -32,6 +32,7 @@ export enum ChainNetwork {
   Injective = 'injective',
   Ethereum = 'ethereum',
   NEAR = 'near',
+  NEARTestnet = 'near-testnet',
   Moloch = 'moloch',
   Marlin = 'marlin',
   MarlinTestnet = 'marlin-testnet',
