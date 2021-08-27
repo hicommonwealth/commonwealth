@@ -587,6 +587,7 @@ export const NewThreadForm: m.Component<{
                     vnode.state.quillEditorState.editor.setContents('');
                     vnode.state.quillEditorState.editor.setText('');
                   }
+                  m.redraw();
                 }
               },
               placeholder: 'Comment (optional)',
@@ -694,7 +695,6 @@ export const NewThreadForm: m.Component<{
                   } catch (e) {
                     newDraftMarkdown = default_offchain_template;
                   }
-
                   // If the text format of the loaded draft differs from the current editor's mode,
                   // we update the current editor's mode accordingly, to preserve formatting
                   if (newDraftDelta && vnode.state.quillEditorState.markdownMode) {
@@ -710,6 +710,7 @@ export const NewThreadForm: m.Component<{
                     vnode.state.quillEditorState.editor.setContents('');
                     vnode.state.quillEditorState.editor.setText('');
                   }
+                  m.redraw();
                 }
               },
               editorNamespace: 'new-discussion',

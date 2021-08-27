@@ -42,7 +42,6 @@ const NewTopicModal: m.Component<{
       && vnode.state.quillEditorState.editor
       && vnode.state.quillEditorState.editor.editor.isBlank()
     ) {
-      console.log(vnode.state.quillEditorState.editor.editor.isBlank());
       disabled = true;
     }
 
