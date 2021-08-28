@@ -780,7 +780,7 @@ const CreateCommunityModal: m.Component<CreateCommunityAttrs, CreateCommunitySta
           onclick: () => { vnode.state.activeForm = 'substrate'; return null; },
         }),
         m(TabItem, {
-          label: 'Sputnik',
+          label: 'Sputnik (V2)',
           active: vnode.state.activeForm === 'sputnik',
           onclick: () => { vnode.state.activeForm = 'sputnik'; return null; },
         }),
