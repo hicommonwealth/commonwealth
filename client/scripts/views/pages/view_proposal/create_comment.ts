@@ -12,14 +12,16 @@ import EditProfileModal from 'views/modals/edit_profile_modal';
 import QuillEditor from 'views/components/quill_editor';
 import User from 'views/components/widgets/user';
 
-import Token from 'controllers/chain/ethereum/token/adapter';
+import { notifyError } from 'controllers/app/notifications';
 import { GlobalStatus } from './body';
+import { IProposalPageState } from '.';
+import jumpHighlightComment from './jump_to_comment';
 
 const CreateComment: m.Component<{
   callback: CallableFunction,
   cancellable?: boolean,
   getSetGlobalEditingStatus: CallableFunction,
-  getSetGlobalReplyStatus: CallableFunction,
+  proposalPageState: IProposalPageState,
   parentComment?: OffchainComment<any>,
   rootProposal: AnyProposal | OffchainThread,
   tabindex?: number,
@@ -35,7 +37,7 @@ const CreateComment: m.Component<{
       callback,
       cancellable,
       getSetGlobalEditingStatus,
-      getSetGlobalReplyStatus,
+      proposalPageState,
       rootProposal
     } = vnode.attrs;
     let { parentComment } = vnode.attrs;
@@ -87,11 +89,15 @@ const CreateComment: m.Component<{
           vnode.state.quillEditorState.clearUnsavedChanges();
         }
         vnode.state.sendingComment = false;
+        proposalPageState.recentlySubmitted = res.id;
         // TODO: Instead of completely refreshing notifications, just add the comment to subscriptions
         // once we are receiving notifications from the websocket
         await app.user.notifications.refresh();
         m.redraw();
+        jumpHighlightComment(res.id);
       } catch (err) {
+        console.log(err);
+        notifyError(err.message || 'Comment submission failed.');
         if (vnode.state.quillEditorState.editor) {
           vnode.state.quillEditorState.editor.enable();
         }
@@ -111,7 +117,8 @@ const CreateComment: m.Component<{
         'Last Comment Created': new Date().toISOString()
       });
 
-      getSetGlobalReplyStatus(GlobalStatus.Set, false, true);
+      proposalPageState.replying = false;
+      proposalPageState.parentCommentId = null;
     };
 
     const { error, sendingComment, uploadsInProgress } = vnode.state;
@@ -169,12 +176,17 @@ const CreateComment: m.Component<{
                 intent: 'primary',
                 type: 'submit',
                 compact: true,
-                disabled: getSetGlobalEditingStatus(GlobalStatus.Get) || sendingComment || uploadsInProgress > 0,
+                disabled: (
+                  getSetGlobalEditingStatus(GlobalStatus.Get)
+                  || vnode.state.quillEditorState?.editor?.editor?.isBlank()
+                  || sendingComment
+                  || uploadsInProgress > 0
+                ),
                 rounded: true,
                 onclick: submitComment,
                 label: (uploadsInProgress > 0)
                   ? 'Uploading...'
-                  : parentType === CommentParent.Proposal ? 'Post comment' : 'Reply to comment'
+                  : 'Submit'
               }),
               cancellable
                 && m(Button, {
@@ -184,7 +196,8 @@ const CreateComment: m.Component<{
                   rounded: true,
                   onclick: (e) => {
                     e.preventDefault();
-                    getSetGlobalReplyStatus(GlobalStatus.Set, false, true);
+                    proposalPageState.replying = false;
+                    proposalPageState.parentCommentId = null;
                   },
                   label: 'Cancel'
                 }),

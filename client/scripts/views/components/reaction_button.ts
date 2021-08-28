@@ -2,7 +2,7 @@ import 'components/reaction_button.scss';
 
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
-import { Popover } from 'construct-ui';
+import { Icon, Icons, Popover, Size } from 'construct-ui';
 
 import app, { LoginState } from 'state';
 import { IUniqueId, Proposal, OffchainComment, OffchainThread, AnyProposal, AddressInfo } from 'models';
@@ -114,10 +114,22 @@ const ReactionButton: m.Component<{
         }
       },
     }, (type === ReactionType.Dislike) && [
-      m('.upvote-icon', large ? '▾' : '👎'),
+      large
+        ? m('.reactions-icon', '▾')
+        : m(Icon, {
+          class: 'reactions-icon',
+          name: Icons.THUMBS_DOWN,
+          size: Size.XL,
+        }),
       m('.upvote-count', dislikes.length),
     ], (type === ReactionType.Like) && [
-      m('.reactions-icon', large ? '▾' : '👍'),
+      large
+        ? m('.reactions-icon', '▾')
+        : m(Icon, {
+          class: 'reactions-icon',
+          name: Icons.THUMBS_UP,
+          size: Size.XL,
+        }),
       m('.reactions-count', likes.length),
     ]);
 

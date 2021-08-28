@@ -42,7 +42,7 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
     )),
     (app.chain?.network === ChainNetwork.Aave || 
       app.chain?.network === ChainNetwork.dYdX ||
-      app.chain?.network === ChainNetwork.Marlin ||
+      app.chain?.network === ChainNetwork.Compound ||
       app.chain?.base === ChainBase.CosmosSDK || 
       app.chain?.base === ChainBase.Substrate)
       && !mobile
@@ -62,9 +62,9 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
       label: 'New On-Chain Proposal',
       iconLeft: mobile ? Icons.PLUS : undefined,
     }),
-    app.chain?.base === ChainBase.Ethereum && app.chain?.network === ChainNetwork.Marlin && m(MenuItem, {
+    app.chain?.network === ChainNetwork.Compound && m(MenuItem, {
       onclick: (e) => navigateToSubpage('/new/proposal/:type', {
-        type: ProposalType.MarlinProposal
+        type: ProposalType.CompoundProposal
       }),
       label: 'New On-Chain Proposal',
       iconLeft: mobile ? Icons.PLUS : undefined,

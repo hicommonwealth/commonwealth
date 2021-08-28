@@ -1123,7 +1123,7 @@ const resetServer = (): Promise<number> => {
         }),
         models.Chain.create({
           id: 'marlin',
-          network: 'marlin',
+          network: 'compound',
           symbol: 'LIN',
           name: 'Marlin',
           icon_url: '/static/img/protocols/eth.png',
@@ -1134,7 +1134,7 @@ const resetServer = (): Promise<number> => {
         }),
         models.Chain.create({
           id: 'marlin-local',
-          network: 'marlin',
+          network: 'compound',
           symbol: 'LIN',
           name: 'Marlin (local)',
           icon_url: '/static/img/protocols/eth.png',
