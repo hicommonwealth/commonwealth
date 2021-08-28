@@ -6,10 +6,14 @@ import m from 'mithril';
 import $ from 'jquery';
 import app from 'state';
 import { slugify } from 'utils';
+import { ChainBase } from 'models';
 import mixpanel from 'mixpanel-browser';
 import { Table, Tabs, TabItem, Button, MenuDivider } from 'construct-ui';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { constructSubstrateUrl } from 'substrate';
+import { NearAccount } from 'controllers/chain/near/account';
+import Near from 'controllers/chain/near/main';
+import NearSputnikDao from 'controllers/chain/near/sputnik/dao';
 import Web3 from 'web3';
 
 import { CompactModalExitButton } from 'views/modal';
@@ -20,7 +24,8 @@ import { initAppState } from '../../app';
 enum CommunityType {
   OffchainCommunity = 'offchain',
   Erc20Community = 'erc20',
-  SubstrateCommunity = 'substrate'
+  SubstrateCommunity = 'substrate',
+  SputnikDao = 'sputnik',
 }
 
 interface OffchainCommunityFormAttrs {}
@@ -567,6 +572,172 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
   }
 };
 
+interface SputnikFormAttrs {}
+
+interface SputnikFormState {
+  name: string,
+  description: string,
+  initialValue: string,
+  website: string,
+  discord: string,
+  element: string,
+  telegram: string,
+  github: string,
+  createNew: boolean,
+  saving: boolean
+}
+
+const SputnikForm: m.Component<SputnikFormAttrs, SputnikFormState> = {
+  oninit: (vnode) => {
+    vnode.state.name = '';
+    vnode.state.initialValue = '';
+    vnode.state.website = '';
+    vnode.state.discord = '';
+    vnode.state.element = '';
+    vnode.state.telegram = '';
+    vnode.state.github = '';
+    vnode.state.description = '';
+    vnode.state.createNew = false;
+    vnode.state.saving = false;
+  },
+  view: (vnode) => {
+    return m('.compact-modal-body-max', [
+      m('.CommunityMetadataManagementTable', [m(Table, {
+        bordered: false,
+        interactive: false,
+        striped: false,
+        class: 'metadata-management-table',
+      }, [
+        m(InputPropertyRow, {
+          title: 'Name',
+          defaultValue: vnode.state.name,
+          onChangeHandler: (v) => { vnode.state.name = v; },
+          placeholder: 'genesis',
+        }),
+        m(InputPropertyRow, {
+          title: 'Description',
+          defaultValue: vnode.state.description,
+          onChangeHandler: (v) => { vnode.state.description = v; },
+          textarea: true,
+        }),
+        m(TogglePropertyRow, {
+          title: 'Deploy',
+          defaultValue: vnode.state.createNew,
+          onToggle: (checked) => { vnode.state.createNew = checked; },
+          caption: (checked) => app.chain.base !== ChainBase.NEAR ? 'Must be on NEAR chain to deploy'
+            : !(app.user?.activeAccount instanceof NearAccount)
+              ? 'Must log into NEAR account to deploy'
+              : checked
+                ? 'Deploying new DAO' : 'Adding existing DAO',
+          disabled: !(app.user?.activeAccount instanceof NearAccount) || app.chain.base !== ChainBase.NEAR,
+        }),
+        m(InputPropertyRow, {
+          title: 'Initial Bond',
+          defaultValue: vnode.state.initialValue,
+          disabled: !vnode.state.createNew,
+          onChangeHandler: (v) => { vnode.state.initialValue = v; },
+          placeholder: '5',
+        }),
+        // TODO: add divider to distinguish on-chain data
+        m(InputPropertyRow, {
+          title: 'Website',
+          defaultValue: vnode.state.website,
+          placeholder: 'https://example.com',
+          onChangeHandler: (v) => { vnode.state.website = v; },
+        }),
+        m(InputPropertyRow, {
+          title: 'Discord',
+          defaultValue: vnode.state.discord,
+          placeholder: 'https://discord.com/invite',
+          onChangeHandler: (v) => { vnode.state.discord = v; },
+        }),
+        m(InputPropertyRow, {
+          title: 'Element',
+          defaultValue: vnode.state.element,
+          placeholder: 'https://matrix.to/#',
+          onChangeHandler: (v) => { vnode.state.element = v; },
+        }),
+        m(InputPropertyRow, {
+          title: 'Telegram',
+          defaultValue: vnode.state.telegram,
+          placeholder: 'https://t.me',
+          onChangeHandler: (v) => { vnode.state.telegram = v; },
+        }),
+        m(InputPropertyRow, {
+          title: 'Github',
+          defaultValue: vnode.state.github,
+          placeholder: 'https://github.com',
+          onChangeHandler: (v) => { vnode.state.github = v; },
+        }),
+      ]),
+      m(Button, {
+        label: 'Save changes',
+        intent: 'primary',
+        disabled: vnode.state.saving,
+        onclick: async (e) => {
+          const {
+            name,
+            description,
+            initialValue,
+            website,
+            discord,
+            element,
+            telegram,
+            github,
+            createNew,
+          } = vnode.state;
+          vnode.state.saving = true;
+          if (createNew) {
+            // TODO: validate
+            // https://github.com/AngelBlock/sputnik-dao-2-mockup/blob/dev/src/Selector.jsx#L159
+            try {
+              const account = app.user.activeAccount as NearAccount;
+              const v = new BN(initialValue);
+              await NearSputnikDao.createDaoTx(account, name, description, v);
+              console.log('Created DAO successfully!');
+            } catch (err) {
+              notifyError(err.responseJSON?.error || 'Creating DAO failed.');
+              console.error(err.responseJSON?.error || err.message);
+              vnode.state.saving = false;
+              return;
+            }
+          }
+          try {
+            // TODO: ensure id format is correct
+            const id = (app.chain as Near).chain.isMainnet ? `${name}.sputnik-dao.near` : `${name}.sputnikv2.testnet`;
+            const res = await $.post(`${app.serverUrl()}/addChainNode`, {
+              name: id,
+              description,
+              node_url: (app.chain as Near).chain.isMainnet
+                ? 'https://rpc.mainnet.near.org'
+                : 'https://rpc.testnet.near.org',
+              symbol: (app.chain as Near).chain.isMainnet ? 'NEAR' : 'tNEAR',
+              website,
+              discord,
+              element,
+              telegram,
+              github,
+              jwt: app.user.jwt,
+              type: 'dao',
+              id,
+              base: 'near',
+              network: 'sputnik'
+            });
+            await initAppState(false);
+            $(e.target).trigger('modalexit');
+            m.route.set(`/${res.result.chain}`);
+          } catch (err) {
+            notifyError(err.responseJSON?.error || 'Creating new community failed');
+          } finally {
+            vnode.state.saving = false;
+          }
+        },
+      }),
+      ]),
+    ]);
+  }
+};
+
 interface CreateCommunityAttrs {}
 interface CreateCommunityState {
   activeForm: string;
@@ -609,7 +780,7 @@ const CreateCommunityModal: m.Component<CreateCommunityAttrs, CreateCommunitySta
           onclick: () => { vnode.state.activeForm = 'substrate'; return null; },
         }),
         m(TabItem, {
-          label: 'Sputnik',
+          label: 'Sputnik (V2)',
           active: vnode.state.activeForm === 'sputnik',
           onclick: () => { vnode.state.activeForm = 'sputnik'; return null; },
         }),
@@ -617,6 +788,7 @@ const CreateCommunityModal: m.Component<CreateCommunityAttrs, CreateCommunitySta
       vnode.state.activeForm === CommunityType.OffchainCommunity && m(OffchainCommunityForm),
       vnode.state.activeForm === CommunityType.Erc20Community && m(ERC20Form),
       vnode.state.activeForm === CommunityType.SubstrateCommunity && m(SubstrateForm),
+      vnode.state.activeForm === CommunityType.SputnikDao && m(SputnikForm),
     ]);
   }
 };

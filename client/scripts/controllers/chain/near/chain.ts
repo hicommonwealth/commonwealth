@@ -2,7 +2,7 @@ import { IChainModule, ITXModalData, NodeInfo } from 'models';
 import { NearToken } from 'adapters/chain/near/types';
 import BN from 'bn.js';
 import { ApiStatus, IApp } from 'state';
-import { Near as NearApi, connect as nearConnect } from 'near-api-js';
+import { Near as NearApi, connect as nearConnect, keyStores } from 'near-api-js';
 import { NodeStatusResult } from 'near-api-js/lib/providers/provider';
 import moment from 'moment';
 import * as m from 'mithril';
@@ -31,6 +31,11 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
     return this._nodeStatus;
   }
 
+  private _networkId = 'testnet';
+  public get isMainnet() {
+    return this._networkId === 'mainnet';
+  }
+
   private _app: IApp;
   public get app() { return this._app; }
 
@@ -39,11 +44,13 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
   }
 
   public async init(node: NodeInfo, accounts: NearAccounts, reset = false) {
+    const networkSuffix = node.chain.id.split('.').pop();
+    this._networkId = node.chain.id === 'near-testnet' || networkSuffix === 'testnet'
+      ? 'testnet' : 'mainnet';
     this._config = {
-      // TODO: configure wallet for beta/testnet
-      networkId: 'mainnet',
+      networkId: this.isMainnet ? 'mainnet' : 'testnet',
       nodeUrl: node.url,
-      walletUrl: 'https://wallet.near.org/',
+      walletUrl: this.isMainnet ? 'https://wallet.near.org/' : 'https://wallet.testnet.near.org/',
       keyStore: accounts.keyStore,
     };
 
