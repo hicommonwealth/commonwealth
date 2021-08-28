@@ -1,13 +1,11 @@
 import { Account, ChainBase, IWebWallet } from 'models';
-import { Coins, Extension, Msg, MsgSend } from '@terra-money/terra.js';
-import { MsgWithdrawDelegationReward } from '@terra-money/terra.js/dist/core/distribution/msgs/MsgWithdrawDelegationReward';
+import { Extension, Msg, MsgStoreCode, StdFee } from '@terra-money/terra.js';
 
 class TerraStationWebWalletController implements IWebWallet<string> {
   private _enabled: boolean;
   private _accounts: string[] = [];
   private _enabling: boolean = false;
   private _extension = new Extension()
-  private _signature: string;
 
   public readonly name = 'terrastation';
   public readonly label = 'Terra Wallet (TerraStation)';
@@ -55,29 +53,40 @@ class TerraStationWebWalletController implements IWebWallet<string> {
   }
 
   public async validateWithAccount(account: Account<any>): Promise<void> {
-    // TODO: sign arbitrary transaction?
     this._extension.on('onSign', (payload) => {
       console.log(payload)
     })
     const msgs: Msg[] = [
-      new MsgWithdrawDelegationReward(this._accounts[0], this._accounts[0])
+      new MsgStoreCode(this._accounts[0], account.validationToken)
     ]
     try {
-      // this._extension.send('sign', account.validationToken)
-      this._extension.sign({ msgs })
+      this._extension.sign({
+        fee: new StdFee(0, '0ust'),
+        msgs
+      })
     } catch (error) {
       console.log(error)
     }
 
     // timeout?
-    const signature = await new Promise<string>((resolve, reject) => {
+    const result = await new Promise<any>((resolve, reject) => {
       this._extension.on('onSign', (payload) => {
-        if (payload.result.signature) resolve(payload.result.signature);
+        if (payload.result?.signature) resolve(payload.result);
         else reject();
       })
     })
 
-    return account.validate(signature);
+    const signature = {
+      signed: result.stdSignMsgData,
+      signature: {
+        pub_key: {
+          type: 'tendermint/PubKeySecp256k1',
+          value: result.public_key
+        },
+        signature: result.signature
+      }
+    }
+    return account.validate(JSON.stringify(signature));
   }
 }
 

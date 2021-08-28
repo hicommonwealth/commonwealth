@@ -251,22 +251,35 @@ export default (
       // this prevents people from using a different key to sign the message than
       // the account they registered with.
       // TODO: ensure osmosis works
-      const bech32Prefix = chain.network === 'straightedge'
-        ? 'str'
-        : chain.network === 'osmosis'
-          ? 'osmo'
-          : chain.network === 'injective'
-            ? 'inj'
-            : chain.network;
+      let bech32Prefix;
+      chain.network = 'terra'; // TODO: used to test terra - change routing system then remove
+      switch (chain.network) {
+        case 'straightedge':
+          bech32Prefix = 'str';
+          break;
+        case 'osmosis':
+          bech32Prefix = 'osmo';
+          break;
+        case 'injective':
+          bech32Prefix = 'inj';
+          break;
+        case 'terra':
+          bech32Prefix = 'terra';
+          break;
+        default:
+          bech32Prefix = chain.network;
+      }
+
       const generatedAddress = pubkeyToAddress(stdSignature.pub_key, bech32Prefix);
       const generatedAddressWithCosmosPrefix = pubkeyToAddress(stdSignature.pub_key, 'cosmos');
 
       if (generatedAddress === addressModel.address || generatedAddressWithCosmosPrefix === addressModel.address) {
         const generatedSignDoc = validationTokenToSignDoc(
-          chain.id,
+          'columbus-4' || chain.id, // TODO: used to test terra change routing system then remove
           addressModel.verification_token.trim(),
           signed.fee,
           signed.memo,
+          <any>signed.msgs,
         );
 
         // ensure correct document was signed
