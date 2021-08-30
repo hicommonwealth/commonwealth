@@ -17,26 +17,26 @@ interface INewTopicModalForm {
   id: number,
   name: string,
   description: string,
-  token_threshold: number
+  tokenThreshold: number
 }
 
-const EditTopicThresholdsRow: m.Component<{ topic: OffchainTopic }, { new_token_threshold: string }> = {
+const EditTopicThresholdsRow: m.Component<{ topic: OffchainTopic }, { newTokenThreshold: string }> = {
   view: (vnode) => {
     const { topic } = vnode.attrs;
     const decimals = app.chain.meta.chain.decimals ? app.chain.meta.chain.decimals : 18;
-    if (vnode.state.new_token_threshold === null || vnode.state.new_token_threshold === undefined) {
-      vnode.state.new_token_threshold = topic.token_threshold
-        ? tokenBaseUnitsToTokens(topic.token_threshold.toString(), decimals) : '0';
+    if (vnode.state.newTokenThreshold === null || vnode.state.newTokenThreshold === undefined) {
+      vnode.state.newTokenThreshold = topic.tokenThreshold
+        ? tokenBaseUnitsToTokens(topic.tokenThreshold.toString(), decimals) : '0';
     }
 
     return m(Form, [
       m('.topic-name', [ topic.name ]),
       m('div',  [ m(Input, {
-        value: vnode.state.new_token_threshold,
+        value: vnode.state.newTokenThreshold,
         oninput: (e) => {
           const threshold = (e.target as any).value;
           if (threshold.match(/^\d*?\.?\d*?$/)) {
-            vnode.state.new_token_threshold = threshold;
+            vnode.state.newTokenThreshold = threshold;
           }
         },
       }),
@@ -47,7 +47,7 @@ const EditTopicThresholdsRow: m.Component<{ topic: OffchainTopic }, { new_token_
         onclick: async (e) => {
           e.preventDefault();
           app.topics.setTopicThreshold(topic,
-            tokensToTokenBaseUnits(vnode.state.new_token_threshold.toString(), decimals))
+            tokensToTokenBaseUnits(vnode.state.newTokenThreshold.toString(), decimals))
             .then((status) => {
               if (status === 'Success') {
                 notifySuccess('Successfully updated threshold value');
@@ -66,7 +66,7 @@ const EditTopicThresholdsModal: m.Component<{
   id: number,
   name: string,
   description: string,
-  token_threshold: number
+  tokenThreshold: number
 }, {
   error: any,
   form: INewTopicModalForm,
@@ -75,10 +75,10 @@ const EditTopicThresholdsModal: m.Component<{
   view: (vnode) => {
     if (!app.user.isSiteAdmin
       && !app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })) return null;
-    const { id, name, description, token_threshold } = vnode.attrs;
+    const { id, name, description, tokenThreshold } = vnode.attrs;
 
     if (!vnode.state.form) {
-      vnode.state.form = { id, name, description, token_threshold };
+      vnode.state.form = { id, name, description, tokenThreshold };
     }
 
     const topics =  app.topics.getByCommunity(app.activeId());

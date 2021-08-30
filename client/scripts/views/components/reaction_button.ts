@@ -90,11 +90,11 @@ const ReactionButton: m.Component<ReactionButtonAttrs, ReactionButtonState> = {
 
     let tokenPostingThreshold;
     if( post instanceof OffchainThread && post.topic && app.topics) {
-      tokenPostingThreshold = app.topics.getByName((post as OffchainThread).topic.name, app.activeId()).token_threshold
+      tokenPostingThreshold = app.topics.getByName((post as OffchainThread).topic.name, app.activeId()).tokenThreshold
     } else if (post instanceof OffchainComment) {
       // post.rootProposal has typescript typedef number but in practice seems to be a string
       const parentThread = app.threads.getById(parseInt(post.rootProposal.toString().split('_')[1], 10));
-      tokenPostingThreshold = app.topics.getByName((parentThread).topic.name, app.activeId()).token_threshold
+      tokenPostingThreshold = app.topics.getByName((parentThread).topic.name, app.activeId()).tokenThreshold
     } else {
       tokenPostingThreshold = new BN(0);
     }

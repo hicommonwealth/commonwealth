@@ -119,7 +119,7 @@ const CreateComment: m.Component<{
     const tokenPostingThreshold = app.topics.getByName(
       activeTopicName,
       app.activeId()
-    )?.token_threshold;
+    )?.tokenThreshold;
 
     const isAdmin = app.user.isSiteAdmin || app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
 
