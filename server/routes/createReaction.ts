@@ -10,6 +10,7 @@ import proposalIdToEntity from '../util/proposalIdToEntity';
 import TokenBalanceCache from '../util/tokenBalanceCache';
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
+import BN from 'bn.js';
 
 const log = factory.getLogger(formatFilename(__filename));
 

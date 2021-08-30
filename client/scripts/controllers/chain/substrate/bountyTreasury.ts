@@ -98,7 +98,7 @@ class SubstrateBountyTreasury extends ProposalModule<
         bond: b.bounty.bond,
         curator: b.bounty.status.isCuratorProposed ? b.bounty.status.asCuratorProposed?.curator
           : b.bounty.status.isActive ? b.bounty.status.asActive.curator
-          : b.bounty.status.isPendingPayout ? b.bounty.status.asPendingPayout.curator : null,
+            : b.bounty.status.isPendingPayout ? b.bounty.status.asPendingPayout.curator : null,
         updateDue: b.bounty.status.isActive ? b.bounty.status.asActive.updateDue : null,
         beneficiary: b.bounty.status.isPendingPayout ? b.bounty.status.asPendingPayout.beneficiary : null,
         unlockAt: b.bounty.status.isPendingPayout ? b.bounty.status.asPendingPayout.unlockAt : null,
@@ -183,7 +183,6 @@ class SubstrateBountyTreasury extends ProposalModule<
       `claimBounty(${bountyId})`
     );
   }
-
 }
 
 export default SubstrateBountyTreasury;

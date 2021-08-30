@@ -26,6 +26,7 @@ export interface ChainAttributes {
   telegram?: string;
   github?: string;
   ss58_prefix?: number;
+  decimals?: number;
   stagesEnabled?: boolean;
   customStages?: string;
   customDomain?: string;
@@ -35,7 +36,6 @@ export interface ChainAttributes {
   substrate_spec?: RegisteredTypes;
   terms?: string;
   snapshot?: string;
-  decimals?: number;
 
   // associations
   ChainNodes?: ChainNodeAttributes[] | ChainNodeAttributes['id'][];
