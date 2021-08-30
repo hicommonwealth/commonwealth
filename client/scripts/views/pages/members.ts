@@ -3,7 +3,7 @@ import 'pages/members.scss';
 import $ from 'jquery';
 import m from 'mithril';
 import _ from 'lodash';
-import { Tag, Table } from 'construct-ui';
+import { Tag, Table, Spinner } from 'construct-ui';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -22,18 +22,25 @@ interface MemberInfo {
 const MEMBERS_PER_PAGE = 20;
 
 const MembersPage : m.Component<{}, { membersRequested: boolean, membersLoaded: MemberInfo[],
-membersToShow: number }> = {
+pageToLoad: number, totalMembers: number }> = {
   view: (vnode) => {
     $(window).on('scroll', () => {
-      if ($(window).scrollTop() + $(window).height() === $(document).height()) {
-        if (vnode.state.membersToShow < vnode.state.membersLoaded.length) {
-          vnode.state.membersToShow += MEMBERS_PER_PAGE;
+      const elementTarget = document.getElementsByClassName('sublayout-main-col')[0];
+      if ($(window).scrollTop() + $(window).height()
+      >= (elementTarget as HTMLElement).offsetTop + (elementTarget as HTMLElement).offsetHeight) {
+        if (!vnode.state.membersRequested) {
+          vnode.state.membersRequested = true;
+          vnode.state.pageToLoad++;
+          m.redraw();
         }
-        m.redraw();
       }
     });
 
-    if (!vnode.state.membersToShow) { vnode.state.membersToShow = MEMBERS_PER_PAGE; }
+    if (!vnode.state.membersRequested && !vnode.state.pageToLoad && !vnode.state.membersLoaded) {
+      vnode.state.membersRequested = true;
+      vnode.state.membersLoaded = [];
+      vnode.state.pageToLoad = 0;
+    }
 
     const activeEntity = app.community ? app.community : app.chain;
     if (!activeEntity) return m(PageLoading, {
@@ -46,49 +53,26 @@ membersToShow: number }> = {
     });
 
     // get members once
-    const activeInfo = app.community ? app.community.meta : app.chain.meta.chain;
-    if (!vnode.state.membersRequested) {
-      vnode.state.membersRequested = true;
-      activeInfo.getMembers(activeInfo.id).then(() => {
-        const activeMembersHash = {};
-        const membersActive: MemberInfo[] = app.recentActivity.getMostActiveUsers().map((user) => {
-          const { chain, address } = user.info;
-          activeMembersHash[`${chain}##${address}`] = true;
-          return { chain, address, count: user.count };
-        });
-        const membersInactive: MemberInfo[] = activeInfo.members.map((role) => {
-          return { address: role.address, chain: role.address_chain, count: 0 };
-        }).filter((info) => {
-          const { chain, address } = info;
-          return (!activeMembersHash[`${chain}##${address}`]);
-        });
-        vnode.state.membersLoaded = membersActive.concat(membersInactive).sort((a, b) => b.count - a.count);
-        m.redraw();
 
-        // restore scroll position
-        if (app.lastNavigatedBack() && app.lastNavigatedFrom().includes(`/${app.activeId()}/account/`)
-            && localStorage[`${app.activeId()}-members-scrollY`]) {
-          setTimeout(() => {
-            window.scrollTo(0, Number(localStorage[`${app.activeId()}-members-scrollY`]));
-          }, 100);
-        }
-      });
+    const activeInfo = app.community ? app.community.meta : app.chain.meta.chain;
+    if (vnode.state.membersRequested) {
+      vnode.state.membersRequested = false;
+      activeInfo.getMembersByPage(activeInfo.id, vnode.state.pageToLoad, MEMBERS_PER_PAGE)
+        .then(({ result, total }) => {
+          vnode.state.membersLoaded = vnode.state.membersLoaded.concat(result.map(((o) => {
+            o.address = o.Address.address;
+            o.chain = o.chain_id;
+            return o;
+          })));
+          vnode.state.totalMembers = total;
+          m.redraw();
+        });
     }
 
     const isAdmin = app.user.isSiteAdmin
     || app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
     const isMod = app.user.isRoleOfCommunity({
       role: 'moderator', chain: app.activeChainId(), community: app.activeCommunityId()
-    });
-
-    if (!vnode.state.membersLoaded) return m(PageLoading, {
-      message: 'Loading members',
-      title: [
-        'Members',
-        m(CommunityOptionsPopover, { isAdmin, isMod }),
-        m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
-      ],
-      showNewProposalButton: true,
     });
 
     return m(Sublayout, {
@@ -106,7 +90,7 @@ membersToShow: number }> = {
           m('th', 'Member'),
           m('th.align-right', 'Posts/ Month'),
         ]),
-        vnode.state.membersLoaded.slice(0, vnode.state.membersToShow).map((info) => {
+        vnode.state.membersLoaded.map((info) => {
           const profile = app.profiles.getProfile(info.chain, info.address);
           return m('tr', [
             m('td.members-item-info', [
@@ -124,6 +108,10 @@ membersToShow: number }> = {
             m('td.align-right', info.count),
           ]);
         })]),
+      !vnode.state.totalMembers
+      || vnode.state.membersLoaded.length < vnode.state.totalMembers
+        ? m('tr', [ m(Spinner, { active: true, size: 'lg' }) ])
+        : null
     ]);
   }
 };
