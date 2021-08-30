@@ -67,23 +67,42 @@ export const modelFromServer = (comment) => {
     // no proposal
   }
 
-  return new OffchainComment({
-    chain: comment.chain,
-    author: comment?.Address?.address || comment.author,
-    text: decodeURIComponent(comment.text),
-    plaintext: comment.plaintext,
-    versionHistory,
-    attachments,
-    proposal,
-    id: comment.id,
-    createdAt: moment(comment.created_at),
-    childComments: [],
-    rootProposal: comment.root_id,
-    parentComment: Number(comment.parent_id) || null,
-    community: comment.community,
-    authorChain: comment?.Address?.chain || comment.authorChain,
-    lastEdited,
-  });
+  const commentParams = comment.deleted_at
+    ? {
+      chain: comment.chain,
+      author: comment?.Address?.address || comment.author,
+      text: null,
+      plaintext: null,
+      versionHistory: null,
+      attachments: null,
+      proposal,
+      id: comment.id,
+      createdAt: moment(comment.created_at),
+      rootProposal: comment.root_id,
+      parentComment: Number(comment.parent_id) || null,
+      community: comment.community,
+      authorChain: comment?.Address?.chain || comment.authorChain,
+      lastEdited,
+      deleted: true,
+    } : {
+      chain: comment.chain,
+      author: comment?.Address?.address || comment.author,
+      text: decodeURIComponent(comment.text),
+      plaintext: comment.plaintext,
+      versionHistory,
+      attachments,
+      proposal,
+      id: comment.id,
+      createdAt: moment(comment.created_at),
+      rootProposal: comment.root_id,
+      parentComment: Number(comment.parent_id) || null,
+      community: comment.community,
+      authorChain: comment?.Address?.chain || comment.authorChain,
+      lastEdited,
+      deleted: false,
+    };
+
+  return new OffchainComment(commentParams);
 };
 
 class CommentsController {
@@ -160,11 +179,6 @@ class CommentsController {
       updateLastVisited(app.activeCommunityId()
         ? (activeEntity.meta as CommunityInfo)
         : (activeEntity.meta as NodeInfo).chain, true);
-      // update childComments of parent, if necessary
-      if (result.parent_id) {
-        const parent = this._store.getById(+result.parent_id);
-        parent.childComments.push(result.id);
-      }
       return newComment;
     } catch (err) {
       console.log('Failed to create comment');

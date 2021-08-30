@@ -34,6 +34,7 @@ const viewComments = async (models: DB, req: Request, res: Response, next: NextF
       }
     ],
     order: [['created_at', 'DESC']],
+    paranoid: false,
   });
   return res.json({ status: 'Success', result: comments.map((c) => c.toJSON()) });
 };
