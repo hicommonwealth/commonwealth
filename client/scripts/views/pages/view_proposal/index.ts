@@ -574,6 +574,32 @@ const ProposalComments: m.Component<{
       }
     };
 
+    const isLivingCommentTree = (comment, children) => {
+      if (!comment.deleted) return true;
+      else if (!children.length) return false;
+      else {
+        let survivingDescendents = false;
+        for (let i = 0; i < children.length; i++) {
+          const child = children[i];
+          if (!child.deleted) {
+            survivingDescendents = true;
+            break;
+          }
+          const grandchildren = app.comments.getByProposal(proposal)
+            .filter((c) => c.parentComment === child.id);
+          for (let j = 0; j < grandchildren.length; j++) {
+            const grandchild = grandchildren[j];
+            if (!grandchild.deleted) {
+              survivingDescendents = true;
+              break;
+            }
+          }
+          if (survivingDescendents) break;
+        }
+        return survivingDescendents;
+      }
+    };
+
     const recursivelyGatherChildComments = (
       childComments: OffchainComment<any>[],
       parentComment: OffchainComment<any>,
@@ -606,24 +632,27 @@ const ProposalComments: m.Component<{
     };
 
     const renderComments = (comments_) => {
+      // eslint-disable-next-line array-callback-return
       return comments_.map((comment, index) => {
         const childComments = app.comments.getByProposal(proposal)
           .filter((c) => c.parentComment === comment.id);
-        return ([
-          m(ProposalComment, {
-            comment,
-            getSetGlobalEditingStatus,
-            proposalPageState,
-            parent: proposal,
-            proposal,
-            callback: createdCommentCallback,
-            isLast: index === comments_.length - 1,
-          }),
-          // if comment has children, they are fetched & rendered
-          !!childComments.length
-            && recursivelyGatherChildComments(childComments, comment, 1),
-          nestedReplyForm(comment),
-        ]);
+        if (isLivingCommentTree(comment, childComments)) {
+          return ([
+            m(ProposalComment, {
+              comment,
+              getSetGlobalEditingStatus,
+              proposalPageState,
+              parent: proposal,
+              proposal,
+              callback: createdCommentCallback,
+              isLast: index === comments_.length - 1,
+            }),
+            // if comment has children, they are fetched & rendered
+            !!childComments.length
+              && recursivelyGatherChildComments(childComments, comment, 1),
+            nestedReplyForm(comment),
+          ]);
+        }
       });
     };
 

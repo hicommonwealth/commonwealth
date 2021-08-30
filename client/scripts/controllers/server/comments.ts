@@ -67,14 +67,15 @@ export const modelFromServer = (comment) => {
     // no proposal
   }
 
-  const commentParams = comment.deleted_at
+  console.log(comment);
+  const commentParams = (comment.deleted_at?.length > 0)
     ? {
       chain: comment.chain,
       author: comment?.Address?.address || comment.author,
-      text: null,
-      plaintext: null,
-      versionHistory: null,
-      attachments: null,
+      text: '[deleted]',
+      plaintext: '[deleted]',
+      versionHistory: [],
+      attachments: [],
       proposal,
       id: comment.id,
       createdAt: moment(comment.created_at),
