@@ -168,6 +168,7 @@ const EditTopicModal : m.Component<{
                   vnode.state.quillEditorState.editor.setContents('');
                   vnode.state.quillEditorState.editor.setText('');
                 }
+                m.redraw();
               },
               editorNamespace: 'new-discussion',
               imageUploader: true,

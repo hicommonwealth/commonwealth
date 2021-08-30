@@ -347,6 +347,7 @@ const setTemplateContent = (parentState) => {
       parentState.quillEditorState.editor.setContents('');
       parentState.quillEditorState.editor.setText('');
     }
+    m.redraw();
   }
 };
 
