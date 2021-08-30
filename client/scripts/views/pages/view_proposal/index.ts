@@ -440,7 +440,6 @@ const ProposalComment: m.Component<{
     const commentReplyCount = app.comments.getByProposal(proposal)
       .filter((c) => c.parentComment === comment.id)
       .length;
-    console.log(comment);
     return m('.ProposalComment', {
       class: `${parentType}-child comment-${comment.id}`,
       onchange: () => m.redraw(), // TODO: avoid catching bubbled input events

@@ -67,7 +67,6 @@ export const modelFromServer = (comment) => {
     // no proposal
   }
 
-  console.log(comment);
   const commentParams = (comment.deleted_at?.length > 0)
     ? {
       chain: comment.chain,

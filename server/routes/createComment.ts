@@ -82,7 +82,6 @@ const createComment = async (
     }
   }
 
-
   if (!root_id) {
     return next(new Error(Errors.MissingRootId));
   }
