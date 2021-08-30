@@ -18,48 +18,6 @@ export default class NearSputnikDao extends ProposalModule<
   INearSputnikProposal,
   NearSputnikProposal
 > {
-  public static async createDaoTx(creator: NearAccount, name: string, purpose: string, value: BN) {
-    // get contract info from https://github.com/AngelBlock/sputnik-dao-2-mockup/blob/dev/src/config.js
-    // following is mainnet
-    const contractName = creator.walletConnection.connection.networkId === 'mainnet'
-      ? 'sputnik2.near'
-      : 'sputnikv2.testnet';
-    const pk = creator.walletConnection.connection.networkId === 'mainnet'
-      ? '2gtDEwdLuUBawzFLAnCS9gUso3Ph76bRzMpVrtb66f3J'
-      : 'G8JpvUhKqfr89puEKgbBqUxQzCMfJfPSRvKw4EJoiZpZ';
-
-    // init contract via wallet connection
-    const walletConnection = creator.walletConnection;
-    const factoryContract = new Contract(
-      walletConnection,
-      contractName,
-      { changeMethods: [ 'create' ], viewMethods: [] },
-    );
-
-    // send tx
-    const argsList = {
-      config: {
-        name,
-        purpose,
-        metadata: '',
-      },
-      // initial council
-      policy: [ creator.address ],
-    };
-    const yoktoNear = new BN('1000000000000000000000000');
-    const amountYokto = value.mul(yoktoNear).toString();
-    const args = Buffer.from(JSON.stringify(argsList)).toString('base64');
-    await (factoryContract as any).create(
-      {
-        name,
-        public_key: pk,
-        args,
-      },
-      '150000000000000',
-      amountYokto,
-    );
-  }
-
   private _Chain: NearChain;
   private _Accounts: NearAccounts;
   private _policy: NearSputnikPolicy;
@@ -67,6 +25,8 @@ export default class NearSputnikDao extends ProposalModule<
 
   private _tokenSupply: BN;
   public get tokenSupply() { return this._tokenSupply; }
+
+  private _nProposals: number;
 
   // INIT / DEINIT
   public async init(chain: NearChain, accounts: NearAccounts) {
@@ -81,6 +41,7 @@ export default class NearSputnikDao extends ProposalModule<
       this,
       { ...p, identifier: `${p.id}` },
     ));
+    this._nProposals = +(await this.query('get_last_proposal_id', {}));
     // TODO: support bounties
     this._initialized = true;
   }
@@ -106,34 +67,20 @@ export default class NearSputnikDao extends ProposalModule<
       throw new Error(`invalid proposal kind: ${kind}`);
     }
 
-    // init contract via wallet connection
-    const account = this.app.user.activeAccount as NearAccount;
-    const walletConnection = account.walletConnection;
-    const contract = new Contract(
-      walletConnection,
-      this.app.activeChainId(),
-      { changeMethods: [ 'add_proposal' ], viewMethods: [] },
-    );
+    // TODO: user pre-checks
 
-    // TODO: user checks
+    const contractId = this.app.activeChainId();
+    const methodName = 'add_proposal';
+    const args = {
+      proposal: {
+        description: description.trim(),
+        kind,
+      },
+    };
 
-    // perform tx
-    try {
-      console.log((contract as any).add_proposal);
-      await (contract as any).add_proposal(
-        {
-          proposal: {
-            description: description.trim(),
-            kind,
-          },
-        },
-        isFunctionCall(kind) ? '250000000000000' : '30000000000000',
-        this.policy.proposal_bond,
-      );
-    } catch (e) {
-      console.error(e);
-      notifyError('Failed to add proposal.');
-    }
+    const nextProposalId = this._nProposals;
+    const callbackUrl = `${window.location.origin}/${contractId}/proposal/sputnikproposal/${nextProposalId}`;
+    await this._Chain.redirectTx(contractId, methodName, args, this.policy.proposal_bond, callbackUrl);
   }
 
   public createTx(...args: any[]): ITXModalData {
