@@ -1,6 +1,14 @@
 @import 'client/styles/shared';
 @import './index';
 
+.create-comment-wrap {
+    display: flex;
+    flex-direction: column;
+    &.new-thread-child {
+        margin-top: 60px;
+    }
+}
+
 .CreateComment {
     display: flex;
     .create-comment-body {

@@ -42,7 +42,9 @@ const CreateComment: m.Component<{
     } = vnode.attrs;
     let { parentComment } = vnode.attrs;
     const author = app.user.activeAccount;
-    const parentType = parentComment ? CommentParent.Comment : CommentParent.Proposal;
+    const parentType = (parentComment || proposalPageState.parentCommentId)
+      ? CommentParent.Comment
+      : CommentParent.Proposal;
     if (!parentComment) parentComment = null;
     if (vnode.state.uploadsInProgress === undefined) {
       vnode.state.uploadsInProgress = 0;
@@ -81,7 +83,7 @@ const CreateComment: m.Component<{
       const communityId = app.activeCommunityId();
       try {
         const res = await app.comments.create(author.address, rootProposal.uniqueIdentifier,
-          chainId, communityId, commentText, parentComment?.id, attachments);
+          chainId, communityId, commentText, proposalPageState.parentCommentId, attachments);
         callback();
         if (vnode.state.quillEditorState.editor) {
           vnode.state.quillEditorState.editor.enable();
@@ -123,88 +125,95 @@ const CreateComment: m.Component<{
 
     const { error, sendingComment, uploadsInProgress } = vnode.state;
 
-    return m('.CreateComment', {
+    return m('.create-comment-wrap', {
       class: parentType === CommentParent.Comment ? 'new-comment-child' : 'new-thread-child'
     }, [
-      m('.create-comment-avatar', [
-        m(User, { user: author, popover: true, avatarOnly: true, avatarSize: 40 }),
+      m('.reply-header', [
+        m('h3', parentType === CommentParent.Comment ? `Replying to ${parentComment.author}` : 'Reply')
       ]),
-      m('.create-comment-body', [
-        m(User, { user: author, popover: true, hideAvatar: true }),
-        (rootProposal instanceof OffchainThread && rootProposal.readOnly)
-          ? m(Callout, {
-            intent: 'primary',
-            content: 'Commenting is disabled because this post has been locked.',
-          })
-          : [
-            app.user.activeAccount?.profile && !app.user.activeAccount.profile.name && m(Callout, {
-              class: 'no-profile-callout',
+      m('.CreateComment', {
+        class: parentType === CommentParent.Comment ? 'new-comment-child' : 'new-thread-child'
+      }, [
+        m('.create-comment-avatar', [
+          m(User, { user: author, popover: true, avatarOnly: true, avatarSize: 40 }),
+        ]),
+        m('.create-comment-body', [
+          m(User, { user: author, popover: true, hideAvatar: true }),
+          (rootProposal instanceof OffchainThread && rootProposal.readOnly)
+            ? m(Callout, {
               intent: 'primary',
-              content: [
-                'You haven\'t set a display name yet. ',
-                m('a', {
-                  href: `/${app.activeId()}/account/${app.user.activeAccount.address}`
-                    + `?base=${app.user.activeAccount.chain}`,
-                  onclick: (e) => {
-                    e.preventDefault();
-                    app.modals.create({
-                      modal: EditProfileModal,
-                      data: {
-                        account: app.user.activeAccount,
-                        refreshCallback: () => m.redraw(),
-                      },
-                    });
-                  }
-                }, 'Set a display name'),
-              ],
-            }),
-            m(QuillEditor, {
-              contentsDoc: '',
-              oncreateBind: (state) => {
-                vnode.state.quillEditorState = state;
-              },
-              editorNamespace: `${document.location.pathname}-commenting`,
-              onkeyboardSubmit: () => {
-                submitComment();
-                m.redraw(); // ensure button is disabled
-              },
-              imageUploader: true,
-              tabindex: vnode.attrs.tabindex,
-            }),
-            m('.form-bottom', [
-              m(Button, {
+              content: 'Commenting is disabled because this post has been locked.',
+            })
+            : [
+              app.user.activeAccount?.profile && !app.user.activeAccount.profile.name && m(Callout, {
+                class: 'no-profile-callout',
                 intent: 'primary',
-                type: 'submit',
-                compact: true,
-                disabled: (
-                  getSetGlobalEditingStatus(GlobalStatus.Get)
-                  || vnode.state.quillEditorState?.editor?.editor?.isBlank()
-                  || sendingComment
-                  || uploadsInProgress > 0
-                ),
-                rounded: true,
-                onclick: submitComment,
-                label: (uploadsInProgress > 0)
-                  ? 'Uploading...'
-                  : 'Submit'
+                content: [
+                  'You haven\'t set a display name yet. ',
+                  m('a', {
+                    href: `/${app.activeId()}/account/${app.user.activeAccount.address}`
+                      + `?base=${app.user.activeAccount.chain}`,
+                    onclick: (e) => {
+                      e.preventDefault();
+                      app.modals.create({
+                        modal: EditProfileModal,
+                        data: {
+                          account: app.user.activeAccount,
+                          refreshCallback: () => m.redraw(),
+                        },
+                      });
+                    }
+                  }, 'Set a display name'),
+                ],
               }),
-              cancellable
-                && m(Button, {
-                  intent: 'none',
-                  type: 'cancel',
+              m(QuillEditor, {
+                contentsDoc: '',
+                oncreateBind: (state) => {
+                  vnode.state.quillEditorState = state;
+                },
+                editorNamespace: `${document.location.pathname}-commenting`,
+                onkeyboardSubmit: () => {
+                  submitComment();
+                  m.redraw(); // ensure button is disabled
+                },
+                imageUploader: true,
+                tabindex: vnode.attrs.tabindex,
+              }),
+              m('.form-bottom', [
+                m(Button, {
+                  intent: 'primary',
+                  type: 'submit',
                   compact: true,
+                  disabled: (
+                    getSetGlobalEditingStatus(GlobalStatus.Get)
+                    || vnode.state.quillEditorState?.editor?.editor?.isBlank()
+                    || sendingComment
+                    || uploadsInProgress > 0
+                  ),
                   rounded: true,
-                  onclick: (e) => {
-                    e.preventDefault();
-                    proposalPageState.replying = false;
-                    proposalPageState.parentCommentId = null;
-                  },
-                  label: 'Cancel'
+                  onclick: submitComment,
+                  label: (uploadsInProgress > 0)
+                    ? 'Uploading...'
+                    : 'Submit'
                 }),
-              error
-                && m('.new-comment-error', error),
-            ])
-          ]
+                cancellable
+                  && m(Button, {
+                    intent: 'none',
+                    type: 'cancel',
+                    compact: true,
+                    rounded: true,
+                    onclick: (e) => {
+                      e.preventDefault();
+                      proposalPageState.replying = false;
+                      proposalPageState.parentCommentId = null;
+                    },
+                    label: 'Cancel'
+                  }),
+                error
+                  && m('.new-comment-error', error),
+              ])
+            ]
+        ])
       ])
     ]);
   }

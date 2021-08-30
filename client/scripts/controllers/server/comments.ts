@@ -239,7 +239,6 @@ class CommentsController {
         }
         this._store.clearProposal(proposal);
         response.result.forEach((comment) => {
-          console.log(comment);
           // TODO: Comments should always have a linked Address
           if (!comment.Address) console.error('Comment missing linked address');
           const model = modelFromServer(comment);

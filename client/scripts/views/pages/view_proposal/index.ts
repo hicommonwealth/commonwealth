@@ -559,7 +559,7 @@ const ProposalComments: m.Component<{
     const nestedReplyForm = (comment) => {
       // if current comment is replyParent, & no posts are being edited, a nested comment form is rendered
       if (
-        proposalPageState.replying
+        !proposalPageState.editing
         && proposalPageState.parentCommentId === comment.id
         && !getSetGlobalEditingStatus(GlobalStatus.Get)
       ) {
@@ -1027,7 +1027,15 @@ const ViewProposalPage: m.Component<{
         && m(ProposalVotingResults, { proposal }),
       !(proposal instanceof OffchainThread)
         && m(ProposalVotingActions, { proposal }),
-      vnode.state.replying
+      m(ProposalComments, {
+        proposal,
+        comments,
+        createdCommentCallback,
+        getSetGlobalEditingStatus,
+        proposalPageState: vnode.state,
+        recentlySubmitted: vnode.state.recentlySubmitted
+      }),
+      !vnode.state.editing
       && !vnode.state.parentCommentId
       && m(CreateComment, {
         callback: createdCommentCallback,
@@ -1036,14 +1044,6 @@ const ViewProposalPage: m.Component<{
         proposalPageState: vnode.state,
         parentComment: null,
         rootProposal: proposal
-      }),
-      m(ProposalComments, {
-        proposal,
-        comments,
-        createdCommentCallback,
-        getSetGlobalEditingStatus,
-        proposalPageState: vnode.state,
-        recentlySubmitted: vnode.state.recentlySubmitted
       }),
     ]);
   }
