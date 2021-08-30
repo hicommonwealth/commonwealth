@@ -34,6 +34,7 @@ export { default as StarredCommunity } from './StarredCommunity';
 export { default as Webhook } from './Webhook';
 
 export { CMNProject, CMNMembers, CMNProjectProtocol } from './CMNProject';
+export { CMNCollective, CMNCollectiveMembers, CMNCollectiveProtocol } from './CMNCollective';
 
 export { DepositVote, BinaryVote } from './votes';
 
@@ -47,7 +48,7 @@ export {
   VotingType,
   VotingUnit,
   ProposalEndTime,
-  AnyProposal,
+  AnyProposal
 } from './types';
 
 export {
@@ -66,5 +67,5 @@ export {
   IThresholdEndTime,
   INotStartedEndTime,
   IUnavailableEndTime,
-  IQueuedEndTime,
+  IQueuedEndTime
 } from './interfaces';
