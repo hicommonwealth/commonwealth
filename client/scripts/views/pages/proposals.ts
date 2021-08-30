@@ -28,9 +28,9 @@ import NewProposalPage from 'views/pages/new_proposal/index';
 import PageNotFound from 'views/pages/404';
 import Listing from 'views/pages/listing';
 import ErrorPage from 'views/pages/error';
-import AaveProposalCardDetail from '../components/proposals/aave_proposal_card_detail';
 import { AaveTypes, CompoundTypes } from '@commonwealth/chain-events';
 import NearSputnik from 'controllers/chain/near/sputnik/adapter';
+import AaveProposalCardDetail from '../components/proposals/aave_proposal_card_detail';
 
 const SubstrateProposalStats: m.Component<{}, {}> = {
   view: (vnode) => {

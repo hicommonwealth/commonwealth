@@ -1,16 +1,9 @@
 @import 'client/styles/shared';
 @import './index';
 
-.create-comment-wrap {
-    display: flex;
-    flex-direction: column;
-    &.new-thread-child {
-        margin-top: 60px;
-    }
-}
-
 .CreateComment {
     display: flex;
+    padding-top: 40px;
     .create-comment-body {
         flex: 1;
         margin-left: 26px;
@@ -39,11 +32,11 @@
                 color: #999999;
             }
         }
-    }
-    .User {
-        font-size: $discussion-meta-font-size;
-        &, a.user-display-name {
-            color: $discussion-meta-color;
+        > .User {
+            font-size: $discussion-meta-font-size;
+            &, a.user-display-name {
+                color: $discussion-meta-color;
+            }
         }
     }
 

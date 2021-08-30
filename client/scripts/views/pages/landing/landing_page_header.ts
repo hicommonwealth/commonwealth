@@ -23,9 +23,7 @@ const triggerMenu = () => {
   } else {
     headerClass.className = `landing-header ${INITIAL_HEADER_STYLE} mt-8 menuOpen`;
   }
-
 };
-
 
 const scrollingHeader = () => {
   if (window.scrollY < 36) {

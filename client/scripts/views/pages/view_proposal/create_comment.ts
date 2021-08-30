@@ -6,7 +6,7 @@ import { Button, Callout } from 'construct-ui';
 
 import app from 'state';
 
-import { OffchainThread, OffchainComment, AnyProposal } from 'models';
+import { OffchainThread, OffchainComment, AnyProposal, Account } from 'models';
 import { CommentParent } from 'controllers/server/comments';
 import EditProfileModal from 'views/modals/edit_profile_modal';
 import QuillEditor from 'views/components/quill_editor';
@@ -67,7 +67,6 @@ const CreateComment: m.Component<{
       const mentionsEle = document.getElementsByClassName('ql-mention-list-container')[0];
       if (mentionsEle) (mentionsEle as HTMLElement).style.visibility = 'hidden';
 
-
       const commentText = quillEditorState.markdownMode
         ? quillEditorState.editor.getText()
         : JSON.stringify(quillEditorState.editor.getContents());
@@ -125,95 +124,102 @@ const CreateComment: m.Component<{
 
     const { error, sendingComment, uploadsInProgress } = vnode.state;
 
-    return m('.create-comment-wrap', {
-      class: parentType === CommentParent.Comment ? 'new-comment-child' : 'new-thread-child'
+    let parentScopedClass: string = 'new-thread-child';
+    let parentAuthor: Account<any>;
+    if (parentType === CommentParent.Comment) {
+      parentScopedClass = 'new-comment-child';
+      parentAuthor = app.community
+        ? app.community.accounts.get(parentComment.author, parentComment.authorChain)
+        : app.chain.accounts.get(parentComment.author);
+    }
+
+    return m('.CreateComment', {
+      class: parentScopedClass
     }, [
-      m('.reply-header', [
-        m('h3', parentType === CommentParent.Comment ? `Replying to ${parentComment.author}` : 'Reply')
+      m('.create-comment-avatar', [
+        m(User, { user: author, popover: true, avatarOnly: true, avatarSize: 40 }),
       ]),
-      m('.CreateComment', {
-        class: parentType === CommentParent.Comment ? 'new-comment-child' : 'new-thread-child'
-      }, [
-        m('.create-comment-avatar', [
-          m(User, { user: author, popover: true, avatarOnly: true, avatarSize: 40 }),
+      m('.create-comment-body', [
+        m('.reply-header', [
+          m('h3', parentType === CommentParent.Comment
+            ? ['Replying to ', m(User, { user: parentAuthor, popover: true, hideAvatar: true })]
+            : 'Reply')
         ]),
-        m('.create-comment-body', [
-          m(User, { user: author, popover: true, hideAvatar: true }),
-          (rootProposal instanceof OffchainThread && rootProposal.readOnly)
-            ? m(Callout, {
+        m(User, { user: author, popover: true, hideAvatar: true }),
+        (rootProposal instanceof OffchainThread && rootProposal.readOnly)
+          ? m(Callout, {
+            intent: 'primary',
+            content: 'Commenting is disabled because this post has been locked.',
+          })
+          : [
+            app.user.activeAccount?.profile && !app.user.activeAccount.profile.name && m(Callout, {
+              class: 'no-profile-callout',
               intent: 'primary',
-              content: 'Commenting is disabled because this post has been locked.',
-            })
-            : [
-              app.user.activeAccount?.profile && !app.user.activeAccount.profile.name && m(Callout, {
-                class: 'no-profile-callout',
+              content: [
+                'You haven\'t set a display name yet. ',
+                m('a', {
+                  href: `/${app.activeId()}/account/${app.user.activeAccount.address}`
+                    + `?base=${app.user.activeAccount.chain}`,
+                  onclick: (e) => {
+                    e.preventDefault();
+                    app.modals.create({
+                      modal: EditProfileModal,
+                      data: {
+                        account: app.user.activeAccount,
+                        refreshCallback: () => m.redraw(),
+                      },
+                    });
+                  }
+                }, 'Set a display name'),
+              ],
+            }),
+            m(QuillEditor, {
+              contentsDoc: '',
+              oncreateBind: (state) => {
+                vnode.state.quillEditorState = state;
+              },
+              editorNamespace: `${document.location.pathname}-commenting`,
+              onkeyboardSubmit: () => {
+                submitComment();
+                m.redraw(); // ensure button is disabled
+              },
+              imageUploader: true,
+              tabindex: vnode.attrs.tabindex,
+            }),
+            m('.form-bottom', [
+              m(Button, {
                 intent: 'primary',
-                content: [
-                  'You haven\'t set a display name yet. ',
-                  m('a', {
-                    href: `/${app.activeId()}/account/${app.user.activeAccount.address}`
-                      + `?base=${app.user.activeAccount.chain}`,
-                    onclick: (e) => {
-                      e.preventDefault();
-                      app.modals.create({
-                        modal: EditProfileModal,
-                        data: {
-                          account: app.user.activeAccount,
-                          refreshCallback: () => m.redraw(),
-                        },
-                      });
-                    }
-                  }, 'Set a display name'),
-                ],
+                type: 'submit',
+                compact: true,
+                disabled: (
+                  getSetGlobalEditingStatus(GlobalStatus.Get)
+                  || vnode.state.quillEditorState?.editor?.editor?.isBlank()
+                  || sendingComment
+                  || uploadsInProgress > 0
+                ),
+                rounded: true,
+                onclick: submitComment,
+                label: (uploadsInProgress > 0)
+                  ? 'Uploading...'
+                  : 'Submit'
               }),
-              m(QuillEditor, {
-                contentsDoc: '',
-                oncreateBind: (state) => {
-                  vnode.state.quillEditorState = state;
-                },
-                editorNamespace: `${document.location.pathname}-commenting`,
-                onkeyboardSubmit: () => {
-                  submitComment();
-                  m.redraw(); // ensure button is disabled
-                },
-                imageUploader: true,
-                tabindex: vnode.attrs.tabindex,
-              }),
-              m('.form-bottom', [
-                m(Button, {
-                  intent: 'primary',
-                  type: 'submit',
+              cancellable
+                && m(Button, {
+                  intent: 'none',
+                  type: 'cancel',
                   compact: true,
-                  disabled: (
-                    getSetGlobalEditingStatus(GlobalStatus.Get)
-                    || vnode.state.quillEditorState?.editor?.editor?.isBlank()
-                    || sendingComment
-                    || uploadsInProgress > 0
-                  ),
                   rounded: true,
-                  onclick: submitComment,
-                  label: (uploadsInProgress > 0)
-                    ? 'Uploading...'
-                    : 'Submit'
+                  onclick: (e) => {
+                    e.preventDefault();
+                    proposalPageState.replying = false;
+                    proposalPageState.parentCommentId = null;
+                  },
+                  label: 'Cancel'
                 }),
-                cancellable
-                  && m(Button, {
-                    intent: 'none',
-                    type: 'cancel',
-                    compact: true,
-                    rounded: true,
-                    onclick: (e) => {
-                      e.preventDefault();
-                      proposalPageState.replying = false;
-                      proposalPageState.parentCommentId = null;
-                    },
-                    label: 'Cancel'
-                  }),
-                error
-                  && m('.new-comment-error', error),
-              ])
-            ]
-        ])
+              error
+                && m('.new-comment-error', error),
+            ])
+          ]
       ])
     ]);
   }
