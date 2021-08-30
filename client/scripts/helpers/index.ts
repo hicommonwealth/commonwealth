@@ -1,4 +1,4 @@
-import m from 'mithril';
+import m, { RouteOptions } from 'mithril';
 import { ICardListItem } from 'models/interfaces';
 import moment from 'moment';
 
@@ -26,7 +26,7 @@ export function offchainThreadStageToLabel(stage: OffchainThreadStage) {
 }
 
 export function parseCustomStages(str) {
-  // Parse additionalStages into a `string[]` and then cast to OffchainThreadStage[]
+  // Parse customStages into a `string[]` and then cast to OffchainThreadStage[]
   // If parsing fails, return an empty array.
   let arr;
   try {
@@ -57,7 +57,15 @@ export function externalLink(selector, target, children) {
   }, children);
 }
 
-export function link(selector: string, target: string, children, extraAttrs?: object, saveScrollPositionAs?: string) {
+export function link(
+  selector: string,
+  target: string,
+  children,
+  extraAttrs?: object,
+  saveScrollPositionAs?: string,
+  beforeRouteSet?: Function,
+  afterRouteSet?: Function,
+) {
   const attrs = {
     href: target,
     onclick: (e) => {
@@ -70,11 +78,17 @@ export function link(selector: string, target: string, children, extraAttrs?: ob
       if (saveScrollPositionAs) {
         localStorage[saveScrollPositionAs] = window.scrollY;
       }
-
-      if (window.location.href.split('?')[0] === target.split('?')[0]) {
-        m.route.set(target, {}, { replace: true });
+      if (beforeRouteSet) beforeRouteSet();
+      const routeArgs: [string, any?, RouteOptions?] = window.location.href.split('?')[0] === target.split('?')[0]
+        ? [target, {}, { replace: true }]
+        : [target];
+      if (afterRouteSet) {
+        (async () => {
+          await m.route.set(...routeArgs);
+          afterRouteSet();
+        })();
       } else {
-        m.route.set(target);
+        m.route.set(...routeArgs);
       }
     },
   };
@@ -182,10 +196,20 @@ export function formatLastUpdated(timestamp) {
   if (timestamp.isBefore(moment().subtract(365, 'days'))) return timestamp.format('MMM D YYYY');
   const formatted = timestamp.fromNow(true);
   return `${formatted
-      .replace(' days', 'd')
-      .replace(' day', 'd')
-      .replace(' hours', 'h')
-      .replace(' hour', 'h')} ago`;
+    .replace(' days', 'd')
+    .replace(' day', 'd')
+    .replace(' hours', 'h')
+    .replace(' hour', 'h')} ago`;
+}
+
+export function formatTimestamp(timestamp) {
+  if (timestamp.isBefore(moment().subtract(365, 'days'))) return timestamp.format('MMM D YYYY');
+  const formatted = timestamp.fromNow(true);
+  return `${formatted
+    .replace(' days', 'd')
+    .replace(' day', 'd')
+    .replace(' hours', 'h')
+    .replace(' hour', 'h')}`;
 }
 
 // duplicated in adapters/currency.ts
@@ -307,7 +331,6 @@ export const loadScript = (scriptURI) => {
     document.head.appendChild(script);
   });
 };
-
 
 export const removeOrAddClasslistToAllElements = (
   cardList: ICardListItem[],

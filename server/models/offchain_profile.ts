@@ -1,7 +1,9 @@
 import * as Sequelize from 'sequelize';
+import { Model, DataTypes } from 'sequelize';
 
 import { SubstrateTypes } from '@commonwealth/chain-events';
 import { AddressAttributes } from './address';
+import { ModelStatic } from './types';
 
 export interface OffchainProfileAttributes {
   address_id: number;
@@ -14,25 +16,22 @@ export interface OffchainProfileAttributes {
 }
 
 export interface OffchainProfileInstance
-extends Sequelize.Instance<OffchainProfileAttributes>, OffchainProfileAttributes {
+extends Model<OffchainProfileAttributes>, OffchainProfileAttributes {}
 
-}
-
-export interface OffchainProfileModel extends Sequelize.Model<OffchainProfileInstance, OffchainProfileAttributes> {
-
-}
+export type OffchainProfileModelStatic = ModelStatic<OffchainProfileInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): OffchainProfileModel => {
-  const OffchainProfile = sequelize.define<OffchainProfileInstance, OffchainProfileAttributes>(
+  dataTypes: typeof DataTypes,
+): OffchainProfileModelStatic => {
+  const OffchainProfile = <OffchainProfileModelStatic>sequelize.define(
     'OffchainProfile', {
       address_id: { type: dataTypes.INTEGER, allowNull: false, primaryKey: true },
       identity: { type: dataTypes.STRING, allowNull: true },
       judgements: { type: dataTypes.JSONB, allowNull: true },
       data: { type: dataTypes.TEXT, allowNull: true },
     }, {
+      tableName: 'OffchainProfiles',
       underscored: true,
       timestamps: false,
       indexes: [

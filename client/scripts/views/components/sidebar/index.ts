@@ -12,13 +12,15 @@ import { ProposalType } from 'identifiers';
 import { link } from 'helpers';
 import { ChainBase, ChainNetwork, ChainInfo, CommunityInfo, NodeInfo } from 'models';
 
+import Moloch from 'controllers/chain/ethereum/moloch/adapter';
 import SubscriptionButton from 'views/components/subscription_button';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import CommunitySelector from 'views/components/sidebar/community_selector';
+import CreateCommunityModal from 'views/modals/create_community_modal';
 
 import { discordIcon, telegramIcon, elementIcon, githubIcon, websiteIcon } from './icons';
-import CreateCommunityModal from '../../modals/create_community_modal';
+import { AaveTypes, CompoundTypes, MolochTypes } from '@commonwealth/chain-events';
 
 const SidebarQuickSwitcherItem: m.Component<{ item, size }> = {
   view: (vnode) => {
@@ -75,7 +77,7 @@ const SidebarQuickSwitcher: m.Component<{}> = {
           },
         }),
         m(CommunitySelector),
-        app.user.isSiteAdmin && m(Button, {
+        app.isLoggedIn() && m(Button, {
           class: 'create-community',
           rounded: true,
           label: m(Icon, { name: Icons.PLUS }),
@@ -185,17 +187,22 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
     const hasProposals = app.chain && !app.community && (
       app.chain.base === ChainBase.CosmosSDK
         || (app.chain.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Plasm)
-        || app.chain.network === ChainNetwork.Moloch
-        || app.chain.network === ChainNetwork.Marlin
-        || app.chain.network === ChainNetwork.MarlinTestnet
-        || app.chain.network === ChainNetwork.Commonwealth);
+        || MolochTypes.EventChains.find((c) => c === app.chain.network)
+        || CompoundTypes.EventChains.find((c) => c === app.chain.network)
+        || AaveTypes.EventChains.find((c) => c === app.chain.network)
+        || app.chain.network === ChainNetwork.Commonwealth
+        || app.chain?.meta.chain.snapshot);
     if (!hasProposals) return;
 
     const showMolochMenuOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Moloch;
     const showMolochMemberOptions = showMolochMenuOptions && (app.user.activeAccount as any)?.shares?.gtn(0);
     const showCommonwealthMenuOptions = app.chain?.network === ChainNetwork.Commonwealth;
 
-    const showMarlinOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Marlin;
+    const showCompoundOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Compound;
+    const showAaveOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Aave;
+
+    const onSnapshotProposal = (p) => p.startsWith(`/${app.activeId()}/snapshot-proposals`);
+    const onSnapshotProposalCreation = (p) => p.startsWith(`/${app.activeId()}/new/snapshot-proposal/`);
 
     const onProposalPage = (p) => (
       p.startsWith(`/${app.activeChainId()}/proposals`)
@@ -235,12 +242,12 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           },
           contentRight: [], // TODO
         }),
-      // proposals (substrate, cosmos, moloch & marlin only)
+      // proposals (substrate, cosmos, moloch & compound only)
       !app.community && ((app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Darwinia)
                          || app.chain?.base === ChainBase.CosmosSDK
-                         || app.chain?.network === ChainNetwork.Moloch
-                         || app.chain?.network === ChainNetwork.Marlin
-                         || app.chain?.network === ChainNetwork.MarlinTestnet)
+                         || MolochTypes.EventChains.find((c) => c === app.chain.network)
+                         || CompoundTypes.EventChains.find((c) => c === app.chain.network)
+                         || AaveTypes.EventChains.find((c) => c === app.chain.network))
         && m(Button, {
           fluid: true,
           rounded: true,
@@ -334,17 +341,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
             navigateToSubpage(`/validators`);
           },
         }),
-      showMarlinOptions && m(Button, {
-        fluid: true,
-        rounded: true,
-        onclick: (e) => {
-          e.preventDefault();
-          navigateToSubpage(`/new/proposal/:type`, { type: ProposalType.MarlinProposal });
-        },
-        label: 'Submit Proposal',
-        active: m.route.get() === `/${app.activeChainId()}/new/proposal/${ProposalType.MarlinProposal}`,
-      }),
-      showMarlinOptions && m(Button, {
+      showCompoundOptions && m(Button, {
         fluid: true,
         rounded: true,
         onclick: (e) => {
@@ -354,6 +351,16 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         label: 'Delegate',
         active: m.route.get() === `/${app.activeChainId()}/delegate`,
       }),
+      // showAaveOptions && m(Button, {
+      //   fluid: true,
+      //   rounded: true,
+      //   onclick: (e) => {
+      //     e.preventDefault();
+      //     m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.AaveProposal });
+      //   },
+      //   label: 'Submit Proposal',
+      //   active: m.route.get() === `/${app.activeChainId()}/new/proposal/${ProposalType.AaveProposal}`,
+      // }),
       showMolochMemberOptions && m(Button, {
         fluid: true,
         rounded: true,
@@ -393,11 +400,32 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
             account: app.user.activeAccount,
             accounts: ((app.user.activeAccount as any).app.chain as any).ethAccounts,
             contractAddress: ((app.user.activeAccount as any).app.chain as any).governance.api.contractAddress,
-            tokenAddress: ((app.user.activeAccount as any).app.chain as any).governance.api.tokenContract.address,
+            tokenAddress: ((app.user.activeAccount as any).app.chain as Moloch).governance.api.token.address,
           });
         },
         label: 'Approve tokens',
       }),
+      m('.sidebar-spacer'),
+      app.chain?.meta.chain.snapshot && m(Button, {
+        rounded: true,
+        fluid: true,
+        active: onSnapshotProposal(m.route.get()),
+        label: 'Snapshot Proposals',
+        onclick: (e) => {
+          e.preventDefault();
+          m.route.set(`/${app.activeChainId()}/snapshot-proposals/${app.chain.meta.chain.snapshot}`);
+        },
+      }),
+      // app.chain?.meta.chain.snapshot && app.user.activeAccount && m(Button, {
+      //   rounded: true,
+      //   fluid: true,
+      //   active: onSnapshotProposalCreation(m.route.get()),
+      //   label: 'New Snapshot Pr...',
+      //   onclick: (e) => {
+      //     e.preventDefault();
+      //     m.route.set(`/${app.activeChainId()}/new/snapshot-proposal/${app.chain.meta.chain.snapshot}`);
+      //   },
+      // }),
       showCommonwealthMenuOptions && m(Button, {
         fluid: true,
         rounded: true,
@@ -580,8 +608,15 @@ const Sidebar: m.Component<{ hideQuickSwitcher? }, {}> = {
         m('br'),
         app.isLoggedIn() && (app.chain || app.community) && m(SubscriptionButton),
         app.chain && m(ChainStatusModule),
-      ])
-    ];
+      ]),
+      app.isCustomDomain() &&
+      m('a', {
+        class: 'PoweredBy',
+        onclick: (e) => {
+          window.open('https://commonwealth.im/');
+        },
+      }),
+    ]
   },
 };
 

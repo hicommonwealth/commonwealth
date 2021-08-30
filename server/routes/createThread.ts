@@ -1,6 +1,7 @@
 import moment from 'moment';
 
 import { Request, Response, NextFunction } from 'express';
+import BN from 'bn.js';
 import { NotificationCategories, ProposalType } from '../../shared/types';
 
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
@@ -8,6 +9,7 @@ import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
 import { parseUserMentions } from '../util/parseUserMentions';
 import TokenBalanceCache from '../util/tokenBalanceCache';
+import { DB } from '../database';
 
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
@@ -24,7 +26,7 @@ export const Errors = {
 };
 
 const createThread = async (
-  models,
+  models: DB,
   tokenBalanceCache: TokenBalanceCache,
   req: Request,
   res: Response,
@@ -151,7 +153,7 @@ const createThread = async (
         const threshold = (await models.OffchainTopic.findOne({ where: { id: topic_id } })).token_threshold;
         const tokenBalance = await tokenBalanceCache.getBalance(chain.id, req.body.address);
 
-        if (threshold && tokenBalance.lt(threshold)) return next(new Error(Errors.InsufficientTokenBalance));
+        if (threshold && tokenBalance.lt(new BN(threshold))) return next(new Error(Errors.InsufficientTokenBalance));
       } catch (e) {
         log.error(`hasToken failed: ${e.message}`);
         return next(new Error(Errors.CouldNotFetchTokenBalance));
@@ -257,8 +259,8 @@ const createThread = async (
         try {
           return models.Address.findOne({
             where: {
-              chain: mention[0],
-              address: mention[1],
+              chain: mention[0] || null,
+              address: mention[1] || null,
             },
             include: [ models.User, models.Role ]
           });

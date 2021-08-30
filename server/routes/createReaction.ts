@@ -1,6 +1,7 @@
 /* eslint-disable prefer-const */
 /* eslint-disable dot-notation */
 import { Request, Response, NextFunction } from 'express';
+import BN from 'bn.js';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { NotificationCategories } from '../../shared/types';
@@ -8,6 +9,7 @@ import { getProposalUrl, getProposalUrlWithoutObject } from '../../shared/utils'
 import proposalIdToEntity from '../util/proposalIdToEntity';
 import TokenBalanceCache from '../util/tokenBalanceCache';
 import { factory, formatFilename } from '../../shared/logging';
+import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -21,7 +23,7 @@ export const Errors = {
 };
 
 const createReaction = async (
-  models,
+  models: DB,
   tokenBalanceCache: TokenBalanceCache,
   req: Request,
   res: Response,
@@ -55,7 +57,7 @@ const createReaction = async (
         }
         const threshold = (await models.OffchainTopic.findOne({ where: { id: thread.topic_id } })).token_threshold;
         const tokenBalance = await tokenBalanceCache.getBalance(chain.id, req.body.address);
-        if (threshold && tokenBalance.lt(threshold)) return next(new Error(Errors.InsufficientTokenBalance));
+        if (threshold && tokenBalance.lt(new BN(threshold))) return next(new Error(Errors.InsufficientTokenBalance));
       } catch (e) {
         log.error(`hasToken failed: ${e.message}`);
         return next(new Error(Errors.CouldNotFetchTokenBalance));
@@ -96,7 +98,7 @@ const createReaction = async (
   try {
     [ finalReaction, created ] = await models.OffchainReaction.findOrCreate({
       where: options,
-      default: options,
+      defaults: options,
       include: [ models.Address]
     });
     if (created) finalReaction = await models.OffchainReaction.findOne({

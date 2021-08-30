@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import { factory, formatFilename } from '../../shared/logging';
+import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -12,7 +13,7 @@ export const Errors = {
   InvalidStage: 'Invalid stage',
 };
 
-const updateThreadStage = async (models, req: Request, res: Response, next: NextFunction) => {
+const updateThreadStage = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const { thread_id, stage } = req.body;
   if (!thread_id) return next(new Error(Errors.NoThreadId));
   if (!stage) return next(new Error(Errors.NoStage));
@@ -25,7 +26,7 @@ const updateThreadStage = async (models, req: Request, res: Response, next: Next
       },
     });
     if (!thread) return next(new Error(Errors.NoThread));
-    const userOwnedAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
+    const userOwnedAddressIds = (await req.user.getAddresses()).filter((addr) => !!addr.verified).map((addr) => addr.id);
     if (!userOwnedAddressIds.includes(thread.address_id)) { // is not author
       const roles = await models.Role.findAll({
         where: {
@@ -40,7 +41,7 @@ const updateThreadStage = async (models, req: Request, res: Response, next: Next
     }
 
     // fetch available stages
-    let additionalStages = [];
+    let customStages = [];
     let entity;
     if (thread.community) {
       entity = await models.OffchainCommunity.findOne({ where: { id: thread.community } });
@@ -48,13 +49,14 @@ const updateThreadStage = async (models, req: Request, res: Response, next: Next
       entity = await models.Chain.findOne({ where: { id: thread.chain } });
     }
     try {
-      additionalStages = Array.from(JSON.parse(entity.additionalStages)).map(s => s.toString()).filter(s => s);
+      customStages = Array.from(JSON.parse(entity.customStages)).map(s => s.toString()).filter(s => s);
     } catch (e) {}
 
     // validate stage
-    const availableStages = [
-      'discussion', 'proposal_in_review', 'voting', 'passed', 'failed', ...additionalStages
-    ];
+    const availableStages = customStages.length === 0 ? [
+      'discussion', 'proposal_in_review', 'voting', 'passed', 'failed',
+    ] : customStages;
+
     if (availableStages.indexOf(stage) === -1) {
       return next(new Error(Errors.InvalidStage));
     }
@@ -70,7 +72,7 @@ const updateThreadStage = async (models, req: Request, res: Response, next: Next
         },
         {
           model: models.Address,
-          through: models.Collaboration,
+          // through: models.Collaboration,
           as: 'collaborators'
         },
         models.OffchainAttachment,

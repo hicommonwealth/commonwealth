@@ -3,7 +3,7 @@ import _ from 'underscore';
 import {
   IDisconnectedRange, IEventHandler, EventSupportingChains, IEventSubscriber,
   SubstrateTypes, SubstrateEvents, MolochTypes, MolochEvents, chainSupportedBy,
-  MarlinTypes, MarlinEvents,
+  CompoundTypes, CompoundEvents, isSupportedChain, AaveTypes, AaveEvents
 } from '@commonwealth/chain-events';
 
 import EventStorageHandler, { StorageFilterConfig } from '../eventHandlers/storage';
@@ -12,7 +12,7 @@ import EntityArchivalHandler from '../eventHandlers/entityArchival';
 import IdentityHandler from '../eventHandlers/identity';
 import UserFlagsHandler from '../eventHandlers/userFlags';
 import ProfileCreationHandler from '../eventHandlers/profileCreation';
-import { sequelize } from '../database';
+import { default as models, sequelize } from '../database';
 import { constructSubstrateUrl } from '../../shared/substrate';
 import { factory, formatFilename } from '../../shared/logging';
 import { ChainNodeInstance } from '../models/chain_node';
@@ -22,13 +22,14 @@ const log = factory.getLogger(formatFilename(__filename));
 // TODO: config this
 const BALANCE_TRANSFER_THRESHOLD_PERMILL: number = 10_000;
 
-const discoverReconnectRange = async (models, chain: string): Promise<IDisconnectedRange> => {
+const discoverReconnectRange = async (chain: string): Promise<IDisconnectedRange> => {
   const lastChainEvent = await models.ChainEvent.findAll({
     limit: 1,
     order: [ [ 'block_number', 'DESC' ]],
     // this $...$ queries the data inside the include (ChainEvents don't have `chain` but ChainEventTypes do)...
     // we might be able to replicate this behavior with where and required: true inside the include
     where: {
+      // @ts-ignore
       '$ChainEventType.chain$': chain,
     },
     include: [
@@ -44,8 +45,58 @@ const discoverReconnectRange = async (models, chain: string): Promise<IDisconnec
   }
 };
 
+export const generateHandlers = (
+  node: ChainNodeInstance,
+  wss?: WebSocket.Server,
+  storageConfig: StorageFilterConfig = {},
+) => {
+  const chain = node.chain;
+  if (!chain || !isSupportedChain(chain)) {
+    throw new Error(`invalid event chain: ${chain}`);
+  }
+
+  // writes events into the db as ChainEvents rows
+  const storageHandler = new EventStorageHandler(models, chain, storageConfig);
+
+  // emits notifications by writing into the db's Notifications table, and also optionally
+  // sending a notification to the client via websocket
+  const excludedNotificationEvents = [
+    SubstrateTypes.EventKind.DemocracyTabled,
+  ];
+  const notificationHandler = new EventNotificationHandler(models, wss, excludedNotificationEvents);
+
+  // creates and updates ChainEntity rows corresponding with entity-related events
+  const entityArchivalHandler = new EntityArchivalHandler(models, chain, wss);
+
+  // creates empty Address and OffchainProfile models for users who perform certain
+  // actions, like voting on proposals or registering an identity
+  const profileCreationHandler = new ProfileCreationHandler(models, node.chain);
+
+  // the set of handlers, run sequentially on all incoming chain events
+  const handlers: IEventHandler[] = [
+    storageHandler,
+    notificationHandler,
+    entityArchivalHandler,
+    profileCreationHandler,
+  ];
+
+  // only handle identities and user flags on substrate chains
+  if (chainSupportedBy(node.chain, SubstrateTypes.EventChains)) {
+    // populates identity information in OffchainProfiles when received (Substrate only)
+    const identityHandler = new IdentityHandler(models, node.chain);
+
+    // populates is_validator and is_councillor flags on Addresses when validator and
+    // councillor sets are updated (Substrate only)
+    const userFlagsHandler = new UserFlagsHandler(models, node.chain);
+
+    handlers.push(identityHandler, userFlagsHandler);
+  }
+
+  return handlers;
+};
+
 const setupChainEventListeners = async (
-  models, wss: WebSocket.Server, chains: string[] | 'all' | 'none', skipCatchup?: boolean
+  wss: WebSocket.Server, chains: string[] | 'all' | 'none', skipCatchup?: boolean
 ): Promise<{ [chain: string]: IEventSubscriber<any, any> }> => {
   const queryNode = (c: string): Promise<ChainNodeInstance> => models.ChainNode.findOne({
     where: { chain: c },
@@ -77,47 +128,6 @@ const setupChainEventListeners = async (
   }
 
   log.info('Setting up event listeners...');
-  const generateHandlers = (node: ChainNodeInstance, storageConfig: StorageFilterConfig = {}) => {
-    // writes events into the db as ChainEvents rows
-    const storageHandler = new EventStorageHandler(models, node.chain, storageConfig);
-
-    // emits notifications by writing into the db's Notifications table, and also optionally
-    // sending a notification to the client via websocket
-    const excludedNotificationEvents = [
-      SubstrateTypes.EventKind.DemocracyTabled,
-    ];
-    const notificationHandler = new EventNotificationHandler(models, wss, excludedNotificationEvents);
-
-    // creates and updates ChainEntity rows corresponding with entity-related events
-    const entityArchivalHandler = new EntityArchivalHandler(models, node.chain, wss);
-
-    // creates empty Address and OffchainProfile models for users who perform certain
-    // actions, like voting on proposals or registering an identity
-    const profileCreationHandler = new ProfileCreationHandler(models, node.chain);
-
-    // the set of handlers, run sequentially on all incoming chain events
-    const handlers: IEventHandler[] = [
-      storageHandler,
-      notificationHandler,
-      entityArchivalHandler,
-      profileCreationHandler,
-    ];
-
-    // only handle identities and user flags on substrate chains
-    if (chainSupportedBy(node.chain, SubstrateTypes.EventChains)) {
-      // populates identity information in OffchainProfiles when received (Substrate only)
-      const identityHandler = new IdentityHandler(models, node.chain);
-
-      // populates is_validator and is_councillor flags on Addresses when validator and
-      // councillor sets are updated (Substrate only)
-      const userFlagsHandler = new UserFlagsHandler(models, node.chain);
-
-      handlers.push(identityHandler, userFlagsHandler);
-    }
-
-    return handlers;
-  };
-
   const subscribers = await Promise.all(nodes.map(async (node) => {
     let subscriber: IEventSubscriber<any, any>;
     if (chainSupportedBy(node.chain, SubstrateTypes.EventChains)) {
@@ -130,12 +140,12 @@ const setupChainEventListeners = async (
         SubstrateTypes.EventKind.HeartbeatReceived,
       ];
 
-      const handlers = generateHandlers(node, { excludedEvents });
+      const handlers = generateHandlers(node, wss, { excludedEvents });
       subscriber = await SubstrateEvents.subscribeEvents({
         chain: node.chain,
         handlers,
         skipCatchup,
-        discoverReconnectRange: () => discoverReconnectRange(models, node.chain),
+        discoverReconnectRange: () => discoverReconnectRange(node.chain),
         api,
         enricherConfig: {
           balanceTransferThresholdPermill: BALANCE_TRANSFER_THRESHOLD_PERMILL,
@@ -144,32 +154,39 @@ const setupChainEventListeners = async (
     } else if (chainSupportedBy(node.chain, MolochTypes.EventChains)) {
       const contractVersion = 1;
       const api = await MolochEvents.createApi(node.url, contractVersion, node.address);
-      const handlers = generateHandlers(node);
+      const handlers = generateHandlers(node, wss);
       subscriber = await MolochEvents.subscribeEvents({
         chain: node.chain,
         handlers,
         skipCatchup,
-        discoverReconnectRange: () => discoverReconnectRange(models, node.chain),
+        discoverReconnectRange: () => discoverReconnectRange(node.chain),
         api,
         contractVersion,
       });
-    } else if (chainSupportedBy(node.chain, MarlinTypes.EventChains)) {
-      const governorAlphaContractAddress = '0x777992c2E4EDF704e49680468a9299C6679e37F6';
-      const timelockContractAddress = '0x42Bf58AD084595e9B6C5bb2aA04050B0C291264b';
-      const api = await MarlinEvents.createApi(
-        node.url, {
-          comp: node.address,
-          governorAlpha: governorAlphaContractAddress,
-          timelock: timelockContractAddress,
-        }
+    } else if (chainSupportedBy(node.chain, CompoundTypes.EventChains)) {
+      const api = await CompoundEvents.createApi(
+        node.url, node.address,
       );
-      const handlers = generateHandlers(node);
-      subscriber = await MarlinEvents.subscribeEvents({
+      const handlers = generateHandlers(node, wss);
+      subscriber = await CompoundEvents.subscribeEvents({
         chain: node.chain,
         handlers,
         skipCatchup,
-        discoverReconnectRange: () => discoverReconnectRange(models, node.chain),
+        discoverReconnectRange: () => discoverReconnectRange(node.chain),
         api,
+      });
+    } else if (chainSupportedBy(node.chain, AaveTypes.EventChains)) {
+      const api = await AaveEvents.createApi(
+        node.url, node.address,
+      );
+      const handlers = generateHandlers(node, wss);
+      subscriber = await AaveEvents.subscribeEvents({
+        chain: node.chain,
+        handlers,
+        skipCatchup,
+        discoverReconnectRange: () => discoverReconnectRange(node.chain),
+        api,
+        verbose: true,
       });
     }
 
@@ -181,7 +198,7 @@ const setupChainEventListeners = async (
     });
     return [ node.chain, subscriber ];
   }));
-  return _.object<{ [chain: string]:  IEventSubscriber<any, any> }>(subscribers);
+  return _.object<{ [chain: string]: IEventSubscriber<any, any> }>(subscribers);
 };
 
 export default setupChainEventListeners;

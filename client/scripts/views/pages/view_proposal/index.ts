@@ -4,7 +4,7 @@ import 'pages/view_proposal/tips.scss';
 import $ from 'jquery';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
-import { PopoverMenu, MenuDivider, Icon, Icons, Button, Input } from 'construct-ui';
+import { PopoverMenu, MenuDivider, MenuItem, Icon, Icons, Button, Input  } from 'construct-ui';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -36,7 +36,7 @@ import PollEditor from 'views/components/poll_editor';
 import {
   TopicEditorMenuItem, ThreadSubscriptionMenuItem
 } from 'views/pages/discussions/discussion_row_menu';
-import ProposalVotingActions from 'views/components/proposals/voting_actions';
+import ProposalVotingActions, { CancelButton, ExecuteButton, QueueButton } from 'views/components/proposals/voting_actions';
 import ProposalVotingResults from 'views/components/proposals/voting_results';
 import PageLoading from 'views/pages/loading';
 import PageNotFound from 'views/pages/404';
@@ -48,6 +48,7 @@ import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 
 import { SocialSharingCarat } from 'views/components/social_sharing_carat';
 
+import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import {
   ProposalHeaderExternalLink, ProposalHeaderBlockExplorerLink, ProposalHeaderVotingInterfaceLink,
   ProposalHeaderOffchainPoll,
@@ -59,7 +60,9 @@ import {
   ProposalTitleEditMenuItem,
   ProposalSidebarStageEditorModule,
   ProposalSidebarPollEditorModule,
+  ProposalLinkEditor,
 } from './header';
+import { AaveViewProposalDetail, AaveViewProposalSummary } from './aave_view_proposal_detail';
 import {
   activeQuillEditorHasText, GlobalStatus, ProposalBodyAvatar, ProposalBodyAuthor, ProposalBodyCreated,
   ProposalBodyLastEdited, ProposalBodyCancelEdit, ProposalBodySaveEdit,
@@ -73,7 +76,6 @@ import User from '../../components/widgets/user';
 import MarkdownFormattedText from '../../components/markdown_formatted_text';
 import { createTXModal } from '../../modals/tx_signing_modal';
 import { SubstrateAccount } from '../../../controllers/chain/substrate/account';
-
 
 const ProposalHeader: m.Component<{
   commentCount: number;
@@ -96,6 +98,8 @@ const ProposalHeader: m.Component<{
   currentText: any;
   topicEditorIsOpen: boolean;
   editPermissionsIsOpen: boolean;
+  updatedTitle: string;
+  updatedUrl: string;
 }> = {
   view: (vnode) => {
     const {
@@ -110,8 +114,8 @@ const ProposalHeader: m.Component<{
     } = vnode.attrs;
 
     const attachments = (proposal instanceof OffchainThread) ? (proposal as OffchainThread).attachments : false;
-    const proposalLink = (app.isCustomDomain() ? '' : `/${app.activeId()}`)
-      + `/proposal/${proposal.slug}/${proposal.identifier}-`
+    const proposalLink = `${app.isCustomDomain() ? '' : `/${app.activeId()}`
+    }/proposal/${proposal.slug}/${proposal.identifier}-`
       + `${slugify(proposal.title)}`;
     const proposalTitleIsEditable = (proposal instanceof SubstrateDemocracyProposal
       || proposal instanceof SubstrateCollectiveProposal
@@ -125,6 +129,17 @@ const ProposalHeader: m.Component<{
     }, [
       m('.proposal-top', [
         m('.proposal-top-left', [
+          !(proposal instanceof OffchainThread)
+            && m('.proposal-meta-top', [
+              m('.proposal-meta-top-left', [
+                m(ProposalHeaderOnchainId, { proposal }),
+              ]),
+              m('.proposal-meta-top-right', [
+                m(QueueButton, { proposal }),
+                m(ExecuteButton, { proposal }),
+                m(CancelButton, { proposal })
+              ])
+            ]),
           !vnode.state.editing
             && m('.proposal-title', [
               m(ProposalHeaderTitle, { proposal }),
@@ -163,10 +178,18 @@ const ProposalHeader: m.Component<{
                       vnode.state.topicEditorIsOpen = true;
                     }
                   }),
-                  (isAuthor || isAdmin)
+                  (isAuthor || isAdmin  || app.user.isSiteAdmin)
                     && m(ProposalBodyDeleteMenuItem, { item: proposal }),
                   (isAuthor || isAdmin)
                     && m(ProposalHeaderPrivacyMenuItems, { proposal, getSetGlobalEditingStatus }),
+                  (isAuthor || isAdmin) && (app.chain?.meta.chain.snapshot !== null)
+                    && m(MenuItem, {
+                      onclick: (e) => {
+                        m.route.set(`/${app.activeChainId()}/new/snapshot-proposal/${app.chain.meta.chain.snapshot}`
+                        + `?fromProposalType=${proposal.slug}&fromProposalId=${proposal.id}`);
+                      },
+                      label: 'Snapshot proposal from thread',
+                    }),
                   (isAuthor || isAdmin)
                     && m(MenuDivider),
                   m(ThreadSubscriptionMenuItem, { proposal: proposal as OffchainThread }),
@@ -175,7 +198,6 @@ const ProposalHeader: m.Component<{
                 trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
               }),
               !app.isCustomDomain() && m('.CommentSocialHeader', [ m(SocialSharingCarat)]),
-              // This is the new social carat menu
               vnode.state.editPermissionsIsOpen
                 && proposal instanceof OffchainThread
                 && m(ProposalEditorPermissions, {
@@ -221,9 +243,8 @@ const ProposalHeader: m.Component<{
                 }),
             ]
             : [
-              m(ProposalHeaderOnchainId, { proposal }),
-              m(ProposalHeaderOnchainStatus, { proposal }),
               m(ProposalBodyAuthor, { item: proposal }),
+              m(ProposalHeaderOnchainStatus, { proposal }),
               app.isLoggedIn()
               && (isAdmin || isAuthor)
               && !getSetGlobalEditingStatus(GlobalStatus.Get)
@@ -248,7 +269,14 @@ const ProposalHeader: m.Component<{
           m('.proposal-body-link', [
             proposal instanceof OffchainThread
               && proposal.kind === OffchainThreadKind.Link
-              && m(ProposalHeaderExternalLink, { proposal }),
+              && [
+                !vnode.state.editing
+                  ? m(ProposalHeaderExternalLink, { proposal })
+                  : m(ProposalLinkEditor, {
+                    item: proposal,
+                    parentState: vnode.state
+                  })
+              ],
             !(proposal instanceof OffchainThread)
               && (proposal['blockExplorerLink'] || proposal['votingInterfaceLink'] || proposal.threadId)
               && m('.proposal-body-link', [
@@ -320,8 +348,8 @@ const ProposalComment: m.Component<{
     if (!comment) return;
     const parentType = comment.parentComment ? CommentParent.Comment : CommentParent.Proposal;
 
-    const commentLink = (app.isCustomDomain() ? '' : `/${app.activeId()}`)
-      + `/proposal/${proposal.slug}/`
+    const commentLink = `${app.isCustomDomain() ? '' : `/${app.activeId()}`
+    }/proposal/${proposal.slug}/`
       + `${proposal.identifier}-${slugify(proposal.title)}?comment=${comment.id}`;
 
     return m('.ProposalComment', {
@@ -947,6 +975,11 @@ const ViewProposalPage: m.Component<{
       }),
       !(proposal instanceof OffchainThread)
         && m(LinkedProposalsEmbed, { proposal }),
+      (proposal instanceof AaveProposal)
+        && [
+          m(AaveViewProposalSummary, { proposal }),
+          m(AaveViewProposalDetail, { proposal }),
+        ],
       !(proposal instanceof OffchainThread)
         && m(ProposalVotingResults, { proposal }),
       !(proposal instanceof OffchainThread)

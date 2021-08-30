@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
-import { NotificationCategories } from '../../shared/types';
+import { DB } from '../database';
 
 export const Errors = {
   InvalidThread: 'Must provide a valid thread_id',
@@ -12,7 +12,7 @@ export const Errors = {
   InvalidAddress: 'Must provide editor address and chain',
 };
 
-const deleteEditors = async (models, req: Request, res: Response, next: NextFunction) => {
+const deleteEditors = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   if (!req.body.thread_id) {
     return next(new Error(Errors.InvalidThread));
   }
@@ -29,7 +29,7 @@ const deleteEditors = async (models, req: Request, res: Response, next: NextFunc
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));
 
-  const userOwnedAddressIds = await (req.user as any).getAddresses()
+  const userOwnedAddressIds = (await req.user.getAddresses())
     .filter((addr) => !!addr.verified).map((addr) => addr.id);
   const thread = await models.OffchainThread.findOne({
     where: {
@@ -67,7 +67,7 @@ const deleteEditors = async (models, req: Request, res: Response, next: NextFunc
   return res.json({
     status: 'Success',
     result: {
-      collaborators: finalEditors.map((e) => e.Address.toJSON())
+      collaborators: finalEditors.map(async (e) => (await e.getAddress()).toJSON())
     },
   });
 };

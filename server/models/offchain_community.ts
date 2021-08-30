@@ -1,7 +1,8 @@
 import * as Sequelize from 'sequelize';
-
+import { Model, DataTypes } from 'sequelize';
+import { ModelStatic } from './types';
 import { AddressAttributes } from './address';
-import { ChainAttributes, ChainInstance } from './chain';
+import { ChainAttributes } from './chain';
 import { StarredCommunityAttributes } from './starred_community';
 import { OffchainTopicAttributes } from './offchain_topic';
 import { OffchainThreadAttributes } from './offchain_thread';
@@ -11,7 +12,9 @@ export interface OffchainCommunityAttributes {
   name: string;
   creator_id: number;
   default_chain: string;
-  iconUrl: string;
+  featured_topics?: string[];
+  privacyEnabled?: boolean;
+  invitesEnabled?: boolean;
   description?: string;
   website?: string;
   discord?: string;
@@ -19,13 +22,11 @@ export interface OffchainCommunityAttributes {
   telegram?: string;
   github?: string;
   terms?: string;
-  featured_topics?: string[];
-  privacyEnabled?: boolean;
-  invitesEnabled?: boolean;
-  stagesEnabled: boolean;
-  additionalStages: string;
   customDomain?: string;
-  collapsed_on_homepage: boolean;
+  iconUrl?: string;
+  stagesEnabled?: boolean;
+  customStages?: string;
+  collapsed_on_homepage?: boolean;
   created_at?: Date;
   updated_at?: Date;
   deleted_at?: Date;
@@ -39,20 +40,15 @@ export interface OffchainCommunityAttributes {
 }
 
 export interface OffchainCommunityInstance
-extends Sequelize.Instance<OffchainCommunityAttributes>, OffchainCommunityAttributes {
+extends Model<OffchainCommunityAttributes>, OffchainCommunityAttributes {}
 
-}
-
-export interface OffchainCommunityModel
-extends Sequelize.Model<OffchainCommunityInstance, OffchainCommunityAttributes> {
-
-}
+export type OffchainCommunityModelStatic = ModelStatic<OffchainCommunityInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): OffchainCommunityModel => {
-  const OffchainCommunity = sequelize.define<OffchainCommunityInstance, OffchainCommunityAttributes>(
+  dataTypes: typeof DataTypes,
+): OffchainCommunityModelStatic => {
+  const OffchainCommunity = <OffchainCommunityModelStatic>sequelize.define(
     'OffchainCommunity', {
       id: { type: dataTypes.STRING, primaryKey: true },
       name: { type: dataTypes.STRING, allowNull: false },
@@ -75,11 +71,16 @@ export default (
       privacyEnabled: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
       invitesEnabled: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
       stagesEnabled: { type: dataTypes.BOOLEAN, allowNull: true, defaultValue: true },
-      additionalStages: { type: dataTypes.STRING, allowNull: true },
+      customStages: { type: dataTypes.STRING, allowNull: true },
       customDomain: { type: dataTypes.STRING, allowNull: true, },
       collapsed_on_homepage: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: true },
     }, {
-      underscored: true,
+      tableName: 'OffchainCommunities',
+      timestamps: true,
+      createdAt: 'created_at',
+      updatedAt: 'updated_at',
+      deletedAt: 'deleted_at',
+      underscored: false,
       paranoid: true,
       indexes: [
         { fields: ['id'], unique: true },

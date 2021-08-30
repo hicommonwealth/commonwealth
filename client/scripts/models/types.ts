@@ -27,30 +27,34 @@ export enum ChainNetwork {
   Darwinia = 'darwinia',
   Phala = 'phala',
   Centrifuge = 'centrifuge',
-  Cosmos = 'cosmos',
   Straightedge = 'straightedge',
   Osmosis = 'osmosis',
   Injective = 'injective',
   Ethereum = 'ethereum',
   NEAR = 'near',
   Moloch = 'moloch',
-  Marlin = 'marlin',
-  MarlinTestnet = 'marlin-testnet',
+  Compound = 'compound',
+  Aave = 'aave',
+  AaveLocal = 'aave-local',
+  dYdX = 'dydx',
   Metacartel = 'metacartel',
   ALEX = 'alex',
   Commonwealth = 'commonwealth',
   ERC20 = 'erc20',
   Clover = 'clover',
   HydraDX = 'hydradx',
+  Yearn = 'yearn',
+  Fei = 'fei',
+  Sushi = 'sushi',
   Crust = 'crust',
-  CosmosHub = 'cosmos-hub',
+  CosmosHub = 'cosmoshub',
   Gaia13k = 'gaia-13k',
 }
 
 // This function returns a default chain for a chainbase
 export function baseToNetwork(n: ChainBase): ChainNetwork {
   switch (n) {
-    case ChainBase.CosmosSDK: return ChainNetwork.Cosmos;
+    case ChainBase.CosmosSDK: return ChainNetwork.Osmosis;
     case ChainBase.Substrate: return ChainNetwork.Edgeware;
     case ChainBase.Ethereum: return ChainNetwork.Ethereum;
     case ChainBase.NEAR: return ChainNetwork.NEAR;
@@ -109,12 +113,13 @@ export enum VotingType {
   MultiOptionVoting = 'multioption',
   None = 'none',
   MolochYesNo = 'moloch',
-  MarlinYesNo = 'marlin',
+  CompoundYesNo = 'compound',
 }
 export enum VotingUnit {
   OnePersonOneVote = '1p1v',
   CoinVote = 'coin',
   ConvictionCoinVote = 'conviction_coin',
+  PowerVote = 'power',
   None = 'none',
 }
 

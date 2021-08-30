@@ -4,9 +4,10 @@ import moment from 'moment';
 import { parseUserMentions } from '../util/parseUserMentions';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
-import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
+import { getProposalUrl, renderQuillDeltaToText, validURL } from '../../shared/utils';
 import { NotificationCategories, ProposalType } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
+import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -14,10 +15,11 @@ export const Errors = {
   NoThreadId: 'Must provide thread_id',
   NoBodyOrAttachment: 'Must provide body or attachment',
   IncorrectOwner: 'Not owned by this user',
+  InvalidLink: 'Invalid thread URL'
 };
 
-const editThread = async (models, req: Request, res: Response, next: NextFunction) => {
-  const { body, title, kind, stage, thread_id, version_history, } = req.body;
+const editThread = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+  const { body, title, kind, stage, thread_id, version_history, url } = req.body;
   if (!thread_id) {
     return next(new Error(Errors.NoThreadId));
   }
@@ -41,12 +43,13 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
         description: 'image',
       });
     } else if (req.body['attachments[]']) {
-      await Promise.all(req.body['attachments[]'].map((url) => models.OffchainAttachment.create({
-        attachable: 'thread',
-        attachment_id: thread_id,
-        url,
-        description: 'image',
-      })));
+      await Promise.all(req.body['attachments[]']
+        .map((url_) => models.OffchainAttachment.create({
+          attachable: 'thread',
+          attachment_id: thread_id,
+          url: url_,
+          description: 'image',
+        })));
     }
   };
 
@@ -105,6 +108,13 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
     if (title) {
       thread.title = title;
     }
+    if (url && thread.kind === 'link') {
+      if (validURL(url)) {
+        thread.url = url;
+      } else {
+        return next(new Error(Errors.InvalidLink));
+      }
+    }
     await thread.save();
     await attachFiles();
     const finalThread = await models.OffchainThread.findOne({
@@ -113,7 +123,7 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
         { model: models.Address, as: 'Address' },
         {
           model: models.Address,
-          through: models.Collaboration,
+          // through: models.Collaboration,
           as: 'collaborators'
         },
         models.OffchainAttachment,

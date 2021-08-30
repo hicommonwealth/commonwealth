@@ -1,11 +1,10 @@
-import Sequelize from 'sequelize';
+import { Op } from 'sequelize';
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../../shared/logging';
 import testSubstrateSpec from '../util/testSubstrateSpec';
+import { DB } from '../database';
 
-const Op = Sequelize.Op;
 const log = factory.getLogger(formatFilename(__filename));
-
 export const Errors = {
   NotLoggedIn: 'Not logged in',
   MustBeAdmin: 'Must be admin',
@@ -15,7 +14,7 @@ export const Errors = {
   InvalidJSON: 'Substrate spec supplied has invalid JSON'
 };
 
-const addChainNode = async (models, req: Request, res: Response, next: NextFunction) => {
+const addChainNode = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {
     return next(new Error(Errors.NotLoggedIn));
   }
@@ -25,9 +24,11 @@ const addChainNode = async (models, req: Request, res: Response, next: NextFunct
   if (!req.body.id || !req.body.name || !req.body.symbol || !req.body.network || !req.body.node_url || !req.body.base) {
     return next(new Error(Errors.MissingParams));
   }
+
+  let sanitizedSpec;
   if (req.body.substrate_spec) {
     try {
-      await testSubstrateSpec(req.body.substrate_spec, req.body.node_url);
+      sanitizedSpec = await testSubstrateSpec(req.body.substrate_spec, req.body.node_url);
     } catch (e) {
       return next(new Error('Failed to validate Substrate Spec'));
     }
@@ -41,7 +42,7 @@ const addChainNode = async (models, req: Request, res: Response, next: NextFunct
     ]
   } });
   if (chain) {
-    const existingNode = await models.ChainNode.find({ where: {
+    const existingNode = await models.ChainNode.findOne({ where: {
       chain: chain.id,
       url: req.body.node_url,
     } });
@@ -57,7 +58,7 @@ const addChainNode = async (models, req: Request, res: Response, next: NextFunct
       icon_url: req.body.icon_url,
       active: true,
       base: req.body.base,
-      substrate_spec: req.body.substrate_spec ? req.body.substrate_spec : '',
+      substrate_spec: sanitizedSpec || '',
       website: req.body.website ? req.body.website : '',
       discord: req.body.discord ? req.body.discord : '',
       telegram: req.body.telegram ? req.body.telegram : '',

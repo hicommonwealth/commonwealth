@@ -9,6 +9,7 @@ import BN from 'bn.js';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { CompactModalExitButton } from 'views/modal';
 import { tokensToTokenBaseUnits } from 'helpers';
+import { stubFalse } from 'lodash';
 interface INewTopicModalForm {
   id: number,
   name: string,
@@ -33,9 +34,14 @@ const NewTopicModal: m.Component<{
   view: (vnode) => {
     if (!app.user.isSiteAdmin && !app.user.isAdminOfEntity({ chain: app.activeChainId(),
       community: app.activeCommunityId() })) return null;
-    const { id, name, description, featured_in_sidebar, token_threshold, featured_in_new_post } = vnode.attrs;
     if (!vnode.state.form) {
-      vnode.state.form = { id, name, description, token_threshold, featured_in_sidebar, featured_in_new_post };
+      vnode.state.form = {
+        id: undefined,
+        name: '',
+        description: '',
+        token_threshold: '0',
+        featured_in_sidebar: false,
+        featured_in_new_post: false };
     }
 
     return m('.NewTopicModal', [

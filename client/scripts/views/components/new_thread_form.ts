@@ -26,10 +26,8 @@ import QuillEditor from 'views/components/quill_editor';
 import TopicSelector from 'views/components/topic_selector';
 import EditProfileModal from 'views/modals/edit_profile_modal';
 
-import Token from 'controllers/chain/ethereum/token/adapter';
 import QuillFormattedText from './quill_formatted_text';
 import MarkdownFormattedText from './markdown_formatted_text';
-
 
 interface IThreadForm {
   topicName?: string;
@@ -148,7 +146,7 @@ const newThread = async (
       ? quillEditorState.editor.getText()
       : JSON.stringify(quillEditorState.editor.getContents());
 
-  let { topicName, topicId, threadTitle, linkTitle, url } = form;
+  const { topicName, topicId, threadTitle, linkTitle, url } = form;
   const title = threadTitle || linkTitle;
   const attachments = [];
   const chainId = app.activeCommunityId() ? null : app.activeChainId();
@@ -164,7 +162,7 @@ const newThread = async (
       chainId,
       communityId,
       title,
-      (topicName) ? topicName : 'General', // if no topic name set to default
+      topicName || 'General', // if no topic name set to default
       topicId,
       bodyText,
       url,
@@ -185,7 +183,7 @@ const newThread = async (
   await app.user.notifications.refresh();
 
   navigateToSubpage(`/proposal/discussion/${result.id}`);
-
+  
   if (result.topic) {
     try {
       const topicNames = Array.isArray(activeEntity?.meta?.topics)
@@ -442,7 +440,6 @@ export const NewThreadForm: m.Component<{
     const discussionDrafts = app.user.discussionDrafts.store.getByCommunity(app.activeId());
     const { fromDraft, postType, saving } = vnode.state;
     const isAdmin = app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
-
     return m('.NewThreadForm', {
       class: `${postType === PostType.Link ? 'link-post' : ''} `
         + `${postType !== PostType.Link && discussionDrafts.length > 0 ? 'has-drafts' : ''} `
@@ -565,6 +562,7 @@ export const NewThreadForm: m.Component<{
               },
               placeholder: 'Comment (optional)',
               editorNamespace: 'new-link',
+              imageUploader: true,
               tabindex: 4,
             })
           ]),
@@ -660,6 +658,7 @@ export const NewThreadForm: m.Component<{
                 vnode.state.quillEditorState = state;
               },
               editorNamespace: 'new-discussion',
+              imageUploader: true,
               tabindex: 3,
             }),
           ]),

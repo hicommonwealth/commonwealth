@@ -1,7 +1,9 @@
 import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
+import BN from 'bn.js';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { NotificationCategories } from '../../shared/types';
+import { DB } from '../database';
 
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
@@ -15,7 +17,6 @@ const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 
 const log = factory.getLogger(formatFilename(__filename));
-
 export const Errors = {
   MissingRootId: 'Must provide root_id',
   InvalidParent: 'Invalid parent',
@@ -28,7 +29,7 @@ export const Errors = {
 };
 
 const createComment = async (
-  models,
+  models: DB,
   tokenBalanceCache: TokenBalanceCache,
   req: Request,
   res: Response,
@@ -58,7 +59,7 @@ const createComment = async (
         const threshold = (await models.OffchainTopic.findOne({ where: { id: thread.topic_id } })).token_threshold;
         const tokenBalance = await tokenBalanceCache.getBalance(chain.id, req.body.address);
 
-        if (threshold && tokenBalance.lt(threshold)) return next(new Error(Errors.InsufficientTokenBalance));
+        if (threshold && tokenBalance.lt(new BN(threshold))) return next(new Error(Errors.InsufficientTokenBalance));
       } catch (e) {
         log.error(`hasToken failed: ${e.message}`);
         return next(new Error(Errors.CouldNotFetchTokenBalance));
@@ -258,7 +259,7 @@ const createComment = async (
       mentionedAddresses = await Promise.all(mentions.map(async (mention) => {
         const user = await models.Address.findOne({
           where: {
-            chain: mention[0],
+            chain: mention[0] || null,
             address: mention[1],
           },
           include: [ models.User, models.Role ]

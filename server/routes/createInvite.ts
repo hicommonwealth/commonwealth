@@ -5,6 +5,7 @@ import { SERVER_URL, SENDGRID_API_KEY } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
 import { DynamicTemplate } from '../../shared/types';
 const log = factory.getLogger(formatFilename(__filename));
+import { DB } from '../database';
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 
@@ -18,7 +19,7 @@ export const Errors = {
   FailedToSendEmail: 'Could not send invite email',
 };
 
-const createInvite = async (models, req: Request, res: Response, next: NextFunction) => {
+const createInvite = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
   if (!req.user) return next(new Error('Not logged in'));
@@ -90,7 +91,7 @@ const createInvite = async (models, req: Request, res: Response, next: NextFunct
 
   const inviteChainOrCommObj = chain
     ? { chain_id: chain.id, community_name: chain.name }
-    : { community_id: community.id, community_name: community.name }
+    : { community_id: community.id, community_name: community.name };
 
   const previousInvite = await models.InviteCode.findOne({
     where: {
