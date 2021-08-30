@@ -12,7 +12,7 @@ const log = factory.getLogger(formatFilename(__filename));
 const bulkThreads = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
   if (error) return next(new Error(error));
-  const { cutoff_date, topic_id, stage } = req.query;
+  const { cutoff_date, topic_id, stage_id } = req.query;
 
   const communityOptions = community
     ? `community = :community `
@@ -27,9 +27,9 @@ const bulkThreads = async (models: DB, req: Request, res: Response, next: NextFu
     topicOptions += `AND t.topic_id = :topic_id `;
     replacements['topic_id'] = topic_id;
   }
-  if (stage) {
-    topicOptions += `AND t.stage = :stage `;
-    replacements['stage'] = stage;
+  if (stage_id) {
+    topicOptions += `AND t.stage_id = :stage_id `;
+    replacements['stage_id'] = stage_id;
   }
 
   replacements['created_at'] = cutoff_date;
@@ -42,7 +42,8 @@ const bulkThreads = async (models: DB, req: Request, res: Response, next: NextFu
       SELECT addr.id AS addr_id, addr.address AS addr_address,
         addr.chain AS addr_chain, thread_id, thread_title,
         thread_community, thread_chain, thread_created, threads.kind,
-        threads.read_only, threads.body, threads.stage,
+        threads.read_only, threads.body,
+        st.id AS stage_id, st.name AS stage_name,
         threads.offchain_voting_options, threads.offchain_voting_votes, threads.offchain_voting_ends_at,
         threads.url, threads.pinned, topics.id AS topic_id, topics.name AS topic_name,
         topics.description AS topic_description, topics.chain_id AS topic_chain,
@@ -54,7 +55,7 @@ const bulkThreads = async (models: DB, req: Request, res: Response, next: NextFu
           t.created_at AS thread_created, t.community AS thread_community,
           t.chain AS thread_chain, t.read_only, t.body,
           t.offchain_voting_options, t.offchain_voting_votes, t.offchain_voting_ends_at,
-          t.stage, t.url, t.pinned, t.topic_id, t.kind, ARRAY_AGG(DISTINCT
+          t.stage_id, t.url, t.pinned, t.topic_id, t.kind, ARRAY_AGG(DISTINCT
             CONCAT(
               '{ "address": "', editors.address, '", "chain": "', editors.chain, '" }'
               )
@@ -94,7 +95,9 @@ const bulkThreads = async (models: DB, req: Request, res: Response, next: NextFu
         ) threads
       ON threads.address_id = addr.id
       LEFT JOIN "OffchainTopics" topics
-      ON threads.topic_id = topics.id`;
+      ON threads.topic_id = topics.id
+      LEFT JOIN "OffchainStages" AS st
+      ON st.id = threads.stage_id`;
 
     let preprocessedThreads, threadsInVoting;
     try {
@@ -126,7 +129,10 @@ const bulkThreads = async (models: DB, req: Request, res: Response, next: NextFu
         body: t.body,
         last_edited,
         kind: t.kind,
-        stage: t.stage,
+        stage: {
+          id: t.stage_id,
+          name: t.stage_name
+        },
         read_only: t.read_only,
         pinned: t.pinned,
         community: t.thread_community,
@@ -223,10 +229,10 @@ const bulkThreads = async (models: DB, req: Request, res: Response, next: NextFu
   });
 
   const countsQuery = `
-     SELECT thread.id, thread.title, stage.name as stage.name
-     FROM "OffchainThreads" AS "thread"
-     LEFT OUTER JOIN "OffchainStages" AS "stage" ON stage.id = thread.stage_id
-     WHERE ${communityOptions} AND (stage.name = 'proposal_in_review' OR stage.name = 'voting')`;
+     SELECT thread.id, thread.title, st.*
+     FROM "OffchainThreads" AS thread
+     LEFT JOIN "OffchainStages" AS st ON st.id = thread.stage_id
+     WHERE ${communityOptions} AND (st.name = 'proposal_in_review' OR st.name = 'voting')`;
 
   const threadsInVoting: OffchainThreadInstance[] = await models.sequelize.query(countsQuery, {
     replacements,

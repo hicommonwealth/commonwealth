@@ -183,7 +183,11 @@ const DiscussionRowMenu: m.Component<{ proposal: OffchainThread }, {
       vnode.state.stageEditorIsOpen && m(StageEditor, {
         thread: vnode.attrs.proposal,
         popoverMenu: true,
-        onChangeHandler: (stage: OffchainThreadStage) => { proposal.stage = stage; m.redraw(); },
+        onChangeHandler: (stage: OffchainThreadStage) => {
+          // TODO: James
+          // proposal.stage = stage;
+          m.redraw();
+        },
         openStateHandler: (v) => { vnode.state.stageEditorIsOpen = v; m.redraw(); },
       })
     ]);

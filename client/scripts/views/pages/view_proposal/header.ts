@@ -252,7 +252,7 @@ export const ProposalHeaderStage: m.Component<{ proposal: OffchainThread }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     if (!proposal) return;
-    if (proposal.stage === OffchainThreadStage.Discussion) return;
+    if (proposal.stage?.name === OffchainThreadStage.Discussion) return;
 
     return m('a.ProposalHeaderStage', {
       href: `/${proposal.chain || proposal.community}?stage=${proposal.stage}`,
@@ -260,11 +260,11 @@ export const ProposalHeaderStage: m.Component<{ proposal: OffchainThread }> = {
         e.preventDefault();
         navigateToSubpage(`?stage=${proposal.stage}`);
       },
-      class: proposal.stage === OffchainThreadStage.ProposalInReview ? 'positive'
-        : proposal.stage === OffchainThreadStage.Voting ? 'positive'
-          : proposal.stage === OffchainThreadStage.Passed ? 'positive'
-            : proposal.stage === OffchainThreadStage.Failed ? 'negative' : 'positive',
-    }, offchainThreadStageToLabel(proposal.stage));
+      class: proposal.stage?.name === OffchainThreadStage.ProposalInReview ? 'positive'
+        : proposal.stage?.name === OffchainThreadStage.Voting ? 'positive'
+          : proposal.stage?.name === OffchainThreadStage.Passed ? 'positive'
+            : proposal.stage?.name === OffchainThreadStage.Failed ? 'negative' : 'positive',
+    }, offchainThreadStageToLabel(proposal.stage?.name));
   }
 };
 

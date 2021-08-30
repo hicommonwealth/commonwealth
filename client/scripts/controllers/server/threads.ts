@@ -15,6 +15,7 @@ import {
   OffchainTopic,
   Profile,
   ChainEntity,
+  OffchainStage,
 } from 'models';
 
 import { notifyError } from 'controllers/app/notifications';
@@ -206,7 +207,7 @@ class ThreadsController {
       this._store.add(result);
 
       // Update stage counts
-      if (result.stage === OffchainThreadStage.Voting) this.numVotingThreads++;
+      if (result.stage?.name === OffchainThreadStage.Voting) this.numVotingThreads++;
 
       // New posts are added to both the topic and allProposals sub-store
       const storeOptions = { allProposals: true, exclusive: false };
@@ -243,7 +244,7 @@ class ThreadsController {
         'community': app.activeCommunityId(),
         'thread_id': proposal.id,
         'kind': proposal.kind,
-        'stage': proposal.stage,
+        'stage_id': proposal.stage?.id,
         'body': encodeURIComponent(newBody),
         'title': newTitle,
         'url': url,
@@ -253,8 +254,8 @@ class ThreadsController {
       success: (response) => {
         const result = modelFromServer(response.result);
         // Update counters
-        if (proposal.stage === OffchainThreadStage.Voting) this.numVotingThreads--;
-        if (result.stage === OffchainThreadStage.Voting) this.numVotingThreads++;
+        if (proposal.stage?.name === OffchainThreadStage.Voting) this.numVotingThreads--;
+        if (result.stage?.name === OffchainThreadStage.Voting) this.numVotingThreads++;
         // Post edits propagate to all thread stores
         this._store.update(result);
         this._listingStore.update(result);
@@ -321,7 +322,7 @@ class ThreadsController {
     });
   }
 
-  public async setStage(args: { threadId: number, stage: OffchainThreadStage }) {
+  public async setStage(args: { threadId: number, stage: OffchainStage }) {
     await $.ajax({
       url: `${app.serverUrl()}/updateStages`,
       type: 'POST',
@@ -329,14 +330,14 @@ class ThreadsController {
         'chain': app.activeChainId(),
         'community': app.activeCommunityId(),
         'thread_id': args.threadId,
-        'stage_name': args.stage,
+        'stage_id': args.stage?.id,
         'jwt': app.user.jwt
       },
       success: (response) => {
         const result = modelFromServer(response.result);
         // Update counters
-        if (args.stage === OffchainThreadStage.Voting) this.numVotingThreads--;
-        if (result.stage === OffchainThreadStage.Voting) this.numVotingThreads++;
+        if (args.stage?.name === OffchainThreadStage.Voting) this.numVotingThreads--;
+        if (result.stage?.name === OffchainThreadStage.Voting) this.numVotingThreads++;
         // Post edits propagate to all thread stores
         this._store.update(result);
         this._listingStore.update(result);
@@ -452,16 +453,16 @@ class ThreadsController {
     communityId: string,
     cutoffDate: moment.Moment,
     topicId?: OffchainTopic
-    stage?: string,
+    stageId?: string,
   }) : Promise<boolean> {
-    const { chainId, communityId, cutoffDate, topicId, stage } = options;
+    const { chainId, communityId, cutoffDate, topicId, stageId } = options;
     const params = {
       chain: chainId,
       community: communityId,
       cutoff_date: cutoffDate.toISOString(),
     };
     if (topicId) params['topic_id'] = topicId;
-    if (stage) params['stage'] = stage;
+    if (stageId) params['stage_id'] = stageId;
     const response = await $.get(`${app.serverUrl()}/bulkThreads`, params);
     if (response.status !== 'Success') {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);
@@ -474,7 +475,7 @@ class ThreadsController {
       }
       try {
         const storeOptions = {
-          allProposals: !topicId && !stage,
+          allProposals: !topicId && !stageId,
           exclusive: true
         };
         this._store.add(modeledThread);

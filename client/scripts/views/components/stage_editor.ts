@@ -7,7 +7,7 @@ import { QueryList, ListItem, Button, Classes, Dialog, InputSelect, Icon, Icons,
 
 import app from 'state';
 import { offchainThreadStageToLabel, parseCustomStages } from 'helpers';
-import { ChainEntity, OffchainThread, OffchainThreadStage } from 'models';
+import { ChainEntity, OffchainStage, OffchainThread, OffchainThreadStage } from 'models';
 import { chainEntityTypeToProposalName } from 'identifiers';
 import ChainEntityController, { EntityRefreshOption } from 'controllers/server/chain_entities';
 
@@ -92,7 +92,7 @@ const StageEditor: m.Component<{
   onChangeHandler: Function;
   openStateHandler: Function;
 }, {
-  stage: OffchainThreadStage;
+  stage: OffchainStage;
   isOpen: boolean;
   chainEntitiesToSet: ChainEntity[];
 }> = {
@@ -129,22 +129,25 @@ const StageEditor: m.Component<{
           m('.stage-options', [
             stages.map((targetStage) => m(Button, {
               class: 'discussions-stage',
-              active: vnode.state.stage === targetStage,
-              iconLeft: vnode.state.stage === targetStage ? Icons.CHECK : null,
+              active: vnode.state.stage?.name === targetStage,
+              iconLeft: vnode.state.stage?.name === targetStage ? Icons.CHECK : null,
               rounded: true,
               size: 'sm',
               label: offchainThreadStageToLabel(targetStage),
               onclick: (e) => {
-                vnode.state.stage = targetStage;
+                // TODO: James
+                // vnode.state.stage?.name = targetStage;
               }
             })),
           ]),
           m(ChainEntitiesSelector, {
             thread: vnode.attrs.thread,
             onSelect: (result) => {
-              if (vnode.state.stage === OffchainThreadStage.Discussion
-                  || vnode.state.stage === OffchainThreadStage.ProposalInReview) {
-                vnode.state.stage = OffchainThreadStage.Voting;
+              if (vnode.state.stage?.name === OffchainThreadStage.Discussion
+                  || vnode.state.stage?.name === OffchainThreadStage.ProposalInReview) {
+
+                // TODO: James
+                // vnode.state.stage?.name = OffchainThreadStage.Voting;
               }
             },
             chainEntitiesToSet: vnode.state.chainEntitiesToSet,

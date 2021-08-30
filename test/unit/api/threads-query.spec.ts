@@ -28,7 +28,8 @@ describe('Thread queries', () => {
         address_id: address.id,
         title: 'title',
         kind: 'kind',
-        stage: 'stage',
+        // TODO: James
+        // stage: 'stage',
       },
     }))[0];
     expect(thread.id).to.be.greaterThan(0);

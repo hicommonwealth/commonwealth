@@ -290,8 +290,8 @@ const DiscussionsPage: m.Component<
     vnode.state.topicInitialized = {};
     vnode.state.topicInitialized[ALL_PROPOSALS_KEY] = true;
     const topic = vnode.attrs.topic;
-    const stage = m.route.param('stage');
-    const subpage = topic || stage ? `${topic || ''}#${stage || ''}` : ALL_PROPOSALS_KEY;
+    const stageId = m.route.param('stage_id');
+    const subpage = topic || stageId ? `${topic || ''}#${stageId || ''}` : ALL_PROPOSALS_KEY;
     const returningFromThread = app.lastNavigatedBack() && app.lastNavigatedFrom().includes('/proposal/discussion/');
     vnode.state.lookback[subpage] =      returningFromThread && localStorage[`${app.activeId()}-lookback-${subpage}`]
       ? moment.unix(parseInt(localStorage[`${app.activeId()}-lookback-${subpage}`], 10))
@@ -301,7 +301,7 @@ const DiscussionsPage: m.Component<
   },
   view: (vnode) => {
     const { topic } = vnode.attrs;
-    const stage = m.route.param('stage');
+    const stageId = m.route.param('stage_id');
     const activeEntity = app.community ? app.community : app.chain;
     if (!activeEntity)
       return m(PageLoading, {
@@ -309,7 +309,7 @@ const DiscussionsPage: m.Component<
         showNewProposalButton: true,
       });
 
-    const subpage = topic || stage ? `${topic || ''}#${stage || ''}` : ALL_PROPOSALS_KEY;
+    const subpage = topic || stageId ? `${topic || ''}#${stageId || ''}` : ALL_PROPOSALS_KEY;
 
     // add chain compatibility (node info?)
     if (app.community && !activeEntity?.serverLoaded)
@@ -352,7 +352,7 @@ const DiscussionsPage: m.Component<
     };
 
     let listing = [];
-    const allThreads = app.threads.listingStore.getByCommunityAndTopic(app.activeId(), topic, stage).sort(orderDiscussionsbyLastComment);
+    const allThreads = app.threads.listingStore.getByCommunityAndTopic(app.activeId(), topic, stageId).sort(orderDiscussionsbyLastComment);
 
     if (allThreads.length > 0) {
       // pinned threads - inserted at the top of the listing
@@ -449,7 +449,7 @@ const DiscussionsPage: m.Component<
         communityId: app.activeCommunityId(),
         cutoffDate: vnode.state.lookback[subpage],
         topicId,
-        stage,
+        stageId,
       };
 
       if (!vnode.state.topicInitialized[subpage]) {
@@ -502,10 +502,19 @@ const DiscussionsPage: m.Component<
       topicDescription = topicObject?.description;
     }
 
+    let stageName;
+    let stageDescription;
+    if (stageId && app.activeId()) {
+      const stages = app.stages.getByCommunity(app.activeId());
+      const stageObject = stages.find((t) => t.id.toString() === stageId);
+      topicName = stageObject?.name;
+      topicDescription = stageObject?.description;
+    }
+
     localStorage.setItem(`${app.activeId()}-lookback-${subpage}`, `${vnode.state.lookback[subpage].unix()}`);
     const stillFetching = allThreads.length === 0 && vnode.state.postsDepleted[subpage] === false;
-    const emptyTopic = allThreads.length === 0 && vnode.state.postsDepleted[subpage] === true && !stage;
-    const emptyStage = allThreads.length === 0 && vnode.state.postsDepleted[subpage] === true && !!stage;
+    const emptyTopic = allThreads.length === 0 && vnode.state.postsDepleted[subpage] === true && !stageId;
+    const emptyStage = allThreads.length === 0 && vnode.state.postsDepleted[subpage] === true && !!stageId;
 
     const isAdmin = app.user.isSiteAdmin || app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
     const isMod = app.user.isRoleOfCommunity({
@@ -525,7 +534,7 @@ const DiscussionsPage: m.Component<
       [
         (app.chain || app.community) && [
           m('.discussions-main', [
-            m(DiscussionStagesBar, { topic: topicName, stage }),
+            m(DiscussionStagesBar, { topic: topicName, stage: stageName }),
             app.chain && (!activeEntity || !activeEntity.serverLoaded || stillFetching)
               ? m('.discussions-main', [m(LoadingRow)])
               : emptyTopic

@@ -27,6 +27,7 @@ import {
   ChainEntity,
   ProposalModule,
   DepositVote,
+  OffchainStage,
 } from 'models';
 
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
@@ -222,7 +223,7 @@ const ProposalHeader: m.Component<{
                 && m(StageEditor, {
                   thread: vnode.attrs.proposal as OffchainThread,
                   popoverMenu: true,
-                  onChangeHandler: (stage: OffchainThreadStage, chainEntities: ChainEntity[]) => {
+                  onChangeHandler: (stage: OffchainStage, chainEntities: ChainEntity[]) => {
                     proposal.stage = stage;
                     proposal.chainEntities = chainEntities;
                     m.redraw();

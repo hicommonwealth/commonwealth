@@ -9,7 +9,7 @@ export async function sleep(msec) {
   return new Promise((resolve) => setTimeout(resolve, msec));
 }
 
-export function offchainThreadStageToLabel(stage: OffchainThreadStage) {
+export function offchainThreadStageToLabel(stage: OffchainThreadStage | string) {
   if (stage === OffchainThreadStage.Discussion) {
     return 'Discussion';
   } else if (stage === OffchainThreadStage.ProposalInReview) {
@@ -34,7 +34,7 @@ export function parseCustomStages(str) {
   } catch (e) {
     return [];
   }
-  return arr.map((s) => s?.toString()).filter(s => s) as unknown as OffchainThreadStage[];
+  return arr.map((s) => s?.toString()).filter((s) => s) as unknown as OffchainThreadStage[];
 }
 
 /*

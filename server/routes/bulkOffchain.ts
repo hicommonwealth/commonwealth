@@ -65,7 +65,8 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
         const query = `
           SELECT addr.id AS addr_id, addr.address AS addr_address,
             addr.chain AS addr_chain, thread_id, thread_title,
-            thread_community, thread_chain, thread_created, threads.kind, threads.stage,
+            thread_community, thread_chain, thread_created, threads.kind,
+            st.id AS stage_id, st.name AS stage_name,
             threads.read_only, threads.body, threads.offchain_voting_options,
             threads.offchain_voting_votes, threads.offchain_voting_ends_at,
             threads.url, threads.pinned, topics.id AS topic_id, topics.name AS topic_name,
@@ -78,7 +79,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
               t.created_at AS thread_created, t.community AS thread_community,
               t.chain AS thread_chain, t.read_only, t.body,
               t.offchain_voting_options, t.offchain_voting_votes, t.offchain_voting_ends_at,
-              t.stage, t.url, t.pinned, t.topic_id, t.kind, ARRAY_AGG(DISTINCT
+              t.stage_id, t.url, t.pinned, t.topic_id, t.kind, ARRAY_AGG(DISTINCT
                 CONCAT(
                   '{ "address": "', editors.address, '", "chain": "', editors.chain, '" }'
                   )
@@ -115,7 +116,9 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
           ) threads
           ON threads.address_id = addr.id
           LEFT JOIN "OffchainTopics" topics
-          ON threads.topic_id = topics.id`;
+          ON threads.topic_id = topics.id
+          LEFT JOIN "OffchainStages" AS st
+          ON st.id = threads.stage_id`;
 
         let preprocessedThreads;
         try {
@@ -146,7 +149,10 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
             body: t.body,
             last_edited,
             kind: t.kind,
-            stage: t.stage,
+            stage: {
+              id: t.stage_id,
+              name: t.stage_name,
+            },
             read_only: t.read_only,
             pinned: t.pinned,
             community: t.thread_community,
@@ -263,8 +269,9 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
       }
     }),
     models.sequelize.query(`
-     SELECT id, title, stage FROM "OffchainThreads"
-     WHERE ${communityOptions} AND (stage = 'proposal_in_review' OR stage = 'voting')`, {
+     SELECT t.id, t.title, st.* FROM "OffchainThreads" AS t
+     LEFT JOIN "OffchainStages" AS st ON t.stage_id = st.id
+     WHERE ${communityOptions} AND (st.name = 'proposal_in_review' OR st.name = 'voting')`, {
       replacements,
       type: QueryTypes.SELECT
     }),

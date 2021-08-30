@@ -16,7 +16,7 @@ import app from 'state';
 import { navigateToSubpage } from 'app';
 
 import { detectURL } from 'helpers/threads';
-import { OffchainTopic, OffchainThreadKind, OffchainThreadStage, CommunityInfo, NodeInfo } from 'models';
+import { OffchainTopic, OffchainThreadKind, OffchainThreadStage, CommunityInfo, NodeInfo, OffchainStage } from 'models';
 
 import { updateLastVisited } from 'controllers/app/login';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
@@ -109,7 +109,7 @@ const newThread = async (
   quillEditorState,
   author,
   kind = OffchainThreadKind.Forum,
-  stage = OffchainThreadStage.Discussion,
+  stage?: OffchainStage,
   readOnly?: boolean
 ) => {
   const topics = app.chain
@@ -157,7 +157,7 @@ const newThread = async (
     result = await app.threads.create(
       author.address,
       kind,
-      stage,
+      stage?.name || OffchainThreadStage.Discussion,
       chainId,
       communityId,
       title,
@@ -182,7 +182,7 @@ const newThread = async (
   await app.user.notifications.refresh();
 
   navigateToSubpage(`/proposal/discussion/${result.id}`);
-  
+
   if (result.topic) {
     try {
       const topicNames = Array.isArray(activeEntity?.meta?.topics)
@@ -484,7 +484,7 @@ export const NewThreadForm: m.Component<{
               onclick: (e) => {
                 vnode.state.overwriteConfirmationModal = true;
                 localStorage.setItem(`${app.activeId()}-from-draft`, `${fromDraft}`);
-                navigateToSubpage(`/new/thread`);
+                navigateToSubpage('/new/thread');
                 $(e.target).trigger('modalexit');
               },
             }),

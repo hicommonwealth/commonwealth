@@ -23,6 +23,9 @@ module.exports = {
         community_id: { type: Sequelize.STRING, allowNull: true },
         featured_in_sidebar: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: false },
         featured_in_new_post: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: false },
+        created_at: { type: Sequelize.DATE, allowNull: false },
+        updated_at: { type: Sequelize.DATE, allowNull: false },
+        deleted_at: Sequelize.DATE,
       });
       const stages = [];
       const [chains] = await queryInterface.sequelize.query('SELECT * FROM "Chains";');
@@ -33,7 +36,9 @@ module.exports = {
             if (stages.findIndex((item) => item.name === stage && item.chain_id === chain.id) < 0) {
               stages.push({
                 name: stage,
-                chain_id: chain.id
+                chain_id: chain.id,
+                created_at: new Date(),
+                updated_at: new Date(),
               });
             }
           });
@@ -47,7 +52,9 @@ module.exports = {
             if (stages.findIndex((item) => item.name === stage && item.community_id === community.id) < 0) {
               stages.push({
                 name: stage,
-                community_id: community.id
+                community_id: community.id,
+                created_at: new Date(),
+                updated_at: new Date(),
               });
             }
           });
@@ -60,7 +67,9 @@ module.exports = {
           if (chain && stages.findIndex((item) => item.name === thread.stage && item.chain_id === chain) < 0) {
             stages.push({
               name: stage,
-              chain_id: chain
+              chain_id: chain,
+              created_at: new Date(),
+              updated_at: new Date(),
             });
           }
           if (
@@ -68,7 +77,9 @@ module.exports = {
           ) {
             stages.push({
               name: stage,
-              community_id: community
+              community_id: community,
+              created_at: new Date(),
+              updated_at: new Date(),
             });
           }
         }
