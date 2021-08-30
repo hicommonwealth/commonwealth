@@ -47,7 +47,7 @@ const createGist = async (models: DB, req: Request, res: Response, next: NextFun
   const githubAccessToken = socialAccount.access_token;
   request
     .post('https://api.github.com/gists')
-    .set('Authorization', 'token ' + githubAccessToken)
+    .set('Authorization', `token ${githubAccessToken}`)
     .send(gistData)
     .end((err, res2) => {
       if (err) {

@@ -8,10 +8,10 @@ import mixpanel from 'mixpanel-browser';
 import { Button, ButtonGroup, Icon, Icons, Menu, MenuItem, MenuDivider, Popover } from 'construct-ui';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
+import { navigateToSubpage, initAppState } from 'app';
 import { AddressInfo, ChainBase, ChainInfo, CommunityInfo } from 'models';
 import { isSameAccount, pluralize } from 'helpers';
-import { initAppState } from 'app';
+
 import { notifySuccess } from 'controllers/app/notifications';
 
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';

@@ -211,16 +211,16 @@ const bulkThreads = async (models: DB, req: Request, res: Response, next: NextFu
     });
   }
 
-  const reactions = await models.OffchainReaction.findAll({
-    where: {
-      [Op.or]: [
-        { thread_id: threads.map((thread) => thread.id) },
-        { comment_id: comments.map((comment) => comment.id) },
-      ],
-    },
-    include: [ models.Address ],
-    order: [['created_at', 'DESC']],
-  });
+  // const reactions = await models.OffchainReaction.findAll({
+  //   where: {
+  //     [Op.or]: [
+  //       { thread_id: threads.map((thread) => thread.id) },
+  //       { comment_id: comments.map((comment) => comment.id) },
+  //     ],
+  //   },
+  //   include: [ models.Address ],
+  //   order: [['created_at', 'DESC']],
+  // });
 
   const countsQuery = `
      SELECT id, title, stage FROM "OffchainThreads"
@@ -238,7 +238,7 @@ const bulkThreads = async (models: DB, req: Request, res: Response, next: NextFu
       numVotingThreads,
       threads,
       comments, // already converted to JSON earlier
-      reactions: reactions.map((r) => r.toJSON()),
+      // reactions: reactions.map((r) => r.toJSON()),
     }
   });
 };

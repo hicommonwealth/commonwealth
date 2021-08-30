@@ -6,7 +6,17 @@ import { OffchainTopic } from 'models';
 import app from 'state';
 
 const modelFromServer = (topic) => {
-  return new OffchainTopic(topic.name, topic.id, topic.description, topic.telegram, topic.community_id, topic.chain_id, topic.featured_in_sidebar, topic.featured_in_new_post);
+  return new OffchainTopic(
+    topic.name,
+    topic.id,
+    topic.description,
+    topic.telegram,
+    topic.community_id,
+    topic.chain_id,
+    topic.featured_in_sidebar,
+    topic.featured_in_new_post,
+    topic.default_offchain_template
+  );
 };
 
 class TopicsController {
@@ -31,9 +41,10 @@ class TopicsController {
         'telegram': topic.telegram,
         'featured_in_sidebar': topic.featuredInSidebar,
         'featured_in_new_post': topic.featuredInNewPost,
+        'default_offchain_template': topic.defaultOffchainTemplate,
         'featured_order': featured_order,
         'address': app.user.activeAccount.address,
-        'jwt': app.user.jwt
+        'jwt': app.user.jwt,
       });
       const result = modelFromServer(response.result);
       if (this._store.getById(result.id)) {
@@ -72,7 +83,14 @@ class TopicsController {
     }
   }
 
-  public async add(name: string, description: string, telegram: string, featured_in_sidebar: boolean, featured_in_new_post: boolean) {
+  public async add(
+    name: string,
+    description: string,
+    telegram: string,
+    featuredInSidebar: boolean,
+    featuredInNewPost: boolean,
+    defaultOffchainTemplate: string
+  ) {
     try {
       const chainOrCommObj = (app.activeChainId())
         ? { 'chain': app.activeChainId() }
@@ -83,8 +101,9 @@ class TopicsController {
         'name': name,
         'description': description,
         'telegram': telegram,
-        'featured_in_sidebar': featured_in_sidebar,
-        'featured_in_new_post': featured_in_new_post,
+        'featured_in_sidebar': featuredInSidebar,
+        'featured_in_new_post': featuredInNewPost,
+        'default_offchain_template': defaultOffchainTemplate,
         'jwt': app.user.jwt,
       });
       const result = modelFromServer(response.result);
