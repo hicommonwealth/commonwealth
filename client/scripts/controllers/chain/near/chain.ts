@@ -109,6 +109,7 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
         purpose,
         metadata: '',
       },
+      // TODO: add far more configuration for initial policy
       // initial council
       policy: [ creator.address ],
     };
