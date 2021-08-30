@@ -8,35 +8,53 @@ import app from 'state';
 import { navigateToSubpage } from 'app';
 
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
+import QuillEditor from 'views/components/quill_editor';
 import { CompactModalExitButton } from 'views/modal';
 
 interface IEditTopicModalForm {
   description: string,
   id: number,
   name: string,
-  featured_in_sidebar: boolean,
-  featured_in_new_post: boolean,
+  featuredInSidebar: boolean,
+  featuredInNewPost: boolean
 }
 
 const EditTopicModal : m.Component<{
   description: string,
   id: number,
   name: string,
-  featured_in_sidebar: boolean,
-  featured_in_new_post: boolean,
+  featuredInSidebar: boolean,
+  featuredInNewPost: boolean,
+  defaultOffchainTemplate: string
 }, {
   error: any,
   form: IEditTopicModalForm,
   saving: boolean,
+  quillEditorState,
 }> = {
   view: (vnode) => {
     if (!app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })) return null;
-    const { id, name, description, featured_in_sidebar, featured_in_new_post } = vnode.attrs;
+    const { id, name, description, featuredInSidebar, featuredInNewPost, defaultOffchainTemplate } = vnode.attrs;
     if (!vnode.state.form) {
-      vnode.state.form = { id, name, description, featured_in_sidebar, featured_in_new_post };
+      vnode.state.form = { id, name, description, featuredInSidebar, featuredInNewPost };
     }
 
     const updateTopic = async (form) => {
+      const { quillEditorState } = vnode.state;
+      if (form.featuredInNewPost && quillEditorState.editor.editor.isBlank()) {
+        return;
+      }
+
+      if (quillEditorState) {
+        quillEditorState.editor.enable(false);
+      }
+
+      const mentionsEle = document.getElementsByClassName('ql-mention-list-container')[0];
+      if (mentionsEle) (mentionsEle as HTMLElement).style.visibility = 'hidden';
+      const bodyText = !quillEditorState ? ''
+        : quillEditorState.markdownMode
+          ? quillEditorState.editor.getText()
+          : JSON.stringify(quillEditorState.editor.getContents());
       const topicInfo = {
         id,
         description: form.description,
@@ -44,8 +62,9 @@ const EditTopicModal : m.Component<{
         communityId: app.activeCommunityId(),
         chainId: app.activeChainId(),
         telegram: null,
-        featuredInSidebar: form.featured_in_sidebar,
-        featuredInNewPost: form.featured_in_new_post
+        featuredInSidebar: form.featuredInSidebar,
+        featuredInNewPost: form.featuredInNewPost,
+        defaultOffchainTemplate: bodyText
       };
       await app.topics.edit(topicInfo);
       navigateToSubpage(`/discussions/${encodeURI(form.name.toString().trim())}`);
@@ -103,19 +122,57 @@ const EditTopicModal : m.Component<{
           m(FormGroup, [
             m(Checkbox, {
               label: 'Featured in Sidebar',
-              checked: vnode.state.form.featured_in_sidebar,
+              checked: vnode.state.form.featuredInSidebar,
               onchange: (e) => {
-                vnode.state.form.featured_in_sidebar = !vnode.state.form.featured_in_sidebar;
+                vnode.state.form.featuredInSidebar = !vnode.state.form.featuredInSidebar;
               },
             }),
           ]),
           m(FormGroup, [
             m(Checkbox, {
               label: 'Featured in New Post',
-              checked: vnode.state.form.featured_in_new_post,
+              checked: vnode.state.form.featuredInNewPost,
               onchange: (e) => {
-                vnode.state.form.featured_in_new_post = !vnode.state.form.featured_in_new_post;
+                vnode.state.form.featuredInNewPost = !vnode.state.form.featuredInNewPost;
               },
+            }),
+          ]),
+          vnode.state.form.featuredInNewPost && m(FormGroup, [
+            m(QuillEditor, {
+              contentsDoc: '',
+              oncreateBind: (state) => {
+                vnode.state.quillEditorState = state;
+
+                let newDraftMarkdown;
+                let newDraftDelta;
+                if (defaultOffchainTemplate) {
+                  try {
+                    newDraftDelta = JSON.parse(defaultOffchainTemplate);
+                    if (!newDraftDelta.ops) throw new Error();
+                  } catch (e) {
+                    newDraftMarkdown = defaultOffchainTemplate;
+                  }
+                }
+                // If the text format of the loaded draft differs from the current editor's mode,
+                // we update the current editor's mode accordingly, to preserve formatting
+                if (newDraftDelta && vnode.state.quillEditorState.markdownMode) {
+                  vnode.state.quillEditorState.markdownMode = false;
+                } else if (newDraftMarkdown && !vnode.state.quillEditorState.markdownMode) {
+                  vnode.state.quillEditorState.markdownMode = true;
+                }
+                if (newDraftDelta) {
+                  vnode.state.quillEditorState.editor.setContents(newDraftDelta);
+                } else if (newDraftMarkdown) {
+                  vnode.state.quillEditorState.editor.setText(newDraftMarkdown);
+                } else {
+                  vnode.state.quillEditorState.editor.setContents('');
+                  vnode.state.quillEditorState.editor.setText('');
+                }
+                m.redraw();
+              },
+              editorNamespace: 'new-discussion',
+              imageUploader: true,
+              tabindex: 3,
             }),
           ]),
           m(FormGroup, [
