@@ -118,8 +118,8 @@ type AddMemberToRole = { AddMemberToRole: { role: string, member_id: AccountId }
 type RemoveMemberFromRole = { RemoveMemberFromRole : { role: string, member_id: AccountId } };
 type Transfer = { Transfer: { token_id: AccountId, amount: U128, receiver_id: AccountId, msg?: string } };
 type FunctionCall = { FunctionCall: { actions: NearSputnikActionCall[], receiver_id: AccountId } };
+type ChangePolicy = { ChangePolicy: { policy: NearSputnikPolicy } };
 export type NearSputnikProposalKind = 'ChangeConfig'
-  | 'ChangePolicy'
   | 'UpgradeSelf'
   | 'UpgradeRemote'
   | 'Transfer'
@@ -127,6 +127,7 @@ export type NearSputnikProposalKind = 'ChangeConfig'
   | 'AddBounty'
   | 'BountyDone'
   | 'Vote'
+  | ChangePolicy
   | AddMemberToRole
   | RemoveMemberFromRole
   | Transfer
@@ -144,9 +145,12 @@ export function isTransfer(kind: NearSputnikProposalKind): kind is Transfer {
 export function isFunctionCall(kind: NearSputnikProposalKind): kind is FunctionCall {
   return (kind as any).FunctionCall !== undefined;
 }
+export function isChangePolicy(kind: NearSputnikProposalKind): kind is ChangePolicy {
+  return (kind as any).ChangePolicy !== undefined;
+}
+
 export function kindToPolicyLabel(kind: NearSputnikProposalKind): string {
   if (kind === 'ChangeConfig') return 'config';
-  if (kind === 'ChangePolicy') return 'policy';
   if (kind === 'UpgradeSelf') return 'upgrade_self';
   if (kind === 'UpgradeRemote') return 'upgrade_remote';
   if (kind === 'Transfer' || isTransfer(kind)) return 'transfer';
@@ -157,14 +161,19 @@ export function kindToPolicyLabel(kind: NearSputnikProposalKind): string {
   if (isAddMemberToRole(kind)) return 'add_member_to_role';
   if (isRemoveMemberFromRole(kind)) return 'remove_member_from_role';
   if (isFunctionCall(kind)) return 'call';
+  if (isChangePolicy(kind)) return 'policy';
   throw new Error(`invalid proposal kind: ${JSON.stringify(kind)}`);
 }
 export function getVotePolicy(policy: NearSputnikPolicy, kind: NearSputnikProposalKind): VotePolicy {
-  const policyString = kindToPolicyLabel(kind);
-  for (const role of policy.roles) {
-    if (role.vote_policy[policyString]) {
-      return role.vote_policy[policyString];
+  try {
+    const policyString = kindToPolicyLabel(kind);
+    for (const role of policy.roles) {
+      if (role.vote_policy[policyString]) {
+        return role.vote_policy[policyString];
+      }
     }
+  } catch (e) {
+    console.error(`Failed to get policy label: ${e.message}`);
   }
   return policy.default_vote_policy;
 }
