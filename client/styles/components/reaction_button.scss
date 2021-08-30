@@ -2,21 +2,31 @@
 
 .ReactionButton {
     display: flex;
+    justify-content: center;
+    align-items: center;
     cursor: pointer;
     user-select: none;
-    // border
-    &.large {
-        color: $text-color-medium;
-        border: 1px solid #ddd;
-        border-radius: 9999px;
+    width: 70px;
+    height: 30px;
+    margin-right: 7%;
+    padding: 6px;
+    border-radius: 20px;
+    border: none;
+    .cui-icon, .reply-count, .reactions-count {
+        color: black;
+        font-weight: 500;
+    }
+    .cui-icon {
+        margin-right: 8px;
+    }
+    .reply-count, .reactions-count {
+        position: relative;
+        top: 2px;
     }
     &:hover, &.active {
-        color: $primary-bg-color;
-        border-color: $primary-bg-color;
-        span {
-            color: inherit;
-        }
+        background: #FFF4F6;
     }
+    // border
     &.disabled {
         background: initial !important;
         color: $text-color-light !important;
@@ -27,7 +37,9 @@
         min-height: 43px !important;
         min-width: 45px !important;
         text-align: center;
-        border-radius: 12px;
+        color: $text-color-medium;
+        border: 1px solid #ddd;
+        border-radius: 9999px;
         .cui-icon {
             margin-right: none;
         }
