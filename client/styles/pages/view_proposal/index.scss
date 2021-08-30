@@ -59,20 +59,10 @@ $discussion-title-font-size: 1.45rem;
             display: flex;
             max-width: 300px;
             align-items: center;
-            .InlineReplyButton {
+            .InlineReplyButton:hover {
                 background: #F3FBFF;
             }
-            .ProposalBodyReaction {
-                background: #FFF4F6;
-            }
-            .InlineReplyButton:hover {
-                background: #bbe6fc;
-            }
-            .ProposalBodyReaction:hover {
-                background: #f5c2cb;
-            }
-            .InlineReplyButton,
-            .ProposalBodyReaction {
+            .InlineReplyButton {
                 margin-right: 7%;
                 padding: 6px;
                 cursor: pointer;
@@ -110,7 +100,7 @@ $discussion-title-font-size: 1.45rem;
     }
     .threading-level-2 {
         .InlineReplyButton {
-            display: none;
+            display: none !important;
         }
     }
     h3 {
