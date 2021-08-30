@@ -12,16 +12,16 @@ interface INewTopicModalForm {
   id: number,
   name: string,
   description: string,
-  featured_in_sidebar: boolean,
-  featured_in_new_post: boolean,
+  featuredInSidebar: boolean,
+  featuredInNewPost: boolean,
 }
 
 const NewTopicModal: m.Component<{
   id: number,
   name: string,
   description: string,
-  featured_in_sidebar: boolean,
-  featured_in_new_post: boolean,
+  featuredInSidebar: boolean,
+  featuredInNewPost: boolean,
 }, {
   error: any,
   form: INewTopicModalForm,
@@ -29,15 +29,18 @@ const NewTopicModal: m.Component<{
   quillEditorState,
 }> = {
   view: (vnode) => {
-    if (!app.user.isSiteAdmin && !app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })) return null;
-    const { id, name, description, featured_in_sidebar, featured_in_new_post } = vnode.attrs;
+    if (!app.user.isSiteAdmin
+    && !app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })) {
+      return null;
+    }
+    const { id, name, description, featuredInSidebar, featuredInNewPost } = vnode.attrs;
     if (!vnode.state.form) {
-      vnode.state.form = { id, name, description, featured_in_sidebar, featured_in_new_post };
+      vnode.state.form = { id, name, description, featuredInSidebar, featuredInNewPost };
     }
     let disabled = false;
     if (!vnode.state.form.name || !vnode.state.form.name.trim()) disabled = true;
 
-    if (vnode.state.form.featured_in_new_post
+    if (vnode.state.form.featuredInNewPost
       && vnode.state.quillEditorState
       && vnode.state.quillEditorState.editor
       && vnode.state.quillEditorState.editor.editor.isBlank()
@@ -86,22 +89,22 @@ const NewTopicModal: m.Component<{
           m(FormGroup, [
             m(Checkbox, {
               label: 'Featured in Sidebar',
-              checked: vnode.state.form.featured_in_sidebar,
+              checked: vnode.state.form.featuredInSidebar,
               onchange: (e) => {
-                vnode.state.form.featured_in_sidebar = !vnode.state.form.featured_in_sidebar;
+                vnode.state.form.featuredInSidebar = !vnode.state.form.featuredInSidebar;
               },
             }),
           ]),
           m(FormGroup, [
             m(Checkbox, {
               label: 'Featured in New Post',
-              checked: vnode.state.form.featured_in_new_post,
+              checked: vnode.state.form.featuredInNewPost,
               onchange: (e) => {
-                vnode.state.form.featured_in_new_post = !vnode.state.form.featured_in_new_post;
+                vnode.state.form.featuredInNewPost = !vnode.state.form.featuredInNewPost;
               },
             }),
           ]),
-          vnode.state.form.featured_in_new_post && m(FormGroup, [
+          vnode.state.form.featuredInNewPost && m(FormGroup, [
             m(QuillEditor, {
               contentsDoc: '',
               oncreateBind: (state) => {
@@ -126,7 +129,7 @@ const NewTopicModal: m.Component<{
 
               const mentionsEle = document.getElementsByClassName('ql-mention-list-container')[0];
               if (mentionsEle) (mentionsEle as HTMLElement).style.visibility = 'hidden';
-              const default_offchain_template = !quillEditorState ? ''
+              const defaultOffchainTemplate = !quillEditorState ? ''
                 : quillEditorState.markdownMode
                   ? quillEditorState.editor.getText()
                   : JSON.stringify(quillEditorState.editor.getContents());
@@ -135,9 +138,9 @@ const NewTopicModal: m.Component<{
                 form.name,
                 form.description,
                 null,
-                form.featured_in_sidebar,
-                form.featured_in_new_post,
-                default_offchain_template
+                form.featuredInSidebar,
+                form.featuredInNewPost,
+                defaultOffchainTemplate
               ).then(() => {
                 vnode.state.saving = false;
                 m.redraw();

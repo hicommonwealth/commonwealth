@@ -15,17 +15,17 @@ interface IEditTopicModalForm {
   description: string,
   id: number,
   name: string,
-  featured_in_sidebar: boolean,
-  featured_in_new_post: boolean
+  featuredInSidebar: boolean,
+  featuredInNewPost: boolean
 }
 
 const EditTopicModal : m.Component<{
   description: string,
   id: number,
   name: string,
-  featured_in_sidebar: boolean,
-  featured_in_new_post: boolean,
-  default_offchain_template: string
+  featuredInSidebar: boolean,
+  featuredInNewPost: boolean,
+  defaultOffchainTemplate: string
 }, {
   error: any,
   form: IEditTopicModalForm,
@@ -34,14 +34,14 @@ const EditTopicModal : m.Component<{
 }> = {
   view: (vnode) => {
     if (!app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })) return null;
-    const { id, name, description, featured_in_sidebar, featured_in_new_post, default_offchain_template } = vnode.attrs;
+    const { id, name, description, featuredInSidebar, featuredInNewPost, defaultOffchainTemplate } = vnode.attrs;
     if (!vnode.state.form) {
-      vnode.state.form = { id, name, description, featured_in_sidebar, featured_in_new_post };
+      vnode.state.form = { id, name, description, featuredInSidebar, featuredInNewPost };
     }
 
     const updateTopic = async (form) => {
       const { quillEditorState } = vnode.state;
-      if (form.featured_in_new_post && quillEditorState.editor.editor.isBlank()) {
+      if (form.featuredInNewPost && quillEditorState.editor.editor.isBlank()) {
         return;
       }
 
@@ -62,8 +62,8 @@ const EditTopicModal : m.Component<{
         communityId: app.activeCommunityId(),
         chainId: app.activeChainId(),
         telegram: null,
-        featuredInSidebar: form.featured_in_sidebar,
-        featuredInNewPost: form.featured_in_new_post,
+        featuredInSidebar: form.featuredInSidebar,
+        featuredInNewPost: form.featuredInNewPost,
         defaultOffchainTemplate: bodyText
       };
       await app.topics.edit(topicInfo);
@@ -122,22 +122,22 @@ const EditTopicModal : m.Component<{
           m(FormGroup, [
             m(Checkbox, {
               label: 'Featured in Sidebar',
-              checked: vnode.state.form.featured_in_sidebar,
+              checked: vnode.state.form.featuredInSidebar,
               onchange: (e) => {
-                vnode.state.form.featured_in_sidebar = !vnode.state.form.featured_in_sidebar;
+                vnode.state.form.featuredInSidebar = !vnode.state.form.featuredInSidebar;
               },
             }),
           ]),
           m(FormGroup, [
             m(Checkbox, {
               label: 'Featured in New Post',
-              checked: vnode.state.form.featured_in_new_post,
+              checked: vnode.state.form.featuredInNewPost,
               onchange: (e) => {
-                vnode.state.form.featured_in_new_post = !vnode.state.form.featured_in_new_post;
+                vnode.state.form.featuredInNewPost = !vnode.state.form.featuredInNewPost;
               },
             }),
           ]),
-          vnode.state.form.featured_in_new_post && m(FormGroup, [
+          vnode.state.form.featuredInNewPost && m(FormGroup, [
             m(QuillEditor, {
               contentsDoc: '',
               oncreateBind: (state) => {
@@ -145,12 +145,12 @@ const EditTopicModal : m.Component<{
 
                 let newDraftMarkdown;
                 let newDraftDelta;
-                if (default_offchain_template) {
+                if (defaultOffchainTemplate) {
                   try {
-                    newDraftDelta = JSON.parse(default_offchain_template);
+                    newDraftDelta = JSON.parse(defaultOffchainTemplate);
                     if (!newDraftDelta.ops) throw new Error();
                   } catch (e) {
-                    newDraftMarkdown = default_offchain_template;
+                    newDraftMarkdown = defaultOffchainTemplate;
                   }
                 }
                 // If the text format of the loaded draft differs from the current editor's mode,
