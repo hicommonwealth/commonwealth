@@ -3,6 +3,7 @@ import mixpanel from 'mixpanel-browser';
 import { WalletAccount, WalletConnection } from 'near-api-js';
 import { FunctionCallOptions } from 'near-api-js/lib/account';
 import BN from 'bn.js';
+import $ from 'jquery';
 
 import app from 'state';
 import { initAppState, navigateToSubpage } from 'app';
@@ -96,9 +97,31 @@ const validate = async (vnode: m.Vnode<{}, IState>, wallet: WalletConnection) =>
       if (tx.attachedDeposit) {
         tx.attachedDeposit = new BN(tx.attachedDeposit);
       }
+      if (tx.gas) {
+        tx.gas = new BN(tx.gas);
+      }
       await wallet.account().functionCall(tx as FunctionCallOptions);
     } catch (err) {
       vnode.state.validationError = err.message;
+    }
+  }
+
+  // create new chain handling
+  // TODO: we need to figure out how to clean this localStorage entry up
+  //   in the case of transaction failure!!
+  const chainName = m.route.param('chain_name');
+  if (chainName && localStorage[chainName]) {
+    try {
+      const chainCreateArgString = localStorage[chainName];
+      delete localStorage[chainName];
+
+      // POST object
+      const chainCreateArgs = JSON.parse(chainCreateArgString);
+      const res = await $.post(`${app.serverUrl()}/addChainNode`, chainCreateArgs);
+      await initAppState(false);
+      m.route.set(`${window.location.origin}/${res.result.chain}`);
+    } catch (err) {
+      vnode.state.validationError = `Failed to initialize chain node: ${err.message}`;
     }
   }
 };

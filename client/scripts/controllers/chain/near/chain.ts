@@ -120,7 +120,11 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
       public_key: pk,
       args,
     };
-    await this.redirectTx(contractId, methodName, propArgs, attachedDeposit);
+
+    // redirect back to /finishNearLogin for chain node creation
+    const id = this.isMainnet ? `${name}.sputnik-dao.near` : `${name}.sputnikv2.testnet`;
+    const redirectUrl = `${window.location.origin}/${this.app.activeChainId()}/finishNearLogin?chain_name=${id}`;
+    await this.redirectTx(contractId, methodName, propArgs, attachedDeposit, redirectUrl, '150000000000000');
   }
 
   public async redirectTx(
@@ -128,7 +132,8 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
     methodName: string,
     args: any,
     attachedDeposit?: string,
-    postTxRedirect?: string
+    postTxRedirect?: string,
+    gas?: string,
   ) {
     // construct tx object
     const functionCall: any = {
@@ -141,6 +146,9 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
     }
     if (postTxRedirect) {
       functionCall.walletCallbackUrl = postTxRedirect;
+    }
+    if (gas) {
+      functionCall.gas = gas;
     }
 
     // generate random identifier as localStorage key

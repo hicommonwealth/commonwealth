@@ -707,13 +707,15 @@ const SputnikForm: m.Component<SputnikFormAttrs, SputnikFormState> = {
             network: 'sputnik'
           };
           if (createNew) {
-            // TODO: validate
+            // TODO: we need to validate arguments prior to making this call/redirect, so that
+            //   /addChainNode doesn't fail after the DAO has been created
             // https://github.com/AngelBlock/sputnik-dao-2-mockup/blob/dev/src/Selector.jsx#L159
             try {
               const account = app.user.activeAccount as NearAccount;
               const v = new BN(initialValue);
               // write addChainNode data to localstorage to call in finishNearLogin page
               localStorage[id] = JSON.stringify(addChainNodeArgs);
+              // triggers a redirect
               await (app.chain as Near).chain.createDaoTx(account, name, description, v);
             } catch (err) {
               notifyError(err.responseJSON?.error || 'Creating DAO failed.');
