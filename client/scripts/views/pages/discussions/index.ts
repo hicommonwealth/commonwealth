@@ -244,35 +244,10 @@ const DiscussionStagesBar: m.Component<{ topic: string; stage: string }, {}> = {
                 e.preventDefault();
                 navigateToSubpage(`/?stage=${targetStage}`);
               },
-<<<<<<< HEAD
-              label: m('.stage-menu-item', [
-                m('.stage-menu-item-name', [
-                  `${offchainThreadStageToLabel(targetStage)}`,
-                  targetStage === OffchainThreadStage.Voting
-                    && [' ', m('.discussions-stage-count', `${app.threads.numVotingThreads}`)],
-                ]),
-                app.user?.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
-                  && m(Button, {
-                    size: 'xs',
-                    label: 'Edit',
-                    class: 'edit-stage-button',
-                    compact: true,
-                    rounded: true,
-                    onclick: (e) => {
-                      e.preventDefault();
-                      // app.modals.create({
-                      //   modal: EditTopicModal,
-                      //   data: { id, name, description, telegram, featured_in_sidebar, featured_in_new_post },
-                      // });
-                    },
-                  }),
-              ]),
-=======
               label: [
                 `${offchainThreadStageToLabel(targetStage)}`, targetStage === OffchainThreadStage.Voting
                 && [' ', m('.discussions-stage-count', `${app.threads.numVotingThreads}`)]
               ],
->>>>>>> master
             })),
           ]),
         }),
@@ -390,12 +365,8 @@ const DiscussionsPage: m.Component<
     };
 
     let listing = [];
-<<<<<<< HEAD
-    const allThreads = app.threads.listingStore.getByCommunityAndTopic(app.activeId(), topic, stageId).sort(orderDiscussionsbyLastComment);
-=======
-    const allThreads = app.threads.listingStore.getByCommunityAndTopic(app.activeId(), topic, stage)
+    const allThreads = app.threads.listingStore.getByCommunityAndTopic(app.activeId(), topic, stageId)
       .sort(orderDiscussionsbyLastComment);
->>>>>>> master
 
     if (allThreads.length > 0) {
       // pinned threads - inserted at the top of the listing
