@@ -527,7 +527,6 @@ const DiscussionsPage: m.Component<
       chain: app.activeChainId(),
       community: app.activeCommunityId(),
     });
-    console.log('still fetching', stillFetching);
     return m(
       Sublayout,
       {
