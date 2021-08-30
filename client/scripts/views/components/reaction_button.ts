@@ -159,22 +159,10 @@ const ReactionButton: m.Component<ReactionButtonAttrs, ReactionButtonState> = {
         }
       },
     }, (type === ReactionType.Dislike) && [
-      large
-        ? m('.reactions-icon', '▾')
-        : m(Icon, {
-          class: 'reactions-icon',
-          name: Icons.THUMBS_DOWN,
-          size: Size.XL,
-        }),
+      m('.upvote-icon', large ? '▾' : '👎'),
       m('.upvote-count', vnode.state.dislikes),
     ], (type === ReactionType.Like) && [
-      large
-        ? m('.reactions-icon', '▾')
-        : m(Icon, {
-          class: 'reactions-icon',
-          name: Icons.THUMBS_UP,
-          size: Size.XL,
-        }),
+      m('.reactions-icon', large ? '▾' : '👍'),
       m('.reactions-count', vnode.state.likes),
     ]);
 
