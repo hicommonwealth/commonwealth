@@ -1,6 +1,8 @@
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
-import { WalletAccount } from 'near-api-js';
+import { WalletAccount, WalletConnection } from 'near-api-js';
+import { FunctionCallOptions } from 'near-api-js/lib/account';
+import BN from 'bn.js';
 
 import app from 'state';
 import { initAppState, navigateToSubpage } from 'app';
@@ -42,10 +44,63 @@ const redirectToNextPage = () => {
       }
       return;
     } catch (e) {
-      console.log('Error restoring path from localStorage');
+      console.error('Error restoring path from localStorage');
     }
   }
   navigateToSubpage('/', { replace: true });
+};
+
+const validate = async (vnode: m.Vnode<{}, IState>, wallet: WalletConnection) => {
+  try {
+    // TODO: do we need to do this every time, or only on first connect?
+    const acct: NearAccount = app.chain.accounts.get(wallet.getAccountId());
+    await createUserWithAddress(acct.address);
+    await acct.validate();
+    if (!app.isLoggedIn()) {
+      await initAppState();
+      const chain = app.user.selectedNode
+        ? app.user.selectedNode.chain
+        : app.config.nodes.getByChain(app.activeChainId())[0].chain;
+      await updateActiveAddresses(chain);
+    }
+    await setActiveAccount(acct);
+    vnode.state.validatedAccount = acct;
+  } catch (err) {
+    vnode.state.validationError = err.responseJSON ? err.responseJSON.error : err.message;
+    return;
+  }
+
+  // tx error handling
+  const failedTx = m.route.param('tx_failure');
+  if (failedTx) {
+    console.log(`Login failed: deleting storage key ${failedTx}`);
+    if (localStorage[failedTx]) {
+      delete localStorage[failedTx];
+    }
+    vnode.state.validationError = 'Login failed.';
+    return;
+  }
+
+  // tx success handling
+  // TODO: ensure that create() calls redirect correctly
+  const savedTx = m.route.param('saved_tx');
+  if (savedTx && localStorage[savedTx]) {
+    try {
+      // fetch tx localstorage hash and execute
+      const txString = localStorage[savedTx];
+      delete localStorage[savedTx];
+
+      // tx object
+      const tx = JSON.parse(txString);
+      // rehydrate BN
+      if (tx.attachedDeposit) {
+        tx.attachedDeposit = new BN(tx.attachedDeposit);
+      }
+      await wallet.account().functionCall(tx as FunctionCallOptions);
+    } catch (err) {
+      vnode.state.validationError = err.message;
+    }
+  }
 };
 
 const FinishNearLogin: m.Component<{}, IState> = {
@@ -95,41 +150,21 @@ const FinishNearLogin: m.Component<{}, IState> = {
         }),
       ]);
     } else if (!vnode.state.validating) {
-      // chain loaded and on near -- finish login
-      // TODO: share one wallet account across all actual accounts and swap out
-      //   login data from localStorage as needed.
-      const validate = async () => {
-        vnode.state.validating = true;
-        const wallet = new WalletAccount((app.chain as Near).chain.api, 'commonwealth_near');
-        if (wallet.isSignedIn()) {
-          try {
-            const acct: NearAccount = app.chain.accounts.get(wallet.getAccountId());
-            await createUserWithAddress(acct.address);
-            await acct.validate();
-            if (!app.isLoggedIn()) {
-              await initAppState();
-              const chain = app.user.selectedNode
-                ? app.user.selectedNode.chain
-                : app.config.nodes.getByChain(app.activeChainId())[0].chain;
-              await updateActiveAddresses(chain);
-            }
-            await setActiveAccount(acct);
-            vnode.state.validatedAccount = acct;
-          } catch (err) {
-            vnode.state.validationError = err.responseJSON ? err.responseJSON.error : err.message;
-          } finally {
-            vnode.state.validationCompleted = true;
-            vnode.state.validating = false;
-            m.redraw();
-          }
-        } else {
-          vnode.state.validationError = 'Sign-in failed.';
-          vnode.state.validating = false;
+      // chain loaded and on near -- finish login and call lingering txs
+      vnode.state.validating = true;
+      const wallet = new WalletAccount((app.chain as Near).chain.api, 'commonwealth_near');
+      if (wallet.isSignedIn()) {
+        validate(vnode, wallet).then(() => {
           vnode.state.validationCompleted = true;
+          vnode.state.validating = false;
           m.redraw();
-        }
-      };
-      validate();
+        });
+      } else {
+        vnode.state.validationError = 'Sign-in failed.';
+        vnode.state.validating = false;
+        vnode.state.validationCompleted = true;
+        m.redraw();
+      }
     } else {
       // validation in progress
     }

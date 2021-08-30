@@ -1,9 +1,11 @@
+import { Near as NearApi, connect as nearConnect, WalletAccount } from 'near-api-js';
+import { FunctionCallOptions } from 'near-api-js/lib/account';
+import { NodeStatusResult } from 'near-api-js/lib/providers/provider';
+import { uuidv4 } from 'lib/util';
 import { IChainModule, ITXModalData, NodeInfo } from 'models';
 import { NearToken } from 'adapters/chain/near/types';
 import BN from 'bn.js';
 import { ApiStatus, IApp } from 'state';
-import { Near as NearApi, connect as nearConnect, keyStores } from 'near-api-js';
-import { NodeStatusResult } from 'near-api-js/lib/providers/provider';
 import moment from 'moment';
 import * as m from 'mithril';
 import { NearAccounts, NearAccount } from './account';
@@ -92,6 +94,71 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
     };
     await syncFn();
     this._syncHandle = setInterval(syncFn, 2000);
+  }
+
+  public async createDaoTx(creator: NearAccount, name: string, purpose: string, value: BN) {
+    const contractId = this.isMainnet ? 'sputnik2.near' : 'sputnikv2.testnet';
+    const methodName = 'create';
+    const pk = this.isMainnet
+      ? '2gtDEwdLuUBawzFLAnCS9gUso3Ph76bRzMpVrtb66f3J'
+      : 'G8JpvUhKqfr89puEKgbBqUxQzCMfJfPSRvKw4EJoiZpZ';
+
+    const argsList = {
+      config: {
+        name,
+        purpose,
+        metadata: '',
+      },
+      // initial council
+      policy: [ creator.address ],
+    };
+    const yoktoNear = new BN('1000000000000000000000000');
+    const attachedDeposit = value.mul(yoktoNear).toString();
+    const args = Buffer.from(JSON.stringify(argsList)).toString('base64');
+    const propArgs = {
+      name,
+      public_key: pk,
+      args,
+    };
+    await this.redirectTx(contractId, methodName, propArgs, attachedDeposit);
+  }
+
+  public async redirectTx(
+    contractId: string,
+    methodName: string,
+    args: any,
+    attachedDeposit?: string,
+    postTxRedirect?: string
+  ) {
+    // construct tx object
+    const functionCall: any = {
+      contractId,
+      methodName,
+      args,
+    };
+    if (attachedDeposit) {
+      functionCall.attachedDeposit = attachedDeposit;
+    }
+    if (postTxRedirect) {
+      functionCall.walletCallbackUrl = postTxRedirect;
+    }
+
+    // generate random identifier as localStorage key
+    const uuid = uuidv4();
+    localStorage[uuid] = JSON.stringify(functionCall);
+
+    // redirect to generate access key for dao contract
+    const redirectUrl = `${window.location.origin}/${this.app.activeChainId()}/finishNearLogin`;
+    const successUrl = `${redirectUrl}?saved_tx=${uuid}`;
+    const failureUrl = `${redirectUrl}?tx_failure=${uuid}`;
+
+    const wallet = new WalletAccount(this.api, 'commonwealth_near');
+    await wallet.requestSignIn({
+      contractId,
+      methodNames: [methodName],
+      successUrl,
+      failureUrl
+    });
   }
 
   public async deinit(): Promise<void> {
