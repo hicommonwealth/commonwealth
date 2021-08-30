@@ -332,7 +332,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
     app.chain = newChain;
   }
   if (initApi) {
-    app.chain.initApi(); // required for loading NearAccounts
+    await app.chain.initApi(); // required for loading NearAccounts
   }
   app.chainPreloading = false;
   app.chain.deferred = deferred;
