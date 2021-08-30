@@ -6,7 +6,7 @@
   "input": {
     "language": "Solidity",
     "sources": {
-      "contracts/Marlin/GovernorAlpha.sol": {
+      "contracts/compound/GovernorAlpha.sol": {
         "content": "pragma solidity >=0.4.21 <0.7.0;\npragma experimental ABIEncoderV2;\n\n\ncontract GovernorAlpha {\n    /// @notice The name of this contract\n    string public constant name = \"Marlin Governor Alpha\";\n\n    /// @notice The number of votes in support of a proposal required in order for a quorum to be reached and for a vote to succeed\n    function quorumVotes() public pure returns (uint256) {\n        return 8000e18;\n    } // 8000 MPond\n\n    /// @notice The number of votes required in order for a voter to become a proposer\n    function proposalThreshold() public pure returns (uint256) {\n        return 1e18;\n    } // 1 MPond\n\n    /// @notice The maximum number of actions that can be included in a proposal\n    function proposalMaxOperations() public pure returns (uint256) {\n        return 10;\n    } // 10 actions\n\n    /// @notice The delay before voting on a proposal may take place, once proposed\n    function votingDelay() public pure returns (uint256) {\n        return 1;\n    } // 1 block\n\n    /// @notice The duration of voting on a proposal, in blocks\n    function votingPeriod() public pure returns (uint256) {\n        return 17200;\n    } // ~3 days in blocks (assuming 15s blocks)\n\n    /// @notice The address of the MPond Protocol Timelock\n    TimelockInterface public timelock;\n\n    /// @notice The address of the MPond governance token\n    MPondInterface public MPond;\n\n    /// @notice The address of the Governor Guardian\n    address public guardian;\n\n    /// @notice The total number of proposals\n    uint256 public proposalCount;\n\n    struct Proposal {\n        /// @notice Unique id for looking up a proposal\n        uint256 id;\n        /// @notice Creator of the proposal\n        address proposer;\n        /// @notice The timestamp that the proposal will be available for execution, set once the vote succeeds\n        uint256 eta;\n        /// @notice the ordered list of target addresses for calls to be made\n        address[] targets;\n        /// @notice The ordered list of values (i.e. msg.value) to be passed to the calls to be made\n        uint256[] values;\n        /// @notice The ordered list of function signatures to be called\n        string[] signatures;\n        /// @notice The ordered list of calldata to be passed to each call\n        bytes[] calldatas;\n        /// @notice The block at which voting begins: holders must delegate their votes prior to this block\n        uint256 startBlock;\n        /// @notice The block at which voting ends: votes must be cast prior to this block\n        uint256 endBlock;\n        /// @notice Current number of votes in favor of this proposal\n        uint256 forVotes;\n        /// @notice Current number of votes in opposition to this proposal\n        uint256 againstVotes;\n        /// @notice Flag marking whether the proposal has been canceled\n        bool canceled;\n        /// @notice Flag marking whether the proposal has been executed\n        bool executed;\n        /// @notice Receipts of ballots for the entire set of voters\n        mapping(address => Receipt) receipts;\n    }\n\n    /// @notice Ballot receipt record for a voter\n    struct Receipt {\n        /// @notice Whether or not a vote has been cast\n        bool hasVoted;\n        /// @notice Whether or not the voter supports the proposal\n        bool support;\n        /// @notice The number of votes the voter had, which were cast\n        uint96 votes;\n    }\n\n    /// @notice Possible states that a proposal may be in\n    enum ProposalState {\n        Pending,\n        Active,\n        Canceled,\n        Defeated,\n        Succeeded,\n        Queued,\n        Expired,\n        Executed\n    }\n\n    /// @notice The official record of all proposals ever proposed\n    mapping(uint256 => Proposal) public proposals;\n\n    /// @notice The latest proposal for each proposer\n    mapping(address => uint256) public latestProposalIds;\n\n    /// @notice The EIP-712 typehash for the contract's domain\n    bytes32 public constant DOMAIN_TYPEHASH = keccak256(\n        \"EIP712Domain(string name,uint256 chainId,address verifyingContract)\"\n    );\n\n    /// @notice The EIP-712 typehash for the ballot struct used by the contract\n    bytes32 public constant BALLOT_TYPEHASH = keccak256(\n        \"Ballot(uint256 proposalId,bool support)\"\n    );\n\n    /// @notice An event emitted when a new proposal is created\n    event ProposalCreated(\n        uint256 id,\n        address proposer,\n        address[] targets,\n        uint256[] values,\n        string[] signatures,\n        bytes[] calldatas,\n        uint256 startBlock,\n        uint256 endBlock,\n        string description\n    );\n\n    /// @notice An event emitted when a vote has been cast on a proposal\n    event VoteCast(\n        address voter,\n        uint256 proposalId,\n        bool support,\n        uint256 votes\n    );\n\n    /// @notice An event emitted when a proposal has been canceled\n    event ProposalCanceled(uint256 id);\n\n    /// @notice An event emitted when a proposal has been queued in the Timelock\n    event ProposalQueued(uint256 id, uint256 eta);\n\n    /// @notice An event emitted when a proposal has been executed in the Timelock\n    event ProposalExecuted(uint256 id);\n\n    constructor(\n        address timelock_,\n        address MPond_,\n        address guardian_\n    ) public {\n        timelock = TimelockInterface(timelock_);\n        MPond = MPondInterface(MPond_);\n        guardian = guardian_;\n    }\n\n    function propose(\n        address[] memory targets,\n        uint256[] memory values,\n        string[] memory signatures,\n        bytes[] memory calldatas,\n        string memory description\n    ) public returns (uint256) {\n        require(\n            MPond.getPriorVotes(msg.sender, sub256(block.number, 1)) >\n                proposalThreshold(),\n            \"GovernorAlpha::propose: proposer votes below proposal threshold\"\n        );\n        require(\n            targets.length == values.length &&\n                targets.length == signatures.length &&\n                targets.length == calldatas.length,\n            \"GovernorAlpha::propose: proposal function information arity mismatch\"\n        );\n        require(\n            targets.length != 0,\n            \"GovernorAlpha::propose: must provide actions\"\n        );\n        require(\n            targets.length <= proposalMaxOperations(),\n            \"GovernorAlpha::propose: too many actions\"\n        );\n\n        uint256 latestProposalId = latestProposalIds[msg.sender];\n        if (latestProposalId != 0) {\n            ProposalState proposersLatestProposalState = state(\n                latestProposalId\n            );\n            require(\n                proposersLatestProposalState != ProposalState.Active,\n                \"GovernorAlpha::propose: one live proposal per proposer, found an already active proposal\"\n            );\n            require(\n                proposersLatestProposalState != ProposalState.Pending,\n                \"GovernorAlpha::propose: one live proposal per proposer, found an already pending proposal\"\n            );\n        }\n\n        uint256 startBlock = add256(block.number, votingDelay());\n        uint256 endBlock = add256(startBlock, votingPeriod());\n\n        proposalCount++;\n        Proposal memory newProposal = Proposal({\n            id: proposalCount,\n            proposer: msg.sender,\n            eta: 0,\n            targets: targets,\n            values: values,\n            signatures: signatures,\n            calldatas: calldatas,\n            startBlock: startBlock,\n            endBlock: endBlock,\n            forVotes: 0,\n            againstVotes: 0,\n            canceled: false,\n            executed: false\n        });\n\n        proposals[newProposal.id] = newProposal;\n        latestProposalIds[newProposal.proposer] = newProposal.id;\n\n        emit ProposalCreated(\n            newProposal.id,\n            msg.sender,\n            targets,\n            values,\n            signatures,\n            calldatas,\n            startBlock,\n            endBlock,\n            description\n        );\n        return newProposal.id;\n    }\n\n    function queue(uint256 proposalId) public {\n        require(\n            state(proposalId) == ProposalState.Succeeded,\n            \"GovernorAlpha::queue: proposal can only be queued if it is succeeded\"\n        );\n        Proposal storage proposal = proposals[proposalId];\n        uint256 eta = add256(block.timestamp, timelock.delay());\n        for (uint256 i = 0; i < proposal.targets.length; i++) {\n            _queueOrRevert(\n                proposal.targets[i],\n                proposal.values[i],\n                proposal.signatures[i],\n                proposal.calldatas[i],\n                eta\n            );\n        }\n        proposal.eta = eta;\n        emit ProposalQueued(proposalId, eta);\n    }\n\n    function _queueOrRevert(\n        address target,\n        uint256 value,\n        string memory signature,\n        bytes memory data,\n        uint256 eta\n    ) internal {\n        require(\n            !timelock.queuedTransactions(\n                keccak256(abi.encode(target, value, signature, data, eta))\n            ),\n            \"GovernorAlpha::_queueOrRevert: proposal action already queued at eta\"\n        );\n        timelock.queueTransaction(target, value, signature, data, eta);\n    }\n\n    function execute(uint256 proposalId) public payable {\n        require(\n            state(proposalId) == ProposalState.Queued,\n            \"GovernorAlpha::execute: proposal can only be executed if it is queued\"\n        );\n        Proposal storage proposal = proposals[proposalId];\n        proposal.executed = true;\n        for (uint256 i = 0; i < proposal.targets.length; i++) {\n            timelock.executeTransaction.value(proposal.values[i])(\n                proposal.targets[i],\n                proposal.values[i],\n                proposal.signatures[i],\n                proposal.calldatas[i],\n                proposal.eta\n            );\n        }\n        emit ProposalExecuted(proposalId);\n    }\n\n    function cancel(uint256 proposalId) public {\n        ProposalState state = state(proposalId);\n        require(\n            state != ProposalState.Executed,\n            \"GovernorAlpha::cancel: cannot cancel executed proposal\"\n        );\n\n        Proposal storage proposal = proposals[proposalId];\n        require(\n            msg.sender == guardian ||\n                MPond.getPriorVotes(\n                    proposal.proposer,\n                    sub256(block.number, 1)\n                ) <\n                proposalThreshold(),\n            \"GovernorAlpha::cancel: proposer above threshold\"\n        );\n\n        proposal.canceled = true;\n        for (uint256 i = 0; i < proposal.targets.length; i++) {\n            timelock.cancelTransaction(\n                proposal.targets[i],\n                proposal.values[i],\n                proposal.signatures[i],\n                proposal.calldatas[i],\n                proposal.eta\n            );\n        }\n\n        emit ProposalCanceled(proposalId);\n    }\n\n    function getActions(uint256 proposalId)\n        public\n        view\n        returns (\n            address[] memory targets,\n            uint256[] memory values,\n            string[] memory signatures,\n            bytes[] memory calldatas\n        )\n    {\n        Proposal storage p = proposals[proposalId];\n        return (p.targets, p.values, p.signatures, p.calldatas);\n    }\n\n    function getReceipt(uint256 proposalId, address voter)\n        public\n        view\n        returns (Receipt memory)\n    {\n        return proposals[proposalId].receipts[voter];\n    }\n\n    function state(uint256 proposalId) public view returns (ProposalState) {\n        require(\n            proposalCount >= proposalId && proposalId > 0,\n            \"GovernorAlpha::state: invalid proposal id\"\n        );\n        Proposal storage proposal = proposals[proposalId];\n        if (proposal.canceled) {\n            return ProposalState.Canceled;\n        } else if (block.number <= proposal.startBlock) {\n            return ProposalState.Pending;\n        } else if (block.number <= proposal.endBlock) {\n            return ProposalState.Active;\n        } else if (\n            proposal.forVotes <= proposal.againstVotes ||\n            proposal.forVotes < quorumVotes()\n        ) {\n            return ProposalState.Defeated;\n        } else if (proposal.eta == 0) {\n            return ProposalState.Succeeded;\n        } else if (proposal.executed) {\n            return ProposalState.Executed;\n        } else if (\n            block.timestamp >= add256(proposal.eta, timelock.GRACE_PERIOD())\n        ) {\n            return ProposalState.Expired;\n        } else {\n            return ProposalState.Queued;\n        }\n    }\n\n    function castVote(uint256 proposalId, bool support) public {\n        return _castVote(msg.sender, proposalId, support);\n    }\n\n    function castVoteBySig(\n        uint256 proposalId,\n        bool support,\n        uint8 v,\n        bytes32 r,\n        bytes32 s\n    ) public {\n        bytes32 domainSeparator = keccak256(\n            abi.encode(\n                DOMAIN_TYPEHASH,\n                keccak256(bytes(name)),\n                getChainId(),\n                address(this)\n            )\n        );\n        bytes32 structHash = keccak256(\n            abi.encode(BALLOT_TYPEHASH, proposalId, support)\n        );\n        bytes32 digest = keccak256(\n            abi.encodePacked(\"\\x19\\x01\", domainSeparator, structHash)\n        );\n        address signatory = ecrecover(digest, v, r, s);\n        require(\n            signatory != address(0),\n            \"GovernorAlpha::castVoteBySig: invalid signature\"\n        );\n        return _castVote(signatory, proposalId, support);\n    }\n\n    function _castVote(\n        address voter,\n        uint256 proposalId,\n        bool support\n    ) internal {\n        require(\n            state(proposalId) == ProposalState.Active,\n            \"GovernorAlpha::_castVote: voting is closed\"\n        );\n        Proposal storage proposal = proposals[proposalId];\n        Receipt storage receipt = proposal.receipts[voter];\n        require(\n            receipt.hasVoted == false,\n            \"GovernorAlpha::_castVote: voter already voted\"\n        );\n        uint96 votes = MPond.getPriorVotes(voter, proposal.startBlock);\n\n        if (support) {\n            proposal.forVotes = add256(proposal.forVotes, votes);\n        } else {\n            proposal.againstVotes = add256(proposal.againstVotes, votes);\n        }\n\n        receipt.hasVoted = true;\n        receipt.support = support;\n        receipt.votes = votes;\n\n        emit VoteCast(voter, proposalId, support, votes);\n    }\n\n    function __acceptAdmin() public {\n        require(\n            msg.sender == guardian,\n            \"GovernorAlpha::__acceptAdmin: sender must be gov guardian\"\n        );\n        timelock.acceptAdmin();\n    }\n\n    function __abdicate() public {\n        require(\n            msg.sender == guardian,\n            \"GovernorAlpha::__abdicate: sender must be gov guardian\"\n        );\n        guardian = address(0);\n    }\n\n    function __queueSetTimelockPendingAdmin(\n        address newPendingAdmin,\n        uint256 eta\n    ) public {\n        require(\n            msg.sender == guardian,\n            \"GovernorAlpha::__queueSetTimelockPendingAdmin: sender must be gov guardian\"\n        );\n        timelock.queueTransaction(\n            address(timelock),\n            0,\n            \"setPendingAdmin(address)\",\n            abi.encode(newPendingAdmin),\n            eta\n        );\n    }\n\n    function __executeSetTimelockPendingAdmin(\n        address newPendingAdmin,\n        uint256 eta\n    ) public {\n        require(\n            msg.sender == guardian,\n            \"GovernorAlpha::__executeSetTimelockPendingAdmin: sender must be gov guardian\"\n        );\n        timelock.executeTransaction(\n            address(timelock),\n            0,\n            \"setPendingAdmin(address)\",\n            abi.encode(newPendingAdmin),\n            eta\n        );\n    }\n\n    function add256(uint256 a, uint256 b) internal pure returns (uint256) {\n        uint256 c = a + b;\n        require(c >= a, \"addition overflow\");\n        return c;\n    }\n\n    function sub256(uint256 a, uint256 b) internal pure returns (uint256) {\n        require(b <= a, \"subtraction underflow\");\n        return a - b;\n    }\n\n    function getChainId() internal pure returns (uint256) {\n        uint256 chainId;\n        assembly {\n            chainId := chainid()\n        }\n        return chainId;\n    }\n}\n\n\ninterface TimelockInterface {\n    function delay() external view returns (uint256);\n\n    function GRACE_PERIOD() external view returns (uint256);\n\n    function acceptAdmin() external;\n\n    function queuedTransactions(bytes32 hash) external view returns (bool);\n\n    function queueTransaction(\n        address target,\n        uint256 value,\n        string calldata signature,\n        bytes calldata data,\n        uint256 eta\n    ) external returns (bytes32);\n\n    function cancelTransaction(\n        address target,\n        uint256 value,\n        string calldata signature,\n        bytes calldata data,\n        uint256 eta\n    ) external;\n\n    function executeTransaction(\n        address target,\n        uint256 value,\n        string calldata signature,\n        bytes calldata data,\n        uint256 eta\n    ) external payable returns (bytes memory);\n}\n\n\ninterface MPondInterface {\n    function getPriorVotes(address account, uint256 blockNumber)\n        external\n        view\n        returns (uint96);\n}\n"
       }
     },
@@ -33,7 +33,7 @@
   },
   "output": {
     "contracts": {
-      "contracts/Marlin/GovernorAlpha.sol": {
+      "contracts/compound/GovernorAlpha.sol": {
         "GovernorAlpha": {
           "abi": [
             {
@@ -990,12 +990,12 @@
       {
         "component": "general",
         "errorCode": "2837",
-        "formattedMessage": "contracts/Marlin/GovernorAlpha.sol:48:17: Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.\n        uint256 id;\n                ^^\n",
+        "formattedMessage": "contracts/compound/GovernorAlpha.sol:48:17: Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.\n        uint256 id;\n                ^^\n",
         "message": "Only state variables can have a docstring. This will be disallowed in 0.7.0.",
         "severity": "warning",
         "sourceLocation": {
           "end": 1639,
-          "file": "contracts/Marlin/GovernorAlpha.sol",
+          "file": "contracts/compound/GovernorAlpha.sol",
           "start": 1637
         },
         "type": "Warning"
@@ -1003,12 +1003,12 @@
       {
         "component": "general",
         "errorCode": "2837",
-        "formattedMessage": "contracts/Marlin/GovernorAlpha.sol:50:17: Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.\n        address proposer;\n                ^------^\n",
+        "formattedMessage": "contracts/compound/GovernorAlpha.sol:50:17: Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.\n        address proposer;\n                ^------^\n",
         "message": "Only state variables can have a docstring. This will be disallowed in 0.7.0.",
         "severity": "warning",
         "sourceLocation": {
           "end": 1709,
-          "file": "contracts/Marlin/GovernorAlpha.sol",
+          "file": "contracts/compound/GovernorAlpha.sol",
           "start": 1701
         },
         "type": "Warning"
@@ -1016,12 +1016,12 @@
       {
         "component": "general",
         "errorCode": "2837",
-        "formattedMessage": "contracts/Marlin/GovernorAlpha.sol:52:17: Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.\n        uint256 eta;\n                ^-^\n",
+        "formattedMessage": "contracts/compound/GovernorAlpha.sol:52:17: Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.\n        uint256 eta;\n                ^-^\n",
         "message": "Only state variables can have a docstring. This will be disallowed in 0.7.0.",
         "severity": "warning",
         "sourceLocation": {
           "end": 1842,
-          "file": "contracts/Marlin/GovernorAlpha.sol",
+          "file": "contracts/compound/GovernorAlpha.sol",
           "start": 1839
         },
         "type": "Warning"
@@ -1029,12 +1029,12 @@
       {
         "component": "general",
         "errorCode": "2837",
-        "formattedMessage": "contracts/Marlin/GovernorAlpha.sol:54:19: Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.\n        address[] targets;\n                  ^-----^\n",
+        "formattedMessage": "contracts/compound/GovernorAlpha.sol:54:19: Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.\n        address[] targets;\n                  ^-----^\n",
         "message": "Only state variables can have a docstring. This will be disallowed in 0.7.0.",
         "severity": "warning",
         "sourceLocation": {
           "end": 1947,
-          "file": "contracts/Marlin/GovernorAlpha.sol",
+          "file": "contracts/compound/GovernorAlpha.sol",
           "start": 1940
         },
         "type": "Warning"
@@ -1042,12 +1042,12 @@
       {
         "component": "general",
         "errorCode": "2837",
-        "formattedMessage": "contracts/Marlin/GovernorAlpha.sol:56:19: Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.\n        uint256[] values;\n                  ^----^\n",
+        "formattedMessage": "contracts/compound/GovernorAlpha.sol:56:19: Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.\n        uint256[] values;\n                  ^----^\n",
         "message": "Only state variables can have a docstring. This will be disallowed in 0.7.0.",
         "severity": "warning",
         "sourceLocation": {
           "end": 2074,
-          "file": "contracts/Marlin/GovernorAlpha.sol",
+          "file": "contracts/compound/GovernorAlpha.sol",
           "start": 2068
         },
         "type": "Warning"
@@ -1055,12 +1055,12 @@
       {
         "component": "general",
         "errorCode": "2837",
-        "formattedMessage": "contracts/Marlin/GovernorAlpha.sol:58:18: Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.\n        string[] signatures;\n                 ^--------^\n",
+        "formattedMessage": "contracts/compound/GovernorAlpha.sol:58:18: Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.\n        string[] signatures;\n                 ^--------^\n",
         "message": "Only state variables can have a docstring. This will be disallowed in 0.7.0.",
         "severity": "warning",
         "sourceLocation": {
           "end": 2176,
-          "file": "contracts/Marlin/GovernorAlpha.sol",
+          "file": "contracts/compound/GovernorAlpha.sol",
           "start": 2166
         },
         "type": "Warning"
@@ -1068,12 +1068,12 @@
       {
         "component": "general",
         "errorCode": "2837",
-        "formattedMessage": "contracts/Marlin/GovernorAlpha.sol:60:17: Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.\n        bytes[] calldatas;\n                ^-------^\n",
+        "formattedMessage": "contracts/compound/GovernorAlpha.sol:60:17: Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.\n        bytes[] calldatas;\n                ^-------^\n",
         "message": "Only state variables can have a docstring. This will be disallowed in 0.7.0.",
         "severity": "warning",
         "sourceLocation": {
           "end": 2278,
-          "file": "contracts/Marlin/GovernorAlpha.sol",
+          "file": "contracts/compound/GovernorAlpha.sol",
           "start": 2269
         },
         "type": "Warning"
@@ -1081,12 +1081,12 @@
       {
         "component": "general",
         "errorCode": "2837",
-        "formattedMessage": "contracts/Marlin/GovernorAlpha.sol:62:17: Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.\n        uint256 startBlock;\n                ^--------^\n",
+        "formattedMessage": "contracts/compound/GovernorAlpha.sol:62:17: Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.\n        uint256 startBlock;\n                ^--------^\n",
         "message": "Only state variables can have a docstring. This will be disallowed in 0.7.0.",
         "severity": "warning",
         "sourceLocation": {
           "end": 2414,
-          "file": "contracts/Marlin/GovernorAlpha.sol",
+          "file": "contracts/compound/GovernorAlpha.sol",
           "start": 2404
         },
         "type": "Warning"
@@ -1094,12 +1094,12 @@
       {
         "component": "general",
         "errorCode": "2837",
-        "formattedMessage": "contracts/Marlin/GovernorAlpha.sol:64:17: Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.\n        uint256 endBlock;\n                ^------^\n",
+        "formattedMessage": "contracts/compound/GovernorAlpha.sol:64:17: Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.\n        uint256 endBlock;\n                ^------^\n",
         "message": "Only state variables can have a docstring. This will be disallowed in 0.7.0.",
         "severity": "warning",
         "sourceLocation": {
           "end": 2531,
-          "file": "contracts/Marlin/GovernorAlpha.sol",
+          "file": "contracts/compound/GovernorAlpha.sol",
           "start": 2523
         },
         "type": "Warning"
@@ -1107,12 +1107,12 @@
       {
         "component": "general",
         "errorCode": "2837",
-        "formattedMessage": "contracts/Marlin/GovernorAlpha.sol:66:17: Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.\n        uint256 forVotes;\n                ^------^\n",
+        "formattedMessage": "contracts/compound/GovernorAlpha.sol:66:17: Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.\n        uint256 forVotes;\n                ^------^\n",
         "message": "Only state variables can have a docstring. This will be disallowed in 0.7.0.",
         "severity": "warning",
         "sourceLocation": {
           "end": 2627,
-          "file": "contracts/Marlin/GovernorAlpha.sol",
+          "file": "contracts/compound/GovernorAlpha.sol",
           "start": 2619
         },
         "type": "Warning"
@@ -1120,12 +1120,12 @@
       {
         "component": "general",
         "errorCode": "2837",
-        "formattedMessage": "contracts/Marlin/GovernorAlpha.sol:68:17: Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.\n        uint256 againstVotes;\n                ^----------^\n",
+        "formattedMessage": "contracts/compound/GovernorAlpha.sol:68:17: Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.\n        uint256 againstVotes;\n                ^----------^\n",
         "message": "Only state variables can have a docstring. This will be disallowed in 0.7.0.",
         "severity": "warning",
         "sourceLocation": {
           "end": 2732,
-          "file": "contracts/Marlin/GovernorAlpha.sol",
+          "file": "contracts/compound/GovernorAlpha.sol",
           "start": 2720
         },
         "type": "Warning"
@@ -1133,12 +1133,12 @@
       {
         "component": "general",
         "errorCode": "2837",
-        "formattedMessage": "contracts/Marlin/GovernorAlpha.sol:70:14: Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.\n        bool canceled;\n             ^------^\n",
+        "formattedMessage": "contracts/compound/GovernorAlpha.sol:70:14: Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.\n        bool canceled;\n             ^------^\n",
         "message": "Only state variables can have a docstring. This will be disallowed in 0.7.0.",
         "severity": "warning",
         "sourceLocation": {
           "end": 2827,
-          "file": "contracts/Marlin/GovernorAlpha.sol",
+          "file": "contracts/compound/GovernorAlpha.sol",
           "start": 2819
         },
         "type": "Warning"
@@ -1146,12 +1146,12 @@
       {
         "component": "general",
         "errorCode": "2837",
-        "formattedMessage": "contracts/Marlin/GovernorAlpha.sol:72:14: Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.\n        bool executed;\n             ^------^\n",
+        "formattedMessage": "contracts/compound/GovernorAlpha.sol:72:14: Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.\n        bool executed;\n             ^------^\n",
         "message": "Only state variables can have a docstring. This will be disallowed in 0.7.0.",
         "severity": "warning",
         "sourceLocation": {
           "end": 2922,
-          "file": "contracts/Marlin/GovernorAlpha.sol",
+          "file": "contracts/compound/GovernorAlpha.sol",
           "start": 2914
         },
         "type": "Warning"
@@ -1159,12 +1159,12 @@
       {
         "component": "general",
         "errorCode": "2837",
-        "formattedMessage": "contracts/Marlin/GovernorAlpha.sol:74:37: Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.\n        mapping(address => Receipt) receipts;\n                                    ^------^\n",
+        "formattedMessage": "contracts/compound/GovernorAlpha.sol:74:37: Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.\n        mapping(address => Receipt) receipts;\n                                    ^------^\n",
         "message": "Only state variables can have a docstring. This will be disallowed in 0.7.0.",
         "severity": "warning",
         "sourceLocation": {
           "end": 3037,
-          "file": "contracts/Marlin/GovernorAlpha.sol",
+          "file": "contracts/compound/GovernorAlpha.sol",
           "start": 3029
         },
         "type": "Warning"
@@ -1172,12 +1172,12 @@
       {
         "component": "general",
         "errorCode": "2837",
-        "formattedMessage": "contracts/Marlin/GovernorAlpha.sol:80:14: Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.\n        bool hasVoted;\n             ^------^\n",
+        "formattedMessage": "contracts/compound/GovernorAlpha.sol:80:14: Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.\n        bool hasVoted;\n             ^------^\n",
         "message": "Only state variables can have a docstring. This will be disallowed in 0.7.0.",
         "severity": "warning",
         "sourceLocation": {
           "end": 3194,
-          "file": "contracts/Marlin/GovernorAlpha.sol",
+          "file": "contracts/compound/GovernorAlpha.sol",
           "start": 3186
         },
         "type": "Warning"
@@ -1185,12 +1185,12 @@
       {
         "component": "general",
         "errorCode": "2837",
-        "formattedMessage": "contracts/Marlin/GovernorAlpha.sol:82:14: Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.\n        bool support;\n             ^-----^\n",
+        "formattedMessage": "contracts/compound/GovernorAlpha.sol:82:14: Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.\n        bool support;\n             ^-----^\n",
         "message": "Only state variables can have a docstring. This will be disallowed in 0.7.0.",
         "severity": "warning",
         "sourceLocation": {
           "end": 3283,
-          "file": "contracts/Marlin/GovernorAlpha.sol",
+          "file": "contracts/compound/GovernorAlpha.sol",
           "start": 3276
         },
         "type": "Warning"
@@ -1198,12 +1198,12 @@
       {
         "component": "general",
         "errorCode": "2837",
-        "formattedMessage": "contracts/Marlin/GovernorAlpha.sol:84:16: Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.\n        uint96 votes;\n               ^---^\n",
+        "formattedMessage": "contracts/compound/GovernorAlpha.sol:84:16: Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.\n        uint96 votes;\n               ^---^\n",
         "message": "Only state variables can have a docstring. This will be disallowed in 0.7.0.",
         "severity": "warning",
         "sourceLocation": {
           "end": 3376,
-          "file": "contracts/Marlin/GovernorAlpha.sol",
+          "file": "contracts/compound/GovernorAlpha.sol",
           "start": 3371
         },
         "type": "Warning"
@@ -1211,12 +1211,12 @@
       {
         "component": "general",
         "errorCode": "1878",
-        "formattedMessage": "contracts/Marlin/GovernorAlpha.sol: Warning: SPDX license identifier not provided in source file. Before publishing, consider adding a comment containing \"SPDX-License-Identifier: <SPDX-License>\" to each source file. Use \"SPDX-License-Identifier: UNLICENSED\" for non-open-source code. Please see https://spdx.org for more information.\n",
+        "formattedMessage": "contracts/compound/GovernorAlpha.sol: Warning: SPDX license identifier not provided in source file. Before publishing, consider adding a comment containing \"SPDX-License-Identifier: <SPDX-License>\" to each source file. Use \"SPDX-License-Identifier: UNLICENSED\" for non-open-source code. Please see https://spdx.org for more information.\n",
         "message": "SPDX license identifier not provided in source file. Before publishing, consider adding a comment containing \"SPDX-License-Identifier: <SPDX-License>\" to each source file. Use \"SPDX-License-Identifier: UNLICENSED\" for non-open-source code. Please see https://spdx.org for more information.",
         "severity": "warning",
         "sourceLocation": {
           "end": -1,
-          "file": "contracts/Marlin/GovernorAlpha.sol",
+          "file": "contracts/compound/GovernorAlpha.sol",
           "start": -1
         },
         "type": "Warning"
@@ -1224,21 +1224,21 @@
       {
         "component": "general",
         "errorCode": "1621",
-        "formattedMessage": "contracts/Marlin/GovernorAlpha.sol:278:13: Warning: Using \".value(...)\" is deprecated. Use \"{value: ...}\" instead.\n            timelock.executeTransaction.value(proposal.values[i])(\n            ^-------------------------------^\n",
+        "formattedMessage": "contracts/compound/GovernorAlpha.sol:278:13: Warning: Using \".value(...)\" is deprecated. Use \"{value: ...}\" instead.\n            timelock.executeTransaction.value(proposal.values[i])(\n            ^-------------------------------^\n",
         "message": "Using \".value(...)\" is deprecated. Use \"{value: ...}\" instead.",
         "severity": "warning",
         "sourceLocation": {
           "end": 9642,
-          "file": "contracts/Marlin/GovernorAlpha.sol",
+          "file": "contracts/compound/GovernorAlpha.sol",
           "start": 9609
         },
         "type": "Warning"
       }
     ],
     "sources": {
-      "contracts/Marlin/GovernorAlpha.sol": {
+      "contracts/compound/GovernorAlpha.sol": {
         "ast": {
-          "absolutePath": "contracts/Marlin/GovernorAlpha.sol",
+          "absolutePath": "contracts/compound/GovernorAlpha.sol",
           "exportedSymbols": {
             "GovernorAlpha": [
               1211

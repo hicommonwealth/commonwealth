@@ -98,7 +98,6 @@ const backportEntityToAdapter = (
   return proposal;
 };
 
-
 export default class MolochProposal extends Proposal<
   MolochAPI,
   EthereumCoin,

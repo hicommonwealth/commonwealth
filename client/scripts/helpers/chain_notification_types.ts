@@ -190,7 +190,7 @@ export const DydxChainNotificationTypes = {
     'transfer',
     'approval',
   ]
-}
+};
 
 export const AaveChainNotificationTypes = {
   Governance: [
@@ -206,4 +206,4 @@ export const AaveChainNotificationTypes = {
     'transfer',
     'approval',
   ]
-}
+};

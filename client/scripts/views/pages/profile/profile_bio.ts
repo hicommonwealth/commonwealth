@@ -3,7 +3,6 @@ import _ from 'lodash';
 import { Account } from 'models';
 import MarkdownFormattedText from '../../components/markdown_formatted_text';
 
-
 const ProfileBio: m.Component<{ account: Account<any> }> = {
   view: (vnode) => {
     const { account } = vnode.attrs;

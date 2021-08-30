@@ -25,21 +25,18 @@ export default class WebWalletController {
       throw new Error('No wallet available');
     }
 
-    let foundWallet: IWebWallet<string>;
     for (const wallet of availableWallets) {
       if (!wallet.enabled) {
         await wallet.enable();
       }
       // TODO: ensure that we can find any wallet, even if non-string accounts
       if (wallet.accounts.find((acc) => acc === address)) {
-        foundWallet = wallet;
+        console.log(`Found wallet: ${wallet.name}`);
+        return wallet;
       }
       // TODO: disable if not found
     }
-    if (!foundWallet) {
-      throw new Error(`No wallet found for ${address}`);
-    }
-    return foundWallet;
+    throw new Error(`No wallet found for ${address}`);
   }
 
   constructor() {

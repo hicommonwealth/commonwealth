@@ -231,7 +231,7 @@ const CouncilPage: m.Component<{}> = {
                   if (activeAccountIsCandidate) {
                     return;
                   }
-                  navigateToSubpage(`/new/proposal/:type`, { type: ProposalType.PhragmenCandidacy });
+                  navigateToSubpage('/new/proposal/:type', { type: ProposalType.PhragmenCandidacy });
                 },
               }, activeAccountIsCandidate ? 'Already a council candidate' : 'Run for council'),
             ]),

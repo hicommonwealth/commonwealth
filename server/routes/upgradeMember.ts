@@ -35,7 +35,8 @@ const upgradeMember = async (models: DB, req: Request, res: Response, next: Next
       permission: 'admin',
     },
   });
-  if (requesterAdminRoles.length < 1) return next(new Error(Errors.MustBeAdmin));
+
+  if (requesterAdminRoles.length < 1 && !req.user.isAdmin) return next(new Error(Errors.MustBeAdmin));
 
   const memberAddress = await models.Address.findOne({
     where: {

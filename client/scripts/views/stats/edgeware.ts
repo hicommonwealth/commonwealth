@@ -17,7 +17,6 @@ import {
   MAINNET_LOCKDROP, ROPSTEN_LOCKDROP, getParticipationSummary,
 } from './stats_helpers';
 
-
 const ETHERSCAN_ADDR_URL = 'https://etherscan.io/address/';
 
 const generalizedLocks = [{
