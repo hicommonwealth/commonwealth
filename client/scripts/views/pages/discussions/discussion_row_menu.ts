@@ -167,7 +167,7 @@ const DiscussionRowMenu: m.Component<{ proposal: OffchainThread }, {
           (isAuthor || hasAdminPermissions) && m(StageEditorMenuItem, {
             openStageEditor: () => { vnode.state.stageEditorIsOpen = true; }
           }),
-          (isAuthor || hasAdminPermissions) && m(ThreadDeletionMenuItem, { proposal }),
+          (isAuthor || hasAdminPermissions || app.user.isSiteAdmin) && m(ThreadDeletionMenuItem, { proposal }),
         ],
         inline: true,
         trigger: m(Icon, {

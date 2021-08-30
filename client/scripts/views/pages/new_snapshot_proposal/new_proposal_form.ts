@@ -238,8 +238,6 @@ const NewProposalForm: m.Component<{snapshotId: string}, {
           || (vnode.state.space.filters?.minScore > 0 && vnode.state.userScore)
           || isMember);
 
-
-
     const today = new Date();
     const nextWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 7);
     return m('.NewThreadForm', {

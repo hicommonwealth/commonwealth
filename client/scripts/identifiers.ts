@@ -1,8 +1,8 @@
 import { StorageModule, ChainBase, ProposalModule, ChainNetwork } from 'models';
 import { ProposalStore } from 'stores';
+import { AaveTypes, CompoundTypes, MolochTypes } from '@commonwealth/chain-events';
 import app from './state';
 import ThreadsController from './controllers/server/threads';
-import { AaveTypes, MarlinTypes, MolochTypes } from '@commonwealth/chain-events';
 
 // eslint-disable-next-line no-shadow
 export enum ProposalType {
@@ -16,7 +16,7 @@ export enum ProposalType {
   OffchainThread = 'discussion',
   CosmosProposal = 'cosmosproposal',
   MolochProposal = 'molochproposal',
-  MarlinProposal = 'marlinproposal',
+  CompoundProposal = 'compoundproposal',
   AaveProposal = 'aaveproposal',
 }
 
@@ -47,8 +47,8 @@ export const proposalSlugToClass = () => {
   if (MolochTypes.EventChains.find((c) => c === app.chain.network)) {
     mmap.set('molochproposal', (app.chain as any).governance);
   }
-  if (MarlinTypes.EventChains.find((c) => c === app.chain.network)) {
-    mmap.set('marlinproposal', (app.chain as any).governance);
+  if (CompoundTypes.EventChains.find((c) => c === app.chain.network)) {
+    mmap.set('compoundproposal', (app.chain as any).governance);
   }
   if (AaveTypes.EventChains.find((c) => c === app.chain.network)) {
     mmap.set('aaveproposal', (app.chain as any).governance);
@@ -74,7 +74,7 @@ export const proposalSlugToFriendlyName = new Map<string, string>([
   ['treasuryproposal', 'Treasury Proposal'],
   ['treasurytip', 'Treasury Tip'],
   ['discussion', 'Discussion Thread'],
-  ['marlinproposal', 'Proposal'],
+  ['compoundproposal', 'Proposal'],
   ['cosmosproposal', 'Proposal'],
   ['molochproposal', 'Proposal'],
   ['aaveproposal', 'Proposal'],

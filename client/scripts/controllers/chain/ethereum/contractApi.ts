@@ -1,6 +1,6 @@
 import { Web3Provider, ExternalProvider, JsonRpcSigner, Provider } from '@ethersproject/providers';
 import { ethers, Contract } from 'ethers';
-import { ChainBase, IWebWallet } from 'models';
+import { ChainBase } from 'models';
 import WebWalletController from 'controllers/app/web_wallets';
 import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web_wallet';
 import WalletConnectWebWalletController from '../../app/webWallets/walletconnect_web_wallet';
@@ -47,7 +47,7 @@ abstract class ContractApi<ContractT extends Contract> {
     this.Contract = factory(this.contractAddress, this.Provider);
   }
 
-  public async init(): Promise<void> {
+  public async init(...args): Promise<void> {
     await this.Contract.deployed();
   }
 }

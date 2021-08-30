@@ -34,17 +34,22 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
       m(MenuItem, {
         onclick: (e) => {
           localStorage.setItem(`${app.activeId()}-active-topic`, t.name);
+          if (t.defaultOffchainTemplate) {
+            localStorage.setItem(`${app.activeId()}-active-topic-default-template`, t.defaultOffchainTemplate);
+          } else {
+            localStorage.removeItem(`${app.activeId()}-active-topic-default-template`);
+          }
           navigateToSubpage('/new/thread');
         },
         label: `New ${t.name} Thread`,
         iconLeft: mobile ? Icons.PLUS : undefined,
       })
     )),
-    (app.chain?.network === ChainNetwork.Aave || 
-      app.chain?.network === ChainNetwork.dYdX ||
-      app.chain?.network === ChainNetwork.Marlin ||
-      app.chain?.base === ChainBase.CosmosSDK || 
-      app.chain?.base === ChainBase.Substrate)
+    (app.chain?.network === ChainNetwork.Aave
+      || app.chain?.network === ChainNetwork.dYdX
+      || app.chain?.network === ChainNetwork.Compound
+      || app.chain?.base === ChainBase.CosmosSDK
+      || app.chain?.base === ChainBase.Substrate)
       && !mobile
       && m(MenuDivider),
     app.chain?.base === ChainBase.CosmosSDK && m(MenuItem, {
@@ -55,16 +60,16 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
       iconLeft: mobile ? Icons.PLUS : undefined,
     }),
     app.chain?.base === ChainBase.Ethereum && app.chain?.network === ChainNetwork.Aave
-     && m(MenuItem, {
+    && m(MenuItem, {
       onclick: (e) => navigateToSubpage('/new/proposal/:type', {
         type: ProposalType.AaveProposal
       }),
       label: 'New On-Chain Proposal',
       iconLeft: mobile ? Icons.PLUS : undefined,
     }),
-    app.chain?.base === ChainBase.Ethereum && app.chain?.network === ChainNetwork.Marlin && m(MenuItem, {
+    app.chain?.network === ChainNetwork.Compound && m(MenuItem, {
       onclick: (e) => navigateToSubpage('/new/proposal/:type', {
-        type: ProposalType.MarlinProposal
+        type: ProposalType.CompoundProposal
       }),
       label: 'New On-Chain Proposal',
       iconLeft: mobile ? Icons.PLUS : undefined,

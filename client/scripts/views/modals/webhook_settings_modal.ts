@@ -34,12 +34,12 @@ const WebhookSettingsModal: m.Component<IAttrs, IState> = {
   },
   view: (vnode) => {
     const { webhook } = vnode.attrs;
-    const isChain = webhook.chain_id ? true : false;
+    const isChain = !!webhook.chain_id;
     const chainNotifications = webhook.chain_id === 'edgeware' ? EdgewareChainNotificationTypes
       : webhook.chain_id === 'kusama' ? KusamaChainNotificationTypes
         : webhook.chain_id === 'kulupu' ? KulupuChainNotificationTypes
           : webhook.chain_id === 'polkadot' ? PolkadotChainNotificationTypes
-            : webhook.chain_id === 'dydx' ? DydxChainNotificationTypes 
+            : webhook.chain_id === 'dydx' ? DydxChainNotificationTypes
               : {};
     const row = (label: string, values: string[]) => {
       const allValuesPresent = values.every((v) => vnode.state.selectedCategories.includes(v));

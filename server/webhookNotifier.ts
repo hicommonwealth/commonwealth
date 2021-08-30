@@ -1,7 +1,7 @@
 import request from 'superagent';
 import { Op } from 'sequelize';
 import { capitalize } from 'lodash';
-import { AaveEvents, chainSupportedBy, MarlinEvents, MolochEvents, SubstrateEvents } from '@commonwealth/chain-events';
+import { AaveEvents, chainSupportedBy, CompoundEvents, MolochEvents, SubstrateEvents } from '@commonwealth/chain-events';
 
 import { NotificationCategories } from '../shared/types';
 import { smartTrim, validURL, renderQuillDeltaToText } from '../shared/utils';
@@ -31,8 +31,8 @@ const getFilteredContent = (content, address) => {
       labelerFn = SubstrateEvents.Label;
     } else if (chainSupportedBy(content.chainEventType.chain, MolochEvents.Types.EventChains)) {
       labelerFn = MolochEvents.Label;
-    } else if (chainSupportedBy(content.chainEventType.chain, MarlinEvents.Types.EventChains)) {
-      labelerFn = MarlinEvents.Label;
+    } else if (chainSupportedBy(content.chainEventType.chain, CompoundEvents.Types.EventChains)) {
+      labelerFn = CompoundEvents.Label;
     } else if (chainSupportedBy(content.chainEventType.chain, AaveEvents.Types.EventChains)) {
       labelerFn = AaveEvents.Label;
     }

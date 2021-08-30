@@ -4,7 +4,7 @@ import { capitalize } from 'lodash';
 import {
   SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents,
   IEventLabel, IEventTitle, IChainEventData, chainSupportedBy,
-  MarlinTypes, MarlinEvents, AaveTypes, AaveEvents
+  CompoundTypes, CompoundEvents, AaveTypes, AaveEvents
 } from '@commonwealth/chain-events';
 
 import { SENDGRID_API_KEY, SERVER_URL } from '../config';
@@ -30,8 +30,8 @@ export const createImmediateNotificationEmailObject = async (notification_data, 
       labelerFn = SubstrateEvents.Label;
     } else if (chainSupportedBy(notification_data.chainEventType?.chain, MolochEvents.Types.EventChains)) {
       labelerFn = MolochEvents.Label;
-    } else if (chainSupportedBy(notification_data.chainEventType?.chain, MarlinEvents.Types.EventChains)) {
-      labelerFn = MarlinEvents.Label;
+    } else if (chainSupportedBy(notification_data.chainEventType?.chain, CompoundEvents.Types.EventChains)) {
+      labelerFn = CompoundEvents.Label;
     } else if (chainSupportedBy(notification_data.chainEventType?.chain, AaveEvents.Types.EventChains)) {
       labelerFn = AaveEvents.Label;
     }
@@ -42,8 +42,8 @@ export const createImmediateNotificationEmailObject = async (notification_data, 
     );
     if (!chainEventLabel) return;
 
-    const subject = (process.env.NODE_ENV !== 'production' ? '[dev] ' : '')
-      + `${chainEventLabel.heading} event on ${capitalize(notification_data.chainEventType?.chain)}`;
+    const subject = `${process.env.NODE_ENV !== 'production' ? '[dev] ' : ''
+    }${chainEventLabel.heading} event on ${capitalize(notification_data.chainEventType?.chain)}`;
 
     return {
       from: 'Commonwealth <no-reply@commonwealth.im>',
@@ -156,8 +156,8 @@ const createNotificationDigestEmailObject = async (user, notifications, models) 
     templateId: DynamicTemplate.BatchNotifications,
     dynamic_template_data: {
       notifications: emailObjArray,
-      subject: (process.env.NODE_ENV !== 'production' ? '[dev] ' : '')
-        + `${notifications.length} new notification${notifications.length === 1 ? '' : 's'}`,
+      subject: `${process.env.NODE_ENV !== 'production' ? '[dev] ' : ''
+      }${notifications.length} new notification${notifications.length === 1 ? '' : 's'}`,
       user: user.email,
     },
   };
@@ -173,7 +173,7 @@ export const sendImmediateNotificationEmail = async (subscription, emailObject) 
   emailObject.bcc = 'raymond+bcc@commonwealth.im';
 
   try {
-    console.log('sending immediate notification email');
+    console.log(`sending immediate notification email to ${emailObject.to}`);
     await sgMail.send(emailObject);
   } catch (e) {
     console.log('Failed to send immediate notification email', e?.response?.body?.errors);

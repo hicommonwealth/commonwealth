@@ -52,12 +52,12 @@ const finishEmailLogin = async (models: DB, req: Request, res: Response, next: N
 
   if (existingUser) {
     req.login(existingUser, async (err) => {
-      if (err) return redirectWithLoginError(res, 'Could not log in with user at ' + email);
+      if (err) return redirectWithLoginError(res, `Could not log in with user at ${email}`);
       // If the user is currently in a partly-logged-in state, merge their
       // social accounts over to the newly found user
       if (previousUser && previousUser.id !== existingUser.id) {
         const [oldSocialAccounts, oldAddresses,
-               newSocialAccounts, newAddresses] = await Promise.all([
+          newSocialAccounts, newAddresses] = await Promise.all([
           previousUser.getSocialAccounts(),
           (await previousUser.getAddresses()).filter((address) => !!address.verified),
           existingUser.getSocialAccounts(),
@@ -78,7 +78,7 @@ const finishEmailLogin = async (models: DB, req: Request, res: Response, next: N
     previousUser.emailVerified = true;
     await previousUser.save();
     req.login(previousUser, (err) => {
-      if (err) return redirectWithLoginError(res, 'Could not log in with user at ' + email);
+      if (err) return redirectWithLoginError(res, `Could not log in with user at ${email}`);
       return redirectWithLoginSuccess(res, email, tokenObj.redirect_path, confirmation);
     });
   } else {
@@ -104,7 +104,7 @@ const finishEmailLogin = async (models: DB, req: Request, res: Response, next: N
       is_active: true,
     });
     req.login(newUser, (err) => {
-      if (err) return redirectWithLoginError(res, 'Could not log in with user at ' + email);
+      if (err) return redirectWithLoginError(res, `Could not log in with user at ${email}`);
       return redirectWithLoginSuccess(res, email, tokenObj.redirect_path, confirmation, true);
     });
   }
