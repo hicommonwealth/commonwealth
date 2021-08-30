@@ -34,6 +34,11 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
       m(MenuItem, {
         onclick: (e) => {
           localStorage.setItem(`${app.activeId()}-active-topic`, t.name);
+          if (t.defaultOffchainTemplate) {
+            localStorage.setItem(`${app.activeId()}-active-topic-default-template`, t.defaultOffchainTemplate);
+          } else {
+            localStorage.removeItem(`${app.activeId()}-active-topic-default-template`);
+          }
           navigateToSubpage('/new/thread');
         },
         label: `New ${t.name} Thread`,

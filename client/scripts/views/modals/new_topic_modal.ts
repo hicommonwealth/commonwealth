@@ -6,7 +6,7 @@ import $ from 'jquery';
 import { Button, Input, Form, FormGroup, FormLabel, Checkbox } from 'construct-ui';
 import BN from 'bn.js';
 
-import { confirmationModalWithText } from 'views/modals/confirm_modal';
+import QuillEditor from 'views/components/quill_editor';
 import { CompactModalExitButton } from 'views/modal';
 import { tokensToTokenBaseUnits } from 'helpers';
 import { stubFalse } from 'lodash';
@@ -14,34 +14,42 @@ interface INewTopicModalForm {
   id: number,
   name: string,
   description: string,
-  token_threshold: string
-  featured_in_sidebar: boolean,
-  featured_in_new_post: boolean,
+  tokenThreshold: string,
+  featuredInSidebar: boolean,
+  featuredInNewPost: boolean,
 }
 
 const NewTopicModal: m.Component<{
   id: number,
   name: string,
   description: string,
-  token_threshold: string
-  featured_in_sidebar: boolean,
-  featured_in_new_post: boolean,
+  tokenThreshold: string,
+  featuredInSidebar: boolean,
+  featuredInNewPost: boolean,
 }, {
   error: any,
   form: INewTopicModalForm,
   saving: boolean,
+  quillEditorState,
 }> = {
   view: (vnode) => {
-    if (!app.user.isSiteAdmin && !app.user.isAdminOfEntity({ chain: app.activeChainId(),
-      community: app.activeCommunityId() })) return null;
+    if (!app.user.isSiteAdmin
+    && !app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })) {
+      return null;
+    }
+    const { id, name, description, tokenThreshold = '0', featuredInSidebar, featuredInNewPost } = vnode.attrs;
     if (!vnode.state.form) {
-      vnode.state.form = {
-        id: undefined,
-        name: '',
-        description: '',
-        token_threshold: '0',
-        featured_in_sidebar: false,
-        featured_in_new_post: false };
+      vnode.state.form = { id, name, description, tokenThreshold, featuredInSidebar, featuredInNewPost };
+    }
+    let disabled = false;
+    if (!vnode.state.form.name || !vnode.state.form.name.trim()) disabled = true;
+
+    if (vnode.state.form.featuredInNewPost
+      && vnode.state.quillEditorState
+      && vnode.state.quillEditorState.editor
+      && vnode.state.quillEditorState.editor.editor.isBlank()
+    ) {
+      disabled = true;
     }
 
     return m('.NewTopicModal', [
@@ -82,17 +90,17 @@ const NewTopicModal: m.Component<{
             }),
           ]),
           m(FormGroup, [
-            m(FormLabel, { for: 'token_threshold' }, `Number of tokens needed to post (${app.chain.meta.chain.symbol})`),
+            m(FormLabel, { for: 'tokenThreshold' }, `Number of tokens needed to post (${app.chain.meta.chain.symbol})`),
             m(Input, {
               title: 'Token threshold',
               class: 'topic-form-token-threshold',
               tabindex: 2,
               defaultValue: '0',
-              value: vnode.state.form.token_threshold,
+              value: vnode.state.form.tokenThreshold,
               oninput: (e) => {
                 // restrict it to numerical input
                 if (e.target.value === '' || /^\d+\.?\d*$/.test(e.target.value)) {
-                  vnode.state.form.token_threshold = (e.target as any).value;
+                  vnode.state.form.tokenThreshold = (e.target as any).value;
                 }
               }
             })
@@ -100,33 +108,60 @@ const NewTopicModal: m.Component<{
           m(FormGroup, [
             m(Checkbox, {
               label: 'Featured in Sidebar',
-              checked: vnode.state.form.featured_in_sidebar,
+              checked: vnode.state.form.featuredInSidebar,
               onchange: (e) => {
-                vnode.state.form.featured_in_sidebar = !vnode.state.form.featured_in_sidebar;
+                vnode.state.form.featuredInSidebar = !vnode.state.form.featuredInSidebar;
               },
             }),
           ]),
           m(FormGroup, [
             m(Checkbox, {
               label: 'Featured in New Post',
-              checked: vnode.state.form.featured_in_new_post,
+              checked: vnode.state.form.featuredInNewPost,
               onchange: (e) => {
-                vnode.state.form.featured_in_new_post = !vnode.state.form.featured_in_new_post;
+                vnode.state.form.featuredInNewPost = !vnode.state.form.featuredInNewPost;
               },
+            }),
+          ]),
+          vnode.state.form.featuredInNewPost && m(FormGroup, [
+            m(QuillEditor, {
+              contentsDoc: '',
+              oncreateBind: (state) => {
+                vnode.state.quillEditorState = state;
+              },
+              editorNamespace: 'new-discussion',
+              imageUploader: true,
+              tabindex: 3,
             }),
           ]),
           m(Button, {
             intent: 'primary',
-            disabled: vnode.state.saving,
+            disabled: vnode.state.saving || disabled,
             rounded: true,
             onclick: async (e) => {
               e.preventDefault();
-              if (!vnode.state.form.name.trim()) return;
+              const { quillEditorState, form } = vnode.state;
+
+              if (quillEditorState) {
+                quillEditorState.editor.enable(false);
+              }
+
+              const mentionsEle = document.getElementsByClassName('ql-mention-list-container')[0];
+              if (mentionsEle) (mentionsEle as HTMLElement).style.visibility = 'hidden';
+              const defaultOffchainTemplate = !quillEditorState ? ''
+                : quillEditorState.markdownMode
+                  ? quillEditorState.editor.getText()
+                  : JSON.stringify(quillEditorState.editor.getContents());
+
               app.topics.add(
-                vnode.state.form.name, vnode.state.form.description, null,
-                vnode.state.form.featured_in_sidebar, vnode.state.form.featured_in_new_post,
-                tokensToTokenBaseUnits(vnode.state.form.token_threshold ? vnode.state.form.token_threshold : '0', 
-                  app.chain.meta.chain.decimals ? app.chain.meta.chain.decimals : 18)
+                form.name,
+                form.description,
+                null,
+                form.featuredInSidebar,
+                form.featuredInNewPost,
+                tokensToTokenBaseUnits(vnode.state.form.tokenThreshold || '0',
+                  app.chain.meta.chain.decimals || 18),
+                defaultOffchainTemplate
               ).then(() => {
                 vnode.state.saving = false;
                 m.redraw();

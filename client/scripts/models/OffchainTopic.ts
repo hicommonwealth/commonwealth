@@ -6,12 +6,13 @@ class OffchainTopic {
   public readonly telegram: string;
   public readonly communityId?: string;
   public readonly chainId?: string;
-  public readonly token_threshold?: BN;
+  public readonly tokenThreshold?: BN;
   public readonly featuredInSidebar?: boolean;
   public readonly featuredInNewPost?: boolean;
+  public readonly defaultOffchainTemplate?: string;
 
   constructor(name, id, description, telegram, communityId, chainId,
-    featuredInSidebar, featuredInNewPost, token_threshold?) {
+    featuredInSidebar, featuredInNewPost, defaultOffchainTemplate, tokenThreshold?) {
     this.name = name;
     this.id = id;
     this.description = description;
@@ -20,13 +21,14 @@ class OffchainTopic {
     this.chainId = chainId;
     this.featuredInSidebar = featuredInSidebar;
     this.featuredInNewPost = featuredInNewPost;
-
-    this.token_threshold = token_threshold;
+    this.defaultOffchainTemplate = defaultOffchainTemplate;
+    this.tokenThreshold = tokenThreshold;
   }
   public static fromJSON({ name, id, description, telegram, communityId, chainId,
-    featuredInSidebar, featuredInNewPost, token_threshold }) {
-    return new OffchainTopic(name, id, description, telegram, communityId, chainId, 
-      featuredInSidebar, featuredInNewPost, token_threshold);
+    featuredInSidebar, featuredInNewPost, defaultOffchainTemplate, tokenThreshold
+  }) {
+    return new OffchainTopic(name, id, description, telegram, communityId, chainId,
+      featuredInSidebar, featuredInNewPost, defaultOffchainTemplate, tokenThreshold);
   }
 }
 
