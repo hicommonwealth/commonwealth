@@ -49,7 +49,7 @@ const updateThreadStage = async (models: DB, req: Request, res: Response, next: 
       entity = await models.Chain.findOne({ where: { id: thread.chain } });
     }
     try {
-      customStages = Array.from(JSON.parse(entity.customStages)).map(s => s.toString()).filter(s => s);
+      customStages = Array.from(JSON.parse(entity.customStages)).map((s) => s.toString()).filter((s) => s);
     } catch (e) {}
 
     // validate stage

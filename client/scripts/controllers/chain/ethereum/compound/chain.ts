@@ -3,23 +3,23 @@ import { GovernorAlpha__factory } from 'eth/types';
 import { NodeInfo } from 'models';
 import EthereumChain from '../chain';
 import { attachSigner } from '../contractApi';
-import MarlinAPI from './api';
+import CompoundAPI from './api';
 
 // Thin wrapper over EthereumChain to guarantee the `init()` implementation
 // on the Governance module works as expected.
 // Also includes some API-but-not-Governance-related calls.
-export default class MarlinChain extends EthereumChain {
-  public marlinApi: MarlinAPI;
+export default class CompoundChain extends EthereumChain {
+  public compoundApi: CompoundAPI;
 
   public async init(selectedNode: NodeInfo) {
     await super.resetApi(selectedNode);
     await super.initMetadata();
-    this.marlinApi = new MarlinAPI(
+    this.compoundApi = new CompoundAPI(
       GovernorAlpha__factory.connect,
       selectedNode.address,
       this.api.currentProvider as any
     );
-    this.marlinApi.init();
+    await this.compoundApi.init(selectedNode.tokenName);
   }
 
   public deinit() {
@@ -29,20 +29,25 @@ export default class MarlinChain extends EthereumChain {
   }
 
   public async priorDelegates(address: string, blockNumber: number | string) {
-    const delegates = await this.marlinApi.Contract.getPriorVotes(address, blockNumber);
+    const delegates = await this.compoundApi.Token.getPriorVotes(address, blockNumber);
     return new BN(delegates.toString(), 10) || new BN(0);
   }
 
   public async balanceOf(address: string) {
-    const balance = await this.marlinApi.Contract.balanceOf(address);
-    console.log('balanceOf Marlin Accounts', balance);
+    const balance = await this.compoundApi.Token.balanceOf(address);
+    console.log('balanceOf Compound Accounts', balance);
     return new BN(balance.toString(), 10) || new BN(0);
   }
 
   public async setDelegate(address: string, amount: number) {
     try {
-      const contract = await attachSigner(this.app.wallets, this.app.user.activeAccount.address, this.marlinApi.MPond);
-      await contract.delegate(address, amount);
+      const contract = await attachSigner(
+        this.app.wallets,
+        this.app.user.activeAccount.address,
+        this.compoundApi.Token,
+      );
+      const gasLimit = await contract.estimateGas.delegate(address, amount);
+      await contract.delegate(address, amount, { gasLimit });
     } catch (e) {
       console.error(e);
       throw new Error(e);
@@ -65,12 +70,12 @@ export default class MarlinChain extends EthereumChain {
   }
 
   public async isHolder(address: string): Promise<boolean> {
-    const m = await this.marlinApi.MPond.balanceOf(address);
+    const m = await this.compoundApi.Token.balanceOf(address);
     return !m.isZero();
   }
 
   public async isDelegate(address: string): Promise<boolean> {
-    const delegator = await this.marlinApi.MPond.getCurrentVotes(address);
+    const delegator = await this.compoundApi.Token.getCurrentVotes(address);
     return !delegator.isZero();
   }
 }

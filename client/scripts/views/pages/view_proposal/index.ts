@@ -49,6 +49,7 @@ import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 import { SocialSharingCarat } from 'views/components/social_sharing_carat';
 
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
+import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
 import {
   ProposalHeaderExternalLink, ProposalHeaderBlockExplorerLink, ProposalHeaderVotingInterfaceLink,
   ProposalHeaderOffchainPoll,
@@ -249,7 +250,7 @@ const ProposalHeader: m.Component<{
                       vnode.state.topicEditorIsOpen = true;
                     }
                   }),
-                  (isAuthor || isAdmin)
+                  (isAuthor || isAdmin  || app.user.isSiteAdmin)
                     && m(ProposalBodyDeleteMenuItem, { item: proposal }),
                   (isAuthor || isAdmin)
                     && m(ProposalHeaderPrivacyMenuItems, { proposal, getSetGlobalEditingStatus }),
@@ -755,9 +756,19 @@ const ViewProposalPage: m.Component<{
       (app.activeCommunityId()
         ? app.comments.refresh(proposal, null, app.activeCommunityId())
         : app.comments.refresh(proposal, app.activeChainId(), null))
-        .then((result) => {
-          // fetch only top-level components first
+        .then(async (result) => {
           vnode.state.comments = app.comments.getByProposal(proposal).filter((c) => c.parentComment === null);
+          // fetch reactions
+          const { result: reactionCounts } = await $.post(`${app.serverUrl()}/reactionsCounts`, {
+            thread_ids: [proposalId],
+            comment_ids: vnode.state.comments.map((comment) => comment.id),
+            active_address: app.user.activeAccount?.address
+          });
+          // app.reactionCounts.deinit()
+          for (const rc of reactionCounts) {
+            const id = app.reactionCounts.store.getIdentifier(rc);
+            app.reactionCounts.store.add(modelReactionCountFromServer({ ...rc, id }));
+          }
           m.redraw();
         }).catch((err) => {
           notifyError('Failed to load comments');

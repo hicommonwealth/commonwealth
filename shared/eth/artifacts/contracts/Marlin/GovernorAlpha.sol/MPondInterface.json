@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
   "contractName": "MPondInterface",
-  "sourceName": "contracts/Marlin/GovernorAlpha.sol",
+  "sourceName": "contracts/compound/GovernorAlpha.sol",
   "abi": [
     {
       "inputs": [

@@ -1030,10 +1030,10 @@
         "AaveTokenV2"
       ]
     },
-    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/Marlin/Timelock.sol": {
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/compound/Timelock.sol": {
       "lastModificationDate": 1622827417915,
       "contentHash": "5db33f7810fb6b85895f99aab24cfca1",
-      "sourceName": "contracts/Marlin/Timelock.sol",
+      "sourceName": "contracts/compound/Timelock.sol",
       "solcConfig": {
         "version": "0.5.5",
         "settings": {
@@ -1442,10 +1442,10 @@
         "SelfdestructTransfer"
       ]
     },
-    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/Marlin/GovernorAlpha.sol": {
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/compound/GovernorAlpha.sol": {
       "lastModificationDate": 1622827417915,
       "contentHash": "75ebd248a23b28d6dd6c2cda9c82d597",
-      "sourceName": "contracts/Marlin/GovernorAlpha.sol",
+      "sourceName": "contracts/compound/GovernorAlpha.sol",
       "solcConfig": {
         "version": "0.6.12",
         "settings": {
@@ -1479,10 +1479,10 @@
         "TimelockInterface"
       ]
     },
-    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/Marlin/MPond.sol": {
+    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/compound/MPond.sol": {
       "lastModificationDate": 1622827417915,
       "contentHash": "db91352c0ae4a34c862bfd8fc859f51e",
-      "sourceName": "contracts/Marlin/MPond.sol",
+      "sourceName": "contracts/compound/MPond.sol",
       "solcConfig": {
         "version": "0.6.12",
         "settings": {

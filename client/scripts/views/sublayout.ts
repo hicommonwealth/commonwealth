@@ -50,26 +50,26 @@ const Sublayout: m.Component<{
     const chain = app.chain ? app.chain.meta.chain : null;
     const community = app.community ? app.community.meta : null;
     const narrowBrowserWidth = (window.innerWidth > 767.98) && (window.innerWidth < 850);
-    const terms = app.chain ? app.chain.meta.chain.terms : null;
+    const terms = app.chain ? chain.terms : null;
 
     const ICON_SIZE = 22;
     const sublayoutHeaderLeft = m('.sublayout-header-left', [
       (!app.activeId() && !app.isCustomDomain() && (m.route.get() === '/' || m.route.get().startsWith('/?'))) ? [
         m('h3', 'Commonwealth')
       ] : chain ? [
-        m('.ChainIcon',[
-          link('a', (!app.isCustomDomain() ? `/${app.activeId()}` : '/' ), [
+        m('.ChainIcon', [
+          link('a', (!app.isCustomDomain() ? `/${app.activeId()}` : '/'), [
             m(ChainIcon, { size: ICON_SIZE, chain })
           ])
-        ]),      
+        ]),
         m('h4.sublayout-header-heading', [
           link('a', (app.isCustomDomain() ? '/' : `/${app.activeId()}`), chain.name),
           title && m('span.breadcrumb', m.trust('/')),
           title
         ]),
       ] : community ? [
-        m('.ChainIcon',[
-          link('a', (!app.isCustomDomain() ? `/${app.activeId()}` : '/' ), [
+        m('.ChainIcon', [
+          link('a', (!app.isCustomDomain() ? `/${app.activeId()}` : '/'), [
             m(CommunityIcon, { size: ICON_SIZE, community })
           ])
         ]),
@@ -133,7 +133,7 @@ const Sublayout: m.Component<{
             ? m('.sublayout-hero', hero)
             : (app.isLoggedIn() && (app.chain as Token)?.isToken && !(app.chain as Token)?.hasToken)
               ? m('.sublayout-hero.token-banner', [
-                m('.token-banner-content', `Link ${app.chain.meta.chain.symbol} address to participate in this community`),
+                m('.token-banner-content', `Link an address that holds ${chain.symbol} to participate in governance.`),
               ]) : '',
           terms && tosStatus !== 'off'
             ? m('.token-banner-terms', [

@@ -8,6 +8,7 @@ export interface ChainNodeAttributes {
   url: string;
   id?: number;
   address?: string;
+  token_name?: string;
 
   // associations
   Chain?: ChainAttributes;
@@ -29,6 +30,7 @@ export default (
     chain: { type: dataTypes.STRING, allowNull: false },
     url: { type: dataTypes.STRING, allowNull: false },
     address: { type: dataTypes.STRING, allowNull: true },
+    token_name: { type: dataTypes.STRING, allowNull: true },
   }, {
     tableName: 'ChainNodes',
     timestamps: false,

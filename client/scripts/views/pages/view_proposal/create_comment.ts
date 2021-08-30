@@ -67,7 +67,6 @@ const CreateComment: m.Component<{
       const mentionsEle = document.getElementsByClassName('ql-mention-list-container')[0];
       if (mentionsEle) (mentionsEle as HTMLElement).style.visibility = 'hidden';
 
-
       const commentText = quillEditorState.markdownMode
         ? quillEditorState.editor.getText()
         : JSON.stringify(quillEditorState.editor.getContents());
