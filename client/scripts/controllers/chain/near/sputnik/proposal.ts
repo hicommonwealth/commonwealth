@@ -20,6 +20,7 @@ import {
   isWeight,
   getUserRoles,
   getTotalSupply,
+  isChangePolicy,
 } from './types';
 
 export default class NearSputnikProposal extends Proposal<
@@ -38,7 +39,7 @@ export default class NearSputnikProposal extends Proposal<
     const decimals = 18;
     // naming taken from https://github.com/AngelBlock/sputnik-dao-2-mockup/blob/dev/src/ProposalPage.jsx#L188
     if (this.data.kind === 'ChangeConfig') return 'Change Config: ';
-    if (this.data.kind === 'ChangePolicy') return 'Change Policy: ';
+    if (isChangePolicy(this.data.kind)) return 'Change Policy';
     if (this.data.kind === 'UpgradeSelf') return `UpgradeSelf: ${this.data.target}`;
     if (this.data.kind === 'UpgradeRemote') return `UpgradeRemote: ${this.data.target}`;
     if (this.data.kind === 'Transfer') return `Transfer: ${this.data.target}`;
