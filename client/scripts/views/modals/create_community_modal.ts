@@ -687,42 +687,46 @@ const SputnikForm: m.Component<SputnikFormAttrs, SputnikFormState> = {
             createNew,
           } = vnode.state;
           vnode.state.saving = true;
+          const id = (app.chain as Near).chain.isMainnet ? `${name}.sputnik-dao.near` : `${name}.sputnikv2.testnet`;
+          const addChainNodeArgs = {
+            name: id,
+            description,
+            node_url: (app.chain as Near).chain.isMainnet
+              ? 'https://rpc.mainnet.near.org'
+              : 'https://rpc.testnet.near.org',
+            symbol: (app.chain as Near).chain.isMainnet ? 'NEAR' : 'tNEAR',
+            website,
+            discord,
+            element,
+            telegram,
+            github,
+            jwt: app.user.jwt,
+            type: 'dao',
+            id,
+            base: 'near',
+            network: 'sputnik'
+          };
           if (createNew) {
-            // TODO: validate
+            // TODO: we need to validate arguments prior to making this call/redirect, so that
+            //   /addChainNode doesn't fail after the DAO has been created
             // https://github.com/AngelBlock/sputnik-dao-2-mockup/blob/dev/src/Selector.jsx#L159
             try {
               const account = app.user.activeAccount as NearAccount;
               const v = new BN(initialValue);
-              await NearSputnikDao.createDaoTx(account, name, description, v);
-              console.log('Created DAO successfully!');
+              // write addChainNode data to localstorage to call in finishNearLogin page
+              localStorage[id] = JSON.stringify(addChainNodeArgs);
+              // triggers a redirect
+              await (app.chain as Near).chain.createDaoTx(account, name, description, v);
             } catch (err) {
               notifyError(err.responseJSON?.error || 'Creating DAO failed.');
               console.error(err.responseJSON?.error || err.message);
               vnode.state.saving = false;
-              return;
             }
+            return;
           }
           try {
             // TODO: ensure id format is correct
-            const id = (app.chain as Near).chain.isMainnet ? `${name}.sputnik-dao.near` : `${name}.sputnikv2.testnet`;
-            const res = await $.post(`${app.serverUrl()}/addChainNode`, {
-              name: id,
-              description,
-              node_url: (app.chain as Near).chain.isMainnet
-                ? 'https://rpc.mainnet.near.org'
-                : 'https://rpc.testnet.near.org',
-              symbol: (app.chain as Near).chain.isMainnet ? 'NEAR' : 'tNEAR',
-              website,
-              discord,
-              element,
-              telegram,
-              github,
-              jwt: app.user.jwt,
-              type: 'dao',
-              id,
-              base: 'near',
-              network: 'sputnik'
-            });
+            const res = await $.post(`${app.serverUrl()}/addChainNode`, addChainNodeArgs);
             await initAppState(false);
             $(e.target).trigger('modalexit');
             m.route.set(`/${res.result.chain}`);

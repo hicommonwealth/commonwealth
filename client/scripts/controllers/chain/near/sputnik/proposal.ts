@@ -1,11 +1,10 @@
-import { Near as NearApi, Contract } from 'near-api-js';
+import { Near as NearApi } from 'near-api-js';
 import BN from 'bn.js';
 import moment from 'moment';
 import { Proposal, ProposalEndTime, VotingType, VotingUnit, ProposalStatus, ITXModalData } from 'models';
 import { NearToken } from 'adapters/chain/near/types';
 import { NearAccount, NearAccounts } from 'controllers/chain/near/account';
 import NearChain from 'controllers/chain/near/chain';
-import { notifyError } from 'controllers/app/notifications';
 import NearSputnikDao from './dao';
 import {
   INearSputnikProposal,
@@ -204,32 +203,20 @@ export default class NearSputnikProposal extends Proposal<
   }
 
   public async submitVoteWebTx(vote: NearSputnikVote) {
-    // init contract via wallet connection
     const account = this._Dao.app.user.activeAccount as NearAccount;
     if (account.address !== vote.account.address) {
       throw new Error('Invalid vote address!');
     }
 
-    const walletConnection = account.walletConnection;
-    const contract = new Contract(
-      walletConnection,
-      this._Dao.app.activeChainId(),
-      { changeMethods: [ 'act_proposal' ], viewMethods: [] },
-    );
+    // TODO: user pre-checks
 
-    // TODO: user checks
-
-    // perform tx
-    try {
-      console.log((contract as any).act_proposal);
-      await (contract as any).act_proposal({
-        id: this.data.id,
-        action: `Vote${vote.choice}`,
-      }, '250000000000000'); // TODO: configure gas?
-    } catch (e) {
-      console.error(e);
-      notifyError('Failed to send vote.');
-    }
+    const contractId = this._Dao.app.activeChainId();
+    const methodName = 'act_proposal';
+    const args = {
+      id: this.data.id,
+      action: `Vote${vote.choice}`,
+    };
+    await this._Chain.redirectTx(contractId, methodName, args, undefined, window.location.href);
   }
 
   public submitVoteTx(vote: NearSputnikVote): ITXModalData {
