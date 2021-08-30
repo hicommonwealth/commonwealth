@@ -41,8 +41,7 @@ $discussion-title-font-size: 1.45rem;
         @include supports-jump-highlight();
     }
     .ProposalHeader,
-    .ProposalComment,
-    .CreateComment {
+    .ProposalComment {
         padding-top: 40px;
         @include xs-max {
             padding-top: 30px;
@@ -60,24 +59,35 @@ $discussion-title-font-size: 1.45rem;
             display: flex;
             max-width: 300px;
             align-items: center;
+            .InlineReplyButton {
+                background: #F3FBFF;
+            }
+            .ProposalBodyReaction {
+                background: #FFF4F6;
+            }
+            .InlineReplyButton:hover {
+                background: #bbe6fc;
+            }
+            .ProposalBodyReaction:hover {
+                background: #f5c2cb;
+            }
             .InlineReplyButton,
             .ProposalBodyReaction {
-                margin-right: 10%;
+                margin-right: 7%;
                 padding: 6px;
                 cursor: pointer;
-                &:hover {
-                    background: #F7F4FF;
-                    border-radius: 8px;
-                    .cui-icon, .reply-count, .reactions-count {
-                        color: #4723AD;
-                    }
-                }
+                border-radius: 20px;
+                width: 70px;
+                height: 30px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
                 .cui-icon, .reply-count, .reactions-count {
                     color: black;
                     font-weight: 500;
                 }
                 .cui-icon {
-                    margin-right: 13px;
+                    margin-right: 8px;
                 }
                 .reply-count, .reactions-count {
                     position: relative;

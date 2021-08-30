@@ -507,7 +507,6 @@ const ProposalComment: m.Component<{
               m(ProposalBodyCancelEdit, { item: comment, getSetGlobalEditingStatus, parentState: vnode.state }),
             ])
             : m('.comment-response-row', [
-              m(ProposalBodyReaction, { item: comment }),
               m(InlineReplyButton, {
                 commentReplyCount,
                 onclick: (e) => {
@@ -518,9 +517,9 @@ const ProposalComment: m.Component<{
                   } else {
                     proposalPageState.replying = false;
                   }
-                  console.log(proposalPageState);
                 }
-              })
+              }),
+              m(ProposalBodyReaction, { item: comment }),
             ]),
         ]),
       ]),
