@@ -42,7 +42,8 @@ const EditTopicModal : m.Component<{
     const updateTopic = async (form) => {
       const { quillEditorState } = vnode.state;
       if (form.featuredInNewPost && quillEditorState.editor.editor.isBlank()) {
-        return;
+        vnode.state.error = 'Must provide template.';
+        throw new Error('Must provide template.');
       }
 
       if (quillEditorState) {
@@ -68,6 +69,7 @@ const EditTopicModal : m.Component<{
       };
       await app.topics.edit(topicInfo);
       navigateToSubpage(`/discussions/${encodeURI(form.name.toString().trim())}`);
+      return true;
     };
 
     const deleteTopic = async (form) => {
