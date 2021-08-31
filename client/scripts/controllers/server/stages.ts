@@ -13,7 +13,8 @@ const modelFromServer = (stage) => {
     stage.community_id,
     stage.chain_id,
     stage.featured_in_sidebar,
-    stage.featured_in_new_post
+    stage.featured_in_new_post,
+    stage.default_offchain_template
   );
 };
 
@@ -38,6 +39,7 @@ class StagesController {
         'description': stage.description,
         'featured_in_sidebar': stage.featuredInSidebar,
         'featured_in_new_post': stage.featuredInNewPost,
+        'default_offchain_template': stage.defaultOffchainTemplate,
         'address': app.user.activeAccount.address,
         'jwt': app.user.jwt
       });

@@ -233,7 +233,7 @@ const DiscussionStagesBar: m.Component<{ topic: string; stageId: number }, {}> =
               label: 'All Stages',
             }),
             m(MenuDivider),
-            stages.map(({ id, name, description, featuredInSidebar, featuredInNewPost }, index) => m(MenuItem, {
+            stages.map(({ id, name, description, featuredInSidebar, featuredInNewPost, defaultOffchainTemplate }, index) => m(MenuItem, {
               key: id,
               active: stageId === id,
               iconLeft: stageId === id ? Icons.CHECK : null,
@@ -255,7 +255,7 @@ const DiscussionStagesBar: m.Component<{ topic: string; stageId: number }, {}> =
                       e.preventDefault();
                       app.modals.create({
                         modal: EditStageModal,
-                        data: { id, name, description, featuredInSidebar, featuredInNewPost },
+                        data: { id, name, description, featuredInSidebar, featuredInNewPost, defaultOffchainTemplate },
                       });
                     },
                   }),

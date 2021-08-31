@@ -6,8 +6,9 @@ class OffchainStage {
   public readonly chainId?: string;
   public readonly featuredInSidebar?: boolean;
   public readonly featuredInNewPost?: boolean;
+  public readonly defaultOffchainTemplate?: string;
 
-  constructor(name, id, description, communityId, chainId, featuredInSidebar, featuredInNewPost) {
+  constructor(name, id, description, communityId, chainId, featuredInSidebar, featuredInNewPost, defaultOffchainTemplate) {
     this.name = name;
     this.id = id;
     this.description = description;
@@ -15,9 +16,10 @@ class OffchainStage {
     this.chainId = chainId;
     this.featuredInSidebar = featuredInSidebar;
     this.featuredInNewPost = featuredInNewPost;
+    this.defaultOffchainTemplate = defaultOffchainTemplate;
   }
-  public static fromJSON({ name, id, description, communityId, chainId, featuredInSidebar, featuredInNewPost }) {
-    return new OffchainStage(name, id, description, communityId, chainId, featuredInSidebar, featuredInNewPost);
+  public static fromJSON({ name, id, description, communityId, chainId, featuredInSidebar, featuredInNewPost, defaultOffchainTemplate }) {
+    return new OffchainStage(name, id, description, communityId, chainId, featuredInSidebar, featuredInNewPost, defaultOffchainTemplate);
   }
 }
 
