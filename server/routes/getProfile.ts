@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import { Op } from 'sequelize';
+import { Op, QueryTypes } from 'sequelize';
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
-import { DB } from '../database';
+import { DB, sequelize } from '../database';
 
 export const Errors = {
   NoChain: 'No base chain provided in query',
@@ -11,7 +11,7 @@ export const Errors = {
 };
 
 const getProfile = async (models: DB, req: Request, res: Response, next: NextFunction) => {
-  const { chain, address } = req.query;
+  const { chain, address, topics, stages } = req.query;
   if (!chain) return next(new Error(Errors.NoChain));
   if (!address) return next(new Error(Errors.NoAddress));
 
@@ -43,7 +43,6 @@ const getProfile = async (models: DB, req: Request, res: Response, next: NextFun
   const publicChains = await models.Chain.findAll();
   const visibleChainIds = publicChains.map((c) => c.id);
 
-
   const addressModel = await models.Address.findOne({
     where: {
       address,
@@ -53,6 +52,16 @@ const getProfile = async (models: DB, req: Request, res: Response, next: NextFun
   });
   if (!addressModel) return next(new Error(Errors.NoAddressFound));
 
+  const topicIdFilter = {};
+  const stagesFilter = {};
+
+  if (topics) {
+    topicIdFilter['topic_id'] = { [Op.in]: topics.split(',') };
+  }
+  if (stages) {
+    stagesFilter['stage'] = { [Op.in]: stages.split(',') };
+  }
+
   const threads = await models.OffchainThread.findAll({
     where: {
       address_id: addressModel.id,
@@ -60,26 +69,48 @@ const getProfile = async (models: DB, req: Request, res: Response, next: NextFun
         community: { [Op.in]: visibleCommunityIds }
       }, {
         chain: { [Op.in]: visibleChainIds }
-      }]
+      }],
+      ...topicIdFilter,
+      ...stagesFilter,
     },
     include: [ { model: models.Address, as: 'Address' } ],
   });
 
-  const comments = await models.OffchainComment.findAll({
-    where: {
-      address_id: addressModel.id,
-      [Op.or]: [{
-        community: { [Op.in]: visibleCommunityIds }
-      }, {
-        chain: { [Op.in]: visibleChainIds }
-      }]
-    },
-  });
+  let comments;
+
+  if (topics || stages) {
+    sequelize.query('', { type:QueryTypes.SELECT });
+  } else {
+    comments = await models.OffchainComment.findAll({
+      where: {
+        address_id: addressModel.id,
+        [Op.or]: [{
+          community: { [Op.in]: visibleCommunityIds }
+        }, {
+          chain: { [Op.in]: visibleChainIds }
+        }]
+      },
+    });
+  }
+
+  // const reactions = await models.OffchainReaction.findAll({
+  //   where: {
+  //     address_id: addressModel.id,
+  //     [Op.or]: [{
+  //       community: { [Op.in]: visibleCommunityIds }
+  //     }, {
+  //       chain: { [Op.in]: visibleChainIds }
+  //     }]
+  //   },
+  // });
 
   return res.json({
     status: 'Success',
     result: {
-      account: addressModel, threads: threads.map((t) => t.toJSON()), comments: comments.map((c) => c.toJSON())
+      account: addressModel,
+      threads: threads.map((t) => t.toJSON()),
+      comments: comments.map((c) => c.toJSON()),
+      // reactions: reactions.map((c) => c.toJSON()),
     }
   });
 };

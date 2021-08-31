@@ -23,6 +23,7 @@ import ProfileHeader from './profile_header';
 import ProfileContent from './profile_content';
 import ProfileBio from './profile_bio';
 import ProfileBanner from './profile_banner';
+import ProfileFilterModal from '../../modals/profile_filter_modal';
 
 const commentModelFromServer = (comment) => {
   const attachments = comment.OffchainAttachments
@@ -413,6 +414,11 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
             }),
             m(Tabs, [{
               name: allTabTitle,
+              filterIcon: true,
+              sticky: true,
+              filterIconOnClick: () => {
+                app.modals.create({ modal: ProfileFilterModal });
+              },
               content: m(ProfileContent, {
                 account,
                 type: UserContent.All,

@@ -1,0 +1,30 @@
+@import 'client/styles/shared';
+
+.ProfileFilterModal {
+  .title {
+    font-size: 32px;
+    font-weight: 500;
+    margin-bottom: 24px;
+  }
+
+  .sub-heading {
+    font-size: 24px;
+    font-weight: 500;
+    color: #666666;
+    margin-bottom: 16px;
+  }
+
+  button {
+    display: block;
+    padding: 8px 15px 2px 15px;
+    border-radius: 8px;
+    border: 2px solid #DDDDDD;
+    color: #999999;
+    max-width: max-content;
+    margin-bottom: 12px;
+  }
+
+  .gray-border {
+    border-color: #DDDDDD;
+  }
+}

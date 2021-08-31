@@ -18,16 +18,24 @@ const Tabs = {
     }
     const names = vnode.children.map((t) => t.name);
     return m('.Tabs', [
-      m('.tab-bar', [
-        names.map((name, index) => {
-          return m('a.tab-entry', {
-            class: (vnode.state.selectedIndex === index ? 'active' : '')
+      m(`.flex.justify-between.bg-white.z-10${vnode.children[0].sticky && '.sticky.top-0'}`, [
+        m('.tab-bar', [
+          names.map((name, index) => {
+            return m('a.tab-entry', {
+              class: (vnode.state.selectedIndex === index ? 'active' : '')
               + (vnode.children[index].disabled ? ' disabled' : ''),
-            href: '#',
-            onclick: ((i, e) => { e.preventDefault(); vnode.state.selectedIndex = i; }).bind(this, index)
-          }, name);
+              href: '#',
+              onclick: ((i, e) => { e.preventDefault(); vnode.state.selectedIndex = i; }).bind(this, index)
+            }, name);
+          }),
+          m('.clear'),
+        ]),
+        vnode.children[0].filterIcon
+        && m('img.cursor-pointer', {
+          onclick: vnode.children[0].filterIconOnClick,
+          src: '/static/img/filter.svg',
+          alt: 'Filter results'
         }),
-        m('.clear'),
       ]),
       m('.tab-content', vnode.children[vnode.state.selectedIndex].content),
       m('.clear'),
