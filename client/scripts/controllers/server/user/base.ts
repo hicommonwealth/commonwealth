@@ -18,6 +18,10 @@ export default class {
   public get activeAccount(): Account<any> { return this._activeAccount; }
   private _setActiveAccount(account: Account<any>): void { this._activeAccount = account; }
 
+  private _user_id: number;
+  public get userId(): number { return this._user_id; }
+  private _setUserId(user_id: number): void { this._user_id = user_id; }
+
   private _email: string;
   public get email(): string { return this._email; }
   private _setEmail(email: string): void { this._email = email; }
@@ -89,6 +93,7 @@ export default class {
   // Recommend using the setActiveAccount helper in controllers/app/login.ts to persist the setting to the backend.
   public ephemerallySetActiveAccount(account: Account<any>): void { this._setActiveAccount(account); }
   public setEmail(email: string): void { this._setEmail(email); }
+  public setUserId(userId: number): void { this._setUserId(userId); }
   public setEmailInterval(emailInterval: string): void { this._setEmailInterval(emailInterval); }
   public setEmailVerified(verified: boolean): void { this._setEmailVerified(verified); }
   public setJWT(JWT: string): void { this._setJWT(JWT); }

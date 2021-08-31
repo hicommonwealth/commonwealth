@@ -14,6 +14,7 @@ export const Errors = {
   ExpiredToken: 'Token has expired, please re-register',
   InvalidSignature: 'Invalid signature, please re-register',
   NoEmail: 'No email to alert',
+  NoUserId: 'No user ID',
 };
 
 const verifyAddress = async (models: DB, req: Request, res: Response, next: NextFunction) => {

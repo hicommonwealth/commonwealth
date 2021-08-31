@@ -215,6 +215,7 @@ GROUP BY CONCAT("OffchainThreads".chain, "OffchainThreads".community);
     invites,
     loggedIn: true,
     user: {
+      userId: user.id,
       email: user.email,
       emailVerified: user.emailVerified,
       emailInterval: user.emailNotificationInterval,
