@@ -185,7 +185,8 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
         const allThreads = pinnedThreads.map((t) => {
           root_ids.push(`discussion_${t.id}`);
           return t.toJSON();
-        }).concat(threads);
+        });
+        // .concat(threads);
 
         // Comments
         const offchainComments = await models.OffchainComment.findAll({
@@ -202,21 +203,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
           return row;
         });
 
-        // Reactions
-        const matchThreadsOrComments = [
-          // @ts-ignore
-          { thread_id: allThreads.map((thread) => thread.id) },
-          // @ts-ignore
-          { comment_id: comments.map((comment) => comment.id) },
-        ];
-        const reactions = await models.OffchainReaction.findAll({
-          where: community
-            ? { community: community.id, [Op.or]: matchThreadsOrComments }
-            : { chain: chain.id, [Op.or]: matchThreadsOrComments },
-          include: [ models.Address ],
-          order: [['created_at', 'DESC']],
-        });
-        resolve([allThreads, comments, reactions]);
+        resolve([allThreads, comments]);
       } catch (e) {
         console.log(e);
         reject(new Error('Could not fetch threads, comments, or reactions'));
@@ -277,7 +264,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
     }),
   ]);
 
-  const [threads, comments, reactions] = threadsCommentsReactions as any;
+  const [threads, comments] = threadsCommentsReactions as any;
 
   // const numVotingThreads = threadsInVoting.filter((t) => t.stage === 'voting').length;
 
@@ -289,7 +276,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
       numVotingThreads: 0,
       threads, // already converted to JSON earlier
       comments, // already converted to JSON earlier
-      reactions: reactions.map((r) => r.toJSON()),
+      // reactions: reactions.map((r) => r.toJSON()),
       //
       admins: admins.map((a) => a.toJSON()),
       activeUsers: mostActiveUsers,

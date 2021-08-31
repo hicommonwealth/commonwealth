@@ -33,12 +33,14 @@ import createReaction from './routes/createReaction';
 import deleteReaction from './routes/deleteReaction';
 import viewReactions from './routes/viewReactions';
 import bulkReactions from './routes/bulkReactions';
+import reactionsCounts from './routes/reactionsCounts';
 import starCommunity from './routes/starCommunity';
 import createCommunity from './routes/createCommunity';
 import deleteCommunity from './routes/deleteCommunity';
 import updateCommunity from './routes/updateCommunity';
 import communityStats from './routes/communityStats';
 import getCommunitiesAndChains from './routes/getCommunitiesAndChains';
+import createChain from './routes/createChain';
 import viewCount from './routes/viewCount';
 import updateEmail from './routes/updateEmail';
 
@@ -202,6 +204,8 @@ function setupRouter(
   router.get('/communityStats', passport.authenticate('jwt', { session: false }), communityStats.bind(this, models));
   router.get('/getTokensFromLists', getTokensFromLists.bind(this, models));
   router.get('/getTokenForum', getTokenForum.bind(this, models));
+  // TODO: Change to POST /chain
+  router.post('/createChain', passport.authenticate('jwt', { session: false }), createChain.bind(this, models));
 
   // offchain threads
   // TODO: Change to POST /thread
@@ -318,6 +322,7 @@ function setupRouter(
   router.get('/viewReactions', viewReactions.bind(this, models));
   // TODO: Change to GET /reactions
   router.get('/bulkReactions', bulkReactions.bind(this, models));
+  router.post('/reactionsCounts', reactionsCounts.bind(this, models));
 
   // generic invite link
   // TODO: Change to POST /inviteLink

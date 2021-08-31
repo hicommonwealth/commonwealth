@@ -776,7 +776,7 @@ const NotificationsPage: m.Component<{}, {
               m(KusamaChainEventNotifications),
               m('tr.on-chain-events-header', m('th', { colspan: 2 }, 'Polkadot chain events')),
               m(PolkadotChainEventNotifications),
-              m('tr.on-chain-events-header', m('th', { colspan: 2 }, 'Dydx chain events')),
+              m('tr.on-chain-events-header', m('th', { colspan: 2 }, 'dYdX chain events')),
               m(DydxChainEventNotifications),
             ],
             selectedCommunity

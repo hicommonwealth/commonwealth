@@ -111,7 +111,6 @@ export default class MolochMember extends EthereumAccount {
     return txReceipt;
   }
 
-
   public async ragequitTx(sharesToBurn: BN) {
     const contract = await attachSigner(this.app.wallets, this.address, this._Members.api.Contract);
     if (!(await this._Members.isMember(this.address))) {
