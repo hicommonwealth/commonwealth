@@ -1,65 +1,89 @@
 import 'components/commonwealth/token_input.scss';
 
 import m from 'mithril';
-import { CustomSelect, ListItem, Icon, Icons, IOption, Input, Button  } from 'construct-ui';
+import { CustomSelect, ListItem, Icon, Icons, Input, Button  } from 'construct-ui';
 
-export type Token = {
-  id: string;
-  name: string;
-  address: {
-    kovan: string,
-    mainnet: string,
-  },
-  decimals: number;
-  symbol: string;
-  icon_url: string;
-}
+const floatRegex = /^[0-9]*\.?[0-9]*$/;
 
 const TokenInputField: m.Component<
-  { tokens: Token[] },
-  { token: Token, balance: number }
+  {
+    tokens: string[],
+    buttonLabel: string,
+    callback: (token: string, balance: number) => void,
+    actionDisabled: boolean
+  },
+  { token: string, balance: number, error: string }
 > = {
+  oncreate: (vnode) => {
+    vnode.state.token = vnode.attrs.tokens[0];
+    vnode.state.error = '';
+    vnode.state.balance = 0;
+  },
   view: (vnode) => {
-    const { tokens } = vnode.attrs;
-    const options = tokens.map(({ id, name }) => {
-      return {
-        label: name,
-        value: id
-      };
+    // contents for dropdown tokens
+    const options = vnode.attrs.tokens.map((symbol) => {
+      return { label: symbol, value: symbol };
     });
 
-    return m('.TokenInput', [
-      m('.SelectTokensField', [
-        m(CustomSelect, {
-          defaultValue: options[0].value,
-          itemRender: (item, isSelected, index) => m(ListItem, {
-            contentLeft: m(Icon, {
-              name: index % 2 ? Icons.FILE_PLUS : Icons.USERS
-            }),
-            label: (item as IOption).label,
-            selected: isSelected
-          }),
-          options,
-          onSelect: (s) => {
-            const selectedToken = tokens.filter(({ id }) => id === (s as any).value)[0];
-            vnode.state.token = selectedToken;
+    const buttonDisabled = vnode.attrs.actionDisabled || (
+      vnode.state.error && vnode.state.error !== ''
+    );
+
+    return m('div', [
+      m('.TokenInput', [
+        m('.SelectTokensField', [
+          m(CustomSelect, {
+            defaultValue: options[0].value,
+            itemRender: (s) => {
+              const sSymbol = (s as any).value;
+              const isSelected = sSymbol === vnode.state.token;
+              return m(ListItem, {
+                contentLeft: isSelected && m(Icon, {
+                  name: Icons.CHECK
+                }),
+                label: sSymbol,
+                selected: isSelected
+              });
+            },
+            options,
+            onSelect: (s) => {
+              vnode.state.token = (s as any).value;
+            }
+          })
+        ]),
+        m(Input, {
+          placeholder: 'Type your amount to back',
+          oninput: (e) => {
+            const result = (e.target as any).value;
+            if (floatRegex.test(result)) {
+              vnode.state.balance = parseFloat(result);
+              vnode.state.error = '';
+            } else {
+              vnode.state.balance = 0;
+              vnode.state.error = 'Invalid amount value';
+            }
           }
-        })
+        }),
+        m(Button, {
+          disabled: buttonDisabled,
+          onclick: async (e) => {
+            e.preventDefault();
+            if (vnode.state.balance <= 0) {
+              vnode.state.error = 'Invalid amount value';
+            } else if (vnode.state.error === '') {
+              await vnode.attrs.callback(vnode.state.token, vnode.state.balance);
+            }
+          },
+          label: vnode.attrs.buttonLabel || 'back',
+        }),
       ]),
-      m(Input, {
-        placeholder: 'Type your amount to back',
-        oninput: (e) => {
-          const result = (e.target as any).value;
-          vnode.state.balance = result;
-        }
-      }),
-      m(Button, {
-        onclick: (e) => {
-          console.log('====>token', vnode.state.token);
-          console.log('====>vnode.state.balance', vnode.state.balance);
-        },
-        label: 'back',
-      }),
+      vnode.state.error
+      && vnode.state.error !== ''
+      && m(
+        'p',
+        { style: 'color: red; width: 100%; text-align: center; margin-top: 5px' },
+        vnode.state.error
+      ),
     ]);
   }
 };

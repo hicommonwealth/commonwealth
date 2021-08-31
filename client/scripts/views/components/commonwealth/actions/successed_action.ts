@@ -1,44 +1,104 @@
 import 'components/commonwealth/action_card.scss';
 
-import { utils } from 'ethers';
-import { Input, FormGroup, Button } from 'construct-ui';
+import { Button } from 'construct-ui';
 import m from 'mithril';
 import BN from 'bn.js';
 
 import app from 'state';
 import { CMNProject } from 'models';
 import { CWUser } from '../members_card';
+import TokenInputField from '../token_input';
 
-const floatRegex = /^[0-9]*\.?[0-9]*$/;
-
-const ActionModule: m.Component<{
-  callback: (isWithdraw: boolean) => void,
-  submitting: number,
-  withdrawAble: boolean,
-  redeemAble: boolean,
-}, {}> = {
+const RedeemCTokenAction: m.Component<{
+  project: CMNProject,
+  project_protocol: any,
+  disabled: boolean
+}, {
+  submitting: boolean,
+  error: string,
+}> = {
+  oncreate: (vnode) => {
+    vnode.state.error = '';
+    vnode.state.submitting = false;
+  },
   view: (vnode) => {
-    const { callback, submitting, withdrawAble, redeemAble } = vnode.attrs;
+    const { project, project_protocol } = vnode.attrs;
+
+    // TODO: replace with cTokens:
+    const tokens = ['USDT', 'USDC'];
+
     return [
-      m(Button, {
-        class: 'contribute-button',
-        label: `Redeem${submitting === 2 ? 'ing' : ''} CToken`,
-        rounded: true,
-        fluid: true,
-        intent: 'primary',
-        disabled: !redeemAble,
-        onclick: async (e) => { await callback(false); }
+      m(TokenInputField, {
+        tokens,
+        buttonLabel: `Redeem${vnode.state.submitting ? 'ing' : ''} CToken`,
+        actionDisabled: vnode.state.submitting,
+        callback: async (tokenSymbol: string, balance: number) => {
+          vnode.state.submitting = true;
+
+          const index = project.acceptedTokens.findIndex((t) => t.symbol === tokenSymbol);
+          const token = project.acceptedTokens[index];
+          const amount = new BN(balance).mul(new BN(10).pow(new BN(token.decimals)));
+          const author = app.user.activeAccount.address;
+
+          const res = await project_protocol.redeemTokens(
+            amount,
+            false,
+            project,
+            author,
+            token.address
+          );
+
+          vnode.state.error = res.error;
+          vnode.state.submitting = false;
+        }
       }),
-      m(Button, {
-        class: 'contribute-button',
-        label: `Withdraw${submitting === 1 ? 'ing' : ''}`,
-        disabled: !withdrawAble,
-        rounded: true,
-        fluid: true,
-        intent: 'primary',
-        onclick: async (e) => { await callback(true); }
-      }),
+      vnode.state.error && vnode.state.error !== '' && m(
+        'label',
+        { 'color': 'red', 'width': '100%', 'text-align': 'center' },
+        vnode.state.error
+      ),
     ];
+  }
+};
+
+const WithdrawAction: m.Component<{
+  project: CMNProject,
+  project_protocol: any,
+  disabled: boolean
+}, {
+  submitting: boolean,
+  error: string,
+}> = {
+  view: (vnode) => {
+    return m('div', [
+      m(Button, {
+        class: 'contribute-button',
+        label: `Withdraw${vnode.state.submitting ? 'ing' : ''}`,
+        disabled: vnode.state.submitting || vnode.attrs.disabled,
+        rounded: true,
+        fluid: true,
+        intent: 'primary',
+        onclick: async (e) => {
+          const author = app.user.activeAccount.address;
+          vnode.state.submitting = true;
+
+          // widthdraw logic
+          try {
+            const res = await vnode.attrs.project_protocol.withdraw(vnode.attrs.project, author);
+            console.log('====>withdraw result', res);
+          } catch (error) {
+            vnode.state.error = error || 'Faild to do withdraw Action';
+          }
+
+          vnode.state.submitting = false;
+        }
+      }),
+      vnode.state.error && vnode.state.error !== '' && m(
+        'label',
+        { 'color': 'red', 'width': '100%', 'text-align': 'center' },
+        vnode.state.error
+      ),
+    ]);
   }
 };
 
@@ -47,25 +107,13 @@ const SuccsedActionCard: m.Component<{
   project_protocol: any,
   curators: CWUser[]
 },
-{
-  amount: any,
-  error: string,
-  submitting: number
-}> = {
-  oncreate: (vnode) => {
-    vnode.state.error = '';
-    vnode.state.amount = 0;
-    vnode.state.submitting = 0;
-  },
+{}> = {
   view: (vnode) => {
     const { project, project_protocol, curators } = vnode.attrs;
 
-    // 0: not in progress, 1: in progress of withdrawing, 2: in progress of redeeming cTokens
-    const { submitting } = vnode.state;
-
     let withdrawAble = false;
     let redeemAble = false;
-    if (app.user.activeAccount && app.isLoggedIn() && submitting === 0) {
+    if (app.user.activeAccount && app.isLoggedIn()) {
       const activeAddress = app.user.activeAccount.address.toLowerCase();
       if (curators.map((item: any) => item.address.toLowerCase()).includes(activeAddress)) {
         redeemAble = true;
@@ -76,57 +124,8 @@ const SuccsedActionCard: m.Component<{
     }
 
     return m('.project-funding-action', [
-      m(FormGroup, [
-        m(Input, {
-          style: {
-            width: '100%'
-          },
-          options: {
-            name: 'amount',
-            placeholder: 'Enter the amount in ETH',
-            autofocus: true,
-          },
-          // disabled: actionDisabled,
-          oninput: (e) => {
-            const result = (e.target as any).value;
-            if (floatRegex.test(result)) {
-              vnode.state.amount = utils.parseEther(result);
-              vnode.state.error = undefined;
-            } else {
-              vnode.state.amount = undefined;
-              vnode.state.error = 'Invalid amount value';
-            }
-            m.redraw();
-          },
-        }),
-      ]),
-      vnode.state.error && vnode.state.error !== '' && m('p.error', vnode.state.error),
-      m(ActionModule, {
-        callback: async (isWithdraw: boolean) => {
-          if (!app.user.activeAccount) return;
-          const author = app.user.activeAccount.address;
-          vnode.state.submitting = isWithdraw ? 1 : 2;
-          let res;
-          if (isWithdraw) {
-            res = await project_protocol.withdraw(project, author);
-          } else if (!vnode.state.amount || vnode.state.amount.toString() === new BN(0).toString()) {
-            vnode.state.error = 'Please enter the amount';
-          } else {
-            res = await project_protocol.redeemTokens(
-              vnode.state.amount,
-              false,
-              project,
-              author
-            );
-          }
-          vnode.state.error = res.error;
-          vnode.state.submitting = 0;
-          m.redraw();
-        },
-        submitting,
-        withdrawAble,
-        redeemAble,
-      })
+      m(RedeemCTokenAction, { project, project_protocol, disabled: !redeemAble }),
+      m(WithdrawAction, { project, project_protocol, disabled: !withdrawAble })
     ]);
   }
 };

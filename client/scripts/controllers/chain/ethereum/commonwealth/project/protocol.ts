@@ -5,10 +5,10 @@ import { Project__factory, CWToken__factory, ERC20__factory } from 'eth/types';
 import { CMNProjectStore, CMNProjectMembersStore } from '../../../../../stores';
 import { CMNProjectProtocol, CMNProject, CMNProjectMembers } from '../../../../../models';
 
-import CMNProjectAPI, { EtherAddress, ProjectMetaData } from './api';
+import CMNProjectAPI, { ProjectMetaData } from './api';
 import { attachSigner } from '../../contractApi';
 import EthereumChain from '../../chain';
-import { tmpTokenData } from '../tokens';
+import { kovanTokenData } from '../tokens';
 
 export default class ProjectProtocol {
   private _projectStore = new CMNProjectStore();
@@ -20,7 +20,6 @@ export default class ProjectProtocol {
   private _chain: EthereumChain;
   private _api: CMNProjectAPI;
 
-  private _syncing = 0;
   private _syncPeriod = 5 * 60 * 1000; // update in every 5 mins
 
   public async init(chain: EthereumChain, api: CMNProjectAPI) {
@@ -67,13 +66,14 @@ export default class ProjectProtocol {
       }
     }
 
-    const acceptedTokens = await projContract.getAcceptedTokens();
+    const acceptedTokenAddresses = await projContract.getAcceptedTokens() || [];
     const bTokens = {};
     const cTokens = {};
-    for (let i = 0; i < acceptedTokens.length; i++) {
-      bTokens[acceptedTokens[i]] = await projContract.getBToken(acceptedTokens[i]);
-      cTokens[acceptedTokens[i]] = await projContract.getCToken(acceptedTokens[i]);
+    for (let i = 0; i < acceptedTokenAddresses.length; i++) {
+      bTokens[acceptedTokenAddresses[i]] = await projContract.getBToken(acceptedTokenAddresses[i]);
+      cTokens[acceptedTokenAddresses[i]] = await projContract.getCToken(acceptedTokenAddresses[i]);
     }
+    const acceptedTokens = this.getAcceptedTokenDetails(acceptedTokenAddresses);
 
     const newProj = new CMNProject(
       utils.parseBytes32String(name),
@@ -106,7 +106,7 @@ export default class ProjectProtocol {
       const proj: CMNProject = await this.getProjectDetails(projectAddresses[i]);
       projects.push(proj);
     }
-    console.log('===>projects', projects);
+
     return projects;
   }
 
@@ -119,16 +119,18 @@ export default class ProjectProtocol {
       );
       this._api.setProjectAPI(projAddress, projectApi);
     }
+    console.log('====>signer', signer);
     if (signer) {
-      const contract = await projectApi.attachSigner(this._chain.app.wallets, signer);
+      const contract = await attachSigner(this._chain.app.wallets, signer, projectApi);
+      console.log('====>contract', contract);
       return contract;
     }
+    
     return projectApi;
   }
 
   public async syncMembers(project: CMNProject) {
     const { bTokens, cTokens, acceptedTokens, projectHash } = project;
-    console.log('====>project', project);
 
     let mStore = this._memberStore.getById(projectHash);
 
@@ -143,15 +145,15 @@ export default class ProjectProtocol {
       return { curators: mStore.curators, backers: mStore.backers };
     }
 
-    for (let i = 0; i < acceptedTokens.length; i++) {
-      const token = acceptedTokens[i];
-      if (bTokens[token]) {
-        backers[token] = await this._api.getTokenHolders(bTokens[token]);
-      }
-      if (cTokens[token]) {
-        curators[token] = await this._api.getTokenHolders(cTokens[token]);
-      }
-    }
+    // for (let i = 0; i < acceptedTokens.length; i++) {
+    //   const token = acceptedTokens[i];
+    //   if (bTokens[token]) {
+    //     backers[token] = await this._api.getTokenHolders(bTokens[token]);
+    //   }
+    //   if (cTokens[token]) {
+    //     curators[token] = await this._api.getTokenHolders(cTokens[token]);
+    //   }
+    // }
 
     if (!mStore || !mStore.updated_at) {
       mStore = new CMNProjectMembers(projectHash, backers, curators);
@@ -181,9 +183,10 @@ export default class ProjectProtocol {
     project: CMNProject,
     isBacking: boolean,
     from: string,
-    tokenAddress = EtherAddress,
+    tokenAddress: string,
   ) {
     const projContractAPI = await this.getProjectContractApi(project.address, from);
+
     let res = { status: 'success', error: '' };
     if (isBacking) {
       res = await this._api.back(projContractAPI, amount, tokenAddress);
@@ -213,6 +216,19 @@ export default class ProjectProtocol {
     return approvalTxReceipt;
   }
 
+  public getAcceptedTokenDetails(tokenAddresses: string[]) {
+    const tokensData = [];
+    for (let i = 0; i < tokenAddresses.length; i++) {
+      const index = kovanTokenData.findIndex(
+        (t) => t.address.toLowerCase() === tokenAddresses[i].toLowerCase()
+      );
+      if (index > -1) {
+        tokensData.push(kovanTokenData[index]);
+      }
+    }
+    return tokensData;
+  }
+
   public async getAcceptedTokens(project?: CMNProject) {
     let tokenAddresses = [];
     if (project) {
@@ -221,16 +237,24 @@ export default class ProjectProtocol {
     } else {
       tokenAddresses = await this._api.getAcceptedTokens();
     }
+    return this.getAcceptedTokenDetails(tokenAddresses);
+  }
 
-    const tokensData = [];
-    for (let i = 0; i < tokenAddresses.length; i++) {
-      const index = tmpTokenData.findIndex(
-        (t) => t.address.toLowerCase() === tokenAddresses[i].toLowerCase()
-      );
-      if (index > -1) {
-        tokensData.push(tmpTokenData[index]);
-      }
+  public async redeemTokens(
+    amount: number,
+    isBToken: boolean,
+    project: CMNProject,
+    from: string,
+    tokenAddress: string,
+  ) {
+    await this.approveCWToken(project, isBToken, from, amount);
+    const projContractAPI = await this.getProjectContractApi(project.address, from);
+    let res = { status: 'success', error: '' };
+    if (isBToken) {
+      res = await this._api.redeemBToken(projContractAPI, amount, tokenAddress);
+    } else {
+      res = await this._api.redeemCToken(projContractAPI, amount, tokenAddress);
     }
-    return tokensData;
+    return res;
   }
 }

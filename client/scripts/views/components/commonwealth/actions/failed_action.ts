@@ -1,35 +1,76 @@
 import 'components/commonwealth/action_card.scss';
 
-import { utils } from 'ethers';
-import { Input, FormGroup, Button } from 'construct-ui';
 import m from 'mithril';
+import BN from 'bn.js';
 
 import app from 'state';
 import { CMNProject } from 'models';
 import { CWUser } from '../members_card';
+import TokenInputField from '../token_input';
 
-const floatRegex = /^[0-9]*\.?[0-9]*$/;
+const RedeemBTokenAction: m.Component<{
+  project: CMNProject,
+  project_protocol: any,
+  disabled: boolean
+}, {
+  submitting: boolean,
+  error: string,
+}> = {
+  oncreate: (vnode) => {
+    vnode.state.error = '';
+    vnode.state.submitting = false;
+  },
+  view: (vnode) => {
+    const { project, project_protocol } = vnode.attrs;
+
+    // TODO: replace with bTokens:
+    const tokens = ['USDT', 'USDC'];
+
+    return [
+      m(TokenInputField, {
+        tokens,
+        buttonLabel: `Redeem${vnode.state.submitting ? 'ing' : ''} CToken`,
+        actionDisabled: vnode.state.submitting,
+        callback: async (tokenSymbol: string, balance: number) => {
+          vnode.state.submitting = true;
+
+          const index = project.acceptedTokens.findIndex((t) => t.symbol === tokenSymbol);
+          const token = project.acceptedTokens[index];
+          const amount = new BN(balance).mul(new BN(10).pow(new BN(token.decimals)));
+          const author = app.user.activeAccount.address;
+
+          const res = await project_protocol.redeemTokens(
+            amount,
+            true,
+            project,
+            author,
+            token.address
+          );
+
+          vnode.state.error = res.console.error();
+          vnode.state.submitting = false;
+        }
+      }),
+      vnode.state.error && vnode.state.error !== '' && m(
+        'label',
+        { 'color': 'red', 'width': '100%', 'text-align': 'center' },
+        vnode.state.error
+      ),
+    ];
+  }
+};
 
 const FailedActionCard: m.Component<{
   project: CMNProject,
   project_protocol: any,
   backers: CWUser[]
 }, {
-  amount: any,
-  error: string,
-  submitting: boolean
 }> = {
-  oncreate: (vnode) => {
-    vnode.state.error = '';
-    vnode.state.amount = 0;
-  },
   view: (vnode) => {
     const { project, project_protocol, backers } = vnode.attrs;
-    const { submitting } = vnode.state;
-    const actionDisabled = !app.user.activeAccount || !app.isLoggedIn() || submitting;
 
     let redeemAble = false;
-    if (app.user.activeAccount && app.isLoggedIn() && !submitting) {
+    if (app.user.activeAccount && app.isLoggedIn()) {
       const activeAddress = app.user.activeAccount.address.toLowerCase();
       if (backers.map((item: any) => item.address.toLowerCase()).includes(activeAddress)) {
         redeemAble = true;
@@ -37,60 +78,9 @@ const FailedActionCard: m.Component<{
     }
 
     return m('.project-funding-action', [
-      m(FormGroup, [
-        m(Input, {
-          style: {
-            width: '100%'
-          },
-          options: {
-            name: 'amount',
-            placeholder: 'Enter the amount in ETH',
-            autofocus: true,
-          },
-          oninput: (e) => {
-            const result = (e.target as any).value;
-            if (floatRegex.test(result)) {
-              vnode.state.amount = utils.parseEther(result);
-              vnode.state.error = undefined;
-            } else {
-              vnode.state.amount = undefined;
-              vnode.state.error = 'Invalid amount value';
-            }
-            m.redraw();
-          },
-        }),
-      ]),
-      vnode.state.error && vnode.state.error !== '' && m('p.error', vnode.state.error),
-      [
-        m(Button, {
-          class: 'contribute-button',
-          label: 'Redeem BTokens',
-          rounded: true,
-          fluid: true,
-          intent: 'primary',
-          disabled: actionDisabled,
-          onclick: async () => {
-            if (!vnode.state.amount || vnode.state.amount === 0) {
-              vnode.state.error = 'Please enter the amount';
-            } else {
-              const author = app.user.activeAccount.address;
-              vnode.state.submitting = true;
-              const res = await project_protocol.redeemTokens(
-                vnode.state.amount,
-                true,
-                project,
-                author
-              );
-              vnode.state.error = res.error;
-              vnode.state.submitting = false;
-            }
-            m.redraw();
-          }
-        }),
-      ]
+      m(RedeemBTokenAction, { project, project_protocol, disabled: !redeemAble }),
     ]);
   }
-}
-
+};
 
 export default FailedActionCard;

@@ -14,7 +14,7 @@ export class CMNProject {
   public readonly ipfsHash: string;
   public readonly cwUrl: string;
   public readonly beneficiary: string;
-  public readonly acceptedTokens: string[];
+  public readonly acceptedTokens: any[];
   public readonly nominations: Array<string>;
   public readonly endTime: Date;
   public readonly projectHash: string;

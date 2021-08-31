@@ -1,6 +1,5 @@
 import 'components/commonwealth/project_card.scss';
 
-import { utils } from 'ethers';
 import m from 'mithril';
 import { Tag } from 'construct-ui';
 import app from 'state';
@@ -11,7 +10,7 @@ const ProjectCard: m.Component<{project: CMNProject}> = {
   view: (vnode) => {
     const { project } = vnode.attrs;
     const bgColor = project.status === 'In Progress' ? 'blue' : (project.status === 'Successed') ? 'green' : 'red';
-    const totalFunding = new BN(project.totalFunding.toString()).div(new BN(100000000)).toString();
+    const totalFunding = new BN(project.totalFunding.toString()).div(new BN(100000000)).toNumber();
 
     const displayText = project.withdrawIsDone
       ? `Withdraw is done. Total Funding was ${totalFunding} Ether`

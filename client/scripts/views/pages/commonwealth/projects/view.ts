@@ -48,14 +48,16 @@ const ProjectContentModule: m.Component<{
       color: project.status === 'In Progress' ? 'blue' : project.status === 'Successed' ? 'green' : 'red'
     };
 
-    return m('.col-lg-8 .content-area', [
-      m('div.project-name', project.name),
-      m('div.project-text', [
-        m('span', 'A project by created by'),
-        m('span.bold', ` ${project.beneficiary}`),
-      ]),
-      m('div.project-description', { style: textColorStyle }, leftTime),
-      m('div.project-description', project.description)
+    return m('.row .content-area', [
+      m('.col-lg-12', [
+        m('div.project-name', project.name),
+        m('div.project-text', [
+          m('span', 'A project by created by'),
+          m('span.bold', ` ${project.beneficiary}`),
+        ]),
+        m('div.project-description', { style: textColorStyle }, leftTime),
+        m('div.project-description', project.description)
+      ])
     ]);
   }
 };
@@ -98,26 +100,29 @@ const ViewProjectPage: m.Component<{
     const project = projects.filter((item) => item.projectHash === vnode.attrs.projectHash)[0];
     const members = await project_protocol.syncMembers(project);
 
-    vnode.state.backers = members.backers;
-    vnode.state.curators = members.curators;
+    vnode.state.backers = members.backers || [];
+    vnode.state.curators = members.curators || [];
     vnode.state.project = project;
     vnode.state.initialized = true;
     m.redraw();
   },
   view: (vnode) => {
-    const { project, initialized } = vnode.state;
+    const { project, initialized, curators, backers } = vnode.state;
 
     if (!initialized) return m(PageLoading);
 
     const project_protocol = app.cmnProtocol.project_protocol;
-    const { curators, backers } = vnode.state;
-
+    const { bTokens, cTokens, endTime } = project;
     const startTime = new Date();
-    const endTime = project.endTime;
     const leftInSeconds = (endTime.getTime() - startTime.getTime()) / 1000;
 
-    const backersContent = project.acceptedTokens.map((token) => m(TokenHolders, { holders: backers[token], token }));
-    const curatorsContent = project.acceptedTokens.map((token) => m(TokenHolders, { holders: curators[token], token }));
+    // const backersContent = project.acceptedTokens.map((token) => m(
+    //   TokenHolders,
+    //   { holders: backers[token], token: bTokens[token] }
+    // ));
+    // const curatorsContent = project.acceptedTokens.map((token) => m(
+    //   TokenHolders, { holders: curators[token], token: cTokens[token] }
+    // ));
 
     return m(Sublayout, {
       class: 'ProjectPage',
@@ -125,23 +130,21 @@ const ViewProjectPage: m.Component<{
       showNewProposalButton: true,
     }, [
       m('.container', [
-        m('.row', [
-          m(ProjectContentModule, {
-            project,
-            leftInSeconds,
-            forceUpdateStatus: async () => {
-              vnode.state.initialized = false;
-              await project_protocol.syncProjects();
-              vnode.state.initialized = true;
-            }
-          }),
-          // m(ActionModule, { project, project_protocol, backers, curators })
-        ]),
+        m(ProjectContentModule, {
+          project,
+          leftInSeconds,
+          forceUpdateStatus: async () => {
+            vnode.state.initialized = false;
+            await project_protocol.syncProjects();
+            vnode.state.initialized = true;
+          }
+        }),
+        m(ActionModule, { project, project_protocol, backers, curators }),
         m('.row .members-card', [
           m('.col-lg-6', [
             m('.title', 'Backers'),
             m('.text .mt-10px', 'Backer funds will go to the project if the funding threshold is reached.'),
-            backersContent
+            // backersContent
           ]),
           m('.col-lg-6', [
             m('.title', 'Curator'),
@@ -149,7 +152,7 @@ const ViewProjectPage: m.Component<{
               '.text .mt-10px',
               'Curators received 5% of the total raise if the project is successful. You should curate.'
             ),
-            curatorsContent,
+            // curatorsContent,
           ])
         ])
       ]),
