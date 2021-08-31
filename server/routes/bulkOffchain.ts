@@ -6,6 +6,7 @@
 //
 import { QueryTypes, Op } from 'sequelize';
 import { Response, NextFunction, Request } from 'express';
+import { OffchainStageInstance } from 'server/models/offchain_stage';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { factory, formatFilename } from '../../shared/logging';
 import { getLastEdited } from '../util/getLastEdited';
@@ -31,9 +32,15 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
     : { chain: chain.id };
 
   // parallelized queries
-  const [topics, threadsCommentsReactions, admins, mostActiveUsers, threadsInVoting] = await <Promise<[OffchainTopicInstance[], unknown, RoleInstance[], unknown, OffchainThreadInstance[]]>>Promise.all([
+  const [topics, stages, threadsCommentsReactions, admins, mostActiveUsers, threadsInVoting] = await <Promise<[OffchainTopicInstance[], OffchainStageInstance[], unknown, RoleInstance[], unknown, OffchainThreadInstance[]]>>Promise.all([
     // topics
     models.OffchainTopic.findAll({
+      where: community
+        ? { community_id: community.id }
+        : { chain_id: chain.id }
+    }),
+    // stages
+    models.OffchainStage.findAll({
       where: community
         ? { community_id: community.id }
         : { chain_id: chain.id }
@@ -272,6 +279,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
     status: 'Success',
     result: {
       topics: topics.map((t) => t.toJSON()),
+      stages: stages.map((t) => t.toJSON()),
       //
       numVotingThreads: 0,
       threads, // already converted to JSON earlier

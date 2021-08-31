@@ -21,6 +21,7 @@ import Listing from 'views/pages/listing';
 import NewTopicModal from 'views/modals/new_topic_modal';
 import NewStageModal from 'views/modals/new_stage_modal';
 import EditTopicModal from 'views/modals/edit_topic_modal';
+import EditStageModal from 'views/modals/edit_stage_modal';
 import CreateInviteModal from 'views/modals/create_invite_modal';
 
 import { INITIAL_PAGE_SIZE } from 'controllers/server/threads';
@@ -131,16 +132,7 @@ const DiscussionStagesBar: m.Component<{ topic: string; stageId: number }, {}> =
 
     const selectedTopic = topics.find((t) => topic && topic === t.name);
 
-    const stages = app.stages.getByCommunity(app.activeId())
-      .map(({ id, name, description, featuredInSidebar, featuredInNewPost }) => {
-        return {
-          id,
-          name,
-          description,
-          featured_in_sidebar: featuredInSidebar,
-          featured_in_new_post: featuredInNewPost,
-        };
-      });
+    const stages = app.stages.getByCommunity(app.activeId());
 
     const selectedStage = stages.find(
       (s) => s.id === stageId
@@ -241,18 +233,34 @@ const DiscussionStagesBar: m.Component<{ topic: string; stageId: number }, {}> =
               label: 'All Stages',
             }),
             m(MenuDivider),
-            stages.map((targetStage, index) => m(MenuItem, {
-              active: stageId === targetStage.id,
-              iconLeft: stageId === targetStage.id ? Icons.CHECK : null,
+            stages.map(({ id, name, description, featuredInSidebar, featuredInNewPost }, index) => m(MenuItem, {
+              key: id,
+              active: stageId === id,
+              iconLeft: stageId === id ? Icons.CHECK : null,
               onclick: (e) => {
                 e.preventDefault();
-                navigateToSubpage(`/?stageId=${targetStage.id}`);
+                navigateToSubpage(`/?stageId=${id}`);
               },
-              label: [
-                `${offchainThreadStageToLabel(targetStage.name)}`, targetStage.name === OffchainThreadStage.Voting
-                && [' ', m('.discussions-stage-count', `${app.threads.numVotingThreads}`)]
-              ],
-            })),
+              label: m('.stage-menu-item', [
+                m('.stage-menu-item-name', offchainThreadStageToLabel(name)),
+                name === OffchainThreadStage.Voting && m('.stage-menu-item-count', app.threads.numVotingThreads),
+                app.user?.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
+                  && m(Button, {
+                    size: 'xs',
+                    label: 'Edit',
+                    class: 'edit-stage-button',
+                    compact: true,
+                    rounded: true,
+                    onclick: (e) => {
+                      e.preventDefault();
+                      app.modals.create({
+                        modal: EditStageModal,
+                        data: { id, name, description, featuredInSidebar, featuredInNewPost },
+                      });
+                    },
+                  }),
+              ]),
+            }))
           ]),
         }),
     ]);

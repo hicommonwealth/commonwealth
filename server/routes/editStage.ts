@@ -52,9 +52,9 @@ const editStage = async (models: DB, req: Request, res: Response, next: NextFunc
     const stage = await models.OffchainStage.findOne({ where: { id } });
     if (!stage) return next(new Error(Errors.StageNotFound));
     if (name) stage.name = name;
-    if (name || description) stage.description = description;
-    stage.featured_in_sidebar = featured_in_sidebar;
-    stage.featured_in_new_post = featured_in_new_post;
+    if (name || description) stage.description = description || '';
+    stage.featured_in_sidebar = featured_in_sidebar || false;
+    stage.featured_in_new_post = featured_in_new_post || false;
     await stage.save();
 
     return res.json({ status: 'Success', result: stage.toJSON() });

@@ -31,11 +31,12 @@ class Community extends ICommunityAdapter<Coin, OffchainAccount> {
     }
 
     const {
-      threads, comments, reactions, topics, admins, activeUsers, numVotingThreads
+      threads, comments, stages, topics, admins, activeUsers, numVotingThreads
     } = response.result;
     this.app.threads.initialize(threads, numVotingThreads, true);
     this.app.comments.initialize(comments, true);
     this.app.topics.initialize(topics, true);
+    this.app.stages.initialize(stages, true);
     this.meta.setAdmins(admins);
     this.app.recentActivity.setMostActiveUsers(activeUsers);
     this._serverLoaded = true;

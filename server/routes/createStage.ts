@@ -32,9 +32,9 @@ const createStage = async (models: DB, req, res: Response, next: NextFunction) =
 
   const options = {
     name: req.body.name,
-    description: req.body.description,
-    featured_in_sidebar: req.body.featured_in_sidebar,
-    featured_in_new_post: req.body.featured_in_new_post,
+    description: req.body.description || '',
+    featured_in_sidebar: req.body.featured_in_sidebar || false,
+    featured_in_new_post: req.body.featured_in_new_post || false,
     ...chainOrCommObj2,
   };
 
