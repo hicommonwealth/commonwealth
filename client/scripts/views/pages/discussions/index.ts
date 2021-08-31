@@ -181,17 +181,18 @@ const DiscussionStagesBar: m.Component<{ topic: string; stage: string }, {}> = {
                 featuredInNewPost,
                 defaultOffchainTemplate
               }, idx) => {
+                const active = m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name.toString().trim())}`
+                  || (topic && topic === name);
                 return m(MenuItem, {
                   key: name,
-                  active: m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name.toString().trim())}`
-                    || (topic && topic === name),
-                  iconLeft: m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name.toString().trim())}`
-                    || (topic && topic === name) ? Icons.CHECK : null,
+                  active,
+                  // iconLeft: active ? Icons.CHECK : null,
                   onclick: (e) => {
                     e.preventDefault();
                     navigateToSubpage(`/discussions/${name}`);
                   },
                   label: m('.topic-menu-item', [
+                    active && m(Icon, { name: Icons.CHECK }),
                     m('.topic-menu-item-name', name),
                     app.user?.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
                       && m(Button, {

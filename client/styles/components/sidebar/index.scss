@@ -1,6 +1,13 @@
 @import 'client/styles/shared';
 
 @mixin sidebar {
+    .OffchainNavigationModule {
+        button > span {
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+    }
     .cui-button.cui-active {
         background: linear-gradient(268.91deg, #91BFFF -61.91%, #91FFA0 2.69%, #FBFF91 60.22%, #FF9191 131.89%);
         border: 1px solid transparent;

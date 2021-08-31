@@ -23,7 +23,8 @@ const editTopic = async (models: DB, req: Request, res: Response, next: NextFunc
     return next(new Error(Errors.NoTopicId));
   }
   if (!req.body.name) return next(new Error(Errors.TopicRequired));
-  if (req.body.featured_in_new_post && (!req.body.default_offchain_template || !req.body.default_offchain_template.trim())) {
+  if (req.body.featured_in_new_post === 'true'
+    && (!req.body.default_offchain_template || !req.body.default_offchain_template.trim())) {
     return next(new Error(Errors.DefaultTemplateRequired));
   }
 
@@ -53,15 +54,24 @@ const editTopic = async (models: DB, req: Request, res: Response, next: NextFunc
     return next(new Error(Errors.NotAdmin));
   }
 
-  const { id, name, description, telegram, featured_order, featured_in_sidebar, featured_in_new_post, default_offchain_template } = req.body;
+  const {
+    id,
+    name,
+    description,
+    telegram,
+    featured_order,
+    featured_in_sidebar,
+    featured_in_new_post,
+    default_offchain_template
+  } = req.body;
   try {
     const topic = await models.OffchainTopic.findOne({ where: { id } });
     if (!topic) return next(new Error(Errors.TopicNotFound));
     if (name) topic.name = name;
     if (name || description) topic.description = description || '';
     if (name || telegram) topic.telegram = telegram || '';
-    topic.featured_in_sidebar = featured_in_sidebar || false;
-    topic.featured_in_new_post = featured_in_new_post || false;
+    topic.featured_in_sidebar = !!(featured_in_sidebar === 'true');
+    topic.featured_in_new_post = !!(featured_in_new_post === 'true');
     topic.default_offchain_template = default_offchain_template || '';
     await topic.save();
 
