@@ -19,13 +19,21 @@
         }
     }
 
-    .discussions-topics,
-    .discussions-stages {
-        margin-bottom: 20px;
-        font-size: 17px;
-        line-height: 1.25;
-        .cui-button-group {
-            flex-wrap: wrap;
+    .DiscussionStagesBar {
+        > button {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .discussions-topics,
+        .discussions-stages {
+            margin-bottom: 20px;
+            font-size: 17px;
+            line-height: 1.25;
+            .cui-button-group {
+                flex-wrap: wrap;
+            }
         }
     }
     @include xs-max {
