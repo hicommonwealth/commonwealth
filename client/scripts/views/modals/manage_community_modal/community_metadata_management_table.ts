@@ -18,7 +18,6 @@ interface ICommunityMetadataManagementState {
   telegram: string;
   github: string;
   stagesEnabled: boolean;
-  customStages: string;
   customDomain: string;
   terms: string;
 }
@@ -43,7 +42,6 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
     vnode.state.telegram = vnode.attrs.community.telegram;
     vnode.state.github = vnode.attrs.community.github;
     vnode.state.stagesEnabled = vnode.attrs.community.stagesEnabled;
-    vnode.state.customStages = vnode.attrs.community.customStages;
     vnode.state.customDomain = vnode.attrs.community.customDomain;
     vnode.state.terms = vnode.attrs.community.terms;
   },
@@ -104,12 +102,6 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
           : 'Don\'t show progress on threads',
       }),
       m(InputPropertyRow, {
-        title: 'Custom Stages',
-        defaultValue: vnode.state.customStages,
-        placeholder: '["Temperature Check", "Consensus Check"]',
-        onChangeHandler: (v) => { vnode.state.customStages = v; },
-      }),
-      m(InputPropertyRow, {
         title: 'Domain',
         defaultValue: vnode.state.customDomain,
         placeholder: 'Contact support', // gov.edgewa.re
@@ -165,7 +157,6 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
           telegram,
           github,
           stagesEnabled,
-          customStages,
           customDomain,
           terms,
           invitesEnabled,
@@ -182,7 +173,6 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
             telegram,
             github,
             stagesEnabled,
-            customStages,
             customDomain,
             terms,
             privacyEnabled,

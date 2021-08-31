@@ -15,7 +15,6 @@ interface CommunityData {
   github: string;
   visible: boolean;
   stagesEnabled: boolean,
-  customStages: string,
   customDomain: string;
   terms: string;
   invitesEnabled: boolean,
@@ -37,7 +36,6 @@ class CommunityInfo {
   public invitesEnabled: boolean;
   public privacyEnabled: boolean;
   public stagesEnabled: boolean;
-  public customStages: string;
   public customDomain: string;
   public terms: string;
   public readonly collapsedOnHomepage: boolean;
@@ -49,8 +47,8 @@ class CommunityInfo {
   // TODO: convert this to accept opject with params instead
   constructor({
     id, name, description, iconUrl, website, discord, element, telegram, github, defaultChain, visible,
-    stagesEnabled, customStages,
-    customDomain, terms, invitesEnabled, privacyEnabled, collapsedOnHomepage, featuredTopics, topics, adminsAndMods
+    stagesEnabled, customDomain, terms, invitesEnabled, privacyEnabled, collapsedOnHomepage,
+    featuredTopics, topics, adminsAndMods
   }) {
     this.id = id;
     this.name = name;
@@ -64,7 +62,6 @@ class CommunityInfo {
     this.defaultChain = defaultChain;
     this.visible = visible;
     this.stagesEnabled = stagesEnabled;
-    this.customStages = customStages;
     this.customDomain = customDomain;
     this.terms = terms;
     this.invitesEnabled = invitesEnabled;
@@ -88,7 +85,6 @@ class CommunityInfo {
     defaultChain: default_chain,
     visible,
     stagesEnabled,
-    customStages,
     customDomain,
     terms,
     invitesEnabled,
@@ -111,7 +107,6 @@ class CommunityInfo {
       defaultChain: default_chain,
       visible,
       stagesEnabled,
-      customStages,
       customDomain,
       terms,
       invitesEnabled,
@@ -177,7 +172,6 @@ class CommunityInfo {
     iconUrl,
     privacyEnabled,
     stagesEnabled,
-    customStages,
     customDomain,
     terms,
     website,
@@ -198,7 +192,6 @@ class CommunityInfo {
       'telegram': telegram,
       'github': github,
       'stagesEnabled': stagesEnabled,
-      'customStages': customStages,
       'customDomain': customDomain,
       'terms': terms,
       'privacy': privacyEnabled,
@@ -215,7 +208,6 @@ class CommunityInfo {
     this.telegram = updatedCommunity.telegram;
     this.github = updatedCommunity.github;
     this.stagesEnabled = stagesEnabled;
-    this.customStages = customStages;
     this.customDomain = updatedCommunity.customDomain;
     this.terms = updatedCommunity.terms;
     this.privacyEnabled = updatedCommunity.privacyEnabled;

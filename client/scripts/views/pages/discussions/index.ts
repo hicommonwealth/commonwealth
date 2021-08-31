@@ -102,12 +102,12 @@ export const CommunityOptionsPopover: m.Component<{ isAdmin: boolean; isMod: boo
   },
 };
 
-const DiscussionStagesBar: m.Component<{ topic: string; stage: string }, {}> = {
+const DiscussionStagesBar: m.Component<{ topic: string; stageId: number }, {}> = {
   view: (vnode) => {
-    const { topic, stage } = vnode.attrs;
+    const { topic, stageId } = vnode.attrs;
 
     if (!app.chain?.meta?.chain && !app.community?.meta) return;
-    const { stagesEnabled, customStages } = app.chain?.meta?.chain || app.community?.meta;
+    const { stagesEnabled } = app.chain?.meta?.chain || app.community?.meta;
 
     const featuredTopicIds = app.community?.meta?.featuredTopics || app.chain?.meta?.chain?.featuredTopics;
     const topics = app.topics.getByCommunity(app.activeId()).map(({ id, name, description, telegram, featuredInSidebar, featuredInNewPost }) => {
@@ -125,16 +125,20 @@ const DiscussionStagesBar: m.Component<{ topic: string; stage: string }, {}> = {
     const otherTopics = topics.filter((t) => t.featured_order === -1).sort((a, b) => a.name.localeCompare(b.name));
 
     const selectedTopic = topics.find((t) => topic && topic === t.name);
-    const stages = !customStages ? [
-      OffchainThreadStage.Discussion,
-      OffchainThreadStage.ProposalInReview,
-      OffchainThreadStage.Voting,
-      OffchainThreadStage.Passed,
-      OffchainThreadStage.Failed
-    ] : parseCustomStages(customStages);
+
+    const stages = app.stages.getByCommunity(app.activeId())
+      .map(({ id, name, description, featuredInSidebar, featuredInNewPost }) => {
+        return {
+          id,
+          name,
+          description,
+          featured_in_sidebar: featuredInSidebar,
+          featured_in_new_post: featuredInNewPost,
+        };
+      });
 
     const selectedStage = stages.find(
-      (s) => s === (stage as any)
+      (s) => s.id === stageId
     );
 
     return m('.DiscussionStagesBar.discussions-stages', [
@@ -199,7 +203,7 @@ const DiscussionStagesBar: m.Component<{ topic: string; stage: string }, {}> = {
             rounded: true,
             compact: true,
             class: 'discussions-stage',
-            label: selectedStage ? `Filter: ${offchainThreadStageToLabel(selectedStage)}` : 'All Stages',
+            label: selectedStage ? `Filter: ${offchainThreadStageToLabel(selectedStage.name)}` : 'All Stages',
             iconRight: Icons.CHEVRON_DOWN,
             size: 'sm',
           }),
@@ -214,22 +218,22 @@ const DiscussionStagesBar: m.Component<{ topic: string; stage: string }, {}> = {
                 e.preventDefault();
                 navigateToSubpage('/');
               },
-              active: !stage,
-              iconLeft: !stage ? Icons.CHECK : null,
+              active: !stageId,
+              iconLeft: !stageId ? Icons.CHECK : null,
               label: 'All Stages',
             }),
             m(MenuDivider),
             stages.map((targetStage, index) => m(MenuItem, {
-              active: stage === targetStage,
-              iconLeft: stage === targetStage ? Icons.CHECK : null,
+              active: stageId === targetStage.id,
+              iconLeft: stageId === targetStage.id ? Icons.CHECK : null,
               onclick: (e) => {
                 e.preventDefault();
-                navigateToSubpage(`/?stage=${targetStage}`);
+                navigateToSubpage(`/?stageId=${targetStage.id}`);
               },
               label: m('.stage-menu-item', [
                 m('.stage-menu-item-name', [
-                  `${offchainThreadStageToLabel(targetStage)}`,
-                  targetStage === OffchainThreadStage.Voting
+                  `${offchainThreadStageToLabel(targetStage.name)}`,
+                  targetStage.name === OffchainThreadStage.Voting
                     && [' ', m('.discussions-stage-count', `${app.threads.numVotingThreads}`)],
                 ]),
                 app.user?.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
@@ -502,15 +506,6 @@ const DiscussionsPage: m.Component<
       topicDescription = topicObject?.description;
     }
 
-    let stageName;
-    let stageDescription;
-    if (stageId && app.activeId()) {
-      const stages = app.stages.getByCommunity(app.activeId());
-      const stageObject = stages.find((t) => t.id.toString() === stageId);
-      topicName = stageObject?.name;
-      topicDescription = stageObject?.description;
-    }
-
     localStorage.setItem(`${app.activeId()}-lookback-${subpage}`, `${vnode.state.lookback[subpage].unix()}`);
     const stillFetching = allThreads.length === 0 && vnode.state.postsDepleted[subpage] === false;
     const emptyTopic = allThreads.length === 0 && vnode.state.postsDepleted[subpage] === true && !stageId;
@@ -534,7 +529,7 @@ const DiscussionsPage: m.Component<
       [
         (app.chain || app.community) && [
           m('.discussions-main', [
-            m(DiscussionStagesBar, { topic: topicName, stage: stageName }),
+            m(DiscussionStagesBar, { topic: topicName, stageId: parseInt(stageId, 10) }),
             app.chain && (!activeEntity || !activeEntity.serverLoaded || stillFetching)
               ? m('.discussions-main', [m(LoadingRow)])
               : emptyTopic

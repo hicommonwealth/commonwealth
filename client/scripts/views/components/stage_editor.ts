@@ -106,14 +106,16 @@ const StageEditor: m.Component<{
   view: (vnode) => {
     if (!app.chain?.meta?.chain && !app.community?.meta) return;
 
-    const { customStages } = app.chain?.meta?.chain || app.community?.meta;
-    const stages = !customStages ? [
-      OffchainThreadStage.Discussion,
-      OffchainThreadStage.ProposalInReview,
-      OffchainThreadStage.Voting,
-      OffchainThreadStage.Passed,
-      OffchainThreadStage.Failed
-    ] : parseCustomStages(customStages);
+    // TODO: James
+    // const { customStages } = app.chain?.meta?.chain || app.community?.meta;
+    // const stages = !customStages ? [
+    //   OffchainThreadStage.Discussion,
+    //   OffchainThreadStage.ProposalInReview,
+    //   OffchainThreadStage.Voting,
+    //   OffchainThreadStage.Passed,
+    //   OffchainThreadStage.Failed
+    // ] : parseCustomStages(customStages);
+    const stages = [];
 
     return m('.StageEditor', [
       !vnode.attrs.popoverMenu && m('a', {

@@ -238,7 +238,6 @@ const bulkThreads = async (models: DB, req: Request, res: Response, next: NextFu
     replacements,
     type: QueryTypes.SELECT
   });
-  console.log(threadsInVoting);
   // const numVotingThreads = threadsInVoting.filter((t) => t.stage.name === 'voting').length;
 
   return res.json({

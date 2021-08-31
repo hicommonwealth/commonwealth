@@ -86,7 +86,6 @@ export async function initAppState(updateSelectedNode = true, customDomain = nul
           featuredTopics: community.featured_topics,
           topics: community.topics,
           stagesEnabled: community.stagesEnabled,
-          customStages: community.customStages,
           customDomain: community.customDomain,
           terms: community.terms,
           adminsAndMods: [],
