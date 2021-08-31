@@ -28,7 +28,6 @@ describe('Thread queries', () => {
         address_id: address.id,
         title: 'title',
         kind: 'kind',
-        // TODO: James
         // stage: 'stage',
       },
     }))[0];
