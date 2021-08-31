@@ -302,7 +302,7 @@ const DiscussionsPage: m.Component<
     vnode.state.topicInitialized = {};
     vnode.state.topicInitialized[ALL_PROPOSALS_KEY] = false;
     const topic = vnode.attrs.topic;
-    const stageId = m.route.param('stage_id');
+    const stageId = m.route.param('stageId');
     const subpage = topic || stageId ? `${topic || ''}#${stageId || ''}` : ALL_PROPOSALS_KEY;
     const returningFromThread = app.lastNavigatedBack() && app.lastNavigatedFrom().includes('/proposal/discussion/');
     vnode.state.lookback[subpage] =      returningFromThread && localStorage[`${app.activeId()}-lookback-${subpage}`]
@@ -313,7 +313,7 @@ const DiscussionsPage: m.Component<
   },
   view: (vnode) => {
     const { topic } = vnode.attrs;
-    const stageId = m.route.param('stage_id');
+    const stageId = m.route.param('stageId');
     const activeEntity = app.community ? app.community : app.chain;
     if (!activeEntity)
       return m(PageLoading, {

@@ -39,11 +39,10 @@ const EditStageModal : m.Component<{
       vnode.state.form = { id, name, description, featuredInSidebar, featuredInNewPost };
     }
 
+    const disabled = vnode.state.form.featuredInNewPost && vnode.state.quillEditorState?.editor?.editor?.isBlank();
+
     const updateStage = async (form) => {
       const { quillEditorState } = vnode.state;
-      if (form.featuredInNewPost && quillEditorState.editor.editor.isBlank()) {
-        // return;
-      }
 
       if (quillEditorState) {
         quillEditorState.editor.enable(false);
@@ -177,7 +176,7 @@ const EditStageModal : m.Component<{
           m(FormGroup, [
             m(Button, {
               intent: 'primary',
-              disabled: vnode.state.saving,
+              disabled: vnode.state.saving || disabled,
               style: 'margin-right: 8px',
               rounded: true,
               onclick: async (e) => {

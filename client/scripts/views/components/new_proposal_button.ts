@@ -10,6 +10,7 @@ import { ProposalType } from 'identifiers';
 import { ChainBase, ChainNetwork } from 'models';
 import NewThreadModal from 'views/modals/new_thread_modal';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
+import { offchainThreadStageToLabel } from 'helpers';
 
 export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]>, mobile?: boolean) => {
   const activeAccount = app.user.activeAccount;
@@ -17,6 +18,14 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
     && app.chain?.meta.chain.snapshot;
 
   const topics = app.topics.getByCommunity(
+    app.activeId()
+  ).reduce(
+    (acc, current) => current.featuredInNewPost
+      ? [...acc, current]
+      : acc, []
+  ).sort((a, b) => a.name.localeCompare(b.name));
+
+  const stages = app.stages.getByCommunity(
     app.activeId()
   ).reduce(
     (acc, current) => current.featuredInNewPost
@@ -42,6 +51,20 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
           navigateToSubpage('/new/thread');
         },
         label: `New ${t.name} Thread`,
+        iconLeft: mobile ? Icons.PLUS : undefined,
+      })
+    )),
+    stages.map((t) => (
+      m(MenuItem, {
+        onclick: (e) => {
+          if (t.defaultOffchainTemplate) {
+            localStorage.setItem(`${app.activeId()}-active-topic-default-template`, t.defaultOffchainTemplate);
+          } else {
+            localStorage.removeItem(`${app.activeId()}-active-topic-default-template`);
+          }
+          navigateToSubpage('/new/thread');
+        },
+        label: `New ${offchainThreadStageToLabel(t.name)} Thread`,
         iconLeft: mobile ? Icons.PLUS : undefined,
       })
     )),

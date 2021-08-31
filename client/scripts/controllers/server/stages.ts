@@ -78,7 +78,8 @@ class StagesController {
     }
   }
 
-  public async add(name: string, description: string, featured_in_sidebar: boolean, featured_in_new_post: boolean) {
+  public async add(name: string, description: string, featured_in_sidebar: boolean, featured_in_new_post: boolean,
+    defaultOffchainTemplate: string) {
     try {
       const chainOrCommObj = (app.activeChainId())
         ? { 'chain': app.activeChainId() }
@@ -90,6 +91,7 @@ class StagesController {
         'description': description,
         'featured_in_sidebar': featured_in_sidebar,
         'featured_in_new_post': featured_in_new_post,
+        'default_offchain_template': defaultOffchainTemplate,
         'jwt': app.user.jwt,
       });
       const result = modelFromServer(response.result);

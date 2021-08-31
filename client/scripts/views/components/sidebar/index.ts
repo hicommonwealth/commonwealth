@@ -104,7 +104,14 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
     const onMembersPage = (p) => p.startsWith(`/${app.activeId()}/members`)
       || p.startsWith(`/${app.activeId()}/account/`);
 
+    const onFeaturedStageDiscussionPage = (p, f) => p === `/${app.activeId()}/?stageId=${f}`
+      || p === `/${app.activeId()}/?stageId=${f}/`;
+
     const topics = app.topics.getByCommunity(app.activeId()).map(({ id, name, featuredInSidebar }) => {
+      return { id, name, featuredInSidebar };
+    }).filter((t) => t.featuredInSidebar).sort((a, b) => a.name.localeCompare(b.name));
+
+    const stages = app.stages.getByCommunity(app.activeId()).map(({ id, name, featuredInSidebar }) => {
       return { id, name, featuredInSidebar };
     }).filter((t) => t.featuredInSidebar).sort((a, b) => a.name.localeCompare(b.name));
 
@@ -131,6 +138,20 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
           onclick: (e) => {
             e.preventDefault();
             navigateToSubpage(`/discussions/${t.name}`);
+          },
+        })
+      )),
+
+      stages.map((t) => (
+        m(Button, {
+          fluid: true,
+          rounded: true,
+          active: onFeaturedStageDiscussionPage(m.route.get(), t.id),
+          label: t.name,
+          class: 'sub-button',
+          onclick: (e) => {
+            e.preventDefault();
+            navigateToSubpage(`/?stageId=${t.id}`);
           },
         })
       )),
