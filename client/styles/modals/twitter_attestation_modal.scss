@@ -1,0 +1,74 @@
+@import 'client/styles/shared';
+
+.TwitterAttestationModal {
+  padding: 50px 80px;
+  text-align: center;
+
+  .close-button {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    opacity: 0.75;
+  }
+
+  .form-steps {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 500;
+  }
+
+  .disabled-step {
+    color: #999999;
+  }
+
+  .gradient-progress-bar {
+    width: 100%;
+  }
+
+  .gradient-progress-bar::-webkit-progress-bar {
+    margin-top: 14px;
+    height: 6px;
+    border-radius: 4px;
+    background-color: #eeeeee;
+  }
+
+  .gradient-progress-bar::-webkit-progress-value {
+    background: linear-gradient(89.99deg, #91BFFF -11.17%, #91FFA0 27.56%, #FBFF91 62.05%, #FF9191 105.02%);
+    border-radius: 4px;
+  }
+
+  .title {
+    font-size: 32px;
+    font-weight: 500;
+    margin-top: 30px;
+  }
+
+  .description {
+    color: #333333;
+    margin: 8px 40px;
+    max-width: 280px;
+  }
+
+  .twitter-handle {
+    margin-top: 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 16px 11px 16px;
+    background: #F7F4FF;
+    border-radius: 79px;
+  }
+
+  .primary-button {
+    font-weight: 600;
+    color: #333333;
+    padding-top: 12px;
+    padding-bottom: 7px;
+    background: linear-gradient(89.41deg, #91BFFF -11.06%, #91FFA0 27.62%, #FBFF91 62.06%, #FF9191 104.97%);
+    border-radius: 8px;
+    margin: 10px 0px;
+    width: 100%;
+  }
+}
