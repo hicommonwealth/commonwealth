@@ -2,4 +2,8 @@
 
 .EditTopicModal {
     max-width: 680px;
+    .error-message {
+        @include error-text();
+        margin-top: 20px;
+    }
 }

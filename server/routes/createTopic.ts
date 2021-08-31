@@ -15,7 +15,8 @@ const createTopic = async (models: DB, req, res: Response, next: NextFunction) =
   if (error) return next(new Error(error));
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   if (!req.body.name) return next(new Error(Errors.TopicRequired));
-  if (req.body.featured_in_new_post && (!req.body.default_offchain_template || !req.body.default_offchain_template.trim())) {
+  if (req.body.featured_in_new_post === 'true'
+    && (!req.body.default_offchain_template || !req.body.default_offchain_template.trim())) {
     return next(new Error(Errors.DefaultTemplateRequired));
   }
 
@@ -37,8 +38,8 @@ const createTopic = async (models: DB, req, res: Response, next: NextFunction) =
   const options = {
     name: req.body.name,
     description: req.body.description || '',
-    featured_in_sidebar: req.body.featured_in_sidebar || false,
-    featured_in_new_post: req.body.featured_in_new_post || false,
+    featured_in_sidebar: !!(req.body.featured_in_sidebar === 'true'),
+    featured_in_new_post: !!(req.body.featured_in_new_post === 'true'),
     default_offchain_template: req.body.default_offchain_template || '',
     ...chainOrCommObj2,
   };
