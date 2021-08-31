@@ -41,8 +41,14 @@
         max-width: 300px;
         .topic-menu-item {
             display: flex;
-            .topic-menu-item-name {
+            .cui-icon {
                 flex: 1;
+            }
+            .topic-menu-item-name {
+                flex: 7;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
                 position: relative;
                 top: 1px;
             }
