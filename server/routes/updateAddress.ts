@@ -27,8 +27,7 @@ const updateAddress = async (models: DB, req: Request, res: Response, next: Next
     }) || {};
 
     try {
-        console.log('ghostAddressId', ghostAddressId)
-        if (ghostAddressId) {
+        if (ghostAddressId && newAddressId) {
             const transaction = await sequelize.transaction();
             // update address in comments
             await models.OffchainComment.update({ address_id: newAddressId }, { where: { address_id: ghostAddressId }, transaction });
