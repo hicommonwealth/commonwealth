@@ -12,6 +12,7 @@ import PageLoading from 'views/pages/loading';
 import User from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
 import { CommunityOptionsPopover } from './discussions';
+import Compound from 'controllers/chain/ethereum/compound/adapter';
 
 interface MemberInfo {
   chain: string;
@@ -22,7 +23,7 @@ interface MemberInfo {
 const MEMBERS_PER_PAGE = 20;
 
 const MembersPage : m.Component<{}, { membersRequested: boolean, membersLoaded: MemberInfo[],
-pageToLoad: number, totalMembers: number }> = {
+pageToLoad: number, totalMembers: number, isCompound: boolean }> = {
   view: (vnode) => {
     $(window).on('scroll', () => {
       const elementTarget = document.getElementsByClassName('sublayout-main-col')[0];
@@ -40,6 +41,7 @@ pageToLoad: number, totalMembers: number }> = {
       vnode.state.membersRequested = true;
       vnode.state.membersLoaded = [];
       vnode.state.pageToLoad = 0;
+      vnode.state.isCompound = app.chain instanceof Compound;
     }
 
     const activeEntity = app.community ? app.community : app.chain;
@@ -59,8 +61,11 @@ pageToLoad: number, totalMembers: number }> = {
       vnode.state.membersRequested = false;
       activeInfo.getMembersByPage(activeInfo.id, vnode.state.pageToLoad, MEMBERS_PER_PAGE)
         .then(({ result, total }) => {
-          vnode.state.membersLoaded = vnode.state.membersLoaded.concat(result.map(((o) => {
+          vnode.state.membersLoaded = vnode.state.membersLoaded.concat(result.map((async (o) => {
             o.address = o.Address.address;
+            if (vnode.state.isCompound) {
+              o.votes = await (app.chain as Compound).chain.getVotingPower(o.address);
+            }
             o.chain = o.chain_id;
             return o;
           })));
@@ -74,7 +79,7 @@ pageToLoad: number, totalMembers: number }> = {
     const isMod = app.user.isRoleOfCommunity({
       role: 'moderator', chain: app.activeChainId(), community: app.activeCommunityId()
     });
-
+    console.log("vnode.state.membersLoaded",vnode.state.membersLoaded)
     return m(Sublayout, {
       class: 'MembersPage',
       title: [

@@ -1228,10 +1228,8 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@commonwealth/chain-events@0.7.9":
-  version "0.7.9"
-  resolved "https://registry.yarnpkg.com/@commonwealth/chain-events/-/chain-events-0.7.9.tgz#0c48a2108d0cf9968de8c9cd8879897584681b66"
-  integrity sha512-z4vBVCCRGc7WkYKfHRMqGhqv4dTeIxByfYb9KDvuoZ8p+OLJ5A37ROQAKWsC2N68I/VUM3l2reKgExNBYvassg==
+"@commonwealth/chain-events@file:.yalc/@commonwealth/chain-events":
+  version "0.7.7"
   dependencies:
     "@edgeware/node-types" "^3.3.3"
     "@ethersproject/abi" "^5.0.0"

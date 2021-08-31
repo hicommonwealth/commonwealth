@@ -39,6 +39,12 @@ export default class CompoundChain extends EthereumChain {
     return new BN(balance.toString(), 10) || new BN(0);
   }
 
+  public async getVotingPower(address: string) {
+    const num = await this.compoundApi.Token.numCheckpoints(address);
+    const { fromBlock, votes } = await this.compoundApi.Token.checkpoints(address, num-1);
+    return votes;
+  }
+
   public async setDelegate(address: string, amount: number) {
     try {
       const contract = await attachSigner(
