@@ -92,13 +92,13 @@ const StageEditor: m.Component<{
   onChangeHandler: Function;
   openStateHandler: Function;
 }, {
-  stage: OffchainStage;
+  stageId: number;
   isOpen: boolean;
   chainEntitiesToSet: ChainEntity[];
 }> = {
   oninit: (vnode) => {
     vnode.state.isOpen = !!vnode.attrs.popoverMenu;
-    vnode.state.stage = vnode.attrs.thread.stage;
+    vnode.state.stageId = vnode.attrs.thread.stage.id;
 
     vnode.state.chainEntitiesToSet = [];
     vnode.attrs.thread.chainEntities.forEach((ce) => vnode.state.chainEntitiesToSet.push(ce));
@@ -106,16 +106,7 @@ const StageEditor: m.Component<{
   view: (vnode) => {
     if (!app.chain?.meta?.chain && !app.community?.meta) return;
 
-    // TODO: James
-    // const { customStages } = app.chain?.meta?.chain || app.community?.meta;
-    // const stages = !customStages ? [
-    //   OffchainThreadStage.Discussion,
-    //   OffchainThreadStage.ProposalInReview,
-    //   OffchainThreadStage.Voting,
-    //   OffchainThreadStage.Passed,
-    //   OffchainThreadStage.Failed
-    // ] : parseCustomStages(customStages);
-    const stages = [];
+    const stages = app.stages.getByCommunity(app.activeId());
 
     return m('.StageEditor', [
       !vnode.attrs.popoverMenu && m('a', {
@@ -131,26 +122,20 @@ const StageEditor: m.Component<{
           m('.stage-options', [
             stages.map((targetStage) => m(Button, {
               class: 'discussions-stage',
-              active: vnode.state.stage?.name === targetStage,
-              iconLeft: vnode.state.stage?.name === targetStage ? Icons.CHECK : null,
+              active: vnode.state.stageId === targetStage.id,
+              iconLeft: vnode.state.stageId === targetStage.id ? Icons.CHECK : null,
               rounded: true,
               size: 'sm',
-              label: offchainThreadStageToLabel(targetStage),
+              label: offchainThreadStageToLabel(targetStage.name),
               onclick: (e) => {
-                // TODO: James
-                // vnode.state.stage?.name = targetStage;
+                vnode.state.stageId = targetStage.id;
               }
             })),
           ]),
           m(ChainEntitiesSelector, {
             thread: vnode.attrs.thread,
             onSelect: (result) => {
-              if (vnode.state.stage?.name === OffchainThreadStage.Discussion
-                  || vnode.state.stage?.name === OffchainThreadStage.ProposalInReview) {
-
-                // TODO: James
-                // vnode.state.stage?.name = OffchainThreadStage.Voting;
-              }
+              console.log(result);
             },
             chainEntitiesToSet: vnode.state.chainEntitiesToSet,
           }),
@@ -184,12 +169,11 @@ const StageEditor: m.Component<{
             intent: 'primary',
             rounded: true,
             onclick: async () => {
-              const { stage } = vnode.state;
               const { thread } = vnode.attrs;
 
-              // set stage
+              const selectedStage = stages.find((s) => s.id === vnode.state.stageId);
               try {
-                await app.threads.setStage({ threadId: thread.id, stage: vnode.state.stage });
+                await app.threads.setStage({ threadId: thread.id, stage: selectedStage });
               } catch (err) {
                 console.log('Failed to update stage');
                 throw new Error((err.responseJSON && err.responseJSON.error)
@@ -207,7 +191,7 @@ const StageEditor: m.Component<{
                   : 'Failed to update linked proposals');
               }
 
-              vnode.attrs.onChangeHandler(vnode.state.stage, vnode.state.chainEntitiesToSet);
+              vnode.attrs.onChangeHandler(selectedStage, vnode.state.chainEntitiesToSet);
 
               if (vnode.attrs.popoverMenu) {
                 vnode.attrs.openStateHandler(false);

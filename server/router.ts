@@ -77,6 +77,7 @@ import createThread from './routes/createThread';
 import editThread from './routes/editThread';
 import updateThreadPolling from './routes/updateThreadPolling';
 import updateThreadPrivacy from './routes/updateThreadPrivacy';
+import updateThreadStage from './routes/updateThreadStage';
 import updateThreadPinned from './routes/updateThreadPinned';
 import updateThreadLinkedChainEntities from './routes/updateThreadLinkedChainEntities';
 import updateOffchainVote from './routes/updateOffchainVote';
@@ -221,6 +222,11 @@ function setupRouter(
     '/updateThreadPolling',
     passport.authenticate('jwt', { session: false }),
     updateThreadPolling.bind(this, models),
+  );
+  router.post(
+    '/updateThreadStage',
+    passport.authenticate('jwt', { session: false }),
+    updateThreadStage.bind(this, models),
   );
   router.post(
     '/updateThreadPrivacy',

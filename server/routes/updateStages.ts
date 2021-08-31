@@ -6,7 +6,6 @@ enum UpdateStageErrors {
   NoUser = 'Not logged in',
   NoThread = 'Must provide thread_id',
   NoAddr = 'Must provide address',
-  NoStage = 'Must provide stage_name',
   InvalidAddr = 'Invalid address',
   NoPermission = `You do not have permission to edit post's stage`
 }
@@ -15,7 +14,6 @@ const updateStages = async (models: DB, req, res: Response, next: NextFunction) 
   if (!req.user) return next(new Error(UpdateStageErrors.NoUser));
   if (!req.body.thread_id) return next(new Error(UpdateStageErrors.NoThread));
   if (!req.body.address) return next(new Error(UpdateStageErrors.NoAddr));
-  if (!req.body.stage_name) return next(new Error(UpdateStageErrors.NoStage));
 
   const userAddresses = await req.user.getAddresses();
   const userAddress = userAddresses.find((a) => !!a.verified && a.address === req.body.address);

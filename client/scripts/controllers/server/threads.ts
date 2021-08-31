@@ -325,14 +325,14 @@ class ThreadsController {
 
   public async setStage(args: { threadId: number, stage: OffchainStage }) {
     await $.ajax({
-      url: `${app.serverUrl()}/updateStages`,
+      url: `${app.serverUrl()}/updateThreadStage`,
       type: 'POST',
       data: {
         'chain': app.activeChainId(),
         'community': app.activeCommunityId(),
         'thread_id': args.threadId,
         'stage_id': args.stage?.id,
-        'jwt': app.user.jwt
+        'jwt': app.user.jwt,
       },
       success: (response) => {
         const result = modelFromServer(response.result);

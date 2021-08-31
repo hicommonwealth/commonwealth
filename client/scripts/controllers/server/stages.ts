@@ -57,29 +57,6 @@ class StagesController {
     }
   }
 
-  public async update(threadId: number, stageName: string, stageId?: number) {
-    try {
-      const response = await $.post(`${app.serverUrl()}/updateStages`, {
-        'jwt': app.user.jwt,
-        'thread_id': threadId,
-        'stage_id': stageId,
-        'stage_name': stageName,
-        'address': app.user.activeAccount.address,
-      });
-      const result = modelFromServer(response.result);
-      if (this._store.getById(result.id)) {
-        this._store.remove(this._store.getById(result.id));
-      }
-      this._store.add(result);
-      return result;
-    } catch (err) {
-      console.log('Failed to update stage');
-      throw new Error((err.responseJSON && err.responseJSON.error)
-        ? err.responseJSON.error
-        : 'Failed to update stage');
-    }
-  }
-
   public async add(name: string, description: string, featured_in_sidebar: boolean, featured_in_new_post: boolean,
     defaultOffchainTemplate: string) {
     try {

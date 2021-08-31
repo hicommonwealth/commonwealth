@@ -6,7 +6,7 @@ import { navigateToSubpage } from 'app';
 import { MenuItem, PopoverMenu, Icon, Icons, MenuDivider } from 'construct-ui';
 
 import { NotificationCategories } from 'types';
-import { OffchainThread, OffchainTopic, OffchainThreadStage } from 'models';
+import { OffchainThread, OffchainTopic, OffchainThreadStage, OffchainStage } from 'models';
 
 import TopicEditor from 'views/components/topic_editor';
 import StageEditor from 'views/components/stage_editor';
@@ -183,9 +183,8 @@ const DiscussionRowMenu: m.Component<{ proposal: OffchainThread }, {
       vnode.state.stageEditorIsOpen && m(StageEditor, {
         thread: vnode.attrs.proposal,
         popoverMenu: true,
-        onChangeHandler: (stage: OffchainThreadStage) => {
-          // TODO: James
-          // proposal.stage = stage;
+        onChangeHandler: (stage: OffchainStage) => {
+          proposal.stage = stage;
           m.redraw();
         },
         openStateHandler: (v) => { vnode.state.stageEditorIsOpen = v; m.redraw(); },
