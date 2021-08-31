@@ -628,6 +628,7 @@ const Sidebar: m.Component<{ hideQuickSwitcher? }, {}> = {
     const hasCMNProtocol = app.cmnProtocol
       && app.cmnProtocol.initialized
       && app.cmnProtocol.chainId === app.activeChainId();
+
     return [
       !app.isCustomDomain() && m(SidebarQuickSwitcher),
       m('.Sidebar', [

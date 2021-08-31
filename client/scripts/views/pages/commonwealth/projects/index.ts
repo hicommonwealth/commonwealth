@@ -29,18 +29,19 @@ const ProjectsPage: m.Component<{}, {initialized: boolean, projects: CMNProject[
 
   view: (vnode) => {
     if (!connectionReady() || !vnode.state.initialized) return m(PageLoading);
+    const notLoggedIn = !app.user.activeAccount || !app.isLoggedIn();
 
     const { projects } = vnode.state;
-    const activeProjectsContent = projects
-      .filter((p) => p.status === 'In Progress')
+    const activeProjectsContent = (projects
+      .filter((p) => p.status === 'In Progress') || [])
       .map((p) => m(ProjectCard, { project: p }));
 
-    const failedProjects = projects
-      .filter((p) => p.status === 'Failed')
+    const failedProjects = (projects
+      .filter((p) => p.status === 'Failed') || [])
       .map((p) => m(ProjectCard, { project: p }));
 
-    const successedProjects = projects
-      .filter((p) => p.status === 'Successed')
+    const successedProjects = (projects
+      .filter((p) => p.status === 'Successed') || [])
       .map((p) => m(ProjectCard, { project: p }));
 
     return m(Sublayout, {
@@ -49,9 +50,10 @@ const ProjectsPage: m.Component<{}, {initialized: boolean, projects: CMNProject[
       showNewProposalButton: true,
     }, [
       m('.stats-box', [
-        m('div', [
-          'CMN Protocol Page',
-        ]),
+        m('div', 'CMN Protocol Page'),
+        m('br'),
+        notLoggedIn && m('div', 'Please login first'),
+        m('div', 'You can find "New Project" button in the the New Thread dropdown'),
       ]),
       m(Listing, {
         content: activeProjectsContent,

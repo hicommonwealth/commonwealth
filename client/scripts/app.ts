@@ -206,11 +206,10 @@ export async function selectCommunity(c?: CommunityInfo): Promise<boolean> {
   return true;
 }
 
-async function initCMNProtocol() {
-  if (!app.activeChainId() || app.activeChainId() === '') return;
-  const response = await $.get(`${app.serverUrl()}/getCMNProtocols`, { chain: app.activeChainId() });
+async function initCMNProtocol(chainId: string) {
+  const response = await $.get(`${app.serverUrl()}/getCMNProtocols`, { chain: chainId });
   if (response.status !== 'Success') return;
-  // if (response.result.protocol)
+
   const { protocol } = response.result;
   if (!protocol) return;
 
@@ -224,6 +223,7 @@ async function initCMNProtocol() {
     /* webpackChunkName: "commonwealth-main" */
     './controllers/chain/ethereum/commonwealth/adapter'
   )).default;
+
   const cmnProtocol = new CMNProtocol();
   app.cmnProtocol = cmnProtocol;
   await app.cmnProtocol.init(
@@ -232,7 +232,6 @@ async function initCMNProtocol() {
     protocol.project_protocol,
     protocol.collective_protocol
   );
-  m.redraw();
 }
 
 // called by the user, when clicking on the chain/node switcher menu
@@ -350,18 +349,16 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
   } else {
     app.chain = newChain;
   }
+
   if (initApi) {
     await app.chain.initApi(); // required for loading NearAccounts
   }
+
   app.chainPreloading = false;
   app.chain.deferred = deferred;
 
   // Instantiate active addresses before chain fully loads
   await updateActiveAddresses(n.chain);
-
-  if (app.chain) {
-    await initCMNProtocol();
-  }
 
   // Update default on server if logged in
   if (app.isLoggedIn()) {
@@ -369,6 +366,11 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       url: n.url,
       chain: n.chain.id
     });
+  }
+
+
+  if (app.chain && app.chain.id) {
+    await initCMNProtocol(app.chain.id);
   }
 
   // If the user was invited to a chain/community, we can now pop up a dialog for them to accept the invite

@@ -59,28 +59,29 @@ export default class CMNProjectAPI extends ContractApi<CMNProjectProtocolContrac
   }
 
   public async getTokenHolders(tokenAddress: string) {
-    const COVALENTHQ_API_BASE_URL = 'https://api.covalenthq.com/v1';
-    const CHAIN_ID = 42; // for kovan
-    const apiUrl = `${COVALENTHQ_API_BASE_URL}/${CHAIN_ID}/tokens/${tokenAddress}/token_holders/`;
-
-    const response = await $.get(apiUrl, {
-      'key': 'ckey_1bee39d2c56f46e4aada2380624',
-      'page-number': 0,
-      'page-size': 200,
-    });
-
     let tokenHolders = [];
-    if (!response.error) {
-      const { items, pagination, updated_at } = response.data;
-      tokenHolders = items.map((item: any) => {
-        const newItem = {
-          address: item.address,
-          balance: item.balance,
-        };
-        return newItem;
+    try {
+      const COVALENTHQ_API_BASE_URL = 'https://api.covalenthq.com/v1';
+      const CHAIN_ID = 42; // for kovan
+      const apiUrl = `${COVALENTHQ_API_BASE_URL}/${CHAIN_ID}/tokens/${tokenAddress}/token_holders/`;
+      const response = await $.get(apiUrl, {
+        'key': 'ckey_1bee39d2c56f46e4aada2380624',
+        'page-number': 0,
+        'page-size': 200,
       });
+      if (!response.error) {
+        const { items, pagination, updated_at } = response.data;
+        tokenHolders = items.map((item: any) => {
+          const newItem = {
+            address: item.address,
+            balance: item.balance,
+          };
+          return newItem;
+        });
+      }
+    } catch (e) {
+      console.log('====>failed to fetch token holders', e);
     }
-
     return tokenHolders;
   }
 
@@ -123,47 +124,41 @@ export default class CMNProjectAPI extends ContractApi<CMNProjectProtocolContrac
   }
 
   public async back(contract: CMNProjectContract, amount: number, tokenAddress: string) {
-    if (tokenAddress === EtherAddress) {
-      let transactionSuccessed: boolean;
-      try {
-        const tx = await contract.backWithETH({ value: amount });
-        const txReceipt = await tx.wait();
-        transactionSuccessed = txReceipt.status === 1;
-      } catch (err) {
-        transactionSuccessed = false;
-      }
-      return {
-        status: transactionSuccessed ? 'success' : 'failed',
-        error: transactionSuccessed ? '' : 'Failed to process backWithETH transaction'
-      };
-    } else {
-      // logic to ERC20 token backing
-    }
+    let transactionSuccessed = false;
+    const tx = tokenAddress === EtherAddress
+      ? await contract.backWithETH({ value: amount })
+      : await contract.back(tokenAddress, amount, { gasLimit: this.gasLimit });
+
+    const txReceipt = await tx.wait();
+    transactionSuccessed = txReceipt.status === 1;
+
+    return {
+      status: transactionSuccessed ? 'success' : 'failed',
+      error: transactionSuccessed ? '' : 'Failed to process backWithETH transaction'
+    };
   }
 
   public async curate(contract: CMNProjectContract, amount: number, tokenAddress: string) {
-    if (tokenAddress === EtherAddress) {
-      let transactionSuccessed: boolean;
-      try {
-        const tx = await contract.curateWithETH({ value: amount });
-        const txReceipt = await tx.wait();
-        transactionSuccessed = txReceipt.status === 1;
-      } catch (err) {
-        transactionSuccessed = false;
-      }
-      return {
-        status: transactionSuccessed ? 'success' : 'failed',
-        error: transactionSuccessed ? '' : 'Failed to process curateWithETH transaction'
-      };
-    } else {
-      // logic to ERC20 token curating
+    let transactionSuccessed: boolean;
+    try {
+      const tx = tokenAddress === EtherAddress
+        ? await contract.curateWithETH({ value: amount })
+        : await contract.curate(tokenAddress, amount, { gasLimit: this.gasLimit });
+      const txReceipt = await tx.wait();
+      transactionSuccessed = txReceipt.status === 1;
+    } catch (err) {
+      transactionSuccessed = false;
     }
+    return {
+      status: transactionSuccessed ? 'success' : 'failed',
+      error: transactionSuccessed ? '' : 'Failed to process curateWithETH transaction'
+    };
   }
 
   public async redeemBToken(contract: CMNProjectContract, amount: number, tokenAddress: string) {
     let transactionSuccessed: boolean;
     try {
-      const tx = await contract.redeemBToken(tokenAddress, amount, { gasLimit: 3000000 });
+      const tx = await contract.redeemBToken(tokenAddress, amount, { gasLimit: this.gasLimit });
       const txReceipt = await tx.wait();
       transactionSuccessed = txReceipt.status === 1;
     } catch (err) {
@@ -178,7 +173,7 @@ export default class CMNProjectAPI extends ContractApi<CMNProjectProtocolContrac
   public async redeemCToken(contract: CMNProjectContract, amount: number, tokenAddress: string) {
     let transactionSuccessed: boolean;
     try {
-      const tx = await contract.redeemCToken(tokenAddress, amount, { gasLimit: 3000000 });
+      const tx = await contract.redeemCToken(tokenAddress, amount, { gasLimit: this.gasLimit });
       const txReceipt = await tx.wait();
       transactionSuccessed = txReceipt.status === 1;
     } catch (err) {
@@ -193,7 +188,7 @@ export default class CMNProjectAPI extends ContractApi<CMNProjectProtocolContrac
   public async withdraw(contract: CMNProjectContract) {
     let transactionSuccessed: boolean;
     try {
-      const tx = await contract.withdraw({ gasLimit: 3000000 });
+      const tx = await contract.withdraw({ gasLimit: this.gasLimit });
       const txReceipt = await tx.wait();
       transactionSuccessed = txReceipt.status === 1;
     } catch (err) {
