@@ -7,6 +7,7 @@ export const Errors = {
   NotLoggedIn: 'Not logged in',
   TopicRequired: 'Topic name required',
   MustBeAdmin: 'Must be an admin',
+  InvalidTokenThreshold: 'Invalid token threshold',
   DefaultTemplateRequired: 'Default Template required'
 };
 
@@ -35,9 +36,14 @@ const createTopic = async (models: DB, req, res: Response, next: NextFunction) =
 
   const chainOrCommObj2 = community ? { community_id: community.id } : { chain_id: chain.id };
 
+  const token_threshold_test = parseInt(req.body.token_threshold, 10);
+  if (Number.isNaN(token_threshold_test)) {
+    return next(new Error(Errors.InvalidTokenThreshold));
+  }
   const options = {
     name: req.body.name,
     description: req.body.description || '',
+    token_threshold: req.body.token_threshold,
     featured_in_sidebar: !!(req.body.featured_in_sidebar === 'true'),
     featured_in_new_post: !!(req.body.featured_in_new_post === 'true'),
     default_offchain_template: req.body.default_offchain_template || '',

@@ -4,14 +4,17 @@ import m from 'mithril';
 import app from 'state';
 import $ from 'jquery';
 import { Button, Input, Form, FormGroup, FormLabel, Checkbox } from 'construct-ui';
+import BN from 'bn.js';
 
 import QuillEditor from 'views/components/quill_editor';
 import { CompactModalExitButton } from 'views/modal';
-
+import { tokensToTokenBaseUnits } from 'helpers';
+import { stubFalse } from 'lodash';
 interface INewTopicModalForm {
   id: number,
   name: string,
   description: string,
+  tokenThreshold: string,
   featuredInSidebar: boolean,
   featuredInNewPost: boolean,
 }
@@ -20,6 +23,7 @@ const NewTopicModal: m.Component<{
   id: number,
   name: string,
   description: string,
+  tokenThreshold: string,
   featuredInSidebar: boolean,
   featuredInNewPost: boolean,
 }, {
@@ -33,9 +37,9 @@ const NewTopicModal: m.Component<{
     && !app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })) {
       return null;
     }
-    const { id, name, description, featuredInSidebar, featuredInNewPost } = vnode.attrs;
+    const { id, name, description, tokenThreshold = '0', featuredInSidebar, featuredInNewPost } = vnode.attrs;
     if (!vnode.state.form) {
-      vnode.state.form = { id, name, description, featuredInSidebar, featuredInNewPost };
+      vnode.state.form = { id, name, description, tokenThreshold, featuredInSidebar, featuredInNewPost };
     }
     let disabled = false;
     if (!vnode.state.form.name || !vnode.state.form.name.trim()) disabled = true;
@@ -84,6 +88,22 @@ const NewTopicModal: m.Component<{
                 vnode.state.form.description = (e.target as any).value;
               }
             }),
+          ]),
+          m(FormGroup, [
+            m(FormLabel, { for: 'tokenThreshold' }, `Number of tokens needed to post (${app.chain.meta.chain.symbol})`),
+            m(Input, {
+              title: 'Token threshold',
+              class: 'topic-form-token-threshold',
+              tabindex: 2,
+              defaultValue: '0',
+              value: vnode.state.form.tokenThreshold,
+              oninput: (e) => {
+                // restrict it to numerical input
+                if (e.target.value === '' || /^\d+\.?\d*$/.test(e.target.value)) {
+                  vnode.state.form.tokenThreshold = (e.target as any).value;
+                }
+              }
+            })
           ]),
           m(FormGroup, [
             m(Checkbox, {
@@ -139,6 +159,8 @@ const NewTopicModal: m.Component<{
                 null,
                 form.featuredInSidebar,
                 form.featuredInNewPost,
+                tokensToTokenBaseUnits(vnode.state.form.tokenThreshold || '0',
+                  app.chain.meta.chain.decimals || 18),
                 defaultOffchainTemplate
               ).then(() => {
                 vnode.state.saving = false;

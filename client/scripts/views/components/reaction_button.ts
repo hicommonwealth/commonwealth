@@ -8,6 +8,8 @@ import app from 'state';
 import { Proposal, OffchainComment, OffchainThread, AnyProposal, AddressInfo } from 'models';
 import User from 'views/components/widgets/user';
 import Token from 'controllers/chain/ethereum/token/adapter';
+import BN from 'bn.js';
+
 import $ from 'jquery';
 import ReactionCount from 'models/ReactionCount';
 import SelectAddressModal from '../modals/select_address_modal';
@@ -80,7 +82,28 @@ const ReactionButton: m.Component<ReactionButtonAttrs, ReactionButtonState> = {
     vnode.state.likes = likes;
     vnode.state.dislikes = dislikes;
 
-    const disabled = vnode.state.loading;
+    const isCommunity = !!app.activeCommunityId();
+
+    const tokenBalance = app.chain && (app.chain as Token).tokenBalance;
+    const isAdmin = app.user.isSiteAdmin
+      || app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
+
+    let tokenPostingThreshold;
+    if( post instanceof OffchainThread && post.topic && app.topics) {
+      tokenPostingThreshold = app.topics.getByName((post as OffchainThread).topic.name, app.activeId()).tokenThreshold
+    } else if (post instanceof OffchainComment) {
+      // post.rootProposal has typescript typedef number but in practice seems to be a string
+      const parentThread = app.threads.getById(parseInt(post.rootProposal.toString().split('_')[1], 10));
+      tokenPostingThreshold = app.topics.getByName((parentThread).topic.name, app.activeId()).tokenThreshold
+    } else {
+      tokenPostingThreshold = new BN(0);
+    }
+    const disabled = vnode.state.loading
+      || (
+        (!isCommunity && (app.chain as Token).isToken)
+        && !isAdmin
+        && (tokenBalance == null || (tokenPostingThreshold && tokenPostingThreshold.gt(tokenBalance)))
+      );
     const activeAddress = app.user.activeAccount?.address;
     vnode.state.hasReacted = hasReacted;
     let hasReactedType;

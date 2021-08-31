@@ -1,5 +1,6 @@
 import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
+import BN from 'bn.js';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { NotificationCategories } from '../../shared/types';
 import { DB } from '../database';
@@ -12,6 +13,7 @@ import TokenBalanceCache from '../util/tokenBalanceCache';
 import { factory, formatFilename } from '../../shared/logging';
 
 import { SENDGRID_API_KEY } from '../config';
+
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 
@@ -40,6 +42,31 @@ const createComment = async (
   if (authorError) return next(new Error(authorError));
 
   const { parent_id, root_id, text } = req.body;
+
+  if (chain && chain.type === 'token') {
+    // skip check for admins
+    const isAdmin = await models.Role.findAll({
+      where: {
+        address_id: author.id,
+        chain_id: chain.id,
+        permission: ['admin'],
+      },
+    });
+    if (!req.user.isAdmin && isAdmin.length === 0) {
+      try {
+        const stage = root_id.substring(0, root_id.indexOf('_'));
+        const topic_id = root_id.substring(root_id.indexOf('_') + 1);
+        const thread = await models.OffchainThread.findOne({ where:{ stage, id: topic_id } });
+        const threshold = (await models.OffchainTopic.findOne({ where: { id: thread.topic_id } })).token_threshold;
+        const tokenBalance = await tokenBalanceCache.getBalance(chain.id, req.body.address);
+
+        if (threshold && tokenBalance.lt(new BN(threshold))) return next(new Error(Errors.InsufficientTokenBalance));
+      } catch (e) {
+        log.error(`hasToken failed: ${e.message}`);
+        return next(new Error(Errors.CouldNotFetchTokenBalance));
+      }
+    }
+  }
 
   const plaintext = (() => {
     try {
