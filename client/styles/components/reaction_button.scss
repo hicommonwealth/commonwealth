@@ -36,10 +36,21 @@
         display: block;
         min-height: 43px !important;
         min-width: 45px !important;
+        max-height: 43px !important;
+        max-width: 45px !important;
         text-align: center;
         color: $text-color-medium;
         border: 1px solid #ddd;
-        border-radius: 9999px;
+        display: block;
+        border-radius: 12px;
+        padding: 0;
+        &.active {
+            color: $primary-bg-color;
+            border-color: $primary-bg-color;
+            span {
+                color: inherit;
+            }
+        }
         .cui-icon {
             margin-right: none;
         }
@@ -61,6 +72,8 @@
         .reactions-count {
             top: 0;
             padding: 0;
+            min-width: 26px;
+            text-align: center;
             color: $text-color-medium;
             font-weight: 500;
         }
