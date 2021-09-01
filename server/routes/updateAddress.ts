@@ -19,11 +19,11 @@ const updateAddress = async (models: DB, req: Request, res: Response, next: Next
     }
 
     const { id: ghostAddressId } = await models.Address.scope('withPrivateData').findOne({
-        where: { chain: 'injective', ghost_address: true, user_id: userId }
+        where: { chain, ghost_address: true, user_id: userId }
     }) || {};
 
     const { id: newAddressId } = await models.Address.scope('withPrivateData').findOne({
-        where: { chain: 'injective', user_id: userId, address }
+        where: { chain, user_id: userId, address }
     }) || {};
 
     try {
