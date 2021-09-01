@@ -6,7 +6,7 @@ import { Button, Callout } from 'construct-ui';
 
 import app from 'state';
 
-import { OffchainThread, OffchainComment, AnyProposal } from 'models';
+import { OffchainThread, OffchainComment, AnyProposal, Account } from 'models';
 import { CommentParent } from 'controllers/server/comments';
 import EditProfileModal from 'views/modals/edit_profile_modal';
 import QuillEditor from 'views/components/quill_editor';
@@ -45,7 +45,9 @@ const CreateComment: m.Component<{
     } = vnode.attrs;
     let { parentComment } = vnode.attrs;
     const author = app.user.activeAccount;
-    const parentType = parentComment ? CommentParent.Comment : CommentParent.Proposal;
+    const parentType = (parentComment || proposalPageState.parentCommentId)
+      ? CommentParent.Comment
+      : CommentParent.Proposal;
     if (!parentComment) parentComment = null;
     if (vnode.state.uploadsInProgress === undefined) {
       vnode.state.uploadsInProgress = 0;
@@ -83,7 +85,7 @@ const CreateComment: m.Component<{
       const communityId = app.activeCommunityId();
       try {
         const res = await app.comments.create(author.address, rootProposal.uniqueIdentifier,
-          chainId, communityId, commentText, parentComment?.id, attachments);
+          chainId, communityId, commentText, proposalPageState.parentCommentId, attachments);
         callback();
         if (vnode.state.quillEditorState.editor) {
           vnode.state.quillEditorState.editor.enable();
@@ -131,14 +133,28 @@ const CreateComment: m.Component<{
 
     const isAdmin = app.user.isSiteAdmin || app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
 
+    let parentScopedClass: string = 'new-thread-child';
+    let parentAuthor: Account<any>;
+    if (parentType === CommentParent.Comment) {
+      parentScopedClass = 'new-comment-child';
+      parentAuthor = app.community
+        ? app.community.accounts.get(parentComment.author, parentComment.authorChain)
+        : app.chain.accounts.get(parentComment.author);
+    }
+
     const { error, sendingComment, uploadsInProgress } = vnode.state;
     return m('.CreateComment', {
-      class: parentType === CommentParent.Comment ? 'new-comment-child' : 'new-thread-child'
+      class: parentScopedClass
     }, [
       m('.create-comment-avatar', [
         m(User, { user: author, popover: true, avatarOnly: true, avatarSize: 40 }),
       ]),
       m('.create-comment-body', [
+        m('.reply-header', [
+          m('h3', parentType === CommentParent.Comment
+            ? ['Replying to ', m(User, { user: parentAuthor, popover: true, hideAvatar: true })]
+            : 'Reply')
+        ]),
         m(User, { user: author, popover: true, hideAvatar: true }),
         (rootProposal instanceof OffchainThread && rootProposal.readOnly)
           ? m(Callout, {
@@ -191,9 +207,17 @@ const CreateComment: m.Component<{
                 intent: 'primary',
                 type: 'submit',
                 compact: true,
-                disabled: getSetGlobalEditingStatus(GlobalStatus.Get) || sendingComment || uploadsInProgress > 0
-                   || (app.activeChainId() && (app.chain as Token).isToken
-                   && ((!app.isAdapterReady) || (!isAdmin && tokenPostingThreshold && tokenPostingThreshold.gt((app.chain as Token).tokenBalance)))),
+                disabled: (
+                  getSetGlobalEditingStatus(GlobalStatus.Get)
+                  || vnode.state.quillEditorState?.editor?.editor?.isBlank()
+                  || sendingComment
+                  || uploadsInProgress > 0
+                  || (app.activeChainId() && (app.chain as Token).isToken
+                    && ((!app.isAdapterReady)
+                      || (!isAdmin
+                        && tokenPostingThreshold
+                        && tokenPostingThreshold.gt((app.chain as Token).tokenBalance))))
+                ),
                 rounded: true,
                 onclick: submitComment,
                 label: (uploadsInProgress > 0)

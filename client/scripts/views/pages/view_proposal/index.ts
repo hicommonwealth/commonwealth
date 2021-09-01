@@ -393,7 +393,6 @@ const ProposalHeader: m.Component<{
                       proposalPageState.replying = false;
                     }
                     proposalPageState.parentCommentId = null;
-                    console.log(proposalPageState);
                   }
                 })
               ])
@@ -411,7 +410,7 @@ const ProposalComment: m.Component<{
   comment: OffchainComment<any>;
   getSetGlobalEditingStatus: CallableFunction;
   proposalPageState: IProposalPageState;
-  parent?: AnyProposal | OffchainComment<any> | OffchainThread;
+  parent: AnyProposal | OffchainComment<any> | OffchainThread;
   proposal: AnyProposal | OffchainThread;
   callback?: Function;
   isLast: boolean,
@@ -502,12 +501,13 @@ const ProposalComment: m.Component<{
         ]),
         m('.comment-body-bottom', [
           vnode.state.editing
-            ? m('.comment-edit-buttons', [
+            && m('.comment-edit-buttons', [
               m(ProposalBodySaveEdit, { item: comment, getSetGlobalEditingStatus, parentState: vnode.state, callback }),
               m(ProposalBodyCancelEdit, { item: comment, getSetGlobalEditingStatus, parentState: vnode.state }),
-            ])
-            : m('.comment-response-row', [
-              m(ProposalBodyReaction, { item: comment }),
+            ]),
+          !vnode.state.editing
+            && !comment.deleted
+            && m('.comment-response-row', [
               m(InlineReplyButton, {
                 commentReplyCount,
                 onclick: (e) => {
@@ -518,9 +518,9 @@ const ProposalComment: m.Component<{
                   } else {
                     proposalPageState.replying = false;
                   }
-                  console.log(proposalPageState);
                 }
-              })
+              }),
+              m(ProposalBodyReaction, { item: comment }),
             ]),
         ]),
       ]),
@@ -560,7 +560,7 @@ const ProposalComments: m.Component<{
     const nestedReplyForm = (comment) => {
       // if current comment is replyParent, & no posts are being edited, a nested comment form is rendered
       if (
-        proposalPageState.replying
+        !proposalPageState.editing
         && proposalPageState.parentCommentId === comment.id
         && !getSetGlobalEditingStatus(GlobalStatus.Get)
       ) {
@@ -575,56 +575,62 @@ const ProposalComments: m.Component<{
       }
     };
 
-    const recursivelyGatherChildComments = (
-      childComments: OffchainComment<any>[],
-      parentComment: OffchainComment<any>,
-      threadLevel: number = 1
-    ) => {
-      // Remove this check + /createComment server-side checks to allow >2 lvls of threading
-      const canContinueThreading = threadLevel <= MAX_THREAD_LEVEL;
-      return childComments.map((child: OffchainComment<any>) => {
-        if (!child) return;
-        const furtherChildren = app.comments.getByProposal(proposal).filter((c) => c.parentComment === child.id);
-        return m(`.threading-level-${threadLevel}`, {
-          style: `margin-left: calc(36px * ${threadLevel})`
-        }, [
-          m(ProposalComment, {
-            comment: child,
-            getSetGlobalEditingStatus,
-            proposalPageState,
-            parent: parentComment,
-            proposal,
-            callback: createdCommentCallback,
-            isLast: false, // TODO: implement isLast
-          }),
-          !!furtherChildren.length
-            && canContinueThreading
-            && recursivelyGatherChildComments(furtherChildren, child, threadLevel + 1),
-          canContinueThreading
-            && nestedReplyForm(child),
-        ]);
-      });
+    const isLivingCommentTree = (comment, children) => {
+      if (!comment.deleted) return true;
+      else if (!children.length) return false;
+      else {
+        let survivingDescendents = false;
+        for (let i = 0; i < children.length; i++) {
+          const child = children[i];
+          if (!child.deleted) {
+            survivingDescendents = true;
+            break;
+          }
+          const grandchildren = app.comments.getByProposal(proposal)
+            .filter((c) => c.parentComment === child.id);
+          for (let j = 0; j < grandchildren.length; j++) {
+            const grandchild = grandchildren[j];
+            if (!grandchild.deleted) {
+              survivingDescendents = true;
+              break;
+            }
+          }
+          if (survivingDescendents) break;
+        }
+        return survivingDescendents;
+      }
     };
 
-    const renderComments = (comments_) => {
-      return comments_.map((comment, index) => {
-        const childComments = app.comments.getByProposal(proposal)
+    const recursivelyGatherComments = (
+      comments_: OffchainComment<any>[],
+      parent: AnyProposal | OffchainThread | OffchainComment<any>,
+      threadLevel: number
+    ) => {
+      const canContinueThreading = threadLevel <= MAX_THREAD_LEVEL;
+      return comments_.map((comment: OffchainComment<any>, idx) => {
+        if (!comment) return;
+        const children = app.comments.getByProposal(proposal)
           .filter((c) => c.parentComment === comment.id);
-        return ([
-          m(ProposalComment, {
-            comment,
-            getSetGlobalEditingStatus,
-            proposalPageState,
-            parent: proposal,
-            proposal,
-            callback: createdCommentCallback,
-            isLast: index === comments_.length - 1,
-          }),
-          // if comment has children, they are fetched & rendered
-          !!childComments.length
-            && recursivelyGatherChildComments(childComments, comment, 1),
-          nestedReplyForm(comment),
-        ]);
+        if (isLivingCommentTree(comment, children)) {
+          return m(`.threading-level-${threadLevel}`, {
+            style: `margin-left: calc(36px * ${threadLevel})`
+          }, [
+            m(ProposalComment, {
+              comment,
+              getSetGlobalEditingStatus,
+              proposalPageState,
+              parent,
+              proposal,
+              callback: createdCommentCallback,
+              isLast: idx === comments_.length - 1,
+            }),
+            !!children.length
+              && canContinueThreading
+              && recursivelyGatherComments(children, comment, threadLevel + 1),
+            canContinueThreading
+              && nestedReplyForm(comment),
+          ]);
+        }
       });
     };
 
@@ -634,7 +640,7 @@ const ProposalComments: m.Component<{
     }, [
       // show comments
       comments
-      && m('.proposal-comments', renderComments(comments)),
+      && m('.proposal-comments', recursivelyGatherComments(comments, proposal, 0)),
       // create comment
       // errors
       vnode.state.commentError
@@ -1038,7 +1044,15 @@ const ViewProposalPage: m.Component<{
         && m(ProposalVotingResults, { proposal }),
       !(proposal instanceof OffchainThread)
         && m(ProposalVotingActions, { proposal }),
-      vnode.state.replying
+      m(ProposalComments, {
+        proposal,
+        comments,
+        createdCommentCallback,
+        getSetGlobalEditingStatus,
+        proposalPageState: vnode.state,
+        recentlySubmitted: vnode.state.recentlySubmitted
+      }),
+      !vnode.state.editing
       && !vnode.state.parentCommentId
       && m(CreateComment, {
         callback: createdCommentCallback,
@@ -1047,14 +1061,6 @@ const ViewProposalPage: m.Component<{
         proposalPageState: vnode.state,
         parentComment: null,
         rootProposal: proposal
-      }),
-      m(ProposalComments, {
-        proposal,
-        comments,
-        createdCommentCallback,
-        getSetGlobalEditingStatus,
-        proposalPageState: vnode.state,
-        recentlySubmitted: vnode.state.recentlySubmitted
       }),
     ]);
   }

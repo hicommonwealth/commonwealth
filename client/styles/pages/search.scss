@@ -164,6 +164,8 @@
         }
         &:focus-within {
             background: linear-gradient(to bottom, #91ACE1, #DDBFE1) !important;
+            border: none;
+            padding: 0 1px;
         }
         &:hover {
             background: linear-gradient(to bottom, #CDDEFE, #E7D8E9);

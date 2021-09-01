@@ -18,7 +18,7 @@ import {
 } from 'models';
 
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
-import User from 'views/components/widgets/user';
+import User, { AnonymousUser } from 'views/components/widgets/user';
 import QuillEditor from 'views/components/quill_editor';
 import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
@@ -61,12 +61,19 @@ export const ProposalBodyAvatar: m.Component<{ item: OffchainThread | OffchainCo
       : app.chain.accounts.get(item.author);
 
     return m('.ProposalBodyAvatar', [
-      m(User, {
-        user: author,
-        popover: true,
-        avatarOnly: true,
-        avatarSize: 40,
-      }),
+      (item as OffchainComment<any>).deleted
+        ? m(AnonymousUser, {
+          avatarOnly: true,
+          avatarSize: 40,
+          showAsDeleted: true,
+          distinguishingKey: item.author.slice(item.author.length - 3),
+        })
+        : m(User, {
+          user: author,
+          popover: true,
+          avatarOnly: true,
+          avatarSize: 40,
+        }),
     ]);
   }
 };
@@ -84,13 +91,15 @@ export const ProposalBodyAuthor: m.Component<{ item: AnyProposal | OffchainThrea
       : item.author;
 
     return m('.ProposalBodyAuthor', [
-      m(User, {
-        user: author,
-        popover: true,
-        linkify: true,
-        hideAvatar: true,
-        showAddressWithDisplayName: true,
-      }),
+      (item as OffchainComment<any>).deleted
+        ? m('span', '[deleted]')
+        : m(User, {
+          user: author,
+          popover: true,
+          linkify: true,
+          hideAvatar: true,
+          showAddressWithDisplayName: true,
+        }),
       item instanceof OffchainThread && item.collaborators && item.collaborators.length > 0
         && m('span.proposal-collaborators', [
           ' and ',

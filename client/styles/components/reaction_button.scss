@@ -1,22 +1,20 @@
 @import 'client/styles/shared';
 
 .ReactionButton {
-    display: flex;
-    cursor: pointer;
     user-select: none;
+    display: flex;
+    .cui-icon, .reply-count, .reactions-count {
+        color: black;
+        font-weight: 500;
+    }
+    .cui-icon {
+        margin-right: 8px;
+    }
+    .reply-count, .reactions-count {
+        position: relative;
+        top: 2px;
+    }
     // border
-    &.large {
-        color: $text-color-medium;
-        border: 1px solid #ddd;
-        border-radius: 9999px;
-    }
-    &:hover, &.active {
-        color: $primary-bg-color;
-        border-color: $primary-bg-color;
-        span {
-            color: inherit;
-        }
-    }
     &.disabled {
         background: initial !important;
         color: $text-color-light !important;
@@ -26,8 +24,21 @@
         display: block;
         min-height: 43px !important;
         min-width: 45px !important;
+        max-height: 43px !important;
+        max-width: 45px !important;
         text-align: center;
+        color: $text-color-medium;
+        border: 1px solid #ddd;
+        display: block;
         border-radius: 12px;
+        padding: 0;
+        &.active {
+            color: $primary-bg-color;
+            border-color: $primary-bg-color;
+            span {
+                color: inherit;
+            }
+        }
         .cui-icon {
             margin-right: none;
         }
@@ -49,6 +60,8 @@
         .reactions-count {
             top: 0;
             padding: 0;
+            min-width: 26px;
+            text-align: center;
             color: $text-color-medium;
             font-weight: 500;
         }
