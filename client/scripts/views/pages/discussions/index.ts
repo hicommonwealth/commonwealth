@@ -65,7 +65,7 @@ export const CommunityOptionsPopover: m.Component<{ isAdmin: boolean; isMod: boo
             },
           }),
         isAdmin
-          && (app.chain as Token).isToken 
+          && (app.chain as Token)?.isToken
           && m(MenuItem, {
             label: 'Edit topic thresholds',
             onclick: (e) => {
