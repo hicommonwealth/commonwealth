@@ -43,7 +43,14 @@ export async function migrateChainEntity(chain: string): Promise<void> {
   }
 
   // query one node for each supported chain
-  const node: ChainNodeInstance = await models['ChainNode'].findOne({ where: { chain } });
+  const node: ChainNodeInstance = await models['ChainNode'].findOne({
+    where: { chain },
+    include: [
+      { model: models.Chain,
+        required: true
+      },
+    ]
+  });
   if (!node) {
     throw new Error('no nodes found for chain entity migration');
   }

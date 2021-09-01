@@ -19,8 +19,10 @@ import EmptyTopicPlaceholder, { EmptyStagePlaceholder } from 'views/components/e
 import LoadingRow from 'views/components/loading_row';
 import Listing from 'views/pages/listing';
 import NewTopicModal from 'views/modals/new_topic_modal';
+import EditTopicThresholdsModal from 'views/modals/edit_topic_thresholds_modal';
 import EditTopicModal from 'views/modals/edit_topic_modal';
 import CreateInviteModal from 'views/modals/create_invite_modal';
+import Token from 'controllers/chain/ethereum/token/adapter';
 
 import { INITIAL_PAGE_SIZE } from 'controllers/server/threads';
 import PinnedListing from './pinned_listing';
@@ -61,6 +63,15 @@ export const CommunityOptionsPopover: m.Component<{ isAdmin: boolean; isMod: boo
               e.preventDefault();
               app.modals.create({ modal: NewTopicModal });
             },
+          }),
+        isAdmin
+          && (app.chain as Token).isToken 
+          && m(MenuItem, {
+            label: 'Edit topic thresholds',
+            onclick: (e) => {
+              e.preventDefault();
+              app.modals.create({ modal: EditTopicThresholdsModal });
+            }
           }),
         (app.community?.meta.invitesEnabled || isAdmin)
           && m(MenuItem, {
@@ -170,17 +181,18 @@ const DiscussionStagesBar: m.Component<{ topic: string; stage: string }, {}> = {
                 featuredInNewPost,
                 defaultOffchainTemplate
               }, idx) => {
+                const active = m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name.toString().trim())}`
+                  || (topic && topic === name);
                 return m(MenuItem, {
                   key: name,
-                  active: m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name.toString().trim())}`
-                    || (topic && topic === name),
-                  iconLeft: m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name.toString().trim())}`
-                    || (topic && topic === name) ? Icons.CHECK : null,
+                  active,
+                  // iconLeft: active ? Icons.CHECK : null,
                   onclick: (e) => {
                     e.preventDefault();
                     navigateToSubpage(`/discussions/${name}`);
                   },
                   label: m('.topic-menu-item', [
+                    active && m(Icon, { name: Icons.CHECK }),
                     m('.topic-menu-item-name', name),
                     app.user?.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
                       && m(Button, {
@@ -300,6 +312,7 @@ const DiscussionsPage: m.Component<
   },
   view: (vnode) => {
     const { topic } = vnode.attrs;
+
     const stage = m.route.param('stage');
     const activeEntity = app.community ? app.community : app.chain;
     if (!activeEntity)
@@ -527,7 +540,6 @@ const DiscussionsPage: m.Component<
       chain: app.activeChainId(),
       community: app.activeCommunityId(),
     });
-    console.log('still fetching', stillFetching);
     return m(
       Sublayout,
       {

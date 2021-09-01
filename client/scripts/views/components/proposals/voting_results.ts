@@ -12,6 +12,7 @@ import { CompoundProposalVote, CompoundVote } from 'controllers/chain/ethereum/c
 import { SubstrateCollectiveVote } from 'controllers/chain/substrate/collective_proposal';
 import { SubstrateDemocracyVote } from 'controllers/chain/substrate/democracy_referendum';
 import AaveProposal, { AaveProposalVote } from 'controllers/chain/ethereum/aave/proposal';
+import { NearSputnikVoteString } from 'controllers/chain/near/sputnik/types';
 
 const COLLAPSE_VOTERS_AFTER = 6; // if there are >6 voters, collapse remaining under "Show more"
 
@@ -309,6 +310,42 @@ const VotingResults: m.Component<{ proposal: AnyProposal }> = {
             m(VoteListing, {
               proposal,
               votes
+            })
+          ]),
+        ]),
+      ]);
+    } else if (proposal.votingType === VotingType.YesNoReject) {
+      return m('.VotingResults', [
+        m('.results-column', [
+          m('.results-header', `Voted approve (${
+            votes.filter((v) => v.choice === NearSputnikVoteString.Approve).length
+          })`),
+          m('.results-cell', [
+            m(VoteListing, {
+              proposal,
+              votes: votes.filter((v) => v.choice === NearSputnikVoteString.Approve)
+            })
+          ]),
+        ]),
+        m('.results-column', [
+          m('.results-header', `Voted reject (${
+            votes.filter((v) => v.choice === NearSputnikVoteString.Reject).length
+          })`),
+          m('.results-cell', [
+            m(VoteListing, {
+              proposal,
+              votes: votes.filter((v) => v.choice === NearSputnikVoteString.Reject)
+            })
+          ]),
+        ]),
+        m('.results-column', [
+          m('.results-header', `Voted remove (${
+            votes.filter((v) => v.choice === NearSputnikVoteString.Remove).length
+          })`),
+          m('.results-cell', [
+            m(VoteListing, {
+              proposal,
+              votes: votes.filter((v) => v.choice === NearSputnikVoteString.Remove)
             })
           ]),
         ]),

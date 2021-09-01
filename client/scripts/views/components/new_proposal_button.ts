@@ -112,6 +112,13 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
         iconLeft: mobile ? Icons.PLUS : undefined,
       }),
     ],
+    app.chain.network === ChainNetwork.Sputnik && m(MenuItem, {
+      onclick: (e) => navigateToSubpage('/new/proposal/:type', {
+        type: ProposalType.SputnikProposal
+      }),
+      label: 'New Sputnik proposal',
+      iconLeft: mobile ? Icons.PLUS : undefined,
+    }),
     showSnapshotOptions && m(MenuItem, {
       onclick: (e) => {
         e.preventDefault();
