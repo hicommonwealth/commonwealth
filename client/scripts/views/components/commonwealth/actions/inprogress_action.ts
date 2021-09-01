@@ -2,14 +2,14 @@ import 'components/commonwealth/action_card.scss';
 
 import m from 'mithril';
 import BN from 'bn.js';
-import { utils } from 'ethers';
+import { utils, BigNumber } from 'ethers';
 
 import { CMNProject } from 'models';
 import app from 'state';
 import TokenInputField from '../token_input';
 
 const BackAciton: m.Component<
-  { project: CMNProject, project_protocol: any },
+  { project: CMNProject, project_protocol: any, creator: string },
   { backing: boolean, error: string }
 > = {
   oncreate: (vnode) => {
@@ -25,26 +25,23 @@ const BackAciton: m.Component<
         buttonLabel: `back${vnode.state.backing ? 'ing' : ''}`,
         actionDisabled: vnode.state.backing,
         callback: async (tokenSymbol: string, balance: number) => {
-          console.log('=====>balance', balance);
           vnode.state.backing = true;
 
           const index = project.acceptedTokens.findIndex((t) => t.symbol === tokenSymbol);
           const token = project.acceptedTokens[index];
-          console.log('=====>2', balance * (10 ** token.decimals));
-          const amount = new BN(balance).mul(new BN(1000000000000000000));
-          console.log('=====>3', amount);
-          const author = app.user.activeAccount.address;
+          const amount = BigNumber.from(balance).mul(BigNumber.from(10).pow(token.decimals));
 
-          // const res = await project_protocol.backOrCurate(
-          //   amount,
-          //   project,
-          //   true,
-          //   author,
-          //   token.address
-          // );
+          const res = await project_protocol.backOrCurate(
+            amount,
+            project,
+            true,
+            vnode.attrs.creator,
+            token.address
+          );
 
-          // vnode.state.error = res.error;
+          vnode.state.error = res.error;
           vnode.state.backing = false;
+          m.redraw();
         }
       }),
       vnode.state.error && vnode.state.error !== '' && m(
@@ -57,7 +54,7 @@ const BackAciton: m.Component<
 };
 
 const CurateAction: m.Component<
-  { project: CMNProject, project_protocol: any },
+  { project: CMNProject, project_protocol: any, creator: string },
   { curating: boolean, error: string }
 > = {
   oncreate: (vnode) => {
@@ -78,18 +75,19 @@ const CurateAction: m.Component<
 
           const index = project.acceptedTokens.findIndex((t) => t.symbol === tokenSymbol);
           const token = project.acceptedTokens[index];
-          const amount = new BN(balance).mul(new BN(10).pow(new BN(token.decimals)));
-          const author = app.user.activeAccount.address;
+          const amount = BigNumber.from(balance).mul(BigNumber.from(10).pow(token.decimals));
 
           const res = await project_protocol.backOrCurate(
             amount,
             project,
             false,
-            author,
+            vnode.attrs.creator,
             token.address
           );
+
           vnode.state.error = res.error;
           vnode.state.curating = false;
+          m.redraw();
         }
       }),
       vnode.state.error && vnode.state.error !== '' && m(
@@ -109,8 +107,8 @@ const InProgressActionCard: m.Component<
     const { project_protocol, project } = vnode.attrs;
 
     return m('div', [
-      m(BackAciton, { project, project_protocol }),
-      m(CurateAction, { project, project_protocol }),
+      m(BackAciton, { project, project_protocol, creator: app.user.activeAccount.address }),
+      m(CurateAction, { project, project_protocol, creator: app.user.activeAccount.address }),
     ]);
   }
 };

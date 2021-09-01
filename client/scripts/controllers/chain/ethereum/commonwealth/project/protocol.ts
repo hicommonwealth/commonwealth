@@ -66,12 +66,14 @@ export default class ProjectProtocol {
       }
     }
 
-    const acceptedTokenAddresses = await projContract.getAcceptedTokens() || [];
+    let acceptedTokenAddresses = await projContract.getAcceptedTokens() || [];
+    acceptedTokenAddresses = acceptedTokenAddresses.map((addr) => addr.toLowerCase());
+
     const bTokens = {};
     const cTokens = {};
     for (let i = 0; i < acceptedTokenAddresses.length; i++) {
-      bTokens[acceptedTokenAddresses[i]] = await projContract.getBToken(acceptedTokenAddresses[i]);
-      cTokens[acceptedTokenAddresses[i]] = await projContract.getCToken(acceptedTokenAddresses[i]);
+      bTokens[acceptedTokenAddresses[i]] = (await projContract.getBToken(acceptedTokenAddresses[i])).toLowerCase();
+      cTokens[acceptedTokenAddresses[i]] = (await projContract.getCToken(acceptedTokenAddresses[i])).toLowerCase();
     }
     const acceptedTokens = this.getAcceptedTokenDetails(acceptedTokenAddresses);
 
@@ -119,13 +121,10 @@ export default class ProjectProtocol {
       );
       this._api.setProjectAPI(projAddress, projectApi);
     }
-    console.log('====>signer', signer);
     if (signer) {
       const contract = await attachSigner(this._chain.app.wallets, signer, projectApi);
-      console.log('====>contract', contract);
       return contract;
     }
-    
     return projectApi;
   }
 
@@ -146,11 +145,13 @@ export default class ProjectProtocol {
     }
 
     // for (let i = 0; i < acceptedTokens.length; i++) {
-    //   const token = acceptedTokens[i];
+    //   const token = acceptedTokens[i].address;
     //   if (bTokens[token]) {
+    //     console.log('===>btoken', bTokens[token]);
     //     backers[token] = await this._api.getTokenHolders(bTokens[token]);
     //   }
     //   if (cTokens[token]) {
+    //     console.log('===>btoken', bTokens[token]);
     //     curators[token] = await this._api.getTokenHolders(cTokens[token]);
     //   }
     // }
@@ -185,43 +186,53 @@ export default class ProjectProtocol {
     from: string,
     tokenAddress: string,
   ) {
-    const projContractAPI = await this.getProjectContractApi(project.address, from);
+    const projContract = await this.getProjectContractApi(project.address, from);
+
+    const approveTxStatus = await this.approveToken(project.address, tokenAddress, from, amount, false);
+    if (!approveTxStatus) {
+      return { status: 'failed', error: 'Failed to approve token' };
+    }
 
     let res = { status: 'success', error: '' };
     if (isBacking) {
-      res = await this._api.back(projContractAPI, amount, tokenAddress);
+      res = await this._api.back(projContract, amount, tokenAddress);
     } else {
-      res = await this._api.curate(projContractAPI, amount, tokenAddress);
+      res = await this._api.curate(projContract, amount, tokenAddress);
     }
     return res;
   }
 
-  public async approveCWToken(project: CMNProject, isBToken: boolean, from: string, amount: number) {
-    const tokenAdddress = isBToken ? project.bTokens : project.cTokens;
-    const tokenApi = CWToken__factory.connect(
-      tokenAdddress,
-      this._chain.api.currentProvider as any
+  public async approveToken(
+    projectAddrss: string,
+    tokenAddress: string,
+    from: string,
+    amount: number,
+    isCWToken = false
+  ) {
+    const tokenApi = isCWToken ? CWToken__factory.connect(
+      tokenAddress,
+      this._api.Provider
+    ) : ERC20__factory.connect(
+      tokenAddress,
+      this._api.Provider
     );
-    const cwTokenContract = await attachSigner(this._chain.app.wallets, from, tokenApi);
 
-    const approvalTx = await cwTokenContract.approve(
-      project.address,
+    let transactionSuccess = false;
+    const tokenContract = await attachSigner(this._chain.app.wallets, from, tokenApi);
+    const approvalTx = await tokenContract.approve(
+      projectAddrss,
       amount,
       { gasLimit: 3000000 }
     );
     const approvalTxReceipt = await approvalTx.wait();
-    if (approvalTxReceipt.status !== 1) {
-      throw new Error('failed to approve amount');
-    }
-    return approvalTxReceipt;
+    transactionSuccess = approvalTxReceipt.status === 1;
+    return transactionSuccess;
   }
 
   public getAcceptedTokenDetails(tokenAddresses: string[]) {
     const tokensData = [];
     for (let i = 0; i < tokenAddresses.length; i++) {
-      const index = kovanTokenData.findIndex(
-        (t) => t.address.toLowerCase() === tokenAddresses[i].toLowerCase()
-      );
+      const index = kovanTokenData.findIndex((t) => t.address === tokenAddresses[i]);
       if (index > -1) {
         tokensData.push(kovanTokenData[index]);
       }
@@ -245,15 +256,20 @@ export default class ProjectProtocol {
     isBToken: boolean,
     project: CMNProject,
     from: string,
+    cwTokenAddress: string,
     tokenAddress: string,
   ) {
-    await this.approveCWToken(project, isBToken, from, amount);
+    const approveTxStatus = await this.approveToken(project.address, cwTokenAddress, from, amount, true);
+    if (!approveTxStatus) {
+      return { status: 'failed', error: 'Failed to approve token' };
+    }
+
     const projContractAPI = await this.getProjectContractApi(project.address, from);
     let res = { status: 'success', error: '' };
     if (isBToken) {
-      res = await this._api.redeemBToken(projContractAPI, amount, tokenAddress);
+      res = await this._api.redeemTokens(projContractAPI, amount, tokenAddress, true);
     } else {
-      res = await this._api.redeemCToken(projContractAPI, amount, tokenAddress);
+      res = await this._api.redeemTokens(projContractAPI, amount, tokenAddress, false);
     }
     return res;
   }

@@ -1,17 +1,16 @@
 import 'components/commonwealth/action_card.scss';
 
 import m from 'mithril';
-import BN from 'bn.js';
+import { BigNumber } from 'ethers';
 
 import app from 'state';
 import { CMNProject } from 'models';
-import { CWUser } from '../members_card';
 import TokenInputField from '../token_input';
 
-const RedeemBTokenAction: m.Component<{
+const FailedActionCard: m.Component<{
   project: CMNProject,
   project_protocol: any,
-  disabled: boolean
+  backers: any
 }, {
   submitting: boolean,
   error: string,
@@ -21,34 +20,42 @@ const RedeemBTokenAction: m.Component<{
     vnode.state.submitting = false;
   },
   view: (vnode) => {
-    const { project, project_protocol } = vnode.attrs;
+    const { project, project_protocol, backers } = vnode.attrs;
+    const { bTokens, acceptedTokens } = project;
 
-    // TODO: replace with bTokens:
-    const tokens = ['USDT', 'USDC'];
+    let redeemAble = false;
+    if (app.user.activeAccount && app.isLoggedIn()) {
+      redeemAble = true;
+      // const activeAddress = app.user.activeAccount.address.toLowerCase();
+      // if (backers.map((item: any) => item.address.toLowerCase()).includes(activeAddress)) {
+      //   redeemAble = true;
+      // }
+    }
 
-    return [
+    return m('.project-funding-action', [
       m(TokenInputField, {
-        tokens,
-        buttonLabel: `Redeem${vnode.state.submitting ? 'ing' : ''} CToken`,
+        tokens: acceptedTokens.map((token) => token.symbol),
+        buttonLabel: `Redeem${vnode.state.submitting ? 'ing' : ''} BToken`,
         actionDisabled: vnode.state.submitting,
         callback: async (tokenSymbol: string, balance: number) => {
           vnode.state.submitting = true;
 
           const index = project.acceptedTokens.findIndex((t) => t.symbol === tokenSymbol);
-          const token = project.acceptedTokens[index];
-          const amount = new BN(balance).mul(new BN(10).pow(new BN(token.decimals)));
-          const author = app.user.activeAccount.address;
+          const acceptedToken = acceptedTokens[index];
+          const amount = BigNumber.from(balance).mul(BigNumber.from(10).pow(acceptedToken.decimals));
 
           const res = await project_protocol.redeemTokens(
             amount,
             true,
             project,
-            author,
-            token.address
+            app.user.activeAccount.address,
+            bTokens[acceptedToken.address],
+            acceptedToken.address
           );
 
-          vnode.state.error = res.console.error();
+          vnode.state.error = res.error;
           vnode.state.submitting = false;
+          m.redraw();
         }
       }),
       vnode.state.error && vnode.state.error !== '' && m(
@@ -56,29 +63,6 @@ const RedeemBTokenAction: m.Component<{
         { 'color': 'red', 'width': '100%', 'text-align': 'center' },
         vnode.state.error
       ),
-    ];
-  }
-};
-
-const FailedActionCard: m.Component<{
-  project: CMNProject,
-  project_protocol: any,
-  backers: CWUser[]
-}, {
-}> = {
-  view: (vnode) => {
-    const { project, project_protocol, backers } = vnode.attrs;
-
-    let redeemAble = false;
-    if (app.user.activeAccount && app.isLoggedIn()) {
-      const activeAddress = app.user.activeAccount.address.toLowerCase();
-      if (backers.map((item: any) => item.address.toLowerCase()).includes(activeAddress)) {
-        redeemAble = true;
-      }
-    }
-
-    return m('.project-funding-action', [
-      m(RedeemBTokenAction, { project, project_protocol, disabled: !redeemAble }),
     ]);
   }
 };
