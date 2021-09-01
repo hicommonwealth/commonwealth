@@ -12,6 +12,7 @@ import { modelFromServer as modelReactionFromServer } from 'controllers/server/r
 import { updateLastVisited } from '../app/login';
 
 // tslint:disable: object-literal-key-quotes
+/* eslint-disable no-shadow */
 
 export enum CommentParent {
   Proposal = 'proposal',
@@ -76,9 +77,9 @@ export const modelFromServer = (comment) => {
     proposal,
     id: comment.id,
     createdAt: moment(comment.created_at),
-    childComments: comment.child_comments,
+    childComments: [],
     rootProposal: comment.root_id,
-    parentComment: comment.parent_id,
+    parentComment: Number(comment.parent_id) || null,
     community: comment.community,
     authorChain: comment?.Address?.chain || comment.authorChain,
     lastEdited,
@@ -153,7 +154,8 @@ class CommentsController {
         'jwt': app.user.jwt,
       });
       const { result } = res;
-      this._store.add(modelFromServer(result));
+      const newComment = modelFromServer(result);
+      this._store.add(newComment);
       const activeEntity = app.activeCommunityId() ? app.community : app.chain;
       updateLastVisited(app.activeCommunityId()
         ? (activeEntity.meta as CommunityInfo)
@@ -163,6 +165,7 @@ class CommentsController {
         const parent = this._store.getById(+result.parent_id);
         parent.childComments.push(result.id);
       }
+      return newComment;
     } catch (err) {
       console.log('Failed to create comment');
       throw new Error((err.responseJSON && err.responseJSON.error)

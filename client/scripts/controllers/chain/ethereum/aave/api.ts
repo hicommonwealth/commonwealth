@@ -1,6 +1,6 @@
 import BN from 'bn.js';
 import {
-  AaveGovernanceV2,
+  IAaveGovernanceV2,
   Executor__factory,
   Executor,
   GovernanceStrategy,
@@ -19,8 +19,8 @@ export interface AaveExecutor {
   delay: number;
 }
 
-export default class AaveApi extends ContractApi<AaveGovernanceV2> {
-  private _Governance: AaveGovernanceV2;
+export default class AaveApi extends ContractApi<IAaveGovernanceV2> {
+  private _Governance: IAaveGovernanceV2;
   public get Governance() { return this._Governance; }
 
   private _Strategy: GovernanceStrategy;

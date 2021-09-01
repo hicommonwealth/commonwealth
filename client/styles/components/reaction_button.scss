@@ -3,11 +3,13 @@
 .ReactionButton {
     display: flex;
     cursor: pointer;
-    color: $text-color-medium;
     user-select: none;
     // border
-    border: 1px solid #ddd;
-    border-radius: 9999px;
+    &.large {
+        color: $text-color-medium;
+        border: 1px solid #ddd;
+        border-radius: 9999px;
+    }
     &:hover, &.active {
         color: $primary-bg-color;
         border-color: $primary-bg-color;
@@ -20,28 +22,18 @@
         color: $text-color-light !important;
         border-color: $border-color-lightest !important;
     }
-    .reactions-icon {
-        position: relative;
-        top: 1px;
-        padding: 5px 0 0;
-        padding-left: 8px;
-        margin-right: -3px;
-    }
-    .reactions-count {
-        position: relative;
-        top: 1px;
-        padding: 5px 4px 0 0;
-        min-width: 26px;
-        font-weight: 500;
-        text-align: center;
-    }
     &.large {
         display: block;
         min-height: 43px !important;
         min-width: 45px !important;
         text-align: center;
         border-radius: 12px;
+        .cui-icon {
+            margin-right: none;
+        }
         .reactions-icon {
+            position: relative;
+            top: 1px;
             font-size: 85%;
             padding: 0;
             margin: 0;
@@ -57,6 +49,8 @@
         .reactions-count {
             top: 0;
             padding: 0;
+            color: $text-color-medium;
+            font-weight: 500;
         }
     }
 }

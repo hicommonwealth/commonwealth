@@ -2,7 +2,7 @@ import 'components/reaction_button.scss';
 
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
-import { Popover } from 'construct-ui';
+import { Icon, Icons, Popover, Size } from 'construct-ui';
 
 import app from 'state';
 import { Proposal, OffchainComment, OffchainThread, AnyProposal, AddressInfo } from 'models';
