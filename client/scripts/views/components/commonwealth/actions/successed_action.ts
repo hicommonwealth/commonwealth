@@ -2,7 +2,7 @@ import 'components/commonwealth/action_card.scss';
 
 import { Button } from 'construct-ui';
 import m from 'mithril';
-import BN from 'bn.js';
+import { BigNumber } from 'ethers';
 
 import app from 'state';
 import { CMNProject } from 'models';
@@ -24,20 +24,19 @@ const RedeemCTokenAction: m.Component<{
   view: (vnode) => {
     const { project, project_protocol } = vnode.attrs;
 
-    // TODO: replace with cTokens:
-    const tokens = ['USDT', 'USDC'];
+    const { acceptedTokens, cTokens } = project;
 
     return [
       m(TokenInputField, {
-        tokens,
+        tokens: acceptedTokens.map((token) => token.symbol),
         buttonLabel: `Redeem${vnode.state.submitting ? 'ing' : ''} CToken`,
         actionDisabled: vnode.state.submitting,
         callback: async (tokenSymbol: string, balance: number) => {
           vnode.state.submitting = true;
 
           const index = project.acceptedTokens.findIndex((t) => t.symbol === tokenSymbol);
-          const token = project.acceptedTokens[index];
-          const amount = new BN(balance).mul(new BN(10).pow(new BN(token.decimals)));
+          const acceptedToken = acceptedTokens[index];
+          const amount = BigNumber.from(balance).mul(BigNumber.from(10).pow(acceptedToken.decimals));
           const author = app.user.activeAccount.address;
 
           const res = await project_protocol.redeemTokens(
@@ -45,7 +44,8 @@ const RedeemCTokenAction: m.Component<{
             false,
             project,
             author,
-            token.address
+            cTokens[acceptedToken.address],
+            acceptedToken.address
           );
 
           vnode.state.error = res.error;
@@ -69,7 +69,9 @@ const WithdrawAction: m.Component<{
   submitting: boolean,
   error: string,
 }> = {
+
   view: (vnode) => {
+    const { project, project_protocol } = vnode.attrs;
     return m('div', [
       m(Button, {
         class: 'contribute-button',
@@ -82,14 +84,8 @@ const WithdrawAction: m.Component<{
           const author = app.user.activeAccount.address;
           vnode.state.submitting = true;
 
-          // widthdraw logic
-          try {
-            const res = await vnode.attrs.project_protocol.withdraw(vnode.attrs.project, author);
-            console.log('====>withdraw result', res);
-          } catch (error) {
-            vnode.state.error = error || 'Faild to do withdraw Action';
-          }
-
+          const res = await project_protocol.withdraw(project, author);
+          vnode.state.error = res.error;
           vnode.state.submitting = false;
         }
       }),

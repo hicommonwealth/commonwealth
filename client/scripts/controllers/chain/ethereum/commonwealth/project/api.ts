@@ -155,10 +155,13 @@ export default class CMNProjectAPI extends ContractApi<CMNProjectProtocolContrac
     };
   }
 
-  public async redeemBToken(contract: CMNProjectContract, amount: number, tokenAddress: string) {
+  public async redeemTokens(contract: CMNProjectContract, amount: number, tokenAddress: string, isBToken: boolean) {
     let transactionSuccessed: boolean;
     try {
-      const tx = await contract.redeemBToken(tokenAddress, amount, { gasLimit: this.gasLimit });
+      const tx = isBToken
+        ? await contract.redeemBToken(tokenAddress, amount, { gasLimit: this.gasLimit })
+        : await contract.redeemCToken(tokenAddress, amount, { gasLimit: this.gasLimit });
+
       const txReceipt = await tx.wait();
       transactionSuccessed = txReceipt.status === 1;
     } catch (err) {
@@ -167,21 +170,6 @@ export default class CMNProjectAPI extends ContractApi<CMNProjectProtocolContrac
     return {
       status: transactionSuccessed ? 'success' : 'failed',
       error: transactionSuccessed ? '' : 'Failed to process redeemBToken transaction'
-    };
-  }
-
-  public async redeemCToken(contract: CMNProjectContract, amount: number, tokenAddress: string) {
-    let transactionSuccessed: boolean;
-    try {
-      const tx = await contract.redeemCToken(tokenAddress, amount, { gasLimit: this.gasLimit });
-      const txReceipt = await tx.wait();
-      transactionSuccessed = txReceipt.status === 1;
-    } catch (err) {
-      transactionSuccessed = false;
-    }
-    return {
-      status: transactionSuccessed ? 'success' : 'failed',
-      error: transactionSuccessed ? '' : 'Failed to process redeemCToken transaction'
     };
   }
 

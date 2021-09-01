@@ -100,8 +100,8 @@ const ViewProjectPage: m.Component<{
     const project = projects.filter((item) => item.projectHash === vnode.attrs.projectHash)[0];
     const members = await project_protocol.syncMembers(project);
 
-    vnode.state.backers = members.backers || [];
-    vnode.state.curators = members.curators || [];
+    vnode.state.backers = members ? members.backers : [];
+    vnode.state.curators = members ? members.curators : [];
     vnode.state.project = project;
     vnode.state.initialized = true;
     m.redraw();

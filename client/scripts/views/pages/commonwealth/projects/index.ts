@@ -12,7 +12,6 @@ import { CMNProject } from 'models';
 export const connectionReady = () => {
   if (!app.chain || !app.cmnProtocol || !app.cmnProtocol.initialized) return false;
   if (app.activeChainId() !== app.cmnProtocol.chainId) return false;
-
   return true;
 };
 
