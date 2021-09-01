@@ -611,7 +611,7 @@ const SputnikForm: m.Component<SputnikFormAttrs, SputnikFormState> = {
         m(InputPropertyRow, {
           title: 'Name',
           defaultValue: vnode.state.name,
-          onChangeHandler: (v) => { vnode.state.name = v; },
+          onChangeHandler: (v) => { vnode.state.name = v.toLowerCase(); },
           placeholder: 'genesis',
         }),
         m(InputPropertyRow, {
@@ -632,7 +632,7 @@ const SputnikForm: m.Component<SputnikFormAttrs, SputnikFormState> = {
           disabled: !(app.user?.activeAccount instanceof NearAccount) || app.chain.base !== ChainBase.NEAR,
         }),
         m(InputPropertyRow, {
-          title: 'Initial Bond',
+          title: 'Initial Bond (Must be >= Ⓝ 5)',
           defaultValue: vnode.state.initialValue,
           disabled: !vnode.state.createNew,
           onChangeHandler: (v) => { vnode.state.initialValue = v; },
