@@ -41,7 +41,10 @@ export default class CompoundChain extends EthereumChain {
 
   public async getVotingPower(address: string) {
     const num = await this.compoundApi.Token.numCheckpoints(address);
+    console.log("num", num)
+    console.log("nextthing", await this.compoundApi.Token.checkpoints(address, num-1)) 
     const { fromBlock, votes } = await this.compoundApi.Token.checkpoints(address, num-1);
+    console.log("votes", votes)
     return votes;
   }
 
