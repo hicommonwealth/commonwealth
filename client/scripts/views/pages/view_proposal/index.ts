@@ -508,6 +508,7 @@ const ProposalComment: m.Component<{
           !vnode.state.editing
             && !comment.deleted
             && m('.comment-response-row', [
+              m(ProposalBodyReaction, { item: comment }),
               m(InlineReplyButton, {
                 commentReplyCount,
                 onclick: (e) => {
@@ -520,7 +521,6 @@ const ProposalComment: m.Component<{
                   }
                 }
               }),
-              m(ProposalBodyReaction, { item: comment }),
             ]),
         ]),
       ]),

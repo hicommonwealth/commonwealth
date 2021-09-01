@@ -110,7 +110,7 @@
 
     // 3. ql-snow form input styles, ql-bubble styles
     .ql-container.ql-snow {
-        border: 1px solid #B37DBA;
+        // border: 1px solid #B37DBA;
         border-radius: 0 0 3px 3px;
         // construct-ui input styles
         color: $text-color-darker;
@@ -128,7 +128,7 @@
 
     // 4. toolbar
     .ql-toolbar.ql-snow {
-        border: 1px solid #B37DBA;
+        // border: 1px solid #B37DBA;
         border-radius: 4px 4px 0 0;
         box-sizing: border-box;
         padding: 5px 8px;
@@ -137,10 +137,10 @@
         min-height: 39px;
     }
     .ql-toolbar.ql-snow .ql-picker.ql-expanded .ql-picker-label {
-        border-color: #B37DBA;
+        // border-color: #B37DBA;
     }
     .ql-toolbar.ql-snow .ql-picker.ql-expanded .ql-picker-options {
-        border-color: #B37DBA;
+        // border-color: #B37DBA;
     }
     // link popup
     .ql-tooltip {
