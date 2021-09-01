@@ -100,7 +100,7 @@ const ReactionButton: m.Component<ReactionButtonAttrs, ReactionButtonState> = {
     }
     const disabled = vnode.state.loading
       || (
-        (!isCommunity && (app.chain as Token).isToken)
+        (!isCommunity && (app.chain as Token)?.isToken)
         && !isAdmin
         && (tokenBalance == null || (tokenPostingThreshold && tokenPostingThreshold.gt(tokenBalance)))
       );
