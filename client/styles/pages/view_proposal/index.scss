@@ -59,7 +59,9 @@ $discussion-title-font-size: 1.45rem;
             display: flex;
             max-width: 300px;
             align-items: center;
-            .InlineReplyButton {
+            .InlineReplyButton,
+            .ProposalBodyReaction {
+                border: 1px solid black;
                 margin-right: 7%;
                 padding: 6px;
                 cursor: pointer;
@@ -69,17 +71,17 @@ $discussion-title-font-size: 1.45rem;
                 display: flex;
                 justify-content: center;
                 align-items: center;
-            }
-            .InlineReplyButton,
-            .ProposalBodyReaction {
                 margin-right: 10%;
                 padding: 6px;
                 cursor: pointer;
                 &:hover {
-                    background: #F7F4FF;
-                    border-radius: 8px;
                     .cui-icon, .reply-count, .reactions-count {
                         color: #4723AD;
+                    }
+                }
+                .active {
+                    .cui-icon, .reply-count, .reactions-count {
+                        color: #4723AD !important;
                     }
                 }
                 .cui-icon, .reply-count, .reactions-count {

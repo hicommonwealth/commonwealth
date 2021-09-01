@@ -393,7 +393,6 @@ const ProposalHeader: m.Component<{
                       proposalPageState.replying = false;
                     }
                     proposalPageState.parentCommentId = null;
-                    console.log(proposalPageState);
                   }
                 })
               ])
@@ -1045,16 +1044,6 @@ const ViewProposalPage: m.Component<{
         && m(ProposalVotingResults, { proposal }),
       !(proposal instanceof OffchainThread)
         && m(ProposalVotingActions, { proposal }),
-      vnode.state.replying
-      && !vnode.state.parentCommentId
-      && m(CreateComment, {
-        callback: createdCommentCallback,
-        cancellable: true,
-        getSetGlobalEditingStatus,
-        proposalPageState: vnode.state,
-        parentComment: null,
-        rootProposal: proposal
-      }),
       m(ProposalComments, {
         proposal,
         comments,

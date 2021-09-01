@@ -1,17 +1,8 @@
 @import 'client/styles/shared';
 
 .ReactionButton {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
     user-select: none;
-    width: 70px;
-    height: 30px;
-    margin-right: 7%;
-    padding: 6px;
-    border-radius: 20px;
-    border: none;
+    display: flex;
     .cui-icon, .reply-count, .reactions-count {
         color: black;
         font-weight: 500;
@@ -22,9 +13,6 @@
     .reply-count, .reactions-count {
         position: relative;
         top: 2px;
-    }
-    &:hover, &.active {
-        background: #FFF4F6;
     }
     // border
     &.disabled {
