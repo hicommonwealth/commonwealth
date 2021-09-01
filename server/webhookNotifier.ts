@@ -254,6 +254,21 @@ const send = async (models, content: WebhookContent) => {
 
         let getUpdatesUrl = `https://api.telegram.org/${process.env.TELEGRAM_BOT_TOKEN}`;
         url = getUpdatesUrl + '/sendMessage';
+      } else if (url.indexOf('matrix') !== -1) {
+        // TODO: matrix format and URL pattern matcher unimplemented
+        // return {
+        //   'text': `${getFiltered(content, address).join('\n')}`,
+        //   'format': 'plain',
+        //   'displayName': 'Commonwealth',
+        //   'avatarUrl': 'http://commonwealthLogoGoesHere'
+        // };
+      } else if (url.indexOf('telegram') !== -1) {
+        let getChatUsername = url.split('/@');
+        getChatUsername = '@' + getChatUsername[1];
+
+        const botToken = process.env.TELEGRAM_BOT_TOKEN;
+        let getUpdatesUrl = `https://api.telegram.org/${process.env.TELEGRAM_BOT_TOKEN}`;
+        url = getUpdatesUrl + '/sendMessage';
 
         webhookData = isChainEvent ? {
           chat_id: getChatUsername,
