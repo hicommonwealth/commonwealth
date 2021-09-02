@@ -43,7 +43,6 @@ const getProfile = async (models: DB, req: Request, res: Response, next: NextFun
   const publicChains = await models.Chain.findAll();
   const visibleChainIds = publicChains.map((c) => c.id);
 
-
   const addressModel = await models.Address.findOne({
     where: {
       address,

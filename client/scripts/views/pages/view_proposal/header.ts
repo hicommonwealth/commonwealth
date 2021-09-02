@@ -34,6 +34,7 @@ import User from 'views/components/widgets/user';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';
 import { activeQuillEditorHasText, GlobalStatus } from './body';
+import { IProposalPageState } from '.';
 
 export const ProposalHeaderExternalLink: m.Component<{ proposal: AnyProposal | OffchainThread }> = {
   view: (vnode) => {
@@ -295,10 +296,13 @@ export const ProposalHeaderViewCount: m.Component<{ viewCount: number }> = {
 };
 
 export const ProposalTitleEditMenuItem: m.Component<{
-  item: AnyProposal, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState
+  item: AnyProposal,
+  proposalPageState: IProposalPageState,
+  getSetGlobalEditingStatus: CallableFunction,
+  parentState
 }> = {
   view: (vnode) => {
-    const { item, getSetGlobalEditingStatus, getSetGlobalReplyStatus, parentState } = vnode.attrs;
+    const { item, getSetGlobalEditingStatus, proposalPageState, parentState } = vnode.attrs;
     if (!item) return;
 
     return m(MenuItem, {
@@ -306,12 +310,13 @@ export const ProposalTitleEditMenuItem: m.Component<{
       class: 'edit-proposal-title',
       onclick: async (e) => {
         e.preventDefault();
-        if (getSetGlobalReplyStatus(GlobalStatus.Get)) {
+        if (proposalPageState.replying) {
           if (activeQuillEditorHasText()) {
             const confirmed = await confirmationModalWithText('Unsubmitted replies will be lost. Continue?')();
             if (!confirmed) return;
           }
-          getSetGlobalReplyStatus(GlobalStatus.Set, false, true);
+          proposalPageState.replying = false;
+          proposalPageState.parentCommentId = null;
         }
         parentState.editing = true;
         getSetGlobalEditingStatus(GlobalStatus.Set, true);

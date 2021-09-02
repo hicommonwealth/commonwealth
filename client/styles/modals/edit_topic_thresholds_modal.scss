@@ -1,0 +1,11 @@
+@import 'client/styles/shared';
+
+.EditTopicThresholdsModal {
+  .topic-name {
+    padding-top: 20px;
+    width: 100%;
+  }
+  input {
+    margin-right: 10px;
+  }
+}

@@ -448,14 +448,20 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
                 rounded: true,
                 onclick: async (e) => {
                   // redirect to NEAR page for login
-                  const WalletAccount = (await import('nearlib')).WalletAccount;
-                  const wallet = new WalletAccount((app.chain as Near).chain.api, null);
+                  const WalletAccount = (await import('near-api-js')).WalletAccount;
+                  const wallet = new WalletAccount((app.chain as Near).chain.api, 'commonwealth_near');
                   if (wallet.isSignedIn()) {
                     // get rid of pre-existing wallet info to make way for new account
                     wallet.signOut();
                   }
                   const redirectUrl = `${window.location.origin}/${app.activeChainId()}/finishNearLogin`;
-                  wallet.requestSignIn('commonwealth', 'commonwealth', redirectUrl, redirectUrl);
+                  wallet.requestSignIn({
+                    contractId: (app.chain as Near).chain.isMainnet
+                      ? 'commonwealth-login.near'
+                      : 'commonwealth-login.testnet',
+                    successUrl: redirectUrl,
+                    failureUrl: redirectUrl
+                  });
                 },
                 label: 'Continue to NEAR wallet'
               }) ]

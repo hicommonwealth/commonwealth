@@ -36,6 +36,7 @@ const getTokenForum = async (
             icon_url: token.icon_url,
             symbol: token.symbol,
             name: token.name,
+            decimals: token.decimals,
             base: 'ethereum',
             has_chain_events_listener: false
           },

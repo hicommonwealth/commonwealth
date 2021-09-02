@@ -4,7 +4,7 @@ import send, { WebhookContent } from '../webhookNotifier';
 import { SERVER_URL } from '../config';
 import { UserAttributes } from './user';
 import { NotificationCategoryAttributes } from './notification_category';
-import {NotificationAttributes, NotificationInstance} from './notification';
+import { NotificationAttributes, NotificationInstance } from './notification';
 import { ModelStatic } from './types';
 import {
   IPostNotificationData, ICommunityNotificationData, IChainEventNotificationData,

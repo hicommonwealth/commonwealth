@@ -42,7 +42,7 @@ module.exports = {
           chunks: 'all',
         },
         near: {
-          test: /[\\/]node_modules[\\/](nearlib)[\\/]/,
+          test: /[\\/]node_modules[\\/](near-api-js)[\\/]/,
           name: 'near',
           chunks: 'all',
         },

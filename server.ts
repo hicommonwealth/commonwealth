@@ -49,12 +49,14 @@ async function main() {
   const SHOULD_UPDATE_EVENTS = process.env.UPDATE_EVENTS === 'true';
   const SHOULD_UPDATE_BALANCES = process.env.UPDATE_BALANCES === 'true';
   const SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS = process.env.UPDATE_EDGEWARE_LOCKDROP_STATS === 'true';
+  const SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS = process.env.SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS === 'true';
 
   const NO_CLIENT_SERVER = process.env.NO_CLIENT === 'true'
     || SHOULD_SEND_EMAILS
     || SHOULD_UPDATE_EVENTS
     || SHOULD_UPDATE_BALANCES
-    || SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS;
+    || SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS
+    || SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS;
 
   // CLI parameters used to configure specific tasks
   const SKIP_EVENT_CATCHUP = process.env.SKIP_EVENT_CATCHUP === 'true';
@@ -65,7 +67,6 @@ async function main() {
 
   const identityFetchCache = new IdentityFetchCache(models);
   const tokenBalanceCache = new TokenBalanceCache(models);
-
   let rc = null;
   if (SHOULD_SEND_EMAILS) {
     rc = await sendBatchedNotificationEmails(models);
