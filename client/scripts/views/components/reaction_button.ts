@@ -17,6 +17,7 @@ import LoginModal from '../modals/login_modal';
 
 const MAX_VISIBLE_REACTING_ACCOUNTS = 10;
 
+// eslint-disable-next-line no-shadow
 export enum ReactionType {
   Like = 'like',
   Dislike = 'dislike'
@@ -76,9 +77,8 @@ const fetchReactionsByPost = async (post: OffchainThread | AnyProposal | Offchai
 const ReactionButton: m.Component<ReactionButtonAttrs, ReactionButtonState> = {
   view: (vnode) => {
     const { post, type, displayAsLink, tooltip, large } = vnode.attrs;
-    const reactionCounts = app.reactionCounts.getByPost(post);
-    const { likes = 0, dislikes = 0, hasReacted } = reactionCounts || {};
-    vnode.state.reactionCounts = reactionCounts;
+    vnode.state.reactionCounts = app.reactionCounts.getByPost(post);
+    const { likes = 0, dislikes = 0, hasReacted } = vnode.state.reactionCounts || {};
     vnode.state.likes = likes;
     vnode.state.dislikes = dislikes;
 
@@ -88,7 +88,7 @@ const ReactionButton: m.Component<ReactionButtonAttrs, ReactionButtonState> = {
     const isAdmin = app.user.isSiteAdmin
       || app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
 
-    let tokenPostingThreshold;
+    let tokenPostingThreshold: BN;
     if (post instanceof OffchainThread && post.topic && app.topics) {
       tokenPostingThreshold = app.topics.getByName((post as OffchainThread).topic.name, app.activeId())?.tokenThreshold;
     } else if (post instanceof OffchainComment) {
@@ -101,7 +101,7 @@ const ReactionButton: m.Component<ReactionButtonAttrs, ReactionButtonState> = {
     const disabled = vnode.state.loading || (
       (!isCommunity && (app.chain as Token)?.isToken)
       && !isAdmin
-      && (tokenBalance == null || (tokenPostingThreshold && tokenPostingThreshold.gt(tokenBalance)))
+      && (!tokenBalance || (tokenPostingThreshold && tokenPostingThreshold.gt(tokenBalance)))
     );
 
     const activeAddress = app.user.activeAccount?.address;
