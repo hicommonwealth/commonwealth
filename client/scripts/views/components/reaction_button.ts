@@ -98,12 +98,11 @@ const ReactionButton: m.Component<ReactionButtonAttrs, ReactionButtonState> = {
     } else {
       tokenPostingThreshold = new BN(0);
     }
-    const disabled = /* vnode.state.loading || */
-      (
-        (!isCommunity && (app.chain as Token)?.isToken)
-        && !isAdmin
-        && (tokenBalance == null || (tokenPostingThreshold && tokenPostingThreshold.gt(tokenBalance)))
-      );
+    const disabled = vnode.state.loading || (
+      (!isCommunity && (app.chain as Token)?.isToken)
+      && !isAdmin
+      && (tokenBalance == null || (tokenPostingThreshold && tokenPostingThreshold.gt(tokenBalance)))
+    );
 
     const activeAddress = app.user.activeAccount?.address;
     vnode.state.hasReacted = hasReacted;
