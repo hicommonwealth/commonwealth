@@ -105,7 +105,6 @@ abstract class Account<C extends Coin> {
         chain: this.chain.id,
         isToken: this.chain.type === 'token',
         jwt: this.app.user.jwt,
-        userId: this.app.user.userId,
         signature,
       };
       const result = await $.post(`${this.app.serverUrl()}/verifyAddress`, params);

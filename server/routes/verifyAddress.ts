@@ -13,8 +13,7 @@ export const Errors = {
   AddressNF: 'Address not found',
   ExpiredToken: 'Token has expired, please re-register',
   InvalidSignature: 'Invalid signature, please re-register',
-  NoEmail: 'No email to alert',
-  NoUserId: 'No user ID',
+  NoEmail: 'No email to alert'
 };
 
 const verifyAddress = async (models: DB, req: Request, res: Response, next: NextFunction) => {

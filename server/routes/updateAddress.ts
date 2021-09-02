@@ -7,23 +7,19 @@ const log = factory.getLogger(formatFilename(__filename));
 
 // update ghost address for imported discourse users by new address
 const updateAddress = async (models: DB, req: Request, res: Response, next: NextFunction) => {
-    const { address, chain, userId } = req.body
+    const { address, chain } = req.body
     if (!address) {
         return next(new Error(Errors.NoAddress));
     }
     if (!chain) {
         return next(new Error(Errors.NoChain));
     }
-    if (!userId) {
-        return next(new Error(Errors.NoUserId));
-    }
-
     const { id: ghostAddressId } = await models.Address.scope('withPrivateData').findOne({
-        where: { chain, ghost_address: true, user_id: userId }
+        where: { chain, ghost_address: true, user_id: req.user.id }
     }) || {};
 
     const { id: newAddressId } = await models.Address.scope('withPrivateData').findOne({
-        where: { chain, user_id: userId, address }
+        where: { chain, user_id: req.user.id, address }
     }) || {};
 
     try {

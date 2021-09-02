@@ -181,7 +181,6 @@ export function updateActiveUser(data) {
     app.user.setActiveAccounts([]);
     app.user.ephemerallySetActiveAccount(null);
   } else {
-    app.user.setUserId(data.userId);
     app.user.setEmail(data.email);
     app.user.setEmailInterval(data.emailInterval);
     app.user.setEmailVerified(data.emailVerified);
