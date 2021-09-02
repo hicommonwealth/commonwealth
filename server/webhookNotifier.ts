@@ -268,7 +268,7 @@ const send = async (models, content: WebhookContent) => {
         //   'displayName': 'Commonwealth',
         //   'avatarUrl': 'http://commonwealthLogoGoesHere'
         // };
-      } else if (url.indexOf('telegram') !== -1) {
+      } else if ((url.indexOf('telegram') !== -1) && process.env.TELEGRAM_BOT_TOKEN) {
         let getChatUsername = url.split('/@');
         getChatUsername = '@' + getChatUsername[1];
 
