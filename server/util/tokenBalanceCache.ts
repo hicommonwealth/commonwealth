@@ -11,6 +11,8 @@ import JobRunner from './cacheJobRunner';
 import { slugify } from '../../shared/utils';
 
 import { factory, formatFilename } from '../../shared/logging';
+import { DB } from '../database';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 // map of addresses to balances
@@ -46,9 +48,9 @@ export class TokenBalanceProvider {
 }
 
 export default class TokenBalanceCache extends JobRunner<CacheT> {
-  private models;
+  private models: DB;
   constructor(
-    models,
+    models: DB,
     noBalancePruneTimeS: number = 5 * 60,
     private readonly _hasBalancePruneTimeS: number = 24 * 60 * 60,
     private readonly _balanceProvider = new TokenBalanceProvider(),
@@ -82,20 +84,10 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     return this.start(prefetchedTokenMeta);
   }
 
-  public async hasToken(contractId: string, address: string, network = 'mainnet'): Promise<boolean> {
-    const tokenMeta = await this.models.Chain.findOne({ where: { id: contractId } })
-      || await this.models.Chain.Token({ where: { id: contractId } });
-
-    if (!tokenMeta) throw new Error('unsupported token');
-    const threshold = tokenMeta.balanceThreshold || new BN(1);
-    const balance = await this.getBalance(contractId, address);
-    return balance.gt(threshold);
-  }
-
   // query a user's balance on a given token contract and save in cache
   public async getBalance(contractId: string, address: string, network = 'mainnet'): Promise<BN> {
-    const tokenMeta = await this.models.Chain.findOne({ where: { id: contractId }}) || 
-      await this.models.Chain.Token({ where: { id: contractId }});
+    const tokenMeta = await this.models.ChainNode.findOne({ where: { chain: contractId } })
+      || await this.models.Token.findOne({ where: { id: contractId } });
     if (!tokenMeta) throw new Error('unsupported token');
 
     // first check the cache for the token balance
