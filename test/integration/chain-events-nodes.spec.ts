@@ -113,8 +113,10 @@ async function clearDB(pool) {
     // clear OffchainProfiles
     query = format(`SELECT "id" FROM "Addresses" WHERE "address" IN (%L)`, addresses)
     const IDs = (await pool.query(query)).rows.map(obj => obj.id);
-    query = format(`DELETE FROM "OffchainProfiles" WHERE "address_id" IN (%L)`, IDs);
-    await pool.query(query)
+    if (IDs.length > 0) {
+      query = format(`DELETE FROM "OffchainProfiles" WHERE "address_id" IN (%L)`, IDs);
+      await pool.query(query)
+    }
 
     // clear Addresses
     query = format(`DELETE FROM "Addresses" WHERE "address" IN (%L)`, addresses);
@@ -145,6 +147,7 @@ async function clearQueues(): Promise<void> {
 }
 
 // populates the Address, OffchainProfiles, and IdentityCaches tables with test data
+// TODO: this should set to true has_chain_events_listener for chains in supportedChains - and revert when done
 async function prepareDB(client): Promise<void> {
   let query
   try {
@@ -217,7 +220,7 @@ function childExit(children: ChildProcess[]) {
 
 // a drop in test case to delay further test cases (used to wait for events) - only use when absolutely necessary (latency reasons)
 function delay(interval) {
-  return it.only('delaying...', (done) => {
+  return it('delaying...', (done) => {
     setTimeout(() => done(), interval);
   }).timeout(interval + 100);
 }
@@ -243,7 +246,7 @@ setTimeout(async () => {
   await clearQueues();
   await prepareDB(client);
 
-  describe.only('Tests for single chain per node', () => {
+  describe('Tests for single chain per node', () => {
     pool.on('error', (err, client) => {
       console.error('Unexpected error on idle client', err);
       assert.fail();
@@ -251,8 +254,8 @@ setTimeout(async () => {
 
     chains.forEach((chain, chainIndex) => {
       if (!supportedChains.includes(chain.id)) return;
-      describe.only(`Tests for a ${chain.id} chain-events node`, () => {
-        it.only(`Should start a node with a ${chain.id} listener`, (done) => {
+      describe(`Tests for a ${chain.id} chain-events node`, () => {
+        it(`Should start a node with a ${chain.id} listener`, (done) => {
           let child = spawn(`ts-node`,
             [`${__dirname}../../../server/scripts/dbNode.ts`],
             {env: { ...process.env, TESTING:'true', WORKER_NUMBER:String(chainIndex), NUM_WORKERS:String(chains.length), HANDLE_IDENTITY:'publish', INFURA_API_KEY: '8e25780c4d574b3cbf53c306a841d09f'}}
@@ -270,7 +273,8 @@ setTimeout(async () => {
             data = String(data)
             console.log(`${data}`);
             if (data.includes('Listener Validation')) {
-              let listeners = JSON.parse(data.substring(data.indexOf(':') + 1))
+              const arr = data.split('Listener Validation:')
+              let listeners = JSON.parse(arr[arr.length - 1])
               verifyListener([chain.id], listeners)
               done()
             }
@@ -287,7 +291,7 @@ setTimeout(async () => {
         // only substrate chains use the identity cache
         if (chain.base == 'substrate' && chain.id != 'stafi' && chain.id != 'clover') {
           // check publish functionality
-          it.only('Should clear the identity cache', async () => {
+          it('Should clear the identity cache', async () => {
             // check identity cache is empty
             const query = `SELECT * FROM "IdentityCaches" WHERE "chain"='polkadot';`
             assert((await pool.query(query)).rows.length == 0)
@@ -296,7 +300,7 @@ setTimeout(async () => {
           // delay briefly due to message latency
           delay(10000);
 
-          it.only('Should publish a message to the identity queue', async () => {
+          it('Should publish a message to the identity queue', async () => {
             // check the proper number of messages have been queued in the identity queue
             const res = await fetch('http://127.0.0.1:15672/api/queues/', {
               method: 'GET',
@@ -334,8 +338,8 @@ setTimeout(async () => {
         }
       })
 
-      describe.only('Tests for the chain-events consumer', () => {
-        it.only('Should start the chain-events consumer',(done) => {
+      describe('Tests for the chain-events consumer', () => {
+        it('Should start the chain-events consumer',(done) => {
           let consumer;
           consumer = spawn('ts-node',
             [`${__dirname}../../../server/scripts/setupChainEventListeners`],
@@ -368,7 +372,7 @@ setTimeout(async () => {
         if (chain.base === 'substrate' && chain.id != 'stafi' && chain.id != 'clover') {
           delay(10000)
 
-          it.only('Should consume identity events', async () => {
+          it('Should consume identity events', async () => {
             assert.isTrue(await verifyIdentityChanges(pool, chain.id))
 
             // makre sure identity queue is empty
