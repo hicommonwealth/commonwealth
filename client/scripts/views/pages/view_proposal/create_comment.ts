@@ -125,7 +125,7 @@ const CreateComment: m.Component<{
       proposalPageState.parentCommentId = null;
     };
 
-    const activeTopicName = rootProposal instanceof OffchainThread ? rootProposal.topic.name : null;
+    const activeTopicName = rootProposal instanceof OffchainThread ? rootProposal?.topic?.name : null;
     const tokenPostingThreshold = app.topics.getByName(
       activeTopicName,
       app.activeId()
