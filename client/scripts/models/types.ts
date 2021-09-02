@@ -32,6 +32,7 @@ export enum ChainNetwork {
   Injective = 'injective',
   Ethereum = 'ethereum',
   NEAR = 'near',
+  NEARTestnet = 'near-testnet',
   Moloch = 'moloch',
   Compound = 'compound',
   Aave = 'aave',
@@ -49,6 +50,7 @@ export enum ChainNetwork {
   Crust = 'crust',
   CosmosHub = 'cosmoshub',
   Gaia13k = 'gaia-13k',
+  Sputnik = 'sputnik',
 }
 
 // This function returns a default chain for a chainbase
@@ -114,6 +116,7 @@ export enum VotingType {
   None = 'none',
   MolochYesNo = 'moloch',
   CompoundYesNo = 'compound',
+  YesNoReject = 'yes_no_reject',
 }
 export enum VotingUnit {
   OnePersonOneVote = '1p1v',

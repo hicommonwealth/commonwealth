@@ -1,4 +1,3 @@
-
 import { Moloch1__factory } from 'eth/types';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 

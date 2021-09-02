@@ -105,8 +105,8 @@ export default class CompoundGovernance extends ProposalModule<
     console.log('Fetching compound proposals from backend.');
     await this.app.chain.chainEntities.refresh(this.app.chain.id, EntityRefreshOption.AllEntities);
     const entities = this.app.chain.chainEntities.store.getByType(CompoundTypes.EntityKind.Proposal);
-    entities.forEach((e) => this._entityConstructor(e));
     console.log(`Found ${entities.length} proposals!`);
+    entities.forEach((e) => this._entityConstructor(e));
 
     // no init logic currently needed
     // await Promise.all(this.store.getAll().map((p) => p.init()));
@@ -120,8 +120,8 @@ export default class CompoundGovernance extends ProposalModule<
 
     // fetch proposals from chain
     // const fetcher = new AaveEvents.StorageFetcher(chainEventsContracts);
-    const subscriber = new CompoundEvents.Subscriber(this._api.Contract, this.app.chain.id);
-    const processor = new CompoundEvents.Processor(this._api.Contract);
+    const subscriber = new CompoundEvents.Subscriber(this._api.Contract as any, this.app.chain.id);
+    const processor = new CompoundEvents.Processor(this._api.Contract as any);
     // await this.app.chain.chainEntities.fetchEntities(this.app.chain.id, () => fetcher.fetch());
     await this.app.chain.chainEntities.subscribeEntities(
       this.app.chain.id,

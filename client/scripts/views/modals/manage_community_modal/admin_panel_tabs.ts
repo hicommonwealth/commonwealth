@@ -70,7 +70,6 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
       });
     };
 
-
     return m(Form, {
       class: 'WebhooksForm',
     }, [
@@ -168,7 +167,6 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
     ]);
   }
 };
-
 
 interface IUpgradeRolesFormAttrs {
   roleData: any[];

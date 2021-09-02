@@ -19,8 +19,8 @@ import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import CommunitySelector from 'views/components/sidebar/community_selector';
 import CreateCommunityModal from 'views/modals/create_community_modal';
 
-import { discordIcon, telegramIcon, elementIcon, githubIcon, websiteIcon } from './icons';
 import { AaveTypes, CompoundTypes, MolochTypes } from '@commonwealth/chain-events';
+import { discordIcon, telegramIcon, elementIcon, githubIcon, websiteIcon } from './icons';
 
 const SidebarQuickSwitcherItem: m.Component<{ item, size }> = {
   view: (vnode) => {
@@ -186,6 +186,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
 
     const hasProposals = app.chain && !app.community && (
       app.chain.base === ChainBase.CosmosSDK
+        || app.chain?.network === ChainNetwork.Sputnik
         || (app.chain.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Plasm)
         || MolochTypes.EventChains.find((c) => c === app.chain.network)
         || CompoundTypes.EventChains.find((c) => c === app.chain.network)
@@ -238,13 +239,14 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           label: 'Referenda',
           onclick: (e) => {
             e.preventDefault();
-            navigateToSubpage(`/referenda`);
+            navigateToSubpage('/referenda');
           },
           contentRight: [], // TODO
         }),
       // proposals (substrate, cosmos, moloch & compound only)
       !app.community && ((app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Darwinia)
                          || app.chain?.base === ChainBase.CosmosSDK
+                         || app.chain?.network === ChainNetwork.Sputnik
                          || MolochTypes.EventChains.find((c) => c === app.chain.network)
                          || CompoundTypes.EventChains.find((c) => c === app.chain.network)
                          || AaveTypes.EventChains.find((c) => c === app.chain.network))
@@ -256,7 +258,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           class: app.chain?.base === ChainBase.Substrate ? 'sub-button' : '',
           onclick: (e) => {
             e.preventDefault();
-            navigateToSubpage(`/proposals`);
+            navigateToSubpage('/proposals');
           },
         }),
       // // motions (substrate only)
@@ -282,7 +284,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           class: 'sub-button',
           onclick: (e) => {
             e.preventDefault();
-            navigateToSubpage(`/council`);
+            navigateToSubpage('/council');
           },
         }),
       m('.sidebar-spacer'),
@@ -295,7 +297,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           label: 'Treasury',
           onclick: (e) => {
             e.preventDefault();
-            navigateToSubpage(`/treasury`);
+            navigateToSubpage('/treasury');
           },
         }),
       // bounties (substrate only)
@@ -310,7 +312,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           class: 'sub-button',
           onclick: (e) => {
             e.preventDefault();
-            navigateToSubpage(`/bounties`);
+            navigateToSubpage('/bounties');
           },
         }),
       // tips (substrate only)
@@ -324,7 +326,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           class: 'sub-button',
           onclick: (e) => {
             e.preventDefault();
-            navigateToSubpage(`/tips`);
+            navigateToSubpage('/tips');
           },
         }),
       m('.sidebar-spacer'),
@@ -338,7 +340,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           label: 'Validators',
           onclick: (e) => {
             e.preventDefault();
-            navigateToSubpage(`/validators`);
+            navigateToSubpage('/validators');
           },
         }),
       showCompoundOptions && m(Button, {
@@ -346,7 +348,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         rounded: true,
         onclick: (e) => {
           e.preventDefault();
-          navigateToSubpage(`/delegate`);
+          navigateToSubpage('/delegate');
         },
         label: 'Delegate',
         active: m.route.get() === `/${app.activeChainId()}/delegate`,
@@ -366,7 +368,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         rounded: true,
         onclick: (e) => {
           e.preventDefault();
-          navigateToSubpage(`/new/proposal/:type`, { type: ProposalType.MolochProposal });
+          navigateToSubpage('/new/proposal/:type', { type: ProposalType.MolochProposal });
         },
         label: 'New proposal',
       }),
@@ -433,7 +435,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         active: m.route.get().startsWith(`/${app.activeChainId()}/projects`),
         onclick: (e) => {
           e.preventDefault();
-          navigateToSubpage(`/projects`);
+          navigateToSubpage('/projects');
         },
       }),
       // showCommonwealthMenuOptions && m(Button, {
@@ -453,7 +455,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         active: m.route.get().startsWith(`/${app.activeChainId()}/collectives`),
         onclick: (e) => {
           e.preventDefault();
-          navigateToSubpage(`/collectives`);
+          navigateToSubpage('/collectives');
         },
       }),
     ]);
@@ -609,14 +611,14 @@ const Sidebar: m.Component<{ hideQuickSwitcher? }, {}> = {
         app.isLoggedIn() && (app.chain || app.community) && m(SubscriptionButton),
         app.chain && m(ChainStatusModule),
       ]),
-      app.isCustomDomain() &&
-      m('a', {
+      app.isCustomDomain()
+      && m('a', {
         class: 'PoweredBy',
         onclick: (e) => {
           window.open('https://commonwealth.im/');
         },
       }),
-    ]
+    ];
   },
 };
 
