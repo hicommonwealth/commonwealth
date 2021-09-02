@@ -48,7 +48,6 @@ import UserModelFactory, { UserModelStatic } from './models/user';
 import WaitlistRegistrationFactory, { WaitlistRegistrationModelStatic } from './models/waitlist_registration';
 import WebhookFactory, { WebhookModelStatic } from './models/webhook';
 
-
 export type Models = {
     Address: AddressModelStatic;
     Chain: ChainModelStatic;

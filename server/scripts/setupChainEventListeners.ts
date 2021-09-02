@@ -2,28 +2,26 @@ import {
   SubstrateTypes,
   CWEvent,
 } from '@commonwealth/chain-events';
+import * as WebSocket from 'ws';
 import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
 
 import { HANDLE_IDENTITY } from '../config';
 
-import * as WebSocket from 'ws';
 import EventNotificationHandler from '../eventHandlers/notifications';
-import EventStorageHandler from '../eventHandlers/storage'
+import EventStorageHandler from '../eventHandlers/storage';
 import EntityArchivalHandler from '../eventHandlers/entityArchival';
 import IdentityHandler from '../eventHandlers/identity';
 import UserFlagsHandler from '../eventHandlers/userFlags';
 import ProfileCreationHandler from '../eventHandlers/profileCreation';
 import { factory, formatFilename } from '../../shared/logging';
 import { Consumer } from '../util/rabbitmq/consumer';
-import models from '../database'
+import models from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
-
 
 const setupChainEventListeners = async (
   wss: WebSocket.Server,
 ): Promise<{}> => {
-
   // writes events into the db as ChainEvents rows
   const storageHandler = new EventStorageHandler(
     models,
@@ -52,7 +50,7 @@ const setupChainEventListeners = async (
     models, null
   );
 
-  const allChainEventHandlers = [storageHandler, notificationHandler, entityArchivalHandler, profileCreationHandler]
+  const allChainEventHandlers = [storageHandler, notificationHandler, entityArchivalHandler, profileCreationHandler];
 
   // populates identity information in OffchainProfiles when received (Substrate only)
   const identityHandler = new IdentityHandler(models, null);
@@ -61,14 +59,14 @@ const setupChainEventListeners = async (
   // councillor sets are updated (Substrate only)
   const userFlagsHandler = new UserFlagsHandler(models, null);
 
-  const substrateEventHandlers = [identityHandler, userFlagsHandler]
+  const substrateEventHandlers = [identityHandler, userFlagsHandler];
 
   const substrateChains = (await models.Chain.findAll({
     attributes: ['id'],
     where: {
       'base': 'substrate'
     }
-  })).map(o => o.id)
+  })).map((o) => o.id);
 
   // will be used for token notifications
   const erc20Tokens = (await models.Chain.findAll({
@@ -77,7 +75,7 @@ const setupChainEventListeners = async (
       'base': 'ethereum',
       'type': 'token'
     }
-  })).map(o => o.id)
+  })).map((o) => o.id);
 
   // feed the events into their respective handlers
   async function processClassicEvents(event: CWEvent): Promise<void> {
@@ -86,8 +84,9 @@ const setupChainEventListeners = async (
       try {
         prevResult = await handler.handle(event, prevResult);
       } catch (err) {
-        // unknown chain event originates from the webhookNotifier which does not support erc20 events and thus throws if an erc20 event is given
-        if (err.message != 'unknown chain event') {
+        // unknown chain event originates from the webhookNotifier which does not support erc20 events
+        // and thus throws if an erc20 event is given
+        if (err.message !== 'unknown chain event') {
           log.error(`Classic event handle failure for the following event: ${JSON.stringify(event, null, 2)}`, err);
           break;
         }
@@ -113,16 +112,15 @@ const setupChainEventListeners = async (
     }
   }
 
-  let eventsSubscriber, identitySubscriber;
-
   const consumer = new Consumer(RabbitMQConfig);
   await consumer.init();
 
-  eventsSubscriber = await consumer.consumeEvents(
+  const eventsSubscriber = await consumer.consumeEvents(
     processClassicEvents,
     'eventsSub'
   );
 
+  let identitySubscriber;
   if (HANDLE_IDENTITY === 'publish') {
     identitySubscriber = await consumer.consumeEvents(
       processIdentityEvents,
@@ -130,18 +128,17 @@ const setupChainEventListeners = async (
     );
   }
 
-  log.info('Consumer started')
-  return {eventsSubscriber, identitySubscriber};
+  log.info('Consumer started');
+  return { eventsSubscriber, identitySubscriber };
 };
 
 async function main() {
   try {
-    log.info('Starting consumer...')
-    await setupChainEventListeners(null)
+    log.info('Starting consumer...');
+    await setupChainEventListeners(null);
   } catch (error) {
     log.fatal('Consumer setup failed', error);
   }
 }
 
 main();
-

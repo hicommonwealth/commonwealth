@@ -46,10 +46,10 @@ export const DATABASE_URI =
       process.env.DATABASE_URL;
 
 export const RABBITMQ_URI = (!process.env.CLOUDAMQP_URL || process.env.NODE_ENV === 'development') ?
-  'amqp://guest:guest@localhost:5672' : process.env.CLOUDAMQP_URL
+  'amqp://guest:guest@localhost:5672' : process.env.CLOUDAMQP_URL;
 
 export const RABBITMQ_VHOST = (!process.env.RABBITMQ_VHOST || process.env.NODE_ENV === 'development') ?
-  '/': 'ntqevykm'
+  '/' : 'ntqevykm';
 
 // limit logins in the last 5 minutes
 // increased because of chain waitlist registrations

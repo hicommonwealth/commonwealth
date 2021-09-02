@@ -59,11 +59,8 @@ async function main() {
     || SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS;
 
   // CLI parameters used to configure specific tasks
-  const SKIP_EVENT_CATCHUP = process.env.SKIP_EVENT_CATCHUP === 'true';
   const IDENTITY_MIGRATION = process.env.IDENTITY_MIGRATION;
   const FLAG_MIGRATION = process.env.FLAG_MIGRATION;
-  const CHAIN_EVENTS = process.env.CHAIN_EVENTS;
-  const RUN_AS_LISTENER = process.env.RUN_AS_LISTENER === 'true';
 
   const identityFetchCache = new IdentityFetchCache(models);
   const tokenBalanceCache = new TokenBalanceCache(models);
@@ -135,15 +132,8 @@ async function main() {
   const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
   const viewCountCache = new ViewCountCache(2 * 60, 10 * 60);
 
-  const closeMiddleware = (): Promise<void> => {
-    if (!NO_CLIENT_SERVER) {
-      return new Promise((resolve) => devMiddleware.close(() => resolve()));
-    } else {
-      return Promise.resolve();
-    }
-  };
-
   const sessionStore = new SequelizeStore({
+    // eslint-disable-next-line import/no-named-as-default-member
     db: models.sequelize,
     tableName: 'Sessions',
     checkExpirationInterval: 15 * 60 * 1000, // Clean up expired sessions every 15 minutes
