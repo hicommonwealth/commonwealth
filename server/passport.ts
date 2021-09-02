@@ -1,6 +1,7 @@
 import passport from 'passport';
 import passportGithub from 'passport-github';
 import passportJWT from 'passport-jwt';
+import { Strategy as TwitterStrategy } from 'passport-twitter';
 import { Request } from 'express';
 import request from 'superagent';
 
@@ -356,6 +357,17 @@ function setupPassport(models: DB) {
       return cb(null, newUser);
     }
   }));
+
+  passport.use(new TwitterStrategy({
+    consumerKey: 'w4EqhqSununRrxZpRDO5bufzQ',
+    consumerSecret: '1WGUaHu3aejveZ8Ug3GuivwOiHfLeaG9xXCaUEjxjRQsjvgh3N',
+    callbackURL: 'http://127.0.0.1:8080/api/auth/twitter/callback',
+    passReqToCallback: true,
+  },
+  ((req, token, tokenSecret, profile, done) => {
+    done(null, req.user);
+  })));
+
   passport.serializeUser<any>((user, done) => {
     getStatsDInstance().increment('cw.users.logged_in');
     if (user?.id) {

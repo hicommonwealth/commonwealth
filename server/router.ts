@@ -503,6 +503,10 @@ function setupRouter(
 
   router.post('/snapshotAPI/sendMessage', sendMessage.bind(this));
 
+  router.get('/auth/twitter', passport.authenticate('twitter'));
+  router.get('/auth/twitter/callback',
+    passport.authenticate('twitter', { successRedirect: '/', failureRedirect: '/login' }));
+
   app.use('/api', router);
 }
 export default setupRouter;

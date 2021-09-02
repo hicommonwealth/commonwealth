@@ -83,7 +83,8 @@ const SidebarQuickSwitcher: m.Component<{}> = {
           rounded: true,
           label: m(Icon, { name: Icons.PLUS }),
           onclick: (e) => {
-            app.modals.create({ modal: TwitterAttestationModal });
+            // app.modals.create({ modal: TwitterAttestationModal });
+            window.location.href = '/api/auth/twitter';
           },
         }),
       ]),

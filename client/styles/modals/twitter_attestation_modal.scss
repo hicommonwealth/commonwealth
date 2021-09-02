@@ -4,13 +4,14 @@
   padding: 50px 80px;
   text-align: center;
 
-  .close-button {
+  .modal-close-button {
     width: 20px;
     height: 20px;
     position: absolute;
     right: 20px;
     top: 20px;
     opacity: 0.75;
+    cursor: pointer;
   }
 
   .form-steps {
@@ -39,10 +40,14 @@
     border-radius: 4px;
   }
 
+  .twitter-logo {
+    width: 44px;
+    margin: 30px auto;
+  }
+
   .title {
     font-size: 32px;
     font-weight: 500;
-    margin-top: 30px;
   }
 
   .description {
@@ -70,5 +75,23 @@
     border-radius: 8px;
     margin: 10px 0px;
     width: 100%;
+  }
+
+  .unverfied-label {
+    padding: 4px 10px 0 10px;
+    margin-left: 10px;
+    background: #F7EDE5;
+    border: 1px solid #C6660E;
+    border-radius: 4px;
+    font-weight: 500;
+    text-transform: uppercase;
+    color: #C6660E;
+  }
+
+  .close-button {
+    width: 20px;
+    height: 20px;
+    opacity: 0.75;
+    cursor: pointer;
   }
 }
