@@ -1,7 +1,7 @@
 import request from 'superagent';
 import { Op } from 'sequelize';
 import { capitalize } from 'lodash';
-import { SubstrateEvents } from '@commonwealth/chain-events';
+import { AaveEvents, chainSupportedBy, CompoundEvents, MolochEvents, SubstrateEvents } from '@commonwealth/chain-events';
 
 import { NotificationCategories } from '../shared/types';
 import { smartTrim, validURL, renderQuillDeltaToText } from '../shared/utils';
@@ -26,7 +26,18 @@ const REGEX_EMOJI = /([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF
 const getFilteredContent = (content, address) => {
   let event;
   if (content.chainEvent && content.chainEventType) {
-    event = SubstrateEvents.Label(
+    let labelerFn;
+    if (chainSupportedBy(content.chainEventType.chain, SubstrateEvents.Types.EventChains)) {
+      labelerFn = SubstrateEvents.Label;
+    } else if (chainSupportedBy(content.chainEventType.chain, MolochEvents.Types.EventChains)) {
+      labelerFn = MolochEvents.Label;
+    } else if (chainSupportedBy(content.chainEventType.chain, CompoundEvents.Types.EventChains)) {
+      labelerFn = CompoundEvents.Label;
+    } else if (chainSupportedBy(content.chainEventType.chain, AaveEvents.Types.EventChains)) {
+      labelerFn = AaveEvents.Label;
+    }
+    if (!labelerFn) throw new Error('unknown chain event');
+    event = labelerFn(
       content.chainEvent.block_number,
       content.chainEventType.chain,
       content.chainEvent.event_data
@@ -87,7 +98,7 @@ const send = async (models, content: WebhookContent) => {
   try {
     address = await models.Address.findOne({ where: { address: content.user, chain: content.author_chain } });
   } catch (err) {
-    console.log("There's no address")
+    // pass nothing if no matching address is found
   }
 
   // if a community is passed with the content, we know that it is from an offchain community
@@ -107,7 +118,9 @@ const send = async (models, content: WebhookContent) => {
   });
   const chainOrCommwebhookUrls = [];
   chainOrCommWebhooks.forEach((wh) => {
-    chainOrCommwebhookUrls.push(wh.url);
+    if(validURL(wh.url)){
+      chainOrCommwebhookUrls.push(wh.url);
+    }
   });
 
   const {
@@ -163,7 +176,7 @@ const send = async (models, content: WebhookContent) => {
   if (!previewImageUrl) {
     // if no embedded image url or the chain/community doesn't have a logo, show the Commonwealth logo as the preview image
     previewImageUrl = previewImageUrl || DEFAULT_COMMONWEALTH_LOGO;
-    previewAltText = previewAltText || 'CommonWealth';
+    previewAltText = previewAltText || 'Commonwealth';
   }
 
   await Promise.all(chainOrCommwebhookUrls
@@ -247,13 +260,6 @@ const send = async (models, content: WebhookContent) => {
             },
           }]
         };
-      } else if (url.indexOf('telegram.org') !== -1) {
-
-        let getChatUsername = url.split('/@');
-        getChatUsername = '@' + getChatUsername[1];
-
-        let getUpdatesUrl = `https://api.telegram.org/${process.env.TELEGRAM_BOT_TOKEN}`;
-        url = getUpdatesUrl + '/sendMessage';
       } else if (url.indexOf('matrix') !== -1) {
         // TODO: matrix format and URL pattern matcher unimplemented
         // return {
@@ -290,7 +296,7 @@ const send = async (models, content: WebhookContent) => {
             'resize_keyboard': true,
             'inline_keyboard': [
               [
-                { 'text': 'Read more on commonwealth', 'url': actedOnLink }
+                { 'text': 'Read more on commonwealth', 'url': 'https://commonwealth.im' }
               ]
             ]
           }
