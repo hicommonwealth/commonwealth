@@ -36,12 +36,15 @@ export interface TokenForumMeta {
 }
 
 export class TokenBalanceProvider {
-  constructor(private _network = 'mainnet') { }
+  private _provider: providers.Web3Provider;
+  constructor(private _network = 'mainnet') {
+    const web3Provider = new Web3.providers.HttpProvider(`https://${this._network}.infura.io/v3/${INFURA_API_KEY}`);
+    this._provider = new providers.Web3Provider(web3Provider);
+  }
 
   public async getBalance(tokenAddress: string, userAddress: string): Promise<BN> {
-    const web3Provider = new Web3.providers.HttpProvider(`https://${this._network}.infura.io/v3/${INFURA_API_KEY}`);
-    const provider = new providers.Web3Provider(web3Provider);
-    const api = ERC20__factory.connect(tokenAddress, provider);
+    const api = ERC20__factory.connect(tokenAddress, this._provider);
+    await api.deployed();
     const balanceBigNum = await api.balanceOf(userAddress);
     return new BN(balanceBigNum.toString());
   }
@@ -88,11 +91,15 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
   public async getBalance(contractId: string, address: string, network = 'mainnet'): Promise<BN> {
     const tokenMeta = await this.models.ChainNode.findOne({ where: { chain: contractId } })
       || await this.models.Token.findOne({ where: { id: contractId } });
-    if (!tokenMeta) throw new Error('unsupported token');
+    if (!tokenMeta?.address) throw new Error('unsupported token');
 
     // first check the cache for the token balance
     const result = await this.access((async (c: CacheT): Promise<BN | undefined> => {
-      return c[contractId][address]?.balance;
+      if (c[contractId]) {
+        return c[contractId][address]?.balance;
+      } else {
+        return undefined;
+      }
     }));
     if (result !== undefined) return result;
 
@@ -107,6 +114,9 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
 
     // write fetched balance back to cache
     await this.access((async (c: CacheT) => {
+      if (!c[contractId]) {
+        c[contractId] = {};
+      }
       c[contractId][address] = { balance, fetchedAt };
     }));
     return balance;
