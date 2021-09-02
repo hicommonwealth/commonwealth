@@ -10,6 +10,7 @@ class TerraStationWebWalletController implements IWebWallet<string> {
   public readonly name = 'terrastation';
   public readonly label = 'Terra Wallet (TerraStation)';
   public readonly chain = ChainBase.CosmosSDK;
+  public readonly specificChain = 'terra';
 
   constructor() {
     this._extension.on('onConnect', (accountAddr) => {

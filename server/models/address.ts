@@ -252,7 +252,7 @@ export default (
       // the account they registered with.
       // TODO: ensure osmosis works
       let bech32Prefix;
-      chain.network = 'terra'; // TODO: used to test terra - change routing system then remove
+      // chain.network = 'terra'; // TODO: used to test terra - change routing system then remove MAKE MIGRATION
       switch (chain.network) {
         case 'straightedge':
           bech32Prefix = 'str';

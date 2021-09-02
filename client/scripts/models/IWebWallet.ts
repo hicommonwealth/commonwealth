@@ -12,6 +12,7 @@ interface IWebWallet<AccountT extends { address: string } | string> {
   validateWithAccount: (account: Account<any>) => Promise<void>;
 
   chain: ChainBase;
+  specificChain?: string;
 }
 
 export default IWebWallet;
