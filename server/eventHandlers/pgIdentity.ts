@@ -75,7 +75,8 @@ export default class extends IEventHandler {
         log.info(`No off-chain profile for ${profiles[0].address}`);
 
       // if we don't have an identity saved yet for a judgement, do nothing
-      if (!offChainProfile.identity) {
+      // TODO: is this correct?
+      if (!offChainProfile[0].identity) {
         log.warn(
           'No corresponding identity found for judgement! Needs identity-migration?'
         );
