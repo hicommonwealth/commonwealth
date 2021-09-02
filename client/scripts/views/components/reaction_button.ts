@@ -94,12 +94,12 @@ const ReactionButton: m.Component<ReactionButtonAttrs, ReactionButtonState> = {
     } else if (post instanceof OffchainComment) {
       // post.rootProposal has typescript typedef number but in practice seems to be a string
       const parentThread = app.threads.getById(parseInt(post.rootProposal.toString().split('_')[1], 10));
-      tokenPostingThreshold = app.topics.getByName((parentThread).topic.name, app.activeId()).tokenThreshold;
+      tokenPostingThreshold = app.topics.getByName((parentThread).topic.name, app.activeId())?.tokenThreshold;
     } else {
       tokenPostingThreshold = new BN(0);
     }
-    const disabled = vnode.state.loading
-      || (
+    const disabled = /* vnode.state.loading || */
+      (
         (!isCommunity && (app.chain as Token)?.isToken)
         && !isAdmin
         && (tokenBalance == null || (tokenPostingThreshold && tokenPostingThreshold.gt(tokenBalance)))
