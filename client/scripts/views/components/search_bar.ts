@@ -51,7 +51,8 @@ const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the datab
 export const getMemberPreview = (addr, closeResultsFn, searchTerm, tabIndex, showChainName?) => {
   const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
   if (addr.name) profile.initialize(addr.name, null, null, null, null);
-  const userLink = `/${m.route.param('scope') || addr.chain}/account/${addr.address}?base=${addr.chain}`;
+  const userLink = `${app.isCustomDomain() ? '' : `/${app.activeId() || addr.chain}`
+  }/account/${addr.address}?base=${addr.chain}`;
   return m(ListItem, {
     tabIndex,
     label: m('a.search-results-item', [
@@ -282,7 +283,6 @@ const concludeSearch = (searchTerm: string, params: SearchParams, state, err?) =
   }
   m.redraw();
 };
-
 
 // Search makes the relevant queries, depending on whether the search is global or
 // community-scoped. It then "concludesSearch," and either assigns the results to

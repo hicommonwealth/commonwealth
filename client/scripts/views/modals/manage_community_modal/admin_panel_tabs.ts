@@ -8,7 +8,7 @@ import app from 'state';
 import { RolePermission, Webhook } from 'models';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import WebhookSettingsModal from 'views/modals/webhook_settings_modal';
-import { pluralize } from 'helpers';
+import { link, pluralize } from 'helpers';
 
 interface IWebhooksFormAttrs {
   webhooks: Webhook[];
@@ -69,7 +69,6 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
         m.redraw();
       });
     };
-
 
     return m(Form, {
       class: 'WebhooksForm',
@@ -145,7 +144,12 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
             });
           }),
           webhooks.length === 0 && m(ListItem, {
-            contentLeft: 'No webhooks yet. Slack and Discord webhooks are supported.'
+            contentLeft: [
+              'No webhooks yet. Slack, Discord, and Telegram webhooks are supported. For more information and examples for setting these up, please view our ',
+              link('a', ('https://docs.commonwealth.im'), [
+                'documentation.'
+              ])
+            ]
           }),
         ]),
       ]),
@@ -168,7 +172,6 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
     ]);
   }
 };
-
 
 interface IUpgradeRolesFormAttrs {
   roleData: any[];

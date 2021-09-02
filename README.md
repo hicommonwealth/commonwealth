@@ -186,6 +186,24 @@ You should now set up any databases and services needed. In particular:
   `SEND_EMAILS=true ts-node --project tsconfig.node.json server.ts`
   at 1pm UTC / 6am PT / 9am ET / 3pm CEST
 
+## Custom Domains
+
+To configure a custom domain, you should:
+
+- Add the custom domain to Heroku
+- Add the custom domain to Magic
+- Set the customDomain field in the Chains or OffchainCommunities
+  row in the database, corresponding to the community to be served on
+  that domain.
+
+You can test the custom domain by setting it in your /etc/hosts file
+and running a local SSL proxy, for example:
+
+```
+npm install -g local-ssl-proxy
+local-ssl-proxy --source 443 --target 8080
+```
+
 ## Chat Server
 
 In order to use chat functionality, you will also need to check out and

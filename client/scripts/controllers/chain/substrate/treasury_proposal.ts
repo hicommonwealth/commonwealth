@@ -33,10 +33,6 @@ export class SubstrateTreasuryProposal
     return `#${this.identifier.toString()}`;
   }
   public generateTitle() {
-    const account = this._Accounts.fromAddress(this.beneficiaryAddress);
-    const displayName = account.profile && account.profile.name
-      ? `${account.profile.name} (${formatAddressShort(this.beneficiaryAddress, account.chain.id)})`
-      : formatAddressShort(this.beneficiaryAddress, account.chain.id);
     return `Proposal for ${formatCoin(this.value)}`;
   }
   public get description() { return null; }
@@ -134,7 +130,6 @@ export class SubstrateTreasuryProposal
     this.threadTitle = entity.threadTitle;
 
     entity.chainEvents.forEach((e) => this.update(e));
-
 
     if (!this._completed) {
       const slug = chainEntityTypeToProposalSlug(entity.type);

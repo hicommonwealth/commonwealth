@@ -35,9 +35,10 @@ export const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
 
 export const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
 export const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
-export const GITHUB_OAUTH_CALLBACK = (process.env.NODE_ENV === 'production'
-                                      ? 'https://commonwealth.im'
-                                      : 'http://localhost:8080') + '/api/auth/github/callback';
+export const GITHUB_OAUTH_CALLBACK = process.env.GITHUB_OAUTH_CALLBACK
+  || (process.env.NODE_ENV === 'production'
+    ? 'https://commonwealth.im'
+    : 'http://localhost:8080') + '/api/auth/github/callback';
 
 export const DATABASE_URI =
       (!process.env.DATABASE_URL || process.env.NODE_ENV === 'development') ?

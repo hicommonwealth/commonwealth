@@ -240,14 +240,14 @@ const LandingPage: m.Component<{}, IState> = {
               alt: '',
               title: 'Claim your token',
               text:
-              ' We generate pages for your favorite community and address from real-time chain actvity. Claim yours. ',
+              ' We generate pages for your favorite community and address from real-time chain activity. Claim yours. ',
             },
             {
               img: 'static/img/bell.svg',
               alt: '',
               title: 'Stay updated',
               text:
-              ' Be the first to know when community events are happening with in-app, email, and mobile push notiications. ',
+              ' Be the first to know when community events are happening with in-app, email, and mobile push notifications. ',
             },
             {
               img: 'static/img/calendar.svg',
@@ -315,11 +315,13 @@ const LandingPage: m.Component<{}, IState> = {
             // { text:  'Developers' },
             { text: 'Blog', externalLink: 'https://blog.commonwealth.im' },
             { text: 'Jobs', externalLink: 'https://angel.co/company/commonwealth-labs/jobs' },
-            { text:  'Terms', redirectTo:  '/terms' },
-            { text:  'Privacy', redirectTo: '/privacy' },
+            { text: 'Terms', redirectTo:  '/terms' },
+            { text: 'Privacy', redirectTo: '/privacy' },
+            { text: 'Docs', redirectTo: 'https://commonwealth.im'},
             { text: 'Why Commonwealth?', redirectTo: '/whyCommonwealth' },
-            { text: 'Discord', externalLink: 'https://discord.gg/yK3x5HcsXG' },
-            { text: 'Telegram', externalLink: 'https://t.me/HiCommonwealth' }
+            { text: 'Discord', externalLink: 'https://discord.gg/frnQxxZG5S' },
+            { text: 'Telegram', externalLink: 'https://t.me/HiCommonwealth' },
+            { text: 'Twitter', externalLink: 'https://twitter.com/hicommonwealth' }
           ],
         }),
         m('script', {

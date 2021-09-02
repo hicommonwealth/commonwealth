@@ -1,6 +1,7 @@
 import moment from 'moment';
 
 import { Request, Response, NextFunction } from 'express';
+import BN from 'bn.js';
 import { NotificationCategories, ProposalType } from '../../shared/types';
 
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
@@ -8,8 +9,10 @@ import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
 import { parseUserMentions } from '../util/parseUserMentions';
 import TokenBalanceCache from '../util/tokenBalanceCache';
+import { DB } from '../database';
 
 import { factory, formatFilename } from '../../shared/logging';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
@@ -24,7 +27,7 @@ export const Errors = {
 };
 
 const createThread = async (
-  models,
+  models: DB,
   tokenBalanceCache: TokenBalanceCache,
   req: Request,
   res: Response,
@@ -36,7 +39,8 @@ const createThread = async (
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));
 
-  const { topic_name, topic_id, title, body, kind, stage, url, readOnly } = req.body;
+  const { topic_name, title, body, kind, stage, url, readOnly } = req.body;
+  let { topic_id } = req.body;
 
   if (kind === 'forum') {
     if (!title || !title.trim()) {
@@ -126,12 +130,35 @@ const createThread = async (
         },
       });
       threadContent['topic_id'] = offchainTopic.id;
+      topic_id = offchainTopic.id;
     } catch (err) {
       return next(err);
     }
   } else {
     if ((community || chain).topics?.length) {
       return next(Error('Must pass a topic_name string and/or a numeric topic_id'));
+    }
+  }
+
+  if (chain && chain.type === 'token') {
+    // skip check for admins
+    const isAdmin = await models.Role.findAll({
+      where: {
+        address_id: author.id,
+        chain_id: chain.id,
+        permission: ['admin'],
+      },
+    });
+    if (!req.user.isAdmin && isAdmin.length === 0) {
+      try {
+        const threshold = (await models.OffchainTopic.findOne({ where: { id: topic_id } })).token_threshold;
+        const tokenBalance = await tokenBalanceCache.getBalance(chain.id, req.body.address);
+
+        if (threshold && tokenBalance.lt(new BN(threshold))) return next(new Error(Errors.InsufficientTokenBalance));
+      } catch (e) {
+        log.error(`hasToken failed: ${e.message}`);
+        return next(new Error(Errors.CouldNotFetchTokenBalance));
+      }
     }
   }
 
@@ -233,8 +260,8 @@ const createThread = async (
         try {
           return models.Address.findOne({
             where: {
-              chain: mention[0],
-              address: mention[1],
+              chain: mention[0] || null,
+              address: mention[1] || null,
             },
             include: [ models.User, models.Role ]
           });

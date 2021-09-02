@@ -12,6 +12,7 @@ import { modelFromServer as modelReactionFromServer } from 'controllers/server/r
 import { updateLastVisited } from '../app/login';
 
 // tslint:disable: object-literal-key-quotes
+/* eslint-disable no-shadow */
 
 export enum CommentParent {
   Proposal = 'proposal',
@@ -66,23 +67,42 @@ export const modelFromServer = (comment) => {
     // no proposal
   }
 
-  return new OffchainComment({
-    chain: comment.chain,
-    author: comment?.Address?.address || comment.author,
-    text: decodeURIComponent(comment.text),
-    plaintext: comment.plaintext,
-    versionHistory,
-    attachments,
-    proposal,
-    id: comment.id,
-    createdAt: moment(comment.created_at),
-    childComments: comment.child_comments,
-    rootProposal: comment.root_id,
-    parentComment: comment.parent_id,
-    community: comment.community,
-    authorChain: comment?.Address?.chain || comment.authorChain,
-    lastEdited,
-  });
+  const commentParams = (comment.deleted_at?.length > 0)
+    ? {
+      chain: comment.chain,
+      author: comment?.Address?.address || comment.author,
+      text: '[deleted]',
+      plaintext: '[deleted]',
+      versionHistory: [],
+      attachments: [],
+      proposal,
+      id: comment.id,
+      createdAt: moment(comment.created_at),
+      rootProposal: comment.root_id,
+      parentComment: Number(comment.parent_id) || null,
+      community: comment.community,
+      authorChain: comment?.Address?.chain || comment.authorChain,
+      lastEdited,
+      deleted: true,
+    } : {
+      chain: comment.chain,
+      author: comment?.Address?.address || comment.author,
+      text: decodeURIComponent(comment.text),
+      plaintext: comment.plaintext,
+      versionHistory,
+      attachments,
+      proposal,
+      id: comment.id,
+      createdAt: moment(comment.created_at),
+      rootProposal: comment.root_id,
+      parentComment: Number(comment.parent_id) || null,
+      community: comment.community,
+      authorChain: comment?.Address?.chain || comment.authorChain,
+      lastEdited,
+      deleted: false,
+    };
+
+  return new OffchainComment(commentParams);
 };
 
 class CommentsController {
@@ -153,16 +173,13 @@ class CommentsController {
         'jwt': app.user.jwt,
       });
       const { result } = res;
-      this._store.add(modelFromServer(result));
+      const newComment = modelFromServer(result);
+      this._store.add(newComment);
       const activeEntity = app.activeCommunityId() ? app.community : app.chain;
       updateLastVisited(app.activeCommunityId()
         ? (activeEntity.meta as CommunityInfo)
         : (activeEntity.meta as NodeInfo).chain, true);
-      // update childComments of parent, if necessary
-      if (result.parent_id) {
-        const parent = this._store.getById(+result.parent_id);
-        parent.childComments.push(result.id);
-      }
+      return newComment;
     } catch (err) {
       console.log('Failed to create comment');
       throw new Error((err.responseJSON && err.responseJSON.error)
@@ -212,7 +229,18 @@ class CommentsController {
         comment_id: comment.id,
       }).then((result) => {
         const existing = this._store.getById(comment.id);
+        const revisedComment : any = Object.assign(
+          existing,
+          {
+            deleted: true,
+            text: '[deleted]',
+            plaintext: '[deleted]',
+            versionHistory: []
+          }
+        );
+        const softDeletion = new OffchainComment(revisedComment);
         this._store.remove(existing);
+        this._store.add(softDeletion);
         resolve(result);
       }).catch((e) => {
         console.error(e);
@@ -223,7 +251,7 @@ class CommentsController {
   }
 
   public async refresh(proposal, chainId: string, communityId: string) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise<void>(async (resolve, reject) => {
       try {
         // TODO: Change to GET /comments
         const response = await $.get(`${app.serverUrl()}/viewComments`, {

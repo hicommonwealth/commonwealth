@@ -1,11 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
 import Sequelize from 'sequelize';
-import lookupCommunityIsVisibleToUser from 'server/util/lookupCommunityIsVisibleToUser';
+import { DB } from '../database';
+import { ChainInstance } from '../models/chain';
+import { OffchainCommunityInstance } from '../models/offchain_community';
 const { Op } = Sequelize;
 
 const DEFAULT_SEARCH_LIMIT = 100;
 
-const getCommunitiesAndChains = async (models, req: Request, res: Response, next: NextFunction) => {
+const getCommunitiesAndChains = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const { user } = req;
   const { searchTerm, limit } = req.query;
   const params = {
@@ -14,12 +16,13 @@ const getCommunitiesAndChains = async (models, req: Request, res: Response, next
   if (searchTerm) {
     params['where'] = { name: { [Op.iLike]: `%${searchTerm}%` } };
   }
-  const chains = await models.Chain.findAll(params);
+  const chains: (ChainInstance | OffchainCommunityInstance)[] = await models.Chain.findAll(params);
   const communities = await models.OffchainCommunity.findAll(params);
   let userAddressIds;
   let userRoles;
   if (user) {
-    userAddressIds = await user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
+    const addresses = await user.getAddresses();
+    userAddressIds = addresses.filter((addr) => !!addr.verified).map((addr) => addr.id);
     userRoles = await models.Role.findAll({
       where: {
         address_id: userAddressIds,

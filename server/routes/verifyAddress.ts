@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../../shared/logging';
+import { DB } from '../database';
 import { DynamicTemplate } from '../../shared/types';
 const sgMail = require('@sendgrid/mail');
 const log = factory.getLogger(formatFilename(__filename));
@@ -15,7 +16,7 @@ export const Errors = {
   NoEmail: 'No email to alert',
 };
 
-const verifyAddress = async (models, req: Request, res: Response, next: NextFunction) => {
+const verifyAddress = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   // Verify that a linked address is actually owned by its supposed user.
   if (!req.body.address) {
     return next(new Error(Errors.NoAddress));

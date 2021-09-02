@@ -1,8 +1,10 @@
 import { StorageModule, ChainBase, ProposalModule, ChainNetwork } from 'models';
 import { ProposalStore } from 'stores';
+import { AaveTypes, CompoundTypes, MolochTypes } from '@commonwealth/chain-events';
 import app from './state';
 import ThreadsController from './controllers/server/threads';
 
+// eslint-disable-next-line no-shadow
 export enum ProposalType {
   SubstrateDemocracyReferendum = 'referendum',
   SubstrateDemocracyProposal = 'democracyproposal',
@@ -14,7 +16,9 @@ export enum ProposalType {
   OffchainThread = 'discussion',
   CosmosProposal = 'cosmosproposal',
   MolochProposal = 'molochproposal',
-  MarlinProposal = 'marlinproposal',
+  CompoundProposal = 'compoundproposal',
+  AaveProposal = 'aaveproposal',
+  SputnikProposal = 'sputnikproposal',
 }
 
 export const proposalSlugToClass = () => {
@@ -41,11 +45,17 @@ export const proposalSlugToClass = () => {
   if (app.chain.network === ChainNetwork.Kusama || app.chain.network === ChainNetwork.Polkadot) {
     mmap.set('technicalcommitteemotion', (app.chain as any).technicalCommittee);
   }
-  if (app.chain.network === ChainNetwork.Moloch) {
+  if (MolochTypes.EventChains.find((c) => c === app.chain.network)) {
     mmap.set('molochproposal', (app.chain as any).governance);
   }
-  if (app.chain.network === ChainNetwork.Marlin) {
-    mmap.set('marlinproposal', (app.chain as any).governance);
+  if (CompoundTypes.EventChains.find((c) => c === app.chain.network)) {
+    mmap.set('compoundproposal', (app.chain as any).governance);
+  }
+  if (AaveTypes.EventChains.find((c) => c === app.chain.network)) {
+    mmap.set('aaveproposal', (app.chain as any).governance);
+  }
+  if (app.chain.network === ChainNetwork.Sputnik) {
+    mmap.set('sputnikproposal', (app.chain as any).dao);
   }
   return mmap;
 };
@@ -68,9 +78,11 @@ export const proposalSlugToFriendlyName = new Map<string, string>([
   ['treasuryproposal', 'Treasury Proposal'],
   ['treasurytip', 'Treasury Tip'],
   ['discussion', 'Discussion Thread'],
-  ['marlinproposal', 'Proposal'],
+  ['compoundproposal', 'Proposal'],
   ['cosmosproposal', 'Proposal'],
-  ['molochproposal', 'Proposal']
+  ['molochproposal', 'Proposal'],
+  ['aaveproposal', 'Proposal'],
+  ['sputnikproposal', 'Proposal'],
 ]);
 
 export const idToProposal = (slug, id) => {

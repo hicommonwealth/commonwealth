@@ -4,9 +4,35 @@ import _ from 'lodash';
 import { TopicStore } from 'stores';
 import { OffchainTopic } from 'models';
 import app from 'state';
+import BN from 'bn.js';
 
 const modelFromServer = (topic) => {
-  return new OffchainTopic(topic.name, topic.id, topic.description, topic.telegram, topic.community_id, topic.chain_id);
+  if (topic.token_threshold !== null) {
+    return new OffchainTopic(
+      topic.name,
+      topic.id,
+      topic.description,
+      topic.telegram,
+      topic.community_id,
+      topic.chain_id,
+      topic.featured_in_sidebar,
+      topic.featured_in_new_post,
+      topic.default_offchain_template,
+      new BN(topic.token_threshold)
+    );
+  } else {
+    return new OffchainTopic(
+      topic.name,
+      topic.id,
+      topic.description,
+      topic.telegram,
+      topic.community_id,
+      topic.chain_id,
+      topic.featured_in_sidebar,
+      topic.featured_in_new_post,
+      topic.default_offchain_template
+    );
+  }
 };
 
 class TopicsController {
@@ -29,9 +55,12 @@ class TopicsController {
         'name': topic.name,
         'description': topic.description,
         'telegram': topic.telegram,
+        'featured_in_sidebar': topic.featuredInSidebar,
+        'featured_in_new_post': topic.featuredInNewPost,
+        'default_offchain_template': topic.defaultOffchainTemplate,
         'featured_order': featured_order,
         'address': app.user.activeAccount.address,
-        'jwt': app.user.jwt
+        'jwt': app.user.jwt,
       });
       const result = modelFromServer(response.result);
       if (this._store.getById(result.id)) {
@@ -39,6 +68,22 @@ class TopicsController {
       }
       this._store.add(result);
       return result;
+    } catch (err) {
+      console.log('Failed to edit topic');
+      throw new Error((err.responseJSON && err.responseJSON.error)
+        ? err.responseJSON.error
+        : 'Failed to edit topic');
+    }
+  }
+
+  public async setTopicThreshold(topic: OffchainTopic, token_threshold: string) {
+    try {
+      const response = await $.post(`${app.serverUrl()}/setTopicThreshold`, {
+        'topic_id': topic.id,
+        'token_threshold': token_threshold,
+        'jwt': app.user.jwt
+      });
+      return response.status;
     } catch (err) {
       console.log('Failed to edit topic');
       throw new Error((err.responseJSON && err.responseJSON.error)
@@ -70,7 +115,15 @@ class TopicsController {
     }
   }
 
-  public async add(name: string, description: string, telegram: string) {
+  public async add(
+    name: string,
+    description: string,
+    telegram: string,
+    featuredInSidebar: boolean,
+    featuredInNewPost: boolean,
+    tokenThreshold: string = '0',
+    defaultOffchainTemplate: string,
+  ) {
     try {
       const chainOrCommObj = (app.activeChainId())
         ? { 'chain': app.activeChainId() }
@@ -81,7 +134,11 @@ class TopicsController {
         'name': name,
         'description': description,
         'telegram': telegram,
+        'featured_in_sidebar': featuredInSidebar,
+        'featured_in_new_post': featuredInNewPost,
+        'default_offchain_template': defaultOffchainTemplate,
         'jwt': app.user.jwt,
+        'token_threshold': tokenThreshold,
       });
       const result = modelFromServer(response.result);
       if (this._store.getById(result.id)) {

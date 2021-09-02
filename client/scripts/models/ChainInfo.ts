@@ -19,8 +19,10 @@ class ChainInfo {
   public telegram: string;
   public github: string;
   public stagesEnabled: boolean;
-  public additionalStages: string;
+  public customStages: string;
   public customDomain: string;
+  public snapshot: string;
+  public terms: string;
   public readonly blockExplorerIds: { [id: string]: string };
   public readonly collapsedOnHomepage: boolean;
   public readonly featuredTopics: string[];
@@ -30,13 +32,14 @@ class ChainInfo {
   public members: RoleInfo[];
   public type: string;
   public readonly ss58Prefix: string;
+  public decimals: number;
   public substrateSpec: RegisteredTypes;
 
   constructor({
     id, network, symbol, name, iconUrl, description, website, discord, element, telegram, github,
-    stagesEnabled, additionalStages,
-    customDomain, blockExplorerIds, collapsedOnHomepage, featuredTopics, topics, adminsAndMods,
-    base, ss58_prefix, type, substrateSpec
+    stagesEnabled, customStages,
+    customDomain, snapshot, terms, blockExplorerIds, collapsedOnHomepage, featuredTopics, topics, adminsAndMods,
+    base, ss58_prefix, type, decimals, substrateSpec
   }) {
     this.id = id;
     this.network = network;
@@ -51,8 +54,11 @@ class ChainInfo {
     this.telegram = telegram;
     this.github = github;
     this.stagesEnabled = stagesEnabled;
-    this.additionalStages = additionalStages;
+    this.customStages = customStages;
     this.customDomain = customDomain;
+    this.snapshot = snapshot;
+    this.terms = terms;
+    this.snapshot = snapshot;
     this.blockExplorerIds = blockExplorerIds;
     this.collapsedOnHomepage = collapsedOnHomepage;
     this.featuredTopics = featuredTopics || [];
@@ -60,6 +66,7 @@ class ChainInfo {
     this.adminsAndMods = adminsAndMods || [];
     this.type = type;
     this.ss58Prefix = ss58_prefix;
+    this.decimals = decimals;
     this.substrateSpec = substrateSpec;
   }
 
@@ -76,8 +83,10 @@ class ChainInfo {
     telegram,
     github,
     stagesEnabled,
-    additionalStages,
+    customStages,
     customDomain,
+    snapshot,
+    terms,
     blockExplorerIds,
     collapsed_on_homepage,
     featured_topics,
@@ -86,6 +95,7 @@ class ChainInfo {
     base,
     ss58_prefix,
     type,
+    decimals,
     substrate_spec,
   }) {
     let blockExplorerIdsParsed;
@@ -108,8 +118,10 @@ class ChainInfo {
       telegram,
       github,
       stagesEnabled,
-      additionalStages,
+      customStages,
       customDomain,
+      snapshot,
+      terms,
       blockExplorerIds: blockExplorerIdsParsed,
       collapsedOnHomepage: collapsed_on_homepage,
       featuredTopics: featured_topics,
@@ -118,6 +130,7 @@ class ChainInfo {
       base,
       ss58_prefix,
       type,
+      decimals: parseInt(decimals, 10),
       substrateSpec: substrate_spec,
     });
   }
@@ -172,7 +185,7 @@ class ChainInfo {
   // TODO: change to accept an object
   public async updateChainData({
     name, description, website, discord, element, telegram,
-    github, stagesEnabled, additionalStages, customDomain
+    github, stagesEnabled, customStages, customDomain, terms, snapshot,
   }) {
     // TODO: Change to PUT /chain
     const r = await $.post(`${app.serverUrl()}/updateChain`, {
@@ -185,8 +198,10 @@ class ChainInfo {
       'telegram': telegram,
       'github': github,
       'stagesEnabled': stagesEnabled,
-      'additionalStages': additionalStages,
+      'customStages': customStages,
       'customDomain': customDomain,
+      'snapshot': snapshot,
+      'terms': terms,
       'jwt': app.user.jwt,
     });
     const updatedChain: ChainInfo = r.result;
@@ -198,8 +213,10 @@ class ChainInfo {
     this.telegram = updatedChain.telegram;
     this.github = updatedChain.github;
     this.stagesEnabled = updatedChain.stagesEnabled;
-    this.additionalStages = updatedChain.additionalStages;
+    this.customStages = updatedChain.customStages;
     this.customDomain = updatedChain.customDomain;
+    this.snapshot = updatedChain.snapshot;
+    this.terms = updatedChain.terms;
   }
 
   public addFeaturedTopic(topic: string) {

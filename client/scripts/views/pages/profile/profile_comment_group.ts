@@ -1,6 +1,7 @@
 import m from 'mithril';
 import _ from 'lodash';
 
+import app from 'state';
 import { link } from 'helpers';
 import { OffchainThread, OffchainComment, AddressInfo, Account } from 'models';
 
@@ -20,6 +21,10 @@ const ProfileCommentGroup : m.Component<IProfileCommentGroupAttrs> = {
     if (!proposal) return;
 
     const { slug, identifier } = proposal;
+
+    // hide rows from communities that don't match
+    if (app.isCustomDomain() && (proposal.chain || proposal.community) !== app.customDomainId()) return;
+
     return m('.ProfileCommentGroup', [
       m('.summary', [
         m(User, {
@@ -38,7 +43,7 @@ const ProfileCommentGroup : m.Component<IProfileCommentGroupAttrs> = {
           ),
           ' in ',
           link('a', `/${proposal.chain || proposal.community}`,
-            ` ${ proposal.chain || proposal.community }`),
+            ` ${proposal.chain || proposal.community}`),
         ],
         comments[0] && comments[0].createdAt && [
           m.trust(' &middot; '),

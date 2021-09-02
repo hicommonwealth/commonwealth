@@ -1,35 +1,32 @@
 import * as Sequelize from 'sequelize';
+import { Model, DataTypes } from 'sequelize';
+import { ModelStatic } from './types';
 
 export interface EdgewareLockdropEverythingAttributes {
-  id?: number;
   createdAt: Date;
+  id?: number;
   data?: string;
-  created_at?: Date;
   updated_at?: Date;
 }
 
 export interface EdgewareLockdropEverythingInstance
-extends Sequelize.Instance<EdgewareLockdropEverythingAttributes>, EdgewareLockdropEverythingAttributes {
+extends Model<EdgewareLockdropEverythingAttributes>, EdgewareLockdropEverythingAttributes {}
 
-}
-
-export interface EdgewareLockdropEverythingModel
-extends Sequelize.Model<EdgewareLockdropEverythingInstance, EdgewareLockdropEverythingAttributes> {
-
-}
+export type EdgewareLockdropEverythingModelStatic = ModelStatic<EdgewareLockdropEverythingInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): EdgewareLockdropEverythingModel => {
-  const EdgewareLockdropEverything = sequelize.define<
-    EdgewareLockdropEverythingInstance, EdgewareLockdropEverythingAttributes
-  >('EdgewareLockdropEverything', {
+  dataTypes: typeof DataTypes,
+): EdgewareLockdropEverythingModelStatic => {
+  const EdgewareLockdropEverything = <EdgewareLockdropEverythingModelStatic>sequelize.define('EdgewareLockdropEverything', {
     id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     createdAt: { type: dataTypes.DATE, allowNull: false },
     data: { type: dataTypes.TEXT, allowNull: true },
   }, {
+    tableName: 'EdgewareLockdropEverythings',
     underscored: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
     timestamps: true,
   });
 

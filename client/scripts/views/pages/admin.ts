@@ -86,6 +86,7 @@ const ChainManager: m.Component<IChainManagerAttrs, IChainManagerState> = {
             symbol: chain.symbol,
             network: chain.network,
             base: chain.base,
+            decimals: chain.decimals,
             node_url: url,
             auth: true,
             jwt: app.user.jwt,

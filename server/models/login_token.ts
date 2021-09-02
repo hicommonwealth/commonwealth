@@ -1,15 +1,18 @@
 import * as Sequelize from 'sequelize';
-
+import { Model, DataTypes } from 'sequelize';
 import crypto from 'crypto';
 import { LOGIN_TOKEN_EXPIRES_IN } from '../config';
 import { SocialAccountAttributes } from './social_account';
+import { ModelStatic } from './types';
 
 export interface LoginTokenAttributes {
-  id?: number;
   token: string;
-  email?: string;
   expires: Date;
+  id?: number;
+  email?: string;
   redirect_path?: string;
+  domain?: string;
+  social_account?: number;
   used?: Date;
 
   created_at?: Date;
@@ -19,28 +22,35 @@ export interface LoginTokenAttributes {
   SocialAccounts?: SocialAccountAttributes[];
 }
 
-export interface LoginTokenInstance extends Sequelize.Instance<LoginTokenAttributes>, LoginTokenAttributes {
+export interface LoginTokenCreationAttributes extends  LoginTokenAttributes {
+  createForEmail?: (email: string, path?: string) => Promise<LoginTokenInstance>;
+  createForOAuth?: (domain: string, social_account?: number) => Promise<LoginTokenInstance>;
+}
+
+export interface LoginTokenInstance extends Model<LoginTokenAttributes>, LoginTokenAttributes {
   // no mixins used yet
 }
 
-export interface LoginTokenModel extends Sequelize.Model<LoginTokenInstance, LoginTokenAttributes> {
-  createForEmail?: (email: string, path?: string) => Promise<LoginTokenInstance>;
-}
+export type LoginTokenModelStatic = ModelStatic<LoginTokenInstance> & LoginTokenCreationAttributes
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): LoginTokenModel => {
-  const LoginToken: LoginTokenModel = sequelize.define<LoginTokenInstance, LoginTokenAttributes>('LoginToken', {
+  dataTypes: typeof DataTypes,
+): LoginTokenModelStatic => {
+  const LoginToken = <LoginTokenModelStatic>sequelize.define('LoginToken', {
     id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     token: { type: dataTypes.STRING, allowNull: false },
     email: { type: dataTypes.STRING, allowNull: true },
     expires: { type: dataTypes.DATE, allowNull: false },
     redirect_path: { type: dataTypes.STRING, allowNull: true },
+    domain: { type: dataTypes.STRING, allowNull: true },
+    social_account: { type: dataTypes.INTEGER, allowNull: true },
     used: { type: dataTypes.DATE, allowNull: true },
-    created_at: { type: dataTypes.DATE, allowNull: false },
-    updated_at: { type: dataTypes.DATE, allowNull: false },
   }, {
+    timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
+    tableName: 'LoginTokens',
     underscored: true,
     indexes: [
       { fields: ['token', 'email'] },
@@ -51,6 +61,17 @@ export default (
     const token = crypto.randomBytes(24).toString('hex');
     const expires = new Date(+(new Date()) + LOGIN_TOKEN_EXPIRES_IN * 60 * 1000);
     const result = await LoginToken.create({ email, expires, token, redirect_path: path });
+    return result;
+  };
+
+  // This creates a LoginToken that is tied to no particular email or social account.
+  // It is up to the implementer to store the ID of the generated LoginToken on a SocialAccount
+  // for it to be looked up later.
+  LoginToken.createForOAuth = async (domain: string, social_account?: number)
+  : Promise<LoginTokenInstance> => {
+    const token = crypto.randomBytes(24).toString('hex');
+    const expires = new Date(+(new Date()) + LOGIN_TOKEN_EXPIRES_IN * 60 * 1000);
+    const result = await LoginToken.create({ email: '', expires, token, domain, social_account });
     return result;
   };
 

@@ -17,6 +17,7 @@ import MolochAPI from './api';
 import MolochMember from './member';
 import Moloch from './adapter';
 import MolochChain from './chain';
+import { attachSigner } from '../contractApi';
 
 export default class MolochGovernance extends ProposalModule<
   MolochAPI,
@@ -85,12 +86,12 @@ export default class MolochGovernance extends ProposalModule<
     } else {
       console.log('Fetching moloch proposals from chain.');
       const fetcher = new MolochEvents.StorageFetcher(
-        api.Contract,
+        api.Contract as any,
         1,
         new EthDater((this.app.chain as Moloch).chain.api)
       );
-      const subscriber = new MolochEvents.Subscriber(api.Contract, this.app.chain.id);
-      const processor = new MolochEvents.Processor(api.Contract, 1);
+      const subscriber = new MolochEvents.Subscriber(api.Contract as any, this.app.chain.id);
+      const processor = new MolochEvents.Processor(api.Contract as any, 1);
       await this.app.chain.chainEntities.fetchEntities(this.app.chain.id, () => fetcher.fetch());
       await this.app.chain.chainEntities.subscribeEntities(
         this.app.chain.id,
@@ -118,7 +119,7 @@ export default class MolochGovernance extends ProposalModule<
     sharesRequested: BN,
     details: string,
   ) {
-    await this.api.attachSigner(this.app.wallets, submitter.address);
+    await attachSigner(this.app.wallets, submitter.address, this.api.Contract);
     if (!(await this._Members.isDelegate(submitter.address))) {
       throw new Error('sender must be valid delegate');
     }
@@ -135,7 +136,7 @@ export default class MolochGovernance extends ProposalModule<
 
     // first, we must approve xfer of proposal deposit tokens from the submitter
     const approvalTxReceipt = await submitter.approveTokenTx(
-      new ERC20Token(this._api.tokenContract.address, this.proposalDeposit),
+      new ERC20Token(this._api.token.address, this.proposalDeposit),
       this._api.contractAddress,
     );
     if (approvalTxReceipt.status !== 1) {

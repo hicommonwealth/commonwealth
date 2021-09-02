@@ -1,14 +1,16 @@
 import * as Sequelize from 'sequelize';
+import { Model, DataTypes } from 'sequelize';
+import { ModelStatic } from './types';
 
 import { OffchainCommunityAttributes } from './offchain_community';
 import { ChainAttributes } from './chain';
 
 export interface InviteCodeAttributes {
+  creator_id: number;
   id?: string;
   community_id?: string;
   community_name?: string;
   chain_id?: string;
-  creator_id: number;
   invited_email?: string;
   used?: boolean;
   created_at?: Date;
@@ -18,20 +20,15 @@ export interface InviteCodeAttributes {
 }
 
 export interface InviteCodeInstance
-extends Sequelize.Instance<InviteCodeAttributes>, InviteCodeAttributes {
+extends Model<InviteCodeAttributes>, InviteCodeAttributes {}
 
-}
-
-export interface InviteCodeModel
-extends Sequelize.Model<InviteCodeInstance, InviteCodeAttributes> {
-
-}
+export type InviteCodeModelStatic = ModelStatic<InviteCodeInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): InviteCodeModel => {
-  const InviteCode = sequelize.define<InviteCodeInstance, InviteCodeAttributes>('InviteCode', {
+  dataTypes: typeof DataTypes,
+): InviteCodeModelStatic => {
+  const InviteCode = <InviteCodeModelStatic>sequelize.define('InviteCode', {
     id: { type: dataTypes.STRING, primaryKey: true },
     community_id: { type: dataTypes.STRING, allowNull: true },
     chain_id: { type: dataTypes.STRING, allowNull: true },
@@ -40,7 +37,11 @@ export default (
     invited_email: { type: dataTypes.STRING, allowNull: true, defaultValue: null },
     used: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
   }, {
+    tableName: 'InviteCodes',
     underscored: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
+    deletedAt: 'deleted_at',
     paranoid: true,
     indexes: [
       { fields: ['id'], unique: true },

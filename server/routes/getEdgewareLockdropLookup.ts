@@ -4,6 +4,7 @@ import _ from 'lodash';
 import { Request, Response, NextFunction } from 'express';
 import { INFURA_API_KEY } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
+import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -90,7 +91,6 @@ export const getSignalsForAddress = async (userAddress, lockdropContractAddress,
   return results;
 };
 
-
 const fetchLocks = async (network = 'mainnet', address, contract) => {
   const web3 = setupWeb3Provider(network);
   const results = await getLocksForAddress(address, contract, web3);
@@ -103,7 +103,7 @@ const fetchSignals = async (network = 'mainnet', address, contract) => {
   return results;
 };
 
-export default async (models, req: Request, res: Response, next: NextFunction) => {
+export default async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const address = req.query.address;
   const network = req.query.network || 'mainnet';
 
@@ -116,11 +116,11 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
     ? [MAINNET_LOCKDROP_ORIG, MAINNET_LOCKDROP]
     : [ROPSTEN_LOCKDROP];
 
-  const locks = await Promise.all(contracts.map(async c => {
+  const locks = await Promise.all(contracts.map(async (c) => {
     // eslint-disable-next-line no-return-await
     return await fetchLocks(network, address, c);
   }));
-  const signals = await Promise.all(contracts.map(async c => {
+  const signals = await Promise.all(contracts.map(async (c) => {
     // eslint-disable-next-line no-return-await
     return await fetchSignals(network, address, c);
   }));
