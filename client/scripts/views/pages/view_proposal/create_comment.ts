@@ -44,6 +44,9 @@ const CreateComment: m.Component<{
       rootProposal
     } = vnode.attrs;
     let { parentComment } = vnode.attrs;
+    let disabled = getSetGlobalEditingStatus(GlobalStatus.Get)
+      || vnode.state.quillEditorState?.editor?.editor?.isBlank();
+
     const author = app.user.activeAccount;
     const parentType = (parentComment || proposalPageState.parentCommentId)
       ? CommentParent.Comment
@@ -125,13 +128,10 @@ const CreateComment: m.Component<{
       proposalPageState.parentCommentId = null;
     };
 
-    const activeTopicName = rootProposal instanceof OffchainThread ? rootProposal.topic.name : null;
-    const tokenPostingThreshold = app.topics.getByName(
-      activeTopicName,
-      app.activeId()
-    )?.tokenThreshold;
+    const activeTopicName = rootProposal instanceof OffchainThread ? rootProposal?.topic?.name : null;
 
-    const isAdmin = app.user.isSiteAdmin || app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
+    const isAdmin = app.user.isSiteAdmin
+      || app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
 
     let parentScopedClass: string = 'new-thread-child';
     let parentAuthor: Account<any>;
@@ -143,6 +143,23 @@ const CreateComment: m.Component<{
     }
 
     const { error, sendingComment, uploadsInProgress } = vnode.state;
+    disabled = getSetGlobalEditingStatus(GlobalStatus.Get)
+      || vnode.state.quillEditorState?.editor?.editor?.isBlank()
+      || sendingComment
+      || uploadsInProgress;
+
+    // token balance check if needed
+    let tokenPostingThreshold = null;
+    if (!app.community && (app.chain as Token)?.isToken) {
+      const tokenBalance = (app.chain as Token).tokenBalance;
+      tokenPostingThreshold = app.topics.getByName(
+        activeTopicName,
+        app.activeId()
+      )?.tokenThreshold;
+      disabled = disabled
+        || ((!app.isAdapterReady) && !isAdmin && tokenPostingThreshold && tokenPostingThreshold.gt(tokenBalance));
+    }
+
     return m('.CreateComment', {
       class: parentScopedClass
     }, [
@@ -207,17 +224,7 @@ const CreateComment: m.Component<{
                 intent: 'primary',
                 type: 'submit',
                 compact: true,
-                disabled: (
-                  getSetGlobalEditingStatus(GlobalStatus.Get)
-                  || vnode.state.quillEditorState?.editor?.editor?.isBlank()
-                  || sendingComment
-                  || uploadsInProgress > 0
-                  || (app.activeChainId() && (app.chain as Token).isToken
-                    && ((!app.isAdapterReady)
-                      || (!isAdmin
-                        && tokenPostingThreshold
-                        && tokenPostingThreshold.gt((app.chain as Token).tokenBalance))))
-                ),
+                disabled,
                 rounded: true,
                 onclick: submitComment,
                 label: (uploadsInProgress > 0)
