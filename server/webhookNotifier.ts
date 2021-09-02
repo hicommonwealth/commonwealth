@@ -118,7 +118,7 @@ const send = async (models, content: WebhookContent) => {
   });
   const chainOrCommwebhookUrls = [];
   chainOrCommWebhooks.forEach((wh) => {
-    if(validURL(wh.url)){
+    if (validURL(wh.url)){
       chainOrCommwebhookUrls.push(wh.url);
     }
   });
