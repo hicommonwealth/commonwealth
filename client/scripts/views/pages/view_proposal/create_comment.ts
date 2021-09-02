@@ -156,11 +156,8 @@ const CreateComment: m.Component<{
         activeTopicName,
         app.activeId()
       )?.tokenThreshold;
-      disabled = getSetGlobalEditingStatus(GlobalStatus.Get)
-      || vnode.state.quillEditorState?.editor?.editor?.isBlank()
-      || sendingComment
-      || uploadsInProgress
-      || ((!app.isAdapterReady) && !isAdmin && tokenPostingThreshold && tokenPostingThreshold.gt(tokenBalance));
+      disabled = disabled
+        || ((!app.isAdapterReady) && !isAdmin && tokenPostingThreshold && tokenPostingThreshold.gt(tokenBalance));
     }
 
     return m('.CreateComment', {
