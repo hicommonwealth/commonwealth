@@ -437,7 +437,7 @@ const ProposalComment: m.Component<{
       + `${proposal.identifier}-${slugify(proposal.title)}?comment=${comment.id}`;
 
     const commentReplyCount = app.comments.getByProposal(proposal)
-      .filter((c) => c.parentComment === comment.id)
+      .filter((c) => c.parentComment === comment.id && !c.deleted)
       .length;
     return m('.ProposalComment', {
       class: `${parentType}-child comment-${comment.id}`,
