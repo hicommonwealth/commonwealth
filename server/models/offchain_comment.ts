@@ -15,7 +15,6 @@ export interface OffchainCommentAttributes {
   id?: number;
   chain?: string;
   parent_id?: string;
-  child_comments?: number[];
   community?: string;
   version_history?: string[];
   created_at?: Date;
@@ -45,7 +44,6 @@ export default (
     chain: { type: dataTypes.STRING, allowNull: true },
     root_id: { type: dataTypes.STRING, allowNull: false },
     parent_id: { type: dataTypes.STRING, allowNull: true },
-    child_comments: { type: dataTypes.ARRAY(dataTypes.INTEGER), allowNull: false, defaultValue: [] },
     address_id: { type: dataTypes.INTEGER, allowNull: false },
     text: { type: dataTypes.TEXT, allowNull: false },
     plaintext: { type: dataTypes.TEXT, allowNull: true },

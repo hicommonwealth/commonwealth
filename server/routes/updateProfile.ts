@@ -26,7 +26,6 @@ export const Errors = {
 const updateProfile = async (
   models: DB, identityFetchCache: IdentityFetchCache, req: Request, res: Response, next: NextFunction
 ) => {
-
   if (!req.body.chain || !req.body.address || !req.body.data) {
     return next(new Error(Errors.MissingParams));
   }
@@ -74,7 +73,6 @@ const updateProfile = async (
   const chains = await models.Chain.findAll({
     where: { base: chain.base }
   });
-
 
   const addressesInSameChainbase = await models.Address.findAll({
     where: {

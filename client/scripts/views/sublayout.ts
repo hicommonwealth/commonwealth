@@ -57,8 +57,8 @@ const Sublayout: m.Component<{
       (!app.activeId() && !app.isCustomDomain() && (m.route.get() === '/' || m.route.get().startsWith('/?'))) ? [
         m('h3', 'Commonwealth')
       ] : chain ? [
-        m('.ChainIcon',[
-          link('a', (!app.isCustomDomain() ? `/${app.activeId()}` : '/' ), [
+        m('.ChainIcon', [
+          link('a', (!app.isCustomDomain() ? `/${app.activeId()}` : '/'), [
             m(ChainIcon, { size: ICON_SIZE, chain })
           ])
         ]),
@@ -69,7 +69,7 @@ const Sublayout: m.Component<{
         ]),
       ] : community ? [
         m('.ChainIcon', [
-          link('a', (!app.isCustomDomain() ? `/${app.activeId()}` : '/' ), [
+          link('a', (!app.isCustomDomain() ? `/${app.activeId()}` : '/'), [
             m(CommunityIcon, { size: ICON_SIZE, community })
           ])
         ]),
@@ -131,7 +131,7 @@ const Sublayout: m.Component<{
           ]),
           hero
             ? m('.sublayout-hero', hero)
-            : (app.isLoggedIn() && (app.chain as Token)?.isToken && !(app.chain as Token)?.hasToken)
+            : (app.isLoggedIn() && (app.chain as Token)?.isToken && !app.user.activeAccount)
               ? m('.sublayout-hero.token-banner', [
                 m('.token-banner-content', `Link an address that holds ${chain.symbol} to participate in governance.`),
               ]) : '',
@@ -164,6 +164,7 @@ const Sublayout: m.Component<{
               { text: 'Jobs', externalLink: 'https://angel.co/company/commonwealth-labs/jobs' },
               { text: 'Terms', redirectTo:  '/terms' },
               { text: 'Privacy', redirectTo: '/privacy' },
+              { text: 'Docs', redirectTo: 'https://docs.commonwealth.im' },
               { text: 'Discord', externalLink: 'https://discord.gg/ZFQCKUMP' },
               { text: 'Telegram', externalLink: 'https://t.me/HiCommonwealth' }
               // { text:  'Use Cases' },
