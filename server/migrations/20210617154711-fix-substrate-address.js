@@ -68,6 +68,8 @@ module.exports = {
           'DELETE FROM "OffchainProfiles" WHERE address_id=:id;',
           { replacements: { id: toReplace, }, transaction, logging: console.log },
         );
+
+        // TODO: use higher of the two roles
         await queryInterface.sequelize.query(
           'UPDATE "Roles" SET address_id=:address WHERE address_id=:id;',
           { replacements: { id: toReplace, address: replaceWith }, transaction, logging: console.log },
@@ -82,11 +84,13 @@ module.exports = {
           { replacements: { id: toReplace }, transaction, logging: console.log },
         );
 
+        // TODO: delete subscriptions
+
         if (threads[0] && threads[0].length) {
           const threadIds = threads[0].map((_) => _.id).join(', ');
           await queryInterface.sequelize.query(
-            `UPDATE "OffchainReactions" SET address_id=:address WHERE thread_id IN (${threadIds});`,
-            { replacements: { address: replaceWith, }, transaction, logging: console.log },
+            `DELETE "OffchainReactions" WHERE thread_id IN (${threadIds});`,
+            { transaction, logging: console.log },
           );
           await queryInterface.sequelize.query(
             `UPDATE "OffchainThreads" SET address_id=:address WHERE id IN (${threadIds});`,
@@ -97,8 +101,8 @@ module.exports = {
         if (comments[0] && comments[0].length) {
           const commentIds = comments[0].map((_) => _.id).join(', ');
           await queryInterface.sequelize.query(
-            `UPDATE "OffchainReactions" SET address_id=:address WHERE comment_id IN (${commentIds});`,
-            { replacements: { address: replaceWith, }, transaction, logging: console.log },
+            `DELETE "OffchainReactions" WHERE comment_id IN (${commentIds});`,
+            { transaction, logging: console.log },
           );
           await queryInterface.sequelize.query(
             `UPDATE "OffchainComments" SET address_id=:address WHERE id IN (${commentIds});`,
