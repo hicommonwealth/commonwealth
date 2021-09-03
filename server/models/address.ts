@@ -252,7 +252,6 @@ export default (
       // the account they registered with.
       // TODO: ensure osmosis works
       let bech32Prefix;
-      // chain.network = 'terra'; // TODO: used to test terra - change routing system then remove MAKE MIGRATION
       switch (chain.network) {
         case 'straightedge':
           bech32Prefix = 'str';
@@ -275,7 +274,7 @@ export default (
 
       if (generatedAddress === addressModel.address || generatedAddressWithCosmosPrefix === addressModel.address) {
         const generatedSignDoc = validationTokenToSignDoc(
-          'columbus-4' || chain.id, // TODO: used to test terra change routing system then remove
+          chain.id === 'terra' ? 'columbus-4' : chain.id,
           addressModel.verification_token.trim(),
           signed.fee,
           signed.memo,
