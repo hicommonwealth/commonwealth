@@ -3,11 +3,6 @@ import { EthereumCoin } from 'shared/adapters/chain/ethereum/types';
 
 type ProjectStatus = 'In Progress' | 'Successed' | 'Failed';
 
-export interface CMNUser {
-  balance: number;
-  address: string;
-}
-
 export class CMNProject {
   public readonly name: string;
   public readonly description: string;
@@ -69,30 +64,35 @@ export class CMNProject {
 
 export class CMNProjectProtocol {
   public readonly id: string;
-  public protocolFee: BN;
-  public feeTo: string;
   public projects: CMNProject[];
   public updated_at: Date;
+  public protocolFee: BN;
+  public feeTo: string;
+  public acceptedTokens: any[];
 
-  constructor(id, protocolFee, feeTo, projects) {
+  constructor(id, protocolFee, feeTo, projects, acceptedTokens) {
     this.protocolFee = protocolFee;
     this.feeTo = feeTo;
     this.id = id;
     this.projects = projects;
+    this.acceptedTokens = acceptedTokens;
     this.updated_at = new Date();
   }
 
-  public static fromJSON({ id, protocolFee, feeTo, projects }) {
-    return new CMNProjectProtocol(id, protocolFee, feeTo, projects);
+  public static fromJSON({ id, protocolFee, feeTo, projects, acceptedTokens }) {
+    return new CMNProjectProtocol(id, protocolFee, feeTo, projects, acceptedTokens);
   }
 
-  public setProjects(_projects: CMNProject[]) {
-    this.projects = _projects;
+  public set(protocolFee, feeTo, projects, acceptedTokens) {
+    this.protocolFee = protocolFee;
+    this.feeTo = feeTo;
+    this.projects = projects;
+    this.acceptedTokens = acceptedTokens;
     this.updated_at = new Date();
   }
 }
 
-export class CMNProjectMembers {
+export class CMNMembers {
   public readonly id: string;
   public backers: any;
   public curators: any;
@@ -106,10 +106,10 @@ export class CMNProjectMembers {
   }
 
   public static fromJSON({ id, backers, curators }) {
-    return new CMNProjectMembers(id, backers, curators);
+    return new CMNMembers(id, backers, curators);
   }
 
-  public setParticipants(backers: any, curators: any) {
+  public set(backers: any, curators: any) {
     this.backers = backers;
     this.curators = curators;
     this.updated_at = new Date();

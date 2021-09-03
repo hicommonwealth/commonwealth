@@ -1,9 +1,9 @@
 import { IApp } from 'state';
 
-import { ProjectFactory__factory as CMNProjectProtocolContract } from 'eth/types';
+// import { ProjectFactory__factory as CMNProjectProtocolContract } from 'eth/types';
 import EthereumChain from '../chain';
-import CMNProjectApi from './project/api';
-import CMNProjectProtocol from './project/protocol';
+// import CMNProjectProtocolApi from './project/api';
+import CMNProjectProtocol from './projectProtocol';
 
 export default class CMNAdapter {
   public chain: EthereumChain;
@@ -23,14 +23,7 @@ export default class CMNAdapter {
     this.chain = app.chain.chain as EthereumChain;
 
     this.project_protocol = new CMNProjectProtocol();
-    // init project functions
-    const projectApi = new CMNProjectApi(
-      CMNProjectProtocolContract.connect,
-      projectProtocolAddress,
-      this.chain.api.currentProvider as any
-    );
-    await projectApi.init();
-    await this.project_protocol.init(this.chain, projectApi);
+    await this.project_protocol.init(this.chain, projectProtocolAddress);
 
     this._initialized = true;
     console.log('Ethereum CMN-Protocol started.');

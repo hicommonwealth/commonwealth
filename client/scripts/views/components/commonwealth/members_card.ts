@@ -4,7 +4,7 @@ import m from 'mithril';
 import { utils } from 'ethers';
 import app from 'state';
 import { CMNProject } from 'models';
-
+import { protocolReady } from 'controllers/chain/ethereum/commonwealth/utils';
 export interface CWUser {
   balance: number;
   address: string;
@@ -21,13 +21,6 @@ const UserComp: m.Component<{user: CWUser}> = {
   }
 };
 
-const connectionReady = () => {
-  if (!app.chain) return false;
-  const project_protocol = (app.chain as any).project_protocol;
-  if (!project_protocol || !project_protocol.initialized || !project_protocol.memberStore) return false;
-  return true;
-};
-
 const MembersModule: m.Component<
   {
     project: CMNProject,
@@ -40,9 +33,9 @@ const MembersModule: m.Component<
   }
 > = {
   onupdate: async (vnode) => {
-    if (!connectionReady()) return;
+    if (!protocolReady()) return;
     const { project } = vnode.attrs;
-    const { backers, curators } = await (app.chain as any).project_protocol.syncMembers(
+    const { backers, curators } = await (app.chain as any).project_protocol.getMembers(
       project
     );
     vnode.state.backers = backers;

@@ -18,4 +18,4 @@ export { default as PersistentStore } from './PersistentStore';
 
 export { UpdateType, IHasId, ISerializable, IHasAddress } from './interfaces';
 
-export { CMNProjectStore, CMNProjectMembersStore } from './CMNProjectStore';
+export { CMNProjectStore, CMNMembersStore } from './CMNProjectStore';
