@@ -6,6 +6,7 @@ import { Button } from 'construct-ui';
 import { AddressInfo } from 'models';
 
 import app from 'state';
+import { navigateToSubpage } from 'app';
 import { formatCoin } from 'adapters/currency';
 import { idToProposal } from 'identifiers';
 import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
@@ -42,8 +43,7 @@ const LinkedProposalsEmbed: m.Component<{ proposal }> = {
       if (!(
         (proposal instanceof SubstrateDemocracyProposal || proposal instanceof SubstrateCollectiveProposal)
           && proposal.getReferendum()
-        ||
-          (proposal instanceof SubstrateDemocracyReferendum && proposal.preimage
+        ||          (proposal instanceof SubstrateDemocracyReferendum && proposal.preimage
            && proposal.getProposalOrMotion(proposal.preimage))
       )) return;
 
@@ -58,7 +58,7 @@ const LinkedProposalsEmbed: m.Component<{ proposal }> = {
               href: `/${app.activeChainId()}/proposal/referendum/${proposal.getReferendum().identifier}`,
               onclick: (e) => {
                 e.preventDefault();
-                m.route.set(`/${app.activeChainId()}/proposal/referendum/${proposal.getReferendum().identifier}`);
+                navigateToSubpage(`/proposal/referendum/${proposal.getReferendum().identifier}`);
               },
               intent: 'primary',
               label: 'Go to referendum',
@@ -77,7 +77,7 @@ const LinkedProposalsEmbed: m.Component<{ proposal }> = {
               href: `/${app.activeChainId()}/proposal/${proposal.getProposalOrMotion(proposal.preimage).slug}/${proposal.getProposalOrMotion(proposal.preimage).identifier}`,
               onclick: (e) => {
                 e.preventDefault();
-                m.route.set(`/${app.activeChainId()}/proposal/${proposal.getProposalOrMotion(proposal.preimage).slug}/${proposal.getProposalOrMotion(proposal.preimage).identifier}`);
+                navigateToSubpage(`/proposal/${proposal.getProposalOrMotion(proposal.preimage).slug}/${proposal.getProposalOrMotion(proposal.preimage).identifier}`);
               },
               intent: 'primary',
               label: 'Go to proposal',
@@ -115,7 +115,7 @@ const LinkedProposalsEmbed: m.Component<{ proposal }> = {
             href: `/${app.activeChainId()}/proposal/democracyproposal/${p.identifier}`,
             onclick: (e) => {
               e.preventDefault();
-              m.route.set(`/${app.activeChainId()}/proposal/democracyproposal/${p.identifier}`);
+              navigateToSubpage(`/proposal/democracyproposal/${p.identifier}`);
             },
             intent: 'primary',
             label: 'Go to democracy proposal',
@@ -135,7 +135,7 @@ const LinkedProposalsEmbed: m.Component<{ proposal }> = {
             href: `/${app.activeChainId()}/proposal/referendum/${r.identifier}`,
             onclick: (e) => {
               e.preventDefault();
-              m.route.set(`/${app.activeChainId()}/proposal/referendum/${r.identifier}`);
+              navigateToSubpage(`/proposal/referendum/${r.identifier}`);
             },
             intent: 'primary',
             label: 'Go to referendum',
@@ -155,7 +155,7 @@ const LinkedProposalsEmbed: m.Component<{ proposal }> = {
             href: `/${app.activeChainId()}/proposal/councilmotion/${mo.identifier}`,
             onclick: (e) => {
               e.preventDefault();
-              m.route.set(`/${app.activeChainId()}/proposal/councilmotion/${mo.identifier}`);
+              navigateToSubpage(`/proposal/councilmotion/${mo.identifier}`);
             },
             intent: 'primary',
             label: 'Go to motion',

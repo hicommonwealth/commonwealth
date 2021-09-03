@@ -52,16 +52,18 @@ const TokensChainsComponent: m.Component<IState, IState> = {
               { class: 'glide__track', 'data-glide-el': 'track' },
               m('ul', { class: 'glide__slides' }, [
                 vnode.attrs.chains.map(
-                  (chain: any) => {
+                  (chain: any, index: number) => {
                     return m(
                       'li',
                       {
+                        id:`card_${index}`,
                         class: 'glide__slide mt-4 pb-8',
+
                         onclick: (e) => {
                           e.preventDefault();
                           localStorage['home-scrollY'] = window.scrollY;
-                          m.route.set(`/${chain.id}`);
                         },
+
                       },
                       m(
                         'div',
@@ -74,6 +76,9 @@ const TokensChainsComponent: m.Component<IState, IState> = {
                             class: 'mx-auto mb-3 w-12 h-auto',
                             src: chain.img,
                             alt: '',
+                            onclick: () => {
+                              m.route.set(`/${chain.id}`);
+                            }
                           }),
                           m(
                             'h3',

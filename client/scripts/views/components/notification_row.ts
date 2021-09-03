@@ -5,15 +5,16 @@ import _ from 'lodash';
 import m from 'mithril';
 import moment from 'moment';
 import {
-  SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents, IEventLabel, chainSupportedBy,
-  // MarlinEvents
+  SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents, IEventLabel, chainSupportedBy, CompoundTypes, CompoundEvents, AaveTypes, AaveEvents,
+  // CompoundEvents
 } from '@commonwealth/chain-events';
 
 import app from 'state';
+import { navigateToSubpage } from 'app';
 import { NotificationCategories } from 'types';
 import { ProposalType } from 'identifiers';
 import { Notification, AddressInfo } from 'models';
-import { pluralize } from 'helpers';
+import { link, pluralize } from 'helpers';
 import { IPostNotificationData } from 'shared/types';
 
 import QuillFormattedText from 'views/components/quill_formatted_text';
@@ -238,6 +239,8 @@ const NotificationRow: m.Component<{
       const chainId = notification.chainEvent.type.chain;
       const chainName = app.config.chains.getById(chainId)?.name;
       let label: IEventLabel;
+
+      if (app.isCustomDomain() && chainId !== app.customDomainId()) return;
       if (chainSupportedBy(chainId, SubstrateTypes.EventChains)) {
         label = SubstrateEvents.Label(
           notification.chainEvent.blockNumber,
@@ -250,12 +253,18 @@ const NotificationRow: m.Component<{
           chainId,
           notification.chainEvent.data,
         );
-      // } else if (chainSupportedBy(chainId, MarlinTypes.EventChains)) {
-      //   label = MarlinEvents.Label(
-      //     notification.chainEvent.blockNumber,
-      //     chainId,
-      //     notification.chainEvent.data,
-      //   )
+      } else if (chainSupportedBy(chainId, CompoundTypes.EventChains)) {
+        label = CompoundEvents.Label(
+          notification.chainEvent.blockNumber,
+          chainId,
+          notification.chainEvent.data,
+        );
+      } else if (chainSupportedBy(chainId, AaveTypes.EventChains)) {
+        label = AaveEvents.Label(
+          notification.chainEvent.blockNumber,
+          chainId,
+          notification.chainEvent.data,
+        );
       } else {
         throw new Error(`invalid notification chain: ${chainId}`);
       }
@@ -280,46 +289,50 @@ const NotificationRow: m.Component<{
           ]),
         ]);
       }
-      return m('li.NotificationRow', {
-        class: notification.isRead ? '' : 'unread',
-        key: notification.id,
-        id: notification.id,
-        onclick: async () => {
+      return link(
+        'a.NotificationRow',
+        `/notificationsList?id=${notification.id}`,
+        [
+          m('.comment-body', [
+            m('.comment-body-top.chain-event-notification-top', [
+              `${label.heading} on ${chainName}`,
+              !vnode.attrs.onListPage && m(Icon, {
+                name: Icons.X,
+                onmousedown: (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                },
+                onclick: (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  vnode.state.scrollOrStop = true;
+                  app.user.notifications.clear([notification]);
+                  m.redraw();
+                },
+              })
+            ]),
+            m('.comment-body-bottom', `Block ${notification.chainEvent.blockNumber}`),
+            m('.comment-body-excerpt', label.label),
+          ]),
+        ], {
+          class: notification.isRead ? '' : 'unread',
+          key: notification.id,
+          id: notification.id,
+        },
+        null,
+        () => {
           if (vnode.state.scrollOrStop) { vnode.state.scrollOrStop = false; return; }
           const notificationArray: Notification[] = [];
           notificationArray.push(notification);
           app.user.notifications.markAsRead(notificationArray).then(() => m.redraw());
-          await m.route.set(`/${app.activeId() || 'edgeware'}/notificationsList?id=${notification.id}`);
-          m.redraw.sync();
         },
-      }, [
-        m('.comment-body', [
-          m('.comment-body-top.chain-event-notification-top', [
-            `${label.heading} on ${chainName}`,
-            !vnode.attrs.onListPage && m(Icon, {
-              name: Icons.X,
-              onmousedown: (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-              },
-              onclick: (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                vnode.state.scrollOrStop = true;
-                app.user.notifications.clear([notification]);
-                m.redraw();
-              },
-            })
-          ]),
-          m('.comment-body-bottom', `Block ${notification.chainEvent.blockNumber}`),
-          m('.comment-body-excerpt', label.label),
-        ]),
-      ]);
+        () => m.redraw.sync(),
+      );
     } else {
       const notificationData = notifications.map((notif) => typeof notif.data === 'string'
         ? JSON.parse(notif.data)
         : notif.data);
-      const {
+      let {
         authorInfo,
         createdAt,
         notificationHeader,
@@ -327,59 +340,68 @@ const NotificationRow: m.Component<{
         path,
         pageJump
       } = getBatchNotificationFields(category, notificationData);
-      return m('li.NotificationRow', {
-        class: notification.isRead ? '' : 'unread',
-        key: notification.id,
-        id: notification.id,
-        onclick: async () => {
-          app.user.notifications.markAsRead(notifications);
-          await m.route.set(path.replace(/ /g, '%20')); // fix for improperly generated notification paths
-          if (pageJump) setTimeout(() => pageJump(), 1);
+
+      if (app.isCustomDomain()) {
+        if (path.indexOf(`https://commonwealth.im/${app.customDomainId()}/`) !== 0
+            && path.indexOf(`http://localhost:8080/${app.customDomainId()}/`) !== 0) return;
+        path = path
+          .replace(`https://commonwealth.im/${app.customDomainId()}/`, '/')
+          .replace(`http://localhost:8080/${app.customDomainId()}/`, '/');
+      }
+
+      return link(
+        'a.NotificationRow',
+        path.replace(/ /g, '%20'), [
+          authorInfo.length === 1
+            ? m(User, {
+              user: new AddressInfo(
+                null,
+                (authorInfo[0] as [string, string])[1],
+                (authorInfo[0] as [string, string])[0],
+                null
+              ),
+              avatarOnly: true,
+              avatarSize: 26,
+            })
+            : m(UserGallery, {
+              users: authorInfo.map((auth) => new AddressInfo(null, auth[1], auth[0], null)),
+              avatarSize: 26,
+            }),
+          m('.comment-body', [
+            m('.comment-body-title', notificationHeader),
+            notificationBody
+              && category !== `${NotificationCategories.NewReaction}`
+              && category !== `${NotificationCategories.NewThread}`
+              && m('.comment-body-excerpt', notificationBody),
+            m('.comment-body-bottom-wrap', [
+              m('.comment-body-created', moment(createdAt).fromNow()),
+              !notification.isRead && m('.comment-body-mark-as-read', {
+                onclick: (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  vnode.state.markingRead = true;
+                  app.user.notifications.markAsRead(notifications)?.then(() => {
+                    vnode.state.markingRead = false;
+                    m.redraw();
+                  }).catch(() => {
+                    vnode.state.markingRead = false;
+                    m.redraw();
+                  });
+                }
+              }, [
+                vnode.state.markingRead ? m(Spinner, { size: 'xs', active: true }) : 'Mark as read',
+              ]),
+            ])
+          ]),
+        ], {
+          class: notification.isRead ? '' : 'unread',
+          key: notification.id,
+          id: notification.id,
         },
-      }, [
-        authorInfo.length === 1
-          ? m(User, {
-            user: new AddressInfo(
-              null,
-              (authorInfo[0] as [string, string])[1],
-              (authorInfo[0] as [string, string])[0],
-              null
-            ),
-            avatarOnly: true,
-            avatarSize: 26,
-          })
-          : m(UserGallery, {
-            users: authorInfo.map((auth) => new AddressInfo(null, auth[1], auth[0], null)),
-            avatarSize: 26,
-          }),
-        m('.comment-body', [
-          m('.comment-body-title', notificationHeader),
-          notificationBody
-            && category !== `${NotificationCategories.NewReaction}`
-            && category !== `${NotificationCategories.NewThread}`
-            && m('.comment-body-excerpt', notificationBody),
-          m('.comment-body-bottom-wrap', [
-            // TODO: add a formatter
-            m('.comment-body-created', createdAt.format()),
-            !notification.isRead && m('.comment-body-mark-as-read', {
-              onclick: (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                vnode.state.markingRead = true;
-                app.user.notifications.markAsRead(notifications).then(() => {
-                  vnode.state.markingRead = false;
-                  m.redraw();
-                }).catch(() => {
-                  vnode.state.markingRead = false;
-                  m.redraw();
-                });
-              }
-            }, [
-              vnode.state.markingRead ? m(Spinner, { size: 'xs', active: true }) : 'Mark as read',
-            ]),
-          ])
-        ]),
-      ]);
+        null,
+        () => app.user.notifications.markAsRead(notifications),
+        pageJump ? () => setTimeout(() => pageJump(), 1) : null,
+      );
     }
   },
 };

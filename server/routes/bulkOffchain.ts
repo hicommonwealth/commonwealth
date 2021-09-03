@@ -4,19 +4,21 @@
 // because it's easy to miss catching errors inside the promise executor, but we use it in this file
 // because the bulk offchain queries are heavily optimized so communities can load quickly.
 //
-import { QueryTypes } from 'sequelize';
+import { QueryTypes, Op } from 'sequelize';
 import { Response, NextFunction, Request } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { factory, formatFilename } from '../../shared/logging';
 import { getLastEdited } from '../util/getLastEdited';
+import { DB } from '../database';
+import { OffchainTopicInstance } from '../models/offchain_topic';
+import { RoleInstance } from '../models/role';
+import { OffchainThreadInstance } from '../models/offchain_thread';
 
 const log = factory.getLogger(formatFilename(__filename));
-
 export const Errors = { };
 
 // Topics, comments, reactions, members+admins, threads
-const bulkOffchain = async (models, req: Request, res: Response, next: NextFunction) => {
-  const { Op } = models.sequelize;
+const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
   if (error) return next(new Error(error));
 
@@ -29,7 +31,7 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
     : { chain: chain.id };
 
   // parallelized queries
-  const [topics, threadsCommentsReactions, admins, mostActiveUsers, threadsInVoting] = await Promise.all([
+  const [topics, threadsCommentsReactions, admins, mostActiveUsers, threadsInVoting] = await <Promise<[OffchainTopicInstance[], unknown, RoleInstance[], unknown, OffchainThreadInstance[]]>>Promise.all([
     // topics
     models.OffchainTopic.findAll({
       where: community
@@ -49,7 +51,7 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
             },
             {
               model: models.Address,
-              through: models.Collaboration,
+              // through: models.Collaboration,
               as: 'collaborators'
             },
             {
@@ -57,14 +59,15 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
               as: 'topic'
             }
           ],
-          exclude: [ 'version_history' ],
+          attributes: { exclude: [ 'version_history' ] },
         });
 
         const query = `
           SELECT addr.id AS addr_id, addr.address AS addr_address,
             addr.chain AS addr_chain, thread_id, thread_title,
             thread_community, thread_chain, thread_created, threads.kind, threads.stage,
-            threads.read_only, threads.body, threads.offchain_voting_votes, threads.offchain_voting_ends_at,
+            threads.read_only, threads.body, threads.offchain_voting_options,
+            threads.offchain_voting_votes, threads.offchain_voting_ends_at,
             threads.url, threads.pinned, topics.id AS topic_id, topics.name AS topic_name,
             topics.description AS topic_description, topics.chain_id AS topic_chain,
             topics.telegram AS topic_telegram,
@@ -73,7 +76,8 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
           RIGHT JOIN (
             SELECT t.id AS thread_id, t.title AS thread_title, t.address_id,
               t.created_at AS thread_created, t.community AS thread_community,
-              t.chain AS thread_chain, t.read_only, t.body, t.offchain_voting_votes, t.offchain_voting_ends_at,
+              t.chain AS thread_chain, t.read_only, t.body,
+              t.offchain_voting_options, t.offchain_voting_votes, t.offchain_voting_ends_at,
               t.stage, t.url, t.pinned, t.topic_id, t.kind, ARRAY_AGG(DISTINCT
                 CONCAT(
                   '{ "address": "', editors.address, '", "chain": "', editors.chain, '" }'
@@ -150,6 +154,7 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
             created_at: t.thread_created,
             collaborators,
             chain_entities,
+            offchain_voting_options: t.offchain_voting_options,
             offchain_voting_votes: t.offchain_voting_votes,
             offchain_voting_ends_at: t.offchain_voting_ends_at,
             Address: {
@@ -174,35 +179,25 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
         const allThreads = pinnedThreads.map((t) => {
           root_ids.push(`discussion_${t.id}`);
           return t.toJSON();
-        }).concat(threads);
+        });
+        // .concat(threads);
 
         // Comments
-        const comments = await models.OffchainComment.findAll({
+        const offchainComments = await models.OffchainComment.findAll({
           where: {
             root_id: root_ids
           },
           include: [models.Address, models.OffchainAttachment],
           order: [['created_at', 'DESC']],
-        }).map((c, idx) => {
+        });
+        const comments = offchainComments.map((c, idx) => {
           const row = c.toJSON();
           const last_edited = getLastEdited(row);
           row['last_edited'] = last_edited;
           return row;
         });
 
-        // Reactions
-        const matchThreadsOrComments = [
-          { thread_id: allThreads.map((thread) => thread.id) },
-          { comment_id: comments.map((comment) => comment.id) },
-        ];
-        const reactions = await models.OffchainReaction.findAll({
-          where: community
-            ? { community: community.id, [Op.or]: matchThreadsOrComments }
-            : { chain: chain.id, [Op.or]: matchThreadsOrComments },
-          include: [ models.Address ],
-          order: [['created_at', 'DESC']],
-        });
-        resolve([allThreads, comments, reactions]);
+        resolve([allThreads, comments]);
       } catch (e) {
         console.log(e);
         reject(new Error('Could not fetch threads, comments, or reactions'));
@@ -232,10 +227,11 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
         const monthlyComments = await models.OffchainComment.findAll({ where, include: [ models.Address ] });
         const monthlyThreads = await models.OffchainThread.findAll({
           where,
+          attributes: { exclude: [ 'version_history' ] },
           include: [ { model: models.Address, as: 'Address' } ],
-          exclude: [ 'version_history' ],
         });
 
+        // @ts-ignore
         monthlyComments.concat(monthlyThreads).forEach((post) => {
           if (!post.Address) return;
           const addr = post.Address.address;
@@ -261,9 +257,8 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
     }),
   ]);
 
-  const [threads, comments, reactions] = threadsCommentsReactions as any;
+  const [threads, comments] = threadsCommentsReactions as any;
 
-  const numPrevotingThreads = threadsInVoting.filter((t) => t.stage === 'proposal_in_review').length;
   const numVotingThreads = threadsInVoting.filter((t) => t.stage === 'voting').length;
 
   return res.json({
@@ -271,11 +266,10 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
     result: {
       topics: topics.map((t) => t.toJSON()),
       //
-      numPrevotingThreads,
       numVotingThreads,
       threads, // already converted to JSON earlier
       comments, // already converted to JSON earlier
-      reactions: reactions.map((r) => r.toJSON()),
+      // reactions: reactions.map((r) => r.toJSON()),
       //
       admins: admins.map((a) => a.toJSON()),
       activeUsers: mostActiveUsers,

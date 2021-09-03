@@ -69,6 +69,8 @@
             }
         }
         .mobile-header-trigger {
+            box-sizing: content-box;
+            width: 26px;
             .cui-icon-x > svg {
                 height: 26px;
                 width: 26px;

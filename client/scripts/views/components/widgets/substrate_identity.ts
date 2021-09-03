@@ -45,16 +45,18 @@ const SubstrateOnlineIdentityWidget: m.Component<ISubstrateIdentityAttrs, ISubst
       : null;
 
     // return polkadot identity if possible
-    let displayName: string;
+    let displayName;
     let quality: IdentityQuality;
     if (profile.isOnchain && !profile.isNameInvalid) {
       // first try to use identity fetched from server
-      displayName = (showAddressWithDisplayName ? profile.displayNameWithAddress : profile.displayName);
+      displayName = showAddressWithDisplayName
+        ? [ profile.displayName, m('.id-short', formatAddressShort(profile.address, profile.chain)) ]
+        : profile.displayName;
       quality = getIdentityQuality(Object.values(profile.judgements));
     } else if (vnode.state.identity?.exists) {
       // then attempt to use identity fetched from chain
       displayName = showAddressWithDisplayName
-        ? `${vnode.state.identity.username} · ${formatAddressShort(profile.address, profile.chain)}`
+        ? [ vnode.state.identity.username, m('.id-short', formatAddressShort(profile.address, profile.chain)) ]
         : vnode.state.identity.username;
       quality = vnode.state.identity.quality;
     }
@@ -69,7 +71,7 @@ const SubstrateOnlineIdentityWidget: m.Component<ISubstrateIdentityAttrs, ISubst
       return linkify
         ? link(
           `a.user-display-name.username.onchain-username${IdentityQuality.Good ? '.verified' : ''}`,
-          profile ? `/${m.route.param('scope')}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
+          profile ? `/${app.activeId()}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
           name
         )
         : m(`a.user-display-name.username.onchain-username${IdentityQuality.Good ? '.verified' : ''}`, name);
@@ -78,12 +80,16 @@ const SubstrateOnlineIdentityWidget: m.Component<ISubstrateIdentityAttrs, ISubst
     // return offchain name while identity is loading
     return linkify
       ? link('a.user-display-name.username',
-        profile ? `/${m.route.param('scope')}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
-        profile ? (showAddressWithDisplayName ? profile.displayNameWithAddress : profile.displayName) : addrShort)
+        profile ? `/${app.activeId()}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
+        !profile ? addrShort : !showAddressWithDisplayName ? profile.displayName : [
+          profile.displayName,
+          m('.id-short', formatAddressShort(profile.address, profile.chain)),
+        ])
       : m('a.user-display-name.username', [
-        profile
-          ? (showAddressWithDisplayName ? profile.displayNameWithAddress : profile.displayName)
-          : addrShort
+        !profile ? addrShort : !showAddressWithDisplayName ? profile.displayName : [
+          profile.displayName,
+          m('.id-short', formatAddressShort(profile.address, profile.chain)),
+        ],
       ]);
   }
 };
@@ -97,7 +103,7 @@ const SubstrateOfflineIdentityWidget: m.Component<ISubstrateIdentityAttrs, ISubs
     if (profile?.isOnchain && profile?.name && quality && !hideIdentityIcon) {
       const name = [
         showAddressWithDisplayName
-          ? [ profile.name, ` · ${formatAddressShort(profile.address, profile.chain)}` ]
+          ? [ profile.name, m('.id-short', formatAddressShort(profile.address, profile.chain)) ]
           : profile.name,
         m(`span.identity-icon${quality === IdentityQuality.Good
           ? '.green' : quality === IdentityQuality.Bad
@@ -109,7 +115,7 @@ const SubstrateOfflineIdentityWidget: m.Component<ISubstrateIdentityAttrs, ISubs
       return linkify
         ? link(
           `a.user-display-name.username.onchain-username${IdentityQuality.Good ? '.verified' : ''}`,
-          profile ? `/${m.route.param('scope')}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
+          profile ? `/${app.activeId()}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
           name
         )
         : m(`a.user-display-name.username.onchain-username${IdentityQuality.Good ? '.verified' : ''}`, name);
@@ -118,12 +124,16 @@ const SubstrateOfflineIdentityWidget: m.Component<ISubstrateIdentityAttrs, ISubs
     // return offchain name while identity is loading
     return linkify
       ? link('a.user-display-name.username',
-        profile ? `/${m.route.param('scope')}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
-        profile ? (showAddressWithDisplayName ? profile.displayNameWithAddress : profile.displayName) : addrShort)
+        profile ? `/${app.activeId()}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
+        !profile ? addrShort : !showAddressWithDisplayName ? profile.displayName : [
+          profile.displayName,
+          m('.id-short', formatAddressShort(profile.address, profile.chain)),
+        ])
       : m('a.user-display-name.username', [
-        profile
-          ? (showAddressWithDisplayName ? profile.displayNameWithAddress : profile.displayName)
-          : addrShort
+        !profile ? addrShort : !showAddressWithDisplayName ? profile.displayName : [
+          profile.displayName,
+          m('.id-short', formatAddressShort(profile.address, profile.chain)),
+        ],
       ]);
   }
 };

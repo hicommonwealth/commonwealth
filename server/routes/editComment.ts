@@ -7,16 +7,16 @@ import { NotificationCategories } from '../../shared/types';
 import { getProposalUrl, getProposalUrlWithoutObject, renderQuillDeltaToText } from '../../shared/utils';
 import { factory, formatFilename } from '../../shared/logging';
 import { parseUserMentions } from '../util/parseUserMentions';
+import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
-
 export const Errors = {
   NoId: 'Must provide id',
   NotAddrOwner: 'Address not owned by this user',
   NoProposal: 'No matching proposal found',
 };
 
-const editComment = async (models, req: Request, res: Response, next: NextFunction) => {
+const editComment = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
@@ -45,7 +45,7 @@ const editComment = async (models, req: Request, res: Response, next: NextFuncti
   };
 
   try {
-    const userOwnedAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
+    const userOwnedAddressIds = (await req.user.getAddresses()).filter((addr) => !!addr.verified).map((addr) => addr.id);
     const comment = await models.OffchainComment.findOne({
       where: {
         id: req.body.id,

@@ -1,9 +1,12 @@
 .DS_Store
 *.pyc
 /report.*.json
+.idea
 /venv
 /build
 /eth/build
+/eth/artifacts
+/eth/cache
 node_modules/
 jsconfig.json
 .vscode
@@ -13,8 +16,7 @@ yarn-error.log
 coverage/
 *.sw*
 .env
-.yalc
-yalc.lock
+*yalc*
 
 # Database downloads
 latest.dump

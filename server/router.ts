@@ -1,7 +1,9 @@
 import express from 'express';
 import webpack from 'webpack';
 import passport from 'passport';
+import { GITHUB_OAUTH_CALLBACK } from './config';
 
+import domain from './routes/domain';
 import status from './routes/status';
 import createGist from './routes/createGist';
 
@@ -20,6 +22,8 @@ import getAddressStatus from './routes/getAddressStatus';
 import selectNode from './routes/selectNode';
 import startEmailLogin from './routes/startEmailLogin';
 import finishEmailLogin from './routes/finishEmailLogin';
+import finishOAuthLogin from './routes/finishOAuthLogin';
+import startOAuthLogin from './routes/startOAuthLogin';
 import createComment from './routes/createComment';
 import editComment from './routes/editComment';
 import deleteComment from './routes/deleteComment';
@@ -29,12 +33,14 @@ import createReaction from './routes/createReaction';
 import deleteReaction from './routes/deleteReaction';
 import viewReactions from './routes/viewReactions';
 import bulkReactions from './routes/bulkReactions';
+import reactionsCounts from './routes/reactionsCounts';
 import starCommunity from './routes/starCommunity';
 import createCommunity from './routes/createCommunity';
 import deleteCommunity from './routes/deleteCommunity';
 import updateCommunity from './routes/updateCommunity';
 import communityStats from './routes/communityStats';
 import getCommunitiesAndChains from './routes/getCommunitiesAndChains';
+import createChain from './routes/createChain';
 import viewCount from './routes/viewCount';
 import updateEmail from './routes/updateEmail';
 
@@ -61,7 +67,6 @@ import acceptInviteLink from './routes/acceptInviteLink';
 import getInviteLinks from './routes/getInviteLinks';
 import deleteGithubAccount from './routes/deleteGithubAccount';
 import getProfile from './routes/getProfile';
-
 
 import createRole from './routes/createRole';
 import deleteRole from './routes/deleteRole';
@@ -104,6 +109,7 @@ import editTopic from './routes/editTopic';
 import deleteTopic from './routes/deleteTopic';
 import bulkTopics from './routes/bulkTopics';
 import bulkOffchain from './routes/bulkOffchain';
+import setTopicThreshold from './routes/setTopicThreshold';
 
 import edgewareLockdropLookup from './routes/getEdgewareLockdropLookup';
 import edgewareLockdropStats from './routes/getEdgewareLockdropStats';
@@ -120,15 +126,31 @@ import { getTokensFromLists } from './routes/getTokensFromLists';
 import getTokenForum from './routes/getTokenForum';
 import getSubstrateSpec from './routes/getSubstrateSpec';
 import editSubstrateSpec from './routes/editSubstrateSpec';
+import { getStatsDInstance } from './util/metrics';
+import { DB } from './database';
+
+import { sendMessage } from './routes/snapshotAPI';
 
 function setupRouter(
   app,
-  models,
+  models: DB,
   viewCountCache: ViewCountCache,
   identityFetchCache: IdentityFetchCache,
   tokenBalanceCache: TokenBalanceCache
 ) {
   const router = express.Router();
+
+  router.use((req, res, next) => {
+    getStatsDInstance().increment(`cw.path.${req.path.slice(1)}.called`);
+    const start = Date.now();
+    res.on('finish', () => {
+      const latency = Date.now() - start;
+      getStatsDInstance().histogram(`cw.path.${req.path.slice(1)}.latency`, latency);
+    });
+    next();
+  });
+
+  router.get('/domain', domain.bind(this, models));
   router.get('/status', status.bind(this, models));
 
   router.get('/getSubstrateSpec', getSubstrateSpec.bind(this, models));
@@ -177,8 +199,10 @@ function setupRouter(
   // TODO: Change to PUT /community
   router.post('/updateCommunity', passport.authenticate('jwt', { session: false }), updateCommunity.bind(this, models));
   router.get('/communityStats', passport.authenticate('jwt', { session: false }), communityStats.bind(this, models));
-  router.get('/getTokensFromLists', getTokensFromLists.bind(this, models, tokenBalanceCache));
-  router.get('/getTokenForum', getTokenForum.bind(this, models, tokenBalanceCache));
+  router.get('/getTokensFromLists', getTokensFromLists.bind(this, models));
+  router.get('/getTokenForum', getTokenForum.bind(this, models));
+  // TODO: Change to POST /chain
+  router.post('/createChain', passport.authenticate('jwt', { session: false }), createChain.bind(this, models));
 
   // offchain threads
   // TODO: Change to POST /thread
@@ -274,6 +298,7 @@ function setupRouter(
   router.post('/deleteTopic', passport.authenticate('jwt', { session: false }), deleteTopic.bind(this, models));
   // TODO: Change to GET /topics
   router.get('/bulkTopics', bulkTopics.bind(this, models));
+  router.post('/setTopicThreshold', passport.authenticate('jwt', { session: false }), setTopicThreshold.bind(this, models));
 
   // offchain reactions
   // TODO: Change to POST /reaction
@@ -288,6 +313,7 @@ function setupRouter(
   router.get('/viewReactions', viewReactions.bind(this, models));
   // TODO: Change to GET /reactions
   router.get('/bulkReactions', bulkReactions.bind(this, models));
+  router.post('/reactionsCounts', reactionsCounts.bind(this, models));
 
   // generic invite link
   // TODO: Change to POST /inviteLink
@@ -459,14 +485,15 @@ function setupRouter(
   // login
   router.post('/login', startEmailLogin.bind(this, models));
   router.get('/finishLogin', finishEmailLogin.bind(this, models));
+
+  router.get('/auth/github', startOAuthLogin.bind(this, models));
+  router.get('/auth/github/callback', startOAuthLogin.bind(this, models));
+  router.get('/finishOAuthLogin', finishOAuthLogin.bind(this, models));
+
   router.post('/auth/magic', passport.authenticate('magic'), (req, res, next) => {
     return res.json({ status: 'Success', result: req.user.toJSON() });
   });
-  router.get('/auth/github', passport.authenticate('github'));
-  router.get(
-    '/auth/github/callback',
-    passport.authenticate('github', { successRedirect: '/', failureRedirect: '/#!/login' }),
-  );
+
   // logout
   router.get('/logout', logout.bind(this, models));
 
@@ -475,6 +502,8 @@ function setupRouter(
 
   // TODO: Change to GET /entities
   router.get('/bulkEntities', bulkEntities.bind(this, models));
+
+  router.post('/snapshotAPI/sendMessage', sendMessage.bind(this));
 
   app.use('/api', router);
 }

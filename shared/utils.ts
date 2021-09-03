@@ -16,9 +16,9 @@ export const getNextOffchainPollEndingTime = (now) => {
 };
 
 export const getNextOffchainPollEndingTimeIsDangerouslyClose = (now, endingTime) => {
-  now.utc().add(5, 'days')
-  endingTime.utc()
-}
+  now.utc().add(5, 'days');
+  endingTime.utc();
+};
 
 export const slugify = (str: string): string => {
   // Remove any character that isn't a alphanumeric character or a
@@ -68,7 +68,7 @@ export const validURL = (str) => {
   const pattern = new RegExp('^(https?:\\/\\/)?' // protocol
     + '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' // domain name
     + '((\\d{1,3}\\.){3}\\d{1,3}))' // OR ip (v4) address
-    + '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' // port and path
+    + '(\\:\\d+)?(\\/[-a-z\\d%_.~+:@]*)*' // port and path
     + '(\\?[;&a-z\\d%_.~+=-]*)?' // query string
     + '(\\#[-a-z\\d_]*)?$', 'i'); // fragment locator
   return !!pattern.test(str);
@@ -141,15 +141,18 @@ export const renderQuillDeltaToText = (delta, paragraphSeparator = '\n\n') => {
   }).filter((parent) => !!parent).join(paragraphSeparator);
 };
 
-export function formatAddressShort(address: string, chain: string) {
+export function formatAddressShort(
+  address: string,
+  chain?: string,
+  includeEllipsis?: boolean,
+  maxCharLength?: number
+) {
   if (!address) return;
   if (chain === 'near') {
     return `@${address}`;
-  } else if (chain === 'straightedge') {
-    return `${address.slice(0, 9)}…`;
-  } else if (chain === 'cosmos') {
-    return `${address.slice(0, 9)}…`;
+  } else if (chain === 'straightedge' || chain === 'cosmoshub' || chain === 'osmosis' || chain === 'injective') {
+    return `${address.slice(0, 9)}${includeEllipsis ? '…' : ''}`;
   } else {
-    return `${address.slice(0, 5)}…`;
+    return `${address.slice(0, maxCharLength || 5)}${includeEllipsis ? '…' : ''}`;
   }
 }

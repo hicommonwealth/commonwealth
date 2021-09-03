@@ -2,6 +2,7 @@ import m from 'mithril';
 import lity from 'lity';
 import { slugify } from 'utils';
 
+import app from 'state';
 import { OffchainThread, OffchainThreadKind, AddressInfo } from 'models';
 import { link } from 'helpers';
 import User from 'views/components/widgets/user';
@@ -11,6 +12,10 @@ const ProfileProposal : m.Component< { proposal: OffchainThread }, { revealThrea
     const proposal = vnode.attrs.proposal;
     const { slug, identifier } = proposal;
     const { attachments, author, body, title, createdAt, chain, community } = proposal;
+
+    // hide rows from communities that don't match
+    if (app.isCustomDomain() && (chain || community) !== app.customDomainId()) return;
+
     return m('.ProfileProposal', [
       m('.summary', [
         m(User, { user: new AddressInfo(null, author, proposal.authorChain, null), linkify: true, hideAvatar: true }),

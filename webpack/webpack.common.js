@@ -41,12 +41,12 @@ module.exports = {
           chunks: 'all',
         },
         near: {
-          test: /[\\/]node_modules[\\/](nearlib)[\\/]/,
+          test: /[\\/]node_modules[\\/](near-api-js)[\\/]/,
           name: 'near',
           chunks: 'all',
         },
         cosmos: {
-          test: /[\\/]node_modules[\\/](@lunie|@tendermint|amino-js|supercop\.js|tendermint)[\\/]/,
+          test: /[\\/]node_modules[\\/](@cosmjs|@tendermint|amino-js|supercop\.js|tendermint)[\\/]/,
           name: 'cosmos',
           chunks: 'all',
         },

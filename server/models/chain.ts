@@ -1,35 +1,41 @@
 import * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { RegisteredTypes } from '@polkadot/types/types';
-
-import { AddressAttributes } from './address';
+import { Model, DataTypes } from 'sequelize';
+import { AddressAttributes, AddressInstance } from './address';
 import { ChainNodeInstance, ChainNodeAttributes } from './chain_node';
 import { StarredCommunityAttributes } from './starred_community';
-import { OffchainTopicAttributes } from './offchain_topic';
+import { OffchainTopicAttributes, OffchainTopicInstance } from './offchain_topic';
 import { OffchainThreadAttributes } from './offchain_thread';
 import { OffchainCommentAttributes } from './offchain_comment';
 import { UserAttributes } from './user';
+import { ModelStatic } from './types';
 
 export interface ChainAttributes {
-  id?: string;
   name: string;
+  symbol: string;
+  network: string;
+  base: string;
+  icon_url: string;
+  active: boolean;
+  type: string;
+  id?: string;
   description?: string;
   discord?: string;
   element?: string;
   website?: string;
   telegram?: string;
   github?: string;
-  featured_topics: string[];
-  symbol: string;
-  network: string;
-  base: string;
   ss58_prefix?: number;
-  icon_url: string;
-  blockExplorerIds: string;
-  collapsed_on_homepage: boolean;
-  active: boolean;
-  customDomain: string;
-  type: string;
-  substrate_spec: RegisteredTypes;
+  decimals?: number;
+  stagesEnabled?: boolean;
+  customStages?: string;
+  customDomain?: string;
+  blockExplorerIds?: string;
+  collapsed_on_homepage?: boolean;
+  featured_topics?: string[];
+  substrate_spec?: RegisteredTypes;
+  terms?: string;
+  snapshot?: string;
 
   // associations
   ChainNodes?: ChainNodeAttributes[] | ChainNodeAttributes['id'][];
@@ -42,20 +48,22 @@ export interface ChainAttributes {
   ChainObjectVersion?; // TODO
 }
 
-export interface ChainInstance extends Sequelize.Instance<ChainAttributes>, ChainAttributes {
+export interface ChainInstance extends Model<ChainAttributes>, ChainAttributes {
   // add mixins as needed
   getChainNodes: Sequelize.HasManyGetAssociationsMixin<ChainNodeInstance>;
+  hasAddresses: Sequelize.HasManyHasAssociationsMixin<AddressInstance, AddressInstance['id']>;
+  getAddresses: Sequelize.HasManyGetAssociationsMixin<AddressInstance>;
+  getTopics: Sequelize.HasManyGetAssociationsMixin<OffchainTopicInstance>;
+  removeTopics: Sequelize.HasManyRemoveAssociationsMixin<OffchainTopicInstance, OffchainTopicInstance['id']>;
 }
 
-export interface ChainModel extends Sequelize.Model<ChainInstance, ChainAttributes> {
-
-}
+export type ChainModelStatic = ModelStatic<ChainInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): ChainModel => {
-  const Chain = sequelize.define<ChainInstance, ChainAttributes>('Chain', {
+  dataTypes: typeof DataTypes,
+): ChainModelStatic => {
+  const Chain = <ChainModelStatic>sequelize.define('Chain', {
     id: { type: dataTypes.STRING, primaryKey: true },
     name: { type: dataTypes.STRING, allowNull: false },
     description: { type: dataTypes.STRING, allowNull: true },
@@ -71,14 +79,20 @@ export default (
     ss58_prefix: { type: dataTypes.INTEGER, allowNull: true },
     icon_url: { type: dataTypes.STRING },
     active: { type: dataTypes.BOOLEAN },
+    stagesEnabled: { type: dataTypes.BOOLEAN, allowNull: true, defaultValue: true },
+    customStages: { type: dataTypes.STRING, allowNull: true },
     customDomain: { type: dataTypes.STRING, allowNull: true, },
     blockExplorerIds: { type: dataTypes.STRING, allowNull: true, },
     collapsed_on_homepage: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: true },
     type: { type: dataTypes.STRING, allowNull: false },
+    decimals: { type: dataTypes.INTEGER, allowNull: true },
     substrate_spec: { type: dataTypes.JSONB, allowNull: true },
+    snapshot: { type: dataTypes.STRING, allowNull: true },
+    terms: { type: dataTypes.STRING, allowNull: true },
   }, {
+    tableName: 'Chains',
     timestamps: false,
-    underscored: true,
+    underscored: false,
   });
 
   Chain.associate = (models) => {

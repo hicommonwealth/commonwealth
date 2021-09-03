@@ -12,6 +12,7 @@ import {
 } from './getEdgewareLockdropLookup';
 const { toBN } = Web3.utils;
 import { factory, formatFilename } from '../../shared/logging';
+import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -144,7 +145,7 @@ const calculateEffectiveLocks = async (web3, lockdropContracts) => {
     // NOTE: if key was less than length of a correct submission (66 chars), funds are considered lost
     let keys = [data.edgewareAddr];
     if (data.edgewareAddr.length >= 66) {
-      keys = data.edgewareAddr.slice(2).match(/.{1,64}/g).map(key => `0x${key}`);
+      keys = data.edgewareAddr.slice(2).match(/.{1,64}/g).map((key) => `0x${key}`);
     }
 
     if (!(data.owner in seen)) {
@@ -283,7 +284,7 @@ const calculateEffectiveSignals = async (web3, lockdropContracts, blockNumber = 
       // NOTE: if key was less than length of a correct submission (66 chars), funds are considered lost
       let keys = [data.edgewareAddr];
       if (data.edgewareAddr.length >= 66) {
-        keys = data.edgewareAddr.slice(2).match(/.{1,64}/g).map(key => `0x${key}`);
+        keys = data.edgewareAddr.slice(2).match(/.{1,64}/g).map((key) => `0x${key}`);
       }
 
       const detailedEvent = await getSignalsForAddress(data.contractAddr, event.address, web3);
@@ -410,12 +411,10 @@ export const getCountsByBlock = async (web3, contracts) => {
   allEvents.forEach((event) => {
     const time = parseInt(event.returnValues.time, 10);
     blocknumToTime[event.blockNumber] = new Date(+web3.utils.toBN(time) * 1000);
-    blocknumToTime[Math.ceil(event.blockNumber / roundToBlocks) * roundToBlocks] =
-      new Date(+web3.utils.toBN(time) * 1000);
+    blocknumToTime[Math.ceil(event.blockNumber / roundToBlocks) * roundToBlocks] =      new Date(+web3.utils.toBN(time) * 1000);
   });
   const time2 = parseInt(allEvents[0].returnValues.time, 10);
-  blocknumToTime[Math.floor(allEvents[0].blockNumber / roundToBlocks) * roundToBlocks] =
-    new Date(+web3.utils.toBN(time2) * 1000);
+  blocknumToTime[Math.floor(allEvents[0].blockNumber / roundToBlocks) * roundToBlocks] =    new Date(+web3.utils.toBN(time2) * 1000);
 
   const lastBlockNum = Math.max.apply(this, allEvents.map((e) => e.blockNumber));
   const lastBlock = await web3.eth.getBlock(lastBlockNum);
@@ -432,7 +431,7 @@ export const getCountsByBlock = async (web3, contracts) => {
   };
 };
 
-export const fetchStats = async (models, net) => {
+export const fetchStats = async (models: DB, net) => {
   const result = await models.EdgewareLockdropEverything.findAll({
     limit: 1,
     order: [ [ 'createdAt', 'DESC' ]]
@@ -513,7 +512,7 @@ export const fetchStats = async (models, net) => {
 
     await models.EdgewareLockdropEverything.create({
       data: JSON.stringify(aggregateResult),
-      createdAt: Date.now(),
+      createdAt: new Date(),
     });
 
     results = aggregateResult;

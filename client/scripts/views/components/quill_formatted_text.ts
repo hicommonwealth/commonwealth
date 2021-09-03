@@ -28,8 +28,8 @@ const renderQuillDelta = (delta, hideFormatting = false, collapse = false) => {
         && groups[groups.length - 1].parents[0].attributes
         && parent.attributes?.list
         && groups[groups.length - 1].parents[0].attributes.list) {
-        // && parent.attributes.list === groups[groups.length - 1].parents[0].attributes.list
-        // && parent.attributes.indent === groups[groups.length - 1].parents[0].attributes.indent) {
+      // && parent.attributes.list === groups[groups.length - 1].parents[0].attributes.list
+      // && parent.attributes.indent === groups[groups.length - 1].parents[0].attributes.indent) {
       groups[groups.length - 1].parents.push(parent);
     } else if (parent.attributes && parent.attributes.list) {
       groups.push({ listtype: parent.attributes.list, parents: [parent] });
@@ -96,7 +96,7 @@ const renderQuillDelta = (delta, hideFormatting = false, collapse = false) => {
               noopener: 'noopener',
               onclick: (e) => {
                 if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
-                if (child.attributes.link.startsWith(document.location.origin + '/')) {
+                if (child.attributes.link.startsWith(`${document.location.origin}/`)) {
                   // don't open a new window if the link is on Commonwealth
                   e.preventDefault();
                   e.stopPropagation();
@@ -174,7 +174,7 @@ const renderQuillDelta = (delta, hideFormatting = false, collapse = false) => {
             noopener: 'noopener',
             onclick: (e) => {
               if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
-              if (child.attributes.link.startsWith(document.location.origin + '/')) {
+              if (child.attributes.link.startsWith(`${document.location.origin}/`)) {
                 // don't open a new window if the link is on Commonwealth
                 e.preventDefault();
                 e.stopPropagation();

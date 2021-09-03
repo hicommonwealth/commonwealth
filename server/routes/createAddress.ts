@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../../shared/logging';
 import AddressSwapper from '../util/addressSwapper';
+import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -10,7 +11,7 @@ export const Errors = {
   InvalidChain: 'Invalid chain',
 };
 
-const createAddress = async (models, req: Request, res: Response, next: NextFunction) => {
+const createAddress = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   // start the process of creating a new address. this may be called
   // when logged in to link a new address for an existing user, or
   // when logged out to create a new user by showing proof of an address.

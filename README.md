@@ -84,7 +84,7 @@ We also use certain environment variables to configure the application itself:
 To download and restore the production database, and run migrations:
 
 ```
-pg_dump $(heroku config:get DATABASE_URL --app commonwealthapp) --verbose --exclude-table-data="public.\"Sessions\"" --exclude-table-data="public.\"DiscussionDrafts\"" --exclude-table-data="public.\"LoginTokens\"" --exclude-table-data="public.\"Notifications\"" --exclude-table-data="public.\"SocialAccounts\"" --exclude-table-data="public.\"Webhooks\"" --exclude-table-data="public.\"ChainEvents\"" --no-privileges --no-owner -f latest.dump
+pg_dump $(heroku config:get DATABASE_URL --app commonwealthapp) --verbose --exclude-table-data="public.\"Sessions\"" --exclude-table-data="public.\"DiscussionDrafts\"" --exclude-table-data="public.\"LoginTokens\"" --exclude-table-data="public.\"Notifications\"" --exclude-table-data="public.\"EdgewareLockdropEverythings\"" --exclude-table-data="public.\"EdgewareLockdropBalances\"" --exclude-table-data="public.\"EdgewareLockdropEvents\"" --exclude-table-data="public.\"SocialAccounts\"" --exclude-table-data="public.\"Webhooks\"" --exclude-table-data="public.\"ChainEvents\"" --no-privileges --no-owner -f latest.dump
 
 npx sequelize db:drop
 npx sequelize db:create
@@ -185,6 +185,24 @@ You should now set up any databases and services needed. In particular:
 - Schedule a daily task for sending notification email digests:
   `SEND_EMAILS=true ts-node --project tsconfig.node.json server.ts`
   at 1pm UTC / 6am PT / 9am ET / 3pm CEST
+
+## Custom Domains
+
+To configure a custom domain, you should:
+
+- Add the custom domain to Heroku
+- Add the custom domain to Magic
+- Set the customDomain field in the Chains or OffchainCommunities
+  row in the database, corresponding to the community to be served on
+  that domain.
+
+You can test the custom domain by setting it in your /etc/hosts file
+and running a local SSL proxy, for example:
+
+```
+npm install -g local-ssl-proxy
+local-ssl-proxy --source 443 --target 8080
+```
 
 ## Chat Server
 

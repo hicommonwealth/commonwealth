@@ -11,7 +11,7 @@ import { notifyError } from 'controllers/app/notifications';
 import User, { UserBlock } from 'views/components/widgets/user';
 import { CompactModalExitButton } from 'views/modal';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
-import { initAppState } from 'app';
+import { initAppState, navigateToSubpage } from 'app';
 
 const SideMenu: m.Component<{invites, onChangeHandler, location}, {}> = {
   view: (vnode) => {
@@ -77,6 +77,11 @@ const ConfirmInviteModal: m.Component<{}, {
         .map((account) => SelectAddress(account));
     }
 
+    const activeInvite = invites[location].community_id
+      ? app.config.communities.getById(invites[location].community_id)
+      : app.config.chains.getById(invites[location].chain_id);
+    const hasTermsOfService = !!activeInvite?.terms;
+
     return m('.ConfirmInviteModal', [
       m('.compact-modal-title', [
         !vnode.state.isComplete
@@ -96,6 +101,12 @@ const ConfirmInviteModal: m.Component<{}, {
             'You\'ve been invited to the ',
             m('strong', invites[location].community_name),
             ' community. Select an address to accept the invite:'
+          ]),
+          hasTermsOfService
+          && m('p.terms-of-service', [
+            `By linking an address, you agree to ${activeInvite.name}'s `,
+            m('a', { href: activeInvite.terms, target: '_blank' }, 'terms of service'),
+            '.'
           ]),
           vnode.state.accepted.includes(location) ? m('h4', 'You\'ve accepted this invite!')
             : vnode.state.rejected.includes(location) ? m('h4', 'You\'ve already deleted this invite!') : [
@@ -127,7 +138,8 @@ const ConfirmInviteModal: m.Component<{}, {
                           $(e.target).trigger('modalexit');
                         }
                         const communityId = invites[location].community_id;
-                        const chainId = invites[location].community_id;
+                        const chainId = invites[location].chain_id;
+                        console.log({ communityId, chainId });
                         // if private community, re-init app
                         if (communityId && !app.config.communities.getByCommunity(communityId)) {
                           initAppState().then(() => m.route.set(`/${communityId}`));
@@ -187,7 +199,11 @@ const ConfirmInviteModal: m.Component<{}, {
                   const web3loginParams = joiningCommunity ? { prev, next, joiningCommunity } : { prev, next };
 
                   // redirect to /web3login to connect to the chain
-                  m.route.set(`/${app.chain?.id || defaultChainId}/web3login`, web3loginParams);
+                  if (app.activeId()) {
+                    navigateToSubpage('/web3login', web3loginParams);
+                  } else {
+                    m.route.set(`${defaultChainId}/web3login`, web3loginParams);
+                  }
 
                   // show web3 login modal
                   app.modals.lazyCreate('link_new_address_modal', {
