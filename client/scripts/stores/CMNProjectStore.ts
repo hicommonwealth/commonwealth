@@ -1,10 +1,10 @@
 import IdStore from './IdStore';
-import { CMNProjectMembers, CMNProjectProtocol } from '../models';
+import { CMNMembers, CMNProjectProtocol } from '../models';
 
 class CMNProjectStore extends IdStore<CMNProjectProtocol> {}
-class CMNProjectMembersStore extends IdStore<CMNProjectMembers> {}
+class CMNMembersStore extends IdStore<CMNMembers> {}
 
 export {
   CMNProjectStore,
-  CMNProjectMembersStore
+  CMNMembersStore
 };

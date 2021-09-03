@@ -363,7 +363,6 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
     });
   }
 
-
   if (app.chain && app.chain.id) {
     await initCMNProtocol(app.chain.id);
   }
@@ -696,7 +695,7 @@ Promise.all([
       // CMN Project
       '/:scope/projects':               importRoute('views/pages/commonwealth/projects', { scoped: true }),
       '/:scope/new/project':            importRoute('views/pages/commonwealth/projects/create', { scoped: true }),
-      '/:scope/project/:projectHash':    importRoute('views/pages/commonwealth/projects/view', { scoped: true }),
+      '/:scope/project/:address':    importRoute('views/pages/commonwealth/projects/view', { scoped: true }),
 
       // CMN Collective
       '/:scope/backers':                importRoute('views/pages/commonwealth/backers', { scoped: true }),

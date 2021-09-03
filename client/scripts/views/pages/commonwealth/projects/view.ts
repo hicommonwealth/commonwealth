@@ -1,15 +1,13 @@
 /* eslint-disable no-mixed-operators */
 import 'pages/commonwealth/projects/view.scss';
-
 import m from 'mithril';
-import { utils } from 'ethers';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import ActionModule from 'views/components/commonwealth/actions/action_card';
 import { CMNProject } from 'models';
-import { connectionReady } from './index';
+import { protocolReady } from 'controllers/chain/ethereum/commonwealth/utils';
 
 function secondsToDhms(seconds) {
   seconds = Number(seconds);
@@ -80,7 +78,7 @@ const TokenHolders: m.Component<{
 };
 
 const ViewProjectPage: m.Component<{
-  projectHash: string
+  address: string
 },
 {
   initialized: boolean,
@@ -92,19 +90,19 @@ const ViewProjectPage: m.Component<{
     vnode.state.initialized = false;
   },
   onupdate: async (vnode) => {
-    if (!connectionReady()) return;
-    if (vnode.state.initialized) return;
+    if (!protocolReady()) return;
+    if (!vnode.state.initialized) {
+      const project_protocol = app.cmnProtocol.project_protocol;
+      const projects = await project_protocol.getProjects();
+      const project = projects.filter((item) => item.address === vnode.attrs.address)[0];
+      const members = await project_protocol.getMembers(project);
 
-    const project_protocol = app.cmnProtocol.project_protocol;
-    const projects = await project_protocol.syncProjects();
-    const project = projects.filter((item) => item.projectHash === vnode.attrs.projectHash)[0];
-    const members = await project_protocol.syncMembers(project);
-
-    vnode.state.backers = members ? members.backers : [];
-    vnode.state.curators = members ? members.curators : [];
-    vnode.state.project = project;
-    vnode.state.initialized = true;
-    m.redraw();
+      vnode.state.backers = members ? members.backers : [];
+      vnode.state.curators = members ? members.curators : [];
+      vnode.state.project = project;
+      vnode.state.initialized = true;
+      m.redraw();
+    }
   },
   view: (vnode) => {
     const { project, initialized, curators, backers } = vnode.state;
@@ -135,7 +133,7 @@ const ViewProjectPage: m.Component<{
           leftInSeconds,
           forceUpdateStatus: async () => {
             vnode.state.initialized = false;
-            await project_protocol.syncProjects();
+            await project_protocol.getProjects();
             vnode.state.initialized = true;
           }
         }),

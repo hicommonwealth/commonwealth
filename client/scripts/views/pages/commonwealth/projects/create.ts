@@ -1,18 +1,13 @@
 import m from 'mithril';
-import { Input, TextArea, Form, FormLabel, FormGroup, Button, Grid, Col, Checkbox } from 'construct-ui';
-import BN from 'bn.js';
-import { utils } from 'ethers';
+import { Input, TextArea, Form, FormLabel, FormGroup, Button, Grid, Col } from 'construct-ui';
 
 import 'pages/new_proposal_page.scss';
 
+import app from 'state';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import SelectToken from 'views/components/commonwealth/select_token';
-import { ProjectMetaData } from 'controllers/chain/ethereum/commonwealth/project/api';
-
-import app from 'state';
-
-import { connectionReady } from './index';
+import { ProjectMetaData, protocolReady } from 'controllers/chain/ethereum/commonwealth/utils';
 
 const floatRegex = /^[0-9]*\.?[0-9]*$/;
 
@@ -239,12 +234,17 @@ const NewProjectPage: m.Component<{}, {
   acceptedTokens: any[],
   initialized: boolean
 }> = {
+  oncreate: (vnode) => {
+    vnode.state.initialized = false;
+  },
   onupdate: async (vnode) => {
-    if (!connectionReady) return;
-    const project_protocol = app.cmnProtocol.project_protocol;
-    if (!project_protocol) return;
-    vnode.state.acceptedTokens = await project_protocol.getAcceptedTokens();
-    vnode.state.initialized = true;
+    if (!protocolReady) return;
+
+    if (!vnode.state.initialized) {
+      vnode.state.acceptedTokens = await app.cmnProtocol.project_protocol.getAcceptedTokens();
+      vnode.state.initialized = true;
+      m.redraw();
+    }
   },
   view: (vnode) => {
     if (!vnode.state.initialized) return m(PageLoading);

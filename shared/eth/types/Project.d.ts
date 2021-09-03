@@ -31,7 +31,7 @@ interface ProjectInterface extends ethers.utils.Interface {
     "curatorFee()": FunctionFragment;
     "deadline()": FunctionFragment;
     "funded()": FunctionFragment;
-    "getAllAcceptedTokens()": FunctionFragment;
+    "getAcceptedTokens()": FunctionFragment;
     "getBToken(address)": FunctionFragment;
     "getCToken(address)": FunctionFragment;
     "initialize(tuple,address[],address[],uint256,uint256,uint256)": FunctionFragment;
@@ -82,7 +82,7 @@ interface ProjectInterface extends ethers.utils.Interface {
   encodeFunctionData(functionFragment: "deadline", values?: undefined): string;
   encodeFunctionData(functionFragment: "funded", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "getAllAcceptedTokens",
+    functionFragment: "getAcceptedTokens",
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "getBToken", values: [string]): string;
@@ -171,7 +171,7 @@ interface ProjectInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "deadline", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "funded", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "getAllAcceptedTokens",
+    functionFragment: "getAcceptedTokens",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "getBToken", data: BytesLike): Result;
@@ -316,7 +316,7 @@ export class Project extends BaseContract {
 
     funded(overrides?: CallOverrides): Promise<[boolean]>;
 
-    getAllAcceptedTokens(overrides?: CallOverrides): Promise<[string[]]>;
+    getAcceptedTokens(overrides?: CallOverrides): Promise<[string[]]>;
 
     getBToken(arg0: string, overrides?: CallOverrides): Promise<[string]>;
 
@@ -447,7 +447,7 @@ export class Project extends BaseContract {
 
   funded(overrides?: CallOverrides): Promise<boolean>;
 
-  getAllAcceptedTokens(overrides?: CallOverrides): Promise<string[]>;
+  getAcceptedTokens(overrides?: CallOverrides): Promise<string[]>;
 
   getBToken(arg0: string, overrides?: CallOverrides): Promise<string>;
 
@@ -571,7 +571,7 @@ export class Project extends BaseContract {
 
     funded(overrides?: CallOverrides): Promise<boolean>;
 
-    getAllAcceptedTokens(overrides?: CallOverrides): Promise<string[]>;
+    getAcceptedTokens(overrides?: CallOverrides): Promise<string[]>;
 
     getBToken(arg0: string, overrides?: CallOverrides): Promise<string>;
 
@@ -729,7 +729,7 @@ export class Project extends BaseContract {
 
     funded(overrides?: CallOverrides): Promise<BigNumber>;
 
-    getAllAcceptedTokens(overrides?: CallOverrides): Promise<BigNumber>;
+    getAcceptedTokens(overrides?: CallOverrides): Promise<BigNumber>;
 
     getBToken(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -848,9 +848,7 @@ export class Project extends BaseContract {
 
     funded(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    getAllAcceptedTokens(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    getAcceptedTokens(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getBToken(
       arg0: string,

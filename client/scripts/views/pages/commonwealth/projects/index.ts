@@ -7,27 +7,28 @@ import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import Listing from 'views/pages/listing';
 import ProjectCard from 'views/components/commonwealth/project_card';
+import { protocolReady } from 'controllers/chain/ethereum/commonwealth/utils';
 import { CMNProject } from 'models';
 
-export const connectionReady = () => {
-  if (!app.chain || !app.cmnProtocol || !app.cmnProtocol.initialized) return false;
-  if (app.activeChainId() !== app.cmnProtocol.chainId) return false;
-  return true;
-};
-
-const ProjectsPage: m.Component<{}, {initialized: boolean, projects: CMNProject[]}> = {
+const ProjectsPage: m.Component<{}, {initialized: number, projects: CMNProject[]}> = {
+  oncreate: (vnode) => {
+    vnode.state.initialized = 0;
+  },
   onupdate: async (vnode) => {
-    if (!connectionReady()) return;
+    if (!protocolReady()) return;
 
-    vnode.state.projects = await app.cmnProtocol.project_protocol.syncProjects();
-    if (!vnode.state.initialized) {
-      vnode.state.initialized = true;
-      m.redraw();
+    if (vnode.state.initialized !== 2) {
+      if (vnode.state.initialized === 0) {
+        vnode.state.initialized = 1;
+        vnode.state.projects = await app.cmnProtocol.project_protocol.getProjects();
+        vnode.state.initialized = 2;
+        m.redraw();
+      }
     }
   },
 
   view: (vnode) => {
-    if (!connectionReady() || !vnode.state.initialized) return m(PageLoading);
+    if (vnode.state.initialized !== 2) return m(PageLoading);
     const notLoggedIn = !app.user.activeAccount || !app.isLoggedIn();
 
     const { projects } = vnode.state;

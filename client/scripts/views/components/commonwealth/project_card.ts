@@ -21,11 +21,11 @@ const ProjectCard: m.Component<{project: CMNProject}> = {
         onclick: (e) => {
           e.stopPropagation();
           e.preventDefault();
-          m.route.set(`/${app.activeChainId()}/project/${project.projectHash}`); // avoid resetting scroll point
+          m.route.set(`/${app.activeChainId()}/project/${project.address}`); // avoid resetting scroll point
         },
       }, [
         m(Tag, {
-          label: ['Project #', project.projectHash.substring(0, 5)],
+          label: ['Project #', project.address.substring(0, 5)],
           intent: 'primary',
           rounded: true,
           size: 'xs',
