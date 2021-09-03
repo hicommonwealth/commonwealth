@@ -3,73 +3,119 @@
 const { checkAddress, decodeAddress, encodeAddress } = require('@polkadot/util-crypto');
 
 module.exports = {
-  up: async (queryInterface, Sequelize) => {
-    const addresses = await queryInterface.sequelize.query('SELECT id, address, chain FROM "Addresses";');
-    const chains = await queryInterface.sequelize.query('SELECT id, network, base, ss58_prefix FROM "Chains";');
-    const promises = [];
-    const removeAddressIds = [];
+  up: (queryInterface, Sequelize) => {
+    return queryInterface.sequelize.transaction(async (transaction) => {
+      const addresses = await queryInterface.sequelize.query(
+        'SELECT id, address, chain FROM "Addresses";',
+        { transaction },
+      );
+      const chains = await queryInterface.sequelize.query(
+        'SELECT id, network, base, ss58_prefix FROM "Chains";',
+        { transaction },
+      );
+      const promises = [];
+      const updateAddressIds = {};
 
-    for (const addr of addresses[0]) {
-      const { id, address, chain } = addr;
-      const ch = chains[0].find((_) => _.network === chain);
-      if (ch && ch.base === 'substrate' && ch.ss58_prefix !== null && ch.ss58_prefix !== undefined) {
-        let decodedAddress;
-        try {
-          decodedAddress = decodeAddress(address);
-        } catch (e) {
-          throw new Error('failed to decode address');
-        }
-
-        // check if it is valid with the current prefix & reencode if needed
-        const [valid] = checkAddress(address, ch.ss58_prefix);
-        if (!valid) {
+      for (const addr of addresses[0]) {
+        const { id, address, chain } = addr;
+        const ch = chains[0].find((_) => _.network === chain);
+        if (ch && ch.base === 'substrate' && typeof ch.ss58_prefix === 'number') {
+          let decodedAddress;
           try {
-            const encoded = encodeAddress(decodedAddress, ch.ss58_prefix);
-            const duplicated = await queryInterface.sequelize.query(`SELECT id FROM "Addresses" WHERE address='${encoded}' AND chain='${chain}';`);
-            if (duplicated[0] && duplicated[0].length) {
-              removeAddressIds.push(id);
-            } else {
-              promises.push(
-                queryInterface.sequelize.query('UPDATE "Addresses" SET address=:address WHERE id=:id;', {
-                  replacements: { id, address: encoded },
-                  type: queryInterface.sequelize.QueryTypes.UPDATE,
-                })
-              );
-            }
+            decodedAddress = decodeAddress(address);
           } catch (e) {
-            console.error('failed to reencode address', e);
+            throw new Error('failed to decode address');
+          }
+
+          // check if it is valid with the current prefix & reencode if needed
+          const [valid] = checkAddress(address, ch.ss58_prefix);
+          if (!valid) {
+            try {
+              const encoded = encodeAddress(decodedAddress, ch.ss58_prefix);
+              const duplicated = await queryInterface.sequelize.query(
+                `SELECT id FROM "Addresses" WHERE address='${encoded}' AND chain='${chain}';`,
+                { transaction },
+              );
+              if (duplicated[0] && duplicated[0][0]?.id) {
+                updateAddressIds[+id] = +duplicated[0][0].id;
+              } else {
+                promises.push(
+                  queryInterface.sequelize.query(
+                    'UPDATE "Addresses" SET address=:address WHERE id=:id;',
+                    {
+                      replacements: { id, address: encoded },
+                      type: queryInterface.sequelize.QueryTypes.UPDATE,
+                      transaction,
+                    },
+                  )
+                );
+              }
+            } catch (e) {
+              console.error(`failed to reencode address: ${address}`);
+              console.error(e.message);
+            }
           }
         }
       }
-    }
 
-    if (removeAddressIds.length) {
-      const payload = removeAddressIds.join(', ');
-      await queryInterface.sequelize.query(`DELETE FROM "OffchainProfiles" WHERE address_id IN (${payload});`);
-      await queryInterface.sequelize.query(`DELETE FROM "Roles" WHERE address_id IN (${payload});`);
-      await queryInterface.sequelize.query(`DELETE FROM "Collaborations" WHERE address_id IN (${payload});`);
+      for (const [toReplace, replaceWith] of Object.entries(updateAddressIds)) {
+        console.log(`Replacing ${toReplace} with ${replaceWith}`);
+        await queryInterface.sequelize.query(
+          'UPDATE "Collaborations" SET address_id=:address WHERE address_id=:id;',
+          { replacements: { id: toReplace, address: replaceWith, }, transaction, logging: console.log },
+        );
+        await queryInterface.sequelize.query(
+          'DELETE FROM "OffchainProfiles" WHERE address_id=:id;',
+          { replacements: { id: toReplace, }, transaction, logging: console.log },
+        );
+        await queryInterface.sequelize.query(
+          'UPDATE "Roles" SET address_id=:address WHERE address_id=:id;',
+          { replacements: { id: toReplace, address: replaceWith }, transaction, logging: console.log },
+        );
 
-      const threads = await queryInterface.sequelize.query(`SELECT id FROM "OffchainThreads" WHERE address_id IN (${payload});`);
-      const comments = await queryInterface.sequelize.query(`SELECT id FROM "OffchainComments" WHERE address_id IN (${payload});`);
+        const threads = await queryInterface.sequelize.query(
+          'SELECT id FROM "OffchainThreads" WHERE address_id=:id;',
+          { replacements: { id: toReplace }, transaction, logging: console.log },
+        );
+        const comments = await queryInterface.sequelize.query(
+          'SELECT id FROM "OffchainComments" WHERE address_id=:id;',
+          { replacements: { id: toReplace }, transaction, logging: console.log },
+        );
 
-      if (threads[0] && threads[0].length) {
-        const threadIds = threads[0].map((_) => _.id).join(', ');
-        await queryInterface.sequelize.query(`DELETE FROM "OffchainReactions" WHERE thread_id IN (${threadIds});`);
-        await queryInterface.sequelize.query(`DELETE FROM "OffchainThreads" WHERE id IN (${threadIds});`);
+        if (threads[0] && threads[0].length) {
+          const threadIds = threads[0].map((_) => _.id).join(', ');
+          await queryInterface.sequelize.query(
+            `UPDATE "OffchainReactions" SET address_id=:address WHERE thread_id IN (${threadIds});`,
+            { replacements: { address: replaceWith, }, transaction, logging: console.log },
+          );
+          await queryInterface.sequelize.query(
+            `UPDATE "OffchainThreads" SET address_id=:address WHERE id IN (${threadIds});`,
+            { replacements: { address: replaceWith, }, transaction, logging: console.log },
+          );
+        }
+
+        if (comments[0] && comments[0].length) {
+          const commentIds = comments[0].map((_) => _.id).join(', ');
+          await queryInterface.sequelize.query(
+            `UPDATE "OffchainReactions" SET address_id=:address WHERE comment_id IN (${commentIds});`,
+            { replacements: { address: replaceWith, }, transaction, logging: console.log },
+          );
+          await queryInterface.sequelize.query(
+            `UPDATE "OffchainComments" SET address_id=:address WHERE id IN (${commentIds});`,
+            { replacements: { address: replaceWith, }, transaction, logging: console.log },
+          );
+        }
+
+        await queryInterface.sequelize.query(
+          'DELETE FROM "Addresses" WHERE id=:id;',
+          { replacements: { id: toReplace }, transaction, logging: console.log },
+        );
       }
 
-      if (comments[0] && comments[0].length) {
-        const commentIds = comments[0].map((_) => _.id).join(', ');
-        await queryInterface.sequelize.query(`DELETE FROM "OffchainReactions" WHERE comment_id IN (${commentIds});`);
-        await queryInterface.sequelize.query(`DELETE FROM "OffchainComments" WHERE id IN (${commentIds});`);
-      }
+      console.log('affected addresses count: ', promises.length);
 
-      await queryInterface.sequelize.query(`DELETE FROM "Addresses" WHERE id IN (${payload});`);
-    }
-
-    console.log('affected addresses count: ', promises.length);
-
-    await Promise.all(promises);
+      await Promise.all(promises);
+    });
   },
 
   down: async (queryInterface, Sequelize) => {
