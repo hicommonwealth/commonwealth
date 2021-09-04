@@ -73,7 +73,8 @@ class CommentsStore extends IdStore<OffchainComment<any>> {
 
   public nComments<T extends IUniqueId>(proposal: T): number {
     if (this._storeProposal[proposal.uniqueIdentifier]) {
-      return this._storeProposal[proposal.uniqueIdentifier].length;
+      return this._storeProposal[proposal.uniqueIdentifier]
+        .filter((c) => !c.deleted).length;
     } else {
       return 0;
     }

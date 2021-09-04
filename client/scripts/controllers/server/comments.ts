@@ -67,7 +67,6 @@ export const modelFromServer = (comment) => {
     // no proposal
   }
 
-  console.log(comment);
   const commentParams = (comment.deleted_at?.length > 0)
     ? {
       chain: comment.chain,
@@ -230,7 +229,18 @@ class CommentsController {
         comment_id: comment.id,
       }).then((result) => {
         const existing = this._store.getById(comment.id);
+        const revisedComment : any = Object.assign(
+          existing,
+          {
+            deleted: true,
+            text: '[deleted]',
+            plaintext: '[deleted]',
+            versionHistory: []
+          }
+        );
+        const softDeletion = new OffchainComment(revisedComment);
         this._store.remove(existing);
+        this._store.add(softDeletion);
         resolve(result);
       }).catch((e) => {
         console.error(e);

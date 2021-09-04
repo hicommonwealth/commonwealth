@@ -1,4 +1,5 @@
 import { Near as NearApi, connect as nearConnect, WalletAccount } from 'near-api-js';
+import { FunctionCallOptions } from 'near-api-js/lib/account';
 import { NodeStatusResult } from 'near-api-js/lib/providers/provider';
 import { uuidv4 } from 'lib/util';
 import { IChainModule, ITXModalData, NodeInfo } from 'models';

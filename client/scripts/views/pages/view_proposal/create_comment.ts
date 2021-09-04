@@ -13,6 +13,9 @@ import QuillEditor from 'views/components/quill_editor';
 import User from 'views/components/widgets/user';
 
 import { notifyError } from 'controllers/app/notifications';
+import Token from 'controllers/chain/ethereum/token/adapter';
+import BN from 'bn.js';
+import { tokenBaseUnitsToTokens } from 'helpers';
 import { GlobalStatus } from './body';
 import { IProposalPageState } from '.';
 import jumpHighlightComment from './jump_to_comment';
@@ -41,6 +44,9 @@ const CreateComment: m.Component<{
       rootProposal
     } = vnode.attrs;
     let { parentComment } = vnode.attrs;
+    let disabled = getSetGlobalEditingStatus(GlobalStatus.Get)
+      || vnode.state.quillEditorState?.editor?.editor?.isBlank();
+
     const author = app.user.activeAccount;
     const parentType = (parentComment || proposalPageState.parentCommentId)
       ? CommentParent.Comment
@@ -122,7 +128,10 @@ const CreateComment: m.Component<{
       proposalPageState.parentCommentId = null;
     };
 
-    const { error, sendingComment, uploadsInProgress } = vnode.state;
+    const activeTopicName = rootProposal instanceof OffchainThread ? rootProposal?.topic?.name : null;
+
+    const isAdmin = app.user.isSiteAdmin
+      || app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
 
     let parentScopedClass: string = 'new-thread-child';
     let parentAuthor: Account<any>;
@@ -131,6 +140,24 @@ const CreateComment: m.Component<{
       parentAuthor = app.community
         ? app.community.accounts.get(parentComment.author, parentComment.authorChain)
         : app.chain.accounts.get(parentComment.author);
+    }
+
+    const { error, sendingComment, uploadsInProgress } = vnode.state;
+    disabled = getSetGlobalEditingStatus(GlobalStatus.Get)
+      || vnode.state.quillEditorState?.editor?.editor?.isBlank()
+      || sendingComment
+      || uploadsInProgress;
+
+    // token balance check if needed
+    let tokenPostingThreshold = null;
+    if (!app.community && (app.chain as Token)?.isToken) {
+      const tokenBalance = (app.chain as Token).tokenBalance;
+      tokenPostingThreshold = app.topics.getByName(
+        activeTopicName,
+        app.activeId()
+      )?.tokenThreshold;
+      disabled = disabled
+        || ((!app.isAdapterReady) && !isAdmin && tokenPostingThreshold && tokenPostingThreshold.gt(tokenBalance));
     }
 
     return m('.CreateComment', {
@@ -186,17 +213,18 @@ const CreateComment: m.Component<{
               imageUploader: true,
               tabindex: vnode.attrs.tabindex,
             }),
+            m('.token-requirement', [
+              tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0))
+                ? `Commenting in ${activeTopicName} requires 
+                ${tokenBaseUnitsToTokens(tokenPostingThreshold.toString(), app.chain.meta.chain.decimals)} ${app.chain.meta.chain.symbol}`
+                : null
+            ]),
             m('.form-bottom', [
               m(Button, {
                 intent: 'primary',
                 type: 'submit',
                 compact: true,
-                disabled: (
-                  getSetGlobalEditingStatus(GlobalStatus.Get)
-                  || vnode.state.quillEditorState?.editor?.editor?.isBlank()
-                  || sendingComment
-                  || uploadsInProgress > 0
-                ),
+                disabled,
                 rounded: true,
                 onclick: submitComment,
                 label: (uploadsInProgress > 0)
@@ -218,7 +246,7 @@ const CreateComment: m.Component<{
                 }),
               error
                 && m('.new-comment-error', error),
-            ])
+            ]),
           ]
       ])
     ]);

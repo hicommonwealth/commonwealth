@@ -159,7 +159,7 @@ const instantiateEditor = (
       const files = Array.from(e.clipboardData.files || []);
       if (!html && files.length > 0) {
         this.quill.uploader.upload(range, files);
-      } else {
+      } else if (text || files.length > 1) {
         this.onPaste(range, isMarkdownMode() ? { text } : { html, text });
       }
     }
@@ -570,7 +570,7 @@ const instantiateEditor = (
   // handle drag-and-drop and paste events
   const imageHandler = async (imageDataUrl, type) => {
     if (!type) type = 'image/png';
-    const index = (quill.getSelection() || {}).index || quill.getLength();
+    const index = (quill.getSelection() || {}).index || quill.getLength() || 0;
 
     // filter out base64 format images from Quill
     const contents = quill.getContents();
@@ -586,13 +586,15 @@ const instantiateEditor = (
     const isMarkdown = $('.QuillEditor').hasClass('markdown-mode');
     const file = dataURLtoFile(imageDataUrl, type);
     quill.enable(false);
-    uploadImg(file).then((response) => {
+    uploadImg(file).then((uploadURL) => {
       quill.enable(true);
-      if (typeof response === 'string' && detectURL(response)) {
-        if (isMarkdown && !!index) {
-          quill.insertText(index, `![](${response})`, 'user');
+      if (typeof uploadURL === 'string' && detectURL(uploadURL)) {
+        if (isMarkdown) {
+          quill.insertText(index, `![](${uploadURL})`, 'user');
+        } else {
+          quill.insertEmbed(index, 'image', uploadURL);
         }
-        quill.setSelection(index + (isMarkdown ? 5 + response.length : 1), 0);
+        quill.setSelection(index + (isMarkdown ? 5 + uploadURL.length : 1), 0);
       }
     }).catch((err) => {
       notifyError('Failed to upload image. Was it a valid JPG, PNG, or GIF?');
@@ -630,9 +632,7 @@ const instantiateEditor = (
       },
       // TODO: Currently works, but throws Parchment error. Smooth functionality
       // requires troubleshooting
-      imageUploader: imageUploader ? {
-        upload: uploadImg
-      } : false,
+      imageUploader: false,
       markdownShortcuts: {
         suppress: () => { return isMarkdownMode(); }
       },
@@ -667,7 +667,7 @@ const instantiateEditor = (
     placeholder,
     formats: hasFormats ? [
       'bold', 'italic', 'strike', 'code',
-      'link', 'image', 'blockquote', 'code-block',
+      'link', 'blockquote', 'code-block',
       'header', 'list', 'twitter', 'video', 'mention',
     ] : [],
     theme,

@@ -393,7 +393,6 @@ const ProposalHeader: m.Component<{
                       proposalPageState.replying = false;
                     }
                     proposalPageState.parentCommentId = null;
-                    console.log(proposalPageState);
                   }
                 })
               ])
@@ -438,9 +437,8 @@ const ProposalComment: m.Component<{
       + `${proposal.identifier}-${slugify(proposal.title)}?comment=${comment.id}`;
 
     const commentReplyCount = app.comments.getByProposal(proposal)
-      .filter((c) => c.parentComment === comment.id)
+      .filter((c) => c.parentComment === comment.id && !c.deleted)
       .length;
-    console.log(comment);
     return m('.ProposalComment', {
       class: `${parentType}-child comment-${comment.id}`,
       onchange: () => m.redraw(), // TODO: avoid catching bubbled input events
@@ -510,6 +508,7 @@ const ProposalComment: m.Component<{
           !vnode.state.editing
             && !comment.deleted
             && m('.comment-response-row', [
+              m(ProposalBodyReaction, { item: comment }),
               m(InlineReplyButton, {
                 commentReplyCount,
                 onclick: (e) => {
@@ -522,7 +521,6 @@ const ProposalComment: m.Component<{
                   }
                 }
               }),
-              m(ProposalBodyReaction, { item: comment }),
             ]),
         ]),
       ]),

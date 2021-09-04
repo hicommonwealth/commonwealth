@@ -14,7 +14,6 @@ $discussion-title-font-size: 1.45rem;
     &.highlighted {
         border-radius: 20px;
         background-color: $background-color-new-comment;
-        z-index: -2;
         .thread-connector {
             background: #00C0A9;
         }
@@ -22,7 +21,6 @@ $discussion-title-font-size: 1.45rem;
     &.highlighted.highlightAnimationComplete {
         background-color: transparent;
         transition: background-color 1s ease-in-out;
-        z-index: 0;
         .thread-connector {
             background: $background-color-light;
             transition: background 1s ease-in-out;
@@ -42,9 +40,10 @@ $discussion-title-font-size: 1.45rem;
     }
     .ProposalHeader,
     .ProposalComment {
-        padding-top: 40px;
+        margin-top: 36px;
+        padding: 4px 0;
         @include xs-max {
-            padding-top: 30px;
+            margin-top: 30px;
         }
     }
     .ProposalComments.no-active-account {
@@ -59,10 +58,9 @@ $discussion-title-font-size: 1.45rem;
             display: flex;
             max-width: 300px;
             align-items: center;
-            .InlineReplyButton:hover {
-                background: #F3FBFF;
-            }
-            .InlineReplyButton {
+            .InlineReplyButton,
+            .ProposalBodyReaction {
+                border: 1px solid $text-color-medium;
                 margin-right: 7%;
                 padding: 6px;
                 cursor: pointer;
@@ -72,8 +70,21 @@ $discussion-title-font-size: 1.45rem;
                 display: flex;
                 justify-content: center;
                 align-items: center;
+                margin-right: 10%;
+                padding: 6px;
+                cursor: pointer;
+                &:hover {
+                    .cui-icon, .reply-count, .reactions-count {
+                        color: #4723AD;
+                    }
+                }
+                .active {
+                    .cui-icon, .reply-count, .reactions-count {
+                        color: #4723AD !important;
+                    }
+                }
                 .cui-icon, .reply-count, .reactions-count {
-                    color: black;
+                    color: $text-color-medium;
                     font-weight: 500;
                 }
                 .cui-icon {
