@@ -158,22 +158,22 @@ const Sublayout: m.Component<{
               rightContent && m('.sublayout-right-col', rightContent),
             ]),
           ]),
-          !app.isCustomDomain() && m(FooterLandingPage, {
-            list: [
-              { text: 'Blog', externalLink: 'https://blog.commonwealth.im' },
-              { text: 'Jobs', externalLink: 'https://angel.co/company/commonwealth-labs/jobs' },
-              { text: 'Terms', redirectTo:  '/terms' },
-              { text: 'Privacy', redirectTo: '/privacy' },
-              { text: 'Docs', redirectTo: 'https://docs.commonwealth.im' },
-              { text: 'Discord', externalLink: 'https://discord.gg/ZFQCKUMP' },
-              { text: 'Telegram', externalLink: 'https://t.me/HiCommonwealth' }
-              // { text:  'Use Cases' },
-              // { text:  'Crowdfunding' },
-              // { text:  'Developers' },
-              // { text:  'About us' },
-              // { text:  'Careers' }
-            ],
-          }),
+          // !app.isCustomDomain() && m(FooterLandingPage, {
+          //   list: [
+          //     { text: 'Blog', externalLink: 'https://blog.commonwealth.im' },
+          //     { text: 'Jobs', externalLink: 'https://angel.co/company/commonwealth-labs/jobs' },
+          //     { text: 'Terms', redirectTo:  '/terms' },
+          //     { text: 'Privacy', redirectTo: '/privacy' },
+          //     { text: 'Docs', redirectTo: 'https://docs.commonwealth.im' },
+          //     { text: 'Discord', externalLink: 'https://discord.gg/ZFQCKUMP' },
+          //     { text: 'Telegram', externalLink: 'https://t.me/HiCommonwealth' }
+          //     // { text:  'Use Cases' },
+          //     // { text:  'Crowdfunding' },
+          //     // { text:  'Developers' },
+          //     // { text:  'About us' },
+          //     // { text:  'Careers' }
+          //   ],
+          // }),
         ]),
       ]),
     ];

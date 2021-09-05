@@ -107,7 +107,7 @@ pre {
     }
 }
 @include sm-max {
-    $mobile-header-height: 60px; // see also sidebar/index.scss
+    $mobile-header-height: 56px; // see also sidebar/index.scss
     .MobileHeader {
         display: flex;
         position: fixed;
