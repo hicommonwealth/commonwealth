@@ -12,13 +12,6 @@ class TerraStationWebWalletController implements IWebWallet<string> {
   public readonly chain = ChainBase.CosmosSDK;
   public readonly specificChain = 'terra';
 
-  constructor() {
-    this._extension.on('onConnect', (accountAddr) => {
-      console.log(accountAddr)
-      this._accounts.push(accountAddr);
-    })
-  }
-
   public get available() {
     return this._extension.isAvailable
   }
@@ -44,8 +37,15 @@ class TerraStationWebWalletController implements IWebWallet<string> {
     this._enabling = true;
 
     try {
-      this._extension.connect()
-      this._enabled = true;
+      const connect = await this._extension.connect()
+      await this._extension.once('onConnect', (accountAddr) => {
+        if (accountAddr && !this._accounts.includes(accountAddr)) {
+          console.log(accountAddr)
+          this._accounts.push(accountAddr);
+          console.log('enabled and added');
+        } 
+        (this._accounts.length === 0 ) ? this._enabled = false : this._enabled = true;
+      });
       this._enabling = false;
     } catch (error) {
       console.error(`Failed to enabled Terra Station ${error.message}`);
