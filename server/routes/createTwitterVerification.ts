@@ -4,8 +4,8 @@ import { Octokit } from '@octokit/rest';
 import { Request, Response, NextFunction } from 'express';
 import { DB } from '../database';
 
-const GITHUB_AUTHENTICATION = '';
-const TWITTER_BEARER = '';
+const GITHUB_AUTHENTICATION = process.env.GITHUB_CLIENT_SECRET;
+const TWITTER_BEARER = process.env.TWITTER_BEARER;
 
 export async function gatherResponse(response) {
   const { headers } = response;
