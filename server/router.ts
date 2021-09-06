@@ -503,9 +503,17 @@ function setupRouter(
 
   router.post('/snapshotAPI/sendMessage', sendMessage.bind(this));
 
-  router.get('/auth/twitter', passport.authenticate('twitter'));
+  router.get('/auth/twitter', (req, res, next) => {
+    req.session.redirect = req.query.redirect;
+    const authenticator = passport.authenticate('twitter');
+    authenticator(req, res, next);
+  });
   router.get('/auth/twitter/callback',
-    passport.authenticate('twitter', { successRedirect: '/', failureRedirect: '/login' }));
+    passport.authenticate('twitter', { failureRedirect: '/login' }),
+    (req, res) => {
+      res.redirect(req.session.redirect || '/');
+      delete req.session.redirect;
+    });
 
   app.use('/api', router);
 }
