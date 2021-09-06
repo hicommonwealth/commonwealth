@@ -68,15 +68,6 @@ const setupChainEventListeners = async (
     }
   })).map((o) => o.id);
 
-  // will be used for token notifications
-  const erc20Tokens = (await models.Chain.findAll({
-    attributes: ['id'],
-    where: {
-      'base': 'ethereum',
-      'type': 'token'
-    }
-  })).map((o) => o.id);
-
   // feed the events into their respective handlers
   async function processClassicEvents(event: CWEvent): Promise<void> {
     let prevResult = null;

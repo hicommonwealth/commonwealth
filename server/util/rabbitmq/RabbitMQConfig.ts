@@ -1,4 +1,3 @@
-import { BrokerConfig } from 'rascal';
 import { RABBITMQ_URI, RABBITMQ_VHOST, HANDLE_IDENTITY } from '../../config';
 
 // We would use BrokerConfig but the "connection" type seems different
