@@ -288,9 +288,6 @@ export default (
         case 'osmosis':
           bech32Prefix = 'osmo';
           break;
-        case 'injective':
-          bech32Prefix = 'inj';
-          break;
         case 'terra':
           bech32Prefix = 'terra';
           break;

@@ -68,9 +68,6 @@ class InjectiveWebWalletController implements IWebWallet<string>{
       if (this._ethAccounts.length === 0) {
         throw new Error('Could not fetch accounts from Metamask');
       } else {
-        // for (let i = 0; i < this._ethAccounts.length; ++i) {
-        //   this._accounts[i] = bech32.encode('inj', bech32.toWords(Address.fromString(this._accounts[i].toString()).toBuffer()))
-        // }
         for (const acc of this._ethAccounts) {
           this._accounts.push(bech32.encode('inj', bech32.toWords(Address.fromString(acc.toString()).toBuffer())))
         }
