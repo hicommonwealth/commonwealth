@@ -428,7 +428,8 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
           ]),
           webWallet?.enabled && m('.accounts-caption', [
             webWallet?.accounts.length === 0 ? [
-              m('p', 'Wallet connected, but no accounts were found.'),
+              m('br'),
+              m('p', 'Wallet connected, but no accounts were found. Please make sure you are signed in to your wallet and try again.'),
             ] : webWallet.chain === ChainBase.Ethereum ? [ // metamask + walletconnect
               m('p.small-text', 'Use your wallet to switch between accounts.'),
             ] : [
