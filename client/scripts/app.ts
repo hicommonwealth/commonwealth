@@ -218,20 +218,25 @@ async function initCMNProtocol(chainId: string) {
     && app.cmnProtocol.initialized
   ) return; // no need to reinitialize
 
+  console.log('initializing CMNProtocol');
+  app.cmnProtocol = null;
+
   const CMNProtocol = (await import(
     /* webpackMode: "lazy" */
     /* webpackChunkName: "commonwealth-main" */
     './controllers/chain/ethereum/commonwealth/adapter'
   )).default;
 
-  const cmnProtocol = new CMNProtocol();
-  app.cmnProtocol = cmnProtocol;
-  await app.cmnProtocol.init(
+  const newCmnProtocol = new CMNProtocol();
+  await newCmnProtocol.init(
     protocol.chain,
     app,
     protocol.project_protocol,
     protocol.collective_protocol
   );
+
+  app.cmnProtocol = newCmnProtocol;
+  console.log('CMNProtocol initialized', app.cmnProtocol);
 }
 
 // called by the user, when clicking on the chain/node switcher menu

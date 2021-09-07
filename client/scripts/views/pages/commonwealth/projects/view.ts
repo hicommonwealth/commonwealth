@@ -30,13 +30,10 @@ function secondsToDhms(seconds) {
 const ProjectContentModule: m.Component<{
   project: CMNProject,
   leftInSeconds: number,
-  forceUpdateStatus: () => void,
 }, {}> = {
   oncreate: async (vnode) => {
     if (vnode.attrs.leftInSeconds > 0) {
       setTimeout(() => { m.redraw(); }, 1000 * 60);
-    } else {
-      await vnode.attrs.forceUpdateStatus();
     }
   },
   view: (vnode) => {
@@ -81,38 +78,36 @@ const ViewProjectPage: m.Component<{
   address: string
 },
 {
-  initialized: boolean,
+  initialized: number,
   project: CMNProject,
   curators: any,
   backers: any
 }> = {
   oncreate: async (vnode) => {
-    vnode.state.initialized = false;
+    vnode.state.initialized = 0;
   },
   onupdate: async (vnode) => {
     if (!protocolReady()) return;
-    if (!vnode.state.initialized) {
-      const project_protocol = app.cmnProtocol.project_protocol;
-      const projects = await project_protocol.getProjects();
-      const project = projects.filter((item) => item.address === vnode.attrs.address)[0];
-      const members = await project_protocol.getMembers(project);
 
-      vnode.state.backers = members ? members.backers : [];
-      vnode.state.curators = members ? members.curators : [];
+    if (vnode.state.initialized === 0) {
+      const {
+        project,
+        backers,
+        curators
+      } = await app.cmnProtocol.project_protocol.getProjectDetails(vnode.attrs.address);
+      vnode.state.backers = backers;
+      vnode.state.curators = curators;
       vnode.state.project = project;
-      vnode.state.initialized = true;
+      vnode.state.initialized = 1;
       m.redraw();
     }
   },
   view: (vnode) => {
-    const { project, initialized, curators, backers } = vnode.state;
+    if (vnode.state.initialized !== 1) return m(PageLoading);
 
-    if (!initialized) return m(PageLoading);
-
+    const { project, curators, backers } = vnode.state;
     const project_protocol = app.cmnProtocol.project_protocol;
     const { bTokens, cTokens, endTime } = project;
-    const startTime = new Date();
-    const leftInSeconds = (endTime.getTime() - startTime.getTime()) / 1000;
 
     // const backersContent = project.acceptedTokens.map((token) => m(
     //   TokenHolders,
@@ -130,12 +125,7 @@ const ViewProjectPage: m.Component<{
       m('.container', [
         m(ProjectContentModule, {
           project,
-          leftInSeconds,
-          forceUpdateStatus: async () => {
-            vnode.state.initialized = false;
-            await project_protocol.getProjects();
-            vnode.state.initialized = true;
-          }
+          leftInSeconds: (endTime.getTime() - (new Date()).getTime()) / 1000,
         }),
         m(ActionModule, { project, project_protocol, backers, curators }),
         m('.row .members-card', [

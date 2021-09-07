@@ -4,8 +4,9 @@ import { utils } from 'ethers';
 import { Project as CMNProjectContract, } from 'eth/types';
 
 import { CMNProject } from '../../../../../models';
-import ContractApi from '../../contractApi';
+import ContractApi, { attachSigner } from '../../contractApi';
 import { EtherAddress, getTokenDetails } from '../utils';
+import EthereumChain from '../../chain';
 
 export default class CMNProjectApi extends ContractApi<CMNProjectContract> {
   public readonly gasLimit: number = 3000000;
@@ -16,87 +17,87 @@ export default class CMNProjectApi extends ContractApi<CMNProjectContract> {
     return getTokenDetails(tokens);
   }
 
-  public async back(amount: number, token: string) {
-    let transactionSuccessed = false;
-    const tx = token === EtherAddress
-      ? await this.Contract.backWithETH({ value: amount })
-      : await this.Contract.back(token, amount, { gasLimit: this.gasLimit });
+  public async back(amount: BN, token: string, from: string, chain: EthereumChain) {
+    const contract = await attachSigner(chain.app.wallets, from, this.Contract);
 
-    const txReceipt = await tx.wait();
-    transactionSuccessed = txReceipt.status === 1;
-
-    return {
-      status: transactionSuccessed ? 'success' : 'failed',
-      error: transactionSuccessed ? '' : 'Failed to process backWithETH transaction'
-    };
-  }
-
-  public async curate(amount: number, token: string) {
-    let transactionSuccessed: boolean;
+    let status = 'failed';
+    let error = '';
     try {
       const tx = token === EtherAddress
-        ? await this.Contract.curateWithETH({ value: amount })
-        : await this.Contract.curate(token, amount, { gasLimit: this.gasLimit });
+        ? await contract.backWithETH({ value: amount.toString() })
+        : await contract.back(token, amount.toString(), { gasLimit: this.gasLimit });
+
       const txReceipt = await tx.wait();
-      transactionSuccessed = txReceipt.status === 1;
+      status = txReceipt.status === 1 ? 'successed' : 'failed';
+      error = txReceipt.status === 1 ? '' : 'Failed to process back transaction';
     } catch (err) {
-      transactionSuccessed = false;
+      status = 'failed';
+      error = err;
     }
-    return {
-      status: transactionSuccessed ? 'success' : 'failed',
-      error: transactionSuccessed ? '' : 'Failed to process curateWithETH transaction'
-    };
+    return { status, error };
   }
 
-  public async redeemTokens(amount: number, token: string, isBToken: boolean) {
-    let transactionSuccessed: boolean;
+  public async curate(amount: BN, token: string, from: string, chain: EthereumChain) {
+    const contract = await attachSigner(chain.app.wallets, from, this.Contract);
+
+    let status = 'failed';
+    let error = '';
+    try {
+      const tx = token === EtherAddress
+        ? await contract.curateWithETH({ value: amount.toString() })
+        : await contract.curate(token, amount.toString(), { gasLimit: this.gasLimit });
+      const txReceipt = await tx.wait();
+      status = txReceipt.status === 1 ? 'successed' : 'failed';
+      error = txReceipt.status === 1 ? '' : 'Failed to process back transaction';
+    } catch (err) {
+      status = 'failed';
+      error = err;
+    }
+    return { status, error };
+  }
+
+  public async redeemTokens(amount: BN, token: string, isBToken: boolean, from: string, chain: EthereumChain) {
+    const contract = await attachSigner(chain.app.wallets, from, this.Contract);
+
+    let status = 'failed';
+    let error = '';
     try {
       const tx = isBToken
-        ? await this.Contract.redeemBToken(token, amount, { gasLimit: this.gasLimit })
-        : await this.Contract.redeemCToken(token, amount, { gasLimit: this.gasLimit });
+        ? await contract.redeemBToken(token, amount.toString(), { gasLimit: this.gasLimit })
+        : await contract.redeemCToken(token, amount.toString(), { gasLimit: this.gasLimit });
 
       const txReceipt = await tx.wait();
-      transactionSuccessed = txReceipt.status === 1;
+      status = txReceipt.status === 1 ? 'successed' : 'failed';
+      error = txReceipt.status === 1 ? '' : 'Failed to process back transaction';
     } catch (err) {
-      transactionSuccessed = false;
+      status = 'failed';
+      error = err;
     }
-    return {
-      status: transactionSuccessed ? 'success' : 'failed',
-      error: transactionSuccessed ? '' : 'Failed to process redeemBToken transaction'
-    };
+    return { status, error };
   }
 
-  public async withdraw() {
-    let transactionSuccessed: boolean;
+  public async withdraw(from: string, chain: EthereumChain) {
+    const contract = await attachSigner(chain.app.wallets, from, this.Contract);
+
+    let status = 'failed';
+    let error = '';
     try {
-      const tx = await this.Contract.withdraw({ gasLimit: this.gasLimit });
+      const tx = await contract.withdraw({ gasLimit: this.gasLimit });
       const txReceipt = await tx.wait();
-      transactionSuccessed = txReceipt.status === 1;
+      status = txReceipt.status === 1 ? 'successed' : 'failed';
+      error = txReceipt.status === 1 ? '' : 'Failed to process back transaction';
     } catch (err) {
-      transactionSuccessed = false;
+      status = 'failed';
+      error = err;
     }
-    return {
-      status: transactionSuccessed ? 'success' : 'failed',
-      error: transactionSuccessed ? '' : 'Failed to process withdraw transaction'
-    };
+    return { status, error };
   }
 
-  public async getProjectDetails() {
-    const metaData = await this.Contract.metaData();
-    const { name, ipfsHash, cwUrl, beneficiary, creator } = metaData;
-
-    const curatorFee = await this.Contract.curatorFee();
-    const threshold = await this.Contract.threshold();
-    const totalFunding = await this.Contract.totalFunding();
+  public async setProjectDetails(project: CMNProject) {
     const funded = await this.Contract.funded();
     const lockedWithdraw = await this.Contract.lockedWithdraw();
     const daedline = (new BN((await this.Contract.deadline()).toString()).mul(new BN(1000))).toNumber();
     const endTime = new Date(daedline);
-
-    const projectHash = utils.solidityKeccak256(
-      ['address', 'address', 'bytes32', 'uint256'],
-      [creator, beneficiary, name, threshold.toString()]
-    );
 
     let status = 'In Progress';
     if ((new Date()).getTime() - endTime.getTime() > 0) {
@@ -112,24 +113,45 @@ export default class CMNProjectApi extends ContractApi<CMNProjectContract> {
       cTokens[acceptedTokenAddresses[i]] = (await this.Contract.getCToken(acceptedTokenAddresses[i])).toLowerCase();
     }
 
+    project.set(acceptedTokens, bTokens, cTokens, lockedWithdraw);
+    return project;
+  }
+
+  public async getProjectInfo() {
+    const metaData = await this.Contract.metaData();
+    const { name, ipfsHash, cwUrl, beneficiary, creator } = metaData;
+
+    // const projectHash = utils.solidityKeccak256(
+    //   ['address', 'address', 'bytes32', 'uint256'],
+    //   [creator, beneficiary, name, threshold.toString()]
+    // );
+
+    const curatorFee = await this.Contract.curatorFee();
+    const threshold = (await this.Contract.threshold()).toNumber();
+    const totalFunding = (await this.Contract.totalFunding()).toNumber();
+
+    const funded = await this.Contract.funded();
+    const daedline = (new BN((await this.Contract.deadline()).toString()).mul(new BN(1000))).toNumber();
+    const endTime = new Date(daedline);
+
+    let status = 'In Progress';
+    if ((new Date()).getTime() - endTime.getTime() > 0) {
+      status = funded ? 'Successed' : 'Failed';
+    }
+
     const newProj = new CMNProject(
       utils.parseBytes32String(name),
       '',
       utils.parseBytes32String(ipfsHash),
-      utils.parseBytes32String(cwUrl),
-      beneficiary,
-      acceptedTokens, // aceptedTokens
-      [], // nominations,
-      threshold, // decimals in 8
+      threshold,
       endTime,
-      curatorFee,
-      projectHash,
-      status,
-      lockedWithdraw,
-      totalFunding, // decimals in 8
-      bTokens,
-      cTokens,
       this.Contract.address,
+      beneficiary,
+      utils.parseBytes32String(cwUrl),
+      curatorFee,
+      status,
+      totalFunding,
+      [], // TODO_CMN: nomination
     );
     return newProj;
   }

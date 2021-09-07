@@ -17,18 +17,15 @@ const ProjectsPage: m.Component<{}, {initialized: number, projects: CMNProject[]
   onupdate: async (vnode) => {
     if (!protocolReady()) return;
 
-    if (vnode.state.initialized !== 2) {
-      if (vnode.state.initialized === 0) {
-        vnode.state.initialized = 1;
-        vnode.state.projects = await app.cmnProtocol.project_protocol.getProjects();
-        vnode.state.initialized = 2;
-        m.redraw();
-      }
+    if (vnode.state.initialized === 0) {
+      vnode.state.projects = await app.cmnProtocol.project_protocol.getProjects();
+      vnode.state.initialized = 1;
+      m.redraw();
     }
   },
 
   view: (vnode) => {
-    if (vnode.state.initialized !== 2) return m(PageLoading);
+    if (vnode.state.initialized !== 1) return m(PageLoading);
     const notLoggedIn = !app.user.activeAccount || !app.isLoggedIn();
 
     const { projects } = vnode.state;

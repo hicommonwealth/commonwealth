@@ -7,7 +7,6 @@ import { CMNProject } from 'models';
 import InProgressActionCard from './inprogress_action';
 import SuccsedActionCard from './successed_action';
 import FailedActionCard from './failed_action';
-import { CWUser } from '../members_card';
 
 const ActionCard: m.Component<{
   project: CMNProject,
@@ -57,7 +56,7 @@ const ActionCard: m.Component<{
         project.status === 'Successed' && m(SuccsedActionCard, {
           project,
           project_protocol,
-          curators
+          curators,
         }),
         project.status === 'Failed' && m(FailedActionCard, {
           project,

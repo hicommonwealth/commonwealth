@@ -28,18 +28,22 @@ const BackAciton: m.Component<
           vnode.state.backing = true;
 
           const index = project.acceptedTokens.findIndex((t) => t.symbol === tokenSymbol);
-          const token = project.acceptedTokens[index];
-          const amount = BigNumber.from(balance).mul(BigNumber.from(10).pow(token.decimals));
+          if (index > -1) {
+            const acceptedToken = project.acceptedTokens[index];
+            const amount = new BN(balance).mul(new BN(10).pow(new BN(acceptedToken.decimals)));
 
-          const res = await project_protocol.backOrCurate(
-            amount,
-            project,
-            true,
-            vnode.attrs.creator,
-            token.address
-          );
-
-          vnode.state.error = res.error;
+            const res = await project_protocol.backOrCurate(
+              amount,
+              project,
+              true,
+              vnode.attrs.creator,
+              acceptedToken.address,
+              acceptedToken.decimals
+            );
+            vnode.state.error = res.error;
+          } else {
+            vnode.state.error = 'Failed to retrive selected AcceptedToken info';
+          }
           vnode.state.backing = false;
           m.redraw();
         }
@@ -74,18 +78,24 @@ const CurateAction: m.Component<
           vnode.state.curating = true;
 
           const index = project.acceptedTokens.findIndex((t) => t.symbol === tokenSymbol);
-          const token = project.acceptedTokens[index];
-          const amount = BigNumber.from(balance).mul(BigNumber.from(10).pow(token.decimals));
 
-          const res = await project_protocol.backOrCurate(
-            amount,
-            project,
-            false,
-            vnode.attrs.creator,
-            token.address
-          );
+          if (index > -1) {
+            const acceptedToken = project.acceptedTokens[index];
+            const amount = new BN(balance).mul(new BN(10).pow(new BN(acceptedToken.decimals)));
 
-          vnode.state.error = res.error;
+            const res = await project_protocol.backOrCurate(
+              amount,
+              project,
+              false,
+              vnode.attrs.creator,
+              acceptedToken.address,
+              acceptedToken.decimals
+            );
+            vnode.state.error = res.error;
+          } else {
+            vnode.state.error = 'Failed to retrive selected AcceptedToken info';
+          }
+
           vnode.state.curating = false;
           m.redraw();
         }

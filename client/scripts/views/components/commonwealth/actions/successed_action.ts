@@ -3,10 +3,10 @@ import 'components/commonwealth/action_card.scss';
 import { Button } from 'construct-ui';
 import m from 'mithril';
 import { BigNumber } from 'ethers';
+import BN from 'bn.js';
 
 import app from 'state';
 import { CMNProject } from 'models';
-import { CWUser } from '../members_card';
 import TokenInputField from '../token_input';
 
 const RedeemCTokenAction: m.Component<{
@@ -23,7 +23,6 @@ const RedeemCTokenAction: m.Component<{
   },
   view: (vnode) => {
     const { project, project_protocol } = vnode.attrs;
-
     const { acceptedTokens, cTokens } = project;
 
     return [
@@ -35,21 +34,27 @@ const RedeemCTokenAction: m.Component<{
           vnode.state.submitting = true;
 
           const index = project.acceptedTokens.findIndex((t) => t.symbol === tokenSymbol);
-          const acceptedToken = acceptedTokens[index];
-          const amount = BigNumber.from(balance).mul(BigNumber.from(10).pow(acceptedToken.decimals));
-          const author = app.user.activeAccount.address;
+          if (index > -1) {
+            const acceptedToken = acceptedTokens[index];
+            const author = app.user.activeAccount.address;
+            const amount = new BN(balance).mul(new BN(10).pow(new BN(acceptedToken.decimals)));
 
-          const res = await project_protocol.redeemTokens(
-            amount,
-            false,
-            project,
-            author,
-            cTokens[acceptedToken.address],
-            acceptedToken.address
-          );
+            const res = await project_protocol.redeemTokens(
+              amount,
+              false,
+              project,
+              author,
+              cTokens[acceptedToken.address],
+              acceptedToken.address,
+              acceptedToken.decimals
+            );
 
-          vnode.state.error = res.error;
+            vnode.state.error = res.error;
+          } else {
+            vnode.state.error = 'Failed to retrive selected AcceptedToken info';
+          }
           vnode.state.submitting = false;
+          m.redraw();
         }
       }),
       vnode.state.error && vnode.state.error !== '' && m(
@@ -101,19 +106,20 @@ const WithdrawAction: m.Component<{
 const SuccsedActionCard: m.Component<{
   project: CMNProject,
   project_protocol: any,
-  curators: CWUser[]
+  curators: any
 },
 {}> = {
   view: (vnode) => {
     const { project, project_protocol, curators } = vnode.attrs;
 
     let withdrawAble = false;
-    let redeemAble = false;
+    const redeemAble = true;
     if (app.user.activeAccount && app.isLoggedIn()) {
       const activeAddress = app.user.activeAccount.address.toLowerCase();
-      if (curators.map((item: any) => item.address.toLowerCase()).includes(activeAddress)) {
-        redeemAble = true;
-      }
+
+      // if (!curators.map((c) => c.address.toLowerCase()).includes(activeAddress)) {
+      //   redeemAble = false;
+      // }
       if ((activeAddress === project.beneficiary.toLowerCase()) && (!project.withdrawIsDone)) {
         withdrawAble = true;
       }

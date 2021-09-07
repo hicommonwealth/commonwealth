@@ -2,6 +2,7 @@ import 'components/commonwealth/action_card.scss';
 
 import m from 'mithril';
 import { BigNumber } from 'ethers';
+import BN from 'bn.js';
 
 import app from 'state';
 import { CMNProject } from 'models';
@@ -22,11 +23,12 @@ const FailedActionCard: m.Component<{
   view: (vnode) => {
     const { project, project_protocol, backers } = vnode.attrs;
     const { bTokens, acceptedTokens } = project;
+    console.log('====>project', project);
 
     let redeemAble = false;
     if (app.user.activeAccount && app.isLoggedIn()) {
       redeemAble = true;
-      // const activeAddress = app.user.activeAccount.address.toLowerCase();
+      const activeAddress = app.user.activeAccount.address.toLowerCase();
       // if (backers.map((item: any) => item.address.toLowerCase()).includes(activeAddress)) {
       //   redeemAble = true;
       // }
@@ -41,19 +43,24 @@ const FailedActionCard: m.Component<{
           vnode.state.submitting = true;
 
           const index = project.acceptedTokens.findIndex((t) => t.symbol === tokenSymbol);
-          const acceptedToken = acceptedTokens[index];
-          const amount = BigNumber.from(balance).mul(BigNumber.from(10).pow(acceptedToken.decimals));
 
-          const res = await project_protocol.redeemTokens(
-            amount,
-            true,
-            project,
-            app.user.activeAccount.address,
-            bTokens[acceptedToken.address],
-            acceptedToken.address
-          );
+          if (index > -1) {
+            const acceptedToken = acceptedTokens[index];
+            const amount = new BN(balance).mul(new BN(10).pow(new BN(acceptedToken.decimals)));
 
-          vnode.state.error = res.error;
+            const res = await project_protocol.redeemTokens(
+              amount,
+              true,
+              project,
+              app.user.activeAccount.address,
+              bTokens[acceptedToken.address],
+              acceptedToken.address,
+              acceptedToken.decimals
+            );
+            vnode.state.error = res.error;
+          } else {
+            vnode.state.error = 'Failed to retrive selected AcceptedToken info';
+          }
           vnode.state.submitting = false;
           m.redraw();
         }

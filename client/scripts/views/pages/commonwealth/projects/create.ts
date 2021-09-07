@@ -189,7 +189,7 @@ const NewProjectForm = {
                 || !vnode.state.form.curatorFee
                 || submitting
               ),
-              label: submitting ? 'Createing now' : 'Create a new Project',
+              label: submitting ? 'Creating now' : 'Create a new Project',
               onclick: async (e) => {
                 e.preventDefault();
                 if (vnode.state.form.threshold.toString()  === '0') {
@@ -232,22 +232,22 @@ const NewProjectPage: m.Component<{}, {
   submitting: boolean,
   createError: string,
   acceptedTokens: any[],
-  initialized: boolean
+  initialized: number
 }> = {
   oncreate: (vnode) => {
-    vnode.state.initialized = false;
+    vnode.state.initialized = 0;
   },
   onupdate: async (vnode) => {
     if (!protocolReady) return;
 
-    if (!vnode.state.initialized) {
+    if (vnode.state.initialized === 0) {
       vnode.state.acceptedTokens = await app.cmnProtocol.project_protocol.getAcceptedTokens();
-      vnode.state.initialized = true;
+      vnode.state.initialized = 1;
       m.redraw();
     }
   },
   view: (vnode) => {
-    if (!vnode.state.initialized) return m(PageLoading);
+    if (vnode.state.initialized !== 1) return m(PageLoading);
     const { acceptedTokens } = vnode.state;
 
     return m(Sublayout, {

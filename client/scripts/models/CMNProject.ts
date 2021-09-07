@@ -4,61 +4,65 @@ import { EthereumCoin } from 'shared/adapters/chain/ethereum/types';
 type ProjectStatus = 'In Progress' | 'Successed' | 'Failed';
 
 export class CMNProject {
+  public readonly cwUrl: string;
+  public readonly curatorFee: number;
+  public readonly ipfsHash: string;
   public readonly name: string;
   public readonly description: string;
-  public readonly ipfsHash: string;
-  public readonly cwUrl: string;
-  public readonly beneficiary: string;
-  public readonly acceptedTokens: any[];
-  public readonly nominations: Array<string>;
+  public readonly threshold: number;
   public readonly endTime: Date;
-  public readonly projectHash: string;
-  public readonly status: ProjectStatus;
-  public readonly withdrawIsDone: boolean;
-  public readonly cTokens: any; // cTokens address
-  public readonly bTokens: any; // bTokens address
-
-  public readonly threshold: EthereumCoin;
-  public readonly totalFunding: EthereumCoin;
-  public readonly curatorFee: number;
   public readonly address: string;
+  public readonly beneficiary: string;
+
+  public status: ProjectStatus;
+  public totalFunding: number;
+
+  public acceptedTokens: any[];
+  public nominations: Array<string>;
+  public withdrawIsDone: boolean;
+  public cTokens: any; // cTokens address
+  public bTokens: any; // bTokens address
+  public updated_at: Date;
 
   constructor(
     name,
     description,
     ipfsHash,
-    cwUrl,
-    beneficiary,
-    acceptedTokens,
-    nominations,
     threshold,
     endTime,
+    projAddress,
+    beneficiary,
+    cwUrl,
     curatorFee,
-    projectHash,
     status,
-    lockedWithdraw,
     totalFunding,
-    bTokens,
-    cTokens,
-    projAddress
+    nominations
   ) {
     this.name = name;
     this.description = description;
     this.ipfsHash = ipfsHash;
-    this.cwUrl = cwUrl;
-    this.beneficiary = beneficiary;
-    this.acceptedTokens = acceptedTokens;
-    this.nominations = nominations;
     this.threshold = threshold;
     this.endTime = endTime;
-    this.curatorFee = curatorFee;
-    this.projectHash = projectHash;
     this.status = status;
-    this.withdrawIsDone = lockedWithdraw;
     this.totalFunding = totalFunding;
+    this.address = projAddress;
+    this.beneficiary = beneficiary;
+    this.curatorFee = curatorFee;
+    this.cwUrl = cwUrl;
+    this.nominations = nominations;
+  }
+
+  public set(
+    acceptedTokens,
+    bTokens,
+    cTokens,
+    lockedWithdraw,
+  ) {
+    this.acceptedTokens = acceptedTokens;
     this.bTokens = bTokens;
     this.cTokens = cTokens;
-    this.address = projAddress;
+    this.withdrawIsDone = lockedWithdraw;
+    this.updated_at = new Date();
   }
 }
 

@@ -1,18 +1,17 @@
 import app from 'state';
 
-
 export const kovanTokenData = [
   {
     'name': 'WETH',
     'symbol': 'WETH',
     'address': '0xd0a1e359811322d97991e03f863a0c30c2cf029c',
-    'deicmals': 18
+    'decimals': 18
   },
   {
     'name': 'USDC',
     'symbol': 'USDC',
     'address': '0xdcfab8057d08634279f8201b55d311c2a67897d2',
-    'deicmals': 2
+    'decimals': 2
 
   },
   {
@@ -43,6 +42,7 @@ export interface ProjectMetaData {
 export const EtherAddress = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
 
 export const getTokenDetails = (tokenAddresses: string[]) => {
+  // TODO_CMN: replace with backend API
   const tokensData = [];
   for (let i = 0; i < tokenAddresses.length; i++) {
     const index = kovanTokenData.findIndex((t) => t.address.toLowerCase() === tokenAddresses[i].toLowerCase());
@@ -82,7 +82,7 @@ export const getTokenHolders = async (tokenAddress: string) => {
 
 export const needSync = (lastUpdatedAt?: Date) => {
   const syncPeriod = 5 * 60 * 1000; // update in every 5 mins
-  if (lastUpdatedAt) {
+  if (!lastUpdatedAt) {
     return true;
   }
   return Math.floor(Math.abs(new Date().getTime() - lastUpdatedAt.getTime()) / syncPeriod) > 0;
@@ -93,3 +93,5 @@ export const protocolReady = () => {
   if (app.activeChainId() !== app.cmnProtocol.chainId) return false;
   return true;
 };
+
+export const MAX_VALUE = '115792089237316195423570985008687907853269984665640564039457584007913129639935';

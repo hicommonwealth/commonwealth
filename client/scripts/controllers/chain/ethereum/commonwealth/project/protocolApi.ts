@@ -3,32 +3,35 @@ import BN from 'bn.js';
 
 import { ProjectFactory as CMNProjectProtocolContract } from 'eth/types';
 
-import ContractApi from '../../contractApi';
+import ContractApi, { attachSigner } from '../../contractApi';
 import CMNProjectApi from './projectApi';
 import { ProjectMetaData, getTokenDetails } from '../utils';
 import { CMNProject } from '../../../../../models';
+import EthereumChain from '../../chain';
 
 export default class CMNProjectProtocolApi extends ContractApi<CMNProjectProtocolContract> {
   public readonly gasLimit: number = 3000000;
 
   public async getAcceptedTokens() {
-    // TODO: getAllAcceptedTokens => getAcceptedTokens
+    // TODO_CMN: getAllAcceptedTokens => getAcceptedTokens
     const tokens = await this.Contract.getAllAcceptedTokens();
     return getTokenDetails(tokens);
   }
 
-  public async createProject(params: ProjectMetaData) {
+  public async createProject(chain: EthereumChain, params: ProjectMetaData) {
     const name = utils.formatBytes32String(params.name);
     const ipfsHash = utils.formatBytes32String('0x01');
     const cwUrl = utils.formatBytes32String('commonwealth.im');
     const nominations = [params.creator, params.beneficiary];
     const endtime = Math.ceil(Math.ceil(Date.now() / 1000) + params.deadline * 24 * 60 * 60); // in days
     const curatorFee = params.curatorFee * 100;
-    const threshold = new BN(params.threshold).mul(new BN(10).pow(new BN(8)));
+    const threshold = new BN(params.threshold * 100000000);
+
+    const contract = await attachSigner(chain.app.wallets, params.creator, this.Contract);
 
     let transactionSuccessed: boolean;
     try {
-      const tx = await this.Contract.createProject(
+      const tx = await contract.createProject(
         name,
         ipfsHash,
         cwUrl,
@@ -47,7 +50,7 @@ export default class CMNProjectProtocolApi extends ContractApi<CMNProjectProtoco
     }
     return {
       status: transactionSuccessed ? 'success' : 'failed',
-      error: transactionSuccessed ? '' : 'Failed to process backWithETH transaction'
+      error: transactionSuccessed ? '' : 'Failed to process createProject transaction'
     };
   }
 
@@ -67,7 +70,7 @@ export default class CMNProjectProtocolApi extends ContractApi<CMNProjectProtoco
 
     const projects: CMNProject[] = [];
     for (let i = 0; i < projApis.length; i++) {
-      const projDetails = await projApis[i].getProjectDetails();
+      const projDetails = await projApis[i].getProjectInfo();
       projects.push(projDetails);
     }
     return {
