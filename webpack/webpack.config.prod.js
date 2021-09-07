@@ -3,6 +3,7 @@ const webpack = require('webpack');
 const merge = require('webpack-merge');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const common = require('./webpack.common.js');
+const CompressionPlugin = require('compression-webpack-plugin');
 
 module.exports = merge(common, {
   entry: {
@@ -25,7 +26,8 @@ module.exports = merge(common, {
     new webpack.optimize.ModuleConcatenationPlugin(),
     new MiniCssExtractPlugin({
       filename: 'bundle.[chunkhash:8].css'
-    })
+    }),
+    new CompressionPlugin()
   ],
   module: {
     rules: [
