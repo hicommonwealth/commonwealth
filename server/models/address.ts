@@ -240,8 +240,7 @@ export default (
         log.error('Invalid keytype.');
         isValid = false;
       }
-    }
-    else if (chain.base === 'cosmos' && chain.network === 'injective') {
+    } else if (chain.base === 'cosmos' && chain.network === 'injective') {
       //
       // ethereum address handling
       //
@@ -261,14 +260,13 @@ export default (
       const lowercaseAddress = ethUtil.bufferToHex(addressBuffer);
       try {
         // const ethAddress = Web3.utils.toChecksumAddress(lowercaseAddress);
-        const injAddrBuf = ethUtil.Address.fromString(lowercaseAddress.toString()).toBuffer()
-        const injAddress = bech32.encode('inj', bech32.toWords(injAddrBuf))
+        const injAddrBuf = ethUtil.Address.fromString(lowercaseAddress.toString()).toBuffer();
+        const injAddress = bech32.encode('inj', bech32.toWords(injAddrBuf));
         if (addressModel.address === injAddress) isValid = true;
       } catch (e) {
         isValid = false;
       }
-    }
-    else if (chain.base === 'cosmos') {
+    } else if (chain.base === 'cosmos') {
       //
       // cosmos-sdk address handling
       //
@@ -287,6 +285,9 @@ export default (
           break;
         case 'osmosis':
           bech32Prefix = 'osmo';
+          break;
+        case 'injective':
+          bech32Prefix = 'inj';
           break;
         case 'terra':
           bech32Prefix = 'terra';

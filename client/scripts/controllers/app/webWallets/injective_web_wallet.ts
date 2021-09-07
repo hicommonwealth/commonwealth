@@ -9,7 +9,7 @@ import app from 'state';
 import { setActiveAccount } from 'controllers/app/login';
 import { Address } from 'ethereumjs-util';
 
-class InjectiveWebWalletController implements IWebWallet<string>{
+class InjectiveWebWalletController implements IWebWallet<string> {
   // GETTERS/SETTERS
   private _enabled: boolean;
   private _enabling: boolean = false;
@@ -69,7 +69,7 @@ class InjectiveWebWalletController implements IWebWallet<string>{
         throw new Error('Could not fetch accounts from Metamask');
       } else {
         for (const acc of this._ethAccounts) {
-          this._accounts.push(bech32.encode('inj', bech32.toWords(Address.fromString(acc.toString()).toBuffer())))
+          this._accounts.push(bech32.encode('inj', bech32.toWords(Address.fromString(acc.toString()).toBuffer())));
         }
       }
 
@@ -94,4 +94,4 @@ class InjectiveWebWalletController implements IWebWallet<string>{
   // TODO: disconnect
 }
 
-export default InjectiveWebWalletController
+export default InjectiveWebWalletController;
