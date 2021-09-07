@@ -10,3 +10,385 @@
     }
   }
 }
+
+.TokenCommunitySection {
+  @media (max-width: 739px) {
+    position: relative;
+  }
+}
+
+.TokensCommunityContainer {
+  display: flex;
+  flex-direction: column;
+  @media (min-width: 740px) {
+    flex-direction: row;
+  }
+}
+
+.TokensCommunityLeftContainer {
+  width: 50%;
+  padding: 3% 0;
+  @media (min-width: 740px) and (max-width: 800px) {
+    width: 63%;
+  }
+  @media (max-width: 739px) {
+    width: 100%;
+  }
+}
+
+.TokenCTitle {
+  font-size: 40px;
+  @media (min-width: 559px) {
+    font-size: 50px;
+  }
+}
+.TokensCommunityContentContainer {
+  margin-top: 35%;
+  margin-left: 5%;
+  margin-right: 5%;
+  @media (min-width: 400px) {
+    margin-top: 25%;
+    margin-left: 7.5%;
+    margin-right: 7.5%;
+  }
+  @media (min-width: 700px) {
+    margin-top: 18%;
+    margin-left: 4.7%;
+  }
+  @media (min-width: 740px) {
+    margin-top: 30%;
+    margin-left: 4.7%;
+  }
+  @media (min-width: 999px) {
+    margin-left: 7.4%;
+  }
+  @media (min-width: 1294px) {
+    margin-right: 10%;
+    margin-left: 15%;
+  }
+  @media (min-width: 1620px) {
+    width: 521px;
+    margin-right: 0px;
+    margin-top: 18%;
+    margin-bottom: 5%;
+  }
+}
+
+.TokenCommunityParagraph {
+  font-size: 20px;
+  line-height: 26px;
+  margin: 0px;
+  @media (min-width: 559px) {
+    font-size: 22px;
+  }
+  @media (min-width: 740px) and (max-width: 799px) {
+    margin-right: 18%;
+  }
+}
+
+.TokenCommunitySearch {
+  @media (max-width: 739px) {
+    position: fixed;
+    width: 87%;
+    top: 0px;
+    z-index: 9999;
+    transition: all .5s;
+  }
+
+}
+
+.TokenCommunityGoButton {
+  display: block;
+  @media (min-width: 559px) {
+    display: none;
+  }
+}
+.TokenCommunityLetGoButton {
+  display: none;
+  @media (min-width: 559px) {
+    display: block;
+  }
+}
+
+.TokenChannelContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  @media (min-width: 740px) {
+    align-items: start;
+  }
+  @media (min-width: 1294px) {
+    flex-direction: row;
+  }
+}
+
+.TokenChannelTitleContainer {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  @media (min-width: 740px) {
+    justify-content: start;
+    align-items: center;
+  }
+  @media (min-width: 1294px) {
+    flex-direction: row;
+    margin-right: 10%;
+  }
+}
+
+.TokenChannelTitle {
+  font-weight: 600;
+  font-size: 28px;
+  line-height: 34px;
+  text-align: center;
+  color: #1c1c25;
+  @media (min-width: 559px) {
+    font-size: 36px;
+  }
+}
+
+.TokenChannelIconsContainer {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  margin-bottom: 10%;
+  margin-top: 5%;
+  @media (min-width: 600px) {
+    margin-bottom: 5%;
+    margin-top: 3%;
+  }
+  @media (min-width: 740px) {
+    justify-content: start;
+  }
+  @media (min-width: 1294px) {
+    margin: 0;
+  }
+}
+
+.TokensCommunityRightContainer {
+  width: 50%;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+
+  @media (min-width: 560px) and (max-width: 739px) {
+    padding-top: 30px;
+    padding-bottom: 95px;
+  }
+
+  @media (min-width: 740px) and (max-width: 800px) {
+    width: 37%;
+  }
+  @media (max-width: 739px) {
+    width: 100%;
+  }
+}
+
+.TokenDiscussionPhoneContainer {
+  padding-top: 45px;
+  padding-bottom: 216px;
+  @media (min-width: 560px) {
+    display: none;
+  }
+}
+
+.TokenDiscussionTabletContainer {
+  width: 442px;
+  display: none;
+  @media (min-width: 560px) and (max-width: 739px) {
+    display: block;
+  }
+}
+
+.TokenDiscussionFitContainer {
+  width: 376px;
+  display: none;
+
+  @media (min-width: 740px) and (max-width: 999px) {
+    display: block;
+    position: absolute;
+    left: 37%;
+    top: 21%;
+  }
+
+  @media (min-width: 1000px) and (max-width: 1440px) {
+    display: none;
+  }
+}
+
+.TokenDiscussionDesktopContainer {
+  display: none;
+  // @media (min-width: 1441px) {
+  //   display: block;
+  //   width: 600px;
+  // }
+}
+
+.TokenDiscussionContainer {
+  display: none;
+  @media (min-width: 0px) and (max-width: 999px) {
+    display: none;
+  }
+
+  @media (min-width: 1000px) and (max-width: 1100px) {
+    display: block;
+    width: 442px;
+    position: absolute;
+    top: 25%;
+    right: 0;
+  }
+  @media (min-width: 1101px) and (max-width: 1440px) {
+    display: block;
+    width: 442px;
+    position: absolute;
+    top: 30%;
+    right: 0;
+  }
+  @media (min-width: 1441px) {
+    display: block;
+    width: 442px;
+    position: absolute;
+    left: 36%;
+    top: 26%;
+  }
+}
+
+.TokenDiscussionContainerCard {
+  width: 331px;
+  position: absolute;
+  top: 43%;
+  left: 0;
+
+  @media (max-width: 559px) {
+    top: 60%;
+    left: auto;
+  }
+
+  @media (min-width: 560px) and (max-width: 599px) {
+    top: 41.5%;
+    left: 1%;
+  }
+  @media (min-width: 600px) and (max-width: 739px) {
+    top: 41.5%;
+    left: 6%;
+  }
+  @media (min-width: 740px) and (max-width: 999px) {
+    top: 47%;
+    left: 8.5%;
+  }
+  @media (min-width: 1000px) and (max-width: 1100px) {
+    left: 27px;
+    top: 52.5%;
+  }
+  @media (min-width: 1100px) and (max-width: 1440px) {
+    left: 70px;
+    top: 57.5%;
+  }
+  @media (min-width: 1441px) {
+    top: 52%;
+    left: 10%;
+  }
+}
+
+.TokenDiscussionContainerMobileCard {
+  width: 291px;
+  position: absolute;
+
+  @media (max-width: 559px) {
+    bottom: 5%;
+  }
+
+  @media (min-width: 560px) and (max-width: 599px) {
+    bottom: 9%;
+    right: 6%;
+  }
+
+  @media (min-width: 600px) and (max-width: 739px) {
+    bottom: 9%;
+    right: 5%;
+  }
+
+  @media (min-width: 740px) {
+    display: none;
+  }
+}
+
+.TokenDiscussionContainerSmallCard {
+  width: 300px;
+  position: absolute;
+  top: 68%;
+  left: 30%;
+  display: none;
+
+  @media (min-width: 740px) and (max-width: 767px) {
+    display: block;
+    width: 240px;
+    left: 22%;
+    top: 69.5%;
+  }
+
+  @media (min-width: 767px) and (max-width: 999px) {
+    display: block;
+    width: 240px;
+    left: 22%;
+    top: 68.5%;
+  }
+
+  @media (min-width: 1000px) and (max-width: 1100px) {
+    display: block;
+    width: 240px;
+    top: 74%;
+    left: 35%;
+  }
+
+  @media (min-width: 1100px) and (max-width: 1294px) {
+    display: block;
+    width: 240px;
+    top: 78%;
+    left: 48%;
+  }
+
+  @media (min-width: 1295px) and (max-width: 1440px) {
+    display: block;
+    width: 240px;
+    top: 68%;
+    left: 54%;
+  }
+
+  @media (min-width: 1440px) {
+    display: block;
+    top: 78%;
+  }
+  @media (min-width: 1441px) {
+    display: block;
+    top: 72%;
+    left: 43%;
+  }
+}
+
+.TokenDiscussionImage {
+  display: block;
+  height: 100%;
+}
+
+.leftArtContainer {
+  width: 50%;
+  @media (min-width: 740px) and (max-width: 800px) {
+    width: 63%;
+  }
+  @media (max-width: 739px) {
+    width: 100%;
+  }
+}
+.rigthArtContainer {
+  width: 50%;
+  @media (min-width: 740px) and (max-width: 800px) {
+    width: 37%;
+  }
+  @media (max-width: 739px) {
+    width: 100%;
+  }
+}
