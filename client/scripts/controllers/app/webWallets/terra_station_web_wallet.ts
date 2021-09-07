@@ -13,11 +13,11 @@ class TerraStationWebWalletController implements IWebWallet<string> {
   public readonly specificChain = 'terra';
 
   public get available() {
-    return this._extension.isAvailable
+    return this._extension.isAvailable;
   }
 
   public get enabled() {
-    return this.available && this._enabled
+    return this.available && this._enabled;
   }
 
   public get enabling() {
@@ -37,15 +37,15 @@ class TerraStationWebWalletController implements IWebWallet<string> {
     this._enabling = true;
 
     try {
-      const connect = await this._extension.connect()
-      await this._extension.once('onConnect', (accountAddr) => {
+      this._extension.once('onConnect', (accountAddr) => {
         if (accountAddr && !this._accounts.includes(accountAddr)) {
-          console.log(accountAddr)
+          console.log(accountAddr);
           this._accounts.push(accountAddr);
           console.log('enabled and added');
-        } 
-        (this._accounts.length === 0 ) ? this._enabled = false : this._enabled = true;
+        }
+        this._enabled = this._accounts.length !== 0;
       });
+      this._extension.connect();
       this._enabling = false;
     } catch (error) {
       console.error(`Failed to enabled Terra Station ${error.message}`);
@@ -55,18 +55,18 @@ class TerraStationWebWalletController implements IWebWallet<string> {
 
   public async validateWithAccount(account: Account<any>): Promise<void> {
     this._extension.on('onSign', (payload) => {
-      console.log(payload)
-    })
+      console.log(payload);
+    });
     const msgs: Msg[] = [
       new MsgStoreCode(this._accounts[0], account.validationToken)
-    ]
+    ];
     try {
       this._extension.sign({
         fee: new StdFee(0, '0ust'),
         msgs
-      })
+      });
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
 
     // timeout?
@@ -74,8 +74,8 @@ class TerraStationWebWalletController implements IWebWallet<string> {
       this._extension.on('onSign', (payload) => {
         if (payload.result?.signature) resolve(payload.result);
         else reject();
-      })
-    })
+      });
+    });
 
     const signature = {
       signed: result.stdSignMsgData,
@@ -86,7 +86,7 @@ class TerraStationWebWalletController implements IWebWallet<string> {
         },
         signature: result.signature
       }
-    }
+    };
     return account.validate(JSON.stringify(signature));
   }
 }

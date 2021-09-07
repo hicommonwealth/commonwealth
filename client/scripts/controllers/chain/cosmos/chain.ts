@@ -152,7 +152,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     // TODO: support multiple wallets
     let wallet;
     if (ChainNetwork.Terra) {
-      wallet = wallets[0]as TerraStationWebWalletController;
+      wallet = wallets[0] as TerraStationWebWalletController;
     } else {
       wallet = wallets[0] as KeplrWebWalletController;
     }
