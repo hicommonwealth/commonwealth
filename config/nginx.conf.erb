@@ -14,7 +14,6 @@ http {
 	gzip_comp_level 2;
 	gzip_min_length 512;
 	gzip_proxied any; # Heroku router sends Via header
-	gzip_static on;
 
 	server_tokens off;
 
@@ -31,6 +30,10 @@ http {
 
 	upstream app_server {
 		server unix:/tmp/nginx.socket fail_timeout=0;
+	}
+
+	location /build/ {
+		gzip_static on;
 	}
 
 	server {
