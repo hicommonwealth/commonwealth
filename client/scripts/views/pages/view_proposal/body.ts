@@ -708,8 +708,6 @@ export const ProposalBodyReaction: m.Component<{ item: OffchainThread | AnyPropo
     const { item } = vnode.attrs;
     if (!item) return;
 
-    return m('.ProposalBodyReaction', [
-      m(ReactionButton, { post: item, type: ReactionType.Like, tooltip: true })
-    ]);
+    return m(ReactionButton, { post: item, type: ReactionType.Like, tooltip: true });
   }
 };

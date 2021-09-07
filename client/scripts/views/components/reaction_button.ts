@@ -17,7 +17,6 @@ import LoginModal from '../modals/login_modal';
 
 const MAX_VISIBLE_REACTING_ACCOUNTS = 10;
 
-// eslint-disable-next-line no-shadow
 export enum ReactionType {
   Like = 'like',
   Dislike = 'dislike'
@@ -113,12 +112,7 @@ const ReactionButton: m.Component<ReactionButtonAttrs, ReactionButtonState> = {
     let hasReactedType;
     if (hasReacted) hasReactedType = ReactionType.Like;
 
-    const rxnButton = m('.ReactionButton', {
-      class: `${(disabled ? 'disabled' : type === hasReactedType ? 'active' : '')
-        + (displayAsLink ? ' as-link' : '')
-        + (large ? ' large' : '')
-        + (type === ReactionType.Like ? ' like' : '')
-        + (type === ReactionType.Dislike ? ' dislike' : '')}`,
+    const rxnButton = m('.ProposalBodyReaction', {
       onmouseenter:  async (e) => {
         vnode.state.reactors = await fetchReactionsByPost(post);
       },
@@ -185,6 +179,12 @@ const ReactionButton: m.Component<ReactionButtonAttrs, ReactionButtonState> = {
           });
         }
       },
+    }, [ m('.ReactionButton', {
+      class: `${(disabled ? 'disabled' : type === hasReactedType ? 'active' : '')
+        + (displayAsLink ? ' as-link' : '')
+        + (large ? ' large' : '')
+        + (type === ReactionType.Like ? ' like' : '')
+        + (type === ReactionType.Dislike ? ' dislike' : '')}`,
     }, (type === ReactionType.Dislike) && [
       large
         ? m('.reactions-icon', '▾')
@@ -203,7 +203,7 @@ const ReactionButton: m.Component<ReactionButtonAttrs, ReactionButtonState> = {
           size: Size.XL,
         }),
       m('.reactions-count', vnode.state.likes),
-    ]);
+    ])]);
 
     return (tooltip && (vnode.state.likes || vnode.state.dislikes))
       ? m(Popover, {

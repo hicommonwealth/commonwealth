@@ -58,6 +58,8 @@
     "no-multi-spaces": 0,
     "strict": 0,
     "no-await-in-loop": 0,
-    "no-async-promise-executor": 0
+    "no-async-promise-executor": 0,
+    "no-shadow": "off",
+    "@typescript-eslint/no-shadow": "error"
   }
 }
