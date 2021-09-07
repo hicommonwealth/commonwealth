@@ -4,7 +4,6 @@ import { AaveTypes, CompoundTypes, MolochTypes } from '@commonwealth/chain-event
 import app from './state';
 import ThreadsController from './controllers/server/threads';
 
-// eslint-disable-next-line no-shadow
 export enum ProposalType {
   SubstrateDemocracyReferendum = 'referendum',
   SubstrateDemocracyProposal = 'democracyproposal',

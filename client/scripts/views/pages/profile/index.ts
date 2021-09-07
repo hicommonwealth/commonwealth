@@ -74,7 +74,6 @@ const getProfileStatus = (account) => {
   });
 };
 
-// eslint-disable-next-line no-shadow
 export enum UserContent {
   All = 'posts',
   Threads = 'threads',
