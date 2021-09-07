@@ -111,6 +111,10 @@
     }
 
     .sublayout-header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: white;
         @include sm-max {
             display: none;
         }
