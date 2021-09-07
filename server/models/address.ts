@@ -4,6 +4,7 @@ import * as Sequelize from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
 import crypto from 'crypto';
 import Web3 from 'web3';
+import { bech32 } from 'bech32';
 
 import Keyring, { decodeAddress } from '@polkadot/keyring';
 import { stringToU8a, hexToU8a } from '@polkadot/util';
@@ -239,6 +240,32 @@ export default (
         log.error('Invalid keytype.');
         isValid = false;
       }
+    } else if (chain.base === 'cosmos' && chain.network === 'injective') {
+      //
+      // ethereum address handling
+      //
+      const msgBuffer = Buffer.from(addressModel.verification_token.trim());
+      // toBuffer() doesn't work if there is a newline
+      const msgHash = ethUtil.hashPersonalMessage(msgBuffer);
+      const ethSignatureBuffer = ethUtil.toBuffer(signatureString.trim());
+      const ethSignatureParams = ethUtil.fromRpcSig(ethSignatureBuffer);
+      const publicKey = ethUtil.ecrecover(
+        msgHash,
+        ethSignatureParams.v,
+        ethSignatureParams.r,
+        ethSignatureParams.s
+      );
+
+      const addressBuffer = ethUtil.publicToAddress(publicKey);
+      const lowercaseAddress = ethUtil.bufferToHex(addressBuffer);
+      try {
+        // const ethAddress = Web3.utils.toChecksumAddress(lowercaseAddress);
+        const injAddrBuf = ethUtil.Address.fromString(lowercaseAddress.toString()).toBuffer();
+        const injAddress = bech32.encode('inj', bech32.toWords(injAddrBuf));
+        if (addressModel.address === injAddress) isValid = true;
+      } catch (e) {
+        isValid = false;
+      }
     } else if (chain.base === 'cosmos') {
       //
       // cosmos-sdk address handling
@@ -258,9 +285,6 @@ export default (
           break;
         case 'osmosis':
           bech32Prefix = 'osmo';
-          break;
-        case 'injective':
-          bech32Prefix = 'inj';
           break;
         case 'terra':
           bech32Prefix = 'terra';

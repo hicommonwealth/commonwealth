@@ -1,10 +1,12 @@
 import { ChainBase, IWebWallet } from 'models';
+import app from 'state';
 import MetamaskWebWalletController from './webWallets/metamask_web_wallet';
 import WalletConnectWebWalletController from './webWallets/walletconnect_web_wallet';
 import KeplrWebWalletController from './webWallets/keplr_web_wallet';
 import PolkadotWebWalletController from './webWallets/polkadot_web_wallet';
 import NearWebWalletController from './webWallets/near_web_wallet';
 import TerraStationWebWalletController from './webWallets/terra_station_web_wallet';
+import InjectiveWebWalletController from './webWallets/injective_web_wallet';
 
 export default class WebWalletController {
   private _wallets: IWebWallet<any>[];
@@ -12,8 +14,13 @@ export default class WebWalletController {
     return this._wallets;
   }
 
+  // TODO filter out wallets that are specific to a chain (and the current page isn't that chain)
   public availableWallets(chain?: ChainBase): IWebWallet<any>[] {
-    return this._wallets.filter((w) => w.available && (!chain || w.chain === chain));
+    return this._wallets.filter((w) => w.available
+      && (!chain || w.chain === chain)
+      // if a specific chain is specified on a wallet AND a current chain is defined (aka not on home page) then load
+      // the wallet if the current chain is the same as the specific chain
+      && ((w.specificChain && app.chain?.meta?.chain.id) ? w.specificChain === app.chain.meta.chain.id : true));
   }
 
   public getByName(name: string): IWebWallet<any> | undefined {
@@ -48,6 +55,7 @@ export default class WebWalletController {
       new KeplrWebWalletController(),
       new NearWebWalletController(),
       new TerraStationWebWalletController(),
+      new InjectiveWebWalletController(),
     ];
   }
 }
