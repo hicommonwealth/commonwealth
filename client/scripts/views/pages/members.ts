@@ -3,7 +3,7 @@ import 'pages/members.scss';
 import $ from 'jquery';
 import m from 'mithril';
 import _ from 'lodash';
-import { Tag, Table, Spinner } from 'construct-ui';
+import { Button, Input, Tag, Table, Spinner } from 'construct-ui';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -25,10 +25,41 @@ interface MemberInfo {
 
 const MEMBERS_PER_PAGE = 20;
 
-const MembersPage : m.Component<{}, { membersRequested: boolean, membersLoaded: MemberInfo[],
-pageToLoad: number, totalMembers: number, isCompound: boolean }> = {
-  oninit: async () => {
+const DelegateModal: m.Component<{ address: string }, { delegateAmount: number }> = {
+  view: (vnode) => {
+    return m('.DelegateModal', [
+      m('.compact-modal-title', [
+        m('h3', 'delegate modal'),
+      ]),
+      m('.compact-modal-body', [
+        m(Input, {
+          title: 'Delegate amount',
+          oninput: (e) => {
+            const num = (e.target as any).value;
+            if (!Number.isNaN(parseInt(num, 10))) {
+              vnode.state.delegateAmount = num;
+            }
+          },
+        }),
+        m(Button, {
+          label: 'Delegate',
+          intent: 'primary',
+          onclick: async (e) => {
+            (app.chain as Compound).chain.setDelegate(vnode.attrs.address, vnode.state.delegateAmount);
+          }
+        })
+      // m(Login),
+      ]),
+    ]);
+  }
+};
 
+const MembersPage : m.Component<{}, { membersRequested: boolean, membersLoaded: MemberInfo[],
+pageToLoad: number, totalMembers: number, isCompound: boolean, voteEvents }> = {
+  oninit: (vnode) => {
+    $.get('/api/getChainEvents?type=marlin-vote-cast').then(({ result }) => {
+      vnode.state.voteEvents = result;
+    });
   },
   view: (vnode) => {
     $(window).on('scroll', () => {
@@ -44,7 +75,7 @@ pageToLoad: number, totalMembers: number, isCompound: boolean }> = {
     });
 
     const activeEntity = app.community ? app.community : app.chain;
-    if (!activeEntity) { 
+    if (!activeEntity) {
       return m(PageLoading, {
         message: 'Loading members',
         title: [
@@ -59,7 +90,6 @@ pageToLoad: number, totalMembers: number, isCompound: boolean }> = {
         vnode.state.membersLoaded = [];
         vnode.state.pageToLoad = 0;
         vnode.state.isCompound = app.chain instanceof Compound;
-
       }
     }
     // get members once
@@ -80,17 +110,17 @@ pageToLoad: number, totalMembers: number, isCompound: boolean }> = {
 
           const offset = vnode.state.membersLoaded.length - newMembers.length;
           if (vnode.state.isCompound) {
-            newMembers.forEach(async(o, i) => {
-              let firstFunc = Promise.resolve()   
+            newMembers.forEach(async (o, i) => {
+              let firstFunc = Promise.resolve();
               if (!app.chain.apiInitialized) {
                 firstFunc = app.chain.initApi();
               }
               firstFunc
-              .then(()=>(app.chain as Compound).chain.getVotingPower(o.address))
-              .then((votes)=>{
-                vnode.state.membersLoaded[offset+i].votes = votes;
-              });
-            })
+                .then(() => (app.chain as Compound).chain.getVotingPower(o.address))
+                .then((votes) => {
+                  vnode.state.membersLoaded[offset + i].votes = votes;
+                });
+            });
           }
           m.redraw();
         });
@@ -115,6 +145,7 @@ pageToLoad: number, totalMembers: number, isCompound: boolean }> = {
         m('tr', [
           m('th', 'Member'),
           m('th.align-right', 'Votes'),
+          m('th.align-right', 'Delegate'),
         ]),
         vnode.state.membersLoaded.map((info) => {
           const profile = app.profiles.getProfile(info.chain, info.address);
@@ -132,6 +163,14 @@ pageToLoad: number, totalMembers: number, isCompound: boolean }> = {
               ]),
             ]),
             m('td.align-right', info.votes ? info.votes.toString() : ''),
+            m('td.align-right',
+              m(Button, {
+                label: 'Delegate',
+                intent: 'primary',
+                onclick: async (e) => {
+                  app.modals.create({ modal: DelegateModal, data: { address: info.address } });
+                }
+              })),
           ]);
         })]),
       !vnode.state.totalMembers

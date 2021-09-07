@@ -35,16 +35,12 @@ export default class CompoundChain extends EthereumChain {
 
   public async balanceOf(address: string) {
     const balance = await this.compoundApi.Token.balanceOf(address);
-    console.log('balanceOf Compound Accounts', balance);
     return new BN(balance.toString(), 10) || new BN(0);
   }
 
   public async getVotingPower(address: string) {
     const num = await this.compoundApi.Token.numCheckpoints(address);
-    console.log("num", num)
-    console.log("nextthing", await this.compoundApi.Token.checkpoints(address, num-1)) 
     const { fromBlock, votes } = await this.compoundApi.Token.checkpoints(address, num-1);
-    console.log("votes", votes)
     return votes;
   }
 
