@@ -4,6 +4,7 @@
     "build": "webpack --config webpack/webpack.config.prod.js --progress",
     "build-contracts": "cd shared/eth && npx hardhat compile",
     "build:css": "tailwindcss build client/styles/style.css -o client/styles/lib/style.css",
+    "bundle-report": "webpack-bundle-analyzer --port 4200 build/stats.json",
     "stylelint": "stylelint client/styles/*",
     "lint": "./scripts/lint-new-work.sh",
     "lint-all": "eslint client/\\**/*.ts server/\\**/*.ts",
