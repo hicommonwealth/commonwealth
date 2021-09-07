@@ -2,12 +2,9 @@ import 'pages/new_proposal_page.scss';
 
 import $ from 'jquery';
 import m from 'mithril';
-import mixpanel from 'mixpanel-browser';
 import { Input, Form, FormLabel, FormGroup, Button, Callout, Spinner, RadioGroup } from 'construct-ui';
 
 import moment from 'moment';
-import snapshotJs from '@snapshot-labs/snapshot.js';
-
 import app from 'state';
 
 import { Account, ChainBase } from 'models';
@@ -17,7 +14,7 @@ import { idToProposal } from 'identifiers';
 import { capitalize } from 'lodash';
 import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
-import { SnapshotSpace } from 'client/scripts/helpers/snapshot_utils';
+import { SnapshotSpace, getScores, getSpaceBlockNumber } from 'helpers/snapshot_utils';
 
 interface IThreadForm {
   name: string;
@@ -82,8 +79,7 @@ const newThread = async (
 
   form.body = bodyText;
 
-  // TODO: do without snapshotjs
-  form.snapshot = await snapshotJs.utils.getBlockNumber(snapshotJs.utils.getProvider(space.network));
+  form.snapshot = await getSpaceBlockNumber(space.network);
   form.metadata.network = space.network;
   form.metadata.strategies = space.strategies;
 
@@ -185,13 +181,7 @@ const NewProposalForm: m.Component<{snapshotId: string}, {
       }
       const space = app.snapshot.space;
 
-      snapshotJs.utils.getScores(
-        space.id,
-        space.strategies,
-        space.network,
-        snapshotJs.utils.getProvider(space.network),
-        [app.user.activeAccount.address]
-      ).then((response) => {
+      getScores(space, app.user.activeAccount.address).then((response) => {
         const scores = response
           .map((score) => Object.values(score).reduce((a, b) => (a as number) + (b as number), 0))
           .reduce((a, b) => (a as number) + (b as number), 0);
@@ -259,7 +249,11 @@ const NewProposalForm: m.Component<{snapshotId: string}, {
             class: 'no-profile-callout',
             intent: 'primary',
             content: [
-              `You need to have a minimum of ${vnode.state.space.filters.minScore} ${vnode.state.space.symbol} in order to submit a proposal`
+              `You need to have a minimum of ${
+                vnode.state.space.filters.minScore
+              } ${
+                vnode.state.space.symbol
+              } in order to submit a proposal`
             ],
           }) : m(Spinner, { active: false, }),
         m('.new-snapshot-proposal-form', [
