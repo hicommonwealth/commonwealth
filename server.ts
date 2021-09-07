@@ -11,6 +11,7 @@ import fs from 'fs';
 import passport from 'passport';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
+import compression from 'compression';
 import webpackHotMiddleware from 'webpack-hot-middleware';
 import { redirectToHTTPS } from 'express-http-to-https';
 import favicon from 'serve-favicon';
@@ -211,6 +212,8 @@ async function main() {
       /localhost:(\d{4})/,
       /127.0.0.1:(\d{4})/
     ], [], 301));
+
+    app.use(compression());
 
     // serve the compiled app
     if (!NO_CLIENT_SERVER) {
