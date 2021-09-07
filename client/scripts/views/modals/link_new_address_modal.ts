@@ -397,6 +397,7 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
                 // initialize API if needed before starting webwallet
                 if (vnode.state.initializingWallet) return;
                 vnode.state.initializingWallet = true;
+                notifyInfo('Connecting, might take a moment.');
                 if (!webWallet.enabling && !webWallet.enabled) {
                   await webWallet?.enable();
                 }
@@ -428,13 +429,14 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
           ]),
           webWallet?.enabled && m('.accounts-caption', [
             webWallet?.accounts.length === 0 ? [
-              m('p', 'Wallet connected, but no accounts were found.'),
+              m('br'),
+              m('p', 'Wallet connected, but no accounts were found. Please make sure you are signed in to your wallet and try again.'),
             ] : webWallet.chain === ChainBase.Ethereum ? [ // metamask + walletconnect
               m('p.small-text', 'Use your wallet to switch between accounts.'),
             ] : [
               m('p', 'Select an address:'),
               m('p.small-text', 'Look for a popup, or check your wallet/browser extension.'),
-              webWallet.chain === ChainBase.CosmosSDK // keplr wallet
+              webWallet.chain === ChainBase.CosmosSDK // keplr wallet, terra station
                 && m('p.small-text', [
                   `Because ${app.chain.meta.chain.name} does not support signed verification messages, `,
                   'you will be asked to sign a transaction that does nothing. It will not be submitted to the chain.'
