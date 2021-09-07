@@ -27,7 +27,7 @@ const nodes = [
   [ 'wss://api.cosmos.network', 'cosmos' ],
   [ 'wss://straightedge.commonwealth.im', 'straightedge' ],
   [ 'http://localhost:3030', 'near-local' ],
-  [ 'https://rpc.nearprotocol.com', 'near' ],
+  [ 'https://rpc.mainnet.near.org', 'near' ],
   [ 'wss://mainnet.infura.io/ws', 'moloch', '0x1fd169A4f5c59ACf79d0Fd5d91D1201EF1Bce9f1'],
   [ 'wss://rpc.kulupu.corepaper.org/ws', 'kulupu'],
   [ 'wss://rpc.plasmnet.io/', 'plasm'],
@@ -1123,7 +1123,7 @@ const resetServer = (): Promise<number> => {
         }),
         models.Chain.create({
           id: 'marlin',
-          network: 'marlin',
+          network: 'compound',
           symbol: 'LIN',
           name: 'Marlin',
           icon_url: '/static/img/protocols/eth.png',
@@ -1134,7 +1134,7 @@ const resetServer = (): Promise<number> => {
         }),
         models.Chain.create({
           id: 'marlin-local',
-          network: 'marlin',
+          network: 'compound',
           symbol: 'LIN',
           name: 'Marlin (local)',
           icon_url: '/static/img/protocols/eth.png',

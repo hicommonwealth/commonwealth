@@ -111,6 +111,10 @@
     }
 
     .sublayout-header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: white;
         @include sm-max {
             display: none;
         }
@@ -136,6 +140,9 @@
             max-width: $layout-max-width;
             padding: 0 $layout-padding;
             margin: 0 auto;
+            .SearchBar {
+                flex: 8;
+            }
             .hide-sidebar & {
                 max-width: 840px;
                 margin: 0 auto;
@@ -146,7 +153,7 @@
             display: flex;
             align-items: center;
             margin-top: 0 !important;
-            flex: 3;
+            flex: 2;
             white-space: nowrap;
             > .ChainIcon{
                 width: 22px;
@@ -206,7 +213,7 @@
         .sublayout-header-right {
             display: flex;
             align-items: center;
-            flex: 1;
+            flex: 2;
             text-align: right;
             flex-direction: row-reverse;
             > .cui-button,

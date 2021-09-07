@@ -6,20 +6,25 @@ import { Button, Callout } from 'construct-ui';
 
 import app from 'state';
 
-import { OffchainThread, OffchainComment, AnyProposal } from 'models';
+import { OffchainThread, OffchainComment, AnyProposal, Account } from 'models';
 import { CommentParent } from 'controllers/server/comments';
 import EditProfileModal from 'views/modals/edit_profile_modal';
 import QuillEditor from 'views/components/quill_editor';
 import User from 'views/components/widgets/user';
 
+import { notifyError } from 'controllers/app/notifications';
 import Token from 'controllers/chain/ethereum/token/adapter';
+import BN from 'bn.js';
+import { tokenBaseUnitsToTokens } from 'helpers';
 import { GlobalStatus } from './body';
+import { IProposalPageState } from '.';
+import jumpHighlightComment from './jump_to_comment';
 
 const CreateComment: m.Component<{
   callback: CallableFunction,
   cancellable?: boolean,
   getSetGlobalEditingStatus: CallableFunction,
-  getSetGlobalReplyStatus: CallableFunction,
+  proposalPageState: IProposalPageState,
   parentComment?: OffchainComment<any>,
   rootProposal: AnyProposal | OffchainThread,
   tabindex?: number,
@@ -35,12 +40,17 @@ const CreateComment: m.Component<{
       callback,
       cancellable,
       getSetGlobalEditingStatus,
-      getSetGlobalReplyStatus,
+      proposalPageState,
       rootProposal
     } = vnode.attrs;
     let { parentComment } = vnode.attrs;
+    let disabled = getSetGlobalEditingStatus(GlobalStatus.Get)
+      || vnode.state.quillEditorState?.editor?.editor?.isBlank();
+
     const author = app.user.activeAccount;
-    const parentType = parentComment ? CommentParent.Comment : CommentParent.Proposal;
+    const parentType = (parentComment || proposalPageState.parentCommentId)
+      ? CommentParent.Comment
+      : CommentParent.Proposal;
     if (!parentComment) parentComment = null;
     if (vnode.state.uploadsInProgress === undefined) {
       vnode.state.uploadsInProgress = 0;
@@ -63,7 +73,6 @@ const CreateComment: m.Component<{
       const mentionsEle = document.getElementsByClassName('ql-mention-list-container')[0];
       if (mentionsEle) (mentionsEle as HTMLElement).style.visibility = 'hidden';
 
-
       const commentText = quillEditorState.markdownMode
         ? quillEditorState.editor.getText()
         : JSON.stringify(quillEditorState.editor.getContents());
@@ -79,7 +88,7 @@ const CreateComment: m.Component<{
       const communityId = app.activeCommunityId();
       try {
         const res = await app.comments.create(author.address, rootProposal.uniqueIdentifier,
-          chainId, communityId, commentText, parentComment?.id, attachments);
+          chainId, communityId, commentText, proposalPageState.parentCommentId, attachments);
         callback();
         if (vnode.state.quillEditorState.editor) {
           vnode.state.quillEditorState.editor.enable();
@@ -87,11 +96,15 @@ const CreateComment: m.Component<{
           vnode.state.quillEditorState.clearUnsavedChanges();
         }
         vnode.state.sendingComment = false;
+        proposalPageState.recentlySubmitted = res.id;
         // TODO: Instead of completely refreshing notifications, just add the comment to subscriptions
         // once we are receiving notifications from the websocket
         await app.user.notifications.refresh();
         m.redraw();
+        jumpHighlightComment(res.id);
       } catch (err) {
+        console.log(err);
+        notifyError(err.message || 'Comment submission failed.');
         if (vnode.state.quillEditorState.editor) {
           vnode.state.quillEditorState.editor.enable();
         }
@@ -111,18 +124,54 @@ const CreateComment: m.Component<{
         'Last Comment Created': new Date().toISOString()
       });
 
-      getSetGlobalReplyStatus(GlobalStatus.Set, false, true);
+      proposalPageState.replying = false;
+      proposalPageState.parentCommentId = null;
     };
 
+    const activeTopicName = rootProposal instanceof OffchainThread ? rootProposal?.topic?.name : null;
+
+    const isAdmin = app.user.isSiteAdmin
+      || app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
+
+    let parentScopedClass: string = 'new-thread-child';
+    let parentAuthor: Account<any>;
+    if (parentType === CommentParent.Comment) {
+      parentScopedClass = 'new-comment-child';
+      parentAuthor = app.community
+        ? app.community.accounts.get(parentComment.author, parentComment.authorChain)
+        : app.chain.accounts.get(parentComment.author);
+    }
+
     const { error, sendingComment, uploadsInProgress } = vnode.state;
+    disabled = getSetGlobalEditingStatus(GlobalStatus.Get)
+      || vnode.state.quillEditorState?.editor?.editor?.isBlank()
+      || sendingComment
+      || uploadsInProgress;
+
+    // token balance check if needed
+    let tokenPostingThreshold = null;
+    if (!app.community && (app.chain as Token)?.isToken) {
+      const tokenBalance = (app.chain as Token).tokenBalance;
+      tokenPostingThreshold = app.topics.getByName(
+        activeTopicName,
+        app.activeId()
+      )?.tokenThreshold;
+      disabled = disabled
+        || ((!app.isAdapterReady) && !isAdmin && tokenPostingThreshold && tokenPostingThreshold.gt(tokenBalance));
+    }
 
     return m('.CreateComment', {
-      class: parentType === CommentParent.Comment ? 'new-comment-child' : 'new-thread-child'
+      class: parentScopedClass
     }, [
       m('.create-comment-avatar', [
         m(User, { user: author, popover: true, avatarOnly: true, avatarSize: 40 }),
       ]),
       m('.create-comment-body', [
+        m('.reply-header', [
+          m('h3', parentType === CommentParent.Comment
+            ? ['Replying to ', m(User, { user: parentAuthor, popover: true, hideAvatar: true })]
+            : 'Reply')
+        ]),
         m(User, { user: author, popover: true, hideAvatar: true }),
         (rootProposal instanceof OffchainThread && rootProposal.readOnly)
           ? m(Callout, {
@@ -164,17 +213,23 @@ const CreateComment: m.Component<{
               imageUploader: true,
               tabindex: vnode.attrs.tabindex,
             }),
+            m('.token-requirement', [
+              tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0))
+                ? `Commenting in ${activeTopicName} requires 
+                ${tokenBaseUnitsToTokens(tokenPostingThreshold.toString(), app.chain.meta.chain.decimals)} ${app.chain.meta.chain.symbol}`
+                : null
+            ]),
             m('.form-bottom', [
               m(Button, {
                 intent: 'primary',
                 type: 'submit',
                 compact: true,
-                disabled: getSetGlobalEditingStatus(GlobalStatus.Get) || sendingComment || uploadsInProgress > 0,
+                disabled,
                 rounded: true,
                 onclick: submitComment,
                 label: (uploadsInProgress > 0)
                   ? 'Uploading...'
-                  : parentType === CommentParent.Proposal ? 'Post comment' : 'Reply to comment'
+                  : 'Submit'
               }),
               cancellable
                 && m(Button, {
@@ -184,13 +239,14 @@ const CreateComment: m.Component<{
                   rounded: true,
                   onclick: (e) => {
                     e.preventDefault();
-                    getSetGlobalReplyStatus(GlobalStatus.Set, false, true);
+                    proposalPageState.replying = false;
+                    proposalPageState.parentCommentId = null;
                   },
                   label: 'Cancel'
                 }),
               error
                 && m('.new-comment-error', error),
-            ])
+            ]),
           ]
       ])
     ]);

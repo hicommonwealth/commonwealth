@@ -14,7 +14,7 @@ import { ChainBase, ChainNetwork, ProposalModule } from 'models';
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
-import Marlin from 'controllers/chain/ethereum/marlin/adapter';
+import Compound from 'controllers/chain/ethereum/compound/adapter';
 import Aave from 'controllers/chain/ethereum/aave/adapter';
 
 import Sublayout from 'views/sublayout';
@@ -28,8 +28,9 @@ import NewProposalPage from 'views/pages/new_proposal/index';
 import PageNotFound from 'views/pages/404';
 import Listing from 'views/pages/listing';
 import ErrorPage from 'views/pages/error';
+import { AaveTypes, CompoundTypes } from '@commonwealth/chain-events';
+import NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import AaveProposalCardDetail from '../components/proposals/aave_proposal_card_detail';
-import { AaveTypes, MarlinTypes } from '@commonwealth/chain-events';
 
 const SubstrateProposalStats: m.Component<{}, {}> = {
   view: (vnode) => {
@@ -69,17 +70,17 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
   }
 };
 
-const MarlinProposalStats: m.Component<{}, {}> = {
+const CompoundProposalStats: m.Component<{}, {}> = {
   view: (vnode) => {
     if (!app.chain) return;
-    if (!(app.chain instanceof Marlin)) return;
+    if (!(app.chain instanceof Compound)) return;
     const activeAccount = app.user.activeAccount;
 
     return m('.stats-box', [
       m('.stats-box-left', '💭'),
       m('.stats-box-right', [
         m('', [
-          m('strong', 'Marlin Proposals'),
+          m('strong', 'Compound Proposals'),
           m('span', [
             '', // TODO: fill in
           ]),
@@ -99,7 +100,7 @@ const MarlinProposalStats: m.Component<{}, {}> = {
         m(Button, {
           intent: 'primary',
           onclick: (e) => navigateToSubpage('/new/proposal/:type', {
-            type: ProposalType.MarlinProposal
+            type: ProposalType.CompoundProposal
           }),
           label: 'New proposal',
         }),
@@ -171,8 +172,9 @@ const ProposalsPage: m.Component<{}> = {
 
     const onSubstrate = app.chain && app.chain.base === ChainBase.Substrate;
     const onMoloch = app.chain && app.chain.network === ChainNetwork.Moloch;
-    const onMarlin = app.chain && MarlinTypes.EventChains.find((c) => c === app.chain.network);
+    const onCompound = app.chain && CompoundTypes.EventChains.find((c) => c === app.chain.network);
     const onAave = app.chain && AaveTypes.EventChains.find((c) => c === app.chain.network);
+    const onSputnik = app.chain && app.chain.network === ChainNetwork.Sputnik;
 
     const modLoading = loadSubstrateModules('Proposals', getModules);
     if (modLoading) return modLoading;
@@ -188,30 +190,35 @@ const ProposalsPage: m.Component<{}> = {
     const activeMolochProposals = onMoloch
       && (app.chain as Moloch).governance.store.getAll().filter((p) => !p.completed)
         .sort((p1, p2) => +p2.data.timestamp - +p1.data.timestamp);
-    const activeMarlinProposals = onMarlin
-      && (app.chain as Marlin).governance.store.getAll().filter((p) => !p.completed)
+    const activeCompoundProposals = onCompound
+      && (app.chain as Compound).governance.store.getAll().filter((p) => !p.completed)
         .sort((p1, p2) => +p2.startingPeriod - +p1.startingPeriod);
     const activeAaveProposals = onAave
       && (app.chain as Aave).governance.store.getAll().filter((p) => !p.completed)
         .sort((p1, p2) => +p2.startBlock - +p1.startBlock);
+    const activeSputnikProposals = onSputnik
+      && (app.chain as NearSputnik).dao.store.getAll().filter((p) => !p.completed)
+        .sort((p1, p2) => p2.data.id - p1.data.id);
 
     const activeProposalContent = !activeDemocracyProposals?.length
       && !activeCouncilProposals?.length
       && !activeCosmosProposals?.length
       && !activeMolochProposals?.length
-      && !activeMarlinProposals?.length
+      && !activeCompoundProposals?.length
       && !activeAaveProposals?.length
+      && !activeSputnikProposals?.length
       ? [ m('.no-proposals', 'No active proposals') ]
       : [ m('.active-proposals', [(activeDemocracyProposals || []).map((proposal) => m(ProposalCard, { proposal }))
         .concat((activeCouncilProposals || []).map((proposal) => m(ProposalCard, { proposal })))
         .concat((activeCosmosProposals || []).map((proposal) => m(ProposalCard, { proposal })))
         .concat((activeMolochProposals || []).map((proposal) => m(ProposalCard, { proposal })))
-        .concat((activeMarlinProposals || []).map((proposal) => m(ProposalCard, { proposal })))
+        .concat((activeCompoundProposals || []).map((proposal) => m(ProposalCard, { proposal })))
         .concat((activeAaveProposals || []).map((proposal) => m(ProposalCard, {
           proposal,
           injectedContent: AaveProposalCardDetail,
-        })))]
-      )];
+        })))
+        .concat((activeSputnikProposals || []).map((proposal) => m(ProposalCard, { proposal })))
+      ])];
 
     // inactive proposals
     const inactiveDemocracyProposals = onSubstrate
@@ -224,30 +231,35 @@ const ProposalsPage: m.Component<{}> = {
     const inactiveMolochProposals = onMoloch
       && (app.chain as Moloch).governance.store.getAll().filter((p) => p.completed)
         .sort((p1, p2) => +p2.data.timestamp - +p1.data.timestamp);
-    const inactiveMarlinProposals = onMarlin
-      && (app.chain as Marlin).governance.store.getAll().filter((p) => p.completed)
+    const inactiveCompoundProposals = onCompound
+      && (app.chain as Compound).governance.store.getAll().filter((p) => p.completed)
         .sort((p1, p2) => +p2.startingPeriod - +p1.startingPeriod);
     const inactiveAaveProposals = onAave
       && (app.chain as Aave).governance.store.getAll().filter((p) => p.completed)
         .sort((p1, p2) => +p2.startBlock - +p1.startBlock);
+    const inactiveSputnikProposals = onSputnik
+      && (app.chain as NearSputnik).dao.store.getAll().filter((p) => p.completed)
+        .sort((p1, p2) => p2.data.id - p1.data.id);
 
     const inactiveProposalContent = !inactiveDemocracyProposals?.length
       && !inactiveCouncilProposals?.length
       && !inactiveCosmosProposals?.length
       && !inactiveMolochProposals?.length
-      && !inactiveMarlinProposals?.length
+      && !inactiveCompoundProposals?.length
       && !inactiveAaveProposals?.length
+      && !inactiveSputnikProposals?.length
       ? [ m('.no-proposals', 'No past proposals') ]
       : [ m('.inactive-proposals', [(inactiveDemocracyProposals || []).map((proposal) => m(ProposalCard, { proposal }))
         .concat((inactiveCouncilProposals || []).map((proposal) => m(ProposalCard, { proposal })))
         .concat((inactiveCosmosProposals || []).map((proposal) => m(ProposalCard, { proposal })))
         .concat((inactiveMolochProposals || []).map((proposal) => m(ProposalCard, { proposal })))
-        .concat((inactiveMarlinProposals || []).map((proposal) => m(ProposalCard, { proposal })))
+        .concat((inactiveCompoundProposals || []).map((proposal) => m(ProposalCard, { proposal })))
         .concat((inactiveAaveProposals || []).map((proposal) => m(ProposalCard, {
           proposal,
           injectedContent: AaveProposalCardDetail,
-        }))) ]
-      )];
+        })))
+        .concat((inactiveSputnikProposals || []).map((proposal) => m(ProposalCard, { proposal })))
+      ])];
 
     // XXX: display these
     const visibleTechnicalCommitteeProposals = app.chain
@@ -263,7 +275,7 @@ const ProposalsPage: m.Component<{}> = {
       showNewProposalButton: true,
     }, [
       onSubstrate && m(SubstrateProposalStats),
-      onMarlin && m(MarlinProposalStats),
+      onCompound && m(CompoundProposalStats),
       m('.clear'),
       m(Listing, {
         content: activeProposalContent,

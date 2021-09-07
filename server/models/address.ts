@@ -4,6 +4,7 @@ import * as Sequelize from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
 import crypto from 'crypto';
 import Web3 from 'web3';
+import { bech32 } from 'bech32';
 
 import Keyring, { decodeAddress } from '@polkadot/keyring';
 import { stringToU8a, hexToU8a } from '@polkadot/util';
@@ -19,9 +20,9 @@ import { NotificationCategories } from '../../shared/types';
 import { ModelStatic } from './types';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { ChainAttributes, ChainInstance } from './chain';
-import {UserAttributes, UserInstance} from './user';
-import {OffchainProfileAttributes, OffchainProfileInstance} from './offchain_profile';
-import {RoleAttributes, RoleInstance} from './role';
+import { UserAttributes, UserInstance } from './user';
+import { OffchainProfileAttributes, OffchainProfileInstance } from './offchain_profile';
+import { RoleAttributes, RoleInstance } from './role';
 import { factory, formatFilename } from '../../shared/logging';
 import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
 const log = factory.getLogger(formatFilename(__filename));
@@ -239,6 +240,32 @@ export default (
         log.error('Invalid keytype.');
         isValid = false;
       }
+    } else if (chain.base === 'cosmos' && chain.network === 'injective') {
+      //
+      // ethereum address handling
+      //
+      const msgBuffer = Buffer.from(addressModel.verification_token.trim());
+      // toBuffer() doesn't work if there is a newline
+      const msgHash = ethUtil.hashPersonalMessage(msgBuffer);
+      const ethSignatureBuffer = ethUtil.toBuffer(signatureString.trim());
+      const ethSignatureParams = ethUtil.fromRpcSig(ethSignatureBuffer);
+      const publicKey = ethUtil.ecrecover(
+        msgHash,
+        ethSignatureParams.v,
+        ethSignatureParams.r,
+        ethSignatureParams.s
+      );
+
+      const addressBuffer = ethUtil.publicToAddress(publicKey);
+      const lowercaseAddress = ethUtil.bufferToHex(addressBuffer);
+      try {
+        // const ethAddress = Web3.utils.toChecksumAddress(lowercaseAddress);
+        const injAddrBuf = ethUtil.Address.fromString(lowercaseAddress.toString()).toBuffer();
+        const injAddress = bech32.encode('inj', bech32.toWords(injAddrBuf));
+        if (addressModel.address === injAddress) isValid = true;
+      } catch (e) {
+        isValid = false;
+      }
     } else if (chain.base === 'cosmos') {
       //
       // cosmos-sdk address handling
@@ -251,22 +278,31 @@ export default (
       // this prevents people from using a different key to sign the message than
       // the account they registered with.
       // TODO: ensure osmosis works
-      const bech32Prefix = chain.network === 'straightedge'
-        ? 'str'
-        : chain.network === 'osmosis'
-          ? 'osmo'
-          : chain.network === 'injective'
-            ? 'inj'
-            : chain.network;
+      let bech32Prefix;
+      switch (chain.network) {
+        case 'straightedge':
+          bech32Prefix = 'str';
+          break;
+        case 'osmosis':
+          bech32Prefix = 'osmo';
+          break;
+        case 'terra':
+          bech32Prefix = 'terra';
+          break;
+        default:
+          bech32Prefix = chain.network;
+      }
+
       const generatedAddress = pubkeyToAddress(stdSignature.pub_key, bech32Prefix);
       const generatedAddressWithCosmosPrefix = pubkeyToAddress(stdSignature.pub_key, 'cosmos');
 
       if (generatedAddress === addressModel.address || generatedAddressWithCosmosPrefix === addressModel.address) {
         const generatedSignDoc = validationTokenToSignDoc(
-          chain.id,
+          chain.id === 'terra' ? 'columbus-4' : chain.id,
           addressModel.verification_token.trim(),
           signed.fee,
           signed.memo,
+          <any>signed.msgs,
         );
 
         // ensure correct document was signed

@@ -41,7 +41,7 @@ module.exports = {
           chunks: 'all',
         },
         near: {
-          test: /[\\/]node_modules[\\/](nearlib)[\\/]/,
+          test: /[\\/]node_modules[\\/](near-api-js)[\\/]/,
           name: 'near',
           chunks: 'all',
         },
@@ -53,6 +53,11 @@ module.exports = {
         polkadot: {
           test: /[\\/]node_modules[\\/](@polkadot)[\\/]/,
           name: 'polkadot',
+          chunks: 'all',
+        },
+        snapshot: {
+          test: /[\\/]node_modules[\\/](@snapshot-labs|@apollo)[\\/]/,
+          name: 'snapshot',
           chunks: 'all',
         },
       },

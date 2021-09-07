@@ -1,5 +1,12 @@
 module.exports = {
-  purge: ['./static/*.html'],
+  purge: {
+    enabled: true,
+    layers: ['components', 'utils', 'elements'],
+    content: [
+      './client/scripts/**/*.ts',
+      './static/*.html',
+    ],
+  },
   darkMode: false, // or 'media' or 'class'
   theme: {
     fontFamily: {

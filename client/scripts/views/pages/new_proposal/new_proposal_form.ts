@@ -22,8 +22,8 @@ import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collect
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
-import Marlin from 'controllers/chain/ethereum/marlin/adapter';
-import { MarlinProposalArgs } from 'controllers/chain/ethereum/marlin/governance';
+import Compound from 'controllers/chain/ethereum/compound/adapter';
+import { CompoundProposalArgs } from 'controllers/chain/ethereum/compound/governance';
 
 import {
   DropdownFormField,
@@ -37,6 +37,7 @@ import ErrorPage from 'views/pages/error';
 import SubstrateBountyTreasury from 'controllers/chain/substrate/bountyTreasury';
 import { AaveProposalArgs } from 'controllers/chain/ethereum/aave/governance';
 import Aave from 'controllers/chain/ethereum/aave/adapter';
+import NearSputnik from 'client/scripts/controllers/chain/near/sputnik/adapter';
 
 // this should be titled the Substrate/Edgeware new proposal form
 const NewProposalForm = {
@@ -88,10 +89,12 @@ const NewProposalForm = {
     let hasThreshold : boolean;
     // moloch proposal
     let hasMolochFields : boolean;
-    // marlin proposal
-    let hasMarlinFields : boolean;
+    // compound proposal
+    let hasCompoundFields : boolean;
     // aave proposal
     let hasAaveFields: boolean;
+    // sputnik proposal
+    let hasSputnikFields: boolean;
     // data loaded
     let dataLoaded : boolean = true;
 
@@ -145,10 +148,12 @@ const NewProposalForm = {
       dataLoaded = !!(app.chain as Cosmos).governance.initialized;
     } else if (proposalTypeEnum === ProposalType.MolochProposal) {
       hasMolochFields = true;
-    } else if (proposalTypeEnum === ProposalType.MarlinProposal) {
-      hasMarlinFields = true;
+    } else if (proposalTypeEnum === ProposalType.CompoundProposal) {
+      hasCompoundFields = true;
     } else if (proposalTypeEnum === ProposalType.AaveProposal) {
       hasAaveFields = true;
+    } else if (proposalTypeEnum === ProposalType.SputnikProposal) {
+      hasSputnikFields = true;
     } else {
       return m('.NewProposalForm', 'Invalid proposal type');
     }
@@ -321,7 +326,7 @@ const NewProposalForm = {
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
         return;
-      } else if (proposalTypeEnum === ProposalType.MarlinProposal) {
+      } else if (proposalTypeEnum === ProposalType.CompoundProposal) {
         vnode.state.proposer = app.user?.activeAccount?.address;
         if (!vnode.state.proposer) throw new Error('Invalid address / not logged in');
         if (!vnode.state.description) throw new Error('Invalid description');
@@ -337,14 +342,14 @@ const NewProposalForm = {
           && valuesArray.length !== calldatasArray.length
           && calldatasArray.length !== signaturesArray.length)
           throw new Error('Array lengths do not match');
-        const details: MarlinProposalArgs = {
+        const details: CompoundProposalArgs = {
           targets: targetsArray.toString(),
           values: valuesArray.toString(),
           signatures: signaturesArray.toString(),
           calldatas: calldatasArray.toString(),
           description: vnode.state.description,
         };
-        (app.chain as Marlin).governance.propose(details)
+        (app.chain as Compound).governance.propose(details)
           .then((result) => done(result))
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
@@ -391,6 +396,16 @@ const NewProposalForm = {
           .catch((err) => notifyError(err.toString()));
         return;
         // @TODO: Create Proposal via WebTx
+      } else if (proposalTypeEnum === ProposalType.SputnikProposal) {
+        // TODO: make type of proposal switchable
+        const account = vnode.state.addMember;
+        const description = vnode.state.description;
+        const propArgs = { AddMemberToRole: { role: 'council', member_id: account } };
+        (app.chain as NearSputnik).dao.proposeTx(description, propArgs)
+          .then((result) => done(result))
+          .then(() => m.redraw())
+          .catch((err) => notifyError(err.toString()));
+        return;
       } else if (proposalTypeEnum === ProposalType.SubstrateTreasuryTip) {
         if (!vnode.state.form.beneficiary) throw new Error('Invalid beneficiary address');
         const beneficiary = app.chain.accounts.get(vnode.state.form.beneficiary);
@@ -764,8 +779,8 @@ const NewProposalForm = {
               }),
             ]),
           ],
-          hasMarlinFields && [
-            m('h2', 'New Marlin Proposal:'),
+          hasCompoundFields && [
+            m('h2', 'New Compound Proposal:'),
             m(FormGroup, [
               m(FormLabel, 'Proposal Targets'),
               m(Input, {
@@ -990,6 +1005,40 @@ const NewProposalForm = {
               ]),
             ]),
           ]),
+          hasSputnikFields && [
+            // TODO: add switcher for kinds that modifies fields
+            // TODO: add deposit copy
+            m(FormGroup, [
+              m(FormLabel, 'Member'),
+              m(Input, {
+                name: 'addMember',
+                defaultValue: 'tokenfactory.testnet',
+                oncreate: (vvnode) => {
+                  vnode.state.addMember = 'tokenfactory.testnet';
+                },
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.addMember = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Description'),
+              m(Input, {
+                name: 'description',
+                defaultValue: '',
+                oncreate: (vvnode) => {
+                  vnode.state.description = '';
+                },
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.description = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+          ],
           hasTipsFields && [
             m(FormGroup, [
               m('.label', 'Finder'),

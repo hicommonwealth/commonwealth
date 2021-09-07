@@ -162,12 +162,12 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
                     m('h1', { class: 'font-bold mb-5 leading-10 md:text-xl lg:text-2xl xl:text-4xl' }, [
                       'We’re also here'
                     ]),
-                    m('div', {class: 'block flex'}, [
+                    m('div', { class: 'block flex' }, [
                       m(
                         'a',
                         {
                           class: 'ml-4',
-                          href: 'https://discord.gg/yK3x5HcsXG',
+                          href: 'https://discord.gg/frnQxxZG5S',
                           target: '_blank'
                         },
                         [

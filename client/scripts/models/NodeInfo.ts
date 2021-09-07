@@ -5,15 +5,17 @@ class NodeInfo {
   public readonly chain: ChainInfo;
   public readonly url: string;
   public readonly address: string;
+  public readonly tokenName: string;
 
-  constructor(id, chain, url, address?) {
+  constructor(id, chain, url, address?, tokenName?) {
     this.id = id;
     this.chain = chain;
     this.url = url;
     this.address = address;
+    this.tokenName = tokenName;
   }
   public static fromJSON(json) {
-    return new NodeInfo(json.id, json.chain, json.url, json.address);
+    return new NodeInfo(json.id, json.chain, json.url, json.address, json.token_name);
   }
 
   public get topics() {

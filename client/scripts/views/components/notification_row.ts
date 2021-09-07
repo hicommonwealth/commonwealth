@@ -5,8 +5,8 @@ import _ from 'lodash';
 import m from 'mithril';
 import moment from 'moment';
 import {
-  SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents, IEventLabel, chainSupportedBy, MarlinTypes, MarlinEvents, AaveTypes, AaveEvents,
-  // MarlinEvents
+  SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents, IEventLabel, chainSupportedBy, CompoundTypes, CompoundEvents, AaveTypes, AaveEvents,
+  // CompoundEvents
 } from '@commonwealth/chain-events';
 
 import app from 'state';
@@ -253,8 +253,8 @@ const NotificationRow: m.Component<{
           chainId,
           notification.chainEvent.data,
         );
-      } else if (chainSupportedBy(chainId, MarlinTypes.EventChains)) {
-        label = MarlinEvents.Label(
+      } else if (chainSupportedBy(chainId, CompoundTypes.EventChains)) {
+        label = CompoundEvents.Label(
           notification.chainEvent.blockNumber,
           chainId,
           notification.chainEvent.data,

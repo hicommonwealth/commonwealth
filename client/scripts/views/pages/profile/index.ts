@@ -19,89 +19,12 @@ import Tabs from 'views/components/widgets/tabs';
 import { decodeAddress, checkAddress, encodeAddress } from '@polkadot/util-crypto';
 import { Bech32 } from '@cosmjs/encoding';
 import { setActiveAccount } from 'controllers/app/login';
+import { modelFromServer  as modelThreadFromServer } from 'controllers/server/threads';
+import { modelFromServer  as modelCommentFromServer } from 'controllers/server/comments';
 import ProfileHeader from './profile_header';
 import ProfileContent from './profile_content';
 import ProfileBio from './profile_bio';
 import ProfileBanner from './profile_banner';
-
-const commentModelFromServer = (comment) => {
-  const attachments = comment.OffchainAttachments
-    ? comment.OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
-    : [];
-  let proposal;
-  try {
-    const proposalSplit = decodeURIComponent(comment.root_id).split(/-|_/);
-    if (proposalSplit[0] === 'discussion') {
-      proposal = new OffchainThread({
-        author: '',
-        title: '',
-        attachments: null,
-        id: Number(proposalSplit[1]),
-        createdAt: comment.created_at,
-        topic: null,
-        kind: null,
-        stage: null,
-        community: comment.community,
-        chain: comment.chain,
-        versionHistory: null,
-        readOnly: null,
-      });
-    } else {
-      proposal = {
-        chain: comment.chain,
-        community: comment.community,
-        slug: proposalSplit[0],
-        identifier: proposalSplit[1],
-      };
-    }
-  } catch (e) {
-    proposal = null;
-  }
-  return new OffchainComment({
-    chain: comment.chain,
-    author: comment?.Address?.address || comment.author,
-    text: decodeURIComponent(comment.text),
-    plaintext: comment.plaintext,
-    versionHistory: comment.version_history,
-    attachments,
-    proposal,
-    id: comment.id,
-    createdAt: moment(comment.created_at),
-    childComments: comment.child_comments,
-    rootProposal: comment.root_id,
-    parentComment: comment.parent_id,
-    community: comment.community,
-    authorChain: comment?.Address?.chain || comment.authorChain,
-    lastEdited: null,
-  });
-};
-
-const threadModelFromServer = (thread) => {
-  const attachments = thread.OffchainAttachments
-    ? thread.OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
-    : [];
-  return new OffchainThread({
-    author: thread.Address.address,
-    title: decodeURIComponent(thread.title),
-    attachments,
-    id: thread.id,
-    createdAt: moment(thread.created_at),
-    topic: thread.topic,
-    kind: thread.kind,
-    stage: thread.stage,
-    versionHistory: thread.version_history,
-    community: thread.community,
-    chain: thread.chain,
-    readOnly: thread.read_only,
-    body: decodeURIComponent(thread.body),
-    plaintext: thread.plaintext,
-    url: thread.url,
-    authorChain: thread.Address.chain,
-    pinned: thread.pinned,
-    collaborators: thread.collaborators,
-    chainEntities: thread.chain_entities,
-  });
-};
 
 const getProfileStatus = (account) => {
   const onOwnProfile = typeof app.user.activeAccount?.chain === 'string'
@@ -151,7 +74,6 @@ const getProfileStatus = (account) => {
   });
 };
 
-// eslint-disable-next-line no-shadow
 export enum UserContent {
   All = 'posts',
   Threads = 'threads',
@@ -253,8 +175,8 @@ const loadProfile = async (vnode: m.Vnode<{ address: string, setIdentity?: boole
       user_id: a.user_id,
     };
     vnode.state.account = account;
-    vnode.state.threads = result.threads.map((t) => threadModelFromServer(t));
-    vnode.state.comments = result.comments.map((c) => commentModelFromServer(c));
+    vnode.state.threads = result.threads.map((t) => modelThreadFromServer(t));
+    vnode.state.comments = result.comments.map((c) => modelCommentFromServer(c));
     m.redraw();
   } catch (err) {
     // for certain chains, display addresses not in db if formatted properly

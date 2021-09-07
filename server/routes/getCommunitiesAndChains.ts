@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import Sequelize from 'sequelize';
 import { DB } from '../database';
-import { ChainInstance } from "../models/chain";
-import { OffchainCommunityInstance } from "../models/offchain_community";
+import { ChainInstance } from '../models/chain';
+import { OffchainCommunityInstance } from '../models/offchain_community';
 const { Op } = Sequelize;
 
 const DEFAULT_SEARCH_LIMIT = 100;

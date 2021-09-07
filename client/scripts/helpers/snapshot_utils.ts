@@ -1,7 +1,112 @@
-import { cloneDeep } from 'lodash';
-import numeral from 'numeral';
-import Snapshot from '@snapshot-labs/snapshot.js';
-import { apolloClient, PROPOSAL_VOTES_QUERY, PROPOSALS_QUERY, SPACE_QUERY } from 'helpers/apollo';
+import gql from 'graphql-tag';
+
+let apolloClient = null;
+async function getApolloClient() {
+  if (apolloClient) return apolloClient;
+
+  const {
+    ApolloClient,
+    createHttpLink,
+    InMemoryCache
+  } = await import('@apollo/client/core');
+
+  // HTTP connection to the API
+  const httpLink = createHttpLink({
+    // You should use an absolute URL here
+    uri: `${process.env.SNAPSHOT_HUB_URL || 'https://hub.snapshot.org'}/graphql`
+  });
+
+  // Create the apollo client
+  apolloClient = new ApolloClient({
+    link: httpLink,
+    cache: new InMemoryCache(),
+    defaultOptions: {
+      query: {
+        fetchPolicy: 'no-cache'
+      }
+    }
+  });
+  return apolloClient;
+}
+
+export const SPACE_QUERY = gql`
+  query Space(
+    $space: String
+  ) {
+    space(id: $space) {
+      id
+      name
+      about
+      symbol
+      private
+      network
+      filters {
+        minScore
+        onlyMembers
+      }
+      strategies {
+        name
+        params
+      }
+      members
+    }
+  }
+`;
+
+export const PROPOSALS_QUERY = gql`
+  query Proposals(
+    $first: Int!
+    $skip: Int!
+    $state: String!
+    $space: String
+    $space_in: [String]
+    $author_in: [String]
+  ) {
+    proposals(
+      first: $first
+      skip: $skip
+      where: {
+        space: $space
+        state: $state
+        space_in: $space_in
+        author_in: $author_in
+      }
+    ) {
+      id
+      ipfs
+      title
+      body
+      choices
+      start
+      end
+      snapshot
+      state
+      author
+      created
+    }
+  }
+`;
+
+export const PROPOSAL_VOTES_QUERY = gql`
+  query Votes(
+    $proposalHash: String!
+  ) {
+    votes (
+      first: 10000
+      skip: 0
+      where: {
+        proposal: $proposalHash
+      }
+      orderBy: "created",
+      orderDirection: desc
+    ) {
+      id
+      voter
+      created
+      choice
+    }
+  }
+`;
 
 export interface SnapshotSpace {
   id: string;
@@ -42,7 +147,8 @@ export interface SnapshotProposalVote {
 }
 
 export async function getSpace(space: string): Promise<SnapshotSpace> {
-  const spaceObj = await apolloClient.query({
+  const client = await getApolloClient();
+  const spaceObj = await client.query({
     query: SPACE_QUERY,
     variables: {
       space,
@@ -52,7 +158,8 @@ export async function getSpace(space: string): Promise<SnapshotSpace> {
 }
 
 export async function getProposals(space: string): Promise<SnapshotProposal[]> {
-  const proposalsObj = await apolloClient.query({
+  const client = await getApolloClient();
+  const proposalsObj = await client.query({
     query: PROPOSALS_QUERY,
     variables: {
       space,
@@ -66,7 +173,8 @@ export async function getProposals(space: string): Promise<SnapshotProposal[]> {
 }
 
 export async function getVotes(proposalHash: string): Promise<SnapshotProposalVote[]> {
-  const response = await apolloClient.query({
+  const client = await getApolloClient();
+  const response = await client.query({
     query: PROPOSAL_VOTES_QUERY,
     variables: {
       proposalHash
@@ -75,8 +183,24 @@ export async function getVotes(proposalHash: string): Promise<SnapshotProposalVo
   return response.data.votes;
 }
 
+export async function getSpaceBlockNumber(network: string): Promise<number> {
+  const { default: Snapshot } = await import('@snapshot-labs/snapshot.js');
+  return Snapshot.utils.getBlockNumber(Snapshot.utils.getProvider(network));
+}
+
+export async function getScores(space: SnapshotSpace, address: string) {
+  const { default: Snapshot } = await import('@snapshot-labs/snapshot.js');
+  return Snapshot.utils.getScores(
+    space.id,
+    space.strategies,
+    space.network,
+    Snapshot.utils.getProvider(space.network),
+    [address]
+  );
+}
+
 export async function getPower(space: SnapshotSpace, address: string, snapshot: string) {
-  // TODO: do without snapshotjs
+  const { default: Snapshot } = await import('@snapshot-labs/snapshot.js');
   const blockNumber = await Snapshot.utils.getBlockNumber(Snapshot.utils.getProvider(space.network));
   const blockTag = +snapshot > blockNumber ? 'latest' : +snapshot;
   const scores: Array<{ [who: string]: number }> = await Snapshot.utils.getScores(
@@ -92,21 +216,4 @@ export async function getPower(space: SnapshotSpace, address: string, snapshot: 
     scores: summedScores,
     totalScore: summedScores.reduce((a, b) => a + b, 0)
   };
-}
-
-export function _n(number: number, format = '(0.[00]a)') {
-  if (number < 0.00001) return 0;
-  return numeral(number).format(format);
-}
-
-export function _shorten(str: string, key?: any): string {
-  if (!str) return str;
-  let limit;
-  if (typeof key === 'number') limit = key;
-  if (key === 'symbol') limit = 6;
-  if (key === 'name') limit = 64;
-  if (key === 'choice') limit = 12;
-  if (limit)
-    return str.length > limit ? `${str.slice(0, limit).trim()}...` : str;
-  return `${str.slice(0, 6)}...${str.slice(str.length - 4)}`;
 }

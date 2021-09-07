@@ -27,7 +27,7 @@ const ProfileCommentGroup : m.Component<IProfileCommentGroupAttrs> = {
 
     return m('.ProfileCommentGroup', [
       m('.summary', [
-        m('', [
+        m('.summary-group', [
           'Commented',
           (proposal.chain || proposal.community) && [
             ' on a ',
