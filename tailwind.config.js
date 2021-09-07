@@ -1,8 +1,9 @@
 module.exports = {
   purge: {
-    layers: ['components'],
+    enabled: true,
+    layers: ['components', 'utils', 'elements'],
     content: [
-      'client/scripts/**/*.ts',
+      './client/scripts/**/*.ts',
       './static/*.html',
     ],
   },
