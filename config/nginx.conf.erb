@@ -1,6 +1,6 @@
 daemon off;
 # Heroku dynos have at least 4 cores.
-worker_processes <%= ENV['NGINX_WORKERS'] || 4 %>;
+worker_processes <%= ENV['NGINX_WORKERS'] || 2 %>;
 
 events {
 	use epoll;
@@ -10,6 +10,7 @@ events {
 
 http {
 	gzip on;
+	gzip types: text/plain text/css application/javascript
 	gzip_comp_level 2;
 	gzip_min_length 512;
 	gzip_proxied any; # Heroku router sends Via header
