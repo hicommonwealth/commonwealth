@@ -99,10 +99,10 @@
       margin-bottom: 12px;
       border-bottom: none;
       position: sticky;
+      top: 83px;
       @include sm-max{
         top: 57px;
       }
-      top: 0;
       background-color: white;
       z-index: 50;
     }
@@ -155,7 +155,7 @@
 .ProfileBio {
   padding-left: 36px;
   position: sticky;
-  top: 24px;
+  top: 83px;
 
   .header {
     font-size: 24px;
