@@ -187,7 +187,7 @@ async function verifyIdentityChanges(pool, chain: string): Promise<boolean> {
   return identity === fetchedIdentities[chain].identity;
 }
 
-async function getChains(pool): Promise<[{id: string, url: string, substrate_spec: string, base: string}]> {
+async function getChains(pool): Promise<{id: string, url: string, substrate_spec: string, base: string}[]> {
   // eslint-disable-next-line max-len
   const query = 'SELECT "Chains"."id", "substrate_spec", "url", "base" FROM "Chains" JOIN "ChainNodes" ON "Chains"."id"="ChainNodes"."chain" WHERE "Chains"."has_chain_events_listener"=\'true\';';
   return (await pool.query(query)).rows;
@@ -247,7 +247,10 @@ setTimeout(async () => {
   });
   await client.connect();
 
-  const chains: [{id: string, url: string, substrate_spec: string, base: string}] = await getChains(pool);
+  const chains: {id: string, url: string, substrate_spec: string, base: string}[] = await getChains(pool);
+  if (chains.length === 0)
+    console.log('\nWARNING: Supported-chains/chains-to-test should have HAS_CHAIN_EVENTS_LISTENER set to true in the '
+      + 'database');
   await clearDB(pool);
   await clearQueues();
   await prepareDB(client);

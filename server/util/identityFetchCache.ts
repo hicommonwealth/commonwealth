@@ -1,5 +1,5 @@
-import models from '../database';
 import { SubstrateEvents } from '@commonwealth/chain-events';
+import models from '../database';
 import IdentityEventHandler from '../eventHandlers/identity';
 import JobRunner from './cacheJobRunner';
 
