@@ -25,6 +25,7 @@ module.exports = {
           try {
             decodedAddress = decodeAddress(address);
           } catch (e) {
+            console.error(e.message);
             throw new Error(`failed to decode address: ${address} for ${ch.base}`);
           }
 
@@ -63,6 +64,7 @@ module.exports = {
             oldPrefix = decoded.prefix;
             oldWords = decoded.words;
           } catch (e) {
+            console.error(e.message);
             throw new Error(`failed to decode address: ${address} for ${ch.base}`);
           }
           if (oldPrefix !== ch.bech32_prefix) {
@@ -108,6 +110,10 @@ module.exports = {
         await queryInterface.sequelize.query(
           'DELETE FROM "Roles" WHERE address_id=:id;',
           { replacements: { id: toReplace }, transaction, logging: console.log },
+        );
+        await queryInterface.sequelize.query(
+          'UPDATE "DiscussionDrafts" SET address_id=:address WHERE address_id=:id;',
+          { replacements: { id: toReplace, address: replaceWith, }, transaction, logging: console.log },
         );
 
         const threads = await queryInterface.sequelize.query(
