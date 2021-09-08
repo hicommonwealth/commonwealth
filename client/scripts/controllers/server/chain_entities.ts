@@ -13,12 +13,10 @@ import {
   IEventSubscriber,
   SubstrateTypes,
   IChainEntityKind,
-  EventSupportingChains,
   isSupportedChain,
 } from '@commonwealth/chain-events';
 import { notifyError } from '../app/notifications';
 
-// eslint-disable-next-line no-shadow
 export enum EntityRefreshOption {
   AllEntities = 'all-entities',
   CompletedEntities = 'completed-entities',

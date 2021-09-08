@@ -60,13 +60,13 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
       iconLeft: mobile ? Icons.PLUS : undefined,
     }),
     app.chain?.base === ChainBase.Ethereum && app.chain?.network === ChainNetwork.Aave
-    && m(MenuItem, {
-      onclick: (e) => navigateToSubpage('/new/proposal/:type', {
-        type: ProposalType.AaveProposal
-      }),
-      label: 'New On-Chain Proposal',
-      iconLeft: mobile ? Icons.PLUS : undefined,
-    }),
+     && m(MenuItem, {
+       onclick: (e) => navigateToSubpage('/new/proposal/:type', {
+         type: ProposalType.AaveProposal
+       }),
+       label: 'New On-Chain Proposal',
+       iconLeft: mobile ? Icons.PLUS : undefined,
+     }),
     app.chain?.network === ChainNetwork.Compound && m(MenuItem, {
       onclick: (e) => navigateToSubpage('/new/proposal/:type', {
         type: ProposalType.CompoundProposal

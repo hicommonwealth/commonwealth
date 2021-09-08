@@ -17,7 +17,6 @@ import LoginModal from '../modals/login_modal';
 
 const MAX_VISIBLE_REACTING_ACCOUNTS = 10;
 
-// eslint-disable-next-line no-shadow
 export enum ReactionType {
   Like = 'like',
   Dislike = 'dislike'

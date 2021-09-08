@@ -5,7 +5,7 @@ import moment from 'moment';
 import _ from 'lodash';
 import mixpanel from 'mixpanel-browser';
 import $ from 'jquery';
-import Web3 from 'web3';
+import { checkAddressChecksum, toChecksumAddress } from 'web3-utils';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -74,7 +74,6 @@ const getProfileStatus = (account) => {
   });
 };
 
-// eslint-disable-next-line no-shadow
 export enum UserContent {
   All = 'posts',
   Threads = 'threads',
@@ -115,7 +114,7 @@ const loadProfile = async (attrs: IProfilePageAttrs, state: IProfilePageState) =
     const ss58Prefix = parseInt(chainInfo.ss58Prefix, 10);
     [valid] = checkAddress(address, ss58Prefix);
   } else if (chainInfo?.base === ChainBase.Ethereum) {
-    valid = Web3.utils.checkAddressChecksum(address);
+    valid = checkAddressChecksum(address);
   } else if (chainInfo?.base === ChainBase.CosmosSDK) {
     valid = checkCosmosAddress(address);
   } else if (chainInfo?.base === ChainBase.NEAR) {
@@ -199,7 +198,7 @@ const loadProfile = async (attrs: IProfilePageAttrs, state: IProfilePageState) =
         // do nothing if can't decode
       }
     } else if (chainInfo?.base === ChainBase.Ethereum) {
-      if (Web3.utils.checkAddressChecksum(address)) {
+      if (checkAddressChecksum(address)) {
         state.account = {
           profile: null,
           chain,
@@ -259,11 +258,11 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
         }
       }
     } else if (chainInfo?.base === ChainBase.Ethereum) {
-      const valid = Web3.utils.checkAddressChecksum(address);
+      const valid = checkAddressChecksum(address);
 
       if (!valid) {
         try {
-          const checksumAddress = Web3.utils.toChecksumAddress(address);
+          const checksumAddress = toChecksumAddress(address);
           navigateToSubpage(`/account/${checksumAddress}${baseSuffix ? `?base=${baseSuffix}` : ''}`);
         } catch (e) {
           // do nothing if can't get checksumAddress
@@ -313,29 +312,29 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
     const allContent = [].concat(proposals || []).concat(comments || [])
       .sort((a, b) => +b.createdAt - +a.createdAt);
 
-    const allTabTitle = (proposals && comments) ? `All (${proposals.length + comments.length})` : 'All';
-    const threadsTabTitle = (proposals) ? `Threads (${proposals.length})` : 'Threads';
-    const commentsTabTitle = (comments) ? `Comments (${comments.length})` : 'Comments';
+    const allTabTitle = (proposals && comments) ? ['All ', m('.count', (proposals.length + comments.length))] : 'All';
+    const threadsTabTitle = (proposals) ? ['Threads ', m('.count', (proposals.length))] : 'Threads';
+    const commentsTabTitle = (comments) ? ['Comments ', m('.count', (comments.length))] : 'Comments';
 
     return m(Sublayout, {
       class: 'ProfilePage',
       showNewProposalButton: true,
     }, [
-      m('.forum-container-alt', [
+      [
         displayBanner
         && m(ProfileBanner, {
           account,
           addressInfo: currentAddressInfo
         }),
-        m(ProfileHeader, {
-          account,
-          setIdentity,
-          onOwnProfile,
-          onLinkedProfile,
-          refreshCallback: () => { vnode.state.refreshProfile = true; },
-        }),
         m('.row.row-narrow.forum-row', [
-          m('.col-xs-8', [
+          m('.col-xs-12 .col-md-8', [
+            m(ProfileHeader, {
+              account,
+              setIdentity,
+              onOwnProfile,
+              onLinkedProfile,
+              refreshCallback: () => { vnode.state.refreshProfile = true; },
+            }),
             m(Tabs, [{
               name: allTabTitle,
               content: m(ProfileContent, {
@@ -365,11 +364,17 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
               }),
             }]),
           ]),
-          m('.col-xs-4', [
-            m(ProfileBio, { account }),
+          m('.xs-display-none .col-md-4', [
+            m(ProfileBio, {
+              account,
+              setIdentity,
+              onOwnProfile,
+              onLinkedProfile,
+              refreshCallback: () => { vnode.state.refreshProfile = true; },
+            }),
           ]),
         ]),
-      ]),
+      ],
     ]);
   },
 };
