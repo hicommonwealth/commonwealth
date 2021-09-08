@@ -5,7 +5,7 @@ import moment from 'moment';
 import _ from 'lodash';
 import mixpanel from 'mixpanel-browser';
 import $ from 'jquery';
-import Web3 from 'web3';
+import { checkAddressChecksum, toChecksumAddress } from 'web3-utils';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -111,7 +111,7 @@ const loadProfile = async (vnode: m.Vnode<{ address: string, setIdentity?: boole
     const ss58Prefix = parseInt(chainInfo.ss58Prefix, 10);
     [valid] = checkAddress(address, ss58Prefix);
   } else if (chainInfo?.base === ChainBase.Ethereum) {
-    valid = Web3.utils.checkAddressChecksum(address);
+    valid = checkAddressChecksum(address);
   } else if (chainInfo?.base === ChainBase.CosmosSDK) {
     valid = checkCosmosAddress(address);
   } else if (chainInfo?.base === ChainBase.NEAR) {
@@ -195,7 +195,7 @@ const loadProfile = async (vnode: m.Vnode<{ address: string, setIdentity?: boole
         // do nothing if can't decode
       }
     } else if (chainInfo?.base === ChainBase.Ethereum) {
-      if (Web3.utils.checkAddressChecksum(address)) {
+      if (checkAddressChecksum(address)) {
         vnode.state.account = {
           profile: null,
           chain,
@@ -256,11 +256,11 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
         }
       }
     } else if (chainInfo?.base === ChainBase.Ethereum) {
-      const valid = Web3.utils.checkAddressChecksum(address);
+      const valid = checkAddressChecksum(address);
 
       if (!valid) {
         try {
-          const checksumAddress = Web3.utils.toChecksumAddress(address);
+          const checksumAddress = toChecksumAddress(address);
           navigateToSubpage(`/account/${checksumAddress}${baseSuffix ? `?base=${baseSuffix}` : ''}`);
         } catch (e) {
           // do nothing if can't get checksumAddress

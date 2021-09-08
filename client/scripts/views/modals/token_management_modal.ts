@@ -1,6 +1,6 @@
 import 'modals/token_management_modal.scss';
 
-import Web3 from 'web3';
+import { isAddress } from 'web3-utils';
 import m from 'mithril';
 import $ from 'jquery';
 import BN from 'bn.js';
@@ -77,7 +77,7 @@ const TokenManagementModal: m.Component<IAttrs, IState> = {
               vnode.state.recipient = result.toString();
 
               // once recipient is entered, fetch its token balance
-              if (Web3.utils.isAddress(vnode.state.recipient)) {
+              if (isAddress(vnode.state.recipient)) {
                 const acct = vnode.attrs.accounts.get(vnode.state.recipient);
                 acct.tokenBalance(vnode.attrs.tokenAddress).then((v) => {
                   if (v) {
@@ -140,7 +140,7 @@ const TokenManagementModal: m.Component<IAttrs, IState> = {
             if (vnode.state.toggleValue === 'approve') {
               txP = vnode.attrs.account.approveTokenTx(tokens, vnode.attrs.contractAddress);
             } else if (vnode.state.toggleValue === 'transfer') {
-              if (!Web3.utils.isAddress(vnode.state.recipient)) {
+              if (!isAddress(vnode.state.recipient)) {
                 vnode.state.error = 'Recipient address invalid.';
                 return;
               }

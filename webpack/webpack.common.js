@@ -61,7 +61,7 @@ module.exports = {
           chunks: 'all',
         },
         vendor: {
-          test: /[\\/]node_modules[\\/](?!(@snapshot-labs|@apollo|@polkadot|@cosmjs|@tendermint|amino-js|supercop\.js|tendermint|libsodium|near-api-js|web3|@audius|ethers|@walletconnect|@ethersproject|bip39).*)/,
+          test: /[\\/]node_modules[\\/](?!(mithril|jquery|moment|lodash|mixpanel-browser|construct-ui|quill|bn|@snapshot-labs|@apollo|@tendermint|amino-js|supercop\.js|tendermint|@audius|ethers|@walletconnect|@ethersproject).*)/,
           name: 'vendors',
           chunks: 'all',
         }

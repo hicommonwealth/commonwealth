@@ -9,7 +9,7 @@ import app from 'state';
 import { CommunityInfo, ChainInfo, RoleInfo, ChainBase } from 'models';
 import { CompactModalExitButton } from 'views/modal';
 import { checkAddress } from '@polkadot/util-crypto';
-import Web3 from 'web3';
+import { checkAddressChecksum } from 'web3-utils';
 
 interface IInviteButtonAttrs {
   selection: string,
@@ -252,7 +252,7 @@ const CreateInviteModal: m.Component<{
     if (selectedChain?.base === ChainBase.Substrate) {
       [isAddressValid] = checkAddress(vnode.state.invitedAddress, parseInt(selectedChain.ss58Prefix, 10));
     } else if (chainInfo?.base === ChainBase.Ethereum) {
-      isAddressValid = Web3.utils.checkAddressChecksum(vnode.state.invitedAddress);
+      isAddressValid = checkAddressChecksum(vnode.state.invitedAddress);
     } else {
       // TODO: check Cosmos & Near?
     }
