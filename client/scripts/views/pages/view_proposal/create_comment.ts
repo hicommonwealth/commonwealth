@@ -215,37 +215,44 @@ const CreateComment: m.Component<{
             }),
             m('.token-requirement', [
               tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0))
-                ? `Commenting in ${activeTopicName} requires 
-                ${tokenBaseUnitsToTokens(tokenPostingThreshold.toString(), app.chain.meta.chain.decimals)} ${app.chain.meta.chain.symbol}`
+                ? [
+                  `Commenting in ${activeTopicName} requires `,
+                  `${tokenBaseUnitsToTokens(tokenPostingThreshold.toString(), app.chain.meta.chain.decimals)} `,
+                  `${app.chain.meta.chain.symbol}`
+                ]
                 : null
             ]),
-            m('.form-bottom', [
-              m(Button, {
-                intent: 'primary',
-                type: 'submit',
-                compact: true,
-                disabled,
-                rounded: true,
-                onclick: submitComment,
-                label: (uploadsInProgress > 0)
-                  ? 'Uploading...'
-                  : 'Submit'
-              }),
-              cancellable
-                && m(Button, {
-                  intent: 'none',
-                  type: 'cancel',
+            m('.form-bottom', {
+              onmouseover: () => m.redraw(), // keeps Quill's isBlank up to date
+            }, [
+              m('.form-buttons', [
+                m(Button, {
+                  intent: 'primary',
+                  type: 'submit',
                   compact: true,
+                  disabled,
                   rounded: true,
-                  onclick: (e) => {
-                    e.preventDefault();
-                    proposalPageState.replying = false;
-                    proposalPageState.parentCommentId = null;
-                  },
-                  label: 'Cancel'
+                  onclick: submitComment,
+                  label: (uploadsInProgress > 0)
+                    ? 'Uploading...'
+                    : 'Submit'
                 }),
+                cancellable
+                  && m(Button, {
+                    intent: 'none',
+                    type: 'cancel',
+                    compact: true,
+                    rounded: true,
+                    onclick: (e) => {
+                      e.preventDefault();
+                      proposalPageState.replying = false;
+                      proposalPageState.parentCommentId = null;
+                    },
+                    label: 'Cancel'
+                  }),
+              ]),
               error
-                && m('.new-comment-error', error),
+              && m('.new-comment-error', error),
             ]),
           ]
       ])

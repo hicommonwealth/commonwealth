@@ -80,6 +80,10 @@ export enum UserContent {
   Comments = 'comments'
 }
 
+interface IProfilePageAttrs {
+  address: string;
+  setIdentity?: boolean;
+}
 interface IProfilePageState {
   account;
   threads: OffchainThread[];
@@ -101,12 +105,11 @@ const checkCosmosAddress = (address: string): boolean => {
   }
 };
 
-const loadProfile = async (vnode: m.Vnode<{ address: string, setIdentity?: boolean }, IProfilePageState>) => {
+const loadProfile = async (attrs: IProfilePageAttrs, state: IProfilePageState) => {
   const chain = m.route.param('base') || app.customDomainId() || m.route.param('scope');
-  const { address } = vnode.attrs;
+  const { address } = attrs;
   const chainInfo = app.config.chains.getById(chain);
   let valid = false;
-
   if (chainInfo?.base === ChainBase.Substrate) {
     const ss58Prefix = parseInt(chainInfo.ss58Prefix, 10);
     [valid] = checkAddress(address, ss58Prefix);
@@ -120,8 +123,8 @@ const loadProfile = async (vnode: m.Vnode<{ address: string, setIdentity?: boole
   if (!valid) {
     return;
   }
-  vnode.state.loading = true;
-  vnode.state.initialized = true;
+  state.loading = true;
+  state.initialized = true;
   try {
     const response = await $.ajax({
       url: `${app.serverUrl()}/profile`,
@@ -134,8 +137,8 @@ const loadProfile = async (vnode: m.Vnode<{ address: string, setIdentity?: boole
     });
 
     const { result } = response;
-    vnode.state.loaded = true;
-    vnode.state.loading = false;
+    state.loaded = true;
+    state.loading = false;
     const a = result.account;
     const profile = new Profile(a.chain, a.address);
     if (a.OffchainProfile) {
@@ -174,16 +177,16 @@ const loadProfile = async (vnode: m.Vnode<{ address: string, setIdentity?: boole
       name: a.name,
       user_id: a.user_id,
     };
-    vnode.state.account = account;
-    vnode.state.threads = result.threads.map((t) => modelThreadFromServer(t));
-    vnode.state.comments = result.comments.map((c) => modelCommentFromServer(c));
+    state.account = account;
+    state.threads = result.threads.map((t) => modelThreadFromServer(t));
+    state.comments = result.comments.map((c) => modelCommentFromServer(c));
     m.redraw();
   } catch (err) {
     // for certain chains, display addresses not in db if formatted properly
     if (chainInfo?.base === ChainBase.Substrate) {
       try {
         decodeAddress(address);
-        vnode.state.account = {
+        state.account = {
           profile: null,
           chain,
           address,
@@ -196,7 +199,7 @@ const loadProfile = async (vnode: m.Vnode<{ address: string, setIdentity?: boole
       }
     } else if (chainInfo?.base === ChainBase.Ethereum) {
       if (checkAddressChecksum(address)) {
-        vnode.state.account = {
+        state.account = {
           profile: null,
           chain,
           address,
@@ -207,7 +210,7 @@ const loadProfile = async (vnode: m.Vnode<{ address: string, setIdentity?: boole
       }
     } else if (chainInfo?.base === ChainBase.CosmosSDK) {
       if (checkCosmosAddress(address)) {
-        vnode.state.account = {
+        state.account = {
           profile: null,
           chain,
           address,
@@ -217,17 +220,17 @@ const loadProfile = async (vnode: m.Vnode<{ address: string, setIdentity?: boole
         };
       }
     }
-    vnode.state.loaded = true;
-    vnode.state.loading = false;
+    state.loaded = true;
+    state.loading = false;
     m.redraw();
-    if (!vnode.state.account)
+    if (!state.account)
       throw new Error((err.responseJSON && err.responseJSON.error)
         ? err.responseJSON.error
         : 'Failed to find profile');
   }
 };
 
-const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProfilePageState> = {
+const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
   oninit: (vnode) => {
     vnode.state.account = null;
     vnode.state.initialized = false;
@@ -236,7 +239,6 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
     vnode.state.threads = [];
     vnode.state.comments = [];
     vnode.state.refreshProfile = false;
-
     const chain = m.route.param('base') || app.customDomainId() || m.route.param('scope');
     const { address } = vnode.attrs;
     const chainInfo = app.config.chains.getById(chain);
@@ -275,11 +277,11 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
     const { setIdentity } = vnode.attrs;
     const { account, loaded, loading, refreshProfile } = vnode.state;
     if (!loading && !loaded) {
-      loadProfile(vnode);
+      loadProfile(vnode.attrs, vnode.state);
     }
     if (account && account.address !== vnode.attrs.address) {
       vnode.state.loaded = false;
-      loadProfile(vnode);
+      loadProfile(vnode.attrs, vnode.state);
     }
     if (loading) return m(PageLoading, { showNewProposalButton: true });
     if (!account && !vnode.state.initialized) {
@@ -291,7 +293,7 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
     const { onOwnProfile, onLinkedProfile, displayBanner, currentAddressInfo } = getProfileStatus(account);
 
     if (refreshProfile) {
-      loadProfile(vnode);
+      loadProfile(vnode.attrs, vnode.state);
       vnode.state.refreshProfile = false;
       if (onOwnProfile) {
         setActiveAccount(account).then(() => {
