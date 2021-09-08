@@ -44,6 +44,9 @@ const CreateComment: m.Component<{
       rootProposal
     } = vnode.attrs;
     let { parentComment } = vnode.attrs;
+    let disabled = getSetGlobalEditingStatus(GlobalStatus.Get)
+      || vnode.state.quillEditorState?.editor?.editor?.isBlank();
+
     const author = app.user.activeAccount;
     const parentType = (parentComment || proposalPageState.parentCommentId)
       ? CommentParent.Comment
@@ -125,13 +128,10 @@ const CreateComment: m.Component<{
       proposalPageState.parentCommentId = null;
     };
 
-    const activeTopicName = rootProposal instanceof OffchainThread ? rootProposal.topic.name : null;
-    const tokenPostingThreshold = app.topics.getByName(
-      activeTopicName,
-      app.activeId()
-    )?.tokenThreshold;
+    const activeTopicName = rootProposal instanceof OffchainThread ? rootProposal?.topic?.name : null;
 
-    const isAdmin = app.user.isSiteAdmin || app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
+    const isAdmin = app.user.isSiteAdmin
+      || app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
 
     let parentScopedClass: string = 'new-thread-child';
     let parentAuthor: Account<any>;
@@ -143,6 +143,23 @@ const CreateComment: m.Component<{
     }
 
     const { error, sendingComment, uploadsInProgress } = vnode.state;
+    disabled = getSetGlobalEditingStatus(GlobalStatus.Get)
+      || vnode.state.quillEditorState?.editor?.editor?.isBlank()
+      || sendingComment
+      || uploadsInProgress;
+
+    // token balance check if needed
+    let tokenPostingThreshold = null;
+    if (!app.community && (app.chain as Token)?.isToken) {
+      const tokenBalance = (app.chain as Token).tokenBalance;
+      tokenPostingThreshold = app.topics.getByName(
+        activeTopicName,
+        app.activeId()
+      )?.tokenThreshold;
+      disabled = disabled
+        || ((!app.isAdapterReady) && !isAdmin && tokenPostingThreshold && tokenPostingThreshold.gt(tokenBalance));
+    }
+
     return m('.CreateComment', {
       class: parentScopedClass
     }, [
@@ -198,47 +215,44 @@ const CreateComment: m.Component<{
             }),
             m('.token-requirement', [
               tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0))
-                ? `Commenting in ${activeTopicName} requires 
-                ${tokenBaseUnitsToTokens(tokenPostingThreshold.toString(), app.chain.meta.chain.decimals)} ${app.chain.meta.chain.symbol}`
+                ? [
+                  `Commenting in ${activeTopicName} requires `,
+                  `${tokenBaseUnitsToTokens(tokenPostingThreshold.toString(), app.chain.meta.chain.decimals)} `,
+                  `${app.chain.meta.chain.symbol}`
+                ]
                 : null
             ]),
-            m('.form-bottom', [
-              m(Button, {
-                intent: 'primary',
-                type: 'submit',
-                compact: true,
-                disabled: (
-                  getSetGlobalEditingStatus(GlobalStatus.Get)
-                  || vnode.state.quillEditorState?.editor?.editor?.isBlank()
-                  || sendingComment
-                  || uploadsInProgress > 0
-                  || (app.activeChainId() && (app.chain as Token).isToken
-                    && ((!app.isAdapterReady)
-                      || (!isAdmin
-                        && tokenPostingThreshold
-                        && tokenPostingThreshold.gt((app.chain as Token).tokenBalance))))
-                ),
-                rounded: true,
-                onclick: submitComment,
-                label: (uploadsInProgress > 0)
-                  ? 'Uploading...'
-                  : 'Submit'
-              }),
-              cancellable
-                && m(Button, {
-                  intent: 'none',
-                  type: 'cancel',
+            m('.form-bottom', {
+              onmouseover: () => m.redraw(), // keeps Quill's isBlank up to date
+            }, [
+              m('.form-buttons', [
+                m(Button, {
+                  intent: 'primary',
+                  type: 'submit',
                   compact: true,
+                  disabled,
                   rounded: true,
-                  onclick: (e) => {
-                    e.preventDefault();
-                    proposalPageState.replying = false;
-                    proposalPageState.parentCommentId = null;
-                  },
-                  label: 'Cancel'
+                  onclick: submitComment,
+                  label: (uploadsInProgress > 0)
+                    ? 'Uploading...'
+                    : 'Submit'
                 }),
+                cancellable
+                  && m(Button, {
+                    intent: 'none',
+                    type: 'cancel',
+                    compact: true,
+                    rounded: true,
+                    onclick: (e) => {
+                      e.preventDefault();
+                      proposalPageState.replying = false;
+                      proposalPageState.parentCommentId = null;
+                    },
+                    label: 'Cancel'
+                  }),
+              ]),
               error
-                && m('.new-comment-error', error),
+              && m('.new-comment-error', error),
             ]),
           ]
       ])

@@ -4,7 +4,6 @@ import { IVote } from 'models';
 import { NearAccount } from 'controllers/chain/near/account';
 import { NearToken } from 'adapters/chain/near/types';
 
-// eslint-disable-next-line no-shadow
 export enum NearSputnikProposalStatus {
   InProgress = 'InProgress',
   Approved = 'Approved',
@@ -14,14 +13,12 @@ export enum NearSputnikProposalStatus {
   Moved = 'Moved',
 }
 
-// eslint-disable-next-line no-shadow
 export enum NearSputnikVoteString {
   Approve = 'Approve',
   Reject = 'Reject',
   Remove = 'Remove',
 }
 
-// eslint-disable-next-line no-shadow
 export enum WeightKind {
   RoleWeight = 'RoleWeight',
   TokenWeight = 'TokenWeight',

@@ -37,6 +37,7 @@ export interface ChainAttributes {
   has_chain_events_listener?: boolean;
   terms?: string;
   snapshot?: string;
+  bech32_prefix?: string;
 
   // associations
   ChainNodes?: ChainNodeAttributes[] | ChainNodeAttributes['id'][];
@@ -91,6 +92,7 @@ export default (
     has_chain_events_listener: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     snapshot: { type: dataTypes.STRING, allowNull: true },
     terms: { type: dataTypes.STRING, allowNull: true },
+    bech32_prefix: { type: dataTypes.STRING, allowNull: true },
   }, {
     tableName: 'Chains',
     timestamps: false,

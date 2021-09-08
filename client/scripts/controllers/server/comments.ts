@@ -12,7 +12,6 @@ import { modelFromServer as modelReactionFromServer } from 'controllers/server/r
 import { updateLastVisited } from '../app/login';
 
 // tslint:disable: object-literal-key-quotes
-/* eslint-disable no-shadow */
 
 export enum CommentParent {
   Proposal = 'proposal',

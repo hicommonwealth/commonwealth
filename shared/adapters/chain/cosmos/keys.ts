@@ -3,7 +3,7 @@
 // generated signature. But first we need the message to insert.
 import { AminoMsg, makeSignDoc, StdSignDoc } from '@cosmjs/amino';
 
-export const validationTokenToSignDoc = (chainId: string, token: string, fee?, memo?): StdSignDoc => {
+export const validationTokenToSignDoc = (chainId: string, token: string, fee?, memo?,  msgs?: AminoMsg[]): StdSignDoc => {
   const jsonTx: AminoMsg = {
     type: 'cosmos-sdk/TextProposal',
     value: {
@@ -15,6 +15,6 @@ export const validationTokenToSignDoc = (chainId: string, token: string, fee?, m
   };
   fee = fee || { gas: '100000', amount: [{ denom: 'astr', amount: '2500000000000000' }] };
   memo = memo || '';
-  const signDoc = makeSignDoc([jsonTx], fee, chainId, memo, '0', '0');
+  const signDoc = makeSignDoc(msgs || [jsonTx], fee, chainId, memo, '0', '0');
   return signDoc;
 };

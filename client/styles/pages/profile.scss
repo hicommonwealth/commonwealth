@@ -1,13 +1,5 @@
 @import "client/styles/shared";
 
-@mixin profile-module {
-  width: 100%;
-  background: $text-color-white;
-  border-radius: 2px;
-  border: 1px solid $background-color-light;
-  box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.04);
-}
-
 @mixin profile-listing {
   h3 {
     margin: 32px 0 30px;
@@ -42,7 +34,9 @@
 }
 
 @mixin comment-level {
-  margin: 26px 0 32px;
+  margin-top: 24px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid #DDDDDD;
   .proposal-title {
     color: black !important;
     font-weight: 600;
@@ -50,10 +44,19 @@
   }
   .summary {
     color: $text-color-light;
-    margin-bottom: 6px;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
   }
   .summary > .User > .username {
     color: $primary-bg-color !important;
+  }
+  .link-bold {
+    font-weight: 500;
+    color: #000000;
+  }
+  .link-normal {
+    color: inherit;
   }
   .proposal {
     .proposal-body {
@@ -88,19 +91,35 @@
   }
   .forum-row {
     margin-top: 14px;
+    min-height: 100%;
   }
   .Tabs {
-    @include profile-module;
-    padding: 12px 26px 6px !important;
     .tab-bar {
+      flex-direction: row !important;
       margin-bottom: 12px;
       border-bottom: none;
+      position: sticky;
+      top: 83px;
+      @include sm-max{
+        top: 57px;
+      }
+      background-color: white;
+      z-index: 50;
     }
     a.tab-entry {
-      padding: 8px 0 0 0;
+      padding: 12px 0 0 0;
       margin-right: 18px;
       margin-bottom: 10px;
       color: $text-color-medium;
+
+      .count {
+        display: inline;
+        background-color: #EEEEEE;
+        padding: 6px 10px 2px 10px;
+        border-radius: 9999px;
+        font-size: 14px;
+        font-weight: 600;
+      }
     }
     a.tab-entry.active {
       color: $text-color-darker;
@@ -127,28 +146,115 @@
   }
 }
 
+.xs-display-none {
+  @include md-max {
+    display: none;
+  }
+}
+
 .ProfileBio {
-  @include profile-module;
-  padding: 22px 30px 4px;
-  margin-bottom: 14px;
+  padding-left: 36px;
+  position: sticky;
+  top: 83px;
+
   .header {
-    font-size: inherit;
+    font-size: 24px;
     font-weight: 600;
     color: $text-color-darker;
-    margin-bottom: 18px;
-    display: block;
+    margin-top: 32px;
+    margin-bottom: 6px;
   }
   .no-items {
     color: $text-color-light;
     margin: 8px 0 20px;
   }
+
+  .address-block-right {
+    display: flex;
+    align-items: flex-end;
+
+    .address {
+      color: #666666;
+      margin-right: 8px;
+    }
+  }
+
+  .show-profile {
+    align-items: center;
+    opacity: 1;
+    max-height: 200px;
+    transition: all 0.3s;
+    transition-delay: 0.3s;
+  }
+
+  .hide-profile {
+    margin: 0 !important;
+    opacity: 0;
+    height: 0;
+    visibility: hidden;
+    transition: all 0.3s;
+  }
+
+  .hide-address {
+    height: 0;
+    opacity: 0;
+    transition: all 0.3s;
+  }
+
+  .show-address {
+    height: 30px;
+    opacity: 1;
+    transition: all 0.3s;
+    transition-delay: 0.3s;
+  }
+
+  button.cui-button.cui-fluid {
+    width: fit-content;
+    border-radius: 6px;
+    background-image: linear-gradient(to bottom left, #6086d1, #b37dba);
+
+    span {
+      padding-right: 0px;
+    }
+  }
+
+  .bio-left {
+    margin-right: 20px;
+  }
+
+  .bio-right {
+    margin-left: 0 !important;
+    max-width: 100%;
+
+    .User {
+      max-width: 100%;
+    }
+  }
+
+  .bio-actions-right {
+    margin: 16px 0;
+
+    .cui-button {
+      margin: 6px 16px 6px 0;
+      border-radius: 8px;
+      padding: 5px 15px 5px 15px;
+      background: #FFFFFF;
+      border: 1px solid #4723AD;
+      color: #4723AD;
+      font-weight: 500;
+      font-size: 18px;
+      text-transform: uppercase;
+    }
+  }
+
+  .ProfileHeader {
+    margin: 24px 0;
+  }
 }
 
 .ProfileBio {
-  margin-right: 15px;
   .QuillFormattedText,
   .MarkdownFormattedText {
-    margin-top: -8px;
     padding-bottom: 8px;
     p:last-child {
       margin-bottom: 0;
@@ -173,25 +279,12 @@
 }
 
 .ProfileHeader {
-  @include profile-module;
-  padding: 0 0 8px;
-  padding: 0 24px !important;
-  margin-top: 12px;
-
-  .cover {
-    width: calc(100% + 24px * 2);
-    height: 96px;
-    background: linear-gradient(180deg, #404040 0%, #111 100%);
-    margin: 0 -24px;
-    @include xs-max {
-      width: calc(100% + 17px * 2);
-      margin: 0 -17px;
-    }
-  }
+  margin: 24px 0;
 
   .bio-main {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
   }
   .bio-left {
     width: 94px;
@@ -199,27 +292,18 @@
       width: 94px;
       height: 94px;
       position: relative;
-      margin-top: -28px;
-      margin-bottom: 18px;
-      background-color: $background-color-white-hover;
-      border: 2px solid $text-color-white;
       border-radius: 9999px;
-      overflow: hidden;
-      box-shadow: 0.5px 0.5px 4px rgba(0, 0, 0, 0.15);
       .avatar-image {
         background-size: cover;
       }
     }
   }
-  .bio-right,
-  .bio-actions {
-    padding: 10px 0 0 20px;
-  }
   .bio-right {
     flex: 1;
-    margin: 6px 0 0;
+    margin-left: 20px;
+
     .User {
-      font-size: 21px;
+      font-size: 24px;
       font-weight: 600;
       .username {
         color: $text-color-darker;
@@ -239,47 +323,47 @@
     }
   }
   .bio-actions {
-    text-align: right;
-    margin: 8px 0 0;
-    a.btn,
-    button {
-      margin-left: 8px;
-      margin-top: 3px;
-      margin-bottom: 3px;
-    }
-    @include lg-max {
-      text-align: left;
-      padding: 0;
-      margin: 8px 0 22px 0;
-      width: 100%;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-top: 12px;
+
+    @include md-max {
       a.btn,
-      button {
-        margin: 0 10px 0 0;
-        width: calc(50% - 5px);
-        &:last-child {
-          margin-right: 0;
-        }
+      .cui-button {
+        margin-right: 16px;
+        border-radius: 8px;
+        padding: 5px 15px 5px 15px;
+        background: #FFFFFF;
+        border: 1px solid #4723AD;
+        color: #4723AD;
+        font-weight: 500;
+        font-size: 18px;
+        text-transform: uppercase;
       }
     }
-    @include xs-max {
-      button {
-        margin: 4px 0;
-        width: 100%;
+    @include lg-min {
+      display: none;
+    }
+  }
+  .address-block-left {
+    @include md-max {
+      display: flex;
+      align-items: flex-end;
+
+      .address {
+        color: #666666;
+        margin-right: 8px;
       }
+    }
+    @include lg-min {
+      display: none;
     }
   }
   .avatar {
     display: block;
   }
   .name-row {
-    margin-bottom: 3px;
-    .name {
-      font-size: 21px;
-      font-weight: 600;
-      line-height: 1.15;
-      margin-bottom: 6px;
-      word-break: break-word;
-    }
     .name,
     .no-verification,
     .verification {
@@ -328,27 +412,33 @@
     }
   }
   .info-row {
-    margin-bottom: 16px;
-    display: flex;
-    span,
-    a {
-      padding-right: 15px;
-      font-size: inherit;
-    }
-    a {
-      text-decoration: none;
-      color: $text-color-light;
-    }
-    .space {
-      flex: 1;
-    }
-    button.cui-button.cui-fluid {
-      width: fit-content;
-      border-radius: 6px;
-      background-image: linear-gradient(to bottom left, #6086d1, #b37dba);
-      span {
-        padding-right: 0px;
+    @include md-max {
+      margin-bottom: 16px;
+      display: flex;
+      span,
+      a {
+        padding-right: 15px;
+        font-size: inherit;
       }
+      a {
+        text-decoration: none;
+        color: $text-color-light;
+      }
+      .space {
+        flex: 1;
+      }
+      button.cui-button.cui-fluid {
+        width: fit-content;
+        border-radius: 6px;
+        background-image: linear-gradient(to bottom left, #6086d1, #b37dba);
+        span {
+          padding-right: 0px;
+        }
+      }
+    }
+
+    @include lg-min {
+      display: none;
     }
   }
   .profile-headline {
@@ -378,7 +468,6 @@
     overflow-y: hidden;
   }
   .infinite-scroll-spinner-wrap {
-    margin: -26px 0 0 0;
     height: 70px;
     width: 100%;
     display: flex;
