@@ -14,7 +14,7 @@ import { constructSubstrateUrl } from 'substrate';
 import { NearAccount } from 'controllers/chain/near/account';
 import Near from 'controllers/chain/near/main';
 import NearSputnikDao from 'controllers/chain/near/sputnik/dao';
-import Web3 from 'web3';
+import { isAddress } from 'web3-utils';
 
 import { CompactModalExitButton } from 'views/modal';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
@@ -410,7 +410,7 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
     vnode.state.error = '';
   },
   view: (vnode) => {
-    const validAddress = Web3.utils.isAddress(vnode.state.address);
+    const validAddress = isAddress(vnode.state.address);
     const disableField = !validAddress || !vnode.state.loaded;
 
     return m('.compact-modal-body-max', [
@@ -427,7 +427,7 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
           onChangeHandler: (v) => {
             vnode.state.address = v;
             vnode.state.loaded = false;
-            if (Web3.utils.isAddress(v)) {
+            if (isAddress(v)) {
               $.get(`${app.serverUrl()}/getTokenForum`, { address: v, allowUncached: true }).then(async (res) => {
                 if (res.status === 'Success') {
                   vnode.state.name = res?.result?.chain?.name || '';

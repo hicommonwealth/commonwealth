@@ -5,13 +5,14 @@ import app from 'state';
 import $ from 'jquery';
 import { Button } from 'construct-ui';
 
-import { SnapshotProposal, SnapshotSpace, _n, _shorten } from 'helpers/snapshot_utils';
+import { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
 import { notifyError } from 'controllers/app/notifications';
 
 import { CompactModalExitButton } from 'views/modal';
 import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import { ChainBase } from 'models';
+import { formatNumberShort } from 'adapters/currency';
 
 enum NewVoteErrors {
   SomethingWentWrong = 'Something went wrong!'
@@ -50,13 +51,13 @@ const ConfirmSnapshotVoteModal: m.Component<{
           // m('.d-flex', [
           //   m('span', { class: 'text-blue' }, 'Snapshot'),
           //   m('a', { href: `${_explorer(space.network, proposal.snapshot, 'block')}`, target: '_blank' }, [
-          //     `${_n(proposal.snapshot, '0,0')}`,
+          //     `${formatNumberShort(proposal.snapshot, '0,0')}`,
           //     m('i', { class: 'iconexternal-link' })
           //   ]),
           // ]),
           m('.d-flex', [
             m('span', { class: 'text-blue' }, 'Your voting power'),
-            m('span', `${_n(totalScore)} ${_shorten(space.symbol, 'symbol')}`)
+            m('span', `${formatNumberShort(totalScore)} ${space.symbol.slice(0, 6).trim()}...`)
           ]),
         ]),
         m('.button-group', [

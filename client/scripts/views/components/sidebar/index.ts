@@ -108,6 +108,8 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
       return { id, name, featuredInSidebar };
     }).filter((t) => t.featuredInSidebar).sort((a, b) => a.name.localeCompare(b.name));
 
+    const discussionsLabel = (['vesuvius', 'olympus'].includes(app.activeId())) ? 'Forums' : 'Discussions';
+
     return m('.OffchainNavigationModule.SidebarModule', [
       // m('.section-header', 'Discuss'),
       m(Button, {
@@ -115,7 +117,7 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
         fluid: true,
         active: onDiscussionsPage(m.route.get())
           && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
-        label: 'Discussions',
+        label: discussionsLabel,
         onclick: (e) => {
           e.preventDefault();
           navigateToSubpage('/');

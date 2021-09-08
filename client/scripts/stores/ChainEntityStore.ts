@@ -39,9 +39,9 @@ class ChainEntityStore extends Store<ChainEntity> {
     this._storeType = {};
   }
 
-  public getByType(type: IChainEntityKind) {
+  public getByType(type: IChainEntityKind, keepEmpty = false) {
     if (this._storeType[type]) {
-      return Object.values(this._storeType[type]);
+      return Object.values(this._storeType[type]).filter((e) => keepEmpty || e.chainEvents.length > 0);
     } else {
       return [];
     }
