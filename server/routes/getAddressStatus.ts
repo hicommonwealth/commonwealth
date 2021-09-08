@@ -1,5 +1,6 @@
 import Sequelize from 'sequelize';
 import { Request, Response, NextFunction } from 'express';
+import { DB } from '../database';
 
 const Op = Sequelize.Op;
 
@@ -9,7 +10,7 @@ export const Errors = {
   InvalidChain: 'Invalid chain',
 };
 
-const getAddressStatus = async (models, req: Request, res: Response, next: NextFunction) => {
+const getAddressStatus = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   if (!req.body.address) {
     return next(new Error(Errors.NeedAddress));
   }

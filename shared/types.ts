@@ -1,6 +1,7 @@
 import { ChainAttributes } from 'server/models/chain';
 import { OffchainCommunityAttributes } from 'server/models/offchain_community';
 
+import { Model, BuildOptions } from 'sequelize';
 // This is a const and not an enum because of a weird webpack error.
 // It has the same syntax, though, so it should be OK, as long as we don't
 // modify any of the values.
@@ -29,6 +30,8 @@ export enum ProposalType {
   OffchainThread = 'discussion',
   CosmosProposal = 'cosmosproposal',
   MolochProposal = 'molochproposal',
+  AaveProposal = 'aaveproposal',
+  CompoundProposal = 'compoundproposal',
 }
 
 export enum WebsocketEventType {

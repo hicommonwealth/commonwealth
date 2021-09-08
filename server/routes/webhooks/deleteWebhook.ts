@@ -21,7 +21,7 @@ const deleteWebhook = async (models, req: Request, res: Response, next: NextFunc
       permission: ['admin']
     },
   });
-  if (adminRoles.length === 0) return next(new Error(Errors.NotAdmin));
+  if (!req.user.isAdmin && adminRoles.length === 0) return next(new Error(Errors.NotAdmin));
   // delete webhook
   if (!req.body.webhookUrl) return next(new Error(Errors.MissingWebhook));
   const webhook = await models.Webhook.findOne({

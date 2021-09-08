@@ -1,7 +1,7 @@
 import request from 'superagent';
 import { Op } from 'sequelize';
 import { capitalize } from 'lodash';
-import { SubstrateEvents } from '@commonwealth/chain-events';
+import { AaveEvents, chainSupportedBy, CompoundEvents, MolochEvents, SubstrateEvents } from '@commonwealth/chain-events';
 
 import { NotificationCategories } from '../shared/types';
 import { smartTrim, validURL, renderQuillDeltaToText } from '../shared/utils';
@@ -26,7 +26,18 @@ const REGEX_EMOJI = /([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF
 const getFilteredContent = (content, address) => {
   let event;
   if (content.chainEvent && content.chainEventType) {
-    event = SubstrateEvents.Label(
+    let labelerFn;
+    if (chainSupportedBy(content.chainEventType.chain, SubstrateEvents.Types.EventChains)) {
+      labelerFn = SubstrateEvents.Label;
+    } else if (chainSupportedBy(content.chainEventType.chain, MolochEvents.Types.EventChains)) {
+      labelerFn = MolochEvents.Label;
+    } else if (chainSupportedBy(content.chainEventType.chain, CompoundEvents.Types.EventChains)) {
+      labelerFn = CompoundEvents.Label;
+    } else if (chainSupportedBy(content.chainEventType.chain, AaveEvents.Types.EventChains)) {
+      labelerFn = AaveEvents.Label;
+    }
+    if (!labelerFn) throw new Error('unknown chain event');
+    event = labelerFn(
       content.chainEvent.block_number,
       content.chainEventType.chain,
       content.chainEvent.event_data
@@ -107,8 +118,7 @@ const send = async (models, content: WebhookContent) => {
   });
   const chainOrCommwebhookUrls = [];
   chainOrCommWebhooks.forEach((wh) => {
-    // We currently only support slack webhooks
-    if (validURL(wh.url)) {
+    if (validURL(wh.url)){
       chainOrCommwebhookUrls.push(wh.url);
     }
   });
@@ -153,7 +163,6 @@ const send = async (models, content: WebhookContent) => {
         previewAltText = chain.name;
       }
     } else if (content.community) {
-      // TODO:
       // if the community has a logo, show it as preview image
       const offchainCommunity = await models.OffchainCommunity.findOne({ where: { id: content.community, privacyEnabled: false } });
       if (offchainCommunity) {
@@ -167,7 +176,7 @@ const send = async (models, content: WebhookContent) => {
   if (!previewImageUrl) {
     // if no embedded image url or the chain/community doesn't have a logo, show the Commonwealth logo as the preview image
     previewImageUrl = previewImageUrl || DEFAULT_COMMONWEALTH_LOGO;
-    previewAltText = previewAltText || 'CommonWealth';
+    previewAltText = previewAltText || 'Commonwealth';
   }
 
   await Promise.all(chainOrCommwebhookUrls
@@ -259,6 +268,39 @@ const send = async (models, content: WebhookContent) => {
         //   'displayName': 'Commonwealth',
         //   'avatarUrl': 'http://commonwealthLogoGoesHere'
         // };
+      } else if ((url.indexOf('telegram') !== -1) && process.env.TELEGRAM_BOT_TOKEN) {
+        let getChatUsername = url.split('/@');
+        getChatUsername = '@' + getChatUsername[1];
+
+        const botToken = process.env.TELEGRAM_BOT_TOKEN;
+        let getUpdatesUrl = `https://api.telegram.org/${process.env.TELEGRAM_BOT_TOKEN}`;
+        url = getUpdatesUrl + '/sendMessage';
+
+        webhookData = isChainEvent ? {
+          chat_id: getChatUsername,
+          text: `<a href="${chainEventLink}"><b>${title}</b></a>\n\n${fulltext}`,
+          parse_mode: 'HTML',
+          reply_markup: {
+            'resize_keyboard': true,
+            'inline_keyboard': [
+              [
+                { 'text': 'Read more on commonwealth', 'url': chainEventLink }
+              ]
+            ]
+          }
+        } : {
+          chat_id: getChatUsername,
+          text: `<b>Author:</b> <a href="${actorAccountLink}">${actor}</a>\n<a href="${actedOnLink}"><b>${notificationTitlePrefix + actedOn}</b></a> \r\n\n${notificationExcerpt.replace(REGEX_EMOJI, '')}`,
+          parse_mode: 'HTML',
+          reply_markup: {
+            'resize_keyboard': true,
+            'inline_keyboard': [
+              [
+                { 'text': 'Read more on commonwealth', 'url': 'https://commonwealth.im' }
+              ]
+            ]
+          }
+        };
       } else {
         // TODO: other formats unimplemented
       }

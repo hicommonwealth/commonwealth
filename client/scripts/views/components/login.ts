@@ -185,6 +185,7 @@ const Login: m.Component<{}, {
                 vnode.state.failure = true;
                 vnode.state.error = err.message;
               }
+              m.redraw();
             },
           }),
         ]),

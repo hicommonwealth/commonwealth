@@ -21,6 +21,7 @@ import { notifyError } from 'controllers/app/notifications';
 import { updateLastVisited } from 'controllers/app/login';
 import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
 import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
+import { modelFromServer as modelReactionCountFromServer }  from 'controllers/server/reactionCounts';
 
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
@@ -156,7 +157,6 @@ class ThreadsController {
 
   public get initialized() { return this._initialized; }
 
-  public numPrevotingThreads: number;
   public numVotingThreads: number;
 
   public getType(primary: string, secondary?: string, tertiary?: string) {
@@ -168,6 +168,10 @@ class ThreadsController {
           : thread.kind === primary;
     });
     return result;
+  }
+
+  public getById(id: number) {
+    return this._store.getByIdentifier(id);
   }
 
   public async create(
@@ -207,7 +211,6 @@ class ThreadsController {
       this._store.add(result);
 
       // Update stage counts
-      if (result.stage === OffchainThreadStage.ProposalInReview) this.numPrevotingThreads++;
       if (result.stage === OffchainThreadStage.Voting) this.numVotingThreads++;
 
       // New posts are added to both the topic and allProposals sub-store
@@ -229,6 +232,7 @@ class ThreadsController {
     proposal: OffchainThread,
     body: string,
     title: string,
+    url?: string,
     attachments?: string[],
   ) {
     const newBody = body || proposal.body;
@@ -247,15 +251,14 @@ class ThreadsController {
         'stage': proposal.stage,
         'body': encodeURIComponent(newBody),
         'title': newTitle,
+        'url': url,
         'attachments[]': attachments,
         'jwt': app.user.jwt
       },
       success: (response) => {
         const result = modelFromServer(response.result);
         // Update counters
-        if (proposal.stage === OffchainThreadStage.ProposalInReview) this.numPrevotingThreads--;
         if (proposal.stage === OffchainThreadStage.Voting) this.numVotingThreads--;
-        if (result.stage === OffchainThreadStage.ProposalInReview) this.numPrevotingThreads++;
         if (result.stage === OffchainThreadStage.Voting) this.numVotingThreads++;
         // Post edits propagate to all thread stores
         this._store.update(result);
@@ -314,7 +317,6 @@ class ThreadsController {
         thread.offchainVotingOptions = { name, choices };
         thread.offchainVotingNumVotes = 0;
         thread.offchainVotingEndsAt = moment(response.result.offchain_voting_ends_at);
-        return;
       },
       error: (err) => {
         console.log('Failed to start polling');
@@ -338,9 +340,7 @@ class ThreadsController {
       success: (response) => {
         const result = modelFromServer(response.result);
         // Update counters
-        if (args.stage === OffchainThreadStage.ProposalInReview) this.numPrevotingThreads--;
         if (args.stage === OffchainThreadStage.Voting) this.numVotingThreads--;
-        if (result.stage === OffchainThreadStage.ProposalInReview) this.numPrevotingThreads++;
         if (result.stage === OffchainThreadStage.Voting) this.numVotingThreads++;
         // Post edits propagate to all thread stores
         this._store.update(result);
@@ -471,7 +471,7 @@ class ThreadsController {
     if (response.status !== 'Success') {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);
     }
-    const { threads, comments, reactions } = response.result;
+    const { threads, comments } = response.result;
     for (const thread of threads) {
       const modeledThread = modelFromServer(thread);
       if (!thread.Address) {
@@ -499,13 +499,18 @@ class ThreadsController {
         console.error(e.message);
       }
     }
-    for (const reaction of reactions) {
-      const existing = app.reactions.store.getById(reaction.id);
+    const { result: reactionCounts } = await $.post(`${app.serverUrl()}/reactionsCounts`, {
+      thread_ids: threads.map((thread) => thread.id),
+      active_address: app.user.activeAccount?.address
+    });
+    for (const rc of reactionCounts) {
+      const id = app.reactionCounts.store.getIdentifier(rc);
+      const existing = app.reactionCounts.store.getById(id);
       if (existing) {
-        app.reactions.store.remove(existing);
+        app.reactionCounts.store.remove(existing);
       }
       try {
-        app.reactions.store.add(modelReactionFromServer(reaction));
+        app.reactionCounts.store.add(modelReactionCountFromServer({ ...rc, id }));
       } catch (e) {
         console.error(e.message);
       }
@@ -535,7 +540,7 @@ class ThreadsController {
         }
         // Threads that are posted in an offchain community are still linked to a chain / author address,
         // so when we want just chain threads, then we have to filter away those that have a community
-        const { threads, numPrevotingThreads, numVotingThreads } = response.result;
+        const { threads, numVotingThreads } = response.result;
         for (const thread of threads) {
           // TODO: OffchainThreads should always have a linked Address
           if (!thread.Address) {
@@ -552,7 +557,6 @@ class ThreadsController {
             console.error(e.message);
           }
         }
-        this.numPrevotingThreads = numPrevotingThreads;
         this.numVotingThreads = numVotingThreads;
         this._initialized = true;
       }, (err) => {
@@ -563,7 +567,7 @@ class ThreadsController {
       });
   }
 
-  public initialize(initialThreads: any[], numPrevotingThreads, numVotingThreads, reset) {
+  public initialize(initialThreads: any[], numVotingThreads, reset) {
     if (reset) {
       this._store.clear();
       this._listingStore.clear();
@@ -582,7 +586,6 @@ class ThreadsController {
         console.error(e.message);
       }
     }
-    this.numPrevotingThreads = numPrevotingThreads;
     this.numVotingThreads = numVotingThreads;
     this._initialized = true;
   }

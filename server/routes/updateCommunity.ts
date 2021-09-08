@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../../shared/logging';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
+import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -16,9 +17,10 @@ export const Errors = {
   InvalidTelegram: 'Telegram must begin with https://t.me/',
   InvalidGithub: 'Github must begin with https://github.com/',
   InvalidCustomDomain: 'Custom domain may not include "commonwealth"',
+  InvalidTerms: 'Terms of Service must begin with https://',
 };
 
-const updateCommunity = async (models, req: Request, res: Response, next: NextFunction) => {
+const updateCommunity = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   if (!req.body.id) return next(new Error(Errors.NoCommunityId));
   if (req.body.network) return next(new Error(Errors.CantChangeNetwork));
@@ -28,19 +30,19 @@ const updateCommunity = async (models, req: Request, res: Response, next: NextFu
   });
   if (!community) return next(new Error(Errors.CommunityNotFound));
   else {
-    const userAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
+    const userAddressIds = (await req.user.getAddresses()).filter((addr) => !!addr.verified).map((addr) => addr.id);
     const userRole = await models.Role.findOne({
       where: {
         address_id: userAddressIds,
         offchain_community_id: community.id,
       },
     });
-    if (!userRole || userRole.permission !== 'admin') {
+    if (!req.user.isAdmin && (!userRole || userRole.permission !== 'admin')) {
       return next(new Error(Errors.NotAdmin));
     }
   }
 
-  const { iconUrl, name, description, website, discord, element, telegram, github, customDomain, invites, privacy } = req.body;
+  const { iconUrl, name, description, website, discord, element, telegram, github, stagesEnabled, customStages, customDomain, invites, privacy, terms } = req.body;
 
   if (website && !urlHasValidHTTPPrefix(website)) {
     return next(new Error(Errors.InvalidWebsite));
@@ -54,6 +56,8 @@ const updateCommunity = async (models, req: Request, res: Response, next: NextFu
     return next(new Error(Errors.InvalidGithub));
   } else if (customDomain && customDomain.includes('commonwealth')) {
     return next(new Error(Errors.InvalidCustomDomain));
+  } else if (terms && !urlHasValidHTTPPrefix(terms)) {
+    return next(new Error(Errors.InvalidTerms));
   }
 
   if (req.body.name) community.name = req.body.name;
@@ -65,15 +69,23 @@ const updateCommunity = async (models, req: Request, res: Response, next: NextFu
   community.element = element;
   community.telegram = telegram;
   community.github = github;
-  community.customDomain = customDomain;
+  community.stagesEnabled = stagesEnabled;
+  community.customStages = customStages;
+  community.terms = terms;
   community.invitesEnabled = invites || false;
   community.privacyEnabled = privacy || false;
+  // Under our current security policy, custom domains must be set by trusted
+  // administrators only. Otherwise an attacker could configure a custom domain and
+  // use the code they run to steal login tokens for arbitrary users.
+  //
+  // community.customDomain = customDomain;
   await community.save();
 
   // @TODO -> make sure this gets changed... on the front end, only allow one image to be attached
   if (req.body['attachments[]']) {
     await Promise.all(req.body['attachments[]'].map((url) => models.OffchainAttachment.create({
       attachable: 'community',
+      // @ts-ignore
       attachment_id: community.id,
       description: 'image',
       url,

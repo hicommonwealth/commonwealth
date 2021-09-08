@@ -1,25 +1,28 @@
 (global as any).window = { location: { href: '/' } };
 
 import * as Sequelize from 'sequelize';
+import { Model, DataTypes } from 'sequelize';
 import crypto from 'crypto';
 import Web3 from 'web3';
+import { bech32 } from 'bech32';
 
 import Keyring, { decodeAddress } from '@polkadot/keyring';
 import { stringToU8a, hexToU8a } from '@polkadot/util';
+import { KeypairType } from '@polkadot/util-crypto/types';
 
 import { serializeSignDoc, decodeSignature } from '@cosmjs/launchpad';
 import { Secp256k1, Secp256k1Signature, Sha256 } from '@cosmjs/crypto';
-import { fromBase64 } from '@cosmjs/encoding';
-import { getCosmosAddress } from '@lunie/cosmos-keys'; // used to check address validity. TODO: remove
+import { AminoSignResponse, pubkeyToAddress } from '@cosmjs/amino';
 
 import nacl from 'tweetnacl';
 import { KeyringOptions } from '@polkadot/keyring/types';
 import { NotificationCategories } from '../../shared/types';
+import { ModelStatic } from './types';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { ChainAttributes, ChainInstance } from './chain';
-import { UserAttributes } from './user';
-import { OffchainProfileAttributes } from './offchain_profile';
-import { RoleAttributes } from './role';
+import { UserAttributes, UserInstance } from './user';
+import { OffchainProfileAttributes, OffchainProfileInstance } from './offchain_profile';
+import { RoleAttributes, RoleInstance } from './role';
 import { factory, formatFilename } from '../../shared/logging';
 import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
 const log = factory.getLogger(formatFilename(__filename));
@@ -28,10 +31,10 @@ const log = factory.getLogger(formatFilename(__filename));
 const ethUtil = require('ethereumjs-util');
 
 export interface AddressAttributes {
-  id?: number;
   address: string;
   chain: string;
   verification_token: string;
+  id?: number;
   verification_token_expires?: Date;
   verified?: Date;
   keytype?: string;
@@ -51,11 +54,15 @@ export interface AddressAttributes {
   Roles?: RoleAttributes[];
 }
 
-export interface AddressInstance extends Sequelize.Instance<AddressAttributes>, AddressAttributes {
+export interface AddressInstance extends Model<AddressAttributes>, AddressCreationAttributes {
   // no mixins used yet
+  getChain: Sequelize.BelongsToGetAssociationMixin<ChainInstance>;
+  getUser: Sequelize.BelongsToGetAssociationMixin<UserInstance>;
+  getOffchainProfile: Sequelize.BelongsToGetAssociationMixin<OffchainProfileInstance>;
+  getRoles: Sequelize.HasManyGetAssociationsMixin<RoleInstance>;
 }
 
-export interface AddressModel extends Sequelize.Model<AddressInstance, AddressAttributes> {
+export interface AddressCreationAttributes extends AddressAttributes {
   // static methods
   createEmpty?: (
     chain: string,
@@ -84,7 +91,7 @@ export interface AddressModel extends Sequelize.Model<AddressInstance, AddressAt
   ) => Promise<AddressInstance>;
 
   verifySignature?: (
-    models: Sequelize.Models,
+    models: any,
     chain: ChainInstance,
     addressModel: AddressInstance,
     user_id: number,
@@ -92,11 +99,13 @@ export interface AddressModel extends Sequelize.Model<AddressInstance, AddressAt
   ) => Promise<boolean>;
 }
 
+export type AddressModelStatic = ModelStatic<AddressInstance> & AddressCreationAttributes
+
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): AddressModel => {
-  const Address: AddressModel = sequelize.define<AddressInstance, AddressAttributes>('Address', {
+  dataTypes: typeof DataTypes,
+): AddressModelStatic => {
+  const Address: AddressModelStatic = <AddressModelStatic>sequelize.define('Address', {
     id:                         { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     address:                    { type: dataTypes.STRING, allowNull: false },
     chain:                      { type: dataTypes.STRING, allowNull: false },
@@ -113,7 +122,11 @@ export default (
     is_validator:               { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     is_magic:                   { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
   }, {
+    timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
     underscored: true,
+    tableName: 'Addresses',
     indexes: [
       { fields: ['address', 'chain'], unique: true },
       { fields: ['user_id'] },
@@ -125,9 +138,7 @@ export default (
       }
     },
     scopes: {
-      withPrivateData: {
-        attributes: {}
-      }
+      withPrivateData: {}
     },
   });
 
@@ -194,7 +205,7 @@ export default (
   // passed from the frontend to show exactly what was signed.
   // Supports Substrate, Ethereum, Cosmos, and NEAR.
   Address.verifySignature = async (
-    models: Sequelize.Models,
+    models: any,
     chain: ChainInstance,
     addressModel: AddressInstance,
     user_id: number,
@@ -205,69 +216,110 @@ export default (
       return false;
     }
 
-    let isValid;
+    let isValid: boolean;
     if (chain.base === 'substrate') {
       //
       // substrate address handling
       //
       const address = decodeAddress(addressModel.address);
       const keyringOptions: KeyringOptions = { type: 'sr25519' };
-      if (addressModel.keytype) {
-        if (addressModel.keytype !== 'sr25519' && addressModel.keytype !== 'ed25519') {
-          log.error('invalid keytype');
-          return false;
+      if (!addressModel.keytype || (addressModel.keytype === 'sr25519' || addressModel.keytype === 'ed25519')) {
+        if (addressModel.keytype) {
+          keyringOptions.type = addressModel.keytype as KeypairType;
         }
-        keyringOptions.type = addressModel.keytype;
+        keyringOptions.ss58Format = chain.ss58_prefix ?? 42;
+        const signerKeyring = new Keyring(keyringOptions).addFromAddress(address);
+        const signedMessageNewline = stringToU8a(`${addressModel.verification_token}\n`);
+        const signedMessageNoNewline = stringToU8a(addressModel.verification_token);
+        const signatureU8a = signatureString.slice(0, 2) === '0x'
+          ? hexToU8a(signatureString)
+          : hexToU8a(`0x${signatureString}`);
+        isValid = signerKeyring.verify(signedMessageNewline, signatureU8a, address)
+          || signerKeyring.verify(signedMessageNoNewline, signatureU8a, address);
+      } else {
+        log.error('Invalid keytype.');
+        isValid = false;
       }
-      keyringOptions.ss58Format = chain.ss58_prefix ?? 42;
-      const signerKeyring = new Keyring(keyringOptions).addFromAddress(address);
-      const signedMessageNewline = stringToU8a(`${addressModel.verification_token}\n`);
-      const signedMessageNoNewline = stringToU8a(addressModel.verification_token);
-      const signatureU8a = signatureString.slice(0, 2) === '0x'
-        ? hexToU8a(signatureString)
-        : hexToU8a(`0x${signatureString}`);
-      isValid = signerKeyring.verify(signedMessageNewline, signatureU8a, address)
-        || signerKeyring.verify(signedMessageNoNewline, signatureU8a, address);
+    } else if (chain.base === 'cosmos' && chain.network === 'injective') {
+      //
+      // ethereum address handling
+      //
+      const msgBuffer = Buffer.from(addressModel.verification_token.trim());
+      // toBuffer() doesn't work if there is a newline
+      const msgHash = ethUtil.hashPersonalMessage(msgBuffer);
+      const ethSignatureBuffer = ethUtil.toBuffer(signatureString.trim());
+      const ethSignatureParams = ethUtil.fromRpcSig(ethSignatureBuffer);
+      const publicKey = ethUtil.ecrecover(
+        msgHash,
+        ethSignatureParams.v,
+        ethSignatureParams.r,
+        ethSignatureParams.s
+      );
+
+      const addressBuffer = ethUtil.publicToAddress(publicKey);
+      const lowercaseAddress = ethUtil.bufferToHex(addressBuffer);
+      try {
+        // const ethAddress = Web3.utils.toChecksumAddress(lowercaseAddress);
+        const injAddrBuf = ethUtil.Address.fromString(lowercaseAddress.toString()).toBuffer();
+        const injAddress = bech32.encode('inj', bech32.toWords(injAddrBuf));
+        if (addressModel.address === injAddress) isValid = true;
+      } catch (e) {
+        isValid = false;
+      }
     } else if (chain.base === 'cosmos') {
       //
       // cosmos-sdk address handling
       //
-      const signatureData = JSON.parse(signatureString);
-      const pk = Buffer.from(signatureData.signature.pub_key.value, 'base64');
+
+      // provided string should be serialized AminoSignResponse object
+      const { signed, signature: stdSignature }: AminoSignResponse = JSON.parse(signatureString);
 
       // we generate an address from the actual public key and verify that it matches,
       // this prevents people from using a different key to sign the message than
       // the account they registered with.
-      const bech32Prefix = chain.network === 'cosmos'
-        ? 'cosmos'
-        : chain.network === 'straightedge' ? 'str' : chain.network;
-      const generatedAddress = getCosmosAddress(pk, bech32Prefix);
-      const generatedAddressWithCosmosPrefix = getCosmosAddress(pk, 'cosmos');
-
-      if (generatedAddress === addressModel.address || generatedAddressWithCosmosPrefix === addressModel.address) {
-        // get tx doc that was signed
-        const signDoc = await validationTokenToSignDoc(addressModel.address, addressModel.verification_token.trim());
-
-        // check for signature validity
-        // see the last test in @cosmjs/launchpad/src/secp256k1wallet.spec.ts for reference
-        const { pubkey, signature } = decodeSignature(signatureData.signature);
-        const secpSignature = Secp256k1Signature.fromFixedLength(fromBase64(signatureData.signature.signature));
-        if (serializeSignDoc(signatureData.signed).toString() !== serializeSignDoc(signDoc).toString()) {
-          isValid = false;
-        } else {
-          const messageHash = new Sha256(serializeSignDoc(signDoc)).digest();
-          isValid = await Secp256k1.verifySignature(secpSignature, messageHash, pubkey);
-        }
-      } else {
+      // TODO: ensure ion works
+      const bech32Prefix = chain.bech32_prefix;
+      if (!bech32Prefix) {
+        log.error('No bech32 prefix found.');
         isValid = false;
+      } else {
+        const generatedAddress = pubkeyToAddress(stdSignature.pub_key, bech32Prefix);
+        const generatedAddressWithCosmosPrefix = pubkeyToAddress(stdSignature.pub_key, 'cosmos');
+
+        if (generatedAddress === addressModel.address || generatedAddressWithCosmosPrefix === addressModel.address) {
+          const generatedSignDoc = validationTokenToSignDoc(
+            chain.id === 'terra' ? 'columbus-4' : chain.id,
+            addressModel.verification_token.trim(),
+            signed.fee,
+            signed.memo,
+            <any>signed.msgs,
+          );
+
+          // ensure correct document was signed
+          if (serializeSignDoc(signed).toString() === serializeSignDoc(generatedSignDoc).toString()) {
+            // ensure valid signature
+            // see the last test in @cosmjs/launchpad/src/secp256k1wallet.spec.ts for reference
+            const { pubkey, signature } = decodeSignature(stdSignature);
+            const secpSignature = Secp256k1Signature.fromFixedLength(signature);
+            const messageHash = new Sha256(serializeSignDoc(generatedSignDoc)).digest();
+            isValid = await Secp256k1.verifySignature(secpSignature, messageHash, pubkey);
+            if (!isValid) {
+              log.error('Signature verification failed.');
+            }
+          } else {
+            log.error(`Sign doc not matched. Generated: ${
+              JSON.stringify(generatedSignDoc)
+            }, found: ${
+              JSON.stringify(signed)
+            }.`);
+            isValid = false;
+          }
+        } else {
+          log.error(`Address not matched. Generated ${generatedAddress}, found ${addressModel.address}.`);
+          isValid = false;
+        }
       }
-    } else if (chain.network === 'ethereum'
-      || chain.network === 'moloch'
-      || chain.network === 'alex'
-      || chain.network === 'metacartel'
-      || chain.network === 'commonwealth'
-      || chain.type === 'token'
-    ) {
+    } else if (chain.base === 'ethereum') {
       //
       // ethereum address handling
       //

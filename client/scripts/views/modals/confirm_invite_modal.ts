@@ -11,7 +11,7 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { UserBlock } from 'views/components/widgets/user';
 import { CompactModalExitButton } from 'views/modal';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
-import { initAppState } from 'app';
+import { initAppState, navigateToSubpage } from 'app';
 import { InviteCodeAttributes } from 'shared/types';
 import { AddressInfo } from 'client/scripts/models';
 import LoginWithWalletDropdown from '../components/login_with_wallet_dropdown';
@@ -87,6 +87,11 @@ const ConfirmInviteModal: m.Component<{}, {
         .map((account) => SelectAddress(account));
     }
 
+    const activeInvite = invites[location].community_id
+      ? app.config.communities.getById(invites[location].community_id)
+      : app.config.chains.getById(invites[location].chain_id);
+    const hasTermsOfService = !!activeInvite?.terms;
+
     return m('.ConfirmInviteModal', [
       m('.compact-modal-title', [
         !vnode.state.isComplete
@@ -109,6 +114,12 @@ const ConfirmInviteModal: m.Component<{}, {
             addresses.length > 0
               ? 'Select an address to accept the invite:'
               : 'To get started, connect an address:'
+          ]),
+          hasTermsOfService
+          && m('p.terms-of-service', [
+            `By linking an address, you agree to ${activeInvite.name}'s `,
+            m('a', { href: activeInvite.terms, target: '_blank' }, 'terms of service'),
+            '.'
           ]),
           vnode.state.accepted.includes(location) ? m('h4', 'You\'ve accepted this invite!')
             : vnode.state.rejected.includes(location) ? m('h4', 'You\'ve already deleted this invite!') : [
@@ -141,7 +152,8 @@ const ConfirmInviteModal: m.Component<{}, {
                           $(e.target).trigger('modalexit');
                         }
                         const communityId = invites[location].community_id;
-                        const chainId = invites[location].community_id;
+                        const chainId = invites[location].chain_id;
+                        console.log({ communityId, chainId });
                         // if private community, re-init app
                         if (communityId && !app.config.communities.getByCommunity(communityId)) {
                           initAppState().then(() => {
@@ -186,35 +198,39 @@ const ConfirmInviteModal: m.Component<{}, {
                   label: 'Reject invite'
                 }),
               ]),
-              // addresses.length === 0 && m('a.btn.add-account', {
-              //   href: '#',
-              //   onclick: (e) => {
-              //     e.preventDefault();
+              addresses.length === 0 && m('a.btn.add-account', {
+                href: '#',
+                onclick: (e) => {
+                  e.preventDefault();
 
-              //     // set defaults for the web3 login modal
-              //     // TODO: let the user select between different crypto wallets for linking an address
-              //     const defaultChainId = 'edgeware';
-              //     const joiningCommunity = invites[vnode.state.location].community_id;
-              //     const targetCommunity = joiningCommunity;
-              //     const prev = m.route.get();
-              //     const next = `/${joiningCommunity}`;
-              //     // TODO: implement joiningChain once confirm_invite_modal supports chains
-              //     const web3loginParams = joiningCommunity ? { prev, next, joiningCommunity } : { prev, next };
+                  // set defaults for the web3 login modal
+                  // TODO: let the user select between different crypto wallets for linking an address
+                  const defaultChainId = 'edgeware';
+                  const joiningCommunity = invites[vnode.state.location].community_id;
+                  const targetCommunity = joiningCommunity;
+                  const prev = m.route.get();
+                  const next = `/${joiningCommunity}`;
+                  // TODO: implement joiningChain once confirm_invite_modal supports chains
+                  const web3loginParams = joiningCommunity ? { prev, next, joiningCommunity } : { prev, next };
 
-              //     // redirect to /web3login to connect to the chain
-              //     m.route.set(`/${app.chain?.id || defaultChainId}/web3login`, web3loginParams);
+                  // redirect to /web3login to connect to the chain
+                  if (app.activeId()) {
+                    navigateToSubpage('/web3login', web3loginParams);
+                  } else {
+                    m.route.set(`${defaultChainId}/web3login`, web3loginParams);
+                  }
 
-              //     // show web3 login modal
-              //     app.modals.lazyCreate('link_new_address_modal', {
-              //       joiningCommunity,
-              //       targetCommunity,
-              //       successCallback: () => {
-              //         m.route.set(next);
-              //         $(e.target).trigger('modalexit');
-              //       }
-              //     });
-              //   }
-              // }, 'Connect a new address'),
+                  // show web3 login modal
+                  app.modals.lazyCreate('link_new_address_modal', {
+                    joiningCommunity,
+                    targetCommunity,
+                    successCallback: () => {
+                      m.route.set(next);
+                      $(e.target).trigger('modalexit');
+                    }
+                  });
+                }
+              }, 'Connect a new address'),
               addresses.length === 0 && m(LoginWithWalletDropdown, {
                 loggingInWithAddress: false,
                 joiningCommunity: invites[vnode.state.location].community_id,

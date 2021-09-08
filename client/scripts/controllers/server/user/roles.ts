@@ -221,6 +221,8 @@ export default class extends Base {
    */
   public isAdminOfEntity(options: { chain?: string, community?: string }): boolean {
     if (!this.activeAccount) return false;
+    if (app.user.isSiteAdmin) return true;
+
     const adminRole = this.roles.find((role) => {
       return role.address === this.activeAccount.address
         && role.permission === RolePermission.admin

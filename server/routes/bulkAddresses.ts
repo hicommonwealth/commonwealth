@@ -3,6 +3,7 @@ import Sequelize from 'sequelize';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 const { Op } = Sequelize;
 import { factory, formatFilename } from '../../shared/logging';
+import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -13,7 +14,7 @@ const log = factory.getLogger(formatFilename(__filename));
 // If an order is supplied (e.g. ['name', 'ASC'], the results will be first & accordingly sorted.
 // Otherwise, it defaults to returning them in order of ['created_at', 'DESC'] (following to /bulkMembers).
 
-const bulkAddresses = async (models, req, res, next) => {
+const bulkAddresses = async (models: DB, req, res, next) => {
   const options = {
     order: req.query.order ? [[req.query.order]] : [['created_at', 'DESC']]
   };
@@ -49,6 +50,7 @@ const bulkAddresses = async (models, req, res, next) => {
       }];
     }
   }
+  // @ts-ignore
   const addresses = await models.Address.findAll(options);
   return res.json({ status: 'Success', result: addresses.map((p) => p.toJSON()) });
 };

@@ -4,14 +4,15 @@ import BN from 'bn.js';
 import { providers } from 'ethers';
 
 import { INFURA_API_KEY } from '../config';
-import { Erc20Factory } from '../../eth/types/Erc20Factory';
+import { ERC20__factory } from '../../shared/eth/types';
 import { TokenResponse } from '../../shared/types';
 
 import JobRunner from './cacheJobRunner';
-import TokenListCache from './tokenListCache';
 import { slugify } from '../../shared/utils';
 
 import { factory, formatFilename } from '../../shared/logging';
+import { DB } from '../database';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 // map of addresses to balances
@@ -31,122 +32,76 @@ export interface TokenForumMeta {
   name: string;
   symbol: string;
   balanceThreshold?: BN;
+  decimals: number;
 }
 
 export class TokenBalanceProvider {
-  constructor(private _network = 'mainnet') { }
+  private _provider: providers.Web3Provider;
+  constructor(private _network = 'mainnet') {
+    const web3Provider = new Web3.providers.HttpProvider(`https://${this._network}.infura.io/v3/${INFURA_API_KEY}`);
+    this._provider = new providers.Web3Provider(web3Provider);
+  }
 
   public async getBalance(tokenAddress: string, userAddress: string): Promise<BN> {
-    const web3Provider = new Web3.providers.HttpProvider(`https://${this._network}.infura.io/v3/${INFURA_API_KEY}`);
-    const provider = new providers.Web3Provider(web3Provider);
-    const api = Erc20Factory.connect(tokenAddress, provider);
+    const api = ERC20__factory.connect(tokenAddress, this._provider);
+    await api.deployed();
     const balanceBigNum = await api.balanceOf(userAddress);
     return new BN(balanceBigNum.toString());
   }
 }
 
 export default class TokenBalanceCache extends JobRunner<CacheT> {
-  private _contracts: TokenForumMeta[];
-
+  private models: DB;
   constructor(
-    private readonly _listCache: TokenListCache,
+    models: DB,
     noBalancePruneTimeS: number = 5 * 60,
     private readonly _hasBalancePruneTimeS: number = 24 * 60 * 60,
     private readonly _balanceProvider = new TokenBalanceProvider(),
   ) {
     super({}, noBalancePruneTimeS);
-    this._listCache = new TokenListCache();
+    this.models = models;
   }
 
-  private async _connectTokens(models): Promise<TokenForumMeta[]> {
-    // initialize metadata from database
-    const dbTokens = await models['Chain'].findAll({
-      where: { type: 'token' },
-      include: [ models['ChainNode'] ],
-    });
-
-    // TODO: support customized balance thresholds
-    // TODO: support ChainId
-    const tokens: TokenForumMeta[] = dbTokens
-      .filter(({ ChainNodes }) => ChainNodes && ChainNodes[0]?.address)
-      .map((chain): TokenForumMeta => ({
-        id: chain.id,
-        address: chain.ChainNodes[0].address,
-        name: chain.name,
-        symbol: chain.symbol,
-        iconUrl: chain.icon_url,
-      }));
-
-    try {
-      const tokensFromListsResponses = await this._listCache.getTokens();
-      const tokensFromLists: TokenForumMeta[] = tokensFromListsResponses
-        .map((o) => {
-          return {
-            id: slugify(o.name),
-            address: o.address,
-            name: o.name,
-            symbol: o.symbol,
-            iconUrl: o.logoURI,
-          };
-        });
-
-      return [...tokens, ...tokensFromLists];
-    } catch (e) {
-      log.error('An error occurred trying to access token lists', e.message);
+  public async start(prefetchedTokenMeta?: TokenForumMeta[]) {
+    if (prefetchedTokenMeta) {
+      // write init values into saved cache
+      await this.access(async (cache) => {
+        for (const { id } of prefetchedTokenMeta) {
+          cache[id] = { };
+        }
+      });
     }
-
-    return tokens;
-  }
-
-  public getToken(searchAddress: string): TokenForumMeta {
-    return this._contracts.find(({ address }) => address === searchAddress);
-  }
-
-  public async start(models?, prefetchedTokenMeta?: TokenForumMeta[]) {
-    if (!prefetchedTokenMeta) {
-      const tokenMeta = await this._connectTokens(models);
-      this._contracts = tokenMeta;
-    } else {
-      this._contracts = prefetchedTokenMeta;
-    }
-
-    // write init values into saved cache
-    await this.access(async (cache) => {
-      for (const { id } of this._contracts) {
-        cache[id] = { };
-      }
-    });
 
     // kick off job
     super.start();
-    log.info(`Started Token Balance Cache with ${this._contracts.length} tokens.`);
+    log.info(`Started Token Balance Cache with ${prefetchedTokenMeta ? prefetchedTokenMeta.length : 0} tokens.`);
   }
 
-  public async reset(models?, prefetchedTokenMeta?: TokenForumMeta[]) {
+  public async reset(prefetchedTokenMeta?: TokenForumMeta[]) {
     super.close();
     await this.access(async (cache) => {
       for (const key of Object.keys(cache)) {
         delete cache[key];
       }
     });
-    return this.start(models, prefetchedTokenMeta);
-  }
-
-  public getTokens(): Promise<TokenResponse[]> {
-    return this._listCache.getTokens();
+    return this.start(prefetchedTokenMeta);
   }
 
   // query a user's balance on a given token contract and save in cache
-  public async hasToken(contractId: string, address: string, network = 'mainnet'): Promise<boolean> {
-    const tokenMeta = this._contracts.find(({ id }) => id === contractId);
-    if (!tokenMeta) throw new Error('unsupported token');
-    const threshold = tokenMeta.balanceThreshold || new BN(1);
+  public async getBalance(contractId: string, address: string, network = 'mainnet'): Promise<BN> {
+    const tokenMeta = await this.models.ChainNode.findOne({ where: { chain: contractId } })
+      || await this.models.Token.findOne({ where: { id: contractId } });
+    if (!tokenMeta?.address) throw new Error('unsupported token');
 
     // first check the cache for the token balance
     const result = await this.access((async (c: CacheT): Promise<BN | undefined> => {
-      return c[contractId][address]?.balance;
+      if (c[contractId]) {
+        return c[contractId][address]?.balance;
+      } else {
+        return undefined;
+      }
     }));
-    if (result !== undefined) return result.gte(threshold);
+    if (result !== undefined) return result;
 
     // fetch balance if not found in cache
     let balance: BN;
@@ -159,9 +114,12 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
 
     // write fetched balance back to cache
     await this.access((async (c: CacheT) => {
+      if (!c[contractId]) {
+        c[contractId] = {};
+      }
       c[contractId][address] = { balance, fetchedAt };
     }));
-    return balance.gte(threshold);
+    return balance;
   }
 
   // prune cache job

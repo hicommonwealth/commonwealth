@@ -1,8 +1,10 @@
 import 'pages/tips.scss';
 
 import m from 'mithril';
-import app from 'state';
 import { Button, Tag } from 'construct-ui';
+
+import app from 'state';
+import { navigateToSubpage } from 'app';
 
 import { formatCoin } from 'adapters/currency';
 import { ProposalType } from 'identifiers';
@@ -19,10 +21,10 @@ import Listing from './listing';
 import ErrorPage from './error';
 import User from '../components/widgets/user';
 
-const TipDetail: m.Component<{ tip: SubstrateTreasuryTip }> = {
+const TipDetail: m.Component<{ proposal: SubstrateTreasuryTip }> = {
   view: (vnode) => {
-    const { tip } = vnode.attrs;
-    const { who, reason } = tip.data;
+    const { proposal } = vnode.attrs;
+    const { who, reason } = proposal.data;
     const beneficiary = app.chain.accounts.get(who);
     return m('.TipDetail', {
       onclick: (e) => {
@@ -98,14 +100,14 @@ const TipsPage: m.Component<{}> = {
     const activeTipContent = activeTips.length
       ? activeTips.map((tip) => m(ProposalCard, {
         proposal: tip,
-        injectedContent: m(TipDetail, { tip }),
+        injectedContent: TipDetail,
       }))
       : [ m('.no-proposals', 'None') ];
 
     const inactiveTipContent = inactiveTips.length
       ? inactiveTips.map((tip) => m(ProposalCard, {
         proposal: tip,
-        injectedContent: m(TipDetail, { tip }),
+        injectedContent: TipDetail,
       }))
       : [ m('.no-proposals', 'None') ];
 
@@ -138,7 +140,7 @@ const TipsPage: m.Component<{}> = {
             m(Button, {
               rounded: true,
               class: activeAccount ? '' : 'disabled',
-              onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
+              onclick: (e) => navigateToSubpage('/new/proposal/:type', {
                 type: ProposalType.SubstrateTreasuryTip,
               }),
               label: 'New tip',

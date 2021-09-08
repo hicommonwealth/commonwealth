@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import { QueryTypes } from 'sequelize';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { factory, formatFilename } from '../../shared/logging';
+import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -12,7 +13,7 @@ const Errors = {
   QueryTooShort: 'Query must be at least 4 characters',
 };
 
-const search = async (models, req: Request, res: Response, next: NextFunction) => {
+const search = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   let replacements = {};
 
   // Community-scoped search

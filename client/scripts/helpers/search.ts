@@ -69,7 +69,7 @@ export const searchChainsAndCommunities = async (
   }
 };
 
-export const SearchIcon = {
+export const SearchIcon: m.Component<{ isMobile?: boolean }, {}> = {
   view: (vnode) => {
     return m('svg.SearchIcon', {
       width: '15px',
@@ -81,7 +81,10 @@ export const SearchIcon = {
         'fill-rule': 'evenodd',
         'clip-rule': 'evenodd',
         'd': 'M12.9816 7.64497C12.9816 10.9536 10.2994 13.6358 6.9908 13.6358C3.68217 13.6358 1 10.9536 1 7.64497C1 4.33635 3.68217 1.65417 6.9908 1.65417C10.2994 1.65417 12.9816 4.33635 12.9816 7.64497ZM11.5679 12.9292C10.3415 13.9924 8.74129 14.6358 6.9908 14.6358C3.12989 14.6358 0 11.5059 0 7.64497C0 3.78406 3.12989 0.654175 6.9908 0.654175C10.8517 0.654175 13.9816 3.78406 13.9816 7.64497C13.9816 9.39547 13.3382 10.9957 12.275 12.2221L14.5447 14.4917C14.7399 14.687 14.7399 15.0036 14.5447 15.1988C14.3494 15.3941 14.0328 15.3941 13.8376 15.1988L11.5679 12.9292Z',
-        'fill': 'url(#paint0_linear)',
+        // 'fill': 'url(#paint0_linear)',
+        'fill': vnode.attrs.isMobile ? 'url(#paint0_linear)' : 'black'
+        // Long-term, gradient URL fill should be used on desktop as well as mobile;
+        // for unclear reasons, currently failing to display on browsers >767.98px
       }),
       m('defs', [
         m('linearGradient', {

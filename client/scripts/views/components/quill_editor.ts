@@ -7,6 +7,7 @@ import moment from 'moment';
 import Quill from 'quill-2.0-dev/quill';
 import { Tag, Tooltip } from 'construct-ui';
 import ImageUploader from 'quill-image-uploader';
+import Image from 'quill/formats/image';
 import QuillImageDropAndPaste from 'quill-image-drop-and-paste';
 import { MarkdownShortcuts } from 'lib/markdownShortcuts';
 import QuillMention from 'quill-mention';
@@ -56,7 +57,6 @@ const instantiateEditor = (
   const Keyboard = Quill.import('modules/keyboard');
   const Clipboard = Quill.import('modules/clipboard') as any;
   let quill;
-
   // Set up markdown mode helper
   const isMarkdownMode = () => $editor.parent('.markdown-mode').length > 0;
 
@@ -159,8 +159,8 @@ const instantiateEditor = (
       const files = Array.from(e.clipboardData.files || []);
       if (!html && files.length > 0) {
         this.quill.uploader.upload(range, files);
-      } else {
-        this.onPaste(range, isMarkdownMode() ? { html: text, text } : { html, text });
+      } else if (text || files.length > 1) {
+        this.onPaste(range, isMarkdownMode() ? { text } : { html, text });
       }
     }
   }
@@ -570,25 +570,31 @@ const instantiateEditor = (
   // handle drag-and-drop and paste events
   const imageHandler = async (imageDataUrl, type) => {
     if (!type) type = 'image/png';
+    const index = (quill.getSelection() || {}).index || quill.getLength() || 0;
 
     // filter out base64 format images from Quill
     const contents = quill.getContents();
     const indexesToFilter = [];
-    contents.ops.forEach((op, index) => {
+    contents.ops.forEach((op, idx) => {
       if (op.insert?.image?.startsWith('data:image/jpeg;base64')
           || op.insert?.image?.startsWith('data:image/gif;base64')
-          || op.insert?.image?.startsWith('data:image/png;base64')) indexesToFilter.push(index);
+          || op.insert?.image?.startsWith('data:image/png;base64')) indexesToFilter.push(idx);
     });
-    contents.ops = contents.ops.filter((op, index) => indexesToFilter.indexOf(index) === -1);
+    contents.ops = contents.ops.filter((op, idx) => indexesToFilter.indexOf(idx) === -1);
     quill.setContents(contents.ops); // must set contents to contents.ops for some reason
 
+    const isMarkdown = $('.QuillEditor').hasClass('markdown-mode');
     const file = dataURLtoFile(imageDataUrl, type);
     quill.enable(false);
-    uploadImg(file).then((response) => {
+    uploadImg(file).then((uploadURL) => {
       quill.enable(true);
-      if (typeof response === 'string' && detectURL(response)) {
-        const index = (quill.getSelection() || {}).index || quill.getLength();
-        if (index) quill.insertEmbed(index, 'image', response, 'user');
+      if (typeof uploadURL === 'string' && detectURL(uploadURL)) {
+        if (isMarkdown) {
+          quill.insertText(index, `![](${uploadURL})`, 'user');
+        } else {
+          quill.insertEmbed(index, 'image', uploadURL);
+        }
+        quill.setSelection(index + (isMarkdown ? 5 + uploadURL.length : 1), 0);
       }
     }).catch((err) => {
       notifyError('Failed to upload image. Was it a valid JPG, PNG, or GIF?');
@@ -624,9 +630,9 @@ const instantiateEditor = (
       imageDropAndPaste: {
         handler: imageHandler
       },
-      imageUploader: imageUploader ? {
-        upload: uploadImg
-      } : false,
+      // TODO: Currently works, but throws Parchment error. Smooth functionality
+      // requires troubleshooting
+      imageUploader: false,
       markdownShortcuts: {
         suppress: () => { return isMarkdownMode(); }
       },
@@ -642,10 +648,10 @@ const instantiateEditor = (
       },
       clipboard: {
         matchers: [
-	  [
+          [
             Node.ELEMENT_NODE,
             (node, delta) => {
-	      return delta.compose(
+              return delta.compose(
                 new Delta().retain(delta.length(), {
                   header: false,
                   align: false,
@@ -653,15 +659,15 @@ const instantiateEditor = (
                   background: false,
                 })
               );
-	    }
-	  ]
-	]
+            }
+          ]
+        ]
       }
     },
     placeholder,
     formats: hasFormats ? [
       'bold', 'italic', 'strike', 'code',
-      'link', 'image', 'blockquote', 'code-block',
+      'link', 'blockquote', 'code-block',
       'header', 'list', 'twitter', 'video', 'mention',
     ] : [],
     theme,

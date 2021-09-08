@@ -4,10 +4,12 @@ import 'components/widgets/user.scss';
 import m from 'mithril';
 import _, { capitalize } from 'lodash';
 import { link } from 'helpers';
-import { Tooltip, Tag, Icon, Icons, Popover } from 'construct-ui';
+import { Tag, Icon, Icons, Popover } from 'construct-ui';
 
 import app from 'state';
-import { Account, AddressInfo, ChainInfo, ChainBase, Profile } from 'models';
+import moment from 'moment';
+import jdenticon from 'jdenticon';
+import { Account, AddressInfo, ChainBase, Profile } from 'models';
 import { formatAddressShort } from '../../../../../shared/utils';
 
 // Address can be shown in full, autotruncated with formatAddressShort(),
@@ -47,8 +49,14 @@ const User: m.Component<{
     let account : Account<any>;
     let profile; // profile is used to retrieve the chain and address later
     let role;
-    const addrShort = formatAddressShort(user.address, typeof user.chain === 'string' ? user.chain : user.chain?.id, false, maxCharLength);
-    const friendlyChainName = app.config.chains.getById(typeof user.chain === 'string' ? user.chain : user.chain?.id)?.name;
+    const addrShort = formatAddressShort(
+      user.address,
+      typeof user.chain === 'string' ? user.chain : user.chain?.id,
+      false,
+      maxCharLength
+    );
+    const friendlyChainName = app.config.chains
+      .getById(typeof user.chain === 'string' ? user.chain : user.chain?.id)?.name;
 
     const adminsAndMods = app.chain
       ? app.chain.meta.chain.adminsAndMods
@@ -129,12 +137,19 @@ const User: m.Component<{
         }, profile && profile.getAvatar(avatarSize)),
         (app.chain && app.chain.base === ChainBase.Substrate && app.cachedIdentityWidget)
           // substrate name
-          ? m(app.cachedIdentityWidget, { account, linkify, profile, hideIdentityIcon, addrShort, showAddressWithDisplayName }) : [
+          ? m(app.cachedIdentityWidget, {
+            account,
+            linkify,
+            profile,
+            hideIdentityIcon,
+            addrShort,
+            showAddressWithDisplayName
+          }) : [
             // non-substrate name
             linkify
               ? link('a.user-display-name.username',
                 (profile
-                  ? `/${m.route.param('scope') || profile.chain}/account/${profile.address}?base=${profile.chain}`
+                  ? `/${app.activeId() || profile.chain}/account/${profile.address}?base=${profile.chain}`
                   : 'javascript:'
                 ), [
                   !profile ? addrShort : !showAddressWithDisplayName ? profile.displayName : [
@@ -166,10 +181,16 @@ const User: m.Component<{
       ]),
       m('.user-name', [
         (app.chain && app.chain.base === ChainBase.Substrate && app.cachedIdentityWidget)
-          ? m(app.cachedIdentityWidget, { account, linkify: true, profile, hideIdentityIcon, addrShort, showAddressWithDisplayName: false })
-          : link('a.user-display-name',
+          ? m(app.cachedIdentityWidget, {
+            account,
+            linkify: true,
+            profile,
+            hideIdentityIcon,
+            addrShort,
+            showAddressWithDisplayName: false
+          }) : link('a.user-display-name',
             profile
-              ? `/${m.route.param('scope') || profile.chain}/account/${profile.address}?base=${profile.chain}`
+              ? `/${app.activeId() || profile.chain}/account/${profile.address}?base=${profile.chain}`
               : 'javascript:',
             !profile ? addrShort : !showAddressWithDisplayName ? profile.displayName : [
               profile.displayName,
@@ -282,7 +303,7 @@ export const UserBlock: m.Component<{
     ];
 
     const userLink = profile
-      ? `/${m.route.param('scope') || profile.chain}/account/${profile.address}?base=${profile.chain}`
+      ? `/${app.activeId() || profile.chain}/account/${profile.address}?base=${profile.chain}`
       : 'javascript:';
 
     return linkify
@@ -290,6 +311,57 @@ export const UserBlock: m.Component<{
       : m('.UserBlock', {
         class: compact ? 'compact' : ''
       }, children);
+  }
+};
+
+export const AnonymousUser: m.Component<{
+  avatarSize?: number;
+  avatarOnly?: boolean;
+  hideAvatar?: boolean;
+  showAsDeleted?: boolean;
+  distinguishingKey: string; // To distinguish user from other anonymous users
+}, {}> = {
+  view: (vnode) => {
+    const { avatarOnly, avatarSize, hideAvatar, distinguishingKey, showAsDeleted } = vnode.attrs;
+    const showAvatar = !hideAvatar;
+    let profileAvatar;
+    if (showAvatar) {
+      const pseudoAddress = distinguishingKey + moment('dddd, MMMM Do YYYY');
+      profileAvatar = m('svg.Jdenticon', {
+        width: avatarSize - 4,
+        height: avatarSize - 4,
+        'data-address': pseudoAddress,
+        oncreate: (vnode_) => {
+          jdenticon.update(vnode_.dom as HTMLElement, pseudoAddress);
+        },
+        onupdate: (vnode_) => {
+          jdenticon.update(vnode_.dom as HTMLElement, pseudoAddress);
+        }
+      })
+    }
+    return avatarOnly
+      ? m('.User.avatar-only', {
+        key: '-'
+      }, [
+        m('.user-avatar-only', {
+          style: `width: ${avatarSize}px; height: ${avatarSize}px;`
+        }, [
+          profileAvatar
+        ]),
+      ])
+      : m('.User', {
+        key: '-',
+      }, [
+        showAvatar
+        && m('.user-avatar-only', {
+          style: `width: ${avatarSize}px; height: ${avatarSize}px;`,
+        }, [
+          profileAvatar
+        ]),
+        [
+          m('a.user-display-name.username', showAsDeleted ? 'Deleted' : 'Anonymous')
+        ],
+      ]);
   }
 };
 

@@ -4,29 +4,29 @@ import BN from 'bn.js';
 export function formatNumberShort(num: number) {
   const round = (n, digits?) => {
     if (digits === undefined) digits = 2;
-    return Math.round(n * Math.pow(10, digits)) / Math.pow(10, digits);
+    return Math.round(n * (10 ** digits)) / (10 ** digits);
   };
 
   const precise = (n, digits?) => {
     if (digits === undefined) digits = 3;
-    return n.toPrecision(digits)
+    return n.toPrecision(digits);
   };
 
   // TODO: Clean this up
-  return num > 1_000_000_000_000 ? round(num / 1_000_000_000_000) + 't' :
-    num > 1_000_000_000 ? round(num / 1_000_000_000) + 'b' :
-    num > 1_000_000 ? round(num / 1_000_000) + 'm' :
-    num > 1_000 ? round(num / 1_000) + 'k' :
-    num > 0.1 ? round(num) :
-    num > 0.01 ? precise(num, 2) :
-    num > 0.001 ? precise(num, 1) :
-    num.toString();
+  return num > 1_000_000_000_000 ? `${round(num / 1_000_000_000_000)}t`
+    : num > 1_000_000_000 ? `${round(num / 1_000_000_000)}b`
+      : num > 1_000_000 ? `${round(num / 1_000_000)}m`
+        : num > 1_000 ? `${round(num / 1_000)}k`
+          : num > 0.1 ? round(num)
+            : num > 0.01 ? precise(num, 2)
+              : num > 0.001 ? precise(num, 1)
+                : num.toString();
 }
 
 const nf = new Intl.NumberFormat();
 
 // duplicated in client/scripts/helpers.ts
-function formatNumberLong(num : number) {
+export function formatNumberLong(num : number) {
   // format small numbers with decimals, large numbers with commas
   if (num === 0) return '0';
   if (num < 0.000001) return num.toFixed(20).replace(/0*$/, '');
@@ -41,8 +41,7 @@ export class Coin extends BN {
   constructor(denomination: string,
     n: number | BN,
     inDollars: boolean = false,
-    dollar: BN = null,
-  ) {
+    dollar: BN = null,) {
     // dollars are not set by default
     if (!dollar) dollar = new BN(1);
 

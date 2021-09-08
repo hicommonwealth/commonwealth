@@ -1,19 +1,24 @@
 import * as Sequelize from 'sequelize';
-
+import { DataTypes, Model } from 'sequelize';
+import { ModelStatic } from './types';
 import { ChainAttributes } from './chain';
 import { OffchainCommunityAttributes } from './offchain_community';
 import { OffchainThreadAttributes } from './offchain_thread';
 
 export interface OffchainTopicAttributes {
-  id?: number;
   name: string;
+  featured_in_sidebar: boolean;
+  featured_in_new_post: boolean;
+  id?: number;
+  chain_id?: string;
+  community_id?: string;
   description?: string;
   telegram?: string;
-  chain_id: string;
-  community_id: string;
   created_at?: Date;
   updated_at?: Date;
   deleted_at?: Date;
+  token_threshold: number;
+  default_offchain_template?: string;
 
   // associations
   community?: OffchainCommunityAttributes;
@@ -21,20 +26,18 @@ export interface OffchainTopicAttributes {
   threads?: OffchainThreadAttributes[] | OffchainTopicAttributes['id'][];
 }
 
-export interface OffchainTopicInstance extends Sequelize.Instance<OffchainTopicAttributes>, OffchainTopicAttributes {
+export interface OffchainTopicInstance extends Model<OffchainTopicAttributes>, OffchainTopicAttributes {
   // no mixins used
   // TODO: do we need to implement the "as" stuff here?
 }
 
-export interface OffchainTopicModel extends Sequelize.Model<OffchainTopicInstance, OffchainTopicAttributes> {
-
-}
+export type OffchainTopicModelStatic = ModelStatic<OffchainTopicInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): OffchainTopicModel => {
-  const OffchainTopic = sequelize.define<OffchainTopicInstance, OffchainTopicAttributes>('OffchainTopic', {
+  dataTypes: typeof DataTypes,
+): OffchainTopicModelStatic => {
+  const OffchainTopic = <OffchainTopicModelStatic>sequelize.define('OffchainTopic', {
     id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     name: { type: dataTypes.STRING, allowNull: false },
     description: { type: dataTypes.TEXT, allowNull: false, defaultValue: '' },
@@ -44,7 +47,16 @@ export default (
     created_at: { type: dataTypes.DATE, allowNull: false },
     updated_at: { type: dataTypes.DATE, allowNull: false },
     deleted_at: { type: dataTypes.DATE, allowNull: true },
+    token_threshold: { type: dataTypes.INTEGER, allowNull: true },
+    featured_in_sidebar: { type: dataTypes.BOOLEAN, allowNull: true, defaultValue: false },
+    featured_in_new_post: { type: dataTypes.BOOLEAN, allowNull: true, defaultValue: false },
+    default_offchain_template: { type: dataTypes.TEXT, allowNull: false, defaultValue: '' },
   }, {
+    timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
+    deletedAt: 'deleted_at',
+    tableName: 'OffchainTopics',
     underscored: true,
     paranoid: true,
     defaultScope: {

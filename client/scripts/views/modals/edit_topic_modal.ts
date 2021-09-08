@@ -1,36 +1,61 @@
 import 'modals/edit_topic_modal.scss';
 
 import m from 'mithril';
-import app from 'state';
 import $ from 'jquery';
-import { Button, Input, Form, FormGroup, FormLabel } from 'construct-ui';
+import { Button, Input, Form, FormGroup, FormLabel, Checkbox } from 'construct-ui';
+
+import app from 'state';
+import { navigateToSubpage } from 'app';
 
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
+import QuillEditor from 'views/components/quill_editor';
 import { CompactModalExitButton } from 'views/modal';
 
 interface IEditTopicModalForm {
   description: string,
   id: number,
   name: string,
+  featuredInSidebar: boolean,
+  featuredInNewPost: boolean
 }
 
 const EditTopicModal : m.Component<{
   description: string,
   id: number,
   name: string,
+  featuredInSidebar: boolean,
+  featuredInNewPost: boolean,
+  defaultOffchainTemplate: string
 }, {
   error: any,
   form: IEditTopicModalForm,
   saving: boolean,
+  quillEditorState,
 }> = {
   view: (vnode) => {
     if (!app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })) return null;
-    const { id, name, description } = vnode.attrs;
+    const { id, name, description, featuredInSidebar, featuredInNewPost, defaultOffchainTemplate } = vnode.attrs;
     if (!vnode.state.form) {
-      vnode.state.form = { id, name, description };
+      vnode.state.form = { id, name, description, featuredInSidebar, featuredInNewPost };
     }
 
     const updateTopic = async (form) => {
+      const { quillEditorState } = vnode.state;
+      if (form.featuredInNewPost && quillEditorState.editor.editor.isBlank()) {
+        vnode.state.error = 'Must provide template.';
+        return false;
+      }
+
+      if (quillEditorState) {
+        quillEditorState.editor.enable(false);
+      }
+
+      const mentionsEle = document.getElementsByClassName('ql-mention-list-container')[0];
+      if (mentionsEle) (mentionsEle as HTMLElement).style.visibility = 'hidden';
+      const bodyText = !quillEditorState ? ''
+        : quillEditorState.markdownMode
+          ? quillEditorState.editor.getText()
+          : JSON.stringify(quillEditorState.editor.getContents());
       const topicInfo = {
         id,
         description: form.description,
@@ -38,9 +63,18 @@ const EditTopicModal : m.Component<{
         communityId: app.activeCommunityId(),
         chainId: app.activeChainId(),
         telegram: null,
+        featuredInSidebar: form.featuredInSidebar,
+        featuredInNewPost: form.featuredInNewPost,
+        defaultOffchainTemplate: bodyText
       };
-      await app.topics.edit(topicInfo);
-      m.route.set(`/${app.activeId()}/discussions/${encodeURI(form.name.toString().trim())}`);
+      try {
+        await app.topics.edit(topicInfo);
+        return true;
+      } catch (err) {
+        vnode.state.error = err.message || err;
+        m.redraw();
+        return false;
+      }
     };
 
     const deleteTopic = async (form) => {
@@ -51,7 +85,7 @@ const EditTopicModal : m.Component<{
         chainId: app.activeChainId(),
       };
       await app.topics.remove(topicInfo);
-      m.route.set(`/${app.activeId()}`);
+      navigateToSubpage('/');
     };
 
     return m('.EditTopicModal', [
@@ -93,15 +127,75 @@ const EditTopicModal : m.Component<{
             }),
           ]),
           m(FormGroup, [
+            m(Checkbox, {
+              label: 'Featured in Sidebar',
+              checked: vnode.state.form.featuredInSidebar,
+              onchange: (e) => {
+                vnode.state.form.featuredInSidebar = !vnode.state.form.featuredInSidebar;
+              },
+            }),
+          ]),
+          m(FormGroup, [
+            m(Checkbox, {
+              label: 'Featured in New Post',
+              checked: vnode.state.form.featuredInNewPost,
+              onchange: (e) => {
+                vnode.state.form.featuredInNewPost = !vnode.state.form.featuredInNewPost;
+              },
+            }),
+          ]),
+          vnode.state.form.featuredInNewPost && m(FormGroup, [
+            m(QuillEditor, {
+              contentsDoc: '',
+              oncreateBind: (state) => {
+                vnode.state.quillEditorState = state;
+
+                let newDraftMarkdown;
+                let newDraftDelta;
+                if (defaultOffchainTemplate) {
+                  try {
+                    newDraftDelta = JSON.parse(defaultOffchainTemplate);
+                    if (!newDraftDelta.ops) throw new Error();
+                  } catch (e) {
+                    newDraftMarkdown = defaultOffchainTemplate;
+                  }
+                }
+                // If the text format of the loaded draft differs from the current editor's mode,
+                // we update the current editor's mode accordingly, to preserve formatting
+                if (newDraftDelta && vnode.state.quillEditorState.markdownMode) {
+                  vnode.state.quillEditorState.markdownMode = false;
+                } else if (newDraftMarkdown && !vnode.state.quillEditorState.markdownMode) {
+                  vnode.state.quillEditorState.markdownMode = true;
+                }
+                if (newDraftDelta) {
+                  vnode.state.quillEditorState.editor.setContents(newDraftDelta);
+                } else if (newDraftMarkdown) {
+                  vnode.state.quillEditorState.editor.setText(newDraftMarkdown);
+                } else {
+                  vnode.state.quillEditorState.editor.setContents('');
+                  vnode.state.quillEditorState.editor.setText('');
+                }
+                m.redraw();
+              },
+              editorNamespace: 'new-discussion',
+              imageUploader: true,
+              tabindex: 3,
+            }),
+          ]),
+          m(FormGroup, [
             m(Button, {
               intent: 'primary',
-              disabled: vnode.state.saving,
+              // disabled: vnode.state.saving || !(vnode.state.form?.name),
               style: 'margin-right: 8px',
               rounded: true,
               onclick: async (e) => {
                 e.preventDefault();
-                updateTopic(vnode.state.form).then(() => {
-                  $(e.target).trigger('modalexit');
+                const { form } = vnode.state;
+                updateTopic(form).then((closeModal) => {
+                  if (closeModal) {
+                    $(e.target).trigger('modalexit');
+                    navigateToSubpage(`/discussions/${encodeURI(form.name.toString().trim())}`);
+                  }
                 }).catch((err) => {
                   vnode.state.saving = false;
                   m.redraw();
@@ -117,9 +211,9 @@ const EditTopicModal : m.Component<{
                 e.preventDefault();
                 const confirmed = await confirmationModalWithText('Delete this topic?')();
                 if (!confirmed) return;
-                deleteTopic(vnode.state.form).then(() => {
+                deleteTopic(vnode.state.form).then((closeModal) => {
                   $(e.target).trigger('modalexit');
-                  m.route.set(`/${app.activeId()}/`);
+                  navigateToSubpage('/');
                 }).catch((err) => {
                   vnode.state.saving = false;
                   m.redraw();

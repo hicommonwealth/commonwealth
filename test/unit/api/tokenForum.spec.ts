@@ -65,7 +65,7 @@ describe('Token Forum tests', () => {
   });
 
   beforeEach(async () => {
-    await tbc.reset(null, modelUtils.createTokenMeta());
+    await tbc.reset(modelUtils.createTokenMeta());
   });
 
   it('should permit token-holder to take actions on token forum', async () => {
@@ -149,107 +149,6 @@ describe('Token Forum tests', () => {
     });
     expect(res).not.to.be.null;
     expect(res.error).not.to.be.null;
-  });
-
-  xit('should not permit former token-holder to take actions on token forum', async () => {
-    // first query is a token holder, then no longer
-    let nQueries = 0;
-    tokenProvider.balanceFn = async () => {
-      nQueries++;
-      if (nQueries === 1) return new BN(1);
-      else return new BN(0);
-    };
-
-    // create a thread successfully
-    const res = await modelUtils.createThread({
-      address: userAddress,
-      kind,
-      stage,
-      chainId: chain,
-      communityId: undefined,
-      title,
-      topicName,
-      topicId,
-      body,
-      jwt: userJWT,
-    });
-    expect(res.status).to.equal('Success');
-    expect(res.result).to.not.be.null;
-    expect(res.result.title).to.equal(encodeURIComponent(title));
-    expect(res.result.body).to.equal(encodeURIComponent(body));
-    expect(res.result.Address).to.not.be.null;
-    expect(res.result.Address.address).to.equal(userAddress);
-
-    // ensure cache is pruned before comment
-    const hasToken = await tbc.hasToken(chain, userAddress);
-    expect(hasToken).to.be.true;
-    await tbc.run();
-    const hasTokenPruned = await tbc.hasToken(chain, userAddress);
-    expect(hasTokenPruned).to.be.false;
-
-    // fail to create a comment
-    const cRes = await modelUtils.createComment({
-      chain,
-      address: userAddress,
-      jwt: userJWT,
-      text: markdownComment.text,
-      root_id: `discussion_${res.id}`,
-    });
-    expect(cRes).not.to.be.null;
-    expect(cRes.error).not.to.be.null;
-  });
-
-  xit('should permit new token-holder to take actions on token forum', async () => {
-    // first query is not a token holder, then all further queries are
-    let nQueries = 0;
-    tokenProvider.balanceFn = async () => {
-      nQueries++;
-      if (nQueries === 1) return new BN(0);
-      else return new BN(1);
-    };
-
-    // create a thread successfully
-    const errorRes = await modelUtils.createThread({
-      address: adminAddress,
-      kind,
-      stage,
-      chainId: chain,
-      communityId: undefined,
-      title,
-      topicName,
-      topicId,
-      body,
-      jwt: userJWT,
-    });
-    expect(errorRes).not.to.be.null;
-    expect(errorRes.error).not.to.be.null;
-
-    // ensure cache is pruned before comment
-    const hasToken = await tbc.hasToken(chain, userAddress);
-    expect(hasToken).to.be.false;
-    await tbc.run();
-    const hasTokenPruned = await tbc.hasToken(chain, userAddress);
-    expect(hasTokenPruned).to.be.true;
-
-    // create a thread successfully
-    const res = await modelUtils.createThread({
-      address: userAddress,
-      kind,
-      stage,
-      chainId: chain,
-      communityId: undefined,
-      title,
-      topicName,
-      topicId,
-      body,
-      jwt: userJWT,
-    });
-    expect(res.status).to.equal('Success');
-    expect(res.result).to.not.be.null;
-    expect(res.result.title).to.equal(encodeURIComponent(title));
-    expect(res.result.body).to.equal(encodeURIComponent(body));
-    expect(res.result.Address).to.not.be.null;
-    expect(res.result.Address.address).to.equal(userAddress);
   });
 
   it('should permit admin to act even without tokens', async () => {

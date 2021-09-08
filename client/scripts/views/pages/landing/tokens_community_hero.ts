@@ -95,12 +95,12 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
     return m('section.TokensCommunityComponent', {
       class: 'bg-gray-700'
     }, [
-      m('div', { class: 'relative mx-auto', style: 'max-width:1400px' }, [
+      m('div', { class: 'relative mx-auto' }, [
         m('div', { class: 'md:flex md:flex-row' }, [
           m('div',
             { class: 'flex items-center justify-center md:w-2/4' }, [
               m('div',
-                { class: 'mt-32 mb-10 md:my-40 lg:px-14 xl:px-0 xl:pr-32 tokenSectionContainer' },
+                { class: 'mt-32 mb-10 md:my-40 sm:px-8 md:px-8 lg:px-8 xl:px-16 px-8' },
                 [
                   m('h1', { class: 'text-4xl font-bold mb-5 leading-10' }, [
                     'A ',
@@ -158,21 +158,21 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
                       }),
                     ]),
                   ]),
-                  m('div', { class: 'block lg:flex' }, [
-                    m('h1', { class: 'text-2xl font-bold mb-5 leading-10 md:text-4xl' }, [
+                  m('div', { class: 'flex justify-center ' }, [
+                    m('h1', { class: 'font-bold mb-5 leading-10 md:text-xl lg:text-2xl xl:text-4xl' }, [
                       'We’re also here'
                     ]),
-                    m('div', [
+                    m('div', { class: 'block flex' }, [
                       m(
                         'a',
                         {
-                          class: 'lg:ml-12',
-                          href: 'https://discord.gg/ZFQCKUMP',
+                          class: 'ml-4',
+                          href: 'https://discord.gg/frnQxxZG5S',
                           target: '_blank'
                         },
                         [
                           m('img', {
-                            class: 'inline mr-1.5',
+                            class: 'inline mr-1.5 h-8 w-8',
                             src: 'static/img/discordIcon.svg',
                             alt: 'Discord',
                           })
@@ -181,13 +181,13 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
                       m(
                         'a',
                         {
-                          class: 'mx-6 lg:mx-3',
+                          class: 'mx-3 lg:mx-3',
                           href: 'https://t.me/HiCommonwealth',
                           target: '_blank'
                         },
                         [
                           m('img', {
-                            class: 'inline mr-1.5',
+                            class: 'inline mr-1.5 h-8 w-8',
                             src: 'static/img/telegramIcon.svg',
                             alt: 'Telegram',
                           })
@@ -202,7 +202,7 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
                         },
                         [
                           m('img', {
-                            class: 'inline mr-1.5',
+                            class: 'inline mr-1.5 h-8 w-8',
                             src: 'static/img/twitterIcon.svg',
                             alt: 'Twitter',
                           })

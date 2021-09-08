@@ -2,9 +2,11 @@ import 'components/header/notifications_menu.scss';
 
 import m from 'mithril';
 import Infinite from 'mithril-infinite';
-import app from 'state';
-
 import { Popover, PopoverMenu, Button, Icon, Icons, ButtonGroup } from 'construct-ui';
+
+import app from 'state';
+import { navigateToSubpage } from 'app';
+
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import NotificationRow from 'views/components/notification_row';
 import { Notification } from 'models';
@@ -27,7 +29,7 @@ const NotificationButtons: m.Component<{ showingChainNotifications: boolean }> =
       m(Button, {
         label: 'See all',
         onclick: () => (app.activeChainId() || app.activeCommunityId())
-          ? m.route.set(`/${app.activeChainId() || app.activeCommunityId()}/notificationsList`)
+          ? navigateToSubpage('/notificationsList')
           : m.route.set('/notificationsList'),
       }),
       showingChainNotifications ? m(Button, {

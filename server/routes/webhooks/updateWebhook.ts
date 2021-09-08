@@ -20,7 +20,7 @@ const updateWebhook = async (models, req: Request, res: Response, next: NextFunc
       permission: ['admin']
     },
   });
-  if (adminRoles.length === 0) return next(new Error(Errors.NotAdmin));
+  if (!req.user.isAdmin && adminRoles.length === 0) return next(new Error(Errors.NotAdmin));
   // check if webhook url exists already in the community
   if (!req.body.webhookId) return next(new Error(Errors.MissingWebhook));
   const existingWebhook = await models.Webhook.findOne({
@@ -29,7 +29,7 @@ const updateWebhook = async (models, req: Request, res: Response, next: NextFunc
     },
   });
   if (!existingWebhook) return next(new Error(Errors.NoWebhookFound));
-  existingWebhook.categories = typeof req.body['categories[]'] === "string" ? [req.body['categories[]']] : req.body['categories[]'] || [];
+  existingWebhook.categories = typeof req.body['categories[]'] === 'string' ? [req.body['categories[]']] : req.body['categories[]'] || [];
   await existingWebhook.save();
   return res.json({ status: 'Success', result: existingWebhook.toJSON() });
 };

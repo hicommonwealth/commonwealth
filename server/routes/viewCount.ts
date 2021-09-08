@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import ViewCountCache from '../util/viewCountCache';
-import { sequelize } from '../database';
 import { factory, formatFilename } from '../../shared/logging';
+import { sequelize, DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -12,18 +12,19 @@ export const Errors = {
   InvalidThread: 'Invalid offchain thread',
 };
 
-const viewCount = async (models, cache: ViewCountCache, req: Request, res: Response, next: NextFunction) => {
+const viewCount = async (models: DB, cache: ViewCountCache, req: Request, res: Response, next: NextFunction) => {
   if (!req.body.object_id) {
     return next(new Error(Errors.NoObjectId));
   }
   if (!req.body.chain && !req.body.community) {
     return next(new Error(Errors.NoChainOrComm));
   }
+  console.log(req.body.chain, req.body.community);
   const chain = await models.Chain.findOne({
-    where: { id: req.body.chain }
+    where: { id: req.body.chain || null }
   });
   const community = await models.OffchainCommunity.findOne({
-    where: { id: req.body.community }
+    where: { id: req.body.community || null }
   });
 
   if (!chain && !community) {

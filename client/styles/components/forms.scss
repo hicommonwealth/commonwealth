@@ -44,7 +44,19 @@
         display: flex;
         flex-direction: column;
         .cui-custom-select {
-            width: 50%;
+            
+            @media (min-width:1024px) {
+                width: 50%;
+            }
+
+            .cui-button {
+                max-width: 100%;
+
+                .cui-button-label{
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+            }
         }
     }
 }
