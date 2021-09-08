@@ -21,7 +21,6 @@ import CreateCommunityModal from 'views/modals/create_community_modal';
 
 import { AaveTypes, CompoundTypes, MolochTypes } from '@commonwealth/chain-events';
 import { discordIcon, telegramIcon, elementIcon, githubIcon, websiteIcon } from './icons';
-import TwitterAttestationModal from '../../modals/twitter_attestation_modal';
 
 const SidebarQuickSwitcherItem: m.Component<{ item, size }> = {
   view: (vnode) => {
@@ -83,8 +82,8 @@ const SidebarQuickSwitcher: m.Component<{}> = {
           rounded: true,
           label: m(Icon, { name: Icons.PLUS }),
           onclick: (e) => {
-            // app.modals.create({ modal: TwitterAttestationModal });
-            window.location.href = `/api/auth/twitter?redirect=${encodeURIComponent(window.location.pathname)}`;
+            app.modals.create({ modal: CreateCommunityModal });
+            // window.location.href = `/api/auth/twitter?redirect=${encodeURIComponent(window.location.pathname)}`;
           },
         }),
       ]),
