@@ -27,7 +27,6 @@ module.exports = merge(common, {
     new MiniCssExtractPlugin({
       filename: 'bundle.[chunkhash:8].css'
     }),
-    // new CompressionPlugin(),
     new BundleAnalyzerPlugin({
       analyzerMode: 'disabled',
       generateStatsFile: true,
