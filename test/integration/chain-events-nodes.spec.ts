@@ -345,7 +345,7 @@ setTimeout(async () => {
           let consumer;
           consumer = spawn('ts-node',
             [`${__dirname}../../../server/scripts/chainEventsConsumer`],
-            {env: { ...process.env, HANDLE_IDENTITY:'publish'}}
+            {env: { ...process.env, HANDLE_IDENTITY:'publish', USE_NEW_IDENTITY_CACHE:'true'}}
           )
 
           childExit([consumer]);

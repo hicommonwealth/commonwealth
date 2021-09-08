@@ -29,7 +29,7 @@ const app = express();
 const SequelizeStore = SessionSequelizeStore(session.Store);
 // set cache TTL to 1 second to test invalidation
 const viewCountCache = new ViewCountCache(1, 10 * 60);
-const identityFetchCache = new IdentityFetchCache(models);
+const identityFetchCache = new IdentityFetchCache(10 * 60);
 
 // always prune both token and non-token holders asap
 const mockTokenBalanceProvider = new MockTokenBalanceProvider();

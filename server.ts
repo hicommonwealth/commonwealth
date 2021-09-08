@@ -22,7 +22,7 @@ import { factory, formatFilename } from './shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 import ViewCountCache from './server/util/viewCountCache';
-import IdentityFetchCache from './server/util/identityFetchCache';
+import IdentityFetchCache, { IdentityFetchCacheNew } from './server/util/identityFetchCache';
 import TokenBalanceCache from './server/util/tokenBalanceCache';
 import { SESSION_SECRET, ROLLBAR_SERVER_TOKEN } from './server/config';
 import models from './server/database';
@@ -66,8 +66,16 @@ async function main() {
   const FLAG_MIGRATION = process.env.FLAG_MIGRATION;
   const CHAIN_EVENTS = process.env.CHAIN_EVENTS;
   const RUN_AS_LISTENER = process.env.RUN_AS_LISTENER === 'true';
+  const USE_NEW_IDENTITY_CACHE = process.env.USE_NEW_IDENTITY_CACHE === 'true';
 
-  const identityFetchCache = new IdentityFetchCache(10 * 60);
+  // if running in old mode then use old identityCache but if running with dbNode.ts use the new db identityCache
+  let identityFetchCache: IdentityFetchCacheNew | IdentityFetchCache;
+  if (!USE_NEW_IDENTITY_CACHE) {
+    identityFetchCache = new IdentityFetchCache(10 * 60);
+  } else {
+    identityFetchCache = new IdentityFetchCacheNew();
+  }
+
   const tokenBalanceCache = new TokenBalanceCache(models);
   const listenChainEvents = async () => {
     try {
@@ -86,7 +94,7 @@ async function main() {
           fetchers[chain] = new SubstrateEvents.StorageFetcher(subscriber.api);
         }
       }
-      await identityFetchCache.start(models, fetchers);
+      await (<IdentityFetchCache>identityFetchCache).start(models, fetchers);
       return 0;
     } catch (e) {
       console.error(`Chain event listener setup failed: ${e.message}`);
@@ -265,7 +273,7 @@ async function main() {
   setupPassport(models);
 
   await tokenBalanceCache.start();
-  setupAPI(app, models, viewCountCache, identityFetchCache, tokenBalanceCache);
+  setupAPI(app, models, viewCountCache, <any>identityFetchCache, tokenBalanceCache);
   setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
   setupErrorHandlers(app, rollbar);
 
