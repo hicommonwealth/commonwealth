@@ -310,29 +310,29 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
     const allContent = [].concat(proposals || []).concat(comments || [])
       .sort((a, b) => +b.createdAt - +a.createdAt);
 
-    const allTabTitle = (proposals && comments) ? `All (${proposals.length + comments.length})` : 'All';
-    const threadsTabTitle = (proposals) ? `Threads (${proposals.length})` : 'Threads';
-    const commentsTabTitle = (comments) ? `Comments (${comments.length})` : 'Comments';
+    const allTabTitle = (proposals && comments) ? ['All ', m('.count', (proposals.length + comments.length))] : 'All';
+    const threadsTabTitle = (proposals) ? ['Threads ', m('.count', (proposals.length))] : 'Threads';
+    const commentsTabTitle = (comments) ? ['Comments ', m('.count', (comments.length))] : 'Comments';
 
     return m(Sublayout, {
       class: 'ProfilePage',
       showNewProposalButton: true,
     }, [
-      m('.forum-container-alt', [
+      [
         displayBanner
         && m(ProfileBanner, {
           account,
           addressInfo: currentAddressInfo
         }),
-        m(ProfileHeader, {
-          account,
-          setIdentity,
-          onOwnProfile,
-          onLinkedProfile,
-          refreshCallback: () => { vnode.state.refreshProfile = true; },
-        }),
         m('.row.row-narrow.forum-row', [
-          m('.col-xs-8', [
+          m('.col-xs-12 .col-md-8', [
+            m(ProfileHeader, {
+              account,
+              setIdentity,
+              onOwnProfile,
+              onLinkedProfile,
+              refreshCallback: () => { vnode.state.refreshProfile = true; },
+            }),
             m(Tabs, [{
               name: allTabTitle,
               content: m(ProfileContent, {
@@ -362,11 +362,17 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
               }),
             }]),
           ]),
-          m('.col-xs-4', [
-            m(ProfileBio, { account }),
+          m('.xs-display-none .col-md-4', [
+            m(ProfileBio, {
+              account,
+              setIdentity,
+              onOwnProfile,
+              onLinkedProfile,
+              refreshCallback: () => { vnode.state.refreshProfile = true; },
+            }),
           ]),
         ]),
-      ]),
+      ],
     ]);
   },
 };
