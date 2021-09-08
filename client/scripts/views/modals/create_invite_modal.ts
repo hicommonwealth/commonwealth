@@ -3,16 +3,28 @@ import 'modals/create_invite_modal.scss';
 import m from 'mithril';
 import $ from 'jquery';
 import mixpanel from 'mixpanel-browser';
-import { Button, Input, Form, FormGroup, FormLabel, Select, RadioGroup, ListItem, List, Spinner, SelectList, Icons } from 'construct-ui';
-
-import Web3 from 'web3';
+import {
+  Button,
+  Input,
+  Form,
+  FormGroup,
+  FormLabel,
+  RadioGroup,
+  ListItem,
+  List,
+  Spinner,
+  SelectList,
+  Icons,
+} from 'construct-ui';
+import { checkAddressChecksum } from 'web3-utils';
+import { decodeAddress } from '@polkadot/util-crypto';
 import moment from 'moment';
+
 import app from 'state';
 import { CommunityInfo, ChainInfo, RoleInfo, ChainBase, Profile } from 'models';
+import { UserBlock } from 'views/components/widgets/user';
 import { CompactModalExitButton } from 'views/modal';
-import { checkAddress, decodeAddress } from '@polkadot/util-crypto';
 import { notifyError } from 'controllers/app/notifications';
-import { UserBlock } from '../components/widgets/user';
 export interface SearchParams {
   communityScope?: string;
   chainScope?: string;
@@ -43,6 +55,7 @@ interface ICommunityOption {
 const SEARCH_PREVIEW_SIZE = 10;
 
 function validateEmail(email) {
+  // eslint-disable-next-line max-len
   const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return re.test(String(email).toLowerCase());
 }
@@ -112,7 +125,14 @@ const getResultsPreview = (searchTerm: string, state, params: SearchParams) => {
 
   (res as any[]).forEach((item) => {
     tabIndex += 1;
-    const resultRow = getMemberPreview(item, state.enterAddress, state.closeResults, searchTerm, tabIndex, !!communityScope);
+    const resultRow = getMemberPreview(
+      item,
+      state.enterAddress,
+      state.closeResults,
+      searchTerm,
+      tabIndex,
+      !!communityScope
+    );
     organizedResults.push(resultRow);
   });
 
@@ -176,7 +196,11 @@ export const search = async (searchTerm: string, params: SearchParams, state) =>
     concludeSearch(searchTerm, params, state);
   }
   try {
-    const addrs = await searchMentionableAddresses(searchTerm, { resultSize, communityScope, chainScope }, ['created_at', 'DESC']);
+    const addrs = await searchMentionableAddresses(
+      searchTerm,
+      { resultSize, communityScope, chainScope },
+      ['created_at', 'DESC']
+    );
 
     app.searchAddressCache[searchTerm].member = addrs.map((addr) => {
       addr.contentType = 'member';
@@ -438,7 +462,8 @@ const CreateInviteModal: m.Component<{
         : null;
     if (!chainOrCommunityObj) return;
 
-    const selectedChainId = vnode.state.invitedAddressChain || (chainInfo ? chainInfo.id : app.config.chains.getAll()[0].id);
+    const selectedChainId = vnode.state.invitedAddressChain
+      || (chainInfo ? chainInfo.id : app.config.chains.getAll()[0].id);
     const selectedChain = app.config.chains.getById(selectedChainId);
 
     if (vnode.state.isTyping) {
@@ -454,7 +479,7 @@ const CreateInviteModal: m.Component<{
           console.log(e);
         }
       } else if (selectedChain?.base === ChainBase.Ethereum) {
-        vnode.state.isAddressValid = Web3.utils.checkAddressChecksum(vnode.state.searchAddressTerm);
+        vnode.state.isAddressValid = checkAddressChecksum(vnode.state.searchAddressTerm);
       } else {
         // TODO: check Cosmos & Near?
       }
@@ -554,7 +579,8 @@ const CreateInviteModal: m.Component<{
                 if (e.target.value?.length > 3) {
                   const params: SearchParams = {
                     communityScope: null,
-                    chainScope: vnode.state.invitedAddressChain || (chainInfo ? chainInfo.id : app.config.chains.getAll()[0].id),
+                    chainScope: vnode.state.invitedAddressChain
+                      || (chainInfo ? chainInfo.id : app.config.chains.getAll()[0].id),
                   };
                   clearTimeout(vnode.state.inputTimeout);
                   vnode.state.inputTimeout = setTimeout(() => {

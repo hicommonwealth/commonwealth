@@ -213,7 +213,24 @@ async function main() {
       /127.0.0.1:(\d{4})/
     ], [], 301));
 
+    // dynamic compression settings used
     app.use(compression());
+
+    // static compression settings unused
+    // app.get('*.js', (req, res, next) => {
+    //   req.url = req.url + '.gz';
+    //   res.set('Content-Encoding', 'gzip');
+    //   res.set('Content-Type', 'application/javascript; charset=UTF-8');
+    //   next();
+    // });
+
+    // // static compression settings unused
+    // app.get('bundle.**.css', (req, res, next) => {
+    //   req.url = req.url + '.gz';
+    //   res.set('Content-Encoding', 'gzip');
+    //   res.set('Content-Type', 'text/css');
+    //   next();
+    // });
 
     // serve the compiled app
     if (!NO_CLIENT_SERVER) {
