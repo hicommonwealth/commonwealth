@@ -103,6 +103,7 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
       || p === `/${app.activeId()}/discussions/${f}/`;
     const onMembersPage = (p) => p.startsWith(`/${app.activeId()}/members`)
       || p.startsWith(`/${app.activeId()}/account/`);
+    const onInfoPage = (p) => p.startsWith(`/${app.activeId()}/info`);
 
     const topics = app.topics.getByCommunity(app.activeId()).map(({ id, name, featuredInSidebar }) => {
       return { id, name, featuredInSidebar };
@@ -156,6 +157,17 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
         onclick: (e) => {
           e.preventDefault();
           navigateToSubpage('/members');
+        },
+      }),
+      m(Button, {
+        rounded: true,
+        fluid: true,
+        active: onInfoPage(m.route.get())
+          && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
+        label: 'Info',
+        onclick: (e) => {
+          e.preventDefault();
+          navigateToSubpage('/info');
         },
       }),
       // m(Button, {

@@ -1,0 +1,120 @@
+@import 'client/styles/shared';
+
+.InfoPage {
+  .info-contents {
+    margin: 38px 24px 0 48px;
+  }
+
+  .chain-image {
+    flex-shrink: 0;
+  }
+
+  .title {
+    font-size: 32px;
+    font-weight: 500;
+  }
+
+  .w-70-percent {
+    width: 70%;
+  }
+
+  .info-box {
+    display: flex;
+    margin: 30px -10px;
+    height: 200px;
+
+    .info-card {
+      background-color: #F4F4F4;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-weight: 500;
+      flex: 1;
+      margin: 0 10px;
+
+      .info-metric-value {
+        font-size: 64px;
+        line-height: 56px;
+      }
+
+      .info-metric-desc {
+        color: #666666;
+      }
+    }
+  }
+
+  .details-box {
+    display: flex;
+    margin: 30px -10px;
+    font-weight: 500;
+    color: #333333;
+
+    .title {
+      font-size: 24px;
+      color: black;
+    }
+
+    .mt-2 {
+      margin-top: 8px;
+    }
+
+    .mx-16px {
+      margin-left: 16px;
+      margin-right: 16px;
+    }
+
+    .space-between {
+      justify-content: space-between;
+    }
+
+    .font-500 {
+      font-weight: 500;
+    }
+
+    .contract-details {
+      width: 66%;
+      flex-grow: 0;
+      background-color: #F4F4F4;
+      border-radius: 10px;
+      margin: 0 10px;
+      padding: 20px;
+
+      .callout {
+        padding: 14px 16px 10px 16px;
+        background: #FFFEEE;
+        border-radius: 8px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .flex-align-center {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 4px;
+      }
+
+      .clipboard-button {
+        margin-left: 16px;
+        cursor: pointer;
+      }
+    }
+
+    .voting-details {
+      width: 34%;
+      flex-grow: 0;
+      background-color: #F4F4F4;
+      border-radius: 10px;
+      margin: 0 10px;
+      padding: 20px;
+      color: #333333;
+      font-weight: 400;
+
+      .mt-20px {
+        margin-top: 20px;
+      }
+    }
+  }
+}
