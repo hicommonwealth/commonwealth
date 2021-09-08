@@ -81,6 +81,10 @@ export enum UserContent {
   Comments = 'comments'
 }
 
+interface IProfilePageAttrs {
+  address: string;
+  setIdentity?: boolean;
+}
 interface IProfilePageState {
   account;
   threads: OffchainThread[];
@@ -102,7 +106,7 @@ const checkCosmosAddress = (address: string): boolean => {
   }
 };
 
-const loadProfile = async (attrs, state) => {
+const loadProfile = async (attrs: IProfilePageAttrs, state: IProfilePageState) => {
   const chain = m.route.param('base') || app.customDomainId() || m.route.param('scope');
   const { address } = attrs;
   const chainInfo = app.config.chains.getById(chain);
@@ -227,7 +231,7 @@ const loadProfile = async (attrs, state) => {
   }
 };
 
-const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProfilePageState> = {
+const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
   oninit: (vnode) => {
     vnode.state.account = null;
     vnode.state.initialized = false;
