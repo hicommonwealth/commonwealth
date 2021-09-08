@@ -1,3 +1,4 @@
+import { SubstrateEvents, SubstrateTypes, chainSupportedBy } from '@commonwealth/chain-events';
 import session from 'express-session';
 import Rollbar from 'rollbar';
 import express from 'express';
@@ -33,6 +34,7 @@ import setupPrerenderServer from './server/scripts/setupPrerenderService';
 import { sendBatchedNotificationEmails } from './server/scripts/emails';
 import setupAPI from './server/router';
 import setupPassport from './server/passport';
+import setupChainEventListeners from './server/scripts/setupChainEventListeners';
 import { fetchStats } from './server/routes/getEdgewareLockdropStats';
 import migrateIdentities from './server/scripts/migrateIdentities';
 import migrateCouncillorValidatorFlags from './server/scripts/migrateCouncillorValidatorFlags';
@@ -59,13 +61,50 @@ async function main() {
     || SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS;
 
   // CLI parameters used to configure specific tasks
+  const SKIP_EVENT_CATCHUP = process.env.SKIP_EVENT_CATCHUP === 'true';
   const IDENTITY_MIGRATION = process.env.IDENTITY_MIGRATION;
   const FLAG_MIGRATION = process.env.FLAG_MIGRATION;
+  const CHAIN_EVENTS = process.env.CHAIN_EVENTS;
+  const RUN_AS_LISTENER = process.env.RUN_AS_LISTENER === 'true';
 
-  const identityFetchCache = new IdentityFetchCache(models);
+  const identityFetchCache = new IdentityFetchCache(10 * 60);
   const tokenBalanceCache = new TokenBalanceCache(models);
+  const listenChainEvents = async () => {
+    try {
+      // configure chain list from events
+      let chains: string[] | 'all' | 'none' = 'all';
+      if (CHAIN_EVENTS === 'none' || CHAIN_EVENTS === 'all') {
+        chains = CHAIN_EVENTS;
+      } else if (CHAIN_EVENTS) {
+        chains = CHAIN_EVENTS.split(',');
+      }
+      const subscribers = await setupChainEventListeners(null, chains, SKIP_EVENT_CATCHUP);
+      // construct storageFetchers needed for the identity cache
+      const fetchers = {};
+      for (const [ chain, subscriber ] of Object.entries(subscribers)) {
+        if (chainSupportedBy(chain, SubstrateTypes.EventChains)) {
+          fetchers[chain] = new SubstrateEvents.StorageFetcher(subscriber.api);
+        }
+      }
+      await identityFetchCache.start(models, fetchers);
+      return 0;
+    } catch (e) {
+      console.error(`Chain event listener setup failed: ${e.message}`);
+      return 1;
+    }
+  };
   let rc = null;
-  if (SHOULD_SEND_EMAILS) {
+  if (RUN_AS_LISTENER) {
+    // hack to keep process running indefinitely
+    process.stdin.resume();
+    listenChainEvents().then((retcode) => {
+      if (retcode) {
+        process.exit(retcode);
+      }
+      // if recode === 0, continue indefinitely
+    });
+    return;
+  } else if (SHOULD_SEND_EMAILS) {
     rc = await sendBatchedNotificationEmails(models);
   } else if (SHOULD_UPDATE_EVENTS) {
     rc = await updateEvents(app, models);
@@ -132,8 +171,15 @@ async function main() {
   const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
   const viewCountCache = new ViewCountCache(2 * 60, 10 * 60);
 
+  const closeMiddleware = (): Promise<void> => {
+    if (!NO_CLIENT_SERVER) {
+      return new Promise((resolve) => devMiddleware.close(() => resolve()));
+    } else {
+      return Promise.resolve();
+    }
+  };
+
   const sessionStore = new SequelizeStore({
-    // eslint-disable-next-line import/no-named-as-default-member
     db: models.sequelize,
     tableName: 'Sessions',
     checkExpirationInterval: 15 * 60 * 1000, // Clean up expired sessions every 15 minutes
@@ -223,6 +269,15 @@ async function main() {
   setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
   setupErrorHandlers(app, rollbar);
 
+  if (CHAIN_EVENTS) {
+    const exitCode = await listenChainEvents();
+    console.log(`setup chain events listener with code: ${exitCode}`);
+    if (exitCode) {
+      await models.sequelize.close();
+      await closeMiddleware();
+      process.exit(exitCode);
+    }
+  }
   setupServer(app, wss, sessionParser);
 }
 

@@ -135,7 +135,8 @@ async function clearQueues(): Promise<void> {
       'Authorization': 'Basic Z3Vlc3Q6Z3Vlc3Q='
     }
   })
-  if (res.status != 204) throw new Error("Could not clear the identity queue")
+  if (res.status == 404) console.log('No eventsQueue to clear')
+  else if (res.status != 204) throw new Error("Could not clear the identity queue")
 
   res = await fetch('http://localhost:15672/api/queues/%2F/eventsQueue/contents', {
     'method': 'DELETE',
@@ -143,7 +144,8 @@ async function clearQueues(): Promise<void> {
       'Authorization': 'Basic Z3Vlc3Q6Z3Vlc3Q='
     }
   })
-  if (res.status != 204) throw new Error("Could not clear the events queue")
+  if (res.status == 404) console.log('No eventsQueue to clear')
+  else if (res.status != 204) throw new Error("Could not clear the events queue")
 }
 
 // populates the Address, OffchainProfiles, and IdentityCaches tables with test data
@@ -342,7 +344,7 @@ setTimeout(async () => {
         it('Should start the chain-events consumer',(done) => {
           let consumer;
           consumer = spawn('ts-node',
-            [`${__dirname}../../../server/scripts/setupChainEventListeners`],
+            [`${__dirname}../../../server/scripts/chainEventsConsumer`],
             {env: { ...process.env, HANDLE_IDENTITY:'publish'}}
           )
 

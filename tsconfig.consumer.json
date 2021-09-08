@@ -13,7 +13,7 @@
     "traceResolution": true
   },
   "files": [
-    "server/scripts/setupChainEventListeners.ts",
+    "server/scripts/chainEventsConsumer.ts",
     "server/scripts/dbNode.ts",
   ],
   "include": [
@@ -22,6 +22,7 @@
   ],
   "exclude": [
     "server/passport.ts",
+    "server/scripts/setupChainEventListeners.ts",
     "server/router.ts",
     "server/webhookNotifier.ts",
     "server/socket",
