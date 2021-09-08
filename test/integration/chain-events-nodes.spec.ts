@@ -154,7 +154,7 @@ async function prepareDB(client): Promise<void> {
   let query
   try {
     for (const [chain, data] of Object.entries(fetchedIdentities)) {
-      query = format(`INSERT INTO "Addresses" (address, chain, verification_token, created_at, updated_at, is_councillor, is_validator, is_magic) VALUES (%L, %L, '1', '2020-05-01', '20-05-01', DEFAULT, DEFAULT, DEFAULT)`,
+      query = format(`INSERT INTO "Addresses" (address, chain, verification_token, created_at, updated_at, is_councillor, is_validator, is_magic) VALUES (%L, %L, '1', '2020-05-01', '2020-05-01', DEFAULT, DEFAULT, DEFAULT)`,
         data.address, chain);
       await client.query(query);
 
@@ -183,7 +183,7 @@ async function verifyIdentityChanges(pool, chain: string): Promise<boolean> {
   return identity == fetchedIdentities[chain].identity;
 }
 
-async function getChains(pool): Promise<[{id: string, url: string, substrate_spec: string, base: string}]> {
+async function getChains(pool): Promise<{id: string, url: string, substrate_spec: string, base: string}[]> {
   const query = `SELECT "Chains"."id", "substrate_spec", "url", "base" FROM "Chains" JOIN "ChainNodes" ON "Chains"."id"="ChainNodes"."chain" WHERE "Chains"."has_chain_events_listener"='true';`;
   return (await pool.query(query)).rows
 }
@@ -228,7 +228,7 @@ function delay(interval) {
 }
 
 setTimeout(async () => {
-  let chains: [{id: string, url: string, substrate_spec: string, base: string}];
+  let chains: {id: string, url: string, substrate_spec: string, base: string}[];
 
   const pool = new Pool({
     connectionString: 'postgresql://commonwealth:edgeware@localhost/commonwealth'
@@ -244,6 +244,8 @@ setTimeout(async () => {
   await client.connect()
 
   chains = await getChains(pool);
+  if (chains.length === 0) console.log('Supported-chains/chains-to-test should have HAS_CHAIN_EVENTS_LISTENER set to true in the db')
+
   await clearDB(pool);
   await clearQueues();
   await prepareDB(client);
