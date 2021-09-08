@@ -6,8 +6,23 @@ import app from '../../state';
 import { OffchainThreadStage } from '../../models/types';
 import { offchainThreadStageToLabel, parseCustomStages } from '../../helpers';
 
-const ProfileFilterModal = {
-  view: (vnode) => {
+type ProfileFilterModalState = {
+  selectedDiscussions: Record<string, boolean>;
+  selectedCategories: Record<number, boolean>;
+  selectedstages: Record<string, boolean>;
+  selectedRange: string;
+  selectedSortOrder: string;
+};
+
+const ProfileFilterModal :m.Component<{}, ProfileFilterModalState> = {
+  oninit: (vnode) => {
+    vnode.state.selectedDiscussions = {};
+    vnode.state.selectedCategories = {};
+    vnode.state.selectedstages = {};
+    vnode.state.selectedRange = null;
+    vnode.state.selectedSortOrder = null;
+  },
+  view: (vnode: m.VnodeDOM<{}, ProfileFilterModalState>) => {
     const topics = app.topics.getByCommunity(app.activeId());
     const { customStages } = app.chain?.meta?.chain || app.community?.meta;
     const stages = !customStages ? [
@@ -17,6 +32,8 @@ const ProfileFilterModal = {
       OffchainThreadStage.Passed,
       OffchainThreadStage.Failed
     ] : parseCustomStages(customStages);
+
+    const { selectedDiscussions, selectedCategories, selectedstages } = vnode.state;
 
     return m('.ProfileFilterModal', [
       m('.flex', [
@@ -29,9 +46,14 @@ const ProfileFilterModal = {
           m('.flex.justify-between', [
             m('.pr-6', [
               m('.sub-heading', 'Discussion'),
-              m('button', 'Threads'),
-              m('button', 'Comments'),
-              m('button', 'Reactions'),
+              m('button', {
+                onclick:() => { selectedDiscussions['Threads'] = !selectedDiscussions['Threads']; },
+                class: `${selectedDiscussions['Threads'] && 'button-active'}`
+              }, 'Threads'),
+              m('button', {
+                onclick:() => { selectedDiscussions['Comments'] = !selectedDiscussions['Comments']; },
+                class: `${selectedDiscussions['Comments'] && 'button-active'}`
+              }, 'Comments'),
             ]),
             m('.pr-6', [
               m('.sub-heading', 'Category'),
@@ -65,7 +87,12 @@ const ProfileFilterModal = {
         }),
       ]),
       m('.pt-4.flex.justify-end.border-t.gray-border', [
-        m('button.mb-4.mr-4.uppercase.font-medium', 'Cancel'),
+        m('button.mb-4.mr-4.uppercase.font-medium', {
+          onclick:() => {
+            $(vnode.dom).trigger('modalforceexit');
+            m.redraw();
+          }
+        }, 'Cancel'),
         m('button.mb-4.mr-4.uppercase.font-medium', 'Apply'),
       ]),
     ]);
