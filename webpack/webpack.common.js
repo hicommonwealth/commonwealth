@@ -36,7 +36,7 @@ module.exports = {
           chunks: 'all',
         },
         ethereum: {
-          test: /[\\/]node_modules[\\/](web3|@audius|ethers)[\\/]/,
+          test: /[\\/]node_modules[\\/](web3|@audius|ethers|@walletconnect|@ethersproject)[\\/]/,
           name: 'ethereum',
           chunks: 'all',
         },
@@ -46,7 +46,7 @@ module.exports = {
           chunks: 'all',
         },
         cosmos: {
-          test: /[\\/]node_modules[\\/](@cosmjs|@tendermint|amino-js|supercop\.js|tendermint)[\\/]/,
+          test: /[\\/]node_modules[\\/](@cosmjs|@tendermint|amino-js|supercop\.js|tendermint|libsodium)[\\/]/,
           name: 'cosmos',
           chunks: 'all',
         },
@@ -60,6 +60,11 @@ module.exports = {
           name: 'snapshot',
           chunks: 'all',
         },
+        vendor: {
+          test: /[\\/]node_modules[\\/](?!(@snapshot-labs|@apollo|@polkadot|@cosmjs|@tendermint|amino-js|supercop\.js|tendermint|libsodium|near-api-js|web3|@audius|ethers|@walletconnect|@ethersproject|bip39).*)/,
+          name: 'vendors',
+          chunks: 'all',
+        }
       },
     },
   },
