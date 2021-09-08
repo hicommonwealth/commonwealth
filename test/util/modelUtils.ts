@@ -45,7 +45,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
   if (chain === 'edgeware') {
     const keyPair = new Keyring({
       type: 'sr25519',
-      ss58Format: 42,
+      ss58Format: 7,
     }).addFromMnemonic(mnemonic);
     const address = keyPair.address;
     let res = await chai.request.agent(app)
