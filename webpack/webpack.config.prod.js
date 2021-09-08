@@ -28,12 +28,6 @@ module.exports = merge(common, {
     new MiniCssExtractPlugin({
       filename: 'bundle.[chunkhash:8].css'
     }),
-    new CompressionPlugin({
-      algorithm: 'gzip',
-      test: /\.js$|\.css$/,
-      threshold: 10240,
-      // minRatio: 0
-    }),
     new BundleAnalyzerPlugin({
       analyzerMode: 'disabled',
       generateStatsFile: true,
