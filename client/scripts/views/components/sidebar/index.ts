@@ -1,9 +1,10 @@
 import 'components/sidebar/index.scss';
 
-import { AaveTypes, MarlinTypes, MolochTypes } from '@commonwealth/chain-events';
 import m from 'mithril';
 import _ from 'lodash';
-import { Button, PopoverMenu, MenuItem, Icon, Icons, Tooltip } from 'construct-ui';
+import {
+  Button, PopoverMenu, MenuItem, Icon, Icons, Tooltip
+} from 'construct-ui';
 
 import { selectNode, initChain, navigateToSubpage } from 'app';
 import app from 'state';

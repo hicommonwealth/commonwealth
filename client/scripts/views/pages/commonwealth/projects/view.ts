@@ -90,14 +90,10 @@ const ViewProjectPage: m.Component<{
     if (!protocolReady()) return;
 
     if (vnode.state.initialized === 0) {
-      const {
-        project,
-        backers,
-        curators
-      } = await app.cmnProtocol.project_protocol.getProjectDetails(vnode.attrs.address);
-      vnode.state.backers = backers;
-      vnode.state.curators = curators;
-      vnode.state.project = project;
+      const res = await app.cmnProtocol.project_protocol.getProjectDetails(vnode.attrs.address);
+      vnode.state.backers = res.backers;
+      vnode.state.curators = res.curators;
+      vnode.state.project = res.project;
       vnode.state.initialized = 1;
       m.redraw();
     }
@@ -106,6 +102,16 @@ const ViewProjectPage: m.Component<{
     if (vnode.state.initialized !== 1) return m(PageLoading);
 
     const { project, curators, backers } = vnode.state;
+
+    if (!project || !project.endTime) {
+      return m(Sublayout, {
+        class: 'ProjectPage',
+        title: 'Projects',
+        showNewProposalButton: true,
+      }, [
+        m('.container', 'This project does not exist.'),
+      ]);
+    }
     const project_protocol = app.cmnProtocol.project_protocol;
     const { bTokens, cTokens, endTime } = project;
 

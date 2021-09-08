@@ -13,7 +13,7 @@ const ProjectCard: m.Component<{project: CMNProject}> = {
     const totalFunding = new BN(project.totalFunding.toString()).div(new BN(100000000)).toNumber();
 
     const displayText = project.withdrawIsDone
-      ? `Withdraw is done. Total Funding was ${totalFunding} Ether`
+      ? `Withdraw is done. Total Funding was ${totalFunding} USD`
       : `Total Funding: ${totalFunding} USD`;
 
     return m('.ProjectCard', [

@@ -19,6 +19,8 @@ export default class CMNAdapter {
     projectProtocolAddress: string,
     collectiveProtocolAddress: string
   ) {
+    console.log('Ethereum CMN-Protocol starting...');
+
     this.chainId = chainId;
     this.chain = app.chain.chain as EthereumChain;
 

@@ -31,6 +31,7 @@ const BackAciton: m.Component<
           if (index > -1) {
             const acceptedToken = project.acceptedTokens[index];
             const amount = new BN(balance).mul(new BN(10).pow(new BN(acceptedToken.decimals)));
+            console.log('====>balance', balance);
 
             const res = await project_protocol.backOrCurate(
               amount,

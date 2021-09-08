@@ -43,6 +43,7 @@ import communityStats from './routes/communityStats';
 import getCommunitiesAndChains from './routes/getCommunitiesAndChains';
 import createChain from './routes/createChain';
 import getCMNProtocols from './routes/getCMNProtocols';
+import getTokenDetails from './routes/getTokenDetails';
 import viewCount from './routes/viewCount';
 import updateEmail from './routes/updateEmail';
 
@@ -203,6 +204,7 @@ function setupRouter(
 
   // cmn protocol
   router.get('/getCMNProtocols', getCMNProtocols.bind(this, models));
+  router.get('/getTokenDetails', getTokenDetails.bind(this, models));
 
   // offchain community admin routes
   // TODO: Change to POST /community

@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import app from 'state';
 
 export const kovanTokenData = [
@@ -41,13 +42,16 @@ export interface ProjectMetaData {
 
 export const EtherAddress = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
 
-export const getTokenDetails = (tokenAddresses: string[]) => {
-  // TODO_CMN: replace with backend API
-  const tokensData = [];
-  for (let i = 0; i < tokenAddresses.length; i++) {
-    const index = kovanTokenData.findIndex((t) => t.address.toLowerCase() === tokenAddresses[i].toLowerCase());
-    if (index > -1) {
-      tokensData.push(kovanTokenData[index]);
+export const getTokenDetails = async (tokens: string[]) => {
+  const tokenAddresses = tokens.map((t) => t.toLowerCase());
+  let tokensData = [];
+  if (app.activeChainId()) {
+    const res = await $.get(`${app.serverUrl()}/getTokenDetails`, {
+      chain: app.activeChainId(),
+      tokenAddresses
+    });
+    if (res.status === 'Success') {
+      tokensData = res.result.tokens || [];
     }
   }
   return tokensData;

@@ -116,7 +116,6 @@ const SuccsedActionCard: m.Component<{
     const redeemAble = true;
     if (app.user.activeAccount && app.isLoggedIn()) {
       const activeAddress = app.user.activeAccount.address.toLowerCase();
-
       // if (!curators.map((c) => c.address.toLowerCase()).includes(activeAddress)) {
       //   redeemAble = false;
       // }

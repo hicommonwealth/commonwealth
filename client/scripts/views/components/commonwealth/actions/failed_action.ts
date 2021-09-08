@@ -23,7 +23,6 @@ const FailedActionCard: m.Component<{
   view: (vnode) => {
     const { project, project_protocol, backers } = vnode.attrs;
     const { bTokens, acceptedTokens } = project;
-    console.log('====>project', project);
 
     let redeemAble = false;
     if (app.user.activeAccount && app.isLoggedIn()) {

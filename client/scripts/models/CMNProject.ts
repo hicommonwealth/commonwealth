@@ -1,5 +1,4 @@
 import BN from 'bn.js';
-import { EthereumCoin } from 'shared/adapters/chain/ethereum/types';
 
 type ProjectStatus = 'In Progress' | 'Successed' | 'Failed';
 

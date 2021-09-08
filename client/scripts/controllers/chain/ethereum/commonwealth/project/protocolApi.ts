@@ -1,7 +1,10 @@
 import { utils } from 'ethers';
 import BN from 'bn.js';
 
-import { ProjectFactory as CMNProjectProtocolContract } from 'eth/types';
+import {
+  ProjectFactory as CMNProjectProtocolContract,
+  Project__factory,
+} from 'eth/types';
 
 import ContractApi, { attachSigner } from '../../contractApi';
 import CMNProjectApi from './projectApi';
@@ -11,14 +14,35 @@ import EthereumChain from '../../chain';
 
 export default class CMNProjectProtocolApi extends ContractApi<CMNProjectProtocolContract> {
   public readonly gasLimit: number = 3000000;
+  private _projectAddresses: string[];
+  private _projectApis;
 
-  public async getAcceptedTokens() {
-    // TODO_CMN: getAllAcceptedTokens => getAcceptedTokens
-    const tokens = await this.Contract.getAllAcceptedTokens();
-    return getTokenDetails(tokens);
+  public async init() {
+    this._projectApis = {};
+    super.init();
   }
 
-  public async createProject(chain: EthereumChain, params: ProjectMetaData) {
+  public deinit() {
+    this._projectApis = {};
+  }
+
+  private async _syncProjectAddresses(chain: EthereumChain) {
+    this._projectAddresses = (await this.Contract.getAllProjects()).map((addr) => addr.toLowerCase());
+    for (let i = 0; i < this._projectAddresses.length; i++) {
+      const proj = this._projectAddresses[i];
+      if (!this._projectApis[proj]) {
+        this._projectApis[proj] = this.getProjectApi(proj, chain);
+      }
+    }
+  }
+
+  public async getAcceptedTokens() {
+    const tokens = await this.Contract.getAllAcceptedTokens();
+    const tokensData = await getTokenDetails(tokens);
+    return tokensData;
+  }
+
+  public async createProject(params: ProjectMetaData, chain: EthereumChain) {
     const name = utils.formatBytes32String(params.name);
     const ipfsHash = utils.formatBytes32String('0x01');
     const cwUrl = utils.formatBytes32String('commonwealth.im');
@@ -28,8 +52,6 @@ export default class CMNProjectProtocolApi extends ContractApi<CMNProjectProtoco
     const threshold = new BN(params.threshold * 100000000);
 
     const contract = await attachSigner(chain.app.wallets, params.creator, this.Contract);
-
-    let transactionSuccessed: boolean;
     try {
       const tx = await contract.createProject(
         name,
@@ -44,33 +66,30 @@ export default class CMNProjectProtocolApi extends ContractApi<CMNProjectProtoco
         { gasLimit: this.gasLimit }
       );
       const txReceipt = await tx.wait();
-      transactionSuccessed = txReceipt.status === 1;
+      return txReceipt.status === 1;
     } catch (err) {
-      transactionSuccessed = false;
+      return false;
     }
-    return {
-      status: transactionSuccessed ? 'success' : 'failed',
-      error: transactionSuccessed ? '' : 'Failed to process createProject transaction'
-    };
   }
 
   public async getProtocolData() {
     const protocolData = await this.Contract.protocolData();
     const protocolFee = protocolData.protocolFee;
     const feeTo = protocolData.feeTo;
-    return {
-      protocolFee,
-      feeTo,
-    };
+    return { protocolFee, feeTo };
   }
 
-  public async loadProtooclData(projApis: CMNProjectApi[]) {
+  public async loadProtooclData(chain: EthereumChain) {
+    await this._syncProjectAddresses(chain);
+
     const { protocolFee, feeTo } = await this.getProtocolData();
     const acceptedTokens = await this.getAcceptedTokens();
 
     const projects: CMNProject[] = [];
-    for (let i = 0; i < projApis.length; i++) {
-      const projDetails = await projApis[i].getProjectInfo();
+    for (let i = 0; i < this._projectAddresses.length; i++) {
+      const proj = this._projectAddresses[i];
+      const projApi = this.getProjectApi(proj, chain);
+      const projDetails = await projApi.getProjectInfo();
       projects.push(projDetails);
     }
     return {
@@ -79,5 +98,16 @@ export default class CMNProjectProtocolApi extends ContractApi<CMNProjectProtoco
       projects,
       acceptedTokens
     };
+  }
+
+  public getProjectApi(proj: string, chain: EthereumChain) {
+    if (!this._projectApis[proj]) {
+      this._projectApis[proj] = new CMNProjectApi(
+        Project__factory.connect,
+        proj,
+        chain.api.currentProvider as any
+      );
+    }
+    return this._projectApis[proj];
   }
 }

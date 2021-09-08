@@ -9,6 +9,7 @@ export interface TokenAttributes {
   address: string;
   symbol: string;
   icon_url?: string;
+  chain: string;
 }
 
 export interface TokenInstance extends Model<TokenAttributes>, TokenAttributes {
@@ -28,6 +29,7 @@ export default (
     address: { type: dataTypes.STRING, allowNull: false },
     symbol: { type: dataTypes.STRING, allowNull: false },
     icon_url: { type: dataTypes.STRING(1024), allowNull: true },
+    chain: { type: dataTypes.STRING, allowNull: false }
   }, {
     tableName: 'Tokens',
     timestamps: false,

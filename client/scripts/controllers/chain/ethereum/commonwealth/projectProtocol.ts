@@ -3,7 +3,6 @@ import BN from 'bn.js';
 
 import {
   ProjectFactory__factory as CMNProjectProtocolContract,
-  Project__factory,
   CWToken__factory,
   ERC20__factory
 } from 'eth/types';
@@ -18,35 +17,22 @@ import CMNProjectApi from './project/projectApi';
 import { needSync, ProjectMetaData, getTokenHolders, MAX_VALUE } from './utils';
 
 export default class ProjectProtocol {
+  private _syncing: boolean;
   private _chain: EthereumChain;
   private _api: CMNProjectProtocolApi;
 
-  private _projectApis; // store all project's APIs
-  private _projectAddresses: string[];
   private _projectStore = new CMNProjectStore();
   private _memberStore = new CMNMembersStore();
 
   public async init(chain: EthereumChain, projectProtocolAddress: string) {
-    console.log('CMN: initializing projectProtocol');
     this._chain = chain;
-
-    // init project protocol API
-    const projectProtocolApi = new CMNProjectProtocolApi(
+    this._api = new CMNProjectProtocolApi(
       CMNProjectProtocolContract.connect,
       projectProtocolAddress,
       this._chain.api.currentProvider as any
     );
-    this._api = projectProtocolApi;
-
-    // init
-    this._projectApis = {};
-    await this._syncProtocolStore(true);
-    const pStore = this._projectStore.getById('cmn_projects');
-    const projects = pStore.projects;
-    for (let i = 0; i < projects.length; i++) {
-      await this._syncMemberStore(projects[i]);
-    }
-    console.log('CMN: projectProtocol initialized');
+    await this._api.init();
+    await this._syncProtocolStore(true); // init projectStore
   }
 
   private async _syncMemberStore(project: CMNProject) {
@@ -80,23 +66,10 @@ export default class ProjectProtocol {
 
   private async _syncProtocolStore(force = false) {
     const pStore = this._projectStore.getById('cmn_projects');
-    if (pStore && !needSync(pStore.updated_at) && !force) {
-      return pStore;
-    }
+    if (pStore && !needSync(pStore.updated_at) && !force) return pStore;
 
     console.log('CMN syncing protocol store');
-    // sync project APIs first
-    this._projectAddresses = await this._api.Contract.getAllProjects();
-    if (!this._projectAddresses && this._projectAddresses.length === 0) return;
-
-    const projectApis = [];
-    for (let i = 0; i < this._projectAddresses.length; i++) {
-      projectApis.push(await this._syncProjectAPI(this._projectAddresses[i]));
-    }
-
-    // sync protocol data again
-    const protocolData = await this._api.loadProtooclData(projectApis);
-
+    const protocolData = await this._api.loadProtooclData(this._chain);
     if (!pStore) {
       // init Store
       this._projectStore.add(
@@ -118,80 +91,57 @@ export default class ProjectProtocol {
     }
 
     console.log('CMN protocol store synchronized');
-
     return this._projectStore.getById('cmn_projects');
-  }
-
-  private async _syncProjectAPI(project: string) {
-    if (!this._projectApis[project]) {
-      this._projectApis[project] = new CMNProjectApi(
-        Project__factory.connect,
-        project,
-        this._chain.api.currentProvider as any
-      );
-    }
-    return this._projectApis[project];
   }
 
   public async deinit() {
     this._projectStore.clear();
     this._memberStore.clear();
-    this._projectApis = {};
   }
 
   // interface APIs
   public async getProjects() {
+    console.log('====>getProjects');
     const pStore = await this._syncProtocolStore();
     return pStore.projects;
   }
 
-  public async createProject(params: ProjectMetaData) {
-    const res = await this._api.createProject(this._chain, params);
-    return res;
-  }
-
   public async getProjectDetails(address: string) {
+    console.log('====>getProjectDetails');
     await this._syncProtocolStore();
 
     const pStore = this._projectStore.getById('cmn_projects');
-    let selectedProject = pStore.projects.filter((proj) => proj.address === address)[0];
-
-    if (!selectedProject || !selectedProject.updated_at || needSync(selectedProject.updated_at)) {
-      const projContractApi: CMNProjectApi = await this._syncProjectAPI(selectedProject.address);
-      selectedProject = await projContractApi.setProjectDetails(selectedProject);
+    const selectedIndex = pStore.projects.findIndex((proj) => proj.address === address);
+    if (selectedIndex < 0) {
+      return;
     }
 
-    const mStore = await this._syncMemberStore(selectedProject);
-
+    let sProject = pStore.projects[selectedIndex];
+    if (needSync(sProject.updated_at)) {
+      const projContractApi: CMNProjectApi = await this._api.getProjectApi(sProject.address, this._chain);
+      sProject = await projContractApi.setProjectDetails(sProject);
+    }
+    const mStore = await this._syncMemberStore(sProject);
     return {
-      project: selectedProject,
+      project: sProject,
       curators: mStore.curators,
       backers: mStore.backers
     };
   }
 
-  public async backOrCurate(
-    amount: BN,
-    project: CMNProject,
-    isBacking: boolean,
-    from: string,
-    tokenAddress: string,
-    tokenDecimals: number
-  ) {
-    const projContractApi: CMNProjectApi = await this._syncProjectAPI(project.address);
-    const approveTokenRes = await this.approveToken(project.address, tokenAddress, from, amount, false, tokenDecimals);
-    if (!approveTokenRes) return { status: 'failed', error: 'Failed to approve this token' };
-
-    let res = { status: 'success', error: '' };
-    if (isBacking) {
-      res = await projContractApi.back(amount, tokenAddress, from, this._chain);
+  public async getAcceptedTokens(project?: CMNProject) {
+    console.log('====>getAcceptedTokens');
+    if (project) {
+      const projContractApi: CMNProjectApi = await this._api.getProjectApi(project.address, this._chain);
+      return projContractApi.getAcceptedTokens(); // project's acceptedTokens
     } else {
-      res = await projContractApi.curate(amount, tokenAddress, from, this._chain);
+      const pStore = await this._syncProtocolStore();
+      return pStore.acceptedTokens; // protocol's acceptedTokens
     }
-    return res;
   }
 
-  public async approveToken(
+  // handle transactions
+  private async approveToken(
     projectAddrss: string,
     tokenAddress: string,
     from: string,
@@ -208,34 +158,52 @@ export default class ProjectProtocol {
       approveBalance = new BN(MAX_VALUE); // approve all
     }
 
-    // TODO_CMN: check if exceeds allowance
-    let allowanceBN = new BN((await tokenApi.allowance(from, projectAddrss)).toString());
-    allowanceBN = allowanceBN.mul(new BN(10).pow(new BN(tokenDecimals)));
-
-    if (allowanceBN.gte(approveBalance)) {
+    const allowance = await tokenApi.allowance(from, projectAddrss);
+    const allowanceBN = new BN(allowance.toString()).mul(new BN(10).pow(new BN(tokenDecimals)));
+    if (allowanceBN.gt(new BN(0)) && allowanceBN.gte(approveBalance)) {
       return true;
     }
 
-    let transactionSuccess = false;
     const tokenContract = await attachSigner(this._chain.app.wallets, from, tokenApi);
     const approvalTx = await tokenContract.approve(
       projectAddrss,
-      approveBalance.toNumber(),
+      approveBalance.toString(),
       { gasLimit: 3000000 }
     );
     const approvalTxReceipt = await approvalTx.wait();
-    transactionSuccess = approvalTxReceipt.status === 1;
-    return transactionSuccess;
+    return approvalTxReceipt.status === 1;
   }
 
-  public async getAcceptedTokens(project?: CMNProject) {
-    if (project) {
-      const projContractApi: CMNProjectApi = await this._syncProjectAPI(project.address);
-      return projContractApi.getAcceptedTokens(); // project's acceptedTokens
+  public async createProject(params: ProjectMetaData) {
+    const transactionSuccessed = await this._api.createProject(params, this._chain);
+    return {
+      status: transactionSuccessed ? 'success' : 'failed',
+      error: transactionSuccessed ? '' : 'Failed to process createProject transaction'
+    };
+  }
+
+  public async backOrCurate(
+    amount: BN,
+    project: CMNProject,
+    isBacking: boolean,
+    from: string,
+    tokenAddress: string,
+    tokenDecimals: number
+  ) {
+    const projContractApi: CMNProjectApi = await this._api.getProjectApi(project.address, this._chain);
+    const approveTokenRes = await this.approveToken(project.address, tokenAddress, from, amount, false, tokenDecimals);
+    if (!approveTokenRes) return { status: 'failed', error: 'Failed to approve this token' };
+
+    let transactionSussessed = false;
+    if (isBacking) {
+      transactionSussessed = await projContractApi.back(amount, tokenAddress, from, this._chain);
     } else {
-      const pStore = await this._syncProtocolStore();
-      return pStore.acceptedTokens; // protocol's acceptedTokens
+      transactionSussessed = await projContractApi.curate(amount, tokenAddress, from, this._chain);
     }
+    return {
+      status: transactionSussessed ? 'success' : 'failed',
+      error: transactionSussessed ? '' : `failed to process ${isBacking ? 'back' : 'curate'} transaction`
+    };
   }
 
   public async redeemTokens(
@@ -247,21 +215,28 @@ export default class ProjectProtocol {
     tokenAddress: string,
     tokenDecimals: number
   ) {
-    const projContractApi: CMNProjectApi = await this._syncProjectAPI(project.address);
+    const projContractApi: CMNProjectApi = await this._api.getProjectApi(project.address, this._chain);
     const approveTokenRes = await this.approveToken(project.address, cwTokenAddress, from, amount, true, tokenDecimals);
     if (!approveTokenRes) return { status: 'failed', error: 'Failed to approve this token' };
-    let res = { status: 'success', error: '' };
+
+    let transactionSussessed = false;
     if (isBToken) {
-      res = await projContractApi.redeemTokens(amount, tokenAddress, true, from, this._chain);
+      transactionSussessed = await projContractApi.redeemTokens(amount, tokenAddress, true, from, this._chain);
     } else {
-      res = await projContractApi.redeemTokens(amount, tokenAddress, false, from, this._chain);
+      transactionSussessed = await projContractApi.redeemTokens(amount, tokenAddress, false, from, this._chain);
     }
-    return res;
+    return {
+      status: transactionSussessed ? 'success' : 'failed',
+      error: transactionSussessed ? '' : `failed to process reedeem${isBToken ? 'B' : 'C'}token transaction`
+    };
   }
 
   public async withdraw(project: CMNProject, from: string) {
-    const projContractApi: CMNProjectApi = await this._syncProjectAPI(project.address);
-    const res = await projContractApi.withdraw(from, this._chain);
-    return res;
+    const projContractApi: CMNProjectApi = await this._api.getProjectApi(project.address, this._chain);
+    const transactionSussessed = await projContractApi.withdraw(from, this._chain);
+    return {
+      status: transactionSussessed ? 'success' : 'failed',
+      error: transactionSussessed ? '' : 'failed to process withdraw transaction'
+    };
   }
 }

@@ -290,7 +290,8 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/ethereum/main'
     )).default;
     newChain = new Ethereum(n, app);
-  } else if (n.chain.network === ChainNetwork.NEAR || n.chain.network == ChainNetwork.NEARTestnet) {
+    initApi = true;
+  } else if (n.chain.network === ChainNetwork.NEAR || n.chain.network === ChainNetwork.NEARTestnet) {
     const Near = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "near-main" */
@@ -373,7 +374,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
     });
   }
 
-  if (app.chain && app.chain.id) {
+  if (app.chain && app.chain.id && app.chain.apiInitialized) {
     await initCMNProtocol(app.chain.id);
   }
 
