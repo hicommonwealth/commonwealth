@@ -57,7 +57,7 @@ const ViewCollectivePage: m.Component<
     }
 
     const collective_protocol = (app.chain as any).collective_protocol;
-    const mStore = collective_protocol.memberStore.getById(collective.collectiveHash);
+    const mStore = collective_protocol.memberStore.getById(collective.ipfsHash);
     const backers = mStore.backers || [];
 
     const backersContent = backers.map((backer) => m('.member', [m('.text', backer.address), m('.text', `${utils.formatEther(backer.balance)}ETH`)]));

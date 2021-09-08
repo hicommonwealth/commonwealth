@@ -698,8 +698,10 @@ Promise.all([
       '/:scope/project/:address':    importRoute('views/pages/commonwealth/projects/view', { scoped: true }),
 
       // CMN Collective
-      '/:scope/backers':                importRoute('views/pages/commonwealth/backers', { scoped: true }),
       '/:scope/collectives':            importRoute('views/pages/commonwealth/collectives', { scoped: true }),
+      '/:scope/new/collective':            importRoute('views/pages/commonwealth/collectives/create', { scoped: true }),
+      '/:scope/collective/:address':    importRoute('views/pages/commonwealth/collectives/view', { scoped: true }),
+      '/:scope/backers':                importRoute('views/pages/commonwealth/backers', { scoped: true }),
 
       // NEAR
       '/:scope/finishNearLogin':   importRoute('views/pages/finish_near_login', { scoped: true }),

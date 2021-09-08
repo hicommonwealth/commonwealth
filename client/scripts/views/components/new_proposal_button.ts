@@ -131,6 +131,13 @@ const getNewProjectMenu = () => {
         label: 'New Project'
       }),
     ],
+    m(MenuDivider),
+    [
+      m(MenuItem, {
+        onclick: (e) => m.route.set(`/${app.activeChainId()}/new/collective`),
+        label: 'New Collective'
+      }),
+    ],
   ];
 };
 

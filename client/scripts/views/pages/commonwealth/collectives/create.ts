@@ -1,15 +1,13 @@
 import m from 'mithril';
 import { Input, TextArea, Form, FormLabel, FormGroup, Button, Grid, Col } from 'construct-ui';
-import BN from 'bn.js';
-import { utils } from 'ethers';
 
 import 'pages/new_proposal_page.scss';
 
+import app from 'state';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import SelectToken from 'views/components/commonwealth/select_token';
 
-import app from 'state';
 import { placeholder } from 'sequelize/types/lib/operators';
 
 const floatRegex = /^[0-9]*\.?[0-9]*$/;
@@ -17,9 +15,8 @@ const floatRegex = /^[0-9]*\.?[0-9]*$/;
 const NewCollectiveForm = {
   form: {},
   view: (vnode) => {
-    const callback = vnode.attrs.callback;
+    const { callback, submitting } = vnode.attrs;
     const author = app.user.activeAccount;
-    const submitting = vnode.attrs.submitting;
 
     if (!author) return m('div', 'Must be logged in');
     if (!callback) return m('div', 'Must have callback');
@@ -109,15 +106,21 @@ const NewCollectiveForm = {
   }
 };
 
-const NewCollectivePage: m.Component<{}, { submitting: boolean; createError: string }> = {
+const NewCollectivePage: m.Component<{}, { submitting: boolean; createError: string; initialized: boolean }> = {
+  oncreate: (vnode) => {
+    vnode.state.initialized = false;
+  },
+  onupdate: async (vnode) => {
+    if (!vnode.state.initialized) {
+      vnode.state.initialized = true;
+      m.redraw();
+    }
+  },
   view: (vnode) => {
-    if (!app.chain) {
-      return m(PageLoading);
-    }
-    const collective_protocol = (app.chain as any).collective_protocol;
-    if (!collective_protocol || !collective_protocol.initialized) {
-      return m(PageLoading);
-    }
+    if (!vnode.state.initialized) return m(PageLoading);
+    // if (!app.chain) {
+    //   return m(PageLoading);
+    // }
 
     return m(
       Sublayout,
