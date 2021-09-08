@@ -5,6 +5,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const common = require('./webpack.common.js');
 const CompressionPlugin = require('compression-webpack-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+const CompressionPlugin = require('compression-webpack-plugin');
 
 module.exports = merge(common, {
   entry: {
@@ -28,7 +29,12 @@ module.exports = merge(common, {
     new MiniCssExtractPlugin({
       filename: 'bundle.[chunkhash:8].css'
     }),
-    new CompressionPlugin(),
+    new CompressionPlugin({
+      algorithm: 'gzip',
+      test: /\.js$|\.css$/,
+      threshold: 10240,
+      // minRatio: 0
+    }),
     new BundleAnalyzerPlugin({
       analyzerMode: 'disabled',
       generateStatsFile: true,
