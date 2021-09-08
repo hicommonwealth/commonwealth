@@ -11,7 +11,7 @@ import fs from 'fs';
 import passport from 'passport';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
-import compression from 'compression';
+// import compression from 'compression';
 import webpackHotMiddleware from 'webpack-hot-middleware';
 import { redirectToHTTPS } from 'express-http-to-https';
 import favicon from 'serve-favicon';
@@ -213,7 +213,24 @@ async function main() {
       /127.0.0.1:(\d{4})/
     ], [], 301));
 
-    app.use(compression());
+    // dynamic compression settings unused
+    // app.use(compression());
+
+    // static compression settings used
+    app.get('*.js', (req, res, next) => {
+      req.url = req.url + '.gz';
+      res.set('Content-Encoding', 'gzip');
+      res.set('Content-Type', 'application/javascript; charset=UTF-8');
+      next();
+    });
+
+    // static compression settings used
+    app.get('bundle.**.css', (req, res, next) => {
+      req.url = req.url + '.gz';
+      res.set('Content-Encoding', 'gzip');
+      res.set('Content-Type', 'text/css');
+      next();
+    });
 
     // serve the compiled app
     if (!NO_CLIENT_SERVER) {

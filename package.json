@@ -120,7 +120,6 @@
     "chart.js": "^2.8.0",
     "cheerio": "1.0.0-rc.3",
     "clipboard-polyfill": "^2.8.6",
-    "compression": "^1.7.4",
     "compression-webpack-plugin": "6.1.1",
     "connect-session-sequelize": "^7.1.1",
     "construct-ui": "^0.3.0",
