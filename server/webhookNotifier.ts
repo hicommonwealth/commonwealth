@@ -298,7 +298,7 @@ const send = async (models, content: WebhookContent) => {
             'resize_keyboard': true,
             'inline_keyboard': [
               [
-                { 'text': 'Read more on commonwealth', 'url': 'https://commonwealth.im' }
+                { 'text': 'Read more on commonwealth', 'url': actedOnLink }
               ]
             ]
           }
