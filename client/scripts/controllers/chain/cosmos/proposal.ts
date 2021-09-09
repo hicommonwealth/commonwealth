@@ -15,7 +15,8 @@ import {
 } from 'controllers/chain/cosmos/types';
 import { ProposalStore } from 'stores';
 import moment from 'moment';
-import { CosmosAccount, CosmosAccounts } from './account';
+import CosmosAccount from './account';
+import CosmosAccounts from './accounts';
 import CosmosChain, { CosmosApiType } from './chain';
 import CosmosGovernance, { marshalTally } from './governance';
 

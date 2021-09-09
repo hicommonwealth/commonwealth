@@ -1,7 +1,6 @@
 import BN from 'bn.js';
 import { Coin } from 'adapters/currency';
 import { IIdentifiable, ICompletable } from 'adapters/shared';
-import { coin } from '@cosmjs/amino';
 
 export class CosmosToken extends Coin {
   constructor(denom: string, n: number | string | BN, inDollars: boolean = false) {
@@ -19,7 +18,10 @@ export class CosmosToken extends Coin {
   }
 
   public toCoinObject() {
-    return coin(this.toNumber(), this.denom);
+    return {
+      denom: this.denom,
+      amount: this.toNumber(),
+    };
   }
 }
 
@@ -31,6 +33,15 @@ export interface ICosmosProposalTally {
   abstain: BN;
   no: BN;
   noWithVeto: BN;
+}
+
+// TODO: note that these vote number values are in terms of _stake_
+export interface ICosmosProposalState extends ICompletable {
+  status: CosmosProposalState;
+  depositors: Array<[ string, BN ]>;
+  totalDeposit: BN;
+  voters: Array<[ string, CosmosVoteChoice ]>;
+  tally: ICosmosProposalTally;
 }
 
 export interface ICosmosProposal extends IIdentifiable {
@@ -45,13 +56,4 @@ export interface ICosmosProposal extends IIdentifiable {
 
   // partially populated initial state update -- no depositors or voters
   state: ICosmosProposalState;
-}
-
-// TODO: note that these vote number values are in terms of _stake_
-export interface ICosmosProposalState extends ICompletable {
-  status: CosmosProposalState;
-  depositors: Array<[ string, BN ]>;
-  totalDeposit: BN;
-  voters: Array<[ string, CosmosVoteChoice ]>;
-  tally: ICosmosProposalTally;
 }

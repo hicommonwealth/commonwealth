@@ -15,7 +15,8 @@ import {
 import {
   ICosmosProposal, CosmosToken, ICosmosProposalTally, CosmosProposalType, CosmosProposalState
 } from 'controllers/chain/cosmos/types';
-import { CosmosAccount, CosmosAccounts } from './account';
+import CosmosAccount from './account';
+import CosmosAccounts from './accounts';
 import CosmosChain, { CosmosApiType } from './chain';
 import { CosmosProposal } from './proposal';
 

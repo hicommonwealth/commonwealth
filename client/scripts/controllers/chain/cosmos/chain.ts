@@ -30,7 +30,7 @@ import {
 } from '@cosmjs/launchpad';
 import { isBroadcastTxSuccess, isBroadcastTxFailure } from '@cosmjs/stargate';
 import { EncodeObject } from '@cosmjs/proto-signing';
-import { CosmosAccount } from './account';
+import CosmosAccount from './account';
 import KeplrWebWalletController from '../../app/webWallets/keplr_web_wallet';
 import TerraStationWebWalletController from '../../app/webWallets/terra_station_web_wallet';
 

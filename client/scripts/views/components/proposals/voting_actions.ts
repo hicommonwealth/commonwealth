@@ -6,7 +6,7 @@ import { hexToUtf8 } from 'web3-utils';
 import { Button, Input } from 'construct-ui';
 
 import app from 'state';
-import { CosmosAccount } from 'controllers/chain/cosmos/account';
+import CosmosAccount from 'controllers/chain/cosmos/account';
 import { CosmosVote, CosmosProposal } from 'controllers/chain/cosmos/proposal';
 import { ProposalStatus, BinaryVote, DepositVote, VotingType, AnyProposal } from 'models';
 import { SubstrateDemocracyReferendum, convictionToWeight } from 'controllers/chain/substrate/democracy_referendum';
