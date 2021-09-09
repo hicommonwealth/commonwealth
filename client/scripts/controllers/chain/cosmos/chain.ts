@@ -12,6 +12,7 @@ import { ApiStatus, IApp } from 'state';
 import moment from 'moment';
 import { BlocktimeHelper } from 'helpers';
 import BN from 'bn.js';
+import { Subscription } from 'xstream';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
 
 import {
@@ -95,7 +96,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
 
     console.log(`Starting REST API at ${this._url}...`);
 
-    console.log('cosmjs api');
+    console.log('tmClient.connect!');
     // TODO: configure broadcast mode
     this._tmClient = await Tendermint34Client.connect(this._url);
     this._api = QueryClient.withExtensions(
@@ -107,6 +108,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     if (this.app.chain.networkStatus === ApiStatus.Disconnected) {
       this.app.chain.networkStatus = ApiStatus.Connecting;
     }
+    console.log('tmClient.status!');
     const { nodeInfo } = await this._tmClient.status();
     this._chainId = nodeInfo.network;
     console.log(`chain id: ${this._chainId}`);
@@ -114,21 +116,25 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
 
     // Poll for new block immediately and then every 2s
     const fetchBlockJob = async () => {
+      console.log('tmClient.block!');
       const { block } = await this._tmClient.block();
+      console.log(block);
       const height = +block.header.height;
       if (height > this.app.chain.block.height) {
-        // TODO: correct this time
-        const time = moment(block.header.time.toTimeString());
-        this._blocktimeHelper.stamp(moment(time));
+        const time = moment.unix(block.header.time.valueOf() / 1000);
+        this._blocktimeHelper.stamp(time);
         this.app.chain.block.height = height;
         m.redraw();
       }
     };
     await fetchBlockJob();
-    this._blockSubscription = setInterval(fetchBlockJob, 2000);
+    // TODO: reenable this
+    // this._blockSubscription = setInterval(fetchBlockJob, 2000);
 
+    console.log('api.staking.pool!');
     const { pool: { bondedTokens } } = await this._api.staking.pool();
     this._staked = this.coins(new BN(bondedTokens));
+    console.log('api.staking.params!');
     const { params: { bondDenom } } = await this._api.staking.params();
     this._denom = bondDenom;
     m.redraw();
