@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
 import { DynamicTemplate } from '../../shared/types';
+import AddressSwapper from '../util/addressSwapper';
+
 const sgMail = require('@sendgrid/mail');
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -35,8 +37,12 @@ const verifyAddress = async (models: DB, req: Request, res: Response, next: Next
     return next(new Error(Errors.InvalidChain));
   }
 
+  const encodedAddress = chain.base === 'substrate'
+    ? AddressSwapper({ address: req.body.address, currentPrefix: chain.ss58_prefix })
+    : req.body.address;
+
   const existingAddress = await models.Address.scope('withPrivateData').findOne({
-    where: { chain: req.body.chain, address: req.body.address }
+    where: { chain: req.body.chain, address: encodedAddress }
   });
   if (!existingAddress) {
     return next(new Error(Errors.AddressNF));
@@ -91,7 +97,7 @@ const verifyAddress = async (models: DB, req: Request, res: Response, next: Next
     } else {
       // if user isn't logged in, log them in now
       const newAddress = await models.Address.findOne({
-        where: { chain: req.body.chain, address: req.body.address },
+        where: { chain: req.body.chain, address: encodedAddress },
       });
       const user = await models.User.scope('withPrivateData').findOne({
         where: { id: newAddress.user_id },

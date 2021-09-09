@@ -18,22 +18,21 @@ const ProfileProposal : m.Component< { proposal: OffchainThread }, { revealThrea
 
     return m('.ProfileProposal', [
       m('.summary', [
-        m(User, { user: new AddressInfo(null, author, proposal.authorChain, null), linkify: true, hideAvatar: true }),
-        proposal.kind === OffchainThreadKind.Question ? ' added a question'
-          : proposal.kind === OffchainThreadKind.Request ? ' added a task'
-            : [
-              ' created a new ',
-              link(
-                'a', `/${chain || community}/proposal/${slug}/${identifier}-${slugify(title)}`, 'thread', {},
-                `profile-${author}-${proposal.authorChain}-${proposal.chain}-scrollY`
-              ),
-              ' in',
-              link('a', `/${chain || community}`, ` ${chain || community}`),
-            ],
-        createdAt && [
-          m.trust(' &middot; '),
-          createdAt.fromNow(),
-        ],
+        m('', [
+          proposal.kind === OffchainThreadKind.Question ? 'Added a question'
+            : proposal.kind === OffchainThreadKind.Request ? 'added a task'
+              : [
+                'Created a new ',
+                link(
+                  'a.link-normal',
+                  `/${chain || community}/proposal/${slug}/${identifier}-${slugify(title)}`, 'thread', {},
+                  `profile-${author}-${proposal.authorChain}-${proposal.chain}-scrollY`
+                ),
+                ' in',
+                link('a.link-bold', `/${chain || community}`, ` ${chain || community}`),
+              ],
+        ]),
+        createdAt && createdAt.fromNow(),
       ]),
       m('.activity.proposal', [
         proposal.kind === OffchainThreadKind.Forum || proposal.kind === OffchainThreadKind.Link

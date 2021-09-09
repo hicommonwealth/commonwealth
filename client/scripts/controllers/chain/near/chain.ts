@@ -1,13 +1,14 @@
+import { Near as NearApi, connect as nearConnect, WalletAccount } from 'near-api-js';
+import { FunctionCallOptions } from 'near-api-js/lib/account';
+import { NodeStatusResult } from 'near-api-js/lib/providers/provider';
+import { uuidv4 } from 'lib/util';
 import { IChainModule, ITXModalData, NodeInfo } from 'models';
 import { NearToken } from 'adapters/chain/near/types';
 import BN from 'bn.js';
 import { ApiStatus, IApp } from 'state';
-import { Near as NearApi, connect as nearConnect } from 'nearlib/lib/near';
-import { BrowserLocalStorageKeyStore } from 'nearlib/lib/key_stores';
 import moment from 'moment';
 import * as m from 'mithril';
-import { NodeStatusResult } from 'nearlib/lib/providers/provider';
-import { NearAccount } from './account';
+import { NearAccounts, NearAccount } from './account';
 
 class NearChain implements IChainModule<NearToken, NearAccount> {
   private _api: NearApi;
@@ -32,6 +33,11 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
     return this._nodeStatus;
   }
 
+  private _networkId = 'testnet';
+  public get isMainnet() {
+    return this._networkId === 'mainnet';
+  }
+
   private _app: IApp;
   public get app() { return this._app; }
 
@@ -39,14 +45,15 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
     this._app = app;
   }
 
-  public async init(node: NodeInfo, reset = false) {
+  public async init(node: NodeInfo, accounts: NearAccounts, reset = false) {
+    const networkSuffix = node.chain.id.split('.').pop();
+    this._networkId = node.chain.id === 'near-testnet' || networkSuffix === 'testnet'
+      ? 'testnet' : 'mainnet';
     this._config = {
-      networkId: node.chain.id === 'near-local' ? 'local' : 'default',
+      networkId: this.isMainnet ? 'mainnet' : 'testnet',
       nodeUrl: node.url,
-      walletUrl: 'https://wallet.nearprotocol.com', // TODO: alternatives?
-      deps: {
-        keyStore: new BrowserLocalStorageKeyStore(),
-      },
+      walletUrl: this.isMainnet ? 'https://wallet.near.org/' : 'https://wallet.testnet.near.org/',
+      keyStore: accounts.keyStore,
     };
 
     this._api = await nearConnect(this.config);
@@ -87,6 +94,80 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
     };
     await syncFn();
     this._syncHandle = setInterval(syncFn, 2000);
+  }
+
+  public async createDaoTx(creator: NearAccount, name: string, purpose: string, value: BN) {
+    const contractId = this.isMainnet ? 'sputnik2.near' : 'sputnikv2.testnet';
+    const methodName = 'create';
+    const pk = this.isMainnet
+      ? '2gtDEwdLuUBawzFLAnCS9gUso3Ph76bRzMpVrtb66f3J'
+      : 'G8JpvUhKqfr89puEKgbBqUxQzCMfJfPSRvKw4EJoiZpZ';
+
+    const argsList = {
+      config: {
+        name,
+        purpose,
+        metadata: '',
+      },
+      // TODO: add far more configuration for initial policy
+      // initial council
+      policy: [ creator.address ],
+    };
+    const yoktoNear = new BN('1000000000000000000000000');
+    const attachedDeposit = value.mul(yoktoNear).toString();
+    const args = Buffer.from(JSON.stringify(argsList)).toString('base64');
+    const propArgs = {
+      name,
+      public_key: pk,
+      args,
+    };
+
+    // redirect back to /finishNearLogin for chain node creation
+    const id = this.isMainnet ? `${name}.sputnik-dao.near` : `${name}.sputnikv2.testnet`;
+    const redirectUrl = `${window.location.origin}/${this.app.activeChainId()}/finishNearLogin?chain_name=${id}`;
+    await this.redirectTx(contractId, methodName, propArgs, attachedDeposit, redirectUrl, '150000000000000');
+  }
+
+  public async redirectTx(
+    contractId: string,
+    methodName: string,
+    args: any,
+    attachedDeposit?: string,
+    postTxRedirect?: string,
+    gas?: string,
+  ) {
+    // construct tx object
+    const functionCall: any = {
+      contractId,
+      methodName,
+      args,
+    };
+    if (attachedDeposit) {
+      functionCall.attachedDeposit = attachedDeposit;
+    }
+    if (postTxRedirect) {
+      functionCall.walletCallbackUrl = postTxRedirect;
+    }
+    if (gas) {
+      functionCall.gas = gas;
+    }
+
+    // generate random identifier as localStorage key
+    const uuid = uuidv4();
+    localStorage[uuid] = JSON.stringify(functionCall);
+
+    // redirect to generate access key for dao contract
+    const redirectUrl = `${window.location.origin}/${this.app.activeChainId()}/finishNearLogin`;
+    const successUrl = `${redirectUrl}?saved_tx=${uuid}`;
+    const failureUrl = `${redirectUrl}?tx_failure=${uuid}`;
+
+    const wallet = new WalletAccount(this.api, 'commonwealth_near');
+    await wallet.requestSignIn({
+      contractId,
+      methodNames: [methodName],
+      successUrl,
+      failureUrl
+    });
   }
 
   public async deinit(): Promise<void> {

@@ -108,6 +108,8 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
       return { id, name, featuredInSidebar };
     }).filter((t) => t.featuredInSidebar).sort((a, b) => a.name.localeCompare(b.name));
 
+    const discussionsLabel = (['vesuvius', 'olympus'].includes(app.activeId())) ? 'Forums' : 'Discussions';
+
     return m('.OffchainNavigationModule.SidebarModule', [
       // m('.section-header', 'Discuss'),
       m(Button, {
@@ -115,7 +117,7 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
         fluid: true,
         active: onDiscussionsPage(m.route.get())
           && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
-        label: 'Discussions',
+        label: discussionsLabel,
         onclick: (e) => {
           e.preventDefault();
           navigateToSubpage('/');
@@ -186,6 +188,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
 
     const hasProposals = app.chain && !app.community && (
       app.chain.base === ChainBase.CosmosSDK
+        || app.chain?.network === ChainNetwork.Sputnik
         || (app.chain.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Plasm)
         || MolochTypes.EventChains.find((c) => c === app.chain.network)
         || CompoundTypes.EventChains.find((c) => c === app.chain.network)
@@ -245,6 +248,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
       // proposals (substrate, cosmos, moloch & compound only)
       !app.community && ((app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Darwinia)
                          || app.chain?.base === ChainBase.CosmosSDK
+                         || app.chain?.network === ChainNetwork.Sputnik
                          || MolochTypes.EventChains.find((c) => c === app.chain.network)
                          || CompoundTypes.EventChains.find((c) => c === app.chain.network)
                          || AaveTypes.EventChains.find((c) => c === app.chain.network))
@@ -608,14 +612,14 @@ const Sidebar: m.Component<{ hideQuickSwitcher? }, {}> = {
         m('br'),
         app.isLoggedIn() && (app.chain || app.community) && m(SubscriptionButton),
         app.chain && m(ChainStatusModule),
+        app.isCustomDomain()
+        && m('a', {
+          class: 'PoweredBy',
+          onclick: (e) => {
+            window.open('https://commonwealth.im/');
+          },
+        }),
       ]),
-      app.isCustomDomain()
-      && m('a', {
-        class: 'PoweredBy',
-        onclick: (e) => {
-          window.open('https://commonwealth.im/');
-        },
-      }),
     ];
   },
 };
