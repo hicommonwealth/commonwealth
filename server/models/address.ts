@@ -10,9 +10,8 @@ import Keyring, { decodeAddress } from '@polkadot/keyring';
 import { stringToU8a, hexToU8a } from '@polkadot/util';
 import { KeypairType } from '@polkadot/util-crypto/types';
 
-import { serializeSignDoc, decodeSignature } from '@cosmjs/launchpad';
 import { Secp256k1, Secp256k1Signature, Sha256 } from '@cosmjs/crypto';
-import { AminoSignResponse, pubkeyToAddress } from '@cosmjs/amino';
+import { AminoSignResponse, pubkeyToAddress, serializeSignDoc, decodeSignature } from '@cosmjs/amino';
 
 import nacl from 'tweetnacl';
 import { KeyringOptions } from '@polkadot/keyring/types';
@@ -54,6 +53,7 @@ export interface AddressAttributes {
   Roles?: RoleAttributes[];
 }
 
+// eslint-disable-next-line no-use-before-define
 export interface AddressInstance extends Model<AddressAttributes>, AddressCreationAttributes {
   // no mixins used yet
   getChain: Sequelize.BelongsToGetAssociationMixin<ChainInstance>;
@@ -298,7 +298,6 @@ export default (
           // ensure correct document was signed
           if (serializeSignDoc(signed).toString() === serializeSignDoc(generatedSignDoc).toString()) {
             // ensure valid signature
-            // see the last test in @cosmjs/launchpad/src/secp256k1wallet.spec.ts for reference
             const { pubkey, signature } = decodeSignature(stdSignature);
             const secpSignature = Secp256k1Signature.fromFixedLength(signature);
             const messageHash = new Sha256(serializeSignDoc(generatedSignDoc)).digest();

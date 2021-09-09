@@ -1,5 +1,9 @@
 import BN from 'bn.js';
-import { GovDepositsResponse, GovTallyResponse, GovVotesResponse } from '@cosmjs/launchpad';
+import {
+  QueryDepositsResponse,
+  QueryVotesResponse,
+  QueryTallyResultResponse
+} from 'cosmjs-types/cosmos/gov/v1beta1/query';
 import {
   Proposal,
   ITXModalData,
@@ -121,7 +125,7 @@ export class CosmosProposal extends Proposal<
   private async _initState() {
     const api = this._Chain.api;
     const [depositResp, voteResp, tallyResp]: [
-      GovDepositsResponse, GovVotesResponse, GovTallyResponse
+      QueryDepositsResponse, QueryVotesResponse, QueryTallyResultResponse
     ] = await Promise.all([
       api.gov.deposits(this.data.identifier),
       this.status === 'DepositPeriod'
@@ -141,15 +145,15 @@ export class CosmosProposal extends Proposal<
       voters: [],
       tally: null,
     };
-    if (depositResp?.result) {
-      for (const deposit of depositResp.result) {
+    if (depositResp?.deposits) {
+      for (const deposit of depositResp?.deposits) {
         if (deposit.amount && deposit.amount[0]) {
           state.depositors.push([ deposit.depositor, new BN(deposit.amount[0].amount) ]);
         }
       }
     }
     if (voteResp) {
-      for (const voter of voteResp.result) {
+      for (const voter of voteResp.votes) {
         const vote = voteToEnum(voter.option);
         if (vote) {
           state.voters.push([ voter.voter, vote ]);
@@ -158,8 +162,8 @@ export class CosmosProposal extends Proposal<
         }
       }
     }
-    if (tallyResp?.result) {
-      state.tally = marshalTally(tallyResp.result);
+    if (tallyResp?.tally) {
+      state.tally = marshalTally(tallyResp?.tally);
     }
   }
 
@@ -275,7 +279,7 @@ export class CosmosProposal extends Proposal<
       return;
     }
     this._completedVotesFetched = true;
-    let voteResp: GovVotesResponse;
+    let voteResp: QueryVotesResponse;
     try {
       voteResp = await this._Chain.api.gov.votes(this.identifier);
     } catch (e) {
@@ -283,7 +287,7 @@ export class CosmosProposal extends Proposal<
       return;
     }
     if (voteResp) {
-      for (const voter of voteResp.result) {
+      for (const voter of voteResp.votes) {
         const vote = voteToEnum(voter.option);
         if (vote) {
           this.addOrUpdateVote(new CosmosVote(this._Accounts.fromAddress(voter.voter), vote));

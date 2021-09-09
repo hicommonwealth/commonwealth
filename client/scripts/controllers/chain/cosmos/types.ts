@@ -1,4 +1,5 @@
 import BN from 'bn.js';
+import moment from 'moment';
 import { Coin } from 'adapters/currency';
 import { IIdentifiable, ICompletable } from 'adapters/shared';
 
@@ -20,14 +21,14 @@ export class CosmosToken extends Coin {
   public toCoinObject() {
     return {
       denom: this.denom,
-      amount: this.toNumber(),
+      amount: this.toString(),
     };
   }
 }
 
 export type CosmosProposalType = 'text' | 'upgrade' | 'parameter';
 export type CosmosVoteChoice = 'Yes' | 'No' | 'NoWithVeto' | 'Abstain';
-export type CosmosProposalState = 'DepositPeriod' | 'VotingPeriod' | 'Passed' | 'Rejected';
+export type CosmosProposalState = 'DepositPeriod' | 'VotingPeriod' | 'Passed' | 'Rejected' | 'Failed';
 export interface ICosmosProposalTally {
   yes: BN;
   abstain: BN;
@@ -49,10 +50,10 @@ export interface ICosmosProposal extends IIdentifiable {
   title: string;
   description: string;
   proposer: string;
-  submitTime: string; // TODO: moment?
-  depositEndTime: string;
-  votingStartTime: string; // TODO: moment
-  votingEndTime: string;
+  submitTime: moment.Moment;
+  depositEndTime: moment.Moment;
+  votingStartTime: moment.Moment;
+  votingEndTime: moment.Moment;
 
   // partially populated initial state update -- no depositors or voters
   state: ICosmosProposalState;

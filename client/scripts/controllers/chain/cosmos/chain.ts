@@ -16,19 +16,17 @@ import { CosmosToken } from 'controllers/chain/cosmos/types';
 
 import {
   StdFee,
-  AuthExtension,
-  GovExtension,
-  LcdClient,
-  setupAuthExtension,
-  setupGovExtension,
-  setupStakingExtension,
-  setupBankExtension,
-  setupSupplyExtension,
-  BankExtension,
-  SupplyExtension,
+  isBroadcastTxSuccess,
+  isBroadcastTxFailure,
+  QueryClient,
   StakingExtension,
-} from '@cosmjs/launchpad';
-import { isBroadcastTxSuccess, isBroadcastTxFailure } from '@cosmjs/stargate';
+  setupStakingExtension,
+  GovExtension,
+  setupGovExtension,
+  BankExtension,
+  setupBankExtension,
+} from '@cosmjs/stargate';
+import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import { EncodeObject } from '@cosmjs/proto-signing';
 import CosmosAccount from './account';
 import KeplrWebWalletController from '../../app/webWallets/keplr_web_wallet';
@@ -43,12 +41,10 @@ export interface ICosmosTXData extends ITXData {
   gas: number;
 }
 
-export type CosmosApiType = LcdClient
+export type CosmosApiType = QueryClient
   & StakingExtension
-  & AuthExtension
   & GovExtension
-  & BankExtension
-  & SupplyExtension;
+  & BankExtension;
 
 class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
   private _url: string;
@@ -88,6 +84,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
   }
 
   private _blocktimeHelper: BlocktimeHelper = new BlocktimeHelper();
+  private _tmClient: Tendermint34Client;
   public async init(node: NodeInfo, reset = false) {
     // A note on REST RPC: gaiacli exposes a command line option "rest-server" which
     // creates the endpoint necessary. However, it doesn't send headers correctly
@@ -100,28 +97,28 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
 
     console.log('cosmjs api');
     // TODO: configure broadcast mode
-    this._api = LcdClient.withExtensions(
-      { apiUrl: this._url },
-      setupAuthExtension,
+    this._tmClient = await Tendermint34Client.connect(this._url);
+    this._api = QueryClient.withExtensions(
+      this._tmClient,
       setupGovExtension,
       setupStakingExtension,
       setupBankExtension,
-      setupSupplyExtension,
     );
     if (this.app.chain.networkStatus === ApiStatus.Disconnected) {
       this.app.chain.networkStatus = ApiStatus.Connecting;
     }
-    const nodeInfo = await this._api.nodeInfo();
-    this._chainId = nodeInfo.node_info.network;
+    const { nodeInfo } = await this._tmClient.status();
+    this._chainId = nodeInfo.network;
     console.log(`chain id: ${this._chainId}`);
     this.app.chain.networkStatus = ApiStatus.Connected;
 
     // Poll for new block immediately and then every 2s
     const fetchBlockJob = async () => {
-      const block = await this._api.blocksLatest();
-      const height = +block.block.header.height;
+      const { block } = await this._tmClient.block();
+      const height = +block.header.height;
       if (height > this.app.chain.block.height) {
-        const time = moment(block.block.header.time);
+        // TODO: correct this time
+        const time = moment(block.header.time.toTimeString());
         this._blocktimeHelper.stamp(moment(time));
         this.app.chain.block.height = height;
         m.redraw();
@@ -130,10 +127,10 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     await fetchBlockJob();
     this._blockSubscription = setInterval(fetchBlockJob, 2000);
 
-    const { result: { bonded_tokens } } = await this._api.staking.pool();
-    this._staked = this.coins(new BN(bonded_tokens));
-    const { result: { bond_denom } } = await this._api.staking.parameters();
-    this._denom = bond_denom;
+    const { pool: { bondedTokens } } = await this._api.staking.pool();
+    this._staked = this.coins(new BN(bondedTokens));
+    const { params: { bondDenom } } = await this._api.staking.params();
+    this._denom = bondDenom;
     m.redraw();
   }
 
