@@ -151,7 +151,7 @@ function setupRouter(
     next();
   });
 
-  router.post('/updateAddress', updateAddress.bind(this, models));
+  router.post('/updateAddress', passport.authenticate('jwt', { session: false }), updateAddress.bind(this, models));
   router.get('/domain', domain.bind(this, models));
   router.get('/status', status.bind(this, models));
 

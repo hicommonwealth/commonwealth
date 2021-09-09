@@ -8,6 +8,7 @@ import { ITXModalData } from './interfaces';
 import { ChainBase } from './types';
 import ChainInfo from './ChainInfo';
 import Profile from './Profile';
+import {AddressInfo} from "models/index";
 
 abstract class Account<C extends Coin> {
   public readonly serverUrl : string;
@@ -110,8 +111,14 @@ abstract class Account<C extends Coin> {
       const result = await $.post(`${this.app.serverUrl()}/verifyAddress`, params);
       if (result.status === 'Success') {
         // update address for discount user
-        await $.post(`${this.app.serverUrl()}/updateAddress`, params);
-        console.log(`Verified address ${this.address}!`);
+        const { success, ghostAddressId } = await $.post(`${this.app.serverUrl()}/updateAddress`, params);
+        if (success && ghostAddressId) {
+          // remove ghost address from addresses
+          app.user.setAddresses(app.user.addresses.filter(({ ghostAddress }) => {
+            return !ghostAddress
+          }));
+          app.user.setActiveAccounts([]);
+        }
       }
     } else {
       throw new Error('signature or key required for validation');
