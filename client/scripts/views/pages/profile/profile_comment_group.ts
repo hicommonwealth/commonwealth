@@ -27,28 +27,21 @@ const ProfileCommentGroup : m.Component<IProfileCommentGroupAttrs> = {
 
     return m('.ProfileCommentGroup', [
       m('.summary', [
-        m(User, {
-          user: new AddressInfo(null, account.address, account.chain, null),
-          linkify: true,
-          hideAvatar: true,
-          popover: true
-        }),
-        ' commented',
-        (proposal.chain || proposal.community) && [
-          ' on a ',
-          link(
-            'a', `/${proposal.chain || proposal.community}/proposal/${slug}/${identifier}`,
-            ((proposal instanceof OffchainThread) ? 'thread' : 'proposal'), {},
-            `profile-${account.address}-${account.chain}-${proposal.chain}-scrollY`
-          ),
-          ' in ',
-          link('a', `/${proposal.chain || proposal.community}`,
-            ` ${ proposal.chain || proposal.community }`),
-        ],
-        comments[0] && comments[0].createdAt && [
-          m.trust(' &middot; '),
-          m('span', comments[0].createdAt.fromNow()),
-        ]
+        m('.summary-group', [
+          'Commented',
+          (proposal.chain || proposal.community) && [
+            ' on a ',
+            link(
+              'a.link-normal', `/${proposal.chain || proposal.community}/proposal/${slug}/${identifier}`,
+              ((proposal instanceof OffchainThread) ? 'thread' : 'proposal'), {},
+              `profile-${account.address}-${account.chain}-${proposal.chain}-scrollY`
+            ),
+            ' in ',
+            link('a.link-bold', `/${proposal.chain || proposal.community}`,
+              ` ${proposal.chain || proposal.community}`),
+          ],
+        ]),
+        comments[0] && comments[0].createdAt && m('span', comments[0].createdAt.fromNow()),
       ]),
       m('.activity', [
         comments.map((comment) => m('.proposal-comment', [

@@ -90,10 +90,14 @@ export const Layout: m.Component<{
     } else if (!scope && ((app.chain && app.chain.network) || app.community)) {
       // Handle the case where we unload the network or community, if we're
       // going to a page that doesn't have one
-      deinitChainOrCommunity().then(() => {
-        vnode.state.loadingScope = null;
-        m.redraw();
-      });
+      // Include this in if for isCustomDomain, scope gets unset on redirect
+      // We don't need this to happen
+      if (!app.isCustomDomain()) {
+        deinitChainOrCommunity().then(() => {
+          vnode.state.loadingScope = null;
+          m.redraw();
+        });
+      }
       return m(LoadingLayout, { hideSidebar });
     }
     return m('.Layout.mithril-app', {

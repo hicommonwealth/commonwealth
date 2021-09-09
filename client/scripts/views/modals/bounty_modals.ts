@@ -59,7 +59,7 @@ export const ApproveBountyModal: m.Component<{ bountyId: number }, { approvals: 
             }, 0);
           },
           label: 'Go to send transaction',
-	}),
+        }),
       ]),
     ]);
   }
@@ -135,7 +135,7 @@ export const ProposeCuratorModal: m.Component<{ bountyId: number }, {
             }, 0);
           },
           label: 'Go to send transaction',
-	}),
+        }),
       ]),
     ]);
   }
@@ -186,7 +186,7 @@ export const AwardBountyModal: m.Component<{ bountyId: number }, { approvals: nu
             }, 0);
           },
           label: 'Go to send transaction',
-	}),
+        }),
       ]),
     ]);
   }
@@ -232,7 +232,7 @@ export const ExtendExpiryModal: m.Component<{ bountyId: number }, { approvals: n
             }, 0);
           },
           label: 'Go to send transaction',
-	}),
+        }),
       ]),
     ]);
   }

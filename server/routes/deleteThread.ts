@@ -58,7 +58,7 @@ const deleteThread = async (models: DB, req: Request, res: Response, next: NextF
 
     const isAdminOrMod = userRole?.permission === 'admin' || userRole?.permission === 'moderator';
 
-    if (!myThread && !isAdminOrMod) {
+    if (!myThread && (!isAdminOrMod && !req.user.isAdmin)) {
       return next(new Error(DeleteThreadErrors.NoPermission));
     }
 

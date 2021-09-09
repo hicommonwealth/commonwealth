@@ -1,15 +1,15 @@
 import 'mobile/mobile_header.scss';
 
 import m from 'mithril';
-import $ from 'jquery';
 import { Button, PopoverMenu, Icon, Icons } from 'construct-ui';
 
-import app, { LoginState } from 'state';
+import app from 'state';
 
 import NotificationsMenu from 'views/components/header/notifications_menu';
 import { SearchBar } from 'views/components/search_bar';
 import MobileSidebar from './mobile_sidebar';
 import { CustomHamburgerIcon } from './mobile_icons';
+import InvitesMenu from '../components/header/invites_menu';
 
 const MobileHeader: m.Component<{}, { sidebarOpen: boolean }> = {
   view: (vnode) => {
@@ -23,6 +23,7 @@ const MobileHeader: m.Component<{}, { sidebarOpen: boolean }> = {
       m(SearchBar),
       m('.mobile-header-right', [
         app.isLoggedIn() && m(NotificationsMenu, { small: false }),
+        app.isLoggedIn() && m(InvitesMenu),
         m(PopoverMenu, {
           class: 'MobileHeaderPopoverMenu',
           transitionDuration: 0,

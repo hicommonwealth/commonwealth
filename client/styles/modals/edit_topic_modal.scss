@@ -1,5 +1,9 @@
 @import 'client/styles/shared';
 
 .EditTopicModal {
-    max-width: 480px;
+    max-width: 680px;
+    .error-message {
+        @include error-text();
+        margin-top: 20px;
+    }
 }

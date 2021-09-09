@@ -1479,17 +1479,10 @@
         "Context"
       ]
     },
-<<<<<<< HEAD
-    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/compound/GovernorAlpha.sol": {
-      "lastModificationDate": 1622827417915,
-      "contentHash": "75ebd248a23b28d6dd6c2cda9c82d597",
-      "sourceName": "contracts/compound/GovernorAlpha.sol",
-=======
     "/Users/dillchen/Coding/hicommonwealth/commonwealth/shared/eth/contracts/AAVE/dependencies/open-zeppelin/Ownable.sol": {
       "lastModificationDate": 1630034887902,
       "contentHash": "a2d8c1d60675d28ea83f831f63b833df",
       "sourceName": "contracts/AAVE/dependencies/open-zeppelin/Ownable.sol",
->>>>>>> master
       "solcConfig": {
         "version": "0.7.5",
         "settings": {
@@ -1523,17 +1516,10 @@
         "Ownable"
       ]
     },
-<<<<<<< HEAD
-    "/home/jnaviask/cw/commonwealth/shared/eth/contracts/compound/MPond.sol": {
-      "lastModificationDate": 1622827417915,
-      "contentHash": "db91352c0ae4a34c862bfd8fc859f51e",
-      "sourceName": "contracts/compound/MPond.sol",
-=======
     "/Users/dillchen/Coding/hicommonwealth/commonwealth/shared/eth/contracts/AAVE/governance/AaveGovernanceV2.sol": {
       "lastModificationDate": 1630034887904,
       "contentHash": "6cabe48985f64873b49e69c76e39bf6b",
       "sourceName": "contracts/AAVE/governance/AaveGovernanceV2.sol",
->>>>>>> master
       "solcConfig": {
         "version": "0.7.5",
         "settings": {

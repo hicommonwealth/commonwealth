@@ -50,7 +50,7 @@ const updateThreadLinkedChainEntities = async (models: DB, req: Request, res: Re
 
   // add any chain entities newly linked to this thread
   const existingEntityIds = existingChainEntities.map((ce) => ce.id);
-  const entityIdsToSet = chain_entity_ids.filter((id) => existingEntityIds.indexOf(id) === -1)
+  const entityIdsToSet = chain_entity_ids.filter((id) => existingEntityIds.indexOf(id) === -1);
   const entitiesToSet = await models.ChainEntity.findAll({
     where: {
       id: { [Op.in]: entityIdsToSet }

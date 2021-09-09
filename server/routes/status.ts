@@ -2,7 +2,9 @@ import { QueryTypes, Op } from 'sequelize';
 import jwt from 'jsonwebtoken';
 import _ from 'lodash';
 import { Request, Response, NextFunction } from 'express';
-import { JWT_SECRET, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } from '../config';
+import Web3 from 'web3';
+import { providers } from 'ethers';
+import { JWT_SECRET, INFURA_API_KEY, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
 import '../types';
 import { DB } from '../database';
@@ -126,7 +128,7 @@ GROUP BY CONCAT("OffchainThreads".chain, "OffchainThreads".community);
   const allCommunities : any = _.uniqBy(publicCommunities.concat(privateCommunities), 'id');
 
   const threadCount = {};
-    const threadCountQueryData: ThreadCountQueryData[] = await models.sequelize.query(`
+  const threadCountQueryData: ThreadCountQueryData[] = await models.sequelize.query(`
 SELECT CONCAT("OffchainThreads".chain, "OffchainThreads".community), COUNT("OffchainThreads".id)
   FROM "OffchainThreads"
   LEFT JOIN "OffchainCommunities"

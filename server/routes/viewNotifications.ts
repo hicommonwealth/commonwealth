@@ -43,7 +43,7 @@ export default async (models: DB, req: Request, res: Response, next: NextFunctio
         required: false,
         as: 'ChainEventType',
       }, ],
-    },]
+    }, ]
   };
   if (req.body.unread_only) {
     notificationParams.where = { is_read: false };

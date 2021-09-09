@@ -6,8 +6,9 @@ Discussions and governance for blockchain networks.
 
 ## Quickstart
 
-Install dependencies:
-```
+###Install dependencies:
+**Postgres**
+```bash
 brew install node yarn postgresql
 brew services start postgresql
 psql postgres -c "CREATE ROLE commonwealth WITH LOGIN PASSWORD 'edgeware'; ALTER ROLE commonwealth CREATEDB;"
@@ -17,15 +18,32 @@ psql postgres -h 127.0.0.1 -U commonwealth -c "CREATE DATABASE commonwealth;"
 This should give you a Postgres server installed and running with user
 "commonwealth" and password "edgeware".
 
+**RabbitMQ - optional**
+
+*Installing RabbitMQ is only necessary if you intend to run chain-event listeners locally.*
+
+Install RabbitMQ using the guide for your OS: https://www.rabbitmq.com/download.html
+
+Once installed run the following commands to create a user:
+```bash
+sudo rabbitmqctl add_user commonwealth edgeware
+sudo rabbitmqctl set_user_tags commonwealth administrator
+sudo rabbitmqctl set_permissions -p / commonwealth ".*" ".*" ".*"
+```
+
+This should give you a RabbitMQ server with user "commonwealth" and password "edgeware"
+
+**nvm**
+
 For development, you should also install nvm:
 
-```
+```bash
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
 nvm install
 ```
 
-- if for some reason, nvm still doesnt work, try using
-```
+- if for some reason, nvm still doesn't work, try using
+```bash
     source ~/.nvm/nvm.sh
 ```
 

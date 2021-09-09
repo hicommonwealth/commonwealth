@@ -45,6 +45,12 @@ export const DATABASE_URI =
       'postgresql://commonwealth:edgeware@localhost/commonwealth' :
       process.env.DATABASE_URL;
 
+export const RABBITMQ_URI = (!process.env.CLOUDAMQP_URL || process.env.NODE_ENV === 'development') ?
+  'amqp://guest:guest@localhost:5672' : process.env.CLOUDAMQP_URL;
+
+export const RABBITMQ_VHOST = (!process.env.RABBITMQ_VHOST || process.env.NODE_ENV === 'development') ?
+  '/' : 'ntqevykm';
+
 // limit logins in the last 5 minutes
 // increased because of chain waitlist registrations
 export const LOGIN_RATE_LIMIT_TRIES = 15;
@@ -58,4 +64,11 @@ export const MAGIC_API_KEY = process.env.MAGIC_API_KEY;
 export const MAGIC_SUPPORTED_BASES = process.env.MAGIC_SUPPORTED_BASES?.split(',') || ['ethereum', 'substrate'];
 export const MAGIC_DEFAULT_CHAIN = process.env.MAGIC_DEFAULT_CHAIN || 'ethereum';
 
-export const DEFAULT_COMMONWEALTH_LOGO = 'https://commonwealth.im/static/img/logo.png';
+export const DEFAULT_COMMONWEALTH_LOGO =
+  'https://commonwealth.im/static/img/logo.png';
+
+export const HANDLE_IDENTITY =
+  process.env.HANDLE_IDENTITY === 'publish' ||
+  process.env.HANDLE_IDENTITY === 'handle'
+    ? process.env.HANDLE_IDENTITY
+    : null;

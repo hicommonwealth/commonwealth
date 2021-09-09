@@ -65,7 +65,7 @@ export async function initAppState(updateSelectedNode = true, customDomain = nul
           url: node.url,
           chain: app.config.chains.getById(node.chain),
           address: node.address,
-          token_name: node.token_name
+          token_name: node.token_name,
         }));
       });
       data.communities.sort((a, b) => a.id - b.id).map((community) => {
@@ -260,13 +260,21 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/ethereum/main'
     )).default;
     newChain = new Ethereum(n, app);
-  } else if (n.chain.network === ChainNetwork.NEAR) {
+  } else if (n.chain.network === ChainNetwork.NEAR || n.chain.network == ChainNetwork.NEARTestnet) {
     const Near = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "near-main" */
       './controllers/chain/near/main'
     )).default;
     newChain = new Near(n, app);
+    initApi = true;
+  } else if (n.chain.network === ChainNetwork.Sputnik) {
+    const Sputnik = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "sputnik-main" */
+      './controllers/chain/near/sputnik/adapter'
+    )).default;
+    newChain = new Sputnik(n, app);
     initApi = true;
   } else if (MolochTypes.EventChains.find((c) => c === n.chain.network)) {
     const Moloch = (await import(
@@ -324,7 +332,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
     app.chain = newChain;
   }
   if (initApi) {
-    app.chain.initApi(); // required for loading NearAccounts
+    await app.chain.initApi(); // required for loading NearAccounts
   }
   app.chainPreloading = false;
   app.chain.deferred = deferred;

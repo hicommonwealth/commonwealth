@@ -4,7 +4,7 @@ import send, { WebhookContent } from '../webhookNotifier';
 import { SERVER_URL } from '../config';
 import { UserAttributes } from './user';
 import { NotificationCategoryAttributes } from './notification_category';
-import {NotificationAttributes, NotificationInstance} from './notification';
+import { NotificationAttributes, NotificationInstance } from './notification';
 import { ModelStatic } from './types';
 import {
   IPostNotificationData, ICommunityNotificationData, IChainEventNotificationData,
@@ -179,8 +179,17 @@ export default (
       return notification;
     }));
 
+    const erc20Tokens = (await models.Chain.findAll({
+      where: {
+        base: 'ethereum',
+        type: 'token'
+      }
+    })).map(o => o.id)
+
     // send data to relevant webhooks
-    if (webhook_data) {
+    // TODO: currently skipping all erc20 events from webhooks - change?
+    // @ts-ignore
+    if (webhook_data && !erc20Tokens.includes(webhook_data.chainEventType.chain)) {
       await send(models, {
         notificationCategory: category_id,
         ...webhook_data
