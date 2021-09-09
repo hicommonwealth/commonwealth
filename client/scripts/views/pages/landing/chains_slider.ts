@@ -61,6 +61,7 @@ const TokensChainsComponent: m.Component<IState, IState> = {
 
                         onclick: (e) => {
                           e.preventDefault();
+                          m.route.set(`/${chain.id}`);
                           localStorage['home-scrollY'] = window.scrollY;
                         },
 
@@ -76,13 +77,13 @@ const TokensChainsComponent: m.Component<IState, IState> = {
                             class: 'mx-auto mb-3 w-12 h-auto',
                             src: chain.img,
                             alt: '',
-                            onclick: () => {
-                              m.route.set(`/${chain.id}`);
-                            }
                           }),
                           m(
                             'h3',
-                            { class: 'text-2xl font-extrabold mb-1' },
+                            {
+                              class: 'text-2xl font-extrabold mb-1',
+                              style: 'word-break: break-word'
+                            },
                             chain.name
                           ),
                           m('p', { class: 'text-xl' }, chain.description),

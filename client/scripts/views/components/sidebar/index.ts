@@ -109,6 +109,8 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
       return { id, name, featuredInSidebar };
     }).filter((t) => t.featuredInSidebar).sort((a, b) => a.name.localeCompare(b.name));
 
+    const discussionsLabel = (['vesuvius', 'olympus'].includes(app.activeId())) ? 'Forums' : 'Discussions';
+
     return m('.OffchainNavigationModule.SidebarModule', [
       // m('.section-header', 'Discuss'),
       m(Button, {
@@ -116,7 +118,7 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
         fluid: true,
         active: onDiscussionsPage(m.route.get())
           && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
-        label: 'Discussions',
+        label: discussionsLabel,
         onclick: (e) => {
           e.preventDefault();
           navigateToSubpage('/');
@@ -611,14 +613,14 @@ const Sidebar: m.Component<{ hideQuickSwitcher? }, {}> = {
         m('br'),
         app.isLoggedIn() && (app.chain || app.community) && m(SubscriptionButton),
         app.chain && m(ChainStatusModule),
+        app.isCustomDomain()
+        && m('a', {
+          class: 'PoweredBy',
+          onclick: (e) => {
+            window.open('https://commonwealth.im/');
+          },
+        }),
       ]),
-      app.isCustomDomain()
-      && m('a', {
-        class: 'PoweredBy',
-        onclick: (e) => {
-          window.open('https://commonwealth.im/');
-        },
-      }),
     ];
   },
 };

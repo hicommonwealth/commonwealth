@@ -144,7 +144,7 @@
     left: 0;
     width: $quick-switcher-width;
     border-right: 1px solid $border-color-off-white;
-    z-index: 3;
+    z-index: 11;
     display: flex;
     flex-direction: column;
     background: #fff;
@@ -219,7 +219,9 @@
 }
 
 .Sidebar {
-    position: relative;
+    max-height: 100%;
+    position: sticky;
+    top: 83px;
     z-index: 2;
     padding-top: 36px;
     padding-bottom: 36px;
