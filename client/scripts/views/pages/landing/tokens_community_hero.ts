@@ -24,15 +24,7 @@ interface IAttrs {
 }
 
 const initiateFullSearch = (searchTerm) => {
-<<<<<<< Updated upstream
   if (!searchTerm || !searchTerm.toString().trim() || !searchTerm.match(/[A-Za-z]+/)) {
-=======
-  if (
-    !searchTerm
-    || !searchTerm.toString().trim()
-    || !searchTerm.match(/[A-Za-z]+/)
-  ) {
->>>>>>> Stashed changes
     return;
   }
   if (searchTerm.length < 3) {
@@ -102,108 +94,6 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
         });
       })
       .filter((comm) => comm);
-<<<<<<< Updated upstream
-
-    return m('section.TokensCommunityComponent', {
-      class: 'bg-gray-700'
-    }, [
-      m('div', { class: 'relative mx-auto' }, [
-        m('div', { class: 'md:flex md:flex-row' }, [
-          m('div',
-            { class: 'flex items-center justify-center md:w-2/4' }, [
-              m('div',
-                { class: 'mt-32 mb-10 md:my-40 sm:px-8 md:px-8 lg:px-8 xl:px-16 px-8' },
-                [
-                  m('h1', { class: 'text-4xl font-bold mb-5 leading-10' }, [
-                    'A ',
-                    m('span', {
-                      class: 'bg-clip-text text-transparent gradient-0'
-                    }, 'community'),
-                    ' for every token. ',
-                  ]),
-                  m('p', {
-                    class: 'text-xl text-gray-600 mb-5'
-                  }, [
-                    'Commonwealth is an all-in-one platform for on-chain communities to discuss, vote, and fund projects together.',
-                    ' Never miss an on-chain event, proposal, or important discussion again. '
-                  ]),
-                  m('.token-search-wrap', {
-                    autocomplete: 'off',
-                    class:
-                      'bg-white shadow-2xl rounded-xl p-2 flex flex-row justify-between mb-10 relative',
-                  }, [
-                    m(FindYourTokenInputComponent, {
-                      onchangeValue: (event: any) => {
-                        vnode.state.inputTokenValue = event.target.value;
-                        vnode.state.refilterResults = false;
-                        clearTimeout(vnode.state.inputTimeout);
-                        vnode.state.inputTimeout = setTimeout(() => {
-                          vnode.state.refilterResults = true;
-                          m.redraw();
-                        }, 200);
-                      },
-                      onkeyupValue: (event: any) => {
-                        if (event.key === 'Enter') {
-                          initiateFullSearch(event.target.value);
-                        }
-                      }
-                    }),
-                    vnode.state.inputTokenValue
-                    && vnode.state.inputTokenValue.length > 2
-                    && m(InputTokensListComponent, {
-                      optionList: vnode.state.chainsAndTokens,
-                      inputValue: vnode.state.inputTokenValue,
-                      maxOptions: 20,
-                      stillLoadingTokens,
-                      refilterResults: vnode.state.refilterResults,
-                    }),
-                    m('button', {
-                      type: 'button',
-                      class: 'btn-primary text-xl font-medium rounded-lg pb-2 pt-3 px-3 w-36',
-                      onclick: () => { initiateFullSearch(vnode.state.inputTokenValue); }
-                    }, [
-                      " Let's Go ",
-                      m('img', {
-                        class: 'inline ml-1.5',
-                        src: 'static/img/arrow-right.svg',
-                        alt: "Let's Go",
-                      }),
-                    ]),
-                  ]),
-                  m('div', { class: 'flex justify-center ' }, [
-                    m('h1', { class: 'font-bold mb-5 leading-10 md:text-xl lg:text-2xl xl:text-4xl' }, [
-                      'We’re also here'
-                    ]),
-                    m('div', { class: 'block flex' }, [
-                      m(
-                        'a',
-                        {
-                          class: 'ml-4',
-                          href: 'https://discord.gg/frnQxxZG5S',
-                          target: '_blank'
-                        },
-                        [
-                          m('img', {
-                            class: 'inline mr-1.5 h-8 w-8',
-                            src: 'static/img/discordIcon.svg',
-                            alt: 'Discord',
-                          })
-                        ]
-                      ),
-                      m(
-                        'a',
-                        {
-                          class: 'mx-3 lg:mx-3',
-                          href: 'https://t.me/HiCommonwealth',
-                          target: '_blank'
-                        },
-                        [
-                          m('img', {
-                            class: 'inline mr-1.5 h-8 w-8',
-                            src: 'static/img/telegramIcon.svg',
-                            alt: 'Telegram',
-                          })
-=======
     return m(
       'section.TokensCommunityComponent',
       {
@@ -356,29 +246,11 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
                             src: 'static/img/telegramIcon.svg',
                             alt: 'Telegram',
                           }),
->>>>>>> Stashed changes
                         ]
                       ),
                       m(
                         'a',
                         {
-<<<<<<< Updated upstream
-                          class: 'lg:mx-3',
-                          href: 'https://twitter.com/hicommonwealth',
-                          target: '_blank'
-                        },
-                        [
-                          m('img', {
-                            class: 'inline mr-1.5 h-8 w-8',
-                            src: 'static/img/twitterIcon.svg',
-                            alt: 'Twitter',
-                          })
-                        ]
-                      )
-                    ])
-                  ])
-                ])
-=======
                           href: 'https://twitter.com/hicommonwealth',
                           target: '_blank',
                         },
@@ -452,19 +324,19 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
                 src: 'static/img/notificationModal.svg',
                 alt: 'Discussion card',
               }),
->>>>>>> Stashed changes
             ]),
-          m('div', {
-            class: 'h-556 md:h-auto md:w-2/4'
-          }, [
             m('div', {
-              class: `gradient-135 overflow-hidden relative h-full lg:min-h-desktop
+              class: 'h-556 md:h-auto md:w-2/4'
+            }, [
+              m('div', {
+                class: `gradient-135 overflow-hidden relative h-full lg:min-h-desktop
                 lg:h-screen lg:w-50-screen lg:absolute lg:object-left xl:h-full xl:min-h-full`,
-            }, mappedCommunities)
-          ]),
+              }, mappedCommunities)
+            ]),
+          ])
         ])
-      ])
-    ]);
+      ]
+    );
   },
 };
 
