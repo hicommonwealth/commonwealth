@@ -12,7 +12,7 @@ const getChainEvents = async (
     return res.json({ status: 'Failure', message: 'Must provide user address' });
   }
   const events = await models.ChainEvent.findAll({ where: { chain_event_type_id: type} });
-  return res.json({ status: 'Success', events });
+  return res.json({ status: 'Success', result: events });
 };
 
 export default getChainEvents;

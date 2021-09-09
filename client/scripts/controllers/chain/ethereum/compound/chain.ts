@@ -4,6 +4,7 @@ import { NodeInfo } from 'models';
 import EthereumChain from '../chain';
 import { attachSigner } from '../contractApi';
 import CompoundAPI from './api';
+import { BigNumber } from 'ethers';
 
 // Thin wrapper over EthereumChain to guarantee the `init()` implementation
 // on the Governance module works as expected.
@@ -20,6 +21,7 @@ export default class CompoundChain extends EthereumChain {
       this.api.currentProvider as any
     );
     await this.compoundApi.init(selectedNode.tokenName);
+    console.log('this token in init 2', this.compoundApi.Token)
   }
 
   public deinit() {
@@ -39,8 +41,10 @@ export default class CompoundChain extends EthereumChain {
   }
 
   public async getVotingPower(address: string) {
+    console.log('this token in get voting power', this.compoundApi.Token);
     const num = await this.compoundApi.Token.numCheckpoints(address);
-    const { fromBlock, votes } = await this.compoundApi.Token.checkpoints(address, num-1);
+    if (num === 0) return BigNumber.from(0);
+    const { fromBlock, votes } = await this.compoundApi.Token.checkpoints(address, num - 1);
     return votes;
   }
 
