@@ -79,7 +79,6 @@ const VoteRow: m.Component<{
   }
 };
 
-// eslint-disable-next-line no-shadow
 enum SnapshotVoteChoice {
   YES = 1,
   NO = 2,

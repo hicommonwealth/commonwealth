@@ -18,7 +18,7 @@ import {
 } from 'models';
 
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
-import User from 'views/components/widgets/user';
+import User, { AnonymousUser } from 'views/components/widgets/user';
 import QuillEditor from 'views/components/quill_editor';
 import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
@@ -28,6 +28,7 @@ import ReactionButton, { ReactionType } from 'views/components/reaction_button';
 import { MenuItem, Button, Dialog, QueryList, Classes, ListItem, Icon, Icons, Popover } from 'construct-ui';
 import { notifyError, notifyInfo, notifySuccess } from 'controllers/app/notifications';
 import { validURL } from '../../../../../shared/utils';
+import { IProposalPageState } from '.';
 
 export enum GlobalStatus {
   Get = 'get',
@@ -60,12 +61,19 @@ export const ProposalBodyAvatar: m.Component<{ item: OffchainThread | OffchainCo
       : app.chain.accounts.get(item.author);
 
     return m('.ProposalBodyAvatar', [
-      m(User, {
-        user: author,
-        popover: true,
-        avatarOnly: true,
-        avatarSize: 40,
-      }),
+      (item as OffchainComment<any>).deleted
+        ? m(AnonymousUser, {
+          avatarOnly: true,
+          avatarSize: 40,
+          showAsDeleted: true,
+          distinguishingKey: item.author.slice(item.author.length - 3),
+        })
+        : m(User, {
+          user: author,
+          popover: true,
+          avatarOnly: true,
+          avatarSize: 40,
+        }),
     ]);
   }
 };
@@ -83,13 +91,15 @@ export const ProposalBodyAuthor: m.Component<{ item: AnyProposal | OffchainThrea
       : item.author;
 
     return m('.ProposalBodyAuthor', [
-      m(User, {
-        user: author,
-        popover: true,
-        linkify: true,
-        hideAvatar: true,
-        showAddressWithDisplayName: true,
-      }),
+      (item as OffchainComment<any>).deleted
+        ? m('span', '[deleted]')
+        : m(User, {
+          user: author,
+          popover: true,
+          linkify: true,
+          hideAvatar: true,
+          showAddressWithDisplayName: true,
+        }),
       item instanceof OffchainThread && item.collaborators && item.collaborators.length > 0
         && m('span.proposal-collaborators', [
           ' and ',
@@ -175,32 +185,14 @@ export const ProposalBodyLastEdited: m.Component<{ item: OffchainThread | Offcha
   }
 };
 
-export const ProposalBodyReplyMenuItem: m.Component<{
-  item: OffchainComment<any>, getSetGlobalReplyStatus, parentType?, parentState
-}> = {
-  view: (vnode) => {
-    const { item, parentType, parentState, getSetGlobalReplyStatus } = vnode.attrs;
-    if (!item) return;
-
-    return m(MenuItem, {
-      label: 'Comment',
-      onclick: async (e) => {
-        e.preventDefault();
-        if (getSetGlobalReplyStatus(GlobalStatus.Get) && activeQuillEditorHasText()) {
-          const confirmed = await confirmationModalWithText('Unsent comments will be lost. Continue?')();
-          if (!confirmed) return;
-        }
-        getSetGlobalReplyStatus(GlobalStatus.Set, item.id);
-      },
-    });
-  }
-};
-
 export const ProposalBodyEditMenuItem: m.Component<{
-  item: OffchainThread | OffchainComment<any>, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState
+  item: OffchainThread | OffchainComment<any>,
+  parentState
+  proposalPageState: IProposalPageState,
+  getSetGlobalEditingStatus,
 }> = {
   view: (vnode) => {
-    const { item, getSetGlobalEditingStatus, getSetGlobalReplyStatus, parentState } = vnode.attrs;
+    const { item, getSetGlobalEditingStatus, proposalPageState, parentState } = vnode.attrs;
     if (!item) return;
     if (item instanceof OffchainThread && item.readOnly) return;
     const isThread = item instanceof OffchainThread;
@@ -211,12 +203,13 @@ export const ProposalBodyEditMenuItem: m.Component<{
       onclick: async (e) => {
         e.preventDefault();
         parentState.currentText = item instanceof OffchainThread ? item.body : item.text;
-        if (getSetGlobalReplyStatus(GlobalStatus.Get)) {
+        if (proposalPageState.replying) {
           if (activeQuillEditorHasText()) {
             const confirmed = await confirmationModalWithText('Unsubmitted replies will be lost. Continue?')();
             if (!confirmed) return;
           }
-          getSetGlobalReplyStatus(GlobalStatus.Set, false, true);
+          proposalPageState.replying = false;
+          proposalPageState.parentCommentId = null;
         }
         parentState.editing = true;
         getSetGlobalEditingStatus(GlobalStatus.Set, true);
@@ -715,8 +708,6 @@ export const ProposalBodyReaction: m.Component<{ item: OffchainThread | AnyPropo
     const { item } = vnode.attrs;
     if (!item) return;
 
-    return m('.ProposalBodyReaction', [
-      m(ReactionButton, { post: item, type: ReactionType.Like, tooltip: true })
-    ]);
+    return m(ReactionButton, { post: item, type: ReactionType.Like, tooltip: true });
   }
 };

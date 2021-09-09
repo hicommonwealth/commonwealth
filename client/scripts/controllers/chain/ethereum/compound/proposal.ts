@@ -25,7 +25,6 @@ import EthereumAccount from '../account';
 import EthereumAccounts from '../accounts';
 import CompoundChain from './chain';
 
-// eslint-disable-next-line no-shadow
 export enum CompoundVote {
   YES = 1,
   NO = 0

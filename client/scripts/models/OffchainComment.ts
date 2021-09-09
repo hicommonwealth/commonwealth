@@ -16,10 +16,10 @@ class OffchainComment<T extends IUniqueId> {
   public readonly community?: string;
   public readonly authorChain?: string;
   public readonly parentComment: number;
-  public readonly rootProposal: number;
-  public readonly childComments: number[];
+  public readonly rootProposal: string;
   public readonly versionHistory: VersionHistory[];
   public readonly lastEdited: moment.Moment;
+  public readonly deleted: boolean;
 
   constructor({
     chain,
@@ -31,13 +31,13 @@ class OffchainComment<T extends IUniqueId> {
     proposal,
     id,
     createdAt,
-    childComments = [],
     rootProposal,
     // optional args
     parentComment,
     community,
     authorChain,
     lastEdited, // moment.Moment
+    deleted
   }) {
     this.chain = chain;
     this.author = author;
@@ -48,12 +48,12 @@ class OffchainComment<T extends IUniqueId> {
     this.proposal = proposal;
     this.id = id;
     this.createdAt = createdAt;
-    this.childComments = childComments;
     this.parentComment = parentComment;
     this.rootProposal = rootProposal;
     this.community = community;
     this.authorChain = authorChain;
     this.lastEdited = lastEdited;
+    this.deleted = deleted;
   }
 }
 
