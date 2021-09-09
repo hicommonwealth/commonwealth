@@ -83,7 +83,6 @@ const SidebarQuickSwitcher: m.Component<{}> = {
           label: m(Icon, { name: Icons.PLUS }),
           onclick: (e) => {
             app.modals.create({ modal: CreateCommunityModal });
-            // window.location.href = `/api/auth/twitter?redirect=${encodeURIComponent(window.location.pathname)}`;
           },
         }),
       ]),

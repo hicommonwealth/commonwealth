@@ -1,6 +1,5 @@
 import m from 'mithril';
 import _ from 'lodash';
-import { Account } from 'models';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { Button } from 'construct-ui';
 import MarkdownFormattedText from '../../components/markdown_formatted_text';
@@ -13,6 +12,7 @@ import { confirmationModalWithText } from '../../modals/confirm_modal';
 import EditIdentityModal from '../../modals/edit_identity_modal';
 import { setActiveAccount } from '../../../controllers/app/login';
 import EditProfileModal from '../../modals/edit_profile_modal';
+import TwitterAttestationModal from '../../modals/twitter_attestation_modal';
 
 const editIdentityAction = (account, currentIdentity: SubstrateIdentity, vnode) => {
   const chainObj = app.config.chains.getById(account.chain);
@@ -73,6 +73,14 @@ export interface IProfileHeaderState {
 const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
   oninit: (vnode) => {
     vnode.state.showProfileRight = false;
+  },
+  oncreate:() => {
+    if (window.location.search) {
+      const query = new URLSearchParams(window.location.search);
+      if (query.get('continueTwitterAttestation')) {
+        app.modals.create({ modal: TwitterAttestationModal });
+      }
+    }
   },
   view: (vnode) => {
     const { account, refreshCallback, onOwnProfile, onLinkedProfile } = vnode.attrs;
@@ -139,6 +147,14 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
           ]),
         ]),
       ]),
+      m(Button, {
+        intent: 'primary',
+        onclick: () => {
+          // eslint-disable-next-line max-len
+          window.location.href = `/api/auth/twitter?redirect=${encodeURIComponent(window.location.pathname)}${window.location.search ? `${encodeURIComponent(window.location.search)}%26` : '%3F'}continueTwitterAttestation=true`;
+        },
+        label: 'Add public identity'
+      }),
       isClaimable && m(LoginWithWalletDropdown, {
         prepopulateAddress: account.address,
         loggingInWithAddress: !app.isLoggedIn(),
