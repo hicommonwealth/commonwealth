@@ -23,6 +23,7 @@ import EdgewareLockdropEverythingFactory, { EdgewareLockdropEverythingModelStati
   from './models/edgeware_lockdrop_everything';
 import HedgehogAuthenticationFactory, { HedgehogAuthenticationModelStatic } from './models/hedgehog_authentication';
 import HedgehogUserFactory, { HedgehogUserModelStatic } from './models/hedgehog_user';
+import IdentityCacheFactory, { IdentityCacheStatic } from './models/identity_cache';
 import InviteCodeFactory, { InviteCodeModelStatic } from './models/invite_code';
 import InviteLinkFactory, { InviteLinkModelStatic } from './models/invite_link';
 import LoginTokenFactory, { LoginTokenModelStatic } from './models/login_token';
@@ -64,6 +65,7 @@ export type Models = {
     EdgewareLockdropEverything: EdgewareLockdropEverythingModelStatic;
     HedgehogAuthentication: HedgehogAuthenticationModelStatic;
     HedgehogUser: HedgehogUserModelStatic;
+    IdentityCache: IdentityCacheStatic;
     InviteCode: InviteCodeModelStatic;
     InviteLink: InviteLinkModelStatic;
     LoginToken: LoginTokenModelStatic;
@@ -132,6 +134,7 @@ const models: Models = {
   EdgewareLockdropEverything: EdgewareLockdropEverythingFactory(sequelize, DataTypes),
   HedgehogAuthentication: HedgehogAuthenticationFactory(sequelize, DataTypes),
   HedgehogUser: HedgehogUserFactory(sequelize, DataTypes),
+  IdentityCache: IdentityCacheFactory(sequelize, DataTypes),
   InviteCode: InviteCodeFactory(sequelize, DataTypes),
   InviteLink: InviteLinkFactory(sequelize, DataTypes),
   LoginToken: LoginTokenFactory(sequelize, DataTypes),

@@ -34,6 +34,7 @@ export interface ChainAttributes {
   collapsed_on_homepage?: boolean;
   featured_topics?: string[];
   substrate_spec?: RegisteredTypes;
+  has_chain_events_listener?: boolean;
   terms?: string;
   snapshot?: string;
   bech32_prefix?: string;
@@ -88,6 +89,7 @@ export default (
     type: { type: dataTypes.STRING, allowNull: false },
     decimals: { type: dataTypes.INTEGER, allowNull: true },
     substrate_spec: { type: dataTypes.JSONB, allowNull: true },
+    has_chain_events_listener: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     snapshot: { type: dataTypes.STRING, allowNull: true },
     terms: { type: dataTypes.STRING, allowNull: true },
     bech32_prefix: { type: dataTypes.STRING, allowNull: true },

@@ -29,7 +29,7 @@ const app = express();
 const SequelizeStore = SessionSequelizeStore(session.Store);
 // set cache TTL to 1 second to test invalidation
 const viewCountCache = new ViewCountCache(1, 10 * 60);
-const identityFetchCache = new IdentityFetchCache(0);
+const identityFetchCache = new IdentityFetchCache(10 * 60);
 
 // always prune both token and non-token holders asap
 const mockTokenBalanceProvider = new MockTokenBalanceProvider();
@@ -75,7 +75,7 @@ app.use((req, res, next) => {
 const setupErrorHandlers = () => {
   // catch 404 and forward to error handler
   app.use((req, res, next) => {
-    const err : any = new Error('Not Found');
+    const err: any = new Error('Not Found');
     err.status = 404;
     next(err);
   });
@@ -86,7 +86,7 @@ const setupErrorHandlers = () => {
   });
 };
 
-const resetServer = (debug=false): Promise<void> => {
+const resetServer = (debug = false): Promise<void> => {
   if (debug) console.log('Resetting database...');
 
   return new Promise((resolve) => {
@@ -122,6 +122,7 @@ const resetServer = (debug=false): Promise<void> => {
         type: 'chain',
         base: 'substrate',
         ss58_prefix: 7,
+        has_chain_events_listener: false
       });
       const eth = await models['Chain'].create({
         id: 'ethereum',
@@ -132,6 +133,7 @@ const resetServer = (debug=false): Promise<void> => {
         active: true,
         type: 'chain',
         base: 'ethereum',
+        has_chain_events_listener: false
       });
       const alex = await models['Chain'].create({
         id: 'alex',
@@ -142,6 +144,7 @@ const resetServer = (debug=false): Promise<void> => {
         active: true,
         type: 'token',
         base: 'ethereum',
+        has_chain_events_listener: false
       });
       const yearn = await models['Chain'].create({
         id: 'yearn',
@@ -152,7 +155,8 @@ const resetServer = (debug=false): Promise<void> => {
         active: true,
         type: 'chain',
         base: 'ethereum',
-        snapshot: 'ybaby.eth'
+        snapshot: 'ybaby.eth',
+        has_chain_events_listener: false
       });
       const sushi = await models['Chain'].create({
         id: 'sushi',
@@ -163,7 +167,8 @@ const resetServer = (debug=false): Promise<void> => {
         active: true,
         type: 'chain',
         base: 'ethereum',
-        snapshot: 'sushi'
+        snapshot: 'sushi',
+        has_chain_events_listener: false
       });
 
       // Admin roles for specific communities
