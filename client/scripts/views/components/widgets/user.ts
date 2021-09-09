@@ -2,7 +2,7 @@
 import 'components/widgets/user.scss';
 
 import m from 'mithril';
-import _ from 'lodash';
+import _, { capitalize } from 'lodash';
 import { link } from 'helpers';
 import { Tag, Icon, Icons, Popover } from 'construct-ui';
 
@@ -290,13 +290,11 @@ export const UserBlock: m.Component<{
         m('.user-block-address', {
           class: profile?.address ? '' : 'no-address',
         }, [
-          highlightSearchTerm
+          m('', highlightSearchTerm
             ? highlightedAddress
-            : showFullAddress
-              ? profile.address
-              : formatAddressShort(profile.address, profile.chain, false, maxCharLength),
-          profile?.address && showChainName && ' · ',
-          showChainName && (typeof user.chain === 'string' ? user.chain : user.chain.name),
+            : showFullAddress ? profile.address : formatAddressShort(profile.address, profile.chain)),
+          profile?.address && showChainName && m('.address-divider', ' · '),
+          showChainName && m('', (typeof user.chain === 'string' ? capitalize(user.chain) : capitalize(user.chain.name))),
         ]),
       ]),
       m('.user-block-right', [

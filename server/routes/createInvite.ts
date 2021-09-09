@@ -74,6 +74,7 @@ const createInvite = async (models: DB, req: Request, res: Response, next: NextF
       address_id: existingAddress.id,
       permission: 'member',
     });
+    // TODO: We need to notify added users; role creation shouldn't happen silently
     return res.json({ status: 'Success', result: role.toJSON() });
   }
 
@@ -115,7 +116,14 @@ const createInvite = async (models: DB, req: Request, res: Response, next: NextF
 
   // create and email the link
   const joinOrLogIn = user ? 'Log in' : 'Sign up';
-  const signupLink = SERVER_URL;
+  const communityRoute = chain
+    ? `/${chain.id}`
+    : community.privacyEnabled
+      ? '' : `/${community.id}`;
+  // todo: inviteComm param may only be necesssary if no communityRoute present
+  const params = `?triggerInvite=t&inviteComm=${(community || chain).id}&inviteEmail=${invitedEmail}`;
+  const signupLink = `${SERVER_URL}${communityRoute}${params}`;
+
   const msg = {
     to: invitedEmail,
     from: 'Commonwealth <no-reply@commonwealth.im>',
