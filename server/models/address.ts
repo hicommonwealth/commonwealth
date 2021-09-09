@@ -45,6 +45,8 @@ export interface AddressAttributes {
   is_councillor?: boolean;
   is_validator?: boolean;
   is_magic?: boolean;
+  twitter_verified?: boolean;
+  twitter_verification_msg?: string;
 
   // associations
   Chain?: ChainAttributes;
@@ -120,6 +122,8 @@ export default (
     is_councillor:              { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     is_validator:               { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     is_magic:                   { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+    twitter_verified:           { type: dataTypes.BOOLEAN, allowNull: true },
+    twitter_verification_msg:   { type: dataTypes.STRING, allowNull: true },
   }, {
     timestamps: true,
     createdAt: 'created_at',
