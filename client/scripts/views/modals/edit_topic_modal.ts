@@ -44,6 +44,11 @@ const EditTopicModal : m.Component<{
     const updateTopic = async (form) => {
       const { quillEditorState } = vnode.state;
 
+      if (form.featuredInNewPost && quillEditorState.editor.editor.isBlank()) {
+        vnode.state.error = 'Must provide template.';
+        return false;
+      }
+
       if (quillEditorState) {
         quillEditorState.editor.enable(false);
       }
@@ -65,8 +70,14 @@ const EditTopicModal : m.Component<{
         featuredInNewPost: form.featuredInNewPost,
         defaultOffchainTemplate: bodyText
       };
-      await app.topics.edit(topicInfo);
-      navigateToSubpage(`/discussions/${encodeURI(form.name.toString().trim())}`);
+      try {
+        await app.topics.edit(topicInfo);
+        return true;
+      } catch (err) {
+        vnode.state.error = err.message || err;
+        m.redraw();
+        return false;
+      }
     };
 
     const deleteTopic = async (form) => {
@@ -177,13 +188,17 @@ const EditTopicModal : m.Component<{
           m(FormGroup, [
             m(Button, {
               intent: 'primary',
-              disabled: vnode.state.saving || disabled,
+              disabled,
               style: 'margin-right: 8px',
               rounded: true,
               onclick: async (e) => {
                 e.preventDefault();
-                updateTopic(vnode.state.form).then(() => {
-                  $(e.target).trigger('modalexit');
+                const { form } = vnode.state;
+                updateTopic(form).then((closeModal) => {
+                  if (closeModal) {
+                    $(e.target).trigger('modalexit');
+                    navigateToSubpage(`/discussions/${encodeURI(form.name.toString().trim())}`);
+                  }
                 }).catch((err) => {
                   vnode.state.saving = false;
                   m.redraw();
@@ -193,13 +208,13 @@ const EditTopicModal : m.Component<{
             }),
             m(Button, {
               intent: 'negative',
-              disabled: vnode.state.saving,
+              disabled,
               rounded: true,
               onclick: async (e) => {
                 e.preventDefault();
                 const confirmed = await confirmationModalWithText('Delete this topic?')();
                 if (!confirmed) return;
-                deleteTopic(vnode.state.form).then(() => {
+                deleteTopic(vnode.state.form).then((closeModal) => {
                   $(e.target).trigger('modalexit');
                   navigateToSubpage('/');
                 }).catch((err) => {

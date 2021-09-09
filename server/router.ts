@@ -114,6 +114,7 @@ import editStage from './routes/editStage';
 import deleteStage from './routes/deleteStage';
 import bulkStages from './routes/bulkStages';
 import bulkOffchain from './routes/bulkOffchain';
+import setTopicThreshold from './routes/setTopicThreshold';
 
 import edgewareLockdropLookup from './routes/getEdgewareLockdropLookup';
 import edgewareLockdropStats from './routes/getEdgewareLockdropStats';
@@ -302,6 +303,7 @@ function setupRouter(
   router.post('/deleteTopic', passport.authenticate('jwt', { session: false }), deleteTopic.bind(this, models));
   // TODO: Change to GET /topics
   router.get('/bulkTopics', bulkTopics.bind(this, models));
+  router.post('/setTopicThreshold', passport.authenticate('jwt', { session: false }), setTopicThreshold.bind(this, models));
 
   // offchain stages
   // TODO: Change to POST /stage

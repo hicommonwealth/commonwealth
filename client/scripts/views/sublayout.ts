@@ -7,7 +7,7 @@ import { link } from 'helpers';
 
 import NewProposalButton, { MobileNewProposalButton } from 'views/components/new_proposal_button';
 import NotificationsMenu from 'views/components/header/notifications_menu';
-import InvitesMenu from 'views/components/header/invites_menu';
+import InvitesMenu, { handleEmailInvites } from 'views/components/header/invites_menu';
 import LoginSelector from 'views/components/header/login_selector';
 import Sidebar from 'views/components/sidebar';
 import MobileHeader from 'views/mobile/mobile_header';
@@ -33,6 +33,8 @@ const Sublayout: m.Component<{
   hideSearch?: boolean,
   centerGrid?: boolean,
   alwaysShowTitle?: boolean,          // show page title even if app.chain and app.community are unavailable
+}, {
+  modalAutoTriggered: boolean
 }> = {
   view: (vnode) => {
     const {
@@ -116,6 +118,10 @@ const Sublayout: m.Component<{
       ]),
     ];
 
+    if (m.route.param('triggerInvite') === 't') {
+      setTimeout(() => handleEmailInvites(vnode.state), 0);
+    }
+
     const tosStatus = localStorage.getItem(`${app.activeId()}-tos`);
 
     return [
@@ -131,7 +137,7 @@ const Sublayout: m.Component<{
           ]),
           hero
             ? m('.sublayout-hero', hero)
-            : (app.isLoggedIn() && (app.chain as Token)?.isToken && !(app.chain as Token)?.hasToken)
+            : (app.isLoggedIn() && (app.chain as Token)?.isToken && !app.user.activeAccount)
               ? m('.sublayout-hero.token-banner', [
                 m('.token-banner-content', `Link an address that holds ${chain.symbol} to participate in governance.`),
               ]) : '',
@@ -164,6 +170,7 @@ const Sublayout: m.Component<{
               { text: 'Jobs', externalLink: 'https://angel.co/company/commonwealth-labs/jobs' },
               { text: 'Terms', redirectTo:  '/terms' },
               { text: 'Privacy', redirectTo: '/privacy' },
+              { text: 'Docs', redirectTo: 'https://docs.commonwealth.im' },
               { text: 'Discord', externalLink: 'https://discord.gg/ZFQCKUMP' },
               { text: 'Telegram', externalLink: 'https://t.me/HiCommonwealth' }
               // { text:  'Use Cases' },

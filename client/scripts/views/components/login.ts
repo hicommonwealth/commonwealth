@@ -35,6 +35,7 @@ const Login: m.Component<{}, {
   error: Error | string;
 }> = {
   view: (vnode) => {
+    const defaultEmail = m.route.param('inviteEmail');
     return m('.Login', {
       onclick: (e) => {
         e.stopPropagation();
@@ -46,6 +47,8 @@ const Login: m.Component<{}, {
             fluid: true,
             name: 'email',
             placeholder: 'Email',
+            disabled: !!defaultEmail,
+            defaultValue: defaultEmail,
             autocomplete: 'off',
             onclick: (e) => {
               e.stopPropagation();

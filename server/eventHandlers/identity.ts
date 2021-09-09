@@ -7,12 +7,13 @@ import {
 } from '@commonwealth/chain-events';
 import { OffchainProfileInstance } from '../models/offchain_profile';
 import { factory, formatFilename } from '../../shared/logging';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 export default class extends IEventHandler {
   constructor(
     private readonly _models,
-    private readonly _chain: string,
+    private readonly _chain?: string,
   ) {
     super();
   }
@@ -22,6 +23,8 @@ export default class extends IEventHandler {
    * the database.
    */
   public async handle(event: CWEvent<IChainEventData>, dbEvent) {
+    const chain = event.chain || this._chain;
+
     // do nothing if wrong type of event
     if (event.data.kind !== SubstrateTypes.EventKind.IdentitySet
         && event.data.kind !== SubstrateTypes.EventKind.JudgementGiven
@@ -38,7 +41,7 @@ export default class extends IEventHandler {
         where: {
           // TODO: do we need to modify address case?
           address: who,
-          chain: this._chain,
+          chain,
         },
         required: true,
       }]
@@ -48,7 +51,7 @@ export default class extends IEventHandler {
     // update profile data depending on event
     if (event.data.kind === SubstrateTypes.EventKind.IdentitySet) {
       profile.identity = event.data.displayName;
-      profile.judgements = _.object<{ [name: string]: SubstrateTypes.IdentityJudgement }>(event.data.judgements);
+      profile.judgements = _.object<{ [registrar: string]: SubstrateTypes.IdentityJudgement; }>(event.data.judgements);
       await profile.save();
 
       // write a comment about the new identity

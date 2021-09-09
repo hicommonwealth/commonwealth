@@ -243,7 +243,7 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
           { text: 'Jobs', externalLink: 'https://angel.co/company/commonwealth-labs/jobs' },
           { text:  'Terms', redirectTo:  '/terms' },
           { text:  'Privacy', redirectTo: '/privacy' },
-          { text: 'Discord', externalLink: 'https://discord.gg/ZFQCKUMP' },
+          { text: 'Discord', externalLink: 'https://discord.gg/frnQxxZG5S' },
           { text: 'Telegram', externalLink: 'https://t.me/HiCommonwealth' },
           { text: 'Twitter', externalLink: 'https://twitter.com/hicommonwealth' }
           // { text:  'Use Cases' },

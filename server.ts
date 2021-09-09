@@ -11,6 +11,7 @@ import fs from 'fs';
 import passport from 'passport';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
+import compression from 'compression';
 import webpackHotMiddleware from 'webpack-hot-middleware';
 import { redirectToHTTPS } from 'express-http-to-https';
 import favicon from 'serve-favicon';
@@ -22,7 +23,7 @@ import { factory, formatFilename } from './shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 import ViewCountCache from './server/util/viewCountCache';
-import IdentityFetchCache from './server/util/identityFetchCache';
+import IdentityFetchCache, { IdentityFetchCacheNew } from './server/util/identityFetchCache';
 import TokenBalanceCache from './server/util/tokenBalanceCache';
 import { SESSION_SECRET, ROLLBAR_SERVER_TOKEN } from './server/config';
 import models from './server/database';
@@ -51,12 +52,14 @@ async function main() {
   const SHOULD_UPDATE_EVENTS = process.env.UPDATE_EVENTS === 'true';
   const SHOULD_UPDATE_BALANCES = process.env.UPDATE_BALANCES === 'true';
   const SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS = process.env.UPDATE_EDGEWARE_LOCKDROP_STATS === 'true';
+  const SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS = process.env.SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS === 'true';
 
   const NO_CLIENT_SERVER = process.env.NO_CLIENT === 'true'
     || SHOULD_SEND_EMAILS
     || SHOULD_UPDATE_EVENTS
     || SHOULD_UPDATE_BALANCES
-    || SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS;
+    || SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS
+    || SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS;
 
   // CLI parameters used to configure specific tasks
   const SKIP_EVENT_CATCHUP = process.env.SKIP_EVENT_CATCHUP === 'true';
@@ -64,8 +67,16 @@ async function main() {
   const FLAG_MIGRATION = process.env.FLAG_MIGRATION;
   const CHAIN_EVENTS = process.env.CHAIN_EVENTS;
   const RUN_AS_LISTENER = process.env.RUN_AS_LISTENER === 'true';
+  const USE_NEW_IDENTITY_CACHE = process.env.USE_NEW_IDENTITY_CACHE === 'true';
 
-  const identityFetchCache = new IdentityFetchCache(10 * 60);
+  // if running in old mode then use old identityCache but if running with dbNode.ts use the new db identityCache
+  let identityFetchCache: IdentityFetchCacheNew | IdentityFetchCache;
+  if (!USE_NEW_IDENTITY_CACHE) {
+    identityFetchCache = new IdentityFetchCache(10 * 60);
+  } else {
+    identityFetchCache = new IdentityFetchCacheNew();
+  }
+
   const tokenBalanceCache = new TokenBalanceCache(models);
   const listenChainEvents = async () => {
     try {
@@ -84,14 +95,13 @@ async function main() {
           fetchers[chain] = new SubstrateEvents.StorageFetcher(subscriber.api);
         }
       }
-      await identityFetchCache.start(models, fetchers);
+      await (<IdentityFetchCache>identityFetchCache).start(models, fetchers);
       return 0;
     } catch (e) {
       console.error(`Chain event listener setup failed: ${e.message}`);
       return 1;
     }
   };
-
   let rc = null;
   if (RUN_AS_LISTENER) {
     // hack to keep process running indefinitely
@@ -211,6 +221,25 @@ async function main() {
       /127.0.0.1:(\d{4})/
     ], [], 301));
 
+    // dynamic compression settings used
+    app.use(compression());
+
+    // static compression settings unused
+    // app.get('*.js', (req, res, next) => {
+    //   req.url = req.url + '.gz';
+    //   res.set('Content-Encoding', 'gzip');
+    //   res.set('Content-Type', 'application/javascript; charset=UTF-8');
+    //   next();
+    // });
+
+    // // static compression settings unused
+    // app.get('bundle.**.css', (req, res, next) => {
+    //   req.url = req.url + '.gz';
+    //   res.set('Content-Encoding', 'gzip');
+    //   res.set('Content-Type', 'text/css');
+    //   next();
+    // });
+
     // serve the compiled app
     if (!NO_CLIENT_SERVER) {
       if (DEV) {
@@ -264,7 +293,7 @@ async function main() {
   setupPassport(models);
 
   await tokenBalanceCache.start();
-  setupAPI(app, models, viewCountCache, identityFetchCache, tokenBalanceCache);
+  setupAPI(app, models, viewCountCache, <any>identityFetchCache, tokenBalanceCache);
   setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
   setupErrorHandlers(app, rollbar);
 

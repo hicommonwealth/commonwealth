@@ -329,7 +329,6 @@ const LoginSelector: m.Component<{
                     if (app.chain) {
                       account.setValidationToken(verification_token);
                     }
-
                     if (joiningChain && !app.user.getRoleInCommunity({ account, chain: joiningChain })) {
                       await app.user.createRole({ address: addressInfo, chain: joiningChain });
                     } else if (joiningCommunity
@@ -346,7 +345,7 @@ const LoginSelector: m.Component<{
                   }
 
                   // If token forum make sure has token and add to app.chain obj
-                  if (app.chain && (app.chain as Token).isToken) {
+                  if (app.chain && (app.chain as Token)?.isToken) {
                     await (app.chain as Token).activeAddressHasToken(app.user.activeAccount.address);
                   }
                   m.redraw();

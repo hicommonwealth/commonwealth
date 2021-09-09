@@ -1,4 +1,5 @@
 import * as Sequelize from 'sequelize';
+import { InviteCodeAttributes } from 'shared/types';
 import { Model, DataTypes } from 'sequelize';
 import { ModelStatic } from './types';
 

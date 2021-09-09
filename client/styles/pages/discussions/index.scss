@@ -19,13 +19,21 @@
         }
     }
 
-    .discussions-topics,
-    .discussions-stages {
-        margin-bottom: 20px;
-        font-size: 17px;
-        line-height: 1.25;
-        .cui-button-group {
-            flex-wrap: wrap;
+    .DiscussionStagesBar {
+        > button {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .discussions-topics,
+        .discussions-stages {
+            margin-bottom: 20px;
+            font-size: 17px;
+            line-height: 1.25;
+            .cui-button-group {
+                flex-wrap: wrap;
+            }
         }
     }
     @include xs-max {
@@ -38,11 +46,20 @@
     }
     .discussions-topic-items,
     .discussions-stage-items {
+        max-height: 70vh;
+        overflow-y: scroll;
         max-width: 300px;
         .topic-menu-item {
             display: flex;
-            .topic-menu-item-name {
+            .cui-icon {
                 flex: 1;
+                margin-right: 0;
+            }
+            .topic-menu-item-name {
+                flex: 7;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
                 position: relative;
                 top: 1px;
             }
