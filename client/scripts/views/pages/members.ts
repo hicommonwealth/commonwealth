@@ -118,25 +118,15 @@ pageToLoad: number, totalMembers: number, isCompound: boolean, voteEvents }> = {
 
           const offset = vnode.state.membersLoaded.length - newMembers.length;
           if (vnode.state.isCompound) {
-            newMembers.forEach(async (o, i) => {
-              let firstFunc = Promise.resolve();
-              if (!app.chain.apiInitialized) {
-                firstFunc = app.chain.initApi();
-              }
-              firstFunc
-                .then(() => {
-                  const func = (app.chain as Compound).chain.getVotingPower(o.address)
-                  //  .catch((e) => { console.log('caught'); return sleep(400).then(func); });
-                  return func;
-                })
-                .then((votes) => {
+            return app.chain.initApi().then(()=>
+              Promise.all(newMembers.map((o, i) => {
+                return (app.chain as Compound).chain.getVotingPower(o.address).then((votes) => {
                   vnode.state.membersLoaded[offset + i].votes = votes;
-                  m.redraw();
-                });
-            });
-          }
-          m.redraw();
-        });
+                })
+              })).then(()=>m.redraw())
+            );
+        }
+      });
     }
 
     const isAdmin = app.user.isSiteAdmin

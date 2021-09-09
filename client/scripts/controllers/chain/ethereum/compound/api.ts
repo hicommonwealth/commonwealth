@@ -22,7 +22,6 @@ export default class CompoundAPI extends ContractApi<GovernorAlpha> {
     } else {
       console.error('No token name found!');
     }
-    console.log('init 1', this.Token)
 
     // const timelockAddress = await this.Contract.timelock();
     // this._Timelock = Timelock__factory.connect(timelockAddress, this.Contract.signer || this.Contract.provider);
