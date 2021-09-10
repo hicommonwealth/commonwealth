@@ -153,8 +153,7 @@ const VoteAction: m.Component<{
   view: (vnode) => {
     const { choices } = vnode.attrs;
     const canVote = true; // TODO: remove these hardcoded values;
-    const hasVotedYes = false;
-    const hasVotedNo = false;
+    const hasVoted = null;
     const { votingModalOpen } = vnode.state;
 
     const onModalClose = () => {
@@ -162,8 +161,7 @@ const VoteAction: m.Component<{
       m.redraw();
     };
 
-    const voteYes = async (e) => {
-      e.preventDefault();
+    const vote = async (selectedChoice: number) => {
       console.log(`vnode.attrs.proposal ${vnode.attrs.proposal}`);
       try {
         app.modals.create({
@@ -172,10 +170,11 @@ const VoteAction: m.Component<{
             space: vnode.attrs.space,
             proposal: vnode.attrs.proposal,
             id: vnode.attrs.id,
-            selectedChoice: 0,
+            selectedChoice,
             totalScore: vnode.attrs.totalScore,
             scores: vnode.attrs.scores,
-            snapshot: vnode.attrs.proposal.snapshot
+            snapshot: vnode.attrs.proposal.snapshot,
+            state: vnode.state
           }
         });
         vnode.state.votingModalOpen = true;
@@ -185,50 +184,20 @@ const VoteAction: m.Component<{
       }
     };
 
-    const voteNo = (e) => {
-      e.preventDefault();
-      try {
-        app.modals.create({
-          modal: ConfirmSnapshotVoteModal,
-          data: {
-            space: vnode.attrs.space,
-            proposal: vnode.attrs.proposal,
-            id: vnode.attrs.id,
-            selectedChoice: 1,
-            totalScore: vnode.attrs.totalScore,
-            scores: vnode.attrs.scores,
-            snapshot: vnode.attrs.proposal.snapshot,
-          }
-        });
-        vnode.state.votingModalOpen = true;
-      } catch (err) {
-        notifyError('Voting failed');
-      }
-    };
-
-    const yesButton = m('.yes-button', [
-      m(Button, {
-        intent: 'positive',
-        disabled: !canVote || hasVotedYes || votingModalOpen,
-        onclick: voteYes,
-        label: hasVotedYes ? `Voted "${choices[0]}"` : `Vote "${choices[0]}"`,
-        compact: true,
-        rounded: true,
-      }),
-    ]);
-    const noButton = m('.no-button', [
-      m(Button, {
-        intent: 'negative',
-        disabled: !canVote || hasVotedNo || votingModalOpen,
-        onclick: voteNo,
-        label: hasVotedNo ? `Voted "${choices[1]}"` : `Vote "${choices[1]}"`,
-        compact: true,
-        rounded: true,
-      })
-    ]);
+    const votingButtons = vnode.attrs.proposal.choices.map((choice, idx) => {
+      return m(`.option-${idx + 1}`, [
+        m(Button, {
+          disabled: !canVote || hasVoted === idx || votingModalOpen,
+          onclick: (e) => vote(idx),
+          label: hasVoted === idx ? `Voted "${choices[idx]}"` : `Vote "${choices[idx]}"`,
+          compact: true,
+          rounded: true,
+        }),
+      ]);
+    });
 
     const votingActionObj = [
-      m('.button-row', [yesButton, noButton]),
+      m('.button-row', votingButtons),
     ];
 
     return m('.VotingActions', [votingActionObj]);
@@ -261,6 +230,7 @@ const ViewProposalPage: m.Component<{
       vnode.state.space = space;
 
       const votes = await getVotes(vnode.state.proposal.ipfs);
+      console.log(votes);
       vnode.state.votes = votes;
       const author = app.user.activeAccount;
 
@@ -291,7 +261,6 @@ const ViewProposalPage: m.Component<{
       loadVotes();
     }
   },
-
   view: (vnode) => {
     const getLoadingPage = () => m('.topic-loading-spinner-wrap', [ m(Spinner, { active: true, size: 'lg' }) ]);
     if (!vnode.state.votes) {
@@ -303,6 +272,7 @@ const ViewProposalPage: m.Component<{
     const isActive = vnode.state.proposal
     && moment(+vnode.state.proposal.start * 1000) <= moment()
     && moment(+vnode.state.proposal.end * 1000) > moment();
+    console.log(vnode.state.proposal.choices);
 
     return m(Sublayout, { class: 'ViewProposalPage', title: 'Snapshot Proposal' }, [
       m(ProposalHeader, {
