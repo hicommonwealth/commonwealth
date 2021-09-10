@@ -260,6 +260,7 @@ const ViewProposalPage: m.Component<{
       }),
       m('.PinnedDivider', m('hr')),
       vnode.state.votes
+      && vnode.state.proposal
       && m(VoteView, {
         choices: vnode.state.proposal.choices,
         votes: vnode.state.votes
