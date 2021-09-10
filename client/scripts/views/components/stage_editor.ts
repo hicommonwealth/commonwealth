@@ -263,6 +263,8 @@ const StageEditor: m.Component<{
                   : 'Failed to update linked proposals');
               }
 
+              // TODO: add set linked snapshot proposals
+
               vnode.attrs.onChangeHandler(vnode.state.stage, vnode.state.chainEntitiesToSet);
 
               if (vnode.attrs.popoverMenu) {

@@ -81,6 +81,16 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
           });
         }),
       ],
+      proposal.snapshotProposal && m(Button, {
+        class: 'discussion-row-linked-chain-entity',
+        label: [
+          'Snap ',
+          `${proposal.snapshotProposal.slice(0, 4)}…`,
+        ],
+        intent: 'primary',
+        size: 'xs',
+        compact: true,
+      }),
       proposal instanceof OffchainThread
         && proposal.stage !== OffchainThreadStage.Discussion
         && m(Button, {
