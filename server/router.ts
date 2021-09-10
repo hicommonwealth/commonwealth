@@ -110,6 +110,7 @@ import deleteTopic from './routes/deleteTopic';
 import bulkTopics from './routes/bulkTopics';
 import bulkOffchain from './routes/bulkOffchain';
 import setTopicThreshold from './routes/setTopicThreshold';
+import isAddress from './routes/isAddress';
 
 import edgewareLockdropLookup from './routes/getEdgewareLockdropLookup';
 import edgewareLockdropStats from './routes/getEdgewareLockdropStats';
@@ -348,6 +349,7 @@ function setupRouter(
   // fetch addresses (e.g. for mentions)
   // TODO: Change to GET /addresses
   router.get('/bulkAddresses', bulkAddresses.bind(this, models));
+  router.get('./isAddress', isAddress.bind(this, models));
 
   // third-party webhooks
   // TODO: Change to POST /webhook

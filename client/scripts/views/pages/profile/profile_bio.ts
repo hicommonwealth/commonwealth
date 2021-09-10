@@ -13,6 +13,8 @@ import { confirmationModalWithText } from '../../modals/confirm_modal';
 import EditIdentityModal from '../../modals/edit_identity_modal';
 import { setActiveAccount } from '../../../controllers/app/login';
 import EditProfileModal from '../../modals/edit_profile_modal';
+import TwitterAttestationModal from '../../modals/twitter_attestation_modal';
+import { isAddressOnSite } from 'helpers';
 
 const editIdentityAction = (account, currentIdentity: SubstrateIdentity, vnode) => {
   const chainObj = app.config.chains.getById(account.chain);
@@ -76,8 +78,8 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
   },
   view: (vnode) => {
     const { account, refreshCallback, onOwnProfile, onLinkedProfile } = vnode.attrs;
-    const showJoinCommunityButton = vnode.attrs.setIdentity && !onOwnProfile;
-    const isClaimable = !account || !account.profile || account.profile.isEmpty;
+    const showJoinCommunityButton = vnode.attrs.setIdentity && !onOwnProfile;      
+    const isClaimable = !isAddressOnSite(account.address) || !account.profile;
 
     window.addEventListener('scroll',
       () => {
@@ -139,13 +141,6 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
           ]),
         ]),
       ]),
-      isClaimable && m(LoginWithWalletDropdown, {
-        prepopulateAddress: account.address,
-        loggingInWithAddress: !app.isLoggedIn(),
-        joiningCommunity: app.activeCommunityId(),
-        joiningChain: app.activeChainId(),
-        label: 'Claim address',
-      }),
       m('.bio-actions-right', [
         onOwnProfile ? [
           editIdentityAction(account, vnode.state.identity, vnode),
@@ -200,6 +195,24 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
           }
         }),
       ]),
+      m('br'),
+      !isClaimable && onOwnProfile && m(Button, {
+        intent: 'warning',
+        onclick: () => {
+          app.modals.create({
+            modal: TwitterAttestationModal,
+            data: { account, refreshCallback },
+          });
+        },
+        label: 'Add a Public Twitter Identity'
+      }),
+      isClaimable && m(LoginWithWalletDropdown, {
+        prepopulateAddress: account.address,
+        loggingInWithAddress: !app.isLoggedIn(),
+        joiningCommunity: app.activeCommunityId(),
+        joiningChain: app.activeChainId(),
+        label: 'Claim address',
+      }),
       m('.header', 'Bio'),
       account.profile && account.profile.bio
         ? m('p', [

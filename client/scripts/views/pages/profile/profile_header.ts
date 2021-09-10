@@ -11,6 +11,8 @@ import SubstrateIdentity from 'controllers/chain/substrate/identity';
 import User from 'views/components/widgets/user';
 import EditProfileModal from 'views/modals/edit_profile_modal';
 import EditIdentityModal from 'views/modals/edit_identity_modal';
+import TwitterAttestationModal from 'views/modals/twitter_attestation_modal';
+import { isAddressOnSite } from 'helpers';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { setActiveAccount } from 'controllers/app/login';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
@@ -78,10 +80,10 @@ export interface IProfileHeaderState {
 }
 
 const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
-  view: (vnode) => {
+    view: (vnode) => {
     const { account, refreshCallback, onOwnProfile, onLinkedProfile } = vnode.attrs;
-    const showJoinCommunityButton = vnode.attrs.setIdentity && !onOwnProfile;
-    const isClaimable = !account || !account.profile || account.profile.isEmpty;
+    const isClaimable = !isAddressOnSite(account.address) || !account.profile;
+    const showJoinCommunityButton = !isAddressOnSite(account.address) && !account.profile;
 
     const joinCommunity = async () => {
       if (!app.activeChainId() || onOwnProfile) return;
@@ -162,6 +164,16 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
               },
               label: 'Edit'
             }),
+            !isClaimable && onOwnProfile && m(Button, {
+              intent: 'warning',
+              onclick: () => {
+                app.modals.create({
+                  modal: TwitterAttestationModal,
+                  data: { account, refreshCallback },
+                });
+              },
+              label: 'Add a Public Twitter Identity'
+            })
           ] : (showJoinCommunityButton && app.activeChainId())
             ? m(Button, {
               intent: 'primary',
@@ -189,7 +201,8 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
               label: onLinkedProfile ? 'Switch to address' : 'Join community'
             })
             : [
-            // TODO: actions for others' accounts
+              // On Other's Profiles
+              // Follow Button    
             ]
         ]),
       ]),

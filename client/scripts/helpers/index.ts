@@ -380,3 +380,12 @@ export const tokenBaseUnitsToTokens = (input: string, decimals: number) => {
 
   return `${partOne}${partTwo.length ? '.' : ''}${partTwo}`;
 };
+
+export const isAddressOnSite = async (address: string, chain?: string) => {
+  const res = await $.get(`${app.serverUrl()}/isAddress`, {
+    address: address,
+    chain: chain
+  });
+  return (res.status === 'true') ? true : false;
+}
+
