@@ -71,11 +71,8 @@ class CosmosGovernance extends ProposalModule<
     this._Accounts = Accounts;
 
     // query chain-wide params
-    console.log('api.gov.params.deposit!');
     const { depositParams } = await this._Chain.api.gov.params('deposit');
-    console.log('api.gov.params.tally!');
     const { tallyParams } = await this._Chain.api.gov.params('tallying');
-    console.log('api.gov.params.voting!');
     const { votingParams } = await this._Chain.api.gov.params('voting');
     this._votingPeriodS = votingParams.votingPeriod.seconds.toNumber();
     this._yesThreshold = asciiLiteralToDecimal(tallyParams.threshold);
@@ -102,15 +99,6 @@ class CosmosGovernance extends ProposalModule<
   private async _initProposals(): Promise<void> {
     const msgToIProposal = (p: Proposal): ICosmosProposal | null => {
       const content = p.content;
-      // TODO: support all sorts of proposals:
-      // - UpdatePoolIncentivesProposal
-      // - ParameterChangeProposal
-      // - CommunityPoolSpendProposal
-      // others?
-      if (content.typeUrl !== '/cosmos.gov.v1beta1.TextProposal') {
-        console.log(`Unsupported proposal content: ${content.typeUrl}`, p);
-        return null;
-      }
       const status = stateEnumToString(p.status);
       const { title, description } = TextProposal.decode(content.value);
       return {
@@ -137,7 +125,6 @@ class CosmosGovernance extends ProposalModule<
     };
 
     // TODO: ensure all proposals fetched regardless of state
-    console.log('api.gov.proposals!');
     const { proposals } = await this._Chain.api.gov.proposals(0, '', '');
     proposals
       .map((p) => msgToIProposal(p))

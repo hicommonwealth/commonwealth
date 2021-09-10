@@ -124,7 +124,6 @@ export class CosmosProposal extends Proposal<
 
   private async _initState() {
     const api = this._Chain.api;
-    console.log('api.gov.deposits/votes/tally!');
     const [depositResp, voteResp, tallyResp]: [
       QueryDepositsResponse, QueryVotesResponse, QueryTallyResultResponse
     ] = await Promise.all([
@@ -282,7 +281,6 @@ export class CosmosProposal extends Proposal<
     this._completedVotesFetched = true;
     let voteResp: QueryVotesResponse;
     try {
-      console.log('api.gov.votes!');
       voteResp = await this._Chain.api.gov.votes(this.identifier);
     } catch (e) {
       console.error(`could not fetch votes on proposal: ${this.identifier}`);

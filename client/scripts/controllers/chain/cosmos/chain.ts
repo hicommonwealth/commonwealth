@@ -87,9 +87,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     /* eslint-disable prefer-template */
     this._url = node.url;
 
-    console.log(`Starting REST API at ${this._url}...`);
-
-    console.log('tmClient.connect!');
+    console.log(`Starting Tendermint RPC API at ${this._url}...`);
     // TODO: configure broadcast mode
     this._tmClient = await Tendermint34Client.connect(this._url);
     this._api = QueryClient.withExtensions(
@@ -104,9 +102,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
 
     // Poll for new block immediately and then every 2s
     const fetchBlockJob = async () => {
-      console.log('tmClient.block!');
       const { block } = await this._tmClient.block();
-      console.log(block);
       const height = +block.header.height;
       if (height > this.app.chain.block.height) {
         const time = moment.unix(block.header.time.valueOf() / 1000);
@@ -116,14 +112,11 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       }
     };
     await fetchBlockJob();
-    // TODO: reenable this
-    // this._blockSubscription = setInterval(fetchBlockJob, 2000);
+    this._blockSubscription = setInterval(fetchBlockJob, 6000);
 
-    console.log('api.staking.pool!');
     const { pool: { bondedTokens } } = await this._api.staking.pool();
     this._staked = this.coins(new BN(bondedTokens));
 
-    console.log('api.staking.params!');
     const { params: { bondDenom } } = await this._api.staking.params();
     this._denom = bondDenom;
     this.app.chain.networkStatus = ApiStatus.Connected;
