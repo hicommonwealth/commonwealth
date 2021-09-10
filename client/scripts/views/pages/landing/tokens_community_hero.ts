@@ -326,14 +326,6 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
                 alt: 'Discussion card',
               }),
             ]),
-            m('div', {
-              class: 'h-556 md:h-auto md:w-2/4'
-            }, [
-              m('div', {
-                class: `gradient-135 overflow-hidden relative h-full lg:min-h-desktop
-                lg:h-screen lg:w-50-screen lg:absolute lg:object-left xl:h-full xl:min-h-full`,
-              }, mappedCommunities)
-            ]),
           ])
         ])
       ]
