@@ -17,6 +17,8 @@ export async function attachSigner<CT extends Contract>(
   if (signingWallet instanceof MetamaskWebWalletController
     || signingWallet instanceof WalletConnectWebWalletController) {
     const walletProvider = new ethers.providers.Web3Provider(signingWallet.provider as any);
+    // 12s minute polling interval (default is 4s)
+    walletProvider.pollingInterval = 12000;
     signer = walletProvider.getSigner(sender);
   } else {
     throw new Error('Unsupported wallet');
@@ -44,6 +46,8 @@ abstract class ContractApi<ContractT extends Contract> {
   ) {
     this.contractAddress = contractAddress;
     this.Provider = new ethers.providers.Web3Provider(web3Provider);
+    // 12s minute polling interval (default is 4s)
+    this.Provider.pollingInterval = 12000;
     this.Contract = factory(this.contractAddress, this.Provider);
   }
 

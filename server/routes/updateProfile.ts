@@ -94,7 +94,7 @@ const updateProfile = async (
   }
 
   // new profiles on substrate chains get added to the identity cache
-  // to be fetched on a timer job
+  // to be fetched by chain-event nodes or on a timer job
   if (!req.body.skipChainFetch && chainSupportedBy(req.body.chain, SubstrateTypes.EventChains)) {
     await identityFetchCache.add(req.body.chain, req.body.address);
   }

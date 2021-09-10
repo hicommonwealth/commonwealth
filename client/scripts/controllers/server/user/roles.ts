@@ -68,14 +68,22 @@ export default class extends Base {
     });
   }
 
-  public acceptInvite(options: { address: string, inviteCode: any, reject?: boolean }): JQueryPromise<void> {
+  public acceptInvite(options: { address: string, inviteCode: any}): JQueryPromise<void> {
     return $.post(`${app.serverUrl()}/acceptInvite`, {
       address: options.address,
-      reject: (options.reject) ? options.reject : false,
+      reject: false,
       inviteCode: options.inviteCode,
       jwt: this.jwt,
     }).then((result) => {
       this.addRole(result.result.role);
+    });
+  }
+
+  public rejectInvite(options: { inviteCode: any }) {
+    return $.post(`${app.serverUrl()}/acceptInvite`, {
+      inviteCode: options.inviteCode,
+      reject: true,
+      jwt: app.user.jwt,
     });
   }
 

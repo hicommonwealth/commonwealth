@@ -6,7 +6,8 @@ const MomentLocalesPlugin = require('moment-locales-webpack-plugin');
 
 module.exports = {
   node: {
-    fs: 'empty'
+    fs: 'empty',
+    net: 'empty'
   },
   context: __dirname,
   devServer: {
