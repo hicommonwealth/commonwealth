@@ -2,7 +2,11 @@
 
 .InfoPage {
   .info-contents {
-    margin: 38px 24px 0 48px;
+    margin: 12px 0;
+
+    @include lg-min {
+      margin: 38px 24px 0 48px;
+    }
   }
 
   .chain-image {
@@ -14,19 +18,29 @@
     font-weight: 500;
   }
 
-  .w-70-percent {
-    width: 70%;
+  .w-60-percent {
+    @include lg-min {
+      width: 60%;
+    }
   }
 
   .info-box {
-    display: flex;
+    @include lg-min {
+      display: flex;
+      height: 200px;
+    }
+
     margin: 30px -10px;
-    height: 200px;
 
     .info-card {
+      @include md-max {
+        margin: 10px 0;
+      }
+
       background-color: #F4F4F4;
       border-radius: 10px;
       display: flex;
+      padding: 20px 12px 12px 12px;
       flex-direction: column;
       justify-content: center;
       align-items: center;
@@ -46,7 +60,10 @@
   }
 
   .details-box {
-    display: flex;
+    @include lg-min {
+      display: flex;
+    }
+
     margin: 30px -10px;
     font-weight: 500;
     color: #333333;
@@ -74,11 +91,18 @@
     }
 
     .contract-details {
-      width: 66%;
-      flex-grow: 0;
+      @include lg-min {
+        width: 66%;
+        flex-grow: 0;
+      }
+
+      @include md-max {
+        margin: 10px 0;
+      }
+
+      margin: 0 10px;
       background-color: #F4F4F4;
       border-radius: 10px;
-      margin: 0 10px;
       padding: 20px;
 
       .callout {
@@ -103,11 +127,18 @@
     }
 
     .voting-details {
-      width: 34%;
-      flex-grow: 0;
+      @include lg-min {
+        width: 34%;
+        flex-grow: 0;
+      }
+
+      @include md-max {
+        margin: 10px 0;
+      }
+
+      margin: 0 10px;
       background-color: #F4F4F4;
       border-radius: 10px;
-      margin: 0 10px;
       padding: 20px;
       color: #333333;
       font-weight: 400;
