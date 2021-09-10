@@ -15,6 +15,7 @@ abstract class Account<C extends Coin> {
   public readonly address: string;
   public readonly chain: ChainInfo;
   public readonly chainBase: ChainBase;
+  public readonly ghost_address: ChainBase;
   public get freeBalance() { return this.balance; }
   public abstract balance: Promise<C>;
   public abstract sendBalanceTx(recipient: Account<C>, amount: C): Promise<ITXModalData> | ITXModalData;
