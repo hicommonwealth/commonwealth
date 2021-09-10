@@ -167,10 +167,8 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
             !isClaimable && onOwnProfile && m(Button, {
               intent: 'warning',
               onclick: () => {
-                app.modals.create({
-                  modal: TwitterAttestationModal,
-                  data: { account, refreshCallback },
-                });
+                window.location.href = `/api/auth/twitter?redirect=${encodeURIComponent(window.location.pathname)}${window.location.search ? 
+                  `${encodeURIComponent(window.location.search)}%26` : '%3F'}continueTwitterAttestation=true`;
               },
               label: 'Add a Public Twitter Identity'
             })

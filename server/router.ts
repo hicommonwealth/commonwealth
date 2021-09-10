@@ -513,10 +513,15 @@ function setupRouter(
     authenticator(req, res, next);
   });
   router.get('/auth/twitter/callback',
-    passport.authenticate('twitter', { failureRedirect: '/login' }),
-    (req, res) => {
-      res.redirect(req.session.redirect || '/');
-      delete req.session.redirect;
+    (req, res, next) => {
+      passport.authenticate('twitter',
+        (err) => {
+          if (err || req.query.denied) {
+            console.warn('Error', err);
+          }
+          res.redirect(req.session.redirect || '/');
+          delete req.session.redirect;
+        })(req, res, next);
     });
 
   app.use('/api', router);

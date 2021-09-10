@@ -157,7 +157,8 @@ const send = async (models, content: WebhookContent) => {
       // if the chain has a logo, show it as preview image
       const chain = await models.Chain.findOne({ where: { id: content.chain } });
       if (chain) {
-        previewImageUrl = `https://commonwealth.im${chain.icon_url}`;
+        previewImageUrl = (chain.icon_url.match(`^(http|https)://`)) ? chain.icon_url :
+          `https://commonwealth.im${chain.icon_url}`;
         // can't handle the prefix of `previeImageUrl` with SERVER_URL
         // because social platforms can't access to localhost:8080.
         previewAltText = chain.name;
@@ -166,7 +167,8 @@ const send = async (models, content: WebhookContent) => {
       // if the community has a logo, show it as preview image
       const offchainCommunity = await models.OffchainCommunity.findOne({ where: { id: content.community, privacyEnabled: false } });
       if (offchainCommunity) {
-        previewImageUrl = `https://commonwealth.im${offchainCommunity.iconUrl}`;
+        previewImageUrl = (offchainCommunity.icon_url.match(`^(http|https)://`)) ? offchainCommunity.icon_url :
+        `https://commonwealth.im${offchainCommunity.icon_url}`;
         previewAltText = offchainCommunity.name;
       }
     }
@@ -296,7 +298,7 @@ const send = async (models, content: WebhookContent) => {
             'resize_keyboard': true,
             'inline_keyboard': [
               [
-                { 'text': 'Read more on commonwealth', 'url': 'https://commonwealth.im' }
+                { 'text': 'Read more on commonwealth', 'url': actedOnLink }
               ]
             ]
           }
