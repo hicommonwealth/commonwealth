@@ -33,6 +33,7 @@ export const modelFromServer = (thread) => {
     body,
     last_edited,
     version_history,
+    snapshot_proposal,
     OffchainAttachments,
     created_at,
     topic,
@@ -94,6 +95,7 @@ export const modelFromServer = (thread) => {
     body: decodeURIComponent(body),
     createdAt: moment(created_at),
     attachments,
+    snapshotProposal: snapshot_proposal,
     topic,
     kind,
     stage,
@@ -396,6 +398,30 @@ class ThreadsController {
       error: (err) => {
         notifyError('Could not update pinned state');
         console.error(err);
+      }
+    });
+  }
+
+  public async setLinkedSnapshotProposal(args: { threadId: number, snapshotProposal: string }) {
+    await $.ajax({
+      url: `${app.serverUrl()}/updateThreadLinkedSnapshotProposal`,
+      type: 'POST',
+      data: {
+        'chain': app.activeChainId(),
+        'thread_id': args.threadId,
+        'snapshot_proposal': args.snapshotProposal,
+        'jwt': app.user.jwt
+      },
+      success: (response) => {
+        const thread = this._store.getByIdentifier(args.threadId);
+        if (!thread) return;
+        thread.snapshotProposal = args.snapshotProposal;
+        return thread;
+      },
+      error: (err) => {
+        console.log('Failed to update linked snapshot proposal');
+        throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error
+          : 'Failed to update linked proposals');
       }
     });
   }

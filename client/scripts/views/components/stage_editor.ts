@@ -1,15 +1,76 @@
 import 'components/stage_editor.scss';
 
 import m from 'mithril';
-import $ from 'jquery';
 import { uuidv4 } from 'lib/util';
-import { QueryList, ListItem, Button, Classes, Dialog, InputSelect, Icon, Icons, MenuItem } from 'construct-ui';
+import { QueryList, ListItem, Button, Classes, Dialog, Icons } from 'construct-ui';
 
 import app from 'state';
 import { offchainThreadStageToLabel, parseCustomStages } from 'helpers';
 import { ChainEntity, OffchainThread, OffchainThreadStage } from 'models';
 import { chainEntityTypeToProposalName } from 'identifiers';
-import ChainEntityController, { EntityRefreshOption } from 'controllers/server/chain_entities';
+import { EntityRefreshOption } from 'controllers/server/chain_entities';
+import { SnapshotProposal } from 'helpers/snapshot_utils';
+
+/*
+const SnapshotProposalSelector: m.Component<{
+  thread: OffchainThread;
+  onSelect,
+}, {
+  initialized: boolean;
+  snapshotProposalsLoaded: boolean;
+}> = {
+  view: (vnode) => {
+    const { thread, onSelect } = vnode.attrs;
+    if (!app.chain || !app.activeChainId()) return;
+    if (!vnode.state.initialized) {
+      vnode.state.initialized = true;
+      if (app.chain.meta.chain.snapshot) {
+        app.snapshot.init(app.chain.meta.chain.snapshot).then(() => {
+          // refreshing loads the latest snapshot proposals into app.snapshot.proposals array
+          vnode.state.snapshotProposalsLoaded = true;
+          m.redraw();
+        });
+      }
+    }
+
+    return m('.ChainEntitiesSelector', [
+      vnode.state.snapshotProposalsLoaded ? m(QueryList, {
+        checkmark: true,
+        items: app.snapshot.proposals.sort((a, b) => {
+          return b.created - a.created;
+        }),
+        inputAttrs: {
+          placeholder: 'Search for an existing snapshot proposal...',
+        },
+        itemRender: (sn: SnapshotProposal, idx: number) => {
+          const selected = vnode.attrs.chainEntitiesToSet.map((ce_) => ce_.id).indexOf(ce.id) !== -1;
+          // TODO: show additional info on the ListItem, like any set proposal title, the creator, or other metadata
+          return m(ListItem, {
+            label: m('.chain-entity-info', [
+              m('.chain-entity-top', `Snapshot Proposal ${sn.id}`),
+              m('.chain-entity-bottom', sn.title),
+            ]),
+            selected,
+            key: sn.id,
+          });
+        },
+        itemPredicate: (query, ce: ChainEntity, idx) => {
+          // TODO
+        },
+        onSelect: (ce: ChainEntity) => {
+          // TODO
+        },
+      }) : m('.chain-entities-selector-placeholder', [
+        m('.chain-entities-selector-placeholder-text', [
+          vnode.state.snapshotProposalsLoaded
+            ? 'TODO: how to begin?'
+            : 'Loading snapshot proposals...'
+        ]),
+      ]),
+    ]);
+  }
+};
+*/
 
 const ChainEntitiesSelector: m.Component<{
   thread: OffchainThread;

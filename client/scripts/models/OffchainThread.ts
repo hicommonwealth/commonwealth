@@ -42,6 +42,7 @@ class OffchainThread implements IUniqueId {
   public readonly community: string;
   public readonly chain: string;
   public readonly lastEdited: moment.Moment;
+  public snapshotProposal: string;
 
   public get uniqueIdentifier() {
     return `${this.slug}_${this.identifier}`;
@@ -115,6 +116,7 @@ class OffchainThread implements IUniqueId {
     collaborators,
     chainEntities,
     lastEdited,
+    snapshotProposal,
     offchainVotingOptions,
     offchainVotingEndsAt,
     offchainVotingNumVotes,
@@ -140,6 +142,7 @@ class OffchainThread implements IUniqueId {
     collaborators?: any[],
     chainEntities?: any[],
     lastEdited?: moment.Moment,
+    snapshotProposal: string,
     offchainVotingOptions?: string,
     offchainVotingEndsAt?: string | moment.Moment | null,
     offchainVotingNumVotes?: number,
@@ -175,6 +178,7 @@ class OffchainThread implements IUniqueId {
     try {
       this.offchainVotingOptions = JSON.parse(offchainVotingOptions);
     } catch (e) {}
+    this.snapshotProposal = snapshotProposal;
     this.offchainVotingEndsAt = offchainVotingEndsAt ? moment(offchainVotingEndsAt) : null;
     this.offchainVotingNumVotes = offchainVotingNumVotes;
     this.offchainVotes = offchainVotes || [];
