@@ -15,6 +15,7 @@ import { CommunityOptionsPopover } from './discussions';
 import Compound from 'controllers/chain/ethereum/compound/adapter';
 import { sleep } from 'helpers';
 import { BigNumber } from 'ethers';
+import { notifyError } from 'controllers/app/notifications';
 
 interface MemberInfo {
   chain: string;
@@ -46,7 +47,13 @@ const DelegateModal: m.Component<{ address: string, name: string }, { delegateAm
           label: 'Delegate',
           intent: 'primary',
           onclick: async (e) => {
-            (app.chain as Compound).chain.setDelegate(vnode.attrs.address, vnode.state.delegateAmount);
+            (app.chain as Compound).chain.setDelegate(vnode.attrs.address, vnode.state.delegateAmount)
+            .catch((err)=>{ 
+              if (err.message.indexOf('delegates underflow') > -1) { 
+                err.message = 'You do not have the requested number of votes to delegate';
+              }
+              notifyError(err.message)
+            });
           }
         })
       // m(Login),
