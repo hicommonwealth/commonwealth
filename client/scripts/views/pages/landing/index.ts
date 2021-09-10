@@ -84,7 +84,7 @@ const LandingPage: m.Component<{}, IState> = {
             chainInfo,
             name: chainInfo.name,
           };
-        } else  {
+        } else {
           // Should never be used
           return {
             img: entity.defaultChain.iconUrl,
@@ -98,12 +98,10 @@ const LandingPage: m.Component<{}, IState> = {
       .filter((chain: any) => chain);
 
     const sortedChainsAndCommunities = sortChains(
-      myChains
-        .filter((c) => c[1][0] && !c[1][0].chain.collapsedOnHomepage)
+      myChains.filter((c) => c[1][0] && !c[1][0].chain.collapsedOnHomepage)
     );
     const betaChainsAndCommunities = sortChains(
-      myChains
-        .filter((c) => c[1][0] && c[1][0].chain.collapsedOnHomepage)
+      myChains.filter((c) => c[1][0] && c[1][0].chain.collapsedOnHomepage)
     );
 
     vnode.state.chains = [
@@ -116,17 +114,24 @@ const LandingPage: m.Component<{}, IState> = {
       setTimeout(() => handleEmailInvites(vnode.state), 0);
     }
     if (app.loginState !== LoginState.LoggedIn) {
+      const isSearching = localStorage.getItem('tokenInputText');
       return m('.LandingPage', { class: 'bg-primary' }, [
         m(
           'div',
-          { class: 'absolute w-screen z-20' },
+          {
+            class: `absolute w-screen z-20 ${
+              isSearching === 'true'
+                ? 'LandingPageHeaderHide'
+                : 'LandingPageHeaderShow'
+            }`,
+          },
           m(HeaderLandingPage, {
             scrollHeader: true,
             navs: [
               { text: 'Why Commonwealth?', redirectTo: '/whyCommonwealth' },
-            // { text: 'Use Cases', redirectTo: '/whyCommonwealth' },
-            // { text: 'Crowdfunding', redirectTo: '/whyCommonwealth' },
-            // { text: 'Developers' },
+              // { text: 'Use Cases', redirectTo: '/whyCommonwealth' },
+              // { text: 'Crowdfunding', redirectTo: '/whyCommonwealth' },
+              // { text: 'Developers' },
             ],
           })
         ),
@@ -167,99 +172,32 @@ const LandingPage: m.Component<{}, IState> = {
           },
           chains: vnode.state.chains,
         }),
-        m(TokensCreatorComponent, {
-          creators: [
-            {
-              button: {
-                id: 'first-section-button1',
-              },
-              texts: {
-                title: ' On-chain notifications ',
-                text:
-                ' Stay up-to-date on chain events like votes and large transfers. ',
-              },
-              card: {
-                id: 'tab-codepen',
-                imgSrc: 'static/img/tab1.svg',
-                imgAlt: '',
-              },
-            },
-            {
-              button: {
-                id: 'first-section-button2',
-              },
-              texts: {
-                title: ' Off-chain polling & on-chain voting ',
-                text:
-                ' Whether you use Snapshot, COMP governance contracts, or native Layer 1 voting, access everything from one place. ',
-              },
-              card: {
-                id: 'tab2-codepen',
-                imgSrc: 'static/img/tab2.svg',
-                imgAlt: '',
-              },
-            },
-            {
-              button: {
-                id: 'first-section-button3',
-              },
-              texts: {
-                title: ' Crowdfunding ',
-                text:
-                ' Fund new tokens and community initiatives with Kickstarter-like raises from a thread. ',
-              },
-              card: {
-                id: 'tab3-codepen',
-                imgSrc: 'static/img/tab3.svg',
-                imgAlt: '',
-              },
-            },
-            {
-              button: {
-                id: 'first-section-button4',
-              },
-              texts: {
-                title: ' A rich forum experience ',
-                text:
-                ' Discuss memes or key decisions, in a Discourse-style forum. Enhance your posts with built in Markdown and fun reactions. ',
-              },
-              card: {
-                id: 'tab4-codepen',
-                imgSrc: 'static/img/tab4.svg',
-                imgAlt: '',
-              },
-            },
-          ],
-        }),
+        m(TokensCreatorComponent),
         m(TokenHoldersComponent, {
           holders: [
             {
               img: 'static/img/circleCrowd.svg',
               alt: '',
               title: 'Your community is here.',
-              text:
-              ' Stop bouncing between 10 tabs at once - everything you need to know about your token is here. ',
+              text: ' Stop bouncing between 10 tabs at once - everything you need to know about your token is here. ',
             },
             {
               img: 'static/img/1stButtonToken.svg',
               alt: '',
               title: 'Claim your token',
-              text:
-              ' We generate pages for your favorite community and address from real-time chain activity. Claim yours. ',
+              text: ' We generate pages for your favorite community and address from real-time chain activity. Claim yours. ',
             },
             {
               img: 'static/img/bell.svg',
               alt: '',
               title: 'Stay updated',
-              text:
-              ' Be the first to know when community events are happening with in-app, email, and mobile push notifications. ',
+              text: ' Be the first to know when community events are happening with in-app, email, and mobile push notifications. ',
             },
             {
               img: 'static/img/calendar.svg',
               alt: '',
               title: 'Participate in events.',
-              text:
-              ' Participate in events like upcoming votes, new projects and community initiatives. ',
+              text: ' Participate in events like upcoming votes, new projects and community initiatives. ',
             },
           ],
         }),
@@ -271,8 +209,7 @@ const LandingPage: m.Component<{}, IState> = {
               },
               texts: {
                 title: 'Fund new projects',
-                text:
-                'Anyone from within your community can easily turn a conversation thread into a Kickstarter-like campaign. ',
+                text: 'Anyone from within your community can easily turn a conversation thread into a Kickstarter-like campaign. ',
               },
               card: {
                 id: 'tab-card',
@@ -286,8 +223,7 @@ const LandingPage: m.Component<{}, IState> = {
               },
               texts: {
                 title: 'Create Community Endowments',
-                text:
-                ' Pool funds with other like-minded folks, and fund interesting projects within your community or across the web. ',
+                text: ' Pool funds with other like-minded folks, and fund interesting projects within your community or across the web. ',
               },
               card: {
                 id: 'tab2-card',
@@ -301,8 +237,7 @@ const LandingPage: m.Component<{}, IState> = {
               },
               texts: {
                 title: 'Launch New Tokens',
-                text:
-                ' Use a project to raise funds for a new DeFi token or NFT. Optionally plug in an allowlist for KYC compliance. ',
+                text: ' Use a project to raise funds for a new DeFi token or NFT. Optionally plug in an allowlist for KYC compliance. ',
               },
               card: {
                 id: 'tab3-card',
@@ -326,41 +261,43 @@ const LandingPage: m.Component<{}, IState> = {
             { text: 'Why Commonwealth?', redirectTo: '/whyCommonwealth' },
             { text: 'Discord', externalLink: 'https://discord.gg/frnQxxZG5S' },
             { text: 'Telegram', externalLink: 'https://t.me/HiCommonwealth' },
-            { text: 'Twitter', externalLink: 'https://twitter.com/hicommonwealth' }
+            {
+              text: 'Twitter',
+              externalLink: 'https://twitter.com/hicommonwealth',
+            },
           ],
         }),
         m('script', {
-          src:
-          'https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.2.0/glide.min.js',
+          src: 'https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.2.0/glide.min.js',
           integrity:
-          'sha512-IkLiryZhI6G4pnA3bBZzYCT9Ewk87U4DGEOz+TnRD3MrKqaUitt+ssHgn2X/sxoM7FxCP/ROUp6wcxjH/GcI5Q==',
+            'sha512-IkLiryZhI6G4pnA3bBZzYCT9Ewk87U4DGEOz+TnRD3MrKqaUitt+ssHgn2X/sxoM7FxCP/ROUp6wcxjH/GcI5Q==',
           crossorigin: 'anonymous',
         }),
         m('link', {
           rel: 'stylesheet',
-          href:
-          'https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.2.0/css/glide.core.min.css',
+          href: 'https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.2.0/css/glide.core.min.css',
           integrity:
-          'sha512-YQlbvfX5C6Ym6fTUSZ9GZpyB3F92hmQAZTO5YjciedwAaGRI9ccNs4iw2QTCJiSPheUQZomZKHQtuwbHkA9lgw==',
+            'sha512-YQlbvfX5C6Ym6fTUSZ9GZpyB3F92hmQAZTO5YjciedwAaGRI9ccNs4iw2QTCJiSPheUQZomZKHQtuwbHkA9lgw==',
           crossorigin: 'anonymous',
         }),
         m('link', {
           rel: 'stylesheet',
-          href:
-          'https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.2.0/css/glide.theme.min.css',
+          href: 'https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.2.0/css/glide.theme.min.css',
           integrity:
-          'sha512-wCwx+DYp8LDIaTem/rpXubV/C1WiNRsEVqoztV0NZm8tiTvsUeSlA/Uz02VTGSiqfzAHD4RnqVoevMcRZgYEcQ==',
+            'sha512-wCwx+DYp8LDIaTem/rpXubV/C1WiNRsEVqoztV0NZm8tiTvsUeSlA/Uz02VTGSiqfzAHD4RnqVoevMcRZgYEcQ==',
           crossorigin: 'anonymous',
         }),
       ]);
     } else {
-      return m(Sublayout, {
-        class: 'Homepage',
-      }, [
-        m(CommunityCards),
-      ]);
+      return m(
+        Sublayout,
+        {
+          class: 'Homepage',
+        },
+        [m(CommunityCards)]
+      );
     }
-  }
+  },
 };
 
 export default LandingPage;

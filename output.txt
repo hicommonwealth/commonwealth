@@ -1,0 +1,49 @@
+yarn run v1.22.5
+$ NODE_OPTIONS=--max_old_space_size=4096 nodemon --delay 0.25 --watch 'server/**/*.ts' --ignore 'server/**/*.spec.ts' --exec 'ts-node --project tsconfig.node.json' server.ts
+[33m[nodemon] 1.19.4[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching dir(s): server/**/*.ts[39m
+[33m[nodemon] watching extensions: ts,json[39m
+[32m[nodemon] starting `ts-node --project tsconfig.node.json server.ts`[39m
+Applied changes: logLevel=Debug to log groups 'all'.
+Applied changes: logLevel=Debug to log groups 'all'.
+Reusing resolution of module 'events' to file '/Users/juliopavila/Documents/Project/commonwealth-1/node_modules/@types/node/child_process.d.ts' from old program.
+Reusing resolution of module 'events' to file '/Users/juliopavila/Documents/Project/commonwealth-1/node_modules/@types/node/cluster.d.ts' from old program.
+Reusing resolution of module 'events' to file '/Users/juliopavila/Documents/Project/commonwealth-1/node_modules/@types/node/dgram.d.ts' from old program.
+Reusing resolution of module 'events' to file '/Users/juliopavila/Documents/Project/commonwealth-1/node_modules/@types/node/domain.d.ts' from old program.
+Reusing resolution of module 'events' to file '/Users/juliopavila/Documents/Project/commonwealth-1/node_modules/@types/node/fs.d.ts' from old program.
+Reusing resolution of module 'url' to file '/Users/juliopavila/Documents/Project/commonwealth-1/node_modules/@types/node/fs.d.ts' from old program.
+Reusing resolution of module 'events' to file '/Users/juliopavila/Documents/Project/commonwealth-1/node_modules/@types/node/http.d.ts' from old program.
+Reusing resolution of module 'url' to file '/Users/juliopavila/Documents/Project/commonwealth-1/node_modules/@types/node/http.d.ts' from old program.
+Reusing resolution of module 'events' to file '/Users/juliopavila/Documents/Project/commonwealth-1/node_modules/@types/node/http2.d.ts' from old program.
+Reusing resolution of module 'url' to file '/Users/juliopavila/Documents/Project/commonwealth-1/node_modules/@types/node/http2.d.ts' from old program.
+Reusing resolution of module 'events' to file '/Users/juliopavila/Documents/Project/commonwealth-1/node_modules/@types/node/https.d.ts' from old program.
+Reusing resolution of module 'url' to file '/Users/juliopavila/Documents/Project/commonwealth-1/node_modules/@types/node/https.d.ts' from old program.
+Reusing resolution of module 'events' to file '/Users/juliopavila/Documents/Project/commonwealth-1/node_modules/@types/node/inspector.d.ts' from old program.
+Reusing resolution of module 'url' to file '/Users/juliopavila/Documents/Project/commonwealth-1/node_modules/@types/node/module.d.ts' from old program.
+Reusing resolution of module 'events' to file '/Users/juliopavila/Documents/Project/commonwealth-1/node_modules/@types/node/net.d.ts' from old program.
+Reusing resolution of module 'events' to file '/Users/juliopavila/Documents/Project/commonwealth-1/node_modules/@types/node/readline.d.ts' from old program.
+Reusing resolution of module 'util' to file '/Users/juliopavila/Documents/Project/commonwealth-1/node_modules/@types/node/repl.d.ts' from old program.
+Reusing resolution of module 'events' to file '/Users/juliopavila/Documents/Project/commonwealth-1/node_modules/@types/node/stream.d.ts' from old program.
+Reusing resolution of module 'querystring' to file '/Users/juliopavila/Documents/Project/commonwealth-1/node_modules/@types/node/url.d.ts' from old program.
+Reusing resolution of module 'events' to file '/Users/juliopavila/Documents/Project/commonwealth-1/node_modules/@types/node/worker_threads.d.ts' from old program.
+Reusing resolution of module 'events' to file '/Users/juliopavila/Documents/Project/commonwealth-1/node_modules/@types/node/child_process.d.ts' from old program.
+Reusing resolution of module 'events' to file '/Users/juliopavila/Documents/Project/commonwealth-1/node_modules/@types/node/cluster.d.ts' from old program.
+Reusing resolution of module 'events' to file '/Users/juliopavila/Documents/Project/commonwealth-1/node_modules/@types/node/dgram.d.ts' from old program.
+Reusing resolution of module 'events' to file '/Users/juliopavila/Documents/Project/commonwealth-1/node_modules/@types/node/domain.d.ts' from old program.
+Reusing resolution of module 'events' to file '/Users/juliopavila/Documents/Project/commonwealth-1/node_modules/@types/node/fs.d.ts' from old program.
+Reusing resolution of module 'url' to file '/Users/juliopavila/Documents/Project/commonwealth-1/node_modules/@types/node/fs.d.ts' from old program.
+Reusing resolution of module 'events' to file '/Users/juliopavila/Documents/Project/commonwealth-1/node_modules/@types/node/http.d.ts' from old program.
+Reusing resolution of module 'url' to file '/Users/juliopavila/Documents/Project/commonwealth-1/node_modules/@types/node/http.d.ts' from old program.
+Reusing resolution of module 'events' to file '/Users/juliopavila/Documents/Project/commonwealth-1/node_modules/@types/node/http2.d.ts' from old program.
+Reusing resolution of module 'url' to file '/Users/juliopavila/Documents/Project/commonwealth-1/node_modules/@types/node/http2.d.ts' from old program.
+Reusing resolution of module 'events' to file '/Users/juliopavila/Documents/Project/commonwealth-1/node_modules/@types/node/https.d.ts' from old program.
+Reusing resolution of module 'url' to file '/Users/juliopavila/Documents/Project/commonwealth-1/node_modules/@types/node/https.d.ts' from old program.
+Reusing resolution of module 'events' to file '/Users/juliopavila/Documents/Project/commonwealth-1/node_modules/@types/node/inspector.d.ts' from old program.
+Reusing resolution of module 'url' to file '/Users/juliopavila/Documents/Project/commonwealth-1/node_modules/@types/node/module.d.ts' from old program.
+Reusing resolution of module 'events' to file '/Users/juliopavila/Documents/Project/commonwealth-1/node_modules/@types/node/net.d.ts' from old program.
+Reusing resolution of module 'events' to file '/Users/juliopavila/Documents/Project/commonwealth-1/node_modules/@types/node/readline.d.ts' from old program.
+Reusing resolution of module 'util' to file '/Users/juliopavila/Documents/Project/commonwealth-1/node_modules/@types/node/repl.d.ts' from old program.
+Reusing resolution of module 'events' to file '/Users/juliopavila/Documents/Project/commonwealth-1/node_modules/@types/node/stream.d.ts' from old program.
+Reusing resolution of module 'querystring' to file '/Users/juliopavila/Documents/Project/commonwealth-1/node_modules/@types/node/url.d.ts' from old program.
+Reusing resolution of module 'events' to file '/Users/juliopavila/Documents/Project/commonwealth-1/node_modules/@types/node/worker_threads.d.ts' from old program.
