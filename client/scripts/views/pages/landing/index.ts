@@ -167,70 +167,7 @@ const LandingPage: m.Component<{}, IState> = {
           },
           chains: vnode.state.chains,
         }),
-        m(TokensCreatorComponent, {
-          creators: [
-            {
-              button: {
-                id: 'first-section-button1',
-              },
-              texts: {
-                title: ' On-chain notifications ',
-                text:
-                ' Stay up-to-date on chain events like votes and large transfers. ',
-              },
-              card: {
-                id: 'tab-codepen',
-                imgSrc: 'static/img/tab1.svg',
-                imgAlt: '',
-              },
-            },
-            {
-              button: {
-                id: 'first-section-button2',
-              },
-              texts: {
-                title: ' Off-chain polling & on-chain voting ',
-                text:
-                ' Whether you use Snapshot, COMP governance contracts, or native Layer 1 voting, access everything from one place. ',
-              },
-              card: {
-                id: 'tab2-codepen',
-                imgSrc: 'static/img/tab2.svg',
-                imgAlt: '',
-              },
-            },
-            {
-              button: {
-                id: 'first-section-button3',
-              },
-              texts: {
-                title: ' Crowdfunding ',
-                text:
-                ' Fund new tokens and community initiatives with Kickstarter-like raises from a thread. ',
-              },
-              card: {
-                id: 'tab3-codepen',
-                imgSrc: 'static/img/tab3.svg',
-                imgAlt: '',
-              },
-            },
-            {
-              button: {
-                id: 'first-section-button4',
-              },
-              texts: {
-                title: ' A rich forum experience ',
-                text:
-                ' Discuss memes or key decisions, in a Discourse-style forum. Enhance your posts with built in Markdown and fun reactions. ',
-              },
-              card: {
-                id: 'tab4-codepen',
-                imgSrc: 'static/img/tab4.svg',
-                imgAlt: '',
-              },
-            },
-          ],
-        }),
+        m(TokensCreatorComponent),
         m(TokenHoldersComponent, {
           holders: [
             {

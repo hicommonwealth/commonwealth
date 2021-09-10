@@ -24,7 +24,11 @@ interface IAttrs {
 }
 
 const initiateFullSearch = (searchTerm) => {
-  if (!searchTerm || !searchTerm.toString().trim() || !searchTerm.match(/[A-Za-z]+/)) {
+  if (
+    !searchTerm ||
+    !searchTerm.toString().trim() ||
+    !searchTerm.match(/[A-Za-z]+/)
+  ) {
     return;
   }
   if (searchTerm.length < 3) {
@@ -53,18 +57,17 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
         {
           img: 'static/img/addFilled.svg',
           id: 'placeholder',
-          chainInfo: { symbol: 'PLACEHOLDER', },
+          chainInfo: { symbol: 'PLACEHOLDER' },
           name: 'Add your token!',
           placeholder: true,
         },
         ...vnode.attrs.chains,
-        ...app.searchCache[ALL_RESULTS_KEY]['tokens']
+        ...app.searchCache[ALL_RESULTS_KEY]['tokens'],
       ];
     }
     const mappedCommunities = [
       {
-        variant:
-          `absolute object-top transform sm:translate-x-16 md:translate-x-64
+        variant: `absolute object-top transform sm:translate-x-16 md:translate-x-64
           lg:translate-x-48 translate-y-16 sm:translate-y-40 md:translate-y-32
           lg:translate-y-32 left-10 max-w-none max-h-none h-auto w-629 xl:left-36
           mt-10 sm:mt-0`,
@@ -72,15 +75,13 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
         alt: '',
       },
       {
-        variant:
-          `absolute object-bottom bottom-0 transform sm:translate-x-16
+        variant: `absolute object-bottom bottom-0 transform sm:translate-x-16
           md:translate-x-8 lg:translate-x-64 -translate-y-8 lg:left-32 w-350`,
         src: 'static/img/notification.svg',
         alt: '',
       },
       {
-        variant:
-          `absolute top-1/2 transform sm:translate-y-16 md:translate-y-48
+        variant: `absolute top-1/2 transform sm:translate-y-16 md:translate-y-48
           lg:translate-y-64  translate-x-8 sm:-translate-x-8 w-400`,
         src: 'static/img/discussion.svg',
         alt: '',

@@ -65,7 +65,7 @@ const InputTokenOptionComponent: m.Component<IAttrs, IState> = {
           },
           class:
             vnode.attrs.route === 'placeholder'
-              ? 'p-3 InputAddToken'
+              ? 'p-3 InputAddToken mb-5'
               : 'p-3 rounded hover:bg-gray-100 flex flex-grow items-center flex-row text-left leading-none w-full justify-between focus:outline-none',
         },
         m(
