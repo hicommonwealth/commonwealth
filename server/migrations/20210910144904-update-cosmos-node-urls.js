@@ -10,10 +10,10 @@ module.exports = {
       }, {
         transaction: t
       });
-      await queryInterface.bulkUpdate('ChainNodes', {
-        url: 'https://straightedge-rpc.cw-figment.workers.dev',
+      await queryInterface.bulkUpdate('Chains', {
+        active: false
       }, {
-        chain: 'straightedge',
+        id: 'straightedge',
       }, {
         transaction: t
       });
@@ -42,10 +42,10 @@ module.exports = {
       }, {
         transaction: t
       });
-      await queryInterface.bulkUpdate('ChainNodes', {
-        url: 'wss://straightedge.commonwealth.im',
+      await queryInterface.bulkUpdate('Chains', {
+        active: true
       }, {
-        chain: 'straightedge',
+        id: 'straightedge',
       }, {
         transaction: t
       });

@@ -20,8 +20,6 @@ import {
   isBroadcastTxSuccess,
   isBroadcastTxFailure,
   QueryClient,
-  StakingExtension,
-  setupStakingExtension,
   GovExtension,
   setupGovExtension,
   BankExtension,
@@ -43,7 +41,6 @@ export interface ICosmosTXData extends ITXData {
 }
 
 export type CosmosApiType = QueryClient
-  & StakingExtension
   & GovExtension
   & BankExtension;
 
@@ -67,9 +64,9 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     return this._chainId;
   }
 
-  private _staked: CosmosToken;
-  public get staked(): CosmosToken {
-    return this._staked;
+  private _supply: CosmosToken;
+  public get supply(): CosmosToken {
+    return this._supply;
   }
 
   private _app: IApp;
@@ -102,7 +99,6 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     this._api = QueryClient.withExtensions(
       this._tmClient,
       setupGovExtension,
-      setupStakingExtension,
       setupBankExtension,
     );
     if (this.app.chain.networkStatus === ApiStatus.Disconnected) {
@@ -131,12 +127,11 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     // TODO: reenable this
     // this._blockSubscription = setInterval(fetchBlockJob, 2000);
 
-    console.log('api.staking.pool!');
-    const { pool: { bondedTokens } } = await this._api.staking.pool();
-    this._staked = this.coins(new BN(bondedTokens));
-    console.log('api.staking.params!');
-    const { params: { bondDenom } } = await this._api.staking.params();
-    this._denom = bondDenom;
+    // TODO: support multiple denoms
+    console.log('api.bank.supplyOf!');
+    const [{ denom, amount }] = await this._api.bank.totalSupply();
+    this._denom = denom;
+    this._supply = this.coins(new BN(amount));
     m.redraw();
   }
 

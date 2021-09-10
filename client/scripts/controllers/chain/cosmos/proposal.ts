@@ -185,7 +185,7 @@ export class CosmosProposal extends Proposal<
       if (this._totalDeposit.eqn(0)) {
         return 0;
       } else {
-        const ratioInPpm = +this._totalDeposit.muln(1_000_000).div(this._Chain.staked);
+        const ratioInPpm = +this._totalDeposit.muln(1_000_000).div(this._Chain.supply);
         return +ratioInPpm / 1_000_000;
       }
     }
