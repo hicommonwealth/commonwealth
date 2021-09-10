@@ -414,6 +414,7 @@ const ProposalComment: m.Component<{
   parent: AnyProposal | OffchainComment<any> | OffchainThread;
   proposal: AnyProposal | OffchainThread;
   callback?: Function;
+  isAdmin?: boolean;
   isLast: boolean,
 }, {
   editing: boolean;
@@ -428,6 +429,7 @@ const ProposalComment: m.Component<{
       proposalPageState,
       proposal,
       callback,
+      isAdmin,
       isLast
     } = vnode.attrs;
     if (!comment) return;
@@ -454,16 +456,18 @@ const ProposalComment: m.Component<{
           m(ProposalBodyCreated, { item: comment, link: commentLink }),
           m(ProposalBodyLastEdited, { item: comment }),
 
-          !vnode.state.editing
+          ((!vnode.state.editing
           && app.user.activeAccount
           && !getSetGlobalEditingStatus(GlobalStatus.Get)
           && app.user.activeAccount?.chain.id === comment.authorChain
-          && app.user.activeAccount?.address === comment.author
+          && app.user.activeAccount?.address === comment.author)
+            || isAdmin)
           && [
             m(PopoverMenu, {
               closeOnContentClick: true,
               content: [
-                m(ProposalBodyEditMenuItem, {
+                (app.user.activeAccount?.address === comment.author)
+                && m(ProposalBodyEditMenuItem, {
                   item: comment, proposalPageState, getSetGlobalEditingStatus, parentState: vnode.state,
                 }),
                 m(ProposalBodyDeleteMenuItem, { item: comment, refresh: () => callback(), }),
@@ -537,6 +541,7 @@ const ProposalComments: m.Component<{
   proposalPageState: IProposalPageState;
   user?: any;
   recentlySubmitted?: number;
+  isAdmin: boolean;
 }, {
   commentError: any;
   dom;
@@ -545,7 +550,7 @@ const ProposalComments: m.Component<{
   view: (vnode) => {
     const {
       proposal, comments, createdCommentCallback, getSetGlobalEditingStatus,
-      proposalPageState
+      proposalPageState, isAdmin
     } = vnode.attrs;
     // Jump to the comment indicated in the URL upon page load. Avoid
     // using m.route.param('comment') because it may return stale
@@ -623,6 +628,7 @@ const ProposalComments: m.Component<{
               parent,
               proposal,
               callback: createdCommentCallback,
+              isAdmin,
               isLast: idx === comments_.length - 1,
             }),
             !!children.length
@@ -1051,7 +1057,8 @@ const ViewProposalPage: m.Component<{
         createdCommentCallback,
         getSetGlobalEditingStatus,
         proposalPageState: vnode.state,
-        recentlySubmitted: vnode.state.recentlySubmitted
+        recentlySubmitted: vnode.state.recentlySubmitted,
+        isAdmin
       }),
       !vnode.state.editing
       && !vnode.state.parentCommentId
