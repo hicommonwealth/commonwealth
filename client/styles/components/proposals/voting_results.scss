@@ -14,7 +14,7 @@
         background-color: $background-color-light;
         padding: 18px 0 12px;
         flex: 1;
-        width: 48%;
+        min-width: 48%;
         max-width: 48%;
         border-radius: 10px;
         .results-cell, .results-header,
@@ -23,7 +23,7 @@
         }
         .results-header {
             font-weight: 500;
-            margin-bottom: 28px;
+            margin-bottom: 14px;
         }
         .results-subheader {
             display: flex;
