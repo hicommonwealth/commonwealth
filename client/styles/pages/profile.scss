@@ -340,25 +340,13 @@
     margin-top: 12px;
 
     @include md-max {
-      a.btn,
       .cui-button {
         margin-right: 16px;
         border-radius: 8px;
         padding: 5px 15px 5px 15px;
-        background: #FFFFFF;
-        border: 1px solid #4723AD;
-        color: #4723AD;
         font-weight: 500;
         font-size: 18px;
         text-transform: uppercase;
-
-        .twitter-btn {
-          .cui-button-label {
-            background-color: rgb(33, 114, 229);
-            border: 0px solid white;
-            color: white
-          }
-        }
       }
     }
     @include lg-min {

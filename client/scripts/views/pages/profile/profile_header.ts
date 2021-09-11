@@ -155,6 +155,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
             editIdentityAction(account, vnode.state.identity, vnode),
             m(Button, {
               intent: 'primary',
+              style: 'background: #FFFFFF; border: 1px solid #4723AD; color: #4723AD;',
               rounded: true,
               onclick: () => {
                 app.modals.create({
@@ -165,7 +166,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
               label: 'Edit Profile'
             }),
             !isClaimable && m(Button, {
-            class: 'twitter-btn',
+            style: 'background-color: rgb(33, 114, 229); border: 0px solid white; color: white;',
             intent: 'primary',
             onclick: () => {
               window.location.href = `/api/auth/twitter?redirect=${encodeURIComponent(window.location.pathname)}${window.location.search ? 

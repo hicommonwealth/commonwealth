@@ -153,6 +153,7 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
           editIdentityAction(account, vnode.state.identity, vnode),
           m(Button, {
             intent: 'primary',
+            style: 'background: #FFFFFF; border: 1px solid #4723AD; color: #4723AD;',
             onclick: () => {
               app.modals.create({
                 modal: EditProfileModal,
@@ -164,6 +165,7 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
           m('.twitter-link', [
             !isClaimable && onOwnProfile && m(Button, {
               intent: 'primary',
+              style: 'background-color: rgb(33, 114, 229); border: 0px solid white; color: white;',
               onclick: () => {
                 window.location.href = `/api/auth/twitter?redirect=${encodeURIComponent(window.location.pathname)}${window.location.search ? 
                   `${encodeURIComponent(window.location.search)}%26` : '%3F'}continueTwitterAttestation=true`;
