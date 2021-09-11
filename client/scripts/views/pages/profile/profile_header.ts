@@ -80,6 +80,14 @@ export interface IProfileHeaderState {
 }
 
 const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
+    oncreate:() => {
+      if (window.location.search) {
+        const query = new URLSearchParams(window.location.search);
+        if (query.get('continueTwitterAttestation')) {
+          app.modals.create({ modal: TwitterAttestationModal });
+        }
+      }
+    },
     view: (vnode) => {
     const { account, refreshCallback, onOwnProfile, onLinkedProfile } = vnode.attrs;
     const isClaimable = !isAddressOnSite(account.address) || !account.profile;
@@ -169,8 +177,16 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
             style: 'background-color: rgb(33, 114, 229); border: 0px solid white; color: white;',
             intent: 'primary',
             onclick: () => {
-              window.location.href = `/api/auth/twitter?redirect=${encodeURIComponent(window.location.pathname)}${window.location.search ? 
-                `${encodeURIComponent(window.location.search)}%26` : '%3F'}continueTwitterAttestation=true`;
+              const twitter = account.find((acct) => acct.provider === 'twitter');
+              if (!twitter) {
+                window.location.href = `/api/auth/twitter?redirect=${encodeURIComponent(window.location.pathname)}${window.location.search ? 
+                  `${encodeURIComponent(window.location.search)}%26` : '%3F'}continueTwitterAttestation=true`;                
+              } else {
+                app.modals.create({
+                  modal: TwitterAttestationModal,
+                  data: { account, refreshCallback },
+                });
+              }
             },
             label: 'Add a Twitter Identity',
             iconRight: Icons.TWITTER,

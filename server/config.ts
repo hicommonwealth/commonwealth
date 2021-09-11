@@ -40,6 +40,13 @@ export const GITHUB_OAUTH_CALLBACK = process.env.GITHUB_OAUTH_CALLBACK
     ? 'https://commonwealth.im'
     : 'http://localhost:8080') + '/api/auth/github/callback';
 
+export const TWITTER_CLIENT_ID = process.env.TWITTER_CLIENT_ID;
+export const TWITTER_CLIENT_SECRET = process.env.TWITTER_CLIENT_SECRET;
+export const TWITTER_OAUTH_CALLBACK = process.env.TWITTER_OAUTH_CALLBACK
+  || (process.env.NODE_ENV === 'production'
+    ? 'https://commonwealth.im'
+    : 'http://localhost:8080') + '/api/auth/github/callback';
+
 export const DATABASE_URI =
       (!process.env.DATABASE_URL || process.env.NODE_ENV === 'development') ?
       'postgresql://commonwealth:edgeware@localhost/commonwealth' :

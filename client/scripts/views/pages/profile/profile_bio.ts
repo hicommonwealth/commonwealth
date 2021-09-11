@@ -167,8 +167,16 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
               intent: 'primary',
               style: 'background-color: rgb(33, 114, 229); border: 0px solid white; color: white;',
               onclick: () => {
-                window.location.href = `/api/auth/twitter?redirect=${encodeURIComponent(window.location.pathname)}${window.location.search ? 
-                  `${encodeURIComponent(window.location.search)}%26` : '%3F'}continueTwitterAttestation=true`;
+                const twitter = app.user.socialAccounts.find((acct) => acct.provider === 'twitter');
+                if (!twitter) {
+                  window.location.href = `/api/auth/twitter?redirect=${encodeURIComponent(window.location.pathname)}${window.location.search ? 
+                    `${encodeURIComponent(window.location.search)}%26` : '%3F'}continueTwitterAttestation=true`;                
+                } else {
+                  app.modals.create({
+                    modal: TwitterAttestationModal,
+                    data: { account, twitter, refreshCallback },
+                  });
+                }
               },
               label: 'Add a Public Identity',
               iconRight: Icons.TWITTER,
