@@ -62,6 +62,7 @@ import {
   ProposalSidebarStageEditorModule,
   ProposalSidebarPollEditorModule,
   ProposalLinkEditor,
+  ProposalSidebarLinkedViewer,
 } from './header';
 import { AaveViewProposalDetail, AaveViewProposalSummary } from './aave_view_proposal_detail';
 import {
@@ -1008,7 +1009,7 @@ const ViewProposalPage: m.Component<{
           && proposal.hasOffchainPoll
           && m(ProposalHeaderOffchainPoll, { proposal }),
         proposal instanceof OffchainThread
-          && isAuthor
+          && (isAuthor || isAdmin)
           && !proposal.offchainVotingEndsAt
           && m(ProposalSidebarPollEditorModule, {
             proposal,
@@ -1016,8 +1017,15 @@ const ViewProposalPage: m.Component<{
               vnode.state.pollEditorIsOpen = true;
             }
           }),
-        proposal instanceof OffchainThread
-          && m(ProposalSidebarStageEditorModule, {
+          proposal instanceof OffchainThread 
+            && ((proposal as OffchainThread).chainEntities.length > 0 
+              || (proposal as OffchainThread).snapshotProposal?.length > 0)
+            && m(ProposalSidebarLinkedViewer, {
+            proposal
+          }),
+          proposal instanceof OffchainThread 
+            && (isAuthor || isAdmin) 
+            && m(ProposalSidebarStageEditorModule, {
             proposal,
             openStageEditor: () => {
               vnode.state.stageEditorIsOpen = true;

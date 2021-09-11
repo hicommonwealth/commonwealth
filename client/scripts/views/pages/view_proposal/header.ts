@@ -549,6 +549,26 @@ export const ProposalSidebarPollEditorModule: m.Component<{
   }
 };
 
+export const ProposalSidebarLinkedViewer: m.Component<{
+  proposal: OffchainThread
+}> = {
+  view: (vnode) => {
+    const { proposal } = vnode.attrs;
+
+    return m('.ProposalSidebarLinkedViewer', [
+      (proposal.chainEntities.length > 0 || proposal.snapshotProposal?.length > 0) 
+        ? m('.placeholder-copy', 'Proposals for this thread:')
+        : m('.placeholder-copy', app.chain ? 'Connect an on-chain proposal?' : 'Track the progress of this thread?'),
+      proposal.chainEntities.length > 0 && m('.proposal-chain-entities', [
+        proposal.chainEntities.map((chainEntity) => {
+          return m(ProposalHeaderThreadLinkedChainEntity, { proposal, chainEntity });
+        }),
+      ]),
+      proposal.snapshotProposal?.length > 0 && m(ProposalHeaderThreadLinkedSnapshot, { proposal }),
+    ])
+  }
+}
+
 export const ProposalSidebarStageEditorModule: m.Component<{
   proposal: OffchainThread,
   openStageEditor: Function
@@ -563,16 +583,6 @@ export const ProposalSidebarStageEditorModule: m.Component<{
     if (!stagesEnabled) return;
 
     return m('.ProposalSidebarStageEditorModule', [
-      (proposal.chainEntities.length > 0 || proposal.snapshotProposal?.length >0) 
-        ? m('.placeholder-copy', 'Proposals for this thread:')
-        : m('.placeholder-copy', app.chain ? 'Connect an on-chain proposal?' : 'Track the progress of this thread?'),
-      proposal.chainEntities.length > 0 && m('.proposal-chain-entities', [
-        proposal.chainEntities.map((chainEntity) => {
-          return m(ProposalHeaderThreadLinkedChainEntity, { proposal, chainEntity });
-        }),
-      ]),
-      proposal.snapshotProposal?.length > 0 && m(ProposalHeaderThreadLinkedSnapshot, { proposal }),
-      m('br'),
       m(Button, {
         rounded: true,
         compact: true,
