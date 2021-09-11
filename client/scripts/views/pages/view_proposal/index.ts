@@ -78,6 +78,7 @@ import User from '../../components/widgets/user';
 import MarkdownFormattedText from '../../components/markdown_formatted_text';
 import { createTXModal } from '../../modals/tx_signing_modal';
 import { SubstrateAccount } from '../../../controllers/chain/substrate/account';
+import { SnapshotProposal } from 'client/scripts/helpers/snapshot_utils';
 
 const MAX_THREAD_LEVEL = 2;
 
@@ -295,9 +296,11 @@ const ProposalHeader: m.Component<{
                 && m(StageEditor, {
                   thread: vnode.attrs.proposal as OffchainThread,
                   popoverMenu: true,
-                  onChangeHandler: (stage: OffchainThreadStage, chainEntities: ChainEntity[]) => {
+                  onChangeHandler: (stage: OffchainThreadStage, chainEntities: ChainEntity[], snapshotProposal: SnapshotProposal) => {
                     proposal.stage = stage;
                     proposal.chainEntities = chainEntities;
+                    proposal.snapshotProposal = snapshotProposal[0].id;
+                    app.threads.fetchThread(proposal.identifier);
                     m.redraw();
                   },
                   openStateHandler: (v) => {
@@ -1044,8 +1047,11 @@ const ViewProposalPage: m.Component<{
         isAdmin,
         stageEditorIsOpen: vnode.state.stageEditorIsOpen,
         pollEditorIsOpen: vnode.state.pollEditorIsOpen,
-        closeStageEditor: () => { vnode.state.stageEditorIsOpen = false; m.redraw(); },
-        closePollEditor: () => { vnode.state.pollEditorIsOpen = false; m.redraw(); },
+        closeStageEditor: () => { vnode.state.stageEditorIsOpen = false; 
+          m.redraw(); },
+        closePollEditor: () => { 
+          vnode.state.pollEditorIsOpen = false; 
+          m.redraw(); },
       }),
       !(proposal instanceof OffchainThread)
         && m(LinkedProposalsEmbed, { proposal }),

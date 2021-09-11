@@ -294,8 +294,7 @@ const StageEditor: m.Component<{
               }
 
               // TODO: add set linked snapshot proposals
-
-              vnode.attrs.onChangeHandler(vnode.state.stage, vnode.state.chainEntitiesToSet);
+              vnode.attrs.onChangeHandler(vnode.state.stage, vnode.state.chainEntitiesToSet, vnode.state.snapshotProposalsToSet);
 
               if (vnode.attrs.popoverMenu) {
                 vnode.attrs.openStateHandler(false);
