@@ -1,7 +1,7 @@
 import m from 'mithril';
 import _ from 'lodash';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { Button } from 'construct-ui';
+import { Button, Icons } from 'construct-ui';
 import MarkdownFormattedText from '../../components/markdown_formatted_text';
 import User from '../../components/widgets/user';
 import { initChain } from '../../../app';
@@ -13,10 +13,7 @@ import EditIdentityModal from '../../modals/edit_identity_modal';
 import { setActiveAccount } from '../../../controllers/app/login';
 import EditProfileModal from '../../modals/edit_profile_modal';
 import TwitterAttestationModal from '../../modals/twitter_attestation_modal';
-<<<<<<< HEAD
 import { isAddressOnSite } from 'helpers';
-=======
->>>>>>> d63a2e847b865af2fde33741edb93d1f2c2956c6
 
 const editIdentityAction = (account, currentIdentity: SubstrateIdentity, vnode) => {
   const chainObj = app.config.chains.getById(account.chain);
@@ -164,6 +161,18 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
             },
             label: 'Edit'
           }),
+          m('.twitter-link', [
+            !isClaimable && onOwnProfile && m(Button, {
+              intent: 'primary',
+              onclick: () => {
+                window.location.href = `/api/auth/twitter?redirect=${encodeURIComponent(window.location.pathname)}${window.location.search ? 
+                  `${encodeURIComponent(window.location.search)}%26` : '%3F'}continueTwitterAttestation=true`;
+              },
+              label: 'Add a Public Identity',
+              iconRight: Icons.TWITTER,
+            }),
+            m('p', 'Connecting your Twitter to your address can help people find you and delegate votes to you')]
+          ),
         ] : (showJoinCommunityButton && app.activeChainId())
           ? m(Button, {
             intent: 'primary',
@@ -190,7 +199,13 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
             label: onLinkedProfile ? 'Switch to address' : 'Join community'
           })
           : [
-            // TODO: actions for others' accounts
+            isClaimable && m(LoginWithWalletDropdown, {
+              prepopulateAddress: account.address,
+              loggingInWithAddress: !app.isLoggedIn(),
+              joiningCommunity: app.activeCommunityId(),
+              joiningChain: app.activeChainId(),
+              label: 'Claim address',
+            }),
           ]
       ]),
       m(`.address-block-right${vnode.state.showProfileRight ? '.hide-address' : '.show-address'}`, [
@@ -205,22 +220,6 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
           }
         }),
       ]),
-      m('br'),
-      !isClaimable && onOwnProfile && m(Button, {
-        intent: 'warning',
-        onclick: () => {
-          window.location.href = `/api/auth/twitter?redirect=${encodeURIComponent(window.location.pathname)}${window.location.search ? 
-            `${encodeURIComponent(window.location.search)}%26` : '%3F'}continueTwitterAttestation=true`;
-        },
-        label: 'Add a Public Twitter Identity'
-      }),
-      isClaimable && m(LoginWithWalletDropdown, {
-        prepopulateAddress: account.address,
-        loggingInWithAddress: !app.isLoggedIn(),
-        joiningCommunity: app.activeCommunityId(),
-        joiningChain: app.activeChainId(),
-        label: 'Claim address',
-      }),
       m('.header', 'Bio'),
       account.profile && account.profile.bio
         ? m('p', [

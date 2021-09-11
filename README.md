@@ -90,6 +90,9 @@ Environment variables used for external services include:
 - MAGIC_API_KEY
 - MAGIC_SUPPORTED_BASES
 - MAGIC_DEFAULT_CHAIN
+- TELEGRAM_BOT_TOKEN
+- TWITTER_BEARER
+- GITHUB_AUTHENTICATION: for posting new public attestations
 
 We also use certain environment variables to configure the application itself:
 

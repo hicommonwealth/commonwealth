@@ -245,6 +245,17 @@
       font-size: 18px;
       text-transform: uppercase;
     }
+
+    .twitter-link {
+      button {
+        background-color: rgb(33, 114, 229);
+        border: 0px solid white;
+
+        .cui-button-label {
+          color: white
+        }
+      }
+    }
   }
 
   .ProfileHeader {
@@ -340,6 +351,14 @@
         font-weight: 500;
         font-size: 18px;
         text-transform: uppercase;
+
+        .twitter-btn {
+          .cui-button-label {
+            background-color: rgb(33, 114, 229);
+            border: 0px solid white;
+            color: white
+          }
+        }
       }
     }
     @include lg-min {

@@ -3,6 +3,7 @@ import { ICardListItem } from 'models/interfaces';
 import moment from 'moment';
 
 import app from 'state';
+import $ from 'jquery';
 import { OffchainThreadStage } from 'models';
 
 export async function sleep(msec) {

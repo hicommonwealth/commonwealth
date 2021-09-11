@@ -1,7 +1,7 @@
 import m from 'mithril';
 import _ from 'lodash';
 import $ from 'jquery';
-import { Button } from 'construct-ui';
+import { Button, Icons } from 'construct-ui';
 import * as clipboard from 'clipboard-polyfill';
 
 import { initChain } from 'app';
@@ -162,16 +162,18 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
                   data: { account, refreshCallback },
                 });
               },
-              label: 'Edit'
+              label: 'Edit Profile'
             }),
-            !isClaimable && onOwnProfile && m(Button, {
-              intent: 'warning',
-              onclick: () => {
-                window.location.href = `/api/auth/twitter?redirect=${encodeURIComponent(window.location.pathname)}${window.location.search ? 
-                  `${encodeURIComponent(window.location.search)}%26` : '%3F'}continueTwitterAttestation=true`;
-              },
-              label: 'Add a Public Twitter Identity'
-            })
+            !isClaimable && m(Button, {
+            class: 'twitter-btn',
+            intent: 'primary',
+            onclick: () => {
+              window.location.href = `/api/auth/twitter?redirect=${encodeURIComponent(window.location.pathname)}${window.location.search ? 
+                `${encodeURIComponent(window.location.search)}%26` : '%3F'}continueTwitterAttestation=true`;
+            },
+            label: 'Add a Twitter Identity',
+            iconRight: Icons.TWITTER,
+            }),
           ] : (showJoinCommunityButton && app.activeChainId())
             ? m(Button, {
               intent: 'primary',
