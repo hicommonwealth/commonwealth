@@ -456,6 +456,26 @@ class ThreadsController {
     });
   }
 
+  public async fetchThreadForSnapshot(args: { snapshot: string }) {
+    const response = await $.ajax({
+      url: `${app.serverUrl()}/fetchThreadForSnapshot`,
+      type: 'GET',
+      data: {
+        snapshot: args.snapshot,
+        chain: app.activeChainId(),
+      },
+    });
+    if (response.status !== 'Success') {
+      throw new Error(`Cannot fetch thread: ${response.status}`);
+    }
+
+    const thread = modelFromServer(response.result);
+    const existing = this._store.getByIdentifier(thread.id);
+    if (existing) this._store.remove(existing);
+    this._store.update(thread);
+    return thread;
+  }
+
   public async fetchThread(id) {
     const params = {
       chain: app.activeChainId(),

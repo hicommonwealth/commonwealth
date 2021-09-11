@@ -190,6 +190,19 @@ export const ProposalHeaderThreadLink: m.Component<{ proposal: AnyProposal }> = 
   }
 };
 
+export const ProposalHeaderSnapshotThreadLink: m.Component<{ thread: OffchainThread }> = {
+  view: (vnode) => {
+    const { thread } = vnode.attrs;
+    if (!thread || !thread.id) return;
+    return m('.ProposalHeaderThreadLink', [
+      link('a.thread-link', `/${thread['chain'] || app.activeId()}/proposal/discussion/${thread.id}`, [
+        'Go to discussion',
+        m(Icon, { name: Icons.EXTERNAL_LINK }),
+      ]),
+    ]);
+  }
+};
+
 export const ProposalHeaderThreadLinkedChainEntity: m.Component<{ proposal: OffchainThread, chainEntity }> = {
   view: (vnode) => {
     const { proposal, chainEntity } = vnode.attrs;

@@ -84,6 +84,7 @@ import updateThreadLinkedSnapshotProposal from './routes/updateThreadLinkedSnaps
 import updateOffchainVote from './routes/updateOffchainVote';
 import viewOffchainVotes from './routes/viewOffchainVotes';
 import fetchEntityTitle from './routes/fetchEntityTitle';
+import fetchThreadForSnapshot from './routes/fetchThreadForSnapshot';
 import updateChainEntityTitle from './routes/updateChainEntityTitle';
 import deleteThread from './routes/deleteThread';
 import addEditors from './routes/addEditors';
@@ -254,6 +255,8 @@ function setupRouter(
   router.get('/viewOffchainVotes', viewOffchainVotes.bind(this, models));
 
   router.get('/fetchEntityTitle', fetchEntityTitle.bind(this, models));
+  router.get('/fetchThreadForSnapshot', fetchThreadForSnapshot.bind(this, models));
+
   router.post(
     '/updateChainEntityTitle',
     passport.authenticate('jwt', { session: false }),

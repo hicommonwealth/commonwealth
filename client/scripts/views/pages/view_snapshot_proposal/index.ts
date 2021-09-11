@@ -9,7 +9,7 @@ import moment from 'moment';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
-import { AddressInfo } from 'models';
+import { AddressInfo, OffchainThread } from 'models';
 import ConfirmSnapshotVoteModal from 'views/modals/confirm_snapshot_vote_modal';
 import { getPower, SnapshotSpace, SnapshotProposal, getVotes, SnapshotProposalVote } from 'helpers/snapshot_utils';
 
@@ -19,13 +19,17 @@ import {
   ProposalBodyAuthor, ProposalBodyCreated,
   ProposalBodyEnded, ProposalBodyText,
 } from './body';
+import { ProposalHeaderSnapshotThreadLink } from '../view_proposal/header';
 import User from '../../components/widgets/user';
 import { SocialSharingCarat } from '../../components/social_sharing_carat';
 
 const ProposalHeader: m.Component<{
   snapshotId: string
   proposal: SnapshotProposal
-}, {}> = {
+}, {
+  loaded: boolean, 
+  thread: OffchainThread
+}> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     if (!proposal) {
@@ -36,6 +40,18 @@ const ProposalHeader: m.Component<{
     // merely have access to the body and title
 
     const proposalLink = `/${app.activeId()}/snapshot-proposal/${vnode.attrs.snapshotId}/${proposal.ipfs}`;
+
+    if (!vnode.state.loaded) {
+      try {
+        app.threads.fetchThreadForSnapshot({snapshot: proposal.id}).then((res) => { 
+          vnode.state.loaded = true;
+          vnode.state.thread = res;
+        })
+        m.redraw();
+      } catch (err) {
+        console.log(err);
+      }
+    }
 
     return m('.ProposalHeader', {
       class: 'proposal-snapshot'
@@ -51,6 +67,10 @@ const ProposalHeader: m.Component<{
             m(ProposalBodyAuthor, { item: proposal }),
             m('.CommentSocialHeader', [ m(SocialSharingCarat) ]),
           ]),
+          m('.proposal-body-link', [
+            vnode.state.loaded && m(ProposalHeaderSnapshotThreadLink, { thread: vnode.state.thread })
+          ]),
+          m('br')
         ]),
       ]),
       m('.proposal-content', [
