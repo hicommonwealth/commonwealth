@@ -17,10 +17,9 @@ const updateThreadLinkedSnapshotProposal = async (models: DB, req: Request, res:
   if (!chain?.snapshot) {
     return next(new Error(Errors.MustBeSnapshotChain));
   }
-
   // ensure snapshot proposal is a bs58-encoded sha256 hash
-  const decodedHash = bs58.decodeUnsafe(req.body.snapshot_proposal);
-  if (!decodedHash || decodedHash.length !== 256) {
+  // const decodedHash = bs58.decodeUnsafe(req.body.snapshot_proposal);
+  if (!req.body.snapshot_proposal) { //  || decodedHash.toString().length !== 256
     return next(new Error(Errors.InvalidSnapshotProposal));
   }
 

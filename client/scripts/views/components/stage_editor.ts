@@ -11,10 +11,10 @@ import { chainEntityTypeToProposalName } from 'identifiers';
 import { EntityRefreshOption } from 'controllers/server/chain_entities';
 import { SnapshotProposal } from 'helpers/snapshot_utils';
 
-/*
 const SnapshotProposalSelector: m.Component<{
   thread: OffchainThread;
   onSelect,
+  snapshotProposalsToSet: SnapshotProposal[];
 }, {
   initialized: boolean;
   snapshotProposalsLoaded: boolean;
@@ -25,11 +25,18 @@ const SnapshotProposalSelector: m.Component<{
     if (!vnode.state.initialized) {
       vnode.state.initialized = true;
       if (app.chain.meta.chain.snapshot) {
-        app.snapshot.init(app.chain.meta.chain.snapshot).then(() => {
-          // refreshing loads the latest snapshot proposals into app.snapshot.proposals array
-          vnode.state.snapshotProposalsLoaded = true;
-          m.redraw();
-        });
+        if (!app.snapshot.initialized) {
+          app.snapshot.init(app.chain.meta.chain.snapshot).then(() => {
+            // refreshing loads the latest snapshot proposals into app.snapshot.proposals array
+            vnode.state.snapshotProposalsLoaded = true;
+            m.redraw();
+          })
+        } else {
+          app.snapshot.refreshProposals().then(() => {
+            vnode.state.snapshotProposalsLoaded = true;
+            m.redraw();
+          })
+        };
       }
     }
 
@@ -43,22 +50,32 @@ const SnapshotProposalSelector: m.Component<{
           placeholder: 'Search for an existing snapshot proposal...',
         },
         itemRender: (sn: SnapshotProposal, idx: number) => {
-          const selected = vnode.attrs.chainEntitiesToSet.map((ce_) => ce_.id).indexOf(ce.id) !== -1;
+          const selected = vnode.attrs.snapshotProposalsToSet.map((sn_) => sn_.created).indexOf(sn.created) !== -1;
           // TODO: show additional info on the ListItem, like any set proposal title, the creator, or other metadata
           return m(ListItem, {
             label: m('.chain-entity-info', [
-              m('.chain-entity-top', `Snapshot Proposal ${sn.id}`),
-              m('.chain-entity-bottom', sn.title),
+              m('.chain-entity-top', `${sn.title.slice(0,60)}...`),
+              m('.chain-entity-bottom', `Hash: ${sn.id}`),
             ]),
             selected,
             key: sn.id,
           });
         },
-        itemPredicate: (query, ce: ChainEntity, idx) => {
+        itemPredicate: (query, sn: SnapshotProposal, idx) => {
           // TODO
+          return sn.title?.toString().toLowerCase().includes(query.toLowerCase())
         },
-        onSelect: (ce: ChainEntity) => {
+        onSelect: (sn: SnapshotProposal) => {
           // TODO
+          if (vnode.attrs.snapshotProposalsToSet.map((sn_) => sn_.created).indexOf(sn.created) !== -1) {
+            const index = vnode.attrs.snapshotProposalsToSet.findIndex((sn_) => sn_.id === sn.id);
+            vnode.attrs.snapshotProposalsToSet.splice(index, 1);
+            console.log(sn);
+          } else {
+            vnode.attrs.snapshotProposalsToSet.push(sn);
+            console.log(sn);
+          }
+          onSelect(sn);
         },
       }) : m('.chain-entities-selector-placeholder', [
         m('.chain-entities-selector-placeholder-text', [
@@ -70,7 +87,6 @@ const SnapshotProposalSelector: m.Component<{
     ]);
   }
 };
-*/
 
 const ChainEntitiesSelector: m.Component<{
   thread: OffchainThread;
@@ -156,12 +172,14 @@ const StageEditor: m.Component<{
   stage: OffchainThreadStage;
   isOpen: boolean;
   chainEntitiesToSet: ChainEntity[];
+  snapshotProposalsToSet: SnapshotProposal[];
 }> = {
   oninit: (vnode) => {
     vnode.state.isOpen = !!vnode.attrs.popoverMenu;
     vnode.state.stage = vnode.attrs.thread.stage;
 
     vnode.state.chainEntitiesToSet = [];
+    vnode.state.snapshotProposalsToSet = [];
     vnode.attrs.thread.chainEntities.forEach((ce) => vnode.state.chainEntitiesToSet.push(ce));
   },
   view: (vnode) => {
@@ -200,6 +218,16 @@ const StageEditor: m.Component<{
               }
             })),
           ]),
+          app.chain.meta.chain.snapshot && m(SnapshotProposalSelector, {
+            thread: vnode.attrs.thread,
+            onSelect: (result) => {
+              if (vnode.state.stage === OffchainThreadStage.Discussion
+                  || vnode.state.stage === OffchainThreadStage.ProposalInReview) {
+                vnode.state.stage = OffchainThreadStage.Voting;
+              }
+            },
+            snapshotProposalsToSet: vnode.state.snapshotProposalsToSet,
+          }),
           m(ChainEntitiesSelector, {
             thread: vnode.attrs.thread,
             onSelect: (result) => {
@@ -256,6 +284,10 @@ const StageEditor: m.Component<{
               // set linked chain entities
               try {
                 await app.threads.setLinkedChainEntities({ threadId: thread.id, entities: vnode.state.chainEntitiesToSet });
+                for (let i = 0; i < vnode.state.snapshotProposalsToSet.length; i++) {
+                  await app.threads.setLinkedSnapshotProposal({ threadId: thread.id, 
+                    snapshotProposal: vnode.state.snapshotProposalsToSet[i].id })
+                }
               } catch (err) {
                 console.log('Failed to update linked proposals');
                 throw new Error((err.responseJSON && err.responseJSON.error)

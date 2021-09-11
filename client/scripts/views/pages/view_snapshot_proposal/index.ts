@@ -253,7 +253,10 @@ const ViewProposalPage: m.Component<{
     && moment(+vnode.state.proposal.start * 1000) <= moment()
     && moment(+vnode.state.proposal.end * 1000) > moment();
 
-    return m(Sublayout, { class: 'ViewProposalPage', title: 'Snapshot Proposal' }, [
+    return m(Sublayout, { 
+      class: 'ViewProposalPage', 
+      title: 'Snapshot Proposal',
+    }, [
       m(ProposalHeader, {
         snapshotId: vnode.attrs.snapshotId,
         proposal: vnode.state.proposal,

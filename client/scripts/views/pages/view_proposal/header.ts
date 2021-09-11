@@ -209,6 +209,49 @@ export const ProposalHeaderThreadLinkedChainEntity: m.Component<{ proposal: Offc
   }
 };
 
+export const ProposalHeaderThreadLinkedSnapshot: m.Component<{ 
+  proposal: OffchainThread, 
+}, { 
+  initialized, 
+  snapshotProposalsLoaded
+  snapshot
+}> = {
+  view: (vnode) => {
+    const { proposal } = vnode.attrs;
+    if (!proposal.snapshotProposal) return;
+    if (!app.chain.meta.chain.snapshot) return;
+    
+    if (!vnode.state.initialized) {
+      vnode.state.initialized = true;
+      app.snapshot.init(app.chain.meta.chain.snapshot).then(() => {
+          // refreshing loads the latest snapshot proposals into app.snapshot.proposals array
+        vnode.state.snapshot = app.snapshot.proposals.find((sn) => sn.id = proposal.snapshotProposal);
+        vnode.state.snapshotProposalsLoaded = true;
+        m.redraw();
+      })
+    }
+    return m('.ProposalHeaderThreadLinkedChainEntity', 
+    !vnode.state.snapshotProposalsLoaded ?   
+    [
+      link(
+        'a',
+        `/${proposal.chain}/snapshot-proposal/${(app.chain?.meta.chain.snapshot)}/${proposal.snapshotProposal}`,
+        [
+          `Snapshot: ${proposal.snapshotProposal.slice(0,10)} ...`,
+        ],
+      ),
+    ] : [
+      link(
+        'a',
+        `/${proposal.chain}/snapshot-proposal/${(app.chain?.meta.chain.snapshot)}/${proposal.snapshotProposal}`,
+        [
+          `Snapshot: ${vnode.state.snapshot.title.slice(0,20)} ...`,
+        ],
+      ),
+    ]);
+  }
+};
+
 export const ProposalHeaderSpacer: m.Component<{}> = {
   view: (vnode) => {
     return m('.ProposalHeaderSpacer', m.trust('&middot;'));
@@ -520,7 +563,7 @@ export const ProposalSidebarStageEditorModule: m.Component<{
     if (!stagesEnabled) return;
 
     return m('.ProposalSidebarStageEditorModule', [
-      proposal.chainEntities.length > 0
+      (proposal.chainEntities.length > 0 || proposal.snapshotProposal?.length >0) 
         ? m('.placeholder-copy', 'Proposals for this thread:')
         : m('.placeholder-copy', app.chain ? 'Connect an on-chain proposal?' : 'Track the progress of this thread?'),
       proposal.chainEntities.length > 0 && m('.proposal-chain-entities', [
@@ -528,6 +571,8 @@ export const ProposalSidebarStageEditorModule: m.Component<{
           return m(ProposalHeaderThreadLinkedChainEntity, { proposal, chainEntity });
         }),
       ]),
+      proposal.snapshotProposal?.length > 0 && m(ProposalHeaderThreadLinkedSnapshot, { proposal }),
+      m('br'),
       m(Button, {
         rounded: true,
         compact: true,

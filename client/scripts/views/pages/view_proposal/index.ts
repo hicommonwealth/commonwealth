@@ -1016,7 +1016,7 @@ const ViewProposalPage: m.Component<{
               vnode.state.pollEditorIsOpen = true;
             }
           }),
-        (isAuthor || isAdmin) && proposal instanceof OffchainThread
+        proposal instanceof OffchainThread
           && m(ProposalSidebarStageEditorModule, {
             proposal,
             openStageEditor: () => {
