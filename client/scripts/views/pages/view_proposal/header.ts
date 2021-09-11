@@ -194,8 +194,10 @@ export const ProposalHeaderSnapshotThreadLink: m.Component<{ thread: OffchainThr
   view: (vnode) => {
     const { thread } = vnode.attrs;
     if (!thread || !thread.id) return;
+    const proposalLink = `${app.isCustomDomain() ? '' : `/${app.activeId()}`}/proposal/discussion/${thread.id}`;
+
     return m('.ProposalHeaderThreadLink', [
-      link('a.thread-link', `/${thread['chain'] || app.activeId()}/proposal/discussion/${thread.id}`, [
+      link('a.thread-link', proposalLink, [
         'Go to discussion',
         m(Icon, { name: Icons.EXTERNAL_LINK }),
       ]),
@@ -209,10 +211,13 @@ export const ProposalHeaderThreadLinkedChainEntity: m.Component<{ proposal: Offc
     const slug = chainEntityTypeToProposalSlug(chainEntity.type);
     if (!slug) return;
 
+    const proposalLink = `${app.isCustomDomain() ? '' : `/${proposal.chain}`
+      }/proposal/${slug}/${chainEntity.typeId}`
+
     return m('.ProposalHeaderThreadLinkedChainEntity', [
       link(
         'a',
-        `/${proposal.chain}/proposal/${slug}/${chainEntity.typeId}`,
+          proposalLink,
         [
           `${chainEntityTypeToProposalName(chainEntity.type)} #${chainEntity.typeId}`,
           chainEntity.completed === 't' ? ' (Completed) ' : ' ',
@@ -243,20 +248,21 @@ export const ProposalHeaderThreadLinkedSnapshot: m.Component<{
         m.redraw();
       })
     }
+    const proposalLink = `${app.isCustomDomain() ? '' : `/${proposal.chain}`
+      }/snapshot-proposal/${(app.chain?.meta.chain.snapshot)}/${proposal.snapshotProposal}`;
+
     return m('.ProposalHeaderThreadLinkedChainEntity', 
     !vnode.state.snapshotProposalsLoaded ?   
     [
       link(
-        'a',
-        `/${proposal.chain}/snapshot-proposal/${(app.chain?.meta.chain.snapshot)}/${proposal.snapshotProposal}`,
+        'a', proposalLink,
         [
           `Snapshot: ${proposal.snapshotProposal.slice(0,10)} ...`,
         ],
       ),
     ] : [
       link(
-        'a',
-        `/${proposal.chain}/snapshot-proposal/${(app.chain?.meta.chain.snapshot)}/${proposal.snapshotProposal}`,
+        'a', proposalLink,
         [
           `Snapshot: ${vnode.state.snapshot.title.slice(0,20)} ...`,
         ],

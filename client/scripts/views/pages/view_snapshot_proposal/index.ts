@@ -161,7 +161,6 @@ const VoteAction: m.Component<{
     };
 
     const vote = async (selectedChoice: number) => {
-      console.log(`vnode.attrs.proposal ${vnode.attrs.proposal}`);
       try {
         app.modals.create({
           modal: ConfirmSnapshotVoteModal,

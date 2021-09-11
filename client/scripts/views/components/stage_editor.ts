@@ -70,10 +70,8 @@ const SnapshotProposalSelector: m.Component<{
           if (vnode.attrs.snapshotProposalsToSet.map((sn_) => sn_.created).indexOf(sn.created) !== -1) {
             const index = vnode.attrs.snapshotProposalsToSet.findIndex((sn_) => sn_.id === sn.id);
             vnode.attrs.snapshotProposalsToSet.splice(index, 1);
-            console.log(sn);
           } else {
             vnode.attrs.snapshotProposalsToSet.push(sn);
-            console.log(sn);
           }
           onSelect(sn);
         },
@@ -277,8 +275,8 @@ const StageEditor: m.Component<{
               } catch (err) {
                 console.log('Failed to update stage');
                 throw new Error((err.responseJSON && err.responseJSON.error)
-                  ? err.responseJSON.error
-                  : 'Failed to update stage');
+                  ?  `${err.responseJSON.error}. Make sure one is selected.`
+                  : 'Failed to update stage, make sure one is selected');
               }
 
               // set linked chain entities
