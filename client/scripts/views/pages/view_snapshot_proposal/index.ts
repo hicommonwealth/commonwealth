@@ -43,8 +43,8 @@ const ProposalHeader: m.Component<{
 
     if (!vnode.state.loaded) {
       try {
+        vnode.state.loaded = true;
         app.threads.fetchThreadIdForSnapshot({snapshot: proposal.id}).then((res) => { 
-          vnode.state.loaded = true;
           vnode.state.thread = res;
         })
         m.redraw();
