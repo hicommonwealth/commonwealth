@@ -35,6 +35,7 @@ import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';
 import { activeQuillEditorHasText, GlobalStatus } from './body';
 import { IProposalPageState } from '.';
+import { SnapshotProposal } from 'client/scripts/helpers/snapshot_utils';
 
 export const ProposalHeaderExternalLink: m.Component<{ proposal: AnyProposal | OffchainThread }> = {
   view: (vnode) => {
@@ -164,6 +165,20 @@ export const ProposalHeaderBlockExplorerLink: m.Component<{ proposal: AnyProposa
   }
 };
 
+export const ProposalHeaderExternalSnapshotLink: m.Component<{ proposal: SnapshotProposal, spaceId: string }> = {
+  view: (vnode) => {
+    const { proposal, spaceId } = vnode.attrs;
+    if (!proposal || !proposal.id || !spaceId) return;
+
+    return m('.ProposalHeaderBlockExplorerLink', [
+      externalLink('a.voting-link', `https://snapshot.org/#/proposal/${spaceId}/${proposal.id}`, [
+        `View on Snapshot`,
+        m(Icon, { name: Icons.EXTERNAL_LINK }),
+      ]),
+    ]);
+  }
+};
+
 export const ProposalHeaderVotingInterfaceLink: m.Component<{ proposal: AnyProposal }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
@@ -237,7 +252,7 @@ export const ProposalHeaderThreadLinkedSnapshot: m.Component<{
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     if (!proposal.snapshotProposal) return;
-    if (!app.chain.meta.chain.snapshot) return;
+    if (!app.chain?.meta.chain.snapshot) return;
     
     if (!vnode.state.initialized) {
       vnode.state.initialized = true;

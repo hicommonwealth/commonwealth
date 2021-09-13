@@ -216,7 +216,7 @@ const StageEditor: m.Component<{
               }
             })),
           ]),
-          app.chain.meta.chain.snapshot && m(SnapshotProposalSelector, {
+          app.chain?.meta?.chain.snapshot && m(SnapshotProposalSelector, {
             thread: vnode.attrs.thread,
             onSelect: (result) => {
               if (vnode.state.stage === OffchainThreadStage.Discussion

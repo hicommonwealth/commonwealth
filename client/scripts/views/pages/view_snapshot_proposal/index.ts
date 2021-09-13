@@ -19,7 +19,7 @@ import {
   ProposalBodyAuthor, ProposalBodyCreated,
   ProposalBodyEnded, ProposalBodyText,
 } from './body';
-import { ProposalHeaderSnapshotThreadLink } from '../view_proposal/header';
+import { ProposalHeaderExternalSnapshotLink, ProposalHeaderSnapshotThreadLink } from '../view_proposal/header';
 import User from '../../components/widgets/user';
 import { SocialSharingCarat } from '../../components/social_sharing_carat';
 
@@ -31,7 +31,7 @@ const ProposalHeader: m.Component<{
   thread: OffchainThread
 }> = {
   view: (vnode) => {
-    const { proposal } = vnode.attrs;
+    const { proposal, snapshotId } = vnode.attrs;
     if (!proposal) {
       return m('.topic-loading-spinner-wrap', [ m(Spinner, { active: true, size: 'lg' }) ]);
     }
@@ -39,7 +39,7 @@ const ProposalHeader: m.Component<{
     // Original posters have full editorial control, while added collaborators
     // merely have access to the body and title
 
-    const proposalLink = `/${app.activeId()}/snapshot-proposal/${vnode.attrs.snapshotId}/${proposal.ipfs}`;
+    const proposalLink = `/${app.activeId()}/snapshot-proposal/${snapshotId}/${proposal.ipfs}`;
 
     if (!vnode.state.loaded) {
       try {
@@ -68,7 +68,8 @@ const ProposalHeader: m.Component<{
             m('.CommentSocialHeader', [ m(SocialSharingCarat) ]),
           ]),
           m('.proposal-body-link', [
-            vnode.state.loaded && m(ProposalHeaderSnapshotThreadLink, { thread: vnode.state.thread })
+            vnode.state.loaded && m(ProposalHeaderSnapshotThreadLink, { thread: vnode.state.thread }),
+            vnode.state.loaded && m(ProposalHeaderExternalSnapshotLink, { proposal: proposal, spaceId: snapshotId }),
           ]),
           m('br')
         ]),
