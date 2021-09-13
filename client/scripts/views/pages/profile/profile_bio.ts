@@ -2,6 +2,7 @@ import m from 'mithril';
 import _ from 'lodash';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { Button, Icons } from 'construct-ui';
+import { isAddressOnSite } from 'helpers';
 import MarkdownFormattedText from '../../components/markdown_formatted_text';
 import User from '../../components/widgets/user';
 import { initChain } from '../../../app';
@@ -13,7 +14,6 @@ import EditIdentityModal from '../../modals/edit_identity_modal';
 import { setActiveAccount } from '../../../controllers/app/login';
 import EditProfileModal from '../../modals/edit_profile_modal';
 import TwitterAttestationModal from '../../modals/twitter_attestation_modal';
-import { isAddressOnSite } from 'helpers';
 
 const editIdentityAction = (account, currentIdentity: SubstrateIdentity, vnode) => {
   const chainObj = app.config.chains.getById(account.chain);
@@ -75,17 +75,23 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
   oninit: (vnode) => {
     vnode.state.showProfileRight = false;
   },
-  oncreate:() => {
+  oncreate:(vnode) => {
     if (window.location.search) {
+      const { account, refreshCallback } = vnode.attrs;
+      const twitter = app.user.socialAccounts.find((acct) => acct.provider === 'twitter');
+
       const query = new URLSearchParams(window.location.search);
       if (query.get('continueTwitterAttestation')) {
-        app.modals.create({ modal: TwitterAttestationModal });
+        app.modals.create({
+          modal: TwitterAttestationModal,
+          data: { account, twitter, refreshCallback },
+        });
       }
     }
   },
   view: (vnode) => {
     const { account, refreshCallback, onOwnProfile, onLinkedProfile } = vnode.attrs;
-    const showJoinCommunityButton = vnode.attrs.setIdentity && !onOwnProfile;      
+    const showJoinCommunityButton = vnode.attrs.setIdentity && !onOwnProfile;
     const isClaimable = !isAddressOnSite(account.address) || !account.profile;
 
     window.addEventListener('scroll',
@@ -169,8 +175,8 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
               onclick: () => {
                 const twitter = app.user.socialAccounts.find((acct) => acct.provider === 'twitter');
                 if (!twitter) {
-                  window.location.href = `/api/auth/twitter?redirect=${encodeURIComponent(window.location.pathname)}${window.location.search ? 
-                    `${encodeURIComponent(window.location.search)}%26` : '%3F'}continueTwitterAttestation=true`;                
+                  // eslint-disable-next-line max-len
+                  window.location.href = `/api/auth/twitter?redirect=${encodeURIComponent(window.location.pathname)}${window.location.search ? `${encodeURIComponent(window.location.search)}%26` : '%3F'}continueTwitterAttestation=true`;
                 } else {
                   app.modals.create({
                     modal: TwitterAttestationModal,
@@ -181,8 +187,7 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
               label: 'Add a Public Identity',
               iconRight: Icons.TWITTER,
             }),
-            m('p', 'Connecting your Twitter to your address can help people find you and delegate votes to you')]
-          ),
+            m('p', 'Connecting your Twitter to your address can help people find you and delegate votes to you')]),
         ] : (showJoinCommunityButton && app.activeChainId())
           ? m(Button, {
             intent: 'primary',

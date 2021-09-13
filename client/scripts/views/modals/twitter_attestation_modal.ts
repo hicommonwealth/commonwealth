@@ -26,62 +26,58 @@ const TwitterAttestationModal: m.Component<{
   userProvidedSignature: string;
   posted: boolean,
 }> = {
+  oninit:(vnode) => {
+    if (!vnode.attrs.twitter.attested) {
+      vnode.state.step = TwitterAttestationModalSteps.Step1Sign;
+    }
+  },
   view: (vnode) => {
     const { account, twitter, refreshCallback } = vnode.attrs;
     if (!twitter) return; // not what we want
 
-    if (!twitter.attested) {
-      // will need to check if
-      vnode.state.step = TwitterAttestationModalSteps.Step1Sign
-    } /// what 
+    // Need to handle all drop offs at any point...
 
-    //
+    // After Step 1
 
-    /*
-  Need to handle all drop offs at any point...
-*/
+    // // check address status if currently logged in, this blob may not be necessary
+    // if (app.isLoggedIn()) {
+    //   const { result } = await $.post(`${app.serverUrl()}/getAddressStatus`, {
+    //     address,
+    //     chain: app.activeChainId(),
+    //     jwt: app.user.jwt,
+    //   });
+    //   if (result.exists) {
+    //     if (result.belongsToUser) {
+    //       notifyInfo('This address is already linked to your current account.');
+    //       return;
+    //     } else {
+    //       const modalMsg = 'This address is currently linked to another account. '
+    //         + 'Remove it from that account and transfer to yours?';
+    //       const confirmed = await confirmationModalWithText(modalMsg)();
+    //       if (!confirmed) {
+    //         vnode.state.linking = false;
+    //         return;
+    //       }
+    //     }
+    //   }
+    // }
 
-    // After Step 1 
-
-      // // check address status if currently logged in, this blob may not be necessary
-      // if (app.isLoggedIn()) {
-      //   const { result } = await $.post(`${app.serverUrl()}/getAddressStatus`, {
-      //     address,
-      //     chain: app.activeChainId(),
-      //     jwt: app.user.jwt,
-      //   });
-      //   if (result.exists) {
-      //     if (result.belongsToUser) {
-      //       notifyInfo('This address is already linked to your current account.');
-      //       return;
-      //     } else {
-      //       const modalMsg = 'This address is currently linked to another account. '
-      //         + 'Remove it from that account and transfer to yours?';
-      //       const confirmed = await confirmationModalWithText(modalMsg)();
-      //       if (!confirmed) {
-      //         vnode.state.linking = false;
-      //         return;
-      //       }
-      //     }
-      //   }
-      // }
-
-      // try {
-      //   vnode.state.linking = true;
-      //   m.redraw();
-      //   await webWallet.validateWithAccount(signerAccount);
-      //   vnode.state.linking = false;
-      //   m.redraw();
-      //   // return if user signs for two addresses
-      //   if (linkNewAddressModalVnode.state.linkingComplete) return;
-      //   linkNewAddressModalVnode.state.linkingComplete = true;
-      //   accountVerifiedCallback(signerAccount);
-      // } catch (err) {
-      //   // catch when the user rejects the sign message prompt
-      //   vnode.state.linking = false;
-      //   errorCallback('Verification failed');
-      //   m.redraw();
-      // }
+    // try {
+    //   vnode.state.linking = true;
+    //   m.redraw();
+    //   await webWallet.validateWithAccount(signerAccount);
+    //   vnode.state.linking = false;
+    //   m.redraw();
+    //   // return if user signs for two addresses
+    //   if (linkNewAddressModalVnode.state.linkingComplete) return;
+    //   linkNewAddressModalVnode.state.linkingComplete = true;
+    //   accountVerifiedCallback(signerAccount);
+    // } catch (err) {
+    //   // catch when the user rejects the sign message prompt
+    //   vnode.state.linking = false;
+    //   errorCallback('Verification failed');
+    //   m.redraw();
+    // }
 
     // On Button Click after Step 2 (Post):
     const tweetPostedCallback = async (twitter, account: Account<any>) => {
@@ -89,15 +85,15 @@ const TwitterAttestationModal: m.Component<{
       // And then redraw the modal with the passed in tweet
       // Handle Errors
       // Errors being... no tweet found?
-        // // Go back to previou
-        // // Server side not working?
+      // // Go back to previou
+      // // Server side not working?
       // If Eror Allow the user to move on to the next step?
-    }
+    };
 
     // On Button Click after Step 3 (Verify)
     // Called after we ping the server the verify that the tweet has been posted
     const twitterAttestedCallback = async (account: Account<any>) => {
-      //   //  
+      //   //
       //   //   m.redraw();
       //   //   mixpanel.track('Twitter Attested', {
       //   //     'Step No': 2,
@@ -108,22 +104,41 @@ const TwitterAttestationModal: m.Component<{
       //   //   $('.TwitterAttestationModal').trigger('modalforceexit');
       //   //   if (vnode.attrs.successCallback) vnode.attrs.successCallback();
       //   //   m.redraw();
-      //   // } 
+      //   // }
       // else {
     };
 
-  
     //
-    const constructSignature = (account, chain) => {
+    const constructSignature = (username) => {
+      const EIP712Domain = [
+        { name: 'name', type: 'string' },
+        { name: 'version', type: 'string' },
+      ];
+      const domain = {
+        name: 'Sybil Verifier',
+        version: '1',
+      };
+      const Permit = [{ name: 'username', type: 'string' }];
+      const message = { username };
+      const data = JSON.stringify({
+        types: {
+          EIP712Domain,
+          Permit,
+        },
+        domain,
+        primaryType: 'Permit',
+        message,
+      });
+      return Buffer.from(data).toString('hex');
+    };
 
-    }
+    const constructTweet = () => {
+      // eslint-disable-next-line max-len
+      const tweetText = `Verifying myself as a @hicommonwealth member 🐮🌝%0Aaddr:${account.address}%0Asig:${vnode.state.userProvidedSignature}`;
+      return tweetText;
+    };
 
-    // add types
-    const constructTweet = (twitter, account) => {
-
-    }
-
-    return m('.TwitterAttestationModal', 
+    return m('.TwitterAttestationModal',
       vnode.state.step === TwitterAttestationModalSteps.Step1Sign ? [
         m('img.modal-close-button', {
           src:'/static/img/close.svg',
@@ -150,16 +165,19 @@ const TwitterAttestationModal: m.Component<{
         ]),
         m('button.primary-button', {
           onclick: async (e) => {
-            vnode.state.step += 1;
-            // try { 
-            //   const wallet = await app.wallets.locateWallet(account.address, app.chain.base);
-            //   console.log(wallet);
-            //   (wallet as MetamaskWebWalletController).signMessage(message);
-            // } catch (err) {
-            //   console.log(err);
-            // }
+            try {
+              const wallet = await app.wallets.locateWallet(account.address, app.chain.base);
+              (wallet as MetamaskWebWalletController).signMessage(`0x${constructSignature(twitter.username)}`)
+                .then((signedResult) => {
+                  vnode.state.step += 1;
+                  vnode.state.userProvidedSignature = signedResult;
+                  m.redraw();
+                });
+            } catch (err) {
+              console.log(err);
+            }
           }
-        },'Sign'),
+        }, 'Sign'),
       ] : vnode.state.step === TwitterAttestationModalSteps.Step2Publicize ? [
         m('img.modal-close-button', {
           src:'/static/img/close.svg',
@@ -175,28 +193,16 @@ const TwitterAttestationModal: m.Component<{
         ]),
         m('progress.gradient-progress-bar', { value:'0.5' }),
         m('img.twitter-logo', { src:'/static/img/twitterBlueIcon.svg' }),
-        m('.title', 'Sign Message'),
-        m('.description', 'Sign and tweet a message that will be used to link your wallet address and Twitter handle.'),
-        m('.twitter-handle', [
-          m('.flex.items-baseline', [
-            m('', `@${twitter.username}`),
-            m('.unverfied-label', 'Unverified'),
-          ]),
-          m('img.close-button', { src:'/static/img/close.svg' }),
-        ]),
+        m('.title', 'Publicize'),
+        m('.tweet-preview', constructTweet()),
         m('button.primary-button', {
           onclick: async (e) => {
+            window.open(`https://twitter.com/intent/tweet?text=${constructTweet()}`, '_blank');
             vnode.state.step += 1;
-            // try { 
-            //   const wallet = await app.wallets.locateWallet(account.address, app.chain.base);
-            //   console.log(wallet);
-            //   (wallet as MetamaskWebWalletController).signMessage(message);
-            // } catch (err) {
-            //   console.log(err);
-            // }
+            m.redraw();
           }
-        },'Publicize'),
-      ] : vnode.state.step === TwitterAttestationModalSteps.Step3Verify && [
+        }, 'Tweet This'),
+      ] : vnode.state.step === TwitterAttestationModalSteps.Step3Verify ? [
         m('img.modal-close-button', {
           src:'/static/img/close.svg',
           onclick:() => {
@@ -209,13 +215,13 @@ const TwitterAttestationModal: m.Component<{
           m('.disabled-step', 'Publicize'),
           m('', 'Verify'),
         ]),
-        m('progress.gradient-progress-bar', { value:'0.85' }),
+        m('progress.gradient-progress-bar', { value:'1' }),
         m('img.twitter-logo', { src:'/static/img/twitterBlueIcon.svg' }),
-        m('.title', 'Sign Message'),
-        m('.description', 'Sign and tweet a message that will be used to link your wallet address and Twitter handle.'),
+        m('.title', 'Verify'),
+        m('.description', 'Verify your tweet and add it to the list of verified mappings.'),
         m('.twitter-handle', [
           m('.flex.items-baseline', [
-            m('', `@${constructTweet(twitter, vnode.state.userProvidedSignature)}`),
+            m('', `@${twitter.username}`),
             m('.unverfied-label', 'Unverified'),
           ]),
           m('img.close-button', { src:'/static/img/close.svg' }),
@@ -223,7 +229,7 @@ const TwitterAttestationModal: m.Component<{
         m('button.primary-button', {
           onclick: async (e) => {
             vnode.state.step += 1;
-            // try { 
+            // try {
             //   const wallet = await app.wallets.locateWallet(account.address, app.chain.base);
             //   console.log(wallet);
             //   (wallet as MetamaskWebWalletController).signMessage(message);
@@ -231,8 +237,8 @@ const TwitterAttestationModal: m.Component<{
             //   console.log(err);
             // }
           }
-        },'Publicize'),
-      ] ? [
+        }, 'Verify'),
+      ] : vnode.state.step === TwitterAttestationModalSteps.Step4Verifying ? [
         m('img.modal-close-button', {
           src:'/static/img/close.svg',
           onclick:() => {
@@ -242,10 +248,10 @@ const TwitterAttestationModal: m.Component<{
         }),
         m('img.twitter-logo', { src:'/static/img/twitterBlueIcon.svg' }),
         m('.title', 'Verify'),
-        m('.description', `We'll check Twitter to see that the message has been posted.`),
+        m('.description', 'We\'ll check Twitter to see that the message has been posted.'),
         m('.twitter-handle', [
           m('.flex.items-baseline', [
-            m('', `@${constructTweet(twitter, vnode.state.userProvidedSignature)}`),
+            m('', ''),
             m('.unverfied-label', 'Unverified'),
           ]),
           m('img.close-button', { src:'/static/img/close.svg' }),
@@ -253,7 +259,7 @@ const TwitterAttestationModal: m.Component<{
         m('button.primary-button', {
           onclick: async (e) => {
             vnode.state.step += 1;
-            // try { 
+            // try {
             //   const wallet = await app.wallets.locateWallet(account.address, app.chain.base);
             //   console.log(wallet);
             //   (wallet as MetamaskWebWalletController).signMessage(message);
@@ -261,7 +267,7 @@ const TwitterAttestationModal: m.Component<{
             //   console.log(err);
             // }
           }
-        },'Verify'),
+        }, 'Verify'),
       ] : [
         m('img.modal-close-button', {
           src:'/static/img/close.svg',
@@ -275,7 +281,7 @@ const TwitterAttestationModal: m.Component<{
         m('button.primary-button', {
           onclick: async (e) => {
             vnode.state.step += 1;
-            // try { 
+            // try {
             //   const wallet = await app.wallets.locateWallet(account.address, app.chain.base);
             //   console.log(wallet);
             //   (wallet as MetamaskWebWalletController).signMessage(message);
@@ -283,7 +289,7 @@ const TwitterAttestationModal: m.Component<{
             //   console.log(err);
             // }
           }
-        },'Close'),
+        }, 'Close'),
       ]);
   }
 };
