@@ -291,7 +291,7 @@ export class BlocktimeHelper {
     return this._blocktime;
   }
 
-  public stamp(timestamp: moment.Moment) {
+  public stamp(timestamp: moment.Moment, heightDiff = 1) {
     this._previousblocktime = this._lastblocktime;
     this._lastblocktime = timestamp;
     if (!this._previousblocktime) {
@@ -299,7 +299,8 @@ export class BlocktimeHelper {
     }
 
     // apply moving average to figure out blocktimes
-    const lastblockduration = moment.duration(timestamp.diff(this._previousblocktime)).asSeconds();
+    const lastblocksduration = moment.duration(timestamp.diff(this._previousblocktime)).asSeconds();
+    const lastblockduration = lastblocksduration / heightDiff;
     this._durations.push(lastblockduration);
     if (this._durations.length > this._durationwindow) {
       this._durations.shift();
@@ -308,6 +309,7 @@ export class BlocktimeHelper {
     durations.sort();
 
     // take the median duration
+    // TODO: support decimal block times
     const newblocktime = Math.round(durations[Math.floor(durations.length / 2)]);
     if (newblocktime > 0 && newblocktime !== this._blocktime) {
       this._blocktime = newblocktime;

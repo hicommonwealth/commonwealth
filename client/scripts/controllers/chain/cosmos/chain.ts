@@ -106,7 +106,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       const height = +block.header.height;
       if (height > this.app.chain.block.height) {
         const time = moment.unix(block.header.time.valueOf() / 1000);
-        this._blocktimeHelper.stamp(time);
+        this._blocktimeHelper.stamp(time, height - this.app.chain.block.height);
         this.app.chain.block.height = height;
         m.redraw();
       }
