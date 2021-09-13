@@ -107,7 +107,7 @@ pageToLoad: number, totalMembers: number, isCompound: boolean, voteEvents }> = {
       vnode.state.membersRequested = false;
       activeInfo.getMembersByPage(activeInfo.id, vnode.state.pageToLoad, MEMBERS_PER_PAGE)
         .then(({ result, total }) => {
-          const newMembers = result.map(((o, i) => {
+          const newMembers = result.map(((o) => {
             o.address = o.Address.address;
             o.chain = o.chain_id;
             return o;
@@ -118,15 +118,13 @@ pageToLoad: number, totalMembers: number, isCompound: boolean, voteEvents }> = {
 
           const offset = vnode.state.membersLoaded.length - newMembers.length;
           if (vnode.state.isCompound) {
-            return app.chain.initApi().then(()=>
-              Promise.all(newMembers.map((o, i) => {
-                return (app.chain as Compound).chain.getVotingPower(o.address).then((votes) => {
-                  vnode.state.membersLoaded[offset + i].votes = votes;
-                })
-              })).then(()=>m.redraw())
-            );
-        }
-      });
+            return app.chain.initApi().then(() => Promise.all(newMembers.map((o, i) => {
+              return (app.chain as Compound).chain.getVotingPower(o.address).then((votes) => {
+                vnode.state.membersLoaded[offset + i].votes = votes;
+              });
+            })).then(() => m.redraw()));
+          }
+        });
     }
 
     const isAdmin = app.user.isSiteAdmin

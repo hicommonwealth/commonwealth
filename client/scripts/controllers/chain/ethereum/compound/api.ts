@@ -32,7 +32,8 @@ export default class CompoundAPI extends ContractApi<GovernorAlpha> {
         const iface = new utils.Interface(JSON.stringify(ABI));
         const data = iface.encodeFunctionData(tokenName);
         const resultData = await this.Contract.provider.call({ to: this.Contract.address, data });
-        const tokenAddress = utils.getAddress(Buffer.from(utils.stripZeros(resultData)).toString('hex'));        this._Token = MPond__factory.connect(tokenAddress, this.Contract.signer || this.Contract.provider);
+        const tokenAddress = utils.getAddress(Buffer.from(utils.stripZeros(resultData)).toString('hex'));
+        this._Token = MPond__factory.connect(tokenAddress, this.Contract.signer || this.Contract.provider);
       } catch (err) {
         console.error(`Could not fetch token ${tokenName}: ${err.message}`);
       }
