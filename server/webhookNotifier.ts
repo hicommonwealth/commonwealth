@@ -1,11 +1,12 @@
 import request from 'superagent';
 import { Op } from 'sequelize';
 import { capitalize } from 'lodash';
-import { AaveEvents, chainSupportedBy, CompoundEvents, MolochEvents, SubstrateEvents } from '@commonwealth/chain-events';
+import {
+  AaveEvents, chainSupportedBy, CompoundEvents, MolochEvents, SubstrateEvents, Erc20Events
+} from '@commonwealth/chain-events';
 
 import { NotificationCategories } from '../shared/types';
 import { smartTrim, validURL, renderQuillDeltaToText } from '../shared/utils';
-import { getForumNotificationCopy } from '../shared/notificationFormatter';
 import { SERVER_URL, SLACK_FEEDBACK_WEBHOOK, DEFAULT_COMMONWEALTH_LOGO } from './config';
 
 export interface WebhookContent {
@@ -35,6 +36,9 @@ const getFilteredContent = (content, address) => {
       labelerFn = CompoundEvents.Label;
     } else if (chainSupportedBy(content.chainEventType.chain, AaveEvents.Types.EventChains)) {
       labelerFn = AaveEvents.Label;
+    } else if (content.chainEvent.event_data.kind === 'approval' || content.chainEvent.event_data.kind === 'transfer') {
+      // TODO: improve this ERC20 detection
+      labelerFn = Erc20Events.Label;
     }
     if (!labelerFn) throw new Error('unknown chain event');
     event = labelerFn(

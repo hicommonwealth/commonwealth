@@ -20,10 +20,10 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
     return next(new Error(Errors.InvalidNotificationCategory));
   }
 
+  const p_entity = req.body.object_id.substr(0, req.body.object_id.lastIndexOf('-'));
+  const p_id = req.body.object_id.substr(req.body.object_id.lastIndexOf('-') + 1);
+
   let obj;
-  const parsed_object_id = req.body.object_id.split(/-|_/);
-  const p_id = parsed_object_id[1];
-  const p_entity = parsed_object_id[0];
   let chain;
 
   switch (category.name) {
@@ -85,14 +85,26 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
           id: req.body.object_id,
         }
       });
-      if (!chainEventType) return next(new Error(Errors.InvalidChainEventId));
-      obj = { chain_id: p_entity, chain_event_type_id: req.body.object_id };
+      // TODO: this is not great -- ideally we should not be creating ChainEventTypes in the middle
+      //   of creating Subscriptions, as theoretically ChainEventTypes are what describe the available
+      //   set of subscriptions... but this entire set of database models needs to be reworked, so this
+      //   is an acceptable hack for now.
+      if (!chainEventType && chain.type === 'token' && p_id === 'transfer') {
+        // TODO: add approval in addition to transfer?
+        await models.ChainEventType.create({
+          id: req.body.object_id,
+          chain: req.body.chain_id,
+          event_name: 'transfer'
+        });
+      } else {
+        return next(new Error(Errors.InvalidChainEventId));
+      }
+      obj = { chain_id: p_entity, chain_event_type_id: req.body.event_name };
       break;
     }
     default:
       return next(new Error(Errors.InvalidNotificationCategory));
   }
-
   const subscription = await models.Subscription.create({
     subscriber_id: req.user.id,
     category_id: req.body.category,

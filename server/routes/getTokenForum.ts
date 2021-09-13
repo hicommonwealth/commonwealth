@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import Erc20SubscriberHolder from 'server/util/erc20SubscriberHolder';
 import { Op } from 'sequelize';
 import Web3 from 'web3';
 import { sequelize, DB } from '../database';
@@ -9,6 +10,7 @@ const log = factory.getLogger(formatFilename(__filename));
 
 const getTokenForum = async (
   models: DB,
+  erc20SubscriberHolder: Erc20SubscriberHolder,
   req: Request,
   res: Response,
   next: NextFunction
@@ -26,6 +28,8 @@ const getTokenForum = async (
   const token = await models.Token.findOne({ where: { address: { [Op.iLike]: address } } });
   if (token) {
     try {
+      erc20SubscriberHolder.subscribeNewToken(address);
+
       const result = await sequelize.transaction(async (t) => {
         const [ chain ] = await models.Chain.findOrCreate({
           where: { id: token.id },

@@ -3,7 +3,7 @@ import _ from 'underscore';
 import {
   IDisconnectedRange, IEventHandler, EventSupportingChains, IEventSubscriber,
   SubstrateTypes, SubstrateEvents, MolochTypes, MolochEvents, chainSupportedBy,
-  CompoundTypes, CompoundEvents, isSupportedChain, AaveTypes, AaveEvents
+  CompoundTypes, CompoundEvents, Erc20Events, isSupportedChain, AaveTypes, AaveEvents,
 } from '@commonwealth/chain-events';
 
 import EventStorageHandler, { StorageFilterConfig } from '../eventHandlers/storage';
@@ -21,6 +21,13 @@ const log = factory.getLogger(formatFilename(__filename));
 // emit globally any transfer over 1% of total issuance
 // TODO: config this
 const BALANCE_TRANSFER_THRESHOLD_PERMILL: number = 10_000;
+const BALANCE_TRANSFER_THRESHOLD: number = 10 ** 22;
+/* TODO: both of these are imperfect solutions. The BALANCE_TRANSFER_THRESHOLD_PERMILL used
+by the Substrate enricher uses an API call to get the max token amount of the chain its referring to
+for every event it processes. This seems like too much overheard for the ERC20 enricher which
+could end being processed on through hundreds of chains all with rapid transfers happening. So
+I have made it a fixed value here (1000 tokens if they're using the default decimal value) but
+the ideal solution would be to have every chain's max token amount stored in the database. */
 
 const discoverReconnectRange = async (chain: string): Promise<IDisconnectedRange> => {
   const lastChainEvent = await models.ChainEvent.findAll({
@@ -47,6 +54,7 @@ const discoverReconnectRange = async (chain: string): Promise<IDisconnectedRange
 
 export const generateHandlers = (
   node: ChainNodeInstance,
+
   wss?: WebSocket.Server,
   storageConfig: StorageFilterConfig = {},
 ) => {
@@ -198,6 +206,50 @@ const setupChainEventListeners = async (
     });
     return [ node.chain, subscriber ];
   }));
+
+  // Add Erc20 subscribers
+  if (chains === 'all' || chains.includes('erc20')) {
+    const erc20Nodes = await models.ChainNode.findAll({
+      include: [{
+        model: models.Chain,
+        where: { type: 'token' },
+        required: true,
+      }],
+    });
+    const erc20Addresses = erc20Nodes.map((o) => o.address);
+
+    // get ethereum's endpoint URL as most canonical one
+    const ethNode = await models.ChainNode.findOne({
+      where: {
+        chain: 'ethereum'
+      }
+    });
+    const ethUrl = ethNode.url;
+
+    const api = await Erc20Events.createApi(ethUrl, erc20Addresses);
+    // we only need notifications for ERC20s
+    const storageHandler = new EventStorageHandler(models, 'erc20', {});
+    const notificationHandler = new EventNotificationHandler(models, wss);
+    const subscriber = await Erc20Events.subscribeEvents({
+      chain: 'erc20',
+      handlers: [ storageHandler, notificationHandler ],
+      skipCatchup,
+      api,
+      // TODO: discover reconnect range for erc20 will need to provide the specific token's
+      //   name at reconnect attempt, so we omit it for now.
+      // discoverReconnectRange: async () => discoverReconnectRange(models, 'erc20'),
+      enricherConfig: {
+        balanceTransferThreshold: BALANCE_TRANSFER_THRESHOLD,
+      }
+    });
+    process.on('SIGTERM', () => {
+      if (subscriber) {
+        subscriber.unsubscribe();
+      }
+    });
+    subscribers.push([ 'erc20', subscriber ]);
+  }
+
   return _.object<{ [chain: string]: IEventSubscriber<any, any> }>(subscribers);
 };
 

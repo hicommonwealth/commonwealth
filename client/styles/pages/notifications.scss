@@ -40,6 +40,9 @@
             border: none;
             padding: 6px 0;
             height: 43px;
+            &.token-icon {
+                width: 50px;
+            }
             &.subscription-label {
                 padding-right: 30px;
                 line-height: 1.2;
@@ -56,6 +59,8 @@
                 color: $text-color-medium;
                 margin-left: 6px;
             }
+        }
+        td.token-icon {
         }
         tr:nth-child(2) td {
             padding-top: 12px;

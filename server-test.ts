@@ -11,6 +11,7 @@ import SessionSequelizeStore from 'connect-session-sequelize';
 import WebSocket from 'ws';
 
 import { SubstrateTypes } from '@commonwealth/chain-events';
+import Erc20SubscriberHolder from 'server/util/erc20SubscriberHolder';
 
 import { SESSION_SECRET } from './server/config';
 import setupAPI from './server/router';
@@ -34,6 +35,7 @@ const identityFetchCache = new IdentityFetchCache(10 * 60);
 // always prune both token and non-token holders asap
 const mockTokenBalanceProvider = new MockTokenBalanceProvider();
 const tokenBalanceCache = new TokenBalanceCache(models, 0, 0, mockTokenBalanceProvider);
+const erc20SubscriberHolder = new Erc20SubscriberHolder();
 const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
 let server;
 
@@ -333,7 +335,7 @@ const setupServer = () => {
 };
 
 setupPassport(models);
-setupAPI(app, models, viewCountCache, identityFetchCache, tokenBalanceCache);
+setupAPI(app, models, viewCountCache, identityFetchCache, tokenBalanceCache, erc20SubscriberHolder);
 setupErrorHandlers();
 setupServer();
 

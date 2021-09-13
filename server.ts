@@ -1,4 +1,4 @@
-import { SubstrateEvents, SubstrateTypes, chainSupportedBy } from '@commonwealth/chain-events';
+import { Erc20Events, SubstrateEvents, SubstrateTypes, chainSupportedBy } from '@commonwealth/chain-events';
 import session from 'express-session';
 import Rollbar from 'rollbar';
 import express from 'express';
@@ -25,6 +25,7 @@ const log = factory.getLogger(formatFilename(__filename));
 import ViewCountCache from './server/util/viewCountCache';
 import IdentityFetchCache, { IdentityFetchCacheNew } from './server/util/identityFetchCache';
 import TokenBalanceCache from './server/util/tokenBalanceCache';
+\import Erc20SubscriberHolder from './server/util/erc20SubscriberHolder';
 import { SESSION_SECRET, ROLLBAR_SERVER_TOKEN } from './server/config';
 import models from './server/database';
 import { updateEvents, updateBalances } from './server/util/eventPoller';
@@ -78,6 +79,7 @@ async function main() {
   }
 
   const tokenBalanceCache = new TokenBalanceCache(models);
+  const erc20SubscriberHolder = new Erc20SubscriberHolder();
   const listenChainEvents = async () => {
     try {
       // configure chain list from events
@@ -93,6 +95,9 @@ async function main() {
       for (const [ chain, subscriber ] of Object.entries(subscribers)) {
         if (chainSupportedBy(chain, SubstrateTypes.EventChains)) {
           fetchers[chain] = new SubstrateEvents.StorageFetcher(subscriber.api);
+        }
+        if (chain === 'erc20') {
+          erc20SubscriberHolder.setSubscriber(subscriber as Erc20Events.Subscriber);
         }
       }
       await (<IdentityFetchCache>identityFetchCache).start(models, fetchers);
@@ -293,7 +298,7 @@ async function main() {
   setupPassport(models);
 
   await tokenBalanceCache.start();
-  setupAPI(app, models, viewCountCache, <any>identityFetchCache, tokenBalanceCache);
+  setupAPI(app, models, viewCountCache, <any>identityFetchCache, tokenBalanceCache, erc20SubscriberHolder);
   setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
   setupErrorHandlers(app, rollbar);
 
