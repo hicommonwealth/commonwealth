@@ -35,6 +35,7 @@ import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';
 import { activeQuillEditorHasText, GlobalStatus } from './body';
 import { IProposalPageState } from '.';
+import { SnapshotProposal } from 'client/scripts/helpers/snapshot_utils';
 
 export const ProposalHeaderExternalLink: m.Component<{ proposal: AnyProposal | OffchainThread }> = {
   view: (vnode) => {
@@ -164,6 +165,20 @@ export const ProposalHeaderBlockExplorerLink: m.Component<{ proposal: AnyProposa
   }
 };
 
+export const ProposalHeaderExternalSnapshotLink: m.Component<{ proposal: SnapshotProposal, spaceId: string }> = {
+  view: (vnode) => {
+    const { proposal, spaceId } = vnode.attrs;
+    if (!proposal || !proposal.id || !spaceId) return;
+
+    return m('.ProposalHeaderBlockExplorerLink', [
+      externalLink('a.voting-link', `https://snapshot.org/#/proposal/${spaceId}/${proposal.id}`, [
+        `View on Snapshot`,
+        m(Icon, { name: Icons.EXTERNAL_LINK }),
+      ]),
+    ]);
+  }
+};
+
 export const ProposalHeaderVotingInterfaceLink: m.Component<{ proposal: AnyProposal }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
@@ -190,21 +205,78 @@ export const ProposalHeaderThreadLink: m.Component<{ proposal: AnyProposal }> = 
   }
 };
 
+export const ProposalHeaderSnapshotThreadLink: m.Component<{ threadId: string }> = {
+  view: (vnode) => {
+    const { threadId } = vnode.attrs;
+    if (!threadId) return;
+    const proposalLink = `${app.isCustomDomain() ? '' : `/${app.activeId()}`}/proposal/discussion/${threadId}`;
+
+    return m('.ProposalHeaderThreadLink', [
+      link('a.thread-link', proposalLink, [
+        'Go to discussion',
+        m(Icon, { name: Icons.EXTERNAL_LINK }),
+      ]),
+    ]);
+  }
+};
+
 export const ProposalHeaderThreadLinkedChainEntity: m.Component<{ proposal: OffchainThread, chainEntity }> = {
   view: (vnode) => {
     const { proposal, chainEntity } = vnode.attrs;
     const slug = chainEntityTypeToProposalSlug(chainEntity.type);
     if (!slug) return;
 
+    const proposalLink = `${app.isCustomDomain() ? '' : `/${proposal.chain}`
+      }/proposal/${slug}/${chainEntity.typeId}`
+
     return m('.ProposalHeaderThreadLinkedChainEntity', [
       link(
         'a',
-        `/${proposal.chain}/proposal/${slug}/${chainEntity.typeId}`,
+          proposalLink,
         [
           `${chainEntityTypeToProposalName(chainEntity.type)} #${chainEntity.typeId}`,
           chainEntity.completed === 't' ? ' (Completed) ' : ' ',
         ],
       ),
+    ]);
+  }
+};
+
+export const ProposalHeaderThreadLinkedSnapshot: m.Component<{ 
+  proposal: OffchainThread, 
+}, { 
+  initialized,
+  snapshotProposalsLoaded
+  snapshot
+}> = {
+  view: (vnode) => {
+    const { proposal } = vnode.attrs;
+    if (!proposal.snapshotProposal) return;
+    if (!app.chain?.meta.chain.snapshot) return;
+    
+    if (!vnode.state.initialized) {
+      vnode.state.initialized = true;
+      app.snapshot.init(app.chain.meta.chain.snapshot).then(() => {
+          // refreshing loads the latest snapshot proposals into app.snapshot.proposals array
+        vnode.state.snapshot = app.snapshot.proposals.find((sn) => sn.id === proposal.snapshotProposal);
+        vnode.state.snapshotProposalsLoaded = true;
+        m.redraw();
+      })
+    }
+
+    if (vnode.state.snapshotProposalsLoaded && proposal.snapshotProposal !== vnode.state.snapshot) {
+      vnode.state.snapshot = app.snapshot.proposals.find((sn) => sn.id === proposal.snapshotProposal);
+      m.redraw();
+    }
+
+    const proposalLink = `${app.isCustomDomain() ? '' : `/${proposal.chain}`
+      }/snapshot-proposal/${(app.chain?.meta.chain.snapshot)}/${proposal.snapshotProposal}`;
+
+    return m('.ProposalHeaderThreadLinkedChainEntity', 
+    !vnode.state.snapshotProposalsLoaded ? [
+      link('a', proposalLink, [`Snapshot: ${proposal.snapshotProposal.slice(0,10)} ...`,]),
+    ] : [
+      link('a', proposalLink, [`Snapshot: ${vnode.state.snapshot.title.slice(0,20)} ...`,]),
     ]);
   }
 };
@@ -506,6 +578,26 @@ export const ProposalSidebarPollEditorModule: m.Component<{
   }
 };
 
+export const ProposalSidebarLinkedViewer: m.Component<{
+  proposal: OffchainThread
+}> = {
+  view: (vnode) => {
+    const { proposal } = vnode.attrs;
+
+    return m('.ProposalSidebarLinkedViewer', [
+      (proposal.chainEntities.length > 0 || proposal.snapshotProposal?.length > 0) 
+        ? m('.placeholder-copy', 'Proposals for this thread:')
+        : m('.placeholder-copy', app.chain ? 'Connect an on-chain proposal?' : 'Track the progress of this thread?'),
+      proposal.chainEntities.length > 0 && m('.proposal-chain-entities', [
+        proposal.chainEntities.map((chainEntity) => {
+          return m(ProposalHeaderThreadLinkedChainEntity, { proposal, chainEntity });
+        }),
+      ]),
+      proposal.snapshotProposal?.length > 0 && m(ProposalHeaderThreadLinkedSnapshot, { proposal }),
+    ])
+  }
+}
+
 export const ProposalSidebarStageEditorModule: m.Component<{
   proposal: OffchainThread,
   openStageEditor: Function
@@ -520,14 +612,6 @@ export const ProposalSidebarStageEditorModule: m.Component<{
     if (!stagesEnabled) return;
 
     return m('.ProposalSidebarStageEditorModule', [
-      proposal.chainEntities.length > 0
-        ? m('.placeholder-copy', 'Proposals for this thread:')
-        : m('.placeholder-copy', app.chain ? 'Connect an on-chain proposal?' : 'Track the progress of this thread?'),
-      proposal.chainEntities.length > 0 && m('.proposal-chain-entities', [
-        proposal.chainEntities.map((chainEntity) => {
-          return m(ProposalHeaderThreadLinkedChainEntity, { proposal, chainEntity });
-        }),
-      ]),
       m(Button, {
         rounded: true,
         compact: true,

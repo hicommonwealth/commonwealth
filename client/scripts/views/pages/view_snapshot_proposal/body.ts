@@ -2,7 +2,7 @@ import 'pages/view_proposal/editor_permissions.scss';
 
 import m from 'mithril';
 
-import { formatLastUpdated } from 'helpers';
+import { formatLastUpdated, formatTimestamp } from 'helpers';
 import { AddressInfo } from 'models';
 
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
@@ -49,10 +49,14 @@ export const ProposalBodyEnded: m.Component<{ item: SnapshotProposal }> = {
     if (!item.end) {
       return;
     }
+
+    const now = moment();
     const time = moment(+item.end * 1000);
 
     return m('.ProposalBodyLastEnded', [
-      m('', `Ended ${formatLastUpdated(time)}`)
+      m('', (now > time)
+      ? `Ended ${formatLastUpdated(time)}`
+      : `Ending in ${formatTimestamp(time)}`)
     ]);
   }
 };

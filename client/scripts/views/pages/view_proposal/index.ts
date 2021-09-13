@@ -62,6 +62,7 @@ import {
   ProposalSidebarStageEditorModule,
   ProposalSidebarPollEditorModule,
   ProposalLinkEditor,
+  ProposalSidebarLinkedViewer,
 } from './header';
 import { AaveViewProposalDetail, AaveViewProposalSummary } from './aave_view_proposal_detail';
 import {
@@ -77,6 +78,7 @@ import User from '../../components/widgets/user';
 import MarkdownFormattedText from '../../components/markdown_formatted_text';
 import { createTXModal } from '../../modals/tx_signing_modal';
 import { SubstrateAccount } from '../../../controllers/chain/substrate/account';
+import { SnapshotProposal } from 'client/scripts/helpers/snapshot_utils';
 
 const MAX_THREAD_LEVEL = 2;
 
@@ -294,9 +296,13 @@ const ProposalHeader: m.Component<{
                 && m(StageEditor, {
                   thread: vnode.attrs.proposal as OffchainThread,
                   popoverMenu: true,
-                  onChangeHandler: (stage: OffchainThreadStage, chainEntities: ChainEntity[]) => {
+                  onChangeHandler: (stage: OffchainThreadStage, chainEntities: ChainEntity[], snapshotProposal: SnapshotProposal) => {
                     proposal.stage = stage;
                     proposal.chainEntities = chainEntities;
+                    if (app.chain?.meta.chain.snapshot) {
+                      proposal.snapshotProposal = snapshotProposal[0]?.id;
+                    }
+                    app.threads.fetchThread(proposal.identifier);
                     m.redraw();
                   },
                   openStateHandler: (v) => {
@@ -1008,7 +1014,7 @@ const ViewProposalPage: m.Component<{
           && proposal.hasOffchainPoll
           && m(ProposalHeaderOffchainPoll, { proposal }),
         proposal instanceof OffchainThread
-          && isAuthor
+          && (isAuthor || isAdmin)
           && !proposal.offchainVotingEndsAt
           && m(ProposalSidebarPollEditorModule, {
             proposal,
@@ -1016,8 +1022,15 @@ const ViewProposalPage: m.Component<{
               vnode.state.pollEditorIsOpen = true;
             }
           }),
-        (isAuthor || isAdmin) && proposal instanceof OffchainThread
-          && m(ProposalSidebarStageEditorModule, {
+          proposal instanceof OffchainThread 
+            && ((proposal as OffchainThread).chainEntities.length > 0 
+              || (proposal as OffchainThread).snapshotProposal?.length > 0)
+            && m(ProposalSidebarLinkedViewer, {
+            proposal
+          }),
+          proposal instanceof OffchainThread 
+            && (isAuthor || isAdmin) 
+            && m(ProposalSidebarStageEditorModule, {
             proposal,
             openStageEditor: () => {
               vnode.state.stageEditorIsOpen = true;
@@ -1036,8 +1049,11 @@ const ViewProposalPage: m.Component<{
         isAdmin,
         stageEditorIsOpen: vnode.state.stageEditorIsOpen,
         pollEditorIsOpen: vnode.state.pollEditorIsOpen,
-        closeStageEditor: () => { vnode.state.stageEditorIsOpen = false; m.redraw(); },
-        closePollEditor: () => { vnode.state.pollEditorIsOpen = false; m.redraw(); },
+        closeStageEditor: () => { vnode.state.stageEditorIsOpen = false; 
+          m.redraw(); },
+        closePollEditor: () => { 
+          vnode.state.pollEditorIsOpen = false; 
+          m.redraw(); },
       }),
       !(proposal instanceof OffchainThread)
         && m(LinkedProposalsEmbed, { proposal }),

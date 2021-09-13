@@ -33,6 +33,7 @@ export const modelFromServer = (thread) => {
     body,
     last_edited,
     version_history,
+    snapshot_proposal,
     OffchainAttachments,
     created_at,
     topic,
@@ -94,6 +95,7 @@ export const modelFromServer = (thread) => {
     body: decodeURIComponent(body),
     createdAt: moment(created_at),
     attachments,
+    snapshotProposal: snapshot_proposal,
     topic,
     kind,
     stage,
@@ -400,6 +402,30 @@ class ThreadsController {
     });
   }
 
+  public async setLinkedSnapshotProposal(args: { threadId: number, snapshotProposal: string }) {
+    await $.ajax({
+      url: `${app.serverUrl()}/updateThreadLinkedSnapshotProposal`,
+      type: 'POST',
+      data: {
+        'chain': app.activeChainId(),
+        'thread_id': args.threadId,
+        'snapshot_proposal': args.snapshotProposal,
+        'jwt': app.user.jwt
+      },
+      success: (response) => {
+        const thread = this._store.getByIdentifier(args.threadId);
+        if (!thread) return;
+        thread.snapshotProposal = args.snapshotProposal;
+        return thread;
+      },
+      error: (err) => {
+        console.log('Failed to update linked snapshot proposal');
+        throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error
+          : 'Failed to update linked proposals');
+      }
+    });
+  }
+
   public async setLinkedChainEntities(args: { threadId: number, entities: ChainEntity[] }) {
     await $.ajax({
       url: `${app.serverUrl()}/updateThreadLinkedChainEntities`,
@@ -428,6 +454,21 @@ class ThreadsController {
           : 'Failed to update linked proposals');
       }
     });
+  }
+
+  public async fetchThreadIdForSnapshot(args: { snapshot: string }) {
+    const response = await $.ajax({
+      url: `${app.serverUrl()}/fetchThreadForSnapshot`,
+      type: 'GET',
+      data: {
+        snapshot: args.snapshot,
+        chain: app.activeId(),
+      },
+    });
+    if (response.status !== 'Success') {
+      return 'false';
+    }
+    return response.result;
   }
 
   public async fetchThread(id) {

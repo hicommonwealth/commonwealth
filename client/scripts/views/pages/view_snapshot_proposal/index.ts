@@ -19,15 +19,19 @@ import {
   ProposalBodyAuthor, ProposalBodyCreated,
   ProposalBodyEnded, ProposalBodyText,
 } from './body';
+import { ProposalHeaderExternalSnapshotLink, ProposalHeaderSnapshotThreadLink } from '../view_proposal/header';
 import User from '../../components/widgets/user';
 import { SocialSharingCarat } from '../../components/social_sharing_carat';
 
 const ProposalHeader: m.Component<{
   snapshotId: string
   proposal: SnapshotProposal
-}, {}> = {
+}, {
+  loaded: boolean, 
+  thread: string,
+}> = {
   view: (vnode) => {
-    const { proposal } = vnode.attrs;
+    const { proposal, snapshotId } = vnode.attrs;
     if (!proposal) {
       return m('.topic-loading-spinner-wrap', [ m(Spinner, { active: true, size: 'lg' }) ]);
     }
@@ -35,7 +39,19 @@ const ProposalHeader: m.Component<{
     // Original posters have full editorial control, while added collaborators
     // merely have access to the body and title
 
-    const proposalLink = `/${app.activeId()}/snapshot-proposal/${vnode.attrs.snapshotId}/${proposal.ipfs}`;
+    const proposalLink = `/${app.activeId()}/snapshot-proposal/${snapshotId}/${proposal.ipfs}`;
+
+    if (!vnode.state.loaded) {
+      try {
+        vnode.state.loaded = true;
+        app.threads.fetchThreadIdForSnapshot({snapshot: proposal.id}).then((res) => { 
+          vnode.state.thread = res;
+        })
+        m.redraw();
+      } catch (err) {
+        console.log(err);
+      }
+    }
 
     return m('.ProposalHeader', {
       class: 'proposal-snapshot'
@@ -51,6 +67,11 @@ const ProposalHeader: m.Component<{
             m(ProposalBodyAuthor, { item: proposal }),
             m('.CommentSocialHeader', [ m(SocialSharingCarat) ]),
           ]),
+          m('.proposal-body-link', [
+            (vnode.state.thread !== 'false') && vnode.state.loaded && m(ProposalHeaderSnapshotThreadLink, { threadId: vnode.state.thread }),
+            vnode.state.loaded && m(ProposalHeaderExternalSnapshotLink, { proposal: proposal, spaceId: snapshotId }),
+          ]),
+          m('br')
         ]),
       ]),
       m('.proposal-content', [
@@ -141,7 +162,6 @@ const VoteAction: m.Component<{
     };
 
     const vote = async (selectedChoice: number) => {
-      console.log(`vnode.attrs.proposal ${vnode.attrs.proposal}`);
       try {
         app.modals.create({
           modal: ConfirmSnapshotVoteModal,
@@ -253,7 +273,10 @@ const ViewProposalPage: m.Component<{
     && moment(+vnode.state.proposal.start * 1000) <= moment()
     && moment(+vnode.state.proposal.end * 1000) > moment();
 
-    return m(Sublayout, { class: 'ViewProposalPage', title: 'Snapshot Proposal' }, [
+    return m(Sublayout, { 
+      class: 'ViewProposalPage', 
+      title: 'Snapshot Proposal',
+    }, [
       m(ProposalHeader, {
         snapshotId: vnode.attrs.snapshotId,
         proposal: vnode.state.proposal,

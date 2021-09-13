@@ -80,9 +80,11 @@ import updateThreadStage from './routes/updateThreadStage';
 import updateThreadPrivacy from './routes/updateThreadPrivacy';
 import updateThreadPinned from './routes/updateThreadPinned';
 import updateThreadLinkedChainEntities from './routes/updateThreadLinkedChainEntities';
+import updateThreadLinkedSnapshotProposal from './routes/updateThreadLinkedSnapshotProposal';
 import updateOffchainVote from './routes/updateOffchainVote';
 import viewOffchainVotes from './routes/viewOffchainVotes';
 import fetchEntityTitle from './routes/fetchEntityTitle';
+import fetchThreadForSnapshot from './routes/fetchThreadForSnapshot';
 import updateChainEntityTitle from './routes/updateChainEntityTitle';
 import deleteThread from './routes/deleteThread';
 import addEditors from './routes/addEditors';
@@ -241,6 +243,11 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     updateThreadLinkedChainEntities.bind(this, models),
   );
+  router.post(
+    '/updateThreadLinkedSnapshotProposal',
+    passport.authenticate('jwt', { session: false }),
+    updateThreadLinkedSnapshotProposal.bind(this, models),
+  );
 
   router.post(
     '/updateOffchainVote',
@@ -250,6 +257,8 @@ function setupRouter(
   router.get('/viewOffchainVotes', viewOffchainVotes.bind(this, models));
 
   router.get('/fetchEntityTitle', fetchEntityTitle.bind(this, models));
+  router.get('/fetchThreadForSnapshot', fetchThreadForSnapshot.bind(this, models));
+
   router.post(
     '/updateChainEntityTitle',
     passport.authenticate('jwt', { session: false }),
@@ -300,7 +309,11 @@ function setupRouter(
   router.post('/deleteTopic', passport.authenticate('jwt', { session: false }), deleteTopic.bind(this, models));
   // TODO: Change to GET /topics
   router.get('/bulkTopics', bulkTopics.bind(this, models));
-  router.post('/setTopicThreshold', passport.authenticate('jwt', { session: false }), setTopicThreshold.bind(this, models));
+  router.post(
+    '/setTopicThreshold',
+    passport.authenticate('jwt', { session: false }),
+    setTopicThreshold.bind(this, models),
+  );
 
   // offchain reactions
   // TODO: Change to POST /reaction
