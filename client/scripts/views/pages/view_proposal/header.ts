@@ -205,11 +205,11 @@ export const ProposalHeaderThreadLink: m.Component<{ proposal: AnyProposal }> = 
   }
 };
 
-export const ProposalHeaderSnapshotThreadLink: m.Component<{ thread: OffchainThread }> = {
+export const ProposalHeaderSnapshotThreadLink: m.Component<{ threadId: string }> = {
   view: (vnode) => {
-    const { thread } = vnode.attrs;
-    if (!thread || !thread.id) return;
-    const proposalLink = `${app.isCustomDomain() ? '' : `/${app.activeId()}`}/proposal/discussion/${thread.id}`;
+    const { threadId } = vnode.attrs;
+    if (!threadId) return;
+    const proposalLink = `${app.isCustomDomain() ? '' : `/${app.activeId()}`}/proposal/discussion/${threadId}`;
 
     return m('.ProposalHeaderThreadLink', [
       link('a.thread-link', proposalLink, [

@@ -299,7 +299,9 @@ const ProposalHeader: m.Component<{
                   onChangeHandler: (stage: OffchainThreadStage, chainEntities: ChainEntity[], snapshotProposal: SnapshotProposal) => {
                     proposal.stage = stage;
                     proposal.chainEntities = chainEntities;
-                    proposal.snapshotProposal = snapshotProposal[0].id;
+                    if (app.chain?.meta.chain.snapshot) {
+                      proposal.snapshotProposal = snapshotProposal[0]?.id;
+                    }
                     app.threads.fetchThread(proposal.identifier);
                     m.redraw();
                   },

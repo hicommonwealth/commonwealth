@@ -16,37 +16,11 @@ const fetchThreadForSnapshot = async (models: DB, req: Request, res: Response, n
     where: { 
       chain: chain,
       snapshot_proposal: snapshot,
-    },
-    include: [
-      {
-        model: models.Address,
-        as: 'Address'
-      },
-      {
-        model: models.Address,
-        // through: models.Collaboration,
-        as: 'collaborators'
-      },
-      {
-        model: models.OffchainTopic,
-        as: 'topic'
-      },
-      {
-        model: models.ChainEntity,
-      },
-      {
-        model: models.OffchainReaction,
-        as: 'reactions',
-        include: [{
-          model: models.Address,
-          as: 'Address'
-        }]
-      }
-    ],
+    }
   });
-  if (!thread) return res.json({ status: 'Failure', message: Errors.NoThread });
+  if (!thread) return res.json({ status: 'Failure', message: '' });
 
-  return res.json({ status: 'Success', result: thread.toJSON() });
+  return res.json({ status: 'Success', result: thread.id });
 };
 
 export default fetchThreadForSnapshot;

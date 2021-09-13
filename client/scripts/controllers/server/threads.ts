@@ -456,7 +456,7 @@ class ThreadsController {
     });
   }
 
-  public async fetchThreadForSnapshot(args: { snapshot: string }) {
+  public async fetchThreadIdForSnapshot(args: { snapshot: string }) {
     const response = await $.ajax({
       url: `${app.serverUrl()}/fetchThreadForSnapshot`,
       type: 'GET',
@@ -466,14 +466,9 @@ class ThreadsController {
       },
     });
     if (response.status !== 'Success') {
-      throw new Error(`Cannot fetch thread: ${response.status}`);
+      return 'false';
     }
-
-    const thread = modelFromServer(response.result);
-    const existing = this._store.getByIdentifier(thread.id);
-    if (existing) this._store.remove(existing);
-    this._store.update(thread);
-    return thread;
+    return response.result;
   }
 
   public async fetchThread(id) {

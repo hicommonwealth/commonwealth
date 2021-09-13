@@ -282,10 +282,8 @@ const StageEditor: m.Component<{
               // set linked chain entities
               try {
                 await app.threads.setLinkedChainEntities({ threadId: thread.id, entities: vnode.state.chainEntitiesToSet });
-                for (let i = 0; i < vnode.state.snapshotProposalsToSet.length; i++) {
-                  await app.threads.setLinkedSnapshotProposal({ threadId: thread.id, 
-                    snapshotProposal: vnode.state.snapshotProposalsToSet[i].id })
-                }
+                await app.threads.setLinkedSnapshotProposal({ threadId: thread.id, 
+                  snapshotProposal: vnode.state.snapshotProposalsToSet[0]?.id })
               } catch (err) {
                 console.log('Failed to update linked proposals');
                 throw new Error((err.responseJSON && err.responseJSON.error)

@@ -9,7 +9,7 @@ import moment from 'moment';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
-import { AddressInfo, OffchainThread } from 'models';
+import { AddressInfo } from 'models';
 import ConfirmSnapshotVoteModal from 'views/modals/confirm_snapshot_vote_modal';
 import { getPower, SnapshotSpace, SnapshotProposal, getVotes, SnapshotProposalVote } from 'helpers/snapshot_utils';
 
@@ -28,7 +28,7 @@ const ProposalHeader: m.Component<{
   proposal: SnapshotProposal
 }, {
   loaded: boolean, 
-  thread: OffchainThread
+  thread: string,
 }> = {
   view: (vnode) => {
     const { proposal, snapshotId } = vnode.attrs;
@@ -43,7 +43,7 @@ const ProposalHeader: m.Component<{
 
     if (!vnode.state.loaded) {
       try {
-        app.threads.fetchThreadForSnapshot({snapshot: proposal.id}).then((res) => { 
+        app.threads.fetchThreadIdForSnapshot({snapshot: proposal.id}).then((res) => { 
           vnode.state.loaded = true;
           vnode.state.thread = res;
         })
@@ -68,7 +68,7 @@ const ProposalHeader: m.Component<{
             m('.CommentSocialHeader', [ m(SocialSharingCarat) ]),
           ]),
           m('.proposal-body-link', [
-            vnode.state.loaded && m(ProposalHeaderSnapshotThreadLink, { thread: vnode.state.thread }),
+            (vnode.state.thread !== 'false') && vnode.state.loaded && m(ProposalHeaderSnapshotThreadLink, { threadId: vnode.state.thread }),
             vnode.state.loaded && m(ProposalHeaderExternalSnapshotLink, { proposal: proposal, spaceId: snapshotId }),
           ]),
           m('br')
