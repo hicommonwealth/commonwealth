@@ -31,6 +31,7 @@ const updateThreadLinkedSnapshotProposal = async (models: DB, req: Request, res:
       id: thread_id,
     },
   });
+  
   if (!thread) return next(new Error(Errors.NoThread));
   const userOwnedAddressIds = (await req.user.getAddresses())
     .filter((addr) => !!addr.verified).map((addr) => addr.id);

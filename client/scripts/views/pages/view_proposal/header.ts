@@ -247,7 +247,7 @@ export const ProposalHeaderThreadLinkedSnapshot: m.Component<{
 }, { 
   initialized,
   snapshotProposalsLoaded
-  currentSnapshot
+  snapshot
 }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
@@ -258,14 +258,14 @@ export const ProposalHeaderThreadLinkedSnapshot: m.Component<{
       vnode.state.initialized = true;
       app.snapshot.init(app.chain.meta.chain.snapshot).then(() => {
           // refreshing loads the latest snapshot proposals into app.snapshot.proposals array
-        vnode.state.currentSnapshot = app.snapshot.proposals.find((sn) => sn.id === proposal.snapshotProposal);
+        vnode.state.snapshot = app.snapshot.proposals.find((sn) => sn.id === proposal.snapshotProposal);
         vnode.state.snapshotProposalsLoaded = true;
         m.redraw();
       })
     }
 
-    if (vnode.state.snapshotProposalsLoaded && proposal.snapshotProposal !== vnode.state.currentSnapshot) {
-      vnode.state.currentSnapshot = app.snapshot.proposals.find((sn) => sn.id === proposal.snapshotProposal);
+    if (vnode.state.snapshotProposalsLoaded && proposal.snapshotProposal !== vnode.state.snapshot) {
+      vnode.state.snapshot = app.snapshot.proposals.find((sn) => sn.id === proposal.snapshotProposal);
       m.redraw();
     }
 
@@ -273,21 +273,10 @@ export const ProposalHeaderThreadLinkedSnapshot: m.Component<{
       }/snapshot-proposal/${(app.chain?.meta.chain.snapshot)}/${proposal.snapshotProposal}`;
 
     return m('.ProposalHeaderThreadLinkedChainEntity', 
-    !vnode.state.snapshotProposalsLoaded ?   
-    [
-      link(
-        'a', proposalLink,
-        [
-          `Snapshot: ${proposal.snapshotProposal.slice(0,10)} ...`,
-        ],
-      ),
+    !vnode.state.snapshotProposalsLoaded ? [
+      link('a', proposalLink, [`Snapshot: ${proposal.snapshotProposal.slice(0,10)} ...`,]),
     ] : [
-      link(
-        'a', proposalLink,
-        [
-          `Snapshot: ${vnode.state.currentSnapshot.title.slice(0,20)} ...`,
-        ],
-      ),
+      link('a', proposalLink, [`Snapshot: ${vnode.state.snapshot.title.slice(0,20)} ...`,]),
     ]);
   }
 };
