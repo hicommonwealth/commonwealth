@@ -25,7 +25,7 @@ const log = factory.getLogger(formatFilename(__filename));
 import ViewCountCache from './server/util/viewCountCache';
 import IdentityFetchCache, { IdentityFetchCacheNew } from './server/util/identityFetchCache';
 import TokenBalanceCache from './server/util/tokenBalanceCache';
-\import Erc20SubscriberHolder from './server/util/erc20SubscriberHolder';
+import Erc20SubscriberHolder from './server/util/erc20SubscriberHolder';
 import { SESSION_SECRET, ROLLBAR_SERVER_TOKEN } from './server/config';
 import models from './server/database';
 import { updateEvents, updateBalances } from './server/util/eventPoller';
@@ -68,18 +68,18 @@ async function main() {
   const FLAG_MIGRATION = process.env.FLAG_MIGRATION;
   const CHAIN_EVENTS = process.env.CHAIN_EVENTS;
   const RUN_AS_LISTENER = process.env.RUN_AS_LISTENER === 'true';
-  const USE_NEW_IDENTITY_CACHE = process.env.USE_NEW_IDENTITY_CACHE === 'true';
+  const USE_NEW_CE_SYSTEM = process.env.USE_NEW_CE_SYSTEM === 'true';
 
   // if running in old mode then use old identityCache but if running with dbNode.ts use the new db identityCache
   let identityFetchCache: IdentityFetchCacheNew | IdentityFetchCache;
-  if (!USE_NEW_IDENTITY_CACHE) {
+  if (!USE_NEW_CE_SYSTEM) {
     identityFetchCache = new IdentityFetchCache(10 * 60);
   } else {
     identityFetchCache = new IdentityFetchCacheNew();
   }
 
   const tokenBalanceCache = new TokenBalanceCache(models);
-  const erc20SubscriberHolder = new Erc20SubscriberHolder();
+  const erc20SubscriberHolder = new Erc20SubscriberHolder(USE_NEW_CE_SYSTEM);
   const listenChainEvents = async () => {
     try {
       // configure chain list from events

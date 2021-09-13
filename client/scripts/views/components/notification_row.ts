@@ -5,7 +5,17 @@ import _ from 'lodash';
 import m from 'mithril';
 import moment from 'moment';
 import {
-  SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents, IEventLabel, chainSupportedBy, CompoundTypes, CompoundEvents, AaveTypes, AaveEvents,
+  SubstrateTypes,
+  MolochTypes,
+  SubstrateEvents,
+  MolochEvents,
+  IEventLabel,
+  chainSupportedBy,
+  CompoundTypes,
+  CompoundEvents,
+  AaveTypes,
+  AaveEvents,
+  Erc20Events
   // CompoundEvents
 } from '@commonwealth/chain-events';
 
@@ -261,6 +271,12 @@ const NotificationRow: m.Component<{
         );
       } else if (chainSupportedBy(chainId, AaveTypes.EventChains)) {
         label = AaveEvents.Label(
+          notification.chainEvent.blockNumber,
+          chainId,
+          notification.chainEvent.data,
+        );
+      } else if (notification.chainEvent.data.kind === 'approval' || notification.chainEvent.data.kind === 'transfer') {
+        label = Erc20Events.Label(
           notification.chainEvent.blockNumber,
           chainId,
           notification.chainEvent.data,

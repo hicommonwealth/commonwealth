@@ -16,7 +16,6 @@ import Identity from '../eventHandlers/pgIdentity';
 import { factory, formatFilename } from '../../shared/logging';
 import { DATABASE_URI, HANDLE_IDENTITY } from '../config';
 import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
-import { ChainAttributes } from '../models/chain';
 
 const log = factory.getLogger(formatFilename(__filename));
 

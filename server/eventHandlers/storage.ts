@@ -35,8 +35,8 @@ export default class extends IEventHandler {
     return event;
   }
 
-  private async _shouldSkip(event: CWEvent, chain: string): Promise<boolean> {
-    const chain = event.chain || this._chain
+  private async _shouldSkip(event: CWEvent, chain?: string): Promise<boolean> {
+    chain = chain || event.chain || this._chain;
     if (this._filterConfig.excludedEvents?.includes(event.data.kind)) return true;
     const addressesExist = async (addresses: string[]) => {
       const addressModels = await this._models.Address.findAll({
@@ -67,14 +67,16 @@ export default class extends IEventHandler {
    * NOTE: this may modify the event.
    */
   public async handle(event: CWEvent) {
-    const chain = event.chain || this._chain
+    let chain = event.chain || this._chain;
 
     event = this.truncateEvent(event);
 
     log.debug(`Received event: ${JSON.stringify(event, null, 2)}`);
 
+    // TODO: this entire if statement is unnecessary with new system since if the token is
+    // TODO: being listened to then it obviously is in the database. This is compatible with new system since
+    // TODO: the new system defines event.chain as the tokenName and thus this will not trigger
     // locate event type and add event (and event type if needed) to database
-    let chain = this._chain;
     if (chain === 'erc20') {
       const address = (event.data as Erc20Types.ITransfer).contractAddress.toLowerCase();
       const tokenChain = await this._models.ChainNode.findOne({

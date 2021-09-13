@@ -28,8 +28,8 @@ const getTokenForum = async (
   const token = await models.Token.findOne({ where: { address: { [Op.iLike]: address } } });
   if (token) {
     try {
-      erc20SubscriberHolder.subscribeNewToken(address);
-
+      // eslint-disable-next-line max-len
+      // TODO: in new system instead of using the erc20SubscriberHolder we can simply findOrCreate with has_chain_events_listener = true
       const result = await sequelize.transaction(async (t) => {
         const [ chain ] = await models.Chain.findOrCreate({
           where: { id: token.id },
@@ -57,6 +57,10 @@ const getTokenForum = async (
         });
         return { chain: chain.toJSON(), node: node.toJSON() };
       });
+
+      // the new system requires that a new token be in the database before listening to events
+      erc20SubscriberHolder.subscribeNewToken(address);
+
       return res.json({ status: 'Success', result });
     } catch (e) {
       log.error(e.message);
