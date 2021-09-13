@@ -245,9 +245,9 @@ export const ProposalHeaderThreadLinkedChainEntity: m.Component<{ proposal: Offc
 export const ProposalHeaderThreadLinkedSnapshot: m.Component<{ 
   proposal: OffchainThread, 
 }, { 
-  initialized, 
+  initialized,
   snapshotProposalsLoaded
-  snapshot
+  currentSnapshot
 }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
@@ -258,11 +258,17 @@ export const ProposalHeaderThreadLinkedSnapshot: m.Component<{
       vnode.state.initialized = true;
       app.snapshot.init(app.chain.meta.chain.snapshot).then(() => {
           // refreshing loads the latest snapshot proposals into app.snapshot.proposals array
-        vnode.state.snapshot = app.snapshot.proposals.find((sn) => sn.id = proposal.snapshotProposal);
+        vnode.state.currentSnapshot = app.snapshot.proposals.find((sn) => sn.id === proposal.snapshotProposal);
         vnode.state.snapshotProposalsLoaded = true;
         m.redraw();
       })
     }
+
+    if (vnode.state.snapshotProposalsLoaded && proposal.snapshotProposal !== vnode.state.currentSnapshot) {
+      vnode.state.currentSnapshot = app.snapshot.proposals.find((sn) => sn.id === proposal.snapshotProposal);
+      m.redraw();
+    }
+
     const proposalLink = `${app.isCustomDomain() ? '' : `/${proposal.chain}`
       }/snapshot-proposal/${(app.chain?.meta.chain.snapshot)}/${proposal.snapshotProposal}`;
 
@@ -279,7 +285,7 @@ export const ProposalHeaderThreadLinkedSnapshot: m.Component<{
       link(
         'a', proposalLink,
         [
-          `Snapshot: ${vnode.state.snapshot.title.slice(0,20)} ...`,
+          `Snapshot: ${vnode.state.currentSnapshot.title.slice(0,20)} ...`,
         ],
       ),
     ]);

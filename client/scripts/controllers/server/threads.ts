@@ -462,7 +462,7 @@ class ThreadsController {
       type: 'GET',
       data: {
         snapshot: args.snapshot,
-        chain: app.activeChainId(),
+        chain: app.activeId(),
       },
     });
     if (response.status !== 'Success') {

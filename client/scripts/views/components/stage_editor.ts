@@ -100,7 +100,7 @@ const ChainEntitiesSelector: m.Component<{
     if (!app.chain || !app.activeChainId()) return;
     if (!vnode.state.initialized) {
       vnode.state.initialized = true;
-      app.chain.chainEntities.refresh(app.chain.id, EntityRefreshOption.AllEntities).then((entities) => {
+      app.chain.chainEntities?.refresh(app.chain.id, EntityRefreshOption.AllEntities).then((entities) => {
         // refreshing loads the latest chain entities into app.chain.chainEntities store
         vnode.state.chainEntitiesLoaded = true;
         m.redraw();
@@ -226,7 +226,7 @@ const StageEditor: m.Component<{
             },
             snapshotProposalsToSet: vnode.state.snapshotProposalsToSet,
           }),
-          m(ChainEntitiesSelector, {
+          app.chain.chainEntities && m(ChainEntitiesSelector, {
             thread: vnode.attrs.thread,
             onSelect: (result) => {
               if (vnode.state.stage === OffchainThreadStage.Discussion
