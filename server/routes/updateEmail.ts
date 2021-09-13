@@ -4,6 +4,7 @@ import moment from 'moment';
 import { LOGIN_RATE_LIMIT_MINS, SERVER_URL, SENDGRID_API_KEY } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
 import { DynamicTemplate } from '../../shared/types';
+import { DB } from '../database';
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 
@@ -18,7 +19,7 @@ export const Errors = {
   NoUpdateForMagic: 'Cannot update email if registered with Magic Link',
 };
 
-const updateEmail = async (models, req: Request, res: Response, next: NextFunction) => {
+const updateEmail = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   if (!req.body.email) return next(new Error(Errors.NoEmail));
   const { email } = req.body;
 
@@ -48,8 +49,7 @@ const updateEmail = async (models, req: Request, res: Response, next: NextFuncti
     }],
   });
   if (!user) return next(new Error(Errors.NoUser));
-  if (user.Addresses && user.Addresses > 0) return next(new Error(Errors.NoUpdateForMagic));
-
+  if (user.Addresses && (await user.Addresses.length) > 0) return next(new Error(Errors.NoUpdateForMagic));
   // ensure no more than 3 tokens have been created in the last 5 minutes
   const recentTokens = await models.LoginToken.findAndCountAll({
     where: {

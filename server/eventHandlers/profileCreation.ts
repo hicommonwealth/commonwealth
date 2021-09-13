@@ -26,12 +26,14 @@ const SUPPORTED_KIND_FIELDS = {
 export default class extends IEventHandler {
   constructor(
     private readonly _models,
-    private readonly _chain: string,
+    private readonly _chain?: string,
   ) {
     super();
   }
 
   public async handle(event: CWEvent, dbEvent) {
+    const chain = event.chain || this._chain
+
     const fields = SUPPORTED_KIND_FIELDS[event.data.kind];
     if (!fields) {
       log.trace('Unsupported profile-related event.');
@@ -51,7 +53,7 @@ export default class extends IEventHandler {
     // query for the addresses -- we skip them if they already exist
     for (const address of addresses) {
       let addressInstance = await this._models.Address.findOne({ where: {
-        address, chain: this._chain,
+        address, chain,
       } });
       if (addressInstance) {
         log.trace('Address model already exists.');
@@ -59,7 +61,7 @@ export default class extends IEventHandler {
       }
 
       // create a new address and profile
-      addressInstance = await this._models.Address.createEmpty(this._chain, address);
+      addressInstance = await this._models.Address.createEmpty(chain, address);
       const profileInstance = await this._models.OffchainProfile.create({
         address_id: addressInstance.id,
       });

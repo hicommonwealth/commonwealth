@@ -4,7 +4,8 @@ import $ from 'jquery';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 import { utils } from 'ethers';
-import { Input, TextArea, Form, FormLabel, FormGroup, Button, Grid, Col, Spinner } from 'construct-ui';
+import { Input, TextArea, Form, FormLabel, FormGroup,
+  Button, Grid, Col, Spinner, Tabs, TabItem, PopoverMenu, Icons, MenuItem } from 'construct-ui';
 import BN from 'bn.js';
 import { blake2AsHex } from '@polkadot/util-crypto';
 
@@ -21,8 +22,8 @@ import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collect
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
-import Marlin from 'controllers/chain/ethereum/marlin/adapter';
-import { MarlinProposalArgs } from 'controllers/chain/ethereum/marlin/governance';
+import Compound from 'controllers/chain/ethereum/compound/adapter';
+import { CompoundProposalArgs } from 'controllers/chain/ethereum/compound/governance';
 
 import {
   DropdownFormField,
@@ -36,12 +37,24 @@ import ErrorPage from 'views/pages/error';
 import SubstrateBountyTreasury from 'controllers/chain/substrate/bountyTreasury';
 import { AaveProposalArgs } from 'controllers/chain/ethereum/aave/governance';
 import Aave from 'controllers/chain/ethereum/aave/adapter';
+import NearSputnik from 'client/scripts/controllers/chain/near/sputnik/adapter';
 
 // this should be titled the Substrate/Edgeware new proposal form
 const NewProposalForm = {
   form: { },
   oncreate: (vnode) => {
     vnode.state.toggleValue = 'proposal';
+  },
+  oninit: (vnode) => {
+    vnode.state.aaveTabCount = 1;
+    vnode.state.activeAaveTabIndex = 0;
+    vnode.state.aaveProposalState = [{
+      target: null,
+      value: null,
+      calldata: null,
+      signature: null,
+      withDelegateCall: false,
+    }];
   },
   view: (vnode) => {
     const callback = vnode.attrs.callback;
@@ -76,10 +89,12 @@ const NewProposalForm = {
     let hasThreshold : boolean;
     // moloch proposal
     let hasMolochFields : boolean;
-    // marlin proposal
-    let hasMarlinFields : boolean;
+    // compound proposal
+    let hasCompoundFields : boolean;
     // aave proposal
     let hasAaveFields: boolean;
+    // sputnik proposal
+    let hasSputnikFields: boolean;
     // data loaded
     let dataLoaded : boolean = true;
 
@@ -133,10 +148,12 @@ const NewProposalForm = {
       dataLoaded = !!(app.chain as Cosmos).governance.initialized;
     } else if (proposalTypeEnum === ProposalType.MolochProposal) {
       hasMolochFields = true;
-    } else if (proposalTypeEnum === ProposalType.MarlinProposal) {
-      hasMarlinFields = true;
+    } else if (proposalTypeEnum === ProposalType.CompoundProposal) {
+      hasCompoundFields = true;
     } else if (proposalTypeEnum === ProposalType.AaveProposal) {
       hasAaveFields = true;
+    } else if (proposalTypeEnum === ProposalType.SputnikProposal) {
+      hasSputnikFields = true;
     } else {
       return m('.NewProposalForm', 'Invalid proposal type');
     }
@@ -309,7 +326,7 @@ const NewProposalForm = {
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
         return;
-      } else if (proposalTypeEnum === ProposalType.MarlinProposal) {
+      } else if (proposalTypeEnum === ProposalType.CompoundProposal) {
         vnode.state.proposer = app.user?.activeAccount?.address;
         if (!vnode.state.proposer) throw new Error('Invalid address / not logged in');
         if (!vnode.state.description) throw new Error('Invalid description');
@@ -325,14 +342,14 @@ const NewProposalForm = {
           && valuesArray.length !== calldatasArray.length
           && calldatasArray.length !== signaturesArray.length)
           throw new Error('Array lengths do not match');
-        const details: MarlinProposalArgs = {
+        const details: CompoundProposalArgs = {
           targets: targetsArray.toString(),
           values: valuesArray.toString(),
           signatures: signaturesArray.toString(),
           calldatas: calldatasArray.toString(),
           description: vnode.state.description,
         };
-        (app.chain as Marlin).governance.propose(details)
+        (app.chain as Compound).governance.propose(details)
           .then((result) => done(result))
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
@@ -341,28 +358,27 @@ const NewProposalForm = {
         vnode.state.proposer = app.user?.activeAccount?.address;
         if (!vnode.state.proposer) throw new Error('Invalid address / not logged in');
         if (!vnode.state.executor) throw new Error('Invalid executor');
-        if (!vnode.state.targets) throw new Error('No targets');
-        if (!vnode.state.values) throw new Error('No values');
-        // signatures optional
-        if (!vnode.state.signatures) {
-          vnode.state.signatures = '';
-        }
-        if (!vnode.state.calldatas) throw new Error('No calldatas');
-        if (!vnode.state.withDelegateCalls) throw new Error('No withDelegateCalls');
         if (!vnode.state.ipfsHash) throw new Error('No ipfs hash');
 
-        // TODO: support multiple calls
-        const targets: string[] = [ vnode.state.targets ];
-        const values: string[] = [ vnode.state.values ];
-        const calldatas: string[] = [ vnode.state.calldatas ];
-        const signatures: string[] = [ vnode.state.signatures ];
-        const withDelegateCalls: boolean[] = [ vnode.state.withDelegateCalls ]
-          .map((v: string): boolean => {
-            if (v.trim().toLowerCase() === 'true') return true;
-            if (v.trim().toLowerCase() === 'false') return false;
-            throw new Error(`invalid withDelegateCalls string: ${v}`);
-          });
+        const targets = [];
+        const values = [];
+        const calldatas = [];
+        const signatures = [];
+        const withDelegateCalls = [];
 
+        for (let i = 0; i < vnode.state.aaveTabCount; i++) {
+          const aaveProposal = vnode.state.aaveProposalState[i];
+          if (aaveProposal.target) {
+            targets.push(aaveProposal.target);
+          } else {
+            throw new Error(`No target for Call ${i + 1}`);
+          }
+
+          values.push(aaveProposal.value || '0');
+          calldatas.push(aaveProposal.calldata || '');
+          withDelegateCalls.push(aaveProposal.withDelegateCall || false);
+          signatures.push(aaveProposal.signature || '');
+        }
         // TODO: preload this ipfs value to ensure it's correct
         const ipfsHash = utils.formatBytes32String(vnode.state.ipfsHash);
         const details: AaveProposalArgs = {
@@ -380,6 +396,16 @@ const NewProposalForm = {
           .catch((err) => notifyError(err.toString()));
         return;
         // @TODO: Create Proposal via WebTx
+      } else if (proposalTypeEnum === ProposalType.SputnikProposal) {
+        // TODO: make type of proposal switchable
+        const account = vnode.state.addMember;
+        const description = vnode.state.description;
+        const propArgs = { AddMemberToRole: { role: 'council', member_id: account } };
+        (app.chain as NearSputnik).dao.proposeTx(description, propArgs)
+          .then((result) => done(result))
+          .then(() => m.redraw())
+          .catch((err) => notifyError(err.toString()));
+        return;
       } else if (proposalTypeEnum === ProposalType.SubstrateTreasuryTip) {
         if (!vnode.state.form.beneficiary) throw new Error('Invalid beneficiary address');
         const beneficiary = app.chain.accounts.get(vnode.state.form.beneficiary);
@@ -432,6 +458,8 @@ const NewProposalForm = {
     }
 
     const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
+
+    const { activeAaveTabIndex, aaveProposalState } = vnode.state;
 
     return m(Form, { class: 'NewProposalForm' }, [
       m(Grid, [
@@ -751,8 +779,8 @@ const NewProposalForm = {
               }),
             ]),
           ],
-          hasMarlinFields && [
-            m('h2', 'New Marlin Proposal:'),
+          hasCompoundFields && [
+            m('h2', 'New Compound Proposal:'),
             m(FormGroup, [
               m(FormLabel, 'Proposal Targets'),
               m(Input, {
@@ -822,18 +850,21 @@ const NewProposalForm = {
               }),
             ]),
           ],
-          hasAaveFields && [
+          hasAaveFields && m('.AaveGovernance', [
             m(FormGroup, [
               m(FormLabel, 'Proposer (you)'),
-              m(Input, {
-                name: 'proposer',
-                value: `${app.user.activeAccount.address}`,
-                disabled: true,
-              }),
+              m('', [
+                m(User, {
+                  user: author,
+                  linkify: true,
+                  popover: true,
+                  showAddressWithDisplayName: true,
+                }),
+              ]),
             ]),
             // TODO: validate this is the correct length, or else hash it ourselves
             m(FormGroup, [
-              m(FormLabel, 'Proposal IPFS Hash'),
+              m(FormLabel, 'IPFS Hash'),
               m(Input, {
                 name: 'ipfsHash',
                 placeholder: 'Proposal IPFS Hash',
@@ -845,75 +876,165 @@ const NewProposalForm = {
               }),
             ]),
             m(FormGroup, [
-              m(FormLabel, 'Proposal Executor'),
-              m(DropdownFormField, {
-                choices: (app.chain as Aave).governance.api.Executors.map(
-                  (r) => ({ name: 'executor', value: r.address, label: `${r.address}` })
-                ),
-                callback: (result) => {
-                  vnode.state.executor = result;
-                  m.redraw();
-                },
-                callbackOnInit: true,
-              }),
+              m(FormLabel, 'Executor'),
+              (app.chain as Aave).governance
+                .api
+                .Executors
+                .map((r) => m(`.executor ${vnode.state.executor === r.address && '.selected-executor'}`, {
+                  onclick: () => { vnode.state.executor = r.address; }
+                }, [
+                  m('.label', 'Address'),
+                  m('', r.address),
+                  m('.label .mt-16', 'Time Delay'),
+                  m('', `${r.delay / (60 * 60 * 24)} Day(s)`),
+                ])),
             ]),
             // TODO: display offchain copy re AIPs and ARCs from https://docs.aave.com/governance/
-            // TODO: make this a form where you add target + value + calldata + signature + withDelegate
-            //  pairings one by one
+            m('.tab-selector', [
+              m(Tabs, {
+                align: 'left',
+                class: 'tabs',
+              }, [
+                aaveProposalState.map((_, index) => m(TabItem, {
+                  key: index,
+                  label: `Call ${index + 1}`,
+                  active: activeAaveTabIndex === index,
+                  onclick: () => { vnode.state.activeAaveTabIndex = index; },
+                })),
+              ]),
+              m(PopoverMenu, {
+                closeOnContentClick: true,
+                content: [
+                  m(MenuItem, {
+                    iconLeft: Icons.EDIT_2,
+                    label: 'Add',
+                    onclick: () => {
+                      vnode.state.aaveTabCount++;
+                      vnode.state.activeAaveTabIndex = vnode.state.aaveTabCount - 1;
+                      vnode.state.aaveProposalState.push({
+                        target: null,
+                        value: null,
+                        calldata: null,
+                        signature: null,
+                        withDelegateCall: false,
+                      });
+                    },
+                  }),
+                  m(MenuItem, {
+                    iconLeft: Icons.TRASH_2,
+                    label: 'Delete',
+                    disabled: vnode.state.activeAaveTabIndex === 0,
+                    onclick: () => {
+                      vnode.state.aaveTabCount--;
+                      vnode.state.activeAaveTabIndex = vnode.state.aaveTabCount - 1;
+                      vnode.state.aaveProposalState.pop();
+                    },
+                  }),
+                ],
+                trigger: m(Button, { iconLeft: Icons.MORE_HORIZONTAL, basic: true })
+              }),
+            ]),
             m(FormGroup, [
-              m(FormLabel, 'Proposal Targets'),
+              m(FormLabel, 'Target'),
               m(Input, {
                 name: 'targets',
-                placeholder: 'Proposal Targets',
+                placeholder: 'Add Target',
+                value: aaveProposalState[activeAaveTabIndex].target,
                 oninput: (e) => {
                   const result = (e.target as any).value;
-                  vnode.state.targets = result;
+                  vnode.state.aaveProposalState[activeAaveTabIndex].target = result;
                   m.redraw();
                 },
               }),
             ]),
             m(FormGroup, [
-              m(FormLabel, 'Proposal Values'),
+              m(FormLabel, 'Value'),
               m(Input, {
                 name: 'values',
-                placeholder: 'Proposal Values',
+                placeholder: 'Enter amount',
+                value: aaveProposalState[activeAaveTabIndex].value,
                 oninput: (e) => {
                   const result = (e.target as any).value;
-                  vnode.state.values = result;
+                  vnode.state.aaveProposalState[activeAaveTabIndex].value = result;
                   m.redraw();
                 },
               }),
             ]),
             m(FormGroup, [
-              m(FormLabel, 'Proposal Calldatas'),
+              m(FormLabel, 'Calldata'),
               m(Input, {
                 name: 'calldatas',
-                placeholder: 'Proposal Calldatas',
+                placeholder: 'Add Calldata',
+                value: aaveProposalState[activeAaveTabIndex].calldata,
                 oninput: (e) => {
                   const result = (e.target as any).value;
-                  vnode.state.calldatas = result;
+                  vnode.state.aaveProposalState[activeAaveTabIndex].calldata = result;
                   m.redraw();
                 },
               }),
             ]),
             m(FormGroup, [
-              m(FormLabel, 'Proposal Signatures'),
+              m('.flex-label', [
+                m(FormLabel, 'Signature'),
+                m('.helper-text', 'Optional'),
+              ]),
               m(Input, {
                 name: 'signatures',
-                placeholder: 'Proposal Signatures',
+                placeholder: 'Add a signature',
+                value: aaveProposalState[activeAaveTabIndex].signature,
                 oninput: (e) => {
                   const result = (e.target as any).value;
-                  vnode.state.signatures = result;
+                  vnode.state.aaveProposalState[activeAaveTabIndex].signature = result;
                   m.redraw();
                 },
               }),
-              m(FormLabel, 'Proposal Delegate Calls'),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Delegate Call'),
+              m('', [
+                m(Button, {
+                  label:'TRUE',
+                  class: `button ${aaveProposalState[activeAaveTabIndex].withDelegateCall === true && 'active'}`,
+                  onclick: () => { vnode.state.aaveProposalState[activeAaveTabIndex].withDelegateCall = true; }
+                }),
+                m(Button, {
+                  label:'FALSE',
+                  class: `ml-12 button ${aaveProposalState[activeAaveTabIndex].withDelegateCall === false && 'active'}`,
+                  onclick: () => { vnode.state.aaveProposalState[activeAaveTabIndex].withDelegateCall = false; }
+                }),
+              ]),
+            ]),
+          ]),
+          hasSputnikFields && [
+            // TODO: add switcher for kinds that modifies fields
+            // TODO: add deposit copy
+            m(FormGroup, [
+              m(FormLabel, 'Member'),
               m(Input, {
-                name: 'withDelegateCalls',
-                placeholder: 'Proposal Delegate Calls (false,true,false...)',
+                name: 'addMember',
+                defaultValue: 'tokenfactory.testnet',
+                oncreate: (vvnode) => {
+                  vnode.state.addMember = 'tokenfactory.testnet';
+                },
                 oninput: (e) => {
                   const result = (e.target as any).value;
-                  vnode.state.withDelegateCalls = result;
+                  vnode.state.addMember = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Description'),
+              m(Input, {
+                name: 'description',
+                defaultValue: '',
+                oncreate: (vvnode) => {
+                  vnode.state.description = '';
+                },
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.description = result;
+                  m.redraw();
                 },
               }),
             ]),
@@ -949,105 +1070,6 @@ const NewProposalForm = {
                   const result = (e.target as any).value;
                   if (vnode.state.form.description === result) return;
                   vnode.state.form.description = result;
-                  m.redraw();
-                },
-              }),
-            ]),
-          ],
-          hasAaveFields && [
-            m(FormGroup, [
-              m(FormLabel, 'Proposer (you)'),
-              m(Input, {
-                name: 'proposer',
-                value: `${app.user.activeAccount.address}`,
-                disabled: true,
-              }),
-            ]),
-            // TODO: validate this is the correct length, or else hash it ourselves
-            m(FormGroup, [
-              m(FormLabel, 'Proposal IPFS Hash'),
-              m(Input, {
-                name: 'ipfsHash',
-                placeholder: 'Proposal IPFS Hash',
-                oninput: (e) => {
-                  const result = (e.target as any).value;
-                  vnode.state.ipfsHash = result;
-                  m.redraw();
-                },
-              }),
-            ]),
-            m(FormGroup, [
-              m(FormLabel, 'Proposal Executor'),
-              m(DropdownFormField, {
-                choices: (app.chain as Aave).governance.api.Executors.map(
-                  (r) => ({ name: 'executor', value: r.address, label: `${r.delay / (60 * 60 * 24)} Day(s) Voting` })
-                ),
-                callback: (result) => {
-                  vnode.state.executor = result;
-                  m.redraw();
-                },
-                callbackOnInit: true,
-              }),
-            ]),
-            // TODO: display offchain copy re AIPs and ARCs from https://docs.aave.com/governance/
-            // TODO: make this a form where you add target + value + calldata + signature + withDelegate
-            //  pairings one by one
-            m(FormGroup, [
-              m(FormLabel, 'Proposal Target'),
-              m(Input, {
-                name: 'targets',
-                placeholder: 'Proposal Target',
-                oninput: (e) => {
-                  const result = (e.target as any).value;
-                  vnode.state.targets = result;
-                  m.redraw();
-                },
-              }),
-            ]),
-            m(FormGroup, [
-              m(FormLabel, 'Proposal Value'),
-              m(Input, {
-                name: 'values',
-                placeholder: 'Proposal Value',
-                oninput: (e) => {
-                  const result = (e.target as any).value;
-                  vnode.state.values = result;
-                  m.redraw();
-                },
-              }),
-            ]),
-            m(FormGroup, [
-              m(FormLabel, 'Proposal Calldata'),
-              m(Input, {
-                name: 'calldatas',
-                placeholder: 'Proposal Calldata',
-                oninput: (e) => {
-                  const result = (e.target as any).value;
-                  vnode.state.calldatas = result;
-                  m.redraw();
-                },
-              }),
-            ]),
-            m(FormGroup, [
-              m(FormLabel, 'Proposal Signature'),
-              m(Input, {
-                name: 'signatures',
-                placeholder: 'Proposal Signature',
-                oninput: (e) => {
-                  const result = (e.target as any).value;
-                  vnode.state.signatures = result;
-                  m.redraw();
-                },
-              }),
-            ]),
-            m(FormGroup, [
-              m(FormLabel, 'Proposal Delegate Call'),
-              m(Input, {
-                name: 'withDelegateCalls',
-                placeholder: 'false',
-                oninput: (e) => {
-                  const result = (e.target as any).value;
-                  vnode.state.withDelegateCalls = result;
                   m.redraw();
                 },
               }),

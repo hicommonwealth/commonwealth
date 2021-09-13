@@ -30,13 +30,15 @@ export enum ChainNetwork {
   Straightedge = 'straightedge',
   Osmosis = 'osmosis',
   Injective = 'injective',
+  Terra = 'terra',
   Ethereum = 'ethereum',
   NEAR = 'near',
+  NEARTestnet = 'near-testnet',
   Moloch = 'moloch',
-  Marlin = 'marlin',
-  MarlinTestnet = 'marlin-testnet',
+  Compound = 'compound',
   Aave = 'aave',
   AaveLocal = 'aave-local',
+  dYdX = 'dydx',
   Metacartel = 'metacartel',
   ALEX = 'alex',
   Commonwealth = 'commonwealth',
@@ -49,7 +51,7 @@ export enum ChainNetwork {
   Crust = 'crust',
   CosmosHub = 'cosmoshub',
   Gaia13k = 'gaia-13k',
-  Demo = 'demo',
+  Sputnik = 'sputnik',
 }
 
 // This function returns a default chain for a chainbase
@@ -114,7 +116,8 @@ export enum VotingType {
   MultiOptionVoting = 'multioption',
   None = 'none',
   MolochYesNo = 'moloch',
-  MarlinYesNo = 'marlin',
+  CompoundYesNo = 'compound',
+  YesNoReject = 'yes_no_reject',
 }
 export enum VotingUnit {
   OnePersonOneVote = '1p1v',

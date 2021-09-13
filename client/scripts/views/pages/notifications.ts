@@ -15,7 +15,8 @@ import { link, pluralize } from 'helpers';
 import { sortSubscriptions } from 'helpers/notifications';
 import {
   EdgewareChainNotificationTypes, KusamaChainNotificationTypes,
-  PolkadotChainNotificationTypes, KulupuChainNotificationTypes
+  PolkadotChainNotificationTypes, KulupuChainNotificationTypes,
+  DydxChainNotificationTypes,
 } from 'helpers/chain_notification_types';
 
 import { notifyError } from 'controllers/app/notifications';
@@ -524,6 +525,15 @@ const KulupuChainEventNotifications: m.Component = {
   }
 };
 
+const DydxChainEventNotifications: m.Component = {
+  view: (vnode) => {
+    return [
+      m(ChainEventSubscriptionRow, { title: 'Governance events', notificationTypeArray: DydxChainNotificationTypes.Governance, recommended: true }),
+      m(ChainEventSubscriptionRow, { title: 'Token events', notificationTypeArray: DydxChainNotificationTypes.Token, recommended: true }),
+    ];
+  }
+};
+
 const IndividualCommunityNotifications: m.Component<{
   community: CommunityInfo | ChainInfo;
   subscriptions: NotificationSubscription[];
@@ -916,6 +926,8 @@ const NotificationsPage: m.Component<{}, {
               m(KusamaChainEventNotifications),
               m('tr.on-chain-events-header', m('th', { colspan: 2 }, 'Polkadot chain events')),
               m(PolkadotChainEventNotifications),
+              m('tr.on-chain-events-header', m('th', { colspan: 2 }, 'dYdX chain events')),
+              m(DydxChainEventNotifications),
             ],
             m(Erc20ChainEventNotifications, { subscriptions }),
             selectedCommunity
@@ -927,6 +939,7 @@ const NotificationsPage: m.Component<{}, {
               selectedCommunity.network === ChainNetwork.Kulupu && m(KulupuChainEventNotifications),
               selectedCommunity.network === ChainNetwork.Kusama && m(KusamaChainEventNotifications),
               selectedCommunity.network === ChainNetwork.Polkadot && m(PolkadotChainEventNotifications),
+              selectedCommunity.network === ChainNetwork.Aave && m(DydxChainEventNotifications),
             ],
           ]),
         ]),

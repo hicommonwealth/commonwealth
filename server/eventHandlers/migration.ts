@@ -4,7 +4,6 @@
 import {
   IEventHandler, CWEvent, eventToEntity, entityToFieldName, IChainEventData, EventSupportingChainT, EntityEventKind
 } from '@commonwealth/chain-events';
-import _ from 'underscore';
 
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
@@ -12,7 +11,7 @@ const log = factory.getLogger(formatFilename(__filename));
 export default class extends IEventHandler {
   constructor(
     private readonly _models,
-    private readonly _chain: EventSupportingChainT,
+    private readonly _chain?: string,
   ) {
     super();
   }
@@ -22,12 +21,14 @@ export default class extends IEventHandler {
    * events depending whether we've seen them before.
    */
   public async handle(event: CWEvent<IChainEventData>) {
+    const chain = event.chain || this._chain
+
     // case by entity type to determine what value to look for
     const createOrUpdateModel = async (fieldName: string, fieldValue: string, eventType: EntityEventKind) => {
       const [ dbEventType, created ] = await this._models.ChainEventType.findOrCreate({
         where: {
-          id: `${this._chain}-${event.data.kind.toString()}`,
-          chain: this._chain,
+          id: `${chain}-${event.data.kind.toString()}`,
+          chain: chain,
           event_name: event.data.kind.toString(),
         }
       });
@@ -59,10 +60,10 @@ export default class extends IEventHandler {
       }
     };
 
-    const entity = eventToEntity(this._chain, event.data.kind);
+    const entity = eventToEntity(chain as EventSupportingChainT, event.data.kind);
     if (!entity) return null;
     const [ entityKind, eventType ] = entity;
-    const fieldName = entityToFieldName(this._chain, entityKind);
+    const fieldName = entityToFieldName(chain as EventSupportingChainT, entityKind);
     if (!fieldName) return null;
     const fieldValue = event.data[fieldName];
     return createOrUpdateModel(fieldName, fieldValue, eventType);

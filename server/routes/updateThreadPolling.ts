@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import { factory, formatFilename } from '../../shared/logging';
 import { getNextOffchainPollEndingTime } from '../../shared/utils';
+import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -14,7 +15,7 @@ export const Errors = {
   NotAuthor: 'Only the thread author can start polling',
 };
 
-const updateThreadPolling = async (models, req: Request, res: Response, next: NextFunction) => {
+const updateThreadPolling = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const { thread_id } = req.body;
   if (!thread_id) return next(new Error(Errors.NoThreadId));
 
@@ -25,7 +26,8 @@ const updateThreadPolling = async (models, req: Request, res: Response, next: Ne
       },
     });
     if (!thread) return next(new Error(Errors.NoThread));
-    const userOwnedAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
+    const userOwnedAddressIds = (await req.user.getAddresses())
+      .filter((addr) => !!addr.verified).map((addr) => addr.id);
     // We should allow collaborators to start polling too
     if (!req.user || !userOwnedAddressIds.includes(thread.address_id)) {
       return next(new Error(Errors.NotAuthor));
@@ -60,7 +62,7 @@ const updateThreadPolling = async (models, req: Request, res: Response, next: Ne
         },
         {
           model: models.Address,
-          through: models.Collaboration,
+          // through: models.Collaboration,
           as: 'collaborators'
         },
         models.OffchainAttachment,

@@ -22,7 +22,7 @@ const setupServer = (app: Express, wss: WebSocket.Server, sessionParser: express
         process.exit(1);
         break;
       case 'EADDRINUSE':
-        log.error('Port is already in use');
+        log.error(`Port ${port} is already in use`);
         process.exit(1);
         break;
       default:

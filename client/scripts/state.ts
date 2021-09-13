@@ -12,12 +12,15 @@ import RecentActivityController from './controllers/app/recent_activity';
 import ProfilesController from './controllers/server/profiles';
 import CommentsController from './controllers/server/comments';
 import ThreadsController from './controllers/server/threads';
+import SnapshotController from './controllers/chain/snapshot';
 import ReactionsController from './controllers/server/reactions';
+import ReactionCountsController from './controllers/server/reactionCounts';
 import WebsocketController from './controllers/server/socket';
 import TopicsController from './controllers/server/topics';
 import CommunitiesController from './controllers/server/communities';
 import UserController from './controllers/server/user/index';
 import WebWalletController from './controllers/app/web_wallets';
+import { InviteCodeAttributes } from 'shared/types';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -46,7 +49,9 @@ export interface IApp {
   profiles: ProfilesController;
   comments: CommentsController;
   threads: ThreadsController;
+  snapshot: SnapshotController;
   reactions: ReactionsController;
+  reactionCounts: ReactionCountsController;
   topics: TopicsController;
   communities: CommunitiesController;
   user: UserController;
@@ -54,6 +59,7 @@ export interface IApp {
 
   recentActivity: RecentActivityController;
   searchCache: any;
+  searchAddressCache: any;
 
   // XXX: replace this with some app.chain helper
   activeChainId(): string;
@@ -71,7 +77,7 @@ export interface IApp {
     contractCategories?: ContractCategory[];
     notificationCategories?: NotificationCategory[];
     defaultChain: string;
-    invites: any[];
+    invites: InviteCodeAttributes[];
   };
   loginStatusLoaded(): boolean;
   isLoggedIn(): boolean;
@@ -111,7 +117,9 @@ const app: IApp = {
   profiles: new ProfilesController(),
   comments: new CommentsController(),
   threads: new ThreadsController(),
+  snapshot: new SnapshotController(),
   reactions: new ReactionsController(),
+  reactionCounts: new ReactionCountsController(),
   topics: new TopicsController(),
   communities: new CommunitiesController(),
   user: new UserController(),
@@ -120,6 +128,8 @@ const app: IApp = {
   recentActivity: new RecentActivityController(),
 
   searchCache: {},
+
+  searchAddressCache: {},
 
   activeChainId: () => app.chain?.id,
   activeCommunityId: () => app.community?.meta.id,

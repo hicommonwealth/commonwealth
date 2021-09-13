@@ -27,12 +27,19 @@
         th, td {
             word-break: normal;
             padding: 5px;
+            text-align: left;
         }
         th {
             vertical-align: bottom;
         }
         td {
             vertical-align: top;
+        }
+        th[align="center"], td[align="center"] {
+            text-align: center;
+        }
+        th[align="right"], td[align="right"] {
+            text-align: right;
         }
     }
 }

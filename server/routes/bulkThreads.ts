@@ -1,15 +1,15 @@
 /* eslint-disable quotes */
 import { Request, Response, NextFunction } from 'express';
-import { QueryTypes } from 'sequelize';
+import { QueryTypes, Op } from 'sequelize';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { factory, formatFilename } from '../../shared/logging';
 import { getLastEdited } from '../util/getLastEdited';
+import { DB } from '../database';
+import { OffchainThreadInstance } from '../models/offchain_thread';
 
 const log = factory.getLogger(formatFilename(__filename));
-
 // bulkThreads takes a date param and fetches the most recent 20 threads before that date
-const bulkThreads = async (models, req: Request, res: Response, next: NextFunction) => {
-  const { Op } = models.sequelize;
+const bulkThreads = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
   if (error) return next(new Error(error));
   const { cutoff_date, topic_id, stage } = req.query;
@@ -156,13 +156,13 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       return data;
     });
 
-    comments = await models.OffchainComment.findAll({
+    comments = (await models.OffchainComment.findAll({
       where: {
         root_id: root_ids
       },
       include: [models.Address, models.OffchainAttachment],
       order: [['created_at', 'DESC']],
-    }).map((c, idx) => {
+    })).map((c, idx) => {
       const row = c.toJSON();
       const last_edited = getLastEdited(row);
       row['last_edited'] = last_edited;
@@ -173,7 +173,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       ? { community: community.id, }
       : { chain: chain.id, };
 
-    threads = await models.OffchainThread.findAll({
+    threads = (await models.OffchainThread.findAll({
       where: whereOptions,
       include: [
         {
@@ -182,7 +182,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
         },
         {
           model: models.Address,
-          through: models.Collaboration,
+          // through: models.Collaboration,
           as: 'collaborators'
         },
         {
@@ -190,21 +190,20 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
           as: 'topic'
         }
       ],
-      exclude: [ 'version_history' ],
+      attributes: { exclude: [ 'version_history' ] },
       order: [['created_at', 'DESC']],
-    }).map((t, idx) => {
+    })).map((t, idx) => {
       const row = t.toJSON();
       const last_edited = getLastEdited(row);
       row['last_edited'] = last_edited;
       return row;
     });
-
-    comments = await models.OffchainComment.findAll({
+    comments = (await models.OffchainComment.findAll({
       where: whereOptions,
       include: [models.Address, models.OffchainAttachment],
-      exclude: [ 'version_history' ],
+      attributes: { exclude: [ 'version_history' ] },
       order: [['created_at', 'DESC']],
-    }).map((c, idx) => {
+    })).map((c, idx) => {
       const row = c.toJSON();
       const last_edited = getLastEdited(row);
       row['last_edited'] = last_edited;
@@ -212,22 +211,22 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
     });
   }
 
-  const reactions = await models.OffchainReaction.findAll({
-    where: {
-      [Op.or]: [
-        { thread_id: threads.map((thread) => thread.id) },
-        { comment_id: comments.map((comment) => comment.id) },
-      ],
-    },
-    include: [ models.Address ],
-    order: [['created_at', 'DESC']],
-  });
+  // const reactions = await models.OffchainReaction.findAll({
+  //   where: {
+  //     [Op.or]: [
+  //       { thread_id: threads.map((thread) => thread.id) },
+  //       { comment_id: comments.map((comment) => comment.id) },
+  //     ],
+  //   },
+  //   include: [ models.Address ],
+  //   order: [['created_at', 'DESC']],
+  // });
 
   const countsQuery = `
      SELECT id, title, stage FROM "OffchainThreads"
      WHERE ${communityOptions} AND (stage = 'proposal_in_review' OR stage = 'voting')`;
 
-  const threadsInVoting = await models.sequelize.query(countsQuery, {
+  const threadsInVoting: OffchainThreadInstance[] = await models.sequelize.query(countsQuery, {
     replacements,
     type: QueryTypes.SELECT
   });
@@ -239,7 +238,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       numVotingThreads,
       threads,
       comments, // already converted to JSON earlier
-      reactions: reactions.map((r) => r.toJSON()),
+      // reactions: reactions.map((r) => r.toJSON()),
     }
   });
 };

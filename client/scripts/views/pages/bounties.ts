@@ -25,10 +25,10 @@ import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 import { notifyError } from 'controllers/app/notifications';
 
+import { SubstrateBounty } from 'client/scripts/controllers/chain/substrate/bounty';
 import Listing from './listing';
 import ErrorPage from './error';
 import loadSubstrateModules from '../components/load_substrate_modules';
-import { SubstrateBounty } from 'client/scripts/controllers/chain/substrate/bounty';
 
 function getModules() {
   if (!app || !app.chain || !app.chain.loaded) {

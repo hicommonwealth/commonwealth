@@ -1,12 +1,10 @@
-import Sequelize from 'sequelize';
 import { Request, Response, NextFunction } from 'express';
-import { sequelize } from '../database';
 import { factory, formatFilename } from '../../shared/logging';
+import { sequelize, DB, } from '../database';
 
-const Op = Sequelize.Op;
 const log = factory.getLogger(formatFilename(__filename));
 
-export default async (models, req: Request, res: Response, next: NextFunction) => {
+export default async (models: DB, req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {
     return next(new Error('Not logged in'));
   }
@@ -21,8 +19,8 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
   });
 
   await sequelize.transaction(async (t) => {
-    await Promise.all(subscriptions.map((s) => {
-      return Promise.all(s.Notifications.map((n) => n.destroy({ transaction: t })));
+    await Promise.all(subscriptions.map(async (s) => {
+      return Promise.all((await s.getNotifications()).map((n) => n.destroy({ transaction: t })));
     }));
   });
 

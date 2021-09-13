@@ -12,8 +12,8 @@ import {
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import EthereumAccount from './account';
 
-export const INFURA_ID = process.env.INFURA_ID || 'b19b8175e688448ead43a0ab5f03438a';
-
+export const INFURA_ID = process.env.INFURA_API_KEY || '90de850aff68424ab8e7321017406586';
+const ETHEREUM_BLOCK_TIME = 15;
 export interface IEthereumTXData extends ITXData {
   chainId: string;
   accountNumber: number;
@@ -60,6 +60,7 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
   public get totalbalance() { return this._totalbalance; }
 
   public async initApi(node?: NodeInfo): Promise<any> {
+    this.app.chain.block.duration = ETHEREUM_BLOCK_TIME;
     if (node.url.includes('infura')) {
       const infuraId = INFURA_ID;
       const networkPrefix = node.url.split('infura')[0];

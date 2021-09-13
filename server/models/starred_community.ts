@@ -1,12 +1,13 @@
 import * as Sequelize from 'sequelize';
-
+import { DataTypes, Model } from 'sequelize';
+import { ModelStatic } from './types';
 import { UserAttributes } from './user';
 import { ChainAttributes } from './chain';
 import { OffchainCommunityAttributes } from './offchain_community';
 
 export interface StarredCommunityAttributes {
-  id?: number;
   user_id: number;
+  id?: number;
   chain?: string;
   community?: string;
   created_at?: Date;
@@ -18,20 +19,18 @@ export interface StarredCommunityAttributes {
   OffchainCommunity?: OffchainCommunityAttributes;
 }
 
-export interface StarredCommunityInstance extends Sequelize.Instance<StarredCommunityAttributes>,
+export interface StarredCommunityInstance extends Model<StarredCommunityAttributes>,
 StarredCommunityAttributes {
   // no mixins used
 }
 
-export interface StarredCommunityModel extends Sequelize.Model<StarredCommunityInstance, StarredCommunityAttributes> {
-
-}
+export type StarredCommunityModelStatic = ModelStatic<StarredCommunityInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): StarredCommunityModel => {
-  const StarredCommunity = sequelize.define<StarredCommunityInstance, StarredCommunityAttributes>('StarredCommunity', {
+  dataTypes: typeof DataTypes,
+): StarredCommunityModelStatic => {
+  const StarredCommunity = <StarredCommunityModelStatic>sequelize.define('StarredCommunity', {
     id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     user_id: { type: dataTypes.INTEGER, allowNull: false },
     chain: { type: dataTypes.STRING, allowNull: true },
@@ -39,7 +38,10 @@ export default (
     created_at: { type: dataTypes.DATE, allowNull: false },
     updated_at: { type: dataTypes.DATE, allowNull: false },
   }, {
+    tableName: 'StarredCommunities',
     underscored: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
     indexes: [
       { fields: ['user_id'] },
       { fields: ['chain'] },

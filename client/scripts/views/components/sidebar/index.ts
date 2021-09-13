@@ -19,8 +19,8 @@ import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import CommunitySelector from 'views/components/sidebar/community_selector';
 import CreateCommunityModal from 'views/modals/create_community_modal';
 
+import { AaveTypes, CompoundTypes, MolochTypes } from '@commonwealth/chain-events';
 import { discordIcon, telegramIcon, elementIcon, githubIcon, websiteIcon } from './icons';
-import { AaveTypes, MarlinTypes, MolochTypes } from '@commonwealth/chain-events';
 
 const SidebarQuickSwitcherItem: m.Component<{ item, size }> = {
   view: (vnode) => {
@@ -77,7 +77,7 @@ const SidebarQuickSwitcher: m.Component<{}> = {
           },
         }),
         m(CommunitySelector),
-        app.user.isSiteAdmin && m(Button, {
+        app.isLoggedIn() && m(Button, {
           class: 'create-community',
           rounded: true,
           label: m(Icon, { name: Icons.PLUS }),
@@ -108,6 +108,8 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
       return { id, name, featuredInSidebar };
     }).filter((t) => t.featuredInSidebar).sort((a, b) => a.name.localeCompare(b.name));
 
+    const discussionsLabel = (['vesuvius', 'olympus'].includes(app.activeId())) ? 'Forums' : 'Discussions';
+
     return m('.OffchainNavigationModule.SidebarModule', [
       // m('.section-header', 'Discuss'),
       m(Button, {
@@ -115,7 +117,7 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
         fluid: true,
         active: onDiscussionsPage(m.route.get())
           && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
-        label: 'Discussions',
+        label: discussionsLabel,
         onclick: (e) => {
           e.preventDefault();
           navigateToSubpage('/');
@@ -186,19 +188,24 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
 
     const hasProposals = app.chain && !app.community && (
       app.chain.base === ChainBase.CosmosSDK
+        || app.chain?.network === ChainNetwork.Sputnik
         || (app.chain.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Plasm)
         || MolochTypes.EventChains.find((c) => c === app.chain.network)
-        || MarlinTypes.EventChains.find((c) => c === app.chain.network)
+        || CompoundTypes.EventChains.find((c) => c === app.chain.network)
         || AaveTypes.EventChains.find((c) => c === app.chain.network)
-        || app.chain.network === ChainNetwork.Commonwealth);
+        || app.chain.network === ChainNetwork.Commonwealth
+        || app.chain?.meta.chain.snapshot);
     if (!hasProposals) return;
 
     const showMolochMenuOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Moloch;
     const showMolochMemberOptions = showMolochMenuOptions && (app.user.activeAccount as any)?.shares?.gtn(0);
     const showCommonwealthMenuOptions = app.chain?.network === ChainNetwork.Commonwealth;
 
-    const showMarlinOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Marlin;
+    const showCompoundOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Compound;
     const showAaveOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Aave;
+
+    const onSnapshotProposal = (p) => p.startsWith(`/${app.activeId()}/snapshot-proposals`);
+    const onSnapshotProposalCreation = (p) => p.startsWith(`/${app.activeId()}/new/snapshot-proposal/`);
 
     const onProposalPage = (p) => (
       p.startsWith(`/${app.activeChainId()}/proposals`)
@@ -234,15 +241,16 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           label: 'Referenda',
           onclick: (e) => {
             e.preventDefault();
-            navigateToSubpage(`/referenda`);
+            navigateToSubpage('/referenda');
           },
           contentRight: [], // TODO
         }),
-      // proposals (substrate, cosmos, moloch & marlin only)
+      // proposals (substrate, cosmos, moloch & compound only)
       !app.community && ((app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Darwinia)
                          || app.chain?.base === ChainBase.CosmosSDK
+                         || app.chain?.network === ChainNetwork.Sputnik
                          || MolochTypes.EventChains.find((c) => c === app.chain.network)
-                         || MarlinTypes.EventChains.find((c) => c === app.chain.network)
+                         || CompoundTypes.EventChains.find((c) => c === app.chain.network)
                          || AaveTypes.EventChains.find((c) => c === app.chain.network))
         && m(Button, {
           fluid: true,
@@ -252,7 +260,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           class: app.chain?.base === ChainBase.Substrate ? 'sub-button' : '',
           onclick: (e) => {
             e.preventDefault();
-            navigateToSubpage(`/proposals`);
+            navigateToSubpage('/proposals');
           },
         }),
       // // motions (substrate only)
@@ -278,7 +286,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           class: 'sub-button',
           onclick: (e) => {
             e.preventDefault();
-            navigateToSubpage(`/council`);
+            navigateToSubpage('/council');
           },
         }),
       m('.sidebar-spacer'),
@@ -291,7 +299,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           label: 'Treasury',
           onclick: (e) => {
             e.preventDefault();
-            navigateToSubpage(`/treasury`);
+            navigateToSubpage('/treasury');
           },
         }),
       // bounties (substrate only)
@@ -306,7 +314,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           class: 'sub-button',
           onclick: (e) => {
             e.preventDefault();
-            navigateToSubpage(`/bounties`);
+            navigateToSubpage('/bounties');
           },
         }),
       // tips (substrate only)
@@ -320,7 +328,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           class: 'sub-button',
           onclick: (e) => {
             e.preventDefault();
-            navigateToSubpage(`/tips`);
+            navigateToSubpage('/tips');
           },
         }),
       m('.sidebar-spacer'),
@@ -334,45 +342,35 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           label: 'Validators',
           onclick: (e) => {
             e.preventDefault();
-            navigateToSubpage(`/validators`);
+            navigateToSubpage('/validators');
           },
         }),
-      showMarlinOptions && m(Button, {
+      showCompoundOptions && m(Button, {
         fluid: true,
         rounded: true,
         onclick: (e) => {
           e.preventDefault();
-          navigateToSubpage(`/new/proposal/:type`, { type: ProposalType.MarlinProposal });
-        },
-        label: 'Submit Proposal',
-        active: m.route.get() === `/${app.activeChainId()}/new/proposal/${ProposalType.MarlinProposal}`,
-      }),
-      showMarlinOptions && m(Button, {
-        fluid: true,
-        rounded: true,
-        onclick: (e) => {
-          e.preventDefault();
-          navigateToSubpage(`/delegate`);
+          navigateToSubpage('/delegate');
         },
         label: 'Delegate',
         active: m.route.get() === `/${app.activeChainId()}/delegate`,
       }),
-      showAaveOptions && m(Button, {
-        fluid: true,
-        rounded: true,
-        onclick: (e) => {
-          e.preventDefault();
-          m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.AaveProposal });
-        },
-        label: 'Submit Proposal',
-        active: m.route.get() === `/${app.activeChainId()}/new/proposal/${ProposalType.AaveProposal}`,
-      }),
+      // showAaveOptions && m(Button, {
+      //   fluid: true,
+      //   rounded: true,
+      //   onclick: (e) => {
+      //     e.preventDefault();
+      //     m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.AaveProposal });
+      //   },
+      //   label: 'Submit Proposal',
+      //   active: m.route.get() === `/${app.activeChainId()}/new/proposal/${ProposalType.AaveProposal}`,
+      // }),
       showMolochMemberOptions && m(Button, {
         fluid: true,
         rounded: true,
         onclick: (e) => {
           e.preventDefault();
-          navigateToSubpage(`/new/proposal/:type`, { type: ProposalType.MolochProposal });
+          navigateToSubpage('/new/proposal/:type', { type: ProposalType.MolochProposal });
         },
         label: 'New proposal',
       }),
@@ -412,6 +410,26 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         label: 'Approve tokens',
       }),
       m('.sidebar-spacer'),
+      app.chain?.meta.chain.snapshot && m(Button, {
+        rounded: true,
+        fluid: true,
+        active: onSnapshotProposal(m.route.get()),
+        label: 'Snapshot Proposals',
+        onclick: (e) => {
+          e.preventDefault();
+          m.route.set(`/${app.activeChainId()}/snapshot-proposals/${app.chain.meta.chain.snapshot}`);
+        },
+      }),
+      // app.chain?.meta.chain.snapshot && app.user.activeAccount && m(Button, {
+      //   rounded: true,
+      //   fluid: true,
+      //   active: onSnapshotProposalCreation(m.route.get()),
+      //   label: 'New Snapshot Pr...',
+      //   onclick: (e) => {
+      //     e.preventDefault();
+      //     m.route.set(`/${app.activeChainId()}/new/snapshot-proposal/${app.chain.meta.chain.snapshot}`);
+      //   },
+      // }),
       showCommonwealthMenuOptions && m(Button, {
         fluid: true,
         rounded: true,
@@ -419,7 +437,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         active: m.route.get().startsWith(`/${app.activeChainId()}/projects`),
         onclick: (e) => {
           e.preventDefault();
-          navigateToSubpage(`/projects`);
+          navigateToSubpage('/projects');
         },
       }),
       // showCommonwealthMenuOptions && m(Button, {
@@ -439,7 +457,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         active: m.route.get().startsWith(`/${app.activeChainId()}/collectives`),
         onclick: (e) => {
           e.preventDefault();
-          navigateToSubpage(`/collectives`);
+          navigateToSubpage('/collectives');
         },
       }),
     ]);
@@ -594,7 +612,14 @@ const Sidebar: m.Component<{ hideQuickSwitcher? }, {}> = {
         m('br'),
         app.isLoggedIn() && (app.chain || app.community) && m(SubscriptionButton),
         app.chain && m(ChainStatusModule),
-      ])
+        app.isCustomDomain()
+        && m('a', {
+          class: 'PoweredBy',
+          onclick: (e) => {
+            window.open('https://commonwealth.im/');
+          },
+        }),
+      ]),
     ];
   },
 };

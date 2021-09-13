@@ -69,6 +69,7 @@ $background-color-darker-monochrome: #2f3136;
 
 $background-color-unread: #ffffe0;      // notifications color
 $background-color-selection-on-dark: #ffdd00;
+$background-color-new-comment: #fffba1;
 
 //
 // border colors
@@ -224,6 +225,7 @@ $text-size-mobile-header: 22px;
     @include xs-max {
         width: 100%;
         max-width: none;
+        margin-right: 0px;
     }
     @include xl-min {
         width: calc(33% - 24px);

@@ -1,5 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
+import { bech32 } from 'bech32';
 import { factory, formatFilename } from '../../shared/logging';
+import AddressSwapper from '../util/addressSwapper';
+import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -9,7 +12,7 @@ export const Errors = {
   InvalidChain: 'Invalid chain',
 };
 
-const createAddress = async (models, req: Request, res: Response, next: NextFunction) => {
+const createAddress = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   // start the process of creating a new address. this may be called
   // when logged in to link a new address for an existing user, or
   // when logged out to create a new user by showing proof of an address.
@@ -28,8 +31,16 @@ const createAddress = async (models, req: Request, res: Response, next: NextFunc
     return next(new Error(Errors.InvalidChain));
   }
 
+  let encodedAddress = req.body.address;
+  if (chain.base === 'substrate') {
+    encodedAddress = AddressSwapper({ address: req.body.address, currentPrefix: chain.ss58_prefix });
+  } else if (chain.base === 'cosmos' && chain.bech32_prefix) {
+    const { words } = bech32.decode(req.body.address, 50);
+    encodedAddress = bech32.encode(chain.bech32_prefix, words);
+  }
+
   const existingAddress = await models.Address.scope('withPrivateData').findOne({
-    where: { chain: req.body.chain, address: req.body.address }
+    where: { chain: req.body.chain, address: encodedAddress }
   });
 
   if (existingAddress) {
@@ -66,7 +77,7 @@ const createAddress = async (models, req: Request, res: Response, next: NextFunc
       const newObj = await models.Address.createWithToken(
         req.user ? req.user.id : null,
         req.body.chain,
-        req.body.address,
+        encodedAddress,
         req.body.keytype
       );
 

@@ -1,0 +1,69 @@
+{
+  "vhosts": {
+    "/": {
+      "connection": {
+        "protocol": "amqp",
+        "hostname": "localhost",
+        "user": "admin",
+        "password": "password",
+        "port": 5672,
+        "vhost": "/"
+      },
+      "exchanges": {
+        "eventsExchange": {
+          "assert": true
+        }
+      },
+      "queues": {
+        "eventsQueue": {
+          "assert": true,
+          "purge": true
+        },
+        "identityQueue": {
+          "assert": true,
+          "purge": true
+        }
+      },
+      "bindings": {
+        "eventsBinding": {
+          "source": "eventsExchange",
+          "destination": "eventsQueue",
+          "destinationType": "queue",
+          "bindingKey": "eQueue"
+        },
+        "identityBinding": {
+          "source": "eventsExchange",
+          "destination": "identityQueue",
+          "destinationType": "queue",
+          "bindingKey": "iQueue"
+        }
+      },
+      "publications": {
+        "eventsPub": {
+          "vhost": "/",
+          "queue": "eventsQueue",
+          "confirm": true,
+          "timeout": 10000
+        },
+        "identityPub": {
+          "vhost": "/",
+          "queue": "identityQueue",
+          "confirm": true,
+          "timeout": 10000
+        }
+      },
+      "subscriptions": {
+        "eventsSub": {
+          "vhost": "/",
+          "queue":"eventsQueue",
+          "contentType": "application/json"
+        },
+        "identitySub": {
+          "vhost": "/",
+          "queue":"identityQueue",
+          "contentType": "application/json"
+        }
+      }
+    }
+  }
+}

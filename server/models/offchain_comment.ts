@@ -1,4 +1,6 @@
 import * as Sequelize from 'sequelize';
+import { Model, DataTypes } from 'sequelize';
+import { ModelStatic } from './types';
 
 import { AddressAttributes } from './address';
 import { ChainAttributes } from './chain';
@@ -6,14 +8,13 @@ import { OffchainCommunityAttributes } from './offchain_community';
 import { OffchainAttachmentAttributes } from './offchain_attachment';
 
 export interface OffchainCommentAttributes {
-  id?: number;
-  chain?: string;
   root_id: string;
-  parent_id?: string;
-  child_comments?: number[];
   address_id: number;
   text: string;
   plaintext: string;
+  id?: number;
+  chain?: string;
+  parent_id?: string;
   community?: string;
   version_history?: string[];
   created_at?: Date;
@@ -28,24 +29,21 @@ export interface OffchainCommentAttributes {
 }
 
 export interface OffchainCommentInstance
-extends Sequelize.Instance<OffchainCommentAttributes>, OffchainCommentAttributes {
+extends Model<OffchainCommentAttributes>, OffchainCommentAttributes {
   // no mixins used
 }
 
-export interface OffchainCommentModel extends Sequelize.Model<OffchainCommentInstance, OffchainCommentAttributes> {
-
-}
+export type OffchainCommentModelStatic =  ModelStatic<OffchainCommentInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): OffchainCommentModel => {
-  const OffchainComment = sequelize.define<OffchainCommentInstance, OffchainCommentAttributes>('OffchainComment', {
+  dataTypes: typeof DataTypes,
+): OffchainCommentModelStatic => {
+  const OffchainComment = <OffchainCommentModelStatic>sequelize.define('OffchainComment', {
     id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     chain: { type: dataTypes.STRING, allowNull: true },
     root_id: { type: dataTypes.STRING, allowNull: false },
     parent_id: { type: dataTypes.STRING, allowNull: true },
-    child_comments: { type: dataTypes.ARRAY(dataTypes.INTEGER), allowNull: false, defaultValue: [] },
     address_id: { type: dataTypes.INTEGER, allowNull: false },
     text: { type: dataTypes.TEXT, allowNull: false },
     plaintext: { type: dataTypes.TEXT, allowNull: true },
@@ -55,6 +53,11 @@ export default (
     updated_at: { type: dataTypes.DATE, allowNull: false },
     deleted_at: { type: dataTypes.DATE, allowNull: true },
   }, {
+    timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
+    deletedAt: 'deleted_at',
+    tableName: 'OffchainComments',
     underscored: true,
     paranoid: true,
     indexes: [

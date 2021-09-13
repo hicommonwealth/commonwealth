@@ -5,7 +5,7 @@ import moment from 'moment';
 import _ from 'lodash';
 import mixpanel from 'mixpanel-browser';
 import $ from 'jquery';
-import Web3 from 'web3';
+import { checkAddressChecksum, toChecksumAddress } from 'web3-utils';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -19,89 +19,12 @@ import Tabs from 'views/components/widgets/tabs';
 import { decodeAddress, checkAddress, encodeAddress } from '@polkadot/util-crypto';
 import { Bech32 } from '@cosmjs/encoding';
 import { setActiveAccount } from 'controllers/app/login';
+import { modelFromServer  as modelThreadFromServer } from 'controllers/server/threads';
+import { modelFromServer  as modelCommentFromServer } from 'controllers/server/comments';
 import ProfileHeader from './profile_header';
 import ProfileContent from './profile_content';
 import ProfileBio from './profile_bio';
 import ProfileBanner from './profile_banner';
-
-const commentModelFromServer = (comment) => {
-  const attachments = comment.OffchainAttachments
-    ? comment.OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
-    : [];
-  let proposal;
-  try {
-    const proposalSplit = decodeURIComponent(comment.root_id).split(/-|_/);
-    if (proposalSplit[0] === 'discussion') {
-      proposal = new OffchainThread({
-        author: '',
-        title: '',
-        attachments: null,
-        id: Number(proposalSplit[1]),
-        createdAt: comment.created_at,
-        topic: null,
-        kind: null,
-        stage: null,
-        community: comment.community,
-        chain: comment.chain,
-        versionHistory: null,
-        readOnly: null,
-      });
-    } else {
-      proposal = {
-        chain: comment.chain,
-        community: comment.community,
-        slug: proposalSplit[0],
-        identifier: proposalSplit[1],
-      };
-    }
-  } catch (e) {
-    proposal = null;
-  }
-  return new OffchainComment({
-    chain: comment.chain,
-    author: comment?.Address?.address || comment.author,
-    text: decodeURIComponent(comment.text),
-    plaintext: comment.plaintext,
-    versionHistory: comment.version_history,
-    attachments,
-    proposal,
-    id: comment.id,
-    createdAt: moment(comment.created_at),
-    childComments: comment.child_comments,
-    rootProposal: comment.root_id,
-    parentComment: comment.parent_id,
-    community: comment.community,
-    authorChain: comment?.Address?.chain || comment.authorChain,
-    lastEdited: null,
-  });
-};
-
-const threadModelFromServer = (thread) => {
-  const attachments = thread.OffchainAttachments
-    ? thread.OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
-    : [];
-  return new OffchainThread({
-    author: thread.Address.address,
-    title: decodeURIComponent(thread.title),
-    attachments,
-    id: thread.id,
-    createdAt: moment(thread.created_at),
-    topic: thread.topic,
-    kind: thread.kind,
-    stage: thread.stage,
-    versionHistory: thread.version_history,
-    community: thread.community,
-    chain: thread.chain,
-    readOnly: thread.read_only,
-    body: decodeURIComponent(thread.body),
-    plaintext: thread.plaintext,
-    url: thread.url,
-    authorChain: thread.Address.chain,
-    pinned: thread.pinned,
-    collaborators: thread.collaborators,
-    chainEntities: thread.chain_entities,
-  });
-};
 
 const getProfileStatus = (account) => {
   const onOwnProfile = typeof app.user.activeAccount?.chain === 'string'
@@ -151,13 +74,16 @@ const getProfileStatus = (account) => {
   });
 };
 
-// eslint-disable-next-line no-shadow
 export enum UserContent {
   All = 'posts',
   Threads = 'threads',
   Comments = 'comments'
 }
 
+interface IProfilePageAttrs {
+  address: string;
+  setIdentity?: boolean;
+}
 interface IProfilePageState {
   account;
   threads: OffchainThread[];
@@ -179,25 +105,26 @@ const checkCosmosAddress = (address: string): boolean => {
   }
 };
 
-const loadProfile = async (vnode: m.Vnode<{ address: string, setIdentity?: boolean }, IProfilePageState>) => {
+const loadProfile = async (attrs: IProfilePageAttrs, state: IProfilePageState) => {
   const chain = m.route.param('base') || app.customDomainId() || m.route.param('scope');
-  const { address } = vnode.attrs;
+  const { address } = attrs;
   const chainInfo = app.config.chains.getById(chain);
   let valid = false;
-
   if (chainInfo?.base === ChainBase.Substrate) {
     const ss58Prefix = parseInt(chainInfo.ss58Prefix, 10);
     [valid] = checkAddress(address, ss58Prefix);
   } else if (chainInfo?.base === ChainBase.Ethereum) {
-    valid = Web3.utils.checkAddressChecksum(address);
+    valid = checkAddressChecksum(address);
   } else if (chainInfo?.base === ChainBase.CosmosSDK) {
     valid = checkCosmosAddress(address);
+  } else if (chainInfo?.base === ChainBase.NEAR) {
+    valid = true;
   }
   if (!valid) {
     return;
   }
-  vnode.state.loading = true;
-  vnode.state.initialized = true;
+  state.loading = true;
+  state.initialized = true;
   try {
     const response = await $.ajax({
       url: `${app.serverUrl()}/profile`,
@@ -210,8 +137,8 @@ const loadProfile = async (vnode: m.Vnode<{ address: string, setIdentity?: boole
     });
 
     const { result } = response;
-    vnode.state.loaded = true;
-    vnode.state.loading = false;
+    state.loaded = true;
+    state.loading = false;
     const a = result.account;
     const profile = new Profile(a.chain, a.address);
     if (a.OffchainProfile) {
@@ -250,16 +177,16 @@ const loadProfile = async (vnode: m.Vnode<{ address: string, setIdentity?: boole
       name: a.name,
       user_id: a.user_id,
     };
-    vnode.state.account = account;
-    vnode.state.threads = result.threads.map((t) => threadModelFromServer(t));
-    vnode.state.comments = result.comments.map((c) => commentModelFromServer(c));
+    state.account = account;
+    state.threads = result.threads.map((t) => modelThreadFromServer(t));
+    state.comments = result.comments.map((c) => modelCommentFromServer(c));
     m.redraw();
   } catch (err) {
     // for certain chains, display addresses not in db if formatted properly
     if (chainInfo?.base === ChainBase.Substrate) {
       try {
         decodeAddress(address);
-        vnode.state.account = {
+        state.account = {
           profile: null,
           chain,
           address,
@@ -271,8 +198,8 @@ const loadProfile = async (vnode: m.Vnode<{ address: string, setIdentity?: boole
         // do nothing if can't decode
       }
     } else if (chainInfo?.base === ChainBase.Ethereum) {
-      if (Web3.utils.checkAddressChecksum(address)) {
-        vnode.state.account = {
+      if (checkAddressChecksum(address)) {
+        state.account = {
           profile: null,
           chain,
           address,
@@ -283,7 +210,7 @@ const loadProfile = async (vnode: m.Vnode<{ address: string, setIdentity?: boole
       }
     } else if (chainInfo?.base === ChainBase.CosmosSDK) {
       if (checkCosmosAddress(address)) {
-        vnode.state.account = {
+        state.account = {
           profile: null,
           chain,
           address,
@@ -293,17 +220,17 @@ const loadProfile = async (vnode: m.Vnode<{ address: string, setIdentity?: boole
         };
       }
     }
-    vnode.state.loaded = true;
-    vnode.state.loading = false;
+    state.loaded = true;
+    state.loading = false;
     m.redraw();
-    if (!vnode.state.account)
+    if (!state.account)
       throw new Error((err.responseJSON && err.responseJSON.error)
         ? err.responseJSON.error
         : 'Failed to find profile');
   }
 };
 
-const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProfilePageState> = {
+const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
   oninit: (vnode) => {
     vnode.state.account = null;
     vnode.state.initialized = false;
@@ -312,7 +239,6 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
     vnode.state.threads = [];
     vnode.state.comments = [];
     vnode.state.refreshProfile = false;
-
     const chain = m.route.param('base') || app.customDomainId() || m.route.param('scope');
     const { address } = vnode.attrs;
     const chainInfo = app.config.chains.getById(chain);
@@ -332,11 +258,11 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
         }
       }
     } else if (chainInfo?.base === ChainBase.Ethereum) {
-      const valid = Web3.utils.checkAddressChecksum(address);
+      const valid = checkAddressChecksum(address);
 
       if (!valid) {
         try {
-          const checksumAddress = Web3.utils.toChecksumAddress(address);
+          const checksumAddress = toChecksumAddress(address);
           navigateToSubpage(`/account/${checksumAddress}${baseSuffix ? `?base=${baseSuffix}` : ''}`);
         } catch (e) {
           // do nothing if can't get checksumAddress
@@ -351,11 +277,11 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
     const { setIdentity } = vnode.attrs;
     const { account, loaded, loading, refreshProfile } = vnode.state;
     if (!loading && !loaded) {
-      loadProfile(vnode);
+      loadProfile(vnode.attrs, vnode.state);
     }
     if (account && account.address !== vnode.attrs.address) {
       vnode.state.loaded = false;
-      loadProfile(vnode);
+      loadProfile(vnode.attrs, vnode.state);
     }
     if (loading) return m(PageLoading, { showNewProposalButton: true });
     if (!account && !vnode.state.initialized) {
@@ -367,7 +293,7 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
     const { onOwnProfile, onLinkedProfile, displayBanner, currentAddressInfo } = getProfileStatus(account);
 
     if (refreshProfile) {
-      loadProfile(vnode);
+      loadProfile(vnode.attrs, vnode.state);
       vnode.state.refreshProfile = false;
       if (onOwnProfile) {
         setActiveAccount(account).then(() => {
@@ -386,29 +312,29 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
     const allContent = [].concat(proposals || []).concat(comments || [])
       .sort((a, b) => +b.createdAt - +a.createdAt);
 
-    const allTabTitle = (proposals && comments) ? `All (${proposals.length + comments.length})` : 'All';
-    const threadsTabTitle = (proposals) ? `Threads (${proposals.length})` : 'Threads';
-    const commentsTabTitle = (comments) ? `Comments (${comments.length})` : 'Comments';
+    const allTabTitle = (proposals && comments) ? ['All ', m('.count', (proposals.length + comments.length))] : 'All';
+    const threadsTabTitle = (proposals) ? ['Threads ', m('.count', (proposals.length))] : 'Threads';
+    const commentsTabTitle = (comments) ? ['Comments ', m('.count', (comments.length))] : 'Comments';
 
     return m(Sublayout, {
       class: 'ProfilePage',
       showNewProposalButton: true,
     }, [
-      m('.forum-container-alt', [
+      [
         displayBanner
         && m(ProfileBanner, {
           account,
           addressInfo: currentAddressInfo
         }),
-        m(ProfileHeader, {
-          account,
-          setIdentity,
-          onOwnProfile,
-          onLinkedProfile,
-          refreshCallback: () => { vnode.state.refreshProfile = true; },
-        }),
         m('.row.row-narrow.forum-row', [
-          m('.col-xs-8', [
+          m('.col-xs-12 .col-md-8', [
+            m(ProfileHeader, {
+              account,
+              setIdentity,
+              onOwnProfile,
+              onLinkedProfile,
+              refreshCallback: () => { vnode.state.refreshProfile = true; },
+            }),
             m(Tabs, [{
               name: allTabTitle,
               content: m(ProfileContent, {
@@ -438,11 +364,17 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
               }),
             }]),
           ]),
-          m('.col-xs-4', [
-            m(ProfileBio, { account }),
+          m('.xs-display-none .col-md-4', [
+            m(ProfileBio, {
+              account,
+              setIdentity,
+              onOwnProfile,
+              onLinkedProfile,
+              refreshCallback: () => { vnode.state.refreshProfile = true; },
+            }),
           ]),
         ]),
-      ]),
+      ],
     ]);
   },
 };

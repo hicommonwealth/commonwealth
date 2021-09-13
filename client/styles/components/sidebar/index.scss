@@ -1,6 +1,13 @@
 @import 'client/styles/shared';
 
 @mixin sidebar {
+    .OffchainNavigationModule {
+        button > span {
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+    }
     .cui-button.cui-active {
         background: linear-gradient(268.91deg, #91BFFF -61.91%, #91FFA0 2.69%, #FBFF91 60.22%, #FF9191 131.89%);
         border: 1px solid transparent;
@@ -137,9 +144,10 @@
     left: 0;
     width: $quick-switcher-width;
     border-right: 1px solid $border-color-off-white;
-    z-index: 3;
+    z-index: 11;
     display: flex;
     flex-direction: column;
+    background: #fff;
     @include sm-max {
         display: none;
     }
@@ -211,9 +219,12 @@
 }
 
 .Sidebar {
-    position: relative;
+    max-height: 100%;
+    position: sticky;
+    top: 83px;
     z-index: 2;
     padding-top: 36px;
+    padding-bottom: 36px;
     .sidebar-content {
         max-height: calc(100vh - 60px);
         padding-top: 16px;
@@ -306,6 +317,23 @@
         background: #6966FF;
         color: white;
     }
+}
+
+.PoweredBy{
+    height: 60.99px;
+    width: 171.43px;
+    position: absolute;
+    border-radius: 8px;
+    border-color: #F9F9F9;
+    font-size: 14px;
+    background-image: url("/static/img/powered-by.svg");
+    background-repeat: no-repeat;
+    background-position: center;
+    margin-top: 10%;
+    cursor: pointer;
+}
+.PoweredBy:hover{
+    background-image: url("/static/img/powered-by-2.svg");
 }
 
 .Sidebar {

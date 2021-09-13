@@ -1,4 +1,4 @@
-import m from 'mithril';
+import m, { RouteOptions } from 'mithril';
 import { ICardListItem } from 'models/interfaces';
 import moment from 'moment';
 
@@ -34,7 +34,7 @@ export function parseCustomStages(str) {
   } catch (e) {
     return [];
   }
-  return arr.map((s) => s?.toString()).filter(s => s) as unknown as OffchainThreadStage[];
+  return arr.map((s) => s?.toString()).filter((s) => s) as unknown as OffchainThreadStage[];
 }
 
 /*
@@ -57,7 +57,15 @@ export function externalLink(selector, target, children) {
   }, children);
 }
 
-export function link(selector: string, target: string, children, extraAttrs?: object, saveScrollPositionAs?: string) {
+export function link(
+  selector: string,
+  target: string,
+  children,
+  extraAttrs?: object,
+  saveScrollPositionAs?: string,
+  beforeRouteSet?: Function,
+  afterRouteSet?: Function,
+) {
   const attrs = {
     href: target,
     onclick: (e) => {
@@ -70,11 +78,17 @@ export function link(selector: string, target: string, children, extraAttrs?: ob
       if (saveScrollPositionAs) {
         localStorage[saveScrollPositionAs] = window.scrollY;
       }
-
-      if (window.location.href.split('?')[0] === target.split('?')[0]) {
-        m.route.set(target, {}, { replace: true });
+      if (beforeRouteSet) beforeRouteSet();
+      const routeArgs: [string, any?, RouteOptions?] = window.location.href.split('?')[0] === target.split('?')[0]
+        ? [target, {}, { replace: true }]
+        : [target];
+      if (afterRouteSet) {
+        (async () => {
+          await m.route.set(...routeArgs);
+          afterRouteSet();
+        })();
       } else {
-        m.route.set(target);
+        m.route.set(...routeArgs);
       }
     },
   };
@@ -185,7 +199,7 @@ export function formatLastUpdated(timestamp) {
     .replace(' days', 'd')
     .replace(' day', 'd')
     .replace(' hours', 'h')
-    .replace(' hour', 'h')} ago`;
+    .replace(' hour', 'h')} ${formatted !== 'now' ? 'ago' : ''}`;
 }
 
 export function formatTimestamp(timestamp) {
@@ -335,4 +349,34 @@ export const removeOrAddClasslistToAllElements = (
 
     return METHODS[method]();
   });
+};
+
+export const tokensToTokenBaseUnits = (input: string, decimals: number) : string => {
+  // necessary unfortunately because BN.js can't parse decimal strings
+  const parts = input.split('.');
+  const zeroesToAdd = parts[1] ? decimals - parts[1].length : decimals;
+
+  if (zeroesToAdd < 0) { throw new Error('More decimals supplied than are'); }
+  return parts[0] + (parts[1] ? parts[1] : '') + '0'.repeat(zeroesToAdd);
+};
+
+export const tokenBaseUnitsToTokens = (input: string, decimals: number) => {
+  if (input === '0') return '0';
+  let partOne = ''; // part before decimal point
+  let partTwo = ''; // part after
+
+  if (input.length >= decimals + 1) {
+    partOne = input.substring(0, input.length - decimals);
+    partTwo = input.substring(partOne.length);
+  } else {
+    const zeroesAtBeginning = '0'.repeat(decimals - input.length);
+    partTwo = zeroesAtBeginning + input;
+  }
+
+  // cut off trailing zeroes
+  while (partTwo.charAt(partTwo.length - 1) === '0') {
+    partTwo = partTwo.slice(0, -1);
+  }
+
+  return `${partOne}${partTwo.length ? '.' : ''}${partTwo}`;
 };

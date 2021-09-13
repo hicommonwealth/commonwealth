@@ -1,6 +1,6 @@
 import { Web3Provider, ExternalProvider, JsonRpcSigner, Provider } from '@ethersproject/providers';
 import { ethers, Contract } from 'ethers';
-import { ChainBase, IWebWallet } from 'models';
+import { ChainBase } from 'models';
 import WebWalletController from 'controllers/app/web_wallets';
 import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web_wallet';
 import WalletConnectWebWalletController from '../../app/webWallets/walletconnect_web_wallet';
@@ -12,29 +12,13 @@ export async function attachSigner<CT extends Contract>(
   sender: string,
   contract: CT
 ): Promise<CT> {
-  const availableWallets = wallets.availableWallets(ChainBase.Ethereum);
-  if (availableWallets.length === 0) {
-    throw new Error('No wallet available');
-  }
-
-  let signingWallet: IWebWallet<string>;
-  for (const wallet of availableWallets) {
-    if (!wallet.enabled) {
-      await wallet.enable();
-    }
-    // TODO: ensure that we can find any wallet, even if non-string accounts
-    if (wallet.accounts.find((acc) => acc === sender)) {
-      signingWallet = wallet;
-    }
-  }
-  if (!signingWallet) {
-    throw new Error('TX sender not found in wallet');
-  }
-
+  const signingWallet = await wallets.locateWallet(sender, ChainBase.Ethereum);
   let signer: JsonRpcSigner;
   if (signingWallet instanceof MetamaskWebWalletController
     || signingWallet instanceof WalletConnectWebWalletController) {
     const walletProvider = new ethers.providers.Web3Provider(signingWallet.provider as any);
+    // 12s minute polling interval (default is 4s)
+    walletProvider.pollingInterval = 12000;
     signer = walletProvider.getSigner(sender);
   } else {
     throw new Error('Unsupported wallet');
@@ -62,10 +46,12 @@ abstract class ContractApi<ContractT extends Contract> {
   ) {
     this.contractAddress = contractAddress;
     this.Provider = new ethers.providers.Web3Provider(web3Provider);
+    // 12s minute polling interval (default is 4s)
+    this.Provider.pollingInterval = 12000;
     this.Contract = factory(this.contractAddress, this.Provider);
   }
 
-  public async init(): Promise<void> {
+  public async init(...args): Promise<void> {
     await this.Contract.deployed();
   }
 }

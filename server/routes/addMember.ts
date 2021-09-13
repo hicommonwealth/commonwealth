@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { factory, formatFilename } from '../../shared/logging';
+import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -13,14 +14,14 @@ export const Errors = {
   AlreadyMember: 'Already a member of this community',
 };
 
-const addMember = async (models, req: Request, res: Response, next: NextFunction) => {
+const addMember = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
   if (!community && !chain) return next(new Error(Errors.InvalidCommunity));
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   if (!req.body.invitedAddress) return next(new Error(Errors.NeedAddress));
-  const chainOrCommunity = chain ? { chain_id: chain.id } : { offchain_community_id: community.id }
-  
+  const chainOrCommunity = chain ? { chain_id: chain.id } : { offchain_community_id: community.id };
+
   // check that either invitesEnabled === true, or the user is an admin or mod
   if ((community && !community.invitesEnabled) || chain) {
     const adminAddress = await models.Address.findOne({

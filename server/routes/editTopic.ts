@@ -2,6 +2,7 @@
 import { Request, Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { factory, formatFilename } from '../../shared/logging';
+import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -10,14 +11,21 @@ export const Errors = {
   NoTopicId: 'Must supply topic ID',
   NotAdmin: 'Must be an admin to edit or feature topics',
   NotVerified: 'Must have a verified address to edit or feature topics',
-  TopicNotFound: 'Topic not found'
+  TopicNotFound: 'Topic not found',
+  TopicRequired: 'Topic name required',
+  DefaultTemplateRequired: 'Default Template required'
 };
 
-const editTopic = async (models, req: Request, res: Response, next: NextFunction) => {
+const editTopic = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
   if (!req.body.id) {
     return next(new Error(Errors.NoTopicId));
+  }
+  if (!req.body.name) return next(new Error(Errors.TopicRequired));
+  if (req.body.featured_in_new_post === 'true'
+    && (!req.body.default_offchain_template || !req.body.default_offchain_template.trim())) {
+    return next(new Error(Errors.DefaultTemplateRequired));
   }
 
   const adminAddress = await models.Address.findOne({
@@ -46,15 +54,25 @@ const editTopic = async (models, req: Request, res: Response, next: NextFunction
     return next(new Error(Errors.NotAdmin));
   }
 
-  const { id, name, description, telegram, featured_order, featured_in_sidebar, featured_in_new_post } = req.body;
+  const {
+    id,
+    name,
+    description,
+    telegram,
+    featured_order,
+    featured_in_sidebar,
+    featured_in_new_post,
+    default_offchain_template
+  } = req.body;
   try {
     const topic = await models.OffchainTopic.findOne({ where: { id } });
     if (!topic) return next(new Error(Errors.TopicNotFound));
     if (name) topic.name = name;
-    if (name || description) topic.description = description;
-    if (name || telegram) topic.telegram = telegram;
-    topic.featured_in_sidebar = featured_in_sidebar;
-    topic.featured_in_new_post = featured_in_new_post;
+    if (name || description) topic.description = description || '';
+    if (name || telegram) topic.telegram = telegram || '';
+    topic.featured_in_sidebar = !!(featured_in_sidebar === 'true');
+    topic.featured_in_new_post = !!(featured_in_new_post === 'true');
+    topic.default_offchain_template = default_offchain_template || '';
     await topic.save();
 
     if (featured_order) {
