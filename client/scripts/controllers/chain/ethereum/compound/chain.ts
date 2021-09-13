@@ -56,7 +56,6 @@ export default class CompoundChain extends EthereumChain {
       const gasLimit = await contract.estimateGas.delegate(address, amount);
       await contract.delegate(address, amount, { gasLimit });
     } catch (e) {
-      console.error(e);
       throw new Error(e);
     }
   }
