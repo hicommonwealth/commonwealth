@@ -199,7 +199,7 @@ export function formatLastUpdated(timestamp) {
     .replace(' days', 'd')
     .replace(' day', 'd')
     .replace(' hours', 'h')
-    .replace(' hour', 'h')} ago`;
+    .replace(' hour', 'h')} ${formatted !== 'now' ? 'ago' : ''}`;
 }
 
 export function formatTimestamp(timestamp) {

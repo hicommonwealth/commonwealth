@@ -36,6 +36,25 @@
     }
 }
 
+.VotingActions.Snapshot {
+    .button-row {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        .voting-option {
+            min-width: 48%;
+            max-width: 48%;
+            button {
+                width: 100%;
+                margin: 5px 0;
+                span {
+                    overflow: clip;
+                }
+            }
+        }
+    }
+}
+
 .VotingActions.AaveProposal {
     padding: 0;
     background: none;
