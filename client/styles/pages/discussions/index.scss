@@ -46,6 +46,8 @@
     }
     .discussions-topic-items,
     .discussions-stage-items {
+        max-height: 70vh;
+        overflow-y: scroll;
         max-width: 300px;
         .topic-menu-item {
             display: flex;

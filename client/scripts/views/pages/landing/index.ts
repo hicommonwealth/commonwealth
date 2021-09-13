@@ -20,6 +20,7 @@ import ChainsCrowdfundingComponent from './crowdfunding_card_section';
 import 'pages/landing/index.scss';
 
 import CommunityCards from './community_cards';
+import { handleEmailInvites } from '../../components/header/invites_menu';
 
 export interface Chain {
   img: string;
@@ -42,6 +43,7 @@ interface IState {
   chains: Chain[];
   hiddenInputTokenList: boolean;
   inputTokenValue: string;
+  modalAutoTriggered: boolean;
 }
 
 const LandingPage: m.Component<{}, IState> = {
@@ -110,6 +112,9 @@ const LandingPage: m.Component<{}, IState> = {
     ];
   },
   view: (vnode) => {
+    if (m.route.param('triggerInvite') === 't') {
+      setTimeout(() => handleEmailInvites(vnode.state), 0);
+    }
     if (app.loginState !== LoginState.LoggedIn) {
       return m('.LandingPage', { class: 'bg-primary' }, [
         m(

@@ -22,7 +22,7 @@ const PageNotFound: m.Component<{ title?: string, message?: string }> = {
           icon: Icons.HELP_CIRCLE,
           header: 'Page not found',
           content: message
-            || 'This page may not be visible to the public. If it belongs to a private thread, try logging in.'
+            || 'This page may not be visible to the public. If it belongs to a private thread or community, try logging in.'
         }),
       ]),
     ]);

@@ -43,7 +43,7 @@ https://github.com/hicommonwealth/ce-rabbitmq-plugin
 
 For development, you should also install nvm:
 
-```bash
+```
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
 nvm install
 ```
