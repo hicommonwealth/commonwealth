@@ -31,6 +31,7 @@ export enum ChainNetwork {
   Osmosis = 'osmosis',
   Injective = 'injective',
   InjectiveTestnet = 'injective-testnet',
+  OsmosisLocal = 'osmosis-local',
   Terra = 'terra',
   Ethereum = 'ethereum',
   NEAR = 'near',

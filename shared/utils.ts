@@ -156,6 +156,7 @@ export function formatAddressShort(
     || chain === 'osmosis'
     || chain === 'injective'
     || chain === 'injective-testnet'
+    || chain === 'osmosis-local'
   ) {
     return `${address.slice(0, 9)}${includeEllipsis ? '…' : ''}`;
   } else {

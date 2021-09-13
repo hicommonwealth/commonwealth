@@ -38,6 +38,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
     return this._accounts || [];
   }
   public get api() { return window.keplr; }
+  public get offlineSigner() { return this._offlineSigner; }
 
   public async validateWithAccount(account: Account<any>): Promise<void> {
     if (!this._chainId || !window.keplr?.signAmino) throw new Error('Missing or misconfigured web wallet');
@@ -49,24 +50,6 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
   }
 
   // ACTIONS
-  public async getClient(url: string, account: string): Promise<SigningStargateClient> {
-    if (!this.enabled || app.chain.meta.chain.id !== this._chainId) {
-      this._offlineSigner = null;
-      this._client = null;
-      await this.enable();
-      if (!this.enabled) {
-        throw new Error(`Failed to enable keplr for ${app.chain.meta.chain.id}.`);
-      }
-    }
-    if (this.accounts[0].address !== account) {
-      throw new Error('Incorrect signing account');
-    }
-    if (!this._client) {
-      this._client = await SigningStargateClient.connectWithSigner(url, this._offlineSigner);
-    }
-    return this._client;
-  }
-
   public async enable() {
     console.log('Attempting to enable Keplr web wallet');
 
@@ -79,7 +62,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
     this._enabling = true;
     try {
       // enabling without version (i.e. cosmoshub instead of cosmoshub-4) should work
-      this._chainId = app.chain.meta.chain.id;
+      this._chainId = app.chain.meta.chain.id.replace('-local', '');
       await window.keplr.enable(this._chainId);
       console.log(`Enabled web wallet for ${this._chainId}`);
       this._offlineSigner = window.keplr.getOfflineSigner(this._chainId);
@@ -87,7 +70,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
       this._enabled = true;
       this._enabling = false;
     } catch (error) {
-      console.error('Failed to enable keplr wallet');
+      console.error(`Failed to enable keplr wallet: ${error.message}`);
       this._enabling = false;
     }
   }

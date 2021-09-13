@@ -288,7 +288,7 @@ export default (
 
         if (generatedAddress === addressModel.address || generatedAddressWithCosmosPrefix === addressModel.address) {
           const generatedSignDoc = validationTokenToSignDoc(
-            chain.id === 'terra' ? 'columbus-4' : chain.id,
+            chain.id === 'terra' ? 'columbus-4' : chain.id === 'osmosis-local' ? 'osmosis' : chain.id,
             addressModel.verification_token.trim(),
             signed.fee,
             signed.memo,
