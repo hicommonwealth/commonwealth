@@ -33,7 +33,8 @@ const createReaction = async (
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));
-  const { reaction, comment_id, proposal_id, thread_id } = req.body;
+  const { reaction, comment_id, proposal_id } = req.body;
+  let thread_id = req.body.thread_id;
 
   if (chain && chain.type === 'token') {
     // skip check for admins
@@ -51,9 +52,8 @@ const createReaction = async (
           thread = await models.OffchainThread.findOne({ where: { id: thread_id } });
         } else if (comment_id) {
           const root_id = (await models.OffchainComment.findOne({ where: { id: comment_id } })).root_id;
-          const stage = root_id.substring(0, root_id.indexOf('_'));
-          const topic_id = root_id.substring(root_id.indexOf('_') + 1);
-          thread = await models.OffchainThread.findOne({ where:{ stage, id: topic_id } });
+          thread_id = root_id.substring(root_id.indexOf('_') + 1);
+          thread = await models.OffchainThread.findOne({ where: { id: thread_id } });
         }
         const threshold = (await models.OffchainTopic.findOne({ where: { id: thread.topic_id } })).token_threshold;
         const tokenBalance = await tokenBalanceCache.getBalance(chain.id, req.body.address);
