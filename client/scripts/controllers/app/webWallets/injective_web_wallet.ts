@@ -21,7 +21,7 @@ class InjectiveWebWalletController implements IWebWallet<string> {
   public readonly name = 'InjMetamask';
   public readonly label = 'Injective MetaMask Wallet';
   public readonly chain = ChainBase.CosmosSDK;
-  public readonly specificChain = 'injective'
+  public readonly specificChain = 'injective';
 
   public get available() {
     return !!(window.ethereum);

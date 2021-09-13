@@ -150,7 +150,13 @@ export function formatAddressShort(
   if (!address) return;
   if (chain === 'near') {
     return `@${address}`;
-  } else if (chain === 'straightedge' || chain === 'cosmoshub' || chain === 'osmosis' || chain === 'injective') {
+  } else if (
+    chain === 'straightedge'
+    || chain === 'cosmoshub'
+    || chain === 'osmosis'
+    || chain === 'injective'
+    || chain === 'injective-testnet'
+  ) {
     return `${address.slice(0, 9)}${includeEllipsis ? '…' : ''}`;
   } else {
     return `${address.slice(0, maxCharLength || 5)}${includeEllipsis ? '…' : ''}`;

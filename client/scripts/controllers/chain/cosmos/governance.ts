@@ -124,9 +124,15 @@ class CosmosGovernance extends ProposalModule<
       };
     };
 
-    // TODO: ensure all proposals fetched regardless of state
-    const { proposals } = await this._Chain.api.gov.proposals(0, '', '');
-    proposals
+    // TODO: this is doable with "0" i.e. unspecified, but we might miss active proposals because
+    //  it returns an arbitrary 100. So we fetch each status separately to ensure we at least have
+    //  all presently active proposals.
+    const { proposals: depositProposals } = await this._Chain.api.gov.proposals(1, '', '');
+    const { proposals: votingProposals } = await this._Chain.api.gov.proposals(2, '', '');
+    const { proposals: passedProposals } = await this._Chain.api.gov.proposals(3, '', '');
+    const { proposals: rejectedProposals } = await this._Chain.api.gov.proposals(4, '', '');
+    const { proposals: failedProposals } = await this._Chain.api.gov.proposals(5, '', '');
+    [...depositProposals, ...votingProposals, ...passedProposals, ...rejectedProposals, ...failedProposals]
       .map((p) => msgToIProposal(p))
       .filter((p) => !!p)
       .sort((p1, p2) => +p2.identifier - +p1.identifier)

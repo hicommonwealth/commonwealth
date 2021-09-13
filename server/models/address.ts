@@ -240,7 +240,7 @@ export default (
         log.error('Invalid keytype.');
         isValid = false;
       }
-    } else if (chain.base === 'cosmos' && chain.network === 'injective') {
+    } else if (chain.base === 'cosmos' && (chain.network === 'injective' || chain.network === 'injective-testnet')) {
       //
       // ethereum address handling
       //
