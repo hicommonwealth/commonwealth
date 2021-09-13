@@ -6,7 +6,9 @@ import {
   ProposalModule,
 } from 'models';
 import { fromAscii } from '@cosmjs/encoding';
+import { MsgSubmitProposalEncodeObject } from '@cosmjs/stargate';
 import { Proposal, TextProposal, ProposalStatus, TallyResult } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
+import { Any } from 'cosmjs-types/google/protobuf/any';
 import {
   ICosmosProposal, CosmosToken, ICosmosProposalTally, CosmosProposalState
 } from 'controllers/chain/cosmos/types';
@@ -153,24 +155,19 @@ class CosmosGovernance extends ProposalModule<
     description: string,
     initialDeposit: CosmosToken,
   ) {
-    /*
-    const msg: MsgSubmitProposal = {
-      type: 'cosmos-sdk/MsgSubmitProposal',
+    const tProp = TextProposal.fromPartial({ title, description });
+    const msg: MsgSubmitProposalEncodeObject = {
+      typeUrl: '/cosmos.gov.v1beta1.MsgSubmitProposal',
       value: {
-        content: {
-          type: 'cosmos-sdk/TextProposal',
-          value: {
-            description,
-            title,
-          },
-        },
-        initial_deposit: [ initialDeposit.toCoinObject() ],
+        initialDeposit: [ initialDeposit.toCoinObject() ],
         proposer: sender.address,
+        content: Any.fromPartial({
+          typeUrl: '/cosmos.gov.v1beta1.TextProposal',
+          value: Uint8Array.from(TextProposal.encode(tProp).finish()),
+        }),
       }
     };
     await this._Chain.sendTx(sender, msg);
-    */
-    throw new Error('proposal submission not yet implemented');
   }
 }
 

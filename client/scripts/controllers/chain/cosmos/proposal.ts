@@ -1,4 +1,6 @@
 import BN from 'bn.js';
+import { MsgDepositEncodeObject, MsgVoteEncodeObject } from '@cosmjs/stargate';
+import { longify } from '@cosmjs/stargate/build/queries/utils';
 import {
   QueryDepositsResponse,
   QueryVotesResponse,
@@ -229,38 +231,34 @@ export class CosmosProposal extends Proposal<
 
   // TRANSACTIONS
   public async submitDepositTx(depositor: CosmosAccount, amount: CosmosToken) {
-    /*
     if (this.status !== 'DepositPeriod') {
       throw new Error('proposal not in deposit period');
     }
-    const msg: MsgDeposit = {
-      type: 'cosmos-sdk/MsgDeposit',
+    const msg: MsgDepositEncodeObject = {
+      typeUrl: '/cosmos.gov.v1beta1.MsgDeposit',
       value: {
-        proposal_id: +this.data.identifier,
+        proposalId: longify(this.data.identifier),
         depositor: depositor.address,
         amount: [ amount.toCoinObject() ],
       }
     };
     await this._Chain.sendTx(depositor, msg);
-    */
     throw new Error('deposit not yet implemented');
   }
 
   public async voteTx(vote: CosmosVote) {
-    /*
     if (this.status !== 'VotingPeriod') {
       throw new Error('proposal not in voting period');
     }
-    const msg: MsgVote = {
-      type: 'cosmos-sdk/MsgVote',
+    const msg: MsgVoteEncodeObject = {
+      typeUrl: '/cosmos.gov.v1beta1.MsgVote',
       value: {
-        proposal_id: +this.data.identifier,
+        proposalId: longify(this.data.identifier),
         voter: vote.account.address,
         option: vote.option,
       }
     };
     await this._Chain.sendTx(vote.account, msg);
-    */
     throw new Error('voting not yet implemented');
   }
 

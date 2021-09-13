@@ -25,6 +25,7 @@ import {
   setupGovExtension,
   BankExtension,
   setupBankExtension,
+  SigningStargateClient
 } from '@cosmjs/stargate';
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import { EncodeObject } from '@cosmjs/proto-signing';
@@ -136,12 +137,10 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     if (!wallets) throw new Error('No cosmos wallet found');
 
     // TODO: support multiple wallets
-    let wallet;
     if (ChainNetwork.Terra) {
-      wallet = wallets[0] as TerraStationWebWalletController;
-    } else {
-      wallet = wallets[0] as KeplrWebWalletController;
+      throw new Error('Tx not yet supported on Terra');
     }
+    const wallet = wallets[0] as KeplrWebWalletController;
     const client = await wallet.getClient(this.app.chain.meta.url, account.address);
 
     // these parameters will be overridden by the wallet
