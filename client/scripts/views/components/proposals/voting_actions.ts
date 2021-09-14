@@ -35,6 +35,7 @@ import { notifyError } from 'controllers/app/notifications';
 import AaveProposal, { AaveProposalVote } from 'controllers/chain/ethereum/aave/proposal';
 import { AaveTypes, CompoundTypes } from '@commonwealth/chain-events';
 import NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
+import Cosmos from 'controllers/chain/cosmos/main';
 import {
   NearSputnikProposalStatus,
   NearSputnikVote,
@@ -286,9 +287,16 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
       } else if (proposal instanceof SubstrateCollectiveProposal) {
         createTXModal(proposal.submitVoteTx(new BinaryVote(user, true), onModalClose));
       } else if (proposal instanceof CosmosProposal) {
-        proposal.voteTx(new CosmosVote(user, 'Yes'))
-          .then(() => m.redraw())
-          .catch((err) => notifyError(err.toString()));
+        if (proposal.status === 'DepositPeriod') {
+          // TODO: configure deposit amount
+          proposal.submitDepositTx(user, (app.chain as Cosmos).governance.minDeposit)
+            .then(() => m.redraw())
+            .catch((err) => notifyError(err.toString()));
+        } else {
+          proposal.voteTx(new CosmosVote(user, 'Yes'))
+            .then(() => m.redraw())
+            .catch((err) => notifyError(err.toString()));
+        }
       } else if (proposal instanceof MolochProposal) {
         proposal.submitVoteWebTx(new MolochProposalVote(user, MolochVote.YES))
           .then(() => m.redraw())

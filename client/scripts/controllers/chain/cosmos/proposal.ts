@@ -114,10 +114,10 @@ export class CosmosProposal extends Proposal<
     // workaround to avoid fetching all voters for completed proposals
     if (!data.state.completed) {
       this._initState();
-    } else {
-      this.updateState(this._Governance.store, data.state);
     }
+    this.updateState(this._Governance.store, data.state);
     this._Governance.store.add(this);
+    console.log(this);
   }
 
   public update() {

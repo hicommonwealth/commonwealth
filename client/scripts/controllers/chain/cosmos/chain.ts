@@ -25,21 +25,11 @@ import {
   setupGovExtension,
   BankExtension,
   setupBankExtension,
-  StargateClient
+  SigningStargateClient
 } from '@cosmjs/stargate';
-import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx';
-import { MsgSubmitProposal } from 'cosmjs-types/cosmos/gov/v1beta1/tx';
-import {
-  EncodeObject,
-  makeSignDoc,
-  TxBodyEncodeObject,
-  Registry,
-  makeAuthInfoBytes,
-  encodePubkey,
-  coins,
-} from '@cosmjs/proto-signing';
-import { toBase64, fromBase64 } from '@cosmjs/encoding';
+import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
+import { EncodeObject } from '@cosmjs/proto-signing';
 import CosmosAccount from './account';
 import KeplrWebWalletController from '../../app/webWallets/keplr_web_wallet';
 import TerraStationWebWalletController from '../../app/webWallets/terra_station_web_wallet';
@@ -144,17 +134,16 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
 
   public async sendTx(account: CosmosAccount, tx: EncodeObject): Promise<string> {
     // TODO: error handling
-    const wallets = this.app.wallets.availableWallets(ChainBase.CosmosSDK);
-    if (!wallets) throw new Error('No cosmos wallet found');
-
     // TODO: support multiple wallets
     if (this._app.chain.network === ChainNetwork.Terra) {
       throw new Error('Tx not yet supported on Terra');
     }
-    const wallet = wallets[0] as KeplrWebWalletController;
+    const wallet = this.app.wallets.getByName('keplr') as KeplrWebWalletController;
+    if (!wallet) throw new Error('Keplr wallet not found');
     if (!wallet.enabled) {
       await wallet.enable();
     }
+    const client = await SigningStargateClient.connectWithSigner(this._app.chain.meta.url, wallet.offlineSigner);
 
     // these parameters will be overridden by the wallet
     // TODO: can it be simulated?
@@ -164,58 +153,20 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     };
     const DEFAULT_MEMO = '';
 
-    // sign the transaction using keplr (for now)
-    console.log('Signing...');
-    const stargateClient = await StargateClient.connect(this._url);
-    console.log(wallet);
-    const signer = wallet.offlineSigner;
-    const { pubkey, address } = wallet.accounts[0];
-    // TODO: verify address === account.address
-    const encodedPubkey = encodePubkey({
-      type: 'tendermint/PubKeySecp256k1',
-      value: toBase64(pubkey),
-    });
-    const txBodyFields: TxBodyEncodeObject = {
-      typeUrl: '/cosmos.tx.v1beta1.TxBody',
-      value: {
-        messages: [ tx ],
-      },
-    };
-    // TODO: ensure all gov types are in the registry
-    const registry = new Registry([
-      ['/cosmos.gov.v1beta1.MsgSubmitProposal', MsgSubmitProposal],
-    ]);
-    console.log('encoding', txBodyFields);
-    const txBodyBytes = registry.encode(txBodyFields);
-    const { accountNumber, sequence } = (await stargateClient.getSequence(account.address))!;
-    // TODO: configure
-    const feeAmount = coins(2000, this.denom);
-    const gasLimit = 200000;
-    const authInfoBytes = makeAuthInfoBytes([{ pubkey: encodedPubkey, sequence }], feeAmount, gasLimit);
-
-    // TODO: this doesn't work, because we need the correct chainId for keplr to sign
-    const chainId = await stargateClient.getChainId();
-    const signDoc = makeSignDoc(txBodyBytes, authInfoBytes, chainId, accountNumber);
-    const { signature } = await signer.signDirect(account.address, signDoc);
-
-    // send the transaction
-    //  (we reinitialize the client here in order to send on any network, not just keplr supported)
-    const txRaw = TxRaw.fromPartial({
-      bodyBytes: txBodyBytes,
-      authInfoBytes,
-      signatures: [fromBase64(signature.signature)],
-    });
-    const txRawBytes = Uint8Array.from(TxRaw.encode(txRaw).finish());
-    const result = await stargateClient.broadcastTx(txRawBytes);
-    stargateClient.disconnect();
-    if (isBroadcastTxFailure(result)) {
+    // send the transaction using keplr-supported signing client
+    try {
+      const result = await client.signAndBroadcast(account.address, [ tx ], DEFAULT_FEE, DEFAULT_MEMO);
       console.log(result);
-      throw new Error('TX execution failed.');
-    } else if (isBroadcastTxSuccess(result)) {
-      console.log(result);
-      return result.transactionHash;
-    } else {
-      throw new Error('Unknown broadcast result');
+      if (isBroadcastTxFailure(result)) {
+        throw new Error('TX execution failed.');
+      } else if (isBroadcastTxSuccess(result)) {
+        return result.transactionHash;
+      } else {
+        throw new Error('Unknown broadcast result');
+      }
+    } catch (err) {
+      console.log(err.message);
+      throw err;
     }
   }
 
