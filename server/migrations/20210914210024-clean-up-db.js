@@ -10,7 +10,7 @@ module.exports = {
       );
       const addressIds = addresses[0].map((_) => _.id).join(', ');
       await queryInterface.sequelize.query(
-        `DELETE FROM "OffchainReactions" WHERE address_id IN (${addressIds});`,
+        `DELETE FROM "OffchainReactions" WHERE address_id NOT IN (${addressIds});`,
         { transaction, logging: console.log },
       );
 
