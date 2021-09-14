@@ -41,7 +41,8 @@ const LinkAccountItem: m.Component<{
   accountVerifiedCallback: (account: Account<any>) => Promise<void>,
   errorCallback: (error: string) => void,
   linkNewAddressModalVnode: m.Vnode<ILinkNewAddressModalAttrs, ILinkNewAddressModalState>,
-  base: ChainBase,
+  joiningChain?: string,
+  base: string,
   webWallet: IWebWallet<any>,
 }, { linking: boolean }> = {
   view: (vnode) => {
@@ -54,10 +55,11 @@ const LinkAccountItem: m.Component<{
       base,
       webWallet,
     } = vnode.attrs;
+    console.log('render bitch');
     const address = base === ChainBase.Substrate
       ? AddressSwapper({
         address: account.address,
-        currentPrefix: (app.chain as Substrate).chain.ss58Format,
+        currentPrefix: parseInt(app.config.chains.getById(vnode.attrs.joiningChain).ss58Prefix),
       })
       : account.address;
     const isPrepopulated = account.address === linkNewAddressModalVnode.attrs.prepopulateAddress
@@ -95,11 +97,9 @@ const LinkAccountItem: m.Component<{
         }
 
         try {
-          const signerAccount = await createUserWithAddress(address, undefined, targetCommunity);
+          const signerAccount = await createUserWithAddress(address, vnode.attrs.joiningChain, undefined, targetCommunity);
           vnode.state.linking = true;
           m.redraw();
-          console.log(app.user);
-          console.log(app.activeChainId());
           await webWallet.validateWithAccount(signerAccount, app.activeChainId());
           vnode.state.linking = false;
           m.redraw();
@@ -116,12 +116,12 @@ const LinkAccountItem: m.Component<{
       }
     }, [
       m('.account-item-avatar', [
-        m('.account-user', m(User, { user: app.chain.accounts.get(address), avatarOnly: true, avatarSize: 40 })),
+        m('.account-user', m(User, { user: app.user.activeAccounts.find((acct) => acct.address === address), avatarOnly: true, avatarSize: 40 })),
       ]),
       m('.account-item-left', [
         m('.account-item-name', `${name}`),
         m('.account-item-address', [
-          m('.account-user', m(User, { user: app.chain.accounts.get(address), hideAvatar: true })),
+          m('.account-user', m(User, { user: app.user.activeAccounts.find((acct) => acct.address === address), hideAvatar: true })),
         ]),
         vnode.state.linking
           && m('p.small-text', 'Check your wallet for a confirmation prompt.')
@@ -143,6 +143,7 @@ interface ILinkNewAddressModalAttrs {
   targetCommunity?: string,       // valid when loggingInWithAddress=true and user joins community thru default chain.
   useCommandLineWallet: boolean,  //
   webWallet?: IWebWallet<any>,
+  defaultChainId?: string,
   alreadyInitializedAccount?: Account<any>; // skip verification, go straight to profile creation (only used for NEAR)
   prepopulateAddress?: string, // link a specific address rather than prompting
   successCallback;
@@ -203,7 +204,7 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
     }
 
     // TODO: refactor this out so we don't have duplicated loading code
-    if (!app.chain && vnode.state.step !== LinkNewAddressSteps.Step2CreateProfile) return m('.LinkNewAddressModal', {
+    if (!vnode.attrs.defaultChainId && vnode.state.step !== LinkNewAddressSteps.Step2CreateProfile) return m('.LinkNewAddressModal', {
       key: 'placeholder', // prevent vnode from being reused so later oninit / oncreate code runs
     }, [
       m('.link-address-step', [
@@ -302,14 +303,15 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
         // load addresses for the current chain/community
         if (app.community) {
           await updateActiveAddresses();
-          app.user.activeAccount.updateGhost(vnode.state.userProvidedSignature);
         } else if (app.chain) {
           // TODO: this breaks when the user action creates a new token forum
           const chain = app.user.selectedNode
             ? app.user.selectedNode.chain
             : app.config.nodes.getByChain(app.activeChainId())[0].chain;
           await updateActiveAddresses(chain);
-          app.user.activeAccount.updateGhost(vnode.state.userProvidedSignature);
+          if (app.user.activeAccounts.find((addr) => addr.ghost_address === true && addr.chainBase === chain.base)) {
+            await app.user.activeAccount.updateGhostAddress(vnode.state.userProvidedSignature)
+          }
         } else {
           notifyError('Signed in, but no chain or community found');
         }
@@ -327,44 +329,44 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
       }
     };
 
-    const cliAddressInputFn = async (address) => {
-      vnode.state.error = null;
-      vnode.state.enteredAddress = address;
+    // const cliAddressInputFn = async (address) => {
+    //   vnode.state.error = null;
+    //   vnode.state.enteredAddress = address;
 
-      // Prevent validation on empty field
-      if (address === '') {
-        return;
-      }
+    //   // Prevent validation on empty field
+    //   if (address === '') {
+    //     return;
+    //   }
 
-      if ((app.chain.base === ChainBase.Substrate)) {
-        if (isU8a(address) || isHex(address)) {
-          vnode.state.error = 'Address must be SS58 (e.g. 5Ew4...)';
-        }
-        try {
-          (await import('@polkadot/keyring')).decodeAddress(address);
-        } catch (err) {
-          vnode.state.error = 'Invalid address';
-        }
-      }
-      if (app.user.activeAccounts.find((acct) => acct.address === address)) {
-        vnode.state.error = 'You have already linked this address';
-      }
+    //   if ((vnode.attrs.defaultChainId === ChainBase.Substrate)) {
+    //     if (isU8a(address) || isHex(address)) {
+    //       vnode.state.error = 'Address must be SS58 (e.g. 5Ew4...)';
+    //     }
+    //     try {
+    //       (await import('@polkadot/keyring')).decodeAddress(address);
+    //     } catch (err) {
+    //       vnode.state.error = 'Invalid address';
+    //     }
+    //   }
+    //   if (app.user.activeAccounts.find((acct) => acct.address === address)) {
+    //     vnode.state.error = 'You have already linked this address';
+    //   }
 
-      if (!vnode.state.error) {
-        try {
-          vnode.state.newAddress = await createUserWithAddress(address, vnode.state.isEd25519 ? 'ed25519' : undefined, targetCommunity);
-        } catch (err) {
-          vnode.state.error = err.responseJSON ? err.responseJSON.error : 'Failed to create user.';
-        }
-      }
+    //   if (!vnode.state.error) {
+    //     try {
+    //       vnode.state.newAddress = await createUserWithAddress(address, vnode.state.isEd25519 ? 'ed25519' : undefined, targetCommunity);
+    //     } catch (err) {
+    //       vnode.state.error = err.responseJSON ? err.responseJSON.error : 'Failed to create user.';
+    //     }
+    //   }
 
-      m.redraw();
-    };
+    //   m.redraw();
+    // };
 
     // immediately trigger address population if given
     if (vnode.attrs.prepopulateAddress && vnode.state.isFirstInit) {
       vnode.state.isFirstInit = false;
-      cliAddressInputFn(vnode.attrs.prepopulateAddress);
+      // cliAddressInputFn(vnode.attrs.prepopulateAddress);
     }
 
     const webWallet = vnode.attrs.webWallet;
@@ -372,7 +374,7 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
       vnode.state.step === LinkNewAddressSteps.Step1VerifyWithWebWallet ? m('.link-address-step', [
         linkAddressHeader,
         m('.link-address-step-narrow', [
-          webWallet?.accounts?.length === 0 && app.chain.base !== ChainBase.NEAR
+          webWallet?.accounts?.length === 0 && vnode.attrs.defaultChainId !== ChainBase.NEAR
             && m(Button, {
               class: 'account-adder',
               intent: 'primary',
@@ -385,14 +387,14 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
                 if (vnode.state.initializingWallet) return;
                 vnode.state.initializingWallet = true;
                 if (!webWallet.enabling && !webWallet.enabled) {
-                  await webWallet?.enable();
+                  await webWallet?.enable().then(() => m.redraw());
                 }
                 // TODO: this check can have race conditions -- need "initializing"
-                // if (!app.chain.apiInitialized) {
+                // if (!app.chain.apiInitialized && vnode.attrs.defaultChainId === ChainBase.NEAR) {
                 //   await app.chain.initApi();
                 // }
                 vnode.state.initializingWallet = false;
-                m.redraw();
+                console.log(`on create: ${webWallet?.accounts.length}`);
               },
               onclick: async (vvnode) => {
                 // initialize API if needed before starting webwallet
@@ -400,32 +402,27 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
                 vnode.state.initializingWallet = true;
                 notifyInfo('Connecting, might take a moment.');
                 if (!webWallet.enabling && !webWallet.enabled) {
-                  await webWallet?.enable();
+                  await webWallet?.enable().then(() => m.redraw());
                 }
                 // TODO: this check can have race conditions -- need "initializing"
-                // if (!app.chain.apiInitialized) {
+                // if (!app.chain.apiInitialized && vnode.attrs.defaultChainId === ChainBase.NEAR) {
                 //   await app.chain.initApi();
                 // }
                 vnode.state.initializingWallet = false;
-                m.redraw();
+                console.log(`on click: ${webWallet?.accounts.length}`);
               },
               label:
                 !webWallet?.available
-                  ? 'No wallet detected'
-                  : (vnode.state.initializingWallet !== false && app.chain.networkStatus !== ApiStatus.Disconnected)
-                    ? [ m(Spinner, { size: 'xs', active: true }), ' Connecting to chain...' ]
-                    : app.chain.networkStatus === ApiStatus.Disconnected
-                      ? [ m(Spinner, { size: 'xs', active: true }), ' Connecting to chain...' ]
-                      : 'Connect to wallet'
+                  ? 'No wallet detected' : (vnode.state.initializingWallet !== false) && 'Connect to wallet',
             }),
           !webWallet?.available && m('.get-wallet-text', [
             'Install a compatible wallet to continue',
             m('br'),
-            app.chain.base === ChainBase.Substrate
+            vnode.attrs.defaultChainId === ChainBase.Substrate
               && link('a', 'https://polkadot.js.org/extension/', 'Get polkadot-js', { target: '_blank' }),
-            app.chain.base === ChainBase.Ethereum
+            vnode.attrs.defaultChainId === ChainBase.Ethereum
               && link('a', 'https://metamask.io/', 'Get Metamask', { target: '_blank' }),
-            app.chain.base === ChainBase.CosmosSDK
+            vnode.attrs.defaultChainId === ChainBase.CosmosSDK
               && link('a', 'https://wallet.keplr.app/', 'Get Keplr', { target: '_blank' }),
           ]),
           webWallet?.enabled && m('.accounts-caption', [
@@ -439,13 +436,13 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
               m('p.small-text', 'Look for a popup, or check your wallet/browser extension.'),
               webWallet.chain === ChainBase.CosmosSDK // keplr wallet, terra station
                 && m('p.small-text', [
-                  `Because ${app.chain.meta.chain.name} does not support signed verification messages, `,
+                  `Because ${app.config.chains.getById(vnode.attrs.joiningChain).name} does not support signed verification messages, `,
                   'you will be asked to sign a transaction that does nothing. It will not be submitted to the chain.'
                 ]),
             ],
           ]),
           m('.accounts-list', [
-            app.chain.base === ChainBase.NEAR
+            vnode.attrs.defaultChainId === ChainBase.NEAR
               ? [ m(Button, {
                 intent: 'primary',
                 rounded: true,
@@ -468,15 +465,16 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
                 },
                 label: 'Continue to NEAR wallet'
               }) ]
-              : app.chain.networkStatus !== ApiStatus.Connected
+              : (vnode.attrs.defaultChainId === ChainBase.NEAR && app.chain?.networkStatus !== ApiStatus.Connected)
                 ? [ ]
                 : [ webWallet?.accounts.map(
                   (addressOrAccount) => m(LinkAccountItem, {
                     account: typeof addressOrAccount === 'string'
                       ? { address: addressOrAccount }
                       : addressOrAccount,
-                    base: app.chain.base,
+                    base: vnode.attrs.defaultChainId,
                     targetCommunity,
+                    joiningChain: vnode.attrs.joiningChain,
                     accountVerifiedCallback,
                     errorCallback: (error) => { notifyError(error); },
                     linkNewAddressModalVnode: vnode,
@@ -486,115 +484,116 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
           ]),
           vnode.state.error && m('.error-message', vnode.state.error),
         ]),
-      ]) : vnode.state.step === LinkNewAddressSteps.Step1VerifyWithCLI ? m('.link-address-step', [
-        linkAddressHeader,
-        m('.link-address-step-narrow', [
-          app.chain.base === ChainBase.Substrate && [
-            m('p.link-address-cli-explainer', [
-              'Enter the address you are using. If you need a new address, generate one by running ',
-              m('code', vnode.state.isEd25519 ? 'subkey generate --scheme ed25519' : 'subkey generate'),
-            ]),
-          ],
-          m(Input, {
-            name: 'Address',
-            fluid: true,
-            autocomplete: 'off',
-            value: vnode.attrs.prepopulateAddress,
-            placeholder: vnode.attrs.prepopulateAddress
-              ? undefined
-              : app.chain.base === ChainBase.Substrate
-                ? 'Paste the address here (e.g. 5Dvq...)'
-                : 'Paste the address here',
-            oninput: async (e) => {
-              const address = (e.target as any).value;
-              cliAddressInputFn(address);
-            },
-          }),
-          // // ed25519 account linking disabled for now, since while address ownership verification works,
-          // // the resulting address is missing an addressId, and will not be added to the current community
-          // // or set as activeAddress correctly (unclear why)
-          // app.chain.base === ChainBase.Substrate && m(Checkbox, {
-          //   name: 'is-ed25519',
-          //   label: 'Key is ed25519 format',
-          //   onchange: async (e) => {
-          //     const result = (e.target as any).checked;
-          //     vnode.state.isEd25519 = !!result;
+      ]) : 
+      // vnode.state.step === LinkNewAddressSteps.Step1VerifyWithCLI ? m('.link-address-step', [
+      //   linkAddressHeader,
+      //   m('.link-address-step-narrow', [
+      //     vnode.attrs.defaultChainId && [
+      //       m('p.link-address-cli-explainer', [
+      //         'Enter the address you are using. If you need a new address, generate one by running ',
+      //         m('code', vnode.state.isEd25519 ? 'subkey generate --scheme ed25519' : 'subkey generate'),
+      //       ]),
+      //     ],
+      //     m(Input, {
+      //       name: 'Address',
+      //       fluid: true,
+      //       autocomplete: 'off',
+      //       value: vnode.attrs.prepopulateAddress,
+      //       placeholder: vnode.attrs.prepopulateAddress
+      //         ? undefined
+      //         : vnode.attrs.defaultChainId === ChainBase.Substrate
+      //           ? 'Paste the address here (e.g. 5Dvq...)'
+      //           : 'Paste the address here',
+      //       oninput: async (e) => {
+      //         const address = (e.target as any).value;
+      //         cliAddressInputFn(address);
+      //       },
+      //     }),
+      //     // // ed25519 account linking disabled for now, since while address ownership verification works,
+      //     // // the resulting address is missing an addressId, and will not be added to the current community
+      //     // // or set as activeAddress correctly (unclear why)
+      //     // app.chain.base === ChainBase.Substrate && m(Checkbox, {
+      //     //   name: 'is-ed25519',
+      //     //   label: 'Key is ed25519 format',
+      //     //   onchange: async (e) => {
+      //     //     const result = (e.target as any).checked;
+      //     //     vnode.state.isEd25519 = !!result;
 
-          //     // resubmit creation if they check box after pasting address
-          //     if (!vnode.state.enteredAddress) return;
-          //     if (!vnode.state.error) {
-          //       try {
-          //         vnode.state.newAddress = await createUserWithAddress(AddressSwapper({
-          //           address: vnode.state.enteredAddress,
-          //           currentPrefix: (app.chain as Substrate).chain.ss58Format,
-          //         }), vnode.state.isEd25519 ? 'ed25519' : undefined, targetCommunity);
-          //       } catch (err) {
-          //         vnode.state.error = err.responseJSON ? err.responseJSON.error : 'Failed to create user.';
-          //       }
-          //     }
+      //     //     // resubmit creation if they check box after pasting address
+      //     //     if (!vnode.state.enteredAddress) return;
+      //     //     if (!vnode.state.error) {
+      //     //       try {
+      //     //         vnode.state.newAddress = await createUserWithAddress(AddressSwapper({
+      //     //           address: vnode.state.enteredAddress,
+      //     //           currentPrefix: (app.chain as Substrate).chain.ss58Format,
+      //     //         }), vnode.state.isEd25519 ? 'ed25519' : undefined, targetCommunity);
+      //     //       } catch (err) {
+      //     //         vnode.state.error = err.responseJSON ? err.responseJSON.error : 'Failed to create user.';
+      //     //       }
+      //     //     }
 
-          //     m.redraw();
-          //   },
-          // }),
-          vnode.state.error && !vnode.state.newAddress && m('.error-message', vnode.state.error),
-          // Allow signing iff address has been created and account has been verified
-          vnode.state.newAddress && m('.link-address-cli-verification', [
-            app.chain.base === ChainBase.Substrate && [
-              m('p', 'Use the secret phrase to sign this message:'),
-              m(CodeBlock, { clickToSelect: true }, [
-                // eslint-disable-next-line max-len
-                `echo "${vnode.state.newAddress.validationToken}" | subkey sign ${vnode.state.isEd25519 ? '--scheme ed25519 ' : '--suri'} "`,
-                m('span.no-select', 'secret phrase'),
-                '"',
-              ]),
-            ],
-            m(Input, {
-              name: 'Signature',
-              fluid: true,
-              autocomplete: 'off',
-              style: 'display: block; margin-bottom: 18px;',
-              placeholder: 'Paste the signature here (e.g. 84e34b...)',
-              oninput: async (e) => {
-                const signature = (e.target as any).value;
-                const unverifiedAcct = vnode.state.newAddress;
-                const validationToken = unverifiedAcct.validationToken;
-                vnode.state.error = null;
-                vnode.state.userProvidedSignature = signature;
-                m.redraw();
-              },
-            }),
-            vnode.state.error && vnode.state.newAddress && m('.error-message', vnode.state.error),
-            app.chain.base === ChainBase.Substrate
-              && m('p', 'Do NOT paste your secret phrase.'),
-            app.chain.base === ChainBase.Substrate && m(Checkbox, {
-              name: 'secret-phrase-saved',
-              label: 'My secret phrase is saved somewhere safe',
-              onchange: async (e) => {
-                const result = (e.target as any).checked;
-                vnode.state.secretPhraseSaved = result;
-              },
-            }),
-            m(Button, {
-              intent: 'primary',
-              rounded: true,
-              onclick: async (e) => {
-                e.preventDefault();
-                const unverifiedAcct: Account<any> = vnode.state.newAddress;
-                unverifiedAcct.validate(vnode.state.userProvidedSignature).then(() => {
-                  // if no exception was raised, account must be valid
-                  accountVerifiedCallback(app.chain.accounts.get(unverifiedAcct.address));
-                }, (err) => {
-                  vnode.state.error = 'Verification failed';
-                  m.redraw();
-                });
-              },
-              label: 'Continue',
-              disabled: !(vnode.state.userProvidedSignature
-                          && (app.chain.base !== ChainBase.Substrate || vnode.state.secretPhraseSaved))
-            }),
-          ]),
-        ]),
-      ]) : vnode.state.step === LinkNewAddressSteps.Step2CreateProfile ? m('.link-address-step', [
+      //     //     m.redraw();
+      //     //   },
+      //     // }),
+      //     vnode.state.error && !vnode.state.newAddress && m('.error-message', vnode.state.error),
+      //     // Allow signing iff address has been created and account has been verified
+      //     vnode.state.newAddress && m('.link-address-cli-verification', [
+      //       vnode.attrs.defaultChainId === ChainBase.Substrate && [
+      //         m('p', 'Use the secret phrase to sign this message:'),
+      //         m(CodeBlock, { clickToSelect: true }, [
+      //           // eslint-disable-next-line max-len
+      //           `echo "${vnode.state.newAddress.validationToken}" | subkey sign ${vnode.state.isEd25519 ? '--scheme ed25519 ' : '--suri'} "`,
+      //           m('span.no-select', 'secret phrase'),
+      //           '"',
+      //         ]),
+      //       ],
+      //       m(Input, {
+      //         name: 'Signature',
+      //         fluid: true,
+      //         autocomplete: 'off',
+      //         style: 'display: block; margin-bottom: 18px;',
+      //         placeholder: 'Paste the signature here (e.g. 84e34b...)',
+      //         oninput: async (e) => {
+      //           const signature = (e.target as any).value;
+      //           const unverifiedAcct = vnode.state.newAddress;
+      //           const validationToken = unverifiedAcct.validationToken;
+      //           vnode.state.error = null;
+      //           vnode.state.userProvidedSignature = signature;
+      //           m.redraw();
+      //         },
+      //       }),
+      //       vnode.state.error && vnode.state.newAddress && m('.error-message', vnode.state.error),
+      //       vnode.attrs.defaultChainId === ChainBase.Substrate
+      //         && m('p', 'Do NOT paste your secret phrase.'),
+      //       vnode.attrs.defaultChainId === ChainBase.Substrate && m(Checkbox, {
+      //         name: 'secret-phrase-saved',
+      //         label: 'My secret phrase is saved somewhere safe',
+      //         onchange: async (e) => {
+      //           const result = (e.target as any).checked;
+      //           vnode.state.secretPhraseSaved = result;
+      //         },
+      //       }),
+      //       m(Button, {
+      //         intent: 'primary',
+      //         rounded: true,
+      //         onclick: async (e) => {
+      //           e.preventDefault();
+      //           const unverifiedAcct: Account<any> = vnode.state.newAddress;
+      //           unverifiedAcct.validate(vnode.state.userProvidedSignature).then(() => {
+      //             // if no exception was raised, account must be valid
+      //             accountVerifiedCallback(app.chain.accounts.get(unverifiedAcct.address));
+      //           }, (err) => {
+      //             vnode.state.error = 'Verification failed';
+      //             m.redraw();
+      //           });
+      //         },
+      //         label: 'Continue',
+      //         disabled: !(vnode.state.userProvidedSignature
+      //                     && (vnode.attrs.defaultChainId !== ChainBase.Substrate || vnode.state.secretPhraseSaved))
+      //       }),
+      //     ]),
+      //   ]),
+      vnode.state.step === LinkNewAddressSteps.Step2CreateProfile ? m('.link-address-step', [
         linkAddressHeader,
         m('.link-address-step-narrow', [
           m('.create-profile-instructions', vnode.state.isNewLogin ? [

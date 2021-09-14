@@ -21,6 +21,7 @@ import CommunitiesController from './controllers/server/communities';
 import UserController from './controllers/server/user/index';
 import WebWalletController from './controllers/app/web_wallets';
 import { InviteCodeAttributes } from 'shared/types';
+import { NearAccounts } from './controllers/chain/near/account';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',

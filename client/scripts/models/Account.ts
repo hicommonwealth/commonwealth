@@ -1,21 +1,18 @@
 import $ from 'jquery';
 import app, { IApp } from 'state';
 import { Coin } from 'adapters/currency';
-import { slugify } from 'utils';
-import Token from 'controllers/chain/ethereum/token/adapter';
 
 import { ITXModalData } from './interfaces';
 import { ChainBase } from './types';
 import ChainInfo from './ChainInfo';
 import Profile from './Profile';
-import {AddressInfo} from "models/index";
 
 abstract class Account<C extends Coin> {
   public readonly serverUrl : string;
   public readonly address: string;
   public readonly chain: ChainInfo;
   public readonly chainBase: ChainBase;
-  public readonly ghost_address: ChainBase;
+  public readonly ghost_address: boolean;
   public get freeBalance() { return this.balance; }
   public abstract balance: Promise<C>;
   public abstract sendBalanceTx(recipient: Account<C>, amount: C): Promise<ITXModalData> | ITXModalData;
@@ -44,7 +41,7 @@ abstract class Account<C extends Coin> {
     // Because there won't be any chain base or chain class
     this.app = _app;
     this.chain = chain;
-    this.chainBase = (_app.chain) ? _app.chain.base : null;
+    this.chainBase = chain.base;
     this.address = address;
     this._profile = _app.profiles.getProfile(chain.id, address);
     this._encoding = encoding;
@@ -88,7 +85,7 @@ abstract class Account<C extends Coin> {
     this._validationToken = token;
   }
 
-  public async updateGhost(signature?: string) {
+  public async updateGhostAddress(signature?: string) {
     const params : any = {
       address: this.address,
       chain: this.chain.id,

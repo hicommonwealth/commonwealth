@@ -17,6 +17,7 @@ coverage/
 *.sw*
 .env
 *yalc*
+madge/
 
 # Database downloads
 latest.dump

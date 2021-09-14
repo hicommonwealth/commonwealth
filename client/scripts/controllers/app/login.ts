@@ -21,6 +21,8 @@ import {
 } from 'models';
 import moment from 'moment';
 import { notifyError } from 'controllers/app/notifications';
+import OffchainAccount from '../chain/community/account';
+
 const MAGIC_PUBLISHABLE_KEY = 'pk_live_B0604AA1B8EEFDB4';
 
 function createAccount(
@@ -197,15 +199,20 @@ export function updateActiveUser(data) {
 }
 
 export async function createUserWithAddress(
-  address: string, keytype?: string, community?: string
+  address: string, chain?: string, keytype?: string, community?: string
 ): Promise<Account<any>> {
-  const account = app.chain.accounts.get(address, keytype);
-  const response = await createAccount(account, community);
-  const token = response.result.verification_token;
-  const newAccount = app.chain.accounts.get(response.result.address, keytype);
-  newAccount.setValidationToken(token);
-  newAccount.setAddressId(response.result.id);
-  return newAccount;
+  await $.post(`${app.serverUrl()}/getAddressStatus`, {
+    address,
+    chain: app.activeChainId(),
+    jwt: app.user.jwt,
+  }).then((res) => {
+    // const account = new OffchainAccount(app, chain, address);
+    // const response = await createAccount(account, community);
+    // const token = response.result.verification_token;
+  })
+  // newAccount.setValidationToken(token);
+  // newAccount.setAddressId(response.result.id);
+  return;
 }
 
 export async function unlinkLogin(account) {

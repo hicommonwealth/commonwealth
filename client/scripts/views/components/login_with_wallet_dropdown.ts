@@ -73,11 +73,14 @@ const LoginWithWalletDropdown: m.Component<{
           const defaultChainId = webWallet?.specificChain || baseToNetwork(base);
           if (app.activeChainId()) {
             navigateToSubpage('/web3login', web3loginParams);
+          } else if (defaultChainId === ChainBase.NEAR) {
+            m.route.set(`/near/web3login`, web3loginParams);
           } else {
-            m.route.set(`${defaultChainId}/web3login`, web3loginParams);
+            m.route.set(`/web3login`, web3loginParams);
           }
           app.modals.lazyCreate('link_new_address_modal', {
             loggingInWithAddress,
+            defaultChainId,
             joiningChain,
             joiningCommunity,
             targetCommunity,
