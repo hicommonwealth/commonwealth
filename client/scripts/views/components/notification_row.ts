@@ -16,7 +16,6 @@ import {
   AaveTypes,
   AaveEvents,
   Erc20Events
-  // CompoundEvents
 } from '@commonwealth/chain-events';
 
 import app from 'state';

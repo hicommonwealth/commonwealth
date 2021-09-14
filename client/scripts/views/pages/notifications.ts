@@ -661,7 +661,7 @@ const Erc20ChainEventNotificationRow: m.Component<{
       vnode.state.option = NOTIFICATION_OFF_OPTION;
     }
 
-    const ERC20_EVENT_LIST = ['transfer'];
+    const ERC20_EVENT_LIST = ['transfer', 'approval'];
     return m('tr.BatchedSubscriptionRow', [
       m('td.token-icon', [
         m('img', { src: chainInfo.iconUrl }),
@@ -760,7 +760,6 @@ const Erc20ChainEventNotifications: m.Component<{
       displayErc20s = activeErc20s;
     }
 
-    //  return activeErc20s.map((n)=>m('tr',n.chain.name))
     return [
       displayErc20s.length > 0
         ? m('tr.on-chain-events-header', [

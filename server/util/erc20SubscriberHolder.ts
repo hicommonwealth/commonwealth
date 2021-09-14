@@ -22,7 +22,9 @@ export default class Erc20SubscriberHolder {
         }]
       });
 
-      if (chainInstance) {
+      if (chainInstance && chainInstance.has_chain_events_listener) {
+        log.info('Token is already being listened to');
+      } else if (chainInstance && !chainInstance.has_chain_events_listener) {
         chainInstance.has_chain_events_listener = true;
         await chainInstance.save();
       } else {
