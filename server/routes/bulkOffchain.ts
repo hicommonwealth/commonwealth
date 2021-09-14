@@ -24,19 +24,19 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
 
   // globally shared SQL replacements
   const communityOptions = community
-    ? 'community = :community'
-    : 'chain = :chain';
+      ? 'community = :community'
+      : 'chain = :chain';
   const replacements = community
-    ? { community: community.id }
-    : { chain: chain.id };
+      ? { community: community.id }
+      : { chain: chain.id };
 
   // parallelized queries
   const [topics, threadsCommentsReactions, admins, mostActiveUsers, threadsInVoting] = await <Promise<[OffchainTopicInstance[], unknown, RoleInstance[], unknown, OffchainThreadInstance[]]>>Promise.all([
     // topics
     models.OffchainTopic.findAll({
       where: community
-        ? { community_id: community.id }
-        : { chain_id: chain.id }
+          ? { community_id: community.id }
+          : { chain_id: chain.id }
     }),
     // threads, comments, reactions
     new Promise(async (resolve, reject) => {
@@ -128,6 +128,16 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
         }
 
         const root_ids = [];
+        const threads = preprocessedThreads.map((t) => {
+          const root_id = `discussion_${t.thread_id}`;
+          root_ids.push(root_id);
+          const collaborators = JSON.parse(t.collaborators[0]).address?.length
+              ? t.collaborators.map((c) => JSON.parse(c))
+              : [];
+          const chain_entities = JSON.parse(t.chain_entities[0]).id
+              ? t.chain_entities.map((c) => JSON.parse(c))
+              : [];
+          const last_edited = getLastEdited(t);
 
           const data = {
             id: t.thread_id,
@@ -171,23 +181,24 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
           root_ids.push(`discussion_${t.id}`);
           return t.toJSON();
         });
+        // .concat(threads);
 
-        // Comments
-        const offchainComments = await models.OffchainComment.findAll({
-          where: {
-            root_id: root_ids
-          },
-          include: [models.Address, models.OffchainAttachment],
-          order: [['created_at', 'DESC']],
-        });
-        const comments = offchainComments.map((c, idx) => {
-          const row = c.toJSON();
-          // const last_edited = getLastEdited(row);
-          // row['last_edited'] = last_edited;
-          return row;
-        });
+        // TODO REFACTOR Comments
+        // const offchainComments = await models.OffchainComment.findAll({
+        //   where: {
+        //     root_id: root_ids
+        //   },
+        //   include: [models.Address, models.OffchainAttachment],
+        //   order: [['created_at', 'DESC']],
+        // });
+        // const comments = offchainComments.map((c, idx) => {
+        //   const row = c.toJSON();
+        //   const last_edited = getLastEdited(row);
+        //   row['last_edited'] = last_edited;
+        //   return row;
+        // });
 
-        resolve([allThreads, comments]);
+        resolve([allThreads]);
       } catch (e) {
         console.log(e);
         reject(new Error('Could not fetch threads, comments, or reactions'));
@@ -258,9 +269,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
       //
       numVotingThreads,
       threads, // already converted to JSON earlier
-      comments, // already converted to JSON earlier
-      // reactions: reactions.map((r) => r.toJSON()),
-      //
+      // comments, // already converted to JSON earlier
       admins: admins.map((a) => a.toJSON()),
       activeUsers: mostActiveUsers,
     }
