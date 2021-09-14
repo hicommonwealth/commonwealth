@@ -15,7 +15,7 @@ abstract class Account<C extends Coin> {
   public readonly address: string;
   public readonly chain: ChainInfo;
   public readonly chainBase: ChainBase;
-  public readonly ghost_address: ChainBase;
+  public readonly ghost_address: boolean;
   public get freeBalance() { return this.balance; }
   public abstract balance: Promise<C>;
   public abstract sendBalanceTx(recipient: Account<C>, amount: C): Promise<ITXModalData> | ITXModalData;
@@ -87,6 +87,26 @@ abstract class Account<C extends Coin> {
   public setValidationToken(token: string) {
     this._validationToken = token;
   }
+
+  public async updateGhostAddress(signature: string) {
+    const params : any = {
+      address: this.address,
+      chain: this.chain.id,
+      isToken: this.chain.type === 'token',
+      jwt: this.app.user.jwt,
+      signature,
+    };
+
+    const { success, ghostAddressId } = await $.post(`${this.app.serverUrl()}/updateAddress`, params);
+    if (success && ghostAddressId) {
+      // remove ghost address from addresses
+      app.user.setAddresses(app.user.addresses.filter(({ ghostAddress }) => {
+        return !ghostAddress
+      }));
+      app.user.setActiveAccounts([]);
+    }
+  }
+  
   public async validate(signature?: string) {
     if (!this._validationToken) {
       throw new Error('no validation token found');
@@ -112,14 +132,6 @@ abstract class Account<C extends Coin> {
       const result = await $.post(`${this.app.serverUrl()}/verifyAddress`, params);
       if (result.status === 'Success') {
         // update address for discount user
-        const { success, ghostAddressId } = await $.post(`${this.app.serverUrl()}/updateAddress`, params);
-        if (success && ghostAddressId) {
-          // remove ghost address from addresses
-          app.user.setAddresses(app.user.addresses.filter(({ ghostAddress }) => {
-            return !ghostAddress
-          }));
-          app.user.setActiveAccounts([]);
-        }
       }
     } else {
       throw new Error('signature or key required for validation');

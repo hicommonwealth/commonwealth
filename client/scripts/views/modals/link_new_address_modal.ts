@@ -306,6 +306,9 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
             ? app.user.selectedNode.chain
             : app.config.nodes.getByChain(app.activeChainId())[0].chain;
           await updateActiveAddresses(chain);
+          if (app.user.activeAccounts.find((addr) => addr.ghost_address === true && addr.chainBase === chain.base)) {
+            await app.user.activeAccount.updateGhostAddress(vnode.state.userProvidedSignature)
+          }
         } else {
           notifyError('Signed in, but no chain or community found');
         }
