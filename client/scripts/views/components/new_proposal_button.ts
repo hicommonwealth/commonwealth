@@ -64,7 +64,7 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
           }
           navigateToSubpage('/new/thread');
         },
-        label: `New ${offchainThreadStageToLabel(t.name)} Thread`,
+        label: `New ${offchainThreadStageToLabel(t.name)} thread`,
         iconLeft: mobile ? Icons.PLUS : undefined,
       })
     )),
