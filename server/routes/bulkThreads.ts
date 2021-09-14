@@ -183,7 +183,6 @@ const bulkThreads = async (models: DB, req: Request, res: Response, next: NextFu
         },
         {
           model: models.Address,
-          // through: models.Collaboration,
           as: 'collaborators'
         },
         {
@@ -211,17 +210,6 @@ const bulkThreads = async (models: DB, req: Request, res: Response, next: NextFu
       return row;
     });
   }
-
-  // const reactions = await models.OffchainReaction.findAll({
-  //   where: {
-  //     [Op.or]: [
-  //       { thread_id: threads.map((thread) => thread.id) },
-  //       { comment_id: comments.map((comment) => comment.id) },
-  //     ],
-  //   },
-  //   include: [ models.Address ],
-  //   order: [['created_at', 'DESC']],
-  // });
 
   const countsQuery = `
      SELECT id, title, stage FROM "OffchainThreads"

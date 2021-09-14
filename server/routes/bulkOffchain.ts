@@ -128,16 +128,6 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
         }
 
         const root_ids = [];
-        const threads = preprocessedThreads.map((t) => {
-          const root_id = `discussion_${t.thread_id}`;
-          root_ids.push(root_id);
-          const collaborators = JSON.parse(t.collaborators[0]).address?.length
-            ? t.collaborators.map((c) => JSON.parse(c))
-            : [];
-          const chain_entities = JSON.parse(t.chain_entities[0]).id
-            ? t.chain_entities.map((c) => JSON.parse(c))
-            : [];
-          const last_edited = getLastEdited(t);
 
           const data = {
             id: t.thread_id,
@@ -181,7 +171,6 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
           root_ids.push(`discussion_${t.id}`);
           return t.toJSON();
         });
-        // .concat(threads);
 
         // Comments
         const offchainComments = await models.OffchainComment.findAll({
@@ -193,8 +182,8 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
         });
         const comments = offchainComments.map((c, idx) => {
           const row = c.toJSON();
-          const last_edited = getLastEdited(row);
-          row['last_edited'] = last_edited;
+          // const last_edited = getLastEdited(row);
+          // row['last_edited'] = last_edited;
           return row;
         });
 

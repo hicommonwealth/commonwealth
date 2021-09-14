@@ -608,7 +608,7 @@ class ThreadsController {
       });
   }
 
-  public initialize(initialThreads: any[], numVotingThreads, reset) {
+  public initialize(initialThreads: any[] = [], numVotingThreads, reset) {
     if (reset) {
       this._store.clear();
       this._listingStore.clear();

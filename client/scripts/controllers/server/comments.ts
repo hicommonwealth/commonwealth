@@ -318,7 +318,7 @@ class CommentsController {
     }
   }
 
-  public initialize(initialComments, reset = true) {
+  public initialize(initialComments = [], reset = true) {
     if (reset) {
       this._store.clear();
     }
