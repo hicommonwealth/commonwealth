@@ -83,10 +83,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
             coinDenom: 'OSMO',
             coinMinimalDenom: 'uosmo',
             coinDecimals: 6,
-            coinGeckoId: 'osmosis',
           },
-          walletUrl: 'https://app.osmosis.zone',
-          walletUrlForStaking: 'http://localhost:8080/#/osmosis/stake',
           bip44: { coinType: 118 },
           bech32Config: {
             bech32PrefixAccAddr: 'osmo',
@@ -101,7 +98,6 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
               coinDenom: 'OSMO',
               coinMinimalDenom: 'uosmo',
               coinDecimals: 6,
-              coinGeckoId: 'osmosis',
             },
           ],
           feeCurrencies: [
@@ -109,7 +105,6 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
               coinDenom: 'OSMO',
               coinMinimalDenom: 'uosmo',
               coinDecimals: 6,
-              coinGeckoId: 'osmosis',
             },
           ],
           gasPriceStep: {

@@ -124,6 +124,7 @@ export class CosmosProposal extends Proposal<
     throw new Error('unimplemented');
   }
 
+  // TODO: fix this
   private async _initState() {
     const api = this._Chain.api;
     const [depositResp, voteResp, tallyResp]: [
@@ -243,7 +244,6 @@ export class CosmosProposal extends Proposal<
       }
     };
     await this._Chain.sendTx(depositor, msg);
-    throw new Error('deposit not yet implemented');
   }
 
   public async voteTx(vote: CosmosVote) {
@@ -259,7 +259,7 @@ export class CosmosProposal extends Proposal<
       }
     };
     await this._Chain.sendTx(vote.account, msg);
-    throw new Error('voting not yet implemented');
+    this.addOrUpdateVote(vote);
   }
 
   public submitVoteTx(vote: CosmosVote, memo: string = '', cb?): ITXModalData {
