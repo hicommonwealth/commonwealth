@@ -87,6 +87,24 @@ abstract class Account<C extends Coin> {
   public setValidationToken(token: string) {
     this._validationToken = token;
   }
+  public async updateGhost(signature?: string) {
+    const params : any = {
+      address: this.address,
+      chain: this.chain.id,
+      isToken: this.chain.type === 'token',
+      jwt: this.app.user.jwt,
+      signature,
+    };
+    const { success, ghostAddressId } = await $.post(`${this.app.serverUrl()}/updateAddress`, params);
+    if (success && ghostAddressId) {
+      // remove ghost address from addresses
+      app.user.setAddresses(app.user.addresses.filter(({ ghostAddress }) => {
+        return !ghostAddress
+      }));
+      app.user.setActiveAccounts([]);
+    }
+  }
+
   public async validate(signature?: string) {
     if (!this._validationToken) {
       throw new Error('no validation token found');
@@ -101,25 +119,18 @@ abstract class Account<C extends Coin> {
       throw new Error('no signature or seed provided');
     }
 
+    const params : any = {
+      address: this.address,
+      chain: this.chain.id,
+      isToken: this.chain.type === 'token',
+      jwt: this.app.user.jwt,
+      signature,
+    };
     if (signature) {
-      const params : any = {
-        address: this.address,
-        chain: this.chain.id,
-        isToken: this.chain.type === 'token',
-        jwt: this.app.user.jwt,
-        signature,
-      };
       const result = await $.post(`${this.app.serverUrl()}/verifyAddress`, params);
       if (result.status === 'Success') {
         // update address for discount user
-        const { success, ghostAddressId } = await $.post(`${this.app.serverUrl()}/updateAddress`, params);
-        if (success && ghostAddressId) {
-          // remove ghost address from addresses
-          app.user.setAddresses(app.user.addresses.filter(({ ghostAddress }) => {
-            return !ghostAddress
-          }));
-          app.user.setActiveAccounts([]);
-        }
+        console.log(result);
       }
     } else {
       throw new Error('signature or key required for validation');

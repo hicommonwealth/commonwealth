@@ -68,7 +68,7 @@ const LoginWithWalletDropdown: m.Component<{
             useCli ? `${baseString} (command line)` : webWallet.label
           ]),
         ]),
-        onclick: (e) => {
+        onclick: (e) => { //@TODO:
           $('.Login').trigger('modalexit');
           const defaultChainId = webWallet?.specificChain || baseToNetwork(base);
           if (app.activeChainId()) {

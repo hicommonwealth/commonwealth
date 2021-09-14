@@ -300,12 +300,14 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
         // load addresses for the current chain/community
         if (app.community) {
           await updateActiveAddresses();
+          app.user.activeAccount.updateGhost(vnode.state.userProvidedSignature);
         } else if (app.chain) {
           // TODO: this breaks when the user action creates a new token forum
           const chain = app.user.selectedNode
             ? app.user.selectedNode.chain
             : app.config.nodes.getByChain(app.activeChainId())[0].chain;
           await updateActiveAddresses(chain);
+          app.user.activeAccount.updateGhost(vnode.state.userProvidedSignature);
         } else {
           notifyError('Signed in, but no chain or community found');
         }
@@ -384,9 +386,9 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
                   await webWallet?.enable();
                 }
                 // TODO: this check can have race conditions -- need "initializing"
-                if (!app.chain.apiInitialized) {
-                  await app.chain.initApi();
-                }
+                // if (!app.chain.apiInitialized) {
+                //   await app.chain.initApi();
+                // }
                 vnode.state.initializingWallet = false;
                 m.redraw();
               },
