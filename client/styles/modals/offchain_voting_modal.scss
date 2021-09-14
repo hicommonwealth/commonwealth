@@ -3,6 +3,7 @@
 .OffchainVotingModal {
     .compact-modal-body {
         width: 640px;
+        overflow-y: scroll;
         @include xs-max {
             width: initial;
         }
