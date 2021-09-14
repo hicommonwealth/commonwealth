@@ -125,7 +125,7 @@ const VoteView: m.Component<{
       const totalForChoice = totals.resultsByVoteBalance[idx];
       const voteFrac = totalForChoice / totals.sumOfResultsBalance;
       return m('.results-column', [
-        m('.results-header', `Voted for ${choice}: ${formatNumberLong(totalForChoice)} ${symbol} (${formatPercent(voteFrac, 4)})`), // ${token.id}
+        m('.results-header', `Voted for ${choice}: ${formatNumberLong(totalForChoice)} ${symbol} (${formatPercent(voteFrac, 4)})`),
         m('.results-cell', [
           m('.vote-group-wrap', votesForChoice
             .map((vote) => m(VoteRow, { vote, symbol }))

@@ -138,8 +138,8 @@ export interface SnapshotProposal {
   body: string
   snapshot: string;
   choices: string[];
-  strategies?: string;
   state: string;
+  strategies?: string;
 }
 
 export interface SnapshotProposalVote {
@@ -225,8 +225,7 @@ export async function getResults(space: SnapshotSpace, proposal: SnapshotProposa
       console.timeEnd('getProposal.scores');
       console.log('Scores', scores);
 
-      votes = votes
-        .map((vote: any) => {
+      votes = votes.map((vote: any) => {
           vote.scores = strategies.map(
             (strategy, i) => scores[i][vote.voter] || 0
           );

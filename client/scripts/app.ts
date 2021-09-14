@@ -618,10 +618,10 @@ Promise.all([
       '/snapshot-proposals/:snapshotId': importRoute(
         'views/pages/snapshot_proposals', { scoped: true, deferChain: true }
       ),
-      '/snapshot-proposal/:snapshotId/:identifier': importRoute(
+      '/snapshot-proposals/:snapshotId/:identifier': importRoute(
         'views/pages/view_snapshot_proposal', { scoped: true }
       ),
-      '/new/snapshot-proposal/:snapshotId': importRoute(
+      '/new/snapshot-proposals/:snapshotId': importRoute(
         'views/pages/new_snapshot_proposal', { scoped: true, deferChain: true }
       ),
 
