@@ -53,7 +53,7 @@ class TerraStationWebWalletController implements IWebWallet<string> {
     }
   }
 
-  public async validateWithAccount(account: Account<any>): Promise<void> {
+  public async validateWithAccount(account: Account<any>, chain?: string): Promise<void> {
     this._extension.on('onSign', (payload) => {
       console.log(payload);
     });
@@ -87,7 +87,7 @@ class TerraStationWebWalletController implements IWebWallet<string> {
         signature: result.signature
       }
     };
-    return account.validate(JSON.stringify(signature));
+    return account.validate(JSON.stringify(signature), chain);
   }
 }
 

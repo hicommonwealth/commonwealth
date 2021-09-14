@@ -98,7 +98,9 @@ const LinkAccountItem: m.Component<{
           const signerAccount = await createUserWithAddress(address, undefined, targetCommunity);
           vnode.state.linking = true;
           m.redraw();
-          await webWallet.validateWithAccount(signerAccount);
+          console.log(app.user);
+          console.log(app.activeChainId());
+          await webWallet.validateWithAccount(signerAccount, app.activeChainId());
           vnode.state.linking = false;
           m.redraw();
           // return if user signs for two addresses
@@ -401,9 +403,9 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
                   await webWallet?.enable();
                 }
                 // TODO: this check can have race conditions -- need "initializing"
-                if (!app.chain.apiInitialized) {
-                  await app.chain.initApi();
-                }
+                // if (!app.chain.apiInitialized) {
+                //   await app.chain.initApi();
+                // }
                 vnode.state.initializingWallet = false;
                 m.redraw();
               },

@@ -87,6 +87,7 @@ abstract class Account<C extends Coin> {
   public setValidationToken(token: string) {
     this._validationToken = token;
   }
+
   public async updateGhost(signature?: string) {
     const params : any = {
       address: this.address,
@@ -105,7 +106,7 @@ abstract class Account<C extends Coin> {
     }
   }
 
-  public async validate(signature?: string) {
+  public async validate(signature?: string, chain?: string) {
     if (!this._validationToken) {
       throw new Error('no validation token found');
     }

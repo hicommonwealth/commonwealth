@@ -45,7 +45,7 @@ class PolkadotWebWalletController implements IWebWallet<InjectedAccountWithMeta>
   }
 
   // ACTIONS
-  public async validateWithAccount(account: Account<any>): Promise<void> {
+  public async validateWithAccount(account: Account<any>, chain?: string): Promise<void> {
     const signer = await this.getSigner(account.address);
     const token = account.validationToken;
     const payload: SignerPayloadRaw = {
@@ -54,7 +54,7 @@ class PolkadotWebWalletController implements IWebWallet<InjectedAccountWithMeta>
       type: 'bytes',
     };
     const signature = (await signer.signRaw(payload)).signature;
-    return account.validate(signature);
+    return account.validate(signature, chain);
   }
 
   public async enable() {

@@ -39,13 +39,13 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
   }
   public get api() { return window.keplr; }
 
-  public async validateWithAccount(account: Account<any>): Promise<void> {
+  public async validateWithAccount(account: Account<any>, chain?: string): Promise<void> {
     if (!this._chainId || !window.keplr?.signAmino) throw new Error('Missing or misconfigured web wallet');
 
     // Get the verification token & placeholder TX to send
     const signDoc = validationTokenToSignDoc(this._chainId, account.validationToken);
     const signature = await window.keplr.signAmino(this._chainId, account.address, signDoc);
-    return account.validate(JSON.stringify(signature));
+    return account.validate(JSON.stringify(signature), chain);
   }
 
   // ACTIONS
