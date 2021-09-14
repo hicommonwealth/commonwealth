@@ -89,12 +89,11 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
       //   of creating Subscriptions, as theoretically ChainEventTypes are what describe the available
       //   set of subscriptions... but this entire set of database models needs to be reworked, so this
       //   is an acceptable hack for now.
-      if (!chainEventType && chain.type === 'token' && p_id === 'transfer') {
-        // TODO: add approval in addition to transfer?
+      if (!chainEventType && chain.type === 'token' && (p_id === 'transfer' || p_id === 'approval')) {
         await models.ChainEventType.create({
           id: req.body.object_id,
           chain: req.body.chain_id,
-          event_name: 'transfer'
+          event_name: p_id
         });
       } else {
         return next(new Error(Errors.InvalidChainEventId));
