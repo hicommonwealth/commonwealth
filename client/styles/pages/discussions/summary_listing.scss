@@ -1,0 +1,57 @@
+.SummaryListing {
+    display: flex;
+    flex-direction: column;
+    .topic {
+        flex: 4;
+    }
+    .thread-count {
+        flex: 1;
+    }
+    .recent-threads {
+        flex: 4;
+    }
+    .row-header {
+        color: #666666;
+        font-size: 18px;
+        display: flex;
+    }
+    .row-wrap {
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+.SummaryRow {
+    display: flex;
+    padding: 20px 0;
+    border-bottom: 1px solid #333333;
+    max-width: 100%;
+    &:last-child {
+        border-bottom: none;
+    }
+    .recent-threads {
+        display: flex;
+        flex-direction: column;
+        .thread-summary {
+            margin-bottom: 10px;
+            a {
+                color: #4723AD;
+                &:hover {
+                    text-decoration: none;
+                }
+            }
+            span {
+                color: #666666;
+                margin-left: 10px;
+            }
+        }
+    }
+    .thread-count {
+        font-weight: 500;
+    }
+    .topic {
+        h3 {
+            font-size: 24px;
+        }
+    }
+}
