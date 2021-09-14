@@ -14,7 +14,7 @@ import { idToProposal } from 'identifiers';
 import { capitalize } from 'lodash';
 import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
-import { SnapshotSpace, getScores, getSpaceBlockNumber } from 'helpers/snapshot_utils';
+import { SnapshotSpace, getScore, getSpaceBlockNumber } from 'helpers/snapshot_utils';
 
 interface IThreadForm {
   name: string;
@@ -181,7 +181,7 @@ const NewProposalForm: m.Component<{snapshotId: string}, {
       }
       const space = app.snapshot.space;
 
-      getScores(space, app.user.activeAccount.address).then((response) => {
+      getScore(space, app.user.activeAccount.address).then((response) => {
         const scores = response
           .map((score) => Object.values(score).reduce((a, b) => (a as number) + (b as number), 0))
           .reduce((a, b) => (a as number) + (b as number), 0);

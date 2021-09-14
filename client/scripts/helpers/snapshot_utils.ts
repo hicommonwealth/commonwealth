@@ -1,4 +1,5 @@
 import gql from 'graphql-tag';
+import moment from 'moment';
 
 let apolloClient = null;
 async function getApolloClient() {
@@ -137,6 +138,8 @@ export interface SnapshotProposal {
   body: string
   snapshot: string;
   choices: string[];
+  strategies?: string;
+  state: string;
 }
 
 export interface SnapshotProposalVote {
@@ -144,6 +147,7 @@ export interface SnapshotProposalVote {
   voter: string;
   created: number;
   choice: number;
+  power: number;
 }
 
 export async function getSpace(space: string): Promise<SnapshotSpace> {
@@ -188,7 +192,7 @@ export async function getSpaceBlockNumber(network: string): Promise<number> {
   return Snapshot.utils.getBlockNumber(Snapshot.utils.getProvider(network));
 }
 
-export async function getScores(space: SnapshotSpace, address: string) {
+export async function getScore(space: SnapshotSpace, address: string) {
   const { default: Snapshot } = await import('@snapshot-labs/snapshot.js');
   return Snapshot.utils.getScores(
     space.id,
@@ -197,6 +201,54 @@ export async function getScores(space: SnapshotSpace, address: string) {
     Snapshot.utils.getProvider(space.network),
     [address]
   );
+}
+
+export async function getResults(space: SnapshotSpace, proposal: SnapshotProposal) {
+  const { default: Snapshot } = await import('@snapshot-labs/snapshot.js');
+  try {
+    let votes = await getVotes(proposal.id);
+
+    // const voters = votes.map(vote => vote.voter);
+    const provider = Snapshot.utils.getProvider(space.network);
+    const strategies = space.strategies;
+    
+    if (proposal.state !== 'pending') {
+      console.time('getProposal.scores');
+      const scores = await Snapshot.utils.getScores(
+        space.id,
+        strategies,
+        space.network,
+        provider,
+        (votes).map((vote) => vote.voter),
+        parseInt(proposal.snapshot)
+      );
+      console.timeEnd('getProposal.scores');
+      console.log('Scores', scores);
+
+      votes = votes
+        .map((vote: any) => {
+          vote.scores = strategies.map(
+            (strategy, i) => scores[i][vote.voter] || 0
+          );
+          vote.power = vote.scores.reduce((a, b: any) => a + b, 0);
+          return vote;
+        })
+        .sort((a, b) => b.power - a.power)
+        .filter(vote => vote.power > 0);
+    }
+
+    /* Get results */
+    const results = {
+      resultsByVoteBalance: resultsByVoteBalance(proposal, votes),
+      // resultsByStrategyScore: resultsByStrategyScore(proposal, votes),
+      sumOfResultsBalance: sumOfResultsBalance(votes),
+    };
+
+    return { votes, results };
+  } catch (e) {
+    console.log(e);
+    return e;
+  }
 }
 
 export async function getPower(space: SnapshotSpace, address: string, snapshot: string) {
@@ -217,3 +269,29 @@ export async function getPower(space: SnapshotSpace, address: string, snapshot: 
     totalScore: summedScores.reduce((a, b) => a + b, 0)
   };
 }
+
+/* Single Choice Voting */
+
+// Returns the total amount of the results
+export function sumOfResultsBalance(votes: SnapshotProposalVote[]) {
+  return votes.reduce((a, b: any) => a + b.power, 0);
+}
+
+  //  Returns an array with the results for each choice
+export function resultsByVoteBalance(proposal: SnapshotProposal, votes: SnapshotProposalVote[]) {
+  return proposal.choices.map((choice, i) =>
+    votes
+      .filter((vote: any) => vote.choice === i + 1)
+      .reduce((a, b: any) => a + b.power, 0)
+  );
+}
+
+// export function resultsByStrategyScore(proposal: SnapshotProposal, votes: SnapshotProposalVote[]) {
+//   return proposal.choices.map((choice, i) =>
+//     proposal.strategies.map((strategy, sI) =>
+//       this.votes
+//         .filter((vote: any) => vote.choice === i + 1)
+//         .reduce((a, b: any) => a + b.scores[sI], 0)
+//     )
+//   );
+// }

@@ -537,14 +537,16 @@ $discussion-title-font-size: 1.45rem;
             flex: 6;
             display: flex;
             flex-direction: row;
-            align-items: center;
+            align-items: left;
             position: relative;
         }
     
         .row-right {
             display: flex;
             flex: 4;
-            align-items: center;
+            line-height: 1.1;
+            align-items: right;
+            flex-direction: row;
             padding-left: 10px;
         }
     }
