@@ -448,19 +448,22 @@ $discussion-title-font-size: 1.45rem;
         }
         .offchain-poll-voters {
             margin-top: 10px;
-            .offchain-poll-voter {
-                display: flex;
-                .User {
-                    display: inline;
-                }
-                .offchain-poll-voter-user {
-                    flex: 1;
-                    padding-right: 5px;
-                }
-                .offchain-poll-voter-choice {
-                    display: inline;
-                    font-weight: 600;
-                    margin-right: 5px;
+            .vote-synopsis {
+                margin-top: 10px;
+                .option-with-votes {
+                    margin: 10px 0;
+                    .poll-bar {
+                        height: 5px;
+                        border-radius: 5px;
+                        background-color: $primary-bg-color;
+                    }
+                    .option-results-label {
+                        display: flex;
+                    }
+                    a {
+                        margin-top: 10px;
+                        display: inline-block;
+                    }
                 }
             }
         }
