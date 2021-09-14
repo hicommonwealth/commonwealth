@@ -111,14 +111,20 @@ abstract class Account<C extends Coin> {
       };
       const result = await $.post(`${this.app.serverUrl()}/verifyAddress`, params);
       if (result.status === 'Success') {
-        // update address for discount user
-        const { success, ghostAddressId } = await $.post(`${this.app.serverUrl()}/updateAddress`, params);
-        if (success && ghostAddressId) {
-          // remove ghost address from addresses
-          app.user.setAddresses(app.user.addresses.filter(({ ghostAddress }) => {
-            return !ghostAddress
-          }));
-          app.user.setActiveAccounts([]);
+        // update ghost address for discourse users
+        const hasGhostAddress = app.user.addresses.some(({ address, ghostAddress, chain }) => (
+            ghostAddress && this.chain.id === chain &&
+            app.user.activeAccounts.some((account) => account.address === address)
+        ))
+        if (hasGhostAddress) {
+          const { success, ghostAddressId } = await $.post(`${this.app.serverUrl()}/updateAddress`, params);
+          if (success && ghostAddressId) {
+            // remove ghost address from addresses
+            app.user.setAddresses(app.user.addresses.filter(({ ghostAddress }) => {
+              return !ghostAddress
+            }));
+            app.user.setActiveAccounts([]);
+          }
         }
       }
     } else {
