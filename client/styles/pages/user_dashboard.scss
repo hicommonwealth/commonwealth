@@ -1,0 +1,53 @@
+@import 'client/styles/shared';
+
+.UserDashboardPage {
+
+    .sublayout-main-col {
+        max-width: 100%;
+    }
+    .title {
+        font-size: 32px;
+        line-height: 38.4px;
+        font-weight: 500;
+        margin-bottom: 14px;
+        color: black;
+    }
+
+    .cui-tabs {
+        .cui-tabs-item {
+            font-size: 24px;
+            font-weight: 500;
+            line-height: 28.8px;
+            color: #ddd;
+
+            &.cui-active {
+                color: black;
+            }
+        }
+    }
+    .NotificationsList {
+        margin-top: 20px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+
+    .communites-list-col {
+        margin-left: 20px;
+    }
+
+    .home-card {
+        padding: 20px 16px;
+        margin-bottom: 20px;
+        .card-top {
+            display: flex;
+            align-items: center;
+
+            .ChainIcon {
+                margin-right: 15px;
+            }
+        }
+        .card-bottom {
+            margin-top: 15px;
+        }
+    }
+}

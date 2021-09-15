@@ -672,6 +672,7 @@ Promise.all([
       // Scoped routes
       //
       '/':                         importRoute('views/pages/landing', { scoped: false, hideSidebar: false }),
+      '/dashboard':                importRoute('views/pages/dashboard', { scoped: true, hideSidebar: true }),
       '/search':                   importRoute('views/pages/search', { scoped: false, deferChain: true }),
       '/whyCommonwealth':          importRoute('views/pages/commonwealth', { scoped: false, hideSidebar: true }),
       // Notifications
