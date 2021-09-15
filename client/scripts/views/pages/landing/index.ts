@@ -129,9 +129,6 @@ const LandingPage: m.Component<{}, IState> = {
             scrollHeader: true,
             navs: [
               { text: 'Why Commonwealth?', redirectTo: '/whyCommonwealth' },
-              // { text: 'Use Cases', redirectTo: '/whyCommonwealth' },
-              // { text: 'Crowdfunding', redirectTo: '/whyCommonwealth' },
-              // { text: 'Developers' },
             ],
           })
         ),
@@ -250,14 +247,11 @@ const LandingPage: m.Component<{}, IState> = {
         m(JoinCommonWealthSection),
         m(FooterLandingPage, {
           list: [
-            // { text:  'Use Cases' },
-            // { text:  'Crowdfunding' },
-            // { text:  'Developers' },
             { text: 'Blog', externalLink: 'https://blog.commonwealth.im' },
             { text: 'Jobs', externalLink: 'https://angel.co/company/commonwealth-labs/jobs' },
             { text: 'Terms', redirectTo:  '/terms' },
             { text: 'Privacy', redirectTo: '/privacy' },
-            { text: 'Docs', redirectTo: 'https://commonwealth.im'},
+            { text: 'Docs', redirectTo: 'https://commonwealth.im' },
             { text: 'Why Commonwealth?', redirectTo: '/whyCommonwealth' },
             { text: 'Discord', externalLink: 'https://discord.gg/frnQxxZG5S' },
             { text: 'Telegram', externalLink: 'https://t.me/HiCommonwealth' },
@@ -289,13 +283,11 @@ const LandingPage: m.Component<{}, IState> = {
         }),
       ]);
     } else {
-      return m(
-        Sublayout,
-        {
-          class: 'Homepage',
-        },
-        [m(CommunityCards)]
-      );
+      return m(Sublayout, {
+        class: 'Homepage',
+      }, [
+        m(CommunityCards)
+      ]);
     }
   },
 };
