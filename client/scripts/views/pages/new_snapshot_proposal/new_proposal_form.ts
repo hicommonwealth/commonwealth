@@ -2,7 +2,7 @@ import 'pages/new_proposal_page.scss';
 
 import $ from 'jquery';
 import m from 'mithril';
-import { Input, Form, FormLabel, FormGroup, Button, Callout, Spinner, RadioGroup } from 'construct-ui';
+import { Input, Form, FormLabel, FormGroup, Button, Callout, Spinner, RadioGroup, Icon, Icons } from 'construct-ui';
 
 import moment from 'moment';
 import app from 'state';
@@ -14,7 +14,7 @@ import { idToProposal } from 'identifiers';
 import { capitalize } from 'lodash';
 import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
-import { SnapshotSpace, getScores, getSpaceBlockNumber } from 'helpers/snapshot_utils';
+import { SnapshotSpace, getScore, getSpaceBlockNumber } from 'helpers/snapshot_utils';
 
 interface IThreadForm {
   name: string;
@@ -117,7 +117,7 @@ const newThread = async (
     } else if (result.status === 'Success') {
       await app.user.notifications.refresh();
       await app.snapshot.refreshProposals();
-      m.route.set(`/${app.activeId()}/snapshot-proposal/${snapshotId}/${result.message.ipfsHash}`);
+      m.route.set(`/${app.activeId()}/snapshot/${snapshotId}/${result.message.ipfsHash}`);
     }
   } catch (err) {
     notifyError(err.message);
@@ -181,7 +181,7 @@ const NewProposalForm: m.Component<{snapshotId: string}, {
       }
       const space = app.snapshot.space;
 
-      getScores(space, app.user.activeAccount.address).then((response) => {
+      getScore(space, app.user.activeAccount.address).then((response) => {
         const scores = response
           .map((score) => Object.values(score).reduce((a, b) => (a as number) + (b as number), 0))
           .reduce((a, b) => (a as number) + (b as number), 0);
@@ -271,31 +271,48 @@ const NewProposalForm: m.Component<{snapshotId: string}, {
                 defaultValue: vnode.state.form.name,
               }),
             ]),
-            m(FormGroup, [
-              m(FormGroup, [
-                m(FormLabel, 'Choice 1'),
+            m(FormGroup, vnode.state.form.choices.map((choice, idx) => {
+              const placeholder = idx === 0
+                ? 'Yes'
+                : idx === 1
+                  ? 'No'
+                  : `Option ${idx + 1}`;
+              return m(FormGroup, [
+                m(FormLabel, `Choice ${idx + 1}`),
                 m(Input, {
                   name: 'targets',
-                  placeholder: 'Yes',
+                  placeholder,
                   oninput: (e) => {
                     const result = (e.target as any).value;
-                    vnode.state.form.choices[0] = result;
+                    vnode.state.form.choices[idx] = result;
                     m.redraw();
                   },
+                  contentRight: (idx > 1 && idx === vnode.state.form.choices.length - 1)
+                    && m(Icon, {
+                      name: Icons.TRASH,
+                      size: 'xl',
+                      style: 'cursor: pointer;',
+                      onclick: () => {
+                        vnode.state.form.choices.pop();
+                        m.redraw();
+                      }
+                    })
                 }),
-              ]),
-              m(FormGroup, [
-                m(FormLabel, 'Choice 2'),
-                m(Input, {
-                  name: 'targets',
-                  placeholder: 'No',
-                  oninput: (e) => {
-                    const result = (e.target as any).value;
-                    vnode.state.form.choices[1] = result;
-                    m.redraw();
-                  },
-                }),
-              ]),
+              ]);
+            })),
+            m('.add-vote-choice', {
+              style: 'cursor: pointer;',
+              onclick: () => {
+                const choiceLength = vnode.state.form.choices.length;
+                vnode.state.form.choices.push(`Option ${choiceLength + 1}`);
+                m.redraw();
+              }
+            }, [
+              m('span', 'Add voting choice'),
+              m(Icon, {
+                name: Icons.PLUS,
+                size: 'xl',
+              }),
             ]),
             m(FormGroup, [
               m(FormLabel, { for: 'period' }, 'Date Range:'),

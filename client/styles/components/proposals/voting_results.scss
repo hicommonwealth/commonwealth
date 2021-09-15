@@ -6,7 +6,24 @@
     justify-content: space-between;
     margin-top: 25px;
     flex-wrap: wrap;
-    border-radius: 3px;
+
+    .VoteRow {
+        display: flex;
+        &:hover {
+            background: #f9fafd;
+        }
+        .row-left {
+            line-height: 1.1;
+            flex: 1;
+            text-align: left;
+        }
+    
+        .row-right {
+            line-height: 1.1;
+            flex: 1;
+            text-align: right;
+        }
+    }
 
     .results-column {
         display: flex;
@@ -14,7 +31,7 @@
         background-color: $background-color-light;
         padding: 18px 0 12px;
         flex: 1;
-        width: 48%;
+        min-width: 48%;
         max-width: 48%;
         border-radius: 10px;
         .results-cell, .results-header,
@@ -23,7 +40,7 @@
         }
         .results-header {
             font-weight: 500;
-            margin-bottom: 28px;
+            margin-bottom: 14px;
         }
         .results-subheader {
             display: flex;

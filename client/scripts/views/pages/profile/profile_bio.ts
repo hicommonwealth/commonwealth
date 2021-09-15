@@ -90,7 +90,7 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
         }
       },
       { passive:true });
-
+    console.log('account', account.ghost_address)
     const joinCommunity = async () => {
       if (!app.activeChainId() || onOwnProfile) return;
       vnode.state.loading = true;
@@ -127,12 +127,16 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
             m('.address-block-right', [
               m('.address', `${account.address.slice(0, 6)}...${account.address.slice(account.address.length - 6)}`),
               m('img', {
-                src: '/static/img/copy_default.svg',
+                src: !account.ghost_address ? '/static/img/copy_default.svg' : '/static/img/ghost.svg',
                 alt: '',
-                class: 'cursor-pointer',
+                width: '20px',
+                style: 'margin-bottom:5px',
+                class: !account.ghost_address ? 'cursor-pointer': '',
                 onclick: (e) => {
-                  window.navigator.clipboard.writeText(account.address)
-                    .then(() => notifySuccess('Copied address to clipboard'));
+                  if (!account.ghost_address) {
+                    window.navigator.clipboard.writeText(account.address)
+                        .then(() => notifySuccess('Copied address to clipboard'));
+                  }
                 }
               }),
             ]),
@@ -191,15 +195,28 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
       m(`.address-block-right${vnode.state.showProfileRight ? '.hide-address' : '.show-address'}`, [
         m('.address', `${account.address.slice(0, 6)}...${account.address.slice(account.address.length - 6)}`),
         m('img', {
-          src: '/static/img/copy_default.svg',
+          src: !account.ghost_address ? '/static/img/copy_default.svg': '/static/img/ghost.svg',
           alt: '',
-          class: 'cursor-pointer',
+          width: '20px',
+          style: 'margin-bottom:5px',
+          class: !account.ghost_address ? 'cursor-pointer': '',
           onclick: (e) => {
-            window.navigator.clipboard.writeText(account.address)
-              .then(() => notifySuccess('Copied address to clipboard'));
+            if (!account.ghost_address) {
+              window.navigator.clipboard.writeText(account.address)
+                  .then(() => notifySuccess('Copied address to clipboard'));
+            }
           }
         }),
       ]),
+      account.ghost_address ? m('div', {
+        style: 'font-style: italic; font-size: 12px;'
+
+      }, `
+      this user was imported from discourse and has a ghost address, if this is your username, login with
+      the same email,
+      and link an address to claim your username, please note this address will be linked to previous
+      post history! Choose wisely!
+      `): [],
       m('.header', 'Bio'),
       account.profile && account.profile.bio
         ? m('p', [

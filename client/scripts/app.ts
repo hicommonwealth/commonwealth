@@ -615,13 +615,13 @@ Promise.all([
       '/settings':               importRoute('views/pages/settings', { scoped: true }),
       '/analytics':              importRoute('views/pages/stats', { scoped: true, deferChain: true }),
 
-      '/snapshot-proposals/:snapshotId': importRoute(
+      '/snapshot/:snapshotId': importRoute(
         'views/pages/snapshot_proposals', { scoped: true, deferChain: true }
       ),
-      '/snapshot-proposal/:snapshotId/:identifier': importRoute(
+      '/snapshot/:snapshotId/:identifier': importRoute(
         'views/pages/view_snapshot_proposal', { scoped: true }
       ),
-      '/new/snapshot-proposal/:snapshotId': importRoute(
+      '/new/snapshot/:snapshotId': importRoute(
         'views/pages/new_snapshot_proposal', { scoped: true, deferChain: true }
       ),
 
@@ -658,14 +658,20 @@ Promise.all([
       '/:scope/admin':              redirectRoute(() => '/admin'),
       '/:scope/spec_settings':      redirectRoute(() => '/spec_settings'),
       '/:scope/analytics':          redirectRoute(() => '/analytics'),
-      '/:scope/snapshot-proposals/:snapshotId':redirectRoute(
-        (attrs) => `/snapshot-proposals/${attrs.snapshotId}`
+      '/:scope/snapshot-proposals/:snapshotId': redirectRoute(
+        (attrs) => `/snapshot/${attrs.snapshotId}`
       ),
       '/:scope/snapshot-proposal/:snapshotId/:identifier': redirectRoute(
-        (attrs) => `/snapshot-proposal/${attrs.snapshotId}/${attrs.identifier}`
+        (attrs) => `/snapshot/${attrs.snapshotId}/${attrs.identifier}`
       ),
-      '/:scope/new/snapshot-proposal/:snapshotId':redirectRoute(
-        (attrs) => `/new/snapshot-proposal/${attrs.snapshotId}`
+      '/:scope/new/snapshot-proposal/:snapshotId': redirectRoute(
+        (attrs) => `/new/snapshot/${attrs.snapshotId}`
+      ),
+      '/:scope/snapshot-proposals/:snapshotId/:identifier': redirectRoute(
+        (attrs) => `/snapshot/${attrs.snapshotId}/${attrs.identifier}`
+      ),
+      '/:scope/new/snapshot-proposals/:snapshotId': redirectRoute(
+        (attrs) => `/new/snapshot/${attrs.snapshotId}`
       ),
     } : {
       //
@@ -725,14 +731,29 @@ Promise.all([
       '/:scope/spec_settings':     importRoute('views/pages/spec_settings', { scoped: true, deferChain: true }),
       '/:scope/analytics':         importRoute('views/pages/stats', { scoped: true, deferChain: true }),
 
-      '/:scope/snapshot-proposals/:snapshotId': importRoute(
+      '/:scope/snapshot/:snapshotId': importRoute(
         'views/pages/snapshot_proposals', { scoped: true, deferChain: true }
       ),
-      '/:scope/snapshot-proposal/:snapshotId/:identifier': importRoute(
+      '/:scope/snapshot/:snapshotId/:identifier': importRoute(
         'views/pages/view_snapshot_proposal', { scoped: true }
       ),
-      '/:scope/new/snapshot-proposal/:snapshotId': importRoute(
+      '/:scope/new/snapshot/:snapshotId': importRoute(
         'views/pages/new_snapshot_proposal', { scoped: true, deferChain: true }
+      ),
+      '/:scope/snapshot-proposals/:snapshotId': redirectRoute(
+        (attrs) => `/${attrs.scope}/snapshot/${attrs.snapshotId}`
+      ),
+      '/:scope/snapshot-proposal/:snapshotId/:identifier': redirectRoute(
+        (attrs) => `/${attrs.scope}/snapshot/${attrs.snapshotId}/${attrs.identifier}`
+      ),
+      '/:scope/new/snapshot-proposal/:snapshotId': redirectRoute(
+        (attrs) => `/${attrs.scope}/new/snapshot/${attrs.snapshotId}`
+      ),
+      '/:scope/snapshot-proposals/:snapshotId/:identifier': redirectRoute(
+        (attrs) => `/${attrs.scope}/snapshot/${attrs.snapshotId}/${attrs.identifier}`
+      ),
+      '/:scope/new/snapshot-proposals/:snapshotId': redirectRoute(
+        (attrs) => `/${attrs.scope}/new/snapshot/${attrs.snapshotId}`
       ),
     }),
   });
@@ -824,31 +845,31 @@ Promise.all([
       handleUpdateEmailConfirmation();
 
       // subscribe to notifications
-      const wsUrl = document.location.origin
-        .replace('http://', 'ws://')
-        .replace('https://', 'wss://');
-      app.socket = new WebsocketController(wsUrl, jwt, null);
-      if (app.loginState === LoginState.LoggedIn) {
-        app.socket.addListener(
-          WebsocketMessageType.Notification,
-          (payload: IWebsocketsPayload<any>) => {
-            if (payload.data && payload.data.subscription_id) {
-              const subscription = app.user.notifications.subscriptions.find(
-                (sub) => sub.id === payload.data.subscription_id
-              );
-              // note that payload.data should have the correct JSON form
-              if (subscription) {
-                console.log('adding new notification from websocket:', payload.data);
-                const notification = Notification.fromJSON(payload.data, subscription);
-                app.user.notifications.update(notification);
-                m.redraw();
-              }
-            } else {
-              console.error('got invalid notification payload:', payload);
-            }
-          },
-        );
-      }
+      // const wsUrl = document.location.origin
+      //   .replace('http://', 'ws://')
+      //   .replace('https://', 'wss://');
+      // app.socket = new WebsocketController(wsUrl, jwt, null);
+      // if (app.loginState === LoginState.LoggedIn) {
+      //   app.socket.addListener(
+      //     WebsocketMessageType.Notification,
+      //     (payload: IWebsocketsPayload<any>) => {
+      //       if (payload.data && payload.data.subscription_id) {
+      //         const subscription = app.user.notifications.subscriptions.find(
+      //           (sub) => sub.id === payload.data.subscription_id
+      //         );
+      //         // note that payload.data should have the correct JSON form
+      //         if (subscription) {
+      //           console.log('adding new notification from websocket:', payload.data);
+      //           const notification = Notification.fromJSON(payload.data, subscription);
+      //           app.user.notifications.update(notification);
+      //           m.redraw();
+      //         }
+      //       } else {
+      //         console.error('got invalid notification payload:', payload);
+      //       }
+      //     },
+      //   );
+      // }
     }
     m.redraw();
   }).catch((err) => {

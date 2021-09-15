@@ -46,6 +46,7 @@ export interface AddressAttributes {
   is_councillor?: boolean;
   is_validator?: boolean;
   is_magic?: boolean;
+  ghost_address?: boolean;
 
   // associations
   Chain?: ChainAttributes;
@@ -121,6 +122,7 @@ export default (
     is_councillor:              { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     is_validator:               { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     is_magic:                   { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+    ghost_address:              { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
   }, {
     timestamps: true,
     createdAt: 'created_at',
