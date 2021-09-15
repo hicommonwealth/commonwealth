@@ -43,7 +43,9 @@ export default class CompoundChain extends EthereumChain {
     const num = await this.compoundApi.Token.numCheckpoints(address);
     if (num === 0) return BigNumber.from(0);
     const { fromBlock, votes } = await this.compoundApi.Token.checkpoints(address, num - 1);
-    return votes;
+    // Todo move this into shared
+    const votesByDecimals = votes.div(BigNumber.from(10).pow(BigNumber.from(this.compoundApi.decimals)));
+    return votesByDecimals;
   }
 
   public async setDelegate(address: string, amount: number) {

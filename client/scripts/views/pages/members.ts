@@ -13,7 +13,7 @@ import User from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
 import { CommunityOptionsPopover } from './discussions';
 import Compound from 'controllers/chain/ethereum/compound/adapter';
-import { sleep } from 'helpers';
+import { sleep, formatNumberLong, pluralize } from 'helpers';
 import { BigNumber } from 'ethers';
 import { notifyError } from 'controllers/app/notifications';
 
@@ -104,7 +104,8 @@ pageToLoad: number, totalMembers: number, isCompound: boolean, voteEvents }> = {
         vnode.state.membersRequested = true;
         vnode.state.membersLoaded = [];
         vnode.state.pageToLoad = 0;
-        vnode.state.isCompound = app.chain instanceof Compound;
+        vnode.state.isCompound = (app.chain instanceof Compound) ? true: false;
+        console.log(vnode.state.isCompound);
       }
     }
     // get members once
@@ -119,6 +120,16 @@ pageToLoad: number, totalMembers: number, isCompound: boolean, voteEvents }> = {
             o.chain = o.chain_id;
             return o;
           }));
+          
+          app.recentActivity.getMostActiveUsers().map((user) => {
+            newMembers.map((u) => {
+              const { chain, address } = user.info;
+              if (u.address === user.info.address) {
+                u.count = user.count
+              }
+              return { chain, address, count: user.count };
+            })
+          });
 
           vnode.state.membersLoaded = vnode.state.membersLoaded.concat(newMembers);
           vnode.state.totalMembers = total;
@@ -152,11 +163,13 @@ pageToLoad: number, totalMembers: number, isCompound: boolean, voteEvents }> = {
       m(Table, [
         m('tr', [
           m('th', 'Member'),
+          m('th.align-right', 'Posts'),
           vnode.state.isCompound ? m('th.align-right', 'Voting Power') : null,
           vnode.state.isCompound ? m('th.align-right', 'Delegate') : null,
         ]),
         vnode.state.membersLoaded.map((info) => {
           const profile = app.profiles.getProfile(info.chain, info.address);
+
           return m('tr', [
             m('td.members-item-info', [
               m('a', {
@@ -182,9 +195,12 @@ pageToLoad: number, totalMembers: number, isCompound: boolean, voteEvents }> = {
                 })
                 : null),
             ]),
+            m('td.align-right', [
+              (info.count > 0) ? `${pluralize(info.count, 'post')} this month` : null,
+            ]),
             vnode.state.isCompound
               ? m('td.align-right',
-                [ info.votes !== undefined ? info.votes.toString() : m(Spinner, { active: true, size: 'xs' }) ]) : null,
+                [ info.votes !== undefined ? `${info.votes.toNumber().toFixed(2)} ${app.chain.meta.chain.symbol}` : m(Spinner, { active: true, size: 'xs' }) ]) : null,
             vnode.state.isCompound ? m('td.align-right',
               m(Button, {
                 label: 'Delegate',
