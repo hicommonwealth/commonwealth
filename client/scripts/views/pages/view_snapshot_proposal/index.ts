@@ -88,7 +88,7 @@ const VoteRow: m.Component<{
 }> = {
   view: (vnode) => {
     const { vote, symbol } = vnode.attrs;
-    return m('.ViewRow', [
+    return m('.VoteRow', [
       m('.row-left', [
         m(User, {
           // TODO: activeID becomes chain_base, fix
@@ -96,13 +96,13 @@ const VoteRow: m.Component<{
           linkify: true,
           popover: true
         }),
-        ` ${formatNumberLong(vote.power)} ${symbol}`
       ]),
+      m('.row-right', `${formatNumberLong(vote.power)} ${symbol}`)
     ]);
   }
 };
 
-const VoteView: m.Component<{
+const VotingResults: m.Component<{
   votes: SnapshotProposalVote[],
   choices: string[],
   totals: any,
@@ -276,7 +276,7 @@ const ViewProposalPage: m.Component<{
       m('.PinnedDivider', m('hr')),
       vnode.state.totals && vnode.state.votes
       && vnode.state.proposal
-      && m(VoteView, {
+      && m(VotingResults, {
         choices: vnode.state.proposal.choices,
         votes: vnode.state.votes,
         totals: vnode.state.totals,
