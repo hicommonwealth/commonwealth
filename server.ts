@@ -266,7 +266,7 @@ async function main() {
 
     // store wss into request obj
     app.use((req: express.Request, res, next) => {
-      log.debug(`${req.path}: store wss into request obj`);
+      log.info(`${req.path}: store wss into request obj`);
       req.wss = wss;
       next();
     });

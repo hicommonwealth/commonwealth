@@ -146,20 +146,20 @@ function setupRouter(
   const log = factory.getLogger(formatFilename(__filename));
 
   router.use((req, res, next) => {
-    log.debug(`requested path : ${req.path}`);
+    log.info(`requested path : ${req.path}`);
     getStatsDInstance().increment(`cw.path.${req.path.slice(1)}.called`);
     const start = Date.now();
     res.on('finish', () => {
       const latency = Date.now() - start;
       getStatsDInstance().histogram(`cw.path.${req.path.slice(1)}.latency`, latency);
-      log.debug(`requested path completed: ${req.path}`);
+      log.info(`requested path completed: ${req.path}`);
     });
     next();
   });
 
   router.get('/logs', (req, res) => {
     const { message } = req.query;
-    log.debug(`logs: ${message}`);
+    log.info(`logs: ${message}`);
     res.json(message)
   })
 
