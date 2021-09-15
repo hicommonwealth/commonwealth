@@ -38,6 +38,7 @@ export interface ChainAttributes {
   terms?: string;
   snapshot?: string;
   bech32_prefix?: string;
+  chain_id?: number;
 
   // associations
   ChainNodes?: ChainNodeAttributes[] | ChainNodeAttributes['id'][];
@@ -93,6 +94,7 @@ export default (
     snapshot: { type: dataTypes.STRING, allowNull: true },
     terms: { type: dataTypes.STRING, allowNull: true },
     bech32_prefix: { type: dataTypes.STRING, allowNull: true },
+    chain_id: { type: dataTypes.NUMBER, allowNull: true },
   }, {
     tableName: 'Chains',
     timestamps: false,
