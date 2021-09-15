@@ -98,8 +98,8 @@ const VoteRow: m.Component<{
           linkify: true,
           popover: true
         }),
+        ` ${formatNumberLong(vote.power)} ${symbol}`
       ]),
-      m('.row-right', `${formatNumberLong(vote.power)} ${symbol}`),
     ]);
   }
 };
