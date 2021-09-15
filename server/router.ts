@@ -144,14 +144,22 @@ function setupRouter(
   const router = express.Router();
 
   router.use((req, res, next) => {
+    console.log('requested path', req.path)
     getStatsDInstance().increment(`cw.path.${req.path.slice(1)}.called`);
     const start = Date.now();
     res.on('finish', () => {
       const latency = Date.now() - start;
       getStatsDInstance().histogram(`cw.path.${req.path.slice(1)}.latency`, latency);
+      console.log('requested path completed', req.path);
     });
     next();
   });
+
+  router.get('/logs', (req, res) => {
+    const { message } = req.query;
+    console.log('logs: ', message)
+    res.json(message)
+  })
 
   router.post('/updateAddress', passport.authenticate('jwt', { session: false }), updateAddress.bind(this, models));
   router.get('/domain', domain.bind(this, models));
