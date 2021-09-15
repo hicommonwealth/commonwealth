@@ -48,6 +48,7 @@ export interface AddressAttributes {
   is_magic?: boolean;
   twitter_verified?: boolean;
   twitter_verification_msg?: string;
+  ghost_address?: boolean;
 
   // associations
   Chain?: ChainAttributes;
@@ -125,6 +126,7 @@ export default (
     is_magic:                   { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     twitter_verified:           { type: dataTypes.BOOLEAN, allowNull: true },
     twitter_verification_msg:   { type: dataTypes.STRING, allowNull: true },
+    ghost_address:              { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
   }, {
     timestamps: true,
     createdAt: 'created_at',

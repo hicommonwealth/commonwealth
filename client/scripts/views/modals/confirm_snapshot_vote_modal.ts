@@ -112,7 +112,7 @@ const ConfirmSnapshotVoteModal: m.Component<{
                   notifyError(errorMessage);
                 } else if (result.status === 'Success') {
                   $(e.target).trigger('modalexit');
-                  m.route.set(`/${app.activeId()}/snapshot-proposals/${space.id}`);
+                  m.route.set(`/${app.activeId()}/snapshot/${space.id}`);
                 }
               } catch (err) {
                 const errorMessage = err.message;
