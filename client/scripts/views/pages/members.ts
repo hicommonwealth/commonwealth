@@ -13,7 +13,7 @@ import User from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
 import { CommunityOptionsPopover } from './discussions';
 import Compound from 'controllers/chain/ethereum/compound/adapter';
-import { sleep, formatNumberLong, pluralize } from 'helpers';
+import { pluralize } from 'helpers';
 import { BigNumber } from 'ethers';
 import { notifyError } from 'controllers/app/notifications';
 
@@ -26,16 +26,16 @@ interface MemberInfo {
 
 const MEMBERS_PER_PAGE = 20;
 
-const DelegateModal: m.Component<{ address: string, name: string }, { delegateAmount: number }> = {
+const DelegateModal: m.Component<{ address: string, name: string, symbol: string }, { delegateAmount: number }> = {
   view: (vnode) => {
     return m('.DelegateModal', [
       m('.compact-modal-title', [
         m('h3', `Delegate to ${vnode.attrs.name ? vnode.attrs.name : 'Anonymous'}`),
       ]),
       m('.compact-modal-body', [
-        m('div', 'Votes to delegate'),
+        m('div', `Amount ${vnode.attrs.symbol} to delegate`),
         m(Input, {
-          title: 'Delegate amount',
+          title: 'Add amount',
           oninput: (e) => {
             const num = (e.target as any).value;
             if (!Number.isNaN(parseInt(num, 10))) {
@@ -90,6 +90,7 @@ pageToLoad: number, totalMembers: number, isCompound: boolean, voteEvents }> = {
     });
 
     const activeEntity = app.community ? app.community : app.chain;
+    vnode.state.isCompound = (app.chain instanceof Compound) ? true: false;
     if (!activeEntity) {
       return m(PageLoading, {
         message: 'Loading members',
@@ -103,9 +104,7 @@ pageToLoad: number, totalMembers: number, isCompound: boolean, voteEvents }> = {
       if (!vnode.state.membersRequested && !vnode.state.pageToLoad && !vnode.state.membersLoaded) {
         vnode.state.membersRequested = true;
         vnode.state.membersLoaded = [];
-        vnode.state.pageToLoad = 0;
-        vnode.state.isCompound = (app.chain instanceof Compound) ? true: false;
-        console.log(vnode.state.isCompound);
+        vnode.state.pageToLoad = 0
       }
     }
     // get members once
@@ -206,7 +205,7 @@ pageToLoad: number, totalMembers: number, isCompound: boolean, voteEvents }> = {
                 label: 'Delegate',
                 intent: 'primary',
                 onclick: async (e) => {
-                  app.modals.create({ modal: DelegateModal, data: { address: info.address, name: profile.name } });
+                  app.modals.create({ modal: DelegateModal, data: { address: info.address, name: profile.name, symbol: app.chain.meta.chain.symbol  } });
                 }
               })) : null,
           ]);
