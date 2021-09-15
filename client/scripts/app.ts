@@ -824,31 +824,31 @@ Promise.all([
       handleUpdateEmailConfirmation();
 
       // subscribe to notifications
-      const wsUrl = document.location.origin
-        .replace('http://', 'ws://')
-        .replace('https://', 'wss://');
-      app.socket = new WebsocketController(wsUrl, jwt, null);
-      if (app.loginState === LoginState.LoggedIn) {
-        app.socket.addListener(
-          WebsocketMessageType.Notification,
-          (payload: IWebsocketsPayload<any>) => {
-            if (payload.data && payload.data.subscription_id) {
-              const subscription = app.user.notifications.subscriptions.find(
-                (sub) => sub.id === payload.data.subscription_id
-              );
-              // note that payload.data should have the correct JSON form
-              if (subscription) {
-                console.log('adding new notification from websocket:', payload.data);
-                const notification = Notification.fromJSON(payload.data, subscription);
-                app.user.notifications.update(notification);
-                m.redraw();
-              }
-            } else {
-              console.error('got invalid notification payload:', payload);
-            }
-          },
-        );
-      }
+      // const wsUrl = document.location.origin
+      //   .replace('http://', 'ws://')
+      //   .replace('https://', 'wss://');
+      // app.socket = new WebsocketController(wsUrl, jwt, null);
+      // if (app.loginState === LoginState.LoggedIn) {
+      //   app.socket.addListener(
+      //     WebsocketMessageType.Notification,
+      //     (payload: IWebsocketsPayload<any>) => {
+      //       if (payload.data && payload.data.subscription_id) {
+      //         const subscription = app.user.notifications.subscriptions.find(
+      //           (sub) => sub.id === payload.data.subscription_id
+      //         );
+      //         // note that payload.data should have the correct JSON form
+      //         if (subscription) {
+      //           console.log('adding new notification from websocket:', payload.data);
+      //           const notification = Notification.fromJSON(payload.data, subscription);
+      //           app.user.notifications.update(notification);
+      //           m.redraw();
+      //         }
+      //       } else {
+      //         console.error('got invalid notification payload:', payload);
+      //       }
+      //     },
+      //   );
+      // }
     }
     m.redraw();
   }).catch((err) => {

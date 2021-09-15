@@ -35,6 +35,12 @@ class SnapshotController {
     this._initializing = false;
     this._initialized = true;
   }
+
+  public async deinit() {
+    this._initialized = false;
+    this._space = null;
+    this._proposals = [];
+  }
 }
 
 export default SnapshotController;
