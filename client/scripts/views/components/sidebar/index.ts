@@ -20,7 +20,7 @@ import CommunitySelector from 'views/components/sidebar/community_selector';
 import CreateCommunityModal from 'views/modals/create_community_modal';
 
 import { AaveTypes, CompoundTypes, MolochTypes } from '@commonwealth/chain-events';
-import { discordIcon, telegramIcon, elementIcon, githubIcon, websiteIcon } from './icons';
+import { DiscordIcon, TelegramIcon, ElementIcon, GithubIcon, WebsiteIcon } from '../component_kit/icons';
 
 const SidebarQuickSwitcherItem: m.Component<{ item, size }> = {
   view: (vnode) => {
@@ -553,7 +553,7 @@ export const ExternalLinksModule: m.Component<{}, {}> = {
         trigger: m(Button, {
           rounded: true,
           onclick: () => window.open(discord),
-          label: m.trust(discordIcon),
+          label: m(DiscordIcon),
           class: 'discord-button',
         }),
       }),
@@ -563,7 +563,7 @@ export const ExternalLinksModule: m.Component<{}, {}> = {
         trigger: m(Button, {
           rounded: true,
           onclick: () => window.open(element),
-          label: m.trust(elementIcon),
+          label: m(ElementIcon),
           class: 'element-button',
         }),
       }),
@@ -573,7 +573,7 @@ export const ExternalLinksModule: m.Component<{}, {}> = {
         trigger: m(Button, {
           rounded: true,
           onclick: () => window.open(telegram),
-          label: m.trust(telegramIcon),
+          label: m(TelegramIcon),
           class: 'telegram-button',
         }),
       }),
@@ -583,7 +583,7 @@ export const ExternalLinksModule: m.Component<{}, {}> = {
         trigger: m(Button, {
           rounded: true,
           onclick: () => window.open(github),
-          label: m.trust(githubIcon),
+          label: m(GithubIcon),
           class: 'github-button',
         }),
       }),
@@ -593,7 +593,7 @@ export const ExternalLinksModule: m.Component<{}, {}> = {
         trigger: m(Button, {
           rounded: true,
           onclick: () => window.open(website),
-          label: m.trust(websiteIcon),
+          label: m(WebsiteIcon),
           class: 'website-button',
         }),
       }),
