@@ -270,7 +270,7 @@ export const ProposalHeaderThreadLinkedSnapshot: m.Component<{
     }
 
     const proposalLink = `${app.isCustomDomain() ? '' : `/${proposal.chain}`
-      }/snapshot-proposal/${(app.chain?.meta.chain.snapshot)}/${proposal.snapshotProposal}`;
+      }/snapshot/${(app.chain?.meta.chain.snapshot)}/${proposal.snapshotProposal}`;
 
     return m('.ProposalHeaderThreadLinkedChainEntity', 
     !vnode.state.snapshotProposalsLoaded ? [

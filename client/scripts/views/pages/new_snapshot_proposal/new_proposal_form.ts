@@ -117,7 +117,7 @@ const newThread = async (
     } else if (result.status === 'Success') {
       await app.user.notifications.refresh();
       await app.snapshot.refreshProposals();
-      m.route.set(`/${app.activeId()}/snapshot-proposal/${snapshotId}/${result.message.ipfsHash}`);
+      m.route.set(`/${app.activeId()}/snapshot/${snapshotId}/${result.message.ipfsHash}`);
     }
   } catch (err) {
     notifyError(err.message);

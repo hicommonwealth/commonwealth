@@ -40,7 +40,7 @@ const ProposalHeader: m.Component<{
     // Original posters have full editorial control, while added collaborators
     // merely have access to the body and title
 
-    const proposalLink = `/${app.activeId()}/snapshot-proposal/${snapshotId}/${proposal.ipfs}`;
+    const proposalLink = `/${app.activeId()}/snapshot/${snapshotId}/${proposal.ipfs}`;
 
     if (!vnode.state.loaded) {
       try {
