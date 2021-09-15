@@ -856,11 +856,6 @@ const ViewProposalPage: m.Component<{
     };
     window.addEventListener('beforeunload', windowListener);
 
-    // fetch completed cosmos proposal votes only when we load the page
-    // if (proposal instanceof CosmosProposal && proposal.completed) {
-    //   proposal.fetchVotes().then(() => m.redraw());
-    // }
-
     const comments = vnode.state.comments;
     const viewCount : number = vnode.state.viewCount;
     const commentCount : number = app.comments.nComments(proposal);

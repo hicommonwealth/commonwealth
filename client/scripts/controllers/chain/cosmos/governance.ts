@@ -98,11 +98,12 @@ class CosmosGovernance extends ProposalModule<
     this._initialized = true;
   }
 
-  private async _initProposals(): Promise<void> {
+  private async _initProposals(proposalId?: number): Promise<void> {
     const msgToIProposal = (p: Proposal): ICosmosProposal | null => {
       console.log(p);
       const content = p.content;
       const status = stateEnumToString(p.status);
+      // TODO: support more types
       const { title, description } = TextProposal.decode(content.value);
       return {
         identifier: p.proposalId.toString(),
@@ -122,24 +123,33 @@ class CosmosGovernance extends ProposalModule<
           totalDeposit: p.totalDeposit && p.totalDeposit[0] ? new BN(p.totalDeposit[0].amount) : new BN(0),
           depositors: [],
           voters: [],
-          tally: marshalTally(p.finalTallyResult),
+          tally: p.finalTallyResult && marshalTally(p.finalTallyResult),
         }
       };
     };
 
-    // TODO: this is doable with "0" i.e. unspecified, but we might miss active proposals because
-    //  it returns an arbitrary 100. So we fetch each status separately to ensure we at least have
-    //  all presently active proposals.
-    const { proposals: depositProposals } = await this._Chain.api.gov.proposals(1, '', '');
-    const { proposals: votingProposals } = await this._Chain.api.gov.proposals(2, '', '');
-    const { proposals: passedProposals } = await this._Chain.api.gov.proposals(3, '', '');
-    const { proposals: rejectedProposals } = await this._Chain.api.gov.proposals(4, '', '');
-    const { proposals: failedProposals } = await this._Chain.api.gov.proposals(5, '', '');
-    [...depositProposals, ...votingProposals, ...passedProposals, ...rejectedProposals, ...failedProposals]
-      .map((p) => msgToIProposal(p))
-      .filter((p) => !!p)
-      .sort((p1, p2) => +p2.identifier - +p1.identifier)
-      .forEach((p) => new CosmosProposal(this._Chain, this._Accounts, this, p));
+    let cosmosProposals: CosmosProposal[];
+    if (!proposalId) {
+      // TODO: we can fetch proposals with "0" i.e. unspecified, but we might miss active proposals because
+      //  it returns an arbitrary 100. So we fetch each status separately to ensure we at least have
+      //  all presently active proposals.
+      // const { proposals: depositProposals } = await this._Chain.api.gov.proposals(1, '', '');
+      // const { proposals: votingProposals } = await this._Chain.api.gov.proposals(2, '', '');
+      // const { proposals: passedProposals } = await this._Chain.api.gov.proposals(3, '', '');
+      // const { proposals: rejectedProposals } = await this._Chain.api.gov.proposals(4, '', '');
+      // const { proposals: failedProposals } = await this._Chain.api.gov.proposals(5, '', '');
+      const { proposals } = await this._Chain.api.gov.proposals(0, '', '');
+      // [...depositProposals, ...votingProposals, ...passedProposals, ...rejectedProposals, ...failedProposals]
+      cosmosProposals = proposals
+        .map((p) => msgToIProposal(p))
+        .filter((p) => !!p)
+        .sort((p1, p2) => +p2.identifier - +p1.identifier)
+        .map((p) => new CosmosProposal(this._Chain, this._Accounts, this, p));
+    } else {
+      const { proposal } = await this._Chain.api.gov.proposal(proposalId);
+      cosmosProposals = [ new CosmosProposal(this._Chain, this._Accounts, this, msgToIProposal(proposal)) ];
+    }
+    await Promise.all(cosmosProposals.map((p) => p.init()));
   }
 
   public createTx(
@@ -168,7 +178,14 @@ class CosmosGovernance extends ProposalModule<
         }),
       }
     };
-    await this._Chain.sendTx(sender, msg);
+
+    // fetch completed proposal from returned events
+    const events = await this._Chain.sendTx(sender, msg);
+    console.log(events);
+    const submitEvent = events.find((e) => e.type === 'submit_proposal');
+    const idAttribute = submitEvent.attributes.find(({ key }) => fromAscii(key) === 'proposal_id');
+    const id = +fromAscii(idAttribute.value);
+    await this._initProposals(id);
   }
 }
 

@@ -27,8 +27,7 @@ import {
   setupBankExtension,
   SigningStargateClient
 } from '@cosmjs/stargate';
-import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx';
-import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
+import { Tendermint34Client, Event } from '@cosmjs/tendermint-rpc';
 import { EncodeObject } from '@cosmjs/proto-signing';
 import CosmosAccount from './account';
 import KeplrWebWalletController from '../../app/webWallets/keplr_web_wallet';
@@ -132,7 +131,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     }
   }
 
-  public async sendTx(account: CosmosAccount, tx: EncodeObject): Promise<string> {
+  public async sendTx(account: CosmosAccount, tx: EncodeObject): Promise<readonly Event[]> {
     // TODO: error handling
     // TODO: support multiple wallets
     if (this._app.chain.network === ChainNetwork.Terra) {
@@ -160,7 +159,9 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       if (isBroadcastTxFailure(result)) {
         throw new Error('TX execution failed.');
       } else if (isBroadcastTxSuccess(result)) {
-        return result.transactionHash;
+        const txHash = result.transactionHash;
+        const txResult = await this._tmClient.tx({ hash: Buffer.from(txHash, 'hex') });
+        return txResult.result.events;
       } else {
         throw new Error('Unknown broadcast result');
       }

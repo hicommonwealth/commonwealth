@@ -17,9 +17,8 @@ import {
   DepositVote
 } from 'models';
 import {
-  ICosmosProposal, ICosmosProposalState, CosmosToken, CosmosVoteChoice, CosmosProposalState, ICosmosProposalTally
+  ICosmosProposal, CosmosToken, CosmosVoteChoice, CosmosProposalState
 } from 'controllers/chain/cosmos/types';
-import { ProposalStore } from 'stores';
 import moment from 'moment';
 import CosmosAccount from './account';
 import CosmosAccounts from './accounts';
@@ -65,7 +64,7 @@ export class CosmosProposal extends Proposal<
   public get shortIdentifier() {
     return `#${this.identifier.toString()}`;
   }
-  public title: string;
+  public get title() { return this.data.title; }
   public get description() { return this.data.description; }
   public get author() { return this.data.proposer ? this._Accounts.fromAddress(this.data.proposer) : null; }
 
@@ -75,25 +74,22 @@ export class CosmosProposal extends Proposal<
     }
     return VotingType.YesNoAbstainVeto;
   }
+
   public get votingUnit() {
     return VotingUnit.CoinVote;
   }
+
   public canVoteFrom(account) {
+    // TODO: balance check
     return account instanceof CosmosAccount;
   }
-  private _tally: ICosmosProposalTally;
-  private _status: CosmosProposalState;
+
   public get status(): CosmosProposalState {
-    return this._status;
+    return this.data.state.status;
   }
 
-  private _totalDeposit: BN = new BN(0);
-  private _depositors: { [depositor: string]: BN } = {};
-  public get depositors() {
-    return this._depositors;
-  }
   public get depositorsAsVotes(): Array<DepositVote<CosmosToken>> {
-    return Object.entries(this.depositors).map(([a, n]) => new DepositVote(
+    return this.data.state.depositors.map(([a, n]) => new DepositVote(
       this._Accounts.fromAddress(a),
       this._Chain.coins(n)
     ));
@@ -102,109 +98,114 @@ export class CosmosProposal extends Proposal<
   private _Chain: CosmosChain;
   private _Accounts: CosmosAccounts;
   private _Governance: CosmosGovernance;
-  private _completedVotesFetched: boolean = false;
 
   constructor(ChainInfo: CosmosChain, Accounts: CosmosAccounts, Governance: CosmosGovernance, data: ICosmosProposal) {
     super('cosmosproposal', data);
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._Governance = Governance;
-    this.title = data.title;
-
-    // workaround to avoid fetching all voters for completed proposals
-    if (!data.state.completed) {
-      this._initState();
-    }
-    this.updateState(this._Governance.store, data.state);
     this._Governance.store.add(this);
-    console.log(this);
   }
 
   public update() {
     throw new Error('unimplemented');
   }
 
-  // TODO: fix this
-  private async _initState() {
+  public async init() {
     const api = this._Chain.api;
-    const [depositResp, voteResp, tallyResp]: [
-      QueryDepositsResponse, QueryVotesResponse, QueryTallyResultResponse
-    ] = await Promise.all([
-      api.gov.deposits(this.data.identifier),
-      this.status === 'DepositPeriod'
-        ? Promise.resolve(null)
-        : api.gov.votes(this.data.identifier),
-      this.status === 'DepositPeriod'
-        ? Promise.resolve(null)
-        : api.gov.tally(this.data.identifier),
-    ]);
-
-    const state: ICosmosProposalState = {
-      identifier: this.data.identifier,
-      completed: false,
-      status: this.status,
-      depositors: [],
-      totalDeposit: new BN(0),
-      voters: [],
-      tally: null,
-    };
-    if (depositResp?.deposits) {
-      for (const deposit of depositResp?.deposits) {
-        if (deposit.amount && deposit.amount[0]) {
-          state.depositors.push([ deposit.depositor, new BN(deposit.amount[0].amount) ]);
+    // only fetch voter data if active
+    if (!this.data.state.completed) {
+      const [depositResp, voteResp, tallyResp]: [
+        QueryDepositsResponse, QueryVotesResponse, QueryTallyResultResponse
+      ] = await Promise.all([
+        this.status === 'DepositPeriod'
+          ? api.gov.deposits(this.data.identifier)
+          : Promise.resolve(null),
+        this.status === 'DepositPeriod'
+          ? Promise.resolve(null)
+          : api.gov.votes(this.data.identifier),
+        this.status === 'DepositPeriod'
+          ? Promise.resolve(null)
+          : api.gov.tally(this.data.identifier),
+      ]);
+      if (depositResp?.deposits) {
+        for (const deposit of depositResp?.deposits) {
+          if (deposit.amount && deposit.amount[0]) {
+            this.data.state.depositors.push([ deposit.depositor, new BN(deposit.amount[0].amount) ]);
+          }
         }
       }
-    }
-    if (voteResp) {
-      for (const voter of voteResp.votes) {
-        const vote = voteToEnum(voter.option);
-        if (vote) {
-          state.voters.push([ voter.voter, vote ]);
-        } else {
-          console.error(`voter: ${voter.voter} has invalid vote option: ${voter.option}`);
+      if (voteResp) {
+        for (const voter of voteResp.votes) {
+          const vote = voteToEnum(voter.option);
+          if (vote) {
+            this.data.state.voters.push([ voter.voter, vote ]);
+            this.addOrUpdateVote(new CosmosVote(this._Accounts.fromAddress(voter.voter), vote));
+          } else {
+            console.error(`voter: ${voter.voter} has invalid vote option: ${voter.option}`);
+          }
         }
       }
+      console.log(tallyResp);
+      if (tallyResp?.tally) {
+        this.data.state.tally = marshalTally(tallyResp?.tally);
+      }
     }
-    if (tallyResp?.tally) {
-      state.tally = marshalTally(tallyResp?.tally);
+    if (!this.initialized) {
+      this._initialized = true;
     }
+    if (this.data.state.completed) {
+      super.complete(this._Governance.store);
+    }
+    console.log(this);
   }
 
   // TODO: add getters for various vote features: tally, quorum, threshold, veto
   // see: https://blog.chorus.one/an-overview-of-cosmos-hub-governance/
   get support() {
     if (this.status === 'DepositPeriod') {
-      return this._Chain.coins(this._totalDeposit);
+      return this._Chain.coins(this.data.state.totalDeposit);
     }
-    if (!this._tally) return 0;
-    const nonAbstainingPower = this._tally.no.add(this._tally.noWithVeto).add(this._tally.yes);
+    if (!this.data.state.tally) return 0;
+    const nonAbstainingPower = this.data.state.tally.no
+      .add(this.data.state.tally.noWithVeto)
+      .add(this.data.state.tally.yes);
     if (nonAbstainingPower.eqn(0)) return 0;
-    const ratioPpm = this._tally.yes.muln(1_000_000).div(nonAbstainingPower);
+    const ratioPpm = this.data.state.tally.yes.muln(1_000_000).div(nonAbstainingPower);
     return +ratioPpm / 1_000_000;
   }
+
   get turnout() {
     if (this.status === 'DepositPeriod') {
-      if (this._totalDeposit.eqn(0)) {
+      if (this.data.state.totalDeposit.eqn(0)) {
         return 0;
       } else {
-        const ratioInPpm = +this._totalDeposit.muln(1_000_000).div(this._Chain.staked);
+        const ratioInPpm = +this.data.state.totalDeposit.muln(1_000_000).div(this._Chain.staked);
         return +ratioInPpm / 1_000_000;
       }
     }
-    if (!this._tally) return 0;
+    if (!this.data.state.tally) return 0;
     // all voters automatically abstain, so we compute turnout as the percent non-abstaining
-    const totalVotingPower = this._tally.no.add(this._tally.noWithVeto).add(this._tally.yes).add(this._tally.abstain);
+    const totalVotingPower = this.data.state.tally.no
+      .add(this.data.state.tally.noWithVeto)
+      .add(this.data.state.tally.yes)
+      .add(this.data.state.tally.abstain);
     if (totalVotingPower.eqn(0)) return 0;
-    const ratioInPpm = +this._tally.abstain.muln(1_000_000).div(totalVotingPower);
+    const ratioInPpm = +this.data.state.tally.abstain.muln(1_000_000).div(totalVotingPower);
     return 1 - (ratioInPpm / 1_000_000);
   }
+
   get veto() {
-    if (!this._tally) return 0;
-    const totalVotingPower = this._tally.no.add(this._tally.noWithVeto).add(this._tally.yes).add(this._tally.abstain);
+    if (!this.data.state.tally) return 0;
+    const totalVotingPower = this.data.state.tally.no
+      .add(this.data.state.tally.noWithVeto)
+      .add(this.data.state.tally.yes)
+      .add(this.data.state.tally.abstain);
     if (totalVotingPower.eqn(0)) return 0;
-    const ratioInPpm = +this._tally.noWithVeto.muln(1_000_000).div(totalVotingPower);
+    const ratioInPpm = +this.data.state.tally.noWithVeto.muln(1_000_000).div(totalVotingPower);
     return ratioInPpm / 1_000_000;
   }
+
   get endTime(): ProposalEndTime {
     // if in deposit period: at most create time + maxDepositTime
     if (this.status === 'DepositPeriod') {
@@ -215,6 +216,7 @@ export class CosmosProposal extends Proposal<
     if (!this.data.votingEndTime) return { kind: 'unavailable' };
     return { kind: 'fixed', time: moment(this.data.votingEndTime) };
   }
+
   get isPassing(): ProposalStatus {
     switch (this.status) {
       case 'Passed':
@@ -224,7 +226,9 @@ export class CosmosProposal extends Proposal<
       case 'VotingPeriod':
         return (this.support > 0.5 && this.veto <= (1 / 3)) ? ProposalStatus.Passing : ProposalStatus.Failing;
       case 'DepositPeriod':
-        return this._totalDeposit.gte(this._Governance.minDeposit) ? ProposalStatus.Passing : ProposalStatus.Failing;
+        return this.data.state.totalDeposit.gte(this._Governance.minDeposit)
+          ? ProposalStatus.Passing
+          : ProposalStatus.Failing;
       default:
         return ProposalStatus.None;
     }
@@ -244,6 +248,7 @@ export class CosmosProposal extends Proposal<
       }
     };
     await this._Chain.sendTx(depositor, msg);
+    this.data.state.depositors.push([ depositor.address, new BN(+amount) ]);
   }
 
   public async voteTx(vote: CosmosVote) {
@@ -264,54 +269,5 @@ export class CosmosProposal extends Proposal<
 
   public submitVoteTx(vote: CosmosVote, memo: string = '', cb?): ITXModalData {
     throw new Error('unsupported');
-  }
-
-  // fetches all votes on a completed proposal -- active proposal are automatically kept updated
-  // with votes.
-  public async fetchVotes() {
-    if (!this.completed) {
-      throw new Error('tried to fetch votes on active proposal!');
-    }
-    if (this._completedVotesFetched) {
-      // votes already fetched
-      return;
-    }
-    this._completedVotesFetched = true;
-    let voteResp: QueryVotesResponse;
-    try {
-      voteResp = await this._Chain.api.gov.votes(this.identifier);
-    } catch (e) {
-      console.error(`could not fetch votes on proposal: ${this.identifier}`);
-      return;
-    }
-    if (voteResp) {
-      for (const voter of voteResp.votes) {
-        const vote = voteToEnum(voter.option);
-        if (vote) {
-          this.addOrUpdateVote(new CosmosVote(this._Accounts.fromAddress(voter.voter), vote));
-        } else {
-          console.error(`voter: ${voter.voter} has invalid vote option: ${voter.option}`);
-        }
-      }
-    }
-  }
-
-  protected updateState(store: ProposalStore<CosmosProposal>, state: ICosmosProposalState) {
-    if (!state) return;
-    if (!this.initialized) {
-      this._initialized = true;
-    }
-    this._status = state.status;
-    this._tally = state.tally;
-    for (const [ voterAddr, choice ] of state.voters) {
-      this.addOrUpdateVote(new CosmosVote(this._Accounts.fromAddress(voterAddr), choice));
-    }
-    for (const [ depositor, deposit ] of state.depositors) {
-      this._depositors[depositor] = deposit;
-    }
-    this._totalDeposit = state.totalDeposit;
-    if (state.completed) {
-      super.complete(store);
-    }
   }
 }
