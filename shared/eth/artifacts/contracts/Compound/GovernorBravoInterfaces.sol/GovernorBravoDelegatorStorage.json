@@ -1,0 +1,50 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "GovernorBravoDelegatorStorage",
+  "sourceName": "contracts/Compound/GovernorBravoInterfaces.sol",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "admin",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "implementation",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "pendingAdmin",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x608060405234801561001057600080fd5b5060de8061001f6000396000f3fe6080604052348015600f57600080fd5b5060043610603c5760003560e01c8063267822471460415780635c60da1b14605b578063f851a440146061575b600080fd5b60476067565b604051605291906094565b60405180910390f35b60476076565b60476085565b6001546001600160a01b031681565b6002546001600160a01b031681565b6000546001600160a01b031681565b6001600160a01b039190911681526020019056fea2646970667358221220c01cc0e096f678cb565138d6bd89a4c971acd8dc62d9238365f5b4acf6fccae064736f6c634300060c0033",
+  "deployedBytecode": "0x6080604052348015600f57600080fd5b5060043610603c5760003560e01c8063267822471460415780635c60da1b14605b578063f851a440146061575b600080fd5b60476067565b604051605291906094565b60405180910390f35b60476076565b60476085565b6001546001600160a01b031681565b6002546001600160a01b031681565b6000546001600160a01b031681565b6001600160a01b039190911681526020019056fea2646970667358221220c01cc0e096f678cb565138d6bd89a4c971acd8dc62d9238365f5b4acf6fccae064736f6c634300060c0033",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

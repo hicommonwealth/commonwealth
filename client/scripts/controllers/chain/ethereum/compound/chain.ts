@@ -1,6 +1,7 @@
 import BN from 'bn.js';
 import { GovernorAlpha__factory } from 'eth/types';
 import { NodeInfo } from 'models';
+import { IApp } from 'state';
 import EthereumChain from '../chain';
 import { attachSigner } from '../contractApi';
 import CompoundAPI from './api';
@@ -10,6 +11,10 @@ import CompoundAPI from './api';
 // Also includes some API-but-not-Governance-related calls.
 export default class CompoundChain extends EthereumChain {
   public compoundApi: CompoundAPI;
+
+  constructor(app: IApp) {
+    super(app);
+  }
 
   public async init(selectedNode: NodeInfo) {
     await super.resetApi(selectedNode);

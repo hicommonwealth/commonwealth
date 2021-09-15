@@ -14,7 +14,7 @@ import moment from 'moment';
 import mixpanel from 'mixpanel-browser';
 import _ from 'underscore';
 
-import { AaveTypes, CompoundTypes, MolochTypes } from '@commonwealth/chain-events';
+import { AaveTypes, CompoundTypes, CompoundBravoTypes, MolochTypes } from '@commonwealth/chain-events';
 import app, { ApiStatus, LoginState } from 'state';
 import {
   ChainInfo,
@@ -290,6 +290,13 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/ethereum/compound/adapter'
     )).default;
     newChain = new Compound(n, app);
+  } else if (CompoundBravoTypes.EventChains.find((c) => c === n.chain.network || c === n.chain.id)) {
+    const Compound = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "compound-main" */
+      './controllers/chain/ethereum/compound/adapter'
+    )).default;
+    newChain = new Compound(n, app, true);
   } else if (AaveTypes.EventChains.find((c) => c === n.chain.network)) {
     const Aave = (await import(
       /* webpackMode: "lazy" */
