@@ -90,6 +90,7 @@ Environment variables used for external services include:
 - MAGIC_API_KEY
 - MAGIC_SUPPORTED_BASES
 - MAGIC_DEFAULT_CHAIN
+- ALCHEMY_POLYGON_API_KEY
 
 We also use certain environment variables to configure the application itself:
 

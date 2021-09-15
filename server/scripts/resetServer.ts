@@ -44,7 +44,7 @@ const nodes = [
   [ 'wss://rpc-01.snakenet.hydradx.io', 'hydradx'],
   [ 'wss://ropsten.infura.io/ws', 'alex-ropsten', '0xFab46E002BbF0b4509813474841E0716E6730136'],
   [ 'wss://ropsten.infura.io/ws', 'demos'],
-
+  [ 'wss://eth-mainnet.alchemyapi.io/v2/', 'polygon']
 ];
 
 const specs = {
@@ -1208,6 +1208,18 @@ const resetServer = (): Promise<number> => {
           collapsed_on_homepage: false,
           base: 'ethereum',
           snapshot: 'polarcat.eth',
+        }),
+        models.Chain.create({
+          id: 'polygon',
+          symbol: 'MATIC',
+          name: 'polygon',
+          icon_url: '/static/img/protocols/eth.png',
+          type: 'chain',
+          network: 'polygon',
+          active: true,
+          collapsed_on_homepage: false,
+          base: 'ethereum',
+          chain_id: 137,
         })
       ]);
 
@@ -1224,7 +1236,7 @@ const resetServer = (): Promise<number> => {
         nearLocal, nearTestnet,
         moloch, metacartel, molochLocal,
         marlin, marlinLocal, aave, aaveLocal,
-        alexRopsten,
+        alexRopsten, 
       ] = chains;
 
       // Admin roles for specific communities
