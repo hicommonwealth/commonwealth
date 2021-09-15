@@ -33,9 +33,7 @@ const ProposalHeader: m.Component<{
 }> = {
   view: (vnode) => {
     const { proposal, snapshotId } = vnode.attrs;
-    if (!proposal) {
-      return m('.topic-loading-spinner-wrap', [ m(Spinner, { active: true, size: 'lg' }) ]);
-    }
+    if (!proposal) return;
 
     // Original posters have full editorial control, while added collaborators
     // merely have access to the body and title
@@ -261,11 +259,6 @@ const ViewProposalPage: m.Component<{
     }
   },
   view: (vnode) => {
-    const getLoadingPage = () => m('.topic-loading-spinner-wrap', [ m(Spinner, { active: true, size: 'lg' }) ]);
-    if (!vnode.state.votes && !vnode.state.totals) {
-      return getLoadingPage();
-    }
-
     const author = app.user.activeAccount;
 
     const isActive = vnode.state.proposal
@@ -275,7 +268,7 @@ const ViewProposalPage: m.Component<{
     return m(Sublayout, { 
       class: 'ViewProposalPage', 
       title: 'Snapshot Proposal',
-    }, (!vnode.state.votes && vnode.state.totals) ? getLoadingPage() : [
+    }, (!vnode.state.votes && !vnode.state.totals) ? m(Spinner, { active: true }) : [
       m(ProposalHeader, {
         snapshotId: vnode.attrs.snapshotId,
         proposal: vnode.state.proposal,
