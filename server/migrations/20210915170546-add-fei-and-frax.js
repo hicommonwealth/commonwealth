@@ -42,40 +42,42 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    // TRIBE UPDATE
-    await queryInterface.bulkUpdate('Chains', {
-      type: 'token',
-      network: 'tribe',
-      collapsed_on_homepage: false,
-    }, {
-      id: 'tribe'
-    }, {
-      transaction: t,
-    });
-    await queryInterface.bulkUpdate('ChainNodes', {
-      address: '0xc7283b66eb1eb5fb86327f08e1b5816b0720212b',
-    }, {
-      chain: 'tribe'
-    }, {
-      transaction: t,
-    });
+    return queryInterface.sequelize.transaction(async (t) => {
+      // TRIBE UPDATE
+      await queryInterface.bulkUpdate('Chains', {
+        type: 'token',
+        network: 'tribe',
+        collapsed_on_homepage: false,
+      }, {
+        id: 'tribe'
+      }, {
+        transaction: t,
+      });
+      await queryInterface.bulkUpdate('ChainNodes', {
+        address: '0xc7283b66eb1eb5fb86327f08e1b5816b0720212b',
+      }, {
+        chain: 'tribe'
+      }, {
+        transaction: t,
+      });
 
-    // FRAX UPDATE
-    await queryInterface.bulkUpdate('Chains', {
-      type: 'token',
-      network: 'frax',
-      collapsed_on_homepage: false,
-    }, {
-      id: 'frax'
-    }, {
-      transaction: t,
+      // FRAX UPDATE
+      await queryInterface.bulkUpdate('Chains', {
+        type: 'token',
+        network: 'frax',
+        collapsed_on_homepage: false,
+      }, {
+        id: 'frax'
+      }, {
+        transaction: t,
+      });
+      await queryInterface.bulkUpdate('ChainNodes', {
+        address: '0x853d955acef822db058eb8505911ed77f175b99e',
+      }, {
+        chain: 'frax'
+      }, {
+        transaction: t,
+      });
     });
-    await queryInterface.bulkUpdate('ChainNodes', {
-      address: '0x853d955acef822db058eb8505911ed77f175b99e',
-    }, {
-      chain: 'frax'
-    }, {
-      transaction: t,
-    });    
-  }
+  },
 };
