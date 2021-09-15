@@ -93,7 +93,7 @@ export const Replies: m.Component<{ color?: string, size?: number; }, {}> = {
 export const Views: m.Component<{ color?: string, size?: number; }, {}> = {
     view: (vnode) => {
       vnode.attrs.color = IconColors.MidiGray;
-      return ();
+      return null;
     }
 }
 
