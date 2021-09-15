@@ -123,7 +123,7 @@ const VotingResults: m.Component<{
       const totalForChoice = totals.resultsByVoteBalance[idx];
       const voteFrac = totalForChoice / totals.sumOfResultsBalance;
       return m('.results-column', [
-        m('.results-header', `Voted for ${choice}: ${formatNumberLong(totalForChoice)} ${symbol} (${formatPercent(voteFrac, 4)})`),
+        m('.results-header', `Voted for ${choice}: ${formatNumberLong(totalForChoice)} ${symbol} (${formatPercent(voteFrac, 4)}) (${votesForChoice.length} voters)`),
         m('.results-cell', [
           m('.vote-group-wrap', votesForChoice
             .map((vote) => m(VoteRow, { vote, symbol }))
