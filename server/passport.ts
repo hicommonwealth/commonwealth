@@ -360,8 +360,8 @@ function setupPassport(models: DB) {
   }));
 
   passport.use(new TwitterStrategy({
-    consumerKey: 'w4EqhqSununRrxZpRDO5bufzQ',
-    consumerSecret: '1WGUaHu3aejveZ8Ug3GuivwOiHfLeaG9xXCaUEjxjRQsjvgh3N',
+    consumerKey: 'w4EqhqSununRrxZpRDO5bufzQ', // TWITTER_CONSUMER_KEY
+    consumerSecret: '1WGUaHu3aejveZ8Ug3GuivwOiHfLeaG9xXCaUEjxjRQsjvgh3N', // TWITTER_CONSUMER_SECRET
     callbackURL: 'http://127.0.0.1:8080/api/auth/twitter/callback', // TWITTER_OAUTH_CALLBACK,
     passReqToCallback: true,
   }, async (req, token, tokenSecret, profile, cb) => {
@@ -390,9 +390,9 @@ function setupPassport(models: DB) {
       if (token !== twitterAccount.access_token
         || tokenSecret !== twitterAccount.access_token_secret
         || profile.username !== twitterAccount.provider_username) {
-          twitterAccount.access_token = token;
-          twitterAccount.access_token_secret = tokenSecret;
-          twitterAccount.provider_username = profile.username;
+        twitterAccount.access_token = token;
+        twitterAccount.access_token_secret = tokenSecret;
+        twitterAccount.provider_username = profile.username;
         await twitterAccount.save();
       }
 

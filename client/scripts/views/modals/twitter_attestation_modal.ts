@@ -5,6 +5,7 @@ import $ from 'jquery';
 import app from 'state';
 import { Account, SocialAccount } from 'client/scripts/models';
 import MetamaskWebWalletController from 'client/scripts/controllers/app/webWallets/metamask_web_wallet';
+import { notifyError } from '../../controllers/app/notifications';
 
 enum TwitterAttestationModalSteps {
   Step1Sign,
@@ -229,13 +230,26 @@ const TwitterAttestationModal: m.Component<{
         m('button.primary-button', {
           onclick: async (e) => {
             vnode.state.step += 1;
-            // try {
-            //   const wallet = await app.wallets.locateWallet(account.address, app.chain.base);
-            //   console.log(wallet);
-            //   (wallet as MetamaskWebWalletController).signMessage(message);
-            // } catch (err) {
-            //   console.log(err);
-            // }
+            $.get(`${app.serverUrl()}/latest-tweet?handle=${twitter.username}`)
+              .then(async (res) => {
+                if (res.result.data[0]) {
+                  if (res.result.data[0].text.includes(`sig:${vnode.state.userProvidedSignature}`)) {
+                    vnode.state.step = 4;
+                  } else {
+                    notifyError('Tweet not found, try again with exact message.');
+                    vnode.state.step = 2;
+                  }
+                } else {
+                  notifyError('Tweet not found');
+                  vnode.state.step = 2;
+                }
+                m.redraw();
+              })
+              .catch(() => {
+                notifyError('Tweet not found');
+                vnode.state.step = 2;
+                m.redraw();
+              });
           }
         }, 'Verify'),
       ] : vnode.state.step === TwitterAttestationModalSteps.Step4Verifying ? [
@@ -246,28 +260,8 @@ const TwitterAttestationModal: m.Component<{
             m.redraw();
           },
         }),
-        m('img.twitter-logo', { src:'/static/img/twitterBlueIcon.svg' }),
-        m('.title', 'Verify'),
-        m('.description', 'We\'ll check Twitter to see that the message has been posted.'),
-        m('.twitter-handle', [
-          m('.flex.items-baseline', [
-            m('', ''),
-            m('.unverfied-label', 'Unverified'),
-          ]),
-          m('img.close-button', { src:'/static/img/close.svg' }),
-        ]),
-        m('button.primary-button', {
-          onclick: async (e) => {
-            vnode.state.step += 1;
-            // try {
-            //   const wallet = await app.wallets.locateWallet(account.address, app.chain.base);
-            //   console.log(wallet);
-            //   (wallet as MetamaskWebWalletController).signMessage(message);
-            // } catch (err) {
-            //   console.log(err);
-            // }
-          }
-        }, 'Verify'),
+        m('img.twitter-logo', { src:'/static/img/logo.png' }),
+        m('.description', 'Attempting verification'),
       ] : [
         m('img.modal-close-button', {
           src:'/static/img/close.svg',
@@ -277,17 +271,11 @@ const TwitterAttestationModal: m.Component<{
           },
         }),
         m('.title', 'Verification Successful'),
-        m('img.twitter-logo', { src:'/static/img/logo.png' }),
+        // m('img.twitter-logo', { src:'/static/img/logo.png' }),
         m('button.primary-button', {
-          onclick: async (e) => {
-            vnode.state.step += 1;
-            // try {
-            //   const wallet = await app.wallets.locateWallet(account.address, app.chain.base);
-            //   console.log(wallet);
-            //   (wallet as MetamaskWebWalletController).signMessage(message);
-            // } catch (err) {
-            //   console.log(err);
-            // }
+          onclick: async () => {
+            $('.TwitterAttestationModal').trigger('modalforceexit');
+            m.redraw();
           }
         }, 'Close'),
       ]);
