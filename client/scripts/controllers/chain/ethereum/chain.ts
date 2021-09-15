@@ -13,6 +13,8 @@ import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import EthereumAccount from './account';
 
 export const INFURA_ID = process.env.INFURA_API_KEY || '90de850aff68424ab8e7321017406586';
+export const ALCHEMY_ID = process.env.ALCHEMY_POLYGON_API_KEY || 'fqx8Q0jDfDAmlyo5ASenUXixhUd02Vu3';
+
 const ETHEREUM_BLOCK_TIME = 15;
 export interface IEthereumTXData extends ITXData {
   chainId: string;
@@ -60,11 +62,24 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
   public get totalbalance() { return this._totalbalance; }
 
   public async initApi(node?: NodeInfo): Promise<any> {
+
     this.app.chain.block.duration = ETHEREUM_BLOCK_TIME;
     if (node.url.includes('infura')) {
       const infuraId = INFURA_ID;
       const networkPrefix = node.url.split('infura')[0];
       const url = `${networkPrefix}infura.io/ws/v3/${infuraId}`;
+      try {
+        const provider = new Web3.providers.WebsocketProvider(url);
+        this._api = new Web3(provider);
+      } catch (error) {
+        console.log('Could not connect to Ethereum using infura');
+        this.app.chain.networkStatus = ApiStatus.Disconnected;
+        throw error;
+      }
+    // Polygon and Alchemy Switch
+    } else if (node.url.includes('alchemy')) {
+      const alchemyId = ALCHEMY_ID;
+      const url = `wss://eth-mainnet.alchemyapi.io/v2/${alchemyId}`;
       try {
         const provider = new Web3.providers.WebsocketProvider(url);
         this._api = new Web3(provider);

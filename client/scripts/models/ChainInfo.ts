@@ -34,12 +34,13 @@ class ChainInfo {
   public readonly ss58Prefix: string;
   public decimals: number;
   public substrateSpec: RegisteredTypes;
+  public chain_id: number;
 
   constructor({
     id, network, symbol, name, iconUrl, description, website, discord, element, telegram, github,
     stagesEnabled, customStages,
     customDomain, snapshot, terms, blockExplorerIds, collapsedOnHomepage, featuredTopics, topics, adminsAndMods,
-    base, ss58_prefix, type, decimals, substrateSpec
+    base, ss58_prefix, type, decimals, substrateSpec, chain_id
   }) {
     this.id = id;
     this.network = network;
@@ -68,6 +69,7 @@ class ChainInfo {
     this.ss58Prefix = ss58_prefix;
     this.decimals = decimals;
     this.substrateSpec = substrateSpec;
+    this.chain_id = chain_id;
   }
 
   public static fromJSON({
@@ -97,6 +99,7 @@ class ChainInfo {
     type,
     decimals,
     substrate_spec,
+    chain_id,
   }) {
     let blockExplorerIdsParsed;
     try {
@@ -132,6 +135,7 @@ class ChainInfo {
       type,
       decimals: parseInt(decimals, 10),
       substrateSpec: substrate_spec,
+      chain_id,
     });
   }
 

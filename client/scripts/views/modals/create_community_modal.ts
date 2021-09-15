@@ -15,6 +15,8 @@ import { NearAccount } from 'controllers/chain/near/account';
 import Near from 'controllers/chain/near/main';
 import NearSputnikDao from 'controllers/chain/near/sputnik/dao';
 import { isAddress } from 'web3-utils';
+import { EVMChainId } from 'types';
+import { toArray } from 'utils';
 
 import { CompactModalExitButton } from 'views/modal';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
@@ -389,7 +391,8 @@ interface ERC20FormState {
   description: string,
   saving: boolean,
   loaded: boolean,
-  error: string
+  error: string,
+  chain_id: string,
 }
 
 const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
@@ -408,6 +411,7 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
     vnode.state.saving = false;
     vnode.state.loaded = false;
     vnode.state.error = '';
+    vnode.state.chain_id = '';
   },
   view: (vnode) => {
     const validAddress = isAddress(vnode.state.address);
@@ -420,6 +424,14 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
         striped: false,
         class: 'metadata-management-table',
       }, [
+        m(SelectPropertyRow, {
+          title: 'Chain',
+          options: toArray(EVMChainId),
+          value: EVMChainId[vnode.state.chain_id],
+          onchange: (value) => {
+            vnode.state.chain_id = value;
+          }
+        }),
         m(InputPropertyRow, {
           title: 'Address',
           defaultValue: vnode.state.address,
@@ -525,6 +537,11 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
         intent: 'primary',
         disabled: vnode.state.saving || !validAddress || !vnode.state.loaded,
         onclick: async (e) => {
+          /* Find Chain Node from Chains: Might be stupid */ 
+          const findProviderForChain = (chain_id) => {
+            const chain = app.config.chains.getByChainId(chain_id)
+            return app.config.nodes.getByChain(chain.id)[0].url;
+          }
           const {
             address,
             id,
@@ -537,6 +554,7 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
             element,
             telegram,
             github,
+            chain_id,
           } = vnode.state;
           vnode.state.saving = true;
           $.post(`${app.serverUrl()}/createChain`, {
@@ -551,11 +569,12 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
             element,
             telegram,
             github,
+            chain_id,
             jwt: app.user.jwt,
             type: 'token',
             base: 'ethereum',
             network: slugify(name),
-            node_url: 'wss://mainnet.infura.io/ws',
+            node_url: !findProviderForChain(chain_id),
           }).then(async (res) => {
             await initAppState(false);
             $(e.target).trigger('modalexit');

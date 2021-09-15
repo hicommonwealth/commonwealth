@@ -131,6 +131,7 @@ const createChain = async (
     github: req.body.github,
     element: req.body.element,
     base: req.body.base,
+    chain_id: req.body.chain_id,
   };
   const chain = await models.Chain.create(chainContent);
 

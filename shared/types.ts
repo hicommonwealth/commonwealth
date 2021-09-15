@@ -41,6 +41,26 @@ export enum WebsocketEventType {
   Close = 'close',
 }
 
+// https://github.com/ethereum-lists/chains
+// Extend this list
+export enum EVMChainId {
+  Ethereum = 1,
+  Optimism = 10,
+  OptimismTestnet = 69,
+  Polygon = 137,
+  Arbitrum = 42161,
+  Celo = 42220,
+  Moonriver = 1285,
+  AVAX = 43114,
+  OKExChain = 66,
+  BinanceSmartChain = 56,
+  Fantom = 250,
+  Karuna = 686,
+  Acala = 787,
+  Moonbeam = 1284,
+  Edgeware = 2021,
+}
+
 export enum WebsocketMessageType {
   Message = 'message',
   Heartbeat = 'heartbeat',

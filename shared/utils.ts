@@ -156,3 +156,13 @@ export function formatAddressShort(
     return `${address.slice(0, maxCharLength || 5)}${includeEllipsis ? '…' : ''}`;
   }
 }
+
+
+// Turn enum into array
+export function toArray(enumme): string[] {
+  const StringIsNumber = value => isNaN(Number(value)) === false;
+
+  return Object.keys(enumme)
+    .filter(StringIsNumber)
+    .map(key => enumme[key]);
+}
