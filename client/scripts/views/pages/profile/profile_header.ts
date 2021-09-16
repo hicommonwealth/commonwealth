@@ -85,6 +85,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
     const { account, refreshCallback, onOwnProfile, onLinkedProfile } = vnode.attrs;
     const isClaimable = !isAddressOnSite(account.address) || !account.profile;
     const showJoinCommunityButton = !isAddressOnSite(account.address) && !account.profile;
+    const addressInfo = app.user.getDefaultAddressInCommunity({chain:app.activeChainId()});
 
     const joinCommunity = async () => {
       if (!app.activeChainId() || onOwnProfile) return;
@@ -166,24 +167,28 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
               },
               label: 'Edit Profile'
             }),
-            (app.chain?.meta.chain.base === ChainBase.Ethereum) && !isClaimable && m(Button, {
-              style: 'background-color: rgb(33, 114, 229); border: 0px solid white; color: white;',
-              intent: 'primary',
-              onclick: () => {
-                const twitter = account.find((acct) => acct.provider === 'twitter');
-                if (!twitter) {
-                  // eslint-disable-next-line max-len
-                  window.location.href = `/api/auth/twitter?redirect=${encodeURIComponent(window.location.pathname)}${window.location.search ? `${encodeURIComponent(window.location.search)}%26` : '%3F'}continueTwitterAttestation=true`;
-                } else {
-                  app.modals.create({
-                    modal: TwitterAttestationModal,
-                    data: { account, refreshCallback },
-                  });
-                }
-              },
-              label: 'Add a Twitter Identity',
-              iconRight: Icons.TWITTER,
-            }),
+            (app.chain?.meta.chain.base === ChainBase.Ethereum) 
+              && !addressInfo.twitter_verified && !isClaimable && m('.twitter-link', [
+              m(Button, {
+                intent: 'primary',
+                style: 'background-color: rgb(33, 114, 229); border: 0px solid white; color: white;',
+                onclick: () => {
+                  const twitter = app.user.socialAccounts.find((acct) => acct.provider === 'twitter');
+                  if (!twitter) {
+                    // eslint-disable-next-line max-len
+                    window.location.href = `/api/auth/twitter?redirect=${encodeURIComponent(window.location.pathname)}${window.location.search ? `${encodeURIComponent(window.location.search)}%26` : '%3F'}continueTwitterAttestation=true`;
+                  } else {
+                    app.modals.create({
+                      modal: TwitterAttestationModal,
+                      data: { account, twitter, refreshCallback },
+                    });
+                  }
+                },
+                label: 'Add a Public Identity',
+                iconRight: Icons.TWITTER,
+              }),
+              m('p', 'Connecting your Twitter to your address can help people find you and delegate votes to you')
+            ]),
           ] : (showJoinCommunityButton && app.activeChainId())
             ? m(Button, {
               intent: 'primary',

@@ -52,7 +52,7 @@ async function verifyTwitterIdentity(tweetID, account) {
     let twitterRes
     try {
       const { data: twitterResponse } = await axios(twitterURL, { method:'GET', headers:requestHeaders });
-      twitterRes = await gatherResponse(twitterResponse);
+      twitterRes = twitterResponse;
     } catch (e) {
       console.warn(e.response);
     }
@@ -206,7 +206,7 @@ const createTwitterVerification = async (models: DB, req: Request, res: Response
   /* need to update all addresses to twitter verifications */ 
   const socialAccount = await models.SocialAccount.findOne({ where: {
     provider: 'twitter',
-    provider_userid: req.user.id
+    provider_username: req.body.twitter_username,
   } });
 
   if (!socialAccount) {
@@ -219,9 +219,9 @@ const createTwitterVerification = async (models: DB, req: Request, res: Response
     const addressesToUpdate = await models.Address.findOne({ where: {
       address: req.body.address,
       user_id: req.user.id,
+      chain: req.body.chain,
     } });
     await addressesToUpdate.update({ twitter_verified: true });
-    addressesToUpdate
     return res.json({ status: 'Success' });
   }
 

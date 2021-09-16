@@ -46,7 +46,7 @@ export const TWITTER_BEARER = process.env.TWITTER_BEARER;
 export const TWITTER_OAUTH_CALLBACK = process.env.TWITTER_OAUTH_CALLBACK
   || (process.env.NODE_ENV === 'production'
     ? 'https://commonwealth.im'
-    : 'http://localhost:8080') + '/api/auth/twitter/callback';
+    : 'http://127.0.0.1:8080') + '/api/auth/twitter/callback';
 
 export const DATABASE_URI =
       (!process.env.DATABASE_URL || process.env.NODE_ENV === 'development') ?

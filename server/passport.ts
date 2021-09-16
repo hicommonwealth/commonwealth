@@ -18,7 +18,9 @@ const log = factory.getLogger(formatFilename(__filename));
 import {
   JWT_SECRET, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_OAUTH_CALLBACK, MAGIC_API_KEY, MAGIC_SUPPORTED_BASES,
   MAGIC_DEFAULT_CHAIN,
-  TWITTER_OAUTH_CALLBACK
+  TWITTER_OAUTH_CALLBACK,
+  TWITTER_CLIENT_ID,
+  TWITTER_CLIENT_SECRET
 } from './config';
 import { NotificationCategories } from '../shared/types';
 import lookupCommunityIsVisibleToUser from './util/lookupCommunityIsVisibleToUser';
@@ -360,9 +362,9 @@ function setupPassport(models: DB) {
   }));
 
   passport.use(new TwitterStrategy({
-    consumerKey: 'w4EqhqSununRrxZpRDO5bufzQ', // TWITTER_CONSUMER_KEY
-    consumerSecret: '1WGUaHu3aejveZ8Ug3GuivwOiHfLeaG9xXCaUEjxjRQsjvgh3N', // TWITTER_CONSUMER_SECRET
-    callbackURL: 'http://127.0.0.1:8080/api/auth/twitter/callback', // TWITTER_OAUTH_CALLBACK,
+    consumerKey: TWITTER_CLIENT_ID,
+    consumerSecret: TWITTER_CLIENT_SECRET,
+    callbackURL: TWITTER_OAUTH_CALLBACK,
     passReqToCallback: true,
   }, async (req, token, tokenSecret, profile, cb) => {
     const twitterAccount = await models.SocialAccount.findOne({

@@ -95,6 +95,7 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
     const { account, refreshCallback, onOwnProfile, onLinkedProfile } = vnode.attrs;
     const showJoinCommunityButton = vnode.attrs.setIdentity && !onOwnProfile;
     const isClaimable = !isAddressOnSite(account.address) || !account.profile;
+    const addressInfo = app.user.getDefaultAddressInCommunity({chain:app.activeChainId()});
 
     window.addEventListener('scroll',
       () => {
@@ -173,8 +174,9 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
             },
             label: 'Edit'
           }),
-          m('.twitter-link', [
-            (app.chain?.meta.chain.base === ChainBase.Ethereum) && !isClaimable && m(Button, {
+          (app.chain?.meta.chain.base === ChainBase.Ethereum) 
+          && !addressInfo.twitter_verified && !isClaimable && m('.twitter-link', [
+            m(Button, {
               intent: 'primary',
               style: 'background-color: rgb(33, 114, 229); border: 0px solid white; color: white;',
               onclick: () => {
@@ -192,7 +194,8 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
               label: 'Add a Public Identity',
               iconRight: Icons.TWITTER,
             }),
-            m('p', 'Connecting your Twitter to your address can help people find you and delegate votes to you')]),
+            m('p', 'Connecting your Twitter to your address can help people find you and delegate votes to you')
+          ]),
         ] : (showJoinCommunityButton && app.activeChainId())
           ? m(Button, {
             intent: 'primary',
