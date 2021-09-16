@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
 import axios from 'axios';
 import { DB } from '../database';
+import { TWITTER_BEARER } from '../config';
 
 // eslint-disable-next-line max-len
-const BEARER_TOKEN = 'AAAAAAAAAAAAAAAAAAAAAAARTQEAAAAAmobQU2AuZubo2rVFQ%2FWWzLgjLIQ%3Dcp1x7fYEVUeP7wVrgl7pPZTOXi1k3yrZ4vYxYjyeY4gGNvq6J0'; // TWITTER_BEARER_TOKEN
 
 const getLatestTweet = async (models: DB, req: Request, res: Response) => {
   const twitterAccount = await models.SocialAccount.findOne({
@@ -15,7 +15,7 @@ const getLatestTweet = async (models: DB, req: Request, res: Response) => {
     const twitterURL = `https://api.twitter.com/2/users/${twitterAccount.provider_userid}/tweets?exclude=retweets,replies`;
 
     const requestHeaders = {
-      'Authorization': `Bearer ${BEARER_TOKEN}`,
+      'Authorization': `Bearer ${TWITTER_BEARER}`,
     };
 
     try {
