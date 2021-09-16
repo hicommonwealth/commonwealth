@@ -6,8 +6,11 @@ import app from 'state';
 import { Account, SocialAccount } from 'client/scripts/models';
 import MetamaskWebWalletController from 'client/scripts/controllers/app/webWallets/metamask_web_wallet';
 import { notifyError } from '../../controllers/app/notifications';
+import { loadScript } from 'helpers';
+import { TWITTER_CLIENT_ID } from 'server/config';
 
 enum TwitterAttestationModalSteps {
+  Step0LinkTwitter,
   Step1Sign,
   Step2Publicize,
   Step3Verify,
@@ -23,93 +26,37 @@ const TwitterAttestationModal: m.Component<{
 {
   step: TwitterAttestationModalSteps, // steps for modal
   error,
-  valid: boolean,
+  twitterAcct,
+  tweet, // id for tweet
   userProvidedSignature: string;
-  posted: boolean,
+  valid: boolean, // Step 2 Signed
+  posted: boolean, // Step 3 Posted to Twitter
+  attested: boolean, // Step 4 Verified
 }> = {
   oninit:(vnode) => {
-    if (!vnode.attrs.twitter.attested) {
+    vnode.state.twitterAcct == vnode.attrs.twitter;
+    if (!vnode.state.twitterAcct?.attested && !vnode.attrs.account.twitter_verification_msg) {
       vnode.state.step = TwitterAttestationModalSteps.Step1Sign;
+    } else if (!vnode.state.twitterAcct.attested && vnode.attrs.account.twitter_verification_msg){
+      vnode.state.step = TwitterAttestationModalSteps.Step2Publicize;
     }
+  },
+  onupdate: (vnode) => {
+    // Add Twitter Embed Widget to embed tweet
+    if (vnode.state.step === TwitterAttestationModalSteps.Step3Verify) {
+      loadScript('//platform.twitter.com/widgets.js').then(() => {
+        setTimeout(() => {
+            // eslint-disable-next-line
+            (<any>window).twttr?.widgets?.load();
+        }, 1);
+      });
+    };
   },
   view: (vnode) => {
     const { account, twitter, refreshCallback } = vnode.attrs;
+    const { twitterAcct, tweet } = vnode.state;
     if (!twitter) return; // not what we want
-
-    // Need to handle all drop offs at any point...
-
-    // After Step 1
-
-    // // check address status if currently logged in, this blob may not be necessary
-    // if (app.isLoggedIn()) {
-    //   const { result } = await $.post(`${app.serverUrl()}/getAddressStatus`, {
-    //     address,
-    //     chain: app.activeChainId(),
-    //     jwt: app.user.jwt,
-    //   });
-    //   if (result.exists) {
-    //     if (result.belongsToUser) {
-    //       notifyInfo('This address is already linked to your current account.');
-    //       return;
-    //     } else {
-    //       const modalMsg = 'This address is currently linked to another account. '
-    //         + 'Remove it from that account and transfer to yours?';
-    //       const confirmed = await confirmationModalWithText(modalMsg)();
-    //       if (!confirmed) {
-    //         vnode.state.linking = false;
-    //         return;
-    //       }
-    //     }
-    //   }
-    // }
-
-    // try {
-    //   vnode.state.linking = true;
-    //   m.redraw();
-    //   await webWallet.validateWithAccount(signerAccount);
-    //   vnode.state.linking = false;
-    //   m.redraw();
-    //   // return if user signs for two addresses
-    //   if (linkNewAddressModalVnode.state.linkingComplete) return;
-    //   linkNewAddressModalVnode.state.linkingComplete = true;
-    //   accountVerifiedCallback(signerAccount);
-    // } catch (err) {
-    //   // catch when the user rejects the sign message prompt
-    //   vnode.state.linking = false;
-    //   errorCallback('Verification failed');
-    //   m.redraw();
-    // }
-
-    // On Button Click after Step 2 (Post):
-    const tweetPostedCallback = async (twitter, account: Account<any>) => {
-      // Ping the server with twitter handle / address / (maybe some additional validation)
-      // And then redraw the modal with the passed in tweet
-      // Handle Errors
-      // Errors being... no tweet found?
-      // // Go back to previou
-      // // Server side not working?
-      // If Eror Allow the user to move on to the next step?
-    };
-
-    // On Button Click after Step 3 (Verify)
-    // Called after we ping the server the verify that the tweet has been posted
-    const twitterAttestedCallback = async (account: Account<any>) => {
-      //   //
-      //   //   m.redraw();
-      //   //   mixpanel.track('Twitter Attested', {
-      //   //     'Step No': 2,
-      //   //     'Step': 'Add Address',
-      //   //     'Option': 'Wallet',
-      //   //     'Scope': app.activeId(),
-      //   //   });
-      //   //   $('.TwitterAttestationModal').trigger('modalforceexit');
-      //   //   if (vnode.attrs.successCallback) vnode.attrs.successCallback();
-      //   //   m.redraw();
-      //   // }
-      // else {
-    };
-
-    //
+    
     const constructSignature = (username) => {
       const EIP712Domain = [
         { name: 'name', type: 'string' },
@@ -139,8 +86,30 @@ const TwitterAttestationModal: m.Component<{
       return tweetText;
     };
 
-    return m('.TwitterAttestationModal',
-      vnode.state.step === TwitterAttestationModalSteps.Step1Sign ? [
+    return m('.TwitterAttestationModal', vnode.state.step === 
+      TwitterAttestationModalSteps.Step0LinkTwitter ? [
+        m('img.modal-close-button', {
+          src:'/static/img/close.svg',
+          onclick:() => {
+            $('.TwitterAttestationModal').trigger('modalforceexit');
+            m.redraw();
+          },
+        }),
+        m('.form-steps', [
+          m('.disabled-step', 'Sign'),
+          m('.disabled-step', 'Publicize'),
+          m('.disabled-step', 'Verify'),
+        ]),
+        m('progress.gradient-progress-bar', { value:'0.0' }),
+        m('img.twitter-logo', { src:'/static/img/twitterBlueIcon.svg' }),
+        m('.title', 'Link a new Twitter'),
+        m('.description', 'Authorize Commonwealth to post a tweet on your behalf.'),
+        m('button.primary-button', {
+          onclick: async (e) => {
+            window.location.href = `/api/auth/twitter?redirect=${encodeURIComponent(window.location.pathname)}${window.location.search ? `${encodeURIComponent(window.location.search)}%26` : '%3F'}continueTwitterAttestation=true`
+          }
+        }, 'Link')
+      ] : vnode.state.step === TwitterAttestationModalSteps.Step1Sign ? [
         m('img.modal-close-button', {
           src:'/static/img/close.svg',
           onclick:() => {
@@ -159,19 +128,41 @@ const TwitterAttestationModal: m.Component<{
         m('.description', 'Sign and tweet a message that will be used to link your wallet address and Twitter handle.'),
         m('.twitter-handle', [
           m('.flex.items-baseline', [
-            m('', `@${twitter.username}`),
+            m('', `@${twitterAcct.username}`),
             m('.unverfied-label', 'Unverified'),
           ]),
-          m('img.close-button', { src:'/static/img/close.svg' }),
+          m('img.close-button', { 
+            src:'/static/img/close.svg', 
+            onclick: async (e) => {
+              console.log('hi');
+              $.ajax({
+                url: `${app.serverUrl()}/socialAccount`,
+                data: { jwt: app.user.jwt, provider : 'twitter' },
+                type: 'DELETE',
+                success: (result) => {
+                  vnode.state.step -= 1;
+                  vnode.state.twitterAcct = null;
+                  m.redraw();
+                },
+                error: (err) => {
+                  console.dir(err);
+                  m.redraw();
+                },
+              });
+            }
+          }),
         ]),
         m('button.primary-button', {
           onclick: async (e) => {
             try {
               const wallet = await app.wallets.locateWallet(account.address, app.chain.base);
-              (wallet as MetamaskWebWalletController).signMessage(`0x${constructSignature(twitter.username)}`)
+              /* ensure that this will work for non ETH cxhains*/
+              wallet.signMessage(`0x${constructSignature(twitterAcct.username)}`)
                 .then((signedResult) => {
                   vnode.state.step += 1;
                   vnode.state.userProvidedSignature = signedResult;
+                  /* save unfinished signature to server */
+                  // $.post(`${app.serverUrl()}/updateAddress`, params)
                   m.redraw();
                 });
             } catch (err) {
@@ -199,6 +190,19 @@ const TwitterAttestationModal: m.Component<{
         m('button.primary-button', {
           onclick: async (e) => {
             window.open(`https://twitter.com/intent/tweet?text=${constructTweet()}`, '_blank');
+            // Add 
+            window.addEventListener('onload', () => {
+              $.get(`${app.serverUrl()}/latest-tweet?handle=${twitterAcct.username}`)
+              .then(async (res) => {
+                vnode.state.tweet = res.result.data[0].id;
+                m.redraw();
+              })
+              .catch(() => {
+                notifyError('Tweet not found');
+                vnode.state.step = 2;
+                m.redraw();
+              });
+            })
             vnode.state.step += 1;
             m.redraw();
           }
@@ -222,36 +226,48 @@ const TwitterAttestationModal: m.Component<{
         m('.description', 'Verify your tweet and add it to the list of verified mappings.'),
         m('.twitter-handle', [
           m('.flex.items-baseline', [
-            m('', `@${twitter.username}`),
-            m('.unverfied-label', 'Unverified'),
+            m('.embedded-twitter', [
+              m('.twitter-tweet', [
+                tweet ? m('a', {
+                  tabindex: -1,
+                  href: `https://twitter.com/user/status/${tweet}`,
+                }) : m('p', ''),
+              ])
+            ]), // 
+            tweet && m('.unverfied-label', 'We found your tweet!'),
           ]),
           m('img.close-button', { src:'/static/img/close.svg' }),
         ]),
         m('button.primary-button', {
           onclick: async (e) => {
-            vnode.state.step += 1;
-            $.get(`${app.serverUrl()}/latest-tweet?handle=${twitter.username}`)
+            if (tweet) {
+              vnode.state.step += 1;
+              const params = {
+                tweetID: tweet,
+                address: account.address
+              }
+              $.post(`${app.serverUrl()}/getTwitterVerification`, params)
               .then(async (res) => {
-                if (res.result.data[0]) {
-                  if (res.result.data[0].text.includes(`sig:${vnode.state.userProvidedSignature}`)) {
-                    vnode.state.step = 4;
-                  } else {
-                    notifyError('Tweet not found, try again with exact message.');
-                    vnode.state.step = 2;
-                  }
-                } else {
-                  notifyError('Tweet not found');
-                  vnode.state.step = 2;
-                }
+                vnode.state.attested = true;
                 m.redraw();
               })
-              .catch(() => {
-                notifyError('Tweet not found');
-                vnode.state.step = 2;
+              .catch((e) => {
+                console.log(`Tweet not found, ${e}`);
                 m.redraw();
               });
+            } else {
+              $.get(`${app.serverUrl()}/latest-tweet?handle=${twitter.username}`)
+              .then(async (res) => {
+                vnode.state.tweet = res.result.data[0].id;
+                m.redraw();
+              })
+              .catch((e) => {
+                console.log(`Tweet not found, ${e}`);
+                m.redraw();
+              });
+            }
           }
-        }, 'Verify'),
+        }, tweet ? 'Verify' : 'Search Twitter Again'),
       ] : vnode.state.step === TwitterAttestationModalSteps.Step4Verifying ? [
         m('img.modal-close-button', {
           src:'/static/img/close.svg',
