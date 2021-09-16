@@ -104,7 +104,6 @@ export default class CompoundGovernance extends ProposalModule<
     return state;
   }
 
-<<<<<<< HEAD:client/scripts/controllers/chain/ethereum/compound/governance.ts
   public async execute(proposalId: number) {
     const address = this.app.user.activeAccount.address;
     const contract = await attachSigner(this.app.wallets, address, this._api.Contract);
@@ -138,8 +137,6 @@ export default class CompoundGovernance extends ProposalModule<
     }
   }
 
-=======
->>>>>>> master:client/scripts/controllers/chain/ethereum/compound/governance.ts
   public async init(chain: CompoundChain, Accounts: EthereumAccounts) {
     this._api = chain.compoundApi;
     this._Chain = chain;
@@ -156,13 +153,8 @@ export default class CompoundGovernance extends ProposalModule<
     console.log('Fetching compound proposals from backend.');
     await this.app.chain.chainEntities.refresh(this.app.chain.id, EntityRefreshOption.AllEntities);
     const entities = this.app.chain.chainEntities.store.getByType(CompoundTypes.EntityKind.Proposal);
-<<<<<<< HEAD:client/scripts/controllers/chain/ethereum/compound/governance.ts
-    entities.forEach((e) => this._entityConstructor(e));
-    console.log(`Found ${entities.length} proposals!`);
-=======
     console.log(`Found ${entities.length} proposals!`);
     entities.forEach((e) => this._entityConstructor(e));
->>>>>>> master:client/scripts/controllers/chain/ethereum/compound/governance.ts
 
     // no init logic currently needed
     // await Promise.all(this.store.getAll().map((p) => p.init()));
@@ -176,13 +168,8 @@ export default class CompoundGovernance extends ProposalModule<
 
     // fetch proposals from chain
     // const fetcher = new AaveEvents.StorageFetcher(chainEventsContracts);
-<<<<<<< HEAD:client/scripts/controllers/chain/ethereum/compound/governance.ts
-    const subscriber = new CompoundEvents.Subscriber(this._api.Contract, this.app.chain.id);
-    const processor = new CompoundEvents.Processor(this._api.Contract);
-=======
     const subscriber = new CompoundEvents.Subscriber(this._api.Contract as any, this.app.chain.id);
     const processor = new CompoundEvents.Processor(this._api.Contract as any);
->>>>>>> master:client/scripts/controllers/chain/ethereum/compound/governance.ts
     // await this.app.chain.chainEntities.fetchEntities(this.app.chain.id, () => fetcher.fetch());
     await this.app.chain.chainEntities.subscribeEntities(
       this.app.chain.id,

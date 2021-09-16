@@ -1243,12 +1243,6 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-<<<<<<< HEAD
-"@commonwealth/chain-events@0.7.9":
-  version "0.7.9"
-  resolved "https://registry.yarnpkg.com/@commonwealth/chain-events/-/chain-events-0.7.9.tgz#0c48a2108d0cf9968de8c9cd8879897584681b66"
-  integrity sha512-z4vBVCCRGc7WkYKfHRMqGhqv4dTeIxByfYb9KDvuoZ8p+OLJ5A37ROQAKWsC2N68I/VUM3l2reKgExNBYvassg==
-=======
 "@commonwealth/ce-rabbitmq-plugin@^0.0.1":
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/@commonwealth/ce-rabbitmq-plugin/-/ce-rabbitmq-plugin-0.0.1.tgz#797a1ff76c0555e628b32cc4361aaff11a8377a5"
@@ -1262,7 +1256,6 @@
   version "0.8.0"
   resolved "https://registry.yarnpkg.com/@commonwealth/chain-events/-/chain-events-0.8.0.tgz#9b2ee42b8e5e6868f7825bb83869cf4f67d23c29"
   integrity sha512-WHtba7J2fm+xnL/IPxD/ShoM/cpYv3DNJctgthqnlrre9pGG8iEMVbNjs41DgzA1siff5s2yiUqGVA2FfUpvAw==
->>>>>>> master
   dependencies:
     "@edgeware/node-types" "^3.3.3"
     "@ethersproject/abi" "^5.0.0"
