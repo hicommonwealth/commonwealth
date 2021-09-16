@@ -11,7 +11,7 @@ import app from 'state';
 import Sublayout from 'views/sublayout';
 import { AddressInfo } from 'models';
 import ConfirmSnapshotVoteModal from 'views/modals/confirm_snapshot_vote_modal';
-import { getPower, SnapshotSpace, SnapshotProposal, getVotes, SnapshotProposalVote } from 'helpers/snapshot_utils';
+import { SnapshotSpace, SnapshotProposal, SnapshotProposalVote, getResults } from 'helpers/snapshot_utils';
 
 import { notifyError } from 'controllers/app/notifications';
 import { ProposalHeaderTitle } from './header';
@@ -19,23 +19,38 @@ import {
   ProposalBodyAuthor, ProposalBodyCreated,
   ProposalBodyEnded, ProposalBodyText,
 } from './body';
+import { ProposalHeaderExternalSnapshotLink, ProposalHeaderSnapshotThreadLink } from '../view_proposal/header';
 import User from '../../components/widgets/user';
 import { SocialSharingCarat } from '../../components/social_sharing_carat';
+import { formatPercent, formatNumberLong } from 'helpers';
 
 const ProposalHeader: m.Component<{
   snapshotId: string
   proposal: SnapshotProposal
-}, {}> = {
+}, {
+  loaded: boolean, 
+  thread: string,
+}> = {
   view: (vnode) => {
-    const { proposal } = vnode.attrs;
-    if (!proposal) {
-      return m('.topic-loading-spinner-wrap', [ m(Spinner, { active: true, size: 'lg' }) ]);
-    }
+    const { proposal, snapshotId } = vnode.attrs;
+    if (!proposal) return;
 
     // Original posters have full editorial control, while added collaborators
     // merely have access to the body and title
 
-    const proposalLink = `/${app.activeId()}/snapshot-proposal/${vnode.attrs.snapshotId}/${proposal.ipfs}`;
+    const proposalLink = `/${app.activeId()}/snapshot/${snapshotId}/${proposal.ipfs}`;
+
+    if (!vnode.state.loaded) {
+      try {
+        vnode.state.loaded = true;
+        app.threads.fetchThreadIdForSnapshot({snapshot: proposal.id}).then((res) => { 
+          vnode.state.thread = res;
+        })
+        m.redraw();
+      } catch (err) {
+        console.log(err);
+      }
+    }
 
     return m('.ProposalHeader', {
       class: 'proposal-snapshot'
@@ -51,6 +66,11 @@ const ProposalHeader: m.Component<{
             m(ProposalBodyAuthor, { item: proposal }),
             m('.CommentSocialHeader', [ m(SocialSharingCarat) ]),
           ]),
+          m('.proposal-body-link', [
+            (vnode.state.thread !== 'false') && vnode.state.loaded && m(ProposalHeaderSnapshotThreadLink, { threadId: vnode.state.thread }),
+            vnode.state.loaded && m(ProposalHeaderExternalSnapshotLink, { proposal: proposal, spaceId: snapshotId }),
+          ]),
+          m('br')
         ]),
       ]),
       m('.proposal-content', [
@@ -64,9 +84,11 @@ const ProposalHeader: m.Component<{
 
 const VoteRow: m.Component<{
   vote: SnapshotProposalVote
+  symbol: string
 }> = {
   view: (vnode) => {
-    return m('.ViewRow', [
+    const { vote, symbol } = vnode.attrs;
+    return m('.VoteRow', [
       m('.row-left', [
         m(User, {
           // TODO: activeID becomes chain_base, fix
@@ -75,69 +97,49 @@ const VoteRow: m.Component<{
           popover: true
         }),
       ]),
+      m('.row-right', `${formatNumberLong(vote.power)} ${symbol}`)
     ]);
   }
 };
 
-// eslint-disable-next-line no-shadow
-enum SnapshotVoteChoice {
-  YES = 1,
-  NO = 2,
-}
-
-const VoteView: m.Component<{ votes: SnapshotProposalVote[] }, { numLoadedYes: number, numLoadedNo: number }> = {
+const VotingResults: m.Component<{
+  votes: SnapshotProposalVote[],
+  choices: string[],
+  totals: any,
+  symbol: string,
+}, {
+  voteCounts: number[],
+  voteListings: any[],
+}> = {
   view: (vnode) => {
-    const { votes } = vnode.attrs;
-    if (!vnode.state.numLoadedYes) { vnode.state.numLoadedYes = 10; }
-    if (!vnode.state.numLoadedNo) { vnode.state.numLoadedNo = 10; }
+    const { votes, choices, totals, symbol } = vnode.attrs;
+    if (!choices.length) return;
+    if (!vnode.state.voteCounts?.length) {
+      vnode.state.voteCounts = choices.map((choice, idx) => 10);
+    }
 
-    const voteYesListing = [];
-    const voteNoListing = [];
-
-    voteYesListing.push(m('.vote-group-wrap', votes
-      .map((vote) => {
-        if (vote.choice === SnapshotVoteChoice.YES) {
-          return m(VoteRow, { vote });
-        } else {
-          return null;
-        }
-      })
-      .filter((v) => !!v)
-      .slice(0, vnode.state.numLoadedYes)));
-
-    voteNoListing.push(m('.vote-group-wrap', votes
-      .map((vote) => {
-        if (vote.choice === SnapshotVoteChoice.NO) {
-          return m(VoteRow, { vote });
-        } else {
-          return null;
-        }
-      })
-      .filter((v) => !!v)
-      .slice(0, vnode.state.numLoadedNo)));
-
-    return m('.VotingResults', [
-      m('.results-column', [
-        m('.results-header', `Voted yes (${votes.filter((v) => v.choice === SnapshotVoteChoice.YES).length})`),
+    vnode.state.voteListings = choices.map((choice, idx) => {
+      const votesForChoice = votes.filter((v) => v.choice === idx + 1);
+      const totalForChoice = totals.resultsByVoteBalance[idx];
+      const voteFrac = totalForChoice / totals.sumOfResultsBalance;
+      return m('.results-column', [
+        m('.results-header', `Voted for ${choice}: ${formatNumberLong(totalForChoice)} ${symbol} (${formatPercent(voteFrac, 4)}) (${votesForChoice.length} voters)`),
         m('.results-cell', [
-          voteYesListing
+          m('.vote-group-wrap', votesForChoice
+            .map((vote) => m(VoteRow, { vote, symbol }))
+            .filter((v) => !!v)
+            .slice(0, vnode.state.voteCounts[idx])),
         ]),
-        votes.filter((v) => v.choice === SnapshotVoteChoice.YES).length > vnode.state.numLoadedYes ? m(Button, {
-          label: 'Load more',
-          onclick: () => { vnode.state.numLoadedYes += 10; m.redraw(); },
-        }) : null
-      ]),
-      m('.results-column', [
-        m('.results-header', `Voted no (${votes.filter((v) => v.choice === SnapshotVoteChoice.NO).length})`),
-        m('.results-cell', [
-          voteNoListing
-        ]),
-        votes.filter((v) => v.choice === SnapshotVoteChoice.NO).length > vnode.state.numLoadedNo ? m(Button, {
-          label: 'Load more',
-          onclick: () => { vnode.state.numLoadedNo += 10; m.redraw(); },
-        }) : null
-      ])
-    ]);
+        votesForChoice.length > vnode.state.voteCounts[idx]
+          ? m(Button, {
+            label: 'Load more',
+            onclick: () => { vnode.state.voteCounts[idx] += 10; m.redraw(); },
+          })
+          : null
+      ]);
+    });
+
+    return m('.VotingResults', vnode.state.voteListings);
   }
 };
 
@@ -148,14 +150,16 @@ const VoteAction: m.Component<{
   totalScore: number,
   scores: number[],
   choices: string[],
+  votes: any[],
 }, {
   votingModalOpen: boolean
 }> = {
   view: (vnode) => {
     const { choices } = vnode.attrs;
     const canVote = true; // TODO: remove these hardcoded values;
-    const hasVotedYes = false;
-    const hasVotedNo = false;
+    const hasVoted = vnode.attrs.votes.find((vote) => {
+      return (vote.voter === app.user?.activeAccount?.address);
+    })?.choice;
     const { votingModalOpen } = vnode.state;
 
     const onModalClose = () => {
@@ -163,9 +167,7 @@ const VoteAction: m.Component<{
       m.redraw();
     };
 
-    const voteYes = async (e) => {
-      e.preventDefault();
-      console.log(`vnode.attrs.proposal ${vnode.attrs.proposal}`);
+    const vote = async (selectedChoice: number) => {
       try {
         app.modals.create({
           modal: ConfirmSnapshotVoteModal,
@@ -173,10 +175,11 @@ const VoteAction: m.Component<{
             space: vnode.attrs.space,
             proposal: vnode.attrs.proposal,
             id: vnode.attrs.id,
-            selectedChoice: 0,
+            selectedChoice,
             totalScore: vnode.attrs.totalScore,
             scores: vnode.attrs.scores,
-            snapshot: vnode.attrs.proposal.snapshot
+            snapshot: vnode.attrs.proposal.snapshot,
+            state: vnode.state
           }
         });
         vnode.state.votingModalOpen = true;
@@ -186,53 +189,25 @@ const VoteAction: m.Component<{
       }
     };
 
-    const voteNo = (e) => {
-      e.preventDefault();
-      try {
-        app.modals.create({
-          modal: ConfirmSnapshotVoteModal,
-          data: {
-            space: vnode.attrs.space,
-            proposal: vnode.attrs.proposal,
-            id: vnode.attrs.id,
-            selectedChoice: 1,
-            totalScore: vnode.attrs.totalScore,
-            scores: vnode.attrs.scores,
-            snapshot: vnode.attrs.proposal.snapshot,
-          }
-        });
-        vnode.state.votingModalOpen = true;
-      } catch (err) {
-        notifyError('Voting failed');
-      }
-    };
-
-    const yesButton = m('.yes-button', [
-      m(Button, {
-        intent: 'positive',
-        disabled: !canVote || hasVotedYes || votingModalOpen,
-        onclick: voteYes,
-        label: hasVotedYes ? `Voted "${choices[0]}"` : `Vote "${choices[0]}"`,
-        compact: true,
-        rounded: true,
-      }),
-    ]);
-    const noButton = m('.no-button', [
-      m(Button, {
-        intent: 'negative',
-        disabled: !canVote || hasVotedNo || votingModalOpen,
-        onclick: voteNo,
-        label: hasVotedNo ? `Voted "${choices[1]}"` : `Vote "${choices[1]}"`,
-        compact: true,
-        rounded: true,
-      })
-    ]);
+    if (!vnode.attrs.proposal.choices?.length) return;
+    const votingButtons = vnode.attrs.proposal.choices.map((choice, idx) => {
+      const choiceNum = idx + 1;
+      return m(`.voting-option.option-${choiceNum}`, [
+        m(Button, {
+          disabled: !canVote || hasVoted === choiceNum || votingModalOpen,
+          onclick: (e) => vote(idx),
+          label: hasVoted === choiceNum ? `Voted "${choices[idx]}"` : `Vote "${choices[idx]}"`,
+          compact: true,
+          rounded: true,
+        }),
+      ]);
+    });
 
     const votingActionObj = [
-      m('.button-row', [yesButton, noButton]),
+      m('.button-row', votingButtons),
     ];
 
-    return m('.VotingActions', [votingActionObj]);
+    return m('.VotingActions.Snapshot', [votingActionObj]);
   }
 };
 
@@ -244,6 +219,8 @@ const ViewProposalPage: m.Component<{
   proposal: SnapshotProposal,
   votes: SnapshotProposalVote[],
   space: SnapshotSpace,
+  totals: any,
+  symbol: string,
   snapshotProposal: SnapshotProposal,
   totalScore: number,
   scores: number[]
@@ -257,28 +234,17 @@ const ViewProposalPage: m.Component<{
         (proposal) => proposal.ipfs === vnode.attrs.identifier
       );
       // TODO: if proposal not found, throw error
+      // const await getResults()
 
       const space = app.snapshot.space;
       vnode.state.space = space;
+      vnode.state.symbol = space.symbol;
 
-      const votes = await getVotes(vnode.state.proposal.ipfs);
-      vnode.state.votes = votes;
-      const author = app.user.activeAccount;
-
-      if (author) {
-        try {
-          const power = await getPower(
-            space,
-            author.address,
-            vnode.state.proposal.snapshot
-          );
-          const { scores, totalScore } = power;
-          vnode.state.scores = scores;
-          vnode.state.totalScore = totalScore;
-        } catch (e) {
-          console.error(`Could not fetch scores: ${e.message}`);
-        }
-      }
+      await getResults(space, vnode.state.proposal).then((res) => {
+        vnode.state.votes = res.votes;
+        vnode.state.totals = res.results;
+        console.log(vnode.state.totals);
+      });      
 
       m.redraw();
     };
@@ -292,33 +258,40 @@ const ViewProposalPage: m.Component<{
       loadVotes();
     }
   },
-
   view: (vnode) => {
-    const getLoadingPage = () => m('.topic-loading-spinner-wrap', [ m(Spinner, { active: true, size: 'lg' }) ]);
-    if (!vnode.state.votes) {
-      return getLoadingPage();
-    }
-
     const author = app.user.activeAccount;
 
     const isActive = vnode.state.proposal
     && moment(+vnode.state.proposal.start * 1000) <= moment()
     && moment(+vnode.state.proposal.end * 1000) > moment();
 
-    return m(Sublayout, { class: 'ViewProposalPage', title: 'Snapshot Proposal' }, [
+    return m(Sublayout, { 
+      class: 'ViewProposalPage', 
+      title: 'Snapshot Proposal',
+    }, (!vnode.state.votes && !vnode.state.totals) ? m(Spinner, { active: true }) : [
       m(ProposalHeader, {
         snapshotId: vnode.attrs.snapshotId,
         proposal: vnode.state.proposal,
       }),
       m('.PinnedDivider', m('hr')),
-      vnode.state.votes && m(VoteView, { votes: vnode.state.votes }),
-      isActive && author && m(VoteAction, {
+      vnode.state.totals && vnode.state.votes
+      && vnode.state.proposal
+      && m(VotingResults, {
+        choices: vnode.state.proposal.choices,
+        votes: vnode.state.votes,
+        totals: vnode.state.totals,
+        symbol: vnode.state.symbol,
+      }),
+      isActive
+      && author
+      && m(VoteAction, {
         space: vnode.state.space,
         proposal: vnode.state.proposal,
         id: vnode.attrs.identifier,
         totalScore: vnode.state.totalScore,
         scores: vnode.state.scores,
-        choices: vnode.state.proposal.choices
+        choices: vnode.state.proposal.choices,
+        votes: vnode.state.votes,
       })
     ]);
   }

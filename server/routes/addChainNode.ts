@@ -18,7 +18,7 @@ const addChainNode = async (models: DB, req: Request, res: Response, next: NextF
   if (!req.user) {
     return next(new Error(Errors.NotLoggedIn));
   }
-  if (!req.user.isAdmin) {
+  if (!req.user.isAdmin && req.body?.base !== 'near') {
     return next(new Error(Errors.MustBeAdmin));
   }
   if (!req.body.id || !req.body.name || !req.body.symbol || !req.body.network || !req.body.node_url || !req.body.base) {
@@ -66,10 +66,11 @@ const addChainNode = async (models: DB, req: Request, res: Response, next: NextF
       element: req.body.element ? req.body.element : '',
       description: req.body.description ? req.body.description : '',
       type: req.body.type ? req.body.type : 'chain',
+      has_chain_events_listener: false
     });
   }
 
-  if (chain.type === 'dao' && !req.body.address) {
+  if (chain.type === 'dao' && !req.body.address && req.body.base !== 'near') {
     return next(new Error(Errors.MustSpecifyContract));
   }
 

@@ -55,15 +55,14 @@ class ProfilesController {
           this._store.add(profile);
           this._refreshProfile(profile);
         }
-        if (result.updatedProfileAddresses) {
-          result.updatedProfileAddresses.forEach((address) => {
-            const profile = this._store.getByAddress(address.address);
-            if (profile) {
-              this._refreshProfile(profile);
-            } else {
-              this._refreshProfile(new Profile(address.chain, address.address));
-            }
-          });
+        if (result.updatedProfileAddress) {
+          const { address, chain } = result.updatedProfileAddress;
+          const profile = this._store.getByAddress(address);
+          if (profile) {
+            this._refreshProfile(profile);
+          } else {
+            this._refreshProfile(new Profile(chain, address));
+          }
         }
         resolve(result.profile);
       }).catch((error) => {

@@ -78,7 +78,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     } = response.result;
     this.app.threads.initialize(threads, numVotingThreads, true);
     this.app.comments.initialize(comments, false);
-    this.app.reactions.initialize(reactions, true);
     this.app.topics.initialize(topics, true);
     this.meta.chain.setAdmins(admins);
     this.app.recentActivity.setMostActiveUsers(activeUsers);
@@ -113,6 +112,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
   public async deinit(): Promise<void> {
     this._apiInitialized = false;
     this.app.isModuleReady = false;
+    if (this.app.snapshot) this.app.snapshot.deinit();
     this._loaded = false;
     console.log(`Stopping ${this.meta.chain.id}...`);
   }

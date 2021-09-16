@@ -2,12 +2,10 @@ import m from 'mithril';
 import 'pages/landing/chains_slider.scss';
 import { Chain } from './index';
 
-
 interface IState {
   chains: Chain[];
   oncreateSlider: Function;
 }
-
 
 const TokensChainsComponent: m.Component<IState, IState> = {
   oninit: (vnode) => {
@@ -60,9 +58,10 @@ const TokensChainsComponent: m.Component<IState, IState> = {
                       {
                         id:`card_${index}`,
                         class: 'glide__slide mt-4 pb-8',
-  
+
                         onclick: (e) => {
                           e.preventDefault();
+                          m.route.set(`/${chain.id}`);
                           localStorage['home-scrollY'] = window.scrollY;
                         },
 
@@ -78,13 +77,13 @@ const TokensChainsComponent: m.Component<IState, IState> = {
                             class: 'mx-auto mb-3 w-12 h-auto',
                             src: chain.img,
                             alt: '',
-                            onclick: () => {
-                              m.route.set(`/${chain.id}`);
-                            }
                           }),
                           m(
                             'h3',
-                            { class: 'text-2xl font-extrabold mb-1' },
+                            {
+                              class: 'text-2xl font-extrabold mb-1',
+                              style: 'word-break: break-word'
+                            },
                             chain.name
                           ),
                           m('p', { class: 'text-xl' }, chain.description),

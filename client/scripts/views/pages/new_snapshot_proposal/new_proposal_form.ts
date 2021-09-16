@@ -2,12 +2,9 @@ import 'pages/new_proposal_page.scss';
 
 import $ from 'jquery';
 import m from 'mithril';
-import mixpanel from 'mixpanel-browser';
-import { Input, Form, FormLabel, FormGroup, Button, Callout, Spinner, RadioGroup } from 'construct-ui';
+import { Input, Form, FormLabel, FormGroup, Button, Callout, Spinner, RadioGroup, Icon, Icons } from 'construct-ui';
 
 import moment from 'moment';
-import snapshotJs from '@snapshot-labs/snapshot.js';
-
 import app from 'state';
 
 import { Account, ChainBase } from 'models';
@@ -17,7 +14,7 @@ import { idToProposal } from 'identifiers';
 import { capitalize } from 'lodash';
 import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
-import { SnapshotSpace } from 'client/scripts/helpers/snapshot_utils';
+import { SnapshotSpace, getScore, getSpaceBlockNumber } from 'helpers/snapshot_utils';
 
 interface IThreadForm {
   name: string;
@@ -82,8 +79,7 @@ const newThread = async (
 
   form.body = bodyText;
 
-  // TODO: do without snapshotjs
-  form.snapshot = await snapshotJs.utils.getBlockNumber(snapshotJs.utils.getProvider(space.network));
+  form.snapshot = await getSpaceBlockNumber(space.network);
   form.metadata.network = space.network;
   form.metadata.strategies = space.strategies;
 
@@ -121,7 +117,7 @@ const newThread = async (
     } else if (result.status === 'Success') {
       await app.user.notifications.refresh();
       await app.snapshot.refreshProposals();
-      m.route.set(`/${app.activeId()}/snapshot-proposal/${snapshotId}/${result.message.ipfsHash}`);
+      m.route.set(`/${app.activeId()}/snapshot/${snapshotId}/${result.message.ipfsHash}`);
     }
   } catch (err) {
     notifyError(err.message);
@@ -185,13 +181,7 @@ const NewProposalForm: m.Component<{snapshotId: string}, {
       }
       const space = app.snapshot.space;
 
-      snapshotJs.utils.getScores(
-        space.id,
-        space.strategies,
-        space.network,
-        snapshotJs.utils.getProvider(space.network),
-        [app.user.activeAccount.address]
-      ).then((response) => {
+      getScore(space, app.user.activeAccount.address).then((response) => {
         const scores = response
           .map((score) => Object.values(score).reduce((a, b) => (a as number) + (b as number), 0))
           .reduce((a, b) => (a as number) + (b as number), 0);
@@ -238,8 +228,6 @@ const NewProposalForm: m.Component<{snapshotId: string}, {
           || (vnode.state.space.filters?.minScore > 0 && vnode.state.userScore)
           || isMember);
 
-
-
     const today = new Date();
     const nextWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 7);
     return m('.NewThreadForm', {
@@ -261,7 +249,11 @@ const NewProposalForm: m.Component<{snapshotId: string}, {
             class: 'no-profile-callout',
             intent: 'primary',
             content: [
-              `You need to have a minimum of ${vnode.state.space.filters.minScore} ${vnode.state.space.symbol} in order to submit a proposal`
+              `You need to have a minimum of ${
+                vnode.state.space.filters.minScore
+              } ${
+                vnode.state.space.symbol
+              } in order to submit a proposal`
             ],
           }) : m(Spinner, { active: false, }),
         m('.new-snapshot-proposal-form', [
@@ -279,31 +271,48 @@ const NewProposalForm: m.Component<{snapshotId: string}, {
                 defaultValue: vnode.state.form.name,
               }),
             ]),
-            m(FormGroup, [
-              m(FormGroup, [
-                m(FormLabel, 'Choice 1'),
+            m(FormGroup, vnode.state.form.choices.map((choice, idx) => {
+              const placeholder = idx === 0
+                ? 'Yes'
+                : idx === 1
+                  ? 'No'
+                  : `Option ${idx + 1}`;
+              return m(FormGroup, [
+                m(FormLabel, `Choice ${idx + 1}`),
                 m(Input, {
                   name: 'targets',
-                  placeholder: 'Yes',
+                  placeholder,
                   oninput: (e) => {
                     const result = (e.target as any).value;
-                    vnode.state.form.choices[0] = result;
+                    vnode.state.form.choices[idx] = result;
                     m.redraw();
                   },
+                  contentRight: (idx > 1 && idx === vnode.state.form.choices.length - 1)
+                    && m(Icon, {
+                      name: Icons.TRASH,
+                      size: 'xl',
+                      style: 'cursor: pointer;',
+                      onclick: () => {
+                        vnode.state.form.choices.pop();
+                        m.redraw();
+                      }
+                    })
                 }),
-              ]),
-              m(FormGroup, [
-                m(FormLabel, 'Choice 2'),
-                m(Input, {
-                  name: 'targets',
-                  placeholder: 'No',
-                  oninput: (e) => {
-                    const result = (e.target as any).value;
-                    vnode.state.form.choices[1] = result;
-                    m.redraw();
-                  },
-                }),
-              ]),
+              ]);
+            })),
+            m('.add-vote-choice', {
+              style: 'cursor: pointer;',
+              onclick: () => {
+                const choiceLength = vnode.state.form.choices.length;
+                vnode.state.form.choices.push(`Option ${choiceLength + 1}`);
+                m.redraw();
+              }
+            }, [
+              m('span', 'Add voting choice'),
+              m(Icon, {
+                name: Icons.PLUS,
+                size: 'xl',
+              }),
             ]),
             m(FormGroup, [
               m(FormLabel, { for: 'period' }, 'Date Range:'),

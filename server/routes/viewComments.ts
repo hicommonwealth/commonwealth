@@ -29,11 +29,13 @@ const viewComments = async (models: DB, req: Request, res: Response, next: NextF
         as: 'reactions',
         include: [{
           model: models.Address,
-          as: 'Address'
+          as: 'Address',
+          required: true
         }]
       }
     ],
     order: [['created_at', 'DESC']],
+    paranoid: false,
   });
   return res.json({ status: 'Success', result: comments.map((c) => c.toJSON()) });
 };

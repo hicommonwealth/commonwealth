@@ -33,12 +33,14 @@ import createReaction from './routes/createReaction';
 import deleteReaction from './routes/deleteReaction';
 import viewReactions from './routes/viewReactions';
 import bulkReactions from './routes/bulkReactions';
+import reactionsCounts from './routes/reactionsCounts';
 import starCommunity from './routes/starCommunity';
 import createCommunity from './routes/createCommunity';
 import deleteCommunity from './routes/deleteCommunity';
 import updateCommunity from './routes/updateCommunity';
 import communityStats from './routes/communityStats';
 import getCommunitiesAndChains from './routes/getCommunitiesAndChains';
+import createChain from './routes/createChain';
 import viewCount from './routes/viewCount';
 import updateEmail from './routes/updateEmail';
 
@@ -78,9 +80,11 @@ import updateThreadStage from './routes/updateThreadStage';
 import updateThreadPrivacy from './routes/updateThreadPrivacy';
 import updateThreadPinned from './routes/updateThreadPinned';
 import updateThreadLinkedChainEntities from './routes/updateThreadLinkedChainEntities';
+import updateThreadLinkedSnapshotProposal from './routes/updateThreadLinkedSnapshotProposal';
 import updateOffchainVote from './routes/updateOffchainVote';
 import viewOffchainVotes from './routes/viewOffchainVotes';
 import fetchEntityTitle from './routes/fetchEntityTitle';
+import fetchThreadForSnapshot from './routes/fetchThreadForSnapshot';
 import updateChainEntityTitle from './routes/updateChainEntityTitle';
 import deleteThread from './routes/deleteThread';
 import addEditors from './routes/addEditors';
@@ -107,6 +111,7 @@ import editTopic from './routes/editTopic';
 import deleteTopic from './routes/deleteTopic';
 import bulkTopics from './routes/bulkTopics';
 import bulkOffchain from './routes/bulkOffchain';
+import setTopicThreshold from './routes/setTopicThreshold';
 
 import edgewareLockdropLookup from './routes/getEdgewareLockdropLookup';
 import edgewareLockdropStats from './routes/getEdgewareLockdropStats';
@@ -124,9 +129,11 @@ import getTokenForum from './routes/getTokenForum';
 import getSubstrateSpec from './routes/getSubstrateSpec';
 import editSubstrateSpec from './routes/editSubstrateSpec';
 import { getStatsDInstance } from './util/metrics';
+import updateAddress from "./routes/updateAddress";
 import { DB } from './database';
-
+import { factory, formatFilename } from '../shared/logging';
 import { sendMessage } from './routes/snapshotAPI';
+
 
 function setupRouter(
   app,
@@ -136,17 +143,27 @@ function setupRouter(
   tokenBalanceCache: TokenBalanceCache
 ) {
   const router = express.Router();
+  const log = factory.getLogger(formatFilename(__filename));
 
   router.use((req, res, next) => {
+    log.info(`requested path : ${req.path}`);
     getStatsDInstance().increment(`cw.path.${req.path.slice(1)}.called`);
     const start = Date.now();
     res.on('finish', () => {
       const latency = Date.now() - start;
       getStatsDInstance().histogram(`cw.path.${req.path.slice(1)}.latency`, latency);
+      log.info(`requested path completed: ${req.path}`);
     });
     next();
   });
 
+  router.get('/logs', (req, res) => {
+    const { message } = req.query;
+    log.info(`logs: ${message}`);
+    res.json(message)
+  })
+
+  router.post('/updateAddress', passport.authenticate('jwt', { session: false }), updateAddress.bind(this, models));
   router.get('/domain', domain.bind(this, models));
   router.get('/status', status.bind(this, models));
 
@@ -198,6 +215,8 @@ function setupRouter(
   router.get('/communityStats', passport.authenticate('jwt', { session: false }), communityStats.bind(this, models));
   router.get('/getTokensFromLists', getTokensFromLists.bind(this, models));
   router.get('/getTokenForum', getTokenForum.bind(this, models));
+  // TODO: Change to POST /chain
+  router.post('/createChain', passport.authenticate('jwt', { session: false }), createChain.bind(this, models));
 
   // offchain threads
   // TODO: Change to POST /thread
@@ -234,6 +253,11 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     updateThreadLinkedChainEntities.bind(this, models),
   );
+  router.post(
+    '/updateThreadLinkedSnapshotProposal',
+    passport.authenticate('jwt', { session: false }),
+    updateThreadLinkedSnapshotProposal.bind(this, models),
+  );
 
   router.post(
     '/updateOffchainVote',
@@ -243,6 +267,8 @@ function setupRouter(
   router.get('/viewOffchainVotes', viewOffchainVotes.bind(this, models));
 
   router.get('/fetchEntityTitle', fetchEntityTitle.bind(this, models));
+  router.get('/fetchThreadForSnapshot', fetchThreadForSnapshot.bind(this, models));
+
   router.post(
     '/updateChainEntityTitle',
     passport.authenticate('jwt', { session: false }),
@@ -293,6 +319,11 @@ function setupRouter(
   router.post('/deleteTopic', passport.authenticate('jwt', { session: false }), deleteTopic.bind(this, models));
   // TODO: Change to GET /topics
   router.get('/bulkTopics', bulkTopics.bind(this, models));
+  router.post(
+    '/setTopicThreshold',
+    passport.authenticate('jwt', { session: false }),
+    setTopicThreshold.bind(this, models),
+  );
 
   // offchain reactions
   // TODO: Change to POST /reaction
@@ -307,6 +338,7 @@ function setupRouter(
   router.get('/viewReactions', viewReactions.bind(this, models));
   // TODO: Change to GET /reactions
   router.get('/bulkReactions', bulkReactions.bind(this, models));
+  router.post('/reactionsCounts', reactionsCounts.bind(this, models));
 
   // generic invite link
   // TODO: Change to POST /inviteLink

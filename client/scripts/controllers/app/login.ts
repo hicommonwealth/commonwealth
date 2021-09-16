@@ -186,7 +186,7 @@ export function updateActiveUser(data) {
     app.user.setEmailVerified(data.emailVerified);
     app.user.setJWT(data.jwt);
 
-    app.user.setAddresses(data.addresses.map((a) => new AddressInfo(a.id, a.address, a.chain, a.keytype, a.is_magic)));
+    app.user.setAddresses(data.addresses.map((a) => new AddressInfo(a.id, a.address, a.chain, a.keytype, a.is_magic, a.ghost_address)));
     app.user.setSocialAccounts(data.socialAccounts.map((sa) => new SocialAccount(sa.provider, sa.provider_username)));
 
     app.user.setSiteAdmin(data.isAdmin);
@@ -202,9 +202,10 @@ export async function createUserWithAddress(
   const account = app.chain.accounts.get(address, keytype);
   const response = await createAccount(account, community);
   const token = response.result.verification_token;
-  account.setValidationToken(token);
-  account.setAddressId(response.result.id);
-  return account;
+  const newAccount = app.chain.accounts.get(response.result.address, keytype);
+  newAccount.setValidationToken(token);
+  newAccount.setAddressId(response.result.id);
+  return newAccount;
 }
 
 export async function unlinkLogin(account) {

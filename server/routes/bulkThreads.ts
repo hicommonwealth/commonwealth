@@ -42,7 +42,7 @@ const bulkThreads = async (models: DB, req: Request, res: Response, next: NextFu
       SELECT addr.id AS addr_id, addr.address AS addr_address,
         addr.chain AS addr_chain, thread_id, thread_title,
         thread_community, thread_chain, thread_created, threads.kind,
-        threads.read_only, threads.body, threads.stage,
+        threads.read_only, threads.body, threads.stage, threads.snapshot_proposal,
         threads.offchain_voting_options, threads.offchain_voting_votes, threads.offchain_voting_ends_at,
         threads.url, threads.pinned, topics.id AS topic_id, topics.name AS topic_name,
         topics.description AS topic_description, topics.chain_id AS topic_chain,
@@ -54,7 +54,7 @@ const bulkThreads = async (models: DB, req: Request, res: Response, next: NextFu
           t.created_at AS thread_created, t.community AS thread_community,
           t.chain AS thread_chain, t.read_only, t.body,
           t.offchain_voting_options, t.offchain_voting_votes, t.offchain_voting_ends_at,
-          t.stage, t.url, t.pinned, t.topic_id, t.kind, ARRAY_AGG(DISTINCT
+          t.stage, t.snapshot_proposal, t.url, t.pinned, t.topic_id, t.kind, ARRAY_AGG(DISTINCT
             CONCAT(
               '{ "address": "', editors.address, '", "chain": "', editors.chain, '" }'
               )
@@ -134,6 +134,7 @@ const bulkThreads = async (models: DB, req: Request, res: Response, next: NextFu
         created_at: t.thread_created,
         collaborators,
         chain_entities,
+        snapshot_proposal: t.snapshot_proposal,
         offchain_voting_options: t.offchain_voting_options,
         offchain_voting_votes: t.offchain_voting_votes,
         offchain_voting_ends_at: t.offchain_voting_ends_at,
@@ -211,16 +212,16 @@ const bulkThreads = async (models: DB, req: Request, res: Response, next: NextFu
     });
   }
 
-  const reactions = await models.OffchainReaction.findAll({
-    where: {
-      [Op.or]: [
-        { thread_id: threads.map((thread) => thread.id) },
-        { comment_id: comments.map((comment) => comment.id) },
-      ],
-    },
-    include: [ models.Address ],
-    order: [['created_at', 'DESC']],
-  });
+  // const reactions = await models.OffchainReaction.findAll({
+  //   where: {
+  //     [Op.or]: [
+  //       { thread_id: threads.map((thread) => thread.id) },
+  //       { comment_id: comments.map((comment) => comment.id) },
+  //     ],
+  //   },
+  //   include: [ models.Address ],
+  //   order: [['created_at', 'DESC']],
+  // });
 
   const countsQuery = `
      SELECT id, title, stage FROM "OffchainThreads"
@@ -238,7 +239,7 @@ const bulkThreads = async (models: DB, req: Request, res: Response, next: NextFu
       numVotingThreads,
       threads,
       comments, // already converted to JSON earlier
-      reactions: reactions.map((r) => r.toJSON()),
+      // reactions: reactions.map((r) => r.toJSON()),
     }
   });
 };

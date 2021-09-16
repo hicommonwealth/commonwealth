@@ -1,5 +1,13 @@
 {
-  "extends": ["airbnb-base"],
+  "extends": [
+    "airbnb-base",
+    "plugin:prettier/recommended",
+    "plugin:import/errors",
+    "plugin:import/warnings",
+    "plugin:import/typescript",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
   "plugins": ["@typescript-eslint"],
   "parser": "@typescript-eslint/parser",
   "settings": {
@@ -12,6 +20,8 @@
     }
   },
   "rules": {
+    "@typescript-eslint/interface-name-prefix": "off",
+    "@typescript-eslint/camelcase": "off",
     "import/extensions": "off",
     "import/no-unresolved": "off",
     "import/no-cycle": "off",
@@ -21,6 +31,7 @@
     "camelcase": 0,
     "no-else-return": 0,
     "no-unused-vars": 0,
+    "no-unused-expressions": 0,
     "class-methods-use-this": 0,
     "import/newline-after-import": 0,
     "import/no-named-default": 0,
@@ -46,7 +57,7 @@
     "one-var": 0,
     "lines-between-class-members": 0,
     "max-classes-per-file": ["error", 5],
-    "max-len": ["error", {"code": 120, "tabWidth": 2}],
+    "max-len": [1, {"code": 120, "tabWidth": 2}],
     "no-constant-condition": ["error", {"checkLoops": false}],
     "no-restricted-syntax": 0,
     "no-trailing-spaces": ["error"],
@@ -56,8 +67,9 @@
     "dot-notation": 0,
     "no-lonely-if": 0,
     "no-multi-spaces": 0,
-    "strict": 0,
     "no-await-in-loop": 0,
-    "no-async-promise-executor": 0
+    "no-async-promise-executor": 0,
+    "no-shadow": "off",
+    "@typescript-eslint/no-shadow": "error"
   }
 }

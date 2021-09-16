@@ -52,7 +52,7 @@ module.exports = {
 
       await queryInterface.bulkUpdate('ChainNodes', {
         url: 'wss://mainnet.infura.io/ws',
-        address: '0x5e4be8Bc9637f0EAA1A755019e06A68ce081D58F', // Governance
+        address: '0xC4e172459f1E7939D522503B81AFAaC1014CE6F6', // Governance
         token_name: 'uni',
       }, {
         chain: 'uniswap',

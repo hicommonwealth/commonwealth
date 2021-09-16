@@ -118,23 +118,18 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
           onChangeHandler: (v) => { vnode.state.customDomain = v; },
           disabled: true, // Custom domains should be admin configurable only
         }),
-        app.chain?.meta.chain.base === 'ethereum' ? m(InputPropertyRow, {
+        app.chain?.meta.chain.base === 'ethereum'
+        && m(InputPropertyRow, {
           title: 'Snapshot',
           defaultValue: vnode.state.snapshot,
           placeholder: vnode.state.network,
           onChangeHandler: (v) => { vnode.state.snapshot = v; },
-        }) : null,
+        }),
         m(InputPropertyRow, {
           title: 'Terms of Service',
           defaultValue: vnode.state.terms,
           placeholder: 'Url that new users see',
           onChangeHandler: (v) => { vnode.state.terms = v; },
-        }),
-        m(InputPropertyRow, {
-          title: 'Snapshot',
-          defaultValue: vnode.state.snapshot,
-          placeholder: vnode.state.network,
-          onChangeHandler: (v) => { vnode.state.snapshot = v; },
         }),
         m('tr', [
           m('td', 'Admins'),

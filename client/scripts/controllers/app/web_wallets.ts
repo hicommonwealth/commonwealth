@@ -1,9 +1,12 @@
 import { ChainBase, IWebWallet } from 'models';
+import app from 'state';
 import MetamaskWebWalletController from './webWallets/metamask_web_wallet';
 import WalletConnectWebWalletController from './webWallets/walletconnect_web_wallet';
 import KeplrWebWalletController from './webWallets/keplr_web_wallet';
 import PolkadotWebWalletController from './webWallets/polkadot_web_wallet';
 import NearWebWalletController from './webWallets/near_web_wallet';
+import TerraStationWebWalletController from './webWallets/terra_station_web_wallet';
+import InjectiveWebWalletController from './webWallets/injective_web_wallet';
 
 export default class WebWalletController {
   private _wallets: IWebWallet<any>[];
@@ -11,8 +14,13 @@ export default class WebWalletController {
     return this._wallets;
   }
 
+  // TODO filter out wallets that are specific to a chain (and the current page isn't that chain)
   public availableWallets(chain?: ChainBase): IWebWallet<any>[] {
-    return this._wallets.filter((w) => w.available && (!chain || w.chain === chain));
+    return this._wallets.filter((w) => w.available
+      && (!chain || w.chain === chain)
+      // if a specific chain is specified on a wallet AND a current chain is defined (aka not on home page) then load
+      // the wallet if the current chain is the same as the specific chain
+      && ((w.specificChain && app.chain?.meta?.chain.id) ? w.specificChain === app.chain.meta.chain.id : true));
   }
 
   public getByName(name: string): IWebWallet<any> | undefined {
@@ -25,21 +33,18 @@ export default class WebWalletController {
       throw new Error('No wallet available');
     }
 
-    let foundWallet: IWebWallet<string>;
     for (const wallet of availableWallets) {
       if (!wallet.enabled) {
         await wallet.enable();
       }
       // TODO: ensure that we can find any wallet, even if non-string accounts
       if (wallet.accounts.find((acc) => acc === address)) {
-        foundWallet = wallet;
+        console.log(`Found wallet: ${wallet.name}`);
+        return wallet;
       }
       // TODO: disable if not found
     }
-    if (!foundWallet) {
-      throw new Error(`No wallet found for ${address}`);
-    }
-    return foundWallet;
+    throw new Error(`No wallet found for ${address}`);
   }
 
   constructor() {
@@ -49,6 +54,8 @@ export default class WebWalletController {
       new WalletConnectWebWalletController(),
       new KeplrWebWalletController(),
       new NearWebWalletController(),
+      new TerraStationWebWalletController(),
+      new InjectiveWebWalletController(),
     ];
   }
 }

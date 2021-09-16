@@ -1,12 +1,22 @@
 import { SubstrateEvents } from '@commonwealth/chain-events';
+import models from '../database';
 import IdentityEventHandler from '../eventHandlers/identity';
 import JobRunner from './cacheJobRunner';
 
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
+
+
 // list of identities to fetch
 type CacheT = { [chain: string]: string[] }
+
+export class IdentityFetchCacheNew {
+  public async add(chain: string, address: string) {
+    await models.IdentityCache.create({ chain, address });
+    log.info(`${address} added to the identity cache`);
+  }
+}
 
 export default class IdentityFetchCache extends JobRunner<CacheT> {
   private _fetchers: { [chain: string]: SubstrateEvents.StorageFetcher } = {};

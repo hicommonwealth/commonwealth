@@ -43,8 +43,7 @@ const LinkedProposalsEmbed: m.Component<{ proposal }> = {
       if (!(
         (proposal instanceof SubstrateDemocracyProposal || proposal instanceof SubstrateCollectiveProposal)
           && proposal.getReferendum()
-        ||
-          (proposal instanceof SubstrateDemocracyReferendum && proposal.preimage
+        ||          (proposal instanceof SubstrateDemocracyReferendum && proposal.preimage
            && proposal.getProposalOrMotion(proposal.preimage))
       )) return;
 

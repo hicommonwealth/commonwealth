@@ -35,7 +35,6 @@ class Community extends ICommunityAdapter<Coin, OffchainAccount> {
     } = response.result;
     this.app.threads.initialize(threads, numVotingThreads, true);
     this.app.comments.initialize(comments, true);
-    this.app.reactions.initialize(reactions, true);
     this.app.topics.initialize(topics, true);
     this.meta.setAdmins(admins);
     this.app.recentActivity.setMostActiveUsers(activeUsers);

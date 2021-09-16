@@ -28,8 +28,9 @@ import NewProposalPage from 'views/pages/new_proposal/index';
 import PageNotFound from 'views/pages/404';
 import Listing from 'views/pages/listing';
 import ErrorPage from 'views/pages/error';
-import AaveProposalCardDetail from '../components/proposals/aave_proposal_card_detail';
 import { AaveTypes, CompoundTypes } from '@commonwealth/chain-events';
+import NearSputnik from 'controllers/chain/near/sputnik/adapter';
+import AaveProposalCardDetail from '../components/proposals/aave_proposal_card_detail';
 
 const SubstrateProposalStats: m.Component<{}, {}> = {
   view: (vnode) => {
@@ -74,6 +75,7 @@ const CompoundProposalStats: m.Component<{}, {}> = {
     if (!app.chain) return;
     if (!(app.chain instanceof Compound)) return;
     const activeAccount = app.user.activeAccount;
+    const symbol = app.chain.meta.chain.symbol;
 
     return m('.stats-box', [
       m('.stats-box-left', '💭'),
@@ -87,10 +89,10 @@ const CompoundProposalStats: m.Component<{}, {}> = {
         m('', [
           // TODO: We shouldn't be hardcoding these figures
           m('.stats-box-stat', [
-            `Quorum: ${app.chain.governance?.quorumVotes.div(new BN('1000000000000000000')).toString()} MPOND`
+            `Quorum: ${app.chain.governance?.quorumVotes.div(new BN('1000000000000000000')).toString()} ${symbol}`
           ]),
           m('.stats-box-stat', [
-            `Proposal Threshold: ${app.chain.governance?.proposalThreshold.div(new BN('1000000000000000000')).toString()} MPOND`
+            `Proposal Threshold: ${app.chain.governance?.proposalThreshold.div(new BN('1000000000000000000')).toString()} ${symbol}`
           ]),
           m('.stats-box-stat', [
             `Voting Period Length: ${app.chain.governance.votingPeriod.toString(10)}`,
@@ -173,6 +175,7 @@ const ProposalsPage: m.Component<{}> = {
     const onMoloch = app.chain && app.chain.network === ChainNetwork.Moloch;
     const onCompound = app.chain && CompoundTypes.EventChains.find((c) => c === app.chain.network);
     const onAave = app.chain && AaveTypes.EventChains.find((c) => c === app.chain.network);
+    const onSputnik = app.chain && app.chain.network === ChainNetwork.Sputnik;
 
     const modLoading = loadSubstrateModules('Proposals', getModules);
     if (modLoading) return modLoading;
@@ -194,6 +197,9 @@ const ProposalsPage: m.Component<{}> = {
     const activeAaveProposals = onAave
       && (app.chain as Aave).governance.store.getAll().filter((p) => !p.completed)
         .sort((p1, p2) => +p2.startBlock - +p1.startBlock);
+    const activeSputnikProposals = onSputnik
+      && (app.chain as NearSputnik).dao.store.getAll().filter((p) => !p.completed)
+        .sort((p1, p2) => p2.data.id - p1.data.id);
 
     const activeProposalContent = !activeDemocracyProposals?.length
       && !activeCouncilProposals?.length
@@ -201,6 +207,7 @@ const ProposalsPage: m.Component<{}> = {
       && !activeMolochProposals?.length
       && !activeCompoundProposals?.length
       && !activeAaveProposals?.length
+      && !activeSputnikProposals?.length
       ? [ m('.no-proposals', 'No active proposals') ]
       : [ m('.active-proposals', [(activeDemocracyProposals || []).map((proposal) => m(ProposalCard, { proposal }))
         .concat((activeCouncilProposals || []).map((proposal) => m(ProposalCard, { proposal })))
@@ -210,8 +217,9 @@ const ProposalsPage: m.Component<{}> = {
         .concat((activeAaveProposals || []).map((proposal) => m(ProposalCard, {
           proposal,
           injectedContent: AaveProposalCardDetail,
-        })))]
-      )];
+        })))
+        .concat((activeSputnikProposals || []).map((proposal) => m(ProposalCard, { proposal })))
+      ])];
 
     // inactive proposals
     const inactiveDemocracyProposals = onSubstrate
@@ -230,6 +238,9 @@ const ProposalsPage: m.Component<{}> = {
     const inactiveAaveProposals = onAave
       && (app.chain as Aave).governance.store.getAll().filter((p) => p.completed)
         .sort((p1, p2) => +p2.startBlock - +p1.startBlock);
+    const inactiveSputnikProposals = onSputnik
+      && (app.chain as NearSputnik).dao.store.getAll().filter((p) => p.completed)
+        .sort((p1, p2) => p2.data.id - p1.data.id);
 
     const inactiveProposalContent = !inactiveDemocracyProposals?.length
       && !inactiveCouncilProposals?.length
@@ -237,6 +248,7 @@ const ProposalsPage: m.Component<{}> = {
       && !inactiveMolochProposals?.length
       && !inactiveCompoundProposals?.length
       && !inactiveAaveProposals?.length
+      && !inactiveSputnikProposals?.length
       ? [ m('.no-proposals', 'No past proposals') ]
       : [ m('.inactive-proposals', [(inactiveDemocracyProposals || []).map((proposal) => m(ProposalCard, { proposal }))
         .concat((inactiveCouncilProposals || []).map((proposal) => m(ProposalCard, { proposal })))
@@ -246,8 +258,9 @@ const ProposalsPage: m.Component<{}> = {
         .concat((inactiveAaveProposals || []).map((proposal) => m(ProposalCard, {
           proposal,
           injectedContent: AaveProposalCardDetail,
-        }))) ]
-      )];
+        })))
+        .concat((inactiveSputnikProposals || []).map((proposal) => m(ProposalCard, { proposal })))
+      ])];
 
     // XXX: display these
     const visibleTechnicalCommitteeProposals = app.chain

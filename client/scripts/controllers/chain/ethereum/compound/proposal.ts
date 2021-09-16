@@ -25,7 +25,6 @@ import EthereumAccount from '../account';
 import EthereumAccounts from '../accounts';
 import CompoundChain from './chain';
 
-// eslint-disable-next-line no-shadow
 export enum CompoundVote {
   YES = 1,
   NO = 0
@@ -109,6 +108,16 @@ export default class CompoundProposal extends Proposal<
     }
   }
 
+<<<<<<< HEAD
+=======
+  public get isExecutable() {
+    // will be Expired if over grace period
+    return this.state === CompoundTypes.ProposalState.Queued
+      && this.data.eta
+      && this.data.eta <= this._Gov.app.chain.block.lastTime.unix();
+  }
+
+>>>>>>> master
   public get isPassing(): ProposalStatus {
     switch (this.state) {
       case CompoundTypes.ProposalState.Canceled:
@@ -184,6 +193,13 @@ export default class CompoundProposal extends Proposal<
     return this.data.cancelled;
   }
 
+<<<<<<< HEAD
+=======
+  public get isQueueable() {
+    return this.state === CompoundTypes.ProposalState.Succeeded;
+  }
+
+>>>>>>> master
   public get support() {
     const votes = this.getVotes();
     const yesPower = sumVotes(votes.filter((v) => v.choice));
@@ -215,7 +231,10 @@ export default class CompoundProposal extends Proposal<
 
     // special case for expiration because no event is emitted
     if (this.state === CompoundTypes.ProposalState.Expired || this.state === CompoundTypes.ProposalState.Defeated) {
+<<<<<<< HEAD
       console.log(entity.chainEvents.filter((v) => v.data.kind !== CompoundTypes.EventKind.VoteCast));
+=======
+>>>>>>> master
       this.complete(this._Gov.store);
     }
 
@@ -264,10 +283,15 @@ export default class CompoundProposal extends Proposal<
   public canVoteFrom(account: EthereumAccount) {
     // We need to check the delegate of account to perform voting checks. Delegates must
     // be fetched from chain, which requires async calls, making this impossible to implement.
+<<<<<<< HEAD
+=======
+    // TODO: load on contract init
+>>>>>>> master
     return true;
   }
 
   public async cancelTx() {
+<<<<<<< HEAD
     if (this.isCancelled) {
       throw new Error('proposal already cancelled');
     }
@@ -282,6 +306,69 @@ export default class CompoundProposal extends Proposal<
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
       throw new Error('failed to cancelled proposal');
+=======
+    if (this.data.cancelled) {
+      throw new Error('proposal already cancelled');
+    }
+
+    // TODO: condition check for who can cancel
+
+    const address = this._Gov.app.user.activeAccount.address;
+    const contract = await attachSigner(this._Gov.app.wallets, address, this._Gov.api.Contract);
+
+    const gasLimit = await contract.estimateGas.cancel(this.data.identifier);
+    const tx = await contract.cancel(
+      this.data.identifier,
+      { gasLimit }
+    );
+    const txReceipt = await tx.wait();
+    if (txReceipt.status !== 1) {
+      throw new Error('failed to cancel proposal');
+    }
+    return txReceipt;
+  }
+
+  public async queueTx() {
+    if (this.data.queued || this.data.executed) {
+      throw new Error('proposal already queued');
+    }
+
+    // TODO: condition check for who can queue
+
+    const address = this._Gov.app.user.activeAccount.address;
+    const contract = await attachSigner(this._Gov.app.wallets, address, this._Gov.api.Contract);
+
+    const gasLimit = await contract.estimateGas.queue(this.data.identifier);
+    const tx = await contract.queue(
+      this.data.identifier,
+      { gasLimit }
+    );
+    const txReceipt = await tx.wait();
+    if (txReceipt.status !== 1) {
+      throw new Error('failed to queue proposal');
+    }
+    return txReceipt;
+  }
+
+  public async executeTx() {
+    if (this.data.executed) {
+      throw new Error('proposal already executed');
+    }
+
+    // TODO: condition check for who can execute
+
+    const address = this._Gov.app.user.activeAccount.address;
+    const contract = await attachSigner(this._Gov.app.wallets, address, this._Gov.api.Contract);
+
+    const gasLimit = await contract.estimateGas.execute(this.data.identifier);
+    const tx = await contract.execute(
+      this.data.identifier,
+      { gasLimit }
+    );
+    const txReceipt = await tx.wait();
+    if (txReceipt.status !== 1) {
+      throw new Error('failed to execute proposal');
+>>>>>>> master
     }
     return txReceipt;
   }
@@ -302,10 +389,21 @@ export default class CompoundProposal extends Proposal<
       throw new Error('proposal not in active period');
     }
 
+<<<<<<< HEAD
     const tx = await contract.castVote(
       this.data.identifier,
       !!vote.choice,
       { gasLimit: this._Gov.api.gasLimit },
+=======
+    const gasLimit = await contract.estimateGas.castVote(
+      this.data.identifier,
+      !!vote.choice
+    );
+    const tx = await contract.castVote(
+      this.data.identifier,
+      !!vote.choice,
+      { gasLimit },
+>>>>>>> master
     );
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {

@@ -95,7 +95,7 @@ class FilterScopedThreadStore extends IdStore<OffchainThread> {
     this._threadsByCommunity = {};
   }
 
-  public getByCommunityAndTopic(community: string, topic: string = '', stage: string = ''): Array<OffchainThread> {
+  public getByCommunityTopicAndStage(community: string, topic: string = '', stage: string = ''): Array<OffchainThread> {
     const subpage = (topic || stage) ? `${topic || ''}#${stage || ''}` : ALL_PROPOSALS_KEY;
     return this._threadsByCommunity[community]
       ? this._threadsByCommunity[community][subpage] || []
