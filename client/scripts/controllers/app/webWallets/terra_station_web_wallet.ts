@@ -32,6 +32,10 @@ class TerraStationWebWalletController implements IWebWallet<string> {
   //   return this._extension.sign({ msgs: [message]});
   // }
 
+  public async signMessage(message: string): Promise<string> {
+    throw new Error('unimplemented');
+  }
+
   public async enable() {
     console.log('Attempting to enable Terra Station');
     this._enabling = true;

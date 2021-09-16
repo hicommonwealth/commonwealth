@@ -14,6 +14,8 @@ import EditIdentityModal from '../../modals/edit_identity_modal';
 import { setActiveAccount } from '../../../controllers/app/login';
 import EditProfileModal from '../../modals/edit_profile_modal';
 import TwitterAttestationModal from '../../modals/twitter_attestation_modal';
+import { ChainBase } from 'models';
+import { formatAddressShort } from '../../../../../shared/utils';
 
 const editIdentityAction = (account, currentIdentity: SubstrateIdentity, vnode) => {
   const chainObj = app.config.chains.getById(account.chain);
@@ -105,7 +107,6 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
         }
       },
       { passive:true });
-    console.log('account', account.ghost_address)
     const joinCommunity = async () => {
       if (!app.activeChainId() || onOwnProfile) return;
       vnode.state.loading = true;
@@ -137,7 +138,7 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
             m('.name-row', [
               m('.User', account.profile
                 ? m(User, { user: account, hideAvatar: true, showRole: true })
-                : account.address),
+                : formatAddressShort(account.address)),
             ]),
             m('.address-block-right', [
               m('.address', `${account.address.slice(0, 6)}...${account.address.slice(account.address.length - 6)}`),
@@ -173,7 +174,7 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
             label: 'Edit'
           }),
           m('.twitter-link', [
-            !isClaimable && onOwnProfile && m(Button, {
+            (app.chain?.meta.chain.base === ChainBase.Ethereum) && !isClaimable && m(Button, {
               intent: 'primary',
               style: 'background-color: rgb(33, 114, 229); border: 0px solid white; color: white;',
               onclick: () => {

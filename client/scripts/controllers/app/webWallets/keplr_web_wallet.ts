@@ -48,6 +48,10 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
     return account.validate(JSON.stringify(signature));
   }
 
+  public async signMessage(message: string): Promise<string> {
+    throw new Error('unimplemented');
+  }
+
   // ACTIONS
   public async getClient(url: string, account: string): Promise<SigningStargateClient> {
     if (!this.enabled || app.chain.meta.chain.id !== this._chainId) {

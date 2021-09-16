@@ -14,6 +14,10 @@ class NearWebWalletController implements IWebWallet<any> {
     return [];
   }
 
+  public async signMessage(message: string): Promise<string> {
+    throw new Error('unimplemented');
+  }
+
   public async validateWithAccount(account: Account<any>): Promise<void> {
     throw new Error('not implemented');
   }

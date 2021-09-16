@@ -44,6 +44,10 @@ class PolkadotWebWalletController implements IWebWallet<InjectedAccountWithMeta>
     return injector.signer;
   }
 
+  public async signMessage(message: string): Promise<string> {
+    throw new Error('unimplemented');
+  }
+
   // ACTIONS
   public async validateWithAccount(account: Account<any>): Promise<void> {
     const signer = await this.getSigner(account.address);
