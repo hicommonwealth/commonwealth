@@ -65,8 +65,9 @@ import upgradeMember from './routes/upgradeMember';
 import createInviteLink from './routes/createInviteLink';
 import acceptInviteLink from './routes/acceptInviteLink';
 import getInviteLinks from './routes/getInviteLinks';
-import deleteGithubAccount from './routes/deleteGithubAccount';
+import deleteSocialAccount from './routes/deleteSocialAccount';
 import getProfile from './routes/getProfile';
+import createTwitterVerification from './routes/createTwitterVerification';
 
 import createRole from './routes/createRole';
 import deleteRole from './routes/deleteRole';
@@ -168,6 +169,8 @@ function setupRouter(
 
   // TODO: Change to POST /gist
   router.post('/createGist', passport.authenticate('jwt', { session: false }), createGist.bind(this, models));
+  router.post('/createTwitterVerification', passport.authenticate('jwt', { session: false }), createTwitterVerification.bind(this, models));
+
   // TODO: Change to POST /address
   router.post('/createAddress', createAddress.bind(this, models));
   // TODO: Change to PUT /address
@@ -400,9 +403,9 @@ function setupRouter(
 
   // social accounts
   router.delete(
-    '/githubAccount',
+    '/socialAccount',
     passport.authenticate('jwt', { session: false }),
-    deleteGithubAccount.bind(this, models),
+    deleteSocialAccount.bind(this, models),
   );
 
   // offchain viewCount
