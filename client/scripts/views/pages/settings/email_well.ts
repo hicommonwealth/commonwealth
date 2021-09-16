@@ -118,7 +118,7 @@ const EmailWell: m.Component<IAttrs, IState> = {
             onclick: () => {
               if (githubAccount) {
                 $.ajax({
-                  url: `${app.serverUrl()}/githubAccount`,
+                  url: `${app.serverUrl()}/socialAccount`,
                   data: { jwt: app.user.jwt },
                   type: 'DELETE',
                   success: (result) => {
@@ -141,7 +141,7 @@ const EmailWell: m.Component<IAttrs, IState> = {
             },
           })
         ]),
-      ])
+      ]),
     ];
   },
 };
