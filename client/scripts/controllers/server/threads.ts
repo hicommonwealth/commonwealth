@@ -578,7 +578,7 @@ class ThreadsController {
     };
     const response = await $.get(`${app.serverUrl()}/bulkThreads`, params);
     if (response.status !== 'Success') {
-      throw new Error(`Unsuccessful refresh status: ${response.status}`);
+      throw new Error(`Unsuccessful getting recent threads: ${response.status}`);
     }
 
     response.result.comments.forEach((comment) => {
