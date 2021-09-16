@@ -50,8 +50,12 @@ const APPLICATION_UPDATE_ACTION = 'Okay';
 // On login: called to initialize the logged-in state, available chains, and other metadata at /api/status
 // On logout: called to reset everything
 export async function initAppState(updateSelectedNode = true, customDomain = null): Promise<void> {
+  await $.get(`${app.serverUrl()}/logs?message=${new Date().toISOString()}-initAppState`);
   return new Promise((resolve, reject) => {
-    $.get(`${app.serverUrl()}/status`).then((data) => {
+    $.get(`${app.serverUrl()}/status`).then( async (data) => {
+         await $.get(
+          `${app.serverUrl()}/logs?message=${new Date().toISOString()}-get-status`
+        );
       app.config.chains.clear();
       app.config.nodes.clear();
       app.config.communities.clear();
@@ -147,8 +151,9 @@ export async function deinitChainOrCommunity() {
   app.user.ephemerallySetActiveAccount(null);
 }
 
-export function handleInviteLinkRedirect() {
+export async function handleInviteLinkRedirect() {
   const inviteMessage = m.route.param('invitemessage');
+  await $.get(`${app.serverUrl()}/logs?message=${new Date().toISOString()}-handleInviteLinkRedirect`);
   if (inviteMessage) {
     mixpanel.track('Invite Link Used', {
       'Step No': 1,
@@ -169,7 +174,10 @@ export function handleInviteLinkRedirect() {
   }
 }
 
-export function handleUpdateEmailConfirmation() {
+export async function handleUpdateEmailConfirmation() {
+  await $.get(
+      `${app.serverUrl()}/logs?message=${new Date().toISOString()}-handleUpdateEmailConfirmation`
+  );
   if (m.route.param('confirmation')) {
     mixpanel.track('Update Email Verification Redirect', {
       'Step No': 1,
@@ -473,8 +481,9 @@ moment.updateLocale('en', {
 Promise.all([
   $.ready,
   $.get('/api/domain'),
-]).then(([ ready, { customDomain } ]) => {
+]).then(async ([ ready, { customDomain } ]) => {
   // set window error handler
+  await $.get(`${app.serverUrl()}/logs?message=${new Date().toISOString()}-ready-get(/api/domain)`);
   // ignore ResizeObserver error: https://stackoverflow.com/questions/49384120/resizeobserver-loop-limit-exceeded
   const resizeObserverLoopErrRe = /^ResizeObserver loop limit exceeded/;
   // replace chunk loading errors with a notification that the app has been updated
@@ -504,7 +513,10 @@ Promise.all([
 
   let hasCompletedSuccessfulPageLoad = false;
   const importRoute = (path: string, attrs: RouteAttrs) => ({
-    onmatch: () => {
+    onmatch:  async () => {
+         $.get(
+          `${app.serverUrl()}/logs?message=${new Date().toISOString()}-importRoute-${path}`
+        );
       return import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "route-[request]" */
@@ -523,9 +535,11 @@ Promise.all([
         if (hasCompletedSuccessfulPageLoad) history.back();
       });
     },
-    render: (vnode) => {
+    render:  (vnode) => {
       const { scoped, hideSidebar } = attrs;
-
+       $.get(
+           `${app.serverUrl()}/logs?message=${new Date().toISOString()}- render-route- ${path}`
+      );
       const scope = typeof scoped === 'string'
         // string => scope is defined by route
         ? scoped
@@ -615,13 +629,13 @@ Promise.all([
       '/settings':               importRoute('views/pages/settings', { scoped: true }),
       '/analytics':              importRoute('views/pages/stats', { scoped: true, deferChain: true }),
 
-      '/snapshot-proposals/:snapshotId': importRoute(
+      '/snapshot/:snapshotId': importRoute(
         'views/pages/snapshot_proposals', { scoped: true, deferChain: true }
       ),
-      '/snapshot-proposal/:snapshotId/:identifier': importRoute(
+      '/snapshot/:snapshotId/:identifier': importRoute(
         'views/pages/view_snapshot_proposal', { scoped: true }
       ),
-      '/new/snapshot-proposal/:snapshotId': importRoute(
+      '/new/snapshot/:snapshotId': importRoute(
         'views/pages/new_snapshot_proposal', { scoped: true, deferChain: true }
       ),
 
@@ -658,14 +672,20 @@ Promise.all([
       '/:scope/admin':              redirectRoute(() => '/admin'),
       '/:scope/spec_settings':      redirectRoute(() => '/spec_settings'),
       '/:scope/analytics':          redirectRoute(() => '/analytics'),
-      '/:scope/snapshot-proposals/:snapshotId':redirectRoute(
-        (attrs) => `/snapshot-proposals/${attrs.snapshotId}`
+      '/:scope/snapshot-proposals/:snapshotId': redirectRoute(
+        (attrs) => `/snapshot/${attrs.snapshotId}`
       ),
       '/:scope/snapshot-proposal/:snapshotId/:identifier': redirectRoute(
-        (attrs) => `/snapshot-proposal/${attrs.snapshotId}/${attrs.identifier}`
+        (attrs) => `/snapshot/${attrs.snapshotId}/${attrs.identifier}`
       ),
-      '/:scope/new/snapshot-proposal/:snapshotId':redirectRoute(
-        (attrs) => `/new/snapshot-proposal/${attrs.snapshotId}`
+      '/:scope/new/snapshot-proposal/:snapshotId': redirectRoute(
+        (attrs) => `/new/snapshot/${attrs.snapshotId}`
+      ),
+      '/:scope/snapshot-proposals/:snapshotId/:identifier': redirectRoute(
+        (attrs) => `/snapshot/${attrs.snapshotId}/${attrs.identifier}`
+      ),
+      '/:scope/new/snapshot-proposals/:snapshotId': redirectRoute(
+        (attrs) => `/new/snapshot/${attrs.snapshotId}`
       ),
     } : {
       //
@@ -725,14 +745,29 @@ Promise.all([
       '/:scope/spec_settings':     importRoute('views/pages/spec_settings', { scoped: true, deferChain: true }),
       '/:scope/analytics':         importRoute('views/pages/stats', { scoped: true, deferChain: true }),
 
-      '/:scope/snapshot-proposals/:snapshotId': importRoute(
+      '/:scope/snapshot/:snapshotId': importRoute(
         'views/pages/snapshot_proposals', { scoped: true, deferChain: true }
       ),
-      '/:scope/snapshot-proposal/:snapshotId/:identifier': importRoute(
+      '/:scope/snapshot/:snapshotId/:identifier': importRoute(
         'views/pages/view_snapshot_proposal', { scoped: true }
       ),
-      '/:scope/new/snapshot-proposal/:snapshotId': importRoute(
+      '/:scope/new/snapshot/:snapshotId': importRoute(
         'views/pages/new_snapshot_proposal', { scoped: true, deferChain: true }
+      ),
+      '/:scope/snapshot-proposals/:snapshotId': redirectRoute(
+        (attrs) => `/${attrs.scope}/snapshot/${attrs.snapshotId}`
+      ),
+      '/:scope/snapshot-proposal/:snapshotId/:identifier': redirectRoute(
+        (attrs) => `/${attrs.scope}/snapshot/${attrs.snapshotId}/${attrs.identifier}`
+      ),
+      '/:scope/new/snapshot-proposal/:snapshotId': redirectRoute(
+        (attrs) => `/${attrs.scope}/new/snapshot/${attrs.snapshotId}`
+      ),
+      '/:scope/snapshot-proposals/:snapshotId/:identifier': redirectRoute(
+        (attrs) => `/${attrs.scope}/snapshot/${attrs.snapshotId}/${attrs.identifier}`
+      ),
+      '/:scope/new/snapshot-proposals/:snapshotId': redirectRoute(
+        (attrs) => `/${attrs.scope}/new/snapshot/${attrs.snapshotId}`
       ),
     }),
   });
@@ -804,7 +839,10 @@ Promise.all([
   }
 
   // initialize the app
-  initAppState(true, customDomain).then(() => {
+  initAppState(true, customDomain).then(async () => {
+    await $.get(
+        `${app.serverUrl()}/logs?message=${new Date().toISOString()}- initAppState-resolve`
+    );
     // setup notifications and websocket if not already set up
     if (!app.socket) {
       let jwt;
@@ -852,6 +890,9 @@ Promise.all([
     }
     m.redraw();
   }).catch((err) => {
+    $.get(
+        `${app.serverUrl()}/logs?message=${new Date().toISOString()}-error-${err}`
+    );
     m.redraw();
   });
 });

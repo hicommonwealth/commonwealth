@@ -11,7 +11,7 @@ import app from 'state';
 import Sublayout from 'views/sublayout';
 import { AddressInfo } from 'models';
 import ConfirmSnapshotVoteModal from 'views/modals/confirm_snapshot_vote_modal';
-import { getPower, SnapshotSpace, SnapshotProposal, getVotes, SnapshotProposalVote } from 'helpers/snapshot_utils';
+import { SnapshotSpace, SnapshotProposal, SnapshotProposalVote, getResults } from 'helpers/snapshot_utils';
 
 import { notifyError } from 'controllers/app/notifications';
 import { ProposalHeaderTitle } from './header';
@@ -22,6 +22,7 @@ import {
 import { ProposalHeaderExternalSnapshotLink, ProposalHeaderSnapshotThreadLink } from '../view_proposal/header';
 import User from '../../components/widgets/user';
 import { SocialSharingCarat } from '../../components/social_sharing_carat';
+import { formatPercent, formatNumberLong } from 'helpers';
 
 const ProposalHeader: m.Component<{
   snapshotId: string
@@ -32,14 +33,12 @@ const ProposalHeader: m.Component<{
 }> = {
   view: (vnode) => {
     const { proposal, snapshotId } = vnode.attrs;
-    if (!proposal) {
-      return m('.topic-loading-spinner-wrap', [ m(Spinner, { active: true, size: 'lg' }) ]);
-    }
+    if (!proposal) return;
 
     // Original posters have full editorial control, while added collaborators
     // merely have access to the body and title
 
-    const proposalLink = `/${app.activeId()}/snapshot-proposal/${snapshotId}/${proposal.ipfs}`;
+    const proposalLink = `/${app.activeId()}/snapshot/${snapshotId}/${proposal.ipfs}`;
 
     if (!vnode.state.loaded) {
       try {
@@ -85,9 +84,11 @@ const ProposalHeader: m.Component<{
 
 const VoteRow: m.Component<{
   vote: SnapshotProposalVote
+  symbol: string
 }> = {
   view: (vnode) => {
-    return m('.ViewRow', [
+    const { vote, symbol } = vnode.attrs;
+    return m('.VoteRow', [
       m('.row-left', [
         m(User, {
           // TODO: activeID becomes chain_base, fix
@@ -96,19 +97,22 @@ const VoteRow: m.Component<{
           popover: true
         }),
       ]),
+      m('.row-right', `${formatNumberLong(vote.power)} ${symbol}`)
     ]);
   }
 };
 
-const VoteView: m.Component<{
+const VotingResults: m.Component<{
   votes: SnapshotProposalVote[],
   choices: string[],
+  totals: any,
+  symbol: string,
 }, {
   voteCounts: number[],
   voteListings: any[],
 }> = {
   view: (vnode) => {
-    const { votes, choices } = vnode.attrs;
+    const { votes, choices, totals, symbol } = vnode.attrs;
     if (!choices.length) return;
     if (!vnode.state.voteCounts?.length) {
       vnode.state.voteCounts = choices.map((choice, idx) => 10);
@@ -116,11 +120,13 @@ const VoteView: m.Component<{
 
     vnode.state.voteListings = choices.map((choice, idx) => {
       const votesForChoice = votes.filter((v) => v.choice === idx + 1);
+      const totalForChoice = totals.resultsByVoteBalance[idx];
+      const voteFrac = totalForChoice / totals.sumOfResultsBalance;
       return m('.results-column', [
-        m('.results-header', `Voted for ${choice} (${votesForChoice.length})`),
+        m('.results-header', `Voted for ${choice}: ${formatNumberLong(totalForChoice)} ${symbol} (${formatPercent(voteFrac, 4)}) (${votesForChoice.length} voters)`),
         m('.results-cell', [
           m('.vote-group-wrap', votesForChoice
-            .map((vote) => m(VoteRow, { vote }))
+            .map((vote) => m(VoteRow, { vote, symbol }))
             .filter((v) => !!v)
             .slice(0, vnode.state.voteCounts[idx])),
         ]),
@@ -213,6 +219,8 @@ const ViewProposalPage: m.Component<{
   proposal: SnapshotProposal,
   votes: SnapshotProposalVote[],
   space: SnapshotSpace,
+  totals: any,
+  symbol: string,
   snapshotProposal: SnapshotProposal,
   totalScore: number,
   scores: number[]
@@ -226,28 +234,17 @@ const ViewProposalPage: m.Component<{
         (proposal) => proposal.ipfs === vnode.attrs.identifier
       );
       // TODO: if proposal not found, throw error
+      // const await getResults()
 
       const space = app.snapshot.space;
       vnode.state.space = space;
+      vnode.state.symbol = space.symbol;
 
-      const votes = await getVotes(vnode.state.proposal.ipfs);
-      vnode.state.votes = votes;
-      const author = app.user.activeAccount;
-
-      if (author) {
-        try {
-          const power = await getPower(
-            space,
-            author.address,
-            vnode.state.proposal.snapshot
-          );
-          const { scores, totalScore } = power;
-          vnode.state.scores = scores;
-          vnode.state.totalScore = totalScore;
-        } catch (e) {
-          console.error(`Could not fetch scores: ${e.message}`);
-        }
-      }
+      await getResults(space, vnode.state.proposal).then((res) => {
+        vnode.state.votes = res.votes;
+        vnode.state.totals = res.results;
+        console.log(vnode.state.totals);
+      });      
 
       m.redraw();
     };
@@ -262,11 +259,6 @@ const ViewProposalPage: m.Component<{
     }
   },
   view: (vnode) => {
-    const getLoadingPage = () => m('.topic-loading-spinner-wrap', [ m(Spinner, { active: true, size: 'lg' }) ]);
-    if (!vnode.state.votes) {
-      return getLoadingPage();
-    }
-
     const author = app.user.activeAccount;
 
     const isActive = vnode.state.proposal
@@ -276,17 +268,19 @@ const ViewProposalPage: m.Component<{
     return m(Sublayout, { 
       class: 'ViewProposalPage', 
       title: 'Snapshot Proposal',
-    }, [
+    }, (!vnode.state.votes && !vnode.state.totals) ? m(Spinner, { active: true }) : [
       m(ProposalHeader, {
         snapshotId: vnode.attrs.snapshotId,
         proposal: vnode.state.proposal,
       }),
       m('.PinnedDivider', m('hr')),
-      vnode.state.votes
+      vnode.state.totals && vnode.state.votes
       && vnode.state.proposal
-      && m(VoteView, {
+      && m(VotingResults, {
         choices: vnode.state.proposal.choices,
-        votes: vnode.state.votes
+        votes: vnode.state.votes,
+        totals: vnode.state.totals,
+        symbol: vnode.state.symbol,
       }),
       isActive
       && author
