@@ -71,7 +71,7 @@ const SnapshotProposalsPage: m.Component<{ topic?: string, snapshotId: string },
         description: '',
         showNewProposalButton: true,
       }, [
-        m(Spinner, { active: true, fill: true })
+        m(Spinner, { active: true, fill: true, size: 'lg' })
       ]);
     }
 

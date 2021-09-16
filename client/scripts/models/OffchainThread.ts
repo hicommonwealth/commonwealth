@@ -58,9 +58,11 @@ class OffchainThread implements IUniqueId {
   public offchainVotingNumVotes: number;
   public offchainVotingEndsAt: moment.Moment | null;
   public offchainVotes: OffchainVote[]; // lazy loaded
+  
   public getOffchainVoteFor(chain: string, address: string) {
     return this.offchainVotes?.find((vote) => vote.address === address && vote.author_chain === chain);
   }
+
   public setOffchainVotes(voteData) {
     const votes = voteData.map((data) => {
       const { address, author_chain, thread_id, option } = data;
@@ -68,6 +70,7 @@ class OffchainThread implements IUniqueId {
     });
     this.offchainVotes = votes;
   }
+
   public async submitOffchainVote(chain: string, community: string, authorChain: string, address: string, option: string) {
     const thread_id = this.id;
     return $.post(`${app.serverUrl()}/updateOffchainVote`, {

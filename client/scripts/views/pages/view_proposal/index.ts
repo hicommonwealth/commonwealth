@@ -259,7 +259,7 @@ const ProposalHeader: m.Component<{
                   (isAuthor || isAdmin) && (app.chain?.meta.chain.snapshot !== null)
                     && m(MenuItem, {
                       onclick: (e) => {
-                        m.route.set(`/${app.activeChainId()}/new/snapshot-proposal/${app.chain.meta.chain.snapshot}`
+                        m.route.set(`/${app.activeChainId()}/new/snapshot/${app.chain.meta.chain.snapshot}`
                         + `?fromProposalType=${proposal.slug}&fromProposalId=${proposal.id}`);
                       },
                       label: 'Snapshot proposal from thread',

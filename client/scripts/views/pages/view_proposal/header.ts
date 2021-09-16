@@ -24,6 +24,7 @@ import {
   OffchainThreadStage,
   AnyProposal,
   AddressInfo,
+  OffchainVote,
 } from 'models';
 
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
@@ -36,6 +37,7 @@ import { alertModalWithText } from 'views/modals/alert_modal';
 import { activeQuillEditorHasText, GlobalStatus } from './body';
 import { IProposalPageState } from '.';
 import { SnapshotProposal } from 'client/scripts/helpers/snapshot_utils';
+import OffchainVotingModal from '../../modals/offchain_voting_modal';
 
 export const ProposalHeaderExternalLink: m.Component<{ proposal: AnyProposal | OffchainThread }> = {
   view: (vnode) => {
@@ -52,7 +54,11 @@ export const ProposalHeaderExternalLink: m.Component<{ proposal: AnyProposal | O
   }
 };
 
-export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread }, { offchainVotes }> = {
+interface IProposalScopedVotes {
+  proposalId?: boolean;
+}
+
+export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread }, { offchainVotes: IProposalScopedVotes }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     if (!proposal.offchainVotingEndsAt) return;
@@ -60,7 +66,7 @@ export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread 
     if (vnode.state.offchainVotes === undefined || vnode.state.offchainVotes[proposal.id] === undefined) {
       // initialize or reset offchain votes
       vnode.state.offchainVotes = {};
-      vnode.state.offchainVotes[proposal.id] = [];
+      vnode.state.offchainVotes[proposal.id] = true;
       // fetch from backend, and then set
       $.get(`/api/viewOffchainVotes?thread_id=${proposal.id}${
         app.activeChainId() ? `&chain=${app.activeChainId()}`
@@ -98,6 +104,38 @@ export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread 
       });
     };
 
+    const optionScopedVotes = proposal.offchainVotingOptions.choices.map((option) => {
+      return ({
+        option,
+        votes: proposal.offchainVotes.filter((v) => v.option === option)
+      });
+    });
+
+    const totalVoteCount = proposal.offchainVotes.length;
+    const voteSynopsis = m('.vote-synopsis', [
+      optionScopedVotes.map((optionWithVotes) => {
+        const optionVoteCount = optionWithVotes.votes.length;
+        const optionVotePercentage = (optionVoteCount / totalVoteCount);
+        return m('.option-with-votes', [
+          m('.option-results-label', [
+            m('div', { style: 'font-weight: 500; margin-right: 5px;' }, `${optionWithVotes.option}`),
+            m('div', `(${optionVoteCount})`),
+          ]),
+          m('.poll-bar', { style: `width: ${Math.round(optionVotePercentage * 10000) / 100}%` }),
+        ])
+      }),
+      m('a', {
+        href: '#',
+        onclick: (e) => {
+          e.preventDefault();
+          app.modals.create({
+            modal: OffchainVotingModal,
+            data: { votes: proposal.offchainVotes }
+          });
+        }
+      }, 'See all votes')
+    ]);
+
     return m('.ProposalHeaderOffchainPoll', [
       m('.offchain-poll-header', [
         proposal.offchainVotingOptions?.name || (pollingEnded ? 'Poll closed' : 'Poll open')
@@ -134,19 +172,9 @@ export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread 
       ]),
       m('.offchain-poll-header', 'Voters'),
       m('.offchain-poll-voters', [
-        proposal.offchainVotes.length === 0 && m('.offchain-poll-no-voters', 'Nobody has voted'),
-        proposal.offchainVotes.map((vote_) => m('.offchain-poll-voter', [
-          m('.offchain-poll-voter-user', [
-            m(User, {
-              avatarSize: 16,
-              popover: true,
-              linkify: true,
-              user: new AddressInfo(null, vote_.address, vote_.author_chain, null, null),
-              hideIdentityIcon: true,
-            }),
-          ]),
-          m('.offchain-poll-voter-choice', vote_.option),
-        ])),
+        proposal.offchainVotes.length === 0
+          ? m('.offchain-poll-no-voters', 'Nobody has voted')
+          : voteSynopsis,
       ]),
     ]);
   }
@@ -171,7 +199,7 @@ export const ProposalHeaderExternalSnapshotLink: m.Component<{ proposal: Snapsho
     if (!proposal || !proposal.id || !spaceId) return;
 
     return m('.ProposalHeaderBlockExplorerLink', [
-      externalLink('a.voting-link', `https://snapshot.org/#/proposal/${spaceId}/${proposal.id}`, [
+      externalLink('a.voting-link', `https://snapshot.org/#/${spaceId}/proposal/${proposal.id}`, [
         `View on Snapshot`,
         m(Icon, { name: Icons.EXTERNAL_LINK }),
       ]),
@@ -270,7 +298,7 @@ export const ProposalHeaderThreadLinkedSnapshot: m.Component<{
     }
 
     const proposalLink = `${app.isCustomDomain() ? '' : `/${proposal.chain}`
-      }/snapshot-proposal/${(app.chain?.meta.chain.snapshot)}/${proposal.snapshotProposal}`;
+      }/snapshot/${(app.chain?.meta.chain.snapshot)}/${proposal.snapshotProposal}`;
 
     return m('.ProposalHeaderThreadLinkedChainEntity', 
     !vnode.state.snapshotProposalsLoaded ? [
