@@ -131,8 +131,9 @@ import editSubstrateSpec from './routes/editSubstrateSpec';
 import { getStatsDInstance } from './util/metrics';
 import updateAddress from "./routes/updateAddress";
 import { DB } from './database';
-
+import { factory, formatFilename } from '../shared/logging';
 import { sendMessage } from './routes/snapshotAPI';
+
 
 function setupRouter(
   app,
@@ -142,16 +143,25 @@ function setupRouter(
   tokenBalanceCache: TokenBalanceCache
 ) {
   const router = express.Router();
+  const log = factory.getLogger(formatFilename(__filename));
 
   router.use((req, res, next) => {
+    log.info(`requested path : ${req.path}`);
     getStatsDInstance().increment(`cw.path.${req.path.slice(1)}.called`);
     const start = Date.now();
     res.on('finish', () => {
       const latency = Date.now() - start;
       getStatsDInstance().histogram(`cw.path.${req.path.slice(1)}.latency`, latency);
+      log.info(`requested path completed: ${req.path}`);
     });
     next();
   });
+
+  router.get('/logs', (req, res) => {
+    const { message } = req.query;
+    log.info(`logs: ${message}`);
+    res.json(message)
+  })
 
   router.post('/updateAddress', passport.authenticate('jwt', { session: false }), updateAddress.bind(this, models));
   router.get('/domain', domain.bind(this, models));
