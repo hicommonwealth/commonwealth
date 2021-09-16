@@ -172,6 +172,7 @@ const DiscussionFilterBar: m.Component<{ topic: string; stage: string, parentSta
               label: 'All Discussions',
               onclick: () => {
                 navigateToSubpage('/');
+                vnode.attrs.parentState.summaryView = false;
               },
             }),
             m(MenuDivider),
@@ -195,6 +196,7 @@ const DiscussionFilterBar: m.Component<{ topic: string; stage: string, parentSta
                   onclick: (e) => {
                     e.preventDefault();
                     navigateToSubpage(`/discussions/${name}`);
+                    vnode.attrs.parentState.summaryView = false;
                   },
                   label: m('.topic-menu-item', [
                     active && m(Icon, { name: Icons.CHECK }),
