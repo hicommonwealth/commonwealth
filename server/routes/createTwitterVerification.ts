@@ -3,6 +3,7 @@ import { ethers } from 'ethers';
 import { Octokit } from '@octokit/rest';
 import { Request, Response, NextFunction } from 'express';
 import { DB } from '../database';
+import axios from 'axios';
 
 const GITHUB_AUTHENTICATION = process.env.GITHUB_CLIENT_SECRET;
 const TWITTER_BEARER = process.env.TWITTER_BEARER;
@@ -22,19 +23,7 @@ export async function gatherResponse(response) {
 }
 
 // github api info
-const USER_AGENT = 'Cloudflare Worker';
-
-// format request for twitter api
-const requestHeaders = new Headers();
-requestHeaders.append('Authorization', `Bearer ${TWITTER_BEARER}`);
-const requestOptions = {
-  method: 'GET',
-  headers: requestHeaders,
-  redirect: 'follow',
-};
-const init = {
-  headers: { 'content-type': 'application/json' },
-};
+const USER_AGENT = 'Commonwealth Worker';
 
 // regex for parsing tweet
 const reg = new RegExp('(?<=sig:).*');
@@ -51,38 +40,43 @@ const reg = new RegExp('(?<=sig:).*');
  */
 async function verifyTwitterIdentity(tweetID, account) {
   try {
-    // get tweet id and account from url
-    // const { searchParams } = new URL(request.url);
-    // const tweetID = searchParams.get('id');
-    // const account = searchParams.get('account');
 
     // get tweet data from twitter api
+    // eslint-disable-next-line max-len
     const twitterURL = `https://api.twitter.com/2/tweets?ids=${tweetID}&expansions=author_id&user.fields=username`;
-    requestOptions.headers.set('Origin', new URL(twitterURL).origin); // format for cors
-    const twitterRes = await fetch(twitterURL, requestOptions);
+
+    const requestHeaders = {
+      'Authorization': `Bearer ${TWITTER_BEARER}`,
+    };
+    
+    let twitterRes
+    try {
+      const { data: twitterResponse } = await axios(twitterURL, { method:'GET', headers:requestHeaders });
+      twitterRes = await gatherResponse(twitterResponse);
+    } catch (e) {
+      console.warn(e.response);
+    }
 
     // parse the response from Twitter
-    const twitterResponse = await gatherResponse(twitterRes);
-
-    // if no tweet or author found, return error
-    if (!twitterResponse.data || !twitterResponse.includes) {
+    if (!twitterRes.data || !twitterRes.includes) {
       return {
         verified: false,
         error: 'Invalid tweet id',
       };
     }
+    // if no tweet or author found, return error
 
     // get tweet text and handle
-    const tweetContent = twitterResponse.data[0].text;
-    const handle = twitterResponse.includes.users[0].username;
+    const tweetContent = twitterRes.data[0].text;
+    const handle = twitterRes.includes.users[0].username;
 
     // parse sig from tweet
     const matchedText = tweetContent.match(reg);
 
     // if no proper signature or handle data found, return error
     if (
-      !twitterResponse.data
-          || !twitterResponse.includes
+      !twitterRes.data
+          || !twitterRes.includes
           || !matchedText
     ) {
       return {
@@ -91,6 +85,7 @@ async function verifyTwitterIdentity(tweetID, account) {
       };
     }
 
+    /* Swap this whole thing out with Address.verify so this can be cross chain */
     // construct data for EIP712 signature recovery
     const data = {
       types: {
@@ -130,58 +125,65 @@ async function verifyTwitterIdentity(tweetID, account) {
       };
     }
 
-    const fileName = 'verified.json';
-    const githubPath = '/repos/Uniswap/sybil-list/contents/';
-
-    const fileInfo = await fetch(
-      `https://api.github.com${githubPath}${fileName}`,
-      {
-        headers: {
-          Authorization: `token ${GITHUB_AUTHENTICATION}`,
-          'User-Agent': USER_AGENT,
+    // Don't use this until we actually have Sybil push access (reach out to Github)
+    const pushToSybil = async () => {
+      const fileName = 'verified.json';
+      const githubPath = '/repos/Uniswap/sybil-list/contents/';
+  
+      const fileInfo = await fetch(
+        `https://api.github.com${githubPath}${fileName}`,
+        {
+          headers: {
+            Authorization: `token ${GITHUB_AUTHENTICATION}`,
+            'User-Agent': USER_AGENT,
+          },
+        }
+      );
+      const fileJSON = await fileInfo.json();
+      const sha = fileJSON.sha;
+  
+      // Decode the String as json object
+      const decodedSybilList = JSON.parse(atob(fileJSON.content));
+      decodedSybilList[formattedSigner] = {
+        twitter: {
+          timestamp: Date.now(),
+          tweetID,
+          handle,
         },
+      };
+  
+      const stringData = JSON.stringify(decodedSybilList);
+      const encodedData = btoa(stringData);
+  
+      const octokit = new Octokit({
+        auth: GITHUB_AUTHENTICATION,
+      });
+  
+      const updateResponse = await octokit.request(
+        `PUT ${githubPath}${fileName}`,
+        {
+          owner: 'uniswap',
+          repo: 'sybil-list',
+          path: fileName,
+          message: `Linking ${formattedSigner} to handle: ${handle}`,
+          sha,
+          content: encodedData,
+        }
+      );
+  
+      if (updateResponse.status === 200) {
+        return {
+          verified: true,
+        };
       }
-    );
-    const fileJSON = await fileInfo.json();
-    const sha = fileJSON.sha;
-
-    // Decode the String as json object
-    const decodedSybilList = JSON.parse(atob(fileJSON.content));
-    decodedSybilList[formattedSigner] = {
-      twitter: {
-        timestamp: Date.now(),
-        tweetID,
-        handle,
-      },
-    };
-
-    const stringData = JSON.stringify(decodedSybilList);
-    const encodedData = btoa(stringData);
-
-    const octokit = new Octokit({
-      auth: GITHUB_AUTHENTICATION,
-    });
-
-    const updateResponse = await octokit.request(
-      `PUT ${githubPath}${fileName}`,
-      {
-        owner: 'uniswap',
-        repo: 'sybil-list',
-        path: fileName,
-        message: `Linking ${formattedSigner} to handle: ${handle}`,
-        sha,
-        content: encodedData,
-      }
-    );
-
-    if (updateResponse.status === 200) {
       return {
-        verified: true,
+        verified: false,
+        error: 'Error updating list'
       };
     }
+
     return {
-      verified: false,
-      error: 'Error updating list'
+      verified: true,
     };
   } catch (e) {
     return {
@@ -201,6 +203,7 @@ const createTwitterVerification = async (models: DB, req: Request, res: Response
   if (!req.body.address) {
     return res.status(400).json({ error: 'No address provided' });
   }
+  /* need to update all addresses to twitter verifications */ 
   const socialAccount = await models.SocialAccount.findOne({ where: {
     provider: 'twitter',
     provider_userid: req.user.id
@@ -213,6 +216,12 @@ const createTwitterVerification = async (models: DB, req: Request, res: Response
   const result = await verifyTwitterIdentity(req.body.tweetID, req.body.address);
 
   if (result.verified) {
+    const addressesToUpdate = await models.Address.findOne({ where: {
+      address: req.body.address,
+      user_id: req.user.id,
+    } });
+    await addressesToUpdate.update({ twitter_verified: true });
+    addressesToUpdate
     return res.json({ status: 'Success' });
   }
 
