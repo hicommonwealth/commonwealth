@@ -56,17 +56,19 @@ const status = async (models: DB, req: Request, res: Response, next: NextFunctio
   if (!user) {
     const threadCount = {};
     const threadCountQueryData: ThreadCountQueryData[] = await models.sequelize.query(`
-SELECT CONCAT("OffchainThreads".chain, "OffchainThreads".community), COUNT("OffchainThreads".id)
-  FROM "OffchainThreads"
-  LEFT JOIN "OffchainCommunities"
-    ON "OffchainThreads".community = "OffchainCommunities".id
-WHERE "OffchainThreads".updated_at > :thirtyDaysAgo
-  AND "OffchainThreads".deleted_at IS NULL
-  AND NOT "OffchainThreads".pinned
-  AND ("OffchainThreads".chain IS NOT NULL
-       OR NOT "OffchainCommunities"."privacyEnabled")
-GROUP BY CONCAT("OffchainThreads".chain, "OffchainThreads".community);
-`, { replacements: { thirtyDaysAgo }, type: QueryTypes.SELECT });
+      SELECT CONCAT("OffchainThreads".chain, "OffchainThreads".community), COUNT("OffchainThreads".id)
+        FROM "OffchainThreads"
+        LEFT JOIN "OffchainCommunities"
+          ON "OffchainThreads".community = "OffchainCommunities".id
+      WHERE "OffchainThreads".updated_at > :thirtyDaysAgo
+        AND "OffchainThreads".deleted_at IS NULL
+        AND NOT "OffchainThreads".pinned
+        AND ("OffchainThreads".chain IS NOT NULL
+            OR NOT "OffchainCommunities"."privacyEnabled")
+      GROUP BY CONCAT("OffchainThreads".chain, "OffchainThreads".community);
+      `,
+      { replacements: { thirtyDaysAgo }, type: QueryTypes.SELECT }
+    );
     // eslint-disable-next-line no-return-assign
     threadCountQueryData.forEach((ct) => threadCount[ct.concat] = ct.count);
 
