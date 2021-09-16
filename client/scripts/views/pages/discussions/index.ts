@@ -15,7 +15,7 @@ import { NodeInfo, CommunityInfo, OffchainThreadStage, OffchainThread } from 'mo
 import { updateLastVisited } from 'controllers/app/login';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
-import EmptyTopicPlaceholder, { EmptyStagePlaceholder } from 'views/components/empty_topic_placeholder';
+import EmptyListingPlaceholder from 'views/components/empty_topic_placeholder';
 import LoadingRow from 'views/components/loading_row';
 import Listing from 'views/pages/listing';
 import NewTopicModal from 'views/modals/new_topic_modal';
@@ -27,6 +27,7 @@ import Token from 'controllers/chain/ethereum/token/adapter';
 import { INITIAL_PAGE_SIZE } from 'controllers/server/threads';
 import PinnedListing from './pinned_listing';
 import DiscussionRow from './discussion_row';
+import { SummaryListing } from './summary_listing';
 
 export const ALL_PROPOSALS_KEY = 'COMMONWEALTH_ALL_PROPOSALS';
 
@@ -106,14 +107,15 @@ export const CommunityOptionsPopover: m.Component<{ isAdmin: boolean; isMod: boo
   },
 };
 
-const DiscussionStagesBar: m.Component<{ topic: string; stage: string }, {}> = {
+const DiscussionFilterBar: m.Component<{ topic: string; stage: string, parentState, disabled: boolean }, {}> = {
   view: (vnode) => {
-    const { topic, stage } = vnode.attrs;
+    const { topic, stage, disabled, parentState } = vnode.attrs;
 
-    if (!app.chain?.meta?.chain && !app.community?.meta) return;
-    const { stagesEnabled, customStages } = app.chain?.meta?.chain || app.community?.meta;
+    const communityInfo = app.chain?.meta?.chain || app.community?.meta;
+    if (!communityInfo) return;
+    const { stagesEnabled, customStages } = communityInfo;
 
-    const featuredTopicIds = app.community?.meta?.featuredTopics || app.chain?.meta?.chain?.featuredTopics;
+    const featuredTopicIds = communityInfo.featuredTopics;
     const topics = app.topics.getByCommunity(app.activeId())
       .map(({ id, name, description, telegram, featuredInSidebar, featuredInNewPost, defaultOffchainTemplate }) => {
         return {
@@ -144,22 +146,25 @@ const DiscussionStagesBar: m.Component<{ topic: string; stage: string }, {}> = {
       (s) => s === (stage as any)
     );
 
-    return m('.DiscussionStagesBar.discussions-stages', [
+    const summaryViewEnabled = vnode.attrs.parentState.summaryView;
+
+    return m('.DiscussionFilterBar', [
       topics.length > 0
         && m(PopoverMenu, {
           trigger: m(Button, {
             rounded: true,
             compact: true,
-            class: 'discussions-topic',
-            label: selectedTopic ? `Filter: ${topic}` : 'All Discussions',
+            class: 'topic-filter',
+            label: selectedTopic ? `Topic: ${topic}` : 'All Discussions',
             iconRight: Icons.CHEVRON_DOWN,
             size: 'sm',
+            disabled
           }),
           inline: true,
           hasArrow: false,
           transitionDuration: 0,
           closeOnContentClick: true,
-          class: 'DiscussionStagesBarTopicsPopover',
+          class: 'TopicsFilterPopover',
           content: m('.discussions-topic-items', [
             m(MenuItem, {
               active: m.route.get() === `/${app.activeId()}` || !topic,
@@ -167,6 +172,7 @@ const DiscussionStagesBar: m.Component<{ topic: string; stage: string }, {}> = {
               label: 'All Discussions',
               onclick: () => {
                 navigateToSubpage('/');
+                vnode.attrs.parentState.summaryView = false;
               },
             }),
             m(MenuDivider),
@@ -190,6 +196,7 @@ const DiscussionStagesBar: m.Component<{ topic: string; stage: string }, {}> = {
                   onclick: (e) => {
                     e.preventDefault();
                     navigateToSubpage(`/discussions/${name}`);
+                    vnode.attrs.parentState.summaryView = false;
                   },
                   label: m('.topic-menu-item', [
                     active && m(Icon, { name: Icons.CHECK }),
@@ -227,16 +234,17 @@ const DiscussionStagesBar: m.Component<{ topic: string; stage: string }, {}> = {
           trigger: m(Button, {
             rounded: true,
             compact: true,
-            class: 'discussions-stage',
-            label: selectedStage ? `Filter: ${offchainThreadStageToLabel(selectedStage)}` : 'All Stages',
+            class: 'stage-filter',
+            label: selectedStage ? `Stage: ${offchainThreadStageToLabel(selectedStage)}` : 'All Stages',
             iconRight: Icons.CHEVRON_DOWN,
             size: 'sm',
+            disabled
           }),
           inline: true,
           hasArrow: false,
           transitionDuration: 0,
           closeOnContentClick: true,
-          class: 'DiscussionStagesBarTopicsPopover',
+          class: 'StagesFilterPopover',
           content: m('.discussions-stage-items', [
             m(MenuItem, {
               onclick: (e) => {
@@ -256,27 +264,59 @@ const DiscussionStagesBar: m.Component<{ topic: string; stage: string }, {}> = {
                 navigateToSubpage(`/?stage=${targetStage}`);
               },
               label: [
-                `${offchainThreadStageToLabel(targetStage)}`, targetStage === OffchainThreadStage.Voting
-                && [' ', m('.discussions-stage-count', `${app.threads.numVotingThreads}`)]
+                `${offchainThreadStageToLabel(targetStage)}`,
+                targetStage === OffchainThreadStage.Voting
+                && m('.discussions-stage-count', `${app.threads.numVotingThreads}`)
               ],
             })),
           ]),
         }),
+      topics.length > 0
+        && m(Button, {
+          rounded: true,
+          compact: true,
+          class: `summary-toggle ${summaryViewEnabled ? 'active' : 'inactive'}`,
+          label: 'Summary',
+          size: 'sm',
+          disabled,
+          onclick: async (e) => {
+            e.preventDefault();
+            vnode.attrs.parentState.recentThreads = await app.threads.getRecentThreads({
+              communityId: app.activeCommunityId(),
+              chainId: app.activeChainId()
+            })
+            vnode.attrs.parentState.summaryView = true;
+            m.redraw();
+          }
+        }),
+      m(Button, {
+        rounded: true,
+        compact: true,
+        class: `latest-toggle ${summaryViewEnabled ? 'inactive' : 'active'}`,
+        label: 'Latest',
+        size: 'sm',
+        disabled,
+        onclick: async (e) => {
+          e.preventDefault();
+          vnode.attrs.parentState.summaryView = false;
+        }
+      }),
     ]);
   },
 };
 
-const DiscussionsPage: m.Component<
-  { topic?: string },
-  {
-    lookback?: { [community: string]: moment.Moment }
-    postsDepleted: { [community: string]: boolean }
-    topicInitialized: { [community: string]: boolean }
-    lastSubpage: string
-    lastVisitedUpdated?: boolean
-    onscroll: any
-  }
-> = {
+const DiscussionsPage: m.Component<{
+    topic?: string
+  }, {
+    lookback?: { [community: string]: moment.Moment },
+    postsDepleted: { [community: string]: boolean },
+    topicInitialized: { [community: string]: boolean },
+    lastSubpage: string,
+    lastVisitedUpdated?: boolean,
+    onscroll: any,
+    summaryView: boolean,
+    recentThreads: OffchainThread[]
+  }> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', {
       'Page Name': 'DiscussionsPage',
@@ -311,16 +351,21 @@ const DiscussionsPage: m.Component<
         : moment();
   },
   view: (vnode) => {
-    const { topic } = vnode.attrs;
+    let { topic } = vnode.attrs;
+    const { summaryView, recentThreads } = vnode.state;
 
-    const stage = m.route.param('stage');
-    const activeEntity = app.community ? app.community : app.chain;
+    let stage = m.route.param('stage');
+    const activeEntity = app.community || app.chain;
     if (!activeEntity)
       return m(PageLoading, {
         title: 'Discussions',
         showNewProposalButton: true,
       });
 
+    if (summaryView) { // overwrite any topic- or stage-scoping in URL
+      topic = null;
+      stage = null;
+    }
     const subpage = topic || stage ? `${topic || ''}#${stage || ''}` : ALL_PROPOSALS_KEY;
 
     // add chain compatibility (node info?)
@@ -376,33 +421,33 @@ const DiscussionsPage: m.Component<
       return tsA - tsB;
     };
 
-    let listing = [];
-    const allThreads = app.threads.listingStore.getByCommunityAndTopic(app.activeId(), topic, stage)
+    let sortedListing = [];
+    const allThreads = app.threads.listingStore.getByCommunityTopicAndStage(app.activeId(), topic, stage)
       .sort(orderDiscussionsbyLastComment);
 
     if (allThreads.length > 0) {
       // pinned threads - inserted at the top of the listing
       const pinnedThreads = allThreads.filter((t) => t.pinned);
       if (pinnedThreads.length > 0) {
-        listing.push(m(PinnedListing, { proposals: pinnedThreads }));
+        sortedListing.push(m(PinnedListing, { proposals: pinnedThreads }));
       }
     }
 
-    const sortedThreads = allThreads.filter((t) => !t.pinned);
+    const unpinnedThreads = allThreads.filter((t) => !t.pinned);
 
-    const firstThread = sortedThreads[0];
-    const lastThread = sortedThreads[sortedThreads.length - 1];
+    const firstThread = unpinnedThreads[0];
+    const lastThread = unpinnedThreads[unpinnedThreads.length - 1];
 
-    if (sortedThreads.length > 0) {
+    if (unpinnedThreads.length > 0) {
       let visitMarkerPlaced = false;
-      vnode.state.lookback[subpage] = moment.unix(getLastUpdate(sortedThreads[sortedThreads.length - 1]));
+      vnode.state.lookback[subpage] = moment.unix(getLastUpdate(unpinnedThreads[unpinnedThreads.length - 1]));
 
-      if (allThreads.length > sortedThreads.length) {
+      if (allThreads.length > unpinnedThreads.length) {
         if (firstThread) {
           if (getLastUpdate(firstThread) > lastVisited.unix()) {
-            listing.push(getLastSeenDivider(false));
+            sortedListing.push(getLastSeenDivider(false));
           } else {
-            listing.push(m('.PinnedDivider', m('hr')));
+            sortedListing.push(m('.PinnedDivider', m('hr')));
           }
         }
       }
@@ -411,25 +456,24 @@ const DiscussionsPage: m.Component<
       const noThreadsSeen = () => lastThread && getLastUpdate(lastThread) > lastVisited.unix();
 
       if (noThreadsSeen() || allThreadsSeen()) {
-        listing.push(
-          m(
-            '.discussion-group-wrap',
-            sortedThreads.map((proposal) => m(DiscussionRow, { proposal }))
-          )
-        );
+        sortedListing.push(m('.discussion-group-wrap', unpinnedThreads.map((proposal) => m(DiscussionRow, { proposal }))));
       } else {
         let count = 0;
-        sortedThreads.forEach((proposal) => {
-          const row = m(DiscussionRow, { proposal });
+        unpinnedThreads.forEach((proposal) => {
           if (!visitMarkerPlaced && getLastUpdate(proposal) < lastVisited.unix()) {
-            listing = [m('.discussion-group-wrap', listing), getLastSeenDivider(), m('.discussion-group-wrap', [row])];
+            const sortedListingCopy = sortedListing;
+            sortedListing = [
+              m('.discussion-group-wrap', sortedListingCopy),
+              getLastSeenDivider(),
+              m('.discussion-group-wrap', [ m(DiscussionRow, { proposal }) ])
+            ];
             visitMarkerPlaced = true;
             count += 1;
           } else {
             if (visitMarkerPlaced) {
-              listing[2].children.push(row);
+              sortedListing[2].children.push(m(DiscussionRow, { proposal }));
             } else {
-              listing.push(row);
+              sortedListing.push(m(DiscussionRow, { proposal }));
             }
             count += 1;
           }
@@ -437,7 +481,7 @@ const DiscussionsPage: m.Component<
       }
     }
 
-    const newSubpage = subpage !== vnode.state.lastSubpage;
+    const newSubpage = (subpage !== vnode.state.lastSubpage);
 
     if (newSubpage) {
       $(window).off('scroll');
@@ -454,7 +498,7 @@ const DiscussionsPage: m.Component<
               showNewProposalButton: true,
             },
             [
-              m(EmptyTopicPlaceholder, {
+              m(EmptyListingPlaceholder, {
                 communityName: app.activeId(),
                 topicName: topic,
               }),
@@ -517,21 +561,20 @@ const DiscussionsPage: m.Component<
       vnode.state.lastSubpage = subpage;
     }
 
-    let topicId;
     let topicName;
     let topicDescription;
     if (topic && app.activeId()) {
       const topics = app.topics.getByCommunity(app.activeId());
       const topicObject = topics.find((t) => t.name === topic);
-      topicId = topicObject?.id;
       topicName = topicObject?.name;
       topicDescription = topicObject?.description;
     }
 
     localStorage.setItem(`${app.activeId()}-lookback-${subpage}`, `${vnode.state.lookback[subpage].unix()}`);
-    const stillFetching = allThreads.length === 0 && vnode.state.postsDepleted[subpage] === false;
-    const emptyTopic = allThreads.length === 0 && vnode.state.postsDepleted[subpage] === true && !stage;
-    const emptyStage = allThreads.length === 0 && vnode.state.postsDepleted[subpage] === true && !!stage;
+    const stillFetching = unpinnedThreads.length === 0 && !vnode.state.postsDepleted[subpage];
+    const isLoading = app.chain && (!activeEntity || !activeEntity.serverLoaded || stillFetching);
+    const isEmpty = !isLoading && allThreads.length === 0 && vnode.state.postsDepleted[subpage] === true;
+    const postsDepleted = allThreads.length > 0 && vnode.state.postsDepleted[subpage];
 
     const isAdmin = app.user.isSiteAdmin
       || app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
@@ -540,9 +583,8 @@ const DiscussionsPage: m.Component<
       chain: app.activeChainId(),
       community: app.activeCommunityId(),
     });
-    return m(
-      Sublayout,
-      {
+    
+    return m(Sublayout, {
         class: 'DiscussionsPage',
         title: [
           'Discussions',
@@ -550,32 +592,38 @@ const DiscussionsPage: m.Component<
         ],
         description: topicDescription,
         showNewProposalButton: true,
-      },
-      [
+      }, [
         (app.chain || app.community) && [
           m('.discussions-main', [
-            m(DiscussionStagesBar, { topic: topicName, stage }),
-            app.chain && (!activeEntity || !activeEntity.serverLoaded || stillFetching)
-              ? m('.discussions-main', [m(LoadingRow)])
-              : emptyTopic
-                ? m(EmptyTopicPlaceholder, { communityName, topicName: topic })
-                : emptyStage
-                  ? m(EmptyStagePlaceholder)
-                  : listing.length === 0
-                    ? m('.topic-loading-spinner-wrap', [m(Spinner, { active: true, size: 'lg' })])
-                    : m(Listing, { content: listing }),
-            // TODO: Incorporate infinite scroll into generic Listing component
-            allThreads.length && vnode.state.postsDepleted[subpage]
-              ? m('.infinite-scroll-reached-end', [
-                `Showing ${allThreads.length} of ${pluralize(allThreads.length, 'thread')}`, topic
-                  ? ` under the topic '${topic}'`
-                  : ''
-              ])
-              : allThreads.length
-                ? m('.infinite-scroll-spinner-wrap', [
-                  m(Spinner, { active: !vnode.state.postsDepleted[subpage], size: 'lg' })
-                ])
-                : null,
+            !isEmpty
+              && m(DiscussionFilterBar, {
+                topic: topicName,
+                stage,
+                parentState: vnode.state,
+                disabled: isLoading || stillFetching
+              }),
+            m('.listing-wrap', [
+              summaryView
+                ? m(Listing, { content: [ m(SummaryListing, { recentThreads }) ] })
+                : [
+                  isLoading
+                    ? m(LoadingRow)
+                    : isEmpty 
+                      ? m(EmptyListingPlaceholder, { stageName: stage, communityName, topicName })
+                      : m(Listing, { content: sortedListing }),
+                  postsDepleted
+                    ? m('.infinite-scroll-reached-end', [
+                      `Showing ${allThreads.length} of ${pluralize(allThreads.length, 'thread')}`, topic
+                        ? ` under the topic '${topic}'`
+                        : ''
+                    ])
+                    : isEmpty
+                      ? null
+                      : m('.infinite-scroll-spinner-wrap', [
+                        m(Spinner, { active: !vnode.state.postsDepleted[subpage], size: 'lg' })
+                      ])
+                ]
+            ])
           ]),
         ],
       ]
