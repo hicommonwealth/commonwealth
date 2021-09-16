@@ -13,6 +13,7 @@
     .row-header {
         color: #666666;
         font-size: 18px;
+        font-weight: 500;
         display: flex;
     }
     .row-wrap {
@@ -24,7 +25,7 @@
 .SummaryRow {
     display: flex;
     padding: 20px 0;
-    border-bottom: 1px solid #333333;
+    border-bottom: 1px solid #DDDDDD;
     max-width: 100%;
     &:last-child {
         border-bottom: none;
