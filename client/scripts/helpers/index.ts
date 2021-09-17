@@ -4,6 +4,7 @@ import moment from 'moment';
 
 import app from 'state';
 import { OffchainThreadStage } from 'models';
+import { isValueNode } from 'graphql';
 
 export async function sleep(msec) {
   return new Promise((resolve) => setTimeout(resolve, msec));
@@ -199,7 +200,9 @@ export function formatLastUpdated(timestamp) {
     .replace(' days', 'd')
     .replace(' day', 'd')
     .replace(' hours', 'h')
-    .replace(' hour', 'h')} ago`;
+    .replace(' hour', 'h')
+    .replace(' months', 'mo')
+    .replace(' month', 'mo')} ${(formatted === 'now') ? '' : 'ago'}`;
 }
 
 export function formatTimestamp(timestamp) {
@@ -209,7 +212,9 @@ export function formatTimestamp(timestamp) {
     .replace(' days', 'd')
     .replace(' day', 'd')
     .replace(' hours', 'h')
-    .replace(' hour', 'h')}`;
+    .replace(' hour', 'h')
+    .replace(' months', 'mo')
+    .replace(' month', 'mo')}`;
 }
 
 // duplicated in adapters/currency.ts
@@ -227,6 +232,14 @@ export function formatPercentShort(num: number) {
   if (num === 1) return '100%';
   if (num > 1) return '100%+';
   return `${(num * 100).toFixed(1)}%`;
+}
+
+/* Choose Total Digits to Display*/
+export function formatPercent(num: number, digits: number) {
+  if (num === 0) return '0%';
+  if (num === 1) return '100%';
+  if (num > 1) return '100%+';
+  return `${(num * 100).toFixed(digits)}%`;
 }
 
 export function formatDuration(duration: moment.Duration, includeSeconds = true) {

@@ -40,6 +40,8 @@ export class TokenBalanceProvider {
   constructor(private _network = 'mainnet') {
     const web3Provider = new Web3.providers.HttpProvider(`https://${this._network}.infura.io/v3/${INFURA_API_KEY}`);
     this._provider = new providers.Web3Provider(web3Provider);
+    // 12s minute polling interval (default is 4s)
+    this._provider.pollingInterval = 12000;
   }
 
   public async getBalance(tokenAddress: string, userAddress: string): Promise<BN> {

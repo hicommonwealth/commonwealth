@@ -46,6 +46,7 @@ export interface AddressAttributes {
   is_councillor?: boolean;
   is_validator?: boolean;
   is_magic?: boolean;
+  ghost_address?: boolean;
 
   // associations
   Chain?: ChainAttributes;
@@ -121,6 +122,7 @@ export default (
     is_councillor:              { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     is_validator:               { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     is_magic:                   { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+    ghost_address:              { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
   }, {
     timestamps: true,
     createdAt: 'created_at',
@@ -277,56 +279,47 @@ export default (
       // we generate an address from the actual public key and verify that it matches,
       // this prevents people from using a different key to sign the message than
       // the account they registered with.
-      // TODO: ensure osmosis works
-      let bech32Prefix;
-      switch (chain.network) {
-        case 'straightedge':
-          bech32Prefix = 'str';
-          break;
-        case 'osmosis':
-          bech32Prefix = 'osmo';
-          break;
-        case 'terra':
-          bech32Prefix = 'terra';
-          break;
-        default:
-          bech32Prefix = chain.network;
-      }
+      // TODO: ensure ion works
+      const bech32Prefix = chain.bech32_prefix;
+      if (!bech32Prefix) {
+        log.error('No bech32 prefix found.');
+        isValid = false;
+      } else {
+        const generatedAddress = pubkeyToAddress(stdSignature.pub_key, bech32Prefix);
+        const generatedAddressWithCosmosPrefix = pubkeyToAddress(stdSignature.pub_key, 'cosmos');
 
-      const generatedAddress = pubkeyToAddress(stdSignature.pub_key, bech32Prefix);
-      const generatedAddressWithCosmosPrefix = pubkeyToAddress(stdSignature.pub_key, 'cosmos');
+        if (generatedAddress === addressModel.address || generatedAddressWithCosmosPrefix === addressModel.address) {
+          const generatedSignDoc = validationTokenToSignDoc(
+            chain.id === 'terra' ? 'columbus-4' : chain.id,
+            addressModel.verification_token.trim(),
+            signed.fee,
+            signed.memo,
+            <any>signed.msgs,
+          );
 
-      if (generatedAddress === addressModel.address || generatedAddressWithCosmosPrefix === addressModel.address) {
-        const generatedSignDoc = validationTokenToSignDoc(
-          chain.id === 'terra' ? 'columbus-4' : chain.id,
-          addressModel.verification_token.trim(),
-          signed.fee,
-          signed.memo,
-          <any>signed.msgs,
-        );
-
-        // ensure correct document was signed
-        if (serializeSignDoc(signed).toString() === serializeSignDoc(generatedSignDoc).toString()) {
-          // ensure valid signature
-          // see the last test in @cosmjs/launchpad/src/secp256k1wallet.spec.ts for reference
-          const { pubkey, signature } = decodeSignature(stdSignature);
-          const secpSignature = Secp256k1Signature.fromFixedLength(signature);
-          const messageHash = new Sha256(serializeSignDoc(generatedSignDoc)).digest();
-          isValid = await Secp256k1.verifySignature(secpSignature, messageHash, pubkey);
-          if (!isValid) {
-            log.error('Signature verification failed.');
+          // ensure correct document was signed
+          if (serializeSignDoc(signed).toString() === serializeSignDoc(generatedSignDoc).toString()) {
+            // ensure valid signature
+            // see the last test in @cosmjs/launchpad/src/secp256k1wallet.spec.ts for reference
+            const { pubkey, signature } = decodeSignature(stdSignature);
+            const secpSignature = Secp256k1Signature.fromFixedLength(signature);
+            const messageHash = new Sha256(serializeSignDoc(generatedSignDoc)).digest();
+            isValid = await Secp256k1.verifySignature(secpSignature, messageHash, pubkey);
+            if (!isValid) {
+              log.error('Signature verification failed.');
+            }
+          } else {
+            log.error(`Sign doc not matched. Generated: ${
+              JSON.stringify(generatedSignDoc)
+            }, found: ${
+              JSON.stringify(signed)
+            }.`);
+            isValid = false;
           }
         } else {
-          log.error(`Sign doc not matched. Generated: ${
-            JSON.stringify(generatedSignDoc)
-          }, found: ${
-            JSON.stringify(signed)
-          }.`);
+          log.error(`Address not matched. Generated ${generatedAddress}, found ${addressModel.address}.`);
           isValid = false;
         }
-      } else {
-        log.error(`Address not matched. Generated ${generatedAddress}, found ${addressModel.address}.`);
-        isValid = false;
       }
     } else if (chain.base === 'ethereum') {
       //

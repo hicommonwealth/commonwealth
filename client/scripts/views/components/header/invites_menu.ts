@@ -6,8 +6,25 @@ import { Button, ButtonGroup, PopoverMenu, Icons, MenuItem } from 'construct-ui'
 import app from 'state';
 import { pluralize } from 'helpers';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
+import LoginModal from '../../modals/login_modal';
 
-const InvitesMenu = {
+export const handleEmailInvites = (state) => {
+  if (!state.modalAutoTriggered && app.user) {
+    state.modalAutoTriggered = true;
+    if (app.config.invites?.length) {
+      app.modals.create({
+        modal: ConfirmInviteModal,
+        data: { community: m.route.param('inviteComm') }
+      });
+    } else if (!app.user.activeAccount) {
+      app.modals.create({
+        modal: LoginModal,
+      });
+    }
+  }
+};
+
+const InvitesMenu: m.Component<{}, { modalAutoTriggered: boolean }> = {
   view: (vnode) => {
     if (!app.config.invites?.length) return;
 

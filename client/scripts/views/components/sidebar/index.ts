@@ -216,8 +216,8 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
     const showCompoundOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Compound;
     const showAaveOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Aave;
 
-    const onSnapshotProposal = (p) => p.startsWith(`/${app.activeId()}/snapshot-proposals`);
-    const onSnapshotProposalCreation = (p) => p.startsWith(`/${app.activeId()}/new/snapshot-proposal/`);
+    const onSnapshotProposal = (p) => p.startsWith(`/${app.activeId()}/snapshot`);
+    const onSnapshotProposalCreation = (p) => p.startsWith(`/${app.activeId()}/new/snapshot/`);
 
     const onProposalPage = (p) => (
       p.startsWith(`/${app.activeChainId()}/proposals`)
@@ -429,7 +429,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         label: 'Snapshot Proposals',
         onclick: (e) => {
           e.preventDefault();
-          m.route.set(`/${app.activeChainId()}/snapshot-proposals/${app.chain.meta.chain.snapshot}`);
+          m.route.set(`/${app.activeChainId()}/snapshot/${app.chain.meta.chain.snapshot}`);
         },
       }),
       // app.chain?.meta.chain.snapshot && app.user.activeAccount && m(Button, {
@@ -439,7 +439,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
       //   label: 'New Snapshot Pr...',
       //   onclick: (e) => {
       //     e.preventDefault();
-      //     m.route.set(`/${app.activeChainId()}/new/snapshot-proposal/${app.chain.meta.chain.snapshot}`);
+      //     m.route.set(`/${app.activeChainId()}/new/snapshot/${app.chain.meta.chain.snapshot}`);
       //   },
       // }),
       showCommonwealthMenuOptions && m(Button, {
@@ -624,14 +624,14 @@ const Sidebar: m.Component<{ hideQuickSwitcher? }, {}> = {
         m('br'),
         app.isLoggedIn() && (app.chain || app.community) && m(SubscriptionButton),
         app.chain && m(ChainStatusModule),
+        app.isCustomDomain()
+        && m('a', {
+          class: 'PoweredBy',
+          onclick: (e) => {
+            window.open('https://commonwealth.im/');
+          },
+        }),
       ]),
-      app.isCustomDomain()
-      && m('a', {
-        class: 'PoweredBy',
-        onclick: (e) => {
-          window.open('https://commonwealth.im/');
-        },
-      }),
     ];
   },
 };

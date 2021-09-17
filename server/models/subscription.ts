@@ -3,6 +3,7 @@ import Sequelize, { DataTypes } from 'sequelize';
 import send, { WebhookContent } from '../webhookNotifier';
 import { SERVER_URL } from '../config';
 import { UserAttributes } from './user';
+import { DB } from '../database';
 import { NotificationCategoryAttributes } from './notification_category';
 import { NotificationAttributes, NotificationInstance } from './notification';
 import { ModelStatic } from './types';
@@ -87,7 +88,7 @@ export default (
   );
 
   Subscription.emitNotifications = async (
-    models,
+    models: DB,
     category_id: string,
     object_id: string,
     notification_data: IPostNotificationData | ICommunityNotificationData | IChainEventNotificationData,
@@ -172,15 +173,34 @@ export default (
             notification_data: JSON.stringify(notification_data)
           }
       );
-      if (msg && isChainEventData(notification_data)) {
-        msg.dynamic_template_data.notification.path = `${SERVER_URL}/${notification_data.chainEventType.chain}/notificationsList?id=${notification.id}`;
+      if (msg && isChainEventData(notification_data) && notification_data.chainEventType?.chain) {
+        msg.dynamic_template_data.notification.path = `${
+          SERVER_URL
+        }/${
+          notification_data.chainEventType.chain
+        }/notificationsList?id=${
+          notification.id
+        }`;
       }
       if (msg && subscription.immediate_email) sendImmediateNotificationEmail(subscription, msg);
       return notification;
     }));
 
+    const erc20Tokens = (await models.Chain.findAll({
+      where: {
+        base: 'ethereum',
+        type: 'token'
+      }
+    })).map((o) => o.id);
+
     // send data to relevant webhooks
-    if (webhook_data) {
+    // TODO: currently skipping all erc20 events from webhooks - change?
+    if (webhook_data && (
+      // @ts-ignore
+      !webhook_data?.chainEventType?.chain
+      // @ts-ignore
+        || !erc20Tokens.includes(webhook_data.chainEventType.chain)
+    )) {
       await send(models, {
         notificationCategory: category_id,
         ...webhook_data

@@ -66,6 +66,7 @@ const addChainNode = async (models: DB, req: Request, res: Response, next: NextF
       element: req.body.element ? req.body.element : '',
       description: req.body.description ? req.body.description : '',
       type: req.body.type ? req.body.type : 'chain',
+      has_chain_events_listener: false
     });
   }
 

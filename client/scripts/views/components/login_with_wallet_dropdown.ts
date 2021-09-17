@@ -24,7 +24,14 @@ const LoginWithWalletDropdown: m.Component<{
   prepopulateAddress?,
 }> = {
   view: (vnode) => {
-    const { label, loggingInWithAddress, joiningChain, joiningCommunity, onSuccess, prepopulateAddress } = vnode.attrs;
+    const {
+      label,
+      loggingInWithAddress,
+      joiningChain,
+      joiningCommunity,
+      onSuccess,
+      prepopulateAddress,
+    } = vnode.attrs;
 
     // prev and next must work whether the modal is on the web3login page, or not...which is why this is so confusing
     const prev = m.route.param('prev') ? m.route.param('prev') : m.route.get();
@@ -63,7 +70,7 @@ const LoginWithWalletDropdown: m.Component<{
         ]),
         onclick: (e) => {
           $('.Login').trigger('modalexit');
-          const defaultChainId = webWallet.specificChain || baseToNetwork(base);
+          const defaultChainId = webWallet?.specificChain || baseToNetwork(base);
           if (app.activeChainId()) {
             navigateToSubpage('/web3login', web3loginParams);
           } else {

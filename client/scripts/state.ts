@@ -20,6 +20,7 @@ import TopicsController from './controllers/server/topics';
 import CommunitiesController from './controllers/server/communities';
 import UserController from './controllers/server/user/index';
 import WebWalletController from './controllers/app/web_wallets';
+import { InviteCodeAttributes } from 'shared/types';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -58,6 +59,7 @@ export interface IApp {
 
   recentActivity: RecentActivityController;
   searchCache: any;
+  searchAddressCache: any;
 
   // XXX: replace this with some app.chain helper
   activeChainId(): string;
@@ -75,7 +77,7 @@ export interface IApp {
     contractCategories?: ContractCategory[];
     notificationCategories?: NotificationCategory[];
     defaultChain: string;
-    invites: any[];
+    invites: InviteCodeAttributes[];
   };
   loginStatusLoaded(): boolean;
   isLoggedIn(): boolean;
@@ -126,6 +128,8 @@ const app: IApp = {
   recentActivity: new RecentActivityController(),
 
   searchCache: {},
+
+  searchAddressCache: {},
 
   activeChainId: () => app.chain?.id,
   activeCommunityId: () => app.community?.meta.id,

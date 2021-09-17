@@ -2,7 +2,7 @@
 import 'components/widgets/user.scss';
 
 import m from 'mithril';
-import _ from 'lodash';
+import _, { capitalize } from 'lodash';
 import { link } from 'helpers';
 import { Tag, Icon, Icons, Popover } from 'construct-ui';
 
@@ -116,7 +116,9 @@ const User: m.Component<{
         size: 'xs',
       }),
     ];
-
+    const ghostAddress = app.user.addresses.some(({ address, ghostAddress }) => {
+      if (this !== undefined) account.address === address && ghostAddress
+    })
     const userFinal = avatarOnly
       ? m('.User.avatar-only', {
         key: profile?.address || '-',
@@ -164,7 +166,12 @@ const User: m.Component<{
                   m('.id-short', formatAddressShort(profile.address, profile.chain)),
                 ],
                 getRoleTags(false),
-              ])
+              ]),
+              ghostAddress && m('img', {
+                src: '/static/img/ghost.svg',
+                width: '20px',
+                style: 'display: inline-block',
+              }),
           ],
       ]);
 
@@ -290,13 +297,11 @@ export const UserBlock: m.Component<{
         m('.user-block-address', {
           class: profile?.address ? '' : 'no-address',
         }, [
-          highlightSearchTerm
+          m('', highlightSearchTerm
             ? highlightedAddress
-            : showFullAddress
-              ? profile.address
-              : formatAddressShort(profile.address, profile.chain, false, maxCharLength),
-          profile?.address && showChainName && ' · ',
-          showChainName && (typeof user.chain === 'string' ? user.chain : user.chain.name),
+            : showFullAddress ? profile.address : formatAddressShort(profile.address, profile.chain)),
+          profile?.address && showChainName && m('.address-divider', ' · '),
+          showChainName && m('', (typeof user.chain === 'string' ? capitalize(user.chain) : capitalize(user.chain.name))),
         ]),
       ]),
       m('.user-block-right', [

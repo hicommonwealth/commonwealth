@@ -24,6 +24,7 @@ import {
   OffchainThreadStage,
   AnyProposal,
   AddressInfo,
+  OffchainVote,
 } from 'models';
 
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
@@ -35,6 +36,8 @@ import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';
 import { activeQuillEditorHasText, GlobalStatus } from './body';
 import { IProposalPageState } from '.';
+import { SnapshotProposal } from 'client/scripts/helpers/snapshot_utils';
+import OffchainVotingModal from '../../modals/offchain_voting_modal';
 
 export const ProposalHeaderExternalLink: m.Component<{ proposal: AnyProposal | OffchainThread }> = {
   view: (vnode) => {
@@ -51,7 +54,11 @@ export const ProposalHeaderExternalLink: m.Component<{ proposal: AnyProposal | O
   }
 };
 
-export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread }, { offchainVotes }> = {
+interface IProposalScopedVotes {
+  proposalId?: boolean;
+}
+
+export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread }, { offchainVotes: IProposalScopedVotes }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     if (!proposal.offchainVotingEndsAt) return;
@@ -59,7 +66,7 @@ export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread 
     if (vnode.state.offchainVotes === undefined || vnode.state.offchainVotes[proposal.id] === undefined) {
       // initialize or reset offchain votes
       vnode.state.offchainVotes = {};
-      vnode.state.offchainVotes[proposal.id] = [];
+      vnode.state.offchainVotes[proposal.id] = true;
       // fetch from backend, and then set
       $.get(`/api/viewOffchainVotes?thread_id=${proposal.id}${
         app.activeChainId() ? `&chain=${app.activeChainId()}`
@@ -97,6 +104,38 @@ export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread 
       });
     };
 
+    const optionScopedVotes = proposal.offchainVotingOptions.choices.map((option) => {
+      return ({
+        option,
+        votes: proposal.offchainVotes.filter((v) => v.option === option)
+      });
+    });
+
+    const totalVoteCount = proposal.offchainVotes.length;
+    const voteSynopsis = m('.vote-synopsis', [
+      optionScopedVotes.map((optionWithVotes) => {
+        const optionVoteCount = optionWithVotes.votes.length;
+        const optionVotePercentage = (optionVoteCount / totalVoteCount);
+        return m('.option-with-votes', [
+          m('.option-results-label', [
+            m('div', { style: 'font-weight: 500; margin-right: 5px;' }, `${optionWithVotes.option}`),
+            m('div', `(${optionVoteCount})`),
+          ]),
+          m('.poll-bar', { style: `width: ${Math.round(optionVotePercentage * 10000) / 100}%` }),
+        ])
+      }),
+      m('a', {
+        href: '#',
+        onclick: (e) => {
+          e.preventDefault();
+          app.modals.create({
+            modal: OffchainVotingModal,
+            data: { votes: proposal.offchainVotes }
+          });
+        }
+      }, 'See all votes')
+    ]);
+
     return m('.ProposalHeaderOffchainPoll', [
       m('.offchain-poll-header', [
         proposal.offchainVotingOptions?.name || (pollingEnded ? 'Poll closed' : 'Poll open')
@@ -133,19 +172,9 @@ export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread 
       ]),
       m('.offchain-poll-header', 'Voters'),
       m('.offchain-poll-voters', [
-        proposal.offchainVotes.length === 0 && m('.offchain-poll-no-voters', 'Nobody has voted'),
-        proposal.offchainVotes.map((vote_) => m('.offchain-poll-voter', [
-          m('.offchain-poll-voter-user', [
-            m(User, {
-              avatarSize: 16,
-              popover: true,
-              linkify: true,
-              user: new AddressInfo(null, vote_.address, vote_.author_chain, null, null),
-              hideIdentityIcon: true,
-            }),
-          ]),
-          m('.offchain-poll-voter-choice', vote_.option),
-        ])),
+        proposal.offchainVotes.length === 0
+          ? m('.offchain-poll-no-voters', 'Nobody has voted')
+          : voteSynopsis,
       ]),
     ]);
   }
@@ -158,6 +187,20 @@ export const ProposalHeaderBlockExplorerLink: m.Component<{ proposal: AnyProposa
     return m('.ProposalHeaderBlockExplorerLink', [
       externalLink('a.voting-link', proposal['blockExplorerLink'], [
         proposal['blockExplorerLinkLabel'] || extractDomain(proposal['blockExplorerLink']),
+        m(Icon, { name: Icons.EXTERNAL_LINK }),
+      ]),
+    ]);
+  }
+};
+
+export const ProposalHeaderExternalSnapshotLink: m.Component<{ proposal: SnapshotProposal, spaceId: string }> = {
+  view: (vnode) => {
+    const { proposal, spaceId } = vnode.attrs;
+    if (!proposal || !proposal.id || !spaceId) return;
+
+    return m('.ProposalHeaderBlockExplorerLink', [
+      externalLink('a.voting-link', `https://snapshot.org/#/${spaceId}/proposal/${proposal.id}`, [
+        `View on Snapshot`,
         m(Icon, { name: Icons.EXTERNAL_LINK }),
       ]),
     ]);
@@ -190,21 +233,78 @@ export const ProposalHeaderThreadLink: m.Component<{ proposal: AnyProposal }> = 
   }
 };
 
+export const ProposalHeaderSnapshotThreadLink: m.Component<{ threadId: string }> = {
+  view: (vnode) => {
+    const { threadId } = vnode.attrs;
+    if (!threadId) return;
+    const proposalLink = `${app.isCustomDomain() ? '' : `/${app.activeId()}`}/proposal/discussion/${threadId}`;
+
+    return m('.ProposalHeaderThreadLink', [
+      link('a.thread-link', proposalLink, [
+        'Go to discussion',
+        m(Icon, { name: Icons.EXTERNAL_LINK }),
+      ]),
+    ]);
+  }
+};
+
 export const ProposalHeaderThreadLinkedChainEntity: m.Component<{ proposal: OffchainThread, chainEntity }> = {
   view: (vnode) => {
     const { proposal, chainEntity } = vnode.attrs;
     const slug = chainEntityTypeToProposalSlug(chainEntity.type);
     if (!slug) return;
 
+    const proposalLink = `${app.isCustomDomain() ? '' : `/${proposal.chain}`
+      }/proposal/${slug}/${chainEntity.typeId}`
+
     return m('.ProposalHeaderThreadLinkedChainEntity', [
       link(
         'a',
-        `/${proposal.chain}/proposal/${slug}/${chainEntity.typeId}`,
+          proposalLink,
         [
           `${chainEntityTypeToProposalName(chainEntity.type)} #${chainEntity.typeId}`,
           chainEntity.completed === 't' ? ' (Completed) ' : ' ',
         ],
       ),
+    ]);
+  }
+};
+
+export const ProposalHeaderThreadLinkedSnapshot: m.Component<{ 
+  proposal: OffchainThread, 
+}, { 
+  initialized,
+  snapshotProposalsLoaded
+  snapshot
+}> = {
+  view: (vnode) => {
+    const { proposal } = vnode.attrs;
+    if (!proposal.snapshotProposal) return;
+    if (!app.chain?.meta.chain.snapshot) return;
+    
+    if (!vnode.state.initialized) {
+      vnode.state.initialized = true;
+      app.snapshot.init(app.chain.meta.chain.snapshot).then(() => {
+          // refreshing loads the latest snapshot proposals into app.snapshot.proposals array
+        vnode.state.snapshot = app.snapshot.proposals.find((sn) => sn.id === proposal.snapshotProposal);
+        vnode.state.snapshotProposalsLoaded = true;
+        m.redraw();
+      })
+    }
+
+    if (vnode.state.snapshotProposalsLoaded && proposal.snapshotProposal !== vnode.state.snapshot) {
+      vnode.state.snapshot = app.snapshot.proposals.find((sn) => sn.id === proposal.snapshotProposal);
+      m.redraw();
+    }
+
+    const proposalLink = `${app.isCustomDomain() ? '' : `/${proposal.chain}`
+      }/snapshot/${(app.chain?.meta.chain.snapshot)}/${proposal.snapshotProposal}`;
+
+    return m('.ProposalHeaderThreadLinkedChainEntity', 
+    !vnode.state.snapshotProposalsLoaded ? [
+      link('a', proposalLink, [`Snapshot: ${proposal.snapshotProposal.slice(0,10)} ...`,]),
+    ] : [
+      link('a', proposalLink, [`Snapshot: ${vnode.state.snapshot.title.slice(0,20)} ...`,]),
     ]);
   }
 };
@@ -506,6 +606,26 @@ export const ProposalSidebarPollEditorModule: m.Component<{
   }
 };
 
+export const ProposalSidebarLinkedViewer: m.Component<{
+  proposal: OffchainThread
+}> = {
+  view: (vnode) => {
+    const { proposal } = vnode.attrs;
+
+    return m('.ProposalSidebarLinkedViewer', [
+      (proposal.chainEntities.length > 0 || proposal.snapshotProposal?.length > 0) 
+        ? m('.placeholder-copy', 'Proposals for this thread:')
+        : m('.placeholder-copy', app.chain ? 'Connect an on-chain proposal?' : 'Track the progress of this thread?'),
+      proposal.chainEntities.length > 0 && m('.proposal-chain-entities', [
+        proposal.chainEntities.map((chainEntity) => {
+          return m(ProposalHeaderThreadLinkedChainEntity, { proposal, chainEntity });
+        }),
+      ]),
+      proposal.snapshotProposal?.length > 0 && m(ProposalHeaderThreadLinkedSnapshot, { proposal }),
+    ])
+  }
+}
+
 export const ProposalSidebarStageEditorModule: m.Component<{
   proposal: OffchainThread,
   openStageEditor: Function
@@ -520,14 +640,6 @@ export const ProposalSidebarStageEditorModule: m.Component<{
     if (!stagesEnabled) return;
 
     return m('.ProposalSidebarStageEditorModule', [
-      proposal.chainEntities.length > 0
-        ? m('.placeholder-copy', 'Proposals for this thread:')
-        : m('.placeholder-copy', app.chain ? 'Connect an on-chain proposal?' : 'Track the progress of this thread?'),
-      proposal.chainEntities.length > 0 && m('.proposal-chain-entities', [
-        proposal.chainEntities.map((chainEntity) => {
-          return m(ProposalHeaderThreadLinkedChainEntity, { proposal, chainEntity });
-        }),
-      ]),
       m(Button, {
         rounded: true,
         compact: true,

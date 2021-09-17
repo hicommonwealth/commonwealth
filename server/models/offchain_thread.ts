@@ -23,6 +23,7 @@ export interface OffchainThreadAttributes {
 
   read_only?: boolean;
   version_history?: string[];
+  snapshot_proposal?: string;
 
   offchain_voting_options?: string;
   offchain_voting_ends_at?: Date;
@@ -66,6 +67,7 @@ export default (
     community: { type: dataTypes.STRING, allowNull: true },
     read_only: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     version_history: { type: dataTypes.ARRAY(dataTypes.TEXT), defaultValue: [], allowNull: false },
+    snapshot_proposal: { type: dataTypes.STRING(48), allowNull: true },
 
     offchain_voting_options: { type: dataTypes.STRING },
     offchain_voting_ends_at: { type: dataTypes.DATE, allowNull: true },
