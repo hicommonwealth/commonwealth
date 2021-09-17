@@ -27,6 +27,8 @@ export const EventChains = [
   'marlin-local',
   'marlin',
   'uniswap',
+  'frax',
+  'tribe',
 ] as const;
 
 // options for the listener class
