@@ -10,8 +10,24 @@
     border-bottom: 1px solid $border-color-lightest;
     text-decoration: none !important;
     color: black !important;
+    position: relative;
+
+    .DashboardRow-overwrite {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+    }
     &:hover {
-        background: $background-color-white-hover;
+        // background: #f2f2f2;
+        // border-radius: 20px;
+
+        .DashboardRow-overwrite {
+            background: #f2f2f2;
+            border-radius: 20px;
+        }
     }
     &.unread {
         // background: $background-color-unread;
@@ -26,6 +42,7 @@
     > .UserGallery .User {
         margin-right: 4px;
     }
+    
     .comment-body {
         flex: 1;
         &:first-child {
@@ -40,7 +57,19 @@
             }
         }
     }
+    .User {
+        padding: 3px 3px 0 3px;
+        // pointer-events: none;
+    }
+    .User:hover {
+        background: #F7F4FF;
+        border-radius: 10px;
+    }
+    .comment-body-title:hover ~ .DashboardRow-overwrite {
+        background: white;
+    }
     .comment-body-title {
+        display: inline-block;
         .User .user-display-name,
         span.commented-obj {
             font-weight: 500;
@@ -52,6 +81,10 @@
             text-align: right;
             font-weight: 400;
             line-height: 21.6px;
+
+            &:hover {
+                color: #4723AD;
+            }
         }
     }
     .comment-body-excerpt {
@@ -126,3 +159,4 @@
         padding: 15px 20px 10px;
     }
 }
+

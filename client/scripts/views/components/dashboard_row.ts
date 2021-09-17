@@ -80,6 +80,11 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
     user: new AddressInfo(null, author_address, author_chain, null),
     hideAvatar: false,
     hideIdentityIcon: false,
+    onclick: (e: any) => {
+      e.preventDefault();
+      e.stopPropagation();
+      m.route.set(`/${author_chain}/account/${author_address}`);
+    }
   });
 
   const ago = getAgo(created_at);
@@ -151,6 +156,10 @@ const getBatchNotificationFields = (category, data: IPostNotificationData[]) => 
     user: new AddressInfo(null, author_address, author_chain, null),
     hideAvatar: true,
     hideIdentityIcon: true,
+    onclick: (e: any) => {
+      e.preventDefault();
+      e.stopPropagation();
+    }
   });
 
   if (category === NotificationCategories.NewComment) {
@@ -411,17 +420,29 @@ const DashboardRow: m.Component<{
                 m(Button, {
                   iconLeft: Icons.PLUS,
                   label: 'Discuss',
-                  rounded: true
+                  rounded: true,
+                  onclick: (e: any) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }
                 }),
                 m(Button, {
                   iconLeft: Icons.SHARE,
                   label: 'Share',
-                  rounded: true
+                  rounded: true,
+                  onclick: (e: any) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }
                 }),
                 m(Button, {
                   iconLeft: Icons.BELL,
                   label: 'Subscribe',
-                  rounded: true
+                  rounded: true,
+                  onclick: (e: any) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }
                 })
               ]),
               m('.comment-body-bottom-right', [
@@ -441,7 +462,9 @@ const DashboardRow: m.Component<{
                   outlined: false
                 })
               ]),
-            ])
+            ]),
+
+            m('.DashboardRow-overwrite')
             // m('.comment-body-bottom-wrap', [
             //   m('.comment-body-created', moment(createdAt).fromNow()),
             //   !notification.isRead && m('.comment-body-mark-as-read', {
@@ -461,7 +484,7 @@ const DashboardRow: m.Component<{
             //     vnode.state.markingRead ? m(Spinner, { size: 'xs', active: true }) : 'Mark as read',
             //   ]),
             // ])
-          ]),
+          ])
         ], {
           class: notification.isRead ? '' : 'unread',
           key: notification.id,

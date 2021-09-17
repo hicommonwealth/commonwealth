@@ -134,6 +134,11 @@ const User: m.Component<{
       : m('.User', {
         key: profile?.address || '-',
         class: linkify ? 'linkified' : '',
+        onclick: (e: any) => {
+          if (vnode.attrs.onclick) {
+            vnode.attrs.onclick(e);
+          }
+        }
       }, [
         showAvatar && m('.user-avatar', {
           style: `width: ${avatarSize}px; height: ${avatarSize}px;`,
