@@ -10,6 +10,7 @@ import { OffchainThreadAttributes } from './offchain_thread';
 export interface OffchainCommunityAttributes {
   id: string;
   name: string;
+  display_name?: string;
   creator_id: number;
   default_chain: string;
   featured_topics?: string[];
@@ -52,6 +53,7 @@ export default (
     'OffchainCommunity', {
       id: { type: dataTypes.STRING, primaryKey: true },
       name: { type: dataTypes.STRING, allowNull: false },
+      display_name: { type: dataTypes.STRING, allowNull: true },
       creator_id: { type: dataTypes.INTEGER, allowNull: false },
       default_chain: { type: dataTypes.STRING, allowNull: false },
       iconUrl: { type: dataTypes.STRING, allowNull: true },

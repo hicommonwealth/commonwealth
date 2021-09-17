@@ -12,6 +12,7 @@ import { ModelStatic } from './types';
 
 export interface ChainAttributes {
   name: string;
+  display_name?: string;
   symbol: string;
   network: string;
   base: string;
@@ -68,6 +69,7 @@ export default (
   const Chain = <ChainModelStatic>sequelize.define('Chain', {
     id: { type: dataTypes.STRING, primaryKey: true },
     name: { type: dataTypes.STRING, allowNull: false },
+    display_name: { type: dataTypes.STRING, allowNull: true },
     description: { type: dataTypes.STRING, allowNull: true },
     website: { type: dataTypes.STRING, allowNull: true },
     discord: { type: dataTypes.STRING, allowNull: true },
