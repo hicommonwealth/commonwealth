@@ -6,9 +6,9 @@ import { TabItem, Tabs, Tag, Col, Grid, Card, Icon, Icons } from 'construct-ui';
 
 import app from 'state';
 import { pluralize } from 'helpers';
-import { NodeInfo, CommunityInfo, AddressInfo } from 'models';
+import { NodeInfo, CommunityInfo } from 'models';
 import { sortNotifications } from 'helpers/notifications';
-import NotificationRow from 'views/components/notification_row';
+import DashboardRow from 'views/components/dashboard_row';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import Sublayout from 'views/sublayout';
 import PageError from 'views/pages/error';
@@ -215,7 +215,7 @@ const DashboardPage: m.Component<{}> = {
                 key: sortedNotifications.length,
                 pageData: () => sortedNotifications,
                 item: (data, opts, index) => {
-                  return m(NotificationRow, { notifications: data, onListPage: true, });
+                  return m(DashboardRow, { notifications: data, onListPage: true, });
                 },
               })
               : m('.no-notifications', 'No Notifications'),
