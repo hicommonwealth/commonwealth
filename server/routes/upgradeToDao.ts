@@ -8,6 +8,7 @@ import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
+  MustBeTokenCommunity: 'Must be token chain community',
   NotAdmin: 'Must be an admin to edit or feature topics',
   NotVerified: 'Must have a verified address to edit or feature topics',
   NoChainNode: 'Cannot find ChainNode',
@@ -28,6 +29,7 @@ const upgradeTokenToDao = async (
   if (error) return next(new Error(error));
   if (community) return next(new Error(Errors.NoCommunity));
   if (!chain) return next(new Error(Errors.NoChainFound));
+  if (chain.type === 'token') return next(new Error(Errors.MustBeTokenCommunity));
   if (!req.body.contractAddress) return next(new Error(Errors.NoContractAddress));
   if (!req.body.tokenName) return next(new Error(Errors.NoTokenName));
   if (!req.body.network) return next(new Error(Errors.NoNetwork));
