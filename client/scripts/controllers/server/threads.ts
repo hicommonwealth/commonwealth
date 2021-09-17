@@ -33,6 +33,7 @@ export const modelFromServer = (thread) => {
     body,
     last_edited,
     version_history,
+    snapshot_proposal,
     OffchainAttachments,
     created_at,
     topic,
@@ -94,6 +95,7 @@ export const modelFromServer = (thread) => {
     body: decodeURIComponent(body),
     createdAt: moment(created_at),
     attachments,
+    snapshotProposal: snapshot_proposal,
     topic,
     kind,
     stage,
@@ -400,6 +402,30 @@ class ThreadsController {
     });
   }
 
+  public async setLinkedSnapshotProposal(args: { threadId: number, snapshotProposal: string }) {
+    await $.ajax({
+      url: `${app.serverUrl()}/updateThreadLinkedSnapshotProposal`,
+      type: 'POST',
+      data: {
+        'chain': app.activeChainId(),
+        'thread_id': args.threadId,
+        'snapshot_proposal': args.snapshotProposal,
+        'jwt': app.user.jwt
+      },
+      success: (response) => {
+        const thread = this._store.getByIdentifier(args.threadId);
+        if (!thread) return;
+        thread.snapshotProposal = args.snapshotProposal;
+        return thread;
+      },
+      error: (err) => {
+        console.log('Failed to update linked snapshot proposal');
+        throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error
+          : 'Failed to update linked proposals');
+      }
+    });
+  }
+
   public async setLinkedChainEntities(args: { threadId: number, entities: ChainEntity[] }) {
     await $.ajax({
       url: `${app.serverUrl()}/updateThreadLinkedChainEntities`,
@@ -428,6 +454,21 @@ class ThreadsController {
           : 'Failed to update linked proposals');
       }
     });
+  }
+
+  public async fetchThreadIdForSnapshot(args: { snapshot: string }) {
+    const response = await $.ajax({
+      url: `${app.serverUrl()}/fetchThreadForSnapshot`,
+      type: 'GET',
+      data: {
+        snapshot: args.snapshot,
+        chain: app.activeId(),
+      },
+    });
+    if (response.status !== 'Success') {
+      return 'false';
+    }
+    return response.result;
   }
 
   public async fetchThread(id) {
@@ -523,6 +564,41 @@ class ThreadsController {
     // it should continue calling the loadNextPage fn on scroll, or else notify the user that all
     // relevant listing threads have been exhausted.
     return !(threads.length < DEFAULT_PAGE_SIZE);
+  }
+
+  public async getRecentThreads(options: {
+    chainId: string,
+    communityId: string,
+  }) {
+    const { chainId, communityId } = options;
+    const params = {
+      chain: chainId,
+      community: communityId,
+      cutoff_date: moment(Date.now() - (30 * 24 * 3600 * 1000)).toISOString(),
+    };
+    const response = await $.get(`${app.serverUrl()}/bulkThreads`, params);
+    if (response.status !== 'Success') {
+      throw new Error(`Unsuccessful getting recent threads: ${response.status}`);
+    }
+
+    response.result.comments.forEach((comment) => {
+      const modeledComment = modelCommentFromServer(comment);
+      const existing = app.comments.store.getById(comment.id);
+      if (existing) {
+        app.comments.store.remove(existing);
+      }
+      try {
+        app.comments.store.add(modeledComment);
+      } catch (e) {
+        console.error(e.message);
+      }
+    })
+
+    return response.result.threads.map((thread) => {
+      const modeledThread = modelFromServer(thread);
+      this._store.add(modeledThread);
+      return modeledThread;
+    });
   }
 
   public refreshAll(chainId: string, communityId: string, reset = false) {

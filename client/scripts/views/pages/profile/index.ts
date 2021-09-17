@@ -175,6 +175,7 @@ const loadProfile = async (attrs: IProfilePageAttrs, state: IProfilePageState) =
       id: a.id,
       name: a.name,
       user_id: a.user_id,
+      ghost_address: a.ghost_address
     };
     state.account = account;
     state.threads = result.threads.map((t) => modelThreadFromServer(t));

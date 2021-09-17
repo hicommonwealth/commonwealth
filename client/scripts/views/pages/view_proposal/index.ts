@@ -62,6 +62,7 @@ import {
   ProposalSidebarStageEditorModule,
   ProposalSidebarPollEditorModule,
   ProposalLinkEditor,
+  ProposalSidebarLinkedViewer,
 } from './header';
 import { AaveViewProposalDetail, AaveViewProposalSummary } from './aave_view_proposal_detail';
 import {
@@ -77,6 +78,7 @@ import User from '../../components/widgets/user';
 import MarkdownFormattedText from '../../components/markdown_formatted_text';
 import { createTXModal } from '../../modals/tx_signing_modal';
 import { SubstrateAccount } from '../../../controllers/chain/substrate/account';
+import { SnapshotProposal } from 'client/scripts/helpers/snapshot_utils';
 
 const MAX_THREAD_LEVEL = 2;
 
@@ -257,7 +259,7 @@ const ProposalHeader: m.Component<{
                   (isAuthor || isAdmin) && (app.chain?.meta.chain.snapshot !== null)
                     && m(MenuItem, {
                       onclick: (e) => {
-                        m.route.set(`/${app.activeChainId()}/new/snapshot-proposal/${app.chain.meta.chain.snapshot}`
+                        m.route.set(`/${app.activeChainId()}/new/snapshot/${app.chain.meta.chain.snapshot}`
                         + `?fromProposalType=${proposal.slug}&fromProposalId=${proposal.id}`);
                       },
                       label: 'Snapshot proposal from thread',
@@ -294,9 +296,13 @@ const ProposalHeader: m.Component<{
                 && m(StageEditor, {
                   thread: vnode.attrs.proposal as OffchainThread,
                   popoverMenu: true,
-                  onChangeHandler: (stage: OffchainThreadStage, chainEntities: ChainEntity[]) => {
+                  onChangeHandler: (stage: OffchainThreadStage, chainEntities: ChainEntity[], snapshotProposal: SnapshotProposal) => {
                     proposal.stage = stage;
                     proposal.chainEntities = chainEntities;
+                    if (app.chain?.meta.chain.snapshot) {
+                      proposal.snapshotProposal = snapshotProposal[0]?.id;
+                    }
+                    app.threads.fetchThread(proposal.identifier);
                     m.redraw();
                   },
                   openStateHandler: (v) => {
@@ -413,6 +419,7 @@ const ProposalComment: m.Component<{
   parent: AnyProposal | OffchainComment<any> | OffchainThread;
   proposal: AnyProposal | OffchainThread;
   callback?: Function;
+  isAdmin?: boolean;
   isLast: boolean,
 }, {
   editing: boolean;
@@ -427,6 +434,7 @@ const ProposalComment: m.Component<{
       proposalPageState,
       proposal,
       callback,
+      isAdmin,
       isLast
     } = vnode.attrs;
     if (!comment) return;
@@ -453,16 +461,18 @@ const ProposalComment: m.Component<{
           m(ProposalBodyCreated, { item: comment, link: commentLink }),
           m(ProposalBodyLastEdited, { item: comment }),
 
-          !vnode.state.editing
+          ((!vnode.state.editing
           && app.user.activeAccount
           && !getSetGlobalEditingStatus(GlobalStatus.Get)
           && app.user.activeAccount?.chain.id === comment.authorChain
-          && app.user.activeAccount?.address === comment.author
+          && app.user.activeAccount?.address === comment.author)
+            || isAdmin)
           && [
             m(PopoverMenu, {
               closeOnContentClick: true,
               content: [
-                m(ProposalBodyEditMenuItem, {
+                (app.user.activeAccount?.address === comment.author)
+                && m(ProposalBodyEditMenuItem, {
                   item: comment, proposalPageState, getSetGlobalEditingStatus, parentState: vnode.state,
                 }),
                 m(ProposalBodyDeleteMenuItem, { item: comment, refresh: () => callback(), }),
@@ -536,6 +546,7 @@ const ProposalComments: m.Component<{
   proposalPageState: IProposalPageState;
   user?: any;
   recentlySubmitted?: number;
+  isAdmin: boolean;
 }, {
   commentError: any;
   dom;
@@ -544,7 +555,7 @@ const ProposalComments: m.Component<{
   view: (vnode) => {
     const {
       proposal, comments, createdCommentCallback, getSetGlobalEditingStatus,
-      proposalPageState
+      proposalPageState, isAdmin
     } = vnode.attrs;
     // Jump to the comment indicated in the URL upon page load. Avoid
     // using m.route.param('comment') because it may return stale
@@ -622,6 +633,7 @@ const ProposalComments: m.Component<{
               parent,
               proposal,
               callback: createdCommentCallback,
+              isAdmin,
               isLast: idx === comments_.length - 1,
             }),
             !!children.length
@@ -997,7 +1009,7 @@ const ViewProposalPage: m.Component<{
           && proposal.hasOffchainPoll
           && m(ProposalHeaderOffchainPoll, { proposal }),
         proposal instanceof OffchainThread
-          && isAuthor
+          && (isAuthor || isAdmin)
           && !proposal.offchainVotingEndsAt
           && m(ProposalSidebarPollEditorModule, {
             proposal,
@@ -1005,8 +1017,15 @@ const ViewProposalPage: m.Component<{
               vnode.state.pollEditorIsOpen = true;
             }
           }),
-        (isAuthor || isAdmin) && proposal instanceof OffchainThread
-          && m(ProposalSidebarStageEditorModule, {
+          proposal instanceof OffchainThread 
+            && ((proposal as OffchainThread).chainEntities.length > 0 
+              || (proposal as OffchainThread).snapshotProposal?.length > 0)
+            && m(ProposalSidebarLinkedViewer, {
+            proposal
+          }),
+          proposal instanceof OffchainThread 
+            && (isAuthor || isAdmin) 
+            && m(ProposalSidebarStageEditorModule, {
             proposal,
             openStageEditor: () => {
               vnode.state.stageEditorIsOpen = true;
@@ -1025,8 +1044,11 @@ const ViewProposalPage: m.Component<{
         isAdmin,
         stageEditorIsOpen: vnode.state.stageEditorIsOpen,
         pollEditorIsOpen: vnode.state.pollEditorIsOpen,
-        closeStageEditor: () => { vnode.state.stageEditorIsOpen = false; m.redraw(); },
-        closePollEditor: () => { vnode.state.pollEditorIsOpen = false; m.redraw(); },
+        closeStageEditor: () => { vnode.state.stageEditorIsOpen = false; 
+          m.redraw(); },
+        closePollEditor: () => { 
+          vnode.state.pollEditorIsOpen = false; 
+          m.redraw(); },
       }),
       !(proposal instanceof OffchainThread)
         && m(LinkedProposalsEmbed, { proposal }),
@@ -1045,7 +1067,8 @@ const ViewProposalPage: m.Component<{
         createdCommentCallback,
         getSetGlobalEditingStatus,
         proposalPageState: vnode.state,
-        recentlySubmitted: vnode.state.recentlySubmitted
+        recentlySubmitted: vnode.state.recentlySubmitted,
+        isAdmin
       }),
       !vnode.state.editing
       && !vnode.state.parentCommentId

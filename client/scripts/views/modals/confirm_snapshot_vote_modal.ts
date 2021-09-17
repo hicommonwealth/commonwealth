@@ -24,13 +24,15 @@ const ConfirmSnapshotVoteModal: m.Component<{
   id: string,
   selectedChoice: string,
   totalScore: number,
+  scores: any
+  snapshot: any,
 }, {
   error: any,
   saving: boolean,
 }> = {
   view: (vnode) => {
     const author = app.user.activeAccount;
-    const { proposal, space, id, selectedChoice, totalScore } = vnode.attrs;
+    const { proposal, space, id, selectedChoice, totalScore, scores, snapshot } = vnode.attrs;
     return m('.ConfirmSnapshotVoteModal', [
       m('.compact-modal-title', [
         m('h3', 'Confirm vote'),
@@ -110,7 +112,7 @@ const ConfirmSnapshotVoteModal: m.Component<{
                   notifyError(errorMessage);
                 } else if (result.status === 'Success') {
                   $(e.target).trigger('modalexit');
-                  m.route.set(`/${app.activeId()}/snapshot-proposals/${space.id}`);
+                  m.route.set(`/${app.activeId()}/snapshot/${space.id}`);
                 }
               } catch (err) {
                 const errorMessage = err.message;

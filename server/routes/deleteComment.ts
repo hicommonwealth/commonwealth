@@ -21,7 +21,7 @@ const deleteComment = async (models: DB, req: Request, res: Response, next: Next
 
   try {
     const userOwnedAddressIds = (await req.user.getAddresses()).filter((addr) => !!addr.verified).map((addr) => addr.id);
-    const comment = await models.OffchainComment.findOne({
+    let comment = await models.OffchainComment.findOne({
       where: {
         id: req.body.comment_id,
         address_id: { [Op.in]: userOwnedAddressIds },
@@ -29,7 +29,27 @@ const deleteComment = async (models: DB, req: Request, res: Response, next: Next
       include: [ models.Address ],
     });
     if (!comment) {
-      return next(new Error(Errors.NotOwned));
+      comment = await models.OffchainComment.findOne({
+        where: {
+          id: req.body.comment_id,
+        },
+        include: [ models.Chain, models.OffchainCommunity ],
+      });
+      const roleWhere = {
+        permission: { [Op.in]: ['admin', 'moderator'] },
+        address_id: { [Op.in]: userOwnedAddressIds },
+      };
+      if (comment.community) {
+        roleWhere['offchain_community_id'] = comment.OffchainCommunity.id;
+      } else if (comment.chain) {
+        roleWhere['chain_id'] = comment.Chain.id;
+      }
+      const requesterIsAdminOrMod = await models.Role.findOne({
+        where: roleWhere
+      });
+      if (!requesterIsAdminOrMod) {
+        return next(new Error(Errors.NotOwned));
+      }
     }
     // find and delete all associated subscriptions
     const subscriptions = await models.Subscription.findAll({

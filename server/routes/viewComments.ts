@@ -29,7 +29,8 @@ const viewComments = async (models: DB, req: Request, res: Response, next: NextF
         as: 'reactions',
         include: [{
           model: models.Address,
-          as: 'Address'
+          as: 'Address',
+          required: true
         }]
       }
     ],
