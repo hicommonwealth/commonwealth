@@ -210,7 +210,7 @@ export class SubstratePhragmenElection extends Proposal<
     // handle differing versions of Substrate API
     const txFunc = (api: ApiPromise) => {
       if (api.tx[this.moduleName].submitCandidacy.meta.args.length === 1) {
-        return api.tx[this.moduleName].submitCandidacy(this.candidates);
+        return api.tx[this.moduleName].submitCandidacy(this._exposedCandidates.length);
       } else {
         return api.tx[this.moduleName].submitCandidacy();
       }
