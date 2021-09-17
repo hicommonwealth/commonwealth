@@ -208,7 +208,7 @@ const DashboardPage: m.Component<{}> = {
               onclick: () => { },
             }),
           ]),
-          m('.NotificationsList', [
+          m('.DashboardList', [
             sortedNotifications.length > 0
               ? m(Infinite, {
                 maxPages: 1, // prevents rollover/repeat
