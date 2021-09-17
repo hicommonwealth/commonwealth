@@ -419,7 +419,7 @@ const DashboardRow: m.Component<{
                   rounded: true
                 }),
                 m(Button, {
-                  iconLeft: Icons.ALERT_CIRCLE,
+                  iconLeft: Icons.BELL,
                   label: 'Subscribe',
                   rounded: true
                 })
@@ -436,7 +436,7 @@ const DashboardRow: m.Component<{
                   outlined: false
                 }),
                 m(Button, {
-                  iconLeft: Icons.COMMAND,
+                  iconLeft: Icons.MESSAGE_SQUARE,
                   label: '84',
                   outlined: false
                 })
