@@ -38,9 +38,9 @@ export async function migrateChainEntity(chain: string): Promise<void> {
   if (!chain) {
     throw new Error('must provide chain');
   }
-  if (!isSupportedChain(chain)) {
-    throw new Error('unsupported chain');
-  }
+  // if (!isSupportedChain(chain)) {
+  //   throw new Error('unsupported chain');
+  // }
 
   // query one node for each supported chain
   const node: ChainNodeInstance = await models['ChainNode'].findOne({
@@ -66,7 +66,7 @@ export async function migrateChainEntity(chain: string): Promise<void> {
       // TODO: determine moloch API version
       // TODO: construct dater
       throw new Error('Moloch migration not yet implemented.');
-    } else if (chainSupportedBy(chain, CompoundTypes.EventChains)) {
+    } else if (chainSupportedBy(chain, [...CompoundTypes.EventChains, 'tribe'])) {
       const api = await CompoundEvents.createApi(node.url, node.address);
       fetcher = new CompoundEvents.StorageFetcher(api);
       // range.startBlock = chain === 'aave' ? 12200000 : 0;
