@@ -125,6 +125,7 @@ UPDATE "Chains" SET "active" = true WHERE id = 'osmosis-local';
 - Navigate to `http://localhost:8080/osmosis-local` and wait for the page to load.
 - Open Keplr and add an account using the mnemonic for the second key you created earlier.
   - **NOTE: IT IS VERY IMPORTANT YOU DO NOT USE THE FIRST KEY, AS IT WILL HAVE "account-number" SET TO 0, WHICH WILL CAUSE BUGS IN THE WEB UI.**
+  - You may need to "Connect" this new account, so that it is selected and will be received by Commonwealth for login.
 - Use that account to log in via Keplr wallet. It should ask you if you want to add "Osmosis Local" as a chain, and you should accept.
   - Then, you can go into Keplr and select the "Osmosis Local" chain under "Beta", and it should display your balance as initialized earlier.
 - Create a new proposal using "New Thread" -> "New text proposal".
@@ -134,3 +135,4 @@ UPDATE "Chains" SET "active" = true WHERE id = 'osmosis-local';
   - If a proposal receives enough Yes votes, it will be marked "Passed".
   - If a proposal receives enough No votes, it will be marked "Rejected".
   - If a proposal fails to receive enough votes, it will be marked "Failed".
+- For QA: ensure that all the transaction types and features work.
