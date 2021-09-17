@@ -11,7 +11,7 @@ module.exports = {
         type: 'chain',
         network: 'injective-testnet',
         base: 'cosmos',
-        active: true,
+        active: false,
         description: 'Injective testnet.',
       }], { transaction: t });
 

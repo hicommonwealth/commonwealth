@@ -39,6 +39,7 @@ import SubstrateBountyTreasury from 'controllers/chain/substrate/bountyTreasury'
 import { AaveProposalArgs } from 'controllers/chain/ethereum/aave/governance';
 import Aave from 'controllers/chain/ethereum/aave/adapter';
 import NearSputnik from 'controllers/chain/near/sputnik/adapter';
+import { navigateToSubpage } from 'app';
 
 // this should be titled the Substrate/Edgeware new proposal form
 const NewProposalForm = {
@@ -167,6 +168,7 @@ const NewProposalForm = {
       const done = (result) => {
         vnode.state.error = '';
         callback(result);
+        return result;
       };
       let createFunc: (...args) => ITXModalData | Promise<ITXModalData> = (a) => {
         return (proposalSlugToClass().get(proposalTypeEnum) as ProposalModule<any, any, any>).createTx(...a);
@@ -301,14 +303,16 @@ const NewProposalForm = {
         const deposit = vnode.state.deposit
           ? new CosmosToken((app.chain as Cosmos).governance.minDeposit.denom, vnode.state.deposit, false)
           : (app.chain as Cosmos).governance.minDeposit;
+        // TODO: add disabled / loading
         (app.chain as Cosmos).governance.submitProposalTx(
           author as CosmosAccount,
           vnode.state.form.title,
           vnode.state.form.description,
           deposit
-        ).then((result) => done(result))
-          .then(() => m.redraw())
-          .catch((err) => notifyError(err.toString()));
+        ).then((result) => {
+          done(result);
+          navigateToSubpage(`/proposal/cosmosproposal/${result}`);
+        }).catch((err) => notifyError(err.toString()));
         return;
       } else if (proposalTypeEnum === ProposalType.MolochProposal) {
         // TODO: check that applicant is valid ETH address in hex

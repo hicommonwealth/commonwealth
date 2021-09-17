@@ -11,7 +11,7 @@ module.exports = {
         type: 'chain',
         network: 'osmosis-local',
         base: 'cosmos',
-        active: true,
+        active: false,
         description: 'Osmosis Local.',
         bech32_prefix: 'osmo'
       }], { transaction: t });

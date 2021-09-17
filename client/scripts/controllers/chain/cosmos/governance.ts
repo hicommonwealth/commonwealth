@@ -165,7 +165,7 @@ class CosmosGovernance extends ProposalModule<
     title: string,
     description: string,
     initialDeposit: CosmosToken,
-  ) {
+  ): Promise<number> {
     const tProp = TextProposal.fromPartial({ title, description });
     const msg: MsgSubmitProposalEncodeObject = {
       typeUrl: '/cosmos.gov.v1beta1.MsgSubmitProposal',
@@ -186,6 +186,7 @@ class CosmosGovernance extends ProposalModule<
     const idAttribute = submitEvent.attributes.find(({ key }) => fromAscii(key) === 'proposal_id');
     const id = +fromAscii(idAttribute.value);
     await this._initProposals(id);
+    return id;
   }
 }
 
