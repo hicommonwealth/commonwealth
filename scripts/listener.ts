@@ -43,6 +43,7 @@ const networkUrls = {
   marlin: 'wss://mainnet.infura.io/ws',
   'marlin-local': 'ws://127.0.0.1:9545',
   uniswap: 'wss://mainnet.infura.io/ws',
+  tribe: 'wss://mainnet.infura.io/ws',
 
   aave: 'wss://mainnet.infura.io/ws',
   'aave-local': 'ws://127.0.0.1:9545',
