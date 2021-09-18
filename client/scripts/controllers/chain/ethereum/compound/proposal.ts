@@ -26,6 +26,7 @@ import EthereumAccounts from '../accounts';
 import CompoundChain from './chain';
 import { formatNumberLong } from 'helpers';
 import Web3 from 'web3';
+import { formatNumberShort } from 'shared/adapters/currency';
 
 export enum CompoundVote {
   YES = 1,
@@ -44,7 +45,7 @@ export class CompoundProposalVote implements IVote<EthereumCoin> {
   }
 
   public format(): string {
-    return `${formatNumberLong(+Web3.utils.fromWei(this.power))}`;
+    return `${formatNumberShort(+Web3.utils.fromWei(this.power))}`;
   }
 }
 
