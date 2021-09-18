@@ -124,7 +124,7 @@ const TwitterAttestationModal: m.Component<{
         m('progress.gradient-progress-bar', { value:'0.1' }),
         m('img.twitter-logo', { src:'/static/img/twitterBlueIcon.svg' }),
         m('.title', 'Sign Message'),
-        m('.description', 'Sign and tweet a message that will be used to link your wallet address and Twitter handle.'),
+        m('.description', 'Sign and tweet a message that will be used to link your wallet address and Twitter handle for interactions on Commonwealth'),
         m('.twitter-handle', [
           m('.flex.items-baseline', [
             m('', `@${twitterAcct.username}`),
@@ -188,6 +188,23 @@ const TwitterAttestationModal: m.Component<{
         m('button.primary-button', {
           onclick: async (e) => {
             window.open(`https://twitter.com/intent/tweet?text=${constructTweet()}`, '_blank');
+            const params = {
+              tweet: constructTweet(),
+              handle: twitterAcct.username,
+              address: account.address,
+            }
+            $.post(`${app.serverUrl()}/post-tweet`, params)
+            .then(async (res) => {
+              vnode.state.tweet = res.result.id
+              vnode.state.posted = true;
+              vnode.state.step += 1;
+              m.redraw();
+            })
+            .catch((e) => {
+              console.log(e);
+              vnode.state.step = 2;
+              m.redraw();
+            });
             vnode.state.step += 1;
             m.redraw();
           }
