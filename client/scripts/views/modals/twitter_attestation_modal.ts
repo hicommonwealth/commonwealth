@@ -25,7 +25,7 @@ const TwitterAttestationModal: m.Component<{
 {
   step: TwitterAttestationModalSteps, // steps for modal
   error,
-  twitterAcct,
+  twitterAcct, // full Social Acct Obj
   tweet, // id for tweet
   userProvidedSignature: string;
   valid: boolean, // Step 2 Signed
@@ -34,9 +34,9 @@ const TwitterAttestationModal: m.Component<{
 }> = {
   oninit:(vnode) => {
     vnode.state.twitterAcct = vnode.attrs.twitter;
-    if (!vnode.state.twitterAcct?.attested && !vnode.attrs.account.twitter_verification_msg) {
+    if (!vnode.state.twitterAcct?.attested) {
       vnode.state.step = TwitterAttestationModalSteps.Step1Sign;
-    } else if (!vnode.state.twitterAcct.attested && vnode.attrs.account.twitter_verification_msg) {
+    } else if (!vnode.state.twitterAcct.attested) {
       vnode.state.step = TwitterAttestationModalSteps.Step2Publicize;
     }
   },
@@ -55,6 +55,8 @@ const TwitterAttestationModal: m.Component<{
     const { account, twitter, refreshCallback } = vnode.attrs;
     const { twitterAcct, tweet } = vnode.state;
     if (!twitter) return; // not what we want
+
+    vnode.state.tweet = '1436375667373924354';
     
     const constructSignature = (username) => {
       const EIP712Domain = [

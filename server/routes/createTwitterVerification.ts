@@ -216,6 +216,8 @@ const createTwitterVerification = async (models: DB, req: Request, res: Response
   const result = await verifyTwitterIdentity(req.body.tweetID, req.body.address);
 
   if (result.verified) {
+    socialAccount.attested = true;
+    socialAccount.save();
     const addressesToUpdate = await models.Address.findAll({ where: {
       address: req.body.address,
       user_id: req.user.id,
@@ -225,6 +227,7 @@ const createTwitterVerification = async (models: DB, req: Request, res: Response
       c.twitter_verified = true;
       return c.save();
     }));
+    // Finds all addresses across the site and updates them
     return res.json({ status: 'Success' });
   }
 
