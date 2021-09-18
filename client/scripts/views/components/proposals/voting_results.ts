@@ -56,7 +56,7 @@ const VoteListing: m.Component<{
                   vnode.state.balancesCache[vote.account.address] = vote.format();
                   m.redraw();
                 } else if (vote instanceof CompoundProposalVote) {
-                  balance = formatCoin(app.chain.chain.coins(vote.power), true);
+                  balance = vote.power;
                   vnode.state.balancesCache[vote.account.address] = balance;
                   m.redraw();
                 } else {
@@ -83,7 +83,7 @@ const VoteListing: m.Component<{
               case (vote instanceof CompoundProposalVote):
                 return m('.vote', [
                   m('.vote-voter', m(User, { user: vote.account, linkify: true })),
-                  balance && m('.vote-balance', balance),
+                  balance && m('.vote-balance', `${balance} ${app.chain.meta.chain.symbol}`),
                 ]);
               case (vote instanceof AaveProposalVote):
                 return m('.vote', [
