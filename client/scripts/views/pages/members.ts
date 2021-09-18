@@ -88,9 +88,9 @@ pageToLoad: number, totalMembers: number, isCompound: boolean, voteEvents }> = {
         }
       }
     });
+    vnode.state.isCompound = (app.chain instanceof Compound) ? true: false;
 
     const activeEntity = app.community ? app.community : app.chain;
-    vnode.state.isCompound = (app.chain instanceof Compound) ? true: false;
     if (!activeEntity) {
       return m(PageLoading, {
         message: 'Loading members',
