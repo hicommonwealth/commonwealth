@@ -30,7 +30,7 @@ const createGist = async (models: DB, req: Request, res: Response, next: NextFun
   if (!req.body.description) {
     return res.status(400).json({ error: 'No description provided' });
   }
-  const socialAccount = await models.SocialAccount.findOne({ where: { provider: 'github', provider_userid: req.user.id } });
+  const socialAccount = await models.SocialAccount.scope('withPrivateData').findOne({ where: { provider: 'github', provider_userid: req.user.id } });
   if (!socialAccount) {
     return next(new Error('No linked Github account'));
   }

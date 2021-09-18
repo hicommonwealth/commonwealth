@@ -115,6 +115,7 @@ import bulkOffchain from './routes/bulkOffchain';
 import setTopicThreshold from './routes/setTopicThreshold';
 import isAddress from './routes/isAddress';
 import getLatestTweet from './routes/getTweet';
+import postTweet from './routes/postTweet';
 
 import edgewareLockdropLookup from './routes/getEdgewareLockdropLookup';
 import edgewareLockdropStats from './routes/getEdgewareLockdropStats';
@@ -544,6 +545,7 @@ function setupRouter(
     });
 
   router.get('/latest-tweet', getLatestTweet.bind(this, models));
+  router.post('/post-tweet', postTweet.bind(this, models));
 
   app.use('/api', router);
 }

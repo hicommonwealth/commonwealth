@@ -51,6 +51,16 @@ export default (
       { fields: ['user_id'] },
       { fields: ['user_id', 'provider'] },
     ],
+    defaultScope: {
+      attributes: {
+        exclude: [
+          'access_token_secret', 'access_token', 'refresh_token'
+        ],
+      }
+  },
+    scopes: {
+      withPrivateData: {}
+    }
   });
 
   SocialAccount.associate = (models) => {
