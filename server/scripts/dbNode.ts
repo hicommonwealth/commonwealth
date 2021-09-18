@@ -128,7 +128,7 @@ async function mainProcess(producer: RabbitMqHandler, pool: Pool) {
           url: 'wss://mainnet.infura.io/ws',
           tokenAddresses: erc20TokenAddresses,
           tokenNames: erc20TokenNames,
-          verbose: false
+          verbose: true
         }, 'erc20');
 
         // add the rabbitmq handler for this chain

@@ -426,7 +426,7 @@ const ChainEventSubscriptionRow: m.Component<{
             align: 'left',
             compact: true,
             rounded: true,
-            disabled: !app.user.emailVerified || vnode.state.loading,
+            disabled: vnode.state.loading,
             iconRight: Icons.CHEVRON_DOWN,
             label: vnode.state.option,
           }),
