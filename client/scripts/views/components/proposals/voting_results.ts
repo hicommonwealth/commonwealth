@@ -2,7 +2,7 @@ import 'components/proposals/voting_results.scss';
 import m from 'mithril';
 import app from 'state';
 
-import { formatCoin } from 'adapters/currency'; // TODO: remove formatCoin, only use coins.format()
+import { formatCoin, formatNumberShort } from 'adapters/currency'; // TODO: remove formatCoin, only use coins.format()
 import User from 'views/components/widgets/user';
 import { VotingType, VotingUnit, IVote, DepositVote, BinaryVote, AnyProposal } from 'models';
 import { CosmosVote, CosmosProposal } from 'controllers/chain/cosmos/proposal';
@@ -13,6 +13,8 @@ import { SubstrateCollectiveVote } from 'controllers/chain/substrate/collective_
 import { SubstrateDemocracyVote } from 'controllers/chain/substrate/democracy_referendum';
 import AaveProposal, { AaveProposalVote } from 'controllers/chain/ethereum/aave/proposal';
 import { NearSputnikVoteString } from 'controllers/chain/near/sputnik/types';
+import Compound from 'controllers/chain/ethereum/compound/adapter';
+import BN from 'bn.js';
 
 const COLLAPSE_VOTERS_AFTER = 6; // if there are >6 voters, collapse remaining under "Show more"
 
@@ -56,7 +58,9 @@ const VoteListing: m.Component<{
                   vnode.state.balancesCache[vote.account.address] = vote.format();
                   m.redraw();
                 } else if (vote instanceof CompoundProposalVote) {
-                  balance = vote.power;
+                  if (!(app.chain instanceof Compound)) return;
+                  const decimals = new BN(10).pow(new BN(app.chain.governance.api.decimals));
+                  balance = formatNumberShort(vote.power.div(decimals).toNumber());
                   vnode.state.balancesCache[vote.account.address] = balance;
                   m.redraw();
                 } else {
