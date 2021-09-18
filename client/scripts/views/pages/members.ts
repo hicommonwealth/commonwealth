@@ -16,6 +16,7 @@ import Compound from 'controllers/chain/ethereum/compound/adapter';
 import { pluralize } from 'helpers';
 import { BigNumber } from 'ethers';
 import { notifyError } from 'controllers/app/notifications';
+import { formatAddressShort } from 'utils';
 
 interface MemberInfo {
   chain: string;
@@ -30,7 +31,7 @@ const DelegateModal: m.Component<{ address: string, name: string, symbol: string
   view: (vnode) => {
     return m('.DelegateModal', [
       m('.compact-modal-title', [
-        m('h3', `Delegate to ${vnode.attrs.name ? vnode.attrs.name : 'Anonymous'}`),
+        m('h3', `Delegate to ${vnode.attrs.name ? `${vnode.attrs.name} at Address: ${formatAddressShort(vnode.attrs.address)}` : `Anonymous at Address: ${formatAddressShort(vnode.attrs.address)}`}`),
       ]),
       m('.compact-modal-body', [
         m('div', `Amount ${vnode.attrs.symbol} to delegate`),
