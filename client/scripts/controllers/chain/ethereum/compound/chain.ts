@@ -55,6 +55,7 @@ export default class CompoundChain extends EthereumChain {
         this.app.user.activeAccount.address,
         this.compoundApi.Token,
       );
+      const bal = await this.balanceOf(address);
       console.log(`User balance: ${bal.toString()}`)
       console.log(`${amount} to delegate before decimals`);
       const balBN = BigNumber.from(amount);

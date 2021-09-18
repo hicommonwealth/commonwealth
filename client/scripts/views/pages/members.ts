@@ -66,7 +66,7 @@ const DelegateModal: m.Component<{ address: string, name: string, symbol: string
 const MembersPage : m.Component<{}, { membersRequested: boolean, membersLoaded: MemberInfo[],
 pageToLoad: number, totalMembers: number, isCompound: boolean, voteEvents }> = {
   oninit: (vnode) => {
-    $.get('/api/getChainEvents?type=marlin-vote-cast').then(({ result }) => {
+    $.get(`/api/getChainEvents?type=${app.activeId}-vote-cast`).then(({ result }) => {
       // Sort by address which voted
       const sortedResults = {};
       result.forEach((r) => {
