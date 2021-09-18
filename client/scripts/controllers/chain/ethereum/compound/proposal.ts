@@ -24,9 +24,8 @@ import { attachSigner } from '../contractApi';
 import EthereumAccount from '../account';
 import EthereumAccounts from '../accounts';
 import CompoundChain from './chain';
-import { formatNumberLong } from 'helpers';
 import Web3 from 'web3';
-import { formatNumberShort } from 'shared/adapters/currency';
+import { formatNumberShort } from 'adapters/currency';
 
 export enum CompoundVote {
   YES = 1,
