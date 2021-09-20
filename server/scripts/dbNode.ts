@@ -129,7 +129,10 @@ async function mainProcess(producer: RabbitMqHandler, pool: Pool) {
           url: 'wss://mainnet.infura.io/ws',
           tokenAddresses: erc20TokenAddresses,
           tokenNames: erc20TokenNames,
-          verbose: false
+          verbose: false,
+          enricherConfig: {
+            balanceTransferThreshold: 10 ** 22 // TODO: get max token amount from a db table
+          }
         }, 'erc20');
 
         // add the rabbitmq handler for this chain
