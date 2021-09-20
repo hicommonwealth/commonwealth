@@ -12,14 +12,15 @@ import User from './user';
 // wishes to prevent redundant rendering of avatars.
 
 const UserGallery: m.Component<{
-  users: Account<any>[] | AddressInfo[];
-  class?: string;
-  avatarSize: number;
-  popover?: boolean;
-  maxUsers?: number;
+    users: Account<any>[] | AddressInfo[];
+    addressesCount?: number;
+    class?: string;
+    avatarSize: number;
+    popover?: boolean;
+    maxUsers?: number;
 }, {}> = {
   view: (vnode) => {
-    const { users, avatarSize, popover } = vnode.attrs;
+    const { users, avatarSize, popover, addressesCount } = vnode.attrs;
     const userCount = users.length;
     const maxUsers = vnode.attrs.maxUsers || 10;
     const overflowUsers = (userCount < maxUsers) ? 0 : (userCount - maxUsers);

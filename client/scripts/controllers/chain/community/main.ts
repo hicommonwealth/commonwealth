@@ -29,12 +29,10 @@ class Community extends ICommunityAdapter<Coin, OffchainAccount> {
     if (this.meta.id !== (this.app.customDomainId() || m.route.param('scope'))) {
       return false;
     }
-
     const {
-      threads, comments, reactions, topics, admins, activeUsers, numVotingThreads
+      threads, topics, admins, activeUsers, numVotingThreads
     } = response.result;
     this.app.threads.initialize(threads, numVotingThreads, true);
-    this.app.comments.initialize(comments, true);
     this.app.topics.initialize(topics, true);
     this.meta.setAdmins(admins);
     this.app.recentActivity.setMostActiveUsers(activeUsers);
@@ -49,6 +47,8 @@ class Community extends ICommunityAdapter<Coin, OffchainAccount> {
     this.app.threads.deinit();
     this.app.comments.deinit();
     this.app.reactions.deinit();
+    this.app.reactionCounts.deinit();
+    this.app.threadUniqueAddressesCount.deinit();
     console.log(`${this.meta.name} stopped.`);
   }
 }

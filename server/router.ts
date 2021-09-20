@@ -34,6 +34,7 @@ import deleteReaction from './routes/deleteReaction';
 import viewReactions from './routes/viewReactions';
 import bulkReactions from './routes/bulkReactions';
 import reactionsCounts from './routes/reactionsCounts';
+import threadsUsersCountAndAvatars from './routes/threadsUsersCountAndAvatars';
 import starCommunity from './routes/starCommunity';
 import createCommunity from './routes/createCommunity';
 import deleteCommunity from './routes/deleteCommunity';
@@ -129,7 +130,7 @@ import getTokenForum from './routes/getTokenForum';
 import getSubstrateSpec from './routes/getSubstrateSpec';
 import editSubstrateSpec from './routes/editSubstrateSpec';
 import { getStatsDInstance } from './util/metrics';
-import updateAddress from "./routes/updateAddress";
+import updateAddress from './routes/updateAddress';
 import { DB } from './database';
 import { factory, formatFilename } from '../shared/logging';
 import { sendMessage } from './routes/snapshotAPI';
@@ -339,6 +340,10 @@ function setupRouter(
   // TODO: Change to GET /reactions
   router.get('/bulkReactions', bulkReactions.bind(this, models));
   router.post('/reactionsCounts', reactionsCounts.bind(this, models));
+  router.post(
+    '/threadsUsersCountAndAvatars',
+    threadsUsersCountAndAvatars.bind(this, models)
+  );
 
   // generic invite link
   // TODO: Change to POST /inviteLink

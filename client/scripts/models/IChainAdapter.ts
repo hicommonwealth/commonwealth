@@ -94,6 +94,8 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     if (this.chainEntities) {
       this.chainEntities.deinit();
     }
+    this.app.reactionCounts.deinit();
+    this.app.threadUniqueAddressesCount.deinit();
     console.log(`${this.meta.chain.name} stopped`);
   }
 

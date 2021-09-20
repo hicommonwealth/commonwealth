@@ -147,11 +147,12 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
           avatarSize: 20,
           popover: true,
           maxUsers: 2,
-          users: app.comments.uniqueCommenters(
-            proposal,
-            proposal.author,
-            proposal.authorChain
-          )
+          addressesCount:
+            app.threadUniqueAddressesCount.getAddressesCountRootId(
+              `${proposal.slug}_${proposal.id}`
+            ),
+          users:
+            app.threadUniqueAddressesCount.getUniqueAddressesByRootId(proposal),
         }),
       ]),
       app.isLoggedIn() && m('.discussion-row-menu', [

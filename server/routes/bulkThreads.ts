@@ -157,22 +157,24 @@ const bulkThreads = async (models: DB, req: Request, res: Response, next: NextFu
       return data;
     });
 
-    comments = (await models.OffchainComment.findAll({
-      where: {
-        root_id: root_ids
-      },
-      include: [models.Address, models.OffchainAttachment],
-      order: [['created_at', 'DESC']],
-    })).map((c, idx) => {
-      const row = c.toJSON();
-      const last_edited = getLastEdited(row);
-      row['last_edited'] = last_edited;
-      return row;
-    });
+    // comments = (
+    //   await models.OffchainComment.findAll({
+    //     where: {
+    //       root_id: root_ids,
+    //     },
+    //     include: [models.Address, models.OffchainAttachment],
+    //     order: [['created_at', 'DESC']],
+    //   })
+    // ).map((c, idx) => {
+    //   const row = c.toJSON();
+    //   const last_edited = getLastEdited(row);
+    //   row['last_edited'] = last_edited;
+    //   return row;
+    // });
   } else {
     const whereOptions = (community)
       ? { community: community.id, }
-      : { chain: chain.id, };
+      : { chain: chain.id };
 
     threads = (await models.OffchainThread.findAll({
       where: whereOptions,
@@ -198,17 +200,17 @@ const bulkThreads = async (models: DB, req: Request, res: Response, next: NextFu
       row['last_edited'] = last_edited;
       return row;
     });
-    comments = (await models.OffchainComment.findAll({
-      where: whereOptions,
-      include: [models.Address, models.OffchainAttachment],
-      attributes: { exclude: [ 'version_history' ] },
-      order: [['created_at', 'DESC']],
-    })).map((c, idx) => {
-      const row = c.toJSON();
-      const last_edited = getLastEdited(row);
-      row['last_edited'] = last_edited;
-      return row;
-    });
+    // comments = (await models.OffchainComment.findAll({
+    //   where: whereOptions,
+    //   include: [models.Address, models.OffchainAttachment],
+    //   attributes: { exclude: [ 'version_history' ] },
+    //   order: [['created_at', 'DESC']],
+    // })).map((c, idx) => {
+    //   const row = c.toJSON();
+    //   const last_edited = getLastEdited(row);
+    //   row['last_edited'] = last_edited;
+    //   return row;
+    // });
   }
 
   const countsQuery = `
@@ -226,7 +228,7 @@ const bulkThreads = async (models: DB, req: Request, res: Response, next: NextFu
     result: {
       numVotingThreads,
       threads,
-      comments, // already converted to JSON earlier
+      // comments, // already converted to JSON earlier
       // reactions: reactions.map((r) => r.toJSON()),
     }
   });
