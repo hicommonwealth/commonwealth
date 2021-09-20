@@ -225,6 +225,9 @@ const createTwitterVerification = async (models: DB, req: Request, res: Response
     // Finds all addresses across the site and updates them
     await Promise.all(addressesToUpdate.map((c) => {
       c.twitter_verified = true;
+      c.twitter_verification_msg = JSON.stringify({
+        username: req.body.twitter_username,
+      });
       return c.save();
     }));
     // Finds all addresses across the site and updates them

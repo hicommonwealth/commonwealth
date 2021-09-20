@@ -176,7 +176,11 @@ const loadProfile = async (attrs: IProfilePageAttrs, state: IProfilePageState) =
       id: a.id,
       name: a.name,
       user_id: a.user_id,
-      ghost_address: a.ghost_address
+      ghost_address: a.ghost_address,
+      twitter_verified: a.twitter_verified,
+      twitter_username: a.twitter_verification_msg
+        ? JSON.parse(a.twitter_verification_msg).username
+        : null,
     };
     state.account = account;
     state.threads = result.threads.map((t) => modelThreadFromServer(t));

@@ -1,7 +1,7 @@
 import m from 'mithril';
 import _ from 'lodash';
 import $ from 'jquery';
-import { Button, Icons } from 'construct-ui';
+import { Button, Icon, Icons } from 'construct-ui';
 import * as clipboard from 'clipboard-polyfill';
 
 import { initChain } from 'app';
@@ -86,6 +86,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
     const isClaimable = !isAddressOnSite(account.address) || !account.profile;
     const showJoinCommunityButton = !isAddressOnSite(account.address) && !account.profile;
     const addressInfo = app.user.getDefaultAddressInCommunity({chain:app.activeChainId()});
+    const twitter = app.user.socialAccounts.find((acct) => acct.provider === 'twitter');
 
     const joinCommunity = async () => {
       if (!app.activeChainId() || onOwnProfile) return;
@@ -118,6 +119,20 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
             m('.User', account.profile
               ? m(User, { user: account, hideAvatar: true, showRole: true })
               : account.address),
+            account.twitter_verified &&
+              m(
+                'a',
+                {
+                  href: `https://twitter.com/${account.twitter_username}`,
+                  target: '_blank',
+                },
+                [
+                  m(Icon, {
+                    class: 'filled-twitter-icon',
+                    name: Icons.TWITTER,
+                  }),
+                ]
+              ),
           ]),
           m('.address-block-left', [
             m('.address', `${account.address.slice(0, 6)}...${account.address.slice(account.address.length - 6)}`),
@@ -173,7 +188,6 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
                 intent: 'primary',
                 style: 'background-color: rgb(33, 114, 229); border: 0px solid white; color: white;',
                 onclick: () => {
-                  const twitter = app.user.socialAccounts.find((acct) => acct.provider === 'twitter');
                   if (!twitter) {
                     // eslint-disable-next-line max-len
                     window.location.href = `/api/auth/twitter?redirect=${encodeURIComponent(window.location.pathname)}${window.location.search ? `${encodeURIComponent(window.location.search)}%26` : '%3F'}continueTwitterAttestation=true`;

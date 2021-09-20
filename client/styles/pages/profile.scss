@@ -152,6 +152,16 @@
   }
 }
 
+.filled-twitter-icon {
+  color: rgb(33, 114, 229);
+  margin-left: 8px;
+  margin-top: -3px;
+
+  svg {
+    fill: rgb(33, 114, 229)
+  }
+}
+
 .ProfileBio {
   padding-left: 36px;
   position: sticky;

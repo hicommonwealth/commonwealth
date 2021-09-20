@@ -56,9 +56,9 @@ const postTweet = async (models: DB, req: Request, res: Response, next: NextFunc
         });
       })  
     } catch (e) {
-      console.warn(e.response);
+      console.warn(e);
       res.json({
-        status: `Failure, ${e.response}`,
+        status: `Failure, ${e}`,
       });
     }
   }

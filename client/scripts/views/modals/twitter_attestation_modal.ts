@@ -56,7 +56,7 @@ const TwitterAttestationModal: m.Component<{
     const { twitterAcct, tweet } = vnode.state;
     if (!twitter) return; // not what we want
 
-    vnode.state.tweet = '1436375667373924354';
+    // vnode.state.tweet = '1436375667373924354';
     
     const constructSignature = (username) => {
       const EIP712Domain = [
@@ -129,7 +129,7 @@ const TwitterAttestationModal: m.Component<{
         m('.description', 'Sign and tweet a message that will be used to link your wallet address and Twitter handle for interactions on Commonwealth'),
         m('.twitter-handle', [
           m('.flex.items-baseline', [
-            m('', `@${twitterAcct.username}`),
+            m('.mr-10', `@${twitterAcct.username}`),
             m('.unverfied-label', 'Unverified'),
           ]),
           m('img.close-button', { 
@@ -190,25 +190,25 @@ const TwitterAttestationModal: m.Component<{
         m('button.primary-button', {
           onclick: async (e) => {
             window.open(`https://twitter.com/intent/tweet?text=${constructTweet()}`, '_blank');
-            const params = {
-              tweet: constructTweet(),
-              handle: twitterAcct.username,
-              address: account.address,
-            }
-            $.post(`${app.serverUrl()}/post-tweet`, params)
-            .then(async (res) => {
-              vnode.state.tweet = res.result.id
-              vnode.state.posted = true;
-              vnode.state.step += 1;
-              m.redraw();
-            })
-            .catch((e) => {
-              console.log(e);
-              vnode.state.step = 2;
-              m.redraw();
-            });
             vnode.state.step += 1;
             m.redraw();
+            // const params = {
+            //   tweet: constructTweet(),
+            //   handle: twitterAcct.username,
+            //   address: account.address,
+            // }
+            // $.post(`${app.serverUrl()}/post-tweet`, params)
+            // .then(async (res) => {
+            //   vnode.state.tweet = res.result.id
+            //   vnode.state.posted = true;
+            //   vnode.state.step += 1;
+            //   m.redraw();
+            // })
+            // .catch((e) => {
+            //   console.log(e);
+            //   vnode.state.step = 2;
+            //   m.redraw();
+            // });
           }
         }, 'Tweet This'),
       ] : vnode.state.step === TwitterAttestationModalSteps.Step3Verify ? [
@@ -296,6 +296,7 @@ const TwitterAttestationModal: m.Component<{
           onclick: async () => {
             $('.TwitterAttestationModal').trigger('modalforceexit');
             m.redraw();
+            refreshCallback();
           }
         }, 'Close'),
       ]);
