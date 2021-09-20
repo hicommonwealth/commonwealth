@@ -189,26 +189,23 @@ const TwitterAttestationModal: m.Component<{
         m('.tweet-preview', constructTweet()),
         m('button.primary-button', {
           onclick: async (e) => {
-            window.open(`https://twitter.com/intent/tweet?text=${constructTweet()}`, '_blank');
-            vnode.state.step += 1;
-            m.redraw();
-            // const params = {
-            //   tweet: constructTweet(),
-            //   handle: twitterAcct.username,
-            //   address: account.address,
-            // }
-            // $.post(`${app.serverUrl()}/post-tweet`, params)
-            // .then(async (res) => {
-            //   vnode.state.tweet = res.result.id
-            //   vnode.state.posted = true;
-            //   vnode.state.step += 1;
-            //   m.redraw();
-            // })
-            // .catch((e) => {
-            //   console.log(e);
-            //   vnode.state.step = 2;
-            //   m.redraw();
-            // });
+            const params = {
+              tweet: constructTweet(),
+              handle: twitterAcct.username,
+              address: account.address,
+            }
+            $.post(`${app.serverUrl()}/post-tweet`, params)
+              .then(async (res) => {
+                vnode.state.tweet = res.result.id
+                vnode.state.posted = true;
+                vnode.state.step += 1;
+                m.redraw();
+              })
+              .catch((e) => {
+                console.log(e);
+                vnode.state.step = 2;
+                m.redraw();
+              });
           }
         }, 'Tweet This'),
       ] : vnode.state.step === TwitterAttestationModalSteps.Step3Verify ? [
@@ -295,8 +292,9 @@ const TwitterAttestationModal: m.Component<{
         m('button.primary-button', {
           onclick: async () => {
             $('.TwitterAttestationModal').trigger('modalforceexit');
-            m.redraw();
             refreshCallback();
+            const href = window.location.href;
+            window.location.href = href.substring(0, href.indexOf('continueTwitterAttestation=true') - 1);
           }
         }, 'Close'),
       ]);

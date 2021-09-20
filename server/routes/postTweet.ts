@@ -48,17 +48,17 @@ const postTweet = async (models: DB, req: Request, res: Response, next: NextFunc
 
     try {
       await twitterClient.tweets.statusesUpdate({
-        status: req.body.text
+        status: req.body.tweet
       }).then((response) => {
         res.json({
           status: 'Success',
-          result: { id: response.id },
+          result: { id: response.id_str },
         });
       })  
     } catch (e) {
       console.warn(e);
       res.json({
-        status: `Failure, ${e}`,
+        status: `Failure, ${e.toString()}`,
       });
     }
   }
