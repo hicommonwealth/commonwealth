@@ -14,11 +14,53 @@ const InfoPage = {
   view: (vnode) => {
     const chain = app.chain ? app.chain.meta.chain : null;
     const community = app.community ? app.community.meta : null;
-    const isAdmin = app.user.isSiteAdmin
-    || app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
+    // if not chain/community should 404 fail whale
+    const isAdmin =
+      app.user.isSiteAdmin ||
+      app.user.isAdminOfEntity({
+        chain: app.activeChainId(),
+        community: app.activeCommunityId(),
+      });
     const isMod = app.user.isRoleOfCommunity({
-      role: 'moderator', chain: app.activeChainId(), community: app.activeCommunityId()
+      role: 'moderator',
+      chain: app.activeChainId(),
+      community: app.activeCommunityId(),
     });
+
+
+    /**
+     * TODO: The data for this info page is going to come
+     * from a variety of different chains and each chain
+     * community is going to have a different subset of data
+     * to be shown. Here I will detail out all the chain
+     * types and the data that should be acquired for each.
+     * The info page should then conditionally render the
+     * various sections.
+     * ---
+     * Ethereum (as a base chain)
+     *    --> Blocktime, total supply, # of validators, etc.
+     * Ethereum Token Communities
+     *    --> Total token supply, contract address, # of
+     *        token holders,
+     * Ethereum Compound (alpha + bravo) Governance Communities
+     *    --> Token Supply, # of Proposals, contract address,
+     *        # of Delegates, # of token holders, total voting
+     *        addresses, voting period and delay, quorum votes,
+     *        proposal threshold
+     * Ethereum AAVE Governance
+     *    --> Same as Compound, but use AAVE controller
+     * Substrate Chains
+     *    --> These are all conditionally present datapoints
+     *    --> Next referenda period, # of referenda, # of
+     *        proposals, # of councilors + runner ups + next
+     *        election cycle start/end time, # of treasury
+     *        proposals, # of bounties, # of tips, # of
+     *        validators.
+     * Cosmos Chains
+     *    --> TODO: Fill in.
+     * Cosmos DAOs:
+     *    --> TODO: Fill in.
+     */
 
     return m(Sublayout, {
       class: 'InfoPage',
