@@ -513,8 +513,7 @@ class ThreadsController {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);
     }
     const { threads, comments } = response.result;
-    console.log('next page of threads');
-    console.log(threads);
+
     for (const thread of threads) {
       const modeledThread = modelFromServer(thread);
       if (!thread.Address) {

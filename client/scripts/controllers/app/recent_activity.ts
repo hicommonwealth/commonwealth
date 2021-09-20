@@ -1,6 +1,7 @@
 import moment from 'moment';
 import { OffchainTopic, AbridgedThread, Profile, OffchainComment, OffchainThread } from 'models';
 import app from 'state';
+import $ from 'jquery';
 import { modelFromServer as modelThreadFromServer } from 'controllers/server/threads';
 import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
 
@@ -82,7 +83,7 @@ class RecentActivityController {
       cutoff_date: cutoffDate.toISOString(),
       include_threads: 't',
     };
-    const response = await $.get(`${app.serverUrl()}/bulkComments`, params);
+    const response = await $.get(`${app.serverUrl()}/activeThreads`, params);
     if (response.status !== 'Success') {
       throw new Error(`Unsuccessful: ${response.status}`);
     }

@@ -14,9 +14,7 @@ const SummaryRow: m.Component<
   view: (vnode) => {
     const { topic, monthlyThreads } = vnode.attrs;
     if (!topic?.name) return null;
-    if (monthlyThreads.length) {
-      console.log(monthlyThreads.map((t) => t.title));
-    }
+
     // TODO: Filter & render inactive, then empty, topics at bottom
     return m('.SummaryRow', [
       m('.topic', [m('h3', topic.name), m('p', topic.description)]),
@@ -43,7 +41,6 @@ export const SummaryListing: m.Component<
   {}
 > = {
   view: (vnode) => {
-    console.log(vnode.attrs.recentThreads);
     const topicScopedThreads = {};
     const topics = app.topics.getByCommunity(app.activeId());
     topics.forEach((topic) => {

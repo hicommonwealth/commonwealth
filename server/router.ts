@@ -73,7 +73,7 @@ import deleteRole from './routes/deleteRole';
 import setDefaultRole from './routes/setDefaultRole';
 
 import getUploadSignature from './routes/getUploadSignature';
-import activeThreads from '.routes/activeThreads';
+import activeThreads from './routes/activeThreads';
 import createThread from './routes/createThread';
 import editThread from './routes/editThread';
 import updateThreadPolling from './routes/updateThreadPolling';

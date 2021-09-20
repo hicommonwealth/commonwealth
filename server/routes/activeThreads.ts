@@ -45,7 +45,6 @@ const activeThreads = async (
       whereOptions.root_id = { [Op.notLike]: 'discussion%' };
     }
   }
-  console.log(whereOptions);
   const comments = await models.OffchainComment.findAll({
     where: whereOptions,
     include: [models.Address, models.OffchainAttachment],
@@ -57,16 +56,14 @@ const activeThreads = async (
     const threadIds = comments.map((c) => {
       return c.root_id.split('_')[1];
     });
-    console.log(threadIds);
-    const threadWhereOptions: WhereOptions<OffchainThreadAttributes> = community
-      ? { community: community.id }
-      : { chain: chain.id };
-    threadWhereOptions.id = {
+    const threadWhereOptions: WhereOptions<OffchainThreadAttributes> = {
       [Op.or]: [
-        { [Op.in]: threadIds },
+        { id: { [Op.in]: threadIds } },
         { created_at: { [Op.gt]: cutoff_date } },
       ],
     };
+    if (chain) threadWhereOptions['chain'] = chain.id;
+    if (community) threadWhereOptions['community'] = community.id;
     threads = await models.OffchainThread.findAll({
       where: threadWhereOptions,
       include: [
