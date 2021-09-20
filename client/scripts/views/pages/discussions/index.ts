@@ -271,7 +271,7 @@ const DiscussionFilterBar: m.Component<{ topic: string; stage: string, parentSta
             })),
           ]),
         }),
-      topics.length > 0
+      topics.length > 0 
         && m(Button, {
           rounded: true,
           compact: true,
@@ -281,10 +281,10 @@ const DiscussionFilterBar: m.Component<{ topic: string; stage: string, parentSta
           disabled,
           onclick: async (e) => {
             e.preventDefault();
-            vnode.attrs.parentState.recentThreads = await app.threads.getRecentThreads({
-              communityId: app.activeCommunityId(),
-              chainId: app.activeChainId()
-            })
+            vnode.attrs.parentState.recentThreads = await app.recentActivity.getRecentCommunityActivity({
+                communityId: app.activeCommunityId(),
+                chainId: app.activeChainId(),
+              });
             vnode.attrs.parentState.summaryView = true;
             m.redraw();
           }
@@ -422,7 +422,8 @@ const DiscussionsPage: m.Component<{
     };
 
     let sortedListing = [];
-    const allThreads = app.threads.listingStore.getByCommunityTopicAndStage(app.activeId(), topic, stage)
+    const allThreads = app.threads.listingStore
+      .getByCommunityTopicAndStage(app.activeId(), topic, stage)
       .sort(orderDiscussionsbyLastComment);
 
     if (allThreads.length > 0) {
@@ -440,7 +441,9 @@ const DiscussionsPage: m.Component<{
 
     if (unpinnedThreads.length > 0) {
       let visitMarkerPlaced = false;
-      vnode.state.lookback[subpage] = moment.unix(getLastUpdate(unpinnedThreads[unpinnedThreads.length - 1]));
+      vnode.state.lookback[subpage] = moment.unix(
+        getLastUpdate(unpinnedThreads[unpinnedThreads.length - 1])
+      );
 
       if (allThreads.length > unpinnedThreads.length) {
         if (firstThread) {

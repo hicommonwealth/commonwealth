@@ -1,10 +1,10 @@
+import sgMail from '@sendgrid/mail';
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
 import { DynamicTemplate } from '../../shared/types';
 import AddressSwapper from '../util/addressSwapper';
 
-const sgMail = require('@sendgrid/mail');
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
@@ -15,10 +15,15 @@ export const Errors = {
   AddressNF: 'Address not found',
   ExpiredToken: 'Token has expired, please re-register',
   InvalidSignature: 'Invalid signature, please re-register',
-  NoEmail: 'No email to alert'
+  NoEmail: 'No email to alert',
 };
 
-const verifyAddress = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const verifyAddress = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<unknown> => {
   // Verify that a linked address is actually owned by its supposed user.
   if (!req.body.address) {
     return next(new Error(Errors.NoAddress));
@@ -31,33 +36,46 @@ const verifyAddress = async (models: DB, req: Request, res: Response, next: Next
   }
 
   const chain = await models.Chain.findOne({
-    where: { id: req.body.chain }
+    where: { id: req.body.chain },
   });
   if (!chain) {
     return next(new Error(Errors.InvalidChain));
   }
 
-  const encodedAddress = chain.base === 'substrate'
-    ? AddressSwapper({ address: req.body.address, currentPrefix: chain.ss58_prefix })
-    : req.body.address;
+  const encodedAddress =
+    chain.base === 'substrate'
+      ? AddressSwapper({
+          address: req.body.address,
+          currentPrefix: chain.ss58_prefix,
+        })
+      : req.body.address;
 
-  const existingAddress = await models.Address.scope('withPrivateData').findOne({
-    where: { chain: req.body.chain, address: encodedAddress }
-  });
+  const existingAddress = await models.Address.scope('withPrivateData').findOne(
+    {
+      where: { chain: req.body.chain, address: encodedAddress },
+    }
+  );
   if (!existingAddress) {
     return next(new Error(Errors.AddressNF));
   } else {
     // first, check whether the token has expired
     const expiration = existingAddress.verification_token_expires;
-    if (expiration && +expiration <= +(new Date())) {
+    if (expiration && +expiration <= +new Date()) {
       return next(new Error(Errors.ExpiredToken));
     }
     // check for validity
-    const isAddressTransfer = !!existingAddress.verified && req.user && existingAddress.user_id !== req.user.id;
+    const isAddressTransfer =
+      !!existingAddress.verified &&
+      req.user &&
+      existingAddress.user_id !== req.user.id;
     const oldId = existingAddress.user_id;
     try {
       const valid = await models.Address.verifySignature(
-        models, chain, existingAddress, (req.user ? req.user.id : null), req.body.signature
+        models,
+        chain,
+        existingAddress,
+        req.user ? req.user.id : null,
+        req.body.signature
       );
       if (!valid) {
         return next(new Error(Errors.InvalidSignature));
@@ -70,7 +88,9 @@ const verifyAddress = async (models: DB, req: Request, res: Response, next: Next
     // has been transferred to someone else
     if (isAddressTransfer) {
       try {
-        const user = await models.User.scope('withPrivateData').findOne({ where: { id: oldId } });
+        const user = await models.User.scope('withPrivateData').findOne({
+          where: { id: oldId },
+        });
         if (!user.email) {
           // users who register thru github don't have emails by default
           throw new Error(Errors.NoEmail);
@@ -85,7 +105,9 @@ const verifyAddress = async (models: DB, req: Request, res: Response, next: Next
           },
         };
         await sgMail.send(msg);
-        log.info(`Sent address move email: ${req.body.address} transferred to a new account`);
+        log.info(
+          `Sent address move email: ${req.body.address} transferred to a new account`
+        );
       } catch (e) {
         log.error(`Could not send address move email for: ${req.body.address}`);
       }
@@ -109,7 +131,7 @@ const verifyAddress = async (models: DB, req: Request, res: Response, next: Next
           result: {
             user,
             message: 'Logged in',
-          }
+          },
         });
       });
     }
