@@ -116,9 +116,9 @@ const User: m.Component<{
         size: 'xs',
       }),
     ];
-    const ghostAddress = app.user.addresses.some(({ address, ghostAddress }) => (
-        account.address === address && ghostAddress
-    ))
+    const ghostAddress = app.user.addresses.some(({ address, ghostAddress }) => {
+      if (this !== undefined) account.address === address && ghostAddress
+    })
     const userFinal = avatarOnly
       ? m('.User.avatar-only', {
         key: profile?.address || '-',

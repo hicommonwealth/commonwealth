@@ -654,6 +654,41 @@ class ThreadsController {
     return !(threads.length < DEFAULT_PAGE_SIZE);
   }
 
+  public async getRecentThreads(options: {
+    chainId: string,
+    communityId: string,
+  }) {
+    const { chainId, communityId } = options;
+    const params = {
+      chain: chainId,
+      community: communityId,
+      cutoff_date: moment(Date.now() - (30 * 24 * 3600 * 1000)).toISOString(),
+    };
+    const response = await $.get(`${app.serverUrl()}/bulkThreads`, params);
+    if (response.status !== 'Success') {
+      throw new Error(`Unsuccessful getting recent threads: ${response.status}`);
+    }
+
+    response.result.comments.forEach((comment) => {
+      const modeledComment = modelCommentFromServer(comment);
+      const existing = app.comments.store.getById(comment.id);
+      if (existing) {
+        app.comments.store.remove(existing);
+      }
+      try {
+        app.comments.store.add(modeledComment);
+      } catch (e) {
+        console.error(e.message);
+      }
+    })
+
+    return response.result.threads.map((thread) => {
+      const modeledThread = modelFromServer(thread);
+      this._store.add(modeledThread);
+      return modeledThread;
+    });
+  }
+
   public refreshAll(chainId: string, communityId: string, reset = false) {
     // TODO: Change to GET /threads
     return $.get(`${app.serverUrl()}/bulkThreads`, {

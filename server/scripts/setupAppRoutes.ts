@@ -59,7 +59,8 @@ const setupAppRoutes = (app, models, devMiddleware, templateFile, sendFile) => {
     const community = await models.OffchainCommunity.findOne({ where: { id: scope, privacyEnabled: false } });
     const title = chain ? chain.name : community ? community.name : 'Commonwealth';
     const description = chain ? chain.description : community ? community.description : '';
-    const image = chain ? (chain.icon_url.match(`^(http|https)://`) ? chain.icon_url : `https://commonwealth.im${chain.icon_url}`) : DEFAULT_COMMONWEALTH_LOGO;
+    const image = chain?.icon_url ? (chain.icon_url.match(`^(http|https)://`) ? 
+      chain.icon_url : `https://commonwealth.im${chain.icon_url}`) : DEFAULT_COMMONWEALTH_LOGO;
     const author = '';
     renderWithMetaTags(res, title, description, author, image);
   });
