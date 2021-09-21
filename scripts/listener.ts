@@ -29,7 +29,7 @@ require('dotenv').config();
 const networkUrls = {
   clover: 'wss://api.clover.finance',
   hydradx: 'wss://rpc-01.snakenet.hydradx.io',
-  edgeware: 'ws://mainnet1.edgewa.re:9944',
+  edgeware: 'ws://mainnet2.edgewa.re:9944',
   'edgeware-local': 'ws://localhost:9944',
   'edgeware-testnet': 'wss://beresheet1.edgewa.re',
   kusama: 'wss://kusama-rpc.polkadot.io',
