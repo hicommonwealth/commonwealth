@@ -23,7 +23,8 @@ const UserGallery: m.Component<{
     const { users, avatarSize, popover, addressesCount } = vnode.attrs;
     const userCount = users.length;
     const maxUsers = vnode.attrs.maxUsers || 10;
-    const overflowUsers = (userCount < maxUsers) ? 0 : (userCount - maxUsers);
+    const overflowUsers =
+      addressesCount || (userCount < maxUsers ? 0 : userCount - maxUsers);
 
     return m('.UserGallery', { class: vnode.attrs.class }, [
       (users as any)
