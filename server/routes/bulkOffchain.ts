@@ -260,7 +260,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
         type: QueryTypes.SELECT,
       }
     ),
-  ]);
+  ]));
 
   const [threads, comments] = threadsCommentsReactions as any;
 
