@@ -618,7 +618,7 @@ class ThreadsController {
         })),
         chain: chainId,
       }),
-  });
+    });
     for (const threadUniqueAddressesCnt of threadsUniqueAddressesCount) {
       app.threadUniqueAddressesCount.store.add(
         modelThreadsUniqueAddressCount(threadUniqueAddressesCnt)
@@ -657,18 +657,20 @@ class ThreadsController {
   }
 
   public async getRecentThreads(options: {
-    chainId: string,
-    communityId: string,
+    chainId: string;
+    communityId: string;
   }) {
     const { chainId, communityId } = options;
     const params = {
       chain: chainId,
       community: communityId,
-      cutoff_date: moment(Date.now() - (30 * 24 * 3600 * 1000)).toISOString(),
+      cutoff_date: moment(Date.now() - 30 * 24 * 3600 * 1000).toISOString(),
     };
     const response = await $.get(`${app.serverUrl()}/bulkThreads`, params);
     if (response.status !== 'Success') {
-      throw new Error(`Unsuccessful getting recent threads: ${response.status}`);
+      throw new Error(
+        `Unsuccessful getting recent threads: ${response.status}`
+      );
     }
 
     response.result.comments.forEach((comment) => {
