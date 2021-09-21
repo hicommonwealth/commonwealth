@@ -55,11 +55,11 @@ const threadsUsersCountAndAvatar = async (
       );
       return res.json(
         threads.map(({ root_id: rootId, author: authorAddress }) => {
-          const addressesCount = uniqueAddressesByThread[rootId]
-            ? uniqueAddressesByThread[rootId].length
-            : 0;
-          const addresses = (uniqueAddressesByThread[rootId] || [])
-            .filter(({ address }) => address !== authorAddress)
+          const uniqueAddresses = (
+            uniqueAddressesByThread[rootId] || []
+          ).filter(({ address }) => address !== authorAddress);
+          const addressesCount = uniqueAddresses.length + 1;
+          const addresses = uniqueAddresses
             .concat({
               root_id: rootId,
               address: authorAddress,
