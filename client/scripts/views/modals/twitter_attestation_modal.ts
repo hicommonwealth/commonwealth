@@ -47,6 +47,11 @@ const TwitterAttestationModal: m.Component<{
         setTimeout(() => {
             // eslint-disable-next-line
             (<any>window).twttr?.widgets?.load();
+            // @ts-ignore
+            window.twttr.widgets.createTweet(
+              vnode.state.tweet,
+              document.getElementById('tweet-container'),
+            );
         }, 1);
       });
     };

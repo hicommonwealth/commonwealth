@@ -532,17 +532,27 @@ function setupRouter(
     const authenticator = passport.authenticate('twitter');
     authenticator(req, res, next);
   });
-  router.get('/auth/twitter/callback',
-    (req, res, next) => {
-      passport.authenticate('twitter',
-        (err) => {
-          if (err || req.query.denied) {
-            console.warn('Error', err);
-          }
-          res.redirect(req.session.redirect || '/');
-          delete req.session.redirect;
-        })(req, res, next);
-    });
+  router.get('/auth/twitter/callback', (req, res, next) => {
+    passport.authenticate('twitter', (err) => {
+      const redirectUrl = req.session.redirect;
+      if (err || req.query.denied) {
+        console.warn('Error', err);
+        if (redirectUrl) {
+          res.redirect(
+            redirectUrl.substring(
+              0,
+              redirectUrl.indexOf('continueTwitterAttestation=true') - 1
+            )
+          );
+        } else {
+          res.redirect('/');
+        }
+      } else {
+        res.redirect(redirectUrl || '/');
+        delete req.session.redirect;
+      }
+    })(req, res, next);
+  });
 
   router.get('/latest-tweet', getLatestTweet.bind(this, models));
   router.post('/post-tweet', postTweet.bind(this, models));
