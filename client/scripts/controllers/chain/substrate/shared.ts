@@ -88,9 +88,6 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
   private _suppressAPIDisconnectErrors: boolean = false;
   private _api: ApiPromise;
 
-  private _reservationFee: SubstrateCoin;
-  public get reservationFee() { return this._reservationFee; }
-
   private _app: IApp;
   public get app() { return this._app; }
 
@@ -291,7 +288,6 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     const existentialdeposit = this.api.consts.balances.existentialDeposit;
     const sudokey = this.api.query.sudo ? (await this.api.query.sudo.key()) : null;
     const chainProps = await this.api.rpc.system.properties();
-    const reservationFee = this.api.consts.nicks ? (this.api.consts.nicks.reservationFee as Balance) : null;
     this.app.chain.name = chainname.toString();
     this.app.chain.version = chainversion.toString();
     this.app.chain.runtimeName = chainruntimename.toString();
@@ -312,7 +308,6 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     this._totalbalance = this.coins(totalbalance);
     this._existentialdeposit = this.coins(existentialdeposit);
     this._sudoKey = sudokey ? sudokey.toString() : undefined;
-    this._reservationFee = reservationFee ? this.coins(reservationFee) : null;
 
     // redraw
     m.redraw();
@@ -488,8 +483,9 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
                   const errorData = e.event.data[0] as DispatchError;
                   let errorInfo;
                   if (errorData.isModule) {
-                    const details = this.registry.findMetaError(errorData.asModule.toU8a());
-                    errorInfo = `${details.section}::${details.name}: ${details.documentation[0]}`;
+                    const decoded = this.registry.findMetaError(errorData.asModule);
+                    const { docs, method, section } = decoded;
+                    errorInfo = `${section}.${method}: ${docs.join(' ')}`;
                   } else if (errorData.isBadOrigin) {
                     errorInfo = 'TX Error: invalid sender origin';
                   } else if (errorData.isCannotLookup) {
@@ -548,7 +544,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
         // TODO: when do we actually see this Moment in practice? is this a correct decoding?
         case 'Compact<Moment>':
           return moment(new Date(this.createType('Compact<Moment>', arg).toNumber())).utc().toString();
-        case 'Compact<Balance>': return formatCoin(this.coins(this.createType('Compact<Balance>', arg)));
+        case 'Compact<Balance>': return formatCoin(this.coins(this.createType('Compact<Balance>', arg).toBn()));
         default: return arg.toString().length > 16 ? `${arg.toString().substr(0, 15)}...` : arg.toString();
       }
     });

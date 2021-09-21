@@ -11,7 +11,7 @@ export interface IdentityCacheInstance
   extends Sequelize.Model<IdentityCacheAttributes>,
     IdentityCacheAttributes {}
 
-export type IdentityCacheStatic = ModelStatic<IdentityCacheInstance>
+export type IdentityCacheStatic = ModelStatic<IdentityCacheInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
@@ -25,6 +25,9 @@ export default (
     },
     { timestamps: false }
   );
+
+  // we don't define a primary key so sequelize assumes a primary key on column "id" so this removes that assumption
+  IdentityCache.removeAttribute('id');
 
   IdentityCache.associate = (models) => {
     models.IdentityCache.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
