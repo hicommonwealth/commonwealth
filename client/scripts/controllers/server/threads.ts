@@ -643,8 +643,10 @@ class ThreadsController {
     if (topicId) params['topic_id'] = topicId;
     if (stage) params['stage'] = stage;
     const threads = await this.fetchThreads({ topicId, stage, params });
-    await this.fetchReactionsCount(threads);
-    await this.fetchThreadsUniqueAddresses({ threads, chainId });
+    await Promise.all([
+      this.fetchReactionsCount(threads),
+      this.fetchThreadsUniqueAddresses({ threads, chainId }),
+    ]);
     // Each bulkThreads call that is passed a cutoff_date param limits its query to
     // the most recent X posts before that date. That count, X, is determined by the pageSize param.
     // If a query returns less than X posts, it is 'exhausted'; there are no more db entries that match
