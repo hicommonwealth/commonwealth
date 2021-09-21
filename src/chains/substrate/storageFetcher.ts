@@ -692,7 +692,7 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
                   blockNumber,
                   data: {
                     kind: EventKind.TipClosing,
-                    proposalHash: hash,
+                    proposalHash: h,
                     closing: closesAt,
                   },
                 });
