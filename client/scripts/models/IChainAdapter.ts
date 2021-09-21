@@ -44,14 +44,9 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
         ? EntityRefreshOption.AllEntities
         : EntityRefreshOption.CompletedEntities;
 
-      let _unused1, _unused2;
-      [_unused1, _unused2, response] = await Promise.all([
+      let _unused1;
+      [_unused1, response] = await Promise.all([
         this.chainEntities.refresh(this.meta.chain.id, refresh),
-        this.app.comments.refreshAll(
-          this.meta.chain.id,
-          null,
-          CommentRefreshOption.LoadProposalComments
-        ),
         $.get(`${this.app.serverUrl()}/bulkOffchain`, {
           chain: this.id,
           community: null,
@@ -74,10 +69,9 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     }
 
     const {
-      threads, comments, reactions, topics, admins, activeUsers, numVotingThreads
+      threads, topics, admins, activeUsers, numVotingThreads
     } = response.result;
     this.app.threads.initialize(threads, numVotingThreads, true);
-    this.app.comments.initialize(comments, false);
     this.app.topics.initialize(topics, true);
     this.meta.chain.setAdmins(admins);
     this.app.recentActivity.setMostActiveUsers(activeUsers);

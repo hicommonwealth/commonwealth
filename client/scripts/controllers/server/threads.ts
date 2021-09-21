@@ -58,6 +58,7 @@ export const modelFromServer = (thread) => {
     offchain_voting_ends_at,
     offchain_voting_votes,
     reactions,
+    latest_comm_created_at,
   } = thread;
 
   const attachments = OffchainAttachments
@@ -124,6 +125,9 @@ export const modelFromServer = (thread) => {
     offchainVotingOptions: offchain_voting_options,
     offchainVotingEndsAt: offchain_voting_ends_at,
     offchainVotingNumVotes: offchain_voting_votes,
+    latest_comm_created_at: latest_comm_created_at
+      ? moment(latest_comm_created_at)
+      : null,
   });
 };
 
@@ -604,28 +608,6 @@ class ThreadsController {
     }
   };
 
-  fetchThreadsUniqueAddresses = async ({ threads, chainId }) => {
-    const threadsUniqueAddressesCount = await $.ajax({
-      type: 'POST',
-      url: `${app.serverUrl()}/threadsUsersCountAndAvatars`,
-      headers: {
-        'content-type': 'application/json',
-      },
-      data: JSON.stringify({
-        threads: threads.map(({ id, Address: { address } }) => ({
-          root_id: `discussion_${id}`,
-          author: address,
-        })),
-        chain: chainId,
-      }),
-    });
-    for (const threadUniqueAddressesCnt of threadsUniqueAddressesCount) {
-      app.threadUniqueAddressesCount.store.add(
-        modelThreadsUniqueAddressCount(threadUniqueAddressesCnt)
-      );
-    }
-  };
-
   // loadNextPage returns false if there are no more threads to load
   public async loadNextPage(options: {
     chainId: string;
@@ -645,7 +627,10 @@ class ThreadsController {
     const threads = await this.fetchThreads({ topicId, stage, params });
     await Promise.all([
       this.fetchReactionsCount(threads),
-      this.fetchThreadsUniqueAddresses({ threads, chainId }),
+      app.threadUniqueAddressesCount.fetchThreadsUniqueAddresses({
+        threads,
+        chainId,
+      }),
     ]);
     // Each bulkThreads call that is passed a cutoff_date param limits its query to
     // the most recent X posts before that date. That count, X, is determined by the pageSize param.

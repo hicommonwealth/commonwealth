@@ -41,39 +41,42 @@ const threadsUsersCountAndAvatar = async (
   req: Request,
   res: Response
 ) => {
-  const { chain, threads } = req.body;
+  const { chain, threads = [] } = req.body;
   try {
-    const root_ids = threads.map(({ root_id }) => root_id);
-    const uniqueAddressesByRootIds = await fetchUniqueAddressesByRootIds(
-      models,
-      { chain, root_ids }
-    );
-    const uniqueAddressesByThread = groupBy<UniqueAddresses>(
-      uniqueAddressesByRootIds,
-      ({ root_id }) => root_id
-    );
-    res.json(
-      threads.map(({ root_id: rootId, author: authorAddress }) => {
-        const addressesCount = uniqueAddressesByThread[rootId]
-          ? uniqueAddressesByThread[rootId].length
-          : 0;
-        const addresses = (uniqueAddressesByThread[rootId] || [])
-          .filter(({ address }) => address !== authorAddress)
-          .concat({
-            root_id: rootId,
-            address: authorAddress,
-            address_id: null,
-            chain,
-          })
-          .slice(0, 2);
-        return {
-          id: rootId,
-          rootId,
-          addresses,
-          count: addressesCount > 2 ? addressesCount - 2 : 0,
-        };
-      })
-    );
+    if (chain && threads.length) {
+      const root_ids = threads.map(({ root_id }) => root_id);
+      const uniqueAddressesByRootIds = await fetchUniqueAddressesByRootIds(
+        models,
+        { chain, root_ids }
+      );
+      const uniqueAddressesByThread = groupBy<UniqueAddresses>(
+        uniqueAddressesByRootIds,
+        ({ root_id }) => root_id
+      );
+      return res.json(
+        threads.map(({ root_id: rootId, author: authorAddress }) => {
+          const addressesCount = uniqueAddressesByThread[rootId]
+            ? uniqueAddressesByThread[rootId].length
+            : 0;
+          const addresses = (uniqueAddressesByThread[rootId] || [])
+            .filter(({ address }) => address !== authorAddress)
+            .concat({
+              root_id: rootId,
+              address: authorAddress,
+              address_id: null,
+              chain,
+            })
+            .slice(0, 2);
+          return {
+            id: rootId,
+            rootId,
+            addresses,
+            count: addressesCount > 2 ? addressesCount - 2 : 0,
+          };
+        })
+      );
+    }
+    return res.json([]);
   } catch (e) {
     log.error(e);
     console.log(e);

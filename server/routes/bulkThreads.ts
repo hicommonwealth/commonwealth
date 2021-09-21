@@ -9,7 +9,12 @@ import { OffchainThreadInstance } from '../models/offchain_thread';
 
 const log = factory.getLogger(formatFilename(__filename));
 // bulkThreads takes a date param and fetches the most recent 20 threads before that date
-const bulkThreads = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const bulkThreads = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
   if (error) return next(new Error(error));
   const { cutoff_date, topic_id, stage } = req.query;
@@ -36,10 +41,9 @@ const bulkThreads = async (models: DB, req: Request, res: Response, next: NextFu
 
   // Threads
   let threads;
-  let comments;
   if (cutoff_date) {
     const query = `
-      SELECT addr.id AS addr_id, addr.address AS addr_address,
+      SELECT addr.id AS addr_id, addr.address AS addr_address, latest_comm_created_at,
         addr.chain AS addr_chain, thread_id, thread_title,
         thread_community, thread_chain, thread_created, threads.kind,
         threads.read_only, threads.body, threads.stage, threads.snapshot_proposal,
@@ -50,7 +54,7 @@ const bulkThreads = async (models: DB, req: Request, res: Response, next: NextFu
         topics.community_id AS topic_community, collaborators, chain_entities
       FROM "Addresses" AS addr
       RIGHT JOIN (
-        SELECT t.id AS thread_id, t.title AS thread_title, t.address_id,
+        SELECT t.id AS thread_id, t.title AS thread_title, t.address_id, latest_comm_created_at,
           t.created_at AS thread_created, t.community AS thread_community,
           t.chain AS thread_chain, t.read_only, t.body,
           t.offchain_voting_options, t.offchain_voting_votes, t.offchain_voting_ends_at,
@@ -69,7 +73,7 @@ const bulkThreads = async (models: DB, req: Request, res: Response, next: NextFu
             ) AS chain_entities
         FROM "OffchainThreads" t
         LEFT JOIN (
-          SELECT root_id, MAX(created_at) AS comm_created_at
+          SELECT root_id, MAX(created_at) AS latest_comm_created_at
           FROM "OffchainComments"
           WHERE ${communityOptions}
             AND root_id LIKE 'discussion%'
@@ -89,18 +93,17 @@ const bulkThreads = async (models: DB, req: Request, res: Response, next: NextFu
           ${topicOptions}
           AND t.created_at < :created_at
           AND t.pinned = false
-          GROUP BY (t.id, c.comm_created_at, t.created_at)
-          ORDER BY COALESCE(c.comm_created_at, t.created_at) DESC LIMIT 20
+          GROUP BY (t.id, c.latest_comm_created_at, t.created_at)
+          ORDER BY COALESCE(c.latest_comm_created_at, t.created_at) DESC LIMIT 20
         ) threads
       ON threads.address_id = addr.id
       LEFT JOIN "OffchainTopics" topics
       ON threads.topic_id = topics.id`;
-
-    let preprocessedThreads, threadsInVoting;
+    let preprocessedThreads;
     try {
       preprocessedThreads = await models.sequelize.query(query, {
         replacements,
-        type: QueryTypes.SELECT
+        type: QueryTypes.SELECT,
       });
     } catch (e) {
       console.log(e);
@@ -109,6 +112,7 @@ const bulkThreads = async (models: DB, req: Request, res: Response, next: NextFu
 
     const root_ids = [];
     threads = preprocessedThreads.map((t) => {
+      const { latest_comm_created_at } = t;
       const root_id = `discussion_${t.thread_id}`;
       root_ids.push(root_id);
       const collaborators = JSON.parse(t.collaborators[0]).address?.length
@@ -138,11 +142,12 @@ const bulkThreads = async (models: DB, req: Request, res: Response, next: NextFu
         offchain_voting_options: t.offchain_voting_options,
         offchain_voting_votes: t.offchain_voting_votes,
         offchain_voting_ends_at: t.offchain_voting_ends_at,
+        latest_comm_created_at,
         Address: {
           id: t.addr_id,
           address: t.addr_address,
           chain: t.addr_chain,
-        }
+        },
       };
       if (t.topic_id) {
         data['topic'] = {
@@ -156,71 +161,48 @@ const bulkThreads = async (models: DB, req: Request, res: Response, next: NextFu
       }
       return data;
     });
-
-    // comments = (
-    //   await models.OffchainComment.findAll({
-    //     where: {
-    //       root_id: root_ids,
-    //     },
-    //     include: [models.Address, models.OffchainAttachment],
-    //     order: [['created_at', 'DESC']],
-    //   })
-    // ).map((c, idx) => {
-    //   const row = c.toJSON();
-    //   const last_edited = getLastEdited(row);
-    //   row['last_edited'] = last_edited;
-    //   return row;
-    // });
   } else {
-    const whereOptions = (community)
-      ? { community: community.id, }
+    const whereOptions = community
+      ? { community: community.id }
       : { chain: chain.id };
 
-    threads = (await models.OffchainThread.findAll({
-      where: whereOptions,
-      include: [
-        {
-          model: models.Address,
-          as: 'Address'
-        },
-        {
-          model: models.Address,
-          as: 'collaborators'
-        },
-        {
-          model: models.OffchainTopic,
-          as: 'topic'
-        }
-      ],
-      attributes: { exclude: [ 'version_history' ] },
-      order: [['created_at', 'DESC']],
-    })).map((t, idx) => {
+    threads = (
+      await models.OffchainThread.findAll({
+        where: whereOptions,
+        include: [
+          {
+            model: models.Address,
+            as: 'Address',
+          },
+          {
+            model: models.Address,
+            as: 'collaborators',
+          },
+          {
+            model: models.OffchainTopic,
+            as: 'topic',
+          },
+        ],
+        attributes: { exclude: ['version_history'] },
+        order: [['created_at', 'DESC']],
+      })
+    ).map((t, idx) => {
       const row = t.toJSON();
       const last_edited = getLastEdited(row);
       row['last_edited'] = last_edited;
       return row;
     });
-    // comments = (await models.OffchainComment.findAll({
-    //   where: whereOptions,
-    //   include: [models.Address, models.OffchainAttachment],
-    //   attributes: { exclude: [ 'version_history' ] },
-    //   order: [['created_at', 'DESC']],
-    // })).map((c, idx) => {
-    //   const row = c.toJSON();
-    //   const last_edited = getLastEdited(row);
-    //   row['last_edited'] = last_edited;
-    //   return row;
-    // });
   }
 
   const countsQuery = `
      SELECT id, title, stage FROM "OffchainThreads"
      WHERE ${communityOptions} AND (stage = 'proposal_in_review' OR stage = 'voting')`;
 
-  const threadsInVoting: OffchainThreadInstance[] = await models.sequelize.query(countsQuery, {
-    replacements,
-    type: QueryTypes.SELECT
-  });
+  const threadsInVoting: OffchainThreadInstance[] =
+    await models.sequelize.query(countsQuery, {
+      replacements,
+      type: QueryTypes.SELECT,
+    });
   const numVotingThreads = threadsInVoting.filter((t) => t.stage === 'voting').length;
 
   return res.json({
@@ -228,9 +210,7 @@ const bulkThreads = async (models: DB, req: Request, res: Response, next: NextFu
     result: {
       numVotingThreads,
       threads,
-      // comments, // already converted to JSON earlier
-      // reactions: reactions.map((r) => r.toJSON()),
-    }
+    },
   });
 };
 
