@@ -31,12 +31,28 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
       : { chain: chain.id };
 
   // parallelized queries
-  const [topics, threadsCommentsReactions, admins, mostActiveUsers, threadsInVoting] = await <Promise<[OffchainTopicInstance[], unknown, RoleInstance[], unknown, OffchainThreadInstance[]]>>Promise.all([
+  const [
+    topics,
+    threadsCommentsReactions,
+    admins,
+    mostActiveUsers,
+    threadsInVoting,
+  ] = await (<
+    Promise<
+      [
+        OffchainTopicInstance[],
+        unknown,
+        RoleInstance[],
+        unknown,
+        OffchainThreadInstance[]
+      ]
+    >
+  >Promise.all([
     // topics
     models.OffchainTopic.findAll({
       where: community
-          ? { community_id: community.id }
-          : { chain_id: chain.id }
+        ? { community_id: community.id }
+        : { chain_id: chain.id },
     }),
     // threads, comments, reactions
     new Promise(async (resolve, reject) => {
@@ -47,19 +63,19 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
           include: [
             {
               model: models.Address,
-              as: 'Address'
+              as: 'Address',
             },
             {
               model: models.Address,
               // through: models.Collaboration,
-              as: 'collaborators'
+              as: 'collaborators',
             },
             {
               model: models.OffchainTopic,
-              as: 'topic'
-            }
+              as: 'topic',
+            },
           ],
-          attributes: { exclude: [ 'version_history' ] },
+          attributes: { exclude: ['version_history'] },
         });
 
         const query = `
@@ -121,7 +137,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
         try {
           preprocessedThreads = await models.sequelize.query(query, {
             replacements,
-            type: QueryTypes.SELECT
+            type: QueryTypes.SELECT,
           });
         } catch (e) {
           console.log(e);
@@ -132,11 +148,11 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
           const root_id = `discussion_${t.thread_id}`;
           root_ids.push(root_id);
           const collaborators = JSON.parse(t.collaborators[0]).address?.length
-              ? t.collaborators.map((c) => JSON.parse(c))
-              : [];
+            ? t.collaborators.map((c) => JSON.parse(c))
+            : [];
           const chain_entities = JSON.parse(t.chain_entities[0]).id
-              ? t.chain_entities.map((c) => JSON.parse(c))
-              : [];
+            ? t.chain_entities.map((c) => JSON.parse(c))
+            : [];
           const last_edited = getLastEdited(t);
 
           const data = {
@@ -181,22 +197,6 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
           root_ids.push(`discussion_${t.id}`);
           return t.toJSON();
         });
-        // .concat(threads);
-
-        // TODO REFACTOR Comments
-        // const offchainComments = await models.OffchainComment.findAll({
-        //   where: {
-        //     root_id: root_ids
-        //   },
-        //   include: [models.Address, models.OffchainAttachment],
-        //   order: [['created_at', 'DESC']],
-        // });
-        // const comments = offchainComments.map((c, idx) => {
-        //   const row = c.toJSON();
-        //   const last_edited = getLastEdited(row);
-        //   row['last_edited'] = last_edited;
-        //   return row;
-        // });
 
         resolve([allThreads]);
       } catch (e) {
@@ -206,14 +206,16 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
     }),
     // admins
     models.Role.findAll({
-      where: chain ? {
-        chain_id: chain.id,
-        permission: { [Op.in]: ['admin', 'moderator'] },
-      } : {
-        offchain_community_id: community.id,
-        permission: { [Op.in]: ['admin', 'moderator'] },
-      },
-      include: [ models.Address ],
+      where: chain
+        ? {
+            chain_id: chain.id,
+            permission: { [Op.in]: ['admin', 'moderator'] },
+          }
+        : {
+            offchain_community_id: community.id,
+            permission: { [Op.in]: ['admin', 'moderator'] },
+          },
+      include: [models.Address],
       order: [['created_at', 'DESC']],
     }),
     // most active users
@@ -228,8 +230,8 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
         const monthlyComments = await models.OffchainComment.findAll({ where, include: [ models.Address ] });
         const monthlyThreads = await models.OffchainThread.findAll({
           where,
-          attributes: { exclude: [ 'version_history' ] },
-          include: [ { model: models.Address, as: 'Address' } ],
+          attributes: { exclude: ['version_history'] },
+          include: [{ model: models.Address, as: 'Address' }],
         });
 
         // @ts-ignore
@@ -237,10 +239,11 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
           if (!post.Address) return;
           const addr = post.Address.address;
           if (activeUsers[addr]) activeUsers[addr]['count'] += 1;
-          else activeUsers[addr] = {
-            info: post.Address,
-            count: 1,
-          };
+          else
+            activeUsers[addr] = {
+              info: post.Address,
+              count: 1,
+            };
         });
         const mostActiveUsers_ = Object.values(activeUsers).sort((a, b) => {
           return ((b as any).count - (a as any).count);
@@ -253,9 +256,10 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
     models.sequelize.query(`
      SELECT id, title, stage FROM "OffchainThreads"
      WHERE ${communityOptions} AND (stage = 'proposal_in_review' OR stage = 'voting')`, {
-      replacements,
-      type: QueryTypes.SELECT
-    }),
+        replacements,
+        type: QueryTypes.SELECT,
+      }
+    ),
   ]);
 
   const [threads, comments] = threadsCommentsReactions as any;
@@ -266,13 +270,11 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
     status: 'Success',
     result: {
       topics: topics.map((t) => t.toJSON()),
-      //
       numVotingThreads,
       threads, // already converted to JSON earlier
-      // comments, // already converted to JSON earlier
       admins: admins.map((a) => a.toJSON()),
       activeUsers: mostActiveUsers,
-    }
+    },
   });
 };
 
