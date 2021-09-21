@@ -540,9 +540,16 @@ class ThreadsController {
         console.error(e.message);
       }
     }
-    const { result: reactionCounts } = await $.post(`${app.serverUrl()}/reactionsCounts`, {
-      thread_ids: threads.map((thread) => thread.id),
-      active_address: app.user.activeAccount?.address
+    const { result: reactionCounts } = await $.ajax({
+      type: 'POST',
+      url: `${app.serverUrl()}/reactionsCounts`,
+      headers: {
+        'content-type': 'application/json',
+      },
+      data: JSON.stringify({
+        thread_ids: threads.map((thread) => thread.id),
+        active_address: app.user.activeAccount?.address,
+      }),
     });
     for (const rc of reactionCounts) {
       const id = app.reactionCounts.store.getIdentifier(rc);
@@ -551,7 +558,9 @@ class ThreadsController {
         app.reactionCounts.store.remove(existing);
       }
       try {
-        app.reactionCounts.store.add(modelReactionCountFromServer({ ...rc, id }));
+        app.reactionCounts.store.add(
+          modelReactionCountFromServer({ ...rc, id })
+        );
       } catch (e) {
         console.error(e.message);
       }
