@@ -2,8 +2,8 @@ import chai, { assert } from 'chai';
 import { IdentityFetchCacheNew } from '../../../server/util/identityFetchCache';
 import models from '../../../server/database';
 
-describe.only('New identity cache tests', () => {
-  it.only('Should add an identity to the cache', async () => {
+describe('New identity cache tests', () => {
+  it('Should add an identity to the cache', async () => {
     const cache = new IdentityFetchCacheNew();
     await cache.add('polkadot', '0x30DB748Fc0E4667CD6494f208de453464cf314A5')
     const result = await models.IdentityCache.findOne({
