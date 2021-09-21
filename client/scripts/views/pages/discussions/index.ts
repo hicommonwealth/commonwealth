@@ -306,7 +306,7 @@ const DiscussionFilterBar: m.Component<{ topic: string; stage: string, parentSta
 };
 
 const DiscussionsPage: m.Component<{
-    topic?: string
+    topic?: string;
   }, {
     lookback?: { [community: string]: moment.Moment },
     postsDepleted: { [community: string]: boolean },
@@ -315,7 +315,7 @@ const DiscussionsPage: m.Component<{
     lastVisitedUpdated?: boolean,
     onscroll: any,
     summaryView: boolean,
-    recentThreads: OffchainThread[]
+    recentThreads: { threads: OffchainThread[]; activitySummary };
   }> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', {
@@ -607,7 +607,9 @@ const DiscussionsPage: m.Component<{
               }),
             m('.listing-wrap', [
               summaryView
-                ? m(Listing, { content: [ m(SummaryListing, { recentThreads }) ] })
+                ? m(Listing, {
+                    content: [m(SummaryListing, { recentThreads })],
+                  })
                 : [
                   isLoading
                     ? m(LoadingRow)

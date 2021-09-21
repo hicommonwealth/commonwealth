@@ -2,17 +2,21 @@
 import 'pages/discussions/summary_listing.scss';
 import app from 'state';
 import m from 'mithril';
+import moment from 'moment';
 import { OffchainThread, OffchainTopic } from 'models';
 import { formatTimestamp, link } from 'helpers';
 import { slugify } from 'utils';
-import { getLastUpdated } from './discussion_row';
 
 const SummaryRow: m.Component<
-  { topic: OffchainTopic; monthlyThreads: OffchainThread[] },
+  {
+    topic: OffchainTopic;
+    monthlyThreads: OffchainThread[];
+    activitySummary;
+  },
   {}
 > = {
   view: (vnode) => {
-    const { topic, monthlyThreads } = vnode.attrs;
+    const { topic, monthlyThreads, activitySummary } = vnode.attrs;
     if (!topic?.name) return null;
 
     // TODO: Filter & render inactive, then empty, topics at bottom
@@ -25,7 +29,9 @@ const SummaryRow: m.Component<
           const discussionLink =
             `/${app.activeId()}/proposal/${thread.slug}/${thread.identifier}-` +
             `${slugify(thread.title)}`;
-          const lastUpdated = getLastUpdated(thread);
+          const lastUpdated = moment(
+            activitySummary[thread.id]?.lastUpdated || thread.createdAt
+          );
           return m('.thread-summary', [
             link('a', discussionLink, thread.title),
             m('span', formatTimestamp(lastUpdated)),
@@ -37,14 +43,14 @@ const SummaryRow: m.Component<
 };
 
 export const SummaryListing: m.Component<
-  { recentThreads: OffchainThread[] },
+  { recentThreads: { threads: OffchainThread[]; activitySummary } },
   {}
 > = {
   view: (vnode) => {
     const topicScopedThreads = {};
     const topics = app.topics.getByCommunity(app.activeId());
     topics.forEach((topic) => {
-      topicScopedThreads[topic.id] = vnode.attrs.recentThreads.filter(
+      topicScopedThreads[topic.id] = vnode.attrs.recentThreads.threads.filter(
         (thread) => thread.topic?.id === topic?.id
       );
     });
@@ -65,6 +71,7 @@ export const SummaryListing: m.Component<
           return m(SummaryRow, {
             topic,
             monthlyThreads: topicScopedThreads[topic.id],
+            activitySummary: vnode.attrs.recentThreads.activitySummary,
           });
         })
       ),

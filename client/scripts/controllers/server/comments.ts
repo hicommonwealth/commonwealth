@@ -8,7 +8,6 @@ import { uniqueIdToProposal } from 'identifiers';
 import { CommentsStore } from 'stores';
 import { OffchainComment, OffchainAttachment, IUniqueId, AddressInfo, CommunityInfo, NodeInfo, OffchainThread } from 'models';
 import { notifyError } from 'controllers/app/notifications';
-import { modelFromServer as modelThreadFromServer } from 'controllers/server/threads';
 import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
 import { updateLastVisited } from '../app/login';
 
