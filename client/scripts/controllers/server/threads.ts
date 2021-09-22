@@ -585,13 +585,17 @@ class ThreadsController {
   };
 
   fetchReactionsCount = async (threads) => {
-    const { result: reactionCounts } = await $.post(
-      `${app.serverUrl()}/reactionsCounts`,
-      {
+    const { result: reactionCounts } = await $.ajax({
+      type: 'POST',
+      url: `${app.serverUrl()}/reactionsCounts`,
+      headers: {
+        'content-type': 'application/json',
+      },
+      data: JSON.stringify({
         thread_ids: threads.map((thread) => thread.id),
         active_address: app.user.activeAccount?.address,
-      }
-    );
+      }),
+    });
     for (const rc of reactionCounts) {
       const id = app.reactionCounts.store.getIdentifier(rc);
       const existing = app.reactionCounts.store.getById(id);
@@ -639,43 +643,6 @@ class ThreadsController {
     // it should continue calling the loadNextPage fn on scroll, or else notify the user that all
     // relevant listing threads have been exhausted.
     return !(threads.length < DEFAULT_PAGE_SIZE);
-  }
-
-  public async getRecentThreads(options: {
-    chainId: string;
-    communityId: string;
-  }) {
-    const { chainId, communityId } = options;
-    const params = {
-      chain: chainId,
-      community: communityId,
-      cutoff_date: moment(Date.now() - 30 * 24 * 3600 * 1000).toISOString(),
-    };
-    const response = await $.get(`${app.serverUrl()}/bulkThreads`, params);
-    if (response.status !== 'Success') {
-      throw new Error(
-        `Unsuccessful getting recent threads: ${response.status}`
-      );
-    }
-
-    response.result.comments.forEach((comment) => {
-      const modeledComment = modelCommentFromServer(comment);
-      const existing = app.comments.store.getById(comment.id);
-      if (existing) {
-        app.comments.store.remove(existing);
-      }
-      try {
-        app.comments.store.add(modeledComment);
-      } catch (e) {
-        console.error(e.message);
-      }
-    })
-
-    return response.result.threads.map((thread) => {
-      const modeledThread = modelFromServer(thread);
-      this._store.add(modeledThread);
-      return modeledThread;
-    });
   }
 
   public refreshAll(chainId: string, communityId: string, reset = false) {

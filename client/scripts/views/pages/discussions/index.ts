@@ -11,7 +11,6 @@ import { navigateToSubpage } from 'app';
 import {
   Spinner,
   Button,
-  ButtonGroup,
   Icons,
   Icon,
   PopoverMenu,
@@ -136,7 +135,7 @@ const DiscussionFilterBar: m.Component<
   {}
 > = {
   view: (vnode) => {
-    const { topic, stage, disabled, parentState } = vnode.attrs;
+    const { topic, stage, disabled } = vnode.attrs;
 
     const communityInfo = app.chain?.meta?.chain || app.community?.meta;
     if (!communityInfo) return;
@@ -215,8 +214,9 @@ const DiscussionFilterBar: m.Component<
                   : null,
               label: 'All Discussions',
               onclick: () => {
-                navigateToSubpage('/');
+                localStorage.setItem('discussion-summary-toggle', 'false');
                 vnode.attrs.parentState.summaryView = false;
+                navigateToSubpage('/');
               },
             }),
             m(MenuDivider),
@@ -250,6 +250,10 @@ const DiscussionFilterBar: m.Component<
                       e.preventDefault();
                       navigateToSubpage(`/discussions/${name}`);
                       vnode.attrs.parentState.summaryView = false;
+                      localStorage.setItem(
+                        'discussion-summary-toggle',
+                        'false'
+                      );
                     },
                     label: m('.topic-menu-item', [
                       active && m(Icon, { name: Icons.CHECK }),
@@ -308,6 +312,8 @@ const DiscussionFilterBar: m.Component<
             m(MenuItem, {
               onclick: (e) => {
                 e.preventDefault();
+                vnode.attrs.parentState.summaryView = false;
+                localStorage.setItem('discussion-summary-toggle', 'false');
                 navigateToSubpage('/');
               },
               active: !stage,
@@ -321,6 +327,8 @@ const DiscussionFilterBar: m.Component<
                 iconLeft: stage === targetStage ? Icons.CHECK : null,
                 onclick: (e) => {
                   e.preventDefault();
+                  vnode.attrs.parentState.summaryView = false;
+                  localStorage.setItem('discussion-summary-toggle', 'false');
                   navigateToSubpage(`/?stage=${targetStage}`);
                 },
                 label: [
@@ -345,13 +353,9 @@ const DiscussionFilterBar: m.Component<
           disabled,
           onclick: async (e) => {
             e.preventDefault();
-            vnode.attrs.parentState.recentThreads =
-              await app.threads.getRecentThreads({
-                communityId: app.activeCommunityId(),
-                chainId: app.activeChainId(),
-              });
+            localStorage.setItem('discussion-summary-toggle', 'true');
             vnode.attrs.parentState.summaryView = true;
-            m.redraw();
+            navigateToSubpage('/');
           },
         }),
       m(Button, {
@@ -364,6 +368,7 @@ const DiscussionFilterBar: m.Component<
         onclick: async (e) => {
           e.preventDefault();
           vnode.attrs.parentState.summaryView = false;
+          localStorage.setItem('discussion-summary-toggle', 'false');
         },
       }),
     ]);
@@ -390,7 +395,8 @@ const DiscussionsPage: m.Component<
     lastVisitedUpdated?: boolean;
     onscroll: any;
     summaryView: boolean;
-    recentThreads: OffchainThread[];
+    recentThreads: { threads: OffchainThread[]; activitySummary };
+    loadingRecentThreads: boolean;
   }
 > = {
   oncreate: (vnode) => {
@@ -440,10 +446,32 @@ const DiscussionsPage: m.Component<
         : moment.isMoment(vnode.state.lookback[subpage])
         ? vnode.state.lookback[subpage]
         : moment();
+    if (app.lastNavigatedBack()) {
+      if (localStorage.getItem('discussion-summary-toggle') === 'true') {
+        vnode.state.summaryView = true;
+      }
+    } else {
+      if (!vnode.state.summaryView) {
+        localStorage.setItem('discussion-summary-toggle', 'false');
+      }
+    }
   },
   view: (vnode) => {
     let { topic } = vnode.attrs;
     const { summaryView, recentThreads } = vnode.state;
+    if (summaryView && !recentThreads?.threads?.length) {
+      vnode.state.loadingRecentThreads = true;
+      app.recentActivity
+        .getRecentCommunityActivity({
+          communityId: app.activeCommunityId(),
+          chainId: app.activeChainId(),
+        })
+        .then((res) => {
+          vnode.state.loadingRecentThreads = false;
+          vnode.state.recentThreads = res;
+          m.redraw();
+        });
+    }
 
     let stage = m.route.param('stage');
     const activeEntity = app.community || app.chain;
@@ -695,8 +723,10 @@ const DiscussionsPage: m.Component<
     const stillFetching =
       unpinnedThreads.length === 0 && !vnode.state.postsDepleted[subpage];
     const isLoading =
-      app.chain &&
-      (!activeEntity || !activeEntity.serverLoaded || stillFetching);
+      vnode.state.loadingRecentThreads ||
+      !activeEntity ||
+      !activeEntity.serverLoaded ||
+      stillFetching;
     const isEmpty =
       !isLoading &&
       allThreads.length === 0 &&
@@ -740,9 +770,11 @@ const DiscussionsPage: m.Component<
               }),
             m('.listing-wrap', [
               summaryView
-                ? m(Listing, {
-                    content: [m(SummaryListing, { recentThreads })],
-                  })
+                ? isLoading
+                  ? m(LoadingRow)
+                  : m(Listing, {
+                      content: [m(SummaryListing, { recentThreads })],
+                    })
                 : [
                     isLoading
                       ? m(LoadingRow)

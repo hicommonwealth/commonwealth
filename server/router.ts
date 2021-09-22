@@ -74,6 +74,7 @@ import deleteRole from './routes/deleteRole';
 import setDefaultRole from './routes/setDefaultRole';
 
 import getUploadSignature from './routes/getUploadSignature';
+import activeThreads from './routes/activeThreads';
 import createThread from './routes/createThread';
 import editThread from './routes/editThread';
 import updateThreadPolling from './routes/updateThreadPolling';
@@ -273,8 +274,11 @@ function setupRouter(
   router.post('/deleteThread', passport.authenticate('jwt', { session: false }), deleteThread.bind(this, models));
   // TODO: Change to GET /threads
   router.get('/bulkThreads', bulkThreads.bind(this, models));
+  router.get('/activeThreads', activeThreads.bind(this, models));
   router.get('/getThread', getThread.bind(this, models));
   router.get('/search', search.bind(this, models));
+
+
 
   router.get('/profile', getProfile.bind(this, models));
 

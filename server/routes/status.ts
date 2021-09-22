@@ -17,7 +17,7 @@ const status = async (models: DB, req: Request, res: Response, next: NextFunctio
     nodes,
     publicCommunities,
     contractCategories,
-    notificationCategories
+    notificationCategories,
   ] = await Promise.all([
     models.Chain.findAll({
       where: { active: true },
@@ -33,7 +33,7 @@ const status = async (models: DB, req: Request, res: Response, next: NextFunctio
         {
           model: models.Chain,
           where: { active: true },
-        }
+        },
       ],
     }),
     models.OffchainCommunity.findAll({
@@ -52,7 +52,7 @@ const status = async (models: DB, req: Request, res: Response, next: NextFunctio
   type ThreadCountQueryData = {
     concat: string;
     count: number;
-  }
+  };
   if (!user) {
     const threadCount = {};
     const threadCountQueryData: ThreadCountQueryData[] = await models.sequelize.query(`
