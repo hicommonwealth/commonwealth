@@ -8,13 +8,13 @@ import {
   searchMentionableAddresses,
   searchDiscussions,
   searchChainsAndCommunities,
-  SearchIcon,
 } from 'helpers/search';
 import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
 import { Profile, AddressInfo } from 'models';
 import moment from 'moment';
 import MarkdownFormattedText from './markdown_formatted_text';
+import { SearchIcon } from '../components/component_kit/icons';
 import QuillFormattedText from './quill_formatted_text';
 import { CommunityLabel } from './sidebar/community_selector';
 import User, { UserBlock } from './widgets/user';
