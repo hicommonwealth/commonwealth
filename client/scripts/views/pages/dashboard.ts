@@ -13,6 +13,7 @@ import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import Sublayout from 'views/sublayout';
 import PageError from 'views/pages/error';
 import PageLoading from 'views/pages/loading';
+import StaticLandingPage from './landing/landing_page';
 
 const getNewTag = (labelCount = null) => {
   const label = labelCount === null ? 'New' : `${labelCount} new`;
@@ -120,8 +121,7 @@ const CommunityCard : m.Component<{ community: CommunityInfo }> = {
 const DashboardPage: m.Component<{}> = {
   view: (vnode) => {
     if (!app.isLoggedIn()) {
-      m.route.set('/communities');
-      return null;
+      return m(StaticLandingPage);
     }
     // const activeEntity = app.community ? app.community : app.chain;
     const activeEntity = 'edgeware';
