@@ -37,8 +37,6 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[] }> = {
     const monthlyThreadCount = app.recentActivity.getCommunityThreadCount(chain);
 
     return m(Card, {
-      elevation: 1,
-      interactive: true,
       class: 'home-card',
       onclick: (e) => {
         e.preventDefault();
@@ -83,8 +81,6 @@ const CommunityCard : m.Component<{ community: CommunityInfo }> = {
     const monthlyThreadCount = app.recentActivity.getCommunityThreadCount(community.id);
 
     return m(Card, {
-      elevation: 1,
-      interactive: true,
       class: 'home-card',
       onclick: (e) => {
         e.preventDefault();
@@ -123,14 +119,10 @@ const CommunityCard : m.Component<{ community: CommunityInfo }> = {
 
 const DashboardPage: m.Component<{}> = {
   view: (vnode) => {
-    if (!app.isLoggedIn()) return m(PageError, {
-      title: [
-        'Notifications ',
-        m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
-      ],
-      message: 'This page requires you to be logged in.'
-    });
-
+    if (!app.isLoggedIn()) {
+      m.route.set('/communities');
+      return null;
+    }
     // const activeEntity = app.community ? app.community : app.chain;
     const activeEntity = 'edgeware';
     if (!activeEntity) return m(PageLoading, {
@@ -226,6 +218,18 @@ const DashboardPage: m.Component<{}> = {
           m('.communities-list', [
             sortedChainsAndCommunities.length > 3 ? sortedChainsAndCommunities.slice(0, 3) : sortedChainsAndCommunities,
             m('.clear'),
+          ]),
+          m('a',{
+            class:'link',
+            onclick: () => {
+              m.route.set('/communities');
+              m.redraw();
+            }
+          }, [
+            'View more communities',
+            m(Icon, {
+              name: Icons.EXTERNAL_LINK,
+            })
           ]),
         ])
       ]),

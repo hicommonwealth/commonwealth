@@ -34,6 +34,7 @@
     }
 
     .cui-tabs {
+        margin-left: -15px;
         .cui-tabs-item {
             font-size: 24px;
             font-weight: 500;
@@ -47,7 +48,7 @@
     }
     .DashboardList {
         margin-top: 20px;
-        border-radius: 4px;
+        margin-left: -17px;
     }
 
     .communites-list-col {
@@ -67,6 +68,42 @@
         }
         .card-bottom {
             margin-top: 15px;
+        }
+    }
+
+    .link {
+        color:#4723AD;
+        font-weight: 500;
+        position: relative;
+        float: right;
+        cursor: pointer;
+        padding: 8px 18px 3px 18px;
+        border-radius: 10px;
+
+        .cui-icon {
+            margin-left: 16px;
+            margin-top: -3px;
+
+            svg {
+                stroke: #4723AD;
+            }
+        }
+
+        &:hover {
+            text-decoration: none;
+            background-color: #F7F4FF;
+        }
+    }
+
+    .cui-card {
+        padding: 20px;
+        border: 1px solid #DDDDDD;
+        border-radius: 10px;
+        cursor: pointer;
+
+        &:hover {
+            background-color: #F7F4FF;
+            border: 1px solid #4723AD
         }
     }
 }
