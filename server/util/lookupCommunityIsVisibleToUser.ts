@@ -1,6 +1,9 @@
 // Helper function to look up a scope, i.e. a chain XOR community.
 // If a community is found, also check that the user is allowed to see it.
 
+import { ChainInstance } from '../models/chain';
+import { OffchainCommunityInstance } from '../models/offchain_community';
+
 export const ChainCommunityErrors = {
   CannotProvideBothCommunityAndChain: 'Cannot provide both community and chain',
   ChainDNE: 'Chain does not exist',
@@ -11,10 +14,13 @@ export const ChainCommunityErrors = {
   NotMember: 'User is not member of private community',
 };
 
-const lookupCommunityIsVisibleToUser = async (models, params, user): Promise<[any, any, string | null]> => {
+// sequelize 5.0 does not accept undefined key in where clause
+const lookupCommunityIsVisibleToUser = async (
+  models, params, user
+): Promise<[ChainInstance, OffchainCommunityInstance, string]> => {
   const chain = await models.Chain.findOne({
     where: {
-      id: params.chain,
+      id: params.chain || null,
     },
     include: [
       {
@@ -27,7 +33,7 @@ const lookupCommunityIsVisibleToUser = async (models, params, user): Promise<[an
   });
   const community = await models.OffchainCommunity.findOne({
     where: {
-      id: params.community,
+      id: params.community || null,
     },
     include: {
       model: models.OffchainTopic,
@@ -45,9 +51,9 @@ const lookupCommunityIsVisibleToUser = async (models, params, user): Promise<[an
   // searching for chain and community that both don't exist
   if (!chain && !community) return [null, null, ChainCommunityErrors.BothChainAndCommunityDNE];
 
-  if (community && community.privacyEnabled) {
+  if (community && community.privacyEnabled && !user?.isAdmin) {
     if (!user) return [null, null, ChainCommunityErrors.NoUserProvided];
-    const userAddressIds = await user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
+    const userAddressIds = (await user.getAddresses()).filter((addr) => !!addr.verified).map((addr) => addr.id);
     const userMembership = await models.Role.findOne({
       where: {
         address_id: userAddressIds,

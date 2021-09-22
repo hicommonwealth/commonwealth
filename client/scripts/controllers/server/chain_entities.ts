@@ -13,6 +13,7 @@ import {
   IEventSubscriber,
   SubstrateTypes,
   IChainEntityKind,
+  isSupportedChain,
 } from '@commonwealth/chain-events';
 import { notifyError } from '../app/notifications';
 
@@ -100,16 +101,24 @@ class ChainEntityController {
     this._handlers = {};
   }
 
-  public async _fetchTitle(chain: string, unique_id: string) {
-    return $.get(`${app.serverUrl()}/fetchEntityTitle`, {
-      unique_id, chain
-    });
+  public async _fetchTitle(chain: string, unique_id: string): Promise<any> {
+    try {
+      return $.get(`${app.serverUrl()}/fetchEntityTitle`, {
+        unique_id, chain
+      });
+    } catch (e) {
+      return { status: 'Failed' };
+    }
   }
 
   private _handleEvents(chain: string, events: CWEvent[]) {
+    if (!isSupportedChain(chain)) {
+      return;
+    }
     for (const cwEvent of events) {
       // immediately return if no entity involved, event unrelated to proposals/etc
-      const eventEntity = eventToEntity(cwEvent.data.kind);
+      const eventEntity = eventToEntity(chain, cwEvent.data.kind);
+      // eslint-disable-next-line no-continue
       if (!eventEntity) continue;
       const [ entityKind ] = eventEntity;
       // create event type
@@ -123,7 +132,8 @@ class ChainEntityController {
       const event = new ChainEvent(cwEvent.blockNumber, cwEvent.data, eventType);
 
       // create entity
-      const fieldName = entityToFieldName(entityKind);
+      const fieldName = entityToFieldName(chain, entityKind);
+      // eslint-disable-next-line no-continue
       if (!fieldName) continue;
       const fieldValue = event.data[fieldName];
       const author = event.data['proposer'];

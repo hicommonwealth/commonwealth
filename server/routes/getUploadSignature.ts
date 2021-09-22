@@ -3,6 +3,7 @@ import uuidv4 from 'uuid/v4';
 
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../../shared/logging';
+import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -16,7 +17,7 @@ export const Errors = {
   ImageType: 'Can only upload JPG, PNG, GIF, and WEBP images',
 };
 
-const getUploadSignature = async (models, req: Request, res: Response, next: NextFunction) => {
+const getUploadSignature = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {
     return next(new Error(Errors.NotLoggedIn));
   }
@@ -24,7 +25,7 @@ const getUploadSignature = async (models, req: Request, res: Response, next: Nex
     return next(new Error(Errors.MissingParams));
   }
   const extension = req.body.name.split('.').pop();
-  const filename = uuidv4() + '.' + extension;
+  const filename = `${uuidv4()}.${extension}`;
   const contentType = req.body.mimetype;
   if (['image/gif', 'image/png', 'image/jpeg', 'image/webp'].indexOf(contentType) === -1) {
     return next(new Error(Errors.ImageType));

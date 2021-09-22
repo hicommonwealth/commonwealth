@@ -5,15 +5,14 @@ import $ from 'jquery';
 import { Button, PopoverMenu, MenuItem, MenuDivider, Icon, Icons } from 'construct-ui';
 
 import app from 'state';
+import { navigateToSubpage } from 'app';
 import { ChainBase, IWebWallet } from 'models';
 import { ChainBaseIcon } from 'views/components/chain_icon';
 import { baseToNetwork } from 'models/types';
 import _ from 'underscore';
 
-import Token from 'controllers/chain/ethereum/token/adapter';
-
 const CHAINBASE_WITH_CLI = [
-  ChainBase.CosmosSDK, ChainBase.Substrate
+  ChainBase.Substrate
 ];
 
 const LoginWithWalletDropdown: m.Component<{
@@ -25,7 +24,14 @@ const LoginWithWalletDropdown: m.Component<{
   prepopulateAddress?,
 }> = {
   view: (vnode) => {
-    const { label, loggingInWithAddress, joiningChain, joiningCommunity, onSuccess, prepopulateAddress } = vnode.attrs;
+    const {
+      label,
+      loggingInWithAddress,
+      joiningChain,
+      joiningCommunity,
+      onSuccess,
+      prepopulateAddress,
+    } = vnode.attrs;
 
     // prev and next must work whether the modal is on the web3login page, or not...which is why this is so confusing
     const prev = m.route.param('prev') ? m.route.param('prev') : m.route.get();
@@ -64,8 +70,12 @@ const LoginWithWalletDropdown: m.Component<{
         ]),
         onclick: (e) => {
           $('.Login').trigger('modalexit');
-          const defaultChainId = baseToNetwork(base);
-          m.route.set(`/${app.chain?.id || defaultChainId}/web3login`, web3loginParams);
+          const defaultChainId = webWallet?.specificChain || baseToNetwork(base);
+          if (app.activeChainId()) {
+            navigateToSubpage('/web3login', web3loginParams);
+          } else {
+            m.route.set(`${defaultChainId}/web3login`, web3loginParams);
+          }
           app.modals.lazyCreate('link_new_address_modal', {
             loggingInWithAddress,
             joiningChain,
@@ -76,7 +86,7 @@ const LoginWithWalletDropdown: m.Component<{
             prepopulateAddress,
             successCallback: () => {
               if (next === '/?') {
-                m.route.set(`/${app.chain?.id || defaultChainId}`);
+                navigateToSubpage('/');
               } else {
                 m.route.set(next);
               }
@@ -96,7 +106,10 @@ const LoginWithWalletDropdown: m.Component<{
       }
     };
 
-    const chainbase = app.chain?.meta?.chain?.base;
+    let chainbase = app.chain?.meta?.chain?.base;
+    if (!chainbase && app.customDomainId() && app.config.chains.getById(app.customDomainId())) {
+      chainbase = app.config.chains.getById(app.customDomainId()).base;
+    }
     const menuItems = (chainbase && CHAINBASE_WITH_CLI.indexOf(chainbase) !== -1)
       ? [
         ...getMenuItemsForChainBase(chainbase),

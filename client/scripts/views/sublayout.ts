@@ -7,11 +7,12 @@ import { link } from 'helpers';
 
 import NewProposalButton, { MobileNewProposalButton } from 'views/components/new_proposal_button';
 import NotificationsMenu from 'views/components/header/notifications_menu';
-import InvitesMenu from 'views/components/header/invites_menu';
+import InvitesMenu, { handleEmailInvites } from 'views/components/header/invites_menu';
 import LoginSelector from 'views/components/header/login_selector';
 import Sidebar from 'views/components/sidebar';
 import MobileHeader from 'views/mobile/mobile_header';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
+import FooterLandingPage from 'views/pages/landing/landing_page_footer';
 import Token from 'controllers/chain/ethereum/token/adapter';
 import { SearchBar } from './components/search_bar';
 
@@ -24,6 +25,7 @@ const Sublayout: m.Component<{
   class?: string,
   title?: any,                        // displayed at the top of the layout
   description?: string,               // displayed at the top of the layout
+  rightContent?: any,
   hero?: any,
   showNewProposalButton?: boolean,
   showCouncilMenu?: boolean,
@@ -31,11 +33,14 @@ const Sublayout: m.Component<{
   hideSearch?: boolean,
   centerGrid?: boolean,
   alwaysShowTitle?: boolean,          // show page title even if app.chain and app.community are unavailable
+}, {
+  modalAutoTriggered: boolean
 }> = {
   view: (vnode) => {
     const {
       title,
       description,
+      rightContent,
       hero,
       showNewProposalButton,
       showCouncilMenu,
@@ -47,22 +52,33 @@ const Sublayout: m.Component<{
     const chain = app.chain ? app.chain.meta.chain : null;
     const community = app.community ? app.community.meta : null;
     const narrowBrowserWidth = (window.innerWidth > 767.98) && (window.innerWidth < 850);
+    const terms = app.chain ? chain.terms : null;
 
     const ICON_SIZE = 22;
     const sublayoutHeaderLeft = m('.sublayout-header-left', [
-      (!m.route.param('scope') && (m.route.get() === '/' || m.route.get().startsWith('/?'))) ? [
+      (!app.activeId() && !app.isCustomDomain() && (m.route.get() === '/' || m.route.get().startsWith('/?'))) ? [
         m('h3', 'Commonwealth')
       ] : chain ? [
-        m(ChainIcon, { size: ICON_SIZE, chain }),
+        m('.ChainIcon', [
+          link('a', (!app.isCustomDomain() ? `/${app.activeId()}` : '/'), [
+            m(ChainIcon, { size: ICON_SIZE, chain })
+          ])
+        ]),
         m('h4.sublayout-header-heading', [
-          link('a', `/${app.activeId()}`, chain.name),
+          link('a', (app.isCustomDomain() ? '/' : `/${app.activeId()}`), chain.name),
           title && m('span.breadcrumb', m.trust('/')),
           title
         ]),
       ] : community ? [
-        m(CommunityIcon, { size: ICON_SIZE, community }),
+        m('.ChainIcon', [
+          link('a', (!app.isCustomDomain() ? `/${app.activeId()}` : '/'), [
+            m(CommunityIcon, { size: ICON_SIZE, community })
+          ])
+        ]),
         m('h4.sublayout-header-heading', [
-          link('a', `/${app.activeId()}`, community.name),
+          m('div.sublayout-header-heading-wrapper', [
+            link('a', (app.isCustomDomain() ? '/' : `/${app.activeId()}`), community.name),
+          ]),
           community.privacyEnabled && m(Icon, { name: Icons.LOCK, size: 'xs' }),
           title && m('span.breadcrumb', m.trust('/')),
           title
@@ -79,7 +95,8 @@ const Sublayout: m.Component<{
       app.isLoggedIn() && m(InvitesMenu),
       app.isLoggedIn() && m(NotificationsMenu),
       showNewProposalButton
-      && (narrowBrowserWidth ? m(MobileNewProposalButton) : m(NewProposalButton, { fluid: false })),
+      && (narrowBrowserWidth ? m(MobileNewProposalButton) : m(NewProposalButton, { fluid: false, threadOnly: !chain })),
+      // above threadOnly option assumes all chains have proposals beyond threads
     ]);
 
     if (vnode.attrs.loadingLayout) return [
@@ -101,6 +118,12 @@ const Sublayout: m.Component<{
       ]),
     ];
 
+    if (m.route.param('triggerInvite') === 't') {
+      setTimeout(() => handleEmailInvites(vnode.state), 0);
+    }
+
+    const tosStatus = localStorage.getItem(`${app.activeId()}-tos`);
+
     return [
       m('.layout-container', [
         m('.Sublayout', { class: vnode.attrs.class }, [
@@ -114,10 +137,22 @@ const Sublayout: m.Component<{
           ]),
           hero
             ? m('.sublayout-hero', hero)
-            : (app.isLoggedIn() && (app.chain as Token)?.isToken && !(app.chain as Token)?.hasToken)
+            : (app.isLoggedIn() && (app.chain as Token)?.isToken && !app.user.activeAccount)
               ? m('.sublayout-hero.token-banner', [
-                m('.token-banner-content', `Link ${app.chain.meta.chain.symbol} address to participate in this community`),
+                m('.token-banner-content', `Link an address that holds ${chain.symbol} to participate in governance.`),
               ]) : '',
+          terms && tosStatus !== 'off'
+            ? m('.token-banner-terms', [
+              m('span', 'Please read the '),
+              m('a', {
+                href: terms,
+              }, 'terms and conditions'),
+              m('span', ' before interacting with this community.'),
+              m('span', { class: 'close-button',
+                onclick: () => {
+                  localStorage.setItem(`${app.activeId()}-tos`, 'off');
+                } }, 'X')
+            ]) : '',
           m('.sublayout-body', [
             m(`.sublayout-grid${vnode.attrs.centerGrid ? '.flex-center' : ''}`, [
               !hideSidebar && m('.sublayout-sidebar-col', [
@@ -126,8 +161,25 @@ const Sublayout: m.Component<{
               m('.sublayout-main-col', [
                 vnode.children
               ]),
+              rightContent && m('.sublayout-right-col', rightContent),
             ]),
           ]),
+          !app.isCustomDomain() && m(FooterLandingPage, {
+            list: [
+              { text: 'Blog', externalLink: 'https://blog.commonwealth.im' },
+              { text: 'Jobs', externalLink: 'https://angel.co/company/commonwealth-labs/jobs' },
+              { text: 'Terms', redirectTo:  '/terms' },
+              { text: 'Privacy', redirectTo: '/privacy' },
+              { text: 'Docs', redirectTo: 'https://docs.commonwealth.im' },
+              { text: 'Discord', externalLink: 'https://discord.gg/ZFQCKUMP' },
+              { text: 'Telegram', externalLink: 'https://t.me/HiCommonwealth' }
+              // { text:  'Use Cases' },
+              // { text:  'Crowdfunding' },
+              // { text:  'Developers' },
+              // { text:  'About us' },
+              // { text:  'Careers' }
+            ],
+          }),
         ]),
       ]),
     ];

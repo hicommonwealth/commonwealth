@@ -7,8 +7,7 @@ $size: 46px;
     color: $text-color-light;
 }
 
-.EmptyTopicPlaceholder {
-    padding: 40px 0;
+.EmptyListingPlaceholder {
     .icon-circle {
         display: inline-block;
         background: $primary-bg-color;
@@ -30,6 +29,7 @@ $size: 46px;
         margin: 18px 0 0;
         strong {
             font-weight: 600;
+            word-break: break-all;
         }
     }
     p {

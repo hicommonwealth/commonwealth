@@ -186,7 +186,7 @@ export function updateActiveUser(data) {
     app.user.setEmailVerified(data.emailVerified);
     app.user.setJWT(data.jwt);
 
-    app.user.setAddresses(data.addresses.map((a) => new AddressInfo(a.id, a.address, a.chain, a.keytype, a.is_magic)));
+    app.user.setAddresses(data.addresses.map((a) => new AddressInfo(a.id, a.address, a.chain, a.keytype, a.is_magic, a.ghost_address)));
     app.user.setSocialAccounts(data.socialAccounts.map((sa) => new SocialAccount(sa.provider, sa.provider_username)));
 
     app.user.setSiteAdmin(data.isAdmin);
@@ -196,47 +196,16 @@ export function updateActiveUser(data) {
   }
 }
 
-// called from within the client only
-// creates SubstrateAccount with only a private key
-export async function createUserWithSeed(seed: string): Promise<Account<any>> {
-  // Look for unlocked account with the same seed
-  const existingDevAccount = app.user.activeAccounts.find((user) => user.getSeed() === seed);
-  if (existingDevAccount) {
-    throw new Error('User with this seed already exists');
-  }
-
-  const account = (app.chain.accounts as any).fromSeed(seed);
-  // Look for account with the same public key
-  const existingUser = app.user.activeAccounts.find((user) => user.address === account.address);
-  if (existingUser) {
-    account.setSeed(seed);
-    // TODO: what should we do here?
-  }
-  const response = await createAccount(account);
-  account.setValidationToken(response.result.verification_token);
-  account.setAddressId(response.result.id);
-  await account.validate();
-  return account;
-}
-
-export async function createUserWithMnemonic(mnemonic: string): Promise<Account<any>> {
-  const account = (app.chain.accounts as any).fromMnemonic(mnemonic);
-  const response = await createAccount(account);
-  account.setValidationToken(response.result.verification_token);
-  account.setAddressId(response.result.id);
-  await account.validate();
-  return account;
-}
-
 export async function createUserWithAddress(
   address: string, keytype?: string, community?: string
 ): Promise<Account<any>> {
   const account = app.chain.accounts.get(address, keytype);
   const response = await createAccount(account, community);
   const token = response.result.verification_token;
-  account.setValidationToken(token);
-  account.setAddressId(response.result.id);
-  return account;
+  const newAccount = app.chain.accounts.get(response.result.address, keytype);
+  newAccount.setValidationToken(token);
+  newAccount.setAddressId(response.result.id);
+  return newAccount;
 }
 
 export async function unlinkLogin(account) {

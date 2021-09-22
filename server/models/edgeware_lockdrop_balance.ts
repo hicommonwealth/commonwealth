@@ -1,35 +1,30 @@
 import * as Sequelize from 'sequelize';
+import { Model, DataTypes } from 'sequelize';
+import { ModelStatic } from './types';
 
 export interface EdgewareLockdropBalanceAttributes {
-  id?: number;
   address: string;
   balance: string;
   blocknum: number;
+  id?: number;
 }
 
 export interface EdgewareLockdropBalanceInstance
-extends Sequelize.Instance<EdgewareLockdropBalanceAttributes>, EdgewareLockdropBalanceAttributes {
+extends Model<EdgewareLockdropBalanceAttributes>, EdgewareLockdropBalanceAttributes {}
 
-}
-
-export interface EdgewareLockdropBalanceModel extends Sequelize.Model<
-  EdgewareLockdropBalanceInstance, EdgewareLockdropBalanceAttributes
-> {
-
-}
+export type EdgewareLockdropBalanceModelStatic = ModelStatic<EdgewareLockdropBalanceInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): EdgewareLockdropBalanceModel => {
-  const EdgewareLockdropBalance = sequelize.define<
-    EdgewareLockdropBalanceInstance, EdgewareLockdropBalanceAttributes
-  >('EdgewareLockdropBalance', {
+  dataTypes: typeof DataTypes,
+): EdgewareLockdropBalanceModelStatic => {
+  const EdgewareLockdropBalance = <EdgewareLockdropBalanceModelStatic>sequelize.define('EdgewareLockdropBalance', {
     id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     address: { type: dataTypes.STRING, allowNull: false },
     balance: { type: dataTypes.STRING, allowNull: false },
     blocknum: { type: dataTypes.INTEGER, allowNull: false },
   }, {
+    tableName: 'EdgewareLockdropBalances',
     timestamps: false,
     underscored: true,
     indexes: [

@@ -2,12 +2,16 @@ import 'components/reaction_button.scss';
 
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
-import { Tooltip } from 'construct-ui';
+import { Icon, Icons, Popover, Size } from 'construct-ui';
 
-import app, { LoginState } from 'state';
-import { IUniqueId, Proposal, OffchainComment, OffchainThread, AnyProposal, AddressInfo } from 'models';
+import app from 'state';
+import { Proposal, OffchainComment, OffchainThread, AnyProposal, AddressInfo } from 'models';
 import User from 'views/components/widgets/user';
 import Token from 'controllers/chain/ethereum/token/adapter';
+import BN from 'bn.js';
+
+import $ from 'jquery';
+import ReactionCount from 'models/ReactionCount';
 import SelectAddressModal from '../modals/select_address_modal';
 import LoginModal from '../modals/login_modal';
 
@@ -18,51 +22,102 @@ export enum ReactionType {
   Dislike = 'dislike'
 }
 
-const ReactionButton: m.Component<{
+type ReactionButtonState = {
+  loading: boolean
+  reactors: any
+  reactionCounts: ReactionCount<any>
+  likes: number
+  dislikes: number
+  hasReacted: boolean
+}
+
+type ReactionButtonAttrs = {
   post: OffchainThread | AnyProposal | OffchainComment<any>;
   type: ReactionType;
   displayAsLink?: boolean;
   tooltip?: boolean;
   large?: boolean;
-}, { loading: boolean }> = {
+}
+
+const getDisplayedReactorsForPopup = (vnode: m.Vnode<ReactionButtonAttrs, ReactionButtonState>) => {
+  const { reactors = [], likes = 0, dislikes = 0 } = vnode.state;
+  const slicedReactors = reactors.slice(0, MAX_VISIBLE_REACTING_ACCOUNTS).map((rxn_) => {
+    const { Address: { address, chain } } = rxn_;
+    return m('.reacting-user', m(User, {
+      user: new AddressInfo(null, address, chain, null),
+      linkify: true
+    }));
+  });
+
+  if (vnode.state.reactors && slicedReactors.length < (likes + dislikes)) {
+    const diff = (likes + dislikes) - slicedReactors.length;
+    slicedReactors.push(m('.reacting-user .truncated-reacting-users', `and ${diff} more`));
+  }
+  return slicedReactors;
+};
+
+const fetchReactionsByPost = async (post: OffchainThread | AnyProposal | OffchainComment<any>) => {
+  let thread_id, proposal_id, comment_id;
+  if (post instanceof OffchainThread) {
+    thread_id = (post as OffchainThread).id;
+  } else if (post instanceof Proposal) {
+    proposal_id = `${(post as AnyProposal).slug}_${(post as AnyProposal).identifier}`;
+  } else if (post instanceof OffchainComment) {
+    comment_id = (post as OffchainComment<any>).id;
+  }
+  const { result = [] } = await $.get(`${app.serverUrl()}/bulkReactions`, {
+    thread_id,
+    comment_id,
+    proposal_id,
+  });
+  return result;
+};
+
+const ReactionButton: m.Component<ReactionButtonAttrs, ReactionButtonState> = {
   view: (vnode) => {
     const { post, type, displayAsLink, tooltip, large } = vnode.attrs;
-    const reactions = app.reactions.getByPost(post);
+    vnode.state.reactionCounts = app.reactionCounts.getByPost(post);
+    const { likes = 0, dislikes = 0, hasReacted } = vnode.state.reactionCounts || {};
+    vnode.state.likes = likes;
+    vnode.state.dislikes = dislikes;
 
-    let dislikes;
-    let likes;
-    if (type === ReactionType.Like) likes = reactions.filter((r) => r.reaction === 'like');
-    if (type === ReactionType.Dislike) dislikes = reactions.filter((r) => r.reaction === 'dislike');
+    let disabled = vnode.state.loading;
 
-    const isCommunity = !!app.activeCommunityId();
+    // token balance check if needed
+    if (!app.community && (app.chain as Token)?.isToken) {
+      const tokenBalance = (app.chain as Token).tokenBalance;
+      const isAdmin = app.user.isSiteAdmin
+        || app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
 
-    const disabled = vnode.state.loading
-      || (!isCommunity && (app.chain as Token).isToken && !(app.chain as Token).hasToken);
-    const activeAddress = app.user.activeAccount?.address;
-    const rxn = reactions.find((r) => r.reaction && r.author === activeAddress);
-    const hasReacted : boolean = !!rxn;
-    let hasReactedType;
-    if (hasReacted) hasReactedType = rxn.reaction;
-
-    const reactors = (likes || dislikes).slice(0, MAX_VISIBLE_REACTING_ACCOUNTS).map((rxn_) => {
-      return m('.reacting-user', m(User, {
-        user: new AddressInfo(null, rxn_.author, rxn_.author_chain, null),
-        linkify: true
-      }));
-    });
-    if (reactors.length < (likes || dislikes).length) {
-      const diff = (likes || dislikes).length - reactors.length;
-      reactors.push(m('.reacting-user .truncated-reacting-users', `and ${diff} more`));
+      let tokenPostingThreshold: BN;
+      if (post instanceof OffchainThread && post.topic && app.topics) {
+        tokenPostingThreshold = app.topics.getByName(
+          (post as OffchainThread).topic.name,
+          app.activeId()
+        )?.tokenThreshold;
+      } else if (post instanceof OffchainComment) {
+        // post.rootProposal has typescript typedef number but in practice seems to be a string
+        const parentThread = app.threads.getById(parseInt(post.rootProposal.toString().split('_')[1], 10));
+        tokenPostingThreshold = app.topics.getByName((parentThread).topic.name, app.activeId())?.tokenThreshold;
+      } else {
+        tokenPostingThreshold = new BN(0);
+      }
+      disabled = vnode.state.loading || (
+        !isAdmin && tokenPostingThreshold && tokenPostingThreshold.gt(tokenBalance)
+      );
     }
-    const tooltipPopover = m('.reaction-button-tooltip', reactors);
 
-    const rxnButton = m('.ReactionButton', {
-      class: `${(disabled ? 'disabled' : type === hasReactedType ? 'active' : '')
-        + (displayAsLink ? ' as-link' : '')
-        + (large ? ' large' : '')
-        + (type === ReactionType.Like ? ' like' : '')
-        + (type === ReactionType.Dislike ? ' dislike' : '')}`,
-      onclick: (e) => {
+    const activeAddress = app.user.activeAccount?.address;
+    vnode.state.hasReacted = hasReacted;
+    let hasReactedType;
+    if (hasReacted) hasReactedType = ReactionType.Like;
+
+    const rxnButton = m('.ProposalBodyReaction', {
+      onmouseenter:  async (e) => {
+        vnode.state.reactors = await fetchReactionsByPost(post);
+      },
+      onclick: async (e) => {
+        const { reactors, reactionCounts } = vnode.state;
         e.preventDefault();
         e.stopPropagation();
         if (disabled) return;
@@ -75,16 +130,24 @@ const ReactionButton: m.Component<{
             modal: SelectAddressModal,
           });
         } else {
+          const { address: userAddress, chain } = app.user.activeAccount;
           // if it's a community use the app.user.activeAccount.chain.id instead of author chain
           const chainId = app.activeCommunityId() ? null : app.activeChainId();
           const communityId = app.activeCommunityId();
           if (hasReacted) {
-            const reaction = reactions.find((r) => r.reaction === hasReactedType && r.author === activeAddress);
+            const reaction = (await fetchReactionsByPost(post)).find((r) => {
+              return (r.reaction === hasReactedType && r.Address.address === activeAddress);
+            });
             vnode.state.loading = true;
-            app.reactions.delete(reaction).then(() => {
+            app.reactionCounts.delete(reaction, {
+              ...reactionCounts,
+              likes: likes - 1,
+              hasReacted: false
+            }).then(() => {
+              vnode.state.reactors = reactors.filter(({ Address }) => Address.address !== userAddress);
               if ((hasReactedType === ReactionType.Like && type === ReactionType.Dislike)
                 || (hasReactedType === ReactionType.Dislike && type === ReactionType.Like)) {
-                app.reactions.create(app.user.activeAccount.address, post, type, chainId, communityId).then(() => {
+                app.reactions.create(userAddress, post, type, chainId, communityId).then(() => {
                   vnode.state.loading = false;
                   m.redraw();
                 });
@@ -95,9 +158,12 @@ const ReactionButton: m.Component<{
             });
           } else {
             vnode.state.loading = true;
-            app.reactions.create(app.user.activeAccount.address, post, type, chainId, communityId)
+            app.reactionCounts.create(userAddress, post, type, chainId, communityId)
               .then(() => {
                 vnode.state.loading = false;
+                vnode.state.reactors = [ ...reactors, {
+                  Address: { address: userAddress, chain }
+                }];
                 m.redraw();
               });
           }
@@ -113,20 +179,39 @@ const ReactionButton: m.Component<{
           });
         }
       },
+    }, [ m('.ReactionButton', {
+      class: `${(disabled ? 'disabled' : type === hasReactedType ? 'active' : '')
+        + (displayAsLink ? ' as-link' : '')
+        + (large ? ' large' : '')
+        + (type === ReactionType.Like ? ' like' : '')
+        + (type === ReactionType.Dislike ? ' dislike' : '')}`,
     }, (type === ReactionType.Dislike) && [
-      m('.upvote-icon', large ? '▾' : '👎'),
-      m('.upvote-count', dislikes.length),
+      large
+        ? m('.reactions-icon', '▾')
+        : m(Icon, {
+          class: 'reactions-icon',
+          name: Icons.THUMBS_DOWN,
+          size: Size.XL,
+        }),
+      m('.upvote-count', vnode.state.dislikes),
     ], (type === ReactionType.Like) && [
-      m('.reactions-icon', large ? '▾' : '👍'),
-      m('.reactions-count', likes.length),
-    ]);
+      large
+        ? m('.reactions-icon', '▾')
+        : m(Icon, {
+          class: 'reactions-icon',
+          name: Icons.THUMBS_UP,
+          size: Size.XL,
+        }),
+      m('.reactions-count', vnode.state.likes),
+    ])]);
 
-    return (tooltip && reactors.length)
-      ? m(Tooltip, {
+    return (tooltip && (vnode.state.likes || vnode.state.dislikes))
+      ? m(Popover, {
         class: 'ReactionButtonTooltip',
-        content: tooltipPopover,
+        interactionType: 'hover',
+        content: m('.reaction-button-tooltip', getDisplayedReactorsForPopup(vnode)),
         trigger: rxnButton,
-        hoverOpenDelay: 1000
+        hoverOpenDelay: 100
       })
       : rxnButton;
   }

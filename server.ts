@@ -11,6 +11,7 @@ import fs from 'fs';
 import passport from 'passport';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
+import compression from 'compression';
 import webpackHotMiddleware from 'webpack-hot-middleware';
 import { redirectToHTTPS } from 'express-http-to-https';
 import favicon from 'serve-favicon';
@@ -25,13 +26,11 @@ import { factory, formatFilename } from './shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 import ViewCountCache from './server/util/viewCountCache';
-import IdentityFetchCache from './server/util/identityFetchCache';
+import IdentityFetchCache, { IdentityFetchCacheNew } from './server/util/identityFetchCache';
 import TokenBalanceCache from './server/util/tokenBalanceCache';
-import TokenListCache from './server/util/tokenListCache';
 import { SESSION_SECRET, ROLLBAR_SERVER_TOKEN, MAGIC_API_KEY } from './server/config';
 import models from './server/database';
 import { updateEvents, updateBalances } from './server/util/eventPoller';
-import resetServer from './server/scripts/resetServer';
 import setupAppRoutes from './server/scripts/setupAppRoutes';
 import setupServer from './server/scripts/setupServer';
 import setupErrorHandlers from './server/scripts/setupErrorHandlers';
@@ -41,7 +40,6 @@ import setupAPI from './server/router';
 import setupPassport from './server/passport';
 import setupChainEventListeners from './server/scripts/setupChainEventListeners';
 import { fetchStats } from './server/routes/getEdgewareLockdropStats';
-import migrateChainEntities from './server/scripts/migrateChainEntities';
 import migrateIdentities from './server/scripts/migrateIdentities';
 import migrateCouncillorValidatorFlags from './server/scripts/migrateCouncillorValidatorFlags';
 
@@ -54,30 +52,37 @@ async function main() {
 
   // CLI parameters for which task to run
   const SHOULD_SEND_EMAILS = process.env.SEND_EMAILS === 'true';
-  const SHOULD_RESET_DB = process.env.RESET_DB === 'true';
   const SHOULD_UPDATE_EVENTS = process.env.UPDATE_EVENTS === 'true';
   const SHOULD_UPDATE_BALANCES = process.env.UPDATE_BALANCES === 'true';
   const SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS = process.env.UPDATE_EDGEWARE_LOCKDROP_STATS === 'true';
+  const SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS = process.env.SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS === 'true';
 
   const NO_CLIENT_SERVER = process.env.NO_CLIENT === 'true'
     || SHOULD_SEND_EMAILS
-    || SHOULD_RESET_DB
     || SHOULD_UPDATE_EVENTS
     || SHOULD_UPDATE_BALANCES
-    || SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS;
+    || SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS
+    || SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS;
 
   // CLI parameters used to configure specific tasks
   const SKIP_EVENT_CATCHUP = process.env.SKIP_EVENT_CATCHUP === 'true';
-  const ENTITY_MIGRATION = process.env.ENTITY_MIGRATION;
   const IDENTITY_MIGRATION = process.env.IDENTITY_MIGRATION;
   const FLAG_MIGRATION = process.env.FLAG_MIGRATION;
   const CHAIN_EVENTS = process.env.CHAIN_EVENTS;
   const RUN_AS_LISTENER = process.env.RUN_AS_LISTENER === 'true';
+  const USE_NEW_IDENTITY_CACHE = process.env.USE_NEW_IDENTITY_CACHE === 'true';
 
   const magic = MAGIC_API_KEY ? new Magic(MAGIC_API_KEY) : null;
-  const identityFetchCache = new IdentityFetchCache(10 * 60);
-  const tokenListCache = new TokenListCache();
-  const tokenBalanceCache = new TokenBalanceCache(tokenListCache);
+  
+  // if running in old mode then use old identityCache but if running with dbNode.ts use the new db identityCache
+  let identityFetchCache: IdentityFetchCacheNew | IdentityFetchCache;
+  if (!USE_NEW_IDENTITY_CACHE) {
+    identityFetchCache = new IdentityFetchCache(10 * 60);
+  } else {
+    identityFetchCache = new IdentityFetchCacheNew();
+  }
+
+  const tokenBalanceCache = new TokenBalanceCache(models);
   const listenChainEvents = async () => {
     try {
       // configure chain list from events
@@ -87,7 +92,7 @@ async function main() {
       } else if (CHAIN_EVENTS) {
         chains = CHAIN_EVENTS.split(',');
       }
-      const subscribers = await setupChainEventListeners(models, null, chains, SKIP_EVENT_CATCHUP);
+      const subscribers = await setupChainEventListeners(null, chains, SKIP_EVENT_CATCHUP);
       // construct storageFetchers needed for the identity cache
       const fetchers = {};
       for (const [ chain, subscriber ] of Object.entries(subscribers)) {
@@ -95,14 +100,13 @@ async function main() {
           fetchers[chain] = new SubstrateEvents.StorageFetcher(subscriber.api);
         }
       }
-      await identityFetchCache.start(models, fetchers);
+      await (<IdentityFetchCache>identityFetchCache).start(models, fetchers);
       return 0;
     } catch (e) {
       console.error(`Chain event listener setup failed: ${e.message}`);
       return 1;
     }
   };
-
   let rc = null;
   if (RUN_AS_LISTENER) {
     // hack to keep process running indefinitely
@@ -116,8 +120,6 @@ async function main() {
     return;
   } else if (SHOULD_SEND_EMAILS) {
     rc = await sendBatchedNotificationEmails(models);
-  } else if (SHOULD_RESET_DB) {
-    rc = await resetServer(models);
   } else if (SHOULD_UPDATE_EVENTS) {
     rc = await updateEvents(app, models);
   } else if (SHOULD_UPDATE_BALANCES) {
@@ -136,18 +138,6 @@ async function main() {
       rc = 0;
     } catch (e) {
       log.error('Failed adding Lockdrop statistics into the DB: ', e.message);
-      rc = 1;
-    }
-  } else if (ENTITY_MIGRATION) {
-    // "all" means run for all supported chains, otherwise we pass in the name of
-    // the specific chain to migrate
-    log.info('Started migrating chain entities into the DB');
-    try {
-      await migrateChainEntities(models, ENTITY_MIGRATION === 'all' ? undefined : ENTITY_MIGRATION);
-      log.info('Finished migrating chain entities into the DB');
-      rc = 0;
-    } catch (e) {
-      log.error('Failed migrating chain entities into the DB: ', e.message);
       rc = 1;
     }
   } else if (IDENTITY_MIGRATION) {
@@ -231,16 +221,29 @@ async function main() {
     });
 
     // redirect to https:// unless we are using a test domain
-    app.use(redirectToHTTPS(DEV ? [
-      /gov.edgewa.re:(\d{4})/,
-      /gov2.edgewa.re:(\d{4})/,
-      /gov3.edgewa.re:(\d{4})/,
-      /localhost:(\d{4})/,
-      /127.0.0.1:(\d{4})/
-    ] : [
+    app.use(redirectToHTTPS([
       /localhost:(\d{4})/,
       /127.0.0.1:(\d{4})/
     ], [], 301));
+
+    // dynamic compression settings used
+    app.use(compression());
+
+    // static compression settings unused
+    // app.get('*.js', (req, res, next) => {
+    //   req.url = req.url + '.gz';
+    //   res.set('Content-Encoding', 'gzip');
+    //   res.set('Content-Type', 'application/javascript; charset=UTF-8');
+    //   next();
+    // });
+
+    // // static compression settings unused
+    // app.get('bundle.**.css', (req, res, next) => {
+    //   req.url = req.url + '.gz';
+    //   res.set('Content-Encoding', 'gzip');
+    //   res.set('Content-Type', 'text/css');
+    //   next();
+    // });
 
     // serve the compiled app
     if (!NO_CLIENT_SERVER) {
@@ -283,7 +286,6 @@ async function main() {
 
   const sendFile = (res) => res.sendFile(`${__dirname}/build/index.html`);
 
-
   // Only run prerender in DEV environment if the WITH_PRERENDER flag is provided.
   // On the other hand, run prerender by default on production.
   if (DEV) {
@@ -295,8 +297,8 @@ async function main() {
   setupMiddleware();
   setupPassport(models, magic);
 
-  await tokenBalanceCache.start(models);
-  setupAPI(app, models, viewCountCache, identityFetchCache, tokenBalanceCache, magic);
+  await tokenBalanceCache.start();
+  setupAPI(app, models, viewCountCache, <any>identityFetchCache, tokenBalanceCache, magic);
   setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
   setupErrorHandlers(app, rollbar);
 

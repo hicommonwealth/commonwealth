@@ -3,3 +3,20 @@
 .cui-popover.cui-popover-menu.InvitesMenu {
     top: 1px !important;
 }
+
+.invites-button-wrap {
+    position: relative;
+    margin-left: 7px;
+    .invites-count-pip {
+        position: absolute;
+        top: 29px;
+        right: -5px;
+        height: 12px;
+        width: 12px;
+        border-radius: 50%;
+        background: red;
+        color: white;
+        line-height: 1;
+        font-size: 12px;
+    }
+}

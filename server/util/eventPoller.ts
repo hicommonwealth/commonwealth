@@ -27,7 +27,7 @@ const fetchEvents = async (web3, originContract, eventName, fromBlock, blocksPer
   let toBlock = fromBlock + blocksPerQuery;
   console.log(`Getting ${eventName} events...`);
   while (toBlock < latestBlock + blocksPerQuery) {
-    const newEvents = await originContract.getPastEvents(eventName, { fromBlock: fromBlock, toBlock: toBlock, });
+    const newEvents = await originContract.getPastEvents(eventName, { fromBlock, toBlock, });
     events = events.concat(newEvents);
     fromBlock += blocksPerQuery;
     toBlock += blocksPerQuery;
@@ -54,7 +54,7 @@ export const updateEvents = (app, models): Promise<number> => {
         const lastSignalEvent = await models.EdgewareLockdropEvent.findOne({
           where: {
             origin: models.sequelize.where(models.sequelize.fn('LOWER', models.sequelize.col('origin')),
-                                          'LIKE', `%${MAINNET_LOCKDROP}%`),
+              'LIKE', `%${MAINNET_LOCKDROP}%`),
             name: 'Signaled',
           },
           order: [['blocknum', 'DESC']]
@@ -62,7 +62,7 @@ export const updateEvents = (app, models): Promise<number> => {
         const lastLockEvent = await models.EdgewareLockdropEvent.findOne({
           where: {
             origin: models.sequelize.where(models.sequelize.fn('LOWER', models.sequelize.col('origin')),
-                                          'LIKE', `%${MAINNET_LOCKDROP}%`),
+              'LIKE', `%${MAINNET_LOCKDROP}%`),
             name: 'Locked',
           },
           order: [['blocknum', 'DESC']]
@@ -80,7 +80,7 @@ export const updateEvents = (app, models): Promise<number> => {
 
         // save events
         const eventsForCreation = [].concat.apply([], events).map((event) => ({
-          //chain: 'ethereum',
+          // chain: 'ethereum',
           origin: event.address,
           blocknum: event.blockNumber,
           name: event.event,
@@ -91,8 +91,8 @@ export const updateEvents = (app, models): Promise<number> => {
 
         // remove duplicate events
         await models.sequelize.query(
-          'delete from "EdgewareLockdropEvents" where id in ' +
-            '(SELECT min(id) FROM "EdgewareLockdropEvents" GROUP BY origin, blocknum, data HAVING count(*) > 1)'
+          'delete from "EdgewareLockdropEvents" where id in '
+            + '(SELECT min(id) FROM "EdgewareLockdropEvents" GROUP BY origin, blocknum, data HAVING count(*) > 1)'
         );
 
         // build lookup table of {signaling addresses => blocknum} for getting balances
@@ -100,8 +100,8 @@ export const updateEvents = (app, models): Promise<number> => {
         signalEvents.map((event) => {
           const contractAddr = event.returnValues.contractAddr;
           if (contractAddr in addresses) {
-            addresses[contractAddr] = addresses[contractAddr] > event.blockNumber ?
-              addresses[contractAddr] : event.blockNumber;
+            addresses[contractAddr] = addresses[contractAddr] > event.blockNumber
+              ? addresses[contractAddr] : event.blockNumber;
           } else {
             addresses[contractAddr] = event.blockNumber;
           }

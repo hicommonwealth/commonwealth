@@ -1,4 +1,4 @@
-import { IChainAdapter, ChainBase, ChainClass, NodeInfo } from 'models';
+import { IChainAdapter, ChainBase, NodeInfo } from 'models';
 import { IApp } from 'state';
 
 import { NearToken } from 'adapters/chain/near/types';
@@ -7,7 +7,6 @@ import { NearAccounts } from './account';
 
 export default class Near extends IChainAdapter<NearToken, any> {
   public base = ChainBase.NEAR;
-  public class = ChainClass.Near;
   public chain: NearChain;
   public accounts: NearAccounts;
 
@@ -18,7 +17,7 @@ export default class Near extends IChainAdapter<NearToken, any> {
   }
 
   public async initApi() {
-    await this.chain.init(this.meta);
+    await this.chain.init(this.meta, this.accounts);
     await this.accounts.init(this.chain);
     await super.initApi();
   }

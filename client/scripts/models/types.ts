@@ -27,59 +27,42 @@ export enum ChainNetwork {
   Darwinia = 'darwinia',
   Phala = 'phala',
   Centrifuge = 'centrifuge',
-  Cosmos = 'cosmos',
   Straightedge = 'straightedge',
+  Osmosis = 'osmosis',
+  Injective = 'injective',
+  Terra = 'terra',
   Ethereum = 'ethereum',
   NEAR = 'near',
+  NEARTestnet = 'near-testnet',
   Moloch = 'moloch',
-  Marlin = 'marlin',
-  MarlinTestnet = 'marlin-testnet',
+  Compound = 'compound',
+  Aave = 'aave',
+  AaveLocal = 'aave-local',
+  dYdX = 'dydx',
   Metacartel = 'metacartel',
   ALEX = 'alex',
   Commonwealth = 'commonwealth',
   ERC20 = 'erc20',
   Clover = 'clover',
   HydraDX = 'hydradx',
+  Yearn = 'yearn',
+  Fei = 'fei',
+  Sushi = 'sushi',
   Crust = 'crust',
+  CosmosHub = 'cosmoshub',
+  Gaia13k = 'gaia-13k',
+  Sputnik = 'sputnik',
 }
 
 // This function returns a default chain for a chainbase
 export function baseToNetwork(n: ChainBase): ChainNetwork {
   switch (n) {
-    case ChainBase.CosmosSDK: return ChainNetwork.Cosmos;
+    case ChainBase.CosmosSDK: return ChainNetwork.Osmosis;
     case ChainBase.Substrate: return ChainNetwork.Edgeware;
     case ChainBase.Ethereum: return ChainNetwork.Ethereum;
     case ChainBase.NEAR: return ChainNetwork.NEAR;
     default: return null;
   }
-}
-
-// TODO: this should be deprecated, and replaced with ChainNetwork in most instances
-export enum ChainClass {
-  Clover = 'clover',
-  Edgeware = 'edgeware',
-  EdgewareTestnet = 'edgeware-testnet',
-  HydraDX = 'hydradx',
-  Kusama = 'kusama',
-  Kulupu = 'kulupu',
-  Polkadot = 'polkadot',
-  Plasm = 'plasm',
-  Stafi = 'stafi',
-  Darwinia = 'darwinia',
-  Phala = 'phala',
-  Centrifuge = 'centrifuge',
-  CosmosHub = 'cosmos-hub',
-  Gaia13k = 'gaia-13k',
-  Straightedge = 'straightedge',
-  Ethereum = 'ethereum',
-  Near = 'near',
-  Moloch = 'moloch',
-  Marlin = 'marlin',
-  MarlinTestnet = 'marlin-testnet',
-  ALEX = 'alex',
-  Commonwealth = 'commonwealth',
-  Crust = 'crust',
-  ERC20 = 'erc20',
 }
 
 // TODO: this is inconsistently used
@@ -90,21 +73,13 @@ export enum OffchainThreadKind {
   Request = 'request',
 }
 
+// TODO: this list should be shared with the server
 export enum OffchainThreadStage {
   Discussion = 'discussion',
   ProposalInReview = 'proposal_in_review',
   Voting = 'voting',
   Passed = 'passed',
   Failed = 'failed',
-}
-
-export enum OffchainVoteOptions {
-  SUPPORT_2,
-  SUPPORT,
-  NEUTRAL_SUPPORT,
-  NEUTRAL_OPPOSE,
-  OPPOSE,
-  OPPOSE_2,
 }
 
 export enum TransactionStatus {
@@ -141,12 +116,14 @@ export enum VotingType {
   MultiOptionVoting = 'multioption',
   None = 'none',
   MolochYesNo = 'moloch',
-  MarlinYesNo = 'marlin',
+  CompoundYesNo = 'compound',
+  YesNoReject = 'yes_no_reject',
 }
 export enum VotingUnit {
   OnePersonOneVote = '1p1v',
   CoinVote = 'coin',
   ConvictionCoinVote = 'conviction_coin',
+  PowerVote = 'power',
   None = 'none',
 }
 

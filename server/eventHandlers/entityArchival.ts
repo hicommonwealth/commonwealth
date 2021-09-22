@@ -10,7 +10,8 @@ import {
   EntityEventKind,
   IChainEntityKind,
   IChainEventData,
-  SubstrateTypes
+  SubstrateTypes,
+  EventSupportingChainT
 } from '@commonwealth/chain-events';
 
 import { factory, formatFilename } from '../../shared/logging';
@@ -20,7 +21,7 @@ const log = factory.getLogger(formatFilename(__filename));
 export default class extends IEventHandler {
   constructor(
     private readonly _models,
-    private readonly _chain: string,
+    private readonly _chain?: string,
     private readonly _wss?: WebSocket.Server,
   ) {
     super();
@@ -52,6 +53,9 @@ export default class extends IEventHandler {
    * `dbEvent` is the database entry corresponding to the `event`.
    */
   public async handle(event: CWEvent<IChainEventData>, dbEvent) {
+    // if chain is stored in the event then that will override the class property
+    // (allows backwards compatibility between reduced memory consuming chain consumer/handlers and other scripts)
+    const chain = event.chain || this._chain
     if (!dbEvent) {
       log.trace('no db event found!');
       return;
@@ -73,11 +77,11 @@ export default class extends IEventHandler {
         completed = true;
       }
       const params = author
-        ? { type: type.toString(), type_id, chain: this._chain, completed, author }
-        : { type: type.toString(), type_id, chain: this._chain, completed };
+        ? { type: type.toString(), type_id, chain,  author }
+        : { type: type.toString(), type_id, chain };
       const [ dbEntity, created ] = await this._models.ChainEntity.findOrCreate({
         where: params,
-        default: { },
+        default: { completed },
       });
       if (created) {
         log.info(`Created db entity, ${type.toString()}: ${type_id}.`);
@@ -100,7 +104,7 @@ export default class extends IEventHandler {
     const updateEntityFn = async (type: IChainEntityKind, type_id: string, completed = false) => {
       const dbEntity = await this._models.ChainEntity.findOne({
         where: {
-          type: type.toString(), type_id, chain: this._chain
+          type: type.toString(), type_id, chain
         }
       });
       if (!dbEntity) {
@@ -123,28 +127,28 @@ export default class extends IEventHandler {
       return dbEvent;
     };
 
-    const entity = eventToEntity(event.data.kind);
+    const entity = eventToEntity(chain as EventSupportingChainT, event.data.kind);
     if (!entity) {
       log.info(`no archival action needed for event of kind ${event.data.kind.toString()}`);
       return dbEvent;
     }
     const [ entityKind, updateType ] = entity;
-    const fieldName = entityToFieldName(entityKind);
+    const fieldName = entityToFieldName(chain as EventSupportingChainT, entityKind);
     const fieldValue = event.data[fieldName].toString();
     const author = event.data['proposer'];
     switch (updateType) {
       case EntityEventKind.Create: {
         return createEntityFn(entityKind, fieldValue, author);
       }
-      case EntityEventKind.Update: {
+      case EntityEventKind.Update:
+      case EntityEventKind.Vote: {
         return updateEntityFn(entityKind, fieldValue);
       }
       case EntityEventKind.Complete: {
         return updateEntityFn(entityKind, fieldValue, true);
       }
       default: {
-        // should be exhaustive
-        const dummy: never = updateType;
+        return null
       }
     }
   }

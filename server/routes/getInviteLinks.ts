@@ -1,4 +1,5 @@
 import { factory, formatFilename } from '../../shared/logging';
+import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -10,7 +11,7 @@ export const Errors = {
   ErrorFetchingLinks: 'Error fetching links',
 };
 
-const getInviteLinks = async (models, req, res, next) => {
+const getInviteLinks = async (models: DB, req, res, next) => {
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   const { community_id } = req.query;
   if (!community_id) return next(new Error(Errors.NoCommunity));

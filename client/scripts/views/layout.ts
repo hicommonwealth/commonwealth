@@ -45,7 +45,7 @@ export const Layout: m.Component<{
       }, [
         m(Sublayout, { errorLayout: [
           m('p', { style: 'color: #222' }, `Application error: ${app.loadingError}`),
-          m('p', { style: 'color: #222' }, 'Please try again at another time'),
+          m('p', { style: 'color: #222' }, 'Please try again later'),
         ] }),
         m(AppModals),
         m(AppToasts),
@@ -87,13 +87,17 @@ export const Layout: m.Component<{
       vnode.state.deferred = false;
       initChain();
       return m(LoadingLayout, { hideSidebar });
-    } else if (!scope && ((app.chain && app.chain.class) || app.community)) {
-      // Handle the case where we unload the chain or community, if we're
+    } else if (!scope && ((app.chain && app.chain.network) || app.community)) {
+      // Handle the case where we unload the network or community, if we're
       // going to a page that doesn't have one
-      deinitChainOrCommunity().then(() => {
-        vnode.state.loadingScope = null;
-        m.redraw();
-      });
+      // Include this in if for isCustomDomain, scope gets unset on redirect
+      // We don't need this to happen
+      if (!app.isCustomDomain()) {
+        deinitChainOrCommunity().then(() => {
+          vnode.state.loadingScope = null;
+          m.redraw();
+        });
+      }
       return m(LoadingLayout, { hideSidebar });
     }
     return m('.Layout.mithril-app', {

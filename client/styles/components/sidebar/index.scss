@@ -1,6 +1,21 @@
 @import 'client/styles/shared';
 
 @mixin sidebar {
+    .OffchainNavigationModule {
+        button > span {
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+    }
+    .cui-button.cui-active {
+        background: linear-gradient(268.91deg, #91BFFF -61.91%, #91FFA0 2.69%, #FBFF91 60.22%, #FF9191 131.89%);
+        border: 1px solid transparent;
+    }
+    .cui-button.sub-button {
+        margin-left: 18px;
+        width: calc(100% - 18px);
+    }
     .cui-button.cui-align-center {
         justify-content: left;
     }
@@ -11,12 +26,15 @@
     .cui-button.element-button, .cui-button.discord-button {
         padding: 0 10px;
         margin-right: 8px;
+        &:last-child {
+            margin-right: 0;
+        }
     }
     .cui-button.telegram-button {
         border-color: tint(#2480cc, 70%);
         color: #2480cc;
         &:hover {
-            border-color: #2480cc;
+            border-color: transparent;
         }
         .cui-button-label {
             flex: 1;
@@ -27,7 +45,7 @@
             top: -3px;
             left: -1px;
             path {
-                stroke: #2480cc;
+                stroke: currentColor;
             }
         }
     }
@@ -35,7 +53,7 @@
         border-color: tint(#0cbd8b, 70%);
         color: #0cbd8b;
         &:hover {
-            border-color: #0cbd8b;
+            border-color: transparent;
         }
         .cui-button-label {
             flex: 1;
@@ -45,7 +63,7 @@
             position: relative;
             top: -4px;
             path {
-                stroke: #0cbd8b;
+                stroke: currentColor;
             }
         }
     }
@@ -53,7 +71,7 @@
         border-color: tint(#677bc4, 70%);
         color: #677bc4;
         &:hover {
-            border-color: #677bc4;
+            border-color: transparent;
         }
         .cui-button-label {
             flex: 1;
@@ -63,7 +81,7 @@
             position: relative;
             top: -4px;
             path {
-                fill: #677bc4;
+                fill: currentColor;
             }
         }
     }
@@ -71,7 +89,7 @@
         border-color: tint(#222222, 70%);
         color: #222222;
         &:hover {
-            border-color: #222222;
+            border-color: transparent;
         }
         .cui-button-label {
             flex: 1;
@@ -81,7 +99,7 @@
             position: relative;
             top: -3px;
             path {
-                fill: #222222;
+                fill: currentColor;
             }
         }
     }
@@ -124,13 +142,25 @@
     top: 0;
     bottom: 0;
     left: 0;
-    padding: 0 14px;
     width: $quick-switcher-width;
     border-right: 1px solid $border-color-off-white;
-    z-index: 3;
-    // overflow-y: auto;
+    z-index: 11;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
     @include sm-max {
         display: none;
+    }
+    .community-nav-bar {
+        padding: 0 14px;
+    }
+    .scrollable-community-bar {
+        padding: 0 14px;
+        overflow-y: auto;
+    }
+    .scrollable-community-bar::-webkit-scrollbar {
+        width: 0;
+        background: transparent;
     }
     .sidebar-home-link.cui-button {
         margin: 15px 0 14px;
@@ -144,6 +174,17 @@
     }
     .CommunitySelector {
         margin: 0 0 14px;
+    }
+    .create-community {
+        margin: 0 0 14px;
+        height: 38px;
+        width: 38px;
+        padding: 0;
+
+        .cui-icon {
+            position: relative;
+            top: -2px;
+        }
     }
     .SidebarQuickSwitcherItem {
         height: 38px;
@@ -178,9 +219,12 @@
 }
 
 .Sidebar {
-    position: relative;
+    max-height: 100%;
+    position: sticky;
+    top: 83px;
     z-index: 2;
     padding-top: 36px;
+    padding-bottom: 36px;
     .sidebar-content {
         max-height: calc(100vh - 60px);
         padding-top: 16px;
@@ -263,13 +307,40 @@
     .cui-button {
         margin-bottom: 4px;
     }
+    .cui-button.cui-rounded:active,
+    .cui-button.cui-rounded.cui-active,
+    .cui-button.cui-rounded:hover {
+        background: linear-gradient(to left, #91FFA0, #FBFF91, #FF9191);
+        border-color: white;
+
+        // @TODO: Remove this and figure out a better solution
+        background: #6966FF;
+        color: white;
+    }
+}
+
+.PoweredBy{
+    height: 60.99px;
+    width: 171.43px;
+    position: absolute;
+    border-radius: 8px;
+    border-color: #F9F9F9;
+    font-size: 14px;
+    background-image: url("/static/img/powered-by.svg");
+    background-repeat: no-repeat;
+    background-position: center;
+    margin-top: 10%;
+    cursor: pointer;
+}
+.PoweredBy:hover{
+    background-image: url("/static/img/powered-by-2.svg");
 }
 
 .Sidebar {
     @include sidebar();
 }
 
-.cui-popover.sidebar-edit-topic .cui-menu,
-.cui-popover.sidebar-add-topic .cui-menu {
+.cui-popover.community-options-popover .cui-menu,
+.cui-popover.community-options-popover .cui-menu {
     padding: 4px 0;
 }

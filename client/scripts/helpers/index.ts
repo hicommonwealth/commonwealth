@@ -1,9 +1,10 @@
-import m from 'mithril';
+import m, { RouteOptions } from 'mithril';
 import { ICardListItem } from 'models/interfaces';
 import moment from 'moment';
 
 import app from 'state';
-import { OffchainThreadStage, OffchainVoteOptions } from 'models';
+import { OffchainThreadStage } from 'models';
+import { isValueNode } from 'graphql';
 
 export async function sleep(msec) {
   return new Promise((resolve) => setTimeout(resolve, msec));
@@ -21,36 +22,20 @@ export function offchainThreadStageToLabel(stage: OffchainThreadStage) {
   } else if (stage === OffchainThreadStage.Failed) {
     return 'Not Passed';
   } else {
-    return 'Other';
+    return stage;
   }
 }
 
-export function offchainThreadStageToIndex(stage: OffchainThreadStage) {
-  if (stage === OffchainThreadStage.Discussion) {
-    return 1;
-  } else if (stage === OffchainThreadStage.ProposalInReview) {
-    return 2;
-  } else if (stage === OffchainThreadStage.Voting) {
-    return 3;
-  } else if (stage === OffchainThreadStage.Passed) {
-    return 4;
-  } else if (stage === OffchainThreadStage.Failed) {
-    return 5;
-  } else {
-    return 6;
+export function parseCustomStages(str) {
+  // Parse customStages into a `string[]` and then cast to OffchainThreadStage[]
+  // If parsing fails, return an empty array.
+  let arr;
+  try {
+    arr = Array.from(JSON.parse(str));
+  } catch (e) {
+    return [];
   }
-}
-
-export function offchainVoteToLabel(option) {
-  switch (option) {
-    case OffchainVoteOptions.SUPPORT_2: return '#a2d16d';
-    case OffchainVoteOptions.SUPPORT: return '#c4dbac';
-    case OffchainVoteOptions.NEUTRAL_SUPPORT: return '#d6ddef';
-    case OffchainVoteOptions.NEUTRAL_OPPOSE: return '#d3d6dc';
-    case OffchainVoteOptions.OPPOSE: return '#ecc9a0';
-    case OffchainVoteOptions.OPPOSE_2: return '#fb9191';
-    default: // invalid
-  }
+  return arr.map((s) => s?.toString()).filter((s) => s) as unknown as OffchainThreadStage[];
 }
 
 /*
@@ -73,7 +58,15 @@ export function externalLink(selector, target, children) {
   }, children);
 }
 
-export function link(selector: string, target: string, children, extraAttrs?: object, saveScrollPositionAs?: string) {
+export function link(
+  selector: string,
+  target: string,
+  children,
+  extraAttrs?: object,
+  saveScrollPositionAs?: string,
+  beforeRouteSet?: Function,
+  afterRouteSet?: Function,
+) {
   const attrs = {
     href: target,
     onclick: (e) => {
@@ -86,11 +79,17 @@ export function link(selector: string, target: string, children, extraAttrs?: ob
       if (saveScrollPositionAs) {
         localStorage[saveScrollPositionAs] = window.scrollY;
       }
-
-      if (window.location.href.split('?')[0] === target.split('?')[0]) {
-        m.route.set(target, {}, { replace: true });
+      if (beforeRouteSet) beforeRouteSet();
+      const routeArgs: [string, any?, RouteOptions?] = window.location.href.split('?')[0] === target.split('?')[0]
+        ? [target, {}, { replace: true }]
+        : [target];
+      if (afterRouteSet) {
+        (async () => {
+          await m.route.set(...routeArgs);
+          afterRouteSet();
+        })();
       } else {
-        m.route.set(target);
+        m.route.set(...routeArgs);
       }
     },
   };
@@ -198,10 +197,24 @@ export function formatLastUpdated(timestamp) {
   if (timestamp.isBefore(moment().subtract(365, 'days'))) return timestamp.format('MMM D YYYY');
   const formatted = timestamp.fromNow(true);
   return `${formatted
-      .replace(' days', 'd')
-      .replace(' day', 'd')
-      .replace(' hours', 'h')
-      .replace(' hour', 'h')} ago`;
+    .replace(' days', 'd')
+    .replace(' day', 'd')
+    .replace(' hours', 'h')
+    .replace(' hour', 'h')
+    .replace(' months', 'mo')
+    .replace(' month', 'mo')} ${(formatted === 'now') ? '' : 'ago'}`;
+}
+
+export function formatTimestamp(timestamp) {
+  if (timestamp.isBefore(moment().subtract(365, 'days'))) return timestamp.format('MMM D YYYY');
+  const formatted = timestamp.fromNow(true);
+  return `${formatted
+    .replace(' days', 'd')
+    .replace(' day', 'd')
+    .replace(' hours', 'h')
+    .replace(' hour', 'h')
+    .replace(' months', 'mo')
+    .replace(' month', 'mo')}`;
 }
 
 // duplicated in adapters/currency.ts
@@ -219,6 +232,14 @@ export function formatPercentShort(num: number) {
   if (num === 1) return '100%';
   if (num > 1) return '100%+';
   return `${(num * 100).toFixed(1)}%`;
+}
+
+/* Choose Total Digits to Display*/
+export function formatPercent(num: number, digits: number) {
+  if (num === 0) return '0%';
+  if (num === 1) return '100%';
+  if (num > 1) return '100%+';
+  return `${(num * 100).toFixed(digits)}%`;
 }
 
 export function formatDuration(duration: moment.Duration, includeSeconds = true) {
@@ -324,7 +345,6 @@ export const loadScript = (scriptURI) => {
   });
 };
 
-
 export const removeOrAddClasslistToAllElements = (
   cardList: ICardListItem[],
   classlist: string,
@@ -342,4 +362,34 @@ export const removeOrAddClasslistToAllElements = (
 
     return METHODS[method]();
   });
+};
+
+export const tokensToTokenBaseUnits = (input: string, decimals: number) : string => {
+  // necessary unfortunately because BN.js can't parse decimal strings
+  const parts = input.split('.');
+  const zeroesToAdd = parts[1] ? decimals - parts[1].length : decimals;
+
+  if (zeroesToAdd < 0) { throw new Error('More decimals supplied than are'); }
+  return parts[0] + (parts[1] ? parts[1] : '') + '0'.repeat(zeroesToAdd);
+};
+
+export const tokenBaseUnitsToTokens = (input: string, decimals: number) => {
+  if (input === '0') return '0';
+  let partOne = ''; // part before decimal point
+  let partTwo = ''; // part after
+
+  if (input.length >= decimals + 1) {
+    partOne = input.substring(0, input.length - decimals);
+    partTwo = input.substring(partOne.length);
+  } else {
+    const zeroesAtBeginning = '0'.repeat(decimals - input.length);
+    partTwo = zeroesAtBeginning + input;
+  }
+
+  // cut off trailing zeroes
+  while (partTwo.charAt(partTwo.length - 1) === '0') {
+    partTwo = partTwo.slice(0, -1);
+  }
+
+  return `${partOne}${partTwo.length ? '.' : ''}${partTwo}`;
 };

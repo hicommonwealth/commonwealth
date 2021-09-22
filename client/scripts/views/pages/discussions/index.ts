@@ -6,24 +6,45 @@ import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 import moment from 'moment';
 import app from 'state';
+import { navigateToSubpage } from 'app';
 
-import { Spinner, Button, ButtonGroup, Icons, Icon, PopoverMenu, MenuItem, MenuDivider } from 'construct-ui';
-import { pluralize, offchainThreadStageToLabel } from 'helpers';
-import { NodeInfo, CommunityInfo, OffchainThreadStage, OffchainThread } from 'models';
+import {
+  Spinner,
+  Button,
+  Icons,
+  Icon,
+  PopoverMenu,
+  MenuItem,
+  MenuDivider,
+} from 'construct-ui';
+import {
+  pluralize,
+  offchainThreadStageToLabel,
+  parseCustomStages,
+} from 'helpers';
+import {
+  NodeInfo,
+  CommunityInfo,
+  OffchainThreadStage,
+  OffchainThread,
+} from 'models';
 
 import { updateLastVisited } from 'controllers/app/login';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
-import EmptyTopicPlaceholder, { EmptyStagePlaceholder } from 'views/components/empty_topic_placeholder';
+import EmptyListingPlaceholder from 'views/components/empty_topic_placeholder';
 import LoadingRow from 'views/components/loading_row';
 import Listing from 'views/pages/listing';
 import NewTopicModal from 'views/modals/new_topic_modal';
+import EditTopicThresholdsModal from 'views/modals/edit_topic_thresholds_modal';
 import EditTopicModal from 'views/modals/edit_topic_modal';
 import CreateInviteModal from 'views/modals/create_invite_modal';
+import Token from 'controllers/chain/ethereum/token/adapter';
 
 import { INITIAL_PAGE_SIZE } from 'controllers/server/threads';
 import PinnedListing from './pinned_listing';
 import DiscussionRow from './discussion_row';
+import { SummaryListing } from './summary_listing';
 
 export const ALL_PROPOSALS_KEY = 'COMMONWEALTH_ALL_PROPOSALS';
 
@@ -35,161 +56,359 @@ const getLastUpdate = (proposal: OffchainThread): number => {
 };
 
 const getLastSeenDivider = (hasText = true) => {
-  return m('.LastSeenDivider', hasText ? [
-    m('hr'),
-    m('span', 'Last visit'),
-    m('hr'),
-  ] : [
-    m('hr'),
-  ]);
+  return m(
+    '.LastSeenDivider',
+    hasText ? [m('hr'), m('span', 'Last visit'), m('hr')] : [m('hr')]
+  );
 };
 
-const DiscussionStagesBar: m.Component<{ topic: string, stage: string }, {}> = {
+export const CommunityOptionsPopover: m.Component<
+  { isAdmin: boolean; isMod: boolean },
+  {}
+> = {
   view: (vnode) => {
-    const { topic, stage } = vnode.attrs;
-
-    const featuredTopicIds = app.community?.meta?.featuredTopics || app.chain?.meta?.chain?.featuredTopics;
-    const topics = app.topics.getByCommunity(app.activeId()).map(({ id, name, description, telegram }) => {
-        return { id, name, description, telegram, featured_order: featuredTopicIds.indexOf(`${id}`) };
+    const { isAdmin, isMod } = vnode.attrs;
+    if (!isAdmin && !isMod && !app.community?.meta.invitesEnabled) return;
+    return m(PopoverMenu, {
+      class: 'community-options-popover',
+      position: 'bottom',
+      transitionDuration: 0,
+      hoverCloseDelay: 0,
+      closeOnContentClick: true,
+      trigger: m(Icon, {
+        name: Icons.CHEVRON_DOWN,
+        style: 'margin-left: 6px;',
+      }),
+      content: [
+        isAdmin &&
+          m(MenuItem, {
+            label: 'New topic',
+            onclick: (e) => {
+              e.preventDefault();
+              app.modals.create({ modal: NewTopicModal });
+            },
+          }),
+        isAdmin &&
+          (app.chain as Token)?.isToken &&
+          m(MenuItem, {
+            label: 'Edit topic thresholds',
+            onclick: (e) => {
+              e.preventDefault();
+              app.modals.create({ modal: EditTopicThresholdsModal });
+            },
+          }),
+        (app.community?.meta.invitesEnabled || isAdmin) &&
+          m(MenuItem, {
+            label: 'Invite members',
+            onclick: (e) => {
+              e.preventDefault();
+              const data = app.activeCommunityId()
+                ? { communityInfo: app.community.meta }
+                : { chainInfo: app.chain.meta.chain };
+              app.modals.create({
+                modal: CreateInviteModal,
+                data,
+              });
+            },
+          }),
+        isAdmin &&
+          m(MenuItem, {
+            label: 'Manage community',
+            onclick: (e) => {
+              e.preventDefault();
+              app.modals.lazyCreate('manage_community_modal');
+            },
+          }),
+        (isAdmin || isMod) &&
+          app.activeId() &&
+          m(MenuItem, {
+            label: 'Analytics',
+            onclick: (e) => navigateToSubpage('/analytics'),
+          }),
+      ],
     });
-    const featuredTopics = topics.filter((t) => t.featured_order !== -1)
+  },
+};
+
+const DiscussionFilterBar: m.Component<
+  { topic: string; stage: string; parentState; disabled: boolean },
+  {}
+> = {
+  view: (vnode) => {
+    const { topic, stage, disabled } = vnode.attrs;
+
+    const communityInfo = app.chain?.meta?.chain || app.community?.meta;
+    if (!communityInfo) return;
+    const { stagesEnabled, customStages } = communityInfo;
+
+    const featuredTopicIds = communityInfo.featuredTopics;
+    const topics = app.topics
+      .getByCommunity(app.activeId())
+      .map(
+        ({
+          id,
+          name,
+          description,
+          telegram,
+          featuredInSidebar,
+          featuredInNewPost,
+          defaultOffchainTemplate,
+        }) => {
+          return {
+            id,
+            name,
+            description,
+            telegram,
+            featured_order: featuredTopicIds.indexOf(`${id}`),
+            featuredInSidebar,
+            featuredInNewPost,
+            defaultOffchainTemplate,
+          };
+        }
+      );
+    const featuredTopics = topics
+      .filter((t) => t.featured_order !== -1)
       .sort((a, b) => Number(a.featured_order) - Number(b.featured_order));
-    const otherTopics = topics.filter((t) => t.featured_order === -1)
+    const otherTopics = topics
+      .filter((t) => t.featured_order === -1)
       .sort((a, b) => a.name.localeCompare(b.name));
 
     const selectedTopic = topics.find((t) => topic && topic === t.name);
-    const selectedStage = [
-      OffchainThreadStage.Discussion,
-      OffchainThreadStage.ProposalInReview,
-      OffchainThreadStage.Voting,
-      OffchainThreadStage.Passed,
-      OffchainThreadStage.Failed,
-    ].find((s) => s === stage as any);
+    const stages = !customStages
+      ? [
+          OffchainThreadStage.Discussion,
+          OffchainThreadStage.ProposalInReview,
+          OffchainThreadStage.Voting,
+          OffchainThreadStage.Passed,
+          OffchainThreadStage.Failed,
+        ]
+      : parseCustomStages(customStages);
 
-    return m('.DiscussionStagesBar.discussions-stages', [
-      topics.length > 0 && m(PopoverMenu, {
-        trigger: m(Button, {
-          rounded: true,
-          compact: true,
-          class: 'discussions-topic',
-          label: selectedTopic ? `Filter: ${topic}` : 'All Discussions',
-          iconRight: Icons.CHEVRON_DOWN,
-          size: 'sm',
-        }),
-        inline: true,
-        hasArrow: false,
-        transitionDuration: 0,
-        closeOnContentClick: true,
-        class: 'DiscussionStagesBarTopicsPopover',
-        content: m('.discussions-topic-items', [
-          m(MenuItem, {
-            active: (m.route.get() === `/${app.activeId()}` || !topic),
-            iconLeft: (m.route.get() === `/${app.activeId()}` || !topic) ? Icons.CHECK : null,
-            label: 'All Discussions',
-            onclick: () => { m.route.set(`/${app.activeId()}`); },
+    const selectedStage = stages.find((s) => s === (stage as any));
+
+    const summaryViewEnabled = vnode.attrs.parentState.summaryView;
+
+    return m('.DiscussionFilterBar', [
+      topics.length > 0 &&
+        m(PopoverMenu, {
+          trigger: m(Button, {
+            rounded: true,
+            compact: true,
+            class: 'topic-filter',
+            label: selectedTopic ? `Topic: ${topic}` : 'All Discussions',
+            iconRight: Icons.CHEVRON_DOWN,
+            size: 'sm',
+            disabled,
           }),
-          m(MenuDivider),
-          // featured topics
-          featuredTopics.concat(otherTopics).map(({ id, name, description, telegram }, idx) => m(MenuItem, {
-            key: name,
-            active: (m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name.toString().trim())}`
-                     || (topic && topic === name)),
-            iconLeft: (m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name.toString().trim())}`
-                        || (topic && topic === name)) ? Icons.CHECK : null,
-            onclick: (e) => {
-              e.preventDefault();
-              m.route.set(`/${app.activeId()}/discussions/${name}`);
-            },
-            label: m('.topic-menu-item', [
-              m('.topic-menu-item-name', name),
-              app.user?.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() }) && m(Button, {
-                size: 'xs',
-                label: 'Edit',
-                class: 'edit-topic-button',
-                compact: true,
-                rounded: true,
-                onclick: (e) => {
-                  e.preventDefault();
-                  app.modals.create({
-                    modal: EditTopicModal,
-                    data: { id, name, description, telegram },
+          inline: true,
+          hasArrow: false,
+          transitionDuration: 0,
+          closeOnContentClick: true,
+          class: 'TopicsFilterPopover',
+          content: m('.discussions-topic-items', [
+            m(MenuItem, {
+              active: m.route.get() === `/${app.activeId()}` || !topic,
+              iconLeft:
+                m.route.get() === `/${app.activeId()}` || !topic
+                  ? Icons.CHECK
+                  : null,
+              label: 'All Discussions',
+              onclick: () => {
+                localStorage.setItem('discussion-summary-toggle', 'false');
+                vnode.attrs.parentState.summaryView = false;
+                navigateToSubpage('/');
+              },
+            }),
+            m(MenuDivider),
+            // featured topics
+            featuredTopics
+              .concat(otherTopics)
+              .map(
+                (
+                  {
+                    id,
+                    name,
+                    description,
+                    telegram,
+                    featuredInSidebar,
+                    featuredInNewPost,
+                    defaultOffchainTemplate,
+                  },
+                  idx
+                ) => {
+                  const active =
+                    m.route.get() ===
+                      `/${app.activeId()}/discussions/${encodeURI(
+                        name.toString().trim()
+                      )}` ||
+                    (topic && topic === name);
+                  return m(MenuItem, {
+                    key: name,
+                    active,
+                    // iconLeft: active ? Icons.CHECK : null,
+                    onclick: (e) => {
+                      e.preventDefault();
+                      navigateToSubpage(`/discussions/${name}`);
+                      vnode.attrs.parentState.summaryView = false;
+                      localStorage.setItem(
+                        'discussion-summary-toggle',
+                        'false'
+                      );
+                    },
+                    label: m('.topic-menu-item', [
+                      active && m(Icon, { name: Icons.CHECK }),
+                      m('.topic-menu-item-name', name),
+                      app.user?.isAdminOfEntity({
+                        chain: app.activeChainId(),
+                        community: app.activeCommunityId(),
+                      }) &&
+                        m(Button, {
+                          size: 'xs',
+                          label: 'Edit',
+                          class: 'edit-topic-button',
+                          compact: true,
+                          rounded: true,
+                          onclick: (e) => {
+                            e.preventDefault();
+                            app.modals.create({
+                              modal: EditTopicModal,
+                              data: {
+                                id,
+                                name,
+                                description,
+                                telegram,
+                                featuredInSidebar,
+                                featuredInNewPost,
+                                defaultOffchainTemplate,
+                              },
+                            });
+                          },
+                        }),
+                    ]),
                   });
                 }
-              }),
-            ]),
-          })),
-        ]),
-      }),
-      m(PopoverMenu, {
-        trigger: m(Button, {
+              ),
+          ]),
+        }),
+      stagesEnabled &&
+        m(PopoverMenu, {
+          trigger: m(Button, {
+            rounded: true,
+            compact: true,
+            class: 'stage-filter',
+            label: selectedStage
+              ? `Stage: ${offchainThreadStageToLabel(selectedStage)}`
+              : 'All Stages',
+            iconRight: Icons.CHEVRON_DOWN,
+            size: 'sm',
+            disabled,
+          }),
+          inline: true,
+          hasArrow: false,
+          transitionDuration: 0,
+          closeOnContentClick: true,
+          class: 'StagesFilterPopover',
+          content: m('.discussions-stage-items', [
+            m(MenuItem, {
+              onclick: (e) => {
+                e.preventDefault();
+                vnode.attrs.parentState.summaryView = false;
+                localStorage.setItem('discussion-summary-toggle', 'false');
+                navigateToSubpage('/');
+              },
+              active: !stage,
+              iconLeft: !stage ? Icons.CHECK : null,
+              label: 'All Stages',
+            }),
+            m(MenuDivider),
+            stages.map((targetStage, index) =>
+              m(MenuItem, {
+                active: stage === targetStage,
+                iconLeft: stage === targetStage ? Icons.CHECK : null,
+                onclick: (e) => {
+                  e.preventDefault();
+                  vnode.attrs.parentState.summaryView = false;
+                  localStorage.setItem('discussion-summary-toggle', 'false');
+                  navigateToSubpage(`/?stage=${targetStage}`);
+                },
+                label: [
+                  `${offchainThreadStageToLabel(targetStage)}`,
+                  targetStage === OffchainThreadStage.Voting &&
+                    m(
+                      '.discussions-stage-count',
+                      `${app.threads.numVotingThreads}`
+                    ),
+                ],
+              })
+            ),
+          ]),
+        }),
+      topics.length > 0 &&
+        m(Button, {
           rounded: true,
           compact: true,
-          class: 'discussions-stage',
-          label: selectedStage ? `Filter: ${offchainThreadStageToLabel(selectedStage)}` : 'All Stages',
-          iconRight: Icons.CHEVRON_DOWN,
+          class: `summary-toggle ${summaryViewEnabled ? 'active' : 'inactive'}`,
+          label: 'Summary',
           size: 'sm',
+          disabled,
+          onclick: async (e) => {
+            e.preventDefault();
+            localStorage.setItem('discussion-summary-toggle', 'true');
+            vnode.attrs.parentState.summaryView = true;
+            navigateToSubpage('/');
+          },
         }),
-        inline: true,
-        hasArrow: false,
-        transitionDuration: 0,
-        closeOnContentClick: true,
-        class: 'DiscussionStagesBarTopicsPopover',
-        content: m('.discussions-stage-items', [
-          m(MenuItem, {
-            onclick: (e) => {
-              e.preventDefault();
-              m.route.set(`/${app.activeId()}`);
-            },
-            active: !stage,
-            iconLeft: !stage ? Icons.CHECK : null,
-            label: 'All Stages'
-          }),
-          m(MenuDivider),
-          [
-            // OffchainThreadStage.Discussion,
-            OffchainThreadStage.ProposalInReview,
-            OffchainThreadStage.Voting,
-            OffchainThreadStage.Passed,
-            OffchainThreadStage.Failed,
-          ].map((targetStage, index) => m(MenuItem, {
-            active: stage === targetStage,
-            iconLeft: stage === targetStage ? Icons.CHECK : null,
-            onclick: (e) => {
-              e.preventDefault();
-              m.route.set(`/${app.activeId()}?stage=${targetStage}`);
-            },
-            label: [
-              `${offchainThreadStageToLabel(targetStage)}`,
-              targetStage === OffchainThreadStage.ProposalInReview
-                && [ ' ', m('.discussions-stage-count', `${app.threads.numPrevotingThreads}`) ],
-              targetStage === OffchainThreadStage.Voting
-                && [ ' ', m('.discussions-stage-count', `${app.threads.numVotingThreads}`) ],
-            ],
-          })),
-        ]),
+      m(Button, {
+        rounded: true,
+        compact: true,
+        class: `latest-toggle ${summaryViewEnabled ? 'inactive' : 'active'}`,
+        label: 'Latest',
+        size: 'sm',
+        disabled,
+        onclick: async (e) => {
+          e.preventDefault();
+          vnode.attrs.parentState.summaryView = false;
+          localStorage.setItem('discussion-summary-toggle', 'false');
+        },
       }),
     ]);
-  }
+  },
 };
 
-const DiscussionsPage: m.Component<{ topic?: string }, {
-  lookback?: { [community: string]: moment.Moment} ;
-  postsDepleted: { [community: string]: boolean };
-  topicInitialized: { [community: string]: boolean };
-  lastSubpage: string;
-  lastVisitedUpdated?: boolean;
-  onscroll: any;
-}> = {
+const DiscussionsPage: m.Component<
+  {
+    topic?: string;
+  },
+  {
+    lookback?: { [community: string]: moment.Moment };
+    postsDepleted: { [community: string]: boolean };
+    topicInitialized: { [community: string]: boolean };
+    lastSubpage: string;
+    lastVisitedUpdated?: boolean;
+    onscroll: any;
+    summaryView: boolean;
+    recentThreads: { threads: OffchainThread[]; activitySummary };
+    loadingRecentThreads: boolean;
+  }
+> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', {
       'Page Name': 'DiscussionsPage',
       Scope: app.activeId(),
     });
 
-    const returningFromThread = (app.lastNavigatedBack() && app.lastNavigatedFrom().includes('/proposal/discussion/'));
-    if (returningFromThread && localStorage[`${app.activeId()}-discussions-scrollY`]) {
+    const returningFromThread =
+      app.lastNavigatedBack() &&
+      app.lastNavigatedFrom().includes('/proposal/discussion/');
+    if (
+      returningFromThread &&
+      localStorage[`${app.activeId()}-discussions-scrollY`]
+    ) {
       setTimeout(() => {
-        window.scrollTo(0, Number(localStorage[`${app.activeId()}-discussions-scrollY`]));
+        window.scrollTo(
+          0,
+          Number(localStorage[`${app.activeId()}-discussions-scrollY`])
+        );
       }, 100);
     }
 
@@ -202,51 +421,104 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
     vnode.state.lookback = {};
     vnode.state.postsDepleted = {};
     vnode.state.topicInitialized = {};
-    vnode.state.topicInitialized[ALL_PROPOSALS_KEY] = true;
+    vnode.state.topicInitialized[ALL_PROPOSALS_KEY] = false;
     const topic = vnode.attrs.topic;
     const stage = m.route.param('stage');
-    const subpage = (topic || stage) ? `${topic || ''}#${stage || ''}` : ALL_PROPOSALS_KEY;
-    const returningFromThread = (app.lastNavigatedBack() && app.lastNavigatedFrom().includes('/proposal/discussion/'));
-    vnode.state.lookback[subpage] = (returningFromThread && localStorage[`${app.activeId()}-lookback-${subpage}`])
-      ? moment.unix(parseInt(localStorage[`${app.activeId()}-lookback-${subpage}`], 10))
-      : moment.isMoment(vnode.state.lookback[subpage])
+    const subpage =
+      topic || stage ? `${topic || ''}#${stage || ''}` : ALL_PROPOSALS_KEY;
+    const returningFromThread =
+      app.lastNavigatedBack() &&
+      app.lastNavigatedFrom().includes('/proposal/discussion/');
+    vnode.state.lookback[subpage] =
+      returningFromThread &&
+      localStorage[`${app.activeId()}-lookback-${subpage}`]
+        ? moment.unix(
+            parseInt(localStorage[`${app.activeId()}-lookback-${subpage}`], 10)
+          )
+        : moment.isMoment(vnode.state.lookback[subpage])
         ? vnode.state.lookback[subpage]
         : moment();
+    if (app.lastNavigatedBack()) {
+      if (localStorage.getItem('discussion-summary-toggle') === 'true') {
+        vnode.state.summaryView = true;
+      }
+    } else {
+      if (!vnode.state.summaryView) {
+        localStorage.setItem('discussion-summary-toggle', 'false');
+      }
+    }
   },
   view: (vnode) => {
-    const { topic } = vnode.attrs;
-    const stage = m.route.param('stage');
-    const activeEntity = app.community ? app.community : app.chain;
-    if (!activeEntity) return m(PageLoading, {
-      title: 'Discussions',
-      showNewProposalButton: true,
-    });
+    let { topic } = vnode.attrs;
+    const { summaryView, recentThreads } = vnode.state;
+    if (summaryView && !recentThreads?.threads?.length) {
+      vnode.state.loadingRecentThreads = true;
+      app.recentActivity
+        .getRecentCommunityActivity({
+          communityId: app.activeCommunityId(),
+          chainId: app.activeChainId(),
+        })
+        .then((res) => {
+          vnode.state.loadingRecentThreads = false;
+          vnode.state.recentThreads = res;
+          m.redraw();
+        });
+    }
 
-    const subpage = (topic || stage) ? `${topic || ''}#${stage || ''}` : ALL_PROPOSALS_KEY;
+    let stage = m.route.param('stage');
+    const activeEntity = app.community || app.chain;
+    if (!activeEntity)
+      return m(PageLoading, {
+        title: 'Discussions',
+        showNewProposalButton: true,
+      });
+
+    if (summaryView) {
+      // overwrite any topic- or stage-scoping in URL
+      topic = null;
+      stage = null;
+    }
+    const subpage =
+      topic || stage ? `${topic || ''}#${stage || ''}` : ALL_PROPOSALS_KEY;
 
     // add chain compatibility (node info?)
-    if (app.community && !activeEntity?.serverLoaded) return m(PageLoading, {
-      title: 'Discussions',
-      showNewProposalButton: true,
-    });
+    if (app.community && !activeEntity?.serverLoaded)
+      return m(PageLoading, {
+        title: 'Discussions',
+        showNewProposalButton: true,
+      });
 
     const activeNode = app.chain?.meta;
-    const selectedNodes = app.config.nodes.getAll().filter((n) => activeNode && n.url === activeNode.url
-                                       && n.chain && activeNode.chain && n.chain.id === activeNode.chain.id);
+    const selectedNodes = app.config.nodes
+      .getAll()
+      .filter(
+        (n) =>
+          activeNode &&
+          n.url === activeNode.url &&
+          n.chain &&
+          activeNode.chain &&
+          n.chain.id === activeNode.chain.id
+      );
     const selectedNode = selectedNodes.length > 0 && selectedNodes[0];
     const selectedCommunity = app.community;
 
     const communityName = selectedNode
-      ? selectedNode.chain.name : selectedCommunity ? selectedCommunity.meta.name : '';
+      ? selectedNode.chain.name
+      : selectedCommunity
+      ? selectedCommunity.meta.name
+      : '';
 
-    const allLastVisited = (typeof app.user.lastVisited === 'string')
-      ? JSON.parse(app.user.lastVisited)
-      : app.user.lastVisited;
+    const allLastVisited =
+      typeof app.user.lastVisited === 'string'
+        ? JSON.parse(app.user.lastVisited)
+        : app.user.lastVisited;
     if (!vnode.state.lastVisitedUpdated) {
       vnode.state.lastVisitedUpdated = true;
-      updateLastVisited(app.community
-        ? (activeEntity.meta as CommunityInfo)
-        : (activeEntity.meta as NodeInfo).chain);
+      updateLastVisited(
+        app.community
+          ? (activeEntity.meta as CommunityInfo)
+          : (activeEntity.meta as NodeInfo).chain
+      );
     }
 
     // select the appropriate lastVisited timestamp from the chain||community & convert to Moment
@@ -271,57 +543,72 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
       return tsA - tsB;
     };
 
-    let listing = [];
+    let sortedListing = [];
     const allThreads = app.threads.listingStore
-      .getByCommunityAndTopic(app.activeId(), topic, stage)
+      .getByCommunityTopicAndStage(app.activeId(), topic, stage)
       .sort(orderDiscussionsbyLastComment);
 
     if (allThreads.length > 0) {
       // pinned threads - inserted at the top of the listing
       const pinnedThreads = allThreads.filter((t) => t.pinned);
       if (pinnedThreads.length > 0) {
-        listing.push(m(PinnedListing, { proposals: pinnedThreads }));
+        sortedListing.push(m(PinnedListing, { proposals: pinnedThreads }));
       }
     }
 
-    const sortedThreads = allThreads.filter((t) => !t.pinned);
+    const unpinnedThreads = allThreads.filter((t) => !t.pinned);
 
-    const firstThread = sortedThreads[0];
-    const lastThread = sortedThreads[sortedThreads.length - 1];
+    const firstThread = unpinnedThreads[0];
+    const lastThread = unpinnedThreads[unpinnedThreads.length - 1];
 
-    if (sortedThreads.length > 0) {
+    if (unpinnedThreads.length > 0) {
       let visitMarkerPlaced = false;
-      vnode.state.lookback[subpage] = moment.unix(getLastUpdate(sortedThreads[sortedThreads.length - 1]));
+      vnode.state.lookback[subpage] = moment.unix(
+        getLastUpdate(unpinnedThreads[unpinnedThreads.length - 1])
+      );
 
-      if (allThreads.length > sortedThreads.length) {
+      if (allThreads.length > unpinnedThreads.length) {
         if (firstThread) {
           if (getLastUpdate(firstThread) > lastVisited.unix()) {
-            listing.push(getLastSeenDivider(false));
+            sortedListing.push(getLastSeenDivider(false));
           } else {
-            listing.push(m('.PinnedDivider', m('hr')));
+            sortedListing.push(m('.PinnedDivider', m('hr')));
           }
         }
       }
 
-      const allThreadsSeen = () => firstThread && getLastUpdate(firstThread) < lastVisited.unix();
-      const noThreadsSeen = () => lastThread && getLastUpdate(lastThread) > lastVisited.unix();
+      const allThreadsSeen = () =>
+        firstThread && getLastUpdate(firstThread) < lastVisited.unix();
+      const noThreadsSeen = () =>
+        lastThread && getLastUpdate(lastThread) > lastVisited.unix();
 
       if (noThreadsSeen() || allThreadsSeen()) {
-        listing.push(m('.discussion-group-wrap', sortedThreads
-          .map((proposal) => m(DiscussionRow, { proposal }))));
+        sortedListing.push(
+          m(
+            '.discussion-group-wrap',
+            unpinnedThreads.map((proposal) => m(DiscussionRow, { proposal }))
+          )
+        );
       } else {
         let count = 0;
-        sortedThreads.forEach((proposal) => {
-          const row = m(DiscussionRow, { proposal });
-          if (!visitMarkerPlaced && getLastUpdate(proposal) < lastVisited.unix()) {
-            listing = [m('.discussion-group-wrap', listing), getLastSeenDivider(), m('.discussion-group-wrap', [row])];
+        unpinnedThreads.forEach((proposal) => {
+          if (
+            !visitMarkerPlaced &&
+            getLastUpdate(proposal) < lastVisited.unix()
+          ) {
+            const sortedListingCopy = sortedListing;
+            sortedListing = [
+              m('.discussion-group-wrap', sortedListingCopy),
+              getLastSeenDivider(),
+              m('.discussion-group-wrap', [m(DiscussionRow, { proposal })]),
+            ];
             visitMarkerPlaced = true;
             count += 1;
           } else {
             if (visitMarkerPlaced) {
-              listing[2].children.push(row);
+              sortedListing[2].children.push(m(DiscussionRow, { proposal }));
             } else {
-              listing.push(row);
+              sortedListing.push(m(DiscussionRow, { proposal }));
             }
             count += 1;
           }
@@ -338,16 +625,20 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
       if (topic) {
         topicId = app.topics.getByName(topic, app.activeId())?.id;
         if (!topicId) {
-          return m(Sublayout, {
-            class: 'DiscussionsPage',
-            title: 'Discussions',
-            showNewProposalButton: true,
-          }, [
-            m(EmptyTopicPlaceholder, {
-              communityName: app.activeId(),
-              topicName: topic,
-            }),
-          ]);
+          return m(
+            Sublayout,
+            {
+              class: 'DiscussionsPage',
+              title: 'Discussions',
+              showNewProposalButton: true,
+            },
+            [
+              m(EmptyListingPlaceholder, {
+                communityName: app.activeId(),
+                topicName: topic,
+              }),
+            ]
+          );
         }
       }
 
@@ -373,7 +664,10 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
           m.redraw();
         });
         vnode.state.topicInitialized[subpage] = true;
-      } else if (allThreads.length < INITIAL_PAGE_SIZE && subpage === ALL_PROPOSALS_KEY) {
+      } else if (
+        allThreads.length < INITIAL_PAGE_SIZE &&
+        subpage === ALL_PROPOSALS_KEY
+      ) {
         vnode.state.postsDepleted[subpage] = true;
       }
 
@@ -382,7 +676,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
         if (vnode.state.postsDepleted[subpage]) return;
         const scrollHeight = $(document).height();
         const scrollPos = $(window).height() + $(window).scrollTop();
-        if (scrollPos > (scrollHeight - 400)) {
+        if (scrollPos > scrollHeight - 400) {
           options.cutoffDate = vnode.state.lookback[subpage];
           const morePostsRemaining = await app.threads.loadNextPage(options);
           if (!morePostsRemaining) vnode.state.postsDepleted[subpage] = true;
@@ -405,108 +699,107 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
       vnode.state.lastSubpage = subpage;
     }
 
-    let topicId;
     let topicName;
     let topicDescription;
     if (topic && app.activeId()) {
       const topics = app.topics.getByCommunity(app.activeId());
       const topicObject = topics.find((t) => t.name === topic);
-      topicId = topicObject?.id;
       topicName = topicObject?.name;
       topicDescription = topicObject?.description;
     }
 
-    localStorage.setItem(`${app.activeId()}-lookback-${subpage}`, `${vnode.state.lookback[subpage].unix()}`);
-    const stillFetching = (allThreads.length === 0 && vnode.state.postsDepleted[subpage] === false);
-    const emptyTopic = (allThreads.length === 0 && vnode.state.postsDepleted[subpage] === true && !stage);
-    const emptyStage = (allThreads.length === 0 && vnode.state.postsDepleted[subpage] === true && !!stage);
+    localStorage.setItem(
+      `${app.activeId()}-lookback-${subpage}`,
+      `${vnode.state.lookback[subpage].unix()}`
+    );
+    const stillFetching =
+      unpinnedThreads.length === 0 && !vnode.state.postsDepleted[subpage];
+    const isLoading =
+      vnode.state.loadingRecentThreads ||
+      !activeEntity ||
+      !activeEntity.serverLoaded ||
+      stillFetching;
+    const isEmpty =
+      !isLoading &&
+      allThreads.length === 0 &&
+      vnode.state.postsDepleted[subpage] === true;
+    const postsDepleted =
+      allThreads.length > 0 && vnode.state.postsDepleted[subpage];
 
-    const isAdmin = app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
+    const isAdmin =
+      app.user.isSiteAdmin ||
+      app.user.isAdminOfEntity({
+        chain: app.activeChainId(),
+        community: app.activeCommunityId(),
+      });
     const isMod = app.user.isRoleOfCommunity({
-      role: 'moderator', chain: app.activeChainId(), community: app.activeCommunityId()
+      role: 'moderator',
+      chain: app.activeChainId(),
+      community: app.activeCommunityId(),
     });
 
-    return m(Sublayout, {
-      class: 'DiscussionsPage',
-      title: [
-        'Discussions',
-        (isAdmin || isMod || app.community?.meta.invitesEnabled)
-          && m(PopoverMenu, {
-            class: 'sidebar-edit-topic',
-            position: 'bottom',
-            transitionDuration: 0,
-            hoverCloseDelay: 0,
-            closeOnContentClick: true,
-            trigger: m(Icon, {
-              name: Icons.CHEVRON_DOWN,
-              style: 'margin-left: 6px;',
-            }),
-            content: [
-              isAdmin && m(MenuItem, {
-                label: 'New topic',
-                onclick: (e) => {
-                  e.preventDefault();
-                  app.modals.create({ modal: NewTopicModal });
-                }
+    return m(
+      Sublayout,
+      {
+        class: 'DiscussionsPage',
+        title: [
+          'Discussions',
+          (isAdmin || isMod || app.community?.meta.invitesEnabled) &&
+            m(CommunityOptionsPopover, { isAdmin, isMod }),
+        ],
+        description: topicDescription,
+        showNewProposalButton: true,
+      },
+      [
+        (app.chain || app.community) && [
+          m('.discussions-main', [
+            !isEmpty &&
+              m(DiscussionFilterBar, {
+                topic: topicName,
+                stage,
+                parentState: vnode.state,
+                disabled: isLoading || stillFetching,
               }),
-              (app.community?.meta.invitesEnabled || isAdmin) && m(MenuItem, {
-                label: 'Invite members',
-                onclick: (e) => {
-                  e.preventDefault();
-                  const data = app.activeCommunityId()
-                    ? { communityInfo: app.community.meta } : { chainInfo: app.chain.meta.chain };
-                  app.modals.create({
-                    modal: CreateInviteModal,
-                    data,
-                  });
-                },
-              }),
-              isAdmin && m(MenuItem, {
-                label: 'Manage community',
-                onclick: (e) => {
-                  e.preventDefault();
-                  app.modals.lazyCreate('manage_community_modal');
-                }
-              }),
-              (isAdmin || isMod) && app.activeId() && m(MenuItem, {
-                label: 'Analytics',
-                onclick: (e) => m.route.set(`/${app.activeId()}/analytics`),
-              }),
-            ],
-          }),
-      ],
-      description: topicDescription,
-      showNewProposalButton: true,
-    }, [
-      (app.chain || app.community) && [
-        m('.discussions-main', [
-          m(DiscussionStagesBar, { topic: topicName, stage }),
-          (app.chain && (!activeEntity || !activeEntity.serverLoaded || stillFetching))
-            ? m('.discussions-main', [
-              m(LoadingRow),
-            ])
-            : emptyTopic
-              ? m(EmptyTopicPlaceholder, { communityName, topicName: topic })
-              : emptyStage
-                ? m(EmptyStagePlaceholder)
-                : listing.length === 0
-                  ? m('.topic-loading-spinner-wrap', [ m(Spinner, { active: true, size: 'lg' }) ])
-                  : m(Listing, { content: listing }),
-          // TODO: Incorporate infinite scroll into generic Listing component
-          (allThreads.length && vnode.state.postsDepleted[subpage])
-            ? m('.infinite-scroll-reached-end', [
-              `Showing ${allThreads.length} of ${pluralize(allThreads.length, 'thread')}`,
-              (topic ? ` under the topic '${topic}'` : '')
-            ])
-            : (allThreads.length)
-              ? m('.infinite-scroll-spinner-wrap', [
-                m(Spinner, { active: !vnode.state.postsDepleted[subpage], size: 'lg' })
-              ])
-              : null
-        ])
+            m('.listing-wrap', [
+              summaryView
+                ? isLoading
+                  ? m(LoadingRow)
+                  : m(Listing, {
+                      content: [m(SummaryListing, { recentThreads })],
+                    })
+                : [
+                    isLoading
+                      ? m(LoadingRow)
+                      : isEmpty
+                      ? m(EmptyListingPlaceholder, {
+                          stageName: stage,
+                          communityName,
+                          topicName,
+                        })
+                      : m(Listing, { content: sortedListing }),
+                    postsDepleted
+                      ? m('.infinite-scroll-reached-end', [
+                          `Showing ${allThreads.length} of ${pluralize(
+                            allThreads.length,
+                            'thread'
+                          )}`,
+                          topic ? ` under the topic '${topic}'` : '',
+                        ])
+                      : isEmpty
+                      ? null
+                      : m('.infinite-scroll-spinner-wrap', [
+                          m(Spinner, {
+                            active: !vnode.state.postsDepleted[subpage],
+                            size: 'lg',
+                          }),
+                        ]),
+                  ],
+            ]),
+          ]),
+        ],
       ]
-    ]);
-  }
+    );
+  },
 };
 
 export default DiscussionsPage;

@@ -26,16 +26,15 @@ class Community extends ICommunityAdapter<Coin, OffchainAccount> {
     // If user is no longer on the initializing community, abort initialization
     // and return false, so that the invoking selectCommunity fn can similarly
     // break, rather than complete.
-    if (this.meta.id !== m.route.param('scope')) {
+    if (this.meta.id !== (this.app.customDomainId() || m.route.param('scope'))) {
       return false;
     }
 
     const {
-      threads, comments, reactions, topics, admins, activeUsers, numPrevotingThreads, numVotingThreads
+      threads, comments, reactions, topics, admins, activeUsers, numVotingThreads
     } = response.result;
-    this.app.threads.initialize(threads, numPrevotingThreads, numVotingThreads, true);
+    this.app.threads.initialize(threads, numVotingThreads, true);
     this.app.comments.initialize(comments, true);
-    this.app.reactions.initialize(reactions, true);
     this.app.topics.initialize(topics, true);
     this.meta.setAdmins(admins);
     this.app.recentActivity.setMostActiveUsers(activeUsers);

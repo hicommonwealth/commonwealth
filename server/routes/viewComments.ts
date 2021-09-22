@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { factory, formatFilename } from '../../shared/logging';
+import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -8,7 +9,7 @@ export const Errors = {
   NoRootId: 'Must provide root_id',
 };
 
-const viewComments = async (models, req: Request, res: Response, next: NextFunction) => {
+const viewComments = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
   if (error) return next(new Error(error));
 
@@ -26,13 +27,15 @@ const viewComments = async (models, req: Request, res: Response, next: NextFunct
       {
         model: models.OffchainReaction,
         as: 'reactions',
-        include: {
+        include: [{
           model: models.Address,
-          as: 'Address'
-        }
+          as: 'Address',
+          required: true
+        }]
       }
     ],
     order: [['created_at', 'DESC']],
+    paranoid: false,
   });
   return res.json({ status: 'Success', result: comments.map((c) => c.toJSON()) });
 };

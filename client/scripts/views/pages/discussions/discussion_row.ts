@@ -17,14 +17,12 @@ import {
 import { OffchainThread, OffchainThreadKind, OffchainThreadStage, AddressInfo } from 'models';
 import ReactionButton, { ReactionType } from 'views/components/reaction_button';
 import User from 'views/components/widgets/user';
-import QuillFormattedText from 'views/components/quill_formatted_text';
-import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import UserGallery from 'views/components/widgets/user_gallery';
 import ListingRow from 'views/components/listing_row';
 
 import DiscussionRowMenu from './discussion_row_menu';
 
-const getLastUpdated = (proposal) => {
+export const getLastUpdated = (proposal) => {
   const lastComment = Number(app.comments.lastCommented(proposal));
   const createdAt = Number(proposal.createdAt.utc());
   const lastUpdate = Math.max(createdAt, lastComment);
@@ -40,29 +38,18 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
     const discussionLink = `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-`
       + `${slugify(proposal.title)}`;
 
-    const rowHeader: any = [
-      (propType === OffchainThreadKind.Link && proposal.url)
-        && [
-          externalLink('a.external-discussion-link', proposal.url, extractDomain(proposal.url)),
-          ' ', // en space
-        ],
-      link('a', discussionLink, proposal.title),
-      ' ', // en space
-      proposal instanceof OffchainThread
-        && proposal.stage !== OffchainThreadStage.Discussion
-        && [
-          m(Button, {
-            class: 'discussion-row-stage',
-            label: offchainThreadStageToLabel(proposal.stage),
-            intent: proposal.stage === OffchainThreadStage.ProposalInReview ? 'positive'
-              : proposal.stage === OffchainThreadStage.Voting ? 'positive'
-                : proposal.stage === OffchainThreadStage.Passed ? 'positive'
-                  : proposal.stage === OffchainThreadStage.Failed ? 'negative' : 'none',
+    const rowHeader: any = link('a', discussionLink, proposal.title);
+    const rowSubheader = [
+      proposal.readOnly && [
+        m('.discussion-locked', [
+          m(Tag, {
             size: 'xs',
-            rounded: true,
-            compact: true,
+            label: [
+              m(Icon, { name: Icons.LOCK, size: 'xs' }),
+            ],
           }),
-        ],
+        ]),
+      ],
       proposal instanceof OffchainThread
         && (proposal.offchainVotingEndsAt || proposal.offchainVotingNumVotes)
         && [
@@ -72,7 +59,6 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
             contentRight: pluralize(proposal.offchainVotingNumVotes, 'vote'),
             intent: 'warning',
             size: 'xs',
-            rounded: true,
             compact: true,
           }),
         ],
@@ -89,25 +75,42 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
             ],
             intent: 'primary',
             size: 'xs',
-            rounded: true,
             compact: true,
           });
         }),
       ],
-    ];
-
-    const rowSubheader = [
-      proposal.readOnly && [
-        m('.discussion-locked', [
-          m(Tag, {
-            size: 'xs',
-            label: [
-              m(Icon, { name: Icons.LOCK, size: 'xs' }),
-            ],
-          }),
-        ]),
-        ' ', // em space
-      ],
+      proposal.snapshotProposal && m(Button, {
+        class: 'discussion-row-linked-chain-entity',
+        label: [
+          'Snap ',
+          `${proposal.snapshotProposal.slice(0, 4)}…`,
+        ],
+        intent: 'primary',
+        size: 'xs',
+        compact: true,
+      }),
+      proposal instanceof OffchainThread
+        && proposal.stage !== OffchainThreadStage.Discussion
+        && m(Button, {
+          class: 'discussion-row-stage-btn',
+          intent: proposal.stage === OffchainThreadStage.ProposalInReview ? 'positive'
+            : proposal.stage === OffchainThreadStage.Voting ? 'positive'
+              : proposal.stage === OffchainThreadStage.Passed ? 'positive'
+                : proposal.stage === OffchainThreadStage.Failed ? 'negative' : 'positive',
+          size: 'xs',
+          compact: true,
+          label: offchainThreadStageToLabel(proposal.stage),
+        }),
+      proposal instanceof OffchainThread && (
+        proposal.stage !== OffchainThreadStage.Discussion
+          || proposal.chainEntities?.length > 0
+          || (proposal.offchainVotingEndsAt || proposal.offchainVotingNumVotes)
+          || proposal.readOnly) && ' ', // en space
+      (propType === OffchainThreadKind.Link && proposal.url)
+        && [
+          externalLink('a.external-discussion-link', proposal.url, `Link: ${extractDomain(proposal.url)}`),
+          ' ', // em space
+        ],
       proposal.topic && [
         link('a.proposal-topic', `/${app.activeId()}/discussions/${proposal.topic.name}`, [
           m('span.proposal-topic-name', `${proposal.topic.name}`),
@@ -120,16 +123,17 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
         popover: true,
         hideAvatar: true,
         showAddressWithDisplayName: true,
+        hideIdentityIcon: true,
       }),
       proposal instanceof OffchainThread && proposal.collaborators && proposal.collaborators.length > 0
         && [
           ' ', // regular space
-          m('span.proposal-collaborators', [ ' +', pluralize(proposal.collaborators.length, 'collaborator') ]),
+          m('span.proposal-collaborators', ` +${proposal.collaborators.length}`),
         ],
       ' ', // em space
       m('.created-at', link('a', discussionLink, `Last active ${formatLastUpdated(getLastUpdated(proposal))}`)),
-      ' ', // em space
       m('.mobile-comment-count', [
+        ' ', // em space
         m(Icon, { name: Icons.MESSAGE_SQUARE }),
         app.comments.nComments(proposal),
       ]),
@@ -140,7 +144,7 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
         m(UserGallery, {
           avatarSize: 20,
           popover: true,
-          maxUsers: 4,
+          maxUsers: 2,
           users: app.comments.uniqueCommenters(
             proposal,
             proposal.author,

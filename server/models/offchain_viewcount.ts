@@ -1,43 +1,40 @@
 import * as Sequelize from 'sequelize';
-
+import { DataTypes, Model } from 'sequelize';
+import { ModelStatic } from './types';
 import { ChainAttributes } from './chain';
 import { OffchainCommunityAttributes } from './offchain_community';
 import { OffchainThreadAttributes } from './offchain_thread';
 
 export interface OffchainViewCountAttributes {
+  object_id: number;
+  view_count: number;
   id?: number;
   chain?: string;
   community?: string;
-  object_id: number;
-  view_count: number;
   Chain?: ChainAttributes;
   OffchainCommunity?: OffchainCommunityAttributes;
   OffchainThread?: OffchainThreadAttributes;
 }
 
 export interface OffchainViewCountInstance
-extends Sequelize.Instance<OffchainViewCountAttributes>, OffchainViewCountAttributes {
+extends Model<OffchainViewCountAttributes>, OffchainViewCountAttributes {
 
 }
 
-export interface OffchainViewCountModel
-extends Sequelize.Model<OffchainViewCountInstance, OffchainViewCountAttributes> {
-
-}
+export type OffchainViewCountModelStatic = ModelStatic<OffchainViewCountInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): OffchainViewCountModel => {
-  const OffchainViewCount = sequelize.define<
-    OffchainViewCountInstance, OffchainViewCountAttributes
-  >('OffchainViewCount', {
+  dataTypes: typeof DataTypes,
+): OffchainViewCountModelStatic => {
+  const OffchainViewCount = <OffchainViewCountModelStatic>sequelize.define('OffchainViewCount', {
     id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     chain: { type: dataTypes.STRING },
     community: { type: dataTypes.STRING },
     object_id: { type: dataTypes.INTEGER, allowNull: false },
     view_count: { type: dataTypes.INTEGER, allowNull: false },
   }, {
+    tableName: 'OffchainViewCounts',
     underscored: true,
     timestamps: false,
     indexes: [

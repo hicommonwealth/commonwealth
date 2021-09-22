@@ -12,12 +12,15 @@ import RecentActivityController from './controllers/app/recent_activity';
 import ProfilesController from './controllers/server/profiles';
 import CommentsController from './controllers/server/comments';
 import ThreadsController from './controllers/server/threads';
+import SnapshotController from './controllers/chain/snapshot';
 import ReactionsController from './controllers/server/reactions';
+import ReactionCountsController from './controllers/server/reactionCounts';
 import WebsocketController from './controllers/server/socket';
 import TopicsController from './controllers/server/topics';
 import CommunitiesController from './controllers/server/communities';
 import UserController from './controllers/server/user/index';
 import WebWalletController from './controllers/app/web_wallets';
+import { InviteCodeAttributes } from 'shared/types';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -30,7 +33,6 @@ export const enum LoginState {
   LoggedOut = 'logged_out',
   LoggedIn = 'logged_in',
 }
-
 
 export interface IApp {
   socket: WebsocketController;
@@ -47,7 +49,9 @@ export interface IApp {
   profiles: ProfilesController;
   comments: CommentsController;
   threads: ThreadsController;
+  snapshot: SnapshotController;
   reactions: ReactionsController;
+  reactionCounts: ReactionCountsController;
   topics: TopicsController;
   communities: CommunitiesController;
   user: UserController;
@@ -55,12 +59,12 @@ export interface IApp {
 
   recentActivity: RecentActivityController;
   searchCache: any;
+  searchAddressCache: any;
 
   // XXX: replace this with some app.chain helper
   activeChainId(): string;
   activeCommunityId(): string;
   activeId(): string;
-  defaultScope(): string;
 
   toasts: ToastStore;
   modals: ModalStore;
@@ -73,7 +77,7 @@ export interface IApp {
     contractCategories?: ContractCategory[];
     notificationCategories?: NotificationCategory[];
     defaultChain: string;
-    invites: any[];
+    invites: InviteCodeAttributes[];
   };
   loginStatusLoaded(): boolean;
   isLoggedIn(): boolean;
@@ -81,9 +85,10 @@ export interface IApp {
   serverUrl(): string;
   loadingError: string;
 
+  _customDomainId: string;
   isCustomDomain(): boolean;
-  setIsCustomDomain(option: boolean): void;
-  _isCustomDomain: boolean;
+  customDomainId(): string;
+  setCustomDomain(d: string): void;
 
   _lastNavigatedBack: boolean;
   _lastNavigatedFrom: string;
@@ -112,7 +117,9 @@ const app: IApp = {
   profiles: new ProfilesController(),
   comments: new CommentsController(),
   threads: new ThreadsController(),
+  snapshot: new SnapshotController(),
   reactions: new ReactionsController(),
+  reactionCounts: new ReactionCountsController(),
   topics: new TopicsController(),
   communities: new CommunitiesController(),
   user: new UserController(),
@@ -122,10 +129,11 @@ const app: IApp = {
 
   searchCache: {},
 
+  searchAddressCache: {},
+
   activeChainId: () => app.chain?.id,
   activeCommunityId: () => app.community?.meta.id,
   activeId: () => app.community ? app.activeCommunityId() : app.activeChainId(),
-  defaultScope: () => app.config.defaultChain,
 
   toasts: getToastStore(),
   modals: getModalStore(),
@@ -138,26 +146,17 @@ const app: IApp = {
     invites: [],
   },
   // TODO: Collect all getters into an object
-  loginStatusLoaded: () => {
-    return app.loginState !== LoginState.NotLoaded;
-  },
-  isLoggedIn: () => {
-    return app.loginState === LoginState.LoggedIn;
-  },
-  isProduction: () => {
-    return document.location.origin.indexOf('commonwealth.im') !== -1;
-  },
-  serverUrl: () => '/api',
+  loginStatusLoaded: () => app.loginState !== LoginState.NotLoaded,
+  isLoggedIn:        () => app.loginState === LoginState.LoggedIn,
+  isProduction:      () => document.location.origin.indexOf('commonwealth.im') !== -1,
+  serverUrl:         () => '/api',
 
   loadingError: null,
 
-  isCustomDomain: () => {
-    return app._isCustomDomain;
-  },
-  setIsCustomDomain: (option: boolean) => {
-    app._isCustomDomain = option;
-  },
-  _isCustomDomain: false,
+  _customDomainId: null,
+  isCustomDomain: () => app._customDomainId !== null,
+  customDomainId: () => { return app._customDomainId; },
+  setCustomDomain: (d) => { app._customDomainId = d; },
 
   _lastNavigatedFrom: null,
   _lastNavigatedBack: false,

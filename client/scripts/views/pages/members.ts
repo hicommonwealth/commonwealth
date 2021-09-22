@@ -1,20 +1,16 @@
 import 'pages/members.scss';
 
-import $ from 'jquery';
 import m from 'mithril';
 import _ from 'lodash';
-import moment from 'moment';
-import { Input, List, ListItem, PopoverMenu, MenuItem, Icon, Icons, Tag } from 'construct-ui';
+import { Tag, Table } from 'construct-ui';
 
 import app from 'state';
-import { AddressInfo, AbridgedThread } from 'models';
-import { pluralize, link } from 'helpers';
+import { navigateToSubpage } from 'app';
 
 import PageLoading from 'views/pages/loading';
-import User, { UserBlock } from 'views/components/widgets/user';
+import User from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
-import ManageCommunityModal from 'views/modals/manage_community_modal';
-import { formatAddressShort } from '../../../../shared/utils';
+import { CommunityOptionsPopover } from './discussions';
 
 interface MemberInfo {
   chain: string;
@@ -63,10 +59,18 @@ const MembersPage : m.Component<{}, { membersRequested: boolean, membersLoaded: 
         }
       });
     }
+
+    const isAdmin = app.user.isSiteAdmin
+    || app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
+    const isMod = app.user.isRoleOfCommunity({
+      role: 'moderator', chain: app.activeChainId(), community: app.activeCommunityId()
+    });
+
     if (!vnode.state.membersLoaded) return m(PageLoading, {
       message: 'Loading members',
       title: [
         'Members',
+        m(CommunityOptionsPopover, { isAdmin, isMod }),
         m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
       ],
       showNewProposalButton: true,
@@ -76,36 +80,35 @@ const MembersPage : m.Component<{}, { membersRequested: boolean, membersLoaded: 
       class: 'MembersPage',
       title: [
         'Members',
+        m(CommunityOptionsPopover, { isAdmin, isMod }),
         m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
       ],
       showNewProposalButton: true,
     }, [
-      // m('.members-caption', `Showing ${pluralize(activeAddresses.length, 'active member')}`),
-      m('.members-list', vnode.state.membersLoaded.map((info) => {
-        const profile = app.profiles.getProfile(info.chain, info.address);
-        return m('a.members-item', {
-          href: `/${app.activeId()}/account/${info.address}?base=${info.chain}`,
-          onclick: (e) => {
-            e.preventDefault();
-            localStorage[`${app.activeId()}-members-scrollY`] = window.scrollY;
-            m.route.set(`/${app.activeId()}/account/${info.address}?base=${info.chain}`);
-          }
-        }, [
-          m('.members-item-icon', [
-            m(User, { user: profile, avatarSize: 36, avatarOnly: true }),
-          ]),
-          m('.members-item-info', [
-            m(User, { user: profile, hideAvatar: true, popover: true, showRole: true }),
-            profile.headline
-              ? m('.members-item-headline', profile.headline)
-              : m('.members-item-address', formatAddressShort(profile.address, profile.chain)),
-            info.count > 0 && m('.members-item-posts', [
-              pluralize(info.count, 'post'),
-              ' this month'
+      m('.title', 'Members'),
+      m(Table, [
+        m('tr', [
+          m('th', 'Member'),
+          m('th.align-right', 'Posts/ Month'),
+        ]),
+        vnode.state.membersLoaded.map((info) => {
+          const profile = app.profiles.getProfile(info.chain, info.address);
+          return m('tr', [
+            m('td.members-item-info', [
+              m('a', {
+                href: `/${app.activeId()}/account/${info.address}?base=${info.chain}`,
+                onclick: (e) => {
+                  e.preventDefault();
+                  localStorage[`${app.activeId()}-members-scrollY`] = window.scrollY;
+                  navigateToSubpage(`/account/${info.address}?base=${info.chain}`);
+                }
+              }, [
+                m(User, { user: profile, showRole: true }),
+              ]),
             ]),
-          ]),
-        ]);
-      })),
+            m('td.align-right', info.count),
+          ]);
+        })]),
     ]);
   }
 };

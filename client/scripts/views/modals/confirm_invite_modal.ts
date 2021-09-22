@@ -7,10 +7,14 @@ import mixpanel from 'mixpanel-browser';
 import { Button, Icon, Icons } from 'construct-ui';
 
 import { orderAccountsByAddress } from 'helpers';
-import { notifyError } from 'controllers/app/notifications';
-import User, { UserBlock } from 'views/components/widgets/user';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { UserBlock } from 'views/components/widgets/user';
 import { CompactModalExitButton } from 'views/modal';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
+import { initAppState, navigateToSubpage } from 'app';
+import { InviteCodeAttributes } from 'shared/types';
+import { AddressInfo } from 'client/scripts/models';
+import LoginWithWalletDropdown from '../components/login_with_wallet_dropdown';
 
 const SideMenu: m.Component<{invites, onChangeHandler, location}, {}> = {
   view: (vnode) => {
@@ -29,13 +33,13 @@ const SideMenu: m.Component<{invites, onChangeHandler, location}, {}> = {
 };
 
 const ConfirmInviteModal: m.Component<{}, {
-  invites;
-  location;
-  isComplete;
-  selectedAddress;
-  addresses;
-  accepted;
-  rejected;
+  invites: InviteCodeAttributes[];
+  location: number;
+  isComplete: boolean;
+  selectedAddress: string;
+  addresses: AddressInfo[];
+  accepted: number[];
+  rejected: number[];
 }> = {
   oninit: (vnode) => {
     vnode.state.invites = app.config.invites;
@@ -54,19 +58,26 @@ const ConfirmInviteModal: m.Component<{}, {
   },
   view: (vnode) => {
     const SelectAddress = (account) => {
+      const isMobile = (window.innerWidth < 767.98);
       return m('.SwitchAddress.account-menu-item', {
         key: `${account.chain.id}-${account.address}`,
-        class: vnode.state.selectedAddress === account.address ? 'selected' : '',
+        class: vnode.state.selectedAddress === account.address
+          ? isMobile
+            ? 'selected mobile'
+            : 'selected'
+          : isMobile
+            ? 'mobile'
+            : '',
         onclick: (e) => {
           e.preventDefault();
           vnode.state.selectedAddress = account.address;
         },
       }, [
-        m(UserBlock, { user: account, showChainName: true })
+        m(UserBlock, { user: account, showChainName: true, addressDisplayOptions: { showFullAddress: !isMobile } })
       ]);
     };
 
-    const invites = vnode.state.invites;
+    const { invites, location } = vnode.state;
     let addresses;
     if (vnode.state.accepted.length + vnode.state.rejected.length === invites.length) {
       vnode.state.isComplete = true;
@@ -75,6 +86,12 @@ const ConfirmInviteModal: m.Component<{}, {
         .sort(orderAccountsByAddress)
         .map((account) => SelectAddress(account));
     }
+
+    const activeInvite = invites[location].community_id
+      ? app.config.communities.getById(invites[location].community_id)
+      : app.config.chains.getById(invites[location].chain_id);
+    const hasTermsOfService = !!activeInvite?.terms;
+
     return m('.ConfirmInviteModal', [
       m('.compact-modal-title', [
         !vnode.state.isComplete
@@ -85,18 +102,27 @@ const ConfirmInviteModal: m.Component<{}, {
       !vnode.state.isComplete
         && m(SideMenu, {
           invites,
-          location: vnode.state.location,
+          location,
           onChangeHandler: (result) => { vnode.state.location = result; vnode.state.selectedAddress = null; }
         }),
       invites.length > 0 && !vnode.state.isComplete
         ? m('.compact-modal-body', [
           m('p', [
             'You\'ve been invited to the ',
-            m('strong', invites[vnode.state.location].community_name),
-            ' community. Select an address to accept the invite:'
+            m('strong', invites[location].community_name),
+            ' community. ',
+            addresses.length > 0
+              ? 'Select an address to accept the invite:'
+              : 'To get started, connect an address:'
           ]),
-          vnode.state.accepted.includes(vnode.state.location) ? m('h4', 'You\'ve accepted this invite!')
-            : vnode.state.rejected.includes(vnode.state.location) ? m('h4', 'You\'ve already deleted this invite!') : [
+          hasTermsOfService
+          && m('p.terms-of-service', [
+            `By linking an address, you agree to ${activeInvite.name}'s `,
+            m('a', { href: activeInvite.terms, target: '_blank' }, 'terms of service'),
+            '.'
+          ]),
+          vnode.state.accepted.includes(location) ? m('h4', 'You\'ve accepted this invite!')
+            : vnode.state.rejected.includes(location) ? m('h4', 'You\'ve already deleted this invite!') : [
               m('.invite-addresses', [
                 addresses,
               ]),
@@ -105,23 +131,39 @@ const ConfirmInviteModal: m.Component<{}, {
                   class: 'submit',
                   intent: 'primary',
                   rounded: true,
-                  disabled: vnode.state.accepted.includes(vnode.state.location) || !vnode.state.selectedAddress,
+                  disabled: vnode.state.accepted.includes(location) || !vnode.state.selectedAddress,
                   onclick: (e) => {
                     e.preventDefault();
+                    const communityName = invites[location].community_name;
                     if (vnode.state.selectedAddress) {
                       app.user.acceptInvite({
                         address: vnode.state.selectedAddress,
-                        inviteCode: invites[vnode.state.location].id
+                        inviteCode: invites[location].id
                       }).then(() => {
                         app.config.invites = app.config.invites.filter(
-                          (invite) => invite.community_name !== invites[vnode.state.location].community_name
+                          (invite) => invite.community_name !== communityName
                         );
-                        vnode.state.accepted.push(vnode.state.location);
+                        vnode.state.accepted.push(location);
                         vnode.state.selectedAddress = null;
-                        m.redraw();
                         mixpanel.track('Address Selected', {
                           'Step': 'Address Selected for Invite',
                         });
+                        if (app.config.invites.length === 0) {
+                          $(e.target).trigger('modalexit');
+                        }
+                        const communityId = invites[location].community_id;
+                        const chainId = invites[location].chain_id;
+                        console.log({ communityId, chainId });
+                        // if private community, re-init app
+                        if (communityId && !app.config.communities.getByCommunity(communityId)) {
+                          initAppState().then(() => {
+                            m.route.set(`/${communityId}`);
+                            notifySuccess(`Successfully joined ${communityName}.`);
+                          });
+                        } else {
+                          m.route.set(`/${communityId || chainId}`);
+                          notifySuccess(`Successfully joined ${communityName}.`);
+                        }
                       }, (err) => {
                         notifyError('Error accepting invite');
                       });
@@ -134,27 +176,24 @@ const ConfirmInviteModal: m.Component<{}, {
                   class: 'reject',
                   intent: 'negative',
                   rounded: true,
-                  disabled: vnode.state.accepted.includes(vnode.state.location),
+                  disabled: vnode.state.accepted.includes(location),
                   onclick: async (e) => {
                     e.preventDefault();
                     const confirmed = await confirmationModalWithText(
                       'Reject this invite? You will need to be invited again.'
                     )();
                     if (!confirmed) return;
-                    $.post(`${app.serverUrl()}/acceptInvite`, {
-                      inviteCode: invites[vnode.state.location].id,
-                      reject: true,
-                      jwt: app.user.jwt,
-                    }).then((result) => {
-                      app.config.invites = app.config.invites.filter(
-                        (invite) => invite.community_name !== invites[vnode.state.location].community_name
-                      );
-                      vnode.state.rejected.push(vnode.state.location);
-                      vnode.state.selectedAddress = null;
-                      m.redraw();
-                    }, (err) => {
-                      notifyError('Error rejecting invite.');
-                    });
+                    app.user.rejectInvite({ inviteCode: invites[location].id })
+                      .then((result) => {
+                        app.config.invites = app.config.invites.filter(
+                          (invite) => invite.community_name !== invites[location].community_name
+                        );
+                        vnode.state.rejected.push(location);
+                        vnode.state.selectedAddress = null;
+                        m.redraw();
+                      }, (err) => {
+                        notifyError('Error rejecting invite.');
+                      });
                   },
                   label: 'Reject invite'
                 }),
@@ -175,7 +214,11 @@ const ConfirmInviteModal: m.Component<{}, {
                   const web3loginParams = joiningCommunity ? { prev, next, joiningCommunity } : { prev, next };
 
                   // redirect to /web3login to connect to the chain
-                  m.route.set(`/${app.chain?.id || defaultChainId}/web3login`, web3loginParams);
+                  if (app.activeId()) {
+                    navigateToSubpage('/web3login', web3loginParams);
+                  } else {
+                    m.route.set(`${defaultChainId}/web3login`, web3loginParams);
+                  }
 
                   // show web3 login modal
                   app.modals.lazyCreate('link_new_address_modal', {
@@ -188,6 +231,16 @@ const ConfirmInviteModal: m.Component<{}, {
                   });
                 }
               }, 'Connect a new address'),
+              addresses.length === 0 && m(LoginWithWalletDropdown, {
+                loggingInWithAddress: false,
+                joiningCommunity: invites[vnode.state.location].community_id,
+                joiningChain: app.chain?.id || 'edgeware',
+                label: 'Connect an address',
+                onSuccess: (e) => {
+                  // $('.ConfirmInviteModal').trigger('modalexit');
+                  m.route.set(`/${invites[vnode.state.location].community_id}`);
+                }
+              })
             ],
         ])
         : m('.compact-modal-body', [

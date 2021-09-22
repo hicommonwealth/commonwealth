@@ -15,7 +15,7 @@ const FooterLandingPage: m.Component<IState, IState> = {
         m('div', [
           m('img', {
             class: 'w-60',
-            src: 'static/img/logo.svg',
+            src: '/static/img/logo.svg',
             alt: 'Commonwealth',
           })
         ]),

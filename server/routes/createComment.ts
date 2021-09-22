@@ -1,7 +1,9 @@
 import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
+import BN from 'bn.js';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { NotificationCategories } from '../../shared/types';
+import { DB } from '../database';
 
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
@@ -11,11 +13,11 @@ import TokenBalanceCache from '../util/tokenBalanceCache';
 import { factory, formatFilename } from '../../shared/logging';
 
 import { SENDGRID_API_KEY } from '../config';
+
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 
 const log = factory.getLogger(formatFilename(__filename));
-
 export const Errors = {
   MissingRootId: 'Must provide root_id',
   InvalidParent: 'Invalid parent',
@@ -25,10 +27,11 @@ export const Errors = {
   CantCommentOnReadOnly: 'Cannot comment when thread is read_only',
   InsufficientTokenBalance: 'Users need to hold some of the community\'s tokens to comment',
   CouldNotFetchTokenBalance: 'Unable to fetch user\'s token balance',
+  NestingTooDeep: 'Comments can only be nested 2 levels deep'
 };
 
 const createComment = async (
-  models,
+  models: DB,
   tokenBalanceCache: TokenBalanceCache,
   req: Request,
   res: Response,
@@ -38,6 +41,9 @@ const createComment = async (
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));
+
+  const { parent_id, root_id, text } = req.body;
+
   if (chain && chain.type === 'token') {
     // skip check for admins
     const isAdmin = await models.Role.findAll({
@@ -47,18 +53,21 @@ const createComment = async (
         permission: ['admin'],
       },
     });
-    if (isAdmin.length === 0) {
+    if (!req.user.isAdmin && isAdmin.length === 0) {
       try {
-        const userHasBalance = await tokenBalanceCache.hasToken(chain.id, req.body.address);
-        if (!userHasBalance) return next(new Error(Errors.InsufficientTokenBalance));
+        const stage = root_id.substring(0, root_id.indexOf('_'));
+        const topic_id = root_id.substring(root_id.indexOf('_') + 1);
+        const thread = await models.OffchainThread.findOne({ where:{ stage, id: topic_id } });
+        const threshold = (await models.OffchainTopic.findOne({ where: { id: thread.topic_id } })).token_threshold;
+        const tokenBalance = await tokenBalanceCache.getBalance(chain.id, req.body.address);
+
+        if (threshold && tokenBalance.lt(new BN(threshold))) return next(new Error(Errors.InsufficientTokenBalance));
       } catch (e) {
         log.error(`hasToken failed: ${e.message}`);
         return next(new Error(Errors.CouldNotFetchTokenBalance));
       }
     }
   }
-
-  const { parent_id, root_id, text } = req.body;
 
   const plaintext = (() => {
     try {
@@ -68,10 +77,10 @@ const createComment = async (
     }
   })();
 
-  // TODO: 'let parentComment' here, saves one db query
+  let parentComment;
   if (parent_id) {
     // check that parent comment is in the same community
-    const parentCommentIsVisibleToUser = await models.OffchainComment.findOne({
+    parentComment = await models.OffchainComment.findOne({
       where: community ? {
         id: parent_id,
         community: community.id,
@@ -80,8 +89,26 @@ const createComment = async (
         chain: chain.id,
       }
     });
-    if (!parentCommentIsVisibleToUser) return next(new Error(Errors.InvalidParent));
+    if (!parentComment) return next(new Error(Errors.InvalidParent));
+
+    // Backend check to ensure comments are never nested more than three levels deep:
+    // top-level, child, and grandchild
+    if (parentComment.parent_id) {
+      const grandparentComment = await models.OffchainComment.findOne({
+        where: community ? {
+          id: parentComment.parent_id,
+          community: community.id,
+        } : {
+          id: parentComment.parent_id,
+          chain: chain.id,
+        }
+      });
+      if (grandparentComment?.parent_id) {
+        return next(new Error(Errors.NestingTooDeep));
+      }
+    }
   }
+
 
   if (!root_id) {
     return next(new Error(Errors.MissingRootId));
@@ -109,7 +136,6 @@ const createComment = async (
   const version_history : string[] = [ JSON.stringify(firstVersion) ];
   const commentContent = {
     root_id,
-    child_comments: [],
     text,
     plaintext,
     version_history,
@@ -127,24 +153,6 @@ const createComment = async (
     comment = await models.OffchainComment.create(commentContent);
   } catch (err) {
     return next(err);
-  }
-
-  let parentComment;
-  if (parent_id) {
-    // TODO: this query is unnecessary, we queried for parentComment earlier
-    parentComment = await models.OffchainComment.findOne({
-      where: community ? {
-        id: parent_id,
-        community: community.id,
-      } : {
-        id: parent_id,
-        chain: chain.id,
-      }
-    });
-    const arr = parentComment.child_comments;
-    arr.push(+comment.id);
-    parentComment.child_comments = arr;
-    await parentComment.save();
   }
 
   // TODO: attachments can likely be handled like mentions (see lines 10 & 11)
@@ -252,7 +260,7 @@ const createComment = async (
       mentionedAddresses = await Promise.all(mentions.map(async (mention) => {
         const user = await models.Address.findOne({
           where: {
-            chain: mention[0],
+            chain: mention[0] || null,
             address: mention[1],
           },
           include: [ models.User, models.Role ]

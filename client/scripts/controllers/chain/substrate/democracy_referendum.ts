@@ -232,10 +232,8 @@ export class SubstrateDemocracyReferendum
     this.updateVoters();
     this._Democracy.store.add(this);
 
-    // sometimes proposals don't get an execution OR DemocracyPassed/DemocracyNotPassed event
-    if (this._endBlock < this._Democracy.app.chain.block.height
-        + (this._Democracy.app.chain as Substrate).democracy.enactmentPeriod
-       && !this.completed) {
+    // fetcher cannot generate "NotPassed" events
+    if (this._endBlock < this._Democracy.app.chain.block.height && !this.passed && !this.completed) {
       this.complete();
     }
   }

@@ -53,7 +53,7 @@
     }
     .sublayout-sidebar-col {
         flex: 1;
-        padding-right: 30px;
+        padding-right: 48px;
         max-width: $sidebar-width;
         .Sidebar {
             max-width: 190px; // sidebar button width
@@ -77,6 +77,23 @@
         @include sm-max {
             padding: 0;
         }
+        @include xs-max {
+            min-width: calc(100vw - 80px);
+        }
+    }
+    .sublayout-right-col {
+        flex: 1.75;
+        padding: 36px 0 36px 36px;
+        max-width: calc(#{$sidebar-width} + 32px);
+        @include xl-min {
+            padding: 36px 20px 36px 32px;
+            max-width: calc(#{$sidebar-width} + 48px);
+        }
+        @include xs-max {
+            padding-left: 20px;
+            padding-right: 20px;
+            min-width: calc(#{$sidebar-width} + 20px);
+        }
     }
     .hide-sidebar & {
         .sublayout-main-col {
@@ -87,13 +104,17 @@
     }
     @include md-max {
         .sublayout-main-col {
-            width: 100%;
-            max-width: none;
+            min-width: 100%;
+            max-width: 100%;
             padding: 0;
         }
     }
 
     .sublayout-header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: white;
         @include sm-max {
             display: none;
         }
@@ -119,6 +140,9 @@
             max-width: $layout-max-width;
             padding: 0 $layout-padding;
             margin: 0 auto;
+            .SearchBar {
+                flex: 8;
+            }
             .hide-sidebar & {
                 max-width: 840px;
                 margin: 0 auto;
@@ -129,10 +153,13 @@
             display: flex;
             align-items: center;
             margin-top: 0 !important;
-            flex: 3;
+            flex: 2;
             white-space: nowrap;
-            max-width: min-content;
-            > .ChainIcon,
+            > .ChainIcon{
+                width: 22px;
+                height: 22px;
+                margin-right: 10px;
+            }
             > .CommunityIcon {
                 display: inline-block;
                 margin-right: 14px;
@@ -143,7 +170,7 @@
             }
             .CommunitySelector,
             .sublayout-header-heading {
-                display: inline-block;
+                display: flex;
             }
             h3 {
                 font-size: 1.15rem;
@@ -174,12 +201,19 @@
                         width: 5px;
                     }
                 }
+
+                .sublayout-header-heading-wrapper {
+                    max-width: 200px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
             }
         }
         .sublayout-header-right {
             display: flex;
             align-items: center;
-            flex: 1;
+            flex: 2;
             text-align: right;
             flex-direction: row-reverse;
             > .cui-button,
@@ -192,6 +226,7 @@
         position: relative;
         min-height: calc(100vh - 140px);
         padding: 1px 0; // prevent margins from flowing outside the container
+        padding-bottom: 80px;
     }
     .token-banner {
         padding: 8px 0 2px;
@@ -200,5 +235,18 @@
         text-align: center;
     }
     .token-banner-content {
+    }
+
+    .token-banner-terms {
+      background-color: #fdf5f9;
+      text-align: center;
+      padding: 5px 0 5px 0;
+
+      .close-button {
+        position: absolute;
+        right: 1rem;
+        line-height: 1.5;
+        cursor: pointer;
+      }
     }
 }

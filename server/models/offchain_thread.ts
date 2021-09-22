@@ -1,5 +1,6 @@
 import * as Sequelize from 'sequelize';
-
+import { DataTypes, Model } from 'sequelize';
+import { ModelStatic } from './types';
 import { AddressAttributes } from './address';
 import { ChainAttributes } from './chain';
 import { OffchainCommunityAttributes } from './offchain_community';
@@ -7,13 +8,13 @@ import { OffchainAttachmentAttributes } from './offchain_attachment';
 import { ChainEntityAttributes } from './chain_entity';
 
 export interface OffchainThreadAttributes {
-  id?: number;
   address_id: number;
   title: string;
-  body?: string;
-  plaintext?: string;
   kind: string;
   stage: string;
+  id?: number;
+  body?: string;
+  plaintext?: string;
   url?: string;
   topic_id?: number;
   pinned?: boolean;
@@ -22,7 +23,9 @@ export interface OffchainThreadAttributes {
 
   read_only?: boolean;
   version_history?: string[];
+  snapshot_proposal?: string;
 
+  offchain_voting_options?: string;
   offchain_voting_ends_at?: Date;
   offchain_voting_votes?: number;
 
@@ -36,21 +39,20 @@ export interface OffchainThreadAttributes {
   Address?: AddressAttributes;
   OffchainAttachments?: OffchainAttachmentAttributes[] | OffchainAttachmentAttributes['id'][];
   ChainEntity?: ChainEntityAttributes;
+  collaborators?: AddressAttributes[]
 }
 
-export interface OffchainThreadInstance extends Sequelize.Instance<OffchainThreadAttributes>, OffchainThreadAttributes {
+export interface OffchainThreadInstance extends Model<OffchainThreadAttributes>, OffchainThreadAttributes {
   // no mixins used
 }
 
-export interface OffchainThreadModel extends Sequelize.Model<OffchainThreadInstance, OffchainThreadAttributes> {
-
-}
+export type OffchainThreadModelStatic = ModelStatic<OffchainThreadInstance>
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: Sequelize.DataTypes,
-): OffchainThreadModel => {
-  const OffchainThread = sequelize.define<OffchainThreadInstance, OffchainThreadAttributes>('OffchainThread', {
+  dataTypes: typeof DataTypes,
+): OffchainThreadModelStatic => {
+  const OffchainThread = <OffchainThreadModelStatic>sequelize.define('OffchainThread', {
     id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     address_id: { type: dataTypes.INTEGER, allowNull: false },
     title: { type: dataTypes.TEXT, allowNull: false },
@@ -65,7 +67,9 @@ export default (
     community: { type: dataTypes.STRING, allowNull: true },
     read_only: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     version_history: { type: dataTypes.ARRAY(dataTypes.TEXT), defaultValue: [], allowNull: false },
+    snapshot_proposal: { type: dataTypes.STRING(48), allowNull: true },
 
+    offchain_voting_options: { type: dataTypes.STRING },
     offchain_voting_ends_at: { type: dataTypes.DATE, allowNull: true },
     offchain_voting_votes: { type: dataTypes.INTEGER, allowNull: true },
 
@@ -73,7 +77,12 @@ export default (
     updated_at: { type: dataTypes.DATE, allowNull: false },
     deleted_at: { type: dataTypes.DATE, allowNull: true },
   }, {
+    timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
+    deletedAt: 'deleted_at',
     underscored: true,
+    tableName: 'OffchainThreads',
     paranoid: true,
     indexes: [
       { fields: ['address_id'] },

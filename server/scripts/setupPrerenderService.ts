@@ -31,5 +31,4 @@ const setupPrerenderServer = () => {
   return run(prerender());
 };
 
-
 export default setupPrerenderServer;

@@ -1,6 +1,7 @@
 /* eslint-disable prefer-const */
 /* eslint-disable dot-notation */
 import { Request, Response, NextFunction } from 'express';
+import BN from 'bn.js';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { NotificationCategories } from '../../shared/types';
@@ -8,6 +9,7 @@ import { getProposalUrl, getProposalUrlWithoutObject } from '../../shared/utils'
 import proposalIdToEntity from '../util/proposalIdToEntity';
 import TokenBalanceCache from '../util/tokenBalanceCache';
 import { factory, formatFilename } from '../../shared/logging';
+import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -21,7 +23,7 @@ export const Errors = {
 };
 
 const createReaction = async (
-  models,
+  models: DB,
   tokenBalanceCache: TokenBalanceCache,
   req: Request,
   res: Response,
@@ -31,6 +33,8 @@ const createReaction = async (
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));
+  const { reaction, comment_id, proposal_id, thread_id } = req.body;
+
   if (chain && chain.type === 'token') {
     // skip check for admins
     const isAdmin = await models.Role.findAll({
@@ -40,10 +44,20 @@ const createReaction = async (
         permission: ['admin'],
       },
     });
-    if (isAdmin.length === 0) {
+    if (!req.user.isAdmin && isAdmin.length === 0) {
       try {
-        const userHasBalance = await tokenBalanceCache.hasToken(chain.id, req.body.address);
-        if (!userHasBalance) return next(new Error(Errors.InsufficientTokenBalance));
+        let thread;
+        if (thread_id) {
+          thread = await models.OffchainThread.findOne({ where: { id: thread_id } });
+        } else if (comment_id) {
+          const root_id = (await models.OffchainComment.findOne({ where: { id: comment_id } })).root_id;
+          const stage = root_id.substring(0, root_id.indexOf('_'));
+          const topic_id = root_id.substring(root_id.indexOf('_') + 1);
+          thread = await models.OffchainThread.findOne({ where:{ stage, id: topic_id } });
+        }
+        const threshold = (await models.OffchainTopic.findOne({ where: { id: thread.topic_id } })).token_threshold;
+        const tokenBalance = await tokenBalanceCache.getBalance(chain.id, req.body.address);
+        if (threshold && tokenBalance.lt(new BN(threshold))) return next(new Error(Errors.InsufficientTokenBalance));
       } catch (e) {
         log.error(`hasToken failed: ${e.message}`);
         return next(new Error(Errors.CouldNotFetchTokenBalance));
@@ -51,7 +65,6 @@ const createReaction = async (
     }
   }
 
-  const { reaction, comment_id, proposal_id, thread_id } = req.body;
   let proposal;
   let root_type;
 
@@ -85,7 +98,7 @@ const createReaction = async (
   try {
     [ finalReaction, created ] = await models.OffchainReaction.findOrCreate({
       where: options,
-      default: options,
+      defaults: options,
       include: [ models.Address]
     });
     if (created) finalReaction = await models.OffchainReaction.findOne({

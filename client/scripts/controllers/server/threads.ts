@@ -21,6 +21,7 @@ import { notifyError } from 'controllers/app/notifications';
 import { updateLastVisited } from 'controllers/app/login';
 import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
 import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
+import { modelFromServer as modelReactionCountFromServer }  from 'controllers/server/reactionCounts';
 
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
@@ -32,6 +33,7 @@ export const modelFromServer = (thread) => {
     body,
     last_edited,
     version_history,
+    snapshot_proposal,
     OffchainAttachments,
     created_at,
     topic,
@@ -45,6 +47,7 @@ export const modelFromServer = (thread) => {
     pinned,
     collaborators,
     chain_entities,
+    offchain_voting_options,
     offchain_voting_ends_at,
     offchain_voting_votes,
     reactions
@@ -92,6 +95,7 @@ export const modelFromServer = (thread) => {
     body: decodeURIComponent(body),
     createdAt: moment(created_at),
     attachments,
+    snapshotProposal: snapshot_proposal,
     topic,
     kind,
     stage,
@@ -105,6 +109,7 @@ export const modelFromServer = (thread) => {
     chainEntities: chain_entities,
     versionHistory: versionHistoryProcessed,
     lastEdited: lastEditedProcessed,
+    offchainVotingOptions: offchain_voting_options,
     offchainVotingEndsAt: offchain_voting_ends_at,
     offchainVotingNumVotes: offchain_voting_votes,
   });
@@ -154,7 +159,6 @@ class ThreadsController {
 
   public get initialized() { return this._initialized; }
 
-  public numPrevotingThreads: number;
   public numVotingThreads: number;
 
   public getType(primary: string, secondary?: string, tertiary?: string) {
@@ -166,6 +170,10 @@ class ThreadsController {
           : thread.kind === primary;
     });
     return result;
+  }
+
+  public getById(id: number) {
+    return this._store.getByIdentifier(id);
   }
 
   public async create(
@@ -205,7 +213,6 @@ class ThreadsController {
       this._store.add(result);
 
       // Update stage counts
-      if (result.stage === OffchainThreadStage.ProposalInReview) this.numPrevotingThreads++;
       if (result.stage === OffchainThreadStage.Voting) this.numVotingThreads++;
 
       // New posts are added to both the topic and allProposals sub-store
@@ -227,6 +234,7 @@ class ThreadsController {
     proposal: OffchainThread,
     body: string,
     title: string,
+    url?: string,
     attachments?: string[],
   ) {
     const newBody = body || proposal.body;
@@ -245,15 +253,14 @@ class ThreadsController {
         'stage': proposal.stage,
         'body': encodeURIComponent(newBody),
         'title': newTitle,
+        'url': url,
         'attachments[]': attachments,
         'jwt': app.user.jwt
       },
       success: (response) => {
         const result = modelFromServer(response.result);
         // Update counters
-        if (proposal.stage === OffchainThreadStage.ProposalInReview) this.numPrevotingThreads--;
         if (proposal.stage === OffchainThreadStage.Voting) this.numVotingThreads--;
-        if (result.stage === OffchainThreadStage.ProposalInReview) this.numPrevotingThreads++;
         if (result.stage === OffchainThreadStage.Voting) this.numVotingThreads++;
         // Post edits propagate to all thread stores
         this._store.update(result);
@@ -289,7 +296,8 @@ class ThreadsController {
     });
   }
 
-  public async setPolling(args: { threadId: number }) {
+  public async setPolling(args: { threadId: number, name: string, choices: string[] }) {
+    const { threadId, name, choices } = args;
     // start polling
     await $.ajax({
       url: `${app.serverUrl()}/updateThreadPolling`,
@@ -297,18 +305,20 @@ class ThreadsController {
       data: {
         'chain': app.activeChainId(),
         'community': app.activeCommunityId(),
-        'thread_id': args.threadId,
-        'jwt': app.user.jwt
+        'jwt': app.user.jwt,
+        'thread_id': threadId,
+        content: JSON.stringify({ name, choices }),
       },
       success: (response) => {
-        const thread = this._store.getByIdentifier(args.threadId);
+        const thread = this._store.getByIdentifier(threadId);
         if (!thread) {
           // TODO: sometimes the thread may not be in the store
           location.reload();
           return;
         }
+        thread.offchainVotingOptions = { name, choices };
+        thread.offchainVotingNumVotes = 0;
         thread.offchainVotingEndsAt = moment(response.result.offchain_voting_ends_at);
-        return;
       },
       error: (err) => {
         console.log('Failed to start polling');
@@ -332,9 +342,7 @@ class ThreadsController {
       success: (response) => {
         const result = modelFromServer(response.result);
         // Update counters
-        if (args.stage === OffchainThreadStage.ProposalInReview) this.numPrevotingThreads--;
         if (args.stage === OffchainThreadStage.Voting) this.numVotingThreads--;
-        if (result.stage === OffchainThreadStage.ProposalInReview) this.numPrevotingThreads++;
         if (result.stage === OffchainThreadStage.Voting) this.numVotingThreads++;
         // Post edits propagate to all thread stores
         this._store.update(result);
@@ -394,6 +402,30 @@ class ThreadsController {
     });
   }
 
+  public async setLinkedSnapshotProposal(args: { threadId: number, snapshotProposal: string }) {
+    await $.ajax({
+      url: `${app.serverUrl()}/updateThreadLinkedSnapshotProposal`,
+      type: 'POST',
+      data: {
+        'chain': app.activeChainId(),
+        'thread_id': args.threadId,
+        'snapshot_proposal': args.snapshotProposal,
+        'jwt': app.user.jwt
+      },
+      success: (response) => {
+        const thread = this._store.getByIdentifier(args.threadId);
+        if (!thread) return;
+        thread.snapshotProposal = args.snapshotProposal;
+        return thread;
+      },
+      error: (err) => {
+        console.log('Failed to update linked snapshot proposal');
+        throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error
+          : 'Failed to update linked proposals');
+      }
+    });
+  }
+
   public async setLinkedChainEntities(args: { threadId: number, entities: ChainEntity[] }) {
     await $.ajax({
       url: `${app.serverUrl()}/updateThreadLinkedChainEntities`,
@@ -422,6 +454,21 @@ class ThreadsController {
           : 'Failed to update linked proposals');
       }
     });
+  }
+
+  public async fetchThreadIdForSnapshot(args: { snapshot: string }) {
+    const response = await $.ajax({
+      url: `${app.serverUrl()}/fetchThreadForSnapshot`,
+      type: 'GET',
+      data: {
+        snapshot: args.snapshot,
+        chain: app.activeId(),
+      },
+    });
+    if (response.status !== 'Success') {
+      return 'false';
+    }
+    return response.result;
   }
 
   public async fetchThread(id) {
@@ -465,7 +512,8 @@ class ThreadsController {
     if (response.status !== 'Success') {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);
     }
-    const { threads, comments, reactions } = response.result;
+    const { threads, comments } = response.result;
+
     for (const thread of threads) {
       const modeledThread = modelFromServer(thread);
       if (!thread.Address) {
@@ -493,13 +541,27 @@ class ThreadsController {
         console.error(e.message);
       }
     }
-    for (const reaction of reactions) {
-      const existing = app.reactions.store.getById(reaction.id);
+    const { result: reactionCounts } = await $.ajax({
+      type: 'POST',
+      url: `${app.serverUrl()}/reactionsCounts`,
+      headers: {
+        'content-type': 'application/json',
+      },
+      data: JSON.stringify({
+        thread_ids: threads.map((thread) => thread.id),
+        active_address: app.user.activeAccount?.address,
+      }),
+    });
+    for (const rc of reactionCounts) {
+      const id = app.reactionCounts.store.getIdentifier(rc);
+      const existing = app.reactionCounts.store.getById(id);
       if (existing) {
-        app.reactions.store.remove(existing);
+        app.reactionCounts.store.remove(existing);
       }
       try {
-        app.reactions.store.add(modelReactionFromServer(reaction));
+        app.reactionCounts.store.add(
+          modelReactionCountFromServer({ ...rc, id })
+        );
       } catch (e) {
         console.error(e.message);
       }
@@ -519,8 +581,8 @@ class ThreadsController {
     return $.get(`${app.serverUrl()}/bulkThreads`, {
       chain: chainId,
       community: communityId,
-    })
-      .then((response) => {
+    }).then(
+      (response) => {
         if (response.status !== 'Success') {
           throw new Error(`Unsuccessful refresh status: ${response.status}`);
         }
@@ -529,7 +591,7 @@ class ThreadsController {
         }
         // Threads that are posted in an offchain community are still linked to a chain / author address,
         // so when we want just chain threads, then we have to filter away those that have a community
-        const { threads, numPrevotingThreads, numVotingThreads } = response.result;
+        const { threads, numVotingThreads } = response.result;
         for (const thread of threads) {
           // TODO: OffchainThreads should always have a linked Address
           if (!thread.Address) {
@@ -546,18 +608,21 @@ class ThreadsController {
             console.error(e.message);
           }
         }
-        this.numPrevotingThreads = numPrevotingThreads;
         this.numVotingThreads = numVotingThreads;
         this._initialized = true;
-      }, (err) => {
+      },
+      (err) => {
         console.log('failed to load offchain discussions');
-        throw new Error((err.responseJSON && err.responseJSON.error)
-          ? err.responseJSON.error
-          : 'Error loading offchain discussions');
-      });
+        throw new Error(
+          err.responseJSON && err.responseJSON.error
+            ? err.responseJSON.error
+            : 'Error loading offchain discussions'
+        );
+      }
+    );
   }
 
-  public initialize(initialThreads: any[], numPrevotingThreads, numVotingThreads, reset) {
+  public initialize(initialThreads: any[], numVotingThreads, reset) {
     if (reset) {
       this._store.clear();
       this._listingStore.clear();
@@ -576,7 +641,6 @@ class ThreadsController {
         console.error(e.message);
       }
     }
-    this.numPrevotingThreads = numPrevotingThreads;
     this.numVotingThreads = numVotingThreads;
     this._initialized = true;
   }

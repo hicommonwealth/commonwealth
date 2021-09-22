@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import { DB } from '../database';
 
-const getThread = async (models, req: Request, res: Response, next: NextFunction) => {
+const getThread = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
   if (error) return next(new Error(error));
 
@@ -18,7 +19,7 @@ const getThread = async (models, req: Request, res: Response, next: NextFunction
         },
         {
           model: models.Address,
-          through: models.Collaboration,
+          // through: models.Collaboration,
           as: 'collaborators'
         },
         {
@@ -31,10 +32,11 @@ const getThread = async (models, req: Request, res: Response, next: NextFunction
         {
           model: models.OffchainReaction,
           as: 'reactions',
-          include: {
+          include: [{
             model: models.Address,
-            as: 'Address'
-          }
+            as: 'Address',
+            required: true
+          }]
         }
       ],
     });

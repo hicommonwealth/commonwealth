@@ -1,6 +1,5 @@
 import moment from 'moment';
 import { IUniqueId } from './interfaces';
-import { OffchainVoteOptions } from './types';
 
 class OffchainVote {
   // public readonly id: number;
@@ -8,7 +7,7 @@ class OffchainVote {
   public readonly address: string;
   public readonly author_chain: string;
   public readonly thread_id: number;
-  public option: OffchainVoteOptions;
+  public option: string;
 
   constructor({ address, author_chain, thread_id, option }) {
     // this.id = id;

@@ -8,9 +8,10 @@ import mixpanel from 'mixpanel-browser';
 import { Button, ButtonGroup, Icon, Icons, Menu, MenuItem, MenuDivider, Popover } from 'construct-ui';
 
 import app from 'state';
+import { navigateToSubpage, initAppState } from 'app';
 import { AddressInfo, ChainBase, ChainInfo, CommunityInfo } from 'models';
 import { isSameAccount, pluralize } from 'helpers';
-import { initAppState } from 'app';
+
 import { notifySuccess } from 'controllers/app/notifications';
 
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
@@ -140,10 +141,10 @@ export const LoginSelectorMenuLeft: m.Component<{
           onclick: () => {
             const pf = app.user.activeAccount.profile;
             if (app.chain) {
-              m.route.set(`/${app.activeId()}/account/${pf.address}`);
+              navigateToSubpage(`/account/${pf.address}`);
             } else if (app.community) {
               const a = app.user.activeAccount;
-              m.route.set(`/${app.activeId()}/account/${pf.address}?base=${pf.chain || a.chain.id}`);
+              navigateToSubpage(`/account/${pf.address}?base=${pf.chain || a.chain.id}`);
             }
           },
           label: m('.label-wrap', [ mobile && m(CustomEyeIcon), m('span', 'View profile') ]),
@@ -185,13 +186,13 @@ export const LoginSelectorMenuRight: m.Component<{ mobile?: boolean }, {}> = {
     return m(Menu, { class: 'LoginSelectorMenu' }, [
       m(MenuItem, {
         onclick: () => (app.activeChainId() || app.activeCommunityId())
-          ? m.route.set(`/${app.activeChainId() || app.activeCommunityId()}/notifications`)
+          ? navigateToSubpage('/notifications')
           : m.route.set('/notifications'),
         label: m('.label-wrap', [ mobile && m(CustomBellIcon), m('span', 'Notification settings') ]),
       }),
       m(MenuItem, {
         onclick: () => app.activeChainId()
-          ? m.route.set(`/${app.activeChainId()}/settings`)
+          ? navigateToSubpage('/settings')
           : m.route.set('/settings'),
         label: m('.label-wrap', [ mobile && m(CustomUserIcon), m('span', 'Account settings') ]),
       }),
@@ -290,6 +291,9 @@ const LoginSelector: m.Component<{
       }
     }
 
+    const activeCommunityMeta = app.chain ? app.chain.meta?.chain : app.community?.meta;
+    const hasTermsOfService = !!activeCommunityMeta?.terms;
+
     return m(ButtonGroup, { class: 'LoginSelector' }, [
       (app.chain || app.community)
         && !app.chainPreloading
@@ -298,7 +302,7 @@ const LoginSelector: m.Component<{
         && m(Button, {
           class: 'login-selector-left',
           onclick: async (e) => {
-            if (samebaseAddresses.length === 1) {
+            if (samebaseAddresses.length === 1 && !hasTermsOfService) {
               const originAddressInfo = samebaseAddresses[0];
 
               if (originAddressInfo) {
@@ -325,7 +329,6 @@ const LoginSelector: m.Component<{
                     if (app.chain) {
                       account.setValidationToken(verification_token);
                     }
-
                     if (joiningChain && !app.user.getRoleInCommunity({ account, chain: joiningChain })) {
                       await app.user.createRole({ address: addressInfo, chain: joiningChain });
                     } else if (joiningCommunity
@@ -342,7 +345,7 @@ const LoginSelector: m.Component<{
                   }
 
                   // If token forum make sure has token and add to app.chain obj
-                  if (app.chain && (app.chain as Token).isToken) {
+                  if (app.chain && (app.chain as Token)?.isToken) {
                     await (app.chain as Token).activeAddressHasToken(app.user.activeAccount.address);
                   }
                   m.redraw();

@@ -33,11 +33,12 @@ export abstract class ProposalModule<
   public get app() { return this._app; }
 
   protected _entityConstructor(entity: ChainEntity): ProposalT {
-    try {
-      return this._constructorFunc(entity);
-    } catch (e) {
-      console.error('failed to construct proposal from entity: ', entity, e);
-    }
+    // try {
+    return this._constructorFunc(entity);
+    // } catch (e) {
+    //   console.error(`failed to construct proposal from entity: ${e.message}`);
+    //   console.error('failed entity: ', entity);
+    // }
   }
 
   public updateProposal(entity: ChainEntity, event: ChainEvent): void {
