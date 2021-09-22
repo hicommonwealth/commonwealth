@@ -237,18 +237,19 @@ const MembersPage: m.Component<
                   }
                 }, [
                   m(User, { user: profile, showRole: true }),
-                  vnode.state.voteEvents[info.address]
+                ], vnode.state.voteEvents[info.address]
                   ? m(Tooltip, {
                       trigger: m(Tag, {
                       label: `${vnode.state.voteEvents[info.address].length} 
                       event${vnode.state.voteEvents[info.address].length !== 1 ? 's' : ''}`,
                       size: 'xs',
-                    }),
+                      }),
                     content: vnode.state.voteEvents[info.address].map((o) => {
                       return m('div', `Proposal #${o.event_data.id}, 
                       ${o.event_data.support ? 'YES' : 'NO'}, ${o.event_data.votes} votes`);
                     })
-                  }) : null)
+                  })
+                  : null),
               ]),
               m('td.align-right', [
                 (info.count > 0) ? `${pluralize(info.count, 'post')} this month` : null,
