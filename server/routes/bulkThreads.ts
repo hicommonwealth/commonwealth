@@ -142,7 +142,7 @@ const bulkThreads = async (
         offchain_voting_options: t.offchain_voting_options,
         offchain_voting_votes: t.offchain_voting_votes,
         offchain_voting_ends_at: t.offchain_voting_ends_at,
-        latest_comm_created_at,
+        latestCommCreatedAt: latest_comm_created_at,
         Address: {
           id: t.addr_id,
           address: t.addr_address,

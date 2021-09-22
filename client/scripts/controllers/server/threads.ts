@@ -58,7 +58,7 @@ export const modelFromServer = (thread) => {
     offchain_voting_ends_at,
     offchain_voting_votes,
     reactions,
-    latest_comm_created_at,
+    latestCommCreatedAt,
   } = thread;
 
   const attachments = OffchainAttachments
@@ -125,8 +125,8 @@ export const modelFromServer = (thread) => {
     offchainVotingOptions: offchain_voting_options,
     offchainVotingEndsAt: offchain_voting_ends_at,
     offchainVotingNumVotes: offchain_voting_votes,
-    latest_comm_created_at: latest_comm_created_at
-      ? moment(latest_comm_created_at)
+    latestCommCreatedAt: latestCommCreatedAt
+      ? moment(latestCommCreatedAt)
       : null,
   });
 };

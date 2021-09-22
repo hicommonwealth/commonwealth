@@ -140,14 +140,14 @@ class OffchainThread implements IUniqueId {
     offchainVotingEndsAt,
     offchainVotingNumVotes,
     offchainVotes,
-    latest_comm_created_at,
+    latestCommCreatedAt,
   }: {
     author: string;
     title: string;
     attachments: OffchainAttachment[];
     id: number;
     createdAt: moment.Moment;
-    latest_comm_created_at: moment.Moment;
+    latestCommCreatedAt: moment.Moment;
     topic: OffchainTopic;
     kind: OffchainThreadKind;
     stage: OffchainThreadStage;
@@ -188,7 +188,7 @@ class OffchainThread implements IUniqueId {
     this.chain = chain;
     this.readOnly = readOnly;
     this.collaborators = collaborators || [];
-    this.latestCommCreatedAt = latest_comm_created_at;
+    this.latestCommCreatedAt = latestCommCreatedAt;
     this.chainEntities = chainEntities
       ? chainEntities.map((ce) => {
           return {

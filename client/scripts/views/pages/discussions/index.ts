@@ -511,7 +511,6 @@ const DiscussionsPage: m.Component<
     let sortedListing = [];
     // fetch unique addresses count for pinned threads
     if (!app.threadUniqueAddressesCount.getInitializedPinned()) {
-      console.log('fetch unique addresses for pinned', app.activeChainId());
       app.threadUniqueAddressesCount
         .fetchThreadsUniqueAddresses({
           threads: app.threads.listingStore
