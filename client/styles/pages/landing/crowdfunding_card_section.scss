@@ -8,7 +8,7 @@ section.ChainsCrowdfunding {
       text-decoration: none;
       cursor: pointer;
       &:hover {
-        opacity: 0.6;
+       opacity: 0.6
       }
     }
   }
@@ -25,132 +25,6 @@ section.ChainsCrowdfunding {
     @media (min-width: 0px) and (max-width: 1200px) {
       margin-top: 0rem;
     }
-  }
-}
 
-.CrowdfundingContainer {
-  background: #ffffff;
-  box-shadow: 0px 30px 60px rgba(0, 0, 0, 0.08);
-  border-radius: 20px;
-  @media (min-width: 503px) and (max-width: 1207px) {
-    border-radius: 0px;
-  }
-
-  @media (min-width: 768px) {
-    display: flex;
-    flex-wrap: wrap;
-    overflow: hidden;
-    justify-content: space-between;
-    padding-left: 5%;
-    padding-right: 5%;
-  }
-
-  @media (min-width: 1100px) {
-    padding-left: 10%;
-    padding-right: 10%;
-  }
-  @media (min-width: 1440px) {
-    margin: 0 8%;
-  }
-}
-
-.CrowdfundingCustomCarousel {
-  padding-top: 15%;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  @media (min-width: 1024px) {
-    padding-top: 8%;
-  }
-}
-
-.CrowdfundingCarouselCarbon {
-  padding-top: 15%;
-  display: flex;
-  flex-direction: column;
-  @media (min-width: 1024px) {
-    padding-top: 8%;
-  }
-}
-
-.CrowdfundingCarouselCarbonImgContainer {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.CrowdfundingImg {
-  width: 324px;
-  z-index: 9999;
-  @media (min-width: 503px) and (max-width: 767px) {
-    width: 431px;
-  }
-  @media (min-width: 768px) and (max-width: 800px) {
-    width: 268px;
-  }
-}
-.CrowdfundingAlterImg {
-  width: 324px;
-  z-index: 9999;
-  @media (min-width: 503px) and (max-width: 767px) {
-    width: 431px;
-  }
-  @media (min-width: 768px) and (max-width: 800px) {
-    width: 364px;
-  }
-  @media (min-width: 1000px) {
-    width: 443px;
-  }
-}
-
-.CrowdfundingBackground {
-  width: 250px;
-  height: 250px;
-  position: absolute;
-  background: #0087eb;
-  mix-blend-mode: normal;
-  opacity: 0.31;
-  filter: blur(72.2008px);
-  border-radius: 57.7607px;
-  transform: matrix(0.71, 0.58, -0.87, 0.71, 0, 0);
-}
-
-.CrowdfundingTextContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 5%;
-}
-
-.CrowdfundingCarouselTitle {
-  font-family: Calibre;
-  font-style: normal;
-  font-weight: 500;
-  font-size: 24px;
-  line-height: 29px;
-  color: #000000;
-  width: 324px;
-  @media (min-width: 503px) and (max-width: 767px) {
-    width: 431px;
-  }
-  @media (min-width: 1024px) {
-    width: 431px;
-  }
-}
-
-.CrowdfundingCarouselText {
-  font-family: Calibre;
-  font-style: normal;
-  font-weight: normal;
-  font-size: 18px;
-  line-height: 22px;
-  color: #000000;
-  margin-top: 1%;
-  width: 324px;
-  @media (min-width: 503px) and (max-width: 767px) {
-    width: 431px;
-  }
-  @media (min-width: 1024px) {
-    width: 431px;
   }
 }

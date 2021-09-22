@@ -6,7 +6,7 @@
     text-decoration: none;
     cursor: pointer;
     &:hover {
-      opacity: 0.6;
+      opacity: 0.6
     }
   }
 }
@@ -23,107 +23,5 @@ img.TokensCreatorsImage {
 
   @media (min-width: 0px) and (max-width: 1200px) {
     margin-left: 0rem;
-  }
-}
-
-.TokensCreatorsContentContainer {
-  background: linear-gradient(180deg, #333236 0%, #29282d 100%);
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.08);
-  border-radius: 20px;
-  @media (min-width: 503px) and (max-width: 1207px) {
-    border-radius: 0px;
-  }
-
-  @media (min-width: 768px) {
-    display: flex;
-    flex-wrap: wrap;
-    overflow: hidden;
-    justify-content: space-between;
-    padding-left: 5%;
-    padding-right: 5%;
-  }
-
-  @media (min-width: 1100px){
-    padding-left: 10%;
-    padding-right: 10%;
-  }
-  @media (min-width: 1440px) {
-    margin: 0 8%;
-  }
-}
-
-.TokenCarouselImg {
-  width: 324px;
-  @media (min-width: 503px) and (max-width: 767px) {
-    width: 431px;
-  }
-  @media (min-width: 1000px) {
-    width: 431px;
-  }
-}
-
-.TokenCarouselDiscussion {
-  padding-top: 15%;
-  display: flex;
-  flex-direction: column;
-  @media (min-width: 1024px) {
-    padding-top: 8%;
-  }
-}
-
-.TokenCarouselDiscussionLast {
-  display: flex;
-  flex-direction: column;
-  padding-top: 15%;
-  padding-bottom: 15%;
-  @media (min-width: 1024px) {
-    padding-top: 8%;
-    padding-bottom: 8%;
-  }
-}
-
-.TokenCarouselDiscussionImgContainer {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.TokenCarouselTextContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 5%;
-}
-
-.TokenCarouselTitle {
-  font-family: Calibre;
-  font-style: normal;
-  font-weight: 500;
-  font-size: 24px;
-  line-height: 29px;
-  color: #ffffff;
-  width: 324px;
-  @media (min-width: 503px) and (max-width: 767px) {
-    width: 431px;
-  }
-  @media (min-width: 1024px) {
-    width: 431px;
-  }
-}
-
-.TokenCarouselText {
-  font-family: Calibre;
-  font-style: normal;
-  font-weight: normal;
-  font-size: 18px;
-  line-height: 22px;
-  color: #ffffff;
-  margin-top: 1%;
-  width: 324px;
-  @media (min-width: 503px) and (max-width: 767px) {
-    width: 431px;
-  }
-  @media (min-width: 1024px) {
-    width: 431px;
   }
 }
