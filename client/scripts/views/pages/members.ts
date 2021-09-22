@@ -27,11 +27,25 @@ interface MemberInfo {
 
 const MEMBERS_PER_PAGE = 20;
 
-const DelegateModal: m.Component<{ address: string, name: string, symbol: string }, { delegateAmount: number }> = {
+const DelegateModal: m.Component<
+  { address: string; name: string; symbol: string },
+  { delegateAmount: number }
+> = {
   view: (vnode) => {
     return m('.DelegateModal', [
       m('.compact-modal-title', [
-        m('h3', `Delegate to ${vnode.attrs.name ? `${vnode.attrs.name} at Address: ${formatAddressShort(vnode.attrs.address)}` : `Anonymous at Address: ${formatAddressShort(vnode.attrs.address)}`}`),
+        m(
+          'h3',
+          `Delegate to ${
+            vnode.attrs.name
+              ? `${vnode.attrs.name} at Address: ${formatAddressShort(
+                  vnode.attrs.address
+                )}`
+              : `Anonymous at Address: ${formatAddressShort(
+                  vnode.attrs.address
+                )}`
+          }`
+        ),
       ]),
       m('.compact-modal-body', [
         m('div', `Amount ${vnode.attrs.symbol} to delegate`),
@@ -48,34 +62,44 @@ const DelegateModal: m.Component<{ address: string, name: string, symbol: string
           label: 'Delegate',
           intent: 'primary',
           onclick: async (e) => {
-            (app.chain as Compound).chain.setDelegate(vnode.attrs.address, vnode.state.delegateAmount)
-            .catch((err)=>{ 
-              if (err.message.indexOf('delegates underflow') > -1) { 
-                err.message = 'You do not have the requested number of votes to delegate';
-              }
-              notifyError(err.message)
-            });
-          }
-        })
-      // m(Login),
+            (app.chain as Compound)?.chain.setDelegate(vnode.attrs.address, vnode.state.delegateAmount)
+              .catch((err) => {
+                if (err.message.indexOf('delegates underflow') > -1) {
+                  err.message =
+                    'You do not have the requested number of votes to delegate';
+                }
+                notifyError(err.message);
+              });
+          },
+        }),
       ]),
     ]);
   }
 };
 
-const MembersPage : m.Component<{}, { membersRequested: boolean, membersLoaded: MemberInfo[],
-pageToLoad: number, totalMembers: number, isCompound: boolean, voteEvents }> = {
+const MembersPage: m.Component<
+  {},
+  {
+    membersRequested: boolean;
+    membersLoaded: MemberInfo[];
+    pageToLoad: number;
+    totalMembers: number;
+    isCompound: boolean;
+    voteEvents;
+  }
+> = {
   oninit: (vnode) => {
     $.get(`/api/getChainEvents?type=${app.activeId}-vote-cast`).then(({ result }) => {
-      // Sort by address which voted
+        // Sort by address which voted
       const sortedResults = {};
-      result.forEach((r) => {
-        const address = r.event_data.voter;
-        if (!sortedResults[address]) { sortedResults[address] = []; }
-        sortedResults[address].push(r);
-      });
-      vnode.state.voteEvents = sortedResults;
-    });
+        result.forEach((r) => {
+          const address = r.event_data.voter;
+          if (!sortedResults[address]) sortedResults[address] = [];
+          sortedResults[address].push(r);
+        });
+        vnode.state.voteEvents = sortedResults;
+      }
+    );
   },
   view: (vnode) => {
     $(window).on('scroll', () => {
@@ -97,12 +121,20 @@ pageToLoad: number, totalMembers: number, isCompound: boolean, voteEvents }> = {
         message: 'Loading members',
         title: [
           'Members',
-          m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+          m(Tag, {
+            size: 'xs',
+            label: 'Beta',
+            style: 'position: relative; top: -2px; margin-left: 6px',
+          }),
         ],
         showNewProposalButton: true,
       });
     } else {
-      if (!vnode.state.membersRequested && !vnode.state.pageToLoad && !vnode.state.membersLoaded) {
+      if (
+        !vnode.state.membersRequested &&
+        !vnode.state.pageToLoad &&
+        !vnode.state.membersLoaded
+      ) {
         vnode.state.membersRequested = true;
         vnode.state.membersLoaded = [];
         vnode.state.pageToLoad = 0
@@ -113,19 +145,24 @@ pageToLoad: number, totalMembers: number, isCompound: boolean, voteEvents }> = {
     const activeInfo = app.community ? app.community.meta : app.chain.meta.chain;
     if (vnode.state.membersRequested) {
       vnode.state.membersRequested = false;
-      activeInfo.getMembersByPage(activeInfo.id, vnode.state.pageToLoad, MEMBERS_PER_PAGE)
+      activeInfo
+        .getMembersByPage(
+          activeInfo.id,
+          vnode.state.pageToLoad,
+          MEMBERS_PER_PAGE
+        )
         .then(({ result, total }) => {
-          const newMembers = result.map(((o) => {
+          const newMembers = result.map((o) => {
             o.address = o.Address.address;
             o.chain = o.chain_id;
             return o;
-          }));
-          
+          });
+
           app.recentActivity.getMostActiveUsers().map((user) => {
             newMembers.map((u) => {
               const { chain, address } = user.info;
               if (u.address === user.info.address) {
-                u.count = user.count
+                u.count = user.count;
               }
               return { chain, address, count: user.count };
             })
@@ -134,89 +171,107 @@ pageToLoad: number, totalMembers: number, isCompound: boolean, voteEvents }> = {
           vnode.state.membersLoaded = vnode.state.membersLoaded.concat(newMembers);
           vnode.state.totalMembers = total;
 
+          // TODO: Change these "isCompound" checks
           const offset = vnode.state.membersLoaded.length - newMembers.length;
           if (vnode.state.isCompound) {
-            return app.chain.initApi().then(() => Promise.all(newMembers.map((o, i) => {
-              return (app.chain as Compound).chain.getVotingPower(o.address).then((votes) => {
-                vnode.state.membersLoaded[offset + i].votes = votes;
-              });
-            })).then(() => m.redraw()));
+            return app.chain.initApi().then(() =>
+              Promise.all(
+                newMembers.map((o, i) => {
+                  return (app.chain as Compound).chain
+                    .getVotingPower(o.address)
+                    .then((votes) => {
+                      vnode.state.membersLoaded[offset + i].votes = votes;
+                    });
+                })
+              ).then(() => m.redraw())
+            );
           }
         });
     }
 
-    const isAdmin = app.user.isSiteAdmin
-    || app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
+    const isAdmin = app.user.isSiteAdmin;
+    app.user.isAdminOfEntity({
+      chain: app.activeChainId(),
+      community: app.activeCommunityId(),
+    });
     const isMod = app.user.isRoleOfCommunity({
-      role: 'moderator', chain: app.activeChainId(), community: app.activeCommunityId()
+      role: 'moderator',
+      chain: app.activeChainId(),
+      community: app.activeCommunityId(),
     });
     return m(Sublayout, {
-      class: 'MembersPage',
-      title: [
+        class: 'MembersPage',
+        title: [
         'Members',
-        m(CommunityOptionsPopover, { isAdmin, isMod }),
-        m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
-      ],
-      showNewProposalButton: true,
-    }, [
-      m('.title', 'Members'),
-      m(Table, [
-        m('tr', [
-          m('th', 'Member'),
-          m('th.align-right', 'Posts'),
-          vnode.state.isCompound ? m('th.align-right', 'Voting Power') : null,
-          vnode.state.isCompound ? m('th.align-right', 'Delegate') : null,
-        ]),
-        vnode.state.membersLoaded.map((info) => {
-          const profile = app.profiles.getProfile(info.chain, info.address);
+          m(CommunityOptionsPopover, { isAdmin, isMod }),
+          m(Tag, {
+            size: 'xs',
+            label: 'Beta',
+            style: 'position: relative; top: -2px; margin-left: 6px',
+          }),
+        ],
+        showNewProposalButton: true,
+      }, [
+        m('.title', 'Members'),
+        m(Table, [
+          m('tr', [
+            m('th', 'Member'),
+            m('th.align-right', 'Posts'),
+            vnode.state.isCompound ? m('th.align-right', 'Voting Power') : null,
+            vnode.state.isCompound ? m('th.align-right', 'Delegate') : null,
+          ]),
+          vnode.state.membersLoaded.map((info) => {
+            const profile = app.profiles.getProfile(info.chain, info.address);
 
-          return m('tr', [
-            m('td.members-item-info', [
-              m('a', {
-                href: `/${app.activeId()}/account/${info.address}?base=${info.chain}`,
-                onclick: (e) => {
-                  e.preventDefault();
-                  localStorage[`${app.activeId()}-members-scrollY`] = window.scrollY;
-                  navigateToSubpage(`/account/${info.address}?base=${info.chain}`);
-                }
-              }, [
-                m(User, { user: profile, showRole: true }),
-              ], vnode.state.voteEvents[info.address]
-                ? m(Tooltip, {
-                  trigger: m(Tag, {
-                    label: `${vnode.state.voteEvents[info.address].length} 
+            return m('tr', [
+              m('td.members-item-info', [
+                m('a', {
+                    href: `/${app.activeId()}/account/${info.address}?base=${
+                      info.chain
+                    }`,
+                  onclick: (e) => {
+                    e.preventDefault();
+                      localStorage[`${app.activeId()}-members-scrollY`] =
+                        window.scrollY;
+                    navigateToSubpage(`/account/${info.address}?base=${info.chain}`);
+                  }
+                }, [
+                  m(User, { user: profile, showRole: true }),
+                  vnode.state.voteEvents[info.address]
+                  ? m(Tooltip, {
+                      trigger: m(Tag, {
+                      label: `${vnode.state.voteEvents[info.address].length} 
                       event${vnode.state.voteEvents[info.address].length !== 1 ? 's' : ''}`,
-                    size: 'xs',
-                  }),
-                  content: vnode.state.voteEvents[info.address].map((o) => {
-                    return m('div', `Proposal #${o.event_data.id}, 
-                    ${o.event_data.support ? 'YES' : 'NO'}, ${o.event_data.votes} votes`);
-                  })
-                })
-                : null),
-            ]),
-            m('td.align-right', [
-              (info.count > 0) ? `${pluralize(info.count, 'post')} this month` : null,
-            ]),
-            vnode.state.isCompound
-              ? m('td.align-right',
-                [ info.votes !== undefined ? `${info.votes.toNumber().toFixed(2)} ${app.chain.meta.chain.symbol}` : m(Spinner, { active: true, size: 'xs' }) ]) : null,
-            vnode.state.isCompound ? m('td.align-right',
-              m(Button, {
-                label: 'Delegate',
-                intent: 'primary',
-                onclick: async (e) => {
-                  app.modals.create({ modal: DelegateModal, data: { address: info.address, name: profile.name, symbol: app.chain.meta.chain.symbol  } });
-                }
-              })) : null,
-          ]);
-        })]),
-      !vnode.state.totalMembers
-      || vnode.state.membersLoaded.length < vnode.state.totalMembers
-        ? m('tr', [ m(Spinner, { active: true, size: 'lg' }) ])
-        : null
-    ]);
-  }
+                      size: 'xs',
+                    }),
+                    content: vnode.state.voteEvents[info.address].map((o) => {
+                      return m('div', `Proposal #${o.event_data.id}, 
+                      ${o.event_data.support ? 'YES' : 'NO'}, ${o.event_data.votes} votes`);
+                    })
+                  }) : null)
+              ]),
+              m('td.align-right', [
+                (info.count > 0) ? `${pluralize(info.count, 'post')} this month` : null,
+              ]),
+              vnode.state.isCompound
+                ? m('td.align-right',
+                  [ info.votes !== undefined ? `${info.votes.toNumber().toFixed(2)} ${app.chain.meta.chain.symbol}` : m(Spinner, { active: true, size: 'xs' }) ]) : null,
+              vnode.state.isCompound ? m('td.align-right',
+                m(Button, {
+                  label: 'Delegate',
+                  intent: 'primary',
+                  onclick: async (e) => {
+                    app.modals.create({ modal: DelegateModal, data: { address: info.address, name: profile.name, symbol: app.chain.meta.chain.symbol  } });
+                  }
+                })) : null,
+            ]);
+          })]),
+        !vnode.state.totalMembers
+        || vnode.state.membersLoaded.length < vnode.state.totalMembers
+          ? m('tr', [ m(Spinner, { active: true, size: 'lg' }) ])
+          : null
+      ]);
+    }
 };
 
 export default MembersPage;
