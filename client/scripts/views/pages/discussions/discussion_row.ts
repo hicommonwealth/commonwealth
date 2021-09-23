@@ -17,14 +17,12 @@ import {
 import { OffchainThread, OffchainThreadKind, OffchainThreadStage, AddressInfo } from 'models';
 import ReactionButton, { ReactionType } from 'views/components/reaction_button';
 import User from 'views/components/widgets/user';
-import QuillFormattedText from 'views/components/quill_formatted_text';
-import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import UserGallery from 'views/components/widgets/user_gallery';
 import ListingRow from 'views/components/listing_row';
 
 import DiscussionRowMenu from './discussion_row_menu';
 
-const getLastUpdated = (proposal) => {
+export const getLastUpdated = (proposal) => {
   const lastComment = Number(app.comments.lastCommented(proposal));
   const createdAt = Number(proposal.createdAt.utc());
   const lastUpdate = Math.max(createdAt, lastComment);

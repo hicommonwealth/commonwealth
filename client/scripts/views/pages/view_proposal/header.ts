@@ -199,7 +199,7 @@ export const ProposalHeaderExternalSnapshotLink: m.Component<{ proposal: Snapsho
     if (!proposal || !proposal.id || !spaceId) return;
 
     return m('.ProposalHeaderBlockExplorerLink', [
-      externalLink('a.voting-link', `https://snapshot.org/#/proposal/${spaceId}/${proposal.id}`, [
+      externalLink('a.voting-link', `https://snapshot.org/#/${spaceId}/proposal/${proposal.id}`, [
         `View on Snapshot`,
         m(Icon, { name: Icons.EXTERNAL_LINK }),
       ]),
@@ -298,7 +298,7 @@ export const ProposalHeaderThreadLinkedSnapshot: m.Component<{
     }
 
     const proposalLink = `${app.isCustomDomain() ? '' : `/${proposal.chain}`
-      }/snapshot-proposal/${(app.chain?.meta.chain.snapshot)}/${proposal.snapshotProposal}`;
+      }/snapshot/${(app.chain?.meta.chain.snapshot)}/${proposal.snapshotProposal}`;
 
     return m('.ProposalHeaderThreadLinkedChainEntity', 
     !vnode.state.snapshotProposalsLoaded ? [

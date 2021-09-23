@@ -41,7 +41,6 @@ const User: m.Component<{
       avatarOnly, hideAvatar, hideIdentityIcon, showAddressWithDisplayName,
       user, linkify, popover, showRole
     } = vnode.attrs;
-    
     const { showFullAddress, autoTruncate, maxCharLength } = vnode.attrs.addressDisplayOptions || {};
     const avatarSize = vnode.attrs.avatarSize || 16;
     const showAvatar = !hideAvatar;
@@ -51,7 +50,7 @@ const User: m.Component<{
     let profile; // profile is used to retrieve the chain and address later
     let role;
     const addrShort = formatAddressShort(
-      user?.address,
+      user.address,
       typeof user.chain === 'string' ? user.chain : user.chain?.id,
       false,
       maxCharLength
@@ -90,16 +89,16 @@ const User: m.Component<{
       profile = vnode.attrs.user;
       // only load account if it's possible to, using the current chain
       if (app.chain && app.chain.id === profile.chain) {
-        account = app.chain.accounts.get(profile?.address);
+        account = app.chain.accounts.get(profile.address);
       }
-      role = adminsAndMods.find((r) => r.address === profile?.address && r.address_chain === profile.chain);
+      role = adminsAndMods.find((r) => r.address === profile.address && r.address_chain === profile.chain);
     } else {
       account = vnode.attrs.user;
       // TODO: we should remove this, since account should always be of type Account,
       // but we currently inject objects of type 'any' on the profile page
       const chainId = typeof account.chain === 'string' ? account.chain : account.chain.id;
       profile = account.profile;
-      role = adminsAndMods.find((r) => r.address === account?.address && r.address_chain === chainId);
+      role = adminsAndMods.find((r) => r.address === account.address && r.address_chain === chainId);
     }
     const getRoleTags = (long?) => [
       // 'long' makes role tags show as full length text
@@ -117,9 +116,9 @@ const User: m.Component<{
         size: 'xs',
       }),
     ];
-    const ghostAddress = app.user.addresses.some(({ address, ghostAddress }) => (
-        account?.address === address && ghostAddress
-    ))
+    const ghostAddress = app.user.addresses.some(({ address, ghostAddress }) => {
+      if (this !== undefined) account.address === address && ghostAddress
+    })
     const userFinal = avatarOnly
       ? m('.User.avatar-only', {
         key: profile?.address || '-',
@@ -134,11 +133,6 @@ const User: m.Component<{
       : m('.User', {
         key: profile?.address || '-',
         class: linkify ? 'linkified' : '',
-        onclick: (e: any) => {
-          if (vnode.attrs.onclick) {
-            vnode.attrs.onclick(e);
-          }
-        }
       }, [
         showAvatar && m('.user-avatar', {
           style: `width: ${avatarSize}px; height: ${avatarSize}px;`,
@@ -157,19 +151,19 @@ const User: m.Component<{
             linkify
               ? link('a.user-display-name.username',
                 (profile
-                  ? `/${app.activeId() || profile.chain}/account/${profile?.address}?base=${profile.chain}`
+                  ? `/${app.activeId() || profile.chain}/account/${profile.address}?base=${profile.chain}`
                   : 'javascript:'
                 ), [
                   !profile ? addrShort : !showAddressWithDisplayName ? profile.displayName : [
                     profile.displayName,
-                    m('.id-short', formatAddressShort(profile?.address, profile.chain)),
+                    m('.id-short', formatAddressShort(profile.address, profile.chain)),
                   ],
                   getRoleTags(false),
                 ])
               : m('a.user-display-name.username', [
                 !profile ? addrShort : !showAddressWithDisplayName ? profile.displayName : [
                   profile.displayName,
-                  m('.id-short', formatAddressShort(profile?.address, profile.chain)),
+                  m('.id-short', formatAddressShort(profile.address, profile.chain)),
                 ],
                 getRoleTags(false),
               ]),
@@ -203,14 +197,14 @@ const User: m.Component<{
             showAddressWithDisplayName: false
           }) : link('a.user-display-name',
             profile
-              ? `/${app.activeId() || profile.chain}/account/${profile?.address}?base=${profile.chain}`
+              ? `/${app.activeId() || profile.chain}/account/${profile.address}?base=${profile.chain}`
               : 'javascript:',
             !profile ? addrShort : !showAddressWithDisplayName ? profile.displayName : [
               profile.displayName,
-              m('.id-short', formatAddressShort(profile?.address, profile.chain)),
+              m('.id-short', formatAddressShort(profile.address, profile.chain)),
             ])
       ]),
-      profile?.address && m('.user-address', formatAddressShort(profile?.address, profile.chain, false, maxCharLength)),
+      profile?.address && m('.user-address', formatAddressShort(profile.address, profile.chain, false, maxCharLength)),
       friendlyChainName && m('.user-chain', friendlyChainName),
       getRoleTags(true), // always show roleTags in .UserPopover
     ]);
@@ -256,26 +250,26 @@ export const UserBlock: m.Component<{
 
     let profile;
     if (user instanceof AddressInfo) {
-      if (!user.chain || !user?.address) return;
-      profile = app.profiles.getProfile(user.chain, user?.address);
+      if (!user.chain || !user.address) return;
+      profile = app.profiles.getProfile(user.chain, user.address);
     } else if (user instanceof Profile) {
       profile = user;
     } else {
-      profile = app.profiles.getProfile(user.chain.id, user?.address);
+      profile = app.profiles.getProfile(user.chain.id, user.address);
     }
 
     const highlightSearchTerm = profile?.address
       && searchTerm
-      && profile?.address.toLowerCase().includes(searchTerm);
+      && profile.address.toLowerCase().includes(searchTerm);
     const highlightedAddress = highlightSearchTerm ? (() => {
-      const isNear = profile?.address.chain === 'near';
-      const queryStart = profile?.address.toLowerCase().indexOf(searchTerm);
+      const isNear = profile.address.chain === 'near';
+      const queryStart = profile.address.toLowerCase().indexOf(searchTerm);
       const queryEnd = queryStart + searchTerm.length;
 
       return ([
-        m('span', profile?.address.slice(0, queryStart)),
-        m('mark', profile?.address.slice(queryStart, queryEnd)),
-        m('span', profile?.address.slice(queryEnd, profile?.address.length)),
+        m('span', profile.address.slice(0, queryStart)),
+        m('mark', profile.address.slice(queryStart, queryEnd)),
+        m('span', profile.address.slice(queryEnd, profile.address.length)),
       ]);
     })() : null;
 
@@ -305,7 +299,7 @@ export const UserBlock: m.Component<{
         }, [
           m('', highlightSearchTerm
             ? highlightedAddress
-            : showFullAddress ? profile?.address : formatAddressShort(profile?.address, profile.chain)),
+            : showFullAddress ? profile.address : formatAddressShort(profile.address, profile.chain)),
           profile?.address && showChainName && m('.address-divider', ' · '),
           showChainName && m('', (typeof user.chain === 'string' ? capitalize(user.chain) : capitalize(user.chain.name))),
         ]),
@@ -316,7 +310,7 @@ export const UserBlock: m.Component<{
     ];
 
     const userLink = profile
-      ? `/${app.activeId() || profile.chain}/account/${profile?.address}?base=${profile.chain}`
+      ? `/${app.activeId() || profile.chain}/account/${profile.address}?base=${profile.chain}`
       : 'javascript:';
 
     return linkify
