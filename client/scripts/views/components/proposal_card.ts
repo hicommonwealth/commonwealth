@@ -70,7 +70,6 @@ export const getStatusText = (proposal: AnyProposal, showCountdown: boolean) => 
               : proposal.endTime.kind === 'unavailable'
                 ? '' : '';
 
-                console.log(typeof proposal);
   if (proposal instanceof MolochProposal) {
     if (proposal.state === MolochProposalState.NotStarted)
       return 'Waiting to start';
