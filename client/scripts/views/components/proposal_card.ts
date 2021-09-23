@@ -49,6 +49,11 @@ export const getStatusText = (proposal: AnyProposal, showCountdown: boolean) => 
     if (proposal.state === AaveTypes.ProposalState.EXECUTED) return 'Executed';
     if (proposal.state === AaveTypes.ProposalState.EXPIRED) return 'Expired';
     if (proposal.state === AaveTypes.ProposalState.FAILED) return 'Did not pass';
+  } else if (proposal.completed && proposal instanceof CompoundProposal) {
+    if (proposal.state === CompoundTypes.ProposalState.Canceled) return 'Cancelled';
+    if (proposal.state === CompoundTypes.ProposalState.Executed) return 'Executed';
+    if (proposal.state === CompoundTypes.ProposalState.Expired) return 'Expired';
+    if (proposal.state === CompoundTypes.ProposalState.Defeated) return 'Did not pass';
   } else if (proposal.completed) {
     if (proposal.isPassing === ProposalStatus.Passed) return 'Passed';
     if (proposal.isPassing === ProposalStatus.Failed) return 'Did not pass';
@@ -85,7 +90,7 @@ export const getStatusText = (proposal: AnyProposal, showCountdown: boolean) => 
       return 'Ready to process';
   }
 
-  if (proposal instanceof AaveProposal || proposal instanceof CompoundProposal) {
+  if (proposal instanceof AaveProposal) {
     if (proposal.state === AaveTypes.ProposalState.ACTIVE)
       return [ proposal.isPassing === ProposalStatus.Passing ? 'Passing, ' : 'Not passing, ', countdown ];
     if (proposal.state === AaveTypes.ProposalState.PENDING)
@@ -95,6 +100,18 @@ export const getStatusText = (proposal: AnyProposal, showCountdown: boolean) => 
     if (proposal.state === AaveTypes.ProposalState.SUCCEEDED)
       return 'Ready to queue';
     if (proposal.state === AaveTypes.ProposalState.EXPIRED) return 'Expired';
+  }
+
+  if (proposal instanceof CompoundProposal) {
+    if (proposal.state === CompoundTypes.ProposalState.Active)
+      return [ proposal.isPassing === ProposalStatus.Passing ? 'Passing, ' : 'Not passing, ', countdown ];
+    if (proposal.state === CompoundTypes.ProposalState.Pending)
+      return ['Pending, ', countdown];
+    if (proposal.state === CompoundTypes.ProposalState.Queued)
+      return [ 'Queued, ', countdown ];
+    if (proposal.state === CompoundTypes.ProposalState.Succeeded)
+      return 'Ready to queue';
+    if (proposal.state === CompoundTypes.ProposalState.Expired) return 'Expired';
   }
 
   if (proposal.isPassing === ProposalStatus.Passed)
