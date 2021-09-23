@@ -86,6 +86,9 @@ export interface IPostNotificationData {
   community_id: string;
   author_address: string;
   author_chain: string;
+  view_count?: number;
+  like_count?: number;
+  comment_count?: number;
 }
 
 export interface ICommunityNotificationData {

@@ -1,11 +1,20 @@
 import 'components/sidebar/dashboard_row.scss';
 
-import { Icon, Icons, Button, ButtonGroup, } from 'construct-ui';
+import { Icon, Icons, Button, ButtonGroup } from 'construct-ui';
 import _ from 'lodash';
 import m from 'mithril';
 import moment from 'moment';
 import {
-  SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents, IEventLabel, chainSupportedBy, CompoundTypes, CompoundEvents, AaveTypes, AaveEvents,
+  SubstrateTypes,
+  MolochTypes,
+  SubstrateEvents,
+  MolochEvents,
+  IEventLabel,
+  chainSupportedBy,
+  CompoundTypes,
+  CompoundEvents,
+  AaveTypes,
+  AaveEvents,
   // CompoundEvents
 } from '@commonwealth/chain-events';
 
@@ -30,7 +39,11 @@ const getCommentPreview = (comment_text) => {
   try {
     const doc = JSON.parse(decodeURIComponent(comment_text));
     if (!doc.ops) throw new Error();
-    decoded_comment_text = m(QuillFormattedText, { doc, hideFormatting: true, collapse: true });
+    decoded_comment_text = m(QuillFormattedText, {
+      doc,
+      hideFormatting: true,
+      collapse: true,
+    });
   } catch (e) {
     let doc = decodeURIComponent(comment_text);
     const regexp = RegExp('\\[(\\@.+?)\\]\\(.+?\\)', 'g');
@@ -38,7 +51,11 @@ const getCommentPreview = (comment_text) => {
     Array.from(matches).forEach((match) => {
       doc = doc.replace(match[0], match[1]);
     });
-    decoded_comment_text = m(MarkdownFormattedText, { doc: doc.slice(0, 140), hideFormatting: true, collapse: true });
+    decoded_comment_text = m(MarkdownFormattedText, {
+      doc: doc.slice(0, 140),
+      hideFormatting: true,
+      collapse: true,
+    });
   }
   return decoded_comment_text;
 };
@@ -55,16 +72,31 @@ const getAgo = (time) => {
   const mi = moment(Date.now()).diff(time, 'minutes');
   if (mi > 0) return `${mi}m`;
   const s = moment(Date.now()).diff(time, 'seconds');
-  return (s > 0) ? `${s}s` : 'now';
-}
+  return s > 0 ? `${s}s` : 'now';
+};
 
 const getNotificationFields = (category, data: IPostNotificationData) => {
-  const { created_at, root_id, root_title, root_type, comment_id, comment_text, parent_comment_id,
-    parent_comment_text, chain_id, community_id, author_address, author_chain } = data;
+  const {
+    created_at,
+    root_id,
+    root_title,
+    root_type,
+    comment_id,
+    comment_text,
+    parent_comment_id,
+    parent_comment_text,
+    chain_id,
+    community_id,
+    author_address,
+    author_chain,
+    like_count,
+    comment_count,
+    view_count,
+  } = data;
 
   const community_name = community_id
-    ? (app.config.communities.getById(community_id)?.name || 'Unknown community')
-    : (app.config.chains.getById(chain_id)?.name || 'Unknown chain');
+    ? app.config.communities.getById(community_id)?.name || 'Unknown community'
+    : app.config.chains.getById(chain_id)?.name || 'Unknown chain';
 
   let notificationHeader;
   let notificationBody;
@@ -84,7 +116,7 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
       e.preventDefault();
       e.stopPropagation();
       m.route.set(`/${author_chain}/account/${author_address}`);
-    }
+    },
   });
 
   const ago = getAgo(created_at);
@@ -92,18 +124,60 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
   if (category === NotificationCategories.NewComment) {
     // Needs logic for notifications issued to parents of nested comments
     notificationHeader = parent_comment_id
-      ? m('span', [ actorName, ' commented on ', m('span.commented-obj', decoded_title), '  ', m('span.comment-ago', ago) ])
-      : m('span', [ actorName, ' responded in ', m('span.commented-obj', decoded_title), '  ', m('span.comment-ago', ago) ]);
+      ? m('span', [
+        actorName,
+        ' commented on ',
+        m('span.commented-obj', decoded_title),
+        '  ',
+        m('span.comment-ago', ago),
+      ])
+      : m('span', [
+        actorName,
+        ' responded in ',
+        m('span.commented-obj', decoded_title),
+        '  ',
+        m('span.comment-ago', ago),
+      ]);
   } else if (category === NotificationCategories.NewThread) {
-    notificationHeader = m('span', [ actorName, ' created a new thread ', m('span.commented-obj', decoded_title), '  ', m('span.comment-ago', ago) ]);
+    notificationHeader = m('span', [
+      actorName,
+      ' created a new thread ',
+      m('span.commented-obj', decoded_title),
+      '  ',
+      m('span.comment-ago', ago),
+    ]);
   } else if (category === `${NotificationCategories.NewMention}`) {
-    notificationHeader = m('span', [ actorName, ' mentioned you in ', m('span.commented-obj', decoded_title), '  ', m('span.comment-ago', ago) ]);
+    notificationHeader = m('span', [
+      actorName,
+      ' mentioned you in ',
+      m('span.commented-obj', decoded_title),
+      '  ',
+      m('span.comment-ago', ago),
+    ]);
   } else if (category === `${NotificationCategories.NewCollaboration}`) {
-    notificationHeader = m('span', [actorName, ' added you as a collaborator on ', m('span.commented-obj', decoded_title), '  ', m('span.comment-ago', ago)]);
+    notificationHeader = m('span', [
+      actorName,
+      ' added you as a collaborator on ',
+      m('span.commented-obj', decoded_title),
+      '  ',
+      m('span.comment-ago', ago),
+    ]);
   } else if (category === `${NotificationCategories.NewReaction}`) {
-    notificationHeader = (!comment_id)
-      ? m('span', [ actorName, ' liked the post ', m('span.commented-obj', decoded_title), '  ', m('span.comment-ago', ago) ])
-      : m('span', [ actorName, ' liked your comment in ', m('span.commented-obj', decoded_title || community_name), '  ', m('span.comment-ago', ago) ]);
+    notificationHeader = !comment_id
+      ? m('span', [
+        actorName,
+        ' liked the post ',
+        m('span.commented-obj', decoded_title),
+        '  ',
+        m('span.comment-ago', ago),
+      ])
+      : m('span', [
+        actorName,
+        ' liked your comment in ',
+        m('span.commented-obj', decoded_title || community_name),
+        '  ',
+        m('span.comment-ago', ago),
+      ]);
   }
   const pseudoProposal = {
     id: root_id,
@@ -111,36 +185,62 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
     chain: chain_id,
     community: community_id,
   };
-  const args = comment_id ? [root_type, pseudoProposal, { id: comment_id }] : [root_type, pseudoProposal];
+  const args = comment_id
+    ? [root_type, pseudoProposal, { id: comment_id }]
+    : [root_type, pseudoProposal];
   const path = (getProposalUrl as any)(...args);
-  const pageJump = comment_id ? () => jumpHighlightComment(comment_id) : () => jumpHighlightComment('parent');
+  const pageJump = comment_id
+    ? () => jumpHighlightComment(comment_id)
+    : () => jumpHighlightComment('parent');
 
-  return ({
+  return {
     authorInfo: [[author_chain, author_address]],
     createdAt: moment.utc(created_at),
     notificationHeader,
     notificationBody,
     path,
-    pageJump
-  });
+    pageJump,
+    viewCount: view_count,
+    likeCount: like_count,
+    commentCount: comment_count,
+  };
 };
 
-const getBatchNotificationFields = (category, data: IPostNotificationData[]) => {
+const getBatchNotificationFields = (
+  category,
+  data: IPostNotificationData[]
+) => {
   if (data.length === 1) {
     return getNotificationFields(category, data[0]);
   }
 
-  const { created_at, root_id, root_title, root_type, comment_id, comment_text, parent_comment_id,
-    parent_comment_text, chain_id, community_id, author_address, author_chain } = data[0];
+  const {
+    created_at,
+    root_id,
+    root_title,
+    root_type,
+    comment_id,
+    comment_text,
+    parent_comment_id,
+    parent_comment_text,
+    chain_id,
+    community_id,
+    author_address,
+    author_chain,
+    view_count,
+    like_count,
+    comment_count,
+  } = data[0];
 
   const ago = getAgo(created_at);
 
-  const authorInfo = _.uniq(data.map((d) => `${d.author_chain}#${d.author_address}`))
-    .map((u) => u.split('#'));
+  const authorInfo = _.uniq(
+    data.map((d) => `${d.author_chain}#${d.author_address}`)
+  ).map((u) => u.split('#'));
   const length = authorInfo.length - 1;
   const community_name = community_id
-    ? (app.config.communities.getById(community_id)?.name || 'Unknown community')
-    : (app.config.chains.getById(chain_id)?.name || 'Unknown chain');
+    ? app.config.communities.getById(community_id)?.name || 'Unknown community'
+    : app.config.chains.getById(chain_id)?.name || 'Unknown chain';
 
   let notificationHeader;
   let notificationBody;
@@ -159,7 +259,7 @@ const getBatchNotificationFields = (category, data: IPostNotificationData[]) => 
     onclick: (e: any) => {
       e.preventDefault();
       e.stopPropagation();
-    }
+    },
   });
 
   if (category === NotificationCategories.NewComment) {
@@ -171,7 +271,7 @@ const getBatchNotificationFields = (category, data: IPostNotificationData[]) => 
         ' commented on ',
         m('span.commented-obj', decoded_title),
         ' ',
-        m('span.comment-ago', ago)
+        m('span.comment-ago', ago),
       ])
       : m('span', [
         actorName,
@@ -179,7 +279,7 @@ const getBatchNotificationFields = (category, data: IPostNotificationData[]) => 
         ' responded in ',
         m('span.commented-obj', decoded_title),
         ' ',
-        m('span.comment-ago', ago)
+        m('span.comment-ago', ago),
       ]);
   } else if (category === NotificationCategories.NewThread) {
     notificationHeader = m('span', [
@@ -188,17 +288,17 @@ const getBatchNotificationFields = (category, data: IPostNotificationData[]) => 
       ' created new threads in ',
       m('span.commented-obj', community_name),
       ' ',
-      m('span.comment-ago', ago)
+      m('span.comment-ago', ago),
     ]);
   } else if (category === `${NotificationCategories.NewMention}`) {
-    notificationHeader = (!comment_id)
+    notificationHeader = !comment_id
       ? m('span', [
         actorName,
         length > 0 && ` and ${pluralize(length, 'other')}`,
         ' mentioned you in ',
         m('span.commented-obj', community_name),
         ' ',
-        m('span.comment-ago', ago)
+        m('span.comment-ago', ago),
       ])
       : m('span', [
         actorName,
@@ -206,17 +306,17 @@ const getBatchNotificationFields = (category, data: IPostNotificationData[]) => 
         ' mentioned you in ',
         m('span.commented-obj', decoded_title || community_name),
         ' ',
-        m('span.comment-ago', ago)
+        m('span.comment-ago', ago),
       ]);
   } else if (category === `${NotificationCategories.NewReaction}`) {
-    notificationHeader = (!comment_id)
+    notificationHeader = !comment_id
       ? m('span', [
         actorName,
         length > 0 && ` and ${pluralize(length, 'other')}`,
         ' liked the post ',
         m('span.commented-obj', decoded_title),
         ' ',
-        m('span.comment-ago', ago)
+        m('span.comment-ago', ago),
       ])
       : m('span', [
         actorName,
@@ -224,7 +324,7 @@ const getBatchNotificationFields = (category, data: IPostNotificationData[]) => 
         ' liked your comment in ',
         m('span.commented-obj', decoded_title || community_name),
         ' ',
-        m('span.comment-ago', ago)
+        m('span.comment-ago', ago),
       ]);
   }
   const pseudoProposal = {
@@ -236,36 +336,45 @@ const getBatchNotificationFields = (category, data: IPostNotificationData[]) => 
   const args = comment_id
     ? [root_type, pseudoProposal, { id: comment_id }]
     : [root_type, pseudoProposal];
-  const path = category === NotificationCategories.NewThread
-    ? (getCommunityUrl as any)(community_id || chain_id)
-    : (getProposalUrl as any)(...args);
+  const path =
+    category === NotificationCategories.NewThread
+      ? (getCommunityUrl as any)(community_id || chain_id)
+      : (getProposalUrl as any)(...args);
   const pageJump = comment_id
     ? () => jumpHighlightComment(comment_id)
     : () => jumpHighlightComment('parent');
 
-  return ({
+  return {
     authorInfo,
     createdAt: moment.utc(created_at),
     notificationHeader,
     notificationBody,
     path,
-    pageJump
-  });
+    pageJump,
+    viewCount: view_count,
+    likeCount: like_count,
+    commentCount: comment_count,
+  };
 };
 
-const DashboardRow: m.Component<{
-  notifications: Notification[],
-  onListPage?: boolean,
-}, {
-  Labeler: any,
-  MolochTypes: any,
-  SubstrateTypes: any,
-  scrollOrStop: boolean;
-  markingRead: boolean;
-}> = {
+const DashboardRow: m.Component<
+  {
+    notifications: Notification[];
+    onListPage?: boolean;
+  },
+  {
+    Labeler: any;
+    MolochTypes: any;
+    SubstrateTypes: any;
+    scrollOrStop: boolean;
+    markingRead: boolean;
+  }
+> = {
   oncreate: (vnode) => {
-    if (m.route.param('id') && vnode.attrs.onListPage
-      && m.route.param('id') === vnode.attrs.notifications[0].id.toString()
+    if (
+      m.route.param('id') &&
+      vnode.attrs.onListPage &&
+      m.route.param('id') === vnode.attrs.notifications[0].id.toString()
     ) {
       vnode.state.scrollOrStop = true;
     }
@@ -287,25 +396,25 @@ const DashboardRow: m.Component<{
         label = SubstrateEvents.Label(
           notification.chainEvent.blockNumber,
           chainId,
-          notification.chainEvent.data,
+          notification.chainEvent.data
         );
       } else if (chainSupportedBy(chainId, MolochTypes.EventChains)) {
         label = MolochEvents.Label(
           notification.chainEvent.blockNumber,
           chainId,
-          notification.chainEvent.data,
+          notification.chainEvent.data
         );
       } else if (chainSupportedBy(chainId, CompoundTypes.EventChains)) {
         label = CompoundEvents.Label(
           notification.chainEvent.blockNumber,
           chainId,
-          notification.chainEvent.data,
+          notification.chainEvent.data
         );
       } else if (chainSupportedBy(chainId, AaveTypes.EventChains)) {
         label = AaveEvents.Label(
           notification.chainEvent.blockNumber,
           chainId,
-          notification.chainEvent.data,
+          notification.chainEvent.data
         );
       } else {
         throw new Error(`invalid notification chain: ${chainId}`);
@@ -321,15 +430,15 @@ const DashboardRow: m.Component<{
       }
 
       if (!label) {
-        return m('li.DashboardRow', {
-          class: notification.isRead ? '' : 'unread',
-          key: notification.id,
-          id: notification.id,
-        }, [
-          m('.comment-body', [
-            m('.comment-body-top', 'Loading...'),
-          ]),
-        ]);
+        return m(
+          'li.DashboardRow',
+          {
+            class: notification.isRead ? '' : 'unread',
+            key: notification.id,
+            id: notification.id,
+          },
+          [m('.comment-body', [m('.comment-body-top', 'Loading...')])]
+        );
       }
       return link(
         'a.DashboardRow',
@@ -338,7 +447,8 @@ const DashboardRow: m.Component<{
           m('.comment-body', [
             m('.comment-body-top.chain-event-notification-top', [
               `${label.heading} on ${chainName}`,
-              !vnode.attrs.onListPage && m(Icon, {
+              !vnode.attrs.onListPage &&
+              m(Icon, {
                 name: Icons.X,
                 onmousedown: (e) => {
                   e.preventDefault();
@@ -351,41 +461,57 @@ const DashboardRow: m.Component<{
                   app.user.notifications.clear([notification]);
                   m.redraw();
                 },
-              })
+              }),
             ]),
-            m('.comment-body-bottom', `Block ${notification.chainEvent.blockNumber}`),
+            m(
+              '.comment-body-bottom',
+              `Block ${notification.chainEvent.blockNumber}`
+            ),
             m('.comment-body-excerpt', label.label),
           ]),
-        ], {
+        ],
+        {
           class: notification.isRead ? '' : 'unread',
           key: notification.id,
           id: notification.id,
         },
         null,
         () => {
-          if (vnode.state.scrollOrStop) { vnode.state.scrollOrStop = false; return; }
+          if (vnode.state.scrollOrStop) {
+            vnode.state.scrollOrStop = false;
+            return;
+          }
           const notificationArray: Notification[] = [];
           notificationArray.push(notification);
-          app.user.notifications.markAsRead(notificationArray).then(() => m.redraw());
+          app.user.notifications
+            .markAsRead(notificationArray)
+            .then(() => m.redraw());
         },
-        () => m.redraw.sync(),
+        () => m.redraw.sync()
       );
     } else {
-      const notificationData = notifications.map((notif) => typeof notif.data === 'string'
-        ? JSON.parse(notif.data)
-        : notif.data);
+      const notificationData = notifications.map((notif) =>
+        typeof notif.data === 'string' ? JSON.parse(notif.data) : notif.data
+      );
       let {
         authorInfo,
         createdAt,
         notificationHeader,
         notificationBody,
         path,
-        pageJump
+        pageJump,
+        viewCount,
+        likeCount,
+        commentCount,
       } = getBatchNotificationFields(category, notificationData);
 
       if (app.isCustomDomain()) {
-        if (path.indexOf(`https://commonwealth.im/${app.customDomainId()}/`) !== 0
-            && path.indexOf(`http://localhost:8080/${app.customDomainId()}/`) !== 0) return;
+        if (
+          path.indexOf(`https://commonwealth.im/${app.customDomainId()}/`) !==
+          0 &&
+          path.indexOf(`http://localhost:8080/${app.customDomainId()}/`) !== 0
+        )
+          return;
         path = path
           .replace(`https://commonwealth.im/${app.customDomainId()}/`, '/')
           .replace(`http://localhost:8080/${app.customDomainId()}/`, '/');
@@ -393,7 +519,8 @@ const DashboardRow: m.Component<{
 
       return link(
         'a.DashboardRow',
-        path.replace(/ /g, '%20'), [
+        path.replace(/ /g, '%20'),
+        [
           // authorInfo.length === 1
           //   ? m(User, {
           //     user: new AddressInfo(
@@ -411,10 +538,10 @@ const DashboardRow: m.Component<{
           //   }),
           m('.comment-body', [
             m('.comment-body-title', notificationHeader),
-            notificationBody
-              && category !== `${NotificationCategories.NewReaction}`
-              && category !== `${NotificationCategories.NewThread}`
-              && m('.comment-body-excerpt', notificationBody),
+            notificationBody &&
+            category !== `${NotificationCategories.NewReaction}` &&
+            category !== `${NotificationCategories.NewThread}` &&
+            m('.comment-body-excerpt', notificationBody),
             m('.comment-body-bottom', [
               m('.comment-body-bottom-left', [
                 m(Button, {
@@ -424,7 +551,7 @@ const DashboardRow: m.Component<{
                   onclick: (e: any) => {
                     e.preventDefault();
                     e.stopPropagation();
-                  }
+                  },
                 }),
                 m(Button, {
                   iconLeft: Icons.SHARE,
@@ -433,7 +560,7 @@ const DashboardRow: m.Component<{
                   onclick: (e: any) => {
                     e.preventDefault();
                     e.stopPropagation();
-                  }
+                  },
                 }),
                 m(Button, {
                   iconLeft: Icons.BELL,
@@ -442,29 +569,29 @@ const DashboardRow: m.Component<{
                   onclick: (e: any) => {
                     e.preventDefault();
                     e.stopPropagation();
-                  }
-                })
+                  },
+                }),
               ]),
               m('.comment-body-bottom-right', [
                 m(Button, {
                   iconLeft: Icons.EYE,
-                  label: '1.8k',
-                  outlined: false
+                  label: viewCount,
+                  outlined: false,
                 }),
                 m(Button, {
                   iconLeft: Icons.HEART,
-                  label: '590',
-                  outlined: false
+                  label: likeCount,
+                  outlined: false,
                 }),
                 m(Button, {
                   iconLeft: Icons.MESSAGE_SQUARE,
-                  label: '84',
-                  outlined: false
-                })
+                  label: commentCount,
+                  outlined: false,
+                }),
               ]),
             ]),
 
-            m('.DashboardRow-overwrite')
+            m('.DashboardRow-overwrite'),
             // m('.comment-body-bottom-wrap', [
             //   m('.comment-body-created', moment(createdAt).fromNow()),
             //   !notification.isRead && m('.comment-body-mark-as-read', {
@@ -484,15 +611,16 @@ const DashboardRow: m.Component<{
             //     vnode.state.markingRead ? m(Spinner, { size: 'xs', active: true }) : 'Mark as read',
             //   ]),
             // ])
-          ])
-        ], {
+          ]),
+        ],
+        {
           class: notification.isRead ? '' : 'unread',
           key: notification.id,
           id: notification.id,
         },
         null,
         () => app.user.notifications.markAsRead(notifications),
-        pageJump ? () => setTimeout(() => pageJump(), 1) : null,
+        pageJump ? () => setTimeout(() => pageJump(), 1) : null
       );
     }
   },
