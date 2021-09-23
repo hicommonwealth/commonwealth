@@ -3,7 +3,7 @@ import 'components/proposal_card.scss';
 import m from 'mithril';
 import moment from 'moment';
 import { Icon, Icons, Tag } from 'construct-ui';
-import { AaveTypes } from '@commonwealth/chain-events';
+import { AaveTypes, CompoundTypes } from '@commonwealth/chain-events';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -21,6 +21,7 @@ import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democr
 import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 import MolochProposal, { MolochProposalState } from 'controllers/chain/ethereum/moloch/proposal';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
+import CompoundProposal from 'controllers/chain/ethereum/compound/proposal';
 
 import Countdown from 'views/components/countdown';
 
@@ -69,6 +70,7 @@ export const getStatusText = (proposal: AnyProposal, showCountdown: boolean) => 
               : proposal.endTime.kind === 'unavailable'
                 ? '' : '';
 
+                console.log(typeof proposal);
   if (proposal instanceof MolochProposal) {
     if (proposal.state === MolochProposalState.NotStarted)
       return 'Waiting to start';
@@ -84,7 +86,7 @@ export const getStatusText = (proposal: AnyProposal, showCountdown: boolean) => 
       return 'Ready to process';
   }
 
-  if (proposal instanceof AaveProposal) {
+  if (proposal instanceof AaveProposal || proposal instanceof CompoundProposal) {
     if (proposal.state === AaveTypes.ProposalState.ACTIVE)
       return [ proposal.isPassing === ProposalStatus.Passing ? 'Passing, ' : 'Not passing, ', countdown ];
     if (proposal.state === AaveTypes.ProposalState.PENDING)
