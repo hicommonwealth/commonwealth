@@ -13,6 +13,7 @@ import User from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
 import { CommunityOptionsPopover } from './discussions';
 import Compound from 'controllers/chain/ethereum/compound/adapter';
+import Aave from 'controllers/chain/ethereum/aave/adapter';
 import { pluralize } from 'helpers';
 import { BigNumber } from 'ethers';
 import { notifyError } from 'controllers/app/notifications';
@@ -28,27 +29,29 @@ interface MemberInfo {
 const MEMBERS_PER_PAGE = 20;
 
 const DelegateModal: m.Component<
-  { address: string; name: string; symbol: string },
+  {
+    address: string;
+    name: string;
+    symbol: string;
+    chainController: Compound | Aave;
+  },
   { delegateAmount: number }
 > = {
   view: (vnode) => {
+    const { address, name, symbol, chainController } = vnode.attrs;
     return m('.DelegateModal', [
       m('.compact-modal-title', [
         m(
           'h3',
           `Delegate to ${
-            vnode.attrs.name
-              ? `${vnode.attrs.name} at Address: ${formatAddressShort(
-                  vnode.attrs.address
-                )}`
-              : `Anonymous at Address: ${formatAddressShort(
-                  vnode.attrs.address
-                )}`
+            name
+              ? `${name} at Address: ${formatAddressShort(address)}`
+              : `Anonymous at Address: ${formatAddressShort(address)}`
           }`
         ),
       ]),
       m('.compact-modal-body', [
-        m('div', `Amount ${vnode.attrs.symbol} to delegate`),
+        m('div', `Amount ${symbol} to delegate`),
         m(Input, {
           title: 'Add amount',
           oninput: (e) => {
@@ -62,7 +65,7 @@ const DelegateModal: m.Component<
           label: 'Delegate',
           intent: 'primary',
           onclick: async (e) => {
-            (app.chain as Compound)?.chain.setDelegate(vnode.attrs.address, vnode.state.delegateAmount)
+            chainController?.chain.setDelegate(vnode.attrs.address, vnode.state.delegateAmount)
               .catch((err) => {
                 if (err.message.indexOf('delegates underflow') > -1) {
                   err.message =
@@ -84,7 +87,7 @@ const MembersPage: m.Component<
     membersLoaded: MemberInfo[];
     pageToLoad: number;
     totalMembers: number;
-    isCompound: boolean;
+    delegates: boolean;
     voteEvents;
   }
 > = {
@@ -113,7 +116,13 @@ const MembersPage: m.Component<
         }
       }
     });
-    vnode.state.isCompound = (app.chain instanceof Compound) ? true: false;
+    vnode.state.delegates = (app.chain instanceof Compound) || (app.chain instanceof Aave);
+    const chainController =
+      app.chain instanceof Compound
+        ? (app.chain as Compound)
+        : app.chain instanceof Aave
+        ? (app.chain as Aave)
+        : null;
 
     const activeEntity = app.community ? app.community : app.chain;
     if (!activeEntity) {
@@ -171,13 +180,12 @@ const MembersPage: m.Component<
           vnode.state.membersLoaded = vnode.state.membersLoaded.concat(newMembers);
           vnode.state.totalMembers = total;
 
-          // TODO: Change these "isCompound" checks
           const offset = vnode.state.membersLoaded.length - newMembers.length;
-          if (vnode.state.isCompound) {
+          if (vnode.state.delegates) {
             return app.chain.initApi().then(() =>
               Promise.all(
                 newMembers.map((o, i) => {
-                  return (app.chain as Compound).chain
+                  return chainController?.chain
                     .getVotingPower(o.address)
                     .then((votes) => {
                       vnode.state.membersLoaded[offset + i].votes = votes;
@@ -217,8 +225,8 @@ const MembersPage: m.Component<
           m('tr', [
             m('th', 'Member'),
             m('th.align-right', 'Posts'),
-            vnode.state.isCompound ? m('th.align-right', 'Voting Power') : null,
-            vnode.state.isCompound ? m('th.align-right', 'Delegate') : null,
+            vnode.state.delegates ? m('th.align-right', 'Voting Power') : null,
+            vnode.state.delegates ? m('th.align-right', 'Delegate') : null,
           ]),
           vnode.state.membersLoaded.map((info) => {
             const profile = app.profiles.getProfile(info.chain, info.address);
@@ -254,17 +262,27 @@ const MembersPage: m.Component<
               m('td.align-right', [
                 (info.count > 0) ? `${pluralize(info.count, 'post')} this month` : null,
               ]),
-              vnode.state.isCompound
+              vnode.state.delegates
                 ? m('td.align-right',
                   [ info.votes !== undefined ? `${info.votes.toNumber().toFixed(2)} ${app.chain.meta.chain.symbol}` : m(Spinner, { active: true, size: 'xs' }) ]) : null,
-              vnode.state.isCompound ? m('td.align-right',
+              vnode.state.delegates ? m('td.align-right',
                 m(Button, {
                   label: 'Delegate',
                   intent: 'primary',
                   onclick: async (e) => {
-                    app.modals.create({ modal: DelegateModal, data: { address: info.address, name: profile.name, symbol: app.chain.meta.chain.symbol  } });
-                  }
-                })) : null,
+                        app.modals.create({
+                          modal: DelegateModal,
+                          data: {
+                            address: info.address,
+                            name: profile.name,
+                            symbol: app.chain.meta.chain.symbol,
+                            chainController: app.chain,
+                          },
+                        });
+                      },
+                    })
+                  )
+                : null,
             ]);
           })]),
         !vnode.state.totalMembers
