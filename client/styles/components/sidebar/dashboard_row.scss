@@ -106,7 +106,9 @@
         align-items: center;
         justify-content: space-between;
         &-left {
-            margin-left: 20px;
+            @include sm-min {
+                margin-left: 20px;
+            }
             svg {
                 stroke: black;
             }
@@ -114,6 +116,9 @@
                 border: 1px solid #ddd;
                 margin-right: 25px;
                 color: black;
+                @include xs-max {
+                    margin-bottom: 6px;
+                }
                 &:hover {
                     background: #F7F4FF;
                     border: 1px solid #4723AD;

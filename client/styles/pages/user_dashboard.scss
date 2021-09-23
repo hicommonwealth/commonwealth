@@ -48,11 +48,19 @@
     }
     .DashboardList {
         margin-top: 20px;
-        margin-left: -17px;
+        @include sm-min {
+            margin-left: -17px;
+        }
+        @include xs-max {
+            margin: 20px -22px 0;
+        }
     }
 
-    .communites-list-col {
-        margin-left: 20px;
+    .expore-communities-col {
+        @include xs-max {
+            margin-top: 20px;
+        } 
+            
     }
 
     .home-card {

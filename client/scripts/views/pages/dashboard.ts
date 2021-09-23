@@ -213,7 +213,7 @@ const DashboardPage: m.Component<{}> = {
               : m('.no-notifications', 'No Notifications'),
           ])
         ]),
-        m(Col, { span: { md: 3 } }, [
+        m(Col, { span: { md: 3 }, class:'expore-communities-col' }, [
           m('.title', 'Explore Communities'),
           m('.communities-list', [
             sortedChainsAndCommunities.length > 3 ? sortedChainsAndCommunities.slice(0, 3) : sortedChainsAndCommunities,
