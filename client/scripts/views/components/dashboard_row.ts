@@ -1,6 +1,6 @@
 import 'components/sidebar/dashboard_row.scss';
 
-import { Icon, Icons, Button, ButtonGroup } from 'construct-ui';
+import { Icon, Icons, Button, ButtonGroup, MenuItem, PopoverMenu } from 'construct-ui';
 import _ from 'lodash';
 import m from 'mithril';
 import moment from 'moment';
@@ -536,7 +536,14 @@ const DashboardRow: m.Component<
           //     users: authorInfo.map((auth) => new AddressInfo(null, auth[1], auth[0], null)),
           //     avatarSize: 26,
           //   }),
-          m('.comment-body', [
+          m('.comment-body', {
+            onclick:(e) => {
+              if (e.target.innerText === 'Share') {
+                e.preventDefault();
+                e.stopPropagation();
+              }
+            },
+          },[
             m('.comment-body-title', notificationHeader),
             notificationBody &&
             category !== `${NotificationCategories.NewReaction}` &&
@@ -553,14 +560,33 @@ const DashboardRow: m.Component<
                     e.stopPropagation();
                   },
                 }),
-                m(Button, {
-                  iconLeft: Icons.SHARE,
-                  label: 'Share',
-                  rounded: true,
-                  onclick: (e: any) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                  },
+                m(PopoverMenu, {
+                  transitionDuration: 0,
+                  closeOnOutsideClick: true,
+                  closeOnContentClick: true,
+                  menuAttrs: { size: 'default' },
+                  content: [
+                    m(MenuItem, {
+                      iconLeft: Icons.COPY,
+                      label: 'Copy URL',
+                      onclick: async (e) => {
+                        await navigator.clipboard.writeText(path);
+                      },
+                    }),
+                    m(MenuItem, {
+                      iconLeft: Icons.TWITTER,
+                      label: 'Share on Twitter',
+                      onclick: async (e) => {
+                        await window.open(`https://twitter.com/intent/tweet?text=${path}`, '_blank');
+                      }
+                    }),
+                  ],
+                  trigger: m(Button, {
+                    iconLeft: Icons.SHARE,
+                    id: 'share-button',
+                    label: 'Share',
+                    rounded: true,
+                  }),
                 }),
                 m(Button, {
                   iconLeft: Icons.BELL,

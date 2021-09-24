@@ -55,10 +55,10 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[] }> = {
         m('.recent-activity', !!monthlyThreadCount && [
           m('span.recent-threads', monthlyThreadCount > 20 ? [
             pluralize(Math.floor(monthlyThreadCount / 5), 'thread'),
-            ' / week',
+            ' this week',
           ] : [
             pluralize(monthlyThreadCount, 'thread'),
-            ' / month',
+            ' this month',
           ]),
           app.user.isMember({
             account: app.user.activeAccount,
@@ -102,10 +102,10 @@ const CommunityCard : m.Component<{ community: CommunityInfo }> = {
         m('.recent-activity', !!monthlyThreadCount && [
           m('span.recent-threads', monthlyThreadCount > 20 ? [
             pluralize(Math.floor(monthlyThreadCount / 5), 'thread'),
-            ' / week',
+            ' this week',
           ] : [
             pluralize(monthlyThreadCount, 'thread'),
-            ' / month',
+            ' this month',
           ]),
           app.user.isMember({ account: app.user.activeAccount, community: community.id })
             && [
