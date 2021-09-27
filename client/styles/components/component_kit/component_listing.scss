@@ -1,0 +1,40 @@
+.ComponentListing {
+    > * {
+        margin: 20px;
+    }
+    > .gallery > * {
+        margin-right: 20px;
+    }
+    .hex-listing {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: wrap;
+        max-height: 160px;
+        .hex-row {
+            display: flex;
+            justify-content: space-between;
+            margin-right: 80px;
+            .hex-sample {
+                min-width: 100px;
+                min-height: 10px;
+                max-width: 100px;
+                max-height: 10px;
+                border-radius: 5px;
+            }
+        }
+    }
+    .icon-listing {
+        display: flex;
+        .icon-gallery {
+            display: flex;
+            flex-direction: column;
+            width: 200px;
+            margin-right: 40px ;
+            .icon-row {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 10px;
+            }
+        }
+    }
+}

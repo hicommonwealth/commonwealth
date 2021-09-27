@@ -1,4 +1,5 @@
 import m from 'mithril';
+import 'components/component_kit/component_listing.scss';
 
 import {
   Breadcrumb,
@@ -16,7 +17,6 @@ import {
   FormLabel,
   List,
   ListItem,
-  Menu,
   MenuItem,
   PopoverMenu,
   Switch,
@@ -33,16 +33,13 @@ import {
   ArrowDownIcon,
   ArrowRightIcon,
   LikesIcon,
-  DiscussIcon,
   ReplyIcon,
   ViewsIcon,
   ShareIcon,
   AccountIcon,
   CopyIcon,
   CreateIcon,
-  FilterIcon,
   NotificationIcon,
-  SubscribeIcon,
   XIcon,
   SearchIcon,
   ElementIcon,
@@ -50,88 +47,155 @@ import {
   TelegramIcon,
   GithubIcon,
   IconSizes,
-} from './component_kit/icons';
+  ExternalLinkIcon,
+  PinIcon,
+  IconIntent,
+  WebsiteIcon,
+} from './icons';
 
-const ComponentKit: m.Component<{}, { radioGroupSelected; activeTab }> = {
+const displayColors = (hexList) => {
+  return Object.entries(hexList).map(([k, v]) => {
+    return m('.hex-row', [
+      m('.hex-name', k),
+      m('.hex-sample', { style: `background: ${v};` }),
+    ]);
+  });
+};
+
+const displayIcons = (headerText: string, iconList) => {
+  return m('.icon-gallery', [
+    m('h1', headerText),
+    Object.entries(iconList).map(([k, v]) => {
+      return m('.icon-row', [m('.icon-name', k), v]);
+    }),
+  ]);
+};
+
+const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
   view: (vnode) => {
-    return m('.ComponentKit', [
+    return m('.ComponentListing', [
+      m('h1', 'Redesign Colors'),
       m(
-        'style',
-        '.ComponentKit > * { margin: 20px; }\n .ComponentKit > .gallery > * { margin-right: 20px; }'
+        '.hex-listing',
+        displayColors({
+          Black: '#000000',
+          DarkGray: '#333333',
+          MidiGray: '#666666',
+          LiteGray: '#999999',
+          DisableGray: '#DDDDDD',
+          BackgroundGray: '#F4F4F4',
+          DarkPurp: '#4723AD',
+          MidiPurp: '#9075DC',
+          LitePurp: '#C7B9EF',
+          XLitePurp: '#F7F4FF',
+          HypeRed: '#FF002E',
+          Pinky: '#FFAFBE',
+          FleshPink: '#FFEBEE',
+          DarkGreen: '#008676',
+          CarribGreen: '#00C0A9',
+          FoamGreen: '#B4F1EA',
+          MintGreen: '#F3FFF9',
+          CreamYellow: '#FFFBA1',
+        })
       ),
       m('h1', 'Redesign Icons'),
-      m('h1', '14x14'),
-      m(
-        '.redesign-icons',
-        {
-          style: 'display: flex;',
-        },
-        [
-          [
-            m(ArrowDownIcon),
-            m(ArrowRightIcon),
-            m(ViewsIcon),
-            m(LikesIcon, { size: IconSizes.Fourteen }),
-            m(ReplyIcon, { size: IconSizes.Fourteen }),
-          ],
-        ]
-      ),
-      m(
-        '.redesign-icons',
-        {
-          style: 'display: flex;',
-        },
-        [
-          [
-            m(LikesIcon, { size: IconSizes.Twenty }),
-            m(DiscussIcon),
-            m(ReplyIcon, { size: IconSizes.Twenty }),
-            m(ShareIcon),
-            m(AccountIcon),
-            m(CopyIcon),
-            m(CreateIcon),
-            m(FilterIcon),
-            m(NotificationIcon),
-            m(SubscribeIcon),
-            m(XIcon),
-            m(SearchIcon),
-            m(ElementIcon),
-            m(DiscordIcon),
-            m(TelegramIcon),
-            m(GithubIcon),
-          ],
-        ]
-      ),
-      m('h1', 'Redesign Icons Disabled'),
-      m(
-        '.redesign-icons',
-        {
-          style: 'display: flex;',
-        },
-        [
-          [
-            m(ArrowDownIcon, { disabled: true }),
-            m(ArrowRightIcon, { disabled: true }),
-            m(LikesIcon, { disabled: true }),
-            m(ViewsIcon, { disabled: true }),
-            m(DiscussIcon, { disabled: true }),
-            m(ReplyIcon, { disabled: true }),
-            m(ShareIcon, { disabled: true }),
-            m(AccountIcon, { disabled: true }),
-            m(CopyIcon, { disabled: true }),
-            m(CreateIcon, { disabled: true }),
-            m(FilterIcon, { disabled: true }),
-            m(NotificationIcon, { disabled: true }),
-            m(SubscribeIcon, { disabled: true }),
-            m(XIcon, { disabled: true }),
-            m(SearchIcon, { disabled: true }),
-            m(ElementIcon, { disabled: true }),
-            m(DiscordIcon, { disabled: true }),
-            m(TelegramIcon, { disabled: true }),
-            m(GithubIcon, { disabled: true }),
-          ],
-        ]
-      ),
+      m('.icon-listing', [
+        displayIcons('14x14', {
+          ArrowDownIcon: m(ArrowDownIcon, {
+            size: IconSizes.SM,
+            intent: IconIntent.Secondary,
+            disabled: false,
+          }),
+          ArrowRightIcon: m(ArrowRightIcon, {
+            size: IconSizes.SM,
+            intent: IconIntent.Secondary,
+            disabled: false,
+          }),
+          ViewsIcon: m(ViewsIcon, {
+            size: IconSizes.SM,
+            intent: IconIntent.Secondary,
+            disabled: true,
+          }),
+          LikesIcon: m(LikesIcon, {
+            size: IconSizes.SM,
+            intent: IconIntent.Secondary,
+            disabled: true,
+          }),
+          ReplyIcon: m(ReplyIcon, {
+            size: IconSizes.SM,
+            intent: IconIntent.Secondary,
+            disabled: true,
+          }),
+          ExternalLinkIcon: m(ExternalLinkIcon, {
+            size: IconSizes.SM,
+          }),
+        }),
+        // search, pin, create, notification, account
+        displayIcons('20x20', {
+          ShareIcon: m(ShareIcon, {
+            size: IconSizes.MD,
+            intent: IconIntent.Primary,
+          }),
+          SubscribeIcon: m(NotificationIcon, {
+            size: IconSizes.MD,
+            intent: IconIntent.Primary,
+          }),
+          CreateIcon: m(CreateIcon, {
+            size: IconSizes.MD,
+            intent: IconIntent.Primary,
+          }),
+          LikesIcon: m(LikesIcon, {
+            size: IconSizes.MD,
+            intent: IconIntent.Primary,
+          }),
+          ReplyIcon: m(ReplyIcon, {
+            size: IconSizes.MD,
+            intent: IconIntent.Primary,
+          }),
+          SearchIcon: m(SearchIcon, {
+            size: IconSizes.MD,
+            intent: IconIntent.Secondary,
+          }),
+          PinIcon: m(PinIcon, {
+            size: IconSizes.MD,
+            intent: IconIntent.Secondary,
+          }),
+          NotificationIcon: m(NotificationIcon, {
+            size: IconSizes.MD,
+            intent: IconIntent.Primary,
+          }),
+          AccountIcon: m(AccountIcon, {
+            size: IconSizes.MD,
+            intent: IconIntent.Primary,
+          }),
+          // FilterIcon: m(FilterIcon),
+        }),
+        displayIcons('28x28', {
+          CopyIcon: m(CopyIcon, {
+            size: IconSizes.LG,
+            intent: IconIntent.Secondary,
+          }),
+          XIcon: m(XIcon, {
+            size: IconSizes.LG,
+            intent: IconIntent.Secondary,
+          }),
+          AccountIcon: m(AccountIcon, {
+            size: IconSizes.LG,
+            intent: IconIntent.Primary,
+          }),
+          NotificationIcon: m(NotificationIcon, {
+            size: IconSizes.LG,
+            intent: IconIntent.Primary,
+          }),
+        }),
+        displayIcons('Social', {
+          ElementIcon: m(ElementIcon),
+          DiscordIcon: m(DiscordIcon),
+          TelegramIcon: m(TelegramIcon),
+          GithubIcon: m(GithubIcon),
+          WebsiteIcon: m(WebsiteIcon),
+        }),
+      ]),
       // buttons and inputs
       m('.gallery', [
         m(Button, {
@@ -647,4 +711,4 @@ const ComponentKit: m.Component<{}, { radioGroupSelected; activeTab }> = {
   },
 };
 
-export default ComponentKit;
+export default ComponentListing;

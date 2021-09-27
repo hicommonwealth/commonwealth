@@ -1,49 +1,31 @@
 @import 'client/styles/facelift';
 
-svg.Icon {
-    &.XIcon,
-    &.CopyIcon {
-        path,
-        circle,
-        rect {
-            stroke: $lite-gray;
-        }
-        &:hover {
-            path,
-            circle,
-            rect {
-                stroke: $black;
-            }
-        }
+@mixin SVGIcon($color, $enabled: 'true') {
+    path,
+    circle,
+    rect {
+        stroke: $color;
     }
-    &.AccountIcon,
-    &.NotificationIcon,
-    &.SearchIcon,
-    &.CreateIcon,
-    &.FilterIcon,
-    &.ShareIcon,
-    &.SubscribeIcon,
-    &.DiscussIcon,
-    &.LikeIcon,
-    &.ReplyIcon {
-        path,
-        circle,
-        rect {
-            stroke: $black;
-        }
-        &:hover {
-            path,
-            circle,
-            rect {
-                stroke: $dark-purp;
-            }
-        }
+    @if $enabled == 'false' {
+        cursor: default !important;
+    }
+}
+
+svg.Icon {
+    cursor: pointer;
+    &.primary {
+        @include SVGIcon($black);
+    }
+    &.primary:hover {
+        @include SVGIcon($dark-purp);
+    }
+    &.secondary {
+        @include SVGIcon($lite-gray)
+    }
+    &.secondary:hover {
+        @include SVGIcon($black);
     }
     &.disabled {
-        path,
-        circle,
-        rect {
-            stroke: $disable-gray;
-        }
+        @include SVGIcon($disable-gray, 'false');
     }
 }
