@@ -73,6 +73,7 @@ import deleteRole from './routes/deleteRole';
 import setDefaultRole from './routes/setDefaultRole';
 
 import getUploadSignature from './routes/getUploadSignature';
+import activeThreads from './routes/activeThreads';
 import createThread from './routes/createThread';
 import editThread from './routes/editThread';
 import updateThreadPolling from './routes/updateThreadPolling';
@@ -146,22 +147,14 @@ function setupRouter(
   const log = factory.getLogger(formatFilename(__filename));
 
   router.use((req, res, next) => {
-    log.info(`requested path : ${req.path}`);
     getStatsDInstance().increment(`cw.path.${req.path.slice(1)}.called`);
     const start = Date.now();
     res.on('finish', () => {
       const latency = Date.now() - start;
       getStatsDInstance().histogram(`cw.path.${req.path.slice(1)}.latency`, latency);
-      log.info(`requested path completed: ${req.path}`);
     });
     next();
   });
-
-  router.get('/logs', (req, res) => {
-    const { message } = req.query;
-    log.info(`logs: ${message}`);
-    res.json(message)
-  })
 
   router.post('/updateAddress', passport.authenticate('jwt', { session: false }), updateAddress.bind(this, models));
   router.get('/domain', domain.bind(this, models));
@@ -280,8 +273,11 @@ function setupRouter(
   router.post('/deleteThread', passport.authenticate('jwt', { session: false }), deleteThread.bind(this, models));
   // TODO: Change to GET /threads
   router.get('/bulkThreads', bulkThreads.bind(this, models));
+  router.get('/activeThreads', activeThreads.bind(this, models));
   router.get('/getThread', getThread.bind(this, models));
   router.get('/search', search.bind(this, models));
+
+
 
   router.get('/profile', getProfile.bind(this, models));
 

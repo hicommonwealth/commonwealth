@@ -24,6 +24,7 @@ import { attachSigner } from '../contractApi';
 import EthereumAccount from '../account';
 import EthereumAccounts from '../accounts';
 import CompoundChain from './chain';
+import { capitalize } from 'lodash';
 
 export enum CompoundVote {
   YES = 1,
@@ -76,7 +77,7 @@ export default class CompoundProposal extends Proposal<
   private _Chain: CompoundChain;
   private _Gov: CompoundGovernance;
 
-  public get shortIdentifier() { return `CompoundProposal-${this.data.identifier}`; }
+  public get shortIdentifier() { return `${capitalize(this._Accounts?.app.activeChainId())}Proposal-${this.data.identifier}`; }
   public get title(): string {
     try {
       const parsed = JSON.parse(this.data.description);

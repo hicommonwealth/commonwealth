@@ -75,7 +75,7 @@ const updateChain = async (models: DB, req: Request, res: Response, next: NextFu
     return next(new Error(Errors.InvalidGithub));
   } else if (customDomain && customDomain.includes('commonwealth')) {
     return next(new Error(Errors.InvalidCustomDomain));
-  } else if (snapshot && !(/^[a-z]+\.eth/).test(snapshot)) {
+  } else if (snapshot && !(/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/ig).test(snapshot)) {
     return next(new Error(Errors.InvalidSnapshot));
   } else if (snapshot && chain.base !== 'ethereum') {
     return next(new Error(Errors.SnapshotOnlyOnEthereum));
