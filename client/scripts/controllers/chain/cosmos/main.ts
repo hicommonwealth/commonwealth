@@ -1,7 +1,8 @@
 import { IChainAdapter, ChainBase, NodeInfo } from 'models';
 import { IApp } from 'state';
 import { CosmosToken } from './types';
-import { CosmosAccount, CosmosAccounts } from './account';
+import CosmosAccount from './account';
+import CosmosAccounts from './accounts';
 import CosmosChain from './chain';
 import CosmosGovernance from './governance';
 
