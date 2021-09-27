@@ -92,7 +92,7 @@ const MembersPage: m.Component<
   }
 > = {
   oninit: (vnode) => {
-    $.get(`/api/getChainEvents?type=${app.activeId}-vote-cast`).then(
+    $.get(`/api/getChainEvents?type=${app.activeId()}-vote-cast`).then(
       ({ result }) => {
         // Sort by address which voted
         const sortedResults = {};
@@ -211,6 +211,7 @@ const MembersPage: m.Component<
       chain: app.activeChainId(),
       community: app.activeCommunityId(),
     });
+    console.log(vnode.state.membersLoaded);
     return m(Sublayout, {
         class: 'MembersPage',
         title: [
