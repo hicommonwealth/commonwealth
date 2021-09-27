@@ -1,6 +1,7 @@
 import { Near as NearApi, connect as nearConnect, WalletAccount } from 'near-api-js';
 import { FunctionCallOptions } from 'near-api-js/lib/account';
 import { NodeStatusResult } from 'near-api-js/lib/providers/provider';
+import { Action } from 'near-api-js/lib/transaction';
 import { uuidv4 } from 'lib/util';
 import { IChainModule, ITXModalData, NodeInfo } from 'models';
 import { NearToken } from 'adapters/chain/near/types';
@@ -124,7 +125,12 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
 
     // redirect back to /finishNearLogin for chain node creation
     const id = this.isMainnet ? `${name}.sputnik-dao.near` : `${name}.sputnikv2.testnet`;
-    const redirectUrl = `${window.location.origin}/${this.app.activeChainId()}/finishNearLogin?chain_name=${id}`;
+    let redirectUrl: string;
+    if (!this.app.isCustomDomain()) {
+      redirectUrl = `${window.location.origin}/${this.app.activeChainId()}/finishNearLogin?chain_name=${id}`;
+    } else {
+      redirectUrl = `${window.location.origin}/finishNearLogin?chain_name=${id}`;
+    }
     await this.redirectTx(contractId, methodName, propArgs, attachedDeposit, redirectUrl, '150000000000000');
   }
 
@@ -134,9 +140,11 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
     args: any,
     attachedDeposit?: string,
     postTxRedirect?: string,
-    gas?: string,
-  ) {
+    gas?: string
+  ): Promise<void> {
     // construct tx object
+    // we use `any` here because we cannot serialize BN for localStorage post-redirect,
+    //   so we store the numeric args as strings and revive them as BN later
     const functionCall: any = {
       contractId,
       methodName,
@@ -157,17 +165,47 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
     localStorage[uuid] = JSON.stringify(functionCall);
 
     // redirect to generate access key for dao contract
-    const redirectUrl = `${window.location.origin}/${this.app.activeChainId()}/finishNearLogin`;
+    // TODO: support custom domain
+    let redirectUrl;
+    if (!this.app.isCustomDomain()) {
+      redirectUrl = `${
+        window.location.origin
+      }/${this.app.activeChainId()}/finishNearLogin`;
+    } else {
+      redirectUrl = `${window.location.origin}/finishNearLogin`;
+    }
     const successUrl = `${redirectUrl}?saved_tx=${uuid}`;
     const failureUrl = `${redirectUrl}?tx_failure=${uuid}`;
 
     const wallet = new WalletAccount(this.api, 'commonwealth_near');
-    await wallet.requestSignIn({
-      contractId,
-      methodNames: [methodName],
-      successUrl,
-      failureUrl
-    });
+    let shouldRequestSignIn = true;
+    if (wallet.isSignedIn) {
+      // check if we can send without requesting a new sign-in
+      const accessKey = await wallet
+        .account()
+        .accessKeyForTransaction(contractId, [
+          {
+            functionCall: {
+              deposit: new BN(attachedDeposit || 0),
+              methodName,
+              gas: new BN(gas || 0),
+              args,
+            },
+          } as Action,
+        ]);
+      console.log(accessKey);
+      shouldRequestSignIn = !accessKey;
+    }
+    if (shouldRequestSignIn) {
+      await wallet.requestSignIn({
+        contractId,
+        methodNames: [methodName],
+        successUrl,
+        failureUrl,
+      });
+    } else {
+      m.route.set(successUrl);
+    }
   }
 
   public async deinit(): Promise<void> {
