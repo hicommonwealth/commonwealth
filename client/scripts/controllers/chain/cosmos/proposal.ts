@@ -115,40 +115,44 @@ export class CosmosProposal extends Proposal<
     const api = this._Chain.api;
     // only fetch voter data if active
     if (!this.data.state.completed) {
-      const [depositResp, voteResp, tallyResp]: [
-        QueryDepositsResponse, QueryVotesResponse, QueryTallyResultResponse
-      ] = await Promise.all([
-        this.status === 'DepositPeriod'
-          ? api.gov.deposits(this.data.identifier)
-          : Promise.resolve(null),
-        this.status === 'DepositPeriod'
-          ? Promise.resolve(null)
-          : api.gov.votes(this.data.identifier),
-        this.status === 'DepositPeriod'
-          ? Promise.resolve(null)
-          : api.gov.tally(this.data.identifier),
-      ]);
-      if (depositResp?.deposits) {
-        for (const deposit of depositResp?.deposits) {
-          if (deposit.amount && deposit.amount[0]) {
-            this.data.state.depositors.push([ deposit.depositor, new BN(deposit.amount[0].amount) ]);
+      try {
+        const [depositResp, voteResp, tallyResp]: [
+          QueryDepositsResponse, QueryVotesResponse, QueryTallyResultResponse
+        ] = await Promise.all([
+          this.status === 'DepositPeriod'
+            ? api.gov.deposits(this.data.identifier)
+            : Promise.resolve(null),
+          this.status === 'DepositPeriod'
+            ? Promise.resolve(null)
+            : api.gov.votes(this.data.identifier),
+          this.status === 'DepositPeriod'
+            ? Promise.resolve(null)
+            : api.gov.tally(this.data.identifier),
+        ]);
+        if (depositResp?.deposits) {
+          for (const deposit of depositResp?.deposits) {
+            if (deposit.amount && deposit.amount[0]) {
+              this.data.state.depositors.push([ deposit.depositor, new BN(deposit.amount[0].amount) ]);
+            }
           }
         }
-      }
-      if (voteResp) {
-        for (const voter of voteResp.votes) {
-          const vote = voteToEnum(voter.option);
-          if (vote) {
-            this.data.state.voters.push([ voter.voter, vote ]);
-            this.addOrUpdateVote(new CosmosVote(this._Accounts.fromAddress(voter.voter), vote));
-          } else {
-            console.error(`voter: ${voter.voter} has invalid vote option: ${voter.option}`);
+        if (voteResp) {
+          for (const voter of voteResp.votes) {
+            const vote = voteToEnum(voter.option);
+            if (vote) {
+              this.data.state.voters.push([ voter.voter, vote ]);
+              this.addOrUpdateVote(new CosmosVote(this._Accounts.fromAddress(voter.voter), vote));
+            } else {
+              console.error(`voter: ${voter.voter} has invalid vote option: ${voter.option}`);
+            }
           }
         }
-      }
-      console.log(tallyResp);
-      if (tallyResp?.tally) {
-        this.data.state.tally = marshalTally(tallyResp?.tally);
+        console.log(tallyResp);
+        if (tallyResp?.tally) {
+          this.data.state.tally = marshalTally(tallyResp?.tally);
+        }
+      } catch (err) {
+        console.error(`Cosmos query failed: ${err.message}`);
       }
     }
     if (!this.initialized) {
