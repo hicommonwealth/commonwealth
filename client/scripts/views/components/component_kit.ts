@@ -33,9 +33,7 @@ import {
   ArrowDownIcon,
   ArrowRightIcon,
   LikesIcon,
-  RepliesIcon,
   DiscussIcon,
-  LikeIcon,
   ReplyIcon,
   ViewsIcon,
   ShareIcon,
@@ -51,6 +49,7 @@ import {
   DiscordIcon,
   TelegramIcon,
   GithubIcon,
+  IconSizes,
 } from './component_kit/icons';
 
 const ComponentKit: m.Component<{}, { radioGroupSelected; activeTab }> = {
@@ -60,31 +59,79 @@ const ComponentKit: m.Component<{}, { radioGroupSelected; activeTab }> = {
         'style',
         '.ComponentKit > * { margin: 20px; }\n .ComponentKit > .gallery > * { margin-right: 20px; }'
       ),
-
-      m('h1.Redesign Icons'),
-      [
-        m(ArrowDownIcon),
-        m(ArrowRightIcon),
-        m(LikesIcon),
-        m(RepliesIcon),
-        m(ViewsIcon),
-        m(DiscussIcon),
-        m(LikeIcon),
-        m(ReplyIcon),
-        m(ShareIcon),
-        m(AccountIcon),
-        m(CopyIcon),
-        m(CreateIcon),
-        m(FilterIcon),
-        m(NotificationIcon),
-        m(SubscribeIcon),
-        m(XIcon),
-        m(SearchIcon),
-        m(ElementIcon),
-        m(DiscordIcon),
-        m(TelegramIcon),
-        m(GithubIcon),
-      ],
+      m('h1', 'Redesign Icons'),
+      m('h1', '14x14'),
+      m(
+        '.redesign-icons',
+        {
+          style: 'display: flex;',
+        },
+        [
+          [
+            m(ArrowDownIcon),
+            m(ArrowRightIcon),
+            m(ViewsIcon),
+            m(LikesIcon, { size: IconSizes.Fourteen }),
+            m(ReplyIcon, { size: IconSizes.Fourteen }),
+          ],
+        ]
+      ),
+      m(
+        '.redesign-icons',
+        {
+          style: 'display: flex;',
+        },
+        [
+          [
+            m(LikesIcon, { size: IconSizes.Twenty }),
+            m(DiscussIcon),
+            m(ReplyIcon, { size: IconSizes.Twenty }),
+            m(ShareIcon),
+            m(AccountIcon),
+            m(CopyIcon),
+            m(CreateIcon),
+            m(FilterIcon),
+            m(NotificationIcon),
+            m(SubscribeIcon),
+            m(XIcon),
+            m(SearchIcon),
+            m(ElementIcon),
+            m(DiscordIcon),
+            m(TelegramIcon),
+            m(GithubIcon),
+          ],
+        ]
+      ),
+      m('h1', 'Redesign Icons Disabled'),
+      m(
+        '.redesign-icons',
+        {
+          style: 'display: flex;',
+        },
+        [
+          [
+            m(ArrowDownIcon, { disabled: true }),
+            m(ArrowRightIcon, { disabled: true }),
+            m(LikesIcon, { disabled: true }),
+            m(ViewsIcon, { disabled: true }),
+            m(DiscussIcon, { disabled: true }),
+            m(ReplyIcon, { disabled: true }),
+            m(ShareIcon, { disabled: true }),
+            m(AccountIcon, { disabled: true }),
+            m(CopyIcon, { disabled: true }),
+            m(CreateIcon, { disabled: true }),
+            m(FilterIcon, { disabled: true }),
+            m(NotificationIcon, { disabled: true }),
+            m(SubscribeIcon, { disabled: true }),
+            m(XIcon, { disabled: true }),
+            m(SearchIcon, { disabled: true }),
+            m(ElementIcon, { disabled: true }),
+            m(DiscordIcon, { disabled: true }),
+            m(TelegramIcon, { disabled: true }),
+            m(GithubIcon, { disabled: true }),
+          ],
+        ]
+      ),
       // buttons and inputs
       m('.gallery', [
         m(Button, {

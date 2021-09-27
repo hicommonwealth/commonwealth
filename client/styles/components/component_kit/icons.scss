@@ -1,1 +1,49 @@
-@import 'client/scripts/facelift';
+@import 'client/styles/facelift';
+
+svg.Icon {
+    &.XIcon,
+    &.CopyIcon {
+        path,
+        circle,
+        rect {
+            stroke: $lite-gray;
+        }
+        &:hover {
+            path,
+            circle,
+            rect {
+                stroke: $black;
+            }
+        }
+    }
+    &.AccountIcon,
+    &.NotificationIcon,
+    &.SearchIcon,
+    &.CreateIcon,
+    &.FilterIcon,
+    &.ShareIcon,
+    &.SubscribeIcon,
+    &.DiscussIcon,
+    &.LikeIcon,
+    &.ReplyIcon {
+        path,
+        circle,
+        rect {
+            stroke: $black;
+        }
+        &:hover {
+            path,
+            circle,
+            rect {
+                stroke: $dark-purp;
+            }
+        }
+    }
+    &.disabled {
+        path,
+        circle,
+        rect {
+            stroke: $disable-gray;
+        }
+    }
+}

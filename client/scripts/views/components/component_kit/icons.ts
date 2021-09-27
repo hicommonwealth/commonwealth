@@ -1,4 +1,5 @@
 /* eslint-disable max-len */
+import 'components/component_kit/icons.scss';
 import m from 'mithril';
 
 export enum IconSizes {
@@ -16,13 +17,13 @@ export enum IconColors {
 }
 
 export const ArrowDownIcon: m.Component<
-  { color?: string; size?: IconSizes },
+  { color?: string; size?: IconSizes; disabled?: boolean },
   {}
 > = {
   view: (vnode) => {
-    const { color, size } = vnode.attrs;
+    const { size, color, disabled } = vnode.attrs;
     return m(
-      'svg.ArrowDownIcon',
+      `svg.Icon.ArrowDownIcon${disabled ? '.disabled' : ''}`,
       {
         width: `${size || 15}`,
         height: `${size || 16}`,
@@ -42,13 +43,13 @@ export const ArrowDownIcon: m.Component<
 };
 
 export const ArrowRightIcon: m.Component<
-  { color?: string; size?: IconSizes },
+  { color?: string; size?: IconSizes; disabled?: boolean },
   {}
 > = {
   view: (vnode) => {
-    const { color, size } = vnode.attrs;
+    const { size, color, disabled } = vnode.attrs;
     return m(
-      'svg.ArrowRightIcon',
+      `svg.Icon.ArrowRightIcon${disabled ? '.disabled' : ''}`,
       {
         width: `${size || 15}`,
         height: `${size || 15}`,
@@ -67,50 +68,81 @@ export const ArrowRightIcon: m.Component<
   },
 };
 
-export const LikesIcon: m.Component<{ color?: string; size?: IconSizes }, {}> =
-  {
-    view: (vnode) => {
-      const { color, size } = vnode.attrs;
-      return m(
-        'svg.LikesIcon',
-        {
-          width: '20',
-          height: '17',
-          fill: 'none',
-          xmlns: 'http://www.w3.org/2000/svg',
-        },
-        [
-          m('path', {
-            d: 'M10.887 15.088a1 1 0 0 1-1.393 0L4.077 9.826l-.738-.717a4.668 4.668 0 0 1-1.425-3.348c0-1.262.516-2.466 1.425-3.349A4.888 4.888 0 0 1 6.744 1.04c1.272 0 2.498.49 3.405 1.372l.042.04.04-.04h.001c.45-.437.982-.782 1.566-1.017a4.927 4.927 0 0 1 3.678 0 4.84 4.84 0 0 1 1.566 1.017l-6.155 12.676Zm0 0 5.417-5.262m-5.416 5.262 5.416-5.262m0 0 .738-.717m-.738.717.738-.717m0 0s0 0 0 0m0 0h0m0 0c.45-.437.809-.957 1.054-1.532M17.042 9.11l1.054-1.532m0 0a4.628 4.628 0 0 0 .372-1.816m-.372 1.816.372-1.816m0 0c0-.624-.127-1.242-.372-1.817m.372 1.817-.372-1.817m0 0a4.715 4.715 0 0 0-1.053-1.531l1.053 1.531Z',
-            stroke: color || IconColors.MidiGray,
-            'stroke-width': '2',
-            'stroke-linecap': 'round',
-            'stroke-linejoin': 'round',
-          }),
-        ]
-      );
-    },
-  };
-
-export const RepliesIcon: m.Component<
-  { color?: string; size?: IconSizes },
+export const ReplyIcon: m.Component<
+  { color?: string; size?: IconSizes; disabled?: boolean },
   {}
 > = {
   view: (vnode) => {
-    const { color, size } = vnode.attrs;
+    const { size, color, disabled } = vnode.attrs;
+    return [
+      size === IconSizes.Fourteen &&
+        m(
+          `svg.Icon.ReplyIcon${disabled ? '.disabled' : ''}`,
+          {
+            width: `${size || 17}`,
+            height: `${size || 17}`,
+            fill: 'none',
+            xmlns: 'http://www.w3.org/2000/svg',
+          },
+          [
+            m('path', {
+              d: 'M1.858 14.322a1 1 0 0 0 1.73.684l2.243-2.393h7.185c.624 0 1.208-.265 1.628-.713a2.402 2.402 0 0 0 .642-1.641V3.487c0-.605-.224-1.196-.642-1.642a2.231 2.231 0 0 0-1.628-.713H4.128a2.23 2.23 0 0 0-1.627.713 2.401 2.401 0 0 0-.643 1.642v10.835Z',
+              stroke: color || IconColors.MidiGray,
+              'stroke-width': '2',
+              'stroke-linecap': 'round',
+              'stroke-linejoin': 'round',
+            }),
+          ]
+        ),
+      size === IconSizes.Twenty &&
+        m(
+          `svg.Icon.ReplyIcon${disabled ? '.disabled' : ''}`,
+          {
+            width: '21',
+            height: '21',
+            fill: 'none',
+            xmlns: 'http://www.w3.org/2000/svg',
+          },
+          m('path', {
+            d: 'M.84 19.207a.75.75 0 0 0 1.28.53l3.65-3.65H17.07a2.685 2.685 0 0 0 2.684-2.685V3.728a2.685 2.685 0 0 0-2.684-2.685H3.524c-.712 0-1.395.283-1.899.787l.53.53-.53-.53A2.685 2.685 0 0 0 .84 3.728v15.479Z',
+            stroke: '#000',
+            'stroke-width': '1.5',
+            'stroke-linecap': 'round',
+            'stroke-linejoin': 'round',
+          })
+        ),
+    ];
+  },
+};
+
+export const ViewsIcon: m.Component<
+  { color?: string; size?: IconSizes; disabled?: boolean },
+  {}
+> = {
+  view: (vnode) => {
+    const { size, color, disabled } = vnode.attrs;
     return m(
-      'svg.RepliesIcon',
+      `svg.Icon.ViewsIcon${disabled ? '.disabled' : ''}`,
       {
-        width: `${size || 17}`,
-        height: `${size || 17}`,
+        width: '22',
+        height: '16',
         fill: 'none',
         xmlns: 'http://www.w3.org/2000/svg',
       },
       [
         m('path', {
-          d: 'M1.858 14.322a1 1 0 0 0 1.73.684l2.243-2.393h7.185c.624 0 1.208-.265 1.628-.713a2.402 2.402 0 0 0 .642-1.641V3.487c0-.605-.224-1.196-.642-1.642a2.231 2.231 0 0 0-1.628-.713H4.128a2.23 2.23 0 0 0-1.627.713 2.401 2.401 0 0 0-.643 1.642v10.835Z',
-          stroke: color || IconColors.MidiGray,
-          'stroke-width': '2',
+          'clip-rule': 'evenodd',
+          d: 'M1.01 8s3.564-7 9.802-7c6.237 0 9.801 7 9.801 7s-3.564 7-9.801 7C4.574 15 1.01 8 1.01 8Z',
+          stroke: '#666',
+          'stroke-width': '1.5',
+          'stroke-linecap': 'round',
+          'stroke-linejoin': 'round',
+        }),
+        m('path', {
+          'clip-rule': 'evenodd',
+          d: 'M10.812 11.247c1.826 0 3.306-1.453 3.306-3.246s-1.48-3.247-3.306-3.247-3.306 1.454-3.306 3.247 1.48 3.246 3.306 3.246Z',
+          stroke: '#666',
+          'stroke-width': '1.5',
           'stroke-linecap': 'round',
           'stroke-linejoin': 'round',
         }),
@@ -119,51 +151,16 @@ export const RepliesIcon: m.Component<
   },
 };
 
-export const ViewsIcon: m.Component<{ color?: string; size?: IconSizes }, {}> =
-  {
-    view: (vnode) => {
-      const { size, color } = vnode.attrs;
-      return m(
-        'svg.ViewsIcon',
-        {
-          width: '22',
-          height: '16',
-          fill: 'none',
-          xmlns: 'http://www.w3.org/2000/svg',
-        },
-        [
-          m('path', {
-            'clip-rule': 'evenodd',
-            d: 'M1.01 8s3.564-7 9.802-7c6.237 0 9.801 7 9.801 7s-3.564 7-9.801 7C4.574 15 1.01 8 1.01 8Z',
-            stroke: '#666',
-            'stroke-width': '1.5',
-            'stroke-linecap': 'round',
-            'stroke-linejoin': 'round',
-          }),
-          m('path', {
-            'clip-rule': 'evenodd',
-            d: 'M10.812 11.247c1.826 0 3.306-1.453 3.306-3.246s-1.48-3.247-3.306-3.247-3.306 1.454-3.306 3.247 1.48 3.246 3.306 3.246Z',
-            stroke: '#666',
-            'stroke-width': '1.5',
-            'stroke-linecap': 'round',
-            'stroke-linejoin': 'round',
-          }),
-        ]
-      );
-    },
-  };
-
 export const DiscussIcon: m.Component<
-  { color?: string; size?: IconSizes },
+  { color?: string; size?: IconSizes; disabled?: boolean },
   {}
 > = {
   view: (vnode) => {
-    const { size, color } = vnode.attrs;
-
+    const { size, color, disabled } = vnode.attrs;
     return [
       size === IconSizes.Twenty &&
         m(
-          'svg.DiscussIcon.md',
+          `svg.Icon.DiscussIcon${disabled ? '.disabled' : ''}`,
           {
             width: '23',
             height: '22',
@@ -179,7 +176,7 @@ export const DiscussIcon: m.Component<
         ),
       size === IconSizes.TwentyEight &&
         m(
-          'svg.DiscussIcon.lg',
+          `svg.Icon.DiscussIcon${disabled ? '.disabled' : ''}`,
           {
             width: '29',
             height: '28',
@@ -197,21 +194,72 @@ export const DiscussIcon: m.Component<
   },
 };
 
-export const LikeIcon: m.Component<{ color?: string; size?: IconSizes }, {}> = {
+export const LikesIcon: m.Component<
+  { color?: string; size?: IconSizes; disabled?: boolean },
+  {}
+> = {
   view: (vnode) => {
-    const { size, color } = vnode.attrs;
+    const { size, color, disabled } = vnode.attrs;
+    return [
+      size === IconSizes.Fourteen &&
+        m(
+          `svg.Icon.LikesIcon${disabled ? '.disabled' : ''}`,
+          {
+            width: '25',
+            height: '22',
+            viewBox: '0 0 25 22',
+            fill: 'none',
+            xmlns: 'http://www.w3.org/2000/svg',
+          },
+          m('path', {
+            d: 'M3.31736 12.0233L3.83995 11.4853L3.31736 12.0233L4.37168 13.0475L12.11 20.5646C12.401 20.8474 12.8641 20.8474 13.1551 20.5646L20.8934 13.0475L21.9476 12.0234C21.9476 12.0234 21.9477 12.0233 21.9477 12.0233C22.5266 11.4612 22.987 10.7926 23.3015 10.0552C23.6161 9.3177 23.7783 8.5264 23.7783 7.72673C23.7783 6.92706 23.6161 6.13576 23.3015 5.39824C22.9869 4.66078 22.5265 3.99218 21.9476 3.43006C21.369 2.86783 20.6833 2.42294 19.9301 2.11977C19.1768 1.81657 18.3702 1.66077 17.556 1.66077C16.7418 1.66077 15.9352 1.81657 15.1819 2.11977C14.4286 2.42297 13.7428 2.8679 13.1643 3.43018C13.1642 3.43022 13.1642 3.43026 13.1641 3.4303L12.6325 3.94672L12.1008 3.43018C10.9324 2.29519 9.35231 1.66128 7.70909 1.66128C6.06587 1.66128 4.48573 2.29519 3.31736 3.43018C2.14826 4.56589 1.4873 6.11094 1.4873 7.72673C1.4873 9.34252 2.14826 10.8876 3.31736 12.0233Z',
+            stroke: 'black',
+            'stroke-width': '1.5',
+            'stroke-linecap': 'round',
+            'stroke-linejoin': 'round',
+          })
+        ),
+      size === IconSizes.Twenty &&
+        m(
+          `svg.Icon.LikesIcon${disabled ? '.disabled' : ''}`,
+          {
+            width: '20',
+            height: '17',
+            fill: 'none',
+            xmlns: 'http://www.w3.org/2000/svg',
+          },
+          [
+            m('path', {
+              d: 'M10.887 15.088a1 1 0 0 1-1.393 0L4.077 9.826l-.738-.717a4.668 4.668 0 0 1-1.425-3.348c0-1.262.516-2.466 1.425-3.349A4.888 4.888 0 0 1 6.744 1.04c1.272 0 2.498.49 3.405 1.372l.042.04.04-.04h.001c.45-.437.982-.782 1.566-1.017a4.927 4.927 0 0 1 3.678 0 4.84 4.84 0 0 1 1.566 1.017l-6.155 12.676Zm0 0 5.417-5.262m-5.416 5.262 5.416-5.262m0 0 .738-.717m-.738.717.738-.717m0 0s0 0 0 0m0 0h0m0 0c.45-.437.809-.957 1.054-1.532M17.042 9.11l1.054-1.532m0 0a4.628 4.628 0 0 0 .372-1.816m-.372 1.816.372-1.816m0 0c0-.624-.127-1.242-.372-1.817m.372 1.817-.372-1.817m0 0a4.715 4.715 0 0 0-1.053-1.531l1.053 1.531Z',
+              stroke: color || IconColors.MidiGray,
+              'stroke-width': '2',
+              'stroke-linecap': 'round',
+              'stroke-linejoin': 'round',
+            }),
+          ]
+        ),
+    ];
+  },
+};
+
+export const ShareIcon: m.Component<
+  { color?: string; size?: IconSizes; disabled?: boolean },
+  {}
+> = {
+  view: (vnode) => {
+    const { size, color, disabled } = vnode.attrs;
+
     return m(
-      'svg.LikeIcon.md',
+      `svg.Icon.ShareIcon${disabled ? '.disabled' : ''}`,
       {
-        width: '25',
+        width: '24',
         height: '22',
-        viewBox: '0 0 25 22',
         fill: 'none',
         xmlns: 'http://www.w3.org/2000/svg',
       },
       m('path', {
-        d: 'M3.31736 12.0233L3.83995 11.4853L3.31736 12.0233L4.37168 13.0475L12.11 20.5646C12.401 20.8474 12.8641 20.8474 13.1551 20.5646L20.8934 13.0475L21.9476 12.0234C21.9476 12.0234 21.9477 12.0233 21.9477 12.0233C22.5266 11.4612 22.987 10.7926 23.3015 10.0552C23.6161 9.3177 23.7783 8.5264 23.7783 7.72673C23.7783 6.92706 23.6161 6.13576 23.3015 5.39824C22.9869 4.66078 22.5265 3.99218 21.9476 3.43006C21.369 2.86783 20.6833 2.42294 19.9301 2.11977C19.1768 1.81657 18.3702 1.66077 17.556 1.66077C16.7418 1.66077 15.9352 1.81657 15.1819 2.11977C14.4286 2.42297 13.7428 2.8679 13.1643 3.43018C13.1642 3.43022 13.1642 3.43026 13.1641 3.4303L12.6325 3.94672L12.1008 3.43018C10.9324 2.29519 9.35231 1.66128 7.70909 1.66128C6.06587 1.66128 4.48573 2.29519 3.31736 3.43018C2.14826 4.56589 1.4873 6.11094 1.4873 7.72673C1.4873 9.34252 2.14826 10.8876 3.31736 12.0233Z',
-        stroke: 'black',
+        d: 'M1.588 11.979v6.444c0 .683.244 1.339.678 1.822.433.483 1.022.755 1.636.755h16.196c.613 0 1.202-.272 1.636-.755a2.734 2.734 0 0 0 .677-1.823V11.98M12 11.412V1m0 0 4.877 4.876M11.999 1 7.123 5.876',
+        stroke: '#000',
         'stroke-width': '1.5',
         'stroke-linecap': 'round',
         'stroke-linejoin': 'round',
@@ -220,62 +268,14 @@ export const LikeIcon: m.Component<{ color?: string; size?: IconSizes }, {}> = {
   },
 };
 
-export const ReplyIcon: m.Component<{ color?: string; size?: IconSizes }, {}> =
-  {
-    view: (vnode) => {
-      const { size, color } = vnode.attrs;
-
-      return m(
-        'svg.ReplyIcon',
-        {
-          width: '21',
-          height: '21',
-          fill: 'none',
-          xmlns: 'http://www.w3.org/2000/svg',
-        },
-        m('path', {
-          d: 'M.84 19.207a.75.75 0 0 0 1.28.53l3.65-3.65H17.07a2.685 2.685 0 0 0 2.684-2.685V3.728a2.685 2.685 0 0 0-2.684-2.685H3.524c-.712 0-1.395.283-1.899.787l.53.53-.53-.53A2.685 2.685 0 0 0 .84 3.728v15.479Z',
-          stroke: '#000',
-          'stroke-width': '1.5',
-          'stroke-linecap': 'round',
-          'stroke-linejoin': 'round',
-        })
-      );
-    },
-  };
-
-export const ShareIcon: m.Component<{ color?: string; size?: IconSizes }, {}> =
-  {
-    view: (vnode) => {
-      const { size, color } = vnode.attrs;
-
-      return m(
-        'svg.ShareIcon',
-        {
-          width: '24',
-          height: '22',
-          fill: 'none',
-          xmlns: 'http://www.w3.org/2000/svg',
-        },
-        m('path', {
-          d: 'M1.588 11.979v6.444c0 .683.244 1.339.678 1.822.433.483 1.022.755 1.636.755h16.196c.613 0 1.202-.272 1.636-.755a2.734 2.734 0 0 0 .677-1.823V11.98M12 11.412V1m0 0 4.877 4.876M11.999 1 7.123 5.876',
-          stroke: '#000',
-          'stroke-width': '1.5',
-          'stroke-linecap': 'round',
-          'stroke-linejoin': 'round',
-        })
-      );
-    },
-  };
-
 export const AccountIcon: m.Component<
-  { color?: string; size?: IconSizes },
+  { color?: string; size?: IconSizes; disabled?: boolean },
   {}
 > = {
   view: (vnode) => {
-    const { color, size } = vnode.attrs;
+    const { size, color, disabled } = vnode.attrs;
     return m(
-      'svg.AccountIcon',
+      `svg.Icon.AccountIcon${disabled ? '.disabled' : ''}`,
       {
         width: '31',
         height: '30',
@@ -285,7 +285,6 @@ export const AccountIcon: m.Component<
       [
         m('path', {
           d: 'M27.483 29.077v-7.962a6 6 0 0 0-6-6H9.935a6 6 0 0 0-6 6v7.962',
-          stroke: '#000',
           'stroke-width': '1.5',
           'stroke-linecap': 'round',
           'stroke-linejoin': 'round',
@@ -294,7 +293,6 @@ export const AccountIcon: m.Component<
           cx: '15.678',
           cy: '8.427',
           r: '6.754',
-          stroke: '#000',
           'stroke-width': '1.5',
           'stroke-linejoin': 'round',
         }),
@@ -303,10 +301,14 @@ export const AccountIcon: m.Component<
   },
 };
 
-export const CopyIcon: m.Component<{ color?: string; size?: IconSizes }, {}> = {
+export const CopyIcon: m.Component<
+  { color?: string; size?: IconSizes; disabled?: boolean },
+  {}
+> = {
   view: (vnode) => {
+    const { size, color, disabled } = vnode.attrs;
     return m(
-      'svg.CopyIcon',
+      `svg.Icon.CopyIcon${disabled ? '.disabled' : ''}`,
       {
         width: '29',
         height: '29',
@@ -321,7 +323,6 @@ export const CopyIcon: m.Component<{ color?: string; size?: IconSizes }, {}> = {
           width: '11.3635',
           height: '16.1785',
           rx: '3',
-          fill: 'white',
           stroke: '#999999',
           'stroke-width': '1.5',
         }),
@@ -331,7 +332,6 @@ export const CopyIcon: m.Component<{ color?: string; size?: IconSizes }, {}> = {
           width: '11.3635',
           height: '16.1785',
           rx: '3',
-          fill: 'white',
           stroke: '#999999',
           'stroke-width': '1.5',
         }),
@@ -340,75 +340,80 @@ export const CopyIcon: m.Component<{ color?: string; size?: IconSizes }, {}> = {
   },
 };
 
-export const CreateIcon: m.Component<{ color?: string; size?: IconSizes }, {}> =
-  {
-    view: (vnode) => {},
-  };
+export const CreateIcon: m.Component<
+  { color?: string; size?: IconSizes; disabled?: boolean },
+  {}
+> = {
+  view: (vnode) => {},
+};
 
-export const FilterIcon: m.Component<{ color?: string; size?: IconSizes }, {}> =
-  {
-    view: (vnode) => {
-      return m(
-        'svg.FilterIcon',
-        {
-          width: '29',
-          height: '28',
-          fill: 'none',
-          xmlns: 'http://www.w3.org/2000/svg',
-        },
-        [
-          m('g', { 'clip-path': 'url(#a)', fill: '#000' }, [
-            m(
-              'mask',
-              {
-                id: 'b',
-                maskUnits: 'userSpaceOnUse',
-                x: '1.131',
-                y: '.23',
-                width: '27',
-                height: '28',
-              },
-              [
-                m('path', { fill: '#fff', d: 'M1.131.23h27v28h-27z' }),
-                m('path', {
-                  'fill-rule': 'evenodd',
-                  'clip-rule': 'evenodd',
-                  d: 'M13.214 15.871v6.576l2.863 3.403v-9.978L26.161 2.23H3.131l10.083 13.641Z',
-                }),
-              ]
-            ),
-            m('path', {
-              d: 'M13.214 22.447h-1.5c0 .354.125.695.352.966l1.148-.966Zm0-6.576h1.5a1.5 1.5 0 0 0-.293-.891l-1.207.891Zm2.863 9.98-1.148.965a1.5 1.5 0 0 0 2.648-.966h-1.5Zm0-9.979-1.206-.892a1.5 1.5 0 0 0-.294.892h1.5ZM26.161 2.23l1.206.892A1.5 1.5 0 0 0 26.161.73v1.5Zm-23.03 0V.73a1.5 1.5 0 0 0-1.206 2.392L3.13 2.23Zm11.583 20.217v-6.576h-3v6.576h3Zm2.511 2.438-2.863-3.403-2.296 1.93 2.863 3.404 2.296-1.931Zm-2.648-9.013v9.978h3v-9.978h-3Zm2.706.892L27.367 3.122l-2.412-1.784L14.871 14.98l2.412 1.784ZM26.161.73H3.131v3h23.03v-3ZM1.925 3.122l10.083 13.64 2.413-1.782L4.337 1.338 1.925 3.122Z',
-              mask: 'url(#b)',
-            }),
-          ]),
-          m(
-            'defs',
-            m(
-              'clipPath',
-              { id: 'a' },
-              m('path', {
-                fill: '#fff',
-                transform: 'translate(.709)',
-                d: 'M0 0h28v28H0z',
-              })
-            )
-          ),
-        ]
-      );
-    },
-  };
-
-export const NotificationIcon: m.Component<
-  { color?: string; size?: IconSizes },
+export const FilterIcon: m.Component<
+  { color?: string; size?: IconSizes; disabled?: boolean },
   {}
 > = {
   view: (vnode) => {
-    const { size, color } = vnode.attrs;
+    const { size, color, disabled } = vnode.attrs;
+    return m(
+      `svg.Icon.FilterIcon${disabled ? '.disabled' : ''}`,
+      {
+        width: '29',
+        height: '28',
+        fill: 'none',
+        xmlns: 'http://www.w3.org/2000/svg',
+      },
+      [
+        m('g', { 'clip-path': 'url(#a)', fill: '#000' }, [
+          m(
+            'mask',
+            {
+              // id: 'b',
+              maskUnits: 'userSpaceOnUse',
+              x: '1.131',
+              y: '.23',
+              width: '27',
+              height: '28',
+            },
+            [
+              m('path', { fill: '#fff', d: 'M1.131.23h27v28h-27z' }),
+              m('path', {
+                'fill-rule': 'evenodd',
+                'clip-rule': 'evenodd',
+                d: 'M13.214 15.871v6.576l2.863 3.403v-9.978L26.161 2.23H3.131l10.083 13.641Z',
+              }),
+            ]
+          ),
+          m('path', {
+            d: 'M13.214 22.447h-1.5c0 .354.125.695.352.966l1.148-.966Zm0-6.576h1.5a1.5 1.5 0 0 0-.293-.891l-1.207.891Zm2.863 9.98-1.148.965a1.5 1.5 0 0 0 2.648-.966h-1.5Zm0-9.979-1.206-.892a1.5 1.5 0 0 0-.294.892h1.5ZM26.161 2.23l1.206.892A1.5 1.5 0 0 0 26.161.73v1.5Zm-23.03 0V.73a1.5 1.5 0 0 0-1.206 2.392L3.13 2.23Zm11.583 20.217v-6.576h-3v6.576h3Zm2.511 2.438-2.863-3.403-2.296 1.93 2.863 3.404 2.296-1.931Zm-2.648-9.013v9.978h3v-9.978h-3Zm2.706.892L27.367 3.122l-2.412-1.784L14.871 14.98l2.412 1.784ZM26.161.73H3.131v3h23.03v-3ZM1.925 3.122l10.083 13.64 2.413-1.782L4.337 1.338 1.925 3.122Z',
+            mask: 'url(#b)',
+          }),
+        ]),
+        m(
+          'defs',
+          m(
+            'clipPath',
+            // { id: 'a' },
+            m('path', {
+              fill: '#fff',
+              transform: 'translate(.709)',
+              d: 'M0 0h28v28H0z',
+            })
+          )
+        ),
+      ]
+    );
+  },
+};
+
+export const NotificationIcon: m.Component<
+  { color?: string; size?: IconSizes; disabled?: boolean },
+  {}
+> = {
+  view: (vnode) => {
+    const { size, color, disabled } = vnode.attrs;
     return [
       size === IconSizes.TwentyEight &&
         m(
-          'svg.NotificationIcon',
+          `svg.Icon.NotificationIcon${disabled ? '.disabled' : ''}`,
           {
             width: '29',
             height: '29',
@@ -423,7 +428,7 @@ export const NotificationIcon: m.Component<
         ),
       size === IconSizes.Twenty &&
         m(
-          'svg.NotificationIcon',
+          `svg.Icon.NotificationIcon${disabled ? '.disabled' : ''}`,
           {
             width: '21',
             height: '24',
@@ -440,16 +445,24 @@ export const NotificationIcon: m.Component<
   },
 };
 
-export const SubscribeIcon: m.Component<{ color?: string }, {}> = {
+export const SubscribeIcon: m.Component<
+  { color?: string; disabled?: boolean },
+  {}
+> = {
   view: (vnode) => {
-    return m(NotificationIcon, { size: IconSizes.Twenty });
+    const { disabled } = vnode.attrs;
+    return m(NotificationIcon, { size: IconSizes.Twenty, disabled });
   },
 };
 
-export const PinIcon: m.Component<{ color?: string; size?: IconSizes }, {}> = {
+export const PinIcon: m.Component<
+  { color?: string; size?: IconSizes; disabled?: boolean },
+  {}
+> = {
   view: (vnode) => {
+    const { color, size, disabled } = vnode.attrs;
     return m(
-      'svg.PinIcon',
+      `svg.Icon.PinIcon${disabled ? '.disabled' : ''}`,
       {
         width: '21',
         height: '21',
@@ -475,10 +488,14 @@ export const PinIcon: m.Component<{ color?: string; size?: IconSizes }, {}> = {
   },
 };
 
-export const XIcon: m.Component<{ color?: string; size?: IconSizes }, {}> = {
+export const XIcon: m.Component<
+  { color?: string; size?: IconSizes; disabled?: boolean },
+  {}
+> = {
   view: (vnode) => {
+    const { size, color, disabled } = vnode.attrs;
     return m(
-      'svg.XIcon',
+      `svg.Icon.XIcon${disabled ? '.disabled' : ''}`,
       {
         width: '28',
         height: '28',
@@ -496,12 +513,13 @@ export const XIcon: m.Component<{ color?: string; size?: IconSizes }, {}> = {
 };
 
 export const SearchIcon: m.Component<
-  { isMobile?: boolean; color?: string; size?: IconSizes },
+  { isMobile?: boolean; color?: string; size?: IconSizes; disabled?: boolean },
   {}
 > = {
   view: (vnode) => {
+    const { size, color, disabled } = vnode.attrs;
     return m(
-      'svg.SearchIcon',
+      `svg.Icon.SearchIcon${disabled ? '.disabled' : ''}`,
       {
         width: '15px',
         height: '16px',
@@ -543,12 +561,13 @@ export const SearchIcon: m.Component<
 // SOCIAL ICONS
 
 export const ElementIcon: m.Component<
-  { color?: string; size?: IconSizes },
+  { color?: string; size?: IconSizes; disabled?: boolean },
   {}
 > = {
   view: (vnode) => {
+    const { size, color, disabled } = vnode.attrs;
     return m(
-      'svg.ElementIcon.md',
+      `svg.Icon.ElementIcon${disabled ? '.disabled' : ''}`,
       {
         width: '15',
         height: '15',
@@ -564,12 +583,13 @@ export const ElementIcon: m.Component<
 };
 
 export const DiscordIcon: m.Component<
-  { color?: string; size?: IconSizes },
+  { color?: string; size?: IconSizes; disabled?: boolean },
   {}
 > = {
   view: (vnode) => {
+    const { size, color, disabled } = vnode.attrs;
     return m(
-      'svg.DiscordIcon',
+      `svg.Icon.DiscordIcon${disabled ? '.disabled' : ''}`,
       {
         width: '15',
         height: '15',
@@ -585,12 +605,13 @@ export const DiscordIcon: m.Component<
 };
 
 export const TelegramIcon: m.Component<
-  { color?: string; size?: IconSizes },
+  { color?: string; size?: IconSizes; disabled?: boolean },
   {}
 > = {
   view: (vnode) => {
+    const { size, color, disabled } = vnode.attrs;
     return m(
-      'svg.TelegramIcon',
+      `svg.Icon.TelegramIcon${disabled ? '.disabled' : ''}`,
       {
         width: '15',
         height: '15',
@@ -606,32 +627,36 @@ export const TelegramIcon: m.Component<
   },
 };
 
-export const GithubIcon: m.Component<{ color?: string; size?: IconSizes }, {}> =
-  {
-    view: (vnode) => {
-      return m(
-        'svg.GithubIcon',
-        {
-          width: '15',
-          height: '15',
-          fill: 'none',
-          xmlns: 'http://www.w3.org/2000/svg',
-        },
-        m('path', {
-          d: 'M5.65 12.477a.5.5 0 1 0-.3-.954l.3.954Zm-3.648-2.96-.484-.128-.254.968.484.127.254-.968ZM9 14.5v.5h1v-.5H9Zm.063-4.813-.054-.497a.5.5 0 0 0-.299.852l.352-.354ZM12.5 5.913h.5V5.91l-.5.002Zm-.833-2.007-.466-.18a.5.5 0 0 0 .112.533l.354-.353Zm-.05-2.017.456-.204a.5.5 0 0 0-.319-.276l-.137.48Zm-2.173.792-.126.484a.5.5 0 0 0 .398-.064l-.272-.42Zm-3.888 0-.272.42a.5.5 0 0 0 .398.064l-.126-.484ZM3.383 1.89l-.137-.48a.5.5 0 0 0-.32.276l.457.204Zm-.05 2.017.354.353a.5.5 0 0 0 .112-.534l-.466.181ZM2.5 5.93H3v-.002l-.5.002Zm3.438 3.758.352.355a.5.5 0 0 0-.293-.851l-.06.496ZM5.5 11H6l-.001-.037L5.5 11ZM5 14.5v.5h1v-.5H5Zm.35-2.977c-.603.19-.986.169-1.24.085-.251-.083-.444-.25-.629-.49a4.8 4.8 0 0 1-.27-.402c-.085-.139-.182-.302-.28-.447-.191-.281-.473-.633-.929-.753l-.254.968c.08.02.184.095.355.346.082.122.16.252.258.412.094.152.202.32.327.484.253.33.598.663 1.11.832.51.168 1.116.15 1.852-.081l-.3-.954Zm4.65-.585c0-.318-.014-.608-.104-.878-.096-.288-.262-.51-.481-.727l-.705.71c.155.153.208.245.237.333.035.105.053.254.053.562h1Zm-.884-.753c.903-.097 1.888-.325 2.647-.982.78-.675 1.237-1.729 1.237-3.29h-1c0 1.359-.39 2.1-.892 2.534-.524.454-1.258.653-2.099.743l.107.995ZM13 5.91a3.354 3.354 0 0 0-.98-2.358l-.707.706c.438.44.685 1.034.687 1.655l1-.003Zm-.867-1.824c.15-.384.22-.794.21-1.207l-1 .025a2.12 2.12 0 0 1-.142.82l.932.362Zm.21-1.207a3.119 3.119 0 0 0-.27-1.195l-.913.408c.115.256.177.532.184.812l1-.025Zm-.726-.99c.137-.481.137-.482.136-.482h-.003l-.004-.002a.462.462 0 0 0-.03-.007 1.261 1.261 0 0 0-.212-.024 2.172 2.172 0 0 0-.51.054c-.425.091-1.024.317-1.82.832l.542.84c.719-.464 1.206-.634 1.488-.694.14-.03.23-.033.273-.032.022 0 .033.002.033.002l-.008-.001a.278.278 0 0 1-.01-.002l-.006-.002h-.003l-.002-.001c-.001 0-.002 0 .136-.482Zm-2.047.307a8.209 8.209 0 0 0-4.14 0l.252.968a7.209 7.209 0 0 1 3.636 0l.252-.968Zm-3.743.064C5.03 1.746 4.43 1.52 4.005 1.43a2.17 2.17 0 0 0-.51-.053 1.259 1.259 0 0 0-.241.03l-.004.002h-.003l.136.481.137.481h-.001l-.002.001-.003.001a.327.327 0 0 1-.016.004l-.008.001h.008a1.19 1.19 0 0 1 .298.03c.282.06.769.23 1.488.694l.543-.84Zm-2.9-.576a3.12 3.12 0 0 0-.27 1.195l1 .025c.006-.28.068-.556.183-.812l-.913-.408Zm-.27 1.195c-.01.413.06.823.21 1.207l.932-.362a2.12 2.12 0 0 1-.143-.82l-1-.025Zm.322.673a3.354 3.354 0 0 0-.726 1.091l.924.38c.118-.285.292-.545.51-.765l-.708-.706Zm-.726 1.091A3.354 3.354 0 0 0 2 5.93l1-.003c0-.31.06-.616.177-.902l-.924-.38ZM2 5.93c0 1.553.458 2.597 1.239 3.268.757.65 1.74.88 2.64.987l.118-.993C5.15 9.09 4.416 8.89 3.89 8.438 3.388 8.007 3 7.276 3 5.928H2Zm3.585 3.404c-.5.498-.629 1.09-.584 1.704L6 10.963c-.03-.408.052-.683.291-.921l-.705-.709ZM5 11v3.5h1V11H5Zm5 3.5V13H9v1.5h1Zm0-1.5v-2.063H9V13h1Z',
-          fill: '#000',
-        })
-      );
-    },
-  };
-
-export const WebsiteIcon: m.Component<
-  { color?: string; size?: IconSizes },
+export const GithubIcon: m.Component<
+  { color?: string; size?: IconSizes; disabled?: boolean },
   {}
 > = {
   view: (vnode) => {
+    const { size, color, disabled } = vnode.attrs;
     return m(
-      'svg.WebsiteIcon',
+      `svg.Icon.GithubIcon${disabled ? '.disabled' : ''}`,
+      {
+        width: '15',
+        height: '15',
+        fill: 'none',
+        xmlns: 'http://www.w3.org/2000/svg',
+      },
+      m('path', {
+        d: 'M5.65 12.477a.5.5 0 1 0-.3-.954l.3.954Zm-3.648-2.96-.484-.128-.254.968.484.127.254-.968ZM9 14.5v.5h1v-.5H9Zm.063-4.813-.054-.497a.5.5 0 0 0-.299.852l.352-.354ZM12.5 5.913h.5V5.91l-.5.002Zm-.833-2.007-.466-.18a.5.5 0 0 0 .112.533l.354-.353Zm-.05-2.017.456-.204a.5.5 0 0 0-.319-.276l-.137.48Zm-2.173.792-.126.484a.5.5 0 0 0 .398-.064l-.272-.42Zm-3.888 0-.272.42a.5.5 0 0 0 .398.064l-.126-.484ZM3.383 1.89l-.137-.48a.5.5 0 0 0-.32.276l.457.204Zm-.05 2.017.354.353a.5.5 0 0 0 .112-.534l-.466.181ZM2.5 5.93H3v-.002l-.5.002Zm3.438 3.758.352.355a.5.5 0 0 0-.293-.851l-.06.496ZM5.5 11H6l-.001-.037L5.5 11ZM5 14.5v.5h1v-.5H5Zm.35-2.977c-.603.19-.986.169-1.24.085-.251-.083-.444-.25-.629-.49a4.8 4.8 0 0 1-.27-.402c-.085-.139-.182-.302-.28-.447-.191-.281-.473-.633-.929-.753l-.254.968c.08.02.184.095.355.346.082.122.16.252.258.412.094.152.202.32.327.484.253.33.598.663 1.11.832.51.168 1.116.15 1.852-.081l-.3-.954Zm4.65-.585c0-.318-.014-.608-.104-.878-.096-.288-.262-.51-.481-.727l-.705.71c.155.153.208.245.237.333.035.105.053.254.053.562h1Zm-.884-.753c.903-.097 1.888-.325 2.647-.982.78-.675 1.237-1.729 1.237-3.29h-1c0 1.359-.39 2.1-.892 2.534-.524.454-1.258.653-2.099.743l.107.995ZM13 5.91a3.354 3.354 0 0 0-.98-2.358l-.707.706c.438.44.685 1.034.687 1.655l1-.003Zm-.867-1.824c.15-.384.22-.794.21-1.207l-1 .025a2.12 2.12 0 0 1-.142.82l.932.362Zm.21-1.207a3.119 3.119 0 0 0-.27-1.195l-.913.408c.115.256.177.532.184.812l1-.025Zm-.726-.99c.137-.481.137-.482.136-.482h-.003l-.004-.002a.462.462 0 0 0-.03-.007 1.261 1.261 0 0 0-.212-.024 2.172 2.172 0 0 0-.51.054c-.425.091-1.024.317-1.82.832l.542.84c.719-.464 1.206-.634 1.488-.694.14-.03.23-.033.273-.032.022 0 .033.002.033.002l-.008-.001a.278.278 0 0 1-.01-.002l-.006-.002h-.003l-.002-.001c-.001 0-.002 0 .136-.482Zm-2.047.307a8.209 8.209 0 0 0-4.14 0l.252.968a7.209 7.209 0 0 1 3.636 0l.252-.968Zm-3.743.064C5.03 1.746 4.43 1.52 4.005 1.43a2.17 2.17 0 0 0-.51-.053 1.259 1.259 0 0 0-.241.03l-.004.002h-.003l.136.481.137.481h-.001l-.002.001-.003.001a.327.327 0 0 1-.016.004l-.008.001h.008a1.19 1.19 0 0 1 .298.03c.282.06.769.23 1.488.694l.543-.84Zm-2.9-.576a3.12 3.12 0 0 0-.27 1.195l1 .025c.006-.28.068-.556.183-.812l-.913-.408Zm-.27 1.195c-.01.413.06.823.21 1.207l.932-.362a2.12 2.12 0 0 1-.143-.82l-1-.025Zm.322.673a3.354 3.354 0 0 0-.726 1.091l.924.38c.118-.285.292-.545.51-.765l-.708-.706Zm-.726 1.091A3.354 3.354 0 0 0 2 5.93l1-.003c0-.31.06-.616.177-.902l-.924-.38ZM2 5.93c0 1.553.458 2.597 1.239 3.268.757.65 1.74.88 2.64.987l.118-.993C5.15 9.09 4.416 8.89 3.89 8.438 3.388 8.007 3 7.276 3 5.928H2Zm3.585 3.404c-.5.498-.629 1.09-.584 1.704L6 10.963c-.03-.408.052-.683.291-.921l-.705-.709ZM5 11v3.5h1V11H5Zm5 3.5V13H9v1.5h1Zm0-1.5v-2.063H9V13h1Z',
+        fill: '#000',
+      })
+    );
+  },
+};
+
+export const WebsiteIcon: m.Component<
+  { color?: string; size?: IconSizes; disabled?: boolean },
+  {}
+> = {
+  view: (vnode) => {
+    const { size, color, disabled } = vnode.attrs;
+    return m(
+      `svg.Icon.WebsiteIcon${disabled ? '.disabled' : ''}`,
       {
         width: '15',
         height: '15',
