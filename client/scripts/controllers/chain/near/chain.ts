@@ -96,6 +96,19 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
     this._syncHandle = setInterval(syncFn, 2000);
   }
 
+  public async viewDaoList(): Promise<string[]> {
+    const rawResult = await this.api.connection.provider.query({
+      request_type: 'call_function',
+      account_id: this.isMainnet ? 'sputnik-dao.near' : 'sputnikv2.testnet',
+      method_name: 'get_dao_list',
+      args_base64: Buffer.from(JSON.stringify({})).toString('base64'),
+      finality: 'optimistic',
+    });
+    const daos: string[] = JSON.parse(Buffer.from((rawResult as any).result).toString());
+    // TODO: fetch additional data
+    return daos;
+  }
+
   public async createDaoTx(creator: NearAccount, name: string, purpose: string, value: BN) {
     const contractId = this.isMainnet ? 'sputnik2.near' : 'sputnikv2.testnet';
     const methodName = 'create';
