@@ -13,7 +13,6 @@ import User from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
 import { CommunityOptionsPopover } from './discussions';
 import Compound from 'controllers/chain/ethereum/compound/adapter';
-import Aave from 'controllers/chain/ethereum/aave/adapter';
 import { pluralize } from 'helpers';
 import { BigNumber } from 'ethers';
 import { notifyError } from 'controllers/app/notifications';
@@ -33,7 +32,7 @@ const DelegateModal: m.Component<
     address: string;
     name: string;
     symbol: string;
-    chainController: Compound | Aave;
+    chainController: Compound;
   },
   { delegateAmount: number }
 > = {
@@ -122,14 +121,9 @@ const MembersPage: m.Component<
         }
       }
     });
-    vnode.state.delegates =
-      app.chain instanceof Compound || app.chain instanceof Aave;
+    vnode.state.delegates = app.chain instanceof Compound;
     const chainController =
-      app.chain instanceof Compound
-        ? (app.chain as Compound)
-        : app.chain instanceof Aave
-        ? (app.chain as Aave)
-        : null;
+      app.chain instanceof Compound ? (app.chain as Compound) : null;
 
     const activeEntity = app.community ? app.community : app.chain;
     if (!activeEntity) {
