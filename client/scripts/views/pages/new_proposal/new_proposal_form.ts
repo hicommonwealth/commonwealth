@@ -942,7 +942,7 @@ const NewProposalForm = {
               }),
             ]),
             m(FormGroup, [
-              m(FormLabel, 'Target'),
+              m(FormLabel, 'Target Address'),
               m(Input, {
                 name: 'targets',
                 placeholder: 'Add Target',
@@ -958,7 +958,7 @@ const NewProposalForm = {
               m(FormLabel, 'Value'),
               m(Input, {
                 name: 'values',
-                placeholder: 'Enter amount',
+                placeholder: 'Enter amount in wei',
                 value: aaveProposalState[activeAaveTabIndex].value,
                 oninput: (e) => {
                   const result = (e.target as any).value;
@@ -982,7 +982,7 @@ const NewProposalForm = {
             ]),
             m(FormGroup, [
               m('.flex-label', [
-                m(FormLabel, 'Signature'),
+                m(FormLabel, 'Function Signature'),
                 m('.helper-text', 'Optional'),
               ]),
               m(Input, {

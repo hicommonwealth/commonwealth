@@ -355,16 +355,6 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         label: 'Delegate',
         active: m.route.get() === `/${app.activeChainId()}/delegate`,
       }),
-      // showAaveOptions && m(Button, {
-      //   fluid: true,
-      //   rounded: true,
-      //   onclick: (e) => {
-      //     e.preventDefault();
-      //     m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.AaveProposal });
-      //   },
-      //   label: 'Submit Proposal',
-      //   active: m.route.get() === `/${app.activeChainId()}/new/proposal/${ProposalType.AaveProposal}`,
-      // }),
       showMolochMemberOptions && m(Button, {
         fluid: true,
         rounded: true,
