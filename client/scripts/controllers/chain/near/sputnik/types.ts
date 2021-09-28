@@ -4,6 +4,12 @@ import { IVote } from 'models';
 import { NearAccount } from 'controllers/chain/near/account';
 import { NearToken } from 'adapters/chain/near/types';
 
+export interface NearSputnikConfig {
+  metadata: string;
+  name: string;
+  purpose: string;
+}
+
 export enum NearSputnikProposalStatus {
   InProgress = 'InProgress',
   Approved = 'Approved',
@@ -38,17 +44,17 @@ export function isWeight(w: WeightOrRatio): w is U128 {
 }
 
 export type VotePolicy = {
-  weight_kind: WeightKind,
+  weight_kind: WeightKind;
 
   // Minimum number required for vote to finalize.
   // If weight kind is TokenWeight - this is minimum number of tokens required.
   // If RoleWeight - this is minimum umber of votes.
-  quorum: U128, // U128
-  threshold: WeightOrRatio,
+  quorum: U128; // U128
+  threshold: WeightOrRatio;
 };
 
 type RoleKind = 'Everyone' | { Member: Balance } | { Group: AccountId[] };
-function isMemberRole(r: RoleKind): r is { Member: Balance } {
+export function isMemberRole(r: RoleKind): r is { Member: Balance } {
   return (r as any).Member !== undefined;
 }
 export function isGroupRole(r: RoleKind): r is { Group: AccountId[] } {
@@ -56,22 +62,25 @@ export function isGroupRole(r: RoleKind): r is { Group: AccountId[] } {
 }
 
 type RolePermission = {
-  name: string,
-  kind: RoleKind,
-  permissions: string[], // e.g. [ *:AddProposal ]
-  vote_policy: { [kind: string]: VotePolicy },
+  name: string;
+  kind: RoleKind;
+  permissions: string[]; // e.g. [ *:AddProposal ]
+  vote_policy: { [kind: string]: VotePolicy };
 };
 
 export type NearSputnikPolicy = {
-  roles: RolePermission[],
-  default_vote_policy: VotePolicy,
-  proposal_bond: U128,
-  proposal_period: Nanoseconds,
-  bounty_bond: U128,
-  bounty_forgiveness_period: Nanoseconds,
+  roles: RolePermission[];
+  default_vote_policy: VotePolicy;
+  proposal_bond: U128;
+  proposal_period: Nanoseconds;
+  bounty_bond: U128;
+  bounty_forgiveness_period: Nanoseconds;
 };
 
-export function getUserRoles(policy: NearSputnikPolicy, user: AccountId): string[] {
+export function getUserRoles(
+  policy: NearSputnikPolicy,
+  user: AccountId
+): string[] {
   const userPermissions: string[] = [];
   for (const role of policy.roles) {
     if (role.kind === 'Everyone') {
@@ -87,7 +96,11 @@ export function getUserRoles(policy: NearSputnikPolicy, user: AccountId): string
   return userPermissions;
 }
 
-export function getTotalSupply(policy: NearSputnikPolicy, votePolicy: VotePolicy, tokenSupply: BN): BN {
+export function getTotalSupply(
+  policy: NearSputnikPolicy,
+  votePolicy: VotePolicy,
+  tokenSupply: BN
+): BN {
   if (votePolicy.weight_kind === WeightKind.RoleWeight) {
     // locate the role representing the proposal's voting group
     const roles = policy.roles;
@@ -104,19 +117,33 @@ export function getTotalSupply(policy: NearSputnikPolicy, votePolicy: VotePolicy
 }
 
 type NearSputnikActionCall = {
-  method_name: string,
-  args: any, // TODO: what is this type?
-  deposit: U128,
-  gas: string, // u64
+  method_name: string;
+  args: any; // TODO: what is this type?
+  deposit: U128;
+  gas: string; // u64
 };
 
 // TODO: support other kinds?
-type AddMemberToRole = { AddMemberToRole: { role: string, member_id: AccountId } };
-type RemoveMemberFromRole = { RemoveMemberFromRole : { role: string, member_id: AccountId } };
-type Transfer = { Transfer: { token_id: AccountId, amount: U128, receiver_id: AccountId, msg?: string } };
-type FunctionCall = { FunctionCall: { actions: NearSputnikActionCall[], receiver_id: AccountId } };
+type AddMemberToRole = {
+  AddMemberToRole: { role: string; member_id: AccountId };
+};
+type RemoveMemberFromRole = {
+  RemoveMemberFromRole: { role: string; member_id: AccountId };
+};
+type Transfer = {
+  Transfer: {
+    token_id: AccountId;
+    amount: U128;
+    receiver_id: AccountId;
+    msg?: string;
+  };
+};
+type FunctionCall = {
+  FunctionCall: { actions: NearSputnikActionCall[]; receiver_id: AccountId };
+};
 type ChangePolicy = { ChangePolicy: { policy: NearSputnikPolicy } };
-export type NearSputnikProposalKind = 'ChangeConfig'
+export type NearSputnikProposalKind =
+  | 'ChangeConfig'
   | 'UpgradeSelf'
   | 'UpgradeRemote'
   | 'Transfer'
@@ -130,19 +157,27 @@ export type NearSputnikProposalKind = 'ChangeConfig'
   | Transfer
   | FunctionCall;
 
-export function isAddMemberToRole(kind: NearSputnikProposalKind): kind is AddMemberToRole {
+export function isAddMemberToRole(
+  kind: NearSputnikProposalKind
+): kind is AddMemberToRole {
   return (kind as any).AddMemberToRole !== undefined;
 }
-export function isRemoveMemberFromRole(kind: NearSputnikProposalKind): kind is RemoveMemberFromRole {
+export function isRemoveMemberFromRole(
+  kind: NearSputnikProposalKind
+): kind is RemoveMemberFromRole {
   return (kind as any).RemoveMemberFromRole !== undefined;
 }
 export function isTransfer(kind: NearSputnikProposalKind): kind is Transfer {
   return (kind as any).Transfer !== undefined;
 }
-export function isFunctionCall(kind: NearSputnikProposalKind): kind is FunctionCall {
+export function isFunctionCall(
+  kind: NearSputnikProposalKind
+): kind is FunctionCall {
   return (kind as any).FunctionCall !== undefined;
 }
-export function isChangePolicy(kind: NearSputnikProposalKind): kind is ChangePolicy {
+export function isChangePolicy(
+  kind: NearSputnikProposalKind
+): kind is ChangePolicy {
   return (kind as any).ChangePolicy !== undefined;
 }
 
@@ -161,7 +196,10 @@ export function kindToPolicyLabel(kind: NearSputnikProposalKind): string {
   if (isChangePolicy(kind)) return 'policy';
   throw new Error(`invalid proposal kind: ${JSON.stringify(kind)}`);
 }
-export function getVotePolicy(policy: NearSputnikPolicy, kind: NearSputnikProposalKind): VotePolicy {
+export function getVotePolicy(
+  policy: NearSputnikPolicy,
+  kind: NearSputnikProposalKind
+): VotePolicy {
   try {
     const policyString = kindToPolicyLabel(kind);
     for (const role of policy.roles) {
@@ -177,27 +215,32 @@ export function getVotePolicy(policy: NearSputnikPolicy, kind: NearSputnikPropos
 
 // proposal type returned by get_proposals query
 export type NearSputnikGetProposalResponse = {
-  id: number,
-  description: string,
+  id: number;
+  description: string;
   // see https://github.com/near-daos/sputnik-dao-contract/blob/master/sputnikdao2/src/proposals.rs#L48
-  kind: NearSputnikProposalKind,
-  target?: any, // TODO: test what is this type...
-  proposer: AccountId,
-  status: NearSputnikProposalStatus,
-  submission_time: Nanoseconds,
+  kind: NearSputnikProposalKind;
+  target?: any; // TODO: test what is this type...
+  proposer: AccountId;
+  status: NearSputnikProposalStatus;
+  submission_time: Nanoseconds;
   // who will be e.g. "council" in the case of a class of voters
-  vote_counts: { [who: string]: [ number, number, number ] }, // yes / no / remove = spam
-  votes: { [who: string]: NearSputnikVoteString, },
+  vote_counts: { [who: string]: [number, number, number] }; // yes / no / remove = spam
+  votes: { [who: string]: NearSputnikVoteString };
 };
 
-export type INearSputnikProposal = IIdentifiable & NearSputnikGetProposalResponse;
+export type INearSputnikProposal = IIdentifiable &
+  NearSputnikGetProposalResponse;
 
 export class NearSputnikVote implements IVote<NearToken> {
   public readonly account: NearAccount;
   public readonly choice: NearSputnikVoteString;
   public readonly balance: BN;
 
-  constructor(member: NearAccount, choice: NearSputnikVoteString, balance = new BN(1)) {
+  constructor(
+    member: NearAccount,
+    choice: NearSputnikVoteString,
+    balance = new BN(1)
+  ) {
     this.account = member;
     this.choice = choice;
     this.balance = balance;

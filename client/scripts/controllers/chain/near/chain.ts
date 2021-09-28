@@ -1,4 +1,10 @@
-import { Near as NearApi, Account as NearApiAccount, connect as nearConnect, WalletAccount, Contract } from 'near-api-js';
+import {
+  Near as NearApi,
+  Account as NearApiAccount,
+  connect as nearConnect,
+  WalletAccount,
+  ConnectConfig,
+} from 'near-api-js';
 import { NodeStatusResult } from 'near-api-js/lib/providers/provider';
 import { uuidv4 } from 'lib/util';
 import { IChainModule, ITXModalData, NodeInfo } from 'models';
@@ -7,15 +13,19 @@ import BN from 'bn.js';
 import { ApiStatus, IApp } from 'state';
 import moment from 'moment';
 import * as m from 'mithril';
+import { NearSputnikConfig, NearSputnikPolicy } from './sputnik/types';
 import { NearAccounts, NearAccount } from './account';
 
 export interface IDaoInfo {
-  council?;
-  bond?;
-  votePeriod?;
-  gracePeriod?;
-  purpose?;
-  state?;
+  contractId: string;
+  amount: string;
+  name: string;
+  purpose: string;
+  proposalBond: string;
+  proposalPeriod: string;
+  bountyBond: string;
+  bountyPeriod: string;
+  council: string[];
 }
 
 class NearChain implements IChainModule<NearToken, NearAccount> {
@@ -24,16 +34,22 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
     return this._api;
   }
 
-  public get denom() { return this.app.chain.currency; }
+  public get denom() {
+    return this.app.chain.currency;
+  }
   public coins(n: number | string | BN, inDollars?: boolean) {
     return new NearToken(n, inDollars);
   }
 
-  private _config: any;
-  public get config() { return this._config; }
+  private _config: ConnectConfig;
+  public get config() {
+    return this._config;
+  }
 
   private _chainId: string;
-  public get chainId() { return this._chainId; }
+  public get chainId() {
+    return this._chainId;
+  }
 
   private _syncHandle;
   private _nodeStatus: NodeStatusResult;
@@ -47,20 +63,26 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
   }
 
   private _app: IApp;
-  public get app() { return this._app; }
+  public get app() {
+    return this._app;
+  }
 
   constructor(app: IApp) {
     this._app = app;
   }
 
-  public async init(node: NodeInfo, accounts: NearAccounts, reset = false) {
+  public async init(node: NodeInfo, accounts: NearAccounts): Promise<void> {
     const networkSuffix = node.chain.id.split('.').pop();
-    this._networkId = node.chain.id === 'near-testnet' || networkSuffix === 'testnet'
-      ? 'testnet' : 'mainnet';
+    this._networkId =
+      node.chain.id === 'near-testnet' || networkSuffix === 'testnet'
+        ? 'testnet'
+        : 'mainnet';
     this._config = {
       networkId: this.isMainnet ? 'mainnet' : 'testnet',
       nodeUrl: node.url,
-      walletUrl: this.isMainnet ? 'https://wallet.near.org/' : 'https://wallet.testnet.near.org/',
+      walletUrl: this.isMainnet
+        ? 'https://wallet.near.org/'
+        : 'https://wallet.testnet.near.org/',
       keyStore: accounts.keyStore,
     };
 
@@ -73,15 +95,18 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
 
         // handle chain-related updates
         this._chainId = this._nodeStatus.chain_id;
-        const { latest_block_time, latest_block_height } = this._nodeStatus.sync_info;
+        const { latest_block_time, latest_block_height } =
+          this._nodeStatus.sync_info;
 
         // update block heights and times
-        const lastTime: moment.Moment = this.app.chain.block && this.app.chain.block.lastTime;
+        const lastTime: moment.Moment =
+          this.app.chain.block && this.app.chain.block.lastTime;
         const lastHeight = this.app.chain.block && this.app.chain.block.height;
         this.app.chain.block.lastTime = moment(latest_block_time);
         this.app.chain.block.height = latest_block_height;
         if (lastTime && lastHeight) {
-          const duration = this.app.chain.block.lastTime.diff(lastTime, 'ms') / 1000;
+          const duration =
+            this.app.chain.block.lastTime.diff(lastTime, 'ms') / 1000;
           const nBlocks = this.app.chain.block.height - lastHeight;
           if (nBlocks > 0 && duration > 0) {
             // if we accidentally miss multiple blocks, use the average block time across all of them
@@ -102,44 +127,83 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
     };
     await syncFn();
     this._syncHandle = setInterval(syncFn, 2000);
-    await this.viewDaoList();
   }
 
-  // NOTE: this function requests A LOT of data from the chain and should be used sparingly
-  public async viewDaoList(): Promise<IDaoInfo[]> {
-    const daoContract = this.isMainnet ? 'sputnik-dao.near' : 'sputnikv2.testnet';
+  public async query<T>(
+    contractId: string,
+    method: string,
+    args: Record<string, unknown>
+  ): Promise<T> {
     const rawResult = await this.api.connection.provider.query({
       request_type: 'call_function',
-      account_id: daoContract,
-      method_name: 'get_dao_list',
-      args_base64: Buffer.from(JSON.stringify({})).toString('base64'),
+      account_id: contractId,
+      method_name: method,
+      args_base64: Buffer.from(JSON.stringify(args)).toString('base64'),
       finality: 'optimistic',
     });
-    const daos: string[] = JSON.parse(Buffer.from((rawResult as any).result).toString());
-    const daoInfos: IDaoInfo[] = await Promise.all(daos.map(async (daoName) => {
-      const contractId = `${daoName}.${daoContract}`;
-      const contract: any = new Contract(this.api.connection.account(), contractId, {
-        viewMethods: ['get_council', 'get_bond', 'get_num_proposals', 'get_purpose', 'get_vote_period'],
-        changeMethods: [],
-      });
-      const bond = await contract.get_bond();
-      const votePeriod = await contract.get_vote_period();
-      const purpose = await contract.get_purpose();
-      const council = await contract.get_council();
-      const state = await new NearApiAccount(this.api.connection, contractId).state();
-      return {
-        council,
-        bond,
-        votePeriod,
-        purpose,
-        state,
-      };
-    }));
-    console.log(daoInfos);
+    const res = JSON.parse(Buffer.from((rawResult as any).result).toString());
+    return res;
+  }
+
+  // NOTE: this function requests A LOT of data from the chain and should be used sparingly,
+  //  ideally only when loading the DAO list page
+  public async viewDaoList(): Promise<IDaoInfo[]> {
+    const daoContract = this.isMainnet
+      ? 'sputnik-dao.near'
+      : 'sputnikv2.testnet';
+    const daos: string[] = await this.query(daoContract, 'get_dao_list', {});
+    const daoInfos: IDaoInfo[] = await Promise.all(
+      daos.map(async (daoId) => {
+        try {
+          const state = await new NearApiAccount(
+            this.api.connection,
+            daoId
+          ).state();
+          const policy: NearSputnikPolicy = await this.query(
+            daoId,
+            'get_policy',
+            {}
+          );
+          const config: NearSputnikConfig = await this.query(
+            daoId,
+            'get_config',
+            {}
+          );
+          const council = policy.roles.find((r) => (r.kind as any).Group);
+          // TODO: support diff types of policy roles
+          // if (!council) {
+          //   console.log(
+          //     `No council found in policy for ${daoId}: ${JSON.stringify(
+          //       policy.roles
+          //     )}`
+          //   );
+          // }
+          return {
+            contractId: daoId,
+            amount: state.amount,
+            name: config.name,
+            purpose: config.purpose,
+            proposalBond: policy.proposal_bond,
+            proposalPeriod: policy.proposal_period,
+            bountyBond: policy.bounty_bond,
+            bountyPeriod: policy.bounty_forgiveness_period,
+            council: (council?.kind as any)?.Group || [],
+          };
+        } catch (e) {
+          // console.error(`Failed to query dao info for ${daoId}: ${e.message}`);
+          return null;
+        }
+      })
+    );
     return daoInfos.filter((d) => !!d);
   }
 
-  public async createDaoTx(creator: NearAccount, name: string, purpose: string, value: BN) {
+  public async createDaoTx(
+    creator: NearAccount,
+    name: string,
+    purpose: string,
+    value: BN
+  ): Promise<void> {
     const contractId = this.isMainnet ? 'sputnik2.near' : 'sputnikv2.testnet';
     const methodName = 'create';
     const pk = this.isMainnet
@@ -154,7 +218,7 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
       },
       // TODO: add far more configuration for initial policy
       // initial council
-      policy: [ creator.address ],
+      policy: [creator.address],
     };
     const yoktoNear = new BN('1000000000000000000000000');
     const attachedDeposit = value.mul(yoktoNear).toString();
@@ -166,9 +230,20 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
     };
 
     // redirect back to /finishNearLogin for chain node creation
-    const id = this.isMainnet ? `${name}.sputnik-dao.near` : `${name}.sputnikv2.testnet`;
-    const redirectUrl = `${window.location.origin}/${this.app.activeChainId()}/finishNearLogin?chain_name=${id}`;
-    await this.redirectTx(contractId, methodName, propArgs, attachedDeposit, redirectUrl, '150000000000000');
+    const id = this.isMainnet
+      ? `${name}.sputnik-dao.near`
+      : `${name}.sputnikv2.testnet`;
+    const redirectUrl = `${
+      window.location.origin
+    }/${this.app.activeChainId()}/finishNearLogin?chain_name=${id}`;
+    await this.redirectTx(
+      contractId,
+      methodName,
+      propArgs,
+      attachedDeposit,
+      redirectUrl,
+      '150000000000000'
+    );
   }
 
   public async redirectTx(
@@ -177,8 +252,8 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
     args: any,
     attachedDeposit?: string,
     postTxRedirect?: string,
-    gas?: string,
-  ) {
+    gas?: string
+  ): Promise<void> {
     // construct tx object
     const functionCall: any = {
       contractId,
@@ -200,7 +275,9 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
     localStorage[uuid] = JSON.stringify(functionCall);
 
     // redirect to generate access key for dao contract
-    const redirectUrl = `${window.location.origin}/${this.app.activeChainId()}/finishNearLogin`;
+    const redirectUrl = `${
+      window.location.origin
+    }/${this.app.activeChainId()}/finishNearLogin`;
     const successUrl = `${redirectUrl}?saved_tx=${uuid}`;
     const failureUrl = `${redirectUrl}?tx_failure=${uuid}`;
 
@@ -209,7 +286,7 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
       contractId,
       methodNames: [methodName],
       successUrl,
-      failureUrl
+      failureUrl,
     });
   }
 
@@ -218,13 +295,7 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
     this.app.chain.networkStatus = ApiStatus.Disconnected;
   }
 
-  public createTXModalData(
-    author: NearAccount,
-    txFunc,
-    txName: string,
-    objName: string,
-    cb?: (success: boolean) => void,
-  ): ITXModalData {
+  public createTXModalData(): ITXModalData {
     // TODO
     throw new Error('Txs not yet implemented');
   }
