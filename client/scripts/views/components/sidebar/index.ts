@@ -417,7 +417,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         label: 'Snapshot Proposals',
         onclick: (e) => {
           e.preventDefault();
-          m.route.set(`/${app.activeChainId()}/snapshot/${app.chain.meta.chain.snapshot}`);
+          navigateToSubpage(`/snapshot/${app.chain.meta.chain.snapshot}`);
         },
       }),
       // app.chain?.meta.chain.snapshot && app.user.activeAccount && m(Button, {
