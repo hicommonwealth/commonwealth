@@ -24,7 +24,7 @@ export const Label: LabelerFilter = (
         heading: 'Proposal Canceled',
         label: `Proposal ${data.id} was cancelled.`,
         linkUrl: chainId
-          ? `/${chainId}/proposal/aaveproposal/${data.id}`
+          ? `/${chainId}/proposal/onchainproposal/${data.id}`
           : null,
       };
     }
@@ -33,7 +33,7 @@ export const Label: LabelerFilter = (
         heading: 'Proposal Created',
         label: `Proposal ${data.id} was created.`,
         linkUrl: chainId
-          ? `/${chainId}/proposal/aaveproposal/${data.id}`
+          ? `/${chainId}/proposal/onchainproposal/${data.id}`
           : null,
       };
     }
@@ -42,7 +42,7 @@ export const Label: LabelerFilter = (
         heading: 'Proposal Executed',
         label: `Proposal ${data.id} was executed.`,
         linkUrl: chainId
-          ? `/${chainId}/proposal/aaveproposal/${data.id}`
+          ? `/${chainId}/proposal/onchainproposal/${data.id}`
           : null,
       };
     }
@@ -53,7 +53,7 @@ export const Label: LabelerFilter = (
           .unix(data.executionTime)
           .format()}.`,
         linkUrl: chainId
-          ? `/${chainId}/proposal/aaveproposal/${data.id}`
+          ? `/${chainId}/proposal/onchainproposal/${data.id}`
           : null,
       };
     }
@@ -64,7 +64,7 @@ export const Label: LabelerFilter = (
           data.support ? 'against' : 'for'
         } proposal ${data.id}.`,
         linkUrl: chainId
-          ? `/${chainId}/proposal/aaveproposal/${data.id}`
+          ? `/${chainId}/proposal/onchainproposal/${data.id}`
           : null,
       };
     }
