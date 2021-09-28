@@ -91,7 +91,7 @@ export const subscribeEvents: SubscribeFunc<
   RawEvent,
   IErc20SubscribeOptions
 > = async (options) => {
-  const { chain, api, handlers, verbose } = options;
+  const { chain, api, handlers, verbose, enricherConfig } = options;
   // helper function that sends an event through event handlers
   const handleEventFn = async (event: CWEvent<IEventData>): Promise<void> => {
     let prevResult = null;
@@ -110,7 +110,7 @@ export const subscribeEvents: SubscribeFunc<
 
   // helper function that sends a block through the event processor and
   // into the event handlers
-  const processor = new Processor(api);
+  const processor = new Processor(api, enricherConfig || {});
   const processEventFn = async (
     event: RawEvent,
     tokenName?: string

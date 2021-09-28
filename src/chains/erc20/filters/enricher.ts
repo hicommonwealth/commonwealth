@@ -28,8 +28,21 @@ export async function Enrich(
     case EventKind.Approval: {
       const { owner, spender, value } = rawData.args as any;
       const contractAddress = rawData.address;
+
+      // only emit to everyone if approval value is 0 or above the configuration threshold
+      const shouldEmitToAll = config.balanceTransferThreshold
+        ? value.gte(config.balanceTransferThreshold)
+        : false;
+
+      // skip this event if the approval value isn't above the threshold
+      if (!shouldEmitToAll) return null;
+
+      // should not notify sender or recipient
+      const excludeAddresses = [owner.toString(), spender.toString()];
+
       return {
         blockNumber,
+        excludeAddresses,
         data: {
           kind,
           owner,
@@ -47,14 +60,16 @@ export async function Enrich(
       const shouldEmitToAll = config.balanceTransferThreshold
         ? value.gte(config.balanceTransferThreshold)
         : false;
-      const includeAddresses = shouldEmitToAll
-        ? []
-        : [from.toString(), to.toString()];
+
+      // skip this event if the transfer value isn't above the threshold
+      if (!shouldEmitToAll) return null;
+
+      // should not notify sender or recipient
+      const excludeAddresses = [from.toString(), to.toString()];
 
       return {
-        // should not notify sender or recipient
         blockNumber,
-        includeAddresses,
+        excludeAddresses,
         data: {
           kind,
           from,

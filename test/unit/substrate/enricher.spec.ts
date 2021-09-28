@@ -684,7 +684,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
-      includeAddresses: [],
+      excludeAddresses: ['alice', 'bob'],
       data: {
         kind,
         sender: 'alice',
@@ -707,7 +707,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     });
     assert.deepEqual(result, {
       blockNumber,
-      includeAddresses: [],
+      excludeAddresses: ['alice', 'bob'],
       data: {
         kind,
         sender: 'alice',
@@ -730,7 +730,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     });
     assert.deepEqual(result, {
       blockNumber,
-      includeAddresses: [],
+      excludeAddresses: ['alice', 'bob'],
       data: {
         kind,
         sender: 'alice',
@@ -753,7 +753,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     });
     assert.deepEqual(result, {
       blockNumber,
-      includeAddresses: ['alice', 'bob'],
+      excludeAddresses: ['alice', 'bob'],
       data: {
         kind,
         sender: 'alice',

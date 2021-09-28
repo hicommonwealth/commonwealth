@@ -43,7 +43,7 @@ export async function createListener(
     archival?: boolean;
     spec?: Record<string, unknown>;
     url?: string;
-    enricherConfig?: EnricherConfig;
+    enricherConfig?: any;
     discoverReconnectRange?: (c: string) => Promise<IDisconnectedRange>;
   },
   customChainBase?: string
@@ -122,6 +122,7 @@ export async function createListener(
       options.tokenAddresses || [options.address],
       options.url,
       Array.isArray(options.tokenNames) ? options.tokenNames : undefined,
+      options.enricherConfig,
       !!options.verbose,
       !!customChainBase
     );

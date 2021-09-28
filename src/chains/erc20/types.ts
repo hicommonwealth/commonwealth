@@ -3,6 +3,8 @@ import { Web3Provider } from '@ethersproject/providers';
 import { TypedEvent } from '../../contractTypes/commons';
 import { ERC20 } from '../../contractTypes';
 
+import { EnricherConfig } from './filters/enricher';
+
 // API is imported contracts classes
 interface IErc20Contracts {
   tokens: ERC20[];
@@ -14,6 +16,7 @@ export interface ListenerOptions {
   url: string;
   tokenAddresses: string[];
   tokenNames?: string[];
+  enricherConfig: EnricherConfig;
 }
 
 export type Api = IErc20Contracts;
