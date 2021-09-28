@@ -1,5 +1,4 @@
-import { Near as NearApi, connect as nearConnect, WalletAccount } from 'near-api-js';
-import { FunctionCallOptions } from 'near-api-js/lib/account';
+import { Near as NearApi, Account as NearApiAccount, connect as nearConnect, WalletAccount, Contract } from 'near-api-js';
 import { NodeStatusResult } from 'near-api-js/lib/providers/provider';
 import { uuidv4 } from 'lib/util';
 import { IChainModule, ITXModalData, NodeInfo } from 'models';
@@ -9,6 +8,15 @@ import { ApiStatus, IApp } from 'state';
 import moment from 'moment';
 import * as m from 'mithril';
 import { NearAccounts, NearAccount } from './account';
+
+export interface IDaoInfo {
+  council?;
+  bond?;
+  votePeriod?;
+  gracePeriod?;
+  purpose?;
+  state?;
+}
 
 class NearChain implements IChainModule<NearToken, NearAccount> {
   private _api: NearApi;
@@ -94,19 +102,41 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
     };
     await syncFn();
     this._syncHandle = setInterval(syncFn, 2000);
+    await this.viewDaoList();
   }
 
-  public async viewDaoList(): Promise<string[]> {
+  // NOTE: this function requests A LOT of data from the chain and should be used sparingly
+  public async viewDaoList(): Promise<IDaoInfo[]> {
+    const daoContract = this.isMainnet ? 'sputnik-dao.near' : 'sputnikv2.testnet';
     const rawResult = await this.api.connection.provider.query({
       request_type: 'call_function',
-      account_id: this.isMainnet ? 'sputnik-dao.near' : 'sputnikv2.testnet',
+      account_id: daoContract,
       method_name: 'get_dao_list',
       args_base64: Buffer.from(JSON.stringify({})).toString('base64'),
       finality: 'optimistic',
     });
     const daos: string[] = JSON.parse(Buffer.from((rawResult as any).result).toString());
-    // TODO: fetch additional data
-    return daos;
+    const daoInfos: IDaoInfo[] = await Promise.all(daos.map(async (daoName) => {
+      const contractId = `${daoName}.${daoContract}`;
+      const contract: any = new Contract(this.api.connection.account(), contractId, {
+        viewMethods: ['get_council', 'get_bond', 'get_num_proposals', 'get_purpose', 'get_vote_period'],
+        changeMethods: [],
+      });
+      const bond = await contract.get_bond();
+      const votePeriod = await contract.get_vote_period();
+      const purpose = await contract.get_purpose();
+      const council = await contract.get_council();
+      const state = await new NearApiAccount(this.api.connection, contractId).state();
+      return {
+        council,
+        bond,
+        votePeriod,
+        purpose,
+        state,
+      };
+    }));
+    console.log(daoInfos);
+    return daoInfos.filter((d) => !!d);
   }
 
   public async createDaoTx(creator: NearAccount, name: string, purpose: string, value: BN) {
