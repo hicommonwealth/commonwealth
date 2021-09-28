@@ -52,6 +52,10 @@ import {
   IconIntent,
   WebsiteIcon,
 } from './icons';
+import {
+  ButtonIntent,
+  FaceliftButton
+} from './buttons';
 
 const displayColors = (hexList) => {
   return Object.entries(hexList).map(([k, v]) => {
@@ -62,9 +66,18 @@ const displayColors = (hexList) => {
   });
 };
 
+const displayGradients = (gradientNames: string[]) => {
+  return gradientNames.map((gradient) => {
+    return m('.gradient-row', [
+      m('.gradient-name', gradient),
+      m('.gradient-sample', { class: gradient }),
+    ]);
+  });
+};
+
 const displayIcons = (headerText: string, iconList) => {
   return m('.icon-gallery', [
-    m('h1', headerText),
+    m('h2', headerText),
     Object.entries(iconList).map(([k, v]) => {
       return m('.icon-row', [m('.icon-name', k), v]);
     }),
@@ -97,6 +110,15 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
           MintGreen: '#F3FFF9',
           CreamYellow: '#FFFBA1',
         })
+      ),
+      m('h1', 'Redesign Gradients'),
+      m(
+        '.gradient-listing',
+        displayGradients([
+          'rainbow-gradient-horizontal',
+          'rainbow-gradient-diagonal',
+          'shadow-gradient',
+        ])
       ),
       m('h1', 'Redesign Icons'),
       m('.icon-listing', [
@@ -194,6 +216,33 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
           TelegramIcon: m(TelegramIcon),
           GithubIcon: m(GithubIcon),
           WebsiteIcon: m(WebsiteIcon),
+        }),
+      ]),
+      m('h1', 'Redesign Buttons'),
+      m('.gallery', [
+        m(FaceliftButton, {
+          intent: ButtonIntent.Primary,
+          label: 'Primary',
+          onclick: () => alert('clicked!'),
+          disabled: false,
+        }),
+        m(FaceliftButton, {
+          intent: ButtonIntent.Primary,
+          label: 'Disabled',
+          onclick: () => alert('clicked!'),
+          disabled: true,
+        }),
+        m(FaceliftButton, {
+          intent: ButtonIntent.Secondary,
+          label: 'Secondary',
+          onclick: () => alert('clicked!'),
+          disabled: false,
+        }),
+        m(FaceliftButton, {
+          intent: ButtonIntent.Secondary,
+          label: 'Disabled',
+          onclick: () => alert('clicked!'),
+          disabled: true,
         }),
       ]),
       // buttons and inputs

@@ -1,3 +1,5 @@
+@import 'client/styles/facelift';
+
 .ComponentListing {
     > * {
         margin: 20px;
@@ -5,22 +7,37 @@
     > .gallery > * {
         margin-right: 20px;
     }
-    .hex-listing {
+    .hex-listing,
+    .gradient-listing {
         display: flex;
         flex-direction: column;
         flex-wrap: wrap;
         max-height: 160px;
-        .hex-row {
+        .hex-row,
+        .gradient-row {
             display: flex;
             justify-content: space-between;
             margin-right: 80px;
-            .hex-sample {
+            .hex-sample,
+            .gradient-sample {
                 min-width: 100px;
                 min-height: 10px;
                 max-width: 100px;
                 max-height: 10px;
                 border-radius: 5px;
             }
+            .rainbow-gradient-horizontal {
+                @include rainbow-gradient-horizontal;
+            }
+            .rainbow-gradient-diagonal {
+                @include rainbow-gradient-diagonal;
+            }
+            .shadow-gradient {
+                @include shadow-gradient;
+            }
+        }
+        .gradient-row {
+            max-width: 400px;
         }
     }
     .icon-listing {
