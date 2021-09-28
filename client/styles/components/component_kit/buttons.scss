@@ -49,6 +49,7 @@
     display: flex;
     max-width: fit-content;
     font-weight: 500;
+    cursor: pointer;
     .link-text {
         color: $dark-purp;
         margin-right: 15px;
@@ -86,9 +87,16 @@
         border: 0.1em solid $lite-gray;
     }
     input {
-        &:checked + .radio-control {
-            background: radial-gradient($purp-blue-magic 50%, $purp-blue-magic-lite 50%);
-            border: 0.1em solid $purp-blue-magic;
+        &:checked ~ .radio-control::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            background: $purp-blue;
+            // background: radial-gradient($purp-blue 50%, $purp-blue-lite 50%);
+            // border: 0.1em solid $purp-blue;
         }
     }
     .radio-label {

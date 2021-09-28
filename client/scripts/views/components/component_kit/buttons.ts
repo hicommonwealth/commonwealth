@@ -221,7 +221,7 @@ export const EngagementButton: m.Component<
   {}
 > = {
   view: (vnode) => {
-    const { size, label, onclick, disabled } = vnode.attrs;
+    const { label, onclick, disabled } = vnode.attrs;
     return m(
       appendTags('Button.EngagementButton', vnode.attrs),
       {

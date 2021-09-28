@@ -1,6 +1,6 @@
 import m from 'mithril';
 import 'components/component_kit/component_listing.scss';
-
+import { notifySuccess } from 'controllers/app/notifications';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -63,7 +63,7 @@ import {
   ButtonSize,
   EngagementButton,
 } from './buttons';
-import { notifySuccess } from 'controllers/app/notifications';
+import { TextInput, TextInputStatus } from './forms';
 
 const displayColors = (hexList) => {
   return Object.entries(hexList).map(([k, v]) => {
@@ -109,8 +109,8 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
           MidiPurp: '#9075DC',
           LitePurp: '#C7B9EF',
           XLitePurp: '#F7F4FF',
-          PurpBlueMagic: '#6300FF',
-          PurpBlueMagicLite: '#F3EBFF',
+          PurpBlue: '#6300FF',
+          PurpBlueLite: '#F3EBFF',
           HypeRed: '#FF002E',
           Pinky: '#FFAFBE',
           FleshPink: '#FFEBEE',
@@ -344,6 +344,34 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
             label: 'Big',
             disabled: true,
             onclick: () => notifySuccess('Button clicked!'),
+          }),
+        ]
+      ),
+      m('h1', 'Form Fields'),
+      m(
+        '.form-gallery',
+        {
+          style: 'max-width: 600px;',
+        },
+        [
+          m(TextInput, {
+            name: 'Form field',
+            oninput: (e) => null,
+            inputValidationFn: (val: string): [TextInputStatus, string] => {
+              if (val.match(/[^A-Za-z]/)) {
+                return [TextInputStatus.Error, 'Must enter characters A-Z'];
+              } else {
+                return [TextInputStatus.Validate, 'Input validated'];
+              }
+            },
+            label: 'This input only accepts A-Z',
+            placeholder: 'Placeholder',
+          }),
+          m(TextInput, {
+            name: 'Text field',
+            oninput: (e) => null,
+            label: 'No status message or error validation',
+            placeholder: 'Placeholder',
           }),
         ]
       ),

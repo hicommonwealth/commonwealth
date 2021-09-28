@@ -17,7 +17,7 @@
         .gradient-row {
             display: flex;
             justify-content: space-between;
-            margin-right: 80px;
+            margin-right: 20px;
             .hex-sample,
             .gradient-sample {
                 min-width: 100px;
@@ -58,5 +58,8 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+    }
+    .TextInput {
+        margin-bottom: 20px;
     }
 }
