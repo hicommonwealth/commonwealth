@@ -100,7 +100,6 @@ class CosmosGovernance extends ProposalModule<
 
   private async _initProposals(proposalId?: number): Promise<void> {
     const msgToIProposal = (p: Proposal): ICosmosProposal | null => {
-      console.log(p);
       const content = p.content;
       const status = stateEnumToString(p.status);
       // TODO: support more types
