@@ -4,6 +4,7 @@ import m from 'mithril';
 import app from 'state';
 import $ from 'jquery';
 import { Button } from 'construct-ui';
+import { navigateToSubpage } from 'app';
 
 import { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
 import { notifyError } from 'controllers/app/notifications';
@@ -112,7 +113,7 @@ const ConfirmSnapshotVoteModal: m.Component<{
                   notifyError(errorMessage);
                 } else if (result.status === 'Success') {
                   $(e.target).trigger('modalexit');
-                  m.route.set(`/${app.activeId()}/snapshot-proposals/${space.id}`);
+                  navigateToSubpage(`/snapshot/${space.id}`);
                 }
               } catch (err) {
                 const errorMessage = err.message;

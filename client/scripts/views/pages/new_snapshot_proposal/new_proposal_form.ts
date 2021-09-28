@@ -6,6 +6,7 @@ import { Input, Form, FormLabel, FormGroup, Button, Callout, Spinner, RadioGroup
 
 import moment from 'moment';
 import app from 'state';
+import { navigateToSubpage } from 'app';
 
 import { Account, ChainBase } from 'models';
 import { notifyError } from 'controllers/app/notifications';
@@ -14,7 +15,7 @@ import { idToProposal } from 'identifiers';
 import { capitalize } from 'lodash';
 import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
-import { SnapshotSpace, getScores, getSpaceBlockNumber } from 'helpers/snapshot_utils';
+import { SnapshotSpace, getScore, getSpaceBlockNumber } from 'helpers/snapshot_utils';
 
 interface IThreadForm {
   name: string;
@@ -117,7 +118,7 @@ const newThread = async (
     } else if (result.status === 'Success') {
       await app.user.notifications.refresh();
       await app.snapshot.refreshProposals();
-      m.route.set(`/${app.activeId()}/snapshot-proposal/${snapshotId}/${result.message.ipfsHash}`);
+      navigateToSubpage(`/snapshot/${snapshotId}/${result.message.ipfsHash}`);
     }
   } catch (err) {
     notifyError(err.message);
@@ -181,7 +182,7 @@ const NewProposalForm: m.Component<{snapshotId: string}, {
       }
       const space = app.snapshot.space;
 
-      getScores(space, app.user.activeAccount.address).then((response) => {
+      getScore(space, app.user.activeAccount.address).then((response) => {
         const scores = response
           .map((score) => Object.values(score).reduce((a, b) => (a as number) + (b as number), 0))
           .reduce((a, b) => (a as number) + (b as number), 0);

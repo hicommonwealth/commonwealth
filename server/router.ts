@@ -73,6 +73,7 @@ import deleteRole from './routes/deleteRole';
 import setDefaultRole from './routes/setDefaultRole';
 
 import getUploadSignature from './routes/getUploadSignature';
+import activeThreads from './routes/activeThreads';
 import createThread from './routes/createThread';
 import editThread from './routes/editThread';
 import updateThreadPolling from './routes/updateThreadPolling';
@@ -131,8 +132,9 @@ import editSubstrateSpec from './routes/editSubstrateSpec';
 import { getStatsDInstance } from './util/metrics';
 import updateAddress from "./routes/updateAddress";
 import { DB } from './database';
-
+import { factory, formatFilename } from '../shared/logging';
 import { sendMessage } from './routes/snapshotAPI';
+
 
 function setupRouter(
   app,
@@ -142,6 +144,7 @@ function setupRouter(
   tokenBalanceCache: TokenBalanceCache
 ) {
   const router = express.Router();
+  const log = factory.getLogger(formatFilename(__filename));
 
   router.use((req, res, next) => {
     getStatsDInstance().increment(`cw.path.${req.path.slice(1)}.called`);
@@ -270,8 +273,11 @@ function setupRouter(
   router.post('/deleteThread', passport.authenticate('jwt', { session: false }), deleteThread.bind(this, models));
   // TODO: Change to GET /threads
   router.get('/bulkThreads', bulkThreads.bind(this, models));
+  router.get('/activeThreads', activeThreads.bind(this, models));
   router.get('/getThread', getThread.bind(this, models));
   router.get('/search', search.bind(this, models));
+
+
 
   router.get('/profile', getProfile.bind(this, models));
 

@@ -1,7 +1,7 @@
 import BN from 'bn.js';
+import moment from 'moment';
 import { Coin } from 'adapters/currency';
 import { IIdentifiable, ICompletable } from 'adapters/shared';
-import { coin } from '@cosmjs/amino';
 
 export class CosmosToken extends Coin {
   constructor(denom: string, n: number | string | BN, inDollars: boolean = false) {
@@ -19,32 +19,21 @@ export class CosmosToken extends Coin {
   }
 
   public toCoinObject() {
-    return coin(this.toNumber(), this.denom);
+    return {
+      denom: this.denom,
+      amount: this.toString(),
+    };
   }
 }
 
 export type CosmosProposalType = 'text' | 'upgrade' | 'parameter';
 export type CosmosVoteChoice = 'Yes' | 'No' | 'NoWithVeto' | 'Abstain';
-export type CosmosProposalState = 'DepositPeriod' | 'VotingPeriod' | 'Passed' | 'Rejected';
+export type CosmosProposalState = 'DepositPeriod' | 'VotingPeriod' | 'Passed' | 'Rejected' | 'Failed';
 export interface ICosmosProposalTally {
   yes: BN;
   abstain: BN;
   no: BN;
   noWithVeto: BN;
-}
-
-export interface ICosmosProposal extends IIdentifiable {
-  type: CosmosProposalType;
-  title: string;
-  description: string;
-  proposer: string;
-  submitTime: string; // TODO: moment?
-  depositEndTime: string;
-  votingStartTime: string; // TODO: moment
-  votingEndTime: string;
-
-  // partially populated initial state update -- no depositors or voters
-  state: ICosmosProposalState;
 }
 
 // TODO: note that these vote number values are in terms of _stake_
@@ -54,4 +43,18 @@ export interface ICosmosProposalState extends ICompletable {
   totalDeposit: BN;
   voters: Array<[ string, CosmosVoteChoice ]>;
   tally: ICosmosProposalTally;
+}
+
+export interface ICosmosProposal extends IIdentifiable {
+  type: CosmosProposalType;
+  title: string;
+  description: string;
+  proposer: string;
+  submitTime: moment.Moment;
+  depositEndTime: moment.Moment;
+  votingStartTime: moment.Moment;
+  votingEndTime: moment.Moment;
+
+  // partially populated initial state update -- no depositors or voters
+  state: ICosmosProposalState;
 }

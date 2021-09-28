@@ -278,7 +278,7 @@ export default class AaveProposal extends Proposal<
     entity: ChainEntity,
   ) {
     // must set identifier before super() because of how response object is named
-    super('aaveproposal', backportEntityToAdapter(entity));
+    super('onchainproposal', backportEntityToAdapter(entity));
 
     this._Chain = Chain;
     this._Accounts = Accounts;

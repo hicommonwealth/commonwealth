@@ -1,14 +1,17 @@
 import cheerio from 'cheerio';
 import { DEFAULT_COMMONWEALTH_LOGO } from '../config';
+import { factory, formatFilename } from '../../shared/logging';
 
 const NO_CLIENT_SERVER = process.env.NO_CLIENT === 'true';
 const DEV = process.env.NODE_ENV !== 'production';
+
+const log = factory.getLogger(formatFilename(__filename));
 
 const setupAppRoutes = (app, models, devMiddleware, templateFile, sendFile) => {
   if (NO_CLIENT_SERVER) {
     return;
   }
-
+  log.info('setupAppRoutes');
   // Development: serve everything through devMiddleware
   if (DEV) {
     app.get('*', (req, res, next) => {
@@ -56,7 +59,8 @@ const setupAppRoutes = (app, models, devMiddleware, templateFile, sendFile) => {
     const community = await models.OffchainCommunity.findOne({ where: { id: scope, privacyEnabled: false } });
     const title = chain ? chain.name : community ? community.name : 'Commonwealth';
     const description = chain ? chain.description : community ? community.description : '';
-    const image = chain ? `https://commonwealth.im${chain.icon_url}` : DEFAULT_COMMONWEALTH_LOGO;
+    const image = chain?.icon_url ? (chain.icon_url.match(`^(http|https)://`) ? 
+      chain.icon_url : `https://commonwealth.im${chain.icon_url}`) : DEFAULT_COMMONWEALTH_LOGO;
     const author = '';
     renderWithMetaTags(res, title, description, author, image);
   });
@@ -150,6 +154,7 @@ const setupAppRoutes = (app, models, devMiddleware, templateFile, sendFile) => {
   });
 
   app.get('*', (req, res, next) => {
+    log.info(`setupAppRoutes sendFiles ${req.path}`);
     sendFile(res);
   });
 };

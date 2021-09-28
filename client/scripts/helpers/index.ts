@@ -4,6 +4,7 @@ import moment from 'moment';
 
 import app from 'state';
 import { OffchainThreadStage } from 'models';
+import { isValueNode } from 'graphql';
 
 export async function sleep(msec) {
   return new Promise((resolve) => setTimeout(resolve, msec));
@@ -199,7 +200,9 @@ export function formatLastUpdated(timestamp) {
     .replace(' days', 'd')
     .replace(' day', 'd')
     .replace(' hours', 'h')
-    .replace(' hour', 'h')} ${formatted !== 'now' ? 'ago' : ''}`;
+    .replace(' hour', 'h')
+    .replace(' months', 'mo')
+    .replace(' month', 'mo')} ${(formatted === 'now') ? '' : 'ago'}`;
 }
 
 export function formatTimestamp(timestamp) {
@@ -209,7 +212,9 @@ export function formatTimestamp(timestamp) {
     .replace(' days', 'd')
     .replace(' day', 'd')
     .replace(' hours', 'h')
-    .replace(' hour', 'h')}`;
+    .replace(' hour', 'h')
+    .replace(' months', 'mo')
+    .replace(' month', 'mo')}`;
 }
 
 // duplicated in adapters/currency.ts
@@ -227,6 +232,14 @@ export function formatPercentShort(num: number) {
   if (num === 1) return '100%';
   if (num > 1) return '100%+';
   return `${(num * 100).toFixed(1)}%`;
+}
+
+/* Choose Total Digits to Display*/
+export function formatPercent(num: number, digits: number) {
+  if (num === 0) return '0%';
+  if (num === 1) return '100%';
+  if (num > 1) return '100%+';
+  return `${(num * 100).toFixed(digits)}%`;
 }
 
 export function formatDuration(duration: moment.Duration, includeSeconds = true) {
@@ -291,7 +304,7 @@ export class BlocktimeHelper {
     return this._blocktime;
   }
 
-  public stamp(timestamp: moment.Moment) {
+  public stamp(timestamp: moment.Moment, heightDiff = 1) {
     this._previousblocktime = this._lastblocktime;
     this._lastblocktime = timestamp;
     if (!this._previousblocktime) {
@@ -299,7 +312,8 @@ export class BlocktimeHelper {
     }
 
     // apply moving average to figure out blocktimes
-    const lastblockduration = moment.duration(timestamp.diff(this._previousblocktime)).asSeconds();
+    const lastblocksduration = moment.duration(timestamp.diff(this._previousblocktime)).asSeconds();
+    const lastblockduration = lastblocksduration / heightDiff;
     this._durations.push(lastblockduration);
     if (this._durations.length > this._durationwindow) {
       this._durations.shift();
@@ -308,6 +322,7 @@ export class BlocktimeHelper {
     durations.sort();
 
     // take the median duration
+    // TODO: support decimal block times
     const newblocktime = Math.round(durations[Math.floor(durations.length / 2)]);
     if (newblocktime > 0 && newblocktime !== this._blocktime) {
       this._blocktime = newblocktime;

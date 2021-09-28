@@ -167,7 +167,8 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
             terms
           } = vnode.state;
 
-          if (snapshot && snapshot !== '' && !(/^[a-z]+\.eth/).test(snapshot)) {
+          // /^[a-z]+\.eth/
+          if (snapshot && snapshot !== '' && !(/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/ig).test(snapshot)) {
             notifyError('Snapshot name must be in the form of *.eth');
             return;
           }

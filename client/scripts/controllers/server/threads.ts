@@ -513,6 +513,7 @@ class ThreadsController {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);
     }
     const { threads, comments } = response.result;
+
     for (const thread of threads) {
       const modeledThread = modelFromServer(thread);
       if (!thread.Address) {
@@ -540,9 +541,16 @@ class ThreadsController {
         console.error(e.message);
       }
     }
-    const { result: reactionCounts } = await $.post(`${app.serverUrl()}/reactionsCounts`, {
-      thread_ids: threads.map((thread) => thread.id),
-      active_address: app.user.activeAccount?.address
+    const { result: reactionCounts } = await $.ajax({
+      type: 'POST',
+      url: `${app.serverUrl()}/reactionsCounts`,
+      headers: {
+        'content-type': 'application/json',
+      },
+      data: JSON.stringify({
+        thread_ids: threads.map((thread) => thread.id),
+        active_address: app.user.activeAccount?.address,
+      }),
     });
     for (const rc of reactionCounts) {
       const id = app.reactionCounts.store.getIdentifier(rc);
@@ -551,7 +559,9 @@ class ThreadsController {
         app.reactionCounts.store.remove(existing);
       }
       try {
-        app.reactionCounts.store.add(modelReactionCountFromServer({ ...rc, id }));
+        app.reactionCounts.store.add(
+          modelReactionCountFromServer({ ...rc, id })
+        );
       } catch (e) {
         console.error(e.message);
       }
@@ -571,8 +581,8 @@ class ThreadsController {
     return $.get(`${app.serverUrl()}/bulkThreads`, {
       chain: chainId,
       community: communityId,
-    })
-      .then((response) => {
+    }).then(
+      (response) => {
         if (response.status !== 'Success') {
           throw new Error(`Unsuccessful refresh status: ${response.status}`);
         }
@@ -600,12 +610,16 @@ class ThreadsController {
         }
         this.numVotingThreads = numVotingThreads;
         this._initialized = true;
-      }, (err) => {
+      },
+      (err) => {
         console.log('failed to load offchain discussions');
-        throw new Error((err.responseJSON && err.responseJSON.error)
-          ? err.responseJSON.error
-          : 'Error loading offchain discussions');
-      });
+        throw new Error(
+          err.responseJSON && err.responseJSON.error
+            ? err.responseJSON.error
+            : 'Error loading offchain discussions'
+        );
+      }
+    );
   }
 
   public initialize(initialThreads: any[], numVotingThreads, reset) {

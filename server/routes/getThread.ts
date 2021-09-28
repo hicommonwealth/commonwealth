@@ -34,7 +34,8 @@ const getThread = async (models: DB, req: Request, res: Response, next: NextFunc
           as: 'reactions',
           include: [{
             model: models.Address,
-            as: 'Address'
+            as: 'Address',
+            required: true
           }]
         }
       ],
