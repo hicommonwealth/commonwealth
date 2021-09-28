@@ -3,7 +3,7 @@
 import 'components/component_kit/icons.scss';
 import m from 'mithril';
 
-export enum IconSizes {
+export enum IconSize {
   'SM' = '14x14',
   'MD' = '20x20',
   'LG' = '28x28',
@@ -14,21 +14,21 @@ export enum IconIntent {
   Secondary = 'secondary',
 }
 
-const appendTags = (name: string, attrs) => {
+const appendTags = (className: string, attrs) => {
   const { intent, disabled, size } = attrs;
-  let tag = `svg.Icon.${name}`;
+  let tag = `svg.Icon.${className}`;
   if (disabled) tag += '.disabled';
   else if (intent === IconIntent.Primary) tag += '.primary';
   else if (intent === IconIntent.Secondary) tag += '.secondary';
-  if (size === IconSizes.SM) tag += '.sm';
-  if (size === IconSizes.MD) tag += '.md';
-  if (size === IconSizes.LG) tag += '.lg';
+  if (size === IconSize.SM) tag += '.sm';
+  if (size === IconSize.MD) tag += '.md';
+  if (size === IconSize.LG) tag += '.lg';
   return tag;
 };
 
 export const ArrowDownIcon: m.Component<
   {
-    size?: IconSizes;
+    size?: IconSize;
     intent: IconIntent;
     disabled?: boolean;
   },
@@ -55,7 +55,7 @@ export const ArrowDownIcon: m.Component<
 
 export const ArrowRightIcon: m.Component<
   {
-    size?: IconSizes;
+    size?: IconSize;
     intent: IconIntent;
     disabled?: boolean;
   },
@@ -82,7 +82,7 @@ export const ArrowRightIcon: m.Component<
 
 export const ReplyIcon: m.Component<
   {
-    size?: IconSizes;
+    size?: IconSize;
     intent: IconIntent;
     disabled?: boolean;
   },
@@ -91,7 +91,7 @@ export const ReplyIcon: m.Component<
   view: (vnode) => {
     const { size, disabled } = vnode.attrs;
     return [
-      size === IconSizes.SM &&
+      size === IconSize.SM &&
         m(
           appendTags('ReplyIcon', vnode.attrs),
           {
@@ -108,7 +108,7 @@ export const ReplyIcon: m.Component<
             }),
           ]
         ),
-      size === IconSizes.MD &&
+      size === IconSize.MD &&
         m(
           appendTags('ReplyIcon', vnode.attrs),
           {
@@ -131,7 +131,7 @@ export const ReplyIcon: m.Component<
 
 export const ViewsIcon: m.Component<
   {
-    size?: IconSizes;
+    size?: IconSize;
     intent: IconIntent;
     disabled?: boolean;
   },
@@ -167,7 +167,7 @@ export const ViewsIcon: m.Component<
 
 export const CreateIcon: m.Component<
   {
-    size?: IconSizes;
+    size: IconSize;
     intent: IconIntent;
     disabled?: boolean;
   },
@@ -176,7 +176,7 @@ export const CreateIcon: m.Component<
   view: (vnode) => {
     const { size } = vnode.attrs;
     return [
-      size === IconSizes.MD &&
+      size === IconSize.MD &&
         m(
           appendTags('CreateIcon', vnode.attrs),
           {
@@ -192,7 +192,7 @@ export const CreateIcon: m.Component<
             }),
           ]
         ),
-      size === IconSizes.LG &&
+      size === IconSize.LG &&
         m(
           appendTags('CreateIcon', vnode.attrs),
           {
@@ -214,7 +214,7 @@ export const CreateIcon: m.Component<
 
 export const LikesIcon: m.Component<
   {
-    size?: IconSizes;
+    size?: IconSize;
     intent: IconIntent;
     disabled?: boolean;
   },
@@ -223,7 +223,7 @@ export const LikesIcon: m.Component<
   view: (vnode) => {
     const { size } = vnode.attrs;
     return [
-      size === IconSizes.SM &&
+      size === IconSize.SM &&
         m(
           appendTags('LikesIcon', vnode.attrs),
           {
@@ -240,7 +240,7 @@ export const LikesIcon: m.Component<
             }),
           ]
         ),
-      size === IconSizes.MD &&
+      size === IconSize.MD &&
         m(
           appendTags('LikesIcon', vnode.attrs),
           {
@@ -263,7 +263,7 @@ export const LikesIcon: m.Component<
 
 export const ShareIcon: m.Component<
   {
-    size?: IconSizes;
+    size?: IconSize;
     intent: IconIntent;
     disabled?: boolean;
   },
@@ -291,7 +291,7 @@ export const ShareIcon: m.Component<
 
 export const AccountIcon: m.Component<
   {
-    size?: IconSizes;
+    size?: IconSize;
     intent: IconIntent;
     disabled?: boolean;
   },
@@ -300,7 +300,7 @@ export const AccountIcon: m.Component<
   view: (vnode) => {
     const { size } = vnode.attrs;
     return [
-      size === IconSizes.MD &&
+      size === IconSize.MD &&
         m(
           appendTags('AccountIcon', vnode.attrs),
           {
@@ -325,7 +325,7 @@ export const AccountIcon: m.Component<
             }),
           ]
         ),
-      size === IconSizes.LG &&
+      size === IconSize.LG &&
         m(
           appendTags('AccountIcon', vnode.attrs),
           {
@@ -354,7 +354,7 @@ export const AccountIcon: m.Component<
 };
 
 export const ExternalLinkIcon: m.Component<{
-  size?: IconSizes;
+  size?: IconSize;
   disabled?: boolean;
 }> = {
   view: (vnode) => {
@@ -378,7 +378,7 @@ export const ExternalLinkIcon: m.Component<{
 
 export const CopyIcon: m.Component<
   {
-    size?: IconSizes;
+    size?: IconSize;
     intent: IconIntent;
     disabled?: boolean;
   },
@@ -415,14 +415,14 @@ export const CopyIcon: m.Component<
 };
 
 // export const FilterIcon: m.Component<
-//   { size?: IconSizes;
+//   { size?: IconSize;
 //   {}
 // > = {
 // };
 
 export const NotificationIcon: m.Component<
   {
-    size?: IconSizes;
+    size?: IconSize;
     intent: IconIntent;
     disabled?: boolean;
   },
@@ -431,7 +431,7 @@ export const NotificationIcon: m.Component<
   view: (vnode) => {
     const { size } = vnode.attrs;
     return [
-      size === IconSizes.MD &&
+      size === IconSize.MD &&
         m(
           appendTags('NotificationIcon', vnode.attrs),
           {
@@ -446,7 +446,7 @@ export const NotificationIcon: m.Component<
             }),
           ]
         ),
-      size === IconSizes.LG &&
+      size === IconSize.LG &&
         m(
           appendTags('NotificationIcon', vnode.attrs),
           {
@@ -467,7 +467,7 @@ export const NotificationIcon: m.Component<
 
 export const PinIcon: m.Component<
   {
-    size?: IconSizes;
+    size?: IconSize;
     intent: IconIntent;
     disabled?: boolean;
   },
@@ -500,7 +500,7 @@ export const PinIcon: m.Component<
 
 export const XIcon: m.Component<
   {
-    size?: IconSizes;
+    size?: IconSize;
     intent: IconIntent;
     disabled?: boolean;
   },
@@ -528,7 +528,7 @@ export const XIcon: m.Component<
 export const SearchIcon: m.Component<
   {
     isMobile?: boolean;
-    size?: IconSizes;
+    size?: IconSize;
     intent: IconIntent;
     disabled?: boolean;
   },
@@ -537,7 +537,7 @@ export const SearchIcon: m.Component<
   view: (vnode) => {
     const { size } = vnode.attrs;
     return [
-      size === IconSizes.MD &&
+      size === IconSize.MD &&
         m(
           appendTags('SearchIcon', vnode.attrs),
           {
@@ -574,7 +574,7 @@ export const SearchIcon: m.Component<
             ]),
           ]
         ),
-      size === IconSizes.LG &&
+      size === IconSize.LG &&
         m(
           'svg',
           {

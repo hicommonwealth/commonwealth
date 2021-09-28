@@ -46,7 +46,7 @@ import {
   DiscordIcon,
   TelegramIcon,
   GithubIcon,
-  IconSizes,
+  IconSize,
   ExternalLinkIcon,
   PinIcon,
   IconIntent,
@@ -54,8 +54,16 @@ import {
 } from './icons';
 import {
   ButtonIntent,
-  FaceliftButton
+  ExternalLinkElement,
+  FaceliftButton,
+  FaceliftButtonGroup,
+  Justify,
+  LinkStyle,
+  FaceliftRadioGroup,
+  ButtonSize,
+  EngagementButton,
 } from './buttons';
+import { notifySuccess } from 'controllers/app/notifications';
 
 const displayColors = (hexList) => {
   return Object.entries(hexList).map(([k, v]) => {
@@ -101,6 +109,8 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
           MidiPurp: '#9075DC',
           LitePurp: '#C7B9EF',
           XLitePurp: '#F7F4FF',
+          PurpBlueMagic: '#6300FF',
+          PurpBlueMagicLite: '#F3EBFF',
           HypeRed: '#FF002E',
           Pinky: '#FFAFBE',
           FleshPink: '#FFEBEE',
@@ -124,89 +134,89 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
       m('.icon-listing', [
         displayIcons('14x14', {
           ArrowDownIcon: m(ArrowDownIcon, {
-            size: IconSizes.SM,
+            size: IconSize.SM,
             intent: IconIntent.Secondary,
             disabled: false,
           }),
           ArrowRightIcon: m(ArrowRightIcon, {
-            size: IconSizes.SM,
+            size: IconSize.SM,
             intent: IconIntent.Secondary,
             disabled: false,
           }),
           ViewsIcon: m(ViewsIcon, {
-            size: IconSizes.SM,
+            size: IconSize.SM,
             intent: IconIntent.Secondary,
             disabled: true,
           }),
           LikesIcon: m(LikesIcon, {
-            size: IconSizes.SM,
+            size: IconSize.SM,
             intent: IconIntent.Secondary,
             disabled: true,
           }),
           ReplyIcon: m(ReplyIcon, {
-            size: IconSizes.SM,
+            size: IconSize.SM,
             intent: IconIntent.Secondary,
             disabled: true,
           }),
           ExternalLinkIcon: m(ExternalLinkIcon, {
-            size: IconSizes.SM,
+            size: IconSize.SM,
           }),
         }),
         // search, pin, create, notification, account
         displayIcons('20x20', {
           ShareIcon: m(ShareIcon, {
-            size: IconSizes.MD,
+            size: IconSize.MD,
             intent: IconIntent.Primary,
           }),
           SubscribeIcon: m(NotificationIcon, {
-            size: IconSizes.MD,
+            size: IconSize.MD,
             intent: IconIntent.Primary,
           }),
           CreateIcon: m(CreateIcon, {
-            size: IconSizes.MD,
+            size: IconSize.MD,
             intent: IconIntent.Primary,
           }),
           LikesIcon: m(LikesIcon, {
-            size: IconSizes.MD,
+            size: IconSize.MD,
             intent: IconIntent.Primary,
           }),
           ReplyIcon: m(ReplyIcon, {
-            size: IconSizes.MD,
+            size: IconSize.MD,
             intent: IconIntent.Primary,
           }),
           SearchIcon: m(SearchIcon, {
-            size: IconSizes.MD,
+            size: IconSize.MD,
             intent: IconIntent.Secondary,
           }),
           PinIcon: m(PinIcon, {
-            size: IconSizes.MD,
+            size: IconSize.MD,
             intent: IconIntent.Secondary,
           }),
           NotificationIcon: m(NotificationIcon, {
-            size: IconSizes.MD,
+            size: IconSize.MD,
             intent: IconIntent.Primary,
           }),
           AccountIcon: m(AccountIcon, {
-            size: IconSizes.MD,
+            size: IconSize.MD,
             intent: IconIntent.Primary,
           }),
           // FilterIcon: m(FilterIcon),
         }),
         displayIcons('28x28', {
           CopyIcon: m(CopyIcon, {
-            size: IconSizes.LG,
+            size: IconSize.LG,
             intent: IconIntent.Secondary,
           }),
           XIcon: m(XIcon, {
-            size: IconSizes.LG,
+            size: IconSize.LG,
             intent: IconIntent.Secondary,
           }),
           AccountIcon: m(AccountIcon, {
-            size: IconSizes.LG,
+            size: IconSize.LG,
             intent: IconIntent.Primary,
           }),
           NotificationIcon: m(NotificationIcon, {
-            size: IconSizes.LG,
+            size: IconSize.LG,
             intent: IconIntent.Primary,
           }),
         }),
@@ -219,32 +229,125 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
         }),
       ]),
       m('h1', 'Redesign Buttons'),
-      m('.gallery', [
-        m(FaceliftButton, {
-          intent: ButtonIntent.Primary,
-          label: 'Primary',
-          onclick: () => alert('clicked!'),
-          disabled: false,
+      m(
+        '.button-gallery',
+        {
+          style: 'max-width: 500px;',
+        },
+        [
+          m(FaceliftButton, {
+            intent: ButtonIntent.Primary,
+            label: 'Primary',
+            onclick: () => notifySuccess('Button clicked!'),
+            disabled: false,
+          }),
+          m(FaceliftButton, {
+            intent: ButtonIntent.Primary,
+            label: 'Disabled',
+            onclick: () => notifySuccess('Button clicked!'),
+            disabled: true,
+          }),
+          m(FaceliftButton, {
+            intent: ButtonIntent.Secondary,
+            label: 'Secondary',
+            onclick: () => notifySuccess('Button clicked!'),
+            disabled: false,
+          }),
+          m(FaceliftButton, {
+            intent: ButtonIntent.Secondary,
+            label: 'Disabled',
+            onclick: () => notifySuccess('Button clicked!'),
+            disabled: true,
+          }),
+        ]
+      ),
+      m('.button-gallery', [
+        m(FaceliftButtonGroup, {
+          secondaryLabel: 'Button',
+          primaryLabel: 'Group',
+          primaryOnClick: () => notifySuccess('Primary clicked!'),
+          secondaryOnClick: () => notifySuccess('Secondary clicked!'),
+          justify: Justify.Left,
         }),
-        m(FaceliftButton, {
-          intent: ButtonIntent.Primary,
-          label: 'Disabled',
-          onclick: () => alert('clicked!'),
-          disabled: true,
+        m(FaceliftButtonGroup, {
+          secondaryLabel: 'Center',
+          primaryLabel: 'Justified',
+          primaryOnClick: () => notifySuccess('Primary clicked!'),
+          secondaryOnClick: () => notifySuccess('Secondary clicked!'),
+          justify: Justify.Center,
         }),
-        m(FaceliftButton, {
-          intent: ButtonIntent.Secondary,
-          label: 'Secondary',
-          onclick: () => alert('clicked!'),
-          disabled: false,
-        }),
-        m(FaceliftButton, {
-          intent: ButtonIntent.Secondary,
-          label: 'Disabled',
-          onclick: () => alert('clicked!'),
-          disabled: true,
+        m(FaceliftButtonGroup, {
+          secondaryLabel: 'Right',
+          primaryLabel: 'Justified',
+          primaryOnClick: () => notifySuccess('Primary clicked!'),
+          secondaryOnClick: () => notifySuccess('Secondary clicked!'),
+          justify: Justify.Right,
         }),
       ]),
+      m(
+        '.button-gallery',
+        {
+          style: 'max-width: 420px;',
+        },
+        [
+          m(ExternalLinkElement, {
+            label: 'Button external link',
+            target: 'https://edgewa.re/',
+            style: LinkStyle.Button,
+          }),
+          m(ExternalLinkElement, {
+            label: 'Inline external link',
+            target: 'https://edgewa.re/',
+            style: LinkStyle.Inline,
+          }),
+        ]
+      ),
+      m(
+        '.button-gallery',
+        {
+          style: 'max-width: 420px;',
+        },
+        [
+          m(FaceliftRadioGroup, {
+            values: ['This', 'Is', 'A', 'Radio', 'Group'],
+            labels: ['This', 'Is', 'A', 'Radio', 'Group'],
+            defaultValue: 'This',
+            name: 'RadioGroup',
+            onchange: (e) => notifySuccess(`"${e.target.value}" selected`),
+          }),
+        ]
+      ),
+      m(
+        '.button-gallery',
+        {
+          style: 'max-width: 600px;',
+        },
+        [
+          m(EngagementButton, {
+            size: ButtonSize.SM,
+            label: 'Small',
+            onclick: () => notifySuccess('Button clicked!'),
+          }),
+          m(EngagementButton, {
+            size: ButtonSize.LG,
+            label: 'Big',
+            onclick: () => notifySuccess('Button clicked!'),
+          }),
+          m(EngagementButton, {
+            size: ButtonSize.SM,
+            label: 'Small',
+            disabled: true,
+            onclick: () => notifySuccess('Button clicked!'),
+          }),
+          m(EngagementButton, {
+            size: ButtonSize.LG,
+            label: 'Big',
+            disabled: true,
+            onclick: () => notifySuccess('Button clicked!'),
+          }),
+        ]
+      ),
+      m('h1', 'Construct UI'),
       // buttons and inputs
       m('.gallery', [
         m(Button, {
