@@ -5,7 +5,11 @@ import {
   WalletAccount,
   ConnectConfig,
 } from 'near-api-js';
-import { NodeStatusResult } from 'near-api-js/lib/providers/provider';
+import {
+  CodeResult,
+  NodeStatusResult,
+} from 'near-api-js/lib/providers/provider';
+import { FunctionCallOptions } from 'near-api-js/lib/account';
 import { uuidv4 } from 'lib/util';
 import { IChainModule, ITXModalData, NodeInfo } from 'models';
 import { NearToken } from 'adapters/chain/near/types';
@@ -13,7 +17,11 @@ import BN from 'bn.js';
 import { ApiStatus, IApp } from 'state';
 import moment from 'moment';
 import * as m from 'mithril';
-import { NearSputnikConfig, NearSputnikPolicy } from './sputnik/types';
+import {
+  isGroupRole,
+  NearSputnikConfig,
+  NearSputnikPolicy,
+} from './sputnik/types';
 import { NearAccounts, NearAccount } from './account';
 
 export interface IDaoInfo {
@@ -27,6 +35,15 @@ export interface IDaoInfo {
   bountyPeriod: string;
   council: string[];
 }
+
+export type SerializableFunctionCallOptions = Omit<
+  FunctionCallOptions,
+  'gas' | 'attachedDeposit'
+> & {
+  gas: string;
+  attachedDeposit: string;
+  walletCallbackUrl: string;
+};
 
 class NearChain implements IChainModule<NearToken, NearAccount> {
   private _api: NearApi;
@@ -134,14 +151,14 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
     method: string,
     args: Record<string, unknown>
   ): Promise<T> {
-    const rawResult = await this.api.connection.provider.query({
+    const rawResult = await this.api.connection.provider.query<CodeResult>({
       request_type: 'call_function',
       account_id: contractId,
       method_name: method,
       args_base64: Buffer.from(JSON.stringify(args)).toString('base64'),
       finality: 'optimistic',
     });
-    const res = JSON.parse(Buffer.from((rawResult as any).result).toString());
+    const res = JSON.parse(Buffer.from(rawResult.result).toString());
     return res;
   }
 
@@ -169,7 +186,7 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
             'get_config',
             {}
           );
-          const council = policy.roles.find((r) => (r.kind as any).Group);
+          const council = policy.roles.find((r) => isGroupRole(r.kind));
           // TODO: support diff types of policy roles
           // if (!council) {
           //   console.log(
@@ -187,7 +204,7 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
             proposalPeriod: policy.proposal_period,
             bountyBond: policy.bounty_bond,
             bountyPeriod: policy.bounty_forgiveness_period,
-            council: (council?.kind as any)?.Group || [],
+            council: (council?.kind as { Group: string[] })?.Group || [],
           };
         } catch (e) {
           // console.error(`Failed to query dao info for ${daoId}: ${e.message}`);
@@ -249,13 +266,13 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
   public async redirectTx(
     contractId: string,
     methodName: string,
-    args: any,
+    args: Record<string, unknown>,
     attachedDeposit?: string,
     postTxRedirect?: string,
     gas?: string
   ): Promise<void> {
     // construct tx object
-    const functionCall: any = {
+    const functionCall: Partial<SerializableFunctionCallOptions> = {
       contractId,
       methodName,
       args,

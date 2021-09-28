@@ -55,10 +55,10 @@ export type VotePolicy = {
 
 type RoleKind = 'Everyone' | { Member: Balance } | { Group: AccountId[] };
 export function isMemberRole(r: RoleKind): r is { Member: Balance } {
-  return (r as any).Member !== undefined;
+  return typeof r === 'object' && typeof r['Member'] !== 'undefined';
 }
 export function isGroupRole(r: RoleKind): r is { Group: AccountId[] } {
-  return (r as any).Group !== undefined;
+  return typeof r === 'object' && typeof r['Group'] !== 'undefined';
 }
 
 type RolePermission = {
@@ -118,7 +118,7 @@ export function getTotalSupply(
 
 type NearSputnikActionCall = {
   method_name: string;
-  args: any; // TODO: what is this type?
+  args: Record<string, unknown>;
   deposit: U128;
   gas: string; // u64
 };
@@ -160,25 +160,29 @@ export type NearSputnikProposalKind =
 export function isAddMemberToRole(
   kind: NearSputnikProposalKind
 ): kind is AddMemberToRole {
-  return (kind as any).AddMemberToRole !== undefined;
+  return (
+    typeof kind === 'object' && typeof kind['AddMemberToRole'] === 'object'
+  );
 }
 export function isRemoveMemberFromRole(
   kind: NearSputnikProposalKind
 ): kind is RemoveMemberFromRole {
-  return (kind as any).RemoveMemberFromRole !== undefined;
+  return (
+    typeof kind === 'object' && typeof kind['RemoveMemberFromRole'] === 'object'
+  );
 }
 export function isTransfer(kind: NearSputnikProposalKind): kind is Transfer {
-  return (kind as any).Transfer !== undefined;
+  return typeof kind === 'object' && typeof kind['Transfer'] === 'object';
 }
 export function isFunctionCall(
   kind: NearSputnikProposalKind
 ): kind is FunctionCall {
-  return (kind as any).FunctionCall !== undefined;
+  return typeof kind === 'object' && typeof kind['FunctionCall'] === 'object';
 }
 export function isChangePolicy(
   kind: NearSputnikProposalKind
 ): kind is ChangePolicy {
-  return (kind as any).ChangePolicy !== undefined;
+  return typeof kind === 'object' && typeof kind['ChangePolicy'] === 'object';
 }
 
 export function kindToPolicyLabel(kind: NearSputnikProposalKind): string {
@@ -219,7 +223,7 @@ export type NearSputnikGetProposalResponse = {
   description: string;
   // see https://github.com/near-daos/sputnik-dao-contract/blob/master/sputnikdao2/src/proposals.rs#L48
   kind: NearSputnikProposalKind;
-  target?: any; // TODO: test what is this type...
+  target?: unknown; // TODO: test what is this type...
   proposer: AccountId;
   status: NearSputnikProposalStatus;
   submission_time: Nanoseconds;
