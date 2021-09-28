@@ -1243,19 +1243,19 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@commonwealth/ce-rabbitmq-plugin@0.0.3":
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/@commonwealth/ce-rabbitmq-plugin/-/ce-rabbitmq-plugin-0.0.3.tgz#9504bf3c716d5f0076ea2e286215b0c58bc39c23"
-  integrity sha512-ed0kvJCbPWEUHt/8BObLof72wf1pzq6WhRajesnwVJNvhIYjvhn2ohPO9BrMx0DLMTqYodKmhRKxF60CqvoiPg==
+"@commonwealth/ce-rabbitmq-plugin@0.0.5":
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/@commonwealth/ce-rabbitmq-plugin/-/ce-rabbitmq-plugin-0.0.5.tgz#e3bdf26cd39473d725f5d0251827a2725dfc84dd"
+  integrity sha512-KzyIkBDsGBF4oAC9Xo82Uf4PF+Ya9uDM1itAKZiinR8NsM936nalaHaebSVwXmFJ4+dRS8mmk6XDutm01yhwQw==
   dependencies:
-    "@commonwealth/chain-events" "0.8.3"
+    "@commonwealth/chain-events" "0.8.5"
     amqplib "^0.8.0"
     rascal "^13.1.0"
 
-"@commonwealth/chain-events@0.8.3":
-  version "0.8.3"
-  resolved "https://registry.yarnpkg.com/@commonwealth/chain-events/-/chain-events-0.8.3.tgz#07df6211332dfdacc2f6a447b7c2580b9d17d98c"
-  integrity sha512-iccl0QvjPaprAk81J5NK6R3x+0zwOB+qx/aS3wXy+RFY0cBcfwssSjDOCNghJlusvJWgB41A+N7KuVKmsh/nQg==
+"@commonwealth/chain-events@0.8.5":
+  version "0.8.5"
+  resolved "https://registry.yarnpkg.com/@commonwealth/chain-events/-/chain-events-0.8.5.tgz#6d1acd40722cc147feca505543048cc3eee12ec8"
+  integrity sha512-Cc/g1TaTDCsOBQLlD0sZBNM8s0MukFAlrA00je+1cZeZ/w9PjyCdhVkgQjE4o3YzioBLqzYdvApiaLxzM6bDQA==
   dependencies:
     "@edgeware/node-types" "^3.3.3"
     "@ethersproject/abi" "^5.0.0"

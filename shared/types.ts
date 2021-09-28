@@ -30,7 +30,7 @@ export enum ProposalType {
   OffchainThread = 'discussion',
   CosmosProposal = 'cosmosproposal',
   MolochProposal = 'molochproposal',
-  AaveProposal = 'aaveproposal',
+  AaveProposal = 'onchainproposal',
   CompoundProposal = 'compoundproposal',
 }
 
