@@ -3,7 +3,7 @@ import 'components/proposal_card.scss';
 import m from 'mithril';
 import moment from 'moment';
 import { Icon, Icons, Tag } from 'construct-ui';
-import { AaveTypes } from '@commonwealth/chain-events';
+import { AaveTypes, CompoundTypes } from '@commonwealth/chain-events';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -21,6 +21,7 @@ import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democr
 import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 import MolochProposal, { MolochProposalState } from 'controllers/chain/ethereum/moloch/proposal';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
+import CompoundProposal from 'controllers/chain/ethereum/compound/proposal';
 
 import Countdown from 'views/components/countdown';
 
@@ -48,6 +49,11 @@ export const getStatusText = (proposal: AnyProposal, showCountdown: boolean) => 
     if (proposal.state === AaveTypes.ProposalState.EXECUTED) return 'Executed';
     if (proposal.state === AaveTypes.ProposalState.EXPIRED) return 'Expired';
     if (proposal.state === AaveTypes.ProposalState.FAILED) return 'Did not pass';
+  } else if (proposal.completed && proposal instanceof CompoundProposal) {
+    if (proposal.state === CompoundTypes.ProposalState.Canceled) return 'Cancelled';
+    if (proposal.state === CompoundTypes.ProposalState.Executed) return 'Executed';
+    if (proposal.state === CompoundTypes.ProposalState.Expired) return 'Expired';
+    if (proposal.state === CompoundTypes.ProposalState.Defeated) return 'Did not pass';
   } else if (proposal.completed) {
     if (proposal.isPassing === ProposalStatus.Passed) return 'Passed';
     if (proposal.isPassing === ProposalStatus.Failed) return 'Did not pass';
@@ -94,6 +100,18 @@ export const getStatusText = (proposal: AnyProposal, showCountdown: boolean) => 
     if (proposal.state === AaveTypes.ProposalState.SUCCEEDED)
       return 'Ready to queue';
     if (proposal.state === AaveTypes.ProposalState.EXPIRED) return 'Expired';
+  }
+
+  if (proposal instanceof CompoundProposal) {
+    if (proposal.state === CompoundTypes.ProposalState.Active)
+      return [ proposal.isPassing === ProposalStatus.Passing ? 'Passing, ' : 'Not passing, ', countdown ];
+    if (proposal.state === CompoundTypes.ProposalState.Pending)
+      return ['Pending, ', countdown];
+    if (proposal.state === CompoundTypes.ProposalState.Queued)
+      return [ 'Queued, ', countdown ];
+    if (proposal.state === CompoundTypes.ProposalState.Succeeded)
+      return 'Ready to queue';
+    if (proposal.state === CompoundTypes.ProposalState.Expired) return 'Expired';
   }
 
   if (proposal.isPassing === ProposalStatus.Passed)

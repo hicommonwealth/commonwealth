@@ -50,6 +50,7 @@ import { SocialSharingCarat } from 'views/components/social_sharing_carat';
 
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
+import { SnapshotProposal } from 'helpers/snapshot_utils';
 import {
   ProposalHeaderExternalLink, ProposalHeaderBlockExplorerLink, ProposalHeaderVotingInterfaceLink,
   ProposalHeaderOffchainPoll,
@@ -78,7 +79,6 @@ import User from '../../components/widgets/user';
 import MarkdownFormattedText from '../../components/markdown_formatted_text';
 import { createTXModal } from '../../modals/tx_signing_modal';
 import { SubstrateAccount } from '../../../controllers/chain/substrate/account';
-import { SnapshotProposal } from 'client/scripts/helpers/snapshot_utils';
 
 const MAX_THREAD_LEVEL = 2;
 
@@ -259,7 +259,7 @@ const ProposalHeader: m.Component<{
                   (isAuthor || isAdmin) && (app.chain?.meta.chain.snapshot !== null)
                     && m(MenuItem, {
                       onclick: (e) => {
-                        m.route.set(`/${app.activeChainId()}/new/snapshot/${app.chain.meta.chain.snapshot}`
+                        navigateToSubpage(`/new/snapshot/${app.chain.meta.chain.snapshot}`
                         + `?fromProposalType=${proposal.slug}&fromProposalId=${proposal.id}`);
                       },
                       label: 'Snapshot proposal from thread',
@@ -777,15 +777,24 @@ const ViewProposalPage: m.Component<{
         .then(async (result) => {
           vnode.state.comments = app.comments.getByProposal(proposal).filter((c) => c.parentComment === null);
           // fetch reactions
-          const { result: reactionCounts } = await $.post(`${app.serverUrl()}/reactionsCounts`, {
-            thread_ids: [proposalId],
-            comment_ids: vnode.state.comments.map((comment) => comment.id),
-            active_address: app.user.activeAccount?.address
+          const { result: reactionCounts } = await $.ajax({
+            type: 'POST',
+            url: `${app.serverUrl()}/reactionsCounts`,
+            headers: {
+              'content-type': 'application/json',
+            },
+            data: JSON.stringify({
+              proposal_ids: [proposalId],
+              comment_ids: vnode.state.comments.map((comment) => comment.id),
+              active_address: app.user.activeAccount?.address,
+            }),
           });
           // app.reactionCounts.deinit()
           for (const rc of reactionCounts) {
             const id = app.reactionCounts.store.getIdentifier(rc);
-            app.reactionCounts.store.add(modelReactionCountFromServer({ ...rc, id }));
+            app.reactionCounts.store.add(
+              modelReactionCountFromServer({ ...rc, id })
+            );
           }
           m.redraw();
         }).catch((err) => {
@@ -867,11 +876,6 @@ const ViewProposalPage: m.Component<{
       }
     };
     window.addEventListener('beforeunload', windowListener);
-
-    // fetch completed cosmos proposal votes only when we load the page
-    // if (proposal instanceof CosmosProposal && proposal.completed) {
-    //   proposal.fetchVotes().then(() => m.redraw());
-    // }
 
     const comments = vnode.state.comments;
     const viewCount : number = vnode.state.viewCount;
@@ -1022,14 +1026,14 @@ const ViewProposalPage: m.Component<{
               vnode.state.pollEditorIsOpen = true;
             }
           }),
-          proposal instanceof OffchainThread 
-            && ((proposal as OffchainThread).chainEntities.length > 0 
+          proposal instanceof OffchainThread
+            && ((proposal as OffchainThread).chainEntities.length > 0
               || (proposal as OffchainThread).snapshotProposal?.length > 0)
             && m(ProposalSidebarLinkedViewer, {
             proposal
           }),
-          proposal instanceof OffchainThread 
-            && (isAuthor || isAdmin) 
+          proposal instanceof OffchainThread
+            && (isAuthor || isAdmin)
             && m(ProposalSidebarStageEditorModule, {
             proposal,
             openStageEditor: () => {
@@ -1049,10 +1053,10 @@ const ViewProposalPage: m.Component<{
         isAdmin,
         stageEditorIsOpen: vnode.state.stageEditorIsOpen,
         pollEditorIsOpen: vnode.state.pollEditorIsOpen,
-        closeStageEditor: () => { vnode.state.stageEditorIsOpen = false; 
+        closeStageEditor: () => { vnode.state.stageEditorIsOpen = false;
           m.redraw(); },
-        closePollEditor: () => { 
-          vnode.state.pollEditorIsOpen = false; 
+        closePollEditor: () => {
+          vnode.state.pollEditorIsOpen = false;
           m.redraw(); },
       }),
       !(proposal instanceof OffchainThread)

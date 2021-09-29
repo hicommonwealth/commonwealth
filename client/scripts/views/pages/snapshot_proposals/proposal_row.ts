@@ -3,49 +3,58 @@ import 'pages/discussions/discussion_row.scss';
 import m from 'mithril';
 import moment from 'moment';
 import _ from 'lodash';
-
 import app from 'state';
-import { formatLastUpdated, formatTimestamp, link } from 'helpers';
-
-import ProposalListingRow from 'views/components/proposal_listing_row';
+import { formatLastUpdated, formatTimestamp } from 'helpers';
 import { SnapshotProposal } from 'helpers/snapshot_utils';
+import { Tag } from 'construct-ui/lib/esm/components/tag';
+import { navigateToSubpage } from '../../../app';
 
-const ProposalRow: m.Component<{ snapshotId: string, proposal: SnapshotProposal }, { expanded: boolean }> = {
+const ProposalRow: m.Component<
+  { snapshotId: string; proposal: SnapshotProposal },
+  { expanded: boolean }
+> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
 
     if (!proposal) return;
-    const proposalLink = `/${app.activeId()}/snapshot/${vnode.attrs.snapshotId}/${proposal.ipfs}`;
+    const proposalLink = `/snapshot/${vnode.attrs.snapshotId}/${proposal.ipfs}`;
 
     const time = moment(+proposal.end * 1000);
     const now = moment();
-    const rowHeader: any = [
-      link('a', proposalLink, proposal.title),
-    ];
-    const rowSubheader = [
-      m('.created-at', link('a', proposalLink, (now > time)
-        ? `Ended ${formatLastUpdated(time)}`
-        : `Ending in ${formatTimestamp(moment(+proposal.end * 1000))}`)),
-      m('span.m-l-20', ' · '),
-      proposal.ipfs && link('a.proposal-topic.m-l-20', proposalLink, [
-        m('span.proposal-topic-name', `${proposal.ipfs}`),
-      ]),
-    ];
 
-    return m(ProposalListingRow, {
-      class: 'DiscussionRow',
-      contentLeft: {
-        header: rowHeader,
-        subheader: rowSubheader,
-      },
-      onclick: (e) => {
-        if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
-        e.preventDefault();
-        localStorage[`${app.activeId()}-proposals-scrollY`] = window.scrollY;
-        m.route.set(proposalLink);
-      },
-    });
-  }
+    return m('.ProposalCard', [
+      m(
+        '.proposal-card-top',
+        {
+          onclick: (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            localStorage[`${app.activeId()}-proposals-scrollY`] =
+              window.scrollY;
+            navigateToSubpage(proposalLink);
+          },
+        },
+        [
+          m('.proposal-card-metadata', [
+            m(Tag, {
+              label: `${proposal.ipfs.slice(0, 6)}...${proposal.ipfs.slice(
+                proposal.ipfs.length - 6
+              )}`,
+              intent: 'primary',
+              rounded: true,
+              size: 'xs',
+            }),
+            m('.proposal-title', proposal.title),
+          ]),
+          m('.proposal-status', [
+            now > time
+              ? `Ended ${formatLastUpdated(time)}`
+              : `Ending in ${formatTimestamp(moment(+proposal.end * 1000))}`,
+          ]),
+        ]
+      ),
+    ]);
+  },
 };
 
 export default ProposalRow;
