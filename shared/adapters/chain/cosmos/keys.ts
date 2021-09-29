@@ -1,9 +1,15 @@
 // Cosmos cannot sign arbitrary blobs, but they can sign transactions. So, as a hack around that,
 // we insert our account registration token into a proposal message, and then verify against the
 // generated signature. But first we need the message to insert.
-import { AminoMsg, makeSignDoc, StdSignDoc } from '@cosmjs/amino';
+import { AminoMsg, makeSignDoc, StdSignDoc, StdFee } from '@cosmjs/amino';
 
-export const validationTokenToSignDoc = (chainId: string, token: string, fee?, memo?,  msgs?: AminoMsg[]): StdSignDoc => {
+export const validationTokenToSignDoc = (
+  chainId: string,
+  token: string,
+  fee?: StdFee,
+  memo?: string,
+  msgs?: AminoMsg[],
+): StdSignDoc => {
   const jsonTx: AminoMsg = {
     type: 'cosmos-sdk/TextProposal',
     value: {

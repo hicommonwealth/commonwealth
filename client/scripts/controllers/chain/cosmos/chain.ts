@@ -16,21 +16,20 @@ import { CosmosToken } from 'controllers/chain/cosmos/types';
 
 import {
   StdFee,
-  AuthExtension,
-  GovExtension,
-  LcdClient,
-  setupAuthExtension,
-  setupGovExtension,
-  setupStakingExtension,
-  setupBankExtension,
-  setupSupplyExtension,
-  BankExtension,
-  SupplyExtension,
+  isBroadcastTxSuccess,
+  isBroadcastTxFailure,
+  QueryClient,
   StakingExtension,
-} from '@cosmjs/launchpad';
-import { isBroadcastTxSuccess, isBroadcastTxFailure } from '@cosmjs/stargate';
+  setupStakingExtension,
+  GovExtension,
+  setupGovExtension,
+  BankExtension,
+  setupBankExtension,
+  SigningStargateClient
+} from '@cosmjs/stargate';
+import { Tendermint34Client, Event } from '@cosmjs/tendermint-rpc';
 import { EncodeObject } from '@cosmjs/proto-signing';
-import { CosmosAccount } from './account';
+import CosmosAccount from './account';
 import KeplrWebWalletController from '../../app/webWallets/keplr_web_wallet';
 import TerraStationWebWalletController from '../../app/webWallets/terra_station_web_wallet';
 
@@ -43,12 +42,10 @@ export interface ICosmosTXData extends ITXData {
   gas: number;
 }
 
-export type CosmosApiType = LcdClient
+export type CosmosApiType = QueryClient
   & StakingExtension
-  & AuthExtension
   & GovExtension
-  & BankExtension
-  & SupplyExtension;
+  & BankExtension;
 
 class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
   private _url: string;
@@ -62,12 +59,6 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
   private _denom: string;
   public get denom(): string {
     return this._denom;
-  }
-
-  // TODO: use this in the UI
-  private _chainId: string;
-  public get chainId(): string {
-    return this._chainId;
   }
 
   private _staked: CosmosToken;
@@ -88,6 +79,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
   }
 
   private _blocktimeHelper: BlocktimeHelper = new BlocktimeHelper();
+  private _tmClient: Tendermint34Client;
   public async init(node: NodeInfo, reset = false) {
     // A note on REST RPC: gaiacli exposes a command line option "rest-server" which
     // creates the endpoint necessary. However, it doesn't send headers correctly
@@ -96,44 +88,39 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     /* eslint-disable prefer-template */
     this._url = node.url;
 
-    console.log(`Starting REST API at ${this._url}...`);
-
-    console.log('cosmjs api');
+    console.log(`Starting Tendermint RPC API at ${this._url}...`);
     // TODO: configure broadcast mode
-    this._api = LcdClient.withExtensions(
-      { apiUrl: this._url },
-      setupAuthExtension,
+    this._tmClient = await Tendermint34Client.connect(this._url);
+    this._api = QueryClient.withExtensions(
+      this._tmClient,
       setupGovExtension,
       setupStakingExtension,
       setupBankExtension,
-      setupSupplyExtension,
     );
     if (this.app.chain.networkStatus === ApiStatus.Disconnected) {
       this.app.chain.networkStatus = ApiStatus.Connecting;
     }
-    const nodeInfo = await this._api.nodeInfo();
-    this._chainId = nodeInfo.node_info.network;
-    console.log(`chain id: ${this._chainId}`);
-    this.app.chain.networkStatus = ApiStatus.Connected;
 
     // Poll for new block immediately and then every 2s
     const fetchBlockJob = async () => {
-      const block = await this._api.blocksLatest();
-      const height = +block.block.header.height;
+      const { block } = await this._tmClient.block();
+      const height = +block.header.height;
       if (height > this.app.chain.block.height) {
-        const time = moment(block.block.header.time);
-        this._blocktimeHelper.stamp(moment(time));
+        const time = moment.unix(block.header.time.valueOf() / 1000);
+        this._blocktimeHelper.stamp(time, height - this.app.chain.block.height);
         this.app.chain.block.height = height;
         m.redraw();
       }
     };
     await fetchBlockJob();
-    this._blockSubscription = setInterval(fetchBlockJob, 2000);
+    this._blockSubscription = setInterval(fetchBlockJob, 6000);
 
-    const { result: { bonded_tokens } } = await this._api.staking.pool();
-    this._staked = this.coins(new BN(bonded_tokens));
-    const { result: { bond_denom } } = await this._api.staking.parameters();
-    this._denom = bond_denom;
+    const { pool: { bondedTokens } } = await this._api.staking.pool();
+    this._staked = this.coins(new BN(bondedTokens));
+
+    const { params: { bondDenom } } = await this._api.staking.params();
+    this._denom = bondDenom;
+    this.app.chain.networkStatus = ApiStatus.Connected;
     m.redraw();
   }
 
@@ -144,19 +131,18 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     }
   }
 
-  public async sendTx(account: CosmosAccount, tx: EncodeObject): Promise<string> {
+  public async sendTx(account: CosmosAccount, tx: EncodeObject): Promise<readonly Event[]> {
     // TODO: error handling
-    const wallets = this.app.wallets.availableWallets(ChainBase.CosmosSDK);
-    if (!wallets) throw new Error('No cosmos wallet found');
-
     // TODO: support multiple wallets
-    let wallet;
-    if (ChainNetwork.Terra) {
-      wallet = wallets[0] as TerraStationWebWalletController;
-    } else {
-      wallet = wallets[0] as KeplrWebWalletController;
+    if (this._app.chain.network === ChainNetwork.Terra) {
+      throw new Error('Tx not yet supported on Terra');
     }
-    const client = await wallet.getClient(this.app.chain.meta.url, account.address);
+    const wallet = this.app.wallets.getByName('keplr') as KeplrWebWalletController;
+    if (!wallet) throw new Error('Keplr wallet not found');
+    if (!wallet.enabled) {
+      await wallet.enable();
+    }
+    const client = await SigningStargateClient.connectWithSigner(this._app.chain.meta.url, wallet.offlineSigner);
 
     // these parameters will be overridden by the wallet
     // TODO: can it be simulated?
@@ -167,15 +153,21 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     const DEFAULT_MEMO = '';
 
     // send the transaction using keplr-supported signing client
-    const result = await client.signAndBroadcast(account.address, [ tx ], DEFAULT_FEE, DEFAULT_MEMO);
-    if (isBroadcastTxFailure(result)) {
+    try {
+      const result = await client.signAndBroadcast(account.address, [ tx ], DEFAULT_FEE, DEFAULT_MEMO);
       console.log(result);
-      throw new Error('TX execution failed.');
-    } else if (isBroadcastTxSuccess(result)) {
-      console.log(result);
-      return result.transactionHash;
-    } else {
-      throw new Error('Unknown broadcast result');
+      if (isBroadcastTxFailure(result)) {
+        throw new Error('TX execution failed.');
+      } else if (isBroadcastTxSuccess(result)) {
+        const txHash = result.transactionHash;
+        const txResult = await this._tmClient.tx({ hash: Buffer.from(txHash, 'hex') });
+        return txResult.result.events;
+      } else {
+        throw new Error('Unknown broadcast result');
+      }
+    } catch (err) {
+      console.log(err.message);
+      throw err;
     }
   }
 

@@ -14,6 +14,7 @@ import { ITXModalData, ProposalModule, ChainBase, OffchainThreadKind, OffchainTh
 import { ProposalType, proposalSlugToClass } from 'identifiers';
 import { formatCoin } from 'adapters/currency';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
+import CosmosAccount from 'controllers/chain/cosmos/account';
 
 import { notifyError } from 'controllers/app/notifications';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
@@ -37,7 +38,8 @@ import ErrorPage from 'views/pages/error';
 import SubstrateBountyTreasury from 'controllers/chain/substrate/bountyTreasury';
 import { AaveProposalArgs } from 'controllers/chain/ethereum/aave/governance';
 import Aave from 'controllers/chain/ethereum/aave/adapter';
-import NearSputnik from 'client/scripts/controllers/chain/near/sputnik/adapter';
+import NearSputnik from 'controllers/chain/near/sputnik/adapter';
+import { navigateToSubpage } from 'app';
 
 // this should be titled the Substrate/Edgeware new proposal form
 const NewProposalForm = {
@@ -166,6 +168,7 @@ const NewProposalForm = {
       const done = (result) => {
         vnode.state.error = '';
         callback(result);
+        return result;
       };
       let createFunc: (...args) => ITXModalData | Promise<ITXModalData> = (a) => {
         return (proposalSlugToClass().get(proposalTypeEnum) as ProposalModule<any, any, any>).createTx(...a);
@@ -300,13 +303,17 @@ const NewProposalForm = {
         const deposit = vnode.state.deposit
           ? new CosmosToken((app.chain as Cosmos).governance.minDeposit.denom, vnode.state.deposit, false)
           : (app.chain as Cosmos).governance.minDeposit;
-        args = [author, vnode.state.form.title, vnode.state.form.description, deposit];
-        mixpanel.track('Create Thread', {
-          'Step No': 2,
-          'Step' : 'Submit Proposal',
-          'Proposal Type': 'Cosmos',
-          'Thread Type': 'Proposal',
-        });
+        // TODO: add disabled / loading
+        (app.chain as Cosmos).governance.submitProposalTx(
+          author as CosmosAccount,
+          vnode.state.form.title,
+          vnode.state.form.description,
+          deposit
+        ).then((result) => {
+          done(result);
+          navigateToSubpage(`/proposal/cosmosproposal/${result}`);
+        }).catch((err) => notifyError(err.toString()));
+        return;
       } else if (proposalTypeEnum === ProposalType.MolochProposal) {
         // TODO: check that applicant is valid ETH address in hex
         if (!vnode.state.applicantAddress) throw new Error('Invalid applicant address');
@@ -935,7 +942,7 @@ const NewProposalForm = {
               }),
             ]),
             m(FormGroup, [
-              m(FormLabel, 'Target'),
+              m(FormLabel, 'Target Address'),
               m(Input, {
                 name: 'targets',
                 placeholder: 'Add Target',
@@ -951,7 +958,7 @@ const NewProposalForm = {
               m(FormLabel, 'Value'),
               m(Input, {
                 name: 'values',
-                placeholder: 'Enter amount',
+                placeholder: 'Enter amount in wei',
                 value: aaveProposalState[activeAaveTabIndex].value,
                 oninput: (e) => {
                   const result = (e.target as any).value;
@@ -975,7 +982,7 @@ const NewProposalForm = {
             ]),
             m(FormGroup, [
               m('.flex-label', [
-                m(FormLabel, 'Signature'),
+                m(FormLabel, 'Function Signature'),
                 m('.helper-text', 'Optional'),
               ]),
               m(Input, {
