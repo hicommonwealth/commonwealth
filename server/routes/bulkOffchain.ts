@@ -72,7 +72,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
         const query = `
           SELECT addr.id AS addr_id, addr.address AS addr_address,
             addr.chain AS addr_chain, thread_id, thread_title,
-            thread_community, thread_chain, thread_created, threads.kind,
+            thread_community, thread_chain, thread_created, threads.kind, threads.snapshot_proposal,
             st.id AS stage_id, st.name AS stage_name,
             threads.read_only, threads.body, threads.offchain_voting_options,
             threads.offchain_voting_votes, threads.offchain_voting_ends_at,
@@ -86,7 +86,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
               t.created_at AS thread_created, t.community AS thread_community,
               t.chain AS thread_chain, t.read_only, t.body,
               t.offchain_voting_options, t.offchain_voting_votes, t.offchain_voting_ends_at,
-              t.stage_id, t.url, t.pinned, t.topic_id, t.kind, ARRAY_AGG(DISTINCT
+              t.stage_id, t.snapshot_proposal, t.url, t.pinned, t.topic_id, t.kind, ARRAY_AGG(DISTINCT
                 CONCAT(
                   '{ "address": "', editors.address, '", "chain": "', editors.chain, '" }'
                   )
@@ -167,6 +167,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
             created_at: t.thread_created,
             collaborators,
             chain_entities,
+            snapshot_proposal: t.snapshot_proposal,
             offchain_voting_options: t.offchain_voting_options,
             offchain_voting_votes: t.offchain_voting_votes,
             offchain_voting_ends_at: t.offchain_voting_ends_at,

@@ -6,7 +6,24 @@
     justify-content: space-between;
     margin-top: 25px;
     flex-wrap: wrap;
-    border-radius: 3px;
+
+    .VoteRow {
+        display: flex;
+        &:hover {
+            background: #f9fafd;
+        }
+        .row-left {
+            line-height: 1.1;
+            flex: 1;
+            text-align: left;
+        }
+    
+        .row-right {
+            line-height: 1.1;
+            flex: 1;
+            text-align: right;
+        }
+    }
 
     .results-column {
         display: flex;

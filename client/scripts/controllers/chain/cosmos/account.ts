@@ -3,29 +3,16 @@ import BN from 'bn.js';
 import { IApp } from 'state';
 import CosmosChain from 'controllers/chain/cosmos/chain';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
-import { Account, IAccountsModule, ITXModalData } from 'models';
-import { AccountsStore } from 'stores';
-import { AuthAccountsResponse } from '@cosmjs/launchpad';
+import { Account, ITXModalData } from 'models';
 import {
   MsgSendEncodeObject,
   MsgDelegateEncodeObject,
   MsgUndelegateEncodeObject,
   MsgWithdrawDelegatorRewardEncodeObject,
 } from '@cosmjs/stargate';
-import { BondStatus } from '@cosmjs/launchpad/build/lcdapi/staking';
+import CosmosAccounts from './accounts';
 
-export interface ICosmosValidator {
-  // TODO: add more properties (commission, unbonding, jailed, etc)
-  // TODO: if we wanted, we could get all delegations to a validator, but is this necessary?
-  pubkey: string;
-  operator: string;
-  tokens: CosmosToken;
-  description: any;
-  status: BondStatus;
-  isJailed: boolean;
-}
-
-export class CosmosAccount extends Account<CosmosToken> {
+export default class CosmosAccount extends Account<CosmosToken> {
   private _Chain: CosmosChain;
   private _Accounts: CosmosAccounts;
 
@@ -61,34 +48,14 @@ export class CosmosAccount extends Account<CosmosToken> {
   }
 
   public updateBalance = _.throttle(async () => {
-    let resp: AuthAccountsResponse;
     try {
-      resp = await this._Chain.api.auth.account(this.address);
+      const bal = await this._Chain.api.bank.balance(this.address, this._Chain.denom);
+      this._balance = this._Chain.coins(new BN(bal.amount));
     } catch (e) {
       // if coins is null, they have a zero balance
-      console.log(`no balance found: ${JSON.stringify(e)}`);
+      console.log(`no balance found: ${e.message}`);
       this._balance = this._Chain.coins(0);
     }
-    // JSON incompatibilities...
-    if (!resp) {
-      console.error('could not update balance');
-      return;
-    }
-    if (resp && resp.result.value.coins && resp.result.value.coins[0]) {
-      for (const coins of resp.result.value.coins) {
-        const bal = new BN(coins.amount);
-        if (coins.denom === this._Chain.denom) {
-          this._balance = this._Chain.coins(bal, true);
-        } else {
-          console.log(`found invalid denomination: ${coins.denom}`);
-        }
-      }
-    }
-    if (!this._balance) {
-      console.log('no compatible denominations found');
-      this._balance = this._Chain.coins(0);
-    }
-    return this._balance;
   });
 
   public sendBalanceTx(recipient: Account<CosmosToken>, amount: CosmosToken):
@@ -141,56 +108,5 @@ export class CosmosAccount extends Account<CosmosToken> {
       }
     };
     await this._Chain.sendTx(this, msg);
-  }
-}
-
-export class CosmosAccounts implements IAccountsModule<CosmosToken, CosmosAccount> {
-  private _initialized: boolean = false;
-  public get initialized() { return this._initialized; }
-
-  // STORAGE
-  private _store: AccountsStore<CosmosAccount> = new AccountsStore();
-  public get store() { return this._store; }
-
-  private _Chain: CosmosChain;
-
-  public get(address: string) {
-    return this.fromAddress(address);
-  }
-
-  private _app: IApp;
-  public get app() { return this._app; }
-
-  constructor(app: IApp) {
-    this._app = app;
-  }
-
-  public fromAddress(address: string): CosmosAccount {
-    // accepts bech32 encoded cosmosxxxxx addresses and not cosmospubxxx
-    let acct;
-    try {
-      acct = this._store.getByAddress(address);
-    } catch (e) {
-      acct = new CosmosAccount(this.app, this._Chain, this, address);
-    }
-    return acct;
-  }
-
-  public fromAddressIfExists(address: string): CosmosAccount | null {
-    try {
-      return this._store.getByAddress(address);
-    } catch (e) {
-      return null;
-    }
-  }
-
-  public deinit() {
-    this._initialized = false;
-    this.store.clear();
-  }
-
-  public async init(ChainInfo: CosmosChain): Promise<void> {
-    this._Chain = ChainInfo;
-    this._initialized = true;
   }
 }

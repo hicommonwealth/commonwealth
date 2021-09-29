@@ -34,6 +34,7 @@ export const modelFromServer = (thread) => {
     body,
     last_edited,
     version_history,
+    snapshot_proposal,
     OffchainAttachments,
     created_at,
     topic,
@@ -95,6 +96,7 @@ export const modelFromServer = (thread) => {
     body: decodeURIComponent(body),
     createdAt: moment(created_at),
     attachments,
+    snapshotProposal: snapshot_proposal,
     topic,
     kind,
     stage,
@@ -401,6 +403,30 @@ class ThreadsController {
     });
   }
 
+  public async setLinkedSnapshotProposal(args: { threadId: number, snapshotProposal: string }) {
+    await $.ajax({
+      url: `${app.serverUrl()}/updateThreadLinkedSnapshotProposal`,
+      type: 'POST',
+      data: {
+        'chain': app.activeChainId(),
+        'thread_id': args.threadId,
+        'snapshot_proposal': args.snapshotProposal,
+        'jwt': app.user.jwt
+      },
+      success: (response) => {
+        const thread = this._store.getByIdentifier(args.threadId);
+        if (!thread) return;
+        thread.snapshotProposal = args.snapshotProposal;
+        return thread;
+      },
+      error: (err) => {
+        console.log('Failed to update linked snapshot proposal');
+        throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error
+          : 'Failed to update linked proposals');
+      }
+    });
+  }
+
   public async setLinkedChainEntities(args: { threadId: number, entities: ChainEntity[] }) {
     await $.ajax({
       url: `${app.serverUrl()}/updateThreadLinkedChainEntities`,
@@ -429,6 +455,21 @@ class ThreadsController {
           : 'Failed to update linked proposals');
       }
     });
+  }
+
+  public async fetchThreadIdForSnapshot(args: { snapshot: string }) {
+    const response = await $.ajax({
+      url: `${app.serverUrl()}/fetchThreadForSnapshot`,
+      type: 'GET',
+      data: {
+        snapshot: args.snapshot,
+        chain: app.activeId(),
+      },
+    });
+    if (response.status !== 'Success') {
+      return 'false';
+    }
+    return response.result;
   }
 
   public async fetchThread(id) {
@@ -473,6 +514,7 @@ class ThreadsController {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);
     }
     const { threads, comments } = response.result;
+
     for (const thread of threads) {
       const modeledThread = modelFromServer(thread);
       if (!thread.Address) {
@@ -500,9 +542,16 @@ class ThreadsController {
         console.error(e.message);
       }
     }
-    const { result: reactionCounts } = await $.post(`${app.serverUrl()}/reactionsCounts`, {
-      thread_ids: threads.map((thread) => thread.id),
-      active_address: app.user.activeAccount?.address
+    const { result: reactionCounts } = await $.ajax({
+      type: 'POST',
+      url: `${app.serverUrl()}/reactionsCounts`,
+      headers: {
+        'content-type': 'application/json',
+      },
+      data: JSON.stringify({
+        thread_ids: threads.map((thread) => thread.id),
+        active_address: app.user.activeAccount?.address,
+      }),
     });
     for (const rc of reactionCounts) {
       const id = app.reactionCounts.store.getIdentifier(rc);
@@ -511,7 +560,9 @@ class ThreadsController {
         app.reactionCounts.store.remove(existing);
       }
       try {
-        app.reactionCounts.store.add(modelReactionCountFromServer({ ...rc, id }));
+        app.reactionCounts.store.add(
+          modelReactionCountFromServer({ ...rc, id })
+        );
       } catch (e) {
         console.error(e.message);
       }
@@ -531,8 +582,8 @@ class ThreadsController {
     return $.get(`${app.serverUrl()}/bulkThreads`, {
       chain: chainId,
       community: communityId,
-    })
-      .then((response) => {
+    }).then(
+      (response) => {
         if (response.status !== 'Success') {
           throw new Error(`Unsuccessful refresh status: ${response.status}`);
         }
@@ -560,12 +611,16 @@ class ThreadsController {
         }
         this.numVotingThreads = numVotingThreads;
         this._initialized = true;
-      }, (err) => {
+      },
+      (err) => {
         console.log('failed to load offchain discussions');
-        throw new Error((err.responseJSON && err.responseJSON.error)
-          ? err.responseJSON.error
-          : 'Error loading offchain discussions');
-      });
+        throw new Error(
+          err.responseJSON && err.responseJSON.error
+            ? err.responseJSON.error
+            : 'Error loading offchain discussions'
+        );
+      }
+    );
   }
 
   public initialize(initialThreads: any[], numVotingThreads, reset) {

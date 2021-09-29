@@ -73,6 +73,7 @@ import deleteRole from './routes/deleteRole';
 import setDefaultRole from './routes/setDefaultRole';
 
 import getUploadSignature from './routes/getUploadSignature';
+import activeThreads from './routes/activeThreads';
 import createThread from './routes/createThread';
 import editThread from './routes/editThread';
 import updateThreadPolling from './routes/updateThreadPolling';
@@ -80,9 +81,11 @@ import updateThreadPrivacy from './routes/updateThreadPrivacy';
 import updateThreadStage from './routes/updateThreadStage';
 import updateThreadPinned from './routes/updateThreadPinned';
 import updateThreadLinkedChainEntities from './routes/updateThreadLinkedChainEntities';
+import updateThreadLinkedSnapshotProposal from './routes/updateThreadLinkedSnapshotProposal';
 import updateOffchainVote from './routes/updateOffchainVote';
 import viewOffchainVotes from './routes/viewOffchainVotes';
 import fetchEntityTitle from './routes/fetchEntityTitle';
+import fetchThreadForSnapshot from './routes/fetchThreadForSnapshot';
 import updateChainEntityTitle from './routes/updateChainEntityTitle';
 import deleteThread from './routes/deleteThread';
 import addEditors from './routes/addEditors';
@@ -134,8 +137,9 @@ import editSubstrateSpec from './routes/editSubstrateSpec';
 import { getStatsDInstance } from './util/metrics';
 import updateAddress from "./routes/updateAddress";
 import { DB } from './database';
-
+import { factory, formatFilename } from '../shared/logging';
 import { sendMessage } from './routes/snapshotAPI';
+
 
 function setupRouter(
   app,
@@ -145,6 +149,7 @@ function setupRouter(
   tokenBalanceCache: TokenBalanceCache
 ) {
   const router = express.Router();
+  const log = factory.getLogger(formatFilename(__filename));
 
   router.use((req, res, next) => {
     getStatsDInstance().increment(`cw.path.${req.path.slice(1)}.called`);
@@ -246,6 +251,11 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     updateThreadLinkedChainEntities.bind(this, models),
   );
+  router.post(
+    '/updateThreadLinkedSnapshotProposal',
+    passport.authenticate('jwt', { session: false }),
+    updateThreadLinkedSnapshotProposal.bind(this, models),
+  );
 
   router.post(
     '/updateOffchainVote',
@@ -255,6 +265,8 @@ function setupRouter(
   router.get('/viewOffchainVotes', viewOffchainVotes.bind(this, models));
 
   router.get('/fetchEntityTitle', fetchEntityTitle.bind(this, models));
+  router.get('/fetchThreadForSnapshot', fetchThreadForSnapshot.bind(this, models));
+
   router.post(
     '/updateChainEntityTitle',
     passport.authenticate('jwt', { session: false }),
@@ -266,8 +278,11 @@ function setupRouter(
   router.post('/deleteThread', passport.authenticate('jwt', { session: false }), deleteThread.bind(this, models));
   // TODO: Change to GET /threads
   router.get('/bulkThreads', bulkThreads.bind(this, models));
+  router.get('/activeThreads', activeThreads.bind(this, models));
   router.get('/getThread', getThread.bind(this, models));
   router.get('/search', search.bind(this, models));
+
+
 
   router.get('/profile', getProfile.bind(this, models));
 
@@ -305,7 +320,11 @@ function setupRouter(
   router.post('/deleteTopic', passport.authenticate('jwt', { session: false }), deleteTopic.bind(this, models));
   // TODO: Change to GET /topics
   router.get('/bulkTopics', bulkTopics.bind(this, models));
-  router.post('/setTopicThreshold', passport.authenticate('jwt', { session: false }), setTopicThreshold.bind(this, models));
+  router.post(
+    '/setTopicThreshold',
+    passport.authenticate('jwt', { session: false }),
+    setTopicThreshold.bind(this, models),
+  );
 
   // offchain stages
   // TODO: Change to POST /stage

@@ -197,7 +197,7 @@ const createThread = async (
       include: [
         { model: models.Address, as: 'Address' },
         models.OffchainAttachment,
-        { model: models.OffchainTopic, as: 'topic' }
+        { model: models.OffchainTopic, as: 'topic' },
       ],
     });
   } catch (err) {
