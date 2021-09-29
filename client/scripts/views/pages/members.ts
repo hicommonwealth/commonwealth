@@ -92,7 +92,7 @@ const MembersPage: m.Component<
   }
 > = {
   oninit: (vnode) => {
-    $.get(`/api/getChainEvents?type=${app.activeId()}-vote-cast`).then(
+    $.get(`/api/getChainEvents?type=${app.activeChainId()}-vote-cast`).then(
       ({ result }) => {
         // Sort by address which voted
         const sortedResults = {};
@@ -114,7 +114,10 @@ const MembersPage: m.Component<
         (elementTarget as HTMLElement).offsetTop +
           (elementTarget as HTMLElement).offsetHeight
       ) {
-        if (!vnode.state.membersRequested && vnode.state.membersLoaded === []) {
+        if (
+          !vnode.state.membersRequested &&
+          vnode.state.membersLoaded.length !== vnode.state.totalMembers
+        ) {
           vnode.state.membersRequested = true;
           vnode.state.pageToLoad++;
           m.redraw();
@@ -195,10 +198,10 @@ const MembersPage: m.Component<
                       vnode.state.membersLoaded[offset + i].votes = votes;
                     });
                 })
-              ).then(() => m.redraw())
+              )
             );
           }
-        });
+        }).then(() => m.redraw());
     }
 
     const isAdmin = app.user.isSiteAdmin;
@@ -211,7 +214,7 @@ const MembersPage: m.Component<
       chain: app.activeChainId(),
       community: app.activeCommunityId(),
     });
-    console.log(vnode.state.membersLoaded);
+
     return m(Sublayout, {
         class: 'MembersPage',
         title: [
