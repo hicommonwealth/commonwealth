@@ -36,7 +36,7 @@
   }
 
   .gradient-progress-bar::-webkit-progress-value {
-    background: linear-gradient(89.99deg, #91BFFF -11.17%, #91FFA0 27.56%, #FBFF91 62.05%, #FF9191 105.02%);
+    background: #6966FF;
     border-radius: 4px;
   }
 
@@ -80,10 +80,10 @@
 
   .primary-button {
     font-weight: 600;
-    color: #333333;
+    color: white;
     padding-top: 12px;
     padding-bottom: 7px;
-    background: linear-gradient(89.41deg, #91BFFF -11.06%, #91FFA0 27.62%, #FBFF91 62.06%, #FF9191 104.97%);
+    background: #6966FF;
     border-radius: 8px;
     margin: 10px 0px;
     width: 100%;
@@ -99,6 +99,7 @@
     border: 1px solid #C6660E;
     border-radius: 4px;
     font-weight: 500;
+    font-size: 14px;
     text-transform: uppercase;
     color: #C6660E;
   }

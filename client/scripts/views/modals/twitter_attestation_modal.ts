@@ -27,6 +27,7 @@ const TwitterAttestationModal: m.Component<{
   error,
   twitterAcct, // full Social Acct Obj
   tweet, // id for tweet
+  tweetLoaded,
   userProvidedSignature: string;
   valid: boolean, // Step 2 Signed
   posted: boolean, // Step 3 Posted to Twitter
@@ -39,19 +40,26 @@ const TwitterAttestationModal: m.Component<{
     } else if (!vnode.state.twitterAcct.attested) {
       vnode.state.step = TwitterAttestationModalSteps.Step2Publicize;
     }
+    vnode.state.tweetLoaded = false;
   },
   onupdate: (vnode) => {
     // Add Twitter Embed Widget to embed tweet
     if (vnode.state.step === TwitterAttestationModalSteps.Step3Verify) {
       loadScript('https://platform.twitter.com/widgets.js').then(() => {
-        setTimeout(() => {
+        setTimeout(async () => {
             // eslint-disable-next-line
             (<any>window).twttr?.widgets?.load();
-            // @ts-ignore
-            window.twttr.widgets.createTweet(
-              vnode.state.tweet,
-              document.getElementById('tweet-container'),
-            );
+            if (!vnode.state.tweetLoaded) {
+              // @ts-ignore
+              window.twttr.widgets.createTweet(
+                vnode.state.tweet,
+                document.getElementById('tweet-container')
+              )
+              .then(() => {
+                vnode.state.tweetLoaded = true;
+                m.redraw();
+              });
+            }
         }, 1);
       });
     };
@@ -61,8 +69,6 @@ const TwitterAttestationModal: m.Component<{
     const { twitterAcct, tweet } = vnode.state;
     if (!twitter) return; // not what we want
 
-    // vnode.state.tweet = '1436375667373924354';
-    
     const constructSignature = (username) => {
       const EIP712Domain = [
         { name: 'name', type: 'string' },
@@ -89,6 +95,12 @@ const TwitterAttestationModal: m.Component<{
     const constructTweet = () => {
       // eslint-disable-next-line max-len
       const tweetText = `Verifying myself as a @hicommonwealth member 🐮🌝%0Aaddr:${account.address}%0Asig:${vnode.state.userProvidedSignature}`;
+      return tweetText;
+    };
+
+    const tweetPreview = () => {
+      // eslint-disable-next-line max-len
+      const tweetText = `Verifying myself as a <a href="https://twitter.com/hicommonwealth" target="_blank">@hicommonwealth</a> member 🐮🌝%0Aaddr:${account.address}%0Asig:${vnode.state.userProvidedSignature}`;
       return tweetText;
     };
 
@@ -191,7 +203,7 @@ const TwitterAttestationModal: m.Component<{
         m('progress.gradient-progress-bar', { value:'0.5' }),
         m('img.twitter-logo', { src:'/static/img/twitterBlueIcon.svg' }),
         m('.title', 'Publicize'),
-        m('.tweet-preview', constructTweet()),
+        m('.tweet-preview', m.trust(tweetPreview())),
         m('button.primary-button', {
           onclick: async (e) => {
             const params = {
@@ -235,7 +247,7 @@ const TwitterAttestationModal: m.Component<{
             id: 'tweet-container',
           })
         ]),
-        tweet && m('.unverfied-label', 'We found your tweet!'),
+        tweet && !vnode.state.tweetLoaded && m('.unverfied-label', 'We found your tweet and are loading it in'),
         m('button.primary-button', {
           onclick: async (e) => {
             if (tweet) {
@@ -265,11 +277,17 @@ const TwitterAttestationModal: m.Component<{
                   if (res.result.data[0]) {
                     if (res.result.data[0].text.includes(`sig:${vnode.state.userProvidedSignature}`)) {
                       vnode.state.tweet = res.result.data[0].id;
-                      // @ts-ignore
-                      window.twttr.widgets.createTweet(
-                        vnode.state.tweet,
-                        document.getElementById('tweet-container'),
-                      );
+                      if (!vnode.state.tweetLoaded) {
+                        // @ts-ignore
+                        window.twttr.widgets.createTweet(
+                          vnode.state.tweet,
+                          document.getElementById('tweet-container')
+                        )
+                        .then(() => {
+                          vnode.state.tweetLoaded = true;
+                          m.redraw();
+                        });
+                      }
                     } else {
                       notifyError('Tweet not found, try again with exact message.');
                     }
@@ -293,13 +311,14 @@ const TwitterAttestationModal: m.Component<{
             m.redraw();
           },
         }),
+        m('img.twitter-logo', { src:'/static/img/checkmark.svg' }),
         m('.title', 'Verification Successful'),
         m('button.primary-button', {
           onclick: async () => {
             $('.TwitterAttestationModal').trigger('modalforceexit');
             refreshCallback();
             const href = window.location.href;
-            window.location.href = href.substring(0, href.indexOf('continueTwitterAttestation=true') - 1);
+            m.route.set(href.substring(0, href.indexOf('continueTwitterAttestation=true') - 1));
           }
         }, 'Close'),
       ]);
