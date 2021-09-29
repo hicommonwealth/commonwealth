@@ -62,6 +62,11 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
               as: 'collaborators'
             },
             {
+              model: models.OffchainStage,
+              // through: models.Collaboration,
+              as: 'stage'
+            },
+            {
               model: models.OffchainTopic,
               as: 'topic'
             }
