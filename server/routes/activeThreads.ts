@@ -55,6 +55,7 @@ const activeThreads = async (
       include: [
         { model: models.Address, as: 'Address' },
         { model: models.OffchainTopic, as: 'topic' },
+        { model: models.OffchainStage, as: 'stage' },
       ],
       order: [['created_at', 'DESC']],
     }

@@ -70,7 +70,8 @@ const updateThreadStage = async (models: DB, req: Request, res: Response, next: 
         {
           model: models.OffchainTopic,
           as: 'topic'
-        }
+        },
+        { model: models.OffchainStage, as: 'stage' },
       ],
     });
 

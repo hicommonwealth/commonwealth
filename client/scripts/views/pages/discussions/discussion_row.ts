@@ -94,6 +94,7 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
         compact: true,
       }),
       proposal instanceof OffchainThread
+        && proposal.stage?.name
         && proposal.stage?.name !== OffchainThreadStage.Discussion
         && m(Button, {
           class: 'discussion-row-stage-btn',

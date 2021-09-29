@@ -17,7 +17,7 @@ import app from 'state';
 import { navigateToSubpage } from 'app';
 
 import { detectURL } from 'helpers/threads';
-import { OffchainTopic, OffchainThreadKind, OffchainThreadStage, CommunityInfo, NodeInfo, OffchainStage } from 'models';
+import { OffchainTopic, OffchainThreadKind, CommunityInfo, NodeInfo, OffchainStage } from 'models';
 
 import { updateLastVisited } from 'controllers/app/login';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
@@ -158,7 +158,7 @@ const newThread = async (
     result = await app.threads.create(
       author.address,
       kind,
-      stage.id,
+      stage?.id,
       chainId,
       communityId,
       title,
@@ -204,7 +204,12 @@ const newThread = async (
   });
 };
 
-const newLink = async (form, quillEditorState, author, kind = OffchainThreadKind.Link) => {
+const newLink = async (
+  form,
+  quillEditorState,
+  author,
+  kind = OffchainThreadKind.Link
+) => {
   const errors = await newThread(form, quillEditorState, author, kind);
   return errors;
 };
@@ -222,7 +227,9 @@ const checkForModifications = async (state, modalMsg) => {
   // If overwritten form body comes from a previous draft, we check whether
   // there have been changes made to the draft, and prompt with a confirmation
   // modal if there have been.
-  const titleInput = document.querySelector("div.new-thread-form-body input[name='new-thread-title']");
+  const titleInput = document.querySelector(
+    "div.new-thread-form-body input[name='new-thread-title']"
+  );
   if (fromDraft) {
     let formBodyDelta;
     let formBodyMarkdown;
@@ -321,7 +328,9 @@ export const loadDraft = async (dom, state, draft) => {
 // };
 
 const setTemplateContent = (parentState) => {
-  const defaultOffchainTemplate = localStorage.getItem(`${app.activeId()}-active-topic-default-template`);
+  const defaultOffchainTemplate =
+    localStorage.getItem(`${app.activeId()}-active-topic-default-template`) ||
+    localStorage.getItem(`${app.activeId()}-active-stage-default-template`);
 
   if (defaultOffchainTemplate) {
     let newDraftMarkdown;
@@ -414,6 +423,8 @@ export const NewThreadForm: m.Component<{
       localStorage.removeItem(`${app.activeId()}-new-discussion-storedText`);
       localStorage.removeItem(`${app.activeId()}-active-topic`);
       localStorage.removeItem(`${app.activeId()}-active-topic-default-template`);
+      localStorage.removeItem(`${app.activeId()}-active-stage`);
+      localStorage.removeItem(`${app.activeId()}-active-stage-default-template`);
       localStorage.removeItem(`${app.activeId()}-post-type`);
     }
   },
@@ -468,6 +479,8 @@ export const NewThreadForm: m.Component<{
       }
       localStorage.removeItem(`${app.activeId()}-active-topic`);
       localStorage.removeItem(`${app.activeId()}-active-topic-default-template`);
+      localStorage.removeItem(`${app.activeId()}-active-stage`);
+      localStorage.removeItem(`${app.activeId()}-active-stage-default-template`);
       localStorage.removeItem(`${app.activeId()}-post-type`);
     };
 
@@ -706,13 +719,15 @@ export const NewThreadForm: m.Component<{
               onclick: async (e) => {
                 vnode.state.saving = true;
                 const { form, quillEditorState } = vnode.state;
+                const stageName = localStorage.getItem(`${app.activeId()}-active-stage`);
+                const stage = app.stages.getByName(stageName, app.activeId());
                 if (!vnode.state.form.threadTitle) {
                   vnode.state.form.threadTitle = (
                     $(e.target).closest('.NewThreadForm').find('input[name=\'new-thread-title\'').val() as string
                   );
                 }
                 try {
-                  await newThread(form, quillEditorState, author);
+                  await newThread(form, quillEditorState, author, OffchainThreadKind.Forum, stage);
                   vnode.state.overwriteConfirmationModal = true;
                   vnode.state.saving = false;
                   if (vnode.state.fromDraft && !vnode.state.recentlyDeletedDrafts.includes(fromDraft)) {

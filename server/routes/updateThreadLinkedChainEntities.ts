@@ -79,8 +79,9 @@ const updateThreadLinkedChainEntities = async (models: DB, req: Request, res: Re
       models.OffchainAttachment,
       {
         model: models.OffchainTopic,
-        as: 'topic'
-      }
+        as: 'topic',
+      },
+      { model: models.OffchainStage, as: 'stage' },
     ],
   });
 

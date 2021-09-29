@@ -55,8 +55,9 @@ const updateThreadPrivacy = async (models: DB, req: Request, res: Response, next
         models.OffchainAttachment,
         {
           model: models.OffchainTopic,
-          as: 'topic'
-        }
+          as: 'topic',
+        },
+        { model: models.OffchainStage, as: 'stage' },
       ],
     });
 

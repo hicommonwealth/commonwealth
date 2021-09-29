@@ -28,7 +28,7 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
   const stages = app.stages.getByCommunity(
     app.activeId()
   ).reduce(
-    (acc, current) => current.featuredInNewPost
+    (acc, current) => current.featuredInNewPost && current.defaultOffchainTemplate
       ? [...acc, current]
       : acc, []
   ).sort((a, b) => a.name.localeCompare(b.name));
@@ -42,29 +42,26 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
     topics.map((t) => (
       m(MenuItem, {
         onclick: (e) => {
+          localStorage.removeItem(`${app.activeId()}-active-stage`);
+          localStorage.removeItem(`${app.activeId()}-active-stage-default-template`);
           localStorage.setItem(`${app.activeId()}-active-topic`, t.name);
-          if (t.defaultOffchainTemplate) {
-            localStorage.setItem(`${app.activeId()}-active-topic-default-template`, t.defaultOffchainTemplate);
-          } else {
-            localStorage.removeItem(`${app.activeId()}-active-topic-default-template`);
-          }
+          localStorage.setItem(`${app.activeId()}-active-topic-default-template`, t.defaultOffchainTemplate);
           navigateToSubpage('/new/thread');
         },
         label: `New ${t.name} Thread`,
         iconLeft: mobile ? Icons.PLUS : undefined,
       })
     )),
-    stages.map((t) => (
+    stages.map((stage) => (
       m(MenuItem, {
         onclick: (e) => {
-          if (t.defaultOffchainTemplate) {
-            localStorage.setItem(`${app.activeId()}-active-topic-default-template`, t.defaultOffchainTemplate);
-          } else {
-            localStorage.removeItem(`${app.activeId()}-active-topic-default-template`);
-          }
+          localStorage.removeItem(`${app.activeId()}-active-topic`);
+          localStorage.removeItem(`${app.activeId()}-active-topic-default-template`);
+          localStorage.setItem(`${app.activeId()}-active-stage`, stage.name);
+          localStorage.setItem(`${app.activeId()}-active-stage-default-template`, stage.defaultOffchainTemplate);
           navigateToSubpage('/new/thread');
         },
-        label: `New ${offchainThreadStageToLabel(t.name)} thread`,
+        label: `New ${offchainThreadStageToLabel(stage.name)} thread`,
         iconLeft: mobile ? Icons.PLUS : undefined,
       })
     )),

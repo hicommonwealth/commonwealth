@@ -68,8 +68,9 @@ const updateThreadLinkedSnapshotProposal = async (models: DB, req: Request, res:
       models.OffchainAttachment,
       {
         model: models.OffchainTopic,
-        as: 'topic'
-      }
+        as: 'topic',
+      },
+      { model: models.OffchainStage, as: 'stage' },
     ],
   });
 

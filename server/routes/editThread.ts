@@ -124,10 +124,11 @@ const editThread = async (models: DB, req: Request, res: Response, next: NextFun
         {
           model: models.Address,
           // through: models.Collaboration,
-          as: 'collaborators'
+          as: 'collaborators',
         },
         models.OffchainAttachment,
         { model: models.OffchainTopic, as: 'topic' },
+        { model: models.OffchainStage, as: 'stage' },
       ],
     });
 

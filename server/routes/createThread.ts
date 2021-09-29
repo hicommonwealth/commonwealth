@@ -85,36 +85,47 @@ const createThread = async (
 
   // New threads get an empty version history initialized, which is passed
   // the thread's first version, formatted on the frontend with timestamps
-  const firstVersion : any = {
+  const firstVersion: any = {
     timestamp: moment(),
     author: req.body.author,
-    body: decodeURIComponent(req.body.body)
+    body: decodeURIComponent(req.body.body),
   };
-  const version_history : string[] = [ JSON.stringify(firstVersion) ];
+  const version_history: string[] = [JSON.stringify(firstVersion)];
 
-  const threadContent = community ? {
-    community: community.id,
-    address_id: author.id,
-    title,
-    body,
-    plaintext,
-    version_history,
-    kind,
-    stage_id,
-    url,
-    read_only: readOnly,
-  } : {
-    chain: chain.id,
-    address_id: author.id,
-    title,
-    body,
-    plaintext,
-    version_history,
-    kind,
-    stage_id,
-    url,
-    read_only: readOnly || false,
-  };
+  let discussionStage;
+  if (!stage_id) {
+    discussionStage = await models.OffchainStage.findOne({
+      where: {
+        name: 'discussion',
+      },
+    });
+  }
+
+  const threadContent = community
+    ? {
+        community: community.id,
+        address_id: author.id,
+        title,
+        body,
+        plaintext,
+        version_history,
+        kind,
+        stage_id: discussionStage?.id || stage_id,
+        url,
+        read_only: readOnly,
+      }
+    : {
+        chain: chain.id,
+        address_id: author.id,
+        title,
+        body,
+        plaintext,
+        version_history,
+        kind,
+        stage_id: discussionStage?.id || stage_id,
+        url,
+        read_only: readOnly || false,
+      };
 
   // New Topic table entries created
   if (topic_id) {
@@ -198,6 +209,7 @@ const createThread = async (
         { model: models.Address, as: 'Address' },
         models.OffchainAttachment,
         { model: models.OffchainTopic, as: 'topic' },
+        { model: models.OffchainStage, as: 'stage' },
       ],
     });
   } catch (err) {
