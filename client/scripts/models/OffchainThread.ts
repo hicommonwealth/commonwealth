@@ -42,8 +42,7 @@ class OffchainThread implements IUniqueId {
   public readonly community: string;
   public readonly chain: string;
   public readonly lastEdited: moment.Moment;
-  public stageName: string;
-  public stageId: number;
+  public stage: OffchainStage;
   public snapshotProposal: string;
 
   public get uniqueIdentifier() {
@@ -107,8 +106,7 @@ class OffchainThread implements IUniqueId {
     createdAt,
     topic,
     kind,
-    stage_id,
-    stage_name,
+    stage,
     versionHistory,
     community,
     chain,
@@ -135,8 +133,7 @@ class OffchainThread implements IUniqueId {
     createdAt: moment.Moment,
     topic: OffchainTopic,
     kind: OffchainThreadKind,
-    stage_name: string,
-    stage_id: Number,
+    stage: OffchainStage,
     versionHistory: VersionHistory[],
     community: string,
     chain: string,
@@ -165,8 +162,7 @@ class OffchainThread implements IUniqueId {
     this.createdAt = createdAt;
     this.topic = topic;
     this.kind = kind;
-    this.stageName = stage_name;
-    this.stageId = +stage_id;
+    this.stage = stage;
     this.authorChain = authorChain;
     this.pinned = pinned;
     this.url = url;

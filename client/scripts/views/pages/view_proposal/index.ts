@@ -298,8 +298,7 @@ const ProposalHeader: m.Component<{
                   thread: vnode.attrs.proposal as OffchainThread,
                   popoverMenu: true,
                   onChangeHandler: (stage: OffchainStage, chainEntities: ChainEntity[], snapshotProposal: SnapshotProposal) => {
-                    proposal.stageName = stage.name;
-                    proposal.stageId = stage.id;
+                    proposal.stage = stage;
                     proposal.chainEntities = chainEntities;
                     if (app.chain?.meta.chain.snapshot) {
                       proposal.snapshotProposal = snapshotProposal[0]?.id;

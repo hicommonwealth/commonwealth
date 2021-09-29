@@ -12,7 +12,6 @@ import {
   OffchainThreadStage,
   CommunityInfo,
   NodeInfo,
-  OffchainTopic,
   Profile,
   ChainEntity,
   OffchainStage,
@@ -27,7 +26,7 @@ import { modelFromServer as modelReactionCountFromServer }  from 'controllers/se
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
 
-export const modelFromServer = (thread) => {
+export const modelFromServer = (thread): OffchainThread => {
   const {
     id,
     title,
@@ -39,8 +38,7 @@ export const modelFromServer = (thread) => {
     created_at,
     topic,
     kind,
-    stage_id,
-    stage_name,
+    stage,
     community,
     chain,
     read_only,
@@ -105,8 +103,7 @@ export const modelFromServer = (thread) => {
     snapshotProposal: snapshot_proposal,
     topic,
     kind,
-    stage_id,
-    stage_name,
+    stage,
     community,
     chain,
     readOnly: read_only,
@@ -221,7 +218,7 @@ class ThreadsController {
       this._store.add(result);
 
       // Update stage counts
-      if (result.stageName === OffchainThreadStage.Voting) this.numVotingThreads++;
+      if (result.stage?.name === OffchainThreadStage.Voting) this.numVotingThreads++;
 
       // New posts are added to both the topic and allProposals sub-store
       const storeOptions = { allProposals: true, exclusive: false };
@@ -258,7 +255,7 @@ class ThreadsController {
         'community': app.activeCommunityId(),
         'thread_id': proposal.id,
         'kind': proposal.kind,
-        'stage_id': proposal.stageId,
+        'stage_id': proposal.stage?.id,
         'body': encodeURIComponent(newBody),
         'title': newTitle,
         'url': url,
@@ -268,10 +265,10 @@ class ThreadsController {
       success: (response) => {
         const result = modelFromServer(response.result);
         // Update counters
-        if (proposal.stageName === OffchainThreadStage.Voting) {
+        if (proposal.stage?.name === OffchainThreadStage.Voting) {
           this.numVotingThreads--;
         }
-        if (result.stageName === OffchainThreadStage.Voting) {
+        if (result.stage?.name === OffchainThreadStage.Voting) {
           this.numVotingThreads++;
         }
         // Post edits propagate to all thread stores
@@ -357,7 +354,7 @@ class ThreadsController {
         if (args.stage?.name === OffchainThreadStage.Voting) {
           this.numVotingThreads--;
         }
-        if (result.stageName === OffchainThreadStage.Voting) {
+        if (result.stage?.name === OffchainThreadStage.Voting) {
           this.numVotingThreads++;
         }
         // Post edits propagate to all thread stores
@@ -529,6 +526,7 @@ class ThreadsController {
     if (response.status !== 'Success') {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);
     }
+    console.log(response.result);
     const { threads, comments } = response.result;
 
     for (const thread of threads) {

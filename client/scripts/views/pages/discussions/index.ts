@@ -428,7 +428,9 @@ const DiscussionsPage: m.Component<
     vnode.state.topicInitialized = {};
     vnode.state.topicInitialized[ALL_PROPOSALS_KEY] = false;
     const topic = vnode.attrs.topic;
-    const stageId: number = +m.route.param('stageId');
+    let stageId: number = m.route.param('stageId')
+      ? +m.route.param('stageId')
+      : null;
     const subpage = topic || stageId ? `${topic || ''}#${stageId || ''}` : ALL_PROPOSALS_KEY;
     const returningFromThread =
       app.lastNavigatedBack() &&
@@ -454,7 +456,9 @@ const DiscussionsPage: m.Component<
   },
   view: (vnode) => {
     let { topic } = vnode.attrs;
-    let stageId: number = +m.route.param('stageId');
+    let stageId: number = m.route.param('stageId')
+      ? +m.route.param('stageId')
+      : null;
     const activeEntity = app.community ? app.community : app.chain;
     const { summaryView, recentThreads } = vnode.state;
     if (summaryView && !recentThreads?.threads?.length) {
@@ -548,7 +552,7 @@ const DiscussionsPage: m.Component<
 
     let sortedListing = [];
     const allThreads = app.threads.listingStore
-      .getByCommunityTopicAndStage(app.activeId(), topic, stageId)
+      .getByCommunityTopicAndStage(app.activeId(), topic, stageId?.toString())
       .sort(orderDiscussionsbyLastComment);
 
     if (allThreads.length > 0) {

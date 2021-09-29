@@ -353,19 +353,19 @@ export const ProposalHeaderStage: m.Component<{ proposal: OffchainThread }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     if (!proposal) return;
-    if (proposal.stageName === OffchainThreadStage.Discussion) return;
+    if (proposal.stage?.name === OffchainThreadStage.Discussion) return;
 
     return m('a.ProposalHeaderStage', {
-      href: `/${proposal.chain || proposal.community}?stage=${proposal.stageId}`,
+      href: `/${proposal.chain || proposal.community}?stage=${proposal.stage?.id}`,
       onclick: (e) => {
         e.preventDefault();
-        navigateToSubpage(`?stage=${proposal.stageId}`);
+        navigateToSubpage(`?stage=${proposal.stage?.id}`);
       },
-      class: proposal.stageName === OffchainThreadStage.ProposalInReview ? 'positive'
-        : proposal.stageName === OffchainThreadStage.Voting ? 'positive'
-          : proposal.stageName === OffchainThreadStage.Passed ? 'positive'
-            : proposal.stageName === OffchainThreadStage.Failed ? 'negative' : 'positive',
-    }, offchainThreadStageToLabel(proposal.stageName));
+      class: proposal.stage?.name === OffchainThreadStage.ProposalInReview ? 'positive'
+        : proposal.stage?.name === OffchainThreadStage.Voting ? 'positive'
+          : proposal.stage?.name === OffchainThreadStage.Passed ? 'positive'
+            : proposal.stage?.name === OffchainThreadStage.Failed ? 'negative' : 'positive',
+    }, offchainThreadStageToLabel(proposal.stage?.name));
   }
 };
 

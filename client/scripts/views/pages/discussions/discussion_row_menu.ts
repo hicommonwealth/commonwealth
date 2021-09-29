@@ -184,8 +184,7 @@ const DiscussionRowMenu: m.Component<{ proposal: OffchainThread }, {
         thread: vnode.attrs.proposal,
         popoverMenu: true,
         onChangeHandler: (stage: OffchainStage) => {
-          proposal.stageName = stage.name;
-          proposal.stageId = stage.id;
+          proposal.stage = stage;
           m.redraw();
         },
             openStateHandler: (v) => {

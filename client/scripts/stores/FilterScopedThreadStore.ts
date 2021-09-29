@@ -35,11 +35,11 @@ class FilterScopedThreadStore extends IdStore<OffchainThread> {
       }
     }
 
-    if (thread.topic && thread.stageName) {
-      addThread(`${thread.topic?.name}#${thread.stageName}`);
+    if (thread.topic && thread.stage?.name) {
+      addThread(`${thread.topic?.name}#${thread.stage?.name}`);
     }
     if (thread.topic) addThread(`${thread.topic?.name}#`);
-    if (thread.stageName) addThread(`#${thread.stageName}`);
+    if (thread.stage?.name) addThread(`#${thread.stage?.name}`);
     return this;
   }
 
@@ -62,11 +62,11 @@ class FilterScopedThreadStore extends IdStore<OffchainThread> {
       communityStore[subpage].push(thread);
     };
 
-    if (thread.topic && thread.stageName) {
-      updateThread(`${thread.topic?.name}#${thread.stageName}`);
+    if (thread.topic && thread.stage?.name) {
+      updateThread(`${thread.topic?.name}#${thread.stage?.name}`);
     }
     if (thread.topic) updateThread(`${thread.topic?.name}#`);
-    if (thread.stageName) updateThread(`#${thread.stageName}`);
+    if (thread.stage?.name) updateThread(`#${thread.stage?.name}`);
     updateThread(ALL_PROPOSALS_KEY);
 
     return this;
@@ -86,11 +86,11 @@ class FilterScopedThreadStore extends IdStore<OffchainThread> {
       topicStore.splice(proposalIndex, 1);
     };
 
-    if (thread.topic && thread.stageName) {
-      removeThread(`${thread.topic?.name}#${thread.stageName}`);
+    if (thread.topic && thread.stage?.name) {
+      removeThread(`${thread.topic?.name}#${thread.stage?.name}`);
     }
     if (thread.topic) removeThread(`${thread.topic?.name}#`);
-    if (thread.stageName) removeThread(`#${thread.stageName}`);
+    if (thread.stage?.name) removeThread(`#${thread.stage?.name}`);
     removeThread(ALL_PROPOSALS_KEY);
 
     return this;
@@ -140,9 +140,8 @@ class FilterScopedThreadStore extends IdStore<OffchainThread> {
       // TODO: also delete topic#stage for all stages
       if (communityStore[ALL_PROPOSALS_KEY]) {
         communityStore[ALL_PROPOSALS_KEY].forEach((thread) => {
-          if (thread.stageName === stageName) {
-            thread.stageName = null;
-            thread.stageId = null;
+          if (thread.stage?.name === stageName) {
+            thread.stage = null;
             this.update(thread);
           }
         });

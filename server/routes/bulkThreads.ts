@@ -131,7 +131,7 @@ const bulkThreads = async (models: DB, req: Request, res: Response, next: NextFu
         kind: t.kind,
         stage: {
           id: t.stage_id,
-          name: t.stage_name
+          name: t.stage_name,
         },
         read_only: t.read_only,
         pinned: t.pinned,

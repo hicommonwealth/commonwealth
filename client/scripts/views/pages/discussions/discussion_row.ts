@@ -90,19 +90,19 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
         compact: true,
       }),
       proposal instanceof OffchainThread
-        && proposal.stageName !== OffchainThreadStage.Discussion
+        && proposal.stage?.name !== OffchainThreadStage.Discussion
         && m(Button, {
           class: 'discussion-row-stage-btn',
-          intent: proposal.stageName === OffchainThreadStage.ProposalInReview ? 'positive'
-            : proposal.stageName === OffchainThreadStage.Voting ? 'positive'
-              : proposal.stageName === OffchainThreadStage.Passed ? 'positive'
-                : proposal.stageName === OffchainThreadStage.Failed ? 'negative' : 'positive',
+          intent: proposal.stage?.name === OffchainThreadStage.ProposalInReview ? 'positive'
+            : proposal.stage?.name === OffchainThreadStage.Voting ? 'positive'
+              : proposal.stage?.name === OffchainThreadStage.Passed ? 'positive'
+                : proposal.stage?.name === OffchainThreadStage.Failed ? 'negative' : 'positive',
           size: 'xs',
           compact: true,
-          label: offchainThreadStageToLabel(proposal.stageName),
+          label: offchainThreadStageToLabel(proposal.stage?.name),
         }),
       proposal instanceof OffchainThread && (
-        proposal.stageName !== OffchainThreadStage.Discussion
+        proposal.stage?.name !== OffchainThreadStage.Discussion
           || proposal.chainEntities?.length > 0
           || (proposal.offchainVotingEndsAt || proposal.offchainVotingNumVotes)
           || proposal.readOnly) && ' ', // en space
