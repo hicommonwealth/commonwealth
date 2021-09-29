@@ -354,7 +354,7 @@ setTimeout(async () => {
         it('Should start the chain-events consumer', (done) => {
           const consumer = spawn('ts-node',
             [`${__dirname}../../../server/scripts/chainEventsConsumer`],
-            { env: { ...process.env, HANDLE_IDENTITY:'publish', USE_NEW_IDENTITY_CACHE:'true' } });
+            { env: { ...process.env, HANDLE_IDENTITY:'publish', USE_NEW_CE_SYSTEM:'true' } });
 
           childExit([consumer]);
 
