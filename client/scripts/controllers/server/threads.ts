@@ -513,7 +513,6 @@ class ThreadsController {
     topicId?: number;
     stageId?: number;
   }) : Promise<boolean> {
-    console.log({ options });
     const { chainId, communityId, cutoffDate, topicId, stageId } = options;
     const params = {
       chain: chainId,
@@ -526,7 +525,6 @@ class ThreadsController {
     if (response.status !== 'Success') {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);
     }
-    console.log(response.result);
     const { threads, comments } = response.result;
 
     for (const thread of threads) {
