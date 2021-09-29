@@ -27,7 +27,6 @@ class OffchainThread implements IUniqueId {
   public readonly plaintext: string;
   public readonly pinned: boolean;
   public readonly kind: OffchainThreadKind;
-  public stage: OffchainStage;
   public readonly attachments: OffchainAttachment[];
   public readonly readOnly: boolean;
 
@@ -43,6 +42,8 @@ class OffchainThread implements IUniqueId {
   public readonly community: string;
   public readonly chain: string;
   public readonly lastEdited: moment.Moment;
+  public stageName: string;
+  public stageId: number;
   public snapshotProposal: string;
 
   public get uniqueIdentifier() {
@@ -106,7 +107,8 @@ class OffchainThread implements IUniqueId {
     createdAt,
     topic,
     kind,
-    stage,
+    stage_id,
+    stage_name,
     versionHistory,
     community,
     chain,
@@ -133,7 +135,8 @@ class OffchainThread implements IUniqueId {
     createdAt: moment.Moment,
     topic: OffchainTopic,
     kind: OffchainThreadKind,
-    stage: OffchainStage,
+    stage_name: string,
+    stage_id: Number,
     versionHistory: VersionHistory[],
     community: string,
     chain: string,
@@ -162,7 +165,8 @@ class OffchainThread implements IUniqueId {
     this.createdAt = createdAt;
     this.topic = topic;
     this.kind = kind;
-    this.stage = stage;
+    this.stageName = stage_name;
+    this.stageId = +stage_id;
     this.authorChain = authorChain;
     this.pinned = pinned;
     this.url = url;
@@ -171,19 +175,23 @@ class OffchainThread implements IUniqueId {
     this.chain = chain;
     this.readOnly = readOnly;
     this.collaborators = collaborators || [];
-    this.chainEntities = chainEntities ? chainEntities.map((ce) => {
-      return {
-        id: +ce.id,
-        type: ce.type,
-        typeId: ce.type_id,
-        completed: ce.completed,
-      };
-    }) : [];
+    this.chainEntities = chainEntities
+      ? chainEntities.map((ce) => {
+          return {
+            id: +ce.id,
+            type: ce.type,
+            typeId: ce.type_id,
+            completed: ce.completed,
+          };
+        })
+      : [];
     try {
       this.offchainVotingOptions = JSON.parse(offchainVotingOptions);
     } catch (e) {}
     this.snapshotProposal = snapshotProposal;
-    this.offchainVotingEndsAt = offchainVotingEndsAt ? moment(offchainVotingEndsAt) : null;
+    this.offchainVotingEndsAt = offchainVotingEndsAt
+      ? moment(offchainVotingEndsAt)
+      : null;
     this.offchainVotingNumVotes = offchainVotingNumVotes;
     this.offchainVotes = offchainVotes || [];
     this.lastEdited = lastEdited;

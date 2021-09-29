@@ -39,7 +39,8 @@ export const modelFromServer = (thread) => {
     created_at,
     topic,
     kind,
-    stage,
+    stage_id,
+    stage_name,
     community,
     chain,
     read_only,
@@ -51,11 +52,13 @@ export const modelFromServer = (thread) => {
     offchain_voting_options,
     offchain_voting_ends_at,
     offchain_voting_votes,
-    reactions
+    reactions,
   } = thread;
 
   const attachments = OffchainAttachments
-    ? OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
+    ? OffchainAttachments.map(
+        (a) => new OffchainAttachment(a.url, a.description)
+      )
     : [];
 
   if (reactions) {
@@ -71,9 +74,12 @@ export const modelFromServer = (thread) => {
       let history;
       try {
         history = JSON.parse(v);
-        history.author = typeof history.author === 'string'
-          ? JSON.parse(history.author)
-          : typeof history.author === 'object' ? history.author : null;
+        history.author =
+          typeof history.author === 'string'
+            ? JSON.parse(history.author)
+            : typeof history.author === 'object'
+            ? history.author
+            : null;
         history.timestamp = moment(history.timestamp);
       } catch (e) {
         console.log(e);
@@ -85,8 +91,8 @@ export const modelFromServer = (thread) => {
   const lastEditedProcessed = last_edited
     ? moment(last_edited)
     : versionHistoryProcessed && versionHistoryProcessed?.length > 1
-      ? versionHistoryProcessed[0].timestamp
-      : null;
+    ? versionHistoryProcessed[0].timestamp
+    : null;
 
   return new OffchainThread({
     id,
@@ -99,7 +105,8 @@ export const modelFromServer = (thread) => {
     snapshotProposal: snapshot_proposal,
     topic,
     kind,
-    stage,
+    stage_id,
+    stage_name,
     community,
     chain,
     readOnly: read_only,
@@ -214,7 +221,7 @@ class ThreadsController {
       this._store.add(result);
 
       // Update stage counts
-      if (result.stage?.name === OffchainThreadStage.Voting) this.numVotingThreads++;
+      if (result.stageName === OffchainThreadStage.Voting) this.numVotingThreads++;
 
       // New posts are added to both the topic and allProposals sub-store
       const storeOptions = { allProposals: true, exclusive: false };
@@ -251,7 +258,7 @@ class ThreadsController {
         'community': app.activeCommunityId(),
         'thread_id': proposal.id,
         'kind': proposal.kind,
-        'stage_id': proposal.stage?.id,
+        'stage_id': proposal.stageId,
         'body': encodeURIComponent(newBody),
         'title': newTitle,
         'url': url,
@@ -261,8 +268,12 @@ class ThreadsController {
       success: (response) => {
         const result = modelFromServer(response.result);
         // Update counters
-        if (proposal.stage?.name === OffchainThreadStage.Voting) this.numVotingThreads--;
-        if (result.stage?.name === OffchainThreadStage.Voting) this.numVotingThreads++;
+        if (proposal.stageName === OffchainThreadStage.Voting) {
+          this.numVotingThreads--;
+        }
+        if (result.stageName === OffchainThreadStage.Voting) {
+          this.numVotingThreads++;
+        }
         // Post edits propagate to all thread stores
         this._store.update(result);
         this._listingStore.update(result);
@@ -343,8 +354,12 @@ class ThreadsController {
       success: (response) => {
         const result = modelFromServer(response.result);
         // Update counters
-        if (args.stage?.name === OffchainThreadStage.Voting) this.numVotingThreads--;
-        if (result.stage?.name === OffchainThreadStage.Voting) this.numVotingThreads++;
+        if (args.stage?.name === OffchainThreadStage.Voting) {
+          this.numVotingThreads--;
+        }
+        if (result.stageName === OffchainThreadStage.Voting) {
+          this.numVotingThreads++;
+        }
         // Post edits propagate to all thread stores
         this._store.update(result);
         this._listingStore.update(result);

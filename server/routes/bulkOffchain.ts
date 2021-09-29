@@ -156,10 +156,8 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
             body: t.body,
             last_edited,
             kind: t.kind,
-            stage: {
-              id: t.stage_id,
-              name: t.stage_name,
-            },
+            stage_d: t.stage_id,
+            stage_name: t.stage_name,
             read_only: t.read_only,
             pinned: t.pinned,
             community: t.thread_community,

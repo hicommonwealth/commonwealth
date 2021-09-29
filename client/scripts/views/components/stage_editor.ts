@@ -174,7 +174,7 @@ const StageEditor: m.Component<{
 }> = {
   oninit: (vnode) => {
     vnode.state.isOpen = !!vnode.attrs.popoverMenu;
-    vnode.state.stageId = vnode.attrs.thread.stage.id;
+    vnode.state.stageId = vnode.attrs.thread.stageId;
 
     vnode.state.chainEntitiesToSet = [];
     vnode.state.snapshotProposalsToSet = [];

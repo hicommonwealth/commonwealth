@@ -209,10 +209,7 @@ const DiscussionFilterBar: m.Component<{ topic: string; stageId: number, parentS
           content: m('.discussions-topic-items', [
             m(MenuItem, {
               active: m.route.get() === `/${app.activeId()}` || !topic,
-              iconLeft:
-                m.route.get() === `/${app.activeId()}` || !topic
-                  ? Icons.CHECK
-                  : null,
+              iconLeft: m.route.get() === `/${app.activeId()}` || !topic ? Icons.CHECK : null,
               label: 'All Discussions',
               onclick: () => {
                 localStorage.setItem('discussion-summary-toggle', 'false');
@@ -246,7 +243,6 @@ const DiscussionFilterBar: m.Component<{ topic: string; stageId: number, parentS
                   return m(MenuItem, {
                     key: name,
                     active,
-                    // iconLeft: active ? Icons.CHECK : null,
                     onclick: (e) => {
                       e.preventDefault();
                       navigateToSubpage(`/discussions/${name}`);
@@ -484,6 +480,7 @@ const DiscussionsPage: m.Component<
     const subpage = topic || stageId ? `${topic || ''}#${stageId || ''}` : ALL_PROPOSALS_KEY;
     if (summaryView) {
       // overwrite any topic- or stage-scoping in URL
+      console.log('OVERWRITE');
       topic = null;
       stageId = null;
     }
@@ -563,6 +560,7 @@ const DiscussionsPage: m.Component<
     }
 
     const unpinnedThreads = allThreads.filter((t) => !t.pinned);
+    console.log(unpinnedThreads);
 
     const firstThread = unpinnedThreads[0];
     const lastThread = unpinnedThreads[unpinnedThreads.length - 1];
@@ -731,7 +729,18 @@ const DiscussionsPage: m.Component<
       vnode.state.postsDepleted[subpage] === true;
     const postsDepleted =
       allThreads.length > 0 && vnode.state.postsDepleted[subpage];
-
+    console.log({ stillFetching, isLoading, isEmpty, postsDepleted });
+    console.log({
+      loadingRecentThreads: vnode.state.loadingRecentThreads,
+      activeEntity,
+      serverLoaded: activeEntity.serverLoaded,
+      stillFetching,
+    })
+    console.log({
+      unpinnedThreads,
+      postsDepletedSubpage: vnode.state.postsDepleted[subpage],
+      postsDepletedAll: vnode.state.postsDepleted,
+    })
     const isAdmin =
       app.user.isSiteAdmin ||
       app.user.isAdminOfEntity({
