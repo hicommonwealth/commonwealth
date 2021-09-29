@@ -27,7 +27,7 @@ const SnapshotProposalStagesBar: m.Component<{
   onChangeFilter: (value: SnapshotProposalFilter) => void
 }, {}> = {
   view: (vnode) => {
-    return m('.DiscussionFilterBar', [
+    return m('.SnapshotProposalStagesBar', [
       Object.values(SnapshotProposalFilter)
         .map((option: SnapshotProposalFilter) => m(Button, {
           rounded: true,

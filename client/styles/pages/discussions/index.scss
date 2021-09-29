@@ -19,7 +19,8 @@
         }
     }
 
-    .DiscussionFilterBar {
+    .DiscussionFilterBar,
+    .SnapshotProposalStagesBar {
         > .cui-button {
             max-width: 200px;
             overflow: hidden;
