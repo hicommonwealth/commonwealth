@@ -178,7 +178,7 @@ const NewProposalForm = {
         app.threads.create(
           author.address,
           OffchainThreadKind.Forum,
-          OffchainThreadStage.Discussion,
+          null,
           app.activeChainId(),
           app.activeCommunityId(),
           vnode.state.form.title,

@@ -39,7 +39,7 @@ const createThread = async (
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));
 
-  const { topic_name, title, body, kind, stage, url, readOnly } = req.body;
+  const { topic_name, title, body, kind, stage_id, url, readOnly } = req.body;
   let { topic_id } = req.body;
 
   if (kind === 'forum') {
@@ -100,7 +100,7 @@ const createThread = async (
     plaintext,
     version_history,
     kind,
-    stage,
+    stage_id,
     url,
     read_only: readOnly,
   } : {
@@ -111,7 +111,7 @@ const createThread = async (
     plaintext,
     version_history,
     kind,
-    stage,
+    stage_id,
     url,
     read_only: readOnly || false,
   };

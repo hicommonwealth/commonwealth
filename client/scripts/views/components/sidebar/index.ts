@@ -9,7 +9,7 @@ import {
 import { selectNode, initChain, navigateToSubpage } from 'app';
 import app from 'state';
 import { ProposalType } from 'identifiers';
-import { link } from 'helpers';
+import { link, offchainThreadStageToLabel } from 'helpers';
 import { ChainBase, ChainNetwork, ChainInfo, CommunityInfo, NodeInfo } from 'models';
 
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
@@ -149,7 +149,7 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
           fluid: true,
           rounded: true,
           active: onFeaturedStageDiscussionPage(m.route.get(), t.id),
-          label: t.name,
+          label: offchainThreadStageToLabel(t.name),
           class: 'sub-button',
           onclick: (e) => {
             e.preventDefault();

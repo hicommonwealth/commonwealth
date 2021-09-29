@@ -158,7 +158,7 @@ const newThread = async (
     result = await app.threads.create(
       author.address,
       kind,
-      stage?.name || OffchainThreadStage.Discussion,
+      stage.id,
       chainId,
       communityId,
       title,

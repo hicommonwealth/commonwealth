@@ -184,7 +184,7 @@ class ThreadsController {
   public async create(
     address: string,
     kind: string,
-    stage: string,
+    stage_id: number,
     chainId: string,
     communityId: string,
     title: string,
@@ -206,7 +206,7 @@ class ThreadsController {
         'title': encodeURIComponent(title),
         'body': encodeURIComponent(body),
         'kind': kind,
-        'stage': stage,
+        'stage_id': stage_id,
         'attachments[]': attachments,
         'topic_name': topicName,
         'topic_id': topicId,
@@ -230,8 +230,10 @@ class ThreadsController {
       return result;
     } catch (err) {
       console.log('Failed to create thread');
-      throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error
-        : 'Failed to create thread');
+      throw new Error(
+        err.responseJSON && err.responseJSON.error
+          ? err.responseJSON.error
+          : 'Failed to create thread');
     }
   }
 
