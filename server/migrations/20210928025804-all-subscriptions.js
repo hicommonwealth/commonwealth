@@ -10,6 +10,7 @@ module.exports = {
           magicIssuer: false,
         }], { transaction: t }
       );
+      
       const chains = await queryInterface.sequelize.query(
         'SELECT id, network FROM "Chains";',
         { transaction: t },
@@ -32,8 +33,6 @@ module.exports = {
 
       const threads = await 
 
-      await models.OffchainComment.findOne({ where: { id: Number(p_id), } });
-
       /* 
         Find all chains, subscribe to all notification categories
         await queryInterface.sequelize.bu(
@@ -52,6 +51,8 @@ module.exports = {
       await queryInterface.bulkDelete('Users', [{
         email: 'notifications@commonwealth.im'
       }], { transaction: t });
+
+      /* remove subscriptions owned by user*/ 
     });
   }
 };
