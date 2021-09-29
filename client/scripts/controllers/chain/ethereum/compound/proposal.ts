@@ -18,14 +18,15 @@ import {
   ChainEvent,
 } from 'models';
 
+import Web3 from 'web3';
+import { formatNumberShort } from 'adapters/currency';
+import { capitalize } from 'lodash';
 import CompoundAPI from './api';
 import CompoundGovernance from './governance';
 import { attachSigner } from '../contractApi';
 import EthereumAccount from '../account';
 import EthereumAccounts from '../accounts';
 import CompoundChain from './chain';
-import Web3 from 'web3';
-import { formatNumberShort } from 'adapters/currency';
 
 export enum CompoundVote {
   YES = 1,
@@ -82,7 +83,7 @@ export default class CompoundProposal extends Proposal<
   private _Chain: CompoundChain;
   private _Gov: CompoundGovernance;
 
-  public get shortIdentifier() { return `CompoundProposal-${this.data.identifier}`; }
+  public get shortIdentifier() { return `${capitalize(this._Accounts?.app.activeChainId())}Proposal-${this.data.identifier}`; }
   public get title(): string {
     try {
       const parsed = JSON.parse(this.data.description);

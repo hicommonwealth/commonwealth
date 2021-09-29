@@ -50,6 +50,7 @@ import { SocialSharingCarat } from 'views/components/social_sharing_carat';
 
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
+import { SnapshotProposal } from 'helpers/snapshot_utils';
 import {
   ProposalHeaderExternalLink, ProposalHeaderBlockExplorerLink, ProposalHeaderVotingInterfaceLink,
   ProposalHeaderOffchainPoll,
@@ -78,7 +79,6 @@ import User from '../../components/widgets/user';
 import MarkdownFormattedText from '../../components/markdown_formatted_text';
 import { createTXModal } from '../../modals/tx_signing_modal';
 import { SubstrateAccount } from '../../../controllers/chain/substrate/account';
-import { SnapshotProposal } from 'client/scripts/helpers/snapshot_utils';
 
 const MAX_THREAD_LEVEL = 2;
 
@@ -259,7 +259,7 @@ const ProposalHeader: m.Component<{
                   (isAuthor || isAdmin) && (app.chain?.meta.chain.snapshot !== null)
                     && m(MenuItem, {
                       onclick: (e) => {
-                        m.route.set(`/${app.activeChainId()}/new/snapshot/${app.chain.meta.chain.snapshot}`
+                        navigateToSubpage(`/new/snapshot/${app.chain.meta.chain.snapshot}`
                         + `?fromProposalType=${proposal.slug}&fromProposalId=${proposal.id}`);
                       },
                       label: 'Snapshot proposal from thread',
@@ -876,11 +876,6 @@ const ViewProposalPage: m.Component<{
       }
     };
     window.addEventListener('beforeunload', windowListener);
-
-    // fetch completed cosmos proposal votes only when we load the page
-    // if (proposal instanceof CosmosProposal && proposal.completed) {
-    //   proposal.fetchVotes().then(() => m.redraw());
-    // }
 
     const comments = vnode.state.comments;
     const viewCount : number = vnode.state.viewCount;
