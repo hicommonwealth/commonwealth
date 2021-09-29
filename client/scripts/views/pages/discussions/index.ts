@@ -183,7 +183,6 @@ const DiscussionFilterBar: m.Component<{ topic: string; stageId: number, parentS
     const selectedTopic = topics.find((t) => topic && topic === t.name);
 
     const stages = app.stages.getByCommunity(app.activeId());
-
     const selectedStage = stages.find(
       (s) => s.id === stageId
     );
@@ -745,6 +744,11 @@ const DiscussionsPage: m.Component<
       community: app.activeCommunityId(),
     });
 
+    const stages = app.stages.getByCommunity(app.activeId());
+    const selectedStage = stages.find(
+      (s) => s.id === parseInt(stageId, 10)
+    );
+
     return m(
       Sublayout,
       {
@@ -779,7 +783,7 @@ const DiscussionsPage: m.Component<
                       ? m(LoadingRow)
                       : isEmpty
                       ? m(EmptyListingPlaceholder, {
-                          stageName: stage,
+                          stageName: selectedStage.name,
                           communityName,
                           topicName,
                         })

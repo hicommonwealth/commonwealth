@@ -212,9 +212,13 @@ const StageEditor: m.Component<{
           app.chain?.meta?.chain.snapshot && m(SnapshotProposalSelector, {
             thread: vnode.attrs.thread,
             onSelect: (result) => {
-              if (vnode.state.stage === OffchainThreadStage.Discussion
-                  || vnode.state.stage === OffchainThreadStage.ProposalInReview) {
-                vnode.state.stage = OffchainThreadStage.Voting;
+              const selectedStage = stages.find((s) => s.id === vnode.state.stageId);
+              if (selectedStage.name === OffchainThreadStage.Discussion
+                  || selectedStage.name === OffchainThreadStage.ProposalInReview) {
+                const votingStage = stages.find((s) => s.name === OffchainThreadStage.Voting);
+                if (votingStage?.id) {
+                  vnode.state.stageId = votingStage.id;
+                }
               }
             },
             snapshotProposalsToSet: vnode.state.snapshotProposalsToSet,
