@@ -428,7 +428,7 @@ const DiscussionsPage: m.Component<
     vnode.state.topicInitialized = {};
     vnode.state.topicInitialized[ALL_PROPOSALS_KEY] = false;
     const topic = vnode.attrs.topic;
-    const stageId = m.route.param('stageId');
+    const stageId: number = +m.route.param('stageId');
     const subpage = topic || stageId ? `${topic || ''}#${stageId || ''}` : ALL_PROPOSALS_KEY;
     const returningFromThread =
       app.lastNavigatedBack() &&
@@ -454,7 +454,7 @@ const DiscussionsPage: m.Component<
   },
   view: (vnode) => {
     let { topic } = vnode.attrs;
-    let stageId = m.route.param('stageId');
+    let stageId: number = +m.route.param('stageId');
     const activeEntity = app.community ? app.community : app.chain;
     const { summaryView, recentThreads } = vnode.state;
     if (summaryView && !recentThreads?.threads?.length) {
@@ -625,7 +625,7 @@ const DiscussionsPage: m.Component<
     if (newSubpage) {
       $(window).off('scroll');
 
-      let topicId;
+      let topicId: number;
       if (topic) {
         topicId = app.topics.getByName(topic, app.activeId())?.id;
         if (!topicId) {
@@ -663,6 +663,7 @@ const DiscussionsPage: m.Component<
 
       if (!vnode.state.topicInitialized[subpage]) {
         // Fetch first page of posts
+        console.log('loading next page of ' + subpage);
         app.threads.loadNextPage(options).then((morePostsRemaining) => {
           if (!morePostsRemaining) vnode.state.postsDepleted[subpage] = true;
           m.redraw();
@@ -755,7 +756,7 @@ const DiscussionsPage: m.Component<
 
     const stages = app.stages.getByCommunity(app.activeId());
     const selectedStage = stages.find(
-      (s) => s.id === parseInt(stageId, 10)
+      (s) => s.id === stageId
     );
 
     return m(
@@ -776,7 +777,7 @@ const DiscussionsPage: m.Component<
             !isEmpty &&
               m(DiscussionFilterBar, {
                 topic: topicName,
-                stageId: parseInt(stageId, 10),
+                stageId,
                 parentState: vnode.state,
                 disabled: isLoading || stillFetching,
               }),

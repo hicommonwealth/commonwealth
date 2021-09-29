@@ -510,12 +510,13 @@ class ThreadsController {
 
   // loadNextPage returns false if there are no more threads to load
   public async loadNextPage(options: {
-    chainId: string,
-    communityId: string,
-    cutoffDate: moment.Moment,
-    topicId?: OffchainTopic
-    stageId?: string,
+    chainId: string;
+    communityId: string;
+    cutoffDate: moment.Moment;
+    topicId?: number;
+    stageId?: number;
   }) : Promise<boolean> {
+    console.log({ options });
     const { chainId, communityId, cutoffDate, topicId, stageId } = options;
     const params = {
       chain: chainId,
