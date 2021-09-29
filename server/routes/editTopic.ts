@@ -13,18 +13,29 @@ export const Errors = {
   NotVerified: 'Must have a verified address to edit or feature topics',
   TopicNotFound: 'Topic not found',
   TopicRequired: 'Topic name required',
-  DefaultTemplateRequired: 'Default Template required'
+  DefaultTemplateRequired: 'Default Template required',
 };
 
-const editTopic = async (models: DB, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+const editTopic = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const [chain, community, error] = await lookupCommunityIsVisibleToUser(
+    models,
+    req.body,
+    req.user
+  );
   if (error) return next(new Error(error));
   if (!req.body.id) {
     return next(new Error(Errors.NoTopicId));
   }
   if (!req.body.name) return next(new Error(Errors.TopicRequired));
-  if (req.body.featured_in_new_post === 'true'
-    && (!req.body.default_offchain_template || !req.body.default_offchain_template.trim())) {
+  if (
+    req.body.featured_in_new_post === 'true' &&
+    !req.body.default_offchain_template?.trim()
+  ) {
     return next(new Error(Errors.DefaultTemplateRequired));
   }
 
@@ -62,7 +73,7 @@ const editTopic = async (models: DB, req: Request, res: Response, next: NextFunc
     featured_order,
     featured_in_sidebar,
     featured_in_new_post,
-    default_offchain_template
+    default_offchain_template,
   } = req.body;
   try {
     const topic = await models.OffchainTopic.findOne({ where: { id } });
@@ -70,21 +81,28 @@ const editTopic = async (models: DB, req: Request, res: Response, next: NextFunc
     if (name) topic.name = name;
     if (name || description) topic.description = description || '';
     if (name || telegram) topic.telegram = telegram || '';
-    topic.featured_in_sidebar = !!(featured_in_sidebar === 'true');
-    topic.featured_in_new_post = !!(featured_in_new_post === 'true');
+    topic.featured_in_sidebar = featured_in_sidebar === 'true';
+    topic.featured_in_new_post = featured_in_new_post === 'true';
     topic.default_offchain_template = default_offchain_template || '';
     await topic.save();
 
     if (featured_order) {
       const activeEntity = community
-        ? await models.OffchainCommunity.findOne({ where: { id: community.id } })
+        ? await models.OffchainCommunity.findOne({
+            where: { id: community.id },
+          })
         : await models.Chain.findOne({ where: { id: chain.id } });
       let { featured_topics } = activeEntity;
       if (featured_order === 'true' && !featured_topics.includes(`${id}`)) {
         featured_topics.push(`${id}`);
-      } else if (featured_order === 'false' && featured_topics.includes(`${id}`)) {
+      } else if (
+        featured_order === 'false' &&
+        featured_topics.includes(`${id}`)
+      ) {
         const idx = featured_topics.indexOf(`${id}`);
-        featured_topics = featured_topics.slice(0, idx).concat(featured_topics.slice(idx + 1));
+        featured_topics = featured_topics
+          .slice(0, idx)
+          .concat(featured_topics.slice(idx + 1));
       }
       activeEntity.featured_topics = featured_topics;
       await activeEntity.save();

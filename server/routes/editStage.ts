@@ -17,19 +17,20 @@ export const Errors = {
 };
 
 const editStage = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+  const { id, name, description, featured_in_sidebar, featured_in_new_post, default_offchain_template, address } = req.body;
   const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
-  if (!req.body.id) {
+  if (!id) {
     return next(new Error(Errors.NoStageId));
   }
-  if (!req.body.name) return next(new Error(Errors.StageRequired));
-  if (req.body.featured_in_new_post && (!req.body.default_offchain_template || !req.body.default_offchain_template.trim())) {
+  if (!name) return next(new Error(Errors.StageRequired));
+  if (featured_in_new_post === 'true' && !default_offchain_template?.trim()) {
     return next(new Error(Errors.DefaultTemplateRequired));
   }
 
   const adminAddress = await models.Address.findOne({
     where: {
-      address: req.body.address,
+      address,
       user_id: req.user.id,
     },
   });
@@ -53,14 +54,13 @@ const editStage = async (models: DB, req: Request, res: Response, next: NextFunc
     return next(new Error(Errors.NotAdmin));
   }
 
-  const { id, name, description, featured_in_sidebar, featured_in_new_post, default_offchain_template } = req.body;
   try {
     const stage = await models.OffchainStage.findOne({ where: { id } });
     if (!stage) return next(new Error(Errors.StageNotFound));
     if (name) stage.name = name;
     if (name || description) stage.description = description || '';
-    stage.featured_in_sidebar = featured_in_sidebar || false;
-    stage.featured_in_new_post = featured_in_new_post || false;
+    stage.featured_in_sidebar = featured_in_sidebar === 'true';
+    stage.featured_in_new_post = featured_in_new_post === 'true';
     stage.default_offchain_template = default_offchain_template || '';
     await stage.save();
 

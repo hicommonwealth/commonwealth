@@ -337,6 +337,7 @@ const DiscussionFilterBar: m.Component<{ topic: string; stageId: number, parentS
                     compact: true,
                     rounded: true,
                     onclick: (e) => {
+                      e.stopPropagation();
                       e.preventDefault();
                       app.modals.create({
                         modal: EditStageModal,

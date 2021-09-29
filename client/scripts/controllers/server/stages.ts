@@ -29,6 +29,7 @@ class StagesController {
   public addToStore(stage: OffchainStage) { return this._store.add(modelFromServer(stage)); }
 
   public async edit(stage: OffchainStage) {
+    console.log(stage);
     try {
       // TODO: Change to PUT /stage
       const response = await $.post(`${app.serverUrl()}/editStage`, {

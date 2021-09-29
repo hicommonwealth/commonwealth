@@ -62,7 +62,7 @@ const EditStageModal : m.Component<{
         chainId: app.activeChainId(),
         featuredInSidebar: form.featuredInSidebar,
         featuredInNewPost: form.featuredInNewPost,
-        defaultOffchainTemplate: bodyText
+        defaultOffchainTemplate: bodyText,
       };
       await app.stages.edit(stageInfo);
       // navigateToSubpage(`/discussions/${encodeURI(form.name.toString().trim())}`);
