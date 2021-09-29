@@ -116,7 +116,9 @@ const User: m.Component<{
         size: 'xs',
       }),
     ];
-
+    const ghostAddress = app.user.addresses.some(({ address, ghostAddress }) => {
+      if (this !== undefined) account.address === address && ghostAddress
+    })
     const userFinal = avatarOnly
       ? m('.User.avatar-only', {
         key: profile?.address || '-',
@@ -164,7 +166,12 @@ const User: m.Component<{
                   m('.id-short', formatAddressShort(profile.address, profile.chain)),
                 ],
                 getRoleTags(false),
-              ])
+              ]),
+              ghostAddress && m('img', {
+                src: '/static/img/ghost.svg',
+                width: '20px',
+                style: 'display: inline-block',
+              }),
           ],
       ]);
 

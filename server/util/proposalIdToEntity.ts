@@ -28,7 +28,7 @@ export default async function (models, chain: string, identifier: string) {
     case 'compoundproposal': {
       return findEntity(CompoundTypes.EntityKind.Proposal.toString());
     }
-    case 'aaveproposal': {
+    case 'onchainproposal': {
       return findEntity(AaveTypes.EntityKind.Proposal.toString());
     }
     // TODO: cosmosproposal

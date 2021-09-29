@@ -5,18 +5,15 @@ import { Button, Icon, Icons } from 'construct-ui';
 import app from 'state';
 import NewProposalButton from 'views/components/new_proposal_button';
 
-export const EmptyStagePlaceholder: m.Component<{}> = {
+const EmptyListingPlaceholder: m.Component<{ stageName?: string, topicName?: string, communityName?: string }> = {
   view: (vnode) => {
-    return m('.EmptyStagePlaceholder', [
-      'There are no threads matching your filter.'
-    ]);
-  }
-};
-
-const EmptyTopicPlaceholder: m.Component<{ topicName?: string, communityName?: string }> = {
-  view: (vnode) => {
-    const { topicName, communityName } = vnode.attrs;
-    return m('.EmptyTopicPlaceholder', [
+    const { stageName, topicName, communityName } = vnode.attrs;
+    if (stageName) {
+      return m('.EmptyStagePlaceholder', [
+        'There are no threads matching your filter.'
+      ]);
+    }
+    return m('.EmptyListingPlaceholder', [
       m('.icon-circle', [
         m(Icon, { name: Icons.HASH, size: 'xl' }),
       ]),
@@ -33,4 +30,4 @@ const EmptyTopicPlaceholder: m.Component<{ topicName?: string, communityName?: s
   }
 };
 
-export default EmptyTopicPlaceholder;
+export default EmptyListingPlaceholder;

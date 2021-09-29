@@ -45,7 +45,7 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
   public get stakedBalance(): Promise<SubstrateCoin> {
     if (!this._Chain?.apiInitialized) return;
     return this.stakingExposure.then(
-      (exposure) => this._Chain.coins(exposure ? exposure.total : NaN)
+      (exposure) => this._Chain.coins(exposure ? exposure.total.toBn() : NaN)
     );
   }
 

@@ -8,12 +8,14 @@ import { ITXModalData } from './interfaces';
 import { ChainBase } from './types';
 import ChainInfo from './ChainInfo';
 import Profile from './Profile';
+import {AddressInfo} from "models/index";
 
 abstract class Account<C extends Coin> {
   public readonly serverUrl : string;
   public readonly address: string;
   public readonly chain: ChainInfo;
   public readonly chainBase: ChainBase;
+  public readonly ghost_address: ChainBase;
   public get freeBalance() { return this.balance; }
   public abstract balance: Promise<C>;
   public abstract sendBalanceTx(recipient: Account<C>, amount: C): Promise<ITXModalData> | ITXModalData;
@@ -109,7 +111,21 @@ abstract class Account<C extends Coin> {
       };
       const result = await $.post(`${this.app.serverUrl()}/verifyAddress`, params);
       if (result.status === 'Success') {
-        console.log(`Verified address ${this.address}!`);
+        // update ghost address for discourse users
+        const hasGhostAddress = app.user.addresses.some(({ address, ghostAddress, chain }) => (
+            ghostAddress && this.chain.id === chain &&
+            app.user.activeAccounts.some((account) => account.address === address)
+        ))
+        if (hasGhostAddress) {
+          const { success, ghostAddressId } = await $.post(`${this.app.serverUrl()}/updateAddress`, params);
+          if (success && ghostAddressId) {
+            // remove ghost address from addresses
+            app.user.setAddresses(app.user.addresses.filter(({ ghostAddress }) => {
+              return !ghostAddress
+            }));
+            app.user.setActiveAccounts([]);
+          }
+        }
       }
     } else {
       throw new Error('signature or key required for validation');

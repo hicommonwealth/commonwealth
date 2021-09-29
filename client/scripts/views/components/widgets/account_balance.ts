@@ -7,7 +7,7 @@ import { Coin, formatCoin } from 'adapters/currency';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import { Account } from 'models';
 
-import { CosmosAccount } from 'controllers/chain/cosmos/account';
+import CosmosAccount from 'controllers/chain/cosmos/account';
 import { NearAccount } from 'controllers/chain/near/account';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import MolochMember from 'controllers/chain/ethereum/moloch/member';
