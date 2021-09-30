@@ -1243,15 +1243,6 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@commonwealth/ce-rabbitmq-plugin@0.0.5":
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/@commonwealth/ce-rabbitmq-plugin/-/ce-rabbitmq-plugin-0.0.5.tgz#e3bdf26cd39473d725f5d0251827a2725dfc84dd"
-  integrity sha512-KzyIkBDsGBF4oAC9Xo82Uf4PF+Ya9uDM1itAKZiinR8NsM936nalaHaebSVwXmFJ4+dRS8mmk6XDutm01yhwQw==
-  dependencies:
-    "@commonwealth/chain-events" "0.8.5"
-    amqplib "^0.8.0"
-    rascal "^13.1.0"
-
 "@commonwealth/chain-events@0.8.5":
   version "0.8.5"
   resolved "https://registry.yarnpkg.com/@commonwealth/chain-events/-/chain-events-0.8.5.tgz#6d1acd40722cc147feca505543048cc3eee12ec8"
