@@ -1,7 +1,6 @@
 import 'pages/profile.scss';
 
 import m from 'mithril';
-import moment from 'moment';
 import _ from 'lodash';
 import mixpanel from 'mixpanel-browser';
 import $ from 'jquery';
@@ -9,7 +8,7 @@ import { checkAddressChecksum, toChecksumAddress } from 'web3-utils';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
-import { OffchainThread, OffchainComment, OffchainAttachment, Profile, ChainBase } from 'models';
+import { OffchainThread, OffchainComment, Profile, ChainBase } from 'models';
 
 import Sublayout from 'views/sublayout';
 import PageNotFound from 'views/pages/404';
@@ -17,7 +16,7 @@ import PageLoading from 'views/pages/loading';
 import Tabs from 'views/components/widgets/tabs';
 
 import { decodeAddress, checkAddress, encodeAddress } from '@polkadot/util-crypto';
-import { Bech32 } from '@cosmjs/encoding';
+import { bech32 } from 'bech32';
 import { setActiveAccount } from 'controllers/app/login';
 import { modelFromServer  as modelThreadFromServer } from 'controllers/server/threads';
 import { modelFromServer  as modelCommentFromServer } from 'controllers/server/comments';
@@ -97,7 +96,7 @@ interface IProfilePageState {
 const checkCosmosAddress = (address: string): boolean => {
   try {
     // 50 character max string length to throw on pubkey
-    const { prefix, data } = Bech32.decode(address, 50);
+    const { prefix, words } = bech32.decode(address, 50);
     // TODO: should we verify prefix as well?
     return true;
   } catch (e) {

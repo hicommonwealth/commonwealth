@@ -6,6 +6,7 @@ import { Input, Form, FormLabel, FormGroup, Button, Callout, Spinner, RadioGroup
 
 import moment from 'moment';
 import app from 'state';
+import { navigateToSubpage } from 'app';
 
 import { Account, ChainBase } from 'models';
 import { notifyError } from 'controllers/app/notifications';
@@ -117,7 +118,7 @@ const newThread = async (
     } else if (result.status === 'Success') {
       await app.user.notifications.refresh();
       await app.snapshot.refreshProposals();
-      m.route.set(`/${app.activeId()}/snapshot/${snapshotId}/${result.message.ipfsHash}`);
+      navigateToSubpage(`/snapshot/${snapshotId}/${result.message.ipfsHash}`);
     }
   } catch (err) {
     notifyError(err.message);
