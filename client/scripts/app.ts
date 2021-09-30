@@ -568,6 +568,7 @@ Promise.all([
     '/terms':                    importRoute('views/pages/landing/terms', { scoped: false }),
     '/privacy':                  importRoute('views/pages/landing/privacy', { scoped: false }),
     '/components':               importRoute('views/pages/components', { scoped: false, hideSidebar: true }),
+    '/finishMagicLogin':         importRoute('views/pages/finishMagicLogin', { scoped: false }),
     ...(isCustomDomain ? {
       //
       // Custom domain routes
@@ -607,7 +608,6 @@ Promise.all([
       '/validators':             importRoute('views/pages/validators', { scoped: true }),
       // Settings
       '/login':                  importRoute('views/pages/login', { scoped: true, deferChain: true }),
-      '/finishMagicLogin':       importRoute('views/pages/finishMagicLogin', { scoped: false }),
       '/web3login':              importRoute('views/pages/web3login', { scoped: true }),
       // Admin
       '/admin':                  importRoute('views/pages/admin', { scoped: true }),
