@@ -293,12 +293,6 @@ export const ProposalHeaderThreadLinkedSnapshot: m.Component<{
       })
     }
 
-    if (vnode.state.snapshotProposalsLoaded && !vnode.state.snapshotProposalLinked) {
-      vnode.state.snapshotProposalLinked = true;
-      vnode.state.snapshot = app.snapshot.proposals.find((sn) => sn.id === proposal.snapshotProposal);
-      m.redraw();
-    }
-
     const proposalLink = `${app.isCustomDomain() ? '' : `/${proposal.chain}`
       }/snapshot/${(app.chain?.meta.chain.snapshot)}/${proposal.snapshotProposal}`;
 
