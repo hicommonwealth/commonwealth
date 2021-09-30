@@ -1,164 +1,197 @@
-import 'pages/view_proposal/index.scss';
-import 'components/proposals/voting_results.scss';
-import 'components/proposals/voting_actions.scss';
+import 'pages/snapshot/view_proposal.scss';
+import 'pages/snapshot/list_proposal.scss';
 
 import m from 'mithril';
-import mixpanel from 'mixpanel-browser';
-import { Spinner, Button } from 'construct-ui';
+import {
+  Spinner,
+  Button,
+  Tabs,
+  TabItem,
+  Icon,
+  Icons,
+  RadioGroup,
+} from 'construct-ui';
 import moment from 'moment';
-
 import app from 'state';
 import Sublayout from 'views/sublayout';
 import { AddressInfo } from 'models';
 import ConfirmSnapshotVoteModal from 'views/modals/confirm_snapshot_vote_modal';
-import { SnapshotSpace, SnapshotProposal, SnapshotProposalVote, getResults } from 'helpers/snapshot_utils';
-
-import { notifyError } from 'controllers/app/notifications';
-import { ProposalHeaderTitle } from './header';
 import {
-  ProposalBodyAuthor, ProposalBodyCreated,
-  ProposalBodyEnded, ProposalBodyText,
-} from './body';
-import { ProposalHeaderExternalSnapshotLink, ProposalHeaderSnapshotThreadLink } from '../view_proposal/header';
+  SnapshotSpace,
+  SnapshotProposal,
+  SnapshotProposalVote,
+  getResults,
+} from 'helpers/snapshot_utils';
+import { notifyError } from 'controllers/app/notifications';
+import { formatPercent, formatNumberLong, formatTimestamp } from 'helpers';
+
+import { ProposalHeaderSnapshotThreadLink } from '../view_proposal/header';
 import User from '../../components/widgets/user';
-import { SocialSharingCarat } from '../../components/social_sharing_carat';
-import { formatPercent, formatNumberLong } from 'helpers';
+import MarkdownFormattedText from '../../components/markdown_formatted_text';
 
-const ProposalHeader: m.Component<{
-  snapshotId: string
-  proposal: SnapshotProposal
-}, {
-  loaded: boolean, 
-  thread: string,
-}> = {
+const ProposalContent: m.Component<
+  {
+    proposal: SnapshotProposal;
+    votes: SnapshotProposalVote[];
+    symbol: string;
+  },
+  {
+    votersListExpanded: boolean;
+  }
+> = {
+  oncreate: (vnode) => {
+    vnode.state.votersListExpanded = false;
+  },
   view: (vnode) => {
-    const { proposal, snapshotId } = vnode.attrs;
-    if (!proposal) return;
+    const { proposal, votes, symbol } = vnode.attrs;
 
-    // Original posters have full editorial control, while added collaborators
-    // merely have access to the body and title
+    const votersList = vnode.state.votersListExpanded
+      ? votes
+      : votes.slice(0, 10);
 
-    const proposalLink = `/${app.activeId()}/snapshot/${snapshotId}/${proposal.ipfs}`;
-
-    if (!vnode.state.loaded) {
-      try {
-        vnode.state.loaded = true;
-        app.threads.fetchThreadIdForSnapshot({snapshot: proposal.id}).then((res) => { 
-          vnode.state.thread = res;
-        })
-        m.redraw();
-      } catch (err) {
-        console.log(err);
-      }
-    }
-
-    return m('.ProposalHeader', {
-      class: 'proposal-snapshot'
-    }, [
-      m('.snapshot-proposal-top', [
-        m('.proposal-top-left', [
-          m('.proposal-title', [
-            m(ProposalHeaderTitle, { proposal })
+    return [
+      m('.proposal-title', proposal.title),
+      m('.proposal-hash.truncate', `#${proposal.ipfs}`),
+      m('.snapshot-proposals-list', [
+        m('.other-details', [
+          m('', [
+            m('.submitted-by', 'submitted by'),
+            m(
+              '.author-address',
+              m(User, {
+                user: new AddressInfo(
+                  null,
+                  proposal.author,
+                  app.activeId(),
+                  null
+                ),
+                linkify: true,
+                popover: true,
+              })
+            ),
           ]),
-          m('.proposal-body-meta', [
-            m(ProposalBodyCreated, { item: proposal, link: proposalLink }),
-            m(ProposalBodyEnded, { item: proposal }),
-            m(ProposalBodyAuthor, { item: proposal }),
-            m('.CommentSocialHeader', [ m(SocialSharingCarat) ]),
-          ]),
-          m('.proposal-body-link', [
-            (vnode.state.thread !== 'false') && vnode.state.loaded && m(ProposalHeaderSnapshotThreadLink, { threadId: vnode.state.thread }),
-            vnode.state.loaded && m(ProposalHeaderExternalSnapshotLink, { proposal: proposal, spaceId: snapshotId }),
-          ]),
-          m('br')
+          moment() < moment(+proposal.end * 1000)
+            ? [
+                m('.active-proposal', [
+                  m(
+                    '',
+                    `Ends in ${formatTimestamp(moment(+proposal.end * 1000))}`
+                  ),
+                  m('.active-text', 'Active'),
+                ]),
+              ]
+            : [m('.closed-proposal', 'Closed')],
         ]),
       ]),
-      m('.proposal-content', [
-        m('.proposal-content-left', [
-          m(ProposalBodyText, { item: proposal })
+      m('.ProposalBodyText mt-32', [
+        m(MarkdownFormattedText, { doc: proposal.body }),
+      ]),
+      votes.length > 0 && [
+        m('.votes-title', [
+          m('.title', 'Votes'),
+          m('.vote-count', votes.length),
         ]),
-      ]),
-    ]);
-  }
+        m('.votes-container', [
+          m('.t-head', [
+            m('.user-column', 'User'),
+            m('.vote-column', 'Vote'),
+            m('.power-column', 'Power'),
+          ]),
+          votersList.map((vote) =>
+            m('.vote-row', [
+              m(
+                '.user-column',
+                m(User, {
+                  user: new AddressInfo(null, vote.voter, app.activeId(), null),
+                  linkify: true,
+                  popover: true,
+                })
+              ),
+              m('.vote-column', proposal.choices[vote.choice - 1]),
+              m('.power-column', `${formatNumberLong(vote.power)} ${symbol}`),
+            ])
+          ),
+          m(
+            'button',
+            {
+              class: 'view-more-button',
+              onclick: () => {
+                vnode.state.votersListExpanded = true;
+                m.redraw();
+              },
+            },
+            'VIEW MORE'
+          ),
+        ]),
+      ],
+    ];
+  },
 };
 
-const VoteRow: m.Component<{
-  vote: SnapshotProposalVote
-  symbol: string
-}> = {
-  view: (vnode) => {
-    const { vote, symbol } = vnode.attrs;
-    return m('.VoteRow', [
-      m('.row-left', [
-        m(User, {
-          // TODO: activeID becomes chain_base, fix
-          user: new AddressInfo(null, vnode.attrs.vote.voter, app.activeId(), null),
-          linkify: true,
-          popover: true
-        }),
-      ]),
-      m('.row-right', `${formatNumberLong(vote.power)} ${symbol}`)
-    ]);
+const VotingResults: m.Component<
+  {
+    votes: SnapshotProposalVote[];
+    choices: string[];
+    totals: any;
+    symbol: string;
+  },
+  {
+    voteCounts: number[];
+    voteListings: any[];
   }
-};
-
-const VotingResults: m.Component<{
-  votes: SnapshotProposalVote[],
-  choices: string[],
-  totals: any,
-  symbol: string,
-}, {
-  voteCounts: number[],
-  voteListings: any[],
-}> = {
+> = {
   view: (vnode) => {
-    const { votes, choices, totals, symbol } = vnode.attrs;
+    const { choices, totals, symbol } = vnode.attrs;
     if (!choices.length) return;
-    if (!vnode.state.voteCounts?.length) {
-      vnode.state.voteCounts = choices.map((choice, idx) => 10);
-    }
 
     vnode.state.voteListings = choices.map((choice, idx) => {
-      const votesForChoice = votes.filter((v) => v.choice === idx + 1);
       const totalForChoice = totals.resultsByVoteBalance[idx];
       const voteFrac = totalForChoice / totals.sumOfResultsBalance;
-      return m('.results-column', [
-        m('.results-header', `Voted for ${choice}: ${formatNumberLong(totalForChoice)} ${symbol} (${formatPercent(voteFrac, 4)}) (${votesForChoice.length} voters)`),
-        m('.results-cell', [
-          m('.vote-group-wrap', votesForChoice
-            .map((vote) => m(VoteRow, { vote, symbol }))
-            .filter((v) => !!v)
-            .slice(0, vnode.state.voteCounts[idx])),
+
+      return m('', [
+        m('.result-choice', choice),
+        m('.flex.justify-between.mt-1', [
+          m('.flex-shrink', [
+            m(
+              'span',
+              { class: 'font-medium' },
+              formatNumberLong(totalForChoice)
+            ),
+            m('span', { class: 'symbol' }, symbol),
+          ]),
+          m('span', { class: 'font-medium' }, formatPercent(voteFrac, 2)),
         ]),
-        votesForChoice.length > vnode.state.voteCounts[idx]
-          ? m(Button, {
-            label: 'Load more',
-            onclick: () => { vnode.state.voteCounts[idx] += 10; m.redraw(); },
-          })
-          : null
+        m('progress', {
+          class: 'result-progress',
+          max: '100',
+          value: voteFrac * 100,
+        }),
       ]);
     });
 
-    return m('.VotingResults', vnode.state.voteListings);
-  }
+    return m('', vnode.state.voteListings);
+  },
 };
 
-const VoteAction: m.Component<{
-  space: SnapshotSpace,
-  proposal: SnapshotProposal,
-  id: string,
-  totalScore: number,
-  scores: number[],
-  choices: string[],
-  votes: any[],
-}, {
-  votingModalOpen: boolean
-}> = {
+const VoteAction: m.Component<
+  {
+    space: SnapshotSpace;
+    proposal: SnapshotProposal;
+    id: string;
+    totalScore: number;
+    scores: number[];
+    choices: string[];
+    votes: any[];
+  },
+  {
+    votingModalOpen: boolean;
+  }
+> = {
   view: (vnode) => {
-    const { choices } = vnode.attrs;
+    const { choices, proposal } = vnode.attrs;
     const canVote = true; // TODO: remove these hardcoded values;
     const hasVoted = vnode.attrs.votes.find((vote) => {
-      return (vote.voter === app.user?.activeAccount?.address);
+      return vote.voter === app.user?.activeAccount?.address;
     })?.choice;
     const { votingModalOpen } = vnode.state;
 
@@ -179,8 +212,8 @@ const VoteAction: m.Component<{
             totalScore: vnode.attrs.totalScore,
             scores: vnode.attrs.scores,
             snapshot: vnode.attrs.proposal.snapshot,
-            state: vnode.state
-          }
+            state: vnode.state,
+          },
         });
         vnode.state.votingModalOpen = true;
       } catch (err) {
@@ -196,45 +229,72 @@ const VoteAction: m.Component<{
         m(Button, {
           disabled: !canVote || hasVoted === choiceNum || votingModalOpen,
           onclick: (e) => vote(idx),
-          label: hasVoted === choiceNum ? `Voted "${choices[idx]}"` : `Vote "${choices[idx]}"`,
+          label:
+            hasVoted === choiceNum
+              ? `Voted "${choices[idx]}"`
+              : `Vote "${choices[idx]}"`,
           compact: true,
           rounded: true,
         }),
       ]);
     });
 
-    const votingActionObj = [
-      m('.button-row', votingButtons),
-    ];
+    // const votingActionObj = [m('.button-row', votingButtons)];
 
-    return m('.VotingActions.Snapshot', [votingActionObj]);
-  }
+    // return m('.VotingActions.Snapshot', [votingActionObj]);
+
+    return m('.proposal-info-box.padding-x-20.mt-30', [
+      m('.title', 'Cast your vote'),
+      m(RadioGroup, {
+        class: 'snapshot-votes',
+        options: proposal.choices,
+        // value: vnode.state.chosenOption,
+        // onchange: (e: Event) => {
+        //   vnode.state.chosenOption = (
+        //     e.currentTarget as HTMLInputElement
+        //   ).value;
+        // },
+      }),
+      m(Button, {
+        label: 'Vote',
+        // disabled: !vnode.state.chosenOption,
+        // onclick: handleVote,
+      }),
+    ]);
+  },
 };
 
-const ViewProposalPage: m.Component<{
-  scope: string,
-  snapshotId: string,
-  identifier: string,
-}, {
-  proposal: SnapshotProposal,
-  votes: SnapshotProposalVote[],
-  space: SnapshotSpace,
-  totals: any,
-  symbol: string,
-  snapshotProposal: SnapshotProposal,
-  totalScore: number,
-  scores: number[]
-}> = {
+const ViewProposalPage: m.Component<
+  {
+    scope: string;
+    snapshotId: string;
+    identifier: string;
+  },
+  {
+    proposal: SnapshotProposal;
+    votes: SnapshotProposalVote[];
+    space: SnapshotSpace;
+    totals: any;
+    symbol: string;
+    snapshotProposal: SnapshotProposal;
+    totalScore: number;
+    scores: number[];
+    activeTab: string;
+    thread: string;
+  }
+> = {
   oninit: (vnode) => {
+    vnode.state.activeTab = 'Proposals';
     vnode.state.votes = [];
     vnode.state.totalScore = 0;
     vnode.state.scores = [];
+    vnode.state.proposal = null;
+    vnode.state.thread = '';
+
     const loadVotes = async () => {
       vnode.state.proposal = app.snapshot.proposals.find(
         (proposal) => proposal.ipfs === vnode.attrs.identifier
       );
-      // TODO: if proposal not found, throw error
-      // const await getResults()
 
       const space = app.snapshot.space;
       vnode.state.space = space;
@@ -243,10 +303,14 @@ const ViewProposalPage: m.Component<{
       await getResults(space, vnode.state.proposal).then((res) => {
         vnode.state.votes = res.votes;
         vnode.state.totals = res.results;
-        console.log(vnode.state.totals);
-      });      
-
+      });
       m.redraw();
+
+      app.threads
+        .fetchThreadIdForSnapshot({ snapshot: vnode.state.proposal.id })
+        .then((res) => {
+          vnode.state.thread = res;
+        });
     };
 
     const snapshotId = vnode.attrs.snapshotId;
@@ -260,41 +324,152 @@ const ViewProposalPage: m.Component<{
   },
   view: (vnode) => {
     const author = app.user.activeAccount;
+    const { proposal, votes, activeTab, thread } = vnode.state;
 
-    const isActive = vnode.state.proposal
-    && moment(+vnode.state.proposal.start * 1000) <= moment()
-    && moment(+vnode.state.proposal.end * 1000) > moment();
+    const isActive =
+      vnode.state.proposal &&
+      moment(+vnode.state.proposal.start * 1000) <= moment() &&
+      moment(+vnode.state.proposal.end * 1000) > moment();
 
-    return m(Sublayout, { 
-      class: 'ViewProposalPage', 
-      title: 'Snapshot Proposal',
-    }, (!vnode.state.votes && !vnode.state.totals) ? m(Spinner, { active: true }) : [
-      m(ProposalHeader, {
-        snapshotId: vnode.attrs.snapshotId,
-        proposal: vnode.state.proposal,
-      }),
-      m('.PinnedDivider', m('hr')),
-      vnode.state.totals && vnode.state.votes
-      && vnode.state.proposal
-      && m(VotingResults, {
-        choices: vnode.state.proposal.choices,
-        votes: vnode.state.votes,
-        totals: vnode.state.totals,
-        symbol: vnode.state.symbol,
-      }),
-      isActive
-      && author
-      && m(VoteAction, {
-        space: vnode.state.space,
-        proposal: vnode.state.proposal,
-        id: vnode.attrs.identifier,
-        totalScore: vnode.state.totalScore,
-        scores: vnode.state.scores,
-        choices: vnode.state.proposal.choices,
-        votes: vnode.state.votes,
-      })
-    ]);
-  }
+    return m(
+      Sublayout,
+      {
+        class: 'view-snapshot-proposal-page',
+        title: 'Snapshot Proposal',
+      },
+      !vnode.state.votes || !vnode.state.totals || !vnode.state.proposal
+        ? m(Spinner, { fill: true, active: true, size: 'xl' })
+        : [
+            // eslint-disable-next-line no-restricted-globals
+            m('.back-button', { onclick: () => history.back() }, [
+              m('img', {
+                class: 'back-icon',
+                src: '/static/img/arrow-right-black.svg',
+                alt: 'Go Back',
+              }),
+              m('.back-button-text', 'Back'),
+            ]),
+            m(
+              Tabs,
+              {
+                align: 'left',
+                class: 'snapshot-tabs',
+              },
+              [
+                m(TabItem, {
+                  label: 'Proposal',
+                  active: activeTab === 'Proposal',
+                  onclick: () => {
+                    vnode.state.activeTab = 'Proposal';
+                  },
+                }),
+                m(TabItem, {
+                  label: 'Info & Results',
+                  active: activeTab === 'Info & Results',
+                  onclick: () => {
+                    vnode.state.activeTab = 'Info & Results';
+                  },
+                }),
+              ]
+            ),
+            m('.proposal-body', [
+              activeTab !== 'Info & Results' && [
+                m('.proposal-content', [
+                  m(ProposalContent, {
+                    proposal,
+                    votes,
+                    symbol: vnode.state.symbol,
+                  }),
+                ]),
+              ],
+              m('.proposal-info', [
+                m('.proposal-info-box', [
+                  m('.title.padding-x-20', 'Information'),
+                  m('.info-block.padding-x-20', [
+                    m('.labels', [
+                      m('', 'Author'),
+                      m('', 'IPFS'),
+                      m('', 'Voting System'),
+                      m('', 'Start Date'),
+                      m('', 'End Date'),
+                      m('', 'Snapshot'),
+                    ]),
+                    m('.values', [
+                      m(User, {
+                        user: new AddressInfo(
+                          null,
+                          proposal.author,
+                          app.activeId(),
+                          null
+                        ),
+                        linkify: true,
+                        popover: true,
+                      }),
+                      m(
+                        'a',
+                        {
+                          class: 'snapshot-link -mt-10',
+                          href: `https://ipfs.fleek.co/ipfs/${proposal.ipfs}`,
+                          target: '_blank',
+                        },
+                        [
+                          m('.truncate', `#${proposal.ipfs}`),
+                          m(Icon, { name: Icons.EXTERNAL_LINK, class: 'ml-1' }),
+                        ]
+                      ),
+                      m(
+                        '.snapshot-type',
+                        proposal.type.split('-').join(' ').concat(' voting')
+                      ),
+                      m('', moment(+proposal.start * 1000).format('lll')),
+                      m('', moment(+proposal.end * 1000).format('lll')),
+                      m(
+                        'a',
+                        {
+                          class: 'snapshot-link',
+                          href: `https://etherscan.io/block/${proposal.snapshot}`,
+                          target: '_blank',
+                        },
+                        [
+                          m('.truncate', `#${proposal.snapshot}`),
+                          m(Icon, { name: Icons.EXTERNAL_LINK, class: 'ml-1' }),
+                        ]
+                      ),
+                    ]),
+                  ]),
+                  thread !== 'false' &&
+                    m('.padding-x-20.linked-discussion', [
+                      m('.heading-2', 'Linked Discussion'),
+                      m(ProposalHeaderSnapshotThreadLink, {
+                        threadId: vnode.state.thread,
+                      }),
+                    ]),
+                ]),
+                isActive &&
+                  author &&
+                  m(VoteAction, {
+                    space: vnode.state.space,
+                    proposal: vnode.state.proposal,
+                    id: vnode.attrs.identifier,
+                    totalScore: vnode.state.totalScore,
+                    scores: vnode.state.scores,
+                    choices: vnode.state.proposal.choices,
+                    votes: vnode.state.votes,
+                  }),
+                m('.proposal-info-box.padding-x-20.mt-30', [
+                  m('.title', 'Current Results'),
+                  m(VotingResults, {
+                    choices: vnode.state.proposal.choices,
+                    votes: vnode.state.votes,
+                    totals: vnode.state.totals,
+                    symbol: vnode.state.symbol,
+                  }),
+                ]),
+              ]),
+            ]),
+          ]
+    );
+  },
 };
 
 export default ViewProposalPage;

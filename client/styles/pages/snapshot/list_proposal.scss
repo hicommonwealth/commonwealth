@@ -1,0 +1,76 @@
+@import 'client/styles/shared';
+
+.snapshot-proposals-list {
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 20px;
+
+  .title {
+    font-size: 24px;
+    font-weight: 500;
+  }
+
+  .body {
+    margin-top: 10px;
+  }
+
+  .other-details {
+    margin-top: 14px;
+
+    @media (min-width:600px) {
+      display: flex;
+    }
+
+    justify-content: space-between;
+    align-items: baseline;
+
+    .submitted-by {
+      display: inline;
+      color: #666666;
+      margin-right: 16px;
+    }
+
+    .author-address {
+      display: inline;
+      background-color: #F7F4FF;
+      padding: 8px 14px 4px;
+      border-radius: 9999px;
+    }
+
+    .closed-proposal {
+      @media(max-width: 600px) {
+        margin-top: 14px;
+      }
+
+      background-color: #999999;
+      border-radius: 9999px;
+      max-width: max-content;
+      padding: 8px 14px 4px;
+      color: white;
+      font-weight: 500;
+    }
+
+    .active-proposal {
+      @media(max-width: 600px) {
+        margin-top: 14px;
+      }
+
+      background-color: #F4F4F4;
+      border-radius: 9999px;
+      max-width: max-content;
+      display: flex;
+      color: #666666;
+
+      &>* {
+        padding: 8px 14px 4px;
+      }
+
+      .active-text {
+        background-color: #00C0A9;
+        border-radius: 9999px;
+        font-weight: 500;
+        color: white;
+      }
+    }
+  }
+}
