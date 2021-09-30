@@ -147,7 +147,6 @@ export class CosmosProposal extends Proposal<
             }
           }
         }
-        console.log(tallyResp);
         if (tallyResp?.tally) {
           this.data.state.tally = marshalTally(tallyResp?.tally);
         }
@@ -161,7 +160,6 @@ export class CosmosProposal extends Proposal<
     if (this.data.state.completed) {
       super.complete(this._Governance.store);
     }
-    console.log(this);
   }
 
   // TODO: add getters for various vote features: tally, quorum, threshold, veto

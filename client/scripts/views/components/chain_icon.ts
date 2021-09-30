@@ -40,6 +40,22 @@ export const ChainBaseIcon: m.Component<{ chainbase: ChainBase, onclick?: Functi
   }
 };
 
+export const ChainNetworkIcon: m.Component<{ chain: string, onclick?: Function, size?: number }> = {
+  view: (vnode) => {
+    const { onclick } = vnode.attrs;
+    const size = vnode.attrs.size || 32;
+    const iconName = vnode.attrs.chain;
+
+    return m('.ChainIcon', { class: onclick ? 'onclick' : '' }, [
+      m('img.chain-icon', {
+        style: `width: ${size}px; height: ${size}px;`,
+        src: `/static/img/protocols/${iconName}.png`,
+        onclick
+      }),
+    ]);
+  }
+};
+
 export const CommunityIcon: m.Component<{ community: CommunityInfo, onclick?: Function, size?: number }> = {
   view: (vnode) => {
     const { community, onclick } = vnode.attrs;
