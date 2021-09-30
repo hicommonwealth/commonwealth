@@ -10,6 +10,7 @@ import {
   NodeStatusResult,
 } from 'near-api-js/lib/providers/provider';
 import { FunctionCallOptions } from 'near-api-js/lib/account';
+import { Action, FunctionCall } from 'near-api-js/lib/transaction';
 import { uuidv4 } from 'lib/util';
 import { IChainModule, ITXModalData, NodeInfo } from 'models';
 import { NearToken } from 'adapters/chain/near/types';
@@ -250,9 +251,14 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
     const id = this.isMainnet
       ? `${name}.sputnik-dao.near`
       : `${name}.sputnikv2.testnet`;
-    const redirectUrl = `${
-      window.location.origin
-    }/${this.app.activeChainId()}/finishNearLogin?chain_name=${id}`;
+    let redirectUrl: string;
+    if (!this.app.isCustomDomain()) {
+      redirectUrl = `${
+        window.location.origin
+      }/${this.app.activeChainId()}/finishNearLogin?chain_name=${id}`;
+    } else {
+      redirectUrl = `${window.location.origin}/finishNearLogin?chain_name=${id}`;
+    }
     await this.redirectTx(
       contractId,
       methodName,
@@ -292,19 +298,49 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
     localStorage[uuid] = JSON.stringify(functionCall);
 
     // redirect to generate access key for dao contract
-    const redirectUrl = `${
-      window.location.origin
-    }/${this.app.activeChainId()}/finishNearLogin`;
+    let redirectUrl;
+    if (!this.app.isCustomDomain()) {
+      redirectUrl = `${
+        window.location.origin
+      }/${this.app.activeChainId()}/finishNearLogin`;
+    } else {
+      redirectUrl = `${window.location.origin}/finishNearLogin`;
+    }
     const successUrl = `${redirectUrl}?saved_tx=${uuid}`;
     const failureUrl = `${redirectUrl}?tx_failure=${uuid}`;
 
     const wallet = new WalletAccount(this.api, 'commonwealth_near');
-    await wallet.requestSignIn({
-      contractId,
-      methodNames: [methodName],
-      successUrl,
-      failureUrl,
-    });
+    let shouldRequestSignIn = true;
+    if (wallet.isSignedIn) {
+      // check if we can send without requesting a new sign-in
+      const accessKey = await wallet
+        .account()
+        .accessKeyForTransaction(contractId, [
+          {
+            functionCall: {
+              // we only need deposit and methodName here based on implementation of
+              // accessKeyForTransaction (which relies on accessKeyMatchesTransaction)
+              // so it's okay to leave args unmarshalled
+              deposit: new BN(attachedDeposit || 0),
+              methodName,
+              gas: new BN(gas || 0),
+              args: args as any,
+            } as FunctionCall,
+          } as Action,
+        ]);
+      console.log(accessKey);
+      shouldRequestSignIn = !accessKey;
+    }
+    if (shouldRequestSignIn) {
+      await wallet.requestSignIn({
+        contractId,
+        methodNames: [methodName],
+        successUrl,
+        failureUrl,
+      });
+    } else {
+      m.route.set(successUrl);
+    }
   }
 
   public async deinit(): Promise<void> {
