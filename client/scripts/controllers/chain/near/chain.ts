@@ -318,6 +318,9 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
         .accessKeyForTransaction(contractId, [
           {
             functionCall: {
+              // we only need deposit and methodName here based on implementation of
+              // accessKeyForTransaction (which relies on accessKeyMatchesTransaction)
+              // so it's okay to leave args unmarshalled
               deposit: new BN(attachedDeposit || 0),
               methodName,
               gas: new BN(gas || 0),
