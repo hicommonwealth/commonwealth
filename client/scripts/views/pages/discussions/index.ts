@@ -375,6 +375,14 @@ const DiscussionFilterBar: m.Component<
   },
 };
 
+// comparator
+const orderDiscussionsbyLastComment = (a, b) => {
+  // tslint:disable-next-line
+  const tsB = Math.max(+b.createdAt, +(b.latestCommCreatedAt || 0));
+  const tsA = Math.max(+a.createdAt, +(a.latestCommCreatedAt || 0));
+  return tsB - tsA;
+};
+
 const DiscussionsPage: m.Component<
   {
     topic?: string;
@@ -417,7 +425,7 @@ const DiscussionsPage: m.Component<
       app.user.unseenPosts[app.activeId()]['threads'] = 0;
     }
   },
-  oninit: (vnode) => {
+  oninit: async (vnode) => {
     vnode.state.lookback = {};
     vnode.state.postsDepleted = {};
     vnode.state.topicInitialized = {};
@@ -528,22 +536,22 @@ const DiscussionsPage: m.Component<
       : (activeEntity.meta as CommunityInfo).id;
     const lastVisited = moment(allLastVisited[id]).utc();
 
-    // comparator
-    const orderDiscussionsbyLastComment = (a, b) => {
-      // tslint:disable-next-line
-      const tsB = Math.max(+b.createdAt, +(app.comments.lastCommented(b) || 0));
-      const tsA = Math.max(+a.createdAt, +(app.comments.lastCommented(a) || 0));
-      return tsB - tsA;
-    };
-
-    const orderByDateReverseChronological = (a, b) => {
-      // tslint:disable-next-line
-      const tsB = Math.max(+b.createdAt);
-      const tsA = Math.max(+a.createdAt);
-      return tsA - tsB;
-    };
-
     let sortedListing = [];
+    // fetch unique addresses count for pinned threads
+    if (!app.threadUniqueAddressesCount.getInitializedPinned()) {
+      app.threadUniqueAddressesCount
+        .fetchThreadsUniqueAddresses({
+          threads: app.threads.listingStore
+            .getByCommunityTopicAndStage(app.activeChainId(), topic, stage)
+            .filter((t) => t.pinned),
+          chainId: app.activeChainId(),
+          pinned: true,
+        })
+        .then(() => {
+          console.log('fetched');
+        });
+    }
+
     const allThreads = app.threads.listingStore
       .getByCommunityTopicAndStage(app.activeId(), topic, stage)
       .sort(orderDiscussionsbyLastComment);
