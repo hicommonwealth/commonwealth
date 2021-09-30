@@ -63,6 +63,8 @@ module.exports = {
           is_active: true,
         });
       }
+
+      await queryInterface.bulkInsert('Subscriptions', newSubscriptions);
     });
   },
 
