@@ -22,74 +22,92 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface TimelockMockInterface extends ethers.utils.Interface {
   functions: {
-    "executeTransaction(address,uint256,string,bytes,uint256)": FunctionFragment;
-    "acceptAdmin()": FunctionFragment;
-    "pendingAdmin()": FunctionFragment;
-    "queueTransaction(address,uint256,string,bytes,uint256)": FunctionFragment;
-    "setPendingAdmin(address)": FunctionFragment;
-    "cancelTransaction(address,uint256,string,bytes,uint256)": FunctionFragment;
-    "delay()": FunctionFragment;
+    "GRACE_PERIOD()": FunctionFragment;
     "MAXIMUM_DELAY()": FunctionFragment;
     "MINIMUM_DELAY()": FunctionFragment;
-    "GRACE_PERIOD()": FunctionFragment;
-    "setDelay(uint256)": FunctionFragment;
-    "queuedTransactions(bytes32)": FunctionFragment;
+    "acceptAdmin()": FunctionFragment;
     "admin()": FunctionFragment;
+    "cancelTransaction(address,uint256,string,bytes,uint256)": FunctionFragment;
+    "delay()": FunctionFragment;
+    "executeTransaction(address,uint256,string,bytes,uint256)": FunctionFragment;
+    "pendingAdmin()": FunctionFragment;
+    "queueTransaction(address,uint256,string,bytes,uint256)": FunctionFragment;
+    "queuedTransactions(bytes32)": FunctionFragment;
+    "setDelay(uint256)": FunctionFragment;
+    "setPendingAdmin(address)": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "executeTransaction",
-    values: [string, BigNumberish, string, BytesLike, BigNumberish]
+    functionFragment: "GRACE_PERIOD",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "MAXIMUM_DELAY",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "MINIMUM_DELAY",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "acceptAdmin",
     values?: undefined
   ): string;
-  encodeFunctionData(
-    functionFragment: "pendingAdmin",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "queueTransaction",
-    values: [string, BigNumberish, string, BytesLike, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setPendingAdmin",
-    values: [string]
-  ): string;
+  encodeFunctionData(functionFragment: "admin", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "cancelTransaction",
     values: [string, BigNumberish, string, BytesLike, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "delay", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "MAXIMUM_DELAY",
+    functionFragment: "executeTransaction",
+    values: [string, BigNumberish, string, BytesLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "pendingAdmin",
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "MINIMUM_DELAY",
-    values?: undefined
+    functionFragment: "queueTransaction",
+    values: [string, BigNumberish, string, BytesLike, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "GRACE_PERIOD",
-    values?: undefined
+    functionFragment: "queuedTransactions",
+    values: [BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "setDelay",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "queuedTransactions",
-    values: [BytesLike]
+    functionFragment: "setPendingAdmin",
+    values: [string]
   ): string;
-  encodeFunctionData(functionFragment: "admin", values?: undefined): string;
 
   decodeFunctionResult(
-    functionFragment: "executeTransaction",
+    functionFragment: "GRACE_PERIOD",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "MAXIMUM_DELAY",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "MINIMUM_DELAY",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "acceptAdmin",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "admin", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "cancelTransaction",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "delay", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "executeTransaction",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -101,47 +119,29 @@ interface TimelockMockInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "setPendingAdmin",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "cancelTransaction",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "delay", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "MAXIMUM_DELAY",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "MINIMUM_DELAY",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "GRACE_PERIOD",
+    functionFragment: "queuedTransactions",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "setDelay", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "queuedTransactions",
+    functionFragment: "setPendingAdmin",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "admin", data: BytesLike): Result;
 
   events: {
-    "NewAdmin(address)": EventFragment;
-    "NewPendingAdmin(address)": EventFragment;
-    "NewDelay(uint256)": EventFragment;
     "CancelTransaction(bytes32,address,uint256,string,bytes,uint256)": EventFragment;
     "ExecuteTransaction(bytes32,address,uint256,string,bytes,uint256)": EventFragment;
+    "NewAdmin(address)": EventFragment;
+    "NewDelay(uint256)": EventFragment;
+    "NewPendingAdmin(address)": EventFragment;
     "QueueTransaction(bytes32,address,uint256,string,bytes,uint256)": EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "NewAdmin"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "NewPendingAdmin"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "NewDelay"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "CancelTransaction"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ExecuteTransaction"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "NewAdmin"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "NewDelay"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "NewPendingAdmin"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "QueueTransaction"): EventFragment;
 }
 
@@ -189,6 +189,52 @@ export class TimelockMock extends Contract {
   interface: TimelockMockInterface;
 
   functions: {
+    GRACE_PERIOD(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    "GRACE_PERIOD()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    MAXIMUM_DELAY(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    "MAXIMUM_DELAY()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    MINIMUM_DELAY(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    "MINIMUM_DELAY()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    acceptAdmin(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "acceptAdmin()"(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    admin(overrides?: CallOverrides): Promise<[string]>;
+
+    "admin()"(overrides?: CallOverrides): Promise<[string]>;
+
+    cancelTransaction(
+      target: string,
+      value: BigNumberish,
+      signature: string,
+      data: BytesLike,
+      eta: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "cancelTransaction(address,uint256,string,bytes,uint256)"(
+      target: string,
+      value: BigNumberish,
+      signature: string,
+      data: BytesLike,
+      eta: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    delay(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    "delay()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     executeTransaction(
       target: string,
       value: BigNumberish,
@@ -205,14 +251,6 @@ export class TimelockMock extends Contract {
       data: BytesLike,
       eta: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    acceptAdmin(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    "acceptAdmin()"(
-      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     pendingAdmin(overrides?: CallOverrides): Promise<[string]>;
@@ -237,49 +275,15 @@ export class TimelockMock extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    setPendingAdmin(
-      pendingAdmin_: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    queuedTransactions(
+      arg0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
 
-    "setPendingAdmin(address)"(
-      pendingAdmin_: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    cancelTransaction(
-      target: string,
-      value: BigNumberish,
-      signature: string,
-      data: BytesLike,
-      eta: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    "cancelTransaction(address,uint256,string,bytes,uint256)"(
-      target: string,
-      value: BigNumberish,
-      signature: string,
-      data: BytesLike,
-      eta: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    delay(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    "delay()"(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    MAXIMUM_DELAY(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    "MAXIMUM_DELAY()"(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    MINIMUM_DELAY(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    "MINIMUM_DELAY()"(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    GRACE_PERIOD(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    "GRACE_PERIOD()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    "queuedTransactions(bytes32)"(
+      arg0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
 
     setDelay(
       delay_: BigNumberish,
@@ -291,20 +295,62 @@ export class TimelockMock extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    queuedTransactions(
-      arg0: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[boolean]>;
+    setPendingAdmin(
+      pendingAdmin_: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
-    "queuedTransactions(bytes32)"(
-      arg0: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[boolean]>;
-
-    admin(overrides?: CallOverrides): Promise<[string]>;
-
-    "admin()"(overrides?: CallOverrides): Promise<[string]>;
+    "setPendingAdmin(address)"(
+      pendingAdmin_: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
   };
+
+  GRACE_PERIOD(overrides?: CallOverrides): Promise<BigNumber>;
+
+  "GRACE_PERIOD()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+  MAXIMUM_DELAY(overrides?: CallOverrides): Promise<BigNumber>;
+
+  "MAXIMUM_DELAY()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+  MINIMUM_DELAY(overrides?: CallOverrides): Promise<BigNumber>;
+
+  "MINIMUM_DELAY()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+  acceptAdmin(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "acceptAdmin()"(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  admin(overrides?: CallOverrides): Promise<string>;
+
+  "admin()"(overrides?: CallOverrides): Promise<string>;
+
+  cancelTransaction(
+    target: string,
+    value: BigNumberish,
+    signature: string,
+    data: BytesLike,
+    eta: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "cancelTransaction(address,uint256,string,bytes,uint256)"(
+    target: string,
+    value: BigNumberish,
+    signature: string,
+    data: BytesLike,
+    eta: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  delay(overrides?: CallOverrides): Promise<BigNumber>;
+
+  "delay()"(overrides?: CallOverrides): Promise<BigNumber>;
 
   executeTransaction(
     target: string,
@@ -322,14 +368,6 @@ export class TimelockMock extends Contract {
     data: BytesLike,
     eta: BigNumberish,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  acceptAdmin(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  "acceptAdmin()"(
-    overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   pendingAdmin(overrides?: CallOverrides): Promise<string>;
@@ -354,49 +392,15 @@ export class TimelockMock extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  setPendingAdmin(
-    pendingAdmin_: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  queuedTransactions(
+    arg0: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
 
-  "setPendingAdmin(address)"(
-    pendingAdmin_: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  cancelTransaction(
-    target: string,
-    value: BigNumberish,
-    signature: string,
-    data: BytesLike,
-    eta: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  "cancelTransaction(address,uint256,string,bytes,uint256)"(
-    target: string,
-    value: BigNumberish,
-    signature: string,
-    data: BytesLike,
-    eta: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  delay(overrides?: CallOverrides): Promise<BigNumber>;
-
-  "delay()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-  MAXIMUM_DELAY(overrides?: CallOverrides): Promise<BigNumber>;
-
-  "MAXIMUM_DELAY()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-  MINIMUM_DELAY(overrides?: CallOverrides): Promise<BigNumber>;
-
-  "MINIMUM_DELAY()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-  GRACE_PERIOD(overrides?: CallOverrides): Promise<BigNumber>;
-
-  "GRACE_PERIOD()"(overrides?: CallOverrides): Promise<BigNumber>;
+  "queuedTransactions(bytes32)"(
+    arg0: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
 
   setDelay(
     delay_: BigNumberish,
@@ -408,74 +412,36 @@ export class TimelockMock extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  queuedTransactions(
-    arg0: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<boolean>;
+  setPendingAdmin(
+    pendingAdmin_: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
-  "queuedTransactions(bytes32)"(
-    arg0: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<boolean>;
-
-  admin(overrides?: CallOverrides): Promise<string>;
-
-  "admin()"(overrides?: CallOverrides): Promise<string>;
+  "setPendingAdmin(address)"(
+    pendingAdmin_: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   callStatic: {
-    executeTransaction(
-      target: string,
-      value: BigNumberish,
-      signature: string,
-      data: BytesLike,
-      eta: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<string>;
+    GRACE_PERIOD(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "executeTransaction(address,uint256,string,bytes,uint256)"(
-      target: string,
-      value: BigNumberish,
-      signature: string,
-      data: BytesLike,
-      eta: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<string>;
+    "GRACE_PERIOD()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    MAXIMUM_DELAY(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "MAXIMUM_DELAY()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    MINIMUM_DELAY(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "MINIMUM_DELAY()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     acceptAdmin(overrides?: CallOverrides): Promise<void>;
 
     "acceptAdmin()"(overrides?: CallOverrides): Promise<void>;
 
-    pendingAdmin(overrides?: CallOverrides): Promise<string>;
+    admin(overrides?: CallOverrides): Promise<string>;
 
-    "pendingAdmin()"(overrides?: CallOverrides): Promise<string>;
-
-    queueTransaction(
-      target: string,
-      value: BigNumberish,
-      signature: string,
-      data: BytesLike,
-      eta: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    "queueTransaction(address,uint256,string,bytes,uint256)"(
-      target: string,
-      value: BigNumberish,
-      signature: string,
-      data: BytesLike,
-      eta: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    setPendingAdmin(
-      pendingAdmin_: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "setPendingAdmin(address)"(
-      pendingAdmin_: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    "admin()"(overrides?: CallOverrides): Promise<string>;
 
     cancelTransaction(
       target: string,
@@ -499,24 +465,45 @@ export class TimelockMock extends Contract {
 
     "delay()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    MAXIMUM_DELAY(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "MAXIMUM_DELAY()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    MINIMUM_DELAY(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "MINIMUM_DELAY()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    GRACE_PERIOD(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "GRACE_PERIOD()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    setDelay(delay_: BigNumberish, overrides?: CallOverrides): Promise<void>;
-
-    "setDelay(uint256)"(
-      delay_: BigNumberish,
+    executeTransaction(
+      target: string,
+      value: BigNumberish,
+      signature: string,
+      data: BytesLike,
+      eta: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<string>;
+
+    "executeTransaction(address,uint256,string,bytes,uint256)"(
+      target: string,
+      value: BigNumberish,
+      signature: string,
+      data: BytesLike,
+      eta: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    pendingAdmin(overrides?: CallOverrides): Promise<string>;
+
+    "pendingAdmin()"(overrides?: CallOverrides): Promise<string>;
+
+    queueTransaction(
+      target: string,
+      value: BigNumberish,
+      signature: string,
+      data: BytesLike,
+      eta: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    "queueTransaction(address,uint256,string,bytes,uint256)"(
+      target: string,
+      value: BigNumberish,
+      signature: string,
+      data: BytesLike,
+      eta: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
 
     queuedTransactions(
       arg0: BytesLike,
@@ -528,24 +515,25 @@ export class TimelockMock extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    admin(overrides?: CallOverrides): Promise<string>;
+    setDelay(delay_: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
-    "admin()"(overrides?: CallOverrides): Promise<string>;
+    "setDelay(uint256)"(
+      delay_: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    setPendingAdmin(
+      pendingAdmin_: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "setPendingAdmin(address)"(
+      pendingAdmin_: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
   };
 
   filters: {
-    NewAdmin(
-      newAdmin: string | null
-    ): TypedEventFilter<[string], { newAdmin: string }>;
-
-    NewPendingAdmin(
-      newPendingAdmin: string | null
-    ): TypedEventFilter<[string], { newPendingAdmin: string }>;
-
-    NewDelay(
-      newDelay: BigNumberish | null
-    ): TypedEventFilter<[BigNumber], { newDelay: BigNumber }>;
-
     CancelTransaction(
       txHash: BytesLike | null,
       target: string | null,
@@ -584,6 +572,18 @@ export class TimelockMock extends Contract {
       }
     >;
 
+    NewAdmin(
+      newAdmin: string | null
+    ): TypedEventFilter<[string], { newAdmin: string }>;
+
+    NewDelay(
+      newDelay: BigNumberish | null
+    ): TypedEventFilter<[BigNumber], { newDelay: BigNumber }>;
+
+    NewPendingAdmin(
+      newPendingAdmin: string | null
+    ): TypedEventFilter<[string], { newPendingAdmin: string }>;
+
     QueueTransaction(
       txHash: BytesLike | null,
       target: string | null,
@@ -605,6 +605,52 @@ export class TimelockMock extends Contract {
   };
 
   estimateGas: {
+    GRACE_PERIOD(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "GRACE_PERIOD()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    MAXIMUM_DELAY(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "MAXIMUM_DELAY()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    MINIMUM_DELAY(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "MINIMUM_DELAY()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    acceptAdmin(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "acceptAdmin()"(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    admin(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "admin()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    cancelTransaction(
+      target: string,
+      value: BigNumberish,
+      signature: string,
+      data: BytesLike,
+      eta: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "cancelTransaction(address,uint256,string,bytes,uint256)"(
+      target: string,
+      value: BigNumberish,
+      signature: string,
+      data: BytesLike,
+      eta: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    delay(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "delay()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     executeTransaction(
       target: string,
       value: BigNumberish,
@@ -621,14 +667,6 @@ export class TimelockMock extends Contract {
       data: BytesLike,
       eta: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    acceptAdmin(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    "acceptAdmin()"(
-      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     pendingAdmin(overrides?: CallOverrides): Promise<BigNumber>;
@@ -653,49 +691,15 @@ export class TimelockMock extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    setPendingAdmin(
-      pendingAdmin_: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
+    queuedTransactions(
+      arg0: BytesLike,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "setPendingAdmin(address)"(
-      pendingAdmin_: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
+    "queuedTransactions(bytes32)"(
+      arg0: BytesLike,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
-
-    cancelTransaction(
-      target: string,
-      value: BigNumberish,
-      signature: string,
-      data: BytesLike,
-      eta: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    "cancelTransaction(address,uint256,string,bytes,uint256)"(
-      target: string,
-      value: BigNumberish,
-      signature: string,
-      data: BytesLike,
-      eta: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    delay(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "delay()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    MAXIMUM_DELAY(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "MAXIMUM_DELAY()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    MINIMUM_DELAY(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "MINIMUM_DELAY()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    GRACE_PERIOD(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "GRACE_PERIOD()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     setDelay(
       delay_: BigNumberish,
@@ -707,22 +711,64 @@ export class TimelockMock extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    queuedTransactions(
-      arg0: BytesLike,
-      overrides?: CallOverrides
+    setPendingAdmin(
+      pendingAdmin_: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "queuedTransactions(bytes32)"(
-      arg0: BytesLike,
-      overrides?: CallOverrides
+    "setPendingAdmin(address)"(
+      pendingAdmin_: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
-
-    admin(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "admin()"(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
+    GRACE_PERIOD(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "GRACE_PERIOD()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    MAXIMUM_DELAY(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "MAXIMUM_DELAY()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    MINIMUM_DELAY(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "MINIMUM_DELAY()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    acceptAdmin(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "acceptAdmin()"(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    admin(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "admin()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    cancelTransaction(
+      target: string,
+      value: BigNumberish,
+      signature: string,
+      data: BytesLike,
+      eta: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "cancelTransaction(address,uint256,string,bytes,uint256)"(
+      target: string,
+      value: BigNumberish,
+      signature: string,
+      data: BytesLike,
+      eta: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    delay(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "delay()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     executeTransaction(
       target: string,
       value: BigNumberish,
@@ -739,14 +785,6 @@ export class TimelockMock extends Contract {
       data: BytesLike,
       eta: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    acceptAdmin(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    "acceptAdmin()"(
-      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     pendingAdmin(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -771,49 +809,15 @@ export class TimelockMock extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    setPendingAdmin(
-      pendingAdmin_: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
+    queuedTransactions(
+      arg0: BytesLike,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "setPendingAdmin(address)"(
-      pendingAdmin_: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
+    "queuedTransactions(bytes32)"(
+      arg0: BytesLike,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
-
-    cancelTransaction(
-      target: string,
-      value: BigNumberish,
-      signature: string,
-      data: BytesLike,
-      eta: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    "cancelTransaction(address,uint256,string,bytes,uint256)"(
-      target: string,
-      value: BigNumberish,
-      signature: string,
-      data: BytesLike,
-      eta: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    delay(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "delay()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    MAXIMUM_DELAY(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "MAXIMUM_DELAY()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    MINIMUM_DELAY(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "MINIMUM_DELAY()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    GRACE_PERIOD(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "GRACE_PERIOD()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     setDelay(
       delay_: BigNumberish,
@@ -825,18 +829,14 @@ export class TimelockMock extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    queuedTransactions(
-      arg0: BytesLike,
-      overrides?: CallOverrides
+    setPendingAdmin(
+      pendingAdmin_: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "queuedTransactions(bytes32)"(
-      arg0: BytesLike,
-      overrides?: CallOverrides
+    "setPendingAdmin(address)"(
+      pendingAdmin_: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
-
-    admin(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "admin()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

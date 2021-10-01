@@ -5,7 +5,7 @@ import { createApi } from '../../../src/chains/substrate/subscribeFunc';
 
 const { assert } = chai;
 
-describe('Subscribe Func Tests', () => {
+describe.skip('Subscribe Func Tests', () => {
   it('should create an API connection', async () => {
     const VALID_URL = 'ws://mainnet1.edgewa.re:9944';
     const api = await createApi(VALID_URL, EdgewareSpec);

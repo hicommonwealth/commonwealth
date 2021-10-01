@@ -9,20 +9,21 @@ import {
   Subscriber,
   Listener,
 } from '../../../src/chains/moloch';
-import { networkUrls, EventSupportingChainT, contracts } from '../../../src';
+import { EventSupportingChainT } from '../../../src';
+import { networkUrls, contracts } from '../../../scripts/listenerUtils';
 import { TestHandler } from '../../util';
 
 dotenv.config();
 
 const { assert } = chai;
 
-describe('Moloch listener class tests', () => {
+describe.skip('Moloch listener class tests', () => {
   let listener;
   const handlerEmitter = new events.EventEmitter();
 
   it('should throw if the chain is not a moloch chain', () => {
     try {
-      new Listener('randomChain' as EventSupportingChainT);
+      const _listener = new Listener('randomChain' as EventSupportingChainT);
     } catch (error) {
       assert(String(error).includes('randomChain'));
     }
@@ -64,26 +65,26 @@ describe('Moloch listener class tests', () => {
 
   it('should verify that the handler handled an event successfully', (done) => {
     let counter = 0;
-    const verifyHandler = () => {
-      assert(listener.eventHandlers.TestHandler.handler.counter >= 1);
-      ++counter;
-      if (counter == 1) {
-        clearTimeout(timeoutHandler);
-        done();
-      }
-    };
-    handlerEmitter.on('eventHandled', verifyHandler);
-
     // after 10 seconds with no event received use storage fetcher to verify api/connection
     const timeoutHandler = setTimeout(() => {
       // handlerEmitter.removeAllListeners();
       const startBlock = 9786650;
 
-      listener.storageFetcher.fetch({ startBlock }).then((events) => {
-        if (events.length > 0) done();
+      listener.storageFetcher.fetch({ startBlock }).then((es) => {
+        if (es.length > 0) done();
         else assert.fail('No event received and storage handler failed');
       });
     }, 10000);
+
+    const verifyHandler = () => {
+      assert(listener.eventHandlers.TestHandler.handler.counter >= 1);
+      ++counter;
+      if (counter === 1) {
+        clearTimeout(timeoutHandler);
+        done();
+      }
+    };
+    handlerEmitter.on('eventHandled', verifyHandler);
   }).timeout(50000);
 
   xit('should update the contract address');
@@ -96,12 +97,10 @@ describe('Moloch listener class tests', () => {
     const verifyHandler = () => {
       assert(listener.eventHandlers.TestHandler.handler.counter >= 1);
       ++counter;
-      if (counter == 1) done();
+      if (counter === 1) done();
     };
     handlerEmitter.on('eventHandled', verifyHandler);
   }).timeout(20000);
-
-  xit('should update the url the listener should connect to', async () => {});
 
   xit('should verify that the handler handled an event successfully after changing urls', () => {
     assert(

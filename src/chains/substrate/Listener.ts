@@ -46,14 +46,14 @@ export class Listener extends BaseListener<
   constructor(
     chain: EventSupportingChainT,
     url?: string,
-    spec?: RegisteredTypes | {},
+    spec?: RegisteredTypes,
     archival?: boolean,
     startBlock?: number,
     skipCatchup?: boolean,
     enricherConfig?: EnricherConfig,
     verbose?: boolean,
     ignoreChainType?: boolean,
-    discoverReconnectRange?: (chain: string) => Promise<IDisconnectedRange>
+    discoverReconnectRange?: (c: string) => Promise<IDisconnectedRange>
   ) {
     super(chain, verbose);
     // if ignoreChainType = true ignore the hard-coded EventChains type
@@ -196,10 +196,10 @@ export class Listener extends BaseListener<
     startBlock: number,
     endBlock?: number
   ): Promise<Block[]> {
-    return await this._poller.poll({ startBlock, endBlock });
+    return this._poller.poll({ startBlock, endBlock });
   }
 
-  public async updateSpec(spec: {}): Promise<void> {
+  public async updateSpec(spec: RegisteredTypes): Promise<void> {
     // set the new spec
     this._options.spec = spec;
 

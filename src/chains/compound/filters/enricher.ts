@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Contract, utils } from 'ethers';
 
-import { GovernorAlpha } from '../../../contractTypes';
+import { GovernorBravoDelegate as GovernorBravo } from '../../../contractTypes';
 import { TypedEventFilter } from '../../../contractTypes/commons';
 import { CWEvent } from '../../../interfaces';
 import { EventKind, RawEvent, IEventData, Api } from '../types';
@@ -21,7 +21,7 @@ export async function Enrich(
   switch (kind) {
     case EventKind.ProposalCanceled: {
       const { id } = rawData.args as GetArgType<
-        GovernorAlpha,
+        GovernorBravo,
         'ProposalCanceled'
       >;
       return {
@@ -87,7 +87,7 @@ export async function Enrich(
     }
     case EventKind.ProposalExecuted: {
       const { id } = rawData.args as GetArgType<
-        GovernorAlpha,
+        GovernorBravo,
         'ProposalExecuted'
       >;
       return {
@@ -101,7 +101,7 @@ export async function Enrich(
     }
     case EventKind.ProposalQueued: {
       const { id, eta } = rawData.args as GetArgType<
-        GovernorAlpha,
+        GovernorBravo,
         'ProposalQueued'
       >;
       return {
@@ -115,10 +115,13 @@ export async function Enrich(
       };
     }
     case EventKind.VoteCast: {
-      const { voter, proposalId, support, votes } = rawData.args as GetArgType<
-        GovernorAlpha,
-        'VoteCast'
-      >;
+      const {
+        voter,
+        proposalId,
+        support,
+        votes,
+        reason,
+      } = rawData.args as GetArgType<GovernorBravo, 'VoteCast'>;
       return {
         blockNumber,
         excludeAddresses: [voter],
@@ -128,6 +131,7 @@ export async function Enrich(
           id: +proposalId,
           support,
           votes: votes.toString(),
+          reason,
         },
       };
     }
@@ -135,6 +139,4 @@ export async function Enrich(
       throw new Error('unknown compound event kind!');
     }
   }
-
-  return { blockNumber: null, data: null };
 }

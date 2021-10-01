@@ -106,10 +106,11 @@ contract TimelockMock {
         bytes memory data,
         uint256 eta
     ) public returns (bytes32) {
-        require(
-            msg.sender == admin,
-            "TimelockMock::queueTransaction: Call must come from admin."
-        );
+        // Remove this check for integration test purposes. We just want the events.
+        // require(
+        //     msg.sender == admin,
+        //     "TimelockMock::queueTransaction: Call must come from admin."
+        // );
         require(
             eta >= getBlockTimestamp().add(delay),
             "TimelockMock::queueTransaction: Estimated execution block must satisfy delay."
@@ -131,10 +132,11 @@ contract TimelockMock {
         bytes memory data,
         uint256 eta
     ) public {
-        require(
-            msg.sender == admin,
-            "TimelockMock::cancelTransaction: Call must come from admin."
-        );
+        // Remove requirement for testing purposes.
+        // require(
+        //     msg.sender == admin,
+        //     "TimelockMock::cancelTransaction: Call must come from admin."
+        // );
 
         bytes32 txHash = keccak256(
             abi.encode(target, value, signature, data, eta)
@@ -151,10 +153,12 @@ contract TimelockMock {
         bytes memory data,
         uint256 eta
     ) public payable returns (bytes memory) {
-        require(
-            msg.sender == admin,
-            "TimelockMock::executeTransaction: Call must come from admin."
-        );
+
+        // Remove this check for integration test purposes. We just want the events.
+        // require(
+        //     msg.sender == admin,
+        //     "TimelockMock::executeTransaction: Call must come from admin."
+        // );
 
         bytes32 txHash = keccak256(
             abi.encode(target, value, signature, data, eta)
@@ -163,10 +167,11 @@ contract TimelockMock {
             queuedTransactions[txHash],
             "TimelockMock::executeTransaction: Transaction hasn't been queued."
         );
-        require(
-            getBlockTimestamp() >= eta,
-            "TimelockMock::executeTransaction: Transaction hasn't surpassed time lock."
-        );
+        // Modify contract again for speeding up testing.
+        // require(
+        //     getBlockTimestamp() >= eta,
+        //     "TimelockMock::executeTransaction: Transaction hasn't surpassed time lock."
+        // );
         require(
             getBlockTimestamp() <= eta.add(GRACE_PERIOD),
             "TimelockMock::executeTransaction: Transaction is stale."

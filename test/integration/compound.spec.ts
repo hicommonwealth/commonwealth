@@ -113,6 +113,8 @@ async function setupSubscription(subscribe = true): Promise<ISetupData> {
   const addresses: string[] = await provider.listAccounts();
   const [member, bridge] = addresses;
   const signer = provider.getSigner(member);
+
+  // Deploy contracts.
   const comp = await deployMPond(signer, member, bridge);
   const timelock = await deployTimelock(signer, member, 2 * 60); // 2 minutes delay
   const governorAlpha = await deployGovernorAlpha(
@@ -252,8 +254,9 @@ async function proposeAndVote(
       kind: EventKind.VoteCast,
       id: +activeProposals,
       voter: from,
-      support: voteYes,
+      support: (voteYes as unknown) as number,
       votes: voteWeight.toString(),
+      reason: undefined,
     });
   });
 }
@@ -317,7 +320,7 @@ async function proposeAndQueue(
 describe('Compound Event Integration Tests', () => {
   describe('COMP contract function events', () => {
     it('initial address should transfer tokens to an address', async () => {
-      const { comp, addresses, handler } = await setupSubscription();
+      const { comp, addresses } = await setupSubscription();
       // test volume
       const initialBalance = await comp.balanceOf(addresses[0]);
       expect(+initialBalance).to.not.be.equal(0);

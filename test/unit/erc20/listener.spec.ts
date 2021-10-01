@@ -4,7 +4,8 @@ import * as chai from 'chai';
 import dotenv from 'dotenv';
 
 import { Processor, Subscriber, Listener } from '../../../src/chains/erc20';
-import { networkUrls, EventSupportingChainT } from '../../../src';
+import { EventSupportingChainT } from '../../../src';
+import { networkUrls } from '../../../scripts/listenerUtils';
 import { TestHandler } from '../../util';
 
 dotenv.config();
@@ -16,7 +17,7 @@ const tokenAddresses = [
 ];
 const tokenNames = ['USDT', 'USDC'];
 
-describe('Erc20 listener class tests', () => {
+describe.skip('Erc20 listener class tests', () => {
   let listener;
   const handlerEmitter = new events.EventEmitter();
 

@@ -10,28 +10,35 @@ import {
   Subscriber,
   Listener,
 } from '../../../src/chains/substrate';
-import { networkUrls, EventSupportingChainT } from '../../../src';
+import { EventSupportingChainT } from '../../../src';
+import { networkUrls } from '../../../scripts/listenerUtils';
 import { TestHandler } from '../../util';
 
 const { assert } = chai;
 
-describe('Substrate listener class tests', () => {
+describe.skip('Substrate listener class tests', () => {
   let listener;
   const handlerEmitter = new events.EventEmitter();
 
   it('should throw if the chain is not a substrate chain', () => {
     try {
-      new Listener('randomChain' as EventSupportingChainT);
+      const _listener = new Listener('randomChain' as EventSupportingChainT);
     } catch (error) {
       assert(String(error).includes('randomChain'));
     }
   });
 
-  it('should allow overriding the built in chain types', () => {});
-
   it('should create the substrate listener', () => {
-    // @ts-ignore
-    listener = new Listener('polkadot', ...Array(4), true, null, false);
+    listener = new Listener(
+      'polkadot',
+      networkUrls.polkadot,
+      {},
+      false,
+      0,
+      true,
+      {},
+      false
+    );
     assert.equal(listener.chain, 'polkadot');
     assert.deepEqual(listener.options, {
       archival: false,
@@ -79,26 +86,27 @@ describe('Substrate listener class tests', () => {
 
   it('should verify that the handler handled an event successfully', (done) => {
     let counter = 0;
-    const verifyHandler = () => {
-      assert(listener.eventHandlers.TestHandler.handler.counter >= 1);
-      ++counter;
-      if (counter == 1) {
-        clearTimeout(timeoutHandler);
-        done();
-      }
-    };
-    handlerEmitter.on('eventHandled', verifyHandler);
 
     // after 10 seconds with no event received use storage fetcher to verify api/connection
     const timeoutHandler = setTimeout(() => {
       // handlerEmitter.removeAllListeners();
       const startBlock = 6435620;
 
-      listener.storageFetcher.fetch({ startBlock }).then((events) => {
-        if (events.length > 0) done();
+      listener.storageFetcher.fetch({ startBlock }).then((es) => {
+        if (es.length > 0) done();
         else assert.fail('No event received and storage handler failed');
       });
     }, 20000);
+
+    const verifyHandler = () => {
+      assert(listener.eventHandlers.TestHandler.handler.counter >= 1);
+      ++counter;
+      if (counter === 1) {
+        clearTimeout(timeoutHandler);
+        done();
+      }
+    };
+    handlerEmitter.on('eventHandled', verifyHandler);
   }).timeout(50000);
 
   it('should update the chain spec', async () => {
@@ -108,29 +116,27 @@ describe('Substrate listener class tests', () => {
 
   it('should verify that the handler handled an event successfully after changing specs', (done) => {
     let counter = 0;
-    const verifyHandler = () => {
-      assert(listener.eventHandlers.TestHandler.handler.counter >= 1);
-      ++counter;
-      if (counter == 1) {
-        clearTimeout(timeoutHandler);
-        done();
-      }
-    };
-    handlerEmitter.on('eventHandled', verifyHandler);
-
     // after 10 seconds with no event received use storage fetcher to verify api/connection
     const timeoutHandler = setTimeout(() => {
       // handlerEmitter.removeAllListeners();
       const startBlock = 6435620;
 
-      listener.storageFetcher.fetch({ startBlock }).then((events) => {
-        if (events.length > 0) done();
+      listener.storageFetcher.fetch({ startBlock }).then((es) => {
+        if (es.length > 0) done();
         else assert.fail('No event received and storage handler failed');
       });
     }, 20000);
-  }).timeout(50000);
 
-  xit('should update the url to the listener should connect to', async () => {});
+    const verifyHandler = () => {
+      assert(listener.eventHandlers.TestHandler.handler.counter >= 1);
+      ++counter;
+      if (counter === 1) {
+        clearTimeout(timeoutHandler);
+        done();
+      }
+    };
+    handlerEmitter.on('eventHandled', verifyHandler);
+  }).timeout(50000);
 
   xit('should verify that the handler handled an event successfully after changing urls', () => {
     assert(listener.eventHandlers.TestHandler.handler.counter >= 1);
