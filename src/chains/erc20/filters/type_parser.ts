@@ -15,7 +15,7 @@ export function ParseType(name: string): EventKind | null {
     case 'Transfer':
       return EventKind.Transfer;
     default: {
-      log.warn(`Unknown Erc20 event name: ${name}!`);
+      log.info(`Unknown Erc20 event name: ${name}!`);
       return null;
     }
   }

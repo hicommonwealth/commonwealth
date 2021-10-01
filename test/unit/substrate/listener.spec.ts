@@ -11,7 +11,7 @@ import {
   Listener,
 } from '../../../src/chains/substrate';
 import { networkUrls, EventSupportingChainT } from '../../../src';
-import { testHandler } from '../../util';
+import { TestHandler } from '../../util';
 
 const { assert } = chai;
 
@@ -64,12 +64,12 @@ describe('Substrate listener class tests', () => {
   });
 
   it('should add a handler', async () => {
-    listener.eventHandlers.testHandler = {
-      handler: new testHandler(listener._verbose, handlerEmitter),
+    listener.eventHandlers.TestHandler = {
+      handler: new TestHandler(listener._verbose, handlerEmitter),
       excludedEvents: [],
     };
 
-    assert(listener.eventHandlers.testHandler.handler instanceof testHandler);
+    assert(listener.eventHandlers.TestHandler.handler instanceof TestHandler);
   });
 
   it('should subscribe the listener to the specified chain', async () => {
@@ -80,7 +80,7 @@ describe('Substrate listener class tests', () => {
   it('should verify that the handler handled an event successfully', (done) => {
     let counter = 0;
     const verifyHandler = () => {
-      assert(listener.eventHandlers.testHandler.handler.counter >= 1);
+      assert(listener.eventHandlers.TestHandler.handler.counter >= 1);
       ++counter;
       if (counter == 1) {
         clearTimeout(timeoutHandler);
@@ -109,7 +109,7 @@ describe('Substrate listener class tests', () => {
   it('should verify that the handler handled an event successfully after changing specs', (done) => {
     let counter = 0;
     const verifyHandler = () => {
-      assert(listener.eventHandlers.testHandler.handler.counter >= 1);
+      assert(listener.eventHandlers.TestHandler.handler.counter >= 1);
       ++counter;
       if (counter == 1) {
         clearTimeout(timeoutHandler);
@@ -133,8 +133,8 @@ describe('Substrate listener class tests', () => {
   xit('should update the url to the listener should connect to', async () => {});
 
   xit('should verify that the handler handled an event successfully after changing urls', () => {
-    assert(listener.eventHandlers.testHandler.handler.counter >= 1);
-    listener.eventHandlers.testHandler.handler.counter = 0;
+    assert(listener.eventHandlers.TestHandler.handler.counter >= 1);
+    listener.eventHandlers.TestHandler.handler.counter = 0;
   });
 
   it('should unsubscribe from the chain', async () => {

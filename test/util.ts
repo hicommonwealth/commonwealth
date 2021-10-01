@@ -7,7 +7,7 @@ import {
   ChainEventKinds,
 } from '../src';
 
-export class testHandler implements IEventHandler {
+export class TestHandler implements IEventHandler {
   private counter = 0;
 
   constructor(

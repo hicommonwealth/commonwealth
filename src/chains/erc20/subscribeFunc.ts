@@ -1,18 +1,21 @@
 import sleep from 'sleep-promise';
+import _ from 'underscore';
+import BN from 'bn.js';
 
 import { createProvider } from '../../eth';
 import { CWEvent, SubscribeFunc, ISubscribeOptions } from '../../interfaces';
 import { factory, formatFilename } from '../../logging';
-import { ERC20__factory as ERC20Factory } from '../../contractTypes';
+import { ERC20__factory as ERC20Factory, ERC20 } from '../../contractTypes';
 
 import { Subscriber } from './subscriber';
 import { Processor } from './processor';
-import { IEventData, RawEvent, Api } from './types';
+import { IEventData, RawEvent, IErc20Contracts } from './types';
 import { EnricherConfig } from './filters/enricher';
 
 const log = factory.getLogger(formatFilename(__filename));
 
-export interface IErc20SubscribeOptions extends ISubscribeOptions<Api> {
+export interface IErc20SubscribeOptions
+  extends ISubscribeOptions<IErc20Contracts> {
   enricherConfig?: EnricherConfig;
 }
 
@@ -28,46 +31,37 @@ export interface IErc20SubscribeOptions extends ISubscribeOptions<Api> {
 export async function createApi(
   ethNetworkUrl: string,
   tokenAddresses: string[],
-  retryTimeMs = 10 * 1000,
-  tokenNames?: string[]
-): Promise<Api> {
+  tokenNames?: string[],
+  retryTimeMs = 10 * 1000
+): Promise<IErc20Contracts> {
   for (let i = 0; i < 3; ++i) {
     try {
       const provider = await createProvider(ethNetworkUrl);
+      log.info(`[erc20]: Connection to ${ethNetworkUrl} successful!`);
 
       const tokenContracts = tokenAddresses.map((o) =>
         ERC20Factory.connect(o, provider)
       );
-      const deployResults = await Promise.all(
-        tokenContracts.map((o, index) =>
-          o
-            .deployed()
-            .then(() => {
-              return {
-                token: o,
-                deployed: true,
-                tokenName: tokenNames ? tokenNames[index] : undefined,
-              };
-            })
-            .catch((err) => {
-              log.error('Failed to find token', err);
-              return {
-                token: o,
-                deployed: false,
-                tokenName: tokenNames ? tokenNames[index] : undefined,
-              };
-            })
-        )
-      );
-
-      const result = deployResults.filter((o) => o.deployed);
-
-      log.info(`[erc20]: Connection to ${ethNetworkUrl} successful!`);
-      return {
-        tokens: result.map((o) => o.token),
-        provider,
-        tokenNames: result.map((o) => o.tokenName),
-      };
+      const deployResults: IErc20Contracts = { provider, tokens: [] };
+      for (const [contract, tokenName] of _.zip(tokenContracts, tokenNames) as [
+        ERC20,
+        string | undefined
+      ][]) {
+        try {
+          await contract.deployed();
+          const totalSupply = new BN((await contract.totalSupply()).toString());
+          deployResults.tokens.push({
+            contract,
+            totalSupply,
+            tokenName,
+          });
+        } catch (err) {
+          log.error(
+            `Error loading token ${contract.address} (${tokenName}): ${err.message}`
+          );
+        }
+      }
+      return deployResults;
     } catch (err) {
       log.error(`Erc20 at ${ethNetworkUrl} failure: ${err.message}`);
       await sleep(retryTimeMs);
@@ -87,18 +81,21 @@ export async function createApi(
  * @returns An active block subscriber.
  */
 export const subscribeEvents: SubscribeFunc<
-  Api,
+  IErc20Contracts,
   RawEvent,
   IErc20SubscribeOptions
 > = async (options) => {
   const { chain, api, handlers, verbose, enricherConfig } = options;
   // helper function that sends an event through event handlers
-  const handleEventFn = async (event: CWEvent<IEventData>): Promise<void> => {
+  const handleEventFn = async (
+    event: CWEvent<IEventData>,
+    tokenName?: string
+  ): Promise<void> => {
+    event.chain = (tokenName as never) || chain;
+    event.received = Date.now();
     let prevResult = null;
     for (const handler of handlers) {
       try {
-        event.chain = chain;
-        event.received = Date.now();
         // pass result of last handler into next one (chaining db events)
         prevResult = await handler.handle(event, prevResult);
       } catch (err) {
@@ -120,7 +117,7 @@ export const subscribeEvents: SubscribeFunc<
 
     // process events in sequence
     for (const cwEvent of cwEvents) {
-      await handleEventFn(cwEvent);
+      await handleEventFn(cwEvent, tokenName);
     }
   };
 

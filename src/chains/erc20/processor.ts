@@ -6,13 +6,13 @@ import { factory, formatFilename } from '../../logging';
 
 import { ParseType } from './filters/type_parser';
 import { Enrich, EnricherConfig } from './filters/enricher';
-import { IEventData, RawEvent, Api } from './types';
+import { IEventData, RawEvent, IErc20Contracts } from './types';
 
 const log = factory.getLogger(formatFilename(__filename));
 
-export class Processor extends IEventProcessor<Api, RawEvent> {
+export class Processor extends IEventProcessor<IErc20Contracts, RawEvent> {
   constructor(
-    protected _api: Api,
+    protected _api: IErc20Contracts,
     private _enricherConfig: EnricherConfig = {}
   ) {
     super(_api);
@@ -37,7 +37,9 @@ export class Processor extends IEventProcessor<Api, RawEvent> {
       );
       return cwEvent ? [cwEvent] : [];
     } catch (e) {
-      log.error(`Failed to enrich event: ${e.message}`);
+      log.error(
+        `Failed to enrich event ${event.address} (${event.event}): ${e.message}`
+      );
       return [];
     }
   }

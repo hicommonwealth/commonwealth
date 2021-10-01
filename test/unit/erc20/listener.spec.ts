@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 
 import { Processor, Subscriber, Listener } from '../../../src/chains/erc20';
 import { networkUrls, EventSupportingChainT } from '../../../src';
-import { testHandler } from '../../util';
+import { TestHandler } from '../../util';
 
 dotenv.config();
 
@@ -22,12 +22,13 @@ describe('Erc20 listener class tests', () => {
 
   it('should throw if the chain is not an Aave based contract', () => {
     try {
+      // eslint-disable-next-line no-new
       new Listener(
         'randomChain' as EventSupportingChainT,
         tokenAddresses,
         networkUrls.erc20,
         tokenNames,
-        false
+        {}
       );
     } catch (error) {
       assert(String(error).includes('randomChain'));
@@ -40,7 +41,7 @@ describe('Erc20 listener class tests', () => {
       tokenAddresses,
       networkUrls.erc20,
       tokenNames,
-      false
+      {}
     );
     assert.equal(listener.chain, 'erc20');
     assert.deepEqual(listener.options, {
@@ -59,12 +60,12 @@ describe('Erc20 listener class tests', () => {
   });
 
   it('should add a handler', async () => {
-    listener.eventHandlers.testHandler = {
-      handler: new testHandler(listener._verbose, handlerEmitter),
+    listener.eventHandlers.TestHandler = {
+      handler: new TestHandler(listener._verbose, handlerEmitter),
       excludedEvents: [],
     };
 
-    assert(listener.eventHandlers.testHandler.handler instanceof testHandler);
+    assert(listener.eventHandlers.TestHandler.handler instanceof TestHandler);
   });
 
   it('should subscribe the listener to the specified erc20 tokens', async () => {
@@ -75,9 +76,9 @@ describe('Erc20 listener class tests', () => {
   it('should verify that the handler handled an event successfully', (done) => {
     let counter = 0;
     const verifyHandler = () => {
-      assert(listener.eventHandlers.testHandler.handler.counter >= 1);
+      assert(listener.eventHandlers.TestHandler.handler.counter >= 1);
       ++counter;
-      if (counter == 1) {
+      if (counter === 1) {
         done();
       }
     };
@@ -87,24 +88,25 @@ describe('Erc20 listener class tests', () => {
   xit('should update a contract address');
 
   xit('should verify that the handler handled an event successfully after changing contract address', (done) => {
-    listener.eventHandlers.testHandler.handler.counter = 0;
+    listener.eventHandlers.TestHandler.handler.counter = 0;
     let counter = 0;
     const verifyHandler = () => {
-      assert(listener.eventHandlers.testHandler.handler.counter >= 1);
+      assert(listener.eventHandlers.TestHandler.handler.counter >= 1);
       ++counter;
-      if (counter == 1) done();
+      if (counter === 1) done();
     };
     handlerEmitter.on('eventHandled', verifyHandler);
   }).timeout(20000);
 
-  xit('should update the url the listener should connect to', async () => {});
+  xit('should update the url the listener should connect to', async () =>
+    undefined);
 
   xit('should verify that the handler handled an event successfully after changing urls', () => {
     assert(
-      listener.eventHandlers.testHandler.handler.counter >= 1,
+      listener.eventHandlers.TestHandler.handler.counter >= 1,
       'Handler was not triggered/used'
     );
-    listener.eventHandlers.testHandler.handler.counter = 0;
+    listener.eventHandlers.TestHandler.handler.counter = 0;
   });
 
   it('should unsubscribe from the chain', async () => {

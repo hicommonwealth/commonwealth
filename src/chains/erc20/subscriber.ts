@@ -3,23 +3,22 @@
  */
 import { Listener } from '@ethersproject/providers';
 import sleep from 'sleep-promise';
+import BN from 'bn.js';
 
 import { IEventSubscriber } from '../../interfaces';
 import { ERC20__factory as ERC20Factory } from '../../contractTypes';
 import { factory, formatFilename } from '../../logging';
 
-import { RawEvent, Api, Token } from './types';
+import { RawEvent, IErc20Contracts } from './types';
 
 const log = factory.getLogger(formatFilename(__filename));
 
-export class Subscriber extends IEventSubscriber<Api, RawEvent> {
+export class Subscriber extends IEventSubscriber<IErc20Contracts, RawEvent> {
   private _name: string;
-
-  public tokens: Token[];
 
   private _listener: Listener | null;
 
-  constructor(api: Api, name: string, verbose = false) {
+  constructor(api: IErc20Contracts, name: string, verbose = false) {
     super(api, verbose);
     this._name = name;
   }
@@ -40,25 +39,26 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
       this._verbose ? log.info(logStr) : log.trace(logStr);
       cb(event, tokenName);
     };
-    this._api.tokens.forEach((o, index) =>
-      o.on('*', this._listener.bind(this, this._api.tokenNames[index]))
+    this._api.tokens.forEach(({ contract, tokenName }) =>
+      contract.on('*', this._listener.bind(this, tokenName))
     );
   }
 
   public unsubscribe(): void {
     if (this._listener) {
-      this._api.tokens.forEach((o) => o.removeListener('*', this._listener));
+      this._api.tokens.forEach(({ contract }) => contract.removeAllListeners());
       this._listener = null;
     }
   }
 
   public async addNewToken(
     tokenAddress: string,
+    tokenName?: string,
     retryTimeMs = 10 * 1000,
     retries = 5
   ): Promise<void> {
-    const existingToken = this.api.tokens.find((o) => {
-      return o.address === tokenAddress;
+    const existingToken = this.api.tokens.find(({ contract }) => {
+      return contract.address === tokenAddress;
     });
     if (existingToken) {
       log.info('Token is already being monitored');
@@ -67,13 +67,14 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
     try {
       const contract = ERC20Factory.connect(tokenAddress, this.api.provider);
       await contract.deployed();
-      this.api.tokens.push(contract);
-      contract.on('*', this._listener);
+      const totalSupply = new BN((await contract.totalSupply()).toString());
+      this.api.tokens.push({ contract, totalSupply, tokenName });
+      contract.on('*', this._listener.bind(this, tokenName));
     } catch (e) {
       await sleep(retryTimeMs);
       if (retries > 0) {
         log.error('Retrying connection...');
-        this.addNewToken(tokenAddress, retryTimeMs, retries - 1);
+        this.addNewToken(tokenAddress, tokenName, retryTimeMs, retries - 1);
       }
     }
   }

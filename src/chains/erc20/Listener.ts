@@ -10,7 +10,7 @@ import {
   ListenerOptions as Erc20ListenerOptions,
   RawEvent,
   EventChains as erc20Chains,
-  Api,
+  IErc20Contracts,
   EventKind,
 } from './types';
 import { createApi } from './subscribeFunc';
@@ -21,7 +21,7 @@ import { EnricherConfig } from './filters/enricher';
 const log = factory.getLogger(formatFilename(__filename));
 
 export class Listener extends BaseListener<
-  Api,
+  IErc20Contracts,
   never,
   Processor,
   Subscriber,
@@ -57,8 +57,8 @@ export class Listener extends BaseListener<
       this._api = await createApi(
         this._options.url,
         this._options.tokenAddresses,
-        10000,
-        this.options.tokenNames
+        this._options.tokenNames,
+        10000
       );
     } catch (error) {
       log.error(
@@ -101,12 +101,6 @@ export class Listener extends BaseListener<
     }
   }
 
-  public async updateTokenList(tokenAddresses: string[]): Promise<void> {
-    this._options.tokenAddresses = tokenAddresses;
-    await this.init();
-    if (this._subscribed === true) await this.subscribe();
-  }
-
   // override handleEvent to stop the chain from being added to event data
   // since the chain/token name is added to event data in the subscriber.ts
   // (since there are multiple tokens)
@@ -140,6 +134,7 @@ export class Listener extends BaseListener<
 
     // process events in sequence
     for (const e of cwEvents) {
+      // TODO: refactor chain/tokenName code in general
       e.chain = tokenName as never;
       await this.handleEvent(e as CWEvent);
     }

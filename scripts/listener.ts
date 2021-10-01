@@ -1,11 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-console */
-import * as yargs from 'yargs';
-import fetch from 'node-fetch';
-import type { RegisteredTypes } from '@polkadot/types/types';
-import { spec as EdgewareSpec } from '@edgeware/node-types';
-import EthDater from 'ethereum-block-by-date';
-
 import {
   chainSupportedBy,
   IEventHandler,
@@ -22,6 +16,12 @@ import { HydraDXSpec } from './specs/hydraDX';
 import { KulupuSpec } from './specs/kulupu';
 import { StafiSpec } from './specs/stafi';
 import { CloverSpec } from './specs/clover';
+
+import * as yargs from 'yargs';
+import fetch from 'node-fetch';
+import type { RegisteredTypes } from '@polkadot/types/types';
+import { spec as EdgewareSpec } from '@edgeware/node-types';
+import EthDater from 'ethereum-block-by-date';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
@@ -257,13 +257,15 @@ if (chainSupportedBy(network, SubstrateEvents.Types.EventChains)) {
 } else if (chainSupportedBy(network, Erc20Events.Types.EventChains)) {
   getTokenLists().then(async (tokens) => {
     const tokenAddresses = tokens.map((o) => o.address);
-    const api = await Erc20Events.createApi(url, tokenAddresses);
+    const tokenNames = tokens.map((o) => o.name);
+    const api = await Erc20Events.createApi(url, tokenAddresses, tokenNames);
     Erc20Events.subscribeEvents({
       chain: network,
       api,
       handlers: [new StandaloneEventHandler()],
       skipCatchup,
-      verbose: true,
+      verbose: false,
+      enricherConfig: { balanceTransferThresholdPermill: 500_000 }, // 50% of total supply
     });
   });
 }
