@@ -1,13 +1,15 @@
 import chai from 'chai';
+import { utils } from 'ethers';
 
 import { EventKind, RawEvent, Api } from '../../../src/chains/compound/types';
 import { Enrich } from '../../../src/chains/compound/filters/enricher';
 
 const { assert } = chai;
 
-const constructEvent = (data): RawEvent => {
+const constructEvent = (data, rawData?): RawEvent => {
   return {
     args: data,
+    data: rawData,
   } as RawEvent;
 };
 
@@ -119,32 +121,61 @@ describe('Compound Event Enricher Filter Tests', () => {
   // ProposalCreated
   it('should enrich ProposalCreated event', async () => {
     const kind = EventKind.ProposalCreated;
-    const event = constructEvent({
-      id: 1,
-      proposer: 'sender',
-      targets: ['hello'],
-      3: ['hello2'],
-      signatures: ['hello3'],
-      calldatas: ['hello4'],
-      startBlock: blockNumber,
-      endBlock: blockNumber + 172, // votingPeriod()
-      description: 'test description',
-    });
+    const address = '0x6E0d01A76C3Cf4288372a29124A26D4353EE51BE';
+    const callData = utils.toUtf8Bytes('calldata');
+    const rawData = utils.defaultAbiCoder.encode(
+      [
+        'uint',
+        'address',
+        'address[]',
+        'uint[]',
+        'string[]',
+        'bytes[]',
+        'uint',
+        'uint',
+        'bytes',
+      ],
+      [
+        1,
+        address,
+        [address],
+        [3],
+        ['hello3'],
+        [callData],
+        blockNumber,
+        blockNumber + 172,
+        utils.toUtf8Bytes('test description'),
+      ]
+    );
+    const event = constructEvent(
+      {
+        id: 1,
+        proposer: address,
+        targets: [address],
+        3: [3],
+        signatures: ['hello3'],
+        calldatas: [callData],
+        startBlock: blockNumber,
+        endBlock: blockNumber + 172, // votingPeriod()
+        description: utils.toUtf8Bytes('test description'),
+      },
+      rawData
+    );
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
-      excludeAddresses: ['sender'],
+      excludeAddresses: [address],
       data: {
         kind,
         id: 1,
-        proposer: 'sender',
-        // targets: ['hello'],
-        // values: ['hello2'],
-        // signatures: ['hello3'],
-        // calldatas: ['hello4'],
+        proposer: address,
+        targets: [address],
+        values: ['3'],
+        signatures: ['hello3'],
+        calldatas: [utils.hexlify(callData)],
         startBlock: blockNumber,
         endBlock: blockNumber + 172, // votingPeriod()
-        // description: 'test description',
+        description: 'test description',
       },
     });
   });
@@ -204,7 +235,7 @@ describe('Compound Event Enricher Filter Tests', () => {
   });
 
   // VoteCast
-  it('should enrich VoteCast event', async () => {
+  it('should enrich GovAlpha VoteCast event', async () => {
     const kind = EventKind.VoteCast;
     const voter = 'i voted!';
     const id = 123;
@@ -224,8 +255,38 @@ describe('Compound Event Enricher Filter Tests', () => {
         kind,
         id,
         voter,
+        support: 0,
+        votes,
+        reason: undefined,
+      },
+    });
+  });
+
+  it('should enrich GovBravo VoteCast event', async () => {
+    const kind = EventKind.VoteCast;
+    const voter = 'i voted!';
+    const id = 123;
+    const support = 2;
+    const votes = '525600';
+    const reason = 'for what?';
+    const event = constructEvent({
+      proposalId: id,
+      voter,
+      support,
+      votes,
+      reason,
+    });
+    const result = await Enrich(api, blockNumber, kind, event);
+    assert.deepEqual(result, {
+      blockNumber,
+      excludeAddresses: [voter],
+      data: {
+        kind,
+        id,
+        voter,
         support,
         votes,
+        reason,
       },
     });
   });

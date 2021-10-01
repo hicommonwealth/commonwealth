@@ -27,17 +27,3 @@ export class TestHandler implements IEventHandler {
     return event.data;
   }
 }
-
-function delay(interval) {
-  return it('delaying...', (done) => {
-    setTimeout(() => done(), interval);
-  }).timeout(interval + 100);
-}
-
-export function discoverReconnectRange(chain: string) {
-  // TODO: populate with good ranges for specific chains
-  switch (chain) {
-    case 'polkadot':
-      return { startBlock: 650000 };
-  }
-}

@@ -36,6 +36,7 @@
     "no-plusplus": "off",
     "no-restricted-syntax": "off",
     "no-underscore-dangle": "off",
-    "no-useless-constructor": "off"
+    "no-useless-constructor": "off",
+    "class-methods-use-this": "off"
   }
 }

@@ -37,7 +37,7 @@ export class Listener extends BaseListener<
     url?: string,
     skipCatchup?: boolean,
     verbose?: boolean,
-    discoverReconnectRange?: (chain: string) => Promise<IDisconnectedRange>
+    discoverReconnectRange?: (c: string) => Promise<IDisconnectedRange>
   ) {
     super(chain, verbose);
     if (!chainSupportedBy(this._chain, CompoundChains))
@@ -111,12 +111,9 @@ export class Listener extends BaseListener<
     }
   }
 
-  public async updateContractAddress(
-    contractName: string,
-    address: string
-  ): Promise<void> {
-    if (contractName != ('comp' || 'governorAlpha' || 'timelock')) {
-      log.info('Contract is not supported');
+  public async updateContractAddress(address: string): Promise<void> {
+    if (address === this._options.contractAddress) {
+      log.warn(`The contract address is already set to ${address}`);
       return;
     }
     this._options.contractAddress = address;
@@ -134,8 +131,8 @@ export class Listener extends BaseListener<
     const cwEvents: CWEvent[] = await this._processor.process(event);
 
     // process events in sequence
-    for (const event of cwEvents)
-      await this.handleEvent(event as CWEvent<IEventData>);
+    for (const evt of cwEvents)
+      await this.handleEvent(evt as CWEvent<IEventData>);
   }
 
   private async processMissedBlocks(): Promise<void> {

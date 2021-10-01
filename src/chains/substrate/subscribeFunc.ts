@@ -31,13 +31,11 @@ export interface ISubstrateSubscribeOptions
  */
 export async function createApi(
   url: string,
-  typeOverrides: RegisteredTypes = {},
-  timeoutMs = 30000
+  typeOverrides: RegisteredTypes = {}
 ): Promise<ApiPromise> {
-  let unsubscribe: () => void;
-
   for (let i = 0; i < 3; ++i) {
     const provider = new WsProvider(url, 0);
+    let unsubscribe: () => void;
     const success = await new Promise<boolean>((resolve) => {
       unsubscribe = provider.on('connected', () => resolve(true));
 

@@ -739,7 +739,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
       },
     });
   });
-  it('should enrich small balance-transfer event to included addresses with config', async () => {
+  it('should not enrich small balance-transfer event to anyone with config', async () => {
     const kind = EventKind.BalanceTransfer;
     const event = constructEvent(['alice', 'bob', new BN('999')], 'balances', [
       'AccountId',
@@ -751,16 +751,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event, {
       balanceTransferThresholdPermill: 1_000,
     });
-    assert.deepEqual(result, {
-      blockNumber,
-      excludeAddresses: ['alice', 'bob'],
-      data: {
-        kind,
-        sender: 'alice',
-        dest: 'bob',
-        value: '999',
-      },
-    });
+    assert.deepEqual(result, null);
   });
   it('should enrich new-session event', async () => {
     // TODO

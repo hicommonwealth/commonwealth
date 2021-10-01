@@ -227,7 +227,7 @@ async function createActiveProposal(
   return activeProposals;
 }
 
-describe('Compound Event Integration Tests', () => {
+describe('Governor Bravo Event Integration Tests', () => {
   describe('COMP contract function events', () => {
     it('initial address should transfer tokens to an address', async () => {
       const { comp, addresses } = await setupSubscription();

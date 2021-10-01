@@ -1,6 +1,6 @@
 {
   "name": "@commonwealth/chain-events",
-  "version": "0.8.7",
+  "version": "0.8.8",
   "description": "Listen to various chains for events.",
   "license": "GPL-3.0",
   "files": [
@@ -11,13 +11,8 @@
   "scripts": {
     "build": "rimraf dist/ && tsc --project tsconfig.json && copyfiles -u 1 \"./src/**/*.d.ts\" \"dist\"",
     "compile-contracts": "cd eth && npx hardhat compile",
-    "unit-test": "nyc ts-mocha --config ./.mocharc.json ./test/unit/**/*.spec.ts",
-    "compound-test": "nyc ts-mocha --config ./.mocharc.json ./test/integration/compound.spec.ts",
-    "cb-test": "cd eth && hardhat test ../test/integration/compoundBravo.spec.ts",
-    "c-test": "cd eth && hardhat test ../test/integration/compound.spec.ts",
-    "integration-test": "nyc ts-mocha --config ./.mocharc.json ./test/integration/*.spec.ts",
-    "integration-test-hh": "cd eth && hardhat test ../test/integration/*.spec.ts",
-    "test": "nyc ts-mocha --config ./.mocharc.json ./test/unit/**/*.spec.ts; cd eth && hardhat test ../test/integration/*.spec.ts",
+    "unit-test": "ts-mocha --config ./.mocharc.json ./test/unit/**/*.spec.ts",
+    "integration-test": "cd eth && hardhat test ../test/integration/*.spec.ts",
     "lint": "eslint src/ test/",
     "listen": "ts-node -T ./scripts/listener.ts",
     "listen-archival": "ts-node -T ./scripts/listener.ts -n edgeware-local -a true",

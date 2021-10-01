@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import chai from 'chai';
+import BN from 'bn.js';
 import {
   AccountId,
   BalanceOf,
@@ -92,7 +93,7 @@ const api = constructFakeApi({
   depositOf: async (idx) =>
     idx !== 1
       ? constructOption()
-      : constructOption((['100', ['Alice']] as unknown) as [
+      : constructOption(([new BN('100'), ['Alice']] as unknown) as [
           BalanceOf,
           Vec<AccountId>
         ] &

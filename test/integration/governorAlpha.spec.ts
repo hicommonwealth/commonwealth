@@ -254,7 +254,7 @@ async function proposeAndVote(
       kind: EventKind.VoteCast,
       id: +activeProposals,
       voter: from,
-      support: (voteYes as unknown) as number,
+      support: +voteYes,
       votes: voteWeight.toString(),
       reason: undefined,
     });
@@ -317,7 +317,7 @@ async function proposeAndQueue(
   ]);
 }
 
-describe('Compound Event Integration Tests', () => {
+describe('Governor Alpha Integration Tests', () => {
   describe('COMP contract function events', () => {
     it('initial address should transfer tokens to an address', async () => {
       const { comp, addresses } = await setupSubscription();

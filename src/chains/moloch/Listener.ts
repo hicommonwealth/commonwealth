@@ -38,7 +38,7 @@ export class Listener extends BaseListener<
     url?: string,
     skipCatchup?: boolean,
     verbose?: boolean,
-    discoverReconnectRange?: (chain: string) => Promise<IDisconnectedRange>
+    discoverReconnectRange?: (c: string) => Promise<IDisconnectedRange>
   ) {
     super(chain, verbose);
     if (!chainSupportedBy(this._chain, molochChains))
@@ -63,7 +63,7 @@ export class Listener extends BaseListener<
         this._options.contractAddress
       );
     } catch (error) {
-      console.error('Fatal error occurred while starting the API');
+      log.error('Fatal error occurred while starting the API');
       throw error;
     }
 
@@ -75,7 +75,7 @@ export class Listener extends BaseListener<
         this._verbose
       );
     } catch (error) {
-      console.error(
+      log.error(
         'Fatal error occurred while starting the Processor, and Subscriber'
       );
       throw error;
@@ -88,7 +88,7 @@ export class Listener extends BaseListener<
         dater
       );
     } catch (error) {
-      console.error(
+      log.error(
         'Fatal error occurred while starting the Ethereum dater and storage fetcher'
       );
       throw error;
@@ -97,7 +97,7 @@ export class Listener extends BaseListener<
 
   public async subscribe(): Promise<void> {
     if (!this._subscriber) {
-      console.log(
+      log.info(
         `Subscriber for ${this._chain} isn't initialized. Please run init() first!`
       );
       return;
@@ -105,16 +105,16 @@ export class Listener extends BaseListener<
 
     // processed blocks missed during downtime
     if (!this._options.skipCatchup) await this.processMissedBlocks();
-    else console.log('Skipping event catchup on startup!');
+    else log.info('Skipping event catchup on startup!');
 
     try {
-      console.info(
+      log.info(
         `Subscribing Moloch contract: ${this._chain}, on url ${this._options.url}`
       );
       await this._subscriber.subscribe(this.processBlock.bind(this));
       this._subscribed = true;
     } catch (error) {
-      console.error(`Subscription error: ${error.message}`);
+      log.error(`Subscription error: ${error.message}`);
     }
   }
 
@@ -189,13 +189,13 @@ export class Listener extends BaseListener<
         await this.handleEvent(event as CWEvent<IEventData>);
       }
     } catch (e) {
-      console.error(`Unable to fetch events from storage: ${e.message}`);
+      log.error(`Unable to fetch events from storage: ${e.message}`);
     }
   }
 
   public async updateContractVersion(version: 1 | 2): Promise<void> {
     if (version === this._options.contractVersion) {
-      console.log(`The contract version is already set to ${version}`);
+      log.warn(`The contract version is already set to ${version}`);
       return;
     }
 
@@ -207,7 +207,7 @@ export class Listener extends BaseListener<
 
   public async updateContractAddress(address: string): Promise<void> {
     if (address === this._options.contractAddress) {
-      console.log(`The contract address is already set to ${address}`);
+      log.warn(`The contract address is already set to ${address}`);
       return;
     }
 

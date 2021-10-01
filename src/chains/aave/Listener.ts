@@ -40,7 +40,7 @@ export class Listener extends BaseListener<
     skipCatchup?: boolean,
     verbose?: boolean,
     ignoreChainType?: boolean,
-    discoverReconnectRange?: (chain: string) => Promise<IDisconnectedRange>
+    discoverReconnectRange?: (c: string) => Promise<IDisconnectedRange>
   ) {
     super(chain, verbose);
     if (!ignoreChainType && !chainSupportedBy(this._chain, AaveEventChains))
@@ -104,7 +104,9 @@ export class Listener extends BaseListener<
     }
   }
 
-  public async updateAddress(): Promise<void> {}
+  public async updateAddress(): Promise<void> {
+    // TODO
+  }
 
   private async processMissedBlocks(): Promise<void> {
     log.info(
@@ -160,8 +162,8 @@ export class Listener extends BaseListener<
 
     const cwEvents: CWEvent[] = await this._processor.process(event);
 
-    for (const event of cwEvents) {
-      await this.handleEvent(event as CWEvent<IEventData>);
+    for (const evt of cwEvents) {
+      await this.handleEvent(evt as CWEvent<IEventData>);
     }
   }
 

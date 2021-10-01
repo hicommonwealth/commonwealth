@@ -28,7 +28,7 @@ export interface ISubstrateListenerOptions {
   skipCatchup: boolean;
   archival: boolean;
   url: string;
-  spec: RegisteredTypes | {};
+  spec: RegisteredTypes;
   enricherConfig: EnricherConfig;
 }
 

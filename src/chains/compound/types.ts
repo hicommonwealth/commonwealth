@@ -2,12 +2,6 @@
 import { TypedEvent } from '../../contractTypes/commons';
 import { GovernorAlpha } from '../../contractTypes';
 
-// Used to unwrap promises returned by contract functions
-type UnPromisify<T> = T extends Promise<infer U> ? U : T;
-export type Proposal = UnPromisify<
-  ReturnType<GovernorAlpha['functions']['proposals']>
->;
-
 export enum ProposalState {
   Pending = 0,
   Active = 1,

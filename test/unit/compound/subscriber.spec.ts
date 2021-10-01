@@ -35,7 +35,7 @@ describe('Compound Event Subscriber Tests', () => {
   });
 
   it('should no-op on unnecessary unsubscribe', (done) => {
-    const compoundApi = { governance: new EventEmitter() };
+    const compoundApi = new EventEmitter();
     const subscriber = new Subscriber(
       (compoundApi as unknown) as Api,
       'compound-test'
@@ -45,7 +45,7 @@ describe('Compound Event Subscriber Tests', () => {
   });
 
   it('should unsubscribe successfully', (done) => {
-    const compoundApi = { governance: new EventEmitter() };
+    const compoundApi = new EventEmitter();
     const subscriber = new Subscriber(
       (compoundApi as unknown) as Api,
       'compound-test'
@@ -55,7 +55,7 @@ describe('Compound Event Subscriber Tests', () => {
     };
     subscriber.subscribe(cb).then(() => {
       subscriber.unsubscribe();
-      assert.deepEqual(compoundApi.governance.listeners('*'), []);
+      assert.deepEqual(compoundApi.listeners('*'), []);
       done();
     });
   });
