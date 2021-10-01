@@ -181,19 +181,18 @@ const VoteAction: m.Component<
     totalScore: number;
     scores: number[];
     choices: string[];
-    votes: any[];
+    votes: SnapshotProposalVote[];
   },
   {
     votingModalOpen: boolean;
+    chosenOption: string;
   }
 > = {
   view: (vnode) => {
-    const { choices, proposal } = vnode.attrs;
-    const canVote = true; // TODO: remove these hardcoded values;
+    const { proposal } = vnode.attrs;
     const hasVoted = vnode.attrs.votes.find((vote) => {
       return vote.voter === app.user?.activeAccount?.address;
     })?.choice;
-    const { votingModalOpen } = vnode.state;
 
     const onModalClose = () => {
       vnode.state.votingModalOpen = false;
@@ -223,42 +222,24 @@ const VoteAction: m.Component<
     };
 
     if (!vnode.attrs.proposal.choices?.length) return;
-    const votingButtons = vnode.attrs.proposal.choices.map((choice, idx) => {
-      const choiceNum = idx + 1;
-      return m(`.voting-option.option-${choiceNum}`, [
-        m(Button, {
-          disabled: !canVote || hasVoted === choiceNum || votingModalOpen,
-          onclick: (e) => vote(idx),
-          label:
-            hasVoted === choiceNum
-              ? `Voted "${choices[idx]}"`
-              : `Vote "${choices[idx]}"`,
-          compact: true,
-          rounded: true,
-        }),
-      ]);
-    });
-
-    // const votingActionObj = [m('.button-row', votingButtons)];
-
-    // return m('.VotingActions.Snapshot', [votingActionObj]);
 
     return m('.proposal-info-box.padding-x-20.mt-30', [
       m('.title', 'Cast your vote'),
       m(RadioGroup, {
         class: 'snapshot-votes',
         options: proposal.choices,
-        // value: vnode.state.chosenOption,
-        // onchange: (e: Event) => {
-        //   vnode.state.chosenOption = (
-        //     e.currentTarget as HTMLInputElement
-        //   ).value;
-        // },
+        value:
+          (hasVoted && proposal.choices[hasVoted]) || vnode.state.chosenOption,
+        onchange: (e: Event) => {
+          vnode.state.chosenOption = (
+            e.currentTarget as HTMLInputElement
+          ).value;
+        },
       }),
       m(Button, {
         label: 'Vote',
-        // disabled: !vnode.state.chosenOption,
-        // onclick: handleVote,
+        disabled: hasVoted !== undefined || !vnode.state.chosenOption,
+        onclick: () => vote(proposal.choices.indexOf(vnode.state.chosenOption)),
       }),
     ]);
   },
