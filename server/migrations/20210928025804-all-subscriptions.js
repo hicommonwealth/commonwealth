@@ -4,12 +4,16 @@ import { NotificationCategories } from 'shared/types';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
-      const user = await queryInterface.bulkInsert('Users', [{ 
+      const user = await queryInterface.bulkInsert(
+        'Users',
+        [
+          {
             email: 'notifications@commonwealth.im',
             emailVerified: true,
             isAdmin: false,
             magicIssuer: false,
-          }],
+          },
+        ],
         { transaction: t }
       );
       const newSubscriptions = [];
@@ -47,6 +51,31 @@ module.exports = {
       }
 
       // new-comment-creation (for every thread in every community)
+      const allThreads = await queryInterface.sequelize.query(
+        'SELECT id, chain, community FROM "OffchainThreads";'
+      );
+      for (const thread of allThreads[0]) {
+        const { id, chain, community } = thread;
+        newSubscriptions.push(
+          chain
+            ? {
+                subscriber_id: user.id,
+                category_id: NotificationCategories.NewComment,
+                chain_id: chain,
+                offchain_thread_id: id,
+                object_id: null, // TODO: construct?
+                is_active: true,
+              }
+            : {
+                subscriber_id: user.id,
+                category_id: NotificationCategories.NewComment,
+                community_id: community,
+                offchain_thread_id: id,
+                object_id: null, // TODO: construct?
+                is_active: true,
+              }
+        );
+      }
 
       // For every ChainEventType, chain-event subscriptions
       const chainEventTypes = await queryInterface.sequelize.query(
@@ -70,11 +99,17 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
-      await queryInterface.bulkDelete('Users', [{
-        email: 'notifications@commonwealth.im'
-      }], { transaction: t });
+      await queryInterface.bulkDelete(
+        'Users',
+        [
+          {
+            email: 'notifications@commonwealth.im',
+          },
+        ],
+        { transaction: t }
+      );
 
-      /* remove subscriptions owned by user*/ 
+      /* remove subscriptions owned by user*/
     });
-  }
+  },
 };
