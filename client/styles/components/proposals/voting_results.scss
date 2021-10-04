@@ -52,9 +52,6 @@
             line-height: 2;
             margin-bottom: 20px;
         }
-        .results-header, .results-cell {
-            min-width: calc(50% - 15px);
-        }
         &.yes-votes {
             border: 2px solid #C5EEE9;
             .results-header {
@@ -73,8 +70,9 @@
     @include lg-max {
         display: block;
         width: 100%;
-        .results-header, .results-cell {
-            width: 100%;
+        .results-column, .results-header, .results-cell {
+            min-width: 100%;
+            max-width: 100%;
         }
     }
     .vote {
