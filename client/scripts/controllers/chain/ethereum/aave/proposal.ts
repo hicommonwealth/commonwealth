@@ -6,7 +6,7 @@ import bs58 from 'bs58';
 import { AaveTypes } from '@commonwealth/chain-events';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import { IAaveProposalResponse } from 'adapters/chain/aave/types';
-import { formatNumberShort } from 'adapters/currency';
+import { formatNumberLong } from 'adapters/currency';
 
 import {
   Proposal,
@@ -39,7 +39,7 @@ export class AaveProposalVote implements IVote<EthereumCoin> {
   }
 
   public format(): string {
-    return `${formatNumberShort(+Web3.utils.fromWei(this.power))} POWER`;
+    return `${formatNumberLong(+Web3.utils.fromWei(this.power))} ${this.account.chain.symbol}`;
   }
 }
 

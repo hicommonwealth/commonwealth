@@ -125,19 +125,6 @@ class CommentsController {
     return this._store.nComments(proposal);
   }
 
-  public uniqueCommenters<T extends IUniqueId>(proposal: T, proposalAuthor?, proposalAuthorChain?) {
-    // Returns an array of [chain, address] arrays
-    // TODO: Use a better comparator to determine uniqueness
-    const comments = (proposalAuthor && proposalAuthorChain)
-      ? [`${proposalAuthorChain}#${proposalAuthor}`]
-        .concat(this._store.getByProposal(proposal).map((c) => `${c.authorChain}#${c.author}`))
-      : (this._store.getByProposal(proposal)).map((c) => `${c.authorChain}#${c.author}`);
-
-    return _.uniq((comments as string[]))
-      .map((slug) => slug.split(/#/))
-      .map(([chain, address]) => new AddressInfo(null, address, chain, null));
-  }
-
   public lastCommented<T extends IUniqueId>(proposal: T) {
     const comments = this._store.getByProposal(proposal);
     if (comments.length === 0) return null;
@@ -318,7 +305,7 @@ class CommentsController {
     }
   }
 
-  public initialize(initialComments, reset = true) {
+  public initialize(initialComments = [], reset = true) {
     if (reset) {
       this._store.clear();
     }
