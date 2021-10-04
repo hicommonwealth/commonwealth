@@ -1,4 +1,5 @@
 import chai from 'chai';
+import { BigNumber } from 'ethers';
 
 import { Processor } from '../../../src/chains/compound/processor';
 import { Api, RawEvent, EventKind } from '../../../src/chains/compound/types';
@@ -18,9 +19,9 @@ describe('Compound Event Processor Tests', () => {
   it('should process a raw event into a CWEvent', async () => {
     const processor = new Processor(({} as unknown) as Api);
     const kind = EventKind.ProposalQueued;
-    const id = 5;
+    const id = BigNumber.from(5);
     const eta = 10;
-    const event = constructEvent({ id, eta });
+    const event = constructEvent([id, eta]);
 
     event.blockNumber = blockNumber;
     event.event = 'ProposalQueued';
@@ -32,7 +33,7 @@ describe('Compound Event Processor Tests', () => {
         excludeAddresses: [],
         data: {
           kind,
-          id,
+          id: '0x05',
           eta,
         },
       },

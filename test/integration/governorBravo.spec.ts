@@ -299,7 +299,7 @@ describe('Governor Bravo Event Integration Tests', () => {
         (evt: CWEvent<IVoteCast>) => {
           assert.deepEqual(evt.data, {
             kind: EventKind.VoteCast,
-            id: +activeProposals,
+            id: activeProposals.toHexString(),
             voter: from,
             support: BravoSupport.Against,
             votes: voteWeight.toString(),
@@ -340,7 +340,7 @@ describe('Governor Bravo Event Integration Tests', () => {
         (evt: CWEvent<IVoteCast>) => {
           assert.deepEqual(evt.data, {
             kind: EventKind.VoteCast,
-            id: +activeProposals,
+            id: activeProposals.toHexString(),
             voter: from,
             support: BravoSupport.For,
             votes: voteWeight.toString(),
@@ -378,7 +378,7 @@ describe('Governor Bravo Event Integration Tests', () => {
         (evt: CWEvent<IProposalCanceled>) => {
           assert.deepEqual(evt.data, {
             kind: EventKind.ProposalCanceled,
-            id: +activeProposals,
+            id: activeProposals.toHexString(),
           });
         }
       );
@@ -415,7 +415,7 @@ describe('Governor Bravo Event Integration Tests', () => {
         (evt: CWEvent<IVoteCast>) => {
           assert.deepEqual(evt.data, {
             kind: EventKind.VoteCast,
-            id: +activeProposals,
+            id: activeProposals.toHexString(),
             voter: from,
             support: BravoSupport.Abstain,
             votes: voteWeight.toString(),
@@ -525,7 +525,7 @@ describe('Governor Bravo Event Integration Tests', () => {
         (evt: CWEvent<IVoteCast>) => {
           assert.deepEqual(evt.data, {
             kind: EventKind.VoteCast,
-            id: +activeProposals,
+            id: activeProposals.toHexString(),
             voter: from,
             support: BravoSupport.For,
             votes: voteWeight.toString(),
@@ -560,7 +560,7 @@ describe('Governor Bravo Event Integration Tests', () => {
               },
               {
                 kind: EventKind.ProposalQueued,
-                id: activeProposals.toNumber(),
+                id: activeProposals.toHexString(),
               }
             );
           }
@@ -583,7 +583,7 @@ describe('Governor Bravo Event Integration Tests', () => {
               },
               {
                 kind: EventKind.ProposalExecuted,
-                id: activeProposals.toNumber(),
+                id: activeProposals.toHexString(),
               }
             );
           }
@@ -623,7 +623,7 @@ describe('Governor Bravo Event Integration Tests', () => {
       (evt: CWEvent<IVoteCast>) => {
         assert.deepEqual(evt.data, {
           kind: EventKind.VoteCast,
-          id: +activeProposals,
+          id: activeProposals.toHexString(),
           voter: from,
           support: BravoSupport.For,
           votes: voteWeight.toString(),
@@ -658,7 +658,7 @@ describe('Governor Bravo Event Integration Tests', () => {
             },
             {
               kind: EventKind.ProposalQueued,
-              id: activeProposals.toNumber(),
+              id: activeProposals.toHexString(),
             }
           );
         }

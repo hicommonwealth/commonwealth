@@ -31,7 +31,7 @@ export class StorageFetcher extends IStorageFetcher<Api> {
 
     // TODO: can we make this more efficient?
     const allProposals = await this.fetch();
-    return allProposals.filter((v) => v.data.id === +id);
+    return allProposals.filter((v) => v.data.id === id);
   }
 
   /**
@@ -122,7 +122,7 @@ export class StorageFetcher extends IStorageFetcher<Api> {
           p
         )) as CWEvent<IProposalCreated>;
         const voteRawEvents = voteCastEvents.filter(
-          (v) => +v.args.proposalId === createdEvent.data.id
+          (v) => v.args.proposalId.toHexString() === createdEvent.data.id
         );
         const voteEvents = await Promise.all(
           voteRawEvents.map(
@@ -140,7 +140,7 @@ export class StorageFetcher extends IStorageFetcher<Api> {
           ...voteEvents,
         ];
         const cancelledRawEvent = proposalCanceledEvents.find(
-          (evt) => +evt.args.id === createdEvent.data.id
+          (evt) => evt.args.id.toHexString() === createdEvent.data.id
         );
         if (cancelledRawEvent) {
           const cancelledEvent = (await Enrich(
@@ -152,7 +152,7 @@ export class StorageFetcher extends IStorageFetcher<Api> {
           proposalEvents.push(cancelledEvent);
         }
         const queuedRawEvent = proposalQueuedEvents.find(
-          (evt) => +evt.args.id === createdEvent.data.id
+          (evt) => evt.args.id.toHexString() === createdEvent.data.id
         );
         if (queuedRawEvent) {
           const queuedEvent = (await Enrich(
@@ -164,7 +164,7 @@ export class StorageFetcher extends IStorageFetcher<Api> {
           proposalEvents.push(queuedEvent);
         }
         const executedRawEvent = proposalExecutedEvents.find(
-          (evt) => +evt.args.id === createdEvent.data.id
+          (evt) => evt.args.id.toHexString() === createdEvent.data.id
         );
         if (executedRawEvent) {
           const executedEvent = (await Enrich(

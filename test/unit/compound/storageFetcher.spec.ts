@@ -112,7 +112,7 @@ describe('Compound Storage Fetcher Tests', () => {
         blockNumber: 200,
         excludeAddresses: [address],
         data: {
-          id: 1,
+          id: '0x01',
           kind: EventKind.ProposalCreated,
           proposer: address,
           targets: [address],

@@ -252,7 +252,7 @@ async function proposeAndVote(
   await assertEvent(handler, EventKind.VoteCast, (evt: CWEvent<IVoteCast>) => {
     assert.deepEqual(evt.data, {
       kind: EventKind.VoteCast,
-      id: +activeProposals,
+      id: activeProposals.toHexString(),
       voter: from,
       support: +voteYes,
       votes: voteWeight.toString(),

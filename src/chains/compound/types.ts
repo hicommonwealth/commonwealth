@@ -63,12 +63,12 @@ type Balance = string; // queried as BigNumber
 
 export interface IProposalCanceled extends IEvent {
   kind: EventKind.ProposalCanceled;
-  id: number;
+  id: string;
 }
 
 export interface IProposalCreated extends IEvent {
   kind: EventKind.ProposalCreated;
-  id: number;
+  id: string;
   proposer: Address;
   targets: Address[];
   values: Balance[];
@@ -81,19 +81,19 @@ export interface IProposalCreated extends IEvent {
 
 export interface IProposalExecuted extends IEvent {
   kind: EventKind.ProposalExecuted;
-  id: number;
+  id: string;
 }
 
 export interface IProposalQueued extends IEvent {
   kind: EventKind.ProposalQueued;
-  id: number;
+  id: string;
   eta: number;
 }
 
 export interface IVoteCast extends IEvent {
   kind: EventKind.VoteCast;
   voter: Address;
-  id: number;
+  id: string;
   support: number; // handle alpha and bravo support types
   votes: Balance;
   reason?: string;

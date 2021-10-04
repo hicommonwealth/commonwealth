@@ -2,7 +2,6 @@ pragma solidity ^0.5.16;
 pragma experimental ABIEncoderV2;
 
 import "./GovernorBravoInterfaces.sol";
-import "hardhat/console.sol";
 
 // TODO fill out modifications to this contract
 contract GovernorBravoDelegateMock is GovernorBravoDelegateStorageV1, GovernorBravoEvents {

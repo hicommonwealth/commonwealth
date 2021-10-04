@@ -6,7 +6,7 @@ import { TypedEventFilter } from '../../../contractTypes/commons';
 import { CWEvent } from '../../../interfaces';
 import { EventKind, RawEvent, IEventData, Api } from '../types';
 
-type GetEventArgs<T> = T extends TypedEventFilter<any, infer Y> ? Y : never;
+type GetEventArgs<T> = T extends TypedEventFilter<infer Y, any> ? Y : never;
 type GetArgType<
   C extends Contract,
   Name extends keyof C['filters']
@@ -20,7 +20,7 @@ export async function Enrich(
 ): Promise<CWEvent<IEventData>> {
   switch (kind) {
     case EventKind.ProposalCanceled: {
-      const { id } = rawData.args as GetArgType<
+      const [id] = rawData.args as GetArgType<
         GovernorBravo,
         'ProposalCanceled'
       >;
@@ -29,7 +29,7 @@ export async function Enrich(
         excludeAddresses: [],
         data: {
           kind,
-          id: +id,
+          id: id.toHexString(),
         },
       };
     }
@@ -73,7 +73,7 @@ export async function Enrich(
         excludeAddresses: [proposer],
         data: {
           kind,
-          id: +id,
+          id: id.toHexString(),
           proposer,
           targets,
           values: values.map((v) => v.toString()),
@@ -86,7 +86,7 @@ export async function Enrich(
       };
     }
     case EventKind.ProposalExecuted: {
-      const { id } = rawData.args as GetArgType<
+      const [id] = rawData.args as GetArgType<
         GovernorBravo,
         'ProposalExecuted'
       >;
@@ -95,12 +95,12 @@ export async function Enrich(
         excludeAddresses: [],
         data: {
           kind,
-          id: +id,
+          id: id.toHexString(),
         },
       };
     }
     case EventKind.ProposalQueued: {
-      const { id, eta } = rawData.args as GetArgType<
+      const [id, eta] = rawData.args as GetArgType<
         GovernorBravo,
         'ProposalQueued'
       >;
@@ -109,26 +109,26 @@ export async function Enrich(
         excludeAddresses: [],
         data: {
           kind,
-          id: +id,
+          id: id.toHexString(),
           eta: +eta,
         },
       };
     }
     case EventKind.VoteCast: {
-      const {
+      const [
         voter,
         proposalId,
         support,
         votes,
         reason,
-      } = rawData.args as GetArgType<GovernorBravo, 'VoteCast'>;
+      ] = rawData.args as GetArgType<GovernorBravo, 'VoteCast'>;
       return {
         blockNumber,
         excludeAddresses: [voter],
         data: {
           kind,
           voter,
-          id: +proposalId,
+          id: proposalId.toHexString(),
           support: +support,
           votes: votes.toString(),
           reason,
