@@ -6,7 +6,7 @@ import bs58 from 'bs58';
 import { AaveTypes } from '@commonwealth/chain-events';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import { IAaveProposalResponse } from 'adapters/chain/aave/types';
-import { formatNumberShort } from 'adapters/currency';
+import { formatNumberLong } from 'adapters/currency';
 
 import {
   Proposal,

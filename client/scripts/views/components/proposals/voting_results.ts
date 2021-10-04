@@ -16,7 +16,6 @@ import { SubstrateDemocracyVote } from 'controllers/chain/substrate/democracy_re
 import AaveProposal, { AaveProposalVote } from 'controllers/chain/ethereum/aave/proposal';
 import { NearSputnikVoteString } from 'controllers/chain/near/sputnik/types';
 import Compound from 'controllers/chain/ethereum/compound/adapter';
-import BN from 'bn.js';
 
 const COLLAPSE_VOTERS_AFTER = 6; // if there are >6 voters, collapse remaining under "Show more"
 
