@@ -138,8 +138,8 @@ class CommunityInfo {
     }
   }
 
-  public async getMembersByPage(id: string, pageNum: number, itemsPerPage: number) {
-    const res = await $.get(`${app.serverUrl()}/bulkMembers`, { chain: id, pageNum, itemsPerPage });
+  public async getMembersByPage(community: string, pageNum: number, itemsPerPage: number) {
+    const res = await $.get(`${app.serverUrl()}/bulkMembers`, { community, pageNum, itemsPerPage });
     return res;
   }
 
