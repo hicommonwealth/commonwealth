@@ -182,6 +182,9 @@ const bulkThreads = async (
             model: models.OffchainTopic,
             as: 'topic',
           },
+          {
+            model: models.ChainEntity,
+          },
         ],
         attributes: { exclude: ['version_history'] },
         order: [['created_at', 'DESC']],
