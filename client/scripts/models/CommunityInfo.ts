@@ -138,6 +138,11 @@ class CommunityInfo {
     }
   }
 
+  public async getMembersByPage(community: string, pageNum: number, itemsPerPage: number) {
+    const res = await $.get(`${app.serverUrl()}/bulkMembers`, { community, pageNum, itemsPerPage });
+    return res;
+  }
+
   public setMembers(roles) {
     this.members = [];
     roles.forEach((r) => {
