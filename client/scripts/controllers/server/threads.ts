@@ -54,6 +54,7 @@ export const modelFromServer = (thread) => {
     pinned,
     collaborators,
     chain_entities,
+    ChainEntities,
     offchain_voting_options,
     offchain_voting_ends_at,
     offchain_voting_votes,
@@ -119,7 +120,7 @@ export const modelFromServer = (thread) => {
     url,
     pinned,
     collaborators,
-    chainEntities: chain_entities,
+    chainEntities: chain_entities || ChainEntities,
     versionHistory: versionHistoryProcessed,
     lastEdited: lastEditedProcessed,
     offchainVotingOptions: offchain_voting_options,
@@ -548,9 +549,6 @@ class ThreadsController {
     if (response.status !== 'Success') {
       throw new Error(`Cannot fetch thread: ${response.status}`);
     }
-
-    // rewrite ChainEntities alias since /getThread returns differently than /bulkThreads
-    response.result.chain_entities = response.result.ChainEntities;
 
     const thread = modelFromServer(response.result);
     const existing = this._store.getByIdentifier(thread.id);
