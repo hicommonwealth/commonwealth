@@ -39,7 +39,6 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
       + `${slugify(proposal.title)}`;
 
     const rowHeader: any = link('a', discussionLink, proposal.title);
-    console.log(proposal.stage);
     if (!proposal.stage || !proposal.stage?.id) {
       console.log(proposal);
     }

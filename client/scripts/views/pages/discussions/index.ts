@@ -784,7 +784,7 @@ const DiscussionsPage: m.Component<
                       ? m(LoadingRow)
                       : isEmpty
                       ? m(EmptyListingPlaceholder, {
-                          stageName: selectedStage.name,
+                          stageName: selectedStage?.name,
                           communityName,
                           topicName,
                         })
