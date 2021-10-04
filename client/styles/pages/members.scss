@@ -28,11 +28,6 @@
             font-size: 18px;
         }
     }
-    @include sm-max {
-        .members-item-info {
-            max-width: 100px;   
-        }
-    }
     .spinner-wrap {
         width: 100%;
         display: flex;

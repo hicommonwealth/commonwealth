@@ -75,6 +75,7 @@
         padding-right: 20px;
         max-width: calc(100% - #{$sidebar-width});
         @include sm-max {
+            max-width: 100%;
             padding: 0;
         }
         @include xs-max {
@@ -99,13 +100,6 @@
         .sublayout-main-col {
             width: 100%;
             margin: 0 auto;
-            padding: 0;
-        }
-    }
-    @include md-max {
-        .sublayout-main-col {
-            min-width: 100%;
-            max-width: 100%;
             padding: 0;
         }
     }
