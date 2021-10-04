@@ -1243,15 +1243,16 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@commonwealth/chain-events@0.8.5":
-  version "0.8.5"
-  resolved "https://registry.yarnpkg.com/@commonwealth/chain-events/-/chain-events-0.8.5.tgz#6d1acd40722cc147feca505543048cc3eee12ec8"
-  integrity sha512-Cc/g1TaTDCsOBQLlD0sZBNM8s0MukFAlrA00je+1cZeZ/w9PjyCdhVkgQjE4o3YzioBLqzYdvApiaLxzM6bDQA==
+"@commonwealth/chain-events@0.9.1":
+  version "0.9.1"
+  resolved "https://registry.yarnpkg.com/@commonwealth/chain-events/-/chain-events-0.9.1.tgz#5fa451a78fd52e8ebc2da10856eea12c19f4f443"
+  integrity sha512-HqVGXTPBxzB7TOdY/TU90KzUJGsPqLl8zFniS5asUGqiYO9CNmrMdbzj7J4ky4EEk+WqU/3QASQUy63ouCYkpw==
   dependencies:
     "@edgeware/node-types" "^3.3.3"
     "@ethersproject/abi" "^5.0.0"
     "@ethersproject/bytes" "^5.0.0"
     "@ethersproject/providers" "^5.0.0"
+    "@nomiclabs/hardhat-ethers" "^2.0.2"
     "@polkadot/api" "6.0.5"
     "@polkadot/api-derive" "6.0.5"
     "@polkadot/types" "6.0.5"
