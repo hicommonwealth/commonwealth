@@ -338,10 +338,10 @@ const ViewProposalPage: m.Component<
               },
               [
                 m(TabItem, {
-                  label: 'Proposal',
-                  active: activeTab === 'Proposal',
+                  label: 'Proposals',
+                  active: activeTab === 'Proposals',
                   onclick: () => {
-                    vnode.state.activeTab = 'Proposal';
+                    vnode.state.activeTab = 'Proposals';
                   },
                 }),
                 m(TabItem, {
