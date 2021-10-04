@@ -177,7 +177,7 @@ const VotingResults: m.Component<{ proposal: AnyProposal }> = {
     } else if (proposal instanceof AaveProposal) {
       return m('.VotingResults', [
         m('.results-column.yes-votes', [
-          m('.results-header', `Yes (${votes.filter((v) => v.choice === MolochVote.YES).length})`),
+          m('.results-header', `Yes (${votes.filter((v) => v.choice === true).length})`),
           m('.results-subheader', [
             m('span', 'User'),
             m('span', 'Power')
@@ -185,12 +185,12 @@ const VotingResults: m.Component<{ proposal: AnyProposal }> = {
           m('.results-cell', [
             m(VoteListing, {
               proposal,
-              votes: votes.filter((v) => v.choice === MolochVote.YES)
+              votes: votes.filter((v) => v.choice === true)
             })
           ]),
         ]),
         m('.results-column.no-votes', [
-          m('.results-header', `No (${votes.filter((v) => v.choice === MolochVote.NO).length})`),
+          m('.results-header', `No (${votes.filter((v) => v.choice === false).length})`),
           m('.results-subheader', [
             m('span', 'User'),
             m('span', 'Power')
@@ -198,7 +198,7 @@ const VotingResults: m.Component<{ proposal: AnyProposal }> = {
           m('.results-cell', [
             m(VoteListing, {
               proposal,
-              votes: votes.filter((v) => v.choice === MolochVote.NO)
+              votes: votes.filter((v) => v.choice === false)
             })
           ]),
         ])
