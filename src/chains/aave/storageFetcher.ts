@@ -212,12 +212,7 @@ export class StorageFetcher extends IStorageFetcher<Api> {
       log.debug(`Fetched Aave proposal ${proposal.id} from storage.`);
 
       const proposalStartBlock = +proposal.startBlock;
-      // TODO: if proposal exists but is before start block, we skip.
-      //   is this desired behavior?
-      if (
-        proposalStartBlock >= range.startBlock &&
-        proposalStartBlock <= range.endBlock
-      ) {
+      if (proposalStartBlock <= range.endBlock) {
         const state = await this._api.governance.getProposalState(proposal.id);
         const events = await this._eventsFromProposal(
           +proposal.id,
@@ -263,6 +258,8 @@ export class StorageFetcher extends IStorageFetcher<Api> {
         );
       }
     }
-    return results;
+
+    // only return events that were emitted after the start block
+    return results.filter(({ blockNumber }) => blockNumber > range.startBlock);
   }
 }

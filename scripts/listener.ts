@@ -162,7 +162,7 @@ if (chainSupportedBy(network, SubstrateEvents.Types.EventChains)) {
     const fetcher = new CompoundEvents.StorageFetcher(api);
     try {
       const fetched = await fetcher.fetch(
-        undefined, // { startBlock: 0, maxResults: 1 },
+        { startBlock: 13353227, maxResults: 1 },
         true
       );
       // const fetched = await fetcher.fetchOne('2');
@@ -185,7 +185,7 @@ if (chainSupportedBy(network, SubstrateEvents.Types.EventChains)) {
     const fetcher = new AaveEvents.StorageFetcher(api);
     try {
       const fetched = await fetcher.fetch(
-        undefined, // { startBlock: 12300000, maxResults: 1 },
+        { startBlock: 13353227, maxResults: 1 },
         true
       );
       // const fetched = await fetcher.fetchOne('10');

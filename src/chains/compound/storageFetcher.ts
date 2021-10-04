@@ -10,6 +10,7 @@ import {
   IProposalCreated,
   IProposalCanceled,
   IProposalQueued,
+  IProposalExecuted,
 } from './types';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -87,101 +88,87 @@ export class StorageFetcher extends IStorageFetcher<Api> {
       range.startBlock,
       range.endBlock || 'latest'
     );
-
-    // sort in descending order (newest first)
-    proposalCreatedEvents.sort((a, b) => b.blockNumber - a.blockNumber);
-    log.info(`Found ${proposalCreatedEvents.length} proposals!`);
-
+    const createdCwEvents = await Promise.all(
+      proposalCreatedEvents.map(
+        (evt) =>
+          Enrich(
+            this._api,
+            evt.blockNumber,
+            EventKind.ProposalCreated,
+            evt
+          ) as Promise<CWEvent<IProposalCreated>>
+      )
+    );
     const voteCastEvents = await this._api.queryFilter(
       this._api.filters.VoteCast(null, null, null, null),
       range.startBlock,
       range.endBlock || 'latest'
+    );
+    const voteCwEvents = await Promise.all(
+      voteCastEvents.map(
+        (evt) =>
+          Enrich(
+            this._api,
+            evt.blockNumber,
+            EventKind.VoteCast,
+            evt
+          ) as Promise<CWEvent<IVoteCast>>
+      )
     );
     const proposalQueuedEvents = await this._api.queryFilter(
       this._api.filters.ProposalQueued(null, null),
       range.startBlock,
       range.endBlock || 'latest'
     );
+    const queuedCwEvents = await Promise.all(
+      proposalQueuedEvents.map(
+        (evt) =>
+          Enrich(
+            this._api,
+            evt.blockNumber,
+            EventKind.ProposalQueued,
+            evt
+          ) as Promise<CWEvent<IProposalQueued>>
+      )
+    );
     const proposalCanceledEvents = await this._api.queryFilter(
       this._api.filters.ProposalCanceled(null),
       range.startBlock,
       range.endBlock || 'latest'
+    );
+    const cancelledCwEvents = await Promise.all(
+      proposalCanceledEvents.map(
+        (evt) =>
+          Enrich(
+            this._api,
+            evt.blockNumber,
+            EventKind.ProposalCanceled,
+            evt
+          ) as Promise<CWEvent<IProposalCanceled>>
+      )
     );
     const proposalExecutedEvents = await this._api.queryFilter(
       this._api.filters.ProposalExecuted(null),
       range.startBlock,
       range.endBlock || 'latest'
     );
-
-    const proposals = await Promise.all(
-      proposalCreatedEvents.map(async (p) => {
-        const createdEvent = (await Enrich(
-          this._api,
-          p.blockNumber,
-          EventKind.ProposalCreated,
-          p
-        )) as CWEvent<IProposalCreated>;
-        const voteRawEvents = voteCastEvents.filter(
-          (v) => v.args.proposalId.toHexString() === createdEvent.data.id
-        );
-        const voteEvents = await Promise.all(
-          voteRawEvents.map(
-            (evt) =>
-              Enrich(
-                this._api,
-                evt.blockNumber,
-                EventKind.VoteCast,
-                evt
-              ) as Promise<CWEvent<IVoteCast>>
-          )
-        );
-        const proposalEvents: CWEvent<IEventData>[] = [
-          createdEvent,
-          ...voteEvents,
-        ];
-        const cancelledRawEvent = proposalCanceledEvents.find(
-          (evt) => evt.args.id.toHexString() === createdEvent.data.id
-        );
-        if (cancelledRawEvent) {
-          const cancelledEvent = (await Enrich(
+    const executedCwEvents = await Promise.all(
+      proposalExecutedEvents.map(
+        (evt) =>
+          Enrich(
             this._api,
-            cancelledRawEvent.blockNumber,
-            EventKind.ProposalCanceled,
-            cancelledRawEvent
-          )) as CWEvent<IProposalCanceled>;
-          proposalEvents.push(cancelledEvent);
-        }
-        const queuedRawEvent = proposalQueuedEvents.find(
-          (evt) => evt.args.id.toHexString() === createdEvent.data.id
-        );
-        if (queuedRawEvent) {
-          const queuedEvent = (await Enrich(
-            this._api,
-            queuedRawEvent.blockNumber,
-            EventKind.ProposalQueued,
-            queuedRawEvent
-          )) as CWEvent<IProposalQueued>;
-          proposalEvents.push(queuedEvent);
-        }
-        const executedRawEvent = proposalExecutedEvents.find(
-          (evt) => evt.args.id.toHexString() === createdEvent.data.id
-        );
-        if (executedRawEvent) {
-          const executedEvent = (await Enrich(
-            this._api,
-            executedRawEvent.blockNumber,
+            evt.blockNumber,
             EventKind.ProposalExecuted,
-            executedRawEvent
-          )) as CWEvent<IProposalQueued>;
-          proposalEvents.push(executedEvent);
-        }
-        return proposalEvents;
-      })
+            evt
+          ) as Promise<CWEvent<IProposalExecuted>>
+      )
     );
-
-    if (range.maxResults) {
-      return proposals.slice(0, range.maxResults).flat();
-    }
-    return proposals.flat();
+    return [
+      ...createdCwEvents,
+      ...voteCwEvents,
+      ...queuedCwEvents,
+      ...cancelledCwEvents,
+      ...executedCwEvents,
+    ].sort((e1, e2) => e2.blockNumber - e1.blockNumber);
   }
 }
