@@ -18,114 +18,165 @@ export class IERC777__factory {
 
 const _abi = [
   {
-    constant: true,
-    inputs: [],
-    name: "defaultOperators",
-    outputs: [
-      {
-        name: "",
-        type: "address[]",
-      },
-    ],
-    payable: false,
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    constant: true,
-    inputs: [],
-    name: "name",
-    outputs: [
-      {
-        name: "",
-        type: "string",
-      },
-    ],
-    payable: false,
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    constant: true,
-    inputs: [],
-    name: "totalSupply",
-    outputs: [
-      {
-        name: "",
-        type: "uint256",
-      },
-    ],
-    payable: false,
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    constant: true,
-    inputs: [],
-    name: "granularity",
-    outputs: [
-      {
-        name: "",
-        type: "uint256",
-      },
-    ],
-    payable: false,
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    constant: false,
+    anonymous: false,
     inputs: [
       {
-        name: "sender",
+        indexed: true,
+        internalType: "address",
+        name: "operator",
         type: "address",
       },
       {
-        name: "recipient",
+        indexed: true,
+        internalType: "address",
+        name: "tokenHolder",
+        type: "address",
+      },
+    ],
+    name: "AuthorizedOperator",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "operator",
         type: "address",
       },
       {
+        indexed: true,
+        internalType: "address",
+        name: "from",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
         name: "amount",
         type: "uint256",
       },
       {
+        indexed: false,
+        internalType: "bytes",
         name: "data",
         type: "bytes",
       },
       {
+        indexed: false,
+        internalType: "bytes",
         name: "operatorData",
         type: "bytes",
       },
     ],
-    name: "operatorSend",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
+    name: "Burned",
+    type: "event",
   },
   {
-    constant: true,
+    anonymous: false,
     inputs: [
       {
-        name: "owner",
+        indexed: true,
+        internalType: "address",
+        name: "operator",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "to",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "bytes",
+        name: "data",
+        type: "bytes",
+      },
+      {
+        indexed: false,
+        internalType: "bytes",
+        name: "operatorData",
+        type: "bytes",
+      },
+    ],
+    name: "Minted",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "operator",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "tokenHolder",
         type: "address",
       },
     ],
-    name: "balanceOf",
-    outputs: [
+    name: "RevokedOperator",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
       {
-        name: "",
+        indexed: true,
+        internalType: "address",
+        name: "operator",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "from",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "to",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "amount",
         type: "uint256",
       },
+      {
+        indexed: false,
+        internalType: "bytes",
+        name: "data",
+        type: "bytes",
+      },
+      {
+        indexed: false,
+        internalType: "bytes",
+        name: "operatorData",
+        type: "bytes",
+      },
     ],
-    payable: false,
-    stateMutability: "view",
-    type: "function",
+    name: "Sent",
+    type: "event",
   },
   {
     constant: false,
     inputs: [
       {
+        internalType: "address",
         name: "operator",
         type: "address",
       },
@@ -138,10 +189,108 @@ const _abi = [
   },
   {
     constant: true,
-    inputs: [],
-    name: "symbol",
+    inputs: [
+      {
+        internalType: "address",
+        name: "owner",
+        type: "address",
+      },
+    ],
+    name: "balanceOf",
     outputs: [
       {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    payable: false,
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+      {
+        internalType: "bytes",
+        name: "data",
+        type: "bytes",
+      },
+    ],
+    name: "burn",
+    outputs: [],
+    payable: false,
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: "defaultOperators",
+    outputs: [
+      {
+        internalType: "address[]",
+        name: "",
+        type: "address[]",
+      },
+    ],
+    payable: false,
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: "granularity",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    payable: false,
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        internalType: "address",
+        name: "operator",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "tokenHolder",
+        type: "address",
+      },
+    ],
+    name: "isOperatorFor",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
+    ],
+    payable: false,
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: "name",
+    outputs: [
+      {
+        internalType: "string",
         name: "",
         type: "string",
       },
@@ -154,77 +303,22 @@ const _abi = [
     constant: false,
     inputs: [
       {
-        name: "recipient",
-        type: "address",
-      },
-      {
-        name: "amount",
-        type: "uint256",
-      },
-      {
-        name: "data",
-        type: "bytes",
-      },
-    ],
-    name: "send",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    constant: true,
-    inputs: [
-      {
-        name: "operator",
-        type: "address",
-      },
-      {
-        name: "tokenHolder",
-        type: "address",
-      },
-    ],
-    name: "isOperatorFor",
-    outputs: [
-      {
-        name: "",
-        type: "bool",
-      },
-    ],
-    payable: false,
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        name: "operator",
-        type: "address",
-      },
-    ],
-    name: "revokeOperator",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    constant: false,
-    inputs: [
-      {
+        internalType: "address",
         name: "account",
         type: "address",
       },
       {
+        internalType: "uint256",
         name: "amount",
         type: "uint256",
       },
       {
+        internalType: "bytes",
         name: "data",
         type: "bytes",
       },
       {
+        internalType: "bytes",
         name: "operatorData",
         type: "bytes",
       },
@@ -239,153 +333,105 @@ const _abi = [
     constant: false,
     inputs: [
       {
+        internalType: "address",
+        name: "sender",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "recipient",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
         name: "amount",
         type: "uint256",
       },
       {
+        internalType: "bytes",
         name: "data",
         type: "bytes",
       },
+      {
+        internalType: "bytes",
+        name: "operatorData",
+        type: "bytes",
+      },
     ],
-    name: "burn",
+    name: "operatorSend",
     outputs: [],
     payable: false,
     stateMutability: "nonpayable",
     type: "function",
   },
   {
-    anonymous: false,
+    constant: false,
     inputs: [
       {
-        indexed: true,
+        internalType: "address",
         name: "operator",
         type: "address",
       },
+    ],
+    name: "revokeOperator",
+    outputs: [],
+    payable: false,
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    constant: false,
+    inputs: [
       {
-        indexed: true,
-        name: "from",
+        internalType: "address",
+        name: "recipient",
         type: "address",
       },
       {
-        indexed: true,
-        name: "to",
-        type: "address",
-      },
-      {
-        indexed: false,
+        internalType: "uint256",
         name: "amount",
         type: "uint256",
       },
       {
-        indexed: false,
+        internalType: "bytes",
         name: "data",
         type: "bytes",
       },
-      {
-        indexed: false,
-        name: "operatorData",
-        type: "bytes",
-      },
     ],
-    name: "Sent",
-    type: "event",
+    name: "send",
+    outputs: [],
+    payable: false,
+    stateMutability: "nonpayable",
+    type: "function",
   },
   {
-    anonymous: false,
-    inputs: [
+    constant: true,
+    inputs: [],
+    name: "symbol",
+    outputs: [
       {
-        indexed: true,
-        name: "operator",
-        type: "address",
+        internalType: "string",
+        name: "",
+        type: "string",
       },
+    ],
+    payable: false,
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: "totalSupply",
+    outputs: [
       {
-        indexed: true,
-        name: "to",
-        type: "address",
-      },
-      {
-        indexed: false,
-        name: "amount",
+        internalType: "uint256",
+        name: "",
         type: "uint256",
       },
-      {
-        indexed: false,
-        name: "data",
-        type: "bytes",
-      },
-      {
-        indexed: false,
-        name: "operatorData",
-        type: "bytes",
-      },
     ],
-    name: "Minted",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        name: "operator",
-        type: "address",
-      },
-      {
-        indexed: true,
-        name: "from",
-        type: "address",
-      },
-      {
-        indexed: false,
-        name: "amount",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        name: "data",
-        type: "bytes",
-      },
-      {
-        indexed: false,
-        name: "operatorData",
-        type: "bytes",
-      },
-    ],
-    name: "Burned",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        name: "operator",
-        type: "address",
-      },
-      {
-        indexed: true,
-        name: "tokenHolder",
-        type: "address",
-      },
-    ],
-    name: "AuthorizedOperator",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        name: "operator",
-        type: "address",
-      },
-      {
-        indexed: true,
-        name: "tokenHolder",
-        type: "address",
-      },
-    ],
-    name: "RevokedOperator",
-    type: "event",
+    payable: false,
+    stateMutability: "view",
+    type: "function",
   },
 ];
