@@ -195,7 +195,7 @@ const VotingResults: m.Component<{ proposal: AnyProposal }> = {
       )} ${app.chain.meta.chain.symbol}`;
       return m('.VotingResults', [
         m('.results-column.yes-votes', [
-          m('.results-header', `Yes (${yesBalanceString})`),
+          m('.results-header', `Yes (${yesBalanceString}) (${yesVotes.length} voters)`),
           m('.results-subheader', [
             m('span', 'User'),
             m('span', 'Power')
@@ -208,7 +208,7 @@ const VotingResults: m.Component<{ proposal: AnyProposal }> = {
           ]),
         ]),
         m('.results-column.no-votes', [
-          m('.results-header', `No (${noBalanceString})`),
+          m('.results-header', `No (${noBalanceString}) (${noVotes.length} voters)`),
           m('.results-subheader', [
             m('span', 'User'),
             m('span', 'Power')
