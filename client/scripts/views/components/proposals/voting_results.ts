@@ -37,11 +37,16 @@ const VoteListing: m.Component<{
     if (!vnode.state.balancesCacheInitialized) vnode.state.balancesCacheInitialized = {};
 
     // TODO: show turnout if specific votes not found
+    const sortedVotes = votes;
+    if (proposal instanceof AaveProposal) {
+      (sortedVotes as AaveProposalVote[]).sort((v1, v2) =>
+        v2.power.cmp(v1.power)
+      );
+    }
     return m('.VoteListing', [
-      votes.length === 0
+      sortedVotes.length === 0
         ? m('.no-votes', 'No votes')
-        : votes.map(
-          (vote) => {
+        : votes.map((vote) => {
             let balance;
             if (balanceWeighted && !(vote instanceof CosmosVote)) {
               // fetch and display balances
