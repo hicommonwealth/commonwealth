@@ -35,6 +35,7 @@ class OffchainThread implements IUniqueId {
   public readonly identifier: string;
   public readonly id: number;
   public readonly createdAt: moment.Moment;
+  public readonly latestCommCreatedAt: moment.Moment;
   public topic: OffchainTopic;
   public readonly slug = 'discussion';
   public readonly url: string;
@@ -58,9 +59,11 @@ class OffchainThread implements IUniqueId {
   public offchainVotingNumVotes: number;
   public offchainVotingEndsAt: moment.Moment | null;
   public offchainVotes: OffchainVote[]; // lazy loaded
-  
+
   public getOffchainVoteFor(chain: string, address: string) {
-    return this.offchainVotes?.find((vote) => vote.address === address && vote.author_chain === chain);
+    return this.offchainVotes?.find(
+      (vote) => vote.address === address && vote.author_chain === chain
+    );
   }
 
   public setOffchainVotes(voteData) {
@@ -71,7 +74,13 @@ class OffchainThread implements IUniqueId {
     this.offchainVotes = votes;
   }
 
-  public async submitOffchainVote(chain: string, community: string, authorChain: string, address: string, option: string) {
+  public async submitOffchainVote(
+    chain: string,
+    community: string,
+    authorChain: string,
+    address: string,
+    option: string
+  ) {
     const thread_id = this.id;
     return $.post(`${app.serverUrl()}/updateOffchainVote`, {
       thread_id,
@@ -80,11 +89,18 @@ class OffchainThread implements IUniqueId {
       chain,
       community,
       author_chain: authorChain,
-      jwt: app.user.jwt
+      jwt: app.user.jwt,
     }).then(() => {
-      const vote = new OffchainVote({ address, author_chain: authorChain, thread_id, option });
+      const vote = new OffchainVote({
+        address,
+        author_chain: authorChain,
+        thread_id,
+        option,
+      });
       // remove any existing vote
-      const existingVoteIndex = this.offchainVotes.findIndex((v) => v.address === address && v.author_chain === authorChain);
+      const existingVoteIndex = this.offchainVotes.findIndex(
+        (v) => v.address === address && v.author_chain === authorChain
+      );
       if (existingVoteIndex !== -1) {
         this.offchainVotes.splice(existingVoteIndex, 1);
       } else {
@@ -124,32 +140,34 @@ class OffchainThread implements IUniqueId {
     offchainVotingEndsAt,
     offchainVotingNumVotes,
     offchainVotes,
+    latestCommCreatedAt,
   }: {
-    author: string,
-    title: string,
-    attachments: OffchainAttachment[],
-    id: number,
-    createdAt: moment.Moment,
-    topic: OffchainTopic,
-    kind: OffchainThreadKind,
-    stage: OffchainThreadStage,
-    versionHistory: VersionHistory[],
-    community: string,
-    chain: string,
-    readOnly: boolean,
-    body?: string,
-    plaintext?: string,
-    url?: string,
-    authorChain?: string,
-    pinned?: boolean,
-    collaborators?: any[],
-    chainEntities?: any[],
-    lastEdited?: moment.Moment,
-    snapshotProposal: string,
-    offchainVotingOptions?: string,
-    offchainVotingEndsAt?: string | moment.Moment | null,
-    offchainVotingNumVotes?: number,
-    offchainVotes?: OffchainVote[],
+    author: string;
+    title: string;
+    attachments: OffchainAttachment[];
+    id: number;
+    createdAt: moment.Moment;
+    latestCommCreatedAt: moment.Moment;
+    topic: OffchainTopic;
+    kind: OffchainThreadKind;
+    stage: OffchainThreadStage;
+    versionHistory: VersionHistory[];
+    community: string;
+    chain: string;
+    readOnly: boolean;
+    body?: string;
+    plaintext?: string;
+    url?: string;
+    authorChain?: string;
+    pinned?: boolean;
+    collaborators?: any[];
+    chainEntities?: any[];
+    lastEdited?: moment.Moment;
+    snapshotProposal: string;
+    offchainVotingOptions?: string;
+    offchainVotingEndsAt?: string | moment.Moment | null;
+    offchainVotingNumVotes?: number;
+    offchainVotes?: OffchainVote[];
   }) {
     this.author = author;
     this.title = title;
@@ -170,19 +188,24 @@ class OffchainThread implements IUniqueId {
     this.chain = chain;
     this.readOnly = readOnly;
     this.collaborators = collaborators || [];
-    this.chainEntities = chainEntities ? chainEntities.map((ce) => {
-      return {
-        id: +ce.id,
-        type: ce.type,
-        typeId: ce.type_id,
-        completed: ce.completed,
-      };
-    }) : [];
+    this.latestCommCreatedAt = latestCommCreatedAt;
+    this.chainEntities = chainEntities
+      ? chainEntities.map((ce) => {
+          return {
+            id: +ce.id,
+            type: ce.type,
+            typeId: ce.type_id,
+            completed: ce.completed,
+          };
+        })
+      : [];
     try {
       this.offchainVotingOptions = JSON.parse(offchainVotingOptions);
     } catch (e) {}
     this.snapshotProposal = snapshotProposal;
-    this.offchainVotingEndsAt = offchainVotingEndsAt ? moment(offchainVotingEndsAt) : null;
+    this.offchainVotingEndsAt = offchainVotingEndsAt
+      ? moment(offchainVotingEndsAt)
+      : null;
     this.offchainVotingNumVotes = offchainVotingNumVotes;
     this.offchainVotes = offchainVotes || [];
     this.lastEdited = lastEdited;

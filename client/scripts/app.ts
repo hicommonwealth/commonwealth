@@ -436,6 +436,19 @@ export const navigateToSubpage = (...args) => {
   m.route.set.apply(this, args);
 };
 
+/* Uncomment for redraw instrumentation
+const _redraw = m.redraw;
+function redrawInstrumented(...args) {
+  console.log('redraw!');
+  _redraw.apply(this, args);
+}
+redrawInstrumented.sync = (...args) => {
+  console.log('redraw sync!');
+  _redraw.sync.apply(this, args);
+};
+m.redraw = redrawInstrumented;
+*/
+
 const _onpopstate = window.onpopstate;
 window.onpopstate = (...args) => {
   app._lastNavigatedBack = true;

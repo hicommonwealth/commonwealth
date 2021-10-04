@@ -10,11 +10,20 @@ import { slugify } from 'utils';
 import app from 'state';
 import { chainEntityTypeToProposalShortName } from 'identifiers';
 import {
-  formatLastUpdated, link, externalLink, extractDomain, pluralize,
-  offchainThreadStageToLabel
+  formatLastUpdated,
+  link,
+  externalLink,
+  extractDomain,
+  pluralize,
+  offchainThreadStageToLabel,
 } from 'helpers';
 
-import { OffchainThread, OffchainThreadKind, OffchainThreadStage, AddressInfo } from 'models';
+import {
+  OffchainThread,
+  OffchainThreadKind,
+  OffchainThreadStage,
+  AddressInfo,
+} from 'models';
 import ReactionButton, { ReactionType } from 'views/components/reaction_button';
 import User from 'views/components/widgets/user';
 import UserGallery from 'views/components/widgets/user_gallery';
@@ -23,20 +32,27 @@ import ListingRow from 'views/components/listing_row';
 import DiscussionRowMenu from './discussion_row_menu';
 
 export const getLastUpdated = (proposal) => {
-  const lastComment = Number(app.comments.lastCommented(proposal));
+  const { latestCommCreatedAt } = proposal;
+  const lastComment = latestCommCreatedAt
+    ? Number(latestCommCreatedAt.utc())
+    : 0;
   const createdAt = Number(proposal.createdAt.utc());
   const lastUpdate = Math.max(createdAt, lastComment);
   return moment(lastUpdate);
 };
 
-const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boolean }, { expanded: boolean }> = {
+const DiscussionRow: m.Component<
+  { proposal: OffchainThread; showExcerpt?: boolean },
+  { expanded: boolean }
+> = {
   view: (vnode) => {
     const { proposal, showExcerpt } = vnode.attrs;
     if (!proposal) return;
     const propType: OffchainThreadKind = proposal.kind;
     const pinned = proposal.pinned;
-    const discussionLink = `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-`
-      + `${slugify(proposal.title)}`;
+    const discussionLink =
+      `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-` +
+      `${slugify(proposal.title)}`;
 
     const rowHeader: any = link('a', discussionLink, proposal.title);
     const rowSubheader = [
@@ -44,15 +60,12 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
         m('.discussion-locked', [
           m(Tag, {
             size: 'xs',
-            label: [
-              m(Icon, { name: Icons.LOCK, size: 'xs' }),
-            ],
+            label: [m(Icon, { name: Icons.LOCK, size: 'xs' })],
           }),
         ]),
       ],
-      proposal instanceof OffchainThread
-        && (proposal.offchainVotingEndsAt || proposal.offchainVotingNumVotes)
-        && [
+      proposal instanceof OffchainThread &&
+        (proposal.offchainVotingEndsAt || proposal.offchainVotingNumVotes) && [
           m(Button, {
             class: 'discussion-row-linked-poll',
             label: 'Poll',
@@ -63,75 +76,105 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
           }),
         ],
       proposal.chainEntities?.length > 0 && [
-        proposal.chainEntities.sort((a, b) => {
-          return a.typeId - b.typeId;
-        }).map((ce) => {
-          if (!chainEntityTypeToProposalShortName(ce.type)) return;
-          return m(Button, {
-            class: 'discussion-row-linked-chain-entity',
-            label: [
-              chainEntityTypeToProposalShortName(ce.type),
-              Number.isNaN(parseInt(ce.typeId, 10)) ? '' : ` #${ce.typeId}`,
-            ],
-            intent: 'primary',
-            size: 'xs',
-            compact: true,
-          });
-        }),
+        proposal.chainEntities
+          .sort((a, b) => {
+            return a.typeId - b.typeId;
+          })
+          .map((ce) => {
+            if (!chainEntityTypeToProposalShortName(ce.type)) return;
+            return m(Button, {
+              class: 'discussion-row-linked-chain-entity',
+              label: [
+                chainEntityTypeToProposalShortName(ce.type),
+                Number.isNaN(parseInt(ce.typeId, 10)) ? '' : ` #${ce.typeId}`,
+              ],
+              intent: 'primary',
+              size: 'xs',
+              compact: true,
+            });
+          }),
       ],
-      proposal.snapshotProposal && m(Button, {
-        class: 'discussion-row-linked-chain-entity',
-        label: [
-          'Snap ',
-          `${proposal.snapshotProposal.slice(0, 4)}…`,
-        ],
-        intent: 'primary',
-        size: 'xs',
-        compact: true,
-      }),
-      proposal instanceof OffchainThread
-        && proposal.stage !== OffchainThreadStage.Discussion
-        && m(Button, {
+      proposal.snapshotProposal &&
+        m(Button, {
+          class: 'discussion-row-linked-chain-entity',
+          label: ['Snap ', `${proposal.snapshotProposal.slice(0, 4)}…`],
+          intent: 'primary',
+          size: 'xs',
+          compact: true,
+        }),
+      proposal instanceof OffchainThread &&
+        proposal.stage !== OffchainThreadStage.Discussion &&
+        m(Button, {
           class: 'discussion-row-stage-btn',
-          intent: proposal.stage === OffchainThreadStage.ProposalInReview ? 'positive'
-            : proposal.stage === OffchainThreadStage.Voting ? 'positive'
-              : proposal.stage === OffchainThreadStage.Passed ? 'positive'
-                : proposal.stage === OffchainThreadStage.Failed ? 'negative' : 'positive',
+          intent:
+            proposal.stage === OffchainThreadStage.ProposalInReview
+              ? 'positive'
+              : proposal.stage === OffchainThreadStage.Voting
+              ? 'positive'
+              : proposal.stage === OffchainThreadStage.Passed
+              ? 'positive'
+              : proposal.stage === OffchainThreadStage.Failed
+              ? 'negative'
+              : 'positive',
           size: 'xs',
           compact: true,
           label: offchainThreadStageToLabel(proposal.stage),
         }),
-      proposal instanceof OffchainThread && (
-        proposal.stage !== OffchainThreadStage.Discussion
-          || proposal.chainEntities?.length > 0
-          || (proposal.offchainVotingEndsAt || proposal.offchainVotingNumVotes)
-          || proposal.readOnly) && ' ', // en space
-      (propType === OffchainThreadKind.Link && proposal.url)
-        && [
-          externalLink('a.external-discussion-link', proposal.url, `Link: ${extractDomain(proposal.url)}`),
+      proposal instanceof OffchainThread &&
+        (proposal.stage !== OffchainThreadStage.Discussion ||
+          proposal.chainEntities?.length > 0 ||
+          proposal.offchainVotingEndsAt ||
+          proposal.offchainVotingNumVotes ||
+          proposal.readOnly) &&
+        ' ', // en space
+      propType === OffchainThreadKind.Link &&
+        proposal.url && [
+          externalLink(
+            'a.external-discussion-link',
+            proposal.url,
+            `Link: ${extractDomain(proposal.url)}`
+          ),
           ' ', // em space
         ],
       proposal.topic && [
-        link('a.proposal-topic', `/${app.activeId()}/discussions/${proposal.topic.name}`, [
-          m('span.proposal-topic-name', `${proposal.topic.name}`),
-        ]),
+        link(
+          'a.proposal-topic',
+          `/${app.activeId()}/discussions/${proposal.topic.name}`,
+          [m('span.proposal-topic-name', `${proposal.topic.name}`)]
+        ),
         ' ', // em space
       ],
       m(User, {
-        user: new AddressInfo(null, proposal.author, proposal.authorChain, null),
+        user: new AddressInfo(
+          null,
+          proposal.author,
+          proposal.authorChain,
+          null
+        ),
         linkify: true,
         popover: true,
         hideAvatar: true,
         showAddressWithDisplayName: true,
         hideIdentityIcon: true,
       }),
-      proposal instanceof OffchainThread && proposal.collaborators && proposal.collaborators.length > 0
-        && [
+      proposal instanceof OffchainThread &&
+        proposal.collaborators &&
+        proposal.collaborators.length > 0 && [
           ' ', // regular space
-          m('span.proposal-collaborators', ` +${proposal.collaborators.length}`),
+          m(
+            'span.proposal-collaborators',
+            ` +${proposal.collaborators.length}`
+          ),
         ],
       ' ', // em space
-      m('.created-at', link('a', discussionLink, `Last active ${formatLastUpdated(getLastUpdated(proposal))}`)),
+      m(
+        '.created-at',
+        link(
+          'a',
+          discussionLink,
+          `Last active ${formatLastUpdated(getLastUpdated(proposal))}`
+        )
+      ),
       m('.mobile-comment-count', [
         ' ', // em space
         m(Icon, { name: Icons.MESSAGE_SQUARE }),
@@ -145,16 +188,16 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
           avatarSize: 20,
           popover: true,
           maxUsers: 2,
-          users: app.comments.uniqueCommenters(
-            proposal,
-            proposal.author,
-            proposal.authorChain
-          )
+          addressesCount:
+            app.threadUniqueAddressesCount.getAddressesCountRootId(
+              `${proposal.slug}_${proposal.id}`
+            ),
+          users:
+            app.threadUniqueAddressesCount.getUniqueAddressesByRootId(proposal),
         }),
       ]),
-      app.isLoggedIn() && m('.discussion-row-menu', [
-        m(DiscussionRowMenu, { proposal }),
-      ]),
+      app.isLoggedIn() &&
+        m('.discussion-row-menu', [m(DiscussionRowMenu, { proposal })]),
     ];
 
     const reaction = m(ReactionButton, {
@@ -183,7 +226,7 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
         m.route.set(discussionLink);
       },
     });
-  }
+  },
 };
 
 export default DiscussionRow;
