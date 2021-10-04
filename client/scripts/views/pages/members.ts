@@ -83,7 +83,7 @@ const DelegateModal: m.Component<
 const MembersPage: m.Component<
   {},
   {
-    membersRequested: boolean;
+    requestMembers: boolean;
     members: MemberInfo[];
     pageToLoad: number;
     totalMemberCount: number;
@@ -115,10 +115,10 @@ const MembersPage: m.Component<
           (elementTarget as HTMLElement).offsetHeight
       ) {
         if (
-          !vnode.state.membersRequested &&
+          !vnode.state.requestMembers &&
           vnode.state.members.length !== vnode.state.totalMemberCount
         ) {
-          vnode.state.membersRequested = true;
+          vnode.state.requestMembers = true;
           vnode.state.pageToLoad++;
           m.redraw();
         }
@@ -144,11 +144,11 @@ const MembersPage: m.Component<
       });
     } else {
       if (
-        !vnode.state.membersRequested &&
+        !vnode.state.requestMembers &&
         !vnode.state.pageToLoad &&
         !vnode.state.members
       ) {
-        vnode.state.membersRequested = true;
+        vnode.state.requestMembers = true;
         vnode.state.members = [];
         vnode.state.pageToLoad = 0;
       }
@@ -158,8 +158,8 @@ const MembersPage: m.Component<
     const activeInfo = app.community
       ? app.community.meta
       : app.chain.meta.chain;
-    if (vnode.state.membersRequested) {
-      vnode.state.membersRequested = false;
+    if (vnode.state.requestMembers) {
+      vnode.state.requestMembers = false;
       activeInfo
         .getMembersByPage(
           app.activeId(),
@@ -215,6 +215,18 @@ const MembersPage: m.Component<
       community: app.activeCommunityId(),
     });
 
+    const {
+      totalMemberCount,
+      pageToLoad,
+      requestMembers,
+      members,
+      delegates,
+      voteEvents,
+    } = vnode.state;
+
+    const noCommunityMembers =
+      totalMemberCount === 0 && pageToLoad === 0 && !requestMembers;
+
     return m(
       Sublayout,
       {
@@ -232,17 +244,15 @@ const MembersPage: m.Component<
       },
       [
         m('.title', 'Members'),
-        vnode.state.totalMemberCount &&
-        vnode.state.members?.length > 0 &&
-        vnode.state.members.length < vnode.state.totalMemberCount
+        (totalMemberCount > 0 && members?.length > 0) || noCommunityMembers
           ? m(Table, [
               m('tr', [
                 m('th', 'Member'),
                 m('th.align-right', 'Posts'),
-                vnode.state.delegates && m('th.align-right', 'Voting Power'),
-                vnode.state.delegates && m('th.align-right', 'Delegate'),
+                delegates && m('th.align-right', 'Voting Power'),
+                delegates && m('th.align-right', 'Delegate'),
               ]),
-              vnode.state.members.map((info) => {
+              members.map((info) => {
                 const profile = app.profiles.getProfile(
                   info.chain,
                   info.address
@@ -267,27 +277,22 @@ const MembersPage: m.Component<
                       },
                       [
                         m(User, { user: profile, showRole: true }),
-                        vnode.state.voteEvents[info.address] &&
+                        voteEvents[info.address] &&
                           m(Tooltip, {
                             trigger: m(Tag, {
-                              label: `${
-                                vnode.state.voteEvents[info.address].length
-                              } event${
-                                vnode.state.voteEvents[info.address].length !==
-                                  1 && 's'
+                              label: `${voteEvents[info.address].length} event${
+                                voteEvents[info.address].length !== 1 && 's'
                               }`,
                               size: 'xs',
                             }),
-                            content: vnode.state.voteEvents[info.address].map(
-                              (o) => {
-                                return m(
-                                  'div',
-                                  `Proposal #${o.event_data.id}, ${
-                                    o.event_data.support ? 'YES' : 'NO'
-                                  }, ${o.event_data.votes} votes`
-                                );
-                              }
-                            ),
+                            content: voteEvents[info.address].map((o) => {
+                              return m(
+                                'div',
+                                `Proposal #${o.event_data.id}, ${
+                                  o.event_data.support ? 'YES' : 'NO'
+                                }, ${o.event_data.votes} votes`
+                              );
+                            }),
                           }),
                       ]
                     ),
@@ -296,7 +301,7 @@ const MembersPage: m.Component<
                     info.count > 0 &&
                       `${pluralize(info.count, 'post')} this month`,
                   ]),
-                  vnode.state.delegates &&
+                  delegates &&
                     m('td.align-right', [
                       info.votes !== undefined
                         ? `${info.votes.toNumber().toFixed(2)} ${
@@ -304,7 +309,7 @@ const MembersPage: m.Component<
                           }`
                         : m(Spinner, { active: true, size: 'xs' }),
                     ]),
-                  vnode.state.delegates &&
+                  delegates &&
                     m(
                       'td.align-right',
                       m(Button, {
@@ -332,6 +337,8 @@ const MembersPage: m.Component<
               size: 'lg',
               message: 'Loading members...',
             }),
+        members.length < totalMemberCount &&
+          m('tr.spinner-wrap', [m(Spinner, { active: true, size: 'lg' })]),
       ]
     );
   },
