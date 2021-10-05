@@ -104,8 +104,7 @@
     }
     @include md-max {
         .sublayout-main-col {
-            min-width: 100%;
-            max-width: 100%;
+            width: calc(100% - #{$sidebar-width});
             padding: 0;
         }
     }
