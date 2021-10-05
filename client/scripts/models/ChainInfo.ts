@@ -126,7 +126,7 @@ class ChainInfo {
       blockExplorerIdsParsed = JSON.parse(block_explorer_ids);
     } catch (e) {
       // ignore invalid JSON blobs
-      blockExplorerIds = {};
+      block_explorer_ids = {};
     }
     return new ChainInfo({
       id,
