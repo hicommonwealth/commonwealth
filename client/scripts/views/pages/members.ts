@@ -63,6 +63,7 @@ const DelegateModal: m.Component<
         m(Button, {
           label: 'Delegate',
           intent: 'primary',
+          disabled: !app.isLoggedIn(),
           onclick: async (e) => {
             chainController?.chain
               .setDelegate(vnode.attrs.address, vnode.state.delegateAmount)
