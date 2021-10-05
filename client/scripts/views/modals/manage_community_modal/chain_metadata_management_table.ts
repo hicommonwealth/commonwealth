@@ -56,23 +56,24 @@ const ChainMetadataManagementTable: m.Component<
     vnode.state.symbol = vnode.attrs.chain.symbol;
     vnode.state.snapshot = vnode.attrs.chain.snapshot;
   },
-  view: (vnode) => {
+  view: (vnode: any) => {
     return m('.ChainMetadataManagementTable', [
       m(AvatarUpload, {
         avatarScope: AvatarScope.Chain,
         uploadStartedCallback: () => {
+          console.log('starting callback');
           vnode.state.uploadInProgress = true;
+          m.redraw();
         },
         uploadCompleteCallback: (files) => {
           files.forEach((f) => {
             if (!f.uploadURL) return;
             const url = f.uploadURL.replace(/\?.*/, '');
             vnode.state.iconUrl = url;
-            $((vnode as any).dom)
-              .find('input[name=avatarUrl]')
-              .val(url.trim());
+            $(vnode.dom).find('input[name=avatarUrl]').val(url.trim());
           });
           vnode.state.uploadInProgress = false;
+          m.redraw();
         },
       }),
       m(
