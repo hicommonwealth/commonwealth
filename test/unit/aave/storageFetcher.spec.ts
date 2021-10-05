@@ -1,15 +1,23 @@
 import chai from 'chai';
-import { BigNumber } from 'ethers';
+import { BigNumber, utils } from 'ethers';
 
 import { StorageFetcher } from '../../../src/chains/aave/storageFetcher';
 import {
   EventKind,
   Proposal,
   ProposalState,
+  RawEvent,
 } from '../../../src/chains/aave/types';
 import { AaveGovernanceV2 } from '../../../src/contractTypes';
 
 const { assert } = chai;
+
+const constructEvent = (blockNumber: number, data): RawEvent => {
+  return {
+    args: data,
+    blockNumber,
+  } as RawEvent;
+};
 
 const makeApi = (proposals: Proposal[]) => {
   const governance = ({
@@ -20,11 +28,49 @@ const makeApi = (proposals: Proposal[]) => {
     getProposalsCount: async () => proposals.length,
     getProposalById: async (n: number) => proposals[n],
     getProposalState: async () => ProposalState.CANCELED,
-    filters: {
-      VoteEmitted: () => null,
-    },
     // TODO: test vote queries
-    queryFilter: async () => [],
+    queryFilter: async (filter) => {
+      // TODO: support all filters
+      if (filter === 'ProposalCreated') {
+        const events = proposals.map((p) => {
+          return constructEvent(+p.startBlock, {
+            id: p.id,
+            creator: p.creator,
+            executor: p.executor,
+            targets: p.targets,
+            signatures: p.signatures,
+            calldatas: p.calldatas,
+            startBlock: p.startBlock,
+            endBlock: p.endBlock,
+            strategy: p.strategy,
+            ipfsHash: p.ipfsHash,
+            4: p[4],
+          });
+        });
+        return events;
+      }
+      if (filter === 'ProposalCanceled') {
+        const events = proposals
+          .map((p) => {
+            if (p.canceled) {
+              return constructEvent(100, {
+                id: p.id,
+              });
+            }
+            return null;
+          })
+          .filter((p) => !!p);
+        return events;
+      }
+      return [];
+    },
+    filters: {
+      VoteEmitted: () => 'VoteEmitted',
+      ProposalCreated: () => 'ProposalCreated',
+      ProposalCanceled: () => 'ProposalCanceled',
+      ProposalQueued: () => 'ProposalQueued',
+      ProposalExecuted: () => 'ProposalExecuted',
+    },
   } as unknown) as AaveGovernanceV2;
   return { governance };
 };
@@ -80,10 +126,11 @@ describe('Aave Storage Fetcher Tests', () => {
     ];
     const api = makeApi(proposals);
     const fetcher = new StorageFetcher(api);
-    const fetched = await fetcher.fetch(undefined, true);
+    const fetched = await fetcher.fetch();
     assert.sameDeepMembers(fetched, [
       {
         blockNumber: 5,
+        excludeAddresses: ['creator'],
         data: {
           kind: EventKind.ProposalCreated,
           id: 1,
@@ -101,6 +148,7 @@ describe('Aave Storage Fetcher Tests', () => {
       },
       {
         blockNumber: 100,
+        excludeAddresses: [],
         data: {
           kind: EventKind.ProposalCanceled,
           id: 1,

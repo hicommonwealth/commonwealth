@@ -44,8 +44,7 @@ export class StorageFetcher extends IStorageFetcher<Api> {
    * @param range Determines the range of blocks to query events within.
    */
   public async fetch(
-    range?: IDisconnectedRange,
-    fetchAllCompleted = false
+    range?: IDisconnectedRange
   ): Promise<CWEvent<IEventData>[]> {
     this._currentBlock = await this._api.provider.getBlockNumber();
     log.info(`Current block: ${this._currentBlock}.`);
@@ -169,6 +168,6 @@ export class StorageFetcher extends IStorageFetcher<Api> {
       ...queuedCwEvents,
       ...cancelledCwEvents,
       ...executedCwEvents,
-    ].sort((e1, e2) => e2.blockNumber - e1.blockNumber);
+    ].sort((e1, e2) => e1.blockNumber - e2.blockNumber);
   }
 }

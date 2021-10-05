@@ -436,9 +436,11 @@ describe('Aave Event Integration Tests', () => {
     } = await proposeToCompletion(setupData);
     const completedProposal = await api.governance.getProposalById(completedId);
 
-    const cancelledEventData: CWEvent<IEventData>[] = [
+    // TODO: compute block numbers rather than manually
+    const eventData: CWEvent<IEventData>[] = [
       {
-        blockNumber: +cancelledProposal.startBlock,
+        blockNumber: 12,
+        excludeAddresses: [addresses[0]],
         data: {
           kind: EventKind.ProposalCreated,
           id: cancelledId,
@@ -455,17 +457,16 @@ describe('Aave Event Integration Tests', () => {
         },
       },
       {
-        blockNumber: +cancelledProposal.endBlock,
+        blockNumber: 13,
+        excludeAddresses: [],
         data: {
           kind: EventKind.ProposalCanceled,
           id: cancelledId,
         },
       },
-    ];
-
-    const completedEventData: CWEvent<IEventData>[] = [
       {
-        blockNumber: +completedProposal.startBlock,
+        blockNumber: 14,
+        excludeAddresses: [addresses[0]],
         data: {
           kind: EventKind.ProposalCreated,
           id: completedId,
@@ -482,22 +483,8 @@ describe('Aave Event Integration Tests', () => {
         },
       },
       {
-        blockNumber: +completedProposal.endBlock,
-        data: {
-          kind: EventKind.ProposalQueued,
-          id: completedId,
-          executionTime: +completedProposal.executionTime,
-        },
-      },
-      {
-        blockNumber: +completedProposal.endBlock,
-        data: {
-          kind: EventKind.ProposalExecuted,
-          id: completedId,
-        },
-      },
-      {
         blockNumber: votingBlock + 1,
+        excludeAddresses: [addresses[0]],
         data: {
           kind: EventKind.VoteEmitted,
           id: completedId,
@@ -506,29 +493,36 @@ describe('Aave Event Integration Tests', () => {
           votingPower: votingPower.toString(),
         },
       },
+      {
+        blockNumber: 32,
+        excludeAddresses: [],
+        data: {
+          kind: EventKind.ProposalQueued,
+          id: completedId,
+          executionTime: +completedProposal.executionTime,
+        },
+      },
+      {
+        blockNumber: 38,
+        excludeAddresses: [],
+        data: {
+          kind: EventKind.ProposalExecuted,
+          id: completedId,
+        },
+      },
     ];
 
     // fetch all non-complete from storage (none)
     const fetcher = new StorageFetcher(api);
-    const nonCompletedData = await fetcher.fetch(undefined, false);
-    assert.deepEqual(nonCompletedData, []);
 
-    // fetch all from storage incl complete
-    const allData = await fetcher.fetch(undefined, true);
-    assert.deepEqual(allData, [...completedEventData, ...cancelledEventData]);
+    // fetch all from storage
+    const allData = await fetcher.fetch();
+    assert.deepEqual(allData, eventData);
 
-    // fetch cancelled from storage via range
-    const cancelledData = await fetcher.fetch(
-      { startBlock: 0, endBlock: +cancelledProposal.startBlock + 1 },
-      true
-    );
-    assert.deepEqual(cancelledData, cancelledEventData);
-
-    // fetch completed from storage via range
-    const completedData = await fetcher.fetch(
-      { startBlock: +completedProposal.startBlock },
-      true
-    );
-    assert.deepEqual(completedData, completedEventData);
+    // fetch some from storage
+    const completedData = await fetcher.fetch({
+      startBlock: 17,
+    });
+    assert.deepEqual(completedData, eventData.slice(3));
   });
 });
