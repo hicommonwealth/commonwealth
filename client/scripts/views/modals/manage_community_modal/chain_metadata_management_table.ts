@@ -61,7 +61,6 @@ const ChainMetadataManagementTable: m.Component<
       m(AvatarUpload, {
         avatarScope: AvatarScope.Chain,
         uploadStartedCallback: () => {
-          console.log('starting callback');
           vnode.state.uploadInProgress = true;
           m.redraw();
         },
