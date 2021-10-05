@@ -30,7 +30,7 @@ const getCommunitiesAndChains = async (models: DB, req: Request, res: Response, 
     });
   }
   const visibleCommunities = communities.filter((community) => {
-    if (!community.privacyEnabled) {
+    if (!community.privacy_enabled) {
       return true;
     } else {
       if (!user) return false;

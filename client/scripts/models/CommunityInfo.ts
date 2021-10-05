@@ -3,6 +3,7 @@ import app from 'state';
 import { RoleInfo, RolePermission } from 'models';
 import ChainInfo from './ChainInfo';
 import OffchainTopic from './OffchainTopic';
+import { OffchainCommunityInstance } from 'server/models/offchain_community';
 
 interface CommunityData {
   name: string;
@@ -237,10 +238,10 @@ class CommunityInfo {
       invites: invitesEnabled,
       jwt: app.user.jwt,
     });
-    const updatedCommunity: CommunityInfo = r.result;
+    const updatedCommunity: OffchainCommunityInstance = r.result;
     this.name = updatedCommunity.name;
     this.description = updatedCommunity.description;
-    this.iconUrl = updatedCommunity.iconUrl;
+    this.iconUrl = updatedCommunity.icon_url;
     this.website = updatedCommunity.website;
     this.discord = updatedCommunity.discord;
     this.element = updatedCommunity.element;
@@ -248,10 +249,10 @@ class CommunityInfo {
     this.github = updatedCommunity.github;
     this.stagesEnabled = stagesEnabled;
     this.customStages = customStages;
-    this.customDomain = updatedCommunity.customDomain;
+    this.customDomain = updatedCommunity.custom_domain;
     this.terms = updatedCommunity.terms;
-    this.privacyEnabled = updatedCommunity.privacyEnabled;
-    this.invitesEnabled = updatedCommunity.invitesEnabled;
+    this.privacyEnabled = updatedCommunity.privacy_enabled;
+    this.invitesEnabled = updatedCommunity.invites_enabled;
   }
 
   public addFeaturedTopic(topic: string) {

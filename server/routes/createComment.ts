@@ -350,7 +350,7 @@ const createComment = async (
         const originCommunity = await models.OffchainCommunity.findOne({
           where: { id: finalComment.community }
         });
-        if (originCommunity.privacyEnabled) {
+        if (originCommunity.privacy_enabled) {
           const destinationCommunity = mentionedAddress.Roles
             .find((role) => role.offchain_community_id === originCommunity.id);
           if (destinationCommunity === undefined) shouldNotifyMentionedUser = false;

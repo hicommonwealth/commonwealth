@@ -37,7 +37,7 @@ const status = async (models: DB, req: Request, res: Response, next: NextFunctio
       ],
     }),
     models.OffchainCommunity.findAll({
-      where: { privacyEnabled: false },
+      where: { privacy_enabled: false },
       include: {
         model: models.OffchainTopic,
         as: 'topics',
@@ -64,7 +64,7 @@ const status = async (models: DB, req: Request, res: Response, next: NextFunctio
         AND "OffchainThreads".deleted_at IS NULL
         AND NOT "OffchainThreads".pinned
         AND ("OffchainThreads".chain IS NOT NULL
-            OR NOT "OffchainCommunities"."privacyEnabled")
+            OR NOT "OffchainCommunities"."privacy_enabled")
       GROUP BY CONCAT("OffchainThreads".chain, "OffchainThreads".community);
       `,
       { replacements: { thirtyDaysAgo }, type: QueryTypes.SELECT }
@@ -120,7 +120,7 @@ const status = async (models: DB, req: Request, res: Response, next: NextFunctio
       id: {
         [Op.in]: visiblePrivateCommunityIds,
       },
-      privacyEnabled: true,
+      privacy_enabled: true,
     },
     include: [{
       model: models.OffchainTopic,
@@ -139,7 +139,7 @@ WHERE "OffchainThreads".updated_at > :thirtyDaysAgo
   AND "OffchainThreads".deleted_at IS NULL
   AND NOT "OffchainThreads".pinned
   AND ("OffchainThreads".chain IS NOT NULL
-    OR NOT "OffchainCommunities"."privacyEnabled"
+    OR NOT "OffchainCommunities"."privacy_enabled"
     OR "OffchainCommunities".id IN(:visiblePrivateCommunityIds))
 GROUP BY CONCAT("OffchainThreads".chain, "OffchainThreads".community);
 `, { replacements: {

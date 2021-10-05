@@ -85,23 +85,23 @@ const updateCommunity = async (
   if (req.body.name) community.name = req.body.name;
   if (req.body['featured_topics[]'])
     community.featured_topics = req.body['featured_topics[]'];
-  community.description = description;
-  community.iconUrl = icon_url;
-  community.website = website;
-  community.discord = discord;
-  community.element = element;
-  community.telegram = telegram;
-  community.github = github;
-  community.stagesEnabled = stages_enabled;
-  community.customStages = custom_stages;
-  community.terms = terms;
-  community.invitesEnabled = invites || false;
-  community.privacyEnabled = privacy || false;
+  if (description) community.description = description;
+  if (icon_url) community.icon_url = icon_url;
+  if (website) community.website = website;
+  if (discord) community.discord = discord;
+  if (element) community.element = element;
+  if (telegram) community.telegram = telegram;
+  if (github) community.github = github;
+  if (stages_enabled) community.stages_enabled = stages_enabled;
+  if (custom_stages) community.custom_stages = custom_stages;
+  if (terms) community.terms = terms;
+  community.invites_enabled = invites || false;
+  community.privacy_enabled = privacy || false;
   // Under our current security policy, custom domains must be set by trusted
   // administrators only. Otherwise an attacker could configure a custom domain and
   // use the code they run to steal login tokens for arbitrary users.
   //
-  // community.customDomain = customDomain;
+  // community.custom_domain = custom_domain;
   await community.save();
 
   // @TODO -> make sure this gets changed... on the front end, only allow one image to be attached

@@ -66,7 +66,7 @@ const updateChain = async (
     github,
     stages_enabled,
     custom_stages,
-    customDomain,
+    custom_domain,
     terms,
     snapshot,
   } = req.body;
@@ -81,7 +81,7 @@ const updateChain = async (
     return next(new Error(Errors.InvalidTelegram));
   } else if (github && !github.startsWith('https://github.com/')) {
     return next(new Error(Errors.InvalidGithub));
-  } else if (customDomain && customDomain.includes('commonwealth')) {
+  } else if (custom_domain && custom_domain.includes('commonwealth')) {
     return next(new Error(Errors.InvalidCustomDomain));
   } else if (
     snapshot &&
@@ -102,22 +102,22 @@ const updateChain = async (
   if (icon_url) chain.icon_url = icon_url;
   if (active !== undefined) chain.active = active;
   if (type) chain.type = type;
-  chain.website = website;
-  chain.discord = discord;
-  chain.element = element;
-  chain.telegram = telegram;
-  chain.github = github;
-  chain.stagesEnabled = stages_enabled;
-  chain.customStages = custom_stages;
-  chain.terms = terms;
-  chain.snapshot = snapshot;
+  if (website) chain.website = website;
+  if (discord) chain.discord = discord;
+  if (element) chain.element = element;
+  if (telegram) chain.telegram = telegram;
+  if (github) chain.github = github;
+  if (stages_enabled) chain.stages_enabled = stages_enabled;
+  if (custom_stages) chain.custom_stages = custom_stages;
+  if (terms) chain.terms = terms;
+  if (snapshot) chain.snapshot = snapshot;
+  if (req.body['featured_topics[]'])
+    chain.featured_topics = req.body['featured_topics[]'];
   // Under our current security policy, custom domains must be set by trusted
   // administrators only. Otherwise an attacker could configure a custom domain and
   // use the code they run to steal login tokens for arbitrary users.
   //
-  // chain.customDomain = customDomain;
-  if (req.body['featured_topics[]'])
-    chain.featured_topics = req.body['featured_topics[]'];
+  // chain.custom_domain = custom_domain;
 
   await chain.save();
 
