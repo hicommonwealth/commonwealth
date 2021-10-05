@@ -3,8 +3,6 @@ import { IAaveGovernanceV2__factory } from 'eth/types';
 import EthereumChain from '../chain';
 import AaveApi from './api';
 import { attachSigner } from '../contractApi';
-import { BigNumber } from 'ethers';
-
 
 // Thin wrapper over EthereumChain to guarantee the `init()` implementation
 // on the Governance module works as expected.
@@ -41,15 +39,5 @@ export default class AaveChain extends EthereumChain {
     if (!token) throw new Error('No token contract found');
     const delegate = await token.getDelegateeByType(delegator, type === 'voting' ? 0 : 1);
     return delegate;
-  }
-
-
-  public async getVotingPower(address: string) {
-    const num = await this.aaveApi.Token.numCheckpoints(address);
-    if (num === 0) return BigNumber.from(0);
-    const { fromBlock, votes } = await this.aaveApi.Token.checkpoints(address, num - 1);
-    // Todo move this into shared
-    const votesByDecimals = votes.div(BigNumber.from(10).pow(BigNumber.from(this.aaveApi.decimals)));
-    return votesByDecimals;
   }
 }

@@ -44,7 +44,7 @@ export default class WebWalletController {
       }
       // TODO: disable if not found
     }
-    throw new Error(`No wallet found for ${address}: Check if you're switched to the right address and network.`);
+    throw new Error(`No wallet found for ${address}`);
   }
 
   constructor() {

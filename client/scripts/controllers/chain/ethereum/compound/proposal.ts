@@ -18,15 +18,13 @@ import {
   ChainEvent,
 } from 'models';
 
-import Web3 from 'web3';
-import { formatNumberShort } from 'adapters/currency';
-import { capitalize } from 'lodash';
 import CompoundAPI from './api';
 import CompoundGovernance from './governance';
 import { attachSigner } from '../contractApi';
 import EthereumAccount from '../account';
 import EthereumAccounts from '../accounts';
 import CompoundChain from './chain';
+import { capitalize } from 'lodash';
 
 export enum CompoundVote {
   YES = 1,
@@ -42,10 +40,6 @@ export class CompoundProposalVote implements IVote<EthereumCoin> {
     this.account = member;
     this.choice = choice;
     this.power = power || new BN(0);
-  }
-
-  public format(): string {
-    return `${formatNumberShort(+Web3.utils.fromWei(this.power))}`;
   }
 }
 

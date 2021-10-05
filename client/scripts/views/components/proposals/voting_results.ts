@@ -15,7 +15,6 @@ import { SubstrateCollectiveVote } from 'controllers/chain/substrate/collective_
 import { SubstrateDemocracyVote } from 'controllers/chain/substrate/democracy_referendum';
 import AaveProposal, { AaveProposalVote } from 'controllers/chain/ethereum/aave/proposal';
 import { NearSputnikVoteString } from 'controllers/chain/near/sputnik/types';
-import Compound from 'controllers/chain/ethereum/compound/adapter';
 
 const COLLAPSE_VOTERS_AFTER = 6; // if there are >6 voters, collapse remaining under "Show more"
 
@@ -64,9 +63,7 @@ const VoteListing: m.Component<{
                   vnode.state.balancesCache[vote.account.address] = vote.format();
                   m.redraw();
                 } else if (vote instanceof CompoundProposalVote) {
-                  if (!(app.chain instanceof Compound)) return;
-                  const decimals = new BN(10).pow(new BN(app.chain.governance.api.decimals));
-                  balance = formatNumberLong(+Web3.utils.fromWei(vote.power.div(decimals).toString()));
+                  balance = formatCoin(app.chain.chain.coins(vote.power), true);
                   vnode.state.balancesCache[vote.account.address] = balance;
                   m.redraw();
                 } else {
@@ -93,7 +90,7 @@ const VoteListing: m.Component<{
               case (vote instanceof CompoundProposalVote):
                 return m('.vote', [
                   m('.vote-voter', m(User, { user: vote.account, linkify: true })),
-                  balance && m('.vote-balance', `${balance} ${app.chain.meta.chain.symbol}`),
+                  balance && m('.vote-balance', balance),
                 ]);
               case (vote instanceof AaveProposalVote):
                 return m('.vote', [

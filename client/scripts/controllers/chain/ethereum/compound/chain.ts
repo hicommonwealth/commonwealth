@@ -4,7 +4,6 @@ import { NodeInfo } from 'models';
 import EthereumChain from '../chain';
 import { attachSigner } from '../contractApi';
 import CompoundAPI from './api';
-import { BigNumber } from 'ethers';
 
 // Thin wrapper over EthereumChain to guarantee the `init()` implementation
 // on the Governance module works as expected.
@@ -36,16 +35,8 @@ export default class CompoundChain extends EthereumChain {
 
   public async balanceOf(address: string) {
     const balance = await this.compoundApi.Token.balanceOf(address);
+    console.log('balanceOf Compound Accounts', balance);
     return new BN(balance.toString(), 10) || new BN(0);
-  }
-
-  public async getVotingPower(address: string) {
-    const num = await this.compoundApi.Token.numCheckpoints(address);
-    if (num === 0) return BigNumber.from(0);
-    const { fromBlock, votes } = await this.compoundApi.Token.checkpoints(address, num - 1);
-    // Todo move this into shared
-    const votesByDecimals = votes.div(BigNumber.from(10).pow(BigNumber.from(this.compoundApi.decimals)));
-    return votesByDecimals;
   }
 
   public async setDelegate(address: string, amount: number) {
@@ -55,16 +46,10 @@ export default class CompoundChain extends EthereumChain {
         this.app.user.activeAccount.address,
         this.compoundApi.Token,
       );
-      const bal = await this.balanceOf(address);
-      console.log(`User balance: ${bal.toString()}`)
-      console.log(`${amount} to delegate before decimals`);
-      const balBN = BigNumber.from(amount);
-      const decimals = BigNumber.from(10).pow(BigNumber.from(this.compoundApi.decimals));
-      const delegateAmt = balBN.mul(decimals).toString();
-      console.log(`${delegateAmt} after decimals`);
-      const gasLimit = await contract.estimateGas.delegate(address, delegateAmt);
-      await contract.delegate(address, delegateAmt, { gasLimit });
+      const gasLimit = await contract.estimateGas.delegate(address, amount);
+      await contract.delegate(address, amount, { gasLimit });
     } catch (e) {
+      console.error(e);
       throw new Error(e);
     }
   }

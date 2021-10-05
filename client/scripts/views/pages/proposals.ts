@@ -76,7 +76,6 @@ const CompoundProposalStats: m.Component<{}, {}> = {
     if (!(app.chain instanceof Compound)) return;
     const activeAccount = app.user.activeAccount;
     const symbol = app.chain.meta.chain.symbol;
-    const decimals = new BN(10).pow(new BN(app.chain.governance.api.decimals));
 
     return m('.stats-box', [
       m('.stats-box-left', '💭'),
@@ -90,10 +89,10 @@ const CompoundProposalStats: m.Component<{}, {}> = {
         m('', [
           // TODO: We shouldn't be hardcoding these figures
           m('.stats-box-stat', [
-            `Quorum: ${app.chain.governance?.quorumVotes.div(decimals).toString()} ${symbol}`
+            `Quorum: ${app.chain.governance?.quorumVotes.div(new BN('1000000000000000000')).toString()} ${symbol}`
           ]),
           m('.stats-box-stat', [
-            `Proposal Threshold: ${app.chain.governance?.proposalThreshold.div(decimals).toString()} ${symbol}`
+            `Proposal Threshold: ${app.chain.governance?.proposalThreshold.div(new BN('1000000000000000000')).toString()} ${symbol}`
           ]),
           m('.stats-box-stat', [
             `Voting Period Length: ${app.chain.governance.votingPeriod.toString(10)}`,

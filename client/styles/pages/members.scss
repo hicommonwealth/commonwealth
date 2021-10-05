@@ -1,22 +1,27 @@
 @import 'client/styles/shared';
 
 .MembersPage {
+
     .title {
         font-size: 32px;
         margin-top: 32px;
         padding-left: 12px;
     }
+
     th {
         color: #666666;
         font-weight: 400;
         border: 0;
     }
+
     td {
         border: 0;
     }
+
     .align-right {
         text-align: right;
     }
+
     .members-item-info {
         a {
             color: $text-color-black;
@@ -27,11 +32,5 @@
             font-weight: 400;
             font-size: 18px;
         }
-    }
-    .spinner-wrap {
-        width: 100%;
-        display: flex;
-        justify-content: center;
-        margin-top: 20px;
     }
 }

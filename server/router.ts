@@ -113,7 +113,6 @@ import editTopic from './routes/editTopic';
 import deleteTopic from './routes/deleteTopic';
 import bulkTopics from './routes/bulkTopics';
 import bulkOffchain from './routes/bulkOffchain';
-import getChainEvents from './routes/getChainEvents';
 import setTopicThreshold from './routes/setTopicThreshold';
 
 import edgewareLockdropLookup from './routes/getEdgewareLockdropLookup';
@@ -210,7 +209,6 @@ function setupRouter(
   router.get('/communityStats', passport.authenticate('jwt', { session: false }), communityStats.bind(this, models));
   router.get('/getTokensFromLists', getTokensFromLists.bind(this, models));
   router.get('/getTokenForum', getTokenForum.bind(this, models));
-  router.get('/getChainEvents', getChainEvents.bind(this, models));
   // TODO: Change to POST /chain
   router.post('/createChain', passport.authenticate('jwt', { session: false }), createChain.bind(this, models));
 

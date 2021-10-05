@@ -1,12 +1,11 @@
 import { GovernorAlpha, MPond, MPond__factory } from 'eth/types';
 import { utils } from 'ethers';
+
 import ContractApi from 'controllers/chain/ethereum/contractApi';
 
 export default class CompoundAPI extends ContractApi<GovernorAlpha> {
   private _Token: MPond;
-  private _decimals: number;
   public get Token() { return this._Token; }
-  public get decimals() { return this._decimals; }
 
   // private _Timelock: Timelock;
   // public get Timelock() { return this._Timelock; }
@@ -36,7 +35,6 @@ export default class CompoundAPI extends ContractApi<GovernorAlpha> {
         const resultData = await this.Contract.provider.call({ to: this.Contract.address, data });
         const tokenAddress = utils.getAddress(Buffer.from(utils.stripZeros(resultData)).toString('hex'));
         this._Token = MPond__factory.connect(tokenAddress, this.Contract.signer || this.Contract.provider);
-        await this._Token.decimals().then((d) => this._decimals = d);
       } catch (err) {
         console.error(`Could not fetch token ${tokenName}: ${err.message}`);
       }

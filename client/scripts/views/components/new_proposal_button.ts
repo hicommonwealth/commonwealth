@@ -67,13 +67,6 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
        label: 'New On-Chain Proposal',
        iconLeft: mobile ? Icons.PLUS : undefined,
      }),
-    app.chain?.network === ChainNetwork.Aave && m(MenuItem, {
-      onclick: (e) => navigateToSubpage('/new/proposal/:type', {
-        type: ProposalType.AaveProposal
-      }),
-      label: 'New On-Chain Proposal',
-      iconLeft: mobile ? Icons.PLUS : undefined,
-    }),
     app.chain?.network === ChainNetwork.Compound && m(MenuItem, {
       onclick: (e) => navigateToSubpage('/new/proposal/:type', {
         type: ProposalType.CompoundProposal
