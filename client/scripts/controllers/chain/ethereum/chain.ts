@@ -13,7 +13,7 @@ import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import EthereumAccount from './account';
 
 export const INFURA_ID = process.env.INFURA_API_KEY || '90de850aff68424ab8e7321017406586';
-const ETHEREUM_BLOCK_TIME = 15;
+const ETHEREUM_BLOCK_TIME = 13;
 export interface IEthereumTXData extends ITXData {
   chainId: string;
   accountNumber: number;

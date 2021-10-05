@@ -1,8 +1,10 @@
 import 'components/proposals/voting_results.scss';
 import m from 'mithril';
 import app from 'state';
+import BN from 'bn.js';
+import Web3 from 'web3';
 
-import { formatCoin } from 'adapters/currency'; // TODO: remove formatCoin, only use coins.format()
+import { formatCoin, formatNumberLong } from 'adapters/currency'; // TODO: remove formatCoin, only use coins.format()
 import User from 'views/components/widgets/user';
 import { VotingType, VotingUnit, IVote, DepositVote, BinaryVote, AnyProposal } from 'models';
 import { CosmosVote, CosmosProposal } from 'controllers/chain/cosmos/proposal';
@@ -35,11 +37,16 @@ const VoteListing: m.Component<{
     if (!vnode.state.balancesCacheInitialized) vnode.state.balancesCacheInitialized = {};
 
     // TODO: show turnout if specific votes not found
+    const sortedVotes = votes;
+    if (proposal instanceof AaveProposal) {
+      (sortedVotes as AaveProposalVote[]).sort((v1, v2) =>
+        v2.power.cmp(v1.power)
+      );
+    }
     return m('.VoteListing', [
-      votes.length === 0
+      sortedVotes.length === 0
         ? m('.no-votes', 'No votes')
-        : votes.map(
-          (vote) => {
+        : votes.map((vote) => {
             let balance;
             if (balanceWeighted && !(vote instanceof CosmosVote)) {
               // fetch and display balances
@@ -175,9 +182,25 @@ const VotingResults: m.Component<{ proposal: AnyProposal }> = {
         ])
       ]);
     } else if (proposal instanceof AaveProposal) {
+      const yesVotes: AaveProposalVote[] = votes.filter((v) => !!v.choice);
+      const yesBalance = yesVotes.reduce(
+        (total, v) => total.add(v.power),
+        new BN(0)
+      );
+      const yesBalanceString = `${formatNumberLong(
+        +Web3.utils.fromWei(yesBalance.toString())
+      )} ${app.chain.meta.chain.symbol}`;
+      const noVotes: AaveProposalVote[] = votes.filter((v) => !v.choice);
+      const noBalance = noVotes.reduce(
+        (total, v) => total.add(v.power),
+        new BN(0)
+      );
+      const noBalanceString = `${formatNumberLong(
+        +Web3.utils.fromWei(noBalance.toString())
+      )} ${app.chain.meta.chain.symbol}`;
       return m('.VotingResults', [
         m('.results-column.yes-votes', [
-          m('.results-header', `Yes (${votes.filter((v) => v.choice === MolochVote.YES).length})`),
+          m('.results-header', `Yes (${yesBalanceString}) (${yesVotes.length} voters)`),
           m('.results-subheader', [
             m('span', 'User'),
             m('span', 'Power')
@@ -185,12 +208,12 @@ const VotingResults: m.Component<{ proposal: AnyProposal }> = {
           m('.results-cell', [
             m(VoteListing, {
               proposal,
-              votes: votes.filter((v) => v.choice === MolochVote.YES)
+              votes: votes.filter((v) => !!v.choice)
             })
           ]),
         ]),
         m('.results-column.no-votes', [
-          m('.results-header', `No (${votes.filter((v) => v.choice === MolochVote.NO).length})`),
+          m('.results-header', `No (${noBalanceString}) (${noVotes.length} voters)`),
           m('.results-subheader', [
             m('span', 'User'),
             m('span', 'Power')
@@ -198,7 +221,7 @@ const VotingResults: m.Component<{ proposal: AnyProposal }> = {
           m('.results-cell', [
             m(VoteListing, {
               proposal,
-              votes: votes.filter((v) => v.choice === MolochVote.NO)
+              votes: votes.filter((v) => !v.choice)
             })
           ]),
         ])
