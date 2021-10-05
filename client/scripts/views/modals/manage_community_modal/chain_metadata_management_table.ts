@@ -67,7 +67,7 @@ const ChainMetadataManagementTable: m.Component<
           files.forEach((f) => {
             if (!f.uploadURL) return;
             const url = f.uploadURL.replace(/\?.*/, '');
-            console.log(url);
+            vnode.state.iconUrl = url;
             $((vnode as any).dom)
               .find('input[name=avatarUrl]')
               .val(url.trim());
@@ -228,6 +228,7 @@ const ChainMetadataManagementTable: m.Component<
             customDomain,
             snapshot,
             terms,
+            iconUrl,
           } = vnode.state;
 
           // /^[a-z]+\.eth/
@@ -256,6 +257,7 @@ const ChainMetadataManagementTable: m.Component<
               customDomain,
               snapshot,
               terms,
+              iconUrl,
             });
             $(e.target).trigger('modalexit');
           } catch (err) {

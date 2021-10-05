@@ -95,27 +95,31 @@ const AvatarUpload: m.Component<IAttrs, IState> = {
     });
   },
   view: (vnode) => {
+    const logoURL =
+      vnode.state.dropzone?.option?.url ||
+      (app.activeCommunityId()
+        ? app.community.meta.iconUrl
+        : app.chain.meta.chain.iconUrl);
     return m('form.AvatarUpload', [
       m(
         '.dropzone-attach',
         {
           class: vnode.state.uploaded ? 'hidden' : '',
+          style:
+            vnode.attrs.avatarScope === AvatarScope.Chain ||
+            vnode.attrs.avatarScope === AvatarScope.Community
+              ? `background-image: url(${logoURL}); background-size: 92px;`
+              : '',
         },
         [m('div.attach-button', [m(Icon, { name: Icons.PLUS, size: 'xs' })])]
       ),
-      !vnode.state.uploaded && vnode.attrs.avatarScope === AvatarScope.Account
-        ? m(User, {
-            user: app.user.activeAccount,
-            avatarOnly: true,
-            avatarSize: 100,
-          })
-        : vnode.attrs.avatarScope === AvatarScope.Chain
-        ? m(ChainIcon, {
-            chain: app.chain.meta.chain,
-          })
-        : m(CommunityIcon, {
-            community: app.community.meta,
-          }),
+      !vnode.state.uploaded &&
+        vnode.attrs.avatarScope === AvatarScope.Account &&
+        m(User, {
+          user: app.user.activeAccount,
+          avatarOnly: true,
+          avatarSize: 100,
+        }),
       m('.dropzone-previews', {
         class: vnode.state.uploaded ? '' : 'hidden',
       }),

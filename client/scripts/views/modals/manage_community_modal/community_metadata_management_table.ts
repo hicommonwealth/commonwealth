@@ -62,7 +62,15 @@ const CommunityMetadataManagementTable: m.Component<
         uploadStartedCallback: () => {
           vnode.state.uploadInProgress = true;
         },
-        uploadCompleteCallback: () => {
+        uploadCompleteCallback: (files) => {
+          files.forEach((f) => {
+            if (!f.uploadURL) return;
+            const url = f.uploadURL.replace(/\?.*/, '');
+            vnode.state.iconUrl = url;
+            $((vnode as any).dom)
+              .find('input[name=avatarUrl]')
+              .val(url.trim());
+          });
           vnode.state.uploadInProgress = false;
         },
       }),

@@ -5,21 +5,26 @@ import ChainInfo from './ChainInfo';
 import OffchainTopic from './OffchainTopic';
 
 interface CommunityData {
-  name: string,
-  iconUrl: string,
-  description: string,
-  website: string,
-  discord: string,
-  element: string,
+  name: string;
+  iconUrl: string;
+  description: string;
+  website: string;
+  discord: string;
+  element: string;
   telegram: string;
   github: string;
   visible: boolean;
-  stagesEnabled: boolean,
-  customStages: string,
+  defaultChain: string;
+  stagesEnabled: boolean;
+  customStages: string;
   customDomain: string;
   terms: string;
-  invitesEnabled: boolean,
-  privacyEnabled: boolean,
+  invitesEnabled: boolean;
+  privacyEnabled: boolean;
+  collapsedOnHomepage: boolean;
+  featuredTopics: any[];
+  topics: any[];
+  adminsAndMods: any;
 }
 
 class CommunityInfo {
@@ -48,9 +53,27 @@ class CommunityInfo {
 
   // TODO: convert this to accept opject with params instead
   constructor({
-    id, name, description, iconUrl, website, discord, element, telegram, github, defaultChain, visible,
-    stagesEnabled, customStages,
-    customDomain, terms, invitesEnabled, privacyEnabled, collapsedOnHomepage, featuredTopics, topics, adminsAndMods
+    id,
+    name,
+    description,
+    iconUrl,
+    website,
+    discord,
+    element,
+    telegram,
+    github,
+    defaultChain,
+    visible,
+    stagesEnabled,
+    customStages,
+    customDomain,
+    terms,
+    invitesEnabled,
+    privacyEnabled,
+    collapsedOnHomepage,
+    featuredTopics,
+    topics,
+    adminsAndMods,
   }) {
     this.id = id;
     this.name = name;
@@ -126,10 +149,15 @@ class CommunityInfo {
   // TODO: get operation should not have side effects, and either way this shouldn't be here
   public async getMembers(id: string) {
     try {
-      const res = await $.get(`${app.serverUrl()}/bulkMembers`, { community: id, });
+      const res = await $.get(`${app.serverUrl()}/bulkMembers`, {
+        community: id,
+      });
       this.setMembers(res.result);
       const roles = res.result.filter((r) => {
-        return r.permission === RolePermission.admin || r.permission === RolePermission.moderator;
+        return (
+          r.permission === RolePermission.admin ||
+          r.permission === RolePermission.moderator
+        );
       });
       this.setAdmins(roles);
       return this.adminsAndMods;
@@ -141,32 +169,36 @@ class CommunityInfo {
   public setMembers(roles) {
     this.members = [];
     roles.forEach((r) => {
-      this.members.push(new RoleInfo(
-        r.id,
-        r.address_id,
-        r.Address.address,
-        r.Address.chain,
-        r.chain_id,
-        r.offchain_community_id,
-        r.permission,
-        r.is_user_default
-      ));
+      this.members.push(
+        new RoleInfo(
+          r.id,
+          r.address_id,
+          r.Address.address,
+          r.Address.chain,
+          r.chain_id,
+          r.offchain_community_id,
+          r.permission,
+          r.is_user_default
+        )
+      );
     });
   }
 
   public setAdmins(roles) {
     this.adminsAndMods = [];
     roles.forEach((r) => {
-      this.adminsAndMods.push(new RoleInfo(
-        r.id,
-        r.address_id,
-        r.Address.address,
-        r.Address.chain,
-        r.chain_id,
-        r.offchain_community_id,
-        r.permission,
-        r.is_user_default
-      ));
+      this.adminsAndMods.push(
+        new RoleInfo(
+          r.id,
+          r.address_id,
+          r.Address.address,
+          r.Address.chain,
+          r.chain_id,
+          r.offchain_community_id,
+          r.permission,
+          r.is_user_default
+        )
+      );
     });
   }
 
@@ -188,22 +220,22 @@ class CommunityInfo {
   }) {
     // TODO: Change to PUT /community
     const r = await $.post(`${app.serverUrl()}/updateCommunity`, {
-      'id': app.activeCommunityId(),
-      'name': name,
-      'description': description,
-      'iconUrl': iconUrl,
-      'website': website,
-      'discord': discord,
-      'element': element,
-      'telegram': telegram,
-      'github': github,
-      'stagesEnabled': stagesEnabled,
-      'customStages': customStages,
-      'customDomain': customDomain,
-      'terms': terms,
-      'privacy': privacyEnabled,
-      'invites': invitesEnabled,
-      'jwt': app.user.jwt,
+      id: app.activeCommunityId(),
+      name,
+      description,
+      icon_url: iconUrl,
+      website,
+      discord,
+      element,
+      telegram,
+      github,
+      stages_enabled: stagesEnabled,
+      custom_stages: customStages,
+      custom_domain: customDomain,
+      terms,
+      privacy: privacyEnabled,
+      invites: invitesEnabled,
+      jwt: app.user.jwt,
     });
     const updatedCommunity: CommunityInfo = r.result;
     this.name = updatedCommunity.name;
@@ -236,15 +268,17 @@ class CommunityInfo {
     try {
       // TODO: Change to PUT /community
       await $.post(`${app.serverUrl()}/updateCommunity`, {
-        'id': app.activeCommunityId(),
+        id: app.activeCommunityId(),
         'featured_topics[]': topics,
-        'jwt': app.user.jwt
+        jwt: app.user.jwt,
       });
     } catch (err) {
       console.log('Failed to update featured topics');
-      throw new Error((err.responseJSON && err.responseJSON.error)
-        ? err.responseJSON.error
-        : 'Failed to update featured topics');
+      throw new Error(
+        err.responseJSON && err.responseJSON.error
+          ? err.responseJSON.error
+          : 'Failed to update featured topics'
+      );
     }
   }
 }
