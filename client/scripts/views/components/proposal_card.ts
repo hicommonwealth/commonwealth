@@ -9,7 +9,7 @@ import app from 'state';
 import { navigateToSubpage } from 'app';
 import { slugify } from 'utils';
 import { Coin } from 'adapters/currency';
-import { blocknumToDuration, formatLastUpdated, formatPercentShort, link, pluralize } from 'helpers';
+import { blocknumToDuration, formatNumberLong, formatPercentShort, link, pluralize } from 'helpers';
 import { ProposalStatus, VotingType, AnyProposal, AddressInfo } from 'models';
 import { ProposalType, proposalSlugToChainEntityType, chainEntityTypeToProposalShortName } from 'identifiers';
 
@@ -60,20 +60,41 @@ export const getStatusText = (proposal: AnyProposal, showCountdown: boolean) => 
     return 'Completed';
   }
 
-  const countdown = proposal.endTime.kind === 'fixed'
-    ? [ m(Countdown, { duration: moment.duration(proposal.endTime.time.diff(moment())) }), ' left' ]
-    : proposal.endTime.kind === 'fixed_block'
-      ? [ m(Countdown, { duration: blocknumToDuration(proposal.endTime.blocknum) }), ' left' ]
+  const countdown =
+    proposal.endTime.kind === 'fixed'
+      ? [
+          m(Countdown, {
+            duration: moment.duration(proposal.endTime.time.diff(moment())),
+          }),
+          ' left',
+        ]
+      : proposal.endTime.kind === 'fixed_block'
+      ? [
+          m(Countdown, {
+            duration: blocknumToDuration(proposal.endTime.blocknum),
+          }),
+          ` left (ends on block ${formatNumberLong(
+            proposal.endTime.blocknum
+          )})`,
+        ]
       : proposal.endTime.kind === 'dynamic'
-        ? [ m(Countdown, { duration: blocknumToDuration(proposal.endTime.getBlocknum()) }), ' left' ]
-        : proposal.endTime.kind === 'threshold'
-          ? `needs ${proposal.endTime.threshold} votes`
-          : proposal.endTime.kind === 'not_started'
-            ? 'not yet started'
-            : proposal.endTime.kind === 'queued'
-              ? 'in queue'
-              : proposal.endTime.kind === 'unavailable'
-                ? '' : '';
+      ? [
+          m(Countdown, {
+            duration: blocknumToDuration(proposal.endTime.getBlocknum()),
+          }),
+          ` left (ends on block ${formatNumberLong(
+            proposal.endTime.getBlocknum()
+          )})`,
+        ]
+      : proposal.endTime.kind === 'threshold'
+      ? `needs ${proposal.endTime.threshold} votes`
+      : proposal.endTime.kind === 'not_started'
+      ? 'not yet started'
+      : proposal.endTime.kind === 'queued'
+      ? 'in queue'
+      : proposal.endTime.kind === 'unavailable'
+      ? ''
+      : '';
 
   if (proposal instanceof MolochProposal) {
     if (proposal.state === MolochProposalState.NotStarted)

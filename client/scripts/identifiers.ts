@@ -106,6 +106,20 @@ export const chainEntityTypeToProposalSlug = (t: string) => {
   else if (t === 'collective-proposal') return ProposalType.SubstrateCollectiveProposal;
   else if (t === 'treasury-bounty') return ProposalType.SubstrateBountyProposal;
   else if (t === 'tip-proposal') return ProposalType.SubstrateTreasuryTip;
+  else if (t === 'proposal') {
+    if (app.chain.network === ChainNetwork.Sputnik) {
+      return ProposalType.SputnikProposal;
+    }
+    if (MolochTypes.EventChains.find((c) => c === app.chain.network)) {
+      return ProposalType.MolochProposal;
+    }
+    if (CompoundTypes.EventChains.find((c) => c === app.chain.network)) {
+      return ProposalType.CompoundProposal;
+    }
+    if (AaveTypes.EventChains.find((c) => c === app.chain.network)) {
+      return ProposalType.AaveProposal;
+    }
+  }
 };
 
 export const proposalSlugToChainEntityType = (t) => {
@@ -124,6 +138,20 @@ export const chainEntityTypeToProposalName = (t: string) => {
   else if (t === 'collective-proposal') return 'Council Motion';
   else if (t === 'treasury-bounty') return 'Bounty Proposal';
   else if (t === 'tip-proposal') return 'Treasury Tip';
+  else if (t === 'proposal') {
+    if (app.chain.network === ChainNetwork.Sputnik) {
+      return 'Sputnik Proposal';
+    }
+    if (MolochTypes.EventChains.find((c) => c === app.chain.network)) {
+      return 'Moloch Proposal';
+    }
+    if (CompoundTypes.EventChains.find((c) => c === app.chain.network)) {
+      return 'Onchain Proposal';
+    }
+    if (AaveTypes.EventChains.find((c) => c === app.chain.network)) {
+      return 'Onchain Proposal';
+    }
+  }
 };
 
 export const chainEntityTypeToProposalShortName = (t: string) => {

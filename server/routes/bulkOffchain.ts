@@ -74,6 +74,9 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
               model: models.OffchainTopic,
               as: 'topic',
             },
+            {
+              model: models.ChainEntity,
+            },
           ],
           attributes: { exclude: ['version_history'] },
         });
@@ -127,7 +130,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
             AND t.deleted_at IS NULL
             AND t.pinned = false
             GROUP BY (t.id, c.comm_created_at, t.created_at)
-            ORDER BY COALESCE(c.comm_created_at, t.created_at) DESC LIMIT ${Math.max(0, 10 - pinnedThreads.length)}
+            ORDER BY COALESCE(c.comm_created_at, t.created_at) DESC
           ) threads
           ON threads.address_id = addr.id
           LEFT JOIN "OffchainTopics" topics
