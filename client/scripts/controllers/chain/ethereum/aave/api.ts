@@ -29,9 +29,6 @@ export default class AaveApi extends ContractApi<IAaveGovernanceV2> {
   private _Token: AaveTokenV2;
   public get Token() { return this._Token; }
 
-  private _decimals: number;
-  public get decimals() { return this._decimals; }
-
   private _Executors: AaveExecutor[];
   public get Executors() { return this._Executors; }
 
@@ -43,8 +40,6 @@ export default class AaveApi extends ContractApi<IAaveGovernanceV2> {
     console.log('aave initApi()');
     await super.init();
     this._Governance = this.Contract;
-
-    await this._Token.decimals().then((d) => this._decimals = d);
 
     // fetch executors from governance via historical filter query
     const executorAuthFilter = this.Governance.filters.ExecutorAuthorized(null);

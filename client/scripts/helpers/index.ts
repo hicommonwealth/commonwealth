@@ -229,20 +229,6 @@ export function formatNumberLong(num: number) {
   return nf.format(num);
 }
 
-// export function formatBNLong(num: BigNumber) {
-//   // format small numbers with decimals, large numbers with commas
-
-//   if (100000000000 > _num && _num > 1000000000) return `${(_num.div(1000000000)).toFixed(2)} bil`
-//   if (100000000 > _num && _num > 1000000) return `${(num/(1000000)).toFixed(2)} mil`
-//   if (100000 > num && num > 1000) return `${(num/(1000)).toFixed(2)} k`
-
-//   if (num === 0) return '0';
-//   if (num < 0.000001) return num.toFixed(20).replace(/0*$/, '');
-//   if (num < 0.001) return num.toString();
-//   const nf = new Intl.NumberFormat();
-//   return nf.format(num);
-// }
-
 export function formatPercentShort(num: number) {
   if (num === 0) return '0%';
   if (num === 1) return '100%';
