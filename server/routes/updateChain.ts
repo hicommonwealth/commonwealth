@@ -19,11 +19,17 @@ export const Errors = {
   InvalidGithub: 'Github must begin with https://github.com/',
   InvalidCustomDomain: 'Custom domain may not include "commonwealth"',
   InvalidSnapshot: 'Snapshot must fit the naming pattern of *.eth',
-  SnapshotOnlyOnEthereum: 'Snapshot data may only be added to chains with Ethereum base',
+  SnapshotOnlyOnEthereum:
+    'Snapshot data may only be added to chains with Ethereum base',
   InvalidTerms: 'Terms of Service must begin with https://',
 };
 
-const updateChain = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const updateChain = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   if (!req.body.id) return next(new Error(Errors.NoChainId));
   if (req.body.network) return next(new Error(Errors.CantChangeNetwork));
@@ -31,7 +37,9 @@ const updateChain = async (models: DB, req: Request, res: Response, next: NextFu
   const chain = await models.Chain.findOne({ where: { id: req.body.id } });
   if (!chain) return next(new Error(Errors.NoChainFound));
   else {
-    const userAddressIds = (await req.user.getAddresses()).filter((addr) => !!addr.verified).map((addr) => addr.id);
+    const userAddressIds = (await req.user.getAddresses())
+      .filter((addr) => !!addr.verified)
+      .map((addr) => addr.id);
     const userMembership = await models.Role.findOne({
       where: {
         address_id: { [Op.in]: userAddressIds },
@@ -56,8 +64,8 @@ const updateChain = async (models: DB, req: Request, res: Response, next: NextFu
     element,
     telegram,
     github,
-    stagesEnabled,
-    customStages,
+    stages_enabled,
+    custom_stages,
     customDomain,
     terms,
     snapshot,
@@ -75,7 +83,12 @@ const updateChain = async (models: DB, req: Request, res: Response, next: NextFu
     return next(new Error(Errors.InvalidGithub));
   } else if (customDomain && customDomain.includes('commonwealth')) {
     return next(new Error(Errors.InvalidCustomDomain));
-  } else if (snapshot && !(/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/ig).test(snapshot)) {
+  } else if (
+    snapshot &&
+    !/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi.test(
+      snapshot
+    )
+  ) {
     return next(new Error(Errors.InvalidSnapshot));
   } else if (snapshot && chain.base !== 'ethereum') {
     return next(new Error(Errors.SnapshotOnlyOnEthereum));
@@ -94,8 +107,8 @@ const updateChain = async (models: DB, req: Request, res: Response, next: NextFu
   chain.element = element;
   chain.telegram = telegram;
   chain.github = github;
-  chain.stagesEnabled = stagesEnabled;
-  chain.customStages = customStages;
+  chain.stagesEnabled = stages_enabled;
+  chain.customStages = custom_stages;
   chain.terms = terms;
   chain.snapshot = snapshot;
   // Under our current security policy, custom domains must be set by trusted
@@ -103,7 +116,8 @@ const updateChain = async (models: DB, req: Request, res: Response, next: NextFu
   // use the code they run to steal login tokens for arbitrary users.
   //
   // chain.customDomain = customDomain;
-  if (req.body['featured_topics[]']) chain.featured_topics = req.body['featured_topics[]'];
+  if (req.body['featured_topics[]'])
+    chain.featured_topics = req.body['featured_topics[]'];
 
   await chain.save();
 
