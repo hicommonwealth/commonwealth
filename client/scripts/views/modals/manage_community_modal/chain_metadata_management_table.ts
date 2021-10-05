@@ -5,14 +5,13 @@ import { Button, Table } from 'construct-ui';
 
 import { ChainNetwork } from 'models';
 import { notifyError } from 'controllers/app/notifications';
-import Token from 'controllers/chain/ethereum/token/adapter';
 import { IChainOrCommMetadataManagementAttrs } from './community_metadata_management_table';
 import {
   TogglePropertyRow,
   InputPropertyRow,
   ManageRolesRow,
 } from './metadata_rows';
-import AvatarUpload from '../../components/avatar_upload';
+import AvatarUpload, { AvatarScope } from '../../components/avatar_upload';
 
 interface IChainMetadataManagementState {
   name: string;
@@ -60,10 +59,19 @@ const ChainMetadataManagementTable: m.Component<
   view: (vnode) => {
     return m('.ChainMetadataManagementTable', [
       m(AvatarUpload, {
+        avatarScope: AvatarScope.Chain,
         uploadStartedCallback: () => {
           vnode.state.uploadInProgress = true;
         },
-        uploadCompleteCallback: () => {
+        uploadCompleteCallback: (files) => {
+          files.forEach((f) => {
+            if (!f.uploadURL) return;
+            const url = f.uploadURL.replace(/\?.*/, '');
+            console.log(url);
+            $((vnode as any).dom)
+              .find('input[name=avatarUrl]')
+              .val(url.trim());
+          });
           vnode.state.uploadInProgress = false;
         },
       }),

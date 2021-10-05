@@ -7,10 +7,18 @@ import Dropzone from 'dropzone';
 import { Icon, Icons } from 'construct-ui';
 import User from 'views/components/widgets/user';
 import app from 'state';
+import { ChainIcon, CommunityIcon } from './chain_icon';
+
+export enum AvatarScope {
+  Account = 'account',
+  Chain = 'chain',
+  Community = 'community',
+}
 
 interface IAttrs {
   uploadStartedCallback?: CallableFunction;
   uploadCompleteCallback?: CallableFunction;
+  avatarScope: AvatarScope;
 }
 
 interface IState {
@@ -21,7 +29,9 @@ interface IState {
 const AvatarUpload: m.Component<IAttrs, IState> = {
   oncreate: (vnode: m.VnodeDOM<IAttrs, IState>) => {
     $(vnode.dom).on('cleardropzone', () => {
-      vnode.state.dropzone.files.map((file) => vnode.state.dropzone.removeFile(file));
+      vnode.state.dropzone.files.map((file) =>
+        vnode.state.dropzone.removeFile(file)
+      );
     });
     vnode.state.dropzone = new Dropzone(vnode.dom, {
       // configuration for textarea dropzone
@@ -45,22 +55,31 @@ const AvatarUpload: m.Component<IAttrs, IState> = {
           mimetype: file.type, // image/png
           auth: true,
           jwt: app.user.jwt,
-        }).then((response) => {
-          if (response.status !== 'Success') {
-            return done('Failed to get an S3 signed upload URL', response.error);
-          }
-          file.uploadURL = response.result;
-          vnode.state.uploaded = true;
-          done();
-          setTimeout(() => vnode.state.dropzone.processFile(file));
-        }).catch((err : any) => {
-          done('Failed to get an S3 signed upload URL',
-            err.responseJSON ? err.responseJSON.error : err.responseText);
-        });
+        })
+          .then((response) => {
+            if (response.status !== 'Success') {
+              return done(
+                'Failed to get an S3 signed upload URL',
+                response.error
+              );
+            }
+            file.uploadURL = response.result;
+            vnode.state.uploaded = true;
+            done();
+            setTimeout(() => vnode.state.dropzone.processFile(file));
+          })
+          .catch((err: any) => {
+            done(
+              'Failed to get an S3 signed upload URL',
+              err.responseJSON ? err.responseJSON.error : err.responseText
+            );
+          });
       },
       sending: (file, xhr) => {
         const _send = xhr.send;
-        xhr.send = () => { _send.call(xhr, file); };
+        xhr.send = () => {
+          _send.call(xhr, file);
+        };
       },
     });
     vnode.state.dropzone.on('processing', (file) => {
@@ -77,23 +96,31 @@ const AvatarUpload: m.Component<IAttrs, IState> = {
   },
   view: (vnode) => {
     return m('form.AvatarUpload', [
-      m('.dropzone-attach', {
-        class: (vnode.state.uploaded) ? 'hidden' : ''
-      }, [
-        m('div.attach-button', [
-          m(Icon, { name: Icons.PLUS, size: 'xs' }),
-        ])
-      ]),
-      !vnode.state.uploaded && m(User, {
-        user: app.user.activeAccount,
-        avatarOnly: true,
-        avatarSize: 100,
-      }),
+      m(
+        '.dropzone-attach',
+        {
+          class: vnode.state.uploaded ? 'hidden' : '',
+        },
+        [m('div.attach-button', [m(Icon, { name: Icons.PLUS, size: 'xs' })])]
+      ),
+      !vnode.state.uploaded && vnode.attrs.avatarScope === AvatarScope.Account
+        ? m(User, {
+            user: app.user.activeAccount,
+            avatarOnly: true,
+            avatarSize: 100,
+          })
+        : vnode.attrs.avatarScope === AvatarScope.Chain
+        ? m(ChainIcon, {
+            chain: app.chain.meta.chain,
+          })
+        : m(CommunityIcon, {
+            community: app.community.meta,
+          }),
       m('.dropzone-previews', {
-        class: (vnode.state.uploaded) ? '' : 'hidden'
+        class: vnode.state.uploaded ? '' : 'hidden',
       }),
     ]);
-  }
+  },
 };
 
 export default AvatarUpload;

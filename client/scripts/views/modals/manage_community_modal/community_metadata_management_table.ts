@@ -9,7 +9,7 @@ import {
   TogglePropertyRow,
   ManageRolesRow,
 } from './metadata_rows';
-import AvatarUpload from '../../components/avatar_upload';
+import AvatarUpload, { AvatarScope } from '../../components/avatar_upload';
 
 interface ICommunityMetadataManagementState {
   name: string;
@@ -58,6 +58,7 @@ const CommunityMetadataManagementTable: m.Component<
   view: (vnode) => {
     return m('.CommunityMetadataManagementTable', [
       m(AvatarUpload, {
+        avatarScope: AvatarScope.Community,
         uploadStartedCallback: () => {
           vnode.state.uploadInProgress = true;
         },
