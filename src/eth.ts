@@ -30,7 +30,10 @@ export async function createProvider(
     try {
       const web3Provider = new Web3.providers.WebsocketProvider(ethNetworkUrl, {
         reconnect: {
-          auto: false,
+          auto: true,
+          delay: 5000,
+          maxAttempts: 10,
+          onTimeout: true,
         },
       });
       const provider = new providers.Web3Provider(web3Provider);
