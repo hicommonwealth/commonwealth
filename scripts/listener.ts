@@ -1,5 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-console */
+
 import {
   chainSupportedBy,
   IEventHandler,
@@ -161,10 +162,10 @@ if (chainSupportedBy(network, SubstrateEvents.Types.EventChains)) {
   CompoundEvents.createApi(url, contract).then(async (api) => {
     const fetcher = new CompoundEvents.StorageFetcher(api);
     try {
-      const fetched = await fetcher.fetch(
-        { startBlock: 13353227, maxResults: 1 },
-        true
-      );
+      const fetched = await fetcher.fetch({
+        startBlock: 13353227,
+        maxResults: 1,
+      });
       // const fetched = await fetcher.fetchOne('2');
       console.log(fetched.map((f) => f.data));
     } catch (err) {
@@ -184,10 +185,10 @@ if (chainSupportedBy(network, SubstrateEvents.Types.EventChains)) {
   AaveEvents.createApi(url, contract).then(async (api) => {
     const fetcher = new AaveEvents.StorageFetcher(api);
     try {
-      const fetched = await fetcher.fetch(
-        { startBlock: 13353227, maxResults: 1 },
-        true
-      );
+      const fetched = await fetcher.fetch({
+        startBlock: 13353227,
+        maxResults: 1,
+      });
       // const fetched = await fetcher.fetchOne('10');
       console.log(fetched.sort((a, b) => a.blockNumber - b.blockNumber));
     } catch (err) {

@@ -3,8 +3,8 @@ import { KulupuSpec } from './specs/kulupu';
 import { StafiSpec } from './specs/stafi';
 import { CloverSpec } from './specs/clover';
 
-import type { RegisteredTypes } from '@polkadot/types/types';
 import { spec as EdgewareSpec } from '@edgeware/node-types';
+import type { RegisteredTypes } from '@polkadot/types/types';
 
 export const networkUrls = {
   clover: 'wss://api.clover.finance',
