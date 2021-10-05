@@ -61,6 +61,7 @@ const CommunityMetadataManagementTable: m.Component<
         avatarScope: AvatarScope.Community,
         uploadStartedCallback: () => {
           vnode.state.uploadInProgress = true;
+          m.redraw();
         },
         uploadCompleteCallback: (files) => {
           files.forEach((f) => {
@@ -72,6 +73,7 @@ const CommunityMetadataManagementTable: m.Component<
               .val(url.trim());
           });
           vnode.state.uploadInProgress = false;
+          m.redraw();
         },
       }),
       m(
