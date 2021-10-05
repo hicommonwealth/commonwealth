@@ -316,6 +316,7 @@ const MembersPage: m.Component<
                       m(Button, {
                         label: 'Delegate',
                         intent: 'primary',
+                        disabled: !app.isLoggedIn(),
                         onclick: async (e) => {
                           app.modals.create({
                             modal: DelegateModal,
