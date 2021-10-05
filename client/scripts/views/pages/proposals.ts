@@ -88,7 +88,6 @@ const CompoundProposalStats: m.Component<{}, {}> = {
           ]),
         ]),
         m('', [
-          // TODO: We shouldn't be hardcoding these figures
           m('.stats-box-stat', [
             `Quorum: ${app.chain.governance?.quorumVotes.div(decimals).toString()} ${symbol}`
           ]),
