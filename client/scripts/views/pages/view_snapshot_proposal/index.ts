@@ -70,7 +70,7 @@ const ProposalContent: m.Component<
               })
             ),
           ]),
-          moment() < moment(+proposal.end * 1000)
+          proposal.state === 'active'
             ? [
                 m('.active-proposal', [
                   m(
@@ -80,7 +80,7 @@ const ProposalContent: m.Component<
                   m('.active-text', 'Active'),
                 ]),
               ]
-            : [m('.closed-proposal', 'Closed')],
+            : [m('.closed-proposal', proposal.state)],
         ]),
       ]),
       m('.ProposalBodyText mt-32', [
@@ -146,7 +146,10 @@ const VotingResults: m.Component<
 
     vnode.state.voteListings = choices.map((choice, idx) => {
       const totalForChoice = totals.resultsByVoteBalance[idx];
-      const voteFrac = totalForChoice / totals.sumOfResultsBalance;
+      const voteFrac =
+        totals.sumOfResultsBalance !== 0
+          ? totalForChoice / totals.sumOfResultsBalance
+          : 0;
 
       return m('', [
         m('.result-choice', choice),
@@ -270,7 +273,7 @@ const ViewProposalPage: m.Component<
     vnode.state.totalScore = 0;
     vnode.state.scores = [];
     vnode.state.proposal = null;
-    vnode.state.thread = '';
+    vnode.state.thread = 'false';
 
     const loadVotes = async () => {
       vnode.state.proposal = app.snapshot.proposals.find(
@@ -291,6 +294,7 @@ const ViewProposalPage: m.Component<
         .fetchThreadIdForSnapshot({ snapshot: vnode.state.proposal.id })
         .then((res) => {
           vnode.state.thread = res;
+          m.redraw();
         });
     };
 
@@ -306,6 +310,8 @@ const ViewProposalPage: m.Component<
   view: (vnode) => {
     const author = app.user.activeAccount;
     const { proposal, votes, activeTab, thread } = vnode.state;
+    const route = m.route.get();
+    const scope = route.slice(0, route.lastIndexOf('/'));
 
     const isActive =
       vnode.state.proposal &&
@@ -322,7 +328,7 @@ const ViewProposalPage: m.Component<
         ? m(Spinner, { fill: true, active: true, size: 'xl' })
         : [
             // eslint-disable-next-line no-restricted-globals
-            m('.back-button', { onclick: () => history.back() }, [
+            m('.back-button', { onclick: () => m.route.set(scope) }, [
               m('img', {
                 class: 'back-icon',
                 src: '/static/img/arrow-right-black.svg',
