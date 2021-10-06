@@ -51,7 +51,7 @@ const ProposalContent: m.Component<
 
     return [
       m('.proposal-title', proposal.title),
-      m('.proposal-hash.truncate', `#${proposal.ipfs}`),
+      m('.proposal-hash', `#${proposal.ipfs}`),
       m('.snapshot-proposals-list', [
         m('.other-details', [
           m('', [
@@ -83,7 +83,7 @@ const ProposalContent: m.Component<
             : [m('.closed-proposal', proposal.state)],
         ]),
       ]),
-      m('.ProposalBodyText mt-32', [
+      m('.ProposalBodyText', [
         m(MarkdownFormattedText, { doc: proposal.body }),
       ]),
       votes.length > 0 && [
@@ -153,7 +153,7 @@ const VotingResults: m.Component<
 
       return m('', [
         m('.result-choice', choice),
-        m('.flex.justify-between.mt-1', [
+        m('.flex.justify-between', [
           m('.flex-shrink', [
             m(
               'span',
@@ -226,7 +226,7 @@ const VoteAction: m.Component<
 
     if (!vnode.attrs.proposal.choices?.length) return;
 
-    return m('.proposal-info-box.padding-x-20.mt-30', [
+    return m('.proposal-info-box', [
       m('.title', 'Cast your vote'),
       m(RadioGroup, {
         class: 'snapshot-votes',
@@ -306,6 +306,13 @@ const ViewProposalPage: m.Component<
     } else {
       loadVotes();
     }
+
+    window.onresize = () => {
+      if (window.innerWidth > 1024 && vnode.state.activeTab !== 'Proposals') {
+        vnode.state.activeTab = 'Proposals';
+        m.redraw();
+      }
+    };
   },
   view: (vnode) => {
     const author = app.user.activeAccount;
@@ -321,7 +328,9 @@ const ViewProposalPage: m.Component<
     return m(
       Sublayout,
       {
-        class: 'view-snapshot-proposal-page',
+        class: `view-snapshot-proposal-page ${
+          activeTab === 'Proposals' ? 'proposal-tab' : 'info-tab'
+        }`,
         title: 'Snapshot Proposal',
       },
       !vnode.state.votes || !vnode.state.totals || !vnode.state.proposal
@@ -371,8 +380,8 @@ const ViewProposalPage: m.Component<
               ],
               m('.proposal-info', [
                 m('.proposal-info-box', [
-                  m('.title.padding-x-20', 'Information'),
-                  m('.info-block.padding-x-20', [
+                  m('.title', 'Information'),
+                  m('.info-block', [
                     m('.labels', [
                       m('', 'Author'),
                       m('', 'IPFS'),
@@ -401,7 +410,10 @@ const ViewProposalPage: m.Component<
                         },
                         [
                           m('.truncate', `#${proposal.ipfs}`),
-                          m(Icon, { name: Icons.EXTERNAL_LINK, class: 'ml-1' }),
+                          m(Icon, {
+                            name: Icons.EXTERNAL_LINK,
+                            class: 'external-link-icon',
+                          }),
                         ]
                       ),
                       m(
@@ -419,13 +431,16 @@ const ViewProposalPage: m.Component<
                         },
                         [
                           m('.truncate', `#${proposal.snapshot}`),
-                          m(Icon, { name: Icons.EXTERNAL_LINK, class: 'ml-1' }),
+                          m(Icon, {
+                            name: Icons.EXTERNAL_LINK,
+                            class: 'external-link-icon',
+                          }),
                         ]
                       ),
                     ]),
                   ]),
                   thread !== 'false' &&
-                    m('.padding-x-20.linked-discussion', [
+                    m('.linked-discussion', [
                       m('.heading-2', 'Linked Discussion'),
                       m(ProposalHeaderSnapshotThreadLink, {
                         threadId: vnode.state.thread,
@@ -443,7 +458,7 @@ const ViewProposalPage: m.Component<
                     choices: vnode.state.proposal.choices,
                     votes: vnode.state.votes,
                   }),
-                m('.proposal-info-box.padding-x-20.mt-30', [
+                m('.proposal-info-box', [
                   m('.title', 'Current Results'),
                   m(VotingResults, {
                     choices: vnode.state.proposal.choices,
