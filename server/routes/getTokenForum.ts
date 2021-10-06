@@ -31,7 +31,7 @@ const getTokenForum = async (
           where: { id: token.id },
           defaults: {
             active: true,
-            network: token.id,
+            network: 'erc20',
             type: 'token',
             icon_url: token.icon_url,
             symbol: token.symbol,

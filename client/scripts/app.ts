@@ -14,7 +14,6 @@ import moment from 'moment';
 import mixpanel from 'mixpanel-browser';
 import _ from 'underscore';
 
-import { AaveTypes, CompoundTypes, MolochTypes } from '@commonwealth/chain-events';
 import app, { ApiStatus, LoginState } from 'state';
 import {
   ChainInfo,
@@ -276,28 +275,28 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
     )).default;
     newChain = new Sputnik(n, app);
     initApi = true;
-  } else if (MolochTypes.EventChains.find((c) => c === n.chain.network)) {
+  } else if (n.chain.network === ChainNetwork.Moloch) {
     const Moloch = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "moloch-main" */
       './controllers/chain/ethereum/moloch/adapter'
     )).default;
     newChain = new Moloch(n, app);
-  } else if (CompoundTypes.EventChains.find((c) => c === n.chain.network || c === n.chain.id)) {
+  } else if (n.chain.network === ChainNetwork.Compound) {
     const Compound = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "compound-main" */
       './controllers/chain/ethereum/compound/adapter'
     )).default;
     newChain = new Compound(n, app);
-  } else if (AaveTypes.EventChains.find((c) => c === n.chain.network)) {
+  } else if (n.chain.network === ChainNetwork.Aave) {
     const Aave = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "aave-main" */
       './controllers/chain/ethereum/aave/adapter'
     )).default;
     newChain = new Aave(n, app);
-  } else if (n.chain.type === 'token') {
+  } else if (n.chain.network === ChainNetwork.ERC20) {
     const Token = (await import(
     //   /* webpackMode: "lazy" */
     //   /* webpackChunkName: "token-main" */

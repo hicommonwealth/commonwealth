@@ -82,7 +82,7 @@ const createChain = async (
     }
   }
 
-  const { website, discord, element, telegram, github, icon_url, node_url } = req.body;
+  const { website, discord, element, telegram, github, icon_url, node_url, network } = req.body;
 
   if (!node_url || !node_url.trim()) {
     return next(new Error(Errors.NoNodeUrl));
@@ -123,7 +123,7 @@ const createChain = async (
     icon_url: req.body.icon_url,
     description: req.body.description,
     active: true,
-    network: req.body.id,
+    network: req.body.network,
     type: req.body.type,
     website: req.body.website,
     discord: req.body.discord,

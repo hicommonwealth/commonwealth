@@ -554,7 +554,7 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
             jwt: app.user.jwt,
             type: 'token',
             base: 'ethereum',
-            network: slugify(name),
+            network: 'erc20',
             node_url: 'wss://mainnet.infura.io/ws',
           }).then(async (res) => {
             await initAppState(false);
