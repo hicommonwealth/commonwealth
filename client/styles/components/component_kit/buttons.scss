@@ -79,25 +79,67 @@
           height: 0;
         }
     }
-    .radio-control {
-        display: block;
-        width: 1em;
-        height: 1em;
-        border-radius: 50%;
-        border: 0.1em solid $lite-gray;
-    }
-    input {
-        &:checked ~ .radio-control::after {
+    input{
+        display: none;
+        &+span{
+          display: inline-block; 
+          position: relative;
+          padding-left: 20px;
+          cursor: pointer;
+          &:before{
             content: '';
+            display: block; 
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            top: 0px;
+            left: 0px;
             border-radius: 50%;
+            margin-right: 5px;
+            width: 16px;
+            height: 16px;
+            border: 1px solid $lite-gray;
+            background: $white;
+          }
+          &:after {
+            content: '';
+            display: block; 
+            width: 10px;
+            height: 10px;
             background: $purp-blue;
-            // background: radial-gradient($purp-blue 50%, $purp-blue-lite 50%);
-            // border: 0.1em solid $purp-blue;
+            position: absolute;
+            border-radius: 50%;
+            top: 3px;
+            left: 3px;
+            opacity: 0;
+            transform: scale(0,0); 
+          }
         }
+        &:hover+span:before {
+            border: 1px solid $purp-blue;
+            background: $purp-blue-lite;
+        }
+        &:hover+span:after {
+            opacity: 1;
+            transform: scale(1,1);
+            background: $purp-blue;
+            top: 6px;
+            left: 6px;
+            width: 4px;
+            height: 4px;
+        }
+        &:checked+span:before {
+            background: $white;
+            border: 1px solid $purp-blue;
+        }
+        &:checked+span:after{
+            opacity: 1;
+            transform: scale(1,1);
+            background: $purp-blue;
+            width: 10px;
+            height: 10px;
+            top: 3px;
+            left: 3px;
+        }
+        
     }
     .radio-label {
         @include body;
@@ -106,6 +148,7 @@
 
 .RadioGroup {
     display: flex;
+    flex-direction: column;
     justify-content: space-between;
     width: 100%;
 }
