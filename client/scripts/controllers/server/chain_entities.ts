@@ -3,7 +3,7 @@ import $ from 'jquery';
 import _ from 'lodash';
 
 import { ChainEntityStore } from 'stores';
-import { ChainEntity, ChainEvent, ChainEventType } from 'models';
+import { ChainEntity, ChainEvent, ChainEventType, ChainInfo, ChainNetwork } from 'models';
 import app from 'state';
 import {
   CWEvent,
@@ -13,7 +13,7 @@ import {
   IEventSubscriber,
   SubstrateTypes,
   IChainEntityKind,
-  isSupportedChain,
+  SupportedNetwork,
 } from '@commonwealth/chain-events';
 import { notifyError } from '../app/notifications';
 
@@ -21,6 +21,15 @@ export enum EntityRefreshOption {
   AllEntities = 'all-entities',
   CompletedEntities = 'completed-entities',
   Nothing = 'nothing',
+}
+
+export function chainToEventNetwork(c: ChainInfo): SupportedNetwork {
+  if (c.base === 'substrate') return SupportedNetwork.Substrate;
+  if (c.network === ChainNetwork.ERC20) return SupportedNetwork.ERC20;
+  if (c.network === ChainNetwork.Compound) return SupportedNetwork.Compound;
+  if (c.network === ChainNetwork.Aave) return SupportedNetwork.Aave;
+  if (c.network === ChainNetwork.Moloch) return SupportedNetwork.Moloch;
+  throw new Error(`Invalid event chain: ${c.id}, on network ${c.network}, base ${c.base}`);
 }
 
 const get = (route, args, callback) => {
@@ -33,7 +42,7 @@ const get = (route, args, callback) => {
   }).catch((e) => console.error(e));
 };
 
-type EntityHandler = (entity: ChainEntity, event: ChainEvent) => void
+type EntityHandler = (entity: ChainEntity, event: ChainEvent) => void;
 
 class ChainEntityController {
   private _store: ChainEntityStore = new ChainEntityStore();
@@ -111,13 +120,10 @@ class ChainEntityController {
     }
   }
 
-  private _handleEvents(chain: string, events: CWEvent[]) {
-    if (!isSupportedChain(chain)) {
-      return;
-    }
+  private _handleEvents(chain: string, network: SupportedNetwork, events: CWEvent[]) {
     for (const cwEvent of events) {
       // immediately return if no entity involved, event unrelated to proposals/etc
-      const eventEntity = eventToEntity(chain, cwEvent.data.kind);
+      const eventEntity = eventToEntity(network, cwEvent.data.kind);
       // eslint-disable-next-line no-continue
       if (!eventEntity) continue;
       const [ entityKind ] = eventEntity;
@@ -125,6 +131,7 @@ class ChainEntityController {
       const eventType = new ChainEventType(
         `${chain}-${cwEvent.data.kind.toString()}`,
         chain,
+        network,
         cwEvent.data.kind.toString()
       );
 
@@ -132,7 +139,7 @@ class ChainEntityController {
       const event = new ChainEvent(cwEvent.blockNumber, cwEvent.data, eventType);
 
       // create entity
-      const fieldName = entityToFieldName(chain, entityKind);
+      const fieldName = entityToFieldName(network, entityKind);
       // eslint-disable-next-line no-continue
       if (!fieldName) continue;
       const fieldValue = event.data[fieldName];
@@ -197,6 +204,7 @@ class ChainEntityController {
 
   public async fetchEntities<T extends CWEvent>(
     chain: string,
+    network: SupportedNetwork,
     fetch: () => Promise<T[]>,
     eventSortFn?: (a: CWEvent, b: CWEvent) => number,
   ): Promise<T[]> {
@@ -209,12 +217,13 @@ class ChainEntityController {
       return;
     }
     if (eventSortFn) existingEvents.sort(eventSortFn);
-    this._handleEvents(chain, existingEvents);
+    this._handleEvents(chain, network, existingEvents);
     return existingEvents;
   }
 
   public async subscribeEntities<Api, RawEvent>(
     chain: string,
+    network: SupportedNetwork,
     subscriber: IEventSubscriber<Api, RawEvent>,
     processor: IEventProcessor<Api, RawEvent>,
   ): Promise<void> {
@@ -225,7 +234,7 @@ class ChainEntityController {
     console.log('Subscribing to chain events.');
     subscriber.subscribe(async (block) => {
       const incomingEvents = await processor.process(block);
-      this._handleEvents(chain, incomingEvents);
+      this._handleEvents(chain, network, incomingEvents);
     });
   }
 }

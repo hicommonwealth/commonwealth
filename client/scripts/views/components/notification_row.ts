@@ -4,10 +4,7 @@ import { Icon, Icons, Tooltip, Spinner } from 'construct-ui';
 import _ from 'lodash';
 import m from 'mithril';
 import moment from 'moment';
-import {
-  SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents, IEventLabel, chainSupportedBy, CompoundTypes, CompoundEvents, AaveTypes, AaveEvents,
-  // CompoundEvents
-} from '@commonwealth/chain-events';
+import { CWEvent, Label as ChainEventLabel } from '@commonwealth/chain-events';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -215,9 +212,6 @@ const NotificationRow: m.Component<{
   notifications: Notification[],
   onListPage?: boolean,
 }, {
-  Labeler: any,
-  MolochTypes: any,
-  SubstrateTypes: any,
   scrollOrStop: boolean;
   markingRead: boolean;
 }> = {
@@ -237,37 +231,17 @@ const NotificationRow: m.Component<{
         throw new Error('chain event notification does not have expected data');
       }
       const chainId = notification.chainEvent.type.chain;
+
+      // construct compatible CW event from DB by inserting network from type
+      const chainEvent: CWEvent = {
+        blockNumber: notification.chainEvent.blockNumber,
+        network: notification.chainEvent.type.eventNetwork,
+        data: notification.chainEvent.data,
+      };
       const chainName = app.config.chains.getById(chainId)?.name;
-      let label: IEventLabel;
 
       if (app.isCustomDomain() && chainId !== app.customDomainId()) return;
-      if (chainSupportedBy(chainId, SubstrateTypes.EventChains)) {
-        label = SubstrateEvents.Label(
-          notification.chainEvent.blockNumber,
-          chainId,
-          notification.chainEvent.data,
-        );
-      } else if (chainSupportedBy(chainId, MolochTypes.EventChains)) {
-        label = MolochEvents.Label(
-          notification.chainEvent.blockNumber,
-          chainId,
-          notification.chainEvent.data,
-        );
-      } else if (chainSupportedBy(chainId, CompoundTypes.EventChains)) {
-        label = CompoundEvents.Label(
-          notification.chainEvent.blockNumber,
-          chainId,
-          notification.chainEvent.data,
-        );
-      } else if (chainSupportedBy(chainId, AaveTypes.EventChains)) {
-        label = AaveEvents.Label(
-          notification.chainEvent.blockNumber,
-          chainId,
-          notification.chainEvent.data,
-        );
-      } else {
-        throw new Error(`invalid notification chain: ${chainId}`);
-      }
+      const label = ChainEventLabel(chainId, chainEvent);
       m.redraw();
 
       if (vnode.state.scrollOrStop) {

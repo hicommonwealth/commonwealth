@@ -4,9 +4,9 @@ import _ from 'underscore';
 import format from 'pg-format';
 import {
   createListener,
-  chainSupportedBy,
   SubstrateTypes,
   SubstrateEvents,
+  SupportedNetwork,
 } from '@commonwealth/chain-events';
 
 import { RabbitMqHandler } from '../eventHandlers/rabbitmqPlugin';
@@ -163,13 +163,13 @@ async function mainProcess(producer: RabbitMqHandler, pool: Pool) {
       try {
         listeners['erc20'] = await createListener(
           'erc20',
+          SupportedNetwork.ERC20,
           {
             url: 'wss://mainnet.infura.io/ws',
             tokenAddresses: erc20TokenAddresses,
             tokenNames: erc20TokenNames,
             verbose: false,
-          },
-          'erc20'
+          }
         );
 
         // add the rabbitmq handler for this chain
@@ -224,26 +224,24 @@ async function mainProcess(producer: RabbitMqHandler, pool: Pool) {
 
       // base is used to override built-in event chains in chain-events - only used for substrate chains in this case
       // NOTE: All erc20 tokens (type='token' base='ethereum') are removed at this point
-      let base: string;
-      if (chain.base === 'substrate') base = 'substrate';
-      else if (chain.network === 'compound') base = 'compound';
-      else if (chain.network === 'aave') base = 'aave';
+      let network: SupportedNetwork;
+      if (chain.base === 'substrate') network = SupportedNetwork.Substrate;
+      else if (chain.network === 'compound')
+        network = SupportedNetwork.Compound;
+      else if (chain.network === 'aave') network = SupportedNetwork.Aave;
+      else if (chain.network === 'moloch') network = SupportedNetwork.Moloch;
 
       try {
-        listeners[chain.id] = await createListener(
-          chain.id,
-          {
-            address: chain.address,
-            archival: false,
-            url: chain.url,
-            spec: chain.substrate_spec,
-            skipCatchup: false,
-            verbose: false,
-            enricherConfig: { balanceTransferThresholdPermill: 10_000 },
-            discoverReconnectRange,
-          },
-          base
-        );
+        listeners[chain.id] = await createListener(chain.id, network, {
+          address: chain.address,
+          archival: false,
+          url: chain.url,
+          spec: chain.substrate_spec,
+          skipCatchup: false,
+          verbose: false,
+          enricherConfig: { balanceTransferThresholdPermill: 10_000 },
+          discoverReconnectRange,
+        });
       } catch (error) {
         delete listeners[chain.id];
         await handleFatalError(error, pool, chain, 'listener-startup');
@@ -252,7 +250,7 @@ async function mainProcess(producer: RabbitMqHandler, pool: Pool) {
 
       // if chain is a substrate chain add the excluded events
       let excludedEvents = [];
-      if (chainSupportedBy(chain.id, SubstrateTypes.EventChains))
+      if (network === SupportedNetwork.Substrate)
         excludedEvents = [
           SubstrateTypes.EventKind.Reward,
           SubstrateTypes.EventKind.TreasuryRewardMinting,

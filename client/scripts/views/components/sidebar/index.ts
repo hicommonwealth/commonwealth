@@ -19,7 +19,6 @@ import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import CommunitySelector from 'views/components/sidebar/community_selector';
 import CreateCommunityModal from 'views/modals/create_community_modal';
 
-import { AaveTypes, CompoundTypes, MolochTypes } from '@commonwealth/chain-events';
 import { discordIcon, telegramIcon, elementIcon, githubIcon, websiteIcon } from './icons';
 
 const SidebarQuickSwitcherItem: m.Component<{ item, size }> = {
@@ -188,13 +187,13 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
 
     const hasProposals = app.chain && !app.community && (
       app.chain.base === ChainBase.CosmosSDK
-        || app.chain?.network === ChainNetwork.Sputnik
+        || app.chain.network === ChainNetwork.Sputnik
         || (app.chain.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Plasm)
-        || MolochTypes.EventChains.find((c) => c === app.chain.network)
-        || CompoundTypes.EventChains.find((c) => c === app.chain.network)
-        || AaveTypes.EventChains.find((c) => c === app.chain.network)
+        || app.chain.network === ChainNetwork.Moloch
+        || app.chain.network === ChainNetwork.Compound
+        || app.chain.network === ChainNetwork.Aave
         || app.chain.network === ChainNetwork.Commonwealth
-        || app.chain?.meta.chain.snapshot);
+        || app.chain.meta.chain.snapshot);
     if (!hasProposals) return;
 
     const showMolochMenuOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Moloch;
@@ -249,9 +248,9 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
       !app.community && ((app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Darwinia)
                          || app.chain?.base === ChainBase.CosmosSDK
                          || app.chain?.network === ChainNetwork.Sputnik
-                         || MolochTypes.EventChains.find((c) => c === app.chain.network)
-                         || CompoundTypes.EventChains.find((c) => c === app.chain.network)
-                         || AaveTypes.EventChains.find((c) => c === app.chain.network))
+                         || app.chain?.network === ChainNetwork.Moloch
+                         || app.chain?.network === ChainNetwork.Compound
+                         || app.chain?.network === ChainNetwork.Aave)
         && m(Button, {
           fluid: true,
           rounded: true,

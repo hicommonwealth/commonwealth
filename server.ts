@@ -1,4 +1,4 @@
-import { SubstrateEvents, SubstrateTypes, chainSupportedBy } from '@commonwealth/chain-events';
+import { SubstrateEvents, SubstrateTypes } from '@commonwealth/chain-events';
 import session from 'express-session';
 import Rollbar from 'rollbar';
 import express from 'express';
@@ -87,12 +87,18 @@ async function main() {
       } else if (CHAIN_EVENTS) {
         chains = CHAIN_EVENTS.split(',');
       }
-      const subscribers = await setupChainEventListeners(null, chains, SKIP_EVENT_CATCHUP);
+      const subscribers = await setupChainEventListeners(
+        null,
+        chains,
+        SKIP_EVENT_CATCHUP
+      );
       // construct storageFetchers needed for the identity cache
       const fetchers = {};
-      for (const [ chain, subscriber ] of Object.entries(subscribers)) {
-        if (chainSupportedBy(chain, SubstrateTypes.EventChains)) {
-          fetchers[chain] = new SubstrateEvents.StorageFetcher(subscriber.api);
+      for (const [node, subscriber] of subscribers) {
+        if (node.Chain.base === 'substrate') {
+          fetchers[node.chain] = new SubstrateEvents.StorageFetcher(
+            subscriber.api
+          );
         }
       }
       await (<IdentityFetchCache>identityFetchCache).start(models, fetchers);

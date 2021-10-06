@@ -1,12 +1,21 @@
 import WebSocket from 'ws';
 import _ from 'underscore';
+import { Op, WhereOptions } from 'sequelize';
 import {
-  IDisconnectedRange, IEventHandler, EventSupportingChains, IEventSubscriber,
-  SubstrateTypes, SubstrateEvents, MolochTypes, MolochEvents, chainSupportedBy,
-  CompoundTypes, CompoundEvents, isSupportedChain, AaveTypes, AaveEvents
+  IDisconnectedRange,
+  IEventHandler,
+  IEventSubscriber,
+  SubstrateTypes,
+  SubstrateEvents,
+  MolochEvents,
+  CompoundEvents,
+  AaveEvents,
 } from '@commonwealth/chain-events';
 
-import EventStorageHandler, { StorageFilterConfig } from '../eventHandlers/storage';
+import { ChainAttributes } from '../models/chain';
+import EventStorageHandler, {
+  StorageFilterConfig,
+} from '../eventHandlers/storage';
 import EventNotificationHandler from '../eventHandlers/notifications';
 import EntityArchivalHandler from '../eventHandlers/entityArchival';
 import IdentityHandler from '../eventHandlers/identity';
@@ -20,21 +29,22 @@ const log = factory.getLogger(formatFilename(__filename));
 
 // emit globally any transfer over 1% of total issuance
 // TODO: config this
-const BALANCE_TRANSFER_THRESHOLD_PERMILL: number = 10_000;
+const BALANCE_TRANSFER_THRESHOLD_PERMILL = 10_000;
 
-const discoverReconnectRange = async (chain: string): Promise<IDisconnectedRange> => {
+const discoverReconnectRange = async (
+  chain: string
+): Promise<IDisconnectedRange> => {
   const lastChainEvent = await models.ChainEvent.findAll({
     limit: 1,
-    order: [ [ 'block_number', 'DESC' ]],
+    order: [['block_number', 'DESC']],
     // this $...$ queries the data inside the include (ChainEvents don't have `chain` but ChainEventTypes do)...
     // we might be able to replicate this behavior with where and required: true inside the include
     where: {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       '$ChainEventType.chain$': chain,
     },
-    include: [
-      { model: models.ChainEventType }
-    ]
+    include: [{ model: models.ChainEventType }],
   });
   if (lastChainEvent && lastChainEvent.length > 0 && lastChainEvent[0]) {
     const lastEventBlockNumber = lastChainEvent[0].block_number;
@@ -48,22 +58,21 @@ const discoverReconnectRange = async (chain: string): Promise<IDisconnectedRange
 export const generateHandlers = (
   node: ChainNodeInstance,
   wss?: WebSocket.Server,
-  storageConfig: StorageFilterConfig = {},
+  storageConfig: StorageFilterConfig = {}
 ) => {
   const chain = node.chain;
-  if (!chain || !isSupportedChain(chain)) {
-    throw new Error(`invalid event chain: ${chain}`);
-  }
 
   // writes events into the db as ChainEvents rows
   const storageHandler = new EventStorageHandler(models, chain, storageConfig);
 
   // emits notifications by writing into the db's Notifications table, and also optionally
   // sending a notification to the client via websocket
-  const excludedNotificationEvents = [
-    SubstrateTypes.EventKind.DemocracyTabled,
-  ];
-  const notificationHandler = new EventNotificationHandler(models, wss, excludedNotificationEvents);
+  const excludedNotificationEvents = [SubstrateTypes.EventKind.DemocracyTabled];
+  const notificationHandler = new EventNotificationHandler(
+    models,
+    wss,
+    excludedNotificationEvents
+  );
 
   // creates and updates ChainEntity rows corresponding with entity-related events
   const entityArchivalHandler = new EntityArchivalHandler(models, chain, wss);
@@ -81,7 +90,7 @@ export const generateHandlers = (
   ];
 
   // only handle identities and user flags on substrate chains
-  if (chainSupportedBy(node.chain, SubstrateTypes.EventChains)) {
+  if (node.Chain.base === 'substrate') {
     // populates identity information in OffchainProfiles when received (Substrate only)
     const identityHandler = new IdentityHandler(models, node.chain);
 
@@ -96,109 +105,123 @@ export const generateHandlers = (
 };
 
 const setupChainEventListeners = async (
-  wss: WebSocket.Server, chains: string[] | 'all' | 'none', skipCatchup?: boolean
-): Promise<{ [chain: string]: IEventSubscriber<any, any> }> => {
-  const queryNode = (c: string): Promise<ChainNodeInstance> => models.ChainNode.findOne({
-    where: { chain: c },
-    include: [{
-      model: models.Chain,
-      where: { active: true },
-      required: true,
-    }],
-  });
-  log.info('Fetching node urls...');
+  wss: WebSocket.Server,
+  chains: string[] | 'all' | 'none',
+  skipCatchup?: boolean
+): Promise<[ChainNodeInstance, IEventSubscriber<any, any>][]> => {
   await sequelize.authenticate();
-  const nodes: ChainNodeInstance[] = [];
-  if (chains === 'all') {
-    const n = (await Promise.all(EventSupportingChains.map((c) => queryNode(c)))).filter((c) => !!c);
-    nodes.push(...n);
-  } else if (chains !== 'none') {
-    const n = (await Promise.all(EventSupportingChains
-      .filter((c) => chains.includes(c))
-      .map((c) => queryNode(c))))
-      .filter((c) => !!c);
-    nodes.push(...n);
-  } else {
+  log.info('Fetching node urls...');
+  if (chains === 'none') {
     log.info('No event listeners configured.');
-    return {};
+    return [];
   }
+  const whereOptions: WhereOptions<ChainAttributes> =
+    chains === 'all'
+      ? {
+          active: true,
+          has_chain_events_listener: true,
+        }
+      : {
+          active: true,
+          has_chain_events_listener: true,
+          id: { [Op.in]: chains },
+        };
+  const nodes = await models.ChainNode.findAll({
+    include: [
+      {
+        model: models.Chain,
+        where: whereOptions,
+        required: true,
+      },
+    ],
+  });
   if (nodes.length === 0) {
     log.info('No event listeners found.');
-    return {};
+    return [];
   }
 
   log.info('Setting up event listeners...');
-  const subscribers = await Promise.all(nodes.map(async (node) => {
-    let subscriber: IEventSubscriber<any, any>;
-    if (chainSupportedBy(node.chain, SubstrateTypes.EventChains)) {
-      const nodeUrl = constructSubstrateUrl(node.url);
-      const api = await SubstrateEvents.createApi(nodeUrl, node.Chain.substrate_spec);
-      const excludedEvents = [
-        SubstrateTypes.EventKind.Reward,
-        SubstrateTypes.EventKind.TreasuryRewardMinting,
-        SubstrateTypes.EventKind.TreasuryRewardMintingV2,
-        SubstrateTypes.EventKind.HeartbeatReceived,
-      ];
+  const subscribers = await Promise.all(
+    nodes.map(
+      async (
+        node
+      ): Promise<[ChainNodeInstance, IEventSubscriber<any, any>]> => {
+        let subscriber: IEventSubscriber<any, any>;
+        if (node.Chain.base === 'substrate') {
+          const nodeUrl = constructSubstrateUrl(node.url);
+          const api = await SubstrateEvents.createApi(
+            nodeUrl,
+            node.Chain.substrate_spec
+          );
+          const excludedEvents = [
+            SubstrateTypes.EventKind.Reward,
+            SubstrateTypes.EventKind.TreasuryRewardMinting,
+            SubstrateTypes.EventKind.TreasuryRewardMintingV2,
+            SubstrateTypes.EventKind.HeartbeatReceived,
+          ];
 
-      const handlers = generateHandlers(node, wss, { excludedEvents });
-      subscriber = await SubstrateEvents.subscribeEvents({
-        chain: node.chain,
-        handlers,
-        skipCatchup,
-        discoverReconnectRange: () => discoverReconnectRange(node.chain),
-        api,
-        enricherConfig: {
-          balanceTransferThresholdPermill: BALANCE_TRANSFER_THRESHOLD_PERMILL,
+          const handlers = generateHandlers(node, wss, { excludedEvents });
+          subscriber = await SubstrateEvents.subscribeEvents({
+            chain: node.chain,
+            handlers,
+            skipCatchup,
+            discoverReconnectRange: () => discoverReconnectRange(node.chain),
+            api,
+            enricherConfig: {
+              balanceTransferThresholdPermill:
+                BALANCE_TRANSFER_THRESHOLD_PERMILL,
+            },
+          });
+        } else if (node.Chain.network === 'moloch') {
+          const contractVersion = 1;
+          const api = await MolochEvents.createApi(
+            node.url,
+            contractVersion,
+            node.address
+          );
+          const handlers = generateHandlers(node, wss);
+          subscriber = await MolochEvents.subscribeEvents({
+            chain: node.chain,
+            handlers,
+            skipCatchup,
+            discoverReconnectRange: () => discoverReconnectRange(node.chain),
+            api,
+            contractVersion,
+          });
+        } else if (node.Chain.network === 'compound') {
+          const api = await CompoundEvents.createApi(node.url, node.address);
+          const handlers = generateHandlers(node, wss);
+          subscriber = await CompoundEvents.subscribeEvents({
+            chain: node.chain,
+            handlers,
+            skipCatchup,
+            discoverReconnectRange: () => discoverReconnectRange(node.chain),
+            api,
+          });
+        } else if (node.Chain.network === 'aave') {
+          const api = await AaveEvents.createApi(node.url, node.address);
+          const handlers = generateHandlers(node, wss);
+          subscriber = await AaveEvents.subscribeEvents({
+            chain: node.chain,
+            handlers,
+            skipCatchup,
+            discoverReconnectRange: () => discoverReconnectRange(node.chain),
+            api,
+            verbose: true,
+          });
         }
-      });
-    } else if (chainSupportedBy(node.chain, MolochTypes.EventChains)) {
-      const contractVersion = 1;
-      const api = await MolochEvents.createApi(node.url, contractVersion, node.address);
-      const handlers = generateHandlers(node, wss);
-      subscriber = await MolochEvents.subscribeEvents({
-        chain: node.chain,
-        handlers,
-        skipCatchup,
-        discoverReconnectRange: () => discoverReconnectRange(node.chain),
-        api,
-        contractVersion,
-      });
-    } else if (chainSupportedBy(node.chain, CompoundTypes.EventChains)) {
-      const api = await CompoundEvents.createApi(
-        node.url, node.address,
-      );
-      const handlers = generateHandlers(node, wss);
-      subscriber = await CompoundEvents.subscribeEvents({
-        chain: node.chain,
-        handlers,
-        skipCatchup,
-        discoverReconnectRange: () => discoverReconnectRange(node.chain),
-        api,
-      });
-    } else if (chainSupportedBy(node.chain, AaveTypes.EventChains)) {
-      const api = await AaveEvents.createApi(
-        node.url, node.address,
-      );
-      const handlers = generateHandlers(node, wss);
-      subscriber = await AaveEvents.subscribeEvents({
-        chain: node.chain,
-        handlers,
-        skipCatchup,
-        discoverReconnectRange: () => discoverReconnectRange(node.chain),
-        api,
-        verbose: true,
-      });
-    }
 
-    // hook for clean exit
-    process.on('SIGTERM', () => {
-      if (subscriber) {
-        subscriber.unsubscribe();
+        // hook for clean exit
+        process.on('SIGTERM', () => {
+          if (subscriber) {
+            subscriber.unsubscribe();
+          }
+        });
+        return [node, subscriber];
       }
-    });
-    return [ node.chain, subscriber ];
-  }));
-  return _.object<{ [chain: string]: IEventSubscriber<any, any> }>(subscribers);
+    )
+  );
+  return subscribers;
 };
 
 export default setupChainEventListeners;

@@ -1,6 +1,5 @@
 import { StorageModule, ChainBase, ProposalModule, ChainNetwork } from 'models';
 import { ProposalStore } from 'stores';
-import { AaveTypes, CompoundTypes, MolochTypes } from '@commonwealth/chain-events';
 import app from './state';
 import ThreadsController from './controllers/server/threads';
 
@@ -44,13 +43,13 @@ export const proposalSlugToClass = () => {
   if (app.chain.network === ChainNetwork.Kusama || app.chain.network === ChainNetwork.Polkadot) {
     mmap.set('technicalcommitteemotion', (app.chain as any).technicalCommittee);
   }
-  if (MolochTypes.EventChains.find((c) => c === app.chain.network)) {
+  if (app.chain.network === ChainNetwork.Moloch) {
     mmap.set('molochproposal', (app.chain as any).governance);
   }
-  if (CompoundTypes.EventChains.find((c) => c === app.chain.network)) {
+  if (app.chain.network === ChainNetwork.Compound) {
     mmap.set('compoundproposal', (app.chain as any).governance);
   }
-  if (AaveTypes.EventChains.find((c) => c === app.chain.network)) {
+  if (app.chain.network === ChainNetwork.Aave) {
     mmap.set('onchainproposal', (app.chain as any).governance);
   }
   if (app.chain.network === ChainNetwork.Sputnik) {
@@ -110,13 +109,13 @@ export const chainEntityTypeToProposalSlug = (t: string) => {
     if (app.chain.network === ChainNetwork.Sputnik) {
       return ProposalType.SputnikProposal;
     }
-    if (MolochTypes.EventChains.find((c) => c === app.chain.network)) {
+    if (app.chain.network === ChainNetwork.Moloch) {
       return ProposalType.MolochProposal;
     }
-    if (CompoundTypes.EventChains.find((c) => c === app.chain.network)) {
+    if (app.chain.network === ChainNetwork.Compound) {
       return ProposalType.CompoundProposal;
     }
-    if (AaveTypes.EventChains.find((c) => c === app.chain.network)) {
+    if (app.chain.network === ChainNetwork.Aave) {
       return ProposalType.AaveProposal;
     }
   }
@@ -142,13 +141,13 @@ export const chainEntityTypeToProposalName = (t: string) => {
     if (app.chain.network === ChainNetwork.Sputnik) {
       return 'Sputnik Proposal';
     }
-    if (MolochTypes.EventChains.find((c) => c === app.chain.network)) {
+    if (app.chain.network === ChainNetwork.Moloch) {
       return 'Moloch Proposal';
     }
-    if (CompoundTypes.EventChains.find((c) => c === app.chain.network)) {
+    if (app.chain.network === ChainNetwork.Compound) {
       return 'Onchain Proposal';
     }
-    if (AaveTypes.EventChains.find((c) => c === app.chain.network)) {
+    if (app.chain.network === ChainNetwork.Aave) {
       return 'Onchain Proposal';
     }
   }

@@ -10,8 +10,6 @@ import express from 'express';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import WebSocket from 'ws';
 
-import { SubstrateTypes } from '@commonwealth/chain-events';
-
 import { SESSION_SECRET } from './server/config';
 import setupAPI from './server/router';
 import setupPassport from './server/passport';
@@ -269,24 +267,6 @@ const resetServer = (debug = false): Promise<void> => {
         [ 'wss://mainnet.infura.io/ws', 'sushi', '0x6b3595068778dd592e39a122f4f5a5cf09c90fe2'],
       ];
       await Promise.all(nodes.map(([ url, chain, address ]) => (models['ChainNode'].create({ chain, url, address }))));
-
-      // initialize chain event types
-      // we don't need to do this on regular reset, because incoming
-      // chain events create their own types, but for testing purposes
-      // we should have these pre-populated.
-      const initChainEventTypes = (chain) => {
-        return Promise.all(
-          SubstrateTypes.EventKinds.map((event_name) => {
-            return models['ChainEventType'].create({
-              id: `${chain}-${event_name}`,
-              chain,
-              event_name,
-            });
-          })
-        );
-      };
-
-      await initChainEventTypes('edgeware');
 
       if (debug) console.log('Database reset!');
       resolve();

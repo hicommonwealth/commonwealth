@@ -10,6 +10,7 @@ import { SubstrateTypes } from '@commonwealth/chain-events';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import { SubstrateBounty } from './bounty';
+import { chainToEventNetwork } from '../../server/chain_entities';
 
 class SubstrateBountyTreasury extends ProposalModule<
   ApiPromise,
@@ -70,6 +71,7 @@ class SubstrateBountyTreasury extends ProposalModule<
     // fetch proposals from chain
     await this.app.chain.chainEntities.fetchEntities(
       this.app.chain.id,
+      chainToEventNetwork(this.app.chain.meta.chain),
       () => this._Chain.fetcher.fetchBounties(this.app.chain.block.height),
     );
 

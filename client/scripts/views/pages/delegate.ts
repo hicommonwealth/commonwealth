@@ -3,7 +3,6 @@ import 'pages/delegate.scss';
 import m from 'mithril';
 import app from 'state';
 import { ChainNetwork } from 'models';
-import { AaveTypes, CompoundTypes } from '@commonwealth/chain-events';
 
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
@@ -61,9 +60,9 @@ interface IDelegateFormState {
 }
 
 const getDelegate = async (vnode: m.Vnode<{}, IDelegateFormState>) => {
-  if (CompoundTypes.EventChains.find((c) => c === app.chain.network)) {
+  if (app.chain.network === ChainNetwork.Compound) {
     vnode.state.currentDelegate = await (app.chain as Compound).chain.getDelegate();
-  } else if (AaveTypes.EventChains.find((c) => c === app.chain.network)) {
+  } else if (app.chain.network === ChainNetwork.Aave) {
     // TODO: switch on delegation type
     vnode.state.currentDelegate = await (app.chain as Aave).chain.getDelegate(app.user.activeAccount.address, 'voting');
   }
@@ -73,11 +72,11 @@ const getDelegate = async (vnode: m.Vnode<{}, IDelegateFormState>) => {
 const setDelegate = async (vnode: m.Vnode<{}, IDelegateFormState>) => {
   if (app.chain.apiInitialized) {
     let delegationPromise: Promise<any>;
-    if (CompoundTypes.EventChains.find((c) => c === app.chain.network)) {
+    if (app.chain.network === ChainNetwork.Compound) {
       delegationPromise = (app.chain as Compound).chain.setDelegate(
         vnode.state.form.address, vnode.state.form.amount
       );
-    } else if (AaveTypes.EventChains.find((c) => c === app.chain.network)) {
+    } else if (app.chain.network === ChainNetwork.Aave) {
       delegationPromise = (app.chain as Aave).chain.setDelegate(vnode.state.form.address);
     }
     if (delegationPromise) {
@@ -172,8 +171,8 @@ const DelegatePage: m.Component<{}> = {
       if (
         app.chain
         && app.chain.loaded
-        && !CompoundTypes.EventChains.find((c) => c === app.chain.network)
-        && !AaveTypes.EventChains.find((c) => c === app.chain.network)
+        && app.chain.network !== ChainNetwork.Compound
+        && app.chain.network !== ChainNetwork.Aave
       ) {
         return m(PageNotFound, {
           title: 'Delegate Page',

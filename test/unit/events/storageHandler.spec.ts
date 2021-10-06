@@ -3,9 +3,12 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
-import BN from 'bn.js';
 
-import { CWEvent, SubstrateTypes } from '@commonwealth/chain-events';
+import {
+  CWEvent,
+  SubstrateTypes,
+  SupportedNetwork,
+} from '@commonwealth/chain-events';
 
 import { resetDatabase } from '../../../server-test';
 import models from '../../../server/database';
@@ -29,6 +32,7 @@ describe('Event Storage Handler Tests', () => {
     // setup
     const event: CWEvent = {
       blockNumber: 10,
+      network: SupportedNetwork.Substrate,
       data: {
         kind: SubstrateTypes.EventKind.DemocracyStarted,
         referendumIndex: 0,
@@ -65,6 +69,7 @@ describe('Event Storage Handler Tests', () => {
     // setup
     const event: CWEvent<SubstrateTypes.IPreimageNoted> = {
       blockNumber: 10,
+      network: SupportedNetwork.Substrate,
       data: {
         kind: SubstrateTypes.EventKind.PreimageNoted,
         proposalHash: 'hash',
@@ -107,6 +112,7 @@ describe('Event Storage Handler Tests', () => {
   it('should create chain event and type for unknown event type', async () => {
     const event = {
       blockNumber: 13,
+      network: SupportedNetwork.Substrate,
       data: {
         kind: 'democracy-exploded',
         whoops: true,
@@ -139,6 +145,7 @@ describe('Event Storage Handler Tests', () => {
   it('should not create chain event for excluded event type', async () => {
     const event: CWEvent = {
       blockNumber: 13,
+      network: SupportedNetwork.Substrate,
       data: {
         kind: SubstrateTypes.EventKind.Reward,
         amount: '10000',
@@ -163,6 +170,7 @@ describe('Event Storage Handler Tests', () => {
   it('should create chain event if included address exists in db', async () => {
     const event: CWEvent = {
       blockNumber: 14,
+      network: SupportedNetwork.Substrate,
       data: {
         kind: SubstrateTypes.EventKind.Bonded,
         stash: loggedInAddr,
@@ -191,6 +199,7 @@ describe('Event Storage Handler Tests', () => {
   it('should not create chain event if no included address exists in db', async () => {
     const event: CWEvent = {
       blockNumber: 15,
+      network: SupportedNetwork.Substrate,
       data: {
         kind: SubstrateTypes.EventKind.Bonded,
         stash: 'alice',
