@@ -129,16 +129,19 @@ class CosmosGovernance extends ProposalModule<
 
     let cosmosProposals: CosmosProposal[];
     if (!proposalId) {
-      // TODO: we can fetch proposals with "0" i.e. unspecified, but we might miss active proposals because
-      //  it returns an arbitrary 100. So we fetch each status separately to ensure we at least have
-      //  all presently active proposals.
-      // const { proposals: depositProposals } = await this._Chain.api.gov.proposals(1, '', '');
-      // const { proposals: votingProposals } = await this._Chain.api.gov.proposals(2, '', '');
-      // const { proposals: passedProposals } = await this._Chain.api.gov.proposals(3, '', '');
-      // const { proposals: rejectedProposals } = await this._Chain.api.gov.proposals(4, '', '');
-      // const { proposals: failedProposals } = await this._Chain.api.gov.proposals(5, '', '');
-      const { proposals } = await this._Chain.api.gov.proposals(0, '', '');
-      // [...depositProposals, ...votingProposals, ...passedProposals, ...rejectedProposals, ...failedProposals]
+      const { proposals, pagination } = await this._Chain.api.gov.proposals(0, '', '');
+
+      // fetch all proposals
+      // TODO: only fetch next page of proposals on scroll
+      let nextKey = pagination.nextKey;
+      while (nextKey.length > 0) {
+        console.log(nextKey);
+        const { proposals: addlProposals, pagination: nextPage } =
+          await this._Chain.api.gov.proposals(0, '', '', nextKey);
+        proposals.push(...addlProposals);
+        nextKey = nextPage.nextKey;
+      }
+
       cosmosProposals = proposals
         .map((p) => msgToIProposal(p))
         .filter((p) => !!p)
