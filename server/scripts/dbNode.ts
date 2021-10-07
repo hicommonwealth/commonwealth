@@ -460,7 +460,7 @@ async function initializer(): Promise<void> {
       }
     );
     if (!result.ok) {
-      log.info(result.status, result.statusText);
+      log.info(`${result.status}, ${result.statusText}`);
       // TODO: downsize/delete this dyno or retry
       throw new Error('Could not update the config var - overlap may occur');
     }
