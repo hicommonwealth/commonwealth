@@ -427,9 +427,11 @@ async function initializer(): Promise<void> {
     // TODO: this will never occur
     throw new Error("No dyno's detected");
   }
+  log.info(`${dynoList}`);
 
   // removes any dyno's that aren't ceNodes
   const ceNodes = dynoList.filter((dyno) => dyno.name.includes('ceNode'));
+  log.info(`${ceNodes}`);
 
   // sort CeNode dyno's by their id
   ceNodes.sort((first, second) => {
@@ -438,6 +440,8 @@ async function initializer(): Promise<void> {
     return 0;
   });
   // TODO: big question for this setup is does the id change after a dyno crashes? If it changes then this setup won't work
+  // TODO: THIS WILL NOT WORK WITH AUTO-SCALING since ALL nodes need to be redeployed everytime a node is added or removed
+  // TODO: unless each node manages/has access to an env var through the http api since changing redeploys all other nodes
   workerNumber = ceNodes
     .map((dyno) => dyno.id)
     .indexOf(process.env.HEROKU_DYNO_ID);
