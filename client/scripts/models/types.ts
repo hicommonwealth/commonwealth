@@ -43,7 +43,6 @@ export enum ChainNetwork {
   dYdX = 'dydx',
   Metacartel = 'metacartel',
   ALEX = 'alex',
-  Commonwealth = 'commonwealth',
   ERC20 = 'erc20',
   Clover = 'clover',
   HydraDX = 'hydradx',

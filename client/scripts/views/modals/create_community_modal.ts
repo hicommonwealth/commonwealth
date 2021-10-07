@@ -6,7 +6,7 @@ import m from 'mithril';
 import $ from 'jquery';
 import app from 'state';
 import { slugify } from 'utils';
-import { ChainBase } from 'models';
+import { ChainBase, ChainNetwork } from 'models';
 import mixpanel from 'mixpanel-browser';
 import { Table, Tabs, TabItem, Button, MenuDivider } from 'construct-ui';
 import { ApiPromise, WsProvider } from '@polkadot/api';
@@ -554,7 +554,7 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
             jwt: app.user.jwt,
             type: 'token',
             base: 'ethereum',
-            network: 'erc20',
+            network: ChainNetwork.ERC20,
             node_url: 'wss://mainnet.infura.io/ws',
           }).then(async (res) => {
             await initAppState(false);
