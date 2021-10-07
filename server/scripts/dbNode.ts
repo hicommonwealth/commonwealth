@@ -411,6 +411,7 @@ async function initializer(): Promise<void> {
   });
 
   // get all dyno's list
+  // TODO: error handling 400's erros
   const res = await fetch(
     'https://api.heroku.com/apps/commonwealth-staging2/dynos',
     {
@@ -439,18 +440,43 @@ async function initializer(): Promise<void> {
     else if (first.id < second.id) return -1;
     return 0;
   });
-  // TODO: big question for this setup is does the id change after a dyno crashes? If it changes then this setup won't work
-  // TODO: THIS WILL NOT WORK WITH AUTO-SCALING since ALL nodes need to be redeployed everytime a node is added or removed
-  // TODO: unless each node manages/has access to an env var through the http api since changing redeploys all other nodes
+
   workerNumber = ceNodes
     .map((dyno) => dyno.id)
     .indexOf(process.env.HEROKU_DYNO_ID);
   numWorkers = ceNodes.length;
 
+  if (numWorkers !== Number(process.env.NUM_WORKERS)) {
+    const result = await fetch(
+      'https://api.heroku.com/apps/commonwealth-staging2/config-vars',
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${process.env.HEROKU_API_TOKEN}`,
+          Accept: 'application/vnd.heroku+json; version=3',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          NUM_WORKERS: numWorkers,
+        }),
+      }
+    );
+    if (!result.ok) {
+      // TODO: downsize/delete this dyno or retry
+      throw new Error('Could not update the config var - overlap may occur');
+    }
+  }
+
   log.info(`Worker Number: ${workerNumber}\nNumber of Workers: ${numWorkers}`);
 
   producer = new RabbitMqHandler(RabbitMQConfig);
   await producer.init();
+
+  // TODO: big question for this setup is does the id change after a dyno crashes? If it changes then this setup won't work
+  // TODO: THIS WILL NOT WORK WITH AUTO-SCALING since ALL nodes need to be redeployed everytime a node is added or removed
+  // TODO: unless each node manages/has access to an env var through the http api since changing redeploys all other nodes
+  // TODO: if the env var set is not the same as the number of ceNodes in the list then use the https api to update the env
+  // TODO: var which will trigger a re-deployment of all the nodes for recalibration
 }
 
 initializer()
