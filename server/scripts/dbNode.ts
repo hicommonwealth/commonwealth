@@ -1,4 +1,5 @@
 /* eslint-disable no-continue */
+import fetch from 'node-fetch';
 import { Pool } from 'pg';
 import _ from 'underscore';
 import format from 'pg-format';
@@ -18,12 +19,6 @@ import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
 const log = factory.getLogger(formatFilename(__filename));
 
 // TODO: RollBar error reporting
-
-// the number of the current worker
-const WORKER_NUMBER: number = Number(process.env.WORKER_NUMBER) || 0;
-
-// the total number of workers
-const NUM_WORKERS: number = Number(process.env.NUM_WORKERS) || 1;
 
 // The number of minutes to wait between each run -- rounded to the nearest whole number
 const REPEAT_TIME = Math.round(Number(process.env.REPEAT_TIME)) || 1;
@@ -65,7 +60,12 @@ async function handleFatalError(
 }
 
 // the function that executes every REPEAT_TIME
-async function mainProcess(producer: RabbitMqHandler, pool: Pool) {
+async function mainProcess(
+  producer: RabbitMqHandler,
+  pool: Pool,
+  workerNumber: number,
+  numWorkers: number
+) {
   // reset the chainError counts at the end of every day
   if (runCount > 1440 / REPEAT_TIME) {
     runCount = 1;
@@ -83,7 +83,7 @@ async function mainProcess(producer: RabbitMqHandler, pool: Pool) {
 
   // gets the chains specific to this node
   let myChainData = allChains.filter(
-    (chain, index) => index % NUM_WORKERS === WORKER_NUMBER
+    (chain, index) => index % numWorkers === workerNumber
   );
 
   // passed to listeners that support it
@@ -392,29 +392,74 @@ async function mainProcess(producer: RabbitMqHandler, pool: Pool) {
   }
 }
 
-// begin process
-log.info('db-node initialization');
+let pool, producer, numWorkers, workerNumber;
+async function initializer(): Promise<void> {
+  // begin process
+  log.info('db-node initialization');
 
-const producer = new RabbitMqHandler(RabbitMQConfig);
-const pool = new Pool({
-  connectionString: DATABASE_URI,
-  ssl: {
-    rejectUnauthorized: false,
-  },
-  max: 3,
-});
+  // setup sql client pool
+  pool = new Pool({
+    connectionString: DATABASE_URI,
+    ssl: {
+      rejectUnauthorized: false,
+    },
+    max: 3,
+  });
 
-pool.on('error', (err, client) => {
-  log.error('Unexpected error on idle client', err);
-});
+  pool.on('error', (err, client) => {
+    log.error('Unexpected error on idle client', err);
+  });
 
-producer
-  .init()
+  // get all dyno's list
+  const res = await fetch(
+    'https://api.heroku.com/apps/commonwealth-staging2/dynos',
+    {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${process.env.HEROKU_API_TOKEN}`,
+        Accept: 'application/vnd.heroku+json; version=3',
+      },
+    }
+  );
+  const dynoList = await res.json();
+
+  if (!dynoList || dynoList.length === 0) {
+    // TODO: this will never occur
+    throw new Error("No dyno's detected");
+  }
+
+  // removes any dyno's that aren't ceNodes
+  const ceNodes = dynoList.filter((dyno) => dyno.name.includes('ceNode'));
+
+  // sort CeNode dyno's by their id
+  ceNodes.sort((first, second) => {
+    if (first.id > second.id) return 1;
+    else if (first.id < second.id) return -1;
+    return 0;
+  });
+  // TODO: big question for this setup is does the id change after a dyno crashes? If it changes then this setup won't work
+  workerNumber = ceNodes
+    .map((dyno) => dyno.id)
+    .indexOf(process.env.HEROKU_DYNO_ID);
+  numWorkers = ceNodes.length;
+
+  producer = new RabbitMqHandler(RabbitMQConfig);
+  await producer.init();
+}
+
+initializer()
   .then(() => {
-    return mainProcess(producer, pool);
+    return mainProcess(producer, pool, workerNumber, numWorkers);
   })
   .then(() => {
-    setInterval(mainProcess, REPEAT_TIME * 60000, producer, pool);
+    setInterval(
+      mainProcess,
+      REPEAT_TIME * 60000,
+      producer,
+      pool,
+      workerNumber,
+      numWorkers
+    );
   })
   .catch((err) => {
     // TODO: any error caught here is critical - no events will be produced
