@@ -84,6 +84,7 @@ export enum ChainNetwork {
   HydraDX = 'hydradx',
   Crust = 'crust',
   Sputnik = 'sputnik',
+  Commonwealth = 'commonwealth',
 }
 
 export enum WebsocketEventType {
