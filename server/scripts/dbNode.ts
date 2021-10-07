@@ -411,7 +411,6 @@ async function initializer(): Promise<void> {
   });
 
   // get all dyno's list
-  // TODO: error handling 400's erros
   const res = await fetch(
     'https://api.heroku.com/apps/commonwealth-staging2/dynos',
     {
@@ -422,6 +421,12 @@ async function initializer(): Promise<void> {
       },
     }
   );
+
+  if (!res.ok) {
+    log.info(`${res.status}, ${res.statusText}`);
+    throw new Error('Could not get dynoList');
+  }
+
   const dynoList = await res.json();
 
   if (!dynoList || dynoList.length === 0) {
@@ -444,9 +449,19 @@ async function initializer(): Promise<void> {
     .indexOf(process.env.HEROKU_DYNO_ID);
   numWorkers = ceNodes.length;
 
+  let mostRecentDate = new Date(ceNodes[0].created_at);
+  let newestDyno;
+  for (const dyno of ceNodes) {
+    const dynoCreated = new Date(dyno.created_at);
+    if (mostRecentDate > dynoCreated) {
+      mostRecentDate = dynoCreated;
+      newestDyno = dyno;
+    }
+  }
+
   if (
     numWorkers !== Number(process.env.NUM_WORKERS) &&
-    ceNodes[0].id === process.env.HEROKU_DYNO_ID // prevents race condition by only allowing worker number 0 to update the config var
+    newestDyno.id === process.env.HEROKU_DYNO_ID // prevents race condition by only allowing the most recently created dyno to update the config vars
   ) {
     const result = await fetch(
       'https://api.heroku.com/apps/commonwealth-staging2/config-vars',
@@ -464,7 +479,6 @@ async function initializer(): Promise<void> {
     );
     if (!result.ok) {
       log.info(`${result.status}, ${result.statusText}`);
-      // TODO: downsize/delete this dyno or retry
       throw new Error('Could not update the config var - overlap may occur');
     }
   }
@@ -473,12 +487,6 @@ async function initializer(): Promise<void> {
 
   producer = new RabbitMqHandler(RabbitMQConfig);
   await producer.init();
-
-  // TODO: big question for this setup is does the id change after a dyno crashes? If it changes then this setup won't work
-  // TODO: THIS WILL NOT WORK WITH AUTO-SCALING since ALL nodes need to be redeployed everytime a node is added or removed
-  // TODO: unless each node manages/has access to an env var through the http api since changing redeploys all other nodes
-  // TODO: if the env var set is not the same as the number of ceNodes in the list then use the https api to update the env
-  // TODO: var which will trigger a re-deployment of all the nodes for recalibration
 }
 
 initializer()
