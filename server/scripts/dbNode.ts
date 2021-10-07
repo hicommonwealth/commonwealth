@@ -443,6 +443,8 @@ async function initializer(): Promise<void> {
     .indexOf(process.env.HEROKU_DYNO_ID);
   numWorkers = ceNodes.length;
 
+  log.info(`Worker Number: ${workerNumber}\nNumber of Workers: ${numWorkers}`);
+
   producer = new RabbitMqHandler(RabbitMQConfig);
   await producer.init();
 }
