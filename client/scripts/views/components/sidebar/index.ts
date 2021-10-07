@@ -192,11 +192,13 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         || app.chain.network === ChainNetwork.Moloch
         || app.chain.network === ChainNetwork.Compound
         || app.chain.network === ChainNetwork.Aave
+        || app.chain.network === ChainNetwork.Commonwealth
         || app.chain.meta.chain.snapshot);
     if (!hasProposals) return;
 
     const showMolochMenuOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Moloch;
     const showMolochMemberOptions = showMolochMenuOptions && (app.user.activeAccount as any)?.shares?.gtn(0);
+    const showCommonwealthMenuOptions = app.chain?.network === ChainNetwork.Commonwealth;
 
     const showCompoundOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Compound;
     const showAaveOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Aave;
