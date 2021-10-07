@@ -1,4 +1,4 @@
-import { SubstrateEvents, SubstrateTypes } from '@commonwealth/chain-events';
+import { SubstrateEvents } from '@commonwealth/chain-events';
 import session from 'express-session';
 import Rollbar from 'rollbar';
 import express from 'express';
@@ -19,6 +19,7 @@ import logger from 'morgan';
 import prerenderNode from 'prerender-node';
 import devWebpackConfig from './webpack/webpack.config.dev.js';
 import prodWebpackConfig from './webpack/webpack.config.prod.js';
+import { ChainBase } from './shared/types';
 import { factory, formatFilename } from './shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -95,7 +96,7 @@ async function main() {
       // construct storageFetchers needed for the identity cache
       const fetchers = {};
       for (const [node, subscriber] of subscribers) {
-        if (node.Chain.base === 'substrate') {
+        if (node.Chain.base === ChainBase.Substrate) {
           fetchers[node.chain] = new SubstrateEvents.StorageFetcher(
             subscriber.api
           );

@@ -4,7 +4,7 @@ import { Request, Response, NextFunction } from 'express';
 import BN from 'bn.js';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
-import { NotificationCategories } from '../../shared/types';
+import { ChainType, NotificationCategories } from '../../shared/types';
 import { getProposalUrl, getProposalUrlWithoutObject } from '../../shared/utils';
 import proposalIdToEntity from '../util/proposalIdToEntity';
 import TokenBalanceCache from '../util/tokenBalanceCache';
@@ -35,7 +35,7 @@ const createReaction = async (
   if (authorError) return next(new Error(authorError));
   const { reaction, comment_id, proposal_id, thread_id } = req.body;
 
-  if (chain && chain.type === 'token') {
+  if (chain && chain.type === ChainType.Token) {
     // skip check for admins
     const isAdmin = await models.Role.findAll({
       where: {

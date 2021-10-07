@@ -10,8 +10,9 @@ import BN from 'bn.js';
 import { blake2AsHex } from '@polkadot/util-crypto';
 
 import app from 'state';
-import { ITXModalData, ProposalModule, ChainBase, OffchainThreadKind, OffchainThreadStage, ChainNetwork } from 'models';
-import { ProposalType, proposalSlugToClass } from 'identifiers';
+import { ProposalType, ChainBase, ChainNetwork } from 'types';
+import { ITXModalData, ProposalModule, OffchainThreadKind, OffchainThreadStage } from 'models';
+import { proposalSlugToClass } from 'identifiers';
 import { formatCoin } from 'adapters/currency';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
 import CosmosAccount from 'controllers/chain/cosmos/account';
@@ -311,7 +312,7 @@ const NewProposalForm = {
           deposit
         ).then((result) => {
           done(result);
-          navigateToSubpage(`/proposal/cosmosproposal/${result}`);
+          navigateToSubpage(`/proposal/${ProposalType.CosmosProposal}/${result}`);
         }).catch((err) => notifyError(err.toString()));
         return;
       } else if (proposalTypeEnum === ProposalType.MolochProposal) {

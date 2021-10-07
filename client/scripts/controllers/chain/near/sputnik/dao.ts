@@ -3,6 +3,7 @@ import { Near as NearApi, Account as NearApiAccount } from 'near-api-js';
 import { ITXModalData, ProposalModule } from 'models';
 import { NearAccounts } from 'controllers/chain/near/account';
 import NearChain from 'controllers/chain/near/chain';
+import { ProposalType } from 'types';
 import NearSputnikProposal from './proposal';
 import {
   INearSputnikProposal,
@@ -86,7 +87,7 @@ export default class NearSputnikDao extends ProposalModule<
     };
 
     const nextProposalId = this._nProposals;
-    const callbackUrl = `${window.location.origin}/${contractId}/proposal/sputnikproposal/${nextProposalId}`;
+    const callbackUrl = `${window.location.origin}/${contractId}/proposal/${ProposalType.SputnikProposal}/${nextProposalId}`;
     await this._Chain.redirectTx(
       contractId,
       methodName,

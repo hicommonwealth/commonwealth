@@ -4,11 +4,11 @@ import { Coin } from 'adapters/currency';
 import { clearLocalStorage } from 'stores/PersistentStore';
 import $ from 'jquery';
 import m from 'mithril';
+import { ChainBase } from 'types';
 
 import { CommentRefreshOption } from 'controllers/server/comments';
 import ChainEntityController, { EntityRefreshOption } from 'controllers/server/chain_entities';
 import { IChainModule, IAccountsModule, IBlockInfo } from './interfaces';
-import { ChainBase } from './types';
 import { Account, NodeInfo, ProposalModule } from '.';
 
 // Extended by a chain's main implementation. Responsible for module

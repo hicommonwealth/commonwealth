@@ -8,7 +8,8 @@ import { checkAddressChecksum, toChecksumAddress } from 'web3-utils';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
-import { OffchainThread, OffchainComment, Profile, ChainBase } from 'models';
+import { ChainBase } from 'types';
+import { OffchainThread, OffchainComment, Profile } from 'models';
 
 import Sublayout from 'views/sublayout';
 import PageNotFound from 'views/pages/404';

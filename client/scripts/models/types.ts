@@ -9,63 +9,6 @@ import {
 } from './interfaces';
 import Proposal from './Proposal';
 
-export enum ChainBase {
-  CosmosSDK = 'cosmos',
-  Substrate = 'substrate',
-  Ethereum = 'ethereum',
-  NEAR = 'near',
-}
-
-export enum ChainNetwork {
-  Edgeware = 'edgeware',
-  EdgewareTestnet = 'edgeware-testnet',
-  Kusama = 'kusama',
-  Kulupu = 'kulupu',
-  Polkadot = 'polkadot',
-  Plasm = 'plasm',
-  Stafi = 'stafi',
-  Darwinia = 'darwinia',
-  Phala = 'phala',
-  Centrifuge = 'centrifuge',
-  Straightedge = 'straightedge',
-  Osmosis = 'osmosis',
-  Injective = 'injective',
-  InjectiveTestnet = 'injective-testnet',
-  OsmosisLocal = 'osmosis-local',
-  Terra = 'terra',
-  Ethereum = 'ethereum',
-  NEAR = 'near',
-  NEARTestnet = 'near-testnet',
-  Moloch = 'moloch',
-  Compound = 'compound',
-  Aave = 'aave',
-  AaveLocal = 'aave-local',
-  dYdX = 'dydx',
-  Metacartel = 'metacartel',
-  ALEX = 'alex',
-  ERC20 = 'erc20',
-  Clover = 'clover',
-  HydraDX = 'hydradx',
-  Yearn = 'yearn',
-  Fei = 'fei',
-  Sushi = 'sushi',
-  Crust = 'crust',
-  CosmosHub = 'cosmoshub',
-  Gaia13k = 'gaia-13k',
-  Sputnik = 'sputnik',
-}
-
-// This function returns a default chain for a chainbase
-export function baseToNetwork(n: ChainBase): ChainNetwork {
-  switch (n) {
-    case ChainBase.CosmosSDK: return ChainNetwork.Osmosis;
-    case ChainBase.Substrate: return ChainNetwork.Edgeware;
-    case ChainBase.Ethereum: return ChainNetwork.Ethereum;
-    case ChainBase.NEAR: return ChainNetwork.NEAR;
-    default: return null;
-  }
-}
-
 // TODO: this is inconsistently used
 export enum OffchainThreadKind {
   Forum = 'forum',
@@ -128,7 +71,13 @@ export enum VotingUnit {
   None = 'none',
 }
 
-export type ProposalEndTime = IFixedEndTime | IFixedBlockEndTime | IDynamicEndTime | IThresholdEndTime |
-  INotStartedEndTime | IQueuedEndTime | IUnavailableEndTime;
+export type ProposalEndTime =
+  | IFixedEndTime
+  | IFixedBlockEndTime
+  | IDynamicEndTime
+  | IThresholdEndTime
+  | INotStartedEndTime
+  | IQueuedEndTime
+  | IUnavailableEndTime;
 
 export type AnyProposal = Proposal<any, any, any, any>;

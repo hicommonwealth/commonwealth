@@ -17,7 +17,7 @@ import models from '../database';
 import MigrationHandler from '../eventHandlers/migration';
 import EntityArchivalHandler from '../eventHandlers/entityArchival';
 import { ChainNodeInstance } from '../models/chain_node';
-
+import { ChainBase, ChainNetwork } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
 import { constructSubstrateUrl } from '../../shared/substrate';
 
@@ -51,26 +51,24 @@ export async function migrateChainEntity(chain: string): Promise<void> {
     const entityArchivalHandler = new EntityArchivalHandler(models, chain);
     let fetcher: IStorageFetcher<any>;
     const range: IDisconnectedRange = { startBlock: 0 };
-    if (node.Chain.base === 'substrate') {
+    if (node.Chain.base === ChainBase.Substrate) {
       const nodeUrl = constructSubstrateUrl(node.url);
       const api = await SubstrateEvents.createApi(
         nodeUrl,
         node.Chain.substrate_spec
       );
       fetcher = new SubstrateEvents.StorageFetcher(api);
-    } else if (node.Chain.network === 'moloch') {
+    } else if (node.Chain.network === ChainNetwork.Moloch) {
       // TODO: determine moloch API version
       // TODO: construct dater
       throw new Error('Moloch migration not yet implemented.');
-    } else if (node.Chain.network === 'compound') {
+    } else if (node.Chain.network === ChainNetwork.Compound) {
       const api = await CompoundEvents.createApi(node.url, node.address);
       fetcher = new CompoundEvents.StorageFetcher(api);
-      // range.startBlock = chain === 'aave' ? 12200000 : 0;
       range.startBlock = 0;
-    } else if (node.Chain.network === 'aave') {
+    } else if (node.Chain.network === ChainNetwork.Aave) {
       const api = await AaveEvents.createApi(node.url, node.address);
       fetcher = new AaveEvents.StorageFetcher(api);
-      // range.startBlock = chain === 'aave' ? 12200000 : 0;
       range.startBlock = 0;
     } else {
       throw new Error('Unsupported migration chain');

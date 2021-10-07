@@ -8,9 +8,9 @@ import {
 
 import { selectNode, initChain, navigateToSubpage } from 'app';
 import app from 'state';
-import { ProposalType } from 'identifiers';
+import { ProposalType, ChainBase, ChainNetwork } from 'types';
 import { link } from 'helpers';
-import { ChainBase, ChainNetwork, ChainInfo, CommunityInfo, NodeInfo } from 'models';
+import { ChainInfo, CommunityInfo, NodeInfo } from 'models';
 
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
 import SubscriptionButton from 'views/components/subscription_button';
@@ -206,20 +206,20 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
 
     const onProposalPage = (p) => (
       p.startsWith(`/${app.activeChainId()}/proposals`)
-        || p.startsWith(`/${app.activeChainId()}/proposal/democracyproposal`));
+        || p.startsWith(`/${app.activeChainId()}/proposal/${ProposalType.SubstrateDemocracyProposal}`));
     const onReferendaPage = (p) => p.startsWith(`/${app.activeChainId()}/referenda`)
-      || p.startsWith(`/${app.activeChainId()}/proposal/referendum`);
+      || p.startsWith(`/${app.activeChainId()}/proposal/${ProposalType.SubstrateDemocracyReferendum}`);
 
     const onTreasuryPage = (p) => p.startsWith(`/${app.activeChainId()}/treasury`)
-      || p.startsWith(`/${app.activeChainId()}/proposal/treasuryproposal`);
+      || p.startsWith(`/${app.activeChainId()}/proposal/${ProposalType.SubstrateTreasuryProposal}`);
     const onBountiesPage = (p) => p.startsWith(`/${app.activeChainId()}/bounties`);
     const onTipsPage = (p) => p.startsWith(`/${app.activeChainId()}/tips`)
-      || p.startsWith(`/${app.activeChainId()}/proposal/treasurytip`);
+      || p.startsWith(`/${app.activeChainId()}/proposal/${ProposalType.SubstrateTreasuryTip}`);
 
     const onCouncilPage = (p) => p.startsWith(`/${app.activeChainId()}/council`);
     const onMotionPage = (p) => (
       p.startsWith(`/${app.activeChainId()}/motions`)
-        || p.startsWith(`/${app.activeChainId()}/proposal/councilmotion`));
+        || p.startsWith(`/${app.activeChainId()}/proposal/${ProposalType.SubstrateCollectiveProposal}`));
 
     const onValidatorsPage = (p) => p.startsWith(`/${app.activeChainId()}/validators`);
     const onNotificationsPage = (p) => p.startsWith('/notifications');

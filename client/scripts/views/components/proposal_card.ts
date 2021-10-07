@@ -11,7 +11,8 @@ import { slugify } from 'utils';
 import { Coin } from 'adapters/currency';
 import { blocknumToDuration, formatNumberLong, formatPercentShort, link, pluralize } from 'helpers';
 import { ProposalStatus, VotingType, AnyProposal, AddressInfo } from 'models';
-import { ProposalType, proposalSlugToChainEntityType, chainEntityTypeToProposalShortName } from 'identifiers';
+import { ProposalType } from 'types';
+import { proposalSlugToChainEntityType, chainEntityTypeToProposalShortName } from 'identifiers';
 
 import Substrate from 'controllers/chain/substrate/main';
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';

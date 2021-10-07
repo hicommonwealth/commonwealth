@@ -5,6 +5,7 @@ import { INFURA_API_KEY } from '../config';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import { DB } from '../database';
 
+import { ChainBase } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -64,7 +65,7 @@ const createChain = async (
   if (!existingBaseChain) {
     return next(new Error(Errors.InvalidBase));
   }
-  if (req.body.base === 'ethereum') {
+  if (req.body.base === ChainBase.Ethereum) {
     if (!Web3.utils.isAddress(req.body.address)) {
       return next(new Error(Errors.InvalidAddress));
     }

@@ -10,6 +10,7 @@ import EntityArchivalHandler from '../eventHandlers/entityArchival';
 import IdentityHandler from '../eventHandlers/identity';
 import UserFlagsHandler from '../eventHandlers/userFlags';
 import ProfileCreationHandler from '../eventHandlers/profileCreation';
+import { ChainBase } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
 import { Consumer } from '../util/rabbitmq/consumer';
 import models from '../database';
@@ -56,7 +57,7 @@ const setupChainEventListeners = async (wss: WebSocket.Server): Promise<{}> => {
     await models.Chain.findAll({
       attributes: ['id'],
       where: {
-        base: 'substrate',
+        base: ChainBase.Substrate,
       },
     })
   ).map((o) => o.id);

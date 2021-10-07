@@ -8,8 +8,8 @@ import BN from 'bn.js';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
-import { ProposalType } from 'identifiers';
-import { ChainBase, ChainNetwork, ProposalModule } from 'models';
+import { ProposalType, ChainBase, ChainNetwork } from 'types';
+import { ProposalModule } from 'models';
 
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';

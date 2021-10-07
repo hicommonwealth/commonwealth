@@ -22,6 +22,7 @@ import IdentityHandler from '../eventHandlers/identity';
 import UserFlagsHandler from '../eventHandlers/userFlags';
 import ProfileCreationHandler from '../eventHandlers/profileCreation';
 import { default as models, sequelize } from '../database';
+import { ChainBase, ChainNetwork } from '../../shared/types';
 import { constructSubstrateUrl } from '../../shared/substrate';
 import { factory, formatFilename } from '../../shared/logging';
 import { ChainNodeInstance } from '../models/chain_node';
@@ -90,7 +91,7 @@ export const generateHandlers = (
   ];
 
   // only handle identities and user flags on substrate chains
-  if (node.Chain.base === 'substrate') {
+  if (node.Chain.base === ChainBase.Substrate) {
     // populates identity information in OffchainProfiles when received (Substrate only)
     const identityHandler = new IdentityHandler(models, node.chain);
 
@@ -147,7 +148,7 @@ const setupChainEventListeners = async (
         node
       ): Promise<[ChainNodeInstance, IEventSubscriber<any, any>]> => {
         let subscriber: IEventSubscriber<any, any>;
-        if (node.Chain.base === 'substrate') {
+        if (node.Chain.base === ChainBase.Substrate) {
           const nodeUrl = constructSubstrateUrl(node.url);
           const api = await SubstrateEvents.createApi(
             nodeUrl,
@@ -172,7 +173,7 @@ const setupChainEventListeners = async (
                 BALANCE_TRANSFER_THRESHOLD_PERMILL,
             },
           });
-        } else if (node.Chain.network === 'moloch') {
+        } else if (node.Chain.network === ChainNetwork.Moloch) {
           const contractVersion = 1;
           const api = await MolochEvents.createApi(
             node.url,
@@ -188,7 +189,7 @@ const setupChainEventListeners = async (
             api,
             contractVersion,
           });
-        } else if (node.Chain.network === 'compound') {
+        } else if (node.Chain.network === ChainNetwork.Compound) {
           const api = await CompoundEvents.createApi(node.url, node.address);
           const handlers = generateHandlers(node, wss);
           subscriber = await CompoundEvents.subscribeEvents({
@@ -198,7 +199,7 @@ const setupChainEventListeners = async (
             discoverReconnectRange: () => discoverReconnectRange(node.chain),
             api,
           });
-        } else if (node.Chain.network === 'aave') {
+        } else if (node.Chain.network === ChainNetwork.Aave) {
           const api = await AaveEvents.createApi(node.url, node.address);
           const handlers = generateHandlers(node, wss);
           subscriber = await AaveEvents.subscribeEvents({

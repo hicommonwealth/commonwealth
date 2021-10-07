@@ -3,7 +3,7 @@ import { Op } from 'sequelize';
 import Web3 from 'web3';
 import { sequelize, DB } from '../database';
 import { INFURA_API_KEY } from '../config';
-
+import { ChainBase, ChainNetwork, ChainType } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -31,14 +31,14 @@ const getTokenForum = async (
           where: { id: token.id },
           defaults: {
             active: true,
-            network: 'erc20',
-            type: 'token',
+            network: ChainNetwork.ERC20,
+            type: ChainType.Token,
             icon_url: token.icon_url,
             symbol: token.symbol,
             name: token.name,
             decimals: token.decimals,
-            base: 'ethereum',
-            has_chain_events_listener: false
+            base: ChainBase.Ethereum,
+            has_chain_events_listener: false,
           },
           transaction: t,
         });

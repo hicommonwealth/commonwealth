@@ -9,6 +9,7 @@ import {
   SupportedNetwork,
 } from '@commonwealth/chain-events';
 
+import { ChainBase, ChainNetwork, ChainType } from '../../shared/types';
 import { RabbitMqHandler } from '../eventHandlers/rabbitmqPlugin';
 import Identity from '../eventHandlers/pgIdentity';
 import { factory, formatFilename } from '../../shared/logging';
@@ -135,7 +136,7 @@ async function mainProcess(producer: RabbitMqHandler, pool: Pool) {
 
   // group erc20 tokens together in order to start only one listener for all erc20 tokens
   const erc20Tokens = myChainData.filter(
-    (chain) => chain.type === 'token' && chain.base === 'ethereum'
+    (chain) => chain.type === ChainType.Token && chain.base === ChainBase.Ethereum
   );
   const erc20TokenAddresses = erc20Tokens.map((chain) => chain.address);
   const erc20TokenNames = erc20Tokens.map((chain) => chain.id);
@@ -202,7 +203,7 @@ async function mainProcess(producer: RabbitMqHandler, pool: Pool) {
 
   // remove erc20 tokens from myChainData
   myChainData = myChainData.filter(
-    (chain) => chain.type !== 'token' || chain.base !== 'ethereum'
+    (chain) => chain.type !== ChainType.Token || chain.base !== ChainBase.Ethereum
   );
 
   // delete listeners for chains that are no longer assigned to this node (skip erc20)
@@ -225,11 +226,14 @@ async function mainProcess(producer: RabbitMqHandler, pool: Pool) {
       // base is used to override built-in event chains in chain-events - only used for substrate chains in this case
       // NOTE: All erc20 tokens (type='token' base='ethereum') are removed at this point
       let network: SupportedNetwork;
-      if (chain.base === 'substrate') network = SupportedNetwork.Substrate;
-      else if (chain.network === 'compound')
+      if (chain.base === ChainBase.Substrate)
+        network = SupportedNetwork.Substrate;
+      else if (chain.network === ChainNetwork.Compound)
         network = SupportedNetwork.Compound;
-      else if (chain.network === 'aave') network = SupportedNetwork.Aave;
-      else if (chain.network === 'moloch') network = SupportedNetwork.Moloch;
+      else if (chain.network === ChainNetwork.Aave)
+        network = SupportedNetwork.Aave;
+      else if (chain.network === ChainNetwork.Moloch)
+        network = SupportedNetwork.Moloch;
 
       try {
         listeners[chain.id] = await createListener(chain.id, network, {
@@ -271,7 +275,7 @@ async function mainProcess(producer: RabbitMqHandler, pool: Pool) {
         await handleFatalError(error, pool, chain.id, 'listener-subscribe');
       }
     } else if (
-      chain.base === 'substrate' &&
+      chain.base === ChainBase.Substrate &&
       !_.isEqual(
         chain.substrate_spec,
         (<SubstrateEvents.Listener>listeners[chain.id]).options.spec
@@ -304,7 +308,7 @@ async function mainProcess(producer: RabbitMqHandler, pool: Pool) {
   // loop through chains that have active listeners again this time dealing with identity
   for (const chain of myChainData) {
     // skip chains that aren't Substrate chains
-    if (chain.base !== 'substrate') continue;
+    if (chain.base !== ChainBase.Substrate) continue;
 
     if (!listeners[chain.id]) {
       log.warn(

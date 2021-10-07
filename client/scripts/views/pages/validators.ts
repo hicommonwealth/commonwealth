@@ -6,7 +6,8 @@ import { Tag } from 'construct-ui';
 
 import app from 'state';
 import { pluralize, externalLink } from 'helpers';
-import { AddressInfo, ChainBase } from 'models';
+import { ChainBase } from 'types';
+import { AddressInfo } from 'models';
 
 import Substrate from 'controllers/chain/substrate/main';
 

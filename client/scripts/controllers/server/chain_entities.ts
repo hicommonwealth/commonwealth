@@ -3,7 +3,8 @@ import $ from 'jquery';
 import _ from 'lodash';
 
 import { ChainEntityStore } from 'stores';
-import { ChainEntity, ChainEvent, ChainEventType, ChainInfo, ChainNetwork } from 'models';
+import { ChainBase, ChainNetwork } from 'types';
+import { ChainEntity, ChainEvent, ChainEventType, ChainInfo } from 'models';
 import app from 'state';
 import {
   CWEvent,
@@ -24,7 +25,7 @@ export enum EntityRefreshOption {
 }
 
 export function chainToEventNetwork(c: ChainInfo): SupportedNetwork {
-  if (c.base === 'substrate') return SupportedNetwork.Substrate;
+  if (c.base === ChainBase.Substrate) return SupportedNetwork.Substrate;
   if (c.network === ChainNetwork.ERC20) return SupportedNetwork.ERC20;
   if (c.network === ChainNetwork.Compound) return SupportedNetwork.Compound;
   if (c.network === ChainNetwork.Aave) return SupportedNetwork.Aave;

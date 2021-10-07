@@ -15,21 +15,18 @@ import mixpanel from 'mixpanel-browser';
 import _ from 'underscore';
 
 import app, { ApiStatus, LoginState } from 'state';
+import { ChainBase, ChainNetwork, ChainType } from 'types';
 import {
   ChainInfo,
   CommunityInfo,
   NodeInfo,
-  ChainNetwork,
   NotificationCategory,
   Notification,
-  ChainBase,
 } from 'models';
-import { WebsocketMessageType, IWebsocketsPayload } from 'types';
 
 import { notifyError, notifySuccess, notifyInfo } from 'controllers/app/notifications';
 import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
 import Community from 'controllers/chain/community/main';
-import WebsocketController from 'controllers/server/socket/index';
 
 import { Layout } from 'views/layout';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
@@ -558,7 +555,7 @@ Promise.all([
       if (path === 'views/pages/view_proposal/index' && vnode.attrs.type === 'discussion') {
         deferChain = true;
       }
-      if (app.chain?.meta.chain.type === 'token') {
+      if (app.chain?.meta.chain.type === ChainType.Token) {
         deferChain = false;
       }
       return m(Layout, { scope, deferChain, hideSidebar }, [ vnode ]);

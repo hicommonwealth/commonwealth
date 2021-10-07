@@ -9,7 +9,8 @@ import { PopoverMenu, MenuDivider, MenuItem, Icon, Icons, Button, Input, Size  }
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import Sublayout from 'views/sublayout';
-import { idToProposal, ProposalType, proposalSlugToClass } from 'identifiers';
+import { ProposalType, ChainBase } from 'types';
+import { idToProposal, proposalSlugToClass } from 'identifiers';
 import { slugify } from 'utils';
 
 import Substrate from 'controllers/chain/substrate/main';
@@ -23,7 +24,6 @@ import {
   OffchainThreadStage,
   AnyProposal,
   Account,
-  ChainBase,
   ChainEntity,
   ProposalModule,
   DepositVote,

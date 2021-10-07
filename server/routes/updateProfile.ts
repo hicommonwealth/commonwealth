@@ -4,13 +4,12 @@ import {
   PROFILE_BIO_MAX_CHARS,
   PROFILE_HEADLINE_MAX_CHARS,
   PROFILE_NAME_MAX_CHARS,
-  PROFILE_NAME_MIN_CHARS
+  PROFILE_NAME_MIN_CHARS,
+  ChainBase,
 } from '../../shared/types';
 import IdentityFetchCache from '../util/identityFetchCache';
 import { DB } from '../database';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
-
-const { Op } = Sequelize;
 
 export const Errors = {
   MissingParams: 'Must specify chain, address, and data',
@@ -97,7 +96,7 @@ const updateProfile = async (
 
   // new profiles on substrate chains get added to the identity cache
   // to be fetched by chain-event nodes or on a timer job
-  if (!req.body.skipChainFetch && chain.base === 'substrate') {
+  if (!req.body.skipChainFetch && chain.base === ChainBase.Substrate) {
     await identityFetchCache.add(req.body.chain, req.body.address);
   }
 

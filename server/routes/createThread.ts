@@ -2,7 +2,7 @@ import moment from 'moment';
 
 import { Request, Response, NextFunction } from 'express';
 import BN from 'bn.js';
-import { NotificationCategories, ProposalType } from '../../shared/types';
+import { NotificationCategories, ProposalType, ChainType } from '../../shared/types';
 
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
@@ -10,7 +10,6 @@ import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
 import { parseUserMentions } from '../util/parseUserMentions';
 import TokenBalanceCache from '../util/tokenBalanceCache';
 import { DB } from '../database';
-
 import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -140,7 +139,7 @@ const createThread = async (
     }
   }
 
-  if (chain && chain.type === 'token') {
+  if (chain && chain.type === ChainType.Token) {
     // skip check for admins
     const isAdmin = await models.Role.findAll({
       where: {

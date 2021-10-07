@@ -7,7 +7,8 @@ import moment from 'moment';
 import { Checkbox, Button, Icons, ListItem, Table, Tag, Grid, Col, SelectList, RadioGroup } from 'construct-ui';
 
 import app from 'state';
-import { NotificationSubscription, ChainInfo, CommunityInfo, ChainNetwork } from 'models';
+import { ChainNetwork } from 'types';
+import { NotificationSubscription, ChainInfo, CommunityInfo } from 'models';
 import { NotificationCategories } from 'types';
 
 import { link, pluralize } from 'helpers';

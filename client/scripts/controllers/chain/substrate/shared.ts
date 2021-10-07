@@ -20,13 +20,13 @@ import { ApiOptions, Signer, SubmittableExtrinsic, VoidFn } from '@polkadot/api/
 
 import { formatCoin } from 'adapters/currency';
 import { BlocktimeHelper } from 'helpers';
+import { ChainNetwork } from 'types';
 import {
   NodeInfo,
   ITXModalData,
   TransactionStatus,
   IChainModule,
   ITXData,
-  ChainNetwork,
 } from 'models';
 
 import { SubstrateEvents } from '@commonwealth/chain-events';

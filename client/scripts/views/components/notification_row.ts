@@ -9,10 +9,9 @@ import { CWEvent, Label as ChainEventLabel } from '@commonwealth/chain-events';
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import { NotificationCategories } from 'types';
-import { ProposalType } from 'identifiers';
 import { Notification, AddressInfo } from 'models';
 import { link, pluralize } from 'helpers';
-import { IPostNotificationData } from 'shared/types';
+import { IPostNotificationData, ProposalType } from 'types';
 
 import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';

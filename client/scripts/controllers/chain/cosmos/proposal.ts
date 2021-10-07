@@ -20,6 +20,7 @@ import {
   ICosmosProposal, CosmosToken, CosmosVoteChoice, CosmosProposalState
 } from 'controllers/chain/cosmos/types';
 import moment from 'moment';
+import { ProposalType } from 'types';
 import CosmosAccount from './account';
 import CosmosAccounts from './accounts';
 import CosmosChain, { CosmosApiType } from './chain';
@@ -100,7 +101,7 @@ export class CosmosProposal extends Proposal<
   private _Governance: CosmosGovernance;
 
   constructor(ChainInfo: CosmosChain, Accounts: CosmosAccounts, Governance: CosmosGovernance, data: ICosmosProposal) {
-    super('cosmosproposal', data);
+    super(ProposalType.CosmosProposal, data);
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._Governance = Governance;
