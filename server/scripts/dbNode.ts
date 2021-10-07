@@ -450,7 +450,7 @@ async function initializer(): Promise<void> {
   numWorkers = ceNodes.length;
 
   let mostRecentDate = new Date(ceNodes[0].created_at);
-  let newestDyno;
+  let newestDyno = ceNodes[0];
   for (const dyno of ceNodes) {
     const dynoCreated = new Date(dyno.created_at);
     if (mostRecentDate > dynoCreated) {
