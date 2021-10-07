@@ -444,7 +444,10 @@ async function initializer(): Promise<void> {
     .indexOf(process.env.HEROKU_DYNO_ID);
   numWorkers = ceNodes.length;
 
-  if (numWorkers !== Number(process.env.NUM_WORKERS)) {
+  if (
+    numWorkers !== Number(process.env.NUM_WORKERS) &&
+    ceNodes[0].id === process.env.HEROKU_DYNO_ID // prevents race condition by only allowing worker number 0 to update the config var
+  ) {
     const result = await fetch(
       'https://api.heroku.com/apps/commonwealth-staging2/config-vars',
       {
