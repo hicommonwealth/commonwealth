@@ -27,8 +27,9 @@ import EthereumAccounts from '../accounts';
 import CompoundChain from './chain';
 
 export enum CompoundVote {
+  NO = 0,
   YES = 1,
-  NO = 0
+  ABSTAIN = 2,
 }
 
 export class CompoundProposalVote implements IVote<EthereumCoin> {
@@ -77,7 +78,9 @@ export default class CompoundProposal extends Proposal<
   private _Chain: CompoundChain;
   private _Gov: CompoundGovernance;
 
-  public get shortIdentifier() { return `${capitalize(this._Accounts?.app.activeChainId())}Proposal-${this.data.identifier}`; }
+  public get shortIdentifier() {
+    return `${capitalize(this._Accounts?.app.activeChainId())}Proposal-${this.data.identifier}`;
+  }
   public get title(): string {
     try {
       const parsed = JSON.parse(this.data.description);
@@ -332,8 +335,8 @@ export default class CompoundProposal extends Proposal<
     const address = this._Gov.app.user.activeAccount.address;
     const contract = await attachSigner(this._Gov.app.wallets, address, this._Gov.api.Contract);
 
-    const gasLimit = await contract.estimateGas.execute(this.data.identifier);
-    const tx = await contract.execute(
+    const gasLimit = await contract.estimateGas['execute(uint256)'](this.data.identifier);
+    const tx = await contract['execute(uint256)'](
       this.data.identifier,
       { gasLimit }
     );
@@ -362,11 +365,11 @@ export default class CompoundProposal extends Proposal<
 
     const gasLimit = await contract.estimateGas.castVote(
       this.data.identifier,
-      !!vote.choice
+      vote.choice
     );
     const tx = await contract.castVote(
       this.data.identifier,
-      !!vote.choice,
+      vote.choice,
       { gasLimit },
     );
     const txReceipt = await tx.wait();

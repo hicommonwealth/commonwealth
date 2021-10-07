@@ -29,7 +29,6 @@ export default class CompoundGovernance extends ProposalModule<
   // CONSTANTS
   private _quorumVotes: BN;
   private _proposalThreshold: BN;
-  private _proposalMaxOperations: BN;
   private _votingDelay: BN;
   private _votingPeriod: BN;
   // private _gracePeriod: BN;
@@ -42,7 +41,6 @@ export default class CompoundGovernance extends ProposalModule<
   // Contract Constants
   public get quorumVotes() { return this._quorumVotes; }
   public get proposalThreshold() { return this._proposalThreshold; }
-  public get proposalMaxOperations() { return this._proposalMaxOperations; }
   public get votingDelay() { return this._votingDelay; }
   public get votingPeriod() { return this._votingPeriod; }
   // public get gracePeriod() { return this._gracePeriod; }
@@ -70,8 +68,14 @@ export default class CompoundGovernance extends ProposalModule<
       throw new Error('applicant cannot be 0');
     }
 
-    const gasLimit = await contract.estimateGas.propose(targets, values, signatures, calldatas, description);
-    const tx = await contract.propose(
+    const gasLimit = await contract.estimateGas['propose(address[],uint256[],string[],bytes[],string)'](
+      targets,
+      values,
+      signatures,
+      calldatas,
+      description,
+    );
+    const tx = await contract['propose(address[],uint256[],string[],bytes[],string)'](
       targets, values, signatures, calldatas, description,
       { gasLimit },
     );
@@ -96,7 +100,6 @@ export default class CompoundGovernance extends ProposalModule<
 
     this._quorumVotes = new BN((await this._api.Contract.quorumVotes()).toString());
     this._proposalThreshold = new BN((await this._api.Contract.proposalThreshold()).toString());
-    this._proposalMaxOperations = new BN((await this._api.Contract.proposalMaxOperations()).toString());
     this._votingDelay = new BN((await this._api.Contract.votingDelay()).toString());
     this._votingPeriod = new BN((await this._api.Contract.votingPeriod()).toString());
     // this._gracePeriod = new BN((await this._api.Timelock.GRACE_PERIOD()).toString());

@@ -1,5 +1,5 @@
 import BN from 'bn.js';
-import { GovernorAlpha__factory } from 'eth/types';
+import { IGovernorCompatibilityBravo__factory } from 'eth/types';
 import { NodeInfo } from 'models';
 import EthereumChain from '../chain';
 import { attachSigner } from '../contractApi';
@@ -15,7 +15,7 @@ export default class CompoundChain extends EthereumChain {
     await super.resetApi(selectedNode);
     await super.initMetadata();
     this.compoundApi = new CompoundAPI(
-      GovernorAlpha__factory.connect,
+      IGovernorCompatibilityBravo__factory.connect,
       selectedNode.address,
       this.api.currentProvider as any
     );
@@ -40,18 +40,23 @@ export default class CompoundChain extends EthereumChain {
   }
 
   public async setDelegate(address: string, amount: number) {
-    try {
-      const contract = await attachSigner(
-        this.app.wallets,
-        this.app.user.activeAccount.address,
-        this.compoundApi.Token,
-      );
-      const gasLimit = await contract.estimateGas.delegate(address, amount);
-      await contract.delegate(address, amount, { gasLimit });
-    } catch (e) {
-      console.error(e);
-      throw new Error(e);
+    // eslint-disable-next-line no-constant-condition
+    if (true || !this.compoundApi.Token) {
+      throw new Error('Cannot delegate, no token found!');
     }
+    // try {
+    //   const contract = await attachSigner(
+    //     this.app.wallets,
+    //     this.app.user.activeAccount.address,
+    //     this.compoundApi.Token
+    //   );
+    //   // TODO: convert this to amountless
+    //   const gasLimit = await contract.estimateGas.delegate(address, amount);
+    //   await contract.delegate(address, amount, { gasLimit });
+    // } catch (e) {
+    //   console.error(e);
+    //   throw new Error(e);
+    // }
   }
 
   public async getDelegate(): Promise<string> {
