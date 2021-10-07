@@ -1,13 +1,18 @@
-import * as yargs from 'yargs';
+import { createListener, LoggingHandler, SupportedNetwork } from '../src';
 
-import { createListener, EventSupportingChains, LoggingHandler } from '../src';
+import * as yargs from 'yargs';
 
 const { argv } = yargs.options({
   network: {
     alias: 'n',
-    choices: EventSupportingChains,
+    choices: Object.values(SupportedNetwork),
     demandOption: true,
-    description: 'chain to listen on',
+    description: 'network to listen on',
+  },
+  chain: {
+    alias: 'c',
+    type: 'string',
+    description: 'name of chain to listen on',
   },
   url: {
     alias: 'u',
@@ -15,12 +20,12 @@ const { argv } = yargs.options({
     description: 'node url',
   },
   contractAddress: {
-    alias: 'c',
+    alias: 'a',
     type: 'string',
     description: 'eth contract address',
   },
   tokenName: {
-    alias: 'a',
+    alias: 't',
     type: 'string',
     description:
       'Name of the token if network is erc20 and contractAddress is a erc20 token address',
@@ -30,7 +35,7 @@ const { argv } = yargs.options({
 async function main(): Promise<any> {
   let listener;
   try {
-    listener = await createListener(argv.network, {
+    listener = await createListener(argv.chain || 'dummyChain', argv.network, {
       url: argv.url,
       address: argv.contractAddress,
       tokenAddresses: [argv.contractAddress],

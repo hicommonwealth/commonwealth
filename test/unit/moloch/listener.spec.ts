@@ -9,7 +9,6 @@ import {
   Subscriber,
   Listener,
 } from '../../../src/chains/moloch';
-import { EventSupportingChainT } from '../../../src';
 import { networkUrls, contracts } from '../../../scripts/listenerUtils';
 import { TestHandler } from '../../util';
 
@@ -20,14 +19,6 @@ const { assert } = chai;
 describe.skip('Moloch listener class tests', () => {
   let listener;
   const handlerEmitter = new events.EventEmitter();
-
-  it('should throw if the chain is not a moloch chain', () => {
-    try {
-      const _listener = new Listener('randomChain' as EventSupportingChainT);
-    } catch (error) {
-      assert(String(error).includes('randomChain'));
-    }
-  });
 
   it('should create the moloch listener', () => {
     listener = new Listener('moloch');

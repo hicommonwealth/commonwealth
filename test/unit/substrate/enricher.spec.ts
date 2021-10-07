@@ -31,9 +31,9 @@ import {
   ReportIdOf,
 } from '@polkadot/types/interfaces/offences';
 
+import { SupportedNetwork } from '../../../src';
 import { Enrich } from '../../../src/chains/substrate/filters/enricher';
 import {
-  BlockNumber,
   EventKind,
   IdentityJudgement,
 } from '../../../src/chains/substrate/types';
@@ -685,6 +685,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: ['alice', 'bob'],
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         sender: 'alice',
@@ -708,6 +709,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: ['alice', 'bob'],
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         sender: 'alice',
@@ -731,6 +733,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: ['alice', 'bob'],
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         sender: 'alice',
@@ -763,6 +766,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         amount: '10000',
@@ -779,6 +783,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     assert.deepEqual(result, {
       blockNumber,
       includeAddresses: ['Alice'],
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         validator: 'Alice',
@@ -793,6 +798,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     assert.deepEqual(result, {
       blockNumber,
       includeAddresses: ['Alice'],
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         validator: 'Alice',
@@ -807,6 +813,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     assert.deepEqual(result, {
       blockNumber,
       includeAddresses: ['alice-stash'],
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         stash: 'alice-stash',
@@ -822,6 +829,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     assert.deepEqual(result, {
       blockNumber,
       includeAddresses: ['alice-stash'],
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         stash: 'alice-stash',
@@ -836,6 +844,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         era: 5,
@@ -860,6 +869,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     assert.deepEqual(result, {
       blockNumber,
       includeAddresses: ['target'],
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         who: 'delegator',
@@ -874,6 +884,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: ['charlie'],
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         proposalIndex: 1,
@@ -890,6 +901,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: ['alice'],
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         proposalIndex: 1,
@@ -903,6 +915,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         proposalIndex: 1,
@@ -915,6 +928,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         referendumIndex: 1,
@@ -930,6 +944,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         referendumIndex: 2,
@@ -949,6 +964,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: ['alice'],
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         referendumIndex: 1,
@@ -975,6 +991,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         referendumIndex: 1,
@@ -988,6 +1005,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         referendumIndex: 1,
@@ -1000,6 +1018,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         referendumIndex: 1,
@@ -1012,6 +1031,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         referendumIndex: 1,
@@ -1028,6 +1048,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: ['alice'],
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         proposalHash: 'hash',
@@ -1046,6 +1067,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         proposalHash: 'hash',
@@ -1059,6 +1081,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         proposalHash: 'hash',
@@ -1072,6 +1095,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         proposalHash: 'hash',
@@ -1086,6 +1110,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: ['bob'],
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         proposalHash: 'hash',
@@ -1102,6 +1127,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         proposalHash: 'tip-hash',
@@ -1119,6 +1145,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, extrinsic);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         proposalHash: 'tip-hash',
@@ -1133,6 +1160,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         proposalHash: 'tip-hash',
@@ -1146,6 +1174,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         proposalHash: 'tip-hash',
@@ -1160,6 +1189,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         proposalHash: 'tip-hash',
@@ -1172,6 +1202,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         proposalHash: 'tip-hash',
@@ -1189,6 +1220,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: ['alice'],
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         proposalIndex: 1,
@@ -1205,6 +1237,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         proposalIndex: 1,
@@ -1219,6 +1252,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         proposalIndex: 1,
@@ -1233,6 +1267,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         bountyIndex: 0,
@@ -1252,6 +1287,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         bountyIndex: 3,
@@ -1268,6 +1304,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         bountyIndex: 1,
@@ -1282,6 +1319,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         bountyIndex: 2,
@@ -1298,6 +1336,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         bountyIndex: 1,
@@ -1313,6 +1352,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         bountyIndex: 1,
@@ -1326,6 +1366,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         bountyIndex: 1,
@@ -1346,6 +1387,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         round: 10,
@@ -1360,6 +1402,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         round: 10,
@@ -1374,6 +1417,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: ['alice'],
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         round: 10,
@@ -1387,6 +1431,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         who: 'alice',
@@ -1399,6 +1444,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         who: 'alice',
@@ -1414,6 +1460,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: ['alice'],
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         collectiveName: 'council',
@@ -1439,6 +1486,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: ['alice'],
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         collectiveName: 'council',
@@ -1454,6 +1502,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         collectiveName: 'council',
@@ -1467,6 +1516,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         collectiveName: 'council',
@@ -1480,6 +1530,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         collectiveName: 'council',
@@ -1494,6 +1545,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         collectiveName: 'council',
@@ -1511,6 +1563,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: ['alice'],
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         proposer: 'alice',
@@ -1530,6 +1583,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         proposalHash: 'hash',
@@ -1544,6 +1598,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         proposalHash: 'hash',
@@ -1558,6 +1613,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         proposalHash: 'hash',
@@ -1573,6 +1629,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         pot: '1000',
@@ -1586,6 +1643,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         pot: '1000',
@@ -1602,6 +1660,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: ['alice'],
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         who: 'alice',
@@ -1619,6 +1678,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         who: 'alice',
@@ -1634,6 +1694,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: ['alice'],
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         who: 'alice',
@@ -1646,6 +1707,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         who: 'alice',
@@ -1664,6 +1726,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
 
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data: {
         kind,
         offenceKind: 'offline',

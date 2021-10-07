@@ -27,13 +27,6 @@ export interface ListenerOptions {
 
 export type Api = IAaveContracts;
 
-export const EventChains = [
-  'aave',
-  'aave-local',
-  'dydx-ropsten',
-  'dydx',
-] as const;
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type RawEvent = TypedEvent<any>;
 

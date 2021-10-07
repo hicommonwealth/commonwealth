@@ -1,5 +1,6 @@
 import chai from 'chai';
 
+import { SupportedNetwork } from '../../../src';
 import { Processor } from '../../../src/chains/aave/processor';
 import { Api, RawEvent, EventKind } from '../../../src/chains/aave/types';
 
@@ -30,6 +31,7 @@ describe('Aave Event Processor Tests', () => {
       {
         blockNumber,
         excludeAddresses: [],
+        network: SupportedNetwork.Aave,
         data: {
           kind,
           id,

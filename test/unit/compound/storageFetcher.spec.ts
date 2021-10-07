@@ -1,6 +1,7 @@
 import chai from 'chai';
 import { BigNumber, utils } from 'ethers';
 
+import { SupportedNetwork } from '../../../src';
 import { StorageFetcher } from '../../../src/chains/compound/storageFetcher';
 import {
   EventKind,
@@ -111,6 +112,7 @@ describe('Compound Storage Fetcher Tests', () => {
       {
         blockNumber: 200,
         excludeAddresses: [address],
+        network: SupportedNetwork.Compound,
         data: {
           id: '0x01',
           kind: EventKind.ProposalCreated,

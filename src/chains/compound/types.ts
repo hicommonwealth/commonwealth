@@ -21,15 +21,6 @@ export enum BravoSupport {
 
 export type Api = GovernorAlpha;
 
-// TODO: clarify how this section works
-export const EventChains = [
-  'compound',
-  'marlin-local',
-  'marlin',
-  'uniswap',
-  'tribe',
-] as const;
-
 // options for the listener class
 export interface ListenerOptions {
   url: string;

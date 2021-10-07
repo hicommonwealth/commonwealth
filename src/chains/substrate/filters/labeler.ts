@@ -1,7 +1,7 @@
 import BN from 'bn.js';
 
 import { IEventLabel, LabelerFilter } from '../../../interfaces';
-import { BalanceString, EventKind, IEventData, EventChains } from '../types';
+import { BalanceString, EventKind, IEventData } from '../types';
 
 function fmtAddr(addr: string) {
   if (!addr) return '';
@@ -45,7 +45,7 @@ function formatNumberShort(num: number) {
     : num.toString();
 }
 
-const getDenom = (chain: typeof EventChains[number]): string => {
+const getDenom = (chain: string): string => {
   switch (chain) {
     case 'clover':
       return 'CLV';
@@ -69,17 +69,12 @@ const getDenom = (chain: typeof EventChains[number]): string => {
     case 'polkadot-local':
       return 'tDOT';
     default: {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const _dummy: never = chain;
       throw new Error('invalid chain');
     }
   }
 };
 
-const edgBalanceFormatter = (
-  chain: typeof EventChains[number],
-  balance: BalanceString
-): string => {
+const edgBalanceFormatter = (chain: string, balance: BalanceString): string => {
   const denom = getDenom(chain);
   let dollar: BN;
   if (chain.startsWith('edgeware')) {
@@ -106,7 +101,7 @@ const edgBalanceFormatter = (
  */
 export const Label: LabelerFilter = (
   blockNumber: number,
-  chainId: typeof EventChains[number],
+  chainId: string,
   data: IEventData
 ): IEventLabel => {
   const balanceFormatter = (bal) => edgBalanceFormatter(chainId, bal);

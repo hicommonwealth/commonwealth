@@ -3,7 +3,7 @@ import { Contract, utils } from 'ethers';
 
 import { GovernorBravoDelegate as GovernorBravo } from '../../../contractTypes';
 import { TypedEventFilter } from '../../../contractTypes/commons';
-import { CWEvent } from '../../../interfaces';
+import { CWEvent, SupportedNetwork } from '../../../interfaces';
 import { EventKind, RawEvent, IEventData, Api } from '../types';
 
 type GetEventArgs<T> = T extends TypedEventFilter<infer Y, any> ? Y : never;
@@ -27,6 +27,7 @@ export async function Enrich(
       return {
         blockNumber,
         excludeAddresses: [],
+        network: SupportedNetwork.Compound,
         data: {
           kind,
           id: id.toHexString(),
@@ -71,6 +72,7 @@ export async function Enrich(
       return {
         blockNumber,
         excludeAddresses: [proposer],
+        network: SupportedNetwork.Compound,
         data: {
           kind,
           id: id.toHexString(),
@@ -93,6 +95,7 @@ export async function Enrich(
       return {
         blockNumber,
         excludeAddresses: [],
+        network: SupportedNetwork.Compound,
         data: {
           kind,
           id: id.toHexString(),
@@ -107,6 +110,7 @@ export async function Enrich(
       return {
         blockNumber,
         excludeAddresses: [],
+        network: SupportedNetwork.Compound,
         data: {
           kind,
           id: id.toHexString(),
@@ -125,6 +129,7 @@ export async function Enrich(
       return {
         blockNumber,
         excludeAddresses: [voter],
+        network: SupportedNetwork.Compound,
         data: {
           kind,
           voter,

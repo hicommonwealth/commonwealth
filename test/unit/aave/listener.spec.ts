@@ -9,7 +9,6 @@ import {
   Subscriber,
   Listener,
 } from '../../../src/chains/aave';
-import { EventSupportingChainT } from '../../../src';
 import { networkUrls, contracts } from '../../../scripts/listenerUtils';
 import { TestHandler } from '../../util';
 
@@ -20,17 +19,6 @@ const { assert } = chai;
 describe.skip('Aave listener class tests', () => {
   let listener;
   const handlerEmitter = new events.EventEmitter();
-
-  it('should throw if the chain is not an Aave based contract', () => {
-    try {
-      const _listener = new Listener(
-        'randomChain' as EventSupportingChainT,
-        contracts.aave
-      );
-    } catch (error) {
-      assert(String(error).includes('randomChain'));
-    }
-  });
 
   it('should create an Aave listener', () => {
     listener = new Listener('aave', contracts.aave, null, true, false);

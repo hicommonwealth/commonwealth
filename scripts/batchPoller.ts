@@ -2,7 +2,7 @@ import { spec } from '@edgeware/node-types';
 import { ApiPromise } from '@polkadot/api';
 import { LogGroupControlSettings } from 'typescript-logging';
 import {
-  chainSupportedBy, SubstrateEvents, EventSupportingChains, IEventHandler, IDisconnectedRange, CWEvent, SubstrateTypes
+  chainSupportedBy, SubstrateEvents, IEventHandler, IDisconnectedRange, CWEvent, SubstrateTypes
 } from '../dist/index';
 import { factoryControl } from '../dist/logging';
 
@@ -94,9 +94,6 @@ class StandaloneEventHandler extends IEventHandler {
 function main() {
   const args = process.argv.slice(2);
   const chain = args[0] || 'edgeware';
-  if (!chainSupportedBy(chain, EventSupportingChains)) {
-    throw new Error(`invalid chain: ${args[0]}`);
-  }
   console.log(`Listening to events on ${chain}.`);
 
   const networks = {
@@ -108,12 +105,10 @@ function main() {
   const url = networks[chain];
 
   if (!url) throw new Error(`no url for chain ${chain}`);
-  if (chainSupportedBy(chain, SubstrateEvents.Types.EventChains)) {
-    SubstrateEvents.createApi(url, spec).then(async (api) => {
-      await batchQuery(api, [ new StandaloneEventHandler() ]);
-      process.exit(0);
-    });
-  }
+  SubstrateEvents.createApi(url, spec).then(async (api) => {
+    await batchQuery(api, [ new StandaloneEventHandler() ]);
+    process.exit(0);
+  });
 }
 
 main();

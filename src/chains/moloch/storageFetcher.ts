@@ -1,6 +1,11 @@
 import EthDater from 'ethereum-block-by-date';
 
-import { CWEvent, IStorageFetcher, IDisconnectedRange } from '../../interfaces';
+import {
+  CWEvent,
+  IStorageFetcher,
+  IDisconnectedRange,
+  SupportedNetwork,
+} from '../../interfaces';
 import { factory, formatFilename } from '../../logging';
 import { Moloch1, Moloch2 } from '../../contractTypes';
 
@@ -46,6 +51,7 @@ export class StorageFetcher extends IStorageFetcher<Api> {
     if (this._isProposalV1(proposal)) {
       const proposedEvent: CWEvent<IEventData> = {
         blockNumber: startBlock,
+        network: SupportedNetwork.Moloch,
         data: {
           kind: EventKind.SubmitProposal,
           proposalIndex: index,
@@ -86,6 +92,7 @@ export class StorageFetcher extends IStorageFetcher<Api> {
 
         const abortedEvent: CWEvent<IEventData> = {
           blockNumber,
+          network: SupportedNetwork.Moloch,
           data: {
             kind: EventKind.Abort,
             proposalIndex: index,
@@ -117,6 +124,7 @@ export class StorageFetcher extends IStorageFetcher<Api> {
 
         const processedEvent: CWEvent<IEventData> = {
           blockNumber,
+          network: SupportedNetwork.Moloch,
           data: {
             kind: EventKind.ProcessProposal,
             proposalIndex: index,

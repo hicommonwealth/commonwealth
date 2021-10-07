@@ -33,26 +33,14 @@ export const ChainEventKinds = [
   ...AaveTypes.EventKinds,
   ...Erc20Types.EventKinds,
 ];
-export const EventSupportingChains = [
-  ...SubstrateTypes.EventChains,
-  ...MolochTypes.EventChains,
-  ...CompoundTypes.EventChains,
-  ...AaveTypes.EventChains,
-  ...Erc20Types.EventChains,
-] as const;
-export type EventSupportingChainT = typeof EventSupportingChains[number];
 
-export function chainSupportedBy<T extends readonly string[]>(
-  c: string,
-  eventChains: T
-): c is T[number] {
-  return eventChains.some((s) => s === c);
-}
-
-export function isSupportedChain(
-  chain: string
-): chain is EventSupportingChainT {
-  return chainSupportedBy(chain, EventSupportingChains);
+// eslint-disable-next-line no-shadow
+export enum SupportedNetwork {
+  Substrate = 'substrate',
+  Aave = 'aave',
+  Compound = 'compound',
+  Moloch = 'moloch',
+  ERC20 = 'erc20',
 }
 
 // eslint-disable-next-line no-shadow
@@ -69,7 +57,8 @@ export interface CWEvent<IEventData = IChainEventData> {
   excludeAddresses?: string[];
 
   data: IEventData;
-  chain?: EventSupportingChainT;
+  network: SupportedNetwork;
+  chain?: string;
   received?: number;
 }
 
@@ -112,7 +101,7 @@ export interface IDisconnectedRange {
 }
 
 export interface ISubscribeOptions<Api> {
-  chain: EventSupportingChainT;
+  chain: string;
   api: Api;
   handlers: IEventHandler<IChainEventData>[];
   skipCatchup?: boolean;
@@ -177,17 +166,17 @@ export interface IEventTitle {
 export type TitlerFilter = (kind: IChainEventKind) => IEventTitle;
 
 export function entityToFieldName(
-  chain: EventSupportingChainT,
+  network: SupportedNetwork,
   entity: IChainEntityKind
 ): string | null {
-  if (MolochTypes.EventChains.find((c) => c === chain)) {
+  if (network === SupportedNetwork.Compound) {
+    return 'id';
+  }
+  if (network === SupportedNetwork.Aave) {
+    return 'id';
+  }
+  if (network === SupportedNetwork.Moloch) {
     return 'proposalIndex';
-  }
-  if (CompoundTypes.EventChains.find((c) => c === chain)) {
-    return 'id';
-  }
-  if (AaveTypes.EventChains.find((c) => c === chain)) {
-    return 'id';
   }
   switch (entity) {
     case SubstrateTypes.EntityKind.DemocracyProposal: {
@@ -214,12 +203,6 @@ export function entityToFieldName(
     case SubstrateTypes.EntityKind.TipProposal: {
       return 'proposalHash';
     }
-    case MolochTypes.EntityKind.Proposal: {
-      return 'proposalIndex';
-    }
-    case CompoundTypes.EntityKind.Proposal: {
-      return 'id';
-    }
     default: {
       return null;
     }
@@ -227,10 +210,10 @@ export function entityToFieldName(
 }
 
 export function eventToEntity(
-  chain: EventSupportingChainT,
+  network: SupportedNetwork,
   event: IChainEventKind
 ): [IChainEntityKind, EntityEventKind] {
-  if (MolochTypes.EventChains.find((c) => c === chain)) {
+  if (network === SupportedNetwork.Moloch) {
     switch (event) {
       case MolochTypes.EventKind.SubmitProposal: {
         return [MolochTypes.EntityKind.Proposal, EntityEventKind.Create];
@@ -244,12 +227,11 @@ export function eventToEntity(
       case MolochTypes.EventKind.Abort: {
         return [MolochTypes.EntityKind.Proposal, EntityEventKind.Complete];
       }
-      default: {
+      default:
         return null;
-      }
     }
   }
-  if (CompoundTypes.EventChains.find((c) => c === chain)) {
+  if (network === SupportedNetwork.Compound) {
     switch (event) {
       case CompoundTypes.EventKind.ProposalCanceled: {
         return [CompoundTypes.EntityKind.Proposal, EntityEventKind.Complete];
@@ -266,12 +248,11 @@ export function eventToEntity(
       case CompoundTypes.EventKind.VoteCast: {
         return [CompoundTypes.EntityKind.Proposal, EntityEventKind.Vote];
       }
-      default: {
+      default:
         return null;
-      }
     }
   }
-  if (AaveTypes.EventChains.find((c) => c === chain)) {
+  if (network === SupportedNetwork.Aave) {
     switch (event) {
       case AaveTypes.EventKind.ProposalCreated: {
         return [AaveTypes.EntityKind.Proposal, EntityEventKind.Create];
@@ -286,189 +267,204 @@ export function eventToEntity(
       case AaveTypes.EventKind.ProposalCanceled: {
         return [AaveTypes.EntityKind.Proposal, EntityEventKind.Complete];
       }
+      default:
+        return null;
+    }
+  }
+  if (network === SupportedNetwork.Substrate) {
+    switch (event) {
+      // SUBSTRATE
+      // Democracy Events
+      case SubstrateTypes.EventKind.DemocracyProposed: {
+        return [
+          SubstrateTypes.EntityKind.DemocracyProposal,
+          EntityEventKind.Create,
+        ];
+      }
+      case SubstrateTypes.EventKind.DemocracyTabled: {
+        return [
+          SubstrateTypes.EntityKind.DemocracyProposal,
+          EntityEventKind.Complete,
+        ];
+      }
+
+      case SubstrateTypes.EventKind.DemocracyStarted: {
+        return [
+          SubstrateTypes.EntityKind.DemocracyReferendum,
+          EntityEventKind.Create,
+        ];
+      }
+      case SubstrateTypes.EventKind.DemocracyVoted: {
+        return [
+          SubstrateTypes.EntityKind.DemocracyReferendum,
+          EntityEventKind.Vote,
+        ];
+      }
+      case SubstrateTypes.EventKind.DemocracyPassed: {
+        return [
+          SubstrateTypes.EntityKind.DemocracyReferendum,
+          EntityEventKind.Update,
+        ];
+      }
+      case SubstrateTypes.EventKind.DemocracyNotPassed:
+      case SubstrateTypes.EventKind.DemocracyCancelled:
+      case SubstrateTypes.EventKind.DemocracyExecuted: {
+        return [
+          SubstrateTypes.EntityKind.DemocracyReferendum,
+          EntityEventKind.Complete,
+        ];
+      }
+
+      // Preimage Events
+      case SubstrateTypes.EventKind.PreimageNoted: {
+        return [
+          SubstrateTypes.EntityKind.DemocracyPreimage,
+          EntityEventKind.Create,
+        ];
+      }
+      case SubstrateTypes.EventKind.PreimageUsed:
+      case SubstrateTypes.EventKind.PreimageInvalid:
+      case SubstrateTypes.EventKind.PreimageReaped: {
+        return [
+          SubstrateTypes.EntityKind.DemocracyPreimage,
+          EntityEventKind.Complete,
+        ];
+      }
+
+      // Tip Events
+      case SubstrateTypes.EventKind.NewTip: {
+        return [SubstrateTypes.EntityKind.TipProposal, EntityEventKind.Create];
+      }
+      case SubstrateTypes.EventKind.TipVoted:
+      case SubstrateTypes.EventKind.TipClosing: {
+        return [SubstrateTypes.EntityKind.TipProposal, EntityEventKind.Update];
+      }
+      case SubstrateTypes.EventKind.TipClosed:
+      case SubstrateTypes.EventKind.TipRetracted:
+      case SubstrateTypes.EventKind.TipSlashed: {
+        return [
+          SubstrateTypes.EntityKind.TipProposal,
+          EntityEventKind.Complete,
+        ];
+      }
+
+      // Treasury Events
+      case SubstrateTypes.EventKind.TreasuryProposed: {
+        return [
+          SubstrateTypes.EntityKind.TreasuryProposal,
+          EntityEventKind.Create,
+        ];
+      }
+      case SubstrateTypes.EventKind.TreasuryRejected:
+      case SubstrateTypes.EventKind.TreasuryAwarded: {
+        return [
+          SubstrateTypes.EntityKind.TreasuryProposal,
+          EntityEventKind.Complete,
+        ];
+      }
+
+      // Bounty Events
+      case SubstrateTypes.EventKind.TreasuryBountyProposed: {
+        return [
+          SubstrateTypes.EntityKind.TreasuryBounty,
+          EntityEventKind.Create,
+        ];
+      }
+      case SubstrateTypes.EventKind.TreasuryBountyAwarded: {
+        return [
+          SubstrateTypes.EntityKind.TreasuryBounty,
+          EntityEventKind.Update,
+        ];
+      }
+      case SubstrateTypes.EventKind.TreasuryBountyBecameActive: {
+        return [
+          SubstrateTypes.EntityKind.TreasuryBounty,
+          EntityEventKind.Update,
+        ];
+      }
+      case SubstrateTypes.EventKind.TreasuryBountyCanceled: {
+        return [
+          SubstrateTypes.EntityKind.TreasuryBounty,
+          EntityEventKind.Complete,
+        ];
+      }
+      case SubstrateTypes.EventKind.TreasuryBountyClaimed: {
+        return [
+          SubstrateTypes.EntityKind.TreasuryBounty,
+          EntityEventKind.Complete,
+        ];
+      }
+      case SubstrateTypes.EventKind.TreasuryBountyExtended: {
+        return [
+          SubstrateTypes.EntityKind.TreasuryBounty,
+          EntityEventKind.Update,
+        ];
+      }
+      case SubstrateTypes.EventKind.TreasuryBountyRejected: {
+        return [
+          SubstrateTypes.EntityKind.TreasuryBounty,
+          EntityEventKind.Complete,
+        ];
+      }
+
+      // Collective Events
+      case SubstrateTypes.EventKind.CollectiveProposed: {
+        return [
+          SubstrateTypes.EntityKind.CollectiveProposal,
+          EntityEventKind.Create,
+        ];
+      }
+      case SubstrateTypes.EventKind.CollectiveVoted: {
+        return [
+          SubstrateTypes.EntityKind.CollectiveProposal,
+          EntityEventKind.Vote,
+        ];
+      }
+      case SubstrateTypes.EventKind.CollectiveApproved: {
+        return [
+          SubstrateTypes.EntityKind.CollectiveProposal,
+          EntityEventKind.Update,
+        ];
+      }
+      case SubstrateTypes.EventKind.CollectiveDisapproved:
+      case SubstrateTypes.EventKind.CollectiveExecuted: {
+        return [
+          SubstrateTypes.EntityKind.CollectiveProposal,
+          EntityEventKind.Complete,
+        ];
+      }
+
+      // Signaling Events
+      case SubstrateTypes.EventKind.SignalingNewProposal: {
+        return [
+          SubstrateTypes.EntityKind.SignalingProposal,
+          EntityEventKind.Create,
+        ];
+      }
+      case SubstrateTypes.EventKind.SignalingCommitStarted:
+      case SubstrateTypes.EventKind.SignalingVotingStarted: {
+        return [
+          SubstrateTypes.EntityKind.SignalingProposal,
+          EntityEventKind.Update,
+        ];
+      }
+      case SubstrateTypes.EventKind.SignalingVotingCompleted: {
+        return [
+          SubstrateTypes.EntityKind.SignalingProposal,
+          EntityEventKind.Complete,
+        ];
+      }
       default: {
         return null;
       }
     }
   }
-  switch (event) {
-    // Democracy Events
-    case SubstrateTypes.EventKind.DemocracyProposed: {
-      return [
-        SubstrateTypes.EntityKind.DemocracyProposal,
-        EntityEventKind.Create,
-      ];
-    }
-    case SubstrateTypes.EventKind.DemocracyTabled: {
-      return [
-        SubstrateTypes.EntityKind.DemocracyProposal,
-        EntityEventKind.Complete,
-      ];
-    }
-
-    case SubstrateTypes.EventKind.DemocracyStarted: {
-      return [
-        SubstrateTypes.EntityKind.DemocracyReferendum,
-        EntityEventKind.Create,
-      ];
-    }
-    case SubstrateTypes.EventKind.DemocracyVoted: {
-      return [
-        SubstrateTypes.EntityKind.DemocracyReferendum,
-        EntityEventKind.Vote,
-      ];
-    }
-    case SubstrateTypes.EventKind.DemocracyPassed: {
-      return [
-        SubstrateTypes.EntityKind.DemocracyReferendum,
-        EntityEventKind.Update,
-      ];
-    }
-    case SubstrateTypes.EventKind.DemocracyNotPassed:
-    case SubstrateTypes.EventKind.DemocracyCancelled:
-    case SubstrateTypes.EventKind.DemocracyExecuted: {
-      return [
-        SubstrateTypes.EntityKind.DemocracyReferendum,
-        EntityEventKind.Complete,
-      ];
-    }
-
-    // Preimage Events
-    case SubstrateTypes.EventKind.PreimageNoted: {
-      return [
-        SubstrateTypes.EntityKind.DemocracyPreimage,
-        EntityEventKind.Create,
-      ];
-    }
-    case SubstrateTypes.EventKind.PreimageUsed:
-    case SubstrateTypes.EventKind.PreimageInvalid:
-    case SubstrateTypes.EventKind.PreimageReaped: {
-      return [
-        SubstrateTypes.EntityKind.DemocracyPreimage,
-        EntityEventKind.Complete,
-      ];
-    }
-
-    // Tip Events
-    case SubstrateTypes.EventKind.NewTip: {
-      return [SubstrateTypes.EntityKind.TipProposal, EntityEventKind.Create];
-    }
-    case SubstrateTypes.EventKind.TipVoted:
-    case SubstrateTypes.EventKind.TipClosing: {
-      return [SubstrateTypes.EntityKind.TipProposal, EntityEventKind.Update];
-    }
-    case SubstrateTypes.EventKind.TipClosed:
-    case SubstrateTypes.EventKind.TipRetracted:
-    case SubstrateTypes.EventKind.TipSlashed: {
-      return [SubstrateTypes.EntityKind.TipProposal, EntityEventKind.Complete];
-    }
-
-    // Treasury Events
-    case SubstrateTypes.EventKind.TreasuryProposed: {
-      return [
-        SubstrateTypes.EntityKind.TreasuryProposal,
-        EntityEventKind.Create,
-      ];
-    }
-    case SubstrateTypes.EventKind.TreasuryRejected:
-    case SubstrateTypes.EventKind.TreasuryAwarded: {
-      return [
-        SubstrateTypes.EntityKind.TreasuryProposal,
-        EntityEventKind.Complete,
-      ];
-    }
-
-    // Bounty Events
-    case SubstrateTypes.EventKind.TreasuryBountyProposed: {
-      return [SubstrateTypes.EntityKind.TreasuryBounty, EntityEventKind.Create];
-    }
-    case SubstrateTypes.EventKind.TreasuryBountyAwarded: {
-      return [SubstrateTypes.EntityKind.TreasuryBounty, EntityEventKind.Update];
-    }
-    case SubstrateTypes.EventKind.TreasuryBountyBecameActive: {
-      return [SubstrateTypes.EntityKind.TreasuryBounty, EntityEventKind.Update];
-    }
-    case SubstrateTypes.EventKind.TreasuryBountyCanceled: {
-      return [
-        SubstrateTypes.EntityKind.TreasuryBounty,
-        EntityEventKind.Complete,
-      ];
-    }
-    case SubstrateTypes.EventKind.TreasuryBountyClaimed: {
-      return [
-        SubstrateTypes.EntityKind.TreasuryBounty,
-        EntityEventKind.Complete,
-      ];
-    }
-    case SubstrateTypes.EventKind.TreasuryBountyExtended: {
-      return [SubstrateTypes.EntityKind.TreasuryBounty, EntityEventKind.Update];
-    }
-    case SubstrateTypes.EventKind.TreasuryBountyRejected: {
-      return [
-        SubstrateTypes.EntityKind.TreasuryBounty,
-        EntityEventKind.Complete,
-      ];
-    }
-
-    // Collective Events
-    case SubstrateTypes.EventKind.CollectiveProposed: {
-      return [
-        SubstrateTypes.EntityKind.CollectiveProposal,
-        EntityEventKind.Create,
-      ];
-    }
-    case SubstrateTypes.EventKind.CollectiveVoted: {
-      return [
-        SubstrateTypes.EntityKind.CollectiveProposal,
-        EntityEventKind.Vote,
-      ];
-    }
-    case SubstrateTypes.EventKind.CollectiveApproved: {
-      return [
-        SubstrateTypes.EntityKind.CollectiveProposal,
-        EntityEventKind.Update,
-      ];
-    }
-    case SubstrateTypes.EventKind.CollectiveDisapproved:
-    case SubstrateTypes.EventKind.CollectiveExecuted: {
-      return [
-        SubstrateTypes.EntityKind.CollectiveProposal,
-        EntityEventKind.Complete,
-      ];
-    }
-
-    // Signaling Events
-    case SubstrateTypes.EventKind.SignalingNewProposal: {
-      return [
-        SubstrateTypes.EntityKind.SignalingProposal,
-        EntityEventKind.Create,
-      ];
-    }
-    case SubstrateTypes.EventKind.SignalingCommitStarted:
-    case SubstrateTypes.EventKind.SignalingVotingStarted: {
-      return [
-        SubstrateTypes.EntityKind.SignalingProposal,
-        EntityEventKind.Update,
-      ];
-    }
-    case SubstrateTypes.EventKind.SignalingVotingCompleted: {
-      return [
-        SubstrateTypes.EntityKind.SignalingProposal,
-        EntityEventKind.Complete,
-      ];
-    }
-    default: {
-      return null;
-    }
-  }
+  return null;
 }
 
-export function isEntityCompleted(
-  chain: EventSupportingChainT,
-  entityEvents: CWEvent<any>[]
-): boolean {
-  return entityEvents.some(({ data: { kind } }) => {
-    const entityData = eventToEntity(chain, kind);
+export function isEntityCompleted(entityEvents: CWEvent[]): boolean {
+  return entityEvents.some(({ network, data: { kind } }) => {
+    const entityData = eventToEntity(network, kind);
     return entityData && entityData[1] === EntityEventKind.Complete;
   });
 }

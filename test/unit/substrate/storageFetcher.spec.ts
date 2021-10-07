@@ -18,6 +18,7 @@ import { stringToHex } from '@polkadot/util';
 import { DeriveReferendum } from '@polkadot/api-derive/democracy/types';
 import { DeriveBounty } from '@polkadot/api-derive/types';
 
+import { SupportedNetwork } from '../../../src';
 import {
   EventKind,
   IDemocracyProposed,
@@ -353,6 +354,7 @@ describe('Edgeware Event Migration Tests', () => {
       [
         {
           blockNumber,
+          network: SupportedNetwork.Substrate,
           data: {
             kind: EventKind.DemocracyProposed,
             proposalIndex: 1,
@@ -363,6 +365,7 @@ describe('Edgeware Event Migration Tests', () => {
         },
         {
           blockNumber,
+          network: SupportedNetwork.Substrate,
           data: {
             kind: EventKind.DemocracyStarted,
             referendumIndex: 3,
@@ -373,6 +376,7 @@ describe('Edgeware Event Migration Tests', () => {
         },
         {
           blockNumber,
+          network: SupportedNetwork.Substrate,
           data: {
             kind: EventKind.DemocracyStarted,
             referendumIndex: 2,
@@ -383,6 +387,7 @@ describe('Edgeware Event Migration Tests', () => {
         },
         {
           blockNumber,
+          network: SupportedNetwork.Substrate,
           data: {
             kind: EventKind.DemocracyPassed,
             referendumIndex: 2,
@@ -391,6 +396,7 @@ describe('Edgeware Event Migration Tests', () => {
         },
         {
           blockNumber: 10,
+          network: SupportedNetwork.Substrate,
           data: {
             kind: EventKind.PreimageNoted,
             proposalHash: 'image-hash-1',
@@ -404,6 +410,7 @@ describe('Edgeware Event Migration Tests', () => {
         },
         {
           blockNumber: 20,
+          network: SupportedNetwork.Substrate,
           data: {
             kind: EventKind.PreimageNoted,
             proposalHash: 'hash1',
@@ -417,6 +424,7 @@ describe('Edgeware Event Migration Tests', () => {
         },
         {
           blockNumber,
+          network: SupportedNetwork.Substrate,
           data: {
             kind: EventKind.TreasuryProposed,
             proposalIndex: 3,
@@ -428,6 +436,7 @@ describe('Edgeware Event Migration Tests', () => {
         },
         {
           blockNumber,
+          network: SupportedNetwork.Substrate,
           data: {
             kind: EventKind.CollectiveProposed,
             collectiveName: 'council',
@@ -444,6 +453,7 @@ describe('Edgeware Event Migration Tests', () => {
         },
         {
           blockNumber,
+          network: SupportedNetwork.Substrate,
           data: {
             kind: EventKind.CollectiveVoted,
             collectiveName: 'council',
@@ -454,6 +464,7 @@ describe('Edgeware Event Migration Tests', () => {
         },
         {
           blockNumber,
+          network: SupportedNetwork.Substrate,
           data: {
             kind: EventKind.CollectiveVoted,
             collectiveName: 'council',
@@ -464,6 +475,7 @@ describe('Edgeware Event Migration Tests', () => {
         },
         {
           blockNumber,
+          network: SupportedNetwork.Substrate,
           data: {
             kind: EventKind.SignalingNewProposal,
             proposer: 'Inactive Author',
@@ -478,6 +490,7 @@ describe('Edgeware Event Migration Tests', () => {
         },
         {
           blockNumber,
+          network: SupportedNetwork.Substrate,
           data: {
             kind: EventKind.SignalingNewProposal,
             proposer: 'Active Author',
@@ -492,6 +505,7 @@ describe('Edgeware Event Migration Tests', () => {
         },
         {
           blockNumber,
+          network: SupportedNetwork.Substrate,
           data: {
             kind: EventKind.SignalingNewProposal,
             proposer: 'Completed Author',
@@ -506,6 +520,7 @@ describe('Edgeware Event Migration Tests', () => {
         },
         {
           blockNumber,
+          network: SupportedNetwork.Substrate,
           data: {
             kind: EventKind.SignalingVotingStarted,
             proposalHash: 'active-hash',
@@ -515,6 +530,7 @@ describe('Edgeware Event Migration Tests', () => {
         },
         {
           blockNumber,
+          network: SupportedNetwork.Substrate,
           data: {
             kind: EventKind.SignalingVotingStarted,
             proposalHash: 'completed-hash',
@@ -524,6 +540,7 @@ describe('Edgeware Event Migration Tests', () => {
         },
         {
           blockNumber,
+          network: SupportedNetwork.Substrate,
           data: {
             kind: EventKind.SignalingVotingCompleted,
             proposalHash: 'completed-hash',
@@ -532,6 +549,7 @@ describe('Edgeware Event Migration Tests', () => {
         },
         {
           blockNumber,
+          network: SupportedNetwork.Substrate,
           data: {
             kind: 'treasury-bounty-proposed',
             bountyIndex: 0,
@@ -545,6 +563,7 @@ describe('Edgeware Event Migration Tests', () => {
         },
         {
           blockNumber,
+          network: SupportedNetwork.Substrate,
           data: {
             kind: 'treasury-bounty-became-active',
             bountyIndex: 0,
@@ -554,6 +573,7 @@ describe('Edgeware Event Migration Tests', () => {
         },
         {
           blockNumber,
+          network: SupportedNetwork.Substrate,
           data: {
             kind: 'new-tip',
             proposalHash: 'tip-hash-1',
@@ -566,6 +586,7 @@ describe('Edgeware Event Migration Tests', () => {
         },
         {
           blockNumber,
+          network: SupportedNetwork.Substrate,
           data: {
             kind: 'new-tip',
             proposalHash: 'tip-hash-2',
@@ -578,6 +599,7 @@ describe('Edgeware Event Migration Tests', () => {
         },
         {
           blockNumber,
+          network: SupportedNetwork.Substrate,
           data: {
             kind: 'tip-voted',
             proposalHash: 'tip-hash-2',
@@ -587,6 +609,7 @@ describe('Edgeware Event Migration Tests', () => {
         },
         {
           blockNumber,
+          network: SupportedNetwork.Substrate,
           data: {
             kind: 'tip-voted',
             proposalHash: 'tip-hash-2',
@@ -596,6 +619,7 @@ describe('Edgeware Event Migration Tests', () => {
         },
         {
           blockNumber,
+          network: SupportedNetwork.Substrate,
           data: {
             kind: 'tip-closing',
             proposalHash: 'tip-hash-2',
@@ -621,6 +645,7 @@ describe('Edgeware Event Migration Tests', () => {
     assert.sameDeepMembers(events, [
       {
         blockNumber,
+        network: SupportedNetwork.Substrate,
         data: {
           kind: EventKind.IdentitySet,
           who: 'alice',
@@ -633,6 +658,7 @@ describe('Edgeware Event Migration Tests', () => {
       },
       {
         blockNumber,
+        network: SupportedNetwork.Substrate,
         data: {
           kind: EventKind.IdentitySet,
           who: 'charlie',

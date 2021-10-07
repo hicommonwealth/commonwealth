@@ -1,6 +1,7 @@
 import chai from 'chai';
 import { BigNumber } from 'ethers';
 
+import { SupportedNetwork } from '../../../src';
 import { Processor } from '../../../src/chains/compound/processor';
 import { Api, RawEvent, EventKind } from '../../../src/chains/compound/types';
 
@@ -31,6 +32,7 @@ describe('Compound Event Processor Tests', () => {
       {
         blockNumber,
         excludeAddresses: [],
+        network: SupportedNetwork.Compound,
         data: {
           kind,
           id: '0x05',

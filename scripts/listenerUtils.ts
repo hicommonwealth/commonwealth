@@ -41,6 +41,8 @@ export const networkSpecs: { [chain: string]: RegisteredTypes } = {
   'edgeware-local': EdgewareSpec,
   'edgeware-testnet': EdgewareSpec,
   stafi: StafiSpec,
+  kusama: {},
+  polkadot: {},
 };
 
 export const contracts = {

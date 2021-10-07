@@ -2,15 +2,14 @@
 /* eslint-disable no-console */
 
 import {
-  chainSupportedBy,
   IEventHandler,
   CWEvent,
   SubstrateEvents,
   CompoundEvents,
   MolochEvents,
-  EventSupportingChains,
   AaveEvents,
   Erc20Events,
+  SupportedNetwork,
 } from '../src/index';
 
 import { contracts, networkSpecs, networkUrls } from './listenerUtils';
@@ -26,8 +25,13 @@ const { argv } = yargs
   .options({
     network: {
       alias: 'n',
-      choices: EventSupportingChains,
+      choices: Object.values(SupportedNetwork),
       demandOption: true,
+      description: 'network listener to use',
+    },
+    chain: {
+      alias: 'c',
+      type: 'string',
       description: 'chain to listen on',
     },
     url: {
@@ -36,12 +40,12 @@ const { argv } = yargs
       description: 'node url',
     },
     contractAddress: {
-      alias: 'c',
+      alias: 'a',
       type: 'string',
       description: 'eth contract address',
     },
     archival: {
-      alias: 'a',
+      alias: 'A',
       type: 'boolean',
       description: 'run listener in archival mode or not',
     },
@@ -53,17 +57,24 @@ const { argv } = yargs
     },
   })
   .check((data) => {
-    if (
-      !chainSupportedBy(data.network, SubstrateEvents.Types.EventChains) &&
-      data.spec
-    ) {
-      throw new Error('cannot pass spec on non-substrate network');
+    if (!data.url && !data.chain) {
+      throw new Error('Must pass either URL or chain name!');
+    }
+    if (!networkUrls[data.chain] && !data.url) {
+      throw new Error(`no URL found for ${data.chain}`);
     }
     if (
-      !chainSupportedBy(data.network, MolochEvents.Types.EventChains) &&
-      data.contractAddress
+      data.network !== SupportedNetwork.Substrate &&
+      !data.contractAddress &&
+      !contracts[data.chain]
     ) {
-      throw new Error('cannot pass contract address on non-moloch network');
+      throw new Error(`no contract found for ${data.chain}`);
+    }
+    if (
+      data.network === SupportedNetwork.Substrate &&
+      !networkSpecs[data.chain]
+    ) {
+      throw new Error(`no spec found for ${data.chain}`);
     }
     return true;
   });
@@ -72,9 +83,11 @@ const { archival } = argv;
 // if running in archival mode then which block shall we star from
 const startBlock: number = argv.startBlock ?? 0;
 const { network } = argv;
-const url: string = argv.url || networkUrls[network];
-const spec = networkSpecs[network] || {};
-const contract: string | undefined = argv.contractAddress || contracts[network];
+const chain = argv.chain || 'dummy';
+const url = argv.url || networkUrls[chain];
+const spec = networkSpecs[chain];
+const contract = argv.contractAddress || contracts[chain];
+
 class StandaloneEventHandler extends IEventHandler {
   // eslint-disable-next-line class-methods-use-this
   public async handle(event: CWEvent): Promise<null> {
@@ -105,8 +118,9 @@ async function getTokenLists() {
     .flat()
     .filter((o) => o);
 }
-console.log(`Connecting to ${network} on url ${url}...`);
-if (chainSupportedBy(network, SubstrateEvents.Types.EventChains)) {
+console.log(`Connecting to ${chain} on url ${url}...`);
+
+if (network === SupportedNetwork.Substrate) {
   SubstrateEvents.createApi(url, spec as any).then(async (api) => {
     const fetcher = new SubstrateEvents.StorageFetcher(api);
     try {
@@ -117,7 +131,7 @@ if (chainSupportedBy(network, SubstrateEvents.Types.EventChains)) {
       console.error(`Got error from fetcher: ${JSON.stringify(err, null, 2)}.`);
     }
     SubstrateEvents.subscribeEvents({
-      chain: network,
+      chain,
       api,
       handlers: [new StandaloneEventHandler()],
       skipCatchup,
@@ -127,9 +141,8 @@ if (chainSupportedBy(network, SubstrateEvents.Types.EventChains)) {
       enricherConfig: { balanceTransferThresholdPermill: 1_000 }, // 0.1% of total issuance
     });
   });
-} else if (chainSupportedBy(network, MolochEvents.Types.EventChains)) {
+} else if (network === SupportedNetwork.Moloch) {
   const contractVersion = 1;
-  if (!contract) throw new Error(`no contract address for ${network}`);
   MolochEvents.createApi(url, contractVersion, contract).then(async (api) => {
     const dater = new EthDater(api.provider);
     const fetcher = new MolochEvents.StorageFetcher(
@@ -149,7 +162,7 @@ if (chainSupportedBy(network, SubstrateEvents.Types.EventChains)) {
       console.error(`Got error from fetcher: ${JSON.stringify(err, null, 2)}.`);
     }
     MolochEvents.subscribeEvents({
-      chain: network,
+      chain,
       api,
       contractVersion,
       handlers: [new StandaloneEventHandler()],
@@ -157,8 +170,7 @@ if (chainSupportedBy(network, SubstrateEvents.Types.EventChains)) {
       verbose: true,
     });
   });
-} else if (chainSupportedBy(network, CompoundEvents.Types.EventChains)) {
-  if (!contract) throw new Error(`no contract address for ${network}`);
+} else if (network === SupportedNetwork.Compound) {
   CompoundEvents.createApi(url, contract).then(async (api) => {
     const fetcher = new CompoundEvents.StorageFetcher(api);
     try {
@@ -173,15 +185,14 @@ if (chainSupportedBy(network, SubstrateEvents.Types.EventChains)) {
       console.error(`Got error from fetcher: ${JSON.stringify(err, null, 2)}.`);
     }
     CompoundEvents.subscribeEvents({
-      chain: network,
+      chain,
       api,
       handlers: [new StandaloneEventHandler()],
       skipCatchup,
       verbose: true,
     });
   });
-} else if (chainSupportedBy(network, AaveEvents.Types.EventChains)) {
-  if (!contract) throw new Error(`no contract address for ${network}`);
+} else if (network === SupportedNetwork.Aave) {
   AaveEvents.createApi(url, contract).then(async (api) => {
     const fetcher = new AaveEvents.StorageFetcher(api);
     try {
@@ -196,20 +207,20 @@ if (chainSupportedBy(network, SubstrateEvents.Types.EventChains)) {
       console.error(`Got error from fetcher: ${JSON.stringify(err, null, 2)}.`);
     }
     AaveEvents.subscribeEvents({
-      chain: network,
+      chain,
       api,
       handlers: [new StandaloneEventHandler()],
       skipCatchup,
       verbose: true,
     });
   });
-} else if (chainSupportedBy(network, Erc20Events.Types.EventChains)) {
+} else if (network === SupportedNetwork.ERC20) {
   getTokenLists().then(async (tokens) => {
     const tokenAddresses = tokens.map((o) => o.address);
     const tokenNames = tokens.map((o) => o.name);
     const api = await Erc20Events.createApi(url, tokenAddresses, tokenNames);
     Erc20Events.subscribeEvents({
-      chain: network,
+      chain,
       api,
       handlers: [new StandaloneEventHandler()],
       skipCatchup,

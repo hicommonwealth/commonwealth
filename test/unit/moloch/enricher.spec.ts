@@ -1,5 +1,6 @@
 import chai from 'chai';
 
+import { SupportedNetwork } from '../../../src';
 import { EventKind, RawEvent, Api } from '../../../src/chains/moloch/types';
 import { Enrich } from '../../../src/chains/moloch/filters/enricher';
 
@@ -46,6 +47,7 @@ describe('Moloch Event Enricher Filter Tests', () => {
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: ['member'],
+      network: SupportedNetwork.Moloch,
       data: {
         kind,
         proposalIndex: 1,
@@ -72,6 +74,7 @@ describe('Moloch Event Enricher Filter Tests', () => {
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: ['member'],
+      network: SupportedNetwork.Moloch,
       data: {
         kind,
         proposalIndex: 1,
@@ -99,6 +102,7 @@ describe('Moloch Event Enricher Filter Tests', () => {
     const result = await Enrich(1, api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Moloch,
       data: {
         kind,
         proposalIndex: 1,
@@ -123,6 +127,7 @@ describe('Moloch Event Enricher Filter Tests', () => {
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: ['member'],
+      network: SupportedNetwork.Moloch,
       data: {
         kind,
         member: 'member',
@@ -141,6 +146,7 @@ describe('Moloch Event Enricher Filter Tests', () => {
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: ['applicant'],
+      network: SupportedNetwork.Moloch,
       data: {
         kind,
         proposalIndex: 1,
@@ -159,6 +165,7 @@ describe('Moloch Event Enricher Filter Tests', () => {
     assert.deepEqual(result, {
       blockNumber,
       includeAddresses: ['new-delegate'],
+      network: SupportedNetwork.Moloch,
       data: {
         kind,
         member: 'member',
@@ -176,6 +183,7 @@ describe('Moloch Event Enricher Filter Tests', () => {
     const result = await Enrich(1, api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
+      network: SupportedNetwork.Moloch,
       data: {
         kind,
         summoner: 'summoner',

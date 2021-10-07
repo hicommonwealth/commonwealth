@@ -1,6 +1,7 @@
 import chai from 'chai';
-import { BigNumber, utils } from 'ethers';
+import { BigNumber } from 'ethers';
 
+import { SupportedNetwork } from '../../../src';
 import { StorageFetcher } from '../../../src/chains/aave/storageFetcher';
 import {
   EventKind,
@@ -131,6 +132,7 @@ describe('Aave Storage Fetcher Tests', () => {
       {
         blockNumber: 5,
         excludeAddresses: ['creator'],
+        network: SupportedNetwork.Aave,
         data: {
           kind: EventKind.ProposalCreated,
           id: 1,
@@ -149,6 +151,7 @@ describe('Aave Storage Fetcher Tests', () => {
       {
         blockNumber: 100,
         excludeAddresses: [],
+        network: SupportedNetwork.Aave,
         data: {
           kind: EventKind.ProposalCanceled,
           id: 1,

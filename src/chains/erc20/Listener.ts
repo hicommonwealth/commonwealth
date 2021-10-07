@@ -1,15 +1,10 @@
-import {
-  chainSupportedBy,
-  CWEvent,
-  EventSupportingChainT,
-} from '../../interfaces';
+import { CWEvent } from '../../interfaces';
 import { Listener as BaseListener } from '../../Listener';
 import { factory, formatFilename } from '../../logging';
 
 import {
   ListenerOptions as Erc20ListenerOptions,
   RawEvent,
-  EventChains as erc20Chains,
   IErc20Contracts,
   EventKind,
 } from './types';
@@ -30,18 +25,14 @@ export class Listener extends BaseListener<
   private readonly _options: Erc20ListenerOptions;
 
   constructor(
-    chain: EventSupportingChainT,
+    chain: string,
     tokenAddresses: string[],
     url?: string,
     tokenNames?: string[],
     enricherConfig?: EnricherConfig,
-    verbose?: boolean,
-    ignoreChainType?: boolean
+    verbose?: boolean
   ) {
     super(chain, verbose);
-    if (!ignoreChainType && !chainSupportedBy(this._chain, erc20Chains))
-      throw new Error(`${chain} is not an ERC20 token`);
-
     this._options = {
       url,
       tokenAddresses,

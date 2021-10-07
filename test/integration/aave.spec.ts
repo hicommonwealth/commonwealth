@@ -30,7 +30,12 @@ import {
   ITransfer,
 } from '../../src/chains/aave/types';
 import { subscribeEvents } from '../../src/chains/aave/subscribeFunc';
-import { IEventHandler, CWEvent, IChainEventData } from '../../src/interfaces';
+import {
+  IEventHandler,
+  CWEvent,
+  IChainEventData,
+  SupportedNetwork,
+} from '../../src/interfaces';
 import { StorageFetcher } from '../../src/chains/aave/storageFetcher';
 
 function getProvider(): providers.Web3Provider {
@@ -441,6 +446,7 @@ describe('Aave Event Integration Tests', () => {
       {
         blockNumber: 12,
         excludeAddresses: [addresses[0]],
+        network: SupportedNetwork.Aave,
         data: {
           kind: EventKind.ProposalCreated,
           id: cancelledId,
@@ -459,6 +465,7 @@ describe('Aave Event Integration Tests', () => {
       {
         blockNumber: 13,
         excludeAddresses: [],
+        network: SupportedNetwork.Aave,
         data: {
           kind: EventKind.ProposalCanceled,
           id: cancelledId,
@@ -467,6 +474,7 @@ describe('Aave Event Integration Tests', () => {
       {
         blockNumber: 14,
         excludeAddresses: [addresses[0]],
+        network: SupportedNetwork.Aave,
         data: {
           kind: EventKind.ProposalCreated,
           id: completedId,
@@ -485,6 +493,7 @@ describe('Aave Event Integration Tests', () => {
       {
         blockNumber: votingBlock + 1,
         excludeAddresses: [addresses[0]],
+        network: SupportedNetwork.Aave,
         data: {
           kind: EventKind.VoteEmitted,
           id: completedId,
@@ -496,6 +505,7 @@ describe('Aave Event Integration Tests', () => {
       {
         blockNumber: 32,
         excludeAddresses: [],
+        network: SupportedNetwork.Aave,
         data: {
           kind: EventKind.ProposalQueued,
           id: completedId,
@@ -505,6 +515,7 @@ describe('Aave Event Integration Tests', () => {
       {
         blockNumber: 38,
         excludeAddresses: [],
+        network: SupportedNetwork.Aave,
         data: {
           kind: EventKind.ProposalExecuted,
           id: completedId,

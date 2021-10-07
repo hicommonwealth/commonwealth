@@ -9,20 +9,6 @@ import { RegisteredTypes } from '@polkadot/types/types';
 
 import { EnricherConfig } from './filters/enricher';
 
-export const EventChains = [
-  'clover',
-  'edgeware',
-  'edgeware-local',
-  'edgeware-testnet',
-  'hydradx',
-  'kusama',
-  'kusama-local',
-  'polkadot',
-  'polkadot-local',
-  'kulupu',
-  'stafi',
-] as const;
-
 export interface ISubstrateListenerOptions {
   startBlock: number;
   skipCatchup: boolean;

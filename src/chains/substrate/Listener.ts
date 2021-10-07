@@ -1,22 +1,11 @@
 import { ApiPromise } from '@polkadot/api';
 import { RegisteredTypes } from '@polkadot/types/types';
 
-import {
-  chainSupportedBy,
-  CWEvent,
-  EventSupportingChainT,
-  IDisconnectedRange,
-  IEventPoller,
-} from '../../interfaces';
+import { CWEvent, IDisconnectedRange, IEventPoller } from '../../interfaces';
 import { Listener as BaseListener } from '../../Listener';
 import { factory, formatFilename } from '../../logging';
 
-import {
-  EventChains as SubstrateChains,
-  EventKind,
-  Block,
-  ISubstrateListenerOptions,
-} from './types';
+import { EventKind, Block, ISubstrateListenerOptions } from './types';
 
 import {
   createApi,
@@ -44,7 +33,7 @@ export class Listener extends BaseListener<
   public discoverReconnectRange: (chain: string) => Promise<IDisconnectedRange>;
 
   constructor(
-    chain: EventSupportingChainT,
+    chain: string,
     url?: string,
     spec?: RegisteredTypes,
     archival?: boolean,
@@ -52,14 +41,9 @@ export class Listener extends BaseListener<
     skipCatchup?: boolean,
     enricherConfig?: EnricherConfig,
     verbose?: boolean,
-    ignoreChainType?: boolean,
     discoverReconnectRange?: (c: string) => Promise<IDisconnectedRange>
   ) {
     super(chain, verbose);
-    // if ignoreChainType = true ignore the hard-coded EventChains type
-    if (!ignoreChainType && !chainSupportedBy(this._chain, SubstrateChains))
-      throw new Error(`${this._chain} is not a Substrate chain`);
-
     this._options = {
       archival: !!archival,
       startBlock: startBlock ?? 0,

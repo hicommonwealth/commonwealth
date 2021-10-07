@@ -1,11 +1,6 @@
 import EthDater from 'ethereum-block-by-date';
 
-import {
-  chainSupportedBy,
-  CWEvent,
-  EventSupportingChainT,
-  IDisconnectedRange,
-} from '../../interfaces';
+import { CWEvent, IDisconnectedRange } from '../../interfaces';
 import { Listener as BaseListener } from '../../Listener';
 import { factory, formatFilename } from '../../logging';
 
@@ -13,7 +8,6 @@ import {
   EventKind,
   Api,
   RawEvent,
-  EventChains as molochChains,
   ListenerOptions as MolochListenerOptions,
   IEventData,
 } from './types';
@@ -32,7 +26,7 @@ export class Listener extends BaseListener<
   private readonly _options: MolochListenerOptions;
 
   constructor(
-    chain: EventSupportingChainT,
+    chain: string,
     contractVersion?: 1 | 2,
     contractAddress?: string,
     url?: string,
@@ -41,9 +35,6 @@ export class Listener extends BaseListener<
     discoverReconnectRange?: (c: string) => Promise<IDisconnectedRange>
   ) {
     super(chain, verbose);
-    if (!chainSupportedBy(this._chain, molochChains))
-      throw new Error(`${this._chain} is not a moloch network`);
-
     this._options = {
       url,
       skipCatchup: !!skipCatchup,

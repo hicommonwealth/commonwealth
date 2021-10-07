@@ -4,7 +4,7 @@ import { hexToNumberString, hexToNumber as web3HexToNumber } from 'web3-utils';
 
 import { TypedEventFilter } from '../../../contractTypes/commons';
 import { Moloch1 } from '../../../contractTypes';
-import { CWEvent } from '../../../interfaces';
+import { CWEvent, SupportedNetwork } from '../../../interfaces';
 import { EventKind, RawEvent, IEventData, Api } from '../types';
 
 type GetEventArgs<T> = T extends TypedEventFilter<any, infer Y> ? Y : never;
@@ -57,6 +57,7 @@ export async function Enrich(
       return {
         blockNumber,
         excludeAddresses: [memberAddress],
+        network: SupportedNetwork.Moloch,
         data: {
           kind,
           proposalIndex: hexToNumber(proposalIndex),
@@ -81,6 +82,7 @@ export async function Enrich(
       return {
         blockNumber,
         excludeAddresses: [memberAddress],
+        network: SupportedNetwork.Moloch,
         data: {
           kind,
           proposalIndex: hexToNumber(proposalIndex),
@@ -104,6 +106,7 @@ export async function Enrich(
       const proposal = await (api as Moloch1).proposalQueue(proposalIndex);
       return {
         blockNumber,
+        network: SupportedNetwork.Moloch,
         data: {
           kind,
           proposalIndex: hexToNumber(proposalIndex),
@@ -125,6 +128,7 @@ export async function Enrich(
       return {
         blockNumber,
         excludeAddresses: [memberAddress],
+        network: SupportedNetwork.Moloch,
         data: {
           kind,
           member: memberAddress,
@@ -140,6 +144,7 @@ export async function Enrich(
       return {
         blockNumber,
         excludeAddresses: [applicantAddress],
+        network: SupportedNetwork.Moloch,
         data: {
           kind,
           proposalIndex: hexToNumber(proposalIndex),
@@ -157,6 +162,7 @@ export async function Enrich(
         // TODO: we only alert the new delegate that the key was changed
         //   ...is this correct?
         includeAddresses: [newDelegateKey],
+        network: SupportedNetwork.Moloch,
         data: {
           kind,
           member: memberAddress,
@@ -171,6 +177,7 @@ export async function Enrich(
       >;
       return {
         blockNumber,
+        network: SupportedNetwork.Moloch,
         data: {
           kind,
           summoner,

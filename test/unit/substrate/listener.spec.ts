@@ -10,7 +10,6 @@ import {
   Subscriber,
   Listener,
 } from '../../../src/chains/substrate';
-import { EventSupportingChainT } from '../../../src';
 import { networkUrls } from '../../../scripts/listenerUtils';
 import { TestHandler } from '../../util';
 
@@ -19,14 +18,6 @@ const { assert } = chai;
 describe.skip('Substrate listener class tests', () => {
   let listener;
   const handlerEmitter = new events.EventEmitter();
-
-  it('should throw if the chain is not a substrate chain', () => {
-    try {
-      const _listener = new Listener('randomChain' as EventSupportingChainT);
-    } catch (error) {
-      assert(String(error).includes('randomChain'));
-    }
-  });
 
   it('should create the substrate listener', () => {
     listener = new Listener(

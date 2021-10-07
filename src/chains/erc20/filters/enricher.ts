@@ -1,6 +1,6 @@
 import BN from 'bn.js';
 
-import { CWEvent } from '../../../interfaces';
+import { CWEvent, SupportedNetwork } from '../../../interfaces';
 import { TypedEventFilter } from '../../../contractTypes/commons';
 import { ERC20 } from '../../../contractTypes';
 import { EventKind, RawEvent, IEventData, IErc20Contracts } from '../types';
@@ -63,6 +63,7 @@ export async function Enrich(
       return {
         blockNumber,
         excludeAddresses,
+        network: SupportedNetwork.ERC20,
         data: {
           kind,
           owner,
@@ -96,6 +97,7 @@ export async function Enrich(
       return {
         blockNumber,
         excludeAddresses,
+        network: SupportedNetwork.ERC20,
         data: {
           kind,
           from,

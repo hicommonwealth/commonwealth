@@ -1,5 +1,6 @@
 import chai from 'chai';
 
+import { SupportedNetwork } from '../../../src';
 import { StorageFetcher } from '../../../src/chains/moloch/storageFetcher';
 import {
   ProposalV1,
@@ -71,6 +72,7 @@ describe('Moloch Storage Fetcher Tests', () => {
     assert.deepEqual(fetched, [
       {
         blockNumber: 3,
+        network: SupportedNetwork.Moloch,
         data: {
           kind: EventKind.SubmitProposal,
           proposalIndex: 0,
@@ -108,6 +110,7 @@ describe('Moloch Storage Fetcher Tests', () => {
     assert.deepEqual(fetched, [
       {
         blockNumber: 3,
+        network: SupportedNetwork.Moloch,
         data: {
           kind: EventKind.SubmitProposal,
           proposalIndex: 0,
@@ -121,6 +124,7 @@ describe('Moloch Storage Fetcher Tests', () => {
       },
       {
         blockNumber: 5,
+        network: SupportedNetwork.Moloch,
         data: {
           kind: EventKind.Abort,
           proposalIndex: 0,
@@ -155,6 +159,7 @@ describe('Moloch Storage Fetcher Tests', () => {
     assert.deepEqual(fetched, [
       {
         blockNumber: 3,
+        network: SupportedNetwork.Moloch,
         data: {
           kind: EventKind.SubmitProposal,
           proposalIndex: 0,
@@ -168,6 +173,7 @@ describe('Moloch Storage Fetcher Tests', () => {
       },
       {
         blockNumber: 8,
+        network: SupportedNetwork.Moloch,
         data: {
           kind: EventKind.ProcessProposal,
           proposalIndex: 0,
@@ -244,6 +250,7 @@ describe('Moloch Storage Fetcher Tests', () => {
       [
         {
           blockNumber: 12,
+          network: SupportedNetwork.Moloch,
           data: {
             kind: EventKind.SubmitProposal,
             proposalIndex: 1,
@@ -257,6 +264,7 @@ describe('Moloch Storage Fetcher Tests', () => {
         },
         {
           blockNumber: 17,
+          network: SupportedNetwork.Moloch,
           data: {
             kind: EventKind.ProcessProposal,
             proposalIndex: 1,
@@ -276,6 +284,7 @@ describe('Moloch Storage Fetcher Tests', () => {
       [
         {
           blockNumber: 102,
+          network: SupportedNetwork.Moloch,
           data: {
             kind: EventKind.SubmitProposal,
             proposalIndex: 2,
@@ -295,6 +304,7 @@ describe('Moloch Storage Fetcher Tests', () => {
     assert.sameDeepMembers(fetchedWithEnd, [
       {
         blockNumber: 12,
+        network: SupportedNetwork.Moloch,
         data: {
           kind: EventKind.SubmitProposal,
           proposalIndex: 1,
@@ -308,6 +318,7 @@ describe('Moloch Storage Fetcher Tests', () => {
       },
       {
         blockNumber: 17,
+        network: SupportedNetwork.Moloch,
         data: {
           kind: EventKind.ProcessProposal,
           proposalIndex: 1,
@@ -363,6 +374,7 @@ describe('Moloch Storage Fetcher Tests', () => {
     assert.sameDeepMembers(fetched, [
       {
         blockNumber: 12,
+        network: SupportedNetwork.Moloch,
         data: {
           kind: EventKind.SubmitProposal,
           proposalIndex: 1,
@@ -376,6 +388,7 @@ describe('Moloch Storage Fetcher Tests', () => {
       },
       {
         blockNumber: 17,
+        network: SupportedNetwork.Moloch,
         data: {
           kind: EventKind.ProcessProposal,
           proposalIndex: 1,
@@ -400,6 +413,7 @@ describe('Moloch Storage Fetcher Tests', () => {
       [
         {
           blockNumber: 3,
+          network: SupportedNetwork.Moloch,
           data: {
             kind: EventKind.SubmitProposal,
             proposalIndex: 0,
@@ -413,6 +427,7 @@ describe('Moloch Storage Fetcher Tests', () => {
         },
         {
           blockNumber: 8,
+          network: SupportedNetwork.Moloch,
           data: {
             kind: EventKind.ProcessProposal,
             proposalIndex: 0,
@@ -435,6 +450,7 @@ describe('Moloch Storage Fetcher Tests', () => {
       [
         {
           blockNumber: 12,
+          network: SupportedNetwork.Moloch,
           data: {
             kind: EventKind.SubmitProposal,
             proposalIndex: 1,
@@ -448,6 +464,7 @@ describe('Moloch Storage Fetcher Tests', () => {
         },
         {
           blockNumber: 17,
+          network: SupportedNetwork.Moloch,
           data: {
             kind: EventKind.ProcessProposal,
             proposalIndex: 1,

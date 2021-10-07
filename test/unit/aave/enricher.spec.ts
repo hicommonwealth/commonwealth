@@ -7,6 +7,7 @@ import {
   Api,
   DelegationType,
 } from '../../../src/chains/aave/types';
+import { SupportedNetwork } from '../../../src';
 import { Enrich } from '../../../src/chains/aave/filters/enricher';
 
 const { assert } = chai;
@@ -49,6 +50,7 @@ describe('Aave Event Enricher Filter Tests', () => {
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: ['sender'],
+      network: SupportedNetwork.Aave,
       data: {
         kind,
         id: 1,
@@ -76,6 +78,7 @@ describe('Aave Event Enricher Filter Tests', () => {
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: [],
+      network: SupportedNetwork.Aave,
       data: {
         kind,
         id: 1,
@@ -93,6 +96,7 @@ describe('Aave Event Enricher Filter Tests', () => {
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: [],
+      network: SupportedNetwork.Aave,
       data: {
         kind,
         id: 1,
@@ -112,6 +116,7 @@ describe('Aave Event Enricher Filter Tests', () => {
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: [],
+      network: SupportedNetwork.Aave,
       data: {
         kind,
         id: 1,
@@ -137,6 +142,7 @@ describe('Aave Event Enricher Filter Tests', () => {
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: [voter],
+      network: SupportedNetwork.Aave,
       data: {
         kind,
         id,
@@ -166,6 +172,7 @@ describe('Aave Event Enricher Filter Tests', () => {
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: [delegator],
+      network: SupportedNetwork.Aave,
       data: {
         kind,
         tokenAddress,
@@ -195,6 +202,7 @@ describe('Aave Event Enricher Filter Tests', () => {
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: [who],
+      network: SupportedNetwork.Aave,
       data: {
         kind,
         tokenAddress,
@@ -224,6 +232,7 @@ describe('Aave Event Enricher Filter Tests', () => {
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: [from],
+      network: SupportedNetwork.Aave,
       data: {
         kind,
         tokenAddress,
@@ -253,6 +262,7 @@ describe('Aave Event Enricher Filter Tests', () => {
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: [owner],
+      network: SupportedNetwork.Aave,
       data: {
         kind,
         tokenAddress,

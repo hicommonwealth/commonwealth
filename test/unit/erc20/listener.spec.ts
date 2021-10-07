@@ -4,7 +4,6 @@ import * as chai from 'chai';
 import dotenv from 'dotenv';
 
 import { Processor, Subscriber, Listener } from '../../../src/chains/erc20';
-import { EventSupportingChainT } from '../../../src';
 import { networkUrls } from '../../../scripts/listenerUtils';
 import { TestHandler } from '../../util';
 
@@ -20,21 +19,6 @@ const tokenNames = ['USDT', 'USDC'];
 describe.skip('Erc20 listener class tests', () => {
   let listener;
   const handlerEmitter = new events.EventEmitter();
-
-  it('should throw if the chain is not an Aave based contract', () => {
-    try {
-      // eslint-disable-next-line no-new
-      new Listener(
-        'randomChain' as EventSupportingChainT,
-        tokenAddresses,
-        networkUrls.erc20,
-        tokenNames,
-        {}
-      );
-    } catch (error) {
-      assert(String(error).includes('randomChain'));
-    }
-  });
 
   it('should create an Erc20 listener', () => {
     listener = new Listener(

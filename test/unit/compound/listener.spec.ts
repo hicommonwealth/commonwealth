@@ -9,7 +9,6 @@ import {
   Subscriber,
   Listener,
 } from '../../../src/chains/compound';
-import { EventSupportingChainT } from '../../../src';
 import { networkUrls, contracts } from '../../../scripts/listenerUtils';
 import { TestHandler } from '../../util';
 
@@ -20,17 +19,6 @@ const { assert } = chai;
 describe.skip('Compound listener class tests', () => {
   let listener;
   const handlerEmitter = new events.EventEmitter();
-
-  it('should throw if the chain is not a Compound based chain', () => {
-    try {
-      const _listener = new Listener(
-        'randomChain' as EventSupportingChainT,
-        contracts.marlin
-      );
-    } catch (error) {
-      assert(String(error).includes('randomChain'));
-    }
-  });
 
   it('should create a Compound listener', () => {
     listener = new Listener('marlin', contracts.marlin, null, true, false);

@@ -23,7 +23,6 @@ import { subscribeEvents } from '../../src/chains/moloch/subscribeFunc';
 import {
   IEventHandler,
   CWEvent,
-  EventSupportingChainT,
   IDisconnectedRange,
   IChainEventData,
 } from '../../src/interfaces';
@@ -93,7 +92,7 @@ async function setupSubscription(subscribe = true): Promise<ISetupData> {
   const handler = new MolochEventHandler(emitter);
   if (subscribe) {
     await subscribeEvents({
-      chain: 'test' as EventSupportingChainT,
+      chain: 'test',
       api,
       contractVersion: 1,
       handlers: [handler],
@@ -434,7 +433,7 @@ describe('Moloch Event Integration Tests', () => {
       startBlock: 0,
     });
     const subscription = await subscribeEvents({
-      chain: 'test' as EventSupportingChainT,
+      chain: 'test',
       api,
       contractVersion: 1,
       handlers: [handler],

@@ -75,7 +75,7 @@ export class StorageFetcher extends IStorageFetcher<Api> {
       return [];
     }
     log.info(
-      `Fetching Compound entities for range: ${range.startBlock}-${range.endBlock}.`
+      `Fetching Aave entities for range: ${range.startBlock}-${range.endBlock}.`
     );
 
     const proposalCreatedEvents = await this._api.governance.queryFilter(

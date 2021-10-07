@@ -2,6 +2,7 @@ import chai from 'chai';
 import { Header, EventRecord, Extrinsic } from '@polkadot/types/interfaces';
 import BN from 'bn.js';
 
+import { SupportedNetwork } from '../../../src';
 import { Processor } from '../../../src/chains/substrate/processor';
 import { EventKind, ISlash } from '../../../src/chains/substrate/types';
 
@@ -139,6 +140,7 @@ describe('Edgeware Event Processor Tests', () => {
               amount: '10000',
             } as ISlash,
             blockNumber: 1,
+            network: SupportedNetwork.Substrate,
             includeAddresses: ['Alice'],
           },
           {
@@ -151,6 +153,7 @@ describe('Edgeware Event Processor Tests', () => {
             },
             excludeAddresses: ['Alice'],
             blockNumber: 1,
+            network: SupportedNetwork.Substrate,
           },
         ]);
         assert.deepEqual(results[1], [
@@ -163,6 +166,7 @@ describe('Edgeware Event Processor Tests', () => {
               endBlock: 123,
             },
             blockNumber: 2,
+            network: SupportedNetwork.Substrate,
           },
           {
             data: {
@@ -172,6 +176,7 @@ describe('Edgeware Event Processor Tests', () => {
             },
             blockNumber: 2,
             excludeAddresses: ['Alice'],
+            network: SupportedNetwork.Substrate,
           },
         ]);
         done();

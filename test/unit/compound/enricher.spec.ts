@@ -1,6 +1,7 @@
 import chai from 'chai';
 import { utils, BigNumber } from 'ethers';
 
+import { SupportedNetwork } from '../../../src';
 import { EventKind, RawEvent, Api } from '../../../src/chains/compound/types';
 import { Enrich } from '../../../src/chains/compound/filters/enricher';
 
@@ -165,6 +166,7 @@ describe('Compound Event Enricher Filter Tests', () => {
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: [address],
+      network: SupportedNetwork.Compound,
       data: {
         kind,
         id: '0x01',
@@ -188,6 +190,7 @@ describe('Compound Event Enricher Filter Tests', () => {
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: [],
+      network: SupportedNetwork.Compound,
       data: {
         kind,
         id: '0x01',
@@ -203,6 +206,7 @@ describe('Compound Event Enricher Filter Tests', () => {
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: [],
+      network: SupportedNetwork.Compound,
       data: {
         kind,
         id: '0x01',
@@ -219,6 +223,7 @@ describe('Compound Event Enricher Filter Tests', () => {
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: [],
+      network: SupportedNetwork.Compound,
       data: {
         kind,
         id: '0x01',
@@ -239,6 +244,7 @@ describe('Compound Event Enricher Filter Tests', () => {
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: [voter],
+      network: SupportedNetwork.Compound,
       data: {
         kind,
         id: id.toHexString(),
@@ -262,6 +268,7 @@ describe('Compound Event Enricher Filter Tests', () => {
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: [voter],
+      network: SupportedNetwork.Compound,
       data: {
         kind,
         id: id.toHexString(),

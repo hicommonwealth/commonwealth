@@ -24,8 +24,6 @@ export interface ListenerOptions {
   enricherConfig: EnricherConfig;
 }
 
-export const EventChains = ['erc20'] as const;
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type RawEvent = TypedEvent<any>;
 

@@ -24,7 +24,12 @@ import { Codec } from '@polkadot/types/types';
 import { DeriveProposalImage } from '@polkadot/api-derive/types';
 import { isFunction, hexToString } from '@polkadot/util';
 
-import { CWEvent, IChainEntityKind, IStorageFetcher } from '../../interfaces';
+import {
+  CWEvent,
+  IChainEntityKind,
+  IStorageFetcher,
+  SupportedNetwork,
+} from '../../interfaces';
 import { factory, formatFilename } from '../../logging';
 
 import {
@@ -99,6 +104,7 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
           return {
             // use current block as "fake" set date
             blockNumber,
+            network: SupportedNetwork.Substrate,
             data: {
               kind: EventKind.IdentitySet,
               who: address,
@@ -253,7 +259,11 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
         .map(([prop, depositOpt]) => constructEvent(prop, depositOpt))
         .filter((e) => !!e);
       log.info(`Found ${proposedEvents.length} democracy proposals!`);
-      return proposedEvents.map((data) => ({ blockNumber, data }));
+      return proposedEvents.map((data) => ({
+        blockNumber,
+        network: SupportedNetwork.Substrate,
+        data,
+      }));
       // eslint-disable-next-line no-else-return
     } else {
       const publicProp = publicProps.find(([idx]) => +idx === +id);
@@ -268,6 +278,7 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
       return [
         {
           blockNumber,
+          network: SupportedNetwork.Substrate,
           data: evt,
         },
       ];
@@ -317,6 +328,7 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
     );
     const results = [...startEvents, ...passedEvents].map((data) => ({
       blockNumber,
+      network: SupportedNetwork.Substrate,
       data,
     }));
 
@@ -366,7 +378,11 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
     });
     const cwEvents = notedEvents
       .filter(([, data]) => !!data)
-      .map(([blockNumber, data]) => ({ blockNumber, data }));
+      .map(([blockNumber, data]) => ({
+        blockNumber,
+        network: SupportedNetwork.Substrate,
+        data,
+      }));
     log.info(`Found ${cwEvents.length} preimages!`);
     return cwEvents;
   }
@@ -394,6 +410,7 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
       return [
         {
           blockNumber,
+          network: SupportedNetwork.Substrate,
           data: {
             kind: EventKind.TreasuryProposed,
             proposalIndex: +id,
@@ -433,7 +450,11 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
       })
       .filter((e) => !!e);
     log.info(`Found ${proposedEvents.length} treasury proposals!`);
-    return proposedEvents.map((data) => ({ blockNumber, data }));
+    return proposedEvents.map((data) => ({
+      blockNumber,
+      network: SupportedNetwork.Substrate,
+      data,
+    }));
   }
 
   public async fetchBounties(
@@ -492,7 +513,11 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
     }
 
     // no easier way to only fetch one than to fetch em all
-    const results = events.map((data) => ({ blockNumber, data }));
+    const results = events.map((data) => ({
+      blockNumber,
+      network: SupportedNetwork.Substrate,
+      data,
+    }));
     if (id !== undefined) {
       const data = results.filter(
         ({ data: { bountyIndex } }) => bountyIndex === +id
@@ -588,7 +613,11 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
         log.error(`No collective proposal found with hash ${id}!`);
         return null;
       }
-      return events.map((data) => ({ blockNumber, data }));
+      return events.map((data) => ({
+        blockNumber,
+        network: SupportedNetwork.Substrate,
+        data,
+      }));
     }
 
     // fetch all
@@ -623,7 +652,11 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
         proposedEvents.length - nProposalEvents
       } votes!`
     );
-    return proposedEvents.map((data) => ({ blockNumber, data }));
+    return proposedEvents.map((data) => ({
+      blockNumber,
+      network: SupportedNetwork.Substrate,
+      data,
+    }));
   }
 
   public async fetchTips(
@@ -661,6 +694,7 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
               // newtip events
               results.push({
                 blockNumber,
+                network: SupportedNetwork.Substrate,
                 data: {
                   kind: EventKind.NewTip,
                   proposalHash: h,
@@ -676,6 +710,7 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
               for (const [voter, amount] of tipVotes) {
                 results.push({
                   blockNumber,
+                  network: SupportedNetwork.Substrate,
                   data: {
                     kind: EventKind.TipVoted,
                     proposalHash: h,
@@ -690,6 +725,7 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
                 const closesAt = +closes.unwrap();
                 results.push({
                   blockNumber,
+                  network: SupportedNetwork.Substrate,
                   data: {
                     kind: EventKind.TipClosing,
                     proposalHash: h,
@@ -824,7 +860,11 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
       ...completedEvents,
     ];
     // we could plausibly populate the completed events with block numbers, but not necessary
-    const results = events.map((data) => ({ blockNumber, data }));
+    const results = events.map((data) => ({
+      blockNumber,
+      network: SupportedNetwork.Substrate,
+      data,
+    }));
 
     // no easier way to only fetch one than to fetch em all
     if (id !== undefined) {

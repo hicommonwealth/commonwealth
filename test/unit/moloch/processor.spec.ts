@@ -1,5 +1,6 @@
 import chai from 'chai';
 
+import { SupportedNetwork } from '../../../src';
 import { Processor } from '../../../src/chains/moloch/processor';
 import { Api, RawEvent, EventKind } from '../../../src/chains/moloch/types';
 
@@ -38,6 +39,7 @@ describe('Moloch Event Processor Tests', () => {
     assert.deepEqual(result, [
       {
         blockNumber: 10,
+        network: SupportedNetwork.Moloch,
         data: {
           kind: EventKind.ProcessProposal,
           proposalIndex: 1,

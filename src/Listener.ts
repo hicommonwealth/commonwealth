@@ -3,7 +3,6 @@ import {
   IChainEventKind,
   IEventSubscriber,
   IEventProcessor,
-  EventSupportingChainT,
   IChainEventData,
   CWEvent,
   IStorageFetcher,
@@ -50,7 +49,7 @@ export abstract class Listener<
 
   protected readonly _verbose: boolean;
 
-  protected constructor(chain: EventSupportingChainT, verbose?: boolean) {
+  protected constructor(chain: string, verbose?: boolean) {
     this._chain = chain;
     this.eventHandlers = {};
     this._verbose = !!verbose;
@@ -81,7 +80,7 @@ export abstract class Listener<
   protected async handleEvent(event: CWEvent<IChainEventData>): Promise<void> {
     let prevResult;
 
-    event.chain = this._chain as EventSupportingChainT;
+    event.chain = this._chain;
     event.received = Date.now();
 
     for (const key of Object.keys(this.eventHandlers)) {

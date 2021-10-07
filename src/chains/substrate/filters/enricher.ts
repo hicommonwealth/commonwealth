@@ -41,7 +41,7 @@ import {
   OffenceDetails,
 } from '@polkadot/types/interfaces/offences';
 
-import { CWEvent } from '../../../interfaces';
+import { CWEvent, SupportedNetwork } from '../../../interfaces';
 import {
   EventKind,
   IEventData,
@@ -1324,5 +1324,7 @@ export async function Enrich(
   const eventData = await (isEvent(rawData)
     ? extractEventData(rawData as Event)
     : extractExtrinsicData(rawData as Extrinsic));
-  return eventData ? { ...eventData, blockNumber } : null;
+  return eventData
+    ? { ...eventData, blockNumber, network: SupportedNetwork.Substrate }
+    : null;
 }

@@ -12,8 +12,6 @@ export type ProposalV2 = UnPromisify<
 
 export type Api = Moloch1 | Moloch2;
 
-export const EventChains = ['moloch', 'moloch-local'] as const;
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type RawEvent = TypedEvent<any>;
 
