@@ -428,11 +428,9 @@ async function initializer(): Promise<void> {
     // TODO: this will never occur
     throw new Error("No dyno's detected");
   }
-  log.info(`${dynoList}`);
 
   // removes any dyno's that aren't ceNodes
   const ceNodes = dynoList.filter((dyno) => dyno.name.includes('ceNode'));
-  log.info(`${ceNodes}`);
 
   // sort CeNode dyno's by their id
   ceNodes.sort((first, second) => {
@@ -450,7 +448,7 @@ async function initializer(): Promise<void> {
     const result = await fetch(
       'https://api.heroku.com/apps/commonwealth-staging2/config-vars',
       {
-        method: 'POST',
+        method: 'PATCH',
         headers: {
           Authorization: `Bearer ${process.env.HEROKU_API_TOKEN}`,
           Accept: 'application/vnd.heroku+json; version=3',
@@ -462,6 +460,7 @@ async function initializer(): Promise<void> {
       }
     );
     if (!result.ok) {
+      log.info(result.status, result.statusText);
       // TODO: downsize/delete this dyno or retry
       throw new Error('Could not update the config var - overlap may occur');
     }
