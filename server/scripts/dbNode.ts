@@ -421,6 +421,12 @@ async function initializer(): Promise<void> {
       },
     }
   );
+
+  if (!res.ok) {
+    log.info(`${res.status}, ${res.statusText}`);
+    throw new Error('Could not get dynoList');
+  }
+
   const dynoList = await res.json();
 
   if (!dynoList || dynoList.length === 0) {
@@ -437,11 +443,47 @@ async function initializer(): Promise<void> {
     else if (first.id < second.id) return -1;
     return 0;
   });
-  // TODO: big question for this setup is does the id change after a dyno crashes? If it changes then this setup won't work
+
   workerNumber = ceNodes
     .map((dyno) => dyno.id)
     .indexOf(process.env.HEROKU_DYNO_ID);
   numWorkers = ceNodes.length;
+
+  let mostRecentDate = new Date(ceNodes[0].created_at);
+  let newestDyno;
+  for (const dyno of ceNodes) {
+    const dynoCreated = new Date(dyno.created_at);
+    if (mostRecentDate > dynoCreated) {
+      mostRecentDate = dynoCreated;
+      newestDyno = dyno;
+    }
+  }
+
+  if (
+    numWorkers !== Number(process.env.NUM_WORKERS) &&
+    newestDyno.id === process.env.HEROKU_DYNO_ID // prevents race condition by only allowing the most recently created dyno to update the config vars
+  ) {
+    const result = await fetch(
+      'https://api.heroku.com/apps/commonwealth-staging2/config-vars',
+      {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${process.env.HEROKU_API_TOKEN}`,
+          Accept: 'application/vnd.heroku+json; version=3',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          NUM_WORKERS: numWorkers,
+        }),
+      }
+    );
+    if (!result.ok) {
+      log.info(`${result.status}, ${result.statusText}`);
+      throw new Error('Could not update the config var - overlap may occur');
+    }
+  }
+
+  log.info(`Worker Number: ${workerNumber}\nNumber of Workers: ${numWorkers}`);
 
   producer = new RabbitMqHandler(RabbitMQConfig);
   await producer.init();
