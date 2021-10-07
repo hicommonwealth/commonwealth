@@ -50,14 +50,13 @@ const ProposalContent: m.Component<
       : votes.slice(0, 10);
 
     return [
-      m('.proposal-title', proposal.title),
-      m('.proposal-hash', `#${proposal.ipfs}`),
+      m('.snapshot-proposal-title', proposal.title),
+      m('.snapshot-proposal-hash', `#${proposal.ipfs}`),
       m('.snapshot-proposals-list', [
         m('.other-details', [
-          m('', [
+          m('div', [
             m('.submitted-by', 'submitted by'),
-            m(
-              '.author-address',
+            m('.author-address', [
               m(User, {
                 user: new AddressInfo(
                   null,
@@ -67,14 +66,14 @@ const ProposalContent: m.Component<
                 ),
                 linkify: true,
                 popover: true,
-              })
-            ),
+              }),
+            ]),
           ]),
           proposal.state === 'active'
             ? [
                 m('.active-proposal', [
                   m(
-                    '',
+                    'span',
                     `Ends in ${formatTimestamp(moment(+proposal.end * 1000))}`
                   ),
                   m('.active-text', 'Active'),
@@ -99,14 +98,13 @@ const ProposalContent: m.Component<
           ]),
           votersList.map((vote) =>
             m('.vote-row', [
-              m(
-                '.user-column',
+              m('.user-column', [
                 m(User, {
                   user: new AddressInfo(null, vote.voter, app.activeId(), null),
                   linkify: true,
                   popover: true,
-                })
-              ),
+                }),
+              ]),
               m('.vote-column', proposal.choices[vote.choice - 1]),
               m('.power-column', `${formatNumberLong(vote.power)} ${symbol}`),
             ])
@@ -151,10 +149,10 @@ const VotingResults: m.Component<
           ? totalForChoice / totals.sumOfResultsBalance
           : 0;
 
-      return m('', [
+      return [
         m('.result-choice', choice),
-        m('.flex.justify-between', [
-          m('.flex-shrink', [
+        m('.result-choice-details', [
+          m('.vote-balance-for-choice', [
             m(
               'span',
               { class: 'font-medium' },
@@ -169,10 +167,10 @@ const VotingResults: m.Component<
           max: '100',
           value: voteFrac * 100,
         }),
-      ]);
+      ];
     });
 
-    return m('', vnode.state.voteListings);
+    return [vnode.state.voteListings];
   },
 };
 
@@ -226,7 +224,7 @@ const VoteAction: m.Component<
 
     if (!vnode.attrs.proposal.choices?.length) return;
 
-    return m('.proposal-info-box', [
+    return m('.VoteAction', [
       m('.title', 'Cast your vote'),
       m(RadioGroup, {
         class: 'snapshot-votes',
@@ -328,7 +326,7 @@ const ViewProposalPage: m.Component<
     return m(
       Sublayout,
       {
-        class: `view-snapshot-proposal-page ${
+        class: `SnapshotViewProposalPage ${
           activeTab === 'Proposals' ? 'proposal-tab' : 'info-tab'
         }`,
         title: 'Snapshot Proposal',
@@ -383,12 +381,12 @@ const ViewProposalPage: m.Component<
                   m('.title', 'Information'),
                   m('.info-block', [
                     m('.labels', [
-                      m('', 'Author'),
-                      m('', 'IPFS'),
-                      m('', 'Voting System'),
-                      m('', 'Start Date'),
-                      m('', 'End Date'),
-                      m('', 'Snapshot'),
+                      m('p', 'Author'),
+                      m('p', 'IPFS'),
+                      m('p', 'Voting System'),
+                      m('p', 'Start Date'),
+                      m('p', 'End Date'),
+                      m('p', 'Snapshot'),
                     ]),
                     m('.values', [
                       m(User, {
@@ -420,8 +418,8 @@ const ViewProposalPage: m.Component<
                         '.snapshot-type',
                         proposal.type.split('-').join(' ').concat(' voting')
                       ),
-                      m('', moment(+proposal.start * 1000).format('lll')),
-                      m('', moment(+proposal.end * 1000).format('lll')),
+                      m('p', moment(+proposal.start * 1000).format('lll')),
+                      m('p', moment(+proposal.end * 1000).format('lll')),
                       m(
                         'a',
                         {

@@ -11,7 +11,7 @@
   padding-right: 20px;
 }
 
-.view-snapshot-proposal-page {
+.SnapshotViewProposalPage {
   .proposal-body {
     display: flex;
     justify-content: space-between;
@@ -24,13 +24,13 @@
         width: 60%;
       }
 
-      .proposal-title {
+      .snapshot-proposal-title {
         margin-top: 24px;
         font-size: 32px;
         font-weight: 500;
       }
 
-      .proposal-hash {
+      .snapshot-proposal-hash {
         font-weight: 600;
         color: #666666;
         margin-top: 6px;
@@ -115,7 +115,8 @@
     .proposal-info {
       max-width: 100%;
 
-      .proposal-info-box {
+      .proposal-info-box,
+      .VoteAction {
         border: 1px solid #DDDDDD;
         border-radius: 8px;
         padding: 20px 0;
@@ -203,6 +204,15 @@
         font-weight: 500;
         font-size: 24px;
         margin-top: 24px;
+      }
+
+      .result-choice-details {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .vote-balance-for-choice {
+        flex-shrink: 1;
       }
 
       .font-medium {
