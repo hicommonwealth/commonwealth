@@ -55,10 +55,12 @@ const createComment = async (
     });
     if (!req.user.isAdmin && isAdmin.length === 0) {
       try {
-        const stage = root_id.substring(0, root_id.indexOf('_'));
         const thread_id = root_id.substring(root_id.indexOf('_') + 1);
-        const thread = await models.OffchainThread.findOne({ where:{ id: thread_id } });
-        const threshold = (await models.OffchainTopic.findOne({ where: { id: thread.topic_id } })).token_threshold;
+        const thread = await models.OffchainThread.findOne({
+          where: { id: thread_id },
+          include: [models.OffchainTopic],
+        });
+        const threshold = thread.OffchainTopic.token_threshold;
         let tokenBalance = new BN(0);
         if (threshold) {
           tokenBalance = await tokenBalanceCache.getBalance(chain.id, req.body.address);
