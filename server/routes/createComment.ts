@@ -58,7 +58,6 @@ const createComment = async (
         const thread_id = root_id.substring(root_id.indexOf('_') + 1);
         const thread = await models.OffchainThread.findOne({
           where: { id: thread_id },
-          // include: [{ model: models.OffchainTopic, as: 'topic' }],
         });
         const topic = await models.OffchainTopic.findOne({
           where: { id: thread.topic_id },
