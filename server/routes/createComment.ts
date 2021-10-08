@@ -58,9 +58,10 @@ const createComment = async (
         const thread_id = root_id.substring(root_id.indexOf('_') + 1);
         const thread = await models.OffchainThread.findOne({
           where: { id: thread_id },
-          include: [{ model: models.OffchainTopic, as: 'OffchainTopic' }],
+          include: [{ model: models.OffchainTopic, as: 'topic' }],
         });
-        const threshold = thread.OffchainTopic.token_threshold;
+        console.log(thread);
+        const threshold = thread.topic.token_threshold;
         let tokenBalance = new BN(0);
         if (threshold) {
           tokenBalance = await tokenBalanceCache.getBalance(chain.id, req.body.address);

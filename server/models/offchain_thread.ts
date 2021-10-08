@@ -41,7 +41,7 @@ export interface OffchainThreadAttributes {
   OffchainAttachments?: OffchainAttachmentAttributes[] | OffchainAttachmentAttributes['id'][];
   ChainEntity?: ChainEntityAttributes;
   collaborators?: AddressAttributes[];
-  OffchainTopic?: OffchainTopicAttributes;
+  topic?: OffchainTopicAttributes;
 }
 
 export interface OffchainThreadInstance extends Model<OffchainThreadAttributes>, OffchainThreadAttributes {
