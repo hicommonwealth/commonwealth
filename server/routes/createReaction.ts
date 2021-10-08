@@ -56,8 +56,12 @@ const createReaction = async (
           thread = await models.OffchainThread.findOne({ where:{ stage, id: topic_id } });
         }
         const threshold = (await models.OffchainTopic.findOne({ where: { id: thread.topic_id } })).token_threshold;
-        const tokenBalance = await tokenBalanceCache.getBalance(chain.id, req.body.address);
-        if (threshold && tokenBalance.lt(new BN(threshold))) return next(new Error(Errors.InsufficientTokenBalance));
+        let tokenBalance = new BN(0);
+        if (threshold) {
+          tokenBalance = await tokenBalanceCache.getBalance(chain.id, req.body.address);
+        }
+        if (threshold && tokenBalance.lt(new BN(threshold)))
+          return next(new Error(Errors.InsufficientTokenBalance));
       } catch (e) {
         log.error(`hasToken failed: ${e.message}`);
         return next(new Error(Errors.CouldNotFetchTokenBalance));
