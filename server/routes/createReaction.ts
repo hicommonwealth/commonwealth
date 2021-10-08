@@ -48,13 +48,21 @@ const createReaction = async (
       try {
         let thread;
         if (thread_id) {
-          thread = await models.OffchainThread.findOne({ where: { id: thread_id } });
+          thread = await models.OffchainThread.findOne({
+            where: { id: thread_id },
+            include: [{ model: models.OffchainTopic, as: 'OffchainTopic' }],
+          });
         } else if (comment_id) {
-          const root_id = (await models.OffchainComment.findOne({ where: { id: comment_id } })).root_id;
-          const topic_id = root_id.substring(root_id.indexOf('_') + 1);
-          thread = await models.OffchainThread.findOne({ where:{ id: topic_id } });
+          const root_id = (
+            await models.OffchainComment.findOne({ where: { id: comment_id } })
+          ).root_id;
+          const comment_thread_id = root_id.substring(root_id.indexOf('_') + 1);
+          thread = await models.OffchainThread.findOne({
+            where: { id: comment_thread_id },
+            include: [{ model: models.OffchainTopic, as: 'OffchainTopic' }],
+          });
         }
-        const threshold = (await models.OffchainTopic.findOne({ where: { id: thread.topic_id } })).token_threshold;
+        const threshold = thread.OffchainTopic.token_threshold;
         let tokenBalance = new BN(0);
         if (threshold) {
           tokenBalance = await tokenBalanceCache.getBalance(chain.id, req.body.address);
