@@ -6,7 +6,6 @@ import { ChainAttributes } from './chain';
 import { OffchainCommunityAttributes } from './offchain_community';
 import { OffchainAttachmentAttributes } from './offchain_attachment';
 import { ChainEntityAttributes } from './chain_entity';
-import { OffchainTopicAttributes } from './offchain_topic';
 
 export interface OffchainThreadAttributes {
   address_id: number;
@@ -40,8 +39,7 @@ export interface OffchainThreadAttributes {
   Address?: AddressAttributes;
   OffchainAttachments?: OffchainAttachmentAttributes[] | OffchainAttachmentAttributes['id'][];
   ChainEntity?: ChainEntityAttributes;
-  collaborators?: AddressAttributes[];
-  topic?: OffchainTopicAttributes;
+  collaborators?: AddressAttributes[]
 }
 
 export interface OffchainThreadInstance extends Model<OffchainThreadAttributes>, OffchainThreadAttributes {
