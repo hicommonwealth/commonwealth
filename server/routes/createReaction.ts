@@ -49,7 +49,6 @@ const createReaction = async (
         let thread;
         if (thread_id) {
           thread = await models.OffchainThread.findOne({ where: { id: thread_id } });
-          console.log('thread', thread);
         } else if (comment_id) {
           const root_id = (await models.OffchainComment.findOne({ where: { id: comment_id } })).root_id;
           const stage = root_id.substring(0, root_id.indexOf('_'));
@@ -58,7 +57,6 @@ const createReaction = async (
         }
         const threshold = (await models.OffchainTopic.findOne({ where: { id: thread.topic_id } })).token_threshold;
         let tokenBalance = new BN(0);
-        console.log(threshold);
         if (threshold) {
           tokenBalance = await tokenBalanceCache.getBalance(chain.id, req.body.address);
         }
