@@ -11,6 +11,7 @@ import { navigateToSubpage } from 'app';
 import { ProposalType, ChainBase, ChainNetwork } from 'types';
 import { ProposalModule } from 'models';
 
+import { formatNumberShort } from 'adapters/currency';
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
@@ -75,7 +76,7 @@ const CompoundProposalStats: m.Component<{}, {}> = {
     if (!(app.chain instanceof Compound)) return;
     const activeAccount = app.user.activeAccount;
     const symbol = app.chain.meta.chain.symbol;
-    const decimals = new BN(10).pow(new BN(app.chain.governance.api.decimals));
+    const decimals = new BN(10).pow(new BN(app.chain.governance.api.decimals || 18));
 
     return m('.stats-box', [
       m('.stats-box-left', '💭'),
@@ -88,13 +89,13 @@ const CompoundProposalStats: m.Component<{}, {}> = {
         ]),
         m('', [
           m('.stats-box-stat', [
-            `Quorum: ${app.chain.governance?.quorumVotes.div(decimals).toString()} ${symbol}`
+            `Quorum: ${formatNumberShort(+app.chain.governance?.quorumVotes.div(decimals))} ${symbol}`
           ]),
           m('.stats-box-stat', [
-            `Proposal Threshold: ${app.chain.governance?.proposalThreshold.div(decimals).toString()} ${symbol}`
+            `Proposal Threshold: ${formatNumberShort(+app.chain.governance?.proposalThreshold.div(decimals))} ${symbol}`
           ]),
           m('.stats-box-stat', [
-            `Voting Period Length: ${app.chain.governance.votingPeriod.toString(10)}`,
+            `Voting Period Length: ${app.chain.governance.votingPeriod.toString(10)} Blocks`,
           ]),
         ]),
         m(Button, {
@@ -124,7 +125,7 @@ function getModules(): ProposalModule<any, any, any>[] {
     ];
   } else if (app.chain.base === ChainBase.CosmosSDK) {
     const chain = (app.chain as Cosmos);
-    return [ chain.governance ];
+    return [chain.governance];
   } else {
     throw new Error('invalid chain');
   }
@@ -207,8 +208,8 @@ const ProposalsPage: m.Component<{}> = {
       && !activeCompoundProposals?.length
       && !activeAaveProposals?.length
       && !activeSputnikProposals?.length
-      ? [ m('.no-proposals', 'No active proposals') ]
-      : [ m('.active-proposals', [(activeDemocracyProposals || []).map((proposal) => m(ProposalCard, { proposal }))
+      ? [m('.no-proposals', 'No active proposals')]
+      : [m('.active-proposals', [(activeDemocracyProposals || []).map((proposal) => m(ProposalCard, { proposal }))
         .concat((activeCouncilProposals || []).map((proposal) => m(ProposalCard, { proposal })))
         .concat((activeCosmosProposals || []).map((proposal) => m(ProposalCard, { proposal })))
         .concat((activeMolochProposals || []).map((proposal) => m(ProposalCard, { proposal })))
@@ -248,8 +249,8 @@ const ProposalsPage: m.Component<{}> = {
       && !inactiveCompoundProposals?.length
       && !inactiveAaveProposals?.length
       && !inactiveSputnikProposals?.length
-      ? [ m('.no-proposals', 'No past proposals') ]
-      : [ m('.inactive-proposals', [(inactiveDemocracyProposals || []).map((proposal) => m(ProposalCard, { proposal }))
+      ? [m('.no-proposals', 'No past proposals')]
+      : [m('.inactive-proposals', [(inactiveDemocracyProposals || []).map((proposal) => m(ProposalCard, { proposal }))
         .concat((inactiveCouncilProposals || []).map((proposal) => m(ProposalCard, { proposal })))
         .concat((inactiveCosmosProposals || []).map((proposal) => m(ProposalCard, { proposal })))
         .concat((inactiveMolochProposals || []).map((proposal) => m(ProposalCard, { proposal })))

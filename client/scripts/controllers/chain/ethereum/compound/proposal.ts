@@ -22,7 +22,6 @@ import {
 
 import Web3 from 'web3';
 import { formatNumberShort } from 'adapters/currency';
-import { capitalize } from 'lodash';
 import CompoundAPI from './api';
 import CompoundGovernance from './governance';
 import { attachSigner } from '../contractApi';
@@ -47,7 +46,7 @@ export class CompoundProposalVote implements IVote<EthereumCoin> {
   }
 
   public format(): string {
-    return `${formatNumberShort(+Web3.utils.fromWei(this.power))}`;
+    return `${formatNumberShort(+Web3.utils.fromWei(this.power))} ${this.account.chain.symbol}`;
   }
 }
 

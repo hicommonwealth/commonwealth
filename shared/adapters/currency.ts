@@ -7,7 +7,7 @@ export function formatNumberShort(num: number) {
     return Math.round(n * (10 ** digits)) / (10 ** digits);
   };
 
-  const precise = (n, digits?) => {
+  const precise = (n: number, digits?: number) => {
     if (digits === undefined) digits = 3;
     return n.toPrecision(digits);
   };
@@ -20,13 +20,13 @@ export function formatNumberShort(num: number) {
           : num > 0.1 ? round(num)
             : num > 0.01 ? precise(num, 2)
               : num > 0.001 ? precise(num, 1)
-                : num.toString();
+                : precise(num, 1); // TODO: display very small numbers correctly
 }
 
 const nf = new Intl.NumberFormat();
 
 // duplicated in client/scripts/helpers.ts
-export function formatNumberLong(num : number) {
+export function formatNumberLong(num: number) {
   // format small numbers with decimals, large numbers with commas
   if (num === 0) return '0';
   if (num < 0.000001) return num.toFixed(20).replace(/0*$/, '');

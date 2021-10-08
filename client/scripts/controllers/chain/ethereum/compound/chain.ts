@@ -1,10 +1,10 @@
 import BN from 'bn.js';
+import { BigNumber } from 'ethers';
 import { GovernorAlpha__factory } from 'eth/types';
 import { NodeInfo } from 'models';
 import EthereumChain from '../chain';
 import { attachSigner } from '../contractApi';
 import CompoundAPI from './api';
-import { BigNumber } from 'ethers';
 
 // Thin wrapper over EthereumChain to guarantee the `init()` implementation
 // on the Governance module works as expected.
@@ -49,39 +49,32 @@ export default class CompoundChain extends EthereumChain {
   }
 
   public async setDelegate(address: string, amount: number) {
-    try {
-      const contract = await attachSigner(
-        this.app.wallets,
-        this.app.user.activeAccount.address,
-        this.compoundApi.Token,
-      );
-      const bal = await this.balanceOf(address);
-      console.log(`User balance: ${bal.toString()}`)
-      console.log(`${amount} to delegate before decimals`);
-      const balBN = BigNumber.from(amount);
-      const decimals = BigNumber.from(10).pow(BigNumber.from(this.compoundApi.decimals));
-      const delegateAmt = balBN.mul(decimals).toString();
-      console.log(`${delegateAmt} after decimals`);
-      const gasLimit = await contract.estimateGas.delegate(address, delegateAmt);
-      await contract.delegate(address, delegateAmt, { gasLimit });
-    } catch (e) {
-      throw new Error(e);
-    }
+    const contract = await attachSigner(
+      this.app.wallets,
+      this.app.user.activeAccount.address,
+      this.compoundApi.Token
+    );
+    const bal = await this.balanceOf(address);
+    console.log(`User balance: ${bal.toString()}`);
+    console.log(`${amount} to delegate before decimals`);
+    const balBN = BigNumber.from(amount);
+    const decimals = BigNumber.from(10).pow(
+      BigNumber.from(this.compoundApi.decimals)
+    );
+    const delegateAmt = balBN.mul(decimals).toString();
+    console.log(`${delegateAmt} after decimals`);
+    const gasLimit = await contract.estimateGas.delegate(address, delegateAmt);
+    await contract.delegate(address, delegateAmt, { gasLimit });
   }
 
-  public async getDelegate(): Promise<string> {
-    // TODO: I don't think this is implementable anymore because of how the MPOND delegates mapping works now
-    return new Promise(() => 'Method Not Implemented');
-    // const sender = this._api.userAddress;
-    // const bridge = this._api.bridge;
-    // try {
-    //   const delegate = await this._api.mPondContract.delegates(bridge, sender);
-    //   const zeroAddress = '0x0000000000000000000000000000000000000000';
-    //   return delegate === zeroAddress ? null : delegate;
-    // } catch (err) {
-    //   console.error(err);
-    //   return null;
-    // }
+  public async getDelegate(address: string): Promise<string> {
+    try {
+      const who = await (this.compoundApi.Token as any).delegates(address);
+      return who;
+    } catch (err) {
+      console.warn(`Could not fetch delegates: ${err.message}`);
+      return null;
+    }
   }
 
   public async isHolder(address: string): Promise<boolean> {

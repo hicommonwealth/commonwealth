@@ -61,7 +61,7 @@ interface IDelegateFormState {
 
 const getDelegate = async (vnode: m.Vnode<{}, IDelegateFormState>) => {
   if (app.chain.network === ChainNetwork.Compound) {
-    vnode.state.currentDelegate = await (app.chain as Compound).chain.getDelegate();
+    vnode.state.currentDelegate = await (app.chain as Compound).chain.getDelegate(app.user.activeAccount.address);
   } else if (app.chain.network === ChainNetwork.Aave) {
     // TODO: switch on delegation type
     vnode.state.currentDelegate = await (app.chain as Aave).chain.getDelegate(app.user.activeAccount.address, 'voting');
