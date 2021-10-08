@@ -6,8 +6,7 @@ import { Button, ButtonGroup, Icon, Icons, PopoverMenu, MenuItem, MenuDivider } 
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
-import { ProposalType } from 'identifiers';
-import { ChainBase, ChainNetwork } from 'models';
+import { ProposalType, ChainBase, ChainNetwork } from 'types';
 import NewThreadModal from 'views/modals/new_thread_modal';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 

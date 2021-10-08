@@ -7,10 +7,9 @@ import { Tag } from 'construct-ui';
 
 import app, { ApiStatus } from 'state';
 import { navigateToSubpage } from 'app';
-import { ProposalType } from 'identifiers';
+import { ProposalType, ChainBase } from 'types';
 import { pluralize, link } from 'helpers';
 import { formatCoin } from 'adapters/currency';
-import { ChainBase } from 'models';
 
 import Substrate from 'controllers/chain/substrate/main';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';

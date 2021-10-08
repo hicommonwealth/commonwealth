@@ -82,7 +82,8 @@ export default class extends IEventHandler {
     const [ dbEventType, created ] = await this._models.ChainEventType.findOrCreate({
       where: {
         id: `${chain}-${event.data.kind.toString()}`,
-        chain: chain,
+        chain,
+        event_network: event.network,
         event_name: event.data.kind.toString(),
       }
     });

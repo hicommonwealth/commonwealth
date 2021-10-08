@@ -8,7 +8,7 @@ import jwtLib from 'jsonwebtoken';
 import {
   CWEvent,
   SubstrateTypes,
-  SubstrateEvents
+  SupportedNetwork,
 } from '@commonwealth/chain-events';
 
 import * as modelUtils from '../../util/modelUtils';
@@ -133,6 +133,7 @@ describe('Identity Chain Event Handler Tests', () => {
   it('should add identity to existing offchain profile', async () => {
     const event: CWEvent<SubstrateTypes.IIdentitySet> = {
       blockNumber: 10,
+      network: SupportedNetwork.Substrate,
       data: {
         kind: SubstrateTypes.EventKind.IdentitySet,
         who: address,
@@ -157,6 +158,7 @@ describe('Identity Chain Event Handler Tests', () => {
   it('should add first judgement to existing offchain profile', async () => {
     const setEvent: CWEvent<SubstrateTypes.IIdentitySet> = {
       blockNumber: 10,
+      network: SupportedNetwork.Substrate,
       data: {
         kind: SubstrateTypes.EventKind.IdentitySet,
         who: address,
@@ -166,6 +168,7 @@ describe('Identity Chain Event Handler Tests', () => {
     };
     const judgementEvent: CWEvent<SubstrateTypes.IJudgementGiven> = {
       blockNumber: 10,
+      network: SupportedNetwork.Substrate,
       data: {
         kind: SubstrateTypes.EventKind.JudgementGiven,
         who: address,
@@ -188,6 +191,7 @@ describe('Identity Chain Event Handler Tests', () => {
   it('should add more judgements to existing offchain profile', async () => {
     const setEvent: CWEvent<SubstrateTypes.IIdentitySet> = {
       blockNumber: 10,
+      network: SupportedNetwork.Substrate,
       data: {
         kind: SubstrateTypes.EventKind.IdentitySet,
         who: address,
@@ -200,6 +204,7 @@ describe('Identity Chain Event Handler Tests', () => {
     };
     const judgementEvent: CWEvent<SubstrateTypes.IJudgementGiven> = {
       blockNumber: 10,
+      network: SupportedNetwork.Substrate,
       data: {
         kind: SubstrateTypes.EventKind.JudgementGiven,
         who: address,
@@ -231,6 +236,7 @@ describe('Identity Chain Event Handler Tests', () => {
   it('should remove identity on identity-cleared', async () => {
     const setEvent: CWEvent<SubstrateTypes.IIdentitySet> = {
       blockNumber: 10,
+      network: SupportedNetwork.Substrate,
       data: {
         kind: SubstrateTypes.EventKind.IdentitySet,
         who: address,
@@ -243,6 +249,7 @@ describe('Identity Chain Event Handler Tests', () => {
     };
     const clearEvent: CWEvent<SubstrateTypes.IIdentityCleared> = {
       blockNumber: 10,
+      network: SupportedNetwork.Substrate,
       data: {
         kind: SubstrateTypes.EventKind.IdentityCleared,
         who: address
@@ -261,6 +268,7 @@ describe('Identity Chain Event Handler Tests', () => {
   it('should remove identity on identity-killed', async () => {
     const setEvent: CWEvent<SubstrateTypes.IIdentitySet> = {
       blockNumber: 10,
+      network: SupportedNetwork.Substrate,
       data: {
         kind: SubstrateTypes.EventKind.IdentitySet,
         who: address,
@@ -273,6 +281,7 @@ describe('Identity Chain Event Handler Tests', () => {
     };
     const killedEvent: CWEvent<SubstrateTypes.IIdentityKilled> = {
       blockNumber: 10,
+      network: SupportedNetwork.Substrate,
       data: {
         kind: SubstrateTypes.EventKind.IdentityKilled,
         who: address
@@ -291,6 +300,7 @@ describe('Identity Chain Event Handler Tests', () => {
   it('should do nothing if no corresponding profile found', async () => {
     const event: CWEvent<SubstrateTypes.IIdentitySet> = {
       blockNumber: 10,
+      network: SupportedNetwork.Substrate,
       data: {
         kind: SubstrateTypes.EventKind.IdentitySet,
         who: 'bob',
@@ -312,6 +322,7 @@ describe('Identity Chain Event Handler Tests', () => {
   it('should not add judgement to offchain profile without identity', async () => {
     const judgementEvent: CWEvent<SubstrateTypes.IJudgementGiven> = {
       blockNumber: 10,
+      network: SupportedNetwork.Substrate,
       data: {
         kind: SubstrateTypes.EventKind.JudgementGiven,
         who: address,
@@ -331,6 +342,7 @@ describe('Identity Chain Event Handler Tests', () => {
   it('should do nothing on unrelated events', async () => {
     const event: CWEvent = {
       blockNumber: 10,
+      network: SupportedNetwork.Substrate,
       data: {
         kind: SubstrateTypes.EventKind.DemocracyStarted,
         referendumIndex: 0,

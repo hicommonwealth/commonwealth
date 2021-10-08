@@ -1,3 +1,5 @@
+import { ChainBase } from '../shared/types';
+
 /* eslint-disable indent,prefer-template,operator-linebreak */
 require('dotenv').config();
 
@@ -61,7 +63,9 @@ export const MIXPANEL_TOKEN = process.env.MIXPANEL_TOKEN;
 export const INFURA_API_KEY = process.env.INFURA_API_KEY;
 
 export const MAGIC_API_KEY = process.env.MAGIC_API_KEY;
-export const MAGIC_SUPPORTED_BASES = process.env.MAGIC_SUPPORTED_BASES?.split(',') || ['ethereum', 'substrate'];
+export const MAGIC_SUPPORTED_BASES = (process.env.MAGIC_SUPPORTED_BASES?.split(
+  ','
+) as ChainBase[]) || [ChainBase.Ethereum, ChainBase.Substrate];
 export const MAGIC_DEFAULT_CHAIN = process.env.MAGIC_DEFAULT_CHAIN || 'ethereum';
 
 export const DEFAULT_COMMONWEALTH_LOGO =

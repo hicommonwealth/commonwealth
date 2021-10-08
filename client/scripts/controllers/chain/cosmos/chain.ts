@@ -1,11 +1,5 @@
-import {
-  ITXModalData,
-  NodeInfo,
-  IChainModule,
-  ITXData,
-  ChainBase,
-  ChainNetwork
-} from 'models';
+import { ITXModalData, NodeInfo, IChainModule, ITXData } from 'models';
+import { ChainNetwork } from 'types';
 import m from 'mithril';
 import _ from 'lodash';
 import { ApiStatus, IApp } from 'state';
@@ -25,7 +19,7 @@ import {
   setupGovExtension,
   BankExtension,
   setupBankExtension,
-  SigningStargateClient
+  SigningStargateClient,
 } from '@cosmjs/stargate';
 import { Tendermint34Client, Event } from '@cosmjs/tendermint-rpc';
 import { EncodeObject } from '@cosmjs/proto-signing';

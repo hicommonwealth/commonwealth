@@ -9,6 +9,7 @@ import { formatAddressShort } from 'utils';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import { SubstrateTreasuryTip } from './treasury_tip';
+import { chainToEventNetwork } from '../../server/chain_entities';
 
 class SubstrateTreasuryTips extends ProposalModule<
   ApiPromise,
@@ -49,6 +50,7 @@ class SubstrateTreasuryTips extends ProposalModule<
     // fetch proposals from chain
     await this.app.chain.chainEntities.fetchEntities(
       this.app.chain.id,
+      chainToEventNetwork(this.app.chain.meta.chain),
       () => this._Chain.fetcher.fetchTips(this.app.chain.block.height)
     );
 

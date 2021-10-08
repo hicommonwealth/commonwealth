@@ -10,6 +10,7 @@ import {
   Proposal, ProposalStatus, ProposalEndTime, BinaryVote, VotingType,
   VotingUnit, ChainEntity, ChainEvent
 } from 'models';
+import { ProposalType } from 'types';
 import { chainEntityTypeToProposalSlug } from 'identifiers';
 
 import SubstrateChain from './shared';
@@ -98,7 +99,7 @@ export class SubstrateCollectiveProposal
     Collective: SubstrateCollective,
     entity: ChainEntity,
   ) {
-    super('councilmotion', backportEventToAdapter(
+    super(ProposalType.SubstrateCollectiveProposal, backportEventToAdapter(
       entity.chainEvents
         .find(
           (e) => e.data.kind === SubstrateTypes.EventKind.CollectiveProposed

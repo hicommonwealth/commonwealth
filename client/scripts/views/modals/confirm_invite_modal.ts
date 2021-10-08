@@ -12,7 +12,7 @@ import { UserBlock } from 'views/components/widgets/user';
 import { CompactModalExitButton } from 'views/modal';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { initAppState, navigateToSubpage } from 'app';
-import { InviteCodeAttributes } from 'shared/types';
+import { InviteCodeAttributes } from 'types';
 import { AddressInfo } from 'client/scripts/models';
 import LoginWithWalletDropdown from '../components/login_with_wallet_dropdown';
 
