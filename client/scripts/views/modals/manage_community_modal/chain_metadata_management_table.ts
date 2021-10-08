@@ -3,9 +3,8 @@ import m from 'mithril';
 import app from 'state';
 import { Button, Table } from 'construct-ui';
 
-import { ChainNetwork } from 'models';
+import { ChainBase, ChainNetwork } from 'types';
 import { notifyError } from 'controllers/app/notifications';
-import Token from 'controllers/chain/ethereum/token/adapter';
 import { IChainOrCommMetadataManagementAttrs } from './community_metadata_management_table';
 import { TogglePropertyRow, InputPropertyRow, ManageRolesRow } from './metadata_rows';
 
@@ -118,7 +117,7 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
           onChangeHandler: (v) => { vnode.state.customDomain = v; },
           disabled: true, // Custom domains should be admin configurable only
         }),
-        app.chain?.meta.chain.base === 'ethereum'
+        app.chain?.meta.chain.base === ChainBase.Ethereum
         && m(InputPropertyRow, {
           title: 'Snapshot',
           defaultValue: vnode.state.snapshot,

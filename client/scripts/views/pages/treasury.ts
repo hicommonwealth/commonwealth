@@ -6,8 +6,7 @@ import { Tag } from 'construct-ui';
 
 import app from 'state';
 import { formatCoin } from 'adapters/currency';
-import { ProposalType } from 'identifiers';
-import { ChainBase } from 'models';
+import { ProposalType, ChainBase } from 'types';
 
 import Substrate from 'controllers/chain/substrate/main';
 

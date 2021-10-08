@@ -3,7 +3,7 @@ import { IApp } from 'state';
 import { IAaveProposalResponse } from 'adapters/chain/aave/types';
 import { AaveEvents, AaveTypes } from '@commonwealth/chain-events';
 import { Executor } from 'eth/types';
-import { EntityRefreshOption } from 'controllers/server/chain_entities';
+import { chainToEventNetwork, EntityRefreshOption } from 'controllers/server/chain_entities';
 
 import AaveProposal from './proposal';
 import AaveChain from './chain';
@@ -131,6 +131,7 @@ export default class AaveGovernance extends ProposalModule<
     // await this.app.chain.chainEntities.fetchEntities(this.app.chain.id, () => fetcher.fetch());
     await this.app.chain.chainEntities.subscribeEntities(
       this.app.chain.id,
+      chainToEventNetwork(this.app.chain.meta.chain),
       subscriber,
       processor,
     );

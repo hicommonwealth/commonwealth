@@ -1,3 +1,4 @@
+import { ProposalType } from '../../shared/types';
 import { SubstrateTypes, MolochTypes, CompoundTypes, AaveTypes } from '@commonwealth/chain-events';
 
 // this function takes an "old style" identifier such as treasuryproposal_4 and attempts
@@ -9,29 +10,32 @@ export default async function (models, chain: string, identifier: string) {
     return models.ChainEntity.findOne({ where: { chain, type, type_id } });
   };
   switch (prefix) {
-    case 'referendum': {
+    case ProposalType.SubstrateDemocracyReferendum: {
       return findEntity(SubstrateTypes.EntityKind.DemocracyReferendum.toString());
     }
-    case 'democracyproposal': {
+    case ProposalType.SubstrateDemocracyProposal: {
       return findEntity(SubstrateTypes.EntityKind.DemocracyProposal.toString());
     }
-    case 'technicalcommitteemotion':
-    case 'councilmotion': {
+    case ProposalType.SubstrateTechnicalCommitteeMotion:
+    case ProposalType.SubstrateCollectiveProposal: {
       return findEntity(SubstrateTypes.EntityKind.CollectiveProposal.toString());
     }
-    case 'treasuryproposal': {
+    case ProposalType.SubstrateTreasuryProposal: {
       return findEntity(SubstrateTypes.EntityKind.TreasuryProposal.toString());
     }
-    case 'molochproposal': {
+    case ProposalType.SubstrateTreasuryTip: {
+      return findEntity(SubstrateTypes.EntityKind.TipProposal.toString());
+    }
+    case ProposalType.MolochProposal: {
       return findEntity(MolochTypes.EntityKind.Proposal.toString());
     }
-    case 'compoundproposal': {
+    case ProposalType.CompoundProposal: {
       return findEntity(CompoundTypes.EntityKind.Proposal.toString());
     }
-    case 'onchainproposal': {
+    case ProposalType.AaveProposal: {
       return findEntity(AaveTypes.EntityKind.Proposal.toString());
     }
-    // TODO: cosmosproposal
+    // cosmos/near proposals do not have associated entities
     // ignore council elections -- no commenting on them
     default: {
       return null;

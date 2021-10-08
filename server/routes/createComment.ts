@@ -2,7 +2,7 @@ import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
 import BN from 'bn.js';
 import { parseUserMentions } from '../util/parseUserMentions';
-import { NotificationCategories } from '../../shared/types';
+import { ChainType, NotificationCategories, ProposalType } from '../../shared/types';
 import { DB } from '../database';
 
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
@@ -44,7 +44,7 @@ const createComment = async (
 
   const { parent_id, root_id, text } = req.body;
 
-  if (chain && chain.type === 'token') {
+  if (chain && chain.type === ChainType.Token) {
     // skip check for admins
     const isAdmin = await models.Role.findAll({
       where: {
@@ -186,8 +186,8 @@ const createComment = async (
   // get parent entity if the comment is on an offchain thread
   // no parent entity if the comment is on an onchain entity
   let proposal;
-  const [prefix, id] = finalComment.root_id.split('_');
-  if (prefix === 'discussion') {
+  const [prefix, id] = finalComment.root_id.split('_') as [ProposalType, string];
+  if (prefix === ProposalType.OffchainThread) {
     proposal = await models.OffchainThread.findOne({
       where: { id }
     });

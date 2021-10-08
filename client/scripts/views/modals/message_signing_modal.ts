@@ -7,7 +7,8 @@ import { Button } from 'construct-ui';
 
 import CodeBlock from 'views/components/widgets/code_block';
 import HorizontalTabs from 'views/components/widgets/horizontal_tabs';
-import { Account, ChainBase } from 'models';
+import { ChainBase } from 'types';
+import { Account } from 'models';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 
 const MessageSigningSeedOrMnemonicOption = {

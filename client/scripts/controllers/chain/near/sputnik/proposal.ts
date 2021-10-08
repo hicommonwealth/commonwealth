@@ -5,6 +5,7 @@ import { Proposal, ProposalEndTime, VotingType, VotingUnit, ProposalStatus, ITXM
 import { NearToken } from 'adapters/chain/near/types';
 import { NearAccount, NearAccounts } from 'controllers/chain/near/account';
 import NearChain from 'controllers/chain/near/chain';
+import { ProposalType } from 'types';
 import NearSputnikDao from './dao';
 import {
   INearSputnikProposal,
@@ -108,7 +109,7 @@ export default class NearSputnikProposal extends Proposal<
     Dao: NearSputnikDao,
     data: INearSputnikProposal
   ) {
-    super('sputnikproposal', data);
+    super(ProposalType.SputnikProposal, data);
     this._Chain = Chain;
     this._Accounts = Accounts;
     this._Dao = Dao;

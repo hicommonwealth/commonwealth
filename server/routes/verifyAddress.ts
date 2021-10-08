@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
-import { DynamicTemplate } from '../../shared/types';
+import { DynamicTemplate, ChainBase } from '../../shared/types';
 import AddressSwapper from '../util/addressSwapper';
 
 const sgMail = require('@sendgrid/mail');
@@ -37,7 +37,7 @@ const verifyAddress = async (models: DB, req: Request, res: Response, next: Next
     return next(new Error(Errors.InvalidChain));
   }
 
-  const encodedAddress = chain.base === 'substrate'
+  const encodedAddress = chain.base === ChainBase.Substrate
     ? AddressSwapper({ address: req.body.address, currentPrefix: chain.ss58_prefix })
     : req.body.address;
 

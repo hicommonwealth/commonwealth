@@ -23,6 +23,7 @@ describe.skip('RabbitMQ producer integration tests', () => {
       assert.equal(content.blockNumber, 10);
       assert.equal(content.data, {});
       assert.equal(content.chain, 'polkadot');
+      assert.equal(content.network, 'substrate');
       assert.equal(content.received, 123);
     });
 
@@ -30,6 +31,7 @@ describe.skip('RabbitMQ producer integration tests', () => {
       blockNumber: 10,
       data: {},
       chain: 'polkadot',
+      network: 'substrate',
       received: 123,
     });
   });
@@ -40,6 +42,7 @@ describe.skip('RabbitMQ producer integration tests', () => {
       assert.equal(content.blockNumber, 10);
       assert.equal(content.data, {});
       assert.equal(content.chain, 'polkadot');
+      assert.equal(content.network, 'substrate');
       assert.equal(content.received, 123);
     });
 
@@ -48,6 +51,7 @@ describe.skip('RabbitMQ producer integration tests', () => {
       data: {
         kind: 'dont-skip',
       },
+      network: 'substrate',
       chain: 'polkadot',
       received: 123,
     });
@@ -57,6 +61,7 @@ describe.skip('RabbitMQ producer integration tests', () => {
       data: {
         kind: 'skip',
       },
+      network: 'substrate',
       chain: 'polkadot',
       received: 77,
     });

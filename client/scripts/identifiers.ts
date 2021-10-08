@@ -1,60 +1,67 @@
-import { StorageModule, ChainBase, ProposalModule, ChainNetwork } from 'models';
+import { StorageModule, ProposalModule } from 'models';
+import { SubstrateTypes, IChainEntityKind } from '@commonwealth/chain-events';
 import { ProposalStore } from 'stores';
-import { AaveTypes, CompoundTypes, MolochTypes } from '@commonwealth/chain-events';
+import { ProposalType, ChainBase, ChainNetwork } from 'types';
 import app from './state';
 import ThreadsController from './controllers/server/threads';
-
-export enum ProposalType {
-  SubstrateDemocracyReferendum = 'referendum',
-  SubstrateDemocracyProposal = 'democracyproposal',
-  SubstrateBountyProposal = 'bountyproposal',
-  SubstrateTreasuryTip = 'treasurytip',
-  SubstrateCollectiveProposal = 'councilmotion',
-  PhragmenCandidacy = 'phragmenelection',
-  SubstrateTreasuryProposal = 'treasuryproposal',
-  OffchainThread = 'discussion',
-  CosmosProposal = 'cosmosproposal',
-  MolochProposal = 'molochproposal',
-  CompoundProposal = 'compoundproposal',
-  AaveProposal = 'onchainproposal',
-  SputnikProposal = 'sputnikproposal',
-}
 
 export const proposalSlugToClass = () => {
   if (app.community) {
     return new Map<string, StorageModule>([
-      ['discussion', app.threads],
+      [ProposalType.OffchainThread, app.threads],
     ]);
   }
 
-  const mmap = new Map<string, ProposalModule<any, any, any> | ThreadsController>([
-    ['discussion', app.threads],
-  ]);
+  const mmap = new Map<
+    string,
+    ProposalModule<any, any, any> | ThreadsController
+  >([[ProposalType.OffchainThread, app.threads]]);
   if (app.chain.base === ChainBase.Substrate) {
-    mmap.set('referendum', (app.chain as any).democracy);
-    mmap.set('democracyproposal', (app.chain as any).democracyProposals);
-    mmap.set('councilmotion', (app.chain as any).council);
-    mmap.set('phragmenelection', (app.chain as any).phragmenElections);
-    mmap.set('treasuryproposal', (app.chain as any).treasury);
-    mmap.set('bountyproposal', (app.chain as any).bounties);
-    mmap.set('treasurytip', (app.chain as any).tips);
+    mmap.set(
+      ProposalType.SubstrateDemocracyReferendum,
+      (app.chain as any).democracy
+    );
+    mmap.set(
+      ProposalType.SubstrateDemocracyProposal,
+      (app.chain as any).democracyProposals
+    );
+    mmap.set(
+      ProposalType.SubstrateCollectiveProposal,
+      (app.chain as any).council
+    );
+    mmap.set(
+      ProposalType.PhragmenCandidacy,
+      (app.chain as any).phragmenElections
+    );
+    mmap.set(
+      ProposalType.SubstrateTreasuryProposal,
+      (app.chain as any).treasury
+    );
+    mmap.set(ProposalType.SubstrateBountyProposal, (app.chain as any).bounties);
+    mmap.set(ProposalType.SubstrateTreasuryTip, (app.chain as any).tips);
   } else if (app.chain.base === ChainBase.CosmosSDK) {
-    mmap.set('cosmosproposal', (app.chain as any).governance);
+    mmap.set(ProposalType.CosmosProposal, (app.chain as any).governance);
   }
-  if (app.chain.network === ChainNetwork.Kusama || app.chain.network === ChainNetwork.Polkadot) {
-    mmap.set('technicalcommitteemotion', (app.chain as any).technicalCommittee);
+  if (
+    app.chain.network === ChainNetwork.Kusama ||
+    app.chain.network === ChainNetwork.Polkadot
+  ) {
+    mmap.set(
+      ProposalType.SubstrateTechnicalCommitteeMotion,
+      (app.chain as any).technicalCommittee
+    );
   }
-  if (MolochTypes.EventChains.find((c) => c === app.chain.network)) {
-    mmap.set('molochproposal', (app.chain as any).governance);
+  if (app.chain.network === ChainNetwork.Moloch) {
+    mmap.set(ProposalType.MolochProposal, (app.chain as any).governance);
   }
-  if (CompoundTypes.EventChains.find((c) => c === app.chain.network)) {
-    mmap.set('compoundproposal', (app.chain as any).governance);
+  if (app.chain.network === ChainNetwork.Compound) {
+    mmap.set(ProposalType.CompoundProposal, (app.chain as any).governance);
   }
-  if (AaveTypes.EventChains.find((c) => c === app.chain.network)) {
-    mmap.set('onchainproposal', (app.chain as any).governance);
+  if (app.chain.network === ChainNetwork.Aave) {
+    mmap.set(ProposalType.AaveProposal, (app.chain as any).governance);
   }
   if (app.chain.network === ChainNetwork.Sputnik) {
-    mmap.set('sputnikproposal', (app.chain as any).dao);
+    mmap.set(ProposalType.SputnikProposal, (app.chain as any).dao);
   }
   return mmap;
 };
@@ -66,25 +73,25 @@ export const proposalSlugToStore = (slug: string): ProposalStore<any> => {
   return proposalSlugToClass().get(slug).store;
 };
 
-export const proposalSlugToFriendlyName = new Map<string, string>([
-  ['referendum', 'Democracy Referendum'],
-  ['democracyproposal', 'Democracy Proposal'],
-  ['democracypreimage', 'Democracy Preimage'],
-  ['bountyproposal', 'Bounty Proposal'],
-  ['democracyimminent', 'Democracy Imminent Preimage'],
-  ['councilmotion', 'Council Motion'],
-  ['phragmenelection', 'Phragmen Council Candidacy'],
-  ['treasuryproposal', 'Treasury Proposal'],
-  ['treasurytip', 'Treasury Tip'],
-  ['discussion', 'Discussion Thread'],
-  ['compoundproposal', 'Proposal'],
-  ['cosmosproposal', 'Proposal'],
-  ['molochproposal', 'Proposal'],
-  ['onchainproposal', 'Proposal'],
-  ['sputnikproposal', 'Proposal'],
+export const proposalSlugToFriendlyName = new Map<ProposalType, string>([
+  [ProposalType.SubstrateDemocracyReferendum, 'Democracy Referendum'],
+  [ProposalType.SubstrateDemocracyProposal, 'Democracy Proposal'],
+  [ProposalType.SubstratePreimage, 'Democracy Preimage'],
+  [ProposalType.SubstrateBountyProposal, 'Bounty Proposal'],
+  [ProposalType.SubstrateImminentPreimage, 'Democracy Imminent Preimage'],
+  [ProposalType.SubstrateCollectiveProposal, 'Council Motion'],
+  [ProposalType.PhragmenCandidacy, 'Phragmen Council Candidacy'],
+  [ProposalType.SubstrateTreasuryProposal, 'Treasury Proposal'],
+  [ProposalType.SubstrateTreasuryTip, 'Treasury Tip'],
+  [ProposalType.OffchainThread, 'Discussion Thread'],
+  [ProposalType.CompoundProposal, 'Proposal'],
+  [ProposalType.CosmosProposal, 'Proposal'],
+  [ProposalType.MolochProposal, 'Proposal'],
+  [ProposalType.AaveProposal, 'Proposal'],
+  [ProposalType.SputnikProposal, 'Proposal'],
 ]);
 
-export const idToProposal = (slug, id) => {
+export const idToProposal = (slug: string, id: string | number) => {
   const store = proposalSlugToStore(slug);
   const proposal = store.getByIdentifier(id);
   if (!proposal) {
@@ -94,71 +101,94 @@ export const idToProposal = (slug, id) => {
   }
 };
 
-export const uniqueIdToProposal = (uid) => {
-  const [ slug, id ] = uid.split('_');
+export const uniqueIdToProposal = (uid: string) => {
+  const [slug, id] = uid.split('_');
   return idToProposal(slug, id);
 };
 
-export const chainEntityTypeToProposalSlug = (t: string) => {
-  if (t === 'treasury-proposal') return ProposalType.SubstrateTreasuryProposal;
-  else if (t === 'democracy-referendum') return ProposalType.SubstrateDemocracyReferendum;
-  else if (t === 'democracy-proposal') return ProposalType.SubstrateDemocracyProposal;
-  else if (t === 'collective-proposal') return ProposalType.SubstrateCollectiveProposal;
-  else if (t === 'treasury-bounty') return ProposalType.SubstrateBountyProposal;
-  else if (t === 'tip-proposal') return ProposalType.SubstrateTreasuryTip;
+export const chainEntityTypeToProposalSlug = (
+  t: IChainEntityKind
+): ProposalType => {
+  if (t === SubstrateTypes.EntityKind.TreasuryProposal)
+    return ProposalType.SubstrateTreasuryProposal;
+  else if (t === SubstrateTypes.EntityKind.DemocracyReferendum)
+    return ProposalType.SubstrateDemocracyReferendum;
+  else if (t === SubstrateTypes.EntityKind.DemocracyProposal)
+    return ProposalType.SubstrateDemocracyProposal;
+  else if (t === SubstrateTypes.EntityKind.CollectiveProposal)
+    return ProposalType.SubstrateCollectiveProposal;
+  else if (t === SubstrateTypes.EntityKind.TreasuryBounty)
+    return ProposalType.SubstrateBountyProposal;
+  else if (t === SubstrateTypes.EntityKind.TipProposal)
+    return ProposalType.SubstrateTreasuryTip;
   else if (t === 'proposal') {
     if (app.chain.network === ChainNetwork.Sputnik) {
       return ProposalType.SputnikProposal;
     }
-    if (MolochTypes.EventChains.find((c) => c === app.chain.network)) {
+    if (app.chain.network === ChainNetwork.Moloch) {
       return ProposalType.MolochProposal;
     }
-    if (CompoundTypes.EventChains.find((c) => c === app.chain.network)) {
+    if (app.chain.network === ChainNetwork.Compound) {
       return ProposalType.CompoundProposal;
     }
-    if (AaveTypes.EventChains.find((c) => c === app.chain.network)) {
+    if (app.chain.network === ChainNetwork.Aave) {
       return ProposalType.AaveProposal;
     }
   }
 };
 
-export const proposalSlugToChainEntityType = (t) => {
-  if (t === ProposalType.SubstrateTreasuryProposal) return 'treasury-proposal';
-  else if (t === ProposalType.SubstrateDemocracyReferendum) return 'democracy-referendum';
-  else if (t === ProposalType.SubstrateDemocracyProposal) return 'democracy-proposal';
-  else if (t === ProposalType.SubstrateCollectiveProposal) return 'collective-proposal';
-  else if (t === ProposalType.SubstrateBountyProposal) return 'treasury-bounty';
-  else if (t === ProposalType.SubstrateTreasuryTip) return 'tip-proposal';
+export const proposalSlugToChainEntityType = (
+  t: ProposalType
+): IChainEntityKind => {
+  if (t === ProposalType.SubstrateTreasuryProposal)
+    return SubstrateTypes.EntityKind.TreasuryProposal;
+  else if (t === ProposalType.SubstrateDemocracyReferendum)
+    return SubstrateTypes.EntityKind.DemocracyReferendum;
+  else if (t === ProposalType.SubstrateDemocracyProposal)
+    return SubstrateTypes.EntityKind.DemocracyProposal;
+  else if (t === ProposalType.SubstrateCollectiveProposal)
+    return SubstrateTypes.EntityKind.CollectiveProposal;
+  else if (t === ProposalType.SubstrateBountyProposal)
+    return SubstrateTypes.EntityKind.TreasuryBounty;
+  else if (t === ProposalType.SubstrateTreasuryTip)
+    return SubstrateTypes.EntityKind.TipProposal;
 };
 
-export const chainEntityTypeToProposalName = (t: string) => {
-  if (t === 'treasury-proposal') return 'Treasury Proposal';
-  else if (t === 'democracy-referendum') return 'Referendum';
-  else if (t === 'democracy-proposal') return 'Democracy Proposal';
-  else if (t === 'collective-proposal') return 'Council Motion';
-  else if (t === 'treasury-bounty') return 'Bounty Proposal';
-  else if (t === 'tip-proposal') return 'Treasury Tip';
+export const chainEntityTypeToProposalName = (t: IChainEntityKind): string => {
+  if (t === SubstrateTypes.EntityKind.TreasuryProposal)
+    return 'Treasury Proposal';
+  else if (t === SubstrateTypes.EntityKind.DemocracyReferendum)
+    return 'Referendum';
+  else if (t === SubstrateTypes.EntityKind.DemocracyProposal)
+    return 'Democracy Proposal';
+  else if (t === SubstrateTypes.EntityKind.CollectiveProposal)
+    return 'Council Motion';
+  else if (t === SubstrateTypes.EntityKind.TreasuryBounty)
+    return 'Bounty Proposal';
+  else if (t === SubstrateTypes.EntityKind.TipProposal) return 'Treasury Tip';
   else if (t === 'proposal') {
     if (app.chain.network === ChainNetwork.Sputnik) {
       return 'Sputnik Proposal';
     }
-    if (MolochTypes.EventChains.find((c) => c === app.chain.network)) {
+    if (app.chain.network === ChainNetwork.Moloch) {
       return 'Moloch Proposal';
     }
-    if (CompoundTypes.EventChains.find((c) => c === app.chain.network)) {
+    if (app.chain.network === ChainNetwork.Compound) {
       return 'Onchain Proposal';
     }
-    if (AaveTypes.EventChains.find((c) => c === app.chain.network)) {
+    if (app.chain.network === ChainNetwork.Aave) {
       return 'Onchain Proposal';
     }
   }
 };
 
-export const chainEntityTypeToProposalShortName = (t: string) => {
-  if (t === 'treasury-proposal') return 'Tres';
-  else if (t === 'democracy-referendum') return 'Ref';
-  else if (t === 'democracy-proposal') return 'Prop';
-  else if (t === 'collective-proposal') return 'Mot';
-  else if (t === 'tip-proposal') return 'Tip';
-  else if (t === 'treasury-bounty') return 'Bounty';
+export const chainEntityTypeToProposalShortName = (
+  t: IChainEntityKind
+): string => {
+  if (t === SubstrateTypes.EntityKind.TreasuryProposal) return 'Tres';
+  else if (t === SubstrateTypes.EntityKind.DemocracyReferendum) return 'Ref';
+  else if (t === SubstrateTypes.EntityKind.DemocracyProposal) return 'Prop';
+  else if (t === SubstrateTypes.EntityKind.CollectiveProposal) return 'Mot';
+  else if (t === SubstrateTypes.EntityKind.TipProposal) return 'Tip';
+  else if (t === SubstrateTypes.EntityKind.TreasuryBounty) return 'Bounty';
 };

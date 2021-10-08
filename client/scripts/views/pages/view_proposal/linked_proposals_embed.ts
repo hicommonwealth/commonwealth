@@ -3,17 +3,15 @@ import 'pages/view_proposal/linked_proposals_embed.scss';
 import $ from 'jquery';
 import m from 'mithril';
 import { Button } from 'construct-ui';
-import { AddressInfo } from 'models';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
-import { formatCoin } from 'adapters/currency';
+import { ProposalType } from 'types';
 import { idToProposal } from 'identifiers';
 import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
-import User from 'views/components/widgets/user';
 import Substrate from 'controllers/chain/substrate/main';
 
 const LinkedProposalsEmbed: m.Component<{ proposal }> = {
@@ -34,7 +32,7 @@ const LinkedProposalsEmbed: m.Component<{ proposal }> = {
       if (call?.section === 'treasury' && (call.method === 'approveProposal' || call.method === 'rejectProposal')) {
         treasuryProposalIndex = call.args[0];
         try {
-          treasuryProposal = idToProposal('treasuryproposal', +treasuryProposalIndex);
+          treasuryProposal = idToProposal(ProposalType.SubstrateTreasuryProposal, +treasuryProposalIndex);
         } catch (e) {
           // do nothing if treasury proposal was not indexed
         }
@@ -55,10 +53,10 @@ const LinkedProposalsEmbed: m.Component<{ proposal }> = {
               `Became referendum ${proposal.getReferendum().identifier}`,
             ]),
             app.activeChainId() && m(Button, {
-              href: `/${app.activeChainId()}/proposal/referendum/${proposal.getReferendum().identifier}`,
+              href: `/${app.activeChainId()}/proposal/${ProposalType.SubstrateDemocracyReferendum}/${proposal.getReferendum().identifier}`,
               onclick: (e) => {
                 e.preventDefault();
-                navigateToSubpage(`/proposal/referendum/${proposal.getReferendum().identifier}`);
+                navigateToSubpage(`/proposal/${ProposalType.SubstrateDemocracyReferendum}/${proposal.getReferendum().identifier}`);
               },
               intent: 'primary',
               label: 'Go to referendum',
@@ -112,10 +110,10 @@ const LinkedProposalsEmbed: m.Component<{ proposal }> = {
             p.preimage?.method === 'rejectProposal' && 'Rejects this proposal',
           ]),
           app.activeChainId() && m(Button, {
-            href: `/${app.activeChainId()}/proposal/democracyproposal/${p.identifier}`,
+            href: `/${app.activeChainId()}/proposal/${ProposalType.SubstrateDemocracyProposal}/${p.identifier}`,
             onclick: (e) => {
               e.preventDefault();
-              navigateToSubpage(`/proposal/democracyproposal/${p.identifier}`);
+              navigateToSubpage(`/proposal/${ProposalType.SubstrateDemocracyProposal}/${p.identifier}`);
             },
             intent: 'primary',
             label: 'Go to democracy proposal',
@@ -132,10 +130,10 @@ const LinkedProposalsEmbed: m.Component<{ proposal }> = {
             r.preimage?.method === 'rejectProposal' && 'Rejects this proposal',
           ]),
           app.activeChainId() && m(Button, {
-            href: `/${app.activeChainId()}/proposal/referendum/${r.identifier}`,
+            href: `/${app.activeChainId()}/proposal/${ProposalType.SubstrateDemocracyReferendum}/${r.identifier}`,
             onclick: (e) => {
               e.preventDefault();
-              navigateToSubpage(`/proposal/referendum/${r.identifier}`);
+              navigateToSubpage(`/proposal/${ProposalType.SubstrateDemocracyReferendum}/${r.identifier}`);
             },
             intent: 'primary',
             label: 'Go to referendum',
@@ -152,10 +150,10 @@ const LinkedProposalsEmbed: m.Component<{ proposal }> = {
             mo.call?.method === 'rejectProposal' && 'Rejects this proposal',
           ]),
           app.activeChainId() && m(Button, {
-            href: `/${app.activeChainId()}/proposal/councilmotion/${mo.identifier}`,
+            href: `/${app.activeChainId()}/proposal/${ProposalType.SubstrateCollectiveProposal}/${mo.identifier}`,
             onclick: (e) => {
               e.preventDefault();
-              navigateToSubpage(`/proposal/councilmotion/${mo.identifier}`);
+              navigateToSubpage(`/proposal/${ProposalType.SubstrateCollectiveProposal}/${mo.identifier}`);
             },
             intent: 'primary',
             label: 'Go to motion',

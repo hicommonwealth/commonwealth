@@ -3,7 +3,8 @@ import BN from 'bn.js';
 
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import { ICompoundProposalResponse } from 'adapters/chain/compound/types';
-
+import { capitalize } from 'lodash';
+import { ProposalType } from 'types';
 import { CompoundTypes } from '@commonwealth/chain-events';
 
 import {
@@ -24,7 +25,6 @@ import { attachSigner } from '../contractApi';
 import EthereumAccount from '../account';
 import EthereumAccounts from '../accounts';
 import CompoundChain from './chain';
-import { capitalize } from 'lodash';
 
 export enum CompoundVote {
   YES = 1,
@@ -216,7 +216,7 @@ export default class CompoundProposal extends Proposal<
     entity: ChainEntity,
   ) {
     // must set identifier before super() because of how response object is named
-    super('compoundproposal', backportEntityToAdapter(Gov, entity));
+    super(ProposalType.CompoundProposal, backportEntityToAdapter(Gov, entity));
 
     this._Accounts = Accounts;
     this._Chain = Chain;

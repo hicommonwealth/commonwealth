@@ -4,7 +4,7 @@ import 'components/widgets/user_gallery.scss';
 import m from 'mithril';
 import _ from 'lodash';
 
-import { Account, AddressInfo, ChainInfo, ChainBase } from 'models';
+import { Account, AddressInfo } from 'models';
 import User from './user';
 
 // The UserGallery does not perform uniqueness checks.

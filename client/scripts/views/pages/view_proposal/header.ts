@@ -14,10 +14,9 @@ import {
 import {
   proposalSlugToFriendlyName,
   chainEntityTypeToProposalSlug,
-  chainEntityTypeToProposalName,
-  ProposalType
+  chainEntityTypeToProposalName
 } from 'identifiers';
-
+import { ProposalType } from 'types';
 import {
   OffchainThread,
   OffchainThreadKind,

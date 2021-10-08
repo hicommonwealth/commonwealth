@@ -9,7 +9,8 @@ import { Tag, Icon, Icons, Popover } from 'construct-ui';
 import app from 'state';
 import moment from 'moment';
 import jdenticon from 'jdenticon';
-import { Account, AddressInfo, ChainBase, Profile } from 'models';
+import { ChainBase } from 'types';
+import { Account, AddressInfo, Profile } from 'models';
 import { formatAddressShort } from '../../../../../shared/utils';
 
 // Address can be shown in full, autotruncated with formatAddressShort(),
