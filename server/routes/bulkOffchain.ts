@@ -106,7 +106,8 @@ const bulkOffchain = async (
               t.created_at AS thread_created, t.community AS thread_community,
               t.chain AS thread_chain, t.read_only, t.body,
               t.offchain_voting_options, t.offchain_voting_votes, t.offchain_voting_ends_at,
-              t.stage, t.snapshot_proposal, t.url, t.pinned, t.topic_id, t.kind, ARRAY_AGG(DISTINCT
+              t.stage, t.snapshot_proposal, t.url, t.pinned, t.topic_id, t.kind, 
+              ARRAY_AGG(DISTINCT
                 CONCAT(
                   '{ "address": "', editors.address, '", "chain": "', editors.chain, '" }'
                   )
@@ -118,7 +119,14 @@ const bulkOffchain = async (
                      "type_id": "', chain_entities.type_id, '",
                      "completed": "', chain_entities.completed, '" }'
                   )
-                ) AS chain_entities
+                ) AS chain_entities, 
+              ARRAY_AGG(DISTINCT
+                CONCAT(
+                  '{ "id": "', linked_threads.id, '",
+                      "linked_thread": "', linked_threads.linked_thread, '",
+                     "linking_thread": "', linked_threads.linking_thread, '" }'
+                )
+              ) AS linked_threads,
             FROM "OffchainThreads" t
             LEFT JOIN (
               SELECT root_id, MAX(created_at) AS comm_created_at
@@ -167,6 +175,9 @@ const bulkOffchain = async (
           const chain_entities = JSON.parse(t.chain_entities[0]).id
             ? t.chain_entities.map((c) => JSON.parse(c))
             : [];
+          const linked_threads = JSON.parse(t.linked_threads[0]).id
+            ? t.linked_threads.map((c) => JSON.parse(c))
+            : [];
           const last_edited = getLastEdited(t);
 
           const data = {
@@ -183,7 +194,7 @@ const bulkOffchain = async (
             chain: t.thread_chain,
             created_at: t.thread_created,
             collaborators,
-            linked_threads: t.linked_threads,
+            linked_threads,
             chain_entities,
             snapshot_proposal: t.snapshot_proposal,
             offchain_voting_options: t.offchain_voting_options,

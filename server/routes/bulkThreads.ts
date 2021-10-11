@@ -70,7 +70,14 @@ const bulkThreads = async (
                  "type_id": "', chain_entities.type_id, '",
                  "completed": "', chain_entities.completed, '" }'
               )
-            ) AS chain_entities
+            ) AS chain_entities,
+          ARRAY_AGG(DISTINCT
+            CONCAT(
+              '{ "id": "', linked_threads.id, '",
+                  "linked_thread": "', linked_threads.linked_thread, '",
+                  "linking_thread": "', linked_threads.linking_thread, '" }'
+            )
+          ) AS linked_threads,
         FROM "OffchainThreads" t
         LEFT JOIN (
           SELECT root_id, MAX(created_at) AS latest_comm_created_at
@@ -123,6 +130,9 @@ const bulkThreads = async (
       const chain_entities = JSON.parse(t.chain_entities[0]).id
         ? t.chain_entities.map((c) => JSON.parse(c))
         : [];
+      const linked_threads = JSON.parse(t.linked_threads[0]).id
+        ? t.linked_threads.map((c) => JSON.parse(c))
+        : [];
       const last_edited = getLastEdited(t);
 
       const data = {
@@ -139,6 +149,7 @@ const bulkThreads = async (
         chain: t.thread_chain,
         created_at: t.thread_created,
         collaborators,
+        linked_threads,
         chain_entities,
         snapshot_proposal: t.snapshot_proposal,
         offchain_voting_options: t.offchain_voting_options,
@@ -186,6 +197,10 @@ const bulkThreads = async (
           },
           {
             model: models.ChainEntity,
+          },
+          {
+            model: models.LinkedThread,
+            as: 'linked_threads',
           },
         ],
         attributes: { exclude: ['version_history'] },
