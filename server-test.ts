@@ -10,7 +10,6 @@ import express from 'express';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import WebSocket from 'ws';
 
-import { SubstrateTypes } from '@commonwealth/chain-events';
 import Erc20SubscriberHolder from 'server/util/erc20SubscriberHolder';
 
 import { SESSION_SECRET } from './server/config';
@@ -18,7 +17,7 @@ import setupAPI from './server/router';
 import setupPassport from './server/passport';
 import models from './server/database';
 import setupWebsocketServer from './server/socket';
-import { NotificationCategories } from './shared/types';
+import { ChainBase, ChainNetwork, NotificationCategories, ChainType } from './shared/types';
 import ViewCountCache from './server/util/viewCountCache';
 import IdentityFetchCache from './server/util/identityFetchCache';
 import TokenBalanceCache from './server/util/tokenBalanceCache';
@@ -116,61 +115,37 @@ const resetServer = (debug = false): Promise<void> => {
       // Initialize different chain + node URLs
       const edgMain = await models['Chain'].create({
         id: 'edgeware',
-        network: 'edgeware',
+        network: ChainNetwork.Edgeware,
         symbol: 'EDG',
         name: 'Edgeware',
         icon_url: '/static/img/protocols/edg.png',
         active: true,
-        type: 'chain',
-        base: 'substrate',
+        type: ChainType.Chain,
+        base: ChainBase.Substrate,
         ss58_prefix: 7,
-        has_chain_events_listener: false
+        has_chain_events_listener: false,
       });
       const eth = await models['Chain'].create({
         id: 'ethereum',
-        network: 'ethereum',
+        network: ChainNetwork.Ethereum,
         symbol: 'ETH',
         name: 'Ethereum',
         icon_url: '/static/img/protocols/eth.png',
         active: true,
-        type: 'chain',
-        base: 'ethereum',
-        has_chain_events_listener: false
+        type: ChainType.Chain,
+        base: ChainBase.Ethereum,
+        has_chain_events_listener: false,
       });
       const alex = await models['Chain'].create({
         id: 'alex',
-        network: 'alex',
+        network: ChainNetwork.ERC20,
         symbol: 'ALEX',
         name: 'Alex',
         icon_url: '/static/img/protocols/eth.png',
         active: true,
-        type: 'token',
-        base: 'ethereum',
-        has_chain_events_listener: false
-      });
-      const yearn = await models['Chain'].create({
-        id: 'yearn',
-        network: 'yearn',
-        symbol: 'YFI',
-        name: 'Yearn',
-        icon_url: '/static/img/protocols/yearn.png',
-        active: true,
-        type: 'chain',
-        base: 'ethereum',
-        snapshot: 'ybaby.eth',
-        has_chain_events_listener: false
-      });
-      const sushi = await models['Chain'].create({
-        id: 'sushi',
-        network: 'sushi',
-        symbol: 'SUSHI',
-        name: 'Sushi',
-        icon_url: '/static/img/protocols/sushi.png',
-        active: true,
-        type: 'chain',
-        base: 'ethereum',
-        snapshot: 'sushi',
-        has_chain_events_listener: false
+        type: ChainType.Token,
+        base: ChainBase.Ethereum,
+        has_chain_events_listener: false,
       });
 
       // Admin roles for specific communities
@@ -213,11 +188,11 @@ const resetServer = (debug = false): Promise<void> => {
       // Notification Categories
       await models['NotificationCategory'].create({
         name: NotificationCategories.NewCommunity,
-        description: 'someone makes a new community'
+        description: 'someone makes a new community',
       });
       await models['NotificationCategory'].create({
         name: NotificationCategories.NewThread,
-        description: 'someone makes a new thread'
+        description: 'someone makes a new thread',
       });
       await models['NotificationCategory'].create({
         name: NotificationCategories.NewComment,
@@ -271,24 +246,6 @@ const resetServer = (debug = false): Promise<void> => {
         [ 'wss://mainnet.infura.io/ws', 'sushi', '0x6b3595068778dd592e39a122f4f5a5cf09c90fe2'],
       ];
       await Promise.all(nodes.map(([ url, chain, address ]) => (models['ChainNode'].create({ chain, url, address }))));
-
-      // initialize chain event types
-      // we don't need to do this on regular reset, because incoming
-      // chain events create their own types, but for testing purposes
-      // we should have these pre-populated.
-      const initChainEventTypes = (chain) => {
-        return Promise.all(
-          SubstrateTypes.EventKinds.map((event_name) => {
-            return models['ChainEventType'].create({
-              id: `${chain}-${event_name}`,
-              chain,
-              event_name,
-            });
-          })
-        );
-      };
-
-      await initChainEventTypes('edgeware');
 
       if (debug) console.log('Database reset!');
       resolve();

@@ -8,7 +8,8 @@ import { Button, TextArea, Grid, Col, Spinner } from 'construct-ui';
 
 import app from 'state';
 import { link } from 'helpers';
-import { ITXModalData, TransactionStatus, ChainBase, IWebWallet, ITXData, ITransactionResult } from 'models';
+import { ChainBase } from 'types';
+import { ITXModalData, TransactionStatus, IWebWallet, ITXData, ITransactionResult } from 'models';
 
 import PolkadotWebWalletController from 'controllers/app/webWallets/polkadot_web_wallet';
 import Substrate from 'controllers/chain/substrate/main';

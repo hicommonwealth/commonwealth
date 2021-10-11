@@ -4,7 +4,11 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
 
-import { CWEvent, SubstrateTypes } from '@commonwealth/chain-events';
+import {
+  CWEvent,
+  SubstrateTypes,
+  SupportedNetwork,
+} from '@commonwealth/chain-events';
 
 import { resetDatabase } from '../../../server-test';
 import models from '../../../server/database';
@@ -78,6 +82,7 @@ describe('Event Handler Tests', () => {
     // setup
     const event: CWEvent = {
       blockNumber: 10,
+      network: SupportedNetwork.Substrate,
       data: {
         kind: SubstrateTypes.EventKind.DemocracyStarted,
         referendumIndex: 0,
@@ -115,6 +120,7 @@ describe('Event Handler Tests', () => {
     const event: CWEvent = {
       blockNumber: 11,
       includeAddresses: ['5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'],
+      network: SupportedNetwork.Substrate,
       data: {
         kind: SubstrateTypes.EventKind.Slash,
         validator: '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty',
@@ -152,6 +158,7 @@ describe('Event Handler Tests', () => {
     const event: CWEvent = {
       blockNumber: 12,
       excludeAddresses: ['5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'],
+      network: SupportedNetwork.Substrate,
       data: {
         kind: SubstrateTypes.EventKind.DemocracyStarted,
         referendumIndex: 1,
@@ -190,6 +197,7 @@ describe('Event Handler Tests', () => {
     const event: CWEvent = {
       blockNumber: 12,
       excludeAddresses: ['5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'],
+      network: SupportedNetwork.Substrate,
       data: {
         kind: SubstrateTypes.EventKind.DemocracyStarted,
         referendumIndex: 1,
@@ -215,6 +223,7 @@ describe('Event Handler Tests', () => {
     // setup
     const event: CWEvent = {
       blockNumber: 10,
+      network: SupportedNetwork.Substrate,
       data: {
         kind: SubstrateTypes.EventKind.DemocracyStarted,
         referendumIndex: 0,

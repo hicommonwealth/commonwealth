@@ -1,4 +1,5 @@
-import { IChainAdapter, ChainBase, NodeInfo } from 'models';
+import { ChainBase } from 'types';
+import { IChainAdapter, NodeInfo } from 'models';
 import { IApp } from 'state';
 
 import { NearToken } from 'adapters/chain/near/types';

@@ -1,16 +1,15 @@
-import { SubstrateTypes, chainSupportedBy } from '@commonwealth/chain-events';
 import { Request, Response, NextFunction } from 'express';
 import Sequelize from 'sequelize';
 import {
   PROFILE_BIO_MAX_CHARS,
   PROFILE_HEADLINE_MAX_CHARS,
   PROFILE_NAME_MAX_CHARS,
-  PROFILE_NAME_MIN_CHARS
+  PROFILE_NAME_MIN_CHARS,
+  ChainBase,
 } from '../../shared/types';
 import IdentityFetchCache from '../util/identityFetchCache';
 import { DB } from '../database';
-
-const { Op } = Sequelize;
+import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 
 export const Errors = {
   MissingParams: 'Must specify chain, address, and data',
@@ -29,6 +28,8 @@ const updateProfile = async (
   if (!req.body.chain || !req.body.address || !req.body.data) {
     return next(new Error(Errors.MissingParams));
   }
+  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  if (error) return next(new Error(error));
 
   let unpackedData;
   try {
@@ -95,7 +96,7 @@ const updateProfile = async (
 
   // new profiles on substrate chains get added to the identity cache
   // to be fetched by chain-event nodes or on a timer job
-  if (!req.body.skipChainFetch && chainSupportedBy(req.body.chain, SubstrateTypes.EventChains)) {
+  if (!req.body.skipChainFetch && chain.base === ChainBase.Substrate) {
     await identityFetchCache.add(req.body.chain, req.body.address);
   }
 

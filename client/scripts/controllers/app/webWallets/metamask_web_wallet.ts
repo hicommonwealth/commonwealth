@@ -3,7 +3,8 @@ declare let window: any;
 import app from 'state';
 import Web3 from 'web3';
 import { provider } from 'web3-core';
-import { Account, ChainBase, IWebWallet } from 'models';
+import { ChainBase } from 'types';
+import { Account, IWebWallet } from 'models';
 import { setActiveAccount } from 'controllers/app/login';
 
 class MetamaskWebWalletController implements IWebWallet<string> {

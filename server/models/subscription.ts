@@ -8,7 +8,7 @@ import { NotificationCategoryAttributes } from './notification_category';
 import { NotificationAttributes, NotificationInstance } from './notification';
 import { ModelStatic } from './types';
 import {
-  IPostNotificationData, ICommunityNotificationData, IChainEventNotificationData,
+  IPostNotificationData, ICommunityNotificationData, IChainEventNotificationData, ChainBase, ChainType,
 } from '../../shared/types';
 import { createImmediateNotificationEmailObject, sendImmediateNotificationEmail } from '../scripts/emails';
 import { factory, formatFilename } from '../../shared/logging';
@@ -188,8 +188,8 @@ export default (
 
     const erc20Tokens = (await models.Chain.findAll({
       where: {
-        base: 'ethereum',
-        type: 'token'
+        base: ChainBase.Ethereum,
+        type: ChainType.Token,
       }
     })).map((o) => o.id);
 

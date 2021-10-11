@@ -3,7 +3,7 @@ import { ProposalModule, ITXModalData } from 'models';
 import { ICompoundProposalResponse } from 'adapters/chain/compound/types';
 import { CompoundEvents, CompoundTypes } from '@commonwealth/chain-events';
 import { IApp } from 'state';
-import { EntityRefreshOption } from 'controllers/server/chain_entities';
+import { chainToEventNetwork, EntityRefreshOption } from 'controllers/server/chain_entities';
 import { BigNumberish } from 'ethers';
 import CompoundAPI from './api';
 import CompoundProposal from './proposal';
@@ -107,9 +107,7 @@ export default class CompoundGovernance extends ProposalModule<
     const entities = this.app.chain.chainEntities.store.getByType(CompoundTypes.EntityKind.Proposal);
     console.log(`Found ${entities.length} proposals!`);
     entities.forEach((e) => this._entityConstructor(e));
-
-    // no init logic currently needed
-    // await Promise.all(this.store.getAll().map((p) => p.init()));
+    await Promise.all(this.store.getAll().map((p) => p.init()));
 
     // register new chain-event handlers
     this.app.chain.chainEntities.registerEntityHandler(
@@ -125,8 +123,9 @@ export default class CompoundGovernance extends ProposalModule<
     // await this.app.chain.chainEntities.fetchEntities(this.app.chain.id, () => fetcher.fetch());
     await this.app.chain.chainEntities.subscribeEntities(
       this.app.chain.id,
+      chainToEventNetwork(this.app.chain.meta.chain),
       subscriber,
-      processor,
+      processor
     );
 
     this._initialized = true;

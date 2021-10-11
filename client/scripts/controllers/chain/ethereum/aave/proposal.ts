@@ -4,7 +4,7 @@ import Web3 from 'web3';
 import $ from 'jquery';
 import bs58 from 'bs58';
 import { AaveTypes } from '@commonwealth/chain-events';
-import { BigNumber } from 'ethers';
+import { ProposalType } from 'types';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import { IAaveProposalResponse } from 'adapters/chain/aave/types';
 import { formatNumberLong } from 'adapters/currency';
@@ -278,7 +278,7 @@ export default class AaveProposal extends Proposal<
     entity: ChainEntity,
   ) {
     // must set identifier before super() because of how response object is named
-    super('onchainproposal', backportEntityToAdapter(entity));
+    super(ProposalType.AaveProposal, backportEntityToAdapter(entity));
 
     this._Chain = Chain;
     this._Accounts = Accounts;

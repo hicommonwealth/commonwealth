@@ -5,12 +5,12 @@ import {
   Proposal, ProposalStatus, ProposalEndTime, ITXModalData, BinaryVote,
   VotingType, VotingUnit, ChainEntity, ChainEvent
 } from 'models';
+import { ProposalType } from 'types';
 import { SubstrateTypes } from '@commonwealth/chain-events';
 import { chainEntityTypeToProposalSlug } from 'identifiers';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateTreasury from './treasury';
-import { formatAddressShort } from '../../../../../shared/utils';
 
 const backportEventToAdapter = (
   ChainInfo: SubstrateChain,
@@ -109,7 +109,7 @@ export class SubstrateTreasuryProposal
     Treasury: SubstrateTreasury,
     entity: ChainEntity,
   ) {
-    super('treasuryproposal', backportEventToAdapter(
+    super(ProposalType.SubstrateTreasuryProposal, backportEventToAdapter(
       ChainInfo,
       // sometimes a TreasuryProposed chainEvent isn't available, so we have to fill in stub data
       (entity.chainEvents.find((e) => e.data.kind === SubstrateTypes.EventKind.TreasuryProposed)?.data as SubstrateTypes.ITreasuryProposed) || entity.typeId

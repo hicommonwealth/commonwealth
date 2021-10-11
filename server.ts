@@ -1,4 +1,4 @@
-import { Erc20Events, SubstrateEvents, SubstrateTypes, chainSupportedBy } from '@commonwealth/chain-events';
+import { Erc20Events, SubstrateEvents } from '@commonwealth/chain-events';
 import session from 'express-session';
 import Rollbar from 'rollbar';
 import express from 'express';
@@ -19,6 +19,7 @@ import logger from 'morgan';
 import prerenderNode from 'prerender-node';
 import devWebpackConfig from './webpack/webpack.config.dev.js';
 import prodWebpackConfig from './webpack/webpack.config.prod.js';
+import { ChainBase } from './shared/types';
 import { factory, formatFilename } from './shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -89,12 +90,18 @@ async function main() {
       } else if (CHAIN_EVENTS) {
         chains = CHAIN_EVENTS.split(',');
       }
-      const subscribers = await setupChainEventListeners(null, chains, SKIP_EVENT_CATCHUP);
+      const subscribers = await setupChainEventListeners(
+        null,
+        chains,
+        SKIP_EVENT_CATCHUP
+      );
       // construct storageFetchers needed for the identity cache
       const fetchers = {};
-      for (const [ chain, subscriber ] of Object.entries(subscribers)) {
-        if (chainSupportedBy(chain, SubstrateTypes.EventChains)) {
-          fetchers[chain] = new SubstrateEvents.StorageFetcher(subscriber.api);
+      for (const [node, subscriber] of subscribers) {
+        if (node.Chain.base === ChainBase.Substrate) {
+          fetchers[node.chain] = new SubstrateEvents.StorageFetcher(
+            subscriber.api
+          );
         }
         if (chain === 'erc20') {
           erc20SubscriberHolder.setSubscriber(subscriber as Erc20Events.Subscriber);

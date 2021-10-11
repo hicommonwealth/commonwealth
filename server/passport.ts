@@ -10,6 +10,7 @@ import { Magic, MagicUserMetadata } from '@magic-sdk/admin';
 import { Strategy as MagicStrategy } from 'passport-magic';
 
 import { sequelize, DB } from './database';
+import { ChainBase } from '../shared/types';
 import { factory, formatFilename } from '../shared/logging';
 import { getStatsDInstance } from './util/metrics';
 const log = factory.getLogger(formatFilename(__filename));
@@ -130,7 +131,7 @@ function setupPassport(models: DB) {
 
           // create an address on their selected chain
           let newAddress;
-          if (registrationChain.base === 'substrate') {
+          if (registrationChain.base === ChainBase.Substrate) {
             newAddress = await models.Address.create({
               address: polkadotAddress,
               chain: registrationChain.id,

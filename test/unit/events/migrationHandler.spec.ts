@@ -4,7 +4,11 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
 
-import { CWEvent, SubstrateTypes } from '@commonwealth/chain-events';
+import {
+  CWEvent,
+  SubstrateTypes,
+  SupportedNetwork,
+} from '@commonwealth/chain-events';
 
 import { resetDatabase } from '../../../server-test';
 import models from '../../../server/database';
@@ -28,6 +32,7 @@ describe('Edgeware Migration Event Handler Tests', () => {
     // setup
     const event: CWEvent<SubstrateTypes.IEventData> = {
       blockNumber: 10,
+      network: SupportedNetwork.Substrate,
       data: {
         kind: SubstrateTypes.EventKind.DemocracyStarted,
         referendumIndex: 0,
@@ -63,6 +68,7 @@ describe('Edgeware Migration Event Handler Tests', () => {
   it('should upgrade existing event', async () => {
     const legacyEvent: any = {
       blockNumber: 10,
+      network: SupportedNetwork.Substrate,
       data: {
         kind: SubstrateTypes.EventKind.PreimageNoted,
         proposalHash: 'hash',
@@ -71,6 +77,7 @@ describe('Edgeware Migration Event Handler Tests', () => {
     };
     const currentEvent: CWEvent<SubstrateTypes.IEventData> = {
       blockNumber: 10,
+      network: SupportedNetwork.Substrate,
       data: {
         kind: SubstrateTypes.EventKind.PreimageNoted,
         proposalHash: 'hash',
@@ -109,6 +116,7 @@ describe('Edgeware Migration Event Handler Tests', () => {
     const event: CWEvent<SubstrateTypes.IEventData> = {
       blockNumber: 11,
       includeAddresses: ['5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'],
+      network: SupportedNetwork.Substrate,
       data: {
         kind: SubstrateTypes.EventKind.Slash,
         validator: '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty',
@@ -126,7 +134,7 @@ describe('Edgeware Migration Event Handler Tests', () => {
   it('should ignore unknown events', async () => {
     const event = {
       blockNumber: 13,
-
+      network: SupportedNetwork.Substrate,
       data: {
         kind: 'democracy-exploded',
         whoops: true,

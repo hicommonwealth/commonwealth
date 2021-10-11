@@ -5,14 +5,15 @@ import _ from 'underscore';
 import format from 'pg-format';
 import {
   createListener,
-  chainSupportedBy,
   SubstrateTypes,
   SubstrateEvents,
   IEventHandler,
   CWEvent,
   LoggingHandler,
+  SupportedNetwork,
 } from '@commonwealth/chain-events';
 
+import { ChainBase, ChainNetwork, ChainType } from '../../shared/types';
 import { RabbitMqHandler } from '../eventHandlers/rabbitmqPlugin';
 import Identity from '../eventHandlers/pgIdentity';
 import { factory, formatFilename } from '../../shared/logging';
@@ -154,7 +155,7 @@ async function mainProcess(
 
   // group erc20 tokens together in order to start only one listener for all erc20 tokens
   const erc20Tokens = myChainData.filter(
-    (chain) => chain.type === 'token' && chain.base === 'ethereum'
+    (chain) => chain.type === ChainType.Token && chain.base === ChainBase.Ethereum
   );
   const erc20TokenAddresses = erc20Tokens.map((chain) => chain.address);
   const erc20TokenNames = erc20Tokens.map((chain) => chain.id);
@@ -187,13 +188,13 @@ async function mainProcess(
       try {
         listeners['erc20'] = await createListener(
           'erc20',
+          SupportedNetwork.ERC20,
           {
             url: 'wss://mainnet.infura.io/ws',
             tokenAddresses: erc20TokenAddresses,
             tokenNames: erc20TokenNames,
             verbose: false,
-          },
-          'erc20'
+          }
         );
 
         // add the rabbitmq handler for this chain
@@ -227,7 +228,7 @@ async function mainProcess(
 
   // remove erc20 tokens from myChainData
   myChainData = myChainData.filter(
-    (chain) => chain.type !== 'token' || chain.base !== 'ethereum'
+    (chain) => chain.type !== ChainType.Token || chain.base !== ChainBase.Ethereum
   );
 
   // delete listeners for chains that are no longer assigned to this node (skip erc20)
@@ -249,26 +250,27 @@ async function mainProcess(
 
       // base is used to override built-in event chains in chain-events - only used for substrate chains in this case
       // NOTE: All erc20 tokens (type='token' base='ethereum') are removed at this point
-      let base: string;
-      if (chain.base === 'substrate') base = 'substrate';
-      else if (chain.network === 'compound') base = 'compound';
-      else if (chain.network === 'aave') base = 'aave';
+      let network: SupportedNetwork;
+      if (chain.base === ChainBase.Substrate)
+        network = SupportedNetwork.Substrate;
+      else if (chain.network === ChainNetwork.Compound)
+        network = SupportedNetwork.Compound;
+      else if (chain.network === ChainNetwork.Aave)
+        network = SupportedNetwork.Aave;
+      else if (chain.network === ChainNetwork.Moloch)
+        network = SupportedNetwork.Moloch;
 
       try {
-        listeners[chain.id] = await createListener(
-          chain.id,
-          {
-            address: chain.address,
-            archival: false,
-            url: chain.url,
-            spec: chain.substrate_spec,
-            skipCatchup: false,
-            verbose: false, // using this will print event before chain is added to it
-            enricherConfig: { balanceTransferThresholdPermill: 10_000 },
-            discoverReconnectRange,
-          },
-          base
-        );
+        listeners[chain.id] = await createListener(chain.id, network, {
+          address: chain.address,
+          archival: false,
+          url: chain.url,
+          spec: chain.substrate_spec,
+          skipCatchup: false,
+          verbose: false, // using this will print event before chain is added to it
+          enricherConfig: { balanceTransferThresholdPermill: 10_000 },
+          discoverReconnectRange,
+        });
       } catch (error) {
         delete listeners[chain.id];
         await handleFatalError(error, pool, chain, 'listener-startup');
@@ -277,7 +279,7 @@ async function mainProcess(
 
       // if chain is a substrate chain add the excluded events
       let excludedEvents = [];
-      if (chainSupportedBy(chain.id, SubstrateTypes.EventChains))
+      if (network === SupportedNetwork.Substrate)
         excludedEvents = [
           SubstrateTypes.EventKind.Reward,
           SubstrateTypes.EventKind.TreasuryRewardMinting,
@@ -304,7 +306,7 @@ async function mainProcess(
         await handleFatalError(error, pool, chain.id, 'listener-subscribe');
       }
     } else if (
-      chain.base === 'substrate' &&
+      chain.base === ChainBase.Substrate &&
       !_.isEqual(
         chain.substrate_spec,
         (<SubstrateEvents.Listener>listeners[chain.id]).options.spec
@@ -341,7 +343,7 @@ async function mainProcess(
   // loop through chains that have active listeners again this time dealing with identity
   for (const chain of myChainData) {
     // skip chains that aren't Substrate chains
-    if (chain.base !== 'substrate') continue;
+    if (chain.base !== ChainBase.Substrate) continue;
 
     if (!listeners[chain.id]) {
       log.warn(

@@ -8,6 +8,7 @@ import { IApp } from 'state';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import { SubstrateCollectiveProposal } from './collective_proposal';
+import { chainToEventNetwork } from '../../server/chain_entities';
 
 class SubstrateCollective extends ProposalModule<
   ApiPromise,
@@ -56,6 +57,7 @@ class SubstrateCollective extends ProposalModule<
     // fetch proposals from chain
     await this.app.chain.chainEntities.fetchEntities(
       this.app.chain.id,
+      chainToEventNetwork(this.app.chain.meta.chain),
       () => this._Chain.fetcher.fetchCollectiveProposals(this.moduleName, this.app.chain.block.height)
     );
 

@@ -1,10 +1,12 @@
 import moment from 'moment';
 import BN from 'bn.js';
+import { capitalize } from 'lodash';
+
+import { CompoundTypes } from '@commonwealth/chain-events';
+import { ProposalType } from 'types';
 
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import { ICompoundProposalResponse } from 'adapters/chain/compound/types';
-
-import { CompoundTypes } from '@commonwealth/chain-events';
 
 import {
   Proposal,
@@ -24,7 +26,6 @@ import { attachSigner } from '../contractApi';
 import EthereumAccount from '../account';
 import EthereumAccounts from '../accounts';
 import CompoundChain from './chain';
-import { capitalize } from 'lodash';
 
 export enum CompoundVote {
   YES = 1,
@@ -55,6 +56,7 @@ const backportEntityToAdapter = (
     executed: false,
     cancelled: false,
     completed: false,
+    expired: false,
     ...startData,
   };
 };
@@ -77,7 +79,9 @@ export default class CompoundProposal extends Proposal<
   private _Chain: CompoundChain;
   private _Gov: CompoundGovernance;
 
-  public get shortIdentifier() { return `${capitalize(this._Accounts?.app.activeChainId())}Proposal-${this.data.identifier}`; }
+  public get shortIdentifier() {
+    return `${capitalize(this._Accounts?.app.activeChainId())}Proposal-${this.data.identifier}`;
+  }
   public get title(): string {
     try {
       const parsed = JSON.parse(this.data.description);
@@ -154,9 +158,12 @@ export default class CompoundProposal extends Proposal<
     const blockNumber = this._Gov.app.chain.block.height;
     if (this.data.cancelled) return CompoundTypes.ProposalState.Canceled;
     if (this.data.executed) return CompoundTypes.ProposalState.Executed;
+    if (this.data.expired) return CompoundTypes.ProposalState.Expired;
     if (this.data.queued) return CompoundTypes.ProposalState.Queued;
-    if (blockNumber <= this.data.startBlock) return CompoundTypes.ProposalState.Pending;
-    if (blockNumber <= this.data.endBlock) return CompoundTypes.ProposalState.Active;
+    if (blockNumber <= this.data.startBlock)
+      return CompoundTypes.ProposalState.Pending;
+    if (blockNumber <= this.data.endBlock)
+      return CompoundTypes.ProposalState.Active;
 
     const votes = this.getVotes();
     const yesPower = sumVotes(votes.filter((v) => v.choice));
@@ -164,20 +171,24 @@ export default class CompoundProposal extends Proposal<
     if (yesPower <= noPower || yesPower <= this._Gov.quorumVotes)
       return CompoundTypes.ProposalState.Defeated;
     if (!this.data.eta) return CompoundTypes.ProposalState.Succeeded;
-    return CompoundTypes.ProposalState.Expired;
+    console.warn(`Invalid state for proposal: ${this}`);
+    return null;
   }
 
   public get endTime(): ProposalEndTime {
     const state = this.state;
 
     // waiting to start
-    if (state === CompoundTypes.ProposalState.Pending) return { kind: 'fixed_block', blocknum: this.data.startBlock };
+    if (state === CompoundTypes.ProposalState.Pending)
+      return { kind: 'fixed_block', blocknum: this.data.startBlock };
 
     // started
-    if (state === CompoundTypes.ProposalState.Active) return { kind: 'fixed_block', blocknum: this.data.endBlock };
+    if (state === CompoundTypes.ProposalState.Active)
+      return { kind: 'fixed_block', blocknum: this.data.endBlock };
 
     // queued but not ready for execution
-    if (state === CompoundTypes.ProposalState.Queued) return { kind: 'fixed', time: moment(this.data.eta) };
+    if (state === CompoundTypes.ProposalState.Queued)
+      return { kind: 'fixed', time: moment(this.data.eta) };
 
     // unavailable if: waiting to passed/failed but not in queue, or completed
     return { kind: 'unavailable' };
@@ -216,7 +227,7 @@ export default class CompoundProposal extends Proposal<
     entity: ChainEntity,
   ) {
     // must set identifier before super() because of how response object is named
-    super('compoundproposal', backportEntityToAdapter(Gov, entity));
+    super(ProposalType.CompoundProposal, backportEntityToAdapter(Gov, entity));
 
     this._Accounts = Accounts;
     this._Chain = Chain;
@@ -224,13 +235,25 @@ export default class CompoundProposal extends Proposal<
 
     entity.chainEvents.sort((e1, e2) => e1.blockNumber - e2.blockNumber).forEach((e) => this.update(e));
 
-    // special case for expiration because no event is emitted
-    if (this.state === CompoundTypes.ProposalState.Expired || this.state === CompoundTypes.ProposalState.Defeated) {
-      this.complete(this._Gov.store);
+    this._Gov.store.add(this);
+  }
+
+  public async init() {
+    // fetch state from chain to check for expired (no event emitted + no way to compute w/o timelock)
+    const queriedState = await this._Gov.api.Contract.state(this.data.id);
+    if (queriedState === CompoundTypes.ProposalState.Expired) {
+      this.data.expired = true;
     }
 
     this._initialized = true;
-    this._Gov.store.add(this);
+
+    // special case for expiration because no event is emitted
+    if (
+      this.state === CompoundTypes.ProposalState.Expired ||
+      this.state === CompoundTypes.ProposalState.Defeated
+    ) {
+      this.complete(this._Gov.store);
+    }
   }
 
   public update(e: ChainEvent) {
@@ -243,7 +266,7 @@ export default class CompoundProposal extends Proposal<
         const vote = new CompoundProposalVote(
           this._Accounts.get(e.data.voter),
           e.data.support ? CompoundVote.YES : CompoundVote.NO,
-          power,
+          power
         );
         this.addOrUpdateVote(vote);
         break;

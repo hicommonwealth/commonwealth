@@ -102,6 +102,7 @@ export default class extends IEventHandler {
       where: {
         id: `${chain}-${event.data.kind.toString()}`,
         chain,
+        event_network: event.network,
         event_name: event.data.kind.toString(),
       }
     });
