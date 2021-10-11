@@ -2,7 +2,11 @@
  * Generic handler that transforms events into notifications.
  */
 import WebSocket from 'ws';
-import { IEventHandler, CWEvent, IChainEventKind } from '@commonwealth/chain-events';
+import {
+  IEventHandler,
+  CWEvent,
+  IChainEventKind,
+} from '@commonwealth/chain-events';
 import { NotificationCategories } from '../../shared/types';
 
 import { factory, formatFilename } from '../../shared/logging';
@@ -12,7 +16,7 @@ export default class extends IEventHandler {
   constructor(
     private readonly _models,
     private readonly _wss?: WebSocket.Server,
-    private readonly _excludedEvents: IChainEventKind[] = [],
+    private readonly _excludedEvents: IChainEventKind[] = []
   ) {
     super();
   }
@@ -21,19 +25,20 @@ export default class extends IEventHandler {
    * Handles an event by emitting notifications as needed.
    */
   public async handle(event: CWEvent, dbEvent) {
+    const logPrefix = `[${event.network}::${event.chain}]: `;
     // log.debug(`Received event: ${JSON.stringify(event, null, 2)}`);
     if (!dbEvent) {
-      log.trace('No db event received! Ignoring.');
+      log.trace(`${logPrefix}No db event received! Ignoring.`);
       return;
     }
     if (this._excludedEvents.includes(event.data.kind)) {
-      log.trace('Skipping event!');
+      log.trace(`${logPrefix}Skipping event!`);
       return dbEvent;
     }
     try {
       const dbEventType = await dbEvent.getChainEventType();
       if (!dbEventType) {
-        log.error('Failed to fetch event type! Ignoring.');
+        log.error(`${logPrefix}Failed to fetch event type! Ignoring.`);
         return;
       }
 
@@ -46,12 +51,12 @@ export default class extends IEventHandler {
         { chainEvent: dbEvent, chainEventType: dbEventType }, // TODO: add webhook data once specced out
         this._wss,
         event.excludeAddresses,
-        event.includeAddresses,
+        event.includeAddresses
       );
-      log.info(`Emitted ${dbNotifications.length} notifications.`);
+      log.info(`${logPrefix}Emitted ${dbNotifications.length} notifications.`);
       return dbEvent;
     } catch (e) {
-      log.error(`Failed to generate notification: ${e.message}!`);
+      log.error(`${logPrefix}Failed to generate notification: ${e.message}!`);
       return dbEvent;
     }
   }

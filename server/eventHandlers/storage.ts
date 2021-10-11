@@ -1,7 +1,13 @@
 /**
  * Generic handler that stores the event in the database.
  */
-import { IEventHandler, CWEvent, IChainEventKind, SubstrateTypes, Erc20Types } from '@commonwealth/chain-events';
+import {
+  IEventHandler,
+  CWEvent,
+  IChainEventKind,
+  SubstrateTypes,
+  Erc20Types,
+} from '@commonwealth/chain-events';
 import Sequelize from 'sequelize';
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
@@ -16,7 +22,7 @@ export default class extends IEventHandler {
   constructor(
     private readonly _models,
     private readonly _chain?: string,
-    private readonly _filterConfig: StorageFilterConfig = {},
+    private readonly _filterConfig: StorageFilterConfig = {}
   ) {
     super();
   }
@@ -27,17 +33,21 @@ export default class extends IEventHandler {
    */
   private truncateEvent(event: CWEvent, maxLength = 64): CWEvent {
     // only truncate preimages, for now
-    if (event.data.kind === SubstrateTypes.EventKind.PreimageNoted && event.data.preimage) {
-      event.data.preimage.args = event.data.preimage.args.map((m) => m.length > maxLength
-        ? `${m.slice(0, maxLength - 1)}…`
-        : m);
+    if (
+      event.data.kind === SubstrateTypes.EventKind.PreimageNoted &&
+      event.data.preimage
+    ) {
+      event.data.preimage.args = event.data.preimage.args.map((m) =>
+        m.length > maxLength ? `${m.slice(0, maxLength - 1)}…` : m
+      );
     }
     return event;
   }
 
   private async _shouldSkip(event: CWEvent, chain?: string): Promise<boolean> {
     chain = chain || event.chain || this._chain;
-    if (this._filterConfig.excludedEvents?.includes(event.data.kind)) return true;
+    if (this._filterConfig.excludedEvents?.includes(event.data.kind))
+      return true;
     const addressesExist = async (addresses: string[]) => {
       const addressModels = await this._models.Address.findAll({
         where: {
@@ -67,54 +77,60 @@ export default class extends IEventHandler {
    * NOTE: this may modify the event.
    */
   public async handle(event: CWEvent) {
+    const logPrefix = `[${event.network}::${event.chain}]: `;
     let chain = event.chain || this._chain;
 
     event = this.truncateEvent(event);
 
-    log.debug(`Received event: ${JSON.stringify(event, null, 2)}`);
+    log.debug(`${logPrefix}Received event: ${JSON.stringify(event, null, 2)}`);
 
     // TODO: this entire if statement is unnecessary with new system since if the token is
     // TODO: being listened to then it obviously is in the database. This is compatible with new system since
     // TODO: the new system defines event.chain as the tokenName and thus this will not trigger
     // locate event type and add event (and event type if needed) to database
     if (chain === 'erc20') {
-      const address = (event.data as Erc20Types.ITransfer).contractAddress.toLowerCase();
+      const address = (
+        event.data as Erc20Types.ITransfer
+      ).contractAddress.toLowerCase();
       const tokenChain = await this._models.ChainNode.findOne({
         where: {
-          address
-        }
+          address,
+        },
       });
       if (tokenChain) {
         chain = tokenChain.chain;
       } else {
-        log.error(`Token ${address} not registered in database, skipping!`);
+        log.error(
+          `${logPrefix}Token ${address} not registered in database, skipping!`
+        );
         return;
       }
     }
 
     const shouldSkip = await this._shouldSkip(event, chain);
     if (shouldSkip) {
-      log.trace('Skipping event!');
+      log.trace(`${logPrefix}Skipping event!`);
       return;
     }
 
-    const [dbEventType, created] = await this._models.ChainEventType.findOrCreate({
-      where: {
-        id: `${chain}-${event.data.kind.toString()}`,
-        chain,
-        event_network: event.network,
-        event_name: event.data.kind.toString(),
-      }
-    });
+    const [dbEventType, created] =
+      await this._models.ChainEventType.findOrCreate({
+        where: {
+          id: `${chain}-${event.data.kind.toString()}`,
+          chain,
+          event_network: event.network,
+          event_name: event.data.kind.toString(),
+        },
+      });
 
     if (!dbEventType) {
-      log.error(`unknown event type: ${event.data.kind}`);
+      log.error(`${logPrefix}unknown event type: ${event.data.kind}`);
       return;
     } else {
       if (created) {
-        log.info(`Created new ChainEventType: ${dbEventType.id}`);
+        log.info(`${logPrefix}Created new ChainEventType: ${dbEventType.id}`);
       } else {
-        log.trace(`found chain event type: ${dbEventType.id}`);
+        log.trace(`${logPrefix}found chain event type: ${dbEventType.id}`);
       }
     }
 

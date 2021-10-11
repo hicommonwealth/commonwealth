@@ -155,7 +155,8 @@ async function mainProcess(
 
   // group erc20 tokens together in order to start only one listener for all erc20 tokens
   const erc20Tokens = myChainData.filter(
-    (chain) => chain.type === ChainType.Token && chain.base === ChainBase.Ethereum
+    (chain) =>
+      chain.type === ChainType.Token && chain.base === ChainBase.Ethereum
   );
   const erc20TokenAddresses = erc20Tokens.map((chain) => chain.address);
   const erc20TokenNames = erc20Tokens.map((chain) => chain.id);
@@ -228,7 +229,8 @@ async function mainProcess(
 
   // remove erc20 tokens from myChainData
   myChainData = myChainData.filter(
-    (chain) => chain.type !== ChainType.Token || chain.base !== ChainBase.Ethereum
+    (chain) =>
+      chain.type !== ChainType.Token || chain.base !== ChainBase.Ethereum
   );
 
   // delete listeners for chains that are no longer assigned to this node (skip erc20)

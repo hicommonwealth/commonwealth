@@ -21,7 +21,7 @@ export default class extends IEventHandler {
   constructor(
     private readonly _models,
     private readonly _chain?: string,
-    private readonly _wss?: WebSocket.Server,
+    private readonly _wss?: WebSocket.Server
   ) {
     super();
   }
@@ -36,12 +36,14 @@ export default class extends IEventHandler {
         chainEntity: dbEntity.toJSON(),
         chainEvent: dbEvent.toJSON(),
         chainEventType: dbEventType.toJSON(),
-      }
+      },
     };
     try {
       this._wss.emit(WebsocketMessageType.ChainEntity, payload);
     } catch (e) {
-      log.warn(`Failed to emit websocket event for entity ${dbEntity.type}:${dbEntity.type_id}`);
+      log.warn(
+        `Failed to emit websocket event for entity ${dbEntity.type}:${dbEntity.type_id}`
+      );
     }
   }
 
@@ -54,7 +56,8 @@ export default class extends IEventHandler {
   public async handle(event: CWEvent<IChainEventData>, dbEvent) {
     // if chain is stored in the event then that will override the class property
     // (allows backwards compatibility between reduced memory consuming chain consumer/handlers and other scripts)
-    const chain = event.chain || this._chain
+    const logPrefix = `[${event.network}::${event.chain}]: `;
+    const chain = event.chain || this._chain;
     if (!dbEvent) {
       log.trace('no db event found!');
       return;
@@ -68,7 +71,12 @@ export default class extends IEventHandler {
      * We should determine, using the event's type, what action to take, based
      * on whether it is a creation, modification, or unrelated event.
      */
-    const createEntityFn = async (type: IChainEntityKind, type_id: string, author?, completed = false) => {
+    const createEntityFn = async (
+      type: IChainEntityKind,
+      type_id: string,
+      author?,
+      completed = false
+    ) => {
       if (type === SubstrateTypes.EntityKind.DemocracyPreimage) {
         // we always mark preimages as "completed" -- we have no link between democracy proposals
         // and preimages in the database, so we want to always fetch them for archival purposes,
@@ -76,16 +84,20 @@ export default class extends IEventHandler {
         completed = true;
       }
       const params = author
-        ? { type: type.toString(), type_id, chain,  author }
+        ? { type: type.toString(), type_id, chain, author }
         : { type: type.toString(), type_id, chain };
-      const [ dbEntity, created ] = await this._models.ChainEntity.findOrCreate({
+      const [dbEntity, created] = await this._models.ChainEntity.findOrCreate({
         where: params,
         default: { completed },
       });
       if (created) {
-        log.info(`Created db entity, ${type.toString()}: ${type_id}.`);
+        log.info(
+          `${logPrefix}Created db entity, ${type.toString()}: ${type_id}.`
+        );
       } else {
-        log.info(`Found duplicate db entity,  ${type.toString()}: ${type_id}.`);
+        log.info(
+          `${logPrefix}Found duplicate db entity,  ${type.toString()}: ${type_id}.`
+        );
       }
 
       if (dbEvent.entity_id !== dbEntity.id) {
@@ -93,24 +105,34 @@ export default class extends IEventHandler {
         await dbEvent.save();
         await this._wssSend(dbEntity, dbEvent);
       } else {
-        log.info('Db Event is already linked to entity! Doing nothing.');
+        log.info(
+          `${logPrefix}Db Event is already linked to entity! Doing nothing.`
+        );
       }
 
       // TODO: create thread?
       return dbEvent;
     };
 
-    const updateEntityFn = async (type: IChainEntityKind, type_id: string, completed = false) => {
+    const updateEntityFn = async (
+      type: IChainEntityKind,
+      type_id: string,
+      completed = false
+    ) => {
       const dbEntity = await this._models.ChainEntity.findOne({
         where: {
-          type: type.toString(), type_id, chain
-        }
+          type: type.toString(),
+          type_id,
+          chain,
+        },
       });
       if (!dbEntity) {
-        log.error(`no relevant db entity found for ${type}: ${type_id}`);
+        log.error(
+          `${logPrefix}no relevant db entity found for ${type}: ${type_id}`
+        );
         return;
       }
-      log.info(`Updated db entity, ${type}: ${type_id}.`);
+      log.info(`${logPrefix}Updated db entity, ${type}: ${type_id}.`);
 
       // link ChainEvent to entity
       dbEvent.entity_id = dbEntity.id;
@@ -128,10 +150,12 @@ export default class extends IEventHandler {
 
     const entity = eventToEntity(event.network, event.data.kind);
     if (!entity) {
-      log.info(`no archival action needed for event of kind ${event.data.kind.toString()}`);
+      log.info(
+        `${logPrefix}no archival action needed for event of kind ${event.data.kind.toString()}`
+      );
       return dbEvent;
     }
-    const [ entityKind, updateType ] = entity;
+    const [entityKind, updateType] = entity;
     const fieldName = entityToFieldName(event.network, entityKind);
     const fieldValue = event.data[fieldName].toString();
     const author = event.data['proposer'];
