@@ -173,9 +173,11 @@ export default (
     });
     models.OffchainThread.hasMany(models.LinkedThread, {
       foreignKey: 'linking_thread',
+      as: 'linking_threads',
     });
     models.OffchainThread.hasMany(models.LinkedThread, {
       foreignKey: 'linked_thread',
+      as: 'linked_threads',
     });
   };
 

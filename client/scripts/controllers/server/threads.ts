@@ -19,10 +19,8 @@ import {
 
 import { notifyError } from 'controllers/app/notifications';
 import { updateLastVisited } from 'controllers/app/login';
-import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
 import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
-import { modelFromServer as modelThreadsUniqueAddressCount } from 'controllers/server/threadUniqueAddressesCount';
 
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
@@ -60,8 +58,9 @@ export const modelFromServer = (thread) => {
     offchain_voting_votes,
     reactions,
     latestCommCreatedAt,
+    linked_threads,
   } = thread;
-
+  console.log(linked_threads);
   const attachments = OffchainAttachments
     ? OffchainAttachments.map(
         (a) => new OffchainAttachment(a.url, a.description)
@@ -129,6 +128,7 @@ export const modelFromServer = (thread) => {
     latestCommCreatedAt: latestCommCreatedAt
       ? moment(latestCommCreatedAt)
       : null,
+    linkedThreads: linked_threads,
   });
 };
 

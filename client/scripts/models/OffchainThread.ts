@@ -43,6 +43,7 @@ class OffchainThread implements IUniqueId {
   public readonly community: string;
   public readonly chain: string;
   public readonly lastEdited: moment.Moment;
+  public readonly linkedThreads: OffchainThread[];
   public snapshotProposal: string;
 
   public get uniqueIdentifier() {
@@ -141,6 +142,7 @@ class OffchainThread implements IUniqueId {
     offchainVotingNumVotes,
     offchainVotes,
     latestCommCreatedAt,
+    linkedThreads,
   }: {
     author: string;
     title: string;
@@ -168,6 +170,7 @@ class OffchainThread implements IUniqueId {
     offchainVotingEndsAt?: string | moment.Moment | null;
     offchainVotingNumVotes?: number;
     offchainVotes?: OffchainVote[];
+    linkedThreads: any;
   }) {
     this.author = author;
     this.title = title;
@@ -209,6 +212,7 @@ class OffchainThread implements IUniqueId {
     this.offchainVotingNumVotes = offchainVotingNumVotes;
     this.offchainVotes = offchainVotes || [];
     this.lastEdited = lastEdited;
+    this.linkedThreads = linkedThreads;
   }
 }
 
