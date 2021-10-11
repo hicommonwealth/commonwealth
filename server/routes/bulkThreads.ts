@@ -51,7 +51,7 @@ const bulkThreads = async (
         threads.url, threads.pinned, topics.id AS topic_id, topics.name AS topic_name,
         topics.description AS topic_description, topics.chain_id AS topic_chain,
         topics.telegram AS topic_telegram,
-        topics.community_id AS topic_community, collaborators, chain_entities
+        topics.community_id AS topic_community, collaborators, chain_entities, linked_threads
       FROM "Addresses" AS addr
       RIGHT JOIN (
         SELECT t.id AS thread_id, t.title AS thread_title, t.address_id, latest_comm_created_at,
@@ -82,6 +82,8 @@ const bulkThreads = async (
           GROUP BY root_id
           ) c
         ON CAST(TRIM('discussion_' FROM c.root_id) AS int) = t.id
+        LEFT JOIN "LinkedThreads" AS linked_threads
+        ON t.id = linked_threads.linking_thread
         LEFT JOIN "Collaborations" AS collaborations
         ON t.id = collaborations.offchain_thread_id
         LEFT JOIN "Addresses" editors

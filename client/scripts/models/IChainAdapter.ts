@@ -71,6 +71,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     const {
       threads, topics, admins, activeUsers, numVotingThreads
     } = response.result;
+    console.log(threads);
     this.app.threads.initialize(threads, numVotingThreads, true);
     this.app.topics.initialize(topics, true);
     this.meta.chain.setAdmins(admins);

@@ -15,20 +15,29 @@ import { RoleInstance } from '../models/role';
 import { OffchainThreadInstance } from '../models/offchain_thread';
 
 const log = factory.getLogger(formatFilename(__filename));
-export const Errors = { };
+export const Errors = {};
 
 // Topics, comments, reactions, members+admins, threads
-const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
+const bulkOffchain = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const [chain, community, error] = await lookupCommunityIsVisibleToUser(
+    models,
+    req.query,
+    req.user
+  );
   if (error) return next(new Error(error));
 
   // globally shared SQL replacements
   const communityOptions = community
-      ? 'community = :community'
-      : 'chain = :chain';
+    ? 'community = :community'
+    : 'chain = :chain';
   const replacements = community
-      ? { community: community.id }
-      : { chain: chain.id };
+    ? { community: community.id }
+    : { chain: chain.id };
 
   // parallelized queries
   const [
@@ -90,7 +99,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
             threads.url, threads.pinned, topics.id AS topic_id, topics.name AS topic_name,
             topics.description AS topic_description, topics.chain_id AS topic_chain,
             topics.telegram AS topic_telegram,
-            topics.community_id AS topic_community, collaborators, chain_entities
+            topics.community_id AS topic_community, collaborators, chain_entities, linked_threads
           FROM "Addresses" AS addr
           RIGHT JOIN (
             SELECT t.id AS thread_id, t.title AS thread_title, t.address_id,
@@ -120,6 +129,8 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
               GROUP BY root_id
               ) c
             ON CAST(TRIM('discussion_' FROM c.root_id) AS int) = t.id
+            LEFT JOIN "LinkedThreads" AS linked_threads
+            ON t.id = linked_threads.linking_thread
             LEFT JOIN "Collaborations" AS collaborations
             ON t.id = collaborations.offchain_thread_id
             LEFT JOIN "Addresses" editors
@@ -172,6 +183,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
             chain: t.thread_chain,
             created_at: t.thread_created,
             collaborators,
+            linked_threads: t.linked_threads,
             chain_entities,
             snapshot_proposal: t.snapshot_proposal,
             offchain_voting_options: t.offchain_voting_options,
@@ -224,13 +236,18 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
     // most active users
     new Promise(async (resolve, reject) => {
       try {
-        const thirtyDaysAgo = new Date((new Date() as any) - 1000 * 24 * 60 * 60 * 30);
+        const thirtyDaysAgo = new Date(
+          (new Date() as any) - 1000 * 24 * 60 * 60 * 30
+        );
         const activeUsers = {};
         const where = { updated_at: { [Op.gt]: thirtyDaysAgo } };
         if (community) where['community'] = community.id;
         else where['chain'] = chain.id;
 
-        const monthlyComments = await models.OffchainComment.findAll({ where, include: [ models.Address ] });
+        const monthlyComments = await models.OffchainComment.findAll({
+          where,
+          include: [models.Address],
+        });
         const monthlyThreads = await models.OffchainThread.findAll({
           where,
           attributes: { exclude: ['version_history'] },
@@ -249,16 +266,18 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
             };
         });
         const mostActiveUsers_ = Object.values(activeUsers).sort((a, b) => {
-          return ((b as any).count - (a as any).count);
+          return (b as any).count - (a as any).count;
         });
         resolve(mostActiveUsers_);
       } catch (e) {
         reject(new Error('Could not fetch most active users'));
       }
     }),
-    models.sequelize.query(`
+    models.sequelize.query(
+      `
      SELECT id, title, stage FROM "OffchainThreads"
-     WHERE ${communityOptions} AND (stage = 'proposal_in_review' OR stage = 'voting')`, {
+     WHERE ${communityOptions} AND (stage = 'proposal_in_review' OR stage = 'voting')`,
+      {
         replacements,
         type: QueryTypes.SELECT,
       }
@@ -267,7 +286,9 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
 
   const [threads, comments] = threadsCommentsReactions as any;
 
-  const numVotingThreads = threadsInVoting.filter((t) => t.stage === 'voting').length;
+  const numVotingThreads = threadsInVoting.filter(
+    (t) => t.stage === 'voting'
+  ).length;
 
   return res.json({
     status: 'Success',
