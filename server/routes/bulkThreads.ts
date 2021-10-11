@@ -77,7 +77,7 @@ const bulkThreads = async (
                   "linked_thread": "', linked_threads.linked_thread, '",
                   "linking_thread": "', linked_threads.linking_thread, '" }'
             )
-          ) AS linked_threads,
+          ) AS linked_threads 
         FROM "OffchainThreads" t
         LEFT JOIN (
           SELECT root_id, MAX(created_at) AS latest_comm_created_at
