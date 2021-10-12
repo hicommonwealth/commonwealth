@@ -21,6 +21,7 @@ const _abi = [
     constant: true,
     inputs: [
       {
+        internalType: "bytes4",
         name: "interfaceId",
         type: "bytes4",
       },
@@ -28,6 +29,7 @@ const _abi = [
     name: "supportsInterface",
     outputs: [
       {
+        internalType: "bool",
         name: "",
         type: "bool",
       },
