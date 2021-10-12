@@ -110,9 +110,7 @@ export default class CompoundGovernance extends ProposalModule<
     const entities = this.app.chain.chainEntities.store.getByType(CompoundTypes.EntityKind.Proposal);
     console.log(`Found ${entities.length} proposals!`);
     entities.forEach((e) => this._entityConstructor(e));
-
-    // no init logic currently needed
-    // await Promise.all(this.store.getAll().map((p) => p.init()));
+    await Promise.all(this.store.getAll().map((p) => p.init()));
 
     // register new chain-event handlers
     this.app.chain.chainEntities.registerEntityHandler(
@@ -130,7 +128,7 @@ export default class CompoundGovernance extends ProposalModule<
       this.app.chain.id,
       chainToEventNetwork(this.app.chain.meta.chain),
       subscriber,
-      processor,
+      processor
     );
 
     this._initialized = true;
