@@ -1,8 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { DB } from '../database';
+import { Op } from 'sequelize/types';
 
-const getThread = async (
+const getThreads = async (
   models: DB,
   req: Request,
   res: Response,
@@ -15,11 +16,11 @@ const getThread = async (
   );
   if (error) return next(new Error(error));
 
-  let thread;
+  let threads;
   try {
-    thread = await models.OffchainThread.findOne({
+    threads = await models.OffchainThread.findAll({
       where: {
-        id: req.query.id,
+        id: { [Op.in]: req.query.ids },
       },
       include: [
         {
@@ -59,9 +60,9 @@ const getThread = async (
     console.log(e);
   }
 
-  return thread
-    ? res.json({ status: 'Success', result: thread.toJSON() })
+  return threads
+    ? res.json({ status: 'Success', result: threads.map((th) => th.toJSON()) })
     : res.json({ status: 'Failure' });
 };
 
-export default getThread;
+export default getThreads;

@@ -302,7 +302,7 @@ const ProposalHeader: m.Component<{
                     if (app.chain?.meta.chain.snapshot) {
                       proposal.snapshotProposal = snapshotProposal[0]?.id;
                     }
-                    app.threads.fetchThread(proposal.identifier);
+                    app.threads.fetchThreadsFromId([proposal.identifier]);
                     m.redraw();
                   },
                   openStateHandler: (v) => {
@@ -720,7 +720,7 @@ const ViewProposalPage: m.Component<{
         // proposal might be loading, if it's not an offchain thread
         if (proposalType === ProposalType.OffchainThread) {
           if (!vnode.state.threadFetched) {
-            app.threads.fetchThread(+proposalId).then((res) => {
+            app.threads.fetchThreadsFromId([+proposalId]).then((res) => {
               vnode.state.proposal = res;
               m.redraw();
             }).catch((err) => {

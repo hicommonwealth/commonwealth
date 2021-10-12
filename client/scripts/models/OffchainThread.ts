@@ -11,15 +11,31 @@ import OffchainVote from './OffchainVote';
 import { VersionHistory } from '../controllers/server/threads';
 
 // field names copied from snapshot
-interface OffchainVotingOptions {
+interface IOffchainVotingOptions {
   name: string;
   choices: string[];
 }
 
+interface ILinkedThread {
+  id: string;
+  linked_thread: string;
+  linking_thread: string;
+}
+
+interface ILinkedChainEntity {
+  type: string;
+  typeId: string;
+  completed: boolean;
+}
+
+interface IThreadCollaborator {
+  address: string;
+  chain: string;
+}
 class OffchainThread implements IUniqueId {
   public readonly author: string;
-  public collaborators?: any[];
-  public chainEntities?: any[];
+  public collaborators?: IThreadCollaborator[];
+  public chainEntities?: ILinkedChainEntity[];
   public readonly authorChain: string;
   public readonly title: string;
   public readonly body: string;
@@ -43,7 +59,7 @@ class OffchainThread implements IUniqueId {
   public readonly community: string;
   public readonly chain: string;
   public readonly lastEdited: moment.Moment;
-  public readonly linkedThreads: OffchainThread[];
+  public readonly linkedThreads: ILinkedThread[];
   public snapshotProposal: string;
 
   public get uniqueIdentifier() {
@@ -56,7 +72,7 @@ class OffchainThread implements IUniqueId {
     // return _hasOffchainPoll;
   }
 
-  public offchainVotingOptions: OffchainVotingOptions;
+  public offchainVotingOptions: IOffchainVotingOptions;
   public offchainVotingNumVotes: number;
   public offchainVotingEndsAt: moment.Moment | null;
   public offchainVotes: OffchainVote[]; // lazy loaded

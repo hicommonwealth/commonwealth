@@ -25,7 +25,7 @@ import { modelFromServer as modelReactionCountFromServer } from 'controllers/ser
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
 
-type FetchThreadsProps = {
+type FetchBulkThreadsProps = {
   topicId: OffchainTopic;
   stage: string;
   params: Record<string, any>;
@@ -539,31 +539,36 @@ class ThreadsController {
     return response.result;
   }
 
-  public async fetchThread(id) {
+  public async fetchThreadsFromId(ids: Array<number | string>) {
     const params = {
       chain: app.activeChainId(),
       community: app.activeCommunityId(),
-      id,
+      ids,
     };
-    const response = await $.get(`${app.serverUrl()}/getThread`, params);
+    const response = await $.get(`${app.serverUrl()}/getThreads`, params);
     if (response.status !== 'Success') {
       throw new Error(`Cannot fetch thread: ${response.status}`);
     }
-
-    const thread = modelFromServer(response.result);
-    const existing = this._store.getByIdentifier(thread.id);
-    if (existing) this._store.remove(existing);
-    this._store.update(thread);
-    return thread;
+    console.log(response.result);
+    return response.result.map((rawThread) => {
+      const thread = modelFromServer(rawThread);
+      const existing = this._store.getByIdentifier(thread.id);
+      if (existing) this._store.remove(existing);
+      this._store.update(thread);
+      return thread;
+    });
   }
 
-  fetchThreads = async ({ topicId, stage, params }: FetchThreadsProps) => {
+  fetchBulkThreads = async ({
+    topicId,
+    stage,
+    params,
+  }: FetchBulkThreadsProps) => {
     const response = await $.get(`${app.serverUrl()}/bulkThreads`, params);
     if (response.status !== 'Success') {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);
     }
     const { threads } = response.result;
-    console.log({ threads });
     for (const thread of threads) {
       const modeledThread = modelFromServer(thread);
       if (!thread.Address) {
@@ -627,7 +632,7 @@ class ThreadsController {
     };
     if (topicId) params['topic_id'] = topicId;
     if (stage) params['stage'] = stage;
-    const threads = await this.fetchThreads({ topicId, stage, params });
+    const threads = await this.fetchBulkThreads({ topicId, stage, params });
     await Promise.all([
       this.fetchReactionsCount(threads),
       app.threadUniqueAddressesCount.fetchThreadsUniqueAddresses({
