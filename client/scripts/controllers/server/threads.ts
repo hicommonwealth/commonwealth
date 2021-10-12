@@ -542,8 +542,12 @@ class ThreadsController {
     linking_thread: OffchainThread
   ): Promise<boolean> {
     const response = await $.post(`${app.serverUrl()}/updateLinkedThreads`, {
+      chain: app.activeChainId(),
+      community: app.activeCommunityId(),
       linked_thread: linked_thread_id,
       linking_thread: linking_thread.id,
+      address: app.user.activeAccount.address,
+      author_chain: app.user.activeAccount.chain,
       jwt: app.user.jwt,
     });
     const modeledThread = modelFromServer(response.result);

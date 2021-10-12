@@ -3,6 +3,12 @@ import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUs
 import { DB } from '../database';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 
+export const Errors = {
+  MustBeAdminOrAuthor: 'Must be admin or author',
+  MustHaveLinkingThreadId: 'Must have linking thread id',
+  MustHaveLinkedThreadId: 'Must have linked thread id',
+};
+
 const updateLinkedThreads = async (
   models: DB,
   req: Request,
@@ -16,8 +22,30 @@ const updateLinkedThreads = async (
   );
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
-  if (authorError) return next(new Error(authorError));
+  if (authorError) {
+    const adminAddress = await models.Address.findOne({
+      where: {
+        address: req.body.address,
+        user_id: req.user.id,
+      },
+    });
+    const requesterIsAdminOrMod = await models.Role.findAll({
+      where: {
+        address_id: adminAddress.id,
+        permission: ['admin', 'moderator'],
+      },
+    });
+    if (!requesterIsAdminOrMod) {
+      return next(new Error(Errors.MustBeAdminOrAuthor));
+    }
+  }
   const { linked_thread_id, linking_thread_id } = req.body;
+  if (!linked_thread_id) {
+    return next(new Error(Errors.MustHaveLinkedThreadId));
+  }
+  if (!linking_thread_id) {
+    return next(new Error(Errors.MustHaveLinkingThreadId));
+  }
   try {
     await models.LinkedThread.create({
       linked_thread: linked_thread_id,
