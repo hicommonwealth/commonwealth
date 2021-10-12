@@ -31,6 +31,7 @@ import { SnapshotProposal } from 'client/scripts/helpers/snapshot_utils';
 import { activeQuillEditorHasText, GlobalStatus } from './body';
 import { IProposalPageState } from '.';
 import OffchainVotingModal from '../../modals/offchain_voting_modal';
+import LinkThreadToThreadModal from '../../modals/link_thread_to_thread_modal';
 
 export const ProposalHeaderExternalLink: m.Component<{
   proposal: AnyProposal | OffchainThread;
@@ -432,7 +433,7 @@ export const ProposalHeaderLinkThreadsMenuItem: m.Component<
       onclick: async (e) => {
         e.preventDefault();
         app.modals.create({
-          modal: OffchainVotingModal,
+          modal: LinkThreadToThreadModal,
           data: { linkingProposal: item },
         });
       },
