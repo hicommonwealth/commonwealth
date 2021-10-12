@@ -3,12 +3,14 @@ import m from 'mithril';
 import app from 'state';
 import moment from 'moment';
 import { ProposalType } from 'types';
+import { IChainEntityKind } from '@commonwealth/chain-events';
 import { IUniqueId } from './interfaces';
 import { OffchainThreadKind, OffchainThreadStage } from './types';
 import OffchainAttachment from './OffchainAttachment';
 import OffchainTopic from './OffchainTopic';
 import OffchainVote from './OffchainVote';
 import { VersionHistory } from '../controllers/server/threads';
+import { ChainEntity } from '.';
 
 // field names copied from snapshot
 interface IOffchainVotingOptions {
@@ -22,12 +24,6 @@ interface ILinkedThread {
   linking_thread: string;
 }
 
-interface ILinkedChainEntity {
-  type: string;
-  typeId: string;
-  completed: boolean;
-}
-
 interface IThreadCollaborator {
   address: string;
   chain: string;
@@ -35,7 +31,7 @@ interface IThreadCollaborator {
 class OffchainThread implements IUniqueId {
   public readonly author: string;
   public collaborators?: IThreadCollaborator[];
-  public chainEntities?: ILinkedChainEntity[];
+  public chainEntities?: any[];
   public readonly authorChain: string;
   public readonly title: string;
   public readonly body: string;
@@ -212,9 +208,11 @@ class OffchainThread implements IUniqueId {
       ? chainEntities.map((ce) => {
           return {
             id: +ce.id,
+            chain,
             type: ce.type,
             typeId: ce.type_id,
             completed: ce.completed,
+            author,
           };
         })
       : [];

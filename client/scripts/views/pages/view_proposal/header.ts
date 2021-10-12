@@ -1,15 +1,7 @@
 import $ from 'jquery';
 import m from 'mithril';
 import moment from 'moment';
-import {
-  Button,
-  Icon,
-  Icons,
-  Tag,
-  Tooltip,
-  MenuItem,
-  Input,
-} from 'construct-ui';
+import { Button, Icon, Icons, Tag, MenuItem, Input } from 'construct-ui';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -22,25 +14,16 @@ import {
   extractDomain,
   offchainThreadStageToLabel,
 } from 'helpers';
-import {
-  proposalSlugToFriendlyName,
-  chainEntityTypeToProposalSlug,
-  chainEntityTypeToProposalName,
-} from 'identifiers';
-import { ProposalType } from 'types';
+import { proposalSlugToFriendlyName } from 'identifiers';
 import {
   OffchainThread,
   OffchainThreadKind,
   OffchainThreadStage,
   AnyProposal,
-  AddressInfo,
-  OffchainVote,
 } from 'models';
 
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import UserGallery from 'views/components/widgets/user_gallery';
 import { getStatusClass, getStatusText } from 'views/components/proposal_card';
-import User from 'views/components/widgets/user';
 
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';
@@ -324,123 +307,6 @@ export const ProposalHeaderSnapshotThreadLink: m.Component<{
   },
 };
 
-export const ProposalHeaderThreadLinkedChainEntity: m.Component<{
-  proposal: OffchainThread;
-  chainEntity;
-}> = {
-  view: (vnode) => {
-    const { proposal, chainEntity } = vnode.attrs;
-    const slug = chainEntityTypeToProposalSlug(chainEntity.type);
-    if (!slug) return;
-
-    const proposalLink = `${
-      app.isCustomDomain() ? '' : `/${proposal.chain}`
-    }/proposal/${slug}/${chainEntity.typeId}`;
-
-    return m('.ProposalHeaderThreadLinkedChainEntity', [
-      link('a', proposalLink, [
-        `${chainEntityTypeToProposalName(chainEntity.type)} #${
-          chainEntity.typeId
-        }`,
-        chainEntity.completed === 't' ? ' (Completed) ' : ' ',
-      ]),
-    ]);
-  },
-};
-
-export const ProposalHeaderThreadLinkedSnapshot: m.Component<
-  {
-    proposal: OffchainThread;
-  },
-  {
-    initialized: boolean;
-    snapshotProposalsLoaded: boolean;
-    snapshot: SnapshotProposal;
-  }
-> = {
-  view: (vnode) => {
-    const { proposal } = vnode.attrs;
-    if (!proposal.snapshotProposal) return;
-    if (!app.chain?.meta.chain.snapshot) return;
-
-    if (!vnode.state.initialized) {
-      vnode.state.initialized = true;
-      app.snapshot.init(app.chain.meta.chain.snapshot).then(() => {
-        // refreshing loads the latest snapshot proposals into app.snapshot.proposals array
-        vnode.state.snapshot = app.snapshot.proposals.find(
-          (sn) => sn.id === proposal.snapshotProposal
-        );
-        vnode.state.snapshotProposalsLoaded = true;
-        m.redraw();
-      });
-    }
-
-    const proposalLink = `${
-      app.isCustomDomain() ? '' : `/${proposal.chain}`
-    }/snapshot/${app.chain?.meta.chain.snapshot}/${proposal.snapshotProposal}`;
-
-    return m(
-      '.ProposalHeaderThreadLinkedChainEntity',
-      !vnode.state.snapshotProposalsLoaded
-        ? [
-            link('a', proposalLink, [
-              `Snapshot: ${proposal.snapshotProposal.slice(0, 10)} ...`,
-            ]),
-          ]
-        : [
-            link('a', proposalLink, [
-              `Snapshot: ${vnode.state.snapshot.title.slice(0, 20)} ...`,
-            ]),
-          ]
-    );
-  },
-};
-
-export const ProposalHeaderThreadLinkedThreads: m.Component<
-  {
-    proposal: OffchainThread;
-  },
-  {
-    initialized: boolean;
-    threadsLoaded: boolean;
-    linkedThreads: OffchainThread[];
-  }
-> = {
-  view: (vnode) => {
-    const { proposal } = vnode.attrs;
-    if (!proposal.linkedThreads?.length) return;
-
-    if (!vnode.state.initialized) {
-      vnode.state.initialized = true;
-      app.threads
-        .fetchThreadsFromId(
-          proposal.linkedThreads.map((th) => th.linked_thread)
-        )
-        .then((result) => {
-          vnode.state.threadsLoaded = true;
-          vnode.state.linkedThreads = result;
-        });
-    }
-
-    return m(
-      '.ProposalHeaderThreadLinkedChainEntity',
-      !vnode.state.threadsLoaded
-        ? vnode.state.linkedThreads.map((thread) => {
-            const proposalLink = `${
-              app.isCustomDomain() ? '' : `/${proposal.chain}`
-            }/proposal/discussion/${thread.id}`;
-            return link('a', proposalLink, thread.title);
-          })
-        : proposal.linkedThreads.map((thread) => {
-            const proposalLink = `${
-              app.isCustomDomain() ? '' : `/${proposal.chain}`
-            }/proposal/discussion/${thread.linked_thread}`;
-            return link('a', proposalLink, 'Loading...');
-          })
-    );
-  },
-};
-
 export const ProposalHeaderSpacer: m.Component<{}> = {
   view: (vnode) => {
     return m('.ProposalHeaderSpacer', m.trust('&middot;'));
@@ -549,6 +415,28 @@ export const ProposalHeaderViewCount: m.Component<{ viewCount: number }> = {
   view: (vnode) => {
     const { viewCount } = vnode.attrs;
     return m('.ViewCountBlock', pluralize(viewCount, 'view'));
+  },
+};
+
+export const ProposalHeaderLinkThreadsMenuItem: m.Component<
+  {
+    item: OffchainThread;
+  },
+  {}
+> = {
+  view: (vnode) => {
+    const { item } = vnode.attrs;
+    return m(MenuItem, {
+      label: 'Link offchain thread',
+      class: 'link-offchain-thread',
+      onclick: async (e) => {
+        e.preventDefault();
+        app.modals.create({
+          modal: OffchainVotingModal,
+          data: { linkingProposal: item },
+        });
+      },
+    });
   },
 };
 
@@ -762,101 +650,5 @@ export const ProposalHeaderPrivacyMenuItems: m.Component<{
         label: proposal.readOnly ? 'Unlock thread' : 'Lock thread',
       }),
     ];
-  },
-};
-
-export const ProposalSidebarPollEditorModule: m.Component<
-  {
-    proposal;
-    openPollEditor: Function;
-  },
-  {
-    isOpen: boolean;
-  }
-> = {
-  view: (vnode) => {
-    const { proposal, openPollEditor } = vnode.attrs;
-    return m('.ProposalSidebarPollEditorModule', [
-      m('.placeholder-copy', 'Add an offchain poll to this thread?'),
-      m(Button, {
-        rounded: true,
-        compact: true,
-        fluid: true,
-        disabled: !!proposal.offchainVotingEndsAt,
-        label: proposal.offchainVotingEndsAt
-          ? 'Polling enabled'
-          : 'Create a poll',
-        onclick: (e) => {
-          e.preventDefault();
-          openPollEditor();
-        },
-      }),
-    ]);
-  },
-};
-
-export const ProposalSidebarLinkedViewer: m.Component<{
-  proposal: OffchainThread;
-}> = {
-  view: (vnode) => {
-    const { proposal } = vnode.attrs;
-
-    return m('.ProposalSidebarLinkedViewer', [
-      proposal.chainEntities.length > 0 || proposal.snapshotProposal?.length > 0
-        ? m('.placeholder-copy', 'Proposals for this thread:')
-        : m(
-            '.placeholder-copy',
-            app.chain
-              ? 'Connect an on-chain proposal?'
-              : 'Track the progress of this thread?'
-          ),
-      proposal.chainEntities.length > 0 &&
-        m('.proposal-chain-entities', [
-          proposal.chainEntities.map((chainEntity) => {
-            return m(ProposalHeaderThreadLinkedChainEntity, {
-              proposal,
-              chainEntity,
-            });
-          }),
-        ]),
-      proposal.snapshotProposal?.length > 0 &&
-        m(ProposalHeaderThreadLinkedSnapshot, { proposal }),
-      proposal.linkedThreads?.length > 0
-        ? m('.placeholder-copy', 'Linked threads:')
-        : m('.placeholder-copy', 'Link offchain threads?'),
-      proposal.linkedThreads?.length > 0 &&
-        renderLinkedThreadTitles(proposal.linkedThreads),
-    ]);
-  },
-};
-
-export const ProposalSidebarStageEditorModule: m.Component<
-  {
-    proposal: OffchainThread;
-    openStageEditor: Function;
-  },
-  {
-    isOpen: boolean;
-  }
-> = {
-  view: (vnode) => {
-    const { proposal, openStageEditor } = vnode.attrs;
-
-    if (!app.chain?.meta?.chain && !app.community?.meta) return;
-    const { stagesEnabled } = app.chain?.meta?.chain || app.community?.meta;
-    if (!stagesEnabled) return;
-
-    return m('.ProposalSidebarStageEditorModule', [
-      m(Button, {
-        rounded: true,
-        compact: true,
-        fluid: true,
-        label: app.chain ? 'Connect a proposal' : 'Update status',
-        onclick: (e) => {
-          e.preventDefault();
-          openStageEditor();
-        },
-      }),
-    ]);
   },
 };

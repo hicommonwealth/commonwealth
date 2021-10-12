@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
+import { Op } from 'sequelize';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { DB } from '../database';
-import { Op } from 'sequelize/types';
 
 const getThreads = async (
   models: DB,

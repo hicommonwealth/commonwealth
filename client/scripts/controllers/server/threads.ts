@@ -94,6 +94,18 @@ export const modelFromServer = (thread) => {
     });
   }
 
+  let chainEntitiesProcessed: ChainEntity[];
+  if (chain_entities && !ChainEntities) {
+    chainEntitiesProcessed = chain_entities.map((c) => {
+      return {
+        id: c.id,
+        chain,
+        type: c.type,
+        typeId: c.type_id || c.typeId,
+      };
+    });
+  }
+
   const lastEditedProcessed = last_edited
     ? moment(last_edited)
     : versionHistoryProcessed && versionHistoryProcessed?.length > 1
@@ -119,7 +131,7 @@ export const modelFromServer = (thread) => {
     url,
     pinned,
     collaborators,
-    chainEntities: chain_entities || ChainEntities,
+    chainEntities: chainEntitiesProcessed || ChainEntities,
     versionHistory: versionHistoryProcessed,
     lastEdited: lastEditedProcessed,
     offchainVotingOptions: offchain_voting_options,
@@ -509,6 +521,7 @@ class ThreadsController {
             id: ce.id,
             type: ce.type,
             typeId: ce.typeId,
+            chain: thread.chain,
           })
         );
         return thread;

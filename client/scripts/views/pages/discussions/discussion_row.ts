@@ -78,7 +78,7 @@ const DiscussionRow: m.Component<
       proposal.chainEntities?.length > 0 && [
         proposal.chainEntities
           .sort((a, b) => {
-            return a.typeId - b.typeId;
+            return +a.typeId - +b.typeId;
           })
           .map((ce) => {
             if (!chainEntityTypeToProposalShortName(ce.type)) return;
