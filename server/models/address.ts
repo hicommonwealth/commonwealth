@@ -15,7 +15,7 @@ import { AminoSignResponse, pubkeyToAddress, serializeSignDoc, decodeSignature }
 
 import nacl from 'tweetnacl';
 import { KeyringOptions } from '@polkadot/keyring/types';
-import { NotificationCategories } from '../../shared/types';
+import { NotificationCategories, ChainBase, ChainNetwork } from '../../shared/types';
 import { ModelStatic } from './types';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { ChainAttributes, ChainInstance } from './chain';
@@ -219,7 +219,7 @@ export default (
     }
 
     let isValid: boolean;
-    if (chain.base === 'substrate') {
+    if (chain.base === ChainBase.Substrate) {
       //
       // substrate address handling
       //
@@ -242,7 +242,11 @@ export default (
         log.error('Invalid keytype.');
         isValid = false;
       }
-    } else if (chain.base === 'cosmos' && (chain.network === 'injective' || chain.network === 'injective-testnet')) {
+    } else if (
+      chain.base === ChainBase.CosmosSDK &&
+      (chain.network === ChainNetwork.Injective ||
+        chain.network === ChainNetwork.InjectiveTestnet)
+    ) {
       //
       // ethereum address handling
       //
@@ -268,7 +272,7 @@ export default (
       } catch (e) {
         isValid = false;
       }
-    } else if (chain.base === 'cosmos') {
+    } else if (chain.base === ChainBase.CosmosSDK) {
       //
       // cosmos-sdk address handling
       //
@@ -320,7 +324,7 @@ export default (
           isValid = false;
         }
       }
-    } else if (chain.base === 'ethereum') {
+    } else if (chain.base === ChainBase.Ethereum) {
       //
       // ethereum address handling
       //
@@ -343,7 +347,7 @@ export default (
       } catch (e) {
         isValid = false;
       }
-    } else if (chain.base === 'near') {
+    } else if (chain.base === ChainBase.NEAR) {
       // both in base64 encoding
       const { signature: sigObj, publicKey } = JSON.parse(signatureString);
       isValid = nacl.sign.detached.verify(

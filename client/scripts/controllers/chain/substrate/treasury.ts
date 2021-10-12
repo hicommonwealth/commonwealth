@@ -12,6 +12,7 @@ import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import { formatAddressShort } from '../../../../../shared/utils';
 import { SubstrateTreasuryProposal } from './treasury_proposal';
+import { chainToEventNetwork } from '../../server/chain_entities';
 
 class SubstrateTreasury extends ProposalModule<
   ApiPromise,
@@ -85,6 +86,7 @@ class SubstrateTreasury extends ProposalModule<
     // fetch proposals from chain
     await this.app.chain.chainEntities.fetchEntities(
       this.app.chain.id,
+      chainToEventNetwork(this.app.chain.meta.chain),
       () => this._Chain.fetcher.fetchTreasuryProposals(this.app.chain.block.height),
     );
 

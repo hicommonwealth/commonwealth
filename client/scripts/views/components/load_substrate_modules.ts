@@ -1,6 +1,7 @@
 import m from 'mithril';
 import app from 'state';
-import { ChainBase, ProposalModule } from 'models';
+import { ChainBase } from 'types';
+import { ProposalModule } from 'models';
 import { Tag } from 'construct-ui';
 import PageLoading from 'views/pages/loading';
 import ErrorPage from 'views/pages/error';

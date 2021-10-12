@@ -6,14 +6,13 @@ import m from 'mithril';
 import $ from 'jquery';
 import app from 'state';
 import { slugify } from 'utils';
-import { ChainBase } from 'models';
+import { ChainBase, ChainNetwork, ChainType } from 'types';
 import mixpanel from 'mixpanel-browser';
 import { Table, Tabs, TabItem, Button, MenuDivider } from 'construct-ui';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { constructSubstrateUrl } from 'substrate';
 import { NearAccount } from 'controllers/chain/near/account';
 import Near from 'controllers/chain/near/main';
-import NearSputnikDao from 'controllers/chain/near/sputnik/dao';
 import { isAddress } from 'web3-utils';
 
 import { CompactModalExitButton } from 'views/modal';
@@ -353,9 +352,9 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
             github,
             substrate_spec,
             jwt: app.user.jwt,
-            type: 'chain',
+            type: ChainType.Chain,
             id: slugify(name),
-            base: 'substrate',
+            base: ChainBase.Substrate,
             network: slugify(name)
           }).then(async (res) => {
             await initAppState(false);
@@ -552,9 +551,9 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
             telegram,
             github,
             jwt: app.user.jwt,
-            type: 'token',
-            base: 'ethereum',
-            network: slugify(name),
+            type: ChainType.Token,
+            base: ChainBase.Ethereum,
+            network: ChainNetwork.ERC20,
             node_url: 'wss://mainnet.infura.io/ws',
           }).then(async (res) => {
             await initAppState(false);
@@ -701,10 +700,10 @@ const SputnikForm: m.Component<SputnikFormAttrs, SputnikFormState> = {
             telegram,
             github,
             jwt: app.user.jwt,
-            type: 'dao',
+            type: ChainType.DAO,
             id,
-            base: 'near',
-            network: 'sputnik'
+            base: ChainBase.NEAR,
+            network: ChainNetwork.Sputnik,
           };
           if (createNew) {
             // TODO: we need to validate arguments prior to making this call/redirect, so that

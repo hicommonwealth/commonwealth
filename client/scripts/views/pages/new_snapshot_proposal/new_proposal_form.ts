@@ -8,7 +8,8 @@ import moment from 'moment';
 import app from 'state';
 import { navigateToSubpage } from 'app';
 
-import { Account, ChainBase } from 'models';
+import { ChainBase } from 'types';
+import { Account } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 import QuillEditor from 'views/components/quill_editor';
 import { idToProposal } from 'identifiers';
@@ -168,7 +169,12 @@ const NewProposalForm: m.Component<{snapshotId: string}, {
       };
 
       if (pathVars.params.fromProposalType && pathVars.params.fromProposalId) {
-        const fromProposal = idToProposal(pathVars.params.fromProposalType, pathVars.params.fromProposalId);
+        const fromProposalId =
+          typeof pathVars.params.fromProposalId === 'number'
+            ? pathVars.params.fromProposalId
+            : pathVars.params.fromProposalId.toString();
+        const fromProposalType = pathVars.params.fromProposalType.toString();
+        const fromProposal = idToProposal(fromProposalType, fromProposalId);
         vnode.state.form.name = fromProposal.title;
         vnode.state.isFromExistingProposal = true;
         if (fromProposal.body) {

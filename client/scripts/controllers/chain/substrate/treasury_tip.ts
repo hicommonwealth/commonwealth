@@ -7,6 +7,7 @@ import {
 } from 'models';
 import { SubstrateTypes } from '@commonwealth/chain-events';
 import { chainEntityTypeToProposalSlug } from 'identifiers';
+import { ProposalType } from 'types';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateTreasuryTips from './treasury_tips';
@@ -125,7 +126,7 @@ export class SubstrateTreasuryTip extends Proposal<
     Tips: SubstrateTreasuryTips,
     entity: ChainEntity,
   ) {
-    super('treasurytip', backportEventToAdapter(
+    super(ProposalType.SubstrateTreasuryTip, backportEventToAdapter(
       ChainInfo,
       entity.chainEvents
         .find(

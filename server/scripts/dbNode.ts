@@ -7,9 +7,6 @@ import {
   createListener,
   SubstrateTypes,
   SubstrateEvents,
-  IEventHandler,
-  CWEvent,
-  LoggingHandler,
   SupportedNetwork,
 } from '@commonwealth/chain-events';
 

@@ -6,8 +6,7 @@ import { Tag } from 'construct-ui';
 
 import app from 'state';
 import { blockperiodToDuration } from 'helpers';
-import { ProposalType } from 'identifiers';
-import { ChainBase } from 'models';
+import { ProposalType, ChainBase } from 'types';
 
 import Substrate from 'controllers/chain/substrate/main';
 

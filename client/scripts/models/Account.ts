@@ -1,14 +1,11 @@
 import $ from 'jquery';
 import app, { IApp } from 'state';
 import { Coin } from 'adapters/currency';
-import { slugify } from 'utils';
-import Token from 'controllers/chain/ethereum/token/adapter';
+import { ChainBase, ChainType } from 'types';
 
 import { ITXModalData } from './interfaces';
-import { ChainBase } from './types';
 import ChainInfo from './ChainInfo';
 import Profile from './Profile';
-import {AddressInfo} from "models/index";
 
 abstract class Account<C extends Coin> {
   public readonly serverUrl : string;
@@ -105,7 +102,7 @@ abstract class Account<C extends Coin> {
       const params : any = {
         address: this.address,
         chain: this.chain.id,
-        isToken: this.chain.type === 'token',
+        isToken: this.chain.type === ChainType.Token,
         jwt: this.app.user.jwt,
         signature,
       };

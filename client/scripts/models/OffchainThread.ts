@@ -2,7 +2,7 @@ import $ from 'jquery';
 import m from 'mithril';
 import app from 'state';
 import moment from 'moment';
-
+import { ProposalType } from 'types';
 import { IUniqueId } from './interfaces';
 import { OffchainThreadKind, OffchainThreadStage } from './types';
 import OffchainAttachment from './OffchainAttachment';
@@ -37,7 +37,7 @@ class OffchainThread implements IUniqueId {
   public readonly createdAt: moment.Moment;
   public readonly latestCommCreatedAt: moment.Moment;
   public topic: OffchainTopic;
-  public readonly slug = 'discussion';
+  public readonly slug = ProposalType.OffchainThread;
   public readonly url: string;
   public readonly versionHistory: VersionHistory[];
   public readonly community: string;
