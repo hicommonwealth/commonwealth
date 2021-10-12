@@ -8,9 +8,9 @@ module.exports = {
         'Chains',
         [
           {
-            id: 'buzzed-bear-hangout',
+            id: 'buzzed-bear-hideout',
             symbol: 'BEAR',
-            name: 'Buzzed Bear Hangout',
+            name: 'Buzzed Bear Hideout',
             type: 'token',
             network: 'erc20',
             base: 'ethereum',
@@ -25,7 +25,7 @@ module.exports = {
         'ChainNodes',
         [
           {
-            chain: 'buzzed-bear-hangout',
+            chain: 'buzzed-bear-hideout',
             url: 'wss://mainnet.infura.io/ws',
             address: '0x4923017F3B7fAC4e096b46e401c0662F0B7E393f',
           },
@@ -39,12 +39,12 @@ module.exports = {
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.bulkDelete(
         'ChainNodes',
-        { chain: 'buzzed-bear-hangout' },
+        { chain: 'buzzed-bear-hideout' },
         { transaction: t }
       );
       await queryInterface.bulkDelete(
         'Chains',
-        { id: ['buzzed-bear-hangout'] },
+        { id: ['buzzed-bear-hideout'] },
         { transaction: t }
       );
     });
