@@ -449,10 +449,11 @@ async function initializer(): Promise<void> {
     log.error('Unexpected error on idle client', err);
   });
 
+  // these requests cannot work locally
   if (process.env.NODE_ENV === 'production') {
     // get all dyno's list
     const res = await fetch(
-      'https://api.heroku.com/apps/commonwealth-staging2/dynos',
+      `https://api.heroku.com/apps/${process.env.HEROKU_APP_NAME}/dynos`,
       {
         method: 'GET',
         headers: {
@@ -504,7 +505,7 @@ async function initializer(): Promise<void> {
       newestDyno.id === process.env.HEROKU_DYNO_ID // prevents race condition by only allowing the most recently created dyno to update the config vars
     ) {
       const result = await fetch(
-        'https://api.heroku.com/apps/commonwealth-staging2/config-vars',
+        `https://api.heroku.com/apps/${process.env.HEROKU_APP_NAME}/config-vars`,
         {
           method: 'PATCH',
           headers: {
