@@ -88,6 +88,7 @@ import viewOffchainVotes from './routes/viewOffchainVotes';
 import fetchEntityTitle from './routes/fetchEntityTitle';
 import fetchThreadForSnapshot from './routes/fetchThreadForSnapshot';
 import updateChainEntityTitle from './routes/updateChainEntityTitle';
+import updateLinkedThreads from './routes/updateLinkedThreads';
 import deleteThread from './routes/deleteThread';
 import addEditors from './routes/addEditors';
 import deleteEditors from './routes/deleteEditors';
@@ -266,7 +267,12 @@ function setupRouter(
   router.post(
     '/updateChainEntityTitle',
     passport.authenticate('jwt', { session: false }),
-    updateChainEntityTitle.bind(this, models),
+    updateChainEntityTitle.bind(this, models)
+  );
+  router.post(
+    '/updateLinkedThreads',
+    passport.authenticate('jwt', { session: false }),
+    updateLinkedThreads.bind(this, models)
   );
   router.post('/addEditors', passport.authenticate('jwt', { session: false }), addEditors.bind(this, models));
   router.post('/deleteEditors', passport.authenticate('jwt', { session: false }), deleteEditors.bind(this, models));

@@ -60,7 +60,7 @@ export const modelFromServer = (thread) => {
     latestCommCreatedAt,
     linked_threads,
   } = thread;
-  console.log(linked_threads);
+
   const attachments = OffchainAttachments
     ? OffchainAttachments.map(
         (a) => new OffchainAttachment(a.url, a.description)

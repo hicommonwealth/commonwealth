@@ -4,11 +4,11 @@ import { ModelStatic } from './types';
 import { OffchainThreadInstance } from './offchain_thread';
 
 export interface LinkedThreadAttributes {
-  id: number;
+  id?: number;
   linked_thread: number;
   linking_thread: number;
-  created_at: Date;
-  updated_at: Date;
+  created_at?: Date;
+  updated_at?: Date;
 }
 
 export interface LinkedThreadInstance
