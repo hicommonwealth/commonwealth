@@ -17,11 +17,11 @@ async function main() {
   const addresses: string[] = await provider.listAccounts();
   const [member, bridge] = addresses;
   const signer = provider.getSigner(member);
-  
+
   // Deploy timelock
   const timelockFactory = new TimelockMock__factory(signer);
   const timelock = await timelockFactory.deploy(member, 2 * 60);
-  
+
   // Deploy comp
   const mpondFactory = new MPond__factory(signer);
   const comp = await mpondFactory.deploy(member, bridge);
@@ -36,7 +36,7 @@ async function main() {
     1,
     '1'
   );
-  await bravo.setInitialProposalId(); // needed?
+  await bravo._initiate();
 
   const from = member;
 
@@ -57,7 +57,7 @@ async function main() {
     from,
   });
 
-  
+
   // Increase Time
   // Wait for proposal to activate (by mining blocks?)
   const activeProposals = await bravo.latestProposalIds(from);
@@ -77,7 +77,7 @@ async function main() {
   //   0,
   //   'i dont like it'
   // );
-  
+
   try {
     await bravo.castVote(activeProposals, 1);
   }

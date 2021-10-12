@@ -58,7 +58,6 @@ interface GovernorBravoImmutableInterface extends ethers.utils.Interface {
     "propose(address[],uint256[],string[],bytes[],string)": FunctionFragment;
     "queue(uint256)": FunctionFragment;
     "quorumVotes()": FunctionFragment;
-    "setInitialProposalId()": FunctionFragment;
     "state(uint256)": FunctionFragment;
     "timelock()": FunctionFragment;
     "votingDelay()": FunctionFragment;
@@ -194,10 +193,6 @@ interface GovernorBravoImmutableInterface extends ethers.utils.Interface {
     functionFragment: "quorumVotes",
     values?: undefined
   ): string;
-  encodeFunctionData(
-    functionFragment: "setInitialProposalId",
-    values?: undefined
-  ): string;
   encodeFunctionData(functionFragment: "state", values: [BigNumberish]): string;
   encodeFunctionData(functionFragment: "timelock", values?: undefined): string;
   encodeFunctionData(
@@ -312,10 +307,6 @@ interface GovernorBravoImmutableInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "queue", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "quorumVotes",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setInitialProposalId",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "state", data: BytesLike): Result;
@@ -758,14 +749,6 @@ export class GovernorBravoImmutable extends Contract {
 
     "quorumVotes()"(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    setInitialProposalId(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    "setInitialProposalId()"(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     state(
       proposalId: BigNumberish,
       overrides?: CallOverrides
@@ -1143,14 +1126,6 @@ export class GovernorBravoImmutable extends Contract {
 
   "quorumVotes()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-  setInitialProposalId(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  "setInitialProposalId()"(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   state(proposalId: BigNumberish, overrides?: CallOverrides): Promise<number>;
 
   "state(uint256)"(
@@ -1507,10 +1482,6 @@ export class GovernorBravoImmutable extends Contract {
     quorumVotes(overrides?: CallOverrides): Promise<BigNumber>;
 
     "quorumVotes()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    setInitialProposalId(overrides?: CallOverrides): Promise<void>;
-
-    "setInitialProposalId()"(overrides?: CallOverrides): Promise<void>;
 
     state(proposalId: BigNumberish, overrides?: CallOverrides): Promise<number>;
 
@@ -1931,14 +1902,6 @@ export class GovernorBravoImmutable extends Contract {
 
     "quorumVotes()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    setInitialProposalId(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    "setInitialProposalId()"(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     state(
       proposalId: BigNumberish,
       overrides?: CallOverrides
@@ -2272,14 +2235,6 @@ export class GovernorBravoImmutable extends Contract {
     quorumVotes(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "quorumVotes()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    setInitialProposalId(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    "setInitialProposalId()"(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
 
     state(
       proposalId: BigNumberish,
