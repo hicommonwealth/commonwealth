@@ -28,13 +28,18 @@ const LinkThreadToThreadModal: m.Component<
               notifyError('Can only enter integers');
             } else {
               vnode.state.linkedThreadId = +e.target.value;
+              m.redraw();
             }
           },
         }),
         m(Button, {
           label: 'Add',
           onclick: (e) => {
-            app.threads.addLinkedThread(vnode.state.linkedThreadId, linkingProposal);
+            console.log(vnode.state.linkedThreadId);
+            app.threads.addLinkedThread(
+              vnode.state.linkedThreadId,
+              linkingProposal
+            );
           },
         }),
       ]),
