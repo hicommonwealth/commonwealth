@@ -537,6 +537,22 @@ class ThreadsController {
     });
   }
 
+  public async addLinkedThread(
+    linked_thread_id: number,
+    linking_thread: OffchainThread
+  ): Promise<boolean> {
+    const response = await $.post(`${app.serverUrl()}/updateLinkedThreads`, {
+      linked_thread: linked_thread_id,
+      linking_thread: linking_thread.id,
+      jwt: app.user.jwt,
+    });
+    const modeledThread = modelFromServer(response.result);
+    this._store.update(modeledThread);
+    if (response.status !== 'Success') {
+      return false;
+    }
+  }
+
   public async fetchThreadIdForSnapshot(args: { snapshot: string }) {
     const response = await $.ajax({
       url: `${app.serverUrl()}/fetchThreadForSnapshot`,

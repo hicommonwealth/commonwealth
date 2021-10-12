@@ -1,31 +1,43 @@
 import 'modals/offchain_voting_modal.scss';
 
 import m from 'mithril';
-import { OffchainVote } from 'models';
 import app from 'state';
+import { OffchainThread } from 'models';
+import { Button, Input } from 'construct-ui';
+import { notifyError } from 'controllers/app/notifications';
 import { CompactModalExitButton } from '../modal';
 
-const addLinkedThread = async (
-  linked_thread_id: number,
-  linking_thread_id: number
-): Promise<boolean> => {
-  const response = await $.post(`${app.serverUrl()}/updateLinkedThreads`, {
-    linked_thread: linked_thread_id,
-    linking_thread: linking_thread_id,
-  });
-  if (response.status !== 'Success') {
-    return false;
-  }
-};
-
-const LinkThreadToThreadModal: m.Component<{ votes: OffchainVote[] }, {}> = {
+const LinkThreadToThreadModal: m.Component<
+  { linkingProposal: OffchainThread },
+  { linkedThreadId: number }
+> = {
   view: (vnode) => {
+    const { linkingProposal } = vnode.attrs;
     return m('.LinkThreadToThreadModal', [
       m('.compact-modal-title', [
         m('h3', 'Link to Existing Threads'),
         m(CompactModalExitButton),
       ]),
-      m('.compact-modal-body', 'Offchain Threads'),
+      m('.compact-modal-body', [
+        m('h3', 'Offchain Threads'),
+        m(Input, {
+          label: 'Add thread id',
+          placeholder: '712',
+          oninput: (e) => {
+            if (!Number.isInteger(+e.target.value)) {
+              notifyError('Can only enter integers');
+            } else {
+              vnode.state.linkedThreadId = +e.target.value;
+            }
+          },
+        }),
+        m(Button, {
+          label: 'Add',
+          onclick: (e) => {
+            app.threads.addLinkedThread(vnode.state.linkedThreadId, linkingProposal);
+          },
+        }),
+      ]),
     ]);
   },
 };

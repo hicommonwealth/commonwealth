@@ -17,12 +17,51 @@ const updateLinkedThreads = async (
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));
+  const { linked_thread_id, linking_thread_id } = req.body;
   try {
     await models.LinkedThread.create({
-      linked_thread: req.body.linked_thread_id,
-      linking_thread: req.body.linking_thread_id,
+      linked_thread: linked_thread_id,
+      linking_thread: linking_thread_id,
     });
-    return res.json({ status: 'Success' });
+    const finalThread = await models.OffchainThread.findOne({
+      where: {
+        id: linking_thread_id,
+      },
+      include: [
+        {
+          model: models.Address,
+          as: 'Address',
+        },
+        {
+          model: models.Address,
+          // through: models.Collaboration,
+          as: 'collaborators',
+        },
+        {
+          model: models.OffchainTopic,
+          as: 'topic',
+        },
+        {
+          model: models.ChainEntity,
+        },
+        {
+          model: models.OffchainReaction,
+          as: 'reactions',
+          include: [
+            {
+              model: models.Address,
+              as: 'Address',
+              required: true,
+            },
+          ],
+        },
+        {
+          model: models.LinkedThread,
+          as: 'linked_threads',
+        },
+      ],
+    });
+    return res.json({ status: 'Success', result: finalThread.toJSON() });
   } catch (e) {
     return next(new Error(e));
   }
