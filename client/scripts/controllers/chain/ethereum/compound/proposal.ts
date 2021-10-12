@@ -334,8 +334,8 @@ export default class CompoundProposal extends Proposal<
     const address = this._Gov.app.user.activeAccount.address;
     const contract = await attachSigner(this._Gov.app.wallets, address, this._Gov.api.Contract);
 
-    const gasLimit = await contract.estimateGas.queue(this.data.identifier);
-    const tx = await contract.queue(
+    const gasLimit = await contract.estimateGas['queue(uint256)'](this.data.identifier);
+    const tx = await contract['queue(uint256)'](
       this.data.identifier,
       { gasLimit }
     );

@@ -1,19 +1,26 @@
-import { ethers } from 'hardhat';
-import '@nomiclabs/hardhat-ethers';
+import { providers } from 'ethers';
+import { BigNumber } from '@ethersproject/bignumber';
+import Web3 from 'web3';
 
 import {
   MPond__factory,
+  TimelockMock__factory,
   GovernorBravoImmutable__factory,
 } from '../types';
 
-import {
-  TimelockMock__factory,
-} from '../types';
-import { BigNumber } from '@ethersproject/bignumber';
-
 async function main() {
-  // Set up accounts
-  const provider = ethers.provider;
+  // TODO: configure URL based on chain
+  const web3Provider = new Web3.providers.WebsocketProvider('http://localhost:8545', {
+    reconnect: {
+      auto: true,
+      delay: 5000,
+      maxAttempts: 10,
+      onTimeout: true,
+    },
+  });
+  const provider = new providers.Web3Provider(web3Provider as any);
+  // 12s minute polling interval (default is 4s)
+  provider.pollingInterval = 12000;
   const addresses: string[] = await provider.listAccounts();
   const [member, bridge] = addresses;
   const signer = provider.getSigner(member);
@@ -32,11 +39,13 @@ async function main() {
     timelock.address,
     comp.address,
     member,
-    17280,
-    1,
-    '1'
+    4, // 4 blocks voting period
+    1, // 1 block voting delay
+    1 // 1 vote proposal threshold
   );
   await bravo._initiate();
+  console.log(bravo.address);
+  return;
 
   const from = member;
 

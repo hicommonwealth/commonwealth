@@ -58,12 +58,13 @@ export default class CompoundGovernance extends ProposalModule<
     const contract = await attachSigner(this.app.wallets, address, this._api.Contract);
 
     const { targets, values, signatures, calldatas, description } = args;
-    if (!targets || !values || !signatures || !calldatas || !description) return;
-    if (!(await this._Chain.isDelegate(address))) throw new Error('sender must be valid delegate');
-    const priorDelegates = await this._Chain.priorDelegates(address, this._api.Provider.blockNumber);
-    if (this.proposalThreshold < priorDelegates) {
-      throw new Error('sender must have requisite delegates');
-    }
+    if (!targets || !values || !signatures || !calldatas || !description)
+      throw new Error('must provide targets, values, signatures, calldatas, description');
+    // if (!(await this._Chain.isDelegate(address))) throw new Error('sender must be valid delegate');
+    // const priorDelegates = await this._Chain.priorDelegates(address, this._api.Provider.blockNumber);
+    // if (this.proposalThreshold < priorDelegates) {
+    //   throw new Error('sender must have requisite delegates');
+    // }
     if (parseInt(address, 16) === 0) {
       throw new Error('applicant cannot be 0');
     }

@@ -40,23 +40,19 @@ export default class CompoundChain extends EthereumChain {
   }
 
   public async setDelegate(address: string, amount: number) {
-    // eslint-disable-next-line no-constant-condition
-    if (true || !this.compoundApi.Token) {
-      throw new Error('Cannot delegate, no token found!');
+    try {
+      const contract = await attachSigner(
+        this.app.wallets,
+        this.app.user.activeAccount.address,
+        this.compoundApi.Token
+      );
+      // TODO: support ERC20VotesComp delegation
+      const gasLimit = await contract.estimateGas.delegate(address, amount);
+      await contract.delegate(address, amount, { gasLimit });
+    } catch (e) {
+      console.error(e);
+      throw new Error(e);
     }
-    // try {
-    //   const contract = await attachSigner(
-    //     this.app.wallets,
-    //     this.app.user.activeAccount.address,
-    //     this.compoundApi.Token
-    //   );
-    //   // TODO: convert this to amountless
-    //   const gasLimit = await contract.estimateGas.delegate(address, amount);
-    //   await contract.delegate(address, amount, { gasLimit });
-    // } catch (e) {
-    //   console.error(e);
-    //   throw new Error(e);
-    // }
   }
 
   public async getDelegate(): Promise<string> {

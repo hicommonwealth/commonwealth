@@ -1,10 +1,10 @@
-import { IGovernorCompatibilityBravo, ERC20VotesComp, ERC20VotesComp__factory } from 'eth/types';
+import { IGovernorCompatibilityBravo, MPond, MPond__factory } from 'eth/types';
 import { utils } from 'ethers';
 
 import ContractApi from 'controllers/chain/ethereum/contractApi';
 
 export default class CompoundAPI extends ContractApi<IGovernorCompatibilityBravo> {
-  private _Token: ERC20VotesComp;
+  private _Token: MPond;
   public get Token() { return this._Token; }
 
   // private _Timelock: Timelock;
@@ -34,14 +34,15 @@ export default class CompoundAPI extends ContractApi<IGovernorCompatibilityBravo
         const data = iface.encodeFunctionData(tokenName);
         const resultData = await this.Contract.provider.call({ to: this.Contract.address, data });
         const tokenAddress = utils.getAddress(Buffer.from(utils.stripZeros(resultData)).toString('hex'));
-        this._Token = ERC20VotesComp__factory.connect(tokenAddress, this.Contract.signer || this.Contract.provider);
+        // TODO: use ERC20VotesComp instead!!
+        this._Token = MPond__factory.connect(tokenAddress, this.Contract.signer || this.Contract.provider);
       } catch (err) {
         console.error(`Could not fetch token ${tokenName}: ${err.message}`);
       }
     } else {
       try {
         const tokenAddress = await this.Contract.token();
-        this._Token = ERC20VotesComp__factory.connect(tokenAddress, this.Contract.signer || this.Contract.provider);
+        this._Token = MPond__factory.connect(tokenAddress, this.Contract.signer || this.Contract.provider);
       } catch (err) {
         console.error(`Failed to query token: ${err.message}`);
       }
