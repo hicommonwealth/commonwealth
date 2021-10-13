@@ -34,7 +34,7 @@ const createInvite = async (models: DB, req: Request, res: Response, next: NextF
     ? { chain_id: chain.id }
     : { offchain_community_id: community.id };
 
-  // check that invitesEnabled === true, or the user is an admin or mod
+  // check that invites_enabled === true, or the user is an admin or mod
   const address = await models.Address.findOne({
     where: {
       address: req.body.address,
@@ -43,7 +43,7 @@ const createInvite = async (models: DB, req: Request, res: Response, next: NextF
   });
   if (!address) return next(new Error(Errors.AddressNotFound));
 
-  if (community && !community.invitesEnabled) {
+  if (community && !community.invites_enabled) {
     const requesterIsAdminOrMod = await models.Role.findAll({
       where: {
         ...chainOrCommObj,
@@ -118,7 +118,7 @@ const createInvite = async (models: DB, req: Request, res: Response, next: NextF
   const joinOrLogIn = user ? 'Log in' : 'Sign up';
   const communityRoute = chain
     ? `/${chain.id}`
-    : community.privacyEnabled
+    : community.privacy_enabled
       ? '' : `/${community.id}`;
   // todo: inviteComm param may only be necesssary if no communityRoute present
   const params = `?triggerInvite=t&inviteComm=${(community || chain).id}&inviteEmail=${invitedEmail}`;
