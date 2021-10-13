@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { BasePage } from './base';
+import { BasePage } from '../base';
 import { Builder, By, Key, until, WebDriver } from 'selenium-webdriver';
 import * as webdriver from 'selenium-webdriver';
 

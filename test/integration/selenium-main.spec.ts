@@ -3,7 +3,7 @@
 // `yarn remove chromedriver` then `DETECT_CHROMEDRIVER_VERSION=true yarn add chromedriver --dev`
 
 // import { resetDatabase } from '../../server-test';
-import { HomePage } from '../util/seleniumPageObjects/home';
+import { HomePage } from '../util/seleniumObjects/Pages/home';
 import chai from 'chai';
 const { assert } = chai;
 
