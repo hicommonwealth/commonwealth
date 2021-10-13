@@ -266,7 +266,7 @@ export default class CompoundProposal extends Proposal<
         const power = new BN(e.data.votes);
         const vote = new CompoundProposalVote(
           this._Accounts.get(e.data.voter),
-          e.data.support ? CompoundVote.YES : CompoundVote.NO,
+          e.data.support,
           power
         );
         this.addOrUpdateVote(vote);
@@ -374,7 +374,7 @@ export default class CompoundProposal extends Proposal<
     const contract = await attachSigner(
       this._Gov.app.wallets,
       address,
-      this._Gov.api.Contract
+      this._Gov.api.Contract,
     );
     if (!(await this._Chain.isDelegate(address))) {
       throw new Error('sender must be valid delegate');
@@ -384,15 +384,34 @@ export default class CompoundProposal extends Proposal<
       throw new Error('proposal not in active period');
     }
 
-    const gasLimit = await contract.estimateGas.castVote(
-      this.data.identifier,
-      +vote.choice
-    );
-    const tx = await contract.castVote(
-      this.data.identifier,
-      +vote.choice,
-      { gasLimit },
-    );
+    let tx;
+    if (this._Gov.api.isGovAlpha(contract)) {
+      let voteBool: boolean;
+      if (vote.choice === CompoundVote.ABSTAIN) {
+        throw new Error('Cannot vote abstain on governor alpha!');
+      } else {
+        voteBool = vote.choice === CompoundVote.YES;
+      }
+      const gasLimit = await contract.estimateGas.castVote(
+        this.data.identifier,
+        voteBool
+      );
+      tx = await contract.castVote(
+        this.data.identifier,
+        voteBool,
+        { gasLimit },
+      );
+    } else {
+      const gasLimit = await contract.estimateGas.castVote(
+        this.data.identifier,
+        +vote.choice
+      );
+      tx = await contract.castVote(
+        this.data.identifier,
+        +vote.choice,
+        { gasLimit },
+      );
+    }
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
       throw new Error('failed to submit vote');

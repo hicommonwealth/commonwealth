@@ -24,26 +24,21 @@ export default class CompoundGovernance extends ProposalModule<
   ICompoundProposalResponse,
   CompoundProposal
 > {
-  // MEMBERS // TODO: Holders anything?
-
   // CONSTANTS
   private _quorumVotes: BN;
   private _proposalThreshold: BN;
   private _votingDelay: BN;
   private _votingPeriod: BN;
-  // private _gracePeriod: BN;
 
   private _api: CompoundAPI;
   private _Chain: CompoundChain;
   private _Accounts: EthereumAccounts;
 
   // GETTERS
-  // Contract Constants
   public get quorumVotes() { return this._quorumVotes; }
   public get proposalThreshold() { return this._proposalThreshold; }
   public get votingDelay() { return this._votingDelay; }
   public get votingPeriod() { return this._votingPeriod; }
-  // public get gracePeriod() { return this._gracePeriod; }
 
   public get api() { return this._api; }
   public get usingServerChainEntities() { return this._usingServerChainEntities; }
@@ -103,7 +98,6 @@ export default class CompoundGovernance extends ProposalModule<
     this._proposalThreshold = new BN((await this._api.Contract.proposalThreshold()).toString());
     this._votingDelay = new BN((await this._api.Contract.votingDelay()).toString());
     this._votingPeriod = new BN((await this._api.Contract.votingPeriod()).toString());
-    // this._gracePeriod = new BN((await this._api.Timelock.GRACE_PERIOD()).toString());
 
     // load server proposals
     console.log('Fetching compound proposals from backend.');
@@ -120,11 +114,9 @@ export default class CompoundGovernance extends ProposalModule<
       }
     );
 
-    // fetch proposals from chain
-    // const fetcher = new AaveEvents.StorageFetcher(chainEventsContracts);
+    // kick off listener
     const subscriber = new CompoundEvents.Subscriber(this._api.Contract as any, this.app.chain.id);
     const processor = new CompoundEvents.Processor(this._api.Contract as any);
-    // await this.app.chain.chainEntities.fetchEntities(this.app.chain.id, () => fetcher.fetch());
     await this.app.chain.chainEntities.subscribeEntities(
       this.app.chain.id,
       chainToEventNetwork(this.app.chain.meta.chain),
