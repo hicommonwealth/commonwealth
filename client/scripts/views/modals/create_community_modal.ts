@@ -27,7 +27,7 @@ enum CommunityType {
   SputnikDao = 'sputnik',
 }
 
-interface OffchainCommunityFormAttrs {}
+interface OffchainCommunityFormAttrs { }
 interface OffchainCommunityFormState {
   disabled: boolean;
   error: string;
@@ -192,7 +192,7 @@ const OffchainCommunityForm: m.Component<OffchainCommunityFormAttrs, OffchainCom
   }
 };
 
-interface SubstrateFormAttrs {}
+interface SubstrateFormAttrs { }
 
 interface SubstrateFormState {
   name: string,
@@ -343,7 +343,7 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
           $.post(`${app.serverUrl()}/addChainNode`, {
             name,
             description,
-            node_url : nodeUrl,
+            node_url: nodeUrl,
             symbol,
             website,
             discord,
@@ -372,7 +372,7 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
   }
 };
 
-interface ERC20FormAttrs {}
+interface ERC20FormAttrs { }
 
 interface ERC20FormState {
   address: string,
@@ -571,7 +571,7 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
   }
 };
 
-interface SputnikFormAttrs {}
+interface SputnikFormAttrs { }
 
 interface SputnikFormState {
   name: string,
@@ -623,12 +623,12 @@ const SputnikForm: m.Component<SputnikFormAttrs, SputnikFormState> = {
           title: 'Deploy',
           defaultValue: vnode.state.createNew,
           onToggle: (checked) => { vnode.state.createNew = checked; },
-          caption: (checked) => app.chain.base !== ChainBase.NEAR ? 'Must be on NEAR chain to deploy'
+          caption: (checked) => app.chain?.base !== ChainBase.NEAR ? 'Must be on NEAR chain to deploy'
             : !(app.user?.activeAccount instanceof NearAccount)
               ? 'Must log into NEAR account to deploy'
               : checked
                 ? 'Deploying new DAO' : 'Adding existing DAO',
-          disabled: !(app.user?.activeAccount instanceof NearAccount) || app.chain.base !== ChainBase.NEAR,
+          disabled: !(app.user?.activeAccount instanceof NearAccount) || app.chain?.base !== ChainBase.NEAR,
         }),
         m(InputPropertyRow, {
           title: 'Initial Bond (Must be >= Ⓝ 5)',
@@ -686,14 +686,15 @@ const SputnikForm: m.Component<SputnikFormAttrs, SputnikFormState> = {
             createNew,
           } = vnode.state;
           vnode.state.saving = true;
-          const id = (app.chain as Near).chain.isMainnet ? `${name}.sputnik-dao.near` : `${name}.sputnikv2.testnet`;
+          const isMainnet = !app.chain || (app.chain as Near).chain.isMainnet;
+          const id = isMainnet ? `${name}.sputnik-dao.near` : `${name}.sputnikv2.testnet`;
           const addChainNodeArgs = {
             name: id,
             description,
-            node_url: (app.chain as Near).chain.isMainnet
+            node_url: isMainnet
               ? 'https://rpc.mainnet.near.org'
               : 'https://rpc.testnet.near.org',
-            symbol: (app.chain as Near).chain.isMainnet ? 'NEAR' : 'tNEAR',
+            symbol: isMainnet ? 'NEAR' : 'tNEAR',
             website,
             discord,
             element,
@@ -741,7 +742,7 @@ const SputnikForm: m.Component<SputnikFormAttrs, SputnikFormState> = {
   }
 };
 
-interface CreateCommunityAttrs {}
+interface CreateCommunityAttrs { }
 interface CreateCommunityState {
   activeForm: string;
 }
