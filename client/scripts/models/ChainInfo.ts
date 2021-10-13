@@ -4,6 +4,7 @@ import app from 'state';
 import { RoleInfo, RolePermission } from 'models';
 import { ChainNetwork, ChainBase } from 'types';
 import OffchainTopic from './OffchainTopic';
+import { ChainInstance } from 'server/models/chain';
 
 class ChainInfo {
   public readonly id: string;
@@ -11,7 +12,7 @@ class ChainInfo {
   public name: string;
   public readonly network: ChainNetwork;
   public readonly base: ChainBase;
-  public readonly iconUrl: string;
+  public iconUrl: string;
   public description: string;
   public website: string;
   public discord: string;
@@ -104,12 +105,12 @@ class ChainInfo {
     element,
     telegram,
     github,
-    stagesEnabled,
-    customStages,
-    customDomain,
+    stages_enabled,
+    custom_stages,
+    custom_domain,
     snapshot,
     terms,
-    blockExplorerIds,
+    block_explorer_ids,
     collapsed_on_homepage,
     featured_topics,
     topics,
@@ -122,10 +123,10 @@ class ChainInfo {
   }) {
     let blockExplorerIdsParsed;
     try {
-      blockExplorerIdsParsed = JSON.parse(blockExplorerIds);
+      blockExplorerIdsParsed = JSON.parse(block_explorer_ids);
     } catch (e) {
       // ignore invalid JSON blobs
-      blockExplorerIds = {};
+      block_explorer_ids = {};
     }
     return new ChainInfo({
       id,
@@ -139,9 +140,9 @@ class ChainInfo {
       element,
       telegram,
       github,
-      stagesEnabled,
-      customStages,
-      customDomain,
+      stagesEnabled: stages_enabled,
+      customStages: custom_stages,
+      customDomain: custom_domain,
       snapshot,
       terms,
       blockExplorerIds: blockExplorerIdsParsed,
@@ -238,6 +239,7 @@ class ChainInfo {
     customDomain,
     terms,
     snapshot,
+    iconUrl,
   }) {
     // TODO: Change to PUT /chain
     const r = await $.post(`${app.serverUrl()}/updateChain`, {
@@ -249,14 +251,15 @@ class ChainInfo {
       element,
       telegram,
       github,
-      stagesEnabled,
-      customStages,
-      customDomain,
+      stages_enabled: stagesEnabled,
+      custom_stages: customStages,
+      custom_domain: customDomain,
       snapshot,
       terms,
+      icon_url: iconUrl,
       jwt: app.user.jwt,
     });
-    const updatedChain: ChainInfo = r.result;
+    const updatedChain: ChainInstance = r.result;
     this.name = updatedChain.name;
     this.description = updatedChain.description;
     this.website = updatedChain.website;
@@ -264,11 +267,12 @@ class ChainInfo {
     this.element = updatedChain.element;
     this.telegram = updatedChain.telegram;
     this.github = updatedChain.github;
-    this.stagesEnabled = updatedChain.stagesEnabled;
-    this.customStages = updatedChain.customStages;
-    this.customDomain = updatedChain.customDomain;
+    this.stagesEnabled = updatedChain.stages_enabled;
+    this.customStages = updatedChain.custom_stages;
+    this.customDomain = updatedChain.custom_domain;
     this.snapshot = updatedChain.snapshot;
     this.terms = updatedChain.terms;
+    this.iconUrl = updatedChain.icon_url;
   }
 
   public addFeaturedTopic(topic: string) {

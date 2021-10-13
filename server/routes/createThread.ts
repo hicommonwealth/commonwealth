@@ -151,8 +151,10 @@ const createThread = async (
     if (!req.user.isAdmin && isAdmin.length === 0) {
       try {
         const threshold = (await models.OffchainTopic.findOne({ where: { id: topic_id } })).token_threshold;
-        const tokenBalance = await tokenBalanceCache.getBalance(chain.id, req.body.address);
-
+        let tokenBalance = new BN(0);
+        if (threshold) {
+          tokenBalance = await tokenBalanceCache.getBalance(chain.id, req.body.address);
+        }
         if (threshold && tokenBalance.lt(new BN(threshold))) return next(new Error(Errors.InsufficientTokenBalance));
       } catch (e) {
         log.error(`hasToken failed: ${e.message}`);
@@ -317,7 +319,7 @@ const createThread = async (
       const originCommunity = await models.OffchainCommunity.findOne({
         where: { id: finalThread.community }
       });
-      if (originCommunity.privacyEnabled) {
+      if (originCommunity.privacy_enabled) {
         const destinationCommunity = mentionedAddress.Roles
           .find((role) => role.offchain_community_id === originCommunity.id);
         if (destinationCommunity === undefined) shouldNotifyMentionedUser = false;

@@ -48,16 +48,28 @@ const createReaction = async (
       try {
         let thread;
         if (thread_id) {
-          thread = await models.OffchainThread.findOne({ where: { id: thread_id } });
+          thread = await models.OffchainThread.findOne({
+            where: { id: thread_id },
+          });
         } else if (comment_id) {
-          const root_id = (await models.OffchainComment.findOne({ where: { id: comment_id } })).root_id;
-          const stage = root_id.substring(0, root_id.indexOf('_'));
-          const topic_id = root_id.substring(root_id.indexOf('_') + 1);
-          thread = await models.OffchainThread.findOne({ where:{ stage, id: topic_id } });
+          const root_id = (
+            await models.OffchainComment.findOne({ where: { id: comment_id } })
+          ).root_id;
+          const comment_thread_id = root_id.substring(root_id.indexOf('_') + 1);
+          thread = await models.OffchainThread.findOne({
+            where: { id: comment_thread_id },
+          });
         }
-        const threshold = (await models.OffchainTopic.findOne({ where: { id: thread.topic_id } })).token_threshold;
-        const tokenBalance = await tokenBalanceCache.getBalance(chain.id, req.body.address);
-        if (threshold && tokenBalance.lt(new BN(threshold))) return next(new Error(Errors.InsufficientTokenBalance));
+        const topic = await models.OffchainTopic.findOne({
+          where: { id: thread.topic_id },
+        });
+        const threshold = topic.token_threshold;
+        let tokenBalance = new BN(0);
+        if (threshold) {
+          tokenBalance = await tokenBalanceCache.getBalance(chain.id, req.body.address);
+        }
+        if (threshold && tokenBalance.lt(new BN(threshold)))
+          return next(new Error(Errors.InsufficientTokenBalance));
       } catch (e) {
         log.error(`hasToken failed: ${e.message}`);
         return next(new Error(Errors.CouldNotFetchTokenBalance));
@@ -95,12 +107,14 @@ const createReaction = async (
 
   let finalReaction;
   let created;
+
   try {
     [ finalReaction, created ] = await models.OffchainReaction.findOrCreate({
       where: options,
       defaults: options,
       include: [ models.Address]
     });
+
     if (created) finalReaction = await models.OffchainReaction.findOne({
       where: options,
       include: [ models.Address]
@@ -176,7 +190,6 @@ const createReaction = async (
     req.wss,
     [ finalReaction.Address.address ],
   );
-
   // update author.last_active (no await)
   author.last_active = new Date();
   author.save();

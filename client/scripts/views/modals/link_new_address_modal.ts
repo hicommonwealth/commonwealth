@@ -20,7 +20,7 @@ import Near from 'controllers/chain/near/main';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import CodeBlock from 'views/components/widgets/code_block';
 import User from 'views/components/widgets/user';
-import AvatarUpload from 'views/components/avatar_upload';
+import AvatarUpload, { AvatarScope } from 'views/components/avatar_upload';
 import AddressSwapper from 'views/components/addresses/address_swapper';
 
 enum LinkNewAddressSteps {
@@ -603,6 +603,7 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
           ]),
           m('.avatar-wrap', [
             m(AvatarUpload, {
+              avatarScope: AvatarScope.Account,
               uploadStartedCallback: () => {
                 vnode.state.uploadsInProgress = true;
                 m.redraw();

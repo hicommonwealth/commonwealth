@@ -41,7 +41,7 @@ const updateThreadStage = async (models: DB, req: Request, res: Response, next: 
     }
 
     // fetch available stages
-    let customStages = [];
+    let custom_stages = [];
     let entity;
     if (thread.community) {
       entity = await models.OffchainCommunity.findOne({ where: { id: thread.community } });
@@ -49,13 +49,13 @@ const updateThreadStage = async (models: DB, req: Request, res: Response, next: 
       entity = await models.Chain.findOne({ where: { id: thread.chain } });
     }
     try {
-      customStages = Array.from(JSON.parse(entity.customStages)).map((s) => s.toString()).filter((s) => s);
+      custom_stages = Array.from(JSON.parse(entity.custom_stages)).map((s) => s.toString()).filter((s) => s);
     } catch (e) {}
 
     // validate stage
-    const availableStages = customStages.length === 0 ? [
+    const availableStages = custom_stages.length === 0 ? [
       'discussion', 'proposal_in_review', 'voting', 'passed', 'failed',
-    ] : customStages;
+    ] : custom_stages;
 
     if (availableStages.indexOf(stage) === -1) {
       return next(new Error(Errors.InvalidStage));
