@@ -10,9 +10,10 @@ import { isFunction } from '@polkadot/util';
 
 import { ISubstrateDemocracyProposal, SubstrateCoin, formatCall } from 'adapters/chain/substrate/types';
 import { formatProposalHashShort } from 'helpers';
+import { ChainBase, ProposalType } from 'types';
 import {
   Proposal, ProposalStatus, ProposalEndTime, DepositVote,
-  VotingType, VotingUnit, ChainBase, Account, ChainEntity, ChainEvent
+  VotingType, VotingUnit, Account, ChainEntity, ChainEvent
 } from 'models';
 
 import { chainEntityTypeToProposalSlug } from 'identifiers';
@@ -125,7 +126,7 @@ class SubstrateDemocracyProposal extends Proposal<
     entity: ChainEntity,
   ) {
     // fake adapter data
-    super('democracyproposal', backportEventToAdapter(
+    super(ProposalType.SubstrateDemocracyProposal, backportEventToAdapter(
       ChainInfo,
       entity.chainEvents
         .find(

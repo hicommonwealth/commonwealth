@@ -12,15 +12,16 @@ import { OffchainThreadAttributes } from './offchain_thread';
 import { OffchainCommentAttributes } from './offchain_comment';
 import { UserAttributes } from './user';
 import { ModelStatic } from './types';
+import { ChainBase, ChainNetwork, ChainType } from '../../shared/types';
 
 export interface ChainAttributes {
   name: string;
   symbol: string;
-  network: string;
-  base: string;
+  network: ChainNetwork;
+  base: ChainBase;
   icon_url: string;
   active: boolean;
-  type: string;
+  type: ChainType;
   id?: string;
   description?: string;
   discord?: string;

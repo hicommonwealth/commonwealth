@@ -7,6 +7,7 @@ import { IApp } from 'state';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import { SubstrateDemocracyReferendum } from './democracy_referendum';
+import { chainToEventNetwork } from '../../server/chain_entities';
 
 class SubstrateDemocracy extends ProposalModule<
   ApiPromise,
@@ -72,11 +73,13 @@ class SubstrateDemocracy extends ProposalModule<
     // fetch referenda from chain
     const events = await this.app.chain.chainEntities.fetchEntities(
       this.app.chain.id,
+      chainToEventNetwork(this.app.chain.meta.chain),
       () => this._Chain.fetcher.fetchDemocracyReferenda(this.app.chain.block.height)
     );
     const hashes = events.filter((e) => (e.data as any).proposalHash).map((e) => (e.data as any).proposalHash);
     await this.app.chain.chainEntities.fetchEntities(
       this.app.chain.id,
+      chainToEventNetwork(this.app.chain.meta.chain),
       () => this._Chain.fetcher.fetchDemocracyPreimages(hashes)
     );
 

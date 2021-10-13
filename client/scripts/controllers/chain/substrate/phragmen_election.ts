@@ -1,11 +1,11 @@
 import _ from 'underscore';
+import { ChainBase, ProposalType } from 'types';
 import {
   Proposal,
   IVote,
   VotingType,
   VotingUnit,
   Account,
-  ChainBase,
   ProposalStatus,
   IFixedBlockEndTime,
 } from 'models';
@@ -91,7 +91,7 @@ export class SubstratePhragmenElection extends Proposal<
     data: ISubstratePhragmenElection,
     moduleName: string,
   ) {
-    super('phragmenelection', data);
+    super(ProposalType.PhragmenCandidacy, data);
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._Elections = Elections;

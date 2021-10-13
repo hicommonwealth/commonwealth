@@ -3,7 +3,7 @@ import m from 'mithril';
 import app from 'state';
 import { Button, Table } from 'construct-ui';
 
-import { ChainNetwork } from 'models';
+import { ChainBase, ChainNetwork } from 'types';
 import { notifyError } from 'controllers/app/notifications';
 import { IChainOrCommMetadataManagementAttrs } from './community_metadata_management_table';
 import {
@@ -167,7 +167,7 @@ const ChainMetadataManagementTable: m.Component<
             },
             disabled: true, // Custom domains should be admin configurable only
           }),
-          app.chain?.meta.chain.base === 'ethereum' &&
+          app.chain?.meta.chain.base === ChainBase.Ethereum &&
             m(InputPropertyRow, {
               title: 'Snapshot',
               defaultValue: vnode.state.snapshot,
@@ -195,6 +195,18 @@ const ChainMetadataManagementTable: m.Component<
               }),
             ]),
           ]),
+          vnode.attrs.mods.length > 0 &&
+            m('tr', [
+              m('td', 'Moderators'),
+              m('td', [
+                m(ManageRolesRow, {
+                  roledata: vnode.attrs.mods,
+                  onRoleUpdate: (x, y) => {
+                    vnode.attrs.onRoleUpdate(x, y);
+                  },
+                }),
+              ]),
+            ]),
           vnode.attrs.mods.length > 0 &&
             m('tr', [
               m('td', 'Moderators'),

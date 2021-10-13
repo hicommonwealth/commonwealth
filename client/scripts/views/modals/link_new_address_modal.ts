@@ -9,7 +9,8 @@ import { Button, Input, TextArea, Spinner, Checkbox } from 'construct-ui';
 
 import { initAppState } from 'app';
 import { isSameAccount, link } from 'helpers';
-import { AddressInfo, Account, ChainBase, IWebWallet } from 'models';
+import { ChainBase } from 'types';
+import { AddressInfo, Account, IWebWallet } from 'models';
 import app, { ApiStatus } from 'state';
 
 import { updateActiveAddresses, createUserWithAddress, setActiveAccount } from 'controllers/app/login';
@@ -631,7 +632,7 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
                 $(vvnode.dom).find('input[type="text"]').val(vnode.state.newAddress.profile.name);
                 vnode.state.hasName = true;
                 m.redraw();
-              } else if (vnode.state.newAddress.chain.network === 'near') {
+              } else if (vnode.state.newAddress.chain.base === ChainBase.NEAR) {
                 $(vvnode.dom).find('input[type="text"]').val(vnode.state.newAddress.address);
                 vnode.state.hasName = true;
                 m.redraw();

@@ -3,7 +3,7 @@ import { Op } from 'sequelize';
 import { factory, formatFilename } from '../../shared/logging';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import { DB } from '../database';
-
+import { ChainBase } from '../../shared/types';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
@@ -90,7 +90,7 @@ const updateChain = async (
     )
   ) {
     return next(new Error(Errors.InvalidSnapshot));
-  } else if (snapshot && chain.base !== 'ethereum') {
+  } else if (snapshot && chain.base !== ChainBase.Ethereum) {
     return next(new Error(Errors.SnapshotOnlyOnEthereum));
   } else if (terms && !urlHasValidHTTPPrefix(terms)) {
     return next(new Error(Errors.InvalidTerms));

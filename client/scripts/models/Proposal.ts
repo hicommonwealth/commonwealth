@@ -1,6 +1,7 @@
 import moment from 'moment';
 import { Coin } from 'adapters/currency';
 import { IIdentifiable } from 'adapters/shared';
+import { ProposalType } from 'types';
 import { IVote, IUniqueId, ITXModalData } from './interfaces';
 import { VotingType, VotingUnit, ProposalEndTime, ProposalStatus } from './types';
 import Account from './Account';
@@ -17,7 +18,7 @@ abstract class Proposal<
   protected _data: ConstructorT;
   public get data(): ConstructorT { return this._data; }
   public readonly identifier: string;
-  public readonly slug: string;
+  public readonly slug: ProposalType;
   public abstract get shortIdentifier(): string;
   public get uniqueIdentifier() {
     return `${this.slug}_${this.identifier}`;
@@ -51,7 +52,7 @@ abstract class Proposal<
   protected _initialized = false;
   public get initialized() { return this._initialized; }
 
-  constructor(slug: string, data: ConstructorT) {
+  constructor(slug: ProposalType, data: ConstructorT) {
     this.slug = slug;
     this._data = data;
     this.identifier = data.identifier;

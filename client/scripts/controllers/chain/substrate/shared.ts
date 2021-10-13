@@ -20,13 +20,13 @@ import { ApiOptions, Signer, SubmittableExtrinsic, VoidFn } from '@polkadot/api/
 
 import { formatCoin } from 'adapters/currency';
 import { BlocktimeHelper } from 'helpers';
+import { ChainNetwork } from 'types';
 import {
   NodeInfo,
   ITXModalData,
   TransactionStatus,
   IChainModule,
   ITXData,
-  ChainNetwork,
 } from 'models';
 
 import { SubstrateEvents } from '@commonwealth/chain-events';
@@ -39,6 +39,7 @@ import { u128 } from '@polkadot/types';
 import { constructSubstrateUrl } from 'substrate';
 import { formatAddressShort } from '../../../../../shared/utils';
 import { SubstrateAccount } from './account';
+import { chainToEventNetwork } from '../../server/chain_entities';
 
 export interface ISubstrateTXData extends ITXData {
   nonce: string;
@@ -229,6 +230,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     const processor = new SubstrateEvents.Processor(this.api);
     return this._app.chain.chainEntities.subscribeEntities(
       this._app.chain.id,
+      chainToEventNetwork(this.app.chain.meta.chain),
       subscriber,
       processor,
     );
