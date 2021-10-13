@@ -455,13 +455,16 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
           }
 
           // create new API
-          const provider = new WsProvider(constructSubstrateUrl(vnode.state.nodeUrl), false);
+          const provider = new WsProvider(
+            constructSubstrateUrl(vnode.state.nodeUrl),
+            false
+          );
           try {
             await provider.connect();
             const api = await ApiPromise.create({
               throwOnConnect: true,
               provider,
-              ...JSON.parse(vnode.state.substrate_spec)
+              ...JSON.parse(vnode.state.substrate_spec),
             });
             await api.disconnect();
             notifySuccess('Test has passed');
@@ -469,7 +472,7 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
             console.error(err.message);
             notifyError('Test API initialization failed');
           }
-        }
+        },
       }),
       m(Button, {
         label: 'Save changes',
@@ -498,7 +501,7 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
           $.post(`${app.serverUrl()}/addChainNode`, {
             name,
             description,
-            node_url : nodeUrl,
+            node_url: nodeUrl,
             symbol,
             website,
             discord,
@@ -510,19 +513,23 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
             type: ChainType.Chain,
             id: slugify(name),
             base: ChainBase.Substrate,
-            network: slugify(name)
-          }).then(async (res) => {
-            await initAppState(false);
-            $(e.target).trigger('modalexit');
-            m.route.set(`/${res.result.chain}`);
-          }).catch((err: any) => {
-            notifyError(err.responseJSON?.error || 'Creating new community failed');
-          }).always(() => {
-            vnode.state.saving = false;
-          });
+            network: slugify(name),
+          })
+            .then(async (res) => {
+              await initAppState(false);
+              $(e.target).trigger('modalexit');
+              m.route.set(`/${res.result.chain}`);
+            })
+            .catch((err: any) => {
+              notifyError(
+                err.responseJSON?.error || 'Creating new community failed'
+              );
+            })
+            .always(() => {
+              vnode.state.saving = false;
+            });
         },
       }),
-      ]),
     ]);
   },
 };
@@ -769,33 +776,44 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
           defaultValue: vnode.state.id,
           value: vnode.state.id,
           disabled: disableField,
-          onChangeHandler: (v) => { vnode.state.id = v; },
+          onChangeHandler: (v) => {
+            vnode.state.id = v;
+          },
         }),
         m(InputPropertyRow, {
           title: 'Name',
           defaultValue: vnode.state.name,
           disabled: disableField,
-          onChangeHandler: (v) => { vnode.state.name = v; vnode.state.id = slugify(v); },
+          onChangeHandler: (v) => {
+            vnode.state.name = v;
+            vnode.state.id = slugify(v);
+          },
         }),
         m(InputPropertyRow, {
           title: 'Symbol',
           disabled: disableField,
           defaultValue: vnode.state.symbol,
           placeholder: 'XYZ',
-          onChangeHandler: (v) => { vnode.state.symbol = v; },
+          onChangeHandler: (v) => {
+            vnode.state.symbol = v;
+          },
         }),
         m(InputPropertyRow, {
           title: 'Icon URL',
           disabled: disableField,
           defaultValue: vnode.state.icon_url,
           placeholder: 'https://',
-          onChangeHandler: (v) => { vnode.state.icon_url = v; },
+          onChangeHandler: (v) => {
+            vnode.state.icon_url = v;
+          },
         }),
         m(InputPropertyRow, {
           title: 'Description',
           disabled: disableField,
           defaultValue: vnode.state.description,
-          onChangeHandler: (v) => { vnode.state.description = v; },
+          onChangeHandler: (v) => {
+            vnode.state.description = v;
+          },
           textarea: true,
         }),
         m(InputPropertyRow, {
@@ -803,35 +821,45 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
           disabled: disableField,
           defaultValue: vnode.state.website,
           placeholder: 'https://example.com',
-          onChangeHandler: (v) => { vnode.state.website = v; },
+          onChangeHandler: (v) => {
+            vnode.state.website = v;
+          },
         }),
         m(InputPropertyRow, {
           title: 'Discord',
           disabled: disableField,
           defaultValue: vnode.state.discord,
           placeholder: 'https://discord.com/invite',
-          onChangeHandler: (v) => { vnode.state.discord = v; },
+          onChangeHandler: (v) => {
+            vnode.state.discord = v;
+          },
         }),
         m(InputPropertyRow, {
           title: 'Element',
           disabled: disableField,
           defaultValue: vnode.state.element,
           placeholder: 'https://matrix.to/#',
-          onChangeHandler: (v) => { vnode.state.element = v; },
+          onChangeHandler: (v) => {
+            vnode.state.element = v;
+          },
         }),
         m(InputPropertyRow, {
           title: 'Telegram',
           disabled: disableField,
           defaultValue: vnode.state.telegram,
           placeholder: 'https://t.me',
-          onChangeHandler: (v) => { vnode.state.telegram = v; },
+          onChangeHandler: (v) => {
+            vnode.state.telegram = v;
+          },
         }),
         m(InputPropertyRow, {
           title: 'Github',
           disabled: disableField,
           defaultValue: vnode.state.github,
           placeholder: 'https://github.com',
-          onChangeHandler: (v) => { vnode.state.github = v; },
+          onChangeHandler: (v) => {
+            vnode.state.github = v;
+          },
         }),
       ]),
       m(Button, {
@@ -870,18 +898,22 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
             base: ChainBase.Ethereum,
             network: ChainNetwork.ERC20,
             node_url: 'wss://mainnet.infura.io/ws',
-          }).then(async (res) => {
-            await initAppState(false);
-            $(e.target).trigger('modalexit');
-            m.route.set(`/${res.result.chain?.id}`);
-          }).catch((err: any) => {
-            notifyError(err.responseJSON?.error || 'Creating new ERC20 community failed');
-          }).always(() => {
-            vnode.state.saving = false;
-          });
+          })
+            .then(async (res) => {
+              await initAppState(false);
+              $(e.target).trigger('modalexit');
+              m.route.set(`/${res.result.chain?.id}`);
+            })
+            .catch((err: any) => {
+              notifyError(
+                err.responseJSON?.error || 'Creating new ERC20 community failed'
+              );
+            })
+            .always(() => {
+              vnode.state.saving = false;
+            });
         },
       }),
-      ]),
     ]);
   },
 };
@@ -916,129 +948,160 @@ const SputnikForm: m.Component<SputnikFormAttrs, SputnikFormState> = {
   },
   view: (vnode) => {
     return m('.compact-modal-body-max', [
-      m('.CommunityMetadataManagementTable', [m(Table, {
-        bordered: false,
-        interactive: false,
-        striped: false,
-        class: 'metadata-management-table',
-      }, [
-        m(InputPropertyRow, {
-          title: 'Name',
-          defaultValue: vnode.state.name,
-          onChangeHandler: (v) => { vnode.state.name = v.toLowerCase(); },
-          placeholder: 'genesis',
-        }),
-        m(InputPropertyRow, {
-          title: 'Description',
-          defaultValue: vnode.state.description,
-          onChangeHandler: (v) => { vnode.state.description = v; },
-          textarea: true,
-        }),
-        m(TogglePropertyRow, {
-          title: 'Deploy',
-          defaultValue: vnode.state.createNew,
-          onToggle: (checked) => { vnode.state.createNew = checked; },
-          caption: (checked) => app.chain.base !== ChainBase.NEAR ? 'Must be on NEAR chain to deploy'
-            : !(app.user?.activeAccount instanceof NearAccount)
-              ? 'Must log into NEAR account to deploy'
-              : checked
-                ? 'Deploying new DAO' : 'Adding existing DAO',
-          disabled: !(app.user?.activeAccount instanceof NearAccount) || app.chain.base !== ChainBase.NEAR,
-        }),
-        m(InputPropertyRow, {
-          title: 'Initial Bond (Must be >= Ⓝ 5)',
-          defaultValue: vnode.state.initialValue,
-          disabled: !vnode.state.createNew,
-          onChangeHandler: (v) => { vnode.state.initialValue = v; },
-          placeholder: '5',
-        }),
-        // TODO: add divider to distinguish on-chain data
-        m(InputPropertyRow, {
-          title: 'Website',
-          defaultValue: vnode.state.website,
-          placeholder: 'https://example.com',
-          onChangeHandler: (v) => { vnode.state.website = v; },
-        }),
-        m(InputPropertyRow, {
-          title: 'Discord',
-          defaultValue: vnode.state.discord,
-          placeholder: 'https://discord.com/invite',
-          onChangeHandler: (v) => { vnode.state.discord = v; },
-        }),
-        m(InputPropertyRow, {
-          title: 'Element',
-          defaultValue: vnode.state.element,
-          placeholder: 'https://matrix.to/#',
-          onChangeHandler: (v) => { vnode.state.element = v; },
-        }),
-        m(InputPropertyRow, {
-          title: 'Telegram',
-          defaultValue: vnode.state.telegram,
-          placeholder: 'https://t.me',
-          onChangeHandler: (v) => { vnode.state.telegram = v; },
-        }),
-        m(InputPropertyRow, {
-          title: 'Github',
-          defaultValue: vnode.state.github,
-          placeholder: 'https://github.com',
-          onChangeHandler: (v) => { vnode.state.github = v; },
-        }),
-      ]),
-      m(Button, {
-        label: 'Save changes',
-        intent: 'primary',
-        disabled: vnode.state.saving,
-        onclick: async (e) => {
-          const {
-            name,
-            description,
-            initialValue,
-            website,
-            discord,
-            element,
-            telegram,
-            github,
-            createNew,
-          } = vnode.state;
-          vnode.state.saving = true;
-          const id = (app.chain as Near).chain.isMainnet ? `${name}.sputnik-dao.near` : `${name}.sputnikv2.testnet`;
-          const addChainNodeArgs = {
-            name: id,
-            description,
-            node_url: (app.chain as Near).chain.isMainnet
-              ? 'https://rpc.mainnet.near.org'
-              : 'https://rpc.testnet.near.org',
-            symbol: (app.chain as Near).chain.isMainnet ? 'NEAR' : 'tNEAR',
-            website,
-            discord,
-            element,
-            telegram,
-            github,
-            jwt: app.user.jwt,
-            type: ChainType.DAO,
-            id,
-            base: ChainBase.NEAR,
-            network: ChainNetwork.Sputnik,
-          };
-          if (createNew) {
-            // TODO: we need to validate arguments prior to making this call/redirect, so that
-            //   /addChainNode doesn't fail after the DAO has been created
-            // https://github.com/AngelBlock/sputnik-dao-2-mockup/blob/dev/src/Selector.jsx#L159
-            try {
-              // TODO: ensure id format is correct
-              const res = await $.post(
-                `${app.serverUrl()}/addChainNode`,
-                addChainNodeArgs
-              );
-              await initAppState(false);
-              $(e.target).trigger('modalexit');
-              m.route.set(`/${res.result.chain}`);
-            } catch (err) {
-              notifyError(
-                err.responseJSON?.error || 'Creating new community failed'
-              );
-            } finally {
-              vnode.state.saving = false;
+      m('.CommunityMetadataManagementTable', [
+        m(
+          Table,
+          {
+            bordered: false,
+            interactive: false,
+            striped: false,
+            class: 'metadata-management-table',
+          },
+          [
+            m(InputPropertyRow, {
+              title: 'Name',
+              defaultValue: vnode.state.name,
+              onChangeHandler: (v) => {
+                vnode.state.name = v.toLowerCase();
+              },
+              placeholder: 'genesis',
+            }),
+            m(InputPropertyRow, {
+              title: 'Description',
+              defaultValue: vnode.state.description,
+              onChangeHandler: (v) => {
+                vnode.state.description = v;
+              },
+              textarea: true,
+            }),
+            m(TogglePropertyRow, {
+              title: 'Deploy',
+              defaultValue: vnode.state.createNew,
+              onToggle: (checked) => {
+                vnode.state.createNew = checked;
+              },
+              caption: (checked) =>
+                app.chain.base !== ChainBase.NEAR
+                  ? 'Must be on NEAR chain to deploy'
+                  : !(app.user?.activeAccount instanceof NearAccount)
+                  ? 'Must log into NEAR account to deploy'
+                  : checked
+                  ? 'Deploying new DAO'
+                  : 'Adding existing DAO',
+              disabled:
+                !(app.user?.activeAccount instanceof NearAccount) ||
+                app.chain.base !== ChainBase.NEAR,
+            }),
+            m(InputPropertyRow, {
+              title: 'Initial Bond (Must be >= Ⓝ 5)',
+              defaultValue: vnode.state.initialValue,
+              disabled: !vnode.state.createNew,
+              onChangeHandler: (v) => {
+                vnode.state.initialValue = v;
+              },
+              placeholder: '5',
+            }),
+            // TODO: add divider to distinguish on-chain data
+            m(InputPropertyRow, {
+              title: 'Website',
+              defaultValue: vnode.state.website,
+              placeholder: 'https://example.com',
+              onChangeHandler: (v) => {
+                vnode.state.website = v;
+              },
+            }),
+            m(InputPropertyRow, {
+              title: 'Discord',
+              defaultValue: vnode.state.discord,
+              placeholder: 'https://discord.com/invite',
+              onChangeHandler: (v) => {
+                vnode.state.discord = v;
+              },
+            }),
+            m(InputPropertyRow, {
+              title: 'Element',
+              defaultValue: vnode.state.element,
+              placeholder: 'https://matrix.to/#',
+              onChangeHandler: (v) => {
+                vnode.state.element = v;
+              },
+            }),
+            m(InputPropertyRow, {
+              title: 'Telegram',
+              defaultValue: vnode.state.telegram,
+              placeholder: 'https://t.me',
+              onChangeHandler: (v) => {
+                vnode.state.telegram = v;
+              },
+            }),
+            m(InputPropertyRow, {
+              title: 'Github',
+              defaultValue: vnode.state.github,
+              placeholder: 'https://github.com',
+              onChangeHandler: (v) => {
+                vnode.state.github = v;
+              },
+            }),
+          ]
+        ),
+        m(Button, {
+          label: 'Save changes',
+          intent: 'primary',
+          disabled: vnode.state.saving,
+          onclick: async (e) => {
+            const {
+              name,
+              description,
+              initialValue,
+              website,
+              discord,
+              element,
+              telegram,
+              github,
+              createNew,
+            } = vnode.state;
+            vnode.state.saving = true;
+            const id = (app.chain as Near).chain.isMainnet
+              ? `${name}.sputnik-dao.near`
+              : `${name}.sputnikv2.testnet`;
+            const addChainNodeArgs = {
+              name: id,
+              description,
+              node_url: (app.chain as Near).chain.isMainnet
+                ? 'https://rpc.mainnet.near.org'
+                : 'https://rpc.testnet.near.org',
+              symbol: (app.chain as Near).chain.isMainnet ? 'NEAR' : 'tNEAR',
+              website,
+              discord,
+              element,
+              telegram,
+              github,
+              jwt: app.user.jwt,
+              type: ChainType.DAO,
+              id,
+              base: ChainBase.NEAR,
+              network: ChainNetwork.Sputnik,
+            };
+            if (createNew) {
+              // TODO: we need to validate arguments prior to making this call/redirect, so that
+              //   /addChainNode doesn't fail after the DAO has been created
+              // https://github.com/AngelBlock/sputnik-dao-2-mockup/blob/dev/src/Selector.jsx#L159
+              try {
+                // TODO: ensure id format is correct
+                const res = await $.post(
+                  `${app.serverUrl()}/addChainNode`,
+                  addChainNodeArgs
+                );
+                await initAppState(false);
+                $(e.target).trigger('modalexit');
+                m.route.set(`/${res.result.chain}`);
+              } catch (err) {
+                notifyError(
+                  err.responseJSON?.error || 'Creating new community failed'
+                );
+              } finally {
+                vnode.state.saving = false;
+              }
             }
           },
         }),
