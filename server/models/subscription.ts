@@ -194,13 +194,7 @@ export default (
     })).map((o) => o.id);
 
     // send data to relevant webhooks
-    // TODO: currently skipping all erc20 events from webhooks - change?
-    if (webhook_data && (
-      // @ts-ignore
-      !webhook_data?.chainEventType?.chain
-      // @ts-ignore
-        || !erc20Tokens.includes(webhook_data.chainEventType.chain)
-    )) {
+    if (webhook_data) {
       await send(models, {
         notificationCategory: category_id,
         ...webhook_data

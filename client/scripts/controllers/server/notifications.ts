@@ -26,7 +26,9 @@ class NotificationsController {
   public get subscriptions() { return this._subscriptions; }
 
   public subscribe(category: string, objectId: string) {
-    const subscription = this.subscriptions.find((v) => v.category === category && v.objectId === objectId);
+    const subscription = this.subscriptions.find(
+      (v) => v.category === category && v.objectId === objectId
+    );
     if (subscription) {
       return this.enableSubscriptions([subscription]);
     } else {

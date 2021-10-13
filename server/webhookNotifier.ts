@@ -5,7 +5,6 @@ import { Label as ChainEventLabel } from '@commonwealth/chain-events';
 
 import { NotificationCategories } from '../shared/types';
 import { smartTrim, validURL, renderQuillDeltaToText } from '../shared/utils';
-import { getForumNotificationCopy } from '../shared/notificationFormatter';
 import { SERVER_URL, SLACK_FEEDBACK_WEBHOOK, DEFAULT_COMMONWEALTH_LOGO } from './config';
 
 export interface WebhookContent {
