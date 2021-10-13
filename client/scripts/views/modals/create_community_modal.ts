@@ -981,7 +981,7 @@ const SputnikForm: m.Component<SputnikFormAttrs, SputnikFormState> = {
                 vnode.state.createNew = checked;
               },
               caption: (checked) =>
-                app.chain.base !== ChainBase.NEAR
+                app.chain?.base !== ChainBase.NEAR
                   ? 'Must be on NEAR chain to deploy'
                   : !(app.user?.activeAccount instanceof NearAccount)
                   ? 'Must log into NEAR account to deploy'
@@ -990,7 +990,7 @@ const SputnikForm: m.Component<SputnikFormAttrs, SputnikFormState> = {
                   : 'Adding existing DAO',
               disabled:
                 !(app.user?.activeAccount instanceof NearAccount) ||
-                app.chain.base !== ChainBase.NEAR,
+                app.chain?.base !== ChainBase.NEAR,
             }),
             m(InputPropertyRow, {
               title: 'Initial Bond (Must be >= Ⓝ 5)',
@@ -1061,16 +1061,17 @@ const SputnikForm: m.Component<SputnikFormAttrs, SputnikFormState> = {
               createNew,
             } = vnode.state;
             vnode.state.saving = true;
-            const id = (app.chain as Near).chain.isMainnet
+            const isMainnet = !app.chain || (app.chain as Near).chain.isMainnet;
+            const id = isMainnet
               ? `${name}.sputnik-dao.near`
               : `${name}.sputnikv2.testnet`;
             const addChainNodeArgs = {
               name: id,
               description,
-              node_url: (app.chain as Near).chain.isMainnet
+              node_url: isMainnet
                 ? 'https://rpc.mainnet.near.org'
                 : 'https://rpc.testnet.near.org',
-              symbol: (app.chain as Near).chain.isMainnet ? 'NEAR' : 'tNEAR',
+              symbol: isMainnet ? 'NEAR' : 'tNEAR',
               website,
               discord,
               element,
@@ -1087,19 +1088,20 @@ const SputnikForm: m.Component<SputnikFormAttrs, SputnikFormState> = {
               //   /addChainNode doesn't fail after the DAO has been created
               // https://github.com/AngelBlock/sputnik-dao-2-mockup/blob/dev/src/Selector.jsx#L159
               try {
-                // TODO: ensure id format is correct
-                const res = await $.post(
-                  `${app.serverUrl()}/addChainNode`,
-                  addChainNodeArgs
+                const account = app.user.activeAccount as NearAccount;
+                const v = new BN(initialValue);
+                // write addChainNode data to localstorage to call in finishNearLogin page
+                localStorage[id] = JSON.stringify(addChainNodeArgs);
+                // triggers a redirect
+                await (app.chain as Near).chain.createDaoTx(
+                  account,
+                  name,
+                  description,
+                  v
                 );
-                await initAppState(false);
-                $(e.target).trigger('modalexit');
-                m.route.set(`/${res.result.chain}`);
               } catch (err) {
-                notifyError(
-                  err.responseJSON?.error || 'Creating new community failed'
-                );
-              } finally {
+                notifyError(err.responseJSON?.error || 'Creating DAO failed.');
+                console.error(err.responseJSON?.error || err.message);
                 vnode.state.saving = false;
               }
             }
