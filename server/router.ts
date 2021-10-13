@@ -124,7 +124,6 @@ import getWebhooks from './routes/webhooks/getWebhooks';
 import ViewCountCache from './util/viewCountCache';
 import IdentityFetchCache from './util/identityFetchCache';
 import TokenBalanceCache from './util/tokenBalanceCache';
-import Erc20SubscriberHolder from './util/erc20SubscriberHolder';
 
 import bulkEntities from './routes/bulkEntities';
 import { getTokensFromLists } from './routes/getTokensFromLists';
@@ -143,8 +142,7 @@ function setupRouter(
   models: DB,
   viewCountCache: ViewCountCache,
   identityFetchCache: IdentityFetchCache,
-  tokenBalanceCache: TokenBalanceCache,
-  erc20SubscriberHolder: Erc20SubscriberHolder
+  tokenBalanceCache: TokenBalanceCache
 ) {
   const router = express.Router();
   const log = factory.getLogger(formatFilename(__filename));
@@ -209,8 +207,8 @@ function setupRouter(
   // TODO: Change to PUT /community
   router.post('/updateCommunity', passport.authenticate('jwt', { session: false }), updateCommunity.bind(this, models));
   router.get('/communityStats', passport.authenticate('jwt', { session: false }), communityStats.bind(this, models));
-  router.get('/getTokensFromLists', getTokensFromLists.bind(this, models, tokenBalanceCache));
-  router.get('/getTokenForum', getTokenForum.bind(this, models, erc20SubscriberHolder, tokenBalanceCache));
+  router.get('/getTokensFromLists', getTokensFromLists.bind(this, models));
+  router.get('/getTokenForum', getTokenForum.bind(this, models));
   // TODO: Change to POST /chain
   router.post('/createChain', passport.authenticate('jwt', { session: false }), createChain.bind(this, models));
 

@@ -33,21 +33,18 @@ export default class extends IEventHandler {
    */
   private truncateEvent(event: CWEvent, maxLength = 64): CWEvent {
     // only truncate preimages, for now
-    if (
-      event.data.kind === SubstrateTypes.EventKind.PreimageNoted &&
-      event.data.preimage
-    ) {
-      event.data.preimage.args = event.data.preimage.args.map((m) =>
-        m.length > maxLength ? `${m.slice(0, maxLength - 1)}…` : m
-      );
+    if (event.data.kind === SubstrateTypes.EventKind.PreimageNoted && event.data.preimage) {
+      event.data.preimage.args = event.data.preimage.args.map((m) => m.length > maxLength
+        ? `${m.slice(0, maxLength - 1)}…`
+        : m);
     }
     return event;
   }
 
-  private async _shouldSkip(event: CWEvent, chain?: string): Promise<boolean> {
-    chain = chain || event.chain || this._chain;
-    if (this._filterConfig.excludedEvents?.includes(event.data.kind))
-      return true;
+  private async _shouldSkip(event: CWEvent): Promise<boolean> {
+    const chain = event.chain || this._chain
+
+    if (this._filterConfig.excludedEvents?.includes(event.data.kind)) return true;
     const addressesExist = async (addresses: string[]) => {
       const addressModels = await this._models.Address.findAll({
         where: {
@@ -81,48 +78,22 @@ export default class extends IEventHandler {
     let chain = event.chain || this._chain;
 
     event = this.truncateEvent(event);
-
-    log.debug(`${logPrefix}Received event: ${JSON.stringify(event, null, 2)}`);
-
-    // TODO: this entire if statement is unnecessary with new system since if the token is
-    // TODO: being listened to then it obviously is in the database. This is compatible with new system since
-    // TODO: the new system defines event.chain as the tokenName and thus this will not trigger
-    // locate event type and add event (and event type if needed) to database
-    if (chain === 'erc20') {
-      const address = (
-        event.data as Erc20Types.ITransfer
-      ).contractAddress.toLowerCase();
-      const tokenChain = await this._models.ChainNode.findOne({
-        where: {
-          address,
-        },
-      });
-      if (tokenChain) {
-        chain = tokenChain.chain;
-      } else {
-        log.error(
-          `${logPrefix}Token ${address} not registered in database, skipping!`
-        );
-        return;
-      }
-    }
-
-    const shouldSkip = await this._shouldSkip(event, chain);
+    log.debug(`Received event: ${JSON.stringify(event, null, 2)}`);
+    const shouldSkip = await this._shouldSkip(event);
     if (shouldSkip) {
       log.trace(`${logPrefix}Skipping event!`);
       return;
     }
 
-    const [dbEventType, created] =
-      await this._models.ChainEventType.findOrCreate({
-        where: {
-          id: `${chain}-${event.data.kind.toString()}`,
-          chain,
-          event_network: event.network,
-          event_name: event.data.kind.toString(),
-        },
-      });
-
+    // locate event type and add event (and event type if needed) to database
+    const [ dbEventType, created ] = await this._models.ChainEventType.findOrCreate({
+      where: {
+        id: `${chain}-${event.data.kind.toString()}`,
+        chain,
+        event_network: event.network,
+        event_name: event.data.kind.toString(),
+      }
+    });
     if (!dbEventType) {
       log.error(`${logPrefix}unknown event type: ${event.data.kind}`);
       return;

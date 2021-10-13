@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express';
-import Erc20SubscriberHolder from 'server/util/erc20SubscriberHolder';
 import { Op } from 'sequelize';
 import Web3 from 'web3';
 import { sequelize, DB } from '../database';
@@ -10,7 +9,6 @@ const log = factory.getLogger(formatFilename(__filename));
 
 const getTokenForum = async (
   models: DB,
-  erc20SubscriberHolder: Erc20SubscriberHolder,
   req: Request,
   res: Response,
   next: NextFunction
@@ -55,10 +53,6 @@ const getTokenForum = async (
         });
         return { chain: chain.toJSON(), node: node.toJSON() };
       });
-
-      // the new system requires that a new token be in the database before listening to events
-      erc20SubscriberHolder.subscribeNewToken(address);
-
       return res.json({ status: 'Success', result });
     } catch (e) {
       log.error(e.message);

@@ -1,6 +1,6 @@
 import 'components/sidebar/notification_row.scss';
 
-import { Icon, Icons, Spinner } from 'construct-ui';
+import { Icon, Icons, Tooltip, Spinner } from 'construct-ui';
 import _ from 'lodash';
 import m from 'mithril';
 import moment from 'moment';
@@ -240,7 +240,6 @@ const NotificationRow: m.Component<{
       const chainName = app.config.chains.getById(chainId)?.name;
 
       if (app.isCustomDomain() && chainId !== app.customDomainId()) return;
-
       const label = ChainEventLabel(chainId, chainEvent);
       m.redraw();
 

@@ -1,6 +1,5 @@
 import { Op } from 'sequelize';
 import { Request, Response, NextFunction } from 'express';
-
 import { factory, formatFilename } from '../../shared/logging';
 import { ChainBase, ChainType } from '../../shared/types';
 import testSubstrateSpec from '../util/testSubstrateSpec';
