@@ -2,14 +2,14 @@
 import { By, WebDriver } from 'selenium-webdriver';
 
 enum WalletName {
-  'Cosmos Wallet (Keplr)',
-  'Terra Wallet (TerraStation)',
-  'Injective MetaMask Wallet',
-  'Ethereum Wallet (MetaMask)',
-  'Ethereum Wallet (WalletConnect)',
-  'NEAR Wallet',
-  'polkadot-js',
-  'Substrate (command line)'
+  COSMOS = 'Cosmos Wallet (Keplr)',
+  TERRA = 'Terra Wallet (TerraStation)',
+  INJECTIVE = 'Injective MetaMask Wallet',
+  METAMASK = 'Ethereum Wallet (MetaMask)',
+  WALLETCONNECT = 'Ethereum Wallet (WalletConnect)',
+  NEAR = 'NEAR Wallet',
+  POLKADOT = 'polkadot-js',
+  SUBSTRATE = 'Substrate (command line)'
 }
 
 /**
