@@ -17,8 +17,9 @@ export class HomePage extends BasePage {
     super();
   }
 
-  public async loadPage(): Promise<void> {
-    await this.go_to_url('www.commonwealth.im')
+  public async loadPage(): Promise<WebDriver> {
+    await this.go_to_url('https://www.commonwealth.im')
+    return this.driver
   }
 
   public async loadWhyCW(): Promise<WebDriver> {
@@ -26,18 +27,27 @@ export class HomePage extends BasePage {
     return this.driver
   }
 
+  /**
+   * Clicks on the discord icon and switches to the new tab that opens
+   */
   public async loadDiscord(): Promise<WebDriver> {
     await this.driver.findElement(this.discordBtn).click()
+    const tabs = await this.driver.getAllWindowHandles()
+    await this.driver.switchTo().window(tabs[1])
     return this.driver
   }
 
   public async loadTelegram(): Promise<WebDriver> {
     await this.driver.findElement(this.telegramBtn).click()
+    const tabs = await this.driver.getAllWindowHandles()
+    await this.driver.switchTo().window(tabs[1])
     return this.driver
   }
 
   public async loadTwitter(): Promise<WebDriver> {
     await this.driver.findElement(this.twitterBtn).click()
+    const tabs = await this.driver.getAllWindowHandles()
+    await this.driver.switchTo().window(tabs[1])
     return this.driver
   }
 
