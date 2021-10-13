@@ -151,7 +151,7 @@ const send = async (models, content: WebhookContent) => {
       }
     } else if (content.community) {
       // if the community has a logo, show it as preview image
-      const offchainCommunity = await models.OffchainCommunity.findOne({ where: { id: content.community, privacyEnabled: false } });
+      const offchainCommunity = await models.OffchainCommunity.findOne({ where: { id: content.community, privacy_enabled: false } });
       if (offchainCommunity) {
         if (offchainCommunity.icon_url) {
           previewImageUrl = (offchainCommunity.icon_url.match(`^(http|https)://`)) ? offchainCommunity.icon_url :
