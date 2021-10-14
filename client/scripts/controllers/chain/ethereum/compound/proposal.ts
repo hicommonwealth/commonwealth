@@ -332,8 +332,6 @@ export default class CompoundProposal extends Proposal<
       throw new Error('proposal already queued');
     }
 
-    // TODO: condition check for who can queue
-
     const address = this._Gov.app.user.activeAccount.address;
     const contract = await attachSigner(this._Gov.app.wallets, address, this._Gov.api.Contract);
 
@@ -353,8 +351,6 @@ export default class CompoundProposal extends Proposal<
     if (this.data.executed) {
       throw new Error('proposal already executed');
     }
-
-    // TODO: condition check for who can execute
 
     const address = this._Gov.app.user.activeAccount.address;
     const contract = await attachSigner(this._Gov.app.wallets, address, this._Gov.api.Contract);

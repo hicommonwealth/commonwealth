@@ -729,7 +729,8 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
         m('.button-row', [
           yesButton,
           noButton,
-          /** executeButton, queueButton, */
+          m(QueueButton, { proposal, votingModalOpen }),
+          m(ExecuteButton, { proposal, votingModalOpen }),
           m(CancelButton, { proposal, votingModalOpen, user, onModalClose })
         ])
       ];
@@ -739,7 +740,8 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
           yesButton,
           noButton,
           abstainButton,
-          /** executeButton, queueButton, */
+          m(QueueButton, { proposal, votingModalOpen }),
+          m(ExecuteButton, { proposal, votingModalOpen }),
           m(CancelButton, { proposal, votingModalOpen, user, onModalClose })
         ])
       ];

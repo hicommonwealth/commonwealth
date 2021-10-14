@@ -4,7 +4,7 @@ import { ICompoundProposalResponse } from 'adapters/chain/compound/types';
 import { CompoundEvents, CompoundTypes } from '@commonwealth/chain-events';
 import { IApp } from 'state';
 import { chainToEventNetwork, EntityRefreshOption } from 'controllers/server/chain_entities';
-import { BigNumberish } from 'ethers';
+import { BigNumber, BigNumberish } from 'ethers';
 import CompoundAPI from './api';
 import CompoundProposal from './proposal';
 import CompoundChain from './chain';
@@ -60,7 +60,7 @@ export default class CompoundGovernance extends ProposalModule<
     super(app, (e) => new CompoundProposal(this._Accounts, this._Chain, this, e));
   }
 
-  public async propose(args: CompoundProposalArgs) {
+  public async propose(args: CompoundProposalArgs): Promise<void> {
     const address = this.app.user.activeAccount.address;
     const contract = await attachSigner(this.app.wallets, address, this._api.Contract);
 
@@ -88,9 +88,12 @@ export default class CompoundGovernance extends ProposalModule<
       { gasLimit },
     );
     const txReceipt = await tx.wait();
+    console.log(txReceipt);
     if (txReceipt.status !== 1) {
       throw new Error('Failed to execute proposal');
     }
+    // const id = (txReceipt.events[0]?.args[0] as BigNumber).toHexString();
+    // return id;
   }
 
   public async state(proposalId: BigNumberish): Promise<number> {
@@ -123,6 +126,10 @@ export default class CompoundGovernance extends ProposalModule<
     this.app.chain.chainEntities.registerEntityHandler(
       CompoundTypes.EntityKind.Proposal, (entity, event) => {
         this.updateProposal(entity, event);
+        const proposal = this.store.getByIdentifier(entity.typeId);
+        if (!proposal.initialized) {
+          proposal.init();
+        }
       }
     );
 
