@@ -25,7 +25,6 @@ module.exports = {
         'SELECT id FROM "Chains";',
         { transaction: t }
       );
-      console.log('chains:', chains[0].length);
 
       for (const chain of chains[0]) {
         newSubscriptions.push({
@@ -41,9 +40,9 @@ module.exports = {
 
       // OffchainCommunity new-thread subscriptions
       const offchainCommunities = await queryInterface.sequelize.query(
-        'SELECT id FROM "OffchainCommunities";'
+        'SELECT id FROM "OffchainCommunities";',
+        { transaction: t }
       );
-      console.log('offchain communities:', offchainCommunities[0].length);
       for (const community of offchainCommunities[0]) {
         newSubscriptions.push({
           subscriber_id: userId,
@@ -65,7 +64,7 @@ module.exports = {
       //   newSubscriptions.push(
       //     chain
       //       ? {
-      //           subscriber_id: user.id,
+      //           subscriber_id: userId,
       //           category_id: 'new-comment-creation',
       //           chain_id: chain,
       //           offchain_thread_id: id,
@@ -73,7 +72,7 @@ module.exports = {
       //           is_active: true,
       //         }
       //       : {
-      //           subscriber_id: user.id,
+      //           subscriber_id: userId,
       //           category_id: 'new-comment-creation',
       //           community_id: community,
       //           offchain_thread_id: id,
@@ -85,11 +84,10 @@ module.exports = {
 
       // For every ChainEventType, chain-event subscriptions
       const chainEventTypes = await queryInterface.sequelize.query(
-        'SELECT id, chain FROM "ChainEventTypes";'
+        'SELECT id, chain FROM "ChainEventTypes";',
+        { transaction: t }
       );
-      console.log('chain-event-types:', chainEventTypes[0].length);
       for (const type of chainEventTypes[0]) {
-        console.log(type);
         newSubscriptions.push({
           subscriber_id: userId,
           category_id: 'chain-event',
@@ -101,15 +99,16 @@ module.exports = {
           updated_at: Sequelize.literal('NOW()'),
         });
       }
-
-      await queryInterface.bulkInsert('Subscriptions', newSubscriptions);
+      await queryInterface.bulkInsert('Subscriptions', newSubscriptions, {
+        transaction: t,
+      });
     });
   },
 
   down: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
       const user = await queryInterface.sequelize.query(
-        `SELECT id FROM "Users" WHERE email="notifications@commonwealth.im";`
+        `SELECT id FROM "Users" WHERE email='notifications@commonwealth.im';`
       );
 
       const { id } = user[0][0];
