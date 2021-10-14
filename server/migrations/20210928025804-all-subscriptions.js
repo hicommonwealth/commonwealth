@@ -99,17 +99,31 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
+      const user = await queryInterface.sequelize.query(
+        `SELECT id FROM "Users" WHERE email="notifications@commonwealth.im";`
+      );
+
+      const { id } = user[0];
       await queryInterface.bulkDelete(
-        'Users',
+        'Subscriptions',
         [
           {
-            email: 'notifications@commonwealth.im',
+            subscriber_id: id,
           },
         ],
         { transaction: t }
       );
 
-      /* remove subscriptions owned by user*/
+      await queryInterface.bulkDelete(
+        'Users',
+        [
+          {
+            id,
+          },
+        ],
+        { transaction: t }
+      );
+
     });
   },
 };
