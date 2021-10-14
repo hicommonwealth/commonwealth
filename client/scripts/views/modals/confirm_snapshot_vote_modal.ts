@@ -4,6 +4,7 @@ import m from 'mithril';
 import app from 'state';
 import $ from 'jquery';
 import { Button } from 'construct-ui';
+import { navigateToSubpage } from 'app';
 
 import { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
 import { notifyError } from 'controllers/app/notifications';
@@ -11,7 +12,7 @@ import { notifyError } from 'controllers/app/notifications';
 import { CompactModalExitButton } from 'views/modal';
 import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
-import { ChainBase } from 'models';
+import { ChainBase } from 'types';
 import { formatNumberShort } from 'adapters/currency';
 
 enum NewVoteErrors {
@@ -112,7 +113,7 @@ const ConfirmSnapshotVoteModal: m.Component<{
                   notifyError(errorMessage);
                 } else if (result.status === 'Success') {
                   $(e.target).trigger('modalexit');
-                  m.route.set(`/${app.activeId()}/snapshot/${space.id}`);
+                  navigateToSubpage(`/snapshot/${space.id}`);
                 }
               } catch (err) {
                 const errorMessage = err.message;

@@ -5,6 +5,7 @@ import { INFURA_API_KEY } from '../config';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import { DB } from '../database';
 
+import { ChainBase } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -64,7 +65,7 @@ const createChain = async (
   if (!existingBaseChain) {
     return next(new Error(Errors.InvalidBase));
   }
-  if (req.body.base === 'ethereum') {
+  if (req.body.base === ChainBase.Ethereum) {
     if (!Web3.utils.isAddress(req.body.address)) {
       return next(new Error(Errors.InvalidAddress));
     }
@@ -82,7 +83,7 @@ const createChain = async (
     }
   }
 
-  const { website, discord, element, telegram, github, icon_url, node_url } = req.body;
+  const { website, discord, element, telegram, github, icon_url, node_url, network } = req.body;
 
   if (!node_url || !node_url.trim()) {
     return next(new Error(Errors.NoNodeUrl));
@@ -123,7 +124,7 @@ const createChain = async (
     icon_url: req.body.icon_url,
     description: req.body.description,
     active: true,
-    network: req.body.id,
+    network: req.body.network,
     type: req.body.type,
     website: req.body.website,
     discord: req.body.discord,

@@ -1,4 +1,5 @@
 import moment from 'moment';
+import { ProposalType } from 'types';
 import { IUniqueId } from './interfaces';
 import OffchainTopic from './OffchainTopic';
 
@@ -15,7 +16,7 @@ class AbridgedThread implements IUniqueId {
   public readonly pinned?: boolean;
   public readonly url?: string;
 
-  public readonly slug = 'discussion';
+  public readonly slug = ProposalType.OffchainThread;
   public readonly identifier: string;
 
   public get uniqueIdentifier() {

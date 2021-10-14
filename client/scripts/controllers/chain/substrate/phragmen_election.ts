@@ -1,11 +1,11 @@
 import _ from 'underscore';
+import { ChainBase, ProposalType } from 'types';
 import {
   Proposal,
   IVote,
   VotingType,
   VotingUnit,
   Account,
-  ChainBase,
   ProposalStatus,
   IFixedBlockEndTime,
 } from 'models';
@@ -91,7 +91,7 @@ export class SubstratePhragmenElection extends Proposal<
     data: ISubstratePhragmenElection,
     moduleName: string,
   ) {
-    super('phragmenelection', data);
+    super(ProposalType.PhragmenCandidacy, data);
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._Elections = Elections;
@@ -210,7 +210,7 @@ export class SubstratePhragmenElection extends Proposal<
     // handle differing versions of Substrate API
     const txFunc = (api: ApiPromise) => {
       if (api.tx[this.moduleName].submitCandidacy.meta.args.length === 1) {
-        return api.tx[this.moduleName].submitCandidacy(this.candidates);
+        return api.tx[this.moduleName].submitCandidacy(this._exposedCandidates.length);
       } else {
         return api.tx[this.moduleName].submitCandidacy();
       }

@@ -6,8 +6,7 @@ import { Button, ButtonGroup, Icon, Icons, PopoverMenu, MenuItem, MenuDivider } 
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
-import { ProposalType } from 'identifiers';
-import { ChainBase, ChainNetwork } from 'models';
+import { ProposalType, ChainBase, ChainNetwork } from 'types';
 import NewThreadModal from 'views/modals/new_thread_modal';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 
@@ -122,7 +121,7 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
     showSnapshotOptions && m(MenuItem, {
       onclick: (e) => {
         e.preventDefault();
-        m.route.set(`/${app.activeChainId()}/new/snapshot-proposal/${app.chain.meta.chain.snapshot}`);
+        navigateToSubpage(`/new/snapshot-proposal/${app.chain.meta.chain.snapshot}`);
       },
       label: 'New Snapshot Proposal',
       iconLeft: mobile ? Icons.PLUS : undefined,

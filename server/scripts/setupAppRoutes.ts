@@ -56,7 +56,7 @@ const setupAppRoutes = (app, models, devMiddleware, templateFile, sendFile) => {
     // Retrieve chain or community
     const scope = req.params.scope;
     const chain = await models.Chain.findOne({ where: { id: scope } });
-    const community = await models.OffchainCommunity.findOne({ where: { id: scope, privacyEnabled: false } });
+    const community = await models.OffchainCommunity.findOne({ where: { id: scope, privacy_enabled: false } });
     const title = chain ? chain.name : community ? community.name : 'Commonwealth';
     const description = chain ? chain.description : community ? community.description : '';
     const image = chain?.icon_url ? (chain.icon_url.match(`^(http|https)://`) ? 
@@ -108,7 +108,7 @@ const setupAppRoutes = (app, models, devMiddleware, templateFile, sendFile) => {
     }
 
     const chain = await models.Chain.findOne({ where: { id: scope } });
-    const community = await models.OffchainCommunity.findOne({ where: { id: scope, privacyEnabled: false } });
+    const community = await models.OffchainCommunity.findOne({ where: { id: scope, privacy_enabled: false } });
 
     if (proposalType === 'discussion' && proposalId !== null) {
       // Retrieve offchain discussion
@@ -126,7 +126,7 @@ const setupAppRoutes = (app, models, devMiddleware, templateFile, sendFile) => {
         where: { id: proposalId },
         include: [{
           model: models.OffchainCommunity,
-          where: { privacyEnabled: false },
+          where: { privacy_enabled: false },
         }, {
           model: models.Address,
           as: 'Address',
@@ -136,7 +136,7 @@ const setupAppRoutes = (app, models, devMiddleware, templateFile, sendFile) => {
       const proposal = chainProposal || communityProposal;
       title = proposal ? decodeURIComponent(proposal.title) : '';
       description = proposal ? proposal.plaintext : '';
-      image = chain ? `https://commonwealth.im${chain.icon_url}` : community ? `https://commonwealth.im${community.iconUrl}` : DEFAULT_COMMONWEALTH_LOGO;
+      image = chain ? `https://commonwealth.im${chain.icon_url}` : community ? `https://commonwealth.im${community.icon_url}` : DEFAULT_COMMONWEALTH_LOGO;
       try {
         const profileData = proposal && proposal.Address && proposal.Address.OffchainProfile
           ? JSON.parse(proposal.Address.OffchainProfile.data) : '';
@@ -147,7 +147,7 @@ const setupAppRoutes = (app, models, devMiddleware, templateFile, sendFile) => {
     } else {
       title = chain ? chain.name : community ? community.name : 'Commonwealth';
       description = '';
-      image = chain ? `https://commonwealth.im${chain.icon_url}` : community ? `https://commonwealth.im${community.iconUrl}` : DEFAULT_COMMONWEALTH_LOGO;
+      image = chain ? `https://commonwealth.im${chain.icon_url}` : community ? `https://commonwealth.im${community.icon_url}` : DEFAULT_COMMONWEALTH_LOGO;
       author = '';
     }
     renderWithMetaTags(res, title, description, author, image);

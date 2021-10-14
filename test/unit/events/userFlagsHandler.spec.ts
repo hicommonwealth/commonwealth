@@ -3,7 +3,11 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
-import { CWEvent, SubstrateTypes } from '@commonwealth/chain-events';
+import {
+  CWEvent,
+  SubstrateTypes,
+  SupportedNetwork,
+} from '@commonwealth/chain-events';
 
 import { resetDatabase } from '../../../server-test';
 import models from '../../../server/database';
@@ -56,6 +60,7 @@ describe('Edgeware Archival Event Handler Tests', () => {
   it('should sync councillors from NewTerm event', async () => {
     const event: CWEvent<SubstrateTypes.IEventData> = {
       blockNumber: 10,
+      network: SupportedNetwork.Substrate,
       data: {
         kind: SubstrateTypes.EventKind.ElectionNewTerm,
         round: 5,
@@ -91,6 +96,7 @@ describe('Edgeware Archival Event Handler Tests', () => {
   it('should sync councillors from EmptyTerm event', async () => {
     const event: CWEvent<SubstrateTypes.IEventData> = {
       blockNumber: 10,
+      network: SupportedNetwork.Substrate,
       data: {
         kind: SubstrateTypes.EventKind.ElectionEmptyTerm,
         round: 5,
@@ -125,6 +131,7 @@ describe('Edgeware Archival Event Handler Tests', () => {
   it('should sync validators from StakingElection event', async () => {
     const event: CWEvent<SubstrateTypes.IEventData> = {
       blockNumber: 10,
+      network: SupportedNetwork.Substrate,
       data: {
         kind: SubstrateTypes.EventKind.StakingElection,
         era: 5,
@@ -159,6 +166,7 @@ describe('Edgeware Archival Event Handler Tests', () => {
   it('should ignore unrelated event', async () => {
     const event: CWEvent<SubstrateTypes.IEventData> = {
       blockNumber: 10,
+      network: SupportedNetwork.Substrate,
       data: {
         kind: SubstrateTypes.EventKind.Reward,
         amount: '500',

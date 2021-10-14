@@ -2,17 +2,26 @@
  * Processes events during migration, upgrading from simple notifications to entities.
  */
 import {
-  IEventHandler, CWEvent, eventToEntity, entityToFieldName, IChainEventData, EventSupportingChainT, EntityEventKind
+  IEventHandler,
+  CWEvent,
+  eventToEntity,
+  entityToFieldName,
+  IChainEventData,
+  EntityEventKind,
 } from '@commonwealth/chain-events';
+import { WhereOptions } from 'sequelize';
+
+import { DB } from '../database';
+import {
+  ChainEventAttributes,
+  ChainEventInstance,
+} from '../models/chain_event';
 
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-export default class extends IEventHandler {
-  constructor(
-    private readonly _models,
-    private readonly _chain?: string,
-  ) {
+export default class extends IEventHandler<ChainEventInstance> {
+  constructor(private readonly _models: DB, private readonly _chain?: string) {
     super();
   }
 
@@ -21,30 +30,42 @@ export default class extends IEventHandler {
    * events depending whether we've seen them before.
    */
   public async handle(event: CWEvent<IChainEventData>) {
-    const chain = event.chain || this._chain
+    const chain = event.chain || this._chain;
 
     // case by entity type to determine what value to look for
-    const createOrUpdateModel = async (fieldName: string, fieldValue: string, eventType: EntityEventKind) => {
-      const [ dbEventType, created ] = await this._models.ChainEventType.findOrCreate({
-        where: {
-          id: `${chain}-${event.data.kind.toString()}`,
-          chain: chain,
-          event_name: event.data.kind.toString(),
-        }
-      });
-      log.trace(`${created ? 'created' : 'found'} chain event type: ${dbEventType.id}`);
+    const createOrUpdateModel = async (
+      fieldName: string,
+      fieldValue: string,
+      eventType: EntityEventKind
+    ) => {
+      const [dbEventType, created] =
+        await this._models.ChainEventType.findOrCreate({
+          where: {
+            id: `${chain}-${event.data.kind.toString()}`,
+            chain,
+            event_network: event.network,
+            event_name: event.data.kind.toString(),
+          },
+        });
+      log.trace(
+        `${created ? 'created' : 'found'} chain event type: ${dbEventType.id}`
+      );
       const queryFieldName = `event_data.${fieldName}`;
-      const queryArgs = eventType === EntityEventKind.Vote
-        ? {
-          chain_event_type_id: dbEventType.id,
-          [queryFieldName]: fieldValue,
-          // votes will be unique by data rather than by type
-          event_data: event.data,
-        } : {
-          chain_event_type_id: dbEventType.id,
-          [queryFieldName]: fieldValue,
-        };
-      const existingEvent = await this._models.ChainEvent.findOne({ where: queryArgs });
+      const queryArgs: WhereOptions<ChainEventAttributes> =
+        eventType === EntityEventKind.Vote
+          ? {
+              chain_event_type_id: dbEventType.id,
+              [queryFieldName]: fieldValue,
+              // votes will be unique by data rather than by type
+              event_data: event.data as any,
+            }
+          : {
+              chain_event_type_id: dbEventType.id,
+              [queryFieldName]: fieldValue,
+            };
+      const existingEvent = await this._models.ChainEvent.findOne({
+        where: queryArgs,
+      });
       if (!existingEvent) {
         log.trace('No existing event found, creating new event in db!');
         return this._models.ChainEvent.create({
@@ -60,10 +81,10 @@ export default class extends IEventHandler {
       }
     };
 
-    const entity = eventToEntity(chain as EventSupportingChainT, event.data.kind);
+    const entity = eventToEntity(event.network, event.data.kind);
     if (!entity) return null;
-    const [ entityKind, eventType ] = entity;
-    const fieldName = entityToFieldName(chain as EventSupportingChainT, entityKind);
+    const [entityKind, eventType] = entity;
+    const fieldName = entityToFieldName(event.network, entityKind);
     if (!fieldName) return null;
     const fieldValue = event.data[fieldName];
     return createOrUpdateModel(fieldName, fieldValue, eventType);

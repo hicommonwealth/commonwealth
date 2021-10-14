@@ -3,15 +3,16 @@ import 'components/proposal_card.scss';
 import m from 'mithril';
 import moment from 'moment';
 import { Icon, Icons, Tag } from 'construct-ui';
-import { AaveTypes } from '@commonwealth/chain-events';
+import { AaveTypes, CompoundTypes } from '@commonwealth/chain-events';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import { slugify } from 'utils';
 import { Coin } from 'adapters/currency';
-import { blocknumToDuration, formatLastUpdated, formatPercentShort, link, pluralize } from 'helpers';
+import { blocknumToDuration, formatNumberLong, formatPercentShort, link, pluralize } from 'helpers';
 import { ProposalStatus, VotingType, AnyProposal, AddressInfo } from 'models';
-import { ProposalType, proposalSlugToChainEntityType, chainEntityTypeToProposalShortName } from 'identifiers';
+import { ProposalType } from 'types';
+import { proposalSlugToChainEntityType, chainEntityTypeToProposalShortName } from 'identifiers';
 
 import Substrate from 'controllers/chain/substrate/main';
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
@@ -21,6 +22,7 @@ import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democr
 import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 import MolochProposal, { MolochProposalState } from 'controllers/chain/ethereum/moloch/proposal';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
+import CompoundProposal from 'controllers/chain/ethereum/compound/proposal';
 
 import Countdown from 'views/components/countdown';
 
@@ -48,26 +50,52 @@ export const getStatusText = (proposal: AnyProposal, showCountdown: boolean) => 
     if (proposal.state === AaveTypes.ProposalState.EXECUTED) return 'Executed';
     if (proposal.state === AaveTypes.ProposalState.EXPIRED) return 'Expired';
     if (proposal.state === AaveTypes.ProposalState.FAILED) return 'Did not pass';
+  } else if (proposal.completed && proposal instanceof CompoundProposal) {
+    if (proposal.state === CompoundTypes.ProposalState.Canceled) return 'Cancelled';
+    if (proposal.state === CompoundTypes.ProposalState.Executed) return 'Executed';
+    if (proposal.state === CompoundTypes.ProposalState.Expired) return 'Expired';
+    if (proposal.state === CompoundTypes.ProposalState.Defeated) return 'Did not pass';
   } else if (proposal.completed) {
     if (proposal.isPassing === ProposalStatus.Passed) return 'Passed';
     if (proposal.isPassing === ProposalStatus.Failed) return 'Did not pass';
     return 'Completed';
   }
 
-  const countdown = proposal.endTime.kind === 'fixed'
-    ? [ m(Countdown, { duration: moment.duration(proposal.endTime.time.diff(moment())) }), ' left' ]
-    : proposal.endTime.kind === 'fixed_block'
-      ? [ m(Countdown, { duration: blocknumToDuration(proposal.endTime.blocknum) }), ' left' ]
+  const countdown =
+    proposal.endTime.kind === 'fixed'
+      ? [
+          m(Countdown, {
+            duration: moment.duration(proposal.endTime.time.diff(moment())),
+          }),
+          ' left',
+        ]
+      : proposal.endTime.kind === 'fixed_block'
+      ? [
+          m(Countdown, {
+            duration: blocknumToDuration(proposal.endTime.blocknum),
+          }),
+          ` left (ends on block ${formatNumberLong(
+            proposal.endTime.blocknum
+          )})`,
+        ]
       : proposal.endTime.kind === 'dynamic'
-        ? [ m(Countdown, { duration: blocknumToDuration(proposal.endTime.getBlocknum()) }), ' left' ]
-        : proposal.endTime.kind === 'threshold'
-          ? `needs ${proposal.endTime.threshold} votes`
-          : proposal.endTime.kind === 'not_started'
-            ? 'not yet started'
-            : proposal.endTime.kind === 'queued'
-              ? 'in queue'
-              : proposal.endTime.kind === 'unavailable'
-                ? '' : '';
+      ? [
+          m(Countdown, {
+            duration: blocknumToDuration(proposal.endTime.getBlocknum()),
+          }),
+          ` left (ends on block ${formatNumberLong(
+            proposal.endTime.getBlocknum()
+          )})`,
+        ]
+      : proposal.endTime.kind === 'threshold'
+      ? `needs ${proposal.endTime.threshold} votes`
+      : proposal.endTime.kind === 'not_started'
+      ? 'not yet started'
+      : proposal.endTime.kind === 'queued'
+      ? 'in queue'
+      : proposal.endTime.kind === 'unavailable'
+      ? ''
+      : '';
 
   if (proposal instanceof MolochProposal) {
     if (proposal.state === MolochProposalState.NotStarted)
@@ -94,6 +122,18 @@ export const getStatusText = (proposal: AnyProposal, showCountdown: boolean) => 
     if (proposal.state === AaveTypes.ProposalState.SUCCEEDED)
       return 'Ready to queue';
     if (proposal.state === AaveTypes.ProposalState.EXPIRED) return 'Expired';
+  }
+
+  if (proposal instanceof CompoundProposal) {
+    if (proposal.state === CompoundTypes.ProposalState.Active)
+      return [ proposal.isPassing === ProposalStatus.Passing ? 'Passing, ' : 'Not passing, ', countdown ];
+    if (proposal.state === CompoundTypes.ProposalState.Pending)
+      return ['Pending, ', countdown];
+    if (proposal.state === CompoundTypes.ProposalState.Queued)
+      return [ 'Queued, ', countdown ];
+    if (proposal.state === CompoundTypes.ProposalState.Succeeded)
+      return 'Ready to queue';
+    if (proposal.state === CompoundTypes.ProposalState.Expired) return 'Expired';
   }
 
   if (proposal.isPassing === ProposalStatus.Passed)

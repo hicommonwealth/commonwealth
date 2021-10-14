@@ -1,9 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import { bech32 } from 'bech32';
-import { factory, formatFilename } from '../../shared/logging';
+
 import AddressSwapper from '../util/addressSwapper';
 import { DB } from '../database';
-
+import { ChainBase } from '../../shared/types';
+import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
@@ -32,9 +33,9 @@ const createAddress = async (models: DB, req: Request, res: Response, next: Next
   }
 
   let encodedAddress = req.body.address;
-  if (chain.base === 'substrate') {
+  if (chain.base === ChainBase.Substrate) {
     encodedAddress = AddressSwapper({ address: req.body.address, currentPrefix: chain.ss58_prefix });
-  } else if (chain.base === 'cosmos' && chain.bech32_prefix) {
+  } else if (chain.base === ChainBase.CosmosSDK && chain.bech32_prefix) {
     const { words } = bech32.decode(req.body.address, 50);
     encodedAddress = bech32.encode(chain.bech32_prefix, words);
   }

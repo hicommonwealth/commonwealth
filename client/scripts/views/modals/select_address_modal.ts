@@ -5,7 +5,8 @@ import $ from 'jquery';
 import { Tag, Button, Icon, Icons } from 'construct-ui';
 
 import app from 'state';
-import { Account, RoleInfo, ChainBase } from 'models';
+import { ChainBase } from 'types';
+import { Account, RoleInfo } from 'models';
 import { UserBlock } from 'views/components/widgets/user';
 import { articlize, isSameAccount, formatAsTitleCase, link } from 'helpers';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';

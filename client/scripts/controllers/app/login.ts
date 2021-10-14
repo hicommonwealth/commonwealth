@@ -10,12 +10,11 @@ import { initAppState } from 'app';
 import { Magic } from 'magic-sdk';
 import { PolkadotExtension } from '@magic-ext/polkadot';
 import Token from 'controllers/chain/ethereum/token/adapter';
-
+import { ChainBase } from 'types';
 import {
   ChainInfo,
   SocialAccount,
   Account,
-  ChainBase,
   CommunityInfo,
   AddressInfo
 } from 'models';

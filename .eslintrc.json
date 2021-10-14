@@ -70,6 +70,7 @@
     "no-await-in-loop": 0,
     "no-async-promise-executor": 0,
     "no-shadow": "off",
-    "@typescript-eslint/no-shadow": "error"
+    "@typescript-eslint/no-shadow": "error",
+    "@typescript-eslint/explicit-module-boundary-types": 0
   }
 }

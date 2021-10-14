@@ -14,23 +14,19 @@ import moment from 'moment';
 import mixpanel from 'mixpanel-browser';
 import _ from 'underscore';
 
-import { AaveTypes, CompoundTypes, MolochTypes } from '@commonwealth/chain-events';
 import app, { ApiStatus, LoginState } from 'state';
+import { ChainBase, ChainNetwork, ChainType } from 'types';
 import {
   ChainInfo,
   CommunityInfo,
   NodeInfo,
-  ChainNetwork,
   NotificationCategory,
   Notification,
-  ChainBase,
 } from 'models';
-import { WebsocketMessageType, IWebsocketsPayload } from 'types';
 
 import { notifyError, notifySuccess, notifyInfo } from 'controllers/app/notifications';
 import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
 import Community from 'controllers/chain/community/main';
-import WebsocketController from 'controllers/server/socket/index';
 
 import { Layout } from 'views/layout';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
@@ -73,24 +69,24 @@ export async function initAppState(updateSelectedNode = true, customDomain = nul
           id: community.id,
           name: community.name,
           description: community.description,
-          iconUrl: community.iconUrl,
+          icon_url: community.icon_url,
           website: community.website,
           discord: community.discord,
           element: community.element,
           telegram: community.telegram,
           github: community.github,
-          defaultChain: app.config.chains.getById(community.default_chain),
+          default_chain: app.config.chains.getById(community.default_chain),
           visible: community.visible,
-          collapsedOnHomepage: community.collapsed_on_homepage,
-          invitesEnabled: community.invitesEnabled,
-          privacyEnabled: community.privacyEnabled,
-          featuredTopics: community.featured_topics,
+          collapsed_on_homepage: community.collapsed_on_homepage,
+          invites_enabled: community.invites_enabled,
+          privacy_enabled: community.privacy_enabled,
+          featured_topics: community.featured_topics,
           topics: community.topics,
-          stagesEnabled: community.stagesEnabled,
-          customStages: community.customStages,
-          customDomain: community.customDomain,
+          stages_enabled: community.stages_enabled,
+          custom_stages: community.custom_stages,
+          custom_domain: community.custom_domain,
           terms: community.terms,
-          adminsAndMods: [],
+          admins_and_mods: [],
         }));
       });
       app.user.setRoles(data.roles);
@@ -276,28 +272,28 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
     )).default;
     newChain = new Sputnik(n, app);
     initApi = true;
-  } else if (MolochTypes.EventChains.find((c) => c === n.chain.network)) {
+  } else if (n.chain.network === ChainNetwork.Moloch) {
     const Moloch = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "moloch-main" */
       './controllers/chain/ethereum/moloch/adapter'
     )).default;
     newChain = new Moloch(n, app);
-  } else if (CompoundTypes.EventChains.find((c) => c === n.chain.network || c === n.chain.id)) {
+  } else if (n.chain.network === ChainNetwork.Compound) {
     const Compound = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "compound-main" */
       './controllers/chain/ethereum/compound/adapter'
     )).default;
     newChain = new Compound(n, app);
-  } else if (AaveTypes.EventChains.find((c) => c === n.chain.network)) {
+  } else if (n.chain.network === ChainNetwork.Aave) {
     const Aave = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "aave-main" */
       './controllers/chain/ethereum/aave/adapter'
     )).default;
     newChain = new Aave(n, app);
-  } else if (n.chain.type === 'token') {
+  } else if (n.chain.network === ChainNetwork.ERC20) {
     const Token = (await import(
     //   /* webpackMode: "lazy" */
     //   /* webpackChunkName: "token-main" */
@@ -436,6 +432,19 @@ export const navigateToSubpage = (...args) => {
   m.route.set.apply(this, args);
 };
 
+/* Uncomment for redraw instrumentation
+const _redraw = m.redraw;
+function redrawInstrumented(...args) {
+  console.log('redraw!');
+  _redraw.apply(this, args);
+}
+redrawInstrumented.sync = (...args) => {
+  console.log('redraw sync!');
+  _redraw.sync.apply(this, args);
+};
+m.redraw = redrawInstrumented;
+*/
+
 const _onpopstate = window.onpopstate;
 window.onpopstate = (...args) => {
   app._lastNavigatedBack = true;
@@ -553,7 +562,7 @@ Promise.all([
       if (path === 'views/pages/view_proposal/index' && vnode.attrs.type === 'discussion') {
         deferChain = true;
       }
-      if (app.chain?.meta.chain.type === 'token') {
+      if (app.chain?.meta.chain.type === ChainType.Token) {
         deferChain = false;
       }
       return m(Layout, { scope, deferChain, hideSidebar }, [ vnode ]);

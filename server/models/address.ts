@@ -10,13 +10,12 @@ import Keyring, { decodeAddress } from '@polkadot/keyring';
 import { stringToU8a, hexToU8a } from '@polkadot/util';
 import { KeypairType } from '@polkadot/util-crypto/types';
 
-import { serializeSignDoc, decodeSignature } from '@cosmjs/launchpad';
 import { Secp256k1, Secp256k1Signature, Sha256 } from '@cosmjs/crypto';
-import { AminoSignResponse, pubkeyToAddress } from '@cosmjs/amino';
+import { AminoSignResponse, pubkeyToAddress, serializeSignDoc, decodeSignature } from '@cosmjs/amino';
 
 import nacl from 'tweetnacl';
 import { KeyringOptions } from '@polkadot/keyring/types';
-import { NotificationCategories } from '../../shared/types';
+import { NotificationCategories, ChainBase, ChainNetwork } from '../../shared/types';
 import { ModelStatic } from './types';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { ChainAttributes, ChainInstance } from './chain';
@@ -55,6 +54,7 @@ export interface AddressAttributes {
   Roles?: RoleAttributes[];
 }
 
+// eslint-disable-next-line no-use-before-define
 export interface AddressInstance extends Model<AddressAttributes>, AddressCreationAttributes {
   // no mixins used yet
   getChain: Sequelize.BelongsToGetAssociationMixin<ChainInstance>;
@@ -219,7 +219,7 @@ export default (
     }
 
     let isValid: boolean;
-    if (chain.base === 'substrate') {
+    if (chain.base === ChainBase.Substrate) {
       //
       // substrate address handling
       //
@@ -242,7 +242,11 @@ export default (
         log.error('Invalid keytype.');
         isValid = false;
       }
-    } else if (chain.base === 'cosmos' && chain.network === 'injective') {
+    } else if (
+      chain.base === ChainBase.CosmosSDK &&
+      (chain.network === ChainNetwork.Injective ||
+        chain.network === ChainNetwork.InjectiveTestnet)
+    ) {
       //
       // ethereum address handling
       //
@@ -268,7 +272,7 @@ export default (
       } catch (e) {
         isValid = false;
       }
-    } else if (chain.base === 'cosmos') {
+    } else if (chain.base === ChainBase.CosmosSDK) {
       //
       // cosmos-sdk address handling
       //
@@ -290,7 +294,7 @@ export default (
 
         if (generatedAddress === addressModel.address || generatedAddressWithCosmosPrefix === addressModel.address) {
           const generatedSignDoc = validationTokenToSignDoc(
-            chain.id === 'terra' ? 'columbus-4' : chain.id,
+            chain.id === 'terra' ? 'columbus-4' : chain.id === 'osmosis-local' ? 'osmosis-local-1' : chain.id,
             addressModel.verification_token.trim(),
             signed.fee,
             signed.memo,
@@ -300,7 +304,6 @@ export default (
           // ensure correct document was signed
           if (serializeSignDoc(signed).toString() === serializeSignDoc(generatedSignDoc).toString()) {
             // ensure valid signature
-            // see the last test in @cosmjs/launchpad/src/secp256k1wallet.spec.ts for reference
             const { pubkey, signature } = decodeSignature(stdSignature);
             const secpSignature = Secp256k1Signature.fromFixedLength(signature);
             const messageHash = new Sha256(serializeSignDoc(generatedSignDoc)).digest();
@@ -321,7 +324,7 @@ export default (
           isValid = false;
         }
       }
-    } else if (chain.base === 'ethereum') {
+    } else if (chain.base === ChainBase.Ethereum) {
       //
       // ethereum address handling
       //
@@ -344,7 +347,7 @@ export default (
       } catch (e) {
         isValid = false;
       }
-    } else if (chain.base === 'near') {
+    } else if (chain.base === ChainBase.NEAR) {
       // both in base64 encoding
       const { signature: sigObj, publicKey } = JSON.parse(signatureString);
       isValid = nacl.sign.detached.verify(

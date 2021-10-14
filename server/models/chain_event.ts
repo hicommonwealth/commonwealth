@@ -2,7 +2,7 @@ import * as Sequelize from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
 import { ModelStatic } from './types';
 
-import { ChainEventTypeAttributes } from './chain_event_type';
+import { ChainEventTypeAttributes, ChainEventTypeInstance } from './chain_event_type';
 import { ChainEntityAttributes } from './chain_entity';
 
 export interface ChainEventAttributes {
@@ -10,7 +10,7 @@ export interface ChainEventAttributes {
   block_number: number;
   id?: number;
   entity_id?: number;
-  event_data: object;
+  event_data: any;
   created_at?: Date;
   updated_at?: Date;
 
@@ -19,7 +19,10 @@ export interface ChainEventAttributes {
 }
 
 export interface ChainEventInstance
-extends Model<ChainEventAttributes>, ChainEventAttributes {}
+  extends Model<ChainEventAttributes>,
+    ChainEventAttributes {
+  getChainEventType: Sequelize.HasOneGetAssociationMixin<ChainEventTypeInstance>;
+}
 
 export type ChainEventModelStatic = ModelStatic<ChainEventInstance>
 
