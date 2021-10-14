@@ -6,7 +6,7 @@
 import { HomePage } from '../util/seleniumObjects/Pages/home';
 import chai from 'chai';
 const { assert } = chai;
-
+require('dotenv').config();
 
 describe('Tests the home page', function() {
   let driver;
@@ -15,6 +15,9 @@ describe('Tests the home page', function() {
   before('start server and reset db', async function () {
     this.timeout(300000)
     // TODO: start local server and use that for selenium testing
+    // create driver and load up extensions
+    home = new HomePage()
+    await home.init()
   })
 
   after('close driver', async function () {
@@ -29,7 +32,6 @@ describe('Tests the home page', function() {
   })
 
   it('The homepage should load properly', async () => {
-    home = new HomePage()
     driver = await home.loadPage();
     assert(await driver.getCurrentUrl() === 'https://commonwealth.im/', 'Page failed to load');
   })
