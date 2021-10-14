@@ -154,6 +154,19 @@ const createCommunity = async (
     [creator_address]
   );
 
+  const ghostUser = await models.User.findOne({
+    where: {
+      email: 'notifications@commonwealth.im',
+    },
+  });
+  await models.Subscription.create({
+    subscriber_id: ghostUser.id,
+    category_id: NotificationCategories.NewThread,
+    object_id: community.id,
+    community_id: community.id,
+    is_active: true,
+  });
+
   return res.json({ status: 'Success', result: community.toJSON() });
 };
 

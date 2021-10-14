@@ -5,7 +5,7 @@ import { INFURA_API_KEY } from '../config';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import { DB } from '../database';
 
-import { ChainBase } from '../../shared/types';
+import { ChainBase, NotificationCategories } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -141,6 +141,19 @@ const createChain = async (
     address: req.body.address,
   };
   const node = await models.ChainNode.create(chainNodeContent);
+
+  const ghostUser = await models.User.findOne({
+    where: {
+      email: 'notifications@commonwealth.im',
+    },
+  });
+  await models.Subscription.create({
+    subscriber_id: ghostUser.id,
+    category_id: NotificationCategories.NewThread,
+    object_id: chain.id,
+    chain_id: chain.id,
+    is_active: true,
+  });
 
   return res.json({ status: 'Success', result: { chain: chain.toJSON(), node: node.toJSON() } });
 };
