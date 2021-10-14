@@ -149,7 +149,10 @@ export default class CompoundProposal extends Proposal<
 
   public get author() { return this._Accounts.get(this.data.proposer); }
 
-  public get votingType() { return VotingType.CompoundYesNo; }
+  public get votingType() {
+    return this._Gov.supportsAbstain
+      ? VotingType.CompoundYesNoAbstain : VotingType.CompoundYesNo;
+  }
   public get votingUnit() { return VotingUnit.CoinVote; }
 
   public get startingPeriod() { return +this.data.startBlock; }

@@ -43,6 +43,18 @@ export default class CompoundGovernance extends ProposalModule<
   public get api() { return this._api; }
   public get usingServerChainEntities() { return this._usingServerChainEntities; }
 
+  public get supportsAbstain(): boolean {
+    if (!this.api) return null;
+    // Bravo supports abstain
+    // TODO: check `COUNTING_MODE` in OZGov
+    return !this.api.isGovAlpha(this.api.Contract);
+  }
+
+  public get supportsDelegationAmount(): boolean {
+    if (!this.api?.Token) return null;
+    return !!this.api.isTokenMPond(this.api.Token);
+  }
+
   // INIT / DEINIT
   constructor(app: IApp, private _usingServerChainEntities = false) {
     super(app, (e) => new CompoundProposal(this._Accounts, this._Chain, this, e));

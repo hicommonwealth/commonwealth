@@ -315,7 +315,7 @@ const NewProposalForm = {
         ).then((result) => {
           done(result);
           navigateToSubpage(`/proposal/${ProposalType.CosmosProposal}/${result}`);
-        }).catch((err) => notifyError(err.toString()));
+        }).catch((err) => notifyError(err.message));
         return;
       } else if (proposalTypeEnum === ProposalType.MolochProposal) {
         // TODO: check that applicant is valid ETH address in hex
@@ -334,7 +334,7 @@ const NewProposalForm = {
           // TODO: handling errors?
           .then((result) => done(result))
           .then(() => m.redraw())
-          .catch((err) => notifyError(err.toString()));
+          .catch((err) => notifyError(err.data?.message || err.message));
         return;
       } else if (proposalTypeEnum === ProposalType.CompoundProposal) {
         vnode.state.proposer = app.user?.activeAccount?.address;
@@ -368,7 +368,7 @@ const NewProposalForm = {
         (app.chain as Compound).governance.propose(details)
           .then((result) => done(result))
           .then(() => m.redraw())
-          .catch((err) => notifyError(err.toString()));
+          .catch((err) => notifyError(err.data?.message || err.message));
         return;
       } else if (proposalTypeEnum === ProposalType.AaveProposal) {
         vnode.state.proposer = app.user?.activeAccount?.address;
@@ -409,7 +409,7 @@ const NewProposalForm = {
         (app.chain as Aave).governance.propose(details)
           .then((result) => done(result))
           .then(() => m.redraw())
-          .catch((err) => notifyError(err.toString()));
+          .catch((err) => notifyError(err.data?.message || err.message));
         return;
         // @TODO: Create Proposal via WebTx
       } else if (proposalTypeEnum === ProposalType.SputnikProposal) {
@@ -420,7 +420,7 @@ const NewProposalForm = {
         (app.chain as NearSputnik).dao.proposeTx(description, propArgs)
           .then((result) => done(result))
           .then(() => m.redraw())
-          .catch((err) => notifyError(err.toString()));
+          .catch((err) => notifyError(err.message));
         return;
       } else if (proposalTypeEnum === ProposalType.SubstrateTreasuryTip) {
         if (!vnode.state.form.beneficiary) throw new Error('Invalid beneficiary address');

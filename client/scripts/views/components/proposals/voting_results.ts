@@ -20,7 +20,7 @@ const COLLAPSE_VOTERS_AFTER = 6; // if there are >6 voters, collapse remaining u
 
 const VoteListing: m.Component<{
   proposal: AnyProposal,
-  votes : Array<IVote<any>>,
+  votes: Array<IVote<any>>,
   amount?: boolean,
   weight?: boolean
 }, {
@@ -47,87 +47,87 @@ const VoteListing: m.Component<{
       sortedVotes.length === 0
         ? m('.no-votes', 'No votes')
         : votes.map((vote) => {
-            let balance;
-            if (balanceWeighted && !(vote instanceof CosmosVote)) {
-              // fetch and display balances
-              if (vnode.state.balancesCache[vote.account.address]) {
-                balance = vnode.state.balancesCache[vote.account.address];
-              } else if (vnode.state.balancesCacheInitialized[vote.account.address]) {
-                // do nothing, fetch already in progress
-                balance = '--';
+          let balance;
+          if (balanceWeighted && !(vote instanceof CosmosVote)) {
+            // fetch and display balances
+            if (vnode.state.balancesCache[vote.account.address]) {
+              balance = vnode.state.balancesCache[vote.account.address];
+            } else if (vnode.state.balancesCacheInitialized[vote.account.address]) {
+              // do nothing, fetch already in progress
+              balance = '--';
+            } else {
+              // fetch balance and store in cache
+              vnode.state.balancesCacheInitialized[vote.account.address] = true;
+              if (vote instanceof AaveProposalVote) {
+                balance = vote.power;
+                vnode.state.balancesCache[vote.account.address] = vote.format();
+                m.redraw();
+              } else if (vote instanceof CompoundProposalVote) {
+                balance = formatCoin(app.chain.chain.coins(vote.power), true);
+                vnode.state.balancesCache[vote.account.address] = balance;
+                m.redraw();
               } else {
-                // fetch balance and store in cache
-                vnode.state.balancesCacheInitialized[vote.account.address] = true;
-                if (vote instanceof AaveProposalVote) {
-                  balance = vote.power;
-                  vnode.state.balancesCache[vote.account.address] = vote.format();
+                vote.account.balance.then((b) => {
+                  balance = b;
+                  vnode.state.balancesCache[vote.account.address] = formatCoin(b, true);
                   m.redraw();
-                } else if (vote instanceof CompoundProposalVote) {
-                  balance = formatCoin(app.chain.chain.coins(vote.power), true);
-                  vnode.state.balancesCache[vote.account.address] = balance;
-                  m.redraw();
-                } else {
-                  vote.account.balance.then((b) => {
-                    balance = b;
-                    vnode.state.balancesCache[vote.account.address] = formatCoin(b, true);
-                    m.redraw();
-                  });
-                  balance = '--';
-                }
+                });
+                balance = '--';
               }
             }
-            switch (true) {
-              case (vote instanceof CosmosVote):
-                return m('.vote', [
-                  m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
-                  // (balanceWeighted && balance) && m('.vote-balance', balance),
-                ]);
-              case (vote instanceof MolochProposalVote):
-                return m('.vote', [
-                  m('.vote-voter', m(User, { user: vote.account, linkify: true })),
-                  balance && m('.vote-balance', balance),
-                ]);
-              case (vote instanceof CompoundProposalVote):
-                return m('.vote', [
-                  m('.vote-voter', m(User, { user: vote.account, linkify: true })),
-                  balance && m('.vote-balance', balance),
-                ]);
-              case (vote instanceof AaveProposalVote):
-                return m('.vote', [
-                  m('.vote-voter', m(User, { user: vote.account, linkify: true })),
-                  balance && m('.vote-balance', balance),
-                ]);
-              case (vote instanceof BinaryVote):
-                switch (true) {
-                  case (vote instanceof SubstrateDemocracyVote):
-                    return m('.vote', [
-                      m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
-                      m('.vote-balance', formatCoin((vote as SubstrateDemocracyVote).balance, true)),
-                      m('.vote-weight', (vote as SubstrateDemocracyVote).weight
-                        && `${(vote as SubstrateDemocracyVote).weight}x`),
-                    ]);
-                  case (vote instanceof SubstrateCollectiveVote):
-                    return m('.vote', [
-                      m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
-                    ]);
-                  default:
-                    return m('.vote', [
-                      m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
-                      m('.vote-balance', (vote as any).amount && (vote as any).amount),
-                      m('.vote-weight', (vote as any).weight && `${(vote as any).weight}x`),
-                    ]);
-                }
-              case (vote instanceof DepositVote):
-                return m('.vote', [
-                  m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
-                  m('.vote-deposit', formatCoin((vote as DepositVote<any>).deposit, true)),
-                ]);
-              default:
-                return m('.vote', [
-                  m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
-                ]);
-            }
           }
+          switch (true) {
+            case (vote instanceof CosmosVote):
+              return m('.vote', [
+                m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
+                // (balanceWeighted && balance) && m('.vote-balance', balance),
+              ]);
+            case (vote instanceof MolochProposalVote):
+              return m('.vote', [
+                m('.vote-voter', m(User, { user: vote.account, linkify: true })),
+                balance && m('.vote-balance', balance),
+              ]);
+            case (vote instanceof CompoundProposalVote):
+              return m('.vote', [
+                m('.vote-voter', m(User, { user: vote.account, linkify: true })),
+                balance && m('.vote-balance', balance),
+              ]);
+            case (vote instanceof AaveProposalVote):
+              return m('.vote', [
+                m('.vote-voter', m(User, { user: vote.account, linkify: true })),
+                balance && m('.vote-balance', balance),
+              ]);
+            case (vote instanceof BinaryVote):
+              switch (true) {
+                case (vote instanceof SubstrateDemocracyVote):
+                  return m('.vote', [
+                    m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
+                    m('.vote-balance', formatCoin((vote as SubstrateDemocracyVote).balance, true)),
+                    m('.vote-weight', (vote as SubstrateDemocracyVote).weight
+                      && `${(vote as SubstrateDemocracyVote).weight}x`),
+                  ]);
+                case (vote instanceof SubstrateCollectiveVote):
+                  return m('.vote', [
+                    m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
+                  ]);
+                default:
+                  return m('.vote', [
+                    m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
+                    m('.vote-balance', (vote as any).amount && (vote as any).amount),
+                    m('.vote-weight', (vote as any).weight && `${(vote as any).weight}x`),
+                  ]);
+              }
+            case (vote instanceof DepositVote):
+              return m('.vote', [
+                m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
+                m('.vote-deposit', formatCoin((vote as DepositVote<any>).deposit, true)),
+              ]);
+            default:
+              return m('.vote', [
+                m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
+              ]);
+          }
+        }
         ),
     ]);
   }
@@ -247,6 +247,36 @@ const VotingResults: m.Component<{ proposal: AnyProposal }> = {
           ]),
         ])
       ]);
+    } else if (proposal.votingType === VotingType.CompoundYesNoAbstain) {
+      return m('.VotingResults', [
+        m('.results-column.yes-votes', [
+          m('.results-header', `Yes (${votes.filter((v) => v.choice === CompoundVote.YES).length})`),
+          m('.results-cell', [
+            m(VoteListing, {
+              proposal,
+              votes: votes.filter((v) => v.choice === CompoundVote.YES)
+            })
+          ]),
+        ]),
+        m('.results-column.no-votes', [
+          m('.results-header', `No (${votes.filter((v) => v.choice === CompoundVote.NO).length})`),
+          m('.results-cell', [
+            m(VoteListing, {
+              proposal,
+              votes: votes.filter((v) => v.choice === CompoundVote.NO)
+            })
+          ]),
+        ]),
+        m('.results-column.no-votes', [
+          m('.results-header', `Abstain (${votes.filter((v) => v.choice === CompoundVote.ABSTAIN).length})`),
+          m('.results-cell', [
+            m(VoteListing, {
+              proposal,
+              votes: votes.filter((v) => v.choice === CompoundVote.ABSTAIN)
+            })
+          ]),
+        ]),
+      ]);
     } else if (proposal.votingType === VotingType.ConvictionYesNoVoting) {
       return m('.VotingResults', [
         m('.results-column.yes-votes', [
@@ -312,7 +342,7 @@ const VotingResults: m.Component<{ proposal: AnyProposal }> = {
         ])
       ]);
     } else if (proposal.votingType === VotingType.SimpleYesApprovalVoting
-               && proposal instanceof CosmosProposal) {
+      && proposal instanceof CosmosProposal) {
       // special case for cosmos proposals in deposit stage
       return m('.VotingResults', [
         m('.results-column', [
@@ -340,9 +370,8 @@ const VotingResults: m.Component<{ proposal: AnyProposal }> = {
     } else if (proposal.votingType === VotingType.YesNoReject) {
       return m('.VotingResults', [
         m('.results-column', [
-          m('.results-header', `Voted approve (${
-            votes.filter((v) => v.choice === NearSputnikVoteString.Approve).length
-          })`),
+          m('.results-header', `Voted approve (${votes.filter((v) => v.choice === NearSputnikVoteString.Approve).length
+            })`),
           m('.results-cell', [
             m(VoteListing, {
               proposal,
@@ -351,9 +380,8 @@ const VotingResults: m.Component<{ proposal: AnyProposal }> = {
           ]),
         ]),
         m('.results-column', [
-          m('.results-header', `Voted reject (${
-            votes.filter((v) => v.choice === NearSputnikVoteString.Reject).length
-          })`),
+          m('.results-header', `Voted reject (${votes.filter((v) => v.choice === NearSputnikVoteString.Reject).length
+            })`),
           m('.results-cell', [
             m(VoteListing, {
               proposal,
@@ -362,9 +390,8 @@ const VotingResults: m.Component<{ proposal: AnyProposal }> = {
           ]),
         ]),
         m('.results-column', [
-          m('.results-header', `Voted remove (${
-            votes.filter((v) => v.choice === NearSputnikVoteString.Remove).length
-          })`),
+          m('.results-header', `Voted remove (${votes.filter((v) => v.choice === NearSputnikVoteString.Remove).length
+            })`),
           m('.results-cell', [
             m(VoteListing, {
               proposal,
