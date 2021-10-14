@@ -45,6 +45,8 @@
             a.proposal-topic {
                 display: inline-block;
                 color: $text-color-light;
+                overflow: hidden;
+                text-overflow: ellipsis;
                 max-width: 100%;
             }
             .mobile-comment-count {
