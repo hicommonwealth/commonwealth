@@ -172,7 +172,7 @@ export const QueueButton: m.Component<{ proposal, votingModalOpen?}, {}> = {
       && m('.QueueButton', [
         m(Button, {
           intent: 'none',
-          disabled: proposal.isQueueable || votingModalOpen,
+          disabled: !proposal.isQueueable || votingModalOpen,
           onclick: () => proposal.queueTx().then(() => m.redraw()),
           label: proposal.data.queued || proposal.data.executed ? 'Queued' : 'Queue',
           compact: true,
@@ -729,8 +729,8 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
         m('.button-row', [
           yesButton,
           noButton,
-          m(QueueButton, { proposal, votingModalOpen }),
-          m(ExecuteButton, { proposal, votingModalOpen }),
+          // m(QueueButton, { proposal, votingModalOpen }),
+          // m(ExecuteButton, { proposal, votingModalOpen }),
           m(CancelButton, { proposal, votingModalOpen, user, onModalClose })
         ])
       ];
@@ -740,8 +740,8 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
           yesButton,
           noButton,
           abstainButton,
-          m(QueueButton, { proposal, votingModalOpen }),
-          m(ExecuteButton, { proposal, votingModalOpen }),
+          // m(QueueButton, { proposal, votingModalOpen }),
+          // m(ExecuteButton, { proposal, votingModalOpen }),
           m(CancelButton, { proposal, votingModalOpen, user, onModalClose })
         ])
       ];

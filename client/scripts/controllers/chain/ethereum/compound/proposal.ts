@@ -96,7 +96,7 @@ export default class CompoundProposal extends Proposal<
       if (this.data.description) {
         return this.data.description.slice(0, 255);
       } else {
-        return `Marlin Proposal #${this.data.identifier}`;
+        return `Compound Proposal #${this.data.identifier}`;
       }
     }
   }
