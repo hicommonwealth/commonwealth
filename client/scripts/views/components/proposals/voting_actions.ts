@@ -216,7 +216,7 @@ export const CancelButton: m.Component<{ proposal, votingModalOpen?, user?, onMo
     ]) : (proposal instanceof CompoundProposal) ? m('.veto-button', [
       m(Button, {
         intent: 'negative',
-        disabled: proposal.isCancelled || votingModalOpen,
+        disabled: proposal.completed || votingModalOpen,
         onclick: (e) => cancelProposal(e, vnode.state, proposal, onModalClose),
         label: proposal.isCancelled ? 'Cancelled' : 'Cancel',
         compact: true,

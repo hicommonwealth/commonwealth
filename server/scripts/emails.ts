@@ -23,7 +23,7 @@ export const createImmediateNotificationEmailObject = async (notification_data, 
     const evt: CWEvent = {
       blockNumber: notification_data.chainEvent.block_number,
       data: notification_data.chainEvent.event_data as IChainEventData,
-      network: notification_data.chainEvent.ChainEventType.event_network as SupportedNetwork,
+      network: notification_data.chainEventType.event_network as SupportedNetwork,
     };
 
     try {

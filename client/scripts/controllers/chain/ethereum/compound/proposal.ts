@@ -192,7 +192,7 @@ export default class CompoundProposal extends Proposal<
 
     // queued but not ready for execution
     if (state === CompoundTypes.ProposalState.Queued)
-      return { kind: 'fixed', time: moment(this.data.eta) };
+      return { kind: 'fixed', time: moment.unix(this.data.eta) };
 
     // unavailable if: waiting to passed/failed but not in queue, or completed
     return { kind: 'unavailable' };
@@ -247,6 +247,18 @@ export default class CompoundProposal extends Proposal<
     const queriedState = await this._Gov.api.Contract.state(this.data.id);
     if (queriedState === CompoundTypes.ProposalState.Expired) {
       this.data.expired = true;
+    }
+
+    // also check queued, as Bravo does not emit queued events + fetch eta
+    if (queriedState === CompoundTypes.ProposalState.Queued && !this.data.queued) {
+      try {
+        const eta = await this._Gov.api.Contract.proposalEta(this.data.id);
+        this.data.eta = +eta;
+      } catch (err) {
+        console.error(err);
+      }
+      // Unclear what to do here -- broken state
+      this.data.queued = true;
     }
 
     this._initialized = true;

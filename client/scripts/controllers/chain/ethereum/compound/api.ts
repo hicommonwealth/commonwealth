@@ -1,6 +1,6 @@
 import {
-  IGovernorCompatibilityBravo,
-  IGovernorCompatibilityBravo__factory,
+  GovernorCompatibilityBravo,
+  GovernorCompatibilityBravo__factory,
   GovernorAlpha,
   GovernorAlpha__factory,
   MPond,
@@ -13,11 +13,11 @@ import { utils } from 'ethers';
 
 import ContractApi from 'controllers/chain/ethereum/contractApi';
 
-export default class CompoundAPI implements ContractApi<GovernorAlpha | IGovernorCompatibilityBravo> {
+export default class CompoundAPI implements ContractApi<GovernorAlpha | GovernorCompatibilityBravo> {
   public readonly gasLimit: number = 3000000;
 
   public readonly contractAddress: string;
-  private _Contract: GovernorAlpha | IGovernorCompatibilityBravo;
+  private _Contract: GovernorAlpha | GovernorCompatibilityBravo;
   public get Contract() { return this._Contract; }
   public readonly Provider: Web3Provider;
 
@@ -26,7 +26,7 @@ export default class CompoundAPI implements ContractApi<GovernorAlpha | IGoverno
 
   private _isAlpha: boolean;
   private _isTokenMPond: boolean;
-  public isGovAlpha(c: GovernorAlpha | IGovernorCompatibilityBravo): c is GovernorAlpha {
+  public isGovAlpha(c: GovernorAlpha | GovernorCompatibilityBravo): c is GovernorAlpha {
     return this._isAlpha;
   }
   public isTokenMPond(t: MPond | ERC20VotesComp | undefined): t is MPond {
@@ -54,7 +54,7 @@ export default class CompoundAPI implements ContractApi<GovernorAlpha | IGoverno
     } catch (e) {
       this._isAlpha = false;
       console.log(`Found non-GovAlpha Compound contract at ${this.Contract.address}, using GovernorCompatibilityBravo`);
-      this._Contract = IGovernorCompatibilityBravo__factory.connect(this.contractAddress, this.Provider);
+      this._Contract = GovernorCompatibilityBravo__factory.connect(this.contractAddress, this.Provider);
     }
     // TODO: use `quorumVotes` to distinguish between raw IGovernor and BravoCompat, for later support
 
