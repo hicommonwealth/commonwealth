@@ -198,7 +198,7 @@ const editThread = async (models: DB, req: Request, res: Response, next: NextFun
         const originCommunity = await models.OffchainCommunity.findOne({
           where: { id: finalThread.community }
         });
-        if (originCommunity.privacyEnabled) {
+        if (originCommunity.privacy_enabled) {
           const destinationCommunity = mentionedAddress.Roles
             .find((role) => role.offchain_community_id === originCommunity.id);
           if (destinationCommunity === undefined) shouldNotifyMentionedUser = false;
