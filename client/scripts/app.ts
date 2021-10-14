@@ -65,29 +65,6 @@ export async function initAppState(updateSelectedNode = true, customDomain = nul
         }));
       });
       data.communities.sort((a, b) => a.id - b.id).map((community) => {
-        console.log(CommunityInfo.fromJSON({
-          id: community.id,
-          name: community.name,
-          description: community.description,
-          icon_url: community.icon_url,
-          website: community.website,
-          discord: community.discord,
-          element: community.element,
-          telegram: community.telegram,
-          github: community.github,
-          default_chain: app.config.chains.getById(community.default_chain),
-          visible: community.visible,
-          collapsed_on_homepage: community.collapsed_on_homepage,
-          invites_enabled: community.invites_enabled,
-          privacy_enabled: community.privacy_enabled,
-          featured_topics: community.featured_topics,
-          topics: community.topics,
-          stages_enabled: community.stages_enabled,
-          custom_stages: community.custom_stages,
-          custom_domain: community.custom_domain,
-          terms: community.terms,
-          admins_and_mods: [],
-        }));
         return app.config.communities.add(CommunityInfo.fromJSON({
           id: community.id,
           name: community.name,
