@@ -9,11 +9,20 @@ const log = factory.getLogger(formatFilename(__filename));
 export const Errors = {
   NoId: 'Must provide id',
   NotOwner: 'User does not have permission to edit this draft',
-  NotFound: 'No draft found for that user'
+  NotFound: 'No draft found for that user',
 };
 
-const deleteDraft = async (models, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+const deleteDraft = async (
+  models,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const [chain, community, error] = await lookupCommunityIsVisibleToUser(
+    models,
+    req.body,
+    req.user
+  );
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));
@@ -23,7 +32,9 @@ const deleteDraft = async (models, req: Request, res: Response, next: NextFuncti
   }
 
   try {
-    const userOwnedAddressIds = (await req.user.getAddresses()).filter((addr) => !!addr.verified).map((addr) => addr.id);
+    const userOwnedAddressIds = (await req.user.getAddresses())
+      .filter((addr) => !!addr.verified)
+      .map((addr) => addr.id);
     const draft = await models.DiscussionDraft.findOne({
       where: {
         id: req.body.id,

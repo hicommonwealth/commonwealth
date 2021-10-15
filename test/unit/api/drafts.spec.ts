@@ -7,7 +7,9 @@ import jwt from 'jsonwebtoken';
 import { Errors as DeleteDraftErrors } from 'server/routes/drafts/deleteDraft';
 import { Errors as CreateDraftErrors } from 'server/routes/drafts/createDraft';
 import { Errors as EditDraftErrors } from 'server/routes/drafts/editDraft';
-import app, { resetDatabase } from '../../../server-test';
+console.log("LOADING import app from '../../../server-test");
+import app, { resetDatabase } from '../../../server-test'; // takes 15 seconds
+console.log("FINISHED import app from '../../../server-test");
 import { JWT_SECRET } from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';
 
@@ -29,6 +31,7 @@ describe('Draft Tests', () => {
 
   before(async () => {
     await resetDatabase();
+
     let res = await modelUtils.createAndVerifyAddress({ chain });
     user2Address = res.address;
     user2JWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
@@ -43,19 +46,21 @@ describe('Draft Tests', () => {
   });
 
   describe('/createDraft', () => {
-    it('should successfully create a community discussion draft with all reqd params', async () => {
-      const res = await chai.request(app)
+    it('should successfully create a community discussion draft with all requested params', async () => {
+      console.log('checkpoint 4');
+      const res = await chai
+        .request(app)
         .post('/api/drafts')
         .set('Accept', 'application/json')
         .send({
-          'address': userAddress,
-          'author_chain': chain,
-          'chain': chain,
-          'community': null,
-          'title': title,
-          'topic': topic,
-          'body': body,
-          'jwt': userJWT,
+          address: userAddress,
+          author_chain: chain,
+          chain,
+          community: null,
+          title,
+          topic,
+          body,
+          jwt: userJWT,
         });
       const { result } = res.body;
       expect(res).to.have.status(200);
@@ -67,18 +72,19 @@ describe('Draft Tests', () => {
     });
 
     it('should successfully create a chain discussion draft with all reqd params', async () => {
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .post('/api/drafts')
         .set('Accept', 'application/json')
         .send({
-          'address': userAddress,
-          'author_chain': chain,
-          'chain': null,
-          'community': community,
-          'title': title,
-          'topic': topic,
-          'body': body,
-          'jwt': userJWT,
+          address: userAddress,
+          author_chain: chain,
+          chain: null,
+          community,
+          title,
+          topic,
+          body,
+          jwt: userJWT,
         });
       const { result } = res.body;
       expect(res).to.have.status(200);
@@ -90,18 +96,19 @@ describe('Draft Tests', () => {
     });
 
     it('should create a discussion draft without a title', async () => {
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .post('/api/drafts')
         .set('Accept', 'application/json')
         .send({
-          'address': userAddress,
-          'author_chain': chain,
-          'chain': chain,
-          'community': null,
-          'title': null,
-          'topic': topic,
-          'body': body,
-          'jwt': userJWT,
+          address: userAddress,
+          author_chain: chain,
+          chain,
+          community: null,
+          title: null,
+          topic,
+          body,
+          jwt: userJWT,
         });
       const { result } = res.body;
       expect(res).to.have.status(200);
@@ -113,18 +120,19 @@ describe('Draft Tests', () => {
     });
 
     it('should create a discussion draft without a topic', async () => {
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .post('/api/drafts')
         .set('Accept', 'application/json')
         .send({
-          'address': userAddress,
-          'author_chain': chain,
-          'chain': chain,
-          'community': null,
-          'title': title,
-          'topic': null,
-          'body': body,
-          'jwt': userJWT,
+          address: userAddress,
+          author_chain: chain,
+          chain,
+          community: null,
+          title,
+          topic: null,
+          body,
+          jwt: userJWT,
         });
       const { result } = res.body;
       expect(res).to.have.status(200);
@@ -136,59 +144,64 @@ describe('Draft Tests', () => {
     });
 
     it('should fail to create a discussion draft missing a body, title, and attachment', async () => {
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .post('/api/drafts')
         .set('Accept', 'application/json')
         .send({
-          'address': userAddress,
-          'author_chain': chain,
-          'chain': chain,
-          'community': null,
-          'title': null,
-          'topic': topic,
-          'body': null,
+          address: userAddress,
+          author_chain: chain,
+          chain,
+          community: null,
+          title: null,
+          topic,
+          body: null,
           'attachments[]': null,
-          'jwt': userJWT,
+          jwt: userJWT,
         });
       expect(res).to.not.have.status(200);
       expect(res.body.error).to.equal(CreateDraftErrors.InsufficientData);
     });
   });
 
+  // return;
+
   describe('/editDraft', () => {
     let firstDraft;
     beforeEach(async () => {
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .post('/api/drafts')
         .set('Accept', 'application/json')
         .send({
-          'address': userAddress,
-          'author_chain': chain,
-          'chain': chain,
-          'community': null,
-          'title': title,
-          'topic': topic,
-          'body': body,
-          'jwt': userJWT,
+          address: userAddress,
+          author_chain: chain,
+          chain,
+          community: null,
+          title,
+          topic,
+          body,
+          jwt: userJWT,
         });
       expect(res).to.have.status(200);
       firstDraft = res.body.result;
     });
 
     it('should successfully edit a draft', async () => {
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .patch('/api/drafts')
         .set('Accept', 'application/json')
         .send({
-          'address': userAddress,
-          'author_chain': chain,
-          'chain': chain,
-          'community': null,
-          'id': firstDraft.id,
-          'title': `${title} edited`,
-          'topic': `${topic} edited`,
-          'body': `${body} edited`,
-          'jwt': userJWT,
+          address: userAddress,
+          author_chain: chain,
+          chain,
+          community: null,
+          id: firstDraft.id,
+          title: `${title} edited`,
+          topic: `${topic} edited`,
+          body: `${body} edited`,
+          jwt: userJWT,
         });
       const { result } = res.body;
       expect(res).to.have.status(200);
@@ -198,19 +211,20 @@ describe('Draft Tests', () => {
     });
 
     it('should fail to edit a draft when missing an id', async () => {
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .patch('/api/drafts')
         .set('Accept', 'application/json')
         .send({
-          'address': userAddress,
-          'author_chain': chain,
-          'chain': chain,
-          'community': null,
-          'id': null,
-          'title': title,
-          'topic': topic,
-          'body': body,
-          'jwt': userJWT,
+          address: userAddress,
+          author_chain: chain,
+          chain,
+          community: null,
+          id: null,
+          title,
+          topic,
+          body,
+          jwt: userJWT,
         });
       const { result } = res.body;
       expect(res).to.not.have.status(200);
@@ -218,19 +232,20 @@ describe('Draft Tests', () => {
     });
 
     it('should fail to edit a draft when attempted by non-owning user', async () => {
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .patch('/api/drafts')
         .set('Accept', 'application/json')
         .send({
-          'address': user2Address,
-          'author_chain': chain,
-          'chain': chain,
-          'community': null,
-          'id': firstDraft.id,
-          'title': title,
-          'topic': topic,
-          'body': body,
-          'jwt': user2JWT,
+          address: user2Address,
+          author_chain: chain,
+          chain,
+          community: null,
+          id: firstDraft.id,
+          title,
+          topic,
+          body,
+          jwt: user2JWT,
         });
       const { result } = res.body;
       expect(res).to.not.have.status(200);
@@ -241,33 +256,35 @@ describe('Draft Tests', () => {
   describe('/deleteDraft', () => {
     let draft;
     beforeEach(async () => {
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .post('/api/drafts')
         .set('Accept', 'application/json')
         .send({
-          'address': userAddress,
-          'author_chain': chain,
-          'chain': chain,
-          'community': null,
-          'title': title,
-          'topic': topic,
-          'body': body,
-          'jwt': userJWT,
+          address: userAddress,
+          author_chain: chain,
+          chain,
+          community: null,
+          title,
+          topic,
+          body,
+          jwt: userJWT,
         });
       draft = res.body.result;
     });
 
     it('should delete a provided draft', async () => {
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .delete('/api/drafts')
         .set('Accept', 'application/json')
         .send({
-          'address': userAddress,
-          'author_chain': chain,
-          'chain': chain,
-          'community': null,
-          'id': draft.id,
-          'jwt': userJWT
+          address: userAddress,
+          author_chain: chain,
+          chain,
+          community: null,
+          id: draft.id,
+          jwt: userJWT,
         });
       const { result } = res.body;
       expect(res).to.have.status(200);
@@ -275,16 +292,17 @@ describe('Draft Tests', () => {
     });
 
     it('should fail to delete a provided draft when attempted by non-owning user', async () => {
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .delete('/api/drafts')
         .set('Accept', 'application/json')
         .send({
-          'address': user2Address,
-          'author_chain': chain,
-          'chain': chain,
-          'community': null,
-          'id': draft.id,
-          'jwt': user2JWT
+          address: user2Address,
+          author_chain: chain,
+          chain,
+          community: null,
+          id: draft.id,
+          jwt: user2JWT,
         });
       const { result } = res.body;
       expect(res).to.not.have.status(200);

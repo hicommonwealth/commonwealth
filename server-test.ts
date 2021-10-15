@@ -11,11 +11,18 @@ import SessionSequelizeStore from 'connect-session-sequelize';
 import WebSocket from 'ws';
 
 import { SESSION_SECRET } from './server/config';
-import setupAPI from './server/router';
+console.log("LOADING import setupAPI from './server/router';");
+import setupAPI from './server/router'; // this takes 15 seconds
+console.log("FINISHED import setupAPI from './server/router';");
 import setupPassport from './server/passport';
 import models from './server/database';
 import setupWebsocketServer from './server/socket';
-import { ChainBase, ChainNetwork, NotificationCategories, ChainType } from './shared/types';
+import {
+  ChainBase,
+  ChainNetwork,
+  NotificationCategories,
+  ChainType,
+} from './shared/types';
 import ViewCountCache from './server/util/viewCountCache';
 import IdentityFetchCache from './server/util/identityFetchCache';
 import TokenBalanceCache from './server/util/tokenBalanceCache';
@@ -31,7 +38,12 @@ const identityFetchCache = new IdentityFetchCache(10 * 60);
 
 // always prune both token and non-token holders asap
 const mockTokenBalanceProvider = new MockTokenBalanceProvider();
-const tokenBalanceCache = new TokenBalanceCache(models, 0, 0, mockTokenBalanceProvider);
+const tokenBalanceCache = new TokenBalanceCache(
+  models,
+  0,
+  0,
+  mockTokenBalanceProvider
+);
 const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
 let server;
 
@@ -39,7 +51,7 @@ const sessionStore = new SequelizeStore({
   db: models.sequelize,
   tableName: 'Sessions',
   checkExpirationInterval: 15 * 60 * 1000, // Clean up expired sessions every 15 minutes
-  expiration: 7 * 24 * 60 * 60 * 1000 // Set session expiration to 7 days
+  expiration: 7 * 24 * 60 * 60 * 1000, // Set session expiration to 7 days
 });
 
 sessionStore.sync();
@@ -90,7 +102,6 @@ const resetServer = (debug = false): Promise<void> => {
   return new Promise((resolve) => {
     models.sequelize.sync({ force: true }).then(async () => {
       if (debug) console.log('Initializing default models...');
-
       const drew = await models['User'].create({
         email: 'drewstone329@gmail.com',
         emailVerified: true,
@@ -109,6 +120,7 @@ const resetServer = (debug = false): Promise<void> => {
         description: 'DAO related contracts',
         color: '#9013fe',
       });
+
       // Initialize different chain + node URLs
       const edgMain = await models['Chain'].create({
         id: 'edgeware',
@@ -135,6 +147,28 @@ const resetServer = (debug = false): Promise<void> => {
       });
       const alex = await models['Chain'].create({
         id: 'alex',
+        network: ChainNetwork.ERC20,
+        symbol: 'ALEX',
+        name: 'Alex',
+        icon_url: '/static/img/protocols/eth.png',
+        active: true,
+        type: ChainType.Token,
+        base: ChainBase.Ethereum,
+        has_chain_events_listener: false,
+      });
+      const yearn = await models['Chain'].create({
+        id: 'yearn',
+        network: ChainNetwork.ERC20,
+        symbol: 'ALEX',
+        name: 'Alex',
+        icon_url: '/static/img/protocols/eth.png',
+        active: true,
+        type: ChainType.Token,
+        base: ChainBase.Ethereum,
+        has_chain_events_listener: false,
+      });
+      const sushi = await models['Chain'].create({
+        id: 'sushi',
         network: ChainNetwork.ERC20,
         symbol: 'ALEX',
         name: 'Alex',
@@ -236,13 +270,34 @@ const resetServer = (debug = false): Promise<void> => {
       });
 
       const nodes = [
-        [ 'mainnet1.edgewa.re', 'edgeware' ],
-        [ 'wss://mainnet.infura.io/ws', 'ethereum' ],
-        [ 'wss://ropsten.infura.io/ws', 'alex', '0xFab46E002BbF0b4509813474841E0716E6730136'],
-        [ 'wss://mainnet.infura.io/ws', 'yearn', '0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e'],
-        [ 'wss://mainnet.infura.io/ws', 'sushi', '0x6b3595068778dd592e39a122f4f5a5cf09c90fe2'],
+        ['mainnet1.edgewa.re', 'edgeware', null],
+        ['wss://mainnet.infura.io/ws', 'ethereum', null],
+        [
+          'wss://ropsten.infura.io/ws',
+          'alex',
+          '0xFab46E002BbF0b4509813474841E0716E6730136',
+        ],
+        [
+          'wss://mainnet.infura.io/ws',
+          'yearn',
+          '0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e',
+        ],
+        [
+          'wss://mainnet.infura.io/ws',
+          'sushi',
+          '0x6b3595068778dd592e39a122f4f5a5cf09c90fe2',
+        ],
       ];
-      await Promise.all(nodes.map(([ url, chain, address ]) => (models['ChainNode'].create({ chain, url, address }))));
+
+      try {
+        await Promise.all(
+          nodes.map(([url, chain, address]) =>
+            models['ChainNode'].create({ chain, url, address })
+          )
+        );
+      } catch (error) {
+        console.log(error);
+      }
 
       if (debug) console.log('Database reset!');
       resolve();
