@@ -20,7 +20,7 @@
     "test": "nyc ts-mocha --project test/tsconfig.node.json ./test/**/*.spec.ts",
     "test-select": "NODE_ENV=test nyc ts-mocha --project test/tsconfig.node.json",
     "test-api": "NODE_ENV=test nyc ts-mocha --project test/tsconfig.node.json ./test/unit/api/*.spec.ts",
-    "test-api-2": "NODE_ENV=test ts-mocha --project test/tsconfig.node.json ./test/unit/api/roles.spec.ts",
+    "test-api-2": "NODE_ENV=test ts-mocha --project test/tsconfig.node.json ./test/unit/api/subscriptions.spec.ts",
     "test-suite": "NODE_ENV=test nyc ts-mocha --project test/tsconfig.node.json ./test/**/*.spec.ts",
     "start": "NODE_OPTIONS=--max_old_space_size=4096 nodemon --delay 0.25 --watch 'server/**/*.ts' --ignore 'server/**/*.spec.ts' --exec 'ts-node --project tsconfig.node.json' server.ts",
     "start-consumer": "ts-node --project server/scripts/tsconfig.consumer.json server/scripts/chainEventsConsumer.ts",
