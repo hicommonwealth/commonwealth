@@ -29,6 +29,7 @@ export const networkUrls = {
   'aave-local': 'ws://127.0.0.1:9545',
   'dydx-ropsten': 'wss://ropsten.infura.io/ws',
   dydx: 'wss://mainnet.infura.io/ws',
+  frax: 'ws://localhost:8545',
 
   erc20: 'wss://mainnet.infura.io/ws',
 } as const;
@@ -54,4 +55,5 @@ export const contracts = {
   'dydx-ropsten': '0x6938240Ba19cB8a614444156244b658f650c8D5c',
   dydx: '0x7E9B1672616FF6D6629Ef2879419aaE79A9018D2',
   uniswap: '0xc4e172459f1e7939d522503b81afaac1014ce6f6',
+  frax: '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0',
 };

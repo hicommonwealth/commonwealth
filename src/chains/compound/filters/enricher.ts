@@ -1,7 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Contract, utils } from 'ethers';
 
-import { GovernorBravoDelegate as GovernorBravo } from '../../../contractTypes';
+import {
+  GovernorAlpha,
+  GovernorCompatibilityBravo,
+} from '../../../contractTypes';
 import { TypedEventFilter } from '../../../contractTypes/commons';
 import { CWEvent, SupportedNetwork } from '../../../interfaces';
 import { EventKind, RawEvent, IEventData, Api } from '../types';
@@ -21,7 +24,7 @@ export async function Enrich(
   switch (kind) {
     case EventKind.ProposalCanceled: {
       const [id] = rawData.args as GetArgType<
-        GovernorBravo,
+        GovernorCompatibilityBravo,
         'ProposalCanceled'
       >;
       return {
@@ -89,7 +92,7 @@ export async function Enrich(
     }
     case EventKind.ProposalExecuted: {
       const [id] = rawData.args as GetArgType<
-        GovernorBravo,
+        GovernorCompatibilityBravo,
         'ProposalExecuted'
       >;
       return {
@@ -104,7 +107,8 @@ export async function Enrich(
     }
     case EventKind.ProposalQueued: {
       const [id, eta] = rawData.args as GetArgType<
-        GovernorBravo,
+        // Bravo omits the Queued event
+        GovernorAlpha,
         'ProposalQueued'
       >;
       return {
@@ -125,7 +129,7 @@ export async function Enrich(
         support,
         votes,
         reason,
-      ] = rawData.args as GetArgType<GovernorBravo, 'VoteCast'>;
+      ] = rawData.args as GetArgType<GovernorCompatibilityBravo, 'VoteCast'>;
       return {
         blockNumber,
         excludeAddresses: [voter],

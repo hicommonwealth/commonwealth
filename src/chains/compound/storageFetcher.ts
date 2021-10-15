@@ -11,6 +11,7 @@ import {
   IProposalCanceled,
   IProposalQueued,
   IProposalExecuted,
+  isGovernorAlpha,
 } from './types';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -99,7 +100,9 @@ export class StorageFetcher extends IStorageFetcher<Api> {
       )
     );
     const voteCastEvents = await this._api.queryFilter(
-      this._api.filters.VoteCast(null, null, null, null),
+      isGovernorAlpha(this._api)
+        ? this._api.filters.VoteCast(null, null, null, null)
+        : this._api.filters.VoteCast(null, null, null, null, null),
       range.startBlock,
       range.endBlock || 'latest'
     );
@@ -114,22 +117,27 @@ export class StorageFetcher extends IStorageFetcher<Api> {
           ) as Promise<CWEvent<IVoteCast>>
       )
     );
-    const proposalQueuedEvents = await this._api.queryFilter(
-      this._api.filters.ProposalQueued(null, null),
-      range.startBlock,
-      range.endBlock || 'latest'
-    );
-    const queuedCwEvents = await Promise.all(
-      proposalQueuedEvents.map(
-        (evt) =>
-          Enrich(
-            this._api,
-            evt.blockNumber,
-            EventKind.ProposalQueued,
-            evt
-          ) as Promise<CWEvent<IProposalQueued>>
-      )
-    );
+
+    // Bravo does not have queued events
+    let queuedCwEvents: CWEvent<IProposalQueued>[] = [];
+    if (isGovernorAlpha(this._api)) {
+      const proposalQueuedEvents = await this._api.queryFilter(
+        this._api.filters.ProposalQueued(null, null),
+        range.startBlock,
+        range.endBlock || 'latest'
+      );
+      queuedCwEvents = await Promise.all(
+        proposalQueuedEvents.map(
+          (evt) =>
+            Enrich(
+              this._api,
+              evt.blockNumber,
+              EventKind.ProposalQueued,
+              evt
+            ) as Promise<CWEvent<IProposalQueued>>
+        )
+      );
+    }
     const proposalCanceledEvents = await this._api.queryFilter(
       this._api.filters.ProposalCanceled(null),
       range.startBlock,

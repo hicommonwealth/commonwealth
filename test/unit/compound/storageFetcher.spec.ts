@@ -20,8 +20,13 @@ const constructEvent = (blockNumber: number, data, rawData?): RawEvent => {
   } as RawEvent;
 };
 
-const makeApi = (proposals) => {
+const makeApi = (proposals, isBravo = false) => {
   const governorAlpha = ({
+    interface: {
+      functions: {
+        'guardian()': !isBravo,
+      },
+    },
     votingDelay: async () => '2',
     votingPeriod: async () => '2',
     proposalCount: async () => proposals.length,

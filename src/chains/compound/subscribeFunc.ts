@@ -1,3 +1,4 @@
+import { providers } from 'ethers';
 import sleep from 'sleep-promise';
 
 import { createProvider } from '../../eth';
@@ -8,7 +9,10 @@ import {
   ISubscribeOptions,
 } from '../../interfaces';
 import { factory, formatFilename } from '../../logging';
-import { GovernorAlpha__factory as GovernorAlphaFactory } from '../../contractTypes';
+import {
+  GovernorAlpha__factory as GovernorAlphaFactory,
+  GovernorCompatibilityBravo__factory as GovernorCompatibilityBravoFactory,
+} from '../../contractTypes';
 
 import { Subscriber } from './subscriber';
 import { Processor } from './processor';
@@ -25,26 +29,43 @@ const log = factory.getLogger(formatFilename(__filename));
  * @param retryTimeMs
  */
 export async function createApi(
-  ethNetworkUrl: string,
-  governorAlphaAddress: string,
+  ethNetworkUrlOrProvider: string | providers.JsonRpcProvider,
+  governorAddress: string,
   retryTimeMs = 10 * 1000
 ): Promise<Api> {
+  const ethNetworkUrl =
+    typeof ethNetworkUrlOrProvider === 'string'
+      ? ethNetworkUrlOrProvider
+      : ethNetworkUrlOrProvider.connection.url;
   for (let i = 0; i < 3; ++i) {
     try {
-      const provider = await createProvider(ethNetworkUrl);
+      const provider =
+        typeof ethNetworkUrlOrProvider === 'string'
+          ? await createProvider(ethNetworkUrlOrProvider)
+          : ethNetworkUrlOrProvider;
 
-      // init governance contract
-      const governorAlphaContract = GovernorAlphaFactory.connect(
-        governorAlphaAddress,
-        provider
-      );
-      await governorAlphaContract.deployed();
+      let contract: Api;
+      try {
+        contract = GovernorAlphaFactory.connect(governorAddress, provider);
+        await contract.deployed();
+        await contract.guardian();
+        log.info(`Found GovAlpha contract at ${contract.address}`);
+      } catch (e) {
+        contract = GovernorCompatibilityBravoFactory.connect(
+          governorAddress,
+          provider
+        );
+        await contract.deployed();
+        log.info(
+          `Found non-GovAlpha Compound contract at ${contract.address}, using GovernorCompatibilityBravo`
+        );
+      }
 
       log.info('Connection successful!');
-      return governorAlphaContract;
+      return contract;
     } catch (err) {
       log.error(
-        `Compound ${governorAlphaAddress} at ${ethNetworkUrl} failure: ${err.message}`
+        `Compound ${governorAddress} at ${ethNetworkUrl} failure: ${err.message}`
       );
       await sleep(retryTimeMs);
       log.error('Retrying connection...');
@@ -52,7 +73,7 @@ export async function createApi(
   }
 
   throw new Error(
-    `Failed to start Compound listener for ${governorAlphaAddress} at ${ethNetworkUrl}`
+    `Failed to start Compound listener for ${governorAddress} at ${ethNetworkUrl}`
   );
 }
 
