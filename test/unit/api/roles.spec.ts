@@ -5,7 +5,6 @@ import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import jwt from 'jsonwebtoken';
 import { NotificationCategories } from 'types';
-import { NotificationSubscription } from 'models';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';
@@ -13,7 +12,6 @@ import * as modelUtils from '../../util/modelUtils';
 import { Errors as createErrors } from '../../../server/routes/createRole';
 import { Errors as upgradeErrors } from '../../../server/routes/upgradeMember';
 import { Errors as deleteErrors } from '../../../server/routes/deleteRole';
-
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -43,7 +41,8 @@ describe('Roles Test', () => {
   describe('/createRole route tests', () => {
     it('should create a member role for a public community', async () => {
       const user = await modelUtils.createAndVerifyAddress({ chain });
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .post('/api/createRole')
         .set('Accept', 'application/json')
         .send({
@@ -56,11 +55,14 @@ describe('Roles Test', () => {
       expect(res.body.result.role.offchain_community_id).to.be.equal(community);
       expect(res.body.result.subscription).to.not.be.null;
       expect(res.body.result.subscription.object_id).to.be.equal(community);
-      expect(res.body.result.subscription.category_id).to.be.equal(NotificationCategories.NewThread);
+      expect(res.body.result.subscription.category_id).to.be.equal(
+        NotificationCategories.NewThread
+      );
     });
 
     it('should return existing role for a public community a user is already a member of', async () => {
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .post('/api/createRole')
         .set('Accept', 'application/json')
         .send({
@@ -75,7 +77,8 @@ describe('Roles Test', () => {
     });
 
     it('should fail to create a role without address_id', async () => {
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .post('/api/createRole')
         .set('Accept', 'application/json')
         .send({
@@ -93,22 +96,26 @@ describe('Roles Test', () => {
     let newJwt;
     let newUserId;
 
-    beforeEach('Create a new user as member of community to invite or upgrade', async () => {
-      const res = await modelUtils.createAndVerifyAddress({ chain });
-      newUserAddress = res.address;
-      newUserAddressId = res.address_id;
-      newJwt = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
-      newUserId = res.user_id;
-      const isMember = await modelUtils.assignRole({
-        address_id: newUserAddressId,
-        chainOrCommObj: { offchain_community_id: community },
-        role: 'member',
-      });
-    });
+    beforeEach(
+      'Create a new user as member of community to invite or upgrade',
+      async () => {
+        const res = await modelUtils.createAndVerifyAddress({ chain });
+        newUserAddress = res.address;
+        newUserAddressId = res.address_id;
+        newJwt = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
+        newUserId = res.user_id;
+        const isMember = await modelUtils.assignRole({
+          address_id: newUserAddressId,
+          chainOrCommObj: { offchain_community_id: community },
+          role: 'member',
+        });
+      }
+    );
 
     it('should pass when admin upgrades new member', async () => {
       const role = 'moderator';
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .post('/api/upgradeMember')
         .set('Accept', 'application/json')
         .send({
@@ -123,7 +130,8 @@ describe('Roles Test', () => {
 
     it('should fail when admin upgrades without address', async () => {
       const role = 'moderator';
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .post('/api/upgradeMember')
         .set('Accept', 'application/json')
         .send({
@@ -137,7 +145,8 @@ describe('Roles Test', () => {
 
     it('should fail when admin upgrades invalid address', async () => {
       const role = 'moderator';
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .post('/api/upgradeMember')
         .set('Accept', 'application/json')
         .send({
@@ -151,7 +160,8 @@ describe('Roles Test', () => {
     });
 
     it('should fail when admin upgrades without role', async () => {
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .post('/api/upgradeMember')
         .set('Accept', 'application/json')
         .send({
@@ -164,7 +174,8 @@ describe('Roles Test', () => {
     });
 
     it('should fail when admin upgrades with invalid role', async () => {
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .post('/api/upgradeMember')
         .set('Accept', 'application/json')
         .send({
@@ -178,7 +189,8 @@ describe('Roles Test', () => {
     });
 
     it('should fail when a non-admin upgrades a member', async () => {
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .post('/api/upgradeMember')
         .set('Accept', 'application/json')
         .send({
@@ -193,8 +205,12 @@ describe('Roles Test', () => {
 
     it('should fail to upgrade a nonexistent member', async () => {
       const temp = await modelUtils.createAndVerifyAddress({ chain });
-      const tempJwt = jwt.sign({ id: temp.user_id, email: temp.email }, JWT_SECRET);
-      const res = await chai.request(app)
+      const tempJwt = jwt.sign(
+        { id: temp.user_id, email: temp.email },
+        JWT_SECRET
+      );
+      const res = await chai
+        .request(app)
         .post('/api/upgradeMember')
         .set('Accept', 'application/json')
         .send({
@@ -209,7 +225,8 @@ describe('Roles Test', () => {
 
     it('should fail when the only admin demotes self', async () => {
       const role = 'member';
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .post('/api/upgradeMember')
         .set('Accept', 'application/json')
         .send({
@@ -225,7 +242,8 @@ describe('Roles Test', () => {
     it('should pass when admin demotes self', async () => {
       // set new user as new admin
       const role = 'admin';
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .post('/api/upgradeMember')
         .set('Accept', 'application/json')
         .send({
@@ -238,7 +256,8 @@ describe('Roles Test', () => {
       expect(res.body.result.permission).to.be.equal(role);
 
       const newAdminRole = 'member';
-      const demoteRes = await chai.request(app)
+      const demoteRes = await chai
+        .request(app)
         .post('/api/upgradeMember')
         .set('Accept', 'application/json')
         .send({
@@ -272,7 +291,8 @@ describe('Roles Test', () => {
     });
 
     it('should delete member role', async () => {
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .post('/api/deleteRole')
         .set('Accept', 'application/json')
         .send({
@@ -284,7 +304,8 @@ describe('Roles Test', () => {
     });
 
     it('should fail to delete role without address_id', async () => {
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .post('/api/deleteRole')
         .set('Accept', 'application/json')
         .send({
@@ -296,7 +317,8 @@ describe('Roles Test', () => {
     });
 
     it('should fail to delete role with invalid address_id', async () => {
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .post('/api/deleteRole')
         .set('Accept', 'application/json')
         .send({
@@ -310,7 +332,8 @@ describe('Roles Test', () => {
 
     it('should fail to delete role where there is none in chain community', async () => {
       // ensure does not exist before attempting to delete
-      await chai.request(app)
+      await chai
+        .request(app)
         .post('/api/deleteRole')
         .set('Accept', 'application/json')
         .send({
@@ -318,7 +341,8 @@ describe('Roles Test', () => {
           chain,
           address_id: memberAddressId,
         });
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .post('/api/deleteRole')
         .set('Accept', 'application/json')
         .send({
@@ -333,41 +357,18 @@ describe('Roles Test', () => {
 
   describe('/bulkMembers route test', () => {
     it('should grab bulk members for a public community', async () => {
-      const res = await chai.request.agent(app)
+      const res = await chai.request
+        .agent(app)
         .get('/api/bulkMembers')
         .set('Accept', 'application/json')
         .query({
           community,
-          jwt: jwtToken
+          jwt: jwtToken,
         });
       expect(res.body.status).to.be.equal('Success');
       expect(res.body.result.length).to.be.greaterThan(0);
     });
 
-    it('should fail to grab bulk members if community is not visible to user', async () => {
-      const communityArgs: modelUtils.CommunityArgs = {
-        jwt: jwtToken,
-        isAuthenticatedForum: 'false',
-        privacyEnabled: 'true',
-        invitesEnabled: 'true',
-        id: 'test',
-        name: 'test community',
-        creator_address: loggedInAddr,
-        creator_chain: chain,
-        description: 'test enabled community',
-        default_chain: chain,
-      };
-      const testCommunity = await modelUtils.createCommunity(communityArgs);
-      const communityId = testCommunity.id;
-      const res = await chai.request.agent(app)
-        .get('/api/bulkMembers')
-        .set('Accept', 'application/json')
-        .query({
-          community,
-          jwt: jwtToken
-        });
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.length).to.be.greaterThan(0);
-    });
+    it('should fail to grab bulk members if community is not visible to user');
   });
 });
