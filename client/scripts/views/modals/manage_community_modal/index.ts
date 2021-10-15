@@ -11,24 +11,37 @@ import CommunityMetadataManagementTable from './community_metadata_management_ta
 import ChainMetadataManagementTable from './chain_metadata_management_table';
 import AdminPanelTabs from './admin_panel_tabs';
 
-const ManageCommunityModal: m.Component<{}, {
-  roleData: RoleInfo[];
-  webhooks: Webhook[];
-  loadingFinished: boolean;
-  loadingStarted: boolean;
-}> = {
+const ManageCommunityModal: m.Component<
+  {},
+  {
+    roleData: RoleInfo[];
+    webhooks: Webhook[];
+    loadingFinished: boolean;
+    loadingStarted: boolean;
+  }
+> = {
   view: (vnode) => {
-    const chainOrCommObj = app.chain ? { chain: app.activeChainId() } : { community: app.activeCommunityId() };
+    const chainOrCommObj = app.chain
+      ? { chain: app.activeChainId() }
+      : { community: app.activeCommunityId() };
     const isCommunity = !!app.activeCommunityId();
     const loadRoles = async () => {
       try {
         // TODO: Change to GET /members
-        const bulkMembers = await $.get(`${app.serverUrl()}/bulkMembers`, chainOrCommObj);
-        if (bulkMembers.status !== 'Success') throw new Error('Could not fetch members');
+        const bulkMembers = await $.get(
+          `${app.serverUrl()}/bulkMembers`,
+          chainOrCommObj
+        );
+        if (bulkMembers.status !== 'Success')
+          throw new Error('Could not fetch members');
         // TODO: Change to GET /webhooks
-        const webhooks = await $.get(`${app.serverUrl()}/getWebhooks`,
-          { ...chainOrCommObj, auth: true, jwt: app.user.jwt });
-        if (webhooks.status !== 'Success') throw new Error('Could not fetch community webhooks');
+        const webhooks = await $.get(`${app.serverUrl()}/getWebhooks`, {
+          ...chainOrCommObj,
+          auth: true,
+          jwt: app.user.jwt,
+        });
+        if (webhooks.status !== 'Success')
+          throw new Error('Could not fetch community webhooks');
         vnode.state.webhooks = webhooks.result;
         vnode.state.roleData = bulkMembers.result;
         vnode.state.loadingFinished = true;
@@ -62,27 +75,41 @@ const ManageCommunityModal: m.Component<{}, {
       const predicate = (r) => {
         return r.id === oldRole.id;
       };
-      vnode.state.roleData.splice(vnode.state.roleData.indexOf(oldRole), 1, newRole);
+      vnode.state.roleData.splice(
+        vnode.state.roleData.indexOf(oldRole),
+        1,
+        newRole
+      );
       app.user.addRole(newRole);
       app.user.removeRole(predicate);
-      const { adminsAndMods } = app.community ? app.community.meta : app.chain.meta.chain;
-      if (oldRole.permission === 'admin' || oldRole.permission === 'moderator') {
+      const { adminsAndMods } = app.community
+        ? app.community.meta
+        : app.chain.meta.chain;
+      if (
+        oldRole.permission === 'admin' ||
+        oldRole.permission === 'moderator'
+      ) {
         const idx = adminsAndMods.findIndex(predicate);
         if (idx !== -1) {
           adminsAndMods.splice(idx, 1);
         }
       }
-      if (newRole.permission === 'admin' || newRole.permission === 'moderator') {
-        adminsAndMods.push(new RoleInfo(
-          newRole.id,
-          newRole.Address?.id || newRole.address_id,
-          newRole.Address.address,
-          newRole.Address.chain,
-          newRole.chain_id,
-          newRole.offchain_community_id,
-          newRole.permission,
-          newRole.is_user_default
-        ));
+      if (
+        newRole.permission === 'admin' ||
+        newRole.permission === 'moderator'
+      ) {
+        adminsAndMods.push(
+          new RoleInfo(
+            newRole.id,
+            newRole.Address?.id || newRole.address_id,
+            newRole.Address.address,
+            newRole.Address.chain,
+            newRole.chain_id,
+            newRole.offchain_community_id,
+            newRole.permission,
+            newRole.is_user_default
+          )
+        );
       }
       m.redraw();
     };
@@ -95,26 +122,29 @@ const ManageCommunityModal: m.Component<{}, {
       m('.compact-modal-body-max', [
         m('.panel-left', [
           isCommunity
-            ? vnode.state.loadingFinished
-              && m(CommunityMetadataManagementTable, {
+            ? vnode.state.loadingFinished &&
+              m(CommunityMetadataManagementTable, {
                 admins,
                 community: app.community.meta,
                 mods,
-                onRoleUpdate: (oldRole, newRole) => onRoleUpdate(oldRole, newRole),
+                onRoleUpdate: (oldRole, newRole) =>
+                  onRoleUpdate(oldRole, newRole),
               })
-            : vnode.state.loadingFinished
-              && m(ChainMetadataManagementTable, {
+            : vnode.state.loadingFinished &&
+              m(ChainMetadataManagementTable, {
                 admins,
                 chain: app.config.chains.getById(app.activeChainId()),
                 mods,
-                onRoleUpdate: (oldRole, newRole) => onRoleUpdate(oldRole, newRole),
+                onRoleUpdate: (oldRole, newRole) =>
+                  onRoleUpdate(oldRole, newRole),
               }),
         ]),
         m('.panel-right', [
-          vnode.state.loadingFinished
-            && m(AdminPanelTabs, {
+          vnode.state.loadingFinished &&
+            m(AdminPanelTabs, {
               defaultTab: 1,
-              onRoleUpgrade: (oldRole, newRole) => onRoleUpdate(oldRole, newRole),
+              onRoleUpgrade: (oldRole, newRole) =>
+                onRoleUpdate(oldRole, newRole),
               roleData: vnode.state.roleData,
               webhooks: vnode.state.webhooks,
             }),

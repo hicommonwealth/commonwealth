@@ -17,7 +17,7 @@
 //   if (!req.user) return next(new Error(Errors.NotLoggedIn));
 //
 //   // Privacy check: Cannot join a private community, but we shouldn't reveal the existence of private communities here
-//   if (community && community.privacyEnabled) return next(new Error(Errors.InvalidChain));
+//   if (community && community.privacy_enabled) return next(new Error(Errors.InvalidChain));
 //
 //   const existingMembership = await models.Membership.findOne({ where: chain ? {
 //     user_id: req.user.id,
