@@ -60,7 +60,7 @@ export default class CompoundGovernance extends ProposalModule<
     super(app, (e) => new CompoundProposal(this._Accounts, this._Chain, this, e));
   }
 
-  public async propose(args: CompoundProposalArgs): Promise<void> {
+  public async propose(args: CompoundProposalArgs): Promise<string> {
     const address = this.app.user.activeAccount.address;
     const contract = await attachSigner(this.app.wallets, address, this._api.Contract);
 
@@ -88,12 +88,11 @@ export default class CompoundGovernance extends ProposalModule<
       { gasLimit },
     );
     const txReceipt = await tx.wait();
-    console.log(txReceipt);
     if (txReceipt.status !== 1) {
       throw new Error('Failed to execute proposal');
     }
-    // const id = (txReceipt.events[0]?.args[0] as BigNumber).toHexString();
-    // return id;
+    const id = (txReceipt.events[0]?.args[0] as BigNumber).toHexString();
+    return id;
   }
 
   public async state(proposalId: BigNumberish): Promise<number> {

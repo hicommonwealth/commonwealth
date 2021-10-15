@@ -19,7 +19,7 @@ import { formatCoin } from 'adapters/currency';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
 import CosmosAccount from 'controllers/chain/cosmos/account';
 
-import { notifyError } from 'controllers/app/notifications';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import MolochMember from 'controllers/chain/ethereum/moloch/member';
 import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
@@ -366,8 +366,14 @@ const NewProposalForm = {
           signatures,
         };
         (app.chain as Compound).governance.propose(details)
-          .then((result) => done(result))
-          .then(() => m.redraw())
+          .then((result: string) => {
+            done(result);
+            return result;
+          })
+          .then((result: string) => {
+            notifySuccess(`Proposal ${result} created successfully!`);
+            m.redraw();
+          })
           .catch((err) => notifyError(err.data?.message || err.message));
         return;
       } else if (proposalTypeEnum === ProposalType.AaveProposal) {
