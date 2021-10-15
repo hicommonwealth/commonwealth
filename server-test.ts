@@ -11,9 +11,7 @@ import SessionSequelizeStore from 'connect-session-sequelize';
 import WebSocket from 'ws';
 
 import { SESSION_SECRET } from './server/config';
-console.log("LOADING import setupAPI from './server/router';");
 import setupAPI from './server/router'; // this takes 15 seconds
-console.log("FINISHED import setupAPI from './server/router';");
 import setupPassport from './server/passport';
 import models from './server/database';
 import setupWebsocketServer from './server/socket';
@@ -289,15 +287,11 @@ const resetServer = (debug = false): Promise<void> => {
         ],
       ];
 
-      try {
-        await Promise.all(
-          nodes.map(([url, chain, address]) =>
-            models['ChainNode'].create({ chain, url, address })
-          )
-        );
-      } catch (error) {
-        console.log(error);
-      }
+      await Promise.all(
+        nodes.map(([url, chain, address]) =>
+          models['ChainNode'].create({ chain, url, address })
+        )
+      );
 
       if (debug) console.log('Database reset!');
       resolve();
