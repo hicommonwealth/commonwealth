@@ -46,11 +46,6 @@ jobs:
 
       - name: Install dependencies
         run: yarn
-
-      - name: Run tests
-        run: yarn test-suite
-        env:
-          NO_CLIENT: true
         
       - name: Run API tests
         run: yarn test-api
