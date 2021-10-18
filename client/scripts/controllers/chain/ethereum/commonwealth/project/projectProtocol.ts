@@ -4,17 +4,26 @@ import BN from 'bn.js';
 import {
   ProjectFactory__factory as CMNProjectProtocolContract,
   CWToken__factory,
-  ERC20__factory
+  ERC20__factory,
 } from 'eth/types';
 
-import { CMNProjectStore, CMNMembersStore } from '../../../../stores';
-import { CMNProjectProtocol, CMNProject, CMNMembers } from '../../../../models';
-import EthereumChain from '../chain';
-import { attachSigner } from '../contractApi';
+import { CMNProjectStore, CMNMembersStore } from '../../../../../stores';
+import {
+  CMNProjectProtocol,
+  CMNProject,
+  CMNMembers,
+} from '../../../../../models';
+import EthereumChain from '../../chain';
+import { attachSigner } from '../../contractApi';
 
-import CMNProjectProtocolApi from './project/protocolApi';
-import CMNProjectApi from './project/projectApi';
-import { needSync, ProjectMetaData, getTokenHolders, MAX_VALUE } from './utils';
+import CMNProjectProtocolApi from './protocolApi';
+import CMNProjectApi from './projectApi';
+import {
+  needSync,
+  ProjectMetaData,
+  getTokenHolders,
+  MAX_VALUE,
+} from '../utils';
 
 export default class ProjectProtocol {
   private _syncing: boolean;
@@ -111,28 +120,36 @@ export default class ProjectProtocol {
     await this._syncProtocolStore();
 
     const pStore = this._projectStore.getById('cmn_projects');
-    const selectedIndex = pStore.projects.findIndex((proj) => proj.address === address);
+    const selectedIndex = pStore.projects.findIndex(
+      (proj) => proj.address === address
+    );
     if (selectedIndex < 0) {
       return;
     }
 
     let sProject = pStore.projects[selectedIndex];
     if (needSync(sProject.updated_at)) {
-      const projContractApi: CMNProjectApi = await this._api.getProjectApi(sProject.address, this._chain);
+      const projContractApi: CMNProjectApi = await this._api.getProjectApi(
+        sProject.address,
+        this._chain
+      );
       sProject = await projContractApi.setProjectDetails(sProject);
     }
     const mStore = await this._syncMemberStore(sProject);
     return {
       project: sProject,
       curators: mStore.curators,
-      backers: mStore.backers
+      backers: mStore.backers,
     };
   }
 
   public async getAcceptedTokens(project?: CMNProject) {
     console.log('====>getAcceptedTokens');
     if (project) {
-      const projContractApi: CMNProjectApi = await this._api.getProjectApi(project.address, this._chain);
+      const projContractApi: CMNProjectApi = await this._api.getProjectApi(
+        project.address,
+        this._chain
+      );
       return projContractApi.getAcceptedTokens(); // project's acceptedTokens
     } else {
       const pStore = await this._syncProtocolStore();
@@ -159,12 +176,18 @@ export default class ProjectProtocol {
     }
 
     const allowance = await tokenApi.allowance(from, projectAddrss);
-    const allowanceBN = new BN(allowance.toString()).mul(new BN(10).pow(new BN(tokenDecimals)));
+    const allowanceBN = new BN(allowance.toString()).mul(
+      new BN(10).pow(new BN(tokenDecimals))
+    );
     if (allowanceBN.gt(new BN(0)) && allowanceBN.gte(approveBalance)) {
       return true;
     }
 
-    const tokenContract = await attachSigner(this._chain.app.wallets, from, tokenApi);
+    const tokenContract = await attachSigner(
+      this._chain.app.wallets,
+      from,
+      tokenApi
+    );
     const approvalTx = await tokenContract.approve(
       projectAddrss,
       approveBalance.toString(),
@@ -175,10 +198,15 @@ export default class ProjectProtocol {
   }
 
   public async createProject(params: ProjectMetaData) {
-    const transactionSuccessed = await this._api.createProject(params, this._chain);
+    const transactionSuccessed = await this._api.createProject(
+      params,
+      this._chain
+    );
     return {
       status: transactionSuccessed ? 'success' : 'failed',
-      error: transactionSuccessed ? '' : 'Failed to process createProject transaction'
+      error: transactionSuccessed
+        ? ''
+        : 'Failed to process createProject transaction',
     };
   }
 
@@ -190,19 +218,42 @@ export default class ProjectProtocol {
     tokenAddress: string,
     tokenDecimals: number
   ) {
-    const projContractApi: CMNProjectApi = await this._api.getProjectApi(project.address, this._chain);
-    const approveTokenRes = await this.approveToken(project.address, tokenAddress, from, amount, false, tokenDecimals);
-    if (!approveTokenRes) return { status: 'failed', error: 'Failed to approve this token' };
+    const projContractApi: CMNProjectApi = await this._api.getProjectApi(
+      project.address,
+      this._chain
+    );
+    const approveTokenRes = await this.approveToken(
+      project.address,
+      tokenAddress,
+      from,
+      amount,
+      false,
+      tokenDecimals
+    );
+    if (!approveTokenRes)
+      return { status: 'failed', error: 'Failed to approve this token' };
 
     let transactionSussessed = false;
     if (isBacking) {
-      transactionSussessed = await projContractApi.back(amount, tokenAddress, from, this._chain);
+      transactionSussessed = await projContractApi.back(
+        amount,
+        tokenAddress,
+        from,
+        this._chain
+      );
     } else {
-      transactionSussessed = await projContractApi.curate(amount, tokenAddress, from, this._chain);
+      transactionSussessed = await projContractApi.curate(
+        amount,
+        tokenAddress,
+        from,
+        this._chain
+      );
     }
     return {
       status: transactionSussessed ? 'success' : 'failed',
-      error: transactionSussessed ? '' : `failed to process ${isBacking ? 'back' : 'curate'} transaction`
+      error: transactionSussessed
+        ? ''
+        : `failed to process ${isBacking ? 'back' : 'curate'} transaction`,
     };
   }
 
@@ -215,28 +266,61 @@ export default class ProjectProtocol {
     tokenAddress: string,
     tokenDecimals: number
   ) {
-    const projContractApi: CMNProjectApi = await this._api.getProjectApi(project.address, this._chain);
-    const approveTokenRes = await this.approveToken(project.address, cwTokenAddress, from, amount, true, tokenDecimals);
-    if (!approveTokenRes) return { status: 'failed', error: 'Failed to approve this token' };
+    const projContractApi: CMNProjectApi = await this._api.getProjectApi(
+      project.address,
+      this._chain
+    );
+    const approveTokenRes = await this.approveToken(
+      project.address,
+      cwTokenAddress,
+      from,
+      amount,
+      true,
+      tokenDecimals
+    );
+    if (!approveTokenRes)
+      return { status: 'failed', error: 'Failed to approve this token' };
 
     let transactionSussessed = false;
     if (isBToken) {
-      transactionSussessed = await projContractApi.redeemTokens(amount, tokenAddress, true, from, this._chain);
+      transactionSussessed = await projContractApi.redeemTokens(
+        amount,
+        tokenAddress,
+        true,
+        from,
+        this._chain
+      );
     } else {
-      transactionSussessed = await projContractApi.redeemTokens(amount, tokenAddress, false, from, this._chain);
+      transactionSussessed = await projContractApi.redeemTokens(
+        amount,
+        tokenAddress,
+        false,
+        from,
+        this._chain
+      );
     }
     return {
       status: transactionSussessed ? 'success' : 'failed',
-      error: transactionSussessed ? '' : `failed to process reedeem${isBToken ? 'B' : 'C'}token transaction`
+      error: transactionSussessed
+        ? ''
+        : `failed to process reedeem${isBToken ? 'B' : 'C'}token transaction`,
     };
   }
 
   public async withdraw(project: CMNProject, from: string) {
-    const projContractApi: CMNProjectApi = await this._api.getProjectApi(project.address, this._chain);
-    const transactionSussessed = await projContractApi.withdraw(from, this._chain);
+    const projContractApi: CMNProjectApi = await this._api.getProjectApi(
+      project.address,
+      this._chain
+    );
+    const transactionSussessed = await projContractApi.withdraw(
+      from,
+      this._chain
+    );
     return {
       status: transactionSussessed ? 'success' : 'failed',
-      error: transactionSussessed ? '' : 'failed to process withdraw transaction'
+      error: transactionSussessed
+        ? ''
+        : 'failed to process withdraw transaction',
     };
   }
 }

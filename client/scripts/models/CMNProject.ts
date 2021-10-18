@@ -51,12 +51,7 @@ export class CMNProject {
     this.nominations = nominations;
   }
 
-  public set(
-    acceptedTokens,
-    bTokens,
-    cTokens,
-    lockedWithdraw,
-  ) {
+  public set(acceptedTokens, bTokens, cTokens, lockedWithdraw) {
     this.acceptedTokens = acceptedTokens;
     this.bTokens = bTokens;
     this.cTokens = cTokens;
@@ -83,7 +78,13 @@ export class CMNProjectProtocol {
   }
 
   public static fromJSON({ id, protocolFee, feeTo, projects, acceptedTokens }) {
-    return new CMNProjectProtocol(id, protocolFee, feeTo, projects, acceptedTokens);
+    return new CMNProjectProtocol(
+      id,
+      protocolFee,
+      feeTo,
+      projects,
+      acceptedTokens
+    );
   }
 
   public set(protocolFee, feeTo, projects, acceptedTokens) {

@@ -3,15 +3,17 @@ import { IApp } from 'state';
 // import { ProjectFactory__factory as CMNProjectProtocolContract } from 'eth/types';
 import EthereumChain from '../chain';
 // import CMNProjectProtocolApi from './project/api';
-import CMNProjectProtocol from './projectProtocol';
+import CMNProjectProtocol from './project/projectProtocol';
 
 export default class CMNAdapter {
   public chain: EthereumChain;
   public project_protocol: CMNProjectProtocol;
   public chainId: string;
 
-  private _initialized: boolean = false;
-  public get initialized() { return this._initialized; }
+  private _initialized = false;
+  public get initialized() {
+    return this._initialized;
+  }
 
   public async init(
     chainId: string,

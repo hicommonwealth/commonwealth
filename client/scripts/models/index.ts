@@ -34,6 +34,7 @@ export { default as StarredCommunity } from './StarredCommunity';
 export { default as Webhook } from './Webhook';
 
 export { CMNProject, CMNMembers, CMNProjectProtocol } from './CMNProject';
+export { CMNCollective, CMNCollectiveProtocol } from './CMNCollective';
 
 export { DepositVote, BinaryVote } from './votes';
 

@@ -27,7 +27,9 @@ export default class CMNProjectProtocolApi extends ContractApi<CMNProjectProtoco
   }
 
   private async _syncProjectAddresses(chain: EthereumChain) {
-    this._projectAddresses = (await this.Contract.getAllProjects()).map((addr) => addr.toLowerCase());
+    this._projectAddresses = (await this.Contract.getAllProjects()).map(
+      (addr) => addr.toLowerCase()
+    );
     for (let i = 0; i < this._projectAddresses.length; i++) {
       const proj = this._projectAddresses[i];
       if (!this._projectApis[proj]) {
@@ -47,11 +49,17 @@ export default class CMNProjectProtocolApi extends ContractApi<CMNProjectProtoco
     const ipfsHash = utils.formatBytes32String('0x01');
     const cwUrl = utils.formatBytes32String('commonwealth.im');
     const nominations = [params.creator, params.beneficiary];
-    const endtime = Math.ceil(Math.ceil(Date.now() / 1000) + params.deadline * 24 * 60 * 60); // in days
+    const endtime = Math.ceil(
+      Math.ceil(Date.now() / 1000) + params.deadline * 24 * 60 * 60
+    ); // in days
     const curatorFee = params.curatorFee * 100;
     const threshold = new BN(params.threshold * 100000000);
 
-    const contract = await attachSigner(chain.app.wallets, params.creator, this.Contract);
+    const contract = await attachSigner(
+      chain.app.wallets,
+      params.creator,
+      this.Contract
+    );
     try {
       const tx = await contract.createProject(
         name,
@@ -96,7 +104,7 @@ export default class CMNProjectProtocolApi extends ContractApi<CMNProjectProtoco
       protocolFee,
       feeTo,
       projects,
-      acceptedTokens
+      acceptedTokens,
     };
   }
 

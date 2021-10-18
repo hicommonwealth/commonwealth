@@ -421,16 +421,6 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
       //     m.route.set(`/${app.activeChainId()}/new/snapshot/${app.chain.meta.chain.snapshot}`);
       //   },
       // }),
-      showCommonwealthMenuOptions && m(Button, {
-        fluid: true,
-        rounded: true,
-        label: 'Projects',
-        active: m.route.get().startsWith(`/${app.activeChainId()}/projects`),
-        onclick: (e) => {
-          e.preventDefault();
-          navigateToSubpage('/projects');
-        },
-      }),
       // showCommonwealthMenuOptions && m(Button, {
       //   fluid: true,
       //   rounded: true,
@@ -441,16 +431,26 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
       //     navigateToSubpage(`/backers`);
       //   },
       // }),
-      showCommonwealthMenuOptions && m(Button, {
-        fluid: true,
-        rounded: true,
-        label: 'Collectives',
-        active: m.route.get().startsWith(`/${app.activeChainId()}/collectives`),
-        onclick: (e) => {
-          e.preventDefault();
-          navigateToSubpage('/collectives');
-        },
-      }),
+      // showCommonwealthMenuOptions && m(Button, {
+      //   fluid: true,
+      //   rounded: true,
+      //   label: 'Projects',
+      //   active: m.route.get().startsWith(`/${app.activeChainId()}/projects`),
+      //   onclick: (e) => {
+      //     e.preventDefault();
+      //     navigateToSubpage('/projects');
+      //   },
+      // }),
+      // showCommonwealthMenuOptions && m(Button, {
+      //   fluid: true,
+      //   rounded: true,
+      //   label: 'Collectives',
+      //   active: m.route.get().startsWith(`/${app.activeChainId()}/collectives`),
+      //   onclick: (e) => {
+      //     e.preventDefault();
+      //     navigateToSubpage('/collectives');
+      //   },
+      // }),
     ]);
   }
 };
@@ -613,7 +613,6 @@ const CMNProtocolModule: m.Component<{}> = {
         fluid: true,
         rounded: true,
         label: 'Collectives',
-        disabled: true,
         active: m.route.get().startsWith(collectivesRoute),
         onclick: (e) => {
           e.preventDefault();

@@ -3,23 +3,18 @@ import 'components/commonwealth/project_card.scss';
 import m from 'mithril';
 import { Tag } from 'construct-ui';
 import app from 'state';
-import { CMNProject } from 'models';
+import { CMNCollective } from 'models';
 import BN from 'bn.js';
 
-const ProjectCard: m.Component<{ project: CMNProject }> = {
+const CollectiveCard: m.Component<{ collective: CMNCollective }> = {
   view: (vnode) => {
-    const { project } = vnode.attrs;
-    const bgColor =
-      project.status === 'In Progress'
-        ? 'blue'
-        : project.status === 'Successed'
-        ? 'green'
-        : 'red';
-    const totalFunding = new BN(project.totalFunding.toString())
+    const { collective } = vnode.attrs;
+
+    const totalFunding = new BN(collective.totalFunding.toString())
       .div(new BN(100000000))
       .toNumber();
 
-    const displayText = project.withdrawIsDone
+    const displayText = collective.withdrawIsDone
       ? `Withdraw is done. Total Funding was ${totalFunding} USD`
       : `Total Funding: ${totalFunding} USD`;
 
@@ -30,20 +25,22 @@ const ProjectCard: m.Component<{ project: CMNProject }> = {
           onclick: (e) => {
             e.stopPropagation();
             e.preventDefault();
-            m.route.set(`/${app.activeChainId()}/project/${project.address}`); // avoid resetting scroll point
+            m.route.set(
+              `/${app.activeChainId()}/collective/${collective.address}`
+            );
           },
         },
         [
           m(Tag, {
-            label: ['Project #', project.address.substring(0, 5)],
+            label: ['Project #', collective.address.substring(0, 5)],
             intent: 'primary',
             rounded: true,
             size: 'xs',
-            style: `background: ${bgColor}`,
+            style: `background: green`,
           }),
-          m('.project-title', project.name),
+          m('.project-title', collective.name),
           m('.project-display', displayText),
-          m('.project-description', project.description),
+          m('.project-description', collective.description),
         ]
       ),
 
@@ -60,4 +57,4 @@ const ProjectCard: m.Component<{ project: CMNProject }> = {
   },
 };
 
-export default ProjectCard;
+export default CollectiveCard;

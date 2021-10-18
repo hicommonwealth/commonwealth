@@ -3,8 +3,17 @@ import { Request, Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { DB } from '../database';
 
-const getTokenDetails = async (models: DB, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
+const getTokenDetails = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const [chain, community, error] = await lookupCommunityIsVisibleToUser(
+    models,
+    req.query,
+    req.user
+  );
   if (error) return next(new Error(error));
 
   const tokenAddresses = req.query.tokenAddresses;
@@ -21,8 +30,8 @@ const getTokenDetails = async (models: DB, req: Request, res: Response, next: Ne
   return res.json({
     status: 'Success',
     result: {
-      tokens
-    }
+      tokens,
+    },
   });
 };
 
