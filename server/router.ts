@@ -654,7 +654,5 @@ function setupRouter(
   router.post('/snapshotAPI/sendMessage', sendMessage.bind(this));
 
   app.use('/api', router);
-
-  console.log('END SETUP ROUTER');
 }
 export default setupRouter;

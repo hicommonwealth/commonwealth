@@ -11,7 +11,7 @@ import SessionSequelizeStore from 'connect-session-sequelize';
 import WebSocket from 'ws';
 
 import { SESSION_SECRET } from './server/config';
-import setupAPI from './server/router'; // this takes 15 seconds
+import setupAPI from './server/router'; // performance note: this takes 15 seconds
 import setupPassport from './server/passport';
 import models from './server/database';
 import setupWebsocketServer from './server/socket';

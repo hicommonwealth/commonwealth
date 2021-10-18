@@ -369,8 +369,31 @@ describe('Roles Test', () => {
       expect(res.body.result.length).to.be.greaterThan(0);
     });
 
-    it.skip(
-      'should fail to grab bulk members if community is not visible to user'
-    );
+    it.skip('should fail to grab bulk members if community is not visible to user', async () => {
+      const communityArgs: modelUtils.CommunityArgs = {
+        jwt: jwtToken,
+        isAuthenticatedForum: 'false',
+        privacyEnabled: 'true',
+        invitesEnabled: 'true',
+        id: 'test',
+        name: 'test community',
+        creator_address: loggedInAddr,
+        creator_chain: chain,
+        description: 'test enabled community',
+        default_chain: chain,
+      };
+      const testCommunity = await modelUtils.createCommunity(communityArgs);
+      const communityId = testCommunity.id;
+      const res = await chai.request
+        .agent(app)
+        .get('/api/bulkMembers')
+        .set('Accept', 'application/json')
+        .query({
+          community,
+          jwt: jwtToken,
+        });
+      expect(res.body.status).to.be.equal('Success');
+      expect(res.body.result.length).to.be.greaterThan(0);
+    });
   });
 });

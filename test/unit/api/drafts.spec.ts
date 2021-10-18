@@ -45,7 +45,6 @@ describe('Draft Tests', () => {
 
   describe('/createDraft', () => {
     it('should successfully create a community discussion draft with all requested params', async () => {
-      console.log('checkpoint 4');
       const res = await chai
         .request(app)
         .post('/api/drafts')
