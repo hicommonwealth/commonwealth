@@ -369,6 +369,8 @@ describe('Roles Test', () => {
       expect(res.body.result.length).to.be.greaterThan(0);
     });
 
-    it('should fail to grab bulk members if community is not visible to user');
+    it.skip(
+      'should fail to grab bulk members if community is not visible to user'
+    );
   });
 });

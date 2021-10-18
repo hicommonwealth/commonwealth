@@ -7,9 +7,7 @@ import jwt from 'jsonwebtoken';
 import { Errors as DeleteDraftErrors } from 'server/routes/drafts/deleteDraft';
 import { Errors as CreateDraftErrors } from 'server/routes/drafts/createDraft';
 import { Errors as EditDraftErrors } from 'server/routes/drafts/editDraft';
-console.log("LOADING import app from '../../../server-test");
-import app, { resetDatabase } from '../../../server-test'; // takes 15 seconds
-console.log("FINISHED import app from '../../../server-test");
+import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';
 
@@ -163,8 +161,6 @@ describe('Draft Tests', () => {
       expect(res.body.error).to.equal(CreateDraftErrors.InsufficientData);
     });
   });
-
-  // return;
 
   describe('/editDraft', () => {
     let firstDraft;

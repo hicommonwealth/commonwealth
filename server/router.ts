@@ -142,7 +142,6 @@ function setupRouter(
   identityFetchCache: IdentityFetchCache,
   tokenBalanceCache: TokenBalanceCache
 ) {
-  console.log('Inside setup router');
   const router = express.Router();
 
   router.use((req, res, next) => {

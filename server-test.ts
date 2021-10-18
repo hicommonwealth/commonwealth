@@ -157,8 +157,8 @@ const resetServer = (debug = false): Promise<void> => {
       const yearn = await models['Chain'].create({
         id: 'yearn',
         network: ChainNetwork.ERC20,
-        symbol: 'ALEX',
-        name: 'Alex',
+        symbol: 'YFI',
+        name: 'yearn.finance',
         icon_url: '/static/img/protocols/eth.png',
         active: true,
         type: ChainType.Token,
@@ -168,8 +168,8 @@ const resetServer = (debug = false): Promise<void> => {
       const sushi = await models['Chain'].create({
         id: 'sushi',
         network: ChainNetwork.ERC20,
-        symbol: 'ALEX',
-        name: 'Alex',
+        symbol: 'SUSHI',
+        name: 'Sushi',
         icon_url: '/static/img/protocols/eth.png',
         active: true,
         type: ChainType.Token,
