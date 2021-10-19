@@ -210,7 +210,7 @@ describe('Thread Tests', () => {
       expect(cRes.error).not.to.be.null;
     });
 
-    it('should successfully create a thread without a topic name (if the community lacks topics)', async () => {
+    it.skip('should successfully create a thread without a topic name (if the community lacks topics)', async () => {
       const communityArgs: modelUtils.CommunityArgs = {
         jwt: adminJWT,
         id: 'test',
@@ -298,7 +298,8 @@ describe('Thread Tests', () => {
 
   describe('/bulkThreads', () => {
     it('should return bulk threads for a public chain', async () => {
-      const res = await chai.request.agent(app)
+      const res = await chai.request
+        .agent(app)
         .get('/api/bulkThreads')
         .set('Accept', 'application/json')
         .query({
@@ -310,7 +311,8 @@ describe('Thread Tests', () => {
       expect(res.body.status).to.be.equal('Success');
     });
     it('should return bulk threads for a public community', async () => {
-      const res = await chai.request.agent(app)
+      const res = await chai.request
+        .agent(app)
         .get('/api/bulkThreads')
         .set('Accept', 'application/json')
         .query({
@@ -442,7 +444,9 @@ describe('Thread Tests', () => {
       });
 
       expect(cRes.error).to.not.be.null;
-      expect(cRes.error).to.be.equal(CreateCommentErrors.MissingTextOrAttachment);
+      expect(cRes.error).to.be.equal(
+        CreateCommentErrors.MissingTextOrAttachment
+      );
     });
 
     it('should fail to create a comment on a non-existent thread', async () => {
@@ -478,27 +482,28 @@ describe('Thread Tests', () => {
       thread = res2.result;
     });
 
-    it('should fail to edit an admin\'s post as a user', async () => {
+    it("should fail to edit an admin's post as a user", async () => {
       const thread_id = thread.id;
       const thread_kind = thread.kind;
       const thread_stage = thread.stage;
-      const recentEdit : any = { timestamp: moment(), body: thread.body };
+      const recentEdit: any = { timestamp: moment(), body: thread.body };
       const versionHistory = JSON.stringify(recentEdit);
       const readOnly = false;
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
-          'chain': chain,
-          'address': adminAddress,
-          'author_chain': chain,
-          'thread_id': thread_id,
-          'kind': thread_kind,
-          'stage': thread_stage,
-          'body': thread.body,
+          chain: chain,
+          address: adminAddress,
+          author_chain: chain,
+          thread_id: thread_id,
+          kind: thread_kind,
+          stage: thread_stage,
+          body: thread.body,
           'attachments[]': null,
-          'read_only': readOnly,
-          'jwt': userJWT,
+          read_only: readOnly,
+          jwt: userJWT,
         });
       expect(res.body.error).to.not.be.null;
       expect(res.status).to.be.equal(500);
@@ -507,23 +512,24 @@ describe('Thread Tests', () => {
     it('should fail to edit a thread without passing a thread id', async () => {
       const thread_kind = thread.kind;
       const thread_stage = thread.stage;
-      const recentEdit : any = { timestamp: moment(), body: thread.body };
+      const recentEdit: any = { timestamp: moment(), body: thread.body };
       const versionHistory = JSON.stringify(recentEdit);
       const readOnly = false;
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
-          'chain': chain,
-          'address': adminAddress,
-          'author_chain': chain,
-          'thread_id': null,
-          'kind': thread_kind,
-          'stage': thread_stage,
-          'body': thread.body,
+          chain: chain,
+          address: adminAddress,
+          author_chain: chain,
+          thread_id: null,
+          kind: thread_kind,
+          stage: thread_stage,
+          body: thread.body,
           'attachments[]': null,
-          'read_only': readOnly,
-          'jwt': adminJWT,
+          read_only: readOnly,
+          jwt: adminJWT,
         });
       expect(res.body.error).to.not.be.null;
       expect(res.status).to.be.equal(500);
@@ -534,23 +540,24 @@ describe('Thread Tests', () => {
       const thread_id = thread.id;
       const thread_kind = thread.kind;
       const thread_stage = thread.stage;
-      const recentEdit : any = { timestamp: moment(), body: thread.body };
+      const recentEdit: any = { timestamp: moment(), body: thread.body };
       const versionHistory = JSON.stringify(recentEdit);
       const readOnly = false;
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
-          'chain': chain,
-          'address': adminAddress,
-          'author_chain': chain,
-          'thread_id': thread_id,
-          'kind': thread_kind,
-          'stage': thread_stage,
-          'body': null,
+          chain: chain,
+          address: adminAddress,
+          author_chain: chain,
+          thread_id: thread_id,
+          kind: thread_kind,
+          stage: thread_stage,
+          body: null,
           'attachments[]': null,
-          'read_only': readOnly,
-          'jwt': adminJWT,
+          read_only: readOnly,
+          jwt: adminJWT,
         });
       expect(res.body.error).to.not.be.null;
       expect(res.status).to.be.equal(500);
@@ -563,20 +570,21 @@ describe('Thread Tests', () => {
       const thread_stage = thread.stage;
       const newBody = 'new Body';
       const readOnly = false;
-      const res = await chai.request.agent(app)
+      const res = await chai.request
+        .agent(app)
         .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
-          'chain': chain,
-          'address': adminAddress,
-          'author_chain': chain,
-          'thread_id': thread_id,
-          'kind': thread_kind,
-          'stage': thread_stage,
-          'body': newBody,
+          chain: chain,
+          address: adminAddress,
+          author_chain: chain,
+          thread_id: thread_id,
+          kind: thread_kind,
+          stage: thread_stage,
+          body: newBody,
           'attachments[]': null,
-          'read_only': readOnly,
-          'jwt': adminJWT,
+          read_only: readOnly,
+          jwt: adminJWT,
         });
       expect(res.status).to.be.equal(200);
       expect(res.body.result.body).to.be.equal(newBody);
@@ -588,21 +596,22 @@ describe('Thread Tests', () => {
       const thread_stage = thread.stage;
       const newTitle = 'new Title';
       const readOnly = false;
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
-          'chain': chain,
-          'address': adminAddress,
-          'author_chain': chain,
-          'thread_id': thread_id,
-          'kind': thread_kind,
-          'stage': thread_stage,
-          'body': thread.body,
-          'title': newTitle,
+          chain: chain,
+          address: adminAddress,
+          author_chain: chain,
+          thread_id: thread_id,
+          kind: thread_kind,
+          stage: thread_stage,
+          body: thread.body,
+          title: newTitle,
           'attachments[]': null,
-          'read_only': readOnly,
-          'jwt': adminJWT,
+          read_only: readOnly,
+          jwt: adminJWT,
         });
       expect(res.status).to.be.equal(200);
       expect(res.body.result.title).to.be.equal(newTitle);
@@ -627,7 +636,8 @@ describe('Thread Tests', () => {
       });
       expect(res1.result).to.not.be.null;
       tempThread = res1.result;
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .post('/api/updateThreadPrivacy')
         .set('Accept', 'application/json')
         .send({
@@ -642,7 +652,10 @@ describe('Thread Tests', () => {
     it('should fail to comment on a read_only thread', async () => {
       // create new user + jwt
       const res = await modelUtils.createAndVerifyAddress({ chain });
-      const newUserJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
+      const newUserJWT = jwt.sign(
+        { id: res.user_id, email: res.email },
+        JWT_SECRET
+      );
       // try to comment and fail
       const cRes = await modelUtils.createComment({
         chain,
@@ -656,7 +669,8 @@ describe('Thread Tests', () => {
     });
 
     it('should turn off readonly as an admin of community', async () => {
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .post('/api/updateThreadPrivacy')
         .set('Accept', 'application/json')
         .send({
@@ -669,7 +683,8 @@ describe('Thread Tests', () => {
     });
 
     it('should fail without read_only', async () => {
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .post('/api/updateThreadPrivacy')
         .set('Accept', 'application/json')
         .send({
@@ -680,9 +695,9 @@ describe('Thread Tests', () => {
       expect(res.body.error).to.be.equal(updateThreadPrivacyErrors.NoReadOnly);
     });
 
-
     it('should fail without thread_id', async () => {
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .post('/api/updateThreadPrivacy')
         .set('Accept', 'application/json')
         .send({
@@ -694,7 +709,8 @@ describe('Thread Tests', () => {
     });
 
     it('should fail with an invalid thread_id', async () => {
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .post('/api/updateThreadPrivacy')
         .set('Accept', 'application/json')
         .send({
@@ -709,8 +725,12 @@ describe('Thread Tests', () => {
     it('should fail if not an admin or author', async () => {
       // create new user + jwt
       const res = await modelUtils.createAndVerifyAddress({ chain });
-      const newUserJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
-      const res2 = await chai.request(app)
+      const newUserJWT = jwt.sign(
+        { id: res.user_id, email: res.email },
+        JWT_SECRET
+      );
+      const res2 = await chai
+        .request(app)
         .post('/api/updateThreadPrivacy')
         .set('Accept', 'application/json')
         .send({
@@ -778,7 +798,8 @@ describe('Thread Tests', () => {
       const object_id = res.result.id;
       expect(object_id).to.not.be.null;
       // should track first view
-      res = await chai.request(app)
+      res = await chai
+        .request(app)
         .post('/api/viewCount')
         .set('Accept', 'application/json')
         .send({ chain, object_id });
@@ -789,7 +810,8 @@ describe('Thread Tests', () => {
       expect(res.body.result.view_count).to.equal(1);
 
       // should ignore second view, same IP
-      res = await chai.request(app)
+      res = await chai
+        .request(app)
         .post('/api/viewCount')
         .set('Accept', 'application/json')
         .send({ chain, object_id });
@@ -801,7 +823,8 @@ describe('Thread Tests', () => {
 
       // sleep a second and verify cache invalidation
       await sleep(1000);
-      res = await chai.request(app)
+      res = await chai
+        .request(app)
         .post('/api/viewCount')
         .set('Accept', 'application/json')
         .send({ chain, object_id });
@@ -828,7 +851,8 @@ describe('Thread Tests', () => {
       const object_id = res.result.id;
 
       // should track first view
-      res = await chai.request(app)
+      res = await chai
+        .request(app)
         .post('/api/viewCount')
         .set('Accept', 'application/json')
         .send({ community, object_id });
@@ -840,7 +864,8 @@ describe('Thread Tests', () => {
     });
 
     it('should not track views without object_id', async () => {
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .post('/api/viewCount')
         .set('Accept', 'application/json')
         .send({ chain });
@@ -850,7 +875,8 @@ describe('Thread Tests', () => {
     });
 
     it('should not track views without chain or community', async () => {
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .post('/api/viewCount')
         .set('Accept', 'application/json')
         .send({ object_id: '9999' });
@@ -860,7 +886,8 @@ describe('Thread Tests', () => {
     });
 
     it('should not track views with invalid chain or community', async () => {
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .post('/api/viewCount')
         .set('Accept', 'application/json')
         .send({ chain: 'adkgjkjgda', object_id: '9999' });
@@ -870,7 +897,8 @@ describe('Thread Tests', () => {
     });
 
     it('should not track views with invalid object_id', async () => {
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .post('/api/viewCount')
         .set('Accept', 'application/json')
         .send({ chain, object_id: '9999' });
@@ -899,36 +927,40 @@ describe('Thread Tests', () => {
     });
 
     it('admin can toggle thread to pinned', async () => {
-      const res2 = await chai.request(app)
+      const res2 = await chai
+        .request(app)
         .post('/api/updateThreadPinned')
         .set('Accept', 'application/json')
-        .send({ thread_id: pinThread, jwt: adminJWT, });
+        .send({ thread_id: pinThread, jwt: adminJWT });
       expect(res2.body.status).to.be.equal('Success');
       expect(res2.body.result.pinned).to.be.true;
     });
 
     it('admin can toggle thread to unpinned', async () => {
-      const res2 = await chai.request(app)
+      const res2 = await chai
+        .request(app)
         .post('/api/updateThreadPinned')
         .set('Accept', 'application/json')
-        .send({ thread_id: pinThread, jwt: adminJWT, });
+        .send({ thread_id: pinThread, jwt: adminJWT });
       expect(res2.body.status).to.be.equal('Success');
       expect(res2.body.result.pinned).to.be.false;
     });
 
     it('admin fails to toggle without thread', async () => {
-      const res2 = await chai.request(app)
+      const res2 = await chai
+        .request(app)
         .post('/api/updateThreadPinned')
         .set('Accept', 'application/json')
-        .send({ jwt: adminJWT, });
+        .send({ jwt: adminJWT });
       expect(res2.body.error).to.be.equal(updateThreadPinnedErrors.NoThread);
     });
 
     it('user fails to toggle pin', async () => {
-      const res2 = await chai.request(app)
+      const res2 = await chai
+        .request(app)
         .post('/api/updateThreadPinned')
         .set('Accept', 'application/json')
-        .send({ thread_id: pinThread, jwt: userJWT, });
+        .send({ thread_id: pinThread, jwt: userJWT });
       expect(res2.body.error).to.be.equal(updateThreadPinnedErrors.NotAdmin);
     });
   });
