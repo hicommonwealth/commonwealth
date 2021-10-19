@@ -1,6 +1,10 @@
 /* eslint-disable */
 import { By, WebDriver } from 'selenium-webdriver';
+import { getWindow } from '../util';
 
+/**
+ * Takes a driver instance that has just injected/installed the MetaMask or has already installed
+ */
 export class MetaMask {
 
   // setup/wallet import objects
@@ -18,6 +22,7 @@ export class MetaMask {
   private whatsNew = By.xpath(`//*[@id="popover-content"]/div/div/section/header/div/button`)
 
   // sign txn objects
+  private nextBtn = By.xpath("//button[text()='Next']");
 
   /**
    * Assumes the driver has just opened and injected MetaMask such that MetaMask is on tab 0 and
@@ -27,6 +32,10 @@ export class MetaMask {
   public async setup(driver: WebDriver) {
     let tabs = await driver.getAllWindowHandles() // TODO: make tab selection dynamic i.e. select tab based on some attribute (metamask) instead of index
     await driver.switchTo().window(tabs[0])
+
+    await getWindow(driver, 'MetaMask');
+
+    // import wallet process
     await driver.findElement(this.metaMaskGetStartedBtn).click();
     await driver.findElement(this.importWalletBtn).click();
     await driver.findElement(this.noThanksBtn).click();
@@ -38,15 +47,17 @@ export class MetaMask {
     await driver.findElement(this.allDoneBtn).click();
     await driver.findElement(this.whatsNew).click();
     tabs = await driver.getAllWindowHandles()
-    // this.tabHandles['metamask'] = tabs[0]
-    // this.tabHandles['cw'] = tabs[1]
-    await driver.switchTo().window(tabs[1])
+    await driver.switchTo().window(tabs[1]);
+    // CANNOT CLOSE METAMASK WINDOW HERE AS IT CAUSES ERROR WHEN LOADING COMMONWEALTH.IM AFTER
+    // return handle id of metamask window
+    return await driver.getWindowHandle()
   }
 
   /**
    * Used to approve/sign a transaction initiated elsewhere
    * @param driver A web driver instance with the metamask extension open and ready to sign a txn
    */
-  public async signTxn(driver: WebDriver) {}
-
+  public async signTxn(driver: WebDriver) {
+    await driver.findElement(this.nextBtn).click();
+  }
 }

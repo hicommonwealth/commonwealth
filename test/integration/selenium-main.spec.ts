@@ -5,19 +5,21 @@
 // import { resetDatabase } from '../../server-test';
 import { HomePage } from '../util/seleniumObjects/Pages/home';
 import chai from 'chai';
+import { LoginModal, WalletName } from '../util/seleniumObjects/modals/loginModal';
 const { assert } = chai;
 require('dotenv').config();
 
 describe('Tests the home page', function() {
   let driver;
   let home;
+  let handles;
 
   before('start server and reset db', async function () {
     this.timeout(300000)
     // TODO: start local server and use that for selenium testing
     // create driver and load up extensions
     home = new HomePage()
-    await home.init()
+    handles = await home.init()
   })
 
   after('close driver', async function () {
@@ -34,10 +36,17 @@ describe('Tests the home page', function() {
   it('The homepage should load properly', async () => {
     driver = await home.loadPage();
     assert(await driver.getCurrentUrl() === 'https://commonwealth.im/', 'Home page failed to load');
+    // driver.execute("window.postMessage('clicked_browser_action', '*')");
   })
 
   xit('Should provide correct link to discord', async () => {
     driver = await home.loadDiscord();
     assert(await driver.getCurrentUrl() === 'https://discord.com/invite/frnQxxZG5S', 'Discord link failed');
   })
+
+  it('Should login with metamask', async () => {
+    driver = await home.startLogin()
+    const loginModal = new LoginModal(driver);
+    await loginModal.connectWallet(WalletName.METAMASK)
+  }).timeout(30000)
 })

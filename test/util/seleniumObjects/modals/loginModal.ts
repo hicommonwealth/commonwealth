@@ -1,11 +1,12 @@
 /* eslint-disable */
 import { By, WebDriver } from 'selenium-webdriver';
+import { MetaMask } from '../wallets/metamask';
 
-enum WalletName {
+export enum WalletName {
   COSMOS = 'Cosmos Wallet (Keplr)',
   TERRA = 'Terra Wallet (TerraStation)',
   INJECTIVE = 'Injective MetaMask Wallet',
-  METAMASK = 'Ethereum Wallet (MetaMask)',
+  METAMASK = 'Ethereum Wallet (Metamask)',
   WALLETCONNECT = 'Ethereum Wallet (WalletConnect)',
   NEAR = 'NEAR Wallet',
   POLKADOT = 'polkadot-js',
@@ -22,7 +23,7 @@ export class LoginModal {
   private emailInput = By.name('email');
   private goBtn = By.xpath('/html/body/div/div[2]/div/div/div/div[2]/div/form[1]/div[2]/button/span')
   private githubBtn = By.xpath("//span[text()='Continue with Github']")
-  private walletBtn = By.xpath("//span[text()='Continue with Wallet']")
+  private walletBtn = By.xpath("//span[text()='Continue with wallet']")
 
   // post goBtn click modal objects
   private existingWalletBtn = By.xpath("//span[text()='Yes, I have a wallet']")
@@ -45,7 +46,18 @@ export class LoginModal {
   public async connectWallet(walletName: WalletName): Promise<WebDriver> {
     await this.driver.findElement(this.walletBtn).click();
     await this.driver.findElement(By.xpath(`//div[text()='${walletName}']`)).click();
-    // TODO: finish login flow for specific wallets
+
+    const homePageHandle = await this.driver.getWindowHandle();
+    await sleep(10000);
+    const windows = await this.driver.getAllWindowHandles()
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>WINDOWS:', windows)
+
+    switch (walletName) {
+      case WalletName.METAMASK:
+        const metamask = new MetaMask()
+        await metamask.signTxn(this.driver);
+    }
+
     return this.driver
   }
 
@@ -68,4 +80,8 @@ export class LoginModal {
     return this.driver
   }
 
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }

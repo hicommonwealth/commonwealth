@@ -5,7 +5,7 @@ import * as webdriver from 'selenium-webdriver';
 
 export class HomePage extends BasePage {
   private whyCW = By.linkText('Why Commonwealth?');
-  private loginBtn = By.xpath('//*[@id="landing-page"]/nav/ul/li[2]/a');
+  private loginBtn = By.xpath("//a[text()=' Login ']")
   private tokenInput = By.id('token-input');
   private tokenInputBtn = By.id('/html/body/div/div/section[1]/div/div/div[1]/div/div[1]/button');
   private discordBtn = By.xpath('/html/body/div/div/section[1]/div/div/div[1]/div/div[2]/div/a[1]/img');

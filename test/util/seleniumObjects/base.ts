@@ -19,10 +19,19 @@ export class BasePage {
     this.driver = new webdriver.Builder().forBrowser('chrome').setChromeOptions(chromeOptions).build();
   }
 
-  public async init(): Promise<void> {
+  /**
+   * Sets all asynchronous settings like timeouts and window size. It also loads and sets up all the required chrome
+   * extensions (mostly wallets).
+   * @returns A dictionary containing all the extension window handles
+   */
+  public async init(): Promise<{[key: string]: string}> {
+    const handles = {}
     await this.driver.manage().setTimeouts({implicit: 10000});
+    await this.driver.manage().window().maximize();
+    handles['home'] = await this.driver.getWindowHandle();
     this.metamask = new MetaMask();
-    await this.metamask.setup(this.driver);
+    handles['metamask'] = await this.metamask.setup(this.driver);
+    return handles;
   }
 
   public async go_to_url(url: string): Promise<void> {
