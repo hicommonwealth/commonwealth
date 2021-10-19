@@ -19,11 +19,17 @@ export const Errors = {
   InvalidGithub: 'Github must begin with https://github.com/',
   InvalidCustomDomain: 'Custom domain may not include "commonwealth"',
   InvalidSnapshot: 'Snapshot must fit the naming pattern of *.eth',
-  SnapshotOnlyOnEthereum: 'Snapshot data may only be added to chains with Ethereum base',
+  SnapshotOnlyOnEthereum:
+    'Snapshot data may only be added to chains with Ethereum base',
   InvalidTerms: 'Terms of Service must begin with https://',
 };
 
-const updateChain = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const updateChain = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   if (!req.body.id) return next(new Error(Errors.NoChainId));
   if (req.body.network) return next(new Error(Errors.CantChangeNetwork));
@@ -31,7 +37,9 @@ const updateChain = async (models: DB, req: Request, res: Response, next: NextFu
   const chain = await models.Chain.findOne({ where: { id: req.body.id } });
   if (!chain) return next(new Error(Errors.NoChainFound));
   else {
-    const userAddressIds = (await req.user.getAddresses()).filter((addr) => !!addr.verified).map((addr) => addr.id);
+    const userAddressIds = (await req.user.getAddresses())
+      .filter((addr) => !!addr.verified)
+      .map((addr) => addr.id);
     const userMembership = await models.Role.findOne({
       where: {
         address_id: { [Op.in]: userAddressIds },
@@ -56,9 +64,9 @@ const updateChain = async (models: DB, req: Request, res: Response, next: NextFu
     element,
     telegram,
     github,
-    stagesEnabled,
-    customStages,
-    customDomain,
+    stages_enabled,
+    custom_stages,
+    custom_domain,
     terms,
     snapshot,
   } = req.body;
@@ -73,9 +81,14 @@ const updateChain = async (models: DB, req: Request, res: Response, next: NextFu
     return next(new Error(Errors.InvalidTelegram));
   } else if (github && !github.startsWith('https://github.com/')) {
     return next(new Error(Errors.InvalidGithub));
-  } else if (customDomain && customDomain.includes('commonwealth')) {
+  } else if (custom_domain && custom_domain.includes('commonwealth')) {
     return next(new Error(Errors.InvalidCustomDomain));
-  } else if (snapshot && !(/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/ig).test(snapshot)) {
+  } else if (
+    snapshot &&
+    !/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi.test(
+      snapshot
+    )
+  ) {
     return next(new Error(Errors.InvalidSnapshot));
   } else if (snapshot && chain.base !== ChainBase.Ethereum) {
     return next(new Error(Errors.SnapshotOnlyOnEthereum));
@@ -89,21 +102,22 @@ const updateChain = async (models: DB, req: Request, res: Response, next: NextFu
   if (icon_url) chain.icon_url = icon_url;
   if (active !== undefined) chain.active = active;
   if (type) chain.type = type;
-  chain.website = website;
-  chain.discord = discord;
-  chain.element = element;
-  chain.telegram = telegram;
-  chain.github = github;
-  chain.stagesEnabled = stagesEnabled;
-  chain.customStages = customStages;
-  chain.terms = terms;
-  chain.snapshot = snapshot;
+  if (website) chain.website = website;
+  if (discord) chain.discord = discord;
+  if (element) chain.element = element;
+  if (telegram) chain.telegram = telegram;
+  if (github) chain.github = github;
+  if (stages_enabled) chain.stages_enabled = stages_enabled;
+  if (custom_stages) chain.custom_stages = custom_stages;
+  if (terms) chain.terms = terms;
+  if (snapshot) chain.snapshot = snapshot;
+  if (req.body['featured_topics[]'])
+    chain.featured_topics = req.body['featured_topics[]'];
   // Under our current security policy, custom domains must be set by trusted
   // administrators only. Otherwise an attacker could configure a custom domain and
   // use the code they run to steal login tokens for arbitrary users.
   //
-  // chain.customDomain = customDomain;
-  if (req.body['featured_topics[]']) chain.featured_topics = req.body['featured_topics[]'];
+  // chain.custom_domain = custom_domain;
 
   await chain.save();
 

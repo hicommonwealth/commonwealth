@@ -54,10 +54,6 @@
             }
             .row-subheader {
                 margin-top: 3px;
-                @media (min-width: 800px){
-                    display: flex;
-                    align-items: baseline;
-                }
                 > * {
                     display: inline;
                 }
