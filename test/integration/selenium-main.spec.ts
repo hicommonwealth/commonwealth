@@ -21,7 +21,7 @@ describe('Tests the home page', function() {
   })
 
   after('close driver', async function () {
-    await driver.quit()
+    // await driver.quit()
   })
 
   beforeEach(() => {
@@ -33,10 +33,10 @@ describe('Tests the home page', function() {
 
   it('The homepage should load properly', async () => {
     driver = await home.loadPage();
-    assert(await driver.getCurrentUrl() === 'https://commonwealth.im/', 'Page failed to load');
+    assert(await driver.getCurrentUrl() === 'https://commonwealth.im/', 'Home page failed to load');
   })
 
-  it('Should provide correct link to discord', async () => {
+  xit('Should provide correct link to discord', async () => {
     driver = await home.loadDiscord();
     assert(await driver.getCurrentUrl() === 'https://discord.com/invite/frnQxxZG5S', 'Discord link failed');
   })
