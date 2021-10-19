@@ -60,3 +60,21 @@ export async function closeWindow(driver: WebDriver, windowTitle: string) {
 
   return false;
 }
+
+/**
+ * Debug function used to get the titles of all the open windows
+ * @param driver A WebDriver instance at any stage/page
+ * @returns String[] An array of window titles
+ */
+export async function getWindowTitles(driver: WebDriver) {
+  const windows = await driver.getAllWindowHandles();
+  const titles = [];
+
+  for (const window of windows) {
+    await driver.switchTo().window(window);
+    const title = await driver.getTitle();
+    titles.push(title);
+  }
+
+  return titles;
+}

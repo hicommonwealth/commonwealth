@@ -5,6 +5,7 @@ import * as chrome from 'selenium-webdriver/chrome'
 import * as fs from 'fs';
 import * as path from 'path';
 import { MetaMask } from './wallets/metamask';
+import { getWindowTitles } from './util';
 
 
 export class BasePage {

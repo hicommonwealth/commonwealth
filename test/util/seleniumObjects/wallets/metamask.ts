@@ -1,6 +1,6 @@
 /* eslint-disable */
 import { By, WebDriver } from 'selenium-webdriver';
-import { getWindow } from '../util';
+import { getWindow, getWindowTitles } from '../util';
 
 /**
  * Takes a driver instance that has just injected/installed the MetaMask or has already installed
@@ -21,8 +21,12 @@ export class MetaMask {
   private allDoneBtn = By.xpath("//button[text()='All Done']");
   private whatsNew = By.xpath(`//*[@id="popover-content"]/div/div/section/header/div/button`)
 
-  // sign txn objects
+  // inject wallet objects
   private nextBtn = By.xpath("//button[text()='Next']");
+  private connectBtn = By.xpath("//button[text()='Connect']");
+
+  // sign txn objects
+  private signBtn = By.xpath("//button[text()='Sign']");
 
   /**
    * Assumes the driver has just opened and injected MetaMask such that MetaMask is on tab 0 and
@@ -30,9 +34,6 @@ export class MetaMask {
    * @param driver A web driver instance with tab 0 being a newly injected MetaMask instance
    */
   public async setup(driver: WebDriver) {
-    let tabs = await driver.getAllWindowHandles() // TODO: make tab selection dynamic i.e. select tab based on some attribute (metamask) instead of index
-    await driver.switchTo().window(tabs[0])
-
     await getWindow(driver, 'MetaMask');
 
     // import wallet process
@@ -46,18 +47,26 @@ export class MetaMask {
     await driver.findElement(this.finalImportBtn).click();
     await driver.findElement(this.allDoneBtn).click();
     await driver.findElement(this.whatsNew).click();
-    tabs = await driver.getAllWindowHandles()
-    await driver.switchTo().window(tabs[1]);
+
+    // return to the starting blank window
+    await getWindow(driver, '');
+
     // CANNOT CLOSE METAMASK WINDOW HERE AS IT CAUSES ERROR WHEN LOADING COMMONWEALTH.IM AFTER
+
     // return handle id of metamask window
     return await driver.getWindowHandle()
   }
 
   /**
-   * Used to approve/sign a transaction initiated elsewhere
-   * @param driver A web driver instance with the metamask extension open and ready to sign a txn
+   * Used to approve/inject the wallet instance into the current window
+   * @param driver A web driver instance with the metamask extension open and ready for connect flow
    */
-  public async signTxn(driver: WebDriver) {
+  public async injectWallet(driver: WebDriver) {
     await driver.findElement(this.nextBtn).click();
+    await driver.findElement(this.connectBtn).click();
+  }
+
+  public async signTxn(driver: WebDriver) {
+    await driver.findElement(this.signBtn).click();
   }
 }

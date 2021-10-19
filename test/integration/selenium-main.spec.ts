@@ -6,6 +6,7 @@
 import { HomePage } from '../util/seleniumObjects/Pages/home';
 import chai from 'chai';
 import { LoginModal, WalletName } from '../util/seleniumObjects/modals/loginModal';
+import { getWindowTitles } from '../util/seleniumObjects/util';
 const { assert } = chai;
 require('dotenv').config();
 

@@ -1,6 +1,7 @@
 /* eslint-disable */
 import { By, WebDriver } from 'selenium-webdriver';
 import { MetaMask } from '../wallets/metamask';
+import { getWindow, getWindowTitles } from '../util';
 
 export enum WalletName {
   COSMOS = 'Cosmos Wallet (Keplr)',
@@ -25,9 +26,12 @@ export class LoginModal {
   private githubBtn = By.xpath("//span[text()='Continue with Github']")
   private walletBtn = By.xpath("//span[text()='Continue with wallet']")
 
-  // post goBtn click modal objects
+  // post goBtn click modal objects - email login
   private existingWalletBtn = By.xpath("//span[text()='Yes, I have a wallet']")
   private noWalletBtn = By.xpath("//span[text()='No, generate an address for me']")
+
+  // account/address list - wallet login
+  private accountItems = By.xpath("//div[@class='account-item-name']");
 
 
   constructor(driver: WebDriver) {
@@ -47,14 +51,20 @@ export class LoginModal {
     await this.driver.findElement(this.walletBtn).click();
     await this.driver.findElement(By.xpath(`//div[text()='${walletName}']`)).click();
 
-    const homePageHandle = await this.driver.getWindowHandle();
+    // gives time for the extension notification prompt to open
     await sleep(10000);
-    const windows = await this.driver.getAllWindowHandles()
-    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>WINDOWS:', windows)
 
     switch (walletName) {
       case WalletName.METAMASK:
+        await getWindow(this.driver, 'MetaMask Notification');
+
         const metamask = new MetaMask()
+        await metamask.injectWallet(this.driver);
+        await getWindow(this.driver, 'Commonwealth');
+        const accounts = await this.driver.findElements(this.accountItems);
+        await accounts[0].click();
+        await sleep(5000); // TODO: figure out non-blocking sleeps
+        await getWindow(this.driver, 'MetaMask Notification');
         await metamask.signTxn(this.driver);
     }
 
