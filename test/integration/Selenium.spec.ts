@@ -26,7 +26,7 @@ describe('Commonwealth.im Chrome Selenium Tests', function() {
     })
 
 
-    it('Should login with metamask', async () => {
+    xit('Should login with metamask', async () => {
       // creates driver with MetaMask
       handles = await home.initWithMetaMask();
 
@@ -52,7 +52,7 @@ describe('Commonwealth.im Chrome Selenium Tests', function() {
       assert(accountName === 'Tim', 'Account loaded from MetaMask is incorrect');
     }).timeout(60000)
 
-    xit('Should login with TerraStation', async () => {
+    it('Should login with TerraStation', async () => {
       // terra station does not open window upon installation so only import wallet AFTER clicking Login on commonwealth.im
       handles = await home.initWithTerraStation();
       driver = await home.loadPage();
@@ -64,7 +64,7 @@ describe('Commonwealth.im Chrome Selenium Tests', function() {
 
       // import wallet once popup opens
       handles['terraStation'] = await home.terraStation.setup(driver);
-    })
+    }).timeout(60000)
   })
   describe('Chain Loading Tests', function() {})
 })

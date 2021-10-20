@@ -57,11 +57,12 @@ export class LoginModal {
     await this.driver.findElement(this.walletBtn).click();
     await this.driver.findElement(By.xpath(`//div[text()='${walletName}']`)).click();
 
+    let accounts;
     switch (walletName) {
       case WalletName.METAMASK:
         await wallet.injectWallet(this.driver);
         await getWindow(this.driver, 'Commonwealth');
-        const accounts = await this.driver.findElements(this.accountItems);
+        accounts = await this.driver.findElements(this.accountItems);
         await accounts[0].click();
 
 
@@ -70,6 +71,9 @@ export class LoginModal {
 
       case WalletName.TERRASTATION:
         await wallet.setup(this.driver);
+        await wallet.injectWallet(this.driver);
+        accounts = await this.driver.findElements(this.accountItems);
+        await accounts[0].click();
     }
 
     return this.driver
