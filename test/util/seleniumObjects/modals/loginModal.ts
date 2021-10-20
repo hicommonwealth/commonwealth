@@ -2,10 +2,12 @@
 import { By, WebDriver } from 'selenium-webdriver';
 import { MetaMask } from '../wallets/metamask';
 import { getWindow, getWindowTitles } from '../util';
+import { HomePage } from '../Pages/home';
+import { WalletInterface } from '../wallets/walletInterface';
 
 export enum WalletName {
   COSMOS = 'Cosmos Wallet (Keplr)',
-  TERRA = 'Terra Wallet (TerraStation)',
+  TERRASTATION = 'Terra Wallet (TerraStation)',
   INJECTIVE = 'Injective MetaMask Wallet',
   METAMASK = 'Ethereum Wallet (Metamask)',
   WALLETCONNECT = 'Ethereum Wallet (WalletConnect)',
@@ -44,10 +46,14 @@ export class LoginModal {
   }
 
   /**
-   * Connects the wallet specified (signs the transaction)
+   * Connects the wallet specified. Depending on the wallet this may mean injecting the wallet and then signing a
+   * transaction or importing a wallet via private key and then injecting and signing. Metamask wallet import is done
+   * at installation time in the chrome-base BasePage init setup whereas TerraStation wallet import is done right before
+   * injecting the wallet.
    * @param walletName The name of the wallet to connect (needs to match exactly with the one in the login dropdown)
+   * @param wallet An instance of a wallet controller
    */
-  public async connectWallet(walletName: WalletName): Promise<WebDriver> {
+  public async connectWallet(walletName: WalletName, wallet: WalletInterface): Promise<WebDriver> {
     await this.driver.findElement(this.walletBtn).click();
     await this.driver.findElement(By.xpath(`//div[text()='${walletName}']`)).click();
 
@@ -61,8 +67,7 @@ export class LoginModal {
 
         await getWindow(this.driver, 'MetaMask Notification');
 
-        const metamask = new MetaMask()
-        await metamask.injectWallet(this.driver);
+        await wallet.injectWallet(this.driver);
         await getWindow(this.driver, 'Commonwealth');
         const accounts = await this.driver.findElements(this.accountItems);
         await accounts[0].click();
@@ -74,7 +79,19 @@ export class LoginModal {
         }, 10000)
 
         await getWindow(this.driver, 'MetaMask Notification');
-        await metamask.signTxn(this.driver);
+        await wallet.signTxn(this.driver);
+        break;
+
+      case WalletName.TERRASTATION:
+        // explicit wait until the signing metamask window opens
+        await this.driver.wait(async () => {
+          const titles = await getWindowTitles(this.driver);
+          return titles.includes('Terra Station');
+        }, 10000)
+
+        await getWindow(this.driver, 'Terra Station');
+
+        await wallet.setup(this.driver);
     }
 
     return this.driver

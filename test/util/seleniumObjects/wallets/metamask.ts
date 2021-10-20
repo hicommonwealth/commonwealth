@@ -1,11 +1,12 @@
 /* eslint-disable */
 import { By, WebDriver } from 'selenium-webdriver';
-import { getWindow, getWindowTitles } from '../util';
+import { getWindow } from '../util';
+import { WalletInterface } from './walletInterface';
 
 /**
  * Takes a driver instance that has just injected/installed the MetaMask or has already installed
  */
-export class MetaMask {
+export class MetaMask implements WalletInterface {
 
   // setup/wallet import objects
   private metaMaskGetStartedBtn = By.xpath('//*[@id="app-content"]/div/div[2]/div/div/div/button')
@@ -29,9 +30,8 @@ export class MetaMask {
   private signBtn = By.xpath("//button[text()='Sign']");
 
   /**
-   * Assumes the driver has just opened and injected MetaMask such that MetaMask is on tab 0 and
-   * tab 1 is commonwealth.im
-   * @param driver A web driver instance with tab 0 being a newly injected MetaMask instance
+   * Takes a driver instance with the MetaMask setup window and imports a wallet
+   * @param driver A web driver instance with the MetaMask setup window open (not necessarily active/selected)
    */
   public async setup(driver: WebDriver) {
     await getWindow(driver, 'MetaMask');
@@ -66,6 +66,10 @@ export class MetaMask {
     await driver.findElement(this.connectBtn).click();
   }
 
+  /**
+   * Used to sign any prompted transaction
+   * @param driver A driver instance that has a Metamask signing popup open AND ACTIVE
+   */
   public async signTxn(driver: WebDriver) {
     await driver.findElement(this.signBtn).click();
   }
