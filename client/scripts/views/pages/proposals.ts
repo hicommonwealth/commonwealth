@@ -86,11 +86,11 @@ const CompoundProposalStats: m.Component<{}, {}> = {
           ]),
         ]),
         m('', [
-          // TODO: We shouldn't be hardcoding these figures
+          // TODO: We shouldn't be hardcoding these decimal amounts
           m('.stats-box-stat', [
             `Quorum: ${app.chain.governance?.quorumVotes.div(new BN('1000000000000000000')).toString()} ${symbol}`
           ]),
-          m('.stats-box-stat', [
+          app.chain.governance?.proposalThreshold && m('.stats-box-stat', [
             `Proposal Threshold: ${app.chain.governance?.proposalThreshold.div(new BN('1000000000000000000')).toString()} ${symbol}`
           ]),
           m('.stats-box-stat', [

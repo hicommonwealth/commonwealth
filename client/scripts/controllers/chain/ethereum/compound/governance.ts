@@ -4,8 +4,9 @@ import { ICompoundProposalResponse } from 'adapters/chain/compound/types';
 import { CompoundEvents, CompoundTypes } from '@commonwealth/chain-events';
 import { IApp } from 'state';
 import { chainToEventNetwork, EntityRefreshOption } from 'controllers/server/chain_entities';
-import { BigNumber, BigNumberish } from 'ethers';
-import CompoundAPI from './api';
+import { BigNumber, BigNumberish, ContractTransaction } from 'ethers';
+import { GovernorCompatibilityBravo } from 'eth/types';
+import CompoundAPI, { GovernorType } from './api';
 import CompoundProposal from './proposal';
 import CompoundChain from './chain';
 import { attachSigner } from '../contractApi';
@@ -14,7 +15,7 @@ import EthereumAccounts from '../accounts';
 export interface CompoundProposalArgs {
   targets: string[],
   values: string[],
-  signatures: string[],
+  signatures?: string[],
   calldatas: string[],
   description: string,
 }
@@ -43,17 +44,11 @@ export default class CompoundGovernance extends ProposalModule<
   public get api() { return this._api; }
   public get usingServerChainEntities() { return this._usingServerChainEntities; }
 
-  public get supportsAbstain(): boolean {
-    if (!this.api) return null;
-    // Bravo supports abstain
-    // TODO: check `COUNTING_MODE` in OZGov
-    return !this.api.isGovAlpha(this.api.Contract);
-  }
-
-  public get supportsDelegationAmount(): boolean {
-    if (!this.api?.Token) return null;
-    return !!this.api.isTokenMPond(this.api.Token);
-  }
+  // capacities based on governor type
+  private _supportsAbstain: boolean;
+  public get supportsAbstain() { return this._supportsAbstain; }
+  private _useAbstainInQuorum: boolean;
+  public get useAbstainInQuorum() { return this._useAbstainInQuorum; }
 
   // INIT / DEINIT
   constructor(app: IApp, private _usingServerChainEntities = false) {
@@ -65,23 +60,38 @@ export default class CompoundGovernance extends ProposalModule<
     const contract = await attachSigner(this.app.wallets, address, this._api.Contract);
 
     const { targets, values, signatures, calldatas, description } = args;
-    if (!targets || !values || !signatures || !calldatas || !description)
-      throw new Error('must provide targets, values, signatures, calldatas, description');
+    if (!targets || !values || !calldatas || !description)
+      throw new Error('must provide targets, values, calldatas, description');
     if (parseInt(address, 16) === 0) {
       throw new Error('applicant cannot be 0');
     }
 
-    const gasLimit = await contract.estimateGas['propose(address[],uint256[],string[],bytes[],string)'](
-      targets,
-      values,
-      signatures,
-      calldatas,
-      description,
-    );
-    const tx = await contract['propose(address[],uint256[],string[],bytes[],string)'](
-      targets, values, signatures, calldatas, description,
-      { gasLimit },
-    );
+    let tx: ContractTransaction;
+    if (this.api.govType === GovernorType.Oz) {
+      // omit signatures in Oz
+      const gasLimit = await contract.estimateGas['propose(address[],uint256[],bytes[],string)'](
+        targets,
+        values,
+        calldatas,
+        description,
+      );
+      tx = await contract['propose(address[],uint256[],bytes[],string)'](
+        targets, values, calldatas, description,
+        { gasLimit },
+      );
+    } else {
+      const gasLimit = await contract.estimateGas['propose(address[],uint256[],string[],bytes[],string)'](
+        targets,
+        values,
+        signatures,
+        calldatas,
+        description,
+      );
+      tx = await contract['propose(address[],uint256[],string[],bytes[],string)'](
+        targets, values, signatures, calldatas, description,
+        { gasLimit },
+      );
+    }
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
       throw new Error('Failed to execute proposal');
@@ -103,10 +113,32 @@ export default class CompoundGovernance extends ProposalModule<
     this._Chain = chain;
     this._Accounts = Accounts;
 
-    this._quorumVotes = new BN((await this._api.Contract.quorumVotes()).toString());
-    this._proposalThreshold = new BN((await this._api.Contract.proposalThreshold()).toString());
     this._votingDelay = new BN((await this._api.Contract.votingDelay()).toString());
     this._votingPeriod = new BN((await this._api.Contract.votingPeriod()).toString());
+
+    // determine capacities and init type-specific parameters
+    if (this.api.isGovAlpha(this.api.Contract)) {
+      this._supportsAbstain = false;
+      this._useAbstainInQuorum = false;
+      this._quorumVotes = new BN((await this._api.Contract.quorumVotes()).toString());
+      this._proposalThreshold = new BN((await this._api.Contract.proposalThreshold()).toString());
+    } else if (this.api.govType === GovernorType.Bravo) {
+      this._supportsAbstain = true;
+      this._useAbstainInQuorum = false;
+      this._quorumVotes = new BN((await this._api.Contract.quorumVotes()).toString());
+      this._proposalThreshold = new BN((await this._api.Contract.proposalThreshold()).toString());
+    } else {
+      // OZ we need to query and parse counting mode
+      const countingMode = await (this.api.Contract as GovernorCompatibilityBravo).COUNTING_MODE();
+      const params = new URLSearchParams(countingMode);
+      this._supportsAbstain = params.get('support') === 'bravo';
+      this._useAbstainInQuorum = params.get('quorum') !== 'bravo';
+      const blockNumber = this.app.chain.block.height;
+      this._quorumVotes = new BN(
+        (await (this.api.Contract as GovernorCompatibilityBravo).quorum(blockNumber)
+      ).toString());
+    }
+
 
     // load server proposals
     console.log('Fetching compound proposals from backend.');

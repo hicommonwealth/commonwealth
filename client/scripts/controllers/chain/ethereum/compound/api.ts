@@ -13,6 +13,18 @@ import { utils } from 'ethers';
 
 import ContractApi from 'controllers/chain/ethereum/contractApi';
 
+export enum GovernorType {
+  Alpha,
+  Bravo,
+  Oz,
+}
+
+export enum GovernorTokenType {
+  MPondToken,
+  Comp,
+  OzVotes
+}
+
 export default class CompoundAPI implements ContractApi<GovernorAlpha | GovernorCompatibilityBravo> {
   public readonly gasLimit: number = 3000000;
 
@@ -21,16 +33,18 @@ export default class CompoundAPI implements ContractApi<GovernorAlpha | Governor
   public get Contract() { return this._Contract; }
   public readonly Provider: Web3Provider;
 
+  private _tokenType: GovernorTokenType;
+  public get tokenType() { return this._tokenType; }
   private _Token: MPond | ERC20VotesComp | undefined;
   public get Token() { return this._Token; }
 
-  private _isAlpha: boolean;
-  private _isTokenMPond: boolean;
+  private _govType: GovernorType;
+  public get govType() { return this._govType; }
   public isGovAlpha(c: GovernorAlpha | GovernorCompatibilityBravo): c is GovernorAlpha {
-    return this._isAlpha;
+    return this._govType === GovernorType.Alpha;
   }
   public isTokenMPond(t: MPond | ERC20VotesComp | undefined): t is MPond {
-    return this._isTokenMPond;
+    return this._tokenType === GovernorTokenType.MPondToken;
   }
 
   constructor(
@@ -49,14 +63,21 @@ export default class CompoundAPI implements ContractApi<GovernorAlpha | Governor
     try {
       this._Contract = GovernorAlpha__factory.connect(this.contractAddress, this.Provider);
       await this.Contract.guardian();
-      this._isAlpha = true;
+      this._govType = GovernorType.Alpha;
       console.log(`Found GovAlpha contract at ${this.Contract.address}`);
     } catch (e) {
-      this._isAlpha = false;
-      console.log(`Found non-GovAlpha Compound contract at ${this.Contract.address}, using GovernorCompatibilityBravo`);
-      this._Contract = GovernorCompatibilityBravo__factory.connect(this.contractAddress, this.Provider);
+      // either Bravo or Oz
     }
-    // TODO: use `quorumVotes` to distinguish between raw IGovernor and BravoCompat, for later support
+    try {
+      this._Contract = GovernorCompatibilityBravo__factory.connect(this.contractAddress, this.Provider);
+      await this.Contract.quorumVotes();
+      console.log(`Found Bravo contract at ${this.Contract.address}, using GovernorCompatibilityBravo`);
+      this._govType = GovernorType.Bravo;
+    } catch (e) {
+      // falling back to Oz
+      console.log(`Falling back to OpenZeppelin governor contract at ${this.Contract.address}`);
+      this._govType = GovernorType.Oz;
+    }
 
     // fetch token and derive token type
     // i.e. "uni" or "MPond" -- should refer to a call
@@ -99,12 +120,19 @@ export default class CompoundAPI implements ContractApi<GovernorAlpha | Governor
       this._Token = MPond__factory.connect(tokenAddress, this.Contract.signer || this.Contract.provider);
       try {
         await this._Token.admin();
-        this._isTokenMPond = true;
+        this._tokenType = GovernorTokenType.MPondToken;
         console.log(`Found MPond-like Comp token at ${tokenAddress}`);
       } catch (e) {
-        this._isTokenMPond = false;
-        console.log(`Found non-MPond Comp token at ${tokenAddress}, using ERC20VotesComp`);
+        // Either Comp or OZ Votes
+      }
+      try {
         this._Token = ERC20VotesComp__factory.connect(tokenAddress, this.Contract.signer || this.Contract.provider);
+        await this._Token.getCurrentVotes(tokenAddress);
+        this._tokenType = GovernorTokenType.Comp;
+        console.log(`Found Comp-type token at ${tokenAddress}, using ERC20VotesComp`);
+      } catch (e) {
+        this._tokenType = GovernorTokenType.OzVotes;
+        console.log(`Falling back to OpenZeppelin ERC20Votes for token at ${tokenAddress}`);
       }
     } else {
       console.warn('No token contract found! Continuing...');
