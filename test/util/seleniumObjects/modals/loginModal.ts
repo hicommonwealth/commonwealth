@@ -51,11 +51,14 @@ export class LoginModal {
     await this.driver.findElement(this.walletBtn).click();
     await this.driver.findElement(By.xpath(`//div[text()='${walletName}']`)).click();
 
-    // gives time for the extension notification prompt to open
-    await sleep(10000);
-
     switch (walletName) {
       case WalletName.METAMASK:
+        // explicit wait until the signing metamask window opens
+        await this.driver.wait(async () => {
+          const titles = await getWindowTitles(this.driver);
+          return titles.includes('MetaMask Notification');
+        }, 10000)
+
         await getWindow(this.driver, 'MetaMask Notification');
 
         const metamask = new MetaMask()
@@ -63,7 +66,13 @@ export class LoginModal {
         await getWindow(this.driver, 'Commonwealth');
         const accounts = await this.driver.findElements(this.accountItems);
         await accounts[0].click();
-        await sleep(5000); // TODO: figure out non-blocking sleeps
+
+        // explicit wait until the signing metamask window opens
+        await this.driver.wait(async () => {
+          const titles = await getWindowTitles(this.driver);
+          return titles.includes('MetaMask Notification');
+        }, 10000)
+
         await getWindow(this.driver, 'MetaMask Notification');
         await metamask.signTxn(this.driver);
     }

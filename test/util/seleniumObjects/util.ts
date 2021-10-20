@@ -7,7 +7,10 @@ import { WebDriver } from 'selenium-webdriver';
  * @param windowTitle The title of the window to switch to.
  * @returns Boolean True if the window with title windowTitle is switched to and false if the window is not found
  */
-export async function getWindow(driver: WebDriver, windowTitle: string) {
+export async function getWindow(
+  driver: WebDriver,
+  windowTitle: string
+): Promise<boolean> {
   const windows = await driver.getAllWindowHandles();
   const currentWindow = await driver.getWindowHandle();
 
@@ -33,7 +36,10 @@ export async function getWindow(driver: WebDriver, windowTitle: string) {
  * @param windowTitle The title of the window to close.
  * @returns Boolean True if the window was closed successfully and false otherwise.
  */
-export async function closeWindow(driver: WebDriver, windowTitle: string) {
+export async function closeWindow(
+  driver: WebDriver,
+  windowTitle: string
+): Promise<boolean> {
   const windows = await driver.getAllWindowHandles();
   const currentWindow = await driver.getWindowHandle();
   const currentTitle = await driver.getTitle();
@@ -66,7 +72,7 @@ export async function closeWindow(driver: WebDriver, windowTitle: string) {
  * @param driver A WebDriver instance at any stage/page
  * @returns String[] An array of window titles
  */
-export async function getWindowTitles(driver: WebDriver) {
+export async function getWindowTitles(driver: WebDriver): Promise<string[]> {
   const windows = await driver.getAllWindowHandles();
   const titles = [];
 
