@@ -1,16 +1,41 @@
-import { WebDriver } from 'selenium-webdriver';
+/* eslint-disable */
+import { By, WebDriver } from 'selenium-webdriver';
 import { WalletInterface } from './walletInterface';
+import { getWindow, getWindowTitles, waitForWindow } from '../util';
 
 export class TerraStation implements WalletInterface {
-  setup(driver: WebDriver): Promise<string> {
+
+  // setup/import wallet objects
+  private importPrivKeyBtn = By.xpath("//h1[text()='Import private key'");
+  private privKeyInput = By.id('key');
+  private passwordInput = By.id('password');
+
+  // inject wallet objects
+  private AllowBtn = By.xpath("//button[text()='Allow']");
+
+  async setup(driver: WebDriver): Promise<string> {
+    await waitForWindow(driver, 'Terra Station');
+    await getWindow(driver, 'Terra Station');
+
+    await driver.findElement(this.importPrivKeyBtn).click();
+    await driver.findElement(this.privKeyInput).sendKeys(process.env.TERRA_STATION_PRIV_KEY);
+    await driver.findElement(this.passwordInput).sendKeys(process.env.TERRA_STATION_PASSWORD);
+
     return Promise.resolve('');
   }
 
-  injectWallet(driver: WebDriver): Promise<void> {
+  async injectWallet(driver: WebDriver): Promise<void> {
+    await waitForWindow(driver, 'Terra Station');
+    await getWindow(driver, 'Terra Station');
+
+    await driver.findElement(this.AllowBtn).click();
     return Promise.resolve(undefined);
   }
 
-  signTxn(driver: WebDriver): Promise<void> {
+  async signTxn(driver: WebDriver): Promise<void> {
+    await waitForWindow(driver, 'Terra Station');
+    await getWindow(driver, 'Terra Station');
+
     return Promise.resolve(undefined);
   }
 }

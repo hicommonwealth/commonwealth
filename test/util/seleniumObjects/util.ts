@@ -84,3 +84,20 @@ export async function getWindowTitles(driver: WebDriver): Promise<string[]> {
 
   return titles;
 }
+
+/**
+ * Function can be used to implicitly wait for a specific window to open. If the window does not open within 10 seconds
+ * the function throws an error
+ * @param driver A WebDriver instance in any state
+ * @param windowTitle The title of the window to wait for
+ */
+export async function waitForWindow(
+  driver: WebDriver,
+  windowTitle: string
+): Promise<void> {
+  // explicit wait until the signing metamask window opens
+  await driver.wait(async () => {
+    const titles = await getWindowTitles(driver);
+    return titles.includes(windowTitle);
+  }, 10000);
+}

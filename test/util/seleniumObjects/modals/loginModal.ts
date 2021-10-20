@@ -59,38 +59,16 @@ export class LoginModal {
 
     switch (walletName) {
       case WalletName.METAMASK:
-        // explicit wait until the signing metamask window opens
-        await this.driver.wait(async () => {
-          const titles = await getWindowTitles(this.driver);
-          return titles.includes('MetaMask Notification');
-        }, 10000)
-
-        await getWindow(this.driver, 'MetaMask Notification');
-
         await wallet.injectWallet(this.driver);
         await getWindow(this.driver, 'Commonwealth');
         const accounts = await this.driver.findElements(this.accountItems);
         await accounts[0].click();
 
-        // explicit wait until the signing metamask window opens
-        await this.driver.wait(async () => {
-          const titles = await getWindowTitles(this.driver);
-          return titles.includes('MetaMask Notification');
-        }, 10000)
 
-        await getWindow(this.driver, 'MetaMask Notification');
         await wallet.signTxn(this.driver);
         break;
 
       case WalletName.TERRASTATION:
-        // explicit wait until the signing metamask window opens
-        await this.driver.wait(async () => {
-          const titles = await getWindowTitles(this.driver);
-          return titles.includes('Terra Station');
-        }, 10000)
-
-        await getWindow(this.driver, 'Terra Station');
-
         await wallet.setup(this.driver);
     }
 
