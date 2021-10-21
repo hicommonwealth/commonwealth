@@ -22,7 +22,7 @@ const updateLinkedThreads = async (
     req.user
   );
   if (error) return next(new Error(error));
-  const { linked_thread_id, linking_thread_id } = req.body;
+  const { linked_thread_id, linking_thread_id, remove_link } = req.body;
   if (!linked_thread_id) {
     return next(new Error(Errors.MustHaveLinkedThreadId));
   }
@@ -49,12 +49,22 @@ const updateLinkedThreads = async (
       }
     }
 
-    // TODO: findOrCreate, add unique constraint to linked & linking
-    // thread cols in LT table
-    await models.LinkedThread.create({
-      linked_thread: linked_thread_id,
-      linking_thread: linking_thread_id,
-    });
+    if (remove_link === 'true') {
+      await models.LinkedThread.destroy({
+        where: {
+          linked_thread: linked_thread_id,
+          linking_thread: linking_thread_id,
+        }
+      })
+    } else {
+      await models.LinkedThread.findOrCreate({
+        where: {
+          linked_thread: linked_thread_id,
+          linking_thread: linking_thread_id,
+        }
+      });
+    }
+
     const linkedThreads = await models.LinkedThread.findAll({
       where: { linking_thread: linking_thread_id },
     })

@@ -561,6 +561,30 @@ class ThreadsController {
     });
   }
 
+  public async removeLinkedThread(
+    linked_thread_id: number,
+    linking_thread: OffchainThread,
+  ): Promise<OffchainThread[]> {
+    const response = await $.post(`${app.serverUrl()}/updateLinkedThreads`, {
+      chain: app.activeChainId(),
+      community: app.activeCommunityId(),
+      linked_thread_id,
+      linking_thread_id: linking_thread.id,
+      address: app.user.activeAccount.address,
+      author_chain: app.user.activeAccount.chain,
+      remove_link: true,
+      jwt: app.user.jwt,
+    });
+    if (response.status !== 'Success') {
+      throw new Error();
+    }
+    console.log(response.result);
+    return response.result.map((rawThread: OffchainThreadInstance) => {
+      const modeledThread = modelFromServer(rawThread);
+      return modeledThread;
+    });
+  }
+
   public async fetchThreadIdForSnapshot(args: { snapshot: string }) {
     const response = await $.ajax({
       url: `${app.serverUrl()}/fetchThreadForSnapshot`,
