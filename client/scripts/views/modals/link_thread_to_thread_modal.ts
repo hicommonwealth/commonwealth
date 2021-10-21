@@ -62,7 +62,6 @@ const LinkThreadToThreadModal: m.Component<
                   params
                 ).then((result) => {
                   vnode.state.searchResults = result;
-                  console.log(vnode.state.searchResults);
                   m.redraw();
                 }).catch((err) => {
                   notifyError('Could not find matching thread');
@@ -74,7 +73,6 @@ const LinkThreadToThreadModal: m.Component<
         vnode.state.searchResults?.length > 0 &&
           vnode.state.searchResults.map((thread: OffchainThreadInstance) => {
             const processedThread = modelFromServer(thread);
-            console.log({ processedThread });
             return m(DiscussionRow, {
               proposal: processedThread,
               onSelect: () => {
@@ -82,6 +80,7 @@ const LinkThreadToThreadModal: m.Component<
                   thread.id,
                   linkingProposal
                 ).then((updatedThread: OffchainThread) => {
+                  console.log({ updatedThread });
                   notifySuccess('Thread successfully linked');
                   vnode.state.searchTerm = '';
                   vnode.state.searchResults = [];

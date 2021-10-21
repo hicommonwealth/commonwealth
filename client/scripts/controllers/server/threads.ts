@@ -553,6 +553,7 @@ class ThreadsController {
     if (response.status !== 'Success') {
       throw new Error();
     }
+    console.log(response.result);
     const modeledThread = modelFromServer(response.result);
     this._store.update(modeledThread);
     return modeledThread;

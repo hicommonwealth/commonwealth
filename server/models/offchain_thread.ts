@@ -6,6 +6,7 @@ import { ChainAttributes } from './chain';
 import { OffchainCommunityAttributes } from './offchain_community';
 import { OffchainAttachmentAttributes } from './offchain_attachment';
 import { ChainEntityAttributes } from './chain_entity';
+import { LinkedThreadAttributes } from './linked_thread';
 
 export interface OffchainThreadAttributes {
   address_id: number;
@@ -42,6 +43,7 @@ export interface OffchainThreadAttributes {
     | OffchainAttachmentAttributes['id'][];
   ChainEntity?: ChainEntityAttributes;
   collaborators?: AddressAttributes[];
+  linked_threads?: LinkedThreadAttributes[];
 }
 
 export interface OffchainThreadInstance
@@ -171,10 +173,10 @@ export default (
       foreignKey: 'thread_id',
       constraints: false,
     });
-    models.OffchainThread.hasMany(models.LinkedThread, {
-      foreignKey: 'linking_thread',
-      as: 'linking_threads',
-    });
+    // models.OffchainThread.hasMany(models.LinkedThread, {
+    //   foreignKey: 'linking_thread',
+    //   as: 'linking_threads',
+    // });
     models.OffchainThread.hasMany(models.LinkedThread, {
       foreignKey: 'linked_thread',
       as: 'linked_threads',

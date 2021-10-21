@@ -48,6 +48,8 @@ const updateLinkedThreads = async (
       }
     }
 
+    // TODO: findOrCreate, add unique constraint to linked & linking
+    // thread cols in LT table
     await models.LinkedThread.create({
       linked_thread: linked_thread_id,
       linking_thread: linking_thread_id,
