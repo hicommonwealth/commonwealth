@@ -14,7 +14,15 @@ module.exports = {
         },
         { transaction: t }
       );
-
+      await queryInterface.bulkUpdate(
+        'OffchainReactions',
+        {
+          community: 'infinity'
+        }, { // WHERE
+          community: 'nft-co'
+        },
+        { transaction: t }
+      );
       // Fix Roles Offchain_community_id to be "infinity" for "nft-co"
       await queryInterface.bulkUpdate(
         'Roles',
@@ -47,12 +55,22 @@ module.exports = {
         },
         { transaction: t }
       );
-      // TODO: Fix addresses? MAYBE
+
+
     });
   },
 
   down: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
+      await queryInterface.bulkUpdate(
+        'OffchainReactions',
+        {
+          community: 'nft-co'
+        }, { // WHERE
+          community: 'infinity'
+        },
+        { transaction: t }
+      );
       // Fix OffchainCommunity Model id to "infinity" from "nft-co"
       await queryInterface.bulkUpdate(
         'OffchainCommunities',
@@ -96,7 +114,6 @@ module.exports = {
         },
         { transaction: t }
       );
-      // TODO: Fix addresses? MAYBE
     });
   }
 };
