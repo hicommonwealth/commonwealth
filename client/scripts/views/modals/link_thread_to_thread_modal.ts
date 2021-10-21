@@ -5,11 +5,18 @@ import app from 'state';
 import { OffchainThread } from 'models';
 import { Button, Input } from 'construct-ui';
 import { notifyError } from 'controllers/app/notifications';
+import { searchThreadTitles } from 'client/scripts/helpers/search';
+import { OffchainThreadInstance } from 'server/models/offchain_thread';
 import { CompactModalExitButton } from '../modal';
+import { SearchParams } from '../components/search_bar';
 
 const LinkThreadToThreadModal: m.Component<
   { linkingProposal: OffchainThread },
-  { linkedThreadId: number }
+  {
+    searchTerm: string;
+    inputTimeout: any;
+    searchResults: OffchainThreadInstance[];
+  }
 > = {
   view: (vnode) => {
     const { linkingProposal } = vnode.attrs;
@@ -24,20 +31,30 @@ const LinkThreadToThreadModal: m.Component<
           label: 'Add thread id',
           placeholder: '712',
           oninput: (e) => {
-            if (!Number.isInteger(+e.target.value)) {
-              notifyError('Can only enter integers');
-            } else {
-              vnode.state.linkedThreadId = +e.target.value;
-              m.redraw();
+            if (e.target.value?.length > 5) {
+              const params: SearchParams = {
+                chainScope: app.activeChainId(),
+                communityScope: app.activeCommunityId(),
+                resultSize: 10,
+              };
+              clearTimeout(vnode.state.inputTimeout);
+              vnode.state.inputTimeout = setTimeout(async () => {
+                vnode.state.searchTerm = e.target.value;
+                vnode.state.searchResults = await searchThreadTitles(
+                  vnode.state.searchTerm,
+                  params
+                );
+                m.redraw();
+              }, 500);
             }
           },
         }),
         m(Button, {
           label: 'Add',
           onclick: (e) => {
-            console.log(vnode.state.linkedThreadId);
+            console.log(vnode.state.searchTerm);
             app.threads.addLinkedThread(
-              vnode.state.linkedThreadId,
+              vnode.state.searchTerm,
               linkingProposal
             );
           },

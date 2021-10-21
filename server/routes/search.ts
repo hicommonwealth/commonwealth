@@ -16,12 +16,13 @@ const Errors = {
 const search = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   let replacements = {};
 
-  if (req.query.thread_title_only) {
+  if (req.query.thread_title_only === 'true') {
     try {
       const threads = await models.OffchainThread.findAll({
         where: {
-          title: { [Op.like]: `%${req.query.search}%` }
+          title: { [Op.like]: `%${req.query.search}%` },
         },
+        limit: req.query.limit || 10,
       });
       return res.json({
         status: 'Success',
