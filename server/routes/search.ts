@@ -1,6 +1,6 @@
 /* eslint-disable quotes */
 import { Request, Response, NextFunction } from 'express';
-import { QueryTypes } from 'sequelize';
+import { Op, QueryTypes } from 'sequelize';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
@@ -15,6 +15,22 @@ const Errors = {
 
 const search = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   let replacements = {};
+
+  if (req.query.thread_title_only) {
+    try {
+      const threads = await models.OffchainThread.findAll({
+        where: {
+          title: { [Op.like]: `%${req.query.search}%` }
+        },
+      });
+      return res.json({
+        status: 'Success',
+        result: threads,
+      });
+    } catch (e) {
+      return next(new Error(Errors.UnexpectedError));
+    }
+  }
 
   // Community-scoped search
   let communityOptions = ''; let communityOptions2 = '';
