@@ -86,16 +86,16 @@ module.exports = {
         { transaction: t }
       );
 
-      // // Fix Roles Offchain_community_id to be "infinity" for "nft-co"
-      // await queryInterface.bulkUpdate(
-      //   'Roles',
-      //   {
-      //     offchain_community_id: 'nft-co'
-      //   }, { // WHERE
-      //     offchain_community_id: 'infinity'
-      //   },
-      //   { transaction: t }
-      // );
+      // Fix Roles Offchain_community_id to be "infinity" for "nft-co"
+      await queryInterface.bulkUpdate(
+        'Roles',
+        {
+          offchain_community_id: 'nft-co'
+        }, { // WHERE
+          offchain_community_id: 'infinity'
+        },
+        { transaction: t }
+      );
 
       // Fix Offchain Threads
       await queryInterface.bulkUpdate(
