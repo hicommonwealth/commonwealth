@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { DB } from '../database';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
+import { Op } from 'sequelize';
 
 export const Errors = {
   MustBeAdminOrAuthor: 'Must be admin or author',
@@ -54,9 +55,15 @@ const updateLinkedThreads = async (
       linked_thread: linked_thread_id,
       linking_thread: linking_thread_id,
     });
-    const finalThread = await models.OffchainThread.findOne({
+    const linkedThreads = await models.LinkedThread.findAll({
+      where: { linking_thread: linking_thread_id },
+    })
+    const linkedThreadIds = linkedThreads.map((thread) => thread.linked_thread);
+    const linkedThreadsFull = await models.OffchainThread.findOne({
       where: {
-        id: linking_thread_id,
+        id: {
+          [Op.in]: linkedThreadIds,
+        }
       },
       include: [
         {
@@ -92,7 +99,7 @@ const updateLinkedThreads = async (
         },
       ],
     });
-    return res.json({ status: 'Success', result: finalThread.toJSON() });
+    return res.json({ status: 'Success', result: linkedThreadsFull.toJSON() });
   } catch (e) {
     return next(new Error(e));
   }

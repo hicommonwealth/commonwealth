@@ -21,6 +21,7 @@ import { notifyError } from 'controllers/app/notifications';
 import { updateLastVisited } from 'controllers/app/login';
 import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
+import { OffchainThreadInstance } from 'server/models/offchain_thread';
 
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
@@ -540,7 +541,7 @@ class ThreadsController {
   public async addLinkedThread(
     linked_thread_id: number,
     linking_thread: OffchainThread
-  ): Promise<OffchainThread> {
+  ): Promise<OffchainThread[]> {
     const response = await $.post(`${app.serverUrl()}/updateLinkedThreads`, {
       chain: app.activeChainId(),
       community: app.activeCommunityId(),
@@ -554,9 +555,10 @@ class ThreadsController {
       throw new Error();
     }
     console.log(response.result);
-    const modeledThread = modelFromServer(response.result);
-    this._store.update(modeledThread);
-    return modeledThread;
+    return response.result.map((rawThread: OffchainThreadInstance) => {
+      const modeledThread = modelFromServer(rawThread);
+      return modeledThread;
+    });
   }
 
   public async fetchThreadIdForSnapshot(args: { snapshot: string }) {

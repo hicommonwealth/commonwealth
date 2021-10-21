@@ -53,10 +53,10 @@ export default (
   );
 
   LinkedThread.associate = (models) => {
-    // models.LinkedThread.belongsTo(models.OffchainThread, {
-    //   foreignKey: 'linking_thread',
-    //   targetKey: 'id',
-    // });
+    models.LinkedThread.belongsTo(models.OffchainThread, {
+      foreignKey: 'linking_thread',
+      targetKey: 'id',
+    });
     models.LinkedThread.belongsTo(models.OffchainThread, {
       foreignKey: 'linked_thread',
       targetKey: 'id',

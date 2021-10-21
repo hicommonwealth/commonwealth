@@ -19,12 +19,9 @@ const LinkThreadToThreadModal: m.Component<
     searchTerm: string;
     inputTimeout: any;
     searchResults: OffchainThreadInstance[];
-    linkedThreads: ILinkedThread[];
+    linkedThreads: OffchainThread[];
   }
 > = {
-  oninit: (vnode) => {
-    vnode.state.linkedThreads = vnode.attrs.linkingProposal.linkedThreads || [];
-  },
   view: (vnode) => {
     const { linkingProposal } = vnode.attrs;
     const { linkedThreads, searchTerm } = vnode.state;
@@ -39,7 +36,7 @@ const LinkThreadToThreadModal: m.Component<
         && linkedThreads.map((lt) => {
           return m('linked-threads', [
             m('a', {
-              href: `/${app.activeId()}/proposal/discussion/${lt.linked_thread}`,
+              href: `/${app.activeId()}/proposal/discussion/${lt.id}`,
             })
           ])
         }),
@@ -79,12 +76,12 @@ const LinkThreadToThreadModal: m.Component<
                 app.threads.addLinkedThread(
                   thread.id,
                   linkingProposal
-                ).then((updatedThread: OffchainThread) => {
-                  console.log({ updatedThread });
+                ).then((updatedLinkedThreads: OffchainThread[]) => {
+                  console.log({ updatedLinkedThreads });
                   notifySuccess('Thread successfully linked');
                   vnode.state.searchTerm = '';
                   vnode.state.searchResults = [];
-                  vnode.state.linkedThreads = updatedThread.linkedThreads;
+                  vnode.state.linkedThreads = updatedLinkedThreads;
                   m.redraw();
                 }).catch((err) => {
                   notifyError('Thread failed to link');
