@@ -13,30 +13,49 @@ const Errors = {
   QueryTooShort: 'Query must be at least 4 characters',
 };
 
-const search = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const search = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   let replacements = {};
 
   if (req.query.thread_title_only === 'true') {
     try {
+      console.log({
+        where: {
+          title: { [Op.like]: `%${req.query.search}%` },
+        },
+        limit: req.query.results_size || 10,
+        include: [models.Address],
+      });
       const threads = await models.OffchainThread.findAll({
         where: {
           title: { [Op.like]: `%${req.query.search}%` },
         },
-        limit: req.query.limit || 10,
+        limit: req.query.results_size || 10,
+        include: [models.Address],
       });
       return res.json({
         status: 'Success',
         result: threads,
       });
     } catch (e) {
+      console.log(e);
       return next(new Error(Errors.UnexpectedError));
     }
   }
 
   // Community-scoped search
-  let communityOptions = ''; let communityOptions2 = '';
+  let communityOptions = '';
+  let communityOptions2 = '';
   if (req.query.chain || req.query.community) {
-    const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
+    const [chain, community, error] = await lookupCommunityIsVisibleToUser(
+      models,
+      req.query,
+      req.user
+    );
     if (error) return next(new Error(error));
 
     // set up query parameters
@@ -66,7 +85,8 @@ const search = async (models: DB, req: Request, res: Response, next: NextFunctio
   // query for both threads and comments, and then execute a union and keep only the most recent :limit
   let threadsAndComments;
   try {
-    threadsAndComments = await models.sequelize.query(`
+    threadsAndComments = await models.sequelize.query(
+      `
 SELECT * FROM (
   (SELECT
       "OffchainThreads".title,
@@ -103,10 +123,12 @@ SELECT * FROM (
     ORDER BY "OffchainComments".created_at DESC LIMIT :limit)
 ) s
 ORDER BY created_at DESC LIMIT :limit;
-`, {
-      replacements,
-      type: QueryTypes.SELECT
-    });
+`,
+      {
+        replacements,
+        type: QueryTypes.SELECT,
+      }
+    );
   } catch (e) {
     console.log(e);
     return next(new Error(Errors.UnexpectedError));

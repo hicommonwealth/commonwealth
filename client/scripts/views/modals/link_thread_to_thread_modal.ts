@@ -5,10 +5,12 @@ import app from 'state';
 import { OffchainThread } from 'models';
 import { Button, Input } from 'construct-ui';
 import { notifyError } from 'controllers/app/notifications';
-import { searchThreadTitles } from 'client/scripts/helpers/search';
+import { searchThreadTitles } from 'helpers/search';
 import { OffchainThreadInstance } from 'server/models/offchain_thread';
+import { modelFromServer } from 'controllers/server/threads';
 import { CompactModalExitButton } from '../modal';
 import { SearchParams } from '../components/search_bar';
+import DiscussionRow from '../pages/discussions/discussion_row';
 
 const LinkThreadToThreadModal: m.Component<
   { linkingProposal: OffchainThread },
@@ -28,8 +30,7 @@ const LinkThreadToThreadModal: m.Component<
       m('.compact-modal-body', [
         m('h3', 'Offchain Threads'),
         m(Input, {
-          label: 'Add thread id',
-          placeholder: '712',
+          label: 'Search thread titles...',
           oninput: (e) => {
             if (e.target.value?.length > 5) {
               const params: SearchParams = {
@@ -44,21 +45,30 @@ const LinkThreadToThreadModal: m.Component<
                   vnode.state.searchTerm,
                   params
                 );
+                console.log(vnode.state.searchResults);
                 m.redraw();
               }, 500);
             }
           },
         }),
-        m(Button, {
-          label: 'Add',
-          onclick: (e) => {
-            console.log(vnode.state.searchTerm);
-            app.threads.addLinkedThread(
-              vnode.state.searchTerm,
-              linkingProposal
-            );
-          },
-        }),
+        vnode.state.searchResults?.length > 0 &&
+          vnode.state.searchResults.map((thread: OffchainThreadInstance) => {
+            const processedThread = modelFromServer(thread);
+            return m(DiscussionRow, {
+              proposal: processedThread,
+              showExcerpt: true,
+            });
+          }),
+        // m(Button, {
+        //   label: 'Add',
+        //   onclick: (e) => {
+        //     console.log(vnode.state.searchTerm);
+        //     app.threads.addLinkedThread(
+        //       vnode.state.searchTerm,
+        //       linkingProposal
+        //     );
+        //   },
+        // }),
       ]),
     ]);
   },
