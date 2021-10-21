@@ -18,7 +18,7 @@ interface IOffchainVotingOptions {
   choices: string[];
 }
 
-interface ILinkedThread {
+export interface ILinkedThread {
   id: string;
   linked_thread: string;
   linking_thread: string;

@@ -4,13 +4,14 @@ import m from 'mithril';
 import app from 'state';
 import { OffchainThread } from 'models';
 import { Button, Input } from 'construct-ui';
-import { notifyError } from 'controllers/app/notifications';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { searchThreadTitles } from 'helpers/search';
 import { OffchainThreadInstance } from 'server/models/offchain_thread';
 import { modelFromServer } from 'controllers/server/threads';
 import { CompactModalExitButton } from '../modal';
 import { SearchParams } from '../components/search_bar';
 import DiscussionRow from '../pages/discussions/discussion_row';
+import { ILinkedThread } from 'client/scripts/models/OffchainThread';
 
 const LinkThreadToThreadModal: m.Component<
   { linkingProposal: OffchainThread },
@@ -18,21 +19,36 @@ const LinkThreadToThreadModal: m.Component<
     searchTerm: string;
     inputTimeout: any;
     searchResults: OffchainThreadInstance[];
+    linkedThreads: ILinkedThread[];
   }
 > = {
+  oninit: (vnode) => {
+    vnode.state.linkedThreads = vnode.attrs.linkingProposal.linkedThreads || [];
+  },
   view: (vnode) => {
     const { linkingProposal } = vnode.attrs;
+    const { linkedThreads, searchTerm } = vnode.state;
+    console.log({ linkingProposal, linkedThreads });
     return m('.LinkThreadToThreadModal', [
       m('.compact-modal-title', [
         m('h3', 'Link to Existing Threads'),
         m(CompactModalExitButton),
       ]),
       m('.compact-modal-body', [
-        m('h3', 'Offchain Threads'),
+        linkedThreads?.length > 0
+        && linkedThreads.map((lt) => {
+          return m('linked-threads', [
+            m('a', {
+              href: `/${app.activeId()}/proposal/discussion/${lt.linked_thread}`,
+            })
+          ])
+        }),
+        m('label', 'Offchain Threads'),
         m(Input, {
           label: 'Search thread titles...',
+          value: searchTerm,
           oninput: (e) => {
-            if (e.target.value?.length > 5) {
+            if (e.target.value?.length > 4) {
               const params: SearchParams = {
                 chainScope: app.activeChainId(),
                 communityScope: app.activeCommunityId(),
@@ -41,12 +57,16 @@ const LinkThreadToThreadModal: m.Component<
               clearTimeout(vnode.state.inputTimeout);
               vnode.state.inputTimeout = setTimeout(async () => {
                 vnode.state.searchTerm = e.target.value;
-                vnode.state.searchResults = await searchThreadTitles(
+                searchThreadTitles(
                   vnode.state.searchTerm,
                   params
-                );
-                console.log(vnode.state.searchResults);
-                m.redraw();
+                ).then((result) => {
+                  vnode.state.searchResults = result;
+                  console.log(vnode.state.searchResults);
+                  m.redraw();
+                }).catch((err) => {
+                  notifyError('Could not find matching thread');
+                });
               }, 500);
             }
           },
@@ -54,21 +74,25 @@ const LinkThreadToThreadModal: m.Component<
         vnode.state.searchResults?.length > 0 &&
           vnode.state.searchResults.map((thread: OffchainThreadInstance) => {
             const processedThread = modelFromServer(thread);
+            console.log({ processedThread });
             return m(DiscussionRow, {
               proposal: processedThread,
-              showExcerpt: true,
+              onSelect: () => {
+                app.threads.addLinkedThread(
+                  thread.id,
+                  linkingProposal
+                ).then((updatedThread: OffchainThread) => {
+                  notifySuccess('Thread successfully linked');
+                  vnode.state.searchTerm = '';
+                  vnode.state.searchResults = [];
+                  vnode.state.linkedThreads = updatedThread.linkedThreads;
+                  m.redraw();
+                }).catch((err) => {
+                  notifyError('Thread failed to link');
+                });
+              }
             });
           }),
-        // m(Button, {
-        //   label: 'Add',
-        //   onclick: (e) => {
-        //     console.log(vnode.state.searchTerm);
-        //     app.threads.addLinkedThread(
-        //       vnode.state.searchTerm,
-        //       linkingProposal
-        //     );
-        //   },
-        // }),
       ]),
     ]);
   },

@@ -540,7 +540,7 @@ class ThreadsController {
   public async addLinkedThread(
     linked_thread_id: number,
     linking_thread: OffchainThread
-  ): Promise<boolean> {
+  ): Promise<OffchainThread> {
     const response = await $.post(`${app.serverUrl()}/updateLinkedThreads`, {
       chain: app.activeChainId(),
       community: app.activeCommunityId(),
@@ -550,11 +550,12 @@ class ThreadsController {
       author_chain: app.user.activeAccount.chain,
       jwt: app.user.jwt,
     });
+    if (response.status !== 'Success') {
+      throw new Error();
+    }
     const modeledThread = modelFromServer(response.result);
     this._store.update(modeledThread);
-    if (response.status !== 'Success') {
-      return false;
-    }
+    return modeledThread;
   }
 
   public async fetchThreadIdForSnapshot(args: { snapshot: string }) {

@@ -23,19 +23,26 @@ const search = async (
 
   if (req.query.thread_title_only === 'true') {
     try {
-      console.log({
-        where: {
-          title: { [Op.like]: `%${req.query.search}%` },
-        },
-        limit: req.query.results_size || 10,
-        include: [models.Address],
-      });
       const threads = await models.OffchainThread.findAll({
         where: {
-          title: { [Op.like]: `%${req.query.search}%` },
+          title: {
+            [Op.or]: [
+              { [Op.iLike]: `%${req.query.search}` },
+              { [Op.iLike]: `${req.query.search}%` },
+              { [Op.iLike]: `%${req.query.search}%` },
+            ]
+          },
         },
         limit: req.query.results_size || 10,
-        include: [models.Address],
+        include: [{
+            model: models.Address,
+            as: 'Address',
+          },
+          {
+            model: models.OffchainTopic,
+            as: 'topic',
+          },
+        ],
       });
       return res.json({
         status: 'Success',
