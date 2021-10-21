@@ -465,9 +465,7 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
                 },
                 label: 'Continue to NEAR wallet'
               }) ]
-              : app.chain.networkStatus !== ApiStatus.Connected
-                ? [ ]
-                : [ webWallet?.accounts.map(
+              : [ webWallet?.accounts.map(
                   (addressOrAccount) => m(LinkAccountItem, {
                     account: typeof addressOrAccount === 'string'
                       ? { address: addressOrAccount }
