@@ -59,7 +59,7 @@ const NewProposalPage: m.Component<{ type }, { typeEnum, titlePre }> = {
                 'Step No': 3,
                 'Step' : 'Transaction Signed',
                 'Thread Type': 'Proposal',
-                'ProposalID': proposal.slug,
+                'ProposalID': typeof proposal === 'object' ? proposal.slug : proposal,
                 'Scope': app.activeId(),
                 'user' : app.user.activeAccount.address,
               });

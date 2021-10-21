@@ -6,7 +6,12 @@ import { Button, Table } from 'construct-ui';
 import { ChainBase, ChainNetwork } from 'types';
 import { notifyError } from 'controllers/app/notifications';
 import { IChainOrCommMetadataManagementAttrs } from './community_metadata_management_table';
-import { TogglePropertyRow, InputPropertyRow, ManageRolesRow } from './metadata_rows';
+import {
+  TogglePropertyRow,
+  InputPropertyRow,
+  ManageRolesRow,
+} from './metadata_rows';
+import AvatarUpload, { AvatarScope } from '../../components/avatar_upload';
 
 interface IChainMetadataManagementState {
   name: string;
@@ -27,9 +32,13 @@ interface IChainMetadataManagementState {
   network: ChainNetwork;
   symbol: string;
   snapshot: string;
+  uploadInProgress: boolean;
 }
 
-const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAttrs, IChainMetadataManagementState> = {
+const ChainMetadataManagementTable: m.Component<
+  IChainOrCommMetadataManagementAttrs,
+  IChainMetadataManagementState
+> = {
   oninit: (vnode) => {
     vnode.state.name = vnode.attrs.chain.name;
     vnode.state.description = vnode.attrs.chain.description;
@@ -47,107 +56,174 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
     vnode.state.symbol = vnode.attrs.chain.symbol;
     vnode.state.snapshot = vnode.attrs.chain.snapshot;
   },
-  view: (vnode) => {
+  view: (vnode: any) => {
     return m('.ChainMetadataManagementTable', [
-      m(Table, {
-        bordered: false,
-        interactive: false,
-        striped: false,
-        class: 'metadata-management-table',
-      }, [
-        m(InputPropertyRow, {
-          title: 'Name',
-          defaultValue: vnode.state.name,
-          onChangeHandler: (v) => { vnode.state.name = v; },
-        }),
-        m(InputPropertyRow, {
-          title: 'Description',
-          defaultValue: vnode.state.description,
-          onChangeHandler: (v) => { vnode.state.description = v; },
-          textarea: true,
-        }),
-        m(InputPropertyRow, {
-          title: 'Website',
-          defaultValue: vnode.state.website,
-          placeholder: 'https://example.com',
-          onChangeHandler: (v) => { vnode.state.website = v; },
-        }),
-        m(InputPropertyRow, {
-          title: 'Discord',
-          defaultValue: vnode.state.discord,
-          placeholder: 'https://discord.com/invite',
-          onChangeHandler: (v) => { vnode.state.discord = v; },
-        }),
-        m(InputPropertyRow, {
-          title: 'Element',
-          defaultValue: vnode.state.element,
-          placeholder: 'https://matrix.to/#',
-          onChangeHandler: (v) => { vnode.state.element = v; },
-        }),
-        m(InputPropertyRow, {
-          title: 'Telegram',
-          defaultValue: vnode.state.telegram,
-          placeholder: 'https://t.me',
-          onChangeHandler: (v) => { vnode.state.telegram = v; },
-        }),
-        m(InputPropertyRow, {
-          title: 'Github',
-          defaultValue: vnode.state.github,
-          placeholder: 'https://github.com',
-          onChangeHandler: (v) => { vnode.state.github = v; },
-        }),
-        m(TogglePropertyRow, {
-          title: 'Stages',
-          defaultValue: vnode.attrs.chain.stagesEnabled,
-          onToggle: (checked) => { vnode.state.stagesEnabled = checked; },
-          caption: (checked) => checked
-            ? 'Show proposal progress on threads'
-            : 'Don\'t show progress on threads',
-        }),
-        m(InputPropertyRow, {
-          title: 'Custom Stages',
-          defaultValue: vnode.state.customStages,
-          placeholder: '["Temperature Check", "Consensus Check"]',
-          onChangeHandler: (v) => { vnode.state.customStages = v; },
-        }),
-        m(InputPropertyRow, {
-          title: 'Domain',
-          defaultValue: vnode.state.customDomain,
-          placeholder: 'Contact support', // gov.edgewa.re
-          onChangeHandler: (v) => { vnode.state.customDomain = v; },
-          disabled: true, // Custom domains should be admin configurable only
-        }),
-        app.chain?.meta.chain.base === ChainBase.Ethereum
-        && m(InputPropertyRow, {
-          title: 'Snapshot',
-          defaultValue: vnode.state.snapshot,
-          placeholder: vnode.state.network,
-          onChangeHandler: (v) => { vnode.state.snapshot = v; },
-        }),
-        m(InputPropertyRow, {
-          title: 'Terms of Service',
-          defaultValue: vnode.state.terms,
-          placeholder: 'Url that new users see',
-          onChangeHandler: (v) => { vnode.state.terms = v; },
-        }),
-        m('tr', [
-          m('td', 'Admins'),
-          m('td', [ m(ManageRolesRow, {
-            roledata: vnode.attrs.admins,
-            onRoleUpdate: (x, y) => { vnode.attrs.onRoleUpdate(x, y); },
-          }), ]),
-        ]),
-        vnode.attrs.mods.length > 0
-          && m('tr', [
-            m('td', 'Moderators'),
-            m('td', [ m(ManageRolesRow, {
-              roledata: vnode.attrs.mods,
-              onRoleUpdate: (x, y) => { vnode.attrs.onRoleUpdate(x, y); },
-            }), ])
+      m(AvatarUpload, {
+        avatarScope: AvatarScope.Chain,
+        uploadStartedCallback: () => {
+          vnode.state.uploadInProgress = true;
+          m.redraw();
+        },
+        uploadCompleteCallback: (files) => {
+          files.forEach((f) => {
+            if (!f.uploadURL) return;
+            const url = f.uploadURL.replace(/\?.*/, '');
+            vnode.state.iconUrl = url;
+            $(vnode.dom).find('input[name=avatarUrl]').val(url.trim());
+          });
+          vnode.state.uploadInProgress = false;
+          m.redraw();
+        },
+      }),
+      m(
+        Table,
+        {
+          bordered: false,
+          interactive: false,
+          striped: false,
+          class: 'metadata-management-table',
+        },
+        [
+          m(InputPropertyRow, {
+            title: 'Name',
+            defaultValue: vnode.state.name,
+            onChangeHandler: (v) => {
+              vnode.state.name = v;
+            },
+          }),
+          m(InputPropertyRow, {
+            title: 'Description',
+            defaultValue: vnode.state.description,
+            onChangeHandler: (v) => {
+              vnode.state.description = v;
+            },
+            textarea: true,
+          }),
+          m(InputPropertyRow, {
+            title: 'Website',
+            defaultValue: vnode.state.website,
+            placeholder: 'https://example.com',
+            onChangeHandler: (v) => {
+              vnode.state.website = v;
+            },
+          }),
+          m(InputPropertyRow, {
+            title: 'Discord',
+            defaultValue: vnode.state.discord,
+            placeholder: 'https://discord.com/invite',
+            onChangeHandler: (v) => {
+              vnode.state.discord = v;
+            },
+          }),
+          m(InputPropertyRow, {
+            title: 'Element',
+            defaultValue: vnode.state.element,
+            placeholder: 'https://matrix.to/#',
+            onChangeHandler: (v) => {
+              vnode.state.element = v;
+            },
+          }),
+          m(InputPropertyRow, {
+            title: 'Telegram',
+            defaultValue: vnode.state.telegram,
+            placeholder: 'https://t.me',
+            onChangeHandler: (v) => {
+              vnode.state.telegram = v;
+            },
+          }),
+          m(InputPropertyRow, {
+            title: 'Github',
+            defaultValue: vnode.state.github,
+            placeholder: 'https://github.com',
+            onChangeHandler: (v) => {
+              vnode.state.github = v;
+            },
+          }),
+          m(TogglePropertyRow, {
+            title: 'Stages',
+            defaultValue: vnode.attrs.chain.stagesEnabled,
+            onToggle: (checked) => {
+              vnode.state.stagesEnabled = checked;
+            },
+            caption: (checked) =>
+              checked
+                ? 'Show proposal progress on threads'
+                : "Don't show progress on threads",
+          }),
+          m(InputPropertyRow, {
+            title: 'Custom Stages',
+            defaultValue: vnode.state.customStages,
+            placeholder: '["Temperature Check", "Consensus Check"]',
+            onChangeHandler: (v) => {
+              vnode.state.customStages = v;
+            },
+          }),
+          m(InputPropertyRow, {
+            title: 'Domain',
+            defaultValue: vnode.state.customDomain,
+            placeholder: 'Contact support', // gov.edgewa.re
+            onChangeHandler: (v) => {
+              vnode.state.customDomain = v;
+            },
+            disabled: true, // Custom domains should be admin configurable only
+          }),
+          app.chain?.meta.chain.base === ChainBase.Ethereum &&
+            m(InputPropertyRow, {
+              title: 'Snapshot',
+              defaultValue: vnode.state.snapshot,
+              placeholder: vnode.state.network,
+              onChangeHandler: (v) => {
+                vnode.state.snapshot = v;
+              },
+            }),
+          m(InputPropertyRow, {
+            title: 'Terms of Service',
+            defaultValue: vnode.state.terms,
+            placeholder: 'Url that new users see',
+            onChangeHandler: (v) => {
+              vnode.state.terms = v;
+            },
+          }),
+          m('tr', [
+            m('td', 'Admins'),
+            m('td', [
+              m(ManageRolesRow, {
+                roledata: vnode.attrs.admins,
+                onRoleUpdate: (x, y) => {
+                  vnode.attrs.onRoleUpdate(x, y);
+                },
+              }),
+            ]),
           ]),
-      ]),
+          vnode.attrs.mods.length > 0 &&
+            m('tr', [
+              m('td', 'Moderators'),
+              m('td', [
+                m(ManageRolesRow, {
+                  roledata: vnode.attrs.mods,
+                  onRoleUpdate: (x, y) => {
+                    vnode.attrs.onRoleUpdate(x, y);
+                  },
+                }),
+              ]),
+            ]),
+          vnode.attrs.mods.length > 0 &&
+            m('tr', [
+              m('td', 'Moderators'),
+              m('td', [
+                m(ManageRolesRow, {
+                  roledata: vnode.attrs.mods,
+                  onRoleUpdate: (x, y) => {
+                    vnode.attrs.onRoleUpdate(x, y);
+                  },
+                }),
+              ]),
+            ]),
+        ]
+      ),
       m(Button, {
         class: 'save-changes-button',
+        disabled: vnode.state.uploadInProgress,
         label: 'Save changes',
         intent: 'primary',
         onclick: async (e) => {
@@ -163,11 +239,18 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
             customStages,
             customDomain,
             snapshot,
-            terms
+            terms,
+            iconUrl,
           } = vnode.state;
 
           // /^[a-z]+\.eth/
-          if (snapshot && snapshot !== '' && !(/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/ig).test(snapshot)) {
+          if (
+            snapshot &&
+            snapshot !== '' &&
+            !/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi.test(
+              snapshot
+            )
+          ) {
             notifyError('Snapshot name must be in the form of *.eth');
             return;
           }
@@ -185,7 +268,8 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
               customStages,
               customDomain,
               snapshot,
-              terms
+              terms,
+              iconUrl,
             });
             $(e.target).trigger('modalexit');
           } catch (err) {
