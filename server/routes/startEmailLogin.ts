@@ -1,8 +1,11 @@
 import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
 import {
-  SENDGRID_API_KEY, LOGIN_RATE_LIMIT_MINS, LOGIN_RATE_LIMIT_TRIES, MAGIC_SUPPORTED_BASES,
-  MAGIC_DEFAULT_CHAIN
+  SENDGRID_API_KEY,
+  LOGIN_RATE_LIMIT_MINS,
+  LOGIN_RATE_LIMIT_TRIES,
+  MAGIC_SUPPORTED_BASES,
+  MAGIC_DEFAULT_CHAIN,
 } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
 import { DynamicTemplate } from '../../shared/types';
@@ -16,23 +19,27 @@ export const Errors = {
   AlreadyLoggedIn: 'Already logged in',
   NoEmail: 'Missing email',
   InvalidEmail: 'Invalid email',
-  ChainOrCommunityRequired: 'Must be within existing chain or community to register',
+  ChainOrCommunityRequired:
+    'Must be within existing chain or community to register',
 };
 
-const startEmailLogin = async (models: DB, req: Request, res: Response, next: NextFunction) => {
-  const protocol = req.headers['x-forwarded-proto'] || req.protocol;
-  const hostname = req.headers['x-forwarded-host'] || req.hostname;
-
+const startEmailLogin = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (req.user && req.user.email) {
     return next(new Error(Errors.AlreadyLoggedIn));
   }
 
   // validate the email
   const email = req.body.email;
-  const validEmailRegex = /\S+@\S+\.\S+/;
   if (!email) {
     return next(new Error(Errors.NoEmail));
-  } else if (!validEmailRegex.test(email)) {
+  }
+  const validEmailRegex = /\S+@\S+\.\S+/;
+  if (!validEmailRegex.test(email)) {
     return next(new Error(Errors.InvalidEmail));
   }
 
@@ -48,7 +55,11 @@ const startEmailLogin = async (models: DB, req: Request, res: Response, next: Ne
   //
   // ignore error because someone might try to log in from the homepage, or another page without
   // chain or community
-  const [ chain, community, error ] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  const [chain, community, error] = await lookupCommunityIsVisibleToUser(
+    models,
+    req.body,
+    req.user
+  );
 
   let magicChain;
   if (chain?.id) {
@@ -60,12 +71,19 @@ const startEmailLogin = async (models: DB, req: Request, res: Response, next: Ne
 
   const isNewRegistration = !previousUser;
   const isExistingMagicUser = previousUser && !!previousUser.lastMagicLoginAt;
-  if (isExistingMagicUser // existing magic users should always use magic login, even if they're in the wrong community
-      || (isNewRegistration && magicChain?.base && MAGIC_SUPPORTED_BASES.includes(magicChain.base)
-          && !req.body.forceEmailLogin)) {
+  if (
+    isExistingMagicUser || // existing magic users should always use magic login, even if they're in the wrong community
+    (isNewRegistration &&
+      magicChain?.base &&
+      MAGIC_SUPPORTED_BASES.includes(magicChain.base) &&
+      !req.body.forceEmailLogin)
+  ) {
     return res.json({
       status: 'Success',
-      result: { shouldUseMagic: true, shouldUseMagicImmediately: !!isExistingMagicUser }
+      result: {
+        shouldUseMagic: true,
+        shouldUseMagicImmediately: !!isExistingMagicUser,
+      },
     });
   }
 
@@ -74,15 +92,17 @@ const startEmailLogin = async (models: DB, req: Request, res: Response, next: Ne
     where: {
       email,
       created_at: {
-        $gte: moment().subtract(LOGIN_RATE_LIMIT_MINS, 'minutes').toDate()
-      }
-    }
+        $gte: moment().subtract(LOGIN_RATE_LIMIT_MINS, 'minutes').toDate(),
+      },
+    },
   });
+
   if (recentTokens.count >= LOGIN_RATE_LIMIT_TRIES) {
     return res.json({
       status: 'Error',
-      message: 'You\'ve tried to log in several times already. '
-        + `Check your spam folder, or wait ${LOGIN_RATE_LIMIT_MINS} minutes to try again.`
+      message:
+        "You've tried to log in several times already. " +
+        `Check your spam folder, or wait ${LOGIN_RATE_LIMIT_MINS} minutes to try again.`,
     });
   }
 
@@ -90,21 +110,33 @@ const startEmailLogin = async (models: DB, req: Request, res: Response, next: Ne
   const path = req.body.path;
   const tokenObj = await models.LoginToken.createForEmail(email, path);
 
-  const loginLink = `${protocol}://${hostname}/api/finishLogin?token=${tokenObj.token}&email=${encodeURIComponent(email)}`;
+  const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+  const hostname = req.headers['x-forwarded-host'] || req.hostname;
+
+  const loginLink = `${protocol}://${hostname}/api/finishLogin?token=${
+    tokenObj.token
+  }&email=${encodeURIComponent(email)}`;
+
   const msg = {
     to: email,
     from: 'Commonwealth <no-reply@commonwealth.im>',
-    templateId: (previousUser) ? DynamicTemplate.SignIn : DynamicTemplate.SignUp,
+    templateId: previousUser ? DynamicTemplate.SignIn : DynamicTemplate.SignUp,
     dynamic_template_data: {
       loginLink,
     },
   };
-  sgMail.send(msg).then((result) => {
-    res.json({ status: 'Success' });
-  }).catch((e) => {
-    log.error(`Could not send authentication email: ${loginLink}`);
-    res.status(500).json({ error: 'Could not send login email', message: e.message });
-  });
+
+  sgMail
+    .send(msg)
+    .then(() => {
+      res.json({ status: 'Success' });
+    })
+    .catch((e) => {
+      log.error(`Could not send authentication email: ${loginLink}`);
+      res
+        .status(500)
+        .json({ error: 'Could not send login email', message: e.message });
+    });
 };
 
 export default startEmailLogin;

@@ -24,7 +24,9 @@ import { factory, formatFilename } from './shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 import ViewCountCache from './server/util/viewCountCache';
-import IdentityFetchCache, { IdentityFetchCacheNew } from './server/util/identityFetchCache';
+import IdentityFetchCache, {
+  IdentityFetchCacheNew,
+} from './server/util/identityFetchCache';
 import TokenBalanceCache from './server/util/tokenBalanceCache';
 import { SESSION_SECRET, ROLLBAR_SERVER_TOKEN } from './server/config';
 import models from './server/database';
@@ -52,15 +54,18 @@ async function main() {
   const SHOULD_SEND_EMAILS = process.env.SEND_EMAILS === 'true';
   const SHOULD_UPDATE_EVENTS = process.env.UPDATE_EVENTS === 'true';
   const SHOULD_UPDATE_BALANCES = process.env.UPDATE_BALANCES === 'true';
-  const SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS = process.env.UPDATE_EDGEWARE_LOCKDROP_STATS === 'true';
-  const SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS = process.env.SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS === 'true';
+  const SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS =
+    process.env.UPDATE_EDGEWARE_LOCKDROP_STATS === 'true';
+  const SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS =
+    process.env.SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS === 'true';
 
-  const NO_CLIENT_SERVER = process.env.NO_CLIENT === 'true'
-    || SHOULD_SEND_EMAILS
-    || SHOULD_UPDATE_EVENTS
-    || SHOULD_UPDATE_BALANCES
-    || SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS
-    || SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS;
+  const NO_CLIENT_SERVER =
+    process.env.NO_CLIENT === 'true' ||
+    SHOULD_SEND_EMAILS ||
+    SHOULD_UPDATE_EVENTS ||
+    SHOULD_UPDATE_BALANCES ||
+    SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS ||
+    SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS;
 
   // CLI parameters used to configure specific tasks
   const SKIP_EVENT_CATCHUP = process.env.SKIP_EVENT_CATCHUP === 'true';
@@ -159,7 +164,10 @@ async function main() {
       log.info('Finished migrating councillor and validator flags into the DB');
       rc = 0;
     } catch (e) {
-      log.error('Failed migrating councillor and validator flags into the DB: ', e.message);
+      log.error(
+        'Failed migrating councillor and validator flags into the DB: ',
+        e.message
+      );
       rc = 1;
     }
   }
@@ -172,18 +180,23 @@ async function main() {
   const WITH_PRERENDER = process.env.WITH_PRERENDER;
   const NO_PRERENDER = process.env.NO_PRERENDER || NO_CLIENT_SERVER;
 
-  const rollbar = process.env.NODE_ENV === 'production' && new Rollbar({
-    accessToken: ROLLBAR_SERVER_TOKEN,
-    environment: process.env.NODE_ENV,
-    captureUncaught: true,
-    captureUnhandledRejections: true,
-  });
+  const rollbar =
+    process.env.NODE_ENV === 'production' &&
+    new Rollbar({
+      accessToken: ROLLBAR_SERVER_TOKEN,
+      environment: process.env.NODE_ENV,
+      captureUncaught: true,
+      captureUnhandledRejections: true,
+    });
 
   const compiler = DEV ? webpack(devWebpackConfig) : webpack(prodWebpackConfig);
   const SequelizeStore = SessionSequelizeStore(session.Store);
-  const devMiddleware = (DEV && !NO_CLIENT_SERVER) ? webpackDevMiddleware(compiler, {
-    publicPath: '/build',
-  }) : null;
+  const devMiddleware =
+    DEV && !NO_CLIENT_SERVER
+      ? webpackDevMiddleware(compiler, {
+          publicPath: '/build',
+        })
+      : null;
   const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
   const viewCountCache = new ViewCountCache(2 * 60, 10 * 60);
 
@@ -223,29 +236,12 @@ async function main() {
     });
 
     // redirect to https:// unless we are using a test domain
-    app.use(redirectToHTTPS([
-      /localhost:(\d{4})/,
-      /127.0.0.1:(\d{4})/
-    ], [], 301));
+    app.use(
+      redirectToHTTPS([/localhost:(\d{4})/, /127.0.0.1:(\d{4})/], [], 301)
+    );
 
     // dynamic compression settings used
     app.use(compression());
-
-    // static compression settings unused
-    // app.get('*.js', (req, res, next) => {
-    //   req.url = req.url + '.gz';
-    //   res.set('Content-Encoding', 'gzip');
-    //   res.set('Content-Type', 'application/javascript; charset=UTF-8');
-    //   next();
-    // });
-
-    // // static compression settings unused
-    // app.get('bundle.**.css', (req, res, next) => {
-    //   req.url = req.url + '.gz';
-    //   res.set('Content-Encoding', 'gzip');
-    //   res.set('Content-Type', 'text/css');
-    //   next();
-    // });
 
     // serve the compiled app
     if (!NO_CLIENT_SERVER) {
@@ -300,7 +296,14 @@ async function main() {
   setupPassport(models);
 
   await tokenBalanceCache.start();
-  setupAPI(app, models, viewCountCache, <any>identityFetchCache, tokenBalanceCache);
+
+  setupAPI(
+    app,
+    models,
+    viewCountCache,
+    <any>identityFetchCache,
+    tokenBalanceCache
+  );
   setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
   setupErrorHandlers(app, rollbar);
 
