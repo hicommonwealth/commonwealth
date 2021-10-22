@@ -159,8 +159,8 @@ const NewTopicModal: m.Component<{
                 null,
                 form.featuredInSidebar,
                 form.featuredInNewPost,
-                tokensToTokenBaseUnits(vnode.state.form.tokenThreshold || '0',
-                  app.chain?.meta.chain.decimals || 18),
+                app.activeId() ? tokensToTokenBaseUnits(vnode.state.form.tokenThreshold || '0',
+                  app.chain?.meta.chain.decimals || 18) : null,
                 defaultOffchainTemplate
               ).then(() => {
                 vnode.state.saving = false;
