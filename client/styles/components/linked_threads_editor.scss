@@ -7,6 +7,8 @@
     border-radius: 5px;
     .cui-control-group {
         margin-bottom: 0;
+        display: flex;
+        flex-direction: column;
     }
     .cui-input input {
         border-top: none;

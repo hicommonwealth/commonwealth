@@ -1,21 +1,21 @@
 import 'components/linked_threads_editor.scss';
 
 import m from 'mithril';
-import { QueryList, ListItem, ControlGroup, Input, List } from 'construct-ui';
+import { ListItem, ControlGroup, Input, List, QueryList, Spinner } from 'construct-ui';
 
 import app from 'state';
 import { OffchainThread } from 'models';
 import { OffchainThreadInstance } from 'server/models/offchain_thread';
 import { ILinkedThread } from 'client/scripts/models/OffchainThread';
-import { notifyError } from 'client/scripts/controllers/app/notifications';
-import { searchThreadTitles } from 'client/scripts/helpers/search';
+import { notifyError } from 'controllers/app/notifications';
+import { searchThreadTitles } from 'helpers/search';
 import { SearchParams } from './search_bar';
 
 const renderLinkedThread = (state, linkedThread: OffchainThread, idx: number) => {
   const selected = state.threadsToLink?.indexOf(linkedThread.id) !== -1;
   return m(ListItem, {
     label: m('.linked-thread-info', [
-      m('.linked-thread-top', linkedThread.title),
+      m('.linked-thread-top', decodeURIComponent(linkedThread.title)),
       m('.linked-thread-bottom', linkedThread.author),
     ]),
     selected,
@@ -33,6 +33,7 @@ export const ThreadsSelector: m.Component<{
   linkedThreads: OffchainThread[];
   linkedThreadsFetched: boolean;
   threadsToLink: number[];
+  displayInitialContent: boolean;
 }> = {
   view: (vnode) => {
     const { onSelect, linkingThread } = vnode.attrs;
@@ -43,21 +44,21 @@ export const ThreadsSelector: m.Component<{
       ).then((res)=> {
         vnode.state.linkedThreads = res;
         vnode.state.linkedThreadsFetched = true;
-        console.log(res);
         m.redraw();
       });
     }
     if (!vnode.state.threadsToLink) {
       vnode.state.threadsToLink = linkingThread.linkedThreads.map((lt) => +lt.linked_thread);
     }
-
+    console.log({ searchResults });
     return m('.ThreadsSelector', [
       linkedThreadsFetched
       ? m(ControlGroup, [
         m(Input, {
-          label: 'Search thread titles...',
-          oninput: (e) => {
-            if (e.target.value?.length > 4) {
+          placeholder: 'Search thread titles...',
+          onchange: (e) => {
+            if ((e.target as HTMLInputElement)?.value?.length > 4) {
+              vnode.state.displayInitialContent = false;
               const params: SearchParams = {
                 chainScope: app.activeChainId(),
                 communityScope: app.activeCommunityId(),
@@ -76,32 +77,37 @@ export const ThreadsSelector: m.Component<{
                   notifyError('Could not find matching thread');
                 });
               }, 500);
+            } else {
+              vnode.state.displayInitialContent = true;
             }
           },
         }),
-        m(List, {
+        m(QueryList, {
+          filterable: false,
           checkmark: true,
-        initialContent: linkedThreads.map((linkedThread, idx) => renderLinkedThread(vnode.state, linkedThread, idx)),
-        inputAttrs: {
-          placeholder: 'Search for offchain thread to link...',
-        },
-        items: [],
-        itemRender: (item: OffchainThread, idx) => renderLinkedThread(vnode.state, item, idx),
-        onSelect: (linkedThread: OffchainThread) => {
-          if (vnode.state.threadsToLink.indexOf(linkedThread.id) !== -1) {
-            const index = vnode.state.threadsToLink.findIndex((ttl) => ttl === linkedThread.id);
-            vnode.state.threadsToLink.splice(index, 1);
-          } else {
-            vnode.state.threadsToLink.push(linkedThread.id);
-          }
-        },
+          inputAttrs: {
+            placeholder: 'Search for offchain thread to link...',
+          },
+          items: vnode.state.displayInitialContent
+            ? linkedThreads
+            : searchResults.map((item, idx) => renderLinkedThread(vnode.state, item, idx)),
+          itemRender: (item: OffchainThread, idx) => renderLinkedThread(vnode.state, item, idx),
+          onSelect: (linkedThread: OffchainThread) => {
+            if (vnode.state.threadsToLink.indexOf(linkedThread.id) !== -1) {
+              const index = vnode.state.threadsToLink.findIndex((ttl) => ttl === linkedThread.id);
+              vnode.state.threadsToLink.splice(index, 1);
+            } else {
+              vnode.state.threadsToLink.push(linkedThread.id);
+            }
+          },
         })
       ])
       : m('.linked-threads-selector-placeholder', [
         m('.linked-threads-selector-placeholder-text', [
           vnode.state.linkedThreadsFetched
             ? 'Select offchain threads.'
-            : 'Loading offchain threads...'
+            : m(Spinner, { active: true, fill: true, message: 'Loading offchain threads...' }),
+
         ]),
       ]),
     ]);
