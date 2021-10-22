@@ -159,7 +159,7 @@ const NewTopicModal: m.Component<{
                 null,
                 form.featuredInSidebar,
                 form.featuredInNewPost,
-                app.activeId() ? tokensToTokenBaseUnits(vnode.state.form.tokenThreshold || '0',
+                app.activeChainId() ? tokensToTokenBaseUnits(vnode.state.form.tokenThreshold || '0',
                   app.chain?.meta.chain.decimals || 18) : null,
                 defaultOffchainTemplate
               ).then(() => {
