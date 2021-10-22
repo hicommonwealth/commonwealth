@@ -193,6 +193,33 @@ export const ProposalSidebarLinkedViewer: m.Component<{
   },
 };
 
+export const ProposalSidebarLinkedThreadsEditorModule: m.Component<
+{
+  proposal: OffchainThread;
+  openLinkedThreadsEditor: Function;
+},
+{
+  isOpen: boolean;
+}
+> = {
+view: (vnode) => {
+  const { openLinkedThreadsEditor } = vnode.attrs;
+
+  return m('.ProposalSidebarLinkedThreadsEditorModule', [
+    m(Button, {
+      rounded: true,
+      compact: true,
+      fluid: true,
+      label: 'Link threads.',
+      onclick: (e) => {
+        e.preventDefault();
+        openLinkedThreadsEditor();
+      },
+    }),
+  ]);
+},
+};
+
 export const ProposalSidebarStageEditorModule: m.Component<
   {
     proposal: OffchainThread;
