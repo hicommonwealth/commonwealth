@@ -948,7 +948,7 @@ const ViewProposalPage: m.Component<{
             m('.proposal-page-row', [
               m('.label', 'Amount'),
               m('.amount', [
-                m('.denominator', proposal.support.denom),
+                m('.denomination', proposal.support.denom),
                 m('', proposal.support.inDollars),
               ]),
             ]),
@@ -992,7 +992,7 @@ const ViewProposalPage: m.Component<{
               contributors.map(({ account, deposit }) => (
                 m('.contributors-row', [
                   m('.amount', [
-                    m('.denominator', deposit.denom),
+                    m('.denomination', deposit.denom),
                     m('', deposit.inDollars),
                   ]),
                   m(User, {
