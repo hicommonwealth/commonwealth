@@ -117,7 +117,6 @@ import User from '../../components/widgets/user';
 import MarkdownFormattedText from '../../components/markdown_formatted_text';
 import { createTXModal } from '../../modals/tx_signing_modal';
 import { SubstrateAccount } from '../../../controllers/chain/substrate/account';
-import LinkedThreadsEditor from '../../components/linked_threads_editor';
 
 const MAX_THREAD_LEVEL = 2;
 
@@ -145,7 +144,6 @@ export interface IProposalPageState {
   threadFetchFailed;
   pollEditorIsOpen: boolean;
   stageEditorIsOpen: boolean;
-  linkedThreadsEditorIsOpen: boolean;
   tipAmount: number;
 }
 
@@ -211,7 +209,6 @@ const ProposalHeader: m.Component<
     isEditor: boolean;
     isAdmin: boolean;
     stageEditorIsOpen: boolean;
-    linkedThreadsEditorIsOpen: boolean;
     pollEditorIsOpen: boolean;
     closePollEditor: Function;
     closeStageEditor: Function;
@@ -403,11 +400,6 @@ const ProposalHeader: m.Component<
                           if (!v) vnode.attrs.closeStageEditor();
                           m.redraw();
                         },
-                      }),
-                    vnode.attrs.linkedThreadsEditorIsOpen &&
-                      proposal instanceof OffchainThread &&
-                      m(LinkedThreadsEditor, {
-                        linkingThread: vnode.attrs.proposal as OffchainThread,
                       }),
                     vnode.attrs.pollEditorIsOpen &&
                       proposal instanceof OffchainThread &&
@@ -1333,7 +1325,6 @@ const ViewProposalPage: m.Component<
           isEditor,
           isAdmin,
           stageEditorIsOpen: vnode.state.stageEditorIsOpen,
-          linkedThreadsEditorIsOpen: vnode.state.linkedThreadsEditorIsOpen,
           pollEditorIsOpen: vnode.state.pollEditorIsOpen,
           closeStageEditor: () => {
             vnode.state.stageEditorIsOpen = false;

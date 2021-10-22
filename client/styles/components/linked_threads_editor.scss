@@ -1,36 +1,6 @@
 @import 'client/styles/shared';
 
-.StageEditor {
-}
-
-.StageEditorDialog {
-    h4 {
-        margin: 10px 7px;
-        font-size: 17px;
-        font-weight: 600;
-    }
-    p {
-        margin: 0 8px;
-        margin-top: 16px;
-    }
-    p.secondary {
-        margin: 0;
-        margin-top: 16px;
-        color: $text-color-medium;
-    }
-    .stage-options {
-        margin-top: 12px;
-        margin-bottom: 30px;
-    }
-    .cui-button.cui-sm {
-        padding: 4px 15px 3px;
-        height: initial;
-        max-height: initial;
-        margin: 0 6px;
-    }
-}
-
-.ChainEntitiesSelector {
+.ThreadsSelector {
     padding: 0;
     border: 1px solid #ddd;
     margin: 10px 8px 20px;
@@ -54,12 +24,13 @@
             background: initial;
         }
         .cui-list-item {
-            .chain-entity-info {
-                .chain-entity-top {
+            .linked-thread-info {
+                .linked-thread-top {
 
                 }
-                .chain-entity-bottom {
+                .linked-thread-bottom {
                     font-size: 88%;
+                    font-weight: 400;
                 }
             }
         }
@@ -67,11 +38,11 @@
     .cui-query-list-checkmark .cui-list-item-content-left {
         left: 0;
     }
-    .chain-entities-selector-placeholder {
+    .linked-threads-selector-placeholder {
         padding: 112px 0;
         text-align: center;
     }
-    .chain-entities-selector-placeholder-text {
+    .linked-threads-selector-placeholder-text {
         height: 30px;
         color: $text-color-medium-dark;
     }

@@ -46,55 +46,6 @@ const LinkThreadToThreadModal: m.Component<
         // }))
         // : m(Spinner, { active: true, fill: true }),
         // m('h4', 'Search offchain threads to add...'),
-        // m(Input, {
-        //   label: 'Search thread titles...',
-        //   oninput: (e) => {
-        //     if (e.target.value?.length > 4) {
-        //       const params: SearchParams = {
-        //         chainScope: app.activeChainId(),
-        //         communityScope: app.activeCommunityId(),
-        //         resultSize: 10,
-        //       };
-        //       clearTimeout(vnode.state.inputTimeout);
-        //       vnode.state.inputTimeout = setTimeout(async () => {
-        //         vnode.state.searchTerm = e.target.value;
-        //         searchThreadTitles(
-        //           vnode.state.searchTerm,
-        //           params
-        //         ).then((result) => {
-        //           vnode.state.searchResults = result;
-        //           m.redraw();
-        //         }).catch((err) => {
-        //           notifyError('Could not find matching thread');
-        //         });
-        //       }, 500);
-        //     }
-        //   },
-        // }),
-        // vnode.state.searchResults?.length > 0 &&
-        //   vnode.state.searchResults.map((thread: OffchainThreadInstance) => {
-        //     const processedThread = modelFromServer(thread);
-        //     return m(DiscussionRow, {
-        //       proposal: processedThread,
-        //       onSelect: () => {
-        //         app.threads.addLinkedThread(
-        //           thread.id,
-        //           linkingProposal
-        //         ).then((updatedLinkedThreads: OffchainThread[]) => {
-        //           console.log({ updatedLinkedThreads });
-        //           notifySuccess('Thread successfully linked');
-        //           vnode.state.searchTerm = '';
-        //           const input = $('.LinkThreadToThreadModal').find('input[name=search');
-        //           input.val('');
-        //           vnode.state.searchResults = [];
-        //           vnode.state.linkedThreads = updatedLinkedThreads;
-        //           m.redraw();
-        //         }).catch((err) => {
-        //           notifyError('Thread failed to link');
-        //         });
-        //       }
-        //     });
-        //   }),
       ]),
     ]);
   },
