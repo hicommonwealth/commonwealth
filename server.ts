@@ -336,6 +336,16 @@ async function main() {
           message: error.message,
         },
       });
+    } else {
+      res.status(error.status || 400);
+      res.json({ error: error.message });
+
+      // res.status(error.status).send({
+      //   error: {
+      //     status: error.status,
+      //     message: error.message,
+      //   },
+      // });
     }
   });
 

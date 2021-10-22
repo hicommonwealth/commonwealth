@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { AppError } from '../util/errors';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { DB } from '../database';
 import { ChainBase } from '../../shared/types';
@@ -17,10 +18,11 @@ const getSubstrateSpec = async (
     req.user
   );
   console.log(error);
-  if (error) return next(new Error(error));
-  if (!chain) return next(new Error('Unknown chain.'));
+  if (error) throw new AppError(error);
+  if (!chain) throw new AppError('Unknown chain.');
   if (chain.base !== ChainBase.Substrate)
-    return next(new Error('Chain must be substrate'));
+    throw new AppError('Chain must be substrate');
+
   const spec = chain.substrate_spec;
   return res.json({ status: 'Success', result: spec || {} });
 };
