@@ -1318,10 +1318,7 @@ const ViewProposalPage: m.Component<
           proposal instanceof OffchainThread &&
             isAuthor &&
             m(ProposalSidebarLinkedThreadsEditorModule, {
-              proposal,
-              openLinkedThreadsEditor: () => {
-                vnode.state.linkedThreadsEditorIsOpen = true;
-              },
+              linkingThread: proposal as OffchainThread,
             }),
         ],
       },
