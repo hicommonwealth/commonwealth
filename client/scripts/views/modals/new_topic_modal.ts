@@ -160,7 +160,7 @@ const NewTopicModal: m.Component<{
                 form.featuredInSidebar,
                 form.featuredInNewPost,
                 app.activeChainId() ? tokensToTokenBaseUnits(vnode.state.form.tokenThreshold || '0',
-                  app.chain?.meta.chain.decimals || 18) : null,
+                  app.chain?.meta.chain.decimals || 18) : '0',
                 defaultOffchainTemplate
               ).then(() => {
                 vnode.state.saving = false;

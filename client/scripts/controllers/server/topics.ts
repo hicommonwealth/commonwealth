@@ -121,7 +121,7 @@ class TopicsController {
     telegram: string,
     featuredInSidebar: boolean,
     featuredInNewPost: boolean,
-    tokenThreshold: string = '0',
+    tokenThreshold: string,
     defaultOffchainTemplate: string,
   ) {
     try {
