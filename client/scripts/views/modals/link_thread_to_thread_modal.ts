@@ -1,18 +1,9 @@
 import 'modals/offchain_voting_modal.scss';
 
 import m from 'mithril';
-import app from 'state';
 import { OffchainThread } from 'models';
-import { Button, Input, Spinner } from 'construct-ui';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { searchThreadTitles } from 'helpers/search';
-import { OffchainThreadInstance } from 'server/models/offchain_thread';
-import { modelFromServer } from 'controllers/server/threads';
-import { ILinkedThread } from 'client/scripts/models/OffchainThread';
 import { CompactModalExitButton } from '../modal';
-import { SearchParams } from '../components/search_bar';
-import DiscussionRow from '../pages/discussions/discussion_row';
-import LinkedThreadsEditor from '../components/linked_threads_editor';
+import { ThreadsSelector } from '../components/linked_threads_editor';
 
 const LinkThreadToThreadModal: m.Component<
   { linkingThread: OffchainThread },
@@ -27,9 +18,12 @@ const LinkThreadToThreadModal: m.Component<
         m(CompactModalExitButton),
       ]),
       m('.compact-modal-body', [
-        m(LinkedThreadsEditor, {
-          linkingThread
-        })
+        m(ThreadsSelector, {
+          linkingThread,
+        }),
+        // m(LinkedThreadsEditor, {
+        //   linkingThread
+        // })
         // m('h4', 'Linked threads'),
         // linkedThreadsFetched
         // ? m('.linked-threads', linkedThreads.map((linkedThread) => {
