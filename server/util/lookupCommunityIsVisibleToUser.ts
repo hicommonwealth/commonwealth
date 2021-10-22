@@ -16,7 +16,9 @@ export const ChainCommunityErrors = {
 
 // sequelize 5.0 does not accept undefined key in where clause
 const lookupCommunityIsVisibleToUser = async (
-  models, params, user
+  models,
+  params,
+  user
 ): Promise<[ChainInstance, OffchainCommunityInstance, string]> => {
   const chain = await models.Chain.findOne({
     where: {
@@ -41,19 +43,34 @@ const lookupCommunityIsVisibleToUser = async (
     },
   });
   // searching for both chain and community
-  if (params.chain && params.community) return [null, null, ChainCommunityErrors.CannotProvideBothCommunityAndChain];
+  if (params.chain && params.community)
+    return [
+      null,
+      null,
+      ChainCommunityErrors.CannotProvideBothCommunityAndChain,
+    ];
   // searching for chain that doesn't exist
-  if (params.chain && !chain) return [null, null, ChainCommunityErrors.ChainDNE];
+  if (params.chain && !chain)
+    return [null, null, ChainCommunityErrors.ChainDNE];
   // searching for community that doesn't exist
-  if (params.community && !community) return [null, null, ChainCommunityErrors.CommunityDNE];
+  if (params.community && !community)
+    return [null, null, ChainCommunityErrors.CommunityDNE];
   // searching for both chain and community with results
-  if (chain && community) return [null, null, ChainCommunityErrors.CannotProvideBothCommunityAndChain];
+  if (chain && community)
+    return [
+      null,
+      null,
+      ChainCommunityErrors.CannotProvideBothCommunityAndChain,
+    ];
   // searching for chain and community that both don't exist
-  if (!chain && !community) return [null, null, ChainCommunityErrors.BothChainAndCommunityDNE];
+  if (!chain && !community)
+    return [null, null, ChainCommunityErrors.BothChainAndCommunityDNE];
 
   if (community && community.privacy_enabled && !user?.isAdmin) {
     if (!user) return [null, null, ChainCommunityErrors.NoUserProvided];
-    const userAddressIds = (await user.getAddresses()).filter((addr) => !!addr.verified).map((addr) => addr.id);
+    const userAddressIds = (await user.getAddresses())
+      .filter((addr) => !!addr.verified)
+      .map((addr) => addr.id);
     const userMembership = await models.Role.findOne({
       where: {
         address_id: userAddressIds,

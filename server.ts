@@ -33,7 +33,6 @@ import models from './server/database';
 import { updateEvents, updateBalances } from './server/util/eventPoller';
 import setupAppRoutes from './server/scripts/setupAppRoutes';
 import setupServer from './server/scripts/setupServer';
-import setupErrorHandlers from './server/scripts/setupErrorHandlers';
 import setupPrerenderServer from './server/scripts/setupPrerenderService';
 import { sendBatchedNotificationEmails } from './server/scripts/emails';
 import setupAPI from './server/router';
@@ -42,6 +41,7 @@ import setupChainEventListeners from './server/scripts/setupChainEventListeners'
 import { fetchStats } from './server/routes/getEdgewareLockdropStats';
 import migrateIdentities from './server/scripts/migrateIdentities';
 import migrateCouncillorValidatorFlags from './server/scripts/migrateCouncillorValidatorFlags';
+import { AppError, ServerError } from './server/util/errors';
 
 // set up express async error handling hack
 require('express-async-errors');
@@ -180,15 +180,6 @@ async function main() {
   const WITH_PRERENDER = process.env.WITH_PRERENDER;
   const NO_PRERENDER = process.env.NO_PRERENDER || NO_CLIENT_SERVER;
 
-  const rollbar =
-    process.env.NODE_ENV === 'production' &&
-    new Rollbar({
-      accessToken: ROLLBAR_SERVER_TOKEN,
-      environment: process.env.NODE_ENV,
-      captureUncaught: true,
-      captureUnhandledRejections: true,
-    });
-
   const compiler = DEV ? webpack(devWebpackConfig) : webpack(prodWebpackConfig);
   const SequelizeStore = SessionSequelizeStore(session.Store);
   const devMiddleware =
@@ -274,16 +265,6 @@ async function main() {
     });
   };
 
-  const templateFile = (() => {
-    try {
-      return fs.readFileSync('./build/index.html');
-    } catch (e) {
-      console.error(`Failed to read template file: ${e.message}`);
-    }
-  })();
-
-  const sendFile = (res) => res.sendFile(`${__dirname}/build/index.html`);
-
   // Only run prerender in DEV environment if the WITH_PRERENDER flag is provided.
   // On the other hand, run prerender by default on production.
   if (DEV) {
@@ -304,8 +285,59 @@ async function main() {
     <any>identityFetchCache,
     tokenBalanceCache
   );
+
+  const templateFile = (() => {
+    try {
+      return fs.readFileSync('./build/index.html');
+    } catch (e) {
+      console.error(`Failed to read template file: ${e.message}`);
+    }
+  })();
+
+  const sendFile = (res) => res.sendFile(`${__dirname}/build/index.html`);
+
   setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
-  setupErrorHandlers(app, rollbar);
+
+  // Handle 404 errors
+  app.use((req, res, next) => {
+    const error: any = new Error('Not found');
+    error.status = 404;
+    next(error);
+  });
+
+  // Production rollbar notifications
+  // Does this need to be nestled between both error handlers?
+  if (process.env.NODE_ENV === 'production') {
+    const rollbar = new Rollbar({
+      accessToken: ROLLBAR_SERVER_TOKEN,
+      environment: process.env.NODE_ENV,
+      captureUncaught: true,
+      captureUnhandledRejections: true,
+    });
+    app.use(rollbar.errorHandler());
+  }
+
+  // Handle server and application errors
+  app.use((error, req, res, next) => {
+    if (error instanceof ServerError) {
+      // rollbar.log(error); TODO but as server error
+      res.status(error.status).send({
+        error: {
+          status: error.status,
+          // Use external facing error message
+          message: 'Server error, please try again later.',
+        },
+      });
+    } else if (error instanceof AppError) {
+      // rollbar.log(error); TOOD: but as application error
+      res.status(error.status).send({
+        error: {
+          status: error.status,
+          message: error.message,
+        },
+      });
+    }
+  });
 
   if (CHAIN_EVENTS) {
     const exitCode = await listenChainEvents();
@@ -316,6 +348,7 @@ async function main() {
       process.exit(exitCode);
     }
   }
+
   setupServer(app, wss, sessionParser);
 }
 
