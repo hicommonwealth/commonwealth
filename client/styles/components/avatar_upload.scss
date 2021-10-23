@@ -10,7 +10,7 @@
     background-color: white;
     border: 1px solid $background-color-light;
     box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.04);
-    > .User {
+    > .User, .ChainIcon, .CommunityIcon {
         position: absolute;
         z-index: 0;
     }
