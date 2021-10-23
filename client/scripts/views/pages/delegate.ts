@@ -69,12 +69,13 @@ const getDelegate = async (vnode: m.Vnode<Record<string, never>, IDelegateFormSt
   m.redraw();
 };
 
+// TODO: remove popup modal for delegation as we auto-delegate all tokens now
 const setDelegate = async (vnode: m.Vnode<Record<string, never>, IDelegateFormState>) => {
   if (app.chain.apiInitialized) {
     let delegationPromise: Promise<void>;
     if (app.chain.network === ChainNetwork.Compound) {
       delegationPromise = (app.chain as Compound).chain.setDelegate(
-        vnode.state.form.address, vnode.state.form.amount
+        vnode.state.form.address
       );
     } else if (app.chain.network === ChainNetwork.Aave) {
       delegationPromise = (app.chain as Aave).chain.setDelegate(vnode.state.form.address);
