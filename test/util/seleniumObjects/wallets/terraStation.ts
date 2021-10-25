@@ -4,8 +4,9 @@ import { WalletInterface } from './walletInterface';
 import { getWindow, getWindowTitles, waitForWindow } from '../util';
 
 export class TerraStation implements WalletInterface {
+  private extensionUrl = 'chrome-extension://aiifbnbfobpmeekipheeijimdpnlpgpp/index.html#/auth';
 
-  // setup/import wallet objects
+  // setup/import wallet objects --- OLD
   private importPrivKeyBtn = By.xpath("//h1[text()='Import private key']");
   private privKeyInput = By.id('key');
   private passwordInput = By.id('password');
@@ -15,8 +16,7 @@ export class TerraStation implements WalletInterface {
   private AllowBtn = By.xpath("//button[text()='Allow']");
 
   async setup(driver: WebDriver): Promise<string> {
-    await waitForWindow(driver, 'Terra Station');
-    await getWindow(driver, 'Terra Station');
+    await driver.get(this.extensionUrl);
 
     await driver.findElement(this.importPrivKeyBtn).click();
     await driver.findElement(this.privKeyInput).sendKeys(process.env.TERRA_STATION_PRIV_KEY);

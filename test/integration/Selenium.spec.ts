@@ -7,7 +7,7 @@ import { HomePage } from '../util/seleniumObjects/Pages/home';
 import { CommunityHome } from '../util/seleniumObjects/Pages/communityHome';
 import chai from 'chai';
 import { LoginModal, WalletName } from '../util/seleniumObjects/modals/loginModal';
-import { getWindow } from '../util/seleniumObjects/util';
+import { getWindow, getWindowTitles, waitForWindow } from '../util/seleniumObjects/util';
 
 const { assert } = chai;
 require('dotenv').config();
@@ -40,7 +40,7 @@ describe('Commonwealth.im Chrome Selenium Tests', function() {
       await loginModal.connectWallet(WalletName.METAMASK, home.metamask);
       await getWindow(driver, 'Commonwealth');
 
-      // explicit wait until the signing metamask window opens
+      // wait for new url/redirect to load
       await driver.wait(async () => {
         const url = await driver.getCurrentUrl()
         if (url) return url.includes('commonwealth.im/ethereum');
@@ -55,6 +55,7 @@ describe('Commonwealth.im Chrome Selenium Tests', function() {
     }).timeout(60000)
 
     xit('Should login with TerraStation', async () => {
+      // TODO: Switch to use extension page wallet import instead of "on login popup" to ensure consistency across tests
       // terra station does not open window upon installation so only import wallet AFTER clicking Login on commonwealth.im
       handles = await home.initWithTerraStation();
       driver = await home.loadPage();
@@ -63,19 +64,37 @@ describe('Commonwealth.im Chrome Selenium Tests', function() {
       driver = await home.startLogin()
       const loginModal = new LoginModal(driver);
       await loginModal.connectWallet(WalletName.TERRASTATION, home.terraStation);
+      await getWindow(driver, 'Commonwealth');
 
-      // import wallet once popup opens
-      handles['terraStation'] = await home.terraStation.setup(driver);
+      // wait for new url/redirect to load
+      await driver.wait(async () => {
+        const url = await driver.getCurrentUrl()
+        if (url) return url.includes('commonwealth.im/terra');
+        else return false
+      }, 10000)
+
+      assert((await driver.getCurrentUrl()).includes('commonwealth.im/terra/'),
+        'TerraStation login flow failed to load Osmosis community page')
+      const communityHome = new CommunityHome(driver);
+      const accountName = await communityHome.getAccountName();
+      assert(accountName === 'Tim', 'Account loaded from TerraStation is incorrect');
     }).timeout(60000)
 
-    it('Should login with Polkadot', async () => {
+    xit('Should login with Polkadot', async () => {
       handles = await home.initWithPolkadotJs();
       driver = await home.loadPage();
       assert(await driver.getCurrentUrl() === 'https://commonwealth.im/', 'Home page failed to load');
 
       driver = await home.startLogin()
       const loginModal = new LoginModal(driver);
-      await loginModal.connectWallet(WalletName.POLKADOT, home.polkadotJs)
+      await loginModal.connectWallet(WalletName.POLKADOT, home.polkadotJs);
+
+      // wait for new url/redirect to load
+      await driver.wait(async () => {
+        const url = await driver.getCurrentUrl()
+        if (url) return url.includes('commonwealth.im/edgeware');
+        else return false
+      }, 10000)
 
       assert((await driver.getCurrentUrl()).includes('commonwealth.im/edgeware/'),
         'PolkadotJs login flow failed to load Edgeware community page')
@@ -83,6 +102,35 @@ describe('Commonwealth.im Chrome Selenium Tests', function() {
       const accountName = await communityHome.getAccountName();
       assert(accountName === 'Tim', 'Account loaded from PolkadotJs is incorrect');
     }).timeout(60000)
+
+    it('Should login with Keplr', async () => {
+      // TODO: works intermittently due to approve button now working on injection
+      driver = await home.initWithKeplr();
+      driver = await home.loadPage();
+
+      assert(await driver.getCurrentUrl() === 'https://commonwealth.im/', 'Home page failed to load');
+
+      driver = await home.startLogin();
+      const loginModal = new LoginModal(driver);
+      await loginModal.connectWallet(WalletName.COSMOS, home.keplr);
+
+      await getWindow(driver, 'Commonwealth');
+      console.log('>>>>>>>>>>>>>>>>>>>>..', (await driver.getCurrentUrl()))
+
+
+      // wait for new url/redirect to load
+      await driver.wait(async () => {
+        const url = await driver.getCurrentUrl()
+        if (url) return url.includes('commonwealth.im/osmosis');
+        else return false
+      }, 10000)
+
+      assert((await driver.getCurrentUrl()).includes('commonwealth.im/osmosis/'),
+        'Keplr login flow failed to load Osmosis community page')
+      const communityHome = new CommunityHome(driver);
+      const accountName = await communityHome.getAccountName();
+      assert(accountName === 'Tim', 'Account loaded from Keplr is incorrect');
+    }).timeout(600000)
   })
   describe('Chain Loading Tests', function() {})
 })

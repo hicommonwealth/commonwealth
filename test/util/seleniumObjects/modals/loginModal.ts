@@ -58,32 +58,48 @@ export class LoginModal {
     await this.driver.findElement(By.xpath(`//div[text()='${walletName}']`)).click();
 
     let accounts;
-    switch (walletName) {
-      case WalletName.METAMASK:
-        await wallet.injectWallet(this.driver);
-        await getWindow(this.driver, 'Commonwealth');
-        accounts = await this.driver.findElements(this.accountItems);
-        await accounts[0].click();
-        await wallet.signTxn(this.driver);
-        break;
-
-      case WalletName.TERRASTATION:
-        await wallet.setup(this.driver);
-        await wallet.injectWallet(this.driver);
-        accounts = await this.driver.findElements(this.accountItems);
-        await accounts[0].click();
-        break;
-
-      case WalletName.POLKADOT:
-        await wallet.injectWallet(this.driver);
-        await waitForWindow(this.driver, 'Commonwealth');
-        await getWindow(this.driver, 'Commonwealth');
-        accounts = await this.driver.findElements(this.accountItems);
-        await accounts[0].click();
-        await wallet.signTxn(this.driver);
-        break;
-    }
-
+    // switch (walletName) {
+    //   case WalletName.METAMASK:
+    //     await wallet.injectWallet(this.driver);
+    //     await getWindow(this.driver, 'Commonwealth');
+    //     accounts = await this.driver.findElements(this.accountItems);
+    //     await accounts[0].click();
+    //     await wallet.signTxn(this.driver);
+    //     break;
+    //
+    //   case WalletName.TERRASTATION:
+    //     await wallet.setup(this.driver);
+    //     await wallet.injectWallet(this.driver);
+    //     await waitForWindow(this.driver, 'Commonwealth');
+    //     await getWindow(this.driver, 'Commonwealth');
+    //     accounts = await this.driver.findElements(this.accountItems);
+    //     await accounts[0].click();
+    //     await wallet.signTxn(this.driver);
+    //     break;
+    //
+    //   case WalletName.POLKADOT:
+    //     await wallet.injectWallet(this.driver);
+    //     await waitForWindow(this.driver, 'Commonwealth');
+    //     await getWindow(this.driver, 'Commonwealth');
+    //     accounts = await this.driver.findElements(this.accountItems);
+    //     await accounts[0].click();
+    //     await wallet.signTxn(this.driver);
+    //     break;
+    //
+    //   case WalletName.COSMOS:
+    //     await wallet.injectWallet(this.driver);
+    //     await waitForWindow(this.driver, 'Commonwealth');
+    //     await getWindow(this.driver, 'Commonwealth');
+    //     accounts = await this.driver.findElements(this.accountItems);
+    //     await accounts[0].click();
+    //     await wallet.signTxn(this.driver);
+    //     break;
+    // }
+    await wallet.injectWallet(this.driver);
+    await getWindow(this.driver, 'Commonwealth');
+    accounts = await this.driver.findElements(this.accountItems);
+    await accounts[0].click();
+    await wallet.signTxn(this.driver);
     return this.driver
   }
 

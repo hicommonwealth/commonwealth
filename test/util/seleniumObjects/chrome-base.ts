@@ -27,67 +27,65 @@ export class BasePage {
    * extensions (mostly wallets).
    * @returns A dictionary containing all the extension window handles
    */
-  private async init(): Promise<{[key: string]: string}> {
-    const handles = {}
+  private async init(): Promise<void> {
     await this.driver.manage().setTimeouts({implicit: 10000});
     await this.driver.manage().window().maximize();
-    handles['home'] = await this.driver.getWindowHandle();
-    return handles;
+    await this.driver.getWindowHandle();
   }
 
   public async go_to_url(url: string): Promise<void> {
-    await this.driver.manage().setTimeouts({implicit: 10000})
     await this.driver.get(url);
   }
 
   /**
    * Creates a driver instance instance with the MetaMask extension installed and properly setup (wallet imported)
    */
-  public async initWithMetaMask(): Promise<{[key: string]: string}> {
+  public async initWithMetaMask(): Promise<WebDriver> {
     const chromeOptions = new chrome.Options().addExtensions([fs.readFileSync(path.resolve(__dirname,
       '../fixtures/ChromeExtensions/MetaMask.crx'), { encoding: 'base64' })])
     this.driver = new webdriver.Builder().forBrowser('chrome').setChromeOptions(chromeOptions).build();
 
-    const handles = await this.init();
+    await this.init();
 
     this._metamask = new MetaMask();
-    handles['metamask'] = await this._metamask.setup(this.driver);
-    return handles;
+    await this._metamask.setup(this.driver);
+    return this.driver;
   }
 
-  public async initWithTerraStation(): Promise<{[key: string]: string}> {
+  public async initWithTerraStation(): Promise<WebDriver> {
     const chromeOptions = new chrome.Options().addExtensions([fs.readFileSync(path.resolve(__dirname,
       '../fixtures/ChromeExtensions/TerraStation.crx'), { encoding: 'base64' })])
     this.driver = new webdriver.Builder().forBrowser('chrome').setChromeOptions(chromeOptions).build();
 
-    const handles = await this.init();
+    await this.init();
 
     this._terraStation = new TerraStation();
-    return handles;
+    await this._terraStation.setup(this.driver);
+    return this.driver;
   }
 
-  public async initWithPolkadotJs(): Promise<{[key: string]: string}> {
+  public async initWithPolkadotJs(): Promise<WebDriver> {
     const chromeOptions = new chrome.Options().addExtensions([fs.readFileSync(path.resolve(__dirname,
       '../fixtures/ChromeExtensions/PolkadotJS.crx'), { encoding: 'base64' })])
     this.driver = new webdriver.Builder().forBrowser('chrome').setChromeOptions(chromeOptions).build();
 
-    const handles = await this.init();
+    await this.init();
 
     this._polkadotJs = new PolkadotJs();
-    handles['polkadotJs'] = await this._polkadotJs.setup(this.driver);
-    return handles;
+    await this._polkadotJs.setup(this.driver);
+    return this.driver;
   }
 
-  public async initWithKeplr(): Promise<{[key: string]: string}> {
+  public async initWithKeplr(): Promise<WebDriver> {
     const chromeOptions = new chrome.Options().addExtensions([fs.readFileSync(path.resolve(__dirname,
       '../fixtures/ChromeExtensions/Keplr.crx'), { encoding: 'base64' })])
     this.driver = new webdriver.Builder().forBrowser('chrome').setChromeOptions(chromeOptions).build();
 
-    const handles = await this.init();
+    await this.init();
 
     this._keplr = new Keplr();
-    handles['keplr'] = await this._keplr.setup(this.driver);
-    return handles;
+    await this._keplr.setup(this.driver);
+    return this.driver;
   }
 
   public get metamask() {
