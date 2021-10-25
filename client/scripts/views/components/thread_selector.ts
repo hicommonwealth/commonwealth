@@ -17,6 +17,7 @@ import { OffchainThread } from 'models';
 import { ILinkedThreadRelation } from 'client/scripts/models/OffchainThread';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { searchThreadTitles } from 'helpers/search';
+import { formatAddressShort } from '../../../../shared/utils';
 import { SearchParams } from './search_bar';
 
 const renderThreadPreview = (state, thread: OffchainThread, idx: number) => {
@@ -27,7 +28,7 @@ const renderThreadPreview = (state, thread: OffchainThread, idx: number) => {
     label: m('.linked-thread-info', [
       m('.linked-thread-top', thread.title),
       m('.linked-thread-bottom', [
-        author.name ? `${author.name} • ${thread.author}` : thread.author,
+        author.name ? `${author.name} • ${formatAddressShort(thread.author)}` : thread.author,
       ]),
     ]),
     selected,
@@ -102,6 +103,7 @@ export const ThreadSelector: m.Component<
               name: 'thread-search',
               contentRight: m(Icon, {
                 name: Icons.X,
+                style: !queryLength && 'cursor: pointer;',
                 onclick: (e) => {
                   e.stopPropagation();
                   const input = $('.ThreadSelector').find('input');
