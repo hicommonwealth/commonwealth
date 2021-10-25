@@ -11,6 +11,7 @@ const Errors = {
   UnexpectedError: 'Unexpected error',
   QueryMissing: 'Must enter query to begin searching',
   QueryTooShort: 'Query must be at least 4 characters',
+  NoCommunity: 'Title search must be community scoped'
 };
 
 const search = async (
@@ -22,21 +23,33 @@ const search = async (
   let replacements = {};
 
   if (req.query.thread_title_only === 'true') {
+    if (!req.query.chain && !req.query.community) {
+      return next(new Error(Errors.NoCommunity));
+    }
+    const [chain, community, error] = await lookupCommunityIsVisibleToUser(
+      models,
+      req.query,
+      req.user
+    );
+    if (error) return next(new Error(error));
     const encodedSearchTerm = encodeURIComponent(req.query.search);
+    const params = {
+      title: {
+        [Op.or]: [
+          { [Op.iLike]: `%${encodedSearchTerm}` },
+          { [Op.iLike]: `${encodedSearchTerm}%` },
+          { [Op.iLike]: `%${encodedSearchTerm}%` },
+          { [Op.iLike]: `%${req.query.search}` },
+          { [Op.iLike]: `${req.query.search}%` },
+          { [Op.iLike]: `%${req.query.search}%` },
+        ]
+      },
+    };
+    if (chain) params['chain'] = chain.id;
+    else if (community) params['community'] = community.id;
     try {
       const threads = await models.OffchainThread.findAll({
-        where: {
-          title: {
-            [Op.or]: [
-              { [Op.iLike]: `%${encodedSearchTerm}` },
-              { [Op.iLike]: `${encodedSearchTerm}%` },
-              { [Op.iLike]: `%${encodedSearchTerm}%` },
-              { [Op.iLike]: `%${req.query.search}` },
-              { [Op.iLike]: `${req.query.search}%` },
-              { [Op.iLike]: `%${req.query.search}%` },
-            ]
-          },
-        },
+        where: params,
         limit: req.query.results_size || 20,
         include: [{
             model: models.Address,

@@ -103,6 +103,9 @@ export const ThreadSelector: m.Component<
                   e.stopPropagation();
                   const input = $('.ThreadSelector').find('input[name=search');
                   input.val('');
+                  vnode.state.searchTerm = '';
+                  vnode.state.searchResults = [];
+                  vnode.state.showOnlyLinkedThreads = true;
                 }
               }),
               oninput: (e) => {
