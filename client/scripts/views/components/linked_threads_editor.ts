@@ -1,7 +1,7 @@
 import 'components/linked_threads_editor.scss';
 
 import m from 'mithril';
-import { ListItem, ControlGroup, Input, List, QueryList, Spinner, Size } from 'construct-ui';
+import { ListItem, ControlGroup, Input, List, QueryList, Spinner, Size, Button } from 'construct-ui';
 
 import app from 'state';
 import { OffchainThread } from 'models';
@@ -39,6 +39,10 @@ export const ThreadsSelector: m.Component<{
   oninit: (vnode) => {
     vnode.state.displayInitialContent = true;
     vnode.state.searchResults = [];
+    vnode.state.linkedThreads = [];
+    if (!vnode.attrs.linkingThread.linkedThreads?.length) {
+      vnode.state.linkedThreadsFetched = true;
+    }
   },
   view: (vnode) => {
     const { linkingThread } = vnode.attrs;
@@ -50,10 +54,13 @@ export const ThreadsSelector: m.Component<{
         vnode.state.linkedThreads = res;
         vnode.state.linkedThreadsFetched = true;
         m.redraw();
+      }).catch((err) => {
+        vnode.state.linkedThreads = [];
+        vnode.state.linkedThreadsFetched = true;
       });
     }
-
-    console.log({ searchResults });
+    console.log({ state: vnode.state });
+    console.log({ searchResults, linkedThreads });
     return m('.ThreadsSelector', [
       linkedThreadsFetched
       ? m(ControlGroup, [
@@ -93,19 +100,21 @@ export const ThreadsSelector: m.Component<{
             }
           },
         }),
-        // vnode.state.isSearching
-        //   && m(Spinner, { active: true, size: Size.LG }),
         m(QueryList, {
           filterable: false,
           checkmark: true,
           inputAttrs: {
             placeholder: 'Search for offchain thread to link...',
           },
-          emptyContent: m('.empty-content-wrap', [
-            vnode.state.isSearching
-              ? m(Spinner, { active: true, size: Size.LG })
-              : 'No threads found.'
-          ]),
+          emptyContent: [
+              m('.empty-content-wrap', [
+              vnode.state.isSearching
+                ? m(Spinner, { active: true, size: Size.LG })
+                : vnode.state.searchTerm?.length > 4
+                  ? m('', 'No threads found.')
+                  : m('', 'Search threads')
+            ])
+          ],
           items: vnode.state.displayInitialContent
             ? linkedThreads
             : searchResults,
@@ -132,12 +141,20 @@ export const ThreadsSelector: m.Component<{
               });
             }
           },
+        }),
+        m(Button, {
+          label: 'Done',
+          intent: 'primary',
+          rounded: true,
+          onclick: (e) => {
+            $(e.target).trigger('modalcomplete');
+          }
         })
       ])
       : m('.linked-threads-selector-placeholder', [
         m('.linked-threads-selector-placeholder-text', [
           vnode.state.linkedThreadsFetched
-            ? 'Select offchain threads.'
+            ? 'Select offchain threads to add.'
             : m(Spinner, { active: true, fill: true, message: 'Loading offchain threads...' }),
 
         ]),

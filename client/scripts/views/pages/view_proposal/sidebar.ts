@@ -10,7 +10,7 @@ import {
 } from 'identifiers';
 import { OffchainThread } from 'models';
 import { SnapshotProposal } from 'client/scripts/helpers/snapshot_utils';
-import LinkThreadToThreadModal from '../../modals/link_thread_to_thread_modal';
+import LinkedThreadModal from '../../modals/linked_thread_modal';
 
 export const ProposalSidebarLinkedChainEntity: m.Component<{
   proposal: OffchainThread;
@@ -213,7 +213,7 @@ view: (vnode) => {
       onclick: (e) => {
         e.preventDefault();
         app.modals.create({
-          modal: LinkThreadToThreadModal,
+          modal: LinkedThreadModal,
           data: { linkingThread },
         });
       },
