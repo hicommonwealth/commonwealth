@@ -21,31 +21,6 @@ const LinkThreadToThreadModal: m.Component<
         m(ThreadsSelector, {
           linkingThread,
         }),
-        // m(LinkedThreadsEditor, {
-        //   linkingThread
-        // })
-        // m('h4', 'Linked threads'),
-        // linkedThreadsFetched
-        // ? m('.linked-threads', linkedThreads.map((linkedThread) => {
-        //     return m(DiscussionRow, {
-        //       proposal: linkedThread,
-        //       onSelect: () => {
-        //         app.threads.removeLinkedThread(
-        //           linkedThread.id,
-        //           linkingProposal
-        //         ).then((updatedLinkedThreads: OffchainThread[]) => {
-        //           console.log({ updatedLinkedThreads });
-        //           notifySuccess('Thread successfully removed');
-        //           vnode.state.linkedThreads = updatedLinkedThreads;
-        //           m.redraw();
-        //         }).catch((err) => {
-        //           notifyError('Failed to remove linked thread');
-        //         });
-        //       }
-        //     })
-        // }))
-        // : m(Spinner, { active: true, fill: true }),
-        // m('h4', 'Search offchain threads to add...'),
       ]),
     ]);
   },

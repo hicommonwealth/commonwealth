@@ -538,14 +538,14 @@ class ThreadsController {
     });
   }
 
-  public async addLinkedThread(
-    linked_thread_id: number,
+  public async addLinkedThreads(
+    linked_thread_ids: number[],
     linking_thread: OffchainThread
   ): Promise<OffchainThread[]> {
     const response = await $.post(`${app.serverUrl()}/updateLinkedThreads`, {
       chain: app.activeChainId(),
       community: app.activeCommunityId(),
-      linked_thread_id,
+      'linked_thread_ids[]': linked_thread_ids,
       linking_thread_id: linking_thread.id,
       address: app.user.activeAccount.address,
       author_chain: app.user.activeAccount.chain,
@@ -561,14 +561,14 @@ class ThreadsController {
     });
   }
 
-  public async removeLinkedThread(
-    linked_thread_id: number,
+  public async removeLinkedThreads(
+    linked_thread_ids: number[],
     linking_thread: OffchainThread,
   ): Promise<OffchainThread[]> {
     const response = await $.post(`${app.serverUrl()}/updateLinkedThreads`, {
       chain: app.activeChainId(),
       community: app.activeCommunityId(),
-      linked_thread_id,
+      'linked_thread_ids[]': linked_thread_ids,
       linking_thread_id: linking_thread.id,
       address: app.user.activeAccount.address,
       author_chain: app.user.activeAccount.chain,
@@ -600,7 +600,7 @@ class ThreadsController {
     return response.result;
   }
 
-  public async fetchThreadsFromId(ids: Array<number | string>) {
+  public async fetchThreadsFromId(ids: Array<number | string>): Promise<OffchainThread[]> {
     const params = {
       chain: app.activeChainId(),
       community: app.activeCommunityId(),

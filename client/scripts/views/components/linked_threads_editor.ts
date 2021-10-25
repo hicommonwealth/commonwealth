@@ -1,7 +1,7 @@
 import 'components/linked_threads_editor.scss';
 
 import m from 'mithril';
-import { ListItem, ControlGroup, Input, List, QueryList, Spinner } from 'construct-ui';
+import { ListItem, ControlGroup, Input, List, QueryList, Spinner, Button } from 'construct-ui';
 
 import app from 'state';
 import { OffchainThread } from 'models';
@@ -29,12 +29,15 @@ export const ThreadsSelector: m.Component<{
 }, {
   searchTerm: string;
   inputTimeout;
-  searchResults: OffchainThreadInstance[];
+  searchResults: OffchainThread[];
   linkedThreads: OffchainThread[];
   linkedThreadsFetched: boolean;
   threadsToLink: number[];
   displayInitialContent: boolean;
 }> = {
+  oninit: (vnode) => {
+    vnode.state.displayInitialContent = true;
+  },
   view: (vnode) => {
     const { onSelect, linkingThread } = vnode.attrs;
     const { linkedThreads, linkedThreadsFetched, searchTerm, inputTimeout, searchResults  } = vnode.state;
@@ -57,7 +60,8 @@ export const ThreadsSelector: m.Component<{
         m(Input, {
           placeholder: 'Search thread titles...',
           onchange: (e) => {
-            if ((e.target as HTMLInputElement)?.value?.length > 4) {
+            const target = e.target as HTMLInputElement;
+            if (target.value?.length > 4) {
               vnode.state.displayInitialContent = false;
               const params: SearchParams = {
                 chainScope: app.activeChainId(),
@@ -66,7 +70,7 @@ export const ThreadsSelector: m.Component<{
               };
               clearTimeout(vnode.state.inputTimeout);
               vnode.state.inputTimeout = setTimeout(async () => {
-                vnode.state.searchTerm = e.target.value;
+                vnode.state.searchTerm = target.value;
                 searchThreadTitles(
                   vnode.state.searchTerm,
                   params
@@ -100,6 +104,18 @@ export const ThreadsSelector: m.Component<{
               vnode.state.threadsToLink.push(linkedThread.id);
             }
           },
+        }),
+        m(Button, {
+          label: 'Cancel',
+          rounded: true,
+        }),
+        m(Button, {
+          label: 'Save changes',
+          intent: 'primary',
+          rounded: true,
+          onclick: async () => {
+            // app.threads.removeLinkedThreads()
+          },
         })
       ])
       : m('.linked-threads-selector-placeholder', [
@@ -113,78 +129,3 @@ export const ThreadsSelector: m.Component<{
     ]);
   }
 };
-
-// const LinkedThreadsEditor: m.Component<{
-//   linkingThread: OffchainThread;
-// }, {
-//   stage: OffchainThreadStage;
-//   isOpen: boolean;
-// }> = {
-//   view: (vnode) => {
-//     const { linkingThread } = vnode.attrs;
-//     return m('.LinkedThreadsEditor', [
-//       m(Dialog, {
-//         basic: false,
-//         closeOnEscapeKey: true,
-//         closeOnOutsideClick: true,
-//         class: 'LinkedThreadsEditorDialog',
-//         content: [
-          
-//         ],
-//         hasBackdrop: true,
-//         isOpen: true,
-//         inline: false,
-//         title: 'Update proposal status',
-//         transitionDuration: 200,
-//         footer: m(`.${Classes.ALIGN_RIGHT}`, [
-//           m(Button, {
-//             label: 'Cancel',
-//             rounded: true,
-//           }),
-//           m(Button, {
-//             label: 'Save changes',
-//             intent: 'primary',
-//             rounded: true,
-//             onclick: async () => {
-//               // const { stage } = vnode.state;
-//               // const { thread } = vnode.attrs;
-
-//               // // set stage
-//               // try {
-//               //   await app.threads.setStage({ threadId: thread.id, stage: vnode.state.stage });
-//               // } catch (err) {
-//               //   console.log('Failed to update stage');
-//               //   throw new Error((err.responseJSON && err.responseJSON.error)
-//               //     ?  `${err.responseJSON.error}. Make sure one is selected.`
-//               //     : 'Failed to update stage, make sure one is selected');
-//               // }
-
-//               // // set linked chain entities
-//               // try {
-//               //   await app.threads.setLinkedChainEntities({ threadId: thread.id, entities: vnode.state.chainEntitiesToSet });
-//               //   await app.threads.setLinkedSnapshotProposal({ threadId: thread.id, 
-//               //     snapshotProposal: vnode.state.snapshotProposalsToSet[0]?.id })
-//               // } catch (err) {
-//               //   console.log('Failed to update linked proposals');
-//               //   throw new Error((err.responseJSON && err.responseJSON.error)
-//               //     ? err.responseJSON.error
-//               //     : 'Failed to update linked proposals');
-//               // }
-
-//               // // TODO: add set linked snapshot proposals
-//               // vnode.attrs.onChangeHandler(vnode.state.stage, vnode.state.chainEntitiesToSet, vnode.state.snapshotProposalsToSet);
-
-//               // if (vnode.attrs.popoverMenu) {
-//               //   vnode.attrs.openStateHandler(false);
-//               // } else {
-//               //   vnode.state.isOpen = false;
-//               // }
-//             },
-//           }),
-//         ])
-//       })
-//     ]);
-//   }
-// };
-
-// export default LinkedThreadsEditor;

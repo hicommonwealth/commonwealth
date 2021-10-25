@@ -900,7 +900,7 @@ const ViewProposalPage: m.Component<
             app.threads
               .fetchThreadsFromId([+proposalId])
               .then((res) => {
-                vnode.state.proposal = res;
+                vnode.state.proposal = res[0];
                 m.redraw();
               })
               .catch((err) => {

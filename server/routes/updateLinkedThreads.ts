@@ -22,8 +22,8 @@ const updateLinkedThreads = async (
     req.user
   );
   if (error) return next(new Error(error));
-  const { linked_thread_id, linking_thread_id, remove_link } = req.body;
-  if (!linked_thread_id) {
+  const { linking_thread_id, remove_link } = req.body;
+  if (!req.body['linked_thread_ids[]']) {
     return next(new Error(Errors.MustHaveLinkedThreadId));
   }
   if (!linking_thread_id) {
@@ -52,14 +52,14 @@ const updateLinkedThreads = async (
     if (remove_link === 'true') {
       await models.LinkedThread.destroy({
         where: {
-          linked_thread: linked_thread_id,
+          linked_thread: { [Op.in]: req.body['linked_thread_ids[]'] },
           linking_thread: linking_thread_id,
         }
       })
     } else {
       await models.LinkedThread.findOrCreate({
         where: {
-          linked_thread: linked_thread_id,
+          linked_thread: { [Op.in]: req.body['linked_thread_ids[]'] },
           linking_thread: linking_thread_id,
         }
       });

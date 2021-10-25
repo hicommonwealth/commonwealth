@@ -1,13 +1,14 @@
 import $ from 'jquery';
 import app from 'state';
 import m from 'mithril';
-import { OffchainThreadInstance } from 'server/models/offchain_thread';
 import { SearchParams } from '../views/components/search_bar';
+import { modelFromServer } from '../controllers/server/threads';
+import { OffchainThread } from '../models';
 
 export const searchThreadTitles = async (
   searchTerm: string,
   params: SearchParams
-): Promise<OffchainThreadInstance[]> => {
+): Promise<OffchainThread[]> => {
   const { resultSize, chainScope, communityScope } = params;
   try {
     const response = await $.get(`${app.serverUrl()}/search`, {
@@ -21,7 +22,9 @@ export const searchThreadTitles = async (
     if (response.status !== 'Success') {
       throw new Error(`Got unsuccessful status: ${response.status}`);
     }
-    return response.result;
+    return response.result.map((rawThread) => {
+      return modelFromServer(rawThread);
+    });
   } catch (e) {
     console.error(e);
     return [];
