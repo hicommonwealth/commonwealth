@@ -538,51 +538,53 @@ class ThreadsController {
     });
   }
 
-  public async addLinkedThreads(
-    linked_thread_ids: number[],
-    linking_thread: OffchainThread
-  ): Promise<OffchainThread[]> {
+  public async addLinkedThread(
+    linking_thread_id: number,
+    linked_thread_id: number,
+  ) { // : Promise<OffchainThread[]> {
     const response = await $.post(`${app.serverUrl()}/updateLinkedThreads`, {
       chain: app.activeChainId(),
       community: app.activeCommunityId(),
-      'linked_thread_ids[]': linked_thread_ids,
-      linking_thread_id: linking_thread.id,
+      linking_thread_id,
+      linked_thread_id,
       address: app.user.activeAccount.address,
       author_chain: app.user.activeAccount.chain,
       jwt: app.user.jwt,
     });
+    console.log(response.result);
     if (response.status !== 'Success') {
       throw new Error();
     }
-    console.log(response.result);
-    return response.result.map((rawThread: OffchainThreadInstance) => {
-      const modeledThread = modelFromServer(rawThread);
-      return modeledThread;
-    });
+    // console.log(response.result);
+    // return response.result.map((rawThread: OffchainThreadInstance) => {
+    //   const modeledThread = modelFromServer(rawThread);
+    //   return modeledThread;
+    // });
   }
 
-  public async removeLinkedThreads(
-    linked_thread_ids: number[],
-    linking_thread: OffchainThread,
-  ): Promise<OffchainThread[]> {
+  public async removeLinkedThread(
+    linking_thread_id: number,
+    linked_thread_id: number,
+  ) { // : Promise<OffchainThread[]> {
     const response = await $.post(`${app.serverUrl()}/updateLinkedThreads`, {
       chain: app.activeChainId(),
       community: app.activeCommunityId(),
-      'linked_thread_ids[]': linked_thread_ids,
-      linking_thread_id: linking_thread.id,
+      linking_thread_id,
+      linked_thread_id,
       address: app.user.activeAccount.address,
       author_chain: app.user.activeAccount.chain,
       remove_link: true,
       jwt: app.user.jwt,
     });
+    console.log(response.result);
     if (response.status !== 'Success') {
       throw new Error();
     }
-    console.log(response.result);
-    return response.result.map((rawThread: OffchainThreadInstance) => {
-      const modeledThread = modelFromServer(rawThread);
-      return modeledThread;
-    });
+    // console.log(response.result);
+    // return response.result.map((rawThread: OffchainThreadInstance) => {
+    //   const modeledThread = modelFromServer(rawThread);
+    //   return modeledThread;
+    // });
   }
 
   public async fetchThreadIdForSnapshot(args: { snapshot: string }) {

@@ -10,13 +10,16 @@
         display: flex;
         flex-direction: column;
     }
-    .cui-input input {
-        border-top: none;
-        border-right: none;
-        border-left: none;
-        border-bottom-color: $border-color-light;
-        height: 44px;
-        border-radius: 0;
+    .cui-input {
+        width: calc(100% - 1px);
+        input {
+            border-top: none;
+            border-right: none;
+            border-left: none;
+            border-bottom-color: $border-color-light;
+            height: 44px;
+            border-radius: 0;
+        }
     }
     .cui-list {
         min-height: 150px;
@@ -35,6 +38,13 @@
                     font-weight: 400;
                 }
             }
+        }
+    }
+    .cui-query-list-empty {
+        .empty-content-wrap {
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
     }
     .cui-query-list-checkmark .cui-list-item-content-left {

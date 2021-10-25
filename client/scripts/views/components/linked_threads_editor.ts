@@ -1,25 +1,25 @@
 import 'components/linked_threads_editor.scss';
 
 import m from 'mithril';
-import { ListItem, ControlGroup, Input, List, QueryList, Spinner, Button } from 'construct-ui';
+import { ListItem, ControlGroup, Input, List, QueryList, Spinner, Size } from 'construct-ui';
 
 import app from 'state';
 import { OffchainThread } from 'models';
-import { OffchainThreadInstance } from 'server/models/offchain_thread';
 import { ILinkedThread } from 'client/scripts/models/OffchainThread';
-import { notifyError } from 'controllers/app/notifications';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { searchThreadTitles } from 'helpers/search';
 import { SearchParams } from './search_bar';
 
-const renderLinkedThread = (state, linkedThread: OffchainThread, idx: number) => {
-  const selected = state.threadsToLink?.indexOf(linkedThread.id) !== -1;
+const renderThreadPreview = (state, thread: OffchainThread, idx: number) => {
+  const selected = state.linkedThreads.find((lT) => +lT.id === +thread.id);
+  console.log(thread);
   return m(ListItem, {
     label: m('.linked-thread-info', [
-      m('.linked-thread-top', decodeURIComponent(linkedThread.title)),
-      m('.linked-thread-bottom', linkedThread.author),
+      m('.linked-thread-top', thread.title),
+      m('.linked-thread-bottom', thread.author),
     ]),
     selected,
-    key: linkedThread.id,
+    key: idx,
   });
 }
 
@@ -29,18 +29,20 @@ export const ThreadsSelector: m.Component<{
 }, {
   searchTerm: string;
   inputTimeout;
+  isSearching: boolean;
   searchResults: OffchainThread[];
   linkedThreads: OffchainThread[];
   linkedThreadsFetched: boolean;
-  threadsToLink: number[];
   displayInitialContent: boolean;
+  selectedThreadId: number;
 }> = {
   oninit: (vnode) => {
     vnode.state.displayInitialContent = true;
+    vnode.state.searchResults = [];
   },
   view: (vnode) => {
-    const { onSelect, linkingThread } = vnode.attrs;
-    const { linkedThreads, linkedThreadsFetched, searchTerm, inputTimeout, searchResults  } = vnode.state;
+    const { linkingThread } = vnode.attrs;
+    const { linkedThreads, linkedThreadsFetched, searchResults  } = vnode.state;
     if (linkingThread.linkedThreads?.length && !linkedThreadsFetched) {
       app.threads.fetchThreadsFromId(
         linkingThread.linkedThreads.map((lt: ILinkedThread) => lt.linked_thread)
@@ -50,19 +52,23 @@ export const ThreadsSelector: m.Component<{
         m.redraw();
       });
     }
-    if (!vnode.state.threadsToLink) {
-      vnode.state.threadsToLink = linkingThread.linkedThreads.map((lt) => +lt.linked_thread);
-    }
+
     console.log({ searchResults });
     return m('.ThreadsSelector', [
       linkedThreadsFetched
       ? m(ControlGroup, [
         m(Input, {
           placeholder: 'Search thread titles...',
-          onchange: (e) => {
+          oninput: (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             const target = e.target as HTMLInputElement;
+            console.log({ target });
             if (target.value?.length > 4) {
+              console.log('> 4')
               vnode.state.displayInitialContent = false;
+              vnode.state.isSearching = true;
+              console.log(vnode.state.isSearching);
               const params: SearchParams = {
                 chainScope: app.activeChainId(),
                 communityScope: app.activeCommunityId(),
@@ -75,46 +81,56 @@ export const ThreadsSelector: m.Component<{
                   vnode.state.searchTerm,
                   params
                 ).then((result) => {
+                  vnode.state.isSearching = false;
                   vnode.state.searchResults = result;
                   m.redraw();
                 }).catch((err) => {
                   notifyError('Could not find matching thread');
                 });
-              }, 500);
+              }, 100);
             } else {
               vnode.state.displayInitialContent = true;
             }
           },
         }),
+        // vnode.state.isSearching
+        //   && m(Spinner, { active: true, size: Size.LG }),
         m(QueryList, {
           filterable: false,
           checkmark: true,
           inputAttrs: {
             placeholder: 'Search for offchain thread to link...',
           },
+          emptyContent: m('.empty-content-wrap', [
+            vnode.state.isSearching
+              ? m(Spinner, { active: true, size: Size.LG })
+              : 'No threads found.'
+          ]),
           items: vnode.state.displayInitialContent
             ? linkedThreads
-            : searchResults.map((item, idx) => renderLinkedThread(vnode.state, item, idx)),
-          itemRender: (item: OffchainThread, idx) => renderLinkedThread(vnode.state, item, idx),
-          onSelect: (linkedThread: OffchainThread) => {
-            if (vnode.state.threadsToLink.indexOf(linkedThread.id) !== -1) {
-              const index = vnode.state.threadsToLink.findIndex((ttl) => ttl === linkedThread.id);
-              vnode.state.threadsToLink.splice(index, 1);
+            : searchResults,
+          itemRender: (item: OffchainThread, idx) => renderThreadPreview(vnode.state, item, idx),
+          onSelect: (thread: OffchainThread) => {
+            const selectedThreadIdx = linkedThreads.findIndex((linkedThread) => linkedThread.id === thread.id);
+            if (selectedThreadIdx !== -1) {
+              app.threads.removeLinkedThread(linkingThread.id, thread.id)
+                .then((result) => {
+                  vnode.state.linkedThreads.splice(selectedThreadIdx, 1);
+                    notifySuccess('Thread unlinked.')
+                })
+                .catch((err) => {
+                    notifyError('Thread failed to unlink.')
+                });
             } else {
-              vnode.state.threadsToLink.push(linkedThread.id);
+              app.threads.addLinkedThread(linkingThread.id, thread.id)
+              .then((result) => {
+                vnode.state.linkedThreads.push(thread);
+                notifySuccess('Thread linked.')
+              })
+              .catch((err) => {
+                notifyError('Thread failed to link.')
+              });
             }
-          },
-        }),
-        m(Button, {
-          label: 'Cancel',
-          rounded: true,
-        }),
-        m(Button, {
-          label: 'Save changes',
-          intent: 'primary',
-          rounded: true,
-          onclick: async () => {
-            // app.threads.removeLinkedThreads()
           },
         })
       ])

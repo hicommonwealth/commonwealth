@@ -1,13 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
+import { Op } from 'sequelize';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { DB } from '../database';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
-import { Op } from 'sequelize';
 
 export const Errors = {
   MustBeAdminOrAuthor: 'Must be admin or author',
   MustHaveLinkingThreadId: 'Must have linking thread id',
   MustHaveLinkedThreadId: 'Must have linked thread id',
+  ThreadsMustShareCommunity: 'Threads do not share community or do not exist'
 };
 
 const updateLinkedThreads = async (
@@ -22,8 +23,8 @@ const updateLinkedThreads = async (
     req.user
   );
   if (error) return next(new Error(error));
-  const { linking_thread_id, remove_link } = req.body;
-  if (!req.body['linked_thread_ids[]']) {
+  const { linked_thread_id, linking_thread_id, remove_link } = req.body;
+  if (!linked_thread_id) {
     return next(new Error(Errors.MustHaveLinkedThreadId));
   }
   if (!linking_thread_id) {
@@ -49,67 +50,74 @@ const updateLinkedThreads = async (
       }
     }
 
-    if (remove_link === 'true') {
-      await models.LinkedThread.destroy({
-        where: {
-          linked_thread: { [Op.in]: req.body['linked_thread_ids[]'] },
-          linking_thread: linking_thread_id,
-        }
-      })
-    } else {
-      await models.LinkedThread.findOrCreate({
-        where: {
-          linked_thread: { [Op.in]: req.body['linked_thread_ids[]'] },
-          linking_thread: linking_thread_id,
-        }
-      });
+    const params = {
+      linked_thread: linked_thread_id,
+      linking_thread: linking_thread_id,
     }
 
-    const linkedThreads = await models.LinkedThread.findAll({
-      where: { linking_thread: linking_thread_id },
-    })
-    const linkedThreadIds = linkedThreads.map((thread) => thread.linked_thread);
-    const linkedThreadsFull = await models.OffchainThread.findOne({
-      where: {
-        id: {
-          [Op.in]: linkedThreadIds,
-        }
-      },
-      include: [
-        {
-          model: models.Address,
-          as: 'Address',
-        },
-        {
-          model: models.Address,
-          // through: models.Collaboration,
-          as: 'collaborators',
-        },
-        {
-          model: models.OffchainTopic,
-          as: 'topic',
-        },
-        {
-          model: models.ChainEntity,
-        },
-        {
-          model: models.OffchainReaction,
-          as: 'reactions',
-          include: [
-            {
-              model: models.Address,
-              as: 'Address',
-              required: true,
-            },
-          ],
-        },
-        {
-          model: models.LinkedThread,
-          as: 'linked_threads',
-        },
-      ],
-    });
-    return res.json({ status: 'Success', result: linkedThreadsFull.toJSON() });
+    if (remove_link === 'true') {
+      await models.LinkedThread.destroy({ where: params })
+    } else {
+      const linkedThread = await models.OffchainThread.findOne({
+        where: { id: linked_thread_id }
+      });
+      const linkingThread = await models.OffchainThread.findOne({
+        where: { id: linking_thread_id }
+      });
+      const threadsShareChain = linkedThread?.chain && linkedThread?.chain === linkingThread?.chain;
+      const threadsShareCommunity = linkedThread?.community && linkedThread?.community === linkingThread?.community;
+      if (threadsShareChain || threadsShareCommunity) {
+        await models.LinkedThread.findOrCreate({ where: params });
+      } else {
+        return next(new Error(Errors.ThreadsMustShareCommunity));
+      }
+    }
+
+    // const linkedThreads = await models.LinkedThread.findAll({
+    //   where: { linking_thread: linking_thread_id },
+    // })
+    // const linkedThreadIds = linkedThreads.map((thread) => thread.linked_thread);
+    // const linkedThreadsFull = await models.OffchainThread.findOne({
+    //   where: {
+    //     id: {
+    //       [Op.in]: linkedThreadIds,
+    //     }
+    //   },
+    //   include: [
+    //     {
+    //       model: models.Address,
+    //       as: 'Address',
+    //     },
+    //     {
+    //       model: models.Address,
+    //       // through: models.Collaboration,
+    //       as: 'collaborators',
+    //     },
+    //     {
+    //       model: models.OffchainTopic,
+    //       as: 'topic',
+    //     },
+    //     {
+    //       model: models.ChainEntity,
+    //     },
+    //     {
+    //       model: models.OffchainReaction,
+    //       as: 'reactions',
+    //       include: [
+    //         {
+    //           model: models.Address,
+    //           as: 'Address',
+    //           required: true,
+    //         },
+    //       ],
+    //     },
+    //     {
+    //       model: models.LinkedThread,
+    //       as: 'linked_threads',
+    //     },
+    //   ],
+    // });
+    return res.json({ status: 'Success', result: null }); // linkedThreadsFull.toJSON() });
   } catch (e) {
     return next(new Error(e));
   }
