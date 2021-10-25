@@ -10,7 +10,7 @@ import {
   SubstrateEvents,
   MolochEvents,
   IEventLabel,
-  chainSupportedBy,
+  // chainSupportedBy,
   CompoundTypes,
   CompoundEvents,
   AaveTypes,
@@ -21,7 +21,7 @@ import {
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import { NotificationCategories } from 'types';
-import { ProposalType } from 'identifiers';
+import { ProposalType } from 'types';
 import { Notification, AddressInfo } from 'models';
 import { link, pluralize } from 'helpers';
 import { IPostNotificationData } from 'shared/types';
@@ -392,33 +392,33 @@ const DashboardRow: m.Component<
       let label: IEventLabel;
 
       if (app.isCustomDomain() && chainId !== app.customDomainId()) return;
-      if (chainSupportedBy(chainId, SubstrateTypes.EventChains)) {
-        label = SubstrateEvents.Label(
-          notification.chainEvent.blockNumber,
-          chainId,
-          notification.chainEvent.data
-        );
-      } else if (chainSupportedBy(chainId, MolochTypes.EventChains)) {
-        label = MolochEvents.Label(
-          notification.chainEvent.blockNumber,
-          chainId,
-          notification.chainEvent.data
-        );
-      } else if (chainSupportedBy(chainId, CompoundTypes.EventChains)) {
-        label = CompoundEvents.Label(
-          notification.chainEvent.blockNumber,
-          chainId,
-          notification.chainEvent.data
-        );
-      } else if (chainSupportedBy(chainId, AaveTypes.EventChains)) {
-        label = AaveEvents.Label(
-          notification.chainEvent.blockNumber,
-          chainId,
-          notification.chainEvent.data
-        );
-      } else {
-        throw new Error(`invalid notification chain: ${chainId}`);
-      }
+      // if (chainSupportedBy(chainId, SubstrateTypes.EventChains)) {
+      //   label = SubstrateEvents.Label(
+      //     notification.chainEvent.blockNumber,
+      //     chainId,
+      //     notification.chainEvent.data
+      //   );
+      // } else if (chainSupportedBy(chainId, MolochTypes.EventChains)) {
+      //   label = MolochEvents.Label(
+      //     notification.chainEvent.blockNumber,
+      //     chainId,
+      //     notification.chainEvent.data
+      //   );
+      // } else if (chainSupportedBy(chainId, CompoundTypes.EventChains)) {
+      //   label = CompoundEvents.Label(
+      //     notification.chainEvent.blockNumber,
+      //     chainId,
+      //     notification.chainEvent.data
+      //   );
+      // } else if (chainSupportedBy(chainId, AaveTypes.EventChains)) {
+      //   label = AaveEvents.Label(
+      //     notification.chainEvent.blockNumber,
+      //     chainId,
+      //     notification.chainEvent.data
+      //   );
+      // } else {
+      //   throw new Error(`invalid notification chain: ${chainId}`);
+      // }
       m.redraw();
 
       if (vnode.state.scrollOrStop) {
