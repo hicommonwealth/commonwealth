@@ -1,112 +1,115 @@
 import 'components/thread_selector.scss';
 
 import m from 'mithril';
+import $ from 'jquery';
 import {
   ListItem,
   ControlGroup,
   Input,
-  List,
   QueryList,
   Spinner,
-  Size,
-  Button,
   Icon,
   Icons,
 } from 'construct-ui';
 
 import app from 'state';
 import { OffchainThread } from 'models';
-import { ILinkedThread } from 'client/scripts/models/OffchainThread';
+import { ILinkedThreadRelation } from 'client/scripts/models/OffchainThread';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { searchThreadTitles } from 'helpers/search';
 import { SearchParams } from './search_bar';
 
 const renderThreadPreview = (state, thread: OffchainThread, idx: number) => {
   const selected = state.linkedThreads.find((lT) => +lT.id === +thread.id);
-  console.log(thread);
+  const author = app.profiles.getProfile(thread.authorChain, thread.author);
+  console.log(author);
   return m(ListItem, {
     label: m('.linked-thread-info', [
       m('.linked-thread-top', thread.title),
-      m('.linked-thread-bottom', thread.author),
+      m('.linked-thread-bottom', [
+        author.name ? `${author.name} • ${thread.author}` : thread.author,
+      ]),
     ]),
     selected,
     key: idx,
   });
 };
 
+// The thread-to-thread relationship is comprised of linked and linking threads,
+// i.e. child and parent nodes.
+// Todo: would parent/child be conceptually clearer as handles?
+
 export const ThreadSelector: m.Component<
   {
     linkingThread: OffchainThread;
-    onSelect?;
   },
   {
-    searchTerm: string;
-    inputTimeout;
-    fetchingResults: boolean;
-    searchResults: OffchainThread[];
     linkedThreads: OffchainThread[];
     linkedThreadsFetched: boolean;
     showOnlyLinkedThreads: boolean;
-    selectedThreadId: number;
+    inputTimeout;
+    searchTerm: string;
+    searchResults: OffchainThread[];
+    fetchingResults: boolean;
   }
 > = {
   oninit: (vnode) => {
     vnode.state.showOnlyLinkedThreads = true;
     vnode.state.searchResults = [];
     vnode.state.linkedThreads = [];
-    if (!vnode.attrs.linkingThread.linkedThreads?.length) {
-      vnode.state.linkedThreadsFetched = true;
-    }
   },
   view: (vnode) => {
     const { linkingThread } = vnode.attrs;
     const { linkedThreads, linkedThreadsFetched, searchResults } = vnode.state;
+
+    // The modal kicks off by fetching the offchain threads linked to by a given parent.
     const hasLinkedThreads = linkingThread.linkedThreads?.length;
-    if (hasLinkedThreads && !linkedThreadsFetched) {
+    if (!hasLinkedThreads) {
+      vnode.state.linkedThreadsFetched = true;
+    } else if (!linkedThreadsFetched) {
       app.threads
         .fetchThreadsFromId(
           linkingThread.linkedThreads.map(
-            (lt: ILinkedThread) => lt.linked_thread
+            (relation: ILinkedThreadRelation) => relation.linked_thread
           )
         )
-        .then((res) => {
-          vnode.state.linkedThreads = res;
+        .then((result) => {
+          vnode.state.linkedThreads = result;
           vnode.state.linkedThreadsFetched = true;
           m.redraw();
         })
         .catch((err) => {
-          vnode.state.linkedThreads = [];
+          console.error(err);
           vnode.state.linkedThreadsFetched = true;
         });
     }
-    console.log({ state: vnode.state });
-    console.log({ searchResults, linkedThreads });
+
     const queryLength = vnode.state.searchTerm?.trim()?.length;
     const emptyContentMessage =
       queryLength > 0 && queryLength < 4
         ? 'Query too short'
+        : queryLength > 4 && searchResults?.length > 0
+        ? 'No threads found'
         : !hasLinkedThreads
         ? 'No currently linked threads'
-        : searchResults?.length === 0
-        ? 'No threads found'
         : null;
 
-    console.log({ emptyContentMessage });
     return m('.ThreadSelector', [
       linkedThreadsFetched
         ? m(ControlGroup, [
             m(Input, {
               placeholder: 'Search thread titles...',
+              name: 'thread-search',
               contentRight: m(Icon, {
                 name: Icons.X,
                 onclick: (e) => {
                   e.stopPropagation();
-                  const input = $('.ThreadSelector').find('input[name=search');
-                  input.val('');
+                  const input = $('.ThreadSelector').find('input');
+                  input.prop('value', '');
                   vnode.state.searchTerm = '';
                   vnode.state.searchResults = [];
                   vnode.state.showOnlyLinkedThreads = true;
-                }
+                },
               }),
               oninput: (e) => {
                 e.preventDefault();
@@ -124,10 +127,13 @@ export const ThreadSelector: m.Component<
                       resultSize: 20,
                     };
                     searchThreadTitles(vnode.state.searchTerm, params)
-                      .then((result) => {
+                      .then((results) => {
                         vnode.state.fetchingResults = false;
                         vnode.state.showOnlyLinkedThreads = false;
-                        vnode.state.searchResults = result;
+                        vnode.state.searchResults = results;
+                        results.forEach((thread) => {
+                          app.profiles.getProfile(thread.authorChain, thread.author);
+                        })
                         m.redraw();
                       })
                       .catch((err) => {
@@ -181,13 +187,11 @@ export const ThreadSelector: m.Component<
           ])
         : m('.linked-threads-selector-placeholder', [
             m('.linked-threads-selector-placeholder-text', [
-              vnode.state.linkedThreadsFetched
-                ? 'Select offchain threads to add.'
-                : m(Spinner, {
-                    active: true,
-                    fill: true,
-                    message: 'Loading offchain threads...',
-                  }),
+              m(Spinner, {
+                active: true,
+                fill: true,
+                message: 'Loading offchain threads...',
+              }),
             ]),
           ]),
     ]);

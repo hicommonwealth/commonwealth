@@ -32,14 +32,19 @@
         .cui-list-item {
             padding-left: 14px;
             padding-right: 14px; 
+            border-bottom: 1px solid $border-color-light;
             .linked-thread-info {
                 .linked-thread-top {
-
+                    font-weight: 500;
                 }
                 .linked-thread-bottom {
                     font-size: 88%;
                     font-weight: 400;
+                    color: darkgray;
                 }
+            }
+            &:last-child {
+                border-bottom: none;
             }
         }
     }

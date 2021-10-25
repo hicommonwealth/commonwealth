@@ -51,13 +51,12 @@ const search = async (
       const threads = await models.OffchainThread.findAll({
         where: params,
         limit: req.query.results_size || 20,
+        attributes: {
+          exclude: ['body', 'plaintext', 'version_history']
+        },
         include: [{
             model: models.Address,
             as: 'Address',
-          },
-          {
-            model: models.OffchainTopic,
-            as: 'topic',
           },
         ],
       });
