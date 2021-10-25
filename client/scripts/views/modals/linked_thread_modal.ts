@@ -4,7 +4,7 @@ import m from 'mithril';
 import { OffchainThread } from 'models';
 import { Button } from 'construct-ui';
 import { CompactModalExitButton } from '../modal';
-import { ThreadsSelector } from '../components/linked_threads_editor';
+import { ThreadSelector } from '../components/thread_selector';
 
 const LinkedThreadModal: m.Component<{ linkingThread: OffchainThread }, {}> = {
   view: (vnode) => {
@@ -15,7 +15,7 @@ const LinkedThreadModal: m.Component<{ linkingThread: OffchainThread }, {}> = {
         m(CompactModalExitButton),
       ]),
       m('.compact-modal-body', [
-        m(ThreadsSelector, {
+        m(ThreadSelector, {
           linkingThread,
         }),
         m(Button, {

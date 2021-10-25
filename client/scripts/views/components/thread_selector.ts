@@ -1,4 +1,4 @@
-import 'components/linked_threads_editor.scss';
+import 'components/thread_selector.scss';
 
 import m from 'mithril';
 import {
@@ -10,6 +10,8 @@ import {
   Spinner,
   Size,
   Button,
+  Icon,
+  Icons,
 } from 'construct-ui';
 
 import app from 'state';
@@ -32,7 +34,7 @@ const renderThreadPreview = (state, thread: OffchainThread, idx: number) => {
   });
 };
 
-export const ThreadsSelector: m.Component<
+export const ThreadSelector: m.Component<
   {
     linkingThread: OffchainThread;
     onSelect?;
@@ -90,11 +92,19 @@ export const ThreadsSelector: m.Component<
         : null;
 
     console.log({ emptyContentMessage });
-    return m('.ThreadsSelector', [
+    return m('.ThreadSelector', [
       linkedThreadsFetched
         ? m(ControlGroup, [
             m(Input, {
               placeholder: 'Search thread titles...',
+              contentRight: m(Icon, {
+                name: Icons.X,
+                onclick: (e) => {
+                  e.stopPropagation();
+                  const input = $('.ThreadSelector').find('input[name=search');
+                  input.val('');
+                }
+              }),
               oninput: (e) => {
                 e.preventDefault();
                 e.stopPropagation();

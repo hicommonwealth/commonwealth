@@ -1,6 +1,6 @@
 @import 'client/styles/shared';
 
-.ThreadsSelector {
+.ThreadSelector {
     padding: 0;
     border: 1px solid #ddd;
     margin: 10px 0 20px;
@@ -19,6 +19,7 @@
             border-bottom-color: $border-color-light;
             height: 44px;
             border-radius: 0;
+            padding: 22px 14px 15.6px;
         }
     }
     .cui-list {
@@ -29,6 +30,8 @@
             background: initial;
         }
         .cui-list-item {
+            padding-left: 14px;
+            padding-right: 14px; 
             .linked-thread-info {
                 .linked-thread-top {
 
