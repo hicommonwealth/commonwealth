@@ -209,7 +209,9 @@ view: (vnode) => {
       rounded: true,
       compact: true,
       fluid: true,
-      label: 'Link threads',
+      label: linkingThread.linkedThreads?.length
+        ? 'Linked threads'
+        : 'Link threads',
       onclick: (e) => {
         e.preventDefault();
         app.modals.create({

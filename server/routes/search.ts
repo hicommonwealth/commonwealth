@@ -22,18 +22,22 @@ const search = async (
   let replacements = {};
 
   if (req.query.thread_title_only === 'true') {
+    const encodedSearchTerm = encodeURIComponent(req.query.search);
     try {
       const threads = await models.OffchainThread.findAll({
         where: {
           title: {
             [Op.or]: [
+              { [Op.iLike]: `%${encodedSearchTerm}` },
+              { [Op.iLike]: `${encodedSearchTerm}%` },
+              { [Op.iLike]: `%${encodedSearchTerm}%` },
               { [Op.iLike]: `%${req.query.search}` },
               { [Op.iLike]: `${req.query.search}%` },
               { [Op.iLike]: `%${req.query.search}%` },
             ]
           },
         },
-        limit: req.query.results_size || 10,
+        limit: req.query.results_size || 20,
         include: [{
             model: models.Address,
             as: 'Address',

@@ -1,0 +1,15 @@
+@import 'client/styles/shared';
+@import 'client/styles/mixins/responsive';
+
+.LinkedThreadModal {
+    min-width: 55vw;
+    max-width: 55vw;
+    @include md-max {
+        max-width: none;
+    }
+    .compact-modal-body {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+    }
+}

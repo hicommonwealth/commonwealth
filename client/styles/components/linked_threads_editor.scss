@@ -3,7 +3,7 @@
 .ThreadsSelector {
     padding: 0;
     border: 1px solid #ddd;
-    margin: 10px 8px 20px;
+    margin: 10px 0 20px;
     border-radius: 5px;
     .cui-control-group {
         margin-bottom: 0;
@@ -41,10 +41,11 @@
         }
     }
     .cui-query-list-empty {
-        .empty-content-wrap {
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        position: relative;
+        top: 50px;
+        bottom: 50px;
+        .cui-query-list-message {
+            text-align: center;
         }
     }
     .cui-query-list-checkmark .cui-list-item-content-left {
