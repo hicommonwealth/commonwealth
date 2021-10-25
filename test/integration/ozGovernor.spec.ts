@@ -4,7 +4,7 @@ import { EventEmitter } from 'events';
 
 import chai, { expect } from 'chai';
 import { ethers } from 'hardhat';
-import { BigNumber, utils } from 'ethers';
+import { BigNumber, BigNumberish, utils } from 'ethers';
 import type { Signer, providers } from 'ethers';
 
 import {
@@ -12,6 +12,8 @@ import {
   GovernorMock__factory as GovernorMockFactory,
   ERC20VotesMock,
   ERC20VotesMock__factory as ERC20VotesMockFactory,
+  TimelockController,
+  TimelockController__factory as TimelockControllerFactory,
 } from '../../src/contractTypes';
 import {
   BravoSupport,
@@ -20,6 +22,7 @@ import {
   IProposalCanceled,
   IProposalCreated,
   IProposalExecuted,
+  IProposalQueued,
   IVoteCast,
   ProposalState,
 } from '../../src/chains/compound/types';
@@ -37,6 +40,16 @@ async function deployErc20VotesMock(
   const t = await factory.deploy('Test Token', 'TEST');
   await t.mint(account, amount);
   return t;
+}
+
+async function deployTimelock(
+  signer: Signer | providers.JsonRpcSigner,
+  minDelay: BigNumberish,
+  proposers: string[],
+  executors: string[]
+): Promise<TimelockController> {
+  const factory = new TimelockControllerFactory(signer);
+  return factory.deploy(minDelay, proposers, executors);
 }
 
 class CompoundEventHandler extends IEventHandler {
@@ -77,6 +90,9 @@ async function setupSubscription(): Promise<ISetupData> {
   // deploy voting token and mint 100 tokens
   const token = await deployErc20VotesMock(signer, member, 100);
 
+  // deploy timelock
+  const timelock = await deployTimelock(signer, 2 * 60, [member], [member]); // 2 min minutes delay
+
   // deploy governor
   const factory = new GovernorMockFactory(signer);
   const governor = await factory.deploy(
@@ -84,8 +100,16 @@ async function setupSubscription(): Promise<ISetupData> {
     token.address,
     2, // 2 blocks delay until vote starts
     16, // vote goes for 16 blocks
-    5 // 5% of token supply must vote to pass = 5 tokens
+    timelock.address,
+    5, // 5% of token supply must vote to pass = 5 tokens,
+    0 // 0 votes required for a voter to become a proposer
   );
+
+  // ensure governor can make calls on timelock by granting roles
+  const PROPOSER_ROLE = await timelock.PROPOSER_ROLE();
+  const EXECUTOR_ROLE = await timelock.EXECUTOR_ROLE();
+  await timelock.grantRole(PROPOSER_ROLE, governor.address);
+  await timelock.grantRole(EXECUTOR_ROLE, governor.address);
 
   const handler = new CompoundEventHandler(new EventEmitter());
 
@@ -413,13 +437,45 @@ describe('OpenZeppelin Governance Event Integration Tests', () => {
       }
 
       // We have voted yes, so proposal should succeed
-      const state = await api.state(p.data.id);
+      let state = await api.state(p.data.id);
       expect(state).to.be.equal(ProposalState.Succeeded);
 
-      // perform execute
+      // queue the proposal
       const descriptionHash = utils.keccak256(
         utils.toUtf8Bytes(p.data.description)
       );
+      await api.queue(
+        p.data.targets,
+        p.data.values,
+        p.data.calldatas,
+        descriptionHash
+      );
+      const qEvt: CWEvent<IProposalQueued> = await assertEvent(
+        handler,
+        EventKind.ProposalQueued
+      );
+      assert.deepEqual(
+        {
+          kind: qEvt.data.kind,
+          id: qEvt.data.id,
+        },
+        {
+          kind: EventKind.ProposalQueued,
+          id: p.data.id,
+        }
+      );
+
+      state = await api.state(p.data.id);
+      expect(state).to.be.equal(ProposalState.Queued);
+
+      // wait 2min
+      const timeToAdvance = 120;
+      await provider.send('evm_increaseTime', [timeToAdvance]);
+      for (let i = 0; i < Math.ceil(timeToAdvance / 15); i++) {
+        await provider.send('evm_mine', []);
+      }
+
+      // perform execute
       await api.execute(
         p.data.targets,
         p.data.values,

@@ -309,7 +309,7 @@ async function proposeAndQueue(
           },
           {
             kind: EventKind.ProposalQueued,
-            id: activeProposals,
+            id: activeProposals.toHexString(),
           }
         );
       }
@@ -431,7 +431,7 @@ describe('Governor Alpha Integration Tests', () => {
       );
     });
 
-    xit('should be queued and executed', async () => {
+    it('should be queued and executed', async () => {
       const {
         governorAlpha,
         comp,
@@ -463,43 +463,51 @@ describe('Governor Alpha Integration Tests', () => {
               },
               {
                 kind: EventKind.ProposalExecuted,
-                id: activeProposals,
+                id: activeProposals.toHexString(),
               }
             );
           }
         ),
       ]);
     });
-  });
 
-  xit('should expire in queue', async () => {
-    const {
-      governorAlpha,
-      comp,
-      timelock,
-      addresses,
-      handler,
-      provider,
-    } = await setupSubscription();
-    await proposeAndQueue(handler, provider, governorAlpha, comp, addresses[0]);
+    it('should expire in queue', async () => {
+      const {
+        governorAlpha,
+        comp,
+        timelock,
+        addresses,
+        handler,
+        provider,
+      } = await setupSubscription();
+      await proposeAndQueue(
+        handler,
+        provider,
+        governorAlpha,
+        comp,
+        addresses[0]
+      );
 
-    // advance beyond grace period so it expires despite successful votes
-    const activeProposals = await governorAlpha.latestProposalIds(addresses[0]);
-    const gracePeriod = await timelock.GRACE_PERIOD();
-    const proposal = await governorAlpha.proposals(activeProposals);
-    const expirationTime = +gracePeriod.add(proposal.eta);
-    const currentBlock = await provider.getBlockNumber();
-    const { timestamp } = await provider.getBlock(currentBlock);
-    const timeUntilExpiration = expirationTime - timestamp;
-    const timeToAdvance = timeUntilExpiration + 15;
-    const blocksToAdvance = Math.ceil(timeToAdvance / 15);
-    await provider.send('evm_increaseTime', [timeToAdvance]);
-    for (let i = 0; i < blocksToAdvance; i++) {
-      await provider.send('evm_mine', []);
-    }
+      // advance beyond grace period so it expires despite successful votes
+      const activeProposals = await governorAlpha.latestProposalIds(
+        addresses[0]
+      );
+      const gracePeriod = await timelock.GRACE_PERIOD();
+      const proposal = await governorAlpha.proposals(activeProposals);
+      const expirationTime = +gracePeriod.add(proposal.eta);
+      const currentBlock = await provider.getBlockNumber();
+      const { timestamp } = await provider.getBlock(currentBlock);
+      const timeUntilExpiration = expirationTime - timestamp;
+      const timeToAdvance = timeUntilExpiration + 15;
+      const blocksToAdvance = Math.ceil(timeToAdvance / 15);
+      await provider.send('evm_increaseTime', [timeToAdvance]);
+      for (let i = 0; i < blocksToAdvance; i++) {
+        await provider.send('evm_mine', []);
+      }
 
-    // ensure state is set to expired
-    const state = await governorAlpha.state(activeProposals);
-    expect(state).to.be.equal(ProposalState.Expired);
+      // ensure state is set to expired
+      const state = await governorAlpha.state(activeProposals);
+      expect(state).to.be.equal(ProposalState.Expired);
+    });
   });
 });

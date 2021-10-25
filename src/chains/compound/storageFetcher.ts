@@ -118,9 +118,8 @@ export class StorageFetcher extends IStorageFetcher<Api> {
       )
     );
 
-    // Bravo does not have queued events
-    let queuedCwEvents: CWEvent<IProposalQueued>[] = [];
-    if (isGovernorAlpha(this._api)) {
+    let queuedCwEvents = [];
+    try {
       const proposalQueuedEvents = await this._api.queryFilter(
         this._api.filters.ProposalQueued(null, null),
         range.startBlock,
@@ -137,6 +136,8 @@ export class StorageFetcher extends IStorageFetcher<Api> {
             ) as Promise<CWEvent<IProposalQueued>>
         )
       );
+    } catch (e) {
+      log.warn('Could not fetched queued events.');
     }
     const proposalCanceledEvents = await this._api.queryFilter(
       this._api.filters.ProposalCanceled(null),

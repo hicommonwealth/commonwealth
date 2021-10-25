@@ -23,6 +23,7 @@ import {
   IProposalCanceled,
   IProposalCreated,
   IProposalExecuted,
+  IProposalQueued,
   IVoteCast,
   ProposalState,
 } from '../../src/chains/compound/types';
@@ -558,8 +559,27 @@ describe('Governor Bravo Event Integration Tests', () => {
 
       activeProposals = await GovernorBravo.latestProposalIds(from);
       await GovernorBravo.queue(activeProposals);
-      await GovernorBravo.execute(activeProposals);
+      await Promise.all([
+        assertEvent(
+          handler,
+          EventKind.ProposalQueued,
+          (evt: CWEvent<IProposalQueued>) => {
+            const { kind, id } = evt.data;
+            assert.deepEqual(
+              {
+                kind,
+                id,
+              },
+              {
+                kind: EventKind.ProposalQueued,
+                id: activeProposals.toHexString(),
+              }
+            );
+          }
+        ),
+      ]);
 
+      await GovernorBravo.execute(activeProposals);
       await Promise.all([
         assertEvent(
           handler,
@@ -580,171 +600,202 @@ describe('Governor Bravo Event Integration Tests', () => {
         ),
       ]);
     });
-  });
 
-  it('should expire in queue', async function () {
-    this.timeout(0);
-    const {
-      GovernorBravo,
-      comp,
-      timelock,
-      addresses,
-      handler,
-      provider,
-    } = await setupSubscription();
+    it('should expire in queue', async function () {
+      this.timeout(0);
+      const {
+        GovernorBravo,
+        comp,
+        timelock,
+        addresses,
+        handler,
+        provider,
+      } = await setupSubscription();
 
-    const from = addresses[0];
+      const from = addresses[0];
 
-    let activeProposals = await createActiveProposal(
-      handler,
-      GovernorBravo,
-      comp,
-      from,
-      provider
-    );
+      let activeProposals = await createActiveProposal(
+        handler,
+        GovernorBravo,
+        comp,
+        from,
+        provider
+      );
 
-    // VoteCast Event
-    const { startBlock } = await GovernorBravo.proposals(activeProposals);
-    const voteWeight = await comp.getPriorVotes(from, startBlock);
-    await GovernorBravo.castVote(activeProposals, BravoSupport.For);
-    await assertEvent(
-      handler,
-      EventKind.VoteCast,
-      (evt: CWEvent<IVoteCast>) => {
-        assert.deepEqual(evt.data, {
-          kind: EventKind.VoteCast,
-          id: activeProposals.toHexString(),
-          voter: from,
-          support: BravoSupport.For,
-          votes: voteWeight.toString(),
-          reason: '',
-        });
+      // VoteCast Event
+      const { startBlock } = await GovernorBravo.proposals(activeProposals);
+      const voteWeight = await comp.getPriorVotes(from, startBlock);
+      await GovernorBravo.castVote(activeProposals, BravoSupport.For);
+      await assertEvent(
+        handler,
+        EventKind.VoteCast,
+        (evt: CWEvent<IVoteCast>) => {
+          assert.deepEqual(evt.data, {
+            kind: EventKind.VoteCast,
+            id: activeProposals.toHexString(),
+            voter: from,
+            support: BravoSupport.For,
+            votes: voteWeight.toString(),
+            reason: '',
+          });
+        }
+      );
+
+      // Increase time until end of voting period
+      const votingPeriodInBlocks = +(await GovernorBravo.votingPeriod());
+      await provider.send('evm_increaseTime', [votingPeriodInBlocks * 15]);
+      for (let i = 0; i < votingPeriodInBlocks; i++) {
+        await provider.send('evm_mine', []);
       }
-    );
 
-    // Increase time until end of voting period
-    const votingPeriodInBlocks = +(await GovernorBravo.votingPeriod());
-    await provider.send('evm_increaseTime', [votingPeriodInBlocks * 15]);
-    for (let i = 0; i < votingPeriodInBlocks; i++) {
-      await provider.send('evm_mine', []);
-    }
+      activeProposals = await GovernorBravo.latestProposalIds(from);
+      let state = await GovernorBravo.state(activeProposals);
+      expect(state).to.be.equal(ProposalState.Succeeded);
 
-    activeProposals = await GovernorBravo.latestProposalIds(from);
-    let state = await GovernorBravo.state(activeProposals);
-    expect(state).to.be.equal(ProposalState.Succeeded);
+      activeProposals = await GovernorBravo.latestProposalIds(from);
+      await GovernorBravo.queue(activeProposals);
+      await Promise.all([
+        assertEvent(
+          handler,
+          EventKind.ProposalQueued,
+          (evt: CWEvent<IProposalQueued>) => {
+            const { kind, id } = evt.data;
+            assert.deepEqual(
+              {
+                kind,
+                id,
+              },
+              {
+                kind: EventKind.ProposalQueued,
+                id: activeProposals.toHexString(),
+              }
+            );
+          }
+        ),
+      ]);
 
-    activeProposals = await GovernorBravo.latestProposalIds(from);
-    await GovernorBravo.queue(activeProposals);
+      // advance beyond grace period so it expires despite successful votes
+      activeProposals = await GovernorBravo.latestProposalIds(addresses[0]);
+      const gracePeriod = await timelock.GRACE_PERIOD();
+      const proposal = await GovernorBravo.proposals(activeProposals);
+      const expirationTime = +gracePeriod.add(proposal.eta);
+      const currentBlock = await provider.getBlockNumber();
+      const { timestamp } = await provider.getBlock(currentBlock);
+      const timeUntilExpiration = expirationTime - timestamp;
+      const timeToAdvance = timeUntilExpiration + 15;
+      const blocksToAdvance = Math.ceil(timeToAdvance / 15);
+      await provider.send('evm_increaseTime', [timeToAdvance]);
+      for (let i = 0; i < blocksToAdvance; i++) {
+        await provider.send('evm_mine', []);
+      }
 
-    // advance beyond grace period so it expires despite successful votes
-    activeProposals = await GovernorBravo.latestProposalIds(addresses[0]);
-    const gracePeriod = await timelock.GRACE_PERIOD();
-    const proposal = await GovernorBravo.proposals(activeProposals);
-    const expirationTime = +gracePeriod.add(proposal.eta);
-    const currentBlock = await provider.getBlockNumber();
-    const { timestamp } = await provider.getBlock(currentBlock);
-    const timeUntilExpiration = expirationTime - timestamp;
-    const timeToAdvance = timeUntilExpiration + 15;
-    const blocksToAdvance = Math.ceil(timeToAdvance / 15);
-    await provider.send('evm_increaseTime', [timeToAdvance]);
-    for (let i = 0; i < blocksToAdvance; i++) {
-      await provider.send('evm_mine', []);
-    }
+      // ensure state is set to expired
+      state = await GovernorBravo.state(activeProposals);
+      expect(state).to.be.equal(ProposalState.Expired);
+    });
 
-    // ensure state is set to expired
-    state = await GovernorBravo.state(activeProposals);
-    expect(state).to.be.equal(ProposalState.Expired);
-  });
+    it('should fetch proposals from storage', async function () {
+      this.timeout(0);
+      const {
+        GovernorBravo,
+        comp,
+        addresses,
+        handler,
+        provider,
+        api,
+      } = await setupSubscription();
 
-  it('should fetch proposals from storage', async function () {
-    this.timeout(0);
-    const {
-      GovernorBravo,
-      comp,
-      addresses,
-      handler,
-      provider,
-      api,
-    } = await setupSubscription();
+      const from = addresses[0];
+      const beginBlock = await provider.getBlockNumber();
 
-    const from = addresses[0];
-    const beginBlock = await provider.getBlockNumber();
+      let activeProposals = await createActiveProposal(
+        handler,
+        GovernorBravo,
+        comp,
+        from,
+        provider
+      );
 
-    let activeProposals = await createActiveProposal(
-      handler,
-      GovernorBravo,
-      comp,
-      from,
-      provider
-    );
+      await GovernorBravo.castVote(activeProposals, BravoSupport.For);
 
-    await GovernorBravo.castVote(activeProposals, BravoSupport.For);
+      // Increase time until end of voting period
+      const votingPeriodInBlocks = +(await GovernorBravo.votingPeriod());
+      await provider.send('evm_increaseTime', [votingPeriodInBlocks * 15]);
+      for (let i = 0; i < votingPeriodInBlocks; i++) {
+        await provider.send('evm_mine', []);
+      }
 
-    // Increase time until end of voting period
-    const votingPeriodInBlocks = +(await GovernorBravo.votingPeriod());
-    await provider.send('evm_increaseTime', [votingPeriodInBlocks * 15]);
-    for (let i = 0; i < votingPeriodInBlocks; i++) {
-      await provider.send('evm_mine', []);
-    }
+      activeProposals = await GovernorBravo.latestProposalIds(from);
+      const state = await GovernorBravo.state(activeProposals);
+      expect(state).to.be.equal(ProposalState.Succeeded);
 
-    activeProposals = await GovernorBravo.latestProposalIds(from);
-    const state = await GovernorBravo.state(activeProposals);
-    expect(state).to.be.equal(ProposalState.Succeeded);
+      activeProposals = await GovernorBravo.latestProposalIds(from);
+      await GovernorBravo.queue(activeProposals);
+      const p = await GovernorBravo.proposals(activeProposals);
+      const eta = +p.eta;
+      await GovernorBravo.execute(activeProposals);
 
-    activeProposals = await GovernorBravo.latestProposalIds(from);
-    await GovernorBravo.queue(activeProposals);
-    await GovernorBravo.execute(activeProposals);
-
-    // TODO: compute block numbers rather than manually
-    const eventData: CWEvent<IEventData>[] = [
-      {
-        blockNumber: beginBlock + 2,
-        data: {
-          calldatas: [
-            '0x000000000000000000000000c11b1268c1a384e55c48c2391d8d480264a3a7f40000000000000000000000000000000000000000000000000853a0d2313c0000',
-          ],
-          description: 'test description',
-          endBlock: beginBlock + 13,
-          id: '0x02',
-          kind: EventKind.ProposalCreated,
-          proposer: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
-          signatures: ['_setCollateralFactor(address,uint256)'],
-          startBlock: beginBlock + 3,
-          targets: ['0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B'],
-          values: ['0'],
+      // TODO: compute block numbers rather than manually
+      const eventData: CWEvent<IEventData>[] = [
+        {
+          blockNumber: beginBlock + 2,
+          data: {
+            calldatas: [
+              '0x000000000000000000000000c11b1268c1a384e55c48c2391d8d480264a3a7f40000000000000000000000000000000000000000000000000853a0d2313c0000',
+            ],
+            description: 'test description',
+            endBlock: beginBlock + 13,
+            id: '0x02',
+            kind: EventKind.ProposalCreated,
+            proposer: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
+            signatures: ['_setCollateralFactor(address,uint256)'],
+            startBlock: beginBlock + 3,
+            targets: ['0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B'],
+            values: ['0'],
+          },
+          excludeAddresses: ['0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'],
+          network: SupportedNetwork.Compound,
         },
-        excludeAddresses: ['0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'],
-        network: SupportedNetwork.Compound,
-      },
-      {
-        blockNumber: beginBlock + 5,
-        data: {
-          id: '0x02',
-          kind: EventKind.VoteCast,
-          reason: '',
-          support: 1,
-          voter: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
-          votes: '3',
+        {
+          blockNumber: beginBlock + 5,
+          data: {
+            id: '0x02',
+            kind: EventKind.VoteCast,
+            reason: '',
+            support: 1,
+            voter: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
+            votes: '3',
+          },
+          excludeAddresses: ['0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'],
+          network: SupportedNetwork.Compound,
         },
-        excludeAddresses: ['0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'],
-        network: SupportedNetwork.Compound,
-      },
-      {
-        blockNumber: beginBlock + 17,
-        data: {
-          id: '0x02',
-          kind: EventKind.ProposalExecuted,
+        {
+          blockNumber: beginBlock + 16,
+          data: {
+            id: '0x02',
+            kind: EventKind.ProposalQueued,
+            eta,
+          },
+          excludeAddresses: [],
+          network: SupportedNetwork.Compound,
         },
-        excludeAddresses: [],
-        network: SupportedNetwork.Compound,
-      },
-    ];
+        {
+          blockNumber: beginBlock + 17,
+          data: {
+            id: '0x02',
+            kind: EventKind.ProposalExecuted,
+          },
+          excludeAddresses: [],
+          network: SupportedNetwork.Compound,
+        },
+      ];
 
-    // fetch all non-complete from storage (none)
-    const fetcher = new StorageFetcher(api);
+      // fetch all non-complete from storage (none)
+      const fetcher = new StorageFetcher(api);
 
-    // fetch all from storage
-    const allData = await fetcher.fetch();
-    assert.deepEqual(allData, eventData);
+      // fetch all from storage
+      const allData = await fetcher.fetch();
+      assert.deepEqual(allData, eventData);
+    });
   });
 });

@@ -1,10 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Contract, utils } from 'ethers';
 
-import {
-  GovernorAlpha,
-  GovernorCompatibilityBravo,
-} from '../../../contractTypes';
+import { GovernorCompatibilityBravo } from '../../../contractTypes';
 import { TypedEventFilter } from '../../../contractTypes/commons';
 import { CWEvent, SupportedNetwork } from '../../../interfaces';
 import { EventKind, RawEvent, IEventData, Api } from '../types';
@@ -107,8 +104,7 @@ export async function Enrich(
     }
     case EventKind.ProposalQueued: {
       const [id, eta] = rawData.args as GetArgType<
-        // Bravo omits the Queued event
-        GovernorAlpha,
+        GovernorCompatibilityBravo,
         'ProposalQueued'
       >;
       return {
@@ -128,7 +124,7 @@ export async function Enrich(
         proposalId,
         support,
         votes,
-        reason,
+        reason, // should be undefined in GovAlpha version
       ] = rawData.args as GetArgType<GovernorCompatibilityBravo, 'VoteCast'>;
       return {
         blockNumber,
