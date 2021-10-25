@@ -7,6 +7,7 @@ import * as path from 'path';
 import { MetaMask } from './wallets/metamask';
 import { getWindowTitles } from './util';
 import { TerraStation } from './wallets/terraStation';
+import { PolkadotJs } from './wallets/polkadotJs';
 
 
 export class BasePage {
@@ -15,6 +16,8 @@ export class BasePage {
   protected _metamask: MetaMask
 
   protected _terraStation: TerraStation
+
+  protected _polkadotJs: PolkadotJs
 
   /**
    * Sets all asynchronous settings like timeouts and window size. It also loads and sets up all the required chrome
@@ -60,11 +63,27 @@ export class BasePage {
     return handles;
   }
 
+  public async initWithPolkadotJs(): Promise<{[key: string]: string}> {
+    const chromeOptions = new chrome.Options().addExtensions([fs.readFileSync(path.resolve(__dirname,
+      '../fixtures/ChromeExtensions/PolkadotJS.crx'), { encoding: 'base64' })])
+    this.driver = new webdriver.Builder().forBrowser('chrome').setChromeOptions(chromeOptions).build();
+
+    const handles = await this.init();
+
+    this._polkadotJs = new PolkadotJs();
+    handles['polkadotJs'] = await this._polkadotJs.setup(this.driver);
+    return handles;
+  }
+
   public get metamask() {
     return this._metamask;
   }
 
   public get terraStation() {
     return this._terraStation;
+  }
+
+  public get polkadotJs() {
+    return this._polkadotJs;
   }
 }

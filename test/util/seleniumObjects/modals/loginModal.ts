@@ -1,7 +1,7 @@
 /* eslint-disable */
 import { By, WebDriver } from 'selenium-webdriver';
 import { MetaMask } from '../wallets/metamask';
-import { getWindow, getWindowTitles } from '../util';
+import { getWindow, getWindowTitles, waitForWindow } from '../util';
 import { HomePage } from '../Pages/home';
 import { WalletInterface } from '../wallets/walletInterface';
 
@@ -64,8 +64,6 @@ export class LoginModal {
         await getWindow(this.driver, 'Commonwealth');
         accounts = await this.driver.findElements(this.accountItems);
         await accounts[0].click();
-
-
         await wallet.signTxn(this.driver);
         break;
 
@@ -74,6 +72,16 @@ export class LoginModal {
         await wallet.injectWallet(this.driver);
         accounts = await this.driver.findElements(this.accountItems);
         await accounts[0].click();
+        break;
+
+      case WalletName.POLKADOT:
+        await wallet.injectWallet(this.driver);
+        await waitForWindow(this.driver, 'Commonwealth');
+        await getWindow(this.driver, 'Commonwealth');
+        accounts = await this.driver.findElements(this.accountItems);
+        await accounts[0].click();
+        await wallet.signTxn(this.driver);
+        break;
     }
 
     return this.driver
