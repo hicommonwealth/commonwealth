@@ -3,7 +3,7 @@ import $ from 'jquery';
 import _ from 'lodash';
 
 import { NotificationStore } from 'stores';
-import { NotificationSubscription, Notification } from 'models';
+import { ChainInfo, CommunityInfo, NotificationSubscription, Notification } from 'models';
 import app from 'state';
 
 const post = (route, args, callback) => {
@@ -204,10 +204,33 @@ class NotificationsController {
     if (!app.user || !app.user.jwt) {
       throw new Error('must be logged in to refresh notifications');
     }
+
+    // Get the user's joined community ids
+    const allCommunities = (app.config.communities.getAll() as (CommunityInfo | ChainInfo)[])
+      .concat(app.config.chains.getAll())
+      .filter((item) => {
+        // only show chains with nodes
+        return (item instanceof ChainInfo)
+          ? app.config.nodes.getByChain(item.id)?.length
+          : true;
+      });
+
+    const isInCommunity = (item) => {
+      if (item instanceof ChainInfo) {
+        return app.user.getAllRolesInCommunity({ chain: item.id }).length > 0;
+      } else if (item instanceof CommunityInfo) {
+        return app.user.getAllRolesInCommunity({ community: item.id }).length > 0;
+      } else {
+        return false;
+      }
+    };
+    
+    const joinedCommunityIds = allCommunities.filter((c) => isInCommunity(c)).map(e => e.id);
+    
     // TODO: Change to GET /notifications
     return post(
       '/viewNotifications',
-      { include_latest_activity_data: true },
+      { include_latest_activity_data: true, communityIds: joinedCommunityIds.join(',') },
       (result) => {
         this._store.clear();
         this._subscriptions = [];
@@ -220,8 +243,10 @@ class NotificationsController {
               notificationJSON,
               subscription
             );
-            console.log(notification);
-            this._store.add(notification);
+            
+            if(this._store.getAll().filter(e => e.data == notification.data).length == 0){
+              this._store.add(notification);
+            }
           }
         }
       }
