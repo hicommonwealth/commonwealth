@@ -555,11 +555,7 @@ class ThreadsController {
     if (response.status !== 'Success') {
       throw new Error();
     }
-    // console.log(response.result);
-    // return response.result.map((rawThread: OffchainThreadInstance) => {
-    //   const modeledThread = modelFromServer(rawThread);
-    //   return modeledThread;
-    // });
+    this._store.update(modelFromServer(response.result));
   }
 
   public async removeLinkedThread(
@@ -580,11 +576,7 @@ class ThreadsController {
     if (response.status !== 'Success') {
       throw new Error();
     }
-    // console.log(response.result);
-    // return response.result.map((rawThread: OffchainThreadInstance) => {
-    //   const modeledThread = modelFromServer(rawThread);
-    //   return modeledThread;
-    // });
+    this._store.update(modelFromServer(response.result));
   }
 
   public async fetchThreadIdForSnapshot(args: { snapshot: string }) {

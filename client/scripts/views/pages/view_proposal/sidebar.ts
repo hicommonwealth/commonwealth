@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { Button } from 'construct-ui';
+import { Button, List, ListItem } from 'construct-ui';
 
 import app from 'state';
 
@@ -9,8 +9,10 @@ import {
   chainEntityTypeToProposalName,
 } from 'identifiers';
 import { OffchainThread } from 'models';
+import { ILinkedThreadRelation } from 'client/scripts/models/OffchainThread';
 import { SnapshotProposal } from 'client/scripts/helpers/snapshot_utils';
 import LinkedThreadModal from '../../modals/linked_thread_modal';
+import { slugify } from '../../../../../shared/utils';
 
 export const ProposalSidebarLinkedChainEntity: m.Component<{
   proposal: OffchainThread;
@@ -84,51 +86,6 @@ export const ProposalSidebarLinkedSnapshot: m.Component<
   },
 };
 
-export const ProposalSidebarLinkedThreads: m.Component<
-  {
-    proposal: OffchainThread;
-  },
-  {
-    initialized: boolean;
-    threadsLoaded: boolean;
-    linkedThreads: OffchainThread[];
-  }
-> = {
-  view: (vnode) => {
-    const { proposal } = vnode.attrs;
-    if (!proposal.linkedThreads?.length) return;
-
-    if (!vnode.state.initialized) {
-      vnode.state.initialized = true;
-      app.threads
-        .fetchThreadsFromId(
-          proposal.linkedThreads.map((th) => th.linked_thread)
-        )
-        .then((result) => {
-          vnode.state.threadsLoaded = true;
-          vnode.state.linkedThreads = result;
-        });
-    }
-
-    return m(
-      '.ProposalSidebarLinkedThreads',
-      !vnode.state.threadsLoaded
-        ? vnode.state.linkedThreads.map((thread) => {
-            const proposalLink = `${
-              app.isCustomDomain() ? '' : `/${proposal.chain}`
-            }/proposal/discussion/${thread.id}`;
-            return link('a', proposalLink, thread.title);
-          })
-        : proposal.linkedThreads.map((thread) => {
-            const proposalLink = `${
-              app.isCustomDomain() ? '' : `/${proposal.chain}`
-            }/proposal/discussion/${thread.linked_thread}`;
-            return link('a', proposalLink, 'Loading...');
-          })
-    );
-  },
-};
-
 export const ProposalSidebarPollEditorModule: m.Component<
   {
     proposal;
@@ -159,6 +116,68 @@ export const ProposalSidebarPollEditorModule: m.Component<
   },
 };
 
+export const ProposalLinkedThreadsEditorModule: m.Component<{
+  proposal: OffchainThread;
+  allowLinking: boolean;
+}, {
+  linkedThreadsFetched: boolean;
+  linkedThreads: OffchainThread[];
+} > = {
+  view: (vnode) => {
+    const { proposal, allowLinking } = vnode.attrs;
+    const { linkedThreadsFetched } = vnode.state;
+    if (!linkedThreadsFetched) {
+      app.threads
+        .fetchThreadsFromId(
+          proposal.linkedThreads.map(
+            (relation: ILinkedThreadRelation) => relation.linked_thread
+          )
+        )
+        .then((result) => {
+          vnode.state.linkedThreads = result;
+          vnode.state.linkedThreadsFetched = true;
+          m.redraw();
+        })
+        .catch((err) => {
+          console.error(err);
+          vnode.state.linkedThreadsFetched = true;
+        });
+    } else if (allowLinking || proposal.linkedThreads.length) {
+      return m('.ProposalLinkedThreadsEditorModule', [
+        m(List, vnode.state.linkedThreads.map((thread) => {
+            const discussionLink =
+            `/${app.activeId()}/proposal/${thread.slug}/${thread.identifier}-` +
+            `${slugify(thread.title)}`;
+            return m(ListItem, {
+              label: link(
+                'a.linked-thread',
+                discussionLink,
+                thread.title,
+              )
+            });
+          })
+        ),
+        allowLinking &&
+        m(Button, {
+          rounded: true,
+          compact: true,
+          fluid: true,
+          label: proposal.linkedThreads?.length
+            ? 'Linked threads'
+            : 'Link threads',
+          onclick: (e) => {
+            e.preventDefault();
+            app.modals.create({
+              modal: LinkedThreadModal,
+              data: { linkingThread: proposal },
+            });
+          },
+        }),
+      ]);
+    }
+  }
+}
+
 export const ProposalSidebarLinkedViewer: m.Component<{
   proposal: OffchainThread;
 }> = {
@@ -185,43 +204,8 @@ export const ProposalSidebarLinkedViewer: m.Component<{
         ]),
       proposal.snapshotProposal?.length > 0 &&
         m(ProposalSidebarLinkedSnapshot, { proposal }),
-      proposal.linkedThreads?.length > 0
-        ? m('.placeholder-copy', 'Linked threads:')
-        : m('.placeholder-copy', 'Link offchain threads?'),
-      proposal.linkedThreads?.length > 0 &&
-        m(ProposalSidebarLinkedThreads, { proposal }),
     ]);
   },
-};
-
-export const ProposalSidebarLinkedThreadsEditorModule: m.Component<
-{
-  linkingThread: OffchainThread;
-},
-{
-  isOpen: boolean;
-}
-> = {
-view: (vnode) => {
-  const { linkingThread } = vnode.attrs;
-  return m('.ProposalSidebarLinkedThreadsEditorModule', [
-    m(Button, {
-      rounded: true,
-      compact: true,
-      fluid: true,
-      label: linkingThread.linkedThreads?.length
-        ? 'Linked threads'
-        : 'Link threads',
-      onclick: (e) => {
-        e.preventDefault();
-        app.modals.create({
-          modal: LinkedThreadModal,
-          data: { linkingThread },
-        });
-      },
-    }),
-  ]);
-},
 };
 
 export const ProposalSidebarStageEditorModule: m.Component<

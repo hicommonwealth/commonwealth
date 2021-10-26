@@ -87,7 +87,7 @@ import {
   ProposalSidebarStageEditorModule,
   ProposalSidebarPollEditorModule,
   ProposalSidebarLinkedViewer,
-  ProposalSidebarLinkedThreadsEditorModule,
+  ProposalLinkedThreadsEditorModule,
 } from './sidebar';
 import {
   AaveViewProposalDetail,
@@ -1308,9 +1308,10 @@ const ViewProposalPage: m.Component<
               },
             }),
           proposal instanceof OffchainThread &&
-            isAuthor &&
-            m(ProposalSidebarLinkedThreadsEditorModule, {
-              linkingThread: proposal as OffchainThread,
+          proposal.linkedThreads?.length > 0 &&
+            m(ProposalLinkedThreadsEditorModule, {
+              proposal,
+              allowLinking: isAuthor || isAdmin,
             }),
         ],
       },

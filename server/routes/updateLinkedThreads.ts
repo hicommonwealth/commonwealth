@@ -73,50 +73,44 @@ const updateLinkedThreads = async (
       }
     }
 
-    // const linkedThreads = await models.LinkedThread.findAll({
-    //   where: { linking_thread: linking_thread_id },
-    // })
-    // const linkedThreadIds = linkedThreads.map((thread) => thread.linked_thread);
-    // const linkedThreadsFull = await models.OffchainThread.findOne({
-    //   where: {
-    //     id: {
-    //       [Op.in]: linkedThreadIds,
-    //     }
-    //   },
-    //   include: [
-    //     {
-    //       model: models.Address,
-    //       as: 'Address',
-    //     },
-    //     {
-    //       model: models.Address,
-    //       // through: models.Collaboration,
-    //       as: 'collaborators',
-    //     },
-    //     {
-    //       model: models.OffchainTopic,
-    //       as: 'topic',
-    //     },
-    //     {
-    //       model: models.ChainEntity,
-    //     },
-    //     {
-    //       model: models.OffchainReaction,
-    //       as: 'reactions',
-    //       include: [
-    //         {
-    //           model: models.Address,
-    //           as: 'Address',
-    //           required: true,
-    //         },
-    //       ],
-    //     },
-    //     {
-    //       model: models.LinkedThread,
-    //       as: 'linked_threads',
-    //     },
-    //   ],
-    // });
+    await models.OffchainThread.findOne({
+      where: {
+        id: linking_thread_id
+      },
+      include: [
+        {
+          model: models.Address,
+          as: 'Address',
+        },
+        {
+          model: models.Address,
+          // through: models.Collaboration,
+          as: 'collaborators',
+        },
+        {
+          model: models.OffchainTopic,
+          as: 'topic',
+        },
+        {
+          model: models.ChainEntity,
+        },
+        {
+          model: models.OffchainReaction,
+          as: 'reactions',
+          include: [
+            {
+              model: models.Address,
+              as: 'Address',
+              required: true,
+            },
+          ],
+        },
+        {
+          model: models.LinkedThread,
+          as: 'linked_threads',
+        },
+      ],
+    })
     return res.json({ status: 'Success', result: null }); // linkedThreadsFull.toJSON() });
   } catch (e) {
     return next(new Error(e));
