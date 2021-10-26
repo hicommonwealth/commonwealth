@@ -1,6 +1,7 @@
 import 'modals/linked_thread_modal.scss';
 
 import m from 'mithril';
+import $ from 'jquery';
 import { OffchainThread } from 'models';
 import { Button } from 'construct-ui';
 import { CompactModalExitButton } from '../modal';
@@ -22,7 +23,8 @@ const LinkedThreadModal: m.Component<{ linkingThread: OffchainThread }, {}> = {
           label: 'Close',
           intent: 'primary',
           onclick: (e) => {
-            $(e.target).trigger('modalcomplete');
+            e.preventDefault();
+            $(e.target).trigger('modalexit');
           },
         }),
       ]),

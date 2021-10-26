@@ -33,6 +33,7 @@ const renderThreadPreview = (state, thread: OffchainThread, idx: number) => {
     ]),
     selected,
     key: idx,
+    style: state.selectInProgress ? 'cursor: wait' : ''
   });
 };
 
@@ -52,6 +53,7 @@ export const ThreadSelector: m.Component<
     searchTerm: string;
     searchResults: OffchainThread[];
     fetchingResults: boolean;
+    selectInProgress: boolean;
   }
 > = {
   oninit: (vnode) => {
@@ -61,7 +63,7 @@ export const ThreadSelector: m.Component<
   },
   view: (vnode) => {
     const { linkingThread } = vnode.attrs;
-    const { linkedThreads, linkedThreadsFetched, searchResults } = vnode.state;
+    const { linkedThreads, linkedThreadsFetched, searchResults, selectInProgress } = vnode.state;
 
     // The modal kicks off by fetching the offchain threads linked to by a given parent.
     const hasLinkedThreads = linkingThread.linkedThreads?.length;
@@ -87,14 +89,17 @@ export const ThreadSelector: m.Component<
 
     const queryLength = vnode.state.searchTerm?.trim()?.length;
     const emptyContentMessage =
-      queryLength > 0 && queryLength < 4
+      queryLength > 0 && queryLength <= 4
         ? 'Query too short'
-        : queryLength > 4 && searchResults?.length > 0
+        : queryLength > 4 && !searchResults?.length
         ? 'No threads found'
-        : !hasLinkedThreads
+        : !vnode.state.linkedThreads?.length
         ? 'No currently linked threads'
         : null;
-
+    console.log({
+      state: vnode.state,
+      emptyContentMessage
+    })
     return m('.ThreadSelector', [
       linkedThreadsFetched
         ? m(ControlGroup, [
@@ -118,8 +123,9 @@ export const ThreadSelector: m.Component<
                 e.stopPropagation();
                 const target = e.target as HTMLInputElement;
                 clearTimeout(vnode.state.inputTimeout);
+                vnode.state.searchTerm = target.value;
+                vnode.state.showOnlyLinkedThreads = false;
                 vnode.state.inputTimeout = setTimeout(async () => {
-                  vnode.state.searchTerm = target.value;
                   m.redraw();
                   if (target.value?.trim().length > 4) {
                     vnode.state.fetchingResults = true;
@@ -131,7 +137,6 @@ export const ThreadSelector: m.Component<
                     searchThreadTitles(vnode.state.searchTerm, params)
                       .then((results) => {
                         vnode.state.fetchingResults = false;
-                        vnode.state.showOnlyLinkedThreads = false;
                         vnode.state.searchResults = results;
                         results.forEach((thread) => {
                           app.profiles.getProfile(thread.authorChain, thread.author);
@@ -154,7 +159,7 @@ export const ThreadSelector: m.Component<
                 placeholder: 'Search for offchain thread to link...',
               },
               emptyContent: emptyContentMessage,
-              items: vnode.state.showOnlyLinkedThreads
+              items: (vnode.state.showOnlyLinkedThreads && !queryLength)
                 ? linkedThreads
                 : searchResults,
               itemRender: (item: OffchainThread, idx) =>
@@ -163,24 +168,29 @@ export const ThreadSelector: m.Component<
                 const selectedThreadIdx = linkedThreads.findIndex(
                   (linkedThread) => linkedThread.id === thread.id
                 );
+                vnode.state.selectInProgress = true;
                 if (selectedThreadIdx !== -1) {
                   app.threads
                     .removeLinkedThread(linkingThread.id, thread.id)
                     .then((result) => {
                       vnode.state.linkedThreads.splice(selectedThreadIdx, 1);
+                      vnode.state.selectInProgress = false;
                       notifySuccess('Thread unlinked.');
                     })
                     .catch((err) => {
+                      vnode.state.selectInProgress = false;
                       notifyError('Thread failed to unlink.');
                     });
                 } else {
                   app.threads
                     .addLinkedThread(linkingThread.id, thread.id)
                     .then((result) => {
+                      vnode.state.selectInProgress = false;
                       vnode.state.linkedThreads.push(thread);
                       notifySuccess('Thread linked.');
                     })
                     .catch((err) => {
+                      vnode.state.selectInProgress = false;
                       notifyError('Thread failed to link.');
                     });
                 }
