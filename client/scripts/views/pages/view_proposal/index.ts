@@ -81,7 +81,7 @@ import {
   ProposalTitleEditor,
   ProposalTitleEditMenuItem,
   ProposalLinkEditor,
-  ProposalHeaderLinkThreadsMenuItem,
+  // ProposalHeaderLinkThreadsMenuItem,
 } from './header';
 import {
   ProposalSidebarStageEditorModule,
@@ -339,10 +339,10 @@ const ProposalHeader: m.Component<
                               },
                               label: 'Snapshot proposal from thread',
                             }),
-                          (isAuthor || isAdmin) &&
-                            m(ProposalHeaderLinkThreadsMenuItem, {
-                              item: proposal,
-                            }),
+                          // (isAuthor || isAdmin) &&
+                          //   m(ProposalHeaderLinkThreadsMenuItem, {
+                          //     item: proposal,
+                          //   }),
                           (isAuthor || isAdmin) && m(MenuDivider),
                           m(ThreadSubscriptionMenuItem, {
                             proposal: proposal as OffchainThread,
@@ -1308,7 +1308,7 @@ const ViewProposalPage: m.Component<
               },
             }),
           proposal instanceof OffchainThread &&
-          proposal.linkedThreads?.length > 0 &&
+          (proposal.linkedThreads?.length > 0 || isAuthor || isAdmin) &&
             m(ProposalLinkedThreadsEditorModule, {
               proposal,
               allowLinking: isAuthor || isAdmin,

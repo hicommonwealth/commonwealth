@@ -419,27 +419,27 @@ export const ProposalHeaderViewCount: m.Component<{ viewCount: number }> = {
   },
 };
 
-export const ProposalHeaderLinkThreadsMenuItem: m.Component<
-  {
-    item: OffchainThread;
-  },
-  {}
-> = {
-  view: (vnode) => {
-    const { item } = vnode.attrs;
-    return m(MenuItem, {
-      label: 'Link offchain thread',
-      class: 'link-offchain-thread',
-      onclick: async (e) => {
-        e.preventDefault();
-        app.modals.create({
-          modal: LinkedThreadModal,
-          data: { linkingProposal: item },
-        });
-      },
-    });
-  },
-};
+// export const ProposalHeaderLinkThreadsMenuItem: m.Component<
+//   {
+//     item: OffchainThread;
+//   },
+//   {}
+// > = {
+//   view: (vnode) => {
+//     const { item } = vnode.attrs;
+//     return m(MenuItem, {
+//       label: 'Link offchain thread',
+//       class: 'link-offchain-thread',
+//       onclick: async (e) => {
+//         e.preventDefault();
+//         app.modals.create({
+//           modal: LinkedThreadModal,
+//           data: { linkingProposal: item },
+//         });
+//       },
+//     });
+//   },
+// };
 
 export const ProposalTitleEditMenuItem: m.Component<{
   item: AnyProposal;

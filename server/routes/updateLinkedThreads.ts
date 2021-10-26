@@ -73,7 +73,7 @@ const updateLinkedThreads = async (
       }
     }
 
-    await models.OffchainThread.findOne({
+    const finalThread = await models.OffchainThread.findOne({
       where: {
         id: linking_thread_id
       },
@@ -111,7 +111,7 @@ const updateLinkedThreads = async (
         },
       ],
     })
-    return res.json({ status: 'Success', result: null }); // linkedThreadsFull.toJSON() });
+    return res.json({ status: 'Success', result: finalThread.toJSON() });
   } catch (e) {
     return next(new Error(e));
   }

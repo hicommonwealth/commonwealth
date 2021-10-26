@@ -127,23 +127,29 @@ export const ProposalLinkedThreadsEditorModule: m.Component<{
     const { proposal, allowLinking } = vnode.attrs;
     const { linkedThreadsFetched } = vnode.state;
     if (!linkedThreadsFetched) {
-      app.threads
-        .fetchThreadsFromId(
-          proposal.linkedThreads.map(
-            (relation: ILinkedThreadRelation) => relation.linked_thread
+      if (!proposal.linkedThreads?.length) {
+        vnode.state.linkedThreads = [];
+        vnode.state.linkedThreadsFetched = true;
+      } else {
+        app.threads
+          .fetchThreadsFromId(
+            proposal.linkedThreads.map(
+              (relation: ILinkedThreadRelation) => relation.linked_thread
+            )
           )
-        )
-        .then((result) => {
-          vnode.state.linkedThreads = result;
-          vnode.state.linkedThreadsFetched = true;
-          m.redraw();
-        })
-        .catch((err) => {
-          console.error(err);
-          vnode.state.linkedThreadsFetched = true;
-        });
+          .then((result) => {
+            vnode.state.linkedThreads = result;
+            vnode.state.linkedThreadsFetched = true;
+            m.redraw();
+          })
+          .catch((err) => {
+            console.error(err);
+            vnode.state.linkedThreadsFetched = true;
+          });
+      }
     } else if (allowLinking || proposal.linkedThreads.length) {
       return m('.ProposalLinkedThreadsEditorModule', [
+        !!vnode.state.linkedThreads?.length &&
         m(List, vnode.state.linkedThreads.map((thread) => {
             const discussionLink =
             `/${app.activeId()}/proposal/${thread.slug}/${thread.identifier}-` +

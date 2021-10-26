@@ -63,12 +63,13 @@ export const ThreadSelector: m.Component<
   },
   view: (vnode) => {
     const { linkingThread } = vnode.attrs;
-    const { linkedThreads, linkedThreadsFetched, searchResults, selectInProgress } = vnode.state;
-
+    const { linkedThreads, linkedThreadsFetched, searchResults } = vnode.state;
+    console.log({ linkingThread });
     // The modal kicks off by fetching the offchain threads linked to by a given parent.
-    const hasLinkedThreads = linkingThread.linkedThreads?.length;
+    const hasLinkedThreads = !!linkingThread.linkedThreads?.length;
     if (!hasLinkedThreads) {
       vnode.state.linkedThreadsFetched = true;
+      m.redraw();
     } else if (!linkedThreadsFetched) {
       app.threads
         .fetchThreadsFromId(

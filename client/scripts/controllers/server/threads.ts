@@ -555,7 +555,8 @@ class ThreadsController {
     if (response.status !== 'Success') {
       throw new Error();
     }
-    this._store.update(modelFromServer(response.result));
+    console.log(response.result);
+    this._store.add(modelFromServer(response.result));
   }
 
   public async removeLinkedThread(
@@ -576,7 +577,8 @@ class ThreadsController {
     if (response.status !== 'Success') {
       throw new Error();
     }
-    this._store.update(modelFromServer(response.result));
+    console.log(response.result);
+    this._store.add(modelFromServer(response.result));
   }
 
   public async fetchThreadIdForSnapshot(args: { snapshot: string }) {
