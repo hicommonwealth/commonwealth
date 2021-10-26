@@ -904,7 +904,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               { scoped: true }
             ),
             '/:scope/collective/:address': importRoute(
-              'views/pages/commonwealth/collectives/edit',
+              'views/pages/commonwealth/collectives/view',
               { scoped: true }
             ),
 

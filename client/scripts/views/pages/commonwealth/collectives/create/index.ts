@@ -5,19 +5,12 @@ import 'pages/commonwealth/new.scss';
 // import app from 'state';
 // import PageLoading from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
-import { kovanTokenData } from 'controllers/chain/ethereum/commonwealth/utils';
+import {
+  kovanTokenData,
+  CollectiveDataType,
+} from 'controllers/chain/ethereum/commonwealth/utils';
 import FirstStepForm from './step1';
 import SecondStepForm from './step2';
-
-interface CollectiveDataType {
-  creator: string;
-  beneficiary: string;
-  acceptedTokens: string[];
-  strategies: string[];
-  name: string;
-  description: string;
-  ipfsHash: string;
-}
 
 const NewCollectiveForm: m.Component<
   { callback; acceptedTokens; submitting },

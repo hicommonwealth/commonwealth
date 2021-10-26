@@ -90,9 +90,7 @@ const ProjectContentModule: m.Component<
 // };
 
 const ViewProjectPage: m.Component<
-  {
-    address: string;
-  },
+  { address: string },
   {
     initialized: number;
     project: CMNProject;

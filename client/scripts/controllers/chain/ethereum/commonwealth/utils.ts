@@ -104,3 +104,13 @@ export const protocolReady = () => {
 
 export const MAX_VALUE =
   '115792089237316195423570985008687907853269984665640564039457584007913129639935';
+
+export interface CollectiveDataType {
+  creator: string;
+  beneficiary: string;
+  acceptedTokens: string[];
+  strategies: string[];
+  name: string;
+  description: string;
+  ipfsHash: string;
+}

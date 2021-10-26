@@ -9,14 +9,17 @@ import app from 'state';
 import { CMNProject } from 'models';
 import TokenInputField from '../token_input';
 
-const RedeemCTokenAction: m.Component<{
-  project: CMNProject,
-  project_protocol: any,
-  disabled: boolean
-}, {
-  submitting: boolean,
-  error: string,
-}> = {
+const RedeemCTokenAction: m.Component<
+  {
+    project: CMNProject;
+    project_protocol: any;
+    disabled: boolean;
+  },
+  {
+    submitting: boolean;
+    error: string;
+  }
+> = {
   oncreate: (vnode) => {
     vnode.state.error = '';
     vnode.state.submitting = false;
@@ -33,11 +36,15 @@ const RedeemCTokenAction: m.Component<{
         callback: async (tokenSymbol: string, balance: number) => {
           vnode.state.submitting = true;
 
-          const index = project.acceptedTokens.findIndex((t) => t.symbol === tokenSymbol);
+          const index = project.acceptedTokens.findIndex(
+            (t) => t.symbol === tokenSymbol
+          );
           if (index > -1) {
             const acceptedToken = acceptedTokens[index];
             const author = app.user.activeAccount.address;
-            const amount = new BN(balance).mul(new BN(10).pow(new BN(acceptedToken.decimals)));
+            const amount = new BN(balance).mul(
+              new BN(10).pow(new BN(acceptedToken.decimals))
+            );
 
             const res = await project_protocol.redeemTokens(
               amount,
@@ -55,26 +62,30 @@ const RedeemCTokenAction: m.Component<{
           }
           vnode.state.submitting = false;
           m.redraw();
-        }
+        },
       }),
-      vnode.state.error && vnode.state.error !== '' && m(
-        'label',
-        { 'color': 'red', 'width': '100%', 'text-align': 'center' },
-        vnode.state.error
-      ),
+      vnode.state.error &&
+        vnode.state.error !== '' &&
+        m(
+          'label',
+          { color: 'red', width: '100%', 'text-align': 'center' },
+          vnode.state.error
+        ),
     ];
-  }
+  },
 };
 
-const WithdrawAction: m.Component<{
-  project: CMNProject,
-  project_protocol: any,
-  disabled: boolean
-}, {
-  submitting: boolean,
-  error: string,
-}> = {
-
+const WithdrawAction: m.Component<
+  {
+    project: CMNProject;
+    project_protocol: any;
+    disabled: boolean;
+  },
+  {
+    submitting: boolean;
+    error: string;
+  }
+> = {
   view: (vnode) => {
     const { project, project_protocol } = vnode.attrs;
     return m('div', [
@@ -92,23 +103,27 @@ const WithdrawAction: m.Component<{
           const res = await project_protocol.withdraw(project, author);
           vnode.state.error = res.error;
           vnode.state.submitting = false;
-        }
+        },
       }),
-      vnode.state.error && vnode.state.error !== '' && m(
-        'label',
-        { 'color': 'red', 'width': '100%', 'text-align': 'center' },
-        vnode.state.error
-      ),
+      vnode.state.error &&
+        vnode.state.error !== '' &&
+        m(
+          'label',
+          { color: 'red', width: '100%', 'text-align': 'center' },
+          vnode.state.error
+        ),
     ]);
-  }
+  },
 };
 
-const SuccsedActionCard: m.Component<{
-  project: CMNProject,
-  project_protocol: any,
-  curators: any
-},
-{}> = {
+const SuccsedActionCard: m.Component<
+  {
+    project: CMNProject;
+    project_protocol: any;
+    curators: any;
+  },
+  {}
+> = {
   view: (vnode) => {
     const { project, project_protocol, curators } = vnode.attrs;
 
@@ -119,16 +134,23 @@ const SuccsedActionCard: m.Component<{
       // if (!curators.map((c) => c.address.toLowerCase()).includes(activeAddress)) {
       //   redeemAble = false;
       // }
-      if ((activeAddress === project.beneficiary.toLowerCase()) && (!project.withdrawIsDone)) {
+      if (
+        activeAddress === project.beneficiary.toLowerCase() &&
+        !project.withdrawIsDone
+      ) {
         withdrawAble = true;
       }
     }
 
     return m('.project-funding-action', [
-      m(RedeemCTokenAction, { project, project_protocol, disabled: !redeemAble }),
-      m(WithdrawAction, { project, project_protocol, disabled: !withdrawAble })
+      m(RedeemCTokenAction, {
+        project,
+        project_protocol,
+        disabled: !redeemAble,
+      }),
+      m(WithdrawAction, { project, project_protocol, disabled: !withdrawAble }),
     ]);
-  }
+  },
 };
 
 export default SuccsedActionCard;
