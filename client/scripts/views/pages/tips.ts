@@ -7,12 +7,11 @@ import app from 'state';
 import { navigateToSubpage } from 'app';
 
 import { formatCoin } from 'adapters/currency';
-import { ProposalType } from 'identifiers';
+import { ProposalType, ChainBase } from 'types';
 
 import Substrate from 'controllers/chain/substrate/main';
 import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 
-import { ChainBase } from 'models';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import ProposalCard from 'views/components/proposal_card';

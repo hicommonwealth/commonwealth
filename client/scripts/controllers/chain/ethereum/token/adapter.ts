@@ -1,9 +1,10 @@
-import { ERC20Token, EthereumCoin } from 'adapters/chain/ethereum/types';
+import { EthereumCoin } from 'adapters/chain/ethereum/types';
 
 import { ERC20__factory } from 'eth/types';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
-import { ChainBase, IChainAdapter, NodeInfo } from 'models';
+import { ChainBase } from 'types';
+import { IChainAdapter, NodeInfo } from 'models';
 import { IApp } from 'state';
 import BN from 'bn.js';
 

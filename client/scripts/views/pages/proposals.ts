@@ -8,8 +8,8 @@ import BN from 'bn.js';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
-import { ProposalType } from 'identifiers';
-import { ChainBase, ChainNetwork, ProposalModule } from 'models';
+import { ProposalType, ChainBase, ChainNetwork } from 'types';
+import { ProposalModule } from 'models';
 
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
@@ -28,7 +28,6 @@ import NewProposalPage from 'views/pages/new_proposal/index';
 import PageNotFound from 'views/pages/404';
 import Listing from 'views/pages/listing';
 import ErrorPage from 'views/pages/error';
-import { AaveTypes, CompoundTypes } from '@commonwealth/chain-events';
 import NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import AaveProposalCardDetail from '../components/proposals/aave_proposal_card_detail';
 
@@ -173,8 +172,8 @@ const ProposalsPage: m.Component<{}> = {
 
     const onSubstrate = app.chain && app.chain.base === ChainBase.Substrate;
     const onMoloch = app.chain && app.chain.network === ChainNetwork.Moloch;
-    const onCompound = app.chain && CompoundTypes.EventChains.find((c) => c === app.chain.network);
-    const onAave = app.chain && AaveTypes.EventChains.find((c) => c === app.chain.network);
+    const onCompound = app.chain && app.chain.network === ChainNetwork.Compound;
+    const onAave = app.chain && app.chain.network === ChainNetwork.Aave;
     const onSputnik = app.chain && app.chain.network === ChainNetwork.Sputnik;
 
     const modLoading = loadSubstrateModules('Proposals', getModules);

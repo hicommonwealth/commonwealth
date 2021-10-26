@@ -21,70 +21,70 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface IERC1820RegistryInterface extends ethers.utils.Interface {
   functions: {
-    "setInterfaceImplementer(address,bytes32,address)": FunctionFragment;
-    "getManager(address)": FunctionFragment;
-    "setManager(address,address)": FunctionFragment;
-    "interfaceHash(string)": FunctionFragment;
-    "updateERC165Cache(address,bytes4)": FunctionFragment;
     "getInterfaceImplementer(address,bytes32)": FunctionFragment;
-    "implementsERC165InterfaceNoCache(address,bytes4)": FunctionFragment;
+    "getManager(address)": FunctionFragment;
     "implementsERC165Interface(address,bytes4)": FunctionFragment;
+    "implementsERC165InterfaceNoCache(address,bytes4)": FunctionFragment;
+    "interfaceHash(string)": FunctionFragment;
+    "setInterfaceImplementer(address,bytes32,address)": FunctionFragment;
+    "setManager(address,address)": FunctionFragment;
+    "updateERC165Cache(address,bytes4)": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "setInterfaceImplementer",
-    values: [string, BytesLike, string]
+    functionFragment: "getInterfaceImplementer",
+    values: [string, BytesLike]
   ): string;
   encodeFunctionData(functionFragment: "getManager", values: [string]): string;
   encodeFunctionData(
-    functionFragment: "setManager",
-    values: [string, string]
+    functionFragment: "implementsERC165Interface",
+    values: [string, BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "implementsERC165InterfaceNoCache",
+    values: [string, BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "interfaceHash",
     values: [string]
   ): string;
   encodeFunctionData(
+    functionFragment: "setInterfaceImplementer",
+    values: [string, BytesLike, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setManager",
+    values: [string, string]
+  ): string;
+  encodeFunctionData(
     functionFragment: "updateERC165Cache",
-    values: [string, BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getInterfaceImplementer",
-    values: [string, BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "implementsERC165InterfaceNoCache",
-    values: [string, BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "implementsERC165Interface",
     values: [string, BytesLike]
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "setInterfaceImplementer",
+    functionFragment: "getInterfaceImplementer",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "getManager", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "setManager", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "implementsERC165Interface",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "implementsERC165InterfaceNoCache",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "interfaceHash",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "setInterfaceImplementer",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "setManager", data: BytesLike): Result;
+  decodeFunctionResult(
     functionFragment: "updateERC165Cache",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getInterfaceImplementer",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "implementsERC165InterfaceNoCache",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "implementsERC165Interface",
     data: BytesLike
   ): Result;
 
@@ -141,6 +141,59 @@ export class IERC1820Registry extends Contract {
   interface: IERC1820RegistryInterface;
 
   functions: {
+    getInterfaceImplementer(
+      account: string,
+      interfaceHash: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    "getInterfaceImplementer(address,bytes32)"(
+      account: string,
+      interfaceHash: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    getManager(account: string, overrides?: CallOverrides): Promise<[string]>;
+
+    "getManager(address)"(
+      account: string,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    implementsERC165Interface(
+      account: string,
+      interfaceId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
+    "implementsERC165Interface(address,bytes4)"(
+      account: string,
+      interfaceId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
+    implementsERC165InterfaceNoCache(
+      account: string,
+      interfaceId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
+    "implementsERC165InterfaceNoCache(address,bytes4)"(
+      account: string,
+      interfaceId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
+    interfaceHash(
+      interfaceName: string,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    "interfaceHash(string)"(
+      interfaceName: string,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
     setInterfaceImplementer(
       account: string,
       interfaceHash: BytesLike,
@@ -155,13 +208,6 @@ export class IERC1820Registry extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    getManager(account: string, overrides?: CallOverrides): Promise<[string]>;
-
-    "getManager(address)"(
-      account: string,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
-
     setManager(
       account: string,
       newManager: string,
@@ -174,16 +220,6 @@ export class IERC1820Registry extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    interfaceHash(
-      interfaceName: string,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
-
-    "interfaceHash(string)"(
-      interfaceName: string,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
-
     updateERC165Cache(
       account: string,
       interfaceId: BytesLike,
@@ -195,43 +231,60 @@ export class IERC1820Registry extends Contract {
       interfaceId: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
-
-    getInterfaceImplementer(
-      account: string,
-      interfaceHash: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
-
-    "getInterfaceImplementer(address,bytes32)"(
-      account: string,
-      interfaceHash: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
-
-    implementsERC165InterfaceNoCache(
-      account: string,
-      interfaceId: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[boolean]>;
-
-    "implementsERC165InterfaceNoCache(address,bytes4)"(
-      account: string,
-      interfaceId: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[boolean]>;
-
-    implementsERC165Interface(
-      account: string,
-      interfaceId: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[boolean]>;
-
-    "implementsERC165Interface(address,bytes4)"(
-      account: string,
-      interfaceId: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[boolean]>;
   };
+
+  getInterfaceImplementer(
+    account: string,
+    interfaceHash: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
+  "getInterfaceImplementer(address,bytes32)"(
+    account: string,
+    interfaceHash: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
+  getManager(account: string, overrides?: CallOverrides): Promise<string>;
+
+  "getManager(address)"(
+    account: string,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
+  implementsERC165Interface(
+    account: string,
+    interfaceId: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
+
+  "implementsERC165Interface(address,bytes4)"(
+    account: string,
+    interfaceId: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
+
+  implementsERC165InterfaceNoCache(
+    account: string,
+    interfaceId: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
+
+  "implementsERC165InterfaceNoCache(address,bytes4)"(
+    account: string,
+    interfaceId: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
+
+  interfaceHash(
+    interfaceName: string,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
+  "interfaceHash(string)"(
+    interfaceName: string,
+    overrides?: CallOverrides
+  ): Promise<string>;
 
   setInterfaceImplementer(
     account: string,
@@ -247,13 +300,6 @@ export class IERC1820Registry extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  getManager(account: string, overrides?: CallOverrides): Promise<string>;
-
-  "getManager(address)"(
-    account: string,
-    overrides?: CallOverrides
-  ): Promise<string>;
-
   setManager(
     account: string,
     newManager: string,
@@ -265,16 +311,6 @@ export class IERC1820Registry extends Contract {
     newManager: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
-
-  interfaceHash(
-    interfaceName: string,
-    overrides?: CallOverrides
-  ): Promise<string>;
-
-  "interfaceHash(string)"(
-    interfaceName: string,
-    overrides?: CallOverrides
-  ): Promise<string>;
 
   updateERC165Cache(
     account: string,
@@ -288,43 +324,60 @@ export class IERC1820Registry extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  getInterfaceImplementer(
-    account: string,
-    interfaceHash: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<string>;
-
-  "getInterfaceImplementer(address,bytes32)"(
-    account: string,
-    interfaceHash: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<string>;
-
-  implementsERC165InterfaceNoCache(
-    account: string,
-    interfaceId: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<boolean>;
-
-  "implementsERC165InterfaceNoCache(address,bytes4)"(
-    account: string,
-    interfaceId: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<boolean>;
-
-  implementsERC165Interface(
-    account: string,
-    interfaceId: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<boolean>;
-
-  "implementsERC165Interface(address,bytes4)"(
-    account: string,
-    interfaceId: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<boolean>;
-
   callStatic: {
+    getInterfaceImplementer(
+      account: string,
+      interfaceHash: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    "getInterfaceImplementer(address,bytes32)"(
+      account: string,
+      interfaceHash: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    getManager(account: string, overrides?: CallOverrides): Promise<string>;
+
+    "getManager(address)"(
+      account: string,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    implementsERC165Interface(
+      account: string,
+      interfaceId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
+    "implementsERC165Interface(address,bytes4)"(
+      account: string,
+      interfaceId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
+    implementsERC165InterfaceNoCache(
+      account: string,
+      interfaceId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
+    "implementsERC165InterfaceNoCache(address,bytes4)"(
+      account: string,
+      interfaceId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
+    interfaceHash(
+      interfaceName: string,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    "interfaceHash(string)"(
+      interfaceName: string,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
     setInterfaceImplementer(
       account: string,
       interfaceHash: BytesLike,
@@ -339,13 +392,6 @@ export class IERC1820Registry extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    getManager(account: string, overrides?: CallOverrides): Promise<string>;
-
-    "getManager(address)"(
-      account: string,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
     setManager(
       account: string,
       newManager: string,
@@ -358,16 +404,6 @@ export class IERC1820Registry extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    interfaceHash(
-      interfaceName: string,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    "interfaceHash(string)"(
-      interfaceName: string,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
     updateERC165Cache(
       account: string,
       interfaceId: BytesLike,
@@ -379,42 +415,6 @@ export class IERC1820Registry extends Contract {
       interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
-
-    getInterfaceImplementer(
-      account: string,
-      interfaceHash: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    "getInterfaceImplementer(address,bytes32)"(
-      account: string,
-      interfaceHash: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    implementsERC165InterfaceNoCache(
-      account: string,
-      interfaceId: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
-
-    "implementsERC165InterfaceNoCache(address,bytes4)"(
-      account: string,
-      interfaceId: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
-
-    implementsERC165Interface(
-      account: string,
-      interfaceId: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
-
-    "implementsERC165Interface(address,bytes4)"(
-      account: string,
-      interfaceId: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
   };
 
   filters: {
@@ -437,61 +437,6 @@ export class IERC1820Registry extends Contract {
   };
 
   estimateGas: {
-    setInterfaceImplementer(
-      account: string,
-      interfaceHash: BytesLike,
-      implementer: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    "setInterfaceImplementer(address,bytes32,address)"(
-      account: string,
-      interfaceHash: BytesLike,
-      implementer: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    getManager(account: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-    "getManager(address)"(
-      account: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    setManager(
-      account: string,
-      newManager: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    "setManager(address,address)"(
-      account: string,
-      newManager: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    interfaceHash(
-      interfaceName: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "interfaceHash(string)"(
-      interfaceName: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    updateERC165Cache(
-      account: string,
-      interfaceId: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    "updateERC165Cache(address,bytes4)"(
-      account: string,
-      interfaceId: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     getInterfaceImplementer(
       account: string,
       interfaceHash: BytesLike,
@@ -501,6 +446,25 @@ export class IERC1820Registry extends Contract {
     "getInterfaceImplementer(address,bytes32)"(
       account: string,
       interfaceHash: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getManager(account: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+    "getManager(address)"(
+      account: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    implementsERC165Interface(
+      account: string,
+      interfaceId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "implementsERC165Interface(address,bytes4)"(
+      account: string,
+      interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -516,32 +480,66 @@ export class IERC1820Registry extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    implementsERC165Interface(
-      account: string,
-      interfaceId: BytesLike,
+    interfaceHash(
+      interfaceName: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "implementsERC165Interface(address,bytes4)"(
-      account: string,
-      interfaceId: BytesLike,
+    "interfaceHash(string)"(
+      interfaceName: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
-  };
 
-  populateTransaction: {
     setInterfaceImplementer(
       account: string,
       interfaceHash: BytesLike,
       implementer: string,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<BigNumber>;
 
     "setInterfaceImplementer(address,bytes32,address)"(
       account: string,
       interfaceHash: BytesLike,
       implementer: string,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    setManager(
+      account: string,
+      newManager: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "setManager(address,address)"(
+      account: string,
+      newManager: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    updateERC165Cache(
+      account: string,
+      interfaceId: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "updateERC165Cache(address,bytes4)"(
+      account: string,
+      interfaceId: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+  };
+
+  populateTransaction: {
+    getInterfaceImplementer(
+      account: string,
+      interfaceHash: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "getInterfaceImplementer(address,bytes32)"(
+      account: string,
+      interfaceHash: BytesLike,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     getManager(
@@ -554,49 +552,15 @@ export class IERC1820Registry extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    setManager(
-      account: string,
-      newManager: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    "setManager(address,address)"(
-      account: string,
-      newManager: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    interfaceHash(
-      interfaceName: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "interfaceHash(string)"(
-      interfaceName: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    updateERC165Cache(
+    implementsERC165Interface(
       account: string,
       interfaceId: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    "updateERC165Cache(address,bytes4)"(
-      account: string,
-      interfaceId: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    getInterfaceImplementer(
-      account: string,
-      interfaceHash: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "getInterfaceImplementer(address,bytes32)"(
+    "implementsERC165Interface(address,bytes4)"(
       account: string,
-      interfaceHash: BytesLike,
+      interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -612,16 +576,52 @@ export class IERC1820Registry extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    implementsERC165Interface(
-      account: string,
-      interfaceId: BytesLike,
+    interfaceHash(
+      interfaceName: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "implementsERC165Interface(address,bytes4)"(
+    "interfaceHash(string)"(
+      interfaceName: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    setInterfaceImplementer(
+      account: string,
+      interfaceHash: BytesLike,
+      implementer: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "setInterfaceImplementer(address,bytes32,address)"(
+      account: string,
+      interfaceHash: BytesLike,
+      implementer: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setManager(
+      account: string,
+      newManager: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "setManager(address,address)"(
+      account: string,
+      newManager: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    updateERC165Cache(
       account: string,
       interfaceId: BytesLike,
-      overrides?: CallOverrides
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "updateERC165Cache(address,bytes4)"(
+      account: string,
+      interfaceId: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };
 }

@@ -5,6 +5,7 @@ import { MolochShares, EthereumCoin } from 'adapters/chain/ethereum/types';
 import { IMolochProposalResponse } from 'adapters/chain/moloch/types';
 import { MolochTypes } from '@commonwealth/chain-events';
 
+import { ProposalType } from 'types';
 import {
   Proposal,
   IVote,
@@ -240,7 +241,7 @@ export default class MolochProposal extends Proposal<
     entity: ChainEntity,
   ) {
     // must set identifier before super() because of how response object is named
-    super('molochproposal', backportEntityToAdapter(Gov, entity));
+    super(ProposalType.MolochProposal, backportEntityToAdapter(Gov, entity));
 
     this._Members = Members;
     this._Gov = Gov;

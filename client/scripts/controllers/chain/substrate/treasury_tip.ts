@@ -7,6 +7,7 @@ import {
 } from 'models';
 import { SubstrateTypes } from '@commonwealth/chain-events';
 import { chainEntityTypeToProposalSlug } from 'identifiers';
+import { ProposalType } from 'types';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateTreasuryTips from './treasury_tips';
@@ -36,7 +37,9 @@ export class SubstrateTreasuryTip extends Proposal<
   }
 
   private _title: string;
-  public get title() { return this._title || `Tip ${this.shortIdentifier}`; }
+  public get title() {
+    return this._title || `${this.support.inDollars} ${this.support.denom} to ${this.data.who.slice(0, 8)}…`;
+  }
 
   private readonly _description: string;
   public get description() { return this._description; }
@@ -125,7 +128,7 @@ export class SubstrateTreasuryTip extends Proposal<
     Tips: SubstrateTreasuryTips,
     entity: ChainEntity,
   ) {
-    super('treasurytip', backportEventToAdapter(
+    super(ProposalType.SubstrateTreasuryTip, backportEventToAdapter(
       ChainInfo,
       entity.chainEvents
         .find(

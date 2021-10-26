@@ -7,9 +7,10 @@ import {
   DemocracyThreshold,
   formatCall,
 } from 'adapters/chain/substrate/types';
+import { ChainBase, ProposalType } from 'types';
 import {
   Proposal, ProposalStatus, ProposalEndTime, BinaryVote, VotingType, VotingUnit,
-  ChainBase, Account, ChainEntity, ChainEvent
+  Account, ChainEntity, ChainEvent
 } from 'models';
 import { SubstrateTypes } from '@commonwealth/chain-events';
 import { Coin } from 'adapters/currency';
@@ -190,7 +191,7 @@ export class SubstrateDemocracyReferendum
     Democracy: SubstrateDemocracy,
     entity: ChainEntity,
   ) {
-    super('referendum', backportEventToAdapter(
+    super(ProposalType.SubstrateDemocracyReferendum, backportEventToAdapter(
       entity.chainEvents
         .find(
           (e) => e.data.kind === SubstrateTypes.EventKind.DemocracyStarted

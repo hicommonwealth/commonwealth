@@ -15,12 +15,13 @@ import ThreadsController from './controllers/server/threads';
 import SnapshotController from './controllers/chain/snapshot';
 import ReactionsController from './controllers/server/reactions';
 import ReactionCountsController from './controllers/server/reactionCounts';
+import ThreadUniqueAddressesCount from './controllers/server/threadUniqueAddressesCount';
 import WebsocketController from './controllers/server/socket';
 import TopicsController from './controllers/server/topics';
 import CommunitiesController from './controllers/server/communities';
 import UserController from './controllers/server/user/index';
 import WebWalletController from './controllers/app/web_wallets';
-import { InviteCodeAttributes } from 'shared/types';
+import { InviteCodeAttributes } from 'types';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -49,6 +50,7 @@ export interface IApp {
   profiles: ProfilesController;
   comments: CommentsController;
   threads: ThreadsController;
+  threadUniqueAddressesCount: ThreadUniqueAddressesCount;
   snapshot: SnapshotController;
   reactions: ReactionsController;
   reactionCounts: ReactionCountsController;
@@ -117,6 +119,7 @@ const app: IApp = {
   profiles: new ProfilesController(),
   comments: new CommentsController(),
   threads: new ThreadsController(),
+  threadUniqueAddressesCount: new ThreadUniqueAddressesCount(),
   snapshot: new SnapshotController(),
   reactions: new ReactionsController(),
   reactionCounts: new ReactionCountsController(),

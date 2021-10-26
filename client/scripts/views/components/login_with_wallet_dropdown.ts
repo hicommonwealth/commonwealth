@@ -6,14 +6,28 @@ import { Button, PopoverMenu, MenuItem, MenuDivider, Icon, Icons } from 'constru
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
-import { ChainBase, IWebWallet } from 'models';
-import { ChainBaseIcon } from 'views/components/chain_icon';
-import { baseToNetwork } from 'models/types';
+import { IWebWallet } from 'models';
+import { ChainBaseIcon, ChainNetworkIcon } from 'views/components/chain_icon';
+import { ChainBase, ChainNetwork } from 'types';
 import _ from 'underscore';
 
-const CHAINBASE_WITH_CLI = [
-  ChainBase.Substrate
-];
+// Returns a default chain for a chainbase
+function baseToNetwork(n: ChainBase): ChainNetwork {
+  switch (n) {
+    case ChainBase.CosmosSDK:
+      return ChainNetwork.Osmosis;
+    case ChainBase.Substrate:
+      return ChainNetwork.Edgeware;
+    case ChainBase.Ethereum:
+      return ChainNetwork.Ethereum;
+    case ChainBase.NEAR:
+      return ChainNetwork.NEAR;
+    default:
+      return null;
+  }
+}
+
+const CHAINBASE_WITH_CLI = [ChainBase.Substrate];
 
 const LoginWithWalletDropdown: m.Component<{
   label,
@@ -63,7 +77,9 @@ const LoginWithWalletDropdown: m.Component<{
       const baseString = base.charAt(0).toUpperCase() + base.slice(1);
       const createItem = (webWallet?: IWebWallet<any>, useCli?: boolean) => m(MenuItem, {
         label: m('.chain-login-label', [
-          m(ChainBaseIcon, { chainbase: base, size: 20 }),
+          webWallet?.name === 'InjMetamask' || webWallet?.name === 'terrastation' ?  
+            m(ChainNetworkIcon, { chain: webWallet.specificChain, size: 20 }) : 
+            m(ChainBaseIcon, { chainbase: base, size: 20 }),
           m('.chain-login-label-name', [
             useCli ? `${baseString} (command line)` : webWallet.label
           ]),

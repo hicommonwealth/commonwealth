@@ -4,7 +4,11 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import { EventEmitter } from 'events';
-import { CWEvent, SubstrateTypes } from '@commonwealth/chain-events';
+import {
+  CWEvent,
+  SubstrateTypes,
+  SupportedNetwork,
+} from '@commonwealth/chain-events';
 
 import { resetDatabase } from '../../../server-test';
 import models from '../../../server/database';
@@ -28,6 +32,7 @@ describe('Edgeware Archival Event Handler Tests', () => {
   it('should create chain entity from event', async () => {
     const event: CWEvent<SubstrateTypes.IEventData> = {
       blockNumber: 10,
+      network: SupportedNetwork.Substrate,
       data: {
         kind: SubstrateTypes.EventKind.DemocracyStarted,
         referendumIndex: 3,
@@ -67,6 +72,7 @@ describe('Edgeware Archival Event Handler Tests', () => {
   it('should update chain entity from event', async () => {
     const createEvent: CWEvent<SubstrateTypes.IEventData> = {
       blockNumber: 20,
+      network: SupportedNetwork.Substrate,
       data: {
         kind: SubstrateTypes.EventKind.TreasuryProposed,
         proposalIndex: 5,
@@ -79,6 +85,7 @@ describe('Edgeware Archival Event Handler Tests', () => {
 
     const updateEvent: CWEvent<SubstrateTypes.IEventData> = {
       blockNumber: 25,
+      network: SupportedNetwork.Substrate,
       data: {
         kind: SubstrateTypes.EventKind.TreasuryAwarded,
         proposalIndex: 5,
@@ -134,6 +141,7 @@ describe('Edgeware Archival Event Handler Tests', () => {
   it('should ignore unrelated events', async () => {
     const event: CWEvent<SubstrateTypes.IEventData> = {
       blockNumber: 11,
+      network: SupportedNetwork.Substrate,
       data: {
         kind: SubstrateTypes.EventKind.Slash,
         validator: '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty',
@@ -161,6 +169,7 @@ describe('Edgeware Archival Event Handler Tests', () => {
   it('should ignore duplicate entities', async () => {
     const event: CWEvent<SubstrateTypes.IEventData> = {
       blockNumber: 10,
+      network: SupportedNetwork.Substrate,
       data: {
         kind: SubstrateTypes.EventKind.DemocracyStarted,
         referendumIndex: 6,

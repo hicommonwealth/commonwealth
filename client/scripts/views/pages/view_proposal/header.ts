@@ -14,10 +14,9 @@ import {
 import {
   proposalSlugToFriendlyName,
   chainEntityTypeToProposalSlug,
-  chainEntityTypeToProposalName,
-  ProposalType
+  chainEntityTypeToProposalName
 } from 'identifiers';
-
+import { ProposalType } from 'types';
 import {
   OffchainThread,
   OffchainThreadKind,
@@ -274,8 +273,9 @@ export const ProposalHeaderThreadLinkedSnapshot: m.Component<{
   proposal: OffchainThread, 
 }, { 
   initialized,
-  snapshotProposalsLoaded
-  snapshot
+  snapshotProposalsLoaded,
+  snapshotProposalLinked,
+  snapshot,
 }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
@@ -290,11 +290,6 @@ export const ProposalHeaderThreadLinkedSnapshot: m.Component<{
         vnode.state.snapshotProposalsLoaded = true;
         m.redraw();
       })
-    }
-
-    if (vnode.state.snapshotProposalsLoaded && proposal.snapshotProposal !== vnode.state.snapshot) {
-      vnode.state.snapshot = app.snapshot.proposals.find((sn) => sn.id === proposal.snapshotProposal);
-      m.redraw();
     }
 
     const proposalLink = `${app.isCustomDomain() ? '' : `/${proposal.chain}`

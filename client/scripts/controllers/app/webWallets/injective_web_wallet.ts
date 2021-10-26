@@ -4,7 +4,8 @@ declare let window: any;
 
 import Web3 from 'web3';
 import { provider } from 'web3-core';
-import { Account, ChainBase, IWebWallet } from 'models';
+import { ChainBase } from 'types';
+import { Account, IWebWallet } from 'models';
 import app from 'state';
 import { setActiveAccount } from 'controllers/app/login';
 import { Address } from 'ethereumjs-util';

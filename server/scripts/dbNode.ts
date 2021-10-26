@@ -4,19 +4,17 @@ import _ from 'underscore';
 import format from 'pg-format';
 import {
   createListener,
-  chainSupportedBy,
   SubstrateTypes,
-  SubstrateEvents
+  SubstrateEvents,
+  SupportedNetwork,
 } from '@commonwealth/chain-events';
 
-import {
-  RabbitMqHandler,
-} from '@commonwealth/ce-rabbitmq-plugin';
+import { ChainBase, ChainNetwork, ChainType } from '../../shared/types';
+import { RabbitMqHandler } from '../eventHandlers/rabbitmqPlugin';
 import Identity from '../eventHandlers/pgIdentity';
 import { factory, formatFilename } from '../../shared/logging';
 import { DATABASE_URI, HANDLE_IDENTITY } from '../config';
 import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
-import { ChainAttributes } from '../models/chain';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -40,17 +38,25 @@ let chainErrors: { [chain: string]: number } = {};
 let runCount = 0;
 
 // stores all the listeners a dbNode has active
-const listeners: { [key: string]: any} = {};
+const listeners: { [key: string]: any } = {};
 
 // any fatal error is handle through here
-async function handleFatalError(error: Error, pool, chain?: string, type?: string): Promise<void> {
+async function handleFatalError(
+  error: Error,
+  pool,
+  chain?: string,
+  type?: string
+): Promise<void> {
   log.error(`${chain ? `[${chain}]: ` : ''}${String(error)}`);
 
   if (chain && chain !== 'erc20' && chainErrors[chain] >= 4) {
     listeners[chain].unsubscribe();
     delete listeners[chain];
 
-    const query = format('UPDATE "Chains" SET "has_chain_events_listener"=\'false\' WHERE "id"=%L', chain);
+    const query = format(
+      'UPDATE "Chains" SET "has_chain_events_listener"=\'false\' WHERE "id"=%L',
+      chain
+    );
     try {
       pool.query(query);
     } catch (err) {
@@ -72,7 +78,8 @@ async function mainProcess(producer: RabbitMqHandler, pool: Pool) {
   log.info('Starting scheduled process');
 
   // eslint-disable-next-line max-len
-  let query = 'SELECT "Chains"."id", "substrate_spec", "url", "address", "base", "type", "network" FROM "Chains" JOIN "ChainNodes" ON "Chains"."id"="ChainNodes"."chain" WHERE "Chains"."has_chain_events_listener"=\'true\';';
+  let query =
+    'SELECT "Chains"."id", "substrate_spec", "url", "address", "base", "type", "network" FROM "Chains" JOIN "ChainNodes" ON "Chains"."id"="ChainNodes"."chain" WHERE "Chains"."has_chain_events_listener"=\'true\';';
   const allChains = (await pool.query(query)).rows;
 
   // gets the chains specific to this node
@@ -85,19 +92,42 @@ async function mainProcess(producer: RabbitMqHandler, pool: Pool) {
     let latestBlock;
     try {
       // eslint-disable-next-line max-len
-      const eventTypes = (await pool.query(format('SELECT "id" FROM "ChainEventTypes" WHERE "chain"=%L', chain))).rows.map((obj) => obj.id);
+      const eventTypes = (
+        await pool.query(
+          format('SELECT "id" FROM "ChainEventTypes" WHERE "chain"=%L', chain)
+        )
+      ).rows.map((obj) => obj.id);
       if (eventTypes.length === 0) {
-        log.info(`[${chain}]: No events in database to get last block number from`);
+        log.info(
+          `[${chain}]: No events in database to get last block number from`
+        );
         return { startBlock: null };
       }
       // eslint-disable-next-line max-len
-      latestBlock = (await pool.query(format('SELECT MAX("block_number") FROM "ChainEvents" WHERE "chain_event_type_id" IN (%L)', eventTypes))).rows;
+      latestBlock = (
+        await pool.query(
+          format(
+            'SELECT MAX("block_number") FROM "ChainEvents" WHERE "chain_event_type_id" IN (%L)',
+            eventTypes
+          )
+        )
+      ).rows;
     } catch (error) {
-      log.warn(`[${chain}]: An error occurred while discovering offline time range`, error);
+      log.warn(
+        `[${chain}]: An error occurred while discovering offline time range`,
+        error
+      );
     }
-    if (latestBlock && latestBlock.length > 0 && latestBlock[0] && latestBlock[0].max) {
+    if (
+      latestBlock &&
+      latestBlock.length > 0 &&
+      latestBlock[0] &&
+      latestBlock[0].max
+    ) {
       const lastEventBlockNumber = latestBlock[0].max;
-      log.info(`[${chain}]: Discovered chain event in db at block ${lastEventBlockNumber}.`);
+      log.info(
+        `[${chain}]: Discovered chain event in db at block ${lastEventBlockNumber}.`
+      );
       return { startBlock: lastEventBlockNumber + 1 };
     } else {
       return { startBlock: null };
@@ -105,17 +135,24 @@ async function mainProcess(producer: RabbitMqHandler, pool: Pool) {
   };
 
   // group erc20 tokens together in order to start only one listener for all erc20 tokens
-  const erc20Tokens = myChainData.filter((chain) => chain.type === 'token' && chain.base === 'ethereum');
+  const erc20Tokens = myChainData.filter(
+    (chain) => chain.type === ChainType.Token && chain.base === ChainBase.Ethereum
+  );
   const erc20TokenAddresses = erc20Tokens.map((chain) => chain.address);
   const erc20TokenNames = erc20Tokens.map((chain) => chain.id);
 
   // don't start a new erc20 listener if it is causing errors
   if (!chainErrors['erc20'] || chainErrors['erc20'] < 4) {
     // start a listener if: it doesn't exist yet OR it exists but the tokens have changed
-    if (erc20Tokens.length > 0
-        && (!listeners['erc20']
-        || (listeners['erc20']
-        && !_.isEqual(erc20TokenAddresses, listeners['erc20'].options.tokenAddresses)))) {
+    if (
+      erc20Tokens.length > 0 &&
+      (!listeners['erc20'] ||
+        (listeners['erc20'] &&
+          !_.isEqual(
+            erc20TokenAddresses,
+            listeners['erc20'].options.tokenAddresses
+          )))
+    ) {
       // clear the listener if it already exists and the tokens have changed
       if (listeners['erc20']) {
         listeners['erc20'].unsubscribe();
@@ -125,12 +162,16 @@ async function mainProcess(producer: RabbitMqHandler, pool: Pool) {
       // start a listener
       log.info(`Starting listener for ${erc20TokenNames}...`);
       try {
-        listeners['erc20'] = await createListener('erc20', {
-          url: 'wss://mainnet.infura.io/ws',
-          tokenAddresses: erc20TokenAddresses,
-          tokenNames: erc20TokenNames,
-          verbose: false
-        }, 'erc20');
+        listeners['erc20'] = await createListener(
+          'erc20',
+          SupportedNetwork.ERC20,
+          {
+            url: 'wss://mainnet.infura.io/ws',
+            tokenAddresses: erc20TokenAddresses,
+            tokenNames: erc20TokenNames,
+            verbose: false,
+          }
+        );
 
         // add the rabbitmq handler for this chain
         listeners['erc20'].eventHandlers['rabbitmq'] = { handler: producer };
@@ -155,11 +196,15 @@ async function mainProcess(producer: RabbitMqHandler, pool: Pool) {
       delete listeners['erc20'];
     }
   } else {
-    log.fatal('[erc20]: There are outstanding errors that need to be resolved before creating a new erc20 listener!');
+    log.fatal(
+      '[erc20]: There are outstanding errors that need to be resolved before creating a new erc20 listener!'
+    );
   }
 
   // remove erc20 tokens from myChainData
-  myChainData = myChainData.filter((chain) => chain.type !== 'token' || chain.base !== 'ethereum');
+  myChainData = myChainData.filter(
+    (chain) => chain.type !== ChainType.Token || chain.base !== ChainBase.Ethereum
+  );
 
   // delete listeners for chains that are no longer assigned to this node (skip erc20)
   const myChains = myChainData.map((row) => row.id);
@@ -180,13 +225,18 @@ async function mainProcess(producer: RabbitMqHandler, pool: Pool) {
 
       // base is used to override built-in event chains in chain-events - only used for substrate chains in this case
       // NOTE: All erc20 tokens (type='token' base='ethereum') are removed at this point
-      let base: string;
-      if (chain.base === 'substrate') base = 'substrate';
-      else if (chain.network === 'compound') base = 'compound';
-      else if (chain.network === 'aave') base = 'aave';
+      let network: SupportedNetwork;
+      if (chain.base === ChainBase.Substrate)
+        network = SupportedNetwork.Substrate;
+      else if (chain.network === ChainNetwork.Compound)
+        network = SupportedNetwork.Compound;
+      else if (chain.network === ChainNetwork.Aave)
+        network = SupportedNetwork.Aave;
+      else if (chain.network === ChainNetwork.Moloch)
+        network = SupportedNetwork.Moloch;
 
       try {
-        listeners[chain.id] = await createListener(chain.id, {
+        listeners[chain.id] = await createListener(chain.id, network, {
           address: chain.address,
           archival: false,
           url: chain.url,
@@ -194,8 +244,8 @@ async function mainProcess(producer: RabbitMqHandler, pool: Pool) {
           skipCatchup: false,
           verbose: false,
           enricherConfig: { balanceTransferThresholdPermill: 10_000 },
-          discoverReconnectRange
-        }, base);
+          discoverReconnectRange,
+        });
       } catch (error) {
         delete listeners[chain.id];
         await handleFatalError(error, pool, chain, 'listener-startup');
@@ -204,18 +254,18 @@ async function mainProcess(producer: RabbitMqHandler, pool: Pool) {
 
       // if chain is a substrate chain add the excluded events
       let excludedEvents = [];
-      if (chainSupportedBy(chain.id, SubstrateTypes.EventChains))
+      if (network === SupportedNetwork.Substrate)
         excludedEvents = [
           SubstrateTypes.EventKind.Reward,
           SubstrateTypes.EventKind.TreasuryRewardMinting,
           SubstrateTypes.EventKind.TreasuryRewardMintingV2,
-          SubstrateTypes.EventKind.HeartbeatReceived
+          SubstrateTypes.EventKind.HeartbeatReceived,
         ];
 
       // add the rabbitmq handler for this chain
       listeners[chain.id].eventHandlers['rabbitmq'] = {
         handler: producer,
-        excludedEvents
+        excludedEvents,
       };
 
       try {
@@ -225,13 +275,18 @@ async function mainProcess(producer: RabbitMqHandler, pool: Pool) {
         await handleFatalError(error, pool, chain.id, 'listener-subscribe');
       }
     } else if (
-      chain.base === 'substrate'
-      && !_.isEqual(chain.substrate_spec, (<SubstrateEvents.Listener>listeners[chain.id]).options.spec)
+      chain.base === ChainBase.Substrate &&
+      !_.isEqual(
+        chain.substrate_spec,
+        (<SubstrateEvents.Listener>listeners[chain.id]).options.spec
+      )
     ) {
       // restart the listener if specs were updated (only substrate chains)
       log.info(`Spec for ${chain.id} changed... restarting listener`);
       try {
-        await (<SubstrateEvents.Listener>listeners[chain.id]).updateSpec(chain.substrate_spec);
+        await (<SubstrateEvents.Listener>listeners[chain.id]).updateSpec(
+          chain.substrate_spec
+        );
       } catch (error) {
         await handleFatalError(error, pool, chain.id, 'update-spec');
       }
@@ -253,10 +308,12 @@ async function mainProcess(producer: RabbitMqHandler, pool: Pool) {
   // loop through chains that have active listeners again this time dealing with identity
   for (const chain of myChainData) {
     // skip chains that aren't Substrate chains
-    if (chain.base !== 'substrate') continue;
+    if (chain.base !== ChainBase.Substrate) continue;
 
     if (!listeners[chain.id]) {
-      log.warn(`There is no active listener for ${chain.id} - cannot fetch identity`);
+      log.warn(
+        `There is no active listener for ${chain.id} - cannot fetch identity`
+      );
       continue;
     }
 
@@ -269,9 +326,7 @@ async function mainProcess(producer: RabbitMqHandler, pool: Pool) {
         'SELECT * FROM "IdentityCaches" WHERE "chain"=%L;',
         chain.id
       );
-      identitiesToFetch = (await pool.query(query)).rows.map(
-        (c) => c.address
-      );
+      identitiesToFetch = (await pool.query(query)).rows.map((c) => c.address);
     } catch (error) {
       await handleFatalError(error, pool, chain.id, 'get-identity-cache');
       continue;
@@ -286,9 +341,9 @@ async function mainProcess(producer: RabbitMqHandler, pool: Pool) {
     let identityEvents;
     try {
       // get identity events using the storage fetcher
-      identityEvents = await listeners[
-        chain.id
-      ].storageFetcher.fetchIdentities(identitiesToFetch);
+      identityEvents = await listeners[chain.id].storageFetcher.fetchIdentities(
+        identitiesToFetch
+      );
     } catch (error) {
       await handleFatalError(error, pool, chain.id, 'fetch-chain-identities');
       continue;
@@ -316,7 +371,10 @@ async function mainProcess(producer: RabbitMqHandler, pool: Pool) {
 
     // clear the identity cache for this chain
     try {
-      query = format('DELETE FROM "IdentityCaches" WHERE "chain"=%L;', chain.id);
+      query = format(
+        'DELETE FROM "IdentityCaches" WHERE "chain"=%L;',
+        chain.id
+      );
       await pool.query(query);
     } catch (error) {
       await handleFatalError(error, pool, chain.id, 'clear-identity-cache');
@@ -343,9 +401,9 @@ const producer = new RabbitMqHandler(RabbitMQConfig);
 const pool = new Pool({
   connectionString: DATABASE_URI,
   ssl: {
-    rejectUnauthorized: false
+    rejectUnauthorized: false,
   },
-  max: 3
+  max: 3,
 });
 
 pool.on('error', (err, client) => {

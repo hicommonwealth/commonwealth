@@ -24,7 +24,7 @@ const createRole = async (
   if (!req.body.address_id) return next(new Error(Errors.InvalidAddress));
 
   // cannot join private communities using this route
-  if (community && community.privacyEnabled) return next(new Error(Errors.InvalidChainComm));
+  if (community && community.privacy_enabled) return next(new Error(Errors.InvalidChainComm));
 
   const validAddress = await models.Address.findOne({
     where: {

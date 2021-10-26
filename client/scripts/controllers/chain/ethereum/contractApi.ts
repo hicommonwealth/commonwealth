@@ -1,6 +1,6 @@
 import { Web3Provider, ExternalProvider, JsonRpcSigner, Provider } from '@ethersproject/providers';
 import { ethers, Contract } from 'ethers';
-import { ChainBase } from 'models';
+import { ChainBase } from 'types';
 import WebWalletController from 'controllers/app/web_wallets';
 import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web_wallet';
 import WalletConnectWebWalletController from '../../app/webWallets/walletconnect_web_wallet';
