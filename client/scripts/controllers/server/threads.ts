@@ -551,11 +551,9 @@ class ThreadsController {
       author_chain: app.user.activeAccount.chain,
       jwt: app.user.jwt,
     });
-    console.log(response.result);
     if (response.status !== 'Success') {
       throw new Error();
     }
-    console.log(response.result);
     this._store.add(modelFromServer(response.result));
   }
 
@@ -573,11 +571,9 @@ class ThreadsController {
       remove_link: true,
       jwt: app.user.jwt,
     });
-    console.log(response.result);
     if (response.status !== 'Success') {
       throw new Error();
     }
-    console.log(response.result);
     this._store.add(modelFromServer(response.result));
   }
 

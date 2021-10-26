@@ -23,7 +23,6 @@ import { SearchParams } from './search_bar';
 const renderThreadPreview = (state, thread: OffchainThread, idx: number) => {
   const selected = state.linkedThreads.find((lT) => +lT.id === +thread.id);
   const author = app.profiles.getProfile(thread.authorChain, thread.author);
-  console.log(author);
   return m(ListItem, {
     label: m('.linked-thread-info', [
       m('.linked-thread-top', thread.title),
@@ -64,7 +63,6 @@ export const ThreadSelector: m.Component<
   view: (vnode) => {
     const { linkingThread } = vnode.attrs;
     const { linkedThreads, linkedThreadsFetched, searchResults } = vnode.state;
-    console.log({ linkingThread });
     // The modal kicks off by fetching the offchain threads linked to by a given parent.
     const hasLinkedThreads = !!linkingThread.linkedThreads?.length;
     if (!hasLinkedThreads) {
@@ -97,10 +95,7 @@ export const ThreadSelector: m.Component<
         : !vnode.state.linkedThreads?.length
         ? 'No currently linked threads'
         : null;
-    console.log({
-      state: vnode.state,
-      emptyContentMessage
-    })
+
     return m('.ThreadSelector', [
       linkedThreadsFetched
         ? m(ControlGroup, [
