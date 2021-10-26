@@ -1,8 +1,10 @@
 import 'pages/user_dashboard.scss';
 
 import m from 'mithril';
+import _ from 'lodash';
+import $ from 'jquery';
 import Infinite from 'mithril-infinite';
-import { TabItem, Tabs, Tag, Col, Grid, Card, Icon, Icons } from 'construct-ui';
+import { TabItem, Tabs, Tag, Col, Grid, Card, Icon, Icons, Spinner } from 'construct-ui';
 
 import app from 'state';
 import { pluralize } from 'helpers';
@@ -118,7 +120,17 @@ const CommunityCard : m.Component<{ community: CommunityInfo }> = {
   }
 };
 
-const DashboardPage: m.Component<{}> = {
+const notificationsRemaining = (contentLength, count) => {
+  return (contentLength >= 10 && count < contentLength);
+};
+
+const DashboardPage: m.Component<{}, {
+  count: number,
+  onscroll;
+}> = {
+  oncreate: (vnode) => {
+    vnode.state.count = 10;
+  },
   view: (vnode) => {
     if (!app.isLoggedIn()) {
       return m(StaticLandingPage);
@@ -166,6 +178,18 @@ const DashboardPage: m.Component<{}> = {
         .concat(myCommunities.filter((c) => !c.collapsedOnHomepage))
     );
 
+    vnode.state.onscroll = _.debounce(async () => {
+      if (!notificationsRemaining(sortedNotifications.length, vnode.state.count)) return;
+      const scrollHeight = $(document).height();
+      const scrollPos = $(window).height() + $(window).scrollTop();
+      if (scrollPos > (scrollHeight - 400)) {
+        vnode.state.count += 10;
+        m.redraw();
+      }
+    }, 400);
+
+    $(window).on('scroll', vnode.state.onscroll);
+
     return m(Sublayout, {
       class: 'UserDashboardPage',
       title: [
@@ -201,16 +225,28 @@ const DashboardPage: m.Component<{}> = {
             }),
           ]),
           m('.DashboardList', [
+            // sortedNotifications.length > 0
+            //   ? m(Infinite, {
+            //     maxPages: 1, // prevents rollover/repeat
+            //     key: sortedNotifications.length,
+            //     pageData: () => sortedNotifications,
+            //     item: (data, opts, index) => {
+            //       return m(DashboardRow, { notifications: data, onListPage: true, });
+            //     },
+            //   })
+            //   : m('.no-notifications', 'No Notifications'),
             sortedNotifications.length > 0
-              ? m(Infinite, {
-                maxPages: 1, // prevents rollover/repeat
-                key: sortedNotifications.length,
-                pageData: () => sortedNotifications,
-                item: (data, opts, index) => {
-                  return m(DashboardRow, { notifications: data, onListPage: true, });
-                },
-              })
-              : m('.no-notifications', 'No Notifications'),
+            ? [
+              sortedNotifications.slice(0, vnode.state.count).map((data) => {
+                return m(DashboardRow, { notifications: data, onListPage: true, });
+              }),
+              notificationsRemaining(sortedNotifications.length, vnode.state.count)
+              ? m('.infinite-scroll-spinner-wrap .text-center', [
+                m(Spinner, { active: true })
+              ])
+              : ''
+            ]
+            : m('.no-notifications', 'No Notifications'),
           ])
         ]),
         m(Col, { span: { md: 3 }, class:'expore-communities-col' }, [
