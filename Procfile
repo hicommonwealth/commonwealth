@@ -4,3 +4,4 @@ ceNode0: WORKER_NUMBER=0 node build/server/scripts/dbNode.js
 ceNode1: WORKER_NUMBER=1 node build/server/scripts/dbNode.js
 ceNode2: WORKER_NUMBER=2 node build/server/scripts/dbNode.js
 release: npx sequelize-cli db:migrate --config server/sequelize.json
+release: heroku pg:copy commonwealth-staging2::DATABASE HEROKU_POSTGRESQL_TEAL --app commonwealth-staging
