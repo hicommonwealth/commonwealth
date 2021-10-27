@@ -37,6 +37,8 @@ const setupChainEventListeners = async (wss: WebSocket.Server): Promise<{}> => {
   // actions, like voting on proposals or registering an identity
   const profileCreationHandler = new ProfileCreationHandler(models, null);
 
+  // WARNING: The storage handler NEEDS to be first since it creates a ChainEventType for new events. This avoids
+  // having to create a new ChainEventType when subscribing to self serve erc20 tokens
   const allChainEventHandlers = [
     storageHandler,
     notificationHandler,

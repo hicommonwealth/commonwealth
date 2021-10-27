@@ -635,6 +635,156 @@ const AllCommunitiesNotifications: m.Component<{
   },
 };
 
+const Erc20ChainEventNotificationRow: m.Component<{
+  subscriptions: NotificationSubscription[];
+  chainInfo: ChainInfo;
+}, {
+  option: string;
+  loading: boolean;
+  expanded: boolean;
+}> = {
+  view: (vnode) => {
+    const { subscriptions, chainInfo } = vnode.attrs;
+    const subscriptionName = `${chainInfo.id}-transfer`;
+    const subscription = subscriptions.find((s) => {
+      return (
+        s.category === NotificationCategories.ChainEvent
+        && s.objectId === subscriptionName
+      );
+    });
+
+    if (subscription && subscription.immediateEmail) {
+      vnode.state.option = NOTIFICATION_ON_IMMEDIATE_EMAIL_OPTION;
+    } else if (subscription && subscription.isActive) {
+      vnode.state.option = NOTIFICATION_ON_OPTION;
+    } else {
+      vnode.state.option = NOTIFICATION_OFF_OPTION;
+    }
+
+    const ERC20_EVENT_LIST = ['transfer'];
+    return m('tr.BatchedSubscriptionRow', [
+      m('td.token-icon', [
+        m('img', { src: chainInfo.iconUrl }),
+      ]),
+      m('td.subscription-label', chainInfo.name,
+        m('.ChainEventDetails', ERC20_EVENT_LIST)),
+      m('td.subscription-setting', [
+        m(SelectList, {
+          class: 'BatchedNotificationSelectList',
+          filterable: false,
+          checkmark: false,
+          emptyContent: null,
+          inputAttrs: {
+            class: 'BatchedNotificationSelectRow',
+          },
+          popoverAttrs: {
+            transitionDuration: 0,
+          },
+          itemRender: (option: string) => {
+            return m(ListItem, {
+              label: option,
+              selected: (vnode.state.option === option),
+            });
+          },
+          items: [NOTIFICATION_ON_IMMEDIATE_EMAIL_OPTION, NOTIFICATION_ON_OPTION, NOTIFICATION_OFF_OPTION],
+          trigger: m(Button, {
+            align: 'left',
+            compact: true,
+            rounded: true,
+            disabled: !app.user.emailVerified || vnode.state.loading,
+            iconRight: Icons.CHEVRON_DOWN,
+            label: vnode.state.option,
+          }),
+          onSelect: async (option: string) => {
+            vnode.state.option = option;
+            vnode.state.loading = true;
+            try {
+              if (option === NOTIFICATION_OFF_OPTION) {
+                await app.user.notifications.disableImmediateEmails([subscription]);
+                await app.user.notifications.disableSubscriptions([subscription]);
+              } else if (option === NOTIFICATION_ON_OPTION) {
+                await app.user.notifications.subscribe(NotificationCategories.ChainEvent, `${chainInfo.id}-transfer`);
+                // Unsure why but this redundancy must be here for it to work
+                await app.user.notifications.enableSubscriptions([subscription]);
+                if (subscription && subscription.immediateEmail) {
+                  await app.user.notifications.disableImmediateEmails([subscription]);
+                }
+              } else if (option === NOTIFICATION_ON_IMMEDIATE_EMAIL_OPTION) {
+                await app.user.notifications.subscribe(NotificationCategories.ChainEvent, `${chainInfo.id}-transfer`)
+                  .then(() => {
+                    const newSubscription = subscriptions.find((s) => {
+                      return (
+                        s.category === NotificationCategories.ChainEvent
+                        && s.objectId === subscriptionName
+                      );
+                    });
+                    return app.user.notifications.enableImmediateEmails([newSubscription]);
+                  });
+              }
+            } catch (err) {
+              notifyError(err.toString());
+            }
+            vnode.state.loading = false;
+            m.redraw();
+          }
+        })])
+    ]);
+  }
+};
+
+const Erc20ChainEventNotifications: m.Component<{
+  subscriptions: NotificationSubscription[];
+}, {
+  expanded: boolean;
+}> = {
+  view: (vnode) => {
+    const { subscriptions } = vnode.attrs;
+    const COLLAPSED_ROW_COUNT = 4;
+    const roles = app.user.roles;
+    const nodes = app.config.nodes.getAll();
+    const activeErc20s = nodes.filter((n) => roles.find((r) => n.chain.id === r.chain_id && n.chain.type === 'token'))
+      .sort((n, o) => {
+        if (n.chain.name < o.chain.name) {
+          return -1;
+        } else if (o.chain.name > n.chain.name) {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
+
+    let displayErc20s;
+    if (!vnode.state.expanded) {
+      displayErc20s = activeErc20s.slice(0, 4);
+    } else {
+      displayErc20s = activeErc20s;
+    }
+
+    //  return activeErc20s.map((n)=>m('tr',n.chain.name))
+    return [
+      displayErc20s.length > 0
+        ? m('tr.on-chain-events-header', [
+          m('th', { colspan: 2 }, 'ERC20 chain events'),
+        ])
+        : null ]
+      .concat(displayErc20s.map((n) => m(Erc20ChainEventNotificationRow, { subscriptions, chainInfo: n.chain })))
+      .concat([
+        activeErc20s.length > COLLAPSED_ROW_COUNT
+          ? m('tr', [
+            m('td', { colspan: 2 }, [
+              m('a.expand-notifications-link', {
+                href: '#',
+                onclick: (e) => { e.preventDefault(); vnode.state.expanded = !vnode.state.expanded; },
+              }, [
+                `${vnode.state.expanded ? 'Hide' : 'Show'} ${pluralize(activeErc20s.length - COLLAPSED_ROW_COUNT, 'token')}`,
+              ]),
+            ]),
+          ])
+          : null
+      ]);
+  }
+};
+
 const NotificationsPage: m.Component<{}, {
   communities: CommunityInfo[];
   subscriptions: NotificationSubscription[];
@@ -779,6 +929,7 @@ const NotificationsPage: m.Component<{}, {
               m('tr.on-chain-events-header', m('th', { colspan: 2 }, 'dYdX chain events')),
               m(DydxChainEventNotifications),
             ],
+            m(Erc20ChainEventNotifications, { subscriptions }),
             selectedCommunity
               && m(IndividualCommunityNotifications, { subscriptions, community: selectedCommunity }),
             // on-chain event notifications

@@ -38,7 +38,7 @@ const getTokenForum = async (
             name: token.name,
             decimals: token.decimals,
             base: ChainBase.Ethereum,
-            has_chain_events_listener: false,
+            has_chain_events_listener: true,
           },
           transaction: t,
         });
