@@ -83,13 +83,7 @@ export const FaceliftButtonGroup: m.Component<
     return m(
       appendTags('.ButtonGroup', vnode.attrs),
       {
-        style: `justify-content: ${
-          justify === Justify.Left
-            ? 'left'
-            : justify === Justify.Center
-            ? 'center'
-            : 'right'
-        }`,
+        style: `justify-content: ${justify}`,
       },
       [
         m(FaceliftButton, {
@@ -109,6 +103,8 @@ export const FaceliftButtonGroup: m.Component<
   },
 };
 
+// TODO: Synchronize/reconcile against
+// Mithril internal/external link helpers
 export const ExternalLinkElement: m.Component<
   {
     label: string;
@@ -166,8 +162,7 @@ export const FaceliftRadioGroup: m.Component<
     defaultValue: string;
     name: string;
     onchange: Function;
-    groupClass?: string;
-    toggleClasses?: string[];
+    klass?: string;
     disabled?: boolean;
   },
   {
@@ -185,20 +180,18 @@ export const FaceliftRadioGroup: m.Component<
       labels,
       onchange,
       name,
-      groupClass,
-      toggleClasses,
+      klass,
       disabled,
     } = vnode.attrs;
     const { toggledValue } = vnode.state;
     return m(
-      `.RadioGroup.${groupClass || ''}`,
+      `.RadioGroup.${klass || ''}`,
       values.map((val, idx) => {
         return m(RadioButton, {
           value: val,
           label: labels[idx] || val,
           toggled: val === toggledValue,
           groupName: name,
-          className: toggleClasses?.length ? toggleClasses[idx] : '',
           onchange: (e) => {
             vnode.state.toggledValue = e?.target?.value;
             onchange(e);

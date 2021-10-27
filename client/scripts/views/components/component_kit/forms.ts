@@ -43,11 +43,13 @@ export const TextInput: m.Component<
         oninput: (e) => {
           e.preventDefault();
           e.stopPropagation();
-          clearTimeout(vnode.state.inputTimeout);
-          vnode.state.inputTimeout = setTimeout(() => {
-            if (oninput) oninput(e);
-            m.redraw();
-          }, 250);
+          if (oninput) {
+            clearTimeout(vnode.state.inputTimeout);
+            vnode.state.inputTimeout = setTimeout(() => {
+              oninput(e);
+              m.redraw();
+            }, 250);
+          }
         },
         onfocusout: (e) => {
           if (inputValidationFn) {
