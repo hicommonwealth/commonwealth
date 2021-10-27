@@ -1,7 +1,7 @@
 import request from 'superagent';
 import { Op } from 'sequelize';
 import { capitalize } from 'lodash';
-import { Label as ChainEventLabel } from '@commonwealth/chain-events';
+import { Label as ChainEventLabel, CWEvent } from '@commonwealth/chain-events';
 
 import { NotificationCategories } from '../shared/types';
 import { smartTrim, validURL, renderQuillDeltaToText } from '../shared/utils';
@@ -25,7 +25,14 @@ const REGEX_EMOJI = /([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF
 
 const getFilteredContent = (content, address) => {
   if (content.chainEvent && content.chainEventType) {
-    const event = ChainEventLabel(content.chainEventType.chain, content.chainEvent);
+    // construct compatible CW event from DB by inserting network from type
+    const evt = {
+      blockNumber: content.chainEvent.block_number,
+      data: content.chainEvent.event_data,
+      network: content.chainEventType.event_network,
+    } as CWEvent;
+
+    const event = ChainEventLabel(content.chainEventType.chain, evt);
     const title = `${capitalize(content.chainEventType.chain)}`;
     const chainEventLink = `${SERVER_URL}/${content.chainEventType.chain}`;
     const fulltext = `${event.heading} on ${capitalize(content.chainEventType?.chain)} at block`
