@@ -13,7 +13,7 @@ const JoinCommonWealthSection: m.Component<{}, {}> = {
             m(
               'h2',
               { class: 'text-white font-bold text-3xl' },
-              'A community for every token. '
+              'A community for every token. Yeet'
             ),
             m(
               'p',
@@ -23,7 +23,7 @@ const JoinCommonWealthSection: m.Component<{}, {}> = {
           ]),
           m(
             'div',
-            { class: 'flex mt-10 md:justify-end md:mt-0' },
+            { class: 'flex mt-10 md:justify-end md:mt-0' }
             // m(
             //   'button',
             //   { class: 'btn-gradient pb-3' },
