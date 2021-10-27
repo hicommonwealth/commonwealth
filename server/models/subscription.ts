@@ -186,26 +186,11 @@ export default (
       return notification;
     }));
 
-    const erc20Tokens = (await models.Chain.findAll({
-      where: {
-        base: ChainBase.Ethereum,
-        type: ChainType.Token,
-      }
-    })).map((o) => o.id);
 
-    // send data to relevant webhooks
-    // TODO: currently skipping all erc20 events from webhooks - change?
-    if (webhook_data && (
-      // @ts-ignore
-      !webhook_data?.chainEventType?.chain
-      // @ts-ignore
-        || !erc20Tokens.includes(webhook_data.chainEventType.chain)
-    )) {
-      await send(models, {
-        notificationCategory: category_id,
-        ...webhook_data
-      });
-    }
+    await send(models, {
+      notificationCategory: category_id,
+      ...webhook_data
+    });
 
     // // send websocket state updates
     // // TODO: debug and figure out why this may fail and prevent calls from returning
