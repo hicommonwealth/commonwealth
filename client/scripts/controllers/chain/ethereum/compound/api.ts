@@ -73,7 +73,12 @@ export default class CompoundAPI implements ContractApi<GovernorAlpha | Governor
         console.log(`Found Bravo contract at ${this.Contract.address}, using GovernorCompatibilityBravo`);
         this._govType = GovernorType.Bravo;
       } catch (_e2) {
-        // falling back to Oz
+        // test to ensure it is Oz-style
+        try {
+          await (this._Contract as GovernorCompatibilityBravo).COUNTING_MODE();
+        } catch (e) {
+          throw new Error(`Could not determine governance contract type of ${this.contractAddress}`);
+        }
         console.log(`Falling back to OpenZeppelin governor contract at ${this.Contract.address}`);
         this._govType = GovernorType.Oz;
       }
@@ -112,7 +117,6 @@ export default class CompoundAPI implements ContractApi<GovernorAlpha | Governor
       tokenAddress = utils.getAddress(Buffer.from(utils.stripZeros(resultData)).toString('hex'));
     } catch (err) {
       console.error(`Could not fetch token ${tokenName}: ${err.message}`);
-      return
     }
 
     // query token and determine token capabilities (MPond vs ERC20VotesComp)
@@ -130,6 +134,12 @@ export default class CompoundAPI implements ContractApi<GovernorAlpha | Governor
           this._tokenType = GovernorTokenType.Comp;
           console.log(`Found Comp-type token at ${tokenAddress}, using ERC20VotesComp`);
         } catch (_e2) {
+          // test to ensure it is Oz-style
+          try {
+            await this._Token.getVotes(tokenAddress);
+          } catch (e) {
+            throw new Error(`Could not determine token type of ${tokenAddress}`);
+          }
           this._tokenType = GovernorTokenType.OzVotes;
           console.log(`Falling back to OpenZeppelin ERC20Votes for token at ${tokenAddress}`);
         }
