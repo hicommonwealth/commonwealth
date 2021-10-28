@@ -170,6 +170,9 @@ async function mainProcess(producer: RabbitMqHandler, pool: Pool) {
             tokenAddresses: erc20TokenAddresses,
             tokenNames: erc20TokenNames,
             verbose: false,
+            enricherConfig: {
+              balanceTransferThresholdPermill: 10 ** 22
+            }
           }
         );
 
