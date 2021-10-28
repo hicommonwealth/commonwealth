@@ -13,22 +13,32 @@ import { DB } from '../database';
 import { OffchainTopicInstance } from '../models/offchain_topic';
 import { RoleInstance } from '../models/role';
 import { OffchainThreadInstance } from '../models/offchain_thread';
+import { AppError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
-export const Errors = { };
+export const Errors = {};
 
 // Topics, comments, reactions, members+admins, threads
-const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
-  if (error) return next(new Error(error));
+const bulkOffchain = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const [chain, community, error] = await lookupCommunityIsVisibleToUser(
+    models,
+    req.query,
+    req.user
+  );
+  if (error) throw new AppError(error);
 
   // globally shared SQL replacements
   const communityOptions = community
-      ? 'community = :community'
-      : 'chain = :chain';
+    ? 'community = :community'
+    : 'chain = :chain';
   const replacements = community
-      ? { community: community.id }
-      : { chain: chain.id };
+    ? { community: community.id }
+    : { chain: chain.id };
 
   // parallelized queries
   const [
@@ -224,13 +234,18 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
     // most active users
     new Promise(async (resolve, reject) => {
       try {
-        const thirtyDaysAgo = new Date((new Date() as any) - 1000 * 24 * 60 * 60 * 30);
+        const thirtyDaysAgo = new Date(
+          (new Date() as any) - 1000 * 24 * 60 * 60 * 30
+        );
         const activeUsers = {};
         const where = { updated_at: { [Op.gt]: thirtyDaysAgo } };
         if (community) where['community'] = community.id;
         else where['chain'] = chain.id;
 
-        const monthlyComments = await models.OffchainComment.findAll({ where, include: [ models.Address ] });
+        const monthlyComments = await models.OffchainComment.findAll({
+          where,
+          include: [models.Address],
+        });
         const monthlyThreads = await models.OffchainThread.findAll({
           where,
           attributes: { exclude: ['version_history'] },
@@ -249,16 +264,18 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
             };
         });
         const mostActiveUsers_ = Object.values(activeUsers).sort((a, b) => {
-          return ((b as any).count - (a as any).count);
+          return (b as any).count - (a as any).count;
         });
         resolve(mostActiveUsers_);
       } catch (e) {
         reject(new Error('Could not fetch most active users'));
       }
     }),
-    models.sequelize.query(`
+    models.sequelize.query(
+      `
      SELECT id, title, stage FROM "OffchainThreads"
-     WHERE ${communityOptions} AND (stage = 'proposal_in_review' OR stage = 'voting')`, {
+     WHERE ${communityOptions} AND (stage = 'proposal_in_review' OR stage = 'voting')`,
+      {
         replacements,
         type: QueryTypes.SELECT,
       }
@@ -267,7 +284,9 @@ const bulkOffchain = async (models: DB, req: Request, res: Response, next: NextF
 
   const [threads, comments] = threadsCommentsReactions as any;
 
-  const numVotingThreads = threadsInVoting.filter((t) => t.stage === 'voting').length;
+  const numVotingThreads = threadsInVoting.filter(
+    (t) => t.stage === 'voting'
+  ).length;
 
   return res.json({
     status: 'Success',
