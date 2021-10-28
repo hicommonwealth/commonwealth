@@ -79,7 +79,6 @@ export default class extends IEventHandler {
     const chain = event.chain || this._chain;
 
     event = this.truncateEvent(event);
-    log.debug(`Received event: ${JSON.stringify(event, null, 2)}`);
     const shouldSkip = await this._shouldSkip(event);
     if (shouldSkip) {
       log.trace(`Skipping event!`);

@@ -23,8 +23,8 @@ export const addPrefix = (filename: string, prefixes?: string[]) => {
   if (!prefixes || prefixes.length === 0) return formatFilename(filename);
   else finalPrefix = `${formatFilename(filename)}`;
 
-  for (let i = 1; i < finalPrefix.length; ++i) {
-    finalPrefix = `${finalPrefix}::${finalPrefix[i]}`;
+  for (let i = 0; i < prefixes.length; ++i) {
+    finalPrefix = `${finalPrefix}::${prefixes[i]}`;
   }
   return finalPrefix
 }

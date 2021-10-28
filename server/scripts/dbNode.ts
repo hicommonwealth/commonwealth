@@ -295,12 +295,6 @@ async function mainProcess(
         excludedEvents,
       };
 
-      if (chain.ce_verbose) {
-        listeners[chain.id].eventHandlers['logger'] = {
-          handler: generalLogger,
-        };
-      }
-
       try {
         // subscribe to the chain to begin listening for events
         await listeners[chain.id].subscribe();
@@ -323,6 +317,13 @@ async function mainProcess(
       } catch (error) {
         await handleFatalError(error, pool, chain.id, 'update-spec');
       }
+    }
+
+    // add the logger if it is needed and isn't already added
+    if (chain.ce_verbose && !listeners[chain.id].eventHandlers['logger']) {
+      listeners[chain.id].eventHandlers['logger'] = {
+        handler: generalLogger,
+      };
     }
 
     // delete the logger if it is active but ce_verbose is false

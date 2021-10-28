@@ -54,7 +54,7 @@ export default class extends IEventHandler {
         event.excludeAddresses,
         event.includeAddresses
       );
-      log.info(`Emitted ${dbNotifications.length} notifications.`);
+      log.trace(`Emitted ${dbNotifications.length} notifications.`);
       return dbEvent;
     } catch (e) {
       log.error(`Failed to generate notification: ${e.message}!`);

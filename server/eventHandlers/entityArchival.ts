@@ -152,7 +152,7 @@ export default class extends IEventHandler {
 
     const entity = eventToEntity(event.network, event.data.kind);
     if (!entity) {
-      log.info(
+      log.trace(
         `no archival action needed for event of kind ${event.data.kind.toString()}`
       );
       return dbEvent;
