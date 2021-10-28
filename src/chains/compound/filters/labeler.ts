@@ -1,4 +1,8 @@
-import { LabelerFilter, IEventLabel } from '../../../interfaces';
+import {
+  LabelerFilter,
+  IEventLabel,
+  SupportedNetwork,
+} from '../../../interfaces';
 import { IEventData, EventKind } from '../types';
 
 /**
@@ -8,7 +12,8 @@ import { IEventData, EventKind } from '../types';
 export const Label: LabelerFilter = (
   blockNumber: number,
   chainId: string,
-  data: IEventData
+  data: IEventData,
+  chain?: string
 ): IEventLabel => {
   switch (data.kind) {
     case EventKind.ProposalCanceled: {
@@ -62,7 +67,11 @@ export const Label: LabelerFilter = (
       // ensure exhaustive matching -- gives ts error if missing cases
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const _exhaustiveMatch: never = data;
-      throw new Error('unknown event type');
+      throw new Error(
+        `[${SupportedNetwork.Compound}${
+          chain ? `::${chain}` : ''
+        }]: Unknown event type`
+      );
     }
   }
 };

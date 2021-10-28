@@ -1,19 +1,21 @@
 /**
  * Processes Moloch events.
  */
-import { IEventProcessor, CWEvent } from '../../interfaces';
-import { factory, formatFilename } from '../../logging';
+import { IEventProcessor, CWEvent, SupportedNetwork } from '../../interfaces';
+import { addPrefix, factory } from '../../logging';
 
 import { ParseType } from './filters/type_parser';
 import { Enrich } from './filters/enricher';
 import { IEventData, RawEvent, Api } from './types';
 
-const log = factory.getLogger(formatFilename(__filename));
-
 export class Processor extends IEventProcessor<Api, RawEvent> {
-  private _version: 1 | 2;
+  private readonly _version: 1 | 2;
 
-  constructor(api: Api, contractVersion: 1 | 2) {
+  constructor(
+    api: Api,
+    contractVersion: 1 | 2,
+    protected readonly chain?: string
+  ) {
     super(api);
     this._version = contractVersion;
   }
@@ -25,7 +27,10 @@ export class Processor extends IEventProcessor<Api, RawEvent> {
    * @returns an array of processed events
    */
   public async process(event: RawEvent): Promise<CWEvent<IEventData>[]> {
-    const kind = ParseType(this._version, event.event);
+    const log = factory.getLogger(
+      addPrefix(__filename, [SupportedNetwork.Moloch, this.chain])
+    );
+    const kind = ParseType(this._version, event.event, this.chain);
     if (!kind) return [];
     try {
       const cwEvent = await Enrich(
@@ -33,11 +38,16 @@ export class Processor extends IEventProcessor<Api, RawEvent> {
         this._api,
         event.blockNumber,
         kind,
-        event
+        event,
+        this.chain
       );
       return [cwEvent];
     } catch (e) {
-      log.error(`Failed to enrich event: ${e.message}`);
+      log.error(
+        `[${SupportedNetwork.Moloch}${
+          this.chain ? `::${this.chain}` : ''
+        }]: Failed to enrich event: ${e.message}`
+      );
       return [];
     }
   }

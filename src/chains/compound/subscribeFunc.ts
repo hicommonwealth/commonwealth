@@ -7,6 +7,7 @@ import {
   CWEvent,
   SubscribeFunc,
   ISubscribeOptions,
+  SupportedNetwork,
 } from '../../interfaces';
 import { factory, formatFilename } from '../../logging';
 import {
@@ -24,24 +25,36 @@ const log = factory.getLogger(formatFilename(__filename));
 /**
  * Attempts to open an API connection, retrying if it cannot be opened.
  * @returns a promise resolving to an ApiPromise once the connection has been established
- * @param ethNetworkUrl
- * @param governorAlphaAddress
+ * @param ethNetworkUrlOrProvider
+ * @param governorAddress
  * @param retryTimeMs
+ * @param chain
  */
 export async function createApi(
   ethNetworkUrlOrProvider: string | providers.JsonRpcProvider,
   governorAddress: string,
-  retryTimeMs = 10 * 1000
+  retryTimeMs = 10 * 1000,
+  chain?: string
 ): Promise<Api> {
   const ethNetworkUrl =
     typeof ethNetworkUrlOrProvider === 'string'
       ? ethNetworkUrlOrProvider
       : ethNetworkUrlOrProvider.connection.url;
+  const chainLog = factory.getLogger(
+    `${formatFilename(__filename)}::${SupportedNetwork.Compound}${
+      chain ? `::${chain}` : ''
+    }`
+  );
+
   for (let i = 0; i < 3; ++i) {
     try {
       const provider =
         typeof ethNetworkUrlOrProvider === 'string'
-          ? await createProvider(ethNetworkUrlOrProvider)
+          ? await createProvider(
+              ethNetworkUrlOrProvider,
+              SupportedNetwork.Compound,
+              chain
+            )
           : ethNetworkUrlOrProvider;
 
       let contract: Api;
@@ -61,19 +74,21 @@ export async function createApi(
         );
       }
 
-      log.info('Connection successful!');
+      chainLog.info(`${this.logPrefix}Connection successful!`);
       return contract;
     } catch (err) {
-      log.error(
-        `Compound ${governorAddress} at ${ethNetworkUrl} failure: ${err.message}`
+      chainLog.error(
+        `Compound contract: ${governorAddress} at url: ${ethNetworkUrl} failure: ${err.message}`
       );
       await sleep(retryTimeMs);
-      log.error('Retrying connection...');
+      chainLog.error(`Retrying connection...`);
     }
   }
 
   throw new Error(
-    `Failed to start Compound listener for ${governorAddress} at ${ethNetworkUrl}`
+    `[${SupportedNetwork.Compound}${
+      chain ? `::${chain}` : ''
+    }]: Failed to start Compound listener for ${governorAddress} at ${ethNetworkUrl}`
   );
 }
 

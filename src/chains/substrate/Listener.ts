@@ -1,11 +1,16 @@
 import { ApiPromise } from '@polkadot/api';
 import { RegisteredTypes } from '@polkadot/types/types';
 
-import { CWEvent, IDisconnectedRange, IEventPoller } from '../../interfaces';
+import {
+  CWEvent,
+  IDisconnectedRange,
+  IEventPoller,
+  SupportedNetwork,
+} from '../../interfaces';
 import { Listener as BaseListener } from '../../Listener';
-import { factory, formatFilename } from '../../logging';
+import { addPrefix, factory, formatFilename } from '../../logging';
 
-import { EventKind, Block, ISubstrateListenerOptions } from './types';
+import { Block, EventKind, ISubstrateListenerOptions } from './types';
 
 import {
   createApi,
@@ -15,8 +20,6 @@ import {
   StorageFetcher,
   Subscriber,
 } from './index';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 // TODO: archival support
 export class Listener extends BaseListener<
@@ -32,6 +35,8 @@ export class Listener extends BaseListener<
 
   public discoverReconnectRange: (chain: string) => Promise<IDisconnectedRange>;
 
+  protected readonly log;
+
   constructor(
     chain: string,
     url?: string,
@@ -43,7 +48,12 @@ export class Listener extends BaseListener<
     verbose?: boolean,
     discoverReconnectRange?: (c: string) => Promise<IDisconnectedRange>
   ) {
-    super(chain, verbose);
+    super(SupportedNetwork.Substrate, chain, verbose);
+
+    this.log = factory.getLogger(
+      addPrefix(__filename, [SupportedNetwork.Substrate, this._chain])
+    );
+
     this._options = {
       archival: !!archival,
       startBlock: startBlock ?? 0,
@@ -59,24 +69,34 @@ export class Listener extends BaseListener<
 
   public async init(): Promise<void> {
     try {
-      this._api = await createApi(this._options.url, this._options.spec);
+      this._api = await createApi(
+        this._options.url,
+        this._options.spec,
+        this._chain
+      );
 
       this._api.on('connected', this.processMissedBlocks);
     } catch (error) {
-      log.error(
-        `[Substrate::${this._chain}]: Fatal error occurred while starting the API`
-      );
+      this.log.error(`Fatal error occurred while starting the API`);
       throw error;
     }
 
     try {
-      this._poller = new Poller(this._api);
-      this._processor = new Processor(this._api, this._options.enricherConfig);
-      this.storageFetcher = new StorageFetcher(this._api);
-      this._subscriber = await new Subscriber(this._api, this._verbose);
+      this._poller = new Poller(this._api, this._chain);
+      this._processor = new Processor(
+        this._api,
+        this._options.enricherConfig,
+        this._chain
+      );
+      this.storageFetcher = new StorageFetcher(this._api, this._chain);
+      this._subscriber = await new Subscriber(
+        this._api,
+        this._verbose,
+        this._chain
+      );
     } catch (error) {
-      log.error(
-        `[Substrate::${this._chain}]: Fatal error occurred while starting the Poller, Processor, Subscriber, and Fetcher`
+      this.log.error(
+        `Fatal error occurred while starting the Poller, Processor, Subscriber, and Fetcher`
       );
       throw error;
     }
@@ -84,41 +104,31 @@ export class Listener extends BaseListener<
 
   public async subscribe(): Promise<void> {
     if (!this._subscriber) {
-      log.warn(
-        `[Substrate::${this._chain}]: Subscriber isn't initialized. Please run init() first!`
-      );
+      this.log.warn(`Subscriber isn't initialized. Please run init() first!`);
       return;
     }
 
     // processed blocks missed during downtime
     if (!this.options.skipCatchup) await this.processMissedBlocks();
-    else
-      log.info(
-        `[Substrate::${this._chain}]: Skipping event catchup on startup!`
-      );
+    else this.log.info(`Skipping event catchup on startup!`);
 
     try {
-      log.info(
-        `[Substrate::${this._chain}]: Subscribing to ${this._chain} on url ${this._options.url}`
+      this.log.info(
+        `Subscribing to ${this._chain} on url ${this._options.url}`
       );
       await this._subscriber.subscribe(this.processBlock.bind(this));
       this._subscribed = true;
     } catch (error) {
-      log.error(
-        `[Substrate::${this._chain}]: Subscription error`,
-        error.message
-      );
+      this.log.error(`Subscription error`, error.message);
     }
   }
 
   private async processMissedBlocks(): Promise<void> {
-    log.info(
-      `[Substrate::${this._chain}]: Detected offline time, polling missed blocks...`
-    );
+    this.log.info(`Detected offline time, polling missed blocks...`);
 
     if (!this.discoverReconnectRange) {
-      log.info(
-        `[Substrate::${this._chain}]: Unable to determine offline range - No discoverReconnectRange function given`
+      this.log.info(
+        `Unable to determine offline range - No discoverReconnectRange function given`
       );
       return;
     }
@@ -128,14 +138,12 @@ export class Listener extends BaseListener<
       // fetch the block of the last server event from database
       offlineRange = await this.discoverReconnectRange(this._chain);
       if (!offlineRange) {
-        log.warn(
-          `[Substrate::${this._chain}]: No offline range found, skipping event catchup.`
-        );
+        this.log.warn(`No offline range found, skipping event catchup.`);
         return;
       }
     } catch (error) {
-      log.error(
-        `[Substrate::${this._chain}]: Could not discover offline range: ${error.message}. Skipping event catchup.`
+      this.log.error(
+        `Could not discover offline range: ${error.message}. Skipping event catchup.`
       );
       return;
     }
@@ -156,9 +164,7 @@ export class Listener extends BaseListener<
     // do nothing
     // (i.e. don't try and fetch all events from block 0 onward)
     if (!offlineRange || !offlineRange.startBlock) {
-      log.warn(
-        `[Substrate::${this._chain}]: Unable to determine offline time range.`
-      );
+      this.log.warn(`Unable to determine offline time range.`);
       return;
     }
 
@@ -169,8 +175,8 @@ export class Listener extends BaseListener<
       );
       await Promise.all(blocks.map(this.processBlock, this));
     } catch (error) {
-      log.error(
-        `[Substrate::${this._chain}]: Block polling failed after disconnect at block ${offlineRange.startBlock}`,
+      this.log.error(
+        `Block polling failed after disconnect at block ${offlineRange.startBlock}`,
         error
       );
     }

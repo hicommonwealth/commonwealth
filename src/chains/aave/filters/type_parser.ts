@@ -1,13 +1,15 @@
 import { EventKind } from '../types';
-import { factory, formatFilename } from '../../../logging';
-
-const log = factory.getLogger(formatFilename(__filename));
+import { addPrefix, factory, formatFilename } from '../../../logging';
+import { SupportedNetwork } from '../../../interfaces';
 
 /**
  * This is the Type Parser function, which takes a raw Event
  * and determines which of our local event kinds it belongs to.
  */
-export function ParseType(name: string): EventKind | null {
+export function ParseType(name: string, chain?: string): EventKind | null {
+  const log = factory.getLogger(
+    addPrefix(__filename, [SupportedNetwork.Aave, chain])
+  );
   switch (name) {
     case 'ProposalExecuted':
       return EventKind.ProposalExecuted;
@@ -28,7 +30,7 @@ export function ParseType(name: string): EventKind | null {
     case 'Approval':
       return EventKind.Approval;
     default: {
-      log.warn(`Unknown Aave event name: ${name}!`);
+      log.warn(`Unknown event name: ${name}`);
       return null;
     }
   }

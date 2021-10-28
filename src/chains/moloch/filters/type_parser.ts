@@ -1,13 +1,19 @@
 import { EventKind } from '../types';
-import { factory, formatFilename } from '../../../logging';
-
-const log = factory.getLogger(formatFilename(__filename));
+import { addPrefix, factory, formatFilename } from '../../../logging';
+import { SupportedNetwork } from '../../../interfaces';
 
 /**
  * This is the Type Parser function, which takes a raw Event
  * and determines which of our local event kinds it belongs to.
  */
-export function ParseType(version: 1 | 2, name: string): EventKind | null {
+export function ParseType(
+  version: 1 | 2,
+  name: string,
+  chain?: string
+): EventKind | null {
+  const log = factory.getLogger(
+    addPrefix(__filename, [SupportedNetwork.Moloch, chain])
+  );
   switch (name) {
     case 'SubmitProposal':
       return EventKind.SubmitProposal;
@@ -24,7 +30,7 @@ export function ParseType(version: 1 | 2, name: string): EventKind | null {
     case 'SummonComplete':
       return EventKind.SummonComplete;
     default: {
-      log.warn(`Unknown Moloch event name: ${name}!`);
+      log.warn(`Unknown event name: ${name}!`);
       return null;
     }
   }

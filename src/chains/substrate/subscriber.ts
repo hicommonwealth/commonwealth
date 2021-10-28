@@ -5,12 +5,10 @@ import { ApiPromise } from '@polkadot/api';
 import { VoidFn } from '@polkadot/api/types';
 import { Header, RuntimeVersion } from '@polkadot/types/interfaces';
 
-import { IEventSubscriber } from '../../interfaces';
-import { factory, formatFilename } from '../../logging';
+import { IEventSubscriber, SupportedNetwork } from '../../interfaces';
+import { addPrefix, factory, formatFilename } from '../../logging';
 
 import { Block } from './types';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 export class Subscriber extends IEventSubscriber<ApiPromise, Block> {
   private _subscription: VoidFn;
@@ -18,6 +16,19 @@ export class Subscriber extends IEventSubscriber<ApiPromise, Block> {
   private _versionName: string;
 
   private _versionNumber: number;
+
+  protected readonly log;
+
+  constructor(
+    protected readonly _api: ApiPromise,
+    protected _verbose = false,
+    chain?: string
+  ) {
+    super(_api);
+    this.log = factory.getLogger(
+      addPrefix(__filename, [SupportedNetwork.Substrate, chain])
+    );
+  }
 
   /**
    * Initializes subscription to chain and starts emitting events.
@@ -28,7 +39,7 @@ export class Subscriber extends IEventSubscriber<ApiPromise, Block> {
       this._api.rpc.state.subscribeRuntimeVersion((version: RuntimeVersion) => {
         this._versionNumber = +version.specVersion;
         this._versionName = version.specName.toString();
-        log.info(
+        this.log.info(
           `Fetched runtime version for ${this._versionName}: ${this._versionNumber}`
         );
         resolve();
@@ -52,7 +63,7 @@ export class Subscriber extends IEventSubscriber<ApiPromise, Block> {
           this._versionNumber
         }: ${+block.header.number}`;
         // eslint-disable-next-line no-unused-expressions
-        this._verbose ? log.info(logStr) : log.trace(logStr);
+        this._verbose ? this.log.info(logStr) : this.log.trace(logStr);
         cb(block);
       }
     );
@@ -60,11 +71,11 @@ export class Subscriber extends IEventSubscriber<ApiPromise, Block> {
 
   public unsubscribe(): void {
     if (this._subscription) {
-      log.info(`Unsubscribing from ${this._versionName}`);
+      this.log.info(`Unsubscribing from ${this._versionName}`);
       this._subscription();
       this._subscription = null;
     } else {
-      log.info(`No subscriber to unsubscribe from`);
+      this.log.info(`No subscriber to unsubscribe from`);
     }
   }
 }

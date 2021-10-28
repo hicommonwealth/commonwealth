@@ -35,9 +35,7 @@ import {
   Label as AaveLabel,
 } from './chains/aave';
 import { Listener } from './Listener';
-import { factory, formatFilename } from './logging';
-
-const log = factory.getLogger(formatFilename(__filename));
+import { addPrefix, factory, formatFilename } from './logging';
 
 export function Title(
   network: SupportedNetwork,
@@ -115,6 +113,7 @@ export async function createListener(
     IEventSubscriber<any, any>,
     any
   >;
+  const log = factory.getLogger(addPrefix(__filename, [network, chain]));
 
   if (network === SupportedNetwork.Substrate) {
     // start a substrate listener
@@ -174,7 +173,7 @@ export async function createListener(
     if (!listener) throw new Error('Listener is still null');
     await listener.init();
   } catch (error) {
-    log.error(`[${chain}]: Failed to initialize the listener`);
+    log.error(`Failed to initialize the listener`);
     throw error;
   }
 

@@ -1,19 +1,17 @@
-import { CWEvent } from '../../interfaces';
+import { CWEvent, SupportedNetwork } from '../../interfaces';
 import { Listener as BaseListener } from '../../Listener';
-import { factory, formatFilename } from '../../logging';
+import { addPrefix, factory, formatFilename } from '../../logging';
 
 import {
+  EventKind,
+  IErc20Contracts,
   ListenerOptions as Erc20ListenerOptions,
   RawEvent,
-  IErc20Contracts,
-  EventKind,
 } from './types';
 import { createApi } from './subscribeFunc';
 import { Processor } from './processor';
 import { Subscriber } from './subscriber';
 import { EnricherConfig } from './filters/enricher';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 export class Listener extends BaseListener<
   IErc20Contracts,
@@ -24,6 +22,8 @@ export class Listener extends BaseListener<
 > {
   private readonly _options: Erc20ListenerOptions;
 
+  protected readonly log;
+
   constructor(
     chain: string,
     tokenAddresses: string[],
@@ -32,7 +32,12 @@ export class Listener extends BaseListener<
     enricherConfig?: EnricherConfig,
     verbose?: boolean
   ) {
-    super(chain, verbose);
+    super(SupportedNetwork.ERC20, chain, verbose);
+
+    this.log = factory.getLogger(
+      addPrefix(__filename, [SupportedNetwork.ERC20])
+    );
+
     this._options = {
       url,
       tokenAddresses,
@@ -52,9 +57,7 @@ export class Listener extends BaseListener<
         10000
       );
     } catch (error) {
-      log.error(
-        `[Erc20::${this._chain}]: Fatal error occurred while starting the API`
-      );
+      this.log.error('Fatal error occurred while starting the API');
       throw error;
     }
 
@@ -62,8 +65,8 @@ export class Listener extends BaseListener<
       this._processor = new Processor(this._api, this._options.enricherConfig);
       this._subscriber = new Subscriber(this._api, this._chain, this._verbose);
     } catch (error) {
-      log.error(
-        `[Erc20::${this._chain}]: Fatal error occurred while starting the Processor and Subscriber`
+      this.log.error(
+        'Fatal error occurred while starting the Processor and Subscriber'
       );
       throw error;
     }
@@ -71,24 +74,20 @@ export class Listener extends BaseListener<
 
   public async subscribe(): Promise<void> {
     if (!this._subscriber) {
-      log.info(
-        `[Erc20::${this._chain}]: Subscriber isn't initialized. Please run init() first!`
-      );
+      this.log.info("Subscriber isn't initialized. Please run init() first!");
       return;
     }
 
     try {
-      log.info(
-        `[Erc20::${this._chain}]: Subscribing to the following token(s): ${
+      this.log.info(
+        `Subscribing to the following token(s): ${
           this.options.tokenNames || '[token names not given!]'
         }, on url ${this._options.url}`
       );
       await this._subscriber.subscribe(this.processBlock.bind(this));
       this._subscribed = true;
     } catch (error) {
-      log.error(
-        `[Erc20::${this._chain}]: Subscription error: ${error.message}`
-      );
+      this.log.error(`Subscription error: ${error.message}`);
     }
   }
 
@@ -111,7 +110,7 @@ export class Listener extends BaseListener<
       try {
         prevResult = await eventHandler.handler.handle(event, prevResult);
       } catch (err) {
-        log.error(`Event handle failure: ${err.message}`);
+        this.log.error(`Event handle failure: ${err.message}`);
         break;
       }
     }
@@ -121,12 +120,10 @@ export class Listener extends BaseListener<
     event: RawEvent,
     tokenName?: string
   ): Promise<void> {
-    const cwEvents: CWEvent[] = await this._processor.process(event);
+    const cwEvents: CWEvent[] = await this._processor.process(event, tokenName);
 
     // process events in sequence
     for (const e of cwEvents) {
-      // TODO: refactor chain/tokenName code in general
-      e.chain = tokenName as never;
       await this.handleEvent(e as CWEvent);
     }
   }

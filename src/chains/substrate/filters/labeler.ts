@@ -1,6 +1,10 @@
 import BN from 'bn.js';
 
-import { IEventLabel, LabelerFilter } from '../../../interfaces';
+import {
+  IEventLabel,
+  LabelerFilter,
+  SupportedNetwork,
+} from '../../../interfaces';
 import { BalanceString, EventKind, IEventData } from '../types';
 
 function fmtAddr(addr: string) {
@@ -69,7 +73,7 @@ const getDenom = (chain: string): string => {
     case 'polkadot-local':
       return 'tDOT';
     default: {
-      throw new Error('invalid chain');
+      throw new Error(`[Substrate::${chain}]: invalid chain`);
     }
   }
 };
@@ -88,7 +92,7 @@ const edgBalanceFormatter = (chain: string, balance: BalanceString): string => {
   } else if (chain.startsWith('clover')) {
     dollar = new BN(10).pow(new BN(CLOVER_DECIMAL));
   } else {
-    throw new Error('unexpected chain');
+    throw new Error(`[Substrate::${chain}]: unexpected chain`);
   }
   const balanceDollars = new BN(balance, 10).div(dollar);
   return `${formatNumberShort(+balanceDollars)} ${denom}`;
@@ -837,7 +841,9 @@ export const Label: LabelerFilter = (
       // ensure exhaustive matching -- gives ts error if missing cases
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const _exhaustiveMatch: never = data;
-      throw new Error('Unknown event type');
+      throw new Error(
+        `[${SupportedNetwork.Substrate}::${chainId}]: Unknown event type`
+      );
     }
   }
 };

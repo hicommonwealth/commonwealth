@@ -1,5 +1,10 @@
-import { CWEvent, IStorageFetcher, IDisconnectedRange } from '../../interfaces';
-import { factory, formatFilename } from '../../logging';
+import {
+  CWEvent,
+  IStorageFetcher,
+  IDisconnectedRange,
+  SupportedNetwork,
+} from '../../interfaces';
+import { addPrefix, factory, formatFilename } from '../../logging';
 
 import { Enrich } from './filters/enricher';
 import {
@@ -12,8 +17,6 @@ import {
   IVoteEmitted,
 } from './types';
 
-const log = factory.getLogger(formatFilename(__filename));
-
 type IEntityEventData =
   | IProposalCanceled
   | IProposalCreated
@@ -22,17 +25,25 @@ type IEntityEventData =
   | IVoteEmitted;
 
 export class StorageFetcher extends IStorageFetcher<Api> {
-  constructor(protected readonly _api: Api) {
+  protected readonly log;
+
+  protected readonly chain;
+
+  constructor(protected readonly _api: Api, chain?: string) {
     super(_api);
+    this.log = factory.getLogger(
+      addPrefix(__filename, [SupportedNetwork.Aave, chain])
+    );
+    this.chain = chain;
   }
 
   private _currentBlock: number;
 
   public async fetchOne(id: string): Promise<CWEvent<IEntityEventData>[]> {
     this._currentBlock = +(await this._api.governance.provider.getBlockNumber());
-    log.info(`Current block: ${this._currentBlock}.`);
+    this.log.info(`Current block: ${this._currentBlock}.`);
     if (!this._currentBlock) {
-      log.error('Failed to fetch current block! Aborting fetch.');
+      this.log.error('Failed to fetch current block! Aborting fetch.');
       return [];
     }
 
@@ -53,9 +64,9 @@ export class StorageFetcher extends IStorageFetcher<Api> {
     range?: IDisconnectedRange
   ): Promise<CWEvent<IEntityEventData>[]> {
     this._currentBlock = await this._api.governance.provider.getBlockNumber();
-    log.info(`Current block: ${this._currentBlock}.`);
+    this.log.info(`Current block: ${this._currentBlock}.`);
     if (!this._currentBlock) {
-      log.error('Failed to fetch current block! Aborting fetch.');
+      this.log.error('Failed to fetch current block! Aborting fetch.');
       return [];
     }
 
@@ -65,16 +76,18 @@ export class StorageFetcher extends IStorageFetcher<Api> {
     } else if (!range.startBlock) {
       range.startBlock = 0;
     } else if (range.startBlock >= this._currentBlock) {
-      log.error(
+      this.log.error(
         `Start block ${range.startBlock} greater than current block ${this._currentBlock}!`
       );
       return [];
     }
     if (range.endBlock && range.startBlock >= range.endBlock) {
-      log.error(`Invalid fetch range: ${range.startBlock}-${range.endBlock}.`);
+      this.log.error(
+        `Invalid fetch range: ${range.startBlock}-${range.endBlock}.`
+      );
       return [];
     }
-    log.info(
+    this.log.info(
       `Fetching Aave entities for range: ${range.startBlock}-${range.endBlock}.`
     );
 
@@ -103,7 +116,8 @@ export class StorageFetcher extends IStorageFetcher<Api> {
             this._api,
             evt.blockNumber,
             EventKind.ProposalCreated,
-            evt
+            evt,
+            this.chain
           ) as Promise<CWEvent<IProposalCreated>>
       )
     );
@@ -119,7 +133,8 @@ export class StorageFetcher extends IStorageFetcher<Api> {
             this._api,
             evt.blockNumber,
             EventKind.VoteEmitted,
-            evt
+            evt,
+            this.chain
           ) as Promise<CWEvent<IVoteEmitted>>
       )
     );
@@ -135,7 +150,8 @@ export class StorageFetcher extends IStorageFetcher<Api> {
             this._api,
             evt.blockNumber,
             EventKind.ProposalQueued,
-            evt
+            evt,
+            this.chain
           ) as Promise<CWEvent<IProposalQueued>>
       )
     );
@@ -151,7 +167,8 @@ export class StorageFetcher extends IStorageFetcher<Api> {
             this._api,
             evt.blockNumber,
             EventKind.ProposalCanceled,
-            evt
+            evt,
+            this.chain
           ) as Promise<CWEvent<IProposalCanceled>>
       )
     );
@@ -167,7 +184,8 @@ export class StorageFetcher extends IStorageFetcher<Api> {
             this._api,
             evt.blockNumber,
             EventKind.ProposalExecuted,
-            evt
+            evt,
+            this.chain
           ) as Promise<CWEvent<IProposalExecuted>>
       )
     );

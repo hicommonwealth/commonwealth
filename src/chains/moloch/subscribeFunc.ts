@@ -6,8 +6,13 @@ import {
   Moloch1__factory as Moloch1Factory,
   Moloch2__factory as Moloch2Factory,
 } from '../../contractTypes';
-import { IDisconnectedRange, CWEvent, SubscribeFunc } from '../../interfaces';
-import { factory, formatFilename } from '../../logging';
+import {
+  IDisconnectedRange,
+  CWEvent,
+  SubscribeFunc,
+  SupportedNetwork,
+} from '../../interfaces';
+import { addPrefix, factory, formatFilename } from '../../logging';
 
 import { Subscriber } from './subscriber';
 import { Processor } from './processor';
@@ -23,16 +28,27 @@ const log = factory.getLogger(formatFilename(__filename));
  * @param contractVersion
  * @param contractAddress
  * @param retryTimeMs
+ * @param chain
  */
 export async function createApi(
   ethNetworkUrl: string,
   contractVersion: 1 | 2,
   contractAddress: string,
-  retryTimeMs = 10 * 1000
+  retryTimeMs = 10 * 1000,
+  chain?: string
 ): Promise<Api> {
+  // eslint-disable-next-line no-shadow
+  const log = factory.getLogger(
+    addPrefix(__filename, [SupportedNetwork.Moloch, chain])
+  );
+
   for (let i = 0; i < 3; ++i) {
     try {
-      const provider = await createProvider(ethNetworkUrl);
+      const provider = await createProvider(
+        ethNetworkUrl,
+        SupportedNetwork.Moloch,
+        chain
+      );
       const contract =
         contractVersion === 1
           ? Moloch1Factory.connect(contractAddress, provider)
@@ -53,7 +69,9 @@ export async function createApi(
   }
 
   throw new Error(
-    `Failed to start Moloch listener for ${contractAddress} at ${ethNetworkUrl}`
+    `[${SupportedNetwork.Moloch}${
+      chain ? `::${chain}` : ''
+    }]: Failed to start Moloch listener for ${contractAddress} at ${ethNetworkUrl}`
   );
 }
 

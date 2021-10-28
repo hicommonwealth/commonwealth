@@ -1,20 +1,22 @@
-import { CWEvent, IDisconnectedRange } from '../../interfaces';
+import {
+  CWEvent,
+  IDisconnectedRange,
+  SupportedNetwork,
+} from '../../interfaces';
 import { Listener as BaseListener } from '../../Listener';
-import { factory, formatFilename } from '../../logging';
+import { addPrefix, factory } from '../../logging';
 
 import {
+  Api,
+  EventKind,
+  IEventData,
   ListenerOptions as CompoundListenerOptions,
   RawEvent,
-  Api,
-  IEventData,
-  EventKind,
 } from './types';
 import { createApi } from './subscribeFunc';
 import { Processor } from './processor';
 import { StorageFetcher } from './storageFetcher';
 import { Subscriber } from './subscriber';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 export class Listener extends BaseListener<
   Api,
@@ -25,6 +27,8 @@ export class Listener extends BaseListener<
 > {
   private readonly _options: CompoundListenerOptions;
 
+  protected readonly log;
+
   constructor(
     chain: string,
     contractAddress: string,
@@ -33,7 +37,12 @@ export class Listener extends BaseListener<
     verbose?: boolean,
     discoverReconnectRange?: (c: string) => Promise<IDisconnectedRange>
   ) {
-    super(chain, verbose);
+    super(SupportedNetwork.Compound, chain, verbose);
+
+    this.log = factory.getLogger(
+      addPrefix(__filename, [SupportedNetwork.Compound, this._chain])
+    );
+
     this._options = {
       url,
       skipCatchup: !!skipCatchup,
@@ -48,32 +57,34 @@ export class Listener extends BaseListener<
     try {
       this._api = await createApi(
         this._options.url,
-        this._options.contractAddress
+        this._options.contractAddress,
+        10 * 1000,
+        this._chain
       );
     } catch (error) {
-      log.error('Fatal error occurred while starting the API');
+      this.log.error(`Fatal error occurred while starting the API`);
       throw error;
     }
 
     try {
-      this._processor = new Processor(this._api);
+      this._processor = new Processor(this._api, this._chain);
       this._subscriber = await new Subscriber(
         this._api,
         this._chain,
         this._verbose
       );
     } catch (error) {
-      log.error(
-        'Fatal error occurred while starting the Processor, and Subscriber'
+      this.log.error(
+        `Fatal error occurred while starting the Processor, and Subscriber`
       );
       throw error;
     }
 
     try {
-      this.storageFetcher = new StorageFetcher(this._api);
+      this.storageFetcher = new StorageFetcher(this._api, this._chain);
     } catch (error) {
-      log.error(
-        'Fatal error occurred while starting the Ethereum dater and storage fetcher'
+      this.log.error(
+        `Fatal error occurred while starting the Ethereum dater and storage fetcher`
       );
       throw error;
     }
@@ -81,7 +92,7 @@ export class Listener extends BaseListener<
 
   public async subscribe(): Promise<void> {
     if (!this._subscriber) {
-      log.info(
+      this.log.info(
         `Subscriber for ${this._chain} isn't initialized. Please run init() first!`
       );
       return;
@@ -89,22 +100,22 @@ export class Listener extends BaseListener<
 
     // processed blocks missed during downtime
     if (!this._options.skipCatchup) await this.processMissedBlocks();
-    else log.info('Skipping event catchup on startup!');
+    else this.log.info(`Skipping event catchup on startup!`);
 
     try {
-      log.info(
+      this.log.info(
         `Subscribing to Compound contract: ${this._chain}, on url ${this._options.url}`
       );
       await this._subscriber.subscribe(this.processBlock.bind(this));
       this._subscribed = true;
     } catch (error) {
-      log.error(`Subscription error: ${error.message}`);
+      this.log.error(`Subscription error: ${error.message}`);
     }
   }
 
   public async updateContractAddress(address: string): Promise<void> {
     if (address === this._options.contractAddress) {
-      log.warn(`The contract address is already set to ${address}`);
+      this.log.warn(`The contract address is already set to ${address}`);
       return;
     }
     this._options.contractAddress = address;
@@ -127,13 +138,11 @@ export class Listener extends BaseListener<
   }
 
   private async processMissedBlocks(): Promise<void> {
-    log.info(
-      `[Compound::${this._chain}]: Detected offline time, polling missed blocks...`
-    );
+    this.log.info(`Detected offline time, polling missed blocks...`);
 
     if (!this.discoverReconnectRange) {
-      log.info(
-        `[Compound::${this._chain}]: Unable to determine offline range - No discoverReconnectRange function given`
+      this.log.info(
+        `Unable to determine offline range - No discoverReconnectRange function given`
       );
       return;
     }
@@ -143,14 +152,12 @@ export class Listener extends BaseListener<
       // fetch the block of the last server event from database
       offlineRange = await this.discoverReconnectRange(this._chain);
       if (!offlineRange) {
-        log.warn(
-          `[Compound::${this._chain}]: No offline range found, skipping event catchup.`
-        );
+        this.log.warn('No offline range found, skipping event catchup.');
         return;
       }
     } catch (error) {
-      log.error(
-        `[Compound::${this._chain}]: Could not discover offline range: ${error.message}. Skipping event catchup.`
+      this.log.error(
+        `Could not discover offline range: ${error.message}. Skipping event catchup.`
       );
       return;
     }
@@ -171,9 +178,7 @@ export class Listener extends BaseListener<
     // do nothing
     // (i.e. don't try and fetch all events from block 0 onward)
     if (!offlineRange || !offlineRange.startBlock) {
-      log.warn(
-        `[Compound::${this._chain}]: Unable to determine offline time range.`
-      );
+      this.log.warn(`Unable to determine offline time range.`);
       return;
     }
 
@@ -183,7 +188,7 @@ export class Listener extends BaseListener<
         await this.handleEvent(event as CWEvent<IEventData>);
       }
     } catch (error) {
-      log.error(`Unable to fetch events from storage: ${error.message}`);
+      this.log.error(`Unable to fetch events from storage: ${error.message}`);
     }
   }
 

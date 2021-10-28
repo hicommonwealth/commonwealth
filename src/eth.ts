@@ -1,13 +1,15 @@
 import { providers } from 'ethers';
 import Web3 from 'web3';
 
-import { factory, formatFilename } from './logging';
-
-const log = factory.getLogger(formatFilename(__filename));
+import { addPrefix, factory } from './logging';
 
 export async function createProvider(
-  ethNetworkUrl: string
+  ethNetworkUrl: string,
+  network?: string,
+  chain?: string
 ): Promise<providers.Web3Provider> {
+  const log = factory.getLogger(addPrefix(__filename, [network, chain]));
+
   if (
     !ethNetworkUrl.includes('alchemy') &&
     !ethNetworkUrl.includes('infura') &&

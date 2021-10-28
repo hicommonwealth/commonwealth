@@ -1,28 +1,39 @@
 /**
  * Processes Aave events.
  */
-import { IEventProcessor, CWEvent } from '../../interfaces';
-import { factory, formatFilename } from '../../logging';
+import { IEventProcessor, CWEvent, SupportedNetwork } from '../../interfaces';
+import { addPrefix, factory, formatFilename } from '../../logging';
 
 import { ParseType } from './filters/type_parser';
 import { Enrich } from './filters/enricher';
 import { IEventData, RawEvent, Api } from './types';
 
-const log = factory.getLogger(formatFilename(__filename));
-
 export class Processor extends IEventProcessor<Api, RawEvent> {
+  constructor(protected _api: Api, protected readonly chain?: string) {
+    super(_api);
+  }
+
   /**
    * Parse events out of an ethereum block and standardizes their format
    * for processing.
    *
-   * @param block the block received for processing
+   * @param event
    * @returns an array of processed events
    */
   public async process(event: RawEvent): Promise<CWEvent<IEventData>[]> {
-    const kind = ParseType(event.event);
+    const log = factory.getLogger(
+      addPrefix(__filename, [SupportedNetwork.Aave, this.chain])
+    );
+    const kind = ParseType(event.event, this.chain);
     if (!kind) return [];
     try {
-      const cwEvent = await Enrich(this._api, event.blockNumber, kind, event);
+      const cwEvent = await Enrich(
+        this._api,
+        event.blockNumber,
+        kind,
+        event,
+        this.chain
+      );
       return [cwEvent];
     } catch (e) {
       log.error(`Failed to enrich event: ${e.message}`);

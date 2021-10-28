@@ -5,13 +5,11 @@ import { Listener } from '@ethersproject/providers';
 import sleep from 'sleep-promise';
 import BN from 'bn.js';
 
-import { IEventSubscriber } from '../../interfaces';
+import { IEventSubscriber, SupportedNetwork } from '../../interfaces';
 import { ERC20__factory as ERC20Factory } from '../../contractTypes';
-import { factory, formatFilename } from '../../logging';
+import { addPrefix, factory, formatFilename } from '../../logging';
 
 import { RawEvent, IErc20Contracts } from './types';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 export class Subscriber extends IEventSubscriber<IErc20Contracts, RawEvent> {
   private _name: string;
@@ -30,11 +28,12 @@ export class Subscriber extends IEventSubscriber<IErc20Contracts, RawEvent> {
     cb: (event: RawEvent, tokenName?: string) => void
   ): Promise<void> {
     this._listener = (tokenName: string, event: RawEvent): void => {
-      const logStr = `Received ${this._name} event: ${JSON.stringify(
-        event,
-        null,
-        2
-      )}.`;
+      const log = factory.getLogger(
+        addPrefix(__filename, [SupportedNetwork.ERC20, tokenName])
+      );
+      const logStr = `[${SupportedNetwork.ERC20}::${tokenName}]: Received ${
+        this._name
+      } event: ${JSON.stringify(event, null, 2)}.`;
       // eslint-disable-next-line no-unused-expressions
       this._verbose ? log.info(logStr) : log.trace(logStr);
       cb(event, tokenName);
@@ -57,6 +56,9 @@ export class Subscriber extends IEventSubscriber<IErc20Contracts, RawEvent> {
     retryTimeMs = 10 * 1000,
     retries = 5
   ): Promise<void> {
+    const log = factory.getLogger(
+      addPrefix(__filename, [SupportedNetwork.ERC20, tokenName])
+    );
     const existingToken = this.api.tokens.find(({ contract }) => {
       return contract.address === tokenAddress;
     });

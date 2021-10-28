@@ -1,14 +1,12 @@
 /**
  * Processes ERC20 events.
  */
-import { IEventProcessor, CWEvent } from '../../interfaces';
-import { factory, formatFilename } from '../../logging';
+import { IEventProcessor, CWEvent, SupportedNetwork } from '../../interfaces';
+import { addPrefix, factory, formatFilename } from '../../logging';
 
 import { ParseType } from './filters/type_parser';
 import { Enrich, EnricherConfig } from './filters/enricher';
 import { IEventData, RawEvent, IErc20Contracts } from './types';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 export class Processor extends IEventProcessor<IErc20Contracts, RawEvent> {
   constructor(
@@ -22,9 +20,16 @@ export class Processor extends IEventProcessor<IErc20Contracts, RawEvent> {
    * Parse events out of an ethereum block and standardizes their format
    * for processing.
    * @param event
+   * @param tokenName
    * @returns an array of processed events
    */
-  public async process(event: RawEvent): Promise<CWEvent<IEventData>[]> {
+  public async process(
+    event: RawEvent,
+    tokenName?: string
+  ): Promise<CWEvent<IEventData>[]> {
+    const log = factory.getLogger(
+      addPrefix(__filename, [SupportedNetwork.ERC20, tokenName])
+    );
     const kind = ParseType(event.event);
     if (!kind) return [];
     try {
@@ -38,7 +43,11 @@ export class Processor extends IEventProcessor<IErc20Contracts, RawEvent> {
       return cwEvent ? [cwEvent] : [];
     } catch (e) {
       log.error(
-        `Failed to enrich event ${event.address} (${event.event}): ${e.message}`
+        `[${SupportedNetwork.ERC20}${
+          tokenName ? `::${tokenName}` : ''
+        }]: Failed to enrich event ${event.address} (${event.event}): ${
+          e.message
+        }`
       );
       return [];
     }

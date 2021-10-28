@@ -1,6 +1,10 @@
+import * as yargs from 'yargs';
+
 import { createListener, LoggingHandler, SupportedNetwork } from '../src';
 
-import * as yargs from 'yargs';
+import { networkUrls, contracts, networkSpecs } from './listenerUtils';
+
+require('dotenv').config();
 
 const { argv } = yargs.options({
   network: {
@@ -36,11 +40,12 @@ async function main(): Promise<any> {
   let listener;
   try {
     listener = await createListener(argv.chain || 'dummyChain', argv.network, {
-      url: argv.url,
-      address: argv.contractAddress,
+      url: argv.url || networkUrls[argv.chain],
+      address: argv.contractAddress || contracts[argv.chain],
       tokenAddresses: [argv.contractAddress],
       tokenNames: [argv.tokenName],
       verbose: false,
+      spec: <any>networkSpecs[argv.chain],
       enricherConfig: {
         balanceTransferThreshold: 500_000,
       },

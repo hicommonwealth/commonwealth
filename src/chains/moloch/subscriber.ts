@@ -3,21 +3,24 @@
  */
 import { Listener } from '@ethersproject/providers';
 
-import { IEventSubscriber } from '../../interfaces';
-import { factory, formatFilename } from '../../logging';
+import { IEventSubscriber, SupportedNetwork } from '../../interfaces';
+import { addPrefix, factory, formatFilename } from '../../logging';
 
 import { RawEvent, Api } from './types';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 export class Subscriber extends IEventSubscriber<Api, RawEvent> {
   private _name: string;
 
   private _listener: Listener | null;
 
+  private log;
+
   constructor(api: Api, name: string, verbose = false) {
     super(api, verbose);
     this._name = name;
+    this.log = factory.getLogger(
+      addPrefix(__filename, [SupportedNetwork.Moloch, this._name])
+    );
   }
 
   /**
@@ -31,7 +34,7 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
         2
       )}.`;
       // eslint-disable-next-line no-unused-expressions
-      this._verbose ? log.info(logStr) : log.trace(logStr);
+      this._verbose ? this.log.info(logStr) : this.log.trace(logStr);
       cb(event);
     };
     this._api.on('*', this._listener);
@@ -39,7 +42,7 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
 
   public unsubscribe(): void {
     if (this._listener) {
-      log.info(`Unsubscribing from ${this._name}`);
+      this.log.info(`Unsubscribing from ${this._name}`);
       this._api.removeListener('*', this._listener);
       this._listener = null;
     }

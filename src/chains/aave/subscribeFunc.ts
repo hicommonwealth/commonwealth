@@ -6,8 +6,9 @@ import {
   CWEvent,
   SubscribeFunc,
   ISubscribeOptions,
+  SupportedNetwork,
 } from '../../interfaces';
-import { factory, formatFilename } from '../../logging';
+import { addPrefix, factory, formatFilename } from '../../logging';
 import {
   IAaveGovernanceV2__factory as IAaveGovernanceV2Factory,
   GovernanceStrategy__factory as GovernanceStrategyFactory,
@@ -26,17 +27,26 @@ const log = factory.getLogger(formatFilename(__filename));
  * @param ethNetworkUrl
  * @param governanceAddress
  * @param retryTimeMs
- * @param retryCount
+ * @param chain
  * @returns a promise resolving to an ApiPromise once the connection has been established
  */
 export async function createApi(
   ethNetworkUrl: string,
   governanceAddress: string,
-  retryTimeMs = 10 * 1000
+  retryTimeMs = 10 * 1000,
+  chain?: string
 ): Promise<Api> {
+  // eslint-disable-next-line no-shadow
+  const log = factory.getLogger(
+    addPrefix(__filename, [SupportedNetwork.Aave, chain])
+  );
   for (let i = 0; i < 3; ++i) {
     try {
-      const provider = await createProvider(ethNetworkUrl);
+      const provider = await createProvider(
+        ethNetworkUrl,
+        SupportedNetwork.Aave,
+        chain
+      );
 
       // fetch governance contract
       const governanceContract = IAaveGovernanceV2Factory.connect(
@@ -100,7 +110,9 @@ export async function createApi(
   }
 
   throw new Error(
-    `Failed to start Aave listener for ${governanceAddress} at ${ethNetworkUrl}`
+    `[${SupportedNetwork.Aave} ${
+      chain ? `::${chain}` : ''
+    }]: Failed to start Aave listener for ${governanceAddress} at ${ethNetworkUrl}`
   );
 }
 

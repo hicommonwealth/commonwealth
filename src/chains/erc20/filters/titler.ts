@@ -1,4 +1,8 @@
-import { IEventTitle, TitlerFilter } from '../../../interfaces';
+import {
+  IEventTitle,
+  SupportedNetwork,
+  TitlerFilter,
+} from '../../../interfaces';
 import { EventKind } from '../types';
 
 /**
@@ -22,7 +26,9 @@ export const Title: TitlerFilter = (kind: EventKind): IEventTitle => {
       // ensure exhaustive matching -- gives ts error if missing cases
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const _exhaustiveMatch: never = kind;
-      throw new Error('unknown event type');
+      throw new Error(
+        `[${SupportedNetwork.ERC20}]: Unknown event type: ${kind}`
+      );
     }
   }
 };

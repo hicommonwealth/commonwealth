@@ -1,20 +1,22 @@
 import { Listener as BaseListener } from '../../Listener';
-import { CWEvent, IDisconnectedRange } from '../../interfaces';
-import { factory, formatFilename } from '../../logging';
+import {
+  CWEvent,
+  IDisconnectedRange,
+  SupportedNetwork,
+} from '../../interfaces';
+import { addPrefix, factory, formatFilename } from '../../logging';
 
 import {
-  ListenerOptions as AaveListenerOptions,
+  Api,
   EventKind,
   IEventData,
+  ListenerOptions as AaveListenerOptions,
   RawEvent,
-  Api,
 } from './types';
 import { createApi } from './subscribeFunc';
 import { Subscriber } from './subscriber';
 import { Processor } from './processor';
 import { StorageFetcher } from './storageFetcher';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 export class Listener extends BaseListener<
   Api,
@@ -27,6 +29,8 @@ export class Listener extends BaseListener<
 
   private readonly _options: AaveListenerOptions;
 
+  protected readonly log;
+
   constructor(
     chain: string,
     govContractAddress: string,
@@ -35,7 +39,12 @@ export class Listener extends BaseListener<
     verbose?: boolean,
     discoverReconnectRange?: (c: string) => Promise<IDisconnectedRange>
   ) {
-    super(chain, verbose);
+    super(SupportedNetwork.Aave, chain, verbose);
+
+    this.log = factory.getLogger(
+      addPrefix(__filename, [SupportedNetwork.Aave, this._chain])
+    );
+
     this._options = {
       url,
       govContractAddress,
@@ -51,22 +60,22 @@ export class Listener extends BaseListener<
     try {
       this._api = await createApi(
         this._options.url,
-        this._options.govContractAddress
+        this._options.govContractAddress,
+        10 * 1000,
+        this._chain
       );
     } catch (error) {
-      log.error(
-        `[Aave::${this._chain}]: Fatal error occurred while starting the API`
-      );
+      this.log.error(`Fatal error occurred while starting the API`);
       throw error;
     }
 
     try {
-      this._processor = new Processor(this._api);
+      this._processor = new Processor(this._api, this._chain);
       this._subscriber = new Subscriber(this._api, this._chain, this._verbose);
-      this.storageFetcher = new StorageFetcher(this._api);
+      this.storageFetcher = new StorageFetcher(this._api, this._chain);
     } catch (error) {
-      log.error(
-        `[Aave::${this._chain}]: Fatal error occurred while starting the Processor, StorageFetcher and Subscriber`
+      this.log.error(
+        `Fatal error occurred while starting the Processor, StorageFetcher and Subscriber`
       );
       throw error;
     }
@@ -74,23 +83,23 @@ export class Listener extends BaseListener<
 
   public async subscribe(): Promise<void> {
     if (!this._subscriber) {
-      log.info(
+      this.log.info(
         `Subscriber for ${this._chain} isn't initialized. Please run init() first!`
       );
       return;
     }
 
     if (!this.options.skipCatchup) await this.processMissedBlocks();
-    else log.info(`[Aave::${this._chain}]: Skipping event catchup!`);
+    else this.log.info(`Skipping event catchup!`);
 
     try {
-      log.info(
-        `[Aave::${this._chain}]: Subscribing to Aave contract: ${this._chain}, on url ${this._options.url}`
+      this.log.info(
+        `Subscribing to Aave contract: ${this._chain}, on url ${this._options.url}`
       );
       await this._subscriber.subscribe(this.processBlock.bind(this));
       this._subscribed = true;
     } catch (error) {
-      log.error(`[Aave::${this._chain}]: Subscription error: ${error.message}`);
+      this.log.error(`Subscription error: ${error.message}`);
     }
   }
 
@@ -99,13 +108,11 @@ export class Listener extends BaseListener<
   }
 
   private async processMissedBlocks(): Promise<void> {
-    log.info(
-      `[Aave::${this._chain}]: Detected offline time, polling missed blocks...`
-    );
+    this.log.info(`Detected offline time, polling missed blocks...`);
 
     if (!this.discoverReconnectRange) {
-      log.info(
-        `[Aave::${this._chain}]: Unable to determine offline range - No discoverReconnectRange function given`
+      this.log.info(
+        `Unable to determine offline range - No discoverReconnectRange function given`
       );
     }
 
@@ -113,22 +120,18 @@ export class Listener extends BaseListener<
     try {
       offlineRange = await this.discoverReconnectRange(this._chain);
       if (!offlineRange) {
-        log.warn(
-          `[Aave::${this._chain}]: No offline range found, skipping event catchup.`
-        );
+        this.log.warn(`No offline range found, skipping event catchup.`);
         return;
       }
     } catch (error) {
-      log.error(
-        `[Aave::${this._chain}]: Could not discover offline range: ${error.message}. Skipping event catchup.`
+      this.log.error(
+        `Could not discover offline range: ${error.message}. Skipping event catchup.`
       );
       return;
     }
 
     if (!offlineRange || !offlineRange.startBlock) {
-      log.warn(
-        `[Aave::${this._chain}]: Unable to determine offline time range.`
-      );
+      this.log.warn(`Unable to determine offline time range.`);
       return;
     }
 
@@ -138,9 +141,7 @@ export class Listener extends BaseListener<
         await this.handleEvent(event);
       }
     } catch (error) {
-      log.error(
-        `[Aave::${this._chain}]: Unable to fetch events from storage: ${error.message}`
-      );
+      this.log.error(`Unable to fetch events from storage: ${error.message}`);
     }
   }
 

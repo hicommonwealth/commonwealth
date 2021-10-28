@@ -3,20 +3,31 @@
  */
 import { ApiPromise } from '@polkadot/api';
 
-import { IEventPoller, IDisconnectedRange } from '../../interfaces';
-import { factory, formatFilename } from '../../logging';
+import {
+  IEventPoller,
+  IDisconnectedRange,
+  SupportedNetwork,
+} from '../../interfaces';
+import { addPrefix, factory, formatFilename } from '../../logging';
 
 import { Block } from './types';
 
-const log = factory.getLogger(formatFilename(__filename));
-
 export class Poller extends IEventPoller<ApiPromise, Block> {
+  protected readonly log;
+
+  constructor(protected _api: ApiPromise, protected readonly chain?: string) {
+    super(_api);
+    this.log = factory.getLogger(
+      addPrefix(__filename, [SupportedNetwork.Substrate, chain])
+    );
+  }
+
   /**
    * Connects to chain, fetches specified blocks and passes them
    * along for processing.
    *
-   * @param startBlock first block to fetch
-   * @param endBlock last block to fetch, omit to fetch to latest
+   * @param range The range of block numbers to poll
+   * @param maxRange The maximum number of blocks to poll
    */
   public async poll(
     range: IDisconnectedRange,
@@ -26,16 +37,16 @@ export class Poller extends IEventPoller<ApiPromise, Block> {
     if (!range.endBlock) {
       const header = await this._api.rpc.chain.getHeader();
       range.endBlock = +header.number;
-      log.info(`Discovered endBlock: ${range.endBlock}`);
+      this.log.info(`Discovered endBlock: ${range.endBlock}`);
     }
     if (range.endBlock - range.startBlock <= 0) {
-      log.error(
+      this.log.error(
         `End of range (${range.endBlock}) <= start (${range.startBlock})! No blocks to fetch.`
       );
       return [];
     }
     if (range.endBlock - range.startBlock > maxRange) {
-      log.info(
+      this.log.info(
         `Attempting to poll ${
           range.endBlock - range.startBlock
         } blocks, reducing query size to ${maxRange}.`
@@ -56,7 +67,9 @@ export class Poller extends IEventPoller<ApiPromise, Block> {
     const blockNumbers = [
       ...Array(range.endBlock - range.startBlock).keys(),
     ].map((i) => range.startBlock + i);
-    log.info(`Fetching hashes for blocks: ${JSON.stringify(blockNumbers)}`);
+    this.log.info(
+      `Fetching hashes for blocks: ${JSON.stringify(blockNumbers)}`
+    );
 
     // the hashes are pruned when using api.query.system.blockHash.multi
     // therefore fetching hashes from chain. the downside is that for every
@@ -67,25 +80,25 @@ export class Poller extends IEventPoller<ApiPromise, Block> {
 
     // remove all-0 block hashes -- those blocks have been pruned & we cannot fetch their data
     const nonZeroHashes = hashes.filter((hash) => !hash.isEmpty);
-    log.info(
+    this.log.info(
       `${nonZeroHashes.length} active and ${
         hashes.length - nonZeroHashes.length
       } pruned hashes fetched!`
     );
-    log.debug('Fetching headers and events...');
+    this.log.debug('Fetching headers and events...');
     const blocks: Block[] = await Promise.all(
       nonZeroHashes.map(async (hash) => {
         const header = await this._api.rpc.chain.getHeader(hash);
         const events = await this._api.query.system.events.at(hash);
         const signedBlock = await this._api.rpc.chain.getBlock(hash);
         const { extrinsics } = signedBlock.block;
-        log.trace(
+        this.log.trace(
           `Fetched Block for ${versionName}:${versionNumber}: ${+header.number}`
         );
         return { header, events, extrinsics, versionNumber, versionName };
       })
     );
-    log.info('Finished polling past blocks!');
+    this.log.info('Finished polling past blocks!');
 
     return blocks;
   }
@@ -131,7 +144,7 @@ export class Poller extends IEventPoller<ApiPromise, Block> {
           }
         }
       } catch (e) {
-        log.error(
+        this.log.error(
           `Block polling failed after disconnect at block ${range.startBlock}`
         );
         return;

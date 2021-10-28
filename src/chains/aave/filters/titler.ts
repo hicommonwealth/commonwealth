@@ -1,4 +1,8 @@
-import { IEventTitle, TitlerFilter } from '../../../interfaces';
+import {
+  IEventTitle,
+  SupportedNetwork,
+  TitlerFilter,
+} from '../../../interfaces';
 import { EventKind } from '../types';
 
 /**
@@ -6,7 +10,10 @@ import { EventKind } from '../types';
  * kind of event, and returns a "plain english" description of that type. This is used
  * on the client to present a list of subscriptions that a user might want to subscribe to.
  */
-export const Title: TitlerFilter = (kind: EventKind): IEventTitle => {
+export const Title: TitlerFilter = (
+  kind: EventKind,
+  chain?: string
+): IEventTitle => {
   switch (kind) {
     case EventKind.ProposalCanceled: {
       return {
@@ -66,7 +73,11 @@ export const Title: TitlerFilter = (kind: EventKind): IEventTitle => {
       // ensure exhaustive matching -- gives ts error if missing cases
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const _exhaustiveMatch: never = kind;
-      throw new Error('unknown event type');
+      throw new Error(
+        `[${SupportedNetwork.Aave}${
+          chain ? `::${chain}` : ''
+        }]: Unknown event type`
+      );
     }
   }
 };

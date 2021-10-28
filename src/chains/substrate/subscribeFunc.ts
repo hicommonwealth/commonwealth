@@ -6,8 +6,9 @@ import {
   CWEvent,
   SubscribeFunc,
   ISubscribeOptions,
+  SupportedNetwork,
 } from '../../interfaces';
-import { factory, formatFilename } from '../../logging';
+import { addPrefix, factory, formatFilename } from '../../logging';
 
 import { Subscriber } from './subscriber';
 import { Poller } from './poller';
@@ -26,13 +27,18 @@ export interface ISubstrateSubscribeOptions
  * Attempts to open an API connection, retrying if it cannot be opened.
  * @param url websocket endpoing to connect to, including ws[s]:// and port
  * @param typeOverrides
- * @param timeoutMs
+ * @param chain
  * @returns a promise resolving to an ApiPromise once the connection has been established
  */
 export async function createApi(
   url: string,
-  typeOverrides: RegisteredTypes = {}
+  typeOverrides: RegisteredTypes = {},
+  chain?: string
 ): Promise<ApiPromise> {
+  // eslint-disable-next-line no-shadow
+  const log = factory.getLogger(
+    addPrefix(__filename, [SupportedNetwork.Substrate, chain])
+  );
   for (let i = 0; i < 3; ++i) {
     const provider = new WsProvider(url, 0);
     let unsubscribe: () => void;
@@ -61,7 +67,11 @@ export async function createApi(
     // TODO: add delay
   }
 
-  throw new Error(`Failed to connect to API endpoint at: ${url}`);
+  throw new Error(
+    `[${SupportedNetwork.Substrate}${
+      chain ? `::${chain}` : ''
+    }]: Failed to connect to API endpoint at: ${url}`
+  );
 }
 
 /**

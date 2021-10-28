@@ -1,4 +1,8 @@
-import { LabelerFilter, IEventLabel } from '../../../interfaces';
+import {
+  LabelerFilter,
+  IEventLabel,
+  SupportedNetwork,
+} from '../../../interfaces';
 import { IEventData, EventKind } from '../types';
 
 function fmtAddr(addr: string) {
@@ -82,7 +86,9 @@ export const Label: LabelerFilter = (
       // ensure exhaustive matching -- gives ts error if missing cases
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const _exhaustiveMatch: never = data;
-      throw new Error('unknown event type');
+      throw new Error(
+        `[${SupportedNetwork.Moloch}::${chainId}]: Unknown event type`
+      );
     }
   }
 };
