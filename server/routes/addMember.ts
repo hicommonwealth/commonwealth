@@ -22,8 +22,8 @@ const addMember = async (models: DB, req: Request, res: Response, next: NextFunc
   if (!req.body.invitedAddress) return next(new Error(Errors.NeedAddress));
   const chainOrCommunity = chain ? { chain_id: chain.id } : { offchain_community_id: community.id };
 
-  // check that either invitesEnabled === true, or the user is an admin or mod
-  if ((community && !community.invitesEnabled) || chain) {
+  // check that either invites_enabled === true, or the user is an admin or mod
+  if ((community && !community.invites_enabled) || chain) {
     const adminAddress = await models.Address.findOne({
       where: {
         address: req.body.address,

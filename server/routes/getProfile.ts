@@ -16,7 +16,7 @@ const getProfile = async (models: DB, req: Request, res: Response, next: NextFun
   if (!address) return next(new Error(Errors.NoAddress));
 
   const publicCommunities = await models.OffchainCommunity.findAll({
-    where: { privacyEnabled: false },
+    where: { privacy_enabled: false },
   });
   const visibleCommunityIds = publicCommunities.map((c) => c.id);
 
@@ -31,7 +31,7 @@ const getProfile = async (models: DB, req: Request, res: Response, next: NextFun
     const visiblePrivateCommunityIds = roles.map((role) => role.offchain_community_id);
     const privateCommunities = await models.OffchainCommunity.findAll({
       where: {
-        privacyEnabled: true,
+        privacy_enabled: true,
         id: {
           [Op.in]: visiblePrivateCommunityIds,
         },
