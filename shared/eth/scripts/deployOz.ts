@@ -71,6 +71,7 @@ async function main() {
   const EXECUTOR_ROLE = await timelock.EXECUTOR_ROLE();
   await timelock.grantRole(PROPOSER_ROLE, governor.address);
   await timelock.grantRole(EXECUTOR_ROLE, governor.address);
+  console.log(governor.address);
 }
 
 main()

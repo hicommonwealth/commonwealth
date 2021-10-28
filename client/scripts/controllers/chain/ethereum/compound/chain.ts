@@ -65,7 +65,9 @@ export default class CompoundChain extends EthereumChain {
       if (this.compoundApi.isTokenMPond(contract)) {
         // automatically delegate all token when using delegation on MPond
         const amount = await this.balanceOf(address);
+        console.log(`Delegating ${amount}`);
         const gasLimit = await contract.estimateGas.delegate(address, amount.toString());
+        console.log(`Estimated ${gasLimit}`);
         await contract.delegate(address, amount.toString(), { gasLimit });
       } else {
         const gasLimit = await contract.estimateGas.delegate(address);

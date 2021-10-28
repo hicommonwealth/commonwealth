@@ -65,18 +65,18 @@ export default class CompoundAPI implements ContractApi<GovernorAlpha | Governor
       await this.Contract.guardian();
       this._govType = GovernorType.Alpha;
       console.log(`Found GovAlpha contract at ${this.Contract.address}`);
-    } catch (e) {
+    } catch (_e) {
       // either Bravo or Oz
-    }
-    try {
-      this._Contract = GovernorCompatibilityBravo__factory.connect(this.contractAddress, this.Provider);
-      await this.Contract.quorumVotes();
-      console.log(`Found Bravo contract at ${this.Contract.address}, using GovernorCompatibilityBravo`);
-      this._govType = GovernorType.Bravo;
-    } catch (e) {
-      // falling back to Oz
-      console.log(`Falling back to OpenZeppelin governor contract at ${this.Contract.address}`);
-      this._govType = GovernorType.Oz;
+      try {
+        this._Contract = GovernorCompatibilityBravo__factory.connect(this.contractAddress, this.Provider);
+        await this.Contract.quorumVotes();
+        console.log(`Found Bravo contract at ${this.Contract.address}, using GovernorCompatibilityBravo`);
+        this._govType = GovernorType.Bravo;
+      } catch (_e2) {
+        // falling back to Oz
+        console.log(`Falling back to OpenZeppelin governor contract at ${this.Contract.address}`);
+        this._govType = GovernorType.Oz;
+      }
     }
 
     // fetch token and derive token type
@@ -122,17 +122,17 @@ export default class CompoundAPI implements ContractApi<GovernorAlpha | Governor
         await this._Token.admin();
         this._tokenType = GovernorTokenType.MPondToken;
         console.log(`Found MPond-like Comp token at ${tokenAddress}`);
-      } catch (e) {
+      } catch (_e) {
         // Either Comp or OZ Votes
-      }
-      try {
-        this._Token = ERC20VotesComp__factory.connect(tokenAddress, this.Contract.signer || this.Contract.provider);
-        await this._Token.getCurrentVotes(tokenAddress);
-        this._tokenType = GovernorTokenType.Comp;
-        console.log(`Found Comp-type token at ${tokenAddress}, using ERC20VotesComp`);
-      } catch (e) {
-        this._tokenType = GovernorTokenType.OzVotes;
-        console.log(`Falling back to OpenZeppelin ERC20Votes for token at ${tokenAddress}`);
+        try {
+          this._Token = ERC20VotesComp__factory.connect(tokenAddress, this.Contract.signer || this.Contract.provider);
+          await this._Token.getCurrentVotes(tokenAddress);
+          this._tokenType = GovernorTokenType.Comp;
+          console.log(`Found Comp-type token at ${tokenAddress}, using ERC20VotesComp`);
+        } catch (_e2) {
+          this._tokenType = GovernorTokenType.OzVotes;
+          console.log(`Falling back to OpenZeppelin ERC20Votes for token at ${tokenAddress}`);
+        }
       }
     } else {
       console.warn('No token contract found! Continuing...');

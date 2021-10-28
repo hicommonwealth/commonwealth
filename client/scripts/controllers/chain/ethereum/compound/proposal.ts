@@ -140,7 +140,6 @@ export default class CompoundProposal extends Proposal<
         const noPower = sumVotes(votes.filter((v) => !v.choice));
         // TODO: voteSucceeded condition may not be simple majority (although it is on Alpha/Bravo)
         const isMajority = yesPower > noPower;
-        console.log(`Turnout: ${this.turnout}`);
         const isQuorum = this.turnout >= 1;
         // TODO: should we omit quorum here for display purposes?
         return isMajority && isQuorum ? ProposalStatus.Passing : ProposalStatus.Failing;
