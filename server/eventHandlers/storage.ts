@@ -75,7 +75,7 @@ export default class extends IEventHandler {
    */
   public async handle(event: CWEvent) {
     const logPrefix = `[${event.network}::${event.chain}]: `;
-    let chain = event.chain || this._chain;
+    const chain = event.chain || this._chain;
 
     event = this.truncateEvent(event);
     log.debug(`Received event: ${JSON.stringify(event, null, 2)}`);

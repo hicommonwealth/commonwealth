@@ -5,7 +5,6 @@
 import {
   IEventHandler,
   CWEvent,
-  IChainEventKind,
   SubstrateTypes,
 } from '@commonwealth/chain-events';
 import Sequelize from 'sequelize';
