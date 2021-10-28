@@ -14,12 +14,12 @@ The first step is to configure all necessary processes in order for Commonwealth
 
 1. Load the frax page at http://localhost:8080/frax.
 2. Configure metamask:
-  a. If not already added, create a local chain via Settings -> Networks -> Add Network, at url http://localhost:8545 and chain id 31337. Ensure Metamask is set to use this chain.
-  b. If not already added, Add a new address using the private key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80. Ensure this account (0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266) is selected.
-  c. If the address already exists, reset its history using Settings -> Advanced -> Reset Account.
-  d. Metamask should display slightly less than 10000 ETH for the test account.
+    1. If not already added, create a local chain via Settings -> Networks -> Add Network, at url http://localhost:8545 and chain id 31337. Ensure Metamask is set to use this chain.
+    2. If not already added, Add a new address using the private key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80. Ensure this account (0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266) is selected.
+    3. If the address already exists, reset its history using Settings -> Advanced -> Reset Account.
+    4. Metamask should display slightly less than 10000 ETH for the test account.
 3. Delegate to yourself via the "Delegate" page from the sidebar. Use the same address as displayed in Metamask (0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266) and you can enter any numeric value (it is ignored).
-  - On loading this page, verify in the console that it correctly detects the type of token and governance based on the contract deployed earlier.
+    - On loading this page, verify in the console that it correctly detects the type of token and governance based on the contract deployed earlier.
 4. Navigate to the "Proposals" page from the sidebar. It should display a few parameters and no proposals.
 5. Click "New Proposal", and it should take you to the page to create a proposal.
   a. Set whatever description you'd like.
