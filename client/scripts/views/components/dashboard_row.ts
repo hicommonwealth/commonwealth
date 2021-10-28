@@ -10,7 +10,7 @@ import {
   SubstrateEvents,
   MolochEvents,
   IEventLabel,
-  // chainSupportedBy,
+  SupportedNetwork,
   CompoundTypes,
   CompoundEvents,
   AaveTypes,
@@ -392,33 +392,33 @@ const DashboardRow: m.Component<
       let label: IEventLabel;
 
       if (app.isCustomDomain() && chainId !== app.customDomainId()) return;
-      // if (chainSupportedBy(chainId, SubstrateTypes.EventChains)) {
-      //   label = SubstrateEvents.Label(
-      //     notification.chainEvent.blockNumber,
-      //     chainId,
-      //     notification.chainEvent.data
-      //   );
-      // } else if (chainSupportedBy(chainId, MolochTypes.EventChains)) {
-      //   label = MolochEvents.Label(
-      //     notification.chainEvent.blockNumber,
-      //     chainId,
-      //     notification.chainEvent.data
-      //   );
-      // } else if (chainSupportedBy(chainId, CompoundTypes.EventChains)) {
-      //   label = CompoundEvents.Label(
-      //     notification.chainEvent.blockNumber,
-      //     chainId,
-      //     notification.chainEvent.data
-      //   );
-      // } else if (chainSupportedBy(chainId, AaveTypes.EventChains)) {
-      //   label = AaveEvents.Label(
-      //     notification.chainEvent.blockNumber,
-      //     chainId,
-      //     notification.chainEvent.data
-      //   );
-      // } else {
-      //   throw new Error(`invalid notification chain: ${chainId}`);
-      // }
+      if (chainId == SupportedNetwork.Substrate) {
+        label = SubstrateEvents.Label(
+          notification.chainEvent.blockNumber,
+          chainId,
+          notification.chainEvent.data
+        );
+      } else if (chainId == SupportedNetwork.Moloch) {
+        label = MolochEvents.Label(
+          notification.chainEvent.blockNumber,
+          chainId,
+          notification.chainEvent.data
+        );
+      } else if (chainId == SupportedNetwork.Compound) {
+        label = CompoundEvents.Label(
+          notification.chainEvent.blockNumber,
+          chainId,
+          notification.chainEvent.data
+        );
+      } else if (chainId == SupportedNetwork.Aave) {
+        label = AaveEvents.Label(
+          notification.chainEvent.blockNumber,
+          chainId,
+          notification.chainEvent.data
+        );
+      } else {
+        throw new Error(`invalid notification chain: ${chainId}`);
+      }
       m.redraw();
 
       if (vnode.state.scrollOrStop) {
