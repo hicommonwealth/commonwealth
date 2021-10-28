@@ -13,7 +13,7 @@ import {
   SubstrateTypes,
 } from '@commonwealth/chain-events';
 
-import { factory, formatFilename } from '../../shared/logging';
+import { factory, formatFilename, addPrefix } from '../../shared/logging';
 import { IWebsocketsPayload, WebsocketMessageType } from '../../shared/types';
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -54,9 +54,11 @@ export default class extends IEventHandler {
    * `dbEvent` is the database entry corresponding to the `event`.
    */
   public async handle(event: CWEvent<IChainEventData>, dbEvent) {
+    // eslint-disable-next-line @typescript-eslint/no-shadow
+    const log = factory.getLogger(addPrefix(__filename, [event.network, event.chain]));
+
     // if chain is stored in the event then that will override the class property
     // (allows backwards compatibility between reduced memory consuming chain consumer/handlers and other scripts)
-    const logPrefix = `[${event.network}::${event.chain}]: `;
     const chain = event.chain || this._chain;
     if (!dbEvent) {
       log.trace('no db event found!');
@@ -92,11 +94,11 @@ export default class extends IEventHandler {
       });
       if (created) {
         log.info(
-          `${logPrefix}Created db entity, ${type.toString()}: ${type_id}.`
+          `Created db entity, ${type.toString()}: ${type_id}.`
         );
       } else {
         log.info(
-          `${logPrefix}Found duplicate db entity,  ${type.toString()}: ${type_id}.`
+          `Found duplicate db entity,  ${type.toString()}: ${type_id}.`
         );
       }
 
@@ -106,7 +108,7 @@ export default class extends IEventHandler {
         await this._wssSend(dbEntity, dbEvent);
       } else {
         log.info(
-          `${logPrefix}Db Event is already linked to entity! Doing nothing.`
+          `Db Event is already linked to entity! Doing nothing.`
         );
       }
 
@@ -128,11 +130,11 @@ export default class extends IEventHandler {
       });
       if (!dbEntity) {
         log.error(
-          `${logPrefix}no relevant db entity found for ${type}: ${type_id}`
+          `no relevant db entity found for ${type}: ${type_id}`
         );
         return;
       }
-      log.info(`${logPrefix}Updated db entity, ${type}: ${type_id}.`);
+      log.info(`Updated db entity, ${type}: ${type_id}.`);
 
       // link ChainEvent to entity
       dbEvent.entity_id = dbEntity.id;
@@ -151,7 +153,7 @@ export default class extends IEventHandler {
     const entity = eventToEntity(event.network, event.data.kind);
     if (!entity) {
       log.info(
-        `${logPrefix}no archival action needed for event of kind ${event.data.kind.toString()}`
+        `no archival action needed for event of kind ${event.data.kind.toString()}`
       );
       return dbEvent;
     }

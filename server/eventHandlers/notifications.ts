@@ -9,7 +9,7 @@ import {
 } from '@commonwealth/chain-events';
 import { NotificationCategories } from '../../shared/types';
 
-import { factory, formatFilename } from '../../shared/logging';
+import { addPrefix, factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 export default class extends IEventHandler {
@@ -25,20 +25,21 @@ export default class extends IEventHandler {
    * Handles an event by emitting notifications as needed.
    */
   public async handle(event: CWEvent, dbEvent) {
-    const logPrefix = `[${event.network}::${event.chain}]: `;
-    // log.debug(`Received event: ${JSON.stringify(event, null, 2)}`);
+    // eslint-disable-next-line @typescript-eslint/no-shadow
+    const log = factory.getLogger(addPrefix(__filename, [event.network, event.chain]));
+
     if (!dbEvent) {
-      log.trace(`${logPrefix}No db event received! Ignoring.`);
+      log.trace(`No db event received! Ignoring.`);
       return;
     }
     if (this._excludedEvents.includes(event.data.kind)) {
-      log.trace(`${logPrefix}Skipping event!`);
+      log.trace(`Skipping event!`);
       return dbEvent;
     }
     try {
       const dbEventType = await dbEvent.getChainEventType();
       if (!dbEventType) {
-        log.error(`${logPrefix}Failed to fetch event type! Ignoring.`);
+        log.error(`Failed to fetch event type! Ignoring.`);
         return;
       }
 
@@ -53,10 +54,10 @@ export default class extends IEventHandler {
         event.excludeAddresses,
         event.includeAddresses
       );
-      log.info(`${logPrefix}Emitted ${dbNotifications.length} notifications.`);
+      log.info(`Emitted ${dbNotifications.length} notifications.`);
       return dbEvent;
     } catch (e) {
-      log.error(`${logPrefix}Failed to generate notification: ${e.message}!`);
+      log.error(`Failed to generate notification: ${e.message}!`);
       return dbEvent;
     }
   }

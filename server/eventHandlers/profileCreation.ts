@@ -10,7 +10,7 @@ import {
 import Sequelize from 'sequelize';
 const Op = Sequelize.Op;
 
-import { factory, formatFilename } from '../../shared/logging';
+import { addPrefix, factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 // A mapping of supported Event Kinds to create empty profiles for, along with
@@ -33,12 +33,13 @@ export default class extends IEventHandler {
   }
 
   public async handle(event: CWEvent, dbEvent) {
-    const logPrefix = `[${event.network}::${event.chain}]: `;
+    // eslint-disable-next-line @typescript-eslint/no-shadow
+    const log = factory.getLogger(addPrefix(__filename, [event.network, event.chain]));
     const chain = event.chain || this._chain;
 
     const fields = SUPPORTED_KIND_FIELDS[event.data.kind];
     if (!fields) {
-      log.trace(`${logPrefix}Unsupported profile-related event.`);
+      log.trace(`Unsupported profile-related event.`);
       return dbEvent;
     }
 
@@ -61,7 +62,7 @@ export default class extends IEventHandler {
         },
       });
       if (addressInstance) {
-        log.trace(`${logPrefix}Address model already exists.`);
+        log.trace(`Address model already exists.`);
         return;
       }
 

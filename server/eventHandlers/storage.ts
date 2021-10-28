@@ -9,7 +9,7 @@ import {
   Erc20Types,
 } from '@commonwealth/chain-events';
 import Sequelize from 'sequelize';
-import { factory, formatFilename } from '../../shared/logging';
+import { addPrefix, factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 const { Op } = Sequelize;
@@ -74,14 +74,15 @@ export default class extends IEventHandler {
    * NOTE: this may modify the event.
    */
   public async handle(event: CWEvent) {
-    const logPrefix = `[${event.network}::${event.chain}]: `;
+    // eslint-disable-next-line @typescript-eslint/no-shadow
+    const log = factory.getLogger(addPrefix(__filename, [event.network, event.chain]));
     const chain = event.chain || this._chain;
 
     event = this.truncateEvent(event);
     log.debug(`Received event: ${JSON.stringify(event, null, 2)}`);
     const shouldSkip = await this._shouldSkip(event);
     if (shouldSkip) {
-      log.trace(`${logPrefix}Skipping event!`);
+      log.trace(`Skipping event!`);
       return;
     }
 
@@ -95,13 +96,13 @@ export default class extends IEventHandler {
       }
     });
     if (!dbEventType) {
-      log.error(`${logPrefix}unknown event type: ${event.data.kind}`);
+      log.error(`unknown event type: ${event.data.kind}`);
       return;
     } else {
       if (created) {
-        log.info(`${logPrefix}Created new ChainEventType: ${dbEventType.id}`);
+        log.info(`Created new ChainEventType: ${dbEventType.id}`);
       } else {
-        log.trace(`${logPrefix}found chain event type: ${dbEventType.id}`);
+        log.trace(`found chain event type: ${dbEventType.id}`);
       }
     }
 

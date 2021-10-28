@@ -6,7 +6,7 @@ import {
   SubstrateTypes,
 } from '@commonwealth/chain-events';
 import { OffchainProfileInstance } from '../models/offchain_profile';
-import { factory, formatFilename } from '../../shared/logging';
+import { addPrefix, factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -20,7 +20,9 @@ export default class extends IEventHandler {
    * the database.
    */
   public async handle(event: CWEvent<IChainEventData>, dbEvent) {
-    const logPrefix = `[${event.network}::${event.chain}]: `;
+    // eslint-disable-next-line @typescript-eslint/no-shadow
+    const log = factory.getLogger(addPrefix(__filename, [event.network, event.chain]));
+
     const chain = event.chain || this._chain;
 
     // do nothing if wrong type of event
@@ -66,7 +68,7 @@ export default class extends IEventHandler {
         logName = name;
       }
       log.debug(
-        `${logPrefix}Discovered name '${profile.identity}' for ${logName}!`
+        `Discovered name '${profile.identity}' for ${logName}!`
       );
     } else if (event.data.kind === SubstrateTypes.EventKind.JudgementGiven) {
       // if we don't have an identity saved yet for a judgement, do nothing
@@ -74,7 +76,7 @@ export default class extends IEventHandler {
       //   unnecessary if we keep the migrations up to date
       if (!profile.identity) {
         log.warn(
-          `${logPrefix}No corresponding identity found for judgement! Needs identity-migration?`
+          `No corresponding identity found for judgement! Needs identity-migration?`
         );
         return dbEvent;
       }
