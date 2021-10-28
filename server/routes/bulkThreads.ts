@@ -6,6 +6,7 @@ import { factory, formatFilename } from '../../shared/logging';
 import { getLastEdited } from '../util/getLastEdited';
 import { DB } from '../database';
 import { OffchainThreadInstance } from '../models/offchain_thread';
+import { AppError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 // bulkThreads takes a date param and fetches the most recent 20 threads before that date
@@ -15,8 +16,13 @@ const bulkThreads = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
-  if (error) return next(new Error(error));
+  const [chain, community, error] = await lookupCommunityIsVisibleToUser(
+    models,
+    req.query,
+    req.user
+  );
+  if (error) throw new AppError(error);
+
   const { cutoff_date, topic_id, stage } = req.query;
 
   const communityOptions = community
@@ -206,7 +212,9 @@ const bulkThreads = async (
       replacements,
       type: QueryTypes.SELECT,
     });
-  const numVotingThreads = threadsInVoting.filter((t) => t.stage === 'voting').length;
+  const numVotingThreads = threadsInVoting.filter(
+    (t) => t.stage === 'voting'
+  ).length;
 
   return res.json({
     status: 'Success',
