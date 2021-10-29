@@ -271,11 +271,11 @@ async function mainProcess(
           skipCatchup: false,
           verbose: false, // using this will print event before chain is added to it
           enricherConfig: { balanceTransferThresholdPermill: 10_000 },
-          discoverReconnectRange,
+          discoverReconnectRange
         });
       } catch (error) {
         delete listeners[chain.id];
-        await handleFatalError(error, pool, chain, 'listener-startup');
+        await handleFatalError(error, pool, chain.id, 'listener-startup');
         continue;
       }
 
