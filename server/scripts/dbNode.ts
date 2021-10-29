@@ -47,7 +47,7 @@ async function handleFatalError(
   chain?: string,
   type?: string
 ): Promise<void> {
-  log.error(`${chain ? `[${chain}]: ` : ''}${String(error)}`);
+  log.error(`${chain ? `[${chain}]: ` : ''}${JSON.stringify(error)}`);
 
   if (chain && chain !== 'erc20' && chainErrors[chain] >= 4) {
     listeners[chain].unsubscribe();
