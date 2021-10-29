@@ -10,21 +10,19 @@ const setupErrorHandlers = (app) => {
     next(error);
   });
 
-  // Production rollbar notifications
-  if (process.env.NODE_ENV === 'production') {
-    const rollbar = new Rollbar({
-      accessToken: ROLLBAR_SERVER_TOKEN,
-      environment: process.env.NODE_ENV,
-      captureUncaught: true,
-      captureUnhandledRejections: true,
-    });
-    app.use(rollbar.errorHandler());
-  }
+  // Rollbar notifications
+  const rollbar = new Rollbar({
+    accessToken: ROLLBAR_SERVER_TOKEN,
+    environment: process.env.NODE_ENV,
+    captureUncaught: true,
+    captureUnhandledRejections: true,
+  });
+  app.use(rollbar.errorHandler());
 
   // Handle server and application errors
   app.use((error, req, res, next) => {
     if (error instanceof ServerError) {
-      // rollbar.log(error); TODO but as server error
+      rollbar.error(error); // expected server error
       res.status(error.status).send({
         error: {
           status: error.status,
@@ -33,7 +31,7 @@ const setupErrorHandlers = (app) => {
         },
       });
     } else if (error instanceof AppError) {
-      // rollbar.log(error); TOOD: but as application error
+      rollbar.log(error); // expected application/user error
       res.status(error.status).send({
         error: {
           status: error.status,
@@ -41,6 +39,7 @@ const setupErrorHandlers = (app) => {
         },
       });
     } else {
+      rollbar.critical(error); // unexpected error
       res.status(error.status || 400);
       res.json({
         error: {
