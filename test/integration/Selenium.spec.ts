@@ -28,7 +28,7 @@ describe('Commonwealth.im Chrome Selenium Tests', function() {
     })
 
 
-    it('Should login with metamask', async () => {
+    xit('Should login with metamask', async () => {
       // creates driver with MetaMask
       handles = await home.initWithMetaMask();
 
@@ -80,7 +80,7 @@ describe('Commonwealth.im Chrome Selenium Tests', function() {
       assert(accountName === 'Tim', 'Account loaded from TerraStation is incorrect');
     }).timeout(60000)
 
-    it('Should login with Polkadot', async () => {
+    xit('Should login with Polkadot', async () => {
       handles = await home.initWithPolkadotJs();
       driver = await home.loadPage();
       assert(await driver.getCurrentUrl() === 'https://commonwealth.im/', 'Home page failed to load');
@@ -97,7 +97,7 @@ describe('Commonwealth.im Chrome Selenium Tests', function() {
       assert(accountName === 'Tim', 'Account loaded from PolkadotJs is incorrect');
     }).timeout(60000)
 
-    xit('Should login with Keplr', async () => {
+    it('Should login with Keplr', async () => {
       // TODO: works intermittently due to approve button now working on injection
       driver = await home.initWithKeplr();
       driver = await home.loadPage();
@@ -108,16 +108,7 @@ describe('Commonwealth.im Chrome Selenium Tests', function() {
       const loginModal = new LoginModal(driver);
       await loginModal.connectWallet(WalletName.COSMOS, home.keplr);
 
-      await getWindow(driver, 'Commonwealth');
-      console.log('>>>>>>>>>>>>>>>>>>>>..', (await driver.getCurrentUrl()))
-
-
-      // wait for new url/redirect to load
-      await driver.wait(async () => {
-        const url = await driver.getCurrentUrl()
-        if (url) return url.includes('commonwealth.im/osmosis');
-        else return false
-      }, 10000)
+      await waitForWindow(driver, 'Commonwealth');
 
       assert((await driver.getCurrentUrl()).includes('commonwealth.im/osmosis/'),
         'Keplr login flow failed to load Osmosis community page')
