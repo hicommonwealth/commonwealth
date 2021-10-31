@@ -8,19 +8,17 @@ import { CommunityHome } from '../util/seleniumObjects/Pages/communityHome';
 import chai from 'chai';
 import { LoginModal, WalletName } from '../util/seleniumObjects/modals/loginModal';
 import { getWindow, getWindowTitles, waitForWindow } from '../util/seleniumObjects/util';
+import { BasePage } from '../util/seleniumObjects/chrome-base';
 
 const { assert } = chai;
 require('dotenv').config();
 
 describe('Commonwealth.im Chrome Selenium Tests', function() {
-  let driver, home, handles;
+  let driver;
   describe('Wallet Login Tests', function() {
     beforeEach('start server and reset db', async function () {
       this.timeout(300000)
       // TODO: start local server and use that for selenium testing
-      // create driver and load up extensions
-      home = new HomePage()
-      handles = null;
     })
 
     afterEach('close driver', async function () {
@@ -28,9 +26,10 @@ describe('Commonwealth.im Chrome Selenium Tests', function() {
     })
 
 
-    xit('Should login with metamask', async () => {
+    it('Should login with metamask', async () => {
+      const home = new HomePage();
       // creates driver with MetaMask
-      handles = await home.initWithMetaMask();
+      await home.initWithMetaMask();
 
       driver = await home.loadPage();
       assert(await driver.getCurrentUrl() === 'https://commonwealth.im/', 'Home page failed to load');
@@ -55,9 +54,11 @@ describe('Commonwealth.im Chrome Selenium Tests', function() {
     }).timeout(60000)
 
     xit('Should login with TerraStation', async () => {
+      const home = new HomePage();
+
       // TODO: Switch to use extension page wallet import instead of "on login popup" to ensure consistency across tests
       // terra station does not open window upon installation so only import wallet AFTER clicking Login on commonwealth.im
-      handles = await home.initWithTerraStation();
+      await home.initWithTerraStation();
       driver = await home.loadPage();
       assert(await driver.getCurrentUrl() === 'https://commonwealth.im/', 'Home page failed to load');
 
@@ -80,8 +81,10 @@ describe('Commonwealth.im Chrome Selenium Tests', function() {
       assert(accountName === 'Tim', 'Account loaded from TerraStation is incorrect');
     }).timeout(60000)
 
-    xit('Should login with Polkadot', async () => {
-      handles = await home.initWithPolkadotJs();
+    it('Should login with Polkadot', async () => {
+      const home = new HomePage();
+
+      await home.initWithPolkadotJs();
       driver = await home.loadPage();
       assert(await driver.getCurrentUrl() === 'https://commonwealth.im/', 'Home page failed to load');
 
@@ -98,8 +101,9 @@ describe('Commonwealth.im Chrome Selenium Tests', function() {
     }).timeout(60000)
 
     it('Should login with Keplr', async () => {
-      // TODO: works intermittently due to approve button now working on injection
-      driver = await home.initWithKeplr();
+      const home = new HomePage();
+
+      await home.initWithKeplr();
       driver = await home.loadPage();
 
       assert(await driver.getCurrentUrl() === 'https://commonwealth.im/', 'Home page failed to load');
@@ -117,7 +121,27 @@ describe('Commonwealth.im Chrome Selenium Tests', function() {
       assert(accountName === 'Tim', 'Account loaded from Keplr is incorrect');
     }).timeout(600000)
   })
-  describe('Chain Loading Tests', function() {})
+  describe('Chain Connection Tests', function() {
+    afterEach('close driver', async function () {
+      await driver.quit()
+    })
+
+    it('Should connect to Ethereum', async () => {
+      const base = new CommunityHome()
+      driver = await base.initNoExtension();
+      await driver.get('https://commonwealth.im/ethereum');
+      const result = await base.connectToChain();
+      assert.isTrue(result);
+    }).timeout(60000)
+
+    it('Should connect to Edgeware', async () => {
+      const base = new CommunityHome();
+      driver = await base.initNoExtension();
+      await driver.get("https://commonwealth.im/edgeware");
+      const result = await base.connectToChain();
+      assert.isTrue(result);
+    }).timeout(60000)
+  })
 })
 
 describe('Commonwealth.im Firefox Selenium Tests', function() {})

@@ -37,6 +37,12 @@ export class BasePage {
     await this.driver.get(url);
   }
 
+  public async initNoExtension(): Promise<WebDriver> {
+    this.driver = new webdriver.Builder().forBrowser('chrome').build();
+    await this.init();
+    return this.driver;
+  }
+
   /**
    * Creates a driver instance instance with the MetaMask extension installed and properly setup (wallet imported)
    */
