@@ -9,13 +9,14 @@ import chai from 'chai';
 import { LoginModal, WalletName } from '../util/seleniumObjects/modals/loginModal';
 import { getWindow, getWindowTitles, waitForWindow } from '../util/seleniumObjects/util';
 import { BasePage } from '../util/seleniumObjects/chrome-base';
+import { ProposalPage } from '../util/seleniumObjects/Pages/proposal';
 
 const { assert } = chai;
 require('dotenv').config();
 
 describe('Commonwealth.im Chrome Selenium Tests', function() {
   let driver;
-  describe('Wallet Login Tests', function() {
+  xdescribe('Wallet Login Tests', function() {
     beforeEach('start server and reset db', async function () {
       this.timeout(300000)
       // TODO: start local server and use that for selenium testing
@@ -121,7 +122,7 @@ describe('Commonwealth.im Chrome Selenium Tests', function() {
       assert(accountName === 'Tim', 'Account loaded from Keplr is incorrect');
     }).timeout(600000)
   })
-  describe('Chain Connection Tests', function() {
+  xdescribe('Chain Connection Tests', function() {
     afterEach('close driver', async function () {
       await driver.quit()
     })
@@ -129,7 +130,7 @@ describe('Commonwealth.im Chrome Selenium Tests', function() {
     it('Should connect to Ethereum', async () => {
       const base = new CommunityHome()
       driver = await base.initNoExtension();
-      await driver.get('https://commonwealth.im/ethereum');
+      await base.loadPage('ethereum');
       const result = await base.connectToChain();
       assert.isTrue(result);
     }).timeout(60000)
@@ -137,8 +138,32 @@ describe('Commonwealth.im Chrome Selenium Tests', function() {
     it('Should connect to Edgeware', async () => {
       const base = new CommunityHome();
       driver = await base.initNoExtension();
-      await driver.get("https://commonwealth.im/edgeware");
+      await base.loadPage('edgeware')
       const result = await base.connectToChain();
+      assert.isTrue(result);
+    }).timeout(60000)
+
+    it('Should connect to Polkadot', async () => {
+      const base = new CommunityHome();
+      driver = await base.initNoExtension();
+      await base.loadPage('polkadot')
+      const result = await base.connectToChain();
+      assert.isTrue(result);
+    }).timeout(60000)
+  })
+
+  describe('Proposal Loading Tests', function() {
+    afterEach('close driver', async function () {
+      await driver.quit()
+    })
+
+    it('Should load dYdX proposals', async () => {
+      const base = new ProposalPage();
+      driver = await base.initNoExtension();
+      await base.loadPage('dydx');
+      let result = await base.isConnectedToChain();
+      assert.isTrue(result);
+      result = await base.isProposalsLoaded();
       assert.isTrue(result);
     }).timeout(60000)
   })

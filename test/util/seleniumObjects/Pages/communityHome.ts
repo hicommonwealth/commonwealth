@@ -5,11 +5,14 @@ export class CommunityHome extends BasePage {
   private accountName = By.xpath("//a[@class='user-display-name username']");
   private connectChainBtn = By.xpath("//span[text()='Connect to chain']");
   private connectedChainElement = By.xpath("//div[@class='status connected']");
-  protected driver: WebDriver;
 
   constructor(driver?: WebDriver) {
     super();
     if (driver) this.driver = driver;
+  }
+
+  public async loadPage(community: string): Promise<void> {
+    await this.driver.get(`https://commonwealth.im/${community}`);
   }
 
   public async getAccountName(): Promise<string> {
