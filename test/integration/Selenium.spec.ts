@@ -166,6 +166,26 @@ describe('Commonwealth.im Chrome Selenium Tests', function() {
       result = await base.isProposalsLoaded();
       assert.isTrue(result);
     }).timeout(60000)
+
+    it('Should load Injective proposals', async () => {
+      const base = new ProposalPage();
+      driver = await base.initNoExtension();
+      await base.loadPage('injective');
+      let result = await base.isConnectedToChain();
+      assert.isTrue(result);
+      result = await base.isProposalsLoaded();
+      assert.isTrue(result);
+    }).timeout(600000)
+
+    it('Should load Edgeware proposals', async () => {
+      const base = new ProposalPage();
+      driver = await base.initNoExtension();
+      await base.loadPage('edgeware');
+      let result = await base.isConnectedToChain();
+      assert.isTrue(result);
+      result = await base.isProposalsLoaded();
+      assert.isTrue(result);
+    }).timeout(60000)
   })
 })
 
