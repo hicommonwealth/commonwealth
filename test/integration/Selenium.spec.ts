@@ -1,7 +1,7 @@
 /* eslint-disable */
 // NOTE: IF YOU GET CHROMEDRIVE VERSION ERROR DO THE FOLLOWING:
 // `yarn remove chromedriver` then `DETECT_CHROMEDRIVER_VERSION=true yarn add chromedriver --dev`
-// NOTE: TESTS ASSUME THE ADDRESS HAS ALREADY BEEN USED TO LOGIN BEFORE I.E. NO ASKING FOR NAME, HEADLINE, OR BIO
+// NOTE: TESTS ASSUME THE ADDRESS HAS ALREADY BEEN USED TO LOGIN BEFORE I.E. NO ASKING FOR NAME, HEADLINE, OR BIO (todo?)
 
 import { HomePage } from '../util/seleniumObjects/Pages/home';
 import { CommunityHome } from '../util/seleniumObjects/Pages/communityHome';
@@ -24,11 +24,11 @@ describe('Commonwealth.im Chrome Selenium Tests', function() {
     })
 
     afterEach('close driver', async function () {
-      // await driver.quit()
+      await driver.quit()
     })
 
 
-    xit('Should login with metamask', async () => {
+    it('Should login with metamask', async () => {
       // creates driver with MetaMask
       handles = await home.initWithMetaMask();
 
@@ -80,7 +80,7 @@ describe('Commonwealth.im Chrome Selenium Tests', function() {
       assert(accountName === 'Tim', 'Account loaded from TerraStation is incorrect');
     }).timeout(60000)
 
-    xit('Should login with Polkadot', async () => {
+    it('Should login with Polkadot', async () => {
       handles = await home.initWithPolkadotJs();
       driver = await home.loadPage();
       assert(await driver.getCurrentUrl() === 'https://commonwealth.im/', 'Home page failed to load');
@@ -89,13 +89,7 @@ describe('Commonwealth.im Chrome Selenium Tests', function() {
       const loginModal = new LoginModal(driver);
       await loginModal.connectWallet(WalletName.POLKADOT, home.polkadotJs);
 
-      // wait for new url/redirect to load
-      await driver.wait(async () => {
-        const url = await driver.getCurrentUrl()
-        if (url) return url.includes('commonwealth.im/edgeware');
-        else return false
-      }, 10000)
-
+      await waitForWindow(driver, 'Commonwealth');
       assert((await driver.getCurrentUrl()).includes('commonwealth.im/edgeware/'),
         'PolkadotJs login flow failed to load Edgeware community page')
       const communityHome = new CommunityHome(driver);
@@ -103,7 +97,7 @@ describe('Commonwealth.im Chrome Selenium Tests', function() {
       assert(accountName === 'Tim', 'Account loaded from PolkadotJs is incorrect');
     }).timeout(60000)
 
-    it('Should login with Keplr', async () => {
+    xit('Should login with Keplr', async () => {
       // TODO: works intermittently due to approve button now working on injection
       driver = await home.initWithKeplr();
       driver = await home.loadPage();

@@ -90,14 +90,21 @@ export async function getWindowTitles(driver: WebDriver): Promise<string[]> {
  * the function throws an error
  * @param driver A WebDriver instance in any state
  * @param windowTitle The title of the window to wait for
+ * @param timeout The number of milliseconds to wait before returning false
  */
 export async function waitForWindow(
   driver: WebDriver,
-  windowTitle: string
-): Promise<void> {
-  // explicit wait until the signing metamask window opens
-  await driver.wait(async () => {
-    const titles = await getWindowTitles(driver);
-    return titles.includes(windowTitle);
-  }, 10000);
+  windowTitle: string,
+  timeout = 10000,
+): Promise<boolean> {
+  try {
+    // explicit wait until the signing metamask window opens
+    await driver.wait(async () => {
+      const titles = await getWindowTitles(driver);
+      return titles.includes(windowTitle);
+    }, timeout);
+  } catch (error) {
+    return false;
+  }
+
 }

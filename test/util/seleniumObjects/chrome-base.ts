@@ -67,6 +67,7 @@ export class BasePage {
   public async initWithPolkadotJs(): Promise<WebDriver> {
     const chromeOptions = new chrome.Options().addExtensions([fs.readFileSync(path.resolve(__dirname,
       '../fixtures/ChromeExtensions/PolkadotJS.crx'), { encoding: 'base64' })])
+    // chromeOptions.headless();
     this.driver = new webdriver.Builder().forBrowser('chrome').setChromeOptions(chromeOptions).build();
 
     await this.init();
