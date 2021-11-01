@@ -13,6 +13,7 @@ describe('API Tests', () => {
         .request(app)
         .get('/api/bulkOffchain?chain=nonexistentchain')
         .set('Accept', 'application/json');
+      console.log('res.status', res.status);
       expect(res.status).to.be.equal(400);
       expect(res.body).to.not.be.null;
       expect(res.body.result).to.not.be.null;

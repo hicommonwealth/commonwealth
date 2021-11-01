@@ -26,6 +26,7 @@ const setupErrorHandlers = (app) => {
   // ServerErrors or AppErrors or (2) triaged as a bug.
   app.use((error, req, res, next) => {
     if (error instanceof ServerError) {
+      console.log('ServerError', error);
       rollbar.error(error); // expected server error
       res.status(error.status).send({
         error: {
@@ -36,6 +37,7 @@ const setupErrorHandlers = (app) => {
       });
     } else if (error instanceof AppError) {
       rollbar.log(error); // expected application/user error
+      console.log('AppError', error);
       res.status(error.status).send({
         error: {
           status: error.status,
@@ -52,6 +54,7 @@ const setupErrorHandlers = (app) => {
       });
     } else {
       rollbar.critical(error); // unexpected error
+      console.log('Other Error', error);
       res.status(500);
       res.json({
         error: {
