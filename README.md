@@ -6,7 +6,7 @@ Discussions and governance for blockchain networks.
 
 ## Quickstart
 
-###Install dependencies:
+### Install dependencies:
 **Postgres**
 ```bash
 brew install node yarn postgresql

@@ -24,7 +24,6 @@ interface GovernorAlphaMockInterface extends ethers.utils.Interface {
   functions: {
     "BALLOT_TYPEHASH()": FunctionFragment;
     "DOMAIN_TYPEHASH()": FunctionFragment;
-    "MPond()": FunctionFragment;
     "__abdicate()": FunctionFragment;
     "__acceptAdmin()": FunctionFragment;
     "__executeSetTimelockPendingAdmin(address,uint256)": FunctionFragment;
@@ -32,6 +31,7 @@ interface GovernorAlphaMockInterface extends ethers.utils.Interface {
     "cancel(uint256)": FunctionFragment;
     "castVote(uint256,bool)": FunctionFragment;
     "castVoteBySig(uint256,bool,uint8,bytes32,bytes32)": FunctionFragment;
+    "comp()": FunctionFragment;
     "execute(uint256)": FunctionFragment;
     "getActions(uint256)": FunctionFragment;
     "getReceipt(uint256,address)": FunctionFragment;
@@ -59,7 +59,6 @@ interface GovernorAlphaMockInterface extends ethers.utils.Interface {
     functionFragment: "DOMAIN_TYPEHASH",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "MPond", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "__abdicate",
     values?: undefined
@@ -88,6 +87,7 @@ interface GovernorAlphaMockInterface extends ethers.utils.Interface {
     functionFragment: "castVoteBySig",
     values: [BigNumberish, boolean, BigNumberish, BytesLike, BytesLike]
   ): string;
+  encodeFunctionData(functionFragment: "comp", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "execute",
     values: [BigNumberish]
@@ -150,7 +150,6 @@ interface GovernorAlphaMockInterface extends ethers.utils.Interface {
     functionFragment: "DOMAIN_TYPEHASH",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "MPond", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "__abdicate", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "__acceptAdmin",
@@ -170,6 +169,7 @@ interface GovernorAlphaMockInterface extends ethers.utils.Interface {
     functionFragment: "castVoteBySig",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "comp", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "execute", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "getActions", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "getReceipt", data: BytesLike): Result;
@@ -276,10 +276,6 @@ export class GovernorAlphaMock extends Contract {
 
     "DOMAIN_TYPEHASH()"(overrides?: CallOverrides): Promise<[string]>;
 
-    MPond(overrides?: CallOverrides): Promise<[string]>;
-
-    "MPond()"(overrides?: CallOverrides): Promise<[string]>;
-
     __abdicate(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -359,6 +355,10 @@ export class GovernorAlphaMock extends Contract {
       s: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    comp(overrides?: CallOverrides): Promise<[string]>;
+
+    "comp()"(overrides?: CallOverrides): Promise<[string]>;
 
     execute(
       proposalId: BigNumberish,
@@ -569,10 +569,6 @@ export class GovernorAlphaMock extends Contract {
 
   "DOMAIN_TYPEHASH()"(overrides?: CallOverrides): Promise<string>;
 
-  MPond(overrides?: CallOverrides): Promise<string>;
-
-  "MPond()"(overrides?: CallOverrides): Promise<string>;
-
   __abdicate(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -652,6 +648,10 @@ export class GovernorAlphaMock extends Contract {
     s: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
+
+  comp(overrides?: CallOverrides): Promise<string>;
+
+  "comp()"(overrides?: CallOverrides): Promise<string>;
 
   execute(
     proposalId: BigNumberish,
@@ -855,10 +855,6 @@ export class GovernorAlphaMock extends Contract {
 
     "DOMAIN_TYPEHASH()"(overrides?: CallOverrides): Promise<string>;
 
-    MPond(overrides?: CallOverrides): Promise<string>;
-
-    "MPond()"(overrides?: CallOverrides): Promise<string>;
-
     __abdicate(overrides?: CallOverrides): Promise<void>;
 
     "__abdicate()"(overrides?: CallOverrides): Promise<void>;
@@ -927,6 +923,10 @@ export class GovernorAlphaMock extends Contract {
       s: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    comp(overrides?: CallOverrides): Promise<string>;
+
+    "comp()"(overrides?: CallOverrides): Promise<string>;
 
     execute(proposalId: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
@@ -1193,10 +1193,6 @@ export class GovernorAlphaMock extends Contract {
 
     "DOMAIN_TYPEHASH()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    MPond(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "MPond()"(overrides?: CallOverrides): Promise<BigNumber>;
-
     __abdicate(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -1276,6 +1272,10 @@ export class GovernorAlphaMock extends Contract {
       s: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    comp(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "comp()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     execute(
       proposalId: BigNumberish,
@@ -1417,10 +1417,6 @@ export class GovernorAlphaMock extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    MPond(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "MPond()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     __abdicate(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -1500,6 +1496,10 @@ export class GovernorAlphaMock extends Contract {
       s: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
+
+    comp(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "comp()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     execute(
       proposalId: BigNumberish,
