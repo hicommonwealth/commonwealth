@@ -7,6 +7,9 @@ import {
   createListener,
   SubstrateTypes,
   SubstrateEvents,
+  IEventHandler,
+  CWEvent,
+  LoggingHandler,
   SupportedNetwork,
 } from '@commonwealth/chain-events';
 
@@ -35,6 +38,8 @@ let runCount = 0;
 // stores all the listeners a dbNode has active
 const listeners: { [key: string]: any } = {};
 
+const generalLogger = new LoggingHandler();
+
 // any fatal error is handle through here
 async function handleFatalError(
   error: Error,
@@ -42,7 +47,7 @@ async function handleFatalError(
   chain?: string,
   type?: string
 ): Promise<void> {
-  log.error(`${chain ? `[${chain}]: ` : ''}${String(error)}`);
+  log.error(`${chain ? `[${chain}]: ` : ''}${JSON.stringify(error)}`);
 
   if (chain && chain !== 'erc20' && chainErrors[chain] >= 4) {
     listeners[chain].unsubscribe();
@@ -61,9 +66,21 @@ async function handleFatalError(
   } else if (chain) ++chainErrors[chain];
 }
 
+class Erc20LoggingHandler extends IEventHandler {
+  constructor(public tokenNames: string[]) {
+    super();
+  }
+  public async handle(event: CWEvent): Promise<undefined> {
+    if (this.tokenNames.includes(event.chain))
+      log.info(`[Erc20]: Received event: ${JSON.stringify(event, null, 2)}`);
+    return null;
+  }
+}
+
 // the function that executes every REPEAT_TIME
 async function mainProcess(
   producer: RabbitMqHandler,
+  erc20Logger: Erc20LoggingHandler,
   pool: Pool,
   workerNumber: number,
   numWorkers: number
@@ -80,9 +97,8 @@ async function mainProcess(
     `Starting scheduled process. Active chains: ${Object.keys(listeners)}`
   );
 
-  // eslint-disable-next-line max-len
   let query =
-    'SELECT "Chains"."id", "substrate_spec", "url", "address", "base", "type", "network" FROM "Chains" JOIN "ChainNodes" ON "Chains"."id"="ChainNodes"."chain" WHERE "Chains"."has_chain_events_listener"=\'true\';';
+    'SELECT "Chains"."id", "substrate_spec", "url", "address", "base", "type", "network", "ce_verbose" FROM "Chains" JOIN "ChainNodes" ON "Chains"."id"="ChainNodes"."chain" WHERE "Chains"."has_chain_events_listener"=\'true\';';
   const allChains = (await pool.query(query)).rows;
 
   // gets the chains specific to this node
@@ -145,6 +161,11 @@ async function mainProcess(
   const erc20TokenAddresses = erc20Tokens.map((chain) => chain.address);
   const erc20TokenNames = erc20Tokens.map((chain) => chain.id);
 
+  // update the names of the tokens whose events should be logged by the erc20Logger
+  erc20Logger.tokenNames = erc20Tokens
+    .filter((chain) => chain.ce_verbose)
+    .map((chain) => chain.id);
+
   // don't start a new erc20 listener if it is causing errors
   if (!chainErrors['erc20'] || chainErrors['erc20'] < 4) {
     // start a listener if: it doesn't exist yet OR it exists but the tokens have changed
@@ -179,6 +200,7 @@ async function mainProcess(
 
         // add the rabbitmq handler for this chain
         listeners['erc20'].eventHandlers['rabbitmq'] = { handler: producer };
+        listeners['erc20'].eventHandlers['logger'] = { handler: erc20Logger };
       } catch (error) {
         delete listeners['erc20'];
         await handleFatalError(error, pool, 'erc20', 'listener-startup');
@@ -249,11 +271,11 @@ async function mainProcess(
           skipCatchup: false,
           verbose: false, // using this will print event before chain is added to it
           enricherConfig: { balanceTransferThresholdPermill: 10_000 },
-          discoverReconnectRange,
+          discoverReconnectRange
         });
       } catch (error) {
         delete listeners[chain.id];
-        await handleFatalError(error, pool, chain, 'listener-startup');
+        await handleFatalError(error, pool, chain.id, 'listener-startup');
         continue;
       }
 
@@ -296,6 +318,17 @@ async function mainProcess(
         await handleFatalError(error, pool, chain.id, 'update-spec');
       }
     }
+
+    // add the logger if it is needed and isn't already added
+    if (chain.ce_verbose && !listeners[chain.id].eventHandlers['logger']) {
+      listeners[chain.id].eventHandlers['logger'] = {
+        handler: generalLogger,
+      };
+    }
+
+    // delete the logger if it is active but ce_verbose is false
+    if (listeners[chain.id].eventHandlers['logger'] && !chain.ce_verbose)
+      listeners[chain.id].eventHandlers['logger'] = null;
   }
 
   if (HANDLE_IDENTITY == null) {
@@ -399,7 +432,7 @@ async function mainProcess(
   }
 }
 
-let pool, producer, numWorkers, workerNumber;
+let pool, producer, numWorkers, workerNumber, erc20Logger;
 async function initializer(): Promise<void> {
   // begin process
   log.info('db-node initialization');
@@ -499,18 +532,20 @@ async function initializer(): Promise<void> {
   log.info(`Worker Number: ${workerNumber}\nNumber of Workers: ${numWorkers}`);
 
   producer = new RabbitMqHandler(RabbitMQConfig);
+  erc20Logger = new Erc20LoggingHandler([]);
   await producer.init();
 }
 
 initializer()
   .then(() => {
-    return mainProcess(producer, pool, workerNumber, numWorkers);
+    return mainProcess(producer, erc20Logger, pool, workerNumber, numWorkers);
   })
   .then(() => {
     setInterval(
       mainProcess,
       REPEAT_TIME * 60000,
       producer,
+      erc20Logger,
       pool,
       workerNumber,
       numWorkers
