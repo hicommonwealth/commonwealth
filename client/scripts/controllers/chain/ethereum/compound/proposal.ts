@@ -1,6 +1,8 @@
 import moment from 'moment';
 import BN from 'bn.js';
 import { capitalize } from 'lodash';
+import { ContractTransaction, utils } from 'ethers';
+import { GovernorCompatibilityBravo } from 'eth/types';
 
 import { CompoundTypes } from '@commonwealth/chain-events';
 import { ProposalType } from 'types';
@@ -20,14 +22,14 @@ import {
   ChainEvent,
 } from 'models';
 
-import CompoundAPI from './api';
+import CompoundAPI, { GovernorType } from './api';
 import CompoundGovernance from './governance';
 import { attachSigner } from '../contractApi';
 import EthereumAccount from '../account';
 import EthereumAccounts from '../accounts';
 import CompoundChain from './chain';
 
-export enum CompoundVote {
+export enum BravoVote {
   NO = 0,
   YES = 1,
   ABSTAIN = 2,
@@ -35,10 +37,10 @@ export enum CompoundVote {
 
 export class CompoundProposalVote implements IVote<EthereumCoin> {
   public readonly account: EthereumAccount;
-  public readonly choice: CompoundVote;
+  public readonly choice: BravoVote;
   public readonly power: BN;
 
-  constructor(member: EthereumAccount, choice: CompoundVote, power?: BN) {
+  constructor(member: EthereumAccount, choice: BravoVote, power?: BN) {
     this.account = member;
     this.choice = choice;
     this.power = power || new BN(0);
@@ -136,8 +138,9 @@ export default class CompoundProposal extends Proposal<
         const votes = this.getVotes();
         const yesPower = sumVotes(votes.filter((v) => v.choice));
         const noPower = sumVotes(votes.filter((v) => !v.choice));
+        // TODO: voteSucceeded condition may not be simple majority (although it is on Alpha/Bravo)
         const isMajority = yesPower > noPower;
-        const isQuorum = yesPower > this._Gov.quorumVotes;
+        const isQuorum = this.turnout >= 1;
         // TODO: should we omit quorum here for display purposes?
         return isMajority && isQuorum ? ProposalStatus.Passing : ProposalStatus.Failing;
       }
@@ -170,10 +173,12 @@ export default class CompoundProposal extends Proposal<
       return CompoundTypes.ProposalState.Active;
 
     const votes = this.getVotes();
-    const yesPower = sumVotes(votes.filter((v) => v.choice));
-    const noPower = sumVotes(votes.filter((v) => !v.choice));
-    if (yesPower <= noPower || yesPower <= this._Gov.quorumVotes)
+    const yesPower = sumVotes(votes.filter((v) => v.choice === BravoVote.YES));
+    const noPower = sumVotes(votes.filter((v) => v.choice === BravoVote.NO));
+    const quorumPct = this.turnout;
+    if (yesPower <= noPower || quorumPct < 1) {
       return CompoundTypes.ProposalState.Defeated;
+    }
     if (!this.data.eta) return CompoundTypes.ProposalState.Succeeded;
     console.warn(`Invalid state for proposal: ${this}`);
     return null;
@@ -191,7 +196,7 @@ export default class CompoundProposal extends Proposal<
       return { kind: 'fixed_block', blocknum: this.data.endBlock };
 
     // queued but not ready for execution
-    if (state === CompoundTypes.ProposalState.Queued)
+    if (state === CompoundTypes.ProposalState.Queued && this.data.eta)
       return { kind: 'fixed', time: moment.unix(this.data.eta) };
 
     // unavailable if: waiting to passed/failed but not in queue, or completed
@@ -212,16 +217,24 @@ export default class CompoundProposal extends Proposal<
 
   public get support() {
     const votes = this.getVotes();
-    const yesPower = sumVotes(votes.filter((v) => v.choice));
-    const noPower = sumVotes(votes.filter((v) => !v.choice));
+    const yesPower = sumVotes(votes.filter((v) => v.choice === BravoVote.YES));
+    const noPower = sumVotes(votes.filter((v) => v.choice === BravoVote.NO));
     if (yesPower.isZero() && noPower.isZero()) return 0;
     const supportBn = yesPower.muln(ONE_HUNDRED_WITH_PRECISION).div(yesPower.add(noPower));
     return +supportBn / ONE_HUNDRED_WITH_PRECISION;
   }
 
-  // TODO: should this be relative to total supply or quorum required?
+  // aka quorum, what % required turned out of required (can be >100%)
   public get turnout() {
-    return null;
+    const votes = this.getVotes();
+    const yesPower = sumVotes(votes.filter((v) => v.choice === BravoVote.YES));
+    const abstainPower = sumVotes(votes.filter((v) => v.choice === BravoVote.ABSTAIN));
+    const totalTurnout = this._Gov.useAbstainInQuorum ? yesPower.add(abstainPower) : yesPower;
+    const requiredTurnout = this._Gov.quorumVotes.isZero() ? new BN(1) : this._Gov.quorumVotes;
+    const pctRequiredTurnout = (
+      +totalTurnout.muln(ONE_HUNDRED_WITH_PRECISION).div(requiredTurnout)
+    ) / ONE_HUNDRED_WITH_PRECISION;
+    return pctRequiredTurnout;
   }
 
   constructor(
@@ -249,16 +262,21 @@ export default class CompoundProposal extends Proposal<
       this.data.expired = true;
     }
 
-    // also check queued, as Bravo does not emit queued events + fetch eta
+    // also check queued, as Bravo/Oz may not emit queued events + fetch eta
     if (queriedState === CompoundTypes.ProposalState.Queued && !this.data.queued) {
-      try {
-        const eta = await this._Gov.api.Contract.proposalEta(this.data.id);
-        this.data.eta = +eta;
-      } catch (err) {
-        console.error(err);
-      }
-      // Unclear what to do here -- broken state
       this.data.queued = true;
+      if (this._Gov.api.govType === GovernorType.Bravo) {
+        const p = await this._Gov.api.Contract.proposals(this.data.id);
+        this.data.eta = +p.eta;
+      } else if (this._Gov.api.govType === GovernorType.Oz) {
+        try {
+          const eta = await this._Gov.api.Contract.proposalEta(this.data.id);
+          this.data.eta = +eta;
+        } catch (e) {
+          // we have no ETA because the proposal is not under a timelock
+          // TODO: understand which sorts of Oz alternatives exist
+        }
+      }
     }
 
     this._initialized = true;
@@ -347,11 +365,35 @@ export default class CompoundProposal extends Proposal<
     const address = this._Gov.app.user.activeAccount.address;
     const contract = await attachSigner(this._Gov.app.wallets, address, this._Gov.api.Contract);
 
-    const gasLimit = await contract.estimateGas['queue(uint256)'](this.data.identifier);
-    const tx = await contract['queue(uint256)'](
-      this.data.identifier,
-      { gasLimit }
-    );
+    let tx: ContractTransaction;
+    if (this._Gov.api.govType === GovernorType.Oz) {
+      const descriptionHash = utils.keccak256(
+        utils.toUtf8Bytes(this.data.description)
+      );
+      const gasLimit = await (
+        contract as GovernorCompatibilityBravo
+      ).estimateGas['queue(address[],uint256[],bytes[],bytes32)'](
+        this.data.targets,
+        this.data.values,
+        this.data.calldatas,
+        descriptionHash
+      );
+      tx = await (
+        contract as GovernorCompatibilityBravo
+      )['queue(address[],uint256[],bytes[],bytes32)'](
+        this.data.targets,
+        this.data.values,
+        this.data.calldatas,
+        descriptionHash,
+        { gasLimit }
+      );
+    } else {
+      const gasLimit = await contract.estimateGas['queue(uint256)'](this.data.identifier);
+      tx = await contract['queue(uint256)'](
+        this.data.identifier,
+        { gasLimit }
+      );
+    }
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
       throw new Error('failed to queue proposal');
@@ -367,11 +409,35 @@ export default class CompoundProposal extends Proposal<
     const address = this._Gov.app.user.activeAccount.address;
     const contract = await attachSigner(this._Gov.app.wallets, address, this._Gov.api.Contract);
 
-    const gasLimit = await contract.estimateGas['execute(uint256)'](this.data.identifier);
-    const tx = await contract['execute(uint256)'](
-      this.data.identifier,
-      { gasLimit }
-    );
+    let tx: ContractTransaction;
+    if (this._Gov.api.govType === GovernorType.Oz) {
+      const descriptionHash = utils.keccak256(
+        utils.toUtf8Bytes(this.data.description)
+      );
+      const gasLimit = await (
+        contract as GovernorCompatibilityBravo
+      ).estimateGas['execute(address[],uint256[],bytes[],bytes32)'](
+        this.data.targets,
+        this.data.values,
+        this.data.calldatas,
+        descriptionHash
+      );
+      tx = await (
+        contract as GovernorCompatibilityBravo
+      )['execute(address[],uint256[],bytes[],bytes32)'](
+        this.data.targets,
+        this.data.values,
+        this.data.calldatas,
+        descriptionHash,
+        { gasLimit }
+      );
+    } else {
+      const gasLimit = await contract.estimateGas['execute(uint256)'](this.data.identifier);
+      tx = await contract['execute(uint256)'](
+        this.data.identifier,
+        { gasLimit }
+      );
+    }
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
       throw new Error('failed to execute proposal');
@@ -380,6 +446,7 @@ export default class CompoundProposal extends Proposal<
   }
 
   // web wallet TX only
+  // TODO: support reason field
   public async submitVoteWebTx(vote: CompoundProposalVote) {
     const address = vote.account.address;
     const contract = await attachSigner(
@@ -390,19 +457,17 @@ export default class CompoundProposal extends Proposal<
     if (!(await this._Chain.isDelegate(address))) {
       throw new Error('sender must be valid delegate');
     }
-
+    if (!this._Gov.supportsAbstain && vote.choice === BravoVote.ABSTAIN) {
+      throw new Error('Cannot vote abstain on governor alpha!');
+    }
     if (this.state !== CompoundTypes.ProposalState.Active) {
       throw new Error('proposal not in active period');
     }
 
-    let tx;
+    let tx: ContractTransaction;
     if (this._Gov.api.isGovAlpha(contract)) {
-      let voteBool: boolean;
-      if (vote.choice === CompoundVote.ABSTAIN) {
-        throw new Error('Cannot vote abstain on governor alpha!');
-      } else {
-        voteBool = vote.choice === CompoundVote.YES;
-      }
+      // convert voting to boolean for govalpha contract
+      const voteBool = vote.choice === BravoVote.YES;
       const gasLimit = await contract.estimateGas.castVote(
         this.data.identifier,
         voteBool
