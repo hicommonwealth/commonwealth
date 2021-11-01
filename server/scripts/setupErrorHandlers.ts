@@ -19,7 +19,11 @@ const setupErrorHandlers = (app) => {
   });
   app.use(rollbar.errorHandler());
 
-  // Handle server and application errors
+  // Handle server and application errors.
+  // 401 Unauthorized errors are handled by Express' middleware and returned
+  // before this handler.
+  // Errors that hit the final condition should be either (1) thrown as
+  // ServerErrors or AppErrors or (2) triaged as a bug.
   app.use((error, req, res, next) => {
     if (error instanceof ServerError) {
       rollbar.error(error); // expected server error
@@ -38,13 +42,23 @@ const setupErrorHandlers = (app) => {
           message: error.message,
         },
       });
-    } else {
-      rollbar.critical(error); // unexpected error
-      res.status(error.status || 400);
+    } else if (error.status === 404) {
+      res.status(error.status);
       res.json({
         error: {
           status: error.status,
-          message: error.message,
+          message: 'The server can not find the requested resource.',
+        },
+      });
+    } else {
+      rollbar.critical(error); // unexpected error
+      res.status(500);
+      res.json({
+        error: {
+          status: error.status,
+          message:
+            error.message ||
+            'Server error, unknown error thrown. Please try again later.',
         },
       });
     }
