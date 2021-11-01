@@ -28,7 +28,7 @@ module.exports = {
             chain: 'notional',
             url: 'wss://mainnet.infura.io/ws',
             address: '0x086b4ecD75c494dD36641195E89c25373E06d7cB', // GovernorAlpha
-            token_name: 'comp', // for alpha/bravo
+            token_name: 'note', // for alpha/bravo
           },
         ],
         { transaction: t }
