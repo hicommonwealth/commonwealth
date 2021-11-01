@@ -28,8 +28,9 @@ import EthereumAccounts from '../accounts';
 import CompoundChain from './chain';
 
 export enum CompoundVote {
+  NO = 0,
   YES = 1,
-  NO = 0
+  ABSTAIN = 2,
 }
 
 export class CompoundProposalVote implements IVote<EthereumCoin> {
@@ -95,7 +96,7 @@ export default class CompoundProposal extends Proposal<
       if (this.data.description) {
         return this.data.description.slice(0, 255);
       } else {
-        return `Marlin Proposal #${this.data.identifier}`;
+        return `Compound Proposal #${this.data.identifier}`;
       }
     }
   }
@@ -148,7 +149,10 @@ export default class CompoundProposal extends Proposal<
 
   public get author() { return this._Accounts.get(this.data.proposer); }
 
-  public get votingType() { return VotingType.CompoundYesNo; }
+  public get votingType() {
+    return this._Gov.supportsAbstain
+      ? VotingType.CompoundYesNoAbstain : VotingType.CompoundYesNo;
+  }
   public get votingUnit() { return VotingUnit.CoinVote; }
 
   public get startingPeriod() { return +this.data.startBlock; }
@@ -188,7 +192,7 @@ export default class CompoundProposal extends Proposal<
 
     // queued but not ready for execution
     if (state === CompoundTypes.ProposalState.Queued)
-      return { kind: 'fixed', time: moment(this.data.eta) };
+      return { kind: 'fixed', time: moment.unix(this.data.eta) };
 
     // unavailable if: waiting to passed/failed but not in queue, or completed
     return { kind: 'unavailable' };
@@ -245,6 +249,18 @@ export default class CompoundProposal extends Proposal<
       this.data.expired = true;
     }
 
+    // also check queued, as Bravo does not emit queued events + fetch eta
+    if (queriedState === CompoundTypes.ProposalState.Queued && !this.data.queued) {
+      try {
+        const eta = await this._Gov.api.Contract.proposalEta(this.data.id);
+        this.data.eta = +eta;
+      } catch (err) {
+        console.error(err);
+      }
+      // Unclear what to do here -- broken state
+      this.data.queued = true;
+    }
+
     this._initialized = true;
 
     // special case for expiration because no event is emitted
@@ -265,7 +281,7 @@ export default class CompoundProposal extends Proposal<
         const power = new BN(e.data.votes);
         const vote = new CompoundProposalVote(
           this._Accounts.get(e.data.voter),
-          e.data.support ? CompoundVote.YES : CompoundVote.NO,
+          e.data.support,
           power
         );
         this.addOrUpdateVote(vote);
@@ -328,13 +344,11 @@ export default class CompoundProposal extends Proposal<
       throw new Error('proposal already queued');
     }
 
-    // TODO: condition check for who can queue
-
     const address = this._Gov.app.user.activeAccount.address;
     const contract = await attachSigner(this._Gov.app.wallets, address, this._Gov.api.Contract);
 
-    const gasLimit = await contract.estimateGas.queue(this.data.identifier);
-    const tx = await contract.queue(
+    const gasLimit = await contract.estimateGas['queue(uint256)'](this.data.identifier);
+    const tx = await contract['queue(uint256)'](
       this.data.identifier,
       { gasLimit }
     );
@@ -350,13 +364,11 @@ export default class CompoundProposal extends Proposal<
       throw new Error('proposal already executed');
     }
 
-    // TODO: condition check for who can execute
-
     const address = this._Gov.app.user.activeAccount.address;
     const contract = await attachSigner(this._Gov.app.wallets, address, this._Gov.api.Contract);
 
-    const gasLimit = await contract.estimateGas.execute(this.data.identifier);
-    const tx = await contract.execute(
+    const gasLimit = await contract.estimateGas['execute(uint256)'](this.data.identifier);
+    const tx = await contract['execute(uint256)'](
       this.data.identifier,
       { gasLimit }
     );
@@ -373,7 +385,7 @@ export default class CompoundProposal extends Proposal<
     const contract = await attachSigner(
       this._Gov.app.wallets,
       address,
-      this._Gov.api.Contract
+      this._Gov.api.Contract,
     );
     if (!(await this._Chain.isDelegate(address))) {
       throw new Error('sender must be valid delegate');
@@ -383,15 +395,34 @@ export default class CompoundProposal extends Proposal<
       throw new Error('proposal not in active period');
     }
 
-    const gasLimit = await contract.estimateGas.castVote(
-      this.data.identifier,
-      !!vote.choice
-    );
-    const tx = await contract.castVote(
-      this.data.identifier,
-      !!vote.choice,
-      { gasLimit },
-    );
+    let tx;
+    if (this._Gov.api.isGovAlpha(contract)) {
+      let voteBool: boolean;
+      if (vote.choice === CompoundVote.ABSTAIN) {
+        throw new Error('Cannot vote abstain on governor alpha!');
+      } else {
+        voteBool = vote.choice === CompoundVote.YES;
+      }
+      const gasLimit = await contract.estimateGas.castVote(
+        this.data.identifier,
+        voteBool
+      );
+      tx = await contract.castVote(
+        this.data.identifier,
+        voteBool,
+        { gasLimit },
+      );
+    } else {
+      const gasLimit = await contract.estimateGas.castVote(
+        this.data.identifier,
+        +vote.choice
+      );
+      tx = await contract.castVote(
+        this.data.identifier,
+        +vote.choice,
+        { gasLimit },
+      );
+    }
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
       throw new Error('failed to submit vote');
