@@ -16,6 +16,7 @@ module.exports = {
             base: 'ethereum',
             snapshot: 'notional.eth',
             active: true,
+            has_chain_events_listener: true,
           },
         ],
         { transaction: t }
