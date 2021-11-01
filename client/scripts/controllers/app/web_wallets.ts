@@ -1,4 +1,5 @@
-import { ChainBase, IWebWallet } from 'models';
+import { IWebWallet } from 'models';
+import { ChainBase } from 'types';
 import app from 'state';
 import MetamaskWebWalletController from './webWallets/metamask_web_wallet';
 import WalletConnectWebWalletController from './webWallets/walletconnect_web_wallet';

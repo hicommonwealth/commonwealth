@@ -53,11 +53,8 @@
                 font-weight: 600;
             }
             .row-subheader {
-                margin-top: 3px;
-                @media (min-width: 800px){
-                    display: flex;
-                    align-items: baseline;
-                }
+                margin-top: 5px;
+                display: flex;
                 > * {
                     display: inline;
                 }

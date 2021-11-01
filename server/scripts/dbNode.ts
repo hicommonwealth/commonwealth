@@ -1,14 +1,19 @@
 /* eslint-disable no-continue */
+import fetch from 'node-fetch';
 import { Pool } from 'pg';
 import _ from 'underscore';
 import format from 'pg-format';
 import {
   createListener,
-  chainSupportedBy,
   SubstrateTypes,
   SubstrateEvents,
+  IEventHandler,
+  CWEvent,
+  LoggingHandler,
+  SupportedNetwork,
 } from '@commonwealth/chain-events';
 
+import { ChainBase, ChainNetwork, ChainType } from '../../shared/types';
 import { RabbitMqHandler } from '../eventHandlers/rabbitmqPlugin';
 import Identity from '../eventHandlers/pgIdentity';
 import { factory, formatFilename } from '../../shared/logging';
@@ -18,12 +23,6 @@ import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
 const log = factory.getLogger(formatFilename(__filename));
 
 // TODO: RollBar error reporting
-
-// the number of the current worker
-const WORKER_NUMBER: number = Number(process.env.WORKER_NUMBER) || 0;
-
-// the total number of workers
-const NUM_WORKERS: number = Number(process.env.NUM_WORKERS) || 1;
 
 // The number of minutes to wait between each run -- rounded to the nearest whole number
 const REPEAT_TIME = Math.round(Number(process.env.REPEAT_TIME)) || 1;
@@ -39,6 +38,8 @@ let runCount = 0;
 // stores all the listeners a dbNode has active
 const listeners: { [key: string]: any } = {};
 
+const generalLogger = new LoggingHandler();
+
 // any fatal error is handle through here
 async function handleFatalError(
   error: Error,
@@ -46,12 +47,13 @@ async function handleFatalError(
   chain?: string,
   type?: string
 ): Promise<void> {
-  log.error(`${chain ? `[${chain}]: ` : ''}${String(error)}`);
+  log.error(`${chain ? `[${chain}]: ` : ''}${JSON.stringify(error)}`);
 
   if (chain && chain !== 'erc20' && chainErrors[chain] >= 4) {
     listeners[chain].unsubscribe();
     delete listeners[chain];
 
+    // TODO: email notification for this
     const query = format(
       'UPDATE "Chains" SET "has_chain_events_listener"=\'false\' WHERE "id"=%L',
       chain
@@ -59,13 +61,30 @@ async function handleFatalError(
     try {
       pool.query(query);
     } catch (err) {
-      log.fatal(`Unable to disabled ${chain}`);
+      log.fatal(`Unable to disable ${chain}`);
     }
   } else if (chain) ++chainErrors[chain];
 }
 
+class Erc20LoggingHandler extends IEventHandler {
+  constructor(public tokenNames: string[]) {
+    super();
+  }
+  public async handle(event: CWEvent): Promise<undefined> {
+    if (this.tokenNames.includes(event.chain))
+      log.info(`[Erc20]: Received event: ${JSON.stringify(event, null, 2)}`);
+    return null;
+  }
+}
+
 // the function that executes every REPEAT_TIME
-async function mainProcess(producer: RabbitMqHandler, pool: Pool) {
+async function mainProcess(
+  producer: RabbitMqHandler,
+  erc20Logger: Erc20LoggingHandler,
+  pool: Pool,
+  workerNumber: number,
+  numWorkers: number
+) {
   // reset the chainError counts at the end of every day
   if (runCount > 1440 / REPEAT_TIME) {
     runCount = 1;
@@ -74,16 +93,17 @@ async function mainProcess(producer: RabbitMqHandler, pool: Pool) {
     ++runCount;
   }
 
-  log.info('Starting scheduled process');
+  log.info(
+    `Starting scheduled process. Active chains: ${Object.keys(listeners)}`
+  );
 
-  // eslint-disable-next-line max-len
   let query =
-    'SELECT "Chains"."id", "substrate_spec", "url", "address", "base", "type", "network" FROM "Chains" JOIN "ChainNodes" ON "Chains"."id"="ChainNodes"."chain" WHERE "Chains"."has_chain_events_listener"=\'true\';';
+    'SELECT "Chains"."id", "substrate_spec", "url", "address", "base", "type", "network", "ce_verbose" FROM "Chains" JOIN "ChainNodes" ON "Chains"."id"="ChainNodes"."chain" WHERE "Chains"."has_chain_events_listener"=\'true\';';
   const allChains = (await pool.query(query)).rows;
 
   // gets the chains specific to this node
   let myChainData = allChains.filter(
-    (chain, index) => index % NUM_WORKERS === WORKER_NUMBER
+    (chain, index) => index % numWorkers === workerNumber
   );
 
   // passed to listeners that support it
@@ -135,10 +155,16 @@ async function mainProcess(producer: RabbitMqHandler, pool: Pool) {
 
   // group erc20 tokens together in order to start only one listener for all erc20 tokens
   const erc20Tokens = myChainData.filter(
-    (chain) => chain.type === 'token' && chain.base === 'ethereum'
+    (chain) =>
+      chain.type === ChainType.Token && chain.base === ChainBase.Ethereum
   );
   const erc20TokenAddresses = erc20Tokens.map((chain) => chain.address);
   const erc20TokenNames = erc20Tokens.map((chain) => chain.id);
+
+  // update the names of the tokens whose events should be logged by the erc20Logger
+  erc20Logger.tokenNames = erc20Tokens
+    .filter((chain) => chain.ce_verbose)
+    .map((chain) => chain.id);
 
   // don't start a new erc20 listener if it is causing errors
   if (!chainErrors['erc20'] || chainErrors['erc20'] < 4) {
@@ -163,17 +189,18 @@ async function mainProcess(producer: RabbitMqHandler, pool: Pool) {
       try {
         listeners['erc20'] = await createListener(
           'erc20',
+          SupportedNetwork.ERC20,
           {
             url: 'wss://mainnet.infura.io/ws',
             tokenAddresses: erc20TokenAddresses,
             tokenNames: erc20TokenNames,
             verbose: false,
-          },
-          'erc20'
+          }
         );
 
         // add the rabbitmq handler for this chain
         listeners['erc20'].eventHandlers['rabbitmq'] = { handler: producer };
+        listeners['erc20'].eventHandlers['logger'] = { handler: erc20Logger };
       } catch (error) {
         delete listeners['erc20'];
         await handleFatalError(error, pool, 'erc20', 'listener-startup');
@@ -202,7 +229,8 @@ async function mainProcess(producer: RabbitMqHandler, pool: Pool) {
 
   // remove erc20 tokens from myChainData
   myChainData = myChainData.filter(
-    (chain) => chain.type !== 'token' || chain.base !== 'ethereum'
+    (chain) =>
+      chain.type !== ChainType.Token || chain.base !== ChainBase.Ethereum
   );
 
   // delete listeners for chains that are no longer assigned to this node (skip erc20)
@@ -224,35 +252,36 @@ async function mainProcess(producer: RabbitMqHandler, pool: Pool) {
 
       // base is used to override built-in event chains in chain-events - only used for substrate chains in this case
       // NOTE: All erc20 tokens (type='token' base='ethereum') are removed at this point
-      let base: string;
-      if (chain.base === 'substrate') base = 'substrate';
-      else if (chain.network === 'compound') base = 'compound';
-      else if (chain.network === 'aave') base = 'aave';
+      let network: SupportedNetwork;
+      if (chain.base === ChainBase.Substrate)
+        network = SupportedNetwork.Substrate;
+      else if (chain.network === ChainNetwork.Compound)
+        network = SupportedNetwork.Compound;
+      else if (chain.network === ChainNetwork.Aave)
+        network = SupportedNetwork.Aave;
+      else if (chain.network === ChainNetwork.Moloch)
+        network = SupportedNetwork.Moloch;
 
       try {
-        listeners[chain.id] = await createListener(
-          chain.id,
-          {
-            address: chain.address,
-            archival: false,
-            url: chain.url,
-            spec: chain.substrate_spec,
-            skipCatchup: false,
-            verbose: false,
-            enricherConfig: { balanceTransferThresholdPermill: 10_000 },
-            discoverReconnectRange,
-          },
-          base
-        );
+        listeners[chain.id] = await createListener(chain.id, network, {
+          address: chain.address,
+          archival: false,
+          url: chain.url,
+          spec: chain.substrate_spec,
+          skipCatchup: false,
+          verbose: false, // using this will print event before chain is added to it
+          enricherConfig: { balanceTransferThresholdPermill: 10_000 },
+          discoverReconnectRange
+        });
       } catch (error) {
         delete listeners[chain.id];
-        await handleFatalError(error, pool, chain, 'listener-startup');
+        await handleFatalError(error, pool, chain.id, 'listener-startup');
         continue;
       }
 
       // if chain is a substrate chain add the excluded events
       let excludedEvents = [];
-      if (chainSupportedBy(chain.id, SubstrateTypes.EventChains))
+      if (network === SupportedNetwork.Substrate)
         excludedEvents = [
           SubstrateTypes.EventKind.Reward,
           SubstrateTypes.EventKind.TreasuryRewardMinting,
@@ -273,7 +302,7 @@ async function mainProcess(producer: RabbitMqHandler, pool: Pool) {
         await handleFatalError(error, pool, chain.id, 'listener-subscribe');
       }
     } else if (
-      chain.base === 'substrate' &&
+      chain.base === ChainBase.Substrate &&
       !_.isEqual(
         chain.substrate_spec,
         (<SubstrateEvents.Listener>listeners[chain.id]).options.spec
@@ -289,6 +318,17 @@ async function mainProcess(producer: RabbitMqHandler, pool: Pool) {
         await handleFatalError(error, pool, chain.id, 'update-spec');
       }
     }
+
+    // add the logger if it is needed and isn't already added
+    if (chain.ce_verbose && !listeners[chain.id].eventHandlers['logger']) {
+      listeners[chain.id].eventHandlers['logger'] = {
+        handler: generalLogger,
+      };
+    }
+
+    // delete the logger if it is active but ce_verbose is false
+    if (listeners[chain.id].eventHandlers['logger'] && !chain.ce_verbose)
+      listeners[chain.id].eventHandlers['logger'] = null;
   }
 
   if (HANDLE_IDENTITY == null) {
@@ -306,7 +346,7 @@ async function mainProcess(producer: RabbitMqHandler, pool: Pool) {
   // loop through chains that have active listeners again this time dealing with identity
   for (const chain of myChainData) {
     // skip chains that aren't Substrate chains
-    if (chain.base !== 'substrate') continue;
+    if (chain.base !== ChainBase.Substrate) continue;
 
     if (!listeners[chain.id]) {
       log.warn(
@@ -392,29 +432,124 @@ async function mainProcess(producer: RabbitMqHandler, pool: Pool) {
   }
 }
 
-// begin process
-log.info('db-node initialization');
+let pool, producer, numWorkers, workerNumber, erc20Logger;
+async function initializer(): Promise<void> {
+  // begin process
+  log.info('db-node initialization');
 
-const producer = new RabbitMqHandler(RabbitMQConfig);
-const pool = new Pool({
-  connectionString: DATABASE_URI,
-  ssl: {
-    rejectUnauthorized: false,
-  },
-  max: 3,
-});
+  // setup sql client pool
+  pool = new Pool({
+    connectionString: DATABASE_URI,
+    ssl: {
+      rejectUnauthorized: false,
+    },
+    max: 3,
+  });
 
-pool.on('error', (err, client) => {
-  log.error('Unexpected error on idle client', err);
-});
+  pool.on('error', (err, client) => {
+    log.error('Unexpected error on idle client', err);
+  });
 
-producer
-  .init()
+  // these requests cannot work locally
+  if (process.env.NODE_ENV === 'production') {
+    // get all dyno's list
+    const res = await fetch(
+      `https://api.heroku.com/apps/${process.env.HEROKU_APP_NAME}/dynos`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${process.env.HEROKU_API_TOKEN}`,
+          Accept: 'application/vnd.heroku+json; version=3',
+        },
+      }
+    );
+
+    if (!res.ok) {
+      log.info(`${res.status}, ${res.statusText}`);
+      throw new Error('Could not get dynoList');
+    }
+
+    const dynoList = await res.json();
+
+    if (!dynoList || dynoList.length === 0) {
+      // TODO: this will never occur
+      throw new Error("No dyno's detected");
+    }
+
+    // removes any dyno's that aren't ceNodes
+    const ceNodes = dynoList.filter((dyno) => dyno.name.includes('ceNode'));
+
+    // sort CeNode dyno's by their id
+    ceNodes.sort((first, second) => {
+      if (first.id > second.id) return 1;
+      else if (first.id < second.id) return -1;
+      return 0;
+    });
+
+    workerNumber = ceNodes
+      .map((dyno) => dyno.id)
+      .indexOf(process.env.HEROKU_DYNO_ID);
+    numWorkers = ceNodes.length;
+
+    let mostRecentDate = new Date(ceNodes[0].created_at);
+    let newestDyno = ceNodes[0];
+    for (const dyno of ceNodes) {
+      const dynoCreated = new Date(dyno.created_at);
+      if (mostRecentDate > dynoCreated) {
+        mostRecentDate = dynoCreated;
+        newestDyno = dyno;
+      }
+    }
+
+    if (
+      numWorkers !== Number(process.env.NUM_WORKERS) &&
+      newestDyno.id === process.env.HEROKU_DYNO_ID // prevents race condition by only allowing the most recently created dyno to update the config vars
+    ) {
+      const result = await fetch(
+        `https://api.heroku.com/apps/${process.env.HEROKU_APP_NAME}/config-vars`,
+        {
+          method: 'PATCH',
+          headers: {
+            Authorization: `Bearer ${process.env.HEROKU_API_TOKEN}`,
+            Accept: 'application/vnd.heroku+json; version=3',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            NUM_WORKERS: numWorkers,
+          }),
+        }
+      );
+      if (!result.ok) {
+        log.info(`${result.status}, ${result.statusText}`);
+        throw new Error('Could not update the config var - overlap may occur');
+      }
+    }
+  } else {
+    workerNumber = 0;
+    numWorkers = 1;
+  }
+
+  log.info(`Worker Number: ${workerNumber}\nNumber of Workers: ${numWorkers}`);
+
+  producer = new RabbitMqHandler(RabbitMQConfig);
+  erc20Logger = new Erc20LoggingHandler([]);
+  await producer.init();
+}
+
+initializer()
   .then(() => {
-    return mainProcess(producer, pool);
+    return mainProcess(producer, erc20Logger, pool, workerNumber, numWorkers);
   })
   .then(() => {
-    setInterval(mainProcess, REPEAT_TIME * 60000, producer, pool);
+    setInterval(
+      mainProcess,
+      REPEAT_TIME * 60000,
+      producer,
+      erc20Logger,
+      pool,
+      workerNumber,
+      numWorkers
+    );
   })
   .catch((err) => {
     // TODO: any error caught here is critical - no events will be produced

@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { DB } from '../database';
+import { ChainBase } from '../../shared/types';
 
 import testSubstrateSpec from '../util/testSubstrateSpec';
 
@@ -8,7 +9,7 @@ const editSubstrateSpec = async (models: DB, req: Request, res: Response, next: 
   const [chain,, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
   if (!chain) return next(new Error('Unknown chain.'));
-  if (chain.base !== 'substrate') return next(new Error('Chain must be substrate'));
+  if (chain.base !== ChainBase.Substrate) return next(new Error('Chain must be substrate'));
 
   const adminAddress = await models.Address.findOne({
     where: {

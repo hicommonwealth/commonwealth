@@ -46,8 +46,8 @@
                 display: inline-block;
                 color: $text-color-light;
                 overflow: hidden;
-                max-width: 100%;
                 text-overflow: ellipsis;
+                max-width: 100%;
             }
             .mobile-comment-count {
                 display: none !important;

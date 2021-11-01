@@ -12,7 +12,7 @@ import { notifyError } from 'controllers/app/notifications';
 import { CompactModalExitButton } from 'views/modal';
 import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
-import { ChainBase } from 'models';
+import { ChainBase } from 'types';
 import { formatNumberShort } from 'adapters/currency';
 
 enum NewVoteErrors {

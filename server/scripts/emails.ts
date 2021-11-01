@@ -1,68 +1,58 @@
-import Sequelize, { Op } from 'sequelize';
+import { Op } from 'sequelize';
 import moment from 'moment';
 import { capitalize } from 'lodash';
 import {
-  SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents,
-  IEventLabel, IEventTitle, IChainEventData, chainSupportedBy,
-  CompoundTypes, CompoundEvents, AaveTypes, AaveEvents
+  Label as ChainEventLabel, CWEvent, IEventLabel, SupportedNetwork, IChainEventData
 } from '@commonwealth/chain-events';
 
-import { SENDGRID_API_KEY, SERVER_URL } from '../config';
+import { SENDGRID_API_KEY, } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
 import { getForumNotificationCopy } from '../../shared/notificationFormatter';
-import {
-  IPostNotificationData, NotificationCategories,
-  DynamicTemplate, IChainEventNotificationData
-} from '../../shared/types';
+import { IPostNotificationData, NotificationCategories, DynamicTemplate } from '../../shared/types';
+import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 
 export const createImmediateNotificationEmailObject = async (notification_data, category_id, models) => {
-  if (notification_data.chainEvent !== undefined) {
-    // chainEventLabel?.label
-    // chainEventLabel?.heading
-
-    let labelerFn;
-    if (chainSupportedBy(notification_data.chainEventType?.chain, SubstrateEvents.Types.EventChains)) {
-      labelerFn = SubstrateEvents.Label;
-    } else if (chainSupportedBy(notification_data.chainEventType?.chain, MolochEvents.Types.EventChains)) {
-      labelerFn = MolochEvents.Label;
-    } else if (chainSupportedBy(notification_data.chainEventType?.chain, CompoundEvents.Types.EventChains)) {
-      labelerFn = CompoundEvents.Label;
-    } else if (chainSupportedBy(notification_data.chainEventType?.chain, AaveEvents.Types.EventChains)) {
-      labelerFn = AaveEvents.Label;
-    }
-    const chainEventLabel = labelerFn && labelerFn(
-      notification_data.chainEvent?.blockNumber,
-      notification_data.chainEventType?.chain,
-      notification_data.chainEvent.event_data
-    );
-    if (!chainEventLabel) return;
-
-    const subject = `${process.env.NODE_ENV !== 'production' ? '[dev] ' : ''
-    }${chainEventLabel.heading} event on ${capitalize(notification_data.chainEventType?.chain)}`;
-
-    return {
-      from: 'Commonwealth <no-reply@commonwealth.im>',
-      to: null,
-      bcc: null,
-      subject,
-      templateId: DynamicTemplate.ImmediateEmailNotification,
-      dynamic_template_data: {
-        notification: {
-          chainId: notification_data.chainEventType?.chain,
-          blockNumber: notification_data.chainEvent?.blockNumber,
-          subject,
-          label: subject,
-          path: null,
-        }
-      }
+  if (notification_data.chainEvent && notification_data.chainEventType) {
+    // construct compatible CW event from DB by inserting network from type
+    const evt: CWEvent = {
+      blockNumber: notification_data.chainEvent.block_number,
+      data: notification_data.chainEvent.event_data as IChainEventData,
+      network: notification_data.chainEventType.event_network as SupportedNetwork,
     };
-  } else {
-    if (category_id === NotificationCategories.NewReaction || category_id === NotificationCategories.ThreadEdit) return;
+
+    try {
+      const chainEventLabel = ChainEventLabel(notification_data.chainEventType.chain, evt);
+      if (!chainEventLabel) return;
+
+      const subject = `${process.env.NODE_ENV !== 'production' ? '[dev] ' : ''
+        }${chainEventLabel.heading} event on ${capitalize(notification_data.chainEventType.chain)}`;
+
+      return {
+        from: 'Commonwealth <no-reply@commonwealth.im>',
+        to: null,
+        bcc: null,
+        subject,
+        templateId: DynamicTemplate.ImmediateEmailNotification,
+        dynamic_template_data: {
+          notification: {
+            chainId: notification_data.chainEventType.chain,
+            blockNumber: notification_data.chainEvent.blockNumber,
+            subject,
+            label: subject,
+            path: null,
+          }
+        }
+      };
+    } catch (err) {
+      console.error(`Failed to label chain event: ${err.message}`);
+    }
+  } else if (category_id !== NotificationCategories.NewReaction && category_id !== NotificationCategories.ThreadEdit) {
     const [
       emailSubjectLine, subjectCopy, actionCopy, objectCopy, communityCopy, excerpt, proposalPath, authorPath
     ] = await getForumNotificationCopy(models, notification_data as IPostNotificationData, category_id);
@@ -88,39 +78,42 @@ export const createImmediateNotificationEmailObject = async (notification_data, 
   }
 };
 
-const createNotificationDigestEmailObject = async (user, notifications, models) => {
+const createNotificationDigestEmailObject = async (user, notifications, models: DB) => {
   const emailObjArray = await Promise.all(notifications.map(async (n) => {
     const s = await n.getSubscription();
     const { category_id } = s;
 
     if (n.chain_event_id) {
       const chainEvent = await models.ChainEvent.findOne({
-        where: { id: n.chain_event_id }
+        where: { id: n.chain_event_id },
+        include: [{
+          model: models.ChainEventType,
+          required: true,
+          as: 'ChainEventType',
+        }]
       });
       if (!chainEvent) return {};
 
-      let label;
-      if (chainSupportedBy(s.chain_id, SubstrateTypes.EventChains)) {
-        label = SubstrateEvents.Label(
-          chainEvent.blockNumber,
-          s.chain_id,
-          chainEvent.event_data,
-        );
-      } else if (chainSupportedBy(s.chain_id, MolochTypes.EventChains)) {
-        label = MolochEvents.Label(
-          chainEvent.blockNumber,
-          s.chain_id,
-          chainEvent.event_data,
-        );
+      // construct compatible CW event from DB by inserting network from type
+      const evt: CWEvent = {
+        blockNumber: chainEvent.block_number,
+        data: chainEvent.event_data as IChainEventData,
+        network: chainEvent.ChainEventType.event_network as SupportedNetwork,
+      };
+
+      let label: IEventLabel;
+      try {
+        label = ChainEventLabel(s.chain_id, evt);
+      } catch (e) {
+        return {};
       }
-      if (!label) return {};
 
       const path = `https://commonwealth.im/${s.chain_id}/notifications`;
       let createdAt = moment(n.created_at).fromNow();
       if (createdAt === 'a day ago') createdAt = `${moment(Date.now()).diff(n.created_at, 'hours')} hours ago`;
       return {
         chainId: s.chain_id,
-        blockNumber: chainEvent.blockNumber,
+        blockNumber: chainEvent.block_number,
         label: label.heading,
         path: `https://commonwealth.im${label.linkUrl}`,
         createdAt,

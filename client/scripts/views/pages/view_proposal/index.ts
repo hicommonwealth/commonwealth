@@ -9,7 +9,8 @@ import { PopoverMenu, MenuDivider, MenuItem, Icon, Icons, Button, Input, Size  }
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import Sublayout from 'views/sublayout';
-import { idToProposal, ProposalType, proposalSlugToClass } from 'identifiers';
+import { ProposalType, ChainBase } from 'types';
+import { idToProposal, proposalSlugToClass } from 'identifiers';
 import { slugify } from 'utils';
 
 import Substrate from 'controllers/chain/substrate/main';
@@ -23,7 +24,6 @@ import {
   OffchainThreadStage,
   AnyProposal,
   Account,
-  ChainBase,
   ChainEntity,
   ProposalModule,
   DepositVote,
@@ -948,7 +948,7 @@ const ViewProposalPage: m.Component<{
             m('.proposal-page-row', [
               m('.label', 'Amount'),
               m('.amount', [
-                m('.denominator', proposal.support.denom),
+                m('.denomination', proposal.support.denom),
                 m('', proposal.support.inDollars),
               ]),
             ]),
@@ -992,7 +992,7 @@ const ViewProposalPage: m.Component<{
               contributors.map(({ account, deposit }) => (
                 m('.contributors-row', [
                   m('.amount', [
-                    m('.denominator', deposit.denom),
+                    m('.denomination', deposit.denom),
                     m('', deposit.inDollars),
                   ]),
                   m(User, {

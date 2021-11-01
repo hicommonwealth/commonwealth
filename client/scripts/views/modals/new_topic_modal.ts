@@ -89,8 +89,8 @@ const NewTopicModal: m.Component<{
               }
             }),
           ]),
-          m(FormGroup, [
-            m(FormLabel, { for: 'tokenThreshold' }, `Number of tokens needed to post (${app.chain.meta.chain.symbol})`),
+          app.activeChainId() && m(FormGroup, [
+            m(FormLabel, { for: 'tokenThreshold' }, `Number of tokens needed to post (${app.chain?.meta.chain.symbol})`),
             m(Input, {
               title: 'Token threshold',
               class: 'topic-form-token-threshold',
@@ -159,8 +159,8 @@ const NewTopicModal: m.Component<{
                 null,
                 form.featuredInSidebar,
                 form.featuredInNewPost,
-                tokensToTokenBaseUnits(vnode.state.form.tokenThreshold || '0',
-                  app.chain.meta.chain.decimals || 18),
+                app.activeChainId() ? tokensToTokenBaseUnits(vnode.state.form.tokenThreshold || '0',
+                  app.chain?.meta.chain.decimals || 18) : '0',
                 defaultOffchainTemplate
               ).then(() => {
                 vnode.state.saving = false;

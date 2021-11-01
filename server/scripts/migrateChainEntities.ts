@@ -6,25 +6,18 @@
 
 import _ from 'underscore';
 import {
-  SubstrateTypes,
   SubstrateEvents,
-  chainSupportedBy,
-  isSupportedChain,
   IStorageFetcher,
-  CompoundTypes,
   CompoundEvents,
-  MolochTypes,
-  AaveTypes,
   AaveEvents,
   IDisconnectedRange,
-  EventSupportingChains,
 } from '@commonwealth/chain-events';
 
 import models from '../database';
 import MigrationHandler from '../eventHandlers/migration';
 import EntityArchivalHandler from '../eventHandlers/entityArchival';
 import { ChainNodeInstance } from '../models/chain_node';
-
+import { ChainBase, ChainNetwork } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
 import { constructSubstrateUrl } from '../../shared/substrate';
 
@@ -38,14 +31,14 @@ export async function migrateChainEntity(chain: string): Promise<void> {
   if (!chain) {
     throw new Error('must provide chain');
   }
-  if (!isSupportedChain(chain)) {
-    throw new Error('unsupported chain');
-  }
 
   // query one node for each supported chain
   const node: ChainNodeInstance = await models['ChainNode'].findOne({
     where: { chain },
-    include: { model: models.Chain, required: true }
+    include: {
+      model: models.Chain,
+      required: true,
+    },
   });
   if (!node) {
     throw new Error('no nodes found for chain entity migration');
@@ -58,23 +51,24 @@ export async function migrateChainEntity(chain: string): Promise<void> {
     const entityArchivalHandler = new EntityArchivalHandler(models, chain);
     let fetcher: IStorageFetcher<any>;
     const range: IDisconnectedRange = { startBlock: 0 };
-    if (chainSupportedBy(chain, SubstrateTypes.EventChains)) {
+    if (node.Chain.base === ChainBase.Substrate) {
       const nodeUrl = constructSubstrateUrl(node.url);
-      const api = await SubstrateEvents.createApi(nodeUrl, node.Chain.substrate_spec);
+      const api = await SubstrateEvents.createApi(
+        nodeUrl,
+        node.Chain.substrate_spec
+      );
       fetcher = new SubstrateEvents.StorageFetcher(api);
-    } else if (chainSupportedBy(chain, MolochTypes.EventChains)) {
+    } else if (node.Chain.network === ChainNetwork.Moloch) {
       // TODO: determine moloch API version
       // TODO: construct dater
       throw new Error('Moloch migration not yet implemented.');
-    } else if (chainSupportedBy(chain, CompoundTypes.EventChains)) {
+    } else if (node.Chain.network === ChainNetwork.Compound) {
       const api = await CompoundEvents.createApi(node.url, node.address);
       fetcher = new CompoundEvents.StorageFetcher(api);
-      // range.startBlock = chain === 'aave' ? 12200000 : 0;
       range.startBlock = 0;
-    } else if (chainSupportedBy(chain, AaveTypes.EventChains)) {
+    } else if (node.Chain.network === ChainNetwork.Aave) {
       const api = await AaveEvents.createApi(node.url, node.address);
       fetcher = new AaveEvents.StorageFetcher(api);
-      // range.startBlock = chain === 'aave' ? 12200000 : 0;
       range.startBlock = 0;
     } else {
       throw new Error('Unsupported migration chain');
@@ -99,8 +93,14 @@ export async function migrateChainEntity(chain: string): Promise<void> {
 }
 
 export async function migrateChainEntities(): Promise<void> {
-  for (const chain of EventSupportingChains) {
-    await migrateChainEntity(chain);
+  const chains = await models.Chain.findAll({
+    where: {
+      active: true,
+      has_chain_events_listener: true,
+    },
+  });
+  for (const { id } of chains) {
+    await migrateChainEntity(id);
   }
 }
 

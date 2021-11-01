@@ -4,7 +4,8 @@ import { Signer } from '@polkadot/api/types';
 import { stringToHex } from '@polkadot/util';
 import { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
 
-import { Account, ChainBase, IWebWallet } from 'models';
+import { ChainBase } from 'types';
+import { Account, IWebWallet } from 'models';
 import AddressSwapper from 'views/components/addresses/address_swapper';
 
 class PolkadotWebWalletController implements IWebWallet<InjectedAccountWithMeta> {

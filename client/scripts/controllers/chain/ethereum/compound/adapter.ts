@@ -3,7 +3,8 @@ import { EthereumCoin } from 'adapters/chain/ethereum/types';
 
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
-import { ChainBase, IChainAdapter, ChainEntity, ChainEvent, NodeInfo } from 'models';
+import { ChainBase } from 'types';
+import { IChainAdapter, ChainEntity, ChainEvent, NodeInfo } from 'models';
 
 import ChainEntityController from 'controllers/server/chain_entities';
 import { IApp } from 'state';
@@ -49,7 +50,7 @@ export default class Compound extends IChainAdapter<EthereumCoin, EthereumAccoun
       await super.initApi();
     } catch (e) {
       this._failed = true;
-      notifyError('Failed to fetch via infura');
+      notifyError('Failed to initialize API.');
     }
   }
 

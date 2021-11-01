@@ -1,9 +1,15 @@
 /**
  * Generic handler that stores the event in the database.
  */
-import { IEventHandler, CWEvent, IChainEventKind, SubstrateTypes } from '@commonwealth/chain-events';
+import {
+  IEventHandler,
+  CWEvent,
+  IChainEventKind,
+  SubstrateTypes,
+  Erc20Types,
+} from '@commonwealth/chain-events';
 import Sequelize from 'sequelize';
-import { factory, formatFilename } from '../../shared/logging';
+import { addPrefix, factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 const { Op } = Sequelize;
@@ -16,7 +22,7 @@ export default class extends IEventHandler {
   constructor(
     private readonly _models,
     private readonly _chain?: string,
-    private readonly _filterConfig: StorageFilterConfig = {},
+    private readonly _filterConfig: StorageFilterConfig = {}
   ) {
     super();
   }
@@ -68,13 +74,14 @@ export default class extends IEventHandler {
    * NOTE: this may modify the event.
    */
   public async handle(event: CWEvent) {
-    const chain = event.chain || this._chain
+    // eslint-disable-next-line @typescript-eslint/no-shadow
+    const log = factory.getLogger(addPrefix(__filename, [event.network, event.chain]));
+    const chain = event.chain || this._chain;
 
     event = this.truncateEvent(event);
-    log.debug(`Received event: ${JSON.stringify(event, null, 2)}`);
     const shouldSkip = await this._shouldSkip(event);
     if (shouldSkip) {
-      log.trace('Skipping event!');
+      log.trace(`Skipping event!`);
       return;
     }
 
@@ -82,7 +89,8 @@ export default class extends IEventHandler {
     const [ dbEventType, created ] = await this._models.ChainEventType.findOrCreate({
       where: {
         id: `${chain}-${event.data.kind.toString()}`,
-        chain: chain,
+        chain,
+        event_network: event.network,
         event_name: event.data.kind.toString(),
       }
     });

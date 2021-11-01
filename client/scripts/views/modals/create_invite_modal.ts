@@ -21,7 +21,8 @@ import { decodeAddress } from '@polkadot/util-crypto';
 import moment from 'moment';
 
 import app from 'state';
-import { CommunityInfo, ChainInfo, RoleInfo, ChainBase, Profile } from 'models';
+import { ChainBase } from 'types';
+import { CommunityInfo, ChainInfo, RoleInfo, Profile } from 'models';
 import { UserBlock } from 'views/components/widgets/user';
 import { CompactModalExitButton } from 'views/modal';
 import { notifyError } from 'controllers/app/notifications';
