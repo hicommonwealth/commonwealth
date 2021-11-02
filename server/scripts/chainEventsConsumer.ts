@@ -70,19 +70,15 @@ const setupChainEventListeners = async (wss: WebSocket.Server): Promise<{}> => {
       try {
         prevResult = await handler.handle(event, prevResult);
       } catch (err) {
-        // unknown chain event originates from the webhookNotifier which does not support erc20 events
-        // and thus throws if an erc20 event is given
-        if (err.message !== 'unknown chain event') {
-          log.error(
-            `Classic event handle failure for the following event: ${JSON.stringify(
-              event,
-              null,
-              2
-            )}`,
-            err
-          );
-          break;
-        }
+        log.error(
+          `Event handle ${handler.constructor.name} failed to process the following event: ${JSON.stringify(
+            event,
+            null,
+            2
+          )}`,
+          err
+        );
+        break;
       }
     }
     if (substrateChains.includes(event.chain)) {

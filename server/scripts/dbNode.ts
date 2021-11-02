@@ -475,7 +475,6 @@ async function initializer(): Promise<void> {
     const dynoList = await res.json();
 
     if (!dynoList || dynoList.length === 0) {
-      // TODO: this will never occur
       throw new Error("No dyno's detected");
     }
 
