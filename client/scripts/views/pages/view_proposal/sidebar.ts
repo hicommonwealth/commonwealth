@@ -131,9 +131,10 @@ export const ProposalLinkedThreadsEditorModule: m.Component<{
         vnode.state.linkedThreads = [];
         vnode.state.linkedThreadsFetched = true;
       } else {
+        const refreshedProposal = app.threads.getById(proposal.id);
         app.threads
           .fetchThreadsFromId(
-            proposal.linkedThreads.map(
+            refreshedProposal.linkedThreads.map(
               (relation: LinkedThreadRelation) => relation.linked_thread
             )
           )
@@ -175,7 +176,12 @@ export const ProposalLinkedThreadsEditorModule: m.Component<{
             e.preventDefault();
             app.modals.create({
               modal: LinkedThreadModal,
-              data: { linkingThread: proposal },
+              data: {
+                linkingThread: proposal,
+                onclose: () => {
+                  vnode.state.linkedThreadsFetched = false;
+                },
+              },
             });
           },
         }),

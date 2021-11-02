@@ -138,7 +138,7 @@ export const ThreadSelector: m.Component<
                         })
                         m.redraw();
                       })
-                      .catch((err) => {
+                      .catch(() => {
                         notifyError('Could not find matching thread');
                       });
                   } else if (target.value?.length === 0) {
@@ -167,24 +167,24 @@ export const ThreadSelector: m.Component<
                 if (selectedThreadIdx !== -1) {
                   app.threads
                     .removeLinkedThread(linkingThread.id, thread.id)
-                    .then((result) => {
+                    .then(() => {
                       vnode.state.linkedThreads.splice(selectedThreadIdx, 1);
                       vnode.state.selectInProgress = false;
                       notifySuccess('Thread unlinked.');
                     })
-                    .catch((err) => {
+                    .catch(() => {
                       vnode.state.selectInProgress = false;
                       notifyError('Thread failed to unlink.');
                     });
                 } else {
                   app.threads
                     .addLinkedThread(linkingThread.id, thread.id)
-                    .then((result) => {
+                    .then(() => {
                       vnode.state.selectInProgress = false;
                       vnode.state.linkedThreads.push(thread);
                       notifySuccess('Thread linked.');
                     })
-                    .catch((err) => {
+                    .catch(() => {
                       vnode.state.selectInProgress = false;
                       notifyError('Thread failed to link.');
                     });

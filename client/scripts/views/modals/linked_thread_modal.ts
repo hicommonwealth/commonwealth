@@ -7,9 +7,12 @@ import { Button } from 'construct-ui';
 import { CompactModalExitButton } from '../modal';
 import { ThreadSelector } from '../components/thread_selector';
 
-const LinkedThreadModal: m.Component<{ linkingThread: OffchainThread }, {}> = {
+const LinkedThreadModal: m.Component<{
+  linkingThread: OffchainThread,
+  onclose: () => null,
+}, {}> = {
   view: (vnode) => {
-    const { linkingThread } = vnode.attrs;
+    const { linkingThread, onclose } = vnode.attrs;
     return m('.LinkedThreadModal', [
       m('.compact-modal-title', [
         m('h3', 'Link to Existing Threads'),
@@ -24,6 +27,7 @@ const LinkedThreadModal: m.Component<{ linkingThread: OffchainThread }, {}> = {
           intent: 'primary',
           onclick: (e) => {
             e.preventDefault();
+            if (onclose) onclose();
             $(e.target).trigger('modalexit');
           },
         }),

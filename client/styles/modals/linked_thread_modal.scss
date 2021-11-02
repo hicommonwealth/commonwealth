@@ -4,8 +4,9 @@
 .LinkedThreadModal {
     min-width: 55vw;
     max-width: 55vw;
-    @include md-max {
-        max-width: none;
+    @include sm-max {
+        min-width: 100vw;
+        max-width: 100vw;
     }
     .compact-modal-body {
         display: flex;
