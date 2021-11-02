@@ -2,13 +2,8 @@ import { QueryTypes, Op } from 'sequelize';
 import jwt from 'jsonwebtoken';
 import _ from 'lodash';
 import { Request, Response, NextFunction } from 'express';
-import Web3 from 'web3';
-import { providers } from 'ethers';
 import {
   JWT_SECRET,
-  INFURA_API_KEY,
-  GITHUB_CLIENT_ID,
-  GITHUB_CLIENT_SECRET,
 } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
 import '../types';
