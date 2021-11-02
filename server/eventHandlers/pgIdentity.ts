@@ -1,10 +1,9 @@
 import { SubstrateTypes, CWEvent, IChainEventData, IEventHandler } from '@commonwealth/chain-events';
 
-// @ts-ignore
 import _ from 'underscore';
 import format from 'pg-format';
 import { Pool } from 'pg';
-import { factory, formatFilename } from '../../shared/logging';
+import { addPrefix, factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -18,6 +17,9 @@ export default class extends IEventHandler {
    * the database.
    */
   public async handle(event: CWEvent<IChainEventData>, dbEvent) {
+    // eslint-disable-next-line @typescript-eslint/no-shadow
+    const log = factory.getLogger(addPrefix(__filename, [event.network, event.chain]));
+
     // do nothing if wrong type of event
     if (
       event.data.kind !== SubstrateTypes.EventKind.IdentitySet

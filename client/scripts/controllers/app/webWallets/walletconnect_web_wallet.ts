@@ -4,7 +4,6 @@ import app from 'state';
 import Web3 from 'web3';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import { setActiveAccount } from 'controllers/app/login';
-import { INFURA_ID } from 'controllers/chain/ethereum/chain';
 
 class WalletConnectWebWalletController implements IWebWallet<string> {
   private _enabled: boolean;
@@ -50,8 +49,12 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     this._enabling = true;
     try {
       //  Create WalletConnect Provider
+      // TODO: switch this based on current chain
       this._provider = new WalletConnectProvider({
-        infuraId: INFURA_ID
+        rpc: {
+          1: "https://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr",
+          3: "https://eth-ropsten.alchemyapi.io/v2/2xXT2xx5AvA3GFTev3j_nB9LzWdmxPk7",
+        }
       });
 
       //  Enable session (triggers QR Code modal)

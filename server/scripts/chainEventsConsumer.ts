@@ -64,6 +64,7 @@ const setupChainEventListeners = async (wss: WebSocket.Server): Promise<{}> => {
 
   // feed the events into their respective handlers
   async function processClassicEvents(event: CWEvent): Promise<void> {
+    log.debug(`Received event: ${JSON.stringify(event, null, 2)}`);
     let prevResult = null;
     for (const handler of allChainEventHandlers) {
       try {
@@ -97,6 +98,7 @@ const setupChainEventListeners = async (wss: WebSocket.Server): Promise<{}> => {
   }
 
   async function processIdentityEvents(event: CWEvent): Promise<void> {
+    log.debug(`Received event: ${JSON.stringify(event, null, 2)}`);
     try {
       await identityHandler.handle(event, null);
     } catch (err) {

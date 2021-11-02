@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import Web3 from 'web3';
 import { Op } from 'sequelize';
-import { INFURA_API_KEY } from '../config';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import { DB } from '../database';
 
@@ -69,7 +68,7 @@ const createChain = async (
     if (!Web3.utils.isAddress(req.body.address)) {
       return next(new Error(Errors.InvalidAddress));
     }
-    const web3 = new Web3(new Web3.providers.HttpProvider(`https://mainnet.infura.io/v3/${INFURA_API_KEY}`));
+    const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr'));
     const code = await web3.eth.getCode(req.body.address);
     if (code === '0x') {
       return next(new Error(Errors.InvalidAddress));

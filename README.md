@@ -33,11 +33,17 @@ sudo rabbitmqctl set_permissions -p / commonwealth ".*" ".*" ".*"
 
 This should give you a RabbitMQ server with user "commonwealth" and password "edgeware"
 
+In order for Rascal (the npm package used to interact with RabbitMQ) to set up the queues and necessary configuration
+the RabbitMQ Management plugin MUST be enabled: https://www.rabbitmq.com/management.html
+
+For more information on RabbitMQ setup/debugging refer to the ce-rabbitmq-plugin repo found here:
+https://github.com/hicommonwealth/ce-rabbitmq-plugin
+
 **nvm**
 
 For development, you should also install nvm:
 
-```bash
+```
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
 nvm install
 ```
@@ -79,7 +85,6 @@ Environment variables used for external services include:
 - AWS_REGION: for uploading images to Amazon S3 (conventionally 'us-east-2')
 - GITHUB_CLIENT_ID: for Github OAuth login
 - GITHUB_CLIENT_SECRET: for Github OAuth login
-- INFURA_API_KEY: for lockdrop lookups (requires archive node access, may be deprecated soon)
 - MIXPANEL_TOKEN: for analytics
 - ROLLBAR_SERVER_TOKEN: for error reporting
 - SENDGRID_API_KEY: for sending emails, email login, etc.
