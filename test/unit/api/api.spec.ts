@@ -21,6 +21,7 @@ describe('API Tests', () => {
       } catch (error) {
         console.log('error encountered', error);
       }
+      console.log('res result', res);
       expect(res.status).to.be.equal(400);
       expect(res.body).to.not.be.null;
       expect(res.body.result).to.not.be.null;
