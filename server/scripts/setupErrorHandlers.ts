@@ -25,6 +25,7 @@ const setupErrorHandlers = (app) => {
   // Errors that hit the final condition should be either (1) thrown as
   // ServerErrors or AppErrors or (2) triaged as a bug.
   app.use((error, req, res, next) => {
+    console.log('hit error handler');
     if (error instanceof ServerError) {
       console.log('ServerError', error);
       rollbar.error(error); // expected server error
