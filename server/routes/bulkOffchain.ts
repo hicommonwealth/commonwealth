@@ -253,6 +253,7 @@ const bulkOffchain = async (
             include: [{ model: models.Address, as: 'Address' }],
           });
 
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           monthlyComments.concat(monthlyThreads).forEach((post) => {
             if (!post.Address) return;
