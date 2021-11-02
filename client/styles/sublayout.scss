@@ -76,6 +76,7 @@
         max-width: calc(100% - #{$sidebar-width});
         @include sm-max {
             padding: 0;
+            max-width: 100%;
         }
         @include xs-max {
             min-width: calc(100vw - 80px);
