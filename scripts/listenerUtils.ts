@@ -17,21 +17,23 @@ export const networkUrls = {
   kulupu: 'ws://rpc.kulupu.corepaper.org/ws',
   stafi: 'wss://scan-rpc.stafi.io/ws',
 
-  moloch: 'wss://mainnet.infura.io/ws',
+  moloch: 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
   'moloch-local': 'ws://127.0.0.1:9545',
 
-  marlin: 'wss://mainnet.infura.io/ws',
+  marlin: 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
   'marlin-local': 'ws://127.0.0.1:9545',
-  uniswap: 'wss://mainnet.infura.io/ws',
-  tribe: 'wss://mainnet.infura.io/ws',
+  uniswap:
+    'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
+  tribe: 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
 
-  aave: 'wss://mainnet.infura.io/ws',
+  aave: 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
   'aave-local': 'ws://127.0.0.1:9545',
-  'dydx-ropsten': 'wss://ropsten.infura.io/ws',
-  dydx: 'wss://mainnet.infura.io/ws',
+  'dydx-ropsten':
+    'wss://eth-ropsten.alchemyapi.io/v2/2xXT2xx5AvA3GFTev3j_nB9LzWdmxPk7',
+  dydx: 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
   frax: 'ws://localhost:8545',
 
-  erc20: 'wss://mainnet.infura.io/ws',
+  erc20: 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
 } as const;
 
 export const networkSpecs: { [chain: string]: RegisteredTypes } = {
