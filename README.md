@@ -85,7 +85,6 @@ Environment variables used for external services include:
 - AWS_REGION: for uploading images to Amazon S3 (conventionally 'us-east-2')
 - GITHUB_CLIENT_ID: for Github OAuth login
 - GITHUB_CLIENT_SECRET: for Github OAuth login
-- INFURA_API_KEY: for lockdrop lookups (requires archive node access, may be deprecated soon)
 - MIXPANEL_TOKEN: for analytics
 - ROLLBAR_SERVER_TOKEN: for error reporting
 - SENDGRID_API_KEY: for sending emails, email login, etc.
