@@ -15,6 +15,7 @@
   "files": [
     "server/scripts/chainEventsConsumer.ts",
     "server/scripts/dbNode.ts",
+    "shared/logging.ts"
   ],
   "include": [
     "server/models/*",
