@@ -450,8 +450,10 @@ async function initializer(): Promise<void> {
     log.error('Unexpected error on idle client', err);
   });
 
+  log.info(`NODE_ENV: ${process.env.NODE_ENV}\tUSE_SLIDER_SCALING: ${process.env.USE_SLIDER_SCALING}`)
+  log.info(`Condition: ${(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') && process.env.USE_SLIDER_SCALING === 'true'}`)
   // these requests cannot work locally
-  if ((process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') && process.env.USE_SLIDER_SCALING) {
+  if ((process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') && process.env.USE_SLIDER_SCALING === 'true') {
     log.info('Connecting to Heroku API');
     // get all dyno's list
     const res = await fetch(
@@ -526,8 +528,8 @@ async function initializer(): Promise<void> {
       }
     }
   } else {
-    workerNumber = Number(process.env.WORKER_NUMBER) || 0;
-    numWorkers = Number(process.env.NUM_WORKERS) || 1;
+    workerNumber = process.env.WORKER_NUMBER ? Number(process.env.WORKER_NUMBER) : 0;
+    numWorkers = process.env.NUM_WORKERS ? Number(process.env.NUM_WORKERS) : 1;
   }
 
   log.info(`Worker Number: ${workerNumber}\nNumber of Workers: ${numWorkers}`);
