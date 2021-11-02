@@ -8,7 +8,7 @@ import {
   SupportedNetwork,
 } from '../../interfaces';
 import { Listener as BaseListener } from '../../Listener';
-import { addPrefix, factory, formatFilename } from '../../logging';
+import { addPrefix, factory } from '../../logging';
 
 import { Block, EventKind, ISubstrateListenerOptions } from './types';
 

@@ -8,15 +8,13 @@ import {
   ISubscribeOptions,
   SupportedNetwork,
 } from '../../interfaces';
-import { addPrefix, factory, formatFilename } from '../../logging';
+import { addPrefix, factory } from '../../logging';
 
 import { Subscriber } from './subscriber';
 import { Poller } from './poller';
 import { Processor } from './processor';
 import { Block, IEventData } from './types';
 import { EnricherConfig } from './filters/enricher';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 export interface ISubstrateSubscribeOptions
   extends ISubscribeOptions<ApiPromise> {
@@ -35,7 +33,6 @@ export async function createApi(
   typeOverrides: RegisteredTypes = {},
   chain?: string
 ): Promise<ApiPromise> {
-  // eslint-disable-next-line no-shadow
   const log = factory.getLogger(
     addPrefix(__filename, [SupportedNetwork.Substrate, chain])
   );
@@ -96,6 +93,9 @@ export const subscribeEvents: SubscribeFunc<
     verbose,
     enricherConfig,
   } = options;
+  const log = factory.getLogger(
+    addPrefix(__filename, [SupportedNetwork.Substrate, chain])
+  );
   // helper function that sends an event through event handlers
   const handleEventFn = async (event: CWEvent<IEventData>): Promise<void> => {
     let prevResult = null;

@@ -35,7 +35,7 @@ import {
   Label as AaveLabel,
 } from './chains/aave';
 import { Listener } from './Listener';
-import { addPrefix, factory, formatFilename } from './logging';
+import { addPrefix, factory } from './logging';
 
 export function Title(
   network: SupportedNetwork,

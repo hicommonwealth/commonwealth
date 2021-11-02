@@ -9,15 +9,13 @@ import {
   ISubscribeOptions,
   SupportedNetwork,
 } from '../../interfaces';
-import { addPrefix, factory, formatFilename } from '../../logging';
+import { addPrefix, factory } from '../../logging';
 import { ERC20__factory as ERC20Factory, ERC20 } from '../../contractTypes';
 
 import { Subscriber } from './subscriber';
 import { Processor } from './processor';
 import { IEventData, RawEvent, IErc20Contracts } from './types';
 import { EnricherConfig } from './filters/enricher';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 export interface IErc20SubscribeOptions
   extends ISubscribeOptions<IErc20Contracts> {
@@ -39,7 +37,6 @@ export async function createApi(
   tokenNames?: string[],
   retryTimeMs = 10 * 1000
 ): Promise<IErc20Contracts> {
-  // eslint-disable-next-line no-shadow
   const log = factory.getLogger(
     addPrefix(__filename, [SupportedNetwork.ERC20])
   );
@@ -99,6 +96,9 @@ export const subscribeEvents: SubscribeFunc<
   IErc20SubscribeOptions
 > = async (options) => {
   const { chain, api, handlers, verbose, enricherConfig } = options;
+  const log = factory.getLogger(
+    addPrefix(__filename, [SupportedNetwork.ERC20])
+  );
   // helper function that sends an event through event handlers
   const handleEventFn = async (
     event: CWEvent<IEventData>,

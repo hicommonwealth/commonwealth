@@ -2,7 +2,7 @@
  * Processes Compound events.
  */
 import { IEventProcessor, CWEvent, SupportedNetwork } from '../../interfaces';
-import { addPrefix, factory, formatFilename } from '../../logging';
+import { addPrefix, factory } from '../../logging';
 
 import { ParseType } from './filters/type_parser';
 import { Enrich } from './filters/enricher';
@@ -27,16 +27,12 @@ export class Processor extends IEventProcessor<Api, RawEvent> {
     const kind = ParseType(event.event, this.chain);
     if (!kind) return [];
     try {
-      const cwEvent = await Enrich(
-        this._api,
-        event.blockNumber,
-        kind,
-        event,
-        this.chain
-      );
+      const cwEvent = await Enrich(this._api, event.blockNumber, kind, event);
       return [cwEvent];
     } catch (e) {
-      log.error(`Failed to enrich event: ${e.message}`);
+      log.error(
+        `Failed to enrich event. Block number: ${event.blockNumber}, Name/Kind: ${event.event}, Error Message: ${e.message}`
+      );
       return [];
     }
   }

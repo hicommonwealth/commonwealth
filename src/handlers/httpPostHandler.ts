@@ -1,9 +1,7 @@
 import fetch from 'node-fetch';
 
 import { CWEvent, IEventHandler } from '../interfaces';
-import { factory, formatFilename } from '../logging';
-
-const log = factory.getLogger(formatFilename(__filename));
+import { addPrefix, factory } from '../logging';
 
 export class httpPostHandler implements IEventHandler {
   public readonly url;
@@ -13,6 +11,10 @@ export class httpPostHandler implements IEventHandler {
   }
 
   public async handle(event: CWEvent): Promise<any> {
+    const log = factory.getLogger(
+      addPrefix(__filename, [event.network, event.chain])
+    );
+
     try {
       const res = await fetch(this.url, {
         method: 'POST',

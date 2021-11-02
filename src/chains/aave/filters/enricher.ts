@@ -18,8 +18,7 @@ export async function Enrich(
   api: Api,
   blockNumber: number,
   kind: EventKind,
-  rawData: RawEvent,
-  chain?: string
+  rawData: RawEvent
 ): Promise<CWEvent<IEventData>> {
   switch (kind) {
     case EventKind.ProposalCanceled: {
@@ -185,11 +184,7 @@ export async function Enrich(
       };
     }
     default: {
-      throw new Error(
-        `[${SupportedNetwork.Aave}${
-          chain ? `::${chain}` : ''
-        }]: Unknown event kind!`
-      );
+      throw new Error(`Unknown event kind: ${kind}`);
     }
   }
 

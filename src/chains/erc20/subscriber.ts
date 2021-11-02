@@ -7,7 +7,7 @@ import BN from 'bn.js';
 
 import { IEventSubscriber, SupportedNetwork } from '../../interfaces';
 import { ERC20__factory as ERC20Factory } from '../../contractTypes';
-import { addPrefix, factory, formatFilename } from '../../logging';
+import { addPrefix, factory } from '../../logging';
 
 import { RawEvent, IErc20Contracts } from './types';
 

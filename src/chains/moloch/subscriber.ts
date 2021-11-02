@@ -4,7 +4,7 @@
 import { Listener } from '@ethersproject/providers';
 
 import { IEventSubscriber, SupportedNetwork } from '../../interfaces';
-import { addPrefix, factory, formatFilename } from '../../logging';
+import { addPrefix, factory } from '../../logging';
 
 import { RawEvent, Api } from './types';
 

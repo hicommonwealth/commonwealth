@@ -1,6 +1,6 @@
 import { CWEvent, SupportedNetwork } from '../../interfaces';
 import { Listener as BaseListener } from '../../Listener';
-import { addPrefix, factory, formatFilename } from '../../logging';
+import { addPrefix, factory } from '../../logging';
 
 import {
   EventKind,

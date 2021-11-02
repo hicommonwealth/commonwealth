@@ -1,5 +1,5 @@
 import { EventKind } from '../types';
-import { addPrefix, factory, formatFilename } from '../../../logging';
+import { addPrefix, factory } from '../../../logging';
 import { SupportedNetwork } from '../../../interfaces';
 
 /**

@@ -9,7 +9,7 @@ import {
   ISubscribeOptions,
   SupportedNetwork,
 } from '../../interfaces';
-import { factory, formatFilename } from '../../logging';
+import { addPrefix, factory } from '../../logging';
 import {
   GovernorAlpha__factory as GovernorAlphaFactory,
   GovernorCompatibilityBravo__factory as GovernorCompatibilityBravoFactory,
@@ -19,8 +19,6 @@ import { Subscriber } from './subscriber';
 import { Processor } from './processor';
 import { StorageFetcher } from './storageFetcher';
 import { IEventData, RawEvent, Api } from './types';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 /**
  * Attempts to open an API connection, retrying if it cannot be opened.
@@ -40,10 +38,8 @@ export async function createApi(
     typeof ethNetworkUrlOrProvider === 'string'
       ? ethNetworkUrlOrProvider
       : ethNetworkUrlOrProvider.connection.url;
-  const chainLog = factory.getLogger(
-    `${formatFilename(__filename)}::${SupportedNetwork.Compound}${
-      chain ? `::${chain}` : ''
-    }`
+  const log = factory.getLogger(
+    addPrefix(__filename, [SupportedNetwork.Compound, chain])
   );
 
   for (let i = 0; i < 3; ++i) {
@@ -74,14 +70,14 @@ export async function createApi(
         );
       }
 
-      chainLog.info(`${this.logPrefix}Connection successful!`);
+      log.info(`Connection successful!`);
       return contract;
     } catch (err) {
-      chainLog.error(
+      log.error(
         `Compound contract: ${governorAddress} at url: ${ethNetworkUrl} failure: ${err.message}`
       );
       await sleep(retryTimeMs);
-      chainLog.error(`Retrying connection...`);
+      log.error(`Retrying connection...`);
     }
   }
 
@@ -116,6 +112,9 @@ export const subscribeEvents: SubscribeFunc<
     discoverReconnectRange,
     verbose,
   } = options;
+  const log = factory.getLogger(
+    addPrefix(__filename, [SupportedNetwork.Compound, chain])
+  );
   // helper function that sends an event through event handlers
   const handleEventFn = async (event: CWEvent<IEventData>): Promise<void> => {
     let prevResult = null;

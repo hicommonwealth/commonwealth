@@ -2,7 +2,7 @@
  * Processes ERC20 events.
  */
 import { IEventProcessor, CWEvent, SupportedNetwork } from '../../interfaces';
-import { addPrefix, factory, formatFilename } from '../../logging';
+import { addPrefix, factory } from '../../logging';
 
 import { ParseType } from './filters/type_parser';
 import { Enrich, EnricherConfig } from './filters/enricher';
@@ -43,11 +43,7 @@ export class Processor extends IEventProcessor<IErc20Contracts, RawEvent> {
       return cwEvent ? [cwEvent] : [];
     } catch (e) {
       log.error(
-        `[${SupportedNetwork.ERC20}${
-          tokenName ? `::${tokenName}` : ''
-        }]: Failed to enrich event ${event.address} (${event.event}): ${
-          e.message
-        }`
+        `Failed to enrich event. Block number: ${event.blockNumber}, Name/Kind: ${event.event}, Error Message: ${e.message}`
       );
       return [];
     }

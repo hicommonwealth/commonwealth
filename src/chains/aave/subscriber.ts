@@ -4,7 +4,7 @@
 import { Listener } from '@ethersproject/providers';
 
 import { IEventSubscriber, SupportedNetwork } from '../../interfaces';
-import { addPrefix, factory, formatFilename } from '../../logging';
+import { addPrefix, factory } from '../../logging';
 
 import { RawEvent, Api } from './types';
 
@@ -15,12 +15,7 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
 
   protected readonly log;
 
-  constructor(
-    api: Api,
-    name: string,
-    verbose = false,
-    protected readonly logPrefix?: string
-  ) {
+  constructor(api: Api, name: string, verbose = false) {
     super(api, verbose);
     this._name = name;
     this.log = factory.getLogger(

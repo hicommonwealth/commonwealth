@@ -8,7 +8,7 @@ import {
   ISubscribeOptions,
   SupportedNetwork,
 } from '../../interfaces';
-import { addPrefix, factory, formatFilename } from '../../logging';
+import { addPrefix, factory } from '../../logging';
 import {
   IAaveGovernanceV2__factory as IAaveGovernanceV2Factory,
   GovernanceStrategy__factory as GovernanceStrategyFactory,
@@ -19,8 +19,6 @@ import { Subscriber } from './subscriber';
 import { Processor } from './processor';
 import { StorageFetcher } from './storageFetcher';
 import { IEventData, RawEvent, Api } from './types';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 /**
  * Attempts to open an API connection, retrying if it cannot be opened.
@@ -36,7 +34,6 @@ export async function createApi(
   retryTimeMs = 10 * 1000,
   chain?: string
 ): Promise<Api> {
-  // eslint-disable-next-line no-shadow
   const log = factory.getLogger(
     addPrefix(__filename, [SupportedNetwork.Aave, chain])
   );
@@ -135,6 +132,9 @@ export const subscribeEvents: SubscribeFunc<
     discoverReconnectRange,
     verbose,
   } = options;
+  const log = factory.getLogger(
+    addPrefix(__filename, [SupportedNetwork.Aave, chain])
+  );
   // helper function that sends an event through event handlers
   const handleEventFn = async (event: CWEvent<IEventData>): Promise<void> => {
     let prevResult = null;

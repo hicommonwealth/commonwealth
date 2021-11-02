@@ -12,14 +12,12 @@ import {
   SubscribeFunc,
   SupportedNetwork,
 } from '../../interfaces';
-import { addPrefix, factory, formatFilename } from '../../logging';
+import { addPrefix, factory } from '../../logging';
 
 import { Subscriber } from './subscriber';
 import { Processor } from './processor';
 import { StorageFetcher } from './storageFetcher';
 import { IEventData, RawEvent, Api, SubscribeOptions } from './types';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 /**
  * Attempts to open an API connection, retrying if it cannot be opened.
@@ -95,6 +93,9 @@ export const subscribeEvents: SubscribeFunc<
     contractVersion,
     verbose,
   } = options;
+  const log = factory.getLogger(
+    addPrefix(__filename, [SupportedNetwork.Moloch, chain])
+  );
   // helper function that sends an event through event handlers
   const handleEventFn = async (event: CWEvent<IEventData>): Promise<void> => {
     let prevResult = null;

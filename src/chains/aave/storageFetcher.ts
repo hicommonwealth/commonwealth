@@ -4,7 +4,7 @@ import {
   IDisconnectedRange,
   SupportedNetwork,
 } from '../../interfaces';
-import { addPrefix, factory, formatFilename } from '../../logging';
+import { addPrefix, factory } from '../../logging';
 
 import { Enrich } from './filters/enricher';
 import {
@@ -110,16 +110,22 @@ export class StorageFetcher extends IStorageFetcher<Api> {
       range.endBlock || 'latest'
     );
     const createdCwEvents = await Promise.all(
-      proposalCreatedEvents.map(
-        (evt) =>
-          Enrich(
+      proposalCreatedEvents.map((evt) => {
+        try {
+          return Enrich(
             this._api,
             evt.blockNumber,
             EventKind.ProposalCreated,
-            evt,
-            this.chain
-          ) as Promise<CWEvent<IProposalCreated>>
-      )
+            evt
+          ) as Promise<CWEvent<IProposalCreated>>;
+        } catch (e) {
+          this.log.error(
+            `Failed to enrich event. Block number: ${evt.blockNumber}, Name/Kind: ${EventKind.ProposalCreated}, Error Message: ${e.message}`
+          );
+          // maintain previous functionality of throwing
+          throw new Error(e.message);
+        }
+      })
     );
     const voteEmittedEvents = await this._api.governance.queryFilter(
       this._api.governance.filters.VoteEmitted(null, null, null, null),
@@ -127,16 +133,22 @@ export class StorageFetcher extends IStorageFetcher<Api> {
       range.endBlock || 'latest'
     );
     const voteCwEvents = await Promise.all(
-      voteEmittedEvents.map(
-        (evt) =>
-          Enrich(
+      voteEmittedEvents.map((evt) => {
+        try {
+          return Enrich(
             this._api,
             evt.blockNumber,
             EventKind.VoteEmitted,
-            evt,
-            this.chain
-          ) as Promise<CWEvent<IVoteEmitted>>
-      )
+            evt
+          ) as Promise<CWEvent<IVoteEmitted>>;
+        } catch (e) {
+          this.log.error(
+            `Failed to enrich event. Block number: ${evt.blockNumber}, Name/Kind: ${EventKind.VoteEmitted}, Error Message: ${e.message}`
+          );
+          // maintain previous functionality of throwing
+          throw new Error(e.message);
+        }
+      })
     );
     const proposalQueuedEvents = await this._api.governance.queryFilter(
       this._api.governance.filters.ProposalQueued(null, null, null),
@@ -144,16 +156,22 @@ export class StorageFetcher extends IStorageFetcher<Api> {
       range.endBlock || 'latest'
     );
     const queuedCwEvents = await Promise.all(
-      proposalQueuedEvents.map(
-        (evt) =>
-          Enrich(
+      proposalQueuedEvents.map((evt) => {
+        try {
+          return Enrich(
             this._api,
             evt.blockNumber,
             EventKind.ProposalQueued,
-            evt,
-            this.chain
-          ) as Promise<CWEvent<IProposalQueued>>
-      )
+            evt
+          ) as Promise<CWEvent<IProposalQueued>>;
+        } catch (e) {
+          this.log.error(
+            `Failed to enrich event. Block number: ${evt.blockNumber}, Name/Kind: ${EventKind.ProposalQueued}, Error Message: ${e.message}`
+          );
+          // maintain previous functionality of throwing
+          throw new Error(e.message);
+        }
+      })
     );
     const proposalCanceledEvents = await this._api.governance.queryFilter(
       this._api.governance.filters.ProposalCanceled(null),
@@ -161,16 +179,22 @@ export class StorageFetcher extends IStorageFetcher<Api> {
       range.endBlock || 'latest'
     );
     const cancelledCwEvents = await Promise.all(
-      proposalCanceledEvents.map(
-        (evt) =>
-          Enrich(
+      proposalCanceledEvents.map((evt) => {
+        try {
+          return Enrich(
             this._api,
             evt.blockNumber,
             EventKind.ProposalCanceled,
-            evt,
-            this.chain
-          ) as Promise<CWEvent<IProposalCanceled>>
-      )
+            evt
+          ) as Promise<CWEvent<IProposalCanceled>>;
+        } catch (e) {
+          this.log.error(
+            `Failed to enrich event. Block number: ${evt.blockNumber}, Name/Kind: ${EventKind.ProposalCanceled}, Error Message: ${e.message}`
+          );
+          // maintain previous functionality of throwing
+          throw new Error(e.message);
+        }
+      })
     );
     const proposalExecutedEvents = await this._api.governance.queryFilter(
       this._api.governance.filters.ProposalExecuted(null, null),
@@ -178,16 +202,22 @@ export class StorageFetcher extends IStorageFetcher<Api> {
       range.endBlock || 'latest'
     );
     const executedCwEvents = await Promise.all(
-      proposalExecutedEvents.map(
-        (evt) =>
-          Enrich(
+      proposalExecutedEvents.map((evt) => {
+        try {
+          return Enrich(
             this._api,
             evt.blockNumber,
             EventKind.ProposalExecuted,
-            evt,
-            this.chain
-          ) as Promise<CWEvent<IProposalExecuted>>
-      )
+            evt
+          ) as Promise<CWEvent<IProposalExecuted>>;
+        } catch (e) {
+          this.log.error(
+            `Failed to enrich event. Block number: ${evt.blockNumber}, Name/Kind: ${EventKind.ProposalExecuted}, Error Message: ${e.message}`
+          );
+          // maintain previous functionality of throwing
+          throw new Error(e.message);
+        }
+      })
     );
     return [
       ...createdCwEvents,

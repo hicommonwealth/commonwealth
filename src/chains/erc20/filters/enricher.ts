@@ -110,9 +110,7 @@ export async function Enrich(
     }
 
     default: {
-      throw new Error(
-        `[${SupportedNetwork.ERC20}::${tokenName}]: Unknown event kind!`
-      );
+      throw new Error(`Unknown event kind: ${kind}`);
     }
   }
 }

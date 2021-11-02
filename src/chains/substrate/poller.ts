@@ -8,7 +8,7 @@ import {
   IDisconnectedRange,
   SupportedNetwork,
 } from '../../interfaces';
-import { addPrefix, factory, formatFilename } from '../../logging';
+import { addPrefix, factory } from '../../logging';
 
 import { Block } from './types';
 
