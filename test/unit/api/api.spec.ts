@@ -10,13 +10,16 @@ describe('API Tests', () => {
   describe('API Tests', () => {
     it('Should receive a 400 error when requesting nonexistent chain', async () => {
       let res;
+      console.log(
+        'trying test: Should receive a 400 error when requesting nonexistent chain'
+      );
       try {
         res = await chai
           .request(app)
           .get('/api/bulkOffchain?chain=nonexistentchain')
           .set('Accept', 'application/json');
       } catch (error) {
-        console.log(error);
+        console.log('error encountered', error);
       }
       expect(res.status).to.be.equal(400);
       expect(res.body).to.not.be.null;
