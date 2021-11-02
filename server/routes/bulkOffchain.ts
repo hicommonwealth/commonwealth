@@ -25,73 +25,74 @@ const bulkOffchain = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(
-    models,
-    req.query,
-    req.user
-  );
-  if (error) throw new AppError(error);
+  try {
+    const [chain, community, error] = await lookupCommunityIsVisibleToUser(
+      models,
+      req.query,
+      req.user
+    );
+    if (error) throw new AppError(error);
 
-  // globally shared SQL replacements
-  const communityOptions = community
-    ? 'community = :community'
-    : 'chain = :chain';
-  const replacements = community
-    ? { community: community.id }
-    : { chain: chain.id };
+    // globally shared SQL replacements
+    const communityOptions = community
+      ? 'community = :community'
+      : 'chain = :chain';
+    const replacements = community
+      ? { community: community.id }
+      : { chain: chain.id };
 
-  // parallelized queries
-  const [
-    topics,
-    threadsCommentsReactions,
-    admins,
-    mostActiveUsers,
-    threadsInVoting,
-  ] = await (<
-    Promise<
-      [
-        OffchainTopicInstance[],
-        unknown,
-        RoleInstance[],
-        unknown,
-        OffchainThreadInstance[]
-      ]
-    >
-  >Promise.all([
-    // topics
-    models.OffchainTopic.findAll({
-      where: community
-        ? { community_id: community.id }
-        : { chain_id: chain.id },
-    }),
-    // threads, comments, reactions
-    new Promise(async (resolve, reject) => {
-      try {
-        const threadParams = Object.assign(replacements, { pinned: true });
-        const pinnedThreads = await models.OffchainThread.findAll({
-          where: threadParams,
-          include: [
-            {
-              model: models.Address,
-              as: 'Address',
-            },
-            {
-              model: models.Address,
-              // through: models.Collaboration,
-              as: 'collaborators',
-            },
-            {
-              model: models.OffchainTopic,
-              as: 'topic',
-            },
-            {
-              model: models.ChainEntity,
-            },
-          ],
-          attributes: { exclude: ['version_history'] },
-        });
+    // parallelized queries
+    const [
+      topics,
+      threadsCommentsReactions,
+      admins,
+      mostActiveUsers,
+      threadsInVoting,
+    ] = await (<
+      Promise<
+        [
+          OffchainTopicInstance[],
+          unknown,
+          RoleInstance[],
+          unknown,
+          OffchainThreadInstance[]
+        ]
+      >
+    >Promise.all([
+      // topics
+      models.OffchainTopic.findAll({
+        where: community
+          ? { community_id: community.id }
+          : { chain_id: chain.id },
+      }),
+      // threads, comments, reactions
+      new Promise(async (resolve, reject) => {
+        try {
+          const threadParams = Object.assign(replacements, { pinned: true });
+          const pinnedThreads = await models.OffchainThread.findAll({
+            where: threadParams,
+            include: [
+              {
+                model: models.Address,
+                as: 'Address',
+              },
+              {
+                model: models.Address,
+                // through: models.Collaboration,
+                as: 'collaborators',
+              },
+              {
+                model: models.OffchainTopic,
+                as: 'topic',
+              },
+              {
+                model: models.ChainEntity,
+              },
+            ],
+            attributes: { exclude: ['version_history'] },
+          });
 
-        const query = `
+          const query = `
           SELECT addr.id AS addr_id, addr.address AS addr_address,
             addr.chain AS addr_chain, thread_id, thread_title,
             thread_community, thread_chain, thread_created, threads.kind, threads.stage, threads.snapshot_proposal,
@@ -146,158 +147,161 @@ const bulkOffchain = async (
           LEFT JOIN "OffchainTopics" topics
           ON threads.topic_id = topics.id`;
 
-        let preprocessedThreads;
-        try {
-          preprocessedThreads = await models.sequelize.query(query, {
-            replacements,
-            type: QueryTypes.SELECT,
+          let preprocessedThreads;
+          try {
+            preprocessedThreads = await models.sequelize.query(query, {
+              replacements,
+              type: QueryTypes.SELECT,
+            });
+          } catch (e) {
+            console.log(e);
+          }
+
+          const root_ids = [];
+          const threads = preprocessedThreads.map((t) => {
+            const root_id = `discussion_${t.thread_id}`;
+            root_ids.push(root_id);
+            const collaborators = JSON.parse(t.collaborators[0]).address?.length
+              ? t.collaborators.map((c) => JSON.parse(c))
+              : [];
+            const chain_entities = JSON.parse(t.chain_entities[0]).id
+              ? t.chain_entities.map((c) => JSON.parse(c))
+              : [];
+            const last_edited = getLastEdited(t);
+
+            const data = {
+              id: t.thread_id,
+              title: t.thread_title,
+              url: t.url,
+              body: t.body,
+              last_edited,
+              kind: t.kind,
+              stage: t.stage,
+              read_only: t.read_only,
+              pinned: t.pinned,
+              community: t.thread_community,
+              chain: t.thread_chain,
+              created_at: t.thread_created,
+              collaborators,
+              chain_entities,
+              snapshot_proposal: t.snapshot_proposal,
+              offchain_voting_options: t.offchain_voting_options,
+              offchain_voting_votes: t.offchain_voting_votes,
+              offchain_voting_ends_at: t.offchain_voting_ends_at,
+              Address: {
+                id: t.addr_id,
+                address: t.addr_address,
+                chain: t.addr_chain,
+              },
+            };
+            if (t.topic_id) {
+              data['topic'] = {
+                id: t.topic_id,
+                name: t.topic_name,
+                description: t.topic_description,
+                communityId: t.topic_community,
+                chainId: t.topic_chain,
+                telegram: t.telegram,
+              };
+            }
+            return data;
           });
+
+          const allThreads = pinnedThreads.map((t) => {
+            root_ids.push(`discussion_${t.id}`);
+            return t.toJSON();
+          });
+
+          resolve([allThreads]);
         } catch (e) {
           console.log(e);
+          reject(new Error('Could not fetch threads, comments, or reactions'));
         }
-
-        const root_ids = [];
-        const threads = preprocessedThreads.map((t) => {
-          const root_id = `discussion_${t.thread_id}`;
-          root_ids.push(root_id);
-          const collaborators = JSON.parse(t.collaborators[0]).address?.length
-            ? t.collaborators.map((c) => JSON.parse(c))
-            : [];
-          const chain_entities = JSON.parse(t.chain_entities[0]).id
-            ? t.chain_entities.map((c) => JSON.parse(c))
-            : [];
-          const last_edited = getLastEdited(t);
-
-          const data = {
-            id: t.thread_id,
-            title: t.thread_title,
-            url: t.url,
-            body: t.body,
-            last_edited,
-            kind: t.kind,
-            stage: t.stage,
-            read_only: t.read_only,
-            pinned: t.pinned,
-            community: t.thread_community,
-            chain: t.thread_chain,
-            created_at: t.thread_created,
-            collaborators,
-            chain_entities,
-            snapshot_proposal: t.snapshot_proposal,
-            offchain_voting_options: t.offchain_voting_options,
-            offchain_voting_votes: t.offchain_voting_votes,
-            offchain_voting_ends_at: t.offchain_voting_ends_at,
-            Address: {
-              id: t.addr_id,
-              address: t.addr_address,
-              chain: t.addr_chain,
+      }),
+      // admins
+      models.Role.findAll({
+        where: chain
+          ? {
+              chain_id: chain.id,
+              permission: { [Op.in]: ['admin', 'moderator'] },
+            }
+          : {
+              offchain_community_id: community.id,
+              permission: { [Op.in]: ['admin', 'moderator'] },
             },
-          };
-          if (t.topic_id) {
-            data['topic'] = {
-              id: t.topic_id,
-              name: t.topic_name,
-              description: t.topic_description,
-              communityId: t.topic_community,
-              chainId: t.topic_chain,
-              telegram: t.telegram,
-            };
-          }
-          return data;
-        });
+        include: [models.Address],
+        order: [['created_at', 'DESC']],
+      }),
+      // most active users
+      new Promise(async (resolve, reject) => {
+        try {
+          const thirtyDaysAgo = new Date(
+            (new Date() as any) - 1000 * 24 * 60 * 60 * 30
+          );
+          const activeUsers = {};
+          const where = { updated_at: { [Op.gt]: thirtyDaysAgo } };
+          if (community) where['community'] = community.id;
+          else where['chain'] = chain.id;
 
-        const allThreads = pinnedThreads.map((t) => {
-          root_ids.push(`discussion_${t.id}`);
-          return t.toJSON();
-        });
+          const monthlyComments = await models.OffchainComment.findAll({
+            where,
+            include: [models.Address],
+          });
+          const monthlyThreads = await models.OffchainThread.findAll({
+            where,
+            attributes: { exclude: ['version_history'] },
+            include: [{ model: models.Address, as: 'Address' }],
+          });
 
-        resolve([allThreads]);
-      } catch (e) {
-        console.log(e);
-        reject(new Error('Could not fetch threads, comments, or reactions'));
-      }
-    }),
-    // admins
-    models.Role.findAll({
-      where: chain
-        ? {
-            chain_id: chain.id,
-            permission: { [Op.in]: ['admin', 'moderator'] },
-          }
-        : {
-            offchain_community_id: community.id,
-            permission: { [Op.in]: ['admin', 'moderator'] },
-          },
-      include: [models.Address],
-      order: [['created_at', 'DESC']],
-    }),
-    // most active users
-    new Promise(async (resolve, reject) => {
-      try {
-        const thirtyDaysAgo = new Date(
-          (new Date() as any) - 1000 * 24 * 60 * 60 * 30
-        );
-        const activeUsers = {};
-        const where = { updated_at: { [Op.gt]: thirtyDaysAgo } };
-        if (community) where['community'] = community.id;
-        else where['chain'] = chain.id;
-
-        const monthlyComments = await models.OffchainComment.findAll({
-          where,
-          include: [models.Address],
-        });
-        const monthlyThreads = await models.OffchainThread.findAll({
-          where,
-          attributes: { exclude: ['version_history'] },
-          include: [{ model: models.Address, as: 'Address' }],
-        });
-
-        // @ts-ignore
-        monthlyComments.concat(monthlyThreads).forEach((post) => {
-          if (!post.Address) return;
-          const addr = post.Address.address;
-          if (activeUsers[addr]) activeUsers[addr]['count'] += 1;
-          else
-            activeUsers[addr] = {
-              info: post.Address,
-              count: 1,
-            };
-        });
-        const mostActiveUsers_ = Object.values(activeUsers).sort((a, b) => {
-          return (b as any).count - (a as any).count;
-        });
-        resolve(mostActiveUsers_);
-      } catch (e) {
-        reject(new Error('Could not fetch most active users'));
-      }
-    }),
-    models.sequelize.query(
-      `
+          // @ts-ignore
+          monthlyComments.concat(monthlyThreads).forEach((post) => {
+            if (!post.Address) return;
+            const addr = post.Address.address;
+            if (activeUsers[addr]) activeUsers[addr]['count'] += 1;
+            else
+              activeUsers[addr] = {
+                info: post.Address,
+                count: 1,
+              };
+          });
+          const mostActiveUsers_ = Object.values(activeUsers).sort((a, b) => {
+            return (b as any).count - (a as any).count;
+          });
+          resolve(mostActiveUsers_);
+        } catch (e) {
+          reject(new Error('Could not fetch most active users'));
+        }
+      }),
+      models.sequelize.query(
+        `
      SELECT id, title, stage FROM "OffchainThreads"
      WHERE ${communityOptions} AND (stage = 'proposal_in_review' OR stage = 'voting')`,
-      {
-        replacements,
-        type: QueryTypes.SELECT,
-      }
-    ),
-  ]));
+        {
+          replacements,
+          type: QueryTypes.SELECT,
+        }
+      ),
+    ]));
 
-  const [threads, comments] = threadsCommentsReactions as any;
+    const [threads, comments] = threadsCommentsReactions as any;
 
-  const numVotingThreads = threadsInVoting.filter(
-    (t) => t.stage === 'voting'
-  ).length;
+    const numVotingThreads = threadsInVoting.filter(
+      (t) => t.stage === 'voting'
+    ).length;
 
-  return res.json({
-    status: 'Success',
-    result: {
-      topics: topics.map((t) => t.toJSON()),
-      numVotingThreads,
-      threads, // already converted to JSON earlier
-      admins: admins.map((a) => a.toJSON()),
-      activeUsers: mostActiveUsers,
-    },
-  });
+    return res.json({
+      status: 'Success',
+      result: {
+        topics: topics.map((t) => t.toJSON()),
+        numVotingThreads,
+        threads, // already converted to JSON earlier
+        admins: admins.map((a) => a.toJSON()),
+        activeUsers: mostActiveUsers,
+      },
+    });
+  } catch (error) {
+    console.log('caught the error', error);
+  }
 };
 
 export default bulkOffchain;
