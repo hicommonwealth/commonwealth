@@ -452,6 +452,7 @@ async function initializer(): Promise<void> {
 
   // these requests cannot work locally
   if ((process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') && process.env.USE_SLIDER_SCALING) {
+    log.info('Connecting to Heroku API');
     // get all dyno's list
     const res = await fetch(
       `https://api.heroku.com/apps/${process.env.HEROKU_APP_NAME}/dynos`,
