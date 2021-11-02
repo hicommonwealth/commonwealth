@@ -14,7 +14,7 @@ import {
 
 import app from 'state';
 import { OffchainThread } from 'models';
-import { ILinkedThreadRelation } from 'client/scripts/models/OffchainThread';
+import { LinkedThreadRelation } from 'client/scripts/models/OffchainThread';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { searchThreadTitles } from 'helpers/search';
 import { formatAddressShort } from '../../../../shared/utils';
@@ -38,7 +38,6 @@ const renderThreadPreview = (state, thread: OffchainThread, idx: number) => {
 
 // The thread-to-thread relationship is comprised of linked and linking threads,
 // i.e. child and parent nodes.
-// Todo: would parent/child be conceptually clearer as handles?
 
 export const ThreadSelector: m.Component<
   {
@@ -72,7 +71,7 @@ export const ThreadSelector: m.Component<
       app.threads
         .fetchThreadsFromId(
           linkingThread.linkedThreads.map(
-            (relation: ILinkedThreadRelation) => relation.linked_thread
+            (relation: LinkedThreadRelation) => relation.linked_thread
           )
         )
         .then((result) => {

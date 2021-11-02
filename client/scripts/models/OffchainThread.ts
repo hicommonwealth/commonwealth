@@ -18,7 +18,7 @@ interface IOffchainVotingOptions {
   choices: string[];
 }
 
-export interface ILinkedThreadRelation {
+export interface LinkedThreadRelation {
   id: string;
   linked_thread: string;
   linking_thread: string;
@@ -55,7 +55,7 @@ class OffchainThread implements IUniqueId {
   public readonly community: string;
   public readonly chain: string;
   public readonly lastEdited: moment.Moment;
-  public readonly linkedThreads: ILinkedThreadRelation[];
+  public readonly linkedThreads: LinkedThreadRelation[];
   public snapshotProposal: string;
 
   public get uniqueIdentifier() {
@@ -182,7 +182,7 @@ class OffchainThread implements IUniqueId {
     offchainVotingEndsAt?: string | moment.Moment | null;
     offchainVotingNumVotes?: number;
     offchainVotes?: OffchainVote[];
-    linkedThreads: any;
+    linkedThreads: LinkedThreadRelation[];
   }) {
     this.author = author;
     this.title = title;

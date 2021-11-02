@@ -18,7 +18,6 @@ export const searchThreadTitles = async (
       results_size: resultSize,
       thread_title_only: true,
     });
-    console.log(response);
     if (response.status !== 'Success') {
       throw new Error(`Got unsuccessful status: ${response.status}`);
     }

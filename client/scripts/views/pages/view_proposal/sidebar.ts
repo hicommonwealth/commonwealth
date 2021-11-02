@@ -9,7 +9,7 @@ import {
   chainEntityTypeToProposalName,
 } from 'identifiers';
 import { OffchainThread } from 'models';
-import { ILinkedThreadRelation } from 'client/scripts/models/OffchainThread';
+import { LinkedThreadRelation } from 'client/scripts/models/OffchainThread';
 import { SnapshotProposal } from 'client/scripts/helpers/snapshot_utils';
 import LinkedThreadModal from '../../modals/linked_thread_modal';
 import { slugify } from '../../../../../shared/utils';
@@ -134,7 +134,7 @@ export const ProposalLinkedThreadsEditorModule: m.Component<{
         app.threads
           .fetchThreadsFromId(
             proposal.linkedThreads.map(
-              (relation: ILinkedThreadRelation) => relation.linked_thread
+              (relation: LinkedThreadRelation) => relation.linked_thread
             )
           )
           .then((result) => {

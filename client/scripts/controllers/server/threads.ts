@@ -602,7 +602,6 @@ class ThreadsController {
     if (response.status !== 'Success') {
       throw new Error(`Cannot fetch thread: ${response.status}`);
     }
-    console.log(response.result);
     return response.result.map((rawThread) => {
       const thread = modelFromServer(rawThread);
       const existing = this._store.getByIdentifier(thread.id);
@@ -719,7 +718,6 @@ class ThreadsController {
         // so when we want just chain threads, then we have to filter away those that have a community
         const { threads, numVotingThreads } = response.result;
         for (const thread of threads) {
-          console.log({ threads });
           // TODO: OffchainThreads should always have a linked Address
           if (!thread.Address) {
             console.error('OffchainThread missing address');

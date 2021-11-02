@@ -36,11 +36,7 @@ const search = async (
     const params = {
       title: {
         [Op.or]: [
-          { [Op.iLike]: `%${encodedSearchTerm}` },
-          { [Op.iLike]: `${encodedSearchTerm}%` },
           { [Op.iLike]: `%${encodedSearchTerm}%` },
-          { [Op.iLike]: `%${req.query.search}` },
-          { [Op.iLike]: `${req.query.search}%` },
           { [Op.iLike]: `%${req.query.search}%` },
         ]
       },
