@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import Web3 from 'web3';
 import { sequelize, DB } from '../database';
-import { INFURA_API_KEY } from '../config';
 import { ChainBase, ChainNetwork, ChainType } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
@@ -17,7 +16,7 @@ const getTokenForum = async (
   if (!address) {
     return res.json({ status: 'Failure', message: 'Must provide token address' });
   }
-  const web3 = new Web3(new Web3.providers.HttpProvider(`https://mainnet.infura.io/v3/${INFURA_API_KEY}`));
+  const web3 = new Web3(new Web3.providers.HttpProvider(`https://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr`));
   const code = await web3.eth.getCode(address);
   if (code === '0x') {
     // Account returns 0x, Smart contract returns bytecode
@@ -46,7 +45,7 @@ const getTokenForum = async (
           where: { chain: token.id },
           defaults: {
             chain: token.id,
-            url: 'wss://mainnet.infura.io/ws',
+            url: 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
             address: token.address,
           },
           transaction: t,

@@ -191,7 +191,7 @@ async function mainProcess(
           'erc20',
           SupportedNetwork.ERC20,
           {
-            url: 'wss://mainnet.infura.io/ws',
+            url: 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
             tokenAddresses: erc20TokenAddresses,
             tokenNames: erc20TokenNames,
             verbose: false,
@@ -451,7 +451,7 @@ async function initializer(): Promise<void> {
   });
 
   // these requests cannot work locally
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.NODE_ENV === 'production' && process.env.USE_SLIDER_SCALING) {
     // get all dyno's list
     const res = await fetch(
       `https://api.heroku.com/apps/${process.env.HEROKU_APP_NAME}/dynos`,
@@ -525,8 +525,8 @@ async function initializer(): Promise<void> {
       }
     }
   } else {
-    workerNumber = 0;
-    numWorkers = 1;
+    workerNumber = Number(process.env.WORKER_NUMBER) || 0;
+    numWorkers = Number(process.env.NUM_WORKERS) || 1;
   }
 
   log.info(`Worker Number: ${workerNumber}\nNumber of Workers: ${numWorkers}`);
