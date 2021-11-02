@@ -393,7 +393,7 @@ export async function initNewTokenChain(address: string) {
   }
   const { chain, node } = response.result;
   const chainInfo = ChainInfo.fromJSON(chain);
-  const nodeInfo = new NodeInfo(node.id, chainInfo, node.url, node.address);
+  const nodeInfo = new NodeInfo(node);
   if (!app.config.chains.getById(chainInfo.id)) {
     app.config.chains.add(chainInfo);
     app.config.nodes.add(nodeInfo);

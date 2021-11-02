@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import Web3 from 'web3';
 import { Op } from 'sequelize';
-import { urlHasValidHTTPPrefix } from '../../shared/utils';
+import { urlHasValidHTTPPrefix, wsToHttp } from '../../shared/utils';
 import { DB } from '../database';
 
 import { ChainBase } from '../../shared/types';
@@ -17,6 +17,7 @@ export const Errors = {
   NoBase: 'Must provide chain base',
   NoNodeUrl: 'Must provide node url',
   InvalidNodeUrl: 'Node url must begin with http://, https://, ws://, wss://',
+  MustBeWs: 'Node must support websockets on ethereum',
   InvalidBase: 'Must provide valid chain base',
   ChainAddressExists: 'The address already exists',
   ChainIDExists: 'The id for this chain already exists, please choose another id',
@@ -38,6 +39,12 @@ const createChain = async (
 ) => {
   if (!req.user) {
     return next(new Error('Not logged in'));
+  }
+  if (!req.body.node_url || !req.body.node_url.trim()) {
+    return next(new Error(Errors.InvalidNodeUrl));
+  }
+  if (!urlHasValidHTTPPrefix(req.body.node_url) && !req.body.node_url.match(/wss?:\/\//)) {
+    return next(new Error(Errors.InvalidNodeUrl));
   }
   if (!req.body.name || !req.body.name.trim()) {
     return next(new Error(Errors.NoName));
@@ -68,7 +75,11 @@ const createChain = async (
     if (!Web3.utils.isAddress(req.body.address)) {
       return next(new Error(Errors.InvalidAddress));
     }
-    const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr'));
+    if (urlHasValidHTTPPrefix(req.body.node_url)) {
+      return next(new Error(Errors.MustBeWs));
+    }
+    const httpNode = wsToHttp(req.body.node_url);
+    const web3 = new Web3(new Web3.providers.HttpProvider(httpNode));
     const code = await web3.eth.getCode(req.body.address);
     if (code === '0x') {
       return next(new Error(Errors.InvalidAddress));
@@ -82,16 +93,7 @@ const createChain = async (
     }
   }
 
-  const { website, discord, element, telegram, github, icon_url, node_url, network } = req.body;
-
-  if (!node_url || !node_url.trim()) {
-    return next(new Error(Errors.NoNodeUrl));
-  }
-
-  if (!urlHasValidHTTPPrefix(node_url) && !node_url.startsWith('ws://') && !node_url.startsWith('wss://')) {
-    return next(new Error(Errors.InvalidNodeUrl));
-  }
-
+  const { website, discord, element, telegram, github, icon_url } = req.body;
   if (website && !urlHasValidHTTPPrefix(website)) {
     return next(new Error(Errors.InvalidWebsite));
   } else if (discord && !urlHasValidHTTPPrefix(discord)) {
@@ -138,6 +140,7 @@ const createChain = async (
     chain: req.body.id,
     url: req.body.node_url,
     address: req.body.address,
+    eth_chain_id: +req.body.eth_chain_id || null,
   };
   const node = await models.ChainNode.create(chainNodeContent);
 

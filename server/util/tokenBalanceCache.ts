@@ -4,18 +4,20 @@ import BN from 'bn.js';
 import { providers } from 'ethers';
 
 import { ERC20__factory } from '../../shared/eth/types';
-import { TokenResponse } from '../../shared/types';
 
 import JobRunner from './cacheJobRunner';
-import { slugify } from '../../shared/utils';
 
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
+import { ChainNodeInstance } from '../models/chain_node';
+import { wsToHttp } from '../../shared/utils';
 
 const log = factory.getLogger(formatFilename(__filename));
 
 // map of addresses to balances
 interface CacheT {
+  // TODO: should we add another layer/identifier here,
+  // in case two contracts collide across ETH networks ?
   [contract: string]: {
     [address: string]: {
       balance: BN,
@@ -34,28 +36,12 @@ export interface TokenForumMeta {
   decimals: number;
 }
 
-export class TokenBalanceProvider {
-  private _provider: providers.Web3Provider;
-  constructor(private _network = 'mainnet') {
-    let web3Provider;
-    if (this._network === 'mainnet') {
-      web3Provider = new Web3.providers.HttpProvider(`https://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr`);
-    } else if (this._network === 'ropsten') {
-      web3Provider = new Web3.providers.HttpProvider(`https://eth-ropsten.alchemyapi.io/v2/2xXT2xx5AvA3GFTev3j_nB9LzWdmxPk7`);
-    } else {
-      throw new Error('invalid network');
-    }
-    this._provider = new providers.Web3Provider(web3Provider);
-    // 12s minute polling interval (default is 4s)
-    this._provider.pollingInterval = 12000;
-  }
-
-  public async getBalance(tokenAddress: string, userAddress: string): Promise<BN> {
-    const api = ERC20__factory.connect(tokenAddress, this._provider);
-    await api.deployed();
-    const balanceBigNum = await api.balanceOf(userAddress);
-    return new BN(balanceBigNum.toString());
-  }
+async function getBalance(url: string, tokenAddress: string, userAddress: string): Promise<BN> {
+  const provider = new Web3.providers.HttpProvider(url);
+  const api = ERC20__factory.connect(tokenAddress, new providers.Web3Provider(provider));
+  await api.deployed();
+  const balanceBigNum = await api.balanceOf(userAddress);
+  return new BN(balanceBigNum.toString());
 }
 
 export default class TokenBalanceCache extends JobRunner<CacheT> {
@@ -64,7 +50,6 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     models: DB,
     noBalancePruneTimeS: number = 5 * 60,
     private readonly _hasBalancePruneTimeS: number = 24 * 60 * 60,
-    private readonly _balanceProvider = new TokenBalanceProvider(),
   ) {
     super({}, noBalancePruneTimeS);
     this.models = models;
@@ -96,10 +81,13 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
   }
 
   // query a user's balance on a given token contract and save in cache
-  public async getBalance(contractId: string, address: string, network = 'mainnet'): Promise<BN> {
+  public async getBalance(contractId: string, address: string, url?: string): Promise<BN> {
     const tokenMeta = await this.models.ChainNode.findOne({ where: { chain: contractId } })
       || await this.models.Token.findOne({ where: { id: contractId } });
     if (!tokenMeta?.address) throw new Error('unsupported token');
+    const tokenUrl = (tokenMeta as ChainNodeInstance)?.url || url;
+    if (!url) throw new Error('no token url found');
+    const tokenUrlHttp = wsToHttp(tokenUrl);
 
     // first check the cache for the token balance
     const result = await this.access((async (c: CacheT): Promise<BN | undefined> => {
@@ -114,7 +102,7 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     // fetch balance if not found in cache
     let balance: BN;
     try {
-      balance = await this._balanceProvider.getBalance(tokenMeta.address, address);
+      balance = await getBalance(tokenUrlHttp, tokenMeta.address, address);
     } catch (e) {
       throw new Error(`Could not fetch token balance: ${e.message}`);
     }

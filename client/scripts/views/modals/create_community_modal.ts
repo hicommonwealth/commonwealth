@@ -425,9 +425,9 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
               github,
               substrate_spec,
               jwt: app.user.jwt,
-              type: 'chain',
+              type: ChainType.Chain,
               id: slugify(name),
-              base: 'substrate',
+              base: ChainBase.Substrate,
               network: slugify(name),
             })
               .then(async (res) => {
@@ -750,10 +750,12 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
               telegram,
               github,
               jwt: app.user.jwt,
-              type: 'token',
-              base: 'ethereum',
-              network: slugify(name),
+              type: ChainType.Token,
+              base: ChainBase.Ethereum,
+              network: ChainNetwork.ERC20,
+              // TODO: support other networks
               node_url: 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
+              eth_chain_id: '1',
             })
               .then(async (res) => {
                 await initAppState(false);
@@ -897,7 +899,9 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
             type: ChainType.Token,
             base: ChainBase.Ethereum,
             network: ChainNetwork.ERC20,
+            // TODO: support other networks
             node_url: 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
+            eth_chain_id: '1',
           })
             .then(async (res) => {
               await initAppState(false);
