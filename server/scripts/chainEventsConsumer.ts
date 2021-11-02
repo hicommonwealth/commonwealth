@@ -71,7 +71,7 @@ const setupChainEventListeners = async (wss: WebSocket.Server): Promise<{}> => {
         prevResult = await handler.handle(event, prevResult);
       } catch (err) {
         log.error(
-          `Event handle ${handler.constructor.name} failed to process the following event: ${JSON.stringify(
+          `Event handler ${handler.constructor.name} failed to process the following event: ${JSON.stringify(
             event,
             null,
             2
