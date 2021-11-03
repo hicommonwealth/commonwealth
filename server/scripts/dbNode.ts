@@ -463,8 +463,6 @@ async function initializer(): Promise<void> {
     log.error('Unexpected error on idle client', err);
   });
 
-  log.info(`NODE_ENV: ${process.env.NODE_ENV}\tUSE_SLIDER_SCALING: ${process.env.USE_SLIDER_SCALING}`)
-  log.info(`Condition: ${(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') && process.env.USE_SLIDER_SCALING === 'true'}`)
   // these requests cannot work locally
   if ((process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') && process.env.USE_SLIDER_SCALING === 'true') {
     log.info('Connecting to Heroku API');
