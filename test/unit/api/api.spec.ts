@@ -16,7 +16,7 @@ describe('API Tests', function () {
       console.log('making chai request');
       res = await chai
         .request(app)
-        .get('/api/bulkOffchain?chain=nonexistentchain')
+        .get('/api/viewOffchainVotes?chain=nonexistentchain')
         .set('Accept', 'application/json');
       console.log('received chai request');
     } catch (error) {

@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { DB } from '../database';
+import { AppError } from '../util/errors';
 
 export const Errors = {
   InvalidThread: 'Invalid thread',
@@ -17,7 +18,9 @@ const viewOffchainVotes = async (
     req.query,
     req.user
   );
-  if (error) return next(new Error(error));
+  if (error) {
+    throw new AppError(error);
+  }
 
   if (!req.query.thread_id) {
     return next(new Error(Errors.InvalidThread));
