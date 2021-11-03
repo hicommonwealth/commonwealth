@@ -25,6 +25,7 @@ import ViewCountCache from './server/util/viewCountCache';
 import IdentityFetchCache from './server/util/identityFetchCache';
 import TokenBalanceCache from './server/util/tokenBalanceCache';
 import { MockTokenBalanceProvider } from './test/util/modelUtils';
+import { ServerError, AppError } from './server/util/errors';
 
 require('express-async-errors');
 
@@ -81,16 +82,50 @@ app.use((req, res, next) => {
 });
 
 const setupErrorHandlers = () => {
-  // catch 404 and forward to error handler
-  app.use((req, res, next) => {
-    const err: any = new Error('Not Found');
-    err.status = 404;
-    next(err);
-  });
-
-  app.use((err, req, res, next) => {
-    res.status(err.status || 500);
-    res.json({ error: err.message });
+  // Handle server and application errors.
+  // 401 Unauthorized errors are handled by Express' middleware and returned
+  // before this handler.
+  // Errors that hit the final condition should be either (1) thrown as
+  // ServerErrors or AppErrors or (2) triaged as a bug.
+  app.use((error, req, res, next) => {
+    console.log('hit error handler');
+    if (error instanceof ServerError) {
+      console.log('ServerError', error);
+      res.status(error.status).send({
+        error: {
+          status: error.status,
+          // Use external facing error message
+          message: 'Server error, please try again later.',
+        },
+      });
+    } else if (error instanceof AppError) {
+      console.log('AppError', error);
+      res.status(error.status).send({
+        error: {
+          status: error.status,
+          message: error.message,
+        },
+      });
+    } else if (error.status === 404) {
+      res.status(error.status);
+      res.json({
+        error: {
+          status: error.status,
+          message: 'The server can not find the requested resource.',
+        },
+      });
+    } else {
+      console.log('Other Error', error);
+      res.status(500);
+      res.json({
+        error: {
+          status: error.status,
+          message:
+            error.message ||
+            'Server error, unknown error thrown. Please try again later.',
+        },
+      });
+    }
   });
 };
 
@@ -269,7 +304,11 @@ const resetServer = (debug = false): Promise<void> => {
 
       const nodes = [
         ['mainnet1.edgewa.re', 'edgeware', null],
-        ['wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr', 'ethereum', null],
+        [
+          'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
+          'ethereum',
+          null,
+        ],
         [
           'wss://eth-ropsten.alchemyapi.io/v2/2xXT2xx5AvA3GFTev3j_nB9LzWdmxPk7',
           'alex',
