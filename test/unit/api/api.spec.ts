@@ -13,10 +13,12 @@ describe('API Tests', function () {
       'trying test: Should receive a 400 error when requesting nonexistent chain'
     );
     try {
+      console.log('making chai request');
       res = await chai
         .request(app)
         .get('/api/bulkOffchain?chain=nonexistentchain')
         .set('Accept', 'application/json');
+      console.log('received chai request');
     } catch (error) {
       console.log('error encountered', error);
     }

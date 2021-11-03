@@ -26,12 +26,18 @@ const bulkOffchain = async (
   next: NextFunction
 ) => {
   try {
+    const modles = await models.sequelize.getQueryInterface().showAllSchemas();
+    console.log('we got the models', modles);
+
     const [chain, community, error] = await lookupCommunityIsVisibleToUser(
       models,
       req.query,
       req.user
     );
-    if (error) throw new AppError(error);
+    if (error) {
+      console.log('error looking up community', error);
+      throw new AppError(error);
+    }
 
     // globally shared SQL replacements
     const communityOptions = community

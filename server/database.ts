@@ -155,7 +155,6 @@ export interface DB extends Models {
 
 const log = factory.getLogger(formatFilename(__filename));
 
-console.log('DATABASE_URI', DATABASE_URI);
 export const sequelize = new Sequelize(DATABASE_URI, {
   // disable string operators (https://github.com/sequelize/sequelize/issues/8417)
   // operatorsAliases: false,
