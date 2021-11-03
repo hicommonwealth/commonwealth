@@ -72,7 +72,6 @@ class Erc20LoggingHandler extends IEventHandler {
     super();
   }
   public async handle(event: CWEvent): Promise<undefined> {
-    if (!event.chain) log.info(`???????????????????????????? RECEIVED NULL CHAIN EVENT: ${JSON.stringify(event, null, 2)}`)
     if (this.tokenNames.includes(event.chain)) {
       // if logger for this specific token doesn't exist, create it - decreases computational cost of logging
       if (!this.logger[event.chain])
