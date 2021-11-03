@@ -186,7 +186,6 @@ export async function selectCommunity(c?: CommunityInfo): Promise<boolean> {
   await deinitChainOrCommunity();
   document.title = `Commonwealth – ${c.name}`;
 
-
   // Begin initializing the community
   const newCommunity = new Community(c, app);
   const finalizeInitialization = await newCommunity.init();
@@ -214,7 +213,6 @@ export async function selectCommunity(c?: CommunityInfo): Promise<boolean> {
 // initChain fn ought to proceed or abort
 export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolean> {
   // Select the default node, if one wasn't provided
-
   if (!n) {
     if (app.user.selectedNode) {
       n = app.user.selectedNode;
@@ -383,7 +381,6 @@ export async function initChain(): Promise<void> {
 
 export function initCommunity(communityId: string): Promise<boolean> {
   const community = app.config.communities.getByCommunity(communityId);
-
   if (community && community.length > 0) {
     return selectCommunity(community[0]);
   } else {
