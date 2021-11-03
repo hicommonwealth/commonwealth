@@ -3,22 +3,34 @@ import m from 'mithril';
 import app from 'state';
 import moment from 'moment';
 import { ProposalType } from 'types';
+import { IChainEntityKind } from '@commonwealth/chain-events';
 import { IUniqueId } from './interfaces';
 import { OffchainThreadKind, OffchainThreadStage } from './types';
 import OffchainAttachment from './OffchainAttachment';
 import OffchainTopic from './OffchainTopic';
 import OffchainVote from './OffchainVote';
 import { VersionHistory } from '../controllers/server/threads';
+import { ChainEntity } from '.';
 
 // field names copied from snapshot
-interface OffchainVotingOptions {
+interface IOffchainVotingOptions {
   name: string;
   choices: string[];
 }
 
+export interface LinkedThreadRelation {
+  id: string;
+  linked_thread: string;
+  linking_thread: string;
+}
+
+interface IThreadCollaborator {
+  address: string;
+  chain: string;
+}
 class OffchainThread implements IUniqueId {
   public readonly author: string;
-  public collaborators?: any[];
+  public collaborators?: IThreadCollaborator[];
   public chainEntities?: any[];
   public readonly authorChain: string;
   public readonly title: string;
@@ -43,6 +55,7 @@ class OffchainThread implements IUniqueId {
   public readonly community: string;
   public readonly chain: string;
   public readonly lastEdited: moment.Moment;
+  public readonly linkedThreads: LinkedThreadRelation[];
   public snapshotProposal: string;
 
   public get uniqueIdentifier() {
@@ -55,7 +68,7 @@ class OffchainThread implements IUniqueId {
     // return _hasOffchainPoll;
   }
 
-  public offchainVotingOptions: OffchainVotingOptions;
+  public offchainVotingOptions: IOffchainVotingOptions;
   public offchainVotingNumVotes: number;
   public offchainVotingEndsAt: moment.Moment | null;
   public offchainVotes: OffchainVote[]; // lazy loaded
@@ -141,6 +154,7 @@ class OffchainThread implements IUniqueId {
     offchainVotingNumVotes,
     offchainVotes,
     latestCommCreatedAt,
+    linkedThreads,
   }: {
     author: string;
     title: string;
@@ -168,6 +182,7 @@ class OffchainThread implements IUniqueId {
     offchainVotingEndsAt?: string | moment.Moment | null;
     offchainVotingNumVotes?: number;
     offchainVotes?: OffchainVote[];
+    linkedThreads: LinkedThreadRelation[];
   }) {
     this.author = author;
     this.title = title;
@@ -193,9 +208,11 @@ class OffchainThread implements IUniqueId {
       ? chainEntities.map((ce) => {
           return {
             id: +ce.id,
+            chain,
             type: ce.type,
             typeId: ce.type_id,
             completed: ce.completed,
+            author,
           };
         })
       : [];
@@ -209,6 +226,7 @@ class OffchainThread implements IUniqueId {
     this.offchainVotingNumVotes = offchainVotingNumVotes;
     this.offchainVotes = offchainVotes || [];
     this.lastEdited = lastEdited;
+    this.linkedThreads = linkedThreads;
   }
 }
 
