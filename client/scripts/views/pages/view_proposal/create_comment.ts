@@ -146,7 +146,8 @@ const CreateComment: m.Component<{
     disabled = getSetGlobalEditingStatus(GlobalStatus.Get)
       || vnode.state.quillEditorState?.editor?.editor?.isBlank()
       || sendingComment
-      || uploadsInProgress;
+      || uploadsInProgress
+      || !app.isLoggedIn();
 
     // token balance check if needed
     let tokenPostingThreshold = null;
@@ -202,6 +203,7 @@ const CreateComment: m.Component<{
             }),
             m(QuillEditor, {
               contentsDoc: '',
+              
               oncreateBind: (state) => {
                 vnode.state.quillEditorState = state;
               },
