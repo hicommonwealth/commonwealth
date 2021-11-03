@@ -203,7 +203,6 @@ const CreateComment: m.Component<{
             }),
             m(QuillEditor, {
               contentsDoc: '',
-              
               oncreateBind: (state) => {
                 vnode.state.quillEditorState = state;
               },
