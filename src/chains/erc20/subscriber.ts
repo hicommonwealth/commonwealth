@@ -31,9 +31,11 @@ export class Subscriber extends IEventSubscriber<IErc20Contracts, RawEvent> {
       const log = factory.getLogger(
         addPrefix(__filename, [SupportedNetwork.ERC20, tokenName])
       );
-      const logStr = `[${SupportedNetwork.ERC20}::${tokenName}]: Received ${
-        this._name
-      } event: ${JSON.stringify(event, null, 2)}.`;
+      const logStr = `Received ${this._name} event: ${JSON.stringify(
+        event,
+        null,
+        2
+      )}.`;
       // eslint-disable-next-line no-unused-expressions
       this._verbose ? log.info(logStr) : log.trace(logStr);
       cb(event, tokenName);

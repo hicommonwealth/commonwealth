@@ -95,7 +95,6 @@ export async function Enrich(
       const excludeAddresses = [from.toString(), to.toString()];
 
       return {
-        chain: <never>tokenName,
         blockNumber,
         excludeAddresses,
         network: SupportedNetwork.ERC20,

@@ -36,20 +36,65 @@ const { argv } = yargs.options({
   },
 });
 
+const shortcuts = {
+  substrate: {
+    chain: 'polkadot',
+    network: SupportedNetwork.Substrate,
+    url: networkUrls.polkadot,
+    spec: networkSpecs.polkadot,
+    enricherConfig: {
+      balanceTransferThreshold: 500_000,
+    },
+  },
+  erc20: {
+    chain: 'erc20',
+    network: SupportedNetwork.ERC20,
+    url: networkUrls.erc20,
+    tokenAddresses: ['0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'],
+    tokenNames: ['usd-coin'],
+  },
+  compound: {
+    chain: 'marlin',
+    network: SupportedNetwork.Compound,
+    url: networkUrls.marlin,
+    address: contracts.marlin,
+  },
+  aave: {
+    chain: 'dydx',
+    network: SupportedNetwork.Aave,
+    url: networkUrls.dydx,
+    address: contracts.dydx,
+  },
+  moloch: {
+    chain: 'moloch',
+    network: SupportedNetwork.Moloch,
+    url: networkUrls.moloch,
+    address: contracts.moloch,
+  },
+};
+
 async function main(): Promise<any> {
   let listener;
+  let sc;
+  if (argv.network && !argv.chain) sc = shortcuts[argv.network];
   try {
-    listener = await createListener(argv.chain || 'dummyChain', argv.network, {
-      url: argv.url || networkUrls[argv.chain],
-      address: argv.contractAddress || contracts[argv.chain],
-      tokenAddresses: [argv.contractAddress],
-      tokenNames: [argv.tokenName],
-      verbose: false,
-      spec: <any>networkSpecs[argv.chain],
-      enricherConfig: {
-        balanceTransferThreshold: 500_000,
-      },
-    });
+    listener = await createListener(
+      argv.chain || sc.chain || 'dummyChain',
+      argv.network || sc.network,
+      {
+        url: argv.url || sc.url || networkUrls[argv.chain],
+        address: argv.contractAddress || sc.address || contracts[argv.chain],
+        tokenAddresses: argv.contractAddress
+          ? [argv.contractAddress]
+          : sc.tokenAddresses,
+        tokenNames: argv.tokenName ? [argv.tokenName] : sc.tokenNames,
+        verbose: false,
+        spec: sc.spec || <any>networkSpecs[argv.chain],
+        enricherConfig: sc.enricherConfig || {
+          balanceTransferThreshold: 500_000,
+        },
+      }
+    );
 
     listener.eventHandlers.logger = {
       handler: new LoggingHandler(),

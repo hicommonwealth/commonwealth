@@ -40,6 +40,7 @@ export class Processor extends IEventProcessor<IErc20Contracts, RawEvent> {
         event,
         this._enricherConfig
       );
+      cwEvent.chain = tokenName;
       return cwEvent ? [cwEvent] : [];
     } catch (e) {
       log.error(
