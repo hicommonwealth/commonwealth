@@ -51,6 +51,7 @@ import IdentityCacheFactory, {
 } from './models/identity_cache';
 import InviteCodeFactory, { InviteCodeModelStatic } from './models/invite_code';
 import InviteLinkFactory, { InviteLinkModelStatic } from './models/invite_link';
+import LinkedThread, { LinkedThreadModelStatic } from './models/linked_thread';
 import LoginTokenFactory, { LoginTokenModelStatic } from './models/login_token';
 import NotificationFactory, {
   NotificationModelStatic,
@@ -125,6 +126,7 @@ export type Models = {
   IdentityCache: IdentityCacheStatic;
   InviteCode: InviteCodeModelStatic;
   InviteLink: InviteLinkModelStatic;
+  LinkedThread: LinkedThreadModelStatic;
   LoginToken: LoginTokenModelStatic;
   Notification: NotificationModelStatic;
   NotificationCategory: NotificationCategoryModelStatic;
@@ -162,7 +164,7 @@ export const sequelize = new Sequelize(DATABASE_URI, {
     process.env.NODE_ENV === 'test'
       ? false
       : (msg) => {
-          log.trace(msg);
+          log.info(msg);
         },
   dialectOptions:
     process.env.NODE_ENV !== 'production'
@@ -205,6 +207,7 @@ const models: Models = {
   IdentityCache: IdentityCacheFactory(sequelize, DataTypes),
   InviteCode: InviteCodeFactory(sequelize, DataTypes),
   InviteLink: InviteLinkFactory(sequelize, DataTypes),
+  LinkedThread: LinkedThread(sequelize, DataTypes),
   LoginToken: LoginTokenFactory(sequelize, DataTypes),
   Notification: NotificationFactory(sequelize, DataTypes),
   NotificationCategory: NotificationCategoryFactory(sequelize, DataTypes),
