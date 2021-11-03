@@ -93,8 +93,15 @@ async function mainProcess(
     ++runCount;
   }
 
+  const activeChains: string[] = (Object.keys(listeners).map((chainName): string => {
+    if (chainName !== 'erc20') return chainName;
+    else {
+      return listeners['erc20'].tokenNames;
+    }
+  })).reduce((acc, val) => acc.concat(val), []);
+
   log.info(
-    `Starting scheduled process. Active chains: ${Object.keys(listeners)}`
+    `Starting scheduled process. Active chains: ${activeChains}`
   );
 
   let query =
