@@ -147,7 +147,7 @@ const CreateComment: m.Component<{
       || vnode.state.quillEditorState?.editor?.editor?.isBlank()
       || sendingComment
       || uploadsInProgress
-      || !app.isLoggedIn();
+      || !app.user.activeAccount;
 
     // token balance check if needed
     let tokenPostingThreshold = null;
