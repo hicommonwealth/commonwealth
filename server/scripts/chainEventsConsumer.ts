@@ -64,14 +64,13 @@ const setupChainEventListeners = async (wss: WebSocket.Server): Promise<{}> => {
 
   // feed the events into their respective handlers
   async function processClassicEvents(event: CWEvent): Promise<void> {
-    log.debug(`Received event: ${JSON.stringify(event, null, 2)}`);
     let prevResult = null;
     for (const handler of allChainEventHandlers) {
       try {
         prevResult = await handler.handle(event, prevResult);
       } catch (err) {
         log.error(
-          `Event handler ${handler.constructor.name} failed to process the following event: ${JSON.stringify(
+          `${handler.name} handler failed to process the following event: ${JSON.stringify(
             event,
             null,
             2
@@ -86,7 +85,14 @@ const setupChainEventListeners = async (wss: WebSocket.Server): Promise<{}> => {
         try {
           prevResult = await handler.handle(event, prevResult);
         } catch (err) {
-          log.error(`Substrate event handle failure: ${err.message}`);
+          log.error(
+            `${handler.name} handler failed to process the following event: ${JSON.stringify(
+              event,
+              null,
+              2
+            )}`,
+            err
+          );
           break;
         }
       }

@@ -13,6 +13,8 @@ import { addPrefix, factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 export default class extends IEventHandler {
+  private _name = 'Notification';
+
   constructor(
     private readonly _models,
     private readonly _wss?: WebSocket.Server,
@@ -60,5 +62,9 @@ export default class extends IEventHandler {
       log.error(`Failed to generate notification: ${e.message}!`);
       return dbEvent;
     }
+  }
+
+  get name(): string {
+    return this._name;
   }
 }

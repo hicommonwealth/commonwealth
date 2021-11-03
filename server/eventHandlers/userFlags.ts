@@ -10,6 +10,8 @@ import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 export default class extends IEventHandler {
+  private _name = 'User Flags';
+
   constructor(
     private readonly _models,
     private readonly _chain?: string,
@@ -77,5 +79,9 @@ export default class extends IEventHandler {
       await this.syncAddressFlags('is_validator', validators, chain);
       return dbEvent;
     }
+  }
+
+  get name(): string {
+    return this._name;
   }
 }
