@@ -130,6 +130,7 @@ const createInvite = async (models: DB, req: Request, res: Response, next: NextF
     templateId: DynamicTemplate.EmailInvite,
     dynamic_template_data: {
       community_name: inviteChainOrCommObj.community_name,
+      communityIcon: community.icon_url,
       inviter: address.name,
       joinOrLogIn,
       invite_link: signupLink,

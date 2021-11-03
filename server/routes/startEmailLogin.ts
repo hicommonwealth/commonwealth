@@ -97,6 +97,7 @@ const startEmailLogin = async (models: DB, req: Request, res: Response, next: Ne
     templateId: (previousUser) ? DynamicTemplate.SignIn : DynamicTemplate.SignUp,
     dynamic_template_data: {
       loginLink,
+      emailId: email,
     },
   };
   sgMail.send(msg).then((result) => {

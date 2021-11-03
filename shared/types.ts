@@ -160,11 +160,11 @@ export const PROFILE_BIO_MAX_CHARS = 1000;
 export const PROFILE_NAME_MIN_CHARS = 3;
 
 export const DynamicTemplate = {
-  ImmediateEmailNotification: 'd-3f30558a95664528a2427b40292fec51',
-  BatchNotifications: 'd-468624f3c2d7434c86ae0ed0e1d2227e',
+  ImmediateEmailNotification: 'd-b417bf76d0bc44909b3e3853ab936407',
+  BatchNotifications: 'd-8b622612b1b04f939a6438f4e06f1b08',
   SignIn: 'd-db52815b5f8647549d1fe6aa703d7274',
-  SignUp: 'd-2b00abbf123e4b5981784d17151e86be',
-  EmailInvite: 'd-000c08160c07459798b46c927b638b9a',
+  SignUp: 'd-7c6b1aad68c54ac2b84e926f9feac33d',
+  EmailInvite: 'd-73c587b7da8b4493a2c38e3eda59f74a',
   UpdateEmail: 'd-a0c28546fecc49fb80a3ba9e535bff48',
   VerifyAddress: 'd-292c161f1aec4d0e98a0bf8d6d8e42c2',
 };
