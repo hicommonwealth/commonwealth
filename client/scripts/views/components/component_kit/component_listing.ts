@@ -573,20 +573,6 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
         }),
       ]),
 
-      // breadcrumb
-      m(
-        Breadcrumb,
-        {
-          size: 'default',
-          seperator: m(Icon, { name: Icons.CHEVRON_RIGHT }),
-        },
-        [
-          m(BreadcrumbItem, { href: '#' }, m(Icon, { name: Icons.HOME })),
-          m(BreadcrumbItem, { href: '#' }, 'Application'),
-          m(BreadcrumbItem, 'Section 1'),
-        ]
-      ),
-
       m('div', [
         m(Tag, { size: 'xs', label: 'Extra small' }),
         m(Tag, { size: 'sm', label: 'Small' }),
