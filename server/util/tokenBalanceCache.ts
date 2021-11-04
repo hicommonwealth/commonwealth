@@ -44,6 +44,7 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     models: DB,
     noBalancePruneTimeS: number = 5 * 60,
     private readonly _hasBalancePruneTimeS: number = 24 * 60 * 60,
+    private readonly _balanceProvider = new TokenBalanceProvider(),
   ) {
     super({}, noBalancePruneTimeS);
     this.models = models;
@@ -111,7 +112,7 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
 
     let balance: BN;
     try {
-      balance = await new TokenBalanceProvider().getBalance(tokenUrlHttp, contractAddress, address);
+      balance = await this._balanceProvider.getBalance(tokenUrlHttp, contractAddress, address);
     } catch (e) {
       throw new Error(`Could not fetch token balance: ${e.message}`);
     }

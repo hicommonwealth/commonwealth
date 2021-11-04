@@ -49,15 +49,10 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     this._enabling = true;
     try {
       // Create WalletConnect Provider
-      const rpc = {
-        1: "https://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr",
-        3: "https://eth-ropsten.alchemyapi.io/v2/2xXT2xx5AvA3GFTev3j_nB9LzWdmxPk7",
-      };
-
-      // support alternative chain id / url combination
-      if (app.chain?.meta.ethChainId !== undefined) {
-        rpc[app.chain.meta.ethChainId] = app.chain.meta.url;
+      if (!app.chain?.meta.ethChainId) {
+        throw new Error(`No chain id found!`);
       }
+      const rpc = { [app.chain.meta.ethChainId]: app.chain.meta.url };
       this._provider = new WalletConnectProvider({ rpc });
 
       //  Enable session (triggers QR Code modal)
@@ -65,15 +60,15 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
       this._web3 = new Web3(this._provider as any);
       this._accounts = await this._web3.eth.getAccounts();
       if (this._accounts.length === 0) {
-        throw new Error('Could not fetch accounts from WalletConnect');
+        throw new Error('WalletConnect fetched no accounts.');
       }
 
       await this.initAccountsChanged();
       this._enabled = true;
       this._enabling = false;
     } catch (error) {
-      console.error(`Failed to enable WalletConnect: ${error.message}`);
       this._enabling = false;
+      throw new Error(`Failed to enable WalletConnect: ${error.message}`);
     }
   }
 

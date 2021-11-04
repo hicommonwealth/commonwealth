@@ -9,7 +9,7 @@ import { bech32 } from 'bech32';
 import Keyring, { decodeAddress } from '@polkadot/keyring';
 import { stringToU8a, hexToU8a } from '@polkadot/util';
 import { KeypairType } from '@polkadot/util-crypto/types';
-import ethUtil from 'ethereumjs-util';
+import * as ethUtil from 'ethereumjs-util';
 
 import { Secp256k1, Secp256k1Signature, Sha256 } from '@cosmjs/crypto';
 import { AminoSignResponse, pubkeyToAddress, serializeSignDoc, decodeSignature } from '@cosmjs/amino';
@@ -326,11 +326,6 @@ export default (
       // ethereum address handling
       //
 
-      const nodes = await chain.getChainNodes();
-      let { eth_chain_id } = nodes.find((n) => n.eth_chain_id);
-      if (!eth_chain_id) {
-        eth_chain_id = 1;
-      }
       const msgBuffer = Buffer.from(addressModel.verification_token.trim());
       const msgHash = ethUtil.hashPersonalMessage(msgBuffer);
       const ethSignatureParams = ethUtil.fromRpcSig(signatureString.trim());
@@ -339,12 +334,11 @@ export default (
         ethSignatureParams.v,
         ethSignatureParams.r,
         ethSignatureParams.s,
-        eth_chain_id,
       );
       const addressBuffer = ethUtil.publicToAddress(publicKey);
       const lowercaseAddress = ethUtil.bufferToHex(addressBuffer);
       try {
-        const address = Web3.utils.toChecksumAddress(lowercaseAddress, eth_chain_id);
+        const address = Web3.utils.toChecksumAddress(lowercaseAddress);
         isValid = (addressModel.address === address);
       } catch (e) {
         isValid = false;
