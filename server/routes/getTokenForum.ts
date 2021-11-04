@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
-import { Op } from 'sequelize';
+import Sequelize, { Op } from 'sequelize';
 import Web3 from 'web3';
 import { sequelize, DB } from '../database';
 import { ChainBase, ChainNetwork, ChainType } from '../../shared/types';
 import { wsToHttp } from '../../shared/utils';
-import ethChainIdToUrl from '../util/ethChainIdToUrl';
+import { getUrlForEthChainId } from '../util/supportedEthChains';
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -18,18 +18,25 @@ const getTokenForum = async (
   if (!address) {
     return res.json({ status: 'Failure', message: 'Must provide token address' });
   }
-  const token = await models.Token.findOne({ where: { address: { [Op.iLike]: address } } });
+
+  // default to mainnet
+  const chain_id = +req.query.chain_id || 1;
+  const token = await models.Token.findOne({
+    where: {
+      address: { [Op.iLike]: address },
+      chain_id,
+    }
+  });
+  const url = await getUrlForEthChainId(models, chain_id);
+  if (!url) {
+    return res.json({ status: 'Failure', message: 'Unsupported chain' });
+  }
+
   if (!token) {
-    // TODO: what is this
     if (req.query.allowUncached) {
       return res.json({ status: 'Success', result: { chain: null, node: null } });
     }
     return res.json({ status: 'Failure', message: 'Token does not exist' });
-  }
-
-  const url = ethChainIdToUrl(token.chain_id);
-  if (!url) {
-    return res.json({ status: 'Failure', message: 'Unsupported chain id' });
   }
 
   try {
@@ -61,7 +68,7 @@ const getTokenForum = async (
           chain: token.id,
           url,
           address: token.address,
-          eth_chain_id: token.chain_id,
+          eth_chain_id: chain_id,
         },
         transaction: t,
       });

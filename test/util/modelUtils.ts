@@ -10,10 +10,7 @@ import { factory, formatFilename } from '../../shared/logging';
 import app from '../../server-test';
 import models from '../../server/database';
 import { Permission } from '../../server/models/role';
-import {
-  TokenBalanceProvider,
-  TokenForumMeta,
-} from '../../server/util/tokenBalanceCache';
+import { TokenBalanceProvider } from '../../server/util/tokenBalanceCache';
 
 const ethUtil = require('ethereumjs-util');
 
@@ -341,19 +338,6 @@ export const createInvite = async (args: InviteArgs) => {
     .send({ ...args });
   const invite = res.body;
   return invite;
-};
-
-export const createTokenMeta = (): TokenForumMeta[] => {
-  return [
-    {
-      id: 'alex',
-      address: '0xFab46E002BbF0b4509813474841E0716E6730136',
-      symbol: 'alex',
-      name: 'Alex',
-      iconUrl: '',
-      decimals: 18,
-    },
-  ];
 };
 
 export class MockTokenBalanceProvider extends TokenBalanceProvider {
