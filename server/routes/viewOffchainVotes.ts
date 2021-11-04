@@ -13,11 +13,16 @@ const viewOffchainVotes = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(
-    models,
-    req.query,
-    req.user
-  );
+  let chain, community, error;
+  try {
+    [chain, community, error] = await lookupCommunityIsVisibleToUser(
+      models,
+      req.query,
+      req.user
+    );
+  } catch (err) {
+    throw new AppError(err);
+  }
   if (error) {
     console.log('It throws an AppError');
     throw new AppError(error);
