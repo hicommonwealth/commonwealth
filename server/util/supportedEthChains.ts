@@ -8,11 +8,8 @@ import { ChainAttributes } from '../models/chain';
 // TODO: fetch a native token, name, symbol, etc. as well, maybe using tokenlist?
 export async function getSupportedEthChainIds(models: DB): Promise<{ [id: number]: string }> {
   const supportedChainIds = await models.ChainNode.findAll({
-    attributes: [
-      // only select one node per chain id -- assuming all have same URL
-      [Sequelize.fn('DISTINCT', Sequelize.col('eth_chain_id')), 'eth_chain_id'],
-      'url'
-    ],
+    attributes: ['url', 'eth_chain_id', ],
+    group: ['url', 'eth_chain_id'],
     where: {
       // get all nodes that have a valid chain id
       eth_chain_id: {
@@ -21,16 +18,9 @@ export async function getSupportedEthChainIds(models: DB): Promise<{ [id: number
           [Op.ne]: 0,
         }
       }
-    },
-    // ensure chain is active
-    include: [{
-      model: models.Chain,
-      required: true,
-      where: {
-        active: true,
-      } as Sequelize.WhereOptions<ChainAttributes>
-    }]
+    }
   });
+  // TODO: should we verify that chain associations are active?
 
   const results: { [id: number]: string } = {};
   for (const { eth_chain_id, url } of supportedChainIds) {

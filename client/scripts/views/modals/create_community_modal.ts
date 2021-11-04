@@ -579,6 +579,7 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
     const disableField = !validAddress || !vnode.state.loaded;
 
     const updateTokenForum = async () => {
+      if (!vnode.state.address || !vnode.state.chain_id) return;
       try {
         const res = await $.get(`${app.serverUrl()}/getTokenForum`, {
           address: vnode.state.address,
@@ -647,21 +648,21 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
               },
             }),
             m(InputPropertyRow, {
-              title: 'ID',
-              defaultValue: vnode.state.id,
-              value: vnode.state.id,
-              disabled: disableField,
-              onChangeHandler: (v) => {
-                vnode.state.id = v;
-              },
-            }),
-            m(InputPropertyRow, {
               title: 'Name',
               defaultValue: vnode.state.name,
               disabled: disableField,
               onChangeHandler: (v) => {
                 vnode.state.name = v;
                 vnode.state.id = slugify(v);
+              },
+            }),
+            m(InputPropertyRow, {
+              title: 'ID',
+              defaultValue: vnode.state.id,
+              value: vnode.state.id,
+              disabled: disableField,
+              onChangeHandler: (v) => {
+                vnode.state.id = v;
               },
             }),
             m(InputPropertyRow, {

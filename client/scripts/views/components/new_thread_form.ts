@@ -658,7 +658,7 @@ export const NewThreadForm: m.Component<{
                   ? vnode.state.activeTopic
                   : localStorage.getItem(`${app.activeId()}-active-topic`),
                 topics: app.topics && app.topics.getByCommunity(app.activeId()).filter((t) => {
-                  // @To-do // Change this because right now the forum threshold is hardcoded to zero
+                  // TODO: Change this because right now the forum threshold is hardcoded to zero
                   return isAdmin || (app.chain && toBN(0).gte(t.tokenThreshold));
                 }),
                 featuredTopics: app.topics.getByCommunity(app.activeId())
