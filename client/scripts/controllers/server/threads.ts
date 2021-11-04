@@ -541,7 +541,7 @@ class ThreadsController {
   public async addLinkedThread(
     linking_thread_id: number,
     linked_thread_id: number,
-  ) { // : Promise<OffchainThread[]> {
+  ) {
     const response = await $.post(`${app.serverUrl()}/updateLinkedThreads`, {
       chain: app.activeChainId(),
       community: app.activeCommunityId(),
@@ -560,7 +560,7 @@ class ThreadsController {
   public async removeLinkedThread(
     linking_thread_id: number,
     linked_thread_id: number,
-  ) { // : Promise<OffchainThread[]> {
+  ) {
     const response = await $.post(`${app.serverUrl()}/updateLinkedThreads`, {
       chain: app.activeChainId(),
       community: app.activeCommunityId(),

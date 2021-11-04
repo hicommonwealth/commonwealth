@@ -22,6 +22,13 @@ const search = async (
 ) => {
   let replacements = {};
 
+  if (!req.query.search) {
+    return next(new Error(Errors.QueryMissing));
+  }
+  if (req.query.search.length < 4) {
+    return next(new Error(Errors.QueryTooShort));
+  }
+
   if (req.query.thread_title_only === 'true') {
     if (!req.query.chain && !req.query.community) {
       return next(new Error(Errors.NoCommunity));
@@ -93,13 +100,6 @@ const search = async (
 
   replacements['searchTerm'] = req.query.search;
   replacements['limit'] = 50; // must be same as SEARCH_PAGE_SIZE on frontend
-
-  if (!req.query.search) {
-    return next(new Error(Errors.QueryMissing));
-  }
-  if (req.query.search.length < 4) {
-    return next(new Error(Errors.QueryTooShort));
-  }
 
   // query for both threads and comments, and then execute a union and keep only the most recent :limit
   let threadsAndComments;
