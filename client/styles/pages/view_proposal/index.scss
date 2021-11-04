@@ -403,11 +403,25 @@ $discussion-title-font-size: 1.45rem;
     .ProposalHeaderOffchainPoll,
     .ProposalSidebarLinkedViewer,
     .ProposalSidebarStageEditorModule,
-    .ProposalSidebarPollEditorModule {
+    .ProposalSidebarPollEditorModule,
+    .ProposalLinkedThreadsEditorModule {
         border-radius: 10px;
         border: 1px solid tint($border-color-lightest, 26%);
         padding: 22px 18px 21px;
         margin-bottom: 24px;
+    }
+    .ProposalLinkedThreadsEditorModule {
+        a.linked-thread {
+            color: #9a9da4;
+        }
+        .cui-list-item {
+            &:first-child {
+                padding-top: 0 !important;
+            }
+            &:hover {
+                background: none;
+            }
+        }
     }
     .ProposalSidebarStageEditorModule,
     .ProposalSidebarPollEditorModule {

@@ -146,7 +146,8 @@ const CreateComment: m.Component<{
     disabled = getSetGlobalEditingStatus(GlobalStatus.Get)
       || vnode.state.quillEditorState?.editor?.editor?.isBlank()
       || sendingComment
-      || uploadsInProgress;
+      || uploadsInProgress
+      || !app.user.activeAccount;
 
     // token balance check if needed
     let tokenPostingThreshold = null;

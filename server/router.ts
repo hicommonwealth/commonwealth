@@ -88,11 +88,12 @@ import viewOffchainVotes from './routes/viewOffchainVotes';
 import fetchEntityTitle from './routes/fetchEntityTitle';
 import fetchThreadForSnapshot from './routes/fetchThreadForSnapshot';
 import updateChainEntityTitle from './routes/updateChainEntityTitle';
+import updateLinkedThreads from './routes/updateLinkedThreads';
 import deleteThread from './routes/deleteThread';
 import addEditors from './routes/addEditors';
 import deleteEditors from './routes/deleteEditors';
 import bulkThreads from './routes/bulkThreads';
-import getThread from './routes/getThread';
+import getThreads from './routes/getThreads';
 import search from './routes/search';
 import createDraft from './routes/drafts/createDraft';
 import deleteDraft from './routes/drafts/deleteDraft';
@@ -320,6 +321,11 @@ function setupRouter(
     updateChainEntityTitle.bind(this, models)
   );
   router.post(
+    '/updateLinkedThreads',
+    passport.authenticate('jwt', { session: false }),
+    updateLinkedThreads.bind(this, models)
+  );
+  router.post(
     '/addEditors',
     passport.authenticate('jwt', { session: false }),
     addEditors.bind(this, models)
@@ -336,7 +342,7 @@ function setupRouter(
   );
   router.get('/bulkThreads', bulkThreads.bind(this, models));
   router.get('/activeThreads', activeThreads.bind(this, models));
-  router.get('/getThread', getThread.bind(this, models));
+  router.get('/getThreads', getThreads.bind(this, models));
   router.get('/search', search.bind(this, models));
 
   router.get('/profile', getProfile.bind(this, models));
