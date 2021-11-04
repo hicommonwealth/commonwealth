@@ -82,6 +82,16 @@ app.use((req, res, next) => {
 });
 
 const setupErrorHandlers = () => {
+  // Handle 404 errors
+  app.use((req, res, next) => {
+    console.log('inside original 404 handler');
+    res.status(400);
+    res.json({
+      status: 404,
+      message: 'The server can not find the requested resource.',
+    });
+  });
+
   // Handle server and application errors.
   // 401 Unauthorized errors are handled by Express' middleware and returned
   // before this handler.
@@ -92,39 +102,30 @@ const setupErrorHandlers = () => {
     if (error instanceof ServerError) {
       console.log('ServerError', error);
       res.status(error.status).send({
-        error: {
-          status: error.status,
-          // Use external facing error message
-          message: 'Server error, please try again later.',
-        },
+        status: error.status,
+        // Use external facing error message
+        message: 'Server error, please try again later.',
       });
     } else if (error instanceof AppError) {
       console.log('AppError', error);
       res.status(error.status).send({
-        error: {
-          status: error.status,
-          message: error.message,
-        },
-      });
-    } else if (error.status === 404) {
-      res.status(error.status);
-      res.json({
-        error: {
-          status: error.status,
-          message: 'The server can not find the requested resource.',
-        },
+        error: error.message,
+        status: error.status,
+        // message: error.message,
       });
     } else {
       console.log('Other Error', error);
-      res.status(500);
-      res.json({
-        error: {
-          status: error.status,
-          message:
-            error.message ||
-            'Server error, unknown error thrown. Please try again later.',
-        },
+      res.status(500).send({
+        error: error.message || 'Unknown server error. Please try again later.',
+        status: error.status,
       });
+      // res.status(500);
+      // res.json({
+      //   error:
+      //     error.message ||
+      //     'Server error, unknown error thrown. Please try again later.',
+      //   status: error.status,
+      // });
     }
   });
 };

@@ -5,9 +5,12 @@ import { ServerError, AppError } from '../util/errors';
 const setupErrorHandlers = (app) => {
   // Handle 404 errors
   app.use((req, res, next) => {
-    const error: any = new Error('Not found');
-    error.status = 404;
-    next(error);
+    console.log('inside original 404 handler');
+    res.status(400);
+    res.json({
+      status: 404,
+      message: 'The server can not find the requested resource.',
+    });
   });
 
   // Rollbar notifications
@@ -30,40 +33,26 @@ const setupErrorHandlers = (app) => {
       console.log('ServerError', error);
       rollbar.error(error); // expected server error
       res.status(error.status).send({
-        error: {
-          status: error.status,
-          // Use external facing error message
-          message: 'Server error, please try again later.',
-        },
+        status: error.status,
+        // Use external facing error message
+        message: 'Server error, please try again later.',
       });
     } else if (error instanceof AppError) {
       rollbar.log(error); // expected application/user error
       console.log('AppError', error);
       res.status(error.status).send({
-        error: {
-          status: error.status,
-          message: error.message,
-        },
-      });
-    } else if (error.status === 404) {
-      res.status(error.status);
-      res.json({
-        error: {
-          status: error.status,
-          message: 'The server can not find the requested resource.',
-        },
+        status: error.status,
+        message: error.message,
       });
     } else {
       rollbar.critical(error); // unexpected error
       console.log('Other Error', error);
       res.status(500);
       res.json({
-        error: {
-          status: error.status,
-          message:
-            error.message ||
-            'Server error, unknown error thrown. Please try again later.',
-        },
+        status: error.status,
+        message:
+          error.message ||
+          'Server error, unknown error thrown. Please try again later.',
       });
     }
   });

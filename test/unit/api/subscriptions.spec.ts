@@ -240,6 +240,7 @@ describe('Subscriptions Tests', () => {
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, category, is_active, object_id });
       expect(res.body.error).to.not.be.null;
+      console.log('testttt', res.body);
       expect(res.body.error).to.be.equal(Errors.ChainRequiredForEntity);
     });
 
