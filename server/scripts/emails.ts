@@ -1,51 +1,58 @@
-import Sequelize, { Op } from 'sequelize';
+import { Op } from 'sequelize';
 import moment from 'moment';
 import { capitalize } from 'lodash';
-import { Label as ChainEventLabel, CWEvent, IEventLabel, SupportedNetwork, IChainEventData } from '@commonwealth/chain-events';
+import {
+  Label as ChainEventLabel, CWEvent, IEventLabel, SupportedNetwork, IChainEventData
+} from '@commonwealth/chain-events';
 
-import { SENDGRID_API_KEY, SERVER_URL } from '../config';
+import { SENDGRID_API_KEY, } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
 import { getForumNotificationCopy } from '../../shared/notificationFormatter';
-import {
-  IPostNotificationData, NotificationCategories,
-  DynamicTemplate, IChainEventNotificationData
-} from '../../shared/types';
+import { IPostNotificationData, NotificationCategories, DynamicTemplate } from '../../shared/types';
 import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 
 export const createImmediateNotificationEmailObject = async (notification_data, category_id, models) => {
   if (notification_data.chainEvent && notification_data.chainEventType) {
-    const chainEventLabel = ChainEventLabel(
-      notification_data.chainEventType.chain,
-      notification_data.chainEvent
-    );
-    if (!chainEventLabel) return;
-
-    const subject = `${process.env.NODE_ENV !== 'production' ? '[dev] ' : ''
-    }${chainEventLabel.heading} event on ${capitalize(notification_data.chainEventType?.chain)}`;
-
-    return {
-      from: 'Commonwealth <no-reply@commonwealth.im>',
-      to: null,
-      bcc: null,
-      subject,
-      templateId: DynamicTemplate.ImmediateEmailNotification,
-      dynamic_template_data: {
-        notification: {
-          chainId: notification_data.chainEventType?.chain,
-          blockNumber: notification_data.chainEvent?.blockNumber,
-          subject,
-          label: subject,
-          path: null,
-        }
-      }
+    // construct compatible CW event from DB by inserting network from type
+    const evt: CWEvent = {
+      blockNumber: notification_data.chainEvent.block_number,
+      data: notification_data.chainEvent.event_data as IChainEventData,
+      network: notification_data.chainEventType.event_network as SupportedNetwork,
     };
-  } else {
-    if (category_id === NotificationCategories.NewReaction || category_id === NotificationCategories.ThreadEdit) return;
+
+    try {
+      const chainEventLabel = ChainEventLabel(notification_data.chainEventType.chain, evt);
+      if (!chainEventLabel) return;
+
+      const subject = `${process.env.NODE_ENV !== 'production' ? '[dev] ' : ''
+        }${chainEventLabel.heading} event on ${capitalize(notification_data.chainEventType.chain)}`;
+
+      return {
+        from: 'Commonwealth <no-reply@commonwealth.im>',
+        to: null,
+        bcc: null,
+        subject,
+        templateId: DynamicTemplate.ImmediateEmailNotification,
+        dynamic_template_data: {
+          notification: {
+            chainId: notification_data.chainEventType.chain,
+            blockNumber: notification_data.chainEvent.blockNumber,
+            subject,
+            label: subject,
+            path: null,
+          }
+        }
+      };
+    } catch (err) {
+      console.error(`Failed to label chain event: ${err.message}`);
+    }
+  } else if (category_id !== NotificationCategories.NewReaction && category_id !== NotificationCategories.ThreadEdit) {
     const [
       emailSubjectLine, subjectCopy, actionCopy, objectCopy, communityCopy, excerpt, proposalPath, authorPath
     ] = await getForumNotificationCopy(models, notification_data as IPostNotificationData, category_id);

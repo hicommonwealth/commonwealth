@@ -5,7 +5,12 @@ import { factory, formatFilename } from '../../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
-export default async (models, req: Request, res: Response, next: NextFunction) => {
+export default async (
+  models,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.user) {
     return next(new Error(Errors.NotLoggedIn));
   }
@@ -14,7 +19,7 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
   }
 
   const category = await models.NotificationCategory.findOne({
-    where: { name: req.body.category }
+    where: { name: req.body.category },
   });
   if (!category) {
     return next(new Error(Errors.InvalidNotificationCategory));
@@ -31,7 +36,7 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
       chain = await models.Chain.findOne({
         where: {
           id: p_entity,
-        }
+        },
       });
       if (chain) {
         obj = { chain_id: p_entity };
@@ -39,7 +44,7 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
         const community = await models.OffchainCommunity.findOne({
           where: {
             id: p_entity,
-          }
+          },
         });
         if (community) obj = { community_id: p_entity };
       }
@@ -48,26 +53,41 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
     case 'new-comment-creation':
     case 'new-reaction': {
       if (p_entity === 'discussion') {
-        const thread = await models.OffchainThread.findOne({ where: { id: Number(p_id), } });
+        const thread = await models.OffchainThread.findOne({
+          where: { id: Number(p_id) },
+        });
         if (!thread) return next(new Error(Errors.NoThread));
         if (thread.community) {
-          obj = { offchain_thread_id: Number(p_id), community_id: thread.community, };
+          obj = {
+            offchain_thread_id: Number(p_id),
+            community_id: thread.community,
+          };
         } else if (thread.chain) {
-          obj = { offchain_thread_id: Number(p_id), chain_id: thread.chain, };
+          obj = { offchain_thread_id: Number(p_id), chain_id: thread.chain };
         }
       } else if (p_entity === 'comment') {
-        const comment = await models.OffchainComment.findOne({ where: { id: Number(p_id), } });
+        const comment = await models.OffchainComment.findOne({
+          where: { id: Number(p_id) },
+        });
         if (!comment) return next(new Error(Errors.NoComment));
         if (comment.chain) {
-          obj = { offchain_comment_id: Number(p_id), chain_id: comment.chain, };
+          obj = { offchain_comment_id: Number(p_id), chain_id: comment.chain };
         } else if (comment.community) {
-          obj = { offchain_comment_id: Number(p_id), community_id: comment.community, };
+          obj = {
+            offchain_comment_id: Number(p_id),
+            community_id: comment.community,
+          };
         }
       } else {
-        if (!req.body.chain_id) return next(new Error(Errors.ChainRequiredForEntity));
-        const chainEntity = await proposalIdToEntity(models, req.body.chain_id, req.body.object_id);
+        if (!req.body.chain_id)
+          return next(new Error(Errors.ChainRequiredForEntity));
+        const chainEntity = await proposalIdToEntity(
+          models,
+          req.body.chain_id,
+          req.body.object_id
+        );
         if (!chainEntity) return next(new Error(Errors.NoChainEntity));
-        obj = { chain_id: chainEntity.chain, chain_entity_id: chainEntity.id, };
+        obj = { chain_id: chainEntity.chain, chain_entity_id: chainEntity.id };
       }
       break;
     }
@@ -77,13 +97,13 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
       chain = await models.Chain.findOne({
         where: {
           id: p_entity,
-        }
+        },
       });
       if (!chain) return next(new Error(Errors.InvalidChain));
       const chainEventType = await models.ChainEventType.findOne({
         where: {
           id: req.body.object_id,
-        }
+        },
       });
       if (!chainEventType) return next(new Error(Errors.InvalidChainEventId));
       obj = { chain_id: p_entity, chain_event_type_id: req.body.object_id };

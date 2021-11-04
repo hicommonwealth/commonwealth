@@ -60,7 +60,8 @@ export enum VotingType {
   MultiOptionVoting = 'multioption',
   None = 'none',
   MolochYesNo = 'moloch',
-  CompoundYesNo = 'compound',
+  CompoundYesNo = 'compound_yes_no',
+  CompoundYesNoAbstain = 'compound_yes_no_abstain',
   YesNoReject = 'yes_no_reject',
 }
 export enum VotingUnit {
