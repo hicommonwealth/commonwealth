@@ -119,13 +119,6 @@ const setupErrorHandlers = () => {
         error: error.message || 'Unknown server error. Please try again later.',
         status: error.status,
       });
-      // res.status(500);
-      // res.json({
-      //   error:
-      //     error.message ||
-      //     'Server error, unknown error thrown. Please try again later.',
-      //   status: error.status,
-      // });
     }
   });
 };

@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { DB } from '../database';
-import { AppError } from '../util/errors';
+import { AppError, ServerError } from '../util/errors';
 
 export const Errors = {
   InvalidThread: 'Invalid thread',
@@ -19,11 +19,13 @@ const viewOffchainVotes = async (
     req.user
   );
   if (error) {
+    console.log('It throws an AppError');
     throw new AppError(error);
   }
 
   if (!req.query.thread_id) {
-    return next(new Error(Errors.InvalidThread));
+    throw new AppError(Errors.InvalidThread);
+    // return next(new Error(Errors.InvalidThread));
   }
 
   try {
@@ -37,7 +39,7 @@ const viewOffchainVotes = async (
       result: votes.map((v) => v.toJSON()),
     });
   } catch (err) {
-    return next(new Error(err));
+    throw new ServerError(err);
   }
 };
 
