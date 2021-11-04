@@ -753,7 +753,7 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
               type: 'token',
               base: 'ethereum',
               network: slugify(name),
-              node_url: 'wss://mainnet.infura.io/ws',
+              node_url: 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
             })
               .then(async (res) => {
                 await initAppState(false);
@@ -897,7 +897,7 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
             type: ChainType.Token,
             base: ChainBase.Ethereum,
             network: ChainNetwork.ERC20,
-            node_url: 'wss://mainnet.infura.io/ws',
+            node_url: 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
           })
             .then(async (res) => {
               await initAppState(false);

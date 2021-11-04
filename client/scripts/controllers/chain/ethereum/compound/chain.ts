@@ -1,8 +1,10 @@
 import BN from 'bn.js';
 import { NodeInfo } from 'models';
+import { ERC20Votes } from 'eth/types';
+import { BigNumber } from 'ethers';
 import EthereumChain from '../chain';
 import { attachSigner } from '../contractApi';
-import CompoundAPI from './api';
+import CompoundAPI, { GovernorTokenType } from './api';
 
 // Thin wrapper over EthereumChain to guarantee the `init()` implementation
 // on the Governance module works as expected.
@@ -32,7 +34,12 @@ export default class CompoundChain extends EthereumChain {
       console.warn('No token found, cannot fetch prior delegates');
       return new BN(0);
     }
-    const delegates = await this.compoundApi.Token.getPriorVotes(address, blockNumber);
+    let delegates: BigNumber;
+    if (this.compoundApi.tokenType === GovernorTokenType.OzVotes) {
+      delegates = await (this.compoundApi.Token as ERC20Votes).getPastVotes(address, blockNumber);
+    } else {
+      delegates = await this.compoundApi.Token.getPriorVotes(address, blockNumber);
+    }
     return new BN(delegates.toString(), 10) || new BN(0);
   }
 
@@ -45,7 +52,7 @@ export default class CompoundChain extends EthereumChain {
     return new BN(balance.toString(), 10) || new BN(0);
   }
 
-  public async setDelegate(address: string, amount?: number) {
+  public async setDelegate(address: string) {
     if (!this.compoundApi.Token) {
       throw new Error('No token found, cannot fetch balance');
     }
@@ -56,11 +63,12 @@ export default class CompoundChain extends EthereumChain {
         this.compoundApi.Token
       );
       if (this.compoundApi.isTokenMPond(contract)) {
-        if (!amount) {
-          throw new Error('Must provide amount for MPond delegation.');
-        }
-        const gasLimit = await contract.estimateGas.delegate(address, amount);
-        await contract.delegate(address, amount, { gasLimit });
+        // automatically delegate all token when using delegation on MPond
+        const amount = await this.balanceOf(address);
+        console.log(`Delegating ${amount}`);
+        const gasLimit = await contract.estimateGas.delegate(address, amount.toString());
+        console.log(`Estimated ${gasLimit}`);
+        await contract.delegate(address, amount.toString(), { gasLimit });
       } else {
         const gasLimit = await contract.estimateGas.delegate(address);
         await contract.delegate(address, { gasLimit });
@@ -78,8 +86,7 @@ export default class CompoundChain extends EthereumChain {
       return null;
     }
     if (this.compoundApi.isTokenMPond(token)) {
-      // TODO: a user can have multiple delegates on MPond, so we will need to make the logic more complex.
-      //   For now, we will return nothing, as we cannot easily fetch it without a queryFilter().
+      // TODO: a user can have multiple delegates on MPond and it cannot be easily fetched. We ignore for now.
       console.warn('Cannot fetch delegates on MPond-type token');
       return null;
     } else {
@@ -98,7 +105,12 @@ export default class CompoundChain extends EthereumChain {
       console.warn('No token found, cannot fetch vote status');
       return null;
     }
-    const voteAmount = await this.compoundApi.Token.getCurrentVotes(address);
+    let voteAmount: BigNumber;
+    if (this.compoundApi.tokenType === GovernorTokenType.OzVotes) {
+      voteAmount = await (this.compoundApi.Token as ERC20Votes).getVotes(address);
+    } else {
+      voteAmount = await this.compoundApi.Token.getCurrentVotes(address);
+    }
     return !voteAmount.isZero();
   }
 }

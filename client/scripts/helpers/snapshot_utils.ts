@@ -78,6 +78,7 @@ export const PROPOSALS_QUERY = gql`
       title
       body
       choices
+      type
       start
       end
       snapshot
@@ -132,6 +133,7 @@ export interface SnapshotProposal {
   ipfs: string;
   author: string;
   created: number;
+  type: string;
   start: number;
   end: number;
   title: string;

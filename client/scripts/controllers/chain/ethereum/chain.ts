@@ -12,7 +12,6 @@ import {
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import EthereumAccount from './account';
 
-export const INFURA_ID = process.env.INFURA_API_KEY || '90de850aff68424ab8e7321017406586';
 const ETHEREUM_BLOCK_TIME = 13;
 export interface IEthereumTXData extends ITXData {
   chainId: string;
@@ -61,33 +60,15 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
 
   public async initApi(node?: NodeInfo): Promise<any> {
     this.app.chain.block.duration = ETHEREUM_BLOCK_TIME;
-    if (node.url.includes('infura')) {
-      const infuraId = INFURA_ID;
-      const networkPrefix = node.url.split('infura')[0];
-      const url = `${networkPrefix}infura.io/ws/v3/${infuraId}`;
-      try {
-        const provider = new Web3.providers.WebsocketProvider(url);
-        this._api = new Web3(provider);
-      } catch (error) {
-        console.log('Could not connect to Ethereum using infura');
-        this.app.chain.networkStatus = ApiStatus.Disconnected;
-        throw error;
-      }
-    } else {
-      // support local/etc
-      try {
-        // TODO: support http?
-        const provider = new Web3.providers.WebsocketProvider(node.url);
-        this._api = new Web3(provider);
-      } catch (error) {
-        console.log(`Could not connect to Ethereum on ${node.url}`);
-        this.app.chain.networkStatus = ApiStatus.Disconnected;
-        throw error;
-      }
+    try {
+      // TODO: support http?
+      const provider = new Web3.providers.WebsocketProvider(node.url);
+      this._api = new Web3(provider);
+    } catch (error) {
+      console.log(`Could not connect to Ethereum on ${node.url}`);
+      this.app.chain.networkStatus = ApiStatus.Disconnected;
+      throw error;
     }
-
-    const isListening = await this._api.eth.net.isListening();
-    // TODO: what should we do with the result?
 
     this.app.chain.networkStatus = ApiStatus.Connected;
     this._api.eth.getBlock('latest').then((headers) => {

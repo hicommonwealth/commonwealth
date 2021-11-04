@@ -35,7 +35,7 @@ contract GovernorAlphaMock {
     TimelockInterface public timelock;
 
     /// @notice The address of the MPond governance token
-    MPondInterface public MPond;
+    MPondInterface public comp;
 
     /// @notice The address of the Governor Guardian
     address public guardian;
@@ -144,11 +144,11 @@ contract GovernorAlphaMock {
 
     constructor(
         address timelock_,
-        address MPond_,
+        address comp_,
         address guardian_
     ) public {
         timelock = TimelockInterface(timelock_);
-        MPond = MPondInterface(MPond_);
+        comp = MPondInterface(comp_);
         guardian = guardian_;
     }
 
@@ -160,7 +160,7 @@ contract GovernorAlphaMock {
         string memory description
     ) public returns (uint256) {
         require(
-            MPond.getPriorVotes(msg.sender, sub256(block.number, 1)) >
+            comp.getPriorVotes(msg.sender, sub256(block.number, 1)) >
                 proposalThreshold(),
             "GovernorAlphaMock::propose: proposer votes below proposal threshold"
         );
@@ -296,7 +296,7 @@ contract GovernorAlphaMock {
         Proposal storage proposal = proposals[proposalId];
         require(
             msg.sender == guardian ||
-                MPond.getPriorVotes(
+                comp.getPriorVotes(
                     proposal.proposer,
                     sub256(block.number, 1)
                 ) <
@@ -418,7 +418,7 @@ contract GovernorAlphaMock {
             receipt.hasVoted == false,
             "GovernorAlphaMock::_castVote: voter already voted"
         );
-        uint96 votes = MPond.getPriorVotes(voter, proposal.startBlock);
+        uint96 votes = comp.getPriorVotes(voter, proposal.startBlock);
 
         if (support) {
             proposal.forVotes = add256(proposal.forVotes, votes);
