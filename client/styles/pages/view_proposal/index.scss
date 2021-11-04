@@ -527,5 +527,26 @@ $discussion-title-font-size: 1.45rem;
         width: 2px;
         z-index: -1;
     }
+    .mobile-toggle {
+        @include sm-max {
+            &.show {
+                display: block;
+            }
+
+            &.hide {
+                display: none;
+            }
+        }
+
+        @include md-min {
+            &.show {
+                display: none;
+            }
+
+            &.hide {
+                display: block;
+            }
+        }
+    }
 }
 
