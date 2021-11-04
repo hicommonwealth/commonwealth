@@ -5,10 +5,10 @@ import _ from 'lodash';
 import { Tag, Table } from 'construct-ui';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
+import { ChainInfo, CommunityInfo } from 'models';
 
 import PageLoading from 'views/pages/loading';
-import User from 'views/components/widgets/user';
+import SputnikDaoRow from 'views/components/sputnik_dao_row';
 import Sublayout from 'views/sublayout';
 import { CommunityOptionsPopover } from './discussions';
 import Near from 'controllers/chain/near/main';
@@ -28,6 +28,8 @@ interface IDaoInfo {
 const SputnikDAOsPage : m.Component<{}, { daosRequested: boolean, daosList: IDaoInfo[] }> = {
   view: (vnode) => {
     const activeEntity = app.community ? app.community : app.chain;
+    var allCommunities = (app.config.communities.getAll() as (CommunityInfo | ChainInfo)[]).concat(app.config.chains.getAll());
+
     if (!activeEntity) return m(PageLoading, {
       message: 'Loading Sputnik DAOs',
       title: [
@@ -36,13 +38,25 @@ const SputnikDAOsPage : m.Component<{}, { daosRequested: boolean, daosList: IDao
       ],
       showNewProposalButton: true,
     });
+    else {
+      if(app.activeId() != 'near'){
+        m.route.set(`/${app.activeId()}`);
+      }
+    }
 
-    if(!vnode.state.daosRequested){
+    if(app.activeId() == 'near' && !vnode.state.daosRequested){
       vnode.state.daosRequested = true;
       (app.chain as Near).chain.viewDaoList().then((daos) => {
         console.log(daos);
         vnode.state.daosList = daos;
-        vnode.state.daosList.sort((d1, d2) => parseFloat(d2.amount) - parseFloat(d1.amount));
+        vnode.state.daosList.sort((d1, d2) => {
+          let d1Exist = allCommunities.filter(c => c.id == d1.name).length;
+          let d2Exist = allCommunities.filter(c => c.id == d2.name).length;
+          if(d1Exist != d2Exist)
+            return d2Exist - d1Exist;
+          else
+            return parseFloat(d2.amount) - parseFloat(d1.amount);
+        });
         m.redraw();
       })
     }
@@ -53,15 +67,20 @@ const SputnikDAOsPage : m.Component<{}, { daosRequested: boolean, daosList: IDao
       role: 'moderator', chain: app.activeChainId(), community: app.activeCommunityId()
     });
 
-    if (!vnode.state.daosList) return m(PageLoading, {
-      message: 'Loading Sputnik DAOs',
-      title: [
-        'Sputnik DAOs',
-        m(CommunityOptionsPopover, { isAdmin, isMod }),
-        m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
-      ],
-      showNewProposalButton: true,
-    });
+    if (!vnode.state.daosList){
+      if(app.activeId() == 'near')
+        return m(PageLoading, {
+          message: 'Loading Sputnik DAOs',
+          title: [
+            'Sputnik DAOs',
+            m(CommunityOptionsPopover, { isAdmin, isMod }),
+            m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+          ],
+          showNewProposalButton: true,
+        });
+      else
+        return m(PageLoading, {message: 'Redirecting...'});
+    }
 
     return m(Sublayout, {
       class: 'SputnikDAOsPage',
@@ -82,18 +101,7 @@ const SputnikDAOsPage : m.Component<{}, { daosRequested: boolean, daosList: IDao
           m('th', {style: {width: "17%"}}, 'Vote Period'),
         ]),
         vnode.state.daosList.map((dao) => {
-          return m('tr.nearRow', {
-            onclick: (e) => {
-              e.preventDefault();
-              m.route.set(`/${dao.contractId}`);
-            }
-          }, [
-            m('td', dao.name),
-            m('td', dao.amount),
-            m('td', dao.council.length),
-            m('td', dao.proposalBond),
-            m('td', dao.proposalPeriod),
-          ]);
+          return m(SputnikDaoRow, { dao: dao, clickable: allCommunities.filter(c => c.id == dao.name).length > 0 });
         })
       ]),
     ]);

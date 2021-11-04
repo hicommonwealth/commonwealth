@@ -1,0 +1,15 @@
+@import 'client/styles/shared';
+
+.nearRow{
+    border: 0px;
+    cursor: pointer;
+
+    td{
+        border: 0;
+    }
+}
+
+.nearRow:hover{
+    background: #F7F4FF;
+}
+
