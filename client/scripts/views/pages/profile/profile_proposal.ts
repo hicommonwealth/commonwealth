@@ -24,12 +24,12 @@ const ProfileProposal : m.Component< { proposal: OffchainThread }, { revealThrea
               : [
                 'Created a new ',
                 link(
-                  'a.link-normal',
+                  'a.link-bold',
                   `/${chain || community}/proposal/${slug}/${identifier}-${slugify(title)}`, 'thread', {},
                   `profile-${author}-${proposal.authorChain}-${proposal.chain}-scrollY`
                 ),
-                ' in',
-                link('a.link-bold', `/${chain || community}`, ` ${chain || community}`),
+                ' in ',
+                link('a.link-bold', `/${chain || community}`, `${chain || community}`),
               ],
         ]),
         createdAt && createdAt.fromNow(),
