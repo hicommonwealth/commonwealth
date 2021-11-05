@@ -200,8 +200,8 @@ const InlineReplyButton: m.Component<
 
 const MobileToggle: m.Component<{behavior: string}> = {
   view:(vnode) => {
-    const {behavior} = vnode.attrs;
-    return m(`.mobile-toggle.${behavior}`,[vnode.children]);
+    const { behavior } = vnode.attrs;
+    return m(`.mobile-toggle.${behavior}`,[ vnode.children ]);
   },
 };
 
@@ -215,7 +215,7 @@ const ProposalActions: m.Component<{
   closeStageEditor: () => void;
 }> = {
   view:(vnode) => {
-    const {proposal, isAdmin, isAuthor, openPollEditor, openStageEditor} = vnode.attrs;
+    const { proposal, isAdmin, isAuthor, openPollEditor, openStageEditor } = vnode.attrs;
 
     return [
       proposal instanceof OffchainThread &&
