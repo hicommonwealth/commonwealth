@@ -27,7 +27,7 @@ export interface OffchainCommunityAttributes {
   stages_enabled?: boolean;
   custom_stages?: string;
   collapsed_on_homepage?: boolean;
-  default_summary_view: boolean;
+  default_summary_view?: boolean;
   created_at?: Date;
   updated_at?: Date;
   deleted_at?: Date;

@@ -39,7 +39,7 @@ export interface ChainAttributes {
   featured_topics?: string[];
   substrate_spec?: RegisteredTypes;
   has_chain_events_listener?: boolean;
-  default_summary_view: boolean;
+  default_summary_view?: boolean;
   terms?: string;
   snapshot?: string;
   bech32_prefix?: string;
