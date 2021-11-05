@@ -197,6 +197,7 @@ $discussion-title-font-size: 1.45rem;
         }
         .proposal-content-right {
             flex: 1;
+            overflow-x: auto;
             margin-left: $discussion-comment-padding;
             @include xs-max {
                 margin-right: 10px;
