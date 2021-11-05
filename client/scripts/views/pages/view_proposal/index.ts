@@ -205,6 +205,51 @@ const MobileToggle: m.Component<{behavior: string}> = {
   },
 };
 
+const ProposalActions: m.Component<{
+  proposal: AnyProposal | OffchainThread;
+  isAuthor: boolean;
+  isAdmin: boolean;
+  openPollEditor: () => void;
+  openStageEditor: () => void;
+  closePollEditor: () => void;
+  closeStageEditor: () => void;
+}> = {
+  view:(vnode) => {
+    const {proposal, isAdmin, isAuthor, openPollEditor, openStageEditor} = vnode.attrs;
+
+    return [
+      proposal instanceof OffchainThread &&
+        proposal.hasOffchainPoll &&
+        m(ProposalHeaderOffchainPoll, { proposal }),
+      proposal instanceof OffchainThread &&
+        (isAuthor || isAdmin) &&
+        !proposal.offchainVotingEndsAt &&
+        m(ProposalSidebarPollEditorModule, {
+          proposal,
+          openPollEditor,
+        }),
+      proposal instanceof OffchainThread &&
+        ((proposal as OffchainThread).chainEntities.length > 0 ||
+          (proposal as OffchainThread).snapshotProposal?.length > 0) &&
+        m(ProposalSidebarLinkedViewer, {
+          proposal,
+        }),
+      proposal instanceof OffchainThread &&
+        (isAuthor || isAdmin) &&
+        m(ProposalSidebarStageEditorModule, {
+          proposal,
+          openStageEditor,
+        }),
+      proposal instanceof OffchainThread &&
+      (proposal.linkedThreads?.length > 0 || isAuthor || isAdmin) &&
+        m(ProposalLinkedThreadsEditorModule, {
+          proposal,
+          allowLinking: isAuthor || isAdmin,
+        }),
+    ];
+  },
+}
+
 const ProposalHeader: m.Component<
   {
     commentCount: number;
@@ -217,8 +262,10 @@ const ProposalHeader: m.Component<
     isAdmin: boolean;
     stageEditorIsOpen: boolean;
     pollEditorIsOpen: boolean;
-    closePollEditor: Function;
-    closeStageEditor: Function;
+    openPollEditor: () => void;
+    openStageEditor: () => void;
+    closePollEditor: () => void;
+    closeStageEditor: () => void;
   },
   {
     savedEdit: string;
@@ -242,6 +289,10 @@ const ProposalHeader: m.Component<
       isAuthor,
       isEditor,
       isAdmin,
+      openPollEditor,
+      openStageEditor,
+      closePollEditor,
+      closeStageEditor,
     } = vnode.attrs;
 
     const attachments =
@@ -444,38 +495,15 @@ const ProposalHeader: m.Component<
                   ]
             ),
             m(MobileToggle, { behavior: 'show' }, [
-              proposal instanceof OffchainThread &&
-                proposal.hasOffchainPoll &&
-                m(ProposalHeaderOffchainPoll, { proposal }),
-              proposal instanceof OffchainThread &&
-                (isAuthor || isAdmin) &&
-                !proposal.offchainVotingEndsAt &&
-                m(ProposalSidebarPollEditorModule, {
-                  proposal,
-                  openPollEditor: () => {
-                    vnode.attrs.pollEditorIsOpen = true;
-                  },
-                }),
-              proposal instanceof OffchainThread &&
-                ((proposal as OffchainThread).chainEntities.length > 0 ||
-                  (proposal as OffchainThread).snapshotProposal?.length > 0) &&
-                m(ProposalSidebarLinkedViewer, {
-                  proposal,
-                }),
-              proposal instanceof OffchainThread &&
-                (isAuthor || isAdmin) &&
-                m(ProposalSidebarStageEditorModule, {
-                  proposal,
-                  openStageEditor: () => {
-                    vnode.attrs.stageEditorIsOpen = true;
-                  },
-                }),
-              proposal instanceof OffchainThread &&
-              (proposal.linkedThreads?.length > 0 || isAuthor || isAdmin) &&
-                m(ProposalLinkedThreadsEditorModule, {
-                  proposal,
-                  allowLinking: isAuthor || isAdmin,
-                }),
+              m(ProposalActions, {
+                proposal,
+                isAuthor,
+                isAdmin,
+                openStageEditor,
+                openPollEditor,
+                closeStageEditor,
+                closePollEditor
+              }),
             ]),
             m('.proposal-body-link', [
               proposal instanceof OffchainThread &&
@@ -1315,6 +1343,26 @@ const ViewProposalPage: m.Component<
       );
     }
 
+    const openStageEditor = () => {
+      vnode.state.stageEditorIsOpen = true;
+      m.redraw();
+    };
+
+    const openPollEditor = () => {
+      vnode.state.pollEditorIsOpen = true;
+      m.redraw();
+    };
+
+    const closeStageEditor = () => {
+      vnode.state.stageEditorIsOpen = false;
+      m.redraw();
+    };
+
+    const closePollEditor = () => {
+      vnode.state.pollEditorIsOpen = false;
+      m.redraw();
+    };
+
     return m(
       Sublayout,
       {
@@ -1323,39 +1371,16 @@ const ViewProposalPage: m.Component<
         title: headerTitle,
         rightContent: [
           m(MobileToggle, { behavior: 'hide' }, [
-            proposal instanceof OffchainThread &&
-              proposal.hasOffchainPoll &&
-              m(ProposalHeaderOffchainPoll, { proposal }),
-            proposal instanceof OffchainThread &&
-              (isAuthor || isAdmin) &&
-              !proposal.offchainVotingEndsAt &&
-              m(ProposalSidebarPollEditorModule, {
-                proposal,
-                openPollEditor: () => {
-                  vnode.state.pollEditorIsOpen = true;
-                },
-              }),
-            proposal instanceof OffchainThread &&
-              ((proposal as OffchainThread).chainEntities.length > 0 ||
-                (proposal as OffchainThread).snapshotProposal?.length > 0) &&
-              m(ProposalSidebarLinkedViewer, {
-                proposal,
-              }),
-            proposal instanceof OffchainThread &&
-              (isAuthor || isAdmin) &&
-              m(ProposalSidebarStageEditorModule, {
-                proposal,
-                openStageEditor: () => {
-                  vnode.state.stageEditorIsOpen = true;
-                },
-              }),
-            proposal instanceof OffchainThread &&
-            (proposal.linkedThreads?.length > 0 || isAuthor || isAdmin) &&
-              m(ProposalLinkedThreadsEditorModule, {
-                proposal,
-                allowLinking: isAuthor || isAdmin,
-              }),
-          ])
+            m(ProposalActions, {
+              proposal,
+              isAuthor,
+              isAdmin,
+              openStageEditor,
+              openPollEditor,
+              closeStageEditor,
+              closePollEditor
+            }),
+          ]),
         ],
       },
       [
@@ -1370,14 +1395,10 @@ const ViewProposalPage: m.Component<
           isAdmin,
           stageEditorIsOpen: vnode.state.stageEditorIsOpen,
           pollEditorIsOpen: vnode.state.pollEditorIsOpen,
-          closeStageEditor: () => {
-            vnode.state.stageEditorIsOpen = false;
-            m.redraw();
-          },
-          closePollEditor: () => {
-            vnode.state.pollEditorIsOpen = false;
-            m.redraw();
-          },
+          openStageEditor,
+          openPollEditor,
+          closeStageEditor,
+          closePollEditor
         }),
         !(proposal instanceof OffchainThread) &&
           m(LinkedProposalsEmbed, { proposal }),
