@@ -32,6 +32,7 @@ import { activeQuillEditorHasText, GlobalStatus } from './body';
 import { IProposalPageState } from '.';
 import OffchainVotingModal from '../../modals/offchain_voting_modal';
 import LinkedThreadModal from '../../modals/linked_thread_modal';
+import Token from 'controllers/chain/ethereum/token/adapter';
 
 export const ProposalHeaderExternalLink: m.Component<{
   proposal: AnyProposal | OffchainThread;
@@ -101,6 +102,9 @@ export const ProposalHeaderOffchainPoll: m.Component<
         app.user.activeAccount.chain.id,
         app.user.activeAccount.address
       );
+    const tokenThresholdPassed = (app.chain instanceof Token)
+      && (proposal.topic.tokenThreshold)
+      && (app.chain as Token).tokenBalance.gte(proposal.topic.tokenThreshold)
 
     const vote = async (option, hasVoted, isSelected) => {
       if (!app.isLoggedIn() || !app.user.activeAccount || isSelected) return;
@@ -193,7 +197,7 @@ export const ProposalHeaderOffchainPoll: m.Component<
                 label: isSelected ? 'Voted' : 'Vote',
                 size: 'sm',
                 rounded: true,
-                disabled: !!(pollingEnded || isSelected),
+                disabled: !!(pollingEnded || isSelected || tokenThresholdPassed),
                 style: pollingEnded || isSelected ? 'pointer-events: none' : '',
                 iconLeft: isSelected ? Icons.CHECK : null,
                 compact: true,
