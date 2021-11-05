@@ -446,6 +446,9 @@ const DiscussionsPage: m.Component<
         : moment.isMoment(vnode.state.lookback[subpage])
         ? vnode.state.lookback[subpage]
         : moment();
+    if (app.community?.meta?.defaultSummaryView || app.chain?.meta?.chain?.defaultSummaryView) {
+      vnode.state.summaryView = true;
+    }
     if (app.lastNavigatedBack()) {
       if (localStorage.getItem('discussion-summary-toggle') === 'true') {
         vnode.state.summaryView = true;

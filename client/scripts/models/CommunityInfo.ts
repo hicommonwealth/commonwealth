@@ -48,7 +48,7 @@ class CommunityInfo {
   public customDomain: string;
   public terms: string;
   public readonly collapsedOnHomepage: boolean;
-  public readonly defaultSummaryView: boolean;
+  public defaultSummaryView: boolean;
   public readonly featuredTopics: string[];
   public readonly topics: OffchainTopic[];
   public adminsAndMods: RoleInfo[];
@@ -215,6 +215,7 @@ class CommunityInfo {
     name,
     iconUrl,
     privacyEnabled,
+    defaultSummaryView,
     stagesEnabled,
     customStages,
     customDomain,
@@ -242,6 +243,7 @@ class CommunityInfo {
       terms,
       privacy: privacyEnabled,
       invites: invitesEnabled,
+      default_summary_view: defaultSummaryView,
       jwt: app.user.jwt,
     });
     const updatedCommunity: OffchainCommunityInstance = r.result;
@@ -259,6 +261,7 @@ class CommunityInfo {
     this.terms = updatedCommunity.terms;
     this.privacyEnabled = updatedCommunity.privacy_enabled;
     this.invitesEnabled = updatedCommunity.invites_enabled;
+    this.defaultSummaryView = updatedCommunity.default_summary_view;
   }
 
   public addFeaturedTopic(topic: string) {

@@ -26,7 +26,7 @@ class ChainInfo {
   public terms: string;
   public readonly blockExplorerIds: { [id: string]: string };
   public readonly collapsedOnHomepage: boolean;
-  public readonly defaultSummaryView: boolean;
+  public defaultSummaryView: boolean;
   public readonly featuredTopics: string[];
   public readonly topics: OffchainTopic[];
   public readonly chainObjectId: string;
@@ -232,6 +232,7 @@ class ChainInfo {
     terms,
     snapshot,
     iconUrl,
+    defaultSummaryView,
   }) {
     // TODO: Change to PUT /chain
     const r = await $.post(`${app.serverUrl()}/updateChain`, {
@@ -249,6 +250,7 @@ class ChainInfo {
       snapshot,
       terms,
       icon_url: iconUrl,
+      default_summary_view: defaultSummaryView,
       jwt: app.user.jwt,
     });
     const updatedChain: ChainInstance = r.result;
@@ -265,6 +267,7 @@ class ChainInfo {
     this.snapshot = updatedChain.snapshot;
     this.terms = updatedChain.terms;
     this.iconUrl = updatedChain.icon_url;
+    this.defaultSummaryView = updatedChain.default_summary_view;
   }
 
   public addFeaturedTopic(topic: string) {
