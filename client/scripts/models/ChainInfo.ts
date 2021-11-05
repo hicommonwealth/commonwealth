@@ -26,6 +26,7 @@ class ChainInfo {
   public terms: string;
   public readonly blockExplorerIds: { [id: string]: string };
   public readonly collapsedOnHomepage: boolean;
+  public readonly defaultSummaryView: boolean;
   public readonly featuredTopics: string[];
   public readonly topics: OffchainTopic[];
   public readonly chainObjectId: string;
@@ -55,6 +56,7 @@ class ChainInfo {
     terms,
     blockExplorerIds,
     collapsedOnHomepage,
+    defaultSummaryView,
     featuredTopics,
     topics,
     adminsAndMods,
@@ -84,6 +86,7 @@ class ChainInfo {
     this.snapshot = snapshot;
     this.blockExplorerIds = blockExplorerIds;
     this.collapsedOnHomepage = collapsedOnHomepage;
+    this.defaultSummaryView = defaultSummaryView;
     this.featuredTopics = featuredTopics || [];
     this.topics = topics || [];
     this.adminsAndMods = adminsAndMods || [];
@@ -112,6 +115,7 @@ class ChainInfo {
     terms,
     block_explorer_ids,
     collapsed_on_homepage,
+    default_summary_view,
     featured_topics,
     topics,
     adminsAndMods,
@@ -147,6 +151,7 @@ class ChainInfo {
       terms,
       blockExplorerIds: blockExplorerIdsParsed,
       collapsedOnHomepage: collapsed_on_homepage,
+      defaultSummaryView: default_summary_view,
       featuredTopics: featured_topics,
       topics,
       adminsAndMods,
