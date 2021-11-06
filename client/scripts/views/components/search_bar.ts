@@ -11,7 +11,7 @@ import {
 } from 'helpers/search';
 import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
-import { Profile, AddressInfo } from 'models';
+import { Profile, AddressInfo, CommunityInfo } from 'models';
 import moment from 'moment';
 import MarkdownFormattedText from './markdown_formatted_text';
 import QuillFormattedText from './quill_formatted_text';
@@ -288,6 +288,7 @@ const concludeSearch = (searchTerm: string, params: SearchParams, state, err?) =
 // app.searchCache or sends them to getResultsPreview, which creates the relevant
 // preview rows
 export const search = async (searchTerm: string, params: SearchParams, state) => {
+  searchTerm = searchTerm.toLowerCase();
   const { isSearchPreview, isHomepageSearch, communityScope, chainScope } = params;
   const resultSize = isSearchPreview ? SEARCH_PREVIEW_SIZE : SEARCH_PAGE_SIZE;
   if (app.searchCache[searchTerm]?.loaded) {
@@ -335,7 +336,7 @@ export const search = async (searchTerm: string, params: SearchParams, state) =>
     });
     app.searchCache[searchTerm][SearchType.Community] = app.searchCache[searchTerm][SearchType.Community]
       .concat(filteredComms.map((commOrChain) => {
-        commOrChain.contentType = commOrChain.created_at ? ContentType.Community : ContentType.Chain;
+        commOrChain.contentType = commOrChain instanceof CommunityInfo ? ContentType.Community : ContentType.Chain;
         commOrChain.searchType = SearchType.Community;
         return commOrChain;
       })).sort(sortResults);

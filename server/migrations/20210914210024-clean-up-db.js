@@ -2,7 +2,6 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    return;
     return queryInterface.sequelize.transaction(async (transaction) => {
     // Query all addresses (not deleted) into Array
       const addresses = await queryInterface.sequelize.query(

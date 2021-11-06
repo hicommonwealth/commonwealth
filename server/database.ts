@@ -164,7 +164,7 @@ export const sequelize = new Sequelize(DATABASE_URI, {
     process.env.NODE_ENV === 'test'
       ? false
       : (msg) => {
-          log.info(msg);
+          log.trace(msg);
         },
   dialectOptions:
     process.env.NODE_ENV !== 'production'
