@@ -397,6 +397,7 @@ const DiscussionsPage: m.Component<
     summaryView: boolean;
     recentThreads: { threads: OffchainThread[]; activitySummary };
     loadingRecentThreads: boolean;
+    activityFetched: boolean;
   }
 > = {
   oncreate: (vnode) => {
@@ -461,8 +462,9 @@ const DiscussionsPage: m.Component<
   },
   view: (vnode) => {
     let { topic } = vnode.attrs;
-    const { summaryView, recentThreads } = vnode.state;
-    if (summaryView && !recentThreads?.threads?.length) {
+    const { summaryView, recentThreads, lookback } = vnode.state;
+    console.log({ summaryView, lookback, community: app.community.meta });
+    if (summaryView && !vnode.state.activityFetched && !vnode.state.loadingRecentThreads) {
       vnode.state.loadingRecentThreads = true;
       app.recentActivity
         .getRecentCommunityActivity({
@@ -470,6 +472,7 @@ const DiscussionsPage: m.Component<
           chainId: app.activeChainId(),
         })
         .then((res) => {
+          vnode.state.activityFetched = true;
           vnode.state.loadingRecentThreads = false;
           vnode.state.recentThreads = res;
           m.redraw();
