@@ -426,7 +426,7 @@ const DiscussionsPage: m.Component<
       app.user.unseenPosts[app.activeId()]['threads'] = 0;
     }
   },
-  oninit: async (vnode) => {
+  oninit: (vnode) => {
     vnode.state.lookback = {};
     vnode.state.postsDepleted = {};
     vnode.state.topicInitialized = {};
@@ -462,8 +462,8 @@ const DiscussionsPage: m.Component<
   },
   view: (vnode) => {
     let { topic } = vnode.attrs;
-    const { summaryView, recentThreads, lookback } = vnode.state;
-    console.log({ summaryView, lookback, community: app.community.meta });
+    if (!app.community && !app.chain) return;
+    const { summaryView, recentThreads, lastSubpage } = vnode.state;
     if (summaryView && !vnode.state.activityFetched && !vnode.state.loadingRecentThreads) {
       vnode.state.loadingRecentThreads = true;
       app.recentActivity
@@ -630,7 +630,8 @@ const DiscussionsPage: m.Component<
       }
     }
 
-    const newSubpage = subpage !== vnode.state.lastSubpage;
+    // TODO: Refactor this logic in light of summary system
+    const newSubpage = subpage !== lastSubpage;
 
     if (newSubpage) {
       $(window).off('scroll');
