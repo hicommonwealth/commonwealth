@@ -7,7 +7,6 @@ import { ControlGroup, Icon, Icons, Input, List, ListItem, Spinner } from 'const
 import {
   searchMentionableAddresses,
   searchDiscussions,
-  searchChainsAndCommunities,
   SearchIcon,
 } from 'helpers/search';
 import app from 'state';
@@ -328,7 +327,8 @@ export const search = async (searchTerm: string, params: SearchParams, state) =>
       return token;
     });
 
-    const allComms = app.searchCache[ALL_RESULTS_KEY]['communities'];
+    const allComms = (app.config.chains.getAll() as any)
+      .concat(app.config.communities.getAll() as any);
     const filteredComms = allComms.filter((comm) => {
       return comm.name?.toLowerCase().includes(searchTerm)
         || comm.symbol?.toLowerCase().includes(searchTerm);
@@ -347,8 +347,7 @@ export const search = async (searchTerm: string, params: SearchParams, state) =>
 };
 
 export const initializeSearch = async () => {
-  // Pre-queries communities and tokens. Future searches merely filter from cached list,
-  // to prevent unnecessary backend requests
+  // Pre-queries tokens.
   if (!app.searchCache[ALL_RESULTS_KEY]?.loaded) {
     app.searchCache[ALL_RESULTS_KEY] = {};
     try {
@@ -360,12 +359,10 @@ export const initializeSearch = async () => {
             return response.result;
           }
         });
-      const [tokens, comms] = await Promise.all([getTokens(), searchChainsAndCommunities()]);
+      const tokens = await getTokens();
       app.searchCache[ALL_RESULTS_KEY]['tokens'] = tokens;
-      app.searchCache[ALL_RESULTS_KEY]['communities'] = comms;
     } catch (err) {
       app.searchCache[ALL_RESULTS_KEY]['tokens'] = [];
-      app.searchCache[ALL_RESULTS_KEY]['communities'] = [];
     }
     app.searchCache[ALL_RESULTS_KEY].loaded = true;
     m.redraw();
