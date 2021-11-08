@@ -187,6 +187,7 @@ const DiscussionFilterBar: m.Component<
     const selectedStage = stages.find((s) => s === (stage as any));
 
     const summaryViewEnabled = vnode.attrs.parentState.summaryView;
+    console.log({ summaryViewEnabled });
 
     return m('.DiscussionFilterBar', [
       topics.length > 0 &&
@@ -449,6 +450,7 @@ const DiscussionsPage: m.Component<
         : moment();
     if (app.community?.meta?.defaultSummaryView || app.chain?.meta?.chain?.defaultSummaryView) {
       vnode.state.summaryView = true;
+      console.log(vnode.state.summaryView);
     }
     if (app.lastNavigatedBack()) {
       if (localStorage.getItem('discussion-summary-toggle') === 'true') {
@@ -459,6 +461,7 @@ const DiscussionsPage: m.Component<
         localStorage.setItem('discussion-summary-toggle', 'false');
       }
     }
+    console.log(vnode.state.summaryView);
   },
   view: (vnode) => {
     let { topic } = vnode.attrs;
