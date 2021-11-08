@@ -4,6 +4,7 @@ import app from 'state';
 import Web3 from 'web3';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import { setActiveAccount } from 'controllers/app/login';
+import { wsToHttp } from 'utils';
 
 class WalletConnectWebWalletController implements IWebWallet<string> {
   private _enabled: boolean;
@@ -52,8 +53,8 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
       if (!app.chain?.meta.ethChainId) {
         throw new Error(`No chain id found!`);
       }
-      const rpc = { [app.chain.meta.ethChainId]: app.chain.meta.url };
-      this._provider = new WalletConnectProvider({ rpc });
+      const rpc = { [app.chain.meta.ethChainId]: wsToHttp(app.chain.meta.url) };
+      this._provider = new WalletConnectProvider({ rpc, chainId: app.chain.meta.ethChainId });
 
       //  Enable session (triggers QR Code modal)
       await this._provider.enable();
