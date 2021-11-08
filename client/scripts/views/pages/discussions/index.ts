@@ -187,7 +187,6 @@ const DiscussionFilterBar: m.Component<
     const selectedStage = stages.find((s) => s === (stage as any));
 
     const summaryViewEnabled = vnode.attrs.parentState.summaryView;
-    console.log({ summaryViewEnabled });
 
     return m('.DiscussionFilterBar', [
       topics.length > 0 &&
@@ -396,6 +395,7 @@ const DiscussionsPage: m.Component<
     lastVisitedUpdated?: boolean;
     onscroll: any;
     summaryView: boolean;
+    summaryViewInitialized: boolean;
     recentThreads: { threads: OffchainThread[]; activitySummary };
     loadingRecentThreads: boolean;
     activityFetched: boolean;
@@ -448,24 +448,25 @@ const DiscussionsPage: m.Component<
         : moment.isMoment(vnode.state.lookback[subpage])
         ? vnode.state.lookback[subpage]
         : moment();
-    if (app.community?.meta?.defaultSummaryView || app.chain?.meta?.chain?.defaultSummaryView) {
-      vnode.state.summaryView = true;
-      console.log(vnode.state.summaryView);
-    }
-    if (app.lastNavigatedBack()) {
-      if (localStorage.getItem('discussion-summary-toggle') === 'true') {
-        vnode.state.summaryView = true;
-      }
-    } else {
-      if (!vnode.state.summaryView) {
-        localStorage.setItem('discussion-summary-toggle', 'false');
-      }
-    }
-    console.log(vnode.state.summaryView);
   },
   view: (vnode) => {
     let { topic } = vnode.attrs;
     if (!app.community && !app.chain) return;
+    if (!vnode.state.summaryViewInitialized) {
+      if (app.community?.meta?.defaultSummaryView || app.chain?.meta?.chain?.defaultSummaryView) {
+        vnode.state.summaryView = true;
+      }
+      if (app.lastNavigatedBack()) {
+        if (localStorage.getItem('discussion-summary-toggle') === 'true') {
+          vnode.state.summaryView = true;
+        }
+      } else {
+        if (!vnode.state.summaryView) {
+          localStorage.setItem('discussion-summary-toggle', 'false');
+        }
+      }
+      vnode.state.summaryViewInitialized = true;
+    }
     const { summaryView, recentThreads, lastSubpage } = vnode.state;
     if (summaryView && !vnode.state.activityFetched && !vnode.state.loadingRecentThreads) {
       vnode.state.loadingRecentThreads = true;
