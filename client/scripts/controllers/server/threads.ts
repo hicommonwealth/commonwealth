@@ -19,15 +19,14 @@ import {
 
 import { notifyError } from 'controllers/app/notifications';
 import { updateLastVisited } from 'controllers/app/login';
-import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
 import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
-import { modelFromServer as modelThreadsUniqueAddressCount } from 'controllers/server/threadUniqueAddressesCount';
+import { OffchainThreadInstance } from 'server/models/offchain_thread';
 
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
 
-type FetchThreadsProps = {
+type FetchBulkThreadsProps = {
   topicId: OffchainTopic;
   stage: string;
   params: Record<string, any>;
@@ -60,6 +59,7 @@ export const modelFromServer = (thread) => {
     offchain_voting_votes,
     reactions,
     latestCommCreatedAt,
+    linked_threads,
   } = thread;
 
   const attachments = OffchainAttachments
@@ -95,6 +95,18 @@ export const modelFromServer = (thread) => {
     });
   }
 
+  let chainEntitiesProcessed: ChainEntity[];
+  if (chain_entities && !ChainEntities) {
+    chainEntitiesProcessed = chain_entities.map((c) => {
+      return {
+        id: c.id,
+        chain,
+        type: c.type,
+        typeId: c.type_id || c.typeId,
+      };
+    });
+  }
+
   const lastEditedProcessed = last_edited
     ? moment(last_edited)
     : versionHistoryProcessed && versionHistoryProcessed?.length > 1
@@ -120,7 +132,7 @@ export const modelFromServer = (thread) => {
     url,
     pinned,
     collaborators,
-    chainEntities: chain_entities || ChainEntities,
+    chainEntities: chainEntitiesProcessed || ChainEntities,
     versionHistory: versionHistoryProcessed,
     lastEdited: lastEditedProcessed,
     offchainVotingOptions: offchain_voting_options,
@@ -129,6 +141,7 @@ export const modelFromServer = (thread) => {
     latestCommCreatedAt: latestCommCreatedAt
       ? moment(latestCommCreatedAt)
       : null,
+    linkedThreads: linked_threads,
   });
 };
 
@@ -509,6 +522,7 @@ class ThreadsController {
             id: ce.id,
             type: ce.type,
             typeId: ce.typeId,
+            chain: thread.chain,
           })
         );
         return thread;
@@ -522,6 +536,45 @@ class ThreadsController {
         );
       },
     });
+  }
+
+  public async addLinkedThread(
+    linking_thread_id: number,
+    linked_thread_id: number,
+  ) {
+    const response = await $.post(`${app.serverUrl()}/updateLinkedThreads`, {
+      chain: app.activeChainId(),
+      community: app.activeCommunityId(),
+      linking_thread_id,
+      linked_thread_id,
+      address: app.user.activeAccount.address,
+      author_chain: app.user.activeAccount.chain,
+      jwt: app.user.jwt,
+    });
+    if (response.status !== 'Success') {
+      throw new Error();
+    }
+    this._store.add(modelFromServer(response.result));
+  }
+
+  public async removeLinkedThread(
+    linking_thread_id: number,
+    linked_thread_id: number,
+  ) {
+    const response = await $.post(`${app.serverUrl()}/updateLinkedThreads`, {
+      chain: app.activeChainId(),
+      community: app.activeCommunityId(),
+      linking_thread_id,
+      linked_thread_id,
+      address: app.user.activeAccount.address,
+      author_chain: app.user.activeAccount.chain,
+      remove_link: true,
+      jwt: app.user.jwt,
+    });
+    if (response.status !== 'Success') {
+      throw new Error();
+    }
+    this._store.add(modelFromServer(response.result));
   }
 
   public async fetchThreadIdForSnapshot(args: { snapshot: string }) {
@@ -539,25 +592,30 @@ class ThreadsController {
     return response.result;
   }
 
-  public async fetchThread(id) {
+  public async fetchThreadsFromId(ids: Array<number | string>): Promise<OffchainThread[]> {
     const params = {
       chain: app.activeChainId(),
       community: app.activeCommunityId(),
-      id,
+      ids,
     };
-    const response = await $.get(`${app.serverUrl()}/getThread`, params);
+    const response = await $.get(`${app.serverUrl()}/getThreads`, params);
     if (response.status !== 'Success') {
       throw new Error(`Cannot fetch thread: ${response.status}`);
     }
-
-    const thread = modelFromServer(response.result);
-    const existing = this._store.getByIdentifier(thread.id);
-    if (existing) this._store.remove(existing);
-    this._store.update(thread);
-    return thread;
+    return response.result.map((rawThread) => {
+      const thread = modelFromServer(rawThread);
+      const existing = this._store.getByIdentifier(thread.id);
+      if (existing) this._store.remove(existing);
+      this._store.update(thread);
+      return thread;
+    });
   }
 
-  fetchThreads = async ({ topicId, stage, params }: FetchThreadsProps) => {
+  fetchBulkThreads = async ({
+    topicId,
+    stage,
+    params,
+  }: FetchBulkThreadsProps) => {
     const response = await $.get(`${app.serverUrl()}/bulkThreads`, params);
     if (response.status !== 'Success') {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);
@@ -626,7 +684,7 @@ class ThreadsController {
     };
     if (topicId) params['topic_id'] = topicId;
     if (stage) params['stage'] = stage;
-    const threads = await this.fetchThreads({ topicId, stage, params });
+    const threads = await this.fetchBulkThreads({ topicId, stage, params });
     await Promise.all([
       this.fetchReactionsCount(threads),
       app.threadUniqueAddressesCount.fetchThreadsUniqueAddresses({
