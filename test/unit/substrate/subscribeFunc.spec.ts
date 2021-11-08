@@ -1,6 +1,6 @@
 import chai from 'chai';
-import { spec as EdgewareSpec } from '@edgeware/node-types';
 
+import { EdgewareSpec } from '../../../scripts/specs/edgeware';
 import { createApi } from '../../../src/chains/substrate/subscribeFunc';
 
 const { assert } = chai;

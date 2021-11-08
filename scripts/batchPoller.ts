@@ -1,4 +1,3 @@
-import { spec } from '@edgeware/node-types';
 import { ApiPromise } from '@polkadot/api';
 import { LogGroupControlSettings } from 'typescript-logging';
 import {
@@ -105,7 +104,7 @@ function main() {
   const url = networks[chain];
 
   if (!url) throw new Error(`no url for chain ${chain}`);
-  SubstrateEvents.createApi(url, spec).then(async (api) => {
+  SubstrateEvents.createApi(url, {}).then(async (api) => {
     await batchQuery(api, [ new StandaloneEventHandler() ]);
     process.exit(0);
   });

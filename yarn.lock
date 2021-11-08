@@ -241,11 +241,6 @@
     "@babel/helper-validator-identifier" "^7.14.9"
     to-fast-properties "^2.0.0"
 
-"@edgeware/node-types@^3.3.3":
-  version "3.3.41"
-  resolved "https://registry.yarnpkg.com/@edgeware/node-types/-/node-types-3.3.41.tgz#60f611dc03ef8a768a55d614372f8d835976d8c0"
-  integrity sha512-C3abZUs5en74X8jXvF0dUsMIFdseieBxKPCYoJK+D57/IppfOKqVk4a45vouvsGw0tlxBCfvNUX5VCd0nSzzNg==
-
 "@eslint/eslintrc@^0.4.3":
   version "0.4.3"
   resolved "https://registry.yarnpkg.com/@eslint/eslintrc/-/eslintrc-0.4.3.tgz#9e42981ef035beb3dd49add17acb96e8ff6f394c"

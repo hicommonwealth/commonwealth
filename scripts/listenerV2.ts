@@ -38,10 +38,10 @@ const { argv } = yargs.options({
 
 const shortcuts = {
   substrate: {
-    chain: 'polkadot',
+    chain: 'edgeware',
     network: SupportedNetwork.Substrate,
-    url: networkUrls.polkadot,
-    spec: networkSpecs.polkadot,
+    url: networkUrls.edgeware,
+    spec: networkSpecs.edgeware,
     enricherConfig: {
       balanceTransferThreshold: 500_000,
     },

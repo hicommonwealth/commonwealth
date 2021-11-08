@@ -1,4 +1,3 @@
-import { spec } from '@edgeware/node-types';
 import { SubstrateEvents, SubstrateTypes } from '../dist/index';
 import { Registration } from '@polkadot/types/interfaces';
 import { Option } from '@polkadot/types';
@@ -18,7 +17,7 @@ const networks = {
 const url = networks[chain];
 
 if (!url) throw new Error(`no url for chain ${chain}`);
-SubstrateEvents.createApi(url, spec as any).then(async (api) => {
+SubstrateEvents.createApi(url, {}).then(async (api) => {
   const subscriber = new SubstrateEvents.Subscriber(api);
   const identities = {};
   const FINISH_BLOCK = 1000000;
