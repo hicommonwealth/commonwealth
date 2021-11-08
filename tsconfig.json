@@ -8,8 +8,6 @@
     "outDir": "./build",
     "baseUrl": ".",
     "paths": {
-      "@polkadot/api/augment": ["./node_modules/@edgeware/node-types/dist/src/interfaces/augment-api.d.ts"],
-      "@polkadot/types/augment": ["./node_modules/@edgeware/node-types/dist/src/interfaces/augment-types.d.ts"],
       "*": ["./*", "shared/*", "client/scripts/*"]
     },
     "resolveJsonModule": true,
