@@ -28,7 +28,7 @@ export default (
     name: { type: dataTypes.STRING, allowNull: false },
     address: { type: dataTypes.STRING, allowNull: false },
     symbol: { type: dataTypes.STRING, allowNull: false },
-    chain_id: { type: dataTypes.NUMBER, allowNull: false, defaultValue: 1 },
+    chain_id: { type: dataTypes.INTEGER, allowNull: false, defaultValue: 1 },
     icon_url: { type: dataTypes.STRING(1024), allowNull: true },
   }, {
     tableName: 'Tokens',
