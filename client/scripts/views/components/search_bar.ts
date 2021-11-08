@@ -7,12 +7,11 @@ import { ControlGroup, Icon, Icons, Input, List, ListItem, Spinner } from 'const
 import {
   searchMentionableAddresses,
   searchDiscussions,
-  searchChainsAndCommunities,
   SearchIcon,
 } from 'helpers/search';
 import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
-import { Profile, AddressInfo } from 'models';
+import { Profile, AddressInfo, CommunityInfo } from 'models';
 import moment from 'moment';
 import MarkdownFormattedText from './markdown_formatted_text';
 import QuillFormattedText from './quill_formatted_text';
@@ -289,6 +288,7 @@ const concludeSearch = (searchTerm: string, params: SearchParams, state, err?) =
 // app.searchCache or sends them to getResultsPreview, which creates the relevant
 // preview rows
 export const search = async (searchTerm: string, params: SearchParams, state) => {
+  searchTerm = searchTerm.toLowerCase();
   const { isSearchPreview, isHomepageSearch, communityScope, chainScope } = params;
   const resultSize = isSearchPreview ? SEARCH_PREVIEW_SIZE : SEARCH_PAGE_SIZE;
   if (app.searchCache[searchTerm]?.loaded) {
@@ -328,14 +328,15 @@ export const search = async (searchTerm: string, params: SearchParams, state) =>
       return token;
     });
 
-    const allComms = app.searchCache[ALL_RESULTS_KEY]['communities'];
+    const allComms = (app.config.chains.getAll() as any)
+      .concat(app.config.communities.getAll() as any);
     const filteredComms = allComms.filter((comm) => {
       return comm.name?.toLowerCase().includes(searchTerm)
         || comm.symbol?.toLowerCase().includes(searchTerm);
     });
     app.searchCache[searchTerm][SearchType.Community] = app.searchCache[searchTerm][SearchType.Community]
       .concat(filteredComms.map((commOrChain) => {
-        commOrChain.contentType = commOrChain.created_at ? ContentType.Community : ContentType.Chain;
+        commOrChain.contentType = commOrChain instanceof CommunityInfo ? ContentType.Community : ContentType.Chain;
         commOrChain.searchType = SearchType.Community;
         return commOrChain;
       })).sort(sortResults);
@@ -347,8 +348,7 @@ export const search = async (searchTerm: string, params: SearchParams, state) =>
 };
 
 export const initializeSearch = async () => {
-  // Pre-queries communities and tokens. Future searches merely filter from cached list,
-  // to prevent unnecessary backend requests
+  // Pre-queries tokens.
   if (!app.searchCache[ALL_RESULTS_KEY]?.loaded) {
     app.searchCache[ALL_RESULTS_KEY] = {};
     try {
@@ -360,12 +360,10 @@ export const initializeSearch = async () => {
             return response.result;
           }
         });
-      const [tokens, comms] = await Promise.all([getTokens(), searchChainsAndCommunities()]);
+      const tokens = await getTokens();
       app.searchCache[ALL_RESULTS_KEY]['tokens'] = tokens;
-      app.searchCache[ALL_RESULTS_KEY]['communities'] = comms;
     } catch (err) {
       app.searchCache[ALL_RESULTS_KEY]['tokens'] = [];
-      app.searchCache[ALL_RESULTS_KEY]['communities'] = [];
     }
     app.searchCache[ALL_RESULTS_KEY].loaded = true;
     m.redraw();

@@ -77,25 +77,6 @@ export const searchMentionableAddresses = async (
   }
 };
 
-export const searchChainsAndCommunities = async (
-  searchTerm?: string,
-  limit?: number,
-) => {
-  try {
-    const response = await $.get(`${app.serverUrl()}/getCommunitiesAndChains`, {
-      searchTerm,
-      limit,
-    });
-    if (response.status !== 'Success') {
-      throw new Error(`Got unsuccessful status: ${response.status}`);
-    }
-    return response.result;
-  } catch (e) {
-    console.error(e);
-    return [];
-  }
-};
-
 export const SearchIcon: m.Component<{ isMobile?: boolean }, {}> = {
   view: (vnode) => {
     return m('svg.SearchIcon', {
