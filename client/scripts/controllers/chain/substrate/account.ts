@@ -327,28 +327,6 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
     );
   }
 
-  public setKeys(sessionKeys: string) {
-    return this._Chain.createTXModalData(
-      this,
-      (api: ApiPromise) => api.tx.session.setKeys(this._Chain.createType('Keys', sessionKeys), '0x'),
-      'setKeys',
-      `${this.address} sets session keys ${sessionKeys}`,
-    );
-  }
-
-  public validateTx(validatorPrefs: number) {
-    if (validatorPrefs < 0 || validatorPrefs > 100) return;
-    const commission = Math.round(1000000000 * ((validatorPrefs * 1.0) / 100));
-    return this._Chain.createTXModalData(
-      this,
-      (api: ApiPromise) => api.tx.staking.validate({
-        commission: new BN(commission),
-      }),
-      'setKeys',
-      `${this.address} sets validation commission ${this.validate}`,
-    );
-  }
-
   public unlockTx() {
     return this._Chain.createTXModalData(
       this,
