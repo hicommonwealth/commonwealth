@@ -150,7 +150,7 @@ const CreateComment: m.Component<{
       || !app.user.activeAccount;
 
     // token balance check if needed
-    let tokenPostingThreshold = null;
+    let tokenPostingThreshold: BN | null = null;
     if (!app.community && (app.chain as Token)?.isToken) {
       const tokenBalance = (app.chain as Token).tokenBalance;
       tokenPostingThreshold = app.topics.getByName(
@@ -158,9 +158,11 @@ const CreateComment: m.Component<{
         app.activeId()
       )?.tokenThreshold;
       disabled = disabled
-        || ((!app.isAdapterReady) && !isAdmin && tokenPostingThreshold && tokenPostingThreshold.gt(tokenBalance));
+        || !app.isAdapterReady
+        || (!isAdmin && tokenPostingThreshold && tokenPostingThreshold.gt(tokenBalance));
     }
 
+    const decimals = app.chain.meta.chain.decimals ? app.chain.meta.chain.decimals : 18;
     return m('.CreateComment', {
       class: parentScopedClass
     }, [
@@ -218,7 +220,7 @@ const CreateComment: m.Component<{
               tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0))
                 ? [
                   `Commenting in ${activeTopicName} requires `,
-                  `${tokenBaseUnitsToTokens(tokenPostingThreshold.toString(), app.chain.meta.chain.decimals)} `,
+                  `${tokenBaseUnitsToTokens(tokenPostingThreshold.toString(), decimals)} `,
                   `${app.chain.meta.chain.symbol}`
                 ]
                 : null
