@@ -79,6 +79,7 @@ export async function initAppState(updateSelectedNode = true, customDomain = nul
           default_chain: app.config.chains.getById(community.default_chain),
           visible: community.visible,
           collapsed_on_homepage: community.collapsed_on_homepage,
+          default_summary_view: community.default_summary_view,
           invites_enabled: community.invites_enabled,
           privacy_enabled: community.privacy_enabled,
           featured_topics: community.featured_topics,

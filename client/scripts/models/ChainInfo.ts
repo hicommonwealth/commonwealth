@@ -26,6 +26,7 @@ class ChainInfo {
   public terms: string;
   public readonly blockExplorerIds: { [id: string]: string };
   public readonly collapsedOnHomepage: boolean;
+  public defaultSummaryView: boolean;
   public readonly featuredTopics: string[];
   public readonly topics: OffchainTopic[];
   public readonly chainObjectId: string;
@@ -55,6 +56,7 @@ class ChainInfo {
     terms,
     blockExplorerIds,
     collapsedOnHomepage,
+    defaultSummaryView,
     featuredTopics,
     topics,
     adminsAndMods,
@@ -84,6 +86,7 @@ class ChainInfo {
     this.snapshot = snapshot;
     this.blockExplorerIds = blockExplorerIds;
     this.collapsedOnHomepage = collapsedOnHomepage;
+    this.defaultSummaryView = defaultSummaryView;
     this.featuredTopics = featuredTopics || [];
     this.topics = topics || [];
     this.adminsAndMods = adminsAndMods || [];
@@ -112,6 +115,7 @@ class ChainInfo {
     terms,
     block_explorer_ids,
     collapsed_on_homepage,
+    default_summary_view,
     featured_topics,
     topics,
     adminsAndMods,
@@ -147,6 +151,7 @@ class ChainInfo {
       terms,
       blockExplorerIds: blockExplorerIdsParsed,
       collapsedOnHomepage: collapsed_on_homepage,
+      defaultSummaryView: default_summary_view,
       featuredTopics: featured_topics,
       topics,
       adminsAndMods,
@@ -227,6 +232,7 @@ class ChainInfo {
     terms,
     snapshot,
     iconUrl,
+    defaultSummaryView,
   }) {
     // TODO: Change to PUT /chain
     const r = await $.post(`${app.serverUrl()}/updateChain`, {
@@ -244,6 +250,7 @@ class ChainInfo {
       snapshot,
       terms,
       icon_url: iconUrl,
+      default_summary_view: defaultSummaryView,
       jwt: app.user.jwt,
     });
     const updatedChain: ChainInstance = r.result;
@@ -260,6 +267,8 @@ class ChainInfo {
     this.snapshot = updatedChain.snapshot;
     this.terms = updatedChain.terms;
     this.iconUrl = updatedChain.icon_url;
+    this.defaultSummaryView = updatedChain.default_summary_view;
+    console.log({ this: this.defaultSummaryView, route: updatedChain.default_summary_view });
   }
 
   public addFeaturedTopic(topic: string) {
