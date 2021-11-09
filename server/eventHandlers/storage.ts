@@ -79,7 +79,6 @@ export default class extends IEventHandler {
     // eslint-disable-next-line @typescript-eslint/no-shadow
     const log = factory.getLogger(addPrefix(__filename, [event.network, event.chain]));
     const chain = event.chain || this._chain;
-    log.info(`>>>>>>>>>>>>>>>>>>>>>>>>>>>DEUBG: ${chain}, event chain: ${event.chain}, class chain: ${this._chain}`);
 
     event = this.truncateEvent(event);
     const shouldSkip = await this._shouldSkip(event);
