@@ -236,31 +236,13 @@ const CommunityMetadataManagementTable: m.Component<
             ]),
         ]
       ),
-      m(Button, {
-        label: 'Save changes',
-        disabled: vnode.state.uploadInProgress,
-        intent: 'primary',
-        rounded: true,
-        onclick: async (e) => {
-          const {
-            name,
-            description,
-            iconUrl,
-            website,
-            discord,
-            element,
-            telegram,
-            github,
-            stagesEnabled,
-            customStages,
-            customDomain,
-            terms,
-            invitesEnabled,
-            privacyEnabled,
-            defaultSummaryView,
-          } = vnode.state;
-          try {
-            await vnode.attrs.community.updateCommunityData({
+      m('.button-wrap', [
+        m(Button, {
+          label: 'Save changes',
+          disabled: vnode.state.uploadInProgress,
+          intent: 'primary',
+          onclick: async (e) => {
+            const {
               name,
               description,
               iconUrl,
@@ -273,16 +255,35 @@ const CommunityMetadataManagementTable: m.Component<
               customStages,
               customDomain,
               terms,
-              privacyEnabled,
               invitesEnabled,
+              privacyEnabled,
               defaultSummaryView,
-            });
-            notifySuccess('Community updated');
-          } catch (err) {
-            notifyError(err.responseJSON?.error || 'Community update failed');
-          }
-        },
-      }),
+            } = vnode.state;
+            try {
+              await vnode.attrs.community.updateCommunityData({
+                name,
+                description,
+                iconUrl,
+                website,
+                discord,
+                element,
+                telegram,
+                github,
+                stagesEnabled,
+                customStages,
+                customDomain,
+                terms,
+                privacyEnabled,
+                invitesEnabled,
+                defaultSummaryView,
+              });
+              notifySuccess('Community updated');
+            } catch (err) {
+              notifyError(err.responseJSON?.error || 'Community update failed');
+            }
+          },
+        }),
+      ])
     ]);
   },
 };
