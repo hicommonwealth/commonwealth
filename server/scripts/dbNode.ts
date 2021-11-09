@@ -403,7 +403,7 @@ async function mainProcess(
     } else if (HANDLE_IDENTITY === 'publish') {
       for (const event of identityEvents) {
         event.chain = chain.id; // augment event with chain
-        await producer.publish(event, 'identityPub');
+        await producer.publish(event, 'SubstrateIdentityEventsPublication');
       }
     }
 
@@ -531,7 +531,7 @@ async function initializer(): Promise<void> {
 
   log.info(`Worker Number: ${workerNumber}\nNumber of Workers: ${numWorkers}`);
 
-  producer = new RabbitMqHandler(RabbitMQConfig);
+  producer = new RabbitMqHandler(RabbitMQConfig, 'ChainEventsHandlersPublication');
   erc20Logger = new Erc20LoggingHandler([]);
   await producer.init();
 }

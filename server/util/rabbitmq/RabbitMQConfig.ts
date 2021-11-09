@@ -62,45 +62,54 @@ if (HANDLE_IDENTITY === 'publish')
             exchange: 'eventsExchange',
             routingKey: 'eQueue',
             confirm: true,
-            retry: {
-              delay: 1000
-            },
-            prefetch: 10,
-            timeout: 10000
+            timeout: 10000,
+            options: {
+              persistent: true
+            }
           },
           SubstrateIdentityEventsPublication: {
             exchange: 'eventsExchange',
             routingKey: 'iQueue',
             confirm: true,
-            retry: {
-              delay: 1000
-            },
-            prefetch: 10,
-            timeout: 10000
+            timeout: 10000,
+            options: {
+              persistent: true
+            }
           },
           ChainEventsNotificationsPublication: {
             exchange: 'eventsExchange',
             routingKey: 'nQueue',
             confirm: true,
-            retry: {
-              delay: 1000
-            },
-            prefetch: 10,
-            timeout: 10000
+            timeout: 10000,
+            options: {
+              persistent: true
+            }
           }
         },
         subscriptions: {
           ChainEventsHandlersSubscription: {
             queue: 'ChainEventsHandlersQueue',
-            contentType: 'application/json'
+            contentType: 'application/json',
+            retry: {
+              delay: 1000
+            },
+            prefetch: 10,
           },
           SubstrateIdentityEventsSubscription: {
             queue: 'SubstrateIdentityEventsQueue',
-            contentType: 'application/json'
+            contentType: 'application/json',
+            retry: {
+              delay: 1000
+            },
+            prefetch: 10,
           },
           ChainEventsNotificationsPublication: {
             queue: 'ChainEventsNotificationsQueue',
-            contentType: 'application/json'
+            contentType: 'application/json',
+            retry: {
+              delay: 1000
+            },
+            prefetch: 10,
           }
         }
       }
