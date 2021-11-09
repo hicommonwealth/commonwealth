@@ -16,7 +16,7 @@ import {
 import { ChainBase, ChainNetwork, ChainType } from '../../shared/types';
 import { RabbitMqHandler } from '../eventHandlers/rabbitmqPlugin';
 import Identity from '../eventHandlers/pgIdentity';
-import { factory, formatFilename } from '../../shared/logging';
+import { addPrefix, factory, formatFilename } from '../../shared/logging';
 import { DATABASE_URI, HANDLE_IDENTITY } from '../config';
 import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
 
@@ -67,12 +67,18 @@ async function handleFatalError(
 }
 
 class Erc20LoggingHandler extends IEventHandler {
+  private logger = {}
   constructor(public tokenNames: string[]) {
     super();
   }
   public async handle(event: CWEvent): Promise<undefined> {
-    if (this.tokenNames.includes(event.chain))
-      log.info(`[Erc20]: Received event: ${JSON.stringify(event, null, 2)}`);
+    if (this.tokenNames.includes(event.chain)) {
+      // if logger for this specific token doesn't exist, create it - decreases computational cost of logging
+      if (!this.logger[event.chain])
+        this.logger[event.chain] = factory.getLogger(addPrefix(__filename, ['Erc20', event.chain]));
+
+      this.logger[event.chain].info(`Received event: ${JSON.stringify(event, null, 2)}`);
+    }
     return null;
   }
 }
@@ -93,8 +99,15 @@ async function mainProcess(
     ++runCount;
   }
 
+  const activeChains: string[] = Object.keys(listeners).map((chainName): string => {
+    if (chainName !== 'erc20') return chainName;
+    else {
+      return listeners['erc20'].tokenNames;
+    }
+  });
+
   log.info(
-    `Starting scheduled process. Active chains: ${Object.keys(listeners)}`
+    `Starting scheduled process. Active chains: ${JSON.stringify(activeChains)}`
   );
 
   let query =
@@ -451,7 +464,8 @@ async function initializer(): Promise<void> {
   });
 
   // these requests cannot work locally
-  if (process.env.NODE_ENV === 'production' && process.env.USE_SLIDER_SCALING) {
+  if ((process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') && process.env.USE_SLIDER_SCALING === 'true') {
+    log.info('Connecting to Heroku API');
     // get all dyno's list
     const res = await fetch(
       `https://api.heroku.com/apps/${process.env.HEROKU_APP_NAME}/dynos`,
@@ -472,7 +486,6 @@ async function initializer(): Promise<void> {
     const dynoList = await res.json();
 
     if (!dynoList || dynoList.length === 0) {
-      // TODO: this will never occur
       throw new Error("No dyno's detected");
     }
 
@@ -525,8 +538,8 @@ async function initializer(): Promise<void> {
       }
     }
   } else {
-    workerNumber = Number(process.env.WORKER_NUMBER) || 0;
-    numWorkers = Number(process.env.NUM_WORKERS) || 1;
+    workerNumber = process.env.WORKER_NUMBER ? Number(process.env.WORKER_NUMBER) : 0;
+    numWorkers = process.env.NUM_WORKERS ? Number(process.env.NUM_WORKERS) : 1;
   }
 
   log.info(`Worker Number: ${workerNumber}\nNumber of Workers: ${numWorkers}`);
