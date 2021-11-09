@@ -102,7 +102,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     }
   }
 
-  public createType<K extends keyof InterfaceTypes>(type: K, ...params: any[]): InterfaceTypes[K] {
+  public createType<K extends keyof InterfaceTypes>(type: K, ...params: any[]) {
     return this.api.registry.createType(type, ...params);
   }
   public findCall(callIndex: Uint8Array | string): CallFunction {
@@ -301,6 +301,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     // chainProps needs to be set first so calls to coins() correctly populate the denom
     if (chainProps) {
       const { ss58Format, tokenDecimals, tokenSymbol } = chainProps;
+      // @ts-ignore
       this.registry.setChainProperties(this.createType('ChainProperties', { ...chainProps, ss58Format }));
       this._ss58Format = +ss58Format.unwrapOr(42);
       this._tokenDecimals = +tokenDecimals.unwrapOr([ 12 ])[0];
@@ -482,7 +483,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
                   });
                   if (unsubscribe) unsubscribe.then((u) => u());
                 } else if (this.api.events.system.ExtrinsicFailed.is(e.event)) {
-                  const errorData = e.event.data[0] as DispatchError;
+                  const errorData = e.event.data[0] as unknown as DispatchError;
                   let errorInfo;
                   if (errorData.isModule) {
                     const decoded = this.registry.findMetaError(errorData.asModule);
@@ -544,9 +545,9 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
         // TODO: provide chain to formatAddressShort
         case 'Address': return formatAddressShort(this.createType('AccountId', arg).toString(), null);
         // TODO: when do we actually see this Moment in practice? is this a correct decoding?
-        case 'Compact<Moment>':
-          return moment(new Date(this.createType('Compact<Moment>', arg).toNumber())).utc().toString();
-        case 'Compact<Balance>': return formatCoin(this.coins(this.createType('Compact<Balance>', arg).toBn()));
+        case 'Moment':
+          return moment(new Date(this.createType('Moment', arg).toNumber())).utc().toString();
+        case 'Balance': return formatCoin(this.coins(this.createType('Balance', arg).toBn()));
         default: return arg.toString().length > 16 ? `${arg.toString().substr(0, 15)}...` : arg.toString();
       }
     });
