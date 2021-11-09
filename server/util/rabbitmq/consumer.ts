@@ -49,14 +49,14 @@ export class Consumer implements IConsumer {
 
   public async consumeEvents(
     eventProcessor: (event: CWEvent) => Promise<void>,
-    queueName: string
+    subscriptionName: string
   ): Promise<any> {
     let subscription: Rascal.SubscriberSessionAsPromised;
-    log.info(`Subscribing to ${queueName}`);
+    log.info(`Subscribing to ${subscriptionName}`);
     try {
-      if (!this._subscribers.includes(queueName))
+      if (!this._subscribers.includes(subscriptionName))
         throw new Error('Subscription does not exist');
-      subscription = await this.broker.subscribe(queueName);
+      subscription = await this.broker.subscribe(subscriptionName);
       subscription.on('message', (message, content, ackOrNack) => {
         try {
           eventProcessor(content);
@@ -64,7 +64,6 @@ export class Consumer implements IConsumer {
         } catch (e) {
           ackOrNack(e, [{strategy: 'republish', defer: 2000, attempts: 3}, {strategy: 'nack'}])
         }
-
       });
       // @ts-ignore
       subscription.on('error', (err, messageId, ackOrNack) => {

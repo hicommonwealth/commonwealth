@@ -111,16 +111,13 @@ const setupChainEventListeners = async (wss: WebSocket.Server): Promise<{}> => {
 
   const eventsSubscriber = await consumer.consumeEvents(
     processClassicEvents,
-    'eventsSub'
+    'ChainEventsHandlersSubscription'
   );
 
-  let identitySubscriber;
-  if (HANDLE_IDENTITY === 'publish') {
-    identitySubscriber = await consumer.consumeEvents(
+  const identitySubscriber = await consumer.consumeEvents(
       processIdentityEvents,
-      'identitySub'
-    );
-  }
+      'SubstrateIdentityEventsSubscription'
+  );
 
   log.info('Consumer started');
   return { eventsSubscriber, identitySubscriber };
