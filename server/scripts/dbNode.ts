@@ -204,7 +204,7 @@ async function mainProcess(
           'erc20',
           SupportedNetwork.ERC20,
           {
-            url: 'wss://mainnet.infura.io/ws',
+            url: 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
             tokenAddresses: erc20TokenAddresses,
             tokenNames: erc20TokenNames,
             verbose: false,

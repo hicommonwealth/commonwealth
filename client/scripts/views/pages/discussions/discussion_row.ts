@@ -42,11 +42,11 @@ export const getLastUpdated = (proposal) => {
 };
 
 const DiscussionRow: m.Component<
-  { proposal: OffchainThread; showExcerpt?: boolean },
+  { proposal: OffchainThread; onSelect?: any },
   { expanded: boolean }
 > = {
   view: (vnode) => {
-    const { proposal, showExcerpt } = vnode.attrs;
+    const { proposal, onSelect } = vnode.attrs;
     if (!proposal) return;
     const propType: OffchainThreadKind = proposal.kind;
     const pinned = proposal.pinned;
@@ -78,7 +78,7 @@ const DiscussionRow: m.Component<
       proposal.chainEntities?.length > 0 && [
         proposal.chainEntities
           .sort((a, b) => {
-            return a.typeId - b.typeId;
+            return +a.typeId - +b.typeId;
           })
           .map((ce) => {
             if (!chainEntityTypeToProposalShortName(ce.type)) return;
@@ -219,6 +219,9 @@ const DiscussionRow: m.Component<
       rightColSpacing: app.isLoggedIn() ? [10, 2] : [12],
       key: proposal.id,
       onclick: (e) => {
+        if (vnode.attrs.onSelect) {
+          return vnode.attrs.onSelect();
+        }
         if ($(e.target).hasClass('cui-tag')) return;
         if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
         e.preventDefault();

@@ -3,7 +3,6 @@ import Web3 from 'web3';
 import BN from 'bn.js';
 import { providers } from 'ethers';
 
-import { INFURA_API_KEY } from '../config';
 import { ERC20__factory } from '../../shared/eth/types';
 import { TokenResponse } from '../../shared/types';
 
@@ -38,7 +37,14 @@ export interface TokenForumMeta {
 export class TokenBalanceProvider {
   private _provider: providers.Web3Provider;
   constructor(private _network = 'mainnet') {
-    const web3Provider = new Web3.providers.HttpProvider(`https://${this._network}.infura.io/v3/${INFURA_API_KEY}`);
+    let web3Provider;
+    if (this._network === 'mainnet') {
+      web3Provider = new Web3.providers.HttpProvider(`https://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr`);
+    } else if (this._network === 'ropsten') {
+      web3Provider = new Web3.providers.HttpProvider(`https://eth-ropsten.alchemyapi.io/v2/2xXT2xx5AvA3GFTev3j_nB9LzWdmxPk7`);
+    } else {
+      throw new Error('invalid network');
+    }
     this._provider = new providers.Web3Provider(web3Provider);
     // 12s minute polling interval (default is 4s)
     this._provider.pollingInterval = 12000;

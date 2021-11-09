@@ -174,13 +174,13 @@ const listenerOptions = {
     enricherConfig: { balanceTransferThresholdPermill: 10_000 },
   },
   moloch: {
-    url: 'wss://mainnet.infura.io/ws',
+    url: 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
     skipCatchup: false,
     contractAddress: '0x1fd169A4f5c59ACf79d0Fd5d91D1201EF1Bce9f1',
     contractVersion: 2,
   },
   marlin: {
-    url: 'wss://mainnet.infura.io/ws',
+    url: 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
     skipCatchup: false,
     contractAddresses: {
       comp: '0xEa2923b099b4B588FdFAD47201d747e3b9599A5f', // TESTNET
@@ -189,7 +189,7 @@ const listenerOptions = {
     },
   },
   susd: {
-    url: 'wss://mainnet.infura.io/ws',
+    url: 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
     tokenAddresses: ['0x57ab1ec28d129707052df4df418d58a2d46d5f51'],
   },
 };
@@ -412,7 +412,6 @@ setTimeout(async () => {
                 WORKER_NUMBER: String(chainIndex),
                 NUM_WORKERS: String(chains.length),
                 HANDLE_IDENTITY: 'publish',
-                INFURA_API_KEY: '8e25780c4d574b3cbf53c306a841d09f',
               },
             }
           );

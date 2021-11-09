@@ -753,7 +753,7 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
               type: 'token',
               base: 'ethereum',
               network: slugify(name),
-              node_url: 'wss://mainnet.infura.io/ws',
+              node_url: 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
             })
               .then(async (res) => {
                 await initAppState(false);
@@ -897,7 +897,7 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
             type: ChainType.Token,
             base: ChainBase.Ethereum,
             network: ChainNetwork.ERC20,
-            node_url: 'wss://mainnet.infura.io/ws',
+            node_url: 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
           })
             .then(async (res) => {
               await initAppState(false);
@@ -1049,6 +1049,10 @@ const SputnikForm: m.Component<SputnikFormAttrs, SputnikFormState> = {
           intent: 'primary',
           disabled: vnode.state.saving,
           onclick: async (e) => {
+            if (!app.chain || !app.activeChainId().includes('near')) {
+              notifyError('Must be on NEAR or NEAR testnet to add Sputnik DAO.');
+              return;
+            }
             const {
               name,
               description,
@@ -1061,7 +1065,7 @@ const SputnikForm: m.Component<SputnikFormAttrs, SputnikFormState> = {
               createNew,
             } = vnode.state;
             vnode.state.saving = true;
-            const isMainnet = !app.chain || (app.chain as Near).chain.isMainnet;
+            const isMainnet = (app.chain as Near).chain.isMainnet;
             const id = isMainnet
               ? `${name}.sputnik-dao.near`
               : `${name}.sputnikv2.testnet`;
@@ -1101,6 +1105,21 @@ const SputnikForm: m.Component<SputnikFormAttrs, SputnikFormState> = {
                 );
               } catch (err) {
                 notifyError(err.responseJSON?.error || 'Creating DAO failed.');
+                console.error(err.responseJSON?.error || err.message);
+                vnode.state.saving = false;
+              }
+            } else {
+              try {
+                // verify the DAO exists
+                await (app.chain as Near).chain.query(id, 'get_last_proposal_id', {});
+
+                // POST object
+                const res = await $.post(`${app.serverUrl()}/addChainNode`, addChainNodeArgs);
+                await initAppState(false);
+                $(e.target).trigger('modalexit');
+                m.route.set(`${window.location.origin}/${res.result.chain}`);
+              } catch (err) {
+                notifyError(err.responseJSON?.error || 'Adding DAO failed.');
                 console.error(err.responseJSON?.error || err.message);
                 vnode.state.saving = false;
               }

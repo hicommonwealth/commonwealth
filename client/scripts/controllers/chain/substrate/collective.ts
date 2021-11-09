@@ -130,7 +130,7 @@ class SubstrateCollective extends ProposalModule<
     const txFunc = fromTechnicalCommittee
       ? ((api: ApiPromise) => api.tx.technicalCommittee.propose.meta.args.length === 3
         ? api.tx.technicalCommittee.propose(threshold, action, length)
-        : api.tx.technicalCommittee.propose(threshold, action))
+        : (api.tx.technicalCommittee.propose as any)(threshold, action))
       : ((api: ApiPromise) => api.tx.council.propose.meta.args.length === 3
         ? api.tx.council.propose(threshold, action, length)
         : (api.tx.council.propose as any)(threshold, action, null));

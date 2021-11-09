@@ -63,6 +63,7 @@ const updateCommunity = async (
     custom_domain,
     invites,
     privacy,
+    default_summary_view,
     terms,
   } = req.body;
 
@@ -97,6 +98,7 @@ const updateCommunity = async (
   if (terms) community.terms = terms;
   community.invites_enabled = invites || false;
   community.privacy_enabled = privacy || false;
+  community.default_summary_view = default_summary_view || false;
   // Under our current security policy, custom domains must be set by trusted
   // administrators only. Otherwise an attacker could configure a custom domain and
   // use the code they run to steal login tokens for arbitrary users.

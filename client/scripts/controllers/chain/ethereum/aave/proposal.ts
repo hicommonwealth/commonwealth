@@ -159,7 +159,7 @@ export default class AaveProposal extends Proposal<
     if (state === AaveTypes.ProposalState.ACTIVE) return { kind: 'fixed_block', blocknum: this.data.endBlock };
 
     // queued but not ready for execution
-    if (state === AaveTypes.ProposalState.QUEUED) return { kind: 'fixed', time: moment(this.data.executionTime) };
+    if (state === AaveTypes.ProposalState.QUEUED) return { kind: 'fixed', time: moment.unix(this.data.executionTime) };
 
     // unavailable if: waiting to passed/failed but not in queue, or completed
     return { kind: 'unavailable' };

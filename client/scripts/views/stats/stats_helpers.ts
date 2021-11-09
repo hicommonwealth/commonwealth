@@ -57,7 +57,7 @@ export const getCurrentTimestamp = async (web3) => {
  * Setup web3 provider using InjectedWeb3's injected providers
  */
 export function setupWeb3Provider(network, url = null) {
-  const providerUrl = url || `https://${network}.infura.io`;
+  const providerUrl = url || `https://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr`;
   const provider = (window['web3'])
     ? window['web3']
     : new Web3.providers.HttpProvider(providerUrl);

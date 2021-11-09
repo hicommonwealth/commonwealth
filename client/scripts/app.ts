@@ -78,6 +78,7 @@ export async function initAppState(updateSelectedNode = true, customDomain = nul
           default_chain: app.config.chains.getById(community.default_chain),
           visible: community.visible,
           collapsed_on_homepage: community.collapsed_on_homepage,
+          default_summary_view: community.default_summary_view,
           invites_enabled: community.invites_enabled,
           privacy_enabled: community.privacy_enabled,
           featured_topics: community.featured_topics,
@@ -141,6 +142,7 @@ export async function deinitChainOrCommunity() {
   app.user.setSelectedNode(null);
   app.user.setActiveAccounts([]);
   app.user.ephemerallySetActiveAccount(null);
+  document.title = 'Commonwealth';
 }
 
 export async function handleInviteLinkRedirect() {
@@ -183,6 +185,7 @@ export async function selectCommunity(c?: CommunityInfo): Promise<boolean> {
 
   // Shut down old chain if applicable
   await deinitChainOrCommunity();
+  document.title = `Commonwealth – ${c.name}`;
 
   // Begin initializing the community
   const newCommunity = new Community(c, app);
@@ -230,6 +233,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
   // Shut down old chain if applicable
   await deinitChainOrCommunity();
   app.chainPreloading = true;
+  document.title = `Commonwealth – ${n.chain.name}`;
   setTimeout(() => m.redraw()); // redraw to show API status indicator
 
   // Import top-level chain adapter lazily, to facilitate code split.
