@@ -26,6 +26,7 @@ interface ICommunityMetadataManagementState {
   customStages: string;
   customDomain: string;
   terms: string;
+  defaultSummaryView: boolean;
   uploadInProgress: boolean;
 }
 
@@ -54,6 +55,7 @@ const CommunityMetadataManagementTable: m.Component<
     vnode.state.customStages = vnode.attrs.community.customStages;
     vnode.state.customDomain = vnode.attrs.community.customDomain;
     vnode.state.terms = vnode.attrs.community.terms;
+    vnode.state.defaultSummaryView = vnode.attrs.community.defaultSummaryView;
   },
   view: (vnode) => {
     return m('.CommunityMetadataManagementTable', [
@@ -198,6 +200,17 @@ const CommunityMetadataManagementTable: m.Component<
                 ? 'Anyone can invite new members'
                 : 'Admins/mods can invite new members',
           }),
+          m(TogglePropertyRow, {
+            title: 'Summary view',
+            defaultValue: vnode.attrs.community.defaultSummaryView,
+            onToggle: (checked) => {
+              vnode.state.defaultSummaryView = checked;
+            },
+            caption: (checked) =>
+              checked
+                ? 'Discussion listing defaults to summary view'
+                : 'Discussion listing defaults to latest activity view',
+          }),
           m('tr', [
             m('td', 'Admins'),
             m('td', [
@@ -244,6 +257,7 @@ const CommunityMetadataManagementTable: m.Component<
             terms,
             invitesEnabled,
             privacyEnabled,
+            defaultSummaryView,
           } = vnode.state;
           try {
             await vnode.attrs.community.updateCommunityData({
@@ -261,6 +275,7 @@ const CommunityMetadataManagementTable: m.Component<
               terms,
               privacyEnabled,
               invitesEnabled,
+              defaultSummaryView,
             });
             $(e.target).trigger('modalexit');
           } catch (err) {

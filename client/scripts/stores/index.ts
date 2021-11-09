@@ -16,4 +16,5 @@ export { default as FilterScopedThreadStore } from './FilterScopedThreadStore';
 export { default as ChainEntityStore } from './ChainEntityStore';
 export { default as PersistentStore } from './PersistentStore';
 
-export { UpdateType, IHasId, ISerializable, IHasAddress } from './interfaces';
+export { UpdateType } from './interfaces';
+export type { IHasId, ISerializable, IHasAddress } from './interfaces';

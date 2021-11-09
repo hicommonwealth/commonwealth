@@ -39,6 +39,7 @@ export interface ChainAttributes {
   featured_topics?: string[];
   substrate_spec?: RegisteredTypes;
   has_chain_events_listener?: boolean;
+  default_summary_view?: boolean;
   terms?: string;
   snapshot?: string;
   bech32_prefix?: string;
@@ -124,6 +125,7 @@ export default (
         allowNull: false,
         defaultValue: false,
       },
+      default_summary_view: { type: dataTypes.BOOLEAN, allowNull: true },
       snapshot: { type: dataTypes.STRING, allowNull: true },
       terms: { type: dataTypes.STRING, allowNull: true },
       bech32_prefix: { type: dataTypes.STRING, allowNull: true },

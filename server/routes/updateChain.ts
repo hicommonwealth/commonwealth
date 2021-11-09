@@ -67,6 +67,7 @@ const updateChain = async (
     stages_enabled,
     custom_stages,
     custom_domain,
+    default_summary_view,
     terms,
     snapshot,
   } = req.body;
@@ -113,6 +114,8 @@ const updateChain = async (
   if (snapshot) chain.snapshot = snapshot;
   if (req.body['featured_topics[]'])
     chain.featured_topics = req.body['featured_topics[]'];
+  chain.default_summary_view = default_summary_view || false;
+
   // Under our current security policy, custom domains must be set by trusted
   // administrators only. Otherwise an attacker could configure a custom domain and
   // use the code they run to steal login tokens for arbitrary users.

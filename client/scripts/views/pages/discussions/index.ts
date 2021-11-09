@@ -392,8 +392,10 @@ const DiscussionsPage: m.Component<
     lastVisitedUpdated?: boolean;
     onscroll: any;
     summaryView: boolean;
+    summaryViewInitialized: boolean;
     recentThreads: { threads: OffchainThread[]; activitySummary };
     loadingRecentThreads: boolean;
+    activityFetched: boolean;
   }
 > = {
   oncreate: (vnode) => {
@@ -422,7 +424,7 @@ const DiscussionsPage: m.Component<
       app.user.unseenPosts[app.activeId()]['threads'] = 0;
     }
   },
-  oninit: async (vnode) => {
+  oninit: (vnode) => {
     vnode.state.lookback = {};
     vnode.state.postsDepleted = {};
     vnode.state.topicInitialized = {};
@@ -443,20 +445,27 @@ const DiscussionsPage: m.Component<
         : moment.isMoment(vnode.state.lookback[subpage])
         ? vnode.state.lookback[subpage]
         : moment();
-    if (app.lastNavigatedBack()) {
-      if (localStorage.getItem('discussion-summary-toggle') === 'true') {
-        vnode.state.summaryView = true;
-      }
-    } else {
-      if (!vnode.state.summaryView) {
-        localStorage.setItem('discussion-summary-toggle', 'false');
-      }
-    }
   },
   view: (vnode) => {
     let { topic } = vnode.attrs;
-    const { summaryView, recentThreads } = vnode.state;
-    if (summaryView && !recentThreads?.threads?.length) {
+    if (!app.community && !app.chain) return;
+    if (!vnode.state.summaryViewInitialized) {
+      if (app.community?.meta?.defaultSummaryView || app.chain?.meta?.chain?.defaultSummaryView) {
+        vnode.state.summaryView = true;
+      }
+      if (app.lastNavigatedBack()) {
+        if (localStorage.getItem('discussion-summary-toggle') === 'true') {
+          vnode.state.summaryView = true;
+        }
+      } else {
+        if (!vnode.state.summaryView) {
+          localStorage.setItem('discussion-summary-toggle', 'false');
+        }
+      }
+      vnode.state.summaryViewInitialized = true;
+    }
+    const { summaryView, recentThreads, lastSubpage } = vnode.state;
+    if (summaryView && !vnode.state.activityFetched && !vnode.state.loadingRecentThreads) {
       vnode.state.loadingRecentThreads = true;
       app.recentActivity
         .getRecentCommunityActivity({
@@ -464,6 +473,7 @@ const DiscussionsPage: m.Component<
           chainId: app.activeChainId(),
         })
         .then((res) => {
+          vnode.state.activityFetched = true;
           vnode.state.loadingRecentThreads = false;
           vnode.state.recentThreads = res;
           m.redraw();
@@ -621,7 +631,8 @@ const DiscussionsPage: m.Component<
       }
     }
 
-    const newSubpage = subpage !== vnode.state.lastSubpage;
+    // TODO: Refactor this logic in light of summary system
+    const newSubpage = subpage !== lastSubpage;
 
     if (newSubpage) {
       $(window).off('scroll');
