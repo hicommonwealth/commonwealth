@@ -42,9 +42,9 @@ export {
   ProposalStatus,
   VotingType,
   VotingUnit,
-  ProposalEndTime,
-  AnyProposal,
 } from './types';
+
+export type { AnyProposal, ProposalEndTime } from './types';
 
 export {
   IBlockInfo,

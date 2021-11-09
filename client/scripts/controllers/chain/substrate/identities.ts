@@ -202,7 +202,11 @@ class SubstrateIdentities implements StorageModule {
   ) {
     return this._Chain.createTXModalData(
       who,
-      (api: ApiPromise) => api.tx.identity.provideJudgement(regIdx, target.account.address, judgement),
+      (api: ApiPromise) => api.tx.identity.provideJudgement(
+        regIdx,
+        target.account.address,
+        judgement as any // PalletIdentityJudgment
+      ),
       'providejudgement',
       `registrar ${regIdx} provides judgement for identity ${target.username}`,
     );

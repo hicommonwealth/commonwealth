@@ -113,8 +113,9 @@ module.exports = {
           path.resolve(__dirname, '../shared'),
           path.resolve(__dirname, '../eth/types'),
         ],
-        use: {
-          loader: 'ts-loader'
+        loader: 'esbuild-loader',
+        options: {
+          loader: 'ts',
         }
       },
       {
