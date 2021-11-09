@@ -1,5 +1,5 @@
 // import 'modals/create_community_modal.scss';
-import 'modals/manage_community_modal.scss';
+import 'pages/manage_community.scss';
 
 import BN from 'bn.js';
 import m from 'mithril';
@@ -21,7 +21,7 @@ import {
   InputPropertyRow,
   TogglePropertyRow,
   SelectPropertyRow,
-} from './manage_community_modal/metadata_rows';
+} from '../pages/manage_community/metadata_rows';
 import { initAppState } from '../../app';
 
 enum CommunityType {

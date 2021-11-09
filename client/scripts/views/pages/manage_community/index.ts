@@ -1,4 +1,4 @@
-import 'modals/manage_community_modal.scss';
+import 'pages/manage_community.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
@@ -10,8 +10,9 @@ import { sortAdminsAndModsFirst } from 'views/pages/discussions/roles';
 import CommunityMetadataManagementTable from './community_metadata_management_table';
 import ChainMetadataManagementTable from './chain_metadata_management_table';
 import AdminPanelTabs from './admin_panel_tabs';
+import Sublayout from '../../sublayout';
 
-const ManageCommunityModal: m.Component<
+const ManageCommunityPage: m.Component<
   {},
   {
     roleData: RoleInfo[];
@@ -114,11 +115,11 @@ const ManageCommunityModal: m.Component<
       m.redraw();
     };
 
-    return m('.ManageCommunityModal', [
-      m('.compact-modal-title', [
-        m('h3', 'Manage Community'),
-        m(CompactModalExitButton),
-      ]),
+    return m(Sublayout, {
+      class: 'ManageCommunityPage',
+      title: 'Manage Community',
+      showNewProposalButton: true,
+    }, [
       m('.compact-modal-body-max', [
         m('.panel-left', [
           isCommunity
@@ -154,4 +155,4 @@ const ManageCommunityModal: m.Component<
   },
 };
 
-export default ManageCommunityModal;
+export default ManageCommunityPage;
