@@ -62,6 +62,11 @@
             .row-subheader + .row-subheader {
                 margin-top: 1px;
             }
+            .row-subheader > .created-at {
+                max-height: 17px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
             .row-subheader > a,
             .row-subheader > .User > a,
             .row-subheader > .created-at > a,
@@ -69,9 +74,15 @@
             > span {
                 color: $text-color-light;
                 font-size: $text-size-item-meta;
+                max-height: 17px;
+                overflow: hidden;
+                text-overflow: ellipsis;
                 &:hover {
                     color: darken($text-color-light, 8%);
                 }
+            }
+            .external-discussion-link {
+                word-break: break-all;
             }
         }
     }
