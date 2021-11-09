@@ -176,10 +176,7 @@ export const scrollToForm = (parentId?: number) => {
   }, 1);
 };
 
-const InlineReplyButton: m.Component<
-  { commentReplyCount: number; onclick },
-  {}
-> = {
+const InlineReplyButton: m.Component<{ commentReplyCount: number; onclick }> = {
   view: (vnode) => {
     const { commentReplyCount, onclick } = vnode.attrs;
     return m(
@@ -198,8 +195,8 @@ const InlineReplyButton: m.Component<
   },
 };
 
-const MobileToggle: m.Component<{behavior: string}> = {
-  view:(vnode) => {
+const MobileToggle: m.Component<{ behavior: string }> = {
+  view: (vnode) => {
     const { behavior } = vnode.attrs;
     return m(`.mobile-toggle.${behavior}`,[ vnode.children ]);
   },

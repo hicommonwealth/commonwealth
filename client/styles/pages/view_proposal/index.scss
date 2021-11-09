@@ -530,7 +530,7 @@ $discussion-title-font-size: 1.45rem;
         z-index: -1;
     }
     .mobile-toggle {
-        @include sm-max {
+        @include md-max {
             &.show {
                 display: block;
             }
@@ -540,7 +540,7 @@ $discussion-title-font-size: 1.45rem;
             }
         }
 
-        @include md-min {
+        @include lg-min {
             &.show {
                 display: none;
             }
