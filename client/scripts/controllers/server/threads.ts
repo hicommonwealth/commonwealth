@@ -113,7 +113,10 @@ export const modelFromServer = (thread) => {
     ? versionHistoryProcessed[0].timestamp
     : null;
 
-  const topicFromStore = app.topics.store.getById(topic.id);
+  let topicFromStore = null;
+  if (topic?.id) {
+    topicFromStore = app.topics.store.getById(topic.id);
+  }
 
   return new OffchainThread({
     id,
