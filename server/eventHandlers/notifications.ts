@@ -13,7 +13,7 @@ import { addPrefix, factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 export default class extends IEventHandler {
-  private _name = 'Notification';
+  public readonly name = 'Notification';
 
   constructor(
     private readonly _models,
@@ -62,9 +62,5 @@ export default class extends IEventHandler {
       log.error(`Failed to generate notification: ${e.message}!`);
       return dbEvent;
     }
-  }
-
-  get name(): string {
-    return this._name;
   }
 }

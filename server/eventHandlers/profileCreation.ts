@@ -27,7 +27,7 @@ const SUPPORTED_KIND_FIELDS = {
 };
 
 export default class extends IEventHandler {
-  private _name = 'Profile Creation';
+  public readonly name = 'Profile Creation';
 
   constructor(private readonly _models, private readonly _chain?: string) {
     super();
@@ -76,9 +76,5 @@ export default class extends IEventHandler {
       //   of events
     }
     return dbEvent;
-  }
-
-  get name(): string {
-    return this._name;
   }
 }

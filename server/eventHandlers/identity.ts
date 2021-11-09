@@ -9,7 +9,7 @@ import { OffchainProfileInstance } from '../models/offchain_profile';
 import { addPrefix, factory } from '../../shared/logging';
 
 export default class extends IEventHandler {
-  private _name = 'Identity';
+  public readonly name = 'Identity';
 
   constructor(private readonly _models, private readonly _chain?: string) {
     super();
@@ -96,9 +96,5 @@ export default class extends IEventHandler {
     }
 
     return dbEvent;
-  }
-
-  get name(): string {
-    return this._name;
   }
 }

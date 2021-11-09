@@ -19,7 +19,7 @@ export interface StorageFilterConfig {
 }
 
 export default class extends IEventHandler {
-  private _name = 'Storage';
+  public readonly name = 'Storage';
 
   constructor(
     private readonly _models,
@@ -115,9 +115,5 @@ export default class extends IEventHandler {
       event_data: event.data,
     });
     return dbEvent;
-  }
-
-  get name(): string {
-    return this._name;
   }
 }
