@@ -22,6 +22,9 @@ const ManageCommunityPage: m.Component<
   }
 > = {
   view: (vnode) => {
+    if (!app.activeChainId() && !app.activeCommunityId()) {
+      return;
+    }
     const chainOrCommObj = app.chain
       ? { chain: app.activeChainId() }
       : { community: app.activeCommunityId() };
@@ -120,8 +123,8 @@ const ManageCommunityPage: m.Component<
       title: 'Manage Community',
       showNewProposalButton: true,
     }, [
-      m('.compact-modal-body-max', [
-        m('.panel-left', [
+      m('.manage-community-wrapper', [
+        m('.panel-top', [
           isCommunity
             ? vnode.state.loadingFinished &&
               m(CommunityMetadataManagementTable, {
@@ -140,7 +143,7 @@ const ManageCommunityPage: m.Component<
                   onRoleUpdate(oldRole, newRole),
               }),
         ]),
-        m('.panel-right', [
+        m('.panel-bottom', [
           vnode.state.loadingFinished &&
             m(AdminPanelTabs, {
               defaultTab: 1,

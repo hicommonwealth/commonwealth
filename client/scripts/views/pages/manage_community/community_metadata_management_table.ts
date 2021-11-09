@@ -277,7 +277,6 @@ const CommunityMetadataManagementTable: m.Component<
               invitesEnabled,
               defaultSummaryView,
             });
-            $(e.target).trigger('modalexit');
           } catch (err) {
             notifyError(err.responseJSON?.error || 'Community update failed');
           }

@@ -83,7 +83,7 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }>
                 vnode.attrs.onRoleUpdate(role, newRole);
 
                 if (isLosingAdminPermissions) {
-                  $('.ManageCommunityModal').trigger('modalforceexit');
+                  m.route.set(`/${app.activeId()}`);
                 }
               } catch (err) {
                 const errMsg = err.responseJSON?.error || 'Failed to alter role.';

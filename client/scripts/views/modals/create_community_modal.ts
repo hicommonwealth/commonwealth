@@ -1150,7 +1150,7 @@ const CreateCommunityModal: m.Component<
     vnode.state.activeForm = CommunityType.OffchainCommunity;
   },
   view: (vnode: m.VnodeDOM<CreateCommunityAttrs, CreateCommunityState>) => {
-    return m('.ManageCommunityModal', [
+    return m('.CreateCommunityModal', [
       m('.compact-modal-title', [
         m('h3', 'New Commonwealth Community'),
         m(CompactModalExitButton),

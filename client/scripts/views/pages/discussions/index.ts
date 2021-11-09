@@ -114,7 +114,7 @@ export const CommunityOptionsPopover: m.Component<
           }),
         isAdmin &&
           m(MenuItem, {
-            label: link('a', `${app.activeId}/manage`, 'Manage community'),
+            label: link('a', `${(app.isCustomDomain() ? '' : `/${app.activeId()}`)}/manage`, 'Manage community'),
           }),
         (isAdmin || isMod) &&
           app.activeId() &&
