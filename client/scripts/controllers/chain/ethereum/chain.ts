@@ -97,9 +97,7 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
     // TODO: deinit the API, if necessary
     // ...
     if (this._api) {
-      // https://web3js.readthedocs.io/en/v1.2.0/web3-net.html
-      const isListening = await this._api.eth.net.isListening();
-      if (isListening && (this.api.currentProvider as any).connection !== undefined) {
+      if ((this.api.currentProvider as any)?.connection.connected) {
         await (this._api.currentProvider as any).connection.close();
       }
       this._api = null;

@@ -268,28 +268,31 @@ const resetServer = (debug = false): Promise<void> => {
       });
 
       const nodes = [
-        ['mainnet1.edgewa.re', 'edgeware', null],
-        ['wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr', 'ethereum', null],
+        ['mainnet1.edgewa.re', 'edgeware', null, '0'],
+        ['wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr', 'ethereum', null, '1'],
         [
           'wss://eth-ropsten.alchemyapi.io/v2/2xXT2xx5AvA3GFTev3j_nB9LzWdmxPk7',
           'alex',
           '0xFab46E002BbF0b4509813474841E0716E6730136',
+          '3'
         ],
         [
           'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
           'yearn',
           '0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e',
+          '1'
         ],
         [
           'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
           'sushi',
           '0x6b3595068778dd592e39a122f4f5a5cf09c90fe2',
+          '1'
         ],
       ];
 
       await Promise.all(
-        nodes.map(([url, chain, address]) =>
-          models['ChainNode'].create({ chain, url, address })
+        nodes.map(([url, chain, address, eth_chain_id, ]) =>
+          models['ChainNode'].create({ chain, url, address, eth_chain_id: +eth_chain_id || null })
         )
       );
 
