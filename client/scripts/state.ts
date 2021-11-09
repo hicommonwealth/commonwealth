@@ -8,11 +8,13 @@ import {
 import { EventEmitter } from 'events';
 import { getToastStore, ToastStore } from 'controllers/app/toasts';
 import { getModalStore, ModalStore } from 'controllers/app/modals';
+import { InviteCodeAttributes } from 'types';
 import RecentActivityController from './controllers/app/recent_activity';
 import ProfilesController from './controllers/server/profiles';
 import CommentsController from './controllers/server/comments';
 import ThreadsController from './controllers/server/threads';
 import SnapshotController from './controllers/chain/snapshot';
+import SearchController from './controllers/server/search'
 import ReactionsController from './controllers/server/reactions';
 import ReactionCountsController from './controllers/server/reactionCounts';
 import ThreadUniqueAddressesCount from './controllers/server/threadUniqueAddressesCount';
@@ -21,7 +23,6 @@ import TopicsController from './controllers/server/topics';
 import CommunitiesController from './controllers/server/communities';
 import UserController from './controllers/server/user/index';
 import WebWalletController from './controllers/app/web_wallets';
-import { InviteCodeAttributes } from 'types';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -51,6 +52,7 @@ export interface IApp {
   comments: CommentsController;
   threads: ThreadsController;
   threadUniqueAddressesCount: ThreadUniqueAddressesCount;
+  search: SearchController;
   snapshot: SnapshotController;
   reactions: ReactionsController;
   reactionCounts: ReactionCountsController;
@@ -120,6 +122,7 @@ const app: IApp = {
   comments: new CommentsController(),
   threads: new ThreadsController(),
   threadUniqueAddressesCount: new ThreadUniqueAddressesCount(),
+  search: new SearchController(),
   snapshot: new SnapshotController(),
   reactions: new ReactionsController(),
   reactionCounts: new ReactionCountsController(),
