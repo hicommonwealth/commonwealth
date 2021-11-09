@@ -15,7 +15,6 @@ import {
 
 import { ChainBase, ChainNetwork, ChainType } from '../../shared/types';
 import { RabbitMqHandler } from '../eventHandlers/rabbitmqPlugin';
-import Identity from '../eventHandlers/pgIdentity';
 import { addPrefix, factory, formatFilename } from '../../shared/logging';
 import { DATABASE_URI, HANDLE_IDENTITY } from '../config';
 import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
@@ -410,18 +409,9 @@ async function mainProcess(
       continue;
     }
 
-    if (HANDLE_IDENTITY === 'handle') {
-      // initialize identity handler
-      const identityHandler = new Identity(pool);
-
-      await Promise.all(
-        identityEvents.map((e) => identityHandler.handle(e, null))
-      );
-    } else if (HANDLE_IDENTITY === 'publish') {
-      for (const event of identityEvents) {
-        event.chain = chain.id; // augment event with chain
-        await producer.publish(event, 'identityPub');
-      }
+    for (const event of identityEvents) {
+      event.chain = chain.id; // augment event with chain
+      await producer.publish(event, 'identityPub');
     }
 
     // clear the identity cache for this chain
