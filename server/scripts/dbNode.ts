@@ -160,6 +160,7 @@ async function mainProcess(
   );
   const erc20ByUrl = _.groupBy(erc20Tokens, 'url');
   for (const [url, tokens] of Object.entries(erc20ByUrl)) {
+    const tokenKey = `erc20_${url}`;
     const erc20TokenAddresses = tokens.map((chain) => chain.address);
     const erc20TokenNames = tokens.map((chain) => chain.id);
 
@@ -169,27 +170,27 @@ async function mainProcess(
       .map((chain) => chain.id);
 
     // don't start a new erc20 listener if it is causing errors
-    if (!chainErrors[`erc20_${url}`] || chainErrors[`erc20_${url}`] < 4) {
+    if (!chainErrors[tokenKey] || chainErrors[tokenKey] < 4) {
       // start a listener if: it doesn't exist yet OR it exists but the tokens have changed
       if (
         tokens.length > 0 &&
-        (!listeners[`erc20_${url}`] ||
-          (listeners[`erc20_${url}`] &&
+        (!listeners[tokenKey] ||
+          (listeners[tokenKey] &&
             !_.isEqual(
               erc20TokenAddresses,
-              listeners[`erc20_${url}`].options.tokenAddresses
+              listeners[tokenKey].options.tokenAddresses
             )))
       ) {
         // clear the listener if it already exists and the tokens have changed
-        if (listeners[`erc20_${url}`]) {
-          listeners[`erc20_${url}`].unsubscribe();
-          delete listeners[`erc20_${url}`];
+        if (listeners[tokenKey]) {
+          listeners[tokenKey].unsubscribe();
+          delete listeners[tokenKey];
         }
 
         // start a listener
         log.info(`Starting listener for ${erc20TokenNames}...`);
         try {
-          listeners[`erc20_${url}`] = await createListener(
+          listeners[tokenKey] = await createListener(
             'erc20',
             SupportedNetwork.ERC20,
             {
@@ -201,31 +202,31 @@ async function mainProcess(
           );
 
           // add the rabbitmq handler for this chain
-          listeners[`erc20_${url}`].eventHandlers['rabbitmq'] = { handler: producer };
-          listeners[`erc20_${url}`].eventHandlers['logger'] = { handler: erc20Logger };
+          listeners[tokenKey].eventHandlers['rabbitmq'] = { handler: producer };
+          listeners[tokenKey].eventHandlers['logger'] = { handler: erc20Logger };
         } catch (error) {
-          delete listeners[`erc20_${url}`];
-          await handleFatalError(error, pool, `erc20_${url}`, 'listener-startup');
+          delete listeners[tokenKey];
+          await handleFatalError(error, pool, tokenKey, 'listener-startup');
         }
 
         // if listener has started at this point then subscribe
-        if (listeners[`erc20_${url}`]) {
+        if (listeners[tokenKey]) {
           try {
             // subscribe to the chain to begin listening for events
-            await listeners[`erc20_${url}`].subscribe();
+            await listeners[tokenKey].subscribe();
           } catch (error) {
-            await handleFatalError(error, pool, `erc20_${url}`, 'listener-subscribe');
+            await handleFatalError(error, pool, tokenKey, 'listener-subscribe');
           }
         }
-      } else if (listeners[`erc20_${url}`] && tokens.length === 0) {
+      } else if (listeners[tokenKey] && tokens.length === 0) {
         // delete the listener if there are no tokens to listen to
-        log.info(`[erc20_${url}]: Deleting erc20 listener...`);
-        listeners[`erc20_${url}`].unsubscribe();
-        delete listeners[`erc20_${url}`];
+        log.info(`[${tokenKey}]: Deleting erc20 listener...`);
+        listeners[tokenKey].unsubscribe();
+        delete listeners[tokenKey];
       }
     } else {
       log.fatal(
-        `[erc20_${url}]: There are outstanding errors that need to be resolved before creating a new erc20 listener!`
+        `[${tokenKey}]: There are outstanding errors that need to be resolved before creating a new erc20 listener!`
       );
     }
   }
@@ -239,7 +240,7 @@ async function mainProcess(
   // delete listeners for chains that are no longer assigned to this node (skip erc20)
   const myChains = myChainData.map((row) => row.id);
   Object.keys(listeners).forEach((chain) => {
-    if (!myChains.includes(chain) && chain !== 'erc20') {
+    if (!myChains.includes(chain) && !chain.startsWith('erc20')) {
       log.info(`[${chain}]: Deleting chain...`);
       if (listeners[chain]) listeners[chain].unsubscribe();
       delete listeners[chain];
