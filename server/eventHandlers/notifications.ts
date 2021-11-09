@@ -13,6 +13,8 @@ import { addPrefix, factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 export default class extends IEventHandler {
+  public readonly name = 'Notification';
+
   constructor(
     private readonly _models,
     private readonly _wss?: WebSocket.Server,

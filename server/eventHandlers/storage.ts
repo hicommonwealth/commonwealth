@@ -19,6 +19,8 @@ export interface StorageFilterConfig {
 }
 
 export default class extends IEventHandler {
+  public readonly name = 'Storage';
+
   constructor(
     private readonly _models,
     private readonly _chain?: string,
