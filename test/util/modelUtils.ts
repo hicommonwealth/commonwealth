@@ -4,6 +4,7 @@ import 'chai/register-should';
 import Web3 from 'web3';
 import BN from 'bn.js';
 import wallet from 'ethereumjs-wallet';
+import * as ethUtil from 'ethereumjs-util';
 import { Keyring } from '@polkadot/api';
 import { stringToU8a, u8aToHex } from '@polkadot/util';
 import { factory, formatFilename } from '../../shared/logging';
@@ -11,8 +12,6 @@ import app from '../../server-test';
 import models from '../../server/database';
 import { Permission } from '../../server/models/role';
 import { TokenBalanceProvider } from '../../server/util/tokenBalanceCache';
-
-const ethUtil = require('ethereumjs-util');
 
 const log = factory.getLogger(formatFilename(__filename));
 

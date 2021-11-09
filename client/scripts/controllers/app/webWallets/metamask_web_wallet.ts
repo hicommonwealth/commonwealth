@@ -57,14 +57,15 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     console.log('Attempting to enable Metamask');
     this._enabling = true;
     try {
-      console.log(app.chain);
       if (!app.chain?.meta.ethChainId) {
         throw new Error('No chain id found!');
       }
 
       // ensure we're on the correct chain
       this._web3 = new Web3((window as any).ethereum);
-      await this._web3.givenProvider.enable();
+      await this._web3.givenProvider.request({
+        method: 'eth_requestAccounts'
+      });
       await this._web3.givenProvider.request({
         method: 'wallet_switchEthereumChain',
         params: [{ chainId: `0x${app.chain.meta.ethChainId.toString(16)}` }],
