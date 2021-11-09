@@ -10,6 +10,7 @@ export interface ChainNodeAttributes {
   address?: string;
   token_name?: string;
   ce_verbose?: boolean;
+  eth_chain_id?: number;
 
   // associations
   Chain?: ChainAttributes;
@@ -37,6 +38,7 @@ export default (
       address: { type: dataTypes.STRING, allowNull: true },
       token_name: { type: dataTypes.STRING, allowNull: true },
       ce_verbose: { type: dataTypes.BOOLEAN, allowNull: true },
+      eth_chain_id: { type: dataTypes.INTEGER, allowNull: true },
     },
     {
       tableName: 'ChainNodes',
