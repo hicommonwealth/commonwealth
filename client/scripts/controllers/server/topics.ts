@@ -83,6 +83,10 @@ class TopicsController {
         'token_threshold': token_threshold,
         'jwt': app.user.jwt
       });
+      if (response.status === 'Success') {
+        // update stored value immediately
+        topic.setTokenThreshold(new BN(token_threshold));
+      }
       return response.status;
     } catch (err) {
       console.log('Failed to edit topic');
