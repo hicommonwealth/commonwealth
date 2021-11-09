@@ -5,7 +5,7 @@ import app from 'state';
 import User from 'views/components/widgets/user';
 import { AddressInfo } from 'models';
 import { notifyError } from 'controllers/app/notifications';
-import { confirmationModalWithText } from '../confirm_modal';
+import { confirmationModalWithText } from '../../modals/confirm_modal';
 
 export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }> = {
   view: (vnode) => {

@@ -21,6 +21,7 @@ import {
   pluralize,
   offchainThreadStageToLabel,
   parseCustomStages,
+  link,
 } from 'helpers';
 import {
   NodeInfo,
@@ -113,11 +114,7 @@ export const CommunityOptionsPopover: m.Component<
           }),
         isAdmin &&
           m(MenuItem, {
-            label: 'Manage community',
-            onclick: (e) => {
-              e.preventDefault();
-              app.modals.lazyCreate('manage_community_modal');
-            },
+            label: link('a', `${app.activeId}/manage`, 'Manage community'),
           }),
         (isAdmin || isMod) &&
           app.activeId() &&
