@@ -95,6 +95,9 @@
             padding-right: 20px;
             min-width: calc(#{$sidebar-width} + 20px);
         }
+        @include md-max {
+            display: none;
+        }
     }
     .hide-sidebar & {
         .sublayout-main-col {
