@@ -5,60 +5,99 @@ let config: any;
 
 if (HANDLE_IDENTITY === 'publish')
   config = {
-    'vhosts': {
+    vhosts: {
       [RABBITMQ_VHOST]: {
-        'connection': RABBITMQ_URI,
-        'exchanges': {
-          'eventsExchange': {
-            'assert': true
+        connection: RABBITMQ_URI,
+        exchanges: {
+          EventsExchange: {
+            assert: true,
+            type: 'topic'
+          },
+          DeadLetterExchange: {
+            assert: true,
           }
         },
-        'queues': {
-          'eventsQueue': {
-            'assert': true
+        queues: {
+          ChainEventsHandlersQueue: {
+            assert: true
           },
-          'identityQueue': {
-            'assert': true
+          SubstrateIdentityEventsQueue: {
+            assert: true
+          },
+          ChainEventsNotificationsQueue: {
+            assert: true
           }
         },
-        'bindings': {
-          'eventsBinding': {
-            'source': 'eventsExchange',
-            'destination': 'eventsQueue',
-            'destinationType': 'queue',
-            'bindingKey': 'eQueue'
+        bindings: {
+          ChainEventsHandlersBinding: {
+            source: 'eventsExchange',
+            destination: 'ChainEventsHandlersQueue',
+            destinationType: 'queue',
+            bindingKey: 'eQueue'
           },
-          'identityBinding': {
-            'source': 'eventsExchange',
-            'destination': 'identityQueue',
-            'destinationType': 'queue',
-            'bindingKey': 'iQueue'
+          SubstrateIdentityEventsBinding: {
+            source: 'eventsExchange',
+            destination: 'SubstrateIdentityEventsQueue',
+            destinationType: 'queue',
+            bindingKey: 'iQueue'
+          },
+          ChainEventsNotificationsBinding: {
+            source: 'eventsExchange',
+            destination: 'ChainEventsNotificationsQueue',
+            destinationType: 'queue',
+            bindingKey: 'nQueue'
+          },
+          DeadLetterBinding: {
+            source: 'DeadLetterExchange',
+            destination: 'DeadLetterQueue',
+            destinationType: 'queue',
+            bindingKey:
           }
         },
-        'publications': {
-          'eventsPub': {
-            'vhost': '/',
-            'queue': 'eventsQueue',
-            'confirm': true,
-            'timeout': 10000
+        publications: {
+          ChainEventsHandlersPublication: {
+            exchange: 'eventsExchange',
+            routingKey: 'eQueue',
+            confirm: true,
+            retry: {
+              delay: 1000
+            },
+            prefetch: 10,
+            timeout: 10000
           },
-          'identityPub': {
-            'vhost': '/',
-            'queue': 'identityQueue',
-            'confirm': true,
-            'timeout': 10000
+          SubstrateIdentityEventsPublication: {
+            exchange: 'eventsExchange',
+            routingKey: 'iQueue',
+            confirm: true,
+            retry: {
+              delay: 1000
+            },
+            prefetch: 10,
+            timeout: 10000
+          },
+          ChainEventsNotificationsPublication: {
+            exchange: 'eventsExchange',
+            routingKey: 'nQueue',
+            confirm: true,
+            retry: {
+              delay: 1000
+            },
+            prefetch: 10,
+            timeout: 10000
           }
         },
-        'subscriptions': {
-          'eventsSub': {
-            'vhost': '/',
-            'queue': 'eventsQueue',
-            'contentType': 'application/json'
+        subscriptions: {
+          ChainEventsHandlersSubscription: {
+            queue: 'ChainEventsHandlersQueue',
+            contentType: 'application/json'
           },
-          'identitySub': {
-            'vhost': '/',
-            'queue': 'identityQueue',
-            'contentType': 'application/json'
+          SubstrateIdentityEventsSubscription: {
+            queue: 'SubstrateIdentityEventsQueue',
+            contentType: 'application/json'
+          },
+          ChainEventsNotificationsPublication: {
+            queue: 'ChainEventsNotificationsQueue',
+            contentType: 'application/json'
           }
         }
       }

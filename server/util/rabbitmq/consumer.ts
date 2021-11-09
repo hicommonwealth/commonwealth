@@ -58,17 +58,22 @@ export class Consumer implements IConsumer {
         throw new Error('Subscription does not exist');
       subscription = await this.broker.subscribe(queueName);
       subscription.on('message', (message, content, ackOrNack) => {
-        eventProcessor(content);
-        ackOrNack();
+        try {
+          eventProcessor(content);
+          ackOrNack();
+        } catch (e) {
+          ackOrNack(e, [{strategy: 'republish', defer: 2000, attempts: 3}, {strategy: 'nack'}])
+        }
+
       });
       // @ts-ignore
-      // TODO: investigate this usage
-      subscription.on('error', (err, messageId) => {
-        log.error(`Publisher error ${err}, ${messageId}`);
+      subscription.on('error', (err, messageId, ackOrNack) => {
+        log.error(`Publisher error: ${err} ${messageId}`);
+        ackOrNack(err, {strategy: 'nack'})
       });
       subscription.on('invalid_content', (err, message, ackOrNack) => {
-        log.error(`Invalid content ${err}`);
-        // ackOrNack(err); // TODO: this should forward to dead letter queue that handles events that created errors
+        log.error(`Invalid content`, err);
+        ackOrNack(err, {strategy: 'nack'})
       });
     } catch (err) {
       throw new Error(`Rascal config error: ${err.message}`);
