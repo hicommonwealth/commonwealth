@@ -25,9 +25,14 @@ export class Consumer implements IConsumer {
     log.info(
       `Rascal connecting to RabbitMQ: ${this._vhost.connection as string}`
     );
-    this.broker = await Rascal.BrokerAsPromised.create(
-      Rascal.withDefaultConfig(this._rabbitMQConfig)
-    );
+    try {
+      this.broker = await Rascal.BrokerAsPromised.create(
+        Rascal.withDefaultConfig(this._rabbitMQConfig)
+      );
+    } catch(e) {
+      log.error('Rascal broker setup failed. Check the Rascal configuration file for errors.')
+      throw e;
+    }
 
     this.broker.on('error', log.error);
     this.broker.on('vhost_initialized', ({ vhost, connectionUrl }) => {
