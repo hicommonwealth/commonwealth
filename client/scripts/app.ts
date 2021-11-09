@@ -92,7 +92,6 @@ export async function initAppState(updateSelectedNode = true, customDomain = nul
         }));
       });
       app.user.setRoles(data.roles);
-      // app.config.topics = data.topics.map((json) => OffchainTopic.fromJSON(json));
       app.config.notificationCategories = data.notificationCategories
         .map((json) => NotificationCategory.fromJSON(json));
       app.config.invites = data.invites;
