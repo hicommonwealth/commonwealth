@@ -104,7 +104,7 @@ export const ProposalHeaderOffchainPoll: m.Component<
       );
 
     const tokenThresholdFailed = (app.chain instanceof Token)
-      && !!(proposal.topic.tokenThreshold)
+      && proposal.topic.tokenThreshold?.gtn(0)
         ? (app.chain as Token).tokenBalance.lt(proposal.topic.tokenThreshold)
         : false;
 
@@ -199,7 +199,7 @@ export const ProposalHeaderOffchainPoll: m.Component<
                 label: isSelected ? 'Voted' : 'Vote',
                 size: 'sm',
                 rounded: true,
-                disabled: !!(pollingEnded || isSelected || tokenThresholdFailed),
+                disabled: pollingEnded || isSelected || tokenThresholdFailed,
                 style: pollingEnded || isSelected ? 'pointer-events: none' : '',
                 iconLeft: isSelected ? Icons.CHECK : null,
                 compact: true,

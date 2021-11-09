@@ -113,6 +113,8 @@ export const modelFromServer = (thread) => {
     ? versionHistoryProcessed[0].timestamp
     : null;
 
+  const topicFromStore = app.topics.store.getById(topic.id);
+
   return new OffchainThread({
     id,
     author: thread.Address.address,
@@ -122,7 +124,7 @@ export const modelFromServer = (thread) => {
     createdAt: moment(created_at),
     attachments,
     snapshotProposal: snapshot_proposal,
-    topic,
+    topic: topicFromStore,
     kind,
     stage,
     community,
