@@ -3,7 +3,7 @@ import m from 'mithril';
 import { Table, Button } from 'construct-ui';
 
 import { CommunityInfo, ChainInfo } from 'models';
-import { notifyError } from 'controllers/app/notifications';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import {
   InputPropertyRow,
   TogglePropertyRow,
@@ -277,6 +277,7 @@ const CommunityMetadataManagementTable: m.Component<
               invitesEnabled,
               defaultSummaryView,
             });
+            notifySuccess('Community updated');
           } catch (err) {
             notifyError(err.responseJSON?.error || 'Community update failed');
           }

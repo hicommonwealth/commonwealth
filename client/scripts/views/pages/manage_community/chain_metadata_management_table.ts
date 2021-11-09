@@ -4,7 +4,7 @@ import app from 'state';
 import { Button, Table } from 'construct-ui';
 
 import { ChainBase, ChainNetwork } from 'types';
-import { notifyError } from 'controllers/app/notifications';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { IChainOrCommMetadataManagementAttrs } from './community_metadata_management_table';
 import {
   TogglePropertyRow,
@@ -287,6 +287,7 @@ const ChainMetadataManagementTable: m.Component<
                 iconUrl,
                 defaultSummaryView,
               });
+              notifySuccess('Chain updated');
             } catch (err) {
               notifyError(err.responseJSON?.error || 'Chain update failed');
             }
