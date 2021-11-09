@@ -26,6 +26,9 @@ if (HANDLE_IDENTITY === 'publish')
           },
           ChainEventsNotificationsQueue: {
             assert: true
+          },
+          DeadLetterQueue: {
+            assert: true
           }
         },
         bindings: {
@@ -51,7 +54,7 @@ if (HANDLE_IDENTITY === 'publish')
             source: 'DeadLetterExchange',
             destination: 'DeadLetterQueue',
             destinationType: 'queue',
-            bindingKey:
+            bindingKey: 'dlQueue'
           }
         },
         publications: {
