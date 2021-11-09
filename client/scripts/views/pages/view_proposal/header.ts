@@ -102,9 +102,11 @@ export const ProposalHeaderOffchainPoll: m.Component<
         app.user.activeAccount.chain.id,
         app.user.activeAccount.address
       );
-    const tokenThresholdPassed = (app.chain instanceof Token)
-      && (proposal.topic.tokenThreshold)
-      && (app.chain as Token).tokenBalance.gte(proposal.topic.tokenThreshold)
+
+    const tokenThresholdFailed = (app.chain instanceof Token)
+      && !!(proposal.topic.tokenThreshold)
+        ? (app.chain as Token).tokenBalance.lt(proposal.topic.tokenThreshold)
+        : false;
 
     const vote = async (option, hasVoted, isSelected) => {
       if (!app.isLoggedIn() || !app.user.activeAccount || isSelected) return;
@@ -197,7 +199,7 @@ export const ProposalHeaderOffchainPoll: m.Component<
                 label: isSelected ? 'Voted' : 'Vote',
                 size: 'sm',
                 rounded: true,
-                disabled: !!(pollingEnded || isSelected || tokenThresholdPassed),
+                disabled: !!(pollingEnded || isSelected || tokenThresholdFailed),
                 style: pollingEnded || isSelected ? 'pointer-events: none' : '',
                 iconLeft: isSelected ? Icons.CHECK : null,
                 compact: true,
