@@ -16,7 +16,7 @@ import {
 import { ChainBase, ChainNetwork, ChainType } from '../../shared/types';
 import { RabbitMqHandler } from '../eventHandlers/rabbitmqPlugin';
 import Identity from '../eventHandlers/pgIdentity';
-import { factory, formatFilename } from '../../shared/logging';
+import { addPrefix, factory, formatFilename } from '../../shared/logging';
 import { DATABASE_URI, HANDLE_IDENTITY } from '../config';
 import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
 
@@ -67,12 +67,18 @@ async function handleFatalError(
 }
 
 class Erc20LoggingHandler extends IEventHandler {
+  private logger = {}
   constructor(public tokenNames: string[]) {
     super();
   }
   public async handle(event: CWEvent): Promise<undefined> {
-    if (this.tokenNames.includes(event.chain))
-      log.info(`[Erc20]: Received event: ${JSON.stringify(event, null, 2)}`);
+    if (this.tokenNames.includes(event.chain)) {
+      // if logger for this specific token doesn't exist, create it - decreases computational cost of logging
+      if (!this.logger[event.chain])
+        this.logger[event.chain] = factory.getLogger(addPrefix(__filename, ['Erc20', event.chain]));
+
+      this.logger[event.chain].info(`Received event: ${JSON.stringify(event, null, 2)}`);
+    }
     return null;
   }
 }
@@ -93,8 +99,15 @@ async function mainProcess(
     ++runCount;
   }
 
+  const activeChains: string[] = Object.keys(listeners).map((chainName): string => {
+    if (chainName !== 'erc20') return chainName;
+    else {
+      return listeners['erc20'].tokenNames;
+    }
+  });
+
   log.info(
-    `Starting scheduled process. Active chains: ${Object.keys(listeners)}`
+    `Starting scheduled process. Active chains: ${JSON.stringify(activeChains)}`
   );
 
   let query =
@@ -160,6 +173,7 @@ async function mainProcess(
   );
   const erc20ByUrl = _.groupBy(erc20Tokens, 'url');
   for (const [url, tokens] of Object.entries(erc20ByUrl)) {
+    const tokenKey = `erc20_${url}`;
     const erc20TokenAddresses = tokens.map((chain) => chain.address);
     const erc20TokenNames = tokens.map((chain) => chain.id);
 
@@ -169,27 +183,27 @@ async function mainProcess(
       .map((chain) => chain.id);
 
     // don't start a new erc20 listener if it is causing errors
-    if (!chainErrors[`erc20_${url}`] || chainErrors[`erc20_${url}`] < 4) {
+    if (!chainErrors[tokenKey] || chainErrors[tokenKey] < 4) {
       // start a listener if: it doesn't exist yet OR it exists but the tokens have changed
       if (
         tokens.length > 0 &&
-        (!listeners[`erc20_${url}`] ||
-          (listeners[`erc20_${url}`] &&
+        (!listeners[tokenKey] ||
+          (listeners[tokenKey] &&
             !_.isEqual(
               erc20TokenAddresses,
-              listeners[`erc20_${url}`].options.tokenAddresses
+              listeners[tokenKey].options.tokenAddresses
             )))
       ) {
         // clear the listener if it already exists and the tokens have changed
-        if (listeners[`erc20_${url}`]) {
-          listeners[`erc20_${url}`].unsubscribe();
-          delete listeners[`erc20_${url}`];
+        if (listeners[tokenKey]) {
+          listeners[tokenKey].unsubscribe();
+          delete listeners[tokenKey];
         }
 
         // start a listener
         log.info(`Starting listener for ${erc20TokenNames}...`);
         try {
-          listeners[`erc20_${url}`] = await createListener(
+          listeners[tokenKey] = await createListener(
             'erc20',
             SupportedNetwork.ERC20,
             {
@@ -201,31 +215,31 @@ async function mainProcess(
           );
 
           // add the rabbitmq handler for this chain
-          listeners[`erc20_${url}`].eventHandlers['rabbitmq'] = { handler: producer };
-          listeners[`erc20_${url}`].eventHandlers['logger'] = { handler: erc20Logger };
+          listeners[tokenKey].eventHandlers['rabbitmq'] = { handler: producer };
+          listeners[tokenKey].eventHandlers['logger'] = { handler: erc20Logger };
         } catch (error) {
-          delete listeners[`erc20_${url}`];
-          await handleFatalError(error, pool, `erc20_${url}`, 'listener-startup');
+          delete listeners[tokenKey];
+          await handleFatalError(error, pool, tokenKey, 'listener-startup');
         }
 
         // if listener has started at this point then subscribe
-        if (listeners[`erc20_${url}`]) {
+        if (listeners[tokenKey]) {
           try {
             // subscribe to the chain to begin listening for events
-            await listeners[`erc20_${url}`].subscribe();
+            await listeners[tokenKey].subscribe();
           } catch (error) {
-            await handleFatalError(error, pool, `erc20_${url}`, 'listener-subscribe');
+            await handleFatalError(error, pool, tokenKey, 'listener-subscribe');
           }
         }
-      } else if (listeners[`erc20_${url}`] && tokens.length === 0) {
+      } else if (listeners[tokenKey] && tokens.length === 0) {
         // delete the listener if there are no tokens to listen to
-        log.info(`[erc20_${url}]: Deleting erc20 listener...`);
-        listeners[`erc20_${url}`].unsubscribe();
-        delete listeners[`erc20_${url}`];
+        log.info(`[${tokenKey}]: Deleting erc20 listener...`);
+        listeners[tokenKey].unsubscribe();
+        delete listeners[tokenKey];
       }
     } else {
       log.fatal(
-        `[erc20_${url}]: There are outstanding errors that need to be resolved before creating a new erc20 listener!`
+        `[${tokenKey}]: There are outstanding errors that need to be resolved before creating a new erc20 listener!`
       );
     }
   }
@@ -239,7 +253,7 @@ async function mainProcess(
   // delete listeners for chains that are no longer assigned to this node (skip erc20)
   const myChains = myChainData.map((row) => row.id);
   Object.keys(listeners).forEach((chain) => {
-    if (!myChains.includes(chain) && chain !== 'erc20') {
+    if (!myChains.includes(chain) && !chain.startsWith('erc20')) {
       log.info(`[${chain}]: Deleting chain...`);
       if (listeners[chain]) listeners[chain].unsubscribe();
       delete listeners[chain];
@@ -454,7 +468,8 @@ async function initializer(): Promise<void> {
   });
 
   // these requests cannot work locally
-  if (process.env.NODE_ENV === 'production' && process.env.USE_SLIDER_SCALING) {
+  if ((process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') && process.env.USE_SLIDER_SCALING === 'true') {
+    log.info('Connecting to Heroku API');
     // get all dyno's list
     const res = await fetch(
       `https://api.heroku.com/apps/${process.env.HEROKU_APP_NAME}/dynos`,
@@ -475,7 +490,6 @@ async function initializer(): Promise<void> {
     const dynoList = await res.json();
 
     if (!dynoList || dynoList.length === 0) {
-      // TODO: this will never occur
       throw new Error("No dyno's detected");
     }
 
@@ -528,8 +542,8 @@ async function initializer(): Promise<void> {
       }
     }
   } else {
-    workerNumber = Number(process.env.WORKER_NUMBER) || 0;
-    numWorkers = Number(process.env.NUM_WORKERS) || 1;
+    workerNumber = process.env.WORKER_NUMBER ? Number(process.env.WORKER_NUMBER) : 0;
+    numWorkers = process.env.NUM_WORKERS ? Number(process.env.NUM_WORKERS) : 1;
   }
 
   log.info(`Worker Number: ${workerNumber}\nNumber of Workers: ${numWorkers}`);
