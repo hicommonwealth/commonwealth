@@ -27,6 +27,7 @@ export const Errors = {
   CantCommentOnReadOnly: 'Cannot comment when thread is read_only',
   InsufficientTokenBalance: 'Users need to hold some of the community\'s tokens to comment',
   CouldNotFetchTokenBalance: 'Unable to fetch user\'s token balance',
+  CouldNotFindEthChainId: 'No eth chain id found for provided token',
   NestingTooDeep: 'Comments can only be nested 2 levels deep'
 };
 
@@ -65,7 +66,11 @@ const createComment = async (
         const threshold = topic.token_threshold;
         let tokenBalance = new BN(0);
         if (threshold) {
-          tokenBalance = await tokenBalanceCache.getBalance(chain.id, req.body.address);
+          const nodes = await chain.getChainNodes();
+          if (!nodes || !nodes[0].eth_chain_id) {
+            return next(new Error(Errors.CouldNotFindEthChainId));
+          }
+          tokenBalance = await tokenBalanceCache.getBalance(nodes[0].eth_chain_id, chain.id, req.body.address);
         }
         if (threshold && tokenBalance.lt(new BN(threshold))) return next(new Error(Errors.InsufficientTokenBalance));
       } catch (e) {

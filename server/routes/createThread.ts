@@ -23,6 +23,7 @@ export const Errors = {
   UnsupportedKind: 'Only forum threads, questions, and requests supported',
   InsufficientTokenBalance: 'Users need to hold some of the community\'s tokens to post',
   CouldNotFetchTokenBalance: 'Unable to fetch user\'s token balance',
+  CouldNotFindEthChainId: 'No eth chain id found for provided token',
 };
 
 const createThread = async (
@@ -153,7 +154,11 @@ const createThread = async (
         const threshold = (await models.OffchainTopic.findOne({ where: { id: topic_id } })).token_threshold;
         let tokenBalance = new BN(0);
         if (threshold) {
-          tokenBalance = await tokenBalanceCache.getBalance(chain.id, req.body.address);
+          const nodes = await chain.getChainNodes();
+          if (!nodes || !nodes[0].eth_chain_id) {
+            return next(new Error(Errors.CouldNotFindEthChainId));
+          }
+          tokenBalance = await tokenBalanceCache.getBalance(nodes[0].eth_chain_id, chain.id, req.body.address);
         }
         if (threshold && tokenBalance.lt(new BN(threshold))) return next(new Error(Errors.InsufficientTokenBalance));
       } catch (e) {

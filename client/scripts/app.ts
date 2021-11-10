@@ -62,6 +62,7 @@ export async function initAppState(updateSelectedNode = true, customDomain = nul
           chain: app.config.chains.getById(node.chain),
           address: node.address,
           token_name: node.token_name,
+          eth_chain_id: node.eth_chain_id,
         }));
       });
       data.communities.sort((a, b) => a.id - b.id).map((community) => {
@@ -397,7 +398,7 @@ export async function initNewTokenChain(address: string) {
   }
   const { chain, node } = response.result;
   const chainInfo = ChainInfo.fromJSON(chain);
-  const nodeInfo = new NodeInfo(node.id, chainInfo, node.url, node.address);
+  const nodeInfo = new NodeInfo(node);
   if (!app.config.chains.getById(chainInfo.id)) {
     app.config.chains.add(chainInfo);
     app.config.nodes.add(nodeInfo);

@@ -15,7 +15,6 @@ import {
 
 import { ChainBase, ChainNetwork, ChainType } from '../../shared/types';
 import { RabbitMqHandler } from '../eventHandlers/rabbitmqPlugin';
-import Identity from '../eventHandlers/pgIdentity';
 import { addPrefix, factory, formatFilename } from '../../shared/logging';
 import { DATABASE_URI, HANDLE_IDENTITY } from '../config';
 import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
@@ -49,7 +48,7 @@ async function handleFatalError(
 ): Promise<void> {
   log.error(`${chain ? `[${chain}]: ` : ''}${JSON.stringify(error)}`);
 
-  if (chain && chain !== 'erc20' && chainErrors[chain] >= 4) {
+  if (chain && chain.indexOf('erc20') === -1 && chainErrors[chain] >= 4) {
     listeners[chain].unsubscribe();
     delete listeners[chain];
 
@@ -166,78 +165,82 @@ async function mainProcess(
     }
   };
 
-  // group erc20 tokens together in order to start only one listener for all erc20 tokens
+  // group erc20 tokens together by URL in order to minimize number of listeners
   const erc20Tokens = myChainData.filter(
     (chain) =>
       chain.type === ChainType.Token && chain.base === ChainBase.Ethereum
   );
-  const erc20TokenAddresses = erc20Tokens.map((chain) => chain.address);
-  const erc20TokenNames = erc20Tokens.map((chain) => chain.id);
+  const erc20ByUrl = _.groupBy(erc20Tokens, 'url');
+  for (const [url, tokens] of Object.entries(erc20ByUrl)) {
+    const tokenKey = `erc20_${url}`;
+    const erc20TokenAddresses = tokens.map((chain) => chain.address);
+    const erc20TokenNames = tokens.map((chain) => chain.id);
 
-  // update the names of the tokens whose events should be logged by the erc20Logger
-  erc20Logger.tokenNames = erc20Tokens
-    .filter((chain) => chain.ce_verbose)
-    .map((chain) => chain.id);
+    // update the names of the tokens whose events should be logged by the erc20Logger
+    erc20Logger.tokenNames = tokens
+      .filter((chain) => chain.ce_verbose)
+      .map((chain) => chain.id);
 
-  // don't start a new erc20 listener if it is causing errors
-  if (!chainErrors['erc20'] || chainErrors['erc20'] < 4) {
-    // start a listener if: it doesn't exist yet OR it exists but the tokens have changed
-    if (
-      erc20Tokens.length > 0 &&
-      (!listeners['erc20'] ||
-        (listeners['erc20'] &&
-          !_.isEqual(
-            erc20TokenAddresses,
-            listeners['erc20'].options.tokenAddresses
-          )))
-    ) {
-      // clear the listener if it already exists and the tokens have changed
-      if (listeners['erc20']) {
-        listeners['erc20'].unsubscribe();
-        delete listeners['erc20'];
-      }
-
-      // start a listener
-      log.info(`Starting listener for ${erc20TokenNames}...`);
-      try {
-        listeners['erc20'] = await createListener(
-          'erc20',
-          SupportedNetwork.ERC20,
-          {
-            url: 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
-            tokenAddresses: erc20TokenAddresses,
-            tokenNames: erc20TokenNames,
-            verbose: false,
-          }
-        );
-
-        // add the rabbitmq handler for this chain
-        listeners['erc20'].eventHandlers['rabbitmq'] = { handler: producer };
-        listeners['erc20'].eventHandlers['logger'] = { handler: erc20Logger };
-      } catch (error) {
-        delete listeners['erc20'];
-        await handleFatalError(error, pool, 'erc20', 'listener-startup');
-      }
-
-      // if listener has started at this point then subscribe
-      if (listeners['erc20']) {
-        try {
-          // subscribe to the chain to begin listening for events
-          await listeners['erc20'].subscribe();
-        } catch (error) {
-          await handleFatalError(error, pool, 'erc20', 'listener-subscribe');
+    // don't start a new erc20 listener if it is causing errors
+    if (!chainErrors[tokenKey] || chainErrors[tokenKey] < 4) {
+      // start a listener if: it doesn't exist yet OR it exists but the tokens have changed
+      if (
+        tokens.length > 0 &&
+        (!listeners[tokenKey] ||
+          (listeners[tokenKey] &&
+            !_.isEqual(
+              erc20TokenAddresses,
+              listeners[tokenKey].options.tokenAddresses
+            )))
+      ) {
+        // clear the listener if it already exists and the tokens have changed
+        if (listeners[tokenKey]) {
+          listeners[tokenKey].unsubscribe();
+          delete listeners[tokenKey];
         }
+
+        // start a listener
+        log.info(`Starting listener for ${erc20TokenNames}...`);
+        try {
+          listeners[tokenKey] = await createListener(
+            'erc20',
+            SupportedNetwork.ERC20,
+            {
+              url,
+              tokenAddresses: erc20TokenAddresses,
+              tokenNames: erc20TokenNames,
+              verbose: false,
+            }
+          );
+
+          // add the rabbitmq handler for this chain
+          listeners[tokenKey].eventHandlers['rabbitmq'] = { handler: producer };
+          listeners[tokenKey].eventHandlers['logger'] = { handler: erc20Logger };
+        } catch (error) {
+          delete listeners[tokenKey];
+          await handleFatalError(error, pool, tokenKey, 'listener-startup');
+        }
+
+        // if listener has started at this point then subscribe
+        if (listeners[tokenKey]) {
+          try {
+            // subscribe to the chain to begin listening for events
+            await listeners[tokenKey].subscribe();
+          } catch (error) {
+            await handleFatalError(error, pool, tokenKey, 'listener-subscribe');
+          }
+        }
+      } else if (listeners[tokenKey] && tokens.length === 0) {
+        // delete the listener if there are no tokens to listen to
+        log.info(`[${tokenKey}]: Deleting erc20 listener...`);
+        listeners[tokenKey].unsubscribe();
+        delete listeners[tokenKey];
       }
-    } else if (listeners['erc20'] && erc20Tokens.length === 0) {
-      // delete the listener if there are no tokens to listen to
-      log.info('[erc20]: Deleting erc20 listener...');
-      listeners['erc20'].unsubscribe();
-      delete listeners['erc20'];
+    } else {
+      log.fatal(
+        `[${tokenKey}]: There are outstanding errors that need to be resolved before creating a new erc20 listener!`
+      );
     }
-  } else {
-    log.fatal(
-      '[erc20]: There are outstanding errors that need to be resolved before creating a new erc20 listener!'
-    );
   }
 
   // remove erc20 tokens from myChainData
@@ -249,7 +252,7 @@ async function mainProcess(
   // delete listeners for chains that are no longer assigned to this node (skip erc20)
   const myChains = myChainData.map((row) => row.id);
   Object.keys(listeners).forEach((chain) => {
-    if (!myChains.includes(chain) && chain !== 'erc20') {
+    if (!myChains.includes(chain) && !chain.startsWith('erc20')) {
       log.info(`[${chain}]: Deleting chain...`);
       if (listeners[chain]) listeners[chain].unsubscribe();
       delete listeners[chain];
@@ -406,18 +409,9 @@ async function mainProcess(
       continue;
     }
 
-    if (HANDLE_IDENTITY === 'handle') {
-      // initialize identity handler
-      const identityHandler = new Identity(pool);
-
-      await Promise.all(
-        identityEvents.map((e) => identityHandler.handle(e, null))
-      );
-    } else if (HANDLE_IDENTITY === 'publish') {
-      for (const event of identityEvents) {
-        event.chain = chain.id; // augment event with chain
-        await producer.publish(event, 'identityPub');
-      }
+    for (const event of identityEvents) {
+      event.chain = chain.id; // augment event with chain
+      await producer.publish(event, 'identityPub');
     }
 
     // clear the identity cache for this chain
