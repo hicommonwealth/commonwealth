@@ -6,7 +6,7 @@ import $ from 'jquery';
 import { Button } from 'construct-ui';
 import { navigateToSubpage } from 'app';
 
-import { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
+import { SnapshotProposal, SnapshotSpace, getVersion } from 'helpers/snapshot_utils';
 import { notifyError } from 'controllers/app/notifications';
 
 import { CompactModalExitButton } from 'views/modal';
@@ -81,10 +81,11 @@ const ConfirmSnapshotVoteModal: m.Component<{
             onclick: async (e) => {
               e.preventDefault();
               vnode.state.saving = true;
+              const version = await getVersion();
               const msg: any = {
                 address: author.address,
                 msg: JSON.stringify({
-                  version: '0.1.3',
+                  version,
                   timestamp: (Date.now() / 1e3).toFixed(),
                   space: space.id,
                   type: 'vote',
