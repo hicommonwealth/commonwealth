@@ -623,6 +623,7 @@ Promise.all([
       '/web3login':              importRoute('views/pages/web3login', { scoped: true }),
       // Admin
       '/admin':                  importRoute('views/pages/admin', { scoped: true }),
+      '/manage':                 importRoute('views/pages/manage_community/index', { scoped: true }),
       '/spec_settings':          importRoute('views/pages/spec_settings', { scoped: true, deferChain: true }),
       '/settings':               importRoute('views/pages/settings', { scoped: true }),
       '/analytics':              importRoute('views/pages/stats', { scoped: true, deferChain: true }),
