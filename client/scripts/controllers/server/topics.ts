@@ -178,7 +178,6 @@ class TopicsController {
       this._store.clear();
     }
     initialTopics.forEach((t) => {
-      console.log(t);
       try {
         this._store.add(new OffchainTopic(t));
       } catch (e) {
