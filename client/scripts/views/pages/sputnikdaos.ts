@@ -27,6 +27,9 @@ interface IDaoInfo {
 
 const SputnikDAOsPage : m.Component<{}, { daosRequested: boolean, daosList: IDaoInfo[] }> = {
   view: (vnode) => {
+    if(app.activeId() && app.activeId() != 'near')
+      m.route.set(`/${app.activeId()}`);
+    
     const activeEntity = app.community ? app.community : app.chain;
     var allCommunities = (app.config.communities.getAll() as (CommunityInfo | ChainInfo)[]).concat(app.config.chains.getAll());
 
@@ -38,16 +41,10 @@ const SputnikDAOsPage : m.Component<{}, { daosRequested: boolean, daosList: IDao
       ],
       showNewProposalButton: true,
     });
-    else {
-      if(app.activeId() != 'near'){
-        m.route.set(`/${app.activeId()}`);
-      }
-    }
 
     if(app.activeId() == 'near' && !vnode.state.daosRequested){
       vnode.state.daosRequested = true;
       (app.chain as Near).chain.viewDaoList().then((daos) => {
-        console.log(daos);
         vnode.state.daosList = daos;
         vnode.state.daosList.sort((d1, d2) => {
           let d1Exist = allCommunities.filter(c => c.id == d1.name).length;
@@ -61,19 +58,12 @@ const SputnikDAOsPage : m.Component<{}, { daosRequested: boolean, daosList: IDao
       })
     }
 
-    const isAdmin = app.user.isSiteAdmin
-    || app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
-    const isMod = app.user.isRoleOfCommunity({
-      role: 'moderator', chain: app.activeChainId(), community: app.activeCommunityId()
-    });
-
     if (!vnode.state.daosList){
       if(app.activeId() == 'near')
         return m(PageLoading, {
           message: 'Loading Sputnik DAOs',
           title: [
-            'Sputnik DAOs',
-            m(CommunityOptionsPopover, { isAdmin, isMod }),
+            'Sputnik DAOs',        
             m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
           ],
           showNewProposalButton: true,
@@ -86,7 +76,6 @@ const SputnikDAOsPage : m.Component<{}, { daosRequested: boolean, daosList: IDao
       class: 'SputnikDAOsPage',
       title: [
         'Sputnik DAOs',
-        m(CommunityOptionsPopover, { isAdmin, isMod }),
         m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
       ],
       showNewProposalButton: true,
