@@ -3,15 +3,12 @@ import 'modals/new_topic_modal.scss';
 
 import m from 'mithril';
 import app from 'state';
-import $ from 'jquery';
-import { Button, Col, Input, Form, FormGroup, FormLabel, Grid, Spinner } from 'construct-ui';
-import BN from 'bn.js';
+import { Button, Switch, Input, Form } from 'construct-ui';
 
-import { confirmationModalWithText } from 'views/modals/confirm_modal';
+import { OffchainTopic } from 'models';
 import { CompactModalExitButton } from 'views/modal';
 import { tokensToTokenBaseUnits, tokenBaseUnitsToTokens } from 'helpers';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { OffchainTopic } from '../../models';
 
 interface INewTopicModalForm {
   id: number,
@@ -20,44 +17,90 @@ interface INewTopicModalForm {
   tokenThreshold: number
 }
 
-const EditTopicThresholdsRow: m.Component<{ topic: OffchainTopic }, { newTokenThreshold: string }> = {
-  view: (vnode) => {
+const EditTopicThresholdsRow: m.Component<{
+  topic: OffchainTopic
+}, {
+  newTokenThreshold: string,
+  useBaseToken: boolean,
+  switchCaption: string,
+}> = {
+  oninit: (vnode) => {
     const { topic } = vnode.attrs;
     const decimals = app.chain.meta.chain.decimals ? app.chain.meta.chain.decimals : 18;
     if (vnode.state.newTokenThreshold === null || vnode.state.newTokenThreshold === undefined) {
       vnode.state.newTokenThreshold = topic.tokenThreshold
         ? tokenBaseUnitsToTokens(topic.tokenThreshold.toString(), decimals) : '0';
     }
+    vnode.state.useBaseToken = false;
+    vnode.state.switchCaption = `Using ${decimals} decimal precision`;
+  },
+  view: (vnode) => {
+    const { topic } = vnode.attrs;
+    const decimals = app.chain.meta.chain.decimals ? app.chain.meta.chain.decimals : 18;
 
     return m(Form, [
-      m('.topic-name', [ topic.name ]),
-      m('div',  [ m(Input, {
+      m('.topic-name', [topic.name]),
+      m(Input, {
+        title: '',
         value: vnode.state.newTokenThreshold,
-        oninput: (e) => {
-          const threshold = (e.target as any).value;
-          if (threshold.match(/^\d*?\.?\d*?$/)) {
-            vnode.state.newTokenThreshold = threshold;
-          }
+        type: 'number',
+        oninput: (v) => {
+          console.log('onkeyup fired');
+          const threshold: string = (v.target as any).value;
+          vnode.state.newTokenThreshold = threshold;
         },
       }),
       m(Button, {
         label: 'Update',
         intent: 'primary',
         rounded: true,
+        disabled: !vnode.state.newTokenThreshold,
         onclick: async (e) => {
           e.preventDefault();
-          app.topics.setTopicThreshold(topic,
-            tokensToTokenBaseUnits(vnode.state.newTokenThreshold.toString(), decimals))
-            .then((status) => {
-              if (status === 'Success') {
-                notifySuccess('Successfully updated threshold value');
-              } else {
-                notifyError('Could not update threshold value');
-              }
-            });
+          try {
+            // always convert to base token
+            const amount = vnode.state.useBaseToken
+              ? vnode.state.newTokenThreshold.toString()
+              : tokensToTokenBaseUnits(vnode.state.newTokenThreshold.toString(), decimals);
+            const status = await app.topics.setTopicThreshold(topic, amount);
+            if (status === 'Success') {
+              notifySuccess('Successfully updated threshold value');
+            } else {
+              notifyError('Could not update threshold value');
+            }
+          } catch (err) {
+            notifyError(`Invalid threshold value: ${err.message}`);
+          }
         },
       }),
-      ]),
+      m('span.token-settings', [
+        m(Switch, {
+          title: '',
+          defaultValue: vnode.state.useBaseToken,
+          onchange: () => {
+            console.log('onchange fired');
+            vnode.state.useBaseToken = !vnode.state.useBaseToken;
+            if (vnode.state.useBaseToken) {
+              vnode.state.switchCaption = 'Using base token value';
+              if (vnode.state.newTokenThreshold) {
+                vnode.state.newTokenThreshold = tokensToTokenBaseUnits(
+                  vnode.state.newTokenThreshold,
+                  decimals
+                );
+              }
+            } else {
+              vnode.state.switchCaption = `Using ${decimals} decimal precision`;
+              if (vnode.state.newTokenThreshold) {
+                vnode.state.newTokenThreshold = tokenBaseUnitsToTokens(
+                  vnode.state.newTokenThreshold,
+                  decimals
+                );
+              }
+            }
+          },
+        }),
+        m('.switch-caption', vnode.state.switchCaption),
+      ])
     ]);
   }
 };
