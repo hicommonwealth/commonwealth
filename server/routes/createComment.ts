@@ -26,8 +26,7 @@ export const Errors = {
   // ChainEntityNotFound: 'Cannot comment; chain entity not found',
   CantCommentOnReadOnly: 'Cannot comment when thread is read_only',
   InsufficientTokenBalance: 'Users need to hold some of the community\'s tokens to comment',
-  CouldNotFetchTokenBalance: 'Unable to fetch user\'s token balance',
-  CouldNotFindEthChainId: 'No eth chain id found for provided token',
+  BalanceCheckFailed: 'Could not verify user token balance',
   NestingTooDeep: 'Comments can only be nested 2 levels deep'
 };
 
@@ -60,22 +59,13 @@ const createComment = async (
         const thread = await models.OffchainThread.findOne({
           where: { id: thread_id },
         });
-        const topic = await models.OffchainTopic.findOne({
-          where: { id: thread.topic_id },
-        });
-        const threshold = topic.token_threshold;
-        let tokenBalance = new BN(0);
-        if (threshold) {
-          const nodes = await chain.getChainNodes();
-          if (!nodes || !nodes[0].eth_chain_id) {
-            return next(new Error(Errors.CouldNotFindEthChainId));
-          }
-          tokenBalance = await tokenBalanceCache.getBalance(nodes[0].eth_chain_id, chain.id, req.body.address);
+        const canReact = await tokenBalanceCache.validateTopicThreshold(thread.topic_id, req.body.address);
+        if (!canReact) {
+          return next(new Error(Errors.BalanceCheckFailed));
         }
-        if (threshold && tokenBalance.lt(new BN(threshold))) return next(new Error(Errors.InsufficientTokenBalance));
       } catch (e) {
         log.error(`hasToken failed: ${e.message}`);
-        return next(new Error(Errors.CouldNotFetchTokenBalance));
+        return next(new Error(Errors.BalanceCheckFailed));
       }
     }
   }
