@@ -17,7 +17,7 @@ const ProposalRow: m.Component<
     const { proposal } = vnode.attrs;
 
     if (!proposal) return;
-    const proposalLink = `/snapshot/${vnode.attrs.snapshotId}/${proposal.ipfs}`;
+    const proposalLink = `/snapshot/${vnode.attrs.snapshotId}/${proposal.id}`;
 
     const time = moment(+proposal.end * 1000);
     const now = moment();
