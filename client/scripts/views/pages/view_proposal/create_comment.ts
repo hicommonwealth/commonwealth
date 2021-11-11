@@ -162,7 +162,7 @@ const CreateComment: m.Component<{
         || (!isAdmin && tokenPostingThreshold && tokenPostingThreshold.gt(tokenBalance));
     }
 
-    const decimals = app.chain.meta.chain.decimals ? app.chain.meta.chain.decimals : 18;
+    const decimals = app.chain?.meta.chain?.decimals ? app.chain.meta.chain.decimals : 18;
     return m('.CreateComment', {
       class: parentScopedClass
     }, [

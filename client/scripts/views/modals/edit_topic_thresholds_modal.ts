@@ -26,7 +26,7 @@ const EditTopicThresholdsRow: m.Component<{
 }> = {
   oninit: (vnode) => {
     const { topic } = vnode.attrs;
-    const decimals = app.chain.meta.chain.decimals ? app.chain.meta.chain.decimals : 18;
+    const decimals = app.chain?.meta.chain?.decimals ? app.chain.meta.chain.decimals : 18;
     if (vnode.state.newTokenThreshold === null || vnode.state.newTokenThreshold === undefined) {
       vnode.state.newTokenThreshold = topic.tokenThreshold
         ? tokenBaseUnitsToTokens(topic.tokenThreshold.toString(), decimals) : '0';
@@ -36,7 +36,7 @@ const EditTopicThresholdsRow: m.Component<{
   },
   view: (vnode) => {
     const { topic } = vnode.attrs;
-    const decimals = app.chain.meta.chain.decimals ? app.chain.meta.chain.decimals : 18;
+    const decimals = app.chain?.meta.chain?.decimals ? app.chain.meta.chain.decimals : 18;
 
     return m(Form, [
       m('.topic-name', [topic.name]),
