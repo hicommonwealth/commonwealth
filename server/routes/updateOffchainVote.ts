@@ -1,17 +1,26 @@
 import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
+import BN from 'bn.js';
 
 import { sequelize, DB } from '../database';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
+import TokenBalanceCache from '../util/tokenBalanceCache';
 
 export const Errors = {
   InvalidThread: 'Invalid thread',
   InvalidUser: 'Invalid user',
   PollingClosed: 'Polling already finished',
+  BalanceCheckFailed: 'Could not verify user token balance',
 };
 
-const updateOffchainVote = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const updateOffchainVote = async (
+  models: DB,
+  tokenBalanceCache: TokenBalanceCache,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
@@ -30,6 +39,12 @@ const updateOffchainVote = async (models: DB, req: Request, res: Response, next:
 
   if (!thread.offchain_voting_ends_at || moment(thread.offchain_voting_ends_at).utc().isBefore(moment().utc())) {
     return next(new Error(Errors.PollingClosed));
+  }
+
+  // check token balance threshold if needed
+  const canVote = await tokenBalanceCache.validateTopicThreshold(thread.topic_id, req.body.address);
+  if (!canVote) {
+    return next(new Error(Errors.BalanceCheckFailed));
   }
 
   let vote;

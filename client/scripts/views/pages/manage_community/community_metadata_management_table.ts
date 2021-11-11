@@ -3,7 +3,7 @@ import m from 'mithril';
 import { Table, Button } from 'construct-ui';
 
 import { CommunityInfo, ChainInfo } from 'models';
-import { notifyError } from 'controllers/app/notifications';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import {
   InputPropertyRow,
   TogglePropertyRow,
@@ -236,31 +236,13 @@ const CommunityMetadataManagementTable: m.Component<
             ]),
         ]
       ),
-      m(Button, {
-        label: 'Save changes',
-        disabled: vnode.state.uploadInProgress,
-        intent: 'primary',
-        rounded: true,
-        onclick: async (e) => {
-          const {
-            name,
-            description,
-            iconUrl,
-            website,
-            discord,
-            element,
-            telegram,
-            github,
-            stagesEnabled,
-            customStages,
-            customDomain,
-            terms,
-            invitesEnabled,
-            privacyEnabled,
-            defaultSummaryView,
-          } = vnode.state;
-          try {
-            await vnode.attrs.community.updateCommunityData({
+      m('.button-wrap', [
+        m(Button, {
+          label: 'Save changes',
+          disabled: vnode.state.uploadInProgress,
+          intent: 'primary',
+          onclick: async (e) => {
+            const {
               name,
               description,
               iconUrl,
@@ -273,16 +255,35 @@ const CommunityMetadataManagementTable: m.Component<
               customStages,
               customDomain,
               terms,
-              privacyEnabled,
               invitesEnabled,
+              privacyEnabled,
               defaultSummaryView,
-            });
-            $(e.target).trigger('modalexit');
-          } catch (err) {
-            notifyError(err.responseJSON?.error || 'Community update failed');
-          }
-        },
-      }),
+            } = vnode.state;
+            try {
+              await vnode.attrs.community.updateCommunityData({
+                name,
+                description,
+                iconUrl,
+                website,
+                discord,
+                element,
+                telegram,
+                github,
+                stagesEnabled,
+                customStages,
+                customDomain,
+                terms,
+                privacyEnabled,
+                invitesEnabled,
+                defaultSummaryView,
+              });
+              notifySuccess('Community updated');
+            } catch (err) {
+              notifyError(err.responseJSON?.error || 'Community update failed');
+            }
+          },
+        }),
+      ])
     ]);
   },
 };

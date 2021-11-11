@@ -296,7 +296,7 @@ function setupRouter(
   router.post(
     '/updateOffchainVote',
     passport.authenticate('jwt', { session: false }),
-    updateOffchainVote.bind(this, models)
+    updateOffchainVote.bind(this, models, tokenBalanceCache)
   );
   router.get('/viewOffchainVotes', viewOffchainVotes.bind(this, models));
 

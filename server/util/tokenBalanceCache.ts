@@ -66,6 +66,41 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     return this.start();
   }
 
+  public async validateTopicThreshold(topicId: number, userAddress: string): Promise<boolean> {
+    if (!topicId || !userAddress) return true;
+    try {
+      const topic = await this.models.OffchainTopic.findOne({
+        where: { id: topicId },
+        include: [
+          {
+            model: this.models.Chain,
+            required: true,
+            as: 'chain',
+          },
+        ]
+      });
+      if (!topic?.chain) {
+        // if associated with an offchain community, always allow
+        return true;
+      }
+      const threshold = topic.token_threshold;
+      if (threshold) {
+        const nodes = await this.models.ChainNode.findAll({ where: { chain: topic.chain.id } });
+        if (!nodes || !nodes[0].eth_chain_id) {
+          throw new Error('Could not find chain node.');
+        }
+        const tokenBalance = await this.getBalance(nodes[0].eth_chain_id, topic.chain.id, userAddress);
+        log.info(`Balance: ${tokenBalance.toString()}, threshold: ${threshold.toString()}`);
+        return (new BN(tokenBalance)).gten(threshold);
+      } else {
+        return true;
+      }
+    } catch (err) {
+      log.warn(`Could not validate topic threshold for ${topicId}: ${err.message}`);
+      return false;
+    }
+  }
+
   // query a user's balance on a given token contract and save in cache
   public async getBalance(chainId: number, contractId: string, address: string): Promise<BN> {
     let contractAddress: string;
