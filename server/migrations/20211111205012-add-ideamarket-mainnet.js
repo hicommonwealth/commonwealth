@@ -26,9 +26,9 @@ module.exports = {
         [
           {
             chain: 'ideamarket',
-            url: 'wss://arb-rinkeby.g.alchemy.com/v2/WLfTX_HT-26kIjsBaBx7CrTHEi45v212', // TODO: Mainnet Arbitrum
+            url: 'wss://arb-mainnet.g.alchemy.com/v2/wJE2b7MRNJgk7S8dfgb_1xZNUDq7SF7G',
             address: '0x...', // TODO: Mainnet Address
-            eth_chain_id: 421611, // TODO: Verify
+            eth_chain_id: 42161,
           },
         ],
         { transaction: t }
