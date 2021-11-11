@@ -10,7 +10,7 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "downlevelIteration": true,
-    "traceResolution": true
+    "traceResolution": false
   },
   "files": [
     "server/scripts/chainEventsConsumer.ts",

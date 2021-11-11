@@ -18,6 +18,8 @@ import { IWebsocketsPayload, WebsocketMessageType } from '../../shared/types';
 const log = factory.getLogger(formatFilename(__filename));
 
 export default class extends IEventHandler {
+  public readonly name = 'Entity Archival';
+
   constructor(
     private readonly _models,
     private readonly _chain?: string,
