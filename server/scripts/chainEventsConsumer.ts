@@ -1,8 +1,7 @@
 import { SubstrateTypes, CWEvent } from '@commonwealth/chain-events';
 import * as WebSocket from 'ws';
+import { BrokerConfig, SubscriberSessionAsPromised } from 'rascal';
 import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
-
-import { HANDLE_IDENTITY } from '../config';
 
 import EventNotificationHandler from '../eventHandlers/notifications';
 import EventStorageHandler from '../eventHandlers/storage';
@@ -12,8 +11,9 @@ import UserFlagsHandler from '../eventHandlers/userFlags';
 import ProfileCreationHandler from '../eventHandlers/profileCreation';
 import { ChainBase } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
-import { Consumer } from '../util/rabbitmq/consumer';
+import { RabbitMQController } from '../util/rabbitmq/rabbitMQController';
 import models from '../database';
+
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -108,9 +108,9 @@ const setupChainEventListeners = async (wss: WebSocket.Server): Promise<{}> => {
     }
   }
 
-  let consumer, eventsSubscriber, identitySubscriber;
+  let consumer: RabbitMQController, eventsSubscriber: SubscriberSessionAsPromised, identitySubscriber: SubscriberSessionAsPromised;
   try {
-    consumer = new Consumer(RabbitMQConfig);
+    consumer = new RabbitMQController(<BrokerConfig>RabbitMQConfig);
     await consumer.init();
   } catch (e) {
     log.error("Rascal consumer setup failed. Please check the Rascal configuration");
@@ -118,7 +118,7 @@ const setupChainEventListeners = async (wss: WebSocket.Server): Promise<{}> => {
   }
 
   try {
-    eventsSubscriber = await consumer.consumeEvents(
+    eventsSubscriber = await consumer.startSubscription(
       processClassicEvents,
       'ChainEventsHandlersSubscription'
     );
@@ -129,7 +129,7 @@ const setupChainEventListeners = async (wss: WebSocket.Server): Promise<{}> => {
 
 
   try {
-    identitySubscriber = await consumer.consumeEvents(
+    identitySubscriber = await consumer.startSubscription(
       processIdentityEvents,
       'SubstrateIdentityEventsSubscription'
     );

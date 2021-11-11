@@ -1,6 +1,7 @@
 import { RABBITMQ_URI } from '../../config';
 
 const vhost = RABBITMQ_URI.includes('localhost') ? '/' : RABBITMQ_URI.split('/')[RABBITMQ_URI.split('/').length - 1]
+const purge = RABBITMQ_URI.includes('localhost')
 
 const config = {
   'vhosts': {
@@ -17,33 +18,37 @@ const config = {
       },
       'queues': {
         'ChainEventsHandlersQueue': {
-          'assert': true
+          'assert': true,
+          'purge': purge
         },
         'SubstrateIdentityEventsQueue': {
-          'assert': true
+          'assert': true,
+          'purge': purge
         },
         'ChainEventsNotificationsQueue': {
-          'assert': true
+          'assert': true,
+          'purge': purge,
         },
         'DeadLetterQueue': {
-          'assert': true
+          'assert': true,
+          'purge': purge
         }
       },
       'bindings': {
         'ChainEventsHandlersBinding': {
-          'source': 'eventsExchange',
+          'source': 'EventsExchange',
           'destination': 'ChainEventsHandlersQueue',
           'destinationType': 'queue',
           'bindingKey': 'eQueue'
         },
         'SubstrateIdentityEventsBinding': {
-          'source': 'eventsExchange',
+          'source': 'EventsExchange',
           'destination': 'SubstrateIdentityEventsQueue',
           'destinationType': 'queue',
           'bindingKey': 'iQueue'
         },
         'ChainEventsNotificationsBinding': {
-          'source': 'eventsExchange',
+          'source': 'EventsExchange',
           'destination': 'ChainEventsNotificationsQueue',
           'destinationType': 'queue',
           'bindingKey': 'nQueue'
@@ -57,7 +62,7 @@ const config = {
       },
       'publications': {
         'ChainEventsHandlersPublication': {
-          'exchange': 'eventsExchange',
+          'exchange': 'EventsExchange',
           'routingKey': 'eQueue',
           'confirm': true,
           'timeout': 10000,
@@ -66,7 +71,7 @@ const config = {
           }
         },
         'SubstrateIdentityEventsPublication': {
-          'exchange': 'eventsExchange',
+          'exchange': 'EventsExchange',
           'routingKey': 'iQueue',
           'confirm': true,
           'timeout': 10000,
@@ -75,7 +80,7 @@ const config = {
           }
         },
         'ChainEventsNotificationsPublication': {
-          'exchange': 'eventsExchange',
+          'exchange': 'EventsExchange',
           'routingKey': 'nQueue',
           'confirm': true,
           'timeout': 10000,

@@ -1,21 +1,21 @@
-import Rascal from 'rascal';
+import Rascal, { BrokerConfig } from 'rascal';
 import { assert } from 'chai';
-import { RabbitMqProducer as Producer } from '../../../server/eventHandlers/rabbitmqPlugin/producer';
-import { getRabbitMQConfig } from '../../../server/eventHandlers/rabbitmqPlugin';
+import { RabbitMQController as Producer } from '../../../server/util/rabbitmq/rabbitMQController';
+import  RabbitMQConfig  from '../../../server/util/rabbitmq/RabbitMQConfig';
 
 // Assumes: A live local CW server, a live local RabbitMQ server
 describe.skip('RabbitMQ producer integration tests', () => {
   let producer, consumer;
 
   it('should initialize a RabbitMQ producer with the default config', async function () {
-    producer = await new Producer(getRabbitMQConfig());
+    producer = await new Producer(<BrokerConfig>RabbitMQConfig);
     await producer.init();
     assert.isNotNull(producer.broker);
   });
 
   it('should publish a CWEvent to a queue', async function () {
     consumer = await Rascal.BrokerAsPromised.create(
-      Rascal.withDefaultConfig(getRabbitMQConfig())
+      Rascal.withDefaultConfig(<BrokerConfig>RabbitMQConfig)
     );
 
     const sub = await consumer.subscribe('eventsSub');
