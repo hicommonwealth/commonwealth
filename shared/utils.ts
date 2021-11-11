@@ -163,3 +163,8 @@ export function formatAddressShort(
     return `${address.slice(0, maxCharLength || 5)}${includeEllipsis ? '…' : ''}`;
   }
 }
+
+// Converts a ws or wss url to the corresponding http/https
+export function wsToHttp(url: string): string {
+  return url.replace(/^ws/, 'http');
+}

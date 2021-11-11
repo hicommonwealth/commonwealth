@@ -62,6 +62,7 @@ export async function initAppState(updateSelectedNode = true, customDomain = nul
           chain: app.config.chains.getById(node.chain),
           address: node.address,
           token_name: node.token_name,
+          eth_chain_id: node.eth_chain_id,
         }));
       });
       data.communities.sort((a, b) => a.id - b.id).map((community) => {
@@ -91,7 +92,6 @@ export async function initAppState(updateSelectedNode = true, customDomain = nul
         }));
       });
       app.user.setRoles(data.roles);
-      // app.config.topics = data.topics.map((json) => OffchainTopic.fromJSON(json));
       app.config.notificationCategories = data.notificationCategories
         .map((json) => NotificationCategory.fromJSON(json));
       app.config.invites = data.invites;
@@ -397,7 +397,7 @@ export async function initNewTokenChain(address: string) {
   }
   const { chain, node } = response.result;
   const chainInfo = ChainInfo.fromJSON(chain);
-  const nodeInfo = new NodeInfo(node.id, chainInfo, node.url, node.address);
+  const nodeInfo = new NodeInfo(node);
   if (!app.config.chains.getById(chainInfo.id)) {
     app.config.chains.add(chainInfo);
     app.config.nodes.add(nodeInfo);
@@ -623,6 +623,7 @@ Promise.all([
       '/web3login':              importRoute('views/pages/web3login', { scoped: true }),
       // Admin
       '/admin':                  importRoute('views/pages/admin', { scoped: true }),
+      '/manage':                 importRoute('views/pages/manage_community/index', { scoped: true }),
       '/spec_settings':          importRoute('views/pages/spec_settings', { scoped: true, deferChain: true }),
       '/settings':               importRoute('views/pages/settings', { scoped: true }),
       '/analytics':              importRoute('views/pages/stats', { scoped: true, deferChain: true }),
@@ -668,6 +669,7 @@ Promise.all([
       '/:scope/web3login':          redirectRoute(() => '/web3login'),
       '/:scope/settings':           redirectRoute(() => '/settings'),
       '/:scope/admin':              redirectRoute(() => '/admin'),
+      '/:scope/manage':             redirectRoute(() => '/manage'),
       '/:scope/spec_settings':      redirectRoute(() => '/spec_settings'),
       '/:scope/analytics':          redirectRoute(() => '/analytics'),
       '/:scope/snapshot-proposals/:snapshotId': redirectRoute(
@@ -740,6 +742,8 @@ Promise.all([
       '/settings':                 importRoute('views/pages/settings', { scoped: false }),
       '/:scope/settings':          importRoute('views/pages/settings', { scoped: true }),
       '/:scope/admin':             importRoute('views/pages/admin', { scoped: true }),
+      '/manage':                 importRoute('views/pages/manage_community/index', { scoped: false }),
+      '/:scope/manage':          importRoute('views/pages/manage_community/index', { scoped: true }),
       '/:scope/spec_settings':     importRoute('views/pages/spec_settings', { scoped: true, deferChain: true }),
       '/:scope/analytics':         importRoute('views/pages/stats', { scoped: true, deferChain: true }),
 

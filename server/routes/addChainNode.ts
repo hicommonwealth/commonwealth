@@ -78,7 +78,8 @@ const addChainNode = async (models: DB, req: Request, res: Response, next: NextF
   const node = await models.ChainNode.create({
     chain: chain.id,
     url: req.body.node_url,
-    address: (req.body.address) ? req.body.address : '',
+    address: req.body.address || '',
+    eth_chain_id: req.body.eth_chain_id || null, // TODO: will this work on nullable field?
   });
 
   return res.json({ status: 'Success', result: node.toJSON() });

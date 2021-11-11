@@ -275,7 +275,7 @@ const ViewProposalPage: m.Component<
 
     const loadVotes = async () => {
       vnode.state.proposal = app.snapshot.proposals.find(
-        (proposal) => proposal.ipfs === vnode.attrs.identifier
+        (proposal) => proposal.id === vnode.attrs.identifier
       );
 
       const space = app.snapshot.space;

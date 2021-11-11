@@ -4,7 +4,7 @@ import app from 'state';
 import { Button, Table } from 'construct-ui';
 
 import { ChainBase, ChainNetwork } from 'types';
-import { notifyError } from 'controllers/app/notifications';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { IChainOrCommMetadataManagementAttrs } from './community_metadata_management_table';
 import {
   TogglePropertyRow,
@@ -234,43 +234,14 @@ const ChainMetadataManagementTable: m.Component<
             ]),
         ]
       ),
-      m(Button, {
-        class: 'save-changes-button',
-        disabled: vnode.state.uploadInProgress,
-        label: 'Save changes',
-        intent: 'primary',
-        onclick: async (e) => {
-          const {
-            name,
-            description,
-            website,
-            discord,
-            element,
-            telegram,
-            github,
-            stagesEnabled,
-            customStages,
-            customDomain,
-            snapshot,
-            terms,
-            iconUrl,
-            defaultSummaryView,
-          } = vnode.state;
-
-          // /^[a-z]+\.eth/
-          if (
-            snapshot &&
-            snapshot !== '' &&
-            !/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi.test(
-              snapshot
-            )
-          ) {
-            notifyError('Snapshot name must be in the form of *.eth');
-            return;
-          }
-
-          try {
-            await vnode.attrs.chain.updateChainData({
+      m('.button-wrap', [
+        m(Button, {
+          class: 'save-changes-button',
+          disabled: vnode.state.uploadInProgress,
+          label: 'Save changes',
+          intent: 'primary',
+          onclick: async (e) => {
+            const {
               name,
               description,
               website,
@@ -285,13 +256,44 @@ const ChainMetadataManagementTable: m.Component<
               terms,
               iconUrl,
               defaultSummaryView,
-            });
-            $(e.target).trigger('modalexit');
-          } catch (err) {
-            notifyError(err.responseJSON?.error || 'Chain update failed');
-          }
-        },
-      }),
+            } = vnode.state;
+  
+            // /^[a-z]+\.eth/
+            if (
+              snapshot &&
+              snapshot !== '' &&
+              !/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi.test(
+                snapshot
+              )
+            ) {
+              notifyError('Snapshot name must be in the form of *.eth');
+              return;
+            }
+  
+            try {
+              await vnode.attrs.chain.updateChainData({
+                name,
+                description,
+                website,
+                discord,
+                element,
+                telegram,
+                github,
+                stagesEnabled,
+                customStages,
+                customDomain,
+                snapshot,
+                terms,
+                iconUrl,
+                defaultSummaryView,
+              });
+              notifySuccess('Chain updated');
+            } catch (err) {
+              notifyError(err.responseJSON?.error || 'Chain update failed');
+            }
+          },
+        }),
+      ])
     ]);
   },
 };

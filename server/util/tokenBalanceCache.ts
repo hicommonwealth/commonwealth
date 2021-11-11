@@ -4,59 +4,39 @@ import BN from 'bn.js';
 import { providers } from 'ethers';
 
 import { ERC20__factory } from '../../shared/eth/types';
-import { TokenResponse } from '../../shared/types';
 
 import JobRunner from './cacheJobRunner';
-import { slugify } from '../../shared/utils';
 
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
+import { wsToHttp } from '../../shared/utils';
+import { getUrlForEthChainId } from './supportedEthChains';
 
 const log = factory.getLogger(formatFilename(__filename));
 
+function getKey(chainId: number, contract: string, address: string) {
+  return `${chainId}-${contract}-${address}`;
+}
+
 // map of addresses to balances
 interface CacheT {
-  [contract: string]: {
-    [address: string]: {
-      balance: BN,
-      fetchedAt: moment.Moment;
-    };
-  };
-}
-
-export interface TokenForumMeta {
-  id: string;
-  address: string;
-  iconUrl: string;
-  name: string;
-  symbol: string;
-  balanceThreshold?: BN;
-  decimals: number;
-}
-
-export class TokenBalanceProvider {
-  private _provider: providers.Web3Provider;
-  constructor(private _network = 'mainnet') {
-    let web3Provider;
-    if (this._network === 'mainnet') {
-      web3Provider = new Web3.providers.HttpProvider(`https://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr`);
-    } else if (this._network === 'ropsten') {
-      web3Provider = new Web3.providers.HttpProvider(`https://eth-ropsten.alchemyapi.io/v2/2xXT2xx5AvA3GFTev3j_nB9LzWdmxPk7`);
-    } else {
-      throw new Error('invalid network');
-    }
-    this._provider = new providers.Web3Provider(web3Provider);
-    // 12s minute polling interval (default is 4s)
-    this._provider.pollingInterval = 12000;
+  [cacheKey: string]: {
+    balance: BN,
+    fetchedAt: moment.Moment;
   }
+}
 
-  public async getBalance(tokenAddress: string, userAddress: string): Promise<BN> {
-    const api = ERC20__factory.connect(tokenAddress, this._provider);
+// Uses a tiny class so it's mockable for testing
+export class TokenBalanceProvider {
+  public async getBalance(url: string, tokenAddress: string, userAddress: string): Promise<BN> {
+    const provider = new Web3.providers.HttpProvider(url);
+    const api = ERC20__factory.connect(tokenAddress, new providers.Web3Provider(provider));
     await api.deployed();
     const balanceBigNum = await api.balanceOf(userAddress);
     return new BN(balanceBigNum.toString());
   }
 }
+
 
 export default class TokenBalanceCache extends JobRunner<CacheT> {
   private models: DB;
@@ -70,41 +50,88 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     this.models = models;
   }
 
-  public async start(prefetchedTokenMeta?: TokenForumMeta[]) {
-    if (prefetchedTokenMeta) {
-      // write init values into saved cache
-      await this.access(async (cache) => {
-        for (const { id } of prefetchedTokenMeta) {
-          cache[id] = { };
-        }
-      });
-    }
-
+  public async start() {
     // kick off job
     super.start();
-    log.info(`Started Token Balance Cache with ${prefetchedTokenMeta ? prefetchedTokenMeta.length : 0} tokens.`);
+    log.info(`Started Token Balance Cache.`);
   }
 
-  public async reset(prefetchedTokenMeta?: TokenForumMeta[]) {
+  public async reset() {
     super.close();
     await this.access(async (cache) => {
       for (const key of Object.keys(cache)) {
         delete cache[key];
       }
     });
-    return this.start(prefetchedTokenMeta);
+    return this.start();
+  }
+
+  public async validateTopicThreshold(topicId: number, userAddress: string): Promise<boolean> {
+    if (!topicId || !userAddress) return true;
+    try {
+      const topic = await this.models.OffchainTopic.findOne({
+        where: { id: topicId },
+        include: [
+          {
+            model: this.models.Chain,
+            required: true,
+            as: 'chain',
+          },
+        ]
+      });
+      if (!topic?.chain) {
+        // if associated with an offchain community, always allow
+        return true;
+      }
+      const threshold = topic.token_threshold;
+      if (threshold) {
+        const nodes = await this.models.ChainNode.findAll({ where: { chain: topic.chain.id } });
+        if (!nodes || !nodes[0].eth_chain_id) {
+          throw new Error('Could not find chain node.');
+        }
+        const tokenBalance = await this.getBalance(nodes[0].eth_chain_id, topic.chain.id, userAddress);
+        log.info(`Balance: ${tokenBalance.toString()}, threshold: ${threshold.toString()}`);
+        return (new BN(tokenBalance)).gten(threshold);
+      } else {
+        return true;
+      }
+    } catch (err) {
+      log.warn(`Could not validate topic threshold for ${topicId}: ${err.message}`);
+      return false;
+    }
   }
 
   // query a user's balance on a given token contract and save in cache
-  public async getBalance(contractId: string, address: string, network = 'mainnet'): Promise<BN> {
-    const tokenMeta = await this.models.ChainNode.findOne({ where: { chain: contractId } })
-      || await this.models.Token.findOne({ where: { id: contractId } });
-    if (!tokenMeta?.address) throw new Error('unsupported token');
+  public async getBalance(chainId: number, contractId: string, address: string): Promise<BN> {
+    let contractAddress: string;
+    // See if token is already in the database as a Chain
+    const node = await this.models.ChainNode.findOne({
+      where: {
+        chain: contractId,
+        eth_chain_id: chainId,
+      }
+    });
+    if (node?.address) {
+      contractAddress = node.address;
+    }
 
-    // first check the cache for the token balance
+    // if token is not in the database, then query against the Token list
+    if (!contractAddress) {
+      const tokenMeta = await this.models.Token.findOne({
+        where: {
+          id: contractId,
+          chain_id: chainId,
+        }
+      });
+      if (!tokenMeta?.address) throw new Error('unsupported token');
+      contractAddress = tokenMeta.address;
+    }
+
+    // check the cache for the token balance
+    const cacheKey = getKey(chainId, contractAddress, address);
     const result = await this.access((async (c: CacheT): Promise<BN | undefined> => {
-      if (c[contractId]) {
-        return c[contractId][address]?.balance;
+      if (c[cacheKey]) {
+        return c[cacheKey].balance;
       } else {
         return undefined;
       }
@@ -112,9 +139,15 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     if (result !== undefined) return result;
 
     // fetch balance if not found in cache
+    const url = await getUrlForEthChainId(this.models, chainId);
+    if (!url) {
+      throw new Error(`unsupported eth chain id ${chainId}`);
+    }
+    const tokenUrlHttp = wsToHttp(url);
+
     let balance: BN;
     try {
-      balance = await this._balanceProvider.getBalance(tokenMeta.address, address);
+      balance = await this._balanceProvider.getBalance(tokenUrlHttp, contractAddress, address);
     } catch (e) {
       throw new Error(`Could not fetch token balance: ${e.message}`);
     }
@@ -122,28 +155,23 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
 
     // write fetched balance back to cache
     await this.access((async (c: CacheT) => {
-      if (!c[contractId]) {
-        c[contractId] = {};
-      }
-      c[contractId][address] = { balance, fetchedAt };
+      c[cacheKey] = { balance, fetchedAt };
     }));
     return balance;
   }
 
   // prune cache job
   protected async _job(cache: CacheT): Promise<void> {
-    for (const contract of Object.keys(cache)) {
-      for (const address of Object.keys(cache[contract])) {
-        if (cache[contract][address].balance.eqn(0)) {
-          // 5 minute lifetime (i.e. one job run) if no token balance
-          delete cache[contract][address];
-        } else {
-          // 24 hour lifetime if token balance
-          const cutoff = moment().subtract(this._hasBalancePruneTimeS, 'seconds');
-          const fetchedAt = cache[contract][address].fetchedAt;
-          if (fetchedAt.isSameOrBefore(cutoff)) {
-            delete cache[contract][address];
-          }
+    for (const key of Object.keys(cache)) {
+      if (cache[key].balance.eqn(0)) {
+        // 5 minute lifetime (i.e. one job run) if no token balance
+        delete cache[key];
+      } else {
+        // 24 hour lifetime if token balance exists
+        const cutoff = moment().subtract(this._hasBalancePruneTimeS, 'seconds');
+        const fetchedAt = cache[key].fetchedAt;
+        if (fetchedAt.isSameOrBefore(cutoff)) {
+          delete cache[key];
         }
       }
     }
