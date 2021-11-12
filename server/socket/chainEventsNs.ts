@@ -17,8 +17,8 @@ export function createCeNamespace(io: Server) {
 		// TODO: query user chain-events subscriptions
 		socket.join([])
 
-		socket.on('newSubscription', (subscriptionName) => {
-			socket.join(subscriptionName);
+		socket.on('newSubscription', (chain, kind) => {
+			socket.join(`${chain}-${kind}`);
 		})
 
 		socket.on('deleteSubscription', (subscriptionName) => {

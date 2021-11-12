@@ -12,6 +12,8 @@ export class WebSocketController {
 		this._socket.on('connect', this.onconnect.bind(this))
 		this._socket.on('connect_error', this.onconnect_error.bind(this))
 		this._socket.on('disconnect', this.ondisconnect.bind(this))
+
+		// add all custom namespaces i.e. chain-event notifications, chat, thread notifications
 		this.chainEventsNs = new ChainEventsNamespace(io, domain)
 	}
 

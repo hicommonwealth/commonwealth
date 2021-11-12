@@ -1,6 +1,7 @@
 // import io from 'socket.io-client';
 
-import { WebsocketNamespaces } from 'types';
+import { WebsocketMessageType, WebsocketNamespaces } from 'types';
+import { CWEvent } from '@commonwealth/chain-events';
 
 
 export class ChainEventsNamespace {
@@ -11,6 +12,19 @@ export class ChainEventsNamespace {
 		this.ceNs = io.of(`${domain}/${WebsocketNamespaces.ChainEvents}`);
 		this.ceNs.on('connect', this.onconnect.bind(this));
 		this.ceNs.on('disconnect', this.ondisconnect.bind(this))
+		this.ceNs.on(WebsocketMessageType.ChainEventNotification, this.onChainEvent.bind(this))
+	}
+
+	public addChainEventSubscription(chain: string, kind: string) {
+		this.ceNs.emit('newSubscription', chain, kind)
+	}
+
+	public deleteChainEventSubscription(chain: string, kind: string) {
+		this.ceNs.emit('deleteSubscription', chain, kind)
+	}
+
+	private onChainEvent(event: CWEvent) {
+		// TODO: create notificationRow and add it to the list of notifications
 	}
 
 	private onconnect() {
@@ -25,5 +39,4 @@ export class ChainEventsNamespace {
 	}
 
 	public get isConnected() { return this._isConnected }
-
 }
