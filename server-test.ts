@@ -14,7 +14,6 @@ import { SESSION_SECRET } from './server/config';
 import setupAPI from './server/router'; // performance note: this takes 15 seconds
 import setupPassport from './server/passport';
 import models from './server/database';
-import setupWebsocketServer from './server/socket';
 import {
   ChainBase,
   ChainNetwork,
@@ -332,8 +331,6 @@ const setupServer = () => {
       console.log(`Listening on port ${addr.port}`);
     }
   };
-
-  setupWebsocketServer(wss, server, sessionParser, false);
 
   server.listen(port);
   server.on('error', onError);

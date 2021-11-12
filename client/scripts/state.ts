@@ -8,6 +8,8 @@ import {
 import { EventEmitter } from 'events';
 import { getToastStore, ToastStore } from 'controllers/app/toasts';
 import { getModalStore, ModalStore } from 'controllers/app/modals';
+import { Socket } from 'socket.io-client';
+import { InviteCodeAttributes } from 'types';
 import RecentActivityController from './controllers/app/recent_activity';
 import ProfilesController from './controllers/server/profiles';
 import CommentsController from './controllers/server/comments';
@@ -21,7 +23,6 @@ import TopicsController from './controllers/server/topics';
 import CommunitiesController from './controllers/server/communities';
 import UserController from './controllers/server/user/index';
 import WebWalletController from './controllers/app/web_wallets';
-import { InviteCodeAttributes } from 'types';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',

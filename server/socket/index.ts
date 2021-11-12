@@ -1,147 +1,46 @@
-import WebSocket from 'ws';
-import * as jwt from 'jsonwebtoken';
-import http from 'http';
-import express from 'express';
-import * as net from 'net';
-import { WebsocketEventType, WebsocketMessageType, IWebsocketsPayload } from '../../shared/types';
-import { JWT_SECRET } from '../config';
+// Use https://admin.socket.io/#/ to monitor
 
-import { factory, formatFilename } from '../../shared/logging';
-const log = factory.getLogger(formatFilename(__filename));
+import { Server } from 'socket.io'
+import { instrument } from '@socket.io/admin-ui';
+import { BrokerConfig } from 'rascal';
+import { createCeNamespace, publishToCERoom } from './chainEventsNs';
+import { RabbitMQController } from '../util/rabbitmq/rabbitMQController';
+import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig'
 
-const ALIVE_TIMEOUT = 30 * 1000; // heartbeats are 15 seconds
-const EXPIRATION_TIME = 15 * 60 * 1000; // 15 minutes, same as session expiration
+// since the websocket servers are not linked with the main Commonwealth server we do not send the socket.io client
+// library to the user since we already import it + disable http long-polling to avoid sticky session issues
+const io = new Server({ serveClient: false, transports: ['websocket'], cors: {
+		origin: "http://localhost:8080", // TODO: change to commonwealth.im in prod/staging
+		methods: ["GET", "POST"]
+	}});
 
-class AuthWebSocket extends WebSocket {
-  isAlive?: boolean;
-  aliveTimer?: NodeJS.Timeout;
-  expirationTimer?: NodeJS.Timeout;
-  isAuthenticated?: boolean;
-  user?: any;
-}
+io.on('connection', (socket) => {
+	console.log('a user has connected')
+	socket.on('disconnect', () => {
+		console.log('user disconnected');
+	});
+});
 
-const userMap: { [user: number]: AuthWebSocket } = {};
-const sessionMap: { [session: string]: AuthWebSocket } = {};
+io.engine.on('connection_error', (err) => {
+	console.log(err.req);      // the request object
+	console.log(err.code);     // the error code, for example 1
+	console.log(err.message);  // the error message, for example "Session ID unknown"
+	console.log(err.context);  // some additional error context
+})
 
-export default function (
-  wss: WebSocket.Server,
-  server: http.Server,
-  sessionParser: express.RequestHandler,
-  logging: boolean
-) {
-  server.on(WebsocketEventType.Upgrade, (req: express.Request, socket: net.Socket, head) => {
-    log.trace('\nParsing session from request...\n');
-    sessionParser(req, {} as express.Response, () => {
-      if (!req.session) {
-        log.error('No session found.');
-        socket.destroy();
-        return;
-      }
+// create the chain-events namespace
+const ceNamespace = createCeNamespace(io);
 
-      log.trace('Session is parsed!');
+// enables the admin analytics dashboard (creates /admin namespace)
+instrument(io, {
+	auth: false,
+})
 
-      wss.handleUpgrade(req, socket, head, (ws) => {
-        wss.emit(WebsocketEventType.Connection, ws, req);
-      });
-    });
-  });
+io.listen(3002)
 
-  wss.on(WebsocketEventType.Connection, (ws: AuthWebSocket, req: express.Request) => {
-    const sessionId = req.sessionID;
-    sessionMap[sessionId] = ws;
+const rabbitController = new RabbitMQController(<BrokerConfig>RabbitMQConfig)
+rabbitController.init()
+	.then(() => {
+		return rabbitController.startSubscription(publishToCERoom.bind(ceNamespace), 'ChainEventsNotificationsSubscription')
+	})
 
-    let userId: number;
-    if (req.session && req.session.passport && req.session.passport.user) {
-      userId = req.session.passport.user;
-      userMap[userId] = ws;
-    }
-    ws.on(WebsocketEventType.Message, (message) => {
-      log.trace(`Received message ${message} from session ${sessionId}`);
-      try {
-        const payload: IWebsocketsPayload<any> = JSON.parse(message.toString());
-        if (payload.event === WebsocketMessageType.Heartbeat) {
-          ws.isAlive = true;
-
-          // reset liveness timers
-          if (ws.aliveTimer) clearTimeout(ws.aliveTimer);
-          ws.aliveTimer = global.setTimeout(() => { ws.isAlive = false; }, ALIVE_TIMEOUT);
-
-          if (ws.expirationTimer) clearTimeout(ws.expirationTimer);
-          ws.expirationTimer = global.setTimeout(() => {
-            // TODO: do i need to manually close the socket here?
-            log.trace(`Websocket ${sessionId} expired, emitting close`);
-            wss.emit(WebsocketEventType.Close);
-          }, EXPIRATION_TIME);
-
-          // get user if verified
-          if (payload.jwt) {
-            jwt.verify(payload.jwt, JWT_SECRET, async (err, decodedUser) => {
-              if (err) {
-                log.info(`received message with malformed JWT: ${payload.jwt}`);
-              } else {
-                ws.isAuthenticated = true;
-                ws.user = decodedUser;
-              }
-            });
-          }
-        } else {
-          log.error('received malformed message');
-        }
-      } catch (e) {
-        log.error('received malformed message');
-      }
-    });
-
-    ws.on(WebsocketEventType.Close, () => {
-      log.trace(`Received close event for websocket ${sessionId}`);
-      if (sessionMap[sessionId]) {
-        delete sessionMap[sessionId];
-      }
-      if (userId && userMap[userId]) {
-        delete userMap[userId];
-      }
-    });
-  });
-
-  // TODO: maybe unify these, or else remove the event type from payload and add it manually here?
-  wss.on(WebsocketMessageType.InitializeScrollback, (payload: IWebsocketsPayload<any>, userIds: number[]) => {
-    if (logging) log.info(`Payloading ${JSON.stringify(payload)} to users ${JSON.stringify(userIds)}`);
-    for (const user of userIds) {
-      if (user && user in userMap && userMap[user].isAlive) {
-        userMap[user].send(JSON.stringify(payload));
-      }
-    }
-  });
-
-  wss.on(
-    WebsocketMessageType.Notification,
-    (payload: IWebsocketsPayload<any>, notifications: { [user: number]: any }) => {
-      if (logging) {
-        log.info(`Payloading ${JSON.stringify(payload)} to users ${JSON.stringify(Object.keys(notifications))}`);
-      }
-      for (const [ user, notification ] of Object.entries(notifications)) {
-        if (user && user in userMap && userMap[user].isAlive) {
-          // augment notification with unique database id
-          payload.data.id = notification.id;
-          payload.data.subscription_id = notification.subscription_id;
-          userMap[user].send(JSON.stringify(payload));
-        }
-      }
-    }
-  );
-
-  wss.on(WebsocketMessageType.ChainEntity, (payload: IWebsocketsPayload<any>) => {
-    if (logging) log.info(`Payloading ${JSON.stringify(payload)}`);
-    for (const [ session, sessionSocket ] of Object.entries(sessionMap)) {
-      if (sessionSocket && sessionSocket.isAlive) {
-        sessionSocket.send(JSON.stringify(payload), (err?) => {
-          if (err) {
-            log.error(`Failed to send chain entity to session: ${session}`);
-            log.error(`Error: ${err}.`);
-            // TODO: remove from map if err is that it's closed?
-          }
-        });
-      }
-    }
-  });
-}

@@ -15,7 +15,8 @@
   "files": [
     "server/scripts/chainEventsConsumer.ts",
     "server/scripts/dbNode.ts",
-    "shared/logging.ts"
+    "shared/logging.ts",
+    "server/socket/index.ts"
   ],
   "include": [
     "server/models/*",
@@ -26,7 +27,6 @@
     "server/scripts/setupChainEventListeners.ts",
     "server/router.ts",
     "server/webhookNotifier.ts",
-    "server/socket",
     "server/migrations",
     "node_modules",
     "build",

@@ -24,6 +24,8 @@ import {
   Notification,
 } from 'models';
 
+import { socket } from 'controllers/server/socket/index2';
+
 import { notifyError, notifySuccess, notifyInfo } from 'controllers/app/notifications';
 import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
 import Community from 'controllers/chain/community/main';
@@ -860,6 +862,7 @@ Promise.all([
       // If the user updates their email
       handleUpdateEmailConfirmation();
 
+      app.socket = socket;
       // subscribe to notifications
       // const wsUrl = document.location.origin
       //   .replace('http://', 'ws://')

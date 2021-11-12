@@ -3,7 +3,6 @@ import http from 'http';
 import express from 'express';
 import { Express } from 'express-serve-static-core';
 import { DEFAULT_PORT } from '../config';
-import setupWebsocketServer from '../socket';
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -38,8 +37,6 @@ const setupServer = (app: Express, wss: WebSocket.Server, sessionParser: express
       log.info(`Listening on port ${addr.port}`);
     }
   };
-
-  setupWebsocketServer(wss, server, sessionParser, true);
 
   server.listen(port);
   server.on('error', onError);
