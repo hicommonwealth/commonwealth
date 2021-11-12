@@ -12,7 +12,6 @@ import $ from 'jquery';
 import { FocusManager } from 'construct-ui';
 import moment from 'moment';
 import mixpanel from 'mixpanel-browser';
-import _ from 'underscore';
 
 import app, { ApiStatus, LoginState } from 'state';
 import { ChainBase, ChainNetwork, ChainType } from 'types';
@@ -21,10 +20,9 @@ import {
   CommunityInfo,
   NodeInfo,
   NotificationCategory,
-  Notification,
 } from 'models';
 
-import { socket } from 'controllers/server/socket/index2';
+import { WebSocketController } from 'controllers/server/socket';
 
 import { notifyError, notifySuccess, notifyInfo } from 'controllers/app/notifications';
 import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
@@ -862,7 +860,7 @@ Promise.all([
       // If the user updates their email
       handleUpdateEmailConfirmation();
 
-      app.socket = socket;
+      app.socket = new WebSocketController("ws//localhost:3002")
       // subscribe to notifications
       // const wsUrl = document.location.origin
       //   .replace('http://', 'ws://')

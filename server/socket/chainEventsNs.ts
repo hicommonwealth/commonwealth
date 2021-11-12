@@ -9,9 +9,9 @@ export function createCeNamespace(io: Server) {
 	const CeNs = io.of('/chain-events');
 
 	CeNs.on('connection', (socket) => {
-		console.log('a user has connected')
+		log.info('a user has connected')
 		socket.on('disconnect', () => {
-			console.log('user disconnected');
+			log.info('user disconnected');
 		});
 
 		// TODO: query user chain-events subscriptions
