@@ -17,17 +17,21 @@ const fetchUniqueAddressesByRootIds = async (
   models: DB,
   { chain, root_ids }
 ) => {
+  const formattedIds = root_ids.map((root_id) => `'${root_id}'`);
   return sequelize.query<UniqueAddresses>(
     `
     select distinct cts.address_id, address, root_id, cts.chain
     from "OffchainComments" cts inner join "Addresses" adr
     on adr.id = cts.address_id
-    where root_id in (${root_ids.map((root_id) => `'${root_id}'`)})
-    and cts.chain = '${chain}'
+    where root_id in (?)
+    and cts.chain = '?'
     and deleted_at is null
     order by root_id
   `,
-    { type: QueryTypes.SELECT }
+    {
+      type: QueryTypes.SELECT,
+      replacements: [formattedIds, chain]
+    }
   );
 };
 
