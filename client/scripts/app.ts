@@ -581,6 +581,7 @@ Promise.all([
     '/terms':                    importRoute('views/pages/landing/terms', { scoped: false }),
     '/privacy':                  importRoute('views/pages/landing/privacy', { scoped: false }),
     '/components':               importRoute('views/pages/components', { scoped: false, hideSidebar: true }),
+    '/create-community':         importRoute('views/pages/create_community', { scoped: false, hideSidebar: true }),
     ...(isCustomDomain ? {
       //
       // Custom domain routes

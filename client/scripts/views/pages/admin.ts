@@ -17,7 +17,6 @@ import EdgewareFunctionPicker from 'views/components/edgeware_function_picker';
 import { DropdownFormField } from 'views/components/forms';
 import Tabs from 'views/components/widgets/tabs';
 import User from 'views/components/widgets/user';
-import CreateCommunityModal from 'views/modals/create_community_modal';
 import PageLoading from 'views/pages/loading';
 
 interface IChainManagerAttrs {
@@ -107,7 +106,10 @@ const ChainManager: m.Component<IChainManagerAttrs, IChainManagerState> = {
 
     return m('.ChainManager', [
       m('button', {
-        onclick: (e) => app.modals.create({ modal: CreateCommunityModal })
+        onclick: (e) => {
+          e.preventDefault();
+          m.route.set('/create-community');
+        }
       }, 'Add a new offchain community'),
       (app.config.chains.getAll() || []).map((chain) => m('.chain-row', [
         m('h3', [

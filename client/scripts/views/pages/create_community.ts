@@ -1,5 +1,5 @@
-// import 'modals/create_community_modal.scss';
 import 'pages/manage_community.scss';
+import 'pages/create_community.scss';
 
 import BN from 'bn.js';
 import m from 'mithril';
@@ -15,14 +15,14 @@ import { NearAccount } from 'controllers/chain/near/account';
 import Near from 'controllers/chain/near/main';
 import { isAddress } from 'web3-utils';
 
-import { CompactModalExitButton } from 'views/modal';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import {
   InputPropertyRow,
   TogglePropertyRow,
   SelectPropertyRow,
-} from '../pages/manage_community/metadata_rows';
+} from './manage_community/metadata_rows';
 import { initAppState } from '../../app';
+import { ALIGN_CENTER } from 'construct-ui/lib/esm/components/icon/generated/IconNames';
 
 enum CommunityType {
   OffchainCommunity = 'offchain',
@@ -81,7 +81,7 @@ const OffchainCommunityForm: m.Component<
       .map((_) => _.id)
       .filter((chain) => app.user.getAllRolesInCommunity({ chain }).length > 0);
 
-    return m('.compact-modal-body-max', [
+    return m('.class', [
       m('.CommunityMetadataManagementTable', [
         m(
           Table,
@@ -218,7 +218,6 @@ const OffchainCommunityForm: m.Component<
             })
               .then(async (res) => {
                 await initAppState(false);
-                $(e.target).trigger('modalexit');
                 m.route.set(`/${res.result.id}`);
               })
               .catch((err: any) => {
@@ -267,7 +266,7 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
     vnode.state.saving = false;
   },
   view: (vnode) => {
-    return m('.compact-modal-body-max', [
+    return m('.class', [
       m('.CommunityMetadataManagementTable', [
         m(
           Table,
@@ -432,7 +431,6 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
             })
               .then(async (res) => {
                 await initAppState(false);
-                $(e.target).trigger('modalexit');
                 m.route.set(`/${res.result.chain}`);
               })
               .catch((err: any) => {
@@ -517,7 +515,6 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
           })
             .then(async (res) => {
               await initAppState(false);
-              $(e.target).trigger('modalexit');
               m.route.set(`/${res.result.chain}`);
             })
             .catch((err: any) => {
@@ -612,7 +609,7 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
       }
     }
 
-    return m('.compact-modal-body-max', [
+    return m('.class', [
       m('.CommunityMetadataManagementTable', [
         m(
           Table,
@@ -781,7 +778,6 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
                 eth_chain_id: chain_id,
               });
               await initAppState(false);
-              $(e.target).trigger('modalexit');
               m.route.set(`/${res.result.chain?.id}`);
             } catch (err) {
               notifyError(
@@ -827,7 +823,7 @@ const SputnikForm: m.Component<SputnikFormAttrs, SputnikFormState> = {
     vnode.state.saving = false;
   },
   view: (vnode) => {
-    return m('.compact-modal-body-max', [
+    return m('.class', [
       m('.CommunityMetadataManagementTable', [
         m(
           Table,
@@ -996,7 +992,6 @@ const SputnikForm: m.Component<SputnikFormAttrs, SputnikFormState> = {
                 // POST object
                 const res = await $.post(`${app.serverUrl()}/addChainNode`, addChainNodeArgs);
                 await initAppState(false);
-                $(e.target).trigger('modalexit');
                 m.route.set(`${window.location.origin}/${res.result.chain}`);
               } catch (err) {
                 notifyError(err.responseJSON?.error || 'Adding DAO failed.');
@@ -1016,25 +1011,22 @@ interface CreateCommunityState {
   activeForm: string;
 }
 
-const CreateCommunityModal: m.Component<
+const CreateCommunity: m.Component<
   CreateCommunityAttrs,
   CreateCommunityState
 > = {
   oncreate: () => {
-    mixpanel.track('New Community', {
-      'Step No': 1,
-      Step: 'Modal Opened',
-    });
+    // mixpanel.track('New Community', {
+    //   'Step No': 1,
+    //   Step: 'Modal Opened',
+    // });
   },
   oninit: (vnode) => {
     vnode.state.activeForm = CommunityType.OffchainCommunity;
   },
   view: (vnode: m.VnodeDOM<CreateCommunityAttrs, CreateCommunityState>) => {
-    return m('.CreateCommunityModal', [
-      m('.compact-modal-title', [
-        m('h3', 'New Commonwealth Community'),
-        m(CompactModalExitButton),
-      ]),
+    return m('div', { class: 'container CreateCommunity' }, [
+      m('h3', 'New Commonwealth Community'),
       m(
         Tabs,
         {
@@ -1050,6 +1042,7 @@ const CreateCommunityModal: m.Component<
               vnode.state.activeForm = 'offchain';
               return null;
             },
+            style: 'text-align: center'
           }),
           m(TabItem, {
             label: 'ERC20',
@@ -1058,6 +1051,7 @@ const CreateCommunityModal: m.Component<
               vnode.state.activeForm = 'erc20';
               return null;
             },
+            style: 'text-align: center'
           }),
           app.user.isSiteAdmin &&
             m(TabItem, {
@@ -1068,6 +1062,7 @@ const CreateCommunityModal: m.Component<
                 vnode.state.activeForm = 'substrate';
                 return null;
               },
+              style: 'text-align: center'
             }),
           m(TabItem, {
             label: 'Sputnik (V2)',
@@ -1076,6 +1071,7 @@ const CreateCommunityModal: m.Component<
               vnode.state.activeForm = 'sputnik';
               return null;
             },
+            style: 'text-align: center'
           }),
         ]
       ),
@@ -1089,4 +1085,4 @@ const CreateCommunityModal: m.Component<
   },
 };
 
-export default CreateCommunityModal;
+export default CreateCommunity;

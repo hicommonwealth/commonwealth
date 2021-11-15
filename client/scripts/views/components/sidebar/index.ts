@@ -17,7 +17,7 @@ import SubscriptionButton from 'views/components/subscription_button';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import CommunitySelector from 'views/components/sidebar/community_selector';
-import CreateCommunityModal from 'views/modals/create_community_modal';
+
 
 import { discordIcon, telegramIcon, elementIcon, githubIcon, websiteIcon } from './icons';
 
@@ -81,7 +81,8 @@ const SidebarQuickSwitcher: m.Component<{}> = {
           rounded: true,
           label: m(Icon, { name: Icons.PLUS }),
           onclick: (e) => {
-            app.modals.create({ modal: CreateCommunityModal });
+            e.preventDefault();
+            m.route.set('/create-community');
           },
         }),
       ]),
