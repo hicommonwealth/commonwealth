@@ -3,7 +3,7 @@ import m from 'mithril';
 import { Table, Button } from 'construct-ui';
 
 import { CommunityInfo, ChainInfo } from 'models';
-import { notifyError } from 'controllers/app/notifications';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import {
   InputPropertyRow,
   TogglePropertyRow,
@@ -26,6 +26,7 @@ interface ICommunityMetadataManagementState {
   customStages: string;
   customDomain: string;
   terms: string;
+  defaultSummaryView: boolean;
   uploadInProgress: boolean;
 }
 
@@ -54,6 +55,7 @@ const CommunityMetadataManagementTable: m.Component<
     vnode.state.customStages = vnode.attrs.community.customStages;
     vnode.state.customDomain = vnode.attrs.community.customDomain;
     vnode.state.terms = vnode.attrs.community.terms;
+    vnode.state.defaultSummaryView = vnode.attrs.community.defaultSummaryView;
   },
   view: (vnode) => {
     return m('.CommunityMetadataManagementTable', [
@@ -198,6 +200,17 @@ const CommunityMetadataManagementTable: m.Component<
                 ? 'Anyone can invite new members'
                 : 'Admins/mods can invite new members',
           }),
+          m(TogglePropertyRow, {
+            title: 'Summary view',
+            defaultValue: vnode.attrs.community.defaultSummaryView,
+            onToggle: (checked) => {
+              vnode.state.defaultSummaryView = checked;
+            },
+            caption: (checked) =>
+              checked
+                ? 'Discussion listing defaults to summary view'
+                : 'Discussion listing defaults to latest activity view',
+          }),
           m('tr', [
             m('td', 'Admins'),
             m('td', [
@@ -223,30 +236,13 @@ const CommunityMetadataManagementTable: m.Component<
             ]),
         ]
       ),
-      m(Button, {
-        label: 'Save changes',
-        disabled: vnode.state.uploadInProgress,
-        intent: 'primary',
-        rounded: true,
-        onclick: async (e) => {
-          const {
-            name,
-            description,
-            iconUrl,
-            website,
-            discord,
-            element,
-            telegram,
-            github,
-            stagesEnabled,
-            customStages,
-            customDomain,
-            terms,
-            invitesEnabled,
-            privacyEnabled,
-          } = vnode.state;
-          try {
-            await vnode.attrs.community.updateCommunityData({
+      m('.button-wrap', [
+        m(Button, {
+          label: 'Save changes',
+          disabled: vnode.state.uploadInProgress,
+          intent: 'primary',
+          onclick: async (e) => {
+            const {
               name,
               description,
               iconUrl,
@@ -259,15 +255,35 @@ const CommunityMetadataManagementTable: m.Component<
               customStages,
               customDomain,
               terms,
-              privacyEnabled,
               invitesEnabled,
-            });
-            $(e.target).trigger('modalexit');
-          } catch (err) {
-            notifyError(err.responseJSON?.error || 'Community update failed');
-          }
-        },
-      }),
+              privacyEnabled,
+              defaultSummaryView,
+            } = vnode.state;
+            try {
+              await vnode.attrs.community.updateCommunityData({
+                name,
+                description,
+                iconUrl,
+                website,
+                discord,
+                element,
+                telegram,
+                github,
+                stagesEnabled,
+                customStages,
+                customDomain,
+                terms,
+                privacyEnabled,
+                invitesEnabled,
+                defaultSummaryView,
+              });
+              notifySuccess('Community updated');
+            } catch (err) {
+              notifyError(err.responseJSON?.error || 'Community update failed');
+            }
+          },
+        }),
+      ])
     ]);
   },
 };

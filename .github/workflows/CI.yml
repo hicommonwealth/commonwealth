@@ -47,6 +47,9 @@ jobs:
       - name: Install dependencies
         run: yarn
         
+      - name: Typecheck
+        run: yarn check-types
+
       - name: Run API tests
         run: yarn test-api
         env:

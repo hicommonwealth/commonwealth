@@ -10,8 +10,7 @@ import {
 import Sequelize from 'sequelize';
 const Op = Sequelize.Op;
 
-import { addPrefix, factory, formatFilename } from '../../shared/logging';
-const log = factory.getLogger(formatFilename(__filename));
+import { addPrefix, factory } from '../../shared/logging';
 
 // A mapping of supported Event Kinds to create empty profiles for, along with
 // the specific field to use in fetching the address.
@@ -28,12 +27,13 @@ const SUPPORTED_KIND_FIELDS = {
 };
 
 export default class extends IEventHandler {
+  public readonly name = 'Profile Creation';
+
   constructor(private readonly _models, private readonly _chain?: string) {
     super();
   }
 
   public async handle(event: CWEvent, dbEvent) {
-    // eslint-disable-next-line @typescript-eslint/no-shadow
     const log = factory.getLogger(addPrefix(__filename, [event.network, event.chain]));
     const chain = event.chain || this._chain;
 
@@ -68,7 +68,7 @@ export default class extends IEventHandler {
 
       // create a new address and profile
       addressInstance = await this._models.Address.createEmpty(chain, address);
-      const profileInstance = await this._models.OffchainProfile.create({
+      await this._models.OffchainProfile.create({
         address_id: addressInstance.id,
       });
       // NOTE: if creating from identity, then identity info will be set on profile
