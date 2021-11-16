@@ -553,7 +553,7 @@ class ThreadsController {
       linking_thread_id,
       linked_thread_id,
       address: app.user.activeAccount.address,
-      author_chain: app.user.activeAccount.chain,
+      author_chain: app.user.activeAccount.chain.id,
       jwt: app.user.jwt,
     });
     if (response.status !== 'Success') {
@@ -572,7 +572,7 @@ class ThreadsController {
       linking_thread_id,
       linked_thread_id,
       address: app.user.activeAccount.address,
-      author_chain: app.user.activeAccount.chain,
+      author_chain: app.user.activeAccount.chain.id,
       remove_link: true,
       jwt: app.user.jwt,
     });
