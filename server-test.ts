@@ -25,8 +25,7 @@ import ViewCountCache from './server/util/viewCountCache';
 import IdentityFetchCache from './server/util/identityFetchCache';
 import TokenBalanceCache from './server/util/tokenBalanceCache';
 import { MockTokenBalanceProvider } from './test/util/modelUtils';
-import { ServerError, AppError } from './server/util/errors';
-import { setupErrorHandlers } from './server/scripts/setupErrorHandlers';
+import setupErrorHandlers from './server/scripts/setupErrorHandlers';
 
 require('express-async-errors');
 

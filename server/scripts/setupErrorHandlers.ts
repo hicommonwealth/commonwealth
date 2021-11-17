@@ -6,7 +6,7 @@ import { ServerError, AppError } from '../util/errors';
 // 401 Unauthorized errors are handled by Express' middleware and returned
 // before this handler. Errors that hit the final condition should be either
 // (1) thrown as ServerErrors or AppErrors or (2) triaged as a critical bug.
-export const setupErrorHandlers = (app) => {
+const setupErrorHandlers = (app) => {
   // Rollbar notifications
   const rollbar = new Rollbar({
     accessToken: ROLLBAR_SERVER_TOKEN,
@@ -52,3 +52,5 @@ export const setupErrorHandlers = (app) => {
     }
   });
 };
+
+export default setupErrorHandlers;
