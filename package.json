@@ -195,7 +195,7 @@
     "postcss-preset-env": "^6.7.0",
     "prerender": "^5.6.0",
     "prerender-node": "^3.2.5",
-    "prettier": "^2.3.0",
+    "prettier": "2.4.1",
     "quill-2.0-dev": "^2.0.0-dev.3",
     "quill-image-drop-and-paste": "^1.0.4",
     "quill-image-uploader": "^1.0.2",
