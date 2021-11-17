@@ -477,6 +477,9 @@ button, .cui-button {
         .cui-icon svg {
             stroke: $text-color-black;
         }
+        a {
+            color: $text-color-black;
+        }
     }
     > .cui-menu-divider {
         margin: 6px 0 5px;

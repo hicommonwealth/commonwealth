@@ -28,6 +28,8 @@ import EditProfileModal from 'views/modals/edit_profile_modal';
 
 import QuillFormattedText from './quill_formatted_text';
 import MarkdownFormattedText from './markdown_formatted_text';
+import Token from 'controllers/chain/ethereum/token/adapter';
+import BN from 'bn.js';
 
 interface IThreadForm {
   topicName?: string;
@@ -658,8 +660,9 @@ export const NewThreadForm: m.Component<{
                   ? vnode.state.activeTopic
                   : localStorage.getItem(`${app.activeId()}-active-topic`),
                 topics: app.topics && app.topics.getByCommunity(app.activeId()).filter((t) => {
-                  // @To-do // Change this because right now the forum threshold is hardcoded to zero
-                  return isAdmin || (app.chain && toBN(0).gte(t.tokenThreshold));
+                  return isAdmin
+                    || t.tokenThreshold.isZero()
+                    || (app.chain instanceof Token && (t.tokenThreshold).lte((app.chain as Token).tokenBalance));
                 }),
                 featuredTopics: app.topics.getByCommunity(app.activeId())
                   .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
